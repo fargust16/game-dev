@@ -54,7 +54,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
 | [10 Turn Action Economy](10%20Turn%20Action%20Economy.md) | Draft | Move + Action + Bonus for turn-based V1 |
 | [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Draft | Square grid space + vault/climb/window verbs |
-| [12 Engine Choice](12%20Engine%20Choice.md) | Draft | Unity vs Godot for AI-assisted implementation |
+| [12 Engine Choice](12%20Engine%20Choice.md) | Draft | Engine locked: Unity URP + custom grid TB |
 | [11 Vertical Slice](11%20Vertical%20Slice.md) | Draft | First playable proof: 1 district, 3 POIs, TB combat |
 | [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) | Draft | Full cards for arrest, collectors, soot-stair trace |
 | [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md) | Draft | Walkable Lower Veil blockout before real systems |
@@ -160,7 +160,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: lock engine in 12 Engine Choice, then start S0 grid greybox.
+Next work: open `unity/` in Unity Hub and implement Milestone S0 grid greybox.
 
 ---
 

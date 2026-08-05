@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.14
+Version: 0.15
 
 Status: Draft
 
@@ -328,7 +328,7 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - Information comes from biased partial Information Sources; no omniscient quest spoiler log that replaces world reading.
 - V1 Turn Action Economy is Move + Action + short Bonus list, in and out of Confront. Do not invent a deep AP/reaction combat stack before the six Approaches are equally supported.
 - World space is square-grid-native from S0. Environment Actions (vault/climb/window/etc.) are first-class turn verbs with failure costs. Do not build off-grid levels and retrofit turns later.
-- Engine choice is pending in [12 Engine Choice](12%20Engine%20Choice.md); do not start implementation until locked.
+- Engine is Unity (URP, C#, folder `unity/`). Custom grid TB only; no marketplace tactics kit as architecture. Follow S0 before POI/combat logic.
 - The first implementation target is [11 Vertical Slice](11%20Vertical%20Slice.md): prove systems with tiny content, do not expand into full-game scope early.
 - Vertical Slice mood: Lord of the Mysteries-like 18–19th century industrial-occult transition; Lower Veil District; Wardens/Veinmarket both selectable; Death Gap out of slice; placeholder names mutable.
 
@@ -341,7 +341,7 @@ Current active design layer:
 1. Keep World Laws through Vertical Slice coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. Next: lock engine (Unity vs Godot), then implement Milestone S0 grid greybox. Do not jump to combat/POI logic before S0 acceptance.
+4. Next: implement Milestone S0 grid greybox in `unity/`. Do not jump to combat/POI logic before S0 acceptance.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

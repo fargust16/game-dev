@@ -1,6 +1,6 @@
 # 12 Engine Choice
 
-Version: 0.1
+Version: 1.0
 
 Status: Draft
 
@@ -16,108 +16,69 @@ Prototype repository setup and implementation milestones.
 
 # Purpose
 
-This document compares engines for implementing the Vertical Slice under the real production constraint of this project:
+This document records the implementation engine for the Vertical Slice under the production constraint:
 
 > AI agents do most of the implementation work from Canonical/Draft docs. The human helps, reviews, and unblocks.
 
-Candidate engines: **Unity** and **Godot 4**.
+# Decision
 
-# Project Constraints That Matter
+**Chosen engine: Unity**
 
-- solo / AI-assisted workflow;
-- documentation-first;
-- grid turn-based world from S0;
-- in-location TB combat + non-combat TB;
-- 3D industrial-era district slice;
-- long-term maintainability over flashy demos.
+| Field | Value |
+|-------|-------|
+| Engine | Unity |
+| Installed editor observed for this machine | `6000.3.9f1` (Unity 6) |
+| Render pipeline | URP |
+| Language | C# |
+| Project folder | `unity/` |
+| Architecture | Custom square grid + Turn Action Economy + Environment Actions |
 
-# Comparison
+Godot 4 was considered and remains historically documented below as the rejected alternative for this project phase.
 
-## Unity
+# Why Unity Was Chosen
 
-### Pros
+1. Human familiarity: the project creator can open the editor and help when AI gets stuck.
+2. Sufficient AI/code ecosystem for C# 3D prototypes.
+3. Acceptable for a custom grid TB game if marketplace combat kits are forbidden as architecture.
 
-- Human familiarity: you already know pieces of the editor, so you can help when AI gets stuck.
-- Huge training corpus: AI tools often produce Unity C# examples quickly.
-- Mature ecosystem for 3D, input, UI toolkits, packaging, and third-party grid/TB assets.
-- Easy to find human tutorials if a blocker is visual/editor-specific.
-- Fine for a grid TB architecture if we own our grid (do not depend on random Asset Store combat kits that fight the design docs).
+# Binding Implementation Constraints
 
-### Cons
-
-- Heavier install/tooling (Hub, editor versions, packages).
-- Scene/prefab workflows can be less transparent in git than Godot text scenes.
-- API churn across versions; AI sometimes suggests outdated Unity patterns.
-- License/account friction is usually fine for hobby, but still more corporate surface than Godot.
-- AI-generated Unity projects can accumulate package bloat if not constrained.
-
-### Best when
-
-The human will regularly open the editor, click scene objects, and rescue AI from Unity-specific confusion.
-
-## Godot 4
-
-### Pros
-
-- Lightweight, open source, simple project model.
-- Many core files are text (`.tscn`, `.gd`), which is often easier for AI agents and git diffs.
-- Fast iteration loop; good fit for greybox → systems.
-- No Hub/account required to start.
-- Godot 4 3D is good enough for a Vertical Slice district.
-- Clear ownership of a custom grid TB system (less temptation to import a mismatched kit).
-
-### Cons
-
-- You are less familiar, so human rescue may be slower at first.
-- Smaller Asset Store equivalent; more custom work for polish.
-- AI sometimes still defaults to Unity mental models and must be corrected.
-- Fewer “BG3-like” ready-made examples than Unity’s sea of tutorials.
-- C# in Godot is viable but ecosystem gravity is still GDScript-first.
-
-### Best when
-
-AI is the primary coder and the repo should stay small, text-diff friendly, and dependency-light.
-
-# Recommendation for This Project
-
-Because AI will do most implementation from our docs:
-
-- **Godot 4 is slightly better for AI-primary, git-friendly, lightweight iteration.**
-- **Unity is the better practical choice if your familiarity is the main human safety net.**
-
-Given you already prefer Unity and can intervene yourself, the recommended lock is:
-
-> **Unity (current LTS / stable supported version), URP, custom grid TB — no random combat Asset Store kit as architecture.**
-
-Godot remains a valid alternative if you later decide human editor familiarity matters less than repo simplicity.
-
-# Pending Confirmation
-
-Engine lock awaits explicit user confirmation:
-
-- **A)** Unity (recommended with your familiarity)
-- **B)** Godot 4 (recommended if optimizing purely for AI/git lightness)
-
-# Implementation Constraints if Unity Is Chosen
-
-1. Custom grid + Turn Action Economy owned by project code.
+1. Custom grid + Turn Action Economy owned by project code in `unity/`.
 2. Environment Actions from [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md) before fancy character controllers.
 3. Prefer URP and minimal packages.
-4. AI must follow docs in `11.x` milestones in order: S0 grid greybox before POI/combat logic.
-5. No replacing Decision Engine with a marketplace tactics pack.
+4. Follow milestones in order: S0 grid greybox before POI/combat logic.
+5. No replacing Decision Engine / Approaches with a marketplace tactics pack.
+6. Keep package bloat low; every package must earn its place.
+7. Design docs remain source of truth over random Unity tutorial patterns.
 
-# Implementation Constraints if Godot Is Chosen
+# Comparison Archive
 
-1. Same custom grid + TB ownership.
-2. Prefer GDScript or C# consistently (pick one at repo init and keep it).
-3. Same milestone order and doc obedience.
-4. Keep scenes/scripts text-friendly and small.
+## Unity — strengths for this project
+
+- human can rescue editor issues;
+- large AI training corpus;
+- mature 3D/input/UI ecosystem.
+
+## Unity — risks to watch
+
+- heavy tooling;
+- AI suggesting outdated APIs;
+- temptation to import mismatched Asset Store combat kits.
+
+## Godot 4 — why not chosen now
+
+- better git/text-diff lightness and lighter install;
+- but lower human familiarity here, which matters because the human is the safety net.
+
+# Next Implementation Step
+
+Create/maintain the Unity project under `unity/` and execute [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md) on a square grid.
 
 # Documentation Review
 
-- Does not change design fantasy; only selects delivery tool.
-- S0 remains first implementation milestone, now grid-native.
-- Final engine not Canonical until user confirms A or B.
+- Engine lock confirmed by project creator.
+- Does not change game fantasy; selects delivery tool only.
+- S0 remains first build milestone.
 
 # Related Documents
 

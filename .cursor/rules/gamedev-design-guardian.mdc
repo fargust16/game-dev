@@ -27,7 +27,7 @@ Information Sources are partial and biased; no omniscient quest spoiler log.
 V1 turns: Move + Action + short Bonus; same in and out of Confront.
 First build target: Vertical Slice with tiny content proving the systems; do not scope-creep into the full game.
 S0 greybox first: grid-native Lower Veil; Environment Action stubs allowed; no full combat/POI resolution until S0 acceptance.
-Lock engine via 12 Engine Choice before implementation.
+Engine locked: Unity in `unity/` (URP, C#, custom grid). Implement S0 greybox next.
 
 Design important choices as Decision Node + POI cards before writing content details.
 Side Events use timed lazy POIs; do not assume always-on scene simulation.
