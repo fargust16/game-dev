@@ -48,6 +48,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) | Draft | Practical card for designing one important choice |
 | [04 Points of Interest](04%20Points%20of%20Interest.md) | Draft | Timed map POIs, lazy activation, missed-event residue |
 | [05 Progression](05%20Progression.md) | Draft | Pathways 9→7, Conduct Progress, External Power Bargains |
+| [06 Approaches](06%20Approaches.md) | Draft | Confront, Convince, Threaten, Exchange, Veil, Withdraw |
 
 ### Reference
 
@@ -83,6 +84,8 @@ This repository is currently a design bible. Implementation begins only after th
     ↓
 05 Progression
     ↓
+06 Approaches
+    ↓
 Future systems
 ```
 
@@ -111,6 +114,7 @@ Draft foundations in active refinement:
 - [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) — practical design card
 - [04 Points of Interest](04%20Points%20of%20Interest.md) — map delivery + Active Windows + lazy activation
 - [05 Progression](05%20Progression.md) — 3 Pathways, stages 9→7, churches/entities as Bargains
+- [06 Approaches](06%20Approaches.md) — six methods of acting; combat is not the default best
 
 Not yet designing as content:
 
@@ -120,7 +124,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: Approaches Surface, Character creation-after-death, or remaining high-priority Open Questions.
+Next work: Character creation-after-death, first combat constraints under Confront, or remaining high-priority Open Questions.
 
 ---
 

@@ -10,7 +10,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md)
 
 Referenced By:
-[03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), Future quest, exploration, combat, progression, faction, magic, and economy design.
+[03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), Future quest, exploration, combat, progression, faction, magic, and economy design.
 
 ---
 
@@ -56,14 +56,14 @@ Attention creates curiosity pressure and opportunity cost. Ignoring something is
 
 **Choose how to act when multiple methods remain viable.**
 
-Examples of instantiation:
+Examples of instantiation are formalised in [06 Approaches](06%20Approaches.md):
 
-- fight, negotiate, infiltrate, barter, withdraw;
-- stalk and eavesdrop when stealth methods, skills, or artifacts allow it;
+- Confront, Convince, Threaten, Exchange, Veil, Withdraw;
+- stalk and eavesdrop under Veil when methods, skills, or artifacts allow it;
 - spare an NPC at a Yield Threshold in exchange for information;
-- solve a problem through force, knowledge, alliance, or avoidance.
+- solve a problem through force, speech, trade, secrecy, or avoidance.
 
-Approach forbids a single default answer. Combat is one Approach among several and must not be the universally best one.
+Approach forbids a single default answer. Confront is one Approach among several and must not be the universally best one.
 
 ## 3. Allegiance
 

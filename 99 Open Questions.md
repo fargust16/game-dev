@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [AGENTS.md](AGENTS.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -72,6 +72,14 @@ Starting Faction soft-nudges toward one Pathway; Pathway may also be gained thro
 **What belongs in the first Progression draft?**  
 Pathway rules plus churches/entities as External Power Bargains. Lore names, full lists, and stages below 7 come later.
 
+## Approaches
+
+**What methods exist in V1?**  
+Six Approaches: Confront, Convince, Threaten, Exchange, Veil, Withdraw. Documented in [06 Approaches](06%20Approaches.md).
+
+**Is combat the default best method?**  
+No. Confront is one Approach among several and must not have the universal best payoff.
+
 ---
 
 # High Priority
@@ -113,6 +121,14 @@ How strongly may a Starting Faction nudge before it becomes a soft lock?
 How do External Power Bargains interact with Pathway conduct when they pull in opposite directions?
 
 What happens if a character tries to abandon or switch Pathways after stage 9?
+
+## Approaches
+
+How much V1 support does each Approach need before it feels real (skills, UI verbs, simple checks)?
+
+When does Threaten escalate into Confront by rule rather than by writer taste?
+
+Should Bound Path get a light Rite/Invoke extension in V1, or remain under Exchange until V2?
 
 ## Character
 

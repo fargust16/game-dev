@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [AGENTS.md](AGENTS.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -240,7 +240,45 @@ Decision axis: engage the unknown, or defer/ignore it. Primary V1 teaching axis.
 
 ## Approach
 
-Decision axis: choose how to act when multiple methods remain viable. Combat is one Approach among several. Immediate companion to Attention in V1 teaching.
+Decision axis: choose how to act when multiple methods remain viable. Immediate companion to Attention in V1 teaching.
+
+Also used for one concrete method from the V1 set in [06 Approaches](06%20Approaches.md): Confront, Convince, Threaten, Exchange, Veil, Withdraw.
+
+---
+
+## Confront
+
+Approach: force the issue openly, including fight or open defiance.
+
+---
+
+## Convince
+
+Approach: change minds through persuasion, appeal, or shared interest, without fear as the main lever.
+
+---
+
+## Threaten
+
+Approach: compel through fear, pressure, or ultimatum.
+
+---
+
+## Exchange
+
+Approach: trade value for value — items, favours, services, secrets, or debts.
+
+---
+
+## Veil
+
+Approach: act with limited visibility — stalk, eavesdrop, sneak, or misdirect.
+
+---
+
+## Withdraw
+
+Approach: leave, delay, or refuse engagement. Meaningful because the world continues.
 
 ---
 
