@@ -1,6 +1,6 @@
 # 000 Project Rules
 
-Version: 1.12
+Version: 1.13
 
 Status: Canonical
 
@@ -111,6 +111,10 @@ Every new document must respect the following hierarchy.
 ↓
 
 11.1 Vertical Slice POIs
+
+↓
+
+11.2 Milestone S0 Greybox
 
 ↓
 
