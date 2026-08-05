@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.11.1
+Version: 0.12
 
 Status: Draft
 
@@ -90,6 +90,8 @@ Always respect this order:
         ↓
 11 Vertical Slice
         ↓
+11.1 Vertical Slice POIs
+        ↓
 All future documentation
 ```
 
@@ -126,6 +128,7 @@ If a contradiction appears, stop and explain it before continuing.
 - 09 Information Sources
 - 10 Turn Action Economy
 - 11 Vertical Slice
+- 11.1 Vertical Slice POIs
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md
@@ -327,7 +330,7 @@ Current active design layer:
 1. Keep World Laws through Vertical Slice coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. Next: flesh Vertical Slice POI/content under confirmed era mood, or begin Milestone S0 greybox planning.
+4. Next: Milestone S0 greybox planning, or review/revise the three authored slice POIs.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

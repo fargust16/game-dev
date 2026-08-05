@@ -1,6 +1,6 @@
 # 000 Project Rules
 
-Version: 1.11
+Version: 1.12
 
 Status: Canonical
 
@@ -107,6 +107,10 @@ Every new document must respect the following hierarchy.
 ↓
 
 11 Vertical Slice
+
+↓
+
+11.1 Vertical Slice POIs
 
 ↓
 

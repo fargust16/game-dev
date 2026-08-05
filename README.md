@@ -54,6 +54,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
 | [10 Turn Action Economy](10%20Turn%20Action%20Economy.md) | Draft | Move + Action + Bonus for turn-based V1 |
 | [11 Vertical Slice](11%20Vertical%20Slice.md) | Draft | First playable proof: 1 district, 3 POIs, TB combat |
+| [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) | Draft | Full cards for arrest, collectors, soot-stair trace |
 
 ### Reference
 
@@ -101,6 +102,8 @@ This repository is currently a design bible. Implementation begins only after th
     ↓
 11 Vertical Slice
     ↓
+11.1 Vertical Slice POIs
+    ↓
 Future systems
 ```
 
@@ -135,6 +138,7 @@ Draft foundations in active refinement:
 - [09 Information Sources](09%20Information%20Sources.md) — how the player learns without omniscient markers
 - [10 Turn Action Economy](10%20Turn%20Action%20Economy.md) — Move + Action + Bonus in turn-based mode
 - [11 Vertical Slice](11%20Vertical%20Slice.md) — first playable proof plan
+- [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) — detailed Lower Veil encounter cards
 
 Not yet designing as content:
 
@@ -144,7 +148,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: detail slice POI cards under the confirmed LoTM-era mood, or Milestone S0 greybox planning.
+Next work: Milestone S0 greybox planning, or polish/review the three slice POI cards.
 
 ---
 

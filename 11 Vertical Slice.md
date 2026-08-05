@@ -1,6 +1,6 @@
 # 11 Vertical Slice
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md)
 
 Referenced By:
-Future prototype milestones and first playable implementation planning.
+[11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), Future prototype milestones and first playable implementation planning.
 
 ---
 
@@ -111,31 +111,31 @@ Newspaper and Soft Memory are optional stretch goals.
 
 ## Points of Interest
 
-Exactly three authored POIs:
+Exactly three authored POIs. Full cards live in [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md).
 
-### POI A — Street Arrest of the Apothecary
+### POI A — Brass-Number Arrest at Harrow & Tincture
 
 - Type: Street Conflict
-- Window: Short
+- Window: Short (until second-shift whistle)
 - Axes: Allegiance + Approach (+ Attention)
 - Teaches: public fork, Influence residue, non-Confront options
-- Uses the existing worked example as the quality bar
+- Wardens vs Apothecary Harrow / Veinmarket pressure; "crowned buyer" hint
 
-### POI B — Night Abductions on the Street
+### POI B — Eleventh-Bell Collectors
 
 - Type: Street Conflict
-- Window: Brief (one night)
+- Window: Brief (eleventh bell to ~02:00)
 - Axes: Allegiance + Approach (+ Attention/Commitment)
 - Teaches: rescue-vs-trail tension, urgency, Turn-Based Confront likely
-- Uses the existing worked example as the quality bar
+- Loom Lane mill-girl abductions; links to black tincture / crowned demand
 
-### POI C — Aftermath Trace
+### POI C — Soot Stair Trace
 
 - Type: Trace / Clue
 - Window: Standard
-- Axes: Attention + Approach
+- Axes: Attention + Approach (+ Bargain tease)
 - Appears after A or B resolves (participated or missed)
-- Teaches: world continues; information chain; Physical Trace reading
+- Teaches: world continues; A+B linkage; Physical Trace reading; priced black-drop Bargain
 
 ## Approaches and Confront
 
