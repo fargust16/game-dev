@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [AGENTS.md](AGENTS.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -193,6 +193,12 @@ The terminal transition of a world after Balance is irreversibly broken and a do
 ## Decision Engine
 
 The systemic rules that make every important player choice interesting. Foundation for quests, exploration, combat, progression, factions, and world interaction.
+
+---
+
+## Decision Node
+
+One important player choice moment designed with the Decision Node Template. It activates Decision Axes, preserves Partial Uncertainty, produces Readable Consequences, and leaves world residue.
 
 ---
 

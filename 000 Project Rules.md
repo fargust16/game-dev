@@ -1,6 +1,6 @@
 # 000 Project Rules
 
-Version: 1.2
+Version: 1.3
 
 Status: Canonical
 
@@ -71,6 +71,10 @@ Every new document must respect the following hierarchy.
 ↓
 
 03 Decision Engine
+
+↓
+
+03.1 Decision Node Template
 
 ↓
 

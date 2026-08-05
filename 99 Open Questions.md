@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [AGENTS.md](AGENTS.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -52,6 +52,9 @@ Player Knowledge unlocks reasoning, important places, methods, and prediction. I
 **External powers / churches / curses?**  
 Always Bargains with readable, often delayed escalating prices. Detailed systems deferred to Progression / Magic docs.
 
+**Two-axis rule for V1 nodes?**  
+Important Decision Nodes require at least two axes. Rare one-axis moments are allowed only as non-major onboarding, not as main forks. Documented in [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md).
+
 ---
 
 # High Priority
@@ -73,8 +76,6 @@ What are the V1 numeric ranges for Difficulty Pressure?
 When and how do Hidden consequences become discoverable across one Character Life versus across Legacy?
 
 What is the V1 readable vocabulary for communicating Opportunity Cost without UI overload?
-
-Should rare one-axis tutorial nodes be allowed, or is two-axis composition always mandatory even in onboarding?
 
 ## Progression Direction
 
