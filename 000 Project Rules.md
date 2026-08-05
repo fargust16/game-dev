@@ -1,6 +1,6 @@
 # 000 Project Rules
 
-Version: 1.1
+Version: 1.2
 
 Status: Canonical
 
@@ -63,6 +63,14 @@ Every new document must respect the following hierarchy.
 ↓
 
 01 Player Experience
+
+↓
+
+02 World Laws
+
+↓
+
+03 Decision Engine
 
 ↓
 

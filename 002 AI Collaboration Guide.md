@@ -1,16 +1,16 @@
 # 002 AI Collaboration Guide
 
-Version: 1.0
+Version: 1.0.1
 
 Status: Canonical
 
-Last Updated: 2026-08-04
+Last Updated: 2026-08-05
 
 Depends On:
 000 Project Rules
 
 Referenced By:
-All future design work
+All future design work, [AGENTS.md](AGENTS.md)
 
 ---
 

@@ -1,6 +1,6 @@
 # 02 World Laws
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md)
 
 Referenced By:
-Future world, faction, consequence, and collapse-system design.
+[03 Decision Engine](03%20Decision%20Engine.md), Future world, faction, consequence, progression, and collapse-system design.
 
 ---
 
@@ -18,7 +18,7 @@ Future world, faction, consequence, and collapse-system design.
 
 This document defines the systemic laws governing the world itself, independent of lore. It is the design basis for world-state changes, faction behaviour, readable consequences, and world collapse. Future faction, settlement, economy, and consequence systems must depend on this document.
 
-The document deliberately defines a lightweight, expandable model. It does not prescribe fictional factions, settings, gods, or magic.
+The document deliberately defines a lightweight, expandable model. It does not prescribe fictional faction identities, settings, gods, or spell lists.
 
 # First Law
 
@@ -34,18 +34,75 @@ No faction truly preserves Balance. Every faction pursues its own long-term goal
 
 Balance is a hidden systemic condition. It is inferred through the world rather than displayed as a single player-facing meter.
 
+## What changes Balance
+
+Balance shifts primarily through **Faction Influence**.
+
+Faction Influence rises when a faction completes Main Goals and can also shift through Side Events and player Allegiance choices. Higher Influence makes a faction harder to oppose and more able to reshape everyday life. Accumulated Influence of competing factions is the pressure that eventually breaks Balance into World Collapse.
+
+# World Seed
+
+Every world is created from a **World Seed**.
+
+The seed determines, at minimum:
+
+- starting world conditions;
+- starting Faction Influence values;
+- which Main Goals are active and their concrete details;
+- Side Event generation;
+- priorities used by the World Engine.
+
+The seed must change details enough that memorised answers from a previous world do not solve the next one. Player Knowledge still transfers as methods of reading and intervening, not as a solved checklist.
+
+# Factions
+
+Each faction owns:
+
+- one or more Main Goals drawn from a limited pool;
+- available Operations;
+- current Faction Influence;
+- conditions required to execute each Operation;
+- access to followers, mentors, artifacts, and economic niches scaled by Influence.
+
+Factions pursue Main Goals independently of the player. The player may participate, interfere, ignore, support, or betray.
+
+## Main Goals
+
+Main Goals come from a **limited pool**.
+
+The seed changes details such as:
+
+- location;
+- timing;
+- involved actors;
+- required conditions;
+- local dressing of the same underlying goal type.
+
+When a faction completes a Main Goal:
+
+1. its Faction Influence increases;
+2. the world changes in a readable way under that Influence;
+3. future Operations become easier, more frequent, or better supported for that faction.
+
+## Side Events
+
+Side Events are secondary, seed-generated situations. They are useful, but never free power.
+
+A Side Event is an Allegiance-bearing decision:
+
+- helping one side yields one benefit;
+- helping the other yields a different benefit;
+- Influence shifts a little toward the supported side;
+- the exact Influence shift stays hidden unless the player understands the faction affiliations involved;
+- the choice may open some paths and close others.
+
+Valid Side Event outcomes include allies, mentors, consumables, clues, artifacts, skills for followers, or Knowledge. The design rule is not "always a gift," but "always a meaningful fork with world residue."
+
 # World Engine
 
 The World Engine is a lightweight scheduler of consequential faction actions. It does **not** simulate civilizations, populations, or every NPC decision.
 
-Each faction owns only:
-
-- long-term goals;
-- available operations;
-- current Faction Influence;
-- conditions required to execute each operation.
-
-At defined world intervals, the World Engine attempts one eligible operation. This keeps the simulation bounded, legible, and feasible for a solo developer while allowing the world to evolve without the player.
+At defined world intervals, the World Engine inspects each faction's current Main Goal, requirements, and eligible Operations, then attempts an eligible Operation. This keeps the simulation bounded, legible, and feasible for a solo developer while allowing the world to evolve without the player.
 
 Operations may include, for example:
 
@@ -64,60 +121,112 @@ Every operation may:
 - fail;
 - be stopped by the player;
 - be stopped by another faction;
-- fail because of a random world event.
+- fail because of an observable world event.
 
 Random world events must never function as opaque outcome rolls. They are observable conditions or events with readable effects. The player cannot always prevent them, but can learn how they alter operation outcomes and use that knowledge to predict consequences.
 
+## Player intervention
+
+The player may intervene in any faction confrontation or Operation if they are in the right place at the right time.
+
+Place and time are Information problems. The player may learn them from faction followers or related NPCs through Approaches such as:
+
+- persuasion / dialogue, affected by character traits and Knowledge;
+- intimidation;
+- barter of an artifact, favour, or service;
+- combat, which may yield information only if the player has a method, skill, or artifact for extraction — otherwise the NPC may simply die with the secret;
+- stalking and eavesdropping, if the player has a stealth-capable method, skill, or artifact;
+- a **Yield Threshold**: before defeat or death, an NPC who values survival may offer the needed information in exchange for being spared.
+
+These Approaches instantiate the Decision Engine. Combat is never the only valid route to information.
+
 ## Incremental scope
 
-**V1:** A small number of factions, a fixed set of operations, simple eligibility conditions, and one attempted operation per interval. Every operation creates at least one readable symptom or persistent consequence.
+**V1:** A small number of factions, a fixed Operation set, Main Goals from a small pool, seed-driven details, simple Side Events with Allegiance forks, and one attempted Operation per interval. Every Operation or Side Event creates at least one Symptom or Readable Consequence.
 
-**V2:** Operations can modify one another's conditions and Faction Influence, allowing indirect conflict and delayed consequences.
+**V2:** Operations and Side Events modify one another's conditions and Faction Influence more richly. Stalking, barter chains, and Yield Threshold behaviour become common tools.
 
-**V3:** Operations may form longer chains and create emergent, unintended cooperation between factions. The World Engine remains operation-based rather than becoming a full civilization simulation.
+**V3:** Longer Operation chains, emergent unintended faction cooperation, and denser seed variation while remaining operation-based rather than a full civilization simulation.
 
 # Symptoms
 
 The player never sees faction progress values or hidden Faction Influence. Instead, the player observes **Symptoms** and reads the world.
 
-Symptoms may include:
+Influence spreads through everyday systems, for example:
 
-- shops closing;
-- merchants disappearing;
-- price increases;
-- mentors leaving;
-- churches changing;
-- strange sermons;
-- disappearances;
-- increased monster activity;
-- dangerous districts;
-- new patrols;
-- rumours;
-- corrupted locations.
+- trade prices, quality, and availability;
+- rest and services becoming restricted or faction-coloured;
+- mentors appearing or leaving;
+- shops closing or changing owners;
+- churches, sermons, and public mood shifting;
+- disappearances and corrupted locations;
+- random encounters growing more frequent or dangerous at night, then later in daytime;
+- otherworldly pressure becoming more likely to find the player;
+- rumours, patrols, and unsafe districts.
 
-Symptoms must be sufficiently consistent for players to form and test hypotheses. They create the context-gathering phase of the Core Loop and let knowledge improve future decisions without exposing a progress bar.
+Symptoms must be consistent enough for hypothesis-forming. They create the context-gathering phase of the Core Loop and let Knowledge improve future decisions without exposing a progress bar.
+
+# Starting Faction and Difficulty
+
+A new character begins aligned with one **Starting Faction** and receives an initial understanding of that faction's current Main Goal and what pursuing it requires.
+
+The character may later betray, defect, or realign. Allegiance change is real and costly: Influence, access, Symptoms, and available paths all change.
+
+## Difficulty Pressure
+
+World Difficulty modifies non-player factions at world creation:
+
+| Difficulty | Pressure |
+|------------|----------|
+| Easy | Pressure favours the player's Starting Faction |
+| Normal | Slight pressure favours opposing factions |
+| Hard | Strong pressure favours opposing factions |
+| Hell | Severe pressure favours opposing factions |
+
+Difficulty must create challenge through Influence, Operation frequency, follower strength, economic disadvantage, and Symptom harshness. It must not invent unknowable randomness or erase the value of Knowledge.
+
+Exact numeric bonuses remain an implementation detail for a later tuning pass. The directional rule above is binding for design.
+
+# Economy Hook
+
+Economy is an expression of Faction Influence.
+
+As a faction's Influence grows, it occupies niches: better access, better prices for allies, worse prices or closed services for opponents, stronger artifacts and support. Detailed economy simulation is deferred, but future economy design must treat Influence as the primary driver rather than an isolated shop spreadsheet.
 
 # World Collapse
 
-A world never ends because of a timer. It ends because Balance has been irreversibly broken: a dominant faction achieves its objective and the world transitions into a terminal state.
+A world never ends because of a timer. It ends because Balance has been irreversibly broken: dominant Faction Influence and completed Main Goals push the world into a terminal state.
 
 The player may delay collapse, redirect which terminal state occurs, or accelerate collapse. The player can never prevent collapse forever. This preserves the finite-world Meta Loop while giving choices meaningful consequences.
 
-The exact conditions that change Balance, define faction victory, and determine whether recovery is possible remain open design questions. No implementation may assume answers before they are resolved.
+Whether Balance can partially recover without the player, and the exact terminal win condition per faction identity, remain open questions. No implementation may invent answers before they are documented.
 
 # Knowledge
 
-The world becomes increasingly understandable through play. Failure should result primarily from incomplete understanding, poor preparation, or accepting a known risk—not from unknowable randomness.
+The world becomes increasingly understandable through play. Failure should result primarily from incomplete understanding, poor preparation, or accepting a known risk — not from unknowable randomness.
 
-By observing Symptoms, operations, and their consequences, the player learns to anticipate likely future changes. Knowledge never guarantees control: it improves prediction and opens better interventions, while the world retains uncertainty and independent agency.
+By observing Symptoms, Operations, and consequences, the player learns to anticipate likely future changes. Knowledge never guarantees control: it improves prediction and opens better interventions, while the world retains uncertainty and independent agency.
+
+Important places, faction tells, information Approaches, and the long-term meaning of bargains are prime Knowledge targets. Character power systems that use formulas, ingredients, or pathways are future Progression design; they must obey Price of Power and must not replace Knowledge with a pure success-rate bonus.
+
+# External Power Principle
+
+Any power granted by otherworldly entities, churches, deities, or similar external sources is a **Bargain**:
+
+- the advantage is real;
+- the price is readable eventually;
+- the price is often delayed and escalates;
+- refusal remains a valid choice.
+
+Detailed curse, blessing, and pathway systems belong to future Progression / Magic documents. They may not contradict this principle.
 
 # Documentation Review
 
-- **Vision:** Compatible. The World Engine reinforces a living, finite world and makes knowledge more valuable than numerical power.
-- **Core Loop:** Compatible. Symptoms provide discoverable context; operations generate meaningful consequences and new questions.
-- **Meta Loop:** Compatible. Collapse is state-driven rather than timer-driven, and the world continues to change after character death.
-- **Design Pillars:** Compatible. The model favours curiosity, trade-offs, incomplete knowledge, experimentation, and finite worlds.
-- **Player Experience:** Compatible. Readable symptoms support tension, agency, surprise with understandable causes, and learning after loss.
-- **Metadata and dependencies:** Present and linked. Affected canonical documents now include required metadata and references.
-- **Glossary:** Updated with Balance, World Engine, Operation, Symptoms, Faction Influence, and World Collapse.
-- **Open Questions:** Updated with the unresolved World Laws decisions that block detailed implementation.
+- **Vision:** Compatible. Living finite world, priced power, and Knowledge over raw control remain central.
+- **Core Loop:** Compatible. Symptoms, Side Events, and intervention Approaches feed notice → context → action → consequence → understanding.
+- **Meta Loop:** Compatible. Seeded worlds stay finite; Knowledge transfers as method, not solved answers.
+- **Design Pillars:** Compatible. Side Events are forks, not free loot; Difficulty raises challenge without erasing curiosity.
+- **Player Experience:** Compatible. Hidden Influence shifts reward understanding; Yield Threshold and eavesdropping support inventive Approaches.
+- **Decision Engine:** Compatible. Intervention and Side Events instantiate Attention, Approach, Allegiance, Commitment, and Bargain.
+- **Glossary:** Updated for Seed, Main Goal, Side Event, Starting Faction, Difficulty Pressure, Yield Threshold.
+- **Open Questions:** Resolved Influence/Balance driver, Engine selection basis, symptom direction, starting faction, difficulty direction; recovery and terminal win details remain open.
