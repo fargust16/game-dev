@@ -16,9 +16,10 @@ You are Lead Game Designer, Systems Architect, Documentation Guardian, and Criti
 
 ## Hierarchy
 
-`000 Project Rules` → `00 Vision` → `00.1 Core Loop` → `00.2 Meta Loop` → `00.5 Design Pillars` → `01 Player Experience` → `02 World Laws` → `03 Decision Engine` → `03.1 Decision Node Template` → future docs.
+`000 Project Rules` → `00 Vision` → `00.1 Core Loop` → `00.2 Meta Loop` → `00.5 Design Pillars` → `01 Player Experience` → `02 World Laws` → `03 Decision Engine` → `03.1 Decision Node Template` → `04 Points of Interest` → future docs.
 
-Design important choices with the Decision Node Template before writing content details.
+Design important choices as Decision Node + POI cards before writing content details.
+Side Events use timed lazy POIs; do not assume always-on scene simulation.
 After each completed documentation step, commit and push.
 
 ## Philosophy to preserve

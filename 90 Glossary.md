@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [AGENTS.md](AGENTS.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -199,6 +199,30 @@ The systemic rules that make every important player choice interesting. Foundati
 ## Decision Node
 
 One important player choice moment designed with the Decision Node Template. It activates Decision Axes, preserves Partial Uncertainty, produces Readable Consequences, and leaves world residue.
+
+---
+
+## Point of Interest
+
+A seed-driven map opportunity that can host a Decision Node or discovery beat. It stays computationally dormant until the player enters its interaction area or its Active Window expires.
+
+---
+
+## Active Window
+
+The finite lifetime of a Point of Interest measured in player world-time. Missing the window causes unattended resolution.
+
+---
+
+## Lazy Activation
+
+Performance and design rule: full encounter logic for a POI starts only when the player enters its interaction area. Timers and abstract world residue still advance without staging the scene.
+
+---
+
+## Unattended Resolution
+
+Outcome applied when a POI's Active Window ends without player participation. Weighted by Faction Influence and local state, never by opaque meaningless randomness. Leaves Symptoms or other Readable Consequences.
 
 ---
 

@@ -46,6 +46,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [02 World Laws](02%20World%20Laws.md) | Draft | World Engine, Balance, Symptoms, Collapse |
 | [03 Decision Engine](03%20Decision%20Engine.md) | Draft | What makes player decisions interesting |
 | [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) | Draft | Practical card for designing one important choice |
+| [04 Points of Interest](04%20Points%20of%20Interest.md) | Draft | Timed map POIs, lazy activation, missed-event residue |
 
 ### Reference
 
@@ -77,6 +78,8 @@ This repository is currently a design bible. Implementation begins only after th
     ↓
 03.1 Decision Node Template
     ↓
+04 Points of Interest
+    ↓
 Future systems
 ```
 
@@ -102,7 +105,8 @@ Draft foundations in active refinement:
 
 - [02 World Laws](02%20World%20Laws.md) — Influence, Seed, Main Goals, Side Events, Symptoms, Starting Faction, Difficulty
 - [03 Decision Engine](03%20Decision%20Engine.md) — five axes; V1 teaches Attention + Approach, then Bargain
-- [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) — practical design card + worked examples
+- [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) — practical design card
+- [04 Points of Interest](04%20Points%20of%20Interest.md) — map delivery + Active Windows + lazy activation
 
 Accepted direction, not yet a full system document:
 
@@ -116,7 +120,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: practice filling Decision Nodes together, then Approaches Surface or remaining high-priority Open Questions.
+Next work: practice filling Decision Node + POI cards together, then Approaches Surface or remaining high-priority Open Questions.
 
 ---
 

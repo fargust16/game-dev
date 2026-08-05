@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [AGENTS.md](AGENTS.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -55,6 +55,9 @@ Always Bargains with readable, often delayed escalating prices. Detailed systems
 **Two-axis rule for V1 nodes?**  
 Important Decision Nodes require at least two axes. Rare one-axis moments are allowed only as non-major onboarding, not as main forks. Documented in [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md).
 
+**How are Side Events delivered in the world?**  
+As timed Points of Interest with lazy activation, readable Active Windows, and Influence-weighted unattended resolution if missed. Documented in [04 Points of Interest](04%20Points%20of%20Interest.md).
+
 ---
 
 # High Priority
@@ -76,6 +79,16 @@ What are the V1 numeric ranges for Difficulty Pressure?
 When and how do Hidden consequences become discoverable across one Character Life versus across Legacy?
 
 What is the V1 readable vocabulary for communicating Opportunity Cost without UI overload?
+
+## Points of Interest
+
+What exact in-world durations belong to Brief / Short / Standard / Long / Persistent in V1?
+
+How exactly does the UI/map express urgency without becoming a stressful quest-timer game?
+
+How many active Marked POIs should a V1 district show at once?
+
+Can a Persistent POI still be finite without feeling like a fake timer?
 
 ## Progression Direction
 

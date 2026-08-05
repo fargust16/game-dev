@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft
 
@@ -74,6 +74,8 @@ Always respect this order:
         ↓
 03.1 Decision Node Template
         ↓
+04 Points of Interest
+        ↓
 All future documentation
 ```
 
@@ -102,6 +104,7 @@ If a contradiction appears, stop and explain it before continuing.
 - 02 World Laws
 - 03 Decision Engine
 - 03.1 Decision Node Template
+- 04 Points of Interest
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md
@@ -285,6 +288,7 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - External power is always a Bargain with readable, often delayed cost.
 - Player Knowledge unlocks reasoning; it is not primarily a success-rate bonus.
 - Pathway / potion / church details are Progression direction only until their own document exists.
+- Side Events and discoveries are delivered as timed Points of Interest with lazy activation; full scenes do not run until the player enters the area or the Active Window expires into unattended resolution.
 
 When the user shares vision instead of a direct Open Question answer, synthesise a clear Draft answer, challenge contradictions, then write it into documents only after confirmation.
 
@@ -292,8 +296,8 @@ When the user shares vision instead of a direct Open Question answer, synthesise
 
 Current active design layer:
 
-1. Keep [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), and [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) coherent while Draft.
-2. Design important choices with the Decision Node Template before writing content details.
+1. Keep World Laws, Decision Engine, Decision Node Template, and Points of Interest coherent while Draft.
+2. Design important choices as Decision Node + POI cards before writing content details.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
 4. Next likely Draft: Approaches Surface, or Progression constraints document.
 

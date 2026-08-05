@@ -1,6 +1,6 @@
 # 02 World Laws
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md)
 
 Referenced By:
-[03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), Future world, faction, consequence, progression, and collapse-system design.
+[03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), Future world, faction, consequence, progression, and collapse-system design.
 
 ---
 
@@ -87,6 +87,8 @@ When a faction completes a Main Goal:
 ## Side Events
 
 Side Events are secondary, seed-generated situations. They are useful, but never free power.
+
+In the playable world, Side Events are normally delivered as timed [Points of Interest](04%20Points%20of%20Interest.md): dormant until the player enters their area, finite in player world-time, and capable of unattended resolution if missed.
 
 A Side Event is an Allegiance-bearing decision:
 
