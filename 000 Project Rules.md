@@ -1,6 +1,6 @@
 # 000 Project Rules
 
-Version: 1.4
+Version: 1.5
 
 Status: Canonical
 
@@ -79,6 +79,10 @@ Every new document must respect the following hierarchy.
 ↓
 
 04 Points of Interest
+
+↓
+
+05 Progression
 
 ↓
 

@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [AGENTS.md](AGENTS.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -289,6 +289,36 @@ A readable change in world state caused by player action, failure, or World Engi
 ## External Power
 
 Capability granted by otherworldly entities, churches, deities, or similar sources. Always treated as a Bargain with a readable, often delayed and escalating price.
+
+---
+
+## Pathway
+
+A staged character-growth track distinct by way of acting. V1 has three Pathways and only stages 9 → 7. Lore names come later.
+
+---
+
+## Stage
+
+A numbered depth on a Pathway. Lower numbers are deeper advancements with sharper prices. V1 uses 9, 8, and 7 only.
+
+---
+
+## Conduct Progress
+
+Between-stage advancement evidence earned by living a Pathway's way of acting. It is not kill-XP and must not become a permanently solved checklist.
+
+---
+
+## Formula
+
+Discoverable advancement knowledge required for a Pathway stage. Concrete formulas vary by World Seed.
+
+---
+
+## Pathless
+
+A character state with no Pathway yet. Valid and sometimes freer, but without staged Pathway advancements.
 
 ---
 

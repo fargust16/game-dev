@@ -10,7 +10,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md)
 
 Referenced By:
-[03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), Future quest, exploration, combat, progression, faction, magic, and economy design.
+[03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), Future quest, exploration, combat, progression, faction, magic, and economy design.
 
 ---
 
@@ -320,15 +320,16 @@ Player Knowledge is what survives between Character Lives and worlds. It changes
 
 ## Character Progression Direction
 
-Character growth inside one life is not XP level-up. Future Progression design may use pathways, formulas, ingredients, staged advancement, churches, and otherworldly bargains. Those systems must:
+Character growth inside one life is not XP level-up. Detailed rules live in [05 Progression](05%20Progression.md):
 
-- gate power behind discovery and preparation;
-- require meaningful between-stage conduct or commitments where relevant;
-- vary concrete formulas and ingredients by World Seed;
-- treat every external power as a Bargain with readable, often delayed cost;
-- widen decision space rather than crowning one best build.
+- Pathways distinct by way of acting;
+- V1 stages 9 → 7;
+- Conduct Progress between stages;
+- seed-varying formulas and ingredients;
+- churches and entities as External Power Bargains;
+- decision space widened rather than one best build crowned.
 
-Detailed pathway rules belong in a future Progression document. This Decision Engine only constrains them.
+This Decision Engine still constrains Progression: power must remain priced, curious, and knowledge-led.
 
 A weaker character guided by stronger Player Knowledge should regularly outperform a stronger character guided by ignorance. That is a success condition for this document.
 

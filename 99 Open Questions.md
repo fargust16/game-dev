@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [AGENTS.md](AGENTS.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -47,16 +47,30 @@ Attention first, Approach immediately with it; Bargain as the second major lesso
 No. They are Allegiance forks with useful different outcomes, hidden Influence residue, and possible path open/close effects.
 
 **What is Knowledge for?**  
-Player Knowledge unlocks reasoning, important places, methods, and prediction. It is not primarily a success-rate bonus. Character pathway power is future Progression design constrained by Price of Power and Bargain.
+Player Knowledge unlocks reasoning, important places, methods, and prediction. It is not primarily a success-rate bonus. Character pathway power is Progression design constrained by Price of Power and Bargain.
 
 **External powers / churches / curses?**  
-Always Bargains with readable, often delayed escalating prices. Detailed systems deferred to Progression / Magic docs.
+Always Bargains with readable, often delayed escalating prices. Detailed systems deferred to content lists; rules documented in [05 Progression](05%20Progression.md).
 
 **Two-axis rule for V1 nodes?**  
 Important Decision Nodes require at least two axes. Rare one-axis moments are allowed only as non-major onboarding, not as main forks. Documented in [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md).
 
 **How are Side Events delivered in the world?**  
 As timed Points of Interest with lazy activation, readable Active Windows, and Influence-weighted unattended resolution if missed. Documented in [04 Points of Interest](04%20Points%20of%20Interest.md).
+
+## Progression
+
+**How many Pathways in V1?**  
+Three, distinct by way of acting, expandable later. Documented in [05 Progression](05%20Progression.md).
+
+**Which stages in V1?**  
+Only 9 → 8 → 7. Deeper stages later.
+
+**How is a Pathway obtained?**  
+Starting Faction soft-nudges toward one Pathway; Pathway may also be gained through Bargain, quest, or discovery. Not a prison. Pathless remains valid.
+
+**What belongs in the first Progression draft?**  
+Pathway rules plus churches/entities as External Power Bargains. Lore names, full lists, and stages below 7 come later.
 
 ---
 
@@ -90,15 +104,15 @@ How many active Marked POIs should a V1 district show at once?
 
 Can a Persistent POI still be finite without feeling like a fake timer?
 
-## Progression Direction
+## Progression
 
-How many pathways exist in V1?
+What are the exact V1 Conduct Progress thresholds for stages 9 → 8 and 8 → 7?
 
-How are between-stage conduct requirements defined without creating a single solved guide?
+How strongly may a Starting Faction nudge before it becomes a soft lock?
 
-How do seed-varying formulas and ingredients remain fair and discoverable?
+How do External Power Bargains interact with Pathway conduct when they pull in opposite directions?
 
-How does between-stage progress work so a character cannot skip straight from lowest to highest stage?
+What happens if a character tries to abandon or switch Pathways after stage 9?
 
 ## Character
 
@@ -153,6 +167,10 @@ Localization
 Accessibility
 
 Mod support
+
+Pathway lore names and full church/entity catalogues
+
+Stages 6 → 0 content
 
 ---
 

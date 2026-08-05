@@ -47,6 +47,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [03 Decision Engine](03%20Decision%20Engine.md) | Draft | What makes player decisions interesting |
 | [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) | Draft | Practical card for designing one important choice |
 | [04 Points of Interest](04%20Points%20of%20Interest.md) | Draft | Timed map POIs, lazy activation, missed-event residue |
+| [05 Progression](05%20Progression.md) | Draft | Pathways 9→7, Conduct Progress, External Power Bargains |
 
 ### Reference
 
@@ -80,6 +81,8 @@ This repository is currently a design bible. Implementation begins only after th
     ↓
 04 Points of Interest
     ↓
+05 Progression
+    ↓
 Future systems
 ```
 
@@ -107,10 +110,7 @@ Draft foundations in active refinement:
 - [03 Decision Engine](03%20Decision%20Engine.md) — five axes; V1 teaches Attention + Approach, then Bargain
 - [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) — practical design card
 - [04 Points of Interest](04%20Points%20of%20Interest.md) — map delivery + Active Windows + lazy activation
-
-Accepted direction, not yet a full system document:
-
-- Progression / pathways / external bargains
+- [05 Progression](05%20Progression.md) — 3 Pathways, stages 9→7, churches/entities as Bargains
 
 Not yet designing as content:
 
@@ -120,7 +120,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: practice filling Decision Node + POI cards together, then Approaches Surface or remaining high-priority Open Questions.
+Next work: Approaches Surface, Character creation-after-death, or remaining high-priority Open Questions.
 
 ---
 

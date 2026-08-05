@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
@@ -76,6 +76,8 @@ Always respect this order:
         ↓
 04 Points of Interest
         ↓
+05 Progression
+        ↓
 All future documentation
 ```
 
@@ -105,6 +107,7 @@ If a contradiction appears, stop and explain it before continuing.
 - 03 Decision Engine
 - 03.1 Decision Node Template
 - 04 Points of Interest
+- 05 Progression
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md
@@ -287,8 +290,8 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - Difficulty Pressure favours the player on Easy and opposing factions more as difficulty rises.
 - External power is always a Bargain with readable, often delayed cost.
 - Player Knowledge unlocks reasoning; it is not primarily a success-rate bonus.
-- Pathway / potion / church details are Progression direction only until their own document exists.
 - Side Events and discoveries are delivered as timed Points of Interest with lazy activation; full scenes do not run until the player enters the area or the Active Window expires into unattended resolution.
+- Progression has no XP level-up. V1 uses 3 Pathways distinct by way of acting, stages 9→7 only, soft faction nudge plus Bargain/quest acquisition, and churches/entities as External Power Bargains.
 
 When the user shares vision instead of a direct Open Question answer, synthesise a clear Draft answer, challenge contradictions, then write it into documents only after confirmation.
 
@@ -296,10 +299,10 @@ When the user shares vision instead of a direct Open Question answer, synthesise
 
 Current active design layer:
 
-1. Keep World Laws, Decision Engine, Decision Node Template, and Points of Interest coherent while Draft.
+1. Keep World Laws, Decision Engine, POI, and Progression coherent while Draft.
 2. Design important choices as Decision Node + POI cards before writing content details.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. Next likely Draft: Approaches Surface, or Progression constraints document.
+4. Next likely Draft: Approaches Surface, or Character Life / after-death creation.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 
