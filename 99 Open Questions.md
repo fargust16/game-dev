@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.11
+Version: 0.12
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [AGENTS.md](AGENTS.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -99,6 +99,9 @@ No. Confront constraints forbid XP-from-kills, abstract loot tables, and univers
 **What is V1 Confront presentation?**  
 In-location Turn-Based Mode, with reference feel from Baldur's Gate 3 / Fallout 1–2. Turn-Based Mode is also available outside combat for deliberate control. Documented in [08 Confront Constraints](08%20Confront%20Constraints.md).
 
+**How does the player learn about POIs and world pressure?**  
+Through reusable Information Sources with bias and partial truth: boards, newspapers, bartenders, rumours, faction contacts, witnesses, physical traces, Soft Memory. Documented in [09 Information Sources](09%20Information%20Sources.md).
+
 ---
 
 # High Priority
@@ -128,6 +131,14 @@ What exact in-world durations belong to Brief / Short / Standard / Long / Persis
 How exactly does the UI/map express urgency without becoming a stressful quest-timer game?
 
 How many active Marked POIs should a V1 district show at once?
+
+## Information Sources
+
+How many tips should a V1 district generate per day from boards / bartenders / rumours?
+
+When does a tip upgrade from Hinted to Marked by rule?
+
+How much false or slanted information is healthy in V1 before trust collapses?
 
 Can a Persistent POI still be finite without feeling like a fake timer?
 

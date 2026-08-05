@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.8.1
+Version: 0.9
 
 Status: Draft
 
@@ -84,6 +84,8 @@ Always respect this order:
         ↓
 08 Confront Constraints
         ↓
+09 Information Sources
+        ↓
 All future documentation
 ```
 
@@ -117,6 +119,7 @@ If a contradiction appears, stop and explain it before continuing.
 - 06 Approaches
 - 07 Character Life
 - 08 Confront Constraints
+- 09 Information Sources
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md
@@ -304,6 +307,7 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - Only the first character in a world gets Starting Faction. Later lives begin Factionless and need Faction Entry. Death uses a fixed Death Gap with world resolution. V1 intentional inheritance is a simple Legacy Cache marker. Soft Memory may affect dialogue/opinion; no bloodline respawn.
 - Confront has hard constraints: no XP-from-kills, diegetic loot only, information not free from victory, residue required, Break Away and Yield/Spare are first-class. Do not design a full combat system that violates [08 Confront Constraints](08%20Confront%20Constraints.md).
 - V1 Confront is in-location Turn-Based Mode (BG3 / Fallout 1–2 feel, not feature parity). Turn-Based Mode is also available outside combat for deliberate control.
+- Information comes from biased partial Information Sources; no omniscient quest spoiler log that replaces world reading.
 
 When the user shares vision instead of a direct Open Question answer, synthesise a clear Draft answer, challenge contradictions, then write it into documents only after confirmation.
 
@@ -311,10 +315,10 @@ When the user shares vision instead of a direct Open Question answer, synthesise
 
 Current active design layer:
 
-1. Keep World Laws through Confront Constraints coherent while Draft.
+1. Keep World Laws through Information Sources coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. Next likely Draft: information/discovery sources, or a minimal V1 Confront resolution model after presentation mode is chosen.
+4. Next likely Draft: minimal V1 turn action economy, or a vertical-slice content plan.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

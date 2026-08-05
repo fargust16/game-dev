@@ -10,7 +10,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md)
 
 Referenced By:
-[05 Progression](05%20Progression.md), Future map, exploration, side-event, quest, and world-presentation design.
+[05 Progression](05%20Progression.md), [09 Information Sources](09%20Information%20Sources.md), Future map, exploration, side-event, quest, and world-presentation design.
 
 ---
 
@@ -104,14 +104,15 @@ When the Active Window ends without activation:
 
 # Discovery
 
-POIs may be found by:
+POIs may be found by stumbling into the interaction area or through [Information Sources](09%20Information%20Sources.md):
 
-- stumbling into the interaction area;
-- newspapers;
+- newspapers / broadsheets;
 - notice boards;
 - bartenders and other informants;
-- rumours, letters, faction followers;
-- another POI that reveals a clue to this one.
+- street rumours;
+- faction contacts;
+- witnesses and physical traces;
+- Soft Memory and follow-up clue chains.
 
 ## Discovery states (V1)
 

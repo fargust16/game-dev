@@ -51,6 +51,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [06 Approaches](06%20Approaches.md) | Draft | Confront, Convince, Threaten, Exchange, Veil, Withdraw |
 | [07 Character Life](07%20Character%20Life.md) | Draft | Death Gap, Factionless successors, Legacy Cache, Soft Memory |
 | [08 Confront Constraints](08%20Confront%20Constraints.md) | Draft | Hard fence around combat so it cannot become the whole game |
+| [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
 
 ### Reference
 
@@ -92,6 +93,8 @@ This repository is currently a design bible. Implementation begins only after th
     ↓
 08 Confront Constraints
     ↓
+09 Information Sources
+    ↓
 Future systems
 ```
 
@@ -123,6 +126,7 @@ Draft foundations in active refinement:
 - [06 Approaches](06%20Approaches.md) — six methods of acting; combat is not the default best
 - [07 Character Life](07%20Character%20Life.md) — death gap, factionless later lives, legacy cache
 - [08 Confront Constraints](08%20Confront%20Constraints.md) — combat fence: no XP, diegetic loot, real alternatives
+- [09 Information Sources](09%20Information%20Sources.md) — how the player learns without omniscient markers
 
 Not yet designing as content:
 
@@ -132,7 +136,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: information/discovery sources, minimal V1 turn action economy, or remaining high-priority Open Questions.
+Next work: minimal V1 turn action economy, first vertical-slice content plan, or remaining high-priority Open Questions.
 
 ---
 

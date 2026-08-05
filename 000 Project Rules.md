@@ -1,6 +1,6 @@
 # 000 Project Rules
 
-Version: 1.8
+Version: 1.9
 
 Status: Canonical
 
@@ -95,6 +95,10 @@ Every new document must respect the following hierarchy.
 ↓
 
 08 Confront Constraints
+
+↓
+
+09 Information Sources
 
 ↓
 

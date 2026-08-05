@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.11
+Version: 0.12
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [AGENTS.md](AGENTS.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -297,6 +297,24 @@ Rewards that exist because a target carried or guarded them, not because a fight
 ## Turn-Based Mode
 
 Deliberate paced control mode used for Confront and optionally outside combat. Begins inside the current location; reference feel from Baldur's Gate 3 / Fallout 1–2 without requiring feature parity.
+
+---
+
+## Information Source
+
+A reusable channel through which the player learns partial world or POI information, such as notice boards, newspapers, bartenders, rumours, faction contacts, witnesses, physical traces, or Soft Memory.
+
+---
+
+## Hinted
+
+Discovery state where the player knows a region, type, or urgency of a POI without an exact map pin.
+
+---
+
+## Marked
+
+Discovery state where a POI is visible on the world map.
 
 ---
 
