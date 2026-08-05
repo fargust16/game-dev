@@ -1,6 +1,6 @@
 # 000 Project Rules
 
-Version: 1.10
+Version: 1.11
 
 Status: Canonical
 
@@ -103,6 +103,10 @@ Every new document must respect the following hierarchy.
 ↓
 
 10 Turn Action Economy
+
+↓
+
+11 Vertical Slice
 
 ↓
 

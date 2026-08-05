@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.13
+Version: 0.14
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [AGENTS.md](AGENTS.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -105,6 +105,9 @@ Through reusable Information Sources with bias and partial truth: boards, newspa
 **What is the V1 turn structure?**  
 Move + Action + optional short Bonus. Same economy in Confront and non-combat Turn-Based Mode. Documented in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md).
 
+**What is the first playable proof?**  
+A Vertical Slice in one district with 2 factions, 3 POIs, Information Sources, Turn-Based Mode, and one Bargain tease. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md). Pending confirmation on district/faction defaults.
+
 ---
 
 # High Priority
@@ -174,6 +177,14 @@ Grid, hex, or navmesh-free ranging for V1 turns?
 Exact initiative formula and Move Speed units for V1?
 
 Is Bonus-to-Dash enabled in V1 or deferred?
+
+## Vertical Slice
+
+Keep Lower Veil District fantasy, or replace the placeholder setting?
+
+Keep both Wardens and Veinmarket as starting choices, or force one faction for an even smaller slice?
+
+Is Death Gap completely out of the slice, or a stretch goal after Milestone S4?
 
 ## Character
 

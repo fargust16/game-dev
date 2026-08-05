@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft
 
@@ -88,6 +88,8 @@ Always respect this order:
         ↓
 10 Turn Action Economy
         ↓
+11 Vertical Slice
+        ↓
 All future documentation
 ```
 
@@ -123,6 +125,7 @@ If a contradiction appears, stop and explain it before continuing.
 - 08 Confront Constraints
 - 09 Information Sources
 - 10 Turn Action Economy
+- 11 Vertical Slice
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md
@@ -312,6 +315,7 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - V1 Confront is in-location Turn-Based Mode (BG3 / Fallout 1–2 feel, not feature parity). Turn-Based Mode is also available outside combat for deliberate control.
 - Information comes from biased partial Information Sources; no omniscient quest spoiler log that replaces world reading.
 - V1 Turn Action Economy is Move + Action + short Bonus list, in and out of Confront. Do not invent a deep AP/reaction combat stack before the six Approaches are equally supported.
+- The first implementation target is [11 Vertical Slice](11%20Vertical%20Slice.md): prove systems with tiny content, do not expand into full-game scope early.
 
 When the user shares vision instead of a direct Open Question answer, synthesise a clear Draft answer, challenge contradictions, then write it into documents only after confirmation.
 
@@ -319,10 +323,10 @@ When the user shares vision instead of a direct Open Question answer, synthesise
 
 Current active design layer:
 
-1. Keep World Laws through Turn Action Economy coherent while Draft.
+1. Keep World Laws through Vertical Slice coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. Next likely Draft: vertical-slice content plan.
+4. Next: confirm Vertical Slice defaults, then implementation milestones S0–S5 or more Open Questions.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 
