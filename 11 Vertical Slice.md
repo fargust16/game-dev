@@ -1,6 +1,6 @@
 # 11 Vertical Slice
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
@@ -29,11 +29,28 @@ Success question:
 
 Working title for the slice setting:
 
-**Lower Veil District** — one dense urban district at the edge of legality, medicine, and night disappearances.
+**Lower Veil District** — one dense urban district at the edge of legality, medicine, factories, and night disappearances.
 
 The player is the **first character in a new world**, so they receive a Starting Faction soft foothold.
 
 No final lore names are locked here. Placeholder faction labels are scaffolding only.
+
+# Era and Mood
+
+Confirmed tone reference: the industrial-occult city feeling associated with *Lord of the Mysteries* — not a copy of its plot, Pathways, or lore names.
+
+The Vertical Slice should feel like a late **18th–19th century transition world**:
+
+- nobility still matters: counts, barons, dukes, a king / crown presence in the background;
+- factories and harmful cheap labour already shape the poor districts;
+- clear separation between wealth and poverty in streets, clothes, lighting, and access;
+- horse-drawn carriages remain common;
+- early modern inventions appear as novelty or uneven progress: early bicycles, the first hints of radio/telegraph-like communication, early steam machines;
+- gaslight / soot / fog / workshop smell energy over clean high-fantasy sparkle.
+
+Lower Veil sits on the poor/industrial side of that divide, with richer order pressing down through Wardens and night commerce pressing up through Veinmarket.
+
+Implementation rule: art, props, NPC dress, and Information Source wording must reinforce this era before any mystical reveal.
 
 # Design Goals Proven by the Slice
 
@@ -67,7 +84,7 @@ The slice must prove all of the following:
 - 2 factions only in the slice:
   - **Wardens** (order / patrol / seizure framing);
   - **Veinmarket** (soft underworld / mixture / night-route framing).
-- Player Starting Faction: choose one of the two at character creation for the slice.
+- Player Starting Faction: **both available as a creation choice** for the slice.
 - Soft Pathway nudge:
   - Wardens → Open Path lean;
   - Veinmarket → Veiled Path lean.
@@ -149,7 +166,7 @@ Turn-Based Mode requirements:
 Not in the Vertical Slice:
 
 - full 3 Pathway content to stage 7;
-- Death Gap and successor characters;
+- Death Gap and successor characters (explicitly out of this slice);
 - Factionless later-life flow;
 - Legacy Cache;
 - World Collapse;
@@ -260,22 +277,22 @@ Keep intentionally tiny:
 
 If the budget grows, cut content before cutting systems proof.
 
-# Open Confirmations
+# Confirmed Slice Decisions
 
-These defaults are recommended and may be adjusted without rewriting the whole spine:
-
-1. District fantasy: Lower Veil urban night-medicine district — keep / rename / replace?
-2. Starting Faction choice between Wardens and Veinmarket — keep both, or force one for an even smaller slice?
-3. Is Death Gap completely out of slice, or a stretch goal after S4?
-4. Placeholder names may all change later — accepted?
+1. **District:** Lower Veil District kept as the slice setting/placeholder.
+2. **Mood/era:** Lord of the Mysteries-like industrial-occult transition (18–19th century social structure + early machines), not a plot/lore copy.
+3. **Starting Faction:** both Wardens and Veinmarket are selectable.
+4. **Death Gap:** fully out of this Vertical Slice.
+5. **Names:** all placeholder names may be renamed later.
 
 # Documentation Review
 
 - **Vision / Player Experience:** Slice targets curiosity, tense choice, agency, residue, priced power tease.
 - **POI / Information / Approaches / Turn Economy:** Directly implemented in miniature.
-- **Progression / Character Life:** Only first-life foothold and Bargain tease; later-life systems deferred.
+- **Progression / Character Life:** Only first-life foothold and Bargain tease; later-life systems deferred. Death Gap excluded from slice scope.
+- **Era mood:** Compatible with priced mystery and social inequality without requiring high-fantasy gloss.
 - **Solo scope:** Content budget and milestones are intentionally small.
-- **Glossary / Open Questions:** Vertical Slice term added; confirmations listed above.
+- **Glossary / Open Questions:** Confirmations recorded as resolved.
 
 # Related Documents
 

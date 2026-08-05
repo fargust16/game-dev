@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.11
+Version: 0.11.1
 
 Status: Draft
 
@@ -316,6 +316,7 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - Information comes from biased partial Information Sources; no omniscient quest spoiler log that replaces world reading.
 - V1 Turn Action Economy is Move + Action + short Bonus list, in and out of Confront. Do not invent a deep AP/reaction combat stack before the six Approaches are equally supported.
 - The first implementation target is [11 Vertical Slice](11%20Vertical%20Slice.md): prove systems with tiny content, do not expand into full-game scope early.
+- Vertical Slice mood: Lord of the Mysteries-like 18–19th century industrial-occult transition; Lower Veil District; Wardens/Veinmarket both selectable; Death Gap out of slice; placeholder names mutable.
 
 When the user shares vision instead of a direct Open Question answer, synthesise a clear Draft answer, challenge contradictions, then write it into documents only after confirmation.
 
@@ -326,7 +327,7 @@ Current active design layer:
 1. Keep World Laws through Vertical Slice coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. Next: confirm Vertical Slice defaults, then implementation milestones S0–S5 or more Open Questions.
+4. Next: flesh Vertical Slice POI/content under confirmed era mood, or begin Milestone S0 greybox planning.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

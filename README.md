@@ -144,7 +144,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: confirm Vertical Slice defaults, then Milestone S0 greybox or remaining high-priority Open Questions.
+Next work: detail slice POI cards under the confirmed LoTM-era mood, or Milestone S0 greybox planning.
 
 ---
 

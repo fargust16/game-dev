@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.14
+Version: 0.15
 
 Status: Draft
 
@@ -106,7 +106,7 @@ Through reusable Information Sources with bias and partial truth: boards, newspa
 Move + Action + optional short Bonus. Same economy in Confront and non-combat Turn-Based Mode. Documented in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md).
 
 **What is the first playable proof?**  
-A Vertical Slice in one district with 2 factions, 3 POIs, Information Sources, Turn-Based Mode, and one Bargain tease. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md). Pending confirmation on district/faction defaults.
+A Vertical Slice in Lower Veil District with 2 selectable factions (Wardens / Veinmarket), 3 POIs, Information Sources, Turn-Based Mode, one Bargain tease, and Lord of the Mysteries-like industrial-era mood. Death Gap is out of slice scope. Placeholder names may change. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md).
 
 ---
 
@@ -180,11 +180,9 @@ Is Bonus-to-Dash enabled in V1 or deferred?
 
 ## Vertical Slice
 
-Keep Lower Veil District fantasy, or replace the placeholder setting?
+What exact prop/language checklist best communicates early radio/steam novelty without turning the slice into a tech museum?
 
-Keep both Wardens and Veinmarket as starting choices, or force one faction for an even smaller slice?
-
-Is Death Gap completely out of the slice, or a stretch goal after Milestone S4?
+How visible should crown/nobility pressure be inside Lower Veil without adding a third faction?
 
 ## Character
 

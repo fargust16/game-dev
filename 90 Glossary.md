@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.14
+Version: 0.15
 
 Status: Draft
 
@@ -321,6 +321,12 @@ A small extra act on a turn from a short V1 list, such as a quick item or brief 
 ## Vertical Slice
 
 The smallest playable prototype that proves the game fantasy and core systems without building the full game.
+
+---
+
+## Lower Veil District
+
+Placeholder name for the Vertical Slice district: a poor/industrial urban area of medicine, night routes, factory pressure, and Warden order.
 
 ---
 
