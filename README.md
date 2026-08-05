@@ -50,6 +50,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [05 Progression](05%20Progression.md) | Draft | Pathways 9→7, Conduct Progress, External Power Bargains |
 | [06 Approaches](06%20Approaches.md) | Draft | Confront, Convince, Threaten, Exchange, Veil, Withdraw |
 | [07 Character Life](07%20Character%20Life.md) | Draft | Death Gap, Factionless successors, Legacy Cache, Soft Memory |
+| [08 Confront Constraints](08%20Confront%20Constraints.md) | Draft | Hard fence around combat so it cannot become the whole game |
 
 ### Reference
 
@@ -89,6 +90,8 @@ This repository is currently a design bible. Implementation begins only after th
     ↓
 07 Character Life
     ↓
+08 Confront Constraints
+    ↓
 Future systems
 ```
 
@@ -119,6 +122,7 @@ Draft foundations in active refinement:
 - [05 Progression](05%20Progression.md) — 3 Pathways, stages 9→7, churches/entities as Bargains
 - [06 Approaches](06%20Approaches.md) — six methods of acting; combat is not the default best
 - [07 Character Life](07%20Character%20Life.md) — death gap, factionless later lives, legacy cache
+- [08 Confront Constraints](08%20Confront%20Constraints.md) — combat fence: no XP, diegetic loot, real alternatives
 
 Not yet designing as content:
 
@@ -128,7 +132,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: Confront combat constraints, information/discovery sources, or remaining high-priority Open Questions.
+Next work: lock V1 Confront presentation mode, information/discovery sources, or remaining high-priority Open Questions.
 
 ---
 

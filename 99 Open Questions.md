@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [AGENTS.md](AGENTS.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -91,6 +91,11 @@ Yes, via a simple V1 Legacy Cache with a next-life map marker. Ordinary leftover
 **What connects lives besides Knowledge and Legacy?**  
 Soft Memory: rumours, dialogue hooks, and opinion shifts. No bloodline power inheritance.
 
+## Confront
+
+**May combat become the main progression engine?**  
+No. Confront constraints forbid XP-from-kills, abstract loot tables, and universal best payoff. Documented in [08 Confront Constraints](08%20Confront%20Constraints.md).
+
 ---
 
 # High Priority
@@ -140,6 +145,14 @@ How much V1 support does each Approach need before it feels real (skills, UI ver
 When does Threaten escalate into Confront by rule rather than by writer taste?
 
 Should Bound Path get a light Rite/Invoke extension in V1, or remain under Exchange until V2?
+
+## Confront
+
+Is V1 Confront turn-based, real-time, or pause-friendly real-time?
+
+What is the minimal V1 resolution model (actions, injury, Break Away chance) that still feels tense?
+
+How often may important nodes offer Confront as one option versus scenes that begin already in Confront?
 
 ## Character
 

@@ -1,6 +1,6 @@
 # 000 Project Rules
 
-Version: 1.7
+Version: 1.8
 
 Status: Canonical
 
@@ -91,6 +91,10 @@ Every new document must respect the following hierarchy.
 ↓
 
 07 Character Life
+
+↓
+
+08 Confront Constraints
 
 ↓
 

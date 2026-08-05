@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [AGENTS.md](AGENTS.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -278,7 +278,19 @@ Also used for one concrete method from the V1 set in [06 Approaches](06%20Approa
 
 ## Confront
 
-Approach: force the issue openly, including fight or open defiance.
+Approach: force the issue openly, including fight or open defiance. Hard constraints live in [08 Confront Constraints](08%20Confront%20Constraints.md).
+
+---
+
+## Break Away
+
+A pressured escape from Confront. A costly form of Withdraw after violence has begun.
+
+---
+
+## Diegetic Loot
+
+Rewards that exist because a target carried or guarded them, not because a fight completion spawned abstract treasure.
 
 ---
 
