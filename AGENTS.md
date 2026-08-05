@@ -292,7 +292,6 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - V1 teaching order: Attention first, Approach with it; Bargain as second major lesson.
 - Balance moves through Faction Influence via Main Goals and Side Events.
 - Side Events are Allegiance forks, not free loot; they may open/close paths and hide small Influence shifts.
-- Characters start with a Starting Faction and may defect later at a cost.
 - Difficulty Pressure favours the player on Easy and opposing factions more as difficulty rises.
 - External power is always a Bargain with readable, often delayed cost.
 - Player Knowledge unlocks reasoning; it is not primarily a success-rate bonus.

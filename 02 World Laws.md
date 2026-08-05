@@ -182,7 +182,7 @@ World Difficulty modifies non-player factions at world creation:
 
 | Difficulty | Pressure |
 |------------|----------|
-| Easy | Pressure favours the player's Starting Faction |
+| Easy | Pressure favours the first character's Starting Faction at world creation |
 | Normal | Slight pressure favours opposing factions |
 | Hard | Strong pressure favours opposing factions |
 | Hell | Severe pressure favours opposing factions |

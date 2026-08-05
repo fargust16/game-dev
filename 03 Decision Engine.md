@@ -1,6 +1,6 @@
 # 03 Decision Engine
 
-Version: 0.2
+Version: 0.2.1
 
 Status: Draft
 
@@ -135,9 +135,9 @@ Side Events from [02 World Laws](02%20World%20Laws.md) are standard Allegiance n
 - the choice may open some paths and close others;
 - pure free bonuses without world residue are invalid.
 
-# Starting Faction Context
+# Faction Context
 
-A character begins with a Starting Faction and may later defect or realign. That starting bond does not remove Allegiance decisions; it frames them. Betrayal, neutrality, and aid to rivals remain meaningful because access, Symptoms, and open paths change with Allegiance.
+Only the first character in a world begins with a Starting Faction. Later characters begin Factionless until Faction Entry. Membership, betrayal, neutrality, and aid to rivals remain Allegiance decisions because access, Symptoms, and open paths change with them. Full rules live in [07 Character Life](07%20Character%20Life.md).
 
 World Difficulty changes opposing Faction Influence pressure at creation. It raises challenge; it does not invent a single correct strategy.
 
