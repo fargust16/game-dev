@@ -1,6 +1,6 @@
 # 04 Points of Interest
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
@@ -365,6 +365,152 @@ Hypotheses:
 - "If guards are righteous, why do they want the drawers more than the man?"
 Remaining question:
 - "Who benefits from controlling this shop?"
+
+### 8. Validation
+Creates curiosity? Yes
+Teaches something about the world? Yes
+Every gained power has a price? Yes
+Multiple viable options? Yes
+Failure valuable? Yes
+World different afterward? Yes
+Lazy / timed POI valid? Yes
+```
+
+# Worked Example B — Night Abductions on the Street
+
+Player-authored concept, refined to match Decision Engine and POI rules.
+
+Refinements applied during review:
+
+- missed event must still leave aftermath and a possible Trace, not a dead end;
+- Allegiance is made concrete: save victims now versus follow the trail for a larger truth;
+- gratitude is seeded and meaningful, not a random candy reward;
+- Active Window class set to Brief for a single night slice (23:00 to 02:00).
+
+```text
+## Decision Node: Night Abductions on the Street
+
+Status: Ready as design example
+World Seed sensitivity: Medium
+(seed changes district, abductor tell, quiet faction sponsor, gratitude form, and exact follow-up Trace)
+
+### POI packaging
+POI type: Street Conflict
+Map presentation: starts Unknown or Hinted; becomes Marked after notice board / bartender / street rumour
+Discovery sources:
+- bartender: "They take girls after the eleventh bell. Tonight again."
+- notice board / rumour: missing persons near the lower street
+- stumbling into the street during the Active Window
+Interaction radius note: the threatened street bend / alley mouth; entering starts the node
+Active Window class: Brief (this night only, about 23:00 to 02:00 world-time)
+How the player learns urgency:
+- bartender names tonight and the eleventh bell;
+- marked map uses Brief/urgent presentation;
+- if the player waits past 02:00, the marker resolves into aftermath.
+Unattended resolution summary:
+- weighted by abductor-side Influence vs local Guard / vigil Influence
+- common miss results: girls taken into a closed cart; or guards spoil the snatch and scatter both sides
+Aftermath Symptom if missed:
+- more fearful night streets; shuttered windows; a blood scrap or dropped glove; rumour of a "collector"
+- the player may not learn the true purpose yet, but the world still changes
+Follow-up POI chance:
+- Trace / Clue POI to cart tracks, a safehouse door, or a guard report room
+- if completely ignored for long, the Trace may be darker and harder
+
+### 1. Situation
+After the eleventh bell, figures try to drag young women from a poorly lit street into a waiting route of alleys.
+Someone shouts for help. A distant patrol horn answers too slowly.
+The player arrives while the abduction can still be stopped, watched, or lost.
+
+### 2. Active Decision Axes
+Primary: Allegiance
+Secondary: Approach
+Optional third: Attention / Commitment (leave, or spend the Brief window following instead of intervening)
+
+### 3. What the player knows
+Observable facts:
+- an abduction is happening now;
+- the Active Window ends before 02:00;
+- immediate rescue is possible;
+- quiet following is possible;
+- walking away is possible.
+
+Symptoms / rumours / clues:
+- recent disappearances;
+- bartender urgency;
+- night streets feel emptier than they should.
+
+Relevant Player Knowledge that can help:
+- recognising abductor tells or faction marks;
+- knowing that immediate heroism can close the trail to the sponsor.
+
+### 4. What stays hidden
+Hidden Influence or affiliations:
+- which faction or cult benefits from the abductions;
+- small Influence shift after the night resolves.
+
+Hidden delayed consequences:
+- whether tonight feeds a ritual, market, blackmail chain, or church purge;
+- which follow-up Trace becomes available.
+
+Information discoverable with effort:
+- follow without being seen;
+- catch a dropped token / route mark;
+- force a Yield Threshold confession from one abductor.
+
+### 5. Options
+
+Option name: Protect the victims now
+Axes used: Allegiance + Approach
+Method / Approach: persuade bystanders / threaten abductors / fight
+Immediate cost or risk: injury, noise, patrol attention, possible death
+Likely Readable Consequence: one or more victims escape tonight
+What may open: gratitude that becomes a seeded meaningful reward later
+  examples by seed: safehouse access, a named clue, a small fund, a personal debt, a Marked Trace the victim knows
+What may close: clean trail to the sponsor; quieter investigation options
+Failure result: some victims are still taken, but the player recovers one route clue or recognises a faction tell
+
+Option name: Follow them instead of stopping the snatch
+Axes used: Allegiance + Approach + Commitment
+Method / Approach: stalk / eavesdrop along the escape route
+Immediate cost or risk: victims remain in danger; chance of being spotted; moral cost is real
+Likely Readable Consequence: player learns destination or purpose fragment
+What may open: stronger Trace POI / safehouse / ritual site / sponsor identity
+What may close: immediate rescue gratitude; some victims may be lost before a later raid
+Failure result: spotted and forced into a worse fight, or lose the trail but still see one Symptom of the sponsor's Influence
+
+Option name: Tip or join a late patrol response
+Axes used: Allegiance + Approach
+Method / Approach: fetch / signal guards, or coordinate with them
+Immediate cost or risk: response may be late or brutal; abductors may kill evidence
+Likely Readable Consequence: official version of the night is written into the district
+What may open: guard favour, report access, legal cover for later Trace
+What may close: underworld informants; victims may distrust the player
+Failure result: guards botch it; player still sees whether the office is corrupt, scared, or outmatched
+
+Option name: Leave the street
+Axes used: Attention + Commitment
+Method / Approach: non-intervention
+Immediate cost or risk: Brief window may expire
+Likely Readable Consequence: unattended resolution + Aftermath Symptoms by morning
+What may open: safer aftermath Trace; second-hand rumour chain
+What may close: rescue gratitude and the best live trail
+Failure result: not a reload fail; next day the district teaches what "collector" pressure looks like
+
+### 6. World residue
+Faction Influence shift: small hidden shift toward abductor sponsor or toward the side that spoiled the route
+Symptom changes: night fear, shuttered windows, missing-person talk, patrol routes
+Path open / path close:
+- rescue path emphasises people and debts;
+- follow path emphasises sponsor truth and harsher later stakes
+Legacy potential: saved victim, abandoned glove, or sealed alley door can persist after death
+
+### 7. Curiosity check
+Hypotheses:
+- "Who needs living captives rather than corpses?"
+- "If I save them now, do I lose the only road to the source?"
+Remaining question:
+- "What is the collector building toward?"
 
 ### 8. Validation
 Creates curiosity? Yes
