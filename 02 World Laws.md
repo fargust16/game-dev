@@ -1,6 +1,6 @@
 # 02 World Laws
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md)
 
 Referenced By:
-[03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), Future world, faction, consequence, progression, and collapse-system design.
+[03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [07 Character Life](07%20Character%20Life.md), Future world, faction, consequence, progression, and collapse-system design.
 
 ---
 
@@ -170,9 +170,11 @@ Symptoms must be consistent enough for hypothesis-forming. They create the conte
 
 # Starting Faction and Difficulty
 
-A new character begins aligned with one **Starting Faction** and receives an initial understanding of that faction's current Main Goal and what pursuing it requires.
+Only the **first character in a newly generated world** begins aligned with a **Starting Faction** and receives an initial understanding of that faction's current Main Goal and what pursuing it requires.
 
-The character may later betray, defect, or realign. Allegiance change is real and costly: Influence, access, Symptoms, and available paths all change.
+Later characters in the same world begin Factionless and must earn membership through Faction Entry. Full rules live in [07 Character Life](07%20Character%20Life.md).
+
+A member may later betray, defect, or realign. Allegiance change is real and costly: Influence, access, Symptoms, and available paths all change.
 
 ## Difficulty Pressure
 

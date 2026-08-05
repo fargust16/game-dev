@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [AGENTS.md](AGENTS.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -30,7 +30,7 @@ From World Seed starting state plus each faction's current Main Goal, requiremen
 Through everyday Symptoms: trade, services, encounters, rumours, otherworldly pressure, and related world changes. Exact stage-to-symptom tables remain open below.
 
 **Starting faction?**  
-New characters begin with a Starting Faction and may later defect or realign at a cost. Documented in [02 World Laws](02%20World%20Laws.md).
+Only the first character in a new world begins with a Starting Faction. Later characters begin Factionless and must earn Faction Entry. Documented in [07 Character Life](07%20Character%20Life.md).
 
 **Difficulty direction?**  
 Easy favours the player's faction; Normal slightly favours opponents; Hard and Hell strongly favour opponents. Exact numbers remain open below.
@@ -79,6 +79,17 @@ Six Approaches: Confront, Convince, Threaten, Exchange, Veil, Withdraw. Document
 
 **Is combat the default best method?**  
 No. Confront is one Approach among several and must not have the universal best payoff.
+
+## Character Life
+
+**When does the next character appear after death?**  
+After a fixed short Death Gap during which the world resolves advanced state. Documented in [07 Character Life](07%20Character%20Life.md).
+
+**Can Legacy be prepared intentionally?**  
+Yes, via a simple V1 Legacy Cache with a next-life map marker. Ordinary leftovers remain unguaranteed.
+
+**What connects lives besides Knowledge and Legacy?**  
+Soft Memory: rumours, dialogue hooks, and opinion shifts. No bloodline power inheritance.
 
 ---
 
@@ -132,11 +143,13 @@ Should Bound Path get a light Rite/Invoke extension in V1, or remain under Excha
 
 ## Character
 
-How is a new character created after death inside the same world, beyond Starting Faction selection?
+What exact V1 length is the Death Gap in days?
 
-What connects different characters besides Legacy and Player Knowledge?
+How large may a Legacy Cache be before it undermines death?
 
-Can Legacy be intentionally prepared for inheritance?
+What is the minimal Faction Entry pattern reusable by all V1 factions?
+
+How many Soft Memory dialogue hooks are required in V1 versus optional flavour?
 
 ---
 

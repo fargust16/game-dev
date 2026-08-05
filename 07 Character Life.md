@@ -1,0 +1,240 @@
+# 07 Character Life
+
+Version: 0.1
+
+Status: Draft
+
+Last Updated: 2026-08-05
+
+Depends On:
+[000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md)
+
+Referenced By:
+Future character creation, death flow, legacy cache, and dialogue-memory design.
+
+---
+
+# Purpose
+
+This document defines one Character Life: how a character begins, dies, leaves residue, and is followed by another life in the same world or by a new world.
+
+It answers:
+
+> What happens after death, and how does the next character enter without turning death into a soft reload?
+
+# Central Rules
+
+1. Character death ends that Character Life permanently.
+2. Character power, Pathway stage, and personal inventory do not continue as a living hero.
+3. The world continues and advances during a fixed short death gap.
+4. Player Knowledge survives.
+5. Legacy may be recovered, but ordinary leftovers are never fully guaranteed.
+6. The next character is a new person in a changed world, not a respawn.
+
+# First Character in a World
+
+The first character created in a newly generated world receives a **Starting Faction**.
+
+That Starting Faction:
+
+- gives an initial understanding of the faction's current Main Goal;
+- soft-nudges toward one Pathway;
+- is not a prison; defection remains possible later at a cost.
+
+This is the only life that begins already inside a faction.
+
+# Death
+
+When the character dies:
+
+1. the Character Life ends;
+2. personal staged Pathway power ends with that life;
+3. the body, carried items, open actions, and local scene become world residue;
+4. a fixed **Death Gap** begins;
+5. during the Death Gap the game resolves world advancement without player control;
+6. after the gap, the player creates a new character for the same world, or may start a new world instead.
+
+Death is not an instant reload of the same person.
+
+# Death Gap
+
+V1 uses a **fixed short Death Gap** measured in player world-time.
+
+Recommended V1 feel: a small number of days, long enough for the world to move, short enough that the player still feels continuity.
+
+During the Death Gap the systems must recompute world state from the current situation, including at least:
+
+- Active Window expiry and Unattended Resolution for relevant POIs;
+- eligible World Engine Operations that fit the elapsed days;
+- Faction Influence residue from those resolutions;
+- visible Symptoms that the next character can read;
+- fate checks on ordinary non-intentional leftovers (body loot, open camps, unprotected items).
+
+Exact day count remains a tuning Open Question. The rule that the gap is fixed and world-resolving is binding.
+
+# New Character After Death
+
+## Factionless penalty
+
+Every character after the first in the same world begins **Factionless**.
+
+Factionless means:
+
+- no Starting Faction privileges;
+- no initial Main Goal briefing from a faction;
+- no soft faction mentor door already open;
+- joining any faction requires a **Faction Entry** challenge.
+
+This is an intentional penalty for continued play in a world already shaped by previous lives. It preserves the value of the first foothold and makes Allegiance earned.
+
+## Faction Entry
+
+To join a faction later, the character must pass a Faction Entry:
+
+- V1 form: a short quest / Decision Node chain / POI-backed trial;
+- success grants membership and then the normal soft Pathway nudge of that faction;
+- failure may close easy entry, worsen opinion, or force another Approach later.
+
+No free faction swap menu.
+
+## Creation choices in V1
+
+When creating a successor character, the player may choose light identity options later defined by content.
+
+System-critical rules for V1:
+
+- starts Factionless if not the first character in the world;
+- starts Pathless unless a special documented exception appears later;
+- inherits Player Knowledge only;
+- can see intentional Legacy Cache markers;
+- enters a world already changed by the Death Gap.
+
+# Legacy
+
+## Ordinary residue
+
+As in Meta Loop, ordinary leftovers may include:
+
+- body and carried items;
+- camps, open routes, damaged places;
+- faction/quest pressure already in motion;
+- NPC fates and local rumours.
+
+These are recoverable in principle, never guaranteed. NPCs may loot, move, sell, or destroy them during the Death Gap or later.
+
+## Intentional Legacy Cache
+
+V1 supports one simple intentional preparation tool:
+
+**Legacy Cache**
+
+- the living character may create a stash;
+- the stash receives a map marker for the next Character Life in this world;
+- this exists specifically to keep solo implementation light while still rewarding preparation.
+
+V1 rule:
+
+- the next character can see the Legacy Cache marker;
+- the cache is the reliable inheritance channel;
+- it should remain small/limited so it does not become a full gear pipeline that erases death.
+
+Ordinary unprotected loot remains uncertain. The intentional cache is the player's deliberate Continuity tool.
+
+V2 may add tampering risk, false markers, or rival discovery. V1 keeps the marked cache simple and mostly dependable.
+
+# Soft Memory Between Lives
+
+Characters are not blood-heirs and do not inherit mystical identity.
+
+They are connected by:
+
+1. Player Knowledge;
+2. Legacy residue and Legacy Cache;
+3. **Soft Memory** in the world.
+
+Soft Memory means NPCs and factions may remember the previous character through:
+
+- rumours;
+- reputation fragments;
+- dialogue options that reference "the one who..." ;
+- opinion shifts if the new character claims kinship, denies it, exploits the legend, or investigates the death.
+
+V1 implementation target: lightweight flags and a few dialogue branches, not a full biography simulator.
+
+Examples of simple V1 hooks:
+
+- an NPC likes the previous rescuer and is warmer to someone investigating their fate;
+- a faction hostile to the previous character is suspicious of a newcomer asking the same questions;
+- a dialogue choice to invoke or hide the previous name changes local opinion.
+
+This must remain optional content density. The system only requires that Soft Memory can matter, not that every NPC has a paragraph about every past life.
+
+# Same World vs New World
+
+After death the player may:
+
+- continue in the same world after the Death Gap;
+- or begin a new world if they choose / if the current world has collapsed.
+
+Same world emphasises Legacy, Soft Memory, and unfinished pressures.
+New world emphasises Player Knowledge without the same local residue.
+
+# Relationship to Other Systems
+
+| System | Interaction after death |
+|--------|-------------------------|
+| World Engine | Advances during Death Gap |
+| Points of Interest | Many expire or resolve unattended during Death Gap |
+| Progression | Pathway stage dies with the character; methods remain as Player Knowledge |
+| Approaches | Soft Memory and Faction Entry are often Convince / Exchange / Threaten / Veil problems |
+| Decision Engine | Investigating a previous life is Attention + Allegiance + Commitment |
+
+# Solo Scope
+
+## V1
+
+- First character: Starting Faction.
+- Later characters: Factionless until Faction Entry quest/node.
+- Fixed short Death Gap with world resolution pass.
+- One intentional Legacy Cache with next-life map marker.
+- Lightweight Soft Memory flags for rumours / a few dialogue opinion hooks.
+- No bloodline power inheritance.
+
+## V2
+
+- Richer Soft Memory and faction legend states.
+- Possible tampering or discovery risk around Legacy Caches.
+- More varied Faction Entry trials by faction.
+
+## V3
+
+- Multi-life district legends.
+- Cross-life investigation chains with delayed Hidden consequence reveals.
+- Still no “same hero respawn.”
+
+# Design Validation
+
+After death, the player should feel:
+
+1. loss of the person, not erasure of the story;
+2. curiosity about what the world did in the gap;
+3. desire to recover, reinterpret, or abandon Legacy;
+4. that the next foothold must be earned if they are no longer the first character;
+5. no urge that reload-as-same-person would have been the real design.
+
+# Documentation Review
+
+- **Meta Loop:** Compatible. Fixed gap, continued world, imperfect ordinary legacy, Knowledge survival.
+- **World Laws:** Compatible if Death Gap runs Operations / POI resolutions. Starting Faction rule updated for first life only.
+- **Progression:** Compatible. Power dies with life; faction membership and Pathway nudge are re-earned after the first life.
+- **Decision Engine / Approaches:** Compatible. Faction Entry and Soft Memory create new decision surfaces.
+- **Glossary / Open Questions:** Updated for Death Gap, Factionless, Faction Entry, Legacy Cache, Soft Memory.
+
+# Related Documents
+
+- [00.2 Meta Loop](00.2%20Meta%20Loop.md)
+- [02 World Laws](02%20World%20Laws.md)
+- [05 Progression](05%20Progression.md)
+- [04 Points of Interest](04%20Points%20of%20Interest.md)
+- [90 Glossary](90%20Glossary.md)
+- [99 Open Questions](99%20Open%20Questions.md)

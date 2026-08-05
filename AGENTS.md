@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft
 
@@ -80,6 +80,8 @@ Always respect this order:
         ↓
 06 Approaches
         ↓
+07 Character Life
+        ↓
 All future documentation
 ```
 
@@ -111,6 +113,7 @@ If a contradiction appears, stop and explain it before continuing.
 - 04 Points of Interest
 - 05 Progression
 - 06 Approaches
+- 07 Character Life
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md
@@ -296,6 +299,7 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - Side Events and discoveries are delivered as timed Points of Interest with lazy activation; full scenes do not run until the player enters the area or the Active Window expires into unattended resolution.
 - Progression has no XP level-up. V1 uses 3 Pathways distinct by way of acting, stages 9→7 only, soft faction nudge plus Bargain/quest acquisition, and churches/entities as External Power Bargains.
 - V1 Approaches are Confront, Convince, Threaten, Exchange, Veil, Withdraw. Confront must never be the universal best payoff.
+- Only the first character in a world gets Starting Faction. Later lives begin Factionless and need Faction Entry. Death uses a fixed Death Gap with world resolution. V1 intentional inheritance is a simple Legacy Cache marker. Soft Memory may affect dialogue/opinion; no bloodline respawn.
 
 When the user shares vision instead of a direct Open Question answer, synthesise a clear Draft answer, challenge contradictions, then write it into documents only after confirmation.
 
@@ -303,10 +307,10 @@ When the user shares vision instead of a direct Open Question answer, synthesise
 
 Current active design layer:
 
-1. Keep World Laws, Decision Engine, POI, Progression, and Approaches coherent while Draft.
+1. Keep World Laws through Character Life coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. Next likely Draft: Character Life / after-death creation, or Confront combat constraints.
+4. Next likely Draft: Confront combat constraints, or information/discovery sources.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [AGENTS.md](AGENTS.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -168,7 +168,37 @@ The hidden current capacity of a faction to pursue its long-term goals and make 
 
 ## Starting Faction
 
-The faction a new character begins aligned with. The character receives an initial understanding of that faction's current Main Goal and may later defect or realign at a real cost.
+The faction granted only to the first character in a newly generated world. That character receives an initial understanding of the faction's current Main Goal and may later defect or realign at a real cost. Later lives begin Factionless.
+
+---
+
+## Factionless
+
+Character state with no faction membership. Default for every life after the first in the same world. Joining requires Faction Entry.
+
+---
+
+## Faction Entry
+
+A required trial, quest, or Decision Node chain to join a faction after starting Factionless.
+
+---
+
+## Death Gap
+
+Fixed short span of world-time after character death during which the world advances and resolves outstanding pressure before the next character is created.
+
+---
+
+## Legacy Cache
+
+An intentional stash prepared for a future Character Life in the same world. In V1 it creates a map marker for the next character and is the simple reliable inheritance channel.
+
+---
+
+## Soft Memory
+
+Lightweight world remembrance of a previous character through rumours, dialogue hooks, and opinion shifts. Not bloodline power inheritance.
 
 ---
 

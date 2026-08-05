@@ -49,6 +49,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [04 Points of Interest](04%20Points%20of%20Interest.md) | Draft | Timed map POIs, lazy activation, missed-event residue |
 | [05 Progression](05%20Progression.md) | Draft | Pathways 9→7, Conduct Progress, External Power Bargains |
 | [06 Approaches](06%20Approaches.md) | Draft | Confront, Convince, Threaten, Exchange, Veil, Withdraw |
+| [07 Character Life](07%20Character%20Life.md) | Draft | Death Gap, Factionless successors, Legacy Cache, Soft Memory |
 
 ### Reference
 
@@ -86,6 +87,8 @@ This repository is currently a design bible. Implementation begins only after th
     ↓
 06 Approaches
     ↓
+07 Character Life
+    ↓
 Future systems
 ```
 
@@ -115,6 +118,7 @@ Draft foundations in active refinement:
 - [04 Points of Interest](04%20Points%20of%20Interest.md) — map delivery + Active Windows + lazy activation
 - [05 Progression](05%20Progression.md) — 3 Pathways, stages 9→7, churches/entities as Bargains
 - [06 Approaches](06%20Approaches.md) — six methods of acting; combat is not the default best
+- [07 Character Life](07%20Character%20Life.md) — death gap, factionless later lives, legacy cache
 
 Not yet designing as content:
 
@@ -124,7 +128,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: Character creation-after-death, first combat constraints under Confront, or remaining high-priority Open Questions.
+Next work: Confront combat constraints, information/discovery sources, or remaining high-priority Open Questions.
 
 ---
 
