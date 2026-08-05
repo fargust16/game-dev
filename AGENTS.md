@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft
 
@@ -86,6 +86,8 @@ Always respect this order:
         ↓
 09 Information Sources
         ↓
+10 Turn Action Economy
+        ↓
 All future documentation
 ```
 
@@ -120,6 +122,7 @@ If a contradiction appears, stop and explain it before continuing.
 - 07 Character Life
 - 08 Confront Constraints
 - 09 Information Sources
+- 10 Turn Action Economy
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md
@@ -308,6 +311,7 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - Confront has hard constraints: no XP-from-kills, diegetic loot only, information not free from victory, residue required, Break Away and Yield/Spare are first-class. Do not design a full combat system that violates [08 Confront Constraints](08%20Confront%20Constraints.md).
 - V1 Confront is in-location Turn-Based Mode (BG3 / Fallout 1–2 feel, not feature parity). Turn-Based Mode is also available outside combat for deliberate control.
 - Information comes from biased partial Information Sources; no omniscient quest spoiler log that replaces world reading.
+- V1 Turn Action Economy is Move + Action + short Bonus list, in and out of Confront. Do not invent a deep AP/reaction combat stack before the six Approaches are equally supported.
 
 When the user shares vision instead of a direct Open Question answer, synthesise a clear Draft answer, challenge contradictions, then write it into documents only after confirmation.
 
@@ -315,10 +319,10 @@ When the user shares vision instead of a direct Open Question answer, synthesise
 
 Current active design layer:
 
-1. Keep World Laws through Information Sources coherent while Draft.
+1. Keep World Laws through Turn Action Economy coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. Next likely Draft: minimal V1 turn action economy, or a vertical-slice content plan.
+4. Next likely Draft: vertical-slice content plan.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

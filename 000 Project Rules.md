@@ -1,6 +1,6 @@
 # 000 Project Rules
 
-Version: 1.9
+Version: 1.10
 
 Status: Canonical
 
@@ -99,6 +99,10 @@ Every new document must respect the following hierarchy.
 ↓
 
 09 Information Sources
+
+↓
+
+10 Turn Action Economy
 
 ↓
 

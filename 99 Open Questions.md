@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.12
+Version: 0.13
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [AGENTS.md](AGENTS.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -102,6 +102,9 @@ In-location Turn-Based Mode, with reference feel from Baldur's Gate 3 / Fallout 
 **How does the player learn about POIs and world pressure?**  
 Through reusable Information Sources with bias and partial truth: boards, newspapers, bartenders, rumours, faction contacts, witnesses, physical traces, Soft Memory. Documented in [09 Information Sources](09%20Information%20Sources.md).
 
+**What is the V1 turn structure?**  
+Move + Action + optional short Bonus. Same economy in Confront and non-combat Turn-Based Mode. Documented in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md).
+
 ---
 
 # High Priority
@@ -160,15 +163,17 @@ When does Threaten escalate into Confront by rule rather than by writer taste?
 
 Should Bound Path get a light Rite/Invoke extension in V1, or remain under Exchange until V2?
 
-## Confront
-
-What is the minimal V1 turn action economy (move / act / reaction) that still feels tense?
+## Confront / Turn Economy
 
 How does the player enter and exit Turn-Based Mode outside combat without making exploration tedious?
 
 How often may important nodes offer Confront as one option versus scenes that begin already in Confront?
 
 Grid, hex, or navmesh-free ranging for V1 turns?
+
+Exact initiative formula and Move Speed units for V1?
+
+Is Bonus-to-Dash enabled in V1 or deferred?
 
 ## Character
 
