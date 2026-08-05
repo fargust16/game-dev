@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft
 
@@ -96,6 +96,9 @@ Soft Memory: rumours, dialogue hooks, and opinion shifts. No bloodline power inh
 **May combat become the main progression engine?**  
 No. Confront constraints forbid XP-from-kills, abstract loot tables, and universal best payoff. Documented in [08 Confront Constraints](08%20Confront%20Constraints.md).
 
+**What is V1 Confront presentation?**  
+In-location Turn-Based Mode, with reference feel from Baldur's Gate 3 / Fallout 1–2. Turn-Based Mode is also available outside combat for deliberate control. Documented in [08 Confront Constraints](08%20Confront%20Constraints.md).
+
 ---
 
 # High Priority
@@ -148,11 +151,13 @@ Should Bound Path get a light Rite/Invoke extension in V1, or remain under Excha
 
 ## Confront
 
-Is V1 Confront turn-based, real-time, or pause-friendly real-time?
+What is the minimal V1 turn action economy (move / act / reaction) that still feels tense?
 
-What is the minimal V1 resolution model (actions, injury, Break Away chance) that still feels tense?
+How does the player enter and exit Turn-Based Mode outside combat without making exploration tedious?
 
 How often may important nodes offer Confront as one option versus scenes that begin already in Confront?
+
+Grid, hex, or navmesh-free ranging for V1 turns?
 
 ## Character
 

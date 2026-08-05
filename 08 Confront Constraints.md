@@ -1,6 +1,6 @@
 # 08 Confront Constraints
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
@@ -171,15 +171,23 @@ Not required in V1:
 
 ## Presentation mode
 
-Whether Confront is turn-based, real-time, or pause-friendly real-time remains an Open Question.
+V1 Confront uses **Turn-Based Mode**.
 
-Binding constraint regardless of presentation:
+Reference feel, not feature parity:
 
-- the player must still make readable decisions under risk;
-- Break Away and Yield/Spare must remain possible as design outcomes;
-- the mode must be shippable by one developer for V1.
+- Baldur's Gate 3 style initiative / turn order once conflict locks in;
+- Fallout 1/2 style deliberate tactical choice inside the same location space.
 
-Current recommendation for solo V1: a simple turn-based or heavily pause-friendly mode, because it preserves decision clarity and is easier to tune than pure action combat. This recommendation is not locked until confirmed.
+Rules:
+
+1. Turn-Based Mode begins **inside the current location**; there is no separate arena teleport for ordinary Confront.
+2. Entering Confront converts the local scene into Turn-Based Mode.
+3. Turn-Based Mode must also be available **outside combat**, so the player can deliberately control tense non-fight moments (approach a target, position, time an action, coordinate a Veil or Exchange setup).
+4. Leaving Turn-Based Mode outside combat returns the scene to normal exploration pacing.
+5. Break Away, Yield/Spare, and other Decision Engine outcomes remain valid inside Turn-Based Mode.
+6. V1 stays simple: readable turns, clear actions, solo-shippable depth. Do not chase full BG3 feature parity.
+
+This locks presentation. Exact action economy, initiative formula, and grid-vs-navmesh details remain later technical design.
 
 # Escalation Rules
 
@@ -229,7 +237,7 @@ Forbidden design directions:
 - Simple fight resolution with Break Away and Yield/Spare.
 - Diegetic loot only.
 - Residue on world/factions.
-- Presentation mode chosen and kept small.
+- Turn-Based Mode in-location for Confront, also usable outside combat for control.
 
 ## V2
 
@@ -261,7 +269,7 @@ If the honest answers collapse to “just fight,” redesign.
 - **Approaches:** Compatible. Confront is fenced so it cannot erase the other five.
 - **Progression / Character Life:** Compatible. No XP; death is real; Conduct may care about open violence.
 - **World Laws / POI:** Compatible. Fights are world events with Symptoms and possible Traces.
-- **Glossary / Open Questions:** Updated; presentation mode and exact V1 resolution model remain open.
+- **Glossary / Open Questions:** Presentation mode locked to in-location Turn-Based Mode, also usable outside combat. Exact action economy remains open.
 
 # Related Documents
 

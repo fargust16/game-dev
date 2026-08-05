@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.8
+Version: 0.8.1
 
 Status: Draft
 
@@ -303,6 +303,7 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - V1 Approaches are Confront, Convince, Threaten, Exchange, Veil, Withdraw. Confront must never be the universal best payoff.
 - Only the first character in a world gets Starting Faction. Later lives begin Factionless and need Faction Entry. Death uses a fixed Death Gap with world resolution. V1 intentional inheritance is a simple Legacy Cache marker. Soft Memory may affect dialogue/opinion; no bloodline respawn.
 - Confront has hard constraints: no XP-from-kills, diegetic loot only, information not free from victory, residue required, Break Away and Yield/Spare are first-class. Do not design a full combat system that violates [08 Confront Constraints](08%20Confront%20Constraints.md).
+- V1 Confront is in-location Turn-Based Mode (BG3 / Fallout 1–2 feel, not feature parity). Turn-Based Mode is also available outside combat for deliberate control.
 
 When the user shares vision instead of a direct Open Question answer, synthesise a clear Draft answer, challenge contradictions, then write it into documents only after confirmation.
 

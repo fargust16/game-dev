@@ -66,6 +66,7 @@ Open force or open physical resolution.
 - Strong when time is short and secrecy is already dead.
 - Costly in wounds, noise, legal heat, and burned relationships.
 - Must not be the only Approach that yields real Information or real rewards.
+- Presented in V1 through in-location Turn-Based Mode; see [08 Confront Constraints](08%20Confront%20Constraints.md).
 
 ## Convince
 

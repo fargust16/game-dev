@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft
 
@@ -291,6 +291,12 @@ A pressured escape from Confront. A costly form of Withdraw after violence has b
 ## Diegetic Loot
 
 Rewards that exist because a target carried or guarded them, not because a fight completion spawned abstract treasure.
+
+---
+
+## Turn-Based Mode
+
+Deliberate paced control mode used for Confront and optionally outside combat. Begins inside the current location; reference feel from Baldur's Gate 3 / Fallout 1–2 without requiring feature parity.
 
 ---
 

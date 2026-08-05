@@ -132,7 +132,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: lock V1 Confront presentation mode, information/discovery sources, or remaining high-priority Open Questions.
+Next work: information/discovery sources, minimal V1 turn action economy, or remaining high-priority Open Questions.
 
 ---
 
