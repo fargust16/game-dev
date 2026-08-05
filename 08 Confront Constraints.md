@@ -187,7 +187,7 @@ Rules:
 5. Break Away, Yield/Spare, and other Decision Engine outcomes remain valid inside Turn-Based Mode.
 6. V1 stays simple: readable turns, clear actions, solo-shippable depth. Do not chase full BG3 feature parity.
 
-This locks presentation. The minimal action skeleton lives in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md). Grid-vs-navmesh details remain later technical design.
+This locks presentation. The minimal action skeleton lives in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md). Spatial truth is a square grid with Environment Actions; see [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md).
 
 # Escalation Rules
 

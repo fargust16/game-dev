@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.13
+Version: 0.14
 
 Status: Draft
 
@@ -88,11 +88,15 @@ Always respect this order:
         ↓
 10 Turn Action Economy
         ↓
+10.1 Grid World and Environment Actions
+        ↓
 11 Vertical Slice
         ↓
 11.1 Vertical Slice POIs
         ↓
 11.2 Milestone S0 Greybox
+        ↓
+12 Engine Choice
         ↓
 All future documentation
 ```
@@ -129,9 +133,11 @@ If a contradiction appears, stop and explain it before continuing.
 - 08 Confront Constraints
 - 09 Information Sources
 - 10 Turn Action Economy
+- 10.1 Grid World and Environment Actions
 - 11 Vertical Slice
 - 11.1 Vertical Slice POIs
 - 11.2 Milestone S0 Greybox
+- 12 Engine Choice
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md
@@ -321,6 +327,8 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - V1 Confront is in-location Turn-Based Mode (BG3 / Fallout 1–2 feel, not feature parity). Turn-Based Mode is also available outside combat for deliberate control.
 - Information comes from biased partial Information Sources; no omniscient quest spoiler log that replaces world reading.
 - V1 Turn Action Economy is Move + Action + short Bonus list, in and out of Confront. Do not invent a deep AP/reaction combat stack before the six Approaches are equally supported.
+- World space is square-grid-native from S0. Environment Actions (vault/climb/window/etc.) are first-class turn verbs with failure costs. Do not build off-grid levels and retrofit turns later.
+- Engine choice is pending in [12 Engine Choice](12%20Engine%20Choice.md); do not start implementation until locked.
 - The first implementation target is [11 Vertical Slice](11%20Vertical%20Slice.md): prove systems with tiny content, do not expand into full-game scope early.
 - Vertical Slice mood: Lord of the Mysteries-like 18–19th century industrial-occult transition; Lower Veil District; Wardens/Veinmarket both selectable; Death Gap out of slice; placeholder names mutable.
 
@@ -333,7 +341,7 @@ Current active design layer:
 1. Keep World Laws through Vertical Slice coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. Next: implement Milestone S0 greybox after engine choice, or continue remaining Open Questions. Do not jump to combat/POI logic before S0 acceptance.
+4. Next: lock engine (Unity vs Godot), then implement Milestone S0 grid greybox. Do not jump to combat/POI logic before S0 acceptance.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

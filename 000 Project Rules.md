@@ -1,6 +1,6 @@
 # 000 Project Rules
 
-Version: 1.13
+Version: 1.14
 
 Status: Canonical
 
@@ -106,6 +106,10 @@ Every new document must respect the following hierarchy.
 
 ↓
 
+10.1 Grid World and Environment Actions
+
+↓
+
 11 Vertical Slice
 
 ↓
@@ -115,6 +119,10 @@ Every new document must respect the following hierarchy.
 ↓
 
 11.2 Milestone S0 Greybox
+
+↓
+
+12 Engine Choice
 
 ↓
 

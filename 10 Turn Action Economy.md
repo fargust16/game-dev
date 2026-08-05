@@ -1,6 +1,6 @@
 # 10 Turn Action Economy
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [03 Decision Engine](03%20Decision%20Engine.md), [06 Approaches](06%20Approaches.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md)
 
 Referenced By:
-Future combat implementation, turn-based exploration control, and encounter tuning.
+[10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), Future combat implementation, turn-based exploration control, and encounter tuning.
 
 ---
 
@@ -50,10 +50,11 @@ You may End Turn early.
 
 ## Move
 
-- Spend movement up to your current Move Speed.
+- Spend movement up to your current Move Speed across the **square grid**.
+- Movement follows legal grid paths from [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md).
 - Movement can be split around Action/Bonus unless an action locks you in place.
 - Difficult terrain, injury, or Bargains may reduce Move Speed.
-- Exact units (meters / cells) are technical design; the rule is “limited reposition per turn.”
+- Elevation changes require stairs/ladder/climb tags; risky traversal uses Environment Actions.
 
 ## Action
 
@@ -67,6 +68,7 @@ V1 Action examples:
 - Exchange offer / hand over item as part of a deal;
 - Veil attempt (hide, silent approach, pick pocket if later allowed);
 - Interact with a significant object (door, body, lever, board);
+- Environment Action (vault/jump, climb, window entry, mantle, breach);
 - **Break Away** attempt;
 - **Spare** / accept or offer Yield terms when available;
 - Aim/prepare a risky setup that consumes the Action;

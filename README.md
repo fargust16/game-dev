@@ -53,6 +53,8 @@ This repository is currently a design bible. Implementation begins only after th
 | [08 Confront Constraints](08%20Confront%20Constraints.md) | Draft | Hard fence around combat so it cannot become the whole game |
 | [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
 | [10 Turn Action Economy](10%20Turn%20Action%20Economy.md) | Draft | Move + Action + Bonus for turn-based V1 |
+| [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Draft | Square grid space + vault/climb/window verbs |
+| [12 Engine Choice](12%20Engine%20Choice.md) | Draft | Unity vs Godot for AI-assisted implementation |
 | [11 Vertical Slice](11%20Vertical%20Slice.md) | Draft | First playable proof: 1 district, 3 POIs, TB combat |
 | [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) | Draft | Full cards for arrest, collectors, soot-stair trace |
 | [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md) | Draft | Walkable Lower Veil blockout before real systems |
@@ -101,11 +103,15 @@ This repository is currently a design bible. Implementation begins only after th
     ↓
 10 Turn Action Economy
     ↓
+10.1 Grid World and Environment Actions
+    ↓
 11 Vertical Slice
     ↓
 11.1 Vertical Slice POIs
     ↓
 11.2 Milestone S0 Greybox
+    ↓
+12 Engine Choice
     ↓
 Future systems
 ```
@@ -140,9 +146,11 @@ Draft foundations in active refinement:
 - [08 Confront Constraints](08%20Confront%20Constraints.md) — combat fence: no XP, diegetic loot, real alternatives
 - [09 Information Sources](09%20Information%20Sources.md) — how the player learns without omniscient markers
 - [10 Turn Action Economy](10%20Turn%20Action%20Economy.md) — Move + Action + Bonus in turn-based mode
+- [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) — grid-native world + env verbs
 - [11 Vertical Slice](11%20Vertical%20Slice.md) — first playable proof plan
 - [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) — detailed Lower Veil encounter cards
 - [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md) — first prototype milestone: walkable greybox
+- [12 Engine Choice](12%20Engine%20Choice.md) — Unity vs Godot decision
 
 Not yet designing as content:
 
@@ -152,7 +160,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: choose engine and build S0.1 space, or continue design Open Questions.
+Next work: lock engine in 12 Engine Choice, then start S0 grid greybox.
 
 ---
 

@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.15
+Version: 0.16
 
 Status: Draft
 
@@ -327,6 +327,18 @@ The smallest playable prototype that proves the game fantasy and core systems wi
 ## Lower Veil District
 
 Placeholder name for the Vertical Slice district: a poor/industrial urban area of medicine, night routes, factory pressure, and Warden order.
+
+---
+
+## Grid World
+
+Gameplay space authored on a square grid. Movement, pathfinding, and most traversal truths are cell-based even if visuals look continuous.
+
+---
+
+## Environment Action
+
+A turn verb that uses tagged scenery — vault/jump, climb, window entry, mantle, breach — usually as an Action with readable failure costs.
 
 ---
 

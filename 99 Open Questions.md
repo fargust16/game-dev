@@ -105,6 +105,12 @@ Through reusable Information Sources with bias and partial truth: boards, newspa
 **What is the V1 turn structure?**  
 Move + Action + optional short Bonus. Same economy in Confront and non-combat Turn-Based Mode. Documented in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md).
 
+**What is the spatial model?**  
+Square grid from S0; levels and props are grid-native; Environment Actions cover vault/climb/window/etc. Documented in [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md).
+
+**Which engine?**  
+Pending confirmation in [12 Engine Choice](12%20Engine%20Choice.md). Human prefers Unity; Godot 4 remains competitive for AI/git lightness.
+
 **What is the first playable proof?**  
 A Vertical Slice in Lower Veil District with 2 selectable factions (Wardens / Veinmarket), 3 POIs, Information Sources, Turn-Based Mode, one Bargain tease, and Lord of the Mysteries-like industrial-era mood. Death Gap is out of slice scope. Placeholder names may change. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md).
 
@@ -172,9 +178,11 @@ How does the player enter and exit Turn-Based Mode outside combat without making
 
 How often may important nodes offer Confront as one option versus scenes that begin already in Confront?
 
-Grid, hex, or navmesh-free ranging for V1 turns?
+Exact initiative formula and Move Speed units / cells per Move for V1?
 
-Exact initiative formula and Move Speed units for V1?
+Diagonal move cost: 1 or 1.5?
+
+Exact fail chance bands for vault/climb/window in V1?
 
 Is Bonus-to-Dash enabled in V1 or deferred?
 
