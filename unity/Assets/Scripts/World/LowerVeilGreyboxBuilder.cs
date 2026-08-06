@@ -41,72 +41,99 @@ namespace GameDev.World
             grid.Configure(36, 28, cellSize, Vector3.zero);
             gridGo.AddComponent<GridDebugDrawer>();
 
-            PaintRect(grid, 0, 0, 35, 27, walkable: true, height: 0, flags: GridCellFlags.Walkable);
-            PaintRect(grid, 0, 22, 35, 27, walkable: true, height: 1, flags: GridCellFlags.Walkable);
-            PaintRect(grid, 30, 4, 35, 18, walkable: false, height: 2, flags: GridCellFlags.BlocksLoS | GridCellFlags.Climbable);
-            PaintRect(grid, 8, 14, 14, 16, walkable: false, height: 1, flags: GridCellFlags.BlocksLoS | GridCellFlags.Window);
+            // S0.2: compact district — readable loop Ridge → Tavern → Tincture → Loom → Stairs.
+            PaintRect(grid, 0, 0, 31, 23, walkable: true, height: 0, flags: GridCellFlags.Walkable);
+            PaintRect(grid, 0, 18, 31, 23, walkable: true, height: 1, flags: GridCellFlags.Walkable);
+
+            // Factory mass (east) and Harrow shop block.
+            PaintRect(grid, 26, 4, 31, 14, walkable: false, height: 2, flags: GridCellFlags.BlocksLoS | GridCellFlags.Climbable);
+            PaintRect(grid, 7, 11, 12, 13, walkable: false, height: 1, flags: GridCellFlags.BlocksLoS | GridCellFlags.Window);
+
+            // Frame the main street so the loop is obvious (side courtyards blocked).
+            PaintRect(grid, 0, 0, 4, 10, walkable: false, height: 1, flags: GridCellFlags.BlocksLoS);
+            PaintRect(grid, 14, 14, 20, 16, walkable: false, height: 1, flags: GridCellFlags.BlocksLoS);
+            PaintRect(grid, 0, 14, 5, 16, walkable: false, height: 1, flags: GridCellFlags.BlocksLoS);
 
             BuildFloorVisuals(grid);
-            PlaceBuildingMass(grid, 30, 4, 35, 18);
-            PlaceBuildingMass(grid, 8, 14, 14, 16);
-            PlaceWallStrip(grid, 30, 4, 30, 18);
+            PlaceBuildingMass(grid, 26, 4, 31, 14);
+            PlaceBuildingMass(grid, 7, 11, 12, 13);
+            PlaceBuildingMass(grid, 0, 0, 4, 10);
+            PlaceBuildingMass(grid, 14, 14, 20, 16);
+            PlaceWallStrip(grid, 26, 4, 26, 14);
 
-            CreateLandmark(grid, LandmarkId.RidgeApproach, "Ridge Approach", new GridCoord(18, 25));
-            CreateLandmark(grid, LandmarkId.SootAndBell, "Soot & Bell Tavern", new GridCoord(10, 20));
+            var ridge = CreateLandmark(grid, LandmarkId.RidgeApproach, "Ridge Approach", new GridCoord(16, 21));
+            AddWorldLabel(ridge, "Ridge Approach");
 
-            var board = SpawnPrefab(noticeBoardPrefab, grid, new GridCoord(12, 20), "Notice Board");
+            var tavern = CreateLandmark(grid, LandmarkId.SootAndBell, "Soot & Bell Tavern", new GridCoord(10, 17));
+            AddWorldLabel(tavern, "Soot & Bell");
+
+            var board = SpawnPrefab(noticeBoardPrefab, grid, new GridCoord(12, 17), "Notice Board");
             EnsureLandmark(board, LandmarkId.NoticeBoard, "Notice Board");
             EnsureInteract(board, "Read board",
                 "Pinned: 1) Warden seizure — Harrow & Tincture before second-shift bell. 2) Missing persons — Loom Lane. 3) Coal price notice.");
+            AddWorldLabel(board, "Notice Board");
 
-            var tavernTalk = CreateLandmark(grid, LandmarkId.SootAndBell, "Bartender Merrin", new GridCoord(9, 19));
+            var tavernTalk = CreateLandmark(grid, LandmarkId.SootAndBell, "Bartender Merrin", new GridCoord(9, 16));
             tavernTalk.name = "Bartender_Merrin";
             EnsureInteract(tavernTalk, "Talk",
                 "Merrin: Brass-numbers are taking old Harrow tonight. After the eleventh bell they take mill girls off Loom Lane. Check the board.");
+            AddWorldLabel(tavernTalk, "Merrin");
 
-            CreateLandmark(grid, LandmarkId.TinctureRow, "Tincture Row", new GridCoord(11, 15));
+            var tincture = CreateLandmark(grid, LandmarkId.TinctureRow, "Tincture Row", new GridCoord(10, 13));
+            AddWorldLabel(tincture, "Tincture Row");
 
-            var harrow = CreatePoi(grid, PoiShellId.PoiA_HarrowArrest, "Harrow & Tincture", new GridCoord(10, 14),
+            var harrow = CreatePoi(grid, PoiShellId.PoiA_HarrowArrest, "Harrow & Tincture", new GridCoord(9, 12),
                 "S1 will start Decision Node: Brass-Number Arrest at Harrow & Tincture.",
                 "Inspect POI A shell",
                 "POI A shell ready. S1 will start the arrest Decision Node here.");
             EnsureLandmark(harrow, LandmarkId.HarrowAndTincture, "Harrow & Tincture");
+            AddWorldLabel(harrow, "POI A — Harrow");
 
-            CreateLandmark(grid, LandmarkId.LoomLane, "Loom Lane", new GridCoord(18, 10));
+            var loom = CreateLandmark(grid, LandmarkId.LoomLane, "Loom Lane", new GridCoord(16, 9));
+            AddWorldLabel(loom, "Loom Lane");
 
-            var alley = CreatePoi(grid, PoiShellId.PoiB_EleventhBellCollectors, "Alley Mouth", new GridCoord(22, 9),
+            var alley = CreatePoi(grid, PoiShellId.PoiB_EleventhBellCollectors, "Alley Mouth", new GridCoord(19, 8),
                 "S1 will start Decision Node: Eleventh-Bell Collectors.",
                 "Inspect POI B shell",
                 "POI B shell ready. S1 will start the collectors Decision Node here.");
             EnsureLandmark(alley, LandmarkId.AlleyMouth, "Alley Mouth");
+            AddWorldLabel(alley, "POI B — Alley");
 
-            CreateLandmark(grid, LandmarkId.FactoryWall, "Factory Wall", new GridCoord(28, 11));
+            var factory = CreateLandmark(grid, LandmarkId.FactoryWall, "Factory Wall", new GridCoord(24, 10));
+            AddWorldLabel(factory, "Factory Wall");
 
-            var stairs = CreatePoi(grid, PoiShellId.PoiC_SootStairTrace, "Coal Stairs", new GridCoord(26, 8),
+            var stairs = CreatePoi(grid, PoiShellId.PoiC_SootStairTrace, "Coal Stairs", new GridCoord(23, 7),
                 "S1 will start Decision Node: Soot Stair Trace.",
                 "Inspect POI C shell",
                 "POI C shell ready. Aftermath Trace will live here after A/B.");
             EnsureLandmark(stairs, LandmarkId.CoalStairs, "Coal Stairs");
+            AddWorldLabel(stairs, "POI C — Stairs");
 
-            CreateEnvAction(grid, new GridCoord(13, 14), "Vault Crates",
+            // Waymarkers along the loop (E for hint if labels are missed).
+            CreateWaymarker(grid, new GridCoord(13, 19), "Waymarker", "South to Soot & Bell / Notice Board.");
+            CreateWaymarker(grid, new GridCoord(10, 15), "Waymarker", "Down Tincture Row — Harrow & Tincture ahead.");
+            CreateWaymarker(grid, new GridCoord(13, 11), "Waymarker", "East to Loom Lane, then the factory stairs.");
+            CreateWaymarker(grid, new GridCoord(20, 9), "Waymarker", "Coal Stairs / POI C under the factory wall.");
+
+            CreateEnvAction(grid, new GridCoord(13, 12), "Vault Crates",
                 EnvironmentActionType.VaultJump, 0.75f,
                 "Vaulted the crates on Tincture Row.",
                 "Slipped on wet cobble — noise, wasted effort.",
                 GridCellFlags.Walkable | GridCellFlags.Vaultable);
 
-            CreateEnvAction(grid, new GridCoord(8, 15), "Side Window",
+            CreateEnvAction(grid, new GridCoord(6, 12), "Side Window",
                 EnvironmentActionType.ClimbThroughWindow, 0.65f,
                 "Climbed through Harrow's side window.",
                 "Boot scraped the frame — spotted / noisy.",
                 GridCellFlags.Walkable | GridCellFlags.Window);
 
-            CreateEnvAction(grid, new GridCoord(29, 8), "Coal Ledge",
+            CreateEnvAction(grid, new GridCoord(25, 7), "Coal Ledge",
                 EnvironmentActionType.ClimbUp, 0.7f,
                 "Mantled the coal-stair ledge.",
                 "Lost grip on sooty brick — drop, Hurt stub.",
                 GridCellFlags.Walkable | GridCellFlags.Climbable | GridCellFlags.Stairs);
 
-            var player = SpawnPrefab(playerCapsulePrefab, grid, new GridCoord(18, 25), "Player");
+            var player = SpawnPrefab(playerCapsulePrefab, grid, new GridCoord(16, 21), "Player");
             DisableBlockingColliders(player);
             var playerCtrl = player.GetComponent<GridPlayerController>();
             if (playerCtrl == null)
@@ -114,7 +141,7 @@ namespace GameDev.World
                 playerCtrl = player.AddComponent<GridPlayerController>();
             }
 
-            playerCtrl.PlaceOnGrid(grid, new GridCoord(18, 25));
+            playerCtrl.PlaceOnGrid(grid, new GridCoord(16, 21));
 
             var camGo = new GameObject("TacticalCamera");
             camGo.transform.SetParent(transform, false);
@@ -129,7 +156,36 @@ namespace GameDev.World
             light.type = LightType.Directional;
             light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
 
-            Debug.Log("[S0] Greybox ready. LMB/Arrows move avatar; WASD pans camera; E interact (on-screen toast).");
+            Debug.Log("[S0.2] Route loop ready: Ridge → Tavern → Tincture → Loom → Stairs. Labels float above landmarks.");
+        }
+
+        private void CreateWaymarker(GridMap grid, GridCoord coord, string prompt, string message)
+        {
+            var go = SpawnPrefab(landmarkBlockPrefab, grid, coord, "Waymarker");
+            go.transform.localScale = Vector3.Scale(go.transform.localScale, new Vector3(0.55f, 0.45f, 0.55f));
+            EnsureInteract(go, prompt, message);
+            AddWorldLabel(go, "→");
+        }
+
+        private void AddWorldLabel(GameObject host, string text)
+        {
+            var existing = host.transform.Find("WorldLabel");
+            if (existing != null)
+            {
+                SafeDestroy(existing.gameObject);
+            }
+
+            var label = new GameObject("WorldLabel");
+            label.transform.SetParent(host.transform, false);
+            label.transform.localPosition = new Vector3(0f, 2.15f, 0f);
+            var tm = label.AddComponent<TextMesh>();
+            tm.text = text;
+            tm.fontSize = 48;
+            tm.characterSize = 0.06f;
+            tm.anchor = TextAnchor.MiddleCenter;
+            tm.alignment = TextAlignment.Center;
+            tm.color = new Color(0.95f, 0.92f, 0.8f, 1f);
+            label.AddComponent<BillboardLabel>();
         }
 
         private void ResolvePrefabs()

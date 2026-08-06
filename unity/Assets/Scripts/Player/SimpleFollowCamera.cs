@@ -19,7 +19,6 @@ namespace GameDev.Player
         [Header("Speeds")]
         [SerializeField] private float panSpeed = 14f;
         [SerializeField] private float fastPanMultiplier = 2.2f;
-        [SerializeField] private float rotateSpeed = 90f;
         [SerializeField] private float mouseRotateSensitivity = 0.18f;
         [SerializeField] private float zoomSpeed = 6f;
         [SerializeField] private float minDistance = 7f;
@@ -104,10 +103,7 @@ namespace GameDev.Player
                 focusPoint -= FlatForward() * (delta.y * 0.04f);
             }
 
-            // Q/E rotate yaw; RMB drag rotates yaw/pitch (common CRPG binding).
-            if (Input.GetKey(KeyCode.Q)) yaw -= rotateSpeed * dt;
-            if (Input.GetKey(KeyCode.E)) yaw += rotateSpeed * dt;
-
+            // Rotate with RMB drag only — E is reserved for interact.
             if (Input.GetMouseButtonDown(1))
             {
                 _draggingRotate = true;

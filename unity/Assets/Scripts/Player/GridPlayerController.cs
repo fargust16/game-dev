@@ -19,11 +19,11 @@ namespace GameDev.Player
     public sealed class GridPlayerController : MonoBehaviour
     {
         [SerializeField] private GridMap grid;
-        [SerializeField] private GridCoord startCoord = new GridCoord(18, 25);
+        [SerializeField] private GridCoord startCoord = new GridCoord(16, 21);
         [SerializeField] private MovementMode mode = MovementMode.FreeExploration;
 
         [Header("Free exploration")]
-        [SerializeField] private float moveSpeed = 4.5f;
+        [SerializeField] private float moveSpeed = 5.5f;
         [SerializeField] private float rotateSpeed = 12f;
         [SerializeField] private float clickArriveDistance = 0.15f;
 
@@ -93,7 +93,7 @@ namespace GameDev.Player
             SnapToCellImmediate();
             InteractionFeedback.Show(
                 "Lower Veil — S0",
-                "LMB move · Arrows walk · WASD camera · Q/E rotate · Wheel zoom · RMB orbit · F focus · E interact · T turn-based");
+                "LMB move · Arrows walk · WASD camera · Wheel zoom · RMB orbit · F focus · E interact · T turn-based");
         }
 
         private void Update()
