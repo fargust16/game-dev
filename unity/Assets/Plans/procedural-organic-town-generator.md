@@ -122,43 +122,45 @@ Block generation uses **recursive OBB subdivision** of district polygons (robust
 
 ### Milestone A — Deterministic data model + debug gizmos
 
-**Step A1 — Geometry foundation**
+> **Progress (2026-08-06): A1–A10 DONE.** Next gated: Milestone B greybox baker.
+
+**Step A1 — Geometry foundation** ✅
 - Create `Assets/Scripts/World/Town/Geometry/Geo2.cs` and `Polygon2.cs` with the utilities above.
 - **Role:** developer · **Dependencies:** None · **Parallelizable:** Yes (independent of A2).
 
-**Step A2 — Data model + config**
+**Step A2 — Data model + config** ✅
 - Create `TownModel.cs`, `RoadEdge.cs` (+`RoadNode`,`RoadClass`), `Portal.cs`, `District.cs` (+enums,`DistrictProfile`), `Block.cs`, `Plot.cs`, `Building.cs`, `OpenSpace.cs`, `Landmark.cs`, and `TownProfile.cs` (ScriptableObject) with a `CreateAssetMenu`. Author one default `TownProfile` asset under `Assets/Settings/`.
 - **Role:** developer · **Dependencies:** A1 (uses `Polygon2`) · **Parallelizable:** Partially.
 
-**Step A3 — Orchestrator + seed streams**
+**Step A3 — Orchestrator + seed streams** ✅
 - Create `TownGenerator.cs` (MonoBehaviour): fields `seed`, `TownProfile profile`, gizmo toggles, "generate on play", "time‑sliced". `Generate(int seed)` runs stages in order; `GenerateAsync` coroutine variant. Reuse `WorldSeed.Fork`. Reusable scratch buffers.
 - **Role:** developer · **Dependencies:** A2 · **Parallelizable:** No.
 
-**Step A4 — Stage: Site, terrain & landmark**
+**Step A4 — Stage: Site, terrain & landmark** ✅
 - `Stage_SiteAndLandmark.cs`: center, orientation, optional river/coast + ridge, boundary polygon, landmark type + footprint + central plaza.
 - **Role:** developer · **Dependencies:** A3 · **Parallelizable:** No.
 
-**Step A5 — Stage: Portals & primary roads**
+**Step A5 — Stage: Portals & primary roads** ✅
 - `Stage_PrimaryRoads.cs`: typed portals on boundary; curved arterials center→portals (Catmull‑Rom, curvature‑limited, bundling); 1–2 broken rings; populate planar graph (`RoadNode`/`RoadEdge`) with widths.
 - **Role:** developer · **Dependencies:** A4 · **Parallelizable:** No.
 
-**Step A6 — Stage: Districts**
+**Step A6 — Stage: Districts** ✅
 - `Stage_Districts.cs`: partition interior into district polygons (clip against arterial/ring corridors; fallback per Risk note); classify wealth/type; assign `DistrictProfile`.
 - **Role:** developer · **Dependencies:** A5 · **Parallelizable:** No.
 
-**Step A7 — Stage: Secondary streets + blocks**
+**Step A7 — Stage: Secondary streets + blocks** ✅
 - `Stage_Streets.cs`: recursive OBB subdivision of each district → blocks; split lines → Secondary/Tertiary/Alley streets (jitter + slight curve, T‑junction bias); dense districts add dead‑ends, service alleys, and cut‑through shortcuts.
 - **Role:** developer · **Dependencies:** A6 + A1 · **Parallelizable:** No.
 
-**Step A8 — Stage: Plots + buildings + open spaces**
+**Step A8 — Stage: Plots + buildings + open spaces** ✅
 - `Stage_Plots.cs` (inset blocks, recursive plot subdivision, frontage guarantee, courtyard/garden leftovers), `Stage_Buildings.cs` (footprints, row/detached/L‑corner, floors), `Stage_OpenSpaces.cs` (plazas at junctions, wells, gardens/courtyards).
 - **Role:** developer · **Dependencies:** A7 · **Parallelizable:** Plots→Buildings sequential; OpenSpaces partially parallel after plots.
 
-**Step A9 — Stage: Connectivity & prominence + human‑scale validation**
+**Step A9 — Stage: Connectivity & prominence + human‑scale validation** ✅
 - `Stage_ConnectivityAndScale.cs`: road‑graph flood‑fill; ensure all portals + landmark + every plot reachable (corrective links); enforce landmark view cone/plaza/elevation; assert metric bounds and log violations.
 - **Role:** developer · **Dependencies:** A8 · **Parallelizable:** No.
 
-**Step A10 — Debug gizmos + editor menu**
+**Step A10 — Debug gizmos + editor menu** ✅
 - `TownGizmoDrawer.cs` (layered toggles per UI section) and `Assets/Scripts/Editor/TownGenerateMenu.cs` (`GameDev/Town/…` generate/clear/open‑scene). Create `Assets/Scenes/Town_Generator.unity` (or reuse a scratch scene) hosting `TownGenerator`.
 - **Role:** developer · **Dependencies:** A2..A9 · **Parallelizable:** Gizmos vs menu parallel.
 

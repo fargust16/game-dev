@@ -1,6 +1,6 @@
 # 13 City Generation
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft
 
@@ -24,9 +24,16 @@ Success question:
 
 > Does regenerating with seed A vs B change crooked streets and blocks while always placing slice POIs and garrison/undercroft stubs, with every anchor path-connected to the market?
 
-# Growth Pipeline
+# Status (2026-08-06)
 
-Implementation: `WorldSeed` + `CityGenerator` + `unity/Assets/Scripts/World/Town/` (`OrganicRoadBuilder`, `TownRoadGraph`, `TownBlockParcelizer`).
+| Layer | State |
+|-------|--------|
+| **v1 raster playable** | `CityGenerator` + `OrganicRoadBuilder` / `TownRoadGraph` / `TownBlockParcelizer` — scene `City_OrganicTown.unity`, menu `GameDev/City/…` |
+| **v2 vector (OrganicTown)** | Milestone **A complete** (data model + stage pipeline + gizmos). Menu `GameDev/Town/…`, scene created via *Open Or Create Town Scene*. Plan: `unity/Assets/Plans/procedural-organic-town-generator.md`. Greybox bake (B), enterable interiors, BG3 occlusion, wilderness — **gated next** |
+
+# Growth Pipeline (v1 raster — playable)
+
+Implementation: `WorldSeed` + `CityGenerator` + raster helpers under `unity/Assets/Scripts/World/Town/`.
 
 Order:
 
