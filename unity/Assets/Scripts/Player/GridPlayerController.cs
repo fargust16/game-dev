@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using GameDev.Environment;
 using GameDev.Grid;
 using GameDev.Interaction;
+using GameDev.World;
 using UnityEngine;
 
 namespace GameDev.Player
