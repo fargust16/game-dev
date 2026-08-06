@@ -1,0 +1,114 @@
+using UnityEngine;
+
+namespace GameDev.Interaction
+{
+    /// <summary>
+    /// S0 on-screen stub feedback. Full dialogue UI comes later; this makes interactions
+    /// readable in the Game view without opening the Console.
+    /// </summary>
+    public sealed class InteractionFeedback : MonoBehaviour
+    {
+        private static InteractionFeedback _instance;
+
+        [SerializeField] private float defaultSeconds = 5f;
+
+        private string _title = "";
+        private string _body = "";
+        private float _until;
+        private GUIStyle _boxStyle;
+        private GUIStyle _titleStyle;
+        private GUIStyle _bodyStyle;
+
+        public static void Show(string title, string body, float seconds = -1f)
+        {
+            EnsureExists();
+            _instance._title = title;
+            _instance._body = body;
+            _instance._until = Time.time + (seconds > 0f ? seconds : _instance.defaultSeconds);
+            Debug.Log($"[{title}] {body}");
+        }
+
+        public static void Show(string body)
+        {
+            Show("Notice", body);
+        }
+
+        private static void EnsureExists()
+        {
+            if (_instance != null)
+            {
+                return;
+            }
+
+            var go = new GameObject("InteractionFeedback");
+            _instance = go.AddComponent<InteractionFeedback>();
+            DontDestroyOnLoad(go);
+        }
+
+        private void Awake()
+        {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            _instance = this;
+        }
+
+        private void OnGUI()
+        {
+            if (Time.time > _until || string.IsNullOrEmpty(_body))
+            {
+                return;
+            }
+
+            EnsureStyles();
+            const float width = 520f;
+            const float height = 120f;
+            var rect = new Rect((Screen.width - width) * 0.5f, Screen.height - height - 28f, width, height);
+            GUI.Box(rect, GUIContent.none, _boxStyle);
+            GUI.Label(new Rect(rect.x + 16f, rect.y + 10f, width - 32f, 24f), _title, _titleStyle);
+            GUI.Label(new Rect(rect.x + 16f, rect.y + 38f, width - 32f, height - 50f), _body, _bodyStyle);
+        }
+
+        private void EnsureStyles()
+        {
+            if (_boxStyle != null)
+            {
+                return;
+            }
+
+            _boxStyle = new GUIStyle(GUI.skin.box);
+            _boxStyle.normal.background = MakeTex(2, 2, new Color(0.08f, 0.08f, 0.1f, 0.88f));
+
+            _titleStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 15,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = new Color(0.95f, 0.85f, 0.55f) }
+            };
+
+            _bodyStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 13,
+                wordWrap = true,
+                normal = { textColor = new Color(0.92f, 0.92f, 0.9f) }
+            };
+        }
+
+        private static Texture2D MakeTex(int w, int h, Color color)
+        {
+            var pixels = new Color[w * h];
+            for (var i = 0; i < pixels.Length; i++)
+            {
+                pixels[i] = color;
+            }
+
+            var tex = new Texture2D(w, h);
+            tex.SetPixels(pixels);
+            tex.Apply();
+            return tex;
+        }
+    }
+}

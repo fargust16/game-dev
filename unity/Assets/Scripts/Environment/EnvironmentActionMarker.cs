@@ -1,3 +1,4 @@
+using GameDev.Interaction;
 using UnityEngine;
 
 namespace GameDev.Environment
@@ -23,9 +24,9 @@ namespace GameDev.Environment
         public bool TryPerform()
         {
             var ok = Random.value <= successChance;
-            Debug.Log(ok
-                ? $"[EnvAction] {actionType}: SUCCESS — {successMessage}"
-                : $"[EnvAction] {actionType}: FAIL — {failMessage}", this);
+            InteractionFeedback.Show(
+                ok ? $"{actionType} — success" : $"{actionType} — fail",
+                ok ? successMessage : failMessage);
             return ok;
         }
     }

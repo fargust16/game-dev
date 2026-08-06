@@ -17,7 +17,7 @@ namespace GameDev.Interaction
 
         public void Interact()
         {
-            Debug.Log($"[Interact] {gameObject.name}: {message}", this);
+            InteractionFeedback.Show(prompt, message);
         }
     }
 }

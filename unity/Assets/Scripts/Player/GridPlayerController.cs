@@ -12,8 +12,8 @@ namespace GameDev.Player
     }
 
     /// <summary>
-    /// Free exploration: smooth WASD (diagonals) + click-to-move.
-    /// Turn-Based: discrete cell steps (S0 stub; full Move+Action comes later).
+    /// Free exploration: click-to-move + arrow keys (WASD is camera pan, BG3-style).
+    /// Turn-Based: discrete cell steps with arrows.
     /// Design: 10 Turn Action Economy, 11.2 Milestone S0.
     /// </summary>
     public sealed class GridPlayerController : MonoBehaviour
@@ -62,9 +62,11 @@ namespace GameDev.Player
                 SnapToCellImmediate();
             }
 
-            Debug.Log(mode == MovementMode.TurnBased
-                ? "[Player] Turn-Based Mode — cell steps (WASD). Press T to return to free exploration."
-                : "[Player] Free Exploration — smooth move + click. Press T for Turn-Based.");
+            InteractionFeedback.Show(
+                mode == MovementMode.TurnBased ? "Turn-Based" : "Free Exploration",
+                mode == MovementMode.TurnBased
+                    ? "Cell steps with Arrow keys. Press T to return to free exploration."
+                    : "LMB click-to-move, Arrows walk. WASD pans camera. Press T for Turn-Based.");
         }
 
         private void Awake()
@@ -89,7 +91,9 @@ namespace GameDev.Player
 
             _ready = true;
             SnapToCellImmediate();
-            Debug.Log("[Player] Free Exploration active. WASD/Arrows move smoothly, LMB click-to-move, E interact, T toggles Turn-Based.");
+            InteractionFeedback.Show(
+                "Lower Veil — S0",
+                "LMB move · Arrows walk · WASD camera · Q/E rotate · Wheel zoom · RMB orbit · F focus · E interact · T turn-based");
         }
 
         private void Update()
@@ -123,12 +127,13 @@ namespace GameDev.Player
 
         private void UpdateFreeExploration()
         {
+            // RMB is camera rotate — only LMB sets move target.
             if (Input.GetMouseButtonDown(0) && !IsPointerOverBlockingUi())
             {
                 TrySetClickTarget();
             }
 
-            var input = ReadMoveInput();
+            var input = ReadArrowMoveInput();
             if (input.sqrMagnitude > 0.001f)
             {
                 _hasClickTarget = false;
@@ -161,13 +166,12 @@ namespace GameDev.Player
                 return;
             }
 
-            var input = ReadMoveInput();
+            var input = ReadArrowMoveInput();
             if (input.sqrMagnitude < 0.001f)
             {
                 return;
             }
 
-            // Cardinal or diagonal one-cell step.
             var dx = input.x > 0.5f ? 1 : input.x < -0.5f ? -1 : 0;
             var dy = input.z > 0.5f ? 1 : input.z < -0.5f ? -1 : 0;
             if (dx == 0 && dy == 0)
@@ -181,7 +185,6 @@ namespace GameDev.Player
                 return;
             }
 
-            // Block diagonal corner-cutting through walls.
             if (dx != 0 && dy != 0)
             {
                 if (!grid.IsWalkable(new GridCoord(_coord.x + dx, _coord.y)) ||
@@ -196,20 +199,15 @@ namespace GameDev.Player
             _nextTurnStepTime = Time.time + turnStepCooldown;
         }
 
-        private static Vector2 ReadMoveInputRaw()
+        private static Vector3 ReadArrowMoveInput()
         {
             var x = 0f;
             var y = 0f;
-            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) x += 1f;
-            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) x -= 1f;
-            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) y += 1f;
-            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) y -= 1f;
-            return new Vector2(x, y);
-        }
-
-        private static Vector3 ReadMoveInput()
-        {
-            var raw = ReadMoveInputRaw();
+            if (Input.GetKey(KeyCode.RightArrow)) x += 1f;
+            if (Input.GetKey(KeyCode.LeftArrow)) x -= 1f;
+            if (Input.GetKey(KeyCode.UpArrow)) y += 1f;
+            if (Input.GetKey(KeyCode.DownArrow)) y -= 1f;
+            var raw = new Vector2(x, y);
             if (raw.sqrMagnitude > 1f)
             {
                 raw.Normalize();
@@ -246,7 +244,6 @@ namespace GameDev.Player
             var next = transform.position + direction * distance;
             if (!CanStandAt(next))
             {
-                // Slide along axes so corners feel less sticky.
                 var onlyX = transform.position + new Vector3(direction.x, 0f, 0f) * distance;
                 var onlyZ = transform.position + new Vector3(0f, 0f, direction.z) * distance;
                 if (CanStandAt(onlyX))
@@ -289,7 +286,7 @@ namespace GameDev.Player
             var point = ray.GetPoint(enter);
             if (!CanStandAt(point))
             {
-                Debug.Log("[Player] Click target blocked.");
+                InteractionFeedback.Show("Blocked", "That ground is not walkable.");
                 return;
             }
 
@@ -305,7 +302,6 @@ namespace GameDev.Player
                 return false;
             }
 
-            // Keep a little clearance from blocked neighbors when near cell edges.
             var center = grid.CoordToWorldCenter(coord);
             var local = world - center;
             var half = grid.CellSize * 0.45f;
@@ -359,7 +355,6 @@ namespace GameDev.Player
 
         private static bool IsPointerOverBlockingUi()
         {
-            // No UI canvas yet in S0.
             return false;
         }
 
@@ -403,7 +398,9 @@ namespace GameDev.Player
                 return;
             }
 
-            Debug.Log("[Player] Nothing nearby. Walk to Soot & Bell / notice board / orange POI, then press E.");
+            InteractionFeedback.Show(
+                "Nothing nearby",
+                "Walk to Soot & Bell / notice board / orange POI, then press E.");
         }
 
         private static float HorizontalDistance(Vector3 a, Vector3 b)

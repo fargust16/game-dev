@@ -116,13 +116,12 @@ namespace GameDev.World
 
             playerCtrl.PlaceOnGrid(grid, new GridCoord(18, 25));
 
-            var camGo = new GameObject("FollowCamera");
+            var camGo = new GameObject("TacticalCamera");
             camGo.transform.SetParent(transform, false);
             var cam = camGo.AddComponent<Camera>();
             cam.tag = "MainCamera";
-            var follow = camGo.AddComponent<SimpleFollowCamera>();
-            follow.SetTarget(player.transform);
-            camGo.transform.position = player.transform.position + new Vector3(0f, 14f, -10f);
+            var tacticalCam = camGo.AddComponent<SimpleFollowCamera>();
+            tacticalCam.SetTarget(player.transform);
 
             var lightGo = new GameObject("Directional Light");
             lightGo.transform.SetParent(transform, false);
@@ -130,7 +129,7 @@ namespace GameDev.World
             light.type = LightType.Directional;
             light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
 
-            Debug.Log("[S0] Lower Veil greybox built from S0_Greybox prefabs. WASD/Arrows move, E interacts.");
+            Debug.Log("[S0] Greybox ready. LMB/Arrows move avatar; WASD pans camera; E interact (on-screen toast).");
         }
 
         private void ResolvePrefabs()
