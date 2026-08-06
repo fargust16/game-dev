@@ -44,6 +44,26 @@ namespace GameDev.Player
 
         public CameraRigMode RigMode => rigMode;
 
+        /// <summary>Current pan/follow focus on the ground plane (XZ).</summary>
+        public Vector3 FocusPoint => focusPoint;
+
+        /// <summary>Avatar / follow target when assigned.</summary>
+        public Transform FocusTarget => focusTarget;
+
+        /// <summary>
+        /// Sample position for building occlusion (D2): prefer avatar, else focus point.
+        /// </summary>
+        public Vector3 GetOcclusionSamplePosition(float sampleHeight = 1f)
+        {
+            if (focusTarget != null)
+            {
+                var p = focusTarget.position;
+                return new Vector3(p.x, Mathf.Max(sampleHeight, p.y), p.z);
+            }
+
+            return new Vector3(focusPoint.x, sampleHeight, focusPoint.z);
+        }
+
         public void SetTarget(Transform newTarget)
         {
             focusTarget = newTarget;

@@ -9,7 +9,7 @@ namespace GameDev.World.Town
 {
     /// <summary>
     /// OrganicTown v2 orchestrator — deterministic stage pipeline into <see cref="TownModel"/>.
-    /// Milestone B/D1: optional greybox bake (streets + shells or enterable interiors).
+    /// Milestone B/D1/D2: greybox bake + building occlusion hookup.
     /// </summary>
     public sealed class TownGenerator : MonoBehaviour
     {
@@ -18,6 +18,7 @@ namespace GameDev.World.Town
         [SerializeField] private bool generateOnPlay;
         [SerializeField] private bool timeSliced;
         [SerializeField] private bool bakeGreybox = true;
+        [SerializeField] private bool enableBuildingOcclusion = true;
 
         [Header("S0 Greybox Prefabs (Milestone B/D1)")]
         [SerializeField] private GameObject floorTilePrefab;
@@ -164,6 +165,30 @@ namespace GameDev.World.Town
             building1x1Prefab = prefs.Building1x1;
             landmarkBlockPrefab = prefs.LandmarkBlock;
             wallSegmentPrefab = prefs.WallSegment;
+            RefreshBuildingOcclusion();
+        }
+
+        private void RefreshBuildingOcclusion()
+        {
+            if (!enableBuildingOcclusion)
+            {
+                var existing = GetComponent<BuildingOcclusionController>();
+                if (existing != null)
+                {
+                    existing.enabled = false;
+                }
+
+                return;
+            }
+
+            var occlusion = GetComponent<BuildingOcclusionController>();
+            if (occlusion == null)
+            {
+                occlusion = gameObject.AddComponent<BuildingOcclusionController>();
+            }
+
+            occlusion.enabled = true;
+            occlusion.SetTownGenerator(this);
         }
 
         private static int CountTemplated(TownModel model)
@@ -185,6 +210,7 @@ namespace GameDev.World.Town
             TownGreyboxBaker.Clear(transform);
             _model.Reset(seed);
             _validationLog.Clear();
+            RefreshBuildingOcclusion();
         }
 
         private void ResolveProfile()

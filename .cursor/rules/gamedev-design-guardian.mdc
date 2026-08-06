@@ -26,7 +26,7 @@ V1 Confront: in-location Turn-Based Mode; also available outside combat.
 Information Sources are partial and biased; no omniscient quest spoiler log.
 V1 turns: Move + Action + short Bonus; same in and out of Confront.
 First build target: Vertical Slice with tiny content proving the systems; do not scope-creep into the full game.
-S0 greybox + OrganicTown v2 A/B + D1 done (enterable templates + socket roles/query). Next D2 BG3 occlusion — see `14 World Generation Roadmap.md` and `unity/Assets/Plans/MILESTONE_D1_PLAN.md`.
+S0 greybox + OrganicTown v2 A/B + D1 done; D2 HideWalls occlusion in progress — see `14 World Generation Roadmap.md` and `unity/Assets/Plans/MILESTONE_D2_PLAN.md`. Next after D2: C1 narrative.
 Engine locked: Unity in `unity/` (URP, C#, custom grid). Do not jump to GridMap bridge / combat before roadmap order.
 
 Design important choices as Decision Node + POI cards before writing content details.

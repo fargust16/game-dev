@@ -124,7 +124,7 @@ Block generation uses **recursive OBB subdivision** of district polygons (robust
 
 ### Milestone A — Deterministic data model + debug gizmos
 
-> **Progress (2026-08-06): A1–A10 DONE. B1 DONE. D1.1–D1.3 DONE (16 templates, sockets+roles+query).** Next: D2 occlusion.
+> **Progress (2026-08-06): A–D1 DONE. D2 HideWalls occlusion landed (volume + visual roots + controller).** Next: verify D2 in Unity, then C1.
 
 **Step A1 — Geometry foundation** ✅
 - Create `Assets/Scripts/World/Town/Geometry/Geo2.cs` and `Polygon2.cs` with the utilities above.

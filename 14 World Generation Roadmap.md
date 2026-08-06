@@ -1,6 +1,6 @@
 # 14 World Generation Roadmap
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft
 
@@ -34,7 +34,8 @@ Success question for agents:
 |-------|-------------|-------------|
 | **OrganicTown v2 Milestone A** | Vector town: `TownModel` filled by stage pipeline + gizmos | `GameDev/Town/Open Or Create Town Scene` → Scene view Gizmos |
 | **OrganicTown v2 Milestone B** | Greybox baker: street ribbons + exterior shells + landmark | `GameDev/Town/Generate From Seed` (auto-bake) or `Bake Greybox` |
-| **OrganicTown v2 D1** ✅ | Enterable templates (~16) + sockets/roles/query for C1 | [`MILESTONE_D1_PLAN.md`](unity/Assets/Plans/MILESTONE_D1_PLAN.md); next **D2** occlusion |
+| **OrganicTown v2 D1** ✅ | Enterable templates (~16) + sockets/roles/query for C1 | [`MILESTONE_D1_PLAN.md`](unity/Assets/Plans/MILESTONE_D1_PLAN.md) |
+| **OrganicTown v2 D2** (partial) | BG3 HideWalls occlusion inside building volumes | [`MILESTONE_D2_PLAN.md`](unity/Assets/Plans/MILESTONE_D2_PLAN.md) |
 | **v1 raster playable city** | Walkable greybox Lower Veil (shells, POIs, tips, clock) | `GameDev/City/Generate From Seed` → `City_OrganicTown.unity` + Play |
 
 ### v2 Milestone A — key files
@@ -62,7 +63,13 @@ Success question for agents:
 - `Stage_AssignTemplates.cs` (fork `templates`)
 - Baker: interior cells + socket pedestals; gizmos: `DrawSockets`
 - Tests: `BuildingTemplateTests.cs`, `BuildingSocketTests.cs`
-- **Next roadmap phase:** **D2** BG3 occlusion
+### v2 D2 — key files (in progress)
+
+- Plan: [`unity/Assets/Plans/MILESTONE_D2_PLAN.md`](unity/Assets/Plans/MILESTONE_D2_PLAN.md)
+- `BuildingVolume.cs`, `BuildingVisualRoot.cs`, `BuildingOcclusionController.cs`
+- Baker tags Wall/Floor/Shell/Socket; `TownGenerator` refreshes occlusion after bake
+- `SimpleFollowCamera.GetOcclusionSamplePosition` (avatar or free focus)
+- **Next:** verify in Unity; optional D2.3 material fade later; then **C1**
 
 ### v1 raster — key files (still live for gameplay)
 
@@ -72,7 +79,7 @@ Success question for agents:
 
 ## Not done yet
 
-- No BG3-style wall/roof fade (**D2**) — next default
+- D2 material-fade / roof meshes not done (HideWalls V1 only)
 - Narrative POI spawn still on v1 raster until **C1** consumes D1 sockets
 - No narrative POI port onto v2 + `GridMap` bridge; raster gen not retired (**C**)
 - No wilderness / caves outside walls (**E**)
@@ -125,7 +132,7 @@ Each phase = its own plan + commit series. Prefer updating this file’s “Wher
 # Agent Instructions (quick)
 
 1. Read this file + [`MILESTONE_B_WORK_REPORT.md`](unity/Assets/Plans/MILESTONE_B_WORK_REPORT.md) + [`13 City Generation.md`](13%20City%20Generation.md) + the Unity plan under `Assets/Plans/`.
-2. **Next implementation default:** Milestone **D2** — BG3-style wall/roof fade while inside a building volume. Do not start C2/E early; C1 may follow D2 or overlap only after occlusion basics exist.
+2. **Next implementation default:** finish verifying **D2** HideWalls, then **C1** narrative on v2 (sockets already ready). Do not start C2/E early.
 3. Keep style: no inheritance tricks, `WorldSeed.Fork` per stage, list order (no HashSet iteration for geometry), human-scale metres on XZ.
 4. Confirm design forks with the user before changing locked architecture above.
 5. After a documentation or milestone step: commit and push to `main` per project habit.

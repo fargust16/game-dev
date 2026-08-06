@@ -7,9 +7,8 @@ using UnityEditor;
 namespace GameDev.World.Town
 {
     /// <summary>
-    /// Milestone B/D1 greybox layer over <see cref="TownModel"/>.
-    /// Streets + exterior shells or enterable template cells + landmark.
-    /// No GridMap bridge, narrative POIs, or occlusion.
+    /// Milestone B/D1/D2 greybox layer over <see cref="TownModel"/>.
+    /// Streets + enterable interiors (or shells) + landmark + visual tags for occlusion.
     /// </summary>
     public static class TownGreyboxBaker
     {
@@ -178,8 +177,10 @@ namespace GameDev.World.Town
                     {
                         var root = new GameObject($"Interior_{bi}_{template.Id}");
                         root.transform.SetParent(parent, false);
-                        BakeInterior(root.transform, building, template, prefs);
-                        BakeSocketMarkers(root.transform, building);
+                        var visual = root.AddComponent<BuildingVisualRoot>();
+                        visual.Configure(bi);
+                        BakeInterior(root.transform, building, template, prefs, visual);
+                        BakeSocketMarkers(root.transform, building, visual);
                         continue;
                     }
                 }
@@ -192,6 +193,9 @@ namespace GameDev.World.Town
                 // Solid shell fallback when no template fits.
                 var go = SpawnPrefab(prefs.Building1x1, parent, $"Building_{bi}_{building.Kind}");
                 PlaceOrientedShell(go, center, axis, sizeX, sizeZ, building.Floors);
+                var shellVisual = go.AddComponent<BuildingVisualRoot>();
+                shellVisual.Configure(bi);
+                shellVisual.RegisterAllInChildren(go, BuildingVisualCategory.Shell);
             }
         }
 
@@ -199,7 +203,8 @@ namespace GameDev.World.Town
             Transform parent,
             Building building,
             BuildingTemplate template,
-            PrefabSet prefs)
+            PrefabSet prefs,
+            BuildingVisualRoot visual)
         {
             var floors = Mathf.Max(0.5f, building.Floors);
             var yaw = building.TemplateYawDeg;
@@ -235,6 +240,11 @@ namespace GameDev.World.Town
                         }
 
                         DisableColliders(wall);
+                        if (visual != null)
+                        {
+                            visual.RegisterAllInChildren(wall, BuildingVisualCategory.Wall);
+                        }
+
                         continue;
                     }
 
@@ -244,6 +254,10 @@ namespace GameDev.World.Town
                     floor.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
                     floor.transform.localScale = new Vector3(cs, 1f, cs);
                     DisableColliders(floor);
+                    if (visual != null)
+                    {
+                        visual.RegisterAllInChildren(floor, BuildingVisualCategory.Floor);
+                    }
                 }
             }
         }
@@ -251,7 +265,7 @@ namespace GameDev.World.Town
         /// <summary>
         /// Tiny greybox pedestals for placed sockets (debug/readability). C1 will replace with real content.
         /// </summary>
-        private static void BakeSocketMarkers(Transform parent, Building building)
+        private static void BakeSocketMarkers(Transform parent, Building building, BuildingVisualRoot visual)
         {
             var sockets = building.Sockets;
             if (sockets == null || sockets.Count == 0)
@@ -271,6 +285,10 @@ namespace GameDev.World.Town
                 marker.transform.position = Geo2.ToVector3(s.WorldPos, height * 0.5f);
                 marker.transform.localScale = new Vector3(0.35f, height, 0.35f);
                 DisableColliders(marker);
+                if (visual != null)
+                {
+                    visual.RegisterAllInChildren(marker, BuildingVisualCategory.Socket);
+                }
             }
         }
 

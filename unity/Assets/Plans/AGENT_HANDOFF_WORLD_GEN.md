@@ -14,12 +14,13 @@
 - **D1.1 DONE** — enterable template foundation (commit `83be757`). Seed 110201: ~26% templated with 5 large starters; roads OK.
 - **D1.2 DONE** — catalog 16 types; seed 110201 **55%** templated; roads OK. Plan: [`MILESTONE_D1_PLAN.md`](MILESTONE_D1_PLAN.md)
 - **D1.3 DONE** — placed sockets with roles + `TownSocketQuery` for future C1; gizmos (`DrawSockets`) + greybox pedestals; still no narrative spawn
+- **D2 IN PROGRESS** — `BuildingVolume` + `BuildingVisualRoot` + `BuildingOcclusionController` (HideWalls). Plan: [`MILESTONE_D2_PLAN.md`](MILESTONE_D2_PLAN.md)
 - **v1 raster city still playable.** Menu: `GameDev/City/…` — do not delete until roadmap **C2**
-- **Next default:** **D2** BG3 occlusion (walls/roof fade while inside)
+- **Next:** finish/verify D2 in Unity (focus inside templated building → walls hide), then **C1** narrative on v2
 
 ## Order
 
-`A ✅ → B ✅ → D1 ✅ (templates + sockets) → D2 (BG3 occlusion) → C1/C2 (narrative + GridMap) → E (wilderness/caves)`
+`A ✅ → B ✅ → D1 ✅ → D2 (occlusion, underway) → C1/C2 (narrative + GridMap) → E (wilderness/caves)`
 
 Do not skip ahead to Valheim wilderness or collapse D1+D2+C into one sprint, unless the user explicitly overrides.
 

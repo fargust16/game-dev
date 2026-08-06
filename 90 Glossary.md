@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.20
+Version: 0.21
 
 Status: Draft
 
@@ -357,6 +357,12 @@ A reusable schematic interior for OrganicTown v2: local cell paint (floor / wall
 ## Building Socket
 
 A placed NPC or prop anchor inside a BuildingTemplate instance. Carries a stable role (Keeper, Counter, Guard, …), local cell, and world position so the narrative layer (C1) can attach content without rescanning interiors. See Milestone D1.3 in `unity/Assets/Plans/MILESTONE_D1_PLAN.md`.
+
+---
+
+## Building Occlusion
+
+Runtime readability aid (Milestone D2): while the tracked subject is inside a building volume, exterior walls/shells of that building are hidden or faded so the interior stays legible (BG3-like). Floors and sockets remain. See `unity/Assets/Plans/MILESTONE_D2_PLAN.md`.
 
 ---
 
