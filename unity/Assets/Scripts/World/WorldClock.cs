@@ -11,7 +11,7 @@ namespace GameDev.World
     {
         public static WorldClock Instance { get; private set; }
 
-        [SerializeField] private float worldHours;
+        [SerializeField] private float worldHours = 9f;
         [Tooltip("Realtime seconds that equal one in-world hour.")]
         [SerializeField] private float realtimeSecondsPerWorldHour = 45f;
         [SerializeField] private bool isPaused;
@@ -97,6 +97,27 @@ namespace GameDev.World
 
             worldHours = Mathf.Max(0f, worldHours + hours);
             Debug.Log($"[WorldClock] Day {DayIndex}, {HourOfDay:0.0}h (total {worldHours:0.0}h)");
+        }
+
+        /// <summary>
+        /// Jump forward to the next occurrence of hourOfDay (0–24).
+        /// </summary>
+        public void SkipToHourOfDay(float hourOfDay)
+        {
+            if (isPaused)
+            {
+                return;
+            }
+
+            hourOfDay = Mathf.Repeat(hourOfDay, 24f);
+            var current = HourOfDay;
+            var delta = hourOfDay - current;
+            if (delta <= 0.05f)
+            {
+                delta += 24f;
+            }
+
+            AdvanceHours(delta);
         }
 
         public string FormatStatus()

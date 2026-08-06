@@ -52,7 +52,7 @@ namespace GameDev.Interaction
         {
             Show(
                 "Lower Veil — legend (H to repeat)",
-                "Tips Hint/Mark POIs. At Marked POI A/B press E → Decision Node (keys 1-5, Esc cancel). ] +1h · P pause · Tab WASD · N day/night · H legend.",
+                "Tips Hint/Mark POIs. E on POI A/B → Decision (1-5). Light follows clock (dusk 17–20). ] +1h · N skip to dusk/morning · P pause · Tab WASD · H legend.",
                 12f);
         }
 

@@ -296,8 +296,7 @@ namespace GameDev.World
                 warmTavern,
                 coolLoom,
                 gasLamps);
-
-            controller.SetDayMode();
+            // Lighting follows WorldClock (starts ~09:00 day, eases through dusk/night).
         }
 
         private static void CreateGasLamp(GameObject parent, string name, Vector3 pos)
