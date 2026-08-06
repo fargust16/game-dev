@@ -128,6 +128,16 @@ The player may manually enter Turn-Based Mode to control tense moments:
 
 The player may leave Turn-Based Mode when not forced by Confront, returning to normal exploration pacing.
 
+## Exploration pacing (locked for V1 feel)
+
+Outside Turn-Based Mode the avatar moves in **Free Exploration**:
+
+- smooth continuous movement (WASD / arrows, including diagonals);
+- optional click-to-move toward a walkable point (BG3-like);
+- the world remains **grid-authored** for walkability, cover, and Environment Actions — free move does not invent off-grid parkour.
+
+Entering Turn-Based Mode switches to discrete cell steps and the Move + Action + Bonus economy. S0 prototype toggles modes with **T**.
+
 ## Leave Confront
 
 Turn-Based Mode ends when:

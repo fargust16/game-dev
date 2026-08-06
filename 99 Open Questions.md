@@ -174,7 +174,8 @@ Should Bound Path get a light Rite/Invoke extension in V1, or remain under Excha
 
 ## Confront / Turn Economy
 
-How does the player enter and exit Turn-Based Mode outside combat without making exploration tedious?
+How does the player enter and exit Turn-Based Mode outside combat without making exploration tedious?  
+**Partial lock:** Free Exploration is smooth continuous move (+ click-to-move); Turn-Based is discrete cells + Move/Action/Bonus. Manual toggle exists in S0 (`T`). Remaining: diegetic UX (when Confront auto-locks, prompts, fatigue of manual TB).
 
 How often may important nodes offer Confront as one option versus scenes that begin already in Confront?
 
