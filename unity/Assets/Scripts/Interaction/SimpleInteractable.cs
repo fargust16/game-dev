@@ -17,6 +17,16 @@ namespace GameDev.Interaction
 
         public void Interact()
         {
+            var tip = GetComponent<GameDev.World.TipGiver>();
+            tip?.GiveTips();
+
+            var poi = GetComponent<GameDev.World.PoiShellMarker>();
+            if (poi != null)
+            {
+                poi.HandleInteract();
+                return;
+            }
+
             InteractionFeedback.Show(prompt, message);
         }
     }

@@ -237,6 +237,8 @@ Detailed plan: [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md)
 - POI A/B Active Windows tick in world-time;
 - unattended resolution stub produces Aftermath flags.
 
+**Implementation note (2026-08-06):** runtime stubs live under `unity/Assets/Scripts/World/` (`WorldClock`, `PoiDirector`, `TipGiver`). Full Decision Nodes remain S2.
+
 ## Milestone S2 — Decision Nodes
 
 - POI A and B fully fill Decision Node cards in data;

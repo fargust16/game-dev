@@ -71,21 +71,29 @@ namespace GameDev.World
             EnsureLandmark(board, LandmarkId.NoticeBoard, "Notice Board");
             EnsureInteract(board, "Read notice board",
                 "Pinned: 1) Warden seizure — Harrow & Tincture before second-shift bell. 2) Missing persons — Loom Lane. 3) Coal price notice.");
+            AddTipGiver(board,
+                hints: new[] { PoiShellId.PoiB_EleventhBellCollectors },
+                marks: new[] { PoiShellId.PoiA_HarrowArrest },
+                summary: "Board marks Harrow seizure and hints trouble on Loom Lane.");
             AddWorldLabel(board, "Notice Board");
 
             var tavernTalk = CreateLandmark(grid, LandmarkId.SootAndBell, "Bartender Merrin", new GridCoord(9, 16));
             tavernTalk.name = "Bartender_Merrin";
             EnsureInteract(tavernTalk, "Talk to Merrin",
                 "Merrin: Brass-numbers are taking old Harrow tonight. After the eleventh bell they take mill girls off Loom Lane. Check the board. (Outdoor hub stub — no tavern interior yet.)");
+            AddTipGiver(tavernTalk,
+                hints: new[] { PoiShellId.PoiB_EleventhBellCollectors },
+                marks: new[] { PoiShellId.PoiA_HarrowArrest },
+                summary: "Merrin marks Harrow and hints the eleventh-bell collectors.");
             AddWorldLabel(tavernTalk, "Merrin (bar stub)");
 
             var tincture = CreateLandmark(grid, LandmarkId.TinctureRow, "Tincture Row", new GridCoord(10, 13));
             AddWorldLabel(tincture, "Tincture Row");
 
             var harrow = CreatePoi(grid, PoiShellId.PoiA_HarrowArrest, "Harrow & Tincture", new GridCoord(9, 12),
-                "S1 will start Decision Node: Brass-Number Arrest at Harrow & Tincture.",
-                "Inspect POI A shell",
-                "POI A shell ready. S1 will start the arrest Decision Node here.");
+                "Brass-Number Arrest shell. Get a tip first, then participate before the Active Window ends.",
+                "Inspect POI A",
+                "Brass-Number Arrest shell.");
             EnsureLandmark(harrow, LandmarkId.HarrowAndTincture, "Harrow & Tincture");
             AddWorldLabel(harrow, "POI A — Harrow");
 
@@ -93,9 +101,9 @@ namespace GameDev.World
             AddWorldLabel(loom, "Loom Lane");
 
             var alley = CreatePoi(grid, PoiShellId.PoiB_EleventhBellCollectors, "Alley Mouth", new GridCoord(19, 8),
-                "S1 will start Decision Node: Eleventh-Bell Collectors.",
-                "Inspect POI B shell",
-                "POI B shell ready. S1 will start the collectors Decision Node here.");
+                "Eleventh-Bell Collectors shell. Tips make it Hinted/Marked; Brief window is short.",
+                "Inspect POI B",
+                "Eleventh-Bell Collectors shell.");
             EnsureLandmark(alley, LandmarkId.AlleyMouth, "Alley Mouth");
             AddWorldLabel(alley, "POI B — Alley");
 
@@ -103,9 +111,9 @@ namespace GameDev.World
             AddWorldLabel(factory, "Factory Wall");
 
             var stairs = CreatePoi(grid, PoiShellId.PoiC_SootStairTrace, "Coal Stairs", new GridCoord(23, 7),
-                "S1 will start Decision Node: Soot Stair Trace.",
-                "Inspect POI C shell",
-                "POI C shell ready. Aftermath Trace will live here after A/B.");
+                "Soot Stair Trace. Unlocks after POI A or B leaves Aftermath.",
+                "Inspect POI C",
+                "Soot Stair Trace shell.");
             EnsureLandmark(stairs, LandmarkId.CoalStairs, "Coal Stairs");
             AddWorldLabel(stairs, "POI C — Stairs");
 
@@ -114,12 +122,20 @@ namespace GameDev.World
             coalHauler.name = "NPC_CoalHauler_Rusk";
             EnsureInteract(coalHauler, "Talk to Rusk",
                 "Rusk: Keep your boots off the wet coal. Wardens are thick on Tincture tonight — and Loom Lane after the eleventh bell.");
+            AddTipGiver(coalHauler,
+                hints: new[] { PoiShellId.PoiA_HarrowArrest, PoiShellId.PoiB_EleventhBellCollectors },
+                marks: System.Array.Empty<PoiShellId>(),
+                summary: "Rusk hints both the seizure street and Loom Lane.");
             AddWorldLabel(coalHauler, "Rusk (street)");
 
             var millGirl = CreateLandmark(grid, LandmarkId.LoomLane, "Mill Girl Nia", new GridCoord(17, 8));
             millGirl.name = "NPC_MillGirl_Nia";
             EnsureInteract(millGirl, "Talk to Nia",
                 "Nia: They took two girls last week from this lane. If you hear coach-wheels after the eleventh bell — don't look helpful. Look small.");
+            AddTipGiver(millGirl,
+                hints: System.Array.Empty<PoiShellId>(),
+                marks: new[] { PoiShellId.PoiB_EleventhBellCollectors },
+                summary: "Nia marks the eleventh-bell collectors on Loom Lane.");
             AddWorldLabel(millGirl, "Nia (street)");
 
             // Waymarkers along the loop (E for hint if labels are missed).
@@ -164,8 +180,28 @@ namespace GameDev.World
             tacticalCam.SetTarget(player.transform);
 
             BuildLighting();
+            BuildS1Systems();
 
-            Debug.Log("[S0.4] Lower Veil Greybox + Lighting ready. LMB/Arrows move, WASD camera, E interact, N day/night, H legend.");
+            Debug.Log("[S1] Greybox + tips/Active Windows ready. Board/Merrin mark POIs. ] advances 1 world-hour. H legend.");
+        }
+
+        private void BuildS1Systems()
+        {
+            var systems = new GameObject("S1_Systems");
+            systems.transform.SetParent(transform, false);
+            systems.AddComponent<WorldClock>();
+            systems.AddComponent<PoiDirector>();
+        }
+
+        private static void AddTipGiver(GameObject go, PoiShellId[] hints, PoiShellId[] marks, string summary)
+        {
+            var tip = go.GetComponent<TipGiver>();
+            if (tip == null)
+            {
+                tip = go.AddComponent<TipGiver>();
+            }
+
+            tip.Setup(hints, marks, summary);
         }
 
         private void BuildLighting()

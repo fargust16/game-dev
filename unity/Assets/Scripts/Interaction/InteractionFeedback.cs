@@ -52,7 +52,7 @@ namespace GameDev.Interaction
         {
             Show(
                 "Lower Veil — legend (H to repeat)",
-                "Brown = place/NPC · Orange = POI · Teal = env · Grey = building · → = waymarker. Mouse: LMB pathfind (auto env), free cam (WASD pans). WASD key: walk + follow cam, E manual. Tab switches. N day/night · T turn-based · H legend.",
+                "Brown NPC/place · Orange POI · Teal env. Mouse LMB path · Tab WASD walk · E talk/tips · N day/night · T TB · ]/+1h world time · P pause clock · H legend. Tips Hint/Mark POIs; windows can expire.",
                 12f);
         }
 
