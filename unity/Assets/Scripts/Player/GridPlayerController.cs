@@ -194,8 +194,8 @@ namespace GameDev.Player
             }
 
             // If a click-path is active, let it finish unless the player steers with WASD.
-            var input = ReadWasdMoveInput();
-            if (input.sqrMagnitude > 0.001f)
+            var move = ReadWasdMoveInput();
+            if (move.sqrMagnitude > 0.001f)
             {
                 ClearPath();
             }
@@ -212,8 +212,8 @@ namespace GameDev.Player
                     return;
                 }
 
-                var dx = input.x > 0.5f ? 1 : input.x < -0.5f ? -1 : 0;
-                var dy = input.z > 0.5f ? 1 : input.z < -0.5f ? -1 : 0;
+                var dx = move.x > 0.5f ? 1 : move.x < -0.5f ? -1 : 0;
+                var dy = move.z > 0.5f ? 1 : move.z < -0.5f ? -1 : 0;
                 if (dx == 0 && dy == 0)
                 {
                     return;
@@ -240,7 +240,7 @@ namespace GameDev.Player
                 return;
             }
 
-            var worldDir = CameraRelativeDirection(input);
+            var worldDir = CameraRelativeDirection(move);
             TrySteer(worldDir, moveSpeed * Time.deltaTime);
         }
 
