@@ -14,9 +14,11 @@ Design source of truth lives in the repo root docs, especially:
 2. Add project from `unity/`
 3. Use editor `6000.3.9f1` (or closest installed Unity 6)
 4. Let Unity regenerate `ProjectSettings/` / `.meta` / solution files
-5. Install **URP** via Package Manager if not already present, create a URP asset, assign it in Graphics settings
+5. Install **URP** via Package Manager if not already present, create a URP asset, assign it in Graphics/Quality settings
 6. Commit generated ProjectSettings + `.meta` files after the first successful open
-7. Continue Milestone S0 greybox in `Assets/Scenes/S0_LowerVeil.unity`
+7. In Unity menu: **GameDev → S0 → Create Lower Veil Greybox Scene**
+8. Press Play — WASD/Arrows move on grid, **E** interacts (board, bartender, POI shells, env stubs)
+9. Continue Milestone S0 polish from [11.2](../11.2%20Milestone%20S0%20Greybox.md)
 
 If Unity asks to upgrade ProjectSettings on first open, accept and commit once stable.
 
