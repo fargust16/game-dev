@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/S0_LowerVeil.unity
+    guid: 916acfd901793e54e80340035b4de36c
   m_configObjects: {}

@@ -3,30 +3,37 @@ using GameDev.Grid;
 using GameDev.Interaction;
 using GameDev.Player;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace GameDev.World
 {
     /// <summary>
-    /// Builds the S0 Lower Veil greybox on a square grid.
+    /// Builds the S0 Lower Veil greybox on a square grid using S0_Greybox prefabs.
     /// Design: 11.2 Milestone S0 Greybox.
     /// </summary>
     public sealed class LowerVeilGreyboxBuilder : MonoBehaviour
     {
-        [SerializeField] private float cellSize = 1f;
-        [SerializeField] private Material greyFloorMaterial;
-        [SerializeField] private Material greyBlockMaterial;
-        [SerializeField] private Material ridgeMaterial;
-        [SerializeField] private Material landmarkMaterial;
+        private const string PrefabFolder = "Assets/Prefabs/S0_Greybox/";
 
-        private Material _floorMat;
-        private Material _blockMat;
-        private Material _ridgeMat;
-        private Material _landmarkMat;
+        [SerializeField] private float cellSize = 1f;
+
+        [Header("S0 Greybox Prefabs")]
+        [SerializeField] private GameObject floorTilePrefab;
+        [SerializeField] private GameObject landmarkBlockPrefab;
+        [SerializeField] private GameObject poiShellPrefab;
+        [SerializeField] private GameObject envActionStubPrefab;
+        [SerializeField] private GameObject building1x1Prefab;
+        [SerializeField] private GameObject building2x2Prefab;
+        [SerializeField] private GameObject wallSegmentPrefab;
+        [SerializeField] private GameObject noticeBoardPrefab;
+        [SerializeField] private GameObject playerCapsulePrefab;
 
         public void Build()
         {
+            ResolvePrefabs();
             ClearChildren();
-            CacheMaterials();
 
             var gridGo = new GameObject("GridMap");
             gridGo.transform.SetParent(transform, false);
@@ -34,82 +41,79 @@ namespace GameDev.World
             grid.Configure(36, 28, cellSize, Vector3.zero);
             gridGo.AddComponent<GridDebugDrawer>();
 
-            // Default all walkable, then carve.
             PaintRect(grid, 0, 0, 35, 27, walkable: true, height: 0, flags: GridCellFlags.Walkable);
-
-            // Ridge (north) higher class strip.
             PaintRect(grid, 0, 22, 35, 27, walkable: true, height: 1, flags: GridCellFlags.Walkable);
-            // Factory wall mass (east).
             PaintRect(grid, 30, 4, 35, 18, walkable: false, height: 2, flags: GridCellFlags.BlocksLoS | GridCellFlags.Climbable);
-            // Block a few solid shop walls.
             PaintRect(grid, 8, 14, 14, 16, walkable: false, height: 1, flags: GridCellFlags.BlocksLoS | GridCellFlags.Window);
 
             BuildFloorVisuals(grid);
-            BuildVolume(grid, 30, 4, 35, 18, 2.5f, _blockMat);
-            BuildVolume(grid, 8, 14, 14, 16, 1.8f, _blockMat);
+            PlaceBuildingMass(grid, 30, 4, 35, 18);
+            PlaceBuildingMass(grid, 8, 14, 14, 16);
+            PlaceWallStrip(grid, 30, 4, 30, 18);
 
-            // Landmarks / route from 11.2
-            CreateLandmark(grid, LandmarkId.RidgeApproach, "Ridge Approach", new GridCoord(18, 25), _ridgeMat);
-            CreateLandmark(grid, LandmarkId.SootAndBell, "Soot & Bell Tavern", new GridCoord(10, 20), _landmarkMat);
+            CreateLandmark(grid, LandmarkId.RidgeApproach, "Ridge Approach", new GridCoord(18, 25));
+            CreateLandmark(grid, LandmarkId.SootAndBell, "Soot & Bell Tavern", new GridCoord(10, 20));
 
-            var board = CreateLandmark(grid, LandmarkId.NoticeBoard, "Notice Board", new GridCoord(12, 20), _landmarkMat);
-            AddInteract(board, "Read board",
+            var board = SpawnPrefab(noticeBoardPrefab, grid, new GridCoord(12, 20), "Notice Board");
+            EnsureLandmark(board, LandmarkId.NoticeBoard, "Notice Board");
+            EnsureInteract(board, "Read board",
                 "Pinned: 1) Warden seizure — Harrow & Tincture before second-shift bell. 2) Missing persons — Loom Lane. 3) Coal price notice.");
 
-            var tavernTalk = CreateLandmark(grid, LandmarkId.SootAndBell, "Bartender Merrin", new GridCoord(9, 19), _landmarkMat);
+            var tavernTalk = CreateLandmark(grid, LandmarkId.SootAndBell, "Bartender Merrin", new GridCoord(9, 19));
             tavernTalk.name = "Bartender_Merrin";
-            AddInteract(tavernTalk, "Talk",
+            EnsureInteract(tavernTalk, "Talk",
                 "Merrin: Brass-numbers are taking old Harrow tonight. After the eleventh bell they take mill girls off Loom Lane. Check the board.");
 
-            CreateLandmark(grid, LandmarkId.TinctureRow, "Tincture Row", new GridCoord(11, 15), _landmarkMat);
+            CreateLandmark(grid, LandmarkId.TinctureRow, "Tincture Row", new GridCoord(11, 15));
 
-            var harrow = CreateLandmark(grid, LandmarkId.HarrowAndTincture, "Harrow & Tincture", new GridCoord(10, 14), _landmarkMat);
-            AddPoi(harrow, PoiShellId.PoiA_HarrowArrest, "S1 will start Decision Node: Brass-Number Arrest at Harrow & Tincture.");
-            AddInteract(harrow, "Inspect POI A shell", "POI A shell ready. S1 will start the arrest Decision Node here.");
+            var harrow = CreatePoi(grid, PoiShellId.PoiA_HarrowArrest, "Harrow & Tincture", new GridCoord(10, 14),
+                "S1 will start Decision Node: Brass-Number Arrest at Harrow & Tincture.",
+                "Inspect POI A shell",
+                "POI A shell ready. S1 will start the arrest Decision Node here.");
+            EnsureLandmark(harrow, LandmarkId.HarrowAndTincture, "Harrow & Tincture");
 
-            CreateLandmark(grid, LandmarkId.LoomLane, "Loom Lane", new GridCoord(18, 10), _landmarkMat);
+            CreateLandmark(grid, LandmarkId.LoomLane, "Loom Lane", new GridCoord(18, 10));
 
-            var alley = CreateLandmark(grid, LandmarkId.AlleyMouth, "Alley Mouth", new GridCoord(22, 9), _landmarkMat);
-            AddPoi(alley, PoiShellId.PoiB_EleventhBellCollectors, "S1 will start Decision Node: Eleventh-Bell Collectors.");
-            AddInteract(alley, "Inspect POI B shell", "POI B shell ready. S1 will start the collectors Decision Node here.");
+            var alley = CreatePoi(grid, PoiShellId.PoiB_EleventhBellCollectors, "Alley Mouth", new GridCoord(22, 9),
+                "S1 will start Decision Node: Eleventh-Bell Collectors.",
+                "Inspect POI B shell",
+                "POI B shell ready. S1 will start the collectors Decision Node here.");
+            EnsureLandmark(alley, LandmarkId.AlleyMouth, "Alley Mouth");
 
-            CreateLandmark(grid, LandmarkId.FactoryWall, "Factory Wall", new GridCoord(28, 11), _landmarkMat);
+            CreateLandmark(grid, LandmarkId.FactoryWall, "Factory Wall", new GridCoord(28, 11));
 
-            var stairs = CreateLandmark(grid, LandmarkId.CoalStairs, "Coal Stairs", new GridCoord(26, 8), _landmarkMat);
-            AddPoi(stairs, PoiShellId.PoiC_SootStairTrace, "S1 will start Decision Node: Soot Stair Trace.");
-            AddInteract(stairs, "Inspect POI C shell", "POI C shell ready. Aftermath Trace will live here after A/B.");
+            var stairs = CreatePoi(grid, PoiShellId.PoiC_SootStairTrace, "Coal Stairs", new GridCoord(26, 8),
+                "S1 will start Decision Node: Soot Stair Trace.",
+                "Inspect POI C shell",
+                "POI C shell ready. Aftermath Trace will live here after A/B.");
+            EnsureLandmark(stairs, LandmarkId.CoalStairs, "Coal Stairs");
 
-            // Environment action stubs
-            var vault = CreateMarker(grid, new GridCoord(13, 14), "Vault Crates");
-            vault.AddComponent<EnvironmentActionMarker>().Setup(
-                EnvironmentActionType.VaultJump,
-                0.75f,
+            CreateEnvAction(grid, new GridCoord(13, 14), "Vault Crates",
+                EnvironmentActionType.VaultJump, 0.75f,
                 "Vaulted the crates on Tincture Row.",
-                "Slipped on wet cobble — noise, wasted effort.");
-            grid.SetFlags(new GridCoord(13, 14), GridCellFlags.Walkable | GridCellFlags.Vaultable);
+                "Slipped on wet cobble — noise, wasted effort.",
+                GridCellFlags.Walkable | GridCellFlags.Vaultable);
 
-            var window = CreateMarker(grid, new GridCoord(8, 15), "Side Window");
-            window.AddComponent<EnvironmentActionMarker>().Setup(
-                EnvironmentActionType.ClimbThroughWindow,
-                0.65f,
+            CreateEnvAction(grid, new GridCoord(8, 15), "Side Window",
+                EnvironmentActionType.ClimbThroughWindow, 0.65f,
                 "Climbed through Harrow's side window.",
-                "Boot scraped the frame — spotted / noisy.");
-            grid.SetFlags(new GridCoord(8, 15), GridCellFlags.Walkable | GridCellFlags.Window);
+                "Boot scraped the frame — spotted / noisy.",
+                GridCellFlags.Walkable | GridCellFlags.Window);
 
-            var climb = CreateMarker(grid, new GridCoord(29, 8), "Coal Ledge");
-            climb.AddComponent<EnvironmentActionMarker>().Setup(
-                EnvironmentActionType.ClimbUp,
-                0.7f,
+            CreateEnvAction(grid, new GridCoord(29, 8), "Coal Ledge",
+                EnvironmentActionType.ClimbUp, 0.7f,
                 "Mantled the coal-stair ledge.",
-                "Lost grip on sooty brick — drop, Hurt stub.");
-            grid.SetFlags(new GridCoord(29, 8), GridCellFlags.Walkable | GridCellFlags.Climbable | GridCellFlags.Stairs);
+                "Lost grip on sooty brick — drop, Hurt stub.",
+                GridCellFlags.Walkable | GridCellFlags.Climbable | GridCellFlags.Stairs);
 
-            // Player + camera
-            var player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            player.name = "Player";
-            player.transform.SetParent(transform, false);
-            SafeDestroy(player.GetComponent<Collider>());
-            var playerCtrl = player.AddComponent<GridPlayerController>();
+            var player = SpawnPrefab(playerCapsulePrefab, grid, new GridCoord(18, 25), "Player");
+            DisableBlockingColliders(player);
+            var playerCtrl = player.GetComponent<GridPlayerController>();
+            if (playerCtrl == null)
+            {
+                playerCtrl = player.AddComponent<GridPlayerController>();
+            }
+
             playerCtrl.PlaceOnGrid(grid, new GridCoord(18, 25));
 
             var camGo = new GameObject("FollowCamera");
@@ -120,23 +124,41 @@ namespace GameDev.World
             follow.SetTarget(player.transform);
             camGo.transform.position = player.transform.position + new Vector3(0f, 14f, -10f);
 
-            // Light
             var lightGo = new GameObject("Directional Light");
             lightGo.transform.SetParent(transform, false);
             var light = lightGo.AddComponent<Light>();
             light.type = LightType.Directional;
             light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
 
-            Debug.Log("[S0] Lower Veil greybox built. WASD/Arrows move, E interacts. Check Console for board/bartender/POI/env stubs.");
+            Debug.Log("[S0] Lower Veil greybox built from S0_Greybox prefabs. WASD/Arrows move, E interacts.");
         }
 
-        private void CacheMaterials()
+        private void ResolvePrefabs()
         {
-            _floorMat = greyFloorMaterial != null ? greyFloorMaterial : CreateColorMat(new Color(0.25f, 0.25f, 0.28f));
-            _blockMat = greyBlockMaterial != null ? greyBlockMaterial : CreateColorMat(new Color(0.18f, 0.18f, 0.2f));
-            _ridgeMat = ridgeMaterial != null ? ridgeMaterial : CreateColorMat(new Color(0.35f, 0.34f, 0.3f));
-            _landmarkMat = landmarkMaterial != null ? landmarkMaterial : CreateColorMat(new Color(0.55f, 0.4f, 0.2f));
+#if UNITY_EDITOR
+            floorTilePrefab = LoadIfNull(floorTilePrefab, "Floor_Tile_1x1.prefab");
+            landmarkBlockPrefab = LoadIfNull(landmarkBlockPrefab, "Landmark_Block.prefab");
+            poiShellPrefab = LoadIfNull(poiShellPrefab, "POI_Shell.prefab");
+            envActionStubPrefab = LoadIfNull(envActionStubPrefab, "EnvAction_Stub.prefab");
+            building1x1Prefab = LoadIfNull(building1x1Prefab, "Building_Shell_1x1.prefab");
+            building2x2Prefab = LoadIfNull(building2x2Prefab, "Building_Shell_2x2.prefab");
+            wallSegmentPrefab = LoadIfNull(wallSegmentPrefab, "Wall_Segment_1x3.prefab");
+            noticeBoardPrefab = LoadIfNull(noticeBoardPrefab, "Prop_NoticeBoard.prefab");
+            playerCapsulePrefab = LoadIfNull(playerCapsulePrefab, "Player_Capsule.prefab");
+#endif
         }
+
+#if UNITY_EDITOR
+        private static GameObject LoadIfNull(GameObject current, string fileName)
+        {
+            if (current != null)
+            {
+                return current;
+            }
+
+            return AssetDatabase.LoadAssetAtPath<GameObject>(PrefabFolder + fileName);
+        }
+#endif
 
         private void PaintRect(GridMap grid, int x0, int y0, int x1, int y1, bool walkable, int height, GridCellFlags flags)
         {
@@ -155,6 +177,7 @@ namespace GameDev.World
         {
             var floorRoot = new GameObject("FloorVisuals");
             floorRoot.transform.SetParent(transform, false);
+
             for (var y = 0; y < grid.Height; y++)
             {
                 for (var x = 0; x < grid.Width; x++)
@@ -170,74 +193,186 @@ namespace GameDev.World
                         continue;
                     }
 
-                    var tile = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    tile.name = $"Floor_{x}_{y}";
-                    tile.transform.SetParent(floorRoot.transform, false);
-                    var center = grid.CoordToWorldCenter(coord);
-                    center.y = cell.height * grid.CellSize - 0.05f;
-                    tile.transform.position = center;
-                    tile.transform.localScale = new Vector3(grid.CellSize * 0.98f, 0.1f, grid.CellSize * 0.98f);
-                    tile.GetComponent<MeshRenderer>().sharedMaterial = cell.height > 0 ? _ridgeMat : _floorMat;
-                    SafeDestroy(tile.GetComponent<Collider>());
+                    var tile = SpawnPrefab(floorTilePrefab, floorRoot.transform, grid, coord, $"Floor_{x}_{y}");
+                    DisableBlockingColliders(tile);
+                    var pos = grid.CoordToWorldCenter(coord);
+                    pos.y = cell.height * grid.CellSize;
+                    tile.transform.position = pos;
                 }
             }
         }
 
-        private void BuildVolume(GridMap grid, int x0, int y0, int x1, int y1, float worldHeight, Material mat)
+        private void PlaceBuildingMass(GridMap grid, int x0, int y0, int x1, int y1)
         {
-            var min = grid.CoordToWorldCenter(new GridCoord(x0, y0));
-            var max = grid.CoordToWorldCenter(new GridCoord(x1, y1));
-            var center = (min + max) * 0.5f;
-            center.y = worldHeight * 0.5f;
-            var size = new Vector3(
-                Mathf.Abs(max.x - min.x) + grid.CellSize,
-                worldHeight,
-                Mathf.Abs(max.z - min.z) + grid.CellSize);
+            var root = new GameObject($"Buildings_{x0}_{y0}");
+            root.transform.SetParent(transform, false);
 
-            var block = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            block.name = "BlockVolume";
-            block.transform.SetParent(transform, false);
-            block.transform.position = center;
-            block.transform.localScale = size;
-            block.GetComponent<MeshRenderer>().sharedMaterial = mat;
+            var y = y0;
+            while (y <= y1)
+            {
+                var rowUses2x2 = building2x2Prefab != null && y + 1 <= y1;
+                var x = x0;
+                while (x <= x1)
+                {
+                    if (rowUses2x2 && x + 1 <= x1)
+                    {
+                        var go = SpawnPrefab(building2x2Prefab, root.transform, grid, new GridCoord(x, y), $"Building2x2_{x}_{y}");
+                        var a = grid.CoordToWorldCenter(new GridCoord(x, y));
+                        var b = grid.CoordToWorldCenter(new GridCoord(x + 1, y + 1));
+                        var pos = (a + b) * 0.5f;
+                        pos.y = 0f;
+                        go.transform.position = pos;
+                        x += 2;
+                    }
+                    else if (building1x1Prefab != null)
+                    {
+                        var go = SpawnPrefab(building1x1Prefab, root.transform, grid, new GridCoord(x, y), $"Building1x1_{x}_{y}");
+                        var pos = grid.CoordToWorldCenter(new GridCoord(x, y));
+                        pos.y = 0f;
+                        go.transform.position = pos;
+                        x += 1;
+                    }
+                    else
+                    {
+                        x += 1;
+                    }
+                }
+
+                y += rowUses2x2 ? 2 : 1;
+            }
         }
 
-        private GameObject CreateLandmark(GridMap grid, LandmarkId id, string label, GridCoord coord, Material mat)
+        private void PlaceWallStrip(GridMap grid, int x0, int y0, int x1, int y1)
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            go.transform.SetParent(transform, false);
-            var pos = grid.CoordToWorldCenter(coord);
-            pos.y = 0.75f + (grid.TryGetCell(coord, out var cell) ? cell.height * grid.CellSize : 0f);
-            go.transform.position = pos;
-            go.transform.localScale = new Vector3(0.8f, 1.5f, 0.8f);
-            go.GetComponent<MeshRenderer>().sharedMaterial = mat;
-            SafeDestroy(go.GetComponent<Collider>());
-            go.AddComponent<LandmarkMarker>().Setup(id, label);
+            if (wallSegmentPrefab == null)
+            {
+                return;
+            }
+
+            var root = new GameObject("WallStrip");
+            root.transform.SetParent(transform, false);
+            for (var y = y0; y <= y1; y++)
+            {
+                var go = SpawnPrefab(wallSegmentPrefab, root.transform, grid, new GridCoord(x0, y), $"Wall_{x0}_{y}");
+                var pos = grid.CoordToWorldCenter(new GridCoord(x0, y));
+                pos.y = 0f;
+                go.transform.position = pos;
+            }
+        }
+
+        private GameObject CreateLandmark(GridMap grid, LandmarkId id, string label, GridCoord coord)
+        {
+            var go = SpawnPrefab(landmarkBlockPrefab, grid, coord, label);
+            EnsureLandmark(go, id, label);
             return go;
         }
 
-        private GameObject CreateMarker(GridMap grid, GridCoord coord, string label)
+        private GameObject CreatePoi(
+            GridMap grid,
+            PoiShellId poiId,
+            string label,
+            GridCoord coord,
+            string poiMessage,
+            string interactPrompt,
+            string interactMessage)
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            go.transform.SetParent(transform, false);
-            var pos = grid.CoordToWorldCenter(coord);
-            pos.y = 0.4f;
-            go.transform.position = pos;
-            go.transform.localScale = new Vector3(0.5f, 0.4f, 0.5f);
-            go.GetComponent<MeshRenderer>().sharedMaterial = _landmarkMat;
-            SafeDestroy(go.GetComponent<Collider>());
+            var go = SpawnPrefab(poiShellPrefab, grid, coord, label);
+            EnsurePoi(go, poiId, poiMessage);
+            EnsureInteract(go, interactPrompt, interactMessage);
+            return go;
+        }
+
+        private void CreateEnvAction(
+            GridMap grid,
+            GridCoord coord,
+            string label,
+            EnvironmentActionType type,
+            float chance,
+            string ok,
+            string fail,
+            GridCellFlags flags)
+        {
+            var go = SpawnPrefab(envActionStubPrefab, grid, coord, label);
+            var marker = go.GetComponent<EnvironmentActionMarker>();
+            if (marker == null)
+            {
+                marker = go.AddComponent<EnvironmentActionMarker>();
+            }
+
+            marker.Setup(type, chance, ok, fail);
+            grid.SetFlags(coord, flags);
+        }
+
+        private GameObject SpawnPrefab(GameObject prefab, GridMap grid, GridCoord coord, string label)
+        {
+            return SpawnPrefab(prefab, transform, grid, coord, label);
+        }
+
+        private GameObject SpawnPrefab(GameObject prefab, Transform parent, GridMap grid, GridCoord coord, string label)
+        {
+            GameObject go;
+            if (prefab != null)
+            {
+#if UNITY_EDITOR
+                go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
+#else
+                go = Object.Instantiate(prefab, parent);
+#endif
+            }
+            else
+            {
+                go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                go.transform.SetParent(parent, false);
+                Debug.LogWarning($"[S0] Missing prefab for '{label}'. Using primitive fallback.");
+            }
+
             go.name = label;
+            var pos = grid.CoordToWorldCenter(coord);
+            pos.y = grid.TryGetCell(coord, out var cell) ? cell.height * grid.CellSize : 0f;
+            go.transform.position = pos;
+            go.transform.rotation = Quaternion.identity;
             return go;
         }
 
-        private static void AddInteract(GameObject go, string prompt, string message)
+        private static void EnsureLandmark(GameObject go, LandmarkId id, string label)
         {
-            go.AddComponent<SimpleInteractable>().Setup(prompt, message);
+            var marker = go.GetComponent<LandmarkMarker>();
+            if (marker == null)
+            {
+                marker = go.AddComponent<LandmarkMarker>();
+            }
+
+            marker.Setup(id, label);
         }
 
-        private static void AddPoi(GameObject go, PoiShellId id, string message)
+        private static void EnsurePoi(GameObject go, PoiShellId id, string message)
         {
-            go.AddComponent<PoiShellMarker>().Setup(id, message);
+            var marker = go.GetComponent<PoiShellMarker>();
+            if (marker == null)
+            {
+                marker = go.AddComponent<PoiShellMarker>();
+            }
+
+            marker.Setup(id, message);
+        }
+
+        private static void EnsureInteract(GameObject go, string prompt, string message)
+        {
+            var interact = go.GetComponent<SimpleInteractable>();
+            if (interact == null)
+            {
+                interact = go.AddComponent<SimpleInteractable>();
+            }
+
+            interact.Setup(prompt, message);
+        }
+
+        private static void DisableBlockingColliders(GameObject go)
+        {
+            foreach (var col in go.GetComponentsInChildren<Collider>())
+            {
+                col.enabled = false;
+            }
         }
 
         private void ClearChildren()
@@ -263,19 +398,6 @@ namespace GameDev.World
             {
                 Object.DestroyImmediate(obj);
             }
-        }
-
-        private static Material CreateColorMat(Color color)
-        {
-            var shader = Shader.Find("Universal Render Pipeline/Lit");
-            if (shader == null)
-            {
-                shader = Shader.Find("Standard");
-            }
-
-            var mat = new Material(shader);
-            mat.color = color;
-            return mat;
         }
     }
 }

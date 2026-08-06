@@ -16,9 +16,10 @@ Design source of truth lives in the repo root docs, especially:
 4. Let Unity regenerate `ProjectSettings/` / `.meta` / solution files
 5. Install **URP** via Package Manager if not already present, create a URP asset, assign it in Graphics/Quality settings
 6. Commit generated ProjectSettings + `.meta` files after the first successful open
-7. In Unity menu: **GameDev → S0 → Create Lower Veil Greybox Scene**
-8. Press Play — WASD/Arrows move on grid, **E** interacts (board, bartender, POI shells, env stubs)
-9. Continue Milestone S0 polish from [11.2](../11.2%20Milestone%20S0%20Greybox.md)
+7. Prefabs live in `Assets/Prefabs/S0_Greybox/` (materials in `Assets/Materials/S0_Greybox/`)
+8. In Unity menu: **GameDev → S0 → Create Lower Veil Greybox Scene** (or **Rebuild Greybox In Open Scene**)
+9. Press Play — WASD/Arrows move on grid, **E** interacts (board, bartender, POI shells, env stubs)
+10. Continue Milestone S0 polish from [11.2](../11.2%20Milestone%20S0%20Greybox.md)
 
 If Unity asks to upgrade ProjectSettings on first open, accept and commit once stable.
 
