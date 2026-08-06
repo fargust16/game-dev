@@ -51,7 +51,7 @@ Godot 4 was considered and remains historically documented below as the rejected
 6. Keep package bloat low; every package must earn its place.
 7. Design docs remain source of truth over random Unity tutorial patterns.
 8. **Input:** Unity Input System, **Package Only** (`activeInputHandler: 1`). Gameplay reads `GameInputService` — not legacy `UnityEngine.Input`.
-9. **City scaffold:** seed-driven districts / avenue / anchors per [13 City Generation](13%20City%20Generation.md); grid remains movement truth.
+9. **City scaffold:** seed-driven organic town growth (market center, crooked streets, wedge districts, anchors) per [13 City Generation](13%20City%20Generation.md); grid remains movement truth.
 
 # Comparison Archive
 
