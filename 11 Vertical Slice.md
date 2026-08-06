@@ -245,6 +245,8 @@ Detailed plan: [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md)
 - Convince / Threaten / Exchange / Veil / Withdraw stubs;
 - residue flags change shop/patrol/rumour.
 
+**Implementation note (2026-08-06):** `DecisionNodeCatalog` + `DecisionNodeSession` (keys 1–5 / Esc). Six Approaches covered across A/B options. Confront remains a stub until S3 TB combat. Residue via `DistrictResidue` (labels + Merrin follow-up lines).
+
 ## Milestone S3 — Turn-Based Mode
 
 - manual TB toggle outside combat;

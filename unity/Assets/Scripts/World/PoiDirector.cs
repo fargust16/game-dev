@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GameDev.Decisions;
 using GameDev.Interaction;
 using UnityEngine;
 
@@ -144,7 +145,15 @@ namespace GameDev.World
                 return;
             }
 
-            // S1: participation stub (full Decision Node is S2).
+            // S2: POI A/B open Decision Node. POI C stays a Trace stub until S4 Bargain.
+            if (id == PoiShellId.PoiA_HarrowArrest || id == PoiShellId.PoiB_EleventhBellCollectors)
+            {
+                if (DecisionNodeSession.Instance != null && DecisionNodeSession.Instance.TryOpen(id))
+                {
+                    return;
+                }
+            }
+
             poi.discovery = PoiDiscoveryState.Resolved;
             poi.windowOpen = false;
             poi.resolution = PoiResolutionKind.Participated;
@@ -152,6 +161,22 @@ namespace GameDev.World
             ApplyAftermathFlags(id, unattended: false);
             MaybeUnlockTrace();
             InteractionFeedback.Show(Label(id) + " — participated", poi.aftermathText, 7f);
+            RefreshAllShellLabels();
+        }
+
+        public void CompleteFromDecision(PoiShellId id, bool withdrawLike, string choiceTitle, string detail)
+        {
+            if (!_pois.TryGetValue(id, out var poi) || poi.discovery == PoiDiscoveryState.Resolved)
+            {
+                return;
+            }
+
+            poi.discovery = PoiDiscoveryState.Resolved;
+            poi.windowOpen = false;
+            poi.resolution = withdrawLike ? PoiResolutionKind.Unattended : PoiResolutionKind.Participated;
+            poi.aftermathText = $"{choiceTitle}\n{detail}";
+            ApplyAftermathFlags(id, unattended: withdrawLike);
+            MaybeUnlockTrace();
             RefreshAllShellLabels();
         }
 
@@ -282,17 +307,38 @@ namespace GameDev.World
 
         private void ApplyAftermathFlags(PoiShellId id, bool unattended)
         {
+            string flag = null;
             switch (id)
             {
                 case PoiShellId.PoiA_HarrowArrest:
-                    _aftermathFlags.Add(unattended ? "aftermath_harrow_sealed" : "aftermath_harrow_intervened");
+                    flag = unattended ? "aftermath_harrow_sealed" : "aftermath_harrow_intervened";
                     break;
                 case PoiShellId.PoiB_EleventhBellCollectors:
-                    _aftermathFlags.Add(unattended ? "aftermath_collectors_took_girls" : "aftermath_collectors_contested");
+                    flag = unattended ? "aftermath_collectors_took_girls" : "aftermath_collectors_contested";
                     break;
                 case PoiShellId.PoiC_SootStairTrace:
-                    _aftermathFlags.Add(unattended ? "aftermath_trace_cold" : "aftermath_trace_read");
+                    flag = unattended ? "aftermath_trace_cold" : "aftermath_trace_read";
                     break;
+            }
+
+            if (flag == null)
+            {
+                return;
+            }
+
+            _aftermathFlags.Add(flag);
+            if (DistrictResidue.Instance != null)
+            {
+                DistrictResidue.Instance.Add(flag);
+                if (unattended && id == PoiShellId.PoiA_HarrowArrest)
+                {
+                    DistrictResidue.Instance.Add("residue_harrow_sealed", "rumour_merrin_missed_arrest");
+                }
+
+                if (unattended && id == PoiShellId.PoiB_EleventhBellCollectors)
+                {
+                    DistrictResidue.Instance.Add("residue_collectors_took_girls", "rumour_merrin_missed_collectors");
+                }
             }
         }
 

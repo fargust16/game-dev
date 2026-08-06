@@ -190,7 +190,9 @@ namespace GameDev.World
             var systems = new GameObject("S1_Systems");
             systems.transform.SetParent(transform, false);
             systems.AddComponent<WorldClock>();
+            systems.AddComponent<DistrictResidue>();
             systems.AddComponent<PoiDirector>();
+            systems.AddComponent<GameDev.Decisions.DecisionNodeSession>();
         }
 
         private static void AddTipGiver(GameObject go, PoiShellId[] hints, PoiShellId[] marks, string summary)

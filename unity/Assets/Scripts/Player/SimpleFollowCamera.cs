@@ -1,3 +1,4 @@
+using GameDev.Decisions;
 using GameDev.World;
 using UnityEngine;
 
@@ -67,7 +68,8 @@ namespace GameDev.Player
 
         private void LateUpdate()
         {
-            var paused = WorldClock.Instance != null && WorldClock.Instance.IsPaused;
+            var paused = (WorldClock.Instance != null && WorldClock.Instance.IsPaused)
+                         || DecisionNodeSession.IsOpen;
             if (!paused)
             {
                 if (rigMode == CameraRigMode.Follow)

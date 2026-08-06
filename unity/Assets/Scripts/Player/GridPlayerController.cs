@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GameDev.Decisions;
 using GameDev.Environment;
 using GameDev.Grid;
 using GameDev.Interaction;
@@ -117,6 +118,12 @@ namespace GameDev.Player
 
             // Full world pause: no move, click-path, interact, or mode toggles.
             if (WorldClock.Instance != null && WorldClock.Instance.IsPaused)
+            {
+                return;
+            }
+
+            // Decision Node UI owns input until resolved / Esc.
+            if (DecisionNodeSession.IsOpen)
             {
                 return;
             }

@@ -27,7 +27,17 @@ namespace GameDev.Interaction
                 return;
             }
 
-            InteractionFeedback.Show(prompt, message);
+            var body = message;
+            if (GameDev.World.DistrictResidue.Instance != null)
+            {
+                var rumour = GameDev.World.DistrictResidue.Instance.BuildMerrinPostRumour();
+                if (!string.IsNullOrEmpty(rumour) && gameObject.name.Contains("Merrin"))
+                {
+                    body = message + "\n\n" + rumour;
+                }
+            }
+
+            InteractionFeedback.Show(prompt, body);
         }
     }
 }
