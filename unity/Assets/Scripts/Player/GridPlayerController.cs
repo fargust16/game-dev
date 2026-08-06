@@ -91,9 +91,7 @@ namespace GameDev.Player
 
             _ready = true;
             SnapToCellImmediate();
-            InteractionFeedback.Show(
-                "Lower Veil — S0",
-                "LMB move · Arrows walk · WASD camera · Wheel zoom · RMB orbit · F focus · E interact · T turn-based");
+            InteractionFeedback.ShowLegend();
         }
 
         private void Update()
@@ -101,6 +99,11 @@ namespace GameDev.Player
             if (!_ready || grid == null)
             {
                 return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                InteractionFeedback.ShowLegend();
             }
 
             if (Input.GetKeyDown(KeyCode.T))
@@ -119,10 +122,65 @@ namespace GameDev.Player
                 UpdateTurnBased();
             }
 
+            UpdateProximityPrompt();
+
             if (Input.GetKeyDown(KeyCode.E))
             {
                 TryInteract();
             }
+        }
+
+        private void UpdateProximityPrompt()
+        {
+            if (TryFindNearestInteractable(out var interact, out _))
+            {
+                InteractionFeedback.SetProximityPrompt($"[E] {interact.Prompt}");
+                return;
+            }
+
+            if (TryFindNearestEnvAction(out var env, out _))
+            {
+                InteractionFeedback.SetProximityPrompt($"[E] {env.Prompt}");
+                return;
+            }
+
+            InteractionFeedback.ClearProximityPrompt();
+        }
+
+        private bool TryFindNearestInteractable(out SimpleInteractable best, out float bestDist)
+        {
+            best = null;
+            bestDist = float.MaxValue;
+            var interactables = FindObjectsByType<SimpleInteractable>(FindObjectsSortMode.None);
+            foreach (var item in interactables)
+            {
+                var d = HorizontalDistance(transform.position, item.transform.position);
+                if (d <= interactRadius && d < bestDist)
+                {
+                    bestDist = d;
+                    best = item;
+                }
+            }
+
+            return best != null;
+        }
+
+        private bool TryFindNearestEnvAction(out EnvironmentActionMarker best, out float bestDist)
+        {
+            best = null;
+            bestDist = float.MaxValue;
+            var envActions = FindObjectsByType<EnvironmentActionMarker>(FindObjectsSortMode.None);
+            foreach (var item in envActions)
+            {
+                var d = HorizontalDistance(transform.position, item.transform.position);
+                if (d <= interactRadius && d < bestDist)
+                {
+                    bestDist = d;
+                    best = item;
+                }
+            }
+
+            return best != null;
         }
 
         private void UpdateFreeExploration()
@@ -360,39 +418,13 @@ namespace GameDev.Player
 
         private void TryInteract()
         {
-            var interactables = FindObjectsByType<SimpleInteractable>(FindObjectsSortMode.None);
-            SimpleInteractable bestInteract = null;
-            var bestDist = float.MaxValue;
-            foreach (var item in interactables)
-            {
-                var d = HorizontalDistance(transform.position, item.transform.position);
-                if (d <= interactRadius && d < bestDist)
-                {
-                    bestDist = d;
-                    bestInteract = item;
-                }
-            }
-
-            if (bestInteract != null)
+            if (TryFindNearestInteractable(out var bestInteract, out _))
             {
                 bestInteract.Interact();
                 return;
             }
 
-            var envActions = FindObjectsByType<EnvironmentActionMarker>(FindObjectsSortMode.None);
-            EnvironmentActionMarker bestEnv = null;
-            bestDist = float.MaxValue;
-            foreach (var item in envActions)
-            {
-                var d = HorizontalDistance(transform.position, item.transform.position);
-                if (d <= interactRadius && d < bestDist)
-                {
-                    bestDist = d;
-                    bestEnv = item;
-                }
-            }
-
-            if (bestEnv != null)
+            if (TryFindNearestEnvAction(out var bestEnv, out _))
             {
                 bestEnv.TryPerform();
                 return;
@@ -400,7 +432,7 @@ namespace GameDev.Player
 
             InteractionFeedback.Show(
                 "Nothing nearby",
-                "Walk to Soot & Bell / notice board / orange POI, then press E.");
+                "Look for brown NPC blocks, orange POI shells, teal env stubs, or → waymarkers. Press H for legend.");
         }
 
         private static float HorizontalDistance(Vector3 a, Vector3 b)

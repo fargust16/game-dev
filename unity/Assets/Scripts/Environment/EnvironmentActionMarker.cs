@@ -11,6 +11,7 @@ namespace GameDev.Environment
         [SerializeField] private string failMessage = "Traversal failed — noise / wasted effort.";
 
         public EnvironmentActionType ActionType => actionType;
+        public string Prompt => $"Try {actionType}";
 
         public void Setup(EnvironmentActionType type, float chance, string ok, string fail)
         {

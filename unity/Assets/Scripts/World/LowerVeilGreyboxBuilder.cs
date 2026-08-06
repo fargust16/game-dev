@@ -69,15 +69,15 @@ namespace GameDev.World
 
             var board = SpawnPrefab(noticeBoardPrefab, grid, new GridCoord(12, 17), "Notice Board");
             EnsureLandmark(board, LandmarkId.NoticeBoard, "Notice Board");
-            EnsureInteract(board, "Read board",
+            EnsureInteract(board, "Read notice board",
                 "Pinned: 1) Warden seizure — Harrow & Tincture before second-shift bell. 2) Missing persons — Loom Lane. 3) Coal price notice.");
             AddWorldLabel(board, "Notice Board");
 
             var tavernTalk = CreateLandmark(grid, LandmarkId.SootAndBell, "Bartender Merrin", new GridCoord(9, 16));
             tavernTalk.name = "Bartender_Merrin";
-            EnsureInteract(tavernTalk, "Talk",
-                "Merrin: Brass-numbers are taking old Harrow tonight. After the eleventh bell they take mill girls off Loom Lane. Check the board.");
-            AddWorldLabel(tavernTalk, "Merrin");
+            EnsureInteract(tavernTalk, "Talk to Merrin",
+                "Merrin: Brass-numbers are taking old Harrow tonight. After the eleventh bell they take mill girls off Loom Lane. Check the board. (Outdoor hub stub — no tavern interior yet.)");
+            AddWorldLabel(tavernTalk, "Merrin (bar stub)");
 
             var tincture = CreateLandmark(grid, LandmarkId.TinctureRow, "Tincture Row", new GridCoord(10, 13));
             AddWorldLabel(tincture, "Tincture Row");
@@ -109,11 +109,24 @@ namespace GameDev.World
             EnsureLandmark(stairs, LandmarkId.CoalStairs, "Coal Stairs");
             AddWorldLabel(stairs, "POI C — Stairs");
 
+            // Street NPC stubs (S0.3).
+            var coalHauler = CreateLandmark(grid, LandmarkId.TinctureRow, "Coal Hauler Rusk", new GridCoord(12, 14));
+            coalHauler.name = "NPC_CoalHauler_Rusk";
+            EnsureInteract(coalHauler, "Talk to Rusk",
+                "Rusk: Keep your boots off the wet coal. Wardens are thick on Tincture tonight — and Loom Lane after the eleventh bell.");
+            AddWorldLabel(coalHauler, "Rusk (street)");
+
+            var millGirl = CreateLandmark(grid, LandmarkId.LoomLane, "Mill Girl Nia", new GridCoord(17, 8));
+            millGirl.name = "NPC_MillGirl_Nia";
+            EnsureInteract(millGirl, "Talk to Nia",
+                "Nia: They took two girls last week from this lane. If you hear coach-wheels after the eleventh bell — don't look helpful. Look small.");
+            AddWorldLabel(millGirl, "Nia (street)");
+
             // Waymarkers along the loop (E for hint if labels are missed).
-            CreateWaymarker(grid, new GridCoord(13, 19), "Waymarker", "South to Soot & Bell / Notice Board.");
-            CreateWaymarker(grid, new GridCoord(10, 15), "Waymarker", "Down Tincture Row — Harrow & Tincture ahead.");
-            CreateWaymarker(grid, new GridCoord(13, 11), "Waymarker", "East to Loom Lane, then the factory stairs.");
-            CreateWaymarker(grid, new GridCoord(20, 9), "Waymarker", "Coal Stairs / POI C under the factory wall.");
+            CreateWaymarker(grid, new GridCoord(13, 19), "Read waymarker", "South to Soot & Bell / Notice Board.");
+            CreateWaymarker(grid, new GridCoord(10, 15), "Read waymarker", "Down Tincture Row — Harrow & Tincture ahead.");
+            CreateWaymarker(grid, new GridCoord(13, 11), "Read waymarker", "East to Loom Lane, then the factory stairs.");
+            CreateWaymarker(grid, new GridCoord(20, 9), "Read waymarker", "Coal Stairs / POI C under the factory wall.");
 
             CreateEnvAction(grid, new GridCoord(13, 12), "Vault Crates",
                 EnvironmentActionType.VaultJump, 0.75f,
@@ -156,7 +169,7 @@ namespace GameDev.World
             light.type = LightType.Directional;
             light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
 
-            Debug.Log("[S0.2] Route loop ready: Ridge → Tavern → Tincture → Loom → Stairs. Labels float above landmarks.");
+            Debug.Log("[S0.3] Interact stubs ready: board, Merrin, Rusk, Nia, POI A/B/C, env actions. H = legend.");
         }
 
         private void CreateWaymarker(GridMap grid, GridCoord coord, string prompt, string message)

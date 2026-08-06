@@ -3,21 +3,22 @@ using UnityEngine;
 namespace GameDev.Interaction
 {
     /// <summary>
-    /// S0 on-screen stub feedback. Full dialogue UI comes later; this makes interactions
-    /// readable in the Game view without opening the Console.
+    /// S0 on-screen stub feedback: toast boxes + persistent proximity prompt.
     /// </summary>
     public sealed class InteractionFeedback : MonoBehaviour
     {
         private static InteractionFeedback _instance;
 
-        [SerializeField] private float defaultSeconds = 5f;
+        [SerializeField] private float defaultSeconds = 6f;
 
         private string _title = "";
         private string _body = "";
         private float _until;
+        private string _proximityPrompt = "";
         private GUIStyle _boxStyle;
         private GUIStyle _titleStyle;
         private GUIStyle _bodyStyle;
+        private GUIStyle _promptStyle;
 
         public static void Show(string title, string body, float seconds = -1f)
         {
@@ -31,6 +32,28 @@ namespace GameDev.Interaction
         public static void Show(string body)
         {
             Show("Notice", body);
+        }
+
+        public static void SetProximityPrompt(string prompt)
+        {
+            EnsureExists();
+            _instance._proximityPrompt = prompt ?? "";
+        }
+
+        public static void ClearProximityPrompt()
+        {
+            if (_instance != null)
+            {
+                _instance._proximityPrompt = "";
+            }
+        }
+
+        public static void ShowLegend()
+        {
+            Show(
+                "Lower Veil — legend (H to repeat)",
+                "Brown = place/NPC · Orange = POI (future scene) · Teal = vault/window/climb · Grey = blocked building · → = waymarker. Bar = outdoor stubs (no interior). Controls: LMB/Arrows move · WASD camera · RMB orbit · Wheel zoom · F focus · E interact · T turn-based.",
+                12f);
         }
 
         private static void EnsureExists()
@@ -58,14 +81,24 @@ namespace GameDev.Interaction
 
         private void OnGUI()
         {
+            EnsureStyles();
+
+            if (!string.IsNullOrEmpty(_proximityPrompt))
+            {
+                const float pWidth = 420f;
+                const float pHeight = 36f;
+                var pRect = new Rect((Screen.width - pWidth) * 0.5f, Screen.height - 175f, pWidth, pHeight);
+                GUI.Box(pRect, GUIContent.none, _boxStyle);
+                GUI.Label(new Rect(pRect.x + 12f, pRect.y + 8f, pWidth - 24f, 24f), _proximityPrompt, _promptStyle);
+            }
+
             if (Time.time > _until || string.IsNullOrEmpty(_body))
             {
                 return;
             }
 
-            EnsureStyles();
-            const float width = 520f;
-            const float height = 120f;
+            const float width = 560f;
+            const float height = 130f;
             var rect = new Rect((Screen.width - width) * 0.5f, Screen.height - height - 28f, width, height);
             GUI.Box(rect, GUIContent.none, _boxStyle);
             GUI.Label(new Rect(rect.x + 16f, rect.y + 10f, width - 32f, 24f), _title, _titleStyle);
@@ -94,6 +127,14 @@ namespace GameDev.Interaction
                 fontSize = 13,
                 wordWrap = true,
                 normal = { textColor = new Color(0.92f, 0.92f, 0.9f) }
+            };
+
+            _promptStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 14,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = new Color(0.75f, 0.95f, 0.8f) }
             };
         }
 
