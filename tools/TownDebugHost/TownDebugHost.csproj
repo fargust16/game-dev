@@ -27,6 +27,8 @@
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\Block.cs" Link="Town\Block.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\Plot.cs" Link="Town\Plot.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\Building.cs" Link="Town\Building.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\BuildingTemplate.cs" Link="Town\BuildingTemplate.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\BuildingTemplateCatalog.cs" Link="Town\BuildingTemplateCatalog.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\OpenSpace.cs" Link="Town\OpenSpace.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\Landmark.cs" Link="Town\Landmark.cs" />
 
@@ -36,6 +38,7 @@
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_Streets.cs" Link="Town\Stage_Streets.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_Plots.cs" Link="Town\Stage_Plots.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_Buildings.cs" Link="Town\Stage_Buildings.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_AssignTemplates.cs" Link="Town\Stage_AssignTemplates.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_OpenSpaces.cs" Link="Town\Stage_OpenSpaces.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_ConnectivityAndScale.cs" Link="Town\Stage_ConnectivityAndScale.cs" />
   </ItemGroup>

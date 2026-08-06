@@ -45,6 +45,7 @@ namespace GameDev.World.Town.Tests
             Stage_Streets.Run(model, profile, ws.Fork("streets"));
             Stage_Plots.Run(model, profile, ws.Fork("plots"));
             Stage_Buildings.Run(model, profile, ws.Fork("buildings"));
+            Stage_AssignTemplates.Run(model, profile, ws.Fork("templates"));
             Stage_OpenSpaces.Run(model, profile, ws.Fork("openSpaces"));
             Stage_ConnectivityAndScale.Run(model, profile, ws.Fork("connectivity"), log);
             return model;

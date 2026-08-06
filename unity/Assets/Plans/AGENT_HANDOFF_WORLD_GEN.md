@@ -11,12 +11,13 @@
 - **OrganicTown v2 Milestone A = DONE** (vector `TownModel` + stages + gizmos). Menu: `GameDev/Town/…`
 - **OrganicTown v2 Milestone B = DONE** (`TownGreyboxBaker` — street ribbons + exterior shells + landmark from footprints). Auto-bake on generate; menu `GameDev/Town/Bake Greybox`
 - **Street corridor topology FIXED (2026-08-06):** `Stage_Streets` places streets on split chords, leaf blocks inset by half-width, node snap/merge. Seed 110201: ~4.5% road samples in buildings, ~5.7% in blocks (was 35% / 99%). Debug: `dotnet run --project tools/TownDebugHost -- 110201` → `Assets/Plans/debug/`.
+- **D1.1 IN PROGRESS** — enterable template foundation: `BuildingTemplate` + coded catalog (5 starters), `Stage_AssignTemplates`, baker interior cell paint (floor/wall/door). Plan: [`MILESTONE_D1_PLAN.md`](MILESTONE_D1_PLAN.md)
 - **v1 raster city still playable.** Menu: `GameDev/City/…` — do not delete until roadmap **C2**
-- **Next default phase: D1** — enterable BuildingTemplates (10–20 types) on plots
+- **Next:** finish/verify D1.1 in Unity, then **D1.2** expand catalog toward 10–20 types
 
 ## Order
 
-`A ✅ → B ✅ → D1 (enterable templates) → D2 (BG3 occlusion) → C1/C2 (narrative + GridMap) → E (wilderness/caves)`
+`A ✅ → B ✅ → D1 (enterable templates; D1.1 underway) → D2 (BG3 occlusion) → C1/C2 (narrative + GridMap) → E (wilderness/caves)`
 
 Do not skip ahead to Valheim wilderness or collapse D1+D2+C into one sprint, unless the user explicitly overrides.
 

@@ -23,6 +23,13 @@ namespace GameDev.World.Town.Tests
             Assert.AreEqual(a.Blocks.Count, b.Blocks.Count);
             Assert.AreEqual(a.Plots.Count, b.Plots.Count);
             Assert.AreEqual(a.Buildings.Count, b.Buildings.Count);
+            Assert.AreEqual(CountTemplated(a), CountTemplated(b));
+            if (a.Buildings.Count > 0)
+            {
+                Assert.AreEqual(a.Buildings[0].TemplateId, b.Buildings[0].TemplateId);
+                Assert.AreEqual(a.Buildings[0].TemplateOrigin.x, b.Buildings[0].TemplateOrigin.x, 1e-3f);
+                Assert.AreEqual(a.Buildings[0].TemplateYawDeg, b.Buildings[0].TemplateYawDeg, 1e-3f);
+            }
 
             Assert.AreEqual(a.Center.x, b.Center.x, 1e-4f);
             Assert.AreEqual(a.Center.y, b.Center.y, 1e-4f);
@@ -53,9 +60,24 @@ namespace GameDev.World.Town.Tests
             Stage_Streets.Run(model, profile, ws.Fork("streets"));
             Stage_Plots.Run(model, profile, ws.Fork("plots"));
             Stage_Buildings.Run(model, profile, ws.Fork("buildings"));
+            Stage_AssignTemplates.Run(model, profile, ws.Fork("templates"));
             Stage_OpenSpaces.Run(model, profile, ws.Fork("openSpaces"));
             Stage_ConnectivityAndScale.Run(model, profile, ws.Fork("connectivity"), log);
             return model;
+        }
+
+        private static int CountTemplated(TownModel model)
+        {
+            var n = 0;
+            for (var i = 0; i < model.Buildings.Count; i++)
+            {
+                if (model.Buildings[i].HasTemplate)
+                {
+                    n++;
+                }
+            }
+
+            return n;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace GameDev.World.Town
 {
     /// <summary>
     /// OrganicTown v2 orchestrator — deterministic stage pipeline into <see cref="TownModel"/>.
-    /// Milestone B: optional greybox bake (shells + street ribbons) after data generation.
+    /// Milestone B/D1: optional greybox bake (streets + shells or enterable interiors).
     /// </summary>
     public sealed class TownGenerator : MonoBehaviour
     {
@@ -19,10 +19,11 @@ namespace GameDev.World.Town
         [SerializeField] private bool timeSliced;
         [SerializeField] private bool bakeGreybox = true;
 
-        [Header("S0 Greybox Prefabs (Milestone B)")]
+        [Header("S0 Greybox Prefabs (Milestone B/D1)")]
         [SerializeField] private GameObject floorTilePrefab;
         [SerializeField] private GameObject building1x1Prefab;
         [SerializeField] private GameObject landmarkBlockPrefab;
+        [SerializeField] private GameObject wallSegmentPrefab;
 
         [Header("Gizmos")]
         [SerializeField] private bool drawBoundary = true;
@@ -90,13 +91,14 @@ namespace GameDev.World.Town
             Stage_Streets.Run(_model, profile, _worldSeed.Fork("streets"));
             Stage_Plots.Run(_model, profile, _worldSeed.Fork("plots"));
             Stage_Buildings.Run(_model, profile, _worldSeed.Fork("buildings"));
+            Stage_AssignTemplates.Run(_model, profile, _worldSeed.Fork("templates"));
             Stage_OpenSpaces.Run(_model, profile, _worldSeed.Fork("openSpaces"));
             Stage_ConnectivityAndScale.Run(_model, profile, _worldSeed.Fork("connectivity"), _validationLog);
 
             Debug.Log(
                 $"[Town] seed={seed} portals={_model.Portals.Count} roads={_model.RoadEdges.Count} " +
                 $"districts={_model.Districts.Count} blocks={_model.Blocks.Count} plots={_model.Plots.Count} " +
-                $"buildings={_model.Buildings.Count} warnings={_validationLog.Count}");
+                $"buildings={_model.Buildings.Count} templated={CountTemplated(_model)} warnings={_validationLog.Count}");
 
             if (bakeGreybox)
             {
@@ -128,11 +130,13 @@ namespace GameDev.World.Town
             yield return null;
             Stage_Buildings.Run(_model, profile, _worldSeed.Fork("buildings"));
             yield return null;
+            Stage_AssignTemplates.Run(_model, profile, _worldSeed.Fork("templates"));
+            yield return null;
             Stage_OpenSpaces.Run(_model, profile, _worldSeed.Fork("openSpaces"));
             yield return null;
             Stage_ConnectivityAndScale.Run(_model, profile, _worldSeed.Fork("connectivity"), _validationLog);
 
-            Debug.Log($"[Town] async done seed={seed} buildings={_model.Buildings.Count}");
+            Debug.Log($"[Town] async done seed={seed} buildings={_model.Buildings.Count} templated={CountTemplated(_model)}");
 
             if (bakeGreybox)
             {
@@ -150,12 +154,28 @@ namespace GameDev.World.Town
             {
                 FloorTile = floorTilePrefab,
                 Building1x1 = building1x1Prefab,
-                LandmarkBlock = landmarkBlockPrefab
+                LandmarkBlock = landmarkBlockPrefab,
+                WallSegment = wallSegmentPrefab
             };
             TownGreyboxBaker.Bake(transform, _model, prefs);
             floorTilePrefab = prefs.FloorTile;
             building1x1Prefab = prefs.Building1x1;
             landmarkBlockPrefab = prefs.LandmarkBlock;
+            wallSegmentPrefab = prefs.WallSegment;
+        }
+
+        private static int CountTemplated(TownModel model)
+        {
+            var n = 0;
+            for (var i = 0; i < model.Buildings.Count; i++)
+            {
+                if (model.Buildings[i].HasTemplate)
+                {
+                    n++;
+                }
+            }
+
+            return n;
         }
 
         public void ClearModel()

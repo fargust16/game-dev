@@ -71,6 +71,11 @@ namespace GameDev.World.Town
                 case DistrictType.Market:
                     return rng.NextDouble() < 0.7 ? BuildingKind.Commercial : BuildingKind.Residential;
                 case DistrictType.Civic:
+                    if (rng.NextDouble() < 0.2)
+                    {
+                        return BuildingKind.Religious;
+                    }
+
                     return rng.NextDouble() < 0.5 ? BuildingKind.Civic : BuildingKind.Residential;
                 case DistrictType.Industrial:
                     return rng.NextDouble() < 0.6 ? BuildingKind.Industrial : BuildingKind.Residential;

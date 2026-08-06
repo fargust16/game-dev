@@ -1,4 +1,5 @@
 using GameDev.World.Town.Geometry;
+using UnityEngine;
 
 namespace GameDev.World.Town
 {
@@ -15,7 +16,7 @@ namespace GameDev.World.Town
 
     /// <summary>
     /// A building instance: a footprint polygon, floor count, and back-reference
-    /// to the plot it occupies.
+    /// to the plot it occupies. Optional D1 template placement for enterable interiors.
     /// </summary>
     public sealed class Building
     {
@@ -31,9 +32,28 @@ namespace GameDev.World.Town
         /// <summary>Architectural/functional category.</summary>
         public BuildingKind Kind;
 
+        /// <summary>Assigned interior schematic, or <see cref="BuildingTemplateId.None"/>.</summary>
+        public BuildingTemplateId TemplateId;
+
+        /// <summary>World XZ of local cell (0,0) corner (door side = local −Z).</summary>
+        public Vector2 TemplateOrigin;
+
+        /// <summary>Yaw degrees; local +Z aligns with depth into the building.</summary>
+        public float TemplateYawDeg;
+
+        public bool HasTemplate => TemplateId != BuildingTemplateId.None;
+
         public Building()
         {
             Footprint = new Polygon2();
+            TemplateId = BuildingTemplateId.None;
+        }
+
+        public void ClearTemplate()
+        {
+            TemplateId = BuildingTemplateId.None;
+            TemplateOrigin = Vector2.zero;
+            TemplateYawDeg = 0f;
         }
     }
 }

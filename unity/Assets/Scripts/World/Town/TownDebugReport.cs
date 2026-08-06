@@ -24,6 +24,7 @@ namespace GameDev.World.Town
             public int RoadSamplesInsideBuildings;
             public int RoadSamplesInsideBlocks;
             public int Buildings;
+            public int BuildingsWithTemplate;
             public int BuildingsOverlappingRoads;
             public int RoadEdges;
             public int DeadEndEdges;
@@ -75,6 +76,14 @@ namespace GameDev.World.Town
                 Plots = model.Plots.Count,
                 Findings = new List<string>(16)
             };
+
+            for (var i = 0; i < model.Buildings.Count; i++)
+            {
+                if (model.Buildings[i].HasTemplate)
+                {
+                    r.BuildingsWithTemplate++;
+                }
+            }
 
             for (var i = 0; i < model.RoadEdges.Count; i++)
             {
@@ -242,6 +251,32 @@ namespace GameDev.World.Town
                     $"WARN sparse street graph vs blocks: roads={model.RoadEdges.Count}, blocks={model.Blocks.Count}.");
             }
 
+            var assignable = 0;
+            for (var i = 0; i < model.Buildings.Count; i++)
+            {
+                if (model.Buildings[i].Kind != BuildingKind.Landmark)
+                {
+                    assignable++;
+                }
+            }
+
+            if (assignable > 0)
+            {
+                var pctT = 100f * r.BuildingsWithTemplate / assignable;
+                if (pctT < 20f)
+                {
+                    r.Findings.Add(
+                        $"WARN templates: only {r.BuildingsWithTemplate}/{assignable} non-landmark buildings " +
+                        $"have interiors ({pctT:F0}%). Catalog may be too large vs footprints.");
+                }
+                else
+                {
+                    r.Findings.Add(
+                        $"OK templates: {r.BuildingsWithTemplate}/{assignable} non-landmark buildings " +
+                        $"have interiors ({pctT:F0}%).");
+                }
+            }
+
             if (r.Findings.Count == 0)
             {
                 r.Findings.Add("No automatic red flags. Still review SVG layers visually.");
@@ -273,6 +308,7 @@ namespace GameDev.World.Town
             sb.AppendLine($"| Blocks | {r.Blocks} |");
             sb.AppendLine($"| Plots | {r.Plots} |");
             sb.AppendLine($"| Buildings | {r.Buildings} |");
+            sb.AppendLine($"| Buildings with template | {r.BuildingsWithTemplate} |");
             sb.AppendLine($"| Open spaces | {model.OpenSpaces.Count} |");
             sb.AppendLine();
             sb.AppendLine("## Overlap / coverage probes");
@@ -328,7 +364,7 @@ namespace GameDev.World.Town
                 var b = model.Buildings[i];
                 var c = b.Footprint != null ? b.Footprint.Centroid : Vector2.zero;
                 sb.AppendLine(
-                    $"- #{i} {b.Kind} floors={F(b.Floors)} verts={b.Footprint?.Count ?? 0} " +
+                    $"- #{i} {b.Kind} template={b.TemplateId} floors={F(b.Floors)} verts={b.Footprint?.Count ?? 0} " +
                     $"centroid=({F(c.x)},{F(c.y)}) area={F(b.Footprint?.Area ?? 0f)}");
             }
 

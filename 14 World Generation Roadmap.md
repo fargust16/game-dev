@@ -1,6 +1,6 @@
 # 14 World Generation Roadmap
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [13 City Generation](13%20City%20Generation.md)
 
 Referenced By:
-[AGENTS.md](AGENTS.md), Unity implementation under `unity/Assets/Scripts/World/Town/`, plan `unity/Assets/Plans/procedural-organic-town-generator.md`, work report `unity/Assets/Plans/MILESTONE_B_WORK_REPORT.md`
+[AGENTS.md](AGENTS.md), Unity implementation under `unity/Assets/Scripts/World/Town/`, plan `unity/Assets/Plans/procedural-organic-town-generator.md`, work report `unity/Assets/Plans/MILESTONE_B_WORK_REPORT.md`, D1 plan `unity/Assets/Plans/MILESTONE_D1_PLAN.md`
 
 ---
 
@@ -34,6 +34,7 @@ Success question for agents:
 |-------|-------------|-------------|
 | **OrganicTown v2 Milestone A** | Vector town: `TownModel` filled by stage pipeline + gizmos | `GameDev/Town/Open Or Create Town Scene` → Scene view Gizmos |
 | **OrganicTown v2 Milestone B** | Greybox baker: street ribbons + exterior shells + landmark | `GameDev/Town/Generate From Seed` (auto-bake) or `Bake Greybox` |
+| **OrganicTown v2 D1.1 (partial)** | Template data + 5 starters + assign stage + interior bake | See [`MILESTONE_D1_PLAN.md`](unity/Assets/Plans/MILESTONE_D1_PLAN.md); Unity generate to verify |
 | **v1 raster playable city** | Walkable greybox Lower Veil (shells, POIs, tips, clock) | `GameDev/City/Generate From Seed` → `City_OrganicTown.unity` + Play |
 
 ### v2 Milestone A — key files
@@ -50,8 +51,17 @@ Success question for agents:
 
 - Baker: `unity/Assets/Scripts/World/Town/TownGreyboxBaker.cs`
 - Wired from `TownGenerator` (`bakeGreybox`, S0 prefab refs) + menu `GameDev/Town/Bake Greybox`
-- Prefabs: `Assets/Prefabs/S0_Greybox/` (`Floor_Tile_1x1`, `Building_Shell_1x1`, `Landmark_Block`)
-- Still **visual-only** — no `GridMap` bridge, no interiors, no narrative POIs
+- Prefabs: `Assets/Prefabs/S0_Greybox/` (`Floor_Tile_1x1`, `Building_Shell_1x1`, `Landmark_Block`, `Wall_Segment_1x3`)
+- Still **no** `GridMap` bridge / narrative POIs
+
+### v2 D1.1 — key files (in progress)
+
+- Plan: [`unity/Assets/Plans/MILESTONE_D1_PLAN.md`](unity/Assets/Plans/MILESTONE_D1_PLAN.md)
+- `BuildingTemplate.cs`, `BuildingTemplateCatalog.cs` (5 coded starters)
+- `Stage_AssignTemplates.cs` (fork `templates`)
+- Baker paints floor/wall/door cells when `Building.HasTemplate`
+- Tests: `BuildingTemplateTests.cs`
+- **Next inside D1:** D1.2 expand catalog to ~10–20 types
 
 ### v1 raster — key files (still live for gameplay)
 
@@ -61,7 +71,7 @@ Success question for agents:
 
 ## Not done yet
 
-- No enterable building interiors / template library (**D1**)
+- D1 not complete — D1.1 foundation landed; catalog still short of 10–20 types (**D1.2**)
 - No BG3-style wall/roof fade (**D2**)
 - No narrative POI port onto v2 + `GridMap` bridge; raster gen not retired (**C**)
 - No wilderness / caves outside walls (**E**)
@@ -114,7 +124,7 @@ Each phase = its own plan + commit series. Prefer updating this file’s “Wher
 # Agent Instructions (quick)
 
 1. Read this file + [`MILESTONE_B_WORK_REPORT.md`](unity/Assets/Plans/MILESTONE_B_WORK_REPORT.md) + [`13 City Generation.md`](13%20City%20Generation.md) + the Unity plan under `Assets/Plans/`.
-2. **Next implementation default:** Milestone **D1** — enterable `BuildingTemplate` library (unless the user explicitly requests another phase).
+2. **Next implementation default:** finish **D1** — D1.1 foundation exists; expand catalog (**D1.2**) unless the user explicitly requests another phase.
 3. Keep style: no inheritance tricks, `WorldSeed.Fork` per stage, list order (no HashSet iteration for geometry), human-scale metres on XZ.
 4. Confirm design forks with the user before changing locked architecture above.
 5. After a documentation or milestone step: commit and push to `main` per project habit.

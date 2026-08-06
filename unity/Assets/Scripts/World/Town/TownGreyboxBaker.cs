@@ -7,8 +7,9 @@ using UnityEditor;
 namespace GameDev.World.Town
 {
     /// <summary>
-    /// Milestone B — thin greybox visual layer over <see cref="TownModel"/>.
-    /// Street ribbons + exterior shells + landmark. No GridMap, interiors, or POIs.
+    /// Milestone B/D1 greybox layer over <see cref="TownModel"/>.
+    /// Streets + exterior shells or enterable template cells + landmark.
+    /// No GridMap bridge, narrative POIs, or occlusion.
     /// </summary>
     public static class TownGreyboxBaker
     {
@@ -21,12 +22,15 @@ namespace GameDev.World.Town
         /// <summary>Landmark_Block Visual local scale on Y (height at root scale 1).</summary>
         private const float LandmarkPrefabY = 1.5f;
         private const float StoreyMetres = 2f;
+        /// <summary>Wall_Segment_1x3 Visual thickness on local Z at root scale 1.</summary>
+        private const float WallPrefabThickness = 0.3f;
 
         public sealed class PrefabSet
         {
             public GameObject FloorTile;
             public GameObject Building1x1;
             public GameObject LandmarkBlock;
+            public GameObject WallSegment;
         }
 
         public static void Clear(Transform parent)
@@ -87,23 +91,33 @@ namespace GameDev.World.Town
 
             EnsureSun(root.transform);
 
+            CountBuildingBake(model, out var shells, out var interiors);
             Debug.Log(
                 $"[TownGreybox] baked roads={model.RoadEdges.Count} " +
-                $"shells={CountNonLandmarkBuildings(model)} landmark={(model.Landmark != null ? 1 : 0)}");
+                $"shells={shells} interiors={interiors} landmark={(model.Landmark != null ? 1 : 0)}");
         }
 
-        private static int CountNonLandmarkBuildings(TownModel model)
+        private static void CountBuildingBake(TownModel model, out int shells, out int interiors)
         {
-            var n = 0;
+            shells = 0;
+            interiors = 0;
             for (var i = 0; i < model.Buildings.Count; i++)
             {
-                if (model.Buildings[i].Kind != BuildingKind.Landmark)
+                var b = model.Buildings[i];
+                if (b.Kind == BuildingKind.Landmark)
                 {
-                    n++;
+                    continue;
+                }
+
+                if (b.HasTemplate)
+                {
+                    interiors++;
+                }
+                else
+                {
+                    shells++;
                 }
             }
-
-            return n;
         }
 
         private static void BakeStreets(Transform parent, TownModel model, GameObject floorPrefab)
@@ -157,14 +171,79 @@ namespace GameDev.World.Town
                     continue;
                 }
 
-                if (!TryFootprintObb(building.Footprint, out var center, out var axis, out var sizeX, out var sizeZ))
+                if (building.HasTemplate)
+                {
+                    var template = BuildingTemplateCatalog.Get(building.TemplateId);
+                    if (template != null)
+                    {
+                        var root = new GameObject($"Interior_{bi}_{template.Id}");
+                        root.transform.SetParent(parent, false);
+                        BakeInterior(root.transform, building, template, prefs);
+                        continue;
+                    }
+                }
+
+                if (!TownFootprintUtil.TryObb(building.Footprint, out var center, out var axis, out var sizeX, out var sizeZ))
                 {
                     continue;
                 }
 
-                // Always 1×1 shell: unit footprint base so localScale maps 1:1 to metres.
+                // Solid shell fallback when no template fits.
                 var go = SpawnPrefab(prefs.Building1x1, parent, $"Building_{bi}_{building.Kind}");
                 PlaceOrientedShell(go, center, axis, sizeX, sizeZ, building.Floors);
+            }
+        }
+
+        private static void BakeInterior(
+            Transform parent,
+            Building building,
+            BuildingTemplate template,
+            PrefabSet prefs)
+        {
+            var floors = Mathf.Max(0.5f, building.Floors);
+            var yaw = building.TemplateYawDeg;
+            var cs = template.CellSize;
+
+            for (var y = 0; y < template.Height; y++)
+            {
+                for (var x = 0; x < template.Width; x++)
+                {
+                    var kind = template.GetCell(x, y);
+                    if (kind == BuildingInteriorCellKind.Empty)
+                    {
+                        continue;
+                    }
+
+                    var center = TownFootprintUtil.CellCenterWorld(building, template, x, y);
+                    var label = $"{kind}_{x}_{y}";
+
+                    if (kind == BuildingInteriorCellKind.Wall)
+                    {
+                        var wallPrefab = prefs.WallSegment != null ? prefs.WallSegment : prefs.Building1x1;
+                        var wall = SpawnPrefab(wallPrefab, parent, label);
+                        wall.transform.position = Geo2.ToVector3(center, 0f);
+                        wall.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+                        if (prefs.WallSegment != null && wallPrefab == prefs.WallSegment)
+                        {
+                            // Fill 1 m cell: X = cell, Z thickens the thin wall visual.
+                            wall.transform.localScale = new Vector3(cs, floors, cs / WallPrefabThickness);
+                        }
+                        else
+                        {
+                            wall.transform.localScale = new Vector3(cs, floors, cs);
+                        }
+
+                        DisableColliders(wall);
+                        continue;
+                    }
+
+                    // Floor / door / sockets — walkable paint (door = opening, no wall).
+                    var floor = SpawnPrefab(prefs.FloorTile, parent, label);
+                    floor.transform.position = Geo2.ToVector3(center, FloorY);
+                    floor.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+                    floor.transform.localScale = new Vector3(cs, 1f, cs);
+                    DisableColliders(floor);
+                }
             }
         }
 
@@ -175,7 +254,7 @@ namespace GameDev.World.Town
                 return;
             }
 
-            if (!TryFootprintObb(model.Landmark.Footprint, out var center, out var axis, out var sizeX, out var sizeZ))
+            if (!TownFootprintUtil.TryObb(model.Landmark.Footprint, out var center, out var axis, out var sizeX, out var sizeZ))
             {
                 return;
             }
@@ -207,60 +286,6 @@ namespace GameDev.World.Town
                 Mathf.Max(1f, sizeX),
                 Mathf.Max(0.5f, floors),
                 Mathf.Max(1f, sizeZ));
-        }
-
-        /// <summary>
-        /// Footprint OBB: <paramref name="axis"/> aligns with local +Z;
-        /// <paramref name="sizeX"/> is width across axis, <paramref name="sizeZ"/> along axis.
-        /// </summary>
-        private static bool TryFootprintObb(
-            Polygon2 poly,
-            out Vector2 center,
-            out Vector2 axis,
-            out float sizeX,
-            out float sizeZ)
-        {
-            center = poly.Centroid;
-            axis = Vector2.up;
-            sizeX = 1f;
-            sizeZ = 1f;
-
-            var verts = poly.Vertices;
-            if (verts.Count < 3)
-            {
-                return false;
-            }
-
-            var (longAxis, splitDir) = Geo2.ObbLongestAxis(verts);
-            if (longAxis.sqrMagnitude < 1e-8f)
-            {
-                return false;
-            }
-
-            axis = longAxis.normalized;
-            var perp = splitDir.sqrMagnitude > 1e-8f
-                ? splitDir.normalized
-                : new Vector2(-axis.y, axis.x);
-
-            var minA = float.MaxValue;
-            var maxA = float.MinValue;
-            var minP = float.MaxValue;
-            var maxP = float.MinValue;
-            for (var i = 0; i < verts.Count; i++)
-            {
-                var v = verts[i];
-                var pa = Vector2.Dot(v, axis);
-                var pp = Vector2.Dot(v, perp);
-                if (pa < minA) minA = pa;
-                if (pa > maxA) maxA = pa;
-                if (pp < minP) minP = pp;
-                if (pp > maxP) maxP = pp;
-            }
-
-            sizeZ = Mathf.Max(0.5f, maxA - minA);
-            sizeX = Mathf.Max(0.5f, maxP - minP);
-            center = axis * ((minA + maxA) * 0.5f) + perp * ((minP + maxP) * 0.5f);
-            return true;
         }
 
         private static void EnsureSun(Transform root)
@@ -322,6 +347,11 @@ namespace GameDev.World.Town
             if (prefs.LandmarkBlock == null)
             {
                 prefs.LandmarkBlock = LoadPrefab("Landmark_Block.prefab");
+            }
+
+            if (prefs.WallSegment == null)
+            {
+                prefs.WallSegment = LoadPrefab("Wall_Segment_1x3.prefab");
             }
 #endif
         }

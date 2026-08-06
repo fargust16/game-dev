@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.17
+Version: 0.18
 
 Status: Draft
 
@@ -349,8 +349,15 @@ Current active design layer:
 1. Keep World Laws through Vertical Slice coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. World/town gen: OrganicTown v2 **A+B done**; next default **D1** enterable BuildingTemplates (see [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)). Do not jump to combat/POI/GridMap bridge before D1.
+4. World/town gen: OrganicTown v2 **A+B done**; **D1.1** template foundation in progress — next **D1.2** catalog expansion (see [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), `MILESTONE_D1_PLAN.md`). Do not jump to combat/POI/GridMap bridge before D1 completes.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 
 After each completed documentation step, commit and push so git preserves the design history.
+
+<!-- lean-ctx -->
+## lean-ctx
+
+lean-ctx is active — the MCP tools replace native equivalents.
+Full rules: LEAN-CTX.md (open on demand — do not auto-load).
+<!-- /lean-ctx -->

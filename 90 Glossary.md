@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.18
+Version: 0.19
 
 Status: Draft
 
@@ -345,6 +345,12 @@ A mandatory landmark / NPC / POI placement that every city regenerate must inclu
 ## Grid World
 
 Gameplay space authored on a square grid. Movement, pathfinding, and most traversal truths are cell-based even if visuals look continuous.
+
+---
+
+## BuildingTemplate
+
+A reusable schematic interior for OrganicTown v2: local cell paint (floor / wall / door / sockets) placed on a building footprint so shops and houses are enterable in the same continuous world. Catalog expansion is Milestone D1; GridMap rasterization of these cells is Milestone C2. See [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md).
 
 ---
 

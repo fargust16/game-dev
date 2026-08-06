@@ -17,22 +17,24 @@
 | Districts | 3 |
 | Blocks | 408 |
 | Plots | 862 |
-| Buildings | 822 |
+| Buildings | 824 |
+| Buildings with template | 213 |
 | Open spaces | 208 |
 
 ## Overlap / coverage probes
 
 - Road centreline samples: **15950**
-- Samples inside **building** footprints: **716** (4.5%)
+- Samples inside **building** footprints: **708** (4.4%)
 - Samples inside **block** polygons: **916** (5.7%)
-- Buildings touched by a road sample: **90** / 822
-- Building footprint area / bounds area: **19.2%**
+- Buildings touched by a road sample: **88** / 824
+- Building footprint area / bounds area: **19.3%**
 
 ## Findings
 
-1. OK roads-vs-buildings: only 4.5% road samples inside footprints.
+1. OK roads-vs-buildings: only 4.4% road samples inside footprints.
 2. OK roads-vs-blocks: only 5.7% road samples inside block polygons.
 3. OK stubs: degree-1 nodes=168 (portals=3, dead-ends=45).
+4. OK templates: 213/823 non-landmark buildings have interiors (26%).
 
 ## How to read the SVG
 
@@ -53,11 +55,11 @@
 
 ## Sample building footprints (first 8)
 
-- #0 Commercial floors=3.18 verts=3 centroid=(41.233,-112.126) area=58.821
-- #1 Commercial floors=4.501 verts=5 centroid=(33.276,-70.767) area=81.7
-- #2 Residential floors=4.358 verts=5 centroid=(101.746,-80.252) area=68.308
-- #3 Commercial floors=2.649 verts=4 centroid=(55.737,-96.634) area=42.739
-- #4 Commercial floors=2.757 verts=4 centroid=(2.534,-123.876) area=157.528
-- #5 Commercial floors=5.296 verts=4 centroid=(-12.372,-129.555) area=26.014
-- #6 Residential floors=3.959 verts=4 centroid=(110.529,-146.056) area=137.949
-- #7 Commercial floors=2.657 verts=3 centroid=(79.194,-97.444) area=209.714
+- #0 Commercial template=None floors=3.18 verts=3 centroid=(41.233,-112.126) area=58.821
+- #1 Commercial template=Tavern floors=4.501 verts=5 centroid=(33.276,-70.767) area=81.7
+- #2 Residential template=WorkerHouse floors=4.358 verts=5 centroid=(101.746,-80.252) area=68.308
+- #3 Commercial template=None floors=2.649 verts=4 centroid=(55.737,-96.634) area=42.739
+- #4 Commercial template=Tavern floors=2.757 verts=4 centroid=(2.534,-123.876) area=157.528
+- #5 Commercial template=Shop floors=5.296 verts=4 centroid=(-12.372,-129.555) area=26.014
+- #6 Residential template=PeasantHouse floors=3.959 verts=4 centroid=(110.529,-146.056) area=137.949
+- #7 Commercial template=Tavern floors=2.657 verts=3 centroid=(79.194,-97.444) area=209.714
