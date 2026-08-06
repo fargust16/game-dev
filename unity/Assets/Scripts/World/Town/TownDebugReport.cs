@@ -25,6 +25,10 @@ namespace GameDev.World.Town
             public int RoadSamplesInsideBlocks;
             public int Buildings;
             public int BuildingsWithTemplate;
+            public int SocketCount;
+            public int NpcSocketCount;
+            public int PropSocketCount;
+            public int KeeperSocketCount;
             public int BuildingsOverlappingRoads;
             public int RoadEdges;
             public int DeadEndEdges;
@@ -79,9 +83,35 @@ namespace GameDev.World.Town
 
             for (var i = 0; i < model.Buildings.Count; i++)
             {
-                if (model.Buildings[i].HasTemplate)
+                var building = model.Buildings[i];
+                if (building.HasTemplate)
                 {
                     r.BuildingsWithTemplate++;
+                }
+
+                var sockets = building.Sockets;
+                if (sockets == null)
+                {
+                    continue;
+                }
+
+                for (var si = 0; si < sockets.Count; si++)
+                {
+                    r.SocketCount++;
+                    var s = sockets[si];
+                    if (s.CellKind == BuildingInteriorCellKind.NpcSocket)
+                    {
+                        r.NpcSocketCount++;
+                    }
+                    else if (s.CellKind == BuildingInteriorCellKind.PropSocket)
+                    {
+                        r.PropSocketCount++;
+                    }
+
+                    if (s.Role == BuildingSocketRole.Keeper)
+                    {
+                        r.KeeperSocketCount++;
+                    }
                 }
             }
 
@@ -277,6 +307,28 @@ namespace GameDev.World.Town
                 }
             }
 
+            if (r.BuildingsWithTemplate > 0)
+            {
+                if (r.SocketCount <= 0)
+                {
+                    r.Findings.Add(
+                        "FAIL sockets: templated buildings exist but zero placed sockets " +
+                        "(D1.3 PlaceSockets not wired or templates lack N/P cells).");
+                }
+                else if (r.NpcSocketCount <= 0 || r.PropSocketCount <= 0)
+                {
+                    r.Findings.Add(
+                        $"WARN sockets: total={r.SocketCount} npc={r.NpcSocketCount} prop={r.PropSocketCount} " +
+                        $"(keepers={r.KeeperSocketCount}). Expected both NPC and prop sockets in catalog.");
+                }
+                else
+                {
+                    r.Findings.Add(
+                        $"OK sockets: total={r.SocketCount} npc={r.NpcSocketCount} prop={r.PropSocketCount} " +
+                        $"keepers={r.KeeperSocketCount}.");
+                }
+            }
+
             if (r.Findings.Count == 0)
             {
                 r.Findings.Add("No automatic red flags. Still review SVG layers visually.");
@@ -309,6 +361,10 @@ namespace GameDev.World.Town
             sb.AppendLine($"| Plots | {r.Plots} |");
             sb.AppendLine($"| Buildings | {r.Buildings} |");
             sb.AppendLine($"| Buildings with template | {r.BuildingsWithTemplate} |");
+            sb.AppendLine($"| Placed sockets | {r.SocketCount} |");
+            sb.AppendLine($"| NPC sockets | {r.NpcSocketCount} |");
+            sb.AppendLine($"| Prop sockets | {r.PropSocketCount} |");
+            sb.AppendLine($"| Keeper roles | {r.KeeperSocketCount} |");
             sb.AppendLine($"| Open spaces | {model.OpenSpaces.Count} |");
             sb.AppendLine();
             sb.AppendLine("## Overlap / coverage probes");

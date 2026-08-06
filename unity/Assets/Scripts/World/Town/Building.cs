@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GameDev.World.Town.Geometry;
 using UnityEngine;
 
@@ -15,8 +16,7 @@ namespace GameDev.World.Town
     }
 
     /// <summary>
-    /// A building instance: a footprint polygon, floor count, and back-reference
-    /// to the plot it occupies. Optional D1 template placement for enterable interiors.
+    /// A building instance: footprint, floors, optional D1 template placement and sockets.
     /// </summary>
     public sealed class Building
     {
@@ -41,12 +41,19 @@ namespace GameDev.World.Town
         /// <summary>Yaw degrees; local +Z aligns with depth into the building.</summary>
         public float TemplateYawDeg;
 
+        /// <summary>
+        /// Placed NPC/prop sockets for this building (D1.3). Empty when no template.
+        /// Ordered stably for C1; filter via <see cref="TownSocketQuery"/>.
+        /// </summary>
+        public List<PlacedBuildingSocket> Sockets;
+
         public bool HasTemplate => TemplateId != BuildingTemplateId.None;
 
         public Building()
         {
             Footprint = new Polygon2();
             TemplateId = BuildingTemplateId.None;
+            Sockets = new List<PlacedBuildingSocket>(4);
         }
 
         public void ClearTemplate()
@@ -54,6 +61,14 @@ namespace GameDev.World.Town
             TemplateId = BuildingTemplateId.None;
             TemplateOrigin = Vector2.zero;
             TemplateYawDeg = 0f;
+            if (Sockets == null)
+            {
+                Sockets = new List<PlacedBuildingSocket>(4);
+            }
+            else
+            {
+                Sockets.Clear();
+            }
         }
     }
 }

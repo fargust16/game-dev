@@ -1,6 +1,6 @@
 # 14 World Generation Roadmap
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
@@ -34,7 +34,7 @@ Success question for agents:
 |-------|-------------|-------------|
 | **OrganicTown v2 Milestone A** | Vector town: `TownModel` filled by stage pipeline + gizmos | `GameDev/Town/Open Or Create Town Scene` → Scene view Gizmos |
 | **OrganicTown v2 Milestone B** | Greybox baker: street ribbons + exterior shells + landmark | `GameDev/Town/Generate From Seed` (auto-bake) or `Bake Greybox` |
-| **OrganicTown v2 D1.1–D1.2** | Enterable templates (~16 types) + assign + interior bake | Seed 110201 ≈55% templated; [`MILESTONE_D1_PLAN.md`](unity/Assets/Plans/MILESTONE_D1_PLAN.md) |
+| **OrganicTown v2 D1** ✅ | Enterable templates (~16) + sockets/roles/query for C1 | [`MILESTONE_D1_PLAN.md`](unity/Assets/Plans/MILESTONE_D1_PLAN.md); next **D2** occlusion |
 | **v1 raster playable city** | Walkable greybox Lower Veil (shells, POIs, tips, clock) | `GameDev/City/Generate From Seed` → `City_OrganicTown.unity` + Play |
 
 ### v2 Milestone A — key files
@@ -54,14 +54,15 @@ Success question for agents:
 - Prefabs: `Assets/Prefabs/S0_Greybox/` (`Floor_Tile_1x1`, `Building_Shell_1x1`, `Landmark_Block`, `Wall_Segment_1x3`)
 - Still **no** `GridMap` bridge / narrative POIs
 
-### v2 D1.1–D1.2 — key files
+### v2 D1 — key files ✅
 
 - Plan: [`unity/Assets/Plans/MILESTONE_D1_PLAN.md`](unity/Assets/Plans/MILESTONE_D1_PLAN.md)
-- `BuildingTemplate.cs`, `BuildingTemplateCatalog.cs` (~16 coded types incl. Booth/Cottage)
-- `Stage_AssignTemplates.cs` (fork `templates`, largest wealth-compatible fit)
-- Baker paints floor/wall/door cells when `Building.HasTemplate`
-- Tests: `BuildingTemplateTests.cs`
-- **Next inside D1:** D1.3 expose NPC/prop sockets for C1 (castle/palace variants optional)
+- `BuildingTemplate.cs`, `BuildingTemplateCatalog.cs` (~16 types)
+- `BuildingTemplateSockets.cs` — roles, place, `TownSocketQuery`
+- `Stage_AssignTemplates.cs` (fork `templates`)
+- Baker: interior cells + socket pedestals; gizmos: `DrawSockets`
+- Tests: `BuildingTemplateTests.cs`, `BuildingSocketTests.cs`
+- **Next roadmap phase:** **D2** BG3 occlusion
 
 ### v1 raster — key files (still live for gameplay)
 
@@ -71,8 +72,8 @@ Success question for agents:
 
 ## Not done yet
 
-- D1 nearly complete — D1.1+D1.2 catalog ~16 types / ~55% coverage; sockets for C1 still open (**D1.3**)
-- No BG3-style wall/roof fade (**D2**)
+- No BG3-style wall/roof fade (**D2**) — next default
+- Narrative POI spawn still on v1 raster until **C1** consumes D1 sockets
 - No narrative POI port onto v2 + `GridMap` bridge; raster gen not retired (**C**)
 - No wilderness / caves outside walls (**E**)
 
@@ -124,7 +125,7 @@ Each phase = its own plan + commit series. Prefer updating this file’s “Wher
 # Agent Instructions (quick)
 
 1. Read this file + [`MILESTONE_B_WORK_REPORT.md`](unity/Assets/Plans/MILESTONE_B_WORK_REPORT.md) + [`13 City Generation.md`](13%20City%20Generation.md) + the Unity plan under `Assets/Plans/`.
-2. **Next implementation default:** finish **D1.3** (socket handoff for C1) or proceed to **D2** occlusion if user prioritizes enterable readability — do not start C2/E early.
+2. **Next implementation default:** Milestone **D2** — BG3-style wall/roof fade while inside a building volume. Do not start C2/E early; C1 may follow D2 or overlap only after occlusion basics exist.
 3. Keep style: no inheritance tricks, `WorldSeed.Fork` per stage, list order (no HashSet iteration for geometry), human-scale metres on XZ.
 4. Confirm design forks with the user before changing locked architecture above.
 5. After a documentation or milestone step: commit and push to `main` per project habit.

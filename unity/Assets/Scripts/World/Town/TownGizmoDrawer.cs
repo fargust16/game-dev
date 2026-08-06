@@ -86,6 +86,28 @@ namespace GameDev.World.Town
                 }
             }
 
+            if (generator.DrawSockets)
+            {
+                for (var i = 0; i < model.Buildings.Count; i++)
+                {
+                    var sockets = model.Buildings[i].Sockets;
+                    if (sockets == null)
+                    {
+                        continue;
+                    }
+
+                    for (var si = 0; si < sockets.Count; si++)
+                    {
+                        var s = sockets[si];
+                        Gizmos.color = s.CellKind == BuildingInteriorCellKind.NpcSocket
+                            ? new Color(0.35f, 0.85f, 1f, 1f)
+                            : new Color(1f, 0.7f, 0.2f, 1f);
+                        var radius = s.CellKind == BuildingInteriorCellKind.NpcSocket ? 0.55f : 0.4f;
+                        Gizmos.DrawSphere(Geo2.ToVector3(s.WorldPos, 0.9f), radius);
+                    }
+                }
+            }
+
             if (generator.DrawOpenSpaces)
             {
                 for (var i = 0; i < model.OpenSpaces.Count; i++)

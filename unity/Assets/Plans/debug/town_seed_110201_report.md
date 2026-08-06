@@ -19,6 +19,10 @@
 | Plots | 862 |
 | Buildings | 824 |
 | Buildings with template | 451 |
+| Placed sockets | 1323 |
+| NPC sockets | 509 |
+| Prop sockets | 814 |
+| Keeper roles | 176 |
 | Open spaces | 208 |
 
 ## Overlap / coverage probes
@@ -35,6 +39,7 @@
 2. OK roads-vs-blocks: only 5.7% road samples inside block polygons.
 3. OK stubs: degree-1 nodes=168 (portals=3, dead-ends=45).
 4. OK templates: 451/823 non-landmark buildings have interiors (55%).
+5. OK sockets: total=1323 npc=509 prop=814 keepers=176.
 
 ## How to read the SVG
 

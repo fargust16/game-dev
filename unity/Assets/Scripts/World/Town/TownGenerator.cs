@@ -34,6 +34,7 @@ namespace GameDev.World.Town
         [SerializeField] private bool drawBlocks = true;
         [SerializeField] private bool drawPlots = true;
         [SerializeField] private bool drawBuildings = true;
+        [SerializeField] private bool drawSockets = true;
         [SerializeField] private bool drawOpenSpaces = true;
         [SerializeField] private bool drawLandmark = true;
 
@@ -55,6 +56,7 @@ namespace GameDev.World.Town
         public bool DrawBlocks => drawBlocks;
         public bool DrawPlots => drawPlots;
         public bool DrawBuildings => drawBuildings;
+        public bool DrawSockets => drawSockets;
         public bool DrawOpenSpaces => drawOpenSpaces;
         public bool DrawLandmark => drawLandmark;
 

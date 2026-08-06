@@ -29,6 +29,7 @@
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\Building.cs" Link="Town\Building.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\BuildingTemplate.cs" Link="Town\BuildingTemplate.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\BuildingTemplateCatalog.cs" Link="Town\BuildingTemplateCatalog.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\BuildingTemplateSockets.cs" Link="Town\BuildingTemplateSockets.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\OpenSpace.cs" Link="Town\OpenSpace.cs" />
     <Compile Include="..\..\unity\Assets\Scripts\World\Town\Landmark.cs" Link="Town\Landmark.cs" />
 

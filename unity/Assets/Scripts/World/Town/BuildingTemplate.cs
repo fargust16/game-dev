@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 
 namespace GameDev.World.Town
 {
@@ -49,6 +49,12 @@ namespace GameDev.World.Town
         public BuildingInteriorCellKind[] Cells;
         public BuildingKind[] CompatibleKinds;
         public WealthClass[] PreferredWealth;
+
+        /// <summary>
+        /// Optional explicit socket table. When null/empty, sockets are scanned from painted cells.
+        /// Reserved for future authoring without breaking ASCII templates.
+        /// </summary>
+        public List<TemplateSocketDef> ExplicitSockets;
 
         public float WorldWidth => Width * CellSize;
         public float WorldDepth => Height * CellSize;
@@ -118,14 +124,5 @@ namespace GameDev.World.Town
 
             return n;
         }
-    }
-
-    /// <summary>Named socket inside a placed template (world metres after placement).</summary>
-    [Serializable]
-    public struct BuildingSocket
-    {
-        public int LocalX;
-        public int LocalY;
-        public BuildingInteriorCellKind Kind;
     }
 }

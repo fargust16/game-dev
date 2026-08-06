@@ -59,6 +59,7 @@ namespace GameDev.World.Town
                 building.TemplateId = pick.Id;
                 building.TemplateOrigin = origin;
                 building.TemplateYawDeg = yawDeg;
+                BuildingTemplateSocketUtil.PlaceSockets(building, pick);
             }
         }
 

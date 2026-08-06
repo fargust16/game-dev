@@ -179,6 +179,7 @@ namespace GameDev.World.Town
                         var root = new GameObject($"Interior_{bi}_{template.Id}");
                         root.transform.SetParent(parent, false);
                         BakeInterior(root.transform, building, template, prefs);
+                        BakeSocketMarkers(root.transform, building);
                         continue;
                     }
                 }
@@ -244,6 +245,32 @@ namespace GameDev.World.Town
                     floor.transform.localScale = new Vector3(cs, 1f, cs);
                     DisableColliders(floor);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Tiny greybox pedestals for placed sockets (debug/readability). C1 will replace with real content.
+        /// </summary>
+        private static void BakeSocketMarkers(Transform parent, Building building)
+        {
+            var sockets = building.Sockets;
+            if (sockets == null || sockets.Count == 0)
+            {
+                return;
+            }
+
+            var root = new GameObject("Sockets");
+            root.transform.SetParent(parent, false);
+            for (var i = 0; i < sockets.Count; i++)
+            {
+                var s = sockets[i];
+                var marker = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                marker.name = $"Socket_{s.Index}_{s.Role}";
+                marker.transform.SetParent(root.transform, false);
+                var height = s.CellKind == BuildingInteriorCellKind.NpcSocket ? 1.2f : 0.55f;
+                marker.transform.position = Geo2.ToVector3(s.WorldPos, height * 0.5f);
+                marker.transform.localScale = new Vector3(0.35f, height, 0.35f);
+                DisableColliders(marker);
             }
         }
 

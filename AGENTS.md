@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.19
+Version: 0.20
 
 Status: Draft
 
@@ -349,7 +349,7 @@ Current active design layer:
 1. Keep World Laws through Vertical Slice coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. World/town gen: OrganicTown v2 **A+B+D1.1+D1.2 done** (~16 templates, ~55% coverage on seed 110201). Next **D1.3** sockets or **D2** occlusion (see [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), `MILESTONE_D1_PLAN.md`). Do not jump to GridMap bridge (C2) / wilderness (E) early.
+4. World/town gen: OrganicTown v2 **A+B+D1 done** (templates + socket roles/query). Next default **D2** occlusion (see [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)). Do not jump to GridMap bridge (C2) / wilderness (E) early.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

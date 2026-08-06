@@ -33,6 +33,9 @@ namespace TownDebugHost
                 $"roads_in_blocks={result.RoadSamplesInsideBlocks}/{result.RoadSamples}");
             Console.WriteLine($"building_coverage={result.BuildingCoverageOfBounds * 100f:F1}%");
             Console.WriteLine($"templated={result.BuildingsWithTemplate}/{result.Buildings}");
+            Console.WriteLine(
+                $"sockets={result.SocketCount} npc={result.NpcSocketCount} " +
+                $"prop={result.PropSocketCount} keepers={result.KeeperSocketCount}");
             foreach (var f in result.Findings)
             {
                 Console.WriteLine("FINDING: " + f);
