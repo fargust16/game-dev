@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using GameDev.Grid;
 using UnityEngine;
+using Random = System.Random;
 
 namespace GameDev.World.Town
 {

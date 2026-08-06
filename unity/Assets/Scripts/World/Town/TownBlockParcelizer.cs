@@ -1,6 +1,6 @@
-using System;
 using GameDev.Grid;
 using UnityEngine;
+using Random = System.Random;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

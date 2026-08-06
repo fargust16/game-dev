@@ -1,6 +1,6 @@
 # 13 City Generation
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft
 
@@ -88,9 +88,11 @@ Slice POIs **live in Lower Veil**.
 
 # Editor
 
+- Scene: `Assets/Scenes/City_OrganicTown.unity` (separate from legacy `S0_LowerVeil`)
+- `GameDev/City/Open Or Create Town Scene`
 - `GameDev/City/Generate From Seed`
 - `GameDev/City/Generate From Seed (New Random)`
-- Legacy `GameDev/S0/...` forwards to the same generator.
+- Legacy `GameDev/S0/...` can still rebuild greybox; prefer City menu for the organic town.
 
 # Explicitly Out
 

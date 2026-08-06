@@ -9,11 +9,35 @@ namespace GameDev.EditorTools
 {
     public static class CityGenerateMenu
     {
-        private const string ScenePath = "Assets/Scenes/S0_LowerVeil.unity";
+        public const string CityScenePath = "Assets/Scenes/City_OrganicTown.unity";
+
+        [MenuItem("GameDev/City/Open Or Create Town Scene")]
+        public static void OpenOrCreateTownScene()
+        {
+            EnsureSceneFolder();
+            if (System.IO.File.Exists(CityScenePath))
+            {
+                EditorSceneManager.OpenScene(CityScenePath, OpenSceneMode.Single);
+            }
+            else
+            {
+                var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+                var root = new GameObject("City_Root");
+                var city = root.AddComponent<CityGenerator>();
+                city.SetSeed(WorldSeed.DefaultPrototypeSeed);
+                city.Generate();
+                EditorSceneManager.SaveScene(scene, CityScenePath);
+                AddToBuildSettings(CityScenePath);
+            }
+
+            Debug.Log($"[City] Town scene: {CityScenePath}");
+        }
 
         [MenuItem("GameDev/City/Generate From Seed")]
         public static void GenerateFromSeed()
         {
+            EnsureTownSceneActive();
+
             var city = Object.FindFirstObjectByType<CityGenerator>();
             if (city == null)
             {
@@ -24,28 +48,19 @@ namespace GameDev.EditorTools
 
             city.Generate();
             var scene = SceneManager.GetActiveScene();
-            if (string.IsNullOrEmpty(scene.path))
-            {
-                EnsureSceneFolder();
-                EditorSceneManager.SaveScene(scene, ScenePath);
-                EditorBuildSettings.scenes = new[]
-                {
-                    new EditorBuildSettingsScene(ScenePath, true)
-                };
-            }
-            else
-            {
-                EditorSceneManager.MarkSceneDirty(scene);
-                EditorSceneManager.SaveScene(scene);
-            }
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, CityScenePath);
+            AddToBuildSettings(CityScenePath);
 
             Selection.activeGameObject = city.gameObject;
-            Debug.Log($"[City] Generated from seed {city.SeedValue}. Menu: GameDev → City → Generate From Seed.");
+            Debug.Log($"[City] Generated seed={city.SeedValue} into {CityScenePath}.");
         }
 
         [MenuItem("GameDev/City/Generate From Seed (New Random)")]
         public static void GenerateRandomSeed()
         {
+            EnsureTownSceneActive();
+
             var city = Object.FindFirstObjectByType<CityGenerator>();
             if (city == null)
             {
@@ -54,7 +69,33 @@ namespace GameDev.EditorTools
             }
 
             city.SetSeed(System.Environment.TickCount);
-            GenerateFromSeed();
+            city.Generate();
+            var scene = SceneManager.GetActiveScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, CityScenePath);
+            AddToBuildSettings(CityScenePath);
+
+            Selection.activeGameObject = city.gameObject;
+            Debug.Log($"[City] Generated random seed={city.SeedValue} into {CityScenePath}.");
+        }
+
+        private static void EnsureTownSceneActive()
+        {
+            EnsureSceneFolder();
+            var active = SceneManager.GetActiveScene();
+            if (active.path == CityScenePath)
+            {
+                return;
+            }
+
+            if (System.IO.File.Exists(CityScenePath))
+            {
+                EditorSceneManager.OpenScene(CityScenePath, OpenSceneMode.Single);
+                return;
+            }
+
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            EditorSceneManager.SaveScene(scene, CityScenePath);
         }
 
         private static void EnsureSceneFolder()
@@ -63,6 +104,23 @@ namespace GameDev.EditorTools
             {
                 AssetDatabase.CreateFolder("Assets", "Scenes");
             }
+        }
+
+        private static void AddToBuildSettings(string path)
+        {
+            var list = new System.Collections.Generic.List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
+            for (var i = 0; i < list.Count; i++)
+            {
+                if (list[i].path == path)
+                {
+                    list[i] = new EditorBuildSettingsScene(path, true);
+                    EditorBuildSettings.scenes = list.ToArray();
+                    return;
+                }
+            }
+
+            list.Add(new EditorBuildSettingsScene(path, true));
+            EditorBuildSettings.scenes = list.ToArray();
         }
     }
 }
