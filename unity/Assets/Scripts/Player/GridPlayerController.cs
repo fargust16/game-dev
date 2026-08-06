@@ -153,16 +153,10 @@ namespace GameDev.Player
 
         private void UpdateMouseScheme()
         {
+            // In mouse scheme WASD pans the free camera (handled by SimpleFollowCamera).
             if (Input.GetMouseButtonDown(0) && !IsPointerOverBlockingUi())
             {
                 TryClickPath();
-            }
-
-            // Pressing WASD switches to keyboard control of the avatar.
-            if (ReadWasdRaw().sqrMagnitude > 0.001f)
-            {
-                ApplyControlScheme(ControlScheme.Keyboard, announce: true);
-                return;
             }
 
             FollowPath(mode == MovementMode.TurnBased);
@@ -170,18 +164,21 @@ namespace GameDev.Player
 
         private void UpdateKeyboardScheme()
         {
-            // Click switches back to mouse path mode.
+            // Optional: click still pathfinds while staying in WASD/follow-cam scheme.
             if (Input.GetMouseButtonDown(0) && !IsPointerOverBlockingUi())
             {
-                ApplyControlScheme(ControlScheme.Mouse, announce: true);
                 TryClickPath();
-                return;
             }
 
-            ClearPath();
+            // If a click-path is active, let it finish unless the player steers with WASD.
             var input = ReadWasdMoveInput();
-            if (input.sqrMagnitude < 0.001f)
+            if (input.sqrMagnitude > 0.001f)
             {
+                ClearPath();
+            }
+            else
+            {
+                FollowPath(mode == MovementMode.TurnBased);
                 return;
             }
 
@@ -247,8 +244,8 @@ namespace GameDev.Player
                 InteractionFeedback.Show(
                     scheme == ControlScheme.Mouse ? "Mouse control" : "WASD control",
                     scheme == ControlScheme.Mouse
-                        ? "Click sets a path around obstacles. Camera is free (WASD pans). Env on the path is used automatically."
-                        : "WASD walks the avatar. Camera follows. Press E for talks/env. Click or Tab returns to mouse path mode.",
+                        ? "LMB pathfinds around obstacles (auto env). WASD pans free camera. Tab → WASD walk mode."
+                        : "WASD walks; camera follows. E = manual talk/env. LMB can still pathfind. Tab → mouse/free cam.",
                     4f);
             }
         }
