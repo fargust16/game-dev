@@ -1,3 +1,4 @@
+using GameDev.World;
 using UnityEngine;
 
 namespace GameDev.Player
@@ -66,7 +67,7 @@ namespace GameDev.Player
 
         private void LateUpdate()
         {
-            var paused = World.WorldClock.Instance != null && World.WorldClock.Instance.IsPaused;
+            var paused = WorldClock.Instance != null && WorldClock.Instance.IsPaused;
             if (!paused)
             {
                 if (rigMode == CameraRigMode.Follow)
