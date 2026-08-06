@@ -73,7 +73,7 @@ namespace GameDev.World.Town
         /// <summary>Functional classification (determines default width range).</summary>
         public RoadClass Class;
 
-        /// <summary>Actual rendered half-width in metres (half on each side of the centreline).</summary>
+        /// <summary>Full corridor width in metres (metres across the centreline).</summary>
         public float Width;
 
         /// <summary>True if this edge terminates at a dead end rather than another node.</summary>

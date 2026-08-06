@@ -9,7 +9,7 @@ namespace GameDev.World.Town
 {
     /// <summary>
     /// OrganicTown v2 orchestrator — deterministic stage pipeline into <see cref="TownModel"/>.
-    /// Milestone A: data + gizmos only (no prefab bake).
+    /// Milestone B: optional greybox bake (shells + street ribbons) after data generation.
     /// </summary>
     public sealed class TownGenerator : MonoBehaviour
     {
@@ -17,6 +17,12 @@ namespace GameDev.World.Town
         [SerializeField] private TownProfile profile;
         [SerializeField] private bool generateOnPlay;
         [SerializeField] private bool timeSliced;
+        [SerializeField] private bool bakeGreybox = true;
+
+        [Header("S0 Greybox Prefabs (Milestone B)")]
+        [SerializeField] private GameObject floorTilePrefab;
+        [SerializeField] private GameObject building1x1Prefab;
+        [SerializeField] private GameObject landmarkBlockPrefab;
 
         [Header("Gizmos")]
         [SerializeField] private bool drawBoundary = true;
@@ -38,6 +44,7 @@ namespace GameDev.World.Town
         public IReadOnlyList<string> ValidationLog => _validationLog;
         public int Seed => seed;
         public TownProfile Profile => profile;
+        public bool BakeGreybox => bakeGreybox;
 
         public bool DrawBoundary => drawBoundary;
         public bool DrawTerrain => drawTerrain;
@@ -90,6 +97,15 @@ namespace GameDev.World.Town
                 $"[Town] seed={seed} portals={_model.Portals.Count} roads={_model.RoadEdges.Count} " +
                 $"districts={_model.Districts.Count} blocks={_model.Blocks.Count} plots={_model.Plots.Count} " +
                 $"buildings={_model.Buildings.Count} warnings={_validationLog.Count}");
+
+            if (bakeGreybox)
+            {
+                BakeGreyboxNow();
+            }
+            else
+            {
+                TownGreyboxBaker.Clear(transform);
+            }
         }
 
         public IEnumerator GenerateAsync(int generateSeed)
@@ -117,10 +133,34 @@ namespace GameDev.World.Town
             Stage_ConnectivityAndScale.Run(_model, profile, _worldSeed.Fork("connectivity"), _validationLog);
 
             Debug.Log($"[Town] async done seed={seed} buildings={_model.Buildings.Count}");
+
+            if (bakeGreybox)
+            {
+                BakeGreyboxNow();
+            }
+            else
+            {
+                TownGreyboxBaker.Clear(transform);
+            }
+        }
+
+        public void BakeGreyboxNow()
+        {
+            var prefs = new TownGreyboxBaker.PrefabSet
+            {
+                FloorTile = floorTilePrefab,
+                Building1x1 = building1x1Prefab,
+                LandmarkBlock = landmarkBlockPrefab
+            };
+            TownGreyboxBaker.Bake(transform, _model, prefs);
+            floorTilePrefab = prefs.FloorTile;
+            building1x1Prefab = prefs.Building1x1;
+            landmarkBlockPrefab = prefs.LandmarkBlock;
         }
 
         public void ClearModel()
         {
+            TownGreyboxBaker.Clear(transform);
             _model.Reset(seed);
             _validationLog.Clear();
         }

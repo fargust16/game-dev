@@ -26,8 +26,8 @@ V1 Confront: in-location Turn-Based Mode; also available outside combat.
 Information Sources are partial and biased; no omniscient quest spoiler log.
 V1 turns: Move + Action + short Bonus; same in and out of Confront.
 First build target: Vertical Slice with tiny content proving the systems; do not scope-creep into the full game.
-S0 greybox first: grid-native Lower Veil; Environment Action stubs allowed; no full combat/POI resolution until S0 acceptance.
-Engine locked: Unity in `unity/` (URP, C#, custom grid). Implement S0 greybox next.
+S0 greybox + OrganicTown v2 A/B done (vector town + greybox baker). Next world-gen default: D1 enterable BuildingTemplates — see `14 World Generation Roadmap.md`.
+Engine locked: Unity in `unity/` (URP, C#, custom grid). Do not jump to GridMap bridge / combat before roadmap order.
 
 Design important choices as Decision Node + POI cards before writing content details.
 Side Events use timed lazy POIs; do not assume always-on scene simulation.

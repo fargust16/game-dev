@@ -1,6 +1,6 @@
 # 14 World Generation Roadmap
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [13 City Generation](13%20City%20Generation.md)
 
 Referenced By:
-[AGENTS.md](AGENTS.md), Unity implementation under `unity/Assets/Scripts/World/Town/`, plan `unity/Assets/Plans/procedural-organic-town-generator.md`
+[AGENTS.md](AGENTS.md), Unity implementation under `unity/Assets/Scripts/World/Town/`, plan `unity/Assets/Plans/procedural-organic-town-generator.md`, work report `unity/Assets/Plans/MILESTONE_B_WORK_REPORT.md`
 
 ---
 
@@ -33,6 +33,7 @@ Success question for agents:
 | Track | Deliverable | How to open |
 |-------|-------------|-------------|
 | **OrganicTown v2 Milestone A** | Vector town: `TownModel` filled by stage pipeline + gizmos | `GameDev/Town/Open Or Create Town Scene` → Scene view Gizmos |
+| **OrganicTown v2 Milestone B** | Greybox baker: street ribbons + exterior shells + landmark | `GameDev/Town/Generate From Seed` (auto-bake) or `Bake Greybox` |
 | **v1 raster playable city** | Walkable greybox Lower Veil (shells, POIs, tips, clock) | `GameDev/City/Generate From Seed` → `City_OrganicTown.unity` + Play |
 
 ### v2 Milestone A — key files
@@ -45,6 +46,13 @@ Success question for agents:
 - Menu: `GameDev/Town/…` (`TownGenerateMenu.cs`)
 - Tests: `unity/Assets/Scripts/Editor/Tests/Geo2Tests.cs`, `TownDeterminismTests.cs`
 
+### v2 Milestone B — key files
+
+- Baker: `unity/Assets/Scripts/World/Town/TownGreyboxBaker.cs`
+- Wired from `TownGenerator` (`bakeGreybox`, S0 prefab refs) + menu `GameDev/Town/Bake Greybox`
+- Prefabs: `Assets/Prefabs/S0_Greybox/` (`Floor_Tile_1x1`, `Building_Shell_1x1`, `Landmark_Block`)
+- Still **visual-only** — no `GridMap` bridge, no interiors, no narrative POIs
+
 ### v1 raster — key files (still live for gameplay)
 
 - `CityGenerator.cs`, `OrganicRoadBuilder.cs`, `TownRoadGraph.cs`, `TownBlockParcelizer.cs`
@@ -53,11 +61,14 @@ Success question for agents:
 
 ## Not done yet
 
-- No greybox bake from v2 footprints (Milestone **B**)
 - No enterable building interiors / template library (**D1**)
 - No BG3-style wall/roof fade (**D2**)
 - No narrative POI port onto v2 + `GridMap` bridge; raster gen not retired (**C**)
 - No wilderness / caves outside walls (**E**)
+
+### Geometry note (post-B fix)
+
+`Stage_Streets` corridor topology was corrected after Milestone B: streets follow OBB split chords (not centroid links), leaf blocks are inset by half street width, road nodes snap/merge. Agent-readable check: `dotnet run --project tools/TownDebugHost -- <seed>` → `unity/Assets/Plans/debug/`.
 
 ---
 
@@ -78,7 +89,7 @@ Success question for agents:
 
 ```text
 A data+gizmos ✅
-    → B greybox shells from footprints
+    → B greybox shells from footprints ✅
         → D1 enterable BuildingTemplates (10–20 types)
             → D2 BG3 occlusion camera
                 → C1 narrative POIs on v2
@@ -89,7 +100,7 @@ A data+gizmos ✅
 | Phase | Goal | Outcome | Depends on |
 |-------|------|---------|------------|
 | **A** | Vector town data + gizmos | `TownModel` + Scene gizmos | — |
-| **B** | Greybox baker | Street ribbons + exterior shells from footprints (S0 prefabs) | A |
+| **B** ✅ | Greybox baker | Street ribbons + exterior shells from footprints (S0 prefabs) | A |
 | **D1** | Enterable templates | 10–20 schematic interiors (tavern, apothecary, churches, station, garrison, castle, palaces, noble/worker/peasant houses, school, university, market hall, dead-house, …) with interior grid + doors; place on plots | B |
 | **D2** | BG3 occlusion | Walls/roof fade when inside; character stays readable | D1 |
 | **C1** | Narrative layer | Port slice anchors/TipGivers/NPCs onto v2 plazas/plots | B (visuals), A (data) |
@@ -102,8 +113,8 @@ Each phase = its own plan + commit series. Prefer updating this file’s “Wher
 
 # Agent Instructions (quick)
 
-1. Read this file + [`13 City Generation.md`](13%20City%20Generation.md) + the Unity plan under `Assets/Plans/`.
-2. **Next implementation default:** Milestone **B** — `TownGreyboxBaker` (unless the user explicitly requests another phase).
+1. Read this file + [`MILESTONE_B_WORK_REPORT.md`](unity/Assets/Plans/MILESTONE_B_WORK_REPORT.md) + [`13 City Generation.md`](13%20City%20Generation.md) + the Unity plan under `Assets/Plans/`.
+2. **Next implementation default:** Milestone **D1** — enterable `BuildingTemplate` library (unless the user explicitly requests another phase).
 3. Keep style: no inheritance tricks, `WorldSeed.Fork` per stage, list order (no HashSet iteration for geometry), human-scale metres on XZ.
 4. Confirm design forks with the user before changing locked architecture above.
 5. After a documentation or milestone step: commit and push to `main` per project habit.

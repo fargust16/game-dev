@@ -5,10 +5,16 @@ using Random = System.Random;
 
 namespace GameDev.World.Town
 {
-    /// <summary>Recursive OBB subdivision of districts → blocks + minor streets.</summary>
+    /// <summary>
+    /// Recursive OBB subdivision of districts → blocks + minor streets.
+    /// Streets follow split chords (shared block edges); leaf blocks are inset
+    /// by half street width so building fabric does not swallow corridors.
+    /// </summary>
     public static class Stage_Streets
     {
         private const int MaxDepth = 8;
+        private const float NodeSnapMetres = 12f;
+        private const float MinBlockArea = 40f;
 
         public static void Run(TownModel model, TownProfile profile, Random rng)
         {
@@ -16,21 +22,34 @@ namespace GameDev.World.Town
             {
                 var district = model.Districts[di];
                 var target = Mathf.Max(18f, district.Profile.BlockSize);
-                Subdivide(model, profile, di, district.Area.ToList(), target, 0, rng, district.Profile);
+                // Pull fabric off arterial / district rim a little before subdividing.
+                var seedPoly = CarveDistrictSeed(district.Area.ToList(), profile);
+                Subdivide(model, profile, di, seedPoly, target, 0, rng, district.Profile);
             }
 
-            // If subdivision produced nothing, each district is one block.
             if (model.Blocks.Count == 0)
             {
                 for (var di = 0; di < model.Districts.Count; di++)
                 {
-                    model.Blocks.Add(new Block
-                    {
-                        Outline = TownGraphUtil.ToPolygon(model.Districts[di].Area.ToList()),
-                        DistrictIndex = di
-                    });
+                    AddLeafBlock(model, di, model.Districts[di].Area.ToList(), profile, model.Districts[di].Profile);
                 }
             }
+
+            TownGraphUtil.MergeNearbyNodes(model, NodeSnapMetres * 0.75f);
+        }
+
+        private static List<Vector2> CarveDistrictSeed(List<Vector2> area, TownProfile profile)
+        {
+            var halfArterial = Mathf.Max(2f, profile.Arterial.WidthMin * 0.45f);
+            var carved = Geo2.InsetPolygon(area, halfArterial);
+            if (carved.Count >= 3 && Mathf.Abs(Geo2.PolygonArea(carved)) > MinBlockArea * 4f)
+            {
+                TownGraphUtil.EnsureCcW(carved);
+                return carved;
+            }
+
+            TownGraphUtil.EnsureCcW(area);
+            return area;
         }
 
         private static void Subdivide(
@@ -53,86 +72,163 @@ namespace GameDev.World.Town
             var approxSide = Mathf.Sqrt(area);
             if (depth >= MaxDepth || approxSide <= targetBlockSize * (1.1f - dp.StreetDensity * 0.25f))
             {
-                model.Blocks.Add(new Block
-                {
-                    Outline = TownGraphUtil.ToPolygon(poly),
-                    DistrictIndex = districtIndex
-                });
+                AddLeafBlock(model, districtIndex, poly, profile, dp);
                 return;
             }
 
             var (axis, splitDir) = Geo2.ObbLongestAxis(poly);
             var centroid = Geo2.PolygonCentroid(poly);
 
-            // T-junction bias: offset split point along axis.
+            // T-junction bias: offset split point along longest axis.
             var offset = axis * TownGraphUtil.NextRange(rng, -approxSide * 0.15f, approxSide * 0.15f);
             var splitPoint = centroid + offset;
 
-            // Prefer nearly perpendicular split; slight rotation for organic feel.
             var ang = TownGraphUtil.NextRange(rng, -0.2f, 0.2f);
             var c = Mathf.Cos(ang);
             var s = Mathf.Sin(ang);
             var dir = new Vector2(splitDir.x * c - splitDir.y * s, splitDir.x * s + splitDir.y * c);
 
-            var (left, right) = Geo2.SplitPolygonByLine(poly, splitPoint, dir);
-            if (left.Count < 3 || right.Count < 3)
+            if (!Geo2.TrySplitChord(poly, splitPoint, dir, out var chordA, out var chordB))
             {
-                model.Blocks.Add(new Block
-                {
-                    Outline = TownGraphUtil.ToPolygon(poly),
-                    DistrictIndex = districtIndex
-                });
+                AddLeafBlock(model, districtIndex, poly, profile, dp);
                 return;
             }
 
-            // Street along split: connect midpoints of shared edge approximately.
-            AddSplitStreet(model, profile, left, right, dp, rng);
+            var (left, right) = Geo2.SplitPolygonByLine(poly, splitPoint, dir);
+            if (left.Count < 3 || right.Count < 3)
+            {
+                AddLeafBlock(model, districtIndex, poly, profile, dp);
+                return;
+            }
 
+            var cls = PickStreetClass(dp);
+            var width = TownGraphUtil.RoadWidth(profile, cls, rng);
+
+            AddCorridorStreet(model, profile, chordA, chordB, cls, width, dp, rng);
+
+            // Recurse on raw halves; leaf blocks inset once so corridors stay between fabric.
             Subdivide(model, profile, districtIndex, left, targetBlockSize, depth + 1, rng, dp);
             Subdivide(model, profile, districtIndex, right, targetBlockSize, depth + 1, rng, dp);
 
-            // Occasional dead-end alley stub in poor/dense districts.
             if (rng.NextDouble() < dp.DeadEndProbability)
             {
-                AddDeadEndStub(model, profile, poly, rng);
+                AddDeadEndStub(model, profile, chordA, chordB, left, right, rng);
             }
         }
 
-        private static void AddSplitStreet(
+        private static void AddLeafBlock(
+            TownModel model,
+            int districtIndex,
+            List<Vector2> poly,
+            TownProfile profile,
+            DistrictProfile dp)
+        {
+            var cls = PickStreetClass(dp);
+            var halfW = Mathf.Max(1.25f, profile.GetRoadClassSettings(cls).WidthMin * 0.5f);
+            var outline = InsetOrFallback(poly, halfW);
+            if (Mathf.Abs(Geo2.PolygonArea(outline)) < MinBlockArea)
+            {
+                return;
+            }
+
+            model.Blocks.Add(new Block
+            {
+                Outline = TownGraphUtil.ToPolygon(outline),
+                DistrictIndex = districtIndex
+            });
+        }
+
+        private static List<Vector2> InsetOrFallback(List<Vector2> poly, float distance)
+        {
+            var inset = Geo2.InsetPolygon(poly, distance);
+            if (inset.Count >= 3 && Mathf.Abs(Geo2.PolygonArea(inset)) >= MinBlockArea)
+            {
+                TownGraphUtil.EnsureCcW(inset);
+                return inset;
+            }
+
+            TownGraphUtil.EnsureCcW(poly);
+            return poly;
+        }
+
+        private static RoadClass PickStreetClass(DistrictProfile dp)
+        {
+            if (dp.StreetDensity > 0.6f)
+            {
+                return RoadClass.Alley;
+            }
+
+            if (dp.StreetDensity > 0.4f)
+            {
+                return RoadClass.Tertiary;
+            }
+
+            return RoadClass.Secondary;
+        }
+
+        private static void AddCorridorStreet(
             TownModel model,
             TownProfile profile,
-            List<Vector2> left,
-            List<Vector2> right,
+            Vector2 chordA,
+            Vector2 chordB,
+            RoadClass cls,
+            float width,
             DistrictProfile dp,
             Random rng)
         {
-            var a = Geo2.PolygonCentroid(left);
-            var b = Geo2.PolygonCentroid(right);
-            // Pull toward shared mid.
-            var mid = (a + b) * 0.5f;
-            var from = Vector2.Lerp(a, mid, 0.35f);
-            var to = Vector2.Lerp(b, mid, 0.35f);
-
-            var cls = dp.StreetDensity > 0.6f ? RoadClass.Alley
-                : dp.StreetDensity > 0.4f ? RoadClass.Tertiary
-                : RoadClass.Secondary;
             var settings = profile.GetRoadClassSettings(cls);
-            var poly = TownGraphUtil.BuildCurvedArterial(from, to, settings, rng, controlPoints: 2);
-            var na = TownGraphUtil.AddNode(model, poly[0]);
-            var nb = TownGraphUtil.AddNode(model, poly[poly.Count - 1]);
-            var width = TownGraphUtil.RoadWidth(profile, cls, rng);
+            var poly = TownGraphUtil.BuildCorridorPolyline(chordA, chordB, settings, rng);
+            if (poly.Count < 2)
+            {
+                return;
+            }
+
+            var na = TownGraphUtil.FindOrAddNode(model, poly[0], NodeSnapMetres);
+            var nb = TownGraphUtil.FindOrAddNode(model, poly[poly.Count - 1], NodeSnapMetres);
+            // Keep polyline endpoints consistent with snapped node positions.
+            poly[0] = model.RoadNodes[na].Pos;
+            poly[poly.Count - 1] = model.RoadNodes[nb].Pos;
+
             var shortcut = rng.NextDouble() < dp.ShortcutProbability;
             TownGraphUtil.AddEdge(model, na, nb, poly, cls, width, deadEnd: false, shortcut: shortcut);
         }
 
-        private static void AddDeadEndStub(TownModel model, TownProfile profile, List<Vector2> poly, Random rng)
+        /// <summary>
+        /// Short alley stub from the corridor into one half — not a cut through the whole block.
+        /// </summary>
+        private static void AddDeadEndStub(
+            TownModel model,
+            TownProfile profile,
+            Vector2 chordA,
+            Vector2 chordB,
+            List<Vector2> left,
+            List<Vector2> right,
+            Random rng)
         {
-            var c = Geo2.PolygonCentroid(poly);
-            var edge = poly[rng.Next(0, poly.Count)];
+            var chordMid = (chordA + chordB) * 0.5f;
+            var chordDir = chordB - chordA;
+            if (chordDir.sqrMagnitude < 1e-4f)
+            {
+                return;
+            }
+
+            chordDir = chordDir.normalized;
+            var perp = new Vector2(-chordDir.y, chordDir.x);
+            var leftC = Geo2.PolygonCentroid(left);
+            var towardLeft = Vector2.Dot(leftC - chordMid, perp) >= 0f ? 1f : -1f;
+            if (rng.Next(0, 2) == 0)
+            {
+                towardLeft = -towardLeft;
+            }
+
+            var stubLen = TownGraphUtil.NextRange(rng, 8f, 14f);
+            var tip = chordMid + perp * (towardLeft * stubLen);
             var settings = profile.Alley;
-            var line = TownGraphUtil.BuildCurvedArterial(edge, c, settings, rng, 1);
-            var na = TownGraphUtil.AddNode(model, line[0]);
-            var nb = TownGraphUtil.AddNode(model, line[line.Count - 1]);
+            var line = TownGraphUtil.BuildCorridorPolyline(chordMid, tip, settings, rng);
+            var na = TownGraphUtil.FindOrAddNode(model, line[0], NodeSnapMetres);
+            var nb = TownGraphUtil.FindOrAddNode(model, line[line.Count - 1], NodeSnapMetres * 0.5f);
+            line[0] = model.RoadNodes[na].Pos;
+            line[line.Count - 1] = model.RoadNodes[nb].Pos;
             TownGraphUtil.AddEdge(model, na, nb, line, RoadClass.Alley,
                 TownGraphUtil.RoadWidth(profile, RoadClass.Alley, rng), deadEnd: true);
         }

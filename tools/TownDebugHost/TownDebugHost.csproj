@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>TownDebugHost</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="UnityEngineStub.cs" />
+    <Compile Include="Program.cs" />
+
+    <Compile Include="..\..\unity\Assets\Scripts\World\WorldSeed.cs" Link="GameDev\WorldSeed.cs" />
+
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Geometry\Geo2.cs" Link="Town\Geometry\Geo2.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Geometry\Polygon2.cs" Link="Town\Geometry\Polygon2.cs" />
+
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\TownModel.cs" Link="Town\TownModel.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\TownProfile.cs" Link="Town\TownProfile.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\TownGraphUtil.cs" Link="Town\TownGraphUtil.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\TownDebugReport.cs" Link="Town\TownDebugReport.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\RoadEdge.cs" Link="Town\RoadEdge.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Portal.cs" Link="Town\Portal.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\District.cs" Link="Town\District.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Block.cs" Link="Town\Block.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Plot.cs" Link="Town\Plot.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Building.cs" Link="Town\Building.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\OpenSpace.cs" Link="Town\OpenSpace.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Landmark.cs" Link="Town\Landmark.cs" />
+
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_SiteAndLandmark.cs" Link="Town\Stage_SiteAndLandmark.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_PrimaryRoads.cs" Link="Town\Stage_PrimaryRoads.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_Districts.cs" Link="Town\Stage_Districts.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_Streets.cs" Link="Town\Stage_Streets.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_Plots.cs" Link="Town\Stage_Plots.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_Buildings.cs" Link="Town\Stage_Buildings.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_OpenSpaces.cs" Link="Town\Stage_OpenSpaces.cs" />
+    <Compile Include="..\..\unity\Assets\Scripts\World\Town\Stage_ConnectivityAndScale.cs" Link="Town\Stage_ConnectivityAndScale.cs" />
+  </ItemGroup>
+</Project>

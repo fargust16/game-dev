@@ -28,8 +28,16 @@ namespace GameDev.World.Town
             {
                 var portal = model.Portals[i];
                 var portalNode = TownGraphUtil.AddNode(model, portal.Pos);
+                // Milder curvature than profile defaults so arterials stay corridor-like.
+                var mild = new RoadClassSettings
+                {
+                    WidthMin = profile.Arterial.WidthMin,
+                    WidthMax = profile.Arterial.WidthMax,
+                    CurvatureAmplitude = profile.Arterial.CurvatureAmplitude * 0.4f,
+                    JitterAmplitude = profile.Arterial.JitterAmplitude * 0.5f
+                };
                 var poly = TownGraphUtil.BuildCurvedArterial(
-                    model.Center, portal.Pos, profile.Arterial, rng, controlPoints: 3 + rng.Next(0, 2));
+                    model.Center, portal.Pos, mild, rng, controlPoints: 2 + rng.Next(0, 2));
                 var width = TownGraphUtil.RoadWidth(profile, RoadClass.Arterial, rng);
                 TownGraphUtil.AddEdge(model, centerNode, portalNode, poly, RoadClass.Arterial, width);
             }
@@ -146,9 +154,11 @@ namespace GameDev.World.Town
                 return;
             }
 
-            var a = TownGraphUtil.AddNode(model, segment[0]);
-            var b = TownGraphUtil.AddNode(model, segment[segment.Count - 1]);
+            var a = TownGraphUtil.FindOrAddNode(model, segment[0], 12f);
+            var b = TownGraphUtil.FindOrAddNode(model, segment[segment.Count - 1], 12f);
             var poly = Geo2.SmoothCatmullRom(segment, 0.2f, 3);
+            poly[0] = model.RoadNodes[a].Pos;
+            poly[poly.Count - 1] = model.RoadNodes[b].Pos;
             var width = TownGraphUtil.RoadWidth(profile, RoadClass.Secondary, rng);
             TownGraphUtil.AddEdge(model, a, b, poly, RoadClass.Secondary, width);
             segment = new List<Vector2>(16);

@@ -122,6 +122,83 @@ namespace GameDev.World.Town.Geometry
             return true;
         }
 
+        /// <summary>
+        /// Intersects the infinite line through <paramref name="origin"/> along
+        /// <paramref name="dir"/> with polygon boundary edges (inclusive).
+        /// Returns hits sorted by projection on <paramref name="dir"/>.
+        /// </summary>
+        public static List<Vector2> IntersectLineWithPolygon(
+            IReadOnlyList<Vector2> poly, Vector2 origin, Vector2 dir)
+        {
+            var hits = new List<Vector2>(4);
+            int n = poly.Count;
+            if (n < 2 || dir.sqrMagnitude < Epsilon)
+            {
+                return hits;
+            }
+
+            var d = dir.normalized;
+            for (int i = 0; i < n; i++)
+            {
+                var a = poly[i];
+                var b = poly[(i + 1) % n];
+                var ab = b - a;
+                float denom = Cross(d, ab);
+                if (Mathf.Abs(denom) < Epsilon)
+                {
+                    continue;
+                }
+
+                // origin + t*d = a + u*ab  →  u = Cross(a - origin, d) / Cross(d, ab)
+                var ao = a - origin;
+                float u = Cross(ao, d) / denom;
+                if (u < -1e-4f || u > 1f + 1e-4f)
+                {
+                    continue;
+                }
+
+                var hit = a + ab * Mathf.Clamp01(u);
+                bool dup = false;
+                for (int h = 0; h < hits.Count; h++)
+                {
+                    if ((hits[h] - hit).sqrMagnitude < 1e-6f)
+                    {
+                        dup = true;
+                        break;
+                    }
+                }
+
+                if (!dup)
+                {
+                    hits.Add(hit);
+                }
+            }
+
+            hits.Sort((p, q) => Dot(p, d).CompareTo(Dot(q, d)));
+            return hits;
+        }
+
+        /// <summary>
+        /// Chord of the split line across <paramref name="poly"/> — the outermost
+        /// two boundary intersections. Returns false when the line does not cut the polygon.
+        /// </summary>
+        public static bool TrySplitChord(
+            IReadOnlyList<Vector2> poly, Vector2 origin, Vector2 dir,
+            out Vector2 a, out Vector2 b)
+        {
+            a = Vector2.zero;
+            b = Vector2.zero;
+            var hits = IntersectLineWithPolygon(poly, origin, dir);
+            if (hits.Count < 2)
+            {
+                return false;
+            }
+
+            a = hits[0];
+            b = hits[hits.Count - 1];
+            return (b - a).sqrMagnitude > 0.25f;
+        }
+
         // ------------------------------------------------------------------ private: infinite-line variant used by InsetPolygon
 
         private static bool LineIntersect(

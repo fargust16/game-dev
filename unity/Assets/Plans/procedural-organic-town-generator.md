@@ -1,6 +1,6 @@
 # Project Overview
 
-> **Agent handoff:** stop-point + full world roadmap live in repo-root [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md) and [`AGENT_HANDOFF_WORLD_GEN.md`](AGENT_HANDOFF_WORLD_GEN.md). Milestone A is complete; **next = B** (`TownGreyboxBaker`).
+> **Agent handoff:** stop-point + full world roadmap live in repo-root [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md) and [`AGENT_HANDOFF_WORLD_GEN.md`](AGENT_HANDOFF_WORLD_GEN.md). Milestones A+B complete; **next = D1** (enterable BuildingTemplates).
 
 - **Game Title / System:** Procedural Organic Historic Town Generator ("OrganicTown v2")
 - **High-Level Concept:** A deterministic, seed-driven generator that grows a believable late‑18th/19th‑century European town from a central landmark outward — arterials to gates/bridges/farms, then districts → blocks → plots → buildings — producing gently curved, varied‑width, irregular streets that read as *grown over decades*, not planned on a grid. Target look: pre‑Haussmann Paris, Prague, Edinburgh, Bruges, Rothenburg ob der Tauber.
@@ -124,7 +124,7 @@ Block generation uses **recursive OBB subdivision** of district polygons (robust
 
 ### Milestone A — Deterministic data model + debug gizmos
 
-> **Progress (2026-08-06): A1–A10 DONE.** Next gated: Milestone B greybox baker.
+> **Progress (2026-08-06): A1–A10 DONE. B1 DONE.** Next gated: Milestone D1 enterable templates.
 
 **Step A1 — Geometry foundation** ✅
 - Create `Assets/Scripts/World/Town/Geometry/Geo2.cs` and `Polygon2.cs` with the utilities above.
@@ -166,8 +166,8 @@ Block generation uses **recursive OBB subdivision** of district polygons (robust
 - `TownGizmoDrawer.cs` (layered toggles per UI section) and `Assets/Scripts/Editor/TownGenerateMenu.cs` (`GameDev/Town/…` generate/clear/open‑scene). Create `Assets/Scenes/Town_Generator.unity` (or reuse a scratch scene) hosting `TownGenerator`.
 - **Role:** developer · **Dependencies:** A2..A9 · **Parallelizable:** Gizmos vs menu parallel.
 
-### Milestone B — Thin visual (greybox) layer *(gated behind A)*
-**Step B1** — `TownGreyboxBaker.cs`: instantiate street floor ribbons (curved) + building shells scaled to footprints + landmark block, reusing S0_Greybox prefabs. **Role:** developer · **Dependencies:** Milestone A · **Parallelizable:** No.
+### Milestone B — Thin visual (greybox) layer *(gated behind A)* ✅
+**Step B1** ✅ — `TownGreyboxBaker.cs`: instantiate street floor ribbons (curved) + building shells scaled to footprints + landmark block, reusing S0_Greybox prefabs. Wired from `TownGenerator` (`bakeGreybox`) and `GameDev/Town/Bake Greybox`. **Role:** developer · **Dependencies:** Milestone A · **Parallelizable:** No.
 
 ### Milestone C — Narrative layer + old‑system retirement *(gated behind A/B)*
 **Step C1** — `TownNarrativeLayer.cs`: port POI/anchor/tip‑giver placement (from `CityGenerator`) to consume new block/plot/plaza data. **Dependencies:** A (+ B for visuals).

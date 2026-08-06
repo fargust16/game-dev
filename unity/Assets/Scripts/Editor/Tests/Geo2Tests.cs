@@ -29,6 +29,34 @@ namespace GameDev.World.Town.Tests
         }
 
         [Test]
+        public void TrySplitChord_UnitSquare_HorizontalMidline()
+        {
+            var sq = new List<Vector2>
+            {
+                new Vector2(0, 0), new Vector2(10, 0), new Vector2(10, 10), new Vector2(0, 10)
+            };
+            Assert.IsTrue(Geo2.TrySplitChord(sq, new Vector2(5, 5), Vector2.right, out var a, out var b));
+            Assert.AreEqual(0f, Mathf.Min(a.x, b.x), 1e-3f);
+            Assert.AreEqual(10f, Mathf.Max(a.x, b.x), 1e-3f);
+            Assert.AreEqual(5f, a.y, 1e-2f);
+            Assert.AreEqual(5f, b.y, 1e-2f);
+        }
+
+        [Test]
+        public void TrySplitChord_UnitSquare_VerticalMidline()
+        {
+            var sq = new List<Vector2>
+            {
+                new Vector2(0, 0), new Vector2(10, 0), new Vector2(10, 10), new Vector2(0, 10)
+            };
+            Assert.IsTrue(Geo2.TrySplitChord(sq, new Vector2(5, 5), Vector2.up, out var a, out var b));
+            Assert.AreEqual(5f, a.x, 1e-2f);
+            Assert.AreEqual(5f, b.x, 1e-2f);
+            Assert.AreEqual(0f, Mathf.Min(a.y, b.y), 1e-3f);
+            Assert.AreEqual(10f, Mathf.Max(a.y, b.y), 1e-3f);
+        }
+
+        [Test]
         public void InsetPolygon_ShrinksArea()
         {
             var sq = new List<Vector2>

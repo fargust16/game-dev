@@ -1,6 +1,6 @@
 # 13 City Generation
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft
 
@@ -29,10 +29,10 @@ Success question:
 | Layer | State |
 |-------|--------|
 | **v1 raster playable** | `CityGenerator` + `OrganicRoadBuilder` / `TownRoadGraph` / `TownBlockParcelizer` — scene `City_OrganicTown.unity`, menu `GameDev/City/…` |
-| **v2 vector (OrganicTown)** | Milestone **A complete** (data model + stage pipeline + gizmos). Menu `GameDev/Town/…`. Detail plan: `unity/Assets/Plans/procedural-organic-town-generator.md` |
+| **v2 vector (OrganicTown)** | Milestones **A+B complete** (data + gizmos + greybox baker shells/ribbons). Menu `GameDev/Town/…`. Detail plan: `unity/Assets/Plans/procedural-organic-town-generator.md` |
 
 **Living roadmap / agent handoff:** [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) and `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`.  
-**Next phase:** **B** — greybox baker from v2 footprints (then D1 enterable templates → D2 BG3 occlusion → C narrative/GridMap → E wilderness).
+**Next phase:** **D1** — enterable BuildingTemplates (then D2 BG3 occlusion → C narrative/GridMap → E wilderness).
 
 # Growth Pipeline (v1 raster — playable)
 
