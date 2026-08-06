@@ -39,7 +39,7 @@ namespace GameDev.Player
 
         private bool _draggingPan;
         private bool _draggingRotate;
-        private Vector3 _lastMouse;
+        private Vector2 _lastMouse;
         private Vector3 _followVelocity;
 
         public CameraRigMode RigMode => rigMode;
