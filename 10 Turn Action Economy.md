@@ -130,13 +130,14 @@ The player may leave Turn-Based Mode when not forced by Confront, returning to n
 
 ## Exploration pacing (locked for V1 feel)
 
-Outside Turn-Based Mode the avatar moves in **Free Exploration**:
+Outside Turn-Based Mode the avatar moves in **Free Exploration** with two control schemes:
 
-- smooth continuous movement (arrow keys and/or click-to-move, including diagonals);
-- **camera is free** (WASD pan / zoom / rotate) and is not glued to the avatar — BG3 / classic CRPG pattern;
-- the world remains **grid-authored** for walkability, cover, and Environment Actions — free move does not invent off-grid parkour.
+- **Mouse:** click sets a grid A* path (around blockers); Environment Actions on that path are used automatically; camera stays free (pan/zoom/orbit).
+- **WASD:** direct walk; camera follows the avatar; Environment Actions require manual **E** (with fail chance).
 
-Entering Turn-Based Mode switches to discrete cell steps and the Move + Action + Bonus economy. S0 prototype toggles modes with **T**.
+The world remains **grid-authored** — pathfinding and traversal truth are cells, not physics parkour.
+
+Entering Turn-Based Mode keeps the same path rules for click-move; keyboard steps are discrete cells. Full Move + Action + Bonus economy comes with Confront. S0 toggles TB with **T**.
 
 ## Leave Confront
 

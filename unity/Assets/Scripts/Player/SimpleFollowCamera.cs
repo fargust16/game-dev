@@ -2,10 +2,14 @@ using UnityEngine;
 
 namespace GameDev.Player
 {
+    public enum CameraRigMode
+    {
+        Free = 0,
+        Follow = 1
+    }
+
     /// <summary>
-    /// BG3-style free tactical camera: pan / zoom / rotate around a focus point.
-    /// Does not glue to the avatar; F recenters on the controlled character.
-    /// Classic Fallout / modern CRPGs use the same pattern (map camera ≠ character body).
+    /// Free: BG3 tactical pan/zoom/orbit. Follow: smooth track of avatar (WASD control scheme).
     /// </summary>
     public sealed class SimpleFollowCamera : MonoBehaviour
     {
@@ -15,6 +19,7 @@ namespace GameDev.Player
         [SerializeField] private float pitch = 52f;
         [SerializeField] private float distance = 18f;
         [SerializeField] private float lookHeight = 0.75f;
+        [SerializeField] private CameraRigMode rigMode = CameraRigMode.Free;
 
         [Header("Speeds")]
         [SerializeField] private float panSpeed = 14f;
@@ -27,49 +32,81 @@ namespace GameDev.Player
         [SerializeField] private float maxPitch = 72f;
         [SerializeField] private float edgePanSize = 12f;
         [SerializeField] private bool enableEdgePan = true;
+        [SerializeField] private float followSmoothTime = 0.18f;
 
         private bool _draggingPan;
         private bool _draggingRotate;
         private Vector3 _lastMouse;
+        private Vector3 _followVelocity;
 
-        /// <summary>Compat with older builder call — sets recenter target and snaps focus.</summary>
+        public CameraRigMode RigMode => rigMode;
+
         public void SetTarget(Transform newTarget)
         {
             focusTarget = newTarget;
             if (focusTarget != null)
             {
                 focusPoint = focusTarget.position;
+                focusPoint.y = 0f;
             }
 
             ApplyCameraTransform();
         }
 
-        public void SetFocusPoint(Vector3 point)
+        public void SetRigMode(CameraRigMode mode)
         {
-            focusPoint = point;
-            focusPoint.y = 0f;
+            rigMode = mode;
+            _followVelocity = Vector3.zero;
+            if (rigMode == CameraRigMode.Follow && focusTarget != null)
+            {
+                focusPoint = focusTarget.position;
+                focusPoint.y = 0f;
+            }
         }
 
         private void LateUpdate()
         {
-            HandleCameraInput();
+            if (rigMode == CameraRigMode.Follow)
+            {
+                UpdateFollowFocus();
+                HandleSharedLookInput(allowWasdPan: false, allowEdgePan: false);
+            }
+            else
+            {
+                HandleSharedLookInput(allowWasdPan: true, allowEdgePan: enableEdgePan);
+            }
+
             ApplyCameraTransform();
         }
 
-        private void HandleCameraInput()
+        private void UpdateFollowFocus()
+        {
+            if (focusTarget == null)
+            {
+                return;
+            }
+
+            var desired = focusTarget.position;
+            desired.y = 0f;
+            focusPoint = Vector3.SmoothDamp(focusPoint, desired, ref _followVelocity, followSmoothTime);
+        }
+
+        private void HandleSharedLookInput(bool allowWasdPan, bool allowEdgePan)
         {
             var dt = Time.deltaTime;
             var fast = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
             var speed = panSpeed * (fast ? fastPanMultiplier : 1f);
 
-            // WASD pan (BG3) — character uses arrows / click instead.
             var pan = Vector3.zero;
-            if (Input.GetKey(KeyCode.W)) pan += FlatForward();
-            if (Input.GetKey(KeyCode.S)) pan -= FlatForward();
-            if (Input.GetKey(KeyCode.D)) pan += FlatRight();
-            if (Input.GetKey(KeyCode.A)) pan -= FlatRight();
+            if (allowWasdPan)
+            {
+                if (Input.GetKey(KeyCode.W)) pan += FlatForward();
+                if (Input.GetKey(KeyCode.S)) pan -= FlatForward();
+                if (Input.GetKey(KeyCode.D)) pan += FlatRight();
+                if (Input.GetKey(KeyCode.A)) pan -= FlatRight();
+            }
 
-            if (enableEdgePan && Application.isFocused)
+            if (allowEdgePan && Application.isFocused)
             {
                 var m = Input.mousePosition;
                 if (m.x <= edgePanSize) pan -= FlatRight();
@@ -83,7 +120,6 @@ namespace GameDev.Player
                 focusPoint += pan.normalized * (speed * dt);
             }
 
-            // Middle-mouse drag pans.
             if (Input.GetMouseButtonDown(2))
             {
                 _draggingPan = true;
@@ -103,7 +139,6 @@ namespace GameDev.Player
                 focusPoint -= FlatForward() * (delta.y * 0.04f);
             }
 
-            // Rotate with RMB drag only — E is reserved for interact.
             if (Input.GetMouseButtonDown(1))
             {
                 _draggingRotate = true;
@@ -129,7 +164,6 @@ namespace GameDev.Player
                 distance = Mathf.Clamp(distance - scroll * zoomSpeed, minDistance, maxDistance);
             }
 
-            // Recenter on controlled character (BG3-like focus).
             if (Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Home))
             {
                 if (focusTarget != null)

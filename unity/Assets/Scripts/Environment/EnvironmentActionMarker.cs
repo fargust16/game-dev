@@ -30,5 +30,14 @@ namespace GameDev.Environment
                 ok ? successMessage : failMessage);
             return ok;
         }
+
+        /// <summary>
+        /// Click-path / TB auto-traversal: environment is used as part of the route, no fail roll.
+        /// Manual E in keyboard mode still uses <see cref="TryPerform"/>.
+        /// </summary>
+        public void PerformForPath()
+        {
+            InteractionFeedback.Show($"{actionType}", successMessage, 2.5f);
+        }
     }
 }
