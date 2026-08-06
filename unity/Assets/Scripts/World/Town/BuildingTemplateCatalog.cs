@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace GameDev.World.Town
 {
     /// <summary>
-    /// Coded starter interior library for D1.1 (headless-safe, no ScriptableObject assets).
+    /// Coded interior library for D1 (headless-safe, no ScriptableObject assets).
     /// ASCII rows: top row = north (high local Z); <c>D</c> = door on street (local −Z) edge.
     /// </summary>
     public static class BuildingTemplateCatalog
@@ -45,8 +45,49 @@ namespace GameDev.World.Town
                 return;
             }
 
+            // D1.1 starters + D1.2 small fillers and VS-oriented types (~16).
             _all = new[]
             {
+                FromAscii(
+                    BuildingTemplateId.Booth,
+                    "Booth",
+                    new[]
+                    {
+                        "WWWW",
+                        "WPNW",
+                        "WFFW",
+                        "WWDW"
+                    },
+                    new[] { BuildingKind.Commercial },
+                    new[] { WealthClass.Poor, WealthClass.Mixed }),
+                FromAscii(
+                    BuildingTemplateId.Cottage,
+                    "Cottage",
+                    new[]
+                    {
+                        "WWWW",
+                        "WFFW",
+                        "WPNW",
+                        "WFFW",
+                        "WFFW",
+                        "WWDW"
+                    },
+                    new[] { BuildingKind.Residential },
+                    null),
+                FromAscii(
+                    BuildingTemplateId.AlleyShop,
+                    "Alley Shop",
+                    new[]
+                    {
+                        "WWWW",
+                        "WPPW",
+                        "WFNW",
+                        "WFFW",
+                        "WFFW",
+                        "WWDW"
+                    },
+                    new[] { BuildingKind.Commercial, BuildingKind.Industrial },
+                    new[] { WealthClass.Poor, WealthClass.Mixed }),
                 FromAscii(
                     BuildingTemplateId.PeasantHouse,
                     "Peasant House",
@@ -82,6 +123,56 @@ namespace GameDev.World.Town
                     new[] { BuildingKind.Residential },
                     new[] { WealthClass.Poor, WealthClass.Mixed }),
                 FromAscii(
+                    BuildingTemplateId.Shop,
+                    "Shop",
+                    new[]
+                    {
+                        "WWWWWW",
+                        "WFFFFW",
+                        "WFPPFW",
+                        "WFFFFW",
+                        "WFFFFW",
+                        "WFNFFW",
+                        "WFFFFW",
+                        "WWWDWW"
+                    },
+                    new[] { BuildingKind.Commercial, BuildingKind.Industrial },
+                    null),
+                FromAscii(
+                    BuildingTemplateId.DeadHouse,
+                    "Dead House",
+                    new[]
+                    {
+                        "WWWWWW",
+                        "WFFFFW",
+                        "WFPPFW",
+                        "WFFFFW",
+                        "WFNFFW",
+                        "WFFFFW",
+                        "WFFFFW",
+                        "WWWDWW"
+                    },
+                    new[] { BuildingKind.Civic, BuildingKind.Religious },
+                    new[] { WealthClass.Poor, WealthClass.Mixed }),
+                FromAscii(
+                    BuildingTemplateId.Apothecary,
+                    "Apothecary",
+                    new[]
+                    {
+                        "WWWWWW",
+                        "WFFFFW",
+                        "WFPPFW",
+                        "WFFFFW",
+                        "WFWWFW",
+                        "WFNFFW",
+                        "WFFFFW",
+                        "WFFFFW",
+                        "WFFFFW",
+                        "WWWDWW"
+                    },
+                    new[] { BuildingKind.Commercial, BuildingKind.Civic },
+                    new[] { WealthClass.Mixed, WealthClass.Rich }),
+                FromAscii(
                     BuildingTemplateId.Tavern,
                     "Tavern",
                     new[]
@@ -102,21 +193,81 @@ namespace GameDev.World.Town
                     new[] { BuildingKind.Commercial },
                     new[] { WealthClass.Mixed, WealthClass.Poor }),
                 FromAscii(
-                    BuildingTemplateId.Shop,
-                    "Shop",
+                    BuildingTemplateId.Station,
+                    "Station",
                     new[]
                     {
-                        "WWWWWW",
-                        "WFFFFW",
-                        "WFPPFW",
-                        "WFFFFW",
-                        "WFFFFW",
-                        "WFNFFW",
-                        "WFFFFW",
-                        "WWWDWW"
+                        "WWWWWWWW",
+                        "WFFFFFFW",
+                        "WFFPPFFW",
+                        "WFFFFFFW",
+                        "WFWWWFFW",
+                        "WFNFFFFW",
+                        "WFFFFFFW",
+                        "WFFFFFFW",
+                        "WFFFFFFW",
+                        "WWWDWWWW"
                     },
-                    new[] { BuildingKind.Commercial, BuildingKind.Industrial },
+                    new[] { BuildingKind.Civic, BuildingKind.Industrial },
                     null),
+                FromAscii(
+                    BuildingTemplateId.School,
+                    "School",
+                    new[]
+                    {
+                        "WWWWWWWW",
+                        "WFFFFFFW",
+                        "WFFNNFFW",
+                        "WFFFFFFW",
+                        "WFWWWWFW",
+                        "WFFFFFFW",
+                        "WFFPPPFW",
+                        "WFFFFFFW",
+                        "WFFFFFFW",
+                        "WWWDWWWW"
+                    },
+                    new[] { BuildingKind.Civic },
+                    new[] { WealthClass.Mixed, WealthClass.Rich }),
+                FromAscii(
+                    BuildingTemplateId.Garrison,
+                    "Garrison",
+                    new[]
+                    {
+                        "WWWWWWWWWW",
+                        "WFFFFFFFFW",
+                        "WFFPPPPFFW",
+                        "WFFFFFFFFW",
+                        "WFFWWWWFFW",
+                        "WFFWNNWFFW",
+                        "WFFFFFFFFW",
+                        "WFFFFFFFFW",
+                        "WFFFFFFFFW",
+                        "WFFFFFFFFW",
+                        "WFFFFFFFFW",
+                        "WWWWWDWWWW"
+                    },
+                    new[] { BuildingKind.Civic, BuildingKind.Industrial },
+                    null),
+                FromAscii(
+                    BuildingTemplateId.NobleHouse,
+                    "Noble House",
+                    new[]
+                    {
+                        "WWWWWWWWWW",
+                        "WFFFFFFFFW",
+                        "WFFPPPPFFW",
+                        "WFFFFFFFFW",
+                        "WFFWWWWFFW",
+                        "WFFWNNWFFW",
+                        "WFFWFFWFFW",
+                        "WFFFFFFFFW",
+                        "WFFFFFFFFW",
+                        "WFFFFFFFFW",
+                        "WFFFFFFFFW",
+                        "WWWWWDWWWW"
+                    },
+                    new[] { BuildingKind.Residential },
+                    new[] { WealthClass.Rich }),
                 FromAscii(
                     BuildingTemplateId.SmallChurch,
                     "Small Church",
@@ -138,7 +289,53 @@ namespace GameDev.World.Town
                         "WWWWWDWWWW"
                     },
                     new[] { BuildingKind.Religious, BuildingKind.Civic },
-                    new[] { WealthClass.Rich, WealthClass.Mixed, WealthClass.Poor })
+                    null),
+                FromAscii(
+                    BuildingTemplateId.MarketHall,
+                    "Market Hall",
+                    new[]
+                    {
+                        "WWWWWWWWWWWW",
+                        "WFFFFFFFFFFW",
+                        "WFFPPPPPPFFW",
+                        "WFFFFFFFFFFW",
+                        "WFFWWWWWWFFW",
+                        "WFFWNNNNWFFW",
+                        "WFFFFFFFFFFW",
+                        "WFFFFFFFFFFW",
+                        "WFFPPPPPPFFW",
+                        "WFFFFFFFFFFW",
+                        "WFFFFFFFFFFW",
+                        "WFFFFFFFFFFW",
+                        "WFFFFFFFFFFW",
+                        "WWWWWDWWWWWW"
+                    },
+                    new[] { BuildingKind.Commercial, BuildingKind.Civic },
+                    new[] { WealthClass.Mixed, WealthClass.Rich }),
+                FromAscii(
+                    BuildingTemplateId.University,
+                    "University",
+                    new[]
+                    {
+                        "WWWWWWWWWWWW",
+                        "WFFFFFFFFFFW",
+                        "WFFNNNNNNFFW",
+                        "WFFFFFFFFFFW",
+                        "WFFWWWWWWFFW",
+                        "WFFWFFFFWFFW",
+                        "WFFWPPPPWFFW",
+                        "WFFWFFFFWFFW",
+                        "WFFWWWWWWFFW",
+                        "WFFFFFFFFFFW",
+                        "WFFFFFFFFFFW",
+                        "WFFPPPPPPFFW",
+                        "WFFFFFFFFFFW",
+                        "WFFFFFFFFFFW",
+                        "WFFFFFFFFFFW",
+                        "WWWWWDWWWWWW"
+                    },
+                    new[] { BuildingKind.Civic },
+                    new[] { WealthClass.Rich, WealthClass.Mixed })
             };
         }
 
@@ -173,7 +370,6 @@ namespace GameDev.World.Town
             var cells = new BuildingInteriorCellKind[width * height];
             for (var row = 0; row < height; row++)
             {
-                // ASCII top = north = high local Z.
                 var y = height - 1 - row;
                 var line = northFirstRows[row];
                 for (var x = 0; x < width; x++)

@@ -134,8 +134,7 @@ namespace GameDev.World.Town
                 }
             }
 
-            // Prefer wealth match; fall back to all fits. Sorted by Id for stable ties.
-            fits.Sort((a, b) => a.Id.CompareTo(b.Id));
+            // Prefer wealth match; among those, bias toward larger interiors that still fit.
             PreferBuffer.Clear();
             for (var i = 0; i < fits.Count; i++)
             {
@@ -146,7 +145,28 @@ namespace GameDev.World.Town
             }
 
             var pool = PreferBuffer.Count > 0 ? PreferBuffer : fits;
-            return pool[rng.Next(0, pool.Count)];
+            pool.Sort((a, b) =>
+            {
+                var byArea = b.CellCount.CompareTo(a.CellCount);
+                return byArea != 0 ? byArea : a.Id.CompareTo(b.Id);
+            });
+
+            // Random among the largest few for variety without tiny booths on big plots.
+            var top = 1;
+            var bestArea = pool[0].CellCount;
+            for (var i = 1; i < pool.Count && i < 3; i++)
+            {
+                if (pool[i].CellCount * 10 >= bestArea * 7)
+                {
+                    top++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return pool[rng.Next(0, top)];
         }
 
         private static bool TryComputePlacement(

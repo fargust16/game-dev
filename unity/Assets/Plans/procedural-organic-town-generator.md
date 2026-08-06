@@ -124,7 +124,7 @@ Block generation uses **recursive OBB subdivision** of district polygons (robust
 
 ### Milestone A — Deterministic data model + debug gizmos
 
-> **Progress (2026-08-06): A1–A10 DONE. B1 DONE. D1.1 foundation landed (5 templates + assign + interior bake).** Next: D1.2 expand catalog.
+> **Progress (2026-08-06): A1–A10 DONE. B1 DONE. D1.1–D1.2 DONE (16 templates, ~55% coverage on 110201).** Next: D1.3 sockets or D2 occlusion.
 
 **Step A1 — Geometry foundation** ✅
 - Create `Assets/Scripts/World/Town/Geometry/Geo2.cs` and `Polygon2.cs` with the utilities above.
@@ -174,7 +174,7 @@ Micro-plan: [`MILESTONE_D1_PLAN.md`](MILESTONE_D1_PLAN.md).
 
 **Step D1.1** ✅ (foundation) — `BuildingTemplate` + coded catalog (PeasantHouse, WorkerHouse, Tavern, Shop, SmallChurch); `Stage_AssignTemplates` (`WorldSeed.Fork("templates")`); baker paints floor/wall/door cells; unfitted plots keep solid shells. **Role:** developer · **Dependencies:** B1.
 
-**Step D1.2** — Expand catalog toward 10–20 VS types (apothecary, station, garrison, castle, palaces, noble house, school, university, market hall, dead-house, …). **Dependencies:** D1.1.
+**Step D1.2** ✅ — Expand catalog to 16 types (Booth/Cottage/AlleyShop + apothecary, station, garrison, school, university, market hall, dead-house, noble house); prefer largest wealth-compatible fit; seed 110201 ≈55% templated. **Dependencies:** D1.1.
 
 **Step D1.3** — Expose NPC/prop sockets for C1 narrative layer (still no GridMap). **Dependencies:** D1.2.
 

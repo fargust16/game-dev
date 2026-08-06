@@ -12,7 +12,7 @@ namespace GameDev.World.Town.Tests
         public void Catalog_StarterTemplates_HaveDoorAndOuterWall()
         {
             var all = BuildingTemplateCatalog.All;
-            Assert.GreaterOrEqual(all.Count, 5);
+            Assert.GreaterOrEqual(all.Count, 12);
 
             for (var i = 0; i < all.Count; i++)
             {
@@ -63,7 +63,7 @@ namespace GameDev.World.Town.Tests
             }
 
             Assert.AreEqual(templatedA, templatedB);
-            Assert.Greater(templatedA, a.Buildings.Count / 5);
+            Assert.Greater(templatedA, a.Buildings.Count / 3);
             Object.DestroyImmediate(profile);
         }
 

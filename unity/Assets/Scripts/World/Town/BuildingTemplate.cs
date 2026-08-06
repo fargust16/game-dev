@@ -13,7 +13,7 @@ namespace GameDev.World.Town
         NpcSocket = 5
     }
 
-    /// <summary>Catalog id for a reusable interior schematic.</summary>
+    /// <summary>Catalog id for a reusable interior schematic. Append-only for save stability.</summary>
     public enum BuildingTemplateId : byte
     {
         None = 0,
@@ -21,7 +21,18 @@ namespace GameDev.World.Town
         WorkerHouse = 2,
         Tavern = 3,
         Shop = 4,
-        SmallChurch = 5
+        SmallChurch = 5,
+        Cottage = 6,
+        AlleyShop = 7,
+        Booth = 8,
+        Apothecary = 9,
+        NobleHouse = 10,
+        MarketHall = 11,
+        Garrison = 12,
+        Station = 13,
+        School = 14,
+        DeadHouse = 15,
+        University = 16
     }
 
     /// <summary>
@@ -41,6 +52,7 @@ namespace GameDev.World.Town
 
         public float WorldWidth => Width * CellSize;
         public float WorldDepth => Height * CellSize;
+        public int CellCount => Width * Height;
 
         public BuildingInteriorCellKind GetCell(int x, int y)
         {
