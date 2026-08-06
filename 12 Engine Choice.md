@@ -1,13 +1,13 @@
 # 12 Engine Choice
 
-Version: 1.0
+Version: 1.1
 
 Status: Draft
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-06
 
 Depends On:
-[000 Project Rules](000%20Project%20Rules.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md)
+[000 Project Rules](000%20Project%20Rules.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [13 City Generation](13%20City%20Generation.md)
 
 Referenced By:
 Prototype repository setup and implementation milestones.
@@ -50,6 +50,8 @@ Godot 4 was considered and remains historically documented below as the rejected
 5. No replacing Decision Engine / Approaches with a marketplace tactics pack.
 6. Keep package bloat low; every package must earn its place.
 7. Design docs remain source of truth over random Unity tutorial patterns.
+8. **Input:** Unity Input System, **Package Only** (`activeInputHandler: 1`). Gameplay reads `GameInputService` — not legacy `UnityEngine.Input`.
+9. **City scaffold:** seed-driven districts / avenue / anchors per [13 City Generation](13%20City%20Generation.md); grid remains movement truth.
 
 # Comparison Archive
 
@@ -85,3 +87,4 @@ Create/maintain the Unity project under `unity/` and execute [11.2 Milestone S0 
 - [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md)
 - [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md)
 - [11 Vertical Slice](11%20Vertical%20Slice.md)
+- [13 City Generation](13%20City%20Generation.md)

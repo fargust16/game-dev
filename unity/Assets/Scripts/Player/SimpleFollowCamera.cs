@@ -1,4 +1,5 @@
 using GameDev.Decisions;
+using GameDev.Input;
 using GameDev.World;
 using UnityEngine;
 
@@ -100,22 +101,28 @@ namespace GameDev.Player
 
         private void HandleSharedLookInput(bool allowWasdPan, bool allowEdgePan)
         {
+            var input = GameInputService.Instance;
+            if (input == null)
+            {
+                return;
+            }
+
             var dt = Time.deltaTime;
-            var fast = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-            var speed = panSpeed * (fast ? fastPanMultiplier : 1f);
+            var speed = panSpeed * (input.CameraFastHeld ? fastPanMultiplier : 1f);
 
             var pan = Vector3.zero;
             if (allowWasdPan)
             {
-                if (Input.GetKey(KeyCode.W)) pan += FlatForward();
-                if (Input.GetKey(KeyCode.S)) pan -= FlatForward();
-                if (Input.GetKey(KeyCode.D)) pan += FlatRight();
-                if (Input.GetKey(KeyCode.A)) pan -= FlatRight();
+                var wasd = input.CameraPanVector;
+                if (wasd.y > 0.01f) pan += FlatForward();
+                if (wasd.y < -0.01f) pan -= FlatForward();
+                if (wasd.x > 0.01f) pan += FlatRight();
+                if (wasd.x < -0.01f) pan -= FlatRight();
             }
 
             if (allowEdgePan && Application.isFocused)
             {
-                var m = Input.mousePosition;
+                var m = input.MousePosition;
                 if (m.x <= edgePanSize) pan -= FlatRight();
                 if (m.x >= Screen.width - edgePanSize) pan += FlatRight();
                 if (m.y <= edgePanSize) pan -= FlatForward();
@@ -127,51 +134,51 @@ namespace GameDev.Player
                 focusPoint += pan.normalized * (speed * dt);
             }
 
-            if (Input.GetMouseButtonDown(2))
+            if (input.CameraPanPressed)
             {
                 _draggingPan = true;
-                _lastMouse = Input.mousePosition;
+                _lastMouse = input.MousePosition;
             }
 
-            if (Input.GetMouseButtonUp(2))
+            if (input.CameraPanReleased)
             {
                 _draggingPan = false;
             }
 
-            if (_draggingPan && Input.GetMouseButton(2))
+            if (_draggingPan && input.CameraPanHeld)
             {
-                var delta = Input.mousePosition - _lastMouse;
-                _lastMouse = Input.mousePosition;
+                var delta = input.MousePosition - _lastMouse;
+                _lastMouse = input.MousePosition;
                 focusPoint -= FlatRight() * (delta.x * 0.04f);
                 focusPoint -= FlatForward() * (delta.y * 0.04f);
             }
 
-            if (Input.GetMouseButtonDown(1))
+            if (input.CameraOrbitPressed)
             {
                 _draggingRotate = true;
-                _lastMouse = Input.mousePosition;
+                _lastMouse = input.MousePosition;
             }
 
-            if (Input.GetMouseButtonUp(1))
+            if (input.CameraOrbitReleased)
             {
                 _draggingRotate = false;
             }
 
-            if (_draggingRotate && Input.GetMouseButton(1))
+            if (_draggingRotate && input.CameraOrbitHeld)
             {
-                var delta = Input.mousePosition - _lastMouse;
-                _lastMouse = Input.mousePosition;
+                var delta = input.MousePosition - _lastMouse;
+                _lastMouse = input.MousePosition;
                 yaw += delta.x * mouseRotateSensitivity;
                 pitch = Mathf.Clamp(pitch - delta.y * mouseRotateSensitivity, minPitch, maxPitch);
             }
 
-            var scroll = Input.mouseScrollDelta.y;
+            var scroll = input.CameraZoomDelta;
             if (Mathf.Abs(scroll) > 0.01f)
             {
                 distance = Mathf.Clamp(distance - scroll * zoomSpeed, minDistance, maxDistance);
             }
 
-            if (Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Home))
+            if (input.CameraFocusPressed)
             {
                 if (focusTarget != null)
                 {

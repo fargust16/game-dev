@@ -1,3 +1,4 @@
+using GameDev.Input;
 using GameDev.Interaction;
 using GameDev.World;
 using UnityEngine;
@@ -60,16 +61,22 @@ namespace GameDev.Decisions
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+            var input = GameInputService.Instance;
+            if (input == null)
+            {
+                return;
+            }
+
+            if (input.CancelPressed)
             {
                 Close();
                 InteractionFeedback.Show("Decision cancelled", "The moment is still open if the Active Window allows.");
                 return;
             }
 
-            for (var i = 0; i < _node.Options.Length && i < 9; i++)
+            for (var i = 0; i < _node.Options.Length && i < 5; i++)
             {
-                if (Input.GetKeyDown(KeyCode.Alpha1 + i) || Input.GetKeyDown(KeyCode.Keypad1 + i))
+                if (input.OptionPressed(i + 1))
                 {
                     Resolve(_node.Options[i]);
                     return;

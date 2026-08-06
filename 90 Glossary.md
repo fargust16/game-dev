@@ -1,16 +1,16 @@
 # 90 Glossary
 
-Version: 0.16
+Version: 0.17
 
 Status: Draft
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-06
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [AGENTS.md](AGENTS.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -327,6 +327,18 @@ The smallest playable prototype that proves the game fantasy and core systems wi
 ## Lower Veil District
 
 Placeholder name for the Vertical Slice district: a poor/industrial urban area of medicine, night routes, factory pressure, and Warden order.
+
+---
+
+## City District
+
+A named band of the seed city scaffold (Ridge, Lower Veil, Undercroft). Districts share one World Seed and road graph; Vertical Slice POIs stay anchored in Lower Veil. See [13 City Generation](13%20City%20Generation.md).
+
+---
+
+## Anchor Site
+
+A mandatory landmark / NPC / POI placement that every city regenerate must include. Seed may change side or offset; presence is fixed (tavern, board, POI A/B/C, garrison and undercroft stubs, etc.).
 
 ---
 

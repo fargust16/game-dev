@@ -1,3 +1,4 @@
+using GameDev.Input;
 using GameDev.Interaction;
 using UnityEngine;
 
@@ -24,6 +25,11 @@ namespace GameDev.World
         public float HourOfDay => worldHours % 24f;
         public bool IsPaused => isPaused;
 
+        private void OnEnable()
+        {
+            GameInputService.EnsureExists();
+        }
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -48,8 +54,10 @@ namespace GameDev.World
 
         private void Update()
         {
+            var input = GameInputService.Instance;
+
             // Pause toggle always listens (works even at timeScale 0).
-            if (Input.GetKeyDown(KeyCode.P))
+            if (input != null && input.PausePressed)
             {
                 SetPaused(!isPaused);
             }
@@ -64,13 +72,18 @@ namespace GameDev.World
                 worldHours += Time.unscaledDeltaTime / realtimeSecondsPerWorldHour;
             }
 
+            if (input == null)
+            {
+                return;
+            }
+
             // Debug: jump world hours while unpaused.
-            if (Input.GetKeyDown(KeyCode.RightBracket) || Input.GetKeyDown(KeyCode.Equals))
+            if (input.AdvanceHourPressed)
             {
                 AdvanceHours(1f);
             }
 
-            if (Input.GetKeyDown(KeyCode.LeftBracket) || Input.GetKeyDown(KeyCode.Minus))
+            if (input.RewindHourPressed)
             {
                 AdvanceHours(-1f);
             }

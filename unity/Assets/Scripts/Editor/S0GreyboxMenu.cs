@@ -13,9 +13,10 @@ namespace GameDev.EditorTools
         public static void CreateLowerVeilScene()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-            var root = new GameObject("S0_LowerVeil");
-            var builder = root.AddComponent<LowerVeilGreyboxBuilder>();
-            builder.Build();
+            var root = new GameObject("City_Root");
+            var city = root.AddComponent<CityGenerator>();
+            city.SetSeed(WorldSeed.DefaultPrototypeSeed);
+            city.Generate();
 
             const string dir = "Assets/Scenes";
             if (!AssetDatabase.IsValidFolder(dir))
@@ -31,24 +32,25 @@ namespace GameDev.EditorTools
             };
 
             Selection.activeGameObject = root;
-            Debug.Log($"[S0] Scene saved to {path}. Press Play. WASD/Arrows move, E interacts.");
+            Debug.Log($"[City] Scene saved to {path}. Seed={city.SeedValue}. Prefer GameDev/City/Generate From Seed.");
         }
 
         [MenuItem("GameDev/S0/Rebuild Greybox In Open Scene")]
         public static void RebuildInOpenScene()
         {
-            var builder = Object.FindFirstObjectByType<LowerVeilGreyboxBuilder>();
-            if (builder == null)
+            var city = Object.FindFirstObjectByType<CityGenerator>();
+            if (city == null)
             {
-                var root = new GameObject("S0_LowerVeil");
-                builder = root.AddComponent<LowerVeilGreyboxBuilder>();
+                var root = new GameObject("City_Root");
+                city = root.AddComponent<CityGenerator>();
+                city.SetSeed(WorldSeed.DefaultPrototypeSeed);
             }
 
-            builder.Build();
+            city.Generate();
             var scene = SceneManager.GetActiveScene();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
-            Debug.Log("[S0] Greybox rebuilt and saved. Press Play — WASD moves on grid, E interacts near tavern/POIs.");
+            Debug.Log($"[City] Rebuilt seed={city.SeedValue}. Press Play — click A* / WASD / E still work.");
         }
     }
 }

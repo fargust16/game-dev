@@ -1,0 +1,86 @@
+{
+    "name": "GameInput",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567001",
+            "actions": [
+                { "name": "Move", "type": "Value", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567101", "expectedControlType": "Vector2" },
+                { "name": "ClickMove", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567102", "expectedControlType": "Button" },
+                { "name": "Interact", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567103", "expectedControlType": "Button" },
+                { "name": "ToggleControlScheme", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567104", "expectedControlType": "Button" },
+                { "name": "ToggleTurnBased", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567105", "expectedControlType": "Button" },
+                { "name": "Legend", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567106", "expectedControlType": "Button" }
+            ],
+            "bindings": [
+                { "name": "WASD", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567201", "path": "2DVector", "action": "Move", "isComposite": true },
+                { "name": "up", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567202", "path": "<Keyboard>/w", "action": "Move", "isPartOfComposite": true },
+                { "name": "down", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567203", "path": "<Keyboard>/s", "action": "Move", "isPartOfComposite": true },
+                { "name": "left", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567204", "path": "<Keyboard>/a", "action": "Move", "isPartOfComposite": true },
+                { "name": "right", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567205", "path": "<Keyboard>/d", "action": "Move", "isPartOfComposite": true },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567206", "path": "<Mouse>/leftButton", "action": "ClickMove" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567207", "path": "<Keyboard>/e", "action": "Interact" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567208", "path": "<Keyboard>/tab", "action": "ToggleControlScheme" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567209", "path": "<Keyboard>/t", "action": "ToggleTurnBased" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567210", "path": "<Keyboard>/h", "action": "Legend" }
+            ]
+        },
+        {
+            "name": "Camera",
+            "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567002",
+            "actions": [
+                { "name": "Pan", "type": "Value", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567111", "expectedControlType": "Vector2" },
+                { "name": "Orbit", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567112", "expectedControlType": "Button" },
+                { "name": "Zoom", "type": "Value", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567113", "expectedControlType": "Axis" },
+                { "name": "Focus", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567114", "expectedControlType": "Button" }
+            ],
+            "bindings": [
+                { "name": "WASD", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567221", "path": "2DVector", "action": "Pan", "isComposite": true },
+                { "name": "up", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567222", "path": "<Keyboard>/w", "action": "Pan", "isPartOfComposite": true },
+                { "name": "down", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567223", "path": "<Keyboard>/s", "action": "Pan", "isPartOfComposite": true },
+                { "name": "left", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567224", "path": "<Keyboard>/a", "action": "Pan", "isPartOfComposite": true },
+                { "name": "right", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567225", "path": "<Keyboard>/d", "action": "Pan", "isPartOfComposite": true },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567226", "path": "<Mouse>/rightButton", "action": "Orbit" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567227", "path": "<Mouse>/scroll/y", "action": "Zoom" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567228", "path": "<Keyboard>/f", "action": "Focus" }
+            ]
+        },
+        {
+            "name": "World",
+            "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567003",
+            "actions": [
+                { "name": "Pause", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567121", "expectedControlType": "Button" },
+                { "name": "AdvanceHour", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567122", "expectedControlType": "Button" },
+                { "name": "RewindHour", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567123", "expectedControlType": "Button" },
+                { "name": "SkipDayNight", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567124", "expectedControlType": "Button" }
+            ],
+            "bindings": [
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567231", "path": "<Keyboard>/p", "action": "Pause" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567232", "path": "<Keyboard>/rightBracket", "action": "AdvanceHour" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567233", "path": "<Keyboard>/leftBracket", "action": "RewindHour" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567234", "path": "<Keyboard>/n", "action": "SkipDayNight" }
+            ]
+        },
+        {
+            "name": "UI",
+            "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567004",
+            "actions": [
+                { "name": "Cancel", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567131", "expectedControlType": "Button" },
+                { "name": "Option1", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567132", "expectedControlType": "Button" },
+                { "name": "Option2", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567133", "expectedControlType": "Button" },
+                { "name": "Option3", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567134", "expectedControlType": "Button" },
+                { "name": "Option4", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567135", "expectedControlType": "Button" },
+                { "name": "Option5", "type": "Button", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567136", "expectedControlType": "Button" }
+            ],
+            "bindings": [
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567241", "path": "<Keyboard>/escape", "action": "Cancel" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567242", "path": "<Keyboard>/1", "action": "Option1" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567243", "path": "<Keyboard>/2", "action": "Option2" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567244", "path": "<Keyboard>/3", "action": "Option3" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567245", "path": "<Keyboard>/4", "action": "Option4" },
+                { "name": "", "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567246", "path": "<Keyboard>/5", "action": "Option5" }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

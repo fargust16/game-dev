@@ -10,6 +10,9 @@ namespace GameDev.World
         LoomLane = 5,
         CoalStairs = 6,
         FactoryWall = 7,
-        AlleyMouth = 8
+        AlleyMouth = 8,
+        WardenPost = 9,
+        VeinmarketAlley = 10,
+        UnlicensedDoctor = 11
     }
 }

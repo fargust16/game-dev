@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using GameDev.Decisions;
 using GameDev.Environment;
 using GameDev.Grid;
+using GameDev.Input;
 using GameDev.Interaction;
 using GameDev.World;
 using UnityEngine;
@@ -84,6 +85,8 @@ namespace GameDev.Player
 
         private void Awake()
         {
+            GameInputService.EnsureExists();
+
             if (grid == null)
             {
                 grid = FindFirstObjectByType<GridMap>();
@@ -128,19 +131,25 @@ namespace GameDev.Player
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.H))
+            var input = GameInputService.Instance;
+            if (input == null)
+            {
+                return;
+            }
+
+            if (input.LegendPressed)
             {
                 InteractionFeedback.ShowLegend();
             }
 
-            if (Input.GetKeyDown(KeyCode.T))
+            if (input.ToggleTurnBasedPressed)
             {
                 SetMode(mode == MovementMode.FreeExploration
                     ? MovementMode.TurnBased
                     : MovementMode.FreeExploration);
             }
 
-            if (Input.GetKeyDown(KeyCode.Tab))
+            if (input.ToggleSchemePressed)
             {
                 ApplyControlScheme(
                     controlScheme == ControlScheme.Mouse ? ControlScheme.Keyboard : ControlScheme.Mouse,
@@ -149,26 +158,26 @@ namespace GameDev.Player
 
             if (controlScheme == ControlScheme.Mouse)
             {
-                UpdateMouseScheme();
+                UpdateMouseScheme(input);
             }
             else
             {
-                UpdateKeyboardScheme();
+                UpdateKeyboardScheme(input);
             }
 
             UpdateProximityPrompt();
 
-            if (Input.GetKeyDown(KeyCode.E))
+            if (input.InteractPressed)
             {
                 // Manual E only meaningful in keyboard scheme for env; always OK for talk stubs.
                 TryInteract(manual: true);
             }
         }
 
-        private void UpdateMouseScheme()
+        private void UpdateMouseScheme(GameInputService input)
         {
             // In mouse scheme WASD pans the free camera (handled by SimpleFollowCamera).
-            if (Input.GetMouseButtonDown(0) && !IsPointerOverBlockingUi())
+            if (input.ClickMovePressed && !IsPointerOverBlockingUi())
             {
                 TryClickPath();
             }
@@ -176,10 +185,10 @@ namespace GameDev.Player
             FollowPath(mode == MovementMode.TurnBased);
         }
 
-        private void UpdateKeyboardScheme()
+        private void UpdateKeyboardScheme(GameInputService input)
         {
             // Optional: click still pathfinds while staying in WASD/follow-cam scheme.
-            if (Input.GetMouseButtonDown(0) && !IsPointerOverBlockingUi())
+            if (input.ClickMovePressed && !IsPointerOverBlockingUi())
             {
                 TryClickPath();
             }
@@ -272,7 +281,10 @@ namespace GameDev.Player
                 return;
             }
 
-            var ray = cam.ScreenPointToRay(Input.mousePosition);
+            var mouse = GameInputService.Instance != null
+                ? GameInputService.Instance.MousePosition
+                : Vector2.zero;
+            var ray = cam.ScreenPointToRay(mouse);
             var plane = new Plane(Vector3.up, new Vector3(0f, transform.position.y, 0f));
             if (!plane.Raycast(ray, out var enter))
             {
@@ -397,20 +409,11 @@ namespace GameDev.Player
             return world;
         }
 
-        private static Vector2 ReadWasdRaw()
-        {
-            var x = 0f;
-            var y = 0f;
-            if (Input.GetKey(KeyCode.D)) x += 1f;
-            if (Input.GetKey(KeyCode.A)) x -= 1f;
-            if (Input.GetKey(KeyCode.W)) y += 1f;
-            if (Input.GetKey(KeyCode.S)) y -= 1f;
-            return new Vector2(x, y);
-        }
-
         private static Vector3 ReadWasdMoveInput()
         {
-            var raw = ReadWasdRaw();
+            var raw = GameInputService.Instance != null
+                ? GameInputService.Instance.MoveVector
+                : Vector2.zero;
             if (raw.sqrMagnitude > 1f)
             {
                 raw.Normalize();

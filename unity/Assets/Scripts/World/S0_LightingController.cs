@@ -1,3 +1,4 @@
+using GameDev.Input;
 using GameDev.Interaction;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -63,7 +64,8 @@ namespace GameDev.World
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.N) && WorldClock.Instance != null && !WorldClock.Instance.IsPaused)
+            var input = GameInputService.Instance;
+            if (input != null && input.SkipDayNightPressed && WorldClock.Instance != null && !WorldClock.Instance.IsPaused)
             {
                 // Preview helper: jump toward dusk or next morning; lighting eases after.
                 var hour = WorldClock.Instance.HourOfDay;
