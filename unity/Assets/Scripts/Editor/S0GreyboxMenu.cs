@@ -45,8 +45,10 @@ namespace GameDev.EditorTools
             }
 
             builder.Build();
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-            Debug.Log("[S0] Greybox rebuilt in open scene.");
+            var scene = SceneManager.GetActiveScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log("[S0] Greybox rebuilt and saved. Press Play — WASD moves on grid, E interacts near tavern/POIs.");
         }
     }
 }

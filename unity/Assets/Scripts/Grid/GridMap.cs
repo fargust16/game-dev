@@ -4,6 +4,7 @@ namespace GameDev.Grid
 {
     /// <summary>
     /// Runtime square grid for S0+. Design: 10.1 Grid World and Environment Actions.
+    /// Cell data is serialized so Play Mode keeps walkability painted by the greybox builder.
     /// </summary>
     public sealed class GridMap : MonoBehaviour
     {
@@ -13,8 +14,7 @@ namespace GameDev.Grid
         [SerializeField] private Vector3 origin = Vector3.zero;
         [SerializeField] private bool allowDiagonalMove = true;
         [SerializeField] private bool diagonalCostsFifteen = true;
-
-        private GridCell[] _cells;
+        [SerializeField] private GridCell[] cells;
 
         public float CellSize => cellSize;
         public int Width => width;
@@ -22,6 +22,12 @@ namespace GameDev.Grid
         public Vector3 Origin => origin;
         public bool AllowDiagonalMove => allowDiagonalMove;
         public bool DiagonalCostsFifteen => diagonalCostsFifteen;
+        public bool HasCells => cells != null && cells.Length == width * height;
+
+        private void Awake()
+        {
+            EnsureCells();
+        }
 
         public void Configure(int newWidth, int newHeight, float newCellSize, Vector3 newOrigin)
         {
@@ -32,15 +38,23 @@ namespace GameDev.Grid
             AllocateDefaultWalkable();
         }
 
+        public void EnsureCells()
+        {
+            if (!HasCells)
+            {
+                AllocateDefaultWalkable();
+            }
+        }
+
         public void AllocateDefaultWalkable()
         {
-            _cells = new GridCell[width * height];
+            cells = new GridCell[width * height];
             for (var y = 0; y < height; y++)
             {
                 for (var x = 0; x < width; x++)
                 {
                     var coord = new GridCoord(x, y);
-                    _cells[Index(coord)] = new GridCell
+                    cells[Index(coord)] = new GridCell
                     {
                         coord = coord,
                         height = 0,
@@ -56,18 +70,18 @@ namespace GameDev.Grid
 
         public ref GridCell GetCell(GridCoord coord)
         {
-            return ref _cells[Index(coord)];
+            return ref cells[Index(coord)];
         }
 
         public bool TryGetCell(GridCoord coord, out GridCell cell)
         {
-            if (!InBounds(coord) || _cells == null)
+            if (!InBounds(coord) || !HasCells)
             {
                 cell = default;
                 return false;
             }
 
-            cell = _cells[Index(coord)];
+            cell = cells[Index(coord)];
             return true;
         }
 
@@ -83,7 +97,7 @@ namespace GameDev.Grid
 
         public void SetFlags(GridCoord coord, GridCellFlags flags, bool walkable = true)
         {
-            if (!InBounds(coord))
+            if (!InBounds(coord) || !HasCells)
             {
                 return;
             }
@@ -102,7 +116,7 @@ namespace GameDev.Grid
 
         public void SetHeight(GridCoord coord, int cellHeight)
         {
-            if (!InBounds(coord))
+            if (!InBounds(coord) || !HasCells)
             {
                 return;
             }

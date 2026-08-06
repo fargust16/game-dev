@@ -11,22 +11,50 @@ namespace GameDev.Player
     public sealed class GridPlayerController : MonoBehaviour
     {
         [SerializeField] private GridMap grid;
+        [SerializeField] private GridCoord startCoord = new GridCoord(18, 25);
         [SerializeField] private float moveCooldown = 0.12f;
-        [SerializeField] private float interactRadius = 1.35f;
+        [SerializeField] private float interactRadius = 1.75f;
 
         private GridCoord _coord;
         private float _nextMoveTime;
+        private bool _ready;
 
         public void PlaceOnGrid(GridMap map, GridCoord start)
         {
             grid = map;
+            startCoord = start;
             _coord = start;
+            _ready = true;
+            SnapToCell();
+        }
+
+        private void Awake()
+        {
+            if (grid == null)
+            {
+                grid = FindFirstObjectByType<GridMap>();
+            }
+
+            if (grid == null)
+            {
+                Debug.LogError("[Player] No GridMap found. Rebuild greybox: GameDev → S0 → Rebuild Greybox In Open Scene.");
+                return;
+            }
+
+            grid.EnsureCells();
+            _coord = grid.InBounds(startCoord) ? startCoord : grid.WorldToCoord(transform.position);
+            if (!grid.IsWalkable(_coord))
+            {
+                _coord = startCoord;
+            }
+
+            _ready = true;
             SnapToCell();
         }
 
         private void Update()
         {
-            if (grid == null)
+            if (!_ready || grid == null)
             {
                 return;
             }
@@ -82,7 +110,7 @@ namespace GameDev.Player
             var bestDist = float.MaxValue;
             foreach (var item in interactables)
             {
-                var d = Vector3.Distance(transform.position, item.transform.position);
+                var d = HorizontalDistance(transform.position, item.transform.position);
                 if (d <= interactRadius && d < bestDist)
                 {
                     bestDist = d;
@@ -101,7 +129,7 @@ namespace GameDev.Player
             bestDist = float.MaxValue;
             foreach (var item in envActions)
             {
-                var d = Vector3.Distance(transform.position, item.transform.position);
+                var d = HorizontalDistance(transform.position, item.transform.position);
                 if (d <= interactRadius && d < bestDist)
                 {
                     bestDist = d;
@@ -115,7 +143,14 @@ namespace GameDev.Player
                 return;
             }
 
-            Debug.Log("[Player] Nothing to interact with nearby.");
+            Debug.Log("[Player] Nothing nearby. Walk south-west to Soot & Bell / notice board, then press E.");
+        }
+
+        private static float HorizontalDistance(Vector3 a, Vector3 b)
+        {
+            a.y = 0f;
+            b.y = 0f;
+            return Vector3.Distance(a, b);
         }
     }
 }
