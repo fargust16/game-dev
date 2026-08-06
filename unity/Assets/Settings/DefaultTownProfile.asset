@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17410b8f9140e2649a0b945b37c5ea0e, type: 3}
+  m_Name: DefaultTownProfile
+  m_EditorClassIdentifier: Assembly-CSharp::GameDev.World.Town.TownProfile
+  TownRadiusMin: 200
+  TownRadiusMax: 320
+  BoundaryIrregularity: 30
+  HasWall: 0
+  RiverCoastProbability: 0.35
+  HasRidge: 0
+  PortalCountMin: 3
+  PortalCountMax: 6
+  PortalWeights:
+    Gate: 3
+    Bridge: 1
+    FarmRoad: 2
+    SettlementRoad: 2
+  Arterial:
+    WidthMin: 8
+    WidthMax: 12
+    CurvatureAmplitude: 6
+    JitterAmplitude: 1
+  Secondary:
+    WidthMin: 4
+    WidthMax: 6
+    CurvatureAmplitude: 4
+    JitterAmplitude: 0.8
+  Tertiary:
+    WidthMin: 3
+    WidthMax: 4
+    CurvatureAmplitude: 3
+    JitterAmplitude: 0.6
+  Alley:
+    WidthMin: 1.5
+    WidthMax: 3
+    CurvatureAmplitude: 2
+    JitterAmplitude: 0.5
+  Service:
+    WidthMin: 1.5
+    WidthMax: 2
+    CurvatureAmplitude: 1
+    JitterAmplitude: 0.3
+  RichDistrict:
+    Profile:
+      BlockSize: 60
+      PlotFrontageMin: 10
+      PlotFrontageMax: 22
+      PlotDepthMin: 20
+      PlotDepthMax: 40
+      StreetDensity: 0.3
+      Setback: 3
+      FloorsMin: 2
+      FloorsMax: 4
+      CourtyardProbability: 0.05
+      GardenProbability: 0.3
+      DeadEndProbability: 0.02
+      ShortcutProbability: 0.02
+  MixedDistrict:
+    Profile:
+      BlockSize: 40
+      PlotFrontageMin: 6
+      PlotFrontageMax: 14
+      PlotDepthMin: 12
+      PlotDepthMax: 28
+      StreetDensity: 0.5
+      Setback: 1.5
+      FloorsMin: 2
+      FloorsMax: 5
+      CourtyardProbability: 0.15
+      GardenProbability: 0.15
+      DeadEndProbability: 0.05
+      ShortcutProbability: 0.05
+  PoorDistrict:
+    Profile:
+      BlockSize: 25
+      PlotFrontageMin: 4
+      PlotFrontageMax: 8
+      PlotDepthMin: 8
+      PlotDepthMax: 18
+      StreetDensity: 0.75
+      Setback: 0.5
+      FloorsMin: 3
+      FloorsMax: 6
+      CourtyardProbability: 0.35
+      GardenProbability: 0.05
+      DeadEndProbability: 0.15
+      ShortcutProbability: 0.12
+  LandmarkWeights:
+    MarketSquare: 3
+    Church: 3
+    Castle: 1
+    TownHall: 2
+  PlazaSizeMin: 8
+  PlazaSizeMax: 20
+  WellDensityPerKm2: 4
