@@ -1,6 +1,6 @@
 # Milestone D2 — BG3 Building Occlusion
 
-**Status:** In progress (D2.1–D2.2)  
+**Status:** D2.1–D2.2 landed (`37fdecb`); verify in Unity, then C1  
 **Date started:** 2026-08-06  
 **Depends on:** D1 ✅ (enterable templates + sockets)  
 **Authoritative order:** [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md)
