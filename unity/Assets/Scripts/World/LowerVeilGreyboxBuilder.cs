@@ -163,13 +163,116 @@ namespace GameDev.World
             var tacticalCam = camGo.AddComponent<SimpleFollowCamera>();
             tacticalCam.SetTarget(player.transform);
 
-            var lightGo = new GameObject("Directional Light");
-            lightGo.transform.SetParent(transform, false);
-            var light = lightGo.AddComponent<Light>();
-            light.type = LightType.Directional;
-            light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+            BuildLighting();
 
-            Debug.Log("[S0.3] Interact stubs ready: board, Merrin, Rusk, Nia, POI A/B/C, env actions. H = legend.");
+            Debug.Log("[S0.4] Lower Veil Greybox + Lighting ready. LMB/Arrows move, WASD camera, E interact, N day/night, H legend.");
+        }
+
+        private void BuildLighting()
+        {
+            var lightingGo = new GameObject("S0_Lighting");
+            lightingGo.transform.SetParent(transform, false);
+            var controller = lightingGo.AddComponent<S0_LightingController>();
+
+            // 1. Sun_Day
+            var sunDay = new GameObject("Sun_Day");
+            sunDay.transform.SetParent(lightingGo.transform, false);
+            var lSunDay = sunDay.AddComponent<Light>();
+            lSunDay.type = LightType.Directional;
+            sunDay.transform.rotation = Quaternion.Euler(50f, -35f, 0f);
+            lSunDay.color = new Color(1.0f, 0.93f, 0.82f);
+            lSunDay.intensity = 1.25f;
+            lSunDay.shadows = LightShadows.Soft;
+            lSunDay.shadowStrength = 0.8f;
+
+            // 2. Sun_Night
+            var sunNight = new GameObject("Sun_Night");
+            sunNight.transform.SetParent(lightingGo.transform, false);
+            var lSunNight = sunNight.AddComponent<Light>();
+            lSunNight.type = LightType.Directional;
+            sunNight.transform.rotation = Quaternion.Euler(28f, -55f, 0f);
+            lSunNight.color = new Color(0.55f, 0.65f, 0.85f);
+            lSunNight.intensity = 0.25f;
+            lSunNight.shadows = LightShadows.Soft;
+            lSunNight.shadowStrength = 0.5f;
+
+            // 3. Fill_Sky_Day
+            var fillSkyDay = new GameObject("Fill_Sky_Day");
+            fillSkyDay.transform.SetParent(lightingGo.transform, false);
+            var lFill = fillSkyDay.AddComponent<Light>();
+            lFill.type = LightType.Directional;
+            fillSkyDay.transform.rotation = Quaternion.Euler(70f, 120f, 0f);
+            lFill.color = new Color(0.55f, 0.62f, 0.72f);
+            lFill.intensity = 0.25f;
+            lFill.shadows = LightShadows.None;
+
+            // 4. Rim_Factory
+            var rimFactory = new GameObject("Rim_Factory");
+            rimFactory.transform.SetParent(lightingGo.transform, false);
+            rimFactory.transform.position = new Vector3(27.0f, 3.5f, 10.5f);
+            rimFactory.transform.rotation = Quaternion.Euler(20f, -90f, 0f);
+            var lRim = rimFactory.AddComponent<Light>();
+            lRim.type = LightType.Spot;
+            lRim.color = new Color(0.40f, 0.65f, 0.75f);
+            lRim.intensity = 1.0f;
+            lRim.range = 15.0f;
+            lRim.spotAngle = 70.0f;
+            lRim.shadows = LightShadows.Soft;
+
+            // 5. Warm_TavernPool
+            var warmTavern = new GameObject("Warm_TavernPool");
+            warmTavern.transform.SetParent(lightingGo.transform, false);
+            warmTavern.transform.position = new Vector3(10.5f, 2.5f, 17.0f);
+            var lTavern = warmTavern.AddComponent<Light>();
+            lTavern.type = LightType.Point;
+            lTavern.color = new Color(1.0f, 0.72f, 0.35f);
+            lTavern.intensity = 0.45f;
+            lTavern.range = 8.0f;
+            lTavern.shadows = LightShadows.Soft;
+
+            // 6. Cool_LoomPool
+            var coolLoom = new GameObject("Cool_LoomPool");
+            coolLoom.transform.SetParent(lightingGo.transform, false);
+            coolLoom.transform.position = new Vector3(17.0f, 2.5f, 9.0f);
+            var lLoom = coolLoom.AddComponent<Light>();
+            lLoom.type = LightType.Point;
+            lLoom.color = new Color(0.40f, 0.60f, 0.85f);
+            lLoom.intensity = 0.35f;
+            lLoom.range = 8.0f;
+            lLoom.shadows = LightShadows.Soft;
+
+            // 7. Night_GasLamps
+            var gasLamps = new GameObject("Night_GasLamps");
+            gasLamps.transform.SetParent(lightingGo.transform, false);
+
+            CreateGasLamp(gasLamps, "GasLamp_Tavern", new Vector3(11.5f, 2.5f, 17.5f));
+            CreateGasLamp(gasLamps, "GasLamp_Tincture", new Vector3(10.0f, 2.5f, 13.0f));
+            CreateGasLamp(gasLamps, "GasLamp_Loom", new Vector3(18.0f, 2.5f, 9.0f));
+            CreateGasLamp(gasLamps, "GasLamp_Stairs", new Vector3(24.0f, 2.5f, 7.5f));
+
+            controller.Bind(
+                sunDay,
+                sunNight,
+                fillSkyDay,
+                rimFactory,
+                warmTavern,
+                coolLoom,
+                gasLamps);
+
+            controller.SetDayMode();
+        }
+
+        private static void CreateGasLamp(GameObject parent, string name, Vector3 pos)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent.transform, false);
+            go.transform.position = pos;
+            var l = go.AddComponent<Light>();
+            l.type = LightType.Point;
+            l.color = new Color(1.0f, 0.65f, 0.25f);
+            l.intensity = 1.8f;
+            l.range = 6.5f;
+            l.shadows = LightShadows.Soft;
         }
 
         private void CreateWaymarker(GridMap grid, GridCoord coord, string prompt, string message)

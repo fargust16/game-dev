@@ -52,7 +52,7 @@ namespace GameDev.Interaction
         {
             Show(
                 "Lower Veil — legend (H to repeat)",
-                "Brown = place/NPC · Orange = POI (future scene) · Teal = vault/window/climb · Grey = blocked building · → = waymarker. Bar = outdoor stubs (no interior). Controls: LMB/Arrows move · WASD camera · RMB orbit · Wheel zoom · F focus · E interact · T turn-based.",
+                "Brown = place/NPC · Orange = POI (future scene) · Teal = vault/window/climb · Grey = blocked building · → = waymarker. Bar = outdoor stubs (no interior). Controls: LMB/Arrows move · WASD camera · RMB orbit · Wheel zoom · F focus · E interact · N day/night · T turn-based.",
                 12f);
         }
 
