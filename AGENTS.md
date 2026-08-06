@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.15
+Version: 0.16
 
 Status: Draft
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-06
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -98,6 +98,10 @@ Always respect this order:
         ↓
 12 Engine Choice
         ↓
+13 City Generation
+        ↓
+14 World Generation Roadmap
+        ↓
 All future documentation
 ```
 
@@ -105,6 +109,8 @@ Lower-level documents may extend higher-level ones.
 They must never contradict them.
 
 If a contradiction appears, stop and explain it before continuing.
+
+**World / town generation handoff:** before changing city or world gen, read [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) and `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`.
 
 ---
 
@@ -138,6 +144,8 @@ If a contradiction appears, stop and explain it before continuing.
 - 11.1 Vertical Slice POIs
 - 11.2 Milestone S0 Greybox
 - 12 Engine Choice
+- 13 City Generation
+- 14 World Generation Roadmap
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md

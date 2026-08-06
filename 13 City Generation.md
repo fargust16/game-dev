@@ -1,6 +1,6 @@
 # 13 City Generation
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 [02 World Laws](02%20World%20Laws.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md), [12 Engine Choice](12%20Engine%20Choice.md)
 
 Referenced By:
-Prototype city scaffold in `unity/`, Vertical Slice playtests.
+[14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), Prototype city scaffold in `unity/`, Vertical Slice playtests.
 
 ---
 
@@ -29,7 +29,10 @@ Success question:
 | Layer | State |
 |-------|--------|
 | **v1 raster playable** | `CityGenerator` + `OrganicRoadBuilder` / `TownRoadGraph` / `TownBlockParcelizer` — scene `City_OrganicTown.unity`, menu `GameDev/City/…` |
-| **v2 vector (OrganicTown)** | Milestone **A complete** (data model + stage pipeline + gizmos). Menu `GameDev/Town/…`, scene created via *Open Or Create Town Scene*. Plan: `unity/Assets/Plans/procedural-organic-town-generator.md`. Greybox bake (B), enterable interiors, BG3 occlusion, wilderness — **gated next** |
+| **v2 vector (OrganicTown)** | Milestone **A complete** (data model + stage pipeline + gizmos). Menu `GameDev/Town/…`. Detail plan: `unity/Assets/Plans/procedural-organic-town-generator.md` |
+
+**Living roadmap / agent handoff:** [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) and `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`.  
+**Next phase:** **B** — greybox baker from v2 footprints (then D1 enterable templates → D2 BG3 occlusion → C narrative/GridMap → E wilderness).
 
 # Growth Pipeline (v1 raster — playable)
 
@@ -116,6 +119,7 @@ Slice POIs **live in Lower Veil**.
 
 # Related Documents
 
+- [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
 - [11 Vertical Slice](11%20Vertical%20Slice.md)
 - [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md)
 - [12 Engine Choice](12%20Engine%20Choice.md)

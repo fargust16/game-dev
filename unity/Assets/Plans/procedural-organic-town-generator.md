@@ -1,5 +1,7 @@
 # Project Overview
 
+> **Agent handoff:** stop-point + full world roadmap live in repo-root [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md) and [`AGENT_HANDOFF_WORLD_GEN.md`](AGENT_HANDOFF_WORLD_GEN.md). Milestone A is complete; **next = B** (`TownGreyboxBaker`).
+
 - **Game Title / System:** Procedural Organic Historic Town Generator ("OrganicTown v2")
 - **High-Level Concept:** A deterministic, seed-driven generator that grows a believable late‑18th/19th‑century European town from a central landmark outward — arterials to gates/bridges/farms, then districts → blocks → plots → buildings — producing gently curved, varied‑width, irregular streets that read as *grown over decades*, not planned on a grid. Target look: pre‑Haussmann Paris, Prague, Edinburgh, Bruges, Rothenburg ob der Tauber.
 - **Players:** N/A (authoring/runtime world system). Consumed by the existing single‑player grid game.
