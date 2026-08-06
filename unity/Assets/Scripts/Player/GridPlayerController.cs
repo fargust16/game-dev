@@ -114,6 +114,12 @@ namespace GameDev.Player
                 return;
             }
 
+            // Full world pause: no move, click-path, interact, or mode toggles.
+            if (WorldClock.Instance != null && WorldClock.Instance.IsPaused)
+            {
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.H))
             {
                 InteractionFeedback.ShowLegend();

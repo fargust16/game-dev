@@ -66,14 +66,18 @@ namespace GameDev.Player
 
         private void LateUpdate()
         {
-            if (rigMode == CameraRigMode.Follow)
+            var paused = World.WorldClock.Instance != null && World.WorldClock.Instance.IsPaused;
+            if (!paused)
             {
-                UpdateFollowFocus();
-                HandleSharedLookInput(allowWasdPan: false, allowEdgePan: false);
-            }
-            else
-            {
-                HandleSharedLookInput(allowWasdPan: true, allowEdgePan: enableEdgePan);
+                if (rigMode == CameraRigMode.Follow)
+                {
+                    UpdateFollowFocus();
+                    HandleSharedLookInput(allowWasdPan: false, allowEdgePan: false);
+                }
+                else
+                {
+                    HandleSharedLookInput(allowWasdPan: true, allowEdgePan: enableEdgePan);
+                }
             }
 
             ApplyCameraTransform();

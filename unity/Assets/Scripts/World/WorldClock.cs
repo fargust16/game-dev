@@ -1,3 +1,4 @@
+using GameDev.Interaction;
 using UnityEngine;
 
 namespace GameDev.World
@@ -12,14 +13,16 @@ namespace GameDev.World
 
         [SerializeField] private float worldHours;
         [Tooltip("Realtime seconds that equal one in-world hour.")]
-        [SerializeField] private float realtimeSecondsPerWorldHour = 8f;
-        [SerializeField] private bool pauseClock;
+        [SerializeField] private float realtimeSecondsPerWorldHour = 45f;
+        [SerializeField] private bool isPaused;
 
         private GUIStyle _style;
+        private float _savedTimeScale = 1f;
 
         public float WorldHours => worldHours;
         public int DayIndex => Mathf.FloorToInt(worldHours / 24f) + 1;
         public float HourOfDay => worldHours % 24f;
+        public bool IsPaused => isPaused;
 
         private void Awake()
         {
@@ -30,16 +33,38 @@ namespace GameDev.World
             }
 
             Instance = this;
+            ApplyPauseState(announce: false);
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+            }
+
+            Time.timeScale = 1f;
         }
 
         private void Update()
         {
-            if (!pauseClock && realtimeSecondsPerWorldHour > 0.01f)
+            // Pause toggle always listens (works even at timeScale 0).
+            if (Input.GetKeyDown(KeyCode.P))
             {
-                worldHours += Time.deltaTime / realtimeSecondsPerWorldHour;
+                SetPaused(!isPaused);
             }
 
-            // Debug: advance / rewind world time for S1 playtests.
+            if (isPaused)
+            {
+                return;
+            }
+
+            if (realtimeSecondsPerWorldHour > 0.01f)
+            {
+                worldHours += Time.unscaledDeltaTime / realtimeSecondsPerWorldHour;
+            }
+
+            // Debug: jump world hours while unpaused.
             if (Input.GetKeyDown(KeyCode.RightBracket) || Input.GetKeyDown(KeyCode.Equals))
             {
                 AdvanceHours(1f);
@@ -49,15 +74,27 @@ namespace GameDev.World
             {
                 AdvanceHours(-1f);
             }
+        }
 
-            if (Input.GetKeyDown(KeyCode.P))
+        public void SetPaused(bool paused)
+        {
+            if (isPaused == paused)
             {
-                pauseClock = !pauseClock;
+                ApplyPauseState(announce: false);
+                return;
             }
+
+            isPaused = paused;
+            ApplyPauseState(announce: true);
         }
 
         public void AdvanceHours(float hours)
         {
+            if (isPaused)
+            {
+                return;
+            }
+
             worldHours = Mathf.Max(0f, worldHours + hours);
             Debug.Log($"[WorldClock] Day {DayIndex}, {HourOfDay:0.0}h (total {worldHours:0.0}h)");
         }
@@ -66,8 +103,37 @@ namespace GameDev.World
         {
             var h = Mathf.FloorToInt(HourOfDay);
             var m = Mathf.FloorToInt((HourOfDay - h) * 60f);
-            var pause = pauseClock ? " PAUSED" : "";
-            return $"Day {DayIndex}  {h:00}:{m:00}{pause}";
+            if (isPaused)
+            {
+                return $"Day {DayIndex}  {h:00}:{m:00}  PAUSED";
+            }
+
+            return $"Day {DayIndex}  {h:00}:{m:00}";
+        }
+
+        private void ApplyPauseState(bool announce)
+        {
+            if (isPaused)
+            {
+                if (Time.timeScale > 0f)
+                {
+                    _savedTimeScale = Time.timeScale;
+                }
+
+                Time.timeScale = 0f;
+                if (announce)
+                {
+                    InteractionFeedback.Show("Paused", "World frozen. Press P to resume. Movement and interacts are locked.", 3f);
+                }
+            }
+            else
+            {
+                Time.timeScale = _savedTimeScale > 0f ? _savedTimeScale : 1f;
+                if (announce)
+                {
+                    InteractionFeedback.Show("Resumed", "World time and controls are active again.", 2.5f);
+                }
+            }
         }
 
         private void OnGUI()
@@ -83,7 +149,8 @@ namespace GameDev.World
                 _style.normal.textColor = Color.white;
             }
 
-            GUI.Box(new Rect(12f, 12f, 220f, 28f), FormatStatus() + "   ]/+ hour", _style);
+            // Clean clock only — hotkeys live in legend (H), not in the time string.
+            GUI.Box(new Rect(12f, 12f, 200f, 28f), FormatStatus(), _style);
         }
     }
 }

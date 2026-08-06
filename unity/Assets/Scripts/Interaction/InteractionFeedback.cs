@@ -52,7 +52,7 @@ namespace GameDev.Interaction
         {
             Show(
                 "Lower Veil — legend (H to repeat)",
-                "Brown NPC/place · Orange POI · Teal env. Mouse LMB path · Tab WASD walk · E talk/tips · N day/night · T TB · ]/+1h world time · P pause clock · H legend. Tips Hint/Mark POIs; windows can expire.",
+                "Brown NPC/place · Orange POI · Teal env. Mouse LMB path · Tab WASD walk · E talk/tips · N day/night · T TB · ] = +1 world hour · P pause (locks controls) · H legend.",
                 12f);
         }
 
