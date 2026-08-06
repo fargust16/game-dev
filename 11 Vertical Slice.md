@@ -231,7 +231,7 @@ Detailed plan: [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md)
 - tavern, board, shop front, alley;
 - walk / look / talk stubs.
 
-**Implementation note (2026-08-06):** compact courtyard greybox superseded by seed city scaffold — see [13 City Generation](13%20City%20Generation.md). Slice POIs remain mandatory anchors in Lower Veil.
+**Implementation note (2026-08-06):** compact courtyard / straight-avenue greybox superseded by organic town growth — see [13 City Generation](13%20City%20Generation.md). Slice POIs remain mandatory anchors in Lower Veil.
 
 ## Milestone S1 — Information + POI shells
 

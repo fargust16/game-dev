@@ -1,6 +1,6 @@
 # 13 City Generation
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
@@ -16,13 +16,28 @@ Prototype city scaffold in `unity/`, Vertical Slice playtests.
 
 # Purpose
 
-Define the **seed-driven city scaffold** that replaces the compact hand-painted S0 courtyard loop.
+Define the **seed-driven organic town scaffold** for Lower Veil: a late-18th/19th-century industrial-occult town that appears to have grown over decades, not a Haussmann grid or a single carved avenue.
 
-The mesh stays greybox. The layout becomes a readable multi-district street graph with mandatory Anchors.
+Meshes stay greybox. Gameplay truth stays `GridMap` + A*.
 
 Success question:
 
-> Does regenerating with seed A vs B change streets/alleys while always placing slice POIs and garrison/undercroft stubs?
+> Does regenerating with seed A vs B change crooked streets and blocks while always placing slice POIs and garrison/undercroft stubs, with every anchor path-connected to the market?
+
+# Growth Pipeline
+
+Implementation: `WorldSeed` + `CityGenerator` + `unity/Assets/Scripts/World/Town/` (`OrganicRoadBuilder`, `TownRoadGraph`, `TownBlockParcelizer`).
+
+Order:
+
+1. **Market plaza** (irregular) at town center — Soot & Bell hub.
+2. **Attractors** on the rim — Ridge (N) gate, factory (E), Undercroft (S) gate, farm/bridge (W).
+3. **Major roads** — organic polylines (midpoint displacement), variable width by district.
+4. **Broken ring** + **secondary streets** + **alleys / courtyards / dead ends**.
+5. **District mask** — radial wedges + distance (not axis-aligned bands).
+6. **Frontage parcels** → greybox buildings; factory mass on the east.
+7. **Mandatory anchors** → path guarantee to market.
+8. Wire clock / POI / decisions / lighting / input.
 
 # World Seed Streams
 
@@ -30,66 +45,52 @@ Prototype default seed: **110201** (Inspector-overridable).
 
 | Stream | Owns |
 |--------|------|
-| `roads` | Avenue Y, cross-streets, alleys, plaza |
-| `parcels` | Building footprints along the avenue |
+| `roads` | Plaza, attractors, majors, ring, secondaries, alleys |
+| `blocks` | Reserved for block IDs / future subdivision detail |
+| `parcels` | Frontage plot depth/width and building instances |
 | `anchors` | Side/offset of mandatory sites (not presence) |
-| `dressing` | Gas-lamp spacing, sparse street stubs, waymarkers |
+| `dressing` | Waymarkers, wells, sparse street stubs |
 
-Implementation: `WorldSeed` + `CityGenerator` in `unity/Assets/Scripts/World/`.
+# Districts (wedges)
 
-# Districts
+Grid target: **~180×140 cells**, ~1 m/cell. Town disk radius ~55–68.
 
-Grid target: **~160×120 cells**, ~1 m/cell.
+| District | Geometry | Role |
+|----------|----------|------|
+| **Ridge** | Northern wedge, higher cells | Richer plots, wider streets, player spawn |
+| **Lower Veil** | Central + eastern belt | Market, slice POIs, factory corridor |
+| **Undercroft** | Southern dense wedge | Narrow alleys, Veinmarket, doctor |
 
-| District | Band (approx.) | Role |
-|----------|----------------|------|
-| **Ridge** | North | Higher class / height band; player spawn (Ridge Approach) |
-| **Lower Veil** | Middle | Industrial main street — Vertical Slice playable core |
-| **Undercroft** | South / dense alleys | Darker stubs — Veinmarket door, unlicensed doctor |
-
-# Road Graph
-
-- Primary **Avenue**: carriage-width **3 cells**, east–west through Lower Veil.
-- Secondary **cross-streets** north–south, including a Ridge approach corridor.
-- **Foot alleys**: 1-cell secondary graph intersecting the avenue; denser in Undercroft.
-- At least one readable **crossroads plaza**.
-
-Gameplay truth remains `GridMap` walkability + A* — not NavMesh.
-
-# Performance (Greybox Scale)
-
-Do **not** spawn one floor cube per cell.
-
-- Merged **avenue/alley floor strips**.
-- Buildings: instance existing S0_Greybox prefabs on parcels.
-- Factory: one east mass volume in Lower Veil.
+Street widths (human scale): Ridge majors 3–4 cells, Veil arterial 3, Undercroft approach 2, alleys 1.
 
 # Mandatory Anchors
 
-Seed may change parcel side / offset. Presence is fixed.
+Seed may change parcel side / offset. Presence is fixed. Each must A*-reach the market (corrective alley if needed).
 
-| Anchor | District | Contents |
-|--------|----------|----------|
-| Soot & Bell + Merrin + Notice Board | Lower Veil | hub + tips |
-| Harrow & Tincture + POI A | Lower Veil | apothecary shell |
-| Loom Lane / Alley + Nia + POI B | Lower Veil | collectors shell |
-| Coal Stairs + POI C | Lower Veil east | Trace after Aftermath |
-| Ridge Approach spawn | Ridge | player start |
-| Warden Post stub | Ridge / Lower edge | garrison + guard NPC stub |
-| Veinmarket Alley stub | Undercroft | dark door + fixer NPC stub |
-| Unlicensed doctor stub | Undercroft | optional tip source |
+| Anchor | Placement rule |
+|--------|----------------|
+| Soot & Bell + Merrin + Notice Board | On / abutting market plaza |
+| Harrow & Tincture + POI A | Lower Veil along east major |
+| Loom Lane / Alley + Nia + POI B | Lower Veil side-street / alley |
+| Coal Stairs + POI C | Near factory mass, east |
+| Ridge Approach spawn | North gate road, Ridge |
+| Warden Post stub | Ridge / Lower boundary |
+| Veinmarket Alley stub | Undercroft deep alley |
+| Unlicensed doctor stub | Undercroft, different block |
 
-Slice POIs **live in Lower Veil** — city scale does not discard [11.1](11.1%20Vertical%20Slice%20POIs.md).
+Slice POIs **live in Lower Veil**.
+
+# Performance (Greybox Scale)
+
+- Merged **street floor strips** only (no per-cell cubes).
+- Buildings along **street frontage**; factory as one mass.
+- Optional dense grid debug drawer — expect cost on large maps.
 
 # Editor
 
-- `GameDev/City/Generate From Seed` — rebuild scene children; seed on `CityGenerator` Inspector.
-- `GameDev/City/Generate From Seed (New Random)` — tick-based seed, then generate.
-- Legacy `GameDev/S0/...` menus forward to the same generator.
-
-# Systems Wired After Generate
-
-`GameInputService`, `WorldClock`, `PoiDirector`, `DistrictResidue`, `DecisionNodeSession`, lighting bind, pathfinding on generated walkability.
+- `GameDev/City/Generate From Seed`
+- `GameDev/City/Generate From Seed (New Random)`
+- Legacy `GameDev/S0/...` forwards to the same generator.
 
 # Explicitly Out
 
@@ -101,8 +102,8 @@ Slice POIs **live in Lower Veil** — city scale does not discard [11.1](11.1%20
 
 # Documentation Review
 
+- Replaces the E–W avenue scaffold model from v0.1.
 - Extends World Seed (02) and grid rules (10.1); does not replace Decision Engine.
-- Greybox milestone scale superseded; slice content still required.
 
 # Related Documents
 

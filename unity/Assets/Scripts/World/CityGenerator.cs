@@ -4,6 +4,7 @@ using GameDev.Grid;
 using GameDev.Input;
 using GameDev.Interaction;
 using GameDev.Player;
+using GameDev.World.Town;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -11,26 +12,13 @@ using UnityEditor;
 
 namespace GameDev.World
 {
-    public enum CityDistrict
-    {
-        Ridge = 0,
-        LowerVeil = 1,
-        Undercroft = 2
-    }
-
     /// <summary>
-    /// Seed-driven multi-district city scaffold: avenue + alleys, parcels, mandatory anchors.
-    /// Design: 13 City Generation / 11 Vertical Slice (POIs stay in Lower Veil).
+    /// Organic historic town orchestrator: growth graph → parcels → slice anchors → systems.
+    /// Design: 13 City Generation.
     /// </summary>
     public sealed class CityGenerator : MonoBehaviour
     {
         private const string PrefabFolder = "Assets/Prefabs/S0_Greybox/";
-        private const int MapWidth = 160;
-        private const int MapHeight = 120;
-
-        private const int UndercroftMaxY = 34;
-        private const int LowerVeilMaxY = 89;
-        // Ridge: y 90..119
 
         [SerializeField] private WorldSeed worldSeed = new WorldSeed(WorldSeed.DefaultPrototypeSeed);
         [SerializeField] private float cellSize = 1f;
@@ -46,9 +34,9 @@ namespace GameDev.World
         [SerializeField] private GameObject noticeBoardPrefab;
         [SerializeField] private GameObject playerCapsulePrefab;
 
-        private readonly bool[,] _road = new bool[MapWidth, MapHeight];
-        private readonly bool[,] _alley = new bool[MapWidth, MapHeight];
+        private TownRoadGraph _graph;
         private readonly HashSet<long> _reserved = new HashSet<long>();
+        private readonly List<GridCoord> _pathScratch = new List<GridCoord>(256);
 
         public int SeedValue => worldSeed != null ? worldSeed.value : WorldSeed.DefaultPrototypeSeed;
 
@@ -69,56 +57,57 @@ namespace GameDev.World
             ResolvePrefabs();
             ClearChildren();
             _reserved.Clear();
-            ClearBoolGrid(_road);
-            ClearBoolGrid(_alley);
 
             var roadsRng = worldSeed.Fork("roads");
+            var blocksRng = worldSeed.Fork("blocks");
             var parcelsRng = worldSeed.Fork("parcels");
             var anchorsRng = worldSeed.Fork("anchors");
             var dressingRng = worldSeed.Fork("dressing");
 
+            _graph = OrganicRoadBuilder.Build(roadsRng);
+
             var gridGo = new GameObject("GridMap");
             gridGo.transform.SetParent(transform, false);
             var grid = gridGo.AddComponent<GridMap>();
-            grid.Configure(MapWidth, MapHeight, cellSize, Vector3.zero);
+            grid.Configure(TownGrowthParams.MapWidth, TownGrowthParams.MapHeight, cellSize, Vector3.zero);
             gridGo.AddComponent<GridDebugDrawer>();
 
-            // Default: blocked city fabric; roads carve walkable paths.
-            PaintAll(grid, walkable: false, height: 0, flags: GridCellFlags.BlocksLoS);
+            TownBlockParcelizer.ApplyRoadsToGrid(_graph, grid);
+            // blocks stream reserved for future block IDs; parcels consume frontage now.
+            _ = blocksRng;
+            TownBlockParcelizer.PlaceFactory(_graph, grid, transform, building2x2Prefab, building1x1Prefab,
+                wallSegmentPrefab);
+            TownBlockParcelizer.PlaceFrontageBuildings(_graph, grid, transform, parcelsRng, building1x1Prefab,
+                building2x2Prefab);
 
-            var avenueY = 48 + roadsRng.Next(0, 12); // Lower Veil band
-            var plazaX = 70 + roadsRng.Next(0, 20);
-            CarveAvenue(grid, avenueY);
-            CarveCrossStreets(grid, roadsRng, avenueY, plazaX);
-            CarveAlleys(grid, roadsRng, avenueY);
-            CarvePlaza(grid, plazaX, avenueY);
-            ApplyDistrictHeights(grid);
+            // Re-apply street walkability after factory collar.
+            for (var y = 0; y < _graph.Height; y++)
+            {
+                for (var x = 0; x < _graph.Width; x++)
+                {
+                    if (!_graph.IsStreet(x, y))
+                    {
+                        continue;
+                    }
 
-            PlaceParcelsAlongRoads(grid, parcelsRng, avenueY);
-
-            // Factory mass — east Lower Veil landmark (always).
-            var factoryX0 = MapWidth - 18;
-            var factoryY0 = avenueY - 8;
-            var factoryX1 = MapWidth - 4;
-            var factoryY1 = avenueY + 6;
-            PaintRect(grid, factoryX0, factoryY0, factoryX1, factoryY1, walkable: false, height: 2,
-                flags: GridCellFlags.BlocksLoS | GridCellFlags.Climbable);
-            PlaceBuildingMass(grid, factoryX0, factoryY0, factoryX1, factoryY1);
-            PlaceWallStrip(grid, factoryX0, factoryY0, factoryX0, factoryY1);
+                    var c = new GridCoord(x, y);
+                    grid.SetFlags(c, GridCellFlags.Walkable, walkable: true);
+                    grid.SetHeight(c, _graph.HeightOf(c));
+                }
+            }
 
             BuildRoadFloorStrips(grid);
-
-            var anchors = PlaceMandatoryAnchors(grid, anchorsRng, avenueY, plazaX, factoryX0, factoryY0);
-            PlaceDressing(grid, dressingRng, avenueY, anchors);
+            var anchors = PlaceMandatoryAnchors(grid, anchorsRng);
+            EnsureAllAnchorsPathToMarket(grid, anchors);
+            PlaceDressing(grid, dressingRng, anchors);
             PlaceEnvActions(grid, anchors);
-
             SpawnPlayerAndCamera(grid, anchors.Spawn);
             BuildLighting(anchors);
             BuildSystems();
 
             Debug.Log(
-                $"[City] Generated seed={SeedValue}. Avenue Y={avenueY}, plaza X={plazaX}. " +
-                "Slice anchors in Lower Veil. Press Play.");
+                $"[City] Organic town seed={SeedValue}. Center=({_graph.Center.x},{_graph.Center.y}) " +
+                $"radius={_graph.TownRadius}. Market hub + slice anchors ready.");
         }
 
         private struct AnchorSet
@@ -132,42 +121,50 @@ namespace GameDev.World
             public GridCoord Warden;
             public GridCoord Veinmarket;
             public GridCoord Doctor;
+            public GridCoord Market;
         }
 
-        private AnchorSet PlaceMandatoryAnchors(
-            GridMap grid,
-            System.Random rng,
-            int avenueY,
-            int plazaX,
-            int factoryX0,
-            int factoryY0)
+        private AnchorSet PlaceMandatoryAnchors(GridMap grid, System.Random rng)
         {
             var set = new AnchorSet();
+            set.Market = _graph.Center;
+            set.Tavern = SnapInDistrict(grid, _graph.Center, CityDistrict.LowerVeil, preferPlaza: true, rng);
+            Reserve(set.Tavern);
 
-            // Ridge Approach spawn — north of avenue on a northbound road.
-            set.Spawn = SnapToRoad(grid, 80 + rng.Next(-8, 9), LowerVeilMaxY + 8 + rng.Next(0, 10), preferAlley: false);
+            set.Spawn = SnapNear(grid, _graph.NorthGate, CityDistrict.Ridge, preferAlley: false, rng);
             Reserve(set.Spawn);
 
-            // Lower Veil slice core along avenue west → east.
-            set.Tavern = SnapToRoad(grid, 36 + rng.Next(-4, 5), avenueY + (rng.Next(0, 2) == 0 ? 2 : -2), false);
-            Reserve(set.Tavern);
-            set.Tincture = SnapToRoad(grid, set.Tavern.x + 14 + rng.Next(0, 6), avenueY + (rng.Next(0, 2) == 0 ? -2 : 2), false);
-            Reserve(set.Tincture);
-            set.Loom = SnapToRoad(grid, plazaX + 8 + rng.Next(0, 8), avenueY - 1, true);
-            Reserve(set.Loom);
-            set.Stairs = SnapToRoad(grid, factoryX0 - 2, factoryY0 + 2 + rng.Next(0, 4), false);
-            Reserve(set.Stairs);
-            set.Factory = SnapToRoad(grid, factoryX0 - 1, avenueY, false);
+            set.Factory = SnapNear(grid,
+                new GridCoord(_graph.FactoryRectMin.x - 1, (_graph.FactoryRectMin.y + _graph.FactoryRectMax.y) / 2),
+                CityDistrict.LowerVeil, preferAlley: false, rng);
             Reserve(set.Factory);
 
-            // Ridge / Lower edge garrison.
-            set.Warden = SnapToRoad(grid, plazaX - 10 + rng.Next(-3, 4), LowerVeilMaxY - 2, false);
+            set.Stairs = SnapNear(grid,
+                new GridCoord(_graph.FactoryRectMin.x - 2, _graph.FactoryRectMin.y + 2 + rng.Next(0, 4)),
+                CityDistrict.LowerVeil, preferAlley: false, rng);
+            Reserve(set.Stairs);
+
+            // Harrow ~25-45 cells along east major from plaza.
+            set.Tincture = SnapAlongMajorToward(grid, _graph.EastFactory, 28 + rng.Next(0, 16),
+                CityDistrict.LowerVeil, rng);
+            Reserve(set.Tincture);
+
+            set.Loom = SnapInDistrict(grid,
+                LerpCoord(set.Tincture, set.Factory, 0.45f + (float)rng.NextDouble() * 0.2f),
+                CityDistrict.LowerVeil, preferPlaza: false, rng, preferAlley: true);
+            Reserve(set.Loom);
+
+            set.Warden = SnapInDistrict(grid,
+                LerpCoord(set.Spawn, set.Tavern, 0.55f),
+                CityDistrict.Ridge, preferPlaza: false, rng);
             Reserve(set.Warden);
 
-            // Undercroft stubs.
-            set.Veinmarket = SnapToRoad(grid, plazaX + rng.Next(-6, 7), 12 + rng.Next(0, 10), true);
+            set.Veinmarket = SnapInDistrict(grid, _graph.SouthGate, CityDistrict.Undercroft, false, rng, true);
             Reserve(set.Veinmarket);
-            set.Doctor = SnapToRoad(grid, 40 + rng.Next(0, 20), 8 + rng.Next(0, 8), true);
+
+            set.Doctor = SnapInDistrict(grid,
+                new GridCoord(_graph.SouthGate.x + rng.Next(-12, 13), _graph.SouthGate.y + rng.Next(-4, 8)),
+                CityDistrict.Undercroft, false, rng, true);
             Reserve(set.Doctor);
 
             var ridge = CreateLandmark(grid, LandmarkId.RidgeApproach, "Ridge Approach", set.Spawn);
@@ -176,13 +173,8 @@ namespace GameDev.World
             var tavern = CreateLandmark(grid, LandmarkId.SootAndBell, "Soot & Bell Tavern", set.Tavern);
             AddWorldLabel(tavern, "Soot & Bell");
 
-            var boardCoord = NeighborRoad(grid, set.Tavern, 1, 0) ?? NeighborRoad(grid, set.Tavern, -1, 0) ?? set.Tavern;
-            if (boardCoord.Equals(set.Tavern))
-            {
-                boardCoord = new GridCoord(set.Tavern.x + 1, set.Tavern.y);
-                EnsureWalkableRoad(grid, boardCoord);
-            }
-
+            var boardCoord = NeighborStreet(set.Tavern, 1, 0) ?? NeighborStreet(set.Tavern, -1, 0) ??
+                             EnsureStreet(grid, new GridCoord(set.Tavern.x + 1, set.Tavern.y));
             Reserve(boardCoord);
             var board = SpawnPrefab(noticeBoardPrefab, grid, boardCoord, "Notice Board");
             EnsureLandmark(board, LandmarkId.NoticeBoard, "Notice Board");
@@ -194,9 +186,8 @@ namespace GameDev.World
                 summary: "Board marks Harrow seizure and hints trouble on Loom Lane.");
             AddWorldLabel(board, "Notice Board");
 
-            var merrinCoord = NeighborRoad(grid, set.Tavern, 0, -1) ?? NeighborRoad(grid, set.Tavern, 0, 1) ??
-                              new GridCoord(set.Tavern.x, set.Tavern.y - 1);
-            EnsureWalkableRoad(grid, merrinCoord);
+            var merrinCoord = NeighborStreet(set.Tavern, 0, -1) ?? NeighborStreet(set.Tavern, 0, 1) ??
+                              EnsureStreet(grid, new GridCoord(set.Tavern.x, set.Tavern.y - 1));
             Reserve(merrinCoord);
             var tavernTalk = CreateLandmark(grid, LandmarkId.SootAndBell, "Bartender Merrin", merrinCoord);
             tavernTalk.name = "Bartender_Merrin";
@@ -211,8 +202,9 @@ namespace GameDev.World
             var tinctureRow = CreateLandmark(grid, LandmarkId.TinctureRow, "Tincture Row", set.Tincture);
             AddWorldLabel(tinctureRow, "Tincture Row");
 
-            var harrowCoord = NeighborRoad(grid, set.Tincture, 0, -1) ?? set.Tincture;
-            EnsureWalkableRoad(grid, harrowCoord);
+            var harrowCoord = NeighborStreet(set.Tincture, 0, -1) ?? NeighborStreet(set.Tincture, 1, 0) ??
+                              set.Tincture;
+            EnsureStreet(grid, harrowCoord);
             Reserve(harrowCoord);
             var harrow = CreatePoi(grid, PoiShellId.PoiA_HarrowArrest, "Harrow & Tincture", harrowCoord,
                 "Brass-Number Arrest shell. Get a tip first, then participate before the Active Window ends.",
@@ -224,8 +216,8 @@ namespace GameDev.World
             var loom = CreateLandmark(grid, LandmarkId.LoomLane, "Loom Lane", set.Loom);
             AddWorldLabel(loom, "Loom Lane");
 
-            var alleyCoord = NeighborRoad(grid, set.Loom, 1, 0) ?? NeighborRoad(grid, set.Loom, -1, 0) ?? set.Loom;
-            EnsureWalkableRoad(grid, alleyCoord);
+            var alleyCoord = NeighborStreet(set.Loom, 1, 0) ?? NeighborStreet(set.Loom, -1, 0) ?? set.Loom;
+            EnsureStreet(grid, alleyCoord);
             Reserve(alleyCoord);
             var alley = CreatePoi(grid, PoiShellId.PoiB_EleventhBellCollectors, "Alley Mouth", alleyCoord,
                 "Eleventh-Bell Collectors shell. Tips make it Hinted/Marked; Brief window is short.",
@@ -248,8 +240,8 @@ namespace GameDev.World
             EnsureInteract(warden, "Watch the post",
                 "Brass-numbers drill at the edge of Lower Veil. A garrison stub — full Warden AI later.");
             AddWorldLabel(warden, "Warden Post");
-            var guardCoord = NeighborRoad(grid, set.Warden, 1, 0) ?? set.Warden;
-            EnsureWalkableRoad(grid, guardCoord);
+            var guardCoord = NeighborStreet(set.Warden, 1, 0) ?? set.Warden;
+            EnsureStreet(grid, guardCoord);
             Reserve(guardCoord);
             var guard = CreateLandmark(grid, LandmarkId.WardenPost, "Warden Guard Stub", guardCoord);
             guard.name = "NPC_WardenGuard";
@@ -261,8 +253,8 @@ namespace GameDev.World
             EnsureInteract(vein, "Study the door",
                 "A dark underworld door stub. Veinmarket fixers keep hours the Wardens pretend not to know.");
             AddWorldLabel(vein, "Veinmarket");
-            var fixerCoord = NeighborRoad(grid, set.Veinmarket, 0, 1) ?? set.Veinmarket;
-            EnsureWalkableRoad(grid, fixerCoord);
+            var fixerCoord = NeighborStreet(set.Veinmarket, 0, 1) ?? set.Veinmarket;
+            EnsureStreet(grid, fixerCoord);
             Reserve(fixerCoord);
             var fixer = CreateLandmark(grid, LandmarkId.VeinmarketAlley, "Fixer Stub", fixerCoord);
             fixer.name = "NPC_VeinmarketFixer";
@@ -282,10 +274,56 @@ namespace GameDev.World
             return set;
         }
 
-        private void PlaceDressing(GridMap grid, System.Random rng, int avenueY, AnchorSet anchors)
+        private void EnsureAllAnchorsPathToMarket(GridMap grid, AnchorSet anchors)
         {
-            var ruskCoord = NeighborRoad(grid, anchors.Tincture, 2, 0) ??
-                            SnapToRoad(grid, anchors.Tincture.x + 2, anchors.Tincture.y, false);
+            var targets = new[]
+            {
+                anchors.Spawn, anchors.Tavern, anchors.Tincture, anchors.Loom, anchors.Stairs,
+                anchors.Factory, anchors.Warden, anchors.Veinmarket, anchors.Doctor
+            };
+
+            foreach (var t in targets)
+            {
+                if (GridPathfinder.TryFindPath(grid, t, anchors.Market, _pathScratch))
+                {
+                    continue;
+                }
+
+                OrganicRoadBuilder.EnsureConnected(_graph, t, anchors.Market);
+                // Paint corrective alley onto grid.
+                PaintGraphStreets(grid);
+                if (!GridPathfinder.TryFindPath(grid, t, anchors.Market, _pathScratch))
+                {
+                    // Force a second thicker connect.
+                    OrganicRoadBuilder.EnsureConnected(_graph, t, anchors.Tavern);
+                    PaintGraphStreets(grid);
+                }
+            }
+        }
+
+        private void PaintGraphStreets(GridMap grid)
+        {
+            for (var y = 0; y < _graph.Height; y++)
+            {
+                for (var x = 0; x < _graph.Width; x++)
+                {
+                    if (!_graph.IsStreet(x, y))
+                    {
+                        continue;
+                    }
+
+                    var c = new GridCoord(x, y);
+                    grid.SetFlags(c, GridCellFlags.Walkable, walkable: true);
+                    grid.SetHeight(c, _graph.HeightOf(c));
+                }
+            }
+        }
+
+        private void PlaceDressing(GridMap grid, System.Random rng, AnchorSet anchors)
+        {
+            var ruskCoord = NeighborStreet(anchors.Tincture, 2, 0) ??
+                            SnapNear(grid, new GridCoord(anchors.Tincture.x + 2, anchors.Tincture.y),
+                                CityDistrict.LowerVeil, false, rng);
             Reserve(ruskCoord);
             var coalHauler = CreateLandmark(grid, LandmarkId.TinctureRow, "Coal Hauler Rusk", ruskCoord);
             coalHauler.name = "NPC_CoalHauler_Rusk";
@@ -297,8 +335,8 @@ namespace GameDev.World
                 summary: "Rusk hints both the seizure street and Loom Lane.");
             AddWorldLabel(coalHauler, "Rusk (street)");
 
-            var niaCoord = NeighborRoad(grid, anchors.Loom, 0, -1) ?? anchors.Loom;
-            EnsureWalkableRoad(grid, niaCoord);
+            var niaCoord = NeighborStreet(anchors.Loom, 0, -1) ?? anchors.Loom;
+            EnsureStreet(grid, niaCoord);
             Reserve(niaCoord);
             var millGirl = CreateLandmark(grid, LandmarkId.LoomLane, "Mill Girl Nia", niaCoord);
             millGirl.name = "NPC_MillGirl_Nia";
@@ -310,50 +348,66 @@ namespace GameDev.World
                 summary: "Nia marks the eleventh-bell collectors on Loom Lane.");
             AddWorldLabel(millGirl, "Nia (street)");
 
-            CreateWaymarker(grid, MidpointRoad(grid, anchors.Spawn, anchors.Tavern), "Read waymarker",
-                "South to Soot & Bell / Notice Board.");
-            CreateWaymarker(grid, MidpointRoad(grid, anchors.Tavern, anchors.Tincture), "Read waymarker",
-                "Along the avenue — Harrow & Tincture ahead.");
-            CreateWaymarker(grid, MidpointRoad(grid, anchors.Tincture, anchors.Loom), "Read waymarker",
-                "East toward Loom Lane alleys and the factory stairs.");
-            CreateWaymarker(grid, MidpointRoad(grid, anchors.Loom, anchors.Stairs), "Read waymarker",
-                "Coal Stairs / POI C under the factory wall.");
+            PlaceWaymarker(grid, MidpointStreet(anchors.Spawn, anchors.Tavern),
+                "South toward the market — Soot & Bell.");
+            PlaceWaymarker(grid, MidpointStreet(anchors.Tavern, anchors.Tincture),
+                "Tincture Row — Harrow & Tincture ahead.");
+            PlaceWaymarker(grid, MidpointStreet(anchors.Tincture, anchors.Loom),
+                "Crooked lanes toward Loom and the factory.");
+            PlaceWaymarker(grid, MidpointStreet(anchors.Loom, anchors.Stairs),
+                "Coal Stairs under the factory wall.");
 
-            // Sparse street stubs on avenue.
-            for (var i = 0; i < 4; i++)
+            // Wells / stubs at a few junctions.
+            var wellCount = Mathf.Min(5, _graph.Junctions.Count);
+            for (var i = 0; i < wellCount; i++)
             {
-                var x = 20 + rng.Next(0, MapWidth - 40);
-                var c = SnapToRoad(grid, x, avenueY, false);
-                if (_reserved.Contains(Key(c)))
+                var j = _graph.Junctions[rng.Next(0, _graph.Junctions.Count)];
+                if (_reserved.Contains(Key(j)))
                 {
                     continue;
                 }
 
-                Reserve(c);
-                var stub = CreateLandmark(grid, LandmarkId.TinctureRow, $"Street Stub {i + 1}", c);
-                stub.name = $"NPC_StreetStub_{i + 1}";
-                EnsureInteract(stub, "Nod past", "A Lower Veil face — busy, soot-streaked, not your story yet.");
+                Reserve(j);
+                var well = CreateLandmark(grid, LandmarkId.TinctureRow, "Well", j);
+                well.name = $"Well_{i}";
+                EnsureInteract(well, "Drink from well", "Brackish but cold. A small plaza around the well.");
+                AddWorldLabel(well, "Well");
             }
+        }
+
+        private void PlaceWaymarker(GridMap grid, GridCoord coord, string message)
+        {
+            if (_reserved.Contains(Key(coord)))
+            {
+                coord = SnapNear(grid, coord, _graph.DistrictOf(coord), false,
+                    new System.Random(SeedValue ^ Key(coord).GetHashCode()));
+            }
+
+            Reserve(coord);
+            var go = SpawnPrefab(landmarkBlockPrefab, grid, coord, "Waymarker");
+            go.transform.localScale = Vector3.Scale(go.transform.localScale, new Vector3(0.55f, 0.45f, 0.55f));
+            EnsureInteract(go, "Read waymarker", message);
+            AddWorldLabel(go, "→");
         }
 
         private void PlaceEnvActions(GridMap grid, AnchorSet anchors)
         {
-            var crates = NeighborRoad(grid, anchors.Tincture, 3, 0) ?? anchors.Tincture;
+            var crates = NeighborStreet(anchors.Tincture, 3, 0) ?? anchors.Tincture;
             CreateEnvAction(grid, crates, "Vault Crates",
                 EnvironmentActionType.VaultJump, 0.75f,
                 "Vaulted the crates on Tincture Row.",
                 "Slipped on wet cobble — noise, wasted effort.",
                 GridCellFlags.Walkable | GridCellFlags.Vaultable);
 
-            var window = NeighborRoad(grid, anchors.Tincture, -2, -1) ?? anchors.Tincture;
+            var window = NeighborStreet(anchors.Tincture, -2, -1) ?? anchors.Tincture;
             CreateEnvAction(grid, window, "Side Window",
                 EnvironmentActionType.ClimbThroughWindow, 0.65f,
                 "Climbed through Harrow's side window.",
                 "Boot scraped the frame — spotted / noisy.",
                 GridCellFlags.Walkable | GridCellFlags.Window);
 
-            var ledge = NeighborRoad(grid, anchors.Stairs, -1, 0) ??
-                        NeighborRoad(grid, anchors.Stairs, 0, 1) ??
+            var ledge = NeighborStreet(anchors.Stairs, -1, 0) ??
+                        NeighborStreet(anchors.Stairs, 0, 1) ??
                         new GridCoord(anchors.Stairs.x - 1, anchors.Stairs.y);
             CreateEnvAction(grid, ledge, "Coal Ledge",
                 EnvironmentActionType.ClimbUp, 0.7f,
@@ -361,6 +415,148 @@ namespace GameDev.World
                 "Lost grip on sooty brick — drop, Hurt stub.",
                 GridCellFlags.Walkable | GridCellFlags.Climbable | GridCellFlags.Stairs);
         }
+
+        private GridCoord SnapInDistrict(
+            GridMap grid,
+            GridCoord hint,
+            CityDistrict district,
+            bool preferPlaza,
+            System.Random rng,
+            bool preferAlley = false)
+        {
+            var best = hint;
+            var bestScore = int.MinValue;
+            for (var attempt = 0; attempt < 80; attempt++)
+            {
+                var x = Mathf.Clamp(hint.x + rng.Next(-14, 15), 2, _graph.Width - 3);
+                var y = Mathf.Clamp(hint.y + rng.Next(-14, 15), 2, _graph.Height - 3);
+                if (!_graph.IsStreet(x, y))
+                {
+                    continue;
+                }
+
+                var c = new GridCoord(x, y);
+                if (_graph.DistrictOf(c) != district && attempt < 50)
+                {
+                    continue;
+                }
+
+                if (_reserved.Contains(Key(c)))
+                {
+                    continue;
+                }
+
+                var score = 100 - Mathf.Abs(x - hint.x) - Mathf.Abs(y - hint.y);
+                if (preferPlaza && _graph.Plaza[x, y])
+                {
+                    score += 40;
+                }
+
+                if (preferAlley && _graph.Alley[x, y])
+                {
+                    score += 20;
+                }
+
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    best = c;
+                }
+            }
+
+            EnsureStreet(grid, best);
+            return best;
+        }
+
+        private GridCoord SnapNear(GridMap grid, GridCoord hint, CityDistrict district, bool preferAlley,
+            System.Random rng)
+        {
+            return SnapInDistrict(grid, hint, district, false, rng, preferAlley);
+        }
+
+        private GridCoord SnapAlongMajorToward(
+            GridMap grid,
+            GridCoord toward,
+            int targetDist,
+            CityDistrict district,
+            System.Random rng)
+        {
+            GridCoord best = _graph.Center;
+            var bestDelta = int.MaxValue;
+            foreach (var p in _graph.MajorSamples)
+            {
+                if (_graph.DistrictOf(p) != district)
+                {
+                    continue;
+                }
+
+                var d = Mathf.Abs(p.x - _graph.Center.x) + Mathf.Abs(p.y - _graph.Center.y);
+                var towardBias = Mathf.Abs(p.x - toward.x) + Mathf.Abs(p.y - toward.y);
+                var delta = Mathf.Abs(d - targetDist) + towardBias / 4;
+                if (delta < bestDelta && !_reserved.Contains(Key(p)))
+                {
+                    bestDelta = delta;
+                    best = p;
+                }
+            }
+
+            // Jitter off the major into a side cell.
+            if (rng.Next(0, 2) == 0)
+            {
+                var side = new GridCoord(best.x + rng.Next(-1, 2), best.y + rng.Next(-1, 2));
+                if (_graph.IsStreet(side))
+                {
+                    best = side;
+                }
+            }
+
+            EnsureStreet(grid, best);
+            return best;
+        }
+
+        private GridCoord MidpointStreet(GridCoord a, GridCoord b)
+        {
+            // Graph-only snap; caller already has streets painted.
+            return SnapInDistrict(null, new GridCoord((a.x + b.x) / 2, (a.y + b.y) / 2), _graph.DistrictOf(a),
+                false, new System.Random(SeedValue + a.x * 17 + b.y * 31), false);
+        }
+
+        private static GridCoord LerpCoord(GridCoord a, GridCoord b, float t)
+        {
+            return new GridCoord(
+                Mathf.RoundToInt(Mathf.Lerp(a.x, b.x, t)),
+                Mathf.RoundToInt(Mathf.Lerp(a.y, b.y, t)));
+        }
+
+        private GridCoord? NeighborStreet(GridCoord origin, int dx, int dy)
+        {
+            var c = new GridCoord(origin.x + dx, origin.y + dy);
+            if (_graph != null && _graph.IsStreet(c))
+            {
+                return c;
+            }
+
+            return null;
+        }
+
+        private GridCoord EnsureStreet(GridMap grid, GridCoord c)
+        {
+            c = new GridCoord(
+                Mathf.Clamp(c.x, 1, TownGrowthParams.MapWidth - 2),
+                Mathf.Clamp(c.y, 1, TownGrowthParams.MapHeight - 2));
+            _graph.MarkStreet(c, TownGrowthParams.AlleyWidth, alley: false);
+            if (grid != null)
+            {
+                grid.SetFlags(c, GridCellFlags.Walkable, walkable: true);
+                grid.SetHeight(c, _graph.HeightOf(c));
+            }
+
+            return c;
+        }
+
+        private void Reserve(GridCoord c) => _reserved.Add(Key(c));
+
+        private static long Key(GridCoord c) => ((long)c.y << 32) ^ (uint)c.x;
 
         private void SpawnPlayerAndCamera(GridMap grid, GridCoord spawn)
         {
@@ -393,216 +589,29 @@ namespace GameDev.World
             GameInputService.EnsureExists();
         }
 
-        private void CarveAvenue(GridMap grid, int avenueY)
-        {
-            for (var x = 2; x < MapWidth - 2; x++)
-            {
-                for (var dy = -1; dy <= 1; dy++)
-                {
-                    var y = avenueY + dy;
-                    if (y < 0 || y >= MapHeight)
-                    {
-                        continue;
-                    }
-
-                    MarkRoad(grid, x, y, alley: false);
-                }
-            }
-        }
-
-        private void CarveCrossStreets(GridMap grid, System.Random rng, int avenueY, int plazaX)
-        {
-            var xs = new List<int> { plazaX };
-            var x = 18 + rng.Next(0, 8);
-            while (x < MapWidth - 12)
-            {
-                if (Mathf.Abs(x - plazaX) > 10)
-                {
-                    xs.Add(x);
-                }
-
-                x += 18 + rng.Next(0, 11);
-            }
-
-            // Ridge approach corridor from spawn band down to avenue.
-            xs.Add(80);
-
-            foreach (var cx in xs)
-            {
-                var y0 = DistrictOfY(avenueY) == CityDistrict.LowerVeil ? UndercroftMaxY - 8 : 4;
-                y0 = Mathf.Max(2, y0);
-                var y1 = MapHeight - 4;
-                for (var y = y0; y <= y1; y++)
-                {
-                    MarkRoad(grid, cx, y, alley: false);
-                    if (cx == plazaX || Mathf.Abs(cx - 80) < 2)
-                    {
-                        // Slightly wider north approach / plaza cross.
-                        if (cx + 1 < MapWidth)
-                        {
-                            MarkRoad(grid, cx + 1, y, alley: false);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void CarveAlleys(GridMap grid, System.Random rng, int avenueY)
-        {
-            // Foot alleys: 1-cell branches off the avenue into both districts.
-            var count = 14 + rng.Next(0, 8);
-            for (var i = 0; i < count; i++)
-            {
-                var startX = 10 + rng.Next(0, MapWidth - 20);
-                var south = rng.Next(0, 2) == 0;
-                var length = 6 + rng.Next(0, 14);
-                var x = startX;
-                var y = avenueY + (south ? -2 : 2);
-                for (var step = 0; step < length; step++)
-                {
-                    if (x < 2 || x >= MapWidth - 2 || y < 2 || y >= MapHeight - 2)
-                    {
-                        break;
-                    }
-
-                    MarkRoad(grid, x, y, alley: true);
-                    if (rng.Next(0, 4) == 0)
-                    {
-                        x += rng.Next(0, 2) == 0 ? -1 : 1;
-                    }
-                    else
-                    {
-                        y += south ? -1 : 1;
-                    }
-                }
-            }
-
-            // Dense Undercroft alley mesh stubs.
-            for (var i = 0; i < 10; i++)
-            {
-                var x0 = 20 + rng.Next(0, MapWidth - 40);
-                var y0 = 4 + rng.Next(0, UndercroftMaxY - 8);
-                var len = 8 + rng.Next(0, 12);
-                for (var s = 0; s < len; s++)
-                {
-                    var x = x0 + (rng.Next(0, 3) - 1);
-                    var y = y0 + s;
-                    if (x > 1 && x < MapWidth - 2 && y > 1 && y < UndercroftMaxY)
-                    {
-                        MarkRoad(grid, x, y, alley: true);
-                    }
-                }
-            }
-        }
-
-        private void CarvePlaza(GridMap grid, int plazaX, int avenueY)
-        {
-            for (var y = avenueY - 3; y <= avenueY + 3; y++)
-            {
-                for (var x = plazaX - 4; x <= plazaX + 4; x++)
-                {
-                    if (grid.InBounds(new GridCoord(x, y)))
-                    {
-                        MarkRoad(grid, x, y, alley: false);
-                    }
-                }
-            }
-        }
-
-        private void ApplyDistrictHeights(GridMap grid)
-        {
-            for (var y = 0; y < MapHeight; y++)
-            {
-                var h = DistrictOfY(y) == CityDistrict.Ridge ? 1 : 0;
-                for (var x = 0; x < MapWidth; x++)
-                {
-                    if (_road[x, y] || _alley[x, y])
-                    {
-                        grid.SetHeight(new GridCoord(x, y), h);
-                    }
-                }
-            }
-        }
-
-        private void PlaceParcelsAlongRoads(GridMap grid, System.Random rng, int avenueY)
-        {
-            // Buildings along both sides of avenue (skip road cells).
-            for (var x = 4; x < MapWidth - 4; x += 1)
-            {
-                TryParcel(grid, rng, x, avenueY + 3);
-                TryParcel(grid, rng, x, avenueY - 3);
-            }
-
-            // Ridge plaza fountain stub.
-            var fx = 70 + rng.Next(0, 20);
-            var fy = LowerVeilMaxY + 6;
-            if (!_road[fx, fy] && !_alley[fx, fy])
-            {
-                PaintRect(grid, fx, fy, fx + 2, fy + 2, walkable: false, height: 1, flags: GridCellFlags.BlocksLoS);
-                PlaceBuildingMass(grid, fx, fy, fx + 2, fy + 2);
-                var fountain = CreateLandmark(grid, LandmarkId.RidgeApproach, "Ridge Fountain Stub",
-                    SnapToRoad(grid, fx, fy - 2, false));
-                AddWorldLabel(fountain, "Fountain");
-            }
-        }
-
-        private void TryParcel(GridMap grid, System.Random rng, int x, int y)
-        {
-            if (!grid.InBounds(new GridCoord(x, y)))
-            {
-                return;
-            }
-
-            if (_road[x, y] || _alley[x, y])
-            {
-                return;
-            }
-
-            if (rng.Next(0, 100) < 35)
-            {
-                return;
-            }
-
-            var use2 = building2x2Prefab != null && rng.Next(0, 100) < 40 &&
-                       grid.InBounds(new GridCoord(x + 1, y + 1)) &&
-                       !_road[x + 1, y] && !_road[x, y + 1] && !_road[x + 1, y + 1];
-            if (use2)
-            {
-                PaintRect(grid, x, y, x + 1, y + 1, walkable: false, height: 1, flags: GridCellFlags.BlocksLoS);
-                PlaceBuildingMass(grid, x, y, x + 1, y + 1);
-            }
-            else if (building1x1Prefab != null)
-            {
-                PaintRect(grid, x, y, x, y, walkable: false, height: 1, flags: GridCellFlags.BlocksLoS);
-                PlaceBuildingMass(grid, x, y, x, y);
-            }
-        }
-
         private void BuildRoadFloorStrips(GridMap grid)
         {
             var floorRoot = new GameObject("FloorStrips");
             floorRoot.transform.SetParent(transform, false);
 
-            // Horizontal merged strips per row of contiguous road cells.
-            for (var y = 0; y < MapHeight; y++)
+            for (var y = 0; y < _graph.Height; y++)
             {
                 var x = 0;
-                while (x < MapWidth)
+                while (x < _graph.Width)
                 {
-                    if (!_road[x, y] && !_alley[x, y])
+                    if (!_graph.IsStreet(x, y))
                     {
                         x++;
                         continue;
                     }
 
                     var start = x;
-                    while (x < MapWidth && (_road[x, y] || _alley[x, y]))
+                    while (x < _graph.Width && _graph.IsStreet(x, y))
                     {
                         x++;
                     }
 
-                    var end = x - 1;
-                    SpawnFloorStrip(floorRoot.transform, grid, start, y, end, y);
+                    SpawnFloorStrip(floorRoot.transform, grid, start, y, x - 1, y);
                 }
             }
         }
@@ -638,128 +647,6 @@ namespace GameDev.World
             DisableBlockingColliders(strip);
         }
 
-        private void MarkRoad(GridMap grid, int x, int y, bool alley)
-        {
-            if (!grid.InBounds(new GridCoord(x, y)))
-            {
-                return;
-            }
-
-            if (alley)
-            {
-                _alley[x, y] = true;
-            }
-            else
-            {
-                _road[x, y] = true;
-            }
-
-            var height = DistrictOfY(y) == CityDistrict.Ridge ? 1 : 0;
-            grid.SetFlags(new GridCoord(x, y), GridCellFlags.Walkable, walkable: true);
-            grid.SetHeight(new GridCoord(x, y), height);
-        }
-
-        private void EnsureWalkableRoad(GridMap grid, GridCoord c)
-        {
-            MarkRoad(grid, c.x, c.y, alley: false);
-        }
-
-        private GridCoord SnapToRoad(GridMap grid, int x, int y, bool preferAlley)
-        {
-            x = Mathf.Clamp(x, 2, MapWidth - 3);
-            y = Mathf.Clamp(y, 2, MapHeight - 3);
-            var best = new GridCoord(x, y);
-            var bestDist = int.MaxValue;
-
-            for (var r = 0; r < 40; r++)
-            {
-                for (var dy = -r; dy <= r; dy++)
-                {
-                    for (var dx = -r; dx <= r; dx++)
-                    {
-                        if (Mathf.Abs(dx) != r && Mathf.Abs(dy) != r)
-                        {
-                            continue;
-                        }
-
-                        var cx = x + dx;
-                        var cy = y + dy;
-                        if (!grid.InBounds(new GridCoord(cx, cy)))
-                        {
-                            continue;
-                        }
-
-                        var isRoad = _road[cx, cy];
-                        var isAlley = _alley[cx, cy];
-                        if (!isRoad && !isAlley)
-                        {
-                            continue;
-                        }
-
-                        if (preferAlley && !isAlley && r < 8)
-                        {
-                            continue;
-                        }
-
-                        var d = Mathf.Abs(dx) + Mathf.Abs(dy);
-                        if (d < bestDist)
-                        {
-                            bestDist = d;
-                            best = new GridCoord(cx, cy);
-                        }
-                    }
-                }
-
-                if (bestDist < int.MaxValue)
-                {
-                    return best;
-                }
-            }
-
-            EnsureWalkableRoad(grid, best);
-            return best;
-        }
-
-        private GridCoord? NeighborRoad(GridMap grid, GridCoord origin, int dx, int dy)
-        {
-            var c = new GridCoord(origin.x + dx, origin.y + dy);
-            if (!grid.InBounds(c))
-            {
-                return null;
-            }
-
-            if (_road[c.x, c.y] || _alley[c.x, c.y] || grid.IsWalkable(c))
-            {
-                return c;
-            }
-
-            return null;
-        }
-
-        private GridCoord MidpointRoad(GridMap grid, GridCoord a, GridCoord b)
-        {
-            return SnapToRoad(grid, (a.x + b.x) / 2, (a.y + b.y) / 2, false);
-        }
-
-        private void Reserve(GridCoord c) => _reserved.Add(Key(c));
-
-        private static long Key(GridCoord c) => ((long)c.y << 32) ^ (uint)c.x;
-
-        public static CityDistrict DistrictOfY(int y)
-        {
-            if (y <= UndercroftMaxY)
-            {
-                return CityDistrict.Undercroft;
-            }
-
-            if (y <= LowerVeilMaxY)
-            {
-                return CityDistrict.LowerVeil;
-            }
-
-            return CityDistrict.Ridge;
-        }
-
         private void BuildLighting(AnchorSet anchors)
         {
             var lightingGo = new GameObject("S0_Lighting");
@@ -775,8 +662,7 @@ namespace GameDev.World
 
             var rimFactory = new GameObject("Rim_Factory");
             rimFactory.transform.SetParent(lightingGo.transform, false);
-            var factoryPos = CoordWorld(anchors.Factory);
-            rimFactory.transform.position = factoryPos + new Vector3(3f, 3.5f, 0f);
+            rimFactory.transform.position = CoordWorld(anchors.Factory) + new Vector3(3f, 3.5f, 0f);
             rimFactory.transform.rotation = Quaternion.Euler(20f, -90f, 0f);
             var lRim = rimFactory.AddComponent<Light>();
             lRim.type = LightType.Spot;
@@ -795,19 +681,17 @@ namespace GameDev.World
 
             var gasLamps = new GameObject("Night_GasLamps");
             gasLamps.transform.SetParent(lightingGo.transform, false);
+            CreateGasLamp(gasLamps, "GasLamp_Market", CoordWorld(anchors.Market) + Vector3.up * 2.5f);
             CreateGasLamp(gasLamps, "GasLamp_Tavern", CoordWorld(anchors.Tavern) + new Vector3(1f, 2.5f, 1f));
             CreateGasLamp(gasLamps, "GasLamp_Tincture", CoordWorld(anchors.Tincture) + Vector3.up * 2.5f);
             CreateGasLamp(gasLamps, "GasLamp_Loom", CoordWorld(anchors.Loom) + Vector3.up * 2.5f);
             CreateGasLamp(gasLamps, "GasLamp_Stairs", CoordWorld(anchors.Stairs) + Vector3.up * 2.5f);
-            CreateGasLamp(gasLamps, "GasLamp_Plaza", CoordWorld(new GridCoord(80, 55)) + Vector3.up * 2.5f);
 
             controller.Bind(sunDay, sunNight, fillSkyDay, rimFactory, warmTavern, coolLoom, gasLamps);
         }
 
-        private Vector3 CoordWorld(GridCoord c)
-        {
-            return new Vector3((c.x + 0.5f) * cellSize, 0f, (c.y + 0.5f) * cellSize);
-        }
+        private Vector3 CoordWorld(GridCoord c) =>
+            new Vector3((c.x + 0.5f) * cellSize, 0f, (c.y + 0.5f) * cellSize);
 
         private static GameObject MakeDirLight(GameObject parent, string name, Vector3 euler, Color color,
             float intensity, bool shadows)
@@ -849,20 +733,6 @@ namespace GameDev.World
             l.intensity = 1.8f;
             l.range = 7.5f;
             l.shadows = LightShadows.Soft;
-        }
-
-        private void CreateWaymarker(GridMap grid, GridCoord coord, string prompt, string message)
-        {
-            if (_reserved.Contains(Key(coord)))
-            {
-                coord = SnapToRoad(grid, coord.x + 1, coord.y, false);
-            }
-
-            Reserve(coord);
-            var go = SpawnPrefab(landmarkBlockPrefab, grid, coord, "Waymarker");
-            go.transform.localScale = Vector3.Scale(go.transform.localScale, new Vector3(0.55f, 0.45f, 0.55f));
-            EnsureInteract(go, prompt, message);
-            AddWorldLabel(go, "→");
         }
 
         private void AddWorldLabel(GameObject host, string text)
@@ -913,98 +783,6 @@ namespace GameDev.World
         }
 #endif
 
-        private static void PaintAll(GridMap grid, bool walkable, int height, GridCellFlags flags)
-        {
-            for (var y = 0; y < grid.Height; y++)
-            {
-                for (var x = 0; x < grid.Width; x++)
-                {
-                    var c = new GridCoord(x, y);
-                    grid.SetFlags(c, flags, walkable);
-                    grid.SetHeight(c, height);
-                }
-            }
-        }
-
-        private static void PaintRect(GridMap grid, int x0, int y0, int x1, int y1, bool walkable, int height,
-            GridCellFlags flags)
-        {
-            for (var y = y0; y <= y1; y++)
-            {
-                for (var x = x0; x <= x1; x++)
-                {
-                    var c = new GridCoord(x, y);
-                    if (!grid.InBounds(c))
-                    {
-                        continue;
-                    }
-
-                    grid.SetFlags(c, flags, walkable);
-                    grid.SetHeight(c, height);
-                }
-            }
-        }
-
-        private void PlaceBuildingMass(GridMap grid, int x0, int y0, int x1, int y1)
-        {
-            var root = new GameObject($"Buildings_{x0}_{y0}");
-            root.transform.SetParent(transform, false);
-
-            var y = y0;
-            while (y <= y1)
-            {
-                var rowUses2x2 = building2x2Prefab != null && y + 1 <= y1;
-                var x = x0;
-                while (x <= x1)
-                {
-                    if (rowUses2x2 && x + 1 <= x1)
-                    {
-                        var go = SpawnPrefab(building2x2Prefab, root.transform, grid, new GridCoord(x, y),
-                            $"Building2x2_{x}_{y}");
-                        var a = grid.CoordToWorldCenter(new GridCoord(x, y));
-                        var b = grid.CoordToWorldCenter(new GridCoord(x + 1, y + 1));
-                        var pos = (a + b) * 0.5f;
-                        pos.y = 0f;
-                        go.transform.position = pos;
-                        x += 2;
-                    }
-                    else if (building1x1Prefab != null)
-                    {
-                        var go = SpawnPrefab(building1x1Prefab, root.transform, grid, new GridCoord(x, y),
-                            $"Building1x1_{x}_{y}");
-                        var pos = grid.CoordToWorldCenter(new GridCoord(x, y));
-                        pos.y = 0f;
-                        go.transform.position = pos;
-                        x += 1;
-                    }
-                    else
-                    {
-                        x += 1;
-                    }
-                }
-
-                y += rowUses2x2 ? 2 : 1;
-            }
-        }
-
-        private void PlaceWallStrip(GridMap grid, int x0, int y0, int x1, int y1)
-        {
-            if (wallSegmentPrefab == null)
-            {
-                return;
-            }
-
-            var root = new GameObject("WallStrip");
-            root.transform.SetParent(transform, false);
-            for (var y = y0; y <= y1; y++)
-            {
-                var go = SpawnPrefab(wallSegmentPrefab, root.transform, grid, new GridCoord(x0, y), $"Wall_{x0}_{y}");
-                var pos = grid.CoordToWorldCenter(new GridCoord(x0, y));
-                pos.y = 0f;
-                go.transform.position = pos;
-            }
-        }
-
         private GameObject CreateLandmark(GridMap grid, LandmarkId id, string label, GridCoord coord)
         {
             var go = SpawnPrefab(landmarkBlockPrefab, grid, coord, label);
@@ -1037,7 +815,7 @@ namespace GameDev.World
             string fail,
             GridCellFlags flags)
         {
-            EnsureWalkableRoad(grid, coord);
+            EnsureStreet(grid, coord);
             var go = SpawnPrefab(envActionStubPrefab, grid, coord, label);
             var marker = go.GetComponent<EnvironmentActionMarker>();
             if (marker == null)
@@ -1051,24 +829,19 @@ namespace GameDev.World
 
         private GameObject SpawnPrefab(GameObject prefab, GridMap grid, GridCoord coord, string label)
         {
-            return SpawnPrefab(prefab, transform, grid, coord, label);
-        }
-
-        private GameObject SpawnPrefab(GameObject prefab, Transform parent, GridMap grid, GridCoord coord, string label)
-        {
             GameObject go;
             if (prefab != null)
             {
 #if UNITY_EDITOR
-                go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
+                go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, transform);
 #else
-                go = Object.Instantiate(prefab, parent);
+                go = Object.Instantiate(prefab, transform);
 #endif
             }
             else
             {
                 go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                go.transform.SetParent(parent, false);
+                go.transform.SetParent(transform, false);
                 Debug.LogWarning($"[City] Missing prefab for '{label}'. Using primitive fallback.");
             }
 
@@ -1137,19 +910,6 @@ namespace GameDev.World
             for (var i = transform.childCount - 1; i >= 0; i--)
             {
                 SafeDestroy(transform.GetChild(i).gameObject);
-            }
-        }
-
-        private static void ClearBoolGrid(bool[,] g)
-        {
-            var w = g.GetLength(0);
-            var h = g.GetLength(1);
-            for (var y = 0; y < h; y++)
-            {
-                for (var x = 0; x < w; x++)
-                {
-                    g[x, y] = false;
-                }
             }
         }
 

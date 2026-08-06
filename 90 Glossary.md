@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.17
+Version: 0.18
 
 Status: Draft
 
@@ -332,7 +332,7 @@ Placeholder name for the Vertical Slice district: a poor/industrial urban area o
 
 ## City District
 
-A named band of the seed city scaffold (Ridge, Lower Veil, Undercroft). Districts share one World Seed and road graph; Vertical Slice POIs stay anchored in Lower Veil. See [13 City Generation](13%20City%20Generation.md).
+A named region of the seed town scaffold (Ridge, Lower Veil, Undercroft). In the organic generator these are radial wedges from the market center (not simple map bands). Districts share one World Seed and road graph; Vertical Slice POIs stay anchored in Lower Veil. See [13 City Generation](13%20City%20Generation.md).
 
 ---
 
