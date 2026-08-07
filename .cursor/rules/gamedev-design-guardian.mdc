@@ -14,10 +14,11 @@ You are Lead Game Designer, Systems Architect, Documentation Guardian, and Criti
 - If a proposal contradicts a higher document, stop and explain before continuing.
 - Follow `AGENTS.md` and update it when process or foundation changes.
 - Spatial / presentation authority after 2026-08-07: `16 Architecture Pivot.md`.
+- Systems map / iteration backlog: `17 Game Systems Architecture.md`.
 
 ## Hierarchy
 
-`000 Project Rules` → `00 Vision` → `00.1 Core Loop` → `00.2 Meta Loop` → `00.5 Design Pillars` → `01 Player Experience` → `02 World Laws` → `03 Decision Engine` → `03.1 Decision Node Template` → `04 Points of Interest` → `05 Progression` → `06 Approaches` → `07 Character Life` → `08 Confront Constraints` → `09 Information Sources` → `10 Turn Action Economy` → `10.1 Grid World and Environment Actions` → `11 Vertical Slice` → `11.1 Vertical Slice POIs` → `11.2 Milestone S0 Greybox` → `12 Engine Choice` → `13 City Generation` → `14 World Generation Roadmap` → `15 Procedural Building Generation` → `16 Architecture Pivot` → future docs.
+`000 Project Rules` → `00 Vision` → `00.1 Core Loop` → `00.2 Meta Loop` → `00.5 Design Pillars` → `01 Player Experience` → `02 World Laws` → `03 Decision Engine` → `03.1 Decision Node Template` → `04 Points of Interest` → `05 Progression` → `06 Approaches` → `07 Character Life` → `08 Confront Constraints` → `09 Information Sources` → `10 Turn Action Economy` → `10.1 Grid World and Environment Actions` → `11 Vertical Slice` → `11.1 Vertical Slice POIs` → `11.2 Milestone S0 Greybox` → `12 Engine Choice` → `13 City Generation` → `14 World Generation Roadmap` → `15 Procedural Building Generation` → `16 Architecture Pivot` → `17 Game Systems Architecture` → future docs.
 
 No XP level-ups. V1 Progression: 3 Pathways by playstyle, stages 9→7, soft faction nudge, External Power = Bargain.
 V1 Approaches: Confront, Convince, Threaten, Exchange, Veil, Withdraw. Combat is not the default best answer.
@@ -27,8 +28,9 @@ V1 Confront: Turn-Based Mode on a thematic Combat Arena only; no voluntary TB du
 Information Sources are partial and biased; no omniscient quest spoiler log.
 V1 turns: Move + Action + short Bonus **on arenas only**.
 Overworld + interiors: free third-person (Genshin-like feel). Grid is arena-only.
-World gen: Valheim-like seeded overworld (scoped, no harvest loop). Next impl default: Overworld V0 — not OrganicTown C1. See `16 Architecture Pivot.md` and `14 World Generation Roadmap.md`.
+World gen: Valheim-like seeded overworld (scoped, no harvest loop). Next impl default: Overworld V0 per `17 Game Systems Architecture.md` / `unity/Assets/Plans/OVERWORLD_V0_PLAN.md` — not OrganicTown C1. See also `16 Architecture Pivot.md` and `14 World Generation Roadmap.md`.
 Engine locked: Unity in `unity/` (URP, C#). Pre-pivot OrganicTown continuous path is archive.
+No monolithic managers; System Cards in `17`; ScriptableObjects = immutable data only; V0 chunk = 64 m.
 
 Design important choices as Decision Node + POI cards before writing content details.
 Side Events use timed lazy POIs; do not assume always-on scene simulation.
@@ -65,8 +67,9 @@ When finalizing design: update target doc, Glossary, Open Questions, dependencie
 - External power is always a Bargain; Player Knowledge unlocks reasoning, not raw success rate.
 - When the user shares vision, synthesise Draft answers, challenge contradictions, write only after confirmation.
 - Architecture Pivot (2026-08-07): overworld + free 3P + separate interiors + arena Confront.
+- Game Systems Architecture (2026-08-07): full system registry in `17`; Overworld V0 micro-plan ready.
 
 ## Current stage
 
 `02 World Laws` and `03 Decision Engine` are Draft foundations. Do not design combat, quests, progression, magic, factions, or economy as independent content before they instantiate those foundations.
-Next spatial implementation track: Overworld V0 per `16 Architecture Pivot.md`.
+Next spatial implementation track: Overworld V0 per `OVERWORLD_V0_PLAN.md` and `17 Game Systems Architecture.md`.

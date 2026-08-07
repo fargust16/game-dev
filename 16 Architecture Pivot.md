@@ -1,6 +1,6 @@
 # 16 Architecture Pivot
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
 
 Referenced By:
-[AGENTS.md](AGENTS.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), future overworld / interior / arena micro-plans
+[AGENTS.md](AGENTS.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), future overworld / interior / arena micro-plans
 
 ---
 
@@ -205,6 +205,7 @@ Agents must **not** treat “full C1 continuous narrative on OrganicTown sockets
 | [13](13%20City%20Generation.md) | Legacy / mood reference |
 | [14](14%20World%20Generation%20Roadmap.md) | Post-pivot overworld roadmap |
 | [15](15%20Procedural%20Building%20Generation.md) | Exterior shells + interior scenes |
+| [17](17%20Game%20Systems%20Architecture.md) | Systems map, interfaces, micro-iteration backlog |
 
 ---
 
@@ -214,7 +215,7 @@ Record only — **do not implement in the documentation pivot pass.**
 
 | # | Ticket | Outcome |
 |---|--------|---------|
-| 1 | **Overworld V0** | Seed → biome bands + walkable terrain + 3–5 POI markers + simple creature spawn points (no harvest) |
+| 1 | **Overworld V0** | Seed → biome bands + walkable terrain + 3–5 POI markers + simple creature spawn points (no harvest). Detail: `unity/Assets/Plans/OVERWORLD_V0_PLAN.md` + Track W in [17](17%20Game%20Systems%20Architecture.md) |
 | 2 | **Locomotion V0** | Third-person controller + follow camera (Genshin-like feel target) |
 | 3 | **Interior V0** | One door → load interior scene → exit back; free move |
 | 4 | **Arena V0** | Confront trigger → theme-tagged arena → TB skeleton → return + residue stub |
@@ -241,4 +242,5 @@ Each ticket should get its own micro-plan before code.
 - [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md)
 - [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
 - [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md)
+- [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
 - [AGENTS.md](AGENTS.md)

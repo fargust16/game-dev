@@ -2,11 +2,12 @@
 
 > **SUPERSEDED AS PRIMARY PATH (2026-08-07).**  
 > Spatial / presentation authority: repo-root [`16 Architecture Pivot.md`](../../../16%20Architecture%20Pivot.md).  
+> Systems map / iterations: [`17 Game Systems Architecture.md`](../../../17%20Game%20Systems%20Architecture.md).  
 > Roadmap: [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md).  
 > OrganicTown continuous enterable + P0 GridMap code in `unity/` is **pre-pivot prototype archive**. Do **not** extend full C1 continuous narrative by default.  
-> **Next default:** Overworld V0 micro-plan.
+> **Next default:** [`OVERWORLD_V0_PLAN.md`](OVERWORLD_V0_PLAN.md) (iterations W0.1–W0.9).
 
-**Read first:** [`16 Architecture Pivot.md`](../../../16%20Architecture%20Pivot.md), then [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md).
+**Read first:** [`16 Architecture Pivot.md`](../../../16%20Architecture%20Pivot.md), then [`17 Game Systems Architecture.md`](../../../17%20Game%20Systems%20Architecture.md), then [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md), then [`OVERWORLD_V0_PLAN.md`](OVERWORLD_V0_PLAN.md).
 
 **Full work report (Milestone B + corridor fix):** [MILESTONE_B_WORK_REPORT.md](MILESTONE_B_WORK_REPORT.md)
 
@@ -22,17 +23,24 @@
 
 ```text
 Architecture Pivot docs ✅
-  → Overworld V0 → Locomotion V0 → Interior V0 → Arena V0 → Theme Packs V0
+  → Game Systems Architecture (17) ✅
+  → Overworld V0 plan ✅ → Overworld V0 code (W0.1–W0.9)
+  → Locomotion V0 → Interior V0 → Arena V0 → Theme Packs V0
     → Vertical Slice content on new rails
 ```
 
 Do not skip ahead to Valheim-scale polish or collapse phases into one uncontrolled sprint, unless the user explicitly overrides.
 
+## Locked V0 engineering defaults (from 17)
+
+- Chunk size: **64 m**
+- Stub extent: **~512 m**
+- Interior / Arena load: **single-scene swap** until a later wave
+
 ## First commands for a new agent
 
 ```bash
-# Docs first
-# open 16 Architecture Pivot.md and 14 World Generation Roadmap.md
+# Docs first — then implement OVERWORLD_V0_PLAN.md starting at W0.1
 # Optional archive check only:
 dotnet run --project tools/TownDebugHost -- 110201
 ```

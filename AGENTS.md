@@ -1,6 +1,6 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.24
+Version: 0.25
 
 Status: Draft
 
@@ -106,6 +106,8 @@ Always respect this order:
         ↓
 16 Architecture Pivot
         ↓
+17 Game Systems Architecture
+        ↓
 All future documentation
 ```
 
@@ -115,7 +117,8 @@ They must never contradict them.
 If a contradiction appears, stop and explain it before continuing.
 
 **Spatial / presentation authority:** [16 Architecture Pivot](16%20Architecture%20Pivot.md) (Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront).  
-**World gen handoff:** [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) + `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`. Pre-pivot OrganicTown continuous path is archive — next default is **Overworld V0**, not C1.
+**Systems map / iteration backlog:** [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).  
+**World gen handoff:** [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) + `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md` + `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`. Pre-pivot OrganicTown continuous path is archive — next default is **Overworld V0**, not C1.
 
 ---
 
@@ -153,6 +156,7 @@ If a contradiction appears, stop and explain it before continuing.
 - 14 World Generation Roadmap
 - 15 Procedural Building Generation
 - 16 Architecture Pivot
+- 17 Game Systems Architecture
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md
@@ -343,7 +347,7 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - Information comes from biased partial Information Sources; no omniscient quest spoiler log that replaces world reading.
 - V1 Turn Action Economy is Move + Action + short Bonus list **on arenas only**. Overworld and interiors use free third-person locomotion. Do not invent a deep AP/reaction combat stack before the six Approaches are equally supported.
 - Square grid is **arena-only** spatial truth ([10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md)). Overworld/interiors are free 3P; Environment Actions as turn verbs are arena-scoped.
-- Engine is Unity (URP, C#, folder `unity/`). Free 3P overworld/interiors + custom arena grid TB; no marketplace tactics kit as architecture. World gen next: **Overworld V0** per [16](16%20Architecture%20Pivot.md) / [14](14%20World%20Generation%20Roadmap.md). OrganicTown continuous enterable path is pre-pivot archive.
+- Engine is Unity (URP, C#, folder `unity/`). Free 3P overworld/interiors + custom arena grid TB; no marketplace tactics kit as architecture. Systems map: [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md). World gen next: **Overworld V0** per `unity/Assets/Plans/OVERWORLD_V0_PLAN.md` and [14](14%20World%20Generation%20Roadmap.md) / [16](16%20Architecture%20Pivot.md). OrganicTown continuous enterable path is pre-pivot archive. No monolithic managers; ScriptableObjects hold immutable data only; chunk size V0 = 64 m.
 - The first implementation target is [11 Vertical Slice](11%20Vertical%20Slice.md): prove systems with tiny content, do not expand into full-game scope early.
 - Vertical Slice mood: Lord of the Mysteries-like 18–19th century industrial-occult transition; Lower Veil District; Wardens/Veinmarket both selectable; Death Gap out of slice; placeholder names mutable.
 
@@ -356,7 +360,7 @@ Current active design layer:
 1. Keep World Laws through Vertical Slice coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. Architecture Pivot locked in [16](16%20Architecture%20Pivot.md). Next implementation default: **Overworld V0** micro-plan — not OrganicTown C1. Building DNA / interior scenes: [15](15%20Procedural%20Building%20Generation.md).
+4. Architecture Pivot locked in [16](16%20Architecture%20Pivot.md). Systems map in [17](17%20Game%20Systems%20Architecture.md). Next implementation default: **Overworld V0** (`OVERWORLD_V0_PLAN.md`, iterations W0.1–W0.9) — not OrganicTown C1. Building DNA / interior scenes: [15](15%20Procedural%20Building%20Generation.md).
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

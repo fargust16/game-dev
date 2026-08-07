@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.25
+Version: 0.26
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [AGENTS.md](AGENTS.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -356,7 +356,19 @@ A mandatory landmark / NPC / POI placement that every city regenerate must inclu
 
 ## Overworld Chunk
 
-Seeded exploration zone/band of the overworld (biome, terrain, POI slots, creature spawns). Streamed/chunked intent like Valheim-shaped worlds; V0 is small. No harvest loop as core progression. See [16 Architecture Pivot](16%20Architecture%20Pivot.md).
+Seeded exploration zone of the overworld (biome, terrain, POI slots, creature spawns). **V0 chunk size = 64 m**; stub playable area ~512 m with chunk API as if infinite. Streamed/chunked intent like Valheim-shaped worlds. No harvest loop as core progression. See [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
+
+---
+
+## Game Systems Architecture
+
+Draft document [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md): systems map authority — System Cards, dependency DAG, micro-iteration backlog. Does not override spatial locks in [16 Architecture Pivot](16%20Architecture%20Pivot.md).
+
+---
+
+## System Card
+
+Standard description of one gameplay system in [17](17%20Game%20Systems%20Architecture.md): responsibilities, dependencies, public interfaces, data flow, save/load, multiplayer, performance, extensibility, V1 scope, owning folder.
 
 ---
 
