@@ -1,6 +1,6 @@
 # Project Overview
 
-> **Agent handoff:** stop-point + full world roadmap live in repo-root [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md) and [`AGENT_HANDOFF_WORLD_GEN.md`](AGENT_HANDOFF_WORLD_GEN.md). Milestones A+B complete; **D1.1 foundation in progress** — see [`MILESTONE_D1_PLAN.md`](MILESTONE_D1_PLAN.md).
+> **Superseded / prototype (2026-08-07):** OrganicTown continuous path is archive. Authority: [`16 Architecture Pivot.md`](../../../16%20Architecture%20Pivot.md). Roadmap: [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md). Handoff: [`AGENT_HANDOFF_WORLD_GEN.md`](AGENT_HANDOFF_WORLD_GEN.md).
 
 - **Game Title / System:** Procedural Organic Historic Town Generator ("OrganicTown v2")
 - **High-Level Concept:** A deterministic, seed-driven generator that grows a believable late‑18th/19th‑century European town from a central landmark outward — arterials to gates/bridges/farms, then districts → blocks → plots → buildings — producing gently curved, varied‑width, irregular streets that read as *grown over decades*, not planned on a grid. Target look: pre‑Haussmann Paris, Prague, Edinburgh, Bruges, Rothenburg ob der Tauber.

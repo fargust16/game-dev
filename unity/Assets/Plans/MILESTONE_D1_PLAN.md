@@ -1,8 +1,10 @@
 # Milestone D1 — Enterable BuildingTemplates
 
-**Status:** D1.1–D1.3 done; D1 complete for handoff to D2/C1  
+> **Superseded / prototype (2026-08-07):** Continuous-world enterable templates are pre-pivot archive. Post-pivot interiors are separate scenes — see [`16 Architecture Pivot.md`](../../../16%20Architecture%20Pivot.md).
+
+**Status:** D1.1–D1.3 done — **archive**  
 **Date started:** 2026-08-06  
-**Authoritative order:** [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md)  
+**Authoritative order:** [`16 Architecture Pivot.md`](../../../16%20Architecture%20Pivot.md) · [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md)  
 **Handoff:** [`AGENT_HANDOFF_WORLD_GEN.md`](AGENT_HANDOFF_WORLD_GEN.md)
 
 ---

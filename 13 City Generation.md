@@ -1,38 +1,41 @@
 # 13 City Generation
 
-Version: 0.6
+Version: 0.7
 
-Status: Draft
+Status: Draft (legacy / mood reference)
 
-Last Updated: 2026-08-06
+Last Updated: 2026-08-07
 
 Depends On:
-[02 World Laws](02%20World%20Laws.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md), [12 Engine Choice](12%20Engine%20Choice.md)
+[02 World Laws](02%20World%20Laws.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 
 Referenced By:
-[14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), Prototype city scaffold in `unity/`, Vertical Slice playtests.
+[14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), Prototype city scaffold in `unity/` (archive).
 
 ---
 
+> **Status after Architecture Pivot (2026-08-07):** This document is **legacy / district-mood reference**. It is **not** the authoritative spatial model. Authority: [16 Architecture Pivot](16%20Architecture%20Pivot.md) (seeded overworld, separate interiors, arena combat). OrganicTown / `CityGenerator` code remains prototype archive.
+
 # Purpose
 
-Define the **seed-driven organic town scaffold** for Lower Veil: a late-18th/19th-century industrial-occult town that appears to have grown over decades, not a Haussmann grid or a single carved avenue.
+Historical definition of the **seed-driven organic town scaffold** for Lower Veil mood: a late-18th/19th-century industrial-occult town that appears to have grown over decades.
 
-Meshes stay greybox. Gameplay truth stays `GridMap` + A*.
+Useful for: street names, district wedges, POI placement fiction, art direction.  
+Not useful as: continuous grid gameplay truth or next implementation default.
 
-Success question:
+Success question (historical):
 
-> Does regenerating with seed A vs B change crooked streets and blocks while always placing slice POIs and garrison/undercroft stubs, with every anchor path-connected to the market?
+> Does regenerating with seed A vs B change crooked streets and blocks while always placing slice POIs?
 
-# Status (2026-08-06)
+# Status (2026-08-07)
 
 | Layer | State |
 |-------|--------|
-| **v1 raster playable** | `CityGenerator` + `OrganicRoadBuilder` / `TownRoadGraph` / `TownBlockParcelizer` — scene `City_OrganicTown.unity`, menu `GameDev/City/…` |
-| **v2 vector (OrganicTown)** | Milestones **A+B complete** (data + gizmos + greybox baker shells/ribbons). Menu `GameDev/Town/…`. Detail plan: `unity/Assets/Plans/procedural-organic-town-generator.md` |
+| **v1 raster playable** | Prototype archive — `CityGenerator` … `City_OrganicTown.unity`, menu `GameDev/City/…` |
+| **v2 vector (OrganicTown)** | Prototype archive — A–D2 + P0 done under pre-pivot locks. Menu `GameDev/Town/…` |
 
-**Living roadmap / agent handoff:** [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) and `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`.  
-**Next phase:** **D1** — enterable BuildingTemplates (then D2 BG3 occlusion → C narrative/GridMap → E wilderness).
+**Living roadmap:** [16 Architecture Pivot](16%20Architecture%20Pivot.md) + post-pivot [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md).  
+**Next phase:** Overworld V0 — not OrganicTown C1.
 
 # Growth Pipeline (v1 raster — playable)
 

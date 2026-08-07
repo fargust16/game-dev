@@ -1,9 +1,11 @@
 # Milestone D2 — BG3 Building Occlusion
 
-**Status:** D2.1–D2.2 landed (`37fdecb`); verify in Unity, then C1  
+> **Superseded / prototype (2026-08-07):** In-world HideWalls largely unnecessary when interiors are separate scenes. See [`16 Architecture Pivot.md`](../../../16%20Architecture%20Pivot.md).
+
+**Status:** D2.1–D2.2 landed (`37fdecb`) — **archive**  
 **Date started:** 2026-08-06  
 **Depends on:** D1 ✅ (enterable templates + sockets)  
-**Authoritative order:** [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md)
+**Authoritative order:** [`16 Architecture Pivot.md`](../../../16%20Architecture%20Pivot.md) · [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md)
 
 ---
 

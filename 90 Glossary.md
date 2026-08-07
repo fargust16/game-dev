@@ -1,16 +1,16 @@
 # 90 Glossary
 
-Version: 0.21
+Version: 0.25
 
 Status: Draft
 
-Last Updated: 2026-08-06
+Last Updated: 2026-08-07
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [AGENTS.md](AGENTS.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [AGENTS.md](AGENTS.md)
 
 ---
 
@@ -344,31 +344,97 @@ A mandatory landmark / NPC / POI placement that every city regenerate must inclu
 
 ## Grid World
 
-Gameplay space authored on a square grid. Movement, pathfinding, and most traversal truths are cell-based even if visuals look continuous.
+**Pre-pivot term.** Post-pivot, square-grid gameplay truth applies on **Combat Arenas only**. Overworld and interiors are free third-person spaces. See [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md).
+
+---
+
+## Architecture Pivot
+
+2026-08-07 presentation split: Valheim-like seeded overworld, Genshin-like free third-person move, separate interior scenes (no grid), Confront on thematic Combat Arenas. Authority: [16 Architecture Pivot](16%20Architecture%20Pivot.md).
+
+---
+
+## Overworld Chunk
+
+Seeded exploration zone/band of the overworld (biome, terrain, POI slots, creature spawns). Streamed/chunked intent like Valheim-shaped worlds; V0 is small. No harvest loop as core progression. See [16 Architecture Pivot](16%20Architecture%20Pivot.md).
+
+---
+
+## Interior Scene
+
+Separate scene (or equivalent isolated space) entered from an overworld door/portal. Free third-person movement; **no grid**. Generated or templated from Building DNA / recipes. See [15](15%20Procedural%20Building%20Generation.md) and [16](16%20Architecture%20Pivot.md).
+
+---
+
+## Combat Arena
+
+Dedicated Turn-Based Confront scene with square-grid Move + Action + Bonus. Chosen from a Theme Pack matching the source location mood; not a 1:1 clone of exploration geometry. Return applies residue. See [08](08%20Confront%20Constraints.md) and [16](16%20Architecture%20Pivot.md).
+
+---
+
+## Theme Pack
+
+Greybox arena kit tagged by mood (street, tavern, cellar, woods, …) used when Confront starts. See [16 Architecture Pivot](16%20Architecture%20Pivot.md).
 
 ---
 
 ## BuildingTemplate
 
-A reusable schematic interior for OrganicTown v2: local cell paint (floor / wall / door / sockets) placed on a building footprint so shops and houses are enterable in the same continuous world. Catalog expansion is Milestone D1; GridMap rasterization of these cells is Milestone C2. See [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md).
+**Pre-pivot / archive:** reusable schematic interior cell paint for continuous OrganicTown enterable buildings (D1). Post-pivot, interior content targets **Interior Scenes**; templates may inform recipes but are not world GridMap authority. See [15](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## Building DNA
+
+Seeded identity of one building instance (archetype, district, wealth, faction ownership, era, style, crime/occult/story/damage levels, secrets mask). Upstream driver for exterior shell, interior scene, facade/roof, dress, secrets, and gameplay sockets. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## Room Graph
+
+Procedural graph of rooms and circulation edges for an **interior scene** (and floor stack). Compiled into scene layout / openings / vertical cores — not into overworld GridMap. Shared Room Library recipes are reused across archetypes. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## Modular Building Pipeline
+
+Architecture-as-system pipeline: DNA → exterior shell / POI → interior scene (room graph) → openings → facade/roof modules → materials → dress → secrets → gameplay bindings. Whole-building prefabs are forbidden as authority; module prefabs are allowed. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
 
 ---
 
 ## Building Socket
 
-A placed NPC or prop anchor inside a BuildingTemplate instance. Carries a stable role (Keeper, Counter, Guard, …), local cell, and world position so the narrative layer (C1) can attach content without rescanning interiors. See Milestone D1.3 in `unity/Assets/Plans/MILESTONE_D1_PLAN.md`.
+A placed NPC or prop anchor inside a building instance / interior scene. Carries a stable role (Keeper, Counter, Guard, …) so the narrative layer can attach content without rescanning geometry. Pre-pivot D1.3 notes: `unity/Assets/Plans/MILESTONE_D1_PLAN.md` (archive).
 
 ---
 
 ## Building Occlusion
 
-Runtime readability aid (Milestone D2): while the tracked subject is inside a building volume, exterior walls/shells of that building are hidden or faded so the interior stays legible (BG3-like). Floors and sockets remain. See `unity/Assets/Plans/MILESTONE_D2_PLAN.md`.
+**Pre-pivot (D2):** hide exterior walls while inside a continuous-world building volume. Largely unnecessary when interiors are separate scenes. Archive: `unity/Assets/Plans/MILESTONE_D2_PLAN.md`.
+
+---
+
+## Playable Radius
+
+**Pre-pivot (P0):** limited metres where OrganicTown v2 was rasterized into a walkable `GridMap`. Superseded as world movement model by free 3P overworld. Archive: `unity/Assets/Plans/PLAYABLE_TOWN_P0_PLAN.md`.
+
+---
+
+## TownGridBaker
+
+**Pre-pivot:** baker that painted a square `GridMap` from OrganicTown roads/interiors inside the Playable Radius. Archive only under post-pivot locks.
+
+---
+
+## Procedural Town Asset Library
+
+Long-term dress library: tileable materials, doors, windows, roof elements, trim, and props for exterior shells and interior scenes. Not complete city scenes. Priority: materials → architectural modules → doors/windows/roofs → props → decals → vegetation → FX last. See `unity/Assets/Plans/PROCEDURAL_TOWN_ASSET_LIBRARY.md`.
 
 ---
 
 ## Environment Action
 
-A turn verb that uses tagged scenery — vault/jump, climb, window entry, mantle, breach — usually as an Action with readable failure costs.
+On **Combat Arenas**, a turn verb that uses tagged scenery — vault/jump, climb, mantle, breach — usually as an Action with readable failure costs. Overworld/interior interacts are diegetic continuous-space actions, not grid turn verbs.
 
 ---
 

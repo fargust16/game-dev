@@ -1,10 +1,10 @@
 # 000 Project Rules
 
-Version: 1.14
+Version: 1.15
 
 Status: Canonical
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-07
 
 Depends On:
 —
@@ -123,6 +123,22 @@ Every new document must respect the following hierarchy.
 ↓
 
 12 Engine Choice
+
+↓
+
+13 City Generation
+
+↓
+
+14 World Generation Roadmap
+
+↓
+
+15 Procedural Building Generation
+
+↓
+
+16 Architecture Pivot
 
 ↓
 

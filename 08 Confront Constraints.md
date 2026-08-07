@@ -1,16 +1,16 @@
 # 08 Confront Constraints
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-07
 
 Depends On:
-[000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md)
+[000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 
 Referenced By:
-[10 Turn Action Economy](10%20Turn%20Action%20Economy.md), Future combat system, weapon content, and encounter tuning.
+[10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), Future combat system, weapon content, and encounter tuning.
 
 ---
 
@@ -171,23 +171,24 @@ Not required in V1:
 
 ## Presentation mode
 
-V1 Confront uses **Turn-Based Mode**.
+V1 Confront uses **Turn-Based Mode on a Combat Arena scene**.
 
 Reference feel, not feature parity:
 
 - Baldur's Gate 3 style initiative / turn order once conflict locks in;
-- Fallout 1/2 style deliberate tactical choice inside the same location space.
+- Fallout 1/2 style deliberate tactical choice on a dedicated arena.
 
 Rules:
 
-1. Turn-Based Mode begins **inside the current location**; there is no separate arena teleport for ordinary Confront.
-2. Entering Confront converts the local scene into Turn-Based Mode.
-3. Turn-Based Mode must also be available **outside combat**, so the player can deliberately control tense non-fight moments (approach a target, position, time an action, coordinate a Veil or Exchange setup).
-4. Leaving Turn-Based Mode outside combat returns the scene to normal exploration pacing.
-5. Break Away, Yield/Spare, and other Decision Engine outcomes remain valid inside Turn-Based Mode.
-6. V1 stays simple: readable turns, clear actions, solo-shippable depth. Do not chase full BG3 feature parity.
+1. When Confront locks in, the game transitions to a **Combat Arena** scene (load or additive — implementation later). Ordinary Confront is **not** resolved in-location on the overworld or interior exploration scene.
+2. The arena is chosen from a **Theme Pack** matching the source location mood (street, tavern, cellar, woods, …). It must feel thematically related; it need not clone exact exploration geometry.
+3. Turn-Based Mode exists **only on arenas**. There is no voluntary Turn-Based Mode during free exploration.
+4. Overworld and interior scenes stay free third-person ([16 Architecture Pivot](16%20Architecture%20Pivot.md)).
+5. Break Away, Yield/Spare, and other Decision Engine outcomes remain valid inside arena Turn-Based Mode.
+6. On Confront end (win, Break Away, Yield/Spare resolution, or death), return to the source scene and apply residue.
+7. V1 stays simple: readable turns, clear actions, solo-shippable depth. Do not chase full BG3 feature parity.
 
-This locks presentation. The minimal action skeleton lives in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md). Spatial truth is a square grid with Environment Actions; see [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md).
+This locks presentation. The minimal action skeleton lives in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md). Arena spatial truth is a square grid with Environment Actions; see [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md).
 
 # Escalation Rules
 
@@ -237,7 +238,7 @@ Forbidden design directions:
 - Simple fight resolution with Break Away and Yield/Spare.
 - Diegetic loot only.
 - Residue on world/factions.
-- Turn-Based Mode in-location for Confront, also usable outside combat for control.
+- Turn-Based Mode on a thematic Combat Arena for Confront only; free exploration outside arenas.
 
 ## V2
 
@@ -269,10 +270,11 @@ If the honest answers collapse to “just fight,” redesign.
 - **Approaches:** Compatible. Confront is fenced so it cannot erase the other five.
 - **Progression / Character Life:** Compatible. No XP; death is real; Conduct may care about open violence.
 - **World Laws / POI:** Compatible. Fights are world events with Symptoms and possible Traces.
-- **Glossary / Open Questions:** Presentation mode locked to in-location Turn-Based Mode, also usable outside combat. Exact action economy remains open.
+- **Glossary / Open Questions:** Presentation locked to Combat Arena Turn-Based Mode ([16 Architecture Pivot](16%20Architecture%20Pivot.md)). Exact action economy numbers remain open.
 
 # Related Documents
 
+- [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 - [06 Approaches](06%20Approaches.md)
 - [03 Decision Engine](03%20Decision%20Engine.md)
 - [05 Progression](05%20Progression.md)

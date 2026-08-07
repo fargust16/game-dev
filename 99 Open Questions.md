@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.16
+Version: 0.18
 
 Status: Draft
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-07
 
 Depends On:
 All Canonical Documents
@@ -97,22 +97,22 @@ Soft Memory: rumours, dialogue hooks, and opinion shifts. No bloodline power inh
 No. Confront constraints forbid XP-from-kills, abstract loot tables, and universal best payoff. Documented in [08 Confront Constraints](08%20Confront%20Constraints.md).
 
 **What is V1 Confront presentation?**  
-In-location Turn-Based Mode, with reference feel from Baldur's Gate 3 / Fallout 1–2. Turn-Based Mode is also available outside combat for deliberate control. Documented in [08 Confront Constraints](08%20Confront%20Constraints.md).
+Turn-Based Mode on a **thematic Combat Arena** scene (BG3 / Fallout 1–2 feel). No voluntary Turn-Based Mode during free exploration. Documented in [08 Confront Constraints](08%20Confront%20Constraints.md) and [16 Architecture Pivot](16%20Architecture%20Pivot.md). *(Cancels prior in-location / outside-combat TB lock.)*
 
 **How does the player learn about POIs and world pressure?**  
 Through reusable Information Sources with bias and partial truth: boards, newspapers, bartenders, rumours, faction contacts, witnesses, physical traces, Soft Memory. Documented in [09 Information Sources](09%20Information%20Sources.md).
 
 **What is the V1 turn structure?**  
-Move + Action + optional short Bonus. Same economy in Confront and non-combat Turn-Based Mode. Documented in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md).
+Move + Action + optional short Bonus **on Combat Arenas only**. Documented in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md).
 
 **What is the spatial model?**  
-Square grid from S0; levels and props are grid-native; Environment Actions cover vault/climb/window/etc. Documented in [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md).
+Free third-person overworld and interior scenes; square grid + Environment Actions on arenas only. Documented in [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md).
 
 **Which engine?**  
-Unity locked. URP, C#, project folder `unity/`, custom grid TB. Documented in [12 Engine Choice](12%20Engine%20Choice.md).
+Unity locked. URP, C#, project folder `unity/`, free 3P + custom arena grid TB. Documented in [12 Engine Choice](12%20Engine%20Choice.md).
 
 **What is the first playable proof?**  
-A Vertical Slice in Lower Veil District with 2 selectable factions (Wardens / Veinmarket), 3 POIs, Information Sources, Turn-Based Mode, one Bargain tease, and Lord of the Mysteries-like industrial-era mood. Death Gap is out of slice scope. Placeholder names may change. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md).
+A Vertical Slice in Lower Veil fantasy with 2 selectable factions (Wardens / Veinmarket), 3 POIs, Information Sources, arena Confront, one Bargain tease, and Lord of the Mysteries-like industrial-era mood — delivered on overworld → interior → arena rails. Death Gap is out of slice scope. Placeholder names may change. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md) and [16](16%20Architecture%20Pivot.md).
 
 ---
 
@@ -174,16 +174,17 @@ Should Bound Path get a light Rite/Invoke extension in V1, or remain under Excha
 
 ## Confront / Turn Economy
 
-How does the player enter and exit Turn-Based Mode outside combat without making exploration tedious?  
-**Partial lock:** Free Exploration is smooth continuous move (+ click-to-move); Turn-Based is discrete cells + Move/Action/Bonus. Manual toggle exists in S0 (`T`). Remaining: diegetic UX (when Confront auto-locks, prompts, fatigue of manual TB).
+How diegetic / readable is the transition into a Combat Arena (fade, cut, warning) without spoiling Attention teaching?
+
+How closely must an arena Theme Pack match the source location before it feels unfair or immersion-breaking?
 
 How often may important nodes offer Confront as one option versus scenes that begin already in Confront?
 
-Exact initiative formula and Move Speed units / cells per Move for V1?
+Exact initiative formula and Move Speed units / cells per Move for V1 arenas?
 
-Diagonal move cost: 1 or 1.5?
+Diagonal move cost on arenas: 1 or 1.5?
 
-Exact fail chance bands for vault/climb/window in V1?
+Exact fail chance bands for vault/climb on arenas in V1?
 
 Is Bonus-to-Dash enabled in V1 or deferred?
 
@@ -234,6 +235,16 @@ How do resources disappear?
 How are secrets generated?
 
 Can secrets vanish forever?
+
+What is the V1 overworld target size (km / play minutes edge-to-edge)?
+
+## Procedural Buildings / Scenes
+
+When does Room Graph + Building DNA replace hand-authored interior templates as generation authority for Interior Scenes? ([15](15%20Procedural%20Building%20Generation.md))
+
+Additive interior load vs single-scene swap for V1?
+
+How aggressive may OccultLevel visual “wrongness” be in V1 without spoiling Veil / Attention teaching?
 
 ---
 

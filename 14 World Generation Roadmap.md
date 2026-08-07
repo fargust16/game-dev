@@ -1,159 +1,134 @@
 # 14 World Generation Roadmap
 
-Version: 0.6
+Version: 0.9
 
 Status: Draft
 
-Last Updated: 2026-08-06
+Last Updated: 2026-08-07
 
 Depends On:
-[10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [13 City Generation](13%20City%20Generation.md)
+[11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 
 Referenced By:
-[AGENTS.md](AGENTS.md), Unity implementation under `unity/Assets/Scripts/World/Town/`, plan `unity/Assets/Plans/procedural-organic-town-generator.md`, work report `unity/Assets/Plans/MILESTONE_B_WORK_REPORT.md`, D1 plan `unity/Assets/Plans/MILESTONE_D1_PLAN.md`
+[AGENTS.md](AGENTS.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), Unity plans under `unity/Assets/Plans/`
 
 ---
 
 # Purpose
 
-Handoff document for **future agents and humans**: where world/town generation stopped, what is authoritative, and the **ordered roadmap** toward a Valheim-scale seeded world with an enterable historic town (BG3-like interiors + camera).
+Handoff document for **future agents and humans**: where world generation stopped, what is authoritative after the Architecture Pivot, and the **ordered roadmap** toward a seeded Valheim-shaped overworld with separate interiors and Combat Arenas.
 
 Chat is not the source of truth — update this file when a milestone lands.
 
 Success question for agents:
 
-> Can a new agent open this doc and know exactly what to implement next without re-deriving the architecture from chat?
+> Can a new agent open this doc and know exactly what to implement next without continuing the pre-pivot continuous OrganicTown path?
+
+**Presentation / scene authority:** [16 Architecture Pivot](16%20Architecture%20Pivot.md).
 
 ---
 
-# Where We Stopped (2026-08-06)
+# Where We Stopped (2026-08-07)
 
-## Done
+## Architecture Pivot ✅ (docs)
 
-| Track | Deliverable | How to open |
-|-------|-------------|-------------|
-| **OrganicTown v2 Milestone A** | Vector town: `TownModel` filled by stage pipeline + gizmos | `GameDev/Town/Open Or Create Town Scene` → Scene view Gizmos |
-| **OrganicTown v2 Milestone B** | Greybox baker: street ribbons + exterior shells + landmark | `GameDev/Town/Generate From Seed` (auto-bake) or `Bake Greybox` |
-| **OrganicTown v2 D1** ✅ | Enterable templates (~16) + sockets/roles/query for C1 | [`MILESTONE_D1_PLAN.md`](unity/Assets/Plans/MILESTONE_D1_PLAN.md) |
-| **OrganicTown v2 D2** (partial) | BG3 HideWalls occlusion inside building volumes | [`MILESTONE_D2_PLAN.md`](unity/Assets/Plans/MILESTONE_D2_PLAN.md) |
-| **v1 raster playable city** | Walkable greybox Lower Veil (shells, POIs, tips, clock) | `GameDev/City/Generate From Seed` → `City_OrganicTown.unity` + Play |
+Locked in [16](16%20Architecture%20Pivot.md):
 
-### v2 Milestone A — key files
+- seeded Valheim-like overworld (scoped; no harvest loop);
+- free third-person locomotion (Genshin-like feel);
+- interiors as separate free-move scenes;
+- Confront → thematic Combat Arena (grid TB only there).
 
-- Plan (detail): [`unity/Assets/Plans/procedural-organic-town-generator.md`](unity/Assets/Plans/procedural-organic-town-generator.md)
-- Orchestrator: `unity/Assets/Scripts/World/Town/TownGenerator.cs`
-- Stages: `Stage_SiteAndLandmark` … `Stage_ConnectivityAndScale`
-- Geometry: `unity/Assets/Scripts/World/Town/Geometry/Geo2.cs`, `Polygon2.cs`
-- Config: `unity/Assets/Settings/DefaultTownProfile.asset`
-- Menu: `GameDev/Town/…` (`TownGenerateMenu.cs`)
-- Tests: `unity/Assets/Scripts/Editor/Tests/Geo2Tests.cs`, `TownDeterminismTests.cs`
+Code under `unity/` is **unchanged** and treated as **pre-pivot prototype archive**.
 
-### v2 Milestone B — key files
+## Pre-pivot prototype archive (do not extend by default)
 
-- Baker: `unity/Assets/Scripts/World/Town/TownGreyboxBaker.cs`
-- Wired from `TownGenerator` (`bakeGreybox`, S0 prefab refs) + menu `GameDev/Town/Bake Greybox`
-- Prefabs: `Assets/Prefabs/S0_Greybox/` (`Floor_Tile_1x1`, `Building_Shell_1x1`, `Landmark_Block`, `Wall_Segment_1x3`)
-- Still **no** `GridMap` bridge / narrative POIs
+| Track | Deliverable | Notes |
+|-------|-------------|-------|
+| OrganicTown v2 A–D2 + P0 | Vector town, greybox, templates, occlusion, radius GridMap | Continuous enterable city — superseded as primary path |
+| v1 raster city | `CityGenerator` playable Lower Veil | Legacy mood / reference |
 
-### v2 D1 — key files ✅
-
-- Plan: [`unity/Assets/Plans/MILESTONE_D1_PLAN.md`](unity/Assets/Plans/MILESTONE_D1_PLAN.md)
-- `BuildingTemplate.cs`, `BuildingTemplateCatalog.cs` (~16 types)
-- `BuildingTemplateSockets.cs` — roles, place, `TownSocketQuery`
-- `Stage_AssignTemplates.cs` (fork `templates`)
-- Baker: interior cells + socket pedestals; gizmos: `DrawSockets`
-- Tests: `BuildingTemplateTests.cs`, `BuildingSocketTests.cs`
-### v2 D2 — key files (in progress)
-
-- Plan: [`unity/Assets/Plans/MILESTONE_D2_PLAN.md`](unity/Assets/Plans/MILESTONE_D2_PLAN.md)
-- `BuildingVolume.cs`, `BuildingVisualRoot.cs`, `BuildingOcclusionController.cs`
-- Baker tags Wall/Floor/Shell/Socket; `TownGenerator` refreshes occlusion after bake
-- `SimpleFollowCamera.GetOcclusionSamplePosition` (avatar or free focus)
-- **Next:** verify in Unity; optional D2.3 material fade later; then **C1**
-
-### v1 raster — key files (still live for gameplay)
-
-- `CityGenerator.cs`, `OrganicRoadBuilder.cs`, `TownRoadGraph.cs`, `TownBlockParcelizer.cs`
-- Menu: `GameDev/City/…`
-- Scene: `unity/Assets/Scenes/City_OrganicTown.unity`
-
-## Not done yet
-
-- D2 material-fade / roof meshes not done (HideWalls V1 only)
-- Narrative POI spawn still on v1 raster until **C1** consumes D1 sockets
-- No narrative POI port onto v2 + `GridMap` bridge; raster gen not retired (**C**)
-- No wilderness / caves outside walls (**E**)
-
-### Geometry note (post-B fix)
-
-`Stage_Streets` corridor topology was corrected after Milestone B: streets follow OBB split chords (not centroid links), leaf blocks are inset by half street width, road nodes snap/merge. Agent-readable check: `dotnet run --project tools/TownDebugHost -- <seed>` → `unity/Assets/Plans/debug/`.
+Detail plans remain under `unity/Assets/Plans/` with **Superseded** banners.
 
 ---
 
-# Locked Architecture (do not silently reverse)
+# Locked Architecture (post-pivot — do not silently reverse)
 
-1. **OrganicTown v2** is the authoritative *geometry* generator (world metres, polylines/polygons). Milestone A = data + gizmos only.
-2. **Gameplay pathfinding** remains **`GridMap` + A\*** until Milestone **C2** adds a rasterization bridge from v2 (+ interiors).
-3. **Enterable buildings** = **same continuous world grid** (doors = walkable openings). Not separate interior scenes for typical shops/taverns.
-4. **BuildingTemplate library** (10–20 greybox types) later: footprint + interior cell paint + NPC sockets; placement by district / `BuildingKind`.
-5. **BG3 camera**: fade/x-ray exterior walls (and optionally roof) while the player is inside a building volume (`BuildingOcclusionController` + follow cam).
-6. **“Valheim-level”** means deterministic seeded world + dense reusable templates + exploration loop — **not** AAA biomes/art in these phases. Greybox until asset packs.
-7. **Do not retire** v1 raster (`GameDev/City/…`) until **C2** parity.
-8. Implement roadmap **one micro-plan at a time** (B, then D1, …). Do not collapse Valheim + interiors into one uncontrolled sprint.
+1. **Overworld** is the authoritative exploration space: world seed → biomes / zones / POIs / creature spawns ([16](16%20Architecture%20Pivot.md)).
+2. **Gameplay movement** on overworld and interiors is **free third-person**, not GridMap.
+3. **Interiors** are **separate scenes** (free move, no grid).
+4. **Confront** always uses a **Combat Arena** scene; grid + Turn Action Economy apply only there ([10](10%20Turn%20Action%20Economy.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md)).
+5. **“Valheim-level”** means deterministic seeded world + biome diversity + streamed/chunked intent — **not** survival harvest, not AAA biomes art in V0.
+6. Pre-pivot OrganicTown continuous fabric is **not** the next implementation default.
+7. Implement **one micro-plan at a time** from the AI backlog in [16](16%20Architecture%20Pivot.md).
 
 ---
 
-# Roadmap (mandatory order)
+# Roadmap (mandatory order — post-pivot)
 
 ```text
-A data+gizmos ✅
-    → B greybox shells from footprints ✅
-        → D1 enterable BuildingTemplates (10–20 types)
-            → D2 BG3 occlusion camera
-                → C1 narrative POIs on v2
-                    → C2 GridMap bridge + retire raster
-                        → E wilderness ring + cave templates
+Architecture Pivot docs ✅
+    → Overworld V0
+        → Locomotion V0
+            → Interior V0
+                → Arena V0
+                    → Theme Packs V0
+                        → Vertical Slice content on new rails
+                            → richer biomes / interior DNA / monsters
 ```
 
 | Phase | Goal | Outcome | Depends on |
 |-------|------|---------|------------|
-| **A** | Vector town data + gizmos | `TownModel` + Scene gizmos | — |
-| **B** ✅ | Greybox baker | Street ribbons + exterior shells from footprints (S0 prefabs) | A |
-| **D1** | Enterable templates | 10–20 schematic interiors (tavern, apothecary, churches, station, garrison, castle, palaces, noble/worker/peasant houses, school, university, market hall, dead-house, …) with interior grid + doors; place on plots | B |
-| **D2** | BG3 occlusion | Walls/roof fade when inside; character stays readable | D1 |
-| **C1** | Narrative layer | Port slice anchors/TipGivers/NPCs onto v2 plazas/plots | B (visuals), A (data) |
-| **C2** | Grid bridge + retire v1 | Rasterize roads+interiors → `GridMap`; repoint menus; keep Input System / clock / decisions | C1, D1 |
-| **E** | Overworld ring | Outside wall: fields/forest/meadows; 3–5 cave/dungeon templates; portal exits | C2 |
+| **Pivot docs** ✅ | Spatial split locked | [16](16%20Architecture%20Pivot.md) + related doc updates | — |
+| **Overworld V0** | Seeded stub world | Biome bands + terrain + 3–5 POI markers + spawn points | Pivot |
+| **Locomotion V0** | Free 3P feel | Controller + follow/orbit camera | Overworld V0 |
+| **Interior V0** | Scene transition | Door → interior → exit; free move | Locomotion V0 |
+| **Arena V0** | Confront presentation | Theme arena + TB skeleton + return + residue stub | Interior V0 |
+| **Theme Packs V0** | Arena variety | Street / tavern / woods greybox kits | Arena V0 |
+| **Slice content** | Lower Veil fantasy | POIs / tips / Decision Nodes on new rails | Theme Packs V0 |
 
 Each phase = its own plan + commit series. Prefer updating this file’s “Where We Stopped” when a phase completes.
 
 ---
 
+# Superseded pre-pivot order (archive)
+
+```text
+A → B → D1 → D2 → P0 → C1 continuous narrative → C2 full GridMap → E wilderness
+```
+
+Do **not** resume this order unless the user explicitly overrides [16](16%20Architecture%20Pivot.md).
+
+---
+
 # Agent Instructions (quick)
 
-1. Read this file + [`MILESTONE_B_WORK_REPORT.md`](unity/Assets/Plans/MILESTONE_B_WORK_REPORT.md) + [`13 City Generation.md`](13%20City%20Generation.md) + the Unity plan under `Assets/Plans/`.
-2. **Next implementation default:** finish verifying **D2** HideWalls, then **C1** narrative on v2 (sockets already ready). Do not start C2/E early.
-3. Keep style: no inheritance tricks, `WorldSeed.Fork` per stage, list order (no HashSet iteration for geometry), human-scale metres on XZ.
+1. Read [16 Architecture Pivot](16%20Architecture%20Pivot.md) first, then this file.
+2. **Next implementation default:** micro-plan **Overworld V0**. Do not extend OrganicTown C1 continuous path.
+3. Keep style: no inheritance tricks; deterministic `WorldSeed` forks; human-scale metres.
 4. Confirm design forks with the user before changing locked architecture above.
-5. After a documentation or milestone step: commit and push to `main` per project habit.
+5. After a documentation or milestone step: commit when the user asks (human steers git).
 
 ---
 
 # Explicitly Out (until later phases)
 
-- Full traffic / carriage AI
-- NavMesh as movement truth
-- Beautiful art packs (use greybox + later marketplace assets)
+- Survival harvest / base-building loop
+- Full Valheim-scale map
+- Marketplace tactics kit as architecture
+- Continuous enterable city GridMap as world truth
+- Voluntary Turn-Based Mode during exploration
 - Full World Engine Influence sim
 - Multi-city overworld map
-- Shipping combat AI / S3 TB combat as part of gen milestones
+- Shipping deep combat AI as part of Overworld V0
 
 ---
 
 # Related Documents
 
-- [13 City Generation](13%20City%20Generation.md) — v1 raster rules + status pointer
-- [12 Engine Choice](12%20Engine%20Choice.md) — Unity / Input System Package Only
-- [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md)
+- [16 Architecture Pivot](16%20Architecture%20Pivot.md) — spatial / presentation authority
+- [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) — exterior shells + interior scenes
+- [13 City Generation](13%20City%20Generation.md) — legacy / mood reference
+- [12 Engine Choice](12%20Engine%20Choice.md)
 - [11 Vertical Slice](11%20Vertical%20Slice.md)
-- Unity detail plan: `unity/Assets/Plans/procedural-organic-town-generator.md`
+- Unity archive plans: `unity/Assets/Plans/`

@@ -1,13 +1,13 @@
 # 12 Engine Choice
 
-Version: 1.1
+Version: 1.2
 
 Status: Draft
 
-Last Updated: 2026-08-06
+Last Updated: 2026-08-07
 
 Depends On:
-[000 Project Rules](000%20Project%20Rules.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [13 City Generation](13%20City%20Generation.md)
+[000 Project Rules](000%20Project%20Rules.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 
 Referenced By:
 Prototype repository setup and implementation milestones.
@@ -16,7 +16,7 @@ Prototype repository setup and implementation milestones.
 
 # Purpose
 
-This document records the implementation engine for the Vertical Slice under the production constraint:
+This document records the implementation engine under the production constraint:
 
 > AI agents do most of the implementation work from Canonical/Draft docs. The human helps, reviews, and unblocks.
 
@@ -31,7 +31,7 @@ This document records the implementation engine for the Vertical Slice under the
 | Render pipeline | URP |
 | Language | C# |
 | Project folder | `unity/` |
-| Architecture | Custom square grid + Turn Action Economy + Environment Actions |
+| Architecture | Free third-person overworld + interior scenes; custom square-grid Turn Action Economy **on Combat Arenas only** |
 
 Godot 4 was considered and remains historically documented below as the rejected alternative for this project phase.
 
@@ -39,19 +39,20 @@ Godot 4 was considered and remains historically documented below as the rejected
 
 1. Human familiarity: the project creator can open the editor and help when AI gets stuck.
 2. Sufficient AI/code ecosystem for C# 3D prototypes.
-3. Acceptable for a custom grid TB game if marketplace combat kits are forbidden as architecture.
+3. Fits free 3P locomotion plus a small custom arena grid without requiring a marketplace tactics kit as architecture.
 
 # Binding Implementation Constraints
 
-1. Custom grid + Turn Action Economy owned by project code in `unity/`.
-2. Environment Actions from [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md) before fancy character controllers.
-3. Prefer URP and minimal packages.
-4. Follow milestones in order: S0 grid greybox before POI/combat logic.
-5. No replacing Decision Engine / Approaches with a marketplace tactics pack.
-6. Keep package bloat low; every package must earn its place.
-7. Design docs remain source of truth over random Unity tutorial patterns.
-8. **Input:** Unity Input System, **Package Only** (`activeInputHandler: 1`). Gameplay reads `GameInputService` — not legacy `UnityEngine.Input`.
-9. **City scaffold:** seed-driven organic town growth (market center, crooked streets, wedge districts, anchors) per [13 City Generation](13%20City%20Generation.md); grid remains movement truth.
+1. **Overworld / interiors:** free third-person controller + follow/orbit camera ([16 Architecture Pivot](16%20Architecture%20Pivot.md)). Genshin-like feel target; not feature parity.
+2. **Combat Arenas:** custom grid + Turn Action Economy owned by project code in `unity/` ([10](10%20Turn%20Action%20Economy.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md)).
+3. NavMesh (or equivalent) **may** be used later for overworld/interior NPC locomotion. It is **not** Confront movement truth — arenas use the project grid.
+4. Prefer URP and minimal packages.
+5. Follow post-pivot AI backlog in [16](16%20Architecture%20Pivot.md): Overworld V0 → Locomotion V0 → Interior V0 → Arena V0 → Theme Packs V0.
+6. No replacing Decision Engine / Approaches with a marketplace tactics pack.
+7. Keep package bloat low; every package must earn its place.
+8. Design docs remain source of truth over random Unity tutorial patterns.
+9. **Input:** Unity Input System, **Package Only** (`activeInputHandler: 1`). Gameplay reads a project input service — not legacy `UnityEngine.Input`.
+10. **Pre-pivot OrganicTown / CityGenerator code** under `unity/` is prototype archive. Do not extend the continuous enterable-town + world GridMap path by default.
 
 # Comparison Archive
 
@@ -65,7 +66,7 @@ Godot 4 was considered and remains historically documented below as the rejected
 
 - heavy tooling;
 - AI suggesting outdated APIs;
-- temptation to import mismatched Asset Store combat kits.
+- temptation to import mismatched Asset Store combat kits or whole-city prefab packs.
 
 ## Godot 4 — why not chosen now
 
@@ -74,17 +75,18 @@ Godot 4 was considered and remains historically documented below as the rejected
 
 # Next Implementation Step
 
-Create/maintain the Unity project under `unity/` and execute [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md) on a square grid.
+Do **not** continue OrganicTown full C1 as default.  
+Next code track after this documentation pivot: micro-plan **Overworld V0** per [16 Architecture Pivot](16%20Architecture%20Pivot.md).
 
 # Documentation Review
 
 - Engine lock confirmed by project creator.
-- Does not change game fantasy; selects delivery tool only.
-- S0 remains first build milestone.
+- Architecture updated for Architecture Pivot (free 3P + arena grid).
+- Does not change game fantasy; selects delivery tool and presentation split.
 
 # Related Documents
 
-- [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md)
+- [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 - [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md)
 - [11 Vertical Slice](11%20Vertical%20Slice.md)
-- [13 City Generation](13%20City%20Generation.md)
+- [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)

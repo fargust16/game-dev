@@ -1,8 +1,10 @@
 # Work Report — OrganicTown Milestone B + Corridor Fix
 
+> **Archive report (2026-08-07):** Historical pre-pivot work. Next path: [`16 Architecture Pivot.md`](../../../16%20Architecture%20Pivot.md).
+
 **Date:** 2026-08-06  
-**Audience:** future agents / humans continuing world gen  
-**Authoritative stop-point:** [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md) · short handoff: [`AGENT_HANDOFF_WORLD_GEN.md`](AGENT_HANDOFF_WORLD_GEN.md)
+**Audience:** future agents / humans reading OrganicTown archive  
+**Authoritative stop-point:** [`16 Architecture Pivot.md`](../../../16%20Architecture%20Pivot.md) · [`14 World Generation Roadmap.md`](../../../14%20World%20Generation%20Roadmap.md) · [`AGENT_HANDOFF_WORLD_GEN.md`](AGENT_HANDOFF_WORLD_GEN.md)
 
 ---
 

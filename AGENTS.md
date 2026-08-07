@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.21
+Version: 0.24
 
 Status: Draft
 
-Last Updated: 2026-08-06
+Last Updated: 2026-08-07
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -102,6 +102,10 @@ Always respect this order:
         ↓
 14 World Generation Roadmap
         ↓
+15 Procedural Building Generation
+        ↓
+16 Architecture Pivot
+        ↓
 All future documentation
 ```
 
@@ -110,7 +114,8 @@ They must never contradict them.
 
 If a contradiction appears, stop and explain it before continuing.
 
-**World / town generation handoff:** before changing city or world gen, read [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) and `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`.
+**Spatial / presentation authority:** [16 Architecture Pivot](16%20Architecture%20Pivot.md) (Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront).  
+**World gen handoff:** [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) + `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`. Pre-pivot OrganicTown continuous path is archive — next default is **Overworld V0**, not C1.
 
 ---
 
@@ -146,6 +151,8 @@ If a contradiction appears, stop and explain it before continuing.
 - 12 Engine Choice
 - 13 City Generation
 - 14 World Generation Roadmap
+- 15 Procedural Building Generation
+- 16 Architecture Pivot
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md
@@ -332,11 +339,11 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - V1 Approaches are Confront, Convince, Threaten, Exchange, Veil, Withdraw. Confront must never be the universal best payoff.
 - Only the first character in a world gets Starting Faction. Later lives begin Factionless and need Faction Entry. Death uses a fixed Death Gap with world resolution. V1 intentional inheritance is a simple Legacy Cache marker. Soft Memory may affect dialogue/opinion; no bloodline respawn.
 - Confront has hard constraints: no XP-from-kills, diegetic loot only, information not free from victory, residue required, Break Away and Yield/Spare are first-class. Do not design a full combat system that violates [08 Confront Constraints](08%20Confront%20Constraints.md).
-- V1 Confront is in-location Turn-Based Mode (BG3 / Fallout 1–2 feel, not feature parity). Turn-Based Mode is also available outside combat for deliberate control.
+- V1 Confront is Turn-Based Mode on a **thematic Combat Arena** scene (BG3 / Fallout 1–2 feel, not feature parity). No voluntary Turn-Based Mode during free exploration. See [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [08 Confront Constraints](08%20Confront%20Constraints.md).
 - Information comes from biased partial Information Sources; no omniscient quest spoiler log that replaces world reading.
-- V1 Turn Action Economy is Move + Action + short Bonus list, in and out of Confront. Do not invent a deep AP/reaction combat stack before the six Approaches are equally supported.
-- World space is square-grid-native from S0. Environment Actions (vault/climb/window/etc.) are first-class turn verbs with failure costs. Do not build off-grid levels and retrofit turns later.
-- Engine is Unity (URP, C#, folder `unity/`). Custom grid TB only; no marketplace tactics kit as architecture. World gen order: OrganicTown A/B done → D1 templates before GridMap bridge / combat logic.
+- V1 Turn Action Economy is Move + Action + short Bonus list **on arenas only**. Overworld and interiors use free third-person locomotion. Do not invent a deep AP/reaction combat stack before the six Approaches are equally supported.
+- Square grid is **arena-only** spatial truth ([10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md)). Overworld/interiors are free 3P; Environment Actions as turn verbs are arena-scoped.
+- Engine is Unity (URP, C#, folder `unity/`). Free 3P overworld/interiors + custom arena grid TB; no marketplace tactics kit as architecture. World gen next: **Overworld V0** per [16](16%20Architecture%20Pivot.md) / [14](14%20World%20Generation%20Roadmap.md). OrganicTown continuous enterable path is pre-pivot archive.
 - The first implementation target is [11 Vertical Slice](11%20Vertical%20Slice.md): prove systems with tiny content, do not expand into full-game scope early.
 - Vertical Slice mood: Lord of the Mysteries-like 18–19th century industrial-occult transition; Lower Veil District; Wardens/Veinmarket both selectable; Death Gap out of slice; placeholder names mutable.
 
@@ -349,7 +356,7 @@ Current active design layer:
 1. Keep World Laws through Vertical Slice coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. World/town gen: OrganicTown v2 **A+B+D1 done**; **D2** HideWalls occlusion in progress (see [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), `MILESTONE_D2_PLAN.md`). After D2 verify → **C1**. Do not jump to GridMap bridge (C2) / wilderness (E) early.
+4. Architecture Pivot locked in [16](16%20Architecture%20Pivot.md). Next implementation default: **Overworld V0** micro-plan — not OrganicTown C1. Building DNA / interior scenes: [15](15%20Procedural%20Building%20Generation.md).
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

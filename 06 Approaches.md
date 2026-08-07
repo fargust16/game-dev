@@ -1,10 +1,10 @@
 # 06 Approaches
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
-Last Updated: 2026-08-05
+Last Updated: 2026-08-07
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md)
@@ -66,7 +66,7 @@ Open force or open physical resolution.
 - Strong when time is short and secrecy is already dead.
 - Costly in wounds, noise, legal heat, and burned relationships.
 - Must not be the only Approach that yields real Information or real rewards.
-- Presented in V1 through in-location Turn-Based Mode; see [08 Confront Constraints](08%20Confront%20Constraints.md).
+- Presented in V1 through Turn-Based Mode on a thematic **Combat Arena** scene; see [08 Confront Constraints](08%20Confront%20Constraints.md) and [16 Architecture Pivot](16%20Architecture%20Pivot.md).
 
 ## Convince
 

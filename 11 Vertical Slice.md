@@ -1,16 +1,16 @@
 # 11 Vertical Slice
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
-Last Updated: 2026-08-06
+Last Updated: 2026-08-07
 
 Depends On:
-[000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [13 City Generation](13%20City%20Generation.md)
+[000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 
 Referenced By:
-[11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md), [13 City Generation](13%20City%20Generation.md), Future prototype milestones and first playable implementation planning.
+[11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), Future prototype milestones and first playable implementation planning.
 
 ---
 
@@ -60,24 +60,27 @@ The slice must prove all of the following:
 2. Multiple Approaches — Confront is not the only profitable answer.
 3. Timed POIs — missing a window changes the world.
 4. Information Sources — board / bartender / rumour / trace beat omniscient markers.
-5. Turn-Based Mode — works in Confront and can be used outside combat.
-6. World residue — tomorrow looks different because of today.
-7. Priced power tease — at least one Bargain-shaped offer or refusal.
-8. Solo scope — one developer can prototype it without a content army.
+5. Combat Arena — Confront transitions to a thematic Turn-Based arena and returns with residue ([16 Architecture Pivot](16%20Architecture%20Pivot.md)).
+6. Scene split — overworld free 3P + at least one separate interior scene (no grid).
+7. World residue — tomorrow looks different because of today.
+8. Priced power tease — at least one Bargain-shaped offer or refusal.
+9. Solo scope — one developer (with AI) can prototype it without a content army.
 
 # Scope In
 
 ## World
 
-- 1 district map with a few connected locations:
-  - street / alley hub;
-  - tavern;
-  - apothecary shop front;
+- Seeded **overworld stub** (Valheim-shaped, small): walkable terrain + biome tint + POI markers ([16](16%20Architecture%20Pivot.md)).
+- Lower Veil fantasy locations as **exterior POIs / shells** plus **separate interior scenes** where needed:
+  - street / alley hub (overworld);
+  - tavern (door → interior scene);
+  - apothecary shop front (+ optional interior);
   - notice board node;
   - one side street for the night abduction POI;
   - one small aftermath / Trace space.
 - 1 World Seed for the slice (fixed seed for prototype reliability).
 - Lightweight Symptoms only (patrol mood, shop open/closed, rumour tone).
+- Pre-pivot continuous OrganicTown grid district is **not** the slice delivery target.
 
 ## Factions
 
@@ -148,12 +151,13 @@ All six Approaches must appear at least once across the three POIs:
 - Veil
 - Withdraw
 
-Turn-Based Mode requirements:
+Turn-Based Mode / arena requirements:
 
-- automatic on Confront;
-- manual toggle outside combat in at least the tavern street / alley approach;
-- Move + Action + Bonus economy;
-- Break Away and Spare/Yield available in the abduction and/or arrest Confront.
+- Confront always loads a **thematic Combat Arena** (not in-location TB);
+- no voluntary Turn-Based Mode during free exploration;
+- Move + Action + Bonus economy on the arena only;
+- Break Away and Spare/Yield available in the abduction and/or arrest Confront;
+- at least one Theme Pack used (e.g. street or alley).
 
 ## Decision / Teaching Order
 
@@ -223,15 +227,18 @@ Hard fail conditions:
 
 # Implementation Milestones
 
-## Milestone S0 — Greybox
+## Milestone S0 — Greybox / post-pivot stub
 
-Detailed plan: [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md)
+Detailed plan: [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md) (historical grid-district notes) + [16 Architecture Pivot](16%20Architecture%20Pivot.md) backlog.
 
-- district layout blocked out;
-- tavern, board, shop front, alley;
-- walk / look / talk stubs.
+Post-pivot S0 target:
 
-**Implementation note (2026-08-06):** compact courtyard / straight-avenue greybox superseded by organic town growth — see [13 City Generation](13%20City%20Generation.md). Slice POIs remain mandatory anchors in Lower Veil.
+- seeded overworld stub + free 3P walk;
+- one interior scene (tavern);
+- board / talk stubs on overworld or interior;
+- POI shell markers.
+
+**Implementation note:** Pre-pivot OrganicTown / CityGenerator greybox remains in `unity/` as prototype archive, not the delivery target.
 
 ## Milestone S1 — Information + POI shells
 
@@ -249,13 +256,14 @@ Detailed plan: [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md)
 
 **Implementation note (2026-08-06):** `DecisionNodeCatalog` + `DecisionNodeSession` (keys 1–5 / Esc). Six Approaches covered across A/B options. Confront remains a stub until S3 TB combat. Residue via `DistrictResidue` (labels + Merrin follow-up lines).
 
-## Milestone S3 — Turn-Based Mode
+## Milestone S3 — Combat Arena
 
-- manual TB toggle outside combat;
-- Confront enters TB automatically;
-- Move + Action + Bonus;
+- Confront loads a thematic Combat Arena;
+- Move + Action + Bonus on arena grid only;
 - one simple enemy type;
-- Break Away + Spare/Yield stubs.
+- Break Away + Spare/Yield stubs;
+- return to source scene with residue stub.
+- no voluntary TB outside arenas.
 
 ## Milestone S4 — Trace + Bargain tease
 
@@ -295,8 +303,9 @@ If the budget grows, cut content before cutting systems proof.
 
 # Documentation Review
 
+- **Architecture Pivot:** Slice delivery follows overworld → interior → arena rails.
 - **Vision / Player Experience:** Slice targets curiosity, tense choice, agency, residue, priced power tease.
-- **POI / Information / Approaches / Turn Economy:** Directly implemented in miniature.
+- **POI / Information / Approaches / Turn Economy:** Directly implemented in miniature (TB on arenas only).
 - **Progression / Character Life:** Only first-life foothold and Bargain tease; later-life systems deferred. Death Gap excluded from slice scope.
 - **Era mood:** Compatible with priced mystery and social inequality without requiring high-fantasy gloss.
 - **Solo scope:** Content budget and milestones are intentionally small.
@@ -304,6 +313,7 @@ If the budget grows, cut content before cutting systems proof.
 
 # Related Documents
 
+- [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 - [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md)
 - [04 Points of Interest](04%20Points%20of%20Interest.md)
 - [08 Confront Constraints](08%20Confront%20Constraints.md)

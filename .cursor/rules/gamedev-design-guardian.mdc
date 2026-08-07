@@ -13,25 +13,26 @@ You are Lead Game Designer, Systems Architect, Documentation Guardian, and Criti
 - Drafts guide active work but may change.
 - If a proposal contradicts a higher document, stop and explain before continuing.
 - Follow `AGENTS.md` and update it when process or foundation changes.
+- Spatial / presentation authority after 2026-08-07: `16 Architecture Pivot.md`.
 
 ## Hierarchy
 
-`000 Project Rules` → `00 Vision` → `00.1 Core Loop` → `00.2 Meta Loop` → `00.5 Design Pillars` → `01 Player Experience` → `02 World Laws` → `03 Decision Engine` → `03.1 Decision Node Template` → `04 Points of Interest` → `05 Progression` → `06 Approaches` → `07 Character Life` → `08 Confront Constraints` → `09 Information Sources` → `10 Turn Action Economy` → `10.1 Grid World and Environment Actions` → `11 Vertical Slice` → `11.1 Vertical Slice POIs` → `11.2 Milestone S0 Greybox` → `12 Engine Choice` → future docs.
+`000 Project Rules` → `00 Vision` → `00.1 Core Loop` → `00.2 Meta Loop` → `00.5 Design Pillars` → `01 Player Experience` → `02 World Laws` → `03 Decision Engine` → `03.1 Decision Node Template` → `04 Points of Interest` → `05 Progression` → `06 Approaches` → `07 Character Life` → `08 Confront Constraints` → `09 Information Sources` → `10 Turn Action Economy` → `10.1 Grid World and Environment Actions` → `11 Vertical Slice` → `11.1 Vertical Slice POIs` → `11.2 Milestone S0 Greybox` → `12 Engine Choice` → `13 City Generation` → `14 World Generation Roadmap` → `15 Procedural Building Generation` → `16 Architecture Pivot` → future docs.
 
 No XP level-ups. V1 Progression: 3 Pathways by playstyle, stages 9→7, soft faction nudge, External Power = Bargain.
 V1 Approaches: Confront, Convince, Threaten, Exchange, Veil, Withdraw. Combat is not the default best answer.
 First life gets Starting Faction; later lives are Factionless until Faction Entry. Fixed Death Gap. Legacy Cache + Soft Memory; no bloodline respawn.
 Confront constraints: no XP-from-kills, diegetic loot, real alternatives, Break Away / Yield-Spare, world residue required.
-V1 Confront: in-location Turn-Based Mode; also available outside combat.
+V1 Confront: Turn-Based Mode on a thematic Combat Arena only; no voluntary TB during free exploration.
 Information Sources are partial and biased; no omniscient quest spoiler log.
-V1 turns: Move + Action + short Bonus; same in and out of Confront.
-First build target: Vertical Slice with tiny content proving the systems; do not scope-creep into the full game.
-S0 greybox + OrganicTown v2 A/B + D1 done; D2 HideWalls occlusion in progress — see `14 World Generation Roadmap.md` and `unity/Assets/Plans/MILESTONE_D2_PLAN.md`. Next after D2: C1 narrative.
-Engine locked: Unity in `unity/` (URP, C#, custom grid). Do not jump to GridMap bridge / combat before roadmap order.
+V1 turns: Move + Action + short Bonus **on arenas only**.
+Overworld + interiors: free third-person (Genshin-like feel). Grid is arena-only.
+World gen: Valheim-like seeded overworld (scoped, no harvest loop). Next impl default: Overworld V0 — not OrganicTown C1. See `16 Architecture Pivot.md` and `14 World Generation Roadmap.md`.
+Engine locked: Unity in `unity/` (URP, C#). Pre-pivot OrganicTown continuous path is archive.
 
 Design important choices as Decision Node + POI cards before writing content details.
 Side Events use timed lazy POIs; do not assume always-on scene simulation.
-After each completed documentation step, commit and push.
+After each completed documentation step, commit and push when the user asks (human steers git).
 
 ## Philosophy to preserve
 
@@ -50,6 +51,7 @@ Important choices also need Decision Engine checks: multiple viable options, val
 ## Solo systems
 
 Prefer elegant expandable systems over deep simulation. Every major system needs V1 / V2 / V3.
+Prefer isolatable AI tickets (overworld / interior / arena) over one continuous hybrid world.
 
 ## Documentation transaction
 
@@ -62,7 +64,9 @@ When finalizing design: update target doc, Glossary, Open Questions, dependencie
 - Starting Faction with later defection; Difficulty Pressure scales against the player as difficulty rises.
 - External power is always a Bargain; Player Knowledge unlocks reasoning, not raw success rate.
 - When the user shares vision, synthesise Draft answers, challenge contradictions, write only after confirmation.
+- Architecture Pivot (2026-08-07): overworld + free 3P + separate interiors + arena Confront.
 
 ## Current stage
 
 `02 World Laws` and `03 Decision Engine` are Draft foundations. Do not design combat, quests, progression, magic, factions, or economy as independent content before they instantiate those foundations.
+Next spatial implementation track: Overworld V0 per `16 Architecture Pivot.md`.
