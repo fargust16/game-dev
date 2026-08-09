@@ -1,0 +1,32 @@
+---
+description: Unity C# conventions — System.Random vs UnityEngine.Random, seed forks, ScriptableObjects
+globs: unity/**/*.cs
+alwaysApply: false
+---
+
+# Unity C# conventions
+
+## System.Random vs UnityEngine.Random (must)
+
+In any `.cs` file that has `using UnityEngine;`, bare `Random` is **ambiguous** (CS0104).
+
+For deterministic world/building/settlement generation:
+
+1. Use **`System.Random`** only — never `UnityEngine.Random` for seeded generation.
+2. Prefer the project alias (already used in Town code):
+
+```csharp
+using UnityEngine;
+using Random = System.Random;
+```
+
+3. Or qualify explicitly: `System.Random rng`.
+4. Obtain streams from `IWorldSeed` / `GameDev.World.Seed.WorldSeed.Fork(streamId)` — do not share one mutable RNG across systems.
+
+`UnityEngine.Random` is allowed only for non-deterministic presentation (VFX jitter, one-off editor toys) — never for regenerable world content.
+
+## Related locks
+
+- ScriptableObjects = immutable defs only; no runtime state.
+- Shell / overworld gen stays deterministic: same seed + stream id → same sequence.
+- Prefer plain C# services over MonoBehaviour “managers” for generation cores.

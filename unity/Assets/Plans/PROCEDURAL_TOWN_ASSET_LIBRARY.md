@@ -67,16 +67,20 @@ If any answer is No → do not buy for the core library.
 Assets/Art/TownDress/
   Materials/          ★★★★★ brick, cobble, plaster, wood, slate, metal
   Modules/
+    Structural/       ★★★★★ walls, corners, ends, foundations (Exterior Shell Grammar)
     Doors/            ★★★★★
     Windows/          ★★★★★
     Roofs/            ★★★★★ ridges, hips, chimneys, eaves
     Trim/             ★★★★★ cornices, ledges, sills
+    Vertical/         ★★★★  chimneys, spires (shell grammar)
   Props/              ★★★★★ lamps, barrels, crates, pipes
   Decals/             ★★★★
   Vegetation/         ★★★★
   FX/                 ★★★   (defer)
   Imported/           raw Asset Store drops before sorting
 ```
+
+Shell sandbox lab (placeholders until meshes land): `BUILDING_SHELL_SANDBOX_V0.md`, authority [15](../../../15%20Procedural%20Building%20Generation.md).
 
 Wire materials into `TownGenerator` slots; modules later bind to template openings (D1 cells / sockets), not to scene-authored streets.
 

@@ -1,0 +1,32 @@
+---
+description: Hard non-overlap law for procedural building shells
+globs: unity/Assets/Scripts/World/Buildings/Shell/**/*.cs,unity/Assets/Plans/**/*SHELL*,unity/Assets/Plans/buildings/**
+alwaysApply: false
+---
+
+# Shell Non-Overlap (HARD)
+
+Authority: `unity/Assets/Plans/SHELL_NON_OVERLAP_RULE.md`
+
+## Law
+
+No two shell pieces may occupy the same space. Tiles end where others begin. Overlap / nesting is a generator bug.
+
+## Must
+
+- Assemble **floor-stack bottom-up** (storey 0→N), not full-height annex volumes.
+- Same-floor slabs: XZ interiors disjoint (touching plane OK).
+- Pieces: AABB ⊆ owning slab (inward walls).
+- Party bay → emit nothing; step bay → wall + AtticWindow only.
+- Door only on floor 0; bay cell ≤1 wall + ≤1 opening.
+- Chimney bottom flush on primary top roof.
+- After assemble: `ShellOverlapGuard.Validate` must pass.
+
+## Forbidden
+
+- Double walls/windows on height-step seams
+- Floating chimneys
+- Roof/foundation overshoot into neighbor slab
+- Standard Window on attic/step faces
+
+Do not merge shell grammar that fails the guard or weakens this rule.

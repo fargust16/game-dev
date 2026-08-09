@@ -1,6 +1,6 @@
 # 17 Game Systems Architecture
 
-Version: 0.2
+Version: 0.4
 
 Status: Draft
 
@@ -32,7 +32,7 @@ Success question for agents:
 |----------|-----------|
 | [16 Architecture Pivot](16%20Architecture%20Pivot.md) | Scene graph, movement mode per scene, Confront → arena |
 | [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) | Ordered world-gen phases / stop point |
-| [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) | Building DNA, Room Graph, shells / interiors |
+| [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) | Exterior Shell Grammar + Interior Piece Assembly; Building DNA |
 | **This document (`17`)** | System registry, interfaces, save/MP/perf notes, iteration backlog |
 
 ---
@@ -88,6 +88,16 @@ Every system below uses this card. Fields are mandatory.
 | **Extensibility** | How V2/V3 grow without rewrite |
 | **V1 scope / Deferred** | Near-term include vs later |
 | **Owning folder** | Intended `unity/Assets/Scripts/…` home |
+
+---
+
+# Third-Party Asset Library
+
+Which imported (and pending) third-party packages serve which System Card is tracked in `unity/Assets/Plans/ASSET_LIBRARY_REFERENCE.md` — check it before reaching for a new tool or writing custom code for terrain, vegetation, locomotion animation, or UI/camera tweening.
+
+# World Generation Pipeline (target shape for Track W)
+
+`unity/Assets/Plans/WORLD_GENERATION_PIPELINE.md` distills the full target world-gen pipeline (world layout → macro terrain → hydrology → biomes → materials → vegetation → roads → settlements → streaming) and cross-references each stage to a System Card below. It is not a build-order override — `OVERWORLD_V0_PLAN.md` and the Micro-iteration Backlog still govern what ships next — but every future Track W wave should stay consistent with it instead of inventing terrain features ad hoc.
 
 ---
 
@@ -211,23 +221,23 @@ flowchart LR
 | **Multiplayer** | Deterministic layout from seed; mutations replicated as deltas. |
 | **Performance** | Generate on chunk/settlement demand; cache layout data. |
 | **Extensibility** | Compose settlement layout from the Piece Kit (plot/road/block Pieces) per [15](15%20Procedural%20Building%20Generation.md) — not from the retired OrganicTown polygon generator. |
-| **V1 scope / Deferred** | V0: town-approach marker only (no full settlement gen). Deferred: procedural settlements at scale. |
+| **V1 scope / Deferred** | V0: town-approach marker only (no full settlement gen). Stub layout + shell bind demo lives under `World/Settlement/` for contract tests; full procedural settlements deferred. Shell Sandbox may feed binder without live Settlement. |
 | **Owning folder** | `unity/Assets/Scripts/World/Settlement/` |
 
 ## W.6 Building / Shell
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Exterior shells / landmarks on overworld; door sockets; Building DNA stub fields; no in-overworld enterable interiors. |
-| **Dependencies** | Settlement (or lone POI), WorldSeed; Piece Kit + DNA rules from [15](15%20Procedural%20Building%20Generation.md). |
-| **Public interfaces** | `IBuildingShellBinder { ShellInstance Bind(BuildingDna dna, PlotFootprint plot); }`; shell exposes `PortalSocket`. |
-| **Data flow** | DNA / archetype + plot → shell mesh/prefab instance + portal metadata → Interior Gen key. |
+| **Responsibilities** | Exterior shells / landmarks on overworld via **Exterior Shell Grammar**; door sockets; Building DNA stub fields; no in-overworld enterable interiors. |
+| **Dependencies** | Settlement (or lone POI), WorldSeed; Exterior Piece Kit + DNA rules from [15](15%20Procedural%20Building%20Generation.md). |
+| **Public interfaces** | `IBuildingShellBinder { ShellInstance Bind(BuildingDna dna, PlotFootprint plot, StreetContext street); }`; shell may expose `PortalSocket` when `InteriorPolicy.Portal`. |
+| **Data flow** | DNA / archetype + plot + StreetContext → ShellInstance (pieces) + optional portal metadata → Interior Gen key. |
 | **Save/load** | Shell regenerable; persist damage/ownership later. |
 | **Multiplayer** | Deterministic instance ids from seed+plot; state deltas for damage. |
-| **Performance** | LOD/shell simplification later; V0 greybox boxes OK. |
-| **Extensibility** | Modular TownDress library; DNA-driven facades in later phases of `15`. |
-| **V1 scope / Deferred** | Overworld V0: POI markers / simple landmark props. Shell binder after Interior V0 rails. |
-| **Owning folder** | `unity/Assets/Scripts/World/Buildings/` |
+| **Performance** | Shared materials, Piece LOD slots, trim capped by wealth; HLOD later. |
+| **Extensibility** | Modular TownDress library; grammar grows by Piece Kit, not whole-building prefabs. |
+| **V1 scope / Deferred** | **Shell Sandbox lab** (`GameDev/Buildings/Shell Sandbox`, `BUILDING_SHELL_SANDBOX_V0.md`) runs **parallel to Overworld V0** and does not block W0.x. Production Settlement wiring after Overworld V0; Portal interiors after Interior V0 rails. Overworld V0 itself: POI markers only. |
+| **Owning folder** | `unity/Assets/Scripts/World/Buildings/Shell/` |
 
 ## W.7 Interior Generation
 
@@ -870,3 +880,5 @@ Detail acceptance: [OVERWORLD_V0_PLAN.md](unity/Assets/Plans/OVERWORLD_V0_PLAN.m
 - [AGENTS.md](AGENTS.md)
 - `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`
 - `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`
+- `unity/Assets/Plans/ASSET_LIBRARY_REFERENCE.md`
+- `unity/Assets/Plans/WORLD_GENERATION_PIPELINE.md`

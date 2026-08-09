@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.20
+Version: 0.21
 
 Status: Draft
 
@@ -121,7 +121,7 @@ A Vertical Slice in Lower Veil fantasy with 2 selectable factions (Wardens / Vei
 Chunk = **64 m**; stub playable ≈ **512 m** with infinite-capable chunk API; Interior and Arena V0 use **single-scene swap** (additive later). Documented in [17](17%20Game%20Systems%20Architecture.md) and `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`.
 
 **What generation mechanism produces World / Settlement / Building / Interior content?**  
-**Piece-Based Assembly**: small hand-authored Pieces carrying Snap Sockets, snapped together deterministically small → large (Piece → Room/Plot → Floor/Building → Block/Settlement → overworld POI), reference model Valheim's room/dungeon piece system. Not an algorithmic subdivision solver, not the retired OrganicTown continuous-mesh generator. Documented in [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
+**Piece-Based Assembly**: small hand-authored Pieces carrying Snap Sockets, snapped together deterministically small → large. **Exterior Shell Grammar** builds overworld fabric (most buildings never get a Room Graph). **Interior Piece Assembly** runs only for `InteriorPolicy.Portal` buildings. Reference model: Valheim's room/dungeon piece system. Not an algorithmic subdivision solver, not the retired OrganicTown continuous-mesh generator. Documented in [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
 
 **Is the OrganicTown / City Generation prototype a reuse source for the new pipeline?**  
 No. [13 City Generation](13%20City%20Generation.md) is Deprecated: not viable (not modular, not optimized, did not read as a real city), not a bridge, not extended. Only generic non-city-specific ideas (deterministic `WorldSeed` fork-by-name) carry forward.
@@ -259,6 +259,8 @@ When does additive interior/arena load replace V0 single-scene swap? (V0 default
 How aggressive may OccultLevel visual “wrongness” be in V1 without spoiling Veil / Attention teaching?
 
 What is the minimum viable Piece Kit size per V1 archetype (how many distinct Pieces per socket type) before repetition becomes visible to the player?
+
+When does live Settlement / overworld chunk streaming consume `IBuildingShellBinder` from the Shell Sandbox lab (parallel to Overworld V0 today)? ([15](15%20Procedural%20Building%20Generation.md), [17](17%20Game%20Systems%20Architecture.md) W.6)
 
 ---
 

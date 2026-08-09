@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.27
+Version: 0.30
 
 Status: Draft
 
@@ -398,43 +398,91 @@ Greybox arena kit tagged by mood (street, tavern, cellar, woods, …) used when 
 
 ## Building DNA
 
-Seeded identity of one building instance (archetype, district, wealth, faction ownership, era, style, crime/occult/story/damage levels, secrets mask). Upstream driver for exterior shell, interior scene, facade/roof, dress, secrets, and gameplay sockets. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+Seeded identity of one building instance (archetype, district, wealth, style, LandmarkClass, InteriorPolicy, and interior stubs such as secrets/occult). Upstream driver for **Exterior Shell Grammar** and, when Portal, interior scene assembly. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## Exterior Shell Grammar
+
+Ordered, DNA-driven assembly of overworld building exteriors from an Exterior Piece Kit on a modular Bay/Storey grid: foundation → storeys → roof → vertical → trim, constrained by PlotFootprint and StreetContext. Background fabric does **not** build a Room Graph. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## Shell Non-Overlap Rule
+
+Hard lock for Exterior Shell Grammar: floor-stack slabs and shell pieces must abut without intersecting. Build bottom-up by storey; party bays emit nothing; step faces use AtticWindow; chimneys sit flush on the roof. Enforced by `ShellOverlapGuard`. Spec: `unity/Assets/Plans/SHELL_NON_OVERLAP_RULE.md`.
+
+---
+
+## AtticWindow
+
+Opening type on a **step face** — the wall of a continuing storey that overlooks a lower roof where another slab ended. Distinct from standard storey `Window` so art/kit can treat dormer/attic lights separately.
+
+---
+
+## StreetContext
+
+Per-face classification of a building plot (`Street`, `Alley`, `Yard`, `Square`, `Party`) used by Exterior Shell Grammar to place doors, shopfronts, windows, and blank party walls. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## PlotFootprint
+
+Settled building lot: bay width/depth, shape (V1 rectangle / corner), orientation, and street mask. Selected before archetype/DNA sampling. Distinct from the assembled ShellInstance. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## LandmarkClass
+
+`Background` | `Notable` | `Landmark`. Background/Notable use Exterior Shell Grammar; Landmark uses a handcrafted prefab + DNA stub and skips fabric grammar. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## InteriorPolicy
+
+`None` (overworld shell only) or `Portal` (shell exposes a door link to a separate interior scene). Most fabric buildings are `None`. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## Bay / Storey
+
+Exterior modular grid units: Bay = 2 m (plan), Storey = 3 m (height). Locked for V1 Piece authoring and shell assembly. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
 
 ---
 
 ## Room Graph
 
-Graph of rooms and circulation edges for an **interior scene** (and floor stack) — the *result* of Piece-Based Assembly, not an algorithmic subdivision. Compiled into scene layout / openings / vertical cores — not into overworld GridMap. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+Graph of rooms and circulation edges for an **interior scene** (Portal buildings only) — the *result* of Interior Piece Assembly, not an algorithmic subdivision. Not used for background overworld shells. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
 
 ---
 
 ## Piece
 
-A small, hand-authored modular unit of geometry (a room segment, a floor slice, a street or block module) carrying Snap Sockets on its boundary. The base unit of Piece-Based Assembly at every scale — interior rooms, buildings, and settlement blocks. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+A small, hand-authored modular unit of geometry (exterior wall/window/roof bay, or interior room segment, or street/block module) carrying Snap Sockets on its boundary. Base unit of Piece-Based Assembly. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
 
 ---
 
 ## Snap Socket
 
-A typed connection point on a Piece's boundary (door-width, wall-run, street-frontage, corridor-end, …). An assembler may only join two Pieces through compatible sockets, which keeps generated output structurally legal without an algorithmic solver. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+A typed connection point on a Piece's boundary (wall-run, street-frontage, door-bay, corridor-end, …). An assembler may only join two Pieces through compatible sockets. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
 
 ---
 
 ## Piece Kit
 
-The curated library of Pieces available to an archetype, district, or biome (also called Room Library at room scale). Grows on demand as new archetypes enter production; never ships as whole-building or whole-room prefabs. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+The curated library of Pieces available to an archetype or district. **Exterior Piece Kit** dresses shells; **Room Library** is the interior kit for Portal buildings. Never ships whole-building prefabs as fabric authority. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
 
 ---
 
 ## Piece-Based Assembly
 
-The locked generation mechanism for World, Settlement, and Building/Interior content: a deterministic seed + DNA-driven algorithm selects and snaps compatible Pieces together small → large (Piece → Room/Plot → Floor/Building → Block/Settlement → overworld POI/zone). Reference model: Valheim's room/dungeon piece system. Replaces algorithmic floor-plan subdivision and the retired OrganicTown continuous-mesh generator ([13 City Generation](13%20City%20Generation.md), deprecated). See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
+Locked generation mechanism: deterministic seed + DNA selects and snaps compatible Pieces small → large. Exterior path: Piece → storey → Shell → Block/Settlement. Interior path (Portal only): Piece → Room → Floor → Interior Scene. Reference: Valheim room/dungeon pieces. Replaces subdivision solvers and retired OrganicTown continuous-mesh ([13 City Generation](13%20City%20Generation.md), deprecated). See [15](15%20Procedural%20Building%20Generation.md), [17](17%20Game%20Systems%20Architecture.md).
 
 ---
 
 ## Modular Building Pipeline
 
-Architecture-as-system pipeline: DNA → exterior shell / POI → interior scene (room graph) → openings → facade/roof modules → materials → dress → secrets → gameplay bindings. Whole-building prefabs are forbidden as authority; module prefabs are allowed. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+DNA → Plot/StreetContext → Exterior Shell Grammar → optional Portal → Interior Piece Assembly (room graph) → dress/secrets/bindings. Whole-building prefabs forbidden as fabric authority; Landmark prefabs and module prefabs allowed. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
 
 ---
 
