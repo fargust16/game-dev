@@ -9,7 +9,7 @@ namespace GameDev.World.Town
 {
     /// <summary>
     /// OrganicTown v2 orchestrator — deterministic stage pipeline into <see cref="TownModel"/>.
-    /// Milestone B/D1/D2: greybox bake + building occlusion hookup.
+    /// Milestone B/D1/D2 + P0 playable radius bridge.
     /// </summary>
     public sealed class TownGenerator : MonoBehaviour
     {
@@ -19,6 +19,23 @@ namespace GameDev.World.Town
         [SerializeField] private bool timeSliced;
         [SerializeField] private bool bakeGreybox = true;
         [SerializeField] private bool enableBuildingOcclusion = true;
+
+        [Header("P0 Playable Bridge")]
+        [SerializeField] private bool bakePlayableGrid = true;
+        [SerializeField] private float playableRadiusMetres = TownGridBaker.DefaultPlayableRadiusMetres;
+        [SerializeField] private bool spawnPlayerAndCamera = true;
+        [SerializeField] private bool spawnInteractables = true;
+        [SerializeField] private bool spawnEnvActions = true;
+        [SerializeField] private bool scatterDress = true;
+        [SerializeField] private GameObject playerCapsulePrefab;
+        [SerializeField] private GameObject envActionStubPrefab;
+        [Header("P0 Library Materials (tileable)")]
+        [SerializeField] private Material roadMaterial;
+        [SerializeField] private Material wallMaterial;
+        [SerializeField] private Material floorMaterial;
+        [SerializeField] private Material plasterMaterial;
+        [SerializeField] private Material roofMaterial;
+        [SerializeField] private Material woodMaterial;
 
         [Header("S0 Greybox Prefabs (Milestone B/D1)")]
         [SerializeField] private GameObject floorTilePrefab;
@@ -42,12 +59,15 @@ namespace GameDev.World.Town
         private readonly TownModel _model = new TownModel();
         private readonly List<string> _validationLog = new List<string>(32);
         private WorldSeed _worldSeed = new WorldSeed();
+        private TownGridBaker.BakeResult _lastPlayableBake;
 
         public TownModel Model => _model;
         public IReadOnlyList<string> ValidationLog => _validationLog;
         public int Seed => seed;
         public TownProfile Profile => profile;
         public bool BakeGreybox => bakeGreybox;
+        public float PlayableRadiusMetres => playableRadiusMetres;
+        public TownGridBaker.BakeResult LastPlayableBake => _lastPlayableBake;
 
         public bool DrawBoundary => drawBoundary;
         public bool DrawTerrain => drawTerrain;
@@ -87,6 +107,7 @@ namespace GameDev.World.Town
             _worldSeed.value = seed;
             _model.Reset(seed);
             _validationLog.Clear();
+            TownPlayableBootstrap.ClearContent(transform);
 
             Stage_SiteAndLandmark.Run(_model, profile, _worldSeed.Fork("site"));
             Stage_PrimaryRoads.Run(_model, profile, _worldSeed.Fork("primaryRoads"));
@@ -111,6 +132,11 @@ namespace GameDev.World.Town
             {
                 TownGreyboxBaker.Clear(transform);
             }
+
+            if (bakePlayableGrid)
+            {
+                BakePlayableNow();
+            }
         }
 
         public IEnumerator GenerateAsync(int generateSeed)
@@ -120,6 +146,7 @@ namespace GameDev.World.Town
             _worldSeed.value = seed;
             _model.Reset(seed);
             _validationLog.Clear();
+            TownPlayableBootstrap.ClearContent(transform);
 
             Stage_SiteAndLandmark.Run(_model, profile, _worldSeed.Fork("site"));
             yield return null;
@@ -149,6 +176,11 @@ namespace GameDev.World.Town
             {
                 TownGreyboxBaker.Clear(transform);
             }
+
+            if (bakePlayableGrid)
+            {
+                BakePlayableNow();
+            }
         }
 
         public void BakeGreyboxNow()
@@ -166,6 +198,37 @@ namespace GameDev.World.Town
             landmarkBlockPrefab = prefs.LandmarkBlock;
             wallSegmentPrefab = prefs.WallSegment;
             RefreshBuildingOcclusion();
+        }
+
+        public TownGridBaker.BakeResult BakePlayableNow()
+        {
+            var prefs = new TownPlayableBootstrap.PrefabRefs
+            {
+                PlayerCapsule = playerCapsulePrefab,
+                EnvStub = envActionStubPrefab,
+                PropStub = building1x1Prefab,
+                LampStub = landmarkBlockPrefab
+            };
+
+            var options = new TownPlayableBootstrap.Options
+            {
+                PlayableRadiusMetres = playableRadiusMetres,
+                SpawnPlayer = spawnPlayerAndCamera,
+                SpawnInteractables = spawnInteractables,
+                SpawnEnvActions = spawnEnvActions,
+                ScatterDress = scatterDress,
+                RoadMaterial = roadMaterial,
+                WallMaterial = wallMaterial,
+                FloorMaterial = floorMaterial,
+                PlasterMaterial = plasterMaterial,
+                RoofMaterial = roofMaterial,
+                WoodMaterial = woodMaterial
+            };
+
+            _lastPlayableBake = TownPlayableBootstrap.Bootstrap(this, ref prefs, options);
+            playerCapsulePrefab = prefs.PlayerCapsule;
+            envActionStubPrefab = prefs.EnvStub;
+            return _lastPlayableBake;
         }
 
         private void RefreshBuildingOcclusion()
@@ -207,9 +270,11 @@ namespace GameDev.World.Town
 
         public void ClearModel()
         {
+            TownPlayableBootstrap.ClearContent(transform);
             TownGreyboxBaker.Clear(transform);
             _model.Reset(seed);
             _validationLog.Clear();
+            _lastPlayableBake = default;
             RefreshBuildingOcclusion();
         }
 

@@ -14,10 +14,10 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: 0.45, g: 0.48, b: 0.52, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.018
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -119,6 +119,50 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &375991712
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 375991714}
+  - component: {fileID: 375991713}
+  m_Layer: 0
+  m_Name: GameInputService
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &375991713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375991712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3e4a5b62738495a6b7c8d9e0f112233, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameDev.Input.GameInputService
+--- !u!4 &375991714
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375991712}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &688558531
 GameObject:
   m_ObjectHideFlags: 0
@@ -129,6 +173,7 @@ GameObject:
   m_Component:
   - component: {fileID: 688558533}
   - component: {fileID: 688558532}
+  - component: {fileID: 688558534}
   m_Layer: 0
   m_Name: TownGenerator
   m_TagString: Untagged
@@ -148,10 +193,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e3151f427df437fb6c38e4348090353, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameDev.World.Town.TownGenerator
-  seed: 964631125
+  seed: 972122828
   profile: {fileID: 11400000, guid: 1d0a59210381ea245b97e3a03f4c5d66, type: 2}
   generateOnPlay: 0
   timeSliced: 0
+  bakeGreybox: 1
+  enableBuildingOcclusion: 1
+  bakePlayableGrid: 1
+  playableRadiusMetres: 90
+  spawnPlayerAndCamera: 1
+  spawnInteractables: 1
+  spawnEnvActions: 1
+  scatterDress: 1
+  playerCapsulePrefab: {fileID: 1401350637610907849, guid: 8a1d8fae47104e1429ef9ed54dc6e337, type: 3}
+  envActionStubPrefab: {fileID: 6946574010318906447, guid: da223bc6e541c514794804cb44015ab3, type: 3}
+  roadMaterial: {fileID: 0}
+  wallMaterial: {fileID: 0}
+  floorMaterial: {fileID: 0}
+  plasterMaterial: {fileID: 0}
+  roofMaterial: {fileID: 0}
+  woodMaterial: {fileID: 0}
+  floorTilePrefab: {fileID: 5882306468440332242, guid: dc14ebd698b40bc41b5377c3b72eb863, type: 3}
+  building1x1Prefab: {fileID: 6608379140717881035, guid: 951b89ed030efa047945f83df8a045af, type: 3}
+  landmarkBlockPrefab: {fileID: 4693989381987915387, guid: d4925c055049af24ab1c0cacbfa1cba7, type: 3}
+  wallSegmentPrefab: {fileID: 8036931506656215241, guid: c93779b09ddfd0e4586d19b9312be9dc, type: 3}
   drawBoundary: 1
   drawTerrain: 1
   drawPortals: 1
@@ -160,6 +225,7 @@ MonoBehaviour:
   drawBlocks: 1
   drawPlots: 1
   drawBuildings: 1
+  drawSockets: 1
   drawOpenSpaces: 1
   drawLandmark: 1
 --- !u!4 &688558533
@@ -177,8 +243,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &688558534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688558531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f69acf562aba767478fb3936fefd290d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameDev.World.Town.BuildingOcclusionController
+  townGenerator: {fileID: 688558532}
+  trackTarget: {fileID: 0}
+  mode: 0
+  sampleHeight: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 688558533}
+  - {fileID: 375991714}

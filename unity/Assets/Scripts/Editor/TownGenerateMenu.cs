@@ -123,6 +123,33 @@ namespace GameDev.EditorTools
             Selection.activeGameObject = gen.gameObject;
         }
 
+        [MenuItem("GameDev/Town/Bake Playable Grid")]
+        public static void BakePlayableGrid()
+        {
+            EnsureTownSceneActive();
+            var gen = FindOrCreateGenerator();
+            if (gen.Model == null || gen.Model.Bounds == null || gen.Model.Bounds.Count < 3)
+            {
+                gen.Generate(gen.Seed);
+            }
+            else
+            {
+                if (gen.transform.Find(TownGreyboxBaker.RootName) == null)
+                {
+                    gen.BakeGreyboxNow();
+                }
+
+                gen.BakePlayableNow();
+            }
+
+            SaveActive();
+            Selection.activeGameObject = gen.gameObject;
+            var bake = gen.LastPlayableBake;
+            Debug.Log(
+                $"[Town] Playable bake walkable={bake.WalkableCount} spawn={bake.Spawn} " +
+                $"portalDir={bake.HasPortalDirectionWalkable}");
+        }
+
         [MenuItem("GameDev/Town/Clear")]
         public static void ClearTown()
         {
