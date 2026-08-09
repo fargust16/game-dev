@@ -1,6 +1,6 @@
 # 14 World Generation Roadmap
 
-Version: 0.11
+Version: 0.12
 
 Status: Draft
 
@@ -43,7 +43,8 @@ Locked in [16](16%20Architecture%20Pivot.md):
 ## Game Systems Architecture ✅ (docs)
 
 [17](17%20Game%20Systems%20Architecture.md) v0.1 records System Cards, dependency DAG, and micro-iterations (Track W = world gen).  
-Overworld V0 code micro-plan: `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`.
+Overworld V0 code micro-plan: `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`.  
+Full target shape for Track W beyond V0 (world layout → macro terrain → hydrology → biomes → materials → vegetation → roads → settlements → streaming, plus the 12-iteration build order): `unity/Assets/Plans/WORLD_GENERATION_PIPELINE.md`. Not a build order override — `OVERWORLD_V0_PLAN.md` and this file's roadmap table below still govern what ships next.
 
 Code under `unity/` is still **pre-pivot prototype archive** until Overworld V0 iterations land.
 
@@ -139,4 +140,4 @@ Do **not** resume this order unless the user explicitly overrides [16](16%20Arch
 - [13 City Generation](13%20City%20Generation.md) — deprecated, historical only
 - [12 Engine Choice](12%20Engine%20Choice.md)
 - [11 Vertical Slice](11%20Vertical%20Slice.md)
-- Unity plans: `OVERWORLD_V0_PLAN.md`, archive under `unity/Assets/Plans/`
+- Unity plans: `OVERWORLD_V0_PLAN.md`, `WORLD_GENERATION_PIPELINE.md`, archive under `unity/Assets/Plans/`
