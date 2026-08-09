@@ -1,10 +1,10 @@
 # 16 Architecture Pivot
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft
 
-Last Updated: 2026-08-07
+Last Updated: 2026-08-09
 
 Depends On:
 [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
@@ -180,16 +180,16 @@ Arenas are greybox-first. Fidelity = readable mood + cover props, not 1:1 copy o
 
 ---
 
-# 5. Pre-Pivot Prototype Map (do not extend by default)
+# 5. Pre-Pivot Prototype Map (deprecated — not a reuse source)
 
 | Prototype | Status |
 |-----------|--------|
-| OrganicTown v2 continuous town (A–D2, P0 GridMap) | Research / archive under `unity/` |
-| In-world Building Occlusion / enterable templates | Superseded as primary path |
-| v1 raster `CityGenerator` playable city | Legacy reference for district mood |
+| OrganicTown v2 continuous town (A–D2, P0 GridMap) | Deprecated / archive under `unity/` — see [13 City Generation](13%20City%20Generation.md) |
+| In-world Building Occlusion / enterable templates | Deprecated, superseded |
+| v1 raster `CityGenerator` playable city | Deprecated, historical reference only |
 | Grid Free Exploration + voluntary TB | Cancelled |
 
-Agents must **not** treat “full C1 continuous narrative on OrganicTown sockets” as the default next implementation unless the user explicitly overrides this pivot.
+OrganicTown is not viable (not modular, not optimized, did not read as a real city — [13 City Generation](13%20City%20Generation.md)). Agents must **not** treat “full C1 continuous narrative on OrganicTown sockets” as the default next implementation, and must not reuse its algorithms in the new [15](15%20Procedural%20Building%20Generation.md) Piece-Based Assembly pipeline.
 
 ---
 
@@ -231,7 +231,7 @@ Each ticket should get its own micro-plan before code.
 - **Vision / Pillars:** Compatible — Curiosity, priced power, living world remain; only presentation splits.
 - **Confront constraints:** Compatible — arena is presentation; residue / no XP / alternatives remain.
 - **Solo / AI shipability:** Improved by isolating overworld, interiors, and arenas.
-- **Code:** Untouched; `unity/` OrganicTown remains pre-pivot prototype until a post-pivot micro-plan says otherwise.
+- **Code:** Untouched; `unity/` OrganicTown remains pre-pivot prototype archive, deprecated, not a reuse source for new world/settlement/building systems ([13](13%20City%20Generation.md), [15](15%20Procedural%20Building%20Generation.md)).
 
 ---
 

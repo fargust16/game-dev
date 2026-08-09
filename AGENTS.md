@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.25
+Version: 0.26
 
 Status: Draft
 
-Last Updated: 2026-08-07
+Last Updated: 2026-08-09
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -150,9 +150,7 @@ If a contradiction appears, stop and explain it before continuing.
 - 10.1 Grid World and Environment Actions
 - 11 Vertical Slice
 - 11.1 Vertical Slice POIs
-- 11.2 Milestone S0 Greybox
 - 12 Engine Choice
-- 13 City Generation
 - 14 World Generation Roadmap
 - 15 Procedural Building Generation
 - 16 Architecture Pivot
@@ -160,6 +158,11 @@ If a contradiction appears, stop and explain it before continuing.
 - 90 Glossary
 - 99 Open Questions
 - AGENTS.md
+
+## Deprecated
+
+- 13 City Generation — retired OrganicTown scaffold; historical only, not a reuse source.
+- 11.2 Milestone S0 Greybox — retired grid-district greybox; superseded by the post-pivot S0 target inline in [11 Vertical Slice](11%20Vertical%20Slice.md).
 
 Before proposing new mechanics, read every document above the level you are changing, plus Glossary and Open Questions.
 

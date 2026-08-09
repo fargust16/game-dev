@@ -1,10 +1,10 @@
 # 13 City Generation
 
-Version: 0.7
+Version: 0.8
 
-Status: Draft (legacy / mood reference)
+Status: Deprecated
 
-Last Updated: 2026-08-07
+Last Updated: 2026-08-09
 
 Depends On:
 [02 World Laws](02%20World%20Laws.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -14,116 +14,41 @@ Referenced By:
 
 ---
 
-> **Status after Architecture Pivot (2026-08-07):** This document is **legacy / district-mood reference**. It is **not** the authoritative spatial model. Authority: [16 Architecture Pivot](16%20Architecture%20Pivot.md) (seeded overworld, separate interiors, arena combat). OrganicTown / `CityGenerator` code remains prototype archive.
+> **Deprecated (2026-08-09).** This document is a historical record only. The seed-driven organic town scaffold it describes (`WorldSeed` + `CityGenerator` + `OrganicTown` vector pipeline) is **not viable** as a foundation for the project: it produced a single hand-tuned, non-modular continuous town that was expensive to iterate on, did not scale, and did not read as a real city. It is **not** a reuse source — not for algorithms, not for street/district ideas, not as a "bridge" for later systems. World and settlement generation authority now lives entirely in [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) and [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), built on **Piece-Based Assembly** (small hand-authored modules snapped small → large, Valheim-style), not on this document's continuous-polygon growth pipeline.
 
-# Purpose
+# What This Document Was
 
-Historical definition of the **seed-driven organic town scaffold** for Lower Veil mood: a late-18th/19th-century industrial-occult town that appears to have grown over decades.
+Historical definition of a **seed-driven organic town scaffold** for the Lower Veil mood: a late-18th/19th-century industrial-occult town grown from a market plaza outward via organic road polylines, radial wedge districts, and frontage-parcel buildings.
 
-Useful for: street names, district wedges, POI placement fiction, art direction.  
-Not useful as: continuous grid gameplay truth or next implementation default.
+Two prototypes were built and shipped as playable greybox under this design:
 
-Success question (historical):
+| Layer | What it was |
+|-------|-------------|
+| v1 raster | `CityGenerator` + raster helpers — a single playable Lower Veil scaffold |
+| v2 vector (OrganicTown) | A–D2 + P0 vector pipeline — districts, parcels, roads, buildings, templates, sockets, occlusion, radius `GridMap` bake |
 
-> Does regenerating with seed A vs B change crooked streets and blocks while always placing slice POIs?
+# Why It Was Retired
 
-# Status (2026-08-07)
+- **Not modular.** The generator produced one continuous, hand-tuned polygon town per seed — there was no small reusable "piece" to iterate on, tune, or reuse across settlements.
+- **Not optimized.** Continuous per-cell raster/vector geometry and GridMap baking did not scale past a single small district.
+- **Did not read as a real city.** Organic road midpoint-displacement and radial wedge districts produced a plausible silhouette but not a structurally believable town.
+- **Tangled with combat and interiors.** The [16 Architecture Pivot](16%20Architecture%20Pivot.md) already identifies this entanglement (grid-truth-everywhere, enterable buildings in the same scene, in-location combat) as the root failure that made the whole stack too expensive for solo + AI-driven development.
 
-| Layer | State |
-|-------|--------|
-| **v1 raster playable** | Prototype archive — `CityGenerator` … `City_OrganicTown.unity`, menu `GameDev/City/…` |
-| **v2 vector (OrganicTown)** | Prototype archive — A–D2 + P0 done under pre-pivot locks. Menu `GameDev/Town/…` |
+# What Replaces It
 
-**Living roadmap:** [16 Architecture Pivot](16%20Architecture%20Pivot.md) + post-pivot [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md).  
-**Next phase:** Overworld V0 — not OrganicTown C1.
+- **Overworld shape:** seeded, chunked, Valheim-style — [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
+- **Settlement / building / interior generation:** Piece-Based Assembly — small hand-authored pieces with Snap Sockets, composed deterministically small → large — [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
 
-# Growth Pipeline (v1 raster — playable)
-
-Implementation: `WorldSeed` + `CityGenerator` + raster helpers under `unity/Assets/Scripts/World/Town/`.
-
-Order:
-
-1. **Market plaza** (irregular) at town center — Soot & Bell hub.
-2. **Attractors** on the rim — Ridge (N) gate, factory (E), Undercroft (S) gate, farm/bridge (W).
-3. **Major roads** — organic polylines (midpoint displacement), variable width by district.
-4. **Broken ring** + **secondary streets** + **alleys / courtyards / dead ends**.
-5. **District mask** — radial wedges + distance (not axis-aligned bands).
-6. **Frontage parcels** → greybox buildings; factory mass on the east.
-7. **Mandatory anchors** → path guarantee to market.
-8. Wire clock / POI / decisions / lighting / input.
-
-# World Seed Streams
-
-Prototype default seed: **110201** (Inspector-overridable).
-
-| Stream | Owns |
-|--------|------|
-| `roads` | Plaza, attractors, majors, ring, secondaries, alleys |
-| `blocks` | Reserved for block IDs / future subdivision detail |
-| `parcels` | Frontage plot depth/width and building instances |
-| `anchors` | Side/offset of mandatory sites (not presence) |
-| `dressing` | Waymarkers, wells, sparse street stubs |
-
-# Districts (wedges)
-
-Grid target: **~180×140 cells**, ~1 m/cell. Town disk radius ~55–68.
-
-| District | Geometry | Role |
-|----------|----------|------|
-| **Ridge** | Northern wedge, higher cells | Richer plots, wider streets, player spawn |
-| **Lower Veil** | Central + eastern belt | Market, slice POIs, factory corridor |
-| **Undercroft** | Southern dense wedge | Narrow alleys, Veinmarket, doctor |
-
-Street widths (human scale): Ridge majors 3–4 cells, Veil arterial 3, Undercroft approach 2, alleys 1.
-
-# Mandatory Anchors
-
-Seed may change parcel side / offset. Presence is fixed. Each must A*-reach the market (corrective alley if needed).
-
-| Anchor | Placement rule |
-|--------|----------------|
-| Soot & Bell + Merrin + Notice Board | On / abutting market plaza |
-| Harrow & Tincture + POI A | Lower Veil along east major |
-| Loom Lane / Alley + Nia + POI B | Lower Veil side-street / alley |
-| Coal Stairs + POI C | Near factory mass, east |
-| Ridge Approach spawn | North gate road, Ridge |
-| Warden Post stub | Ridge / Lower boundary |
-| Veinmarket Alley stub | Undercroft deep alley |
-| Unlicensed doctor stub | Undercroft, different block |
-
-Slice POIs **live in Lower Veil**.
-
-# Performance (Greybox Scale)
-
-- Merged **street floor strips** only (no per-cell cubes).
-- Buildings along **street frontage**; factory as one mass.
-- Optional dense grid debug drawer — expect cost on large maps.
-
-# Editor
-
-- Scene: `Assets/Scenes/City_OrganicTown.unity` (separate from legacy `S0_LowerVeil`)
-- `GameDev/City/Open Or Create Town Scene`
-- `GameDev/City/Generate From Seed`
-- `GameDev/City/Generate From Seed (New Random)`
-- Legacy `GameDev/S0/...` can still rebuild greybox; prefer City menu for the organic town.
-
-# Explicitly Out
-
-- Full traffic / carriage AI.
-- NavMesh as movement truth.
-- Beautiful art packs.
-- Full World Engine Influence sim.
-- Multi-city / overworld map.
+Code under `unity/` implementing this document (`CityGenerator`, `OrganicTown`, `TownGridBaker`, related menus/scenes) remains in the repository as archive per [001 Documentation Standards](001%20Documentation%20Standards.md) ("never delete design history") but must not be extended.
 
 # Documentation Review
 
-- Replaces the E–W avenue scaffold model from v0.1.
-- Extends World Seed (02) and grid rules (10.1); does not replace Decision Engine.
+- Deprecated in the same transaction that adds Piece-Based Assembly to [14](14%20World%20Generation%20Roadmap.md)/[15](15%20Procedural%20Building%20Generation.md).
+- No longer authoritative for World Seed districts, street generation, or spatial gameplay truth.
 
 # Related Documents
 
 - [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
-- [11 Vertical Slice](11%20Vertical%20Slice.md)
-- [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md)
-- [12 Engine Choice](12%20Engine%20Choice.md)
+- [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md)
+- [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 - [90 Glossary](90%20Glossary.md)

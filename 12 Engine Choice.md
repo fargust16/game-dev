@@ -1,10 +1,10 @@
 # 12 Engine Choice
 
-Version: 1.2
+Version: 1.3
 
 Status: Draft
 
-Last Updated: 2026-08-07
+Last Updated: 2026-08-09
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -52,7 +52,7 @@ Godot 4 was considered and remains historically documented below as the rejected
 7. Keep package bloat low; every package must earn its place.
 8. Design docs remain source of truth over random Unity tutorial patterns.
 9. **Input:** Unity Input System, **Package Only** (`activeInputHandler: 1`). Gameplay reads a project input service — not legacy `UnityEngine.Input`.
-10. **Pre-pivot OrganicTown / CityGenerator code** under `unity/` is prototype archive. Do not extend the continuous enterable-town + world GridMap path by default.
+10. **Pre-pivot OrganicTown / CityGenerator code** under `unity/` is deprecated prototype archive ([13 City Generation](13%20City%20Generation.md)). It is not a reuse source — do not extend the continuous enterable-town + world GridMap path. New building/settlement generation uses Piece-Based Assembly ([15](15%20Procedural%20Building%20Generation.md)).
 
 # Comparison Archive
 

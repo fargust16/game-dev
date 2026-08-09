@@ -1,10 +1,10 @@
 # 000 Project Rules
 
-Version: 1.15
+Version: 1.16
 
 Status: Canonical
 
-Last Updated: 2026-08-07
+Last Updated: 2026-08-09
 
 Depends On:
 —
@@ -139,6 +139,10 @@ Every new document must respect the following hierarchy.
 ↓
 
 16 Architecture Pivot
+
+↓
+
+17 Game Systems Architecture
 
 ↓
 

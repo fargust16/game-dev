@@ -52,12 +52,22 @@ This repository is currently a design bible. Implementation begins only after th
 | [07 Character Life](07%20Character%20Life.md) | Draft | Death Gap, Factionless successors, Legacy Cache, Soft Memory |
 | [08 Confront Constraints](08%20Confront%20Constraints.md) | Draft | Hard fence around combat so it cannot become the whole game |
 | [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
-| [10 Turn Action Economy](10%20Turn%20Action%20Economy.md) | Draft | Move + Action + Bonus for turn-based V1 |
-| [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Draft | Square grid space + vault/climb/window verbs |
-| [12 Engine Choice](12%20Engine%20Choice.md) | Draft | Engine locked: Unity URP + custom grid TB |
-| [11 Vertical Slice](11%20Vertical%20Slice.md) | Draft | First playable proof: 1 district, 3 POIs, TB combat |
+| [10 Turn Action Economy](10%20Turn%20Action%20Economy.md) | Draft | Move + Action + Bonus for turn-based V1, arenas only |
+| [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Draft | Combat Arena grid + vault/climb/window verbs |
+| [11 Vertical Slice](11%20Vertical%20Slice.md) | Draft | First playable proof: 1 district, 3 POIs, arena TB combat |
 | [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) | Draft | Full cards for arrest, collectors, soot-stair trace |
-| [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md) | Draft | Walkable Lower Veil blockout before real systems |
+| [12 Engine Choice](12%20Engine%20Choice.md) | Draft | Engine locked: Unity URP, free 3P + custom arena grid TB |
+| [16 Architecture Pivot](16%20Architecture%20Pivot.md) | Draft | Spatial authority: Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront |
+| [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) | Draft | Systems map, dependency DAG, micro-iteration backlog |
+| [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) | Draft | Post-pivot world-gen order; Piece-Based Assembly |
+| [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) | Draft | Buildings/interiors via Piece-Based Assembly (small → large) |
+
+### Deprecated
+
+| Doc | Status | Role |
+|-----|--------|------|
+| [13 City Generation](13%20City%20Generation.md) | Deprecated | Retired OrganicTown scaffold — historical only, not a reuse source |
+| [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md) | Deprecated | Retired grid-district greybox — see [11](11%20Vertical%20Slice.md) for the current S0 target |
 
 ### Reference
 
@@ -109,12 +119,22 @@ This repository is currently a design bible. Implementation begins only after th
     ↓
 11.1 Vertical Slice POIs
     ↓
-11.2 Milestone S0 Greybox
-    ↓
 12 Engine Choice
+    ↓
+13 City Generation (Deprecated)
+    ↓
+14 World Generation Roadmap
+    ↓
+15 Procedural Building Generation
+    ↓
+16 Architecture Pivot
+    ↓
+17 Game Systems Architecture
     ↓
 Future systems
 ```
+
+`11.2 Milestone S0 Greybox` is Deprecated and sits outside this active chain — see the Deprecated table above.
 
 Lower documents may extend higher ones. They must never contradict them.
 
@@ -149,8 +169,10 @@ Draft foundations in active refinement:
 - [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) — grid-native world + env verbs
 - [11 Vertical Slice](11%20Vertical%20Slice.md) — first playable proof plan
 - [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) — detailed Lower Veil encounter cards
-- [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md) — first prototype milestone: walkable greybox
-- [12 Engine Choice](12%20Engine%20Choice.md) — Unity vs Godot decision
+- [12 Engine Choice](12%20Engine%20Choice.md) — Unity locked: free 3P + custom arena grid TB
+- [16 Architecture Pivot](16%20Architecture%20Pivot.md) — Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront (BG3 / Fallout 1–2 feel)
+- [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — systems map, dependency DAG, micro-iteration backlog
+- [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) / [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) — world/settlement/building generation via **Piece-Based Assembly**: small hand-authored pieces snapped small → large (Valheim-style), not the retired [13 City Generation](13%20City%20Generation.md) prototype
 
 Not yet designing as content:
 
@@ -160,7 +182,7 @@ Not yet designing as content:
 - combat as the default solution
 - full economy simulation
 
-Next work: open `unity/` in Unity Hub and implement Milestone S0 grid greybox.
+Next work: **Overworld V0** per [16 Architecture Pivot](16%20Architecture%20Pivot.md) / [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) and `unity/Assets/Plans/OVERWORLD_V0_PLAN.md` (iterations W0.1–W0.9) — not the archived grid greybox.
 
 ---
 

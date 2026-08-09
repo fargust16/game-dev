@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
-Last Updated: 2026-08-07
+Last Updated: 2026-08-09
 
 Depends On:
 [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -49,6 +49,7 @@ Success question for agents:
 8. **Iteration budget.** Never implement a feature larger than ~500 lines of code in one iteration. Design → break into subsystems → one component → review → refactor → continue.
 9. **Multiplayer-ready core state.** Even while shipping single-player first, core world identity (seed, chunk payloads, POI ids, residue) must not assume local-only mutable globals.
 10. **Design gates.** Combat trees, quest lines, faction lore, and economy simulation must instantiate [02 World Laws](02%20World%20Laws.md) and [03 Decision Engine](03%20Decision%20Engine.md) — this document records **boundaries and interfaces**, not full content mechanics, for gated tracks.
+11. **Piece-Based Assembly, small → large.** World, Settlement, and Building/Interior generation compose from small hand-authored Pieces with Snap Sockets (Valheim-style room/dungeon piece model), never from a whole hand-tuned continuous mesh or an algorithmic subdivision solver. Binding for Track W and [15](15%20Procedural%20Building%20Generation.md); the retired OrganicTown continuous pipeline ([13](13%20City%20Generation.md)) is not a reuse source.
 
 ## Scene reminder (from 16)
 
@@ -66,7 +67,7 @@ Interior ── Confront ──┘
 | Chunk size | **64 m** |
 | Overworld V0 playable stub | **~512 m** edge (chunk API as if infinite) |
 | Interior / Arena load | **Single-scene swap** (additive later) |
-| OrganicTown / TownGridBaker continuous path | **Archive** — do not extend by default |
+| OrganicTown / TownGridBaker continuous path | **Deprecated** — archive only, not a reuse source ([13](13%20City%20Generation.md)) |
 | Combat depth in near-term | Arena V0 TB skeleton + Theme Pack greybox; BG3-depth is long-horizon |
 
 ---
@@ -209,7 +210,7 @@ flowchart LR
 | **Save/load** | Regenerable layout; persist only player/faction mutations later. |
 | **Multiplayer** | Deterministic layout from seed; mutations replicated as deltas. |
 | **Performance** | Generate on chunk/settlement demand; cache layout data. |
-| **Extensibility** | Later plug OrganicTown polygon ideas as exterior-only generators. |
+| **Extensibility** | Compose settlement layout from the Piece Kit (plot/road/block Pieces) per [15](15%20Procedural%20Building%20Generation.md) — not from the retired OrganicTown polygon generator. |
 | **V1 scope / Deferred** | V0: town-approach marker only (no full settlement gen). Deferred: procedural settlements at scale. |
 | **Owning folder** | `unity/Assets/Scripts/World/Settlement/` |
 
@@ -218,7 +219,7 @@ flowchart LR
 | Field | Content |
 |-------|---------|
 | **Responsibilities** | Exterior shells / landmarks on overworld; door sockets; Building DNA stub fields; no in-overworld enterable interiors. |
-| **Dependencies** | Settlement (or lone POI), WorldSeed; recipes from [15](15%20Procedural%20Building%20Generation.md). |
+| **Dependencies** | Settlement (or lone POI), WorldSeed; Piece Kit + DNA rules from [15](15%20Procedural%20Building%20Generation.md). |
 | **Public interfaces** | `IBuildingShellBinder { ShellInstance Bind(BuildingDna dna, PlotFootprint plot); }`; shell exposes `PortalSocket`. |
 | **Data flow** | DNA / archetype + plot → shell mesh/prefab instance + portal metadata → Interior Gen key. |
 | **Save/load** | Shell regenerable; persist damage/ownership later. |
@@ -232,8 +233,8 @@ flowchart LR
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Build or select Interior Scene content from building id + seed (templates → later DNA / Room Graph). Free 3P space; **no grid**. |
-| **Dependencies** | Building/Shell (portal key), WorldSeed; [15](15%20Procedural%20Building%20Generation.md). |
+| **Responsibilities** | Build or select Interior Scene content from building id + seed (one hand template → later Piece-Based Assembly / Room Graph). Free 3P space; **no grid**. |
+| **Dependencies** | Building/Shell (portal key), WorldSeed; Piece Kit + Room Graph generator from [15](15%20Procedural%20Building%20Generation.md). |
 | **Public interfaces** | `IInteriorSceneKey { BuildingId Id; int SeedFork; }`; `IInteriorCompiler { InteriorSceneSpec Compile(IInteriorSceneKey); }` |
 | **Data flow** | Portal activate → scene key → compile/load interior → exit returns overworld pose. |
 | **Save/load** | Geometry regenerable; persist interior mutables (looted containers, NPCs) by building id. |
@@ -843,7 +844,7 @@ Detail acceptance: [OVERWORLD_V0_PLAN.md](unity/Assets/Plans/OVERWORLD_V0_PLAN.m
 2. Next **code** default: [OVERWORLD_V0_PLAN.md](unity/Assets/Plans/OVERWORLD_V0_PLAN.md) iterations W0.1 → W0.9.
 3. Before coding a system, open its System Card; if the card is Deferred/gated, do not invent a full implementation.
 4. If architecture must change, update this document (and contradict-check `16`) **before** code.
-5. Prefer extracting reusable ideas from OrganicTown (`WorldSeed` forks, Geo2, dress library) over extending continuous enterable path.
+5. OrganicTown is deprecated and not a reuse source ([13](13%20City%20Generation.md)). Only generic, non-city-specific patterns already specified independently in this document carry forward: deterministic `WorldSeed` fork-by-name (W.1) and the modular art dressing library (`PROCEDURAL_TOWN_ASSET_LIBRARY.md`). Do not port OrganicTown's polygon/continuous-mesh generation code or algorithms.
 
 ---
 

@@ -1,10 +1,10 @@
 # 14 World Generation Roadmap
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft
 
-Last Updated: 2026-08-07
+Last Updated: 2026-08-09
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
@@ -47,14 +47,14 @@ Overworld V0 code micro-plan: `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`.
 
 Code under `unity/` is still **pre-pivot prototype archive** until Overworld V0 iterations land.
 
-## Pre-pivot prototype archive (do not extend by default)
+## Pre-pivot prototype archive (deprecated — not a reuse source)
 
 | Track | Deliverable | Notes |
 |-------|-------------|-------|
-| OrganicTown v2 A–D2 + P0 | Vector town, greybox, templates, occlusion, radius GridMap | Continuous enterable city — superseded as primary path |
-| v1 raster city | `CityGenerator` playable Lower Veil | Legacy mood / reference |
+| OrganicTown v2 A–D2 + P0 | Vector town, greybox, templates, occlusion, radius GridMap | Continuous enterable city — deprecated, not viable, not reused |
+| v1 raster city | `CityGenerator` playable Lower Veil | Deprecated, historical reference only ([13](13%20City%20Generation.md)) |
 
-Detail plans remain under `unity/Assets/Plans/` with **Superseded** banners.
+Detail plans remain under `unity/Assets/Plans/` with **Superseded** banners. Neither track feeds the new Piece-Based Assembly pipeline in [15](15%20Procedural%20Building%20Generation.md).
 
 ---
 
@@ -65,8 +65,9 @@ Detail plans remain under `unity/Assets/Plans/` with **Superseded** banners.
 3. **Interiors** are **separate scenes** (free move, no grid).
 4. **Confront** always uses a **Combat Arena** scene; grid + Turn Action Economy apply only there ([10](10%20Turn%20Action%20Economy.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md)).
 5. **“Valheim-level”** means deterministic seeded world + biome diversity + streamed/chunked intent — **not** survival harvest, not AAA biomes art in V0.
-6. Pre-pivot OrganicTown continuous fabric is **not** the next implementation default.
-7. Implement **one micro-plan at a time** from the AI backlog in [16](16%20Architecture%20Pivot.md).
+6. Pre-pivot OrganicTown continuous fabric is **deprecated** — not the next implementation default, and not a reuse source for the new pipeline ([13](13%20City%20Generation.md)).
+7. **Piece-Based Assembly, small → large.** World, settlement, and building generation compose from small hand-authored Pieces with Snap Sockets (Valheim-style), never from a whole hand-tuned continuous mesh or an algorithmic subdivision solver. Detail: [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+8. Implement **one micro-plan at a time** from the AI backlog in [16](16%20Architecture%20Pivot.md).
 
 ---
 
@@ -135,7 +136,7 @@ Do **not** resume this order unless the user explicitly overrides [16](16%20Arch
 - [16 Architecture Pivot](16%20Architecture%20Pivot.md) — spatial / presentation authority
 - [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — systems map + Track W iterations
 - [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) — exterior shells + interior scenes
-- [13 City Generation](13%20City%20Generation.md) — legacy / mood reference
+- [13 City Generation](13%20City%20Generation.md) — deprecated, historical only
 - [12 Engine Choice](12%20Engine%20Choice.md)
 - [11 Vertical Slice](11%20Vertical%20Slice.md)
 - Unity plans: `OVERWORLD_V0_PLAN.md`, archive under `unity/Assets/Plans/`

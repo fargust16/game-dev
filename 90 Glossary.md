@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.26
+Version: 0.27
 
 Status: Draft
 
-Last Updated: 2026-08-07
+Last Updated: 2026-08-09
 
 Depends On:
 All Canonical Documents
@@ -296,7 +296,7 @@ Rewards that exist because a target carried or guarded them, not because a fight
 
 ## Turn-Based Mode
 
-Deliberate paced control mode used for Confront and optionally outside combat. Begins inside the current location; reference feel from Baldur's Gate 3 / Fallout 1–2 without requiring feature parity.
+Deliberate paced control mode used only for Confront, on a **Combat Arena** scene ([16 Architecture Pivot](16%20Architecture%20Pivot.md)). Never available voluntarily during free exploration and never begins in the current overworld/interior location. Reference feel from Baldur's Gate 3 / Fallout 1–2 without requiring feature parity.
 
 ---
 
@@ -332,13 +332,13 @@ Placeholder name for the Vertical Slice district: a poor/industrial urban area o
 
 ## City District
 
-A named region of the seed town scaffold (Ridge, Lower Veil, Undercroft). In the organic generator these are radial wedges from the market center (not simple map bands). Districts share one World Seed and road graph; Vertical Slice POIs stay anchored in Lower Veil. See [13 City Generation](13%20City%20Generation.md).
+**Pre-pivot / archive:** a named region of the retired seed town scaffold (Ridge, Lower Veil, Undercroft) — radial wedges from a market center. Not a reuse source. Post-pivot, "Lower Veil" survives only as a Vertical Slice fantasy/POI-naming label, not a spatial scaffold. See [13 City Generation](13%20City%20Generation.md) (deprecated).
 
 ---
 
 ## Anchor Site
 
-A mandatory landmark / NPC / POI placement that every city regenerate must include. Seed may change side or offset; presence is fixed (tavern, board, POI A/B/C, garrison and undercroft stubs, etc.).
+**Pre-pivot / archive:** a mandatory landmark / NPC / POI placement that every retired city regenerate had to include. Post-pivot, deterministic POI presence is owned by [W.4 POI Placement](17%20Game%20Systems%20Architecture.md) in [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), not this term.
 
 ---
 
@@ -392,7 +392,7 @@ Greybox arena kit tagged by mood (street, tavern, cellar, woods, …) used when 
 
 ## BuildingTemplate
 
-**Pre-pivot / archive:** reusable schematic interior cell paint for continuous OrganicTown enterable buildings (D1). Post-pivot, interior content targets **Interior Scenes**; templates may inform recipes but are not world GridMap authority. See [15](15%20Procedural%20Building%20Generation.md).
+**Pre-pivot / archive:** reusable schematic interior cell paint for continuous OrganicTown enterable buildings (D1). Deprecated and not a reuse source — post-pivot interior content targets **Interior Scenes** built fresh by Piece-Based Assembly. See [15](15%20Procedural%20Building%20Generation.md).
 
 ---
 
@@ -404,7 +404,31 @@ Seeded identity of one building instance (archetype, district, wealth, faction o
 
 ## Room Graph
 
-Procedural graph of rooms and circulation edges for an **interior scene** (and floor stack). Compiled into scene layout / openings / vertical cores — not into overworld GridMap. Shared Room Library recipes are reused across archetypes. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+Graph of rooms and circulation edges for an **interior scene** (and floor stack) — the *result* of Piece-Based Assembly, not an algorithmic subdivision. Compiled into scene layout / openings / vertical cores — not into overworld GridMap. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## Piece
+
+A small, hand-authored modular unit of geometry (a room segment, a floor slice, a street or block module) carrying Snap Sockets on its boundary. The base unit of Piece-Based Assembly at every scale — interior rooms, buildings, and settlement blocks. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## Snap Socket
+
+A typed connection point on a Piece's boundary (door-width, wall-run, street-frontage, corridor-end, …). An assembler may only join two Pieces through compatible sockets, which keeps generated output structurally legal without an algorithmic solver. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## Piece Kit
+
+The curated library of Pieces available to an archetype, district, or biome (also called Room Library at room scale). Grows on demand as new archetypes enter production; never ships as whole-building or whole-room prefabs. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+
+---
+
+## Piece-Based Assembly
+
+The locked generation mechanism for World, Settlement, and Building/Interior content: a deterministic seed + DNA-driven algorithm selects and snaps compatible Pieces together small → large (Piece → Room/Plot → Floor/Building → Block/Settlement → overworld POI/zone). Reference model: Valheim's room/dungeon piece system. Replaces algorithmic floor-plan subdivision and the retired OrganicTown continuous-mesh generator ([13 City Generation](13%20City%20Generation.md), deprecated). See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
 
 ---
 
