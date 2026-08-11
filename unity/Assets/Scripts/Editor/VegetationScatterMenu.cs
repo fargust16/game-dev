@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Den.Tools;
 using GameDev.World.Seed;
 using GameDev.World.Terrain;
+using GameDev.World.Water;
 using MapMagic.Core;
 using MapMagic.Terrains;
 using UnityEditor;
@@ -22,7 +23,6 @@ namespace GameDev.EditorTools
     {
         private const string PrefabRoot = "Assets/Polytope Studio/Lowpoly_Environments/Prefabs";
         private const string RootObjectName = "OverworldVegetation";
-        private const string WaterObjectName = "OverworldWater";
 
         // Samples per reference 1000x1000m tile; scaled by actual tile area.
         private const int ReferenceAttempts = 4000;
@@ -109,7 +109,7 @@ namespace GameDev.EditorTools
             var root = new GameObject(RootObjectName);
             var sampler = new MapMagicBiomeSampler(holder);
             var rng = new WorldSeed(OverworldTerrainMenu.LastSeed).Fork("vegetation");
-            var waterY = FindWaterLevelY();
+            var waterZones = Object.FindFirstObjectByType<OverworldWaterZones>();
 
             var minX = tileCoord.x * mapMagic.tileSize.x;
             var minZ = tileCoord.z * mapMagic.tileSize.z;
@@ -129,7 +129,12 @@ namespace GameDev.EditorTools
                     continue;
                 }
 
-                if (!TryFindSurface(x, z, out var y) || y <= waterY)
+                if (!TryFindSurface(x, z, out var y))
+                {
+                    continue;
+                }
+
+                if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y <= waterY)
                 {
                     continue;
                 }
@@ -171,12 +176,6 @@ namespace GameDev.EditorTools
 
             y = 0f;
             return false;
-        }
-
-        private static float FindWaterLevelY()
-        {
-            var water = GameObject.Find(WaterObjectName);
-            return water != null ? water.transform.position.y : float.NegativeInfinity;
         }
 
         private static GameObject PickPrefab(BiomeId biome, System.Random rng)

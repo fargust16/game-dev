@@ -71,11 +71,7 @@ namespace GameDev.EditorTools
             mapMagic.graph = null;
             mapMagic.Refresh(true);
 
-            var water = GameObject.Find("OverworldWater");
-            if (water != null)
-            {
-                Object.DestroyImmediate(water);
-            }
+            WaterZoneMenu.ClearWaterZones();
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
         }
@@ -136,64 +132,11 @@ namespace GameDev.EditorTools
             Debug.Log($"[Overworld] Pinned origin tile. Pinned tiles after pin: {mapMagic.tiles.pinned.Count}, " +
                       $"total tiles in grid: {tileCount}.");
 
-            CreateOrUpdateWaterPlane(mapMagic, originCoord);
+            WaterZoneMenu.GenerateForTile(mapMagic, originCoord);
 
             SaveActive();
             Selection.activeGameObject = mapMagic.gameObject;
             Debug.Log($"[Overworld] Generated terrain from seed {seed}.");
-        }
-
-        /// <summary>
-        /// V0 hydrology, first slice: a flat plane at a fixed height threshold (matches
-        /// BiomeClassifier's Swamp band start) rather than simulated flow/rivers - terrain that
-        /// dips below it reads as lake/pond. Real flow-based rivers are a follow-up
-        /// (WORLD_GENERATION_PIPELINE.md, Iteration 05); this only needs the height scale
-        /// MapMagic already resolves per graph (mapMagic.globals.height, default 250m), no new
-        /// terrain sampling.
-        /// </summary>
-        private static void CreateOrUpdateWaterPlane(MapMagicObject mapMagic, Coord tileCoord)
-        {
-            const float waterLevel01 = 0.1f;
-            const float extentMeters = 1200f;
-            var worldY = waterLevel01 * mapMagic.globals.height;
-
-            // MapMagic tile coords are floor-based like our own ChunkCoord: tile (0,0) spans
-            // world [0, tileSize) on each axis, not centered on the world origin. Center the
-            // water plane on the actual tile instead of assuming (0,0,0) - that mismatch is why
-            // the first version only partly overlapped the terrain.
-            var centerX = (tileCoord.x + 0.5) * mapMagic.tileSize.x;
-            var centerZ = (tileCoord.z + 0.5) * mapMagic.tileSize.z;
-
-            var water = GameObject.Find("OverworldWater");
-            if (water == null)
-            {
-                water = GameObject.CreatePrimitive(PrimitiveType.Plane);
-                water.name = "OverworldWater";
-                var collider = water.GetComponent<Collider>();
-                if (collider != null)
-                {
-                    Object.DestroyImmediate(collider);
-                }
-
-                var renderer = water.GetComponent<Renderer>();
-                renderer.sharedMaterial = CreateWaterMaterial();
-            }
-
-            // Unity's built-in Plane primitive is 10x10 world units at scale 1.
-            var scale = extentMeters / 10f;
-            water.transform.position = new Vector3((float)centerX, worldY, (float)centerZ);
-            water.transform.localScale = new Vector3(scale, 1f, scale);
-
-            Debug.Log($"[Overworld] Water plane at ({centerX:F0},{worldY:F1},{centerZ:F0}) " +
-                      $"(waterLevel01={waterLevel01}).");
-        }
-
-        private static Material CreateWaterMaterial()
-        {
-            var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-            var material = new Material(shader) { name = "OverworldWater (generated)" };
-            material.color = new Color(0.15f, 0.35f, 0.55f, 0.75f);
-            return material;
         }
 
         private static MapMagicObject FindOrCreateMapMagicObject()
@@ -212,22 +155,30 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>
-        /// Plateau noise remapped to a thin margin just above the water level, with an added
-        /// rolling-hills noise layer, blended with one huge-period noise field cut off by Levels
-        /// so only its highest local values rise into a single mountain mass, then six deliberate
-        /// lake sites (varied size/threshold, random world-space offsets, combined via max) are
-        /// subtracted so multiple lakes of varying size actually reach below the water level
-        /// instead of either flooding the whole plateau or floating entirely clear of the water
-        /// plane (both tried and rejected in earlier passes). SimpleForm200 was tried first for
-        /// the "one deliberate mountain" shape but its "chunk-size-relative" sizing tiled the cone
-        /// across the tile regardless of the Wrap setting - a huge-period Noise200 is a plain
-        /// function of world position (no chunk-relative sizing), so it can't repeat inside one
-        /// tile; the same trick, repeated six times with random offsets, is what makes the lake
-        /// sites deliberate instead of probabilistic. Recipe: (PlateauNoise -> Levels ->
-        /// +HillsNoise) blended with (MountainNoise -> Levels cutoff), then that result blended
-        /// with (six lake NoiseN -> Levels cutoffs, chained via max) subtracted -> Erosion ->
-        /// Height Output. Seeded from <see cref="WorldSeed"/> so the same world seed reproduces
-        /// the same terrain, mountain, hills, and lake placement.
+        /// Plateau noise remapped to a thin margin near the low end of the height range, with an
+        /// added rolling-hills noise layer, blended with one huge-period noise field cut off by
+        /// Levels so only its highest local values rise into a single mountain mass and then
+        /// terraced into stepped ledges (Terrace200 - WORLD_GENERATION_PIPELINE.md Iteration 01's
+        /// remaining "cliffs/terraces" piece), then six deliberate lake-pit sites (varied
+        /// size/threshold, random world-space offsets, combined via max) are subtracted to carve
+        /// believable basins into the plateau. SimpleForm200 was tried first for the "one
+        /// deliberate mountain" shape but its "chunk-size-relative" sizing tiled the cone across
+        /// the tile regardless of the Wrap setting - a huge-period Noise200 is a plain function of
+        /// world position (no chunk-relative sizing), so it can't repeat inside one tile; the same
+        /// trick, repeated six times with random offsets, is what makes the lake-pit sites
+        /// deliberate instead of probabilistic. Recipe: (PlateauNoise -> Levels -> +HillsNoise)
+        /// blended with (MountainNoise -> Levels cutoff -> Terrace), then that result blended with
+        /// (six lake-pit NoiseN -> Levels cutoffs, chained via max) subtracted -> Erosion -> Height
+        /// Output. Seeded from <see cref="WorldSeed"/> so the same world seed reproduces the same
+        /// terrain, mountain, hills, terrace steps, and basin placement.
+        /// <para>
+        /// This carving only needs to produce plausible dips - it does not need to reach any
+        /// particular threshold. <see cref="GameDev.EditorTools.WaterZoneMenu"/> finds where water
+        /// actually belongs by sampling the generated heightmap after this graph runs (flood-fill
+        /// from real local minima, see <see cref="GameDev.World.Water.LakeBasinFinder"/>), so a
+        /// basin that carves too shallow or too deep no longer produces a dry crater or a flooded
+        /// plateau the way comparing against one fixed global water constant used to.
+        /// </para>
         /// </summary>
         private static Graph BuildGraph(int seed)
         {
@@ -238,6 +189,7 @@ namespace GameDev.EditorTools
             var plateauSeed = terrainSeed.Next();
             var mountainSeed = terrainSeed.Next();
             var hillsSeed = terrainSeed.Next();
+            var terraceSeed = terrainSeed.Next();
 
             var graph = Graph.Create();
             graph.random = new Noise(graphSeed, 32768);
@@ -252,11 +204,12 @@ namespace GameDev.EditorTools
             plateauNoise.detail = 0.55f;
             graph.Add(plateauNoise);
 
-            // Remaps the plateau's raw 0..1 noise into a range close above the water level (0.1,
-            // see CreateOrUpdateWaterPlane) - deliberately thin margin (0.13-0.19) so the lake
-            // pits below don't need to punch through a thick buffer to reach the water; wider
-            // margins in earlier passes either flooded almost everything (0.12 flat) or floated
-            // entirely clear of the water plane (0.20-0.44).
+            // Remaps the plateau's raw 0..1 noise into a low, thin margin (0.13-0.19) so the lake
+            // pits below don't need to punch through a thick buffer to carve a visible basin;
+            // wider margins in earlier passes needed much deeper subtract opacity to read as
+            // lakes at all. The exact margin is no longer load-bearing for "does this count as
+            // water" (WaterZoneMenu decides that from the generated heightmap, not this range),
+            // just for how deep a dip the lake sites need to carve to look like a basin.
             var plateauLevels = (Levels200)Generator.Create(typeof(Levels200));
             plateauLevels.inMin = 0f;
             plateauLevels.inMax = 1f;
@@ -307,6 +260,21 @@ namespace GameDev.EditorTools
             graph.Add(levels);
             graph.Link(mountainNoise, levels);
 
+            // Terraces the mountain mass into stepped ledges with steep risers (WORLD_GENERATION_
+            // PIPELINE.md Iteration 01: "cliffs/terraces" was the one piece missing from macro
+            // terrain shaping). Applied here - to the mountain's own 0..1 contribution, before it's
+            // added into the plains below - rather than to the final blended height, so terracing
+            // reads as a mountain feature and never touches the plains or the lake-pit sites
+            // (there the mountain contribution is ~0, and Terrace200 maps 0 to 0 regardless of
+            // step count, so it's a no-op away from the mountain).
+            var terrace = (Terrace200)Generator.Create(typeof(Terrace200));
+            terrace.seed = terraceSeed;
+            terrace.num = 6;
+            terrace.uniformity = 0.6f;
+            terrace.steepness = 0.8f;
+            graph.Add(terrace);
+            graph.Link((IOutlet<Den.Tools.Matrices.MatrixWorld>)levels, (IInlet<Den.Tools.Matrices.MatrixWorld>)terrace);
+
             var blend = (Blend200)Generator.Create(typeof(Blend200));
             blend.layers[0].algorithm = Blend200.BlendAlgorithm.mix;
             blend.layers[0].opacity = 1f;
@@ -314,7 +282,7 @@ namespace GameDev.EditorTools
             blend.layers[1].opacity = 1f;
             graph.Add(blend);
             graph.Link((IOutlet<Den.Tools.Matrices.MatrixWorld>)hillsBlend, (IInlet<Den.Tools.Matrices.MatrixWorld>)blend.layers[0].inlet);
-            graph.Link(levels, blend.layers[1].inlet);
+            graph.Link(terrace, blend.layers[1].inlet);
 
             // Six guaranteed lake sites of varying size instead of a probabilistic noise
             // threshold: each is its own (Noise -> Levels cutoff) pair - same non-repeating "huge
@@ -374,9 +342,10 @@ namespace GameDev.EditorTools
             lakeBlend.layers[0].opacity = 1f;
             lakeBlend.layers[1].algorithm = Blend200.BlendAlgorithm.subtract;
             // Each of the 6 sites reaches a different peak mask value depending on its own
-            // noise/threshold - 0.35 was enough for the deepest sites but left shallower ones as
-            // a dry crater instead of a filled lake. Higher opacity so all six reliably punch
-            // through to below the water level, not just the strongest ones.
+            // noise/threshold - higher opacity so all six reliably carve a visible dip, not just
+            // the strongest ones (WaterZoneMenu's flood-fill only needs a real local minimum to
+            // work with, but a dip too shallow to register at the sampling grid's resolution
+            // would still fail to become a lake).
             lakeBlend.layers[1].opacity = 0.7f;
             graph.Add(lakeBlend);
             graph.Link((IOutlet<Den.Tools.Matrices.MatrixWorld>)blend, (IInlet<Den.Tools.Matrices.MatrixWorld>)lakeBlend.layers[0].inlet);

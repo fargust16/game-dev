@@ -5,6 +5,7 @@ using GameDev.World.Poi;
 using GameDev.World.Seed;
 using GameDev.World.Streaming;
 using GameDev.World.Terrain;
+using GameDev.World.Water;
 using MapMagic.Core;
 using MapMagic.Terrains;
 using UnityEditor;
@@ -23,7 +24,6 @@ namespace GameDev.EditorTools
     public static class PoiMarkerMenu
     {
         private const string RootObjectName = "OverworldPoi";
-        private const string WaterObjectName = "OverworldWater";
 
         private static readonly Dictionary<PoiKind, Color> KindColors = new Dictionary<PoiKind, Color>
         {
@@ -62,13 +62,20 @@ namespace GameDev.EditorTools
             var candidateChunks = ChunksCoveringTile(tileCoord, mapMagic.tileSize);
             var placer = new StubPoiPlacer(worldSeed, sampler, candidateChunks);
 
-            var waterY = FindWaterLevelY();
+            var waterZones = Object.FindFirstObjectByType<OverworldWaterZones>();
             var placed = 0;
             foreach (var chunk in candidateChunks)
             {
                 foreach (var marker in placer.PlaceForChunk(chunk))
                 {
-                    if (!TryFindSurface(marker.Position.x, marker.Position.z, out var y) || y <= waterY)
+                    if (!TryFindSurface(marker.Position.x, marker.Position.z, out var y))
+                    {
+                        continue;
+                    }
+
+                    if (waterZones != null &&
+                        waterZones.TryGetWaterLevel(marker.Position.x, marker.Position.z, out var waterY) &&
+                        y <= waterY)
                     {
                         continue;
                     }
@@ -132,12 +139,6 @@ namespace GameDev.EditorTools
 
             y = 0f;
             return false;
-        }
-
-        private static float FindWaterLevelY()
-        {
-            var water = GameObject.Find(WaterObjectName);
-            return water != null ? water.transform.position.y : float.NegativeInfinity;
         }
     }
 }
