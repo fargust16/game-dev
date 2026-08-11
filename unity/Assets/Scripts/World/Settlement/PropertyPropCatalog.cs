@@ -15,8 +15,28 @@ namespace GameDev.World.Settlement
                 case "RichTownhouse": return Rich();
                 case "ShopFront": return Shop();
                 case "EliteEstate": return Elite();
+                case GardenSquareFactory.ArchetypeId: return GardenSquare();
                 default: return System.Array.Empty<PropertyPropRule>();
             }
+        }
+
+        private static PropertyPropRule[] GardenSquare()
+        {
+            return new[]
+            {
+                PropertyPropRule.Create(
+                    PropertyPropKind.Planter, PropSemantic.Civic, PropertyZoneKind.OpenSpace,
+                    2, 4, new Vector3(0.7f, 0.5f, 0.7f), new Color(0.25f, 0.45f, 0.28f)),
+                PropertyPropRule.Create(
+                    PropertyPropKind.Bench, PropSemantic.Civic, PropertyZoneKind.OpenSpace,
+                    1, 2, new Vector3(1.2f, 0.45f, 0.4f), new Color(0.35f, 0.28f, 0.2f)),
+                PropertyPropRule.Create(
+                    PropertyPropKind.GardenLamp, PropSemantic.Civic, PropertyZoneKind.OpenSpace,
+                    1, 2, new Vector3(0.25f, 1.6f, 0.25f), new Color(0.75f, 0.7f, 0.45f)),
+                PropertyPropRule.Create(
+                    PropertyPropKind.PathMarker, PropSemantic.Civic, PropertyZoneKind.OpenSpace,
+                    1, 3, new Vector3(0.5f, 0.08f, 0.5f), new Color(0.55f, 0.55f, 0.5f)),
+            };
         }
 
         private static PropertyPropRule[] Worker()

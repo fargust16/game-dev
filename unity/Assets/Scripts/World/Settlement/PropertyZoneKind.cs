@@ -13,6 +13,8 @@ namespace GameDev.World.Settlement
         Drive = 4,
         Boundary = 5,
         /// <summary>Secondary structure pad (stable / coach house) — Elite S2.</summary>
-        SecondaryPad = 6
+        SecondaryPad = 6,
+        /// <summary>Public / semi-public green (GardenSquare) — no shell (S7).</summary>
+        OpenSpace = 7
     }
 }

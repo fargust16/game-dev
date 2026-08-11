@@ -7,6 +7,11 @@ namespace GameDev.World.Poi
         Camp,
         Shrine,
         TownApproach,
-        CaveMouth
+        CaveMouth,
+
+        /// <summary>V0 stand-in for a distinctive per-biome point of interest (see
+        /// <see cref="PoiDemoScenario"/>) - one requested per biome until dedicated per-biome
+        /// landmark flavors exist.</summary>
+        Landmark
     }
 }

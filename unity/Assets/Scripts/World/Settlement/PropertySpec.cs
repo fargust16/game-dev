@@ -21,6 +21,8 @@ namespace GameDev.World.Settlement
         public StreetContext Street;
         public bool HasSecondaryBuilding;
         public PlotFootprint SecondaryBuildingPad;
+        /// <summary>GardenSquare / plaza — land + props only, no Exterior Shell.</summary>
+        public bool IsOpenSpace;
 
         public SettlementPlotSpec ToPlotSpec()
         {

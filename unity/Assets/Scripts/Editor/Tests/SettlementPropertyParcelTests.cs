@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using GameDev.World.Buildings.Shell;
+using GameDev.World.Poi;
 using GameDev.World.Settlement;
+using GameDev.World.Terrain;
+using GameDev.World.Water;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -443,6 +446,280 @@ namespace GameDev.World.Settlement.Tests
             Assert.IsTrue(dst.Parcel.ContainsPad(dst.BuildingPad));
         }
 
+        [Test]
+        public void ApproachBinder_PicksStableTownApproach()
+        {
+            var markers = new[]
+            {
+                new PoiMarker(
+                    new PoiId("Ruin_0"),
+                    PoiKind.Ruin,
+                    new Vector3(1f, 0f, 1f),
+                    BiomeId.Forest),
+                new PoiMarker(
+                    new PoiId("TownApproach_1"),
+                    PoiKind.TownApproach,
+                    new Vector3(100f, 0f, 200f),
+                    BiomeId.Meadow),
+                new PoiMarker(
+                    new PoiId("TownApproach_0"),
+                    PoiKind.TownApproach,
+                    new Vector3(50f, 0f, 50f),
+                    BiomeId.Meadow),
+            };
+
+            Assert.IsTrue(SettlementApproachBinder.TryFindTownApproach(markers, out var picked));
+            Assert.AreEqual("TownApproach_0", picked.Id.Value);
+        }
+
+        [Test]
+        public void ApproachBinder_CreateFabricAtApproach_IsDeterministicAndNearPose()
+        {
+            var approach = new PoiMarker(
+                new PoiId("TownApproach_0"),
+                PoiKind.TownApproach,
+                new Vector3(128f, 0f, 256f),
+                BiomeId.Meadow);
+
+            var a = SettlementApproachBinder.CreateFabricAtApproach(approach, 12f, 110201);
+            var b = SettlementApproachBinder.CreateFabricAtApproach(approach, 12f, 110201);
+            Assert.IsTrue(a.HasWorldPose);
+            Assert.AreEqual(a.Pose.Position, b.Pose.Position);
+            Assert.AreEqual(a.Pose.YawDegrees, b.Pose.YawDegrees);
+            Assert.AreEqual(a.Properties.Count, b.Properties.Count);
+            Assert.AreEqual(12f, a.Pose.Position.y, 0.01f);
+
+            for (var i = 0; i < a.Properties.Count; i++)
+            {
+                Assert.AreEqual(a.Properties[i].Parcel.Origin, b.Properties[i].Parcel.Origin);
+                // GardenSquare has no BuildingPad — Shell skip via IsOpenSpace.
+                if (!a.Properties[i].IsOpenSpace)
+                    Assert.IsTrue(a.Properties[i].Parcel.ContainsPad(a.Properties[i].BuildingPad));
+                var dx = a.Properties[i].Parcel.Origin.x - a.Pose.Position.x;
+                var dz = a.Properties[i].Parcel.Origin.z - a.Pose.Position.z;
+                Assert.Less(Mathf.Sqrt(dx * dx + dz * dz), 250f, "parcel unexpectedly far from pose");
+                Assert.AreEqual(a.Pose.Position.y, a.Properties[i].Parcel.Origin.y, 0.01f);
+            }
+        }
+
+        [Test]
+        public void ApplyPose_RotatesYawAndKeepsPadInsideParcel()
+        {
+            var local = SettlementBlockLayout.Create(3, DistrictKind.Worker, 2);
+            var pose = SettlementPose.Create(new Vector3(40f, 5f, -20f), 90f, 99, "test");
+            var src = local.Properties[0];
+            var dst = SettlementPropertyTransform.ApplyPose(src, pose, src.PlotIndex);
+            Assert.AreEqual(src.Parcel.YawDegrees + 90f, dst.Parcel.YawDegrees, 0.01f);
+            Assert.AreEqual(5f, dst.Parcel.Origin.y, 0.01f);
+            Assert.IsTrue(dst.Parcel.ContainsPad(dst.BuildingPad));
+        }
+
+        [Test]
+        public void TerrainConform_SnapsEachLotToMaxCornerHeight()
+        {
+            var approach = new PoiMarker(
+                new PoiId("TownApproach_0"),
+                PoiKind.TownApproach,
+                new Vector3(0f, 0f, 0f),
+                BiomeId.Meadow);
+            var fabric = SettlementApproachBinder.CreateFabricAtApproach(approach, 10f, 110201, plotsPerSide: 2);
+            // Slope: Y = 10 + 0.1 * worldX — uphill lots must rise above the flat pose Y.
+            SettlementTerrainConform.SnapFabric(fabric, new SlopeHeightSampler(baseY: 10f, slopeX: 0.1f));
+
+            var sawLift = false;
+            for (var i = 0; i < fabric.Properties.Count; i++)
+            {
+                var prop = fabric.Properties[i];
+                if (!prop.IsOpenSpace)
+                    Assert.IsTrue(prop.Parcel.ContainsPad(prop.BuildingPad));
+                Assert.GreaterOrEqual(prop.Parcel.Origin.y, 10f - 0.01f);
+                if (prop.Parcel.Origin.y > 10.05f)
+                    sawLift = true;
+            }
+
+            Assert.IsTrue(sawLift, "Expected at least one lot lifted on the slope");
+        }
+
+        [Test]
+        public void CreateDistrictMix_HasCommercialWorkerAndGardenSquare()
+        {
+            var fabric = SettlementFabricLayout.CreateDistrictMix(110201, plotsPerSide: 2);
+            var commercial = 0;
+            var worker = 0;
+            var open = 0;
+            for (var i = 0; i < fabric.Properties.Count; i++)
+            {
+                var p = fabric.Properties[i];
+                if (p.IsOpenSpace)
+                {
+                    open++;
+                    Assert.AreEqual(GardenSquareFactory.ArchetypeId, p.ArchetypeId);
+                    Assert.IsTrue(HasZone(p, PropertyZoneKind.OpenSpace));
+                }
+                else if (p.ArchetypeId == "ShopFront")
+                    commercial++;
+                else if (p.ArchetypeId == "WorkerYard")
+                    worker++;
+            }
+
+            Assert.Greater(commercial, 0);
+            Assert.Greater(worker, 0);
+            Assert.AreEqual(1, open);
+            Assert.Less(fabric.Plots.Count, fabric.Properties.Count);
+
+            var archetypes = ShellCatalogFactory.CreateDefaultArchetypes();
+            var districts = ShellCatalogFactory.CreateDefaultDistricts();
+            var bridge = new SettlementShellBridge(new BuildingShellBinder(), archetypes, districts);
+            var shells = bridge.BindProperties(fabric, 110201);
+            Assert.AreEqual(fabric.Plots.Count, shells.Count);
+            Assert.AreEqual(fabric.Properties.Count - open, shells.Count);
+        }
+
+        [Test]
+        public void CreateStreetSpine_PlacesStreetPropsDeterministically()
+        {
+            var a = SettlementFabricLayout.CreateStreetSpine(110201, DistrictKind.Worker, 2, 3);
+            var b = SettlementFabricLayout.CreateStreetSpine(110201, DistrictKind.Worker, 2, 3);
+            Assert.Greater(a.StreetProps.Count, 0);
+            Assert.AreEqual(a.StreetProps.Count, b.StreetProps.Count);
+            for (var i = 0; i < a.StreetProps.Count; i++)
+            {
+                Assert.AreEqual(a.StreetProps[i].Kind, b.StreetProps[i].Kind);
+                Assert.AreEqual(a.StreetProps[i].StreetKind, b.StreetProps[i].StreetKind);
+                Assert.AreEqual(a.StreetProps[i].Position, b.StreetProps[i].Position);
+            }
+        }
+
+        [Test]
+        public void CreateStreetSpine_StreetPropsStayNearRibbons()
+        {
+            var fabric = SettlementFabricLayout.CreateStreetSpine(110201, DistrictKind.Worker, 2, 3);
+            Assert.Greater(fabric.StreetProps.Count, 0);
+            for (var i = 0; i < fabric.StreetProps.Count; i++)
+            {
+                var prop = fabric.StreetProps[i];
+                var near = false;
+                for (var s = 0; s < fabric.Streets.Count; s++)
+                {
+                    var street = fabric.Streets[s];
+                    if (street.Kind != prop.StreetKind)
+                        continue;
+                    var dist = DistancePointToSegmentXZ(
+                        prop.Position,
+                        street.CenterlineStart,
+                        street.CenterlineEnd);
+                    // Half ribbon + max catalog curb offset (~1.1) + slack.
+                    if (dist <= street.WidthMeters * 0.5f + 1.5f)
+                    {
+                        near = true;
+                        break;
+                    }
+                }
+
+                Assert.IsTrue(near, $"Street prop {prop.Kind} far from {prop.StreetKind} ribbon");
+            }
+        }
+
+        [Test]
+        public void SiteValidator_RejectsLotsUnderWater()
+        {
+            var parcel = PlotParcel.Rect(2, 3, new Vector3(0f, 5f, 0f));
+            var water = new FakeWaterSampler(waterY: 8f, minX: -10f, maxX: 10f, minZ: -10f, maxZ: 10f);
+            Assert.IsFalse(SettlementSiteValidator.IsParcelDry(parcel, water));
+
+            var dryParcel = PlotParcel.Rect(2, 3, new Vector3(0f, 12f, 0f));
+            Assert.IsTrue(SettlementSiteValidator.IsParcelDry(dryParcel, water));
+        }
+
+        [Test]
+        public void ApproachBinder_SkipsWetFootprintForDryOffset()
+        {
+            var approach = new PoiMarker(
+                new PoiId("TownApproach_0"),
+                PoiKind.TownApproach,
+                new Vector3(0f, 0f, 0f),
+                BiomeId.Meadow);
+            // Small lake at origin; dry land outside ~±20m. Search ring should land on a dry pad.
+            var height = new FlatHeightSampler(10f);
+            var water = new FakeWaterSampler(waterY: 20f, minX: -20f, maxX: 20f, minZ: -20f, maxZ: 20f);
+
+            Assert.IsTrue(
+                SettlementApproachBinder.TryCreateDryFabricNearApproach(
+                    approach,
+                    110201,
+                    height,
+                    water,
+                    out var fabric,
+                    out var placedAt,
+                    plotsPerSide: 2));
+            Assert.IsNotNull(fabric);
+            Assert.Greater(
+                Mathf.Max(Mathf.Abs(placedAt.x), Mathf.Abs(placedAt.z)),
+                20f);
+            Assert.IsTrue(SettlementSiteValidator.IsFabricDry(fabric, water));
+        }
+
+        private sealed class SlopeHeightSampler : IWorldHeightSampler
+        {
+            private readonly float _baseY;
+            private readonly float _slopeX;
+
+            public SlopeHeightSampler(float baseY, float slopeX)
+            {
+                _baseY = baseY;
+                _slopeX = slopeX;
+            }
+
+            public bool TrySampleWorldY(float worldX, float worldZ, out float worldY)
+            {
+                worldY = _baseY + _slopeX * worldX;
+                return true;
+            }
+        }
+
+        private sealed class FlatHeightSampler : IWorldHeightSampler
+        {
+            private readonly float _y;
+
+            public FlatHeightSampler(float y) => _y = y;
+
+            public bool TrySampleWorldY(float worldX, float worldZ, out float worldY)
+            {
+                worldY = _y;
+                return true;
+            }
+        }
+
+        private sealed class FakeWaterSampler : IWaterSampler
+        {
+            private readonly float _waterY;
+            private readonly float _minX;
+            private readonly float _maxX;
+            private readonly float _minZ;
+            private readonly float _maxZ;
+
+            public FakeWaterSampler(float waterY, float minX, float maxX, float minZ, float maxZ)
+            {
+                _waterY = waterY;
+                _minX = minX;
+                _maxX = maxX;
+                _minZ = minZ;
+                _maxZ = maxZ;
+            }
+
+            public bool TryGetWaterLevel(float worldX, float worldZ, out float waterY)
+            {
+                if (worldX >= _minX && worldX <= _maxX && worldZ >= _minZ && worldZ <= _maxZ)
+                {
+                    waterY = _waterY;
+                    return true;
+                }
+
+                waterY = 0f;
+                return false;
+            }
+        }
+
         private static bool HasGate(PropertySpec prop)
         {
             for (var i = 0; i < prop.Boundaries.Count; i++)
@@ -538,7 +815,8 @@ namespace GameDev.World.Settlement.Tests
                 p.Zones.Count,
                 p.Boundaries.Count,
                 p.Props.Count,
-                p.HasSecondaryBuilding);
+                p.HasSecondaryBuilding,
+                p.IsOpenSpace);
         }
 
         private static bool ParcelContainsPoint(PlotParcel parcel, Vector3 world)
@@ -550,6 +828,34 @@ namespace GameDev.World.Settlement.Tests
                    && local.z >= -eps
                    && local.x <= parcel.WidthMeters + eps
                    && local.z <= parcel.DepthMeters + eps;
+        }
+
+        private static float DistancePointToSegmentXZ(Vector3 point, Vector3 a, Vector3 b)
+        {
+            var ax = a.x;
+            var az = a.z;
+            var bx = b.x;
+            var bz = b.z;
+            var px = point.x;
+            var pz = point.z;
+            var abx = bx - ax;
+            var abz = bz - az;
+            var len2 = abx * abx + abz * abz;
+            if (len2 < 1e-6f)
+            {
+                var dx0 = px - ax;
+                var dz0 = pz - az;
+                return Mathf.Sqrt(dx0 * dx0 + dz0 * dz0);
+            }
+
+            var t = ((px - ax) * abx + (pz - az) * abz) / len2;
+            if (t < 0f) t = 0f;
+            else if (t > 1f) t = 1f;
+            var qx = ax + abx * t;
+            var qz = az + abz * t;
+            var dx = px - qx;
+            var dz = pz - qz;
+            return Mathf.Sqrt(dx * dx + dz * dz);
         }
 
         private static string ShellFingerprint(ShellInstance shell)

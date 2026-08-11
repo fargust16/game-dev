@@ -4,7 +4,8 @@ using UnityEngine;
 namespace GameDev.World.Settlement
 {
     /// <summary>
-    /// Spawns greybox placeholders for property boundaries, gates, and secondary pads.
+    /// Spawns greybox placeholders for property boundaries, gates, secondary pads,
+    /// and SettlementStreet dress props (S8).
     /// </summary>
     public static class PropertyFeatureSpawner
     {
@@ -23,6 +24,9 @@ namespace GameDev.World.Settlement
                 SpawnSecondary(prop, propRoot.transform);
                 SpawnProps(prop, propRoot.transform);
             }
+
+            if (layout is SettlementFabricLayout fabric)
+                SpawnStreetProps(fabric, root.transform);
 
             return root;
         }
@@ -126,6 +130,42 @@ namespace GameDev.World.Settlement
             }
         }
 
+        private static void SpawnStreetProps(SettlementFabricLayout fabric, Transform parent)
+        {
+            if (fabric.StreetProps == null || fabric.StreetProps.Count == 0)
+                return;
+
+            var streetRoot = new GameObject("StreetProps");
+            streetRoot.transform.SetParent(parent, false);
+
+            for (var i = 0; i < fabric.StreetProps.Count; i++)
+            {
+                var p = fabric.StreetProps[i];
+                var go = GameObject.CreatePrimitive(PrimitiveForStreet(p.Kind));
+                go.name = $"Street_{p.StreetKind}_{p.Kind}_{i:00}";
+                go.transform.SetParent(streetRoot.transform, false);
+                go.transform.SetPositionAndRotation(
+                    p.Position,
+                    Quaternion.Euler(0f, p.YawDegrees, 0f));
+                go.transform.localScale = p.Scale;
+
+                var r = go.GetComponent<Renderer>();
+                if (r != null)
+                    r.sharedMaterial = CreateTint(p.Tint);
+
+                var col = go.GetComponent<Collider>();
+                if (col != null)
+                {
+#if UNITY_EDITOR
+                    if (!Application.isPlaying)
+                        Object.DestroyImmediate(col);
+                    else
+#endif
+                        Object.Destroy(col);
+                }
+            }
+        }
+
         private static PrimitiveType PrimitiveFor(PropertyPropKind kind)
         {
             switch (kind)
@@ -137,6 +177,19 @@ namespace GameDev.World.Settlement
                 case PropertyPropKind.WardMarker:
                 case PropertyPropKind.Statue:
                     return PrimitiveType.Capsule;
+                default:
+                    return PrimitiveType.Cube;
+            }
+        }
+
+        private static PrimitiveType PrimitiveForStreet(StreetPropKind kind)
+        {
+            switch (kind)
+            {
+                case StreetPropKind.StreetLamp:
+                    return PrimitiveType.Capsule;
+                case StreetPropKind.Bollard:
+                    return PrimitiveType.Cylinder;
                 default:
                     return PrimitiveType.Cube;
             }

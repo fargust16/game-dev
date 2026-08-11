@@ -1,6 +1,6 @@
 #if UNITY_EDITOR
 using Den.Tools;
-using Den.Tools.Tasks;
+using GameDev.World.Streaming;
 using GameDev.World.Water;
 using MapMagic.Core;
 using MapMagic.Terrains;
@@ -66,7 +66,7 @@ namespace GameDev.EditorTools
                 return;
             }
 
-            if (!WaitForTileReady(tile))
+            if (!MapMagicTileSync.WaitForTileReady(tile))
             {
                 Debug.LogWarning("[Water] Tile did not finish generating within the timeout - water " +
                                   "zones may not match the final terrain. Re-run " +
@@ -89,8 +89,10 @@ namespace GameDev.EditorTools
 
             // Inset from the raw tile edge so every sampled cell - and its neighbours - stays
             // inside the holder's bounds; keeps HeightSampler's out-of-bounds fallback out of
-            // normal operation instead of quietly biasing basins near the tile border.
-            var inset = CellSize * 2f;
+            // normal operation instead of quietly biasing basins near the tile border. Shared with
+            // POI placement and road routing (OverworldTileChunks) so nothing else treats this same
+            // unreliable border strip as safe, sampled ground.
+            var inset = OverworldTileChunks.DefaultMarginMeters;
             var minX = (float)(tileCoord.x * mapMagic.tileSize.x) + inset;
             var minZ = (float)(tileCoord.z * mapMagic.tileSize.z) + inset;
             var sizeX = (float)mapMagic.tileSize.x - 2f * inset;
@@ -117,35 +119,6 @@ namespace GameDev.EditorTools
 
             Debug.Log($"[Water] Generated {zones.Length} water zone(s) from sampled terrain " +
                       $"(levels: {string.Join(", ", System.Array.ConvertAll(zones, z => z.WaterLevelY.ToString("F1")))}).");
-        }
-
-        /// <summary>
-        /// MapMagic's Apply step (which populates DirectMatricesHolder - see
-        /// DirectMatricesOutput200.ApplyData.Apply in TexturesOut.cs) runs through
-        /// Den.Tools.Tasks.CoroutineManager, normally pumped once per frame by
-        /// MapMagicObject.EditorUpdate() via EditorApplication.update. That event never fires
-        /// while this method is still on the call stack, so without manually pumping it here,
-        /// sampling right after Refresh()/Pin() can read a still-incomplete or stale (previous
-        /// generation's) height matrix - the cause of water zones that didn't match the visible
-        /// terrain on the first generate. Background generation itself (Den.Tools.Tasks.ThreadManager)
-        /// keeps progressing on its own real threads regardless; only the main-thread Apply queue
-        /// needs help here.
-        /// </summary>
-        private static bool WaitForTileReady(TerrainTile tile, float timeoutSeconds = 30f)
-        {
-            var start = System.DateTime.UtcNow;
-            while (tile.main == null || !tile.Ready)
-            {
-                CoroutineManager.Update();
-                System.Threading.Thread.Sleep(1);
-
-                if ((System.DateTime.UtcNow - start).TotalSeconds > timeoutSeconds)
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         public static void ClearWaterZones()

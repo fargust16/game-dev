@@ -9,7 +9,8 @@ namespace GameDev.World.Settlement
         SingleStrip = 0,
         RearLane = 1,
         DoubleFrontage = 2,
-        StreetSpine = 3
+        StreetSpine = 3,
+        DistrictMix = 4
     }
 
     /// <summary>
@@ -72,6 +73,14 @@ namespace GameDev.World.Settlement
                         _district,
                         _blockCount,
                         count,
+                        _streetWidthMeters,
+                        SettlementFabricLayout.DefaultCrossStreetWidthMeters,
+                        _laneWidthMeters);
+                    break;
+                case SettlementLabBlockMode.DistrictMix:
+                    _layout = SettlementFabricLayout.CreateDistrictMix(
+                        _seed,
+                        Mathf.Clamp(count, 2, 4),
                         _streetWidthMeters,
                         SettlementFabricLayout.DefaultCrossStreetWidthMeters,
                         _laneWidthMeters);
@@ -258,6 +267,7 @@ namespace GameDev.World.Settlement
                 case PropertyZoneKind.Drive: return new Color(0.4f, 0.4f, 0.45f, 0.35f);
                 case PropertyZoneKind.BuildingPad: return new Color(0.85f, 0.35f, 0.25f, 0.25f);
                 case PropertyZoneKind.SecondaryPad: return new Color(0.7f, 0.4f, 0.2f, 0.35f);
+                case PropertyZoneKind.OpenSpace: return new Color(0.3f, 0.7f, 0.4f, 0.4f);
                 default: return new Color(0.6f, 0.6f, 0.6f, 0.2f);
             }
         }

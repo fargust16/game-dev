@@ -4,15 +4,17 @@ namespace GameDev.World.Terrain
 {
     /// <summary>
     /// <see cref="IBiomeSampler"/> backed by a MapMagic 2 <see cref="DirectMatricesHolder"/>
-    /// (see ASSET_LIBRARY_REFERENCE.md) reading the "height" channel wired up in
-    /// OverworldTerrainMenu.BuildGraph. Takes an already-resolved holder rather than searching
-    /// the scene per query (DirectMatricesHolder.FindHolder/FindValueAtPosition scan every
-    /// instance and are explicitly flagged "not quick" in MapMagic's own source) — the owning
+    /// (see ASSET_LIBRARY_REFERENCE.md) reading the "height", "slope", and "moisture" channels
+    /// wired up in OverworldTerrainMenu.BuildGraph. Takes an already-resolved holder rather than
+    /// searching the scene per query (DirectMatricesHolder.FindHolder/FindValueAtPosition scan
+    /// every instance and are explicitly flagged "not quick" in MapMagic's own source) — the owning
     /// chunk/tile lookup (W0.5 IChunkStreamer) is responsible for resolving the right holder.
     /// </summary>
-    public sealed class MapMagicBiomeSampler : IBiomeSampler
+    public sealed class MapMagicBiomeSampler : IBiomeSampler, ITerrainSlopeSampler
     {
         private const string HeightChannel = "height";
+        private const string SlopeChannel = "slope";
+        private const string MoistureChannel = "moisture";
 
         private readonly DirectMatricesHolder holder;
 
@@ -23,17 +25,30 @@ namespace GameDev.World.Terrain
 
         public float SampleHeight(float worldX, float worldZ)
         {
+            return SampleChannel(HeightChannel, worldX, worldZ);
+        }
+
+        public float SampleSlope01(float worldX, float worldZ)
+        {
+            return SampleChannel(SlopeChannel, worldX, worldZ);
+        }
+
+        public BiomeId SampleBiome(float worldX, float worldZ)
+        {
+            var height = SampleHeight(worldX, worldZ);
+            var slope = SampleSlope01(worldX, worldZ);
+            var moisture = SampleChannel(MoistureChannel, worldX, worldZ);
+            return BiomeClassifier.Classify(height, slope, moisture);
+        }
+
+        private float SampleChannel(string channel, float worldX, float worldZ)
+        {
             if (holder == null || !holder.ContainsPosition(worldX, worldZ))
             {
                 return 0f;
             }
 
-            return holder.ValueAtPositionInterpolated(HeightChannel, worldX, worldZ);
-        }
-
-        public BiomeId SampleBiome(float worldX, float worldZ)
-        {
-            return BiomeClassifier.Classify(SampleHeight(worldX, worldZ));
+            return holder.ValueAtPositionInterpolated(channel, worldX, worldZ);
         }
     }
 }

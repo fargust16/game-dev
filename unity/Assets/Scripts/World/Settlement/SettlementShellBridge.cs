@@ -49,6 +49,8 @@ namespace GameDev.World.Settlement
             for (var i = 0; i < layout.Properties.Count; i++)
             {
                 var prop = layout.Properties[i];
+                if (prop.IsOpenSpace)
+                    continue;
                 // Property boundaries own street fences — suppress Shell FrontGardenDress fence duplicate.
                 var suppressShellFence = HasFrontBoundary(prop);
                 BindOne(

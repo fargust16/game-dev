@@ -107,6 +107,19 @@ namespace GameDev.EditorTools
                 $"[SettlementProperty] Street spine, seed {lab.Seed}, plots {lab.Layout.Properties.Count}, streets {streets}.");
         }
 
+        [MenuItem("GameDev/Settlement/Generate/District Mix Fabric")]
+        public static void GenerateDistrictMix()
+        {
+            var lab = EnsureLab();
+            lab.SetBlockMode(SettlementLabBlockMode.DistrictMix);
+            lab.SetPlotCount(3);
+            lab.Generate();
+            SaveActive();
+            Selection.activeGameObject = lab.gameObject;
+            Debug.Log(
+                $"[SettlementProperty] District mix (Commercial + GardenSquare + Worker), seed {lab.Seed}, plots {lab.Layout.Properties.Count}.");
+        }
+
         [MenuItem("GameDev/Settlement/Clear Block Properties")]
         public static void Clear()
         {

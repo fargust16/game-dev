@@ -221,7 +221,7 @@ flowchart LR
 | **Multiplayer** | Deterministic layout from seed; mutations replicated as deltas. |
 | **Performance** | Generate on chunk/settlement demand; cache layout data. |
 | **Extensibility** | Compose settlement layout from the Piece Kit (plot/road/block Pieces) per [15](15%20Procedural%20Building%20Generation.md) — not from the retired OrganicTown polygon generator. |
-| **V1 scope / Deferred** | **Property lab S1–S5** (`SETTLEMENT_PROPERTY_V0.md`): block strip → zones → BuildingPad → Shell; S2 boundaries/Elite/Shop; S3 property props; S4 rear lane + double-frontage; S5 Street Spine (`SettlementFabricLayout` + `SettlementStreetSpec` ribbons, not TownRoadGraph). Stub layout remains for contract tests. Deferred: street props (S8), overworld TownApproach (S6), TownDress meshes, full pathfinding StreetNetwork. |
+| **V1 scope / Deferred** | **Property lab S1–S8** (`SETTLEMENT_PROPERTY_V0.md`): parcels → Shell; S5 Street Spine; S6 TownApproach pose + terrain snap + dry search; S7 District Mix (`CreateDistrictMix`: Commercial + GardenSquare + Worker); S8 Street Props on ribbons. Stub layout remains for contract tests. Deferred: terraces / carved pads, TownDress meshes, full pathfinding StreetNetwork. |
 | **Owning folder** | `unity/Assets/Scripts/World/Settlement/` |
 
 ## W.6 Building / Shell

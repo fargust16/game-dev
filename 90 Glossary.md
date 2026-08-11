@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.33
+Version: 0.36
 
 Status: Draft
 
@@ -480,9 +480,27 @@ Primary or cross street ribbon (`SettlementStreetSpec`) on the Settlement Street
 
 ---
 
+## Street Prop
+
+Dressing on a Settlement Street ribbon (lamp, bollard, curb bench, paving marker) via `StreetPropCatalog` / `StreetPropPlacer`. Distinct from Property Prop (lot zones). Lab greybox; TownDress meshes later. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md` (S8).
+
+---
+
 ## Settlement Fabric
 
-Composable settlement layout (`SettlementFabricLayout`): street ribbons + one or more property blocks with aggregated Properties/Plots for Shell. Lab S5 Street Spine. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md` (S5).
+Composable settlement layout (`SettlementFabricLayout`): street ribbons + one or more property blocks with aggregated Properties/Plots for Shell. Lab S5 Street Spine; S8 adds `StreetProps`. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md` (S5–S8).
+
+---
+
+## Settlement Pose
+
+World placement for a Settlement Fabric: terrain position, cardinal yaw, settlement seed, and source TownApproach POI id (`SettlementPose`). Built by `SettlementApproachBinder` (S6). See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md` (S6).
+
+---
+
+## GardenSquare
+
+Public / semi-public open-space Property (`IsOpenSpace`, zone `OpenSpace`) with civic props and no Exterior Shell. Used in Settlement District Mix (S7) between Commercial and Worker blocks. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md` (S7).
 
 ---
 

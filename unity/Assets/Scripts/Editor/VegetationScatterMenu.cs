@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Den.Tools;
 using GameDev.World.Seed;
 using GameDev.World.Terrain;
+using GameDev.World.Vegetation;
 using GameDev.World.Water;
 using MapMagic.Core;
 using MapMagic.Terrains;
@@ -12,20 +13,23 @@ using UnityEngine;
 namespace GameDev.EditorTools
 {
     /// <summary>
-    /// Overworld V0 vegetation, first slice (WORLD_GENERATION_PIPELINE.md Iteration 07): scatters
+    /// Overworld V0 vegetation (WORLD_GENERATION_PIPELINE.md Iteration 07): scatters
     /// biome-appropriate Low Poly Environment prefabs (see ASSET_LIBRARY_REFERENCE.md) using the
-    /// same <see cref="MapMagicBiomeSampler"/> IBiomeSampler wired up for W0.3. No density map
-    /// asset yet - straight WorldSeed-forked random sampling with a per-biome acceptance
-    /// probability, which is enough to prove biome-driven placement before building the real
-    /// thing.
+    /// same <see cref="MapMagicBiomeSampler"/> IBiomeSampler wired up for W0.3. Still no painted
+    /// density-map asset, but acceptance is no longer a flat per-biome probability: it's scaled by
+    /// <see cref="VegetationDensity"/>'s Perlin-blob patchiness (so growth reads as groves/clearings,
+    /// not uniform static) and its slope falloff (so cliffs within a "lush" biome still thin out).
     /// </summary>
     public static class VegetationScatterMenu
     {
         private const string PrefabRoot = "Assets/Polytope Studio/Lowpoly_Environments/Prefabs";
         private const string RootObjectName = "OverworldVegetation";
 
-        // Samples per reference 1000x1000m tile; scaled by actual tile area.
-        private const int ReferenceAttempts = 4000;
+        // Samples per reference 1000x1000m tile; scaled by actual tile area. Raised from the
+        // original 4000 - VegetationDensity's patch/slope multipliers average roughly 0.4-0.5x on
+        // top of the per-biome acceptance now, so attempts needed roughly doubling to keep the
+        // densest patches reading as "full" instead of the whole map looking thinned out.
+        private const int ReferenceAttempts = 8000;
 
         private struct Entry
         {
@@ -39,6 +43,7 @@ namespace GameDev.EditorTools
         {
             { BiomeId.Meadow, 0.35f },
             { BiomeId.Forest, 0.45f },
+            { BiomeId.Highland, 0.20f },
             { BiomeId.Mountain, 0.08f },
             { BiomeId.Swamp, 0.15f },
         };
@@ -59,6 +64,14 @@ namespace GameDev.EditorTools
                     new Entry { PrefabPath = $"{PrefabRoot}/Trees/PT_Pine_Tree_03_green.prefab", Weight = 0.55f },
                     new Entry { PrefabPath = $"{PrefabRoot}/Trees/PT_Fruit_Tree_01_green.prefab", Weight = 0.20f },
                     new Entry { PrefabPath = $"{PrefabRoot}/Shrubs/PT_Generic_Shrub_01_green.prefab", Weight = 0.25f },
+                }
+            },
+            {
+                BiomeId.Highland, new[]
+                {
+                    new Entry { PrefabPath = $"{PrefabRoot}/Rocks/PT_Generic_Rock_01.prefab", Weight = 0.40f },
+                    new Entry { PrefabPath = $"{PrefabRoot}/Shrubs/PT_Generic_Shrub_01_green.prefab", Weight = 0.35f },
+                    new Entry { PrefabPath = $"{PrefabRoot}/Trees/PT_Pine_Tree_03_green.prefab", Weight = 0.25f },
                 }
             },
             {
@@ -91,7 +104,18 @@ namespace GameDev.EditorTools
 
             var tileCoord = new Coord(0, 0);
             var tile = mapMagic.tiles[tileCoord];
-            var terrain = tile?.main?.terrain;
+            if (tile == null)
+            {
+                Debug.LogWarning("[Vegetation] Origin tile has no generated Terrain yet.");
+                return;
+            }
+
+            if (!MapMagicTileSync.WaitForTileReady(tile))
+            {
+                Debug.LogWarning("[Vegetation] Tile did not finish generating within the timeout - scatter may use stale terrain data.");
+            }
+
+            var terrain = tile.main?.terrain;
             if (terrain == null)
             {
                 Debug.LogWarning("[Vegetation] Origin tile has no generated Terrain yet.");
@@ -108,8 +132,16 @@ namespace GameDev.EditorTools
             ClearVegetation();
             var root = new GameObject(RootObjectName);
             var sampler = new MapMagicBiomeSampler(holder);
-            var rng = new WorldSeed(OverworldTerrainMenu.LastSeed).Fork("vegetation");
+            var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
+            var rng = worldSeed.Fork("vegetation");
             var waterZones = Object.FindFirstObjectByType<OverworldWaterZones>();
+
+            // Own fork (not the main scatter rng) so the noise offset roll doesn't perturb the
+            // attempt/accept/prefab-pick sequence - only the density field's position shifts per
+            // seed, everything else about the scatter stays reproducible the same way it always was.
+            var densityRng = worldSeed.Fork("vegetation-density");
+            var noiseOffsetX = (float)densityRng.NextDouble() * 10000f;
+            var noiseOffsetZ = (float)densityRng.NextDouble() * 10000f;
 
             var minX = tileCoord.x * mapMagic.tileSize.x;
             var minZ = tileCoord.z * mapMagic.tileSize.z;
@@ -124,7 +156,16 @@ namespace GameDev.EditorTools
                 var z = minZ + (float)rng.NextDouble() * sizeZ;
 
                 var biome = sampler.SampleBiome(x, z);
-                if (!BiomeAcceptance.TryGetValue(biome, out var acceptance) || rng.NextDouble() > acceptance)
+                if (!BiomeAcceptance.TryGetValue(biome, out var acceptance))
+                {
+                    continue;
+                }
+
+                var slope = sampler.SampleSlope01(x, z);
+                var density = VegetationDensity.SamplePatch(x, z, noiseOffsetX, noiseOffsetZ);
+                var slopeMultiplier = VegetationDensity.SlopeMultiplier(slope);
+                var finalAcceptance = acceptance * density * slopeMultiplier;
+                if (rng.NextDouble() > finalAcceptance)
                 {
                     continue;
                 }

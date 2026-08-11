@@ -18,7 +18,8 @@ namespace GameDev.World.Poi.Tests
             return (float)h;
         }
 
-        public BiomeId SampleBiome(float worldX, float worldZ) => BiomeClassifier.Classify(SampleHeight(worldX, worldZ));
+        // Flat/dry: this fake only varies height, so slope/moisture stay at neutral defaults.
+        public BiomeId SampleBiome(float worldX, float worldZ) => BiomeClassifier.Classify(SampleHeight(worldX, worldZ), 0f, 0f);
     }
 
     public sealed class StubPoiPlacerTests
@@ -29,6 +30,22 @@ namespace GameDev.World.Poi.Tests
             for (var x = -4; x < 4; x++)
             {
                 for (var z = -4; z < 4; z++)
+                {
+                    chunks.Add(new ChunkCoord(x, z));
+                }
+            }
+
+            return chunks;
+        }
+
+        // Wide enough that PoiDemoScenario's 23-request quota (well under this grid's ~256 candidate
+        // chunks) has room to place every marker without starving the pool.
+        private static List<ChunkCoord> WideStubChunks()
+        {
+            var chunks = new List<ChunkCoord>();
+            for (var x = -8; x < 8; x++)
+            {
+                for (var z = -8; z < 8; z++)
                 {
                     chunks.Add(new ChunkCoord(x, z));
                 }
@@ -95,6 +112,85 @@ namespace GameDev.World.Poi.Tests
             {
                 Assert.LessOrEqual(placer.PlaceForChunk(chunk).Count, 1);
             }
+        }
+
+        [Test]
+        public void Always_PlacesTownApproach_WhenCandidatesExist()
+        {
+            var chunks = StubChunks();
+            var placer = new StubPoiPlacer(new GameDev.World.Seed.WorldSeed(110201), new FakeBiomeSampler(), chunks);
+            var markers = AllMarkers(placer, chunks);
+            Assert.IsTrue(
+                markers.Exists(m => m.Kind == PoiKind.TownApproach),
+                "Expected a TownApproach marker for settlement S6 hook");
+        }
+
+        [Test]
+        public void QuotaConstructor_PlacesExactlyTheRequestedCountPerKind()
+        {
+            var chunks = WideStubChunks();
+            var requests = new List<PoiRequest>
+            {
+                new PoiRequest(PoiKind.Camp, new[] { BiomeId.Meadow, BiomeId.Forest }),
+                new PoiRequest(PoiKind.Camp, new[] { BiomeId.Meadow, BiomeId.Forest }),
+                new PoiRequest(PoiKind.Camp, new[] { BiomeId.Meadow, BiomeId.Forest }),
+                new PoiRequest(PoiKind.Shrine, new[] { BiomeId.Forest, BiomeId.Mountain }),
+            };
+
+            var placer = new StubPoiPlacer(new GameDev.World.Seed.WorldSeed(110201), new FakeBiomeSampler(), chunks, requests);
+            var markers = AllMarkers(placer, chunks);
+
+            Assert.AreEqual(3, markers.Count(m => m.Kind == PoiKind.Camp),
+                "repeating a request three times should place three markers of that kind, not collapse to one");
+            Assert.AreEqual(1, markers.Count(m => m.Kind == PoiKind.Shrine));
+        }
+
+        [Test]
+        public void QuotaConstructor_SameSeed_ProducesIdenticalMarkers()
+        {
+            var chunks = WideStubChunks();
+            var requests = PoiDemoScenario.BuildRequests();
+
+            var a = AllMarkers(new StubPoiPlacer(new GameDev.World.Seed.WorldSeed(110201), new FakeBiomeSampler(), chunks, requests), chunks);
+            var b = AllMarkers(new StubPoiPlacer(new GameDev.World.Seed.WorldSeed(110201), new FakeBiomeSampler(), chunks, requests), chunks);
+
+            Assert.AreEqual(a.Count, b.Count);
+            for (var i = 0; i < a.Count; i++)
+            {
+                Assert.AreEqual(a[i].Id, b[i].Id);
+                Assert.AreEqual(a[i].Kind, b[i].Kind);
+                Assert.AreEqual(a[i].Position, b[i].Position);
+            }
+        }
+
+        [Test]
+        public void QuotaConstructor_MarkerIdsAreUniquePerKind()
+        {
+            var chunks = WideStubChunks();
+            var requests = PoiDemoScenario.BuildRequests();
+            var placer = new StubPoiPlacer(new GameDev.World.Seed.WorldSeed(110201), new FakeBiomeSampler(), chunks, requests);
+            var markers = AllMarkers(placer, chunks);
+
+            var ids = markers.Select(m => m.Id).ToList();
+            Assert.AreEqual(ids.Count, ids.Distinct().Count(), "every marker, including repeats of the same kind, must get a unique id");
+        }
+
+        [Test]
+        public void PoiDemoScenario_BuildRequests_MatchesTheDocumentedQuota()
+        {
+            var requests = PoiDemoScenario.BuildRequests();
+
+            Assert.AreEqual(PoiDemoScenario.TownApproachCount, requests.Count(r => r.Kind == PoiKind.TownApproach));
+            Assert.AreEqual(PoiDemoScenario.ShrineCount, requests.Count(r => r.Kind == PoiKind.Shrine));
+            Assert.AreEqual(PoiDemoScenario.CampCount, requests.Count(r => r.Kind == PoiKind.Camp));
+            Assert.AreEqual(5, requests.Count(r => r.Kind == PoiKind.Landmark), "one landmark per biome");
+
+            var landmarkBiomes = requests
+                .Where(r => r.Kind == PoiKind.Landmark)
+                .SelectMany(r => r.PreferredBiomes)
+                .Distinct()
+                .ToList();
+            Assert.AreEqual(5, landmarkBiomes.Count, "each biome should get its own distinct landmark request");
         }
     }
 }

@@ -4,9 +4,94 @@ using UnityEngine;
 
 namespace GameDev.World.Settlement
 {
-    /// <summary>World-space translate for property specs (fabric composition).</summary>
+    /// <summary>World-space translate / pose for property specs (fabric composition + S6).</summary>
     public static class SettlementPropertyTransform
     {
+        public static Vector3 ApplyPosePoint(Vector3 local, SettlementPose pose)
+        {
+            var yaw = Quaternion.Euler(0f, pose.YawDegrees, 0f);
+            var flat = yaw * new Vector3(local.x, 0f, local.z);
+            return pose.Position + flat;
+        }
+
+        public static PropertySpec ApplyPose(PropertySpec src, SettlementPose pose, int newPlotIndex)
+        {
+            if (src == null)
+                return null;
+
+            var parcel = src.Parcel;
+            parcel.Origin = ApplyPosePoint(parcel.Origin, pose);
+            parcel.YawDegrees = parcel.YawDegrees + pose.YawDegrees;
+
+            var pad = src.BuildingPad;
+            pad.Origin = ApplyPosePoint(pad.Origin, pose);
+            pad.YawDegrees = pad.YawDegrees + pose.YawDegrees;
+
+            var secondary = src.SecondaryBuildingPad;
+            if (src.HasSecondaryBuilding)
+            {
+                secondary.Origin = ApplyPosePoint(secondary.Origin, pose);
+                secondary.YawDegrees = secondary.YawDegrees + pose.YawDegrees;
+            }
+
+            var zones = new List<PropertyZone>(src.Zones.Count);
+            for (var i = 0; i < src.Zones.Count; i++)
+            {
+                var z = src.Zones[i];
+                z.Origin = ApplyPosePoint(z.Origin, pose);
+                z.YawDegrees = z.YawDegrees + pose.YawDegrees;
+                zones.Add(z);
+            }
+
+            var boundaries = new List<PropertyBoundarySegment>(src.Boundaries.Count);
+            for (var i = 0; i < src.Boundaries.Count; i++)
+            {
+                var b = src.Boundaries[i];
+                b.StartWorld = ApplyPosePoint(b.StartWorld, pose);
+                b.EndWorld = ApplyPosePoint(b.EndWorld, pose);
+                boundaries.Add(b);
+            }
+
+            var props = new List<PropertyPropSpec>(src.Props.Count);
+            for (var i = 0; i < src.Props.Count; i++)
+            {
+                var p = src.Props[i];
+                p.Position = ApplyPosePoint(p.Position, pose);
+                p.YawDegrees = p.YawDegrees + pose.YawDegrees;
+                props.Add(p);
+            }
+
+            return new PropertySpec
+            {
+                PlotIndex = newPlotIndex,
+                DistrictId = src.DistrictId,
+                ArchetypeId = src.ArchetypeId,
+                Parcel = parcel,
+                Zones = zones,
+                Boundaries = boundaries,
+                Props = props,
+                BuildingPad = pad,
+                Street = src.Street,
+                HasSecondaryBuilding = src.HasSecondaryBuilding,
+                SecondaryBuildingPad = secondary,
+                IsOpenSpace = src.IsOpenSpace
+            };
+        }
+
+        public static SettlementStreetSpec ApplyPoseStreet(SettlementStreetSpec street, SettlementPose pose)
+        {
+            street.Origin = ApplyPosePoint(street.Origin, pose);
+            street.YawDegrees = street.YawDegrees + pose.YawDegrees;
+            return street;
+        }
+
+        public static SettlementLaneSpec ApplyPoseLane(SettlementLaneSpec lane, SettlementPose pose)
+        {
+            lane.Origin = ApplyPosePoint(lane.Origin, pose);
+            lane.YawDegrees = lane.YawDegrees + pose.YawDegrees;
+            return lane;
+        }
+
         public static PropertySpec Translate(PropertySpec src, Vector3 delta, int newPlotIndex)
         {
             if (src == null)
@@ -59,7 +144,8 @@ namespace GameDev.World.Settlement
                 BuildingPad = pad,
                 Street = src.Street,
                 HasSecondaryBuilding = src.HasSecondaryBuilding,
-                SecondaryBuildingPad = secondary
+                SecondaryBuildingPad = secondary,
+                IsOpenSpace = src.IsOpenSpace
             };
         }
 
