@@ -102,6 +102,12 @@ namespace GameDev.EditorTools
             Debug.Log($"[ShellSandbox] Settlement stub bound {layout.Plots.Count} plots → shells.");
         }
 
+        [MenuItem("GameDev/Buildings/Shell Sandbox/Bind Settlement Property Block Demo")]
+        public static void BindSettlementPropertyBlockDemo()
+        {
+            SettlementPropertyMenu.GenerateBlockProperties();
+        }
+
         private static void GenerateDistrict(DistrictKind kind)
         {
             var lab = EnsureLab();

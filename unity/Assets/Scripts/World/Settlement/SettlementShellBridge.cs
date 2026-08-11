@@ -31,21 +31,35 @@ namespace GameDev.World.Settlement
             for (var i = 0; i < layout.Plots.Count; i++)
             {
                 var plotSpec = layout.Plots[i];
-                var district = FindDistrict(plotSpec.DistrictId);
-                var archRng = ws.Fork($"settlement_arch_{plotSpec.PlotIndex}");
-                var archetype = _selector.Select(plotSpec.Footprint, district, archRng);
-                if (archetype == null)
-                    continue;
-                var dnaRng = ws.Fork($"settlement_dna_{plotSpec.PlotIndex}");
-                var dna = ShellDnaSampler.Sample(
-                    archetype,
-                    district,
-                    plotSpec.Footprint,
-                    plotSpec.Street,
+                // Footprint is the building pad (PropertySpec.BuildingPad when from block layout).
+                BindOne(result, plotSpec.Footprint, plotSpec.Street, plotSpec.DistrictId, plotSpec.PlotIndex, worldSeed, ws);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Binds shells from property building pads. Same result as <see cref="BindAll"/> when
+        /// <paramref name="layout"/> projects pads into <see cref="ISettlementLayout.Plots"/>.
+        /// </summary>
+        public List<ShellInstance> BindProperties(ISettlementPropertyLayout layout, int worldSeed)
+        {
+            var result = new List<ShellInstance>(layout.Properties.Count);
+            var ws = new WorldSeed(worldSeed);
+            for (var i = 0; i < layout.Properties.Count; i++)
+            {
+                var prop = layout.Properties[i];
+                // Property boundaries own street fences — suppress Shell FrontGardenDress fence duplicate.
+                var suppressShellFence = HasFrontBoundary(prop);
+                BindOne(
+                    result,
+                    prop.BuildingPad,
+                    prop.Street,
+                    prop.DistrictId,
+                    prop.PlotIndex,
                     worldSeed,
-                    plotSpec.PlotIndex,
-                    dnaRng);
-                result.Add(_binder.Bind(dna, plotSpec.Footprint, plotSpec.Street, archetype, district));
+                    ws,
+                    suppressShellFence);
             }
 
             return result;
@@ -67,6 +81,66 @@ namespace GameDev.World.Settlement
             }
 
             return root;
+        }
+
+        public GameObject SpawnProperties(ISettlementPropertyLayout layout, int worldSeed, Transform parent)
+        {
+            var shells = BindProperties(layout, worldSeed);
+            var root = new GameObject($"SettlementProperties_{layout.SettlementId}");
+            if (parent != null)
+                root.transform.SetParent(parent, false);
+            for (var i = 0; i < shells.Count; i++)
+            {
+                var s = shells[i];
+                ShellPlaceholderFactory.SpawnShellRoot(
+                    s,
+                    root.transform,
+                    $"Shell_{i:00}_{s.Dna.ArchetypeId}");
+            }
+
+            return root;
+        }
+
+        private void BindOne(
+            List<ShellInstance> result,
+            PlotFootprint buildingPad,
+            StreetContext street,
+            string districtId,
+            int plotIndex,
+            int worldSeed,
+            WorldSeed ws,
+            bool suppressShellFrontFence = false)
+        {
+            var district = FindDistrict(districtId);
+            var archRng = ws.Fork($"settlement_arch_{plotIndex}");
+            var archetype = _selector.Select(buildingPad, district, archRng);
+            if (archetype == null)
+                return;
+            var dnaRng = ws.Fork($"settlement_dna_{plotIndex}");
+            var dna = ShellDnaSampler.Sample(
+                archetype,
+                district,
+                buildingPad,
+                street,
+                worldSeed,
+                plotIndex,
+                dnaRng);
+            if (suppressShellFrontFence)
+                dna.FrontGardenDress = false;
+            result.Add(_binder.Bind(dna, buildingPad, street, archetype, district));
+        }
+
+        private static bool HasFrontBoundary(PropertySpec prop)
+        {
+            if (prop?.Boundaries == null)
+                return false;
+            for (var i = 0; i < prop.Boundaries.Count; i++)
+            {
+                if (prop.Boundaries[i].Edge == PlotFace.Front)
+                    return true;
+            }
+
+            return false;
         }
 
         private DistrictProfileDef FindDistrict(string id)

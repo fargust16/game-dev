@@ -32,6 +32,36 @@ namespace GameDev.World.Buildings.Shell
             };
         }
 
+        public static StreetContext CornerFrontRight()
+        {
+            return new StreetContext
+            {
+                Front = FaceKind.Street,
+                Right = FaceKind.Street,
+                Back = FaceKind.Yard,
+                Left = FaceKind.Party
+            };
+        }
+
+        /// <summary>Street frontage with service lane / alley at the rear (S4).</summary>
+        public static StreetContext StreetFrontAlleyBack()
+        {
+            return new StreetContext
+            {
+                Front = FaceKind.Street,
+                Right = FaceKind.Party,
+                Back = FaceKind.Alley,
+                Left = FaceKind.Party
+            };
+        }
+
+        public StreetContext WithBack(FaceKind back)
+        {
+            var c = this;
+            c.Back = back;
+            return c;
+        }
+
         public FaceKind Get(PlotFace face)
         {
             switch (face)

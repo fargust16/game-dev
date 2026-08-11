@@ -476,7 +476,7 @@ namespace GameDev.World.Buildings.Shell
                 return;
             }
 
-            var peak = w <= ModularGrid.BayMeters * 2.2f ? 1.5f : 1.25f;
+            var peak = GablePeakHeight(w);
             shell.AddPiece(
                 ExteriorPieceCategory.RoofGable,
                 $"F{floor}_ROOF_GABLE_{slab.Id}",
@@ -486,6 +486,11 @@ namespace GameDev.World.Buildings.Shell
                 roof,
                 owner,
                 floorIndex: floor);
+        }
+
+        private static float GablePeakHeight(float roofWidthMeters)
+        {
+            return roofWidthMeters <= ModularGrid.BayMeters * 2.2f ? 1.5f : 1.25f;
         }
 
         private static void AddChimneysOnPrimaryRoof(
@@ -520,9 +525,12 @@ namespace GameDev.World.Buildings.Shell
             }
 
             var yBase = ModularGrid.FoundationHeight + (topFloor + 1) * ModularGrid.StoreyMeters;
+            // Must match AddRoof inset width — peak height is keyed off roof piece width, not raw slab.
+            var edge = ModularGrid.WallThickness;
+            var roofW = Mathf.Max(0.2f, slab.WidthMeters - edge * 2f);
             var roofTop = dna.RoofType == RoofType.Flat
                 ? yBase + 0.24f
-                : yBase + (slab.WidthMeters <= ModularGrid.BayMeters * 2.2f ? 1.5f : 1.25f);
+                : yBase + GablePeakHeight(roofW);
 
             var chimneyH = 1.1f;
             var chimneyY = roofTop + chimneyH * 0.5f; // flush: bottom sits on roof top

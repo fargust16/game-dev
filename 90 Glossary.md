@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.30
+Version: 0.33
 
 Status: Draft
 
-Last Updated: 2026-08-09
+Last Updated: 2026-08-11
 
 Depends On:
 All Canonical Documents
@@ -428,7 +428,61 @@ Per-face classification of a building plot (`Street`, `Alley`, `Yard`, `Square`,
 
 ## PlotFootprint
 
-Settled building lot: bay width/depth, shape (V1 rectangle / corner), orientation, and street mask. Selected before archetype/DNA sampling. Distinct from the assembled ShellInstance. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
+Building pad for Exterior Shell Grammar: bay width/depth, shape (V1 rectangle / corner), orientation. **Not** the full land lot — that is Plot Parcel. Selected after Property zoning, before archetype/DNA sampling. Distinct from the assembled ShellInstance. See [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md`.
+
+---
+
+## Plot Parcel
+
+Geometric land lot (frontage × depth, origin, yaw) subdivided from a settlement block. May be larger than the building pad. Owned by Settlement / Property generation (`PlotParcel`). See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md`.
+
+---
+
+## Property (Settlement)
+
+Logical unit on a Plot Parcel: property archetype, zones (front garden, rear yard, service, …), and a BuildingPad (`PlotFootprint`) for Shell. Not ownership simulation. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md`, [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) W.5.
+
+---
+
+## Property Archetype
+
+Immutable fabric recipe (`PropertyArchetypeDef`) that drives lot size, setbacks, and which property zones exist for a `DistrictKind` (e.g. PoorRow, WorkerYard, AffluentGarden). Shell silhouette still comes from DistrictProfile + building DNA. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md`.
+
+---
+
+## Property Boundary
+
+Fence, iron fence, or wall edge segments around a Property lot, optionally with a front gate. Lab uses greybox placeholders (`PropertyBoundarySegment`); production TownDress meshes come later. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md` (S2).
+
+---
+
+## Property Prop
+
+Dressing placed inside a Property zone (garden lamp, planter, crate, …) via `PropertyPropCatalog` rules. Tagged with PropSemantic so fantasy/industrial/occult pieces have a reason to exist. Street and building-mounted props are separate systems. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md` (S3).
+
+---
+
+## PropSemantic
+
+`Domestic` | `Service` | `Industrial` | `Occult` | `Civic`. Semantic tag on Property Props — prevents random fantasy clutter. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md` (S3).
+
+---
+
+## Settlement Lane
+
+Service / rear lane strip between property frontages inside a settlement block (`SettlementLaneSpec`). Used by double-frontage and rear-lane parcelizers (S4). Not a full StreetNetwork. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md` (S4).
+
+---
+
+## Settlement Street
+
+Primary or cross street ribbon (`SettlementStreetSpec`) on the Settlement Street Spine. Centerline + width only — not a pathfinding graph and not OrganicTown `TownRoadGraph`. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md` (S5).
+
+---
+
+## Settlement Fabric
+
+Composable settlement layout (`SettlementFabricLayout`): street ribbons + one or more property blocks with aggregated Properties/Plots for Shell. Lab S5 Street Spine. See `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md` (S5).
 
 ---
 

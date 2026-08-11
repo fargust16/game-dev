@@ -1,16 +1,16 @@
 # 17 Game Systems Architecture
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
-Last Updated: 2026-08-09
+Last Updated: 2026-08-11
 
 Depends On:
 [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
 
 Referenced By:
-[AGENTS.md](AGENTS.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`, `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`
+[AGENTS.md](AGENTS.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`, `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`, `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md`
 
 ---
 
@@ -215,13 +215,13 @@ flowchart LR
 |-------|---------|
 | **Responsibilities** | Turn settlement-scale POIs (town approach, hamlet) into layout intents: road hints, plot footprints, district tags — **not** continuous enterable city GridMap. |
 | **Dependencies** | POI Placement, WorldSeed, Terrain/Biome. |
-| **Public interfaces** | `ISettlementLayout { SettlementId Id; IReadOnlyList<PlotFootprint> Plots; }`; generator from `PoiMarker` of settlement kinds. |
-| **Data flow** | Settlement POI → seed fork `"settlement"` → footprints / road spines → Building/Shell. |
+| **Public interfaces** | `ISettlementLayout` / `ISettlementPropertyLayout` (`Plots` = building pads; `Properties` = parcels + zones + boundaries); generator from `PoiMarker` of settlement kinds (overworld hook later). |
+| **Data flow** | Seed fork `"settlement_*"` → `SettlementBlockLayout` (PlotParcel + zones + boundaries + BuildingPad) → Building/Shell + feature placeholders. Overworld: Settlement POI → layout pose (deferred). |
 | **Save/load** | Regenerable layout; persist only player/faction mutations later. |
 | **Multiplayer** | Deterministic layout from seed; mutations replicated as deltas. |
 | **Performance** | Generate on chunk/settlement demand; cache layout data. |
 | **Extensibility** | Compose settlement layout from the Piece Kit (plot/road/block Pieces) per [15](15%20Procedural%20Building%20Generation.md) — not from the retired OrganicTown polygon generator. |
-| **V1 scope / Deferred** | V0: town-approach marker only (no full settlement gen). Stub layout + shell bind demo lives under `World/Settlement/` for contract tests; full procedural settlements deferred. Shell Sandbox may feed binder without live Settlement. |
+| **V1 scope / Deferred** | **Property lab S1–S5** (`SETTLEMENT_PROPERTY_V0.md`): block strip → zones → BuildingPad → Shell; S2 boundaries/Elite/Shop; S3 property props; S4 rear lane + double-frontage; S5 Street Spine (`SettlementFabricLayout` + `SettlementStreetSpec` ribbons, not TownRoadGraph). Stub layout remains for contract tests. Deferred: street props (S8), overworld TownApproach (S6), TownDress meshes, full pathfinding StreetNetwork. |
 | **Owning folder** | `unity/Assets/Scripts/World/Settlement/` |
 
 ## W.6 Building / Shell
