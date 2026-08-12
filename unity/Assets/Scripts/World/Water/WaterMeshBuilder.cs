@@ -4,151 +4,297 @@ using UnityEngine;
 namespace GameDev.World.Water
 {
     /// <summary>
-    /// Builds a Unity mesh directly from a <see cref="WaterZone"/>'s flooded-cell mask: one flat
-    /// quad per flooded cell at the zone's own <see cref="WaterZone.WaterLevelY"/>, so the surface
-    /// only exists where sampled terrain is actually at or below that height - never a plane
-    /// bleeding across dry ground. Boundary cells get a thin vertical skirt down to the adjacent
-    /// unflooded terrain's real sampled height, closing the seam between water edge and shore
-    /// instead of leaving a visible gap or an underwater view straight through the shoreline.
-    /// Shoreline follows the sampling grid resolution (blocky at low cell counts) - smoothing it
-    /// (marching squares) is a follow-up polish item, not required to fix the water/terrain
-    /// mismatch this replaces.
+    /// One flat water surface per lake at <see cref="WaterZone.WaterLevelY"/>.
+    /// Contour is built from <b>post-carve terrain</b>: every XZ where ground sits below the water
+    /// plane (plus a small shore pad). That way the mesh fills the real basin instead of a flood-AABB
+    /// rectangle floating over dry crater floor.
     /// </summary>
     public static class WaterMeshBuilder
     {
-        private const float SkirtMargin = 0.25f;
+        public const float MeshStepMeters = 1f;
+        /// <summary>Include ground this far above waterY so the plane meets the soft bank.</summary>
+        public const float ShorePadMeters = 0.75f;
 
-        /// <param name="zone">The zone this mesh is being built for.</param>
-        /// <param name="allZones">
-        /// Every zone from the same generation, sharing the same grid. Skirts must check "is this
-        /// neighbour cell wet in ANY zone", not just this one - two basins can be geometrically
-        /// adjacent while still being separate <see cref="WaterZone"/> instances (each flood only
-        /// claims its own cells), and checking only <paramref name="zone"/>'s own mask would read
-        /// the other zone's water as "dry land" and drop a spurious wall down to real terrain right
-        /// through the middle of what should be one continuous surface.
-        /// </param>
-        public static Mesh Build(WaterZone zone, IReadOnlyList<WaterZone> allZones)
+        public static Mesh Build(WaterZone zone, IReadOnlyList<WaterZone> allZones) =>
+            Build(zone, allZones, sampleTerrainY: null, clipXZ: null);
+
+        public static Mesh Build(
+            WaterZone zone,
+            IReadOnlyList<WaterZone> allZones,
+            System.Func<float, float, float> sampleTerrainY) =>
+            Build(zone, allZones, sampleTerrainY, clipXZ: null);
+
+        public static Mesh Build(
+            WaterZone zone,
+            IReadOnlyList<WaterZone> allZones,
+            System.Func<float, float, float> sampleTerrainY,
+            Rect? clipXZ)
         {
-            var vertices = new List<Vector3>();
-            var triangles = new List<int>();
-            var uvs = new List<Vector2>();
+            _ = allZones;
 
-            void AddQuad(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+            if (!TryGetFloodBounds(zone, out var minX, out var minZ, out var maxX, out var maxZ))
             {
-                var baseIndex = vertices.Count;
-                vertices.Add(a);
-                vertices.Add(b);
-                vertices.Add(c);
-                vertices.Add(d);
-                uvs.Add(new Vector2(0f, 0f));
-                uvs.Add(new Vector2(1f, 0f));
-                uvs.Add(new Vector2(1f, 1f));
-                uvs.Add(new Vector2(0f, 1f));
-                triangles.Add(baseIndex);
-                triangles.Add(baseIndex + 1);
-                triangles.Add(baseIndex + 2);
-                triangles.Add(baseIndex);
-                triangles.Add(baseIndex + 2);
-                triangles.Add(baseIndex + 3);
-            }
-
-            float? FindWaterLevelAt(int nx, int nz)
-            {
-                for (var i = 0; i < allZones.Count; i++)
-                {
-                    if (allZones[i].IsFlooded(nx, nz))
-                    {
-                        return allZones[i].WaterLevelY;
-                    }
-                }
-
-                return null;
-            }
-
-            void AddSkirt(int nx, int nz, Vector3 topA, Vector3 topB)
-            {
-                var otherLevel = FindWaterLevelAt(nx, nz);
-                if (otherLevel.HasValue)
-                {
-                    // Cell edges already meet at (near enough) the same height - no seam to cover.
-                    if (Mathf.Abs(otherLevel.Value - zone.WaterLevelY) < 0.01f)
-                    {
-                        return;
-                    }
-
-                    // Neighbour belongs to a different zone sitting at a different level - connect
-                    // down to that zone's own surface, not bare terrain, so the two water sheets
-                    // meet cleanly instead of leaving a gap between them. Only the higher zone
-                    // draws this (never the lower one looking back) so the step isn't built twice.
-                    if (zone.WaterLevelY > otherLevel.Value)
-                    {
-                        var stepA = new Vector3(topA.x, otherLevel.Value, topA.z);
-                        var stepB = new Vector3(topB.x, otherLevel.Value, topB.z);
-                        AddQuad(topA, topB, stepB, stepA);
-                    }
-
-                    return;
-                }
-
-                var neighborHeight = zone.HeightAt(nx, nz);
-
-                // Dry neighbour already sits at or above the water surface - an island or the
-                // mainland naturally rising out of the lake. The terrain mesh already draws that
-                // slope; a skirt down (really up) to it would just glue a redundant vertical wall
-                // onto ground that was never a gap in the first place (the bug behind rings of
-                // "cliffs" appearing around islands and along otherwise normal shoreline).
-                if (neighborHeight >= zone.WaterLevelY)
-                {
-                    return;
-                }
-
-                var bottomY = neighborHeight - SkirtMargin;
-                var bottomA = new Vector3(topA.x, bottomY, topA.z);
-                var bottomB = new Vector3(topB.x, bottomY, topB.z);
-                AddQuad(topA, topB, bottomB, bottomA);
+                return new Mesh { name = $"WaterZoneMesh_{zone.Id}_empty" };
             }
 
             var y = zone.WaterLevelY;
-            for (var x = 0; x < zone.Width; x++)
+            var step = Mathf.Max(MeshStepMeters, 0.75f);
+            // Pad past flood AABB — carve + bank blur often extends beyond the boolean mask.
+            var pad = Mathf.Max(zone.CellSize * 4f, LakeTerrainCarver.BankBlendMeters);
+            minX -= pad;
+            minZ -= pad;
+            maxX += pad;
+            maxZ += pad;
+
+            // Never extend water past the live terrain tile (SampleHeight outside clamps to the
+            // rim and falsely reads "underwater", producing giant rectangles off the mesh edge).
+            if (clipXZ.HasValue)
             {
-                for (var z = 0; z < zone.Depth; z++)
+                var c = clipXZ.Value;
+                minX = Mathf.Max(minX, c.xMin);
+                minZ = Mathf.Max(minZ, c.yMin);
+                maxX = Mathf.Min(maxX, c.xMax);
+                maxZ = Mathf.Min(maxZ, c.yMax);
+                if (maxX <= minX || maxZ <= minZ)
                 {
-                    if (!zone.IsFlooded(x, z))
+                    return new Mesh { name = $"WaterZoneMesh_{zone.Id}_empty" };
+                }
+            }
+
+            var cellsX = Mathf.Max(1, Mathf.CeilToInt((maxX - minX) / step));
+            var cellsZ = Mathf.Max(1, Mathf.CeilToInt((maxZ - minZ) / step));
+
+            // Corner field: how far below water (positive => underwater / include in mesh).
+            var field = new float[cellsX + 1, cellsZ + 1];
+            var anyWet = false;
+            for (var iz = 0; iz <= cellsZ; iz++)
+            {
+                for (var ix = 0; ix <= cellsX; ix++)
+                {
+                    var wx = minX + ix * step;
+                    var wz = minZ + iz * step;
+                    float groundY;
+                    if (clipXZ.HasValue)
+                    {
+                        var c = clipXZ.Value;
+                        if (wx < c.xMin || wx > c.xMax || wz < c.yMin || wz > c.yMax)
+                        {
+                            field[ix, iz] = -1f;
+                            continue;
+                        }
+                    }
+
+                    if (sampleTerrainY != null)
+                    {
+                        groundY = sampleTerrainY(wx, wz);
+                    }
+                    else
+                    {
+                        // Editor tests without terrain: fall back to flood occupancy.
+                        groundY = zone.Contains(wx, wz) ? y - 2f : y + 2f;
+                    }
+
+                    var depth = y + ShorePadMeters - groundY;
+                    field[ix, iz] = depth;
+                    if (depth >= 0f)
+                    {
+                        anyWet = true;
+                    }
+                }
+            }
+
+            if (!anyWet)
+            {
+                return new Mesh { name = $"WaterZoneMesh_{zone.Id}_empty" };
+            }
+
+            var verts = new List<Vector3>(cellsX * cellsZ * 4);
+            var uvs = new List<Vector2>(cellsX * cellsZ * 4);
+            var tris = new List<int>(cellsX * cellsZ * 6);
+            var spanX = Mathf.Max(maxX - minX, 0.01f);
+            var spanZ = Mathf.Max(maxZ - minZ, 0.01f);
+
+            for (var iz = 0; iz < cellsZ; iz++)
+            {
+                for (var ix = 0; ix < cellsX; ix++)
+                {
+                    var x0 = minX + ix * step;
+                    var z0 = minZ + iz * step;
+                    var x1 = x0 + step;
+                    var z1 = z0 + step;
+
+                    var s00 = field[ix, iz];
+                    var s10 = field[ix + 1, iz];
+                    var s11 = field[ix + 1, iz + 1];
+                    var s01 = field[ix, iz + 1];
+
+                    var mask =
+                        (s00 >= 0f ? 1 : 0) |
+                        (s10 >= 0f ? 2 : 0) |
+                        (s11 >= 0f ? 4 : 0) |
+                        (s01 >= 0f ? 8 : 0);
+
+                    if (mask == 0)
                     {
                         continue;
                     }
 
-                    var x0 = zone.OriginX + x * zone.CellSize;
-                    var x1 = x0 + zone.CellSize;
-                    var z0 = zone.OriginZ + z * zone.CellSize;
-                    var z1 = z0 + zone.CellSize;
+                    if (mask == 15)
+                    {
+                        AddQuad(verts, uvs, tris, y, x0, z0, x1, z1, minX, minZ, spanX, spanZ);
+                        continue;
+                    }
 
-                    var p00 = new Vector3(x0, y, z0);
-                    var p10 = new Vector3(x1, y, z0);
-                    var p11 = new Vector3(x1, y, z1);
-                    var p01 = new Vector3(x0, y, z1);
-
-                    AddQuad(p00, p01, p11, p10);
-
-                    AddSkirt(x - 1, z, p01, p00);
-                    AddSkirt(x + 1, z, p10, p11);
-                    AddSkirt(x, z - 1, p00, p10);
-                    AddSkirt(x, z + 1, p11, p01);
+                    EmitCell(verts, uvs, tris, y, mask, x0, z0, x1, z1, s00, s10, s11, s01, minX, minZ, spanX, spanZ);
                 }
             }
 
             var mesh = new Mesh { name = $"WaterZoneMesh_{zone.Id}" };
-            if (vertices.Count > 65000)
+            if (verts.Count == 0)
+            {
+                return mesh;
+            }
+
+            if (verts.Count > 65000)
             {
                 mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
             }
 
-            mesh.SetVertices(vertices);
+            mesh.SetVertices(verts);
             mesh.SetUVs(0, uvs);
-            mesh.SetTriangles(triangles, 0);
+            mesh.SetTriangles(tris, 0);
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
             return mesh;
+        }
+
+        private static void AddQuad(
+            List<Vector3> verts, List<Vector2> uvs, List<int> tris,
+            float y, float x0, float z0, float x1, float z1,
+            float minX, float minZ, float spanX, float spanZ)
+        {
+            var i = verts.Count;
+            verts.Add(new Vector3(x0, y, z0));
+            verts.Add(new Vector3(x0, y, z1));
+            verts.Add(new Vector3(x1, y, z1));
+            verts.Add(new Vector3(x1, y, z0));
+            uvs.Add(new Vector2((x0 - minX) / spanX, (z0 - minZ) / spanZ));
+            uvs.Add(new Vector2((x0 - minX) / spanX, (z1 - minZ) / spanZ));
+            uvs.Add(new Vector2((x1 - minX) / spanX, (z1 - minZ) / spanZ));
+            uvs.Add(new Vector2((x1 - minX) / spanX, (z0 - minZ) / spanZ));
+            tris.Add(i);
+            tris.Add(i + 1);
+            tris.Add(i + 2);
+            tris.Add(i);
+            tris.Add(i + 2);
+            tris.Add(i + 3);
+        }
+
+        private static void EmitCell(
+            List<Vector3> verts, List<Vector2> uvs, List<int> tris,
+            float y, int mask,
+            float x0, float z0, float x1, float z1,
+            float s00, float s10, float s11, float s01,
+            float minX, float minZ, float spanX, float spanZ)
+        {
+            var e0 = LerpEdge(x0, z0, x1, z0, s00, s10);
+            var e1 = LerpEdge(x1, z0, x1, z1, s10, s11);
+            var e2 = LerpEdge(x1, z1, x0, z1, s11, s01);
+            var e3 = LerpEdge(x0, z1, x0, z0, s01, s00);
+
+            var c00 = new Vector2(x0, z0);
+            var c10 = new Vector2(x1, z0);
+            var c11 = new Vector2(x1, z1);
+            var c01 = new Vector2(x0, z1);
+
+            switch (mask)
+            {
+                case 1: AddTri(verts, uvs, tris, y, c00, e0, e3, minX, minZ, spanX, spanZ); break;
+                case 2: AddTri(verts, uvs, tris, y, c10, e1, e0, minX, minZ, spanX, spanZ); break;
+                case 3: AddQuadPts(verts, uvs, tris, y, c00, e3, e1, c10, minX, minZ, spanX, spanZ); break;
+                case 4: AddTri(verts, uvs, tris, y, c11, e2, e1, minX, minZ, spanX, spanZ); break;
+                case 5:
+                    AddTri(verts, uvs, tris, y, c00, e0, e3, minX, minZ, spanX, spanZ);
+                    AddTri(verts, uvs, tris, y, c11, e2, e1, minX, minZ, spanX, spanZ);
+                    break;
+                case 6: AddQuadPts(verts, uvs, tris, y, c10, e0, e2, c11, minX, minZ, spanX, spanZ); break;
+                case 7: AddPent(verts, uvs, tris, y, c00, e3, e2, c11, c10, minX, minZ, spanX, spanZ); break;
+                case 8: AddTri(verts, uvs, tris, y, c01, e3, e2, minX, minZ, spanX, spanZ); break;
+                case 9: AddQuadPts(verts, uvs, tris, y, c00, c01, e2, e0, minX, minZ, spanX, spanZ); break;
+                case 10:
+                    AddTri(verts, uvs, tris, y, c10, e1, e0, minX, minZ, spanX, spanZ);
+                    AddTri(verts, uvs, tris, y, c01, e3, e2, minX, minZ, spanX, spanZ);
+                    break;
+                case 11: AddPent(verts, uvs, tris, y, c00, c01, e2, e1, c10, minX, minZ, spanX, spanZ); break;
+                case 12: AddQuadPts(verts, uvs, tris, y, c01, c11, e1, e3, minX, minZ, spanX, spanZ); break;
+                case 13: AddPent(verts, uvs, tris, y, c00, c01, c11, e1, e0, minX, minZ, spanX, spanZ); break;
+                case 14: AddPent(verts, uvs, tris, y, c10, e0, e3, c01, c11, minX, minZ, spanX, spanZ); break;
+            }
+        }
+
+        private static Vector2 LerpEdge(float ax, float az, float bx, float bz, float sa, float sb)
+        {
+            var denom = sa - sb;
+            var t = Mathf.Abs(denom) < 1e-5f ? 0.5f : Mathf.Clamp01(sa / denom);
+            return new Vector2(Mathf.Lerp(ax, bx, t), Mathf.Lerp(az, bz, t));
+        }
+
+        private static void AddTri(
+            List<Vector3> verts, List<Vector2> uvs, List<int> tris,
+            float y, Vector2 a, Vector2 b, Vector2 c,
+            float minX, float minZ, float spanX, float spanZ)
+        {
+            var i = verts.Count;
+            Push(verts, uvs, y, a, minX, minZ, spanX, spanZ);
+            Push(verts, uvs, y, b, minX, minZ, spanX, spanZ);
+            Push(verts, uvs, y, c, minX, minZ, spanX, spanZ);
+            tris.Add(i);
+            tris.Add(i + 1);
+            tris.Add(i + 2);
+        }
+
+        private static void AddQuadPts(
+            List<Vector3> verts, List<Vector2> uvs, List<int> tris,
+            float y, Vector2 a, Vector2 b, Vector2 c, Vector2 d,
+            float minX, float minZ, float spanX, float spanZ)
+        {
+            AddTri(verts, uvs, tris, y, a, b, c, minX, minZ, spanX, spanZ);
+            AddTri(verts, uvs, tris, y, a, c, d, minX, minZ, spanX, spanZ);
+        }
+
+        private static void AddPent(
+            List<Vector3> verts, List<Vector2> uvs, List<int> tris,
+            float y, Vector2 a, Vector2 b, Vector2 c, Vector2 d, Vector2 e,
+            float minX, float minZ, float spanX, float spanZ)
+        {
+            AddTri(verts, uvs, tris, y, a, b, c, minX, minZ, spanX, spanZ);
+            AddTri(verts, uvs, tris, y, a, c, d, minX, minZ, spanX, spanZ);
+            AddTri(verts, uvs, tris, y, a, d, e, minX, minZ, spanX, spanZ);
+        }
+
+        private static void Push(
+            List<Vector3> verts, List<Vector2> uvs, float y, Vector2 p,
+            float minX, float minZ, float spanX, float spanZ)
+        {
+            verts.Add(new Vector3(p.x, y, p.y));
+            uvs.Add(new Vector2((p.x - minX) / spanX, (p.y - minZ) / spanZ));
+        }
+
+        private static bool TryGetFloodBounds(
+            WaterZone zone, out float minX, out float minZ, out float maxX, out float maxZ)
+        {
+            var aabb = zone.GetFloodAabbXZ();
+            if (aabb.width <= 0f || aabb.height <= 0f)
+            {
+                minX = minZ = maxX = maxZ = 0f;
+                return false;
+            }
+
+            minX = aabb.xMin;
+            minZ = aabb.yMin;
+            maxX = aabb.xMax;
+            maxZ = aabb.yMax;
+            return true;
         }
     }
 }

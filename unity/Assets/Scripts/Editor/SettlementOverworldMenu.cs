@@ -28,8 +28,6 @@ namespace GameDev.EditorTools
             var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
             if (mapMagic == null || mapMagic.graph == null)
             {
-                Debug.LogWarning(
-                    "[Settlement] No generated terrain — run GameDev/Overworld/Generate Terrain From Seed first.");
                 return;
             }
 
@@ -39,8 +37,6 @@ namespace GameDev.EditorTools
             var holder = terrain != null ? terrain.GetComponent<DirectMatricesHolder>() : null;
             if (holder == null)
             {
-                Debug.LogWarning(
-                    "[Settlement] No DirectMatricesHolder — regenerate terrain with OverworldTerrainMenu first.");
                 return;
             }
 
@@ -51,19 +47,12 @@ namespace GameDev.EditorTools
 
             if (!SettlementApproachBinder.TryFindTownApproach(placer.AllMarkers(), out var approach))
             {
-                Debug.LogWarning(
-                    "[Settlement] No TownApproach POI for this seed — try Place POI Markers or another seed.");
                 return;
             }
 
-            var waterZones = Object.FindFirstObjectByType<OverworldWaterZones>();
-            if (waterZones == null && GameObject.Find("OverworldWater") != null)
-            {
-                Debug.LogWarning(
-                    "[Settlement] Found OverworldWater without OverworldWaterZones — run Generate Water Zones.");
-            }
-
-            IWaterSampler water = waterZones;
+            var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
+            var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
+            IWaterSampler water = new CompositeWaterSampler(lakeZones, riverZones);
             // Must clear before height probes — otherwise Raycast hits prior shells/cylinder and
             // SnapFabric lifts the whole town into the air.
             ClearSettlement();
@@ -80,9 +69,6 @@ namespace GameDev.EditorTools
                     blockCount: 2,
                     plotsPerSide: 3))
             {
-                Debug.LogWarning(
-                    $"[Settlement] No dry footprint near TownApproach {approach.Id} " +
-                    "(lake bed / flooded lots). Regenerate water, try another seed, or move approach.");
                 return;
             }
 
@@ -116,13 +102,6 @@ namespace GameDev.EditorTools
             mr.sharedMaterial = mat;
 
             Selection.activeGameObject = root;
-            var moved = Vector3.Distance(
-                new Vector3(approach.Position.x, 0f, approach.Position.z),
-                new Vector3(placedAt.x, 0f, placedAt.z));
-            Debug.Log(
-                $"[Settlement] Placed dry fabric near TownApproach {approach.Id} " +
-                $"at {placedAt} (offset {moved:F0}m) yaw={fabric.Pose.YawDegrees} " +
-                $"plots={fabric.Properties.Count} seed={OverworldTerrainMenu.LastSeed}.");
         }
 
         [MenuItem("GameDev/Overworld/Clear Overworld Settlement")]

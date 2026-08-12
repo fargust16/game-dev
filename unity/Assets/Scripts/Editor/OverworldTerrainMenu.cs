@@ -42,7 +42,6 @@ namespace GameDev.EditorTools
                 CreateFreshSceneAndGenerate(DefaultSeed);
             }
 
-            Debug.Log($"[Overworld] Scene: {ScenePath}");
         }
 
         [MenuItem("GameDev/Overworld/Generate Terrain From Seed")]
@@ -65,7 +64,6 @@ namespace GameDev.EditorTools
             var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
             if (mapMagic == null)
             {
-                Debug.LogWarning("[Overworld] No MapMagicObject in scene.");
                 return;
             }
 
@@ -73,6 +71,7 @@ namespace GameDev.EditorTools
             mapMagic.Refresh(true);
 
             WaterZoneMenu.ClearWaterZones();
+            WaterZoneMenu.ClearRiverZones();
             VegetationScatterMenu.ClearVegetation();
             PoiMarkerMenu.ClearMarkers();
             RoadNetworkMenu.ClearRoadNetwork();
@@ -104,23 +103,55 @@ namespace GameDev.EditorTools
             lightObject.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
         }
 
+        /// <summary>
+        /// This lab scene never had a Camera at all (EmptyScene + generation code only ever added a
+        /// light) - fine for Scene-View-only review, but it means Game View (and Play mode) always
+        /// shows black, which came up specifically while debugging why a water material looked wrong
+        /// - Scene View has its own "Scene Lighting"/"Effects" display toggles independent of the
+        /// actual scene, so it's not a reliable way to judge final rendering, and there was no Game
+        /// View fallback to cross-check against. A straight-down review camera high enough to frame
+        /// the whole 1400x1400 tile is a reasonable default for a generation lab scene regardless of
+        /// this specific incident. Only added if the scene doesn't already have a camera (from a
+        /// previous run, or one the user added themselves) - never overwrites/duplicates.
+        /// </summary>
+        private static void EnsureReviewCamera()
+        {
+            if (Object.FindFirstObjectByType<Camera>() != null)
+            {
+                return;
+            }
+
+            var cameraObject = new GameObject("Review Camera");
+            cameraObject.tag = "MainCamera";
+            var camera = cameraObject.AddComponent<Camera>();
+            camera.farClipPlane = 3000f;
+
+            // Tile spans world (0,0) to (tileSize,tileSize) - centred, high enough above the
+            // tallest plausible terrain (globals.height, ~200-250m in practice) to frame the full
+            // 1400m width straight down at the default ~60 degree field of view.
+            cameraObject.transform.position = new Vector3(700f, 1600f, 700f);
+            cameraObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        }
+
         private static void GenerateInternal(int seed)
         {
             LastSeed = seed;
 
-            // Vegetation/POI/Roads/Settlement are all derived from the terrain and become stale
-            // (wrong biome, wrong spot relative to the new water level, routed across water that
-            // didn't exist there before) the moment it regenerates - never leave them sitting on
-            // the old shape. Roads are the most visibly broken by this: a stale route built against
-            // an earlier lake layout can end up crossing straight through a lake the new generation
-            // placed right where the old dry ground used to be.
+            EnsureReviewCamera();
+
+            // Vegetation/POI/Roads/Settlement/Water are all derived from the terrain and become stale
+            // the moment it regenerates - never leave them sitting on the old shape. Stale water
+            // meshes are the worst offender visually: they float at the previous WaterLevelY over a
+            // completely different heightmap. Roads are similarly broken when an old route crosses a
+            // new lake.
+            WaterZoneMenu.ClearWaterZones();
+            WaterZoneMenu.ClearRiverZones();
             VegetationScatterMenu.ClearVegetation();
             PoiMarkerMenu.ClearMarkers();
             RoadNetworkMenu.ClearRoadNetwork();
             SettlementOverworldMenu.ClearSettlement();
 
             var graph = BuildGraph(seed);
-            Debug.Log($"[Overworld] Graph built: {graph.generators.Length} generators, seed {seed}.");
 
             var mapMagic = FindOrCreateMapMagicObject();
             // MapMagicObject's own default (1000x1000) - bumped up so there's more room for both
@@ -129,27 +160,20 @@ namespace GameDev.EditorTools
             mapMagic.graph = graph;
             mapMagic.gameObject.SetActive(true);
             mapMagic.Refresh(true);
-            Debug.Log($"[Overworld] Refresh(true) called. Pinned tiles before pin: {mapMagic.tiles.pinned.Count}.");
 
             // Outside Play mode MapMagic's own Update() only recalculates tile distances
             // (MapMagicObject.cs Update(): distsOnly = !isPlaying) and never constructs a tile
             // without one. Pin forces the origin tile to actually build in the Editor.
             var originCoord = new Coord(0, 0);
             mapMagic.tiles.Pin(originCoord, false, mapMagic);
-            var tileCount = 0;
-            foreach (var unused in mapMagic.tiles.Tiles())
-            {
-                tileCount++;
-            }
 
-            Debug.Log($"[Overworld] Pinned origin tile. Pinned tiles after pin: {mapMagic.tiles.pinned.Count}, " +
-                      $"total tiles in grid: {tileCount}.");
-
+            // Lakes + rivers after the origin tile is ready so LakeBasinFinder / FlowNetwork sample
+            // the final height channel. Basin pits come from BuildGraph; LakeTerrainCarver then
+            // guarantees a real bed under each flooded zone before meshes are built.
             WaterZoneMenu.GenerateForTile(mapMagic, originCoord);
 
             SaveActive();
             Selection.activeGameObject = mapMagic.gameObject;
-            Debug.Log($"[Overworld] Generated terrain from seed {seed}.");
         }
 
         private static MapMagicObject FindOrCreateMapMagicObject()
@@ -176,43 +200,60 @@ namespace GameDev.EditorTools
         /// was the actual problem. Ranking guarantees it instead: <see cref="BiomeClassifier"/>'s
         /// height bands are literal area-fraction promises (bottom 10% Swamp-eligible, next 70%
         /// Green, next 10% Highland, top 10% Mountain) that hold for every seed, because rank IS
-        /// the percentile by construction. One macroNoise field feeds the rank (not separate
-        /// plateau/mountain fields - splitting them would defeat the single-distribution guarantee
-        /// the ranking relies on); the mountain band is then terraced in isolation and swapped back
-        /// in without changing which fraction of the map is "mountain" (see the mountain-terracing
-        /// block below); six deliberate lake-pit sites (varied size/threshold, random world-space
-        /// offsets, combined via max) are subtracted afterward to carve believable basins, same as
-        /// before. Recipe: MacroNoise -> PercentileRank -> (+HillsNoise) -> [mountain terrace swap]
-        /// -> -LakePits -> Erosion -> Height Output. Seeded from <see cref="WorldSeed"/> so the same
-        /// world seed reproduces the same terrain, mountain, hills, terrace steps, and basin
-        /// placement.
+        /// the percentile by construction.
         /// <para>
-        /// Lake-pit carving only needs to produce plausible dips - it does not need to reach any
-        /// particular threshold. <see cref="GameDev.EditorTools.WaterZoneMenu"/> finds where water
-        /// actually belongs by sampling the generated heightmap after this graph runs (flood-fill
-        /// from real local minima, see <see cref="GameDev.World.Water.LakeBasinFinder"/>), so a
-        /// basin that carves too shallow or too deep no longer produces a dry crater or a flooded
-        /// plateau the way comparing against one fixed global water constant used to. Lakes are not
-        /// part of the percentile-band guarantee (they carve into whichever band they land in, same
-        /// as real hydrology sitting in low ground) - only the dry-land height bands are ranked.
+        /// Before ranking, a Voronoi "cellular" (F2-F1) ridge field is added on top of the macro
+        /// noise, masked to the macro field's own high range so the ridge network only shows up
+        /// where the map was already going to be highland - a connected range with foothills
+        /// tapering into plains, not isolated peaks or a mountain that reads as a shapeless blob.
+        /// Ranking still sees one combined field (ridges included), so the area-fraction guarantee
+        /// holds regardless of whether the input is plain noise or noise-plus-ridges - splitting
+        /// ridges/macro into separately-ranked fields would defeat that guarantee. The mountain and
+        /// highland bands are then each terraced in isolation and swapped back in without changing
+        /// which fraction of the map counts as Mountain/Highland (see the terracing blocks below).
+        /// </para>
+        /// <para>
+        /// Basin carving IS back (incident: removing it entirely, on the theory that ridge structure
+        /// alone would produce enough closed basins, was wrong - ridges only shape the highland/
+        /// mountain band; the compressed plains band (<see cref="BiomeClassifier.PlainsElevationCap"/>)
+        /// is deliberately near-flat for buildability and has no relief of its own to form a real
+        /// depression). Five deliberate basin sites, masked to the plains band only and carved deep
+        /// enough to guarantee a real rim, replace the six-pit system this originally had - see the
+        /// basinSpecs block below for the fixes over that original version (plains-only masking,
+        /// full-band-width carve depth). <see cref="GameDev.EditorTools.WaterZoneMenu"/> still finds
+        /// the actual basins by flood-filling local minima in the generated height (see
+        /// <see cref="GameDev.World.Water.LakeBasinFinder"/>, unchanged), and now also traces rivers
+        /// into them from flow accumulation over that same height field (see
+        /// <see cref="GameDev.World.Water.FlowNetwork"/>, <see cref="GameDev.World.Water.RiverTracer"/>).
+        /// Recipe: MacroNoise -> (+masked ridge) -> PercentileRank -> (+HillsNoise) -> [mountain/
+        /// highland terrace swaps] -> (-masked basins) -> Erosion -> Height Output. Seeded from
+        /// <see cref="WorldSeed"/>, one independently-named fork per concern (terrain.macro,
+        /// terrain.ridge, terrain.hills, terrain.terrace, terrain.highland-terrace, terrain.detail,
+        /// terrain.basins, terrain.graph), so inserting or removing a layer here can no longer
+        /// silently shift another layer's seed the way deriving them all from one shared fork via
+        /// sequential calls used to.
         /// </para>
         /// </summary>
         private static Graph BuildGraph(int seed)
         {
             EnsureSettingsFolder();
 
-            var terrainSeed = new WorldSeed(seed).Fork("terrain");
-            var graphSeed = terrainSeed.Next();
-            var macroSeed = terrainSeed.Next();
-            var hillsSeed = terrainSeed.Next();
-            var terraceSeed = terrainSeed.Next();
-            var highlandTerraceSeed = terrainSeed.Next();
-            var detailSeed = terrainSeed.Next();
-
-            // Own top-level fork, not chained off terrainSeed - matches the seed hierarchy in
-            // WORLD_GENERATION_PIPELINE.md ("terrain" and "biome" are independent streams), so a
-            // future change to moisture generation can never shift terrain shaping the way a
-            // shared sequential fork would (the doc's "Known gap" note this file already has).
+            // Each terrain concern gets its own named fork instead of sequential .Next() calls off
+            // one shared "terrain" stream (WORLD_GENERATION_PIPELINE.md's own "Known gap" note this
+            // file used to carry): inserting/removing a layer here can no longer silently reshuffle
+            // every other layer's seed. "biome" (moisture) stays its own independent top-level
+            // fork, unchanged.
+            var graphSeed = new WorldSeed(seed).Fork("terrain.graph").Next();
+            var macroSeed = new WorldSeed(seed).Fork("terrain.macro").Next();
+            var ridgeSeed = new WorldSeed(seed).Fork("terrain.ridge").Next();
+            var hillsSeed = new WorldSeed(seed).Fork("terrain.hills").Next();
+            var terraceSeed = new WorldSeed(seed).Fork("terrain.terrace").Next();
+            var highlandTerraceSeed = new WorldSeed(seed).Fork("terrain.highland-terrace").Next();
+            var detailSeed = new WorldSeed(seed).Fork("terrain.detail").Next();
+            // Own fork, sequential .Next() calls WITHIN it (fine - the seed-fork fix above is about
+            // not sharing one fork ACROSS unrelated concerns, not about avoiding .Next() sequences
+            // for one self-contained concern's own sub-values).
+            var basinSeed = new WorldSeed(seed).Fork("terrain.basins");
             var moistureSeed = new WorldSeed(seed).Fork("biome").Next();
 
             var graph = Graph.Create();
@@ -225,14 +266,110 @@ namespace GameDev.EditorTools
             var macroNoise = (Noise200)Generator.Create(typeof(Noise200));
             macroNoise.type = Noise200.Type.Perlin;
             macroNoise.seed = macroSeed;
-            macroNoise.size = 700f;
+            macroNoise.size = 950f;
             macroNoise.intensity = 1f;
-            macroNoise.detail = 0.55f;
+            macroNoise.detail = 0.5f;
             graph.Add(macroNoise);
+
+            // Two seeded mountain *masses* in opposite strata (jittered). Without this, a single
+            // elongated high-macro band + ridges often yields one wall or one corner peak and
+            // leaves half the tile without highland river sources.
+            var massSeed = new WorldSeed(seed).Fork("terrain.masses");
+            IOutlet<Den.Tools.Matrices.MatrixWorld> mountainMasses = null;
+            for (var mi = 0; mi < 2; mi++)
+            {
+                var massNoise = (Noise200)Generator.Create(typeof(Noise200));
+                massNoise.type = Noise200.Type.Perlin;
+                massNoise.seed = massSeed.Next();
+                massNoise.size = 480f;
+                massNoise.intensity = 1f;
+                massNoise.detail = 0.35f;
+                // Push peaks toward opposite halves of the tile (noise-space offset ≈ world bias).
+                var ox = mi == 0
+                    ? massSeed.Next(-520, -120)
+                    : massSeed.Next(120, 520);
+                var oz = mi == 0
+                    ? massSeed.Next(-520, -80)
+                    : massSeed.Next(80, 520);
+                massNoise.offset = new Vector2D(ox, oz);
+                graph.Add(massNoise);
+
+                var massCutoff = (Levels200)Generator.Create(typeof(Levels200));
+                massCutoff.inMin = 0.58f;
+                massCutoff.inMax = 0.92f;
+                massCutoff.outMin = 0f;
+                massCutoff.outMax = 1f;
+                graph.Add(massCutoff);
+                graph.Link(massNoise, massCutoff);
+
+                mountainMasses = mountainMasses == null
+                    ? (IOutlet<Den.Tools.Matrices.MatrixWorld>)massCutoff
+                    : Combine(graph, mountainMasses, massCutoff, Blend200.BlendAlgorithm.max);
+            }
+
+            var macroWithMasses = Combine(graph, macroNoise, mountainMasses, Blend200.BlendAlgorithm.add, 0.55f);
+
+            // Ridge structure: Voronoi's "cellular" blend is F2-F1 (distance to the second-closest
+            // cell point minus distance to the closest one), the standard ridge-noise trick - it
+            // reads as a connected network of ridgelines along cell boundaries, not isolated peaks,
+            // because every ridge is shared between two neighbouring cells the way a real drainage
+            // divide is shared between two neighbouring valleys. cellSize ~380m on a 1400m tile
+            // keeps a handful of massifs; combined with low add-opacity below so ridges sculpt a
+            // mountain *mass* instead of a wall that bisects the tile left/right.
+            var ridgeNoise = (Voronoi200)Generator.Create(typeof(Voronoi200));
+            ridgeNoise.seed = ridgeSeed;
+            ridgeNoise.cellSize = 380;
+            ridgeNoise.uniformity = 0.55f;
+            ridgeNoise.blendType = Voronoi200.BlendType.cellular;
+            ridgeNoise.intensity = 1f;
+            graph.Add(ridgeNoise);
+
+            // Ridges only matter where macroNoise's own raw field already reads high - the same
+            // region that ranking will later turn into the Highland/Mountain bands. Elsewhere
+            // (the map's plains-and-hills majority) the mask fades to zero, so the range reads as
+            // one coherent highland mass with foothills tapering into plains, not mountains
+            // scattered across the whole tile. Levels200 clamps outside its own inMin/inMax the
+            // same way the Threshold helper below relies on, so this is a soft-edged region mask,
+            // not a hard cutoff.
+            // <para>
+            // Incident: the first attempt at this (inMin 0.45) started well BELOW Perlin's own
+            // ~0.5 mean, so roughly half the map's raw macroNoise values picked up some ridge
+            // contribution - not just the top ~20% that ranking turns into Highland/Mountain, but a
+            // huge swath of what ranking turns into the compressed "plains" band too. PercentileRank
+            // only cares about relative order, not magnitude, but that broad low-amplitude ridge
+            // bleed still reshuffled the FINE relief within the plains band enough to give
+            // LakeBasinFinder real (if shallow) local minima where the pure-noise field had none at
+            // all - and once that band has minima, its extreme flatness meant nothing bounded the
+            // flood (see the WaterZoneMenu.MaxLakeDepthMeters/CellCountSafetyCap incident notes,
+            // which fought the symptom for two rounds before this got fixed at the source). Raised
+            // well above the raw field's own mean so ridge contribution concentrates on genuinely
+            // elevated territory only - the plains stay close to their original, ridge-free flatness.
+            // </para>
+            var ridgeRegionMask = (Levels200)Generator.Create(typeof(Levels200));
+            ridgeRegionMask.inMin = 0.68f;
+            ridgeRegionMask.inMax = 0.88f;
+            ridgeRegionMask.outMin = 0f;
+            ridgeRegionMask.outMax = 1f;
+            graph.Add(ridgeRegionMask);
+            graph.Link(macroWithMasses, ridgeRegionMask);
+
+            var maskedRidge = Combine(graph, ridgeNoise, ridgeRegionMask, Blend200.BlendAlgorithm.multiply);
+
+            // Soften cellular walls into massifs before ranking — sharp F2-F1 edges otherwise
+            // survive as a continuous barrier across the tile.
+            var ridgeBlur = (Blur200)Generator.Create(typeof(Blur200));
+            ridgeBlur.blur = 90f;
+            graph.Add(ridgeBlur);
+            graph.Link((IOutlet<Den.Tools.Matrices.MatrixWorld>)maskedRidge, (IInlet<Den.Tools.Matrices.MatrixWorld>)ridgeBlur);
+            IOutlet<Den.Tools.Matrices.MatrixWorld> softRidge = ridgeBlur;
+
+            // Ridge contribution on top of the dual-mass macro field. Opacity moderate so masses
+            // stay readable as separate peaks rather than one bisecting wall.
+            var macroWithRidges = Combine(graph, macroWithMasses, softRidge, Blend200.BlendAlgorithm.add, 0.38f);
 
             var rankHeightGen = (PercentileRankGenerator)Generator.Create(typeof(PercentileRankGenerator));
             graph.Add(rankHeightGen);
-            graph.Link(macroNoise, rankHeightGen);
+            graph.Link(macroWithRidges, rankHeightGen);
 
             // Percentile ranking guarantees area fractions, but it does that by locally steepening
             // the field wherever the raw noise's own value distribution is densest: "more rank
@@ -375,55 +512,125 @@ namespace GameDev.EditorTools
             var withoutSmoothHighland = Combine(graph, terracedHeight, highlandLocalOut, Blend200.BlendAlgorithm.subtract, highlandBandWidth);
             var fullyTerracedHeight = Combine(graph, withoutSmoothHighland, highlandTerracedLocal, Blend200.BlendAlgorithm.add, highlandBandWidth);
 
-            // Six guaranteed lake sites of varying size instead of a probabilistic noise
-            // threshold: each is its own (Noise -> Levels cutoff) pair - same non-repeating "huge
-            // period, single peak" trick as before - with a random world-space offset so the six
-            // peaks land in different, spread-out spots rather than clustering, and a varied
-            // size/threshold pair so they don't all read as the same lake. Combined pairwise via
-            // max ("whichever site is deepest here wins") into one mask, then subtracted.
-            var lakeSpecs = new (float Size, float InMin)[]
+            // Basin carving (incident: removing this entirely was the wrong call - see
+            // WORLD_GENERATION_PIPELINE.md's Hydrology row for the full story). Ridge structure
+            // gives the highland/mountain band real relief on its own, but the compressed plains
+            // band (PlainsElevationCap) is DELIBERATELY near-flat for buildability and has no
+            // mechanism of its own to produce a genuine depression - leaving basin carving out
+            // entirely let LakeBasinFinder's flood run across the plains' leftover noise-scale
+            // ripples with no real rim to stop at, rendering as a "lake" with almost no depth under
+            // it (a flat quad sitting a few centimetres over real ground, with the flood's arbitrary
+            // cutoff cap producing a jarring cliff-walled edge instead of a natural shoreline).
+            // <para>
+            // Five deliberate basin sites - same non-repeating "huge period noise, single peak
+            // threshold" trick as the old lake-pit system this replaces, combined via max ("whichever
+            // site is deepest here wins") - but two real fixes over that old version: masked to the
+            // plains band ONLY (via plainsBandMask below) so a site can never bite into the
+            // highland/mountain terracing, and subtracted with opacity equal to the WHOLE
+            // PlainsElevationCap band width, not a fraction of it - a pit's strongest point can reach
+            // 0 (real sea level) even though the surrounding plains sit as high as
+            // PlainsElevationCap*globals.height, guaranteeing LakeBasinFinder a real, generous rim
+            // instead of a few metres of noise.
+            // <para>
+            // Incident within this fix: the first attempt at plainsBandMask used a symmetric ramp
+            // spanning the ENTIRE plains band (center = half of PlainsElevationCap, margin = the
+            // same) - meaning a basin site centred on merely-average plains ground (not the very
+            // lowest point in the whole band) already had its carve strength cut roughly in half or
+            // more before the noise cutoff even applied, since basin site positions are random and
+            // uncorrelated with where the terrain happens to already be lowest. Only sites that
+            // happened to land on the very bottom of the band carved anything deep - most of the 5
+            // sites ended up too shallow to register as a lake at all ("почти нет воды"). The mask's
+            // actual job is narrower than that: stop a site from biting into highland, nothing more -
+            // it should read ~1 across nearly the whole plains band and only fall off right at the
+            // highland boundary. Narrowed to a ramp over just the top 15% of the band.
+            // </para>
+            var plainsBandMask = Threshold(
+                graph, fullyTerracedHeight,
+                BiomeClassifier.PlainsElevationCap * 0.925f, BiomeClassifier.PlainsElevationCap * 0.075f,
+                rising: false);
+
+            // Incident: raising the cutoff threshold (0.55-0.66 -> 0.68-0.77) to shrink the final
+            // flooded footprint didn't work, twice - confirmed with WaterZoneMenu's
+            // CellCountSafetyCap actually enforcing its new, lower value (1500) on a fresh compile,
+            // 7 of 8 zones still landed exactly on that cap. The threshold controls how selectively a
+            // noise field's OWN peak gets isolated, but a Perlin field's spatial features are still
+            // fundamentally sized by its period regardless of where you cut it - a 320m-period field
+            // cut at 0.55 or at 0.77 both isolate a peak region on the order of hundreds of metres
+            // across, just with a steeper or gentler edge, not a smaller one. Size (period), not
+            // threshold, is what actually controls final footprint. Dropped well below the old lake-
+            // pit system's periods (150-480m) to something pond/small-lake scaled (80-200m) -
+            // thresholds relaxed back down since a smaller period no longer needs an aggressive
+            // cutoff to stay a distinct, modest feature.
+            // Incident: shrinking the period fixed HALF the zones (932/430/267/992 cells - genuinely
+            // pond/small-lake sized) but the other half still hit the safety cap - candidate minima
+            // jumped 17-27 -> 120 (a shorter period naturally has more peaks per unit area), and
+            // enough of those peaks now sit close enough together that their floods bridge into one
+            // merged basin before either finds a real rim. Density, not size, is the remaining lever:
+            // thresholds raised again (this time to cut how much total area qualifies at all, not to
+            // shrink one basin's own footprint, which round seven showed doesn't work) so fewer,
+            // more separated peaks get any carve at all.
+            var basinSpecs = new (float Size, float InMin)[]
             {
-                (520f, 0.55f), // large
-                (430f, 0.58f), // large
-                (300f, 0.60f), // medium
-                (260f, 0.62f), // medium
-                (160f, 0.64f), // small
-                (120f, 0.66f), // small
+                (180f, 0.66f), // medium lake
+                (140f, 0.68f), // medium-small
+                (110f, 0.70f), // small lake
+                (90f, 0.72f),  // small lake B
+                (70f, 0.74f),  // pond
+                (55f, 0.76f),  // tiny pond
+                (45f, 0.78f),  // tiny pond B
+                (40f, 0.80f),  // micro pond — sparse-seed insurance
             };
 
-            IOutlet<Den.Tools.Matrices.MatrixWorld> lakeMask = null;
-            foreach (var spec in lakeSpecs)
+            IOutlet<Den.Tools.Matrices.MatrixWorld> basinMask = null;
+            foreach (var spec in basinSpecs)
             {
-                var noise = (Noise200)Generator.Create(typeof(Noise200));
-                noise.type = Noise200.Type.Perlin;
-                noise.seed = terrainSeed.Next();
-                noise.size = spec.Size;
-                noise.intensity = 1f;
-                noise.detail = 0.35f;
-                noise.offset = new Vector2D(terrainSeed.Next(-450, 450), terrainSeed.Next(-450, 450));
-                graph.Add(noise);
+                var basinNoise = (Noise200)Generator.Create(typeof(Noise200));
+                basinNoise.type = Noise200.Type.Perlin;
+                basinNoise.seed = basinSeed.Next();
+                basinNoise.size = spec.Size;
+                basinNoise.intensity = 1f;
+                basinNoise.detail = 0.35f;
+                basinNoise.offset = new Vector2D(basinSeed.Next(-450, 450), basinSeed.Next(-450, 450));
+                graph.Add(basinNoise);
 
-                var cutoff = (Levels200)Generator.Create(typeof(Levels200));
-                cutoff.inMin = spec.InMin;
-                cutoff.inMax = 1f;
-                cutoff.outMin = 0f;
-                cutoff.outMax = 1f;
-                graph.Add(cutoff);
-                graph.Link(noise, cutoff);
+                var basinCutoff = (Levels200)Generator.Create(typeof(Levels200));
+                basinCutoff.inMin = spec.InMin;
+                basinCutoff.inMax = 1f;
+                basinCutoff.outMin = 0f;
+                basinCutoff.outMax = 1f;
+                graph.Add(basinCutoff);
+                graph.Link(basinNoise, basinCutoff);
 
-                lakeMask = lakeMask == null ? (IOutlet<Den.Tools.Matrices.MatrixWorld>)cutoff : Combine(graph, lakeMask, cutoff, Blend200.BlendAlgorithm.max);
+                basinMask = basinMask == null
+                    ? (IOutlet<Den.Tools.Matrices.MatrixWorld>)basinCutoff
+                    : Combine(graph, basinMask, basinCutoff, Blend200.BlendAlgorithm.max);
             }
 
-            // Each of the 6 sites reaches a different peak mask value depending on its own
-            // noise/threshold - higher opacity so all six reliably carve a visible dip, not just
-            // the strongest ones (WaterZoneMenu's flood-fill only needs a real local minimum to
-            // work with, but a dip too shallow to register at the sampling grid's resolution
-            // would still fail to become a lake).
-            var lakeBlend = Combine(graph, fullyTerracedHeight, lakeMask, Blend200.BlendAlgorithm.subtract, 0.7f);
+            var maskedBasins = Combine(graph, basinMask, plainsBandMask, Blend200.BlendAlgorithm.multiply);
+            // Opacity well above PlainsElevationCap so MapMagic pits stay deep after stock erosion;
+            // LakeTerrainCarver then digs the final size-scaled bowl under each flooded zone.
+            // Softer MapMagic pits — LakeTerrainCarver digs the real bowl; leftover dry scars stay shallow.
+            // Shallow MapMagic hints only — LakeTerrainCarver digs the real bowl; leftover dry scars stay mild.
+            var withBasins = Combine(graph, fullyTerracedHeight, maskedBasins, Blend200.BlendAlgorithm.subtract, 0.22f);
 
             var erosion = (Erosion200)Generator.Create(typeof(Erosion200));
+            // Left at MapMagic's own stock defaults (iterations 3, durability 0.9, sediment 0.75,
+            // fluidity 3) after an incident chain: pushing this well past stock (6 iterations,
+            // durability 0.85, sediment 0.6, fluidity 4) manufactured spurious tiny local minima
+            // across the deliberately-flat plains band on its own; dialing back helped but didn't
+            // fix the underlying issue, because the real cause was upstream (the ridge mask bleeding
+            // into the plains, then - after that was fixed - the complete absence of any basin-
+            // carving mechanism at all, see basinSpecs above). Now that basin carving is back with
+            // real depth, erosion runs on top of it here to soften the carved pits' edges into a
+            // more natural-looking rim, the same "erosion refines, doesn't invent" role it plays on
+            // the ridge terracing above - no evidence yet that plains need more than stock.
+            erosion.iterations = 3;
+            erosion.terrainDurability = 0.9f;
+            erosion.erosionAmount = 1f;
+            erosion.sedimentAmount = 0.75f;
+            erosion.fluidityIterations = 3;
             graph.Add(erosion);
-            graph.Link(lakeBlend, erosion);
+            graph.Link(withBasins, erosion);
 
             // Explicit small-scale feature layer (WORLD_GENERATION_PIPELINE.md Iteration 03:
             // "large/medium/small feature scales" - mountain=large ~2000m, plateau+hills=medium
@@ -549,18 +756,21 @@ namespace GameDev.EditorTools
             // Source tileSize values (GrassGreen=30, GrassYellow=15, Dirt=15, Gravel=4,
             // CliffBright=20, Snow=50) were authored for MapMagic's small demo scene and alias
             // badly at our terrain scale - rescaled uniformly here (see LoadScaledTerrainLayer).
+            // Plains = saturated GrassGreen. Pale only near mountains via highland gravel / rock —
+            // no GrassYellow band on the plains (that bleached the whole tile).
             var grassLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/GrassGreen.terrainlayer", 45f);
             var dirtLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/Dirt.terrainlayer", 45f);
-            var forestLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/GrassYellow.terrainlayer", 45f);
+            var forestLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/GrassGreen.terrainlayer", 45f);
             var highlandLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/Gravel.terrainlayer", 60f);
             var rockLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/CliffBright.terrainlayer", 60f);
             var snowLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/Snow.terrainlayer", 60f);
-            // Bottom-to-top priority order (see BlendLayers note above): grass is the fallback
-            // background, then wet-low dirt, the forest height band, highland gravel, mountain
-            // rock, and finally snow last so it wins the peak over bare rock instead of being
-            // buried beneath it.
-            texturesOutput.layers = new[] { grassLayer, dirtLayer, forestLayer, highlandLayer, rockLayer, snowLayer };
+
+            texturesOutput.layers = new[]
+            {
+                grassLayer, dirtLayer, forestLayer, highlandLayer, rockLayer, snowLayer
+            };
             graph.Add(texturesOutput);
+            // Wet dirt only in the swamp strip — not a tan wash across the plains.
             graph.Link(dirtMask, dirtLayer);
             graph.Link(forestBandMask, forestLayer);
             graph.Link(highlandBandMask, highlandLayer);
@@ -623,10 +833,6 @@ namespace GameDev.EditorTools
         private static TexturesOutput200.TextureLayer MakeTextureLayer(TexturesOutput200 output, string terrainLayerPath, float tileSizeMeters)
         {
             var prototype = LoadScaledTerrainLayer(terrainLayerPath, tileSizeMeters);
-            if (prototype == null)
-            {
-                Debug.LogWarning($"[Overworld] TerrainLayer not found at '{terrainLayerPath}' - that texture slot will render blank.");
-            }
 
             var layer = new TexturesOutput200.TextureLayer
             {

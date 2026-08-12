@@ -38,7 +38,7 @@ namespace GameDev.World.Terrain
         /// of ranked area (Swamp+Green) is compressed into - small on purpose, so that band reads
         /// as walkable, buildable plains instead of rolling hills with nowhere flat for a
         /// settlement. Highland+Mountain get the remaining (1 - this) share of the range.</summary>
-        public const float PlainsElevationCap = 0.20f;
+        public const float PlainsElevationCap = 0.17f;
 
         /// <summary>Bottom 10% of area (by rank): Swamp (wet) / Meadow (dry).</summary>
         public const float SwampMaxHeight = RankSwampMaxHeight * (PlainsElevationCap / RankGreenMaxHeight);

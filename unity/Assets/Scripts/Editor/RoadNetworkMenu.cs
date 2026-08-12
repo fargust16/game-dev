@@ -80,7 +80,6 @@ namespace GameDev.EditorTools
             var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
             if (mapMagic == null || mapMagic.graph == null)
             {
-                Debug.LogWarning("[Roads] No generated terrain - run GameDev/Overworld/Generate Terrain From Seed first.");
                 return;
             }
 
@@ -88,20 +87,15 @@ namespace GameDev.EditorTools
             var tile = mapMagic.tiles[tileCoord];
             if (tile == null)
             {
-                Debug.LogWarning("[Roads] No tile at the requested coord - regenerate with OverworldTerrainMenu first.");
                 return;
             }
 
-            if (!MapMagicTileSync.WaitForTileReady(tile))
-            {
-                Debug.LogWarning("[Roads] Tile did not finish generating within the timeout - roads may use stale terrain data.");
-            }
+            MapMagicTileSync.WaitForTileReady(tile);
 
             var terrain = tile.main?.terrain;
             var holder = terrain != null ? terrain.GetComponent<DirectMatricesHolder>() : null;
             if (holder == null)
             {
-                Debug.LogWarning("[Roads] No DirectMatricesHolder on the terrain - regenerate with OverworldTerrainMenu first.");
                 return;
             }
 
@@ -110,7 +104,9 @@ namespace GameDev.EditorTools
             var candidateChunks = OverworldTileChunks.CoveringTile(tileCoord, mapMagic.tileSize, OverworldTileChunks.DefaultMarginMeters);
             var placer = new StubPoiPlacer(worldSeed, sampler, candidateChunks, PoiDemoScenario.BuildRequests());
 
-            var waterZones = Object.FindFirstObjectByType<OverworldWaterZones>();
+            var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
+            var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
+            IWaterSampler waterZones = new CompositeWaterSampler(lakeZones, riverZones);
             var heightSampler = new RaycastWorldHeightSampler();
             var costSampler = new RoadCostSampler(sampler, sampler, waterZones, heightSampler);
 
@@ -146,7 +142,6 @@ namespace GameDev.EditorTools
 
             if (nodes.Count < 2)
             {
-                Debug.LogWarning("[Roads] Fewer than 2 valid POI markers for this seed - nothing to connect. Try Place POI Markers or another seed.");
                 return;
             }
 
@@ -175,7 +170,6 @@ namespace GameDev.EditorTools
             var segments = RoadNetworkBuilder.BuildNetwork(nodes, grid, costSampler.SampleCost, HeightMeters);
             if (segments.Count == 0)
             {
-                Debug.LogWarning("[Roads] No route found between any POI pair - terrain may be fully blocked by water/cliffs for this seed.");
                 return;
             }
 
@@ -196,11 +190,6 @@ namespace GameDev.EditorTools
             if (terrain != null)
             {
                 var grooveLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(GrooveLayerPath);
-                if (grooveLayer == null)
-                {
-                    Debug.LogWarning($"[Roads] Groove texture layer not found at '{GrooveLayerPath}' - carving height only, no dirt texture.");
-                }
-
                 RoadTerrainCarver.Carve(terrain, allRibbonCenterlines, CarveWidthMeters, CarveDepthMeters, grooveLayer);
             }
 
@@ -208,12 +197,7 @@ namespace GameDev.EditorTools
             var root = new GameObject(RootObjectName);
             var material = CreateRoadMaterial();
             var bridgePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BridgePrefabPath);
-            if (bridgePrefab == null)
-            {
-                Debug.LogWarning($"[Roads] Bridge prefab not found at '{BridgePrefabPath}' - bridged crossings will render as a plain road strip.");
-            }
 
-            var bridgeCount = 0;
             foreach (var (segment, ribbonRuns, bridgeSpans) in plans)
             {
                 foreach (var run in ribbonRuns)
@@ -224,11 +208,8 @@ namespace GameDev.EditorTools
                 foreach (var (from, to) in bridgeSpans)
                 {
                     BuildBridgeSpan(root.transform, segment, from, to, heightSampler, bridgePrefab);
-                    bridgeCount++;
                 }
             }
-
-            Debug.Log($"[Roads] Connected {nodes.Count} POI markers with {segments.Count} road segment(s), {bridgeCount} bridge crossing(s) (seed {OverworldTerrainMenu.LastSeed}).");
         }
 
         [MenuItem("GameDev/Overworld/Clear Road Network")]

@@ -102,7 +102,6 @@ namespace GameDev.EditorTools
             var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
             if (mapMagic == null || mapMagic.graph == null)
             {
-                Debug.LogWarning("[Poi] No generated terrain - run GameDev/Overworld/Generate Terrain From Seed first.");
                 return;
             }
 
@@ -110,20 +109,15 @@ namespace GameDev.EditorTools
             var tile = mapMagic.tiles[tileCoord];
             if (tile == null)
             {
-                Debug.LogWarning("[Poi] No tile at the requested coord - regenerate with OverworldTerrainMenu first.");
                 return;
             }
 
-            if (!MapMagicTileSync.WaitForTileReady(tile))
-            {
-                Debug.LogWarning("[Poi] Tile did not finish generating within the timeout - markers may use stale terrain data.");
-            }
+            MapMagicTileSync.WaitForTileReady(tile);
 
             var terrain = tile.main?.terrain;
             var holder = terrain != null ? terrain.GetComponent<DirectMatricesHolder>() : null;
             if (holder == null)
             {
-                Debug.LogWarning("[Poi] No DirectMatricesHolder on the terrain - regenerate with OverworldTerrainMenu first.");
                 return;
             }
 
@@ -135,10 +129,11 @@ namespace GameDev.EditorTools
             var candidateChunks = OverworldTileChunks.CoveringTile(tileCoord, mapMagic.tileSize, OverworldTileChunks.DefaultMarginMeters);
             var placer = new StubPoiPlacer(worldSeed, sampler, candidateChunks, PoiDemoScenario.BuildRequests());
 
-            var waterZones = Object.FindFirstObjectByType<OverworldWaterZones>();
+            var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
+            var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
+            IWaterSampler waterZones = new CompositeWaterSampler(lakeZones, riverZones);
             var visualRng = worldSeed.Fork("poi-visual");
             var buildingArchetypes = ShellCatalogFactory.CreateDefaultArchetypes();
-            var placed = 0;
             foreach (var chunk in candidateChunks)
             {
                 foreach (var marker in placer.PlaceForChunk(chunk))
@@ -158,7 +153,6 @@ namespace GameDev.EditorTools
                     if (BuildingKindDistricts.TryGetValue(marker.Kind, out var districtKind))
                     {
                         SpawnBuilding(root.transform, marker, districtKind, y, worldSeed, buildingArchetypes);
-                        placed++;
                         continue;
                     }
 
@@ -174,12 +168,8 @@ namespace GameDev.EditorTools
                     visual.transform.position = new Vector3(marker.Position.x, y, marker.Position.z);
                     visual.transform.rotation = Quaternion.Euler(0f, (float)visualRng.NextDouble() * 360f, 0f);
                     visual.transform.localScale = Vector3.one * MarkerScale;
-
-                    placed++;
                 }
             }
-
-            Debug.Log($"[Poi] Placed {placed} POI markers (seed {OverworldTerrainMenu.LastSeed}).");
         }
 
         // Temporary stand-in (per WORLD_GENERATION_PIPELINE.md Iteration 08/10 notes) for real

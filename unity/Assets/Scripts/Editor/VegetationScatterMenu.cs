@@ -19,17 +19,21 @@ namespace GameDev.EditorTools
     /// density-map asset, but acceptance is no longer a flat per-biome probability: it's scaled by
     /// <see cref="VegetationDensity"/>'s Perlin-blob patchiness (so growth reads as groves/clearings,
     /// not uniform static) and its slope falloff (so cliffs within a "lush" biome still thin out).
+    /// Trees get a capsule collider; shrubs/grass stay pass-through.
     /// </summary>
     public static class VegetationScatterMenu
     {
         private const string PrefabRoot = "Assets/Polytope Studio/Lowpoly_Environments/Prefabs";
         private const string RootObjectName = "OverworldVegetation";
 
-        // Samples per reference 1000x1000m tile; scaled by actual tile area. Raised from the
-        // original 4000 - VegetationDensity's patch/slope multipliers average roughly 0.4-0.5x on
-        // top of the per-biome acceptance now, so attempts needed roughly doubling to keep the
-        // densest patches reading as "full" instead of the whole map looking thinned out.
-        private const int ReferenceAttempts = 8000;
+        // Samples per reference 1000x1000m tile; scaled by actual tile area.
+        private const int ReferenceAttempts = 14000;
+
+        // Keep trunks off the wet mask edge when grid sampling is coarse relative to prefab size.
+        private const float ShoreBufferMeters = 1.5f;
+
+        private const float TreeScaleMin = 1.25f;
+        private const float TreeScaleMax = 1.45f;
 
         private struct Entry
         {
@@ -37,8 +41,6 @@ namespace GameDev.EditorTools
             public float Weight;
         }
 
-        // Acceptance probability per attempt (0..1) - qualitative "how lush", not a calibrated
-        // ecological density.
         private static readonly Dictionary<BiomeId, float> BiomeAcceptance = new Dictionary<BiomeId, float>
         {
             { BiomeId.Meadow, 0.35f },
@@ -98,7 +100,6 @@ namespace GameDev.EditorTools
             var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
             if (mapMagic == null || mapMagic.graph == null)
             {
-                Debug.LogWarning("[Vegetation] No generated terrain - run GameDev/Overworld/Generate Terrain From Seed first.");
                 return;
             }
 
@@ -106,26 +107,20 @@ namespace GameDev.EditorTools
             var tile = mapMagic.tiles[tileCoord];
             if (tile == null)
             {
-                Debug.LogWarning("[Vegetation] Origin tile has no generated Terrain yet.");
                 return;
             }
 
-            if (!MapMagicTileSync.WaitForTileReady(tile))
-            {
-                Debug.LogWarning("[Vegetation] Tile did not finish generating within the timeout - scatter may use stale terrain data.");
-            }
+            MapMagicTileSync.WaitForTileReady(tile);
 
             var terrain = tile.main?.terrain;
             if (terrain == null)
             {
-                Debug.LogWarning("[Vegetation] Origin tile has no generated Terrain yet.");
                 return;
             }
 
             var holder = terrain.GetComponent<DirectMatricesHolder>();
             if (holder == null)
             {
-                Debug.LogWarning("[Vegetation] No DirectMatricesHolder on the terrain - regenerate with OverworldTerrainMenu first.");
                 return;
             }
 
@@ -134,11 +129,10 @@ namespace GameDev.EditorTools
             var sampler = new MapMagicBiomeSampler(holder);
             var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
             var rng = worldSeed.Fork("vegetation");
-            var waterZones = Object.FindFirstObjectByType<OverworldWaterZones>();
+            var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
+            var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
+            IWaterSampler waterZones = new CompositeWaterSampler(lakeZones, riverZones);
 
-            // Own fork (not the main scatter rng) so the noise offset roll doesn't perturb the
-            // attempt/accept/prefab-pick sequence - only the density field's position shifts per
-            // seed, everything else about the scatter stays reproducible the same way it always was.
             var densityRng = worldSeed.Fork("vegetation-density");
             var noiseOffsetX = (float)densityRng.NextDouble() * 10000f;
             var noiseOffsetZ = (float)densityRng.NextDouble() * 10000f;
@@ -149,7 +143,6 @@ namespace GameDev.EditorTools
             var sizeZ = mapMagic.tileSize.z;
             var attempts = Mathf.RoundToInt(ReferenceAttempts * (sizeX * sizeZ) / (1000f * 1000f));
 
-            var placed = 0;
             for (var i = 0; i < attempts; i++)
             {
                 var x = minX + (float)rng.NextDouble() * sizeX;
@@ -170,17 +163,22 @@ namespace GameDev.EditorTools
                     continue;
                 }
 
-                if (!TryFindSurface(x, z, out var y))
+                if (!TrySampleTerrainHeight(terrain, x, z, out var groundY))
                 {
                     continue;
                 }
 
-                if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y <= waterY)
+                if (WaterProximity.IsUnderOrTooCloseToWater(waterZones, x, z, groundY, ShoreBufferMeters))
                 {
                     continue;
                 }
 
-                var prefab = PickPrefab(biome, rng);
+                if (!TryPickEntry(biome, rng, out var entry))
+                {
+                    continue;
+                }
+
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(entry.PrefabPath);
                 if (prefab == null)
                 {
                     continue;
@@ -188,12 +186,25 @@ namespace GameDev.EditorTools
 
                 var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
                 instance.transform.SetParent(root.transform, worldPositionStays: false);
-                instance.transform.position = new Vector3(x, y, z);
                 instance.transform.rotation = Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f);
-                placed++;
-            }
 
-            Debug.Log($"[Vegetation] Placed {placed} instances from {attempts} attempts (seed {OverworldTerrainMenu.LastSeed}).");
+                var isTree = entry.PrefabPath.Contains("/Trees/");
+                var scale = 1f;
+                if (isTree)
+                {
+                    scale = Mathf.Lerp(TreeScaleMin, TreeScaleMax, (float)rng.NextDouble());
+                    instance.transform.localScale = Vector3.one * scale;
+                }
+
+                // Pivot is often at the mesh centre on Polytope trees — plant the mesh bottom on terrain.
+                instance.transform.position = new Vector3(x, groundY, z);
+                GroundPrefabOnTerrain(instance, groundY);
+
+                if (isTree)
+                {
+                    EnsureTreeCollider(instance);
+                }
+            }
         }
 
         [MenuItem("GameDev/Overworld/Clear Vegetation")]
@@ -206,44 +217,114 @@ namespace GameDev.EditorTools
             }
         }
 
-        private static bool TryFindSurface(float x, float z, out float y)
+        private static void EnsureTreeCollider(GameObject instance)
         {
-            const float rayStartY = 400f;
-            if (Physics.Raycast(new Vector3(x, rayStartY, z), Vector3.down, out var hit, rayStartY * 2f))
+            if (instance.GetComponentInChildren<Collider>() != null)
             {
-                y = hit.point.y;
-                return true;
+                return;
             }
 
-            y = 0f;
-            return false;
+            var renderer = instance.GetComponentInChildren<Renderer>();
+            var bounds = renderer != null
+                ? renderer.bounds
+                : new Bounds(instance.transform.position, new Vector3(1f, 4f, 1f));
+
+            var capsule = instance.AddComponent<CapsuleCollider>();
+            var localCenter = instance.transform.InverseTransformPoint(bounds.center);
+            var height = Mathf.Max(1f, bounds.size.y / Mathf.Max(instance.transform.lossyScale.y, 0.01f));
+            var radius = Mathf.Max(0.2f, Mathf.Max(bounds.size.x, bounds.size.z) * 0.2f /
+                                         Mathf.Max(instance.transform.lossyScale.x, 0.01f));
+            capsule.height = height;
+            capsule.radius = radius;
+            capsule.center = new Vector3(localCenter.x, height * 0.5f, localCenter.z);
+            capsule.direction = 1; // Y-axis
         }
 
-        private static GameObject PickPrefab(BiomeId biome, System.Random rng)
+        /// <summary>
+        /// Terrain height only — never Physics.Raycast. Raycasts hit previously-placed tree
+        /// capsules and stack the next tree on top (classic floating-forest bug).
+        /// </summary>
+        private static bool TrySampleTerrainHeight(UnityEngine.Terrain terrain, float x, float z, out float y)
         {
+            if (terrain == null || terrain.terrainData == null)
+            {
+                y = 0f;
+                return false;
+            }
+
+            var pos = terrain.transform.position;
+            var size = terrain.terrainData.size;
+            if (x < pos.x || z < pos.z || x > pos.x + size.x || z > pos.z + size.z)
+            {
+                y = 0f;
+                return false;
+            }
+
+            y = terrain.SampleHeight(new Vector3(x, 0f, z)) + pos.y;
+            return true;
+        }
+
+        /// <summary>
+        /// Moves the instance so the lowest renderer bound sits on <paramref name="groundY"/>
+        /// (Polytope tree pivots are often at the canopy centre, not the trunk base).
+        /// </summary>
+        private static void GroundPrefabOnTerrain(GameObject instance, float groundY)
+        {
+            var renderers = instance.GetComponentsInChildren<Renderer>();
+            if (renderers == null || renderers.Length == 0)
+            {
+                return;
+            }
+
+            var minY = float.PositiveInfinity;
+            foreach (var r in renderers)
+            {
+                if (r.bounds.min.y < minY)
+                {
+                    minY = r.bounds.min.y;
+                }
+            }
+
+            if (float.IsInfinity(minY))
+            {
+                return;
+            }
+
+            var delta = groundY - minY;
+            if (Mathf.Abs(delta) > 0.001f)
+            {
+                instance.transform.position += new Vector3(0f, delta, 0f);
+            }
+        }
+
+        private static bool TryPickEntry(BiomeId biome, System.Random rng, out Entry entry)
+        {
+            entry = default;
             if (!BiomeVegetation.TryGetValue(biome, out var entries) || entries.Length == 0)
             {
-                return null;
+                return false;
             }
 
             var totalWeight = 0f;
-            foreach (var entry in entries)
+            foreach (var e in entries)
             {
-                totalWeight += entry.Weight;
+                totalWeight += e.Weight;
             }
 
             var roll = (float)rng.NextDouble() * totalWeight;
             var accum = 0f;
-            foreach (var entry in entries)
+            foreach (var e in entries)
             {
-                accum += entry.Weight;
+                accum += e.Weight;
                 if (roll <= accum)
                 {
-                    return AssetDatabase.LoadAssetAtPath<GameObject>(entry.PrefabPath);
+                    entry = e;
+                    return true;
                 }
             }
 
-            return AssetDatabase.LoadAssetAtPath<GameObject>(entries[entries.Length - 1].PrefabPath);
+            entry = entries[entries.Length - 1];
+            return true;
         }
     }
 }
