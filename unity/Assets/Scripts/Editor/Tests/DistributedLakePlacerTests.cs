@@ -22,11 +22,11 @@ namespace GameDev.World.Water.Tests
                 sizeZ: 900f,
                 cellSize: 3f,
                 rng: new Random(42),
-                minLakes: 4,
-                targetLakes: 6);
+                minLakes: 2,
+                targetLakes: 3);
 
-            Assert.GreaterOrEqual(zones.Length, 4);
-            Assert.LessOrEqual(zones.Length, 6);
+            Assert.GreaterOrEqual(zones.Length, 2);
+            Assert.LessOrEqual(zones.Length, 3);
 
             for (var i = 0; i < zones.Length; i++)
             {
@@ -36,7 +36,7 @@ namespace GameDev.World.Water.Tests
                     var b = zones[j].GetFloodCentroidXZ();
                     var dx = a.x - b.x;
                     var dz = a.z - b.z;
-                    Assert.Greater(Mathf.Sqrt(dx * dx + dz * dz), 100f);
+                    Assert.Greater(Mathf.Sqrt(dx * dx + dz * dz), 250f);
                 }
             }
         }
@@ -46,8 +46,8 @@ namespace GameDev.World.Water.Tests
         {
             float Sampler(float x, float z) => 50f + Mathf.Sin(x * 0.01f) * 3f;
 
-            var a = DistributedLakePlacer.Place(Sampler, 0, 0, 600, 600, 3f, new Random(7), 4, 5);
-            var b = DistributedLakePlacer.Place(Sampler, 0, 0, 600, 600, 3f, new Random(7), 4, 5);
+            var a = DistributedLakePlacer.Place(Sampler, 0, 0, 600, 600, 3f, new Random(7), 2, 3);
+            var b = DistributedLakePlacer.Place(Sampler, 0, 0, 600, 600, 3f, new Random(7), 2, 3);
             Assert.AreEqual(a.Length, b.Length);
             for (var i = 0; i < a.Length; i++)
             {

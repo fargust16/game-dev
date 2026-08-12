@@ -607,12 +607,10 @@ namespace GameDev.EditorTools
             }
 
             var maskedBasins = Combine(graph, basinMask, plainsBandMask, Blend200.BlendAlgorithm.multiply);
-            // Opacity well above PlainsElevationCap so MapMagic pits stay deep after stock erosion;
-            // LakeTerrainCarver then digs the final size-scaled bowl under each flooded zone.
-            // Softer MapMagic pits — LakeTerrainCarver digs the real bowl; leftover dry scars stay shallow.
-            // Shallow MapMagic hints only — LakeTerrainCarver digs the real bowl; leftover dry scars stay mild.
-            var withBasins = Combine(graph, fullyTerracedHeight, maskedBasins, Blend200.BlendAlgorithm.subtract, 0.22f);
-
+            // MapMagic basin subtract OFF — those pits became dry "mini-ruts" across the plains
+            // because DistributedLakePlacer + LakeTerrainCarver own the real lakes now. Keep the
+            // generators in the graph for determinism/history, but do not carve the height field.
+            _ = maskedBasins;
             var erosion = (Erosion200)Generator.Create(typeof(Erosion200));
             // Left at MapMagic's own stock defaults (iterations 3, durability 0.9, sediment 0.75,
             // fluidity 3) after an incident chain: pushing this well past stock (6 iterations,
@@ -620,17 +618,15 @@ namespace GameDev.EditorTools
             // across the deliberately-flat plains band on its own; dialing back helped but didn't
             // fix the underlying issue, because the real cause was upstream (the ridge mask bleeding
             // into the plains, then - after that was fixed - the complete absence of any basin-
-            // carving mechanism at all, see basinSpecs above). Now that basin carving is back with
-            // real depth, erosion runs on top of it here to soften the carved pits' edges into a
-            // more natural-looking rim, the same "erosion refines, doesn't invent" role it plays on
-            // the ridge terracing above - no evidence yet that plains need more than stock.
+            // carving mechanism at all, see basinSpecs above). Now lakes come from the placer/carver
+            // path, so erosion only softens ridge terracing — no MapMagic pit subtract underneath.
             erosion.iterations = 3;
             erosion.terrainDurability = 0.9f;
             erosion.erosionAmount = 1f;
             erosion.sedimentAmount = 0.75f;
             erosion.fluidityIterations = 3;
             graph.Add(erosion);
-            graph.Link(withBasins, erosion);
+            graph.Link(fullyTerracedHeight, erosion);
 
             // Explicit small-scale feature layer (WORLD_GENERATION_PIPELINE.md Iteration 03:
             // "large/medium/small feature scales" - mountain=large ~2000m, plateau+hills=medium

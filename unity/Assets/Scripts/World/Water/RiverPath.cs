@@ -108,8 +108,10 @@ namespace GameDev.World.Water
 
                 var lakeY = FindLakeWaterY(lakes, point.x, point.z);
                 float surface;
-                if (!float.IsNaN(lakeY))
+                if (!float.IsNaN(lakeY) && bedY <= lakeY + 0.75f)
                 {
+                    // Only sit on the lake plane once the bed is actually at/under the water —
+                    // snapping earlier buries the ribbon under the dry shore bank (visible gap).
                     surface = lakeY;
                 }
                 else
@@ -135,12 +137,20 @@ namespace GameDev.World.Water
                         surface = bedY + span * fill;
                         surface = Mathf.Clamp(surface, bedY + 0.1f, bankY - 0.05f);
                     }
+
+                    // Soft blend toward lake when nearby and bed is approaching the plane.
+                    if (!float.IsNaN(lakeY) && bedY < lakeY + 4f)
+                    {
+                        var blend = Mathf.InverseLerp(lakeY + 4f, lakeY + 0.75f, bedY);
+                        surface = Mathf.Lerp(surface, Mathf.Max(lakeY, bedY + 0.1f), blend);
+                    }
                 }
 
                 waterSurfaceY[i] = surface;
             }
 
-            // Guarantee the mouth meets the lake plane when we terminated in a lake.
+            // Guarantee the mouth meets the lake plane when we terminated in a lake — but never
+            // pull segments that still sit on a dry bank above the lake (that hides the ribbon).
             if (Termination == RiverTermination.Lake && lakes != null && Centerline.Count > 0)
             {
                 var end = Centerline[Centerline.Count - 1];
@@ -152,10 +162,16 @@ namespace GameDev.World.Water
 
                 if (!float.IsNaN(mouthLakeY))
                 {
-                    var tail = Mathf.Min(6, Centerline.Count);
+                    var tail = Mathf.Min(8, Centerline.Count);
                     for (var t = 0; t < tail; t++)
                     {
                         var idx = Centerline.Count - 1 - t;
+                        var bedY = sampleTerrainHeightY(Centerline[idx].x, Centerline[idx].z);
+                        if (bedY > mouthLakeY + 0.75f)
+                        {
+                            continue;
+                        }
+
                         var u = tail == 1 ? 1f : 1f - t / (float)(tail - 1);
                         waterSurfaceY[idx] = Mathf.Lerp(waterSurfaceY[idx], mouthLakeY, u);
                     }

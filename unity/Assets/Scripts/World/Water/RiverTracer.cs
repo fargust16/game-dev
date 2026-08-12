@@ -482,6 +482,9 @@ namespace GameDev.World.Water
                 return null;
             }
 
+            var claimed = new bool[grid.Width, grid.Depth];
+            AppendMouthOverlap(grid, lake, cellsX, cellsZ, claimed, overlapCells: 12);
+
             return BuildPath(grid, cellsX, cellsZ, termination, settings, riverIndex);
         }
 
@@ -572,12 +575,12 @@ namespace GameDev.World.Water
                 }
 
                 var world = grid.CellToWorld(cx, cz);
-                var enteredLake = false;
+                WaterZone hitLake = null;
                 for (var i = 0; i < lakes.Count; i++)
                 {
                     if (lakes[i].Contains(world.x, world.y))
                     {
-                        enteredLake = true;
+                        hitLake = lakes[i];
                         break;
                     }
                 }
@@ -586,9 +589,12 @@ namespace GameDev.World.Water
                 cellsZ.Add(cz);
                 claimed[cx, cz] = true;
 
-                if (enteredLake)
+                if (hitLake != null)
                 {
                     termination = RiverTermination.Lake;
+                    // Keep walking into the lake so the ribbon overlaps the water plane (stopping on
+                    // the first flood cell leaves a dry gap after soft bank carve / shore pad).
+                    AppendMouthOverlap(grid, hitLake, cellsX, cellsZ, claimed, overlapCells: 12);
                     break;
                 }
 
@@ -619,6 +625,79 @@ namespace GameDev.World.Water
             }
 
             return BuildPath(grid, cellsX, cellsZ, termination, settings, riverIndex);
+        }
+
+        /// <summary>
+        /// Extra cells past the shoreline, prefer downstream flow while still in the lake, else
+        /// step toward the lake centroid.
+        /// </summary>
+        private static void AppendMouthOverlap(
+            FlowGrid grid,
+            WaterZone lake,
+            List<int> cellsX,
+            List<int> cellsZ,
+            bool[,] claimed,
+            int overlapCells)
+        {
+            var cx = cellsX[cellsX.Count - 1];
+            var cz = cellsZ[cellsZ.Count - 1];
+            var target = lake.GetFloodCentroidXZ();
+
+            for (var k = 0; k < overlapCells; k++)
+            {
+                var nextX = cx;
+                var nextZ = cz;
+                if (grid.TryGetDownstream(cx, cz, out var fx, out var fz))
+                {
+                    var fw = grid.CellToWorld(fx, fz);
+                    if (lake.Contains(fw.x, fw.y))
+                    {
+                        nextX = fx;
+                        nextZ = fz;
+                    }
+                }
+
+                if (nextX == cx && nextZ == cz)
+                {
+                    var bestScore = float.PositiveInfinity;
+                    foreach (var (dx, dz) in Neighbors8)
+                    {
+                        var nx = cx + dx;
+                        var nz = cz + dz;
+                        if (!grid.InBounds(nx, nz))
+                        {
+                            continue;
+                        }
+
+                        var nw = grid.CellToWorld(nx, nz);
+                        if (!lake.Contains(nw.x, nw.y))
+                        {
+                            continue;
+                        }
+
+                        var ddx = nw.x - target.x;
+                        var ddz = nw.y - target.z;
+                        var score = ddx * ddx + ddz * ddz;
+                        if (score < bestScore)
+                        {
+                            bestScore = score;
+                            nextX = nx;
+                            nextZ = nz;
+                        }
+                    }
+                }
+
+                if (nextX == cx && nextZ == cz)
+                {
+                    break;
+                }
+
+                cx = nextX;
+                cz = nextZ;
+                cellsX.Add(cx);
+                cellsZ.Add(cz);
+                claimed[cx, cz] = true;
+            }
         }
 
         private static RiverPath BuildPath(

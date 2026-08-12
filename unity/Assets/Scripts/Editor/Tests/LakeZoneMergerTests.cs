@@ -64,12 +64,25 @@ namespace GameDev.World.Water.Tests
         }
 
         [Test]
+        public void CullOverlapping_NearTouchingAabbs_BecomeOneLake()
+        {
+            // Two large lobes with ~60m AABB gap — soft banks make them one visual lake.
+            var a = MakeBlob("a", 0, 0, 200, 20, 20, 80, 80, 10f);
+            var b = MakeBlob("b", 0, 0, 200, 100, 20, 160, 80, 10f);
+            Assert.Less(LakeZoneMerger.AabbSeparation(a.GetFloodAabbXZ(), b.GetFloodAabbXZ()), 90f);
+            var culled = LakeZoneMerger.CullOverlapping(new[] { a, b }, maxOverlapFraction: 0.12f, maxCellsPerLake: 5000);
+            Assert.AreEqual(1, culled.Length);
+        }
+
+        [Test]
         public void CullOverlapping_ChainAcrossPlains_DoesNotCollapseToOne()
         {
-            // Three well-separated lakes — must NOT transitively glue into one.
-            var a = MakeBlob("a", 0, 0, 120, 5, 5, 20, 20, 10f);
-            var b = MakeBlob("b", 0, 0, 120, 50, 50, 65, 65, 10f);
-            var c = MakeBlob("c", 0, 0, 120, 95, 95, 110, 110, 10f);
+            // Three well-separated lakes (AABB gaps > soft-bank merge threshold) — must stay 3.
+            var a = MakeBlob("a", 0, 0, 320, 5, 5, 30, 30, 10f);
+            var b = MakeBlob("b", 0, 0, 320, 145, 145, 170, 170, 10f);
+            var c = MakeBlob("c", 0, 0, 320, 285, 285, 310, 310, 10f);
+            Assert.Greater(LakeZoneMerger.AabbSeparation(a.GetFloodAabbXZ(), b.GetFloodAabbXZ()), 90f);
+            Assert.Greater(LakeZoneMerger.AabbSeparation(b.GetFloodAabbXZ(), c.GetFloodAabbXZ()), 90f);
             var culled = LakeZoneMerger.CullOverlapping(new[] { a, b, c }, maxOverlapFraction: 0.12f);
             Assert.AreEqual(3, culled.Length);
         }
@@ -105,8 +118,9 @@ namespace GameDev.World.Water.Tests
         [Test]
         public void CullOverlapping_FarApart_StaySeparate()
         {
-            var a = MakeBlob("a", 0, 0, 40, 2, 2, 6, 6, 10f);
-            var b = MakeBlob("b", 0, 0, 40, 30, 30, 34, 34, 10f);
+            var a = MakeBlob("a", 0, 0, 280, 5, 5, 25, 25, 10f);
+            var b = MakeBlob("b", 0, 0, 280, 200, 200, 220, 220, 10f);
+            Assert.Greater(LakeZoneMerger.AabbSeparation(a.GetFloodAabbXZ(), b.GetFloodAabbXZ()), 90f);
             var culled = LakeZoneMerger.CullOverlapping(new[] { a, b }, maxOverlapFraction: 0.12f);
             Assert.AreEqual(2, culled.Length);
         }

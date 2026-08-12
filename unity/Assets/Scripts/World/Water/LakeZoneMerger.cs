@@ -146,9 +146,29 @@ namespace GameDev.World.Water
                     var pair = new[] { kept[matchIdx], candidate };
                     kept[matchIdx] = MergeGroup(pair, new List<int> { 0, 1 }, kept[matchIdx].Id);
                 }
+                // else drop candidate — one visual basin keeps the larger lobe only
             }
 
             return Renumber(kept);
+        }
+
+        /// <summary>Keep at most <paramref name="maxCount"/> largest lakes (after spatial cull).</summary>
+        public static WaterZone[] CapCount(WaterZone[] zones, int maxCount)
+        {
+            if (zones == null || zones.Length == 0)
+            {
+                return System.Array.Empty<WaterZone>();
+            }
+
+            if (maxCount < 1 || zones.Length <= maxCount)
+            {
+                return Renumber(new List<WaterZone>(zones));
+            }
+
+            var ordered = new List<WaterZone>(zones);
+            ordered.Sort((a, b) => b.FloodedCellCount.CompareTo(a.FloodedCellCount));
+            ordered.RemoveRange(maxCount, ordered.Count - maxCount);
+            return Renumber(ordered);
         }
 
         /// <summary>
@@ -225,7 +245,7 @@ namespace GameDev.World.Water
 
         /// <summary>
         /// True when two floods read as the same crater / shoreline (player would see one lake).
-        /// Centroid link requires AABB overlap so large lakes across the tile do not chain-merge.
+        /// Includes near-touching AABBs — soft bank carve (~72m) makes close lobes look merged.
         /// </summary>
         public static bool SameVisualBasin(WaterZone a, WaterZone b, float maxOverlapFraction = 0.12f)
         {
@@ -241,28 +261,55 @@ namespace GameDev.World.Water
 
             var aabbA = a.GetFloodAabbXZ();
             var aabbB = b.GetFloodAabbXZ();
-            if (AabbIoU(aabbA, aabbB) >= 0.28f)
+            if (AabbIoU(aabbA, aabbB) >= 0.18f)
             {
                 return true;
             }
 
-            if (!aabbA.Overlaps(aabbB))
+            // Soft-bank visual merge: shores within ~90m look like one water body after carve.
+            if (AabbSeparation(aabbA, aabbB) < 90f)
             {
-                return false;
+                return true;
             }
 
             var ca = a.GetFloodCentroidXZ();
             var cb = b.GetFloodCentroidXZ();
             var dx = ca.x - cb.x;
             var dz = ca.z - cb.z;
-            var distSq = dx * dx + dz * dz;
-            var link = (a.EquivalentRadiusMeters + b.EquivalentRadiusMeters) * 0.5f;
-            if (link < 35f)
+            var dist = Mathf.Sqrt(dx * dx + dz * dz);
+            var link = a.EquivalentRadiusMeters + b.EquivalentRadiusMeters + 40f;
+            return dist <= link;
+        }
+
+        /// <summary>0 if AABBs overlap; otherwise Euclidean gap between rect edges.</summary>
+        public static float AabbSeparation(Rect a, Rect b)
+        {
+            var dx = 0f;
+            if (a.xMax < b.xMin)
             {
-                link = 35f;
+                dx = b.xMin - a.xMax;
+            }
+            else if (b.xMax < a.xMin)
+            {
+                dx = a.xMin - b.xMax;
             }
 
-            return distSq <= link * link;
+            var dy = 0f;
+            if (a.yMax < b.yMin)
+            {
+                dy = b.yMin - a.yMax;
+            }
+            else if (b.yMax < a.yMin)
+            {
+                dy = a.yMin - b.yMax;
+            }
+
+            if (dx <= 0f && dy <= 0f)
+            {
+                return 0f;
+            }
+
+            return Mathf.Sqrt(dx * dx + dy * dy);
         }
 
         public static float AabbIoU(Rect a, Rect b)

@@ -6,14 +6,15 @@ using Random = System.Random;
 namespace GameDev.World.Water
 {
     /// <summary>
-    /// Guarantees a scattered set of lakes by planting basins in a jittered grid (not "whatever
-    /// noise minima happened to appear"). Each site gets its own circular flood mask so later
-    /// merge/cull cannot glue the whole plains into one mega-lake.
+    /// Plants a few large, irregular lake basins on a jittered strata grid. Shapes are
+    /// anisotropic + angular noise (not perfect circles). MapMagic basin pits are intentionally
+    /// not used for the final lakes — <see cref="LakeTerrainCarver"/> digs under these masks.
     /// </summary>
     public static class DistributedLakePlacer
     {
-        public const int DefaultMinLakes = 4;
-        public const int DefaultTargetLakes = 7;
+        public const int DefaultMinLakes = 2;
+        public const int DefaultTargetLakes = 3;
+        public const float DefaultMinSeparationMeters = 380f;
 
         public static WaterZone[] Place(
             Func<float, float, float> worldHeightSampler,
@@ -31,8 +32,8 @@ namespace GameDev.World.Water
                 return Array.Empty<WaterZone>();
             }
 
-            minLakes = Mathf.Clamp(minLakes, 1, 12);
-            targetLakes = Mathf.Clamp(targetLakes, minLakes, 12);
+            minLakes = Mathf.Clamp(minLakes, 1, 6);
+            targetLakes = Mathf.Clamp(targetLakes, minLakes, 6);
 
             var width = Mathf.Max(2, Mathf.RoundToInt(sizeX / cellSize));
             var depth = Mathf.Max(2, Mathf.RoundToInt(sizeZ / cellSize));
@@ -47,8 +48,11 @@ namespace GameDev.World.Water
                 }
             }
 
-            // 3×3 strata → up to 9 candidate pockets; we keep targetLakes of them.
-            const int strata = 3;
+            // Keep large lakes off the tile rim so soft banks / water meshes don't spill past terrain.
+            var edgeMarginCells = Mathf.Max(20, Mathf.RoundToInt(140f / cellSize));
+
+            // 2×2 strata — enough pockets for 2–3 well-spaced large lakes.
+            const int strata = 2;
             var candidates = new List<(int Cx, int Cz, float Score)>(strata * strata);
             for (var gx = 0; gx < strata; gx++)
             {
@@ -58,21 +62,35 @@ namespace GameDev.World.Water
                     var x1 = Mathf.FloorToInt(width * ((gx + 1) / (float)strata)) - 1;
                     var z0 = Mathf.FloorToInt(depth * (gz / (float)strata));
                     var z1 = Mathf.FloorToInt(depth * ((gz + 1) / (float)strata)) - 1;
-                    x0 = Mathf.Clamp(x0, 2, width - 3);
-                    x1 = Mathf.Clamp(x1, x0 + 1, width - 3);
-                    z0 = Mathf.Clamp(z0, 2, depth - 3);
-                    z1 = Mathf.Clamp(z1, z0 + 1, depth - 3);
+                    x0 = Mathf.Clamp(x0, 4, width - 5);
+                    x1 = Mathf.Clamp(x1, x0 + 1, width - 5);
+                    z0 = Mathf.Clamp(z0, 4, depth - 5);
+                    z1 = Mathf.Clamp(z1, z0 + 1, depth - 5);
 
-                    // Jittered pick inside the cell, then snap to the lowest nearby sample so the
-                    // bowl sits in a natural dip when one exists.
                     var jx = x0 + rng.Next(0, Mathf.Max(1, x1 - x0 + 1));
                     var jz = z0 + rng.Next(0, Mathf.Max(1, z1 - z0 + 1));
-                    FindLocalLow(heights, width, depth, jx, jz, searchRadius: 8, out var cx, out var cz);
+                    FindLocalLow(heights, width, depth, jx, jz, searchRadius: 12, out var cx, out var cz);
+                    if (cx < edgeMarginCells || cz < edgeMarginCells ||
+                        cx >= width - edgeMarginCells || cz >= depth - edgeMarginCells)
+                    {
+                        cx = Mathf.Clamp(cx, edgeMarginCells, width - edgeMarginCells - 1);
+                        cz = Mathf.Clamp(cz, edgeMarginCells, depth - edgeMarginCells - 1);
+                    }
 
-                    // Prefer lower ground (plains pockets) but keep highland sites usable.
                     var score = -heights[cx, cz] + (float)rng.NextDouble() * 2f;
                     candidates.Add((cx, cz, score));
                 }
+            }
+
+            // Extra candidates from remaining low spots so we can still hit minLakes on awkward tiles.
+            for (var n = 0; n < 4; n++)
+            {
+                var jx = edgeMarginCells + rng.Next(0, Mathf.Max(1, width - 2 * edgeMarginCells));
+                var jz = edgeMarginCells + rng.Next(0, Mathf.Max(1, depth - 2 * edgeMarginCells));
+                FindLocalLow(heights, width, depth, jx, jz, searchRadius: 10, out var cx, out var cz);
+                cx = Mathf.Clamp(cx, edgeMarginCells, width - edgeMarginCells - 1);
+                cz = Mathf.Clamp(cz, edgeMarginCells, depth - edgeMarginCells - 1);
+                candidates.Add((cx, cz, -heights[cx, cz] + (float)rng.NextDouble()));
             }
 
             candidates.Sort((a, b) => b.Score.CompareTo(a.Score));
@@ -81,7 +99,7 @@ namespace GameDev.World.Water
             count = Mathf.Min(count, candidates.Count);
 
             var zones = new List<WaterZone>(count);
-            var minSepCells = Mathf.Max(18, Mathf.RoundToInt(160f / cellSize));
+            var minSepCells = Mathf.Max(40, Mathf.RoundToInt(DefaultMinSeparationMeters / cellSize));
             var minSepSq = minSepCells * minSepCells;
 
             foreach (var candidate in candidates)
@@ -99,7 +117,9 @@ namespace GameDev.World.Water
                     var ez = Mathf.FloorToInt((ec.z - minZ) / cellSize);
                     var dx = candidate.Cx - ex;
                     var dz = candidate.Cz - ez;
-                    if (dx * dx + dz * dz < minSepSq)
+                    var distMeters = Mathf.Sqrt(dx * dx + dz * dz) * cellSize;
+                    var edgeNeed = existing.EquivalentRadiusMeters + 140f + 120f;
+                    if (dx * dx + dz * dz < minSepSq || distMeters < edgeNeed)
                     {
                         tooClose = true;
                         break;
@@ -111,12 +131,12 @@ namespace GameDev.World.Water
                     continue;
                 }
 
-                // First lakes larger; later ones become ponds.
-                var t = zones.Count / Mathf.Max(1f, count - 1f);
-                var radiusMeters = Mathf.Lerp(92f, 32f, t) + (float)(rng.NextDouble() * 12f - 6f);
-                radiusMeters = Mathf.Clamp(radiusMeters, 28f, 100f);
+                // All lakes are large; slight size variety only.
+                var radiusMeters = Mathf.Lerp(130f, 105f, zones.Count / Mathf.Max(1f, count - 1f));
+                radiusMeters += (float)(rng.NextDouble() * 20f - 8f);
+                radiusMeters = Mathf.Clamp(radiusMeters, 95f, 155f);
 
-                zones.Add(MakeCircularZone(
+                zones.Add(MakeOrganicZone(
                     $"lake_{zones.Count}",
                     heights,
                     minX,
@@ -126,12 +146,14 @@ namespace GameDev.World.Water
                     depth,
                     candidate.Cx,
                     candidate.Cz,
-                    radiusMeters));
+                    radiusMeters,
+                    rng));
             }
 
-            // Hard floor: if separation ate too many, relax and fill from remaining candidates.
             if (zones.Count < minLakes)
             {
+                var relaxSepSq = Mathf.RoundToInt(280f / cellSize);
+                relaxSepSq *= relaxSepSq;
                 foreach (var candidate in candidates)
                 {
                     if (zones.Count >= minLakes)
@@ -139,25 +161,27 @@ namespace GameDev.World.Water
                         break;
                     }
 
-                    var already = false;
+                    var tooClose = false;
                     foreach (var existing in zones)
                     {
                         var ec = existing.GetFloodCentroidXZ();
                         var ex = Mathf.FloorToInt((ec.x - minX) / cellSize);
                         var ez = Mathf.FloorToInt((ec.z - minZ) / cellSize);
-                        if (ex == candidate.Cx && ez == candidate.Cz)
+                        var dx = candidate.Cx - ex;
+                        var dz = candidate.Cz - ez;
+                        if (dx * dx + dz * dz < relaxSepSq)
                         {
-                            already = true;
+                            tooClose = true;
                             break;
                         }
                     }
 
-                    if (already)
+                    if (tooClose)
                     {
                         continue;
                     }
 
-                    zones.Add(MakeCircularZone(
+                    zones.Add(MakeOrganicZone(
                         $"lake_{zones.Count}",
                         heights,
                         minX,
@@ -167,7 +191,8 @@ namespace GameDev.World.Water
                         depth,
                         candidate.Cx,
                         candidate.Cz,
-                        48f));
+                        110f,
+                        rng));
                 }
             }
 
@@ -209,7 +234,10 @@ namespace GameDev.World.Water
             }
         }
 
-        private static WaterZone MakeCircularZone(
+        /// <summary>
+        /// Irregular shoreline: rotated ellipse + multi-harmonic radius wobble + optional bay lobe.
+        /// </summary>
+        private static WaterZone MakeOrganicZone(
             string id,
             float[,] heights,
             float originX,
@@ -219,41 +247,87 @@ namespace GameDev.World.Water
             int depth,
             int centerX,
             int centerZ,
-            float radiusMeters)
+            float radiusMeters,
+            Random rng)
         {
-            var radiusCells = Mathf.Max(4, Mathf.RoundToInt(radiusMeters / cellSize));
+            var radiusCells = Mathf.Max(8, Mathf.RoundToInt(radiusMeters / cellSize));
             var flooded = new bool[width, depth];
             var rimSum = 0f;
             var rimCount = 0;
-            var rInner = radiusCells * 0.72f;
-            var rOuter = radiusCells;
 
-            for (var z = 0; z < depth; z++)
+            var aspect = 0.62f + (float)rng.NextDouble() * 0.32f; // elongated
+            var rot = (float)(rng.NextDouble() * Mathf.PI * 2f);
+            var cos = Mathf.Cos(rot);
+            var sin = Mathf.Sin(rot);
+            var phase1 = (float)(rng.NextDouble() * Mathf.PI * 2f);
+            var phase2 = (float)(rng.NextDouble() * Mathf.PI * 2f);
+            var phase3 = (float)(rng.NextDouble() * Mathf.PI * 2f);
+            var amp1 = 0.18f + (float)rng.NextDouble() * 0.12f;
+            var amp2 = 0.10f + (float)rng.NextDouble() * 0.10f;
+            var amp3 = 0.06f + (float)rng.NextDouble() * 0.06f;
+            var noiseSeed = rng.Next();
+
+            // Optional bay / second lobe offset for a less blob-like silhouette.
+            var bay = rng.NextDouble() < 0.7;
+            var bayAngle = (float)(rng.NextDouble() * Mathf.PI * 2f);
+            var bayDist = radiusCells * (0.35f + (float)rng.NextDouble() * 0.25f);
+            var bayCx = centerX + Mathf.Cos(bayAngle) * bayDist;
+            var bayCz = centerZ + Mathf.Sin(bayAngle) * bayDist;
+            var bayR = radiusCells * (0.35f + (float)rng.NextDouble() * 0.2f);
+
+            var pad = Mathf.CeilToInt(radiusCells * 1.55f);
+            var xMin = Mathf.Max(0, centerX - pad);
+            var xMax = Mathf.Min(width - 1, centerX + pad);
+            var zMin = Mathf.Max(0, centerZ - pad);
+            var zMax = Mathf.Min(depth - 1, centerZ + pad);
+
+            for (var z = zMin; z <= zMax; z++)
             {
-                for (var x = 0; x < width; x++)
+                for (var x = xMin; x <= xMax; x++)
                 {
                     var dx = x - centerX;
                     var dz = z - centerZ;
-                    var dist = Mathf.Sqrt(dx * dx + dz * dz);
-                    if (dist <= rInner)
+                    var rx = dx * cos + dz * sin;
+                    var rz = (-dx * sin + dz * cos) / aspect;
+                    var dist = Mathf.Sqrt(rx * rx + rz * rz);
+                    var ang = Mathf.Atan2(rz, rx);
+                    var wobble =
+                        1f
+                        + amp1 * Mathf.Sin(2f * ang + phase1)
+                        + amp2 * Mathf.Sin(5f * ang + phase2)
+                        + amp3 * Mathf.Sin(9f * ang + phase3)
+                        + 0.08f * HashNoise(x, z, noiseSeed);
+                    var r = radiusCells * Mathf.Clamp(wobble, 0.55f, 1.45f);
+
+                    var inside = dist <= r;
+                    if (!inside && bay)
                     {
-                        flooded[x, z] = true;
+                        var bdx = x - bayCx;
+                        var bdz = z - bayCz;
+                        inside = bdx * bdx + bdz * bdz <= bayR * bayR;
                     }
-                    else if (dist <= rOuter)
+
+                    if (!inside)
                     {
-                        // Soft shore band — still flooded so carver digs a bowl, rim samples water Y.
-                        flooded[x, z] = true;
+                        continue;
+                    }
+
+                    flooded[x, z] = true;
+                    if (dist > r * 0.72f)
+                    {
                         rimSum += heights[x, z];
                         rimCount++;
                     }
                 }
             }
 
+            LakeZoneMerger.FillEnclosedHoles(flooded, width, depth);
+            LakeZoneMerger.SmoothFloodMask(flooded, width, depth, blurPasses: 3, threshold: 0.42f);
+
             var waterY = rimCount > 0
                 ? rimSum / rimCount
                 : heights[centerX, centerZ] + 1.5f;
 
-            // Copy heights so zones don't share a mutable buffer.
             var heightCopy = new float[width, depth];
             for (var x = 0; x < width; x++)
             {
@@ -264,6 +338,19 @@ namespace GameDev.World.Water
             }
 
             return new WaterZone(id, waterY, originX, originZ, cellSize, flooded, heightCopy);
+        }
+
+        private static float HashNoise(int x, int z, int seed)
+        {
+            unchecked
+            {
+                var h = seed;
+                h = (h * 374761393) + x * 668265263;
+                h = (h * 374761393) + z * 1274126177;
+                h = (h ^ (h >> 13)) * 1274126177;
+                h ^= h >> 16;
+                return ((h & 0xFFFF) / 65535f) * 2f - 1f;
+            }
         }
     }
 }

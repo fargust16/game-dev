@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using Den.Tools;
 using GameDev.World.Streaming;
 using GameDev.World.Water;
@@ -12,7 +13,7 @@ namespace GameDev.EditorTools
     /// <summary>
     /// Builds overworld lakes as <b>filled 2D areas</b> and rivers as separate line corridors.
     /// Nearby floods are merged into one lake / one plane / one pit. Basin dig is an absolute
-    /// smooth bowl at half mountain height (does not preserve MapMagic terraces inside the mask).
+    /// bowl under the water plane (min ~36 m for large lakes) for sunk-city volume.
     /// </summary>
     public static class WaterZoneMenu
     {
@@ -83,28 +84,28 @@ namespace GameDev.EditorTools
             var sizeX = (float)mapMagic.tileSize.x - 2f * inset;
             var sizeZ = (float)mapMagic.tileSize.z - 2f * inset;
 
-            // Guaranteed scattered lakes (jittered 3×3 strata). Finder ponds are optional extras
-            // that must stay away from forced sites so we never glue the map into one mega-lake.
+            // 2–3 large organic lakes only — no MapMagic/finder pond clutter.
             var lakeRng = new GameDev.World.Seed.WorldSeed(OverworldTerrainMenu.LastSeed).Fork("water.lakes");
             var forced = DistributedLakePlacer.Place(
                 HeightSampler, minX, minZ, sizeX, sizeZ, CellSize, lakeRng,
                 minLakes: DistributedLakePlacer.DefaultMinLakes,
                 targetLakes: DistributedLakePlacer.DefaultTargetLakes);
-            var natural = LakeBasinFinder.FindZones(
-                HeightSampler, minX, minZ, sizeX, sizeZ, CellSize,
-                MaxLakeDepthMeters, CellCountSafetyCap, MinCellsPerZone, MaxZones);
-            var ponds = FilterDistantZones(natural, forced, minSeparationMeters: 180f);
-            var zones = ConcatZones(forced, ponds);
-            // Only collapse true nested duplicates — never MergeNearby across the tile.
-            zones = LakeZoneMerger.CullOverlapping(zones, maxOverlapFraction: 0.25f, MaxCellsPerZone);
+            var zones = LakeZoneMerger.CullOverlapping(forced, maxOverlapFraction: 0.12f, maxCellsPerLake: 4000);
+            zones = LakeZoneMerger.CapCount(zones, maxCount: 3);
             if (zones.Length < DistributedLakePlacer.DefaultMinLakes)
             {
                 zones = LakeZoneMerger.EnsureMinDistinct(
-                    zones, forced, DistributedLakePlacer.DefaultMinLakes, minCenterSeparationMeters: 160f);
+                    zones, forced, DistributedLakePlacer.DefaultMinLakes,
+                    minCenterSeparationMeters: DistributedLakePlacer.DefaultMinSeparationMeters);
             }
 
             var mountainLocalHeight = MeasureMountainLocalHeight(terrain, HeightSampler, minX, minZ, sizeX, sizeZ);
-            var halfMountain = Mathf.Max(LakeTerrainCarver.MinShoreDepthMeters, mountainLocalHeight * 0.5f);
+            // Sunk-city bowl (~36–48 m). Do NOT use 80% of mountain height — that asks for ~170 m
+            // digs while plains sit on the heightmap floor and the dig silently clamps to ~5 m.
+            var basinDepth = Mathf.Clamp(
+                mountainLocalHeight * 0.2f,
+                LakeTerrainCarver.MinLargeBasinDepthMeters,
+                LakeTerrainCarver.MaxLargeBasinDepthMeters);
 
             var terrainBaseY = terrain != null ? terrain.transform.position.y : 0f;
             var heightScale = terrain != null
@@ -117,7 +118,7 @@ namespace GameDev.EditorTools
             if (terrain != null && zones.Length > 0)
             {
                 var lakeBankLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(BankLayerPath);
-                LakeTerrainCarver.Carve(terrain, zones, halfMountain, lakeBankLayer);
+                LakeTerrainCarver.Carve(terrain, zones, basinDepth, lakeBankLayer);
             }
 
             System.Func<float, float, float> sampleTerrainY = null;
@@ -179,67 +180,7 @@ namespace GameDev.EditorTools
 
             LogOverworldSummary(
                 terrain, zones, rivers,
-                mapMagic.globals.height, mountainLocalHeight, halfMountain, planesCreated, forced.Length);
-        }
-
-        private static WaterZone[] FilterDistantZones(
-            WaterZone[] candidates,
-            WaterZone[] anchors,
-            float minSeparationMeters)
-        {
-            if (candidates == null || candidates.Length == 0)
-            {
-                return System.Array.Empty<WaterZone>();
-            }
-
-            if (anchors == null || anchors.Length == 0)
-            {
-                return candidates;
-            }
-
-            var kept = new System.Collections.Generic.List<WaterZone>();
-            var minSepSq = minSeparationMeters * minSeparationMeters;
-            foreach (var c in candidates)
-            {
-                var cc = c.GetFloodCentroidXZ();
-                var far = true;
-                foreach (var a in anchors)
-                {
-                    var ac = a.GetFloodCentroidXZ();
-                    var dx = cc.x - ac.x;
-                    var dz = cc.z - ac.z;
-                    if (dx * dx + dz * dz < minSepSq)
-                    {
-                        far = false;
-                        break;
-                    }
-                }
-
-                if (far)
-                {
-                    kept.Add(c);
-                }
-            }
-
-            return kept.ToArray();
-        }
-
-        private static WaterZone[] ConcatZones(WaterZone[] a, WaterZone[] b)
-        {
-            var ac = a?.Length ?? 0;
-            var bc = b?.Length ?? 0;
-            var result = new WaterZone[ac + bc];
-            if (ac > 0)
-            {
-                System.Array.Copy(a, 0, result, 0, ac);
-            }
-
-            if (bc > 0)
-            {
-                System.Array.Copy(b, 0, result, ac, bc);
-            }
-
-            return result;
+                mapMagic.globals.height, mountainLocalHeight, basinDepth, planesCreated, forced.Length);
         }
 
         private static float MeasureMountainLocalHeight(
@@ -278,9 +219,12 @@ namespace GameDev.EditorTools
         {
             Debug.Log(
                 $"[Overworld] 1) Mountain height: {mountainLocalHeight:F1}m above terrain base " +
-                $"(globals.height {globalsHeight:F0}m, large-lake dig cap {basinDepth:F1}m, ponds size-scaled)");
+                $"(globals.height {globalsHeight:F0}m, lake dig target {basinDepth:F1}m " +
+                $"(clamp {LakeTerrainCarver.MinLargeBasinDepthMeters:F0}–{LakeTerrainCarver.MaxLargeBasinDepthMeters:F0}m), " +
+                $"headroomShift={LakeTerrainCarver.LastHeadroomShiftMeters:F1}m)");
 
             var digs = LakeTerrainCarver.LastPerLakeMaxDigMeters;
+            var targets = LakeTerrainCarver.LastPerLakeTargetDepthMeters;
             if (zones.Length == 0)
             {
                 Debug.Log("[Overworld] 2) Lake basin depths: none (no lakes)");
@@ -291,8 +235,11 @@ namespace GameDev.EditorTools
                 for (var i = 0; i < zones.Length; i++)
                 {
                     var dig = i < digs.Count ? digs[i] : 0f;
+                    var target = i < targets.Count ? targets[i] : 0f;
                     var c = zones[i].GetFloodCentroidXZ();
                     var aabb = zones[i].GetFloodAabbXZ();
+                    MeasureLakeBed(terrain, zones[i], out var bedMin, out var bedMedian, out var wetFrac);
+                    var column = zones[i].WaterLevelY - bedMin;
                     if (i > 0)
                     {
                         parts.Append("; ");
@@ -302,7 +249,9 @@ namespace GameDev.EditorTools
                         $"{zones[i].Id} center=({c.x:F0},{c.z:F0}) " +
                         $"r≈{zones[i].EquivalentRadiusMeters:F0}m " +
                         $"aabb=({aabb.xMin:F0},{aabb.yMin:F0})-({aabb.xMax:F0},{aabb.yMax:F0}) " +
-                        $"maxDig={dig:F1}m waterY={zones[i].WaterLevelY:F1}m");
+                        $"targetDig={target:F1}m maxDig={dig:F1}m " +
+                        $"waterY={zones[i].WaterLevelY:F1}m bedMin={bedMin:F1}m bedMed={bedMedian:F1}m " +
+                        $"waterColumn={column:F1}m wetFrac={wetFrac:P0}");
                 }
 
                 Debug.Log(
@@ -343,6 +292,63 @@ namespace GameDev.EditorTools
 
                 Debug.Log($"[Overworld] 4) Rivers: {rivers.Length} | {parts}");
             }
+        }
+
+        private static void MeasureLakeBed(
+            UnityEngine.Terrain terrain,
+            WaterZone zone,
+            out float bedMin,
+            out float bedMedian,
+            out float wetFraction)
+        {
+            bedMin = float.PositiveInfinity;
+            bedMedian = zone.WaterLevelY;
+            wetFraction = 0f;
+            if (terrain == null)
+            {
+                bedMin = zone.WaterLevelY;
+                return;
+            }
+
+            var samples = new List<float>(256);
+            var wet = 0;
+            var total = 0;
+            var step = Mathf.Max(1, Mathf.Min(zone.Width, zone.Depth) / 24);
+            for (var x = 0; x < zone.Width; x += step)
+            {
+                for (var z = 0; z < zone.Depth; z += step)
+                {
+                    if (!zone.IsFlooded(x, z))
+                    {
+                        continue;
+                    }
+
+                    var wx = zone.OriginX + (x + 0.5f) * zone.CellSize;
+                    var wz = zone.OriginZ + (z + 0.5f) * zone.CellSize;
+                    var y = terrain.SampleHeight(new Vector3(wx, 0f, wz)) + terrain.transform.position.y;
+                    samples.Add(y);
+                    total++;
+                    if (y < zone.WaterLevelY - 0.15f)
+                    {
+                        wet++;
+                    }
+
+                    if (y < bedMin)
+                    {
+                        bedMin = y;
+                    }
+                }
+            }
+
+            if (samples.Count == 0)
+            {
+                bedMin = zone.WaterLevelY;
+                return;
+            }
+
+            samples.Sort();
+            bedMedian = samples[samples.Count / 2];
+            wetFraction = total > 0 ? wet / (float)total : 0f;
         }
 
         private static float ApproximatePathLength(RiverPath river)

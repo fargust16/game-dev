@@ -39,22 +39,29 @@ namespace GameDev.World.Water
 
             var y = zone.WaterLevelY;
             var step = Mathf.Max(MeshStepMeters, 0.75f);
-            // Pad past flood AABB — carve + bank blur often extends beyond the boolean mask.
-            var pad = Mathf.Max(zone.CellSize * 4f, LakeTerrainCarver.BankBlendMeters);
+
+            // Search only a thin skirt past the flood AABB. Using BankBlendMeters (~72m) here made
+            // the sampler roam to the tile rim where SampleHeight clamps and falsely reads wet,
+            // producing a straight water edge hanging off the terrain.
+            var pad = Mathf.Max(zone.CellSize * 3f, 14f);
+            var floodMinX = minX;
+            var floodMinZ = minZ;
+            var floodMaxX = maxX;
+            var floodMaxZ = maxZ;
             minX -= pad;
             minZ -= pad;
             maxX += pad;
             maxZ += pad;
 
-            // Never extend water past the live terrain tile (SampleHeight outside clamps to the
-            // rim and falsely reads "underwater", producing giant rectangles off the mesh edge).
+            // Never extend water past the live terrain tile; inset slightly so verts sit on the mesh.
             if (clipXZ.HasValue)
             {
+                const float edgeInset = 1.25f;
                 var c = clipXZ.Value;
-                minX = Mathf.Max(minX, c.xMin);
-                minZ = Mathf.Max(minZ, c.yMin);
-                maxX = Mathf.Min(maxX, c.xMax);
-                maxZ = Mathf.Min(maxZ, c.yMax);
+                minX = Mathf.Max(minX, c.xMin + edgeInset);
+                minZ = Mathf.Max(minZ, c.yMin + edgeInset);
+                maxX = Mathf.Min(maxX, c.xMax - edgeInset);
+                maxZ = Mathf.Min(maxZ, c.yMax - edgeInset);
                 if (maxX <= minX || maxZ <= minZ)
                 {
                     return new Mesh { name = $"WaterZoneMesh_{zone.Id}_empty" };
@@ -67,23 +74,35 @@ namespace GameDev.World.Water
             // Corner field: how far below water (positive => underwater / include in mesh).
             var field = new float[cellsX + 1, cellsZ + 1];
             var anyWet = false;
+            // Only accept wet samples near the planted flood — stops rim-clamp leaks far outside the basin.
+            var nearFloodPad = pad + zone.CellSize;
             for (var iz = 0; iz <= cellsZ; iz++)
             {
                 for (var ix = 0; ix <= cellsX; ix++)
                 {
                     var wx = minX + ix * step;
                     var wz = minZ + iz * step;
-                    float groundY;
                     if (clipXZ.HasValue)
                     {
                         var c = clipXZ.Value;
-                        if (wx < c.xMin || wx > c.xMax || wz < c.yMin || wz > c.yMax)
+                        if (wx < c.xMin + 0.5f || wx > c.xMax - 0.5f ||
+                            wz < c.yMin + 0.5f || wz > c.yMax - 0.5f)
                         {
                             field[ix, iz] = -1f;
                             continue;
                         }
                     }
 
+                    var nearFlood =
+                        wx >= floodMinX - nearFloodPad && wx <= floodMaxX + nearFloodPad &&
+                        wz >= floodMinZ - nearFloodPad && wz <= floodMaxZ + nearFloodPad;
+                    if (!nearFlood)
+                    {
+                        field[ix, iz] = -1f;
+                        continue;
+                    }
+
+                    float groundY;
                     if (sampleTerrainY != null)
                     {
                         groundY = sampleTerrainY(wx, wz);
@@ -95,11 +114,16 @@ namespace GameDev.World.Water
                     }
 
                     var depth = y + ShorePadMeters - groundY;
-                    field[ix, iz] = depth;
-                    if (depth >= 0f)
+                    // Mesh follows the planted flood mask only. Expanding via "terrain below waterY"
+                    // flooded whole plains when the heightmap floor sat just under the water plane.
+                    if (!zone.Contains(wx, wz) || depth < 0f)
                     {
-                        anyWet = true;
+                        field[ix, iz] = -1f;
+                        continue;
                     }
+
+                    field[ix, iz] = depth;
+                    anyWet = true;
                 }
             }
 
