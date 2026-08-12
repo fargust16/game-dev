@@ -4,22 +4,20 @@ using UnityEngine;
 namespace GameDev.World.Water
 {
     /// <summary>
-    /// Builds a ribbon-strip mesh for one <see cref="RiverPath"/>'s water surface - same technique
-    /// as <see cref="GameDev.World.Roads.RoadMeshBuilder"/> (width as a horizontal offset off the
-    /// flattened tangent, UVs tiled by travelled distance), except width varies per point (a river
-    /// widens toward its mouth, a road doesn't) and Y comes from the path's own
-    /// <see cref="RiverPath.WaterSurfaceY"/> instead of a re-sampled ground raycast - the water
-    /// surface is data this system already computed, not something to re-derive from the (now
-    /// carved) terrain.
+    /// Builds one continuous ribbon mesh per <see cref="RiverPath"/> (no strip seams).
+    /// Centerline is densified before triangulation so the surface follows banks smoothly instead
+    /// of faceted segments with visible gaps at the shoreline.
     /// </summary>
     public static class RiverMeshBuilder
     {
+        public const float DensifyStepMeters = 2.5f;
+        public const float WidthPadMeters = 0.35f;
+
         public static Mesh Build(RiverPath river, float uvTileLength)
         {
-            var centerline = river.Centerline;
-            var widths = river.Widths;
-            var count = centerline.Count;
+            Densify(river, DensifyStepMeters, out var centerline, out var widths, out var surfaceY);
 
+            var count = centerline.Count;
             var vertices = new List<Vector3>(count * 2);
             var uvs = new List<Vector2>(count * 2);
             var triangles = new List<int>(System.Math.Max(0, count - 1) * 6);
@@ -29,13 +27,13 @@ namespace GameDev.World.Water
 
             for (var i = 0; i < count; i++)
             {
-                var point = new Vector3(centerline[i].x, river.WaterSurfaceY[i], centerline[i].z);
+                var point = new Vector3(centerline[i].x, surfaceY[i], centerline[i].z);
                 var right = Right(Tangent(centerline, i));
-                var halfWidth = widths[i] * 0.5f;
+                var halfWidth = (widths[i] * 0.5f) + WidthPadMeters;
 
                 if (i > 0)
                 {
-                    var previous = new Vector3(centerline[i - 1].x, river.WaterSurfaceY[i - 1], centerline[i - 1].z);
+                    var previous = new Vector3(centerline[i - 1].x, surfaceY[i - 1], centerline[i - 1].z);
                     traveled += Vector3.Distance(previous, point);
                 }
 
@@ -51,8 +49,6 @@ namespace GameDev.World.Water
                     continue;
                 }
 
-                // Same index pattern as RoadMeshBuilder: base=L(i-1), base+1=R(i-1), base+2=L(i),
-                // base+3=R(i) - gives an upward-facing normal for any tangent direction.
                 var baseIndex = (i - 1) * 2;
                 triangles.Add(baseIndex);
                 triangles.Add(baseIndex + 3);
@@ -72,8 +68,45 @@ namespace GameDev.World.Water
             return mesh;
         }
 
-        // Central difference at interior points, forward/backward at the endpoints - flattened to
-        // XZ so width offset stays horizontal even as the water surface Y falls downstream.
+        private static void Densify(
+            RiverPath river,
+            float stepMeters,
+            out List<Vector3> centerline,
+            out List<float> widths,
+            out List<float> surfaceY)
+        {
+            var srcC = river.Centerline;
+            var srcW = river.Widths;
+            var srcY = river.WaterSurfaceY;
+            centerline = new List<Vector3>(srcC.Count * 2);
+            widths = new List<float>(srcC.Count * 2);
+            surfaceY = new List<float>(srcC.Count * 2);
+
+            if (srcC.Count == 0)
+            {
+                return;
+            }
+
+            centerline.Add(srcC[0]);
+            widths.Add(srcW[0]);
+            surfaceY.Add(srcY[0]);
+
+            for (var i = 1; i < srcC.Count; i++)
+            {
+                var a = srcC[i - 1];
+                var b = srcC[i];
+                var flatDist = Vector2.Distance(new Vector2(a.x, a.z), new Vector2(b.x, b.z));
+                var segments = Mathf.Max(1, Mathf.CeilToInt(flatDist / Mathf.Max(stepMeters, 0.5f)));
+                for (var s = 1; s <= segments; s++)
+                {
+                    var t = s / (float)segments;
+                    centerline.Add(Vector3.Lerp(a, b, t));
+                    widths.Add(Mathf.Lerp(srcW[i - 1], srcW[i], t));
+                    surfaceY.Add(Mathf.Lerp(srcY[i - 1], srcY[i], t));
+                }
+            }
+        }
+
         private static Vector3 Tangent(IReadOnlyList<Vector3> points, int i)
         {
             if (points.Count < 2)

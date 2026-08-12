@@ -4,16 +4,23 @@ using UnityEngine;
 namespace GameDev.World.Water
 {
     /// <summary>
-    /// One flat water surface per lake at <see cref="WaterZone.WaterLevelY"/>.
-    /// Contour is built from <b>post-carve terrain</b>: every XZ where ground sits below the water
-    /// plane (plus a small shore pad). That way the mesh fills the real basin instead of a flood-AABB
-    /// rectangle floating over dry crater floor.
+    /// One continuous flat water surface per lake at <see cref="WaterZone.WaterLevelY"/>.
+    /// Silhouette is a <b>smooth inflated flood contour</b> (SDF + small plan expand) — slightly
+    /// larger than the carved pit in top-down overlap — not a terrain-gated swiss-cheese mask.
+    /// Terrain height is not used to punch holes in the shoreline (that caused torn slits).
     /// </summary>
     public static class WaterMeshBuilder
     {
-        public const float MeshStepMeters = 1f;
-        /// <summary>Include ground this far above waterY so the plane meets the soft bank.</summary>
-        public const float ShorePadMeters = 0.75f;
+        public const float MeshStepMeters = 0.5f;
+
+        /// <summary>
+        /// How far past the flood mask (metres) the water sheet extends in plan view — a slight
+        /// overlap over the bank so the rim reads solid, not under-sized vs the pit.
+        /// </summary>
+        public const float ShoreExpandMeters = 2.75f;
+
+        /// <summary>Optional blur radius on the fine mesh field (in cells) before marching squares.</summary>
+        public const int FieldSmoothPasses = 2;
 
         public static Mesh Build(WaterZone zone, IReadOnlyList<WaterZone> allZones) =>
             Build(zone, allZones, sampleTerrainY: null, clipXZ: null);
@@ -31,6 +38,7 @@ namespace GameDev.World.Water
             Rect? clipXZ)
         {
             _ = allZones;
+            _ = sampleTerrainY; // kept for API compatibility; silhouette is flood-SDF only
 
             if (!TryGetFloodBounds(zone, out var minX, out var minZ, out var maxX, out var maxZ))
             {
@@ -38,22 +46,15 @@ namespace GameDev.World.Water
             }
 
             var y = zone.WaterLevelY;
-            var step = Mathf.Max(MeshStepMeters, 0.75f);
+            var step = Mathf.Max(MeshStepMeters, 0.35f);
+            var sdf = LakeShoreField.BuildSignedDistance(zone, exteriorCapMeters: ShoreExpandMeters + 12f);
 
-            // Search only a thin skirt past the flood AABB. Using BankBlendMeters (~72m) here made
-            // the sampler roam to the tile rim where SampleHeight clamps and falsely reads wet,
-            // producing a straight water edge hanging off the terrain.
-            var pad = Mathf.Max(zone.CellSize * 3f, 14f);
-            var floodMinX = minX;
-            var floodMinZ = minZ;
-            var floodMaxX = maxX;
-            var floodMaxZ = maxZ;
+            var pad = ShoreExpandMeters + step * 2f;
             minX -= pad;
             minZ -= pad;
             maxX += pad;
             maxZ += pad;
 
-            // Never extend water past the live terrain tile; inset slightly so verts sit on the mesh.
             if (clipXZ.HasValue)
             {
                 const float edgeInset = 1.25f;
@@ -71,11 +72,10 @@ namespace GameDev.World.Water
             var cellsX = Mathf.Max(1, Mathf.CeilToInt((maxX - minX) / step));
             var cellsZ = Mathf.Max(1, Mathf.CeilToInt((maxZ - minZ) / step));
 
-            // Corner field: how far below water (positive => underwater / include in mesh).
+            // Continuous field: zero-crossing at the expanded flood contour (smooth iso-line).
+            // Positive = inside water sheet. No terrain depth punches — those tore the shore.
             var field = new float[cellsX + 1, cellsZ + 1];
             var anyWet = false;
-            // Only accept wet samples near the planted flood — stops rim-clamp leaks far outside the basin.
-            var nearFloodPad = pad + zone.CellSize;
             for (var iz = 0; iz <= cellsZ; iz++)
             {
                 for (var ix = 0; ix <= cellsX; ix++)
@@ -93,37 +93,13 @@ namespace GameDev.World.Water
                         }
                     }
 
-                    var nearFlood =
-                        wx >= floodMinX - nearFloodPad && wx <= floodMaxX + nearFloodPad &&
-                        wz >= floodMinZ - nearFloodPad && wz <= floodMaxZ + nearFloodPad;
-                    if (!nearFlood)
+                    var shore = LakeShoreField.Sample(zone, sdf, wx, wz);
+                    var value = shore + ShoreExpandMeters;
+                    field[ix, iz] = value;
+                    if (value >= 0f)
                     {
-                        field[ix, iz] = -1f;
-                        continue;
+                        anyWet = true;
                     }
-
-                    float groundY;
-                    if (sampleTerrainY != null)
-                    {
-                        groundY = sampleTerrainY(wx, wz);
-                    }
-                    else
-                    {
-                        // Editor tests without terrain: fall back to flood occupancy.
-                        groundY = zone.Contains(wx, wz) ? y - 2f : y + 2f;
-                    }
-
-                    var depth = y + ShorePadMeters - groundY;
-                    // Mesh follows the planted flood mask only. Expanding via "terrain below waterY"
-                    // flooded whole plains when the heightmap floor sat just under the water plane.
-                    if (!zone.Contains(wx, wz) || depth < 0f)
-                    {
-                        field[ix, iz] = -1f;
-                        continue;
-                    }
-
-                    field[ix, iz] = depth;
-                    anyWet = true;
                 }
             }
 
@@ -131,6 +107,8 @@ namespace GameDev.World.Water
             {
                 return new Mesh { name = $"WaterZoneMesh_{zone.Id}_empty" };
             }
+
+            SmoothField(field, cellsX + 1, cellsZ + 1, FieldSmoothPasses);
 
             var verts = new List<Vector3>(cellsX * cellsZ * 4);
             var uvs = new List<Vector2>(cellsX * cellsZ * 4);
@@ -190,6 +168,38 @@ namespace GameDev.World.Water
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
             return mesh;
+        }
+
+        private static void SmoothField(float[,] field, int width, int height, int passes)
+        {
+            if (passes <= 0)
+            {
+                return;
+            }
+
+            var copy = new float[width, height];
+            for (var p = 0; p < passes; p++)
+            {
+                for (var z = 0; z < height; z++)
+                {
+                    for (var x = 0; x < width; x++)
+                    {
+                        copy[x, z] = field[x, z];
+                    }
+                }
+
+                for (var z = 1; z < height - 1; z++)
+                {
+                    for (var x = 1; x < width - 1; x++)
+                    {
+                        var sum =
+                            copy[x - 1, z - 1] + copy[x, z - 1] + copy[x + 1, z - 1] +
+                            copy[x - 1, z] + copy[x, z] * 4f + copy[x + 1, z] +
+                            copy[x - 1, z + 1] + copy[x, z + 1] + copy[x + 1, z + 1];
+                        field[x, z] = sum / 12f;
+                    }
+                }
+            }
         }
 
         private static void AddQuad(

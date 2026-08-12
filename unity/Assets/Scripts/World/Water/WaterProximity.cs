@@ -46,5 +46,53 @@ namespace GameDev.World.Water
 
             return false;
         }
+
+        /// <summary>
+        /// Soft 0..1 wetness for ecological vegetation (shore → wet meadow), not a hard spawn ring.
+        /// Underwater samples return 1; dry ground beyond <paramref name="falloffMeters"/> returns 0.
+        /// </summary>
+        public static float SampleWetness01(
+            IWaterSampler water, float worldX, float worldZ, float falloffMeters)
+        {
+            if (water == null || falloffMeters <= 0f)
+            {
+                return 0f;
+            }
+
+            if (water.TryGetWaterLevel(worldX, worldZ, out _))
+            {
+                return 1f;
+            }
+
+            // Expanding rings: first hit distance approximates shoreline proximity without a full SDF.
+            const int rings = 4;
+            const int samplesPerRing = 8;
+            var best = falloffMeters + 1f;
+            for (var r = 1; r <= rings; r++)
+            {
+                var radius = falloffMeters * (r / (float)rings);
+                for (var i = 0; i < samplesPerRing; i++)
+                {
+                    var angle = (Mathf.PI * 2f * i) / samplesPerRing;
+                    var sx = worldX + Mathf.Cos(angle) * radius;
+                    var sz = worldZ + Mathf.Sin(angle) * radius;
+                    if (water.TryGetWaterLevel(sx, sz, out _))
+                    {
+                        if (radius < best)
+                        {
+                            best = radius;
+                        }
+                    }
+                }
+            }
+
+            if (best > falloffMeters)
+            {
+                return 0f;
+            }
+
+            var t = 1f - (best / falloffMeters);
+            return t * t * (3f - 2f * t);
+        }
     }
 }

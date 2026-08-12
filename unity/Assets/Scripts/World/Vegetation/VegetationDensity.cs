@@ -3,16 +3,9 @@ using UnityEngine;
 namespace GameDev.World.Vegetation
 {
     /// <summary>
-    /// Pure per-point vegetation density modifiers (WORLD_GENERATION_PIPELINE.md Iteration 07):
-    /// scaling factors <see cref="VegetationScatterMenu"/> multiplies into its per-biome acceptance
-    /// probability, not a replacement for it. Two independent effects:
-    /// <list type="bullet">
-    /// <item><see cref="SamplePatch"/> - large, smooth Perlin blobs so vegetation reads as natural
-    /// groves/clearings instead of uniform static, without needing an actual painted density-map
-    /// asset (there isn't one yet).</item>
-    /// <item><see cref="SlopeMultiplier"/> - steep ground thins out regardless of biome, since a
-    /// cliff face doesn't grow a forest just because the biome underneath it is Forest.</item>
-    /// </list>
+    /// Shared slope falloff plus a legacy meso patch helper. New flora placement uses
+    /// <see cref="VegetationEcology"/> (macro forest / shrub / grass fields); <see cref="SamplePatch"/>
+    /// remains for tests and any callers that only need a single ~50m blob field.
     /// </summary>
     public static class VegetationDensity
     {

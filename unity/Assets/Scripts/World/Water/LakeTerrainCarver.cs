@@ -19,7 +19,12 @@ namespace GameDev.World.Water
         /// <summary>Hard cap — deeper than this fights the heightmap ceiling and is not needed for V0.</summary>
         public const float MaxLargeBasinDepthMeters = 48f;
 
-        public const float WaterFreeboardMeters = 0.55f;
+        // Plane sits just under the spill rim (low outlet), not the median high-bank —
+        // median rim left the low side of slope lakes with a flying water sheet.
+        public const float WaterFreeboardMeters = 0.35f;
+
+        /// <summary>Spill percentile of dry-neighbour rim heights (0 = min, 1 = max).</summary>
+        public const float RimSpillPercentile = 0.18f;
 
         /// <summary>Extra-wide soft bank for rounded waterline.</summary>
         public const float BankBlendMeters = 72f;
@@ -136,6 +141,11 @@ namespace GameDev.World.Water
 
             SoftenShoreHeights(
                 heights, resolution, terrainPos, worldPerPixelX, worldPerPixelZ, zones);
+
+            // Blur + exterior bank dig can pull the shoreline below the locked plane — raise the
+            // dry rim back so the water sheet meets terrain instead of floating over a moat.
+            SealLakeRims(
+                heights, resolution, terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight, zones);
 
             data.SetHeights(0, 0, heights);
         }
@@ -330,13 +340,16 @@ namespace GameDev.World.Water
 
                     if (signed < 0f)
                     {
-                        if (signed > -BankBlendMeters)
+                        // Soft approach from ABOVE the plane only — never dig a dry moat under the
+                        // waterline (that is exactly the "flying lake" look).
+                        if (signed > -BankBlendMeters && currentWorldY > waterPlaneY + WaterFreeboardMeters)
                         {
                             var t = 1f + signed / BankBlendMeters;
                             var smooth = t * t * (3f - 2f * t);
-                            var digBank = MinShoreDepthMeters * 0.35f * smooth;
+                            var shelfY = waterPlaneY + WaterFreeboardMeters;
+                            var target = Mathf.Lerp(currentWorldY, shelfY, smooth * 0.55f);
                             var appliedBank = WriteWorldYIfLower(
-                                heights, pz, px, terrainPos.y, worldHeight, currentWorldY - digBank);
+                                heights, pz, px, terrainPos.y, worldHeight, target);
                             if (appliedBank > maxActualDig)
                             {
                                 maxActualDig = appliedBank;
@@ -419,15 +432,84 @@ namespace GameDev.World.Water
                 }
             }
 
-            if (rim.Count == 0)
+            return SpillWaterLevel(rim, zone.WaterLevelY);
+        }
+
+        private static float SpillWaterLevel(List<float> rim, float fallbackWaterY)
+        {
+            if (rim == null || rim.Count == 0)
             {
-                return zone.WaterLevelY - WaterFreeboardMeters;
+                return fallbackWaterY - WaterFreeboardMeters;
             }
 
             rim.Sort();
-            // Use median rim — 25th percentile sits too low on slopes and floods the plains.
-            var idx = Mathf.Clamp(rim.Count / 2, 0, rim.Count - 1);
+            // True lake level = spill / low outlet. Median high-bank made slope lakes float.
+            var idx = Mathf.Clamp(
+                Mathf.RoundToInt((rim.Count - 1) * RimSpillPercentile),
+                0,
+                rim.Count - 1);
+            // Ignore a couple of noisy low samples on large rims.
+            if (rim.Count > 20)
+            {
+                idx = Mathf.Max(idx, 1);
+            }
+
             return rim[idx] - WaterFreeboardMeters;
+        }
+
+        /// <summary>
+        /// After shore blur: ensure dry land next to the flood sits at/above the water plane so the
+        /// mesh cannot hover over a lowered bank.
+        /// </summary>
+        private static void SealLakeRims(
+            float[,] heights,
+            int resolution,
+            Vector3 terrainPos,
+            float worldPerPixelX,
+            float worldPerPixelZ,
+            float worldHeight,
+            IReadOnlyList<WaterZone> zones)
+        {
+            for (var i = 0; i < zones.Count; i++)
+            {
+                var zone = zones[i];
+                var waterY = zone.WaterLevelY;
+                var sealY = waterY + WaterFreeboardMeters * 0.25f;
+                var sdf = LakeShoreField.BuildSignedDistance(zone, exteriorCapMeters: BankBlendMeters + 4f);
+                var aabb = zone.GetFloodAabbXZ();
+                var pad = zone.CellSize * 3f;
+                var minPx = Mathf.Max(0, Mathf.FloorToInt((aabb.xMin - pad - terrainPos.x) / worldPerPixelX) - 1);
+                var maxPx = Mathf.Min(resolution - 1, Mathf.CeilToInt((aabb.xMax + pad - terrainPos.x) / worldPerPixelX) + 1);
+                var minPz = Mathf.Max(0, Mathf.FloorToInt((aabb.yMin - pad - terrainPos.z) / worldPerPixelZ) - 1);
+                var maxPz = Mathf.Min(resolution - 1, Mathf.CeilToInt((aabb.yMax + pad - terrainPos.z) / worldPerPixelZ) + 1);
+
+                for (var pz = minPz; pz <= maxPz; pz++)
+                {
+                    for (var px = minPx; px <= maxPx; px++)
+                    {
+                        var worldX = terrainPos.x + px * worldPerPixelX;
+                        var worldZ = terrainPos.z + pz * worldPerPixelZ;
+                        var signed = LakeShoreField.Sample(zone, sdf, worldX, worldZ);
+                        // Dry ring only — never raise the wet basin floor.
+                        if (signed >= -0.01f || signed < -zone.CellSize * 2.5f)
+                        {
+                            continue;
+                        }
+
+                        var current = terrainPos.y + heights[pz, px] * worldHeight;
+                        if (current >= sealY)
+                        {
+                            continue;
+                        }
+
+                        var candidate = (sealY - terrainPos.y) / worldHeight;
+                        if (candidate > heights[pz, px])
+                        {
+                            heights[pz, px] = Mathf.Clamp01(candidate);
+                        }
+                    }
+                }
+            }
         }
 
         private static void TryAddDryRimFromHeights(
@@ -473,14 +555,7 @@ namespace GameDev.World.Water
                 }
             }
 
-            if (rim.Count == 0)
-            {
-                return zone.WaterLevelY - WaterFreeboardMeters;
-            }
-
-            rim.Sort();
-            var idx = Mathf.Clamp(rim.Count / 2, 0, rim.Count - 1);
-            return rim[idx] - WaterFreeboardMeters;
+            return SpillWaterLevel(rim, zone.WaterLevelY);
         }
 
         private static void TryAddDryRim(

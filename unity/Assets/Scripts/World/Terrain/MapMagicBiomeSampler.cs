@@ -37,8 +37,13 @@ namespace GameDev.World.Terrain
         {
             var height = SampleHeight(worldX, worldZ);
             var slope = SampleSlope01(worldX, worldZ);
-            var moisture = SampleChannel(MoistureChannel, worldX, worldZ);
+            var moisture = SampleMoisture01(worldX, worldZ);
             return BiomeClassifier.Classify(height, slope, moisture);
+        }
+
+        public float SampleMoisture01(float worldX, float worldZ)
+        {
+            return SampleChannel(MoistureChannel, worldX, worldZ);
         }
 
         private float SampleChannel(string channel, float worldX, float worldZ)
