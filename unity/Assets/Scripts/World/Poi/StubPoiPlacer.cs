@@ -13,12 +13,13 @@ namespace GameDev.World.Poi
     /// a caller-supplied set of candidate chunks, seeded from <see cref="IWorldSeed"/>.Fork("poi"),
     /// each request preferring a biome band read from <see cref="IBiomeSampler"/> at the chunk
     /// center. Repeating the same kind in the request list places multiple markers of that kind
-    /// (see <see cref="PoiDemoScenario"/>) - this replaces the original stub's "3-5 markers, at most
-    /// one per kind" ceiling, which couldn't scale to "ten camps" style demo requests. The
-    /// no-request constructor keeps that original behaviour byte-for-byte (same rng call order) for
-    /// existing callers/tests that still want a small randomized set. All markers are computed once
-    /// at construction (not on every <see cref="PlaceForChunk"/> call), matching the System Card's
-    /// "no global scans each frame" performance note.
+    /// (see <see cref="PoiDemoScenario"/>). Same-kind markers use greedy maximin spacing (each new
+    /// pick maximizes distance to already-placed markers of that kind) so towns/camps/shrines
+    /// spread across the candidate map; different kinds ignore each other and may sit adjacent.
+    /// The no-request constructor still builds a small randomized request list; placement itself
+    /// always uses the same-kind spread rule. All markers are computed once at construction (not on
+    /// every <see cref="PlaceForChunk"/> call), matching the System Card's "no global scans each
+    /// frame" performance note.
     /// </summary>
     public sealed class StubPoiPlacer : IPoiPlacer
     {
@@ -95,8 +96,7 @@ namespace GameDev.World.Poi
             return candidates;
         }
 
-        // Reproduces the original stub's exact rng call order (count roll, then shuffle) so
-        // existing seed -> marker-set expectations (StubPoiPlacerTests) stay unchanged. Landmark is
+        // Count roll + kind shuffle stay deterministic for the no-request constructor. Landmark is
         // deliberately excluded from the shuffled pool - it's a quota-only kind (one per biome via
         // PoiDemoScenario), not part of this grab-bag of flavor kinds.
         private static List<PoiRequest> BuildDefaultRequests(System.Random rng)
@@ -127,6 +127,7 @@ namespace GameDev.World.Poi
             System.Random rng)
         {
             var perKindIndex = new Dictionary<PoiKind, int>();
+            var placedByKind = new Dictionary<PoiKind, List<Vector3>>();
             foreach (var request in requests)
             {
                 var pool = candidates.Where(c => request.PreferredBiomes.Contains(c.Biome)).ToList();
@@ -140,7 +141,13 @@ namespace GameDev.World.Poi
                     break; // no viable chunk left at all - place fewer markers than requested
                 }
 
-                var picked = pool[rng.Next(pool.Count)];
+                if (!placedByKind.TryGetValue(request.Kind, out var sameKind))
+                {
+                    sameKind = new List<Vector3>();
+                    placedByKind[request.Kind] = sameKind;
+                }
+
+                var picked = PickSpreadCandidate(pool, sameKind, rng);
                 candidates.RemoveAll(c => c.Chunk == picked.Chunk);
 
                 var index = perKindIndex.TryGetValue(request.Kind, out var existing) ? existing : 0;
@@ -148,7 +155,60 @@ namespace GameDev.World.Poi
 
                 var id = new PoiId($"{request.Kind}_{index}");
                 markersByChunk[picked.Chunk] = new PoiMarker(id, request.Kind, picked.Center, picked.Biome);
+                sameKind.Add(picked.Center);
             }
+        }
+
+        /// <summary>
+        /// First marker of a kind: uniform random in the biome pool. Later markers: maximize the
+        /// minimum XZ distance to already-placed same-kind centers (ties broken by rng).
+        /// </summary>
+        private static (ChunkCoord Chunk, Vector3 Center, BiomeId Biome) PickSpreadCandidate(
+            List<(ChunkCoord Chunk, Vector3 Center, BiomeId Biome)> pool,
+            List<Vector3> sameKindCenters,
+            System.Random rng)
+        {
+            if (sameKindCenters.Count == 0)
+            {
+                return pool[rng.Next(pool.Count)];
+            }
+
+            var bestScore = float.NegativeInfinity;
+            var best = new List<(ChunkCoord Chunk, Vector3 Center, BiomeId Biome)>();
+            for (var i = 0; i < pool.Count; i++)
+            {
+                var candidate = pool[i];
+                var score = MinDistanceSqXZ(candidate.Center, sameKindCenters);
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    best.Clear();
+                    best.Add(candidate);
+                }
+                else if (Mathf.Approximately(score, bestScore))
+                {
+                    best.Add(candidate);
+                }
+            }
+
+            return best[rng.Next(best.Count)];
+        }
+
+        private static float MinDistanceSqXZ(Vector3 point, List<Vector3> others)
+        {
+            var best = float.PositiveInfinity;
+            for (var i = 0; i < others.Count; i++)
+            {
+                var dx = point.x - others[i].x;
+                var dz = point.z - others[i].z;
+                var dSq = dx * dx + dz * dz;
+                if (dSq < best)
+                {
+                    best = dSq;
+                }
+            }
+
+            return best;
         }
 
         private static T[] Shuffle<T>(T[] source, System.Random rng)

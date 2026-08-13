@@ -5,15 +5,14 @@ using UnityEngine;
 namespace GameDev.EditorTools
 {
     /// <summary>
-    /// One-button pipeline: runs every Overworld generation step in sequence (terrain+water, POI,
-    /// settlement, roads, vegetation), in dependency order (POI needs biome/height; settlement needs
-    /// TownApproach; roads route to the real settlement anchor; vegetation runs last so it can soft-
-    /// clear around roads/POIs/settlements via <see cref="GameDev.World.Vegetation.VegetationClearance"/>).
-    /// WORLD_GENERATION_PIPELINE.md's iteration list is expected to keep growing - each new
-    /// Iteration's own menu item should get one more call appended to <see cref="RunRemainingSteps"/>
-    /// (and, if it adds a Clear* counterpart, to <see cref="ClearFullOverworld"/> too) so this stays
-    /// the single "give me the latest, everything-wired-up demo" action instead of drifting out of
-    /// sync with what the individual per-step menus can do.
+    /// One-button pipeline: terrain+water, then settlement → roads → POI markers → vegetation.
+    /// Settlement/roads recompute the same seeded <c>StubPoiPlacer</c> quota (no scene POI needed).
+    /// Visual POI markers land immediately before vegetation so flora can hard-clear a pocket around
+    /// each marker via <see cref="GameDev.World.Vegetation.VegetationClearance"/>. Vegetation is
+    /// always last. WORLD_GENERATION_PIPELINE.md's iteration list is expected to keep growing - each
+    /// new Iteration's own menu item should get one more call in <see cref="RunRemainingSteps"/>
+    /// (and Clear* in <see cref="ClearFullOverworld"/> if needed) so this stays the single full-demo
+    /// action.
     /// </summary>
     public static class OverworldPipelineMenu
     {
@@ -35,15 +34,14 @@ namespace GameDev.EditorTools
             OverworldGenTiming.Log("full-overworld", OverworldGenTiming.StopMs(total), "default seed");
         }
 
-        // Terrain generation (OverworldTerrainMenu.GenerateInternal) clears prior derived output and
-        // already runs water (lakes + rivers + carve + meshes) before returning. Settlement must run
-        // before Roads (anchor displacement). Vegetation runs after both so clearance falloff can
-        // read OverworldRoads / OverworldSettlement / OverworldPoi.
+        // Terrain generation clears prior derived output and builds water before returning.
+        // Settlement before roads (anchor displacement). POI visuals penultimate; vegetation last
+        // so clearance reads OverworldRoads / OverworldSettlement / OverworldPoi.
         private static void RunRemainingSteps()
         {
-            OverworldGenTiming.Time("poi", PoiMarkerMenu.PlaceMarkers);
             OverworldGenTiming.Time("settlement", SettlementOverworldMenu.PlaceSettlementAtTownApproach);
             OverworldGenTiming.Time("roads", RoadNetworkMenu.BuildRoadNetwork);
+            OverworldGenTiming.Time("poi", PoiMarkerMenu.PlaceMarkers);
             OverworldGenTiming.Time("vegetation", VegetationScatterMenu.ScatterVegetation);
         }
 

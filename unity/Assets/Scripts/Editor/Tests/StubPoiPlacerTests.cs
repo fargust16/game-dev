@@ -5,6 +5,7 @@ using GameDev.World.Seed;
 using GameDev.World.Streaming;
 using GameDev.World.Terrain;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace GameDev.World.Poi.Tests
 {
@@ -146,6 +147,36 @@ namespace GameDev.World.Poi.Tests
         }
 
         [Test]
+        public void QuotaConstructor_SameKindMarkers_SpreadAcrossMap()
+        {
+            // All biomes preferred so the pool is the full grid — isolates maximin spacing from
+            // meadow/forest band geometry on the fake sampler.
+            var chunks = WideStubChunks();
+            var allBiomes = new[]
+            {
+                BiomeId.Swamp, BiomeId.Meadow, BiomeId.Forest, BiomeId.Highland, BiomeId.Mountain
+            };
+            var requests = new List<PoiRequest>(9);
+            for (var i = 0; i < 9; i++)
+            {
+                requests.Add(new PoiRequest(PoiKind.Camp, allBiomes));
+            }
+
+            var placer = new StubPoiPlacer(
+                new GameDev.World.Seed.WorldSeed(110201), new FakeBiomeSampler(), chunks, requests);
+            var camps = AllMarkers(placer, chunks).Where(m => m.Kind == PoiKind.Camp).ToList();
+            Assert.AreEqual(9, camps.Count);
+
+            var minDist = MinPairwiseDistanceXZ(camps);
+            // 9 points on a ~1024 m stub tile: random placement often stacks neighbors; maximin
+            // should keep every same-kind pair well clear of adjacent chunks.
+            Assert.Greater(
+                minDist,
+                ChunkCoord.ChunkSize * 3.5f,
+                $"same-kind camps clustered (minDist={minDist:F1}m); expected spread across the map");
+        }
+
+        [Test]
         public void QuotaConstructor_SameSeed_ProducesIdenticalMarkers()
         {
             var chunks = WideStubChunks();
@@ -191,6 +222,31 @@ namespace GameDev.World.Poi.Tests
                 .Distinct()
                 .ToList();
             Assert.AreEqual(5, landmarkBiomes.Count, "each biome should get its own distinct landmark request");
+        }
+
+        private static float MinPairwiseDistanceXZ(IReadOnlyList<PoiMarker> markers)
+        {
+            var min = float.PositiveInfinity;
+            for (var i = 0; i < markers.Count; i++)
+            {
+                for (var j = i + 1; j < markers.Count; j++)
+                {
+                    var d = DistanceXZ(markers[i].Position, markers[j].Position);
+                    if (d < min)
+                    {
+                        min = d;
+                    }
+                }
+            }
+
+            return min;
+        }
+
+        private static float DistanceXZ(Vector3 a, Vector3 b)
+        {
+            var dx = a.x - b.x;
+            var dz = a.z - b.z;
+            return Mathf.Sqrt(dx * dx + dz * dz);
         }
     }
 }

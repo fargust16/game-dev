@@ -40,10 +40,14 @@ namespace GameDev.EditorTools
         private const float RoadFalloff = 8f;
         private const float SettlementClearRadius = 28f;
         private const float SettlementFalloff = 22f;
-        private const float PoiClearRadius = 10f;
-        private const float PoiFalloff = 12f;
-        private const float TownApproachClearRadius = 22f;
-        private const float TownApproachFalloff = 18f;
+        // Hard empty pocket around POI props/buildings so forest/grass does not sit on the marker;
+        // short falloff lets flora resume just outside that pocket.
+        private const float PoiClearRadius = 14f;
+        private const float PoiFalloff = 8f;
+        private const float CampClearRadius = 18f;
+        private const float CampFalloff = 10f;
+        private const float TownApproachClearRadius = 24f;
+        private const float TownApproachFalloff = 14f;
 
         private struct Entry
         {
@@ -624,11 +628,26 @@ namespace GameDev.EditorTools
                 foreach (Transform child in poiRoot.transform)
                 {
                     var pos = child.position;
-                    var isTown = child.name.IndexOf("TownApproach", System.StringComparison.OrdinalIgnoreCase) >= 0;
-                    disks.Add(new VegetationClearance.Disk(
-                        new Vector2(pos.x, pos.z),
-                        isTown ? TownApproachClearRadius : PoiClearRadius,
-                        isTown ? TownApproachFalloff : PoiFalloff));
+                    var name = child.name;
+                    float clearR;
+                    float falloff;
+                    if (name.IndexOf("TownApproach", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        clearR = TownApproachClearRadius;
+                        falloff = TownApproachFalloff;
+                    }
+                    else if (name.IndexOf("Camp", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        clearR = CampClearRadius;
+                        falloff = CampFalloff;
+                    }
+                    else
+                    {
+                        clearR = PoiClearRadius;
+                        falloff = PoiFalloff;
+                    }
+
+                    disks.Add(new VegetationClearance.Disk(new Vector2(pos.x, pos.z), clearR, falloff));
                 }
             }
 

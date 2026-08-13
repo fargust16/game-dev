@@ -17,8 +17,8 @@ namespace GameDev.EditorTools
     /// <summary>
     /// Overworld V0 POI groundwork (WORLD_GENERATION_PIPELINE.md Iteration 08 / OVERWORLD_V0_PLAN
     /// W0.6): runs <see cref="StubPoiPlacer"/> over the current MapMagic tile's chunk range and
-    /// drops a visual per placed POI, raycast onto the real terrain surface (same pattern as
-    /// VegetationScatterMenu). Most kinds get a real Low Poly Environment/Village prop (see
+    /// drops a visual per placed POI, grounded via <c>Terrain.SampleHeight</c> (same pattern as
+    /// VegetationScatterMenu — Physics raycasts miss when tile height exceeds the old 400m ray). Most kinds get a real Low Poly Environment/Village prop (see
     /// ASSET_LIBRARY_REFERENCE.md - no dedicated ruin/shrine/cave asset exists, so each reuses the
     /// closest-fitting prop from the same library VegetationScatterMenu already draws from); a
     /// "city" (TownApproach) or Camp instead borrows a single generated building from the Exterior
@@ -116,8 +116,9 @@ namespace GameDev.EditorTools
 
             var terrain = tile.main?.terrain;
             var holder = terrain != null ? terrain.GetComponent<DirectMatricesHolder>() : null;
-            if (holder == null)
+            if (terrain == null || holder == null)
             {
+                Debug.LogWarning("[POI] PlaceMarkers aborted: terrain or DirectMatricesHolder missing.");
                 return;
             }
 
@@ -134,12 +135,17 @@ namespace GameDev.EditorTools
             IWaterSampler waterZones = new CompositeWaterSampler(lakeZones, riverZones);
             var visualRng = worldSeed.Fork("poi-visual");
             var buildingArchetypes = ShellCatalogFactory.CreateDefaultArchetypes();
+            var placed = 0;
+            var skippedNoSurface = 0;
+            var skippedWater = 0;
+            var skippedNoPrefab = 0;
             foreach (var chunk in candidateChunks)
             {
                 foreach (var marker in placer.PlaceForChunk(chunk))
                 {
-                    if (!TryFindSurface(marker.Position.x, marker.Position.z, out var y))
+                    if (!TrySampleTerrainHeight(terrain, marker.Position.x, marker.Position.z, out var y))
                     {
+                        skippedNoSurface++;
                         continue;
                     }
 
@@ -147,18 +153,21 @@ namespace GameDev.EditorTools
                         waterZones.TryGetWaterLevel(marker.Position.x, marker.Position.z, out var waterY) &&
                         y <= waterY)
                     {
+                        skippedWater++;
                         continue;
                     }
 
                     if (BuildingKindDistricts.TryGetValue(marker.Kind, out var districtKind))
                     {
                         SpawnBuilding(root.transform, marker, districtKind, y, worldSeed, buildingArchetypes);
+                        placed++;
                         continue;
                     }
 
                     var prefab = PickPrefab(marker.Kind, marker.Biome, visualRng);
                     if (prefab == null)
                     {
+                        skippedNoPrefab++;
                         continue;
                     }
 
@@ -168,8 +177,13 @@ namespace GameDev.EditorTools
                     visual.transform.position = new Vector3(marker.Position.x, y, marker.Position.z);
                     visual.transform.rotation = Quaternion.Euler(0f, (float)visualRng.NextDouble() * 360f, 0f);
                     visual.transform.localScale = Vector3.one * MarkerScale;
+                    placed++;
                 }
             }
+
+            Debug.Log(
+                $"[POI] placed={placed} (seed={OverworldTerrainMenu.LastSeed}, markers={placer.AllMarkers().Count}) " +
+                $"skipped: noSurface={skippedNoSurface} water={skippedWater} noPrefab={skippedNoPrefab}");
         }
 
         // Temporary stand-in (per WORLD_GENERATION_PIPELINE.md Iteration 08/10 notes) for real
@@ -231,17 +245,24 @@ namespace GameDev.EditorTools
             }
         }
 
-        private static bool TryFindSurface(float x, float z, out float y)
+        private static bool TrySampleTerrainHeight(UnityEngine.Terrain terrain, float x, float z, out float y)
         {
-            const float rayStartY = 400f;
-            if (Physics.Raycast(new Vector3(x, rayStartY, z), Vector3.down, out var hit, rayStartY * 2f))
+            if (terrain == null || terrain.terrainData == null)
             {
-                y = hit.point.y;
-                return true;
+                y = 0f;
+                return false;
             }
 
-            y = 0f;
-            return false;
+            var pos = terrain.transform.position;
+            var size = terrain.terrainData.size;
+            if (x < pos.x || z < pos.z || x > pos.x + size.x || z > pos.z + size.z)
+            {
+                y = 0f;
+                return false;
+            }
+
+            y = terrain.SampleHeight(new Vector3(x, 0f, z)) + pos.y;
+            return true;
         }
 
         private static GameObject PickPrefab(PoiKind kind, BiomeId biome, System.Random rng)
