@@ -115,7 +115,7 @@ namespace GameDev.EditorTools
         /// <summary>Editor height probe — prefer TerrainCollider, else nearest ground hit.</summary>
         private sealed class RaycastWorldHeightSampler : IWorldHeightSampler
         {
-            private const float RayStartY = 400f;
+            private const float RayStartY = 4000f;
 
             public bool TrySampleWorldY(float worldX, float worldZ, out float worldY)
             {

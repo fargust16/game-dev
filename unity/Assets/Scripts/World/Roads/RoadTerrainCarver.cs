@@ -3,40 +3,37 @@ using UnityEngine;
 
 namespace GameDev.World.Roads
 {
+    /// <summary>One worn-path stroke: densified segment carve + optional dirt alphamap paint.</summary>
+    public readonly struct RoadCarveStroke
+    {
+        public IReadOnlyList<Vector2> Centerline { get; }
+        public float CarveWidthMeters { get; }
+        public float CarveDepthMeters { get; }
+        public float PaintWidthMeters { get; }
+
+        public RoadCarveStroke(
+            IReadOnlyList<Vector2> centerline,
+            float carveWidthMeters,
+            float carveDepthMeters,
+            float paintWidthMeters = 0f)
+        {
+            Centerline = centerline;
+            CarveWidthMeters = carveWidthMeters;
+            CarveDepthMeters = carveDepthMeters;
+            PaintWidthMeters = paintWidthMeters > 0f ? paintWidthMeters : carveWidthMeters;
+        }
+    }
+
     /// <summary>
-    /// Presses a shallow, smooth-edged groove into a Unity <see cref="UnityEngine.Terrain"/>'s
-    /// heightmap along a set of road centerlines, and optionally paints a matching "worn dirt"
-    /// texture layer into the alphamap over the same footprint - the "worn cart track" look
-    /// (WORLD_GENERATION_PIPELINE.md Iteration 09): centuries of wheels and hooves settle a road
-    /// into the ground and wear the grass away, rather than leaving a ribbon resting on top of
-    /// undisturbed ground. Both passes read the whole map once, apply every centerline's
-    /// contribution to an in-memory copy, then write back once - point-by-point
-    /// <c>TerrainData.SetHeights</c>/<c>SetAlphamaps</c> calls would be both slow (each can trigger a
-    /// sync) and wrong within a single call (each successive point would measure against the
-    /// already-modified ground instead of the original).
-    /// <para>
-    /// Known limitation: neither pass has any memory of what the terrain looked like before the
-    /// first carve, so calling <see cref="Carve"/> again on an already-carved terrain (e.g. running
-    /// <c>Build Road Network</c> twice without regenerating terrain in between) carves/paints a
-    /// second time on top of the first rather than replacing it. Regenerating terrain
-    /// (<c>OverworldTerrainMenu</c>) always produces a fresh heightmap/alphamap from the graph, so
-    /// that's the reliable way to get a clean result.
-    /// </para>
+    /// Presses a shallow continuous worn groove into terrain along road centerlines (capsule
+    /// segments like river carve, gentler depth) and paints matching dirt into the alphamap.
     /// </summary>
     public static class RoadTerrainCarver
     {
-        // Never sample fewer than this many pixels of radius, regardless of how wide the caller
-        // asked for relative to the map's actual resolution - a coarse heightmap/alphamap (a few
-        // metres per texel) could otherwise resolve a "wide" groove down to a single pixel, which
-        // reads as a barely-there dimple instead of a real trench no matter how deep it's set.
         private const int MinRadiusPixels = 4;
+        public const float DensifyStepMeters = 2.5f;
+        private const int CorridorSoftenPasses = 1;
 
-        /// <param name="grooveLayer">Terrain layer painted into the alphamap along the same
-        /// footprint as the height carve (e.g. a dirt layer, so the groove reads as trampled ground,
-        /// not just a dip in the grass). Pass null to skip texture painting and only carve height.</param>
-        /// <param name="paintWidthMeters">Width of the alphamap paint - independent of
-        /// <paramref name="carveWidthMeters"/> so the visible "bare dirt" strip can be narrower or
-        /// wider than the height groove's own banks.</param>
         public static void Carve(
             UnityEngine.Terrain terrain,
             IEnumerable<IReadOnlyList<Vector2>> centerlines,
@@ -45,27 +42,38 @@ namespace GameDev.World.Roads
             TerrainLayer grooveLayer = null,
             float paintWidthMeters = 0f)
         {
+            var strokes = new List<RoadCarveStroke>();
+            foreach (var line in centerlines)
+            {
+                strokes.Add(new RoadCarveStroke(line, carveWidthMeters, carveDepthMeters, paintWidthMeters));
+            }
+
+            Carve(terrain, strokes, grooveLayer);
+        }
+
+        public static void Carve(
+            UnityEngine.Terrain terrain,
+            IEnumerable<RoadCarveStroke> strokes,
+            TerrainLayer grooveLayer = null)
+        {
             if (terrain == null || terrain.terrainData == null)
             {
                 return;
             }
 
-            // Centerlines is a lazily-enumerable sequence in general - both passes need to walk it
-            // fully and independently, so pin it to a list once up front instead of re-enumerating
-            // (or worse, exhausting) whatever the caller passed in.
-            var pinned = new List<IReadOnlyList<Vector2>>(centerlines);
+            var pinned = new List<RoadCarveStroke>(strokes);
+            if (pinned.Count == 0)
+            {
+                return;
+            }
 
-            CarveHeights(terrain, pinned, carveWidthMeters, carveDepthMeters);
+            CarveHeights(terrain, pinned);
 
             if (grooveLayer != null)
             {
-                PaintGroove(terrain, pinned, paintWidthMeters > 0f ? paintWidthMeters : carveWidthMeters, grooveLayer);
+                PaintGroove(terrain, pinned, grooveLayer);
             }
 
-            // TerrainCollider can lag a direct SetHeights/SetAlphamaps call - reassigning its
-            // terrainData forces an immediate resync, so a raycast against this terrain right after
-            // Carve() (as RoadNetworkMenu's mesh-building pass does) hits the newly-carved surface,
-            // not the stale pre-carve one.
             var collider = terrain.GetComponent<TerrainCollider>();
             if (collider != null)
             {
@@ -73,96 +81,186 @@ namespace GameDev.World.Roads
             }
         }
 
-        private static void CarveHeights(
-            UnityEngine.Terrain terrain,
-            IReadOnlyList<IReadOnlyList<Vector2>> centerlines,
-            float carveWidthMeters,
-            float carveDepthMeters)
+        private static void CarveHeights(UnityEngine.Terrain terrain, IReadOnlyList<RoadCarveStroke> strokes)
         {
             var data = terrain.terrainData;
             var resolution = data.heightmapResolution;
             var heights = data.GetHeights(0, 0, resolution, resolution);
             var original = (float[,])heights.Clone();
+            var carvedMask = new bool[resolution, resolution];
 
             var terrainPos = terrain.transform.position;
             var size = data.size;
-            var halfWidth = carveWidthMeters * 0.5f;
-            var depthNormalized = carveDepthMeters / Mathf.Max(size.y, 0.01f);
-
             var worldPerPixelX = size.x / (resolution - 1);
             var worldPerPixelZ = size.z / (resolution - 1);
-            var radiusPixelsX = Mathf.Max(MinRadiusPixels, Mathf.CeilToInt(halfWidth / worldPerPixelX) + 1);
-            var radiusPixelsZ = Mathf.Max(MinRadiusPixels, Mathf.CeilToInt(halfWidth / worldPerPixelZ) + 1);
+            var worldHeight = Mathf.Max(size.y, 0.01f);
 
-            foreach (var centerline in centerlines)
+            foreach (var stroke in strokes)
             {
-                foreach (var point in centerline)
-                {
-                    CarveHeightPoint(
-                        heights, original, resolution, resolution,
-                        terrainPos, worldPerPixelX, worldPerPixelZ,
-                        point, halfWidth, radiusPixelsX, radiusPixelsZ, depthNormalized);
-                }
-            }
-
-            data.SetHeights(0, 0, heights);
-        }
-
-        private static void CarveHeightPoint(
-            float[,] heights,
-            float[,] original,
-            int resolutionX,
-            int resolutionZ,
-            Vector3 terrainPos,
-            float worldPerPixelX,
-            float worldPerPixelZ,
-            Vector2 worldPoint,
-            float halfWidth,
-            int radiusPixelsX,
-            int radiusPixelsZ,
-            float depthNormalized)
-        {
-            var localX = (worldPoint.x - terrainPos.x) / worldPerPixelX;
-            var localZ = (worldPoint.y - terrainPos.z) / worldPerPixelZ;
-            var centerPx = Mathf.RoundToInt(localX);
-            var centerPz = Mathf.RoundToInt(localZ);
-
-            for (var dz = -radiusPixelsZ; dz <= radiusPixelsZ; dz++)
-            {
-                var pz = centerPz + dz;
-                if (pz < 0 || pz >= resolutionZ)
+                var dense = DensifyPolyline(stroke.Centerline, DensifyStepMeters);
+                if (dense.Count < 2)
                 {
                     continue;
                 }
 
-                for (var dx = -radiusPixelsX; dx <= radiusPixelsX; dx++)
-                {
-                    var px = centerPx + dx;
-                    if (px < 0 || px >= resolutionX)
-                    {
-                        continue;
-                    }
+                var halfW = Mathf.Max(stroke.CarveWidthMeters * 0.5f, 1f);
+                var depth = Mathf.Max(stroke.CarveDepthMeters, 0.05f);
 
-                    var worldDx = (px - localX) * worldPerPixelX;
-                    var worldDz = (pz - localZ) * worldPerPixelZ;
-                    var dist = Mathf.Sqrt(worldDx * worldDx + worldDz * worldDz);
+                for (var i = 0; i < dense.Count - 1; i++)
+                {
+                    CarveHeightSegment(
+                        heights, original, carvedMask, resolution,
+                        terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight,
+                        dense[i], dense[i + 1], halfW, depth);
+                }
+            }
+
+            SoftenCarvedCorridor(heights, carvedMask, resolution, CorridorSoftenPasses);
+            data.SetHeights(0, 0, heights);
+        }
+
+        public static List<Vector2> DensifyPolyline(IReadOnlyList<Vector2> source, float stepMeters)
+        {
+            var result = new List<Vector2>();
+            if (source == null || source.Count == 0)
+            {
+                return result;
+            }
+
+            result.Add(source[0]);
+            var step = Mathf.Max(stepMeters, 0.5f);
+            for (var i = 1; i < source.Count; i++)
+            {
+                var a = source[i - 1];
+                var b = source[i];
+                var flat = Vector2.Distance(a, b);
+                var segments = Mathf.Max(1, Mathf.CeilToInt(flat / step));
+                for (var s = 1; s <= segments; s++)
+                {
+                    result.Add(Vector2.Lerp(a, b, s / (float)segments));
+                }
+            }
+
+            return result;
+        }
+
+        private static void CarveHeightSegment(
+            float[,] heights,
+            float[,] original,
+            bool[,] carvedMask,
+            int resolution,
+            Vector3 terrainPos,
+            float worldPerPixelX,
+            float worldPerPixelZ,
+            float worldHeight,
+            Vector2 a,
+            Vector2 b,
+            float halfWidth,
+            float depthMeters)
+        {
+            var pad = halfWidth + worldPerPixelX * 2f;
+            var minX = Mathf.Min(a.x, b.x) - pad;
+            var maxX = Mathf.Max(a.x, b.x) + pad;
+            var minZ = Mathf.Min(a.y, b.y) - pad;
+            var maxZ = Mathf.Max(a.y, b.y) + pad;
+
+            var minPx = Mathf.Max(0, Mathf.FloorToInt((minX - terrainPos.x) / worldPerPixelX) - 1);
+            var maxPx = Mathf.Min(resolution - 1, Mathf.CeilToInt((maxX - terrainPos.x) / worldPerPixelX) + 1);
+            var minPz = Mathf.Max(0, Mathf.FloorToInt((minZ - terrainPos.z) / worldPerPixelZ) - 1);
+            var maxPz = Mathf.Min(resolution - 1, Mathf.CeilToInt((maxZ - terrainPos.z) / worldPerPixelZ) + 1);
+
+            var ab = b - a;
+            var abLenSq = ab.sqrMagnitude;
+            if (abLenSq < 1e-6f)
+            {
+                return;
+            }
+
+            for (var pz = minPz; pz <= maxPz; pz++)
+            {
+                for (var px = minPx; px <= maxPx; px++)
+                {
+                    var worldX = terrainPos.x + px * worldPerPixelX;
+                    var worldZ = terrainPos.z + pz * worldPerPixelZ;
+                    var p = new Vector2(worldX, worldZ);
+                    var ap = p - a;
+                    var t = Mathf.Clamp01(Vector2.Dot(ap, ab) / abLenSq);
+                    var closest = a + ab * t;
+                    var dist = Vector2.Distance(p, closest);
                     if (dist > halfWidth)
                     {
                         continue;
                     }
 
-                    // Smoothstep falloff: full depth at the centerline, tapering to zero extra depth
-                    // at halfWidth, so the groove blends into the surrounding ground instead of
-                    // leaving a hard-edged trench.
-                    var t = dist / halfWidth;
-                    var smooth = t * t * (3f - 2f * t);
-                    var depthHere = depthNormalized * (1f - smooth);
+                    var u = dist / Mathf.Max(halfWidth, 1e-3f);
+                    var radial = u * u * (3f - 2f * u);
+                    // Flatter worn tread: more depth across the centre strip than a sharp V.
+                    var centreFlat = 1f - Mathf.SmoothStep(0.25f, 1f, u);
+                    var profile = Mathf.Max(1f - radial, centreFlat * 0.9f);
+                    var depthNorm = (depthMeters / worldHeight) * profile;
 
-                    // heights/original are indexed [z, x] (Unity's TerrainData.GetHeights convention).
-                    var candidate = original[pz, px] - depthHere;
+                    var candidate = original[pz, px] - depthNorm;
                     if (candidate < heights[pz, px])
                     {
                         heights[pz, px] = Mathf.Clamp01(candidate);
+                        carvedMask[pz, px] = true;
+                    }
+                }
+            }
+        }
+
+        private static void SoftenCarvedCorridor(
+            float[,] heights, bool[,] carvedMask, int resolution, int passes)
+        {
+            var n = Mathf.Clamp(passes, 0, 6);
+            if (n == 0)
+            {
+                return;
+            }
+
+            var scratch = new float[resolution, resolution];
+            for (var pass = 0; pass < n; pass++)
+            {
+                for (var pz = 0; pz < resolution; pz++)
+                {
+                    for (var px = 0; px < resolution; px++)
+                    {
+                        if (!carvedMask[pz, px])
+                        {
+                            scratch[pz, px] = heights[pz, px];
+                            continue;
+                        }
+
+                        var sum = 0f;
+                        var count = 0;
+                        for (var dz = -1; dz <= 1; dz++)
+                        {
+                            for (var dx = -1; dx <= 1; dx++)
+                            {
+                                var nx = px + dx;
+                                var nz = pz + dz;
+                                if (nx < 0 || nz < 0 || nx >= resolution || nz >= resolution)
+                                {
+                                    continue;
+                                }
+
+                                sum += heights[nz, nx];
+                                count++;
+                            }
+                        }
+
+                        scratch[pz, px] = count > 0 ? sum / count : heights[pz, px];
+                    }
+                }
+
+                for (var pz = 0; pz < resolution; pz++)
+                {
+                    for (var px = 0; px < resolution; px++)
+                    {
+                        if (carvedMask[pz, px])
+                        {
+                            heights[pz, px] = scratch[pz, px];
+                        }
                     }
                 }
             }
@@ -170,36 +268,30 @@ namespace GameDev.World.Roads
 
         private static void PaintGroove(
             UnityEngine.Terrain terrain,
-            IReadOnlyList<IReadOnlyList<Vector2>> centerlines,
-            float paintWidthMeters,
+            IReadOnlyList<RoadCarveStroke> strokes,
             TerrainLayer grooveLayer)
         {
             var data = terrain.terrainData;
-
-            // Must happen before GetAlphamaps - adding a layer resizes the alphamap's layer
-            // dimension, and fetching first would hand back a stale, one-layer-short array.
             var layerIndex = EnsureLayer(data, grooveLayer);
 
             var resolution = data.alphamapResolution;
             var alphamaps = data.GetAlphamaps(0, 0, resolution, resolution);
             var layerCount = alphamaps.GetLength(2);
-
-            // Desired groove-layer weight per pixel, the max across every centerline point that
-            // reaches it - computed once before touching alphamaps so multiple nearby points (or a
-            // road curving back near itself) don't compound into over-strong painting.
             var influence = new float[resolution, resolution];
 
             var terrainPos = terrain.transform.position;
             var size = data.size;
-            var halfWidth = paintWidthMeters * 0.5f;
             var worldPerPixelX = size.x / resolution;
             var worldPerPixelZ = size.z / resolution;
-            var radiusPixelsX = Mathf.Max(MinRadiusPixels, Mathf.CeilToInt(halfWidth / worldPerPixelX) + 1);
-            var radiusPixelsZ = Mathf.Max(MinRadiusPixels, Mathf.CeilToInt(halfWidth / worldPerPixelZ) + 1);
 
-            foreach (var centerline in centerlines)
+            foreach (var stroke in strokes)
             {
-                foreach (var point in centerline)
+                var dense = DensifyPolyline(stroke.Centerline, DensifyStepMeters);
+                var halfWidth = Mathf.Max(stroke.PaintWidthMeters * 0.5f, 1f);
+                var radiusPixelsX = Mathf.Max(MinRadiusPixels, Mathf.CeilToInt(halfWidth / worldPerPixelX) + 1);
+                var radiusPixelsZ = Mathf.Max(MinRadiusPixels, Mathf.CeilToInt(halfWidth / worldPerPixelZ) + 1);
+
+                foreach (var point in dense)
                 {
                     AccumulateInfluence(
                         influence, resolution, terrainPos, worldPerPixelX, worldPerPixelZ,
@@ -224,9 +316,6 @@ namespace GameDev.World.Roads
                         continue;
                     }
 
-                    // Scale every OTHER layer down proportionally so the total stays 1 - the groove
-                    // layer eats into whatever was there (grass, forest floor, etc.) rather than
-                    // just adding on top and pushing the total over 1.
                     var otherSum = 1f - current;
                     var newOtherSum = 1f - newWeight;
                     var scale = otherSum > 0.0001f ? newOtherSum / otherSum : 0f;

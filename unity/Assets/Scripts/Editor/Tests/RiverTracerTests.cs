@@ -190,14 +190,53 @@ namespace GameDev.World.Water.Tests
             var heights = MakeRamp(10);
             var grid = FlowNetwork.Compute(Sampler(heights), 0, 0, 10, 10, 1);
 
-            // Same channel-strength ramp as Trace_Ramp_EveryRiverEndsInTheLake, but with no lake for
-            // it to reach - every trace dead-ends at the tile edge (x=0 is a border cell) instead,
-            // and "always mountain to nearest lake, or it doesn't exist" means none of those partial
-            // runs should be returned as rivers.
+            // Lake-feeder pass discards OffTile/Sink runs. EnsureSpineRiver may still keep one long
+            // OffTile channel as the map-spanning stem when no lake exists on the stub tile.
             var rivers = RiverTracer.Trace(grid, Array.Empty<WaterZone>(), LowThresholdSettings());
 
-            Assert.AreEqual(0, rivers.Length,
-                "a run that never reaches a lake is a dead end, not a river - it should be discarded, not returned with a non-Lake termination");
+            Assert.LessOrEqual(rivers.Length, 1,
+                "without lakes, only an optional OffTile spine is allowed — not a pile of dead-end feeders");
+            if (rivers.Length == 1)
+            {
+                Assert.AreEqual(RiverTermination.OffTile, rivers[0].Termination);
+            }
+        }
+
+        [Test]
+        public void Trace_LargeRamp_SpineRiverSpansMostOfTheTile()
+        {
+            // Bigger grid so the 0.45× tile-span length gate for EnsureSpineRiver is meaningful.
+            const int size = 40;
+            var heights = MakeRamp(size);
+            var grid = FlowNetwork.Compute(Sampler(heights), 0, 0, size, size, 1);
+            var lakes = new[] { MakeLakeAtLowXColumn(size) };
+
+            var rivers = RiverTracer.Trace(grid, lakes, LowThresholdSettings(maxRivers: 4));
+            Assert.Greater(rivers.Length, 0);
+
+            var tileSpan = size;
+            var minLen = tileSpan * 0.45f;
+            var longest = 0f;
+            foreach (var river in rivers)
+            {
+                var len = 0f;
+                for (var i = 1; i < river.Centerline.Count; i++)
+                {
+                    var a = river.Centerline[i - 1];
+                    var b = river.Centerline[i];
+                    var dx = b.x - a.x;
+                    var dz = b.z - a.z;
+                    len += Mathf.Sqrt(dx * dx + dz * dz);
+                }
+
+                if (len > longest)
+                {
+                    longest = len;
+                }
+            }
+
+            Assert.GreaterOrEqual(longest, minLen * 0.85f,
+                "expected at least one mountain→lake/OffTile stem spanning most of the tile");
         }
 
         [Test]

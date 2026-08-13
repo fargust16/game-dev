@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using Den.Tools;
+using GameDev.World.Roads;
 using GameDev.World.Seed;
 using GameDev.World.Settlement;
 using GameDev.World.Terrain;
@@ -652,24 +653,12 @@ namespace GameDev.EditorTools
             }
 
             var roadSamples = new List<Vector2>(512);
-            var roads = GameObject.Find("OverworldRoads");
-            if (roads != null)
+            var roadClearance = Object.FindFirstObjectByType<OverworldRoadClearance>();
+            if (roadClearance != null && roadClearance.Samples != null)
             {
-                foreach (var filter in roads.GetComponentsInChildren<MeshFilter>())
+                for (var i = 0; i < roadClearance.Samples.Count; i++)
                 {
-                    var mesh = filter.sharedMesh;
-                    if (mesh == null)
-                    {
-                        continue;
-                    }
-
-                    var verts = mesh.vertices;
-                    var step = Mathf.Max(1, verts.Length / 40);
-                    for (var i = 0; i < verts.Length; i += step)
-                    {
-                        var w = filter.transform.TransformPoint(verts[i]);
-                        roadSamples.Add(new Vector2(w.x, w.z));
-                    }
+                    roadSamples.Add(roadClearance.Samples[i]);
                 }
             }
 

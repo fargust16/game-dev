@@ -136,5 +136,90 @@ namespace GameDev.World.Roads.Tests
 
             Assert.AreEqual(20, connected.Count, "every node must end up reachable despite the KNN candidate limit");
         }
+
+        [Test]
+        public void BuildHierarchicalNetwork_TownsAreMain_OtherPoisAreBranches()
+        {
+            var grid = new RoadGridSpec(0f, 0f, 40, 40, 10f);
+            // Three hubs (towns) + two camps.
+            var nodes = new List<Vector2>
+            {
+                new Vector2(20f, 20f),  // 0 hub
+                new Vector2(20f, 380f), // 1 hub
+                new Vector2(380f, 20f), // 2 hub
+                new Vector2(100f, 40f), // 3 branch near hub 0
+                new Vector2(40f, 300f), // 4 branch near hub 1
+            };
+            var isHub = new List<bool> { true, true, true, false, false };
+
+            var segments = RoadNetworkBuilder.BuildHierarchicalNetwork(nodes, isHub, grid, (x, z) => 1f);
+
+            var main = 0;
+            var branch = 0;
+            foreach (var seg in segments)
+            {
+                if (seg.Tier == RoadTier.Main)
+                {
+                    main++;
+                    Assert.IsTrue(isHub[seg.NodeA] && isHub[seg.NodeB], "Main edges must connect hubs only");
+                }
+                else
+                {
+                    branch++;
+                    Assert.IsTrue(
+                        (isHub[seg.NodeA] && !isHub[seg.NodeB]) || (!isHub[seg.NodeA] && isHub[seg.NodeB]),
+                        "Branch edges must attach a non-hub to a hub");
+                }
+            }
+
+            Assert.AreEqual(2, main, "open TSP path over 3 hubs has 2 main edges");
+            Assert.AreEqual(2, branch, "each non-hub should get one branch spur");
+
+            // Main tract must be a single path visiting every hub (TSP open path), not a star.
+            var hubDegree = new Dictionary<int, int>();
+            foreach (var seg in segments)
+            {
+                if (seg.Tier != RoadTier.Main)
+                {
+                    continue;
+                }
+
+                hubDegree[seg.NodeA] = hubDegree.TryGetValue(seg.NodeA, out var da) ? da + 1 : 1;
+                hubDegree[seg.NodeB] = hubDegree.TryGetValue(seg.NodeB, out var db) ? db + 1 : 1;
+            }
+
+            Assert.AreEqual(3, hubDegree.Count, "every hub must lie on the main tract");
+            var endpoints = 0;
+            foreach (var kv in hubDegree)
+            {
+                Assert.IsTrue(kv.Value == 1 || kv.Value == 2);
+                if (kv.Value == 1)
+                {
+                    endpoints++;
+                }
+            }
+
+            Assert.AreEqual(2, endpoints, "open TSP path has exactly two endpoints");
+        }
+
+        [Test]
+        public void BuildHierarchicalNetwork_NoHubs_FallsBackToFlatMst()
+        {
+            var grid = MakeGrid();
+            var nodes = new List<Vector2>
+            {
+                new Vector2(10f, 10f),
+                new Vector2(10f, 90f),
+                new Vector2(90f, 10f),
+            };
+            var isHub = new List<bool> { false, false, false };
+
+            var segments = RoadNetworkBuilder.BuildHierarchicalNetwork(nodes, isHub, grid, (x, z) => 1f);
+            Assert.AreEqual(2, segments.Count);
+            foreach (var seg in segments)
+            {
+                Assert.AreEqual(RoadTier.Main, seg.Tier);
+            }
+        }
     }
 }

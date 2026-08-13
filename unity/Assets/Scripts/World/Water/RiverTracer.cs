@@ -188,7 +188,232 @@ namespace GameDev.World.Water
             }
 
             EnsureLakeFeeders(grid, lakes, rivers, claimed, acceptedStarts, settings, maxSteps);
+            EnsureSpineRiver(grid, lakes, rivers, claimed, acceptedStarts, settings, maxSteps);
             return rivers.ToArray();
+        }
+
+        /// <summary>
+        /// One long mountain-origin river that spans a large fraction of the tile (lake mouth or
+        /// OffTile border exit). Reserved outside the normal <see cref="RiverTracerSettings.MaxRivers"/>
+        /// cap so lake feeders are not displaced.
+        /// </summary>
+        private static void EnsureSpineRiver(
+            FlowGrid grid,
+            IReadOnlyList<WaterZone> lakes,
+            List<RiverPath> rivers,
+            bool[,] claimed,
+            List<Vector2> acceptedStarts,
+            RiverTracerSettings settings,
+            int maxSteps)
+        {
+            var tileSpan = Mathf.Max(grid.Width, grid.Depth) * grid.CellSize;
+            var minLength = tileSpan * 0.45f;
+
+            for (var i = 0; i < rivers.Count; i++)
+            {
+                if (IsLongSpineCandidate(rivers[i], minLength))
+                {
+                    return;
+                }
+            }
+
+            if (!TryFindHighestChannelHead(grid, settings, out var hx, out var hz))
+            {
+                return;
+            }
+
+            // Scratch claim so a failed spine attempt does not pollute the feeder corridors.
+            var scratchClaimed = (bool[,])claimed.Clone();
+            scratchClaimed[hx, hz] = false;
+
+            var path = TraceOne(grid, lakes, scratchClaimed, hx, hz, maxSteps, settings, rivers.Count);
+            if (path == null || !IsLongSpineCandidate(path, minLength))
+            {
+                path = BuildDescendingPathTowardFarBorder(grid, hx, hz, settings, rivers.Count);
+            }
+
+            if (path == null || PathLengthXZ(path) < minLength * 0.85f)
+            {
+                return;
+            }
+
+            if (path.Termination != RiverTermination.Lake &&
+                path.Termination != RiverTermination.OffTile)
+            {
+                // Long sink path still reads as a map-spanning channel on a single stub tile.
+                if (PathLengthXZ(path) < minLength)
+                {
+                    return;
+                }
+            }
+
+            rivers.Add(path);
+            var start = grid.CellToWorld(hx, hz);
+            acceptedStarts.Add(new Vector2(start.x, start.y));
+            ClaimPathCorridor(claimed, path, grid, radiusCells: 3);
+        }
+
+        private static bool IsLongSpineCandidate(RiverPath path, float minLength)
+        {
+            if (path == null || path.Centerline.Count < 2)
+            {
+                return false;
+            }
+
+            if (PathLengthXZ(path) < minLength)
+            {
+                return false;
+            }
+
+            return path.Termination == RiverTermination.Lake ||
+                   path.Termination == RiverTermination.OffTile;
+        }
+
+        private static float PathLengthXZ(RiverPath path)
+        {
+            var len = 0f;
+            for (var i = 1; i < path.Centerline.Count; i++)
+            {
+                var a = path.Centerline[i - 1];
+                var b = path.Centerline[i];
+                var dx = b.x - a.x;
+                var dz = b.z - a.z;
+                len += Mathf.Sqrt(dx * dx + dz * dz);
+            }
+
+            return len;
+        }
+
+        private static bool TryFindHighestChannelHead(
+            FlowGrid grid, RiverTracerSettings settings, out int bestX, out int bestZ)
+        {
+            bestX = 0;
+            bestZ = 0;
+            bool IsChannel(int x, int z) => grid.AccumulationAt(x, z) >= settings.ChannelAccumulationThreshold;
+            bool IsValidSource(int x, int z) => grid.HeightAt(x, z) >= settings.MinSourceElevationY;
+            var heads = FindHeads(grid, IsChannel, IsValidSource);
+            if (heads.Count == 0)
+            {
+                return false;
+            }
+
+            var bestY = float.NegativeInfinity;
+            var bestAccum = -1;
+            var found = false;
+            for (var i = 0; i < heads.Count; i++)
+            {
+                var h = heads[i];
+                var y = grid.HeightAt(h.X, h.Z);
+                if (y < bestY || (Mathf.Approximately(y, bestY) && h.Accum <= bestAccum))
+                {
+                    continue;
+                }
+
+                bestY = y;
+                bestAccum = h.Accum;
+                bestX = h.X;
+                bestZ = h.Z;
+                found = true;
+            }
+
+            return found;
+        }
+
+        private static RiverPath BuildDescendingPathTowardFarBorder(
+            FlowGrid grid,
+            int startX,
+            int startZ,
+            RiverTracerSettings settings,
+            int riverIndex)
+        {
+            var startWorld = grid.CellToWorld(startX, startZ);
+            var midX = grid.OriginX + grid.Width * grid.CellSize * 0.5f;
+            var midZ = grid.OriginZ + grid.Depth * grid.CellSize * 0.5f;
+
+            // Push toward the opposite tile border from the source.
+            float targetX;
+            float targetZ;
+            if (Mathf.Abs(startWorld.x - midX) >= Mathf.Abs(startWorld.y - midZ))
+            {
+                targetX = startWorld.x < midX
+                    ? grid.OriginX + (grid.Width - 1) * grid.CellSize
+                    : grid.OriginX;
+                targetZ = startWorld.y;
+            }
+            else
+            {
+                targetX = startWorld.x;
+                targetZ = startWorld.y < midZ
+                    ? grid.OriginZ + (grid.Depth - 1) * grid.CellSize
+                    : grid.OriginZ;
+            }
+
+            var cellsX = new List<int>();
+            var cellsZ = new List<int>();
+            var cx = startX;
+            var cz = startZ;
+            var maxSteps = grid.Width + grid.Depth;
+
+            for (var step = 0; step < maxSteps; step++)
+            {
+                cellsX.Add(cx);
+                cellsZ.Add(cz);
+
+                if (grid.IsBorderCell(cx, cz) && step > 4)
+                {
+                    break;
+                }
+
+                var bestX = cx;
+                var bestZ = cz;
+                var bestScore = float.PositiveInfinity;
+                var curY = grid.HeightAt(cx, cz);
+                foreach (var (dx, dz) in Neighbors8)
+                {
+                    var nx = cx + dx;
+                    var nz = cz + dz;
+                    if (!grid.InBounds(nx, nz))
+                    {
+                        continue;
+                    }
+
+                    var ny = grid.HeightAt(nx, nz);
+                    if (ny > curY + 0.08f)
+                    {
+                        continue;
+                    }
+
+                    var nw = grid.CellToWorld(nx, nz);
+                    var ddx = nw.x - targetX;
+                    var ddz = nw.y - targetZ;
+                    var distSq = ddx * ddx + ddz * ddz;
+                    var score = distSq + (ny - curY) * 25f;
+                    if (score < bestScore)
+                    {
+                        bestScore = score;
+                        bestX = nx;
+                        bestZ = nz;
+                    }
+                }
+
+                if (bestX == cx && bestZ == cz)
+                {
+                    break;
+                }
+
+                cx = bestX;
+                cz = bestZ;
+            }
+
+            if (cellsX.Count < settings.MinPathCells)
+            {
+                return null;
+            }
+
+            var termination = grid.IsBorderCell(cellsX[cellsX.Count - 1], cellsZ[cellsZ.Count - 1])
+                ? RiverTermination.OffTile
+                : RiverTermination.Sink;
+            return BuildPath(grid, cellsX, cellsZ, termination, settings, riverIndex);
         }
 
         /// <summary>

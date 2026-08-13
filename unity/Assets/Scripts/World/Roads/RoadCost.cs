@@ -22,7 +22,9 @@ namespace GameDev.World.Roads
         public const float BaseCost = 1f;
         public const float SwampCost = 2.5f;
         public const float HighlandCost = 1.6f;
-        public const float MountainCost = 4f;
+        // High enough that roads prefer highland/meadow skirts over mountain faces, while a flat
+        // mountain saddle can still beat a near-vertical highland climb (see RoadCostTests).
+        public const float MountainCost = 9f;
 
         /// <summary>How sharply a steep slope multiplies cost on top of the biome cost - large
         /// enough that the pathfinder detours through a gentler saddle rather than climbing
