@@ -6,10 +6,11 @@ namespace GameDev.World.Streaming
     /// <summary>
     /// Integer XZ coordinate of a 64 m overworld chunk. Floor-divides world position so
     /// negative coordinates map correctly (e.g. world x = -1 belongs to chunk x = -1, not 0).
+    /// Size must stay equal to <see cref="WorldScale.ChunkSizeMeters"/>.
     /// </summary>
     public readonly struct ChunkCoord : IEquatable<ChunkCoord>
     {
-        public const float ChunkSize = 64f;
+        public const float ChunkSize = GameDev.World.WorldScale.ChunkSizeMeters;
 
         public readonly int X;
         public readonly int Z;

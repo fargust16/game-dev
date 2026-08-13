@@ -86,94 +86,74 @@ namespace GameDev.World.Water
         }
 
         /// <summary>
-        /// After lake + river carves: sit the ribbon in the river trench. If the sample point falls
-        /// into a deep lake basin (span ≫ river carve), snap to that lake's water plane instead of
-        /// floating halfway up a 100m crater wall.
+        /// After lake + river carves: sit the ribbon just above the carved trench bed (small
+        /// freeboard), not mid-air from bank−bed·fill. Lake mouth still blends onto the lake plane.
         /// </summary>
         public void SyncWaterSurfaceAfterCarve(
             System.Func<float, float, float> sampleTerrainHeightY,
             float waterFillFraction,
             IReadOnlyList<WaterZone> lakes = null)
         {
-            var fill = Mathf.Clamp01(waterFillFraction);
+            var fill = Mathf.Clamp(waterFillFraction, 0.15f, 0.55f);
+            var bedSamples = new float[Centerline.Count];
+            var freeboards = new float[Centerline.Count];
+
             for (var i = 0; i < Centerline.Count; i++)
             {
                 var point = Centerline[i];
+                // Centerline only — wide SampleBedMin was pulling Y into side ditches / lake bowls
+                // (freeboard spikes to 16m) and then the ribbon buried on the real trench floor.
                 var bedY = sampleTerrainHeightY(point.x, point.z);
-                var bankY = point.y;
-                if (bankY < bedY + 0.05f)
-                {
-                    bankY = bedY + Mathf.Max(CarveDepths[i], 0.5f);
-                }
+                bedSamples[i] = bedY;
 
+                var freeboard = Mathf.Clamp(CarveDepths[i] * fill * 0.45f, 0.45f, 1.2f);
+                freeboards[i] = freeboard;
+                var surface = bedY + freeboard;
+
+                // Only sit on the lake plane when the sample is actually inside the lake
+                // (bed at/under water). Long blends floated a high sheet over the grass approach.
                 var lakeY = FindLakeWaterY(lakes, point.x, point.z);
-                float surface;
-                if (!float.IsNaN(lakeY) && bedY <= lakeY + 0.75f)
+                if (!float.IsNaN(lakeY) && bedY <= lakeY + 0.5f)
                 {
-                    // Only sit on the lake plane once the bed is actually at/under the water —
-                    // snapping earlier buries the ribbon under the dry shore bank (visible gap).
                     surface = lakeY;
-                }
-                else
-                {
-                    var span = bankY - bedY;
-                    var maxRiverSpan = Mathf.Max(CarveDepths[i] * 2f, 3f);
-                    if (span > maxRiverSpan)
-                    {
-                        // Deep foreign carve under the path (usually lake) but outside flood mask —
-                        // keep a shallow ribbon above the local bed, not mid-air.
-                        surface = bedY + Mathf.Max(CarveDepths[i] * fill, 0.35f);
-                    }
-                    else if (span < 0.2f)
-                    {
-                        surface = bankY - Mathf.Max(CarveDepths[i] * (1f - fill), 0.2f);
-                        if (surface < bedY + 0.05f)
-                        {
-                            surface = bedY + 0.05f;
-                        }
-                    }
-                    else
-                    {
-                        surface = bedY + span * fill;
-                        surface = Mathf.Clamp(surface, bedY + 0.1f, bankY - 0.05f);
-                    }
-
-                    // Soft blend toward lake when nearby and bed is approaching the plane.
-                    if (!float.IsNaN(lakeY) && bedY < lakeY + 4f)
-                    {
-                        var blend = Mathf.InverseLerp(lakeY + 4f, lakeY + 0.75f, bedY);
-                        surface = Mathf.Lerp(surface, Mathf.Max(lakeY, bedY + 0.1f), blend);
-                    }
                 }
 
                 waterSurfaceY[i] = surface;
             }
 
-            // Guarantee the mouth meets the lake plane when we terminated in a lake — but never
-            // pull segments that still sit on a dry bank above the lake (that hides the ribbon).
+            // Light smooth + clamp to bed (no downhill Min — that fought steep mountain drops).
+            for (var pass = 0; pass < 1; pass++)
+            {
+                for (var i = 1; i < Centerline.Count - 1; i++)
+                {
+                    waterSurfaceY[i] =
+                        (waterSurfaceY[i - 1] + waterSurfaceY[i] * 2f + waterSurfaceY[i + 1]) * 0.25f;
+                }
+            }
+
+            for (var i = 0; i < Centerline.Count; i++)
+            {
+                waterSurfaceY[i] = Mathf.Max(waterSurfaceY[i], bedSamples[i] + freeboards[i] * 0.9f);
+            }
+
+            // Short mouth blend: last few points already inside the lake only.
             if (Termination == RiverTermination.Lake && lakes != null && Centerline.Count > 0)
             {
                 var end = Centerline[Centerline.Count - 1];
                 var mouthLakeY = FindLakeWaterY(lakes, end.x, end.z);
-                if (float.IsNaN(mouthLakeY))
-                {
-                    mouthLakeY = FindNearestLakeWaterY(lakes, end.x, end.z, maxDistMeters: 48f);
-                }
-
                 if (!float.IsNaN(mouthLakeY))
                 {
-                    var tail = Mathf.Min(8, Centerline.Count);
+                    var tail = Mathf.Min(4, Centerline.Count);
                     for (var t = 0; t < tail; t++)
                     {
                         var idx = Centerline.Count - 1 - t;
-                        var bedY = sampleTerrainHeightY(Centerline[idx].x, Centerline[idx].z);
-                        if (bedY > mouthLakeY + 0.75f)
+                        if (bedSamples[idx] > mouthLakeY + 0.5f)
                         {
                             continue;
                         }
 
                         var u = tail == 1 ? 1f : 1f - t / (float)(tail - 1);
-                        waterSurfaceY[idx] = Mathf.Lerp(waterSurfaceY[idx], mouthLakeY, u);
+                        waterSurfaceY[idx] = Mathf.Lerp(waterSurfaceY[idx], mouthLakeY, u * 0.85f);
                     }
                 }
             }
@@ -197,34 +177,6 @@ namespace GameDev.World.Water
             }
 
             return float.NaN;
-        }
-
-        private static float FindNearestLakeWaterY(
-            IReadOnlyList<WaterZone> lakes, float x, float z, float maxDistMeters)
-        {
-            if (lakes == null || lakes.Count == 0)
-            {
-                return float.NaN;
-            }
-
-            var bestY = float.NaN;
-            var bestDistSq = maxDistMeters * maxDistMeters;
-            for (var i = 0; i < lakes.Count; i++)
-            {
-                var aabb = lakes[i].GetFloodAabbXZ();
-                var cx = Mathf.Clamp(x, aabb.xMin, aabb.xMax);
-                var cz = Mathf.Clamp(z, aabb.yMin, aabb.yMax);
-                var dx = cx - x;
-                var dz = cz - z;
-                var distSq = dx * dx + dz * dz;
-                if (distSq <= bestDistSq)
-                {
-                    bestDistSq = distSq;
-                    bestY = lakes[i].WaterLevelY;
-                }
-            }
-
-            return bestY;
         }
 
         private void Rasterize()

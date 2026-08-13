@@ -5,22 +5,22 @@ namespace GameDev.World.Water
 {
     /// <summary>
     /// One continuous flat water surface per lake at <see cref="WaterZone.WaterLevelY"/>.
-    /// Silhouette is a <b>smooth inflated flood contour</b> (SDF + small plan expand) — slightly
-    /// larger than the carved pit in top-down overlap — not a terrain-gated swiss-cheese mask.
-    /// Terrain height is not used to punch holes in the shoreline (that caused torn slits).
+    /// Prefer <see cref="WaterZone.Silhouette"/> analytic SDF (smooth trig shore); fall back to
+    /// flood-mask chamfer SDF for legacy zones. Sheet is inflated past the carve so the basin
+    /// has no see-through slits. Terrain height is not used to punch holes.
     /// </summary>
     public static class WaterMeshBuilder
     {
         public const float MeshStepMeters = 0.5f;
 
         /// <summary>
-        /// How far past the flood mask (metres) the water sheet extends in plan view — a slight
-        /// overlap over the bank so the rim reads solid, not under-sized vs the pit.
+        /// How far past the shore iso-line (metres) the water sheet extends — covers ≥1 heightmap
+        /// pixel and the soft bank dig so the excavated basin stays fully under water.
         /// </summary>
-        public const float ShoreExpandMeters = 2.75f;
+        public const float ShoreExpandMeters = GameDev.World.WorldScale.WaterShoreExpandMeters;
 
-        /// <summary>Optional blur radius on the fine mesh field (in cells) before marching squares.</summary>
-        public const int FieldSmoothPasses = 2;
+        /// <summary>Blur passes on the analytic field before marching squares (rounds iso faceting).</summary>
+        public const int FieldSmoothPasses = 3;
 
         public static Mesh Build(WaterZone zone, IReadOnlyList<WaterZone> allZones) =>
             Build(zone, allZones, sampleTerrainY: null, clipXZ: null);
@@ -47,7 +47,11 @@ namespace GameDev.World.Water
 
             var y = zone.WaterLevelY;
             var step = Mathf.Max(MeshStepMeters, 0.35f);
-            var sdf = LakeShoreField.BuildSignedDistance(zone, exteriorCapMeters: ShoreExpandMeters + 12f);
+            float[,] maskSdf = null;
+            if (zone.Silhouette == null)
+            {
+                maskSdf = LakeShoreField.BuildSignedDistance(zone, exteriorCapMeters: ShoreExpandMeters + 12f);
+            }
 
             var pad = ShoreExpandMeters + step * 2f;
             minX -= pad;
@@ -57,12 +61,12 @@ namespace GameDev.World.Water
 
             if (clipXZ.HasValue)
             {
-                const float edgeInset = 1.25f;
+                // Soft clip to terrain extents only — no hard inset (that left rim slits).
                 var c = clipXZ.Value;
-                minX = Mathf.Max(minX, c.xMin + edgeInset);
-                minZ = Mathf.Max(minZ, c.yMin + edgeInset);
-                maxX = Mathf.Min(maxX, c.xMax - edgeInset);
-                maxZ = Mathf.Min(maxZ, c.yMax - edgeInset);
+                minX = Mathf.Max(minX, c.xMin);
+                minZ = Mathf.Max(minZ, c.yMin);
+                maxX = Mathf.Min(maxX, c.xMax);
+                maxZ = Mathf.Min(maxZ, c.yMax);
                 if (maxX <= minX || maxZ <= minZ)
                 {
                     return new Mesh { name = $"WaterZoneMesh_{zone.Id}_empty" };
@@ -72,8 +76,7 @@ namespace GameDev.World.Water
             var cellsX = Mathf.Max(1, Mathf.CeilToInt((maxX - minX) / step));
             var cellsZ = Mathf.Max(1, Mathf.CeilToInt((maxZ - minZ) / step));
 
-            // Continuous field: zero-crossing at the expanded flood contour (smooth iso-line).
-            // Positive = inside water sheet. No terrain depth punches — those tore the shore.
+            // Continuous field: zero-crossing at expanded analytic (or mask) shore.
             var field = new float[cellsX + 1, cellsZ + 1];
             var anyWet = false;
             for (var iz = 0; iz <= cellsZ; iz++)
@@ -85,15 +88,14 @@ namespace GameDev.World.Water
                     if (clipXZ.HasValue)
                     {
                         var c = clipXZ.Value;
-                        if (wx < c.xMin + 0.5f || wx > c.xMax - 0.5f ||
-                            wz < c.yMin + 0.5f || wz > c.yMax - 0.5f)
+                        if (wx < c.xMin || wx > c.xMax || wz < c.yMin || wz > c.yMax)
                         {
                             field[ix, iz] = -1f;
                             continue;
                         }
                     }
 
-                    var shore = LakeShoreField.Sample(zone, sdf, wx, wz);
+                    var shore = zone.ShoreSignedDistance(wx, wz, maskSdf);
                     var value = shore + ShoreExpandMeters;
                     field[ix, iz] = value;
                     if (value >= 0f)

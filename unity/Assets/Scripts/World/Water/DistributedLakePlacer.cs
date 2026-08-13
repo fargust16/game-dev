@@ -131,10 +131,16 @@ namespace GameDev.World.Water
                     continue;
                 }
 
-                // All lakes are large; slight size variety only.
-                var radiusMeters = Mathf.Lerp(130f, 105f, zones.Count / Mathf.Max(1f, count - 1f));
+                // All lakes are large; slight size variety only (WorldScale small-lake band).
+                var radiusMeters = Mathf.Lerp(
+                    GameDev.World.WorldScale.LakeRadiusMaxMeters - 25f,
+                    GameDev.World.WorldScale.LakeRadiusMinMeters + 10f,
+                    zones.Count / Mathf.Max(1f, count - 1f));
                 radiusMeters += (float)(rng.NextDouble() * 20f - 8f);
-                radiusMeters = Mathf.Clamp(radiusMeters, 95f, 155f);
+                radiusMeters = Mathf.Clamp(
+                    radiusMeters,
+                    GameDev.World.WorldScale.LakeRadiusMinMeters,
+                    GameDev.World.WorldScale.LakeRadiusMaxMeters);
 
                 zones.Add(MakeOrganicZone(
                     $"lake_{zones.Count}",
@@ -250,15 +256,12 @@ namespace GameDev.World.Water
             float radiusMeters,
             Random rng)
         {
-            var radiusCells = Mathf.Max(8, Mathf.RoundToInt(radiusMeters / cellSize));
             var flooded = new bool[width, depth];
             var rimSum = 0f;
             var rimCount = 0;
 
-            var aspect = 0.62f + (float)rng.NextDouble() * 0.32f; // elongated
+            var aspect = 0.62f + (float)rng.NextDouble() * 0.32f;
             var rot = (float)(rng.NextDouble() * Mathf.PI * 2f);
-            var cos = Mathf.Cos(rot);
-            var sin = Mathf.Sin(rot);
             var phase1 = (float)(rng.NextDouble() * Mathf.PI * 2f);
             var phase2 = (float)(rng.NextDouble() * Mathf.PI * 2f);
             var phase3 = (float)(rng.NextDouble() * Mathf.PI * 2f);
@@ -267,53 +270,57 @@ namespace GameDev.World.Water
             var amp3 = 0.06f + (float)rng.NextDouble() * 0.06f;
             var noiseSeed = rng.Next();
 
-            // Optional bay / second lobe offset for a less blob-like silhouette.
-            var bay = rng.NextDouble() < 0.7;
-            var bayAngle = (float)(rng.NextDouble() * Mathf.PI * 2f);
-            var bayDist = radiusCells * (0.35f + (float)rng.NextDouble() * 0.25f);
-            var bayCx = centerX + Mathf.Cos(bayAngle) * bayDist;
-            var bayCz = centerZ + Mathf.Sin(bayAngle) * bayDist;
-            var bayR = radiusCells * (0.35f + (float)rng.NextDouble() * 0.2f);
+            var centerWorldX = originX + (centerX + 0.5f) * cellSize;
+            var centerWorldZ = originZ + (centerZ + 0.5f) * cellSize;
 
-            var pad = Mathf.CeilToInt(radiusCells * 1.55f);
-            var xMin = Mathf.Max(0, centerX - pad);
-            var xMax = Mathf.Min(width - 1, centerX + pad);
-            var zMin = Mathf.Max(0, centerZ - pad);
-            var zMax = Mathf.Min(depth - 1, centerZ + pad);
+            // Optional bay / second lobe (world metres) — same formula as analytic silhouette.
+            var hasBay = rng.NextDouble() < 0.7;
+            var bayAngle = (float)(rng.NextDouble() * Mathf.PI * 2f);
+            var bayDist = radiusMeters * (0.35f + (float)rng.NextDouble() * 0.25f);
+            var bayWorldX = centerWorldX + Mathf.Cos(bayAngle) * bayDist;
+            var bayWorldZ = centerWorldZ + Mathf.Sin(bayAngle) * bayDist;
+            var bayRadius = radiusMeters * (0.35f + (float)rng.NextDouble() * 0.2f);
+
+            var silhouette = new LakeSilhouette(
+                centerWorldX,
+                centerWorldZ,
+                radiusMeters,
+                aspect,
+                rot,
+                phase1,
+                phase2,
+                phase3,
+                amp1,
+                amp2,
+                amp3,
+                noiseSeed,
+                hasBay,
+                bayWorldX,
+                bayWorldZ,
+                hasBay ? bayRadius : 0f);
+
+            // Occupancy mask for Contains/biomes — shore mesh/carve use Silhouette, not this raster.
+            var aabb = silhouette.GetAabbXZ(padMeters: cellSize * 2f);
+            var xMin = Mathf.Max(0, Mathf.FloorToInt((aabb.xMin - originX) / cellSize));
+            var xMax = Mathf.Min(width - 1, Mathf.CeilToInt((aabb.xMax - originX) / cellSize));
+            var zMin = Mathf.Max(0, Mathf.FloorToInt((aabb.yMin - originZ) / cellSize));
+            var zMax = Mathf.Min(depth - 1, Mathf.CeilToInt((aabb.yMax - originZ) / cellSize));
 
             for (var z = zMin; z <= zMax; z++)
             {
                 for (var x = xMin; x <= xMax; x++)
                 {
-                    var dx = x - centerX;
-                    var dz = z - centerZ;
-                    var rx = dx * cos + dz * sin;
-                    var rz = (-dx * sin + dz * cos) / aspect;
-                    var dist = Mathf.Sqrt(rx * rx + rz * rz);
-                    var ang = Mathf.Atan2(rz, rx);
-                    var wobble =
-                        1f
-                        + amp1 * Mathf.Sin(2f * ang + phase1)
-                        + amp2 * Mathf.Sin(5f * ang + phase2)
-                        + amp3 * Mathf.Sin(9f * ang + phase3)
-                        + 0.08f * HashNoise(x, z, noiseSeed);
-                    var r = radiusCells * Mathf.Clamp(wobble, 0.55f, 1.45f);
-
-                    var inside = dist <= r;
-                    if (!inside && bay)
-                    {
-                        var bdx = x - bayCx;
-                        var bdz = z - bayCz;
-                        inside = bdx * bdx + bdz * bdz <= bayR * bayR;
-                    }
-
-                    if (!inside)
+                    var wx = originX + (x + 0.5f) * cellSize;
+                    var wz = originZ + (z + 0.5f) * cellSize;
+                    var signed = silhouette.SignedDistance(wx, wz);
+                    if (signed < 0f)
                     {
                         continue;
                     }
 
                     flooded[x, z] = true;
-                    if (dist > r * 0.72f)
+                    // Near-shore ring for provisional waterY before carver locks the rim.
+                    if (signed < radiusMeters * 0.28f)
                     {
                         rimSum += heights[x, z];
                         rimCount++;
@@ -322,7 +329,6 @@ namespace GameDev.World.Water
             }
 
             LakeZoneMerger.FillEnclosedHoles(flooded, width, depth);
-            LakeZoneMerger.SmoothFloodMask(flooded, width, depth, blurPasses: 3, threshold: 0.42f);
 
             var waterY = rimCount > 0
                 ? rimSum / rimCount
@@ -337,20 +343,7 @@ namespace GameDev.World.Water
                 }
             }
 
-            return new WaterZone(id, waterY, originX, originZ, cellSize, flooded, heightCopy);
-        }
-
-        private static float HashNoise(int x, int z, int seed)
-        {
-            unchecked
-            {
-                var h = seed;
-                h = (h * 374761393) + x * 668265263;
-                h = (h * 374761393) + z * 1274126177;
-                h = (h ^ (h >> 13)) * 1274126177;
-                h ^= h >> 16;
-                return ((h & 0xFFFF) / 65535f) * 2f - 1f;
-            }
+            return new WaterZone(id, waterY, originX, originZ, cellSize, flooded, heightCopy, silhouette);
         }
     }
 }

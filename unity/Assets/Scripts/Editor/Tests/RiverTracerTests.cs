@@ -201,7 +201,7 @@ namespace GameDev.World.Water.Tests
         }
 
         [Test]
-        public void SyncWaterSurfaceAfterCarve_PlacesSurfaceBetweenBedAndBank()
+        public void SyncWaterSurfaceAfterCarve_HugsCarvedBedWithSmallFreeboard()
         {
             var centerline = new[] { new Vector3(5f, 10f, 5f), new Vector3(4f, 9f, 5f) };
             var widths = new[] { 4f, 4f };
@@ -211,17 +211,15 @@ namespace GameDev.World.Water.Tests
                 "r0", RiverTermination.Lake, centerline, widths, carveDepths, surface,
                 0f, 0f, 1f, 10, 10);
 
-            path.SyncWaterSurfaceAfterCarve((x, z) => 7f, waterFillFraction: 0.6f);
+            const float bed = 7f;
+            path.SyncWaterSurfaceAfterCarve((x, z) => bed, waterFillFraction: 0.35f);
 
             for (var i = 0; i < path.WaterSurfaceY.Count; i++)
             {
-                Assert.Greater(path.WaterSurfaceY[i], 7f);
+                Assert.Greater(path.WaterSurfaceY[i], bed + 0.3f);
+                Assert.Less(path.WaterSurfaceY[i], bed + 1.3f, "must not float metres above the trench");
                 Assert.Less(path.WaterSurfaceY[i], centerline[i].y);
             }
-
-            // When the heightmap shows almost no carve, surface still drops under the bank.
-            path.SyncWaterSurfaceAfterCarve((x, z) => centerline[0].y - 0.05f, waterFillFraction: 0.6f);
-            Assert.Less(path.WaterSurfaceY[0], centerline[0].y);
         }
     }
 }

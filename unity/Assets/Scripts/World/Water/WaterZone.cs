@@ -7,6 +7,8 @@ namespace GameDev.World.Water
     /// as the flood spill elevation from <see cref="LakeBasinFinder"/>, then becomes the
     /// authoritative post-carve rim level once <see cref="LakeTerrainCarver"/> finalises the basin
     /// (single source of truth for mesh Y, depth, and shoreline).
+    /// When <see cref="Silhouette"/> is set, mesh/carve shore use that continuous analytic field
+    /// instead of the boolean occupancy raster.
     /// </summary>
     public sealed class WaterZone
     {
@@ -18,6 +20,11 @@ namespace GameDev.World.Water
         public int Width { get; }
         public int Depth { get; }
 
+        /// <summary>
+        /// Optional analytic shore. Null for legacy/tests that only supply a flood mask.
+        /// </summary>
+        public LakeSilhouette Silhouette { get; }
+
         /// <summary>Number of cells the flood actually claimed - diagnostic mainly (e.g. spotting a
         /// flood that ran all the way out to <c>LakeBasinFinder.FindZones</c>'s
         /// <c>cellCountSafetyCap</c> instead of stopping at a real rim).</summary>
@@ -25,24 +32,26 @@ namespace GameDev.World.Water
 
         /// <summary>Approx equivalent radius in metres from flooded area (π r² ≈ area).</summary>
         public float EquivalentRadiusMeters =>
-            Mathf.Sqrt(FloodedCellCount * CellSize * CellSize / Mathf.PI);
+            Silhouette != null
+                ? Silhouette.RadiusMeters
+                : Mathf.Sqrt(FloodedCellCount * CellSize * CellSize / Mathf.PI);
 
         private readonly bool[,] flooded;
         private readonly float[,] heights;
 
         public WaterZone(string id, float waterLevelY, float originX, float originZ, float cellSize,
-            bool[,] flooded, float[,] heights)
+            bool[,] flooded, float[,] heights, LakeSilhouette silhouette = null)
         {
             Id = id;
             WaterLevelY = waterLevelY;
             OriginX = originX;
             OriginZ = originZ;
             CellSize = cellSize;
+            Silhouette = silhouette;
             this.flooded = flooded;
             this.heights = heights;
             Width = flooded.GetLength(0);
             Depth = flooded.GetLength(1);
-
             var count = 0;
             for (var x = 0; x < Width; x++)
             {
@@ -79,14 +88,43 @@ namespace GameDev.World.Water
 
         public bool Contains(float worldX, float worldZ)
         {
+            if (Silhouette != null)
+            {
+                return Silhouette.Contains(worldX, worldZ);
+            }
+
             var x = Mathf.FloorToInt((worldX - OriginX) / CellSize);
             var z = Mathf.FloorToInt((worldZ - OriginZ) / CellSize);
             return IsFlooded(x, z);
         }
 
+        /// <summary>
+        /// Shore signed distance in metres (positive inside). Analytic when silhouette is set;
+        /// otherwise chamfer-SDF of the flood mask.
+        /// </summary>
+        public float ShoreSignedDistance(float worldX, float worldZ, float[,] maskSdf = null)
+        {
+            if (Silhouette != null)
+            {
+                return Silhouette.SignedDistance(worldX, worldZ);
+            }
+
+            if (maskSdf != null)
+            {
+                return LakeShoreField.Sample(this, maskSdf, worldX, worldZ);
+            }
+
+            return Contains(worldX, worldZ) ? CellSize : -CellSize;
+        }
+
         /// <summary>XZ AABB of flooded cells (metres). Empty flood → zero rect at origin.</summary>
         public Rect GetFloodAabbXZ()
         {
+            if (Silhouette != null)
+            {
+                return Silhouette.GetAabbXZ(padMeters: 0f);
+            }
+
             var minX = float.PositiveInfinity;
             var minZ = float.PositiveInfinity;
             var maxX = float.NegativeInfinity;
@@ -119,6 +157,11 @@ namespace GameDev.World.Water
         /// <summary>Centroid of flooded cells in world XZ (Y unused / 0).</summary>
         public Vector3 GetFloodCentroidXZ()
         {
+            if (Silhouette != null)
+            {
+                return new Vector3(Silhouette.CenterX, 0f, Silhouette.CenterZ);
+            }
+
             double sx = 0;
             double sz = 0;
             var n = 0;

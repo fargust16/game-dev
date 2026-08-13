@@ -7,6 +7,7 @@ using MapMagic.Core;
 using MapMagic.Terrains;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace GameDev.EditorTools
 {
@@ -22,13 +23,12 @@ namespace GameDev.EditorTools
         private const float CellSize = 3f;
         private const int MinCellsPerZone = 28;
         private const int MaxZones = 20;
-        /// <summary>Deep enough to fill MapMagic pits; cell cap still blocks plains mega-lakes.</summary>
         private const float MaxLakeDepthMeters = 14f;
-        /// <summary>~2400 cells @ 3m ≈ 93m equivalent radius — one visual lake, not a tile flood.</summary>
         private const int MaxCellsPerZone = 2400;
         private const int CellCountSafetyCap = 2400;
         private const float LakeMergeGapMeters = 6f;
         private const string BankLayerPath = "Assets/Settings/TerrainLayers/Dirt_Scaled.terrainlayer";
+        private const string WaterMaterialPath = "Assets/Polytope Studio/Lowpoly_Environments/Sources/Materials/PT_Water_mat.mat";
 
         [MenuItem("GameDev/Overworld/Generate Water Zones")]
         public static void GenerateWaterZonesMenuItem()
@@ -44,6 +44,7 @@ namespace GameDev.EditorTools
 
         public static void GenerateForTile(MapMagicObject mapMagic, Coord tileCoord)
         {
+            var total = OverworldGenTiming.Start();
             ClearWaterZones();
             ClearRiverZones();
 
@@ -53,7 +54,7 @@ namespace GameDev.EditorTools
                 return;
             }
 
-            MapMagicTileSync.WaitForTileReady(tile);
+            OverworldGenTiming.Time("water.wait-tile", () => MapMagicTileSync.WaitForTileReady(tile));
 
             var terrain = tile.main?.terrain;
             var holder = terrain != null ? terrain.GetComponent<DirectMatricesHolder>() : null;
@@ -62,9 +63,6 @@ namespace GameDev.EditorTools
                 return;
             }
 
-            // Authoritative world Y from the live Terrain — DirectMatrices*globals.height drifts
-            // from SampleHeight when the tile pivot is elevated or size.y ≠ globals.height
-            // (that mismatch buried rivers ~370m under the mesh).
             float HeightSampler(float x, float z)
             {
                 if (terrain != null)
@@ -84,12 +82,15 @@ namespace GameDev.EditorTools
             var sizeX = (float)mapMagic.tileSize.x - 2f * inset;
             var sizeZ = (float)mapMagic.tileSize.z - 2f * inset;
 
-            // 2–3 large organic lakes only — no MapMagic/finder pond clutter.
             var lakeRng = new GameDev.World.Seed.WorldSeed(OverworldTerrainMenu.LastSeed).Fork("water.lakes");
-            var forced = DistributedLakePlacer.Place(
-                HeightSampler, minX, minZ, sizeX, sizeZ, CellSize, lakeRng,
-                minLakes: DistributedLakePlacer.DefaultMinLakes,
-                targetLakes: DistributedLakePlacer.DefaultTargetLakes);
+            WaterZone[] forced = null;
+            OverworldGenTiming.Time("water.lakes-place", () =>
+            {
+                forced = DistributedLakePlacer.Place(
+                    HeightSampler, minX, minZ, sizeX, sizeZ, CellSize, lakeRng,
+                    minLakes: DistributedLakePlacer.DefaultMinLakes,
+                    targetLakes: DistributedLakePlacer.DefaultTargetLakes);
+            });
             var zones = LakeZoneMerger.CullOverlapping(forced, maxOverlapFraction: 0.12f, maxCellsPerLake: 4000);
             zones = LakeZoneMerger.CapCount(zones, maxCount: 3);
             if (zones.Length < DistributedLakePlacer.DefaultMinLakes)
@@ -99,9 +100,9 @@ namespace GameDev.EditorTools
                     minCenterSeparationMeters: DistributedLakePlacer.DefaultMinSeparationMeters);
             }
 
+            LogSilhouetteDiagnostics(zones);
+
             var mountainLocalHeight = MeasureMountainLocalHeight(terrain, HeightSampler, minX, minZ, sizeX, sizeZ);
-            // Sunk-city bowl (~36–48 m). Do NOT use 80% of mountain height — that asks for ~170 m
-            // digs while plains sit on the heightmap floor and the dig silently clamps to ~5 m.
             var basinDepth = Mathf.Clamp(
                 mountainLocalHeight * 0.2f,
                 LakeTerrainCarver.MinLargeBasinDepthMeters,
@@ -112,13 +113,19 @@ namespace GameDev.EditorTools
                 ? Mathf.Max(terrain.terrainData.size.y, mountainLocalHeight)
                 : Mathf.Max(mapMagic.globals.height, mountainLocalHeight);
             var riverSettings = RiverTracerSettings.Default(terrainBaseY, heightScale);
-            var flowGrid = FlowNetwork.Compute(HeightSampler, minX, minZ, sizeX, sizeZ, CellSize);
-            var rivers = RiverTracer.Trace(flowGrid, zones, riverSettings);
+            FlowGrid flowGrid = null;
+            RiverPath[] rivers = null;
+            OverworldGenTiming.Time("water.flow+rivers", () =>
+            {
+                flowGrid = FlowNetwork.Compute(HeightSampler, minX, minZ, sizeX, sizeZ, CellSize);
+                rivers = RiverTracer.Trace(flowGrid, zones, riverSettings);
+            });
 
             if (terrain != null && zones.Length > 0)
             {
                 var lakeBankLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(BankLayerPath);
-                LakeTerrainCarver.Carve(terrain, zones, basinDepth, lakeBankLayer);
+                OverworldGenTiming.Time("water.lake-carve", () =>
+                    LakeTerrainCarver.Carve(terrain, zones, basinDepth, lakeBankLayer));
             }
 
             System.Func<float, float, float> sampleTerrainY = null;
@@ -128,22 +135,33 @@ namespace GameDev.EditorTools
                     terrain.SampleHeight(new Vector3(x, 0f, z)) + terrain.transform.position.y;
             }
 
-            if (terrain != null && rivers.Length > 0)
+            if (terrain != null && rivers != null && rivers.Length > 0)
             {
                 var bankLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(BankLayerPath);
-                RiverTerrainCarver.Carve(terrain, rivers, bankLayer);
-
-                for (var i = 0; i < rivers.Length; i++)
+                OverworldGenTiming.Time("water.river-carve", () =>
                 {
-                    rivers[i].SyncWaterSurfaceAfterCarve(sampleTerrainY, riverSettings.WaterFillFraction, zones);
-                }
+                    Debug.Log($"[River] carve begin count={rivers.Length} bankLayer={(bankLayer != null ? bankLayer.name : "null")}");
+                    RiverTerrainCarver.Carve(terrain, rivers, bankLayer);
+                    for (var i = 0; i < rivers.Length; i++)
+                    {
+                        rivers[i].SyncWaterSurfaceAfterCarve(sampleTerrainY, riverSettings.WaterFillFraction, zones);
+                    }
+
+                    Debug.Log("[River] carve+sync done — diagnostics");
+                    RiverDiagnostics.LogAfterCarveSync(rivers, sampleTerrainY, riverSettings.WaterFillFraction);
+                });
             }
+
+            rivers ??= System.Array.Empty<RiverPath>();
 
             var root = new GameObject(RootObjectName);
             var holderComponent = root.AddComponent<OverworldWaterZones>();
             holderComponent.SetZones(zones);
 
             var waterMaterial = CreateWaterMaterial();
+            Debug.Log(
+                $"[Water] material='{waterMaterial.name}' shader='{waterMaterial.shader.name}' " +
+                $"(PT colors/normals, no scene-color refraction)");
             var planesCreated = 0;
             Rect? terrainClip = null;
             if (terrain != null)
@@ -153,34 +171,78 @@ namespace GameDev.EditorTools
                 terrainClip = new Rect(tp.x, tp.z, ts.x, ts.z);
             }
 
-            foreach (var zone in zones)
+            OverworldGenTiming.Time("water.meshes", () =>
             {
-                var zoneObject = new GameObject($"WaterZone_{zone.Id}");
-                zoneObject.transform.SetParent(root.transform, worldPositionStays: true);
-                var meshFilter = zoneObject.AddComponent<MeshFilter>();
-                meshFilter.sharedMesh = WaterMeshBuilder.Build(zone, zones, sampleTerrainY, terrainClip);
-                var renderer = zoneObject.AddComponent<MeshRenderer>();
-                renderer.sharedMaterial = waterMaterial;
-                planesCreated++;
-            }
+                foreach (var zone in zones)
+                {
+                    var zoneObject = new GameObject($"WaterZone_{zone.Id}");
+                    zoneObject.transform.SetParent(root.transform, worldPositionStays: true);
+                    var meshFilter = zoneObject.AddComponent<MeshFilter>();
+                    meshFilter.sharedMesh = WaterMeshBuilder.Build(zone, zones, sampleTerrainY, terrainClip);
+                    var renderer = zoneObject.AddComponent<MeshRenderer>();
+                    renderer.sharedMaterial = waterMaterial;
+                    planesCreated++;
+                }
 
-            var riverRoot = new GameObject(RiverRootObjectName);
-            var riverHolder = riverRoot.AddComponent<OverworldRiverZones>();
-            riverHolder.SetRivers(rivers);
+                var riverRoot = new GameObject(RiverRootObjectName);
+                var riverHolder = riverRoot.AddComponent<OverworldRiverZones>();
+                riverHolder.SetRivers(rivers);
 
-            foreach (var river in rivers)
-            {
-                var riverObject = new GameObject($"River_{river.Id}");
-                riverObject.transform.SetParent(riverRoot.transform, worldPositionStays: true);
-                var meshFilter = riverObject.AddComponent<MeshFilter>();
-                meshFilter.sharedMesh = RiverMeshBuilder.Build(river, uvTileLength: 8f);
-                var renderer = riverObject.AddComponent<MeshRenderer>();
-                renderer.sharedMaterial = waterMaterial;
-            }
+                foreach (var river in rivers)
+                {
+                    var riverObject = new GameObject($"River_{river.Id}");
+                    riverObject.transform.SetParent(riverRoot.transform, worldPositionStays: true);
+                    var meshFilter = riverObject.AddComponent<MeshFilter>();
+                    meshFilter.sharedMesh = RiverMeshBuilder.Build(river, uvTileLength: 8f, sampleTerrainY);
+                    var renderer = riverObject.AddComponent<MeshRenderer>();
+                    renderer.sharedMaterial = waterMaterial;
+                    var vCount = meshFilter.sharedMesh != null ? meshFilter.sharedMesh.vertexCount : 0;
+                    Debug.Log($"[River] {river.Id} mesh assigned verts={vCount} mat={waterMaterial.shader.name}");
+                }
+
+                if (rivers.Length > 0)
+                {
+                    RiverDiagnostics.LogAfterMesh(rivers, sampleTerrainY);
+                }
+            });
 
             LogOverworldSummary(
                 terrain, zones, rivers,
                 mapMagic.globals.height, mountainLocalHeight, basinDepth, planesCreated, forced.Length);
+            OverworldGenTiming.Log(
+                "water.total",
+                OverworldGenTiming.StopMs(total),
+                $"lakes={zones.Length} rivers={rivers.Length}");
+        }
+
+        private static void LogSilhouetteDiagnostics(WaterZone[] zones)
+        {
+            if (zones == null || zones.Length == 0)
+            {
+                Debug.Log("[Water] silhouette: no lakes");
+                return;
+            }
+
+            for (var i = 0; i < zones.Length; i++)
+            {
+                var z = zones[i];
+                if (z.Silhouette == null)
+                {
+                    Debug.LogWarning(
+                        $"[Water] {z.Id}: Silhouette=NULL — mesh/carve will use pixel flood mask (stairs)");
+                    continue;
+                }
+
+                var s = z.Silhouette;
+                var r0 = s.ShoreRadiusAtAngle(0f);
+                var r1 = s.ShoreRadiusAtAngle(Mathf.PI * 0.5f);
+                var r2 = s.ShoreRadiusAtAngle(Mathf.PI);
+                var jump = Mathf.Max(Mathf.Abs(r1 - r0), Mathf.Abs(r2 - r1));
+                Debug.Log(
+                    $"[Water] {z.Id}: Silhouette OK center=({s.CenterX:F0},{s.CenterZ:F0}) " +
+                    $"R={s.RadiusMeters:F1}m aspect={s.Aspect:F2} bay={s.HasBay} " +
+                    $"curveR(0/90/180)=({r0:F1},{r1:F1},{r2:F1}) maxStep≈{jump:F1}m");
+            }
         }
 
         private static float MeasureMountainLocalHeight(
@@ -246,7 +308,8 @@ namespace GameDev.EditorTools
                     }
 
                     parts.Append(
-                        $"{zones[i].Id} center=({c.x:F0},{c.z:F0}) " +
+                        $"{zones[i].Id} sil={(zones[i].Silhouette != null ? "yes" : "NO")} " +
+                        $"center=({c.x:F0},{c.z:F0}) " +
                         $"r≈{zones[i].EquivalentRadiusMeters:F0}m " +
                         $"aabb=({aabb.xMin:F0},{aabb.yMin:F0})-({aabb.xMax:F0},{aabb.yMax:F0}) " +
                         $"targetDig={target:F1}m maxDig={dig:F1}m " +
@@ -260,38 +323,7 @@ namespace GameDev.EditorTools
             }
 
             Debug.Log($"[Overworld] 3) Lakes: {zones.Length}, water planes: {waterPlaneCount}");
-
-            if (rivers.Length == 0)
-            {
-                Debug.Log("[Overworld] 4) Rivers: 0");
-            }
-            else
-            {
-                var parts = new System.Text.StringBuilder();
-                for (var i = 0; i < rivers.Length; i++)
-                {
-                    var river = rivers[i];
-                    var start = river.Centerline[0];
-                    var end = river.Centerline[river.Centerline.Count - 1];
-                    var startSurf = river.WaterSurfaceY[0];
-                    var endSurf = river.WaterSurfaceY[river.WaterSurfaceY.Count - 1];
-                    var startTerrain = SampleTerrainOrNaN(terrain, start.x, start.z);
-                    var endTerrain = SampleTerrainOrNaN(terrain, end.x, end.z);
-                    var pathLen = ApproximatePathLength(river);
-                    if (i > 0)
-                    {
-                        parts.Append("; ");
-                    }
-
-                    parts.Append(
-                        $"{river.Id} len={pathLen:F0}m " +
-                        $"start=({start.x:F0},{start.z:F0}) surf={startSurf:F1} vsTerrain={DescribeVsTerrain(startSurf, startTerrain)} | " +
-                        $"end=({end.x:F0},{end.z:F0}) surf={endSurf:F1} vsTerrain={DescribeVsTerrain(endSurf, endTerrain)} " +
-                        $"→ {river.Termination}");
-                }
-
-                Debug.Log($"[Overworld] 4) Rivers: {rivers.Length} | {parts}");
-            }
+            Debug.Log($"[Overworld] 4) Rivers: see [River] diagnostics above (count={rivers.Length})");
         }
 
         private static void MeasureLakeBed(
@@ -351,49 +383,6 @@ namespace GameDev.EditorTools
             wetFraction = total > 0 ? wet / (float)total : 0f;
         }
 
-        private static float ApproximatePathLength(RiverPath river)
-        {
-            var len = 0f;
-            for (var i = 1; i < river.Centerline.Count; i++)
-            {
-                var a = river.Centerline[i - 1];
-                var b = river.Centerline[i];
-                var dx = b.x - a.x;
-                var dz = b.z - a.z;
-                len += Mathf.Sqrt(dx * dx + dz * dz);
-            }
-
-            return len;
-        }
-
-        private static float SampleTerrainOrNaN(UnityEngine.Terrain terrain, float x, float z)
-        {
-            if (terrain == null)
-            {
-                return float.NaN;
-            }
-
-            return terrain.SampleHeight(new Vector3(x, 0f, z)) + terrain.transform.position.y;
-        }
-
-        private static string DescribeVsTerrain(float waterY, float terrainY)
-        {
-            if (float.IsNaN(terrainY))
-            {
-                return "n/a";
-            }
-
-            var delta = waterY - terrainY;
-            if (Mathf.Abs(delta) < 0.25f)
-            {
-                return $"on({terrainY:F1}m)";
-            }
-
-            return delta > 0f
-                ? $"+{delta:F1}m above({terrainY:F1}m)"
-                : $"{delta:F1}m below({terrainY:F1}m)";
-        }
-
         public static void ClearWaterZones()
         {
             var root = GameObject.Find(RootObjectName);
@@ -412,42 +401,140 @@ namespace GameDev.EditorTools
             }
         }
 
-        private const string WaterMaterialPath = "Assets/Polytope Studio/Lowpoly_Environments/Sources/Materials/PT_Water_mat.mat";
-
+        /// <summary>
+        /// Same look as <c>PT_Water_mat</c> (Deep/Shallow, foam, scrolling normals, opacity)
+        /// via <c>GameDev/Overworld/LakeWater</c> — no <c>_CameraOpaqueTexture</c> refraction
+        /// (that is why the stock Polytope shader goes black in Scene/Game).
+        /// </summary>
         private static Material CreateWaterMaterial()
         {
             var preset = AssetDatabase.LoadAssetAtPath<Material>(WaterMaterialPath);
-            if (preset != null)
+            return CreatePolytopeLikeLakeWater(preset);
+        }
+
+        private static Material CreatePolytopeLikeLakeWater(Material colorSource)
+        {
+            var shader = Shader.Find("GameDev/Overworld/LakeWater");
+            if (shader == null)
             {
-                var instance = new Material(preset) { name = "OverworldWater (generated)" };
-
-                if (instance.HasProperty("_Mettalic"))
-                {
-                    instance.SetFloat("_Mettalic", 0.05f);
-                }
-
-                if (instance.HasProperty("_Smootness"))
-                {
-                    instance.SetFloat("_Smootness", Mathf.Max(instance.GetFloat("_Smootness"), 0.85f));
-                }
-
-                if (instance.HasProperty("_Cull"))
-                {
-                    instance.SetFloat("_Cull", (float)UnityEngine.Rendering.CullMode.Off);
-                }
-
-                return instance;
+                Debug.LogWarning("[Water] GameDev/Overworld/LakeWater missing — falling back to URP Lit tint.");
+                return CreateTintedTransparentWaterFallback(colorSource);
             }
 
+            var mat = new Material(shader) { name = "OverworldWater (PT-like, no-refraction)" };
+
+            var deep = colorSource != null && colorSource.HasProperty("_DeepColor")
+                ? colorSource.GetColor("_DeepColor")
+                : new Color(0.214f, 0.611f, 0.623f, 1f);
+            var shallow = colorSource != null && colorSource.HasProperty("_ShallowColor")
+                ? colorSource.GetColor("_ShallowColor")
+                : new Color(0.220f, 0.465f, 0.537f, 1f);
+            var foam = colorSource != null && colorSource.HasProperty("_FoamColor")
+                ? colorSource.GetColor("_FoamColor")
+                : new Color(0.30f, 1f, 0.91f, 1f);
+
+            // Dense, slightly olive-teal body — less glassy than stock PT preview.
+            deep = Color.Lerp(deep, new Color(0.05f, 0.16f, 0.14f, 1f), 0.48f);
+            shallow = Color.Lerp(shallow, new Color(0.09f, 0.24f, 0.22f, 1f), 0.40f);
+            // Tiny green push on top of the teal (very subtle).
+            deep = new Color(deep.r * 0.92f, Mathf.Min(deep.g * 1.08f, 0.38f), deep.b * 0.95f, 1f);
+            shallow = new Color(shallow.r * 0.94f, Mathf.Min(shallow.g * 1.06f, 0.42f), shallow.b * 0.96f, 1f);
+            deep.a = 1f;
+            shallow.a = 0.98f;
+            mat.SetColor("_DeepColor", deep);
+            mat.SetColor("_ShallowColor", shallow);
+            mat.SetColor("_FoamColor", foam);
+
+            // Prefer a denser body of water; PT _TRANSPARENCY alone reads too clear in Scene.
+            var opacity = 0.99f;
+            if (colorSource != null && colorSource.HasProperty("_TRANSPARENCY"))
+            {
+                opacity = Mathf.Clamp(Mathf.Max(colorSource.GetFloat("_TRANSPARENCY"), 0.98f), 0.98f, 1f);
+            }
+
+            mat.SetFloat("_Opacity", opacity);
+            if (mat.HasProperty("_DepthFade"))
+            {
+                mat.SetFloat("_DepthFade", 3f);
+            }
+
+            if (colorSource != null && colorSource.HasProperty("_Smootness"))
+            {
+                mat.SetFloat("_Smoothness", Mathf.Clamp01(colorSource.GetFloat("_Smootness")));
+            }
+            else if (colorSource != null && colorSource.HasProperty("_Smoothness"))
+            {
+                mat.SetFloat("_Smoothness", Mathf.Clamp01(colorSource.GetFloat("_Smoothness")));
+            }
+            else
+            {
+                mat.SetFloat("_Smoothness", 0.84f);
+            }
+
+            if (colorSource != null && colorSource.HasProperty("_NormalMapWavesSpeed"))
+            {
+                mat.SetFloat("_NormalSpeed", colorSource.GetFloat("_NormalMapWavesSpeed"));
+            }
+
+            if (colorSource != null && colorSource.HasProperty("_NormalMapsWavesSize"))
+            {
+                mat.SetFloat("_NormalTiling", colorSource.GetFloat("_NormalMapsWavesSize"));
+            }
+
+            if (colorSource != null && colorSource.HasProperty("_FoamAmount"))
+            {
+                mat.SetFloat("_ShoreFoam", colorSource.GetFloat("_FoamAmount"));
+            }
+
+            Texture nrm = null;
+            if (colorSource != null && colorSource.HasProperty("_NormalMapTexture"))
+            {
+                nrm = colorSource.GetTexture("_NormalMapTexture");
+            }
+
+            if (nrm == null && colorSource != null && colorSource.HasProperty("_normalmap"))
+            {
+                nrm = colorSource.GetTexture("_normalmap");
+            }
+
+            if (nrm != null)
+            {
+                mat.SetTexture("_NormalMap", nrm);
+            }
+
+            mat.renderQueue = (int)RenderQueue.Transparent;
+            return mat;
+        }
+
+        private static Material CreateTintedTransparentWaterFallback(Material colorSource)
+        {
             var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-            var fallback = new Material(shader) { name = "OverworldWater (generated, fallback)" };
-            fallback.color = new Color(0.15f, 0.35f, 0.55f, 0.75f);
-            if (fallback.HasProperty("_Cull"))
+            var mat = new Material(shader) { name = "OverworldWater (Lit fallback)" };
+            var deep = colorSource != null && colorSource.HasProperty("_DeepColor")
+                ? colorSource.GetColor("_DeepColor")
+                : new Color(0.214f, 0.611f, 0.623f, 1f);
+            deep.a = 0.85f;
+            if (mat.HasProperty("_BaseColor"))
             {
-                fallback.SetFloat("_Cull", (float)UnityEngine.Rendering.CullMode.Off);
+                mat.SetColor("_BaseColor", deep);
+            }
+            else
+            {
+                mat.color = deep;
             }
 
-            return fallback;
+            if (mat.HasProperty("_Surface"))
+            {
+                mat.SetFloat("_Surface", 1f);
+            }
+
+            mat.SetOverrideTag("RenderType", "Transparent");
+            mat.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+            mat.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+            mat.SetInt("_ZWrite", 0);
+            mat.renderQueue = (int)RenderQueue.Transparent;
+            mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            return mat;
         }
     }
 }

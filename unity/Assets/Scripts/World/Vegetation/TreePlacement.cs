@@ -1,26 +1,31 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameDev.World.Vegetation
 {
     /// <summary>
-    /// World-space tree height targets and trunk-only collision helpers.
-    /// Character ≈ 1.8 m → mature trees should read 3–5× taller (≈12–25 m+).
+    /// World-space tree height targets and trunk collision helpers.
+    /// Capsules are fitted from mid-trunk mesh vertices (not crown AABB). Unity can also use
+    /// <see cref="MeshCollider"/> on a full render mesh, but that includes the canopy and is too
+    /// heavy for thousands of trees — so we fit capsules to the bole geometry instead.
     /// </summary>
     public static class TreePlacement
     {
-        public const float CharacterHeightMeters = 1.8f;
-        public const float MatureHeightMinMeters = 12f;
-        public const float MatureHeightMaxMeters = 25f;
-        public const float YoungHeightMinMeters = 8f;
-        public const float YoungHeightMaxMeters = 14f;
+        public const float CharacterHeightMeters = GameDev.World.WorldScale.CharacterHeightMeters;
+        public const float MatureHeightMinMeters = GameDev.World.WorldScale.TreeMatureMinMeters;
+        public const float MatureHeightMaxMeters = GameDev.World.WorldScale.TreeMatureMaxMeters;
+        public const float YoungHeightMinMeters = GameDev.World.WorldScale.TreeYoungMinMeters;
+        public const float YoungHeightMaxMeters = GameDev.World.WorldScale.TreeYoungMaxMeters;
 
-        /// <summary>Trunk capsule radius as a fraction of measured crown width (clamped).</summary>
-        public const float TrunkRadiusFractionOfWidth = 0.07f;
-        public const float TrunkRadiusMinMeters = 0.22f;
-        public const float TrunkRadiusMaxMeters = 0.55f;
+        public const float TrunkRadiusMinMeters = 0.10f;
+        public const float TrunkRadiusMaxMeters = 0.38f;
+        public const float TrunkHeightFraction = 0.45f;
 
-        /// <summary>Capsule height as a fraction of final tree height (lower trunk only).</summary>
-        public const float TrunkHeightFraction = 0.42f;
+        /// <summary>Last fitted world radius (metres) — for editor diagnostics.</summary>
+        public static float LastFittedRadiusMeters { get; private set; }
+
+        /// <summary>Last fitted capsule world height (metres).</summary>
+        public static float LastFittedHeightMeters { get; private set; }
 
         public static float PickTargetHeightMeters(bool young, System.Random rng)
         {
@@ -29,10 +34,6 @@ namespace GameDev.World.Vegetation
             return Mathf.Lerp(min, max, (float)rng.NextDouble());
         }
 
-        /// <summary>
-        /// Uniform scale so renderer bounds height ≈ <paramref name="targetHeightMeters"/>.
-        /// Returns the applied scale (1 if bounds unusable).
-        /// </summary>
         public static float ApplyWorldHeight(GameObject instance, float targetHeightMeters)
         {
             if (instance == null || targetHeightMeters <= 0.01f)
@@ -71,8 +72,8 @@ namespace GameDev.World.Vegetation
         }
 
         /// <summary>
-        /// Strip crown-sized colliders and attach a thin Y-axis capsule on the trunk only so the
-        /// player can walk under the canopy up to the bole.
+        /// Strip prefab colliders and attach a pivot-centred capsule fitted to mid-trunk vertices.
+        /// Optionally adds a short base capsule when root flare is wider than the bole (fruit trees).
         /// </summary>
         public static void EnsureTrunkCollider(GameObject instance)
         {
@@ -111,25 +112,113 @@ namespace GameDev.World.Vegetation
 
             var lossy = Mathf.Max(instance.transform.lossyScale.x, 0.01f);
             var worldHeight = Mathf.Max(1f, bounds.size.y);
-            var worldWidth = Mathf.Max(bounds.size.x, bounds.size.z);
-            var worldRadius = Mathf.Clamp(
-                worldWidth * TrunkRadiusFractionOfWidth,
-                TrunkRadiusMinMeters,
-                TrunkRadiusMaxMeters);
+            SampleTrunkRadii(instance, bounds, out var boleRadius, out var rootRadius);
+
+            var worldRadius = Mathf.Clamp(boleRadius, TrunkRadiusMinMeters, TrunkRadiusMaxMeters);
             var worldCapsuleHeight = Mathf.Clamp(
                 worldHeight * TrunkHeightFraction,
-                worldRadius * 2.2f,
+                worldRadius * 2.5f,
                 worldHeight * 0.55f);
 
+            LastFittedRadiusMeters = worldRadius;
+            LastFittedHeightMeters = worldCapsuleHeight;
+
             var capsule = instance.AddComponent<CapsuleCollider>();
-            capsule.direction = 1; // Y
+            capsule.direction = 1;
             capsule.radius = worldRadius / lossy;
             capsule.height = worldCapsuleHeight / lossy;
-            // Sit on the ground: capsule bottom ≈ bounds.min.y.
             var worldCenterY = bounds.min.y + worldCapsuleHeight * 0.5f;
-            var localCenter = instance.transform.InverseTransformPoint(
-                new Vector3(bounds.center.x, worldCenterY, bounds.center.z));
-            capsule.center = localCenter;
+            var pivot = instance.transform.position;
+            capsule.center = instance.transform.InverseTransformPoint(
+                new Vector3(pivot.x, worldCenterY, pivot.z));
+
+            // Fruit-tree root flare: short extra capsule at the ground so the player cannot
+            // walk through exposed roots while the bole capsule stays thin.
+            if (rootRadius > worldRadius * 1.25f && rootRadius > 0.14f)
+            {
+                var baseRadius = Mathf.Clamp(rootRadius * 0.85f, worldRadius, TrunkRadiusMaxMeters);
+                var baseHeight = Mathf.Clamp(worldHeight * 0.12f, baseRadius * 2.1f, 1.6f);
+                var baseCapsule = instance.AddComponent<CapsuleCollider>();
+                baseCapsule.direction = 1;
+                baseCapsule.radius = baseRadius / lossy;
+                baseCapsule.height = baseHeight / lossy;
+                var baseCenterY = bounds.min.y + baseHeight * 0.45f;
+                baseCapsule.center = instance.transform.InverseTransformPoint(
+                    new Vector3(pivot.x, baseCenterY, pivot.z));
+            }
+        }
+
+        private static void SampleTrunkRadii(
+            GameObject instance, Bounds worldBounds, out float boleRadius, out float rootRadius)
+        {
+            boleRadius = 0.2f;
+            rootRadius = 0f;
+            var pivot = instance.transform.position;
+            var minY = worldBounds.min.y;
+            var h = Mathf.Max(worldBounds.size.y, 0.1f);
+            // Skip ground roots (0–8%) and canopy (>40%); bole lives in the mid band.
+            var boleMinY = minY + h * 0.10f;
+            var boleMaxY = minY + h * 0.38f;
+            var rootMaxY = minY + h * 0.08f;
+
+            var boleSamples = new List<float>(128);
+            var rootSamples = new List<float>(64);
+            var filters = instance.GetComponentsInChildren<MeshFilter>();
+            for (var f = 0; f < filters.Length; f++)
+            {
+                var mesh = filters[f].sharedMesh;
+                if (mesh == null)
+                {
+                    continue;
+                }
+
+                var verts = mesh.vertices;
+                var xf = filters[f].transform;
+                var step = Mathf.Max(1, verts.Length / 320);
+                for (var i = 0; i < verts.Length; i += step)
+                {
+                    var w = xf.TransformPoint(verts[i]);
+                    var dx = w.x - pivot.x;
+                    var dz = w.z - pivot.z;
+                    var r = Mathf.Sqrt(dx * dx + dz * dz);
+                    if (w.y >= boleMinY && w.y <= boleMaxY)
+                    {
+                        boleSamples.Add(r);
+                    }
+                    else if (w.y <= rootMaxY)
+                    {
+                        rootSamples.Add(r);
+                    }
+                }
+            }
+
+            if (boleSamples.Count >= 6)
+            {
+                boleSamples.Sort();
+                // Median — max would pick needles/leaf cards that poke the trunk band.
+                boleRadius = boleSamples[boleSamples.Count / 2];
+                // Soft upper trim: ignore extreme outliers above 90th percentile.
+                var p90 = boleSamples[(int)(boleSamples.Count * 0.9f)];
+                boleRadius = Mathf.Min(boleRadius * 1.15f, p90);
+            }
+            else if (boleSamples.Count > 0)
+            {
+                boleSamples.Sort();
+                boleRadius = boleSamples[boleSamples.Count / 2];
+            }
+            else
+            {
+                boleRadius = Mathf.Clamp(h * 0.015f, TrunkRadiusMinMeters, TrunkRadiusMaxMeters);
+            }
+
+            if (rootSamples.Count >= 4)
+            {
+                rootSamples.Sort();
+                // Prefer lower quartile of roots so one wild root card doesn't balloon the capsule.
+                rootRadius = rootSamples[rootSamples.Count / 4];
+                var rootMed = rootSamples[rootSamples.Count / 2];
+                rootRadius = Mathf.Lerp(rootRadius, rootMed, 0.5f);
+            }
         }
     }
 }

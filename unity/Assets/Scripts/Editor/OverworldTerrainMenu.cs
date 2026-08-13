@@ -136,6 +136,7 @@ namespace GameDev.EditorTools
         private static void GenerateInternal(int seed)
         {
             LastSeed = seed;
+            var total = OverworldGenTiming.Start();
 
             EnsureReviewCamera();
 
@@ -151,29 +152,34 @@ namespace GameDev.EditorTools
             RoadNetworkMenu.ClearRoadNetwork();
             SettlementOverworldMenu.ClearSettlement();
 
-            var graph = BuildGraph(seed);
+            Graph graph = null;
+            OverworldGenTiming.Time("terrain.graph", () => { graph = BuildGraph(seed); });
 
             var mapMagic = FindOrCreateMapMagicObject();
             // MapMagicObject's own default (1000x1000) - bumped up so there's more room for both
             // a mountain feature and flat, buildable plains without either crowding the other out.
-            mapMagic.tileSize = new Vector2D(1400, 1400);
+            mapMagic.tileSize = new Vector2D(GameDev.World.WorldScale.OverworldTileMeters, GameDev.World.WorldScale.OverworldTileMeters);
             mapMagic.graph = graph;
             mapMagic.gameObject.SetActive(true);
-            mapMagic.Refresh(true);
 
-            // Outside Play mode MapMagic's own Update() only recalculates tile distances
-            // (MapMagicObject.cs Update(): distsOnly = !isPlaying) and never constructs a tile
-            // without one. Pin forces the origin tile to actually build in the Editor.
-            var originCoord = new Coord(0, 0);
-            mapMagic.tiles.Pin(originCoord, false, mapMagic);
+            OverworldGenTiming.Time("terrain.mapmagic-refresh", () =>
+            {
+                mapMagic.Refresh(true);
+                // Outside Play mode MapMagic's own Update() only recalculates tile distances
+                // (MapMagicObject.cs Update(): distsOnly = !isPlaying) and never constructs a tile
+                // without one. Pin forces the origin tile to actually build in the Editor.
+                var originCoord = new Coord(0, 0);
+                mapMagic.tiles.Pin(originCoord, false, mapMagic);
+            });
 
             // Lakes + rivers after the origin tile is ready so LakeBasinFinder / FlowNetwork sample
             // the final height channel. Basin pits come from BuildGraph; LakeTerrainCarver then
             // guarantees a real bed under each flooded zone before meshes are built.
-            WaterZoneMenu.GenerateForTile(mapMagic, originCoord);
+            OverworldGenTiming.Time("water", () => WaterZoneMenu.GenerateForTile(mapMagic, new Coord(0, 0)));
 
             SaveActive();
             Selection.activeGameObject = mapMagic.gameObject;
+            OverworldGenTiming.Log("terrain+water.total", OverworldGenTiming.StopMs(total), $"seed={seed}");
         }
 
         private static MapMagicObject FindOrCreateMapMagicObject()

@@ -38,6 +38,23 @@ No `river` fork: rivers are traced deterministically from the already-generated 
 
 `W.1 WorldSeed` (`unity/Assets/Scripts/World/Seed/`) already implements fork-by-name. **Former known gap, now fixed:** `OverworldTerrainMenu.BuildGraph` used to derive multiple values from one `"terrain"` fork via sequential `.Next()` calls, so inserting a new noise layer in the middle silently shifted every later derived seed. Fixed while adding the ridge layer below — every terrain concern now gets its own independently-named fork (`terrain.graph`, `terrain.macro`, `terrain.ridge`, `terrain.hills`, `terrain.terrace`, `terrain.highland-terrace`, `terrain.detail`), so inserting or removing a layer no longer reshuffles anything else's seed. `biome` (moisture) stays its own top-level fork, unchanged. Rivers (`FlowNetwork`/`RiverTracer`) need no seed at all — they're a pure deterministic function of the generated height field, not a separate random draw, so there's no `river` fork to add.
 
+### World scale (single table)
+
+All natural objects share one metre relationship via `GameDev.World.WorldScale` (character ≈ 1.8 m as the base unit):
+
+| Layer | Target metres |
+|---|---|
+| Character | 1.7–1.8 height, ~0.3 radius |
+| Trees | mature 12–25 (hero up to ~40), young 8–14 |
+| Shrubs | 0.5–3 |
+| Grass / flowers | short 0.05–0.5, tall 0.3–1, flowers 0.1–1 |
+| Small lakes (V0 tile) | radius 95–155 → diameter ~190–310 |
+| Lake basin dig | 36–48 (sunk-city volume; soft banks, not cliffs) |
+| Tile / chunk | 1400 / 64 |
+| Terrain height budget | ~220 |
+
+Do not scale prefabs independently — placers read `WorldScale`. Lake shores use analytic `LakeSilhouette` SDF (trig wobble), not the 3 m occupancy raster. Generation timing logs as `[Gen] step=... ms=...` from `OverworldGenTiming`.
+
 ---
 
 ## 2. Pipeline stages → System Cards

@@ -26,10 +26,13 @@ namespace GameDev.EditorTools
         private const string RootObjectName = "OverworldVegetation";
         private const string DebugOverlayName = "OverworldVegetationDebug";
 
-        private const int TreeReferenceAttempts = 16000;
-        private const int ShrubReferenceAttempts = 28000;
-        private const int GrassReferenceAttempts = 42000;
-        private const int RockReferenceAttempts = 3500;
+        // Lab density: enough coverage without ~175k PrefabUtility instantiates per tile.
+        private const int TreeReferenceAttempts = 6000;
+        private const int ShrubReferenceAttempts = 9000;
+        private const int GrassReferenceAttempts = 12000;
+        private const int RockReferenceAttempts = 1800;
+
+        private static readonly Dictionary<string, GameObject> PrefabCache = new Dictionary<string, GameObject>(64);
 
         private const float ShoreBufferMeters = 1.5f;
 
@@ -154,6 +157,7 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Scatter Vegetation")]
         public static void ScatterVegetation()
         {
+            var total = OverworldGenTiming.Start();
             var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
             if (mapMagic == null || mapMagic.graph == null)
             {
@@ -210,33 +214,100 @@ namespace GameDev.EditorTools
             var sizeZ = mapMagic.tileSize.z;
             var areaScale = (sizeX * sizeZ) / (1000f * 1000f);
 
-            var treeCount = ScatterLayer(
-                LayerKind.Tree, TreeByBiome, treesRoot.transform,
-                Mathf.RoundToInt(TreeReferenceAttempts * areaScale),
-                minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, offsets, rng,
-                density => density.Forest);
+            var treeAttempts = Mathf.RoundToInt(TreeReferenceAttempts * areaScale);
+            var shrubAttempts = Mathf.RoundToInt(ShrubReferenceAttempts * areaScale);
+            var grassAttempts = Mathf.RoundToInt(GrassReferenceAttempts * areaScale);
+            var rockAttempts = Mathf.RoundToInt(RockReferenceAttempts * areaScale);
 
-            var shrubCount = ScatterLayer(
-                LayerKind.Shrub, ShrubByBiome, shrubsRoot.transform,
-                Mathf.RoundToInt(ShrubReferenceAttempts * areaScale),
-                minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, offsets, rng,
-                density => Mathf.Max(density.Shrub, density.Thicket * 0.85f),
-                allowThicketClusters: true);
+            var treeCount = 0;
+            var shrubCount = 0;
+            var grassCount = 0;
+            var rockCount = 0;
+            OverworldGenTiming.Time("vegetation.trees", () =>
+            {
+                treeCount = ScatterLayer(
+                    LayerKind.Tree, TreeByBiome, treesRoot.transform, treeAttempts,
+                    minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, offsets, rng,
+                    density => density.Forest);
+            }, $"attempts={treeAttempts}");
 
-            var grassCount = ScatterLayer(
-                LayerKind.Grass, GrassByBiome, grassRoot.transform,
-                Mathf.RoundToInt(GrassReferenceAttempts * areaScale),
-                minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, offsets, rng,
-                density => density.Grass);
+            OverworldGenTiming.Time("vegetation.shrubs", () =>
+            {
+                shrubCount = ScatterLayer(
+                    LayerKind.Shrub, ShrubByBiome, shrubsRoot.transform, shrubAttempts,
+                    minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, offsets, rng,
+                    density => Mathf.Max(density.Shrub, density.Thicket * 0.85f),
+                    allowThicketClusters: true);
+            }, $"attempts={shrubAttempts}");
 
-            var rockCount = ScatterRocks(
-                rocksRoot.transform,
-                Mathf.RoundToInt(RockReferenceAttempts * areaScale),
-                minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, rng);
+            OverworldGenTiming.Time("vegetation.grass", () =>
+            {
+                grassCount = ScatterLayer(
+                    LayerKind.Grass, GrassByBiome, grassRoot.transform, grassAttempts,
+                    minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, offsets, rng,
+                    density => density.Grass);
+            }, $"attempts={grassAttempts}");
+
+            OverworldGenTiming.Time("vegetation.rocks", () =>
+            {
+                rockCount = ScatterRocks(
+                    rocksRoot.transform, rockAttempts,
+                    minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, rng);
+            }, $"attempts={rockAttempts}");
 
             Debug.Log(
                 $"[Vegetation] Ecology scatter seed={OverworldTerrainMenu.LastSeed}: " +
                 $"trees={treeCount}, shrubs={shrubCount}, grass={grassCount}, rocks={rockCount}");
+            LogTrunkColliderSamples(treesRoot.transform);
+            OverworldGenTiming.Log(
+                "vegetation.total",
+                OverworldGenTiming.StopMs(total),
+                $"spawned trees={treeCount} shrubs={shrubCount} grass={grassCount} rocks={rockCount}");
+        }
+
+        private static void LogTrunkColliderSamples(Transform treesRoot)
+        {
+            if (treesRoot == null)
+            {
+                return;
+            }
+
+            var pineN = 0;
+            var fruitN = 0;
+            var pineR = 0f;
+            var fruitR = 0f;
+            var pineCaps = 0;
+            var fruitCaps = 0;
+            for (var i = 0; i < treesRoot.childCount; i++)
+            {
+                var t = treesRoot.GetChild(i);
+                var name = t.name;
+                var caps = t.GetComponents<CapsuleCollider>();
+                if (caps == null || caps.Length == 0)
+                {
+                    continue;
+                }
+
+                var r = caps[0].radius * t.lossyScale.x;
+                if (name.Contains("Pine") || name.Contains("pine"))
+                {
+                    pineN++;
+                    pineR += r;
+                    pineCaps += caps.Length;
+                }
+                else if (name.Contains("Fruit") || name.Contains("fruit"))
+                {
+                    fruitN++;
+                    fruitR += r;
+                    fruitCaps += caps.Length;
+                }
+            }
+
+            Debug.Log(
+                $"[Vegetation] trunk colliders: " +
+                $"pine n={pineN} avgR={(pineN > 0 ? pineR / pineN : 0f):F3}m caps/tree={(pineN > 0 ? pineCaps / (float)pineN : 0f):F1} | " +
+                $"fruit n={fruitN} avgR={(fruitN > 0 ? fruitR / fruitN : 0f):F3}m caps/tree={(fruitN > 0 ? fruitCaps / (float)fruitN : 0f):F1} " +
+                $"(fitted from mid-trunk mesh verts; MeshCollider on full crown is intentionally avoided)");
         }
 
         [MenuItem("GameDev/Overworld/Clear Vegetation")]
@@ -596,7 +667,12 @@ namespace GameDev.EditorTools
             VegetationEcology.Sample density,
             System.Random rng)
         {
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (!PrefabCache.TryGetValue(path, out var prefab) || prefab == null)
+            {
+                prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                PrefabCache[path] = prefab;
+            }
+
             if (prefab == null)
             {
                 return false;
@@ -614,15 +690,34 @@ namespace GameDev.EditorTools
             }
             else if (layer == LayerKind.Grass)
             {
-                // Density field drives coverage; local scale varies thick/medium/sparse look.
-                var cover = Mathf.Lerp(0.7f, 1.45f, Mathf.Clamp01(density.Grass));
-                var jitter = Mathf.Lerp(0.9f, 1.15f, (float)rng.NextDouble());
-                instance.transform.localScale = Vector3.one * (cover * jitter);
+                var isFlower = path.Contains("/Flowers/");
+                float minH;
+                float maxH;
+                if (isFlower)
+                {
+                    minH = GameDev.World.WorldScale.FlowerMinMeters;
+                    maxH = GameDev.World.WorldScale.FlowerMaxMeters;
+                }
+                else
+                {
+                    // Meadow grass reads taller; forest understory shorter.
+                    minH = GameDev.World.WorldScale.GrassShortMinMeters;
+                    maxH = Mathf.Lerp(
+                        GameDev.World.WorldScale.GrassShortMaxMeters,
+                        GameDev.World.WorldScale.GrassTallMaxMeters,
+                        Mathf.Clamp01(density.Grass));
+                }
+
+                var targetH = Mathf.Lerp(minH, maxH, (float)rng.NextDouble());
+                ApplyTargetHeight(instance, targetH);
             }
             else if (layer == LayerKind.Shrub)
             {
-                var scale = Mathf.Lerp(0.9f, 1.35f, (float)rng.NextDouble());
-                instance.transform.localScale = Vector3.one * scale;
+                var targetH = Mathf.Lerp(
+                    GameDev.World.WorldScale.ShrubMinMeters,
+                    GameDev.World.WorldScale.ShrubMaxMeters,
+                    (float)rng.NextDouble());
+                ApplyTargetHeight(instance, targetH);
             }
 
             instance.transform.position = new Vector3(x, groundY, z);
@@ -634,6 +729,24 @@ namespace GameDev.EditorTools
             }
 
             return true;
+        }
+
+        private static void ApplyTargetHeight(GameObject instance, float targetHeightMeters)
+        {
+            if (instance == null || targetHeightMeters <= 0.01f)
+            {
+                return;
+            }
+
+            instance.transform.localScale = Vector3.one;
+            var height = TreePlacement.MeasureRendererHeight(instance);
+            if (height < 0.02f)
+            {
+                instance.transform.localScale = Vector3.one * targetHeightMeters;
+                return;
+            }
+
+            instance.transform.localScale = Vector3.one * (targetHeightMeters / height);
         }
 
         private static void ClearDebugOverlay()

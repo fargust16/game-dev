@@ -377,7 +377,9 @@ namespace GameDev.World.Water
                 }
             }
 
-            return new WaterZone(id, zone.WaterLevelY, zone.OriginX, zone.OriginZ, zone.CellSize, flooded, heights);
+            return new WaterZone(
+                id, zone.WaterLevelY, zone.OriginX, zone.OriginZ, zone.CellSize, flooded, heights,
+                zone.Silhouette);
         }
 
         /// <summary>True if any flooded cell of A is within gapCells of a flooded cell of B.</summary>
@@ -491,8 +493,15 @@ namespace GameDev.World.Water
             FillEnclosedHoles(flooded, width, depth);
             Dilate(flooded, width, depth, cells: 1);
             FillEnclosedHoles(flooded, width, depth);
-            SmoothFloodMask(flooded, width, depth, blurPasses: 4, threshold: 0.40f);
-            return new WaterZone(id, level, first.OriginX, first.OriginZ, first.CellSize, flooded, heights);
+            // Keep analytic silhouette when merging a single lake; multi-merge drops it (rare path).
+            var silhouette = members.Count == 1 ? first.Silhouette : null;
+            if (silhouette == null)
+            {
+                SmoothFloodMask(flooded, width, depth, blurPasses: 4, threshold: 0.40f);
+            }
+
+            return new WaterZone(
+                id, level, first.OriginX, first.OriginZ, first.CellSize, flooded, heights, silhouette);
         }
 
         private static WaterZone FinalizeZone(WaterZone zone, string id)
@@ -509,10 +518,17 @@ namespace GameDev.World.Water
             }
 
             FillEnclosedHoles(flooded, zone.Width, zone.Depth);
-            Dilate(flooded, zone.Width, zone.Depth, cells: 1);
-            FillEnclosedHoles(flooded, zone.Width, zone.Depth);
-            SmoothFloodMask(flooded, zone.Width, zone.Depth, blurPasses: 4, threshold: 0.40f);
-            return new WaterZone(id, zone.WaterLevelY, zone.OriginX, zone.OriginZ, zone.CellSize, flooded, heights);
+            // Analytic lakes already have a continuous shore — do not re-pixelate the mask.
+            if (zone.Silhouette == null)
+            {
+                Dilate(flooded, zone.Width, zone.Depth, cells: 1);
+                FillEnclosedHoles(flooded, zone.Width, zone.Depth);
+                SmoothFloodMask(flooded, zone.Width, zone.Depth, blurPasses: 4, threshold: 0.40f);
+            }
+
+            return new WaterZone(
+                id, zone.WaterLevelY, zone.OriginX, zone.OriginZ, zone.CellSize, flooded, heights,
+                zone.Silhouette);
         }
 
         /// <summary>

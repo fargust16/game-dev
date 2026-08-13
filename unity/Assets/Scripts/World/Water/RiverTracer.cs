@@ -74,11 +74,12 @@ namespace GameDev.World.Water
         public static RiverTracerSettings Default(float terrainBaseY, float heightScaleMeters) => new RiverTracerSettings(
             channelAccumulationThreshold: 60,
             referenceAccumulation: 60 * 10,
-            minWidthMeters: 6f,
-            maxWidthMeters: 22f,
-            minCarveDepthMeters: 2.5f,
-            maxCarveDepthMeters: 7f,
-            waterFillFraction: 0.6f,
+            minWidthMeters: 8f,
+            maxWidthMeters: 26f,
+            minCarveDepthMeters: 4f,
+            maxCarveDepthMeters: 9f,
+            // Low fill → ribbon hugs the carved bed (high values floated metres above the trench).
+            waterFillFraction: 0.35f,
             maxRivers: 12,
             minPathCells: 12,
             minSourceElevationY: terrainBaseY +

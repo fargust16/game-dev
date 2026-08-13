@@ -20,15 +20,19 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Build Full Overworld (Random Seed)")]
         public static void BuildFullRandomSeed()
         {
-            OverworldTerrainMenu.GenerateRandomSeed();
+            var total = OverworldGenTiming.Start();
+            OverworldGenTiming.Time("terrain+water", OverworldTerrainMenu.GenerateRandomSeed);
             RunRemainingSteps();
+            OverworldGenTiming.Log("full-overworld", OverworldGenTiming.StopMs(total), "random seed");
         }
 
         [MenuItem("GameDev/Overworld/Build Full Overworld (Default Seed)")]
         public static void BuildFullDefaultSeed()
         {
-            OverworldTerrainMenu.GenerateFromSeed();
+            var total = OverworldGenTiming.Start();
+            OverworldGenTiming.Time("terrain+water", OverworldTerrainMenu.GenerateFromSeed);
             RunRemainingSteps();
+            OverworldGenTiming.Log("full-overworld", OverworldGenTiming.StopMs(total), "default seed");
         }
 
         // Terrain generation (OverworldTerrainMenu.GenerateInternal) clears prior derived output and
@@ -37,10 +41,10 @@ namespace GameDev.EditorTools
         // read OverworldRoads / OverworldSettlement / OverworldPoi.
         private static void RunRemainingSteps()
         {
-            PoiMarkerMenu.PlaceMarkers();
-            SettlementOverworldMenu.PlaceSettlementAtTownApproach();
-            RoadNetworkMenu.BuildRoadNetwork();
-            VegetationScatterMenu.ScatterVegetation();
+            OverworldGenTiming.Time("poi", PoiMarkerMenu.PlaceMarkers);
+            OverworldGenTiming.Time("settlement", SettlementOverworldMenu.PlaceSettlementAtTownApproach);
+            OverworldGenTiming.Time("roads", RoadNetworkMenu.BuildRoadNetwork);
+            OverworldGenTiming.Time("vegetation", VegetationScatterMenu.ScatterVegetation);
         }
 
         [MenuItem("GameDev/Overworld/Clear Full Overworld")]

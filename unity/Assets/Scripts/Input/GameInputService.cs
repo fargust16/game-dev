@@ -21,6 +21,8 @@ namespace GameDev.Input
         private InputAction _toggleScheme;
         private InputAction _toggleTurnBased;
         private InputAction _legend;
+        private InputAction _jump;
+        private InputAction _sprint;
 
         private InputAction _camPan;
         private InputAction _camOrbit;
@@ -97,6 +99,8 @@ namespace GameDev.Input
         public bool ToggleSchemePressed => _toggleScheme != null && _toggleScheme.WasPressedThisFrame();
         public bool ToggleTurnBasedPressed => _toggleTurnBased != null && _toggleTurnBased.WasPressedThisFrame();
         public bool LegendPressed => _legend != null && _legend.WasPressedThisFrame();
+        public bool JumpPressed => _jump != null && _jump.WasPressedThisFrame();
+        public bool SprintHeld => _sprint != null && _sprint.IsPressed();
 
         public Vector2 CameraPanVector => _camPan != null ? _camPan.ReadValue<Vector2>() : Vector2.zero;
         public bool CameraOrbitHeld => _camOrbit != null && _camOrbit.IsPressed();
@@ -167,6 +171,10 @@ namespace GameDev.Input
             _toggleScheme = _player.AddAction("ToggleControlScheme", InputActionType.Button, "<Keyboard>/tab");
             _toggleTurnBased = _player.AddAction("ToggleTurnBased", InputActionType.Button, "<Keyboard>/t");
             _legend = _player.AddAction("Legend", InputActionType.Button, "<Keyboard>/h");
+            _jump = _player.AddAction("Jump", InputActionType.Button, "<Keyboard>/space");
+            _sprint = _player.AddAction("Sprint", InputActionType.Button);
+            _sprint.AddBinding("<Keyboard>/leftShift");
+            _sprint.AddBinding("<Keyboard>/rightShift");
 
             _camera = new InputActionMap("Camera");
             _camPan = _camera.AddAction("Pan", InputActionType.Value);
