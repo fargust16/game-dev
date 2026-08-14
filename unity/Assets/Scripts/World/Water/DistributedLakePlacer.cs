@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GameDev.World.Seed;
+using GameDev.World.Terrain;
 using UnityEngine;
 using Random = System.Random;
 
@@ -9,7 +10,8 @@ namespace GameDev.World.Water
     /// <summary>
     /// Plants elongated, terrain-aware lakes on a jittered strata grid. Shapes are
     /// BaseEllipse × TerrainInfluence × SeededOrganicVariation. Placement uses
-    /// <see cref="LakePlacementScore"/> — not naive height ranking.
+    /// <see cref="LakePlacementScore"/> plus full-silhouette Mountain occupancy —
+    /// not naive height ranking. Min count is a soft target: fewer lakes beat a sheet through a ridge.
     /// </summary>
     public static class DistributedLakePlacer
     {
@@ -18,6 +20,7 @@ namespace GameDev.World.Water
         public const float DefaultMinSeparationMeters = 380f;
         public const float AspectRatioMin = 1.4f;
         public const float AspectRatioMax = 2.2f;
+        public const float MountainOccupancySampleStepMeters = 8f;
 
         private enum LakeSizeTier
         {
@@ -42,7 +45,8 @@ namespace GameDev.World.Water
                 placeRng: rng,
                 worldSeed: null,
                 settings: WorldGenSettings.Default,
-                minLakes, targetLakes);
+                minLakes, targetLakes,
+                biomeAtWorld: null);
         }
 
         public static WaterZone[] Place(
@@ -55,14 +59,30 @@ namespace GameDev.World.Water
             IWorldSeed worldSeed,
             WorldGenSettings settings)
         {
+            return Place(
+                worldHeightSampler, minX, minZ, sizeX, sizeZ, cellSize,
+                worldSeed, settings, biomeAtWorld: null);
+        }
+
+        public static WaterZone[] Place(
+            Func<float, float, float> worldHeightSampler,
+            float minX,
+            float minZ,
+            float sizeX,
+            float sizeZ,
+            float cellSize,
+            IWorldSeed worldSeed,
+            WorldGenSettings settings,
+            Func<float, float, BiomeId> biomeAtWorld)
+        {
             settings.Clamp();
             var placeRng = worldSeed.Fork("lake.place");
-            // Guaranteed minimum: never ship fewer than LakeMinCount when terrain allows.
+            // Soft target: try for LakeCount, never force onto mountains.
             var target = Mathf.Max(WorldScale.LakeMinCount, settings.LakeCount);
             var minLakes = target;
             return Place(
                 worldHeightSampler, minX, minZ, sizeX, sizeZ, cellSize,
-                placeRng, worldSeed, settings, minLakes, target);
+                placeRng, worldSeed, settings, minLakes, target, biomeAtWorld);
         }
 
         private static WaterZone[] Place(
@@ -76,7 +96,8 @@ namespace GameDev.World.Water
             IWorldSeed worldSeed,
             WorldGenSettings settings,
             int minLakes,
-            int targetLakes)
+            int targetLakes,
+            Func<float, float, BiomeId> biomeAtWorld = null)
         {
             if (worldHeightSampler == null || placeRng == null ||
                 sizeX < cellSize * 4f || sizeZ < cellSize * 4f)
@@ -85,19 +106,31 @@ namespace GameDev.World.Water
             }
 
             settings.Clamp();
-            minLakes = Mathf.Clamp(minLakes, WorldScale.LakeMinCount, 6);
+            minLakes = Mathf.Clamp(minLakes, 1, 6);
             targetLakes = Mathf.Clamp(targetLakes, minLakes, 6);
 
             var width = Mathf.Max(2, Mathf.RoundToInt(sizeX / cellSize));
             var depth = Mathf.Max(2, Mathf.RoundToInt(sizeZ / cellSize));
             var heights = new float[width, depth];
+            var heightMin = float.PositiveInfinity;
+            var heightMax = float.NegativeInfinity;
             for (var x = 0; x < width; x++)
             {
                 for (var z = 0; z < depth; z++)
                 {
-                    heights[x, z] = worldHeightSampler(
+                    var h = worldHeightSampler(
                         minX + (x + 0.5f) * cellSize,
                         minZ + (z + 0.5f) * cellSize);
+                    heights[x, z] = h;
+                    if (h < heightMin)
+                    {
+                        heightMin = h;
+                    }
+
+                    if (h > heightMax)
+                    {
+                        heightMax = h;
+                    }
                 }
             }
 
@@ -153,7 +186,6 @@ namespace GameDev.World.Water
                 candidates.Add((cx, cz, score));
             }
 
-            // Stable sort: score desc, then (cx,cz) for ties.
             candidates.Sort((a, b) =>
             {
                 var c = b.Score.CompareTo(a.Score);
@@ -166,7 +198,6 @@ namespace GameDev.World.Water
                 return c != 0 ? c : a.Cz.CompareTo(b.Cz);
             });
 
-            // Always attempt the full target (min 3). No random under-count.
             var count = Mathf.Min(targetLakes, Mathf.Max(1, candidates.Count));
             var zones = new List<WaterZone>(count);
             var minSepCells = Mathf.Max(40, Mathf.RoundToInt(DefaultMinSeparationMeters / cellSize));
@@ -175,11 +206,12 @@ namespace GameDev.World.Water
 
             TryPlaceLakes(
                 zones, candidates, heights, minX, minZ, cellSize, width, depth,
-                worldSeed, placeRng, settings, mapArea, minSepSq, targetLakes);
+                worldSeed, placeRng, settings, mapArea, minSepSq, targetLakes,
+                heightMin, heightMax, biomeAtWorld);
 
             if (zones.Count < minLakes)
             {
-                // Soft candidates: keep mountain reject, loosen slope/edge so we still hit min count.
+                // Soft candidates: loosen slope/edge but Mountain occupancy still hard-rejects.
                 var soft = GatherSoftCandidates(
                     heights, width, depth, cellSize, edgeMarginCells, placeRng);
                 soft.Sort((a, b) =>
@@ -198,7 +230,8 @@ namespace GameDev.World.Water
                 relaxSepSq *= relaxSepSq;
                 TryPlaceLakes(
                     zones, soft, heights, minX, minZ, cellSize, width, depth,
-                    worldSeed, placeRng, settings, mapArea, relaxSepSq, minLakes);
+                    worldSeed, placeRng, settings, mapArea, relaxSepSq, minLakes,
+                    heightMin, heightMax, biomeAtWorld);
             }
 
             return zones.ToArray();
@@ -260,7 +293,10 @@ namespace GameDev.World.Water
             WorldGenSettings settings,
             float mapArea,
             int minSepSq,
-            int desiredCount)
+            int desiredCount,
+            float heightMin,
+            float heightMax,
+            Func<float, float, BiomeId> biomeAtWorld)
         {
             foreach (var candidate in candidates)
             {
@@ -284,7 +320,7 @@ namespace GameDev.World.Water
                 var tier = SizeTierForIndex(lakeIndex, desiredCount);
                 var radiusMeters = RadiusForSizeTier(mapArea, tier, lakeRng, settings.LakeSize);
 
-                zones.Add(MakeOrganicZone(
+                var zone = MakeOrganicZone(
                     $"lake_{lakeIndex}",
                     heights,
                     minX,
@@ -298,8 +334,154 @@ namespace GameDev.World.Water
                     lakeRng,
                     settings.ShapeIrregularity,
                     settings.TerrainConformity,
-                    settings.WaterDepthOffsetMeters));
+                    settings.WaterDepthOffsetMeters);
+
+                if (FloodTouchesMountain(zone, heights, width, depth, heightMin, heightMax, biomeAtWorld))
+                {
+                    continue;
+                }
+
+                zones.Add(zone);
             }
+        }
+
+        /// <summary>
+        /// Hard Mountain occupancy: any flooded / silhouette sample on BiomeId.Mountain
+        /// (or steep highland) rejects the lake. Prefer fewer lakes over a sheet through a ridge.
+        /// </summary>
+        public static bool FloodTouchesMountain(
+            WaterZone zone,
+            float[,] heights,
+            int width,
+            int depth,
+            float heightMin,
+            float heightMax,
+            Func<float, float, BiomeId> biomeAtWorld = null)
+        {
+            if (zone == null)
+            {
+                return false;
+            }
+
+            var range = Mathf.Max(heightMax - heightMin, 0.01f);
+            var step = Mathf.Max(1, Mathf.RoundToInt(MountainOccupancySampleStepMeters / Mathf.Max(zone.CellSize, 0.01f)));
+
+            if (zone.Silhouette != null)
+            {
+                var aabb = zone.Silhouette.GetAabbXZ(padMeters: zone.CellSize);
+                for (var wz = aabb.yMin; wz <= aabb.yMax; wz += MountainOccupancySampleStepMeters)
+                {
+                    for (var wx = aabb.xMin; wx <= aabb.xMax; wx += MountainOccupancySampleStepMeters)
+                    {
+                        if (zone.Silhouette.SignedDistance(wx, wz) < 0f)
+                        {
+                            continue;
+                        }
+
+                        if (IsMountainAt(wx, wz, zone, heights, width, depth, heightMin, range, biomeAtWorld))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            for (var z = 0; z < depth; z += step)
+            {
+                for (var x = 0; x < width; x += step)
+                {
+                    if (!zone.IsFlooded(x, z))
+                    {
+                        continue;
+                    }
+
+                    var wx = zone.OriginX + (x + 0.5f) * zone.CellSize;
+                    var wz = zone.OriginZ + (z + 0.5f) * zone.CellSize;
+                    if (IsMountainAt(wx, wz, zone, heights, width, depth, heightMin, range, biomeAtWorld))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsMountainAt(
+            float wx,
+            float wz,
+            WaterZone zone,
+            float[,] heights,
+            int width,
+            int depth,
+            float heightMin,
+            float range,
+            Func<float, float, BiomeId> biomeAtWorld)
+        {
+            if (biomeAtWorld != null)
+            {
+                var biome = biomeAtWorld(wx, wz);
+                return biome == BiomeId.Mountain;
+            }
+
+            var cx = Mathf.Clamp(
+                Mathf.FloorToInt((wx - zone.OriginX) / Mathf.Max(zone.CellSize, 0.01f)),
+                0, width - 1);
+            var cz = Mathf.Clamp(
+                Mathf.FloorToInt((wz - zone.OriginZ) / Mathf.Max(zone.CellSize, 0.01f)),
+                0, depth - 1);
+            var h01 = (heights[cx, cz] - heightMin) / range;
+            var hx = SampleBlurred(heights, width, depth, Mathf.Min(cx + 1, width - 1), cz) -
+                     SampleBlurred(heights, width, depth, Mathf.Max(cx - 1, 0), cz);
+            var hz = SampleBlurred(heights, width, depth, cx, Mathf.Min(cz + 1, depth - 1)) -
+                     SampleBlurred(heights, width, depth, cx, Mathf.Max(cz - 1, 0));
+            var slope = Mathf.Sqrt(hx * hx + hz * hz) / (2f * Mathf.Max(zone.CellSize, 0.01f));
+            var slope01 = Mathf.Clamp01(slope / 0.6f);
+            return BiomeClassifier.Classify(h01, slope01, 0.5f) == BiomeId.Mountain;
+        }
+
+        /// <summary>Majority biome under the flood for swamp tint etc.</summary>
+        public static BiomeId MajorityBiome(
+            WaterZone zone,
+            Func<float, float, BiomeId> biomeAtWorld)
+        {
+            if (zone == null || biomeAtWorld == null)
+            {
+                return BiomeId.Meadow;
+            }
+
+            var counts = new Dictionary<BiomeId, int>();
+            var step = Mathf.Max(zone.CellSize * 2f, MountainOccupancySampleStepMeters);
+            var aabb = zone.GetFloodAabbXZ();
+            for (var wz = aabb.yMin; wz <= aabb.yMax; wz += step)
+            {
+                for (var wx = aabb.xMin; wx <= aabb.xMax; wx += step)
+                {
+                    if (!zone.Contains(wx, wz))
+                    {
+                        continue;
+                    }
+
+                    var b = biomeAtWorld(wx, wz);
+                    counts.TryGetValue(b, out var n);
+                    counts[b] = n + 1;
+                }
+            }
+
+            var best = BiomeId.Meadow;
+            var bestN = -1;
+            foreach (var kv in counts)
+            {
+                if (kv.Value > bestN)
+                {
+                    bestN = kv.Value;
+                    best = kv.Key;
+                }
+            }
+
+            return best;
         }
 
         private static LakeSizeTier SizeTierForIndex(int lakeIndex, int total)

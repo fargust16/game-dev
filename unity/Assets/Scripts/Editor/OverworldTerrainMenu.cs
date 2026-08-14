@@ -66,6 +66,12 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Clear Terrain")]
         public static void ClearTerrain()
         {
+            OverworldPipeline.ClearAll();
+        }
+
+        /// <summary>Clear MapMagic graph only (caller owns downstream clears).</summary>
+        public static void ClearTerrainOnly()
+        {
             var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
             if (mapMagic == null)
             {
@@ -74,14 +80,6 @@ namespace GameDev.EditorTools
 
             mapMagic.graph = null;
             mapMagic.Refresh(true);
-
-            WaterZoneMenu.ClearWaterZones();
-            WaterZoneMenu.ClearRiverZones();
-            VegetationScatterMenu.ClearVegetation();
-            PoiMarkerMenu.ClearMarkers();
-            RoadNetworkMenu.ClearRoadNetwork();
-            SettlementOverworldMenu.ClearSettlement();
-
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
         }
 
@@ -140,74 +138,38 @@ namespace GameDev.EditorTools
 
         private static void GenerateInternal(int seed)
         {
-            LastSeed = seed;
-            var total = OverworldGenTiming.Start();
-
-            EnsureReviewCamera();
-
-            // Vegetation/POI/Roads/Settlement/Water are all derived from the terrain and become stale
-            // the moment it regenerates - never leave them sitting on the old shape. Stale water
-            // meshes are the worst offender visually: they float at the previous WaterLevelY over a
-            // completely different heightmap. Roads are similarly broken when an old route crosses a
-            // new lake.
-            WaterZoneMenu.ClearWaterZones();
-            WaterZoneMenu.ClearRiverZones();
-            VegetationScatterMenu.ClearVegetation();
-            PoiMarkerMenu.ClearMarkers();
-            RoadNetworkMenu.ClearRoadNetwork();
-            SettlementOverworldMenu.ClearSettlement();
-
-            Graph graph = null;
-            OverworldGenTiming.Time("terrain.graph", () => { graph = BuildGraph(seed); });
-
-            var mapMagic = FindOrCreateMapMagicObject();
-            // MapMagicObject's own default (1000x1000) - bumped up so there's more room for both
-            // a mountain feature and flat, buildable plains without either crowding the other out.
-            mapMagic.tileSize = new Vector2D(GameDev.World.WorldScale.OverworldTileMeters, GameDev.World.WorldScale.OverworldTileMeters);
-            mapMagic.graph = graph;
-            mapMagic.gameObject.SetActive(true);
-
-            OverworldGenTiming.Time("terrain.mapmagic-refresh", () =>
-            {
-                mapMagic.Refresh(true);
-                // Outside Play mode MapMagic's own Update() only recalculates tile distances
-                // (MapMagicObject.cs Update(): distsOnly = !isPlaying) and never constructs a tile
-                // without one. Pin forces the origin tile to actually build in the Editor.
-                var originCoord = new Coord(0, 0);
-                mapMagic.tiles.Pin(originCoord, false, mapMagic);
-            });
-
-            // Lakes placed as definitions (SDF) so LandscapePlanner can route before dig.
-            // Full pipeline defers basin dig until after roads; standalone terrain menu still
-            // finishes water immediately via GenerateForTile(defer:false) default.
-            OverworldGenTiming.Time("water", () => WaterZoneMenu.GenerateForTile(mapMagic, new Coord(0, 0)));
-
-            SaveActive();
-            Selection.activeGameObject = mapMagic.gameObject;
-            OverworldGenTiming.Log("terrain+water.total", OverworldGenTiming.StopMs(total), $"seed={seed}");
+            // Standalone terrain menu: surface only (no lakes). Use Part-Gen/Lakes or Generate All for water.
+            GenerateSurface(seed, TerrainBakeFlags.Full);
         }
 
         /// <summary>
-        /// Base terrain + planned lake/river definitions only (no basin dig / water meshes).
-        /// Used by LandscapePlanner full overworld pipeline.
+        /// Height graph bake. Cascade-clears lakes/POI/roads/veg — never leaves stale water on a new heightmap.
+        /// Does not place lakes (use Lakes pipeline step).
         /// </summary>
-        public static void GenerateTerrainAndLakePlan(int seed)
+        public static void GenerateSurface(int seed, TerrainBakeFlags flags)
         {
             LastSeed = seed;
+            LastBakeFlags = flags;
             var total = OverworldGenTiming.Start();
+
             EnsureReviewCamera();
+
             WaterZoneMenu.ClearWaterZones();
             WaterZoneMenu.ClearRiverZones();
             VegetationScatterMenu.ClearVegetation();
+            GrassBakeMenu.Clear();
             PoiMarkerMenu.ClearMarkers();
             RoadNetworkMenu.ClearRoadNetwork();
             SettlementOverworldMenu.ClearSettlement();
+            OverworldPlayerMenu.ClearPlayer();
 
             Graph graph = null;
-            OverworldGenTiming.Time("terrain.graph", () => { graph = BuildGraph(seed); });
+            OverworldGenTiming.Time("terrain.graph", () => { graph = BuildGraph(seed, flags); });
 
             var mapMagic = FindOrCreateMapMagicObject();
-            mapMagic.tileSize = new Vector2D(GameDev.World.WorldScale.OverworldTileMeters, GameDev.World.WorldScale.OverworldTileMeters);
+            mapMagic.tileSize = new Vector2D(
+                GameDev.World.WorldScale.OverworldTileMeters,
+                GameDev.World.WorldScale.OverworldTileMeters);
             mapMagic.graph = graph;
             mapMagic.gameObject.SetActive(true);
 
@@ -217,12 +179,24 @@ namespace GameDev.EditorTools
                 mapMagic.tiles.Pin(new Coord(0, 0), false, mapMagic);
             });
 
-            OverworldGenTiming.Time("water.plan", () =>
-                WaterZoneMenu.GenerateForTile(mapMagic, new Coord(0, 0), deferTerrainDeformAndMeshes: true));
-
             SaveActive();
             Selection.activeGameObject = mapMagic.gameObject;
-            OverworldGenTiming.Log("terrain+lake-plan.total", OverworldGenTiming.StopMs(total), $"seed={seed}");
+            OverworldGenTiming.Log(
+                "terrain.surface",
+                OverworldGenTiming.StopMs(total),
+                $"seed={seed} flags={flags}");
+        }
+
+        /// <summary>Last bake flags (Part-Gen Mountains/Zones merge against this).</summary>
+        public static TerrainBakeFlags LastBakeFlags { get; private set; } = TerrainBakeFlags.Full;
+
+        /// <summary>
+        /// Legacy alias: surface with full flags only (no lake plan). Prefer
+        /// <see cref="GenerateSurface"/> + Lakes step.
+        /// </summary>
+        public static void GenerateTerrainAndLakePlan(int seed)
+        {
+            GenerateSurface(seed, TerrainBakeFlags.Full);
         }
 
         private static MapMagicObject FindOrCreateMapMagicObject()
@@ -283,27 +257,34 @@ namespace GameDev.EditorTools
         /// sequential calls used to.
         /// </para>
         /// </summary>
-        private static Graph BuildGraph(int seed)
+        private static Graph BuildGraph(int seed, TerrainBakeFlags flags = TerrainBakeFlags.Full)
         {
             EnsureSettingsFolder();
+
+            var includeMountains = (flags & TerrainBakeFlags.IncludeMountains) != 0;
+            var includeZones = (flags & TerrainBakeFlags.IncludeZoneTextures) != 0;
 
             // Each terrain concern gets its own named fork instead of sequential .Next() calls off
             // one shared "terrain" stream (WORLD_GENERATION_PIPELINE.md's own "Known gap" note this
             // file used to carry): inserting/removing a layer here can no longer silently reshuffle
             // every other layer's seed. "biome" (moisture) stays its own independent top-level
-            // fork, unchanged.
+            // fork, unchanged. Skipped mountain layers still must NOT consume other forks.
             var graphSeed = new WorldSeed(seed).Fork("terrain.graph").Next();
             var macroSeed = new WorldSeed(seed).Fork("terrain.macro").Next();
-            var ridgeSeed = new WorldSeed(seed).Fork("terrain.ridge").Next();
             var hillsSeed = new WorldSeed(seed).Fork("terrain.hills").Next();
-            var terraceSeed = new WorldSeed(seed).Fork("terrain.terrace").Next();
-            var highlandTerraceSeed = new WorldSeed(seed).Fork("terrain.highland-terrace").Next();
             var detailSeed = new WorldSeed(seed).Fork("terrain.detail").Next();
-            // Own fork, sequential .Next() calls WITHIN it (fine - the seed-fork fix above is about
-            // not sharing one fork ACROSS unrelated concerns, not about avoiding .Next() sequences
-            // for one self-contained concern's own sub-values).
             var basinSeed = new WorldSeed(seed).Fork("terrain.basins");
             var moistureSeed = new WorldSeed(seed).Fork("biome").Next();
+            // Mountain-only forks: only read when IncludeMountains so skip does not change other streams.
+            var ridgeSeed = 0;
+            var terraceSeed = 0;
+            var highlandTerraceSeed = 0;
+            if (includeMountains)
+            {
+                ridgeSeed = new WorldSeed(seed).Fork("terrain.ridge").Next();
+                terraceSeed = new WorldSeed(seed).Fork("terrain.terrace").Next();
+                highlandTerraceSeed = new WorldSeed(seed).Fork("terrain.highland-terrace").Next();
+            }
 
             var graph = Graph.Create();
             graph.random = new Noise(graphSeed, 32768);
@@ -320,9 +301,11 @@ namespace GameDev.EditorTools
             macroNoise.detail = 0.5f;
             graph.Add(macroNoise);
 
-            // Two seeded mountain *masses* in opposite strata (jittered). Without this, a single
-            // elongated high-macro band + ridges often yields one wall or one corner peak and
-            // leaves half the tile without highland river sources.
+            // Two seeded mountain *masses* in opposite strata (jittered). Skipped when
+            // TerrainBakeFlags.IncludeMountains is off — fork is not consumed.
+            IOutlet<Den.Tools.Matrices.MatrixWorld> rankedInput = macroNoise;
+            if (includeMountains)
+            {
             var massSeed = new WorldSeed(seed).Fork("terrain.masses");
             IOutlet<Den.Tools.Matrices.MatrixWorld> mountainMasses = null;
             for (var mi = 0; mi < 2; mi++)
@@ -415,10 +398,12 @@ namespace GameDev.EditorTools
             // Ridge contribution on top of the dual-mass macro field. Opacity moderate so masses
             // stay readable as separate peaks rather than one bisecting wall.
             var macroWithRidges = Combine(graph, macroWithMasses, softRidge, Blend200.BlendAlgorithm.add, 0.38f);
+            rankedInput = macroWithRidges;
+            } // includeMountains
 
             var rankHeightGen = (PercentileRankGenerator)Generator.Create(typeof(PercentileRankGenerator));
             graph.Add(rankHeightGen);
-            graph.Link(macroWithRidges, rankHeightGen);
+            graph.Link(rankedInput, rankHeightGen);
 
             // Percentile ranking guarantees area fractions, but it does that by locally steepening
             // the field wherever the raw noise's own value distribution is densest: "more rank
@@ -491,6 +476,9 @@ namespace GameDev.EditorTools
             var elevationSum = Combine(graph, greenCompressed, highlandExpanded, Blend200.BlendAlgorithm.add);
             var flattenedHeight = Combine(graph, elevationSum, plainsCapConstant, Blend200.BlendAlgorithm.subtract);
 
+            IOutlet<Den.Tools.Matrices.MatrixWorld> fullyTerracedHeight = flattenedHeight;
+            if (includeMountains)
+            {
             // Mountain terracing (WORLD_GENERATION_PIPELINE.md Iteration 01: cliffs/terraces):
             // swaps the smooth top of the compressed field for a terraced version without changing
             // WHICH fraction of the map counts as Mountain. Isolate the mountain band's own local
@@ -559,7 +547,8 @@ namespace GameDev.EditorTools
 
             IOutlet<Den.Tools.Matrices.MatrixWorld> highlandLocalOut = highlandLocal;
             var withoutSmoothHighland = Combine(graph, terracedHeight, highlandLocalOut, Blend200.BlendAlgorithm.subtract, highlandBandWidth);
-            var fullyTerracedHeight = Combine(graph, withoutSmoothHighland, highlandTerracedLocal, Blend200.BlendAlgorithm.add, highlandBandWidth);
+            fullyTerracedHeight = Combine(graph, withoutSmoothHighland, highlandTerracedLocal, Blend200.BlendAlgorithm.add, highlandBandWidth);
+            } // includeMountains
 
             // Basin carving (incident: removing this entirely was the wrong call - see
             // WORLD_GENERATION_PIPELINE.md's Hydrology row for the full story). Ridge structure
@@ -748,27 +737,11 @@ namespace GameDev.EditorTools
             graph.Link((IOutlet<Den.Tools.Matrices.MatrixWorld>)slope, (IInlet<Den.Tools.Matrices.MatrixWorld>)slopeChannel);
             graph.Link(moistureNoise, moistureChannel);
 
+            if (includeZones)
+            {
             // Terrain material painting (WORLD_GENERATION_PIPELINE.md Iteration 06): six
-            // TerrainLayers (Assets/MapMagic/Demo/TerrainLayers/, ready-made grass/dirt/rock/snow
-            // textures - see ASSET_LIBRARY_REFERENCE.md) painted from the same height/slope/
-            // moisture fields BiomeClassifier reads, so what the player sees roughly matches what
-            // the game logic thinks the ground is, not two independently tuned systems that happen
-            // to agree. TexturesOutput200 blends its layer array "Photoshop style"
-            // (Matrix.BlendLayers processes Length-1 down to 0): layer 0 is the background and
-            // gets whatever no higher layer claims (its own inlet is ignored - MapMagic fills it to
-            // 1 before blending), each higher-indexed layer claims mask*opacity of whatever budget
-            // is left - so a higher-priority layer (e.g. Mountain rock) automatically wins any
-            // overlap with a lower one (e.g. Highland gravel) without needing to explicitly
-            // subtract the overlap from the lower layer's own mask; the leftover-budget stacking
-            // handles it. Thresholds ramp softly over bandBlend instead of a hard step, so texture
-            // transitions don't read as a harsh line.
+            // TerrainLayers painted from the same height/slope/moisture fields BiomeClassifier reads.
             const float bandBlend = 0.03f;
-            // Top ~3% of area (by rank) within the Mountain band, re-expressed relative to
-            // HighlandMaxHeight so it stays correct if the compression constants above change:
-            // 70% of the way from the band's start to the peak, in elevation terms, is the same
-            // position as the top 3% of area in rank terms, since the mountain band's own
-            // elevation-to-rank relationship stays linear even after the plains compression below
-            // (only the Green/Swamp portion gets compressed).
             const float snowBandFraction = 0.7f;
             const float snowHeight = BiomeClassifier.HighlandMaxHeight + snowBandFraction * (1f - BiomeClassifier.HighlandMaxHeight);
 
@@ -786,41 +759,60 @@ namespace GameDev.EditorTools
 
             var highMask = Threshold(graph, erosion, BiomeClassifier.HighlandMaxHeight, bandBlend, rising: true);
             var steepMask = Threshold(graph, slope, BiomeClassifier.SteepSlope, bandBlend, rising: true);
-            // Mirrors BiomeClassifier: slope alone only counts as Mountain once at least in the
-            // highland band (>= GreenMaxHeight, reusing aboveGreenMask from the highland mask
-            // above), so a lake pit's steep rim carved into flat lowlands doesn't get painted as
-            // bare rock - only genuinely elevated steep ground does. Placing this layer above
-            // Highland's in the array means Mountain automatically wins any overlap (see the type
-            // doc above), so highlandBandMask doesn't need its own explicit "not steep" subtraction.
             var steepAndElevatedMask = Combine(graph, steepMask, aboveGreenMask, Blend200.BlendAlgorithm.multiply);
             var mountainMask = Combine(graph, highMask, steepAndElevatedMask, Blend200.BlendAlgorithm.max);
 
             var snowMask = Threshold(graph, erosion, snowHeight, bandBlend, rising: true);
 
             var texturesOutput = (TexturesOutput200)Generator.Create(typeof(TexturesOutput200));
-            // Source tileSize values (GrassGreen=30, GrassYellow=15, Dirt=15, Gravel=4,
-            // CliffBright=20, Snow=50) were authored for MapMagic's small demo scene and alias
-            // badly at our terrain scale - rescaled uniformly here (see LoadScaledTerrainLayer).
-            // Plains = saturated GrassGreen. Pale only near mountains via highland gravel / rock —
-            // no GrassYellow band on the plains (that bleached the whole tile).
-            var grassLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/GrassGreen.terrainlayer", 45f);
-            var dirtLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/Dirt.terrainlayer", 45f);
-            var forestLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/GrassGreen.terrainlayer", 45f);
-            var highlandLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/Gravel.terrainlayer", 60f);
-            var rockLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/CliffBright.terrainlayer", 60f);
-            var snowLayer = MakeTextureLayer(texturesOutput, "Assets/MapMagic/Demo/TerrainLayers/Snow.terrainlayer", 60f);
+            var grassLayer = MakeTextureLayer(
+                texturesOutput,
+                "Assets/MapMagic/Demo/TerrainLayers/GrassYellow.terrainlayer",
+                TerrainBiomePalette.AlbedoTileMeters,
+                "Grass_Fields",
+                TerrainBiomePalette.Fields);
+            var dirtLayer = MakeTextureLayer(
+                texturesOutput,
+                "Assets/MapMagic/Demo/TerrainLayers/Dirt.terrainlayer",
+                TerrainBiomePalette.AlbedoTileMeters,
+                "Dirt_Swamp",
+                TerrainBiomePalette.Swamp);
+            var forestLayer = MakeTextureLayer(
+                texturesOutput,
+                "Assets/MapMagic/Demo/TerrainLayers/GrassGreen.terrainlayer",
+                TerrainBiomePalette.AlbedoTileMeters,
+                "Grass_Forest",
+                TerrainBiomePalette.Forest);
+            var highlandLayer = MakeTextureLayer(
+                texturesOutput,
+                "Assets/MapMagic/Demo/TerrainLayers/Gravel.terrainlayer",
+                TerrainBiomePalette.HighlandTileMeters,
+                "Gravel_Highland",
+                TerrainBiomePalette.Highland);
+            var rockLayer = MakeTextureLayer(
+                texturesOutput,
+                "Assets/MapMagic/Demo/TerrainLayers/CliffBright.terrainlayer",
+                TerrainBiomePalette.RockTileMeters,
+                "Cliff_Rock",
+                TerrainBiomePalette.Rock);
+            var snowLayer = MakeTextureLayer(
+                texturesOutput,
+                "Assets/MapMagic/Demo/TerrainLayers/Snow.terrainlayer",
+                TerrainBiomePalette.SnowTileMeters,
+                "Snow_Muted",
+                TerrainBiomePalette.Snow);
 
             texturesOutput.layers = new[]
             {
                 grassLayer, dirtLayer, forestLayer, highlandLayer, rockLayer, snowLayer
             };
             graph.Add(texturesOutput);
-            // Wet dirt only in the swamp strip — not a tan wash across the plains.
             graph.Link(dirtMask, dirtLayer);
             graph.Link(forestBandMask, forestLayer);
             graph.Link(highlandBandMask, highlandLayer);
             graph.Link(mountainMask, rockLayer);
             graph.Link(snowMask, snowLayer);
+            } // includeZones
 
             if (AssetDatabase.LoadAssetAtPath<Graph>(GraphPath) != null)
             {
@@ -875,13 +867,19 @@ namespace GameDev.EditorTools
 
         private const string ScaledTerrainLayerFolder = "Assets/Settings/TerrainLayers";
 
-        private static TexturesOutput200.TextureLayer MakeTextureLayer(TexturesOutput200 output, string terrainLayerPath, float tileSizeMeters)
+        private static TexturesOutput200.TextureLayer MakeTextureLayer(
+            TexturesOutput200 output,
+            string terrainLayerPath,
+            float tileSizeMeters,
+            string scaledAssetName,
+            TerrainBiomePalette.Look look)
         {
-            var prototype = LoadScaledTerrainLayer(terrainLayerPath, tileSizeMeters);
+            var prototype = LoadScaledTerrainLayer(
+                terrainLayerPath, tileSizeMeters, scaledAssetName, look);
 
             var layer = new TexturesOutput200.TextureLayer
             {
-                name = System.IO.Path.GetFileNameWithoutExtension(terrainLayerPath),
+                name = scaledAssetName,
                 prototype = prototype,
             };
             layer.SetGen(output);
@@ -889,13 +887,13 @@ namespace GameDev.EditorTools
             return layer;
         }
 
-        // MapMagic's Demo TerrainLayers were authored for a small demo scene (tileSize as low as
-        // 4m for Gravel) - at our ~1400m tile size that repeats hundreds of times across the
-        // terrain and shows up as a "TV static" aliasing artifact on mountain slopes. Rather than
-        // mutating those shared third-party assets in place (which AssetDatabase.LoadAssetAtPath
-        // would do, since it returns a reference to the real asset), keep a duplicate per source
-        // layer under ScaledTerrainLayerFolder with just the tileSize adjusted.
-        private static TerrainLayer LoadScaledTerrainLayer(string sourcePath, float tileSizeMeters)
+        // Duplicate MapMagic demo layers under Settings/TerrainLayers with muted remaps +
+        // memo tile sizes. Never mutate the shared third-party demo assets in place.
+        private static TerrainLayer LoadScaledTerrainLayer(
+            string sourcePath,
+            float tileSizeMeters,
+            string scaledAssetName,
+            TerrainBiomePalette.Look look)
         {
             var sourceLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(sourcePath);
             if (sourceLayer == null)
@@ -913,23 +911,18 @@ namespace GameDev.EditorTools
                 AssetDatabase.CreateFolder("Assets/Settings", "TerrainLayers");
             }
 
-            var scaledName = System.IO.Path.GetFileNameWithoutExtension(sourcePath) + "_Scaled";
-            var scaledPath = $"{ScaledTerrainLayerFolder}/{scaledName}.terrainlayer";
-
+            var scaledPath = $"{ScaledTerrainLayerFolder}/{scaledAssetName}.terrainlayer";
             var scaled = AssetDatabase.LoadAssetAtPath<TerrainLayer>(scaledPath);
             if (scaled == null)
             {
                 scaled = Object.Instantiate(sourceLayer);
+                scaled.name = scaledAssetName;
                 AssetDatabase.CreateAsset(scaled, scaledPath);
             }
 
-            if (!Mathf.Approximately(scaled.tileSize.x, tileSizeMeters) || !Mathf.Approximately(scaled.tileSize.y, tileSizeMeters))
-            {
-                scaled.tileSize = new Vector2(tileSizeMeters, tileSizeMeters);
-                EditorUtility.SetDirty(scaled);
-                AssetDatabase.SaveAssets();
-            }
-
+            TerrainBiomePalette.Apply(scaled, look, tileSizeMeters);
+            EditorUtility.SetDirty(scaled);
+            AssetDatabase.SaveAssets();
             return scaled;
         }
 

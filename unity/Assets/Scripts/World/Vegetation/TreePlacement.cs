@@ -21,6 +21,12 @@ namespace GameDev.World.Vegetation
         public const float TrunkRadiusMaxMeters = 0.38f;
         public const float TrunkHeightFraction = 0.45f;
 
+        /// <summary>
+        /// Sink the trunk into the terrain after AABB grounding so the flat mesh cut
+        /// does not hover (renderer bounds often sit above the visible bole base).
+        /// </summary>
+        public const float TrunkSinkMeters = 0.4f;
+
         /// <summary>Last fitted world radius (metres) — for editor diagnostics.</summary>
         public static float LastFittedRadiusMeters { get; private set; }
 

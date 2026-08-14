@@ -1,6 +1,10 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using System.Linq;
 using GameDev.Player;
+using GameDev.World.Poi;
+using GameDev.World.Seed;
+using GameDev.World.Settlement;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
@@ -210,12 +214,9 @@ namespace GameDev.EditorTools
                 player.AddComponent<OverworldPlayerController>();
             }
 
-            // Tile spans (0,0) to (tileSize,tileSize) - (700,700) is the centre for the 1400x1400
-            // default OverworldTerrainMenu builds (see its own review-camera framing for the same
-            // constant). Only re-placed if not already standing on something, so re-running this
-            // step to pick up controller/CharacterController changes doesn't yank a manually
-            // positioned player back to the tile centre.
-            if (existing == null)
+            // Prefer TownApproach / settlement when SpawnPlayerAtTown was used; otherwise keep
+            // prior position on update. Only place at tile centre for brand-new player with no town.
+            if (existing == null && !s_PreferTownSpawn)
             {
                 var spawnXZ = new Vector3(700f, 0f, 700f);
                 if (TryFindGroundHeight(spawnXZ, out var groundY))
@@ -236,6 +237,82 @@ namespace GameDev.EditorTools
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
             Selection.activeGameObject = player;
             Debug.Log("[Overworld] Player spawned/updated in scene.");
+        }
+
+        private static bool s_PreferTownSpawn;
+
+        /// <summary>
+        /// Pipeline Player step: spawn at a seeded TownApproach (or settlement anchor for that id).
+        /// </summary>
+        public static void SpawnPlayerAtTown()
+        {
+            ConfigureCharacterAsHumanoid();
+            BuildLocomotionAnimatorController();
+
+            var mapMagic = Object.FindFirstObjectByType<MapMagic.Core.MapMagicObject>();
+            IReadOnlyList<PoiMarker> markers = System.Array.Empty<PoiMarker>();
+            if (mapMagic != null)
+            {
+                markers = OverworldWorldPlan.GetOrBuildPois(mapMagic, new Den.Tools.Coord(0, 0));
+            }
+
+            var towns = new List<PoiMarker>();
+            foreach (var m in markers)
+            {
+                if (m.Kind == PoiKind.TownApproach)
+                {
+                    towns.Add(m);
+                }
+            }
+
+            if (towns.Count == 0)
+            {
+                Debug.LogWarning("[Overworld] Player step: no TownApproach markers — skipping spawn.");
+                return;
+            }
+
+            var seed = new WorldSeed(OverworldTerrainMenu.LastSeed);
+            var rng = seed.Fork("player.spawn");
+            var pick = towns[rng.Next(0, towns.Count)];
+            var spawn = pick.Position;
+            var anchor = Object.FindFirstObjectByType<OverworldSettlementAnchor>();
+            if (anchor != null && anchor.ApproachId == pick.Id.Value)
+            {
+                spawn = anchor.Position;
+            }
+
+            s_PreferTownSpawn = true;
+            SpawnOrUpdatePlayerInScene();
+            s_PreferTownSpawn = false;
+
+            var player = GameObject.Find(PlayerObjectName);
+            if (player == null)
+            {
+                return;
+            }
+
+            if (TryFindGroundHeight(spawn, out var groundY))
+            {
+                player.transform.position = new Vector3(spawn.x, groundY + 0.1f, spawn.z);
+            }
+            else
+            {
+                player.transform.position = new Vector3(spawn.x, spawn.y + 0.1f, spawn.z);
+            }
+
+            EnsureFollowCamera(player.transform);
+            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            Selection.activeGameObject = player;
+            Debug.Log($"[Overworld] Player at town approach id={pick.Id} pos={player.transform.position}");
+        }
+
+        public static void ClearPlayer()
+        {
+            var existing = GameObject.Find(PlayerObjectName);
+            if (existing != null)
+            {
+                Object.DestroyImmediate(existing);
+            }
         }
 
         private static void FitPlayerMeshToWorldScale(GameObject player)

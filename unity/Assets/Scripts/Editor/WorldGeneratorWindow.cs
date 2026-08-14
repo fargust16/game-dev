@@ -7,7 +7,7 @@ namespace GameDev.EditorTools
 {
     /// <summary>
     /// World Generator panel: seed, Copy / Regenerate / GENERATE WORLD, subsystem foldouts,
-    /// and live World Statistics from <see cref="OverworldWorldState"/>.
+    /// pipeline step checkboxes, and live World Statistics from <see cref="OverworldWorldState"/>.
     /// </summary>
     public sealed class WorldGeneratorWindow : EditorWindow
     {
@@ -22,6 +22,7 @@ namespace GameDev.EditorTools
         private bool foldRoads = true;
         private bool foldPoi = true;
         private bool foldVegetation;
+        private bool foldSteps = true;
 
         [MenuItem("GameDev/Overworld/World Generator")]
         public static void Open()
@@ -39,24 +40,22 @@ namespace GameDev.EditorTools
             scroll = EditorGUILayout.BeginScrollView(scroll);
             EditorGUILayout.LabelField("WORLD GENERATOR", EditorStyles.boldLabel);
             EditorGUILayout.Space(4f);
-
             DrawSeedSection();
             EditorGUILayout.Space(8f);
-
             if (GUILayout.Button("GENERATE WORLD", GUILayout.Height(36f)))
             {
                 GenerateWorld();
             }
 
             EditorGUILayout.Space(10f);
+            DrawStepCheckboxes();
+            EditorGUILayout.Space(10f);
             DrawSettingsFoldouts();
             EditorGUILayout.Space(10f);
             DrawStatistics();
             EditorGUILayout.Space(8f);
             DrawPoiLegend();
-
             EditorGUILayout.EndScrollView();
-
             if (GUI.changed)
             {
                 SavePrefs();
@@ -82,8 +81,61 @@ namespace GameDev.EditorTools
 
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.HelpBox(
-                "Same Seed + same settings → identical geography. Regenerate keeps the field seed.",
+                "Same Seed + same settings → identical geography. Regenerate keeps the field seed. " +
+                "Step checkboxes are not seeds — Mountains off yields a stable map without ridges.",
                 MessageType.Info);
+        }
+
+        private void DrawStepCheckboxes()
+        {
+            foldSteps = EditorGUILayout.Foldout(foldSteps, "PIPELINE STEPS", true);
+            if (!foldSteps)
+            {
+                return;
+            }
+
+            EditorGUI.indentLevel++;
+            settings.RunSurface = EditorGUILayout.Toggle("Surface", settings.RunSurface);
+            settings.RunZones = EditorGUILayout.Toggle("Zones", settings.RunZones);
+            settings.RunMountains = EditorGUILayout.Toggle("Mountains", settings.RunMountains);
+            settings.RunLakes = EditorGUILayout.Toggle("Lakes", settings.RunLakes);
+            settings.RunMarkers = EditorGUILayout.Toggle("Markers", settings.RunMarkers);
+            settings.RunSettlements = EditorGUILayout.Toggle("Settlements", settings.RunSettlements);
+            settings.RunRoads = EditorGUILayout.Toggle("Roads", settings.RunRoads);
+            settings.RunWaterMeshes = EditorGUILayout.Toggle("Water Meshes", settings.RunWaterMeshes);
+            settings.RunTrees = EditorGUILayout.Toggle("Trees", settings.RunTrees);
+            settings.RunUndergrowth = EditorGUILayout.Toggle("Undergrowth", settings.RunUndergrowth);
+            settings.RunGrass = EditorGUILayout.Toggle("Grass", settings.RunGrass);
+            settings.RunPlayer = EditorGUILayout.Toggle("Player", settings.RunPlayer);
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("All On"))
+            {
+                SetAllSteps(true);
+            }
+
+            if (GUILayout.Button("All Off"))
+            {
+                SetAllSteps(false);
+            }
+
+            EditorGUILayout.EndHorizontal();
+            EditorGUI.indentLevel--;
+        }
+
+        private void SetAllSteps(bool on)
+        {
+            settings.RunSurface = on;
+            settings.RunZones = on;
+            settings.RunMountains = on;
+            settings.RunLakes = on;
+            settings.RunMarkers = on;
+            settings.RunSettlements = on;
+            settings.RunRoads = on;
+            settings.RunWaterMeshes = on;
+            settings.RunTrees = on;
+            settings.RunUndergrowth = on;
+            settings.RunGrass = on;
+            settings.RunPlayer = on;
         }
 
         private void DrawSettingsFoldouts()
@@ -94,7 +146,7 @@ namespace GameDev.EditorTools
                 EditorGUI.indentLevel++;
                 EditorGUILayout.HelpBox(
                     "Terrain shape comes from the MapMagic Overworld graph (seeded forks). " +
-                    "No extra knobs in V0 — regenerate to rebuild height.",
+                    "Mountains / Zones toggles rebuild the graph with TerrainBakeFlags.",
                     MessageType.None);
                 EditorGUI.indentLevel--;
             }
@@ -116,6 +168,9 @@ namespace GameDev.EditorTools
                     "Water Depth Offset (m)", settings.WaterDepthOffsetMeters, 0.75f, 2.5f);
                 settings.MaxDepthMeters = EditorGUILayout.Slider(
                     "Max Depth (m)", settings.MaxDepthMeters, 8f, 48f);
+                EditorGUILayout.HelpBox(
+                    "Mountain occupancy hard-rejects ridge sites. Fewer lakes beat a sheet through a mountain.",
+                    MessageType.None);
                 EditorGUI.indentLevel--;
             }
 
@@ -159,8 +214,8 @@ namespace GameDev.EditorTools
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.HelpBox(
-                    "Vegetation uses Fork(\"vegetation\") after lakes/roads/POI. " +
-                    "No density knobs in this panel yet.",
+                    "Trees use Fork(\"vegetation\"); undergrowth Fork(\"vegetation.shrubs\"); " +
+                    "grass Fork(\"grass\"). Clear trees does not clear grass.",
                     MessageType.None);
                 EditorGUI.indentLevel--;
             }
@@ -196,7 +251,7 @@ namespace GameDev.EditorTools
             settings.Clamp();
             SavePrefs();
             OverworldTerrainMenu.ActiveSettings = settings;
-            OverworldPipelineMenu.BuildFull(seed, settings);
+            OverworldPipeline.GenerateAll(seed, settings);
             Repaint();
         }
 
@@ -218,6 +273,24 @@ namespace GameDev.EditorTools
             else
             {
                 settings = WorldGenSettings.Default;
+            }
+
+            // Older prefs without step flags deserialize as false — treat all-false as Default on.
+            if (!settings.RunSurface && !settings.RunLakes && !settings.RunRoads && !settings.RunTrees)
+            {
+                var d = WorldGenSettings.Default;
+                settings.RunSurface = d.RunSurface;
+                settings.RunZones = d.RunZones;
+                settings.RunMountains = d.RunMountains;
+                settings.RunLakes = d.RunLakes;
+                settings.RunMarkers = d.RunMarkers;
+                settings.RunSettlements = d.RunSettlements;
+                settings.RunRoads = d.RunRoads;
+                settings.RunWaterMeshes = d.RunWaterMeshes;
+                settings.RunTrees = d.RunTrees;
+                settings.RunUndergrowth = d.RunUndergrowth;
+                settings.RunGrass = d.RunGrass;
+                settings.RunPlayer = d.RunPlayer;
             }
 
             settings.Clamp();

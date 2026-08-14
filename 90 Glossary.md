@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.37
+Version: 0.38
 
 Status: Draft
 
@@ -776,7 +776,7 @@ Vertical recess of the water plane under dry shore (`WorldScale.WaterInsetDepthM
 
 ## Water Depth Offset
 
-Metres subtracted from a **low shore-rim percentile** (not the average) after headroom: `WaterLevel = LowRim − max(WaterDepthOffset, WaterInsetDepth)` (`WorldScale.WaterDepthOffsetMeters`, ~1.25 m). Average rim left the plane floating over downhill shores; low-rim spill keeps banks above the sheet. Downhill gaps get a capped shore-lip fill; the water mesh stays a continuous flat sheet and terrain conforms to it. A shore-strip blur removes heightmap stairs at the bank.
+Metres subtracted from a **low shore-rim percentile** (not the average) after headroom: `WaterLevel = LowRim − max(WaterDepthOffset, WaterInsetDepth)` (`WorldScale.WaterDepthOffsetMeters`, ~1.25 m). Average rim left the plane floating over downhill shores; low-rim spill keeps banks above the sheet. Downhill gaps get a capped shore-lip fill; the water mesh stays a flat sheet with **mountain safety-clip** where terrain sits above water on mountain cells. A shore-strip blur removes heightmap stairs at the bank.
 
 ---
 
@@ -788,7 +788,7 @@ Aggregate snapshot of one overworld generation: `WorldSeed`, `WorldGenSettings`,
 
 ## Lake Placement Score
 
-Score used to pick lake sites from macro terrain: enclosing basin walls + low slope + low variance + edge distance − excavation − mountain/cliff. Hard-rejects sites that would destroy mountains or sit mid-slope / near map edge. Replaces naive `-height + rng` ranking. See `DistributedLakePlacer` / [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
+Score used to pick lake sites from macro terrain: enclosing basin walls + low slope + low variance + edge distance − excavation − mountain/cliff. Hard-rejects sites that would destroy mountains or sit mid-slope / near map edge. Full-silhouette **Mountain Occupancy** (`BiomeId.Mountain`) is an additional hard reject beyond the local score window. Replaces naive `-height + rng` ranking. See `DistributedLakePlacer` / [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
 
 ---
 
@@ -813,3 +813,21 @@ Equal-size 3×3 partition of the overworld tile used for TownApproach and second
 ## Terrain Conformity
 
 0–1 knob scaling how strongly macro terrain (smoothed height / basin) pulls lake shore radius and orientation (default ~0.75). Limited so lakes stay elongated ellipses, not copies of heightmap noise.
+
+---
+
+## Pipeline Step
+
+One Generate/Clear procedure in the overworld Editor pipeline (`IOverworldStep`): Surface, Zones, Mountains, Lakes, Markers, Settlements, Roads, WaterMeshes, Trees, Undergrowth, Grass, Player. Output is a pure function of `WorldSeed.Fork(step)`, upstream artifacts, and `WorldGenSettings`. Skipping a step must not advance another step's fork. See [WORLD_GENERATION_PIPELINE.md](unity/Assets/Plans/WORLD_GENERATION_PIPELINE.md) §5.
+
+---
+
+## Part-Gen
+
+Editor menu under `GameDev/Overworld/Part-Gen/<Step>/` that runs the same Generate or Clear method as Generate All for one pipeline step. Used to iterate a single concern without rebuilding the whole tile (except Surface/Mountains, which cascade-clear hydrology and later steps).
+
+---
+
+## Mountain Occupancy
+
+Hard rule for lake placement: no water silhouette cell may sit on `BiomeId.Mountain` (or steep highland). Soft-pass and min-count helpers must not violate it — fewer lakes beat a sheet through a ridge. Water meshes also safety-clip mountain cells above the water plane. See [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).

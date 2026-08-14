@@ -134,13 +134,14 @@ namespace GameDev.World.Vegetation
             // Dense canopy still allows understory, but not as a 1:1 copy of trees.
             shrub *= Mathf.Lerp(1f, 0.7f, Mathf.Clamp01((forest - 0.55f) / 0.45f));
 
-            // Grass covers almost all land; grassPatch only varies thick→sparse→bare, not presence.
+            // Grass: open meadows stay lush; forests become patchy understory (not a carpet).
             var grass = grassBias * slopeMul;
-            grass *= 0.55f + grassPatch * 0.5f;
-            grass *= 1f - forest * 0.35f; // understory still has ground cover
+            grass *= 0.35f + grassPatch * 0.65f;
+            grass *= 1f - forest * 0.58f;
             grass *= 0.85f + moisture01 * 0.25f + wetness01 * 0.2f;
-            grass *= 1f - thicket * 0.2f;
-            grass = Mathf.Clamp01(Mathf.Max(grass, grassBias * slopeMul * 0.35f));
+            grass *= 1f - thicket * 0.28f;
+            var grassFloor = grassBias * slopeMul * Mathf.Lerp(0.28f, 0.08f, forest);
+            grass = Mathf.Clamp01(Mathf.Max(grass, grassFloor));
 
             // Near water: soft wet meadow, not a hard decorative ring of trees.
             forest *= 1f - wetness01 * 0.55f;

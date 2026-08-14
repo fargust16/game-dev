@@ -51,7 +51,8 @@ namespace GameDev.World.Water
             float shoreOverlapMeters)
         {
             _ = allZones;
-            _ = sampleTerrainY; // mesh is a flat shore SDF sheet — terrain is fitted to it, not vice versa.
+            // Flat SDF sheet at WaterLevelY. Safety-clip: do not emit where terrain sits above the
+            // plane (stops a leaked silhouette from cutting a mountain ridge).
 
             if (!TryGetFloodBounds(zone, out var minX, out var minZ, out var maxX, out var maxZ))
             {
@@ -95,6 +96,7 @@ namespace GameDev.World.Water
             // Continuous field: zero-crossing at expanded analytic (or mask) shore.
             var field = new float[cellsX + 1, cellsZ + 1];
             var anyWet = false;
+            const float mountainSafetyEpsilon = 0.5f;
             for (var iz = 0; iz <= cellsZ; iz++)
             {
                 for (var ix = 0; ix <= cellsX; ix++)
@@ -113,6 +115,16 @@ namespace GameDev.World.Water
 
                     var shore = zone.ShoreSignedDistance(wx, wz, maskSdf);
                     var value = shore + overlap;
+                    if (value >= 0f && sampleTerrainY != null)
+                    {
+                        var terrainY = sampleTerrainY(wx, wz);
+                        if (terrainY > y + mountainSafetyEpsilon)
+                        {
+                            // Terrain above the plane — do not paint water through a ridge.
+                            value = -1f;
+                        }
+                    }
+
                     field[ix, iz] = value;
                     if (value >= 0f)
                     {

@@ -72,7 +72,7 @@ namespace GameDev.EditorTools
             // ground search above can move it well away from the raw POI marker position) instead
             // of the original TownApproach coordinate.
             var anchor = root.AddComponent<OverworldSettlementAnchor>();
-            anchor.Set(approach.Id.Value, placedAt);
+            anchor.Set(approach.Id.Value, placedAt, fabric);
 
             var archetypes = ShellCatalogFactory.CreateDefaultArchetypes();
             var districts = ShellCatalogFactory.CreateDefaultDistricts();

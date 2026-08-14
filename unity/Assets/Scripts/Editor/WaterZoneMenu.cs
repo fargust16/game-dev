@@ -1,14 +1,17 @@
 #if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using Den.Tools;
 using GameDev.World;
 using GameDev.World.Streaming;
+using GameDev.World.Terrain;
 using GameDev.World.Water;
 using MapMagic.Core;
 using MapMagic.Terrains;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Object = UnityEngine.Object;
 using WorldScale = GameDev.World.WorldScale;
 
 namespace GameDev.EditorTools
@@ -130,21 +133,38 @@ namespace GameDev.EditorTools
             var worldSeed = new GameDev.World.Seed.WorldSeed(OverworldTerrainMenu.LastSeed);
             var settings = OverworldTerrainMenu.ActiveSettings;
             settings.Clamp();
+
+            MapMagicBiomeSampler biomeSampler = null;
+            if (holder != null)
+            {
+                biomeSampler = new MapMagicBiomeSampler(holder);
+            }
+
+            Func<float, float, GameDev.World.Terrain.BiomeId> biomeAtWorld = null;
+            if (biomeSampler != null)
+            {
+                biomeAtWorld = (x, z) => biomeSampler.SampleBiome(x, z);
+            }
+
             WaterZone[] forced = null;
             OverworldGenTiming.Time("water.lakes-place", () =>
             {
                 forced = DistributedLakePlacer.Place(
                     HeightSampler, minX, minZ, sizeX, sizeZ, CellSize,
-                    worldSeed, settings);
+                    worldSeed, settings, biomeAtWorld);
             });
             var zones = LakeZoneMerger.CullOverlapping(forced, maxOverlapFraction: 0.12f, maxCellsPerLake: 4000);
             var wantLakes = Mathf.Max(WorldScale.LakeMinCount, settings.LakeCount);
             zones = LakeZoneMerger.CapCount(zones, maxCount: wantLakes);
-            if (zones.Length < wantLakes)
+            // Do NOT EnsureMinDistinct onto mountain sites — fewer lakes beat a ridge sheet.
+            if (zones.Length < wantLakes && biomeAtWorld != null && forced != null)
             {
+                var safePool = FilterNonMountainZones(forced, biomeAtWorld);
                 zones = LakeZoneMerger.EnsureMinDistinct(
-                    zones, forced, wantLakes,
+                    zones, safePool, wantLakes,
                     minCenterSeparationMeters: DistributedLakePlacer.DefaultMinSeparationMeters);
+                // Re-filter in case pool still had edge cases.
+                zones = FilterNonMountainZones(zones, biomeAtWorld);
             }
 
             LogSilhouetteDiagnostics(zones);
@@ -299,7 +319,8 @@ namespace GameDev.EditorTools
                 Object.DestroyImmediate(waterRoot.transform.GetChild(i).gameObject);
             }
 
-            var waterMaterial = CreateWaterMaterial();
+            var clearWater = CreateWaterMaterial();
+            var swampWater = CreateSwampWaterMaterial(clearWater);
             Rect? terrainClip = null;
             if (terrain != null)
             {
@@ -320,6 +341,13 @@ namespace GameDev.EditorTools
 
                 LakeRecessDiagnostics.LogAfterCarve(zones, sampleTerrainY, carveRan, overlap);
 
+                MapMagicBiomeSampler meshBiome = null;
+                var holder = terrain != null ? terrain.GetComponent<DirectMatricesHolder>() : null;
+                if (holder != null)
+                {
+                    meshBiome = new MapMagicBiomeSampler(holder);
+                }
+
                 foreach (var zone in zones)
                 {
                     var zoneObject = new GameObject($"WaterZone_{zone.Id}");
@@ -328,7 +356,10 @@ namespace GameDev.EditorTools
                     meshFilter.sharedMesh = WaterMeshBuilder.Build(
                         zone, zones, sampleTerrainY, terrainClip, overlap);
                     var renderer = zoneObject.AddComponent<MeshRenderer>();
-                    renderer.sharedMaterial = waterMaterial;
+                    var useSwamp = meshBiome != null &&
+                                   DistributedLakePlacer.MajorityBiome(
+                                       zone, (x, z) => meshBiome.SampleBiome(x, z)) == BiomeId.Swamp;
+                    renderer.sharedMaterial = useSwamp ? swampWater : clearWater;
                 }
 
                 LakeRecessDiagnostics.LogAfterMesh(zones, sampleTerrainY, overlap);
@@ -353,7 +384,7 @@ namespace GameDev.EditorTools
                     var meshFilter = riverObject.AddComponent<MeshFilter>();
                     meshFilter.sharedMesh = RiverMeshBuilder.Build(river, uvTileLength: 8f, sampleTerrainY);
                     var renderer = riverObject.AddComponent<MeshRenderer>();
-                    renderer.sharedMaterial = waterMaterial;
+                    renderer.sharedMaterial = clearWater;
                 }
 
                 if (rivers.Count > 0)
@@ -542,6 +573,28 @@ namespace GameDev.EditorTools
             }
         }
 
+        /// <summary>Clear mesh children only; keep lake plan / definitions.</summary>
+        public static void ClearWaterMeshesOnly()
+        {
+            var waterRoot = GameObject.Find(RootObjectName);
+            if (waterRoot != null)
+            {
+                for (var i = waterRoot.transform.childCount - 1; i >= 0; i--)
+                {
+                    Object.DestroyImmediate(waterRoot.transform.GetChild(i).gameObject);
+                }
+            }
+
+            var riverRoot = GameObject.Find(RiverRootObjectName);
+            if (riverRoot != null)
+            {
+                for (var i = riverRoot.transform.childCount - 1; i >= 0; i--)
+                {
+                    Object.DestroyImmediate(riverRoot.transform.GetChild(i).gameObject);
+                }
+            }
+        }
+
         public static void ClearRiverZones()
         {
             var root = GameObject.Find(RiverRootObjectName);
@@ -549,6 +602,60 @@ namespace GameDev.EditorTools
             {
                 Object.DestroyImmediate(root);
             }
+        }
+
+        private static WaterZone[] FilterNonMountainZones(
+            WaterZone[] pool,
+            Func<float, float, BiomeId> biomeAtWorld)
+        {
+            if (pool == null || pool.Length == 0 || biomeAtWorld == null)
+            {
+                return pool ?? Array.Empty<WaterZone>();
+            }
+
+            var kept = new List<WaterZone>(pool.Length);
+            foreach (var zone in pool)
+            {
+                if (zone == null)
+                {
+                    continue;
+                }
+
+                // Use MajorityBiome: if majority is Mountain, reject. Also sample silhouette.
+                if (DistributedLakePlacer.MajorityBiome(zone, biomeAtWorld) == BiomeId.Mountain)
+                {
+                    continue;
+                }
+
+                var touches = false;
+                if (zone.Silhouette != null)
+                {
+                    var aabb = zone.Silhouette.GetAabbXZ(padMeters: zone.CellSize);
+                    for (var wz = aabb.yMin; wz <= aabb.yMax && !touches; wz += 12f)
+                    {
+                        for (var wx = aabb.xMin; wx <= aabb.xMax; wx += 12f)
+                        {
+                            if (zone.Silhouette.SignedDistance(wx, wz) < 0f)
+                            {
+                                continue;
+                            }
+
+                            if (biomeAtWorld(wx, wz) == BiomeId.Mountain)
+                            {
+                                touches = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!touches)
+                {
+                    kept.Add(zone);
+                }
+            }
+
+            return kept.ToArray();
         }
 
         /// <summary>
@@ -653,6 +760,31 @@ namespace GameDev.EditorTools
             }
 
             mat.renderQueue = (int)RenderQueue.Transparent;
+            return mat;
+        }
+
+        /// <summary>Murkier olive-brown body for lakes whose majority biome is Swamp.</summary>
+        private static Material CreateSwampWaterMaterial(Material clearSource)
+        {
+            var mat = CreatePolytopeLikeLakeWater(clearSource);
+            mat.name = "OverworldWater (Swamp)";
+            var deep = new Color(0.12f, 0.18f, 0.10f, 1f);
+            var shallow = new Color(0.22f, 0.28f, 0.14f, 0.98f);
+            if (mat.HasProperty("_DeepColor"))
+            {
+                mat.SetColor("_DeepColor", deep);
+            }
+
+            if (mat.HasProperty("_ShallowColor"))
+            {
+                mat.SetColor("_ShallowColor", shallow);
+            }
+
+            if (mat.HasProperty("_Opacity"))
+            {
+                mat.SetFloat("_Opacity", 1f);
+            }
+
             return mat;
         }
 

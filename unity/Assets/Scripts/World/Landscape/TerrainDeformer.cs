@@ -16,7 +16,9 @@ namespace GameDev.World.Landscape
             IReadOnlyList<LakeDefinition> lakes,
             IReadOnlyList<RoadDefinition> roads,
             TerrainLayer lakeBankLayer = null,
-            TerrainLayer roadDirtLayer = null)
+            TerrainLayer roadCenterLayer = null,
+            TerrainLayer roadGravelLayer = null,
+            TerrainLayer roadEdgeLayer = null)
         {
             if (terrain == null)
             {
@@ -41,7 +43,8 @@ namespace GameDev.World.Landscape
 
             if (roads != null && roads.Count > 0)
             {
-                RoadCorridorDeformer.Apply(terrain, roads, roadDirtLayer, lakes);
+                RoadCorridorDeformer.Apply(
+                    terrain, roads, roadCenterLayer, lakes, roadGravelLayer, roadEdgeLayer);
             }
         }
     }

@@ -206,5 +206,67 @@ namespace GameDev.World.Water.Tests
             Assert.GreaterOrEqual(radii[0], radii[1] - 1f);
             Assert.GreaterOrEqual(radii[1], radii[2] - 1f);
         }
+
+        [Test]
+        public void FloodTouchesMountain_SilhouetteOnRidge_IsRejected()
+        {
+            const int w = 80;
+            const int d = 80;
+            var heights = new float[w, d];
+            var heightMin = float.PositiveInfinity;
+            var heightMax = float.NegativeInfinity;
+            for (var x = 0; x < w; x++)
+            {
+                for (var z = 0; z < d; z++)
+                {
+                    // Flat floor with a steep high ridge on the right half.
+                    heights[x, z] = x < 40 ? 50f : 50f + (x - 40) * 4f;
+                    heightMin = Mathf.Min(heightMin, heights[x, z]);
+                    heightMax = Mathf.Max(heightMax, heights[x, z]);
+                }
+            }
+
+            // Ellipse centered on the ridge flank — silhouette covers mountain cells.
+            var sil = new LakeSilhouette(
+                55f * 3f, 40f * 3f, 60f,
+                aspect: 1f / 1.6f,
+                rotationRadians: 0f,
+                phase1: 0f, phase2: 0f, phase3: 0f,
+                amp1: 0f, amp2: 0f, amp3: 0f,
+                noiseSeed: 1,
+                hasBay: false,
+                bayCenterX: 0f, bayCenterZ: 0f, bayRadiusMeters: 0f);
+            var flooded = new bool[w, d];
+            for (var z = 0; z < d; z++)
+            {
+                for (var x = 0; x < w; x++)
+                {
+                    var wx = (x + 0.5f) * 3f;
+                    var wz = (z + 0.5f) * 3f;
+                    flooded[x, z] = sil.SignedDistance(wx, wz) >= 0f;
+                }
+            }
+
+            var zone = new WaterZone("ridge", 55f, 0f, 0f, 3f, flooded, heights, sil);
+            Assert.IsTrue(
+                DistributedLakePlacer.FloodTouchesMountain(
+                    zone, heights, w, d, heightMin, heightMax, biomeAtWorld: null),
+                "silhouette covering ridge cells must hard-reject");
+        }
+
+        [Test]
+        public void Place_AllMountainBiome_ReturnsNoLakes()
+        {
+            float Sampler(float x, float z) =>
+                60f + 0.00002f * ((x - 350f) * (x - 350f) + (z - 350f) * (z - 350f));
+            var settings = WorldGenSettings.Default;
+            settings.LakeCount = 3;
+            global::GameDev.World.Seed.IWorldSeed seed = new global::GameDev.World.Seed.WorldSeed(777);
+            var zones = DistributedLakePlacer.Place(
+                Sampler, 0, 0, 700, 700, 4f, seed, settings,
+                biomeAtWorld: (x, z) => GameDev.World.Terrain.BiomeId.Mountain);
+            Assert.AreEqual(0, zones.Length,
+                "Mountain occupancy must reject every site when the whole tile is Mountain");
+        }
     }
 }

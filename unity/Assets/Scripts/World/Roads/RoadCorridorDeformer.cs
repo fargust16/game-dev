@@ -16,8 +16,10 @@ namespace GameDev.World.Roads
         public static void Apply(
             UnityEngine.Terrain terrain,
             IReadOnlyList<RoadDefinition> roads,
-            TerrainLayer grooveLayer = null,
-            IReadOnlyList<LakeDefinition> lakes = null)
+            TerrainLayer centerLayer = null,
+            IReadOnlyList<LakeDefinition> lakes = null,
+            TerrainLayer gravelLayer = null,
+            TerrainLayer edgeLayer = null)
         {
             if (terrain == null || terrain.terrainData == null || roads == null || roads.Count == 0)
             {
@@ -44,9 +46,9 @@ namespace GameDev.World.Roads
 
             data.SetHeights(0, 0, heights);
 
-            if (grooveLayer != null)
+            if (centerLayer != null)
             {
-                PaintDirt(terrain, roads, grooveLayer);
+                RoadSurfacePaint.Paint(terrain, roads, centerLayer, edgeLayer, gravelLayer);
             }
 
             var collider = terrain.GetComponent<TerrainCollider>();
@@ -228,111 +230,6 @@ namespace GameDev.World.Roads
             }
 
             return result;
-        }
-
-        private static void PaintDirt(
-            UnityEngine.Terrain terrain,
-            IReadOnlyList<RoadDefinition> roads,
-            TerrainLayer grooveLayer)
-        {
-            var data = terrain.terrainData;
-            var layers = data.terrainLayers;
-            var layerIndex = -1;
-            for (var i = 0; i < layers.Length; i++)
-            {
-                if (layers[i] == grooveLayer)
-                {
-                    layerIndex = i;
-                    break;
-                }
-            }
-
-            if (layerIndex < 0)
-            {
-                var expanded = new TerrainLayer[layers.Length + 1];
-                layers.CopyTo(expanded, 0);
-                expanded[layers.Length] = grooveLayer;
-                data.terrainLayers = expanded;
-                layerIndex = layers.Length;
-            }
-
-            var resolution = data.alphamapResolution;
-            var alphamaps = data.GetAlphamaps(0, 0, resolution, resolution);
-            var layerCount = alphamaps.GetLength(2);
-            var terrainPos = terrain.transform.position;
-            var size = data.size;
-            var worldPerPixelX = size.x / resolution;
-            var worldPerPixelZ = size.z / resolution;
-
-            for (var r = 0; r < roads.Count; r++)
-            {
-                var road = roads[r];
-                var paintW = road.RoadWidthMeters * 0.5f + road.ShoulderMeters * 0.5f;
-                var dense = RoadTerrainCarver.DensifyPolyline(road.CenterlineXZ, DensifyStepMeters);
-                for (var i = 0; i < dense.Count - 1; i++)
-                {
-                    var a = dense[i];
-                    var b = dense[i + 1];
-                    var ab = b - a;
-                    var len = ab.magnitude;
-                    if (len < 1e-4f)
-                    {
-                        continue;
-                    }
-
-                    var dir = ab / len;
-                    var pad = paintW + 2f;
-                    var minAx = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(a.x, b.x) - pad - terrainPos.x) / worldPerPixelX));
-                    var maxAx = Mathf.Min(resolution - 1, Mathf.CeilToInt((Mathf.Max(a.x, b.x) + pad - terrainPos.x) / worldPerPixelX));
-                    var minAz = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(a.y, b.y) - pad - terrainPos.z) / worldPerPixelZ));
-                    var maxAz = Mathf.Min(resolution - 1, Mathf.CeilToInt((Mathf.Max(a.y, b.y) + pad - terrainPos.z) / worldPerPixelZ));
-
-                    for (var z = minAz; z <= maxAz; z++)
-                    {
-                        for (var x = minAx; x <= maxAx; x++)
-                        {
-                            var worldX = terrainPos.x + (x + 0.5f) * worldPerPixelX;
-                            var worldZ = terrainPos.z + (z + 0.5f) * worldPerPixelZ;
-                            var p = new Vector2(worldX, worldZ);
-                            var ap = p - a;
-                            var t = Mathf.Clamp01(Vector2.Dot(ap, dir) / len);
-                            var closest = a + dir * (t * len);
-                            var dist = Vector2.Distance(p, closest);
-                            if (dist > paintW)
-                            {
-                                continue;
-                            }
-
-                            var u = dist / paintW;
-                            var target = 1f - Smooth01(u);
-                            target *= 0.85f;
-                            if (target <= 0.02f)
-                            {
-                                continue;
-                            }
-
-                            var current = alphamaps[z, x, layerIndex];
-                            var newWeight = Mathf.Max(current, target);
-                            if (newWeight <= current)
-                            {
-                                continue;
-                            }
-
-                            var otherSum = 1f - current;
-                            var newOtherSum = 1f - newWeight;
-                            var scale = otherSum > 0.0001f ? newOtherSum / otherSum : 0f;
-                            for (var l = 0; l < layerCount; l++)
-                            {
-                                alphamaps[z, x, l] = l == layerIndex
-                                    ? newWeight
-                                    : alphamaps[z, x, l] * scale;
-                            }
-                        }
-                    }
-                }
-            }
-
-            data.SetAlphamaps(0, 0, alphamaps);
         }
     }
 }

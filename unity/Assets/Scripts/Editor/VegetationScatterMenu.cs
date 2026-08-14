@@ -11,15 +11,16 @@ using MapMagic.Core;
 using MapMagic.Terrains;
 using UnityEditor;
 using UnityEngine;
+using WorldScale = GameDev.World.WorldScale;
 
 namespace GameDev.EditorTools
 {
     /// <summary>
     /// Overworld flora scatter (WORLD_GENERATION_PIPELINE.md Iteration 07): layered placement driven
     /// by <see cref="VegetationEcology"/> density fields (forest regions → trees; correlated shrub /
-    /// grass fields; soft clearance around roads/POIs/settlements). Prefabs remain Low Poly
-    /// Environment (ASSET_LIBRARY_REFERENCE.md). MapMagic Objects pack is not installed — ecology
-    /// and placement stay in C# on top of MapMagic height/slope/moisture + water samplers.
+    /// fields; soft clearance around roads/POIs/settlements). Grass coverage is GPU-instanced via
+    /// <see cref="GrassBakeMenu"/> / <see cref="GrassField"/> — not GameObject tufts.
+    /// Prefabs remain Low Poly Environment (ASSET_LIBRARY_REFERENCE.md) for trees/shrubs/flowers/rocks.
     /// </summary>
     public static class VegetationScatterMenu
     {
@@ -30,15 +31,17 @@ namespace GameDev.EditorTools
         // Lab density: enough coverage without ~175k PrefabUtility instantiates per tile.
         private const int TreeReferenceAttempts = 6000;
         private const int ShrubReferenceAttempts = 9000;
-        private const int GrassReferenceAttempts = 12000;
+        /// <summary>Sparse flowers / mushrooms only — carpet grass is GPU <see cref="GrassField"/>.</summary>
+        private const int FlowerReferenceAttempts = 2500;
         private const int RockReferenceAttempts = 1800;
 
         private static readonly Dictionary<string, GameObject> PrefabCache = new Dictionary<string, GameObject>(64);
 
         private const float ShoreBufferMeters = 1.5f;
 
-        private const float RoadClearRadius = 3.5f;
-        private const float RoadFalloff = 8f;
+        // Soft road shoulder: bare core + 1–3 m density/height falloff (see GrassMask).
+        private const float RoadClearRadius = GrassMask.RoadClearCoreMeters;
+        private const float RoadFalloff = GrassMask.RoadEdgeFalloffMeters;
         private const float SettlementClearRadius = 28f;
         private const float SettlementFalloff = 22f;
         // Hard empty pocket around POI props/buildings so forest/grass does not sit on the marker;
@@ -60,7 +63,7 @@ namespace GameDev.EditorTools
         {
             Tree,
             Shrub,
-            Grass,
+            Flower,
             Rock,
         }
 
@@ -122,32 +125,19 @@ namespace GameDev.EditorTools
             },
         };
 
-        private static readonly Dictionary<BiomeId, Entry[]> GrassByBiome = new Dictionary<BiomeId, Entry[]>
+        /// <summary>Sparse decorative props (flowers/mushrooms) — not the grass carpet.</summary>
+        private static readonly Dictionary<BiomeId, Entry[]> FlowerByBiome = new Dictionary<BiomeId, Entry[]>
         {
             {
                 BiomeId.Meadow, new[]
                 {
-                    new Entry { PrefabPath = $"{PrefabRoot}/Plants/PT_Grass_02.prefab", Weight = 0.7f },
-                    new Entry { PrefabPath = $"{PrefabRoot}/Flowers/PT_Poppy_02.prefab", Weight = 0.3f },
-                }
-            },
-            {
-                BiomeId.Forest, new[]
-                {
-                    new Entry { PrefabPath = $"{PrefabRoot}/Plants/PT_Grass_02.prefab", Weight = 1f },
+                    new Entry { PrefabPath = $"{PrefabRoot}/Flowers/PT_Poppy_02.prefab", Weight = 1f },
                 }
             },
             {
                 BiomeId.Swamp, new[]
                 {
-                    new Entry { PrefabPath = $"{PrefabRoot}/Plants/PT_Grass_02.prefab", Weight = 0.6f },
-                    new Entry { PrefabPath = $"{PrefabRoot}/Mushrooms/PT_Caesars_Mushroom_01.prefab", Weight = 0.4f },
-                }
-            },
-            {
-                BiomeId.Highland, new[]
-                {
-                    new Entry { PrefabPath = $"{PrefabRoot}/Plants/PT_Grass_02.prefab", Weight = 1f },
+                    new Entry { PrefabPath = $"{PrefabRoot}/Mushrooms/PT_Caesars_Mushroom_01.prefab", Weight = 1f },
                 }
             },
         };
@@ -163,111 +153,229 @@ namespace GameDev.EditorTools
         public static void ScatterVegetation()
         {
             var total = OverworldGenTiming.Start();
+            ClearVegetation();
+            ScatterTrees();
+            ScatterUndergrowth();
+            BakeGrassOnly();
+            OverworldGenTiming.Log("vegetation.total", OverworldGenTiming.StopMs(total), "all layers");
+        }
+
+        public static void ScatterTrees()
+        {
+            if (!TryBeginScatter(out var ctx))
+            {
+                return;
+            }
+
+            ClearChildNamed(ctx.Root, "Trees");
+            var treesGo = new GameObject("Trees");
+            treesGo.transform.SetParent(ctx.Root.transform, false);
+
+            var rng = ctx.WorldSeed.Fork("vegetation");
+            var treeCount = 0;
+            OverworldGenTiming.Time("vegetation.trees", () =>
+            {
+                treeCount = ScatterLayer(
+                    LayerKind.Tree, TreeByBiome, treesGo.transform, ctx.TreeAttempts,
+                    ctx.MinX, ctx.MinZ, ctx.SizeX, ctx.SizeZ, ctx.Sampler, ctx.Terrain,
+                    ctx.Water, ctx.Clearance, ctx.Offsets, rng,
+                    density => density.Forest);
+            }, $"attempts={ctx.TreeAttempts}");
+            LogTrunkColliderSamples(treesGo.transform);
+            Debug.Log($"[Vegetation] trees={treeCount} seed={OverworldTerrainMenu.LastSeed}");
+        }
+
+        public static void ScatterUndergrowth()
+        {
+            if (!TryBeginScatter(out var ctx))
+            {
+                return;
+            }
+
+            ClearChildNamed(ctx.Root, "Shrubs");
+            ClearChildNamed(ctx.Root, "Flowers");
+            ClearChildNamed(ctx.Root, "Rocks");
+            var shrubsGo = new GameObject("Shrubs");
+            var flowersGo = new GameObject("Flowers");
+            var rocksGo = new GameObject("Rocks");
+            shrubsGo.transform.SetParent(ctx.Root.transform, false);
+            flowersGo.transform.SetParent(ctx.Root.transform, false);
+            rocksGo.transform.SetParent(ctx.Root.transform, false);
+
+            var rng = ctx.WorldSeed.Fork("vegetation.shrubs");
+            var shrubCount = 0;
+            var flowerCount = 0;
+            var rockCount = 0;
+            OverworldGenTiming.Time("vegetation.shrubs", () =>
+            {
+                shrubCount = ScatterLayer(
+                    LayerKind.Shrub, ShrubByBiome, shrubsGo.transform, ctx.ShrubAttempts,
+                    ctx.MinX, ctx.MinZ, ctx.SizeX, ctx.SizeZ, ctx.Sampler, ctx.Terrain,
+                    ctx.Water, ctx.Clearance, ctx.Offsets, rng,
+                    density => Mathf.Max(density.Shrub, density.Thicket * 0.85f),
+                    allowThicketClusters: true);
+            }, $"attempts={ctx.ShrubAttempts}");
+
+            OverworldGenTiming.Time("vegetation.flowers", () =>
+            {
+                flowerCount = ScatterLayer(
+                    LayerKind.Flower, FlowerByBiome, flowersGo.transform, ctx.FlowerAttempts,
+                    ctx.MinX, ctx.MinZ, ctx.SizeX, ctx.SizeZ, ctx.Sampler, ctx.Terrain,
+                    ctx.Water, ctx.Clearance, ctx.Offsets, rng,
+                    density => density.Grass * 0.35f);
+            }, $"attempts={ctx.FlowerAttempts}");
+
+            OverworldGenTiming.Time("vegetation.rocks", () =>
+            {
+                rockCount = ScatterRocks(
+                    rocksGo.transform, ctx.RockAttempts,
+                    ctx.MinX, ctx.MinZ, ctx.SizeX, ctx.SizeZ, ctx.Sampler, ctx.Terrain,
+                    ctx.Water, ctx.Clearance, rng);
+                rockCount += ScatterRoadBorderRocks(
+                    rocksGo.transform, ctx.Clearance, ctx.Terrain, ctx.Water, rng);
+            }, $"attempts={ctx.RockAttempts}");
+
+            Debug.Log(
+                $"[Vegetation] undergrowth shrubs={shrubCount} flowers={flowerCount} " +
+                $"rocks={rockCount} seed={OverworldTerrainMenu.LastSeed}");
+        }
+
+        public static void BakeGrassOnly()
+        {
+            if (!TryBeginScatter(out var ctx))
+            {
+                return;
+            }
+
+            GrassBakeMenu.Clear();
+            var grassInstances = 0;
+            OverworldGenTiming.Time("vegetation.grass-gpu", () =>
+            {
+                var field = GrassBakeMenu.Bake(
+                    ctx.Sampler, ctx.Terrain, ctx.Water, ctx.Clearance, ctx.Offsets,
+                    ctx.MinX, ctx.MinZ, ctx.SizeX, ctx.SizeZ, OverworldTerrainMenu.LastSeed);
+                grassInstances = field != null ? field.TotalInstances : 0;
+                RoadLawnMask.BakeFromScene();
+            });
+            Debug.Log($"[Vegetation] grassInstances={grassInstances} seed={OverworldTerrainMenu.LastSeed}");
+        }
+
+        public static void ClearTrees()
+        {
+            var root = GameObject.Find(RootObjectName);
+            if (root != null)
+            {
+                ClearChildNamed(root, "Trees");
+            }
+        }
+
+        public static void ClearUndergrowth()
+        {
+            var root = GameObject.Find(RootObjectName);
+            if (root != null)
+            {
+                ClearChildNamed(root, "Shrubs");
+                ClearChildNamed(root, "Flowers");
+                ClearChildNamed(root, "Rocks");
+            }
+        }
+
+        private struct ScatterContext
+        {
+            public GameObject Root;
+            public MapMagicBiomeSampler Sampler;
+            public UnityEngine.Terrain Terrain;
+            public IWaterSampler Water;
+            public VegetationClearance Clearance;
+            public VegetationEcology.NoiseOffsets Offsets;
+            public WorldSeed WorldSeed;
+            public float MinX;
+            public float MinZ;
+            public float SizeX;
+            public float SizeZ;
+            public int TreeAttempts;
+            public int ShrubAttempts;
+            public int FlowerAttempts;
+            public int RockAttempts;
+        }
+
+        private static bool TryBeginScatter(out ScatterContext ctx)
+        {
+            ctx = default;
             var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
             if (mapMagic == null || mapMagic.graph == null)
             {
-                return;
+                return false;
             }
 
             var tileCoord = new Coord(0, 0);
             var tile = mapMagic.tiles[tileCoord];
             if (tile == null)
             {
-                return;
+                return false;
             }
 
             MapMagicTileSync.WaitForTileReady(tile);
-
             var terrain = tile.main?.terrain;
             if (terrain == null)
             {
-                return;
+                return false;
             }
 
             var holder = terrain.GetComponent<DirectMatricesHolder>();
             if (holder == null)
             {
-                return;
+                return false;
             }
 
-            ClearVegetation();
             ClearDebugOverlay();
-            var root = new GameObject(RootObjectName);
-            var treesRoot = new GameObject("Trees");
-            var shrubsRoot = new GameObject("Shrubs");
-            var grassRoot = new GameObject("Grass");
-            var rocksRoot = new GameObject("Rocks");
-            treesRoot.transform.SetParent(root.transform, false);
-            shrubsRoot.transform.SetParent(root.transform, false);
-            grassRoot.transform.SetParent(root.transform, false);
-            rocksRoot.transform.SetParent(root.transform, false);
+            var root = GameObject.Find(RootObjectName);
+            if (root == null)
+            {
+                root = new GameObject(RootObjectName);
+            }
 
-            var sampler = new MapMagicBiomeSampler(holder);
             var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
-            var rng = worldSeed.Fork("vegetation");
             var densityRng = worldSeed.Fork("vegetation-density");
             var offsets = VegetationEcology.NoiseOffsets.FromRng(densityRng);
-
             var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
             var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
             IWaterSampler waterZones = new CompositeWaterSampler(lakeZones, riverZones);
             var clearance = BuildClearanceFromScene();
-
             var minX = tileCoord.x * mapMagic.tileSize.x;
             var minZ = tileCoord.z * mapMagic.tileSize.z;
             var sizeX = mapMagic.tileSize.x;
             var sizeZ = mapMagic.tileSize.z;
             var areaScale = (sizeX * sizeZ) / (1000f * 1000f);
 
-            var treeAttempts = Mathf.RoundToInt(TreeReferenceAttempts * areaScale);
-            var shrubAttempts = Mathf.RoundToInt(ShrubReferenceAttempts * areaScale);
-            var grassAttempts = Mathf.RoundToInt(GrassReferenceAttempts * areaScale);
-            var rockAttempts = Mathf.RoundToInt(RockReferenceAttempts * areaScale);
-
-            var treeCount = 0;
-            var shrubCount = 0;
-            var grassCount = 0;
-            var rockCount = 0;
-            OverworldGenTiming.Time("vegetation.trees", () =>
+            ctx = new ScatterContext
             {
-                treeCount = ScatterLayer(
-                    LayerKind.Tree, TreeByBiome, treesRoot.transform, treeAttempts,
-                    minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, offsets, rng,
-                    density => density.Forest);
-            }, $"attempts={treeAttempts}");
+                Root = root,
+                Sampler = new MapMagicBiomeSampler(holder),
+                Terrain = terrain,
+                Water = waterZones,
+                Clearance = clearance,
+                Offsets = offsets,
+                WorldSeed = worldSeed,
+                MinX = minX,
+                MinZ = minZ,
+                SizeX = sizeX,
+                SizeZ = sizeZ,
+                TreeAttempts = Mathf.RoundToInt(TreeReferenceAttempts * areaScale),
+                ShrubAttempts = Mathf.RoundToInt(ShrubReferenceAttempts * areaScale),
+                FlowerAttempts = Mathf.RoundToInt(FlowerReferenceAttempts * areaScale),
+                RockAttempts = Mathf.RoundToInt(RockReferenceAttempts * areaScale),
+            };
+            return true;
+        }
 
-            OverworldGenTiming.Time("vegetation.shrubs", () =>
+        private static void ClearChildNamed(GameObject root, string childName)
+        {
+            var t = root.transform.Find(childName);
+            if (t != null)
             {
-                shrubCount = ScatterLayer(
-                    LayerKind.Shrub, ShrubByBiome, shrubsRoot.transform, shrubAttempts,
-                    minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, offsets, rng,
-                    density => Mathf.Max(density.Shrub, density.Thicket * 0.85f),
-                    allowThicketClusters: true);
-            }, $"attempts={shrubAttempts}");
-
-            OverworldGenTiming.Time("vegetation.grass", () =>
-            {
-                grassCount = ScatterLayer(
-                    LayerKind.Grass, GrassByBiome, grassRoot.transform, grassAttempts,
-                    minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, offsets, rng,
-                    density => density.Grass);
-            }, $"attempts={grassAttempts}");
-
-            OverworldGenTiming.Time("vegetation.rocks", () =>
-            {
-                rockCount = ScatterRocks(
-                    rocksRoot.transform, rockAttempts,
-                    minX, minZ, sizeX, sizeZ, sampler, terrain, waterZones, clearance, rng);
-            }, $"attempts={rockAttempts}");
-
-            Debug.Log(
-                $"[Vegetation] Ecology scatter seed={OverworldTerrainMenu.LastSeed}: " +
-                $"trees={treeCount}, shrubs={shrubCount}, grass={grassCount}, rocks={rockCount}");
-            LogTrunkColliderSamples(treesRoot.transform);
-            OverworldGenTiming.Log(
-                "vegetation.total",
-                OverworldGenTiming.StopMs(total),
-                $"spawned trees={treeCount} shrubs={shrubCount} grass={grassCount} rocks={rockCount}");
+                Object.DestroyImmediate(t.gameObject);
+            }
         }
 
         private static void LogTrunkColliderSamples(Transform treesRoot)
@@ -324,6 +432,7 @@ namespace GameDev.EditorTools
                 Object.DestroyImmediate(root);
             }
 
+            GrassBakeMenu.Clear();
             ClearDebugOverlay();
         }
 
@@ -523,6 +632,80 @@ namespace GameDev.EditorTools
             return placed;
         }
 
+        /// <summary>
+        /// Sparse stones along road shoulders (memo: decor at road borders — no extra road meshes).
+        /// </summary>
+        private static int ScatterRoadBorderRocks(
+            Transform parent,
+            VegetationClearance clearance,
+            UnityEngine.Terrain terrain,
+            IWaterSampler waterZones,
+            System.Random rng)
+        {
+            var roadClearance = Object.FindFirstObjectByType<OverworldRoadClearance>();
+            if (roadClearance == null || roadClearance.Samples == null || roadClearance.Samples.Count < 2)
+            {
+                return 0;
+            }
+
+            var samples = roadClearance.Samples;
+            var placed = 0;
+            var step = 3;
+            var halfW = WorldScale.RoadMainWidthMeters * 0.5f;
+            for (var i = step; i < samples.Count - 1; i += step)
+            {
+                if (rng.NextDouble() > 0.28f)
+                {
+                    continue;
+                }
+
+                var a = samples[i - 1];
+                var b = samples[i];
+                var ab = b - a;
+                var len = ab.magnitude;
+                if (len < 0.2f)
+                {
+                    continue;
+                }
+
+                var dir = ab / len;
+                var perp = new Vector2(-dir.y, dir.x);
+                var side = rng.NextDouble() < 0.5 ? -1f : 1f;
+                var offset = halfW + 0.6f + (float)rng.NextDouble() * 1.8f;
+                var x = b.x + perp.x * side * offset;
+                var z = b.y + perp.y * side * offset;
+
+                // Prefer the soft shoulder: not on the packed bed, not deep in lawn.
+                var clear = clearance.Multiplier(x, z);
+                if (clear < 0.08f || clear > 0.85f)
+                {
+                    continue;
+                }
+
+                if (!TrySampleTerrainHeight(terrain, x, z, out var groundY))
+                {
+                    continue;
+                }
+
+                if (WaterProximity.IsUnderOrTooCloseToWater(waterZones, x, z, groundY, ShoreBufferMeters))
+                {
+                    continue;
+                }
+
+                if (!TryPickEntry(MountainRocks, rng, out var entry))
+                {
+                    continue;
+                }
+
+                if (SpawnPrefab(entry.PrefabPath, parent, x, groundY, z, LayerKind.Rock, default, rng))
+                {
+                    placed++;
+                }
+            }
+
+            return placed;
+        }
+
         private static int SpawnThicketExtras(
             Entry[] entries,
             Transform parent,
@@ -618,9 +801,14 @@ namespace GameDev.EditorTools
             var settlement = Object.FindFirstObjectByType<OverworldSettlementAnchor>();
             if (settlement != null)
             {
-                var p = settlement.Position;
-                disks.Add(new VegetationClearance.Disk(
-                    new Vector2(p.x, p.z), SettlementClearRadius, SettlementFalloff));
+                // Fabric-aware grass exclusion handles streets/pads; keep a coarse disk only when
+                // fabric was not persisted (legacy / partial place).
+                if (settlement.Fabric == null)
+                {
+                    var p = settlement.Position;
+                    disks.Add(new VegetationClearance.Disk(
+                        new Vector2(p.x, p.z), SettlementClearRadius, SettlementFalloff));
+                }
             }
 
             var poiRoot = GameObject.Find("OverworldPoi");
@@ -703,27 +891,12 @@ namespace GameDev.EditorTools
                 var targetH = TreePlacement.PickTargetHeightMeters(young, rng);
                 TreePlacement.ApplyWorldHeight(instance, targetH);
             }
-            else if (layer == LayerKind.Grass)
+            else if (layer == LayerKind.Flower)
             {
-                var isFlower = path.Contains("/Flowers/");
-                float minH;
-                float maxH;
-                if (isFlower)
-                {
-                    minH = GameDev.World.WorldScale.FlowerMinMeters;
-                    maxH = GameDev.World.WorldScale.FlowerMaxMeters;
-                }
-                else
-                {
-                    // Meadow grass reads taller; forest understory shorter.
-                    minH = GameDev.World.WorldScale.GrassShortMinMeters;
-                    maxH = Mathf.Lerp(
-                        GameDev.World.WorldScale.GrassShortMaxMeters,
-                        GameDev.World.WorldScale.GrassTallMaxMeters,
-                        Mathf.Clamp01(density.Grass));
-                }
-
-                var targetH = Mathf.Lerp(minH, maxH, (float)rng.NextDouble());
+                var targetH = Mathf.Lerp(
+                    GameDev.World.WorldScale.FlowerMinMeters,
+                    GameDev.World.WorldScale.FlowerMaxMeters,
+                    (float)rng.NextDouble());
                 ApplyTargetHeight(instance, targetH);
             }
             else if (layer == LayerKind.Shrub)
@@ -740,6 +913,10 @@ namespace GameDev.EditorTools
 
             if (layer == LayerKind.Tree)
             {
+                // Bury the flat trunk cut — AABB grounding alone often leaves a visible air gap.
+                var sink = TreePlacement.TrunkSinkMeters * Mathf.Clamp(
+                    instance.transform.lossyScale.y, 0.75f, 1.6f);
+                instance.transform.position += Vector3.down * sink;
                 TreePlacement.EnsureTrunkCollider(instance);
             }
 

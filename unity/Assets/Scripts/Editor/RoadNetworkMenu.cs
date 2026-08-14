@@ -8,6 +8,7 @@ using GameDev.World.Roads;
 using GameDev.World.Settlement;
 using GameDev.World.Streaming;
 using GameDev.World.Terrain;
+using GameDev.World.Vegetation;
 using GameDev.World.Water;
 using MapMagic.Core;
 using MapMagic.Terrains;
@@ -26,7 +27,10 @@ namespace GameDev.EditorTools
     {
         private const string RootObjectName = "OverworldRoads";
         private const float GridCellSizeMeters = 25f;
-        private const string GrooveLayerPath = "Assets/Settings/TerrainLayers/Dirt_Scaled.terrainlayer";
+        private const string RoadCenterLayerPath = "Assets/Settings/TerrainLayers/Dirt_Road_Center.terrainlayer";
+        private const string RoadEdgeLayerPath = "Assets/Settings/TerrainLayers/Dirt_Road_Edge.terrainlayer";
+        private const string RoadGravelLayerPath = "Assets/Settings/TerrainLayers/Road_Gravel.terrainlayer";
+        private const string LakeBankLayerPath = "Assets/Settings/TerrainLayers/Dirt_Scaled.terrainlayer";
         private const float BridgeSpanDetectionThresholdMeters = GridCellSizeMeters * 1.8f;
         private const string BridgePrefabPath =
             "Assets/Polytope Studio/Lowpoly_Village/Prefabs/Modular/Bridge/PT_Wooden_Bridge_02.prefab";
@@ -256,15 +260,21 @@ namespace GameDev.EditorTools
 
             if (terrain != null)
             {
-                var grooveLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(GrooveLayerPath);
+                var centerLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadCenterLayerPath);
+                var edgeLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadEdgeLayerPath);
+                var gravelLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadGravelLayerPath);
+                var lakeBankLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(LakeBankLayerPath);
+                ApplyRoadLayerLooks(centerLayer, edgeLayer, gravelLayer);
                 var lakesNeedDig = lakes != null && lakes.Count > 0 &&
                                    (lakeZones == null || !lakeZones.BasinsApplied);
                 TerrainDeformer.Apply(
                     terrain,
                     lakesNeedDig ? lakes : null,
                     dryRoadDefs,
-                    lakesNeedDig ? grooveLayer : null,
-                    grooveLayer);
+                    lakesNeedDig ? lakeBankLayer : null,
+                    centerLayer,
+                    gravelLayer,
+                    edgeLayer);
                 if (lakesNeedDig && lakeZones != null)
                 {
                     lakeZones.MarkBasinsApplied();
@@ -275,6 +285,7 @@ namespace GameDev.EditorTools
             var root = new GameObject(RootObjectName);
             var clearance = root.AddComponent<OverworldRoadClearance>();
             clearance.SetSamples(clearanceSamples);
+            RoadLawnMask.BakeFromScene();
 
             var bridgePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BridgePrefabPath);
             for (var i = 0; i < bridgeSpans.Count; i++)
@@ -285,7 +296,51 @@ namespace GameDev.EditorTools
 
             Debug.Log(
                 $"[Roads] landscape-planner main={mainCount} branch={branchCount} " +
-                $"bridges={bridgeSpans.Count} corridors={dryRoadDefs.Count} (nodes={nodes.Count})");
+                $"bridges={bridgeSpans.Count} corridors={dryRoadDefs.Count} (nodes={nodes.Count}); " +
+                "packed-earth alphamap painted (center/edge/gravel).");
+        }
+
+        [MenuItem("GameDev/Overworld/Repaint Road Surface")]
+        public static void RepaintRoadSurface()
+        {
+            var terrain = UnityEngine.Terrain.activeTerrains != null &&
+                          UnityEngine.Terrain.activeTerrains.Length > 0
+                ? UnityEngine.Terrain.activeTerrains[0]
+                : Object.FindFirstObjectByType<UnityEngine.Terrain>();
+            if (terrain == null)
+            {
+                Debug.LogError("[Roads] No terrain found for road surface repaint.");
+                return;
+            }
+
+            var clearance = Object.FindFirstObjectByType<OverworldRoadClearance>();
+            if (clearance == null || clearance.Samples == null || clearance.Samples.Count == 0)
+            {
+                Debug.LogError(
+                    "[Roads] No OverworldRoadClearance samples. Build Road Network first, then Repaint.");
+                return;
+            }
+
+            var centerLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadCenterLayerPath);
+            var edgeLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadEdgeLayerPath);
+            var gravelLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadGravelLayerPath);
+            if (centerLayer == null)
+            {
+                Debug.LogError($"[Roads] Missing terrain layer at {RoadCenterLayerPath}");
+                return;
+            }
+
+            ApplyRoadLayerLooks(centerLayer, edgeLayer, gravelLayer);
+            RoadSurfacePaint.PaintFromClearanceSamples(
+                terrain,
+                clearance.Samples,
+                WorldScale.RoadMainWidthMeters,
+                WorldScale.RoadMainShoulderMeters,
+                centerLayer,
+                edgeLayer,
+                gravelLayer);
+            RoadLawnMask.BakeFromScene();
+            SceneView.RepaintAll();
         }
 
         [MenuItem("GameDev/Overworld/Clear Road Network")]
@@ -295,6 +350,30 @@ namespace GameDev.EditorTools
             if (root != null)
             {
                 Object.DestroyImmediate(root);
+            }
+        }
+
+        private static void ApplyRoadLayerLooks(
+            TerrainLayer centerLayer,
+            TerrainLayer edgeLayer,
+            TerrainLayer gravelLayer)
+        {
+            if (centerLayer != null)
+            {
+                TerrainBiomePalette.Apply(centerLayer, TerrainBiomePalette.RoadCenter, 8f);
+                EditorUtility.SetDirty(centerLayer);
+            }
+
+            if (edgeLayer != null)
+            {
+                TerrainBiomePalette.Apply(edgeLayer, TerrainBiomePalette.RoadEdge, 10f);
+                EditorUtility.SetDirty(edgeLayer);
+            }
+
+            if (gravelLayer != null)
+            {
+                TerrainBiomePalette.Apply(gravelLayer, TerrainBiomePalette.RoadGravel, 7f);
+                EditorUtility.SetDirty(gravelLayer);
             }
         }
 
