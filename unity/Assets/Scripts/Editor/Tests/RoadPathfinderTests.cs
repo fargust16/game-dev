@@ -131,8 +131,8 @@ namespace GameDev.World.Roads.Tests
             var pathWithGrade = new List<Vector2>();
             var pathWithoutGrade = new List<Vector2>();
 
-            // Grade here is 0.4 (4m rise over one 10m step) - above MaxComfortableGrade (0.15) but
-            // below MaxWalkableGrade (0.6), so this is penalized but not hard-blocked. Same step
+            // Grade here is 0.4 (4m rise over one 10m step) - above MaxComfortableGrade but
+            // below MaxWalkableGrade, so this is penalized but not hard-blocked. Same step
             // everywhere (height ignores z), so both runs are forced onto the identical physical
             // route - isolates "does grade increase the reported cost" from any routing choice.
             float Height(float x, float z) => x < 40f ? 0f : 4f;
@@ -152,7 +152,7 @@ namespace GameDev.World.Roads.Tests
             var grid = MakeGrid();
             var path = new List<Vector2>();
 
-            // Grade 3.0 (30m rise over one 10m step, ignoring z) is far past MaxWalkableGrade (0.6)
+            // Grade 3.0 (30m rise over one 10m step, ignoring z) is far past MaxWalkableGrade
             // in every direction on this grid - no detour can avoid it, so this must fail honestly
             // instead of drawing a physically-impossible near-vertical "road".
             float Height(float x, float z) => x < 40f ? 0f : 30f;
@@ -169,9 +169,9 @@ namespace GameDev.World.Roads.Tests
             var path = new List<Vector2>();
 
             // Below z=50: a sheer step (0 -> 30 in one 10m grid step, grade 3.0) - well past
-            // MaxWalkableGrade (0.6), genuinely impassable. At/above z=50: the same 30m rise spread
-            // evenly across the full 100m width (grade ~0.3) - above MaxComfortableGrade (0.15, so
-            // still penalized) but comfortably under the hard cap, so it's a real, walkable detour.
+            // MaxWalkableGrade, genuinely impassable. At/above z=50: the same 30m rise spread
+            // evenly across the full 100m width (grade ~0.3) - under the hard cap, so it's a
+            // real walkable detour.
             float Height(float x, float z) => z < 50f ? (x < 40f ? 0f : 30f) : (x / 100f) * 30f;
 
             var found = RoadPathfinder.TryFindPath(grid, (x, z) => 1f, new Vector2(5f, 5f), new Vector2(95f, 5f), path, out _, Height);

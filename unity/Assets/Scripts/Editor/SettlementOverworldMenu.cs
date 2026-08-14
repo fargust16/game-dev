@@ -1,11 +1,8 @@
 #if UNITY_EDITOR
-using System.Collections.Generic;
 using Den.Tools;
 using GameDev.World.Buildings.Shell;
 using GameDev.World.Poi;
-using GameDev.World.Seed;
 using GameDev.World.Settlement;
-using GameDev.World.Streaming;
 using GameDev.World.Terrain;
 using GameDev.World.Water;
 using MapMagic.Core;
@@ -40,12 +37,8 @@ namespace GameDev.EditorTools
                 return;
             }
 
-            var sampler = new MapMagicBiomeSampler(holder);
-            var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
-            var chunks = OverworldTileChunks.CoveringTile(tileCoord, mapMagic.tileSize, OverworldTileChunks.DefaultMarginMeters);
-            var placer = new StubPoiPlacer(worldSeed, sampler, chunks, PoiDemoScenario.BuildRequests());
-
-            if (!SettlementApproachBinder.TryFindTownApproach(placer.AllMarkers(), out var approach))
+            var markers = OverworldWorldPlan.GetOrBuildPois(mapMagic, tileCoord);
+            if (!SettlementApproachBinder.TryFindTownApproach(markers, out var approach))
             {
                 return;
             }

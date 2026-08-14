@@ -39,5 +39,27 @@ namespace GameDev.World.Seed.Tests
 
             Assert.AreNotEqual(a.Next(), b.Next());
         }
+
+        [Test]
+        public void IndexedFork_IsolatesSiblingObjects()
+        {
+            var seed = new WorldSeed(1847459267);
+            var lake0 = seed.Fork("lake", 0).Next();
+            var lake1 = seed.Fork("lake", 1).Next();
+            var veg = seed.Fork("vegetation").Next();
+
+            Assert.AreNotEqual(lake0, lake1);
+            Assert.AreNotEqual(lake0, veg);
+            Assert.AreEqual(lake0, seed.Fork("lake", 0).Next());
+        }
+
+        [Test]
+        public void StringFork_UnchangedByIndexedOverloadPresence()
+        {
+            // Regression: Fork(string) must not mix trailing zero ints.
+            var a = new WorldSeed(110201).Fork("water.lakes").Next();
+            var b = new WorldSeed(110201).Fork("water.lakes").Next();
+            Assert.AreEqual(a, b);
+        }
     }
 }

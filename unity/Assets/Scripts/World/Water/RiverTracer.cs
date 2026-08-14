@@ -74,8 +74,8 @@ namespace GameDev.World.Water
         public static RiverTracerSettings Default(float terrainBaseY, float heightScaleMeters) => new RiverTracerSettings(
             channelAccumulationThreshold: 60,
             referenceAccumulation: 60 * 10,
-            minWidthMeters: 8f,
-            maxWidthMeters: 26f,
+            minWidthMeters: WorldScale.RiverSourceWidthMeters,
+            maxWidthMeters: WorldScale.RiverMouthWidthMeters,
             minCarveDepthMeters: 4f,
             maxCarveDepthMeters: 9f,
             // Low fill → ribbon hugs the carved bed (high values floated metres above the trench).
@@ -237,14 +237,11 @@ namespace GameDev.World.Water
                 return;
             }
 
+            // Valid terminals only: Lake or map edge. Never keep a Sink mid-terrain.
             if (path.Termination != RiverTermination.Lake &&
                 path.Termination != RiverTermination.OffTile)
             {
-                // Long sink path still reads as a map-spanning channel on a single stub tile.
-                if (PathLengthXZ(path) < minLength)
-                {
-                    return;
-                }
+                return;
             }
 
             rivers.Add(path);
@@ -709,7 +706,7 @@ namespace GameDev.World.Water
             }
 
             var claimed = new bool[grid.Width, grid.Depth];
-            AppendMouthOverlap(grid, lake, cellsX, cellsZ, claimed, overlapCells: 12);
+            AppendMouthOverlap(grid, lake, cellsX, cellsZ, claimed, overlapCells: 20);
 
             return BuildPath(grid, cellsX, cellsZ, termination, settings, riverIndex);
         }
@@ -820,7 +817,7 @@ namespace GameDev.World.Water
                     termination = RiverTermination.Lake;
                     // Keep walking into the lake so the ribbon overlaps the water plane (stopping on
                     // the first flood cell leaves a dry gap after soft bank carve / shore pad).
-                    AppendMouthOverlap(grid, hitLake, cellsX, cellsZ, claimed, overlapCells: 12);
+                    AppendMouthOverlap(grid, hitLake, cellsX, cellsZ, claimed, overlapCells: 20);
                     break;
                 }
 
@@ -938,6 +935,20 @@ namespace GameDev.World.Water
 
             var accumRange = Mathf.Max(1, settings.ReferenceAccumulation - settings.ChannelAccumulationThreshold);
 
+            // Arc-length profile: width grows from source → mouth (t^growthExponent).
+            var arc = new float[count];
+            for (var i = 1; i < count; i++)
+            {
+                var wa = grid.CellToWorld(cellsX[i - 1], cellsZ[i - 1]);
+                var wb = grid.CellToWorld(cellsX[i], cellsZ[i]);
+                var dx = wb.x - wa.x;
+                var dz = wb.y - wa.y;
+                arc[i] = arc[i - 1] + Mathf.Sqrt(dx * dx + dz * dz);
+            }
+
+            var totalLen = Mathf.Max(arc[count - 1], 1e-3f);
+            var growth = WorldScale.RiverWidthGrowthExponent;
+
             for (var i = 0; i < count; i++)
             {
                 var x = cellsX[i];
@@ -946,7 +957,10 @@ namespace GameDev.World.Water
                 var groundY = grid.HeightAt(x, z);
 
                 var accum = grid.AccumulationAt(x, z);
-                var t = Mathf.Clamp01((accum - settings.ChannelAccumulationThreshold) / (float)accumRange);
+                var accumT = Mathf.Clamp01((accum - settings.ChannelAccumulationThreshold) / (float)accumRange);
+                var pathT = Mathf.Pow(Mathf.Clamp01(arc[i] / totalLen), growth);
+                // Downstream distance dominates; accumulation still widens confluence stretches.
+                var t = Mathf.Max(pathT, accumT * 0.65f);
 
                 var width = Mathf.Lerp(settings.MinWidthMeters, settings.MaxWidthMeters, t);
                 var carveDepth = Mathf.Lerp(settings.MinCarveDepthMeters, settings.MaxCarveDepthMeters, t);

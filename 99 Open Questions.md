@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.21
+Version: 0.22
 
 Status: Draft
 
-Last Updated: 2026-08-09
+Last Updated: 2026-08-14
 
 Depends On:
 All Canonical Documents
@@ -261,6 +261,10 @@ How aggressive may OccultLevel visual “wrongness” be in V1 without spoiling 
 What is the minimum viable Piece Kit size per V1 archetype (how many distinct Pieces per socket type) before repetition becomes visible to the player?
 
 When does live Settlement / overworld chunk streaming consume `IBuildingShellBinder` from the Shell Sandbox lab (parallel to Overworld V0 today)? ([15](15%20Procedural%20Building%20Generation.md), [17](17%20Game%20Systems%20Architecture.md) W.6)
+
+Should Local road stubs be generated as a third Prim pass after Secondary, or only when Settlement / building pads exist? ([LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md))
+
+When do `PoiPlacementProfile` C# catalog entries move into ScriptableObject immutable defs for authoring? ([17](17%20Game%20Systems%20Architecture.md) W.4)
 
 ---
 

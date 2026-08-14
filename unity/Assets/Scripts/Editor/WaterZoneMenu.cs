@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using Den.Tools;
+using GameDev.World;
 using GameDev.World.Streaming;
 using GameDev.World.Water;
 using MapMagic.Core;
@@ -8,6 +9,7 @@ using MapMagic.Terrains;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using WorldScale = GameDev.World.WorldScale;
 
 namespace GameDev.EditorTools
 {
@@ -42,7 +44,50 @@ namespace GameDev.EditorTools
             GenerateForTile(mapMagic, new Coord(0, 0));
         }
 
+        [MenuItem("GameDev/Overworld/Log Lake Recess Diagnostics")]
+        public static void LogLakeRecessDiagnosticsMenuItem()
+        {
+            var holder = Object.FindFirstObjectByType<OverworldWaterZones>();
+            if (holder == null || holder.Zones == null || holder.Zones.Count == 0)
+            {
+                Debug.LogWarning("[LakeRecess] No OverworldWaterZones in scene — generate water first.");
+                return;
+            }
+
+            var terrain = Object.FindFirstObjectByType<UnityEngine.Terrain>();
+            System.Func<float, float, float> sample = null;
+            if (terrain != null)
+            {
+                sample = (x, z) =>
+                    terrain.SampleHeight(new Vector3(x, 0f, z)) + terrain.transform.position.y;
+            }
+
+            var overlap = WorldScale.WaterOverlapMeters;
+            if (holder.LakeDefinitions != null && holder.LakeDefinitions.Count > 0)
+            {
+                overlap = holder.LakeDefinitions[0].WaterOverlapMeters;
+            }
+
+            Debug.Log(
+                $"[LakeRecess] === manual dump BasinsApplied={holder.BasinsApplied} " +
+                $"lakes={holder.Zones.Count} ===");
+            LakeRecessDiagnostics.LogAfterMesh(holder.Zones, sample, overlap);
+        }
+
         public static void GenerateForTile(MapMagicObject mapMagic, Coord tileCoord)
+        {
+            GenerateForTile(mapMagic, tileCoord, deferTerrainDeformAndMeshes: false);
+        }
+
+        /// <summary>
+        /// When <paramref name="deferTerrainDeformAndMeshes"/> is true: place lake definitions +
+        /// river paths only (LandscapePlanner routes before dig). Call
+        /// <see cref="ApplyDeformAndMeshes"/> after roads are planned.
+        /// </summary>
+        public static void GenerateForTile(
+            MapMagicObject mapMagic,
+            Coord tileCoord,
+            bool deferTerrainDeformAndMeshes)
         {
             var total = OverworldGenTiming.Start();
             ClearWaterZones();
@@ -82,21 +127,23 @@ namespace GameDev.EditorTools
             var sizeX = (float)mapMagic.tileSize.x - 2f * inset;
             var sizeZ = (float)mapMagic.tileSize.z - 2f * inset;
 
-            var lakeRng = new GameDev.World.Seed.WorldSeed(OverworldTerrainMenu.LastSeed).Fork("water.lakes");
+            var worldSeed = new GameDev.World.Seed.WorldSeed(OverworldTerrainMenu.LastSeed);
+            var settings = OverworldTerrainMenu.ActiveSettings;
+            settings.Clamp();
             WaterZone[] forced = null;
             OverworldGenTiming.Time("water.lakes-place", () =>
             {
                 forced = DistributedLakePlacer.Place(
-                    HeightSampler, minX, minZ, sizeX, sizeZ, CellSize, lakeRng,
-                    minLakes: DistributedLakePlacer.DefaultMinLakes,
-                    targetLakes: DistributedLakePlacer.DefaultTargetLakes);
+                    HeightSampler, minX, minZ, sizeX, sizeZ, CellSize,
+                    worldSeed, settings);
             });
             var zones = LakeZoneMerger.CullOverlapping(forced, maxOverlapFraction: 0.12f, maxCellsPerLake: 4000);
-            zones = LakeZoneMerger.CapCount(zones, maxCount: 3);
-            if (zones.Length < DistributedLakePlacer.DefaultMinLakes)
+            var wantLakes = Mathf.Max(WorldScale.LakeMinCount, settings.LakeCount);
+            zones = LakeZoneMerger.CapCount(zones, maxCount: wantLakes);
+            if (zones.Length < wantLakes)
             {
                 zones = LakeZoneMerger.EnsureMinDistinct(
-                    zones, forced, DistributedLakePlacer.DefaultMinLakes,
+                    zones, forced, wantLakes,
                     minCenterSeparationMeters: DistributedLakePlacer.DefaultMinSeparationMeters);
             }
 
@@ -104,9 +151,14 @@ namespace GameDev.EditorTools
 
             var mountainLocalHeight = MeasureMountainLocalHeight(terrain, HeightSampler, minX, minZ, sizeX, sizeZ);
             var basinDepth = Mathf.Clamp(
-                mountainLocalHeight * 0.2f,
+                settings.MaxDepthMeters > 0f
+                    ? settings.MaxDepthMeters
+                    : mountainLocalHeight * 0.2f,
                 LakeTerrainCarver.MinLargeBasinDepthMeters,
                 LakeTerrainCarver.MaxLargeBasinDepthMeters);
+
+            var lakeDefs = LakeDefinition.FromZones(
+                zones, basinDepth, WorldScale.LakeBasinExpandMeters, settings.WaterInsetMeters);
 
             var terrainBaseY = terrain != null ? terrain.transform.position.y : 0f;
             var heightScale = terrain != null
@@ -120,12 +172,88 @@ namespace GameDev.EditorTools
                 flowGrid = FlowNetwork.Compute(HeightSampler, minX, minZ, sizeX, sizeZ, CellSize);
                 rivers = RiverTracer.Trace(flowGrid, zones, riverSettings);
             });
+            rivers ??= System.Array.Empty<RiverPath>();
 
-            if (terrain != null && zones.Length > 0)
+            // Publish planned lakes early so road cost can see lake SDF before dig.
+            var root = new GameObject(RootObjectName);
+            var holderComponent = root.AddComponent<OverworldWaterZones>();
+            holderComponent.SetLakePlan(lakeDefs, basinDepth);
+
+            var riverRoot = new GameObject(RiverRootObjectName);
+            var riverHolder = riverRoot.AddComponent<OverworldRiverZones>();
+            riverHolder.SetRivers(rivers);
+
+            if (deferTerrainDeformAndMeshes)
+            {
+                LastDeferredBasinDepth = basinDepth;
+                LastDeferredMountainLocalHeight = mountainLocalHeight;
+                LastDeferredRawLakeCount = forced.Length;
+                OverworldGenTiming.Log(
+                    "water.total",
+                    OverworldGenTiming.StopMs(total),
+                    $"deferred lakes={zones.Length} rivers={rivers.Length}");
+                return;
+            }
+
+            ApplyDeformAndMeshes(mapMagic, tileCoord, carveLakes: true, carveRivers: true);
+            LogOverworldSummary(
+                terrain, zones, rivers,
+                mapMagic.globals.height, mountainLocalHeight, basinDepth,
+                zones.Length, forced.Length);
+            OverworldGenTiming.Log(
+                "water.total",
+                OverworldGenTiming.StopMs(total),
+                $"lakes={zones.Length} rivers={rivers.Length}");
+        }
+
+        public static float LastDeferredBasinDepth { get; private set; }
+        public static float LastDeferredMountainLocalHeight { get; private set; }
+        public static int LastDeferredRawLakeCount { get; private set; }
+
+        /// <summary>
+        /// Lake basin dig + river carve + water meshes. Safe after road corridor planning when
+        /// lakes were placed with deferTerrainDeformAndMeshes.
+        /// </summary>
+        public static void ApplyDeformAndMeshes(
+            MapMagicObject mapMagic,
+            Coord tileCoord,
+            bool carveLakes = true,
+            bool carveRivers = true)
+        {
+            var tile = mapMagic.tiles[tileCoord];
+            var terrain = tile?.main?.terrain;
+            var lakeHolder = Object.FindFirstObjectByType<OverworldWaterZones>();
+            var riverHolder = Object.FindFirstObjectByType<OverworldRiverZones>();
+            if (lakeHolder == null)
+            {
+                return;
+            }
+
+            var zones = lakeHolder.Zones;
+            var lakes = lakeHolder.LakeDefinitions;
+            var basinDepth = lakeHolder.PlannedBasinDepthMeters > 1f
+                ? lakeHolder.PlannedBasinDepthMeters
+                : LastDeferredBasinDepth;
+            var rivers = riverHolder != null
+                ? riverHolder.Rivers
+                : System.Array.Empty<RiverPath>();
+
+            var carveRan = false;
+            if (terrain != null && carveLakes && zones != null && zones.Count > 0 &&
+                (lakeHolder == null || !lakeHolder.BasinsApplied))
             {
                 var lakeBankLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(BankLayerPath);
                 OverworldGenTiming.Time("water.lake-carve", () =>
                     LakeTerrainCarver.Carve(terrain, zones, basinDepth, lakeBankLayer));
+                lakeHolder?.MarkBasinsApplied();
+                carveRan = true;
+            }
+            else if (carveLakes && zones != null && zones.Count > 0 &&
+                     lakeHolder != null && lakeHolder.BasinsApplied)
+            {
+                Debug.LogWarning(
+                    "[LakeRecess] Skip lake carve — BasinsApplied=true. " +
+                    "Meshes will rebuild with current zone.WaterLevelY vs already-carved terrain.");
             }
 
             System.Func<float, float, float> sampleTerrainY = null;
@@ -135,34 +263,43 @@ namespace GameDev.EditorTools
                     terrain.SampleHeight(new Vector3(x, 0f, z)) + terrain.transform.position.y;
             }
 
-            if (terrain != null && rivers != null && rivers.Length > 0)
+            var terrainBaseY = terrain != null ? terrain.transform.position.y : 0f;
+            var heightScale = terrain != null
+                ? terrain.terrainData.size.y
+                : mapMagic.globals.height;
+            var riverSettings = RiverTracerSettings.Default(terrainBaseY, heightScale);
+
+            if (terrain != null && carveRivers && rivers != null && rivers.Count > 0)
             {
                 var bankLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(BankLayerPath);
                 OverworldGenTiming.Time("water.river-carve", () =>
                 {
-                    Debug.Log($"[River] carve begin count={rivers.Length} bankLayer={(bankLayer != null ? bankLayer.name : "null")}");
                     RiverTerrainCarver.Carve(terrain, rivers, bankLayer);
-                    for (var i = 0; i < rivers.Length; i++)
+                    for (var i = 0; i < rivers.Count; i++)
                     {
                         rivers[i].SyncWaterSurfaceAfterCarve(sampleTerrainY, riverSettings.WaterFillFraction, zones);
                     }
 
-                    Debug.Log("[River] carve+sync done — diagnostics");
                     RiverDiagnostics.LogAfterCarveSync(rivers, sampleTerrainY, riverSettings.WaterFillFraction);
                 });
             }
 
-            rivers ??= System.Array.Empty<RiverPath>();
+            // Rebuild meshes under existing roots.
+            var waterRoot = GameObject.Find(RootObjectName);
+            if (waterRoot == null)
+            {
+                waterRoot = new GameObject(RootObjectName);
+                lakeHolder = waterRoot.AddComponent<OverworldWaterZones>();
+                lakeHolder.SetZones(zones);
+            }
 
-            var root = new GameObject(RootObjectName);
-            var holderComponent = root.AddComponent<OverworldWaterZones>();
-            holderComponent.SetZones(zones);
+            // Clear prior mesh children only.
+            for (var i = waterRoot.transform.childCount - 1; i >= 0; i--)
+            {
+                Object.DestroyImmediate(waterRoot.transform.GetChild(i).gameObject);
+            }
 
             var waterMaterial = CreateWaterMaterial();
-            Debug.Log(
-                $"[Water] material='{waterMaterial.name}' shader='{waterMaterial.shader.name}' " +
-                $"(PT colors/normals, no scene-color refraction)");
-            var planesCreated = 0;
             Rect? terrainClip = null;
             if (terrain != null)
             {
@@ -173,20 +310,41 @@ namespace GameDev.EditorTools
 
             OverworldGenTiming.Time("water.meshes", () =>
             {
+                var meshSettings = OverworldTerrainMenu.ActiveSettings;
+                meshSettings.Clamp();
+                var overlap = meshSettings.WaterInsetMeters;
+                if (lakes != null && lakes.Count > 0)
+                {
+                    overlap = lakes[0].WaterOverlapMeters;
+                }
+
+                LakeRecessDiagnostics.LogAfterCarve(zones, sampleTerrainY, carveRan, overlap);
+
                 foreach (var zone in zones)
                 {
                     var zoneObject = new GameObject($"WaterZone_{zone.Id}");
-                    zoneObject.transform.SetParent(root.transform, worldPositionStays: true);
+                    zoneObject.transform.SetParent(waterRoot.transform, worldPositionStays: true);
                     var meshFilter = zoneObject.AddComponent<MeshFilter>();
-                    meshFilter.sharedMesh = WaterMeshBuilder.Build(zone, zones, sampleTerrainY, terrainClip);
+                    meshFilter.sharedMesh = WaterMeshBuilder.Build(
+                        zone, zones, sampleTerrainY, terrainClip, overlap);
                     var renderer = zoneObject.AddComponent<MeshRenderer>();
                     renderer.sharedMaterial = waterMaterial;
-                    planesCreated++;
                 }
 
-                var riverRoot = new GameObject(RiverRootObjectName);
-                var riverHolder = riverRoot.AddComponent<OverworldRiverZones>();
-                riverHolder.SetRivers(rivers);
+                LakeRecessDiagnostics.LogAfterMesh(zones, sampleTerrainY, overlap);
+
+                var riverRoot = GameObject.Find(RiverRootObjectName);
+                if (riverRoot == null)
+                {
+                    riverRoot = new GameObject(RiverRootObjectName);
+                    riverHolder = riverRoot.AddComponent<OverworldRiverZones>();
+                    riverHolder.SetRivers(rivers);
+                }
+
+                for (var i = riverRoot.transform.childCount - 1; i >= 0; i--)
+                {
+                    Object.DestroyImmediate(riverRoot.transform.GetChild(i).gameObject);
+                }
 
                 foreach (var river in rivers)
                 {
@@ -196,24 +354,16 @@ namespace GameDev.EditorTools
                     meshFilter.sharedMesh = RiverMeshBuilder.Build(river, uvTileLength: 8f, sampleTerrainY);
                     var renderer = riverObject.AddComponent<MeshRenderer>();
                     renderer.sharedMaterial = waterMaterial;
-                    var vCount = meshFilter.sharedMesh != null ? meshFilter.sharedMesh.vertexCount : 0;
-                    Debug.Log($"[River] {river.Id} mesh assigned verts={vCount} mat={waterMaterial.shader.name}");
                 }
 
-                if (rivers.Length > 0)
+                if (rivers.Count > 0)
                 {
                     RiverDiagnostics.LogAfterMesh(rivers, sampleTerrainY);
                 }
             });
-
-            LogOverworldSummary(
-                terrain, zones, rivers,
-                mapMagic.globals.height, mountainLocalHeight, basinDepth, planesCreated, forced.Length);
-            OverworldGenTiming.Log(
-                "water.total",
-                OverworldGenTiming.StopMs(total),
-                $"lakes={zones.Length} rivers={rivers.Length}");
         }
+
+        // Legacy body removed — GenerateForTile above is the single entry.
 
         private static void LogSilhouetteDiagnostics(WaterZone[] zones)
         {

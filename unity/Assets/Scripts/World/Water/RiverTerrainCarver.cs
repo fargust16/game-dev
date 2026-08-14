@@ -144,7 +144,8 @@ namespace GameDev.World.Water
             float depthMetersA,
             float depthMetersB)
         {
-            var maxHalf = Mathf.Max(halfWidthA, halfWidthB);
+            var bankExtra = WorldScale.RiverBankWidthMeters;
+            var maxHalf = Mathf.Max(halfWidthA, halfWidthB) + bankExtra;
             var pad = maxHalf + worldPerPixelX * 2f;
             var minX = Mathf.Min(a.x, b.x) - pad;
             var maxX = Mathf.Max(a.x, b.x) + pad;
@@ -175,19 +176,34 @@ namespace GameDev.World.Water
                     var closest = a + ab * t;
                     var dist = Vector2.Distance(p, closest);
                     var halfW = Mathf.Lerp(halfWidthA, halfWidthB, t);
-                    if (dist > halfW)
+                    var outer = halfW + bankExtra;
+                    if (dist > outer)
                     {
                         continue;
                     }
 
                     var depthMeters = Mathf.Lerp(depthMetersA, depthMetersB, t);
-                    var u = dist / Mathf.Max(halfW, 1e-3f);
-                    // Softer U-profile than a hard V — full depth on a wider centre strip.
-                    var radial = u * u * (3f - 2f * u);
-                    var centreFlat = 1f - Mathf.SmoothStep(0.35f, 1f, u);
-                    var profile = Mathf.Max(1f - radial, centreFlat * 0.85f);
-                    var depthNorm = (depthMeters / worldHeight) * profile;
+                    float profile;
+                    if (dist <= halfW)
+                    {
+                        var u = dist / Mathf.Max(halfW, 1e-3f);
+                        // Softer U-profile — full depth on a wider centre strip.
+                        var radial = u * u * (3f - 2f * u);
+                        var centreFlat = 1f - Mathf.SmoothStep(0.35f, 1f, u);
+                        profile = Mathf.Max(1f - radial, centreFlat * 0.85f);
+                    }
+                    else
+                    {
+                        // Soft bank shoulder: shallow blend beyond the water half-width.
+                        // Keep at least WaterInsetDepth so river water is recessed like lakes.
+                        var bankU = (dist - halfW) / Mathf.Max(bankExtra, 1e-3f);
+                        var smooth = bankU * bankU * (3f - 2f * bankU);
+                        var insetFloor = WorldScale.WaterInsetDepthMeters /
+                                         Mathf.Max(depthMeters, 0.01f);
+                        profile = Mathf.Max((1f - smooth) * 0.35f, (1f - smooth) * insetFloor);
+                    }
 
+                    var depthNorm = (depthMeters / worldHeight) * profile;
                     var candidate = original[pz, px] - depthNorm;
                     if (candidate < heights[pz, px])
                     {
@@ -285,10 +301,13 @@ namespace GameDev.World.Water
                 DensifyPath(river, DensifyStepMeters, out var pts, out var halfWidths, out _);
                 for (var i = 0; i < pts.Count - 1; i++)
                 {
+                    var bankScale = 1f + WorldScale.RiverBankWidthMeters /
+                        Mathf.Max(1f, Mathf.Max(halfWidths[i], halfWidths[i + 1]));
                     AccumulateInfluenceSegment(
                         influence, resolution, terrainPos, worldPerPixelX, worldPerPixelZ,
                         pts[i], pts[i + 1],
-                        halfWidths[i] * widthScale, halfWidths[i + 1] * widthScale);
+                        halfWidths[i] * widthScale * bankScale,
+                        halfWidths[i + 1] * widthScale * bankScale);
                 }
             }
 

@@ -5,8 +5,10 @@ namespace GameDev.World.Water
 {
     /// <summary>
     /// Digs one continuous bathymetric basin under each filled lake area (distance-to-shore field,
-    /// not spline grooves / centre cones). Plains often sit near heightmap 0, so the carver first
-    /// shifts the tile up for dig headroom, then cuts the bed under a locked water plane.
+    /// not spline grooves / centre cones). Interior is dig-only; the shore-overlap ring may fill a
+    /// tight lip so the flat water sheet tucks under banks. Plains often sit near heightmap 0, so
+    /// the carver first shifts the whole tile up for dig headroom, then cuts the bed under a locked
+    /// spill water plane.
     /// <see cref="LastPerLakeMaxDigMeters"/> is the <b>actual</b> applied dig.
     /// </summary>
     public static class LakeTerrainCarver
@@ -20,18 +22,23 @@ namespace GameDev.World.Water
         /// <summary>Hard cap — deeper than this fights the heightmap ceiling and is not needed for V0.</summary>
         public const float MaxLargeBasinDepthMeters = GameDev.World.WorldScale.LakeBasinDepthMaxMeters;
 
-        // Plane sits just under the spill rim (low outlet), not the median high-bank —
-        // median rim left the low side of slope lakes with a flying water sheet.
-        public const float WaterFreeboardMeters = 0.35f;
+        /// <summary>
+        /// Shore shelf height above the water plane (vertical InsetDepth). Dry ground at the lip
+        /// must clear the water sheet so edges never float or gap.
+        /// </summary>
+        public const float WaterFreeboardMeters = WorldScale.WaterInsetDepthMeters;
 
-        /// <summary>Spill percentile of dry-neighbour rim heights (0 = min, 1 = max).</summary>
+        /// <summary>Legacy spill percentile — basin deformer now uses average shore − depth offset.</summary>
         public const float RimSpillPercentile = 0.18f;
 
-        /// <summary>Soft bank width — wide enough to read as a beach, not a cliff; not so wide
-        /// that heightmap blur pulls spikes into the wet bowl.</summary>
-        public const float BankBlendMeters = 36f;
+        /// <summary>Exterior dry blend — ~1 heightmap texel only.</summary>
+        public const float BankBlendMeters = 4f;
 
-        private const int ShoreBlurPasses = 3;
+        /// <summary>Shore-strip half-width for blur on both wet and dry sides of the lip.</summary>
+        public const float ShoreStripBlurMeters = 12f;
+
+        private const int ShoreBlurPasses = 5;
+        private const int WallBandBlurPasses = 5;
 
         /// <summary>Active bathymetric profile (p, flat start, LF noise). Mutable for tuning/tests.</summary>
         public static LakeBathymetry.Settings Profile { get; set; } = LakeBathymetry.Settings.NaturalDefault;
@@ -53,6 +60,22 @@ namespace GameDev.World.Water
 
         /// <summary>How far the whole heightmap was lifted to make dig room (metres).</summary>
         public static float LastHeadroomShiftMeters { get; private set; }
+
+        /// <summary>Copy dig diagnostics from <see cref="GameDev.World.Landscape.LakeBasinDeformer"/> after joint deform.</summary>
+        public static void RecordDigStats(
+            IReadOnlyList<float> perLakeMaxDig,
+            float maxDigMeters,
+            float headroomShiftMeters,
+            IReadOnlyList<float> perLakeTargets = null)
+        {
+            LastPerLakeMaxDigMeters = perLakeMaxDig ?? System.Array.Empty<float>();
+            LastMaxDigMeters = maxDigMeters;
+            LastHeadroomShiftMeters = headroomShiftMeters;
+            if (perLakeTargets != null)
+            {
+                LastPerLakeTargetDepthMeters = perLakeTargets;
+            }
+        }
 
         public static void Carve(
             UnityEngine.Terrain terrain,
@@ -85,84 +108,23 @@ namespace GameDev.World.Water
                 MinLargeBasinDepthMeters,
                 Mathf.Min(MaxLargeBasinDepthMeters, worldHeight * 0.45f));
 
-            // Always use current plate/inset defaults (stale Profile from domain reload breaks bowls).
             Profile = LakeBathymetry.Settings.NaturalDefault;
 
-            CarveHeights(terrain, pinned, maxDepth);
-
-            if (bankLayer != null)
+            var defs = LakeDefinition.FromZones(pinned, maxDepth);
+            var targets = new float[defs.Length];
+            for (var i = 0; i < defs.Length; i++)
             {
-                PaintBanks(terrain, pinned, bankLayer);
+                targets[i] = defs[i].TargetDepthMeters;
             }
 
-            var collider = terrain.GetComponent<TerrainCollider>();
-            if (collider != null)
-            {
-                collider.terrainData = terrain.terrainData;
-            }
-        }
+            LastPerLakeTargetDepthMeters = targets;
 
-        private static void CarveHeights(
-            UnityEngine.Terrain terrain,
-            IReadOnlyList<WaterZone> zones,
-            float targetDepthMeters)
-        {
-            var data = terrain.terrainData;
-            var resolution = data.heightmapResolution;
-            var heights = data.GetHeights(0, 0, resolution, resolution);
-            var terrainPos = terrain.transform.position;
-            var size = data.size;
-            var worldPerPixelX = size.x / (resolution - 1);
-            var worldPerPixelZ = size.z / (resolution - 1);
-            var worldHeight = Mathf.Max(size.y, 0.01f);
+            // Analytic basin from LakeDefinition (expanded bowl + designed floor).
+            GameDev.World.Landscape.LakeBasinDeformer.Apply(terrain, defs, bankLayer);
 
-            LastHeadroomShiftMeters = EnsureDigHeadroom(
-                heights, resolution, terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight,
-                zones, targetDepthMeters);
-
-            // Water plane from rim AFTER headroom shift (heights not yet flushed — sample the array).
-            for (var i = 0; i < zones.Count; i++)
-            {
-                zones[i].SetWaterLevel(
-                    ComputeWaterLevelFromHeights(
-                        heights, resolution, terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight,
-                        zones[i]));
-            }
-
-            var perLake = new float[zones.Count];
-            var perTarget = new float[zones.Count];
-            var globalMax = 0f;
-            for (var i = 0; i < zones.Count; i++)
-            {
-                var depthHere = DepthForLakeSize(zones[i], targetDepthMeters);
-                perTarget[i] = depthHere;
-                perLake[i] = CarveFilledBowl(
-                    heights, resolution, terrainPos, worldPerPixelX, worldPerPixelZ,
-                    worldHeight, zones[i], depthHere);
-                if (perLake[i] > globalMax)
-                {
-                    globalMax = perLake[i];
-                }
-            }
-
-            LastPerLakeTargetDepthMeters = perTarget;
-            LastPerLakeMaxDigMeters = perLake;
-            LastMaxDigMeters = globalMax;
-
-            SoftenShoreHeights(
-                heights, resolution, terrainPos, worldPerPixelX, worldPerPixelZ, zones);
-
-            // Re-apply bathymetry from a smoothed interior distance field, blur the deep bowl,
-            // then pin the shore lip (Depth≈0). Raw SDF still decides wet vs dry.
-            EnforceSmoothWetFloor(
-                heights, resolution, terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight, zones);
-
-            // Blur + exterior bank dig can pull the shoreline below the locked plane — raise the
-            // dry rim back so the water sheet meets terrain instead of floating over a moat.
-            SealLakeRims(
-                heights, resolution, terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight, zones);
-
-            data.SetHeights(0, 0, heights);
+            LastPerLakeMaxDigMeters = GameDev.World.Landscape.LakeBasinDeformer.LastPerLakeMaxDigMeters;
+            LastMaxDigMeters = GameDev.World.Landscape.LakeBasinDeformer.LastMaxDigMeters;
+            LastHeadroomShiftMeters = GameDev.World.Landscape.LakeBasinDeformer.LastHeadroomShiftMeters;
         }
 
         /// <summary>
@@ -283,18 +245,18 @@ namespace GameDev.World.Water
                 if (zones[i].Silhouette == null)
                 {
                     maskSdfs[i] = LakeShoreField.BuildSignedDistance(
-                        zones[i], exteriorCapMeters: BankBlendMeters + 8f);
+                        zones[i], exteriorCapMeters: ShoreStripBlurMeters + BankBlendMeters + 4f);
                 }
             }
 
-            // Blur only inside per-lake pads (not the whole heightmap) — same visual, far cheaper.
+            // Blur a narrow strip on BOTH sides of the shore iso — smooth lip without tearing the pit.
             for (var pass = 0; pass < ShoreBlurPasses; pass++)
             {
                 var copy = (float[,])heights.Clone();
                 for (var zi = 0; zi < zones.Count; zi++)
                 {
                     var aabb = zones[zi].GetFloodAabbXZ();
-                    var pad = BankBlendMeters * 0.45f;
+                    var pad = ShoreStripBlurMeters + BankBlendMeters;
                     var minPx = Mathf.Max(1, Mathf.FloorToInt((aabb.xMin - pad - terrainPos.x) / worldPerPixelX));
                     var maxPx = Mathf.Min(resolution - 2, Mathf.CeilToInt((aabb.xMax + pad - terrainPos.x) / worldPerPixelX));
                     var minPz = Mathf.Max(1, Mathf.FloorToInt((aabb.yMin - pad - terrainPos.z) / worldPerPixelZ));
@@ -307,9 +269,7 @@ namespace GameDev.World.Water
                             var worldX = terrainPos.x + px * worldPerPixelX;
                             var worldZ = terrainPos.z + pz * worldPerPixelZ;
                             var signed = zones[zi].ShoreSignedDistance(worldX, worldZ, maskSdfs[zi]);
-                            // Dry bank only — blurring wet pixels with dry neighbours creates
-                            // the "earth spikes" / torn pit look.
-                            if (signed >= -0.05f || signed <= -BankBlendMeters * 0.5f)
+                            if (Mathf.Abs(signed) > ShoreStripBlurMeters)
                             {
                                 continue;
                             }
@@ -327,10 +287,12 @@ namespace GameDev.World.Water
 
         /// <summary>
         /// Snap wet pixels to bathymetry from a <b>smoothed</b> interior distance field (softens
-        /// clover medial ridges), blur the deep bowl, pin the shore lip to the raw profile.
+        /// clover medial ridges), blur the wall band, pin the shore lip to the raw profile.
+        /// Dig-only: never raise above <paramref name="originalHeights"/>.
         /// </summary>
         private static void EnforceSmoothWetFloor(
             float[,] heights,
+            float[,] originalHeights,
             int resolution,
             Vector3 terrainPos,
             float worldPerPixelX,
@@ -375,6 +337,8 @@ namespace GameDev.World.Water
                         zone, (x, z) => zone.ShoreSignedDistance(x, z, maskSdf));
                 }
 
+                var wallWidth = LakeBathymetry.WallWidthMeters(dMaxInterior, profile);
+
                 for (var pz = minPz; pz <= maxPz; pz++)
                 {
                     for (var px = minPx; px <= maxPx; px++)
@@ -393,7 +357,8 @@ namespace GameDev.World.Water
                             dUse, dMaxInterior, depthHere,
                             worldX, worldZ, zone.EquivalentRadiusMeters, seed, profile);
                         var targetInteriorY = Mathf.Max(floorY, waterPlaneY - dig);
-                        WriteWorldYExact(heights, pz, px, terrainPos.y, worldHeight, targetInteriorY);
+                        WriteWorldYDigOnly(
+                            heights, originalHeights, pz, px, terrainPos.y, worldHeight, targetInteriorY);
                     }
                 }
 
@@ -401,22 +366,26 @@ namespace GameDev.World.Water
                     heights, rawD, minPx, maxPx, minPz, maxPz,
                     profile.InteriorHeightSmoothPasses, profile.ShorePinMeters);
 
-                // Re-pin lip so blur cannot raise/lower the shoreline band.
-                PinShoreBandHeights(
-                    heights, rawD, minPx, maxPx, minPz, maxPz,
-                    terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight,
-                    waterPlaneY, floorY, dMaxInterior, depthHere, zone, seed, profile);
-
                 // Final snap to inset-contour plate (flat floor + arc walls) — no centre funnel.
                 ResnapInteriorToSmoothBathymetry(
-                    heights, rawD, minPx, maxPx, minPz, maxPz,
+                    heights, originalHeights, rawD, minPx, maxPx, minPz, maxPz,
                     terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight,
                     waterPlaneY, floorY, dMaxInterior, depthHere, profile);
+
+                // Soften wall band bumps, then re-pin only the narrow lip so blur cannot tear the shore.
+                BlurWallBandHeights(
+                    heights, rawD, minPx, maxPx, minPz, maxPz, wallWidth, WallBandBlurPasses);
+
+                PinShoreBandHeights(
+                    heights, originalHeights, rawD, minPx, maxPx, minPz, maxPz,
+                    terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight,
+                    waterPlaneY, floorY, dMaxInterior, depthHere, zone, seed, profile);
             }
         }
 
         private static void ResnapInteriorToSmoothBathymetry(
             float[,] heights,
+            float[,] originalHeights,
             float[,] rawDistance,
             int minPx,
             int maxPx,
@@ -448,7 +417,90 @@ namespace GameDev.World.Water
                         raw, dMaxInterior, maxDepthMeters, quiet);
                     dig = Mathf.Max(dig, quiet.ShoreEpsilonMeters);
                     var targetY = Mathf.Max(floorY, waterPlaneY - dig);
-                    WriteWorldYExact(heights, pz, px, terrainPos.y, worldHeight, targetY);
+                    WriteWorldYDigOnly(
+                        heights, originalHeights, pz, px, terrainPos.y, worldHeight, targetY);
+                }
+            }
+        }
+
+        /// <summary>Blur heights in the wet wall ring (0 &lt; d &lt; wall) to kill stair/bump artifacts.</summary>
+        private static void BlurWallBandHeights(
+            float[,] heights,
+            float[,] rawDistance,
+            int minPx,
+            int maxPx,
+            int minPz,
+            int maxPz,
+            float wallWidthMeters,
+            int passes)
+        {
+            var n = Mathf.Clamp(passes, 0, 8);
+            var wall = Mathf.Max(wallWidthMeters, 2f);
+            if (n == 0)
+            {
+                return;
+            }
+
+            var w = maxPx - minPx + 1;
+            var h = maxPz - minPz + 1;
+            if (w < 3 || h < 3)
+            {
+                return;
+            }
+
+            var scratch = new float[h, w];
+            for (var pass = 0; pass < n; pass++)
+            {
+                for (var pz = minPz; pz <= maxPz; pz++)
+                {
+                    for (var px = minPx; px <= maxPx; px++)
+                    {
+                        var d = rawDistance[pz, px];
+                        if (d <= 0.15f || d >= wall)
+                        {
+                            scratch[pz - minPz, px - minPx] = heights[pz, px];
+                            continue;
+                        }
+
+                        var sum = heights[pz, px] * 4f;
+                        var count = 4f;
+                        for (var oz = -1; oz <= 1; oz++)
+                        {
+                            for (var ox = -1; ox <= 1; ox++)
+                            {
+                                if (ox == 0 && oz == 0)
+                                {
+                                    continue;
+                                }
+
+                                var nx = px + ox;
+                                var nz = pz + oz;
+                                if (nx < minPx || nx > maxPx || nz < minPz || nz > maxPz)
+                                {
+                                    continue;
+                                }
+
+                                var nd = rawDistance[nz, nx];
+                                if (nd < 0f)
+                                {
+                                    continue;
+                                }
+
+                                sum += heights[nz, nx];
+                                count += 1f;
+                            }
+                        }
+
+                        scratch[pz - minPz, px - minPx] = sum / count;
+                    }
+                }
+
+                for (var pz = minPz; pz <= maxPz; pz++)
+                {
+                    for (var px = minPx; px <= maxPx; px++)
+                    {
+                        heights[pz, px] = scratch[pz - minPz, px - minPx];
+                    }
                 }
             }
         }
@@ -496,6 +548,7 @@ namespace GameDev.World.Water
 
         private static float CarveFilledBowl(
             float[,] heights,
+            float[,] originalHeights,
             int resolution,
             Vector3 terrainPos,
             float worldPerPixelX,
@@ -547,16 +600,16 @@ namespace GameDev.World.Water
 
                     if (signed < 0f)
                     {
-                        // Soft approach from ABOVE the plane only — never dig a dry moat under the
-                        // waterline (that is exactly the "flying lake" look).
+                        // Tiny exterior blend (~1–2 texels) only when land sits above the plane —
+                        // never dig a wide dry moat under the waterline.
                         if (signed > -BankBlendMeters && currentWorldY > waterPlaneY + WaterFreeboardMeters)
                         {
                             var t = 1f + signed / BankBlendMeters;
                             var smooth = t * t * (3f - 2f * t);
                             var shelfY = waterPlaneY + WaterFreeboardMeters;
-                            var target = Mathf.Lerp(currentWorldY, shelfY, smooth * 0.55f);
-                            var appliedBank = WriteWorldYIfLower(
-                                heights, pz, px, terrainPos.y, worldHeight, target);
+                            var target = Mathf.Lerp(currentWorldY, shelfY, smooth * 0.35f);
+                            var appliedBank = WriteWorldYDigOnly(
+                                heights, originalHeights, pz, px, terrainPos.y, worldHeight, target);
                             if (appliedBank > maxActualDig)
                             {
                                 maxActualDig = appliedBank;
@@ -573,8 +626,8 @@ namespace GameDev.World.Water
                         worldX, worldZ, zone.EquivalentRadiusMeters, seed, profile);
 
                     var targetInteriorY = Mathf.Max(floorY, waterPlaneY - dig);
-                    var applied = WriteWorldYIfLower(
-                        heights, pz, px, terrainPos.y, worldHeight, targetInteriorY);
+                    var applied = WriteWorldYDigOnly(
+                        heights, originalHeights, pz, px, terrainPos.y, worldHeight, targetInteriorY);
                     if (applied > maxActualDig)
                     {
                         maxActualDig = applied;
@@ -795,6 +848,7 @@ namespace GameDev.World.Water
 
         private static void PinShoreBandHeights(
             float[,] heights,
+            float[,] originalHeights,
             float[,] rawDistance,
             int minPx,
             int maxPx,
@@ -830,29 +884,32 @@ namespace GameDev.World.Water
                         raw, dMaxInterior, maxDepthMeters,
                         worldX, worldZ, zone.EquivalentRadiusMeters, seed, profile);
                     var targetY = Mathf.Max(floorY, waterPlaneY - dig);
-                    WriteWorldYExact(heights, pz, px, terrainPos.y, worldHeight, targetY);
+                    WriteWorldYDigOnly(
+                        heights, originalHeights, pz, px, terrainPos.y, worldHeight, targetY);
                 }
             }
         }
 
-        private static void WriteWorldYExact(
-            float[,] heights, int pz, int px, float terrainPosY, float worldHeight, float worldY)
-        {
-            heights[pz, px] = Mathf.Clamp01((worldY - terrainPosY) / worldHeight);
-        }
-
-        /// <returns>Actual metres lowered at this pixel (0 if unchanged).</returns>
-        private static float WriteWorldYIfLower(
-            float[,] heights, int pz, int px, float terrainPosY, float worldHeight, float worldY)
+        /// <summary>Write target Y but never above the pre-carve original (dig-only).</summary>
+        private static float WriteWorldYDigOnly(
+            float[,] heights,
+            float[,] originalHeights,
+            int pz,
+            int px,
+            float terrainPosY,
+            float worldHeight,
+            float worldY)
         {
             var before = terrainPosY + heights[pz, px] * worldHeight;
-            var candidate = (worldY - terrainPosY) / worldHeight;
+            var originalY = terrainPosY + originalHeights[pz, px] * worldHeight;
+            var cappedY = Mathf.Min(worldY, originalY);
+            var candidate = Mathf.Clamp01((cappedY - terrainPosY) / worldHeight);
             if (candidate >= heights[pz, px])
             {
                 return 0f;
             }
 
-            heights[pz, px] = Mathf.Clamp01(candidate);
+            heights[pz, px] = candidate;
             var after = terrainPosY + heights[pz, px] * worldHeight;
             return before - after;
         }
@@ -896,44 +953,39 @@ namespace GameDev.World.Water
 
         private static float SpillWaterLevel(List<float> rim, float fallbackWaterY)
         {
+            var offset = Mathf.Max(
+                WorldScale.WaterDepthOffsetMeters,
+                WorldScale.WaterInsetDepthMeters);
             if (rim == null || rim.Count == 0)
             {
-                return fallbackWaterY - WaterFreeboardMeters;
+                return fallbackWaterY - Mathf.Min(offset, WaterFreeboardMeters);
             }
 
+            // Low-rim spill (same as LakeBasinDeformer): avg sits above downhill shores.
             rim.Sort();
-            // True lake level = spill / low outlet. Median high-bank made slope lakes float.
-            var idx = Mathf.Clamp(
-                Mathf.RoundToInt((rim.Count - 1) * RimSpillPercentile),
+            var lowIdx = Mathf.Clamp(
+                Mathf.FloorToInt((rim.Count - 1) * RimSpillPercentile),
                 0,
                 rim.Count - 1);
-            // Ignore a couple of noisy low samples on large rims.
-            if (rim.Count > 20)
-            {
-                idx = Mathf.Max(idx, 1);
-            }
-
-            return rim[idx] - WaterFreeboardMeters;
+            return rim[lowIdx] - offset;
         }
 
         /// <summary>
-        /// After shore blur: ensure dry land next to the flood sits at/above the water plane so the
-        /// mesh cannot hover over a lowered bank.
+        /// Dig-only guard: dry land in the lake pad must never sit above the pre-carve surface
+        /// (no berm / crater rim). Wet pixels are already dig-capped during bathymetry writes.
         /// </summary>
-        private static void SealLakeRims(
+        private static void ClampDryToOriginal(
             float[,] heights,
+            float[,] originalHeights,
             int resolution,
             Vector3 terrainPos,
             float worldPerPixelX,
             float worldPerPixelZ,
-            float worldHeight,
             IReadOnlyList<WaterZone> zones)
         {
             for (var i = 0; i < zones.Count; i++)
             {
                 var zone = zones[i];
-                var waterY = zone.WaterLevelY;
-                var sealY = waterY + WaterFreeboardMeters * 0.25f;
                 float[,] maskSdf = null;
                 if (zone.Silhouette == null)
                 {
@@ -941,7 +993,7 @@ namespace GameDev.World.Water
                 }
 
                 var aabb = zone.GetFloodAabbXZ();
-                var pad = Mathf.Max(zone.CellSize * 3f, WaterMeshBuilder.ShoreExpandMeters + 1f);
+                var pad = Mathf.Max(BankBlendMeters + zone.CellSize * 2f, 4f);
                 var minPx = Mathf.Max(0, Mathf.FloorToInt((aabb.xMin - pad - terrainPos.x) / worldPerPixelX) - 1);
                 var maxPx = Mathf.Min(resolution - 1, Mathf.CeilToInt((aabb.xMax + pad - terrainPos.x) / worldPerPixelX) + 1);
                 var minPz = Mathf.Max(0, Mathf.FloorToInt((aabb.yMin - pad - terrainPos.z) / worldPerPixelZ) - 1);
@@ -954,22 +1006,20 @@ namespace GameDev.World.Water
                         var worldX = terrainPos.x + px * worldPerPixelX;
                         var worldZ = terrainPos.z + pz * worldPerPixelZ;
                         var signed = zone.ShoreSignedDistance(worldX, worldZ, maskSdf);
-                        // Dry ring only — never raise the wet basin floor.
-                        if (signed >= -0.01f || signed < -zone.CellSize * 2.5f)
+                        if (signed >= 0f)
                         {
+                            // Wet: also never above original (spikes from blur).
+                            if (heights[pz, px] > originalHeights[pz, px])
+                            {
+                                heights[pz, px] = originalHeights[pz, px];
+                            }
+
                             continue;
                         }
 
-                        var current = terrainPos.y + heights[pz, px] * worldHeight;
-                        if (current >= sealY)
+                        if (heights[pz, px] > originalHeights[pz, px])
                         {
-                            continue;
-                        }
-
-                        var candidate = (sealY - terrainPos.y) / worldHeight;
-                        if (candidate > heights[pz, px])
-                        {
-                            heights[pz, px] = Mathf.Clamp01(candidate);
+                            heights[pz, px] = originalHeights[pz, px];
                         }
                     }
                 }

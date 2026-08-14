@@ -662,7 +662,14 @@ namespace GameDev.EditorTools
                 }
             }
 
-            return new VegetationClearance(disks, roadSamples, RoadClearRadius, RoadFalloff);
+            IReadOnlyList<LakeDefinition> lakes = null;
+            var water = Object.FindFirstObjectByType<OverworldWaterZones>();
+            if (water != null && water.LakeDefinitions != null && water.LakeDefinitions.Count > 0)
+            {
+                lakes = water.LakeDefinitions;
+            }
+
+            return new VegetationClearance(disks, roadSamples, RoadClearRadius, RoadFalloff, lakes);
         }
 
         private static bool SpawnPrefab(

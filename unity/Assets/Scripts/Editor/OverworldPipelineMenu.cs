@@ -1,46 +1,77 @@
 #if UNITY_EDITOR
+using Den.Tools;
+using GameDev.World;
+using GameDev.World.Landscape;
+using MapMagic.Core;
 using UnityEditor;
 using UnityEngine;
 
 namespace GameDev.EditorTools
 {
     /// <summary>
-    /// One-button pipeline: terrain+water, then settlement → roads → POI markers → vegetation.
-    /// Settlement/roads recompute the same seeded <c>StubPoiPlacer</c> quota (no scene POI needed).
-    /// Visual POI markers land immediately before vegetation so flora can hard-clear a pocket around
-    /// each marker via <see cref="GameDev.World.Vegetation.VegetationClearance"/>. Vegetation is
-    /// always last. WORLD_GENERATION_PIPELINE.md's iteration list is expected to keep growing - each
-    /// new Iteration's own menu item should get one more call in <see cref="RunRemainingSteps"/>
-    /// (and Clear* in <see cref="ClearFullOverworld"/> if needed) so this stays the single full-demo
-    /// action.
+    /// LandscapePlanner full demo:
+    /// base terrain → lake plan → POI plan → settlement → roads → joint deform → water → POI visuals → vegetation.
     /// </summary>
     public static class OverworldPipelineMenu
     {
         [MenuItem("GameDev/Overworld/Build Full Overworld (Random Seed)")]
         public static void BuildFullRandomSeed()
         {
-            var total = OverworldGenTiming.Start();
-            OverworldGenTiming.Time("terrain+water", OverworldTerrainMenu.GenerateRandomSeed);
-            RunRemainingSteps();
-            OverworldGenTiming.Log("full-overworld", OverworldGenTiming.StopMs(total), "random seed");
+            BuildFull(System.Environment.TickCount, OverworldTerrainMenu.ActiveSettings);
         }
 
         [MenuItem("GameDev/Overworld/Build Full Overworld (Default Seed)")]
         public static void BuildFullDefaultSeed()
         {
-            var total = OverworldGenTiming.Start();
-            OverworldGenTiming.Time("terrain+water", OverworldTerrainMenu.GenerateFromSeed);
-            RunRemainingSteps();
-            OverworldGenTiming.Log("full-overworld", OverworldGenTiming.StopMs(total), "default seed");
+            BuildFull(OverworldTerrainMenu.DefaultSeed, OverworldTerrainMenu.ActiveSettings);
         }
 
-        // Terrain generation clears prior derived output and builds water before returning.
-        // Settlement before roads (anchor displacement). POI visuals penultimate; vegetation last
-        // so clearance reads OverworldRoads / OverworldSettlement / OverworldPoi.
-        private static void RunRemainingSteps()
+        /// <summary>Entry used by World Generator window and menu shortcuts.</summary>
+        public static void BuildFull(int seed, WorldGenSettings settings)
         {
+            settings.Clamp();
+            OverworldTerrainMenu.ActiveSettings = settings;
+            var state = OverworldWorldState.FindOrCreate();
+            state.SetDefinition(new WorldDefinition
+            {
+                Seed = seed,
+                Settings = settings,
+            });
+
+            var total = OverworldGenTiming.Start();
+            OverworldGenTiming.Time("terrain+lake-plan", () =>
+                OverworldTerrainMenu.GenerateTerrainAndLakePlan(seed));
+
+            RunLandscapeSteps();
+            OverworldGenTiming.Log(
+                "full-overworld",
+                OverworldGenTiming.StopMs(total),
+                $"seed={seed}");
+        }
+
+        private static void RunLandscapeSteps()
+        {
+            var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
+            var tileCoord = new Coord(0, 0);
+
+            OverworldGenTiming.Time("poi-plan", () =>
+            {
+                if (mapMagic != null)
+                {
+                    OverworldWorldPlan.BuildAndStorePois(mapMagic, tileCoord);
+                }
+            });
+
             OverworldGenTiming.Time("settlement", SettlementOverworldMenu.PlaceSettlementAtTownApproach);
-            OverworldGenTiming.Time("roads", RoadNetworkMenu.BuildRoadNetwork);
+            OverworldGenTiming.Time("roads+deform", RoadNetworkMenu.BuildRoadNetworkWithLandscapePlanner);
+            OverworldGenTiming.Time("water.meshes", () =>
+            {
+                if (mapMagic != null)
+                {
+                    WaterZoneMenu.ApplyDeformAndMeshes(
+                        mapMagic, tileCoord, carveLakes: false, carveRivers: true);
+                }
+            });
             OverworldGenTiming.Time("poi", PoiMarkerMenu.PlaceMarkers);
             OverworldGenTiming.Time("vegetation", VegetationScatterMenu.ScatterVegetation);
         }
@@ -48,8 +79,12 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Clear Full Overworld")]
         public static void ClearFullOverworld()
         {
-            // ClearTerrain already cascades Water/Vegetation/POI/Roads/Settlement (kept in one place
-            // in OverworldTerrainMenu so GenerateInternal and this button can't drift apart).
+            var state = OverworldWorldState.Find();
+            if (state != null)
+            {
+                state.Clear();
+            }
+
             SettlementOverworldMenu.ClearSettlement();
             OverworldTerrainMenu.ClearTerrain();
         }

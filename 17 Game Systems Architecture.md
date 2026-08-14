@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft
 
-Last Updated: 2026-08-11
+Last Updated: 2026-08-14
 
 Depends On:
 [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -194,19 +194,34 @@ flowchart LR
 | **V1 scope / Deferred** | V0: ~512 m stub, ring streaming around editor/player focus. Deferred: async jobs, LOD, infinite travel polish. |
 | **Owning folder** | `unity/Assets/Scripts/World/Streaming/` |
 
+## W.2b Landscape Planner (hydrology + roads)
+
+| Field | Content |
+|-------|---------|
+| **Responsibilities** | Plan lakes / POIs / roads against shared terrain analysis, then conform terrain once; own `WorldDefinition` aggregate and deferred dig order. |
+| **Dependencies** | WorldSeed, Terrain/Biome, Water (`LakeDefinition`), POI Placement, Roads. |
+| **Public interfaces** | `WorldDefinition` / `WorldGenSettings` / `OverworldWorldState`; `LandscapePlanner`; `LandscapeCostField`; `LakeDefinition` + `LakeBasinDeformer`; `TerrainDeformer`; `RoadDefinition` + corridor/vertical profile. |
+| **Data flow** | Seed + settings → lake plan (`lake.place` / `lake.{i}`) → POI plan once → Primary/Secondary roads (no RNG) → joint deform → water meshes → visuals → vegetation. |
+| **Save/load** | Regenerable from seed + settings; scene holds plan for editor tools. |
+| **Multiplayer** | Same seed + settings → same geography; no per-frame sync. |
+| **Performance** | Cost field cell ~10 m; A* on tile grid; dig once per generate. |
+| **Extensibility** | New lake/road knobs via `WorldGenSettings`; Local road stubs deferred. |
+| **V1 scope / Deferred** | V0: elongated lakes + hierarchical roads + World Generator window. Deferred: Local roads, decoration stream, multi-tile. |
+| **Owning folder** | `unity/Assets/Scripts/World/Landscape/` + `WorldDefinition`; plan: `unity/Assets/Plans/LANDSCAPE_PLANNER.md`. |
+
 ## W.4 POI Placement
 
 | Field | Content |
 |-------|---------|
 | **Responsibilities** | Deterministically place POI markers (ruin, camp, shrine, town approach, cave mouth, …) from seed + chunk/world coords; emit stable `PoiId`. |
-| **Dependencies** | WorldSeed, Terrain/Biome, Chunk Streaming (placement evaluated per chunk or world pass). |
-| **Public interfaces** | `IPoiPlacer { IReadOnlyList<PoiMarker> PlaceForChunk(ChunkCoord); }`; `PoiMarker { PoiId Id; PoiKind Kind; Vector3 Position; BiomeId Biome; }` |
-| **Data flow** | Chunk coord + seed fork `"poi"` + biome/height constraints → marker list. |
+| **Dependencies** | WorldSeed, Terrain/Biome, Landscape analysis (slope/flatness/lakes), Chunk Streaming (placement evaluated per chunk or world pass). |
+| **Public interfaces** | `IPoiPlacer { IReadOnlyList<PoiMarker> PlaceForChunk(ChunkCoord); }`; `PoiMarker { PoiId Id; PoiKind Kind; Vector3 Position; BiomeId Biome; }`; `PoiPlacementProfile` (hard/soft/relation/footprint) + `PoiPlacementCatalog` + `PoiPlacementEngine`. |
+| **Data flow** | Chunk candidates + seed fork `poi.{kind}.{index}` + per-kind profile scoring (TownApproach first) → stable sorted marker list written once into `WorldDefinition`. |
 | **Save/load** | Marker positions regenerable; persist discovery state / Active Window / resolution elsewhere (POI Director). |
 | **Multiplayer** | Same markers from seed; discovery/state is per-player or shared by design later. |
 | **Performance** | Cap markers per chunk; no global scans each frame. |
-| **Extensibility** | New `PoiKind` values + rules tables (ScriptableObject immutable defs). |
-| **V1 scope / Deferred** | V0: 3–5 markers in stub world. Deferred: timed Side Event POIs density, multi-district. |
+| **Extensibility** | New `PoiKind` = add a `PoiPlacementProfile` to the catalog. ScriptableObject wrappers deferred; V0 uses a plain C# catalog. |
+| **V1 scope / Deferred** | V0: demo quotas via `PoiDemoScenario` + profile scoring. Deferred: timed Side Event POIs density, multi-district, SO authoring. |
 | **Owning folder** | `unity/Assets/Scripts/World/Poi/` |
 
 ## W.5 Settlement

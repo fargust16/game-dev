@@ -6,39 +6,52 @@ namespace GameDev.World.Water
     /// <summary>
     /// One continuous flat water surface per lake at <see cref="WaterZone.WaterLevelY"/>.
     /// Prefer <see cref="WaterZone.Silhouette"/> analytic SDF (smooth trig shore); fall back to
-    /// flood-mask chamfer SDF for legacy zones. Sheet is inflated past the carve so the basin
-    /// has no see-through slits. Terrain height is not used to punch holes.
+    /// flood-mask chamfer SDF for legacy zones. Sheet expands slightly past the shore iso so edges
+    /// sink under terrain banks (<see cref="ShoreOverlapMeters"/>).
     /// </summary>
     public static class WaterMeshBuilder
     {
         public const float MeshStepMeters = 0.5f;
 
         /// <summary>
-        /// How far past the shore iso-line (metres) the water sheet extends — covers ≥1 heightmap
-        /// pixel and the soft bank dig so the excavated basin stays fully under water.
+        /// How far past the shore iso-line (metres) the water sheet extends under banks.
         /// </summary>
-        public const float ShoreExpandMeters = GameDev.World.WorldScale.WaterShoreExpandMeters;
+        public const float ShoreOverlapMeters = GameDev.World.WorldScale.WaterOverlapMeters;
+
+        /// <summary>Legacy alias — overlap is positive expand; inset name kept for callers.</summary>
+        public const float ShoreInsetMeters = -ShoreOverlapMeters;
+
+        /// <summary>Legacy alias — expand equals overlap.</summary>
+        public const float ShoreExpandMeters = ShoreOverlapMeters;
 
         /// <summary>Blur passes on the analytic field before marching squares (rounds iso faceting).</summary>
-        public const int FieldSmoothPasses = 3;
+        public const int FieldSmoothPasses = 2;
 
         public static Mesh Build(WaterZone zone, IReadOnlyList<WaterZone> allZones) =>
-            Build(zone, allZones, sampleTerrainY: null, clipXZ: null);
+            Build(zone, allZones, sampleTerrainY: null, clipXZ: null, shoreOverlapMeters: -1f);
 
         public static Mesh Build(
             WaterZone zone,
             IReadOnlyList<WaterZone> allZones,
             System.Func<float, float, float> sampleTerrainY) =>
-            Build(zone, allZones, sampleTerrainY, clipXZ: null);
+            Build(zone, allZones, sampleTerrainY, clipXZ: null, shoreOverlapMeters: -1f);
 
         public static Mesh Build(
             WaterZone zone,
             IReadOnlyList<WaterZone> allZones,
             System.Func<float, float, float> sampleTerrainY,
-            Rect? clipXZ)
+            Rect? clipXZ) =>
+            Build(zone, allZones, sampleTerrainY, clipXZ, shoreOverlapMeters: -1f);
+
+        public static Mesh Build(
+            WaterZone zone,
+            IReadOnlyList<WaterZone> allZones,
+            System.Func<float, float, float> sampleTerrainY,
+            Rect? clipXZ,
+            float shoreOverlapMeters)
         {
             _ = allZones;
-            _ = sampleTerrainY; // kept for API compatibility; silhouette is flood-SDF only
+            _ = sampleTerrainY; // mesh is a flat shore SDF sheet — terrain is fitted to it, not vice versa.
 
             if (!TryGetFloodBounds(zone, out var minX, out var minZ, out var maxX, out var maxZ))
             {
@@ -50,10 +63,13 @@ namespace GameDev.World.Water
             float[,] maskSdf = null;
             if (zone.Silhouette == null)
             {
-                maskSdf = LakeShoreField.BuildSignedDistance(zone, exteriorCapMeters: ShoreExpandMeters + 12f);
+                maskSdf = LakeShoreField.BuildSignedDistance(zone, exteriorCapMeters: 12f);
             }
 
-            var pad = ShoreExpandMeters + step * 2f;
+            var overlap = shoreOverlapMeters >= 0f
+                ? shoreOverlapMeters
+                : Mathf.Max(ShoreOverlapMeters, 0f);
+            var pad = step * 2f + overlap;
             minX -= pad;
             minZ -= pad;
             maxX += pad;
@@ -96,7 +112,7 @@ namespace GameDev.World.Water
                     }
 
                     var shore = zone.ShoreSignedDistance(wx, wz, maskSdf);
-                    var value = shore + ShoreExpandMeters;
+                    var value = shore + overlap;
                     field[ix, iz] = value;
                     if (value >= 0f)
                     {

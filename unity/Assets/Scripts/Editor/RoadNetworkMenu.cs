@@ -1,9 +1,10 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using Den.Tools;
+using GameDev.World;
+using GameDev.World.Landscape;
 using GameDev.World.Poi;
 using GameDev.World.Roads;
-using GameDev.World.Seed;
 using GameDev.World.Settlement;
 using GameDev.World.Streaming;
 using GameDev.World.Terrain;
@@ -12,28 +13,19 @@ using MapMagic.Core;
 using MapMagic.Terrains;
 using UnityEditor;
 using UnityEngine;
+using WorldScale = GameDev.World.WorldScale;
 
 namespace GameDev.EditorTools
 {
     /// <summary>
-    /// Overworld roads (WORLD_GENERATION_PIPELINE.md Iteration 09): terrain-only worn paths.
-    /// Wide <see cref="RoadTier.Main"/> open-TSP tract among TownApproach hubs; thinner
-    /// <see cref="RoadTier.Branch"/> trails to other POIs. No road mesh/material — carve + dirt
-    /// alphamap only. Bridge prefabs still span river gaps. A* avoids mountains/lakes.
+    /// Overworld roads via LandscapePlanner: nonlinear cost field, Prim Primary network among
+    /// TownApproach hubs (with existing-road paint), Secondary spurs onto the growing network,
+    /// vertical profiles, corridor conform (no canyon cut). Bridges rivers only.
     /// </summary>
     public static class RoadNetworkMenu
     {
         private const string RootObjectName = "OverworldRoads";
         private const float GridCellSizeMeters = 25f;
-
-        // Main tract: wide, deeper trampled groove. Branches: narrow footpaths.
-        private const float MainCarveWidthMeters = 16f;
-        private const float MainCarveDepthMeters = 1.0f;
-        private const float MainPaintWidthMeters = 12f;
-        private const float BranchCarveWidthMeters = 6f;
-        private const float BranchCarveDepthMeters = 0.35f;
-        private const float BranchPaintWidthMeters = 4.5f;
-
         private const string GrooveLayerPath = "Assets/Settings/TerrainLayers/Dirt_Scaled.terrainlayer";
         private const float BridgeSpanDetectionThresholdMeters = GridCellSizeMeters * 1.8f;
         private const string BridgePrefabPath =
@@ -43,7 +35,13 @@ namespace GameDev.EditorTools
         private const float ClearanceSampleStepMeters = 6f;
 
         [MenuItem("GameDev/Overworld/Build Road Network")]
-        public static void BuildRoadNetwork()
+        public static void BuildRoadNetwork() => BuildRoadNetworkWithLandscapePlanner();
+
+        /// <summary>
+        /// Plans roads on LandscapeCostField, ensures POI degree ≥ 1, applies joint lake+road
+        /// terrain deform when lake definitions are present and not yet dug.
+        /// </summary>
+        public static void BuildRoadNetworkWithLandscapePlanner()
         {
             var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
             if (mapMagic == null || mapMagic.graph == null)
@@ -68,22 +66,33 @@ namespace GameDev.EditorTools
             }
 
             var sampler = new MapMagicBiomeSampler(holder);
-            var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
-            var candidateChunks = OverworldTileChunks.CoveringTile(
-                tileCoord, mapMagic.tileSize, OverworldTileChunks.DefaultMarginMeters);
-            var placer = new StubPoiPlacer(worldSeed, sampler, candidateChunks, PoiDemoScenario.BuildRequests());
 
             var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
             var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
             IWaterSampler waterZones = new CompositeWaterSampler(lakeZones, riverZones);
             var heightSampler = new TerrainWorldHeightSampler(terrain);
-            var costSampler = new RoadCostSampler(sampler, sampler, waterZones, heightSampler);
+
+            var margin = OverworldTileChunks.DefaultMarginMeters;
+            var minX = tileCoord.x * mapMagic.tileSize.x + margin;
+            var minZ = tileCoord.z * mapMagic.tileSize.z + margin;
+            var usableSizeX = mapMagic.tileSize.x - 2f * margin;
+            var usableSizeZ = mapMagic.tileSize.z - 2f * margin;
+            var worldHeightScale = mapMagic.globals.height;
+            float HeightMeters(float x, float z) => sampler.SampleHeight(x, z) * worldHeightScale;
+
+            var lakes = lakeZones != null
+                ? lakeZones.LakeDefinitions
+                : System.Array.Empty<LakeDefinition>();
+            var settings = OverworldTerrainMenu.ActiveSettings;
+            settings.Clamp();
+
+            var markers = OverworldWorldPlan.GetOrBuildPois(mapMagic, tileCoord);
 
             var settlementAnchor = Object.FindFirstObjectByType<OverworldSettlementAnchor>();
 
             var nodes = new List<Vector2>();
             var isHub = new List<bool>();
-            foreach (var marker in placer.AllMarkers())
+            foreach (var marker in markers)
             {
                 var x = marker.Position.x;
                 var z = marker.Position.z;
@@ -94,6 +103,13 @@ namespace GameDev.EditorTools
                 }
 
                 if (!heightSampler.TrySampleWorldY(x, z, out var y))
+                {
+                    continue;
+                }
+
+                if (lakeZones != null &&
+                    lakeZones.TryGetPlannedLakeSignedDistance(x, z, out var lakeSd) &&
+                    lakeSd >= 0f)
                 {
                     continue;
                 }
@@ -113,35 +129,100 @@ namespace GameDev.EditorTools
                 return;
             }
 
-            var margin = OverworldTileChunks.DefaultMarginMeters;
-            var minX = tileCoord.x * mapMagic.tileSize.x + margin;
-            var minZ = tileCoord.z * mapMagic.tileSize.z + margin;
-            var usableSizeX = mapMagic.tileSize.x - 2f * margin;
-            var usableSizeZ = mapMagic.tileSize.z - 2f * margin;
             var width = Mathf.Max(1, Mathf.FloorToInt(usableSizeX / GridCellSizeMeters));
             var height = Mathf.Max(1, Mathf.FloorToInt(usableSizeZ / GridCellSizeMeters));
             var grid = new RoadGridSpec(minX, minZ, width, height, GridCellSizeMeters);
 
-            var worldHeightScale = mapMagic.globals.height;
-            float HeightMeters(float x, float z) => sampler.SampleHeight(x, z) * worldHeightScale;
+            bool CanBridgeSpan(Vector2 from, Vector2 to)
+            {
+                if (riverZones == null)
+                {
+                    return false;
+                }
 
-            var segments = RoadNetworkBuilder.BuildHierarchicalNetwork(
-                nodes, isHub, grid, costSampler.SampleCost, HeightMeters);
+                var dist = Vector2.Distance(from, to);
+                var step = Mathf.Max(GridCellSizeMeters * 0.5f, 4f);
+                var samples = Mathf.Max(2, Mathf.CeilToInt(dist / step));
+                var sawRiver = false;
+                for (var s = 1; s < samples; s++)
+                {
+                    var t = s / (float)samples;
+                    var p = Vector2.Lerp(from, to, t);
+                    if (lakeZones != null &&
+                        lakeZones.TryGetPlannedLakeSignedDistance(p.x, p.y, out var sd) &&
+                        sd >= 0f)
+                    {
+                        return false;
+                    }
+
+                    if (lakeZones != null && lakeZones.TryGetWaterLevel(p.x, p.y, out _))
+                    {
+                        return false;
+                    }
+
+                    if (riverZones.TryGetWaterLevel(p.x, p.y, out _))
+                    {
+                        sawRiver = true;
+                    }
+                }
+
+                return sawRiver;
+            }
+
+            var planner = new LandscapePlanner();
+            planner.SetLakes(lakes);
+            planner.BuildCostField(
+                minX, minZ, usableSizeX, usableSizeZ,
+                HeightMeters,
+                (x, z) => sampler.SampleBiome(x, z),
+                WorldScale.LandscapeCostCellMeters);
+            ApplyRoadSettings(planner.CostField, settings);
+            RoadPathSimplifier.ActiveMinTurnRadiusMeters = settings.TurnRadiusMeters;
+            RoadPathSimplifier.ActiveMaxHeadingChangeDegrees =
+                Mathf.Clamp(180f / Mathf.Max(settings.TurnRadiusMeters, 1f) * 8f, 12f, 40f);
+            planner.PlanRoads(nodes, isHub, grid, HeightMeters, CanBridgeSpan);
+
+            var segments = planner.Segments;
             if (segments.Count == 0)
             {
                 Debug.LogWarning("[Roads] no routable segments.");
                 return;
             }
 
-            var strokes = new List<RoadCarveStroke>();
+            OverworldWorldPlan.StoreRoads(planner.Roads);
+
             var clearanceSamples = new List<Vector2>();
             var bridgeSpans = new List<(Vector2 From, Vector2 To)>();
             var mainCount = 0;
             var branchCount = 0;
 
-            foreach (var segment in segments)
+            bool IsSubmerged(float x, float z)
             {
-                if (segment.Tier == RoadTier.Main)
+                if (lakeZones != null &&
+                    lakeZones.TryGetPlannedLakeSignedDistance(x, z, out var sd) &&
+                    sd >= 0f)
+                {
+                    return true;
+                }
+
+                if (waterZones == null || !waterZones.TryGetWaterLevel(x, z, out var waterY))
+                {
+                    return false;
+                }
+
+                if (!heightSampler.TrySampleWorldY(x, z, out var groundY))
+                {
+                    return true;
+                }
+
+                return groundY <= waterY;
+            }
+
+            var dryRoadDefs = new List<RoadDefinition>();
+            for (var si = 0; si < segments.Count; si++)
+            {
+                var segment = segments[si];
+                if (segment.Tier == RoadTier.Primary)
                 {
                     mainCount++;
                 }
@@ -150,23 +231,44 @@ namespace GameDev.EditorTools
                     branchCount++;
                 }
 
-                var (dryRuns, bridges) = SplitSegmentXZ(segment.Points);
+                var (dryRuns, bridges) = SplitSegmentXZ(segment.Points, IsSubmerged);
                 bridgeSpans.AddRange(bridges);
 
-                var carveW = segment.Tier == RoadTier.Main ? MainCarveWidthMeters : BranchCarveWidthMeters;
-                var carveD = segment.Tier == RoadTier.Main ? MainCarveDepthMeters : BranchCarveDepthMeters;
-                var paintW = segment.Tier == RoadTier.Main ? MainPaintWidthMeters : BranchPaintWidthMeters;
+                var isMain = segment.Tier == RoadTier.Primary;
                 foreach (var run in dryRuns)
                 {
-                    strokes.Add(new RoadCarveStroke(run, carveW, carveD, paintW));
+                    if (run.Count < 2)
+                    {
+                        continue;
+                    }
+
+                    var profile = RoadVerticalProfile.Build(run, HeightMeters);
+                    dryRoadDefs.Add(new RoadDefinition(
+                        run,
+                        profile,
+                        isMain ? WorldScale.RoadMainWidthMeters : WorldScale.RoadBranchWidthMeters,
+                        isMain ? WorldScale.RoadMainShoulderMeters : WorldScale.RoadBranchShoulderMeters,
+                        isMain ? WorldScale.RoadMainBlendMeters : WorldScale.RoadBranchBlendMeters,
+                        segment.Tier));
                     AppendClearanceSamples(clearanceSamples, run, ClearanceSampleStepMeters);
                 }
             }
 
-            if (terrain != null && strokes.Count > 0)
+            if (terrain != null)
             {
                 var grooveLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(GrooveLayerPath);
-                RoadTerrainCarver.Carve(terrain, strokes, grooveLayer);
+                var lakesNeedDig = lakes != null && lakes.Count > 0 &&
+                                   (lakeZones == null || !lakeZones.BasinsApplied);
+                TerrainDeformer.Apply(
+                    terrain,
+                    lakesNeedDig ? lakes : null,
+                    dryRoadDefs,
+                    lakesNeedDig ? grooveLayer : null,
+                    grooveLayer);
+                if (lakesNeedDig && lakeZones != null)
+                {
+                    lakeZones.MarkBasinsApplied();
+                }
             }
 
             ClearRoadNetwork();
@@ -182,8 +284,8 @@ namespace GameDev.EditorTools
             }
 
             Debug.Log(
-                $"[Roads] terrain-only main={mainCount} branch={branchCount} " +
-                $"bridges={bridgeSpans.Count} (nodes={nodes.Count})");
+                $"[Roads] landscape-planner main={mainCount} branch={branchCount} " +
+                $"bridges={bridgeSpans.Count} corridors={dryRoadDefs.Count} (nodes={nodes.Count})");
         }
 
         [MenuItem("GameDev/Overworld/Clear Road Network")]
@@ -219,7 +321,8 @@ namespace GameDev.EditorTools
         }
 
         private static (List<List<Vector2>> DryRuns, List<(Vector2 From, Vector2 To)> Bridges) SplitSegmentXZ(
-            IReadOnlyList<Vector2> points)
+            IReadOnlyList<Vector2> points,
+            System.Func<float, float, bool> isSubmerged)
         {
             var dryRuns = new List<List<Vector2>>();
             var bridges = new List<(Vector2, Vector2)>();
@@ -232,7 +335,13 @@ namespace GameDev.EditorTools
             var runStart = 0;
             for (var i = 1; i < points.Count; i++)
             {
-                if (Vector2.Distance(points[i - 1], points[i]) < BridgeSpanDetectionThresholdMeters)
+                var a = points[i - 1];
+                var b = points[i];
+                var dist = Vector2.Distance(a, b);
+                // Long gap alone is not a bridge (string-pull collapses dry A* stairs into long
+                // chords). Only split when the chord actually crosses submerged ground.
+                if (dist < BridgeSpanDetectionThresholdMeters ||
+                    !SegmentCrossesWater(a, b, isSubmerged))
                 {
                     continue;
                 }
@@ -242,7 +351,7 @@ namespace GameDev.EditorTools
                     dryRuns.Add(SubRange(points, runStart, i - runStart));
                 }
 
-                bridges.Add((points[i - 1], points[i]));
+                bridges.Add((a, b));
                 runStart = i;
             }
 
@@ -252,6 +361,32 @@ namespace GameDev.EditorTools
             }
 
             return (dryRuns, bridges);
+        }
+
+        private static bool SegmentCrossesWater(
+            Vector2 a,
+            Vector2 b,
+            System.Func<float, float, bool> isSubmerged)
+        {
+            if (isSubmerged == null)
+            {
+                return false;
+            }
+
+            var dist = Vector2.Distance(a, b);
+            var step = Mathf.Max(GridCellSizeMeters * 0.5f, 4f);
+            var samples = Mathf.Max(2, Mathf.CeilToInt(dist / step));
+            for (var s = 1; s < samples; s++)
+            {
+                var t = s / (float)samples;
+                var p = Vector2.Lerp(a, b, t);
+                if (isSubmerged(p.x, p.y))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static List<Vector2> SubRange(IReadOnlyList<Vector2> points, int start, int count)
@@ -355,6 +490,27 @@ namespace GameDev.EditorTools
 
                 return found;
             }
+        }
+
+        private static void ApplyRoadSettings(LandscapeCostField field, WorldGenSettings settings)
+        {
+            if (field == null)
+            {
+                return;
+            }
+
+            field.MaxGrade = settings.MaxGrade;
+            field.MaxCutDepth = settings.MaxCutDepthMeters;
+            field.MaxFillHeight = settings.MaxFillHeightMeters;
+            field.SlopeWeight *= settings.PrimaryRoadCostWeight;
+            field.ExcavationWeight *= settings.PrimaryRoadCostWeight;
+            // Higher ParallelRoadPenalty → stronger preference for existing corridors
+            // (lower discount = more penalty for leaving the corridor).
+            field.ExistingCorridorDiscount = Mathf.Clamp(
+                1f / Mathf.Max(settings.ParallelRoadPenalty, 0.1f),
+                0.05f,
+                0.5f);
+            field.DetourTolerance = WorldScale.RoadDetourTolerance;
         }
     }
 }

@@ -39,14 +39,15 @@ namespace GameDev.World.Roads.Tests
         }
 
         [Test]
-        public void Evaluate_GentleMountainPass_CanBeCheaperThanSteepHighland()
+        public void Evaluate_Mountain_CostsMoreThanSteepMeadow_SoMountainsAreSkirted()
         {
-            // A pathfinder choosing "flatter mountain saddle" over "steep highland shortcut" only
-            // works if slope dominates biome for extreme slope values - this is the "mountain
-            // passes, not straight through peaks" requirement from the pipeline doc.
-            var mountainPass = RoadCost.Evaluate(BiomeId.Mountain, 0.05f, isSubmerged: false);
+            var mountainFlat = RoadCost.Evaluate(BiomeId.Mountain, 0f, isSubmerged: false);
+            var steepMeadow = RoadCost.Evaluate(BiomeId.Meadow, 0.95f, isSubmerged: false);
             var steepHighland = RoadCost.Evaluate(BiomeId.Highland, 0.95f, isSubmerged: false);
-            Assert.Less(mountainPass, steepHighland);
+
+            Assert.Greater(mountainFlat, steepMeadow * 0.5f);
+            Assert.IsTrue(RoadCost.IsHardObstacleCost(mountainFlat));
+            Assert.Greater(steepHighland, RoadCost.BaseCost);
         }
 
         [Test]

@@ -85,6 +85,33 @@ namespace GameDev.World.Water.Tests
         }
 
         [Test]
+        public void TerrainFactors_ClampToMacroRange()
+        {
+            var factors = new float[LakeSilhouette.TerrainFactorSampleCount];
+            for (var i = 0; i < factors.Length; i++)
+            {
+                factors[i] = i % 2 == 0 ? 0.5f : 1.5f; // will be clamped on construct
+            }
+
+            var s = new LakeSilhouette(
+                0f, 0f, 80f, 0.9f, 0.2f,
+                0f, 0f, 0f, 0.02f, 0.01f, 0.01f, 3,
+                false, 0f, 0f, 0f, factors);
+
+            for (var i = 0; i < LakeSilhouette.TerrainFactorSampleCount; i++)
+            {
+                var ang = i * Mathf.PI * 2f / LakeSilhouette.TerrainFactorSampleCount;
+                var f = s.TerrainFactorAtAngle(ang);
+                Assert.GreaterOrEqual(f, 0.7f);
+                Assert.LessOrEqual(f, 1.3f);
+            }
+
+            var rLow = s.ShoreRadiusAtAngle(0f);
+            Assert.Greater(rLow, 80f * 0.75f);
+            Assert.Less(rLow, 80f * 1.30f);
+        }
+
+        [Test]
         public void ShoreRadiusAtAngle_ChangesContinuously()
         {
             var s = new LakeSilhouette(

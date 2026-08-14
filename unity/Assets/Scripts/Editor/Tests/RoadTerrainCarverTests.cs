@@ -34,5 +34,15 @@ namespace GameDev.World.Roads.Tests
             Assert.AreEqual(1, one.Count);
             Assert.AreEqual(new Vector2(1f, 2f), one[0]);
         }
+
+        [Test]
+        public void DensifyPolyline_PreservesEndpointsForCutToGrade()
+        {
+            var src = new List<Vector2> { new Vector2(0f, 0f), new Vector2(100f, 50f) };
+            var dense = RoadTerrainCarver.DensifyPolyline(src, stepMeters: 5f);
+            Assert.AreEqual(src[0], dense[0]);
+            Assert.AreEqual(src[src.Count - 1], dense[dense.Count - 1]);
+            Assert.Greater(dense.Count, 10);
+        }
     }
 }

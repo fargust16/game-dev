@@ -4,7 +4,6 @@ using Den.Tools;
 using GameDev.World.Buildings.Shell;
 using GameDev.World.Poi;
 using GameDev.World.Seed;
-using GameDev.World.Streaming;
 using GameDev.World.Terrain;
 using GameDev.World.Water;
 using MapMagic.Core;
@@ -125,64 +124,61 @@ namespace GameDev.EditorTools
             ClearMarkers();
             var root = new GameObject(RootObjectName);
 
-            var sampler = new MapMagicBiomeSampler(holder);
             var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
-            var candidateChunks = OverworldTileChunks.CoveringTile(tileCoord, mapMagic.tileSize, OverworldTileChunks.DefaultMarginMeters);
-            var placer = new StubPoiPlacer(worldSeed, sampler, candidateChunks, PoiDemoScenario.BuildRequests());
+            var markers = OverworldWorldPlan.GetOrBuildPois(mapMagic, tileCoord);
 
             var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
             var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
             IWaterSampler waterZones = new CompositeWaterSampler(lakeZones, riverZones);
+
             var visualRng = worldSeed.Fork("poi-visual");
             var buildingArchetypes = ShellCatalogFactory.CreateDefaultArchetypes();
             var placed = 0;
             var skippedNoSurface = 0;
             var skippedWater = 0;
             var skippedNoPrefab = 0;
-            foreach (var chunk in candidateChunks)
+
+            foreach (var marker in markers)
             {
-                foreach (var marker in placer.PlaceForChunk(chunk))
+                if (!TrySampleTerrainHeight(terrain, marker.Position.x, marker.Position.z, out var y))
                 {
-                    if (!TrySampleTerrainHeight(terrain, marker.Position.x, marker.Position.z, out var y))
-                    {
-                        skippedNoSurface++;
-                        continue;
-                    }
-
-                    if (waterZones != null &&
-                        waterZones.TryGetWaterLevel(marker.Position.x, marker.Position.z, out var waterY) &&
-                        y <= waterY)
-                    {
-                        skippedWater++;
-                        continue;
-                    }
-
-                    if (BuildingKindDistricts.TryGetValue(marker.Kind, out var districtKind))
-                    {
-                        SpawnBuilding(root.transform, marker, districtKind, y, worldSeed, buildingArchetypes);
-                        placed++;
-                        continue;
-                    }
-
-                    var prefab = PickPrefab(marker.Kind, marker.Biome, visualRng);
-                    if (prefab == null)
-                    {
-                        skippedNoPrefab++;
-                        continue;
-                    }
-
-                    var visual = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-                    visual.name = $"Poi_{marker.Id}";
-                    visual.transform.SetParent(root.transform, worldPositionStays: false);
-                    visual.transform.position = new Vector3(marker.Position.x, y, marker.Position.z);
-                    visual.transform.rotation = Quaternion.Euler(0f, (float)visualRng.NextDouble() * 360f, 0f);
-                    visual.transform.localScale = Vector3.one * MarkerScale;
-                    placed++;
+                    skippedNoSurface++;
+                    continue;
                 }
+
+                if (waterZones != null &&
+                    waterZones.TryGetWaterLevel(marker.Position.x, marker.Position.z, out var waterY) &&
+                    y <= waterY)
+                {
+                    skippedWater++;
+                    continue;
+                }
+
+                if (BuildingKindDistricts.TryGetValue(marker.Kind, out var districtKind))
+                {
+                    SpawnBuilding(root.transform, marker, districtKind, y, worldSeed, buildingArchetypes);
+                    placed++;
+                    continue;
+                }
+
+                var prefab = PickPrefab(marker.Kind, marker.Biome, visualRng);
+                if (prefab == null)
+                {
+                    skippedNoPrefab++;
+                    continue;
+                }
+
+                var visual = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                visual.name = $"Poi_{marker.Id}";
+                visual.transform.SetParent(root.transform, worldPositionStays: false);
+                visual.transform.position = new Vector3(marker.Position.x, y, marker.Position.z);
+                visual.transform.rotation = Quaternion.Euler(0f, (float)visualRng.NextDouble() * 360f, 0f);
+                visual.transform.localScale = Vector3.one * MarkerScale;
+                placed++;
             }
 
             Debug.Log(
-                $"[POI] placed={placed} (seed={OverworldTerrainMenu.LastSeed}, markers={placer.AllMarkers().Count}) " +
+                $"[POI] placed={placed} (seed={OverworldTerrainMenu.LastSeed}, markers={markers.Count}) " +
                 $"skipped: noSurface={skippedNoSurface} water={skippedWater} noPrefab={skippedNoPrefab}");
         }
 

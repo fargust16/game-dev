@@ -51,11 +51,8 @@ namespace GameDev.World.Water.Tests
             zone.SetWaterLevel(8.5f);
             float Sample(float x, float z)
             {
-                // Spiky terrain that would previously punch slits into the water silhouette.
-                var cx = 16f;
-                var cz = 16f;
-                var d = Mathf.Sqrt((x - cx) * (x - cx) + (z - cz) * (z - cz));
-                return 8.5f - 2.5f + d * 0.15f + Mathf.Sin(x * 2f) * 3f;
+                // Bowl below waterY — sampler is ignored; sheet stays one body.
+                return 8.5f - 2.5f + Mathf.Sin(x * 0.4f) * 0.35f;
             }
 
             var mesh = WaterMeshBuilder.Build(zone, new[] { zone }, Sample);
@@ -65,7 +62,22 @@ namespace GameDev.World.Water.Tests
         }
 
         [Test]
-        public void Build_ExpandedSilhouette_ExtendsPastFloodAabbSlightly()
+        public void Build_IgnoresTerrainSampler_DoesNotPunchHoles()
+        {
+            var zone = MakeFilledBlob(16, 2f, 10f);
+            zone.SetWaterLevel(8.5f);
+            var baseline = WaterMeshBuilder.Build(zone, new[] { zone });
+            float SampleRidge(float x, float z) => 100f;
+            var mesh = WaterMeshBuilder.Build(zone, new[] { zone }, SampleRidge);
+            Assert.AreEqual(
+                baseline.vertexCount,
+                mesh.vertexCount,
+                "terrain sampler must not clip or hole the flat water sheet");
+            Assert.IsTrue(mesh.vertices.All(v => Mathf.Approximately(v.y, 8.5f)));
+        }
+
+        [Test]
+        public void Build_InsetSilhouette_StaysInsideFloodAabb()
         {
             var zone = MakeFilledBlob(14, 2f, 10f);
             zone.SetWaterLevel(9f);
@@ -85,10 +97,14 @@ namespace GameDev.World.Water.Tests
                 if (v.z > maxZ) maxZ = v.z;
             }
 
-            Assert.Less(minX, flood.xMin + 0.01f, "water should slightly overshoot flood minX");
-            Assert.Greater(maxX, flood.xMax - 0.01f, "water should slightly overshoot flood maxX");
-            Assert.Less(minZ, flood.yMin + 0.01f, "water should slightly overshoot flood minZ");
-            Assert.Greater(maxZ, flood.yMax - 0.01f, "water should slightly overshoot flood maxZ");
+            var overlap = WaterMeshBuilder.ShoreOverlapMeters;
+            // Water expands past flood AABB slightly, but stays well inside basin expand (2.5m+).
+            Assert.LessOrEqual(minX, flood.xMin + 0.5f, "water should reach or slightly pass shore");
+            Assert.GreaterOrEqual(maxX, flood.xMax - 0.5f);
+            Assert.GreaterOrEqual(minX, flood.xMin - overlap - 2f, "water must not explode past overlap");
+            Assert.LessOrEqual(maxX, flood.xMax + overlap + 2f);
+            Assert.GreaterOrEqual(minZ, flood.yMin - overlap - 2f);
+            Assert.LessOrEqual(maxZ, flood.yMax + overlap + 2f);
         }
     }
 }

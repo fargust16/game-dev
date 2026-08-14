@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Den.Tools;
+using GameDev.World;
 using GameDev.World.Seed;
 using GameDev.World.Terrain;
 using MapMagic.Core;
@@ -11,6 +12,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using WorldSeed = GameDev.World.Seed.WorldSeed;
 
 namespace GameDev.EditorTools
 {
@@ -24,10 +26,13 @@ namespace GameDev.EditorTools
     {
         public const string ScenePath = "Assets/Scenes/Overworld_Generator.unity";
         private const string GraphPath = "Assets/Settings/OverworldTerrainGraph.asset";
-        private const int DefaultSeed = 110201;
+        public const int DefaultSeed = 110201;
 
         /// <summary>Seed of the last Generate call, so other tools (vegetation scatter) fork the same WorldSeed.</summary>
         public static int LastSeed { get; private set; }
+
+        /// <summary>Active generation settings (World Generator window / pipeline).</summary>
+        public static WorldGenSettings ActiveSettings { get; set; } = WorldGenSettings.Default;
 
         [MenuItem("GameDev/Overworld/Open Or Create Terrain Scene")]
         public static void OpenOrCreateScene()
@@ -172,14 +177,52 @@ namespace GameDev.EditorTools
                 mapMagic.tiles.Pin(originCoord, false, mapMagic);
             });
 
-            // Lakes + rivers after the origin tile is ready so LakeBasinFinder / FlowNetwork sample
-            // the final height channel. Basin pits come from BuildGraph; LakeTerrainCarver then
-            // guarantees a real bed under each flooded zone before meshes are built.
+            // Lakes placed as definitions (SDF) so LandscapePlanner can route before dig.
+            // Full pipeline defers basin dig until after roads; standalone terrain menu still
+            // finishes water immediately via GenerateForTile(defer:false) default.
             OverworldGenTiming.Time("water", () => WaterZoneMenu.GenerateForTile(mapMagic, new Coord(0, 0)));
 
             SaveActive();
             Selection.activeGameObject = mapMagic.gameObject;
             OverworldGenTiming.Log("terrain+water.total", OverworldGenTiming.StopMs(total), $"seed={seed}");
+        }
+
+        /// <summary>
+        /// Base terrain + planned lake/river definitions only (no basin dig / water meshes).
+        /// Used by LandscapePlanner full overworld pipeline.
+        /// </summary>
+        public static void GenerateTerrainAndLakePlan(int seed)
+        {
+            LastSeed = seed;
+            var total = OverworldGenTiming.Start();
+            EnsureReviewCamera();
+            WaterZoneMenu.ClearWaterZones();
+            WaterZoneMenu.ClearRiverZones();
+            VegetationScatterMenu.ClearVegetation();
+            PoiMarkerMenu.ClearMarkers();
+            RoadNetworkMenu.ClearRoadNetwork();
+            SettlementOverworldMenu.ClearSettlement();
+
+            Graph graph = null;
+            OverworldGenTiming.Time("terrain.graph", () => { graph = BuildGraph(seed); });
+
+            var mapMagic = FindOrCreateMapMagicObject();
+            mapMagic.tileSize = new Vector2D(GameDev.World.WorldScale.OverworldTileMeters, GameDev.World.WorldScale.OverworldTileMeters);
+            mapMagic.graph = graph;
+            mapMagic.gameObject.SetActive(true);
+
+            OverworldGenTiming.Time("terrain.mapmagic-refresh", () =>
+            {
+                mapMagic.Refresh(true);
+                mapMagic.tiles.Pin(new Coord(0, 0), false, mapMagic);
+            });
+
+            OverworldGenTiming.Time("water.plan", () =>
+                WaterZoneMenu.GenerateForTile(mapMagic, new Coord(0, 0), deferTerrainDeformAndMeshes: true));
+
+            SaveActive();
+            Selection.activeGameObject = mapMagic.gameObject;
+            OverworldGenTiming.Log("terrain+lake-plan.total", OverworldGenTiming.StopMs(total), $"seed={seed}");
         }
 
         private static MapMagicObject FindOrCreateMapMagicObject()

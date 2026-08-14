@@ -25,14 +25,14 @@ namespace GameDev.World.Roads
     }
 
     /// <summary>
-    /// Presses a shallow continuous worn groove into terrain along road centerlines (capsule
-    /// segments like river carve, gentler depth) and paints matching dirt into the alphamap.
+    /// Cuts a continuous worn corridor into terrain along road centerlines: linear grade between
+    /// stroke ends (flatten hills), plus a shallow groove, dig-only (never raise). Dirt alphamap paint optional.
     /// </summary>
     public static class RoadTerrainCarver
     {
         private const int MinRadiusPixels = 4;
         public const float DensifyStepMeters = 2.5f;
-        private const int CorridorSoftenPasses = 1;
+        private const int CorridorSoftenPasses = 2;
 
         public static void Carve(
             UnityEngine.Terrain terrain,
@@ -106,16 +106,52 @@ namespace GameDev.World.Roads
                 var halfW = Mathf.Max(stroke.CarveWidthMeters * 0.5f, 1f);
                 var depth = Mathf.Max(stroke.CarveDepthMeters, 0.05f);
 
+                // Linear design grade between stroke ends — cut hills down to that plane.
+                SampleHeightNorm(original, resolution, terrainPos, worldPerPixelX, worldPerPixelZ,
+                    dense[0], out var y0Norm);
+                SampleHeightNorm(original, resolution, terrainPos, worldPerPixelX, worldPerPixelZ,
+                    dense[dense.Count - 1], out var y1Norm);
+
+                var totalLen = 0f;
+                var cumLen = new float[dense.Count];
+                cumLen[0] = 0f;
+                for (var i = 1; i < dense.Count; i++)
+                {
+                    totalLen += Vector2.Distance(dense[i - 1], dense[i]);
+                    cumLen[i] = totalLen;
+                }
+
+                if (totalLen < 0.01f)
+                {
+                    continue;
+                }
+
                 for (var i = 0; i < dense.Count - 1; i++)
                 {
+                    var t0 = cumLen[i] / totalLen;
+                    var t1 = cumLen[i + 1] / totalLen;
+                    var grade0 = Mathf.Lerp(y0Norm, y1Norm, t0);
+                    var grade1 = Mathf.Lerp(y0Norm, y1Norm, t1);
                     CarveHeightSegment(
                         heights, original, carvedMask, resolution,
                         terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight,
-                        dense[i], dense[i + 1], halfW, depth);
+                        dense[i], dense[i + 1], halfW, depth, grade0, grade1);
                 }
             }
 
             SoftenCarvedCorridor(heights, carvedMask, resolution, CorridorSoftenPasses);
+            // Dig-only after soften — blur must not raise above original.
+            for (var pz = 0; pz < resolution; pz++)
+            {
+                for (var px = 0; px < resolution; px++)
+                {
+                    if (carvedMask[pz, px] && heights[pz, px] > original[pz, px])
+                    {
+                        heights[pz, px] = original[pz, px];
+                    }
+                }
+            }
+
             data.SetHeights(0, 0, heights);
         }
 
@@ -144,6 +180,22 @@ namespace GameDev.World.Roads
             return result;
         }
 
+        private static void SampleHeightNorm(
+            float[,] original,
+            int resolution,
+            Vector3 terrainPos,
+            float worldPerPixelX,
+            float worldPerPixelZ,
+            Vector2 worldXZ,
+            out float heightNorm)
+        {
+            var px = Mathf.Clamp(
+                Mathf.RoundToInt((worldXZ.x - terrainPos.x) / worldPerPixelX), 0, resolution - 1);
+            var pz = Mathf.Clamp(
+                Mathf.RoundToInt((worldXZ.y - terrainPos.z) / worldPerPixelZ), 0, resolution - 1);
+            heightNorm = original[pz, px];
+        }
+
         private static void CarveHeightSegment(
             float[,] heights,
             float[,] original,
@@ -156,7 +208,9 @@ namespace GameDev.World.Roads
             Vector2 a,
             Vector2 b,
             float halfWidth,
-            float depthMeters)
+            float depthMeters,
+            float gradeNormA,
+            float gradeNormB)
         {
             var pad = halfWidth + worldPerPixelX * 2f;
             var minX = Mathf.Min(a.x, b.x) - pad;
@@ -175,6 +229,8 @@ namespace GameDev.World.Roads
             {
                 return;
             }
+
+            var depthNorm = depthMeters / worldHeight;
 
             for (var pz = minPz; pz <= maxPz; pz++)
             {
@@ -197,9 +253,11 @@ namespace GameDev.World.Roads
                     // Flatter worn tread: more depth across the centre strip than a sharp V.
                     var centreFlat = 1f - Mathf.SmoothStep(0.25f, 1f, u);
                     var profile = Mathf.Max(1f - radial, centreFlat * 0.9f);
-                    var depthNorm = (depthMeters / worldHeight) * profile;
 
-                    var candidate = original[pz, px] - depthNorm;
+                    var gradeNorm = Mathf.Lerp(gradeNormA, gradeNormB, t);
+                    // Cut-to-grade: flatten hills to the design plane, then press the groove.
+                    var targetNorm = gradeNorm - depthNorm * profile;
+                    var candidate = Mathf.Min(original[pz, px], targetNorm);
                     if (candidate < heights[pz, px])
                     {
                         heights[pz, px] = Mathf.Clamp01(candidate);

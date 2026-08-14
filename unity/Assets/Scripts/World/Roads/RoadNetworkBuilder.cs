@@ -1,16 +1,21 @@
 using System;
 using System.Collections.Generic;
+using GameDev.World.Landscape;
 using UnityEngine;
+using WorldScale = GameDev.World.WorldScale;
 
 namespace GameDev.World.Roads
 {
     public enum RoadTier
     {
-        /// <summary>TownApproach ↔ TownApproach primary network.</summary>
-        Main,
+        /// <summary>TownApproach growing Prim network.</summary>
+        Primary = 0,
 
-        /// <summary>Spur from a non-town POI to the nearest hub.</summary>
-        Branch,
+        /// <summary>Non-town POI spur onto the existing network.</summary>
+        Secondary = 1,
+
+        /// <summary>Short stubs (widths reserved; generation deferred).</summary>
+        Local = 2,
     }
 
     public readonly struct RoadSegment
@@ -20,7 +25,7 @@ namespace GameDev.World.Roads
         public IReadOnlyList<Vector2> Points { get; }
         public RoadTier Tier { get; }
 
-        public RoadSegment(int nodeA, int nodeB, IReadOnlyList<Vector2> points, RoadTier tier = RoadTier.Main)
+        public RoadSegment(int nodeA, int nodeB, IReadOnlyList<Vector2> points, RoadTier tier = RoadTier.Primary)
         {
             NodeA = nodeA;
             NodeB = nodeB;
@@ -30,70 +35,92 @@ namespace GameDev.World.Roads
     }
 
     /// <summary>
-    /// Connects world-space nodes into a road graph. <see cref="BuildNetwork"/> builds a flat MST
-    /// over every node. <see cref="BuildHierarchicalNetwork"/> first solves an open TSP path among
-    /// hub nodes (towns) as <see cref="RoadTier.Main"/>, then attaches remaining POIs as
-    /// <see cref="RoadTier.Branch"/> spurs.
+    /// Connects world-space nodes into a road graph. Hierarchical build grows a Primary Prim
+    /// network among town hubs (snapping onto accepted corridors), then attaches other POIs as
+    /// Secondary spurs onto the whole network. Painting accepted polylines into
+    /// <see cref="LandscapeCostField"/> prevents parallel A* corridors.
     /// </summary>
     public static class RoadNetworkBuilder
     {
         private const int NeighborCandidateCount = 6;
         private const int MaxRepairAttemptsPerRound = 20;
-        // Exact open-path TSP over A* costs; beyond this fall back to MST (factorial blow-up).
-        private const int MaxExactTspHubs = 9;
+        private const float JunctionSampleStepMeters = 20f;
 
         public static List<RoadSegment> BuildNetwork(
             IReadOnlyList<Vector2> nodes,
             RoadGridSpec grid,
             Func<float, float, float> costAtWorld,
-            Func<float, float, float> heightMetersAtWorld = null)
+            Func<float, float, float> heightMetersAtWorld = null,
+            Func<Vector2, Vector2, bool> canBridgeSpan = null)
         {
-            return BuildMst(nodes, grid, costAtWorld, heightMetersAtWorld, RoadTier.Main);
+            return BuildMst(nodes, grid, costAtWorld, heightMetersAtWorld, RoadTier.Primary, canBridgeSpan);
         }
 
-        /// <param name="isHub">Per-node hub flag (true = TownApproach). Non-hubs become branches.</param>
+        /// <param name="isHub">Per-node hub flag (true = TownApproach). Non-hubs become Secondary.</param>
         public static List<RoadSegment> BuildHierarchicalNetwork(
             IReadOnlyList<Vector2> nodes,
             IReadOnlyList<bool> isHub,
             RoadGridSpec grid,
             Func<float, float, float> costAtWorld,
-            Func<float, float, float> heightMetersAtWorld = null)
+            Func<float, float, float> heightMetersAtWorld = null,
+            Func<Vector2, Vector2, bool> canBridgeSpan = null)
+        {
+            return BuildHierarchicalNetwork(
+                nodes, isHub, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan, costField: null);
+        }
+
+        public static List<RoadSegment> BuildHierarchicalNetwork(
+            IReadOnlyList<Vector2> nodes,
+            IReadOnlyList<bool> isHub,
+            RoadGridSpec grid,
+            LandscapeCostField costField,
+            Func<float, float, float> heightMetersAtWorld = null,
+            Func<Vector2, Vector2, bool> canBridgeSpan = null)
+        {
+            if (costField == null)
+            {
+                return new List<RoadSegment>();
+            }
+
+            Func<float, float, float> costAtWorld = (x, z) => costField.EvaluateAtTerrain(x, z);
+            return BuildHierarchicalNetwork(
+                nodes, isHub, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan, costField);
+        }
+
+        private static List<RoadSegment> BuildHierarchicalNetwork(
+            IReadOnlyList<Vector2> nodes,
+            IReadOnlyList<bool> isHub,
+            RoadGridSpec grid,
+            Func<float, float, float> costAtWorld,
+            Func<float, float, float> heightMetersAtWorld,
+            Func<Vector2, Vector2, bool> canBridgeSpan,
+            LandscapeCostField costField)
         {
             var segments = new List<RoadSegment>();
             var n = nodes.Count;
             if (n < 2 || isHub == null || isHub.Count != n)
             {
-                return BuildNetwork(nodes, grid, costAtWorld, heightMetersAtWorld);
+                return BuildNetwork(nodes, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan);
             }
 
-            var hubLocal = new List<Vector2>();
-            var hubGlobal = new List<int>();
+            var hubs = new List<int>();
             for (var i = 0; i < n; i++)
             {
-                if (!isHub[i])
+                if (isHub[i])
                 {
-                    continue;
-                }
-
-                hubLocal.Add(nodes[i]);
-                hubGlobal.Add(i);
-            }
-
-            if (hubLocal.Count >= 2)
-            {
-                var hubSegments = hubLocal.Count <= MaxExactTspHubs
-                    ? BuildOpenTspPath(hubLocal, grid, costAtWorld, heightMetersAtWorld, RoadTier.Main)
-                    : BuildMst(hubLocal, grid, costAtWorld, heightMetersAtWorld, RoadTier.Main);
-
-                foreach (var seg in hubSegments)
-                {
-                    segments.Add(new RoadSegment(
-                        hubGlobal[seg.NodeA], hubGlobal[seg.NodeB], seg.Points, RoadTier.Main));
+                    hubs.Add(i);
                 }
             }
-            else if (hubLocal.Count == 0)
+
+            if (hubs.Count >= 2)
             {
-                return BuildNetwork(nodes, grid, costAtWorld, heightMetersAtWorld);
+                GrowPrimNetwork(
+                    hubs, nodes, segments, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan,
+                    costField, RoadTier.Primary);
+            }
+            else if (hubs.Count == 0)
+            {
+                return BuildNetwork(nodes, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan);
             }
 
             for (var i = 0; i < n; i++)
@@ -103,178 +130,374 @@ namespace GameDev.World.Roads
                     continue;
                 }
 
-                if (!TryAttachBranch(nodes, hubGlobal, i, grid, costAtWorld, heightMetersAtWorld, out var branch))
+                if (!TryAttachToNetwork(
+                        nodes[i], i, segments, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan,
+                        RoadTier.Secondary, acceptAnyTier: true, out var branch))
                 {
                     continue;
                 }
 
                 segments.Add(branch);
+                Paint(costField, branch.Points);
             }
 
             return segments;
         }
 
         /// <summary>
-        /// Open traveling-salesman path among hubs: visit each once, minimize sum of A* edge costs
-        /// (no return-to-start). Exact for small hub counts used by the overworld demo.
+        /// Constraint: every POI node must have degree ≥ 1. Connect orphans to the nearest
+        /// network point (existing polyline or node) when a path exists.
         /// </summary>
-        private static List<RoadSegment> BuildOpenTspPath(
+        public static void EnsureMinimumConnectivity(
             IReadOnlyList<Vector2> nodes,
+            List<RoadSegment> segments,
             RoadGridSpec grid,
             Func<float, float, float> costAtWorld,
-            Func<float, float, float> heightMetersAtWorld,
-            RoadTier tier)
+            Func<float, float, float> heightMetersAtWorld = null,
+            Func<Vector2, Vector2, bool> canBridgeSpan = null,
+            int minimumDegree = 1,
+            LandscapeCostField costField = null)
         {
-            var n = nodes.Count;
-            var segments = new List<RoadSegment>();
-            if (n < 2)
+            if (nodes == null || segments == null || nodes.Count == 0 || minimumDegree < 1)
             {
-                return segments;
+                return;
             }
 
-            var costs = new float[n, n];
-            var paths = new List<Vector2>[n, n];
-            for (var i = 0; i < n; i++)
+            var degree = new int[nodes.Count];
+            for (var i = 0; i < segments.Count; i++)
             {
-                for (var j = i + 1; j < n; j++)
+                var a = segments[i].NodeA;
+                var b = segments[i].NodeB;
+                if (a >= 0 && a < degree.Length)
                 {
-                    var path = new List<Vector2>();
-                    if (RoadPathfinder.TryFindPath(
-                            grid, costAtWorld, nodes[i], nodes[j], path, out var cost, heightMetersAtWorld))
-                    {
-                        costs[i, j] = cost;
-                        costs[j, i] = cost;
-                        paths[i, j] = path;
-                        paths[j, i] = ReversePath(path);
-                    }
-                    else
-                    {
-                        costs[i, j] = float.PositiveInfinity;
-                        costs[j, i] = float.PositiveInfinity;
-                    }
+                    degree[a]++;
+                }
+
+                if (b >= 0 && b < degree.Length)
+                {
+                    degree[b]++;
                 }
             }
 
-            var order = new int[n];
-            for (var i = 0; i < n; i++)
+            for (var i = 0; i < nodes.Count; i++)
             {
-                order[i] = i;
-            }
-
-            var bestOrder = (int[])order.Clone();
-            var bestCost = float.PositiveInfinity;
-            PermuteOpenTsp(order, 0, costs, ref bestCost, bestOrder);
-
-            if (float.IsPositiveInfinity(bestCost))
-            {
-                return BuildMst(nodes, grid, costAtWorld, heightMetersAtWorld, tier);
-            }
-
-            for (var i = 0; i < n - 1; i++)
-            {
-                var a = bestOrder[i];
-                var b = bestOrder[i + 1];
-                var path = paths[a, b];
-                if (path == null || path.Count < 2)
+                if (degree[i] >= minimumDegree)
                 {
                     continue;
                 }
 
-                segments.Add(new RoadSegment(a, b, path, tier));
-            }
-
-            return segments;
-        }
-
-        private static void PermuteOpenTsp(
-            int[] order, int start, float[,] costs, ref float bestCost, int[] bestOrder)
-        {
-            var n = order.Length;
-            if (start >= n - 1)
-            {
-                var total = 0f;
-                for (var i = 0; i < n - 1; i++)
+                if (TryAttachToNetwork(
+                        nodes[i], i, segments, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan,
+                        RoadTier.Secondary, acceptAnyTier: true, out var branch))
                 {
-                    var edge = costs[order[i], order[i + 1]];
-                    if (float.IsPositiveInfinity(edge))
+                    segments.Add(branch);
+                    degree[i]++;
+                    Paint(costField, branch.Points);
+                    continue;
+                }
+
+                var bestCost = float.PositiveInfinity;
+                List<Vector2> bestPath = null;
+                var bestJ = -1;
+                for (var j = 0; j < nodes.Count; j++)
+                {
+                    if (j == i)
                     {
-                        return;
+                        continue;
                     }
 
-                    total += edge;
-                    if (total >= bestCost)
+                    var path = new List<Vector2>();
+                    if (!RoadPathfinder.TryFindPath(
+                            grid, costAtWorld, nodes[i], nodes[j], path, out var cost,
+                            heightMetersAtWorld, canBridgeSpan))
                     {
-                        return;
+                        continue;
+                    }
+
+                    if (cost < bestCost)
+                    {
+                        bestCost = cost;
+                        bestPath = path;
+                        bestJ = j;
                     }
                 }
 
-                if (total < bestCost)
+                if (bestPath != null && bestJ >= 0)
                 {
-                    bestCost = total;
-                    Array.Copy(order, bestOrder, n);
+                    var seg = new RoadSegment(
+                        i, bestJ, FinalizePath(bestPath, costAtWorld, grid.CellSize), RoadTier.Secondary);
+                    segments.Add(seg);
+                    degree[i]++;
+                    Paint(costField, seg.Points);
                 }
-
-                return;
-            }
-
-            for (var i = start; i < n; i++)
-            {
-                (order[start], order[i]) = (order[i], order[start]);
-                PermuteOpenTsp(order, start + 1, costs, ref bestCost, bestOrder);
-                (order[start], order[i]) = (order[i], order[start]);
             }
         }
 
-        private static List<Vector2> ReversePath(IReadOnlyList<Vector2> path)
-        {
-            var rev = new List<Vector2>(path.Count);
-            for (var i = path.Count - 1; i >= 0; i--)
-            {
-                rev.Add(path[i]);
-            }
-
-            return rev;
-        }
-
-        private static bool TryAttachBranch(
+        private static void GrowPrimNetwork(
+            List<int> hubs,
             IReadOnlyList<Vector2> nodes,
-            IReadOnlyList<int> hubGlobals,
-            int branchIndex,
+            List<RoadSegment> segments,
             RoadGridSpec grid,
             Func<float, float, float> costAtWorld,
             Func<float, float, float> heightMetersAtWorld,
-            out RoadSegment segment)
+            Func<Vector2, Vector2, bool> canBridgeSpan,
+            LandscapeCostField costField,
+            RoadTier tier)
+        {
+            var connected = new HashSet<int> { hubs[0] };
+            var remaining = new HashSet<int>();
+            for (var i = 1; i < hubs.Count; i++)
+            {
+                remaining.Add(hubs[i]);
+            }
+
+            while (remaining.Count > 0)
+            {
+                var bestCost = float.PositiveInfinity;
+                var bestHub = -1;
+                RoadSegment bestSeg = default;
+                var found = false;
+
+                foreach (var hub in remaining)
+                {
+                    // Prefer snap onto existing Primary corridors once any exist.
+                    if (segments.Count > 0 &&
+                        TryAttachToNetwork(
+                            nodes[hub], hub, segments, grid, costAtWorld, heightMetersAtWorld,
+                            canBridgeSpan, tier, acceptAnyTier: false, out var snapSeg))
+                    {
+                        var snapCost = EstimatePathCost(snapSeg.Points, costAtWorld);
+                        // Also compare a direct route to the nearest connected hub.
+                        var directOk = TryBestHubLink(
+                            hub, connected, nodes, grid, costAtWorld, heightMetersAtWorld,
+                            canBridgeSpan, tier, out var directSeg, out var directCost);
+
+                        var useSnap = true;
+                        if (directOk)
+                        {
+                            var detour = costField != null
+                                ? costField.DetourTolerance
+                                : WorldScale.RoadDetourTolerance;
+                            // Independent route only wins if clearly cheaper than snap×tolerance.
+                            if (directCost * detour < snapCost)
+                            {
+                                useSnap = false;
+                            }
+                        }
+
+                        if (useSnap && snapCost < bestCost)
+                        {
+                            bestCost = snapCost;
+                            bestHub = hub;
+                            bestSeg = snapSeg;
+                            found = true;
+                        }
+                        else if (!useSnap && directOk && directCost < bestCost)
+                        {
+                            bestCost = directCost;
+                            bestHub = hub;
+                            bestSeg = directSeg;
+                            found = true;
+                        }
+
+                        continue;
+                    }
+
+                    if (TryBestHubLink(
+                            hub, connected, nodes, grid, costAtWorld, heightMetersAtWorld,
+                            canBridgeSpan, tier, out var linkSeg, out var linkCost) &&
+                        linkCost < bestCost)
+                    {
+                        bestCost = linkCost;
+                        bestHub = hub;
+                        bestSeg = linkSeg;
+                        found = true;
+                    }
+                }
+
+                if (!found || bestHub < 0)
+                {
+                    break;
+                }
+
+                segments.Add(bestSeg);
+                Paint(costField, bestSeg.Points);
+                connected.Add(bestHub);
+                remaining.Remove(bestHub);
+            }
+        }
+
+        private static bool TryBestHubLink(
+            int hub,
+            HashSet<int> connected,
+            IReadOnlyList<Vector2> nodes,
+            RoadGridSpec grid,
+            Func<float, float, float> costAtWorld,
+            Func<float, float, float> heightMetersAtWorld,
+            Func<Vector2, Vector2, bool> canBridgeSpan,
+            RoadTier tier,
+            out RoadSegment segment,
+            out float cost)
         {
             segment = default;
-            if (hubGlobals.Count == 0)
+            cost = float.PositiveInfinity;
+            var bestPath = (List<Vector2>)null;
+            var bestOther = -1;
+
+            foreach (var other in connected)
+            {
+                var path = new List<Vector2>();
+                if (!RoadPathfinder.TryFindPath(
+                        grid, costAtWorld, nodes[hub], nodes[other], path, out var c,
+                        heightMetersAtWorld, canBridgeSpan))
+                {
+                    continue;
+                }
+
+                if (c < cost)
+                {
+                    cost = c;
+                    bestPath = path;
+                    bestOther = other;
+                }
+            }
+
+            if (bestPath == null || bestOther < 0)
             {
                 return false;
             }
 
-            var candidates = new List<(float Dist, int Hub)>(hubGlobals.Count);
-            for (var h = 0; h < hubGlobals.Count; h++)
-            {
-                var hub = hubGlobals[h];
-                candidates.Add((Vector2.Distance(nodes[branchIndex], nodes[hub]), hub));
-            }
+            segment = new RoadSegment(
+                hub, bestOther, FinalizePath(bestPath, costAtWorld, grid.CellSize), tier);
+            return true;
+        }
 
-            candidates.Sort((a, b) => a.Dist.CompareTo(b.Dist));
+        /// <summary>
+        /// Spur from a POI to the best connection point on the existing network (min connection cost).
+        /// </summary>
+        private static bool TryAttachToNetwork(
+            Vector2 poi,
+            int branchIndex,
+            IReadOnlyList<RoadSegment> network,
+            RoadGridSpec grid,
+            Func<float, float, float> costAtWorld,
+            Func<float, float, float> heightMetersAtWorld,
+            Func<Vector2, Vector2, bool> canBridgeSpan,
+            RoadTier tier,
+            bool acceptAnyTier,
+            out RoadSegment segment)
+        {
+            segment = default;
+            var bestCost = float.PositiveInfinity;
+            List<Vector2> bestPath = null;
+            var bestJunction = poi;
+            var bestAnchor = branchIndex;
 
-            for (var c = 0; c < candidates.Count; c++)
+            for (var s = 0; s < network.Count; s++)
             {
-                var hub = candidates[c].Hub;
-                var path = new List<Vector2>();
-                if (!RoadPathfinder.TryFindPath(
-                        grid, costAtWorld, nodes[branchIndex], nodes[hub], path, out _, heightMetersAtWorld))
+                var seg = network[s];
+                if (!acceptAnyTier && seg.Tier != RoadTier.Primary)
                 {
                     continue;
                 }
 
-                segment = new RoadSegment(branchIndex, hub, path, RoadTier.Branch);
-                return true;
+                if (seg.Points == null || seg.Points.Count < 2)
+                {
+                    continue;
+                }
+
+                foreach (var sample in SamplePolyline(seg.Points, JunctionSampleStepMeters))
+                {
+                    var path = new List<Vector2>();
+                    if (!RoadPathfinder.TryFindPath(
+                            grid, costAtWorld, poi, sample, path, out var cost,
+                            heightMetersAtWorld, canBridgeSpan))
+                    {
+                        continue;
+                    }
+
+                    // Soft preference for shorter Euclidean connectors (anti-parallel).
+                    var euclid = Vector2.Distance(poi, sample);
+                    var scored = cost + euclid * 0.05f;
+                    if (scored < bestCost)
+                    {
+                        bestCost = scored;
+                        bestPath = path;
+                        bestJunction = sample;
+                        bestAnchor = seg.NodeA;
+                    }
+                }
             }
 
-            return false;
+            if (bestPath == null)
+            {
+                return false;
+            }
+
+            if (bestPath.Count > 0)
+            {
+                bestPath[bestPath.Count - 1] = bestJunction;
+            }
+
+            segment = new RoadSegment(
+                branchIndex,
+                bestAnchor,
+                FinalizePath(bestPath, costAtWorld, grid.CellSize),
+                tier);
+            return true;
+        }
+
+        private static IEnumerable<Vector2> SamplePolyline(IReadOnlyList<Vector2> points, float stepMeters)
+        {
+            yield return points[0];
+            var remaining = stepMeters;
+            for (var i = 0; i < points.Count - 1; i++)
+            {
+                var a = points[i];
+                var b = points[i + 1];
+                var len = Vector2.Distance(a, b);
+                var t = 0f;
+                while (t + remaining <= len)
+                {
+                    t += remaining;
+                    yield return Vector2.Lerp(a, b, t / Mathf.Max(len, 1e-4f));
+                    remaining = stepMeters;
+                }
+
+                remaining -= len - t;
+            }
+
+            yield return points[points.Count - 1];
+        }
+
+        private static float EstimatePathCost(IReadOnlyList<Vector2> points, Func<float, float, float> costAtWorld)
+        {
+            if (points == null || points.Count < 2)
+            {
+                return float.PositiveInfinity;
+            }
+
+            var sum = 0f;
+            for (var i = 0; i < points.Count - 1; i++)
+            {
+                var a = points[i];
+                var b = points[i + 1];
+                var dist = Vector2.Distance(a, b);
+                var c = (costAtWorld(a.x, a.y) + costAtWorld(b.x, b.y)) * 0.5f;
+                if (float.IsPositiveInfinity(c))
+                {
+                    return float.PositiveInfinity;
+                }
+
+                sum += dist * c;
+            }
+
+            return sum;
+        }
+
+        private static void Paint(LandscapeCostField costField, IReadOnlyList<Vector2> points)
+        {
+            costField?.PaintExistingRoad(points);
         }
 
         private static List<RoadSegment> BuildMst(
@@ -282,7 +505,8 @@ namespace GameDev.World.Roads
             RoadGridSpec grid,
             Func<float, float, float> costAtWorld,
             Func<float, float, float> heightMetersAtWorld,
-            RoadTier tier)
+            RoadTier tier,
+            Func<Vector2, Vector2, bool> canBridgeSpan = null)
         {
             var segments = new List<RoadSegment>();
             var n = nodes.Count;
@@ -297,7 +521,9 @@ namespace GameDev.World.Roads
             foreach (var (a, b) in candidateEdges)
             {
                 var path = new List<Vector2>();
-                if (RoadPathfinder.TryFindPath(grid, costAtWorld, nodes[a], nodes[b], path, out var cost, heightMetersAtWorld))
+                if (RoadPathfinder.TryFindPath(
+                        grid, costAtWorld, nodes[a], nodes[b], path, out var cost,
+                        heightMetersAtWorld, canBridgeSpan))
                 {
                     weighted.Add((cost, a, b, path));
                 }
@@ -313,10 +539,12 @@ namespace GameDev.World.Roads
                 }
 
                 union.Union(edge.A, edge.B);
-                segments.Add(new RoadSegment(edge.A, edge.B, edge.Path, tier));
+                segments.Add(new RoadSegment(
+                    edge.A, edge.B, FinalizePath(edge.Path, costAtWorld, grid.CellSize), tier));
             }
 
-            RepairDisconnectedComponents(nodes, grid, costAtWorld, heightMetersAtWorld, union, segments, tier);
+            RepairDisconnectedComponents(
+                nodes, grid, costAtWorld, heightMetersAtWorld, union, segments, tier, canBridgeSpan);
 
             return segments;
         }
@@ -359,9 +587,11 @@ namespace GameDev.World.Roads
             Func<float, float, float> heightMetersAtWorld,
             UnionFind union,
             List<RoadSegment> segments,
-            RoadTier tier)
+            RoadTier tier,
+            Func<Vector2, Vector2, bool> canBridgeSpan)
         {
-            while (TryMergeOneComponent(nodes, grid, costAtWorld, heightMetersAtWorld, union, segments, tier))
+            while (TryMergeOneComponent(
+                       nodes, grid, costAtWorld, heightMetersAtWorld, union, segments, tier, canBridgeSpan))
             {
             }
         }
@@ -373,7 +603,8 @@ namespace GameDev.World.Roads
             Func<float, float, float> heightMetersAtWorld,
             UnionFind union,
             List<RoadSegment> segments,
-            RoadTier tier)
+            RoadTier tier,
+            Func<Vector2, Vector2, bool> canBridgeSpan)
         {
             var n = nodes.Count;
             var groups = new Dictionary<int, List<int>>();
@@ -423,17 +654,32 @@ namespace GameDev.World.Roads
 
                 var path = new List<Vector2>();
                 if (!RoadPathfinder.TryFindPath(
-                        grid, costAtWorld, nodes[candidate.A], nodes[candidate.B], path, out _, heightMetersAtWorld))
+                        grid, costAtWorld, nodes[candidate.A], nodes[candidate.B], path, out _,
+                        heightMetersAtWorld, canBridgeSpan))
                 {
                     continue;
                 }
 
                 union.Union(candidate.A, candidate.B);
-                segments.Add(new RoadSegment(candidate.A, candidate.B, path, tier));
+                segments.Add(new RoadSegment(
+                    candidate.A, candidate.B, FinalizePath(path, costAtWorld, grid.CellSize), tier));
                 return true;
             }
 
             return false;
+        }
+
+        private static List<Vector2> FinalizePath(
+            List<Vector2> path,
+            Func<float, float, float> costAtWorld,
+            float cellSizeMeters)
+        {
+            if (path == null || path.Count < 2)
+            {
+                return path ?? new List<Vector2>();
+            }
+
+            return RoadPathSimplifier.SoftenNatural(path, costAtWorld, cellSizeMeters * 0.5f);
         }
 
         private sealed class UnionFind

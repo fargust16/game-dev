@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using GameDev.World.Landscape;
 using GameDev.World.Roads;
+using GameDev.World.Terrain;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -52,7 +54,7 @@ namespace GameDev.World.Roads.Tests
         [Test]
         public void BuildNetwork_NoGapInWall_FindsNoRoute()
         {
-            // Band (220m) exceeds RoadCost.MaxBridgeSpanMeters (200m) and spans every z - neither a
+            // Band (220m) exceeds RoadCost.MaxBridgeSpanMeters and spans every z - neither a
             // bridge nor a walk-around detour exists, so BuildNetwork must report that honestly
             // rather than fabricating a segment.
             var grid = new RoadGridSpec(0f, 0f, 35, 10, 10f);
@@ -158,7 +160,7 @@ namespace GameDev.World.Roads.Tests
             var branch = 0;
             foreach (var seg in segments)
             {
-                if (seg.Tier == RoadTier.Main)
+                if (seg.Tier == RoadTier.Primary)
                 {
                     main++;
                     Assert.IsTrue(isHub[seg.NodeA] && isHub[seg.NodeB], "Main edges must connect hubs only");
@@ -166,20 +168,19 @@ namespace GameDev.World.Roads.Tests
                 else
                 {
                     branch++;
-                    Assert.IsTrue(
-                        (isHub[seg.NodeA] && !isHub[seg.NodeB]) || (!isHub[seg.NodeA] && isHub[seg.NodeB]),
-                        "Branch edges must attach a non-hub to a hub");
+                    Assert.AreEqual(RoadTier.Secondary, seg.Tier);
+                    Assert.IsFalse(isHub[seg.NodeA], "Secondary NodeA is the non-town POI");
                 }
             }
 
-            Assert.AreEqual(2, main, "open TSP path over 3 hubs has 2 main edges");
-            Assert.AreEqual(2, branch, "each non-hub should get one branch spur");
+            Assert.AreEqual(2, main, "MST trade tree over 3 hubs has 2 main edges");
+            Assert.AreEqual(2, branch, "each non-hub should get one branch spur onto the main road");
 
-            // Main tract must be a single path visiting every hub (TSP open path), not a star.
+            // Main tract must span every hub (trade tree).
             var hubDegree = new Dictionary<int, int>();
             foreach (var seg in segments)
             {
-                if (seg.Tier != RoadTier.Main)
+                if (seg.Tier != RoadTier.Primary)
                 {
                     continue;
                 }
@@ -189,17 +190,18 @@ namespace GameDev.World.Roads.Tests
             }
 
             Assert.AreEqual(3, hubDegree.Count, "every hub must lie on the main tract");
-            var endpoints = 0;
-            foreach (var kv in hubDegree)
-            {
-                Assert.IsTrue(kv.Value == 1 || kv.Value == 2);
-                if (kv.Value == 1)
-                {
-                    endpoints++;
-                }
-            }
 
-            Assert.AreEqual(2, endpoints, "open TSP path has exactly two endpoints");
+            foreach (var seg in segments)
+            {
+                if (seg.Tier != RoadTier.Secondary)
+                {
+                    continue;
+                }
+
+                // Secondary NodeA is the POI; NodeB is a metadata anchor on the network (hub or prior POI).
+                Assert.IsFalse(isHub[seg.NodeA], "secondary NodeA is the non-town POI");
+                Assert.GreaterOrEqual(seg.Points.Count, 2);
+            }
         }
 
         [Test]
@@ -218,8 +220,112 @@ namespace GameDev.World.Roads.Tests
             Assert.AreEqual(2, segments.Count);
             foreach (var seg in segments)
             {
-                Assert.AreEqual(RoadTier.Main, seg.Tier);
+                Assert.AreEqual(RoadTier.Primary, seg.Tier);
             }
+        }
+
+        [Test]
+        public void BuildHierarchicalNetwork_PaintsCorridor_SoSecondHubPrefersExistingRoad()
+        {
+            var grid = new RoadGridSpec(0f, 0f, 40, 40, 10f);
+            float Height(float x, float z) => 10f;
+            BiomeId Biome(float x, float z) => BiomeId.Meadow;
+            var field = new LandscapeCostField(0f, 0f, 400f, 400f, 10f, Height, Biome, lakes: null);
+
+            var nodes = new List<Vector2>
+            {
+                new Vector2(20f, 50f),
+                new Vector2(380f, 50f),
+                new Vector2(200f, 80f),
+            };
+            var isHub = new List<bool> { true, true, true };
+
+            var seedPath = new List<Vector2>();
+            Assert.IsTrue(RoadPathfinder.TryFindPath(
+                grid, (x, z) => field.EvaluateAtTerrain(x, z), nodes[0], nodes[1], seedPath, out _));
+            field.PaintExistingRoad(seedPath);
+
+            var afterPaint = field.EvaluateAtTerrain(200f, 50f);
+            var offRoad = field.EvaluateAtTerrain(200f, 200f);
+            Assert.Less(afterPaint, offRoad * 0.5f, "painted corridor must be much cheaper");
+
+            var segments = RoadNetworkBuilder.BuildHierarchicalNetwork(
+                nodes, isHub, grid, field, Height);
+            Assert.GreaterOrEqual(segments.Count, 2);
+
+            RoadSegment spur = default;
+            var foundSpur = false;
+            foreach (var seg in segments)
+            {
+                if (seg.NodeA != 2 && seg.NodeB != 2)
+                {
+                    continue;
+                }
+
+                if (!foundSpur || EstimateLen(seg) < EstimateLen(spur))
+                {
+                    spur = seg;
+                    foundSpur = true;
+                }
+            }
+
+            Assert.IsTrue(foundSpur);
+            Assert.Less(EstimateLen(spur), 120f, "mid hub should snap with a short connector, not a parallel run");
+        }
+
+        [Test]
+        public void BuildHierarchicalNetwork_SecondaryAttachesToPrimaryPolyline()
+        {
+            var grid = new RoadGridSpec(0f, 0f, 40, 40, 10f);
+            float Height(float x, float z) => 10f;
+            BiomeId Biome(float x, float z) => BiomeId.Meadow;
+            var field = new LandscapeCostField(0f, 0f, 400f, 400f, 10f, Height, Biome, lakes: null);
+
+            var nodes = new List<Vector2>
+            {
+                new Vector2(20f, 50f),
+                new Vector2(380f, 50f),
+                new Vector2(200f, 200f),
+            };
+            var isHub = new List<bool> { true, true, false };
+
+            var segments = RoadNetworkBuilder.BuildHierarchicalNetwork(
+                nodes, isHub, grid, field, Height);
+
+            Assert.GreaterOrEqual(segments.Count, 2);
+            var secondary = 0;
+            var primary = 0;
+            foreach (var seg in segments)
+            {
+                if (seg.Tier == RoadTier.Secondary)
+                {
+                    secondary++;
+                    Assert.IsTrue(seg.NodeA == 2 || seg.NodeB == 2);
+                }
+                else
+                {
+                    primary++;
+                }
+            }
+
+            Assert.GreaterOrEqual(primary, 1);
+            Assert.AreEqual(1, secondary, "one secondary spur for the non-town POI");
+        }
+
+        private static float EstimateLen(RoadSegment seg)
+        {
+            if (seg.Points == null || seg.Points.Count < 2)
+            {
+                return float.PositiveInfinity;
+            }
+
+            var len = 0f;
+            for (var i = 0; i < seg.Points.Count - 1; i++)
+            {
+                len += Vector2.Distance(seg.Points[i], seg.Points[i + 1]);
+            }
+
+            return len;
         }
     }
 }

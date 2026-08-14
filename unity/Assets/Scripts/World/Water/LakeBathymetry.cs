@@ -47,18 +47,17 @@ namespace GameDev.World.Water
 
             public static Settings NaturalDefault => new Settings
             {
-                // Bottom contour ~33% smaller than shore (scale 0.67). Walls loft outer→inner as an arc.
-                InnerContourScale = 0.67f,
-                ShapeExponent = 2f,
+                // Very wide wall (~70% of R): gentle beach→basin, not a cliff ring.
+                InnerContourScale = 0.30f,
+                ShapeExponent = 1.6f,
                 NoiseAmplitude = 0f,
                 NoiseScaleRelativeToRadius = 0.65f,
-                ShoreEpsilonMeters = 0.03f,
+                ShoreEpsilonMeters = 0.05f,
                 MeanToMaxDepthRatio = 0f,
-                FlatBottomStartU = 0.67f,
-                // Inset model does not need medial-axis blur; light height soften only.
-                DistanceFieldSmoothPasses = 0,
-                InteriorHeightSmoothPasses = 3,
-                ShorePinMeters = 2.5f,
+                FlatBottomStartU = 0.30f,
+                DistanceFieldSmoothPasses = 2,
+                InteriorHeightSmoothPasses = 5,
+                ShorePinMeters = 1.5f,
             };
         }
 
@@ -84,8 +83,43 @@ namespace GameDev.World.Water
         }
 
         /// <summary>
+        /// Analytic basin depth from normalized distance-to-shore u∈[0,1] (0 = shore, 1 = deepest).
+        /// Two-stage bowl: gentle shore → main wall → nearly flat floor. No noise.
+        /// </summary>
+        public static float AnalyticBasinDepth01(float normalizedDistanceToShore, float maxDepthMeters)
+        {
+            var dMax = Mathf.Max(maxDepthMeters, 0f);
+            var u = Mathf.Clamp01(normalizedDistanceToShore);
+            if (dMax <= 1e-6f || u <= 1e-5f)
+            {
+                return 0f;
+            }
+
+            // 0–15%: very gentle shore shelf
+            if (u < 0.15f)
+            {
+                var t = u / 0.15f;
+                var shelf = t * t * (3f - 2f * t);
+                return dMax * 0.08f * shelf;
+            }
+
+            // 15–60%: main bowl wall
+            if (u < 0.60f)
+            {
+                var t = (u - 0.15f) / 0.45f;
+                var wall = WallArc01(t, 1.8f);
+                return dMax * Mathf.Lerp(0.08f, 0.92f, wall);
+            }
+
+            // 60–100%: nearly flat deep floor
+            var tDeep = (u - 0.60f) / 0.40f;
+            var flat = tDeep * tDeep * (3f - 2f * tDeep);
+            return dMax * Mathf.Lerp(0.92f, 1f, flat);
+        }
+
+        /// <summary>
         /// Depth from shore distance and characteristic radius (≈ outer contour size / d at centre).
-        /// Inside the inner contour → flat D<sub>max</sub>. In the wall ring → smooth arc.
+        /// Uses the two-stage analytic basin (no noise on the floor).
         /// </summary>
         public static float BaseDepthFromShoreDistance(
             float distanceToShoreMeters,
@@ -99,15 +133,18 @@ namespace GameDev.World.Water
                 return 0f;
             }
 
-            var wall = WallWidthMeters(characteristicRadiusMeters, settings);
-            if (distanceToShoreMeters >= wall)
+            var radius = Mathf.Max(characteristicRadiusMeters, 1f);
+            var u = Mathf.Clamp01(distanceToShoreMeters / radius);
+            var dig = AnalyticBasinDepth01(u, dMax);
+
+            // Optional legacy wall-scale nudge when InnerContourScale is used by tests.
+            var wall = WallWidthMeters(radius, settings);
+            if (distanceToShoreMeters >= wall && dig < dMax * 0.99f)
             {
-                // Inside the smaller contour — flat plate floor (no centre funnel).
-                return dMax;
+                dig = dMax;
             }
 
-            var t = distanceToShoreMeters / wall;
-            return Mathf.Clamp(dMax * WallArc01(t, settings.ShapeExponent), 0f, dMax);
+            return Mathf.Clamp(dig, 0f, dMax);
         }
 
         /// <summary>Legacy u-normalisation (tests / debug). Prefer inset <see cref="BaseDepthFromShoreDistance"/>.</summary>
@@ -189,6 +226,10 @@ namespace GameDev.World.Water
             int lakeSeed,
             Settings settings)
         {
+            _ = worldX;
+            _ = worldZ;
+            _ = lakeSeed;
+            // Analytic basin only — bed noise is intentionally disabled for LandscapePlanner.
             var radius = Mathf.Max(maxInteriorDistanceMeters, equivalentRadiusMeters, 1f);
             var d0 = BaseDepthFromShoreDistance(
                 distanceToShoreMeters, radius, maxDepthMeters, settings);
@@ -197,10 +238,8 @@ namespace GameDev.World.Water
                 return Mathf.Max(0f, settings.ShoreEpsilonMeters);
             }
 
-            var d = ApplyBedNoise(
-                d0, maxDepthMeters, worldX, worldZ, equivalentRadiusMeters, lakeSeed, settings);
-            var t = Mathf.Clamp01(distanceToShoreMeters / Mathf.Max(WallWidthMeters(radius, settings), 1e-3f));
-            return Mathf.Max(d, settings.ShoreEpsilonMeters * Mathf.Clamp01(t * 8f));
+            var t = Mathf.Clamp01(distanceToShoreMeters / Mathf.Max(radius, 1e-3f));
+            return Mathf.Max(d0, settings.ShoreEpsilonMeters * Mathf.Clamp01(t * 8f));
         }
 
         public static float MaxDepthForLake(

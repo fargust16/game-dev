@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.36
+Version: 0.37
 
 Status: Draft
 
-Last Updated: 2026-08-11
+Last Updated: 2026-08-14
 
 Depends On:
 All Canonical Documents
@@ -735,3 +735,81 @@ Work in progress.
 ## Deprecated
 
 Historical documentation kept for reference.
+
+---
+
+## Primary Road
+
+Overworld road tier connecting TownApproach hubs via a growing Prim network that snaps onto already-accepted corridors. See `RoadTier.Primary` and [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
+
+---
+
+## Secondary Road
+
+Overworld road tier attaching non-town POIs to the nearest good point on the existing road network (Primary + accepted Secondary). See `RoadTier.Secondary`.
+
+---
+
+## Local Road
+
+Overworld road tier reserved for short stubs to buildings / props. Enum and widths exist; generation deferred. See `RoadTier.Local`.
+
+---
+
+## POI Placement Profile
+
+Per-`PoiKind` hard constraints, soft preferences, relation rules, and optional footprint scoring used by `PoiPlacementEngine`. Adding a new marker type means adding a profile, not rewriting the engine. See [17](17%20Game%20Systems%20Architecture.md) W.4.
+
+---
+
+## Water Overlap
+
+Metres the water sheet expands beyond the lake shore iso so the mesh sinks under terrain banks (`WorldScale.WaterOverlapMeters`, ~1.75 m — InsetWidth). Basin dig expands further by buffer (`LakeBasinExpandMeters` = overlap + `WaterInsetBufferMeters`). World Generator UI label **Water Inset Width (m)** maps to this overlap (positive expand under banks — not a shrink). Prefer larger values over visible gaps or floating water edges.
+
+---
+
+## Water Inset Depth
+
+Vertical recess of the water plane under dry shore (`WorldScale.WaterInsetDepthMeters`, ~1.0 m). Shore shelf dig targets `waterY + InsetDepth`; steep shores add `slope * WaterInsetSlopeFactor` (capped at 1.5 m). Freeboard / spill helpers use at least this depth.
+
+---
+
+## Water Depth Offset
+
+Metres subtracted from a **low shore-rim percentile** (not the average) after headroom: `WaterLevel = LowRim − max(WaterDepthOffset, WaterInsetDepth)` (`WorldScale.WaterDepthOffsetMeters`, ~1.25 m). Average rim left the plane floating over downhill shores; low-rim spill keeps banks above the sheet. Downhill gaps get a capped shore-lip fill; the water mesh stays a continuous flat sheet and terrain conforms to it. A shore-strip blur removes heightmap stairs at the bank.
+
+---
+
+## World Definition
+
+Aggregate snapshot of one overworld generation: `WorldSeed`, `WorldGenSettings`, lakes (`LakeDefinition[]`), POIs (stable sorted markers), roads (`RoadDefinition[]`), and stats (lake count, road km, POI count). Scene holder: `OverworldWorldState`. Downstream systems read this instead of re-running placers. See [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
+
+---
+
+## Lake Placement Score
+
+Score used to pick lake sites from macro terrain: enclosing basin walls + low slope + low variance + edge distance − excavation − mountain/cliff. Hard-rejects sites that would destroy mountains or sit mid-slope / near map edge. Replaces naive `-height + rng` ranking. See `DistributedLakePlacer` / [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
+
+---
+
+## Max Lake Terrain Modification
+
+Cap (metres) on how far any heightmap sample may be dug below the pre-basin surface when applying a lake bowl (`WorldScale.LakeMaxTerrainModificationMeters`). Prevents mountain flanks from being excavated into cliffs. Candidates that would require more dig should be rejected at placement, not forced.
+
+---
+
+## World Sector Map
+
+Equal-size 3×3 partition of the overworld tile used for TownApproach and secondary POI quotas. Preferred towns: four corners + center hub; unsuitable sectors fall back to the nearest habitable neighbor. See `WorldSectorMap` / [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
+
+---
+
+## Shape Irregularity
+
+0–1 knob scaling low-frequency organic shore harmonics on a lake ellipse (default ~0.35). 0 ≈ perfect ellipse; ~0.45 = noticeable smooth bends; never fine tooth-noise.
+
+---
+
+## Terrain Conformity
+
+0–1 knob scaling how strongly macro terrain (smoothed height / basin) pulls lake shore radius and orientation (default ~0.75). Limited so lakes stay elongated ellipses, not copies of heightmap noise.

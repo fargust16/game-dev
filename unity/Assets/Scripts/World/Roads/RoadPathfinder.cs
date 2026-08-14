@@ -43,7 +43,8 @@ namespace GameDev.World.Roads
             Vector2 goalWorld,
             List<Vector2> pathOut,
             out float totalCost,
-            Func<float, float, float> heightMetersAtWorld = null)
+            Func<float, float, float> heightMetersAtWorld = null,
+            Func<Vector2, Vector2, bool> canBridgeSpan = null)
         {
             pathOut.Clear();
             totalCost = 0f;
@@ -116,10 +117,7 @@ namespace GameDev.World.Roads
                     var neighborCost = costAtWorld(neighborCenter.x, neighborCenter.y);
                     if (float.IsPositiveInfinity(neighborCost))
                     {
-                        // The immediate step is blocked (submerged) - see if a short bridge can
-                        // skip over it to the nearest dry landing in the same direction, instead of
-                        // giving up on this direction entirely.
-                        TryBridge(grid, costAtWorld, cx, cz, dx, dz, currentIndex, currentCenter,
+                        TryBridge(grid, costAtWorld, canBridgeSpan, cx, cz, dx, dz, currentIndex, currentCenter,
                             goalX, goalZ, gScore, cameFrom, visited, open);
                         continue;
                     }
@@ -188,6 +186,7 @@ namespace GameDev.World.Roads
         private static void TryBridge(
             RoadGridSpec grid,
             Func<float, float, float> costAtWorld,
+            Func<Vector2, Vector2, bool> canBridgeSpan,
             int cx, int cz, int dx, int dz,
             int currentIndex, Vector2 currentCenter,
             int goalX, int goalZ,
@@ -199,26 +198,32 @@ namespace GameDev.World.Roads
                 var fz = cz + dz * span;
                 if (fx < 0 || fx >= grid.Width || fz < 0 || fz >= grid.Height)
                 {
-                    return; // ran off the grid before finding dry land - no bridge here
+                    return;
                 }
 
                 var farCenter = grid.CellCenter(fx, fz);
                 var bridgeDistance = Vector2.Distance(currentCenter, farCenter);
                 if (bridgeDistance > RoadCost.MaxBridgeSpanMeters)
                 {
-                    return; // too far to bridge - let the pathfinder go around instead
+                    return;
                 }
 
                 var farIndex = grid.Index(fx, fz);
                 if (visited[farIndex])
                 {
-                    return; // already settled via a cheaper route - no point bridging to it
+                    return;
                 }
 
                 var farCost = costAtWorld(farCenter.x, farCenter.y);
                 if (float.IsPositiveInfinity(farCost))
                 {
-                    continue; // still over water, keep extending the span
+                    continue;
+                }
+
+                if (canBridgeSpan != null && !canBridgeSpan(currentCenter, farCenter))
+                {
+                    // Landing is dry but span crosses a lake (or other non-bridgeable water) — skip.
+                    return;
                 }
 
                 var bridgeCost = bridgeDistance * RoadCost.BridgeCostPerMeter;
@@ -230,7 +235,7 @@ namespace GameDev.World.Roads
                     open.Push(farIndex, tentative + Heuristic(grid, fx, fz, goalX, goalZ));
                 }
 
-                return; // found the first dry landing - stop scanning, a farther one only costs more
+                return;
             }
         }
 
