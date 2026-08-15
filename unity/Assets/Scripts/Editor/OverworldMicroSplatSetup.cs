@@ -65,8 +65,8 @@ namespace GameDev.EditorTools
 
         /// <summary>
         /// One slope/height splat scheme on every tile (degrees). Fallback when Vista left empty weights.
-        /// Sand prefers gentle sea-facing coasts (directed beach mask); cliff coast stays rock.
-        /// Yaw arc is a soft prior only — not a hard half-ring gate for underwater sand near shore.
+        /// Dry sand = ASL height band (not flood-distance ring). Underwater sand = near-land only.
+        /// Yaw arc biases cliff coasts only — never gates height-based sand.
         /// </summary>
         public static void PaintUnifiedIslandSplats(UnityEngine.Terrain[] terrains, int worldSeed = 0)
         {
@@ -91,6 +91,17 @@ namespace GameDev.EditorTools
                 : 0f;
             var useBeachArc = worldSeed != 0;
 
+            // Height-primary sand band (ASL metres). Wide soft fade above FullEnd; noise breaks contour rings.
+            var seaAsl = WorldScale.SeaLevelMeters;
+            const float sandFullEndAboveSea = 2.5f;
+            const float sandFadeEndAboveSea = 30f;
+            var sandFullEndAsl = seaAsl + sandFullEndAboveSea;
+            var sandFadeEndAsl = seaAsl + sandFadeEndAboveSea;
+            const float sandThresholdNoiseMeters = 7f;
+            const float sandNoiseMetersPerCycle = 95f;
+            // Underwater: still need land proximity so deep ocean floor is not all sand.
+            const float underwaterSandMaxDistMeters = 320f;
+
             for (var t = 0; t < terrains.Length; t++)
             {
                 var terrain = terrains[t];
@@ -113,22 +124,19 @@ namespace GameDev.EditorTools
                 var cx = WorldScale.WorldExtentXMeters * 0.5f;
                 var cz = WorldScale.WorldExtentZMeters * 0.5f;
                 // Match CoastalBeachShelf sea sampling (origin.y aware).
-                var sea01 = (WorldScale.SeaLevelMeters - terrainBaseY) / sizeY;
-                var snow01 = (WorldScale.SeaLevelMeters + WorldScale.SnowLineMeters - terrainBaseY) / sizeY;
-                // Beach sand: wide band, strong weights so MicroSplat reads as sand (not grass tint).
-                const float sandFullDistMeters = 100f;
-                const float sandMaxDistMeters = 260f;
-                var sandMaxAsl = WorldScale.SeaLevelMeters + 22f;
-                var sandMax01 = (sandMaxAsl - terrainBaseY) / sizeY;
+                var sea01 = (seaAsl - terrainBaseY) / sizeY;
+                var snow01 = (seaAsl + WorldScale.SnowLineMeters - terrainBaseY) / sizeY;
                 var cellMeters = Mathf.Max(0.25f, 0.5f * (sizeX + sizeZ) / Mathf.Max(1, hRes - 1));
-                var maxDistCells = Mathf.Max(4, Mathf.CeilToInt(sandMaxDistMeters / cellMeters) + 2);
-                var distSea = BuildFloodDist(heights, hRes, maxDistCells, h => h <= sea01);
+                var maxDistCells = Mathf.Max(
+                    4,
+                    Mathf.CeilToInt(underwaterSandMaxDistMeters / cellMeters) + 2);
+                // Only dist-to-land for underwater sand; dry sand ignores flood rings.
                 var distLand = BuildFloodDist(heights, hRes, maxDistCells, h => h > sea01);
 
                 var drySandPx = 0;
                 var wetSandPx = 0;
                 var underwaterSandPx = 0;
-                var dryNearCoast = 0;
+                var heightSandPx = 0;
 
                 for (var z = 0; z < res; z++)
                 {
@@ -138,10 +146,9 @@ namespace GameDev.EditorTools
                     {
                         var ux = x / (float)(res - 1);
                         var hx = Mathf.RoundToInt(ux * (hRes - 1));
-                        var dSea = MinDistNeighborhood(distSea, hRes, hz, hx);
                         var dLand = MinDistNeighborhood(distLand, hRes, hz, hx);
-                        // Center sample — max-neighborhood was pulling plateau height onto the rim.
                         var h = heights[hz, hx];
+                        var asl = terrainBaseY + h * sizeY;
 
                         for (var l = 0; l < layers.Length; l++)
                             maps[z, x, l] = 0f;
@@ -152,22 +159,18 @@ namespace GameDev.EditorTools
                         var beachW = useBeachArc
                             ? CoastalBeachShelf.BeachArcWeight(yawDeg, beachYawDeg)
                             : 1f;
-                        // Soft prior only for mild cliff/beach bias — never zeros sand.
-                        var sandPrior = useBeachArc
-                            ? Mathf.Lerp(0.65f, 1f, beachW)
-                            : 1f;
 
                         if (h <= sea01)
                         {
                             var dLandM = dLand < 0 ? 1e6f : dLand * cellMeters;
                             // Strong underwater sand near land (must read as sand, not rock tint).
-                            if (dLandM <= sandMaxDistMeters * 1.5f)
+                            if (dLandM <= underwaterSandMaxDistMeters)
                             {
                                 var proxim = 1f - Mathf.SmoothStep(
                                     8f,
-                                    sandMaxDistMeters * 1.5f,
+                                    underwaterSandMaxDistMeters,
                                     dLandM);
-                                var wetW = Mathf.Clamp01(Mathf.Lerp(0.55f, 1f, proxim) * sandPrior);
+                                var wetW = Mathf.Clamp01(Mathf.Lerp(0.55f, 1f, proxim));
                                 if (dLandM <= 60f)
                                     wetW = Mathf.Max(wetW, 0.88f);
                                 maps[z, x, shore] = wetW;
@@ -181,10 +184,8 @@ namespace GameDev.EditorTools
                             continue;
                         }
 
-                        var dMeters = dSea < 0 ? 1e6f : dSea * cellMeters;
-                        var lowShelf = h <= sandMax01;
-                        if ((dMeters <= sandMaxDistMeters || lowShelf) && sandPrior > 0.2f)
-                            dryNearCoast++;
+                        if (asl <= sandFadeEndAsl)
+                            heightSandPx++;
 
                         var hL = heights[hz, Mathf.Max(0, hx - 1)];
                         var hR = heights[hz, Mathf.Min(hRes - 1, hx + 1)];
@@ -196,31 +197,22 @@ namespace GameDev.EditorTools
                             Mathf.Atan2(riseX, stepX * 2f) * Mathf.Rad2Deg,
                             Mathf.Atan2(riseZ, stepZ * 2f) * Mathf.Rad2Deg);
 
+                        // Height-primary dry sand + spatial noise so the edge is not a contour ring.
+                        var n01 = SplatNoise01(worldX, worldZ, worldSeed, sandNoiseMetersPerCycle);
+                        var nSigned = (n01 - 0.5f) * 2f;
+                        var fullEnd = sandFullEndAsl + nSigned * (sandThresholdNoiseMeters * 0.45f);
+                        var fadeEnd = sandFadeEndAsl + nSigned * sandThresholdNoiseMeters;
+                        if (fadeEnd < fullEnd + 6f)
+                            fadeEnd = fullEnd + 6f;
+
                         var shoreW = 0f;
+                        if (asl <= fadeEnd)
                         {
-                            var byDist = 0f;
-                            if (dMeters <= sandMaxDistMeters)
-                            {
-                                byDist = 1f - Mathf.SmoothStep(sandFullDistMeters, sandMaxDistMeters, dMeters);
-                                if (dMeters <= sandFullDistMeters)
-                                    byDist = 1f;
-                            }
+                            if (asl <= fullEnd)
+                                shoreW = 1f;
+                            else
+                                shoreW = 1f - Mathf.SmoothStep(fullEnd, fadeEnd, asl);
 
-                            var byHeight = 0f;
-                            if (lowShelf)
-                            {
-                                byHeight = 1f - Mathf.SmoothStep(
-                                    WorldScale.SeaLevelMeters + 1.5f,
-                                    sandMaxAsl,
-                                    terrainBaseY + h * sizeY);
-                            }
-
-                            shoreW = Mathf.Max(byDist, byHeight) * sandPrior;
-                            // Near shoreline: dominate with sand so MicroSplat reads beige, not grass tint.
-                            if (dMeters <= 90f && slopeDeg < 55f)
-                                shoreW = Mathf.Max(shoreW, 0.82f * sandPrior);
-                            if (lowShelf && slopeDeg < 48f)
-                                shoreW = Mathf.Max(shoreW, 0.7f * sandPrior);
                             // Drop sand only on sheer walls.
                             shoreW *= 1f - Mathf.InverseLerp(58f, 78f, slopeDeg);
                             shoreW = Mathf.Clamp01(shoreW);
@@ -229,21 +221,27 @@ namespace GameDev.EditorTools
                         if (shoreW > 0.45f)
                             drySandPx++;
 
-                        // Coastal band: sand/grass win — no sawtooth rock ribbons on terrace faces.
-                        var inCoastBand = dMeters <= sandMaxDistMeters || lowShelf;
-                        var cliffBoost = useBeachArc && beachW < 0.12f && inCoastBand && slopeDeg > 55f
+                        // Low ASL shelf: sand/grass win — no sawtooth rock ribbons on terrace faces.
+                        var inSandBand = asl <= fadeEnd;
+                        var cliffBoost = useBeachArc && beachW < 0.12f && inSandBand && slopeDeg > 55f
                             ? Mathf.InverseLerp(55f, 75f, slopeDeg)
                             : 0f;
 
-                        var sandDominant = shoreW > 0.3f || (inCoastBand && slopeDeg < 50f);
+                        // Noise also softens rock onset so rock/grass joins are not contour-locked.
+                        var rockNoise = (SplatNoise01(worldX + 40f, worldZ - 17f, worldSeed ^ 0x5F3759DF, 70f) - 0.5f) * 8f;
+                        var rockStartDeg = 35f + rockNoise;
+                        var rockEndDeg = 62f + rockNoise * 0.5f;
+
+                        var sandDominant = shoreW > 0.25f || (inSandBand && slopeDeg < 50f);
                         var cliffW = sandDominant
                             ? Mathf.InverseLerp(70f, 88f, slopeDeg) * (1f - shoreW) * 0.35f
                             : Mathf.Max(cliffBoost, Mathf.InverseLerp(55f, 78f, slopeDeg));
                         var rockW = sandDominant
                             ? Mathf.InverseLerp(62f, 80f, slopeDeg) * (1f - shoreW) * 0.15f
-                            : Mathf.InverseLerp(35f, 62f, slopeDeg) * (1f - cliffW) * (1f - shoreW);
+                            : Mathf.InverseLerp(rockStartDeg, rockEndDeg, slopeDeg) * (1f - cliffW) *
+                              (1f - shoreW);
                         // Kill mid-slope rock ribbons in the beach transition (the "ladder" look).
-                        if (inCoastBand && slopeDeg < 58f)
+                        if (inSandBand && slopeDeg < 58f)
                         {
                             cliffW *= 0.08f;
                             rockW *= 0.12f;
@@ -284,9 +282,12 @@ namespace GameDev.EditorTools
                     }
                 }
 
-                // Soft sand↔grass fringe (multi-pass); never blur underwater wet sand into rock.
-                FeatherShoreGrassBlend(maps, res, shore, grass, rock, cliff, blurStrength: 0.55f, radius: 2);
-                FeatherShoreGrassBlend(maps, res, shore, grass, rock, cliff, blurStrength: 0.4f, radius: 1);
+                // Soft transitions: wide sand↔grass feather, then global alphamap blur (all layers).
+                FeatherShoreGrassBlend(maps, res, shore, grass, rock, cliff, blurStrength: 0.7f, radius: 4);
+                FeatherShoreGrassBlend(maps, res, shore, grass, rock, cliff, blurStrength: 0.55f, radius: 3);
+                FeatherShoreGrassBlend(maps, res, shore, grass, rock, cliff, blurStrength: 0.4f, radius: 2);
+                SoftenAllLayerBlends(maps, res, blurStrength: 0.5f, radius: 2);
+                SoftenAllLayerBlends(maps, res, blurStrength: 0.35f, radius: 1);
 
                 var shorePx = 0;
                 var shoreStrong = 0;
@@ -309,15 +310,15 @@ namespace GameDev.EditorTools
                 Debug.Log(
                     $"[Overworld] splat '{terrain.name}' shoreMean={shoreSum / (res * res):F3} " +
                     $"shorePx>0.15={shorePx} drySand={drySandPx} wetSand={wetSandPx} " +
-                    $"underwaterSand={underwaterSandPx} dryNearCoast={dryNearCoast} " +
-                    $"(of {res * res}) sandDist≤{sandMaxDistMeters:F0}m " +
+                    $"underwaterSand={underwaterSandPx} heightBandPx={heightSandPx} " +
+                    $"(of {res * res}) sandASL={sandFullEndAsl:F1}..{sandFadeEndAsl:F1} " +
                     $"beachYaw={(useBeachArc ? beachYawDeg.ToString("F0") : "off")}° " +
-                    $"sea={WorldScale.SeaLevelMeters:F1} sandMax={sandMaxAsl:F1}");
+                    $"sea={seaAsl:F1}");
             }
 
             Debug.Log(
                 $"[Overworld] Unified island splats on {terrains.Length} tiles " +
-                "(coast sand + soft beach prior; cliff coast prefers rock).");
+                "(height-band sand + underwater near-land; cliff coast prefers rock).");
         }
 
         private static int MinDistNeighborhood(int[,] dist, int hRes, int hz, int hx)
@@ -430,7 +431,7 @@ namespace GameDev.EditorTools
                 return;
 
             blurStrength = Mathf.Clamp01(blurStrength);
-            radius = Mathf.Clamp(radius, 1, 3);
+            radius = Mathf.Clamp(radius, 1, 5);
             var shoreBlur = new float[res, res];
             var cliffBlur = new float[res, res];
 
@@ -495,6 +496,89 @@ namespace GameDev.EditorTools
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Box-blur every alphamap layer then renormalize — softens rock/grass and residual hard edges.
+        /// Skips underwater wet-sand cells (grass≈0, rock carries seafloor).
+        /// </summary>
+        private static void SoftenAllLayerBlends(
+            float[,,] maps,
+            int res,
+            float blurStrength = 0.45f,
+            int radius = 2)
+        {
+            if (maps == null || res < 3)
+                return;
+
+            blurStrength = Mathf.Clamp01(blurStrength);
+            radius = Mathf.Clamp(radius, 1, 4);
+            var layerCount = maps.GetLength(2);
+            var blurred = new float[res, res, layerCount];
+
+            for (var z = 0; z < res; z++)
+            {
+                for (var x = 0; x < res; x++)
+                {
+                    for (var l = 0; l < layerCount; l++)
+                    {
+                        var acc = 0f;
+                        var w = 0f;
+                        for (var dz = -radius; dz <= radius; dz++)
+                        {
+                            for (var dx = -radius; dx <= radius; dx++)
+                            {
+                                var zz = z + dz;
+                                var xx = x + dx;
+                                if (zz < 0 || xx < 0 || zz >= res || xx >= res)
+                                    continue;
+                                var dist = Mathf.Abs(dx) + Mathf.Abs(dz);
+                                var k = dist == 0 ? 4f : (dist == 1 ? 2f : 1f);
+                                acc += maps[zz, xx, l] * k;
+                                w += k;
+                            }
+                        }
+
+                        blurred[z, x, l] = acc / Mathf.Max(1e-5f, w);
+                    }
+                }
+            }
+
+            for (var z = 0; z < res; z++)
+            {
+                for (var x = 0; x < res; x++)
+                {
+                    if (maps[z, x, 0] < 0.02f && maps[z, x, 3] > 0.05f)
+                        continue;
+
+                    var sum = 0f;
+                    for (var l = 0; l < layerCount; l++)
+                    {
+                        maps[z, x, l] = Mathf.Lerp(maps[z, x, l], blurred[z, x, l], blurStrength);
+                        sum += maps[z, x, l];
+                    }
+
+                    if (sum > 1e-5f)
+                    {
+                        for (var l = 0; l < layerCount; l++)
+                            maps[z, x, l] /= sum;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deterministic 0..1 spatial noise for splat thresholds (breaks contour rings).
+        /// </summary>
+        private static float SplatNoise01(float worldX, float worldZ, int seed, float metersPerCycle)
+        {
+            metersPerCycle = Mathf.Max(8f, metersPerCycle);
+            var s = seed * 0.00137f;
+            var fx = worldX / metersPerCycle + s;
+            var fz = worldZ / metersPerCycle + s * 1.73f;
+            var n = Mathf.PerlinNoise(fx, fz);
+            n = n * 0.62f + Mathf.PerlinNoise(fx * 2.17f + 19.1f, fz * 2.17f - 11.3f) * 0.38f;
+            return Mathf.Clamp01(n);
         }
 
         /// <summary>
@@ -621,7 +705,13 @@ namespace GameDev.EditorTools
             DisableHybridHeightBlend(list);
             // Convert can leave control maps stale; re-paint after Sync so sand sticks.
             PaintUnifiedIslandSplats(list.ToArray(), worldSeed);
+            // Per-tile alphamap blur does not cross tile borders — stitch shared edges.
+            var arr = list.ToArray();
+            TerrainTileSeams.DiagnoseAndWarn(arr, "after-splat-pre-stitch");
+            TerrainTileSeams.StitchAlphamaps(arr);
+            TerrainTileSeams.WireNeighbors(arr);
             JBooth.MicroSplat.MicroSplatTerrain.SyncAll();
+            TerrainTileSeams.DiagnoseAndWarn(arr, "after-seam-fix");
             Debug.Log(
                 $"[Overworld] MicroSplat Convert done: tiles={list.Count} layers={shared.Length} " +
                 $"(beach-arc splat + Convert + no HybridHeightBlend + re-paint, " +

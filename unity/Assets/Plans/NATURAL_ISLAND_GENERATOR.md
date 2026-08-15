@@ -54,7 +54,7 @@ WorldSeed forks
   → Vista GenerateAll → remap cache onto tiles
   → SyncFromGpu + ForceTileSize (1400, 700, 1400)
   → CoastalBeachShelf directed ≤12° profile + SmoothCoastBand (no terrace / no flood-ring ladder)
-  → C# coast splat (wet/dry/underwater sand, soft fringe) → MicroSplat Convert **without** HybridHeightBlend
+  → C# height-band coast splat (ASL Sea+0…Sea+16; underwater near-land) → MicroSplat Convert **without** HybridHeightBlend
   → WorldWater at SeaLevel (OverworldWater.mat)
   → GrassField (Polytope PT_Grass_02, full 2800×2800)
 ```

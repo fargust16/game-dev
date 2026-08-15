@@ -812,7 +812,7 @@ Pinwheel Vista Personal `LocalProceduralBiome`. **Quality SoT:** multi-LPB stack
 
 ## Terrain Surface Stack
 
-V0 overworld TerrainLayers painted by `OverworldMicroSplatSetup` then Converted to MicroSplat: **0 grass** (`MS_Moss_Fields`), **1 sand** (`MS_Shore_Sand`), **2 cliff** (`MS_Cliff_Rock`), **3 rock** (`MS_Rock_Cliff`). Coast geometry: `CoastalBeachShelf` ≤12° + SmoothCoastBand. Operator rules and anti-patterns: [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces. Never `_HYBRIDHEIGHTBLEND` on this bake.
+V0 overworld TerrainLayers painted by `OverworldMicroSplatSetup` then Converted to MicroSplat: **0 grass** (`MS_Moss_Fields`), **1 sand** (`MS_Shore_Sand`), **2 cliff** (`MS_Cliff_Rock`), **3 rock** (`MS_Rock_Cliff`). Dry sand = **ASL height band** (Sea+0…Sea+30) + spatial noise (breaks contour rings); underwater sand = near-land only; soft multi-pass alphamap blur. Coast geometry: `CoastalBeachShelf` ≤12° + SmoothCoastBand. Operator rules: [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces. Never `_HYBRIDHEIGHTBLEND` on this bake.
 
 ---
 

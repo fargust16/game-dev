@@ -30,7 +30,7 @@ Desired feel: one warm living fantasy world with soft joins — not four hard-co
 | Index | Layer asset | Role | When it wins |
 |-------|-------------|------|----------------|
 | 0 | `MS_Moss_Fields` (grass) | Dry plains / gentle slopes | Default inland; soft fringe with sand |
-| 1 | `MS_Shore_Sand` (shore) | Beach + wet / underwater shelf | Near sea by distance + low ASL; strong weights so sand reads beige |
+| 1 | `MS_Shore_Sand` (shore) | Beach + wet / underwater shelf | **Dry:** ASL band Sea+0…Sea+30 (full ≤Sea+2.5) + spatial noise. **Wet:** near land only. Soft fade into grass |
 | 2 | `MS_Cliff_Rock` (cliff) | Sheer faces | Steep only (≳70°); **suppressed** in coastal band &lt;58° |
 | 3 | `MS_Rock_Cliff` (rock) | Steep foothills / mountain slopes | Steep inland; **not** on beach transition terraces |
 
@@ -38,9 +38,9 @@ Do **not** invent parallel TerrainLayer stacks after Convert — channel remaps 
 
 ### Surface rules (operators)
 
-1. **Sand must stay visible underwater** near shore (water on or off). Wet sand is painted by proximity to land, not a hard yaw half-ring.
-2. **Grass↔sand** = soft multi-pass feather (`FeatherShoreGrassBlend`). No stair-step alphamap edge.
-3. **No sawtooth rock ribbons** on the beach rise — those came from integer flood-ring terraces + slope→rock paint. Fix = coast-band **height smooth** + kill cliff/rock in coastal band under ~58°.
+1. **Dry sand = ASL height band** (Sea+0…Sea+30, full ≤Sea+2.5) with **±~7 m spatial noise** so the edge is not a contour ring. Lakes / low shelves get sand too. **Underwater sand** stays near-land only.
+2. **Grass↔sand** = wide SmoothStep fade + multi-pass `FeatherShoreGrassBlend` + `SoftenAllLayerBlends` (all layers). No stair-step alphamap edge.
+3. **No sawtooth rock ribbons** on the beach rise — those came from integer flood-ring terraces + slope→rock paint. Fix = coast-band **height smooth** + kill cliff/rock in sand ASL band under ~58°.
 4. **Mountain rock/snow** may stay steep; do not flatten massifs for material joins ([rule 5](#how-to-read-this--the-reference-sheets)).
 5. Never enable MicroSplat **`_HYBRIDHEIGHTBLEND`** on this bake — it crushed shore weights to invisible.
 6. Plateau plains ≈ **55 m** ASL (~30–55 with remap); Outer falloff ≈ **420** local m. Do not raise island base to ~90 m “to look taller” — that recreates the mesa wall.
@@ -63,9 +63,12 @@ Vista LPB heights (IslandBase Replace + Mountain Raise)
 | Symptom | Cause | Fix |
 |---------|--------|-----|
 | Mesa / cake rim | Plateau ~90 m + short Outer falloff + slope-gated coast | Plateau ~55 m; falloff ~420; distance-based ≤12° carve |
-| No sand (even underwater) | Hard `beachW` gate / weak shore weights / HybridHeightBlend | Soft prior; strong wet sand near land; strip HybridHeightBlend |
-| Green→brown→green cake | Rock/cliff on moderate coastal slope | Suppress cliff/rock in coast band &lt;58°; sandDominant |
+| No sand (even underwater) | Hard `beachW` gate / weak shore weights / HybridHeightBlend | Height-band dry sand; strong wet sand near land; strip HybridHeightBlend |
+| Green→brown→green cake | Rock/cliff on moderate coastal slope | Suppress cliff/rock in sand ASL band &lt;58°; sandDominant |
 | Sawtooth / “ladder” rock at sand edge | Integer flood distance terraces + rock on step faces | `SmoothCoastBand` after carve; stronger shore↔grass feather |
+| Sand ring / donut only | Flood-distance or hard ASL contour paint | Dry sand by ASL + Perlin threshold noise; multi-pass blur |
+| Contour “staircase” sand↔grass | Hard height threshold + weak feather | Wider fade (≈30 m) + noise ±7 m + SoftenAllLayerBlends |
+| Black/white diagonal tile crack | Per-tile beach/splat blur + no `SetNeighbors` | `TerrainTileSeams` stitch + WireNeighbors; WARNING logs maxΔh / maxΔsplat |
 | Sand in alphamap but Scene looks green | shoreMax ≲0.4 or control not synced | Force shore ≥0.8 near shoreline; Convert → re-paint → SyncAll |
 
 Full island geology contract: [NATURAL_ISLAND_GENERATOR.md](NATURAL_ISLAND_GENERATOR.md), [VISTA_OVERWORLD_REFERENCE.md](VISTA_OVERWORLD_REFERENCE.md).

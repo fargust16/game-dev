@@ -513,6 +513,10 @@ namespace GameDev.EditorTools
             if (!demoAsIs)
             {
                 CoastalBeachShelf.ApplyAll(terrains, seed);
+                // Per-tile beach flood cannot match shared edges — stitch before splat.
+                TerrainTileSeams.DiagnoseAndWarn(terrains, "after-beach-pre-stitch");
+                TerrainTileSeams.StitchHeights(terrains);
+                TerrainTileSeams.WireNeighbors(terrains);
                 for (var i = 0; i < terrains.Length; i++)
                 {
                     if (terrains[i] != null)

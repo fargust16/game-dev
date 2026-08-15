@@ -203,7 +203,7 @@ order 40–49 City / Village ground   textures (+ light flatten later)
 
 **Automated bake** (`OverworldLpbBake`): IslandPlateau base + 1–3 Mountain LPBs with **Raise** (not KeepHigher stamp). Secondary menu: `Spawn Secondary LPB Scaffold` (orders 20–40).
 
-**Coast:** after Vista Generate, `CoastalBeachShelf` applies a **directed ≤12°** height profile on low/mid shelves, then **SmoothCoastBand** (removes flood-ring terraces). High cliff-azimuth walls may stay steep. Sand splat uses **strong** shore weights (including underwater) + multi-pass shore↔grass feather; cliff/rock suppressed on coastal slopes &lt;58°. MicroSplat Convert **without** `_HYBRIDHEIGHTBLEND`. Island Outer falloff SoT = **420** local m; plateau ≈ **55 m** ASL.
+**Coast:** after Vista Generate, `CoastalBeachShelf` applies a **directed ≤12°** height profile on low/mid shelves, then **SmoothCoastBand** (removes flood-ring terraces). High cliff-azimuth walls may stay steep. Sand splat uses **ASL height band** (Sea+0…Sea+30 + spatial noise) + multi-pass shore↔grass feather / SoftenAllLayerBlends; underwater sand near land only; cliff/rock suppressed on sand-band slopes &lt;58°. MicroSplat Convert **without** `_HYBRIDHEIGHTBLEND`. Island Outer falloff SoT = **420** local m; plateau ≈ **55 m** ASL.
 
 **Mask shapes:** Island = radius harmonics (not near-circle); Mountain = irregular ellipse + yaw; never one universal circular mask for every biome type.
 

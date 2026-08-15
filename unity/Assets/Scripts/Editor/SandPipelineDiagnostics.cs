@@ -123,12 +123,13 @@ namespace GameDev.EditorTools
             var terrainBaseY = origin.y;
             var seaLevel = WorldScale.SeaLevelMeters;
             var sea01 = (seaLevel - terrainBaseY) / sizeY;
-            var sandMaxAsl = seaLevel + 18f;
-            var sandMinAsl = seaLevel - 8f;
+            var sandFullEndAsl = seaLevel + 2.5f;
+            var sandFadeEndAsl = seaLevel + 30f;
             var cellMeters = Mathf.Max(0.25f, 0.5f * (sizeX + sizeZ) / Mathf.Max(1, hRes - 1));
-            const float sandMaxDistMeters = 220f;
-            var maxDistCells = Mathf.Max(4, Mathf.CeilToInt(sandMaxDistMeters / cellMeters) + 2);
-            var distSea = BuildFloodDist(heights, hRes, maxDistCells, h => h <= sea01);
+            const float underwaterSandMaxDistMeters = 320f;
+            var maxDistCells = Mathf.Max(
+                4,
+                Mathf.CeilToInt(underwaterSandMaxDistMeters / cellMeters) + 2);
             var distLand = BuildFloodDist(heights, hRes, maxDistCells, h => h > sea01);
             var cx = WorldScale.WorldExtentXMeters * 0.5f;
             var cz = WorldScale.WorldExtentZMeters * 0.5f;
@@ -174,7 +175,7 @@ namespace GameDev.EditorTools
             var probeDry = new Vector2Int(-1, -1);
             var probeGrass = new Vector2Int(-1, -1);
             var bestUnderSand = -1f;
-            var bestShore = 1e6f;
+            var bestShore = float.MaxValue;
             var bestDry = -1f;
             var bestGrassFar = -1f;
 
@@ -188,24 +189,13 @@ namespace GameDev.EditorTools
                     var hx = Mathf.RoundToInt(ux * (hRes - 1));
                     var h = heights[hz, hx];
                     var asl = terrainBaseY + h * sizeY;
-                    var dSea = MinDist(distSea, hRes, hz, hx);
                     var dLand = MinDist(distLand, hRes, hz, hx);
-                    var dSeaM = dSea < 0 ? 1e6f : dSea * cellMeters;
                     var dLandM = dLand < 0 ? 1e6f : dLand * cellMeters;
-                    var worldX = origin.x + ux * sizeX;
-                    var worldZ = origin.z + vz * sizeZ;
-                    var yawDeg = Mathf.Atan2(worldZ - cz, worldX - cx) * Mathf.Rad2Deg;
-                    var beachW = useBeachArc
-                        ? CoastalBeachShelf.BeachArcWeight(yawDeg, beachYawDeg)
-                        : 1f;
-
-                    var sandPrior = useBeachArc
-                        ? Mathf.Lerp(0.65f, 1f, beachW)
-                        : 1f;
                     var isUnder = h <= sea01;
+                    var inHeightSandBand = !isUnder && asl <= sandFadeEndAsl;
                     var isNearSea = isUnder
-                        ? dLandM <= sandMaxDistMeters * 1.5f
-                        : dSeaM <= sandMaxDistMeters;
+                        ? dLandM <= underwaterSandMaxDistMeters
+                        : inHeightSandBand;
                     if (isNearSea)
                         nearSea++;
                     if (isUnder)
@@ -218,11 +208,11 @@ namespace GameDev.EditorTools
                     sandCount++;
                     localMax = Mathf.Max(localMax, sandW);
 
-                    var maskWet = isUnder && dLandM <= sandMaxDistMeters * 1.5f && sandPrior > 0.2f;
+                    var maskWet = isUnder && dLandM <= underwaterSandMaxDistMeters;
                     var maskDry = !isUnder && sandW > 0.45f;
                     if (maskWet)
                         wetSand++;
-                    if (isUnder && sandW > 0.15f && dLandM <= sandMaxDistMeters * 1.5f)
+                    if (isUnder && sandW > 0.15f && dLandM <= underwaterSandMaxDistMeters)
                         underwaterSand++;
                     if (maskDry)
                         drySand++;
@@ -234,23 +224,24 @@ namespace GameDev.EditorTools
                         probeUnder = new Vector2Int(x, z);
                     }
 
-                    if (!isUnder && dSeaM < bestShore && dSeaM < 30f)
+                    if (!isUnder && asl < bestShore && asl <= sandFullEndAsl + 4f)
                     {
-                        bestShore = dSeaM;
+                        bestShore = asl;
                         probeShore = new Vector2Int(x, z);
                     }
 
-                    if (!isUnder && sandW > bestDry && asl < sandMaxAsl)
+                    if (!isUnder && sandW > bestDry && asl <= sandFadeEndAsl)
                     {
                         bestDry = sandW;
                         probeDry = new Vector2Int(x, z);
                     }
 
-                    if (!isUnder && dSeaM > 80f && dSeaM < 400f && sandW < 0.1f && asl > sandMaxAsl)
+                    if (!isUnder && sandW < 0.1f && asl > sandFadeEndAsl + 4f)
                     {
-                        if (dSeaM > bestGrassFar)
+                        var heightAbove = asl - sandFadeEndAsl;
+                        if (heightAbove > bestGrassFar)
                         {
-                            bestGrassFar = dSeaM;
+                            bestGrassFar = heightAbove;
                             probeGrass = new Vector2Int(x, z);
                         }
                     }
@@ -283,22 +274,23 @@ namespace GameDev.EditorTools
             var hybrid = KeywordEnabled(terrain, "_HYBRIDHEIGHTBLEND");
 
             Debug.Log(
-                $"[SandDiag] tile='{terrain.name}' seaLevel={seaLevel:F1} sandMin={sandMinAsl:F1} " +
-                $"sandMax={sandMaxAsl:F1} terrainMin={tMin:F1} terrainMax={tMax:F1}\n" +
-                $"  nearSea={nearSea} underWater={underWater} underwaterSand={underwaterSand} " +
+                $"[SandDiag] tile='{terrain.name}' seaLevel={seaLevel:F1} " +
+                $"sandASL={sandFullEndAsl:F1}..{sandFadeEndAsl:F1} " +
+                $"terrainMin={tMin:F1} terrainMax={tMax:F1}\n" +
+                $"  heightBand={nearSea} underWater={underWater} underwaterSand={underwaterSand} " +
                 $"wetSand={wetSand} drySand={drySand} " +
                 $"sandWeightMean={(sandCount > 0 ? sandSum / sandCount : 0f):F4} sandWeightMax={localMax:F3}\n" +
                 $"  shoreIndex={shoreIndex} layers=[{layerNames}] shader={shaderName} " +
                 $"hybridHeightBlend={hybrid} msControlShoreMean={msControlShoreMean:F4}");
 
             LogProbe(terrain, "underwaterNearShore", probeUnder, heights, maps, hRes, aRes, sizeY, terrainBaseY,
-                sea01, distSea, distLand, cellMeters, beachYawDeg, useBeachArc, shoreIndex, cx, cz, origin, sizeX, sizeZ);
+                sea01, distLand, cellMeters, beachYawDeg, useBeachArc, shoreIndex, cx, cz, origin, sizeX, sizeZ);
             LogProbe(terrain, "shoreline", probeShore, heights, maps, hRes, aRes, sizeY, terrainBaseY,
-                sea01, distSea, distLand, cellMeters, beachYawDeg, useBeachArc, shoreIndex, cx, cz, origin, sizeX, sizeZ);
+                sea01, distLand, cellMeters, beachYawDeg, useBeachArc, shoreIndex, cx, cz, origin, sizeX, sizeZ);
             LogProbe(terrain, "dryBeach", probeDry, heights, maps, hRes, aRes, sizeY, terrainBaseY,
-                sea01, distSea, distLand, cellMeters, beachYawDeg, useBeachArc, shoreIndex, cx, cz, origin, sizeX, sizeZ);
+                sea01, distLand, cellMeters, beachYawDeg, useBeachArc, shoreIndex, cx, cz, origin, sizeX, sizeZ);
             LogProbe(terrain, "grassBehind", probeGrass, heights, maps, hRes, aRes, sizeY, terrainBaseY,
-                sea01, distSea, distLand, cellMeters, beachYawDeg, useBeachArc, shoreIndex, cx, cz, origin, sizeX, sizeZ);
+                sea01, distLand, cellMeters, beachYawDeg, useBeachArc, shoreIndex, cx, cz, origin, sizeX, sizeZ);
 
             if (overlay != null)
             {
@@ -330,7 +322,6 @@ namespace GameDev.EditorTools
             float sizeY,
             float terrainBaseY,
             float sea01,
-            int[,] distSea,
             int[,] distLand,
             float cellMeters,
             float beachYawDeg,
@@ -354,7 +345,6 @@ namespace GameDev.EditorTools
             var hz = Mathf.RoundToInt(vz * (hRes - 1));
             var h = heights[hz, hx];
             var asl = terrainBaseY + h * sizeY;
-            var dSea = MinDist(distSea, hRes, hz, hx);
             var dLand = MinDist(distLand, hRes, hz, hx);
             var worldX = origin.x + ux * sizeX;
             var worldZ = origin.z + vz * sizeZ;
@@ -366,7 +356,6 @@ namespace GameDev.EditorTools
             var under = h <= sea01;
             Debug.Log(
                 $"[SandDiag] probe {label} '{terrain.name}' asl={asl:F2} under={under} " +
-                $"dSea={(dSea < 0 ? -1 : dSea * cellMeters):F1}m " +
                 $"dLand={(dLand < 0 ? -1 : dLand * cellMeters):F1}m " +
                 $"beachW={Mathf.Clamp01(beachW):F2} sandWeight={sandW:F3} yaw={yawDeg:F0}°");
         }
