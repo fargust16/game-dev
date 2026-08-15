@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.38
+Version: 0.43
 
 Status: Draft
 
-Last Updated: 2026-08-14
+Last Updated: 2026-08-15
 
 Depends On:
 All Canonical Documents
@@ -755,6 +755,82 @@ Overworld road tier attaching non-town POIs to the nearest good point on the exi
 Overworld road tier reserved for short stubs to buildings / props. Enum and widths exist; generation deferred. See `RoadTier.Local`.
 
 ---
+
+## TerrainBiomePalette
+
+Static remaps and albedo tile sizes for overworld `TerrainLayer` assets (Fields, Forest, Swamp, Dust, Highland, Rock, Snow, road looks). Applied at bake; read by MicroSplat / URP TerrainLit layers (custom `GameDev/Overworld/Terrain` deleted). Spec: [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md).
+
+---
+
+## RoadSurfaceStyle
+
+Tunables for packed-earth road alphamap paint: soft edge width (0.5–1.5 m), bed/transition coverage, gravel/ruts. Kept in sync with `GrassMask` road lawn (sparse residual at center, not bald). See `RoadSurfacePaint`.
+
+---
+
+## Overworld Terrain Shader
+
+**Retired** custom URP TerrainLit fork (`GameDev/Overworld/Terrain`) — deleted. Current SoT: **MicroSplat Core** (full shader needs MicroSplat URP adapter); until then TerrainLit + MicroSplat example textures via `OverworldMicroSplatSetup`. Do not reintroduce the custom fork.
+
+---
+
+## Sea Level
+
+World Y of the single water plane (`WorldScale.SeaLevelMeters`, default **24 m**). Full-square terrain continues under this as shelf/bathymetry; dry island sits above; inland lakes are closed depressions intersecting the same plane. WaterWorks `WorldWater` is placed here.
+
+---
+
+## Coastal Height Transition
+
+Directed post-Vista height pass (`CoastalBeachShelf`): profile targets **≤12°** over a wide band; island plains sit at **~55 m** ASL. Softens the rim, then **coast-band height smooth** removes flood-ring terraces (sawtooth rock faces). Sand splat uses strong shore weights + multi-pass shore↔grass feather; MicroSplat Convert **without** `_HYBRIDHEIGHTBLEND`. Debug: `GameDev/Overworld/Debug/Diagnose Sand Pipeline`.
+
+---
+
+## Island Occupancy
+
+Post-geography height pass (`IslandOccupancy`) that **only** enforces tile-border submersion below Sea Level (`MinimumSubmersionMeters` / shelf floor). Island silhouette and geology come from Vista LPB Anchors + Outer Falloff (not a radial pancake). Legacy `IslandNaturalGeography` is not used in the V0 Vista bake path.
+
+---
+
+## WorldWater
+
+Single overworld water GameObject (WaterWorks `Water_Plane` + `SSR_Water`) under `OverworldWater`, Y = Sea Level, covering the tile. Ocean and inland lakes share this plane. No per-lake water objects.
+
+---
+
+## WaterWorks
+
+Third-party URP water pack (`Assets/WaterWorks/`). Overworld SoT for the single water plane. `Water_Volume` renderer feature is stubbed for Unity 6 — do not enqueue. Not a river/waterfall mesh kit. See [ASSET_LIBRARY_REFERENCE.md](unity/Assets/Plans/ASSET_LIBRARY_REFERENCE.md) and [NATURAL_ISLAND_GENERATOR.md](unity/Assets/Plans/NATURAL_ISLAND_GENERATOR.md).
+
+---
+
+## Vista Biome
+
+Pinwheel Vista Personal `LocalProceduralBiome`. **Quality SoT:** multi-LPB stack on `Overworld_Generator` — [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md). Height budget **700 m**. Order bands: Geology (IslandBase Replace + Mountain **Raise**) → Hydrology → Ecology → Civilization. Island silhouette = **harmonic asymmetric Anchors + Outer Falloff + SoftFalloff BiomeMaskGraph**; coast = **directed CoastalBeachShelf** (no terrace ring); mountains = elongated ellipse anchors + wide falloff (not circular KeepHigher stamps). Drive layout with **`biome.seed`**. Terrain shading = C# coast/degree splat → MicroSplat Convert + URP6.3 **without** `_HYBRIDHEIGHTBLEND`; grass = Polytope Lowpoly `PT_Grass_02` via `GrassField`. Water look = `Assets/Settings/Water/OverworldWater.mat` (clone of WaterWorks SSR_Water).
+
+---
+
+## Terrain Surface Stack
+
+V0 overworld TerrainLayers painted by `OverworldMicroSplatSetup` then Converted to MicroSplat: **0 grass** (`MS_Moss_Fields`), **1 sand** (`MS_Shore_Sand`), **2 cliff** (`MS_Cliff_Rock`), **3 rock** (`MS_Rock_Cliff`). Coast geometry: `CoastalBeachShelf` ≤12° + SmoothCoastBand. Operator rules and anti-patterns: [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces. Never `_HYBRIDHEIGHTBLEND` on this bake.
+
+---
+
+## Snow Line
+
+Metres **above Sea Level** where snow paint may start (`WorldScale.SnowLineMeters`, default 95 m) — not a raw 0–1 heightmap fraction. Steep faces stay rock.
+
+---
+
+## One Click Add Water
+
+Third-party stylized water pack (OCW). **Demoted** — unused stylized fallback. Prefer WaterWorks `WorldWater`. Do not spawn per-lake OCW planes. Custom `LakeWater` removed. See [ASSET_LIBRARY_REFERENCE.md](unity/Assets/Plans/ASSET_LIBRARY_REFERENCE.md).
+
+---
+
+## Lake Safety Margin
+
+Metres above Sea Level that lake rims must maintain (`WorldScale.LakeSafetyMarginMeters`, ~6 m) so the single water plane cannot spill to the ocean.
 
 ## POI Placement Profile
 

@@ -107,8 +107,23 @@ namespace GameDev.World
         /// <summary>Minimum distance from map/usable edge to a lake center.</summary>
         public const float LakeEdgeMinDistanceMeters = 160f;
 
-        /// <summary>Guaranteed minimum lake count per overworld tile.</summary>
-        public const int LakeMinCount = 3;
+        /// <summary>Guaranteed minimum lake count per overworld island.</summary>
+        public const int LakeMinCount = 2;
+
+        /// <summary>
+        /// Preferred upper lake count. Actual count is seed-derived in
+        /// <c>[LakeMinCount, LakePreferredMaxCount]</c>.
+        /// </summary>
+        public const int LakePreferredMaxCount = 3;
+
+        /// <summary>
+        /// Terrain around a closed lake rim must stay above
+        /// <c>SeaLevel + LakeSafetyMargin</c> so the single water plane cannot spill to the ocean.
+        /// </summary>
+        public const float LakeSafetyMarginMeters = 6f;
+
+        /// <summary>Minimum inland water-region area (heightmap cells) to count as a valid lake.</summary>
+        public const int LakeMinCells = 48;
 
         // Area-fraction size tiers (of tile area) → equivalent radius via √(A/π).
         public const float LakeSmallAreaFracMin = 0.005f;
@@ -155,8 +170,86 @@ namespace GameDev.World
         public const float LandscapeCostCellMeters = 10f;
 
         // --- Macro geography ---
+        /// <summary>Edge length of one Unity Terrain tile (Vista grid cell).</summary>
         public const float OverworldTileMeters = 1400f;
+
+        /// <summary>Tiles along world +X.</summary>
+        public const int OverworldTileCountX = 2;
+
+        /// <summary>Tiles along world +Z.</summary>
+        public const int OverworldTileCountZ = 2;
+
+        /// <summary>
+        /// Outer falloff each per-tile Vista biome extends past the tile edge so neighboring
+        /// caches soft-blend. Keeps LPB footprint near demo scale (~tile + 2×overlap), not the
+        /// full world extent (world-extent biomes OOM simulation nodes).
+        /// </summary>
+        public const float VistaBiomeSeamOverlapMeters = 80f;
+
+        /// <summary>Full overworld width (tileCountX × tile size).</summary>
+        public static float WorldExtentXMeters => OverworldTileMeters * OverworldTileCountX;
+
+        /// <summary>Full overworld depth (tileCountZ × tile size).</summary>
+        public static float WorldExtentZMeters => OverworldTileMeters * OverworldTileCountZ;
+
         public const float ChunkSizeMeters = 64f;
-        public const float TerrainHeightBudgetMeters = 220f;
+        public const float TerrainHeightBudgetMeters = 700f;
+
+        /// <summary>
+        /// World Y of the ocean plane. Full terrain continues under this level as shelf/bathymetry;
+        /// dry island land sits above it. With <see cref="TerrainHeightBudgetMeters"/> = 700,
+        /// peaks have ~676 m of relief above water at default sea.
+        /// Lower than the old 32 m so Outer-falloff sand shelves sit above the waterline.
+        /// </summary>
+        public const float SeaLevelMeters = 24f;
+
+        /// <summary>
+        /// Soft margin from world edge to typical island coastline (ocean shelf toward the border).
+        /// Island silhouette stays inscribed inside the world extent square.
+        /// </summary>
+        public const float IslandOceanMarginMeters = 280f;
+
+        /// <summary>
+        /// Typical horizontal width of the directed coast transition (sea → green terrain).
+        /// Geometry SoT: <c>CoastalBeachShelf</c> (≤12° profile + coast-band smooth).
+        /// </summary>
+        public const float CoastShelfWidthMeters = 200f;
+
+        /// <summary>
+        /// Typical dry-sand band width above sea level (material paint guide).
+        /// </summary>
+        public const float BeachWidthMeters = 80f;
+
+        /// <summary>
+        /// Snow line as metres above <see cref="SeaLevelMeters"/> (not a raw 0–1 heightmap fraction).
+        /// </summary>
+        public const float SnowLineMeters = 95f;
+
+        /// <summary>How far below sea the outer shelf floor settles (metres of water column at tile edge).</summary>
+        public const float OceanShelfDepthMeters = 22f;
+
+        /// <summary>
+        /// Tile-border cells intended as ocean must sit at least this far below Sea Level
+        /// (prevents visible terrain/water gaps).
+        /// </summary>
+        public const float MinimumSubmersionMeters = 1.5f;
+
+        /// <summary>Minimum major peaks per island (seeded Mountain LPBs).</summary>
+        public const int PeakMinCount = 1;
+
+        /// <summary>Preferred peak count lower bound.</summary>
+        public const int PeakPreferredMinCount = 1;
+
+        /// <summary>Preferred peak count upper bound (1–3 natural mountains).</summary>
+        public const int PeakPreferredMaxCount = 2;
+
+        /// <summary>Minimum world-space distance between major peaks / massifs.</summary>
+        public const float PeakMinSeparationMeters = 480f;
+
+        /// <summary>
+        /// Mouth band: river carve may go at/below Sea Level only within this many metres of the ocean
+        /// (cells with landMask near 0 / near coastline). Inland beds stay above Sea Level.
+        /// </summary>
+        public const float RiverMouthSeaBandMeters = 90f;
     }
 }

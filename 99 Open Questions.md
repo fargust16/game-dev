@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.22
+Version: 0.24
 
 Status: Draft
 
-Last Updated: 2026-08-14
+Last Updated: 2026-08-15
 
 Depends On:
 All Canonical Documents
@@ -125,6 +125,12 @@ Chunk = **64 m**; stub playable ≈ **512 m** with infinite-capable chunk API; I
 
 **Is the OrganicTown / City Generation prototype a reuse source for the new pipeline?**  
 No. [13 City Generation](13%20City%20Generation.md) is Deprecated: not viable (not modular, not optimized, did not read as a real city), not a bridge, not extended. Only generic non-city-specific ideas (deterministic `WorldSeed` fork-by-name) carry forward.
+
+**Overworld terrain height budget?**  
+**700 m** — `WorldScale.TerrainHeightBudgetMeters` matches VistaManager `terrainMaxHeight` and tile `size.y`. Documented in [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md).
+
+**How is the island / ocean silhouette framed?**  
+Harmonic asymmetric LPB **Anchors** + **Outer Falloff (~420 local m)** + **SoftFalloff BiomeMaskGraph** on `LPB_IslandBase` (order 0, IslandPlateau graph, Height Replace, rolling plains **~55 m** / ASL ~30–55). Soft coast via `CoastalBeachShelf` ≤12° + SmoothCoastBand into `WorldWater` at Sea Level **24 m**. Surface paint: grass / sand / cliff / rock (`OverworldMicroSplatSetup`); sand stays visible underwater; no `_HYBRIDHEIGHTBLEND`. Mountains are **separate** LPBs (order 10–19) with elongated ellipse anchors, wide falloff, and **Raise** height delta — not circular KeepHigher stamps and not one Mountain graph for the whole island. Order bands: Geology → Hydrology → Ecology → Civilization. Documented in [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md) and [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces.
 
 ---
 
@@ -265,6 +271,10 @@ When does live Settlement / overworld chunk streaming consume `IBuildingShellBin
 Should Local road stubs be generated as a third Prim pass after Secondary, or only when Settlement / building pads exist? ([LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md))
 
 When do `PoiPlacementProfile` C# catalog entries move into ScriptableObject immutable defs for authoring? ([17](17%20Game%20Systems%20Architecture.md) W.4)
+
+Do we ever allow alpine lakes above Sea Level (extra water planes), or stay Valheim-style single plane forever? ([NATURAL_ISLAND_GENERATOR.md](unity/Assets/Plans/NATURAL_ISLAND_GENERATOR.md))
+
+What asset/API provides waterfall meshes once WaterWorks is confirmed to lack one? ([NATURAL_ISLAND_GENERATOR.md](unity/Assets/Plans/NATURAL_ISLAND_GENERATOR.md))
 
 ---
 
