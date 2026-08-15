@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using GameDev.World.Water;
+using GameDev.World.Roads;
 using UnityEngine;
 
 namespace GameDev.World.Vegetation
 {
     /// <summary>
-    /// Soft exclusion around gameplay clearings (roads, POIs, settlements, planned lakes).
-    /// Returns a 0..1 multiplier — 0 at the cleared core, 1 in undisturbed wild.
+    /// Soft exclusion around gameplay clearings (roads, POIs, settlements).
+    /// Returns a 0..1 multiplier — near-0 at cleared cores, 1 in undisturbed wild.
     /// </summary>
     public sealed class VegetationClearance
     {
@@ -29,23 +29,20 @@ namespace GameDev.World.Vegetation
         private readonly IReadOnlyList<Vector2> roadSamples;
         private readonly float roadClearRadius;
         private readonly float roadFalloff;
-        private readonly IReadOnlyList<LakeDefinition> lakes;
-        private readonly float lakeShoreFalloff;
+        private readonly float roadMinAtCore;
 
         public VegetationClearance(
             IReadOnlyList<Disk> disks,
             IReadOnlyList<Vector2> roadSamples,
             float roadClearRadius,
             float roadFalloff,
-            IReadOnlyList<LakeDefinition> lakes = null,
-            float lakeShoreFalloffMeters = 6f)
+            float roadMinAtCore = 0f)
         {
             this.disks = disks ?? Array.Empty<Disk>();
             this.roadSamples = roadSamples ?? Array.Empty<Vector2>();
             this.roadClearRadius = Mathf.Max(0f, roadClearRadius);
             this.roadFalloff = Mathf.Max(0.01f, roadFalloff);
-            this.lakes = lakes ?? Array.Empty<LakeDefinition>();
-            this.lakeShoreFalloff = Mathf.Max(0.01f, lakeShoreFalloffMeters);
+            this.roadMinAtCore = Mathf.Clamp01(roadMinAtCore);
         }
 
         public static VegetationClearance None { get; } =
@@ -62,36 +59,24 @@ namespace GameDev.World.Vegetation
                 var dist = Vector2.Distance(p, d.Center);
                 mul = Mathf.Min(mul, FalloffMultiplier(dist, d.ClearRadius, d.Falloff));
                 if (mul <= 0f)
-                {
                     return 0f;
-                }
             }
 
-            if (roadSamples.Count > 0 && roadClearRadius > 0f)
+            if (RoadLawnMask.HasCpuBake)
+            {
+                mul = Mathf.Min(mul, RoadLawnMask.SampleBakedLawn01(worldX, worldZ));
+                if (mul <= 0f)
+                    return 0f;
+            }
+            else if (roadSamples.Count > 0 && roadClearRadius > 0f)
             {
                 var nearest = NearestRoadDistanceSq(p);
                 var dist = Mathf.Sqrt(nearest);
-                mul = Mathf.Min(mul, FalloffMultiplier(dist, roadClearRadius, roadFalloff));
+                mul = Mathf.Min(
+                    mul,
+                    FalloffMultiplier(dist, roadClearRadius, roadFalloff, roadMinAtCore));
                 if (mul <= 0f)
-                {
                     return 0f;
-                }
-            }
-
-            for (var i = 0; i < lakes.Count; i++)
-            {
-                // Positive inside basin → fully excluded; negative outside with shore falloff.
-                var sd = lakes[i].BasinSignedDistance(worldX, worldZ);
-                if (sd >= 0f)
-                {
-                    return 0f;
-                }
-
-                mul = Mathf.Min(mul, FalloffMultiplier(-sd, 0f, lakeShoreFalloff));
-                if (mul <= 0f)
-                {
-                    return 0f;
-                }
             }
 
             return mul;
@@ -99,34 +84,27 @@ namespace GameDev.World.Vegetation
 
         private float NearestRoadDistanceSq(Vector2 p)
         {
-            var best = float.PositiveInfinity;
-            for (var i = 0; i < roadSamples.Count; i++)
-            {
-                var d = (roadSamples[i] - p).sqrMagnitude;
-                if (d < best)
-                {
-                    best = d;
-                }
-            }
-
-            return best;
+            var dist = RoadSampleDistance.NearestMeters(p, roadSamples);
+            return dist * dist;
         }
 
         public static float FalloffMultiplier(float distance, float clearRadius, float falloff)
         {
+            return FalloffMultiplier(distance, clearRadius, falloff, minAtCore: 0f);
+        }
+
+        public static float FalloffMultiplier(float distance, float clearRadius, float falloff, float minAtCore)
+        {
+            minAtCore = Mathf.Clamp01(minAtCore);
             if (distance <= clearRadius)
-            {
-                return 0f;
-            }
-
-            var t = (distance - clearRadius) / falloff;
+                return minAtCore;
+            var span = Mathf.Max(falloff, 0.01f);
+            var t = (distance - clearRadius) / span;
             if (t >= 1f)
-            {
                 return 1f;
-            }
-
             t = Mathf.Clamp01(t);
-            return t * t * (3f - 2f * t);
+            t = t * t * (3f - 2f * t);
+            return Mathf.Lerp(minAtCore, 1f, t);
         }
     }
 }

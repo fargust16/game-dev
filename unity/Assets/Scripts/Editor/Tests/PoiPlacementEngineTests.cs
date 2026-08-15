@@ -72,7 +72,7 @@ namespace GameDev.World.Poi.Tests
             // Left half flat, right half steep.
             float Height(float x, float z) => x < 200f ? 10f : 10f + (x - 200f) * 0.4f;
             BiomeId Biome(float x, float z) => BiomeId.Meadow;
-            var field = new LandscapeCostField(0f, 0f, 512f, 512f, 16f, Height, Biome, lakes: null);
+            var field = new LandscapeCostField(0f, 0f, 512f, 512f, 16f, Height, Biome);
 
             var chunks = new List<ChunkCoord>();
             for (var z = 0; z < 8; z++)
@@ -191,7 +191,7 @@ namespace GameDev.World.Poi.Tests
 
             float Height(float x, float z) => 20f;
             BiomeId Biome(float x, float z) => BiomeId.Meadow;
-            var field = new LandscapeCostField(0f, 0f, 960f, 960f, 32f, Height, Biome, lakes: null);
+            var field = new LandscapeCostField(0f, 0f, 960f, 960f, 32f, Height, Biome);
             var chunks = GridChunks(15);
             var markers = new PoiPlacementEngine(
                 new global::GameDev.World.Seed.WorldSeed(123),

@@ -38,7 +38,8 @@ namespace GameDev.World.Roads
             var worldPerPixelX = size.x / resolution;
             var worldPerPixelZ = size.z / resolution;
 
-            var transition = Mathf.Clamp(RoadSurfaceStyle.TransitionMeters, 1.5f, 3.0f);
+            var transition = RoadSurfaceStyle.SoftRimMeters(
+                Mathf.Max(worldPerPixelX, worldPerPixelZ));
 
             for (var r = 0; r < roads.Count; r++)
             {
@@ -49,8 +50,7 @@ namespace GameDev.World.Roads
                 }
 
                 var halfRoad = Mathf.Max(0.5f, road.RoadWidthMeters * 0.5f);
-                var shoulder = Mathf.Max(0f, road.ShoulderMeters);
-                var packedEnd = halfRoad + shoulder * 0.55f;
+                var packedEnd = halfRoad;
                 var blendEnd = packedEnd + transition;
                 var rutOffset = halfRoad * RoadSurfaceStyle.RutOffsetFraction;
 
@@ -231,7 +231,7 @@ namespace GameDev.World.Roads
 
         /// <summary>
         /// Repaint roads from densified clearance samples (when full <see cref="RoadDefinition"/>
-        /// list is not available). Uses radial packed-earth stamps.
+        /// list is not available). Uses segment distance between ordered samples (not radial stamps).
         /// </summary>
         public static void PaintFromClearanceSamples(
             UnityEngine.Terrain terrain,
@@ -242,6 +242,7 @@ namespace GameDev.World.Roads
             TerrainLayer edgeLayer,
             TerrainLayer gravelLayer)
         {
+            _ = shoulderMeters; // height shoulder stays in WorldScale; packed paint uses halfRoad only.
             if (terrain == null || terrain.terrainData == null ||
                 samples == null || samples.Count == 0 || centerLayer == null)
             {
@@ -263,31 +264,37 @@ namespace GameDev.World.Roads
             var worldPerPixelZ = size.z / resolution;
 
             var halfRoad = Mathf.Max(0.5f, roadWidthMeters * 0.5f);
-            var packedEnd = halfRoad + Mathf.Max(0f, shoulderMeters) * 0.55f;
-            var blendEnd = packedEnd + Mathf.Clamp(RoadSurfaceStyle.TransitionMeters, 1.5f, 3.0f);
-            var stampR = blendEnd;
-            var metersPerPx = Mathf.Min(worldPerPixelX, worldPerPixelZ);
-            var stampPx = Mathf.CeilToInt(stampR / metersPerPx) + 1;
+            var packedEnd = halfRoad;
+            var transition = RoadSurfaceStyle.SoftRimMeters(
+                Mathf.Max(worldPerPixelX, worldPerPixelZ));
+            var blendEnd = packedEnd + transition;
+            var pad = blendEnd + 2.5f;
 
-            for (var i = 0; i < samples.Count; i++)
+            for (var i = 0; i < samples.Count - 1; i++)
             {
-                var s = samples[i];
-                var cx = Mathf.FloorToInt((s.x - terrainPos.x) / worldPerPixelX);
-                var cz = Mathf.FloorToInt((s.y - terrainPos.z) / worldPerPixelZ);
-                var minX = Mathf.Max(0, cx - stampPx);
-                var maxX = Mathf.Min(resolution - 1, cx + stampPx);
-                var minZ = Mathf.Max(0, cz - stampPx);
-                var maxZ = Mathf.Min(resolution - 1, cz + stampPx);
-
-                for (var z = minZ; z <= maxZ; z++)
+                var a = samples[i];
+                var b = samples[i + 1];
+                var ab = b - a;
+                var len = ab.magnitude;
+                if (len < 1e-4f || len > RoadSampleDistance.MaxSegmentGapMeters)
                 {
-                    var worldZ = terrainPos.z + (z + 0.5f) * worldPerPixelZ;
-                    for (var x = minX; x <= maxX; x++)
+                    continue;
+                }
+
+                var dir = ab / len;
+                var minAx = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(a.x, b.x) - pad - terrainPos.x) / worldPerPixelX));
+                var maxAx = Mathf.Min(resolution - 1, Mathf.CeilToInt((Mathf.Max(a.x, b.x) + pad - terrainPos.x) / worldPerPixelX));
+                var minAz = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(a.y, b.y) - pad - terrainPos.z) / worldPerPixelZ));
+                var maxAz = Mathf.Min(resolution - 1, Mathf.CeilToInt((Mathf.Max(a.y, b.y) + pad - terrainPos.z) / worldPerPixelZ));
+
+                for (var z = minAz; z <= maxAz; z++)
+                {
+                    for (var x = minAx; x <= maxAx; x++)
                     {
                         var worldX = terrainPos.x + (x + 0.5f) * worldPerPixelX;
-                        var dx = worldX - s.x;
-                        var dz = worldZ - s.y;
-                        var dist = Mathf.Sqrt(dx * dx + dz * dz);
+                        var worldZ = terrainPos.z + (z + 0.5f) * worldPerPixelZ;
+                        var p = new Vector2(worldX, worldZ);
+                        var dist = RoadSampleDistance.PointToSegmentMeters(p, a, b);
                         if (dist > blendEnd)
                         {
                             continue;
@@ -299,11 +306,13 @@ namespace GameDev.World.Roads
                             ? SampleEdgeMask(dist, halfRoad, packedEnd, blendEnd)
                             : 0f;
 
+                        var along = (a.x + b.x) * 0.37f + (a.y + b.y) * 0.71f;
                         var rough = Hash01(x * 73856093 ^ z * 19349663 ^ i * 83492791);
+                        var alongRough = 0.5f + 0.5f * Mathf.Sin(along * 0.19f + rough * 6.28f);
                         var roughMul = Mathf.Lerp(
                             1f - RoadSurfaceStyle.RoughnessVariation * 0.45f,
                             1f + RoadSurfaceStyle.RoughnessVariation * 0.25f,
-                            rough);
+                            Mathf.Lerp(rough, alongRough, 0.45f));
 
                         var centerW = Mathf.Clamp01(
                             centerMask * RoadSurfaceStyle.CenterStrength *
@@ -349,7 +358,7 @@ namespace GameDev.World.Roads
             data.SetAlphamaps(0, 0, alphamaps);
             Debug.Log(
                 $"[Roads] Repainted packed-earth surface from {samples.Count} clearance samples " +
-                $"(width={roadWidthMeters:F1}m). BedCoverage={RoadSurfaceStyle.BedCoverage:F2}.");
+                $"(width={roadWidthMeters:F1}m, segment SDF). BedCoverage={RoadSurfaceStyle.BedCoverage:F2}.");
         }
 
         /// <summary>

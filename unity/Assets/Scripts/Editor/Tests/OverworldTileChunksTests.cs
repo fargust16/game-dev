@@ -1,4 +1,3 @@
-using Den.Tools;
 using GameDev.World.Streaming;
 using NUnit.Framework;
 
@@ -9,8 +8,8 @@ namespace GameDev.World.Streaming.Tests
         [Test]
         public void CoveringTile_ZeroMargin_IncludesEveryChunkTouchingTheTile()
         {
-            var tileSize = new Vector2D(256f, 256f); // 4x4 chunks at ChunkCoord.ChunkSize=64
-            var chunks = OverworldTileChunks.CoveringTile(new Coord(0, 0), tileSize, marginMeters: 0f);
+            // 4x4 chunks at ChunkCoord.ChunkSize=64
+            var chunks = OverworldTileChunks.CoveringTile(0, 0, 256f, 256f, marginMeters: 0f);
 
             Assert.AreEqual(16, chunks.Count);
         }
@@ -23,8 +22,7 @@ namespace GameDev.World.Streaming.Tests
             // the unfiltered tile extent - this is exactly the case a corner-based range check
             // (checking only whether the chunk's INDEX overlaps the inset rectangle, not whether
             // its actual center does) gets wrong.
-            var tileSize = new Vector2D(256f, 256f);
-            var chunks = OverworldTileChunks.CoveringTile(new Coord(0, 0), tileSize, marginMeters: 40f);
+            var chunks = OverworldTileChunks.CoveringTile(0, 0, 256f, 256f, marginMeters: 40f);
 
             foreach (var chunk in chunks)
             {
@@ -43,8 +41,7 @@ namespace GameDev.World.Streaming.Tests
             // very first chunk's center (32m from the true edge) already clears it, so it should
             // still be included - the fix must not overcorrect into excluding everything near an
             // edge regardless of how small the margin is.
-            var tileSize = new Vector2D(256f, 256f);
-            var chunks = OverworldTileChunks.CoveringTile(new Coord(0, 0), tileSize, marginMeters: 20f);
+            var chunks = OverworldTileChunks.CoveringTile(0, 0, 256f, 256f, marginMeters: 20f);
 
             var found = false;
             foreach (var chunk in chunks)
@@ -61,8 +58,7 @@ namespace GameDev.World.Streaming.Tests
         [Test]
         public void CoveringTile_NonOriginTile_OffsetsCorrectly()
         {
-            var tileSize = new Vector2D(256f, 256f);
-            var chunks = OverworldTileChunks.CoveringTile(new Coord(1, 0), tileSize, marginMeters: 0f);
+            var chunks = OverworldTileChunks.CoveringTile(1, 0, 256f, 256f, marginMeters: 0f);
 
             foreach (var chunk in chunks)
             {

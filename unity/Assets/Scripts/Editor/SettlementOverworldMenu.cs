@@ -1,12 +1,9 @@
 #if UNITY_EDITOR
-using Den.Tools;
 using GameDev.World.Buildings.Shell;
 using GameDev.World.Poi;
 using GameDev.World.Settlement;
 using GameDev.World.Terrain;
 using GameDev.World.Water;
-using MapMagic.Core;
-using MapMagic.Terrains;
 using UnityEditor;
 using UnityEngine;
 
@@ -22,30 +19,18 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Place Settlement At TownApproach")]
         public static void PlaceSettlementAtTownApproach()
         {
-            var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
-            if (mapMagic == null || mapMagic.graph == null)
+            var terrain = OverworldTerrainAccess.FindTerrain();
+            if (terrain == null)
             {
                 return;
             }
 
-            var tileCoord = new Coord(0, 0);
-            var tile = mapMagic.tiles[tileCoord];
-            var terrain = tile?.main?.terrain;
-            var holder = terrain != null ? terrain.GetComponent<DirectMatricesHolder>() : null;
-            if (holder == null)
-            {
-                return;
-            }
-
-            var markers = OverworldWorldPlan.GetOrBuildPois(mapMagic, tileCoord);
+            var markers = OverworldWorldPlan.GetOrBuildPois();
             if (!SettlementApproachBinder.TryFindTownApproach(markers, out var approach))
             {
                 return;
             }
-
-            var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
-            var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
-            IWaterSampler water = new CompositeWaterSampler(lakeZones, riverZones);
+            IWaterSampler water = SeaLevelOceanSampler.FromTerrain(terrain);
             // Must clear before height probes — otherwise Raycast hits prior shells/cylinder and
             // SnapFabric lifts the whole town into the air.
             ClearSettlement();
@@ -94,7 +79,49 @@ namespace GameDev.EditorTools
             mat.color = new Color(0.9f, 0.85f, 0.1f);
             mr.sharedMaterial = mat;
 
+            var dustLayer = EnsureDustTerrainLayer();
+            if (dustLayer != null && terrain != null)
+            {
+                SettlementDustPaint.Paint(terrain, fabric, dustLayer);
+            }
+
             Selection.activeGameObject = root;
+        }
+
+        private static TerrainLayer EnsureDustTerrainLayer()
+        {
+            const string path = "Assets/Settings/TerrainLayers/Dirt_Settlement_Dust.terrainlayer";
+            var existing = AssetDatabase.LoadAssetAtPath<TerrainLayer>(path);
+            if (existing != null)
+            {
+                TerrainBiomePalette.Apply(existing, TerrainBiomePalette.Dust, TerrainBiomePalette.AlbedoTileMeters);
+                EditorUtility.SetDirty(existing);
+                return existing;
+            }
+
+            var source = AssetDatabase.LoadAssetAtPath<TerrainLayer>(
+                "Assets/Settings/TerrainLayers/Dirt_Scaled.terrainlayer");
+            if (source == null)
+            {
+                return null;
+            }
+
+            if (!AssetDatabase.IsValidFolder("Assets/Settings"))
+            {
+                AssetDatabase.CreateFolder("Assets", "Settings");
+            }
+
+            if (!AssetDatabase.IsValidFolder("Assets/Settings/TerrainLayers"))
+            {
+                AssetDatabase.CreateFolder("Assets/Settings", "TerrainLayers");
+            }
+
+            var layer = Object.Instantiate(source);
+            layer.name = "Dirt_Settlement_Dust";
+            TerrainBiomePalette.Apply(layer, TerrainBiomePalette.Dust, TerrainBiomePalette.AlbedoTileMeters);
+            AssetDatabase.CreateAsset(layer, path);
+            AssetDatabase.SaveAssets();
+            return layer;
         }
 
         [MenuItem("GameDev/Overworld/Clear Overworld Settlement")]
@@ -102,7 +129,9 @@ namespace GameDev.EditorTools
         {
             var root = GameObject.Find(RootObjectName);
             if (root != null)
+            {
                 Object.DestroyImmediate(root);
+            }
         }
 
         /// <summary>Editor height probe — prefer TerrainCollider, else nearest ground hit.</summary>

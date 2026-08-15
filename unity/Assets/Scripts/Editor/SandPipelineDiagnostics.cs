@@ -124,7 +124,7 @@ namespace GameDev.EditorTools
             var seaLevel = WorldScale.SeaLevelMeters;
             var sea01 = (seaLevel - terrainBaseY) / sizeY;
             var sandFullEndAsl = seaLevel + 2.5f;
-            var sandFadeEndAsl = seaLevel + 30f;
+            var sandFadeEndAsl = seaLevel + 13f;
             var cellMeters = Mathf.Max(0.25f, 0.5f * (sizeX + sizeZ) / Mathf.Max(1, hRes - 1));
             const float underwaterSandMaxDistMeters = 320f;
             var maxDistCells = Mathf.Max(

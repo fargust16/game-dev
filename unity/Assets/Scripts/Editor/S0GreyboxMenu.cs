@@ -38,7 +38,7 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/S0/Rebuild Greybox In Open Scene")]
         public static void RebuildInOpenScene()
         {
-            var city = Object.FindFirstObjectByType<CityGenerator>();
+            var city = Object.FindAnyObjectByType<CityGenerator>();
             if (city == null)
             {
                 var root = new GameObject("City_Root");

@@ -289,7 +289,7 @@ namespace GameDev.World.Buildings.Shell.Tests
             }
 
             Assert.IsTrue(found, "Expected street-facing ground door/shopfront.");
-            Assert.IsTrue(shell.Portal.HasValue);
+            Assert.IsTrue(shell.HasPortal);
         }
 
         [Test]

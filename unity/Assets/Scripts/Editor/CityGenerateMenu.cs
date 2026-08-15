@@ -38,7 +38,7 @@ namespace GameDev.EditorTools
         {
             EnsureTownSceneActive();
 
-            var city = Object.FindFirstObjectByType<CityGenerator>();
+            var city = Object.FindAnyObjectByType<CityGenerator>();
             if (city == null)
             {
                 var root = new GameObject("City_Root");
@@ -61,7 +61,7 @@ namespace GameDev.EditorTools
         {
             EnsureTownSceneActive();
 
-            var city = Object.FindFirstObjectByType<CityGenerator>();
+            var city = Object.FindAnyObjectByType<CityGenerator>();
             if (city == null)
             {
                 var root = new GameObject("City_Root");

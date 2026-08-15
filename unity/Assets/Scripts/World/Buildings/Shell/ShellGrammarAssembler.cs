@@ -61,6 +61,7 @@ namespace GameDev.World.Buildings.Shell
 
             if (dna.InteriorPolicy == InteriorPolicy.Portal)
             {
+                shell.HasPortal = true;
                 shell.Portal = new PortalSocket
                 {
                     LocalPosition = new Vector3(plot.WidthMeters * 0.5f, ModularGrid.FoundationHeight, 0.05f),

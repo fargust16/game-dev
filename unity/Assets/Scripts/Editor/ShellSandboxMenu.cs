@@ -65,7 +65,7 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Buildings/Shell Sandbox/Clear")]
         public static void Clear()
         {
-            var lab = Object.FindFirstObjectByType<ShellSandboxLab>();
+            var lab = Object.FindAnyObjectByType<ShellSandboxLab>();
             if (lab == null)
             {
                 Debug.LogWarning("[ShellSandbox] No ShellSandboxLab in scene.");
@@ -129,7 +129,7 @@ namespace GameDev.EditorTools
                     CreateFreshScene(42);
             }
 
-            var lab = Object.FindFirstObjectByType<ShellSandboxLab>();
+            var lab = Object.FindAnyObjectByType<ShellSandboxLab>();
             if (lab != null)
                 return lab;
 

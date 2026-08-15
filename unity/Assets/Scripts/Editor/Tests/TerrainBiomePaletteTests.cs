@@ -9,8 +9,9 @@ namespace GameDev.World.Terrain.Tests
         [Test]
         public void Fields_IsWarmNotNeon()
         {
-            Assert.Less(TerrainBiomePalette.Fields.RemapMax.y, 0.7f);
+            Assert.Less(TerrainBiomePalette.Fields.RemapMax.y, 0.85f);
             Assert.Greater(TerrainBiomePalette.Fields.RemapMax.x, 0.4f);
+            Assert.Greater(TerrainBiomePalette.Fields.RemapMax.y, TerrainBiomePalette.Forest.RemapMax.y);
         }
 
         [Test]
@@ -21,17 +22,24 @@ namespace GameDev.World.Terrain.Tests
         }
 
         [Test]
-        public void Swamp_HasBlueGreyBias()
+        public void Swamp_IsMurkyDesaturated()
         {
-            Assert.GreaterOrEqual(
-                TerrainBiomePalette.Swamp.RemapMax.z,
-                TerrainBiomePalette.Swamp.RemapMax.x);
+            var max = TerrainBiomePalette.Swamp.RemapMax;
+            Assert.Less(max.y, 0.45f);
+            Assert.Greater(max.y, max.x);
         }
 
         [Test]
         public void RoadCenter_IsLighterThanSwampDirt()
         {
             Assert.Greater(TerrainBiomePalette.RoadCenter.RemapMax.x, TerrainBiomePalette.Swamp.RemapMax.x);
+        }
+
+        [Test]
+        public void AlbedoTiles_AreWithinMemoBand()
+        {
+            Assert.GreaterOrEqual(TerrainBiomePalette.AlbedoTileMeters, 8f);
+            Assert.LessOrEqual(TerrainBiomePalette.SnowTileMeters, 16f);
         }
 
         [Test]

@@ -132,12 +132,12 @@ namespace GameDev.World.Vegetation.Tests
         [Test]
         public void RoadFalloff_IsWithinMemoBand()
         {
-            Assert.GreaterOrEqual(GrassMask.RoadEdgeFalloffMeters, 1.5f);
-            Assert.LessOrEqual(GrassMask.RoadEdgeFalloffMeters, 3.0f);
+            Assert.GreaterOrEqual(GrassMask.RoadEdgeFalloffMeters, 0.5f);
+            Assert.LessOrEqual(GrassMask.RoadEdgeFalloffMeters, 1.5f);
         }
 
         [Test]
-        public void RoadLawnSample_OnCenterline_IsRoad()
+        public void RoadLawnSample_OnCenterline_IsBare()
         {
             var samples = new List<Vector2> { new Vector2(10f, 10f) };
             var lawn = RoadLawnMask.SampleLawn01(
@@ -164,6 +164,23 @@ namespace GameDev.World.Vegetation.Tests
                 mid, 0f, samples, GrassMask.RoadClearCoreMeters, GrassMask.RoadEdgeFalloffMeters);
             Assert.Greater(lawn, 0.2f);
             Assert.Less(lawn, 0.8f);
+        }
+
+        [Test]
+        public void RoadLawnSample_AlongSegment_IsSmoothNotScalloped()
+        {
+            var samples = new List<Vector2>
+            {
+                new Vector2(0f, 0f),
+                new Vector2(8f, 0f),
+            };
+            var lateral = GrassMask.RoadClearCoreMeters + GrassMask.RoadEdgeFalloffMeters * 0.5f;
+            var midOff = RoadLawnMask.SampleLawn01(
+                4f, lateral, samples, GrassMask.RoadClearCoreMeters, GrassMask.RoadEdgeFalloffMeters);
+            var nearPoint = RoadLawnMask.SampleLawn01(
+                0.5f, lateral, samples, GrassMask.RoadClearCoreMeters, GrassMask.RoadEdgeFalloffMeters);
+            // Mid-span lateral sample should match near-endpoint lateral sample (segment SDF).
+            Assert.AreEqual(nearPoint, midOff, 0.05f);
         }
     }
 }

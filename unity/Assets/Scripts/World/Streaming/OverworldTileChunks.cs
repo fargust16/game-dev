@@ -1,13 +1,12 @@
-using System.Collections.Generic;
-using Den.Tools;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameDev.World.Streaming
 {
     /// <summary>
-    /// Chunk coordinates covering one MapMagic overworld tile, inset from the raw tile edge by a
+    /// Chunk coordinates covering one overworld tile, inset from the raw tile edge by a
     /// shared margin. The last strip near a tile's border has less reliable derived data -
-    /// WaterZoneMenu's own flood-fill sampling already skips a margin there so its neighbour
+    /// VistaHydro height-field sampling already skips a margin there so its neighbour
     /// lookups never read out-of-bounds height (an out-of-bounds read is a synthetic +Infinity
     /// "wall" that would otherwise bias basin shapes near the border) - so a lake that visually
     /// reaches the tile edge can still have its flood mask stop just short of it. POI placement and
@@ -22,12 +21,17 @@ namespace GameDev.World.Streaming
     {
         public const float DefaultMarginMeters = 20f;
 
-        public static IReadOnlyList<ChunkCoord> CoveringTile(Coord tileCoord, Vector2D tileSize, float marginMeters)
+        public static IReadOnlyList<ChunkCoord> CoveringTile(
+            int tileCoordX,
+            int tileCoordZ,
+            float tileSizeX,
+            float tileSizeZ,
+            float marginMeters)
         {
-            var minX = tileCoord.x * tileSize.x + marginMeters;
-            var maxX = (tileCoord.x + 1) * tileSize.x - marginMeters;
-            var minZ = tileCoord.z * tileSize.z + marginMeters;
-            var maxZ = (tileCoord.z + 1) * tileSize.z - marginMeters;
+            var minX = tileCoordX * tileSizeX + marginMeters;
+            var maxX = (tileCoordX + 1) * tileSizeX - marginMeters;
+            var minZ = tileCoordZ * tileSizeZ + marginMeters;
+            var maxZ = (tileCoordZ + 1) * tileSizeZ - marginMeters;
 
             // Sweep every chunk touching the raw (unmargined) tile extent, then keep only the ones
             // whose own center actually lands inside the margin-inset rectangle - a corner-based
@@ -35,10 +39,12 @@ namespace GameDev.World.Streaming
             // single chunk (ChunkCoord.ChunkSize = 64m), in which case an edge chunk's index would
             // still overlap the unfiltered range even though its center sits inside the excluded
             // border strip.
-            var rawMinChunkX = ChunkCoord.FromWorld(new Vector3(tileCoord.x * tileSize.x, 0f, 0f)).X;
-            var rawMaxChunkX = ChunkCoord.FromWorld(new Vector3((tileCoord.x + 1) * tileSize.x - 0.01f, 0f, 0f)).X;
-            var rawMinChunkZ = ChunkCoord.FromWorld(new Vector3(0f, 0f, tileCoord.z * tileSize.z)).Z;
-            var rawMaxChunkZ = ChunkCoord.FromWorld(new Vector3(0f, 0f, (tileCoord.z + 1) * tileSize.z - 0.01f)).Z;
+            var rawMinChunkX = ChunkCoord.FromWorld(new Vector3(tileCoordX * tileSizeX, 0f, 0f)).X;
+            var rawMaxChunkX = ChunkCoord.FromWorld(
+                new Vector3((tileCoordX + 1) * tileSizeX - 0.01f, 0f, 0f)).X;
+            var rawMinChunkZ = ChunkCoord.FromWorld(new Vector3(0f, 0f, tileCoordZ * tileSizeZ)).Z;
+            var rawMaxChunkZ = ChunkCoord.FromWorld(
+                new Vector3(0f, 0f, (tileCoordZ + 1) * tileSizeZ - 0.01f)).Z;
 
             var chunks = new List<ChunkCoord>();
             for (var x = rawMinChunkX; x <= rawMaxChunkX; x++)

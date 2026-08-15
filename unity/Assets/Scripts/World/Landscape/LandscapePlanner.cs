@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using GameDev.World.Roads;
 using GameDev.World.Terrain;
-using GameDev.World.Water;
 using UnityEngine;
 using WorldScale = GameDev.World.WorldScale;
 
@@ -15,17 +14,10 @@ namespace GameDev.World.Landscape
     public sealed class LandscapePlanner
     {
         public LandscapeCostField CostField { get; private set; }
-        public IReadOnlyList<LakeDefinition> Lakes { get; private set; } =
-            Array.Empty<LakeDefinition>();
         public IReadOnlyList<RoadDefinition> Roads { get; private set; } =
             Array.Empty<RoadDefinition>();
         public IReadOnlyList<RoadSegment> Segments { get; private set; } =
             Array.Empty<RoadSegment>();
-
-        public void SetLakes(IReadOnlyList<LakeDefinition> lakes)
-        {
-            Lakes = lakes ?? Array.Empty<LakeDefinition>();
-        }
 
         public void BuildCostField(
             float originX,
@@ -39,7 +31,7 @@ namespace GameDev.World.Landscape
             var cell = cellSize > 0f ? cellSize : WorldScale.LandscapeCostCellMeters;
             CostField = new LandscapeCostField(
                 originX, originZ, sizeX, sizeZ, cell,
-                heightAtWorld, biomeAtWorld, Lakes);
+                heightAtWorld, biomeAtWorld);
         }
 
         /// <summary>

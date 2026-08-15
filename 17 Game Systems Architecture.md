@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft
 
-Last Updated: 2026-08-14
+Last Updated: 2026-08-15
 
 Depends On:
 [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -176,7 +176,7 @@ flowchart LR
 | **Multiplayer** | Same seed → same samples on all peers; no per-frame sync of heightfields. |
 | **Performance** | Sampling must be O(1) / cheap noise; cache per-chunk if builders need grids. |
 | **Extensibility** | Swap noise implementation behind `IBiomeSampler`; add moisture/temperature channels later. |
-| **V1 scope / Deferred** | V0: 2–4 biome bands + gentle height. Deferred: rivers, cliffs, full Valheim-scale biomes. |
+| **V1 scope / Deferred** | V0: multi-LPB island + mountains + ocean. Deferred: inland hydro redesign, cliffs, full Valheim-scale biomes. |
 | **Owning folder** | `unity/Assets/Scripts/World/Terrain/` |
 
 ## W.3 Chunk Streaming
@@ -194,19 +194,19 @@ flowchart LR
 | **V1 scope / Deferred** | V0: ~512 m stub, ring streaming around editor/player focus. Deferred: async jobs, LOD, infinite travel polish. |
 | **Owning folder** | `unity/Assets/Scripts/World/Streaming/` |
 
-## W.2b Landscape Planner (hydrology + roads)
+## W.2b Landscape Planner (roads + ocean exclusion)
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Plan lakes / POIs / roads against shared terrain analysis, then conform terrain once; own `WorldDefinition` aggregate and deferred dig order. |
-| **Dependencies** | WorldSeed, Terrain/Biome, Water (`LakeDefinition`), POI Placement, Roads. |
-| **Public interfaces** | `WorldDefinition` / `WorldGenSettings` / `OverworldWorldState`; `LandscapePlanner`; `LandscapeCostField`; `LakeDefinition` + `LakeBasinDeformer`; `TerrainDeformer`; `RoadDefinition` + corridor/vertical profile. |
-| **Data flow** | Seed + settings → lake plan (`lake.place` / `lake.{i}`) → POI plan once → Primary/Secondary roads (no RNG) → joint deform → water meshes → visuals → vegetation. |
+| **Responsibilities** | Plan POIs / roads against shared terrain analysis, then conform road corridors; own `WorldDefinition` aggregate. Ensure ocean plane at Sea Level. |
+| **Dependencies** | WorldSeed, Terrain/Biome, POI Placement, Roads; ocean sampler (`SeaLevelOceanSampler`). |
+| **Public interfaces** | `WorldDefinition` / `WorldGenSettings` / `OverworldWorldState`; `LandscapePlanner`; `LandscapeCostField`; `TerrainDeformer` (roads); `RoadDefinition` + corridor/vertical profile; `IWaterSampler` / `WaterProximity`. |
+| **Data flow** | Seed + settings → POI plan once → Primary/Secondary roads (no RNG) → corridor deform → ensure `WorldWater` → visuals → vegetation. |
 | **Save/load** | Regenerable from seed + settings; scene holds plan for editor tools. |
 | **Multiplayer** | Same seed + settings → same geography; no per-frame sync. |
-| **Performance** | Cost field cell ~10 m; A* on tile grid; dig once per generate. |
-| **Extensibility** | New lake/road knobs via `WorldGenSettings`; Local road stubs deferred. |
-| **V1 scope / Deferred** | V0: elongated lakes + hierarchical roads + World Generator window. Deferred: Local roads, decoration stream, multi-tile. |
+| **Performance** | Cost field cell ~10 m; A* on tile grid; corridor dig once per generate. |
+| **Extensibility** | Road/POI knobs via `WorldGenSettings`; Local road stubs deferred; inland hydro redesign deferred (not a restore of removed lake/river types). |
+| **V1 scope / Deferred** | V0: hierarchical roads + World Generator + **ocean only**. Deferred: Local roads, inland lakes/rivers, multi-tile. |
 | **Owning folder** | `unity/Assets/Scripts/World/Landscape/` + `WorldDefinition`; plan: `unity/Assets/Plans/LANDSCAPE_PLANNER.md`. |
 
 ## W.4 POI Placement
@@ -214,7 +214,7 @@ flowchart LR
 | Field | Content |
 |-------|---------|
 | **Responsibilities** | Deterministically place POI markers (ruin, camp, shrine, town approach, cave mouth, …) from seed + chunk/world coords; emit stable `PoiId`. |
-| **Dependencies** | WorldSeed, Terrain/Biome, Landscape analysis (slope/flatness/lakes), Chunk Streaming (placement evaluated per chunk or world pass). |
+| **Dependencies** | WorldSeed, Terrain/Biome, Landscape analysis (slope/flatness), Chunk Streaming (placement evaluated per chunk or world pass). |
 | **Public interfaces** | `IPoiPlacer { IReadOnlyList<PoiMarker> PlaceForChunk(ChunkCoord); }`; `PoiMarker { PoiId Id; PoiKind Kind; Vector3 Position; BiomeId Biome; }`; `PoiPlacementProfile` (hard/soft/relation/footprint) + `PoiPlacementCatalog` + `PoiPlacementEngine`. |
 | **Data flow** | Chunk candidates + seed fork `poi.{kind}.{index}` + per-kind profile scoring (TownApproach first) → stable sorted marker list written once into `WorldDefinition`. |
 | **Save/load** | Marker positions regenerable; persist discovery state / Active Window / resolution elsewhere (POI Director). |

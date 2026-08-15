@@ -89,7 +89,7 @@ namespace GameDev.Player
 
             if (grid == null)
             {
-                grid = FindFirstObjectByType<GridMap>();
+                grid = FindAnyObjectByType<GridMap>();
             }
 
             if (grid == null)
@@ -105,7 +105,7 @@ namespace GameDev.Player
                 _coord = startCoord;
             }
 
-            _camera = FindFirstObjectByType<SimpleFollowCamera>();
+            _camera = FindAnyObjectByType<SimpleFollowCamera>();
             _ready = true;
             SnapToCellImmediate();
             ApplyControlScheme(ControlScheme.Mouse, announce: false);
@@ -249,7 +249,7 @@ namespace GameDev.Player
             controlScheme = scheme;
             if (_camera == null)
             {
-                _camera = FindFirstObjectByType<SimpleFollowCamera>();
+                _camera = FindAnyObjectByType<SimpleFollowCamera>();
             }
 
             if (_camera != null)
@@ -585,7 +585,7 @@ namespace GameDev.Player
         {
             best = null;
             bestDist = float.MaxValue;
-            var interactables = FindObjectsByType<SimpleInteractable>(FindObjectsSortMode.None);
+            var interactables = FindObjectsByType<SimpleInteractable>();
             foreach (var item in interactables)
             {
                 var d = HorizontalDistance(transform.position, item.transform.position);
@@ -610,7 +610,7 @@ namespace GameDev.Player
         {
             EnvironmentActionMarker best = null;
             var bestDist = float.MaxValue;
-            var envActions = FindObjectsByType<EnvironmentActionMarker>(FindObjectsSortMode.None);
+            var envActions = FindObjectsByType<EnvironmentActionMarker>();
             foreach (var item in envActions)
             {
                 var d = HorizontalDistance(world, item.transform.position);

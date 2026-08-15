@@ -8,7 +8,7 @@ namespace GameDev.EditorTools
 {
     /// <summary>
     /// Secondary Local Procedural Biome scaffold (visual terrain only).
-    /// Order bands: Geology 0–19 → Hydrology 20–29 → Ecology 30–39 → Civilization 40–49.
+    /// Order bands: Geology 0–19 → Ecology 30–39 → Civilization 40–49.
     /// Automated Generate still runs IslandBase + Mountain LPBs only until secondary graphs exist.
     /// </summary>
     public static class OverworldSecondaryLpbScaffold
@@ -16,8 +16,6 @@ namespace GameDev.EditorTools
         public const int OrderMountains = 10;
         public const int OrderBeach = 5;
         public const int OrderHills = 15;
-        public const int OrderLakes = 20;
-        public const int OrderRivers = 25;
         public const int OrderForest = 30;
         public const int OrderMeadow = 32;
         public const int OrderSwamp = 34;
@@ -33,14 +31,6 @@ namespace GameDev.EditorTools
                 Debug.LogError("[SecondaryLPB] No VistaManager — Generate terrain first.");
                 return;
             }
-
-            // Hydrology
-            EnsurePlaceholder(manager, "LPB_Lakes", OrderLakes,
-                BiomeBlendOptions.HeightBlendMode.Lower,
-                height: true);
-            EnsurePlaceholder(manager, "LPB_Rivers", OrderRivers,
-                BiomeBlendOptions.HeightBlendMode.Lower,
-                height: true);
 
             // Ecology (surface — no height by default)
             EnsurePlaceholder(manager, "LPB_Forest", OrderForest,
@@ -63,7 +53,7 @@ namespace GameDev.EditorTools
 
             Debug.Log(
                 "[SecondaryLPB] Scaffold ready under VistaManager " +
-                "(Hydro 20/25, Eco 30–36, Civ 40). Mountains stay 10–19 from bake. " +
+                "(Eco 30–36, Civ 40). Mountains stay 10–19 from bake. " +
                 "Assign TerrainGraphs when authored; Generate uses IslandBase + Mountains only.");
         }
 

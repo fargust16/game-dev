@@ -93,6 +93,42 @@ namespace GameDev.World.Vegetation
             float wetness01,
             NoiseOffsets offsets)
         {
+            GetBiomeWeights(biome, moisture01, out var forestBias, out var shrubBias, out var grassBias);
+            return EvaluateWithBiases(
+                worldX, worldZ, slope01, moisture01, wetness01, offsets,
+                forestBias, shrubBias, grassBias);
+        }
+
+        /// <summary>
+        /// Soft biome blend from continuous height/slope/moisture so grass density/hue drivers
+        /// do not jump when hard <see cref="BiomeId"/> flips at a band edge.
+        /// </summary>
+        public static Sample EvaluateSoft(
+            float worldX,
+            float worldZ,
+            float height01,
+            float slope01,
+            float moisture01,
+            float wetness01,
+            NoiseOffsets offsets)
+        {
+            SoftBiomeBiases(height01, slope01, moisture01, out var forestBias, out var shrubBias, out var grassBias);
+            return EvaluateWithBiases(
+                worldX, worldZ, slope01, moisture01, wetness01, offsets,
+                forestBias, shrubBias, grassBias);
+        }
+
+        private static Sample EvaluateWithBiases(
+            float worldX,
+            float worldZ,
+            float slope01,
+            float moisture01,
+            float wetness01,
+            NoiseOffsets offsets,
+            float forestBias,
+            float shrubBias,
+            float grassBias)
+        {
             var slopeMul = VegetationDensity.SlopeMultiplier(slope01);
             if (slopeMul <= 0f)
             {
@@ -107,8 +143,6 @@ namespace GameDev.World.Vegetation
             // Clearings are coherent meso holes — smaller/rarer so dense interiors stay massifs.
             var clearing = Mathf.Clamp01((meso - 0.68f) / 0.32f);
             clearing = clearing * clearing * (3f - 2f * clearing);
-
-            GetBiomeWeights(biome, moisture01, out var forestBias, out var shrubBias, out var grassBias);
 
             // Macro field decides whether a forest region exists; biome bias gates how strongly.
             var forestRegion = SoftThreshold(macro, forestBias);
@@ -221,8 +255,8 @@ namespace GameDev.World.Vegetation
                     break;
                 default:
                     forestBias = 0.2f;
-                    shrubBias = 0.3f;
-                    grassBias = 0.4f;
+                    shrubBias = 0.4f;
+                    grassBias = 0.7f;
                     break;
             }
 
@@ -231,6 +265,61 @@ namespace GameDev.World.Vegetation
             forestBias = Mathf.Clamp01(forestBias + (wet - 0.5f) * 0.12f);
             shrubBias = Mathf.Clamp01(shrubBias + (wet - 0.4f) * 0.18f);
             grassBias = Mathf.Clamp01(grassBias + (wet - 0.35f) * 0.2f);
+        }
+
+        /// <summary>
+        /// Blend discrete biome ecology biases across nearby height/moisture samples so ecotones
+        /// change character gradually instead of flipping with hard Classify bands.
+        /// </summary>
+        public static void SoftBiomeBiases(
+            float height01,
+            float slope01,
+            float moisture01,
+            out float forestBias,
+            out float shrubBias,
+            out float grassBias)
+        {
+            const float hDelta = 0.045f;
+            const float mDelta = 0.08f;
+
+            forestBias = 0f;
+            shrubBias = 0f;
+            grassBias = 0f;
+            var wSum = 0f;
+
+            AccumulateBiomeBias(height01, slope01, moisture01, 1f, ref forestBias, ref shrubBias, ref grassBias, ref wSum);
+            AccumulateBiomeBias(height01 - hDelta, slope01, moisture01, 0.55f, ref forestBias, ref shrubBias, ref grassBias, ref wSum);
+            AccumulateBiomeBias(height01 + hDelta, slope01, moisture01, 0.55f, ref forestBias, ref shrubBias, ref grassBias, ref wSum);
+            AccumulateBiomeBias(height01, slope01, moisture01 - mDelta, 0.35f, ref forestBias, ref shrubBias, ref grassBias, ref wSum);
+            AccumulateBiomeBias(height01, slope01, moisture01 + mDelta, 0.35f, ref forestBias, ref shrubBias, ref grassBias, ref wSum);
+
+            if (wSum < 1e-5f)
+            {
+                GetBiomeWeights(BiomeId.Meadow, moisture01, out forestBias, out shrubBias, out grassBias);
+                return;
+            }
+
+            forestBias /= wSum;
+            shrubBias /= wSum;
+            grassBias /= wSum;
+        }
+
+        private static void AccumulateBiomeBias(
+            float height01,
+            float slope01,
+            float moisture01,
+            float weight,
+            ref float forestBias,
+            ref float shrubBias,
+            ref float grassBias,
+            ref float wSum)
+        {
+            var biome = BiomeClassifier.Classify(height01, slope01, moisture01);
+            GetBiomeWeights(biome, moisture01, out var f, out var s, out var g);
+            forestBias += f * weight;
+            shrubBias += s * weight;
+            grassBias += g * weight;
+            wSum += weight;
         }
 
         private static float SoftThreshold(float field, float bias)

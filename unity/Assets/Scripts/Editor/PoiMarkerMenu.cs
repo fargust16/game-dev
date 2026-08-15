@@ -1,13 +1,10 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
-using Den.Tools;
 using GameDev.World.Buildings.Shell;
 using GameDev.World.Poi;
 using GameDev.World.Seed;
 using GameDev.World.Terrain;
 using GameDev.World.Water;
-using MapMagic.Core;
-using MapMagic.Terrains;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,7 +12,7 @@ namespace GameDev.EditorTools
 {
     /// <summary>
     /// Overworld V0 POI groundwork (WORLD_GENERATION_PIPELINE.md Iteration 08 / OVERWORLD_V0_PLAN
-    /// W0.6): runs <see cref="StubPoiPlacer"/> over the current MapMagic tile's chunk range and
+    /// W0.6): runs <see cref="StubPoiPlacer"/> over the current Vista terrain tile's chunk range and
     /// drops a visual per placed POI, grounded via <c>Terrain.SampleHeight</c> (same pattern as
     /// VegetationScatterMenu — Physics raycasts miss when tile height exceeds the old 400m ray). Most kinds get a real Low Poly Environment/Village prop (see
     /// ASSET_LIBRARY_REFERENCE.md - no dedicated ruin/shrine/cave asset exists, so each reuses the
@@ -25,7 +22,7 @@ namespace GameDev.EditorTools
     /// settlement fabrics) as a stand-in - an Elite mansion for a city, a Poor house for a camp -
     /// until real settlement placement replaces these markers outright. Candidate chunks cover the
     /// actual generated tile extent rather than the doc's illustrative 512m-centered-on-origin stub,
-    /// since our tile is currently a single ~1400m MapMagic tile, not the real W0.5 chunk streamer.
+    /// since our tile is currently a single ~1400m Vista overworld tile, not the real W0.5 chunk streamer.
     /// </summary>
     public static class PoiMarkerMenu
     {
@@ -98,26 +95,12 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Place POI Markers")]
         public static void PlaceMarkers()
         {
-            var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
-            if (mapMagic == null || mapMagic.graph == null)
-            {
-                return;
-            }
+            VistaTileSync.WaitForTerrainReady();
 
-            var tileCoord = new Coord(0, 0);
-            var tile = mapMagic.tiles[tileCoord];
-            if (tile == null)
+            var terrain = OverworldTerrainAccess.FindTerrain();
+            if (terrain == null)
             {
-                return;
-            }
-
-            MapMagicTileSync.WaitForTileReady(tile);
-
-            var terrain = tile.main?.terrain;
-            var holder = terrain != null ? terrain.GetComponent<DirectMatricesHolder>() : null;
-            if (terrain == null || holder == null)
-            {
-                Debug.LogWarning("[POI] PlaceMarkers aborted: terrain or DirectMatricesHolder missing.");
+                Debug.LogWarning("[POI] PlaceMarkers aborted: terrain missing.");
                 return;
             }
 
@@ -125,11 +108,8 @@ namespace GameDev.EditorTools
             var root = new GameObject(RootObjectName);
 
             var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
-            var markers = OverworldWorldPlan.GetOrBuildPois(mapMagic, tileCoord);
-
-            var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
-            var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
-            IWaterSampler waterZones = new CompositeWaterSampler(lakeZones, riverZones);
+            var markers = OverworldWorldPlan.GetOrBuildPois();
+            IWaterSampler waterZones = SeaLevelOceanSampler.FromTerrain(terrain);
 
             var visualRng = worldSeed.Fork("poi-visual");
             var buildingArchetypes = ShellCatalogFactory.CreateDefaultArchetypes();

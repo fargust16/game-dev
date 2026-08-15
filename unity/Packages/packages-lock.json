@@ -7,6 +7,20 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.jbooth.microsplat.core": {
+      "version": "file:com.jbooth.microsplat.core",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "com.jbooth.microsplat.urp6p3": {
+      "version": "file:com.jbooth.microsplat.urp6p3",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.jbooth.microsplat.core": "3.9.0"
+      }
+    },
     "com.kyrylokuzyk.primetween": {
       "version": "file:../Packages/com.kyrylokuzyk.primetween.tgz",
       "depth": 0,
@@ -15,7 +29,7 @@
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
-      "depth": 1,
+      "depth": 0,
       "source": "builtin",
       "dependencies": {}
     },
@@ -487,6 +501,12 @@
     "com.unity.modules.unitywebrequest": {
       "version": "1.0.0",
       "depth": 1,
+      "source": "builtin",
+      "dependencies": {}
+    },
+    "com.unity.modules.wind": {
+      "version": "1.0.0",
+      "depth": 0,
       "source": "builtin",
       "dependencies": {}
     }

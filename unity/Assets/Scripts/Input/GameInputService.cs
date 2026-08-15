@@ -45,7 +45,7 @@ namespace GameDev.Input
                 return Instance;
             }
 
-            var existing = FindFirstObjectByType<GameInputService>();
+            var existing = FindAnyObjectByType<GameInputService>();
             if (existing != null)
             {
                 return existing;

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using GameDev.World.Poi;
 using GameDev.World.Roads;
-using GameDev.World.Water;
 using UnityEngine;
 
 namespace GameDev.World
@@ -17,23 +16,14 @@ namespace GameDev.World
         public int Seed { get; set; }
         public WorldGenSettings Settings { get; set; }
 
-        public IReadOnlyList<LakeDefinition> Lakes { get; private set; } =
-            Array.Empty<LakeDefinition>();
-
         public IReadOnlyList<PoiMarker> Pois { get; private set; } =
             Array.Empty<PoiMarker>();
 
         public IReadOnlyList<RoadDefinition> Roads { get; private set; } =
             Array.Empty<RoadDefinition>();
 
-        public int LakeCount => Lakes.Count;
         public int PoiCount => Pois.Count;
         public float RoadLengthKilometers { get; private set; }
-
-        public void SetLakes(IReadOnlyList<LakeDefinition> lakes)
-        {
-            Lakes = lakes ?? Array.Empty<LakeDefinition>();
-        }
 
         public void SetPois(IReadOnlyList<PoiMarker> pois)
         {
@@ -58,10 +48,7 @@ namespace GameDev.World
         {
             var kind = ((int)a.Kind).CompareTo((int)b.Kind);
             if (kind != 0)
-            {
                 return kind;
-            }
-
             return string.CompareOrdinal(a.Id.Value, b.Id.Value);
         }
 
@@ -72,14 +59,9 @@ namespace GameDev.World
             {
                 var pts = roads[i].CenterlineXZ;
                 if (pts == null || pts.Count < 2)
-                {
                     continue;
-                }
-
                 for (var p = 1; p < pts.Count; p++)
-                {
                     meters += Vector2.Distance(pts[p - 1], pts[p]);
-                }
             }
 
             return meters * 0.001f;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GameDev.World;
 using GameDev.World.Streaming;
 using GameDev.World.Terrain;
 using GameDev.World.Water;
@@ -18,10 +19,14 @@ namespace GameDev.World.Vegetation
         /// Instance spacing. PT_Grass_02 clump is ~1.2 m wide — overlap still reads as a lawn
         /// in open meadows; forest density is driven by the mask, not cell size alone.
         /// </summary>
-        public const float CellMeters = 0.4f;
+        public const float CellMeters = 0.35f;
 
         /// <summary>Mask sample spacing (metres). Bilinear-upsampled to <see cref="CellMeters"/>.</summary>
         public const float MaskSampleMeters = 1.5f;
+
+        /// <summary>Jitter as fraction of cell (memo scatter 0.25–0.6).</summary>
+        public const float JitterMinFraction = 0.3f;
+        public const float JitterMaxFraction = 0.6f;
 
         public const float ScaleMin = 0.85f;
         public const float ScaleMax = 1.4f;
@@ -32,11 +37,14 @@ namespace GameDev.World.Vegetation
         /// <summary>Only skip near-zero mask; soft edges use probability + height falloff.</summary>
         public const float PlaceThreshold = 0.08f;
 
+        public const float ShortHeightMeters = 0.3f;
+        public const float TallHeightMeters = 1.5f;
+
         public static GrassChunk BakeChunk(
             int chunkX,
             int chunkZ,
             Random rng,
-            MapMagicBiomeSampler sampler,
+            VistaTerrainSampler sampler,
             UnityEngine.Terrain terrain,
             VegetationEcology.NoiseOffsets offsets,
             VegetationClearance clearance,
@@ -78,11 +86,11 @@ namespace GameDev.World.Vegetation
                         continue;
                     }
 
-                    var biome = sampler.SampleBiome(x, z);
+                    var height01 = sampler.SampleHeight(x, z);
                     var slope = sampler.SampleSlope01(x, z);
                     var moisture = sampler.SampleMoisture01(x, z);
-                    mask[mx, mz] = GrassMask.Evaluate(
-                        x, z, groundY, biome, slope, moisture, offsets,
+                    mask[mx, mz] = GrassMask.EvaluateSoft(
+                        x, z, groundY, height01, slope, moisture, offsets,
                         clearance, water, settlement);
                 }
             }
@@ -98,8 +106,10 @@ namespace GameDev.World.Vegetation
             {
                 for (var ix = 0; ix < cells; ix++)
                 {
-                    var jx = ((float)rng.NextDouble() - 0.5f) * CellMeters * 0.45f;
-                    var jz = ((float)rng.NextDouble() - 0.5f) * CellMeters * 0.45f;
+                    var jitterFrac = Mathf.Lerp(
+                        JitterMinFraction, JitterMaxFraction, (float)rng.NextDouble());
+                    var jx = ((float)rng.NextDouble() - 0.5f) * CellMeters * jitterFrac * 2f;
+                    var jz = ((float)rng.NextDouble() - 0.5f) * CellMeters * jitterFrac * 2f;
                     var x = origin.x + (ix + 0.5f) * CellMeters + jx;
                     var z = origin.z + (iz + 0.5f) * CellMeters + jz;
 
@@ -126,9 +136,13 @@ namespace GameDev.World.Vegetation
                     // Density also shortens understory (low mask → short grass).
                     var understoryH = Mathf.Lerp(0.35f, 1f, density);
                     var heightVar = Mathf.Lerp(1f - GrassMask.HeightVariation, 1f + GrassMask.HeightVariation, t);
-                    var heightM = Mathf.Lerp(minScaleMeters, maxScaleMeters, 0.25f + t * 0.75f)
+                    // Short / tall mix of the same mesh (0.3–1.5 m).
+                    var shortBias = density < 0.45f || t < 0.35f;
+                    var hMin = shortBias ? minScaleMeters : Mathf.Lerp(minScaleMeters, maxScaleMeters, 0.45f);
+                    var hMax = shortBias ? Mathf.Lerp(minScaleMeters, maxScaleMeters, 0.55f) : maxScaleMeters;
+                    var heightM = Mathf.Lerp(hMin, hMax, t)
                                   * edgeH * understoryH * heightVar;
-                    heightM = Mathf.Max(heightM, minScaleMeters * 0.25f * Mathf.Max(edgeH, 0.15f));
+                    heightM = Mathf.Clamp(heightM, minScaleMeters * 0.85f, maxScaleMeters);
                     var scale = Mathf.Lerp(ScaleMin, ScaleMax, t) * Mathf.Lerp(0.65f, 1f, edgeH);
                     var uniform = (heightM / MeshRefHeightMeters) * scale;
 
@@ -161,7 +175,7 @@ namespace GameDev.World.Vegetation
             float sizeX,
             float sizeZ,
             Random rng,
-            MapMagicBiomeSampler sampler,
+            VistaTerrainSampler sampler,
             UnityEngine.Terrain terrain,
             VegetationEcology.NoiseOffsets offsets,
             VegetationClearance clearance,
@@ -230,6 +244,19 @@ namespace GameDev.World.Vegetation
 
         private static bool TrySampleHeight(UnityEngine.Terrain terrain, float x, float z, out float y)
         {
+            // Multi-tile overworld: sample across the Vista grid, not only the SW tile.
+            y = OverworldTerrainAccess.SampleHeightWorld(x, z);
+            if (y > 0.01f || OverworldTerrainAccess.FindTerrains().Length > 0)
+            {
+                // Reject ocean + beach terrace (keep sand visible; grass starts inland).
+                if (y <= WorldScale.SeaLevelMeters + 10f)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
             if (terrain == null || terrain.terrainData == null)
             {
                 y = 0f;
@@ -245,7 +272,7 @@ namespace GameDev.World.Vegetation
             }
 
             y = terrain.SampleHeight(new Vector3(x, 0f, z)) + pos.y;
-            return true;
+            return y > WorldScale.SeaLevelMeters + 10f;
         }
     }
 }

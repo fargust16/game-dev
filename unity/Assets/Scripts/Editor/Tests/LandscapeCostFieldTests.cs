@@ -33,7 +33,7 @@ namespace GameDev.World.Landscape.Tests
             BiomeId Biome(float x, float z) => BiomeId.Meadow;
 
             var field = new LandscapeCostField(
-                0f, 0f, 100f, 100f, 10f, Height, Biome, lakes: null);
+                0f, 0f, 100f, 100f, 10f, Height, Biome);
 
             var gentle = field.EvaluateAtTerrain(10f, 10f);
             var steep = field.EvaluateAtTerrain(10f, 90f);
@@ -62,7 +62,7 @@ namespace GameDev.World.Landscape.Tests
         {
             float Height(float x, float z) => 10f;
             BiomeId Biome(float x, float z) => BiomeId.Meadow;
-            var field = new LandscapeCostField(0f, 0f, 200f, 200f, 10f, Height, Biome, lakes: null);
+            var field = new LandscapeCostField(0f, 0f, 200f, 200f, 10f, Height, Biome);
             var before = field.EvaluateAtTerrain(100f, 100f);
             field.PaintExistingRoad(new[]
             {
@@ -80,7 +80,7 @@ namespace GameDev.World.Landscape.Tests
         {
             float Height(float x, float z) => 5f;
             BiomeId Biome(float x, float z) => BiomeId.Meadow;
-            var field = new LandscapeCostField(0f, 0f, 200f, 200f, 10f, Height, Biome, lakes: null);
+            var field = new LandscapeCostField(0f, 0f, 200f, 200f, 10f, Height, Biome);
             var fp = field.SampleFootprint(100f, 100f, 40f);
             Assert.Greater(fp.SampleCount, 0);
             Assert.Greater(fp.FlatAreaRatio, 0.9f);

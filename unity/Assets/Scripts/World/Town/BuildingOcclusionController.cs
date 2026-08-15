@@ -54,7 +54,7 @@ namespace GameDev.World.Town
 
             if (townGenerator == null)
             {
-                townGenerator = FindFirstObjectByType<TownGenerator>();
+                townGenerator = FindAnyObjectByType<TownGenerator>();
             }
 
             if (townGenerator == null)
@@ -75,7 +75,7 @@ namespace GameDev.World.Town
                 _volumes.Add(BuildingVolume.FromBuilding(i, model.Buildings[i]));
             }
 
-            _camera = FindFirstObjectByType<SimpleFollowCamera>();
+            _camera = FindAnyObjectByType<SimpleFollowCamera>();
         }
 
         /// <summary>Test helper / tools: which building contains this world position.</summary>
@@ -143,7 +143,7 @@ namespace GameDev.World.Town
 
             if (_camera == null)
             {
-                _camera = FindFirstObjectByType<SimpleFollowCamera>();
+                _camera = FindAnyObjectByType<SimpleFollowCamera>();
             }
 
             if (_camera != null)

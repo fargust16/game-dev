@@ -6,7 +6,6 @@ using GameDev.World.Settlement;
 using GameDev.World.Streaming;
 using GameDev.World.Terrain;
 using GameDev.World.Water;
-using MapMagic.Terrains;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Random = System.Random;
@@ -59,15 +58,25 @@ namespace GameDev.World.Vegetation
         [SerializeField] private float windSpeed = 1.1f;
 
         private readonly Dictionary<long, GrassChunk> chunkCache = new Dictionary<long, GrassChunk>(64);
+        private readonly Queue<long> bakeQueue = new Queue<long>(32);
+        private readonly HashSet<long> queuedKeys = new HashSet<long>();
         private readonly Matrix4x4[] drawBatch = new Matrix4x4[GrassRenderer.BatchSize];
         private MaterialPropertyBlock drawProps;
         private Transform player;
         private bool drawing;
         private int cachedInstanceTotal;
         private int bakedChunkCount;
+        private Vector3 lastFocus;
+        private Vector3 focusVelocity;
+
+        /// <summary>Max grass chunks baked per Update (avoids 0.5s hitch on chunk entry).</summary>
+        public const int MaxBakesPerFrame = 1;
+
+        /// <summary>Warm-ahead distance along movement (metres).</summary>
+        public const float WarmAheadMeters = 48f;
 
         // Scene services resolved lazily (not serialized).
-        private MapMagicBiomeSampler sampler;
+        private VistaTerrainSampler sampler;
         private UnityEngine.Terrain terrain;
         private VegetationClearance clearance;
         private IWaterSampler water;
@@ -153,6 +162,8 @@ namespace GameDev.World.Vegetation
             bakeConfigured = true;
 
             chunkCache.Clear();
+            bakeQueue.Clear();
+            queuedKeys.Clear();
             cachedInstanceTotal = 0;
             bakedChunkCount = 0;
             servicesReady = false;
@@ -188,7 +199,7 @@ namespace GameDev.World.Vegetation
             {
                 for (var cz = minCz; cz <= maxCz; cz++)
                 {
-                    EnsureChunk(cx, cz);
+                    BakeChunkNow(cx, cz);
                 }
             }
         }
@@ -201,6 +212,16 @@ namespace GameDev.World.Vegetation
         private void OnDisable()
         {
             RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
+        }
+
+        private void Update()
+        {
+            if (!IsConfigured || !servicesReady)
+            {
+                return;
+            }
+
+            ProcessBakeQueue();
         }
 
         private void OnBeginCameraRendering(ScriptableRenderContext context, Camera cam)
@@ -224,8 +245,17 @@ namespace GameDev.World.Vegetation
                     return;
                 }
 
+                var focus = cam.transform.position;
+                var delta = focus - lastFocus;
+                if (delta.sqrMagnitude > 1e-6f && Time.deltaTime > 1e-4f)
+                {
+                    focusVelocity = delta / Time.deltaTime;
+                }
+
+                lastFocus = focus;
                 PushShaderGlobals();
-                DrawResidentChunks(cam.transform.position);
+                EnqueueResidentChunks(focus);
+                DrawResidentChunks(focus);
             }
             finally
             {
@@ -247,25 +277,29 @@ namespace GameDev.World.Vegetation
                 return;
             }
 
-            var holder = terrain.GetComponent<DirectMatricesHolder>();
-            if (holder == null)
-            {
-                servicesReady = false;
-                return;
-            }
-
-            sampler = new MapMagicBiomeSampler(holder);
-            var lakeZones = FindFirstObjectByType<OverworldWaterZones>();
-            var riverZones = FindFirstObjectByType<OverworldRiverZones>();
-            water = new CompositeWaterSampler(lakeZones, riverZones);
+            sampler = new VistaTerrainSampler(terrain, worldSeed);
+            water = SeaLevelOceanSampler.FromTerrain(terrain);
             clearance = BuildClearanceFromScene();
-            var anchor = FindFirstObjectByType<OverworldSettlementAnchor>();
+            var anchor = FindAnyObjectByType<OverworldSettlementAnchor>();
             settlement = anchor != null && anchor.Fabric != null
                 ? GrassExclusion.FromFabric(anchor.Fabric)
                 : GrassExclusion.None;
             CollectTreeTrunks();
+
+            // Prefer existing CPU lawn bake; only rebuild when missing (avoid hitch on first Play frame).
+            if (!RoadLawnMask.HasCpuBake)
+            {
+                RoadLawnMask.BakeFromScene();
+            }
+            else
+            {
+                RoadLawnMask.BindEdgeParams();
+            }
+
+            GrassTintMask.BakeFromScene();
             servicesReady = true;
-            RoadLawnMask.BakeFromScene();
+            // Rebuild clearance after lawn CPU bake so Multiplier uses O(1) sample.
+            clearance = BuildClearanceFromScene();
         }
 
         private void CollectTreeTrunks()
@@ -294,13 +328,7 @@ namespace GameDev.World.Vegetation
 
         private static UnityEngine.Terrain FindTerrain()
         {
-            var terrains = UnityEngine.Terrain.activeTerrains;
-            if (terrains != null && terrains.Length > 0 && terrains[0] != null)
-            {
-                return terrains[0];
-            }
-
-            return FindFirstObjectByType<UnityEngine.Terrain>();
+            return OverworldTerrainAccess.FindTerrain();
         }
 
         private void PushShaderGlobals()
@@ -325,7 +353,7 @@ namespace GameDev.World.Vegetation
                 return player.position;
             }
 
-            var controller = FindFirstObjectByType<OverworldPlayerController>();
+            var controller = FindAnyObjectByType<OverworldPlayerController>();
             if (controller != null)
             {
                 player = controller.transform;
@@ -334,6 +362,67 @@ namespace GameDev.World.Vegetation
 
             var cam = Camera.main;
             return cam != null ? cam.transform.position : Vector3.zero;
+        }
+
+        private void EnqueueResidentChunks(Vector3 focus)
+        {
+            var ahead = focusVelocity;
+            ahead.y = 0f;
+            if (ahead.sqrMagnitude > 1f)
+            {
+                ahead = ahead.normalized * WarmAheadMeters;
+            }
+            else
+            {
+                ahead = Vector3.zero;
+            }
+
+            EnqueueAround(focus, CullDistanceMeters);
+            if (ahead.sqrMagnitude > 1f)
+            {
+                EnqueueAround(focus + ahead, ChunkCoord.ChunkSize * 1.5f);
+            }
+        }
+
+        private void EnqueueAround(Vector3 focus, float radiusMeters)
+        {
+            var r = Mathf.Max(radiusMeters, ChunkCoord.ChunkSize * 0.5f);
+            var minCx = Mathf.FloorToInt((focus.x - r) / ChunkCoord.ChunkSize);
+            var maxCx = Mathf.FloorToInt((focus.x + r) / ChunkCoord.ChunkSize);
+            var minCz = Mathf.FloorToInt((focus.z - r) / ChunkCoord.ChunkSize);
+            var maxCz = Mathf.FloorToInt((focus.z + r) / ChunkCoord.ChunkSize);
+            for (var cx = minCx; cx <= maxCx; cx++)
+            {
+                for (var cz = minCz; cz <= maxCz; cz++)
+                {
+                    if (!ChunkOverlapsTile(cx, cz))
+                    {
+                        continue;
+                    }
+
+                    var key = PackKey(cx, cz);
+                    if (chunkCache.ContainsKey(key) || queuedKeys.Contains(key))
+                    {
+                        continue;
+                    }
+
+                    bakeQueue.Enqueue(key);
+                    queuedKeys.Add(key);
+                }
+            }
+        }
+
+        private void ProcessBakeQueue()
+        {
+            var n = 0;
+            while (n < MaxBakesPerFrame && bakeQueue.Count > 0)
+            {
+                var key = bakeQueue.Dequeue();
+                queuedKeys.Remove(key);
+                UnpackKey(key, out var cx, out var cz);
+                BakeChunkNow(cx, cz);
+                n++;
+            }
         }
 
         private void DrawResidentChunks(Vector3 focus)
@@ -377,8 +466,8 @@ namespace GameDev.World.Vegetation
                         continue;
                     }
 
-                    var chunk = EnsureChunk(cx, cz);
-                    if (chunk == null || chunk.Count == 0)
+                    var key = PackKey(cx, cz);
+                    if (!chunkCache.TryGetValue(key, out var chunk) || chunk == null || chunk.Count == 0)
                     {
                         continue;
                     }
@@ -402,12 +491,12 @@ namespace GameDev.World.Vegetation
                    && ez > tileMinZ && oz < tileMinZ + tileSizeZ;
         }
 
-        private GrassChunk EnsureChunk(int cx, int cz)
+        private void BakeChunkNow(int cx, int cz)
         {
             var key = PackKey(cx, cz);
-            if (chunkCache.TryGetValue(key, out var existing))
+            if (chunkCache.ContainsKey(key))
             {
-                return existing;
+                return;
             }
 
             var offsets = new VegetationEcology.NoiseOffsets(
@@ -422,17 +511,21 @@ namespace GameDev.World.Vegetation
             }
 
             var rng = new Random(salt);
-            // Readable carpet height (avoid near-zero WorldScale.GrassShortMinMeters clumps).
             var chunk = GrassDistribution.BakeChunk(
                 cx, cz, rng, sampler, terrain, offsets,
                 clearance, water, settlement,
-                0.55f,
-                1.15f,
+                GrassDistribution.ShortHeightMeters,
+                GrassDistribution.TallHeightMeters,
                 treeTrunks);
             chunkCache[key] = chunk;
             bakedChunkCount++;
             cachedInstanceTotal += chunk.Count;
-            return chunk;
+        }
+
+        private static void UnpackKey(long key, out int cx, out int cz)
+        {
+            cx = (int)(key >> 32);
+            cz = (int)(key & 0xFFFFFFFFL);
         }
 
         private void FlushChunk(GrassChunk chunk, bool farLod, ref int drawn)
@@ -476,7 +569,8 @@ namespace GameDev.World.Vegetation
         private static VegetationClearance BuildClearanceFromScene()
         {
             var roadClearRadius = GrassMask.RoadClearCoreMeters;
-            var roadFalloff = GrassMask.RoadEdgeFalloffMeters;
+            var mPerPx = WorldScale.OverworldTileMeters / 512f;
+            var roadFalloff = RoadSurfaceStyle.SoftRimMeters(mPerPx);
             const float settlementClearRadius = 28f;
             const float settlementFalloff = 22f;
             const float poiClearRadius = 14f;
@@ -487,7 +581,7 @@ namespace GameDev.World.Vegetation
             const float townApproachFalloff = 14f;
 
             var disks = new List<VegetationClearance.Disk>();
-            var settlementAnchor = FindFirstObjectByType<OverworldSettlementAnchor>();
+            var settlementAnchor = FindAnyObjectByType<OverworldSettlementAnchor>();
             if (settlementAnchor != null && settlementAnchor.Fabric == null)
             {
                 var p = settlementAnchor.Position;
@@ -525,7 +619,7 @@ namespace GameDev.World.Vegetation
             }
 
             var roadSamples = new List<Vector2>(512);
-            var roadClearance = FindFirstObjectByType<OverworldRoadClearance>();
+            var roadClearance = FindAnyObjectByType<OverworldRoadClearance>();
             if (roadClearance != null && roadClearance.Samples != null)
             {
                 for (var i = 0; i < roadClearance.Samples.Count; i++)
@@ -534,14 +628,9 @@ namespace GameDev.World.Vegetation
                 }
             }
 
-            IReadOnlyList<LakeDefinition> lakes = null;
-            var waterZones = FindFirstObjectByType<OverworldWaterZones>();
-            if (waterZones != null && waterZones.LakeDefinitions != null && waterZones.LakeDefinitions.Count > 0)
-            {
-                lakes = waterZones.LakeDefinitions;
-            }
-
-            return new VegetationClearance(disks, roadSamples, roadClearRadius, roadFalloff, lakes);
+            return new VegetationClearance(
+                disks, roadSamples, roadClearRadius, roadFalloff,
+                roadMinAtCore: GrassMask.RoadLawnMinAtCenter);
         }
     }
 }

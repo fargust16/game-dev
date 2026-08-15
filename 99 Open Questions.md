@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.24
+Version: 0.25
 
 Status: Draft
 
@@ -131,6 +131,12 @@ No. [13 City Generation](13%20City%20Generation.md) is Deprecated: not viable (n
 
 **How is the island / ocean silhouette framed?**  
 Harmonic asymmetric LPB **Anchors** + **Outer Falloff (~420 local m)** + **SoftFalloff BiomeMaskGraph** on `LPB_IslandBase` (order 0, IslandPlateau graph, Height Replace, rolling plains **~55 m** / ASL ~30–55). Soft coast via `CoastalBeachShelf` ≤12° + SmoothCoastBand into `WorldWater` at Sea Level **24 m**. Surface paint: grass / sand / cliff / rock — **dry sand by ASL** (Sea+0…Sea+16); underwater near-land; no `_HYBRIDHEIGHTBLEND`. Mountains are **separate** LPBs (order 10–19) with elongated ellipse anchors, wide falloff, and **Raise** height delta — not circular KeepHigher stamps and not one Mountain graph for the whole island. Order bands: Geology → Hydrology → Ecology → Civilization. Documented in [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md) and [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces.
+
+**Overworld height / island framing?**  
+**700 m** height budget; IslandPlateau ~55 m plains + mountain Raise LPBs; ocean Sea Level **24 m**. Documented in Vista / NATURAL_ISLAND plans.
+
+**V0 inland lakes / rivers?**  
+**Removed from code (2026-08-15).** V0 ships **ocean only** (`WorldWater` at Sea Level). No `LakeDefinition` / `RiverTracer` / lake pipeline steps. Future inland hydro is a redesign. Alpine multi-plane lakes stay deferred; single Sea Level ocean plane is the locked V0 water model.
 
 ---
 
@@ -272,9 +278,7 @@ Should Local road stubs be generated as a third Prim pass after Secondary, or on
 
 When do `PoiPlacementProfile` C# catalog entries move into ScriptableObject immutable defs for authoring? ([17](17%20Game%20Systems%20Architecture.md) W.4)
 
-Do we ever allow alpine lakes above Sea Level (extra water planes), or stay Valheim-style single plane forever? ([NATURAL_ISLAND_GENERATOR.md](unity/Assets/Plans/NATURAL_ISLAND_GENERATOR.md))
-
-What asset/API provides waterfall meshes once WaterWorks is confirmed to lack one? ([NATURAL_ISLAND_GENERATOR.md](unity/Assets/Plans/NATURAL_ISLAND_GENERATOR.md))
+What asset/API provides waterfall meshes if inland hydro returns later? (Deferred with lake/river redesign.) ([NATURAL_ISLAND_GENERATOR.md](unity/Assets/Plans/NATURAL_ISLAND_GENERATOR.md))
 
 ---
 

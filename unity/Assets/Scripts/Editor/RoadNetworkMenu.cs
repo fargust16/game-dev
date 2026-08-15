@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
-using Den.Tools;
 using GameDev.World;
 using GameDev.World.Landscape;
 using GameDev.World.Poi;
@@ -10,8 +9,6 @@ using GameDev.World.Streaming;
 using GameDev.World.Terrain;
 using GameDev.World.Vegetation;
 using GameDev.World.Water;
-using MapMagic.Core;
-using MapMagic.Terrains;
 using UnityEditor;
 using UnityEngine;
 using WorldScale = GameDev.World.WorldScale;
@@ -30,69 +27,49 @@ namespace GameDev.EditorTools
         private const string RoadCenterLayerPath = "Assets/Settings/TerrainLayers/Dirt_Road_Center.terrainlayer";
         private const string RoadEdgeLayerPath = "Assets/Settings/TerrainLayers/Dirt_Road_Edge.terrainlayer";
         private const string RoadGravelLayerPath = "Assets/Settings/TerrainLayers/Road_Gravel.terrainlayer";
-        private const string LakeBankLayerPath = "Assets/Settings/TerrainLayers/Dirt_Scaled.terrainlayer";
-        private const float BridgeSpanDetectionThresholdMeters = GridCellSizeMeters * 1.8f;
+private const float BridgeSpanDetectionThresholdMeters = GridCellSizeMeters * 1.8f;
         private const string BridgePrefabPath =
             "Assets/Polytope Studio/Lowpoly_Village/Prefabs/Modular/Bridge/PT_Wooden_Bridge_02.prefab";
         private const float BridgeModuleLengthMeters = 4.47f;
         private const float RoadSurfaceLift = 0.08f;
-        private const float ClearanceSampleStepMeters = 6f;
+        // Must stay well below road half-width + shoulder so radial fallbacks don't scallop;
+        // lawn/paint prefer segment distance between these samples.
+        private const float ClearanceSampleStepMeters = 1.25f;
 
         [MenuItem("GameDev/Overworld/Build Road Network")]
         public static void BuildRoadNetwork() => BuildRoadNetworkWithLandscapePlanner();
 
         /// <summary>
-        /// Plans roads on LandscapeCostField, ensures POI degree ≥ 1, applies joint lake+road
-        /// terrain deform when lake definitions are present and not yet dug.
+        /// Plans roads on LandscapeCostField, ensures POI degree ≥ 1, applies road corridor deform.
         /// </summary>
         public static void BuildRoadNetworkWithLandscapePlanner()
         {
-            var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
-            if (mapMagic == null || mapMagic.graph == null)
+            VistaTileSync.WaitForTerrainReady();
+
+            var terrain = OverworldTerrainAccess.FindTerrain();
+            var sampler = OverworldTerrainAccess.CreateSampler(OverworldTerrainMenu.LastSeed);
+            if (terrain == null || sampler == null)
             {
                 return;
             }
 
-            var tileCoord = new Coord(0, 0);
-            var tile = mapMagic.tiles[tileCoord];
-            if (tile == null)
-            {
-                return;
-            }
-
-            MapMagicTileSync.WaitForTileReady(tile);
-
-            var terrain = tile.main?.terrain;
-            var holder = terrain != null ? terrain.GetComponent<DirectMatricesHolder>() : null;
-            if (holder == null)
-            {
-                return;
-            }
-
-            var sampler = new MapMagicBiomeSampler(holder);
-
-            var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
-            var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
-            IWaterSampler waterZones = new CompositeWaterSampler(lakeZones, riverZones);
+            IWaterSampler waterZones = SeaLevelOceanSampler.FromTerrain(terrain);
             var heightSampler = new TerrainWorldHeightSampler(terrain);
 
             var margin = OverworldTileChunks.DefaultMarginMeters;
-            var minX = tileCoord.x * mapMagic.tileSize.x + margin;
-            var minZ = tileCoord.z * mapMagic.tileSize.z + margin;
-            var usableSizeX = mapMagic.tileSize.x - 2f * margin;
-            var usableSizeZ = mapMagic.tileSize.z - 2f * margin;
-            var worldHeightScale = mapMagic.globals.height;
-            float HeightMeters(float x, float z) => sampler.SampleHeight(x, z) * worldHeightScale;
+            var tileSize = WorldScale.OverworldTileMeters;
+            var minX = margin;
+            var minZ = margin;
+            var usableSizeX = tileSize - 2f * margin;
+            var usableSizeZ = tileSize - 2f * margin;
+            float HeightMeters(float x, float z) => sampler.SampleWorldHeight(x, z);
 
-            var lakes = lakeZones != null
-                ? lakeZones.LakeDefinitions
-                : System.Array.Empty<LakeDefinition>();
             var settings = OverworldTerrainMenu.ActiveSettings;
             settings.Clamp();
 
-            var markers = OverworldWorldPlan.GetOrBuildPois(mapMagic, tileCoord);
+            var markers = OverworldWorldPlan.GetOrBuildPois();
 
-            var settlementAnchor = Object.FindFirstObjectByType<OverworldSettlementAnchor>();
+            var settlementAnchor = Object.FindAnyObjectByType<OverworldSettlementAnchor>();
 
             var nodes = new List<Vector2>();
             var isHub = new List<bool>();
@@ -110,15 +87,7 @@ namespace GameDev.EditorTools
                 {
                     continue;
                 }
-
-                if (lakeZones != null &&
-                    lakeZones.TryGetPlannedLakeSignedDistance(x, z, out var lakeSd) &&
-                    lakeSd >= 0f)
-                {
-                    continue;
-                }
-
-                if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y <= waterY)
+if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y <= waterY)
                 {
                     continue;
                 }
@@ -137,44 +106,9 @@ namespace GameDev.EditorTools
             var height = Mathf.Max(1, Mathf.FloorToInt(usableSizeZ / GridCellSizeMeters));
             var grid = new RoadGridSpec(minX, minZ, width, height, GridCellSizeMeters);
 
-            bool CanBridgeSpan(Vector2 from, Vector2 to)
-            {
-                if (riverZones == null)
-                {
-                    return false;
-                }
-
-                var dist = Vector2.Distance(from, to);
-                var step = Mathf.Max(GridCellSizeMeters * 0.5f, 4f);
-                var samples = Mathf.Max(2, Mathf.CeilToInt(dist / step));
-                var sawRiver = false;
-                for (var s = 1; s < samples; s++)
-                {
-                    var t = s / (float)samples;
-                    var p = Vector2.Lerp(from, to, t);
-                    if (lakeZones != null &&
-                        lakeZones.TryGetPlannedLakeSignedDistance(p.x, p.y, out var sd) &&
-                        sd >= 0f)
-                    {
-                        return false;
-                    }
-
-                    if (lakeZones != null && lakeZones.TryGetWaterLevel(p.x, p.y, out _))
-                    {
-                        return false;
-                    }
-
-                    if (riverZones.TryGetWaterLevel(p.x, p.y, out _))
-                    {
-                        sawRiver = true;
-                    }
-                }
-
-                return sawRiver;
-            }
+            bool CanBridgeSpan(Vector2 from, Vector2 to) => false;
 
             var planner = new LandscapePlanner();
-            planner.SetLakes(lakes);
             planner.BuildCostField(
                 minX, minZ, usableSizeX, usableSizeZ,
                 HeightMeters,
@@ -202,23 +136,10 @@ namespace GameDev.EditorTools
 
             bool IsSubmerged(float x, float z)
             {
-                if (lakeZones != null &&
-                    lakeZones.TryGetPlannedLakeSignedDistance(x, z, out var sd) &&
-                    sd >= 0f)
-                {
-                    return true;
-                }
-
                 if (waterZones == null || !waterZones.TryGetWaterLevel(x, z, out var waterY))
-                {
                     return false;
-                }
-
                 if (!heightSampler.TrySampleWorldY(x, z, out var groundY))
-                {
                     return true;
-                }
-
                 return groundY <= waterY;
             }
 
@@ -263,22 +184,13 @@ namespace GameDev.EditorTools
                 var centerLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadCenterLayerPath);
                 var edgeLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadEdgeLayerPath);
                 var gravelLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadGravelLayerPath);
-                var lakeBankLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(LakeBankLayerPath);
                 ApplyRoadLayerLooks(centerLayer, edgeLayer, gravelLayer);
-                var lakesNeedDig = lakes != null && lakes.Count > 0 &&
-                                   (lakeZones == null || !lakeZones.BasinsApplied);
                 TerrainDeformer.Apply(
                     terrain,
-                    lakesNeedDig ? lakes : null,
                     dryRoadDefs,
-                    lakesNeedDig ? lakeBankLayer : null,
                     centerLayer,
                     gravelLayer,
                     edgeLayer);
-                if (lakesNeedDig && lakeZones != null)
-                {
-                    lakeZones.MarkBasinsApplied();
-                }
             }
 
             ClearRoadNetwork();
@@ -286,6 +198,7 @@ namespace GameDev.EditorTools
             var clearance = root.AddComponent<OverworldRoadClearance>();
             clearance.SetSamples(clearanceSamples);
             RoadLawnMask.BakeFromScene();
+            GrassTintMask.BakeFromScene();
 
             var bridgePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BridgePrefabPath);
             for (var i = 0; i < bridgeSpans.Count; i++)
@@ -306,14 +219,14 @@ namespace GameDev.EditorTools
             var terrain = UnityEngine.Terrain.activeTerrains != null &&
                           UnityEngine.Terrain.activeTerrains.Length > 0
                 ? UnityEngine.Terrain.activeTerrains[0]
-                : Object.FindFirstObjectByType<UnityEngine.Terrain>();
+                : Object.FindAnyObjectByType<UnityEngine.Terrain>();
             if (terrain == null)
             {
                 Debug.LogError("[Roads] No terrain found for road surface repaint.");
                 return;
             }
 
-            var clearance = Object.FindFirstObjectByType<OverworldRoadClearance>();
+            var clearance = Object.FindAnyObjectByType<OverworldRoadClearance>();
             if (clearance == null || clearance.Samples == null || clearance.Samples.Count == 0)
             {
                 Debug.LogError(
@@ -340,6 +253,7 @@ namespace GameDev.EditorTools
                 edgeLayer,
                 gravelLayer);
             RoadLawnMask.BakeFromScene();
+            GrassTintMask.BakeFromScene();
             SceneView.RepaintAll();
         }
 

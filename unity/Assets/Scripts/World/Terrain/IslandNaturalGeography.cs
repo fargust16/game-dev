@@ -7,7 +7,7 @@ namespace GameDev.World.Terrain
     /// <summary>
     /// Soft island framing over Vista height SoT.
     /// Does NOT rebuild mountains — preserves Vista relief, sinks ocean rim below SeaLevel,
-    /// and carves closed inland lake basins.
+
     /// Coastline = Terrain height ∩ SeaLevel.
     /// </summary>
     public static class IslandNaturalGeography
@@ -19,7 +19,7 @@ namespace GameDev.World.Terrain
         }
 
         /// <summary>
-        /// Soft land-weight framing + lake basins. <paramref name="includeMountains"/> unused
+        /// Soft land-weight framing. <paramref name="includeMountains"/> unused
         /// (mountains come from Vista); kept for call-site compatibility.
         /// </summary>
         public static void Apply(UnityEngine.Terrain terrain, int worldSeed, bool includeMountains = true)
@@ -47,7 +47,6 @@ namespace GameDev.World.Terrain
             var seed = new Seed.WorldSeed(worldSeed);
             var islandSeed = seed.Fork("terrain.island").Next();
             var coastSeed = seed.Fork("terrain.coast").Next();
-            var lakeSeed = seed.Fork("lake.place").Next();
 
             var islandRng = new Random(islandSeed);
             var worldSize = new Vector3(
@@ -93,8 +92,6 @@ namespace GameDev.World.Terrain
                 }
             }
 
-            // Pass 2: closed lake basins (prefer low Vista pockets inland).
-            CarveBasins(heights, res, size, pos, sea01, maskParams, lakeSeed);
 
             TerrainHeightWrite.Commit(terrain, heights);
         }
@@ -215,148 +212,5 @@ namespace GameDev.World.Terrain
 
             return new MaskSample { LandMask = landMask, NormalizedRadius = r };
         }
-
-        private struct BasinSite
-        {
-            public float Cx;
-            public float Cz;
-            public float Radius;
-            public float Depth01;
-            public float Aspect;
-            public float Cos;
-            public float Sin;
-            public int NoiseSeed;
-        }
-
-        private static void CarveBasins(
-            float[,] heights,
-            int res,
-            Vector3 size,
-            Vector3 pos,
-            float sea01,
-            MaskParams maskParams,
-            int lakeSeed)
-        {
-            var rng = new Random(lakeSeed);
-            var target = WorldScale.LakeMinCount +
-                         rng.Next(0, Mathf.Max(1, WorldScale.LakePreferredMaxCount - WorldScale.LakeMinCount + 1));
-            var sites = new List<BasinSite>(target);
-            var extentX = WorldScale.WorldExtentXMeters;
-            var extentZ = WorldScale.WorldExtentZMeters;
-            var attempts = 0;
-            while (sites.Count < target && attempts++ < 100)
-            {
-                var cx = extentX * (0.28f + (float)rng.NextDouble() * 0.44f);
-                var cz = extentZ * (0.28f + (float)rng.NextDouble() * 0.44f);
-                var mask = SampleMask(cx, cz, maskParams);
-                if (mask.LandMask < 0.62f)
-                {
-                    continue;
-                }
-
-                var tooClose = false;
-                for (var i = 0; i < sites.Count; i++)
-                {
-                    var dx = cx - sites[i].Cx;
-                    var dz = cz - sites[i].Cz;
-                    if (dx * dx + dz * dz < 180f * 180f)
-                    {
-                        tooClose = true;
-                        break;
-                    }
-                }
-
-                if (tooClose)
-                {
-                    continue;
-                }
-
-                var rot = (float)(rng.NextDouble() * Mathf.PI);
-                sites.Add(new BasinSite
-                {
-                    Cx = cx,
-                    Cz = cz,
-                    Radius = 70f + (float)rng.NextDouble() * 140f,
-                    Depth01 = 0.03f + (float)rng.NextDouble() * 0.05f,
-                    Aspect = 0.5f + (float)rng.NextDouble() * 0.8f,
-                    Cos = Mathf.Cos(rot),
-                    Sin = Mathf.Sin(rot),
-                    NoiseSeed = rng.Next(),
-                });
-            }
-
-            if (sites.Count == 0)
-            {
-                return;
-            }
-
-            var rim01 = Mathf.Clamp01(
-                (WorldScale.SeaLevelMeters + WorldScale.LakeSafetyMarginMeters) /
-                Mathf.Max(0.01f, size.y));
-            var floor01 = sea01 - 0.03f;
-            var wppX = size.x / (res - 1);
-            var wppZ = size.z / (res - 1);
-
-            for (var b = 0; b < sites.Count; b++)
-            {
-                var basin = sites[b];
-                // Skip basins whose center is far outside this tile (cheap cull).
-                if (basin.Cx < pos.x - basin.Radius * 1.5f ||
-                    basin.Cx > pos.x + size.x + basin.Radius * 1.5f ||
-                    basin.Cz < pos.z - basin.Radius * 1.5f ||
-                    basin.Cz > pos.z + size.z + basin.Radius * 1.5f)
-                {
-                    continue;
-                }
-
-                var rad = basin.Radius * 1.4f;
-                var minPx = Mathf.Max(0, Mathf.FloorToInt((basin.Cx - rad - pos.x) / wppX));
-                var maxPx = Mathf.Min(res - 1, Mathf.CeilToInt((basin.Cx + rad - pos.x) / wppX));
-                var minPz = Mathf.Max(0, Mathf.FloorToInt((basin.Cz - rad - pos.z) / wppZ));
-                var maxPz = Mathf.Min(res - 1, Mathf.CeilToInt((basin.Cz + rad - pos.z) / wppZ));
-
-                for (var pz = minPz; pz <= maxPz; pz++)
-                {
-                    var wz = pos.z + pz * wppZ;
-                    for (var px = minPx; px <= maxPx; px++)
-                    {
-                        var wx = pos.x + px * wppX;
-                        var dx = wx - basin.Cx;
-                        var dz = wz - basin.Cz;
-                        var rx = (dx * basin.Cos + dz * basin.Sin) / basin.Radius;
-                        var rz = (-dx * basin.Sin + dz * basin.Cos) / (basin.Radius * basin.Aspect);
-                        // Domain-warped radius → irregular shoreline (not a clean ellipse).
-                        var n1 = (Mathf.PerlinNoise(wx * 0.008f + basin.NoiseSeed, wz * 0.008f) - 0.5f) * 0.55f;
-                        var n2 = (Mathf.PerlinNoise(wx * 0.018f + 11f, wz * 0.018f + basin.NoiseSeed) - 0.5f) * 0.25f;
-                        var r = Mathf.Sqrt(rx * rx + rz * rz) + n1 + n2;
-                        if (r >= 1.2f)
-                        {
-                            continue;
-                        }
-
-                        var mask = SampleMask(wx, wz, maskParams);
-                        if (mask.LandMask < 0.45f)
-                        {
-                            continue;
-                        }
-
-                        if (r < 0.68f)
-                        {
-                            var bowl = 1f - Mathf.Clamp01(r / 0.68f);
-                            bowl = bowl * bowl;
-                            var bowlHeight01 = Mathf.Lerp(sea01 - 0.008f, floor01 - basin.Depth01 * 0.45f, bowl);
-                            heights[pz, px] = Mathf.Min(heights[pz, px], Mathf.Clamp01(bowlHeight01));
-                        }
-                        else
-                        {
-                            var ring = 1f - Mathf.Clamp01((r - 0.68f) / 0.52f);
-                            ring = ring * ring;
-                            var raised = Mathf.Max(heights[pz, px], rim01);
-                            heights[pz, px] = Mathf.Lerp(heights[pz, px], raised, ring * 0.75f);
-                        }
-                    }
-                }
-            }
-        }
-    }
+}
 }

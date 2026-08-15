@@ -1,6 +1,8 @@
 #if UNITY_EDITOR
 using GameDev.World;
+using GameDev.World.Terrain;
 using UnityEditor;
+using UnityEngine;
 
 namespace GameDev.EditorTools
 {
@@ -12,7 +14,24 @@ namespace GameDev.EditorTools
         private const int BasePriority = 100;
 
         [MenuItem("GameDev/Overworld/Part-Gen/Surface/Generate", false, BasePriority)]
-        public static void SurfaceGenerate() => OverworldPipeline.GenerateStep(OverworldPipelineStepId.Surface);
+        public static void SurfaceGenerate()
+        {
+            var seed = OverworldTerrainMenu.LastSeed != 0
+                ? OverworldTerrainMenu.LastSeed
+                : OverworldTerrainMenu.DefaultSeed;
+            Debug.Log(
+                $"[Part-Gen] Surface Generate uses seed={seed} (deterministic). " +
+                "Same seed → same island. For a new shape: Part-Gen/Surface/Generate Random Seed.");
+            OverworldPipeline.GenerateStep(OverworldPipelineStepId.Surface);
+        }
+
+        [MenuItem("GameDev/Overworld/Part-Gen/Surface/Generate Random Seed", false, BasePriority)]
+        public static void SurfaceGenerateRandom()
+        {
+            var seed = System.Environment.TickCount;
+            Debug.Log($"[Part-Gen] Surface Generate Random Seed seed={seed}");
+            OverworldTerrainMenu.GenerateSurface(seed, TerrainBakeFlags.None);
+        }
 
         [MenuItem("GameDev/Overworld/Part-Gen/Surface/Clear", false, BasePriority + 1)]
         public static void SurfaceClear() => OverworldPipeline.ClearStep(OverworldPipelineStepId.Surface);
@@ -28,12 +47,6 @@ namespace GameDev.EditorTools
 
         [MenuItem("GameDev/Overworld/Part-Gen/Mountains/Clear", false, BasePriority + 21)]
         public static void MountainsClear() => OverworldPipeline.ClearStep(OverworldPipelineStepId.Mountains);
-
-        [MenuItem("GameDev/Overworld/Part-Gen/Lakes/Generate", false, BasePriority + 30)]
-        public static void LakesGenerate() => OverworldPipeline.GenerateStep(OverworldPipelineStepId.Lakes);
-
-        [MenuItem("GameDev/Overworld/Part-Gen/Lakes/Clear", false, BasePriority + 31)]
-        public static void LakesClear() => OverworldPipeline.ClearStep(OverworldPipelineStepId.Lakes);
 
         [MenuItem("GameDev/Overworld/Part-Gen/Markers/Generate", false, BasePriority + 40)]
         public static void MarkersGenerate() => OverworldPipeline.GenerateStep(OverworldPipelineStepId.Markers);
@@ -52,12 +65,6 @@ namespace GameDev.EditorTools
 
         [MenuItem("GameDev/Overworld/Part-Gen/Roads/Clear", false, BasePriority + 61)]
         public static void RoadsClear() => OverworldPipeline.ClearStep(OverworldPipelineStepId.Roads);
-
-        [MenuItem("GameDev/Overworld/Part-Gen/WaterMeshes/Generate", false, BasePriority + 70)]
-        public static void WaterMeshesGenerate() => OverworldPipeline.GenerateStep(OverworldPipelineStepId.WaterMeshes);
-
-        [MenuItem("GameDev/Overworld/Part-Gen/WaterMeshes/Clear", false, BasePriority + 71)]
-        public static void WaterMeshesClear() => OverworldPipeline.ClearStep(OverworldPipelineStepId.WaterMeshes);
 
         [MenuItem("GameDev/Overworld/Part-Gen/Trees/Generate", false, BasePriority + 80)]
         public static void TreesGenerate() => OverworldPipeline.GenerateStep(OverworldPipelineStepId.Trees);

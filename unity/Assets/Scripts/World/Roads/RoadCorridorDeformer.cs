@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GameDev.World.Water;
 using UnityEngine;
 using WorldScale = GameDev.World.WorldScale;
 
@@ -17,14 +16,11 @@ namespace GameDev.World.Roads
             UnityEngine.Terrain terrain,
             IReadOnlyList<RoadDefinition> roads,
             TerrainLayer centerLayer = null,
-            IReadOnlyList<LakeDefinition> lakes = null,
             TerrainLayer gravelLayer = null,
             TerrainLayer edgeLayer = null)
         {
             if (terrain == null || terrain.terrainData == null || roads == null || roads.Count == 0)
-            {
                 return;
-            }
 
             var data = terrain.terrainData;
             var resolution = data.heightmapResolution;
@@ -41,21 +37,17 @@ namespace GameDev.World.Roads
             {
                 ApplyRoad(
                     heights, original, touched, resolution,
-                    terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight, roads[r], lakes);
+                    terrainPos, worldPerPixelX, worldPerPixelZ, worldHeight, roads[r]);
             }
 
             data.SetHeights(0, 0, heights);
 
             if (centerLayer != null)
-            {
                 RoadSurfacePaint.Paint(terrain, roads, centerLayer, edgeLayer, gravelLayer);
-            }
 
             var collider = terrain.GetComponent<TerrainCollider>();
             if (collider != null)
-            {
                 collider.terrainData = terrain.terrainData;
-            }
         }
 
         private static void ApplyRoad(
@@ -67,14 +59,11 @@ namespace GameDev.World.Roads
             float worldPerPixelX,
             float worldPerPixelZ,
             float worldHeight,
-            RoadDefinition road,
-            IReadOnlyList<LakeDefinition> lakes)
+            RoadDefinition road)
         {
             if (road.CenterlineXZ == null || road.CenterlineXZ.Count < 2 ||
                 road.ProfileY == null || road.ProfileY.Count < 2)
-            {
                 return;
-            }
 
             var dense = DensifyWithProfile(road.CenterlineXZ, road.ProfileY, DensifyStepMeters);
             var halfRoad = road.RoadWidthMeters * 0.5f;
@@ -92,10 +81,7 @@ namespace GameDev.World.Roads
                 var ab = b - a;
                 var len = ab.magnitude;
                 if (len < 1e-4f)
-                {
                     continue;
-                }
-
                 var dir = ab / len;
                 var pad = blendEnd + worldPerPixelX * 2f;
                 var minX = Mathf.Min(a.x, b.x) - pad;
@@ -113,39 +99,25 @@ namespace GameDev.World.Roads
                     {
                         var worldX = terrainPos.x + px * worldPerPixelX;
                         var worldZ = terrainPos.z + pz * worldPerPixelZ;
-                        if (IsInsideLakeWater(lakes, worldX, worldZ))
-                        {
-                            continue;
-                        }
                         var p = new Vector2(worldX, worldZ);
                         var ap = p - a;
                         var t = Mathf.Clamp01(Vector2.Dot(ap, dir) / len);
                         var closest = a + dir * (t * len);
                         var dist = Vector2.Distance(p, closest);
                         if (dist > blendEnd)
-                        {
                             continue;
-                        }
 
                         var roadY = Mathf.Lerp(ya, yb, t);
                         var originalY = terrainPos.y + original[pz, px] * worldHeight;
-
-                        // Cap earthwork so we never create canyon walls.
                         var delta = roadY - originalY;
                         if (delta < -maxCut)
-                        {
                             roadY = originalY - maxCut;
-                        }
                         else if (delta > maxFill)
-                        {
                             roadY = originalY + maxFill;
-                        }
 
                         float influence;
                         if (dist <= halfRoad)
-                        {
                             influence = 1f;
-                        }
                         else if (dist <= shoulderEnd)
                         {
                             var u = (dist - halfRoad) / Mathf.Max(road.ShoulderMeters, 0.01f);
@@ -154,46 +126,21 @@ namespace GameDev.World.Roads
                         else
                         {
                             var u = (dist - shoulderEnd) / Mathf.Max(road.BlendMeters, 0.01f);
-                            // Outer blend: smoothstep 0→1 away from road → lerp back to original.
                             influence = 1f - Smooth01(u);
                         }
 
                         var targetY = Mathf.Lerp(originalY, roadY, influence);
                         var candidate = Mathf.Clamp01((targetY - terrainPos.y) / worldHeight);
-
-                        // Prefer stronger influence when multiple roads overlap.
                         if (!touched[pz, px] || influence > 0.5f)
                         {
                             heights[pz, px] = candidate;
                             touched[pz, px] = true;
                         }
                         else
-                        {
                             heights[pz, px] = Mathf.Lerp(heights[pz, px], candidate, influence);
-                        }
                     }
                 }
             }
-        }
-
-        private static bool IsInsideLakeWater(
-            IReadOnlyList<LakeDefinition> lakes, float worldX, float worldZ)
-        {
-            if (lakes == null || lakes.Count == 0)
-            {
-                return false;
-            }
-
-            for (var i = 0; i < lakes.Count; i++)
-            {
-                var protect = Mathf.Max(8f, lakes[i].BasinExpandMeters + 4f);
-                if (lakes[i].WaterShoreSignedDistance(worldX, worldZ) >= -protect)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private static float Smooth01(float t)
@@ -209,10 +156,7 @@ namespace GameDev.World.Roads
         {
             var result = new List<(Vector2, float)>();
             if (xz.Count == 0)
-            {
                 return result;
-            }
-
             result.Add((xz[0], y[0]));
             for (var i = 0; i < xz.Count - 1; i++)
             {
@@ -228,7 +172,6 @@ namespace GameDev.World.Roads
                     result.Add((Vector2.Lerp(a, b, t), Mathf.Lerp(ya, yb, t)));
                 }
             }
-
             return result;
         }
     }

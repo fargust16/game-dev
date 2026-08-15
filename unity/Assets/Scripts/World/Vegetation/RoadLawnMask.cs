@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using GameDev.World;
+using GameDev.World.Roads;
 using UnityEngine;
 
 namespace GameDev.World.Vegetation
 {
     /// <summary>
-    /// World-space lawn factor for roads: 0 = packed road bed, 1 = full lawn.
+    /// World-space lawn factor for roads: sparse residual at bed → 1 = full lawn.
     /// Bound as a global shader texture so grass height/density/tilt stay continuous
     /// without extra meshes or draw calls.
     /// </summary>
@@ -14,12 +16,14 @@ namespace GameDev.World.Vegetation
         public static readonly int WorldId = Shader.PropertyToID("_OverworldRoadLawnMask_World");
         public static readonly int EdgeParamsId = Shader.PropertyToID("_OverworldGrassEdgeParams");
 
-        public const int DefaultResolution = 768;
+        /// <summary>~1 m/px on a 1400 m tile keeps 0.5–1.5 m shoulders continuous.</summary>
+        public const int DefaultResolution = 1536;
 
         private static Texture2D boundTexture;
 
         /// <summary>
         /// Sample lawn factor from road clearance samples (CPU mirror of the baked mask).
+        /// Uses segment distance so shoulders are not scalloped disks.
         /// </summary>
         public static float SampleLawn01(
             float worldX,
@@ -33,20 +37,9 @@ namespace GameDev.World.Vegetation
                 return 1f;
             }
 
-            var best = float.MaxValue;
-            for (var i = 0; i < roadSamples.Count; i++)
-            {
-                var s = roadSamples[i];
-                var dx = worldX - s.x;
-                var dz = worldZ - s.y;
-                var d = Mathf.Sqrt(dx * dx + dz * dz);
-                if (d < best)
-                {
-                    best = d;
-                }
-            }
-
-            return VegetationClearance.FalloffMultiplier(best, clearCoreMeters, transitionMeters);
+            var best = RoadSampleDistance.NearestMeters(new Vector2(worldX, worldZ), roadSamples);
+            return VegetationClearance.FalloffMultiplier(
+                best, clearCoreMeters, transitionMeters, GrassMask.RoadLawnMinAtCenter);
         }
 
         public static void BindDefaults()
@@ -54,6 +47,8 @@ namespace GameDev.World.Vegetation
             Shader.SetGlobalTexture(TextureId, Texture2D.whiteTexture);
             Shader.SetGlobalVector(WorldId, new Vector4(0f, 0f, 1f, 1f));
             BindEdgeParams();
+            cpuPixels = null;
+            cpuRes = 0;
         }
 
         public static void BindEdgeParams()
@@ -68,7 +63,7 @@ namespace GameDev.World.Vegetation
         }
 
         /// <summary>
-        /// Stamp road samples into an R8 mask and bind globals. Safe to call from EditMode.
+        /// Stamp road polylines into an R8 mask and bind globals. Safe to call from EditMode.
         /// </summary>
         public static void BakeAndBind(
             IReadOnlyList<Vector2> roadSamples,
@@ -79,7 +74,6 @@ namespace GameDev.World.Vegetation
             int resolution = DefaultResolution)
         {
             BindEdgeParams();
-
             if (roadSamples == null || roadSamples.Count == 0 ||
                 worldSizeX < 1f || worldSizeZ < 1f)
             {
@@ -113,28 +107,27 @@ namespace GameDev.World.Vegetation
             }
 
             var core = GrassMask.RoadClearCoreMeters;
-            var falloff = GrassMask.RoadEdgeFalloffMeters;
+            var metersPerPx = Mathf.Max(worldSizeX / res, worldSizeZ / res);
+            var falloff = RoadSurfaceStyle.SoftRimMeters(metersPerPx);
             var stampR = core + falloff;
-            var invSizeX = 1f / worldSizeX;
-            var invSizeZ = 1f / worldSizeZ;
             var metersPerPxX = worldSizeX / res;
             var metersPerPxZ = worldSizeZ / res;
-            var stampPx = Mathf.CeilToInt(stampR / Mathf.Min(metersPerPxX, metersPerPxZ)) + 1;
+            var pad = stampR + 2f;
 
-            for (var i = 0; i < roadSamples.Count; i++)
+            for (var i = 0; i < roadSamples.Count - 1; i++)
             {
-                var s = roadSamples[i];
-                var cx = Mathf.FloorToInt((s.x - worldMinX) * invSizeX * res);
-                var cz = Mathf.FloorToInt((s.y - worldMinZ) * invSizeZ * res);
-                if (cx < -stampPx || cz < -stampPx || cx >= res + stampPx || cz >= res + stampPx)
+                var a = roadSamples[i];
+                var b = roadSamples[i + 1];
+                var len = Vector2.Distance(a, b);
+                if (len < 1e-4f || len > RoadSampleDistance.MaxSegmentGapMeters)
                 {
                     continue;
                 }
 
-                var minX = Mathf.Max(0, cx - stampPx);
-                var maxX = Mathf.Min(res - 1, cx + stampPx);
-                var minZ = Mathf.Max(0, cz - stampPx);
-                var maxZ = Mathf.Min(res - 1, cz + stampPx);
+                var minX = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(a.x, b.x) - pad - worldMinX) / metersPerPxX));
+                var maxX = Mathf.Min(res - 1, Mathf.CeilToInt((Mathf.Max(a.x, b.x) + pad - worldMinX) / metersPerPxX));
+                var minZ = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(a.y, b.y) - pad - worldMinZ) / metersPerPxZ));
+                var maxZ = Mathf.Min(res - 1, Mathf.CeilToInt((Mathf.Max(a.y, b.y) + pad - worldMinZ) / metersPerPxZ));
 
                 for (var z = minZ; z <= maxZ; z++)
                 {
@@ -142,10 +135,10 @@ namespace GameDev.World.Vegetation
                     for (var x = minX; x <= maxX; x++)
                     {
                         var worldX = worldMinX + (x + 0.5f) * metersPerPxX;
-                        var dx = worldX - s.x;
-                        var dz = worldZ - s.y;
-                        var dist = Mathf.Sqrt(dx * dx + dz * dz);
-                        var lawn = VegetationClearance.FalloffMultiplier(dist, core, falloff);
+                        var dist = RoadSampleDistance.PointToSegmentMeters(
+                            new Vector2(worldX, worldZ), a, b);
+                        var lawn = VegetationClearance.FalloffMultiplier(
+                            dist, core, falloff, GrassMask.RoadLawnMinAtCenter);
                         var v = (byte)Mathf.Clamp(Mathf.RoundToInt(lawn * 255f), 0, 255);
                         var idx = z * res + x;
                         if (v < pixels[idx])
@@ -158,35 +151,86 @@ namespace GameDev.World.Vegetation
 
             tex.SetPixelData(pixels, 0);
             tex.Apply(false, false);
-
+            boundTexture = tex;
+            cpuPixels = pixels;
+            cpuRes = res;
+            cpuMinX = worldMinX;
+            cpuMinZ = worldMinZ;
+            cpuSizeX = worldSizeX;
+            cpuSizeZ = worldSizeZ;
             Shader.SetGlobalTexture(TextureId, tex);
             Shader.SetGlobalVector(
                 WorldId,
                 new Vector4(worldMinX, worldMinZ, worldSizeX, worldSizeZ));
         }
 
+        /// <summary>True after <see cref="BakeAndBind"/> with road data (CPU buffer ready for grass bake).</summary>
+        public static bool HasCpuBake =>
+            cpuPixels != null && cpuRes > 0 && cpuSizeX > 0f && cpuSizeZ > 0f;
+
+        /// <summary>
+        /// Bilinear sample of the baked lawn texture (O(1)). Prefer this over polyline scans in grass bake.
+        /// </summary>
+        public static float SampleBakedLawn01(float worldX, float worldZ)
+        {
+            if (!HasCpuBake)
+            {
+                return 1f;
+            }
+
+            var u = (worldX - cpuMinX) / cpuSizeX;
+            var v = (worldZ - cpuMinZ) / cpuSizeZ;
+            if (u < 0f || v < 0f || u > 1f || v > 1f)
+            {
+                return 1f;
+            }
+
+            var fx = u * (cpuRes - 1);
+            var fz = v * (cpuRes - 1);
+            var x0 = Mathf.FloorToInt(fx);
+            var z0 = Mathf.FloorToInt(fz);
+            var x1 = Mathf.Min(x0 + 1, cpuRes - 1);
+            var z1 = Mathf.Min(z0 + 1, cpuRes - 1);
+            var tx = fx - x0;
+            var tz = fz - z0;
+            tx = tx * tx * (3f - 2f * tx);
+            tz = tz * tz * (3f - 2f * tz);
+
+            float A = cpuPixels[z0 * cpuRes + x0] / 255f;
+            float B = cpuPixels[z0 * cpuRes + x1] / 255f;
+            float C = cpuPixels[z1 * cpuRes + x0] / 255f;
+            float D = cpuPixels[z1 * cpuRes + x1] / 255f;
+            return Mathf.Lerp(Mathf.Lerp(A, B, tx), Mathf.Lerp(C, D, tx), tz);
+        }
+
         public static void BakeFromScene()
         {
-            var clearance = Object.FindFirstObjectByType<Roads.OverworldRoadClearance>();
+            var clearance = Object.FindAnyObjectByType<OverworldRoadClearance>();
             var terrain = UnityEngine.Terrain.activeTerrains != null &&
                           UnityEngine.Terrain.activeTerrains.Length > 0
                 ? UnityEngine.Terrain.activeTerrains[0]
-                : Object.FindFirstObjectByType<UnityEngine.Terrain>();
-
+                : Object.FindAnyObjectByType<UnityEngine.Terrain>();
             if (terrain == null || terrain.terrainData == null)
             {
                 BindDefaults();
+                cpuPixels = null;
+                cpuRes = 0;
                 return;
             }
 
-            var pos = terrain.transform.position;
-            var size = terrain.terrainData.size;
             BakeAndBind(
                 clearance != null ? clearance.Samples : null,
-                pos.x,
-                pos.z,
-                size.x,
-                size.z);
+                0f,
+                0f,
+                WorldScale.WorldExtentXMeters,
+                WorldScale.WorldExtentZMeters);
         }
+
+        private static byte[] cpuPixels;
+        private static int cpuRes;
+        private static float cpuMinX;
+        private static float cpuMinZ;
+        private static float cpuSizeX;
+        private static float cpuSizeZ;
     }
 }

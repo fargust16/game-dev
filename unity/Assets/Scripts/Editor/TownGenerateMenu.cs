@@ -153,7 +153,7 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Town/Clear")]
         public static void ClearTown()
         {
-            var gen = Object.FindFirstObjectByType<TownGenerator>();
+            var gen = Object.FindAnyObjectByType<TownGenerator>();
             if (gen == null)
             {
                 Debug.LogWarning("[Town] No TownGenerator in scene.");
@@ -197,7 +197,7 @@ namespace GameDev.EditorTools
 
         private static TownGenerator FindOrCreateGenerator()
         {
-            var gen = Object.FindFirstObjectByType<TownGenerator>();
+            var gen = Object.FindAnyObjectByType<TownGenerator>();
             if (gen != null)
             {
                 if (gen.Profile == null)

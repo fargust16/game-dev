@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GameDev.World;
 using GameDev.World.Roads;
 using GameDev.World.Terrain;
 using GameDev.World.Water;
@@ -13,13 +14,28 @@ namespace GameDev.World.Vegetation
     public static class GrassMask
     {
         public const float MinDensity = 0.05f;
-        public const float ShoreFadeMeters = 3f;
-
-        /// <summary>Bare packed road bed (no grass).</summary>
-        public const float RoadClearCoreMeters = 2.4f;
 
         /// <summary>
-        /// Soft shoulder width (memo: 1.5–3.0 m). Kept in sync with road splat blend.
+        /// Floor on green dry land / biome transitions (memo 0.25–0.35).
+        /// </summary>
+        public const float LandDensityMin = 0.3f;
+
+        public const float TransitionDensityFloor = 0.28f;
+
+        public const float LandDensityMax = 1.0f;
+
+        public const float ShoreFadeMeters = 3f;
+
+        /// <summary>
+        /// Sparse residual at road centerline (memo: density drops toward center, not bald).
+        /// </summary>
+        public const float RoadLawnMinAtCenter = 0f;
+
+        /// <summary>Primary half-width — lawn ramps from bare bed to full past this + falloff.</summary>
+        public const float RoadClearCoreMeters = WorldScale.RoadPrimaryWidthMeters * 0.5f;
+
+        /// <summary>
+        /// Soft shoulder width guide. Bake uses SoftRimMeters so falloff ≥ 2.5 texels.
         /// </summary>
         public const float RoadEdgeFalloffMeters = RoadSurfaceStyle.TransitionMeters;
 
@@ -99,7 +115,35 @@ namespace GameDev.World.Vegetation
                 density *= ForestPatchFactor(worldX, worldZ, offsets, forest);
             }
 
-            return density < MinDensity ? 0f : Mathf.Clamp01(density);
+            // Height softens highland/mountain grass (visual direction: density from height too).
+            density *= HeightFactor(groundY, terrainHeightBudget: WorldScale.TerrainHeightBudgetMeters);
+
+            if (density < MinDensity)
+            {
+                return 0f;
+            }
+
+            // Open green land / soft biome joins keep a readable floor (0.25–1.0).
+            if (settlementMul > 0.4f && clearanceMul > 0.4f && waterFactor > 0.5f && forest < 0.85f)
+            {
+                var floor = Mathf.Lerp(LandDensityMin, TransitionDensityFloor, forest);
+                density = Mathf.Max(density, floor);
+            }
+
+            return Mathf.Clamp(density, 0f, LandDensityMax);
+        }
+
+        /// <summary>0..1 mul — full below ~mid plains, fades toward peaks.</summary>
+        public static float HeightFactor(float groundY, float terrainHeightBudget)
+        {
+            if (terrainHeightBudget <= 1f)
+            {
+                return 1f;
+            }
+
+            var h01 = Mathf.Clamp01(groundY / terrainHeightBudget);
+            // Soft drop above ~55% of height budget (highland→mountain).
+            return 1f - Mathf.SmoothStep(0.55f, 0.92f, h01) * 0.75f;
         }
 
         public static float Evaluate(
@@ -125,6 +169,37 @@ namespace GameDev.World.Vegetation
                 water, worldX, worldZ, VegetationEcology.WetBoostMeters);
             var ecology = VegetationEcology.Evaluate(
                 worldX, worldZ, biome, slope01, moisture01, wetness, offsets);
+            return Sample(
+                worldX, worldZ, groundY, ecology, clearMul, water, settlement,
+                shoreBufferMeters, offsets);
+        }
+
+        /// <summary>
+        /// Continuous ecology from height/slope/moisture — avoids hard biome flips at band edges.
+        /// </summary>
+        public static float EvaluateSoft(
+            float worldX,
+            float worldZ,
+            float groundY,
+            float height01,
+            float slope01,
+            float moisture01,
+            VegetationEcology.NoiseOffsets offsets,
+            VegetationClearance clearance,
+            IWaterSampler water,
+            GrassExclusion settlement,
+            float shoreBufferMeters = 1.5f)
+        {
+            var clearMul = clearance != null ? clearance.Multiplier(worldX, worldZ) : 1f;
+            if (clearMul <= 0.01f)
+            {
+                return 0f;
+            }
+
+            var wetness = WaterProximity.SampleWetness01(
+                water, worldX, worldZ, VegetationEcology.WetBoostMeters);
+            var ecology = VegetationEcology.EvaluateSoft(
+                worldX, worldZ, height01, slope01, moisture01, wetness, offsets);
             return Sample(
                 worldX, worldZ, groundY, ecology, clearMul, water, settlement,
                 shoreBufferMeters, offsets);

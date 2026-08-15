@@ -1,15 +1,11 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
-using Den.Tools;
 using GameDev.World;
 using GameDev.World.Landscape;
 using GameDev.World.Poi;
 using GameDev.World.Seed;
 using GameDev.World.Streaming;
 using GameDev.World.Terrain;
-using GameDev.World.Water;
-using MapMagic.Core;
-using MapMagic.Terrains;
 using UnityEngine;
 using WorldSeed = GameDev.World.Seed.WorldSeed;
 
@@ -41,9 +37,7 @@ namespace GameDev.EditorTools
             return def;
         }
 
-        public static IReadOnlyList<PoiMarker> GetOrBuildPois(
-            MapMagicObject mapMagic,
-            Coord tileCoord)
+        public static IReadOnlyList<PoiMarker> GetOrBuildPois()
         {
             var settings = OverworldTerrainMenu.ActiveSettings;
             settings.Clamp();
@@ -54,18 +48,14 @@ namespace GameDev.EditorTools
                 return def.Pois;
             }
 
-            return BuildAndStorePois(mapMagic, tileCoord, def);
+            return BuildAndStorePois(def);
         }
 
-        public static IReadOnlyList<PoiMarker> BuildAndStorePois(
-            MapMagicObject mapMagic,
-            Coord tileCoord,
-            WorldDefinition def = null)
+        public static IReadOnlyList<PoiMarker> BuildAndStorePois(WorldDefinition def = null)
         {
-            var tile = mapMagic.tiles[tileCoord];
-            var terrain = tile?.main?.terrain;
-            var holder = terrain != null ? terrain.GetComponent<DirectMatricesHolder>() : null;
-            if (holder == null)
+            var terrain = OverworldTerrainAccess.FindTerrain();
+            var sampler = OverworldTerrainAccess.CreateSampler(OverworldTerrainMenu.LastSeed);
+            if (terrain == null || sampler == null)
             {
                 return System.Array.Empty<PoiMarker>();
             }
@@ -74,35 +64,21 @@ namespace GameDev.EditorTools
             settings.Clamp();
             def ??= EnsureDefinition(OverworldTerrainMenu.LastSeed, settings);
 
-            var sampler = new MapMagicBiomeSampler(holder);
             var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
+            var tileSize = WorldScale.OverworldTileMeters;
             var chunks = OverworldTileChunks.CoveringTile(
-                tileCoord, mapMagic.tileSize, OverworldTileChunks.DefaultMarginMeters);
-
-            var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
+                0, 0, tileSize, tileSize, OverworldTileChunks.DefaultMarginMeters);
             var margin = OverworldTileChunks.DefaultMarginMeters;
-            var minX = tileCoord.x * mapMagic.tileSize.x + margin;
-            var minZ = tileCoord.z * mapMagic.tileSize.z + margin;
-            var usableSizeX = mapMagic.tileSize.x - 2f * margin;
-            var usableSizeZ = mapMagic.tileSize.z - 2f * margin;
-            var worldHeightScale = mapMagic.globals.height;
-            float HeightMeters(float x, float z) => sampler.SampleHeight(x, z) * worldHeightScale;
-
-            var lakes = lakeZones != null
-                ? lakeZones.LakeDefinitions
-                : System.Array.Empty<LakeDefinition>();
-
-            if (lakes.Count > 0)
-            {
-                def.SetLakes(lakes);
-            }
-
+            var minX = margin;
+            var minZ = margin;
+            var usableSizeX = tileSize - 2f * margin;
+            var usableSizeZ = tileSize - 2f * margin;
+            float HeightMeters(float x, float z) => sampler.SampleWorldHeight(x, z);
             var analysis = new LandscapeCostField(
                 minX, minZ, usableSizeX, usableSizeZ,
                 WorldScale.LandscapeCostCellMeters,
                 HeightMeters,
-                (x, z) => sampler.SampleBiome(x, z),
-                lakes);
+                (x, z) => sampler.SampleBiome(x, z));
 
             var placer = new StubPoiPlacer(
                 worldSeed,

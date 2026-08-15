@@ -402,7 +402,7 @@ namespace GameDev.World
 
         private void RefreshAllShellLabels()
         {
-            var shells = FindObjectsByType<PoiShellMarker>(FindObjectsSortMode.None);
+            var shells = FindObjectsByType<PoiShellMarker>();
             foreach (var shell in shells)
             {
                 shell.RefreshPresentation();

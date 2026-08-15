@@ -42,7 +42,9 @@ namespace GameDev.World.Buildings.Shell
         public PlotFootprint Plot;
         public StreetContext Street;
         public List<ShellPieceInstance> Pieces = new List<ShellPieceInstance>(64);
-        public PortalSocket? Portal;
+        /// <summary>When false, <see cref="Portal"/> is unused (Unity cannot serialize <c>PortalSocket?</c>).</summary>
+        public bool HasPortal;
+        public PortalSocket Portal;
         public Bounds LocalBounds;
 
         public void AddPiece(

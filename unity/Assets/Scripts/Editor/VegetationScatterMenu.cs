@@ -1,17 +1,16 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
-using Den.Tools;
+using GameDev.World;
 using GameDev.World.Roads;
 using GameDev.World.Seed;
 using GameDev.World.Settlement;
 using GameDev.World.Terrain;
 using GameDev.World.Vegetation;
 using GameDev.World.Water;
-using MapMagic.Core;
-using MapMagic.Terrains;
 using UnityEditor;
 using UnityEngine;
 using WorldScale = GameDev.World.WorldScale;
+using WorldSeed = GameDev.World.Seed.WorldSeed;
 
 namespace GameDev.EditorTools
 {
@@ -32,16 +31,17 @@ namespace GameDev.EditorTools
         private const int TreeReferenceAttempts = 6000;
         private const int ShrubReferenceAttempts = 9000;
         /// <summary>Sparse flowers / mushrooms only — carpet grass is GPU <see cref="GrassField"/>.</summary>
-        private const int FlowerReferenceAttempts = 2500;
+        private const int FlowerReferenceAttempts = 4500;
         private const int RockReferenceAttempts = 1800;
 
         private static readonly Dictionary<string, GameObject> PrefabCache = new Dictionary<string, GameObject>(64);
 
         private const float ShoreBufferMeters = 1.5f;
 
-        // Soft road shoulder: bare core + 1–3 m density/height falloff (see GrassMask).
+        // Soft road shoulder: bare core + SoftRim falloff (≥2.5 alphamap texels).
         private const float RoadClearRadius = GrassMask.RoadClearCoreMeters;
-        private const float RoadFalloff = GrassMask.RoadEdgeFalloffMeters;
+        private static float RoadFalloffMeters =>
+            RoadSurfaceStyle.SoftRimMeters(WorldScale.OverworldTileMeters / 512f);
         private const float SettlementClearRadius = 28f;
         private const float SettlementFalloff = 22f;
         // Hard empty pocket around POI props/buildings so forest/grass does not sit on the marker;
@@ -254,8 +254,20 @@ namespace GameDev.EditorTools
                 var field = GrassBakeMenu.Bake(
                     ctx.Sampler, ctx.Terrain, ctx.Water, ctx.Clearance, ctx.Offsets,
                     ctx.MinX, ctx.MinZ, ctx.SizeX, ctx.SizeZ, OverworldTerrainMenu.LastSeed);
+                if (field != null)
+                {
+                    // Scene camera may sit on another tile — warm island centers so EditMode shows lawn.
+                    field.WarmBakeAround(
+                        new Vector3(ctx.MinX + ctx.SizeX * 0.5f, 0f, ctx.MinZ + ctx.SizeZ * 0.5f),
+                        GrassField.CullDistanceMeters);
+                    field.WarmBakeAround(
+                        new Vector3(WorldScale.OverworldTileMeters * 0.5f, 0f, WorldScale.OverworldTileMeters * 0.5f),
+                        GrassField.CullDistanceMeters);
+                }
+
                 grassInstances = field != null ? field.TotalInstances : 0;
                 RoadLawnMask.BakeFromScene();
+                GrassTintMask.BakeFromScene();
             });
             Debug.Log($"[Vegetation] grassInstances={grassInstances} seed={OverworldTerrainMenu.LastSeed}");
         }
@@ -283,7 +295,7 @@ namespace GameDev.EditorTools
         private struct ScatterContext
         {
             public GameObject Root;
-            public MapMagicBiomeSampler Sampler;
+            public VistaTerrainSampler Sampler;
             public UnityEngine.Terrain Terrain;
             public IWaterSampler Water;
             public VegetationClearance Clearance;
@@ -302,28 +314,10 @@ namespace GameDev.EditorTools
         private static bool TryBeginScatter(out ScatterContext ctx)
         {
             ctx = default;
-            var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
-            if (mapMagic == null || mapMagic.graph == null)
-            {
-                return false;
-            }
+            VistaTileSync.WaitForTerrainReady();
 
-            var tileCoord = new Coord(0, 0);
-            var tile = mapMagic.tiles[tileCoord];
-            if (tile == null)
-            {
-                return false;
-            }
-
-            MapMagicTileSync.WaitForTileReady(tile);
-            var terrain = tile.main?.terrain;
+            var terrain = OverworldTerrainAccess.FindTerrain();
             if (terrain == null)
-            {
-                return false;
-            }
-
-            var holder = terrain.GetComponent<DirectMatricesHolder>();
-            if (holder == null)
             {
                 return false;
             }
@@ -338,20 +332,18 @@ namespace GameDev.EditorTools
             var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
             var densityRng = worldSeed.Fork("vegetation-density");
             var offsets = VegetationEcology.NoiseOffsets.FromRng(densityRng);
-            var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
-            var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
-            IWaterSampler waterZones = new CompositeWaterSampler(lakeZones, riverZones);
+            IWaterSampler waterZones = SeaLevelOceanSampler.FromTerrain(terrain);
             var clearance = BuildClearanceFromScene();
-            var minX = tileCoord.x * mapMagic.tileSize.x;
-            var minZ = tileCoord.z * mapMagic.tileSize.z;
-            var sizeX = mapMagic.tileSize.x;
-            var sizeZ = mapMagic.tileSize.z;
+            var minX = 0f;
+            var minZ = 0f;
+            var sizeX = WorldScale.WorldExtentXMeters;
+            var sizeZ = WorldScale.WorldExtentZMeters;
             var areaScale = (sizeX * sizeZ) / (1000f * 1000f);
 
             ctx = new ScatterContext
             {
                 Root = root,
-                Sampler = new MapMagicBiomeSampler(holder),
+                Sampler = OverworldTerrainAccess.CreateSampler(OverworldTerrainMenu.LastSeed),
                 Terrain = terrain,
                 Water = waterZones,
                 Clearance = clearance,
@@ -366,7 +358,7 @@ namespace GameDev.EditorTools
                 FlowerAttempts = Mathf.RoundToInt(FlowerReferenceAttempts * areaScale),
                 RockAttempts = Mathf.RoundToInt(RockReferenceAttempts * areaScale),
             };
-            return true;
+            return ctx.Sampler != null;
         }
 
         private static void ClearChildNamed(GameObject root, string childName)
@@ -439,34 +431,23 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Debug/Vegetation Density Overlay")]
         public static void BuildDensityDebugOverlay()
         {
-            var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
-            if (mapMagic == null || mapMagic.graph == null)
-            {
-                return;
-            }
-
-            var tileCoord = new Coord(0, 0);
-            var tile = mapMagic.tiles[tileCoord];
-            var terrain = tile?.main?.terrain;
-            var holder = terrain != null ? terrain.GetComponent<DirectMatricesHolder>() : null;
-            if (holder == null)
+            var terrain = OverworldTerrainAccess.FindTerrain();
+            var sampler = OverworldTerrainAccess.CreateSampler(OverworldTerrainMenu.LastSeed);
+            if (terrain == null || sampler == null)
             {
                 return;
             }
 
             ClearDebugOverlay();
 
-            var sampler = new MapMagicBiomeSampler(holder);
             var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
             var offsets = VegetationEcology.NoiseOffsets.FromRng(worldSeed.Fork("vegetation-density"));
-            var lakeZones = Object.FindFirstObjectByType<OverworldWaterZones>();
-            var riverZones = Object.FindFirstObjectByType<OverworldRiverZones>();
-            IWaterSampler waterZones = new CompositeWaterSampler(lakeZones, riverZones);
+            IWaterSampler waterZones = SeaLevelOceanSampler.FromTerrain(terrain);
 
-            var minX = tileCoord.x * mapMagic.tileSize.x;
-            var minZ = tileCoord.z * mapMagic.tileSize.z;
-            var sizeX = mapMagic.tileSize.x;
-            var sizeZ = mapMagic.tileSize.z;
+            var minX = 0f;
+            var minZ = 0f;
+            var sizeX = WorldScale.OverworldTileMeters;
+            var sizeZ = WorldScale.OverworldTileMeters;
 
             const int res = 256;
             var tex = new Texture2D(res, res, TextureFormat.RGB24, false)
@@ -496,7 +477,10 @@ namespace GameDev.EditorTools
             var go = GameObject.CreatePrimitive(PrimitiveType.Quad);
             go.name = DebugOverlayName;
             Object.DestroyImmediate(go.GetComponent<Collider>());
-            go.transform.position = new Vector3(minX + sizeX * 0.5f, mapMagic.globals.height + 40f, minZ + sizeZ * 0.5f);
+            go.transform.position = new Vector3(
+                minX + sizeX * 0.5f,
+                OverworldTerrainAccess.HeightBudgetMeters(terrain) + 40f,
+                minZ + sizeZ * 0.5f);
             go.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
             go.transform.localScale = new Vector3(sizeX, sizeZ, 1f);
 
@@ -524,7 +508,7 @@ namespace GameDev.EditorTools
             float minZ,
             float sizeX,
             float sizeZ,
-            MapMagicBiomeSampler sampler,
+            VistaTerrainSampler sampler,
             UnityEngine.Terrain terrain,
             IWaterSampler waterZones,
             VegetationClearance clearance,
@@ -581,7 +565,7 @@ namespace GameDev.EditorTools
             float minZ,
             float sizeX,
             float sizeZ,
-            MapMagicBiomeSampler sampler,
+            VistaTerrainSampler sampler,
             UnityEngine.Terrain terrain,
             IWaterSampler waterZones,
             VegetationClearance clearance,
@@ -642,7 +626,7 @@ namespace GameDev.EditorTools
             IWaterSampler waterZones,
             System.Random rng)
         {
-            var roadClearance = Object.FindFirstObjectByType<OverworldRoadClearance>();
+            var roadClearance = Object.FindAnyObjectByType<OverworldRoadClearance>();
             if (roadClearance == null || roadClearance.Samples == null || roadClearance.Samples.Count < 2)
             {
                 return 0;
@@ -758,7 +742,7 @@ namespace GameDev.EditorTools
         private static bool TryEvaluatePoint(
             float x,
             float z,
-            MapMagicBiomeSampler sampler,
+            VistaTerrainSampler sampler,
             UnityEngine.Terrain terrain,
             IWaterSampler waterZones,
             VegetationClearance clearance,
@@ -798,7 +782,7 @@ namespace GameDev.EditorTools
         {
             var disks = new List<VegetationClearance.Disk>();
 
-            var settlement = Object.FindFirstObjectByType<OverworldSettlementAnchor>();
+            var settlement = Object.FindAnyObjectByType<OverworldSettlementAnchor>();
             if (settlement != null)
             {
                 // Fabric-aware grass exclusion handles streets/pads; keep a coarse disk only when
@@ -841,7 +825,7 @@ namespace GameDev.EditorTools
             }
 
             var roadSamples = new List<Vector2>(512);
-            var roadClearance = Object.FindFirstObjectByType<OverworldRoadClearance>();
+            var roadClearance = Object.FindAnyObjectByType<OverworldRoadClearance>();
             if (roadClearance != null && roadClearance.Samples != null)
             {
                 for (var i = 0; i < roadClearance.Samples.Count; i++)
@@ -850,14 +834,9 @@ namespace GameDev.EditorTools
                 }
             }
 
-            IReadOnlyList<LakeDefinition> lakes = null;
-            var water = Object.FindFirstObjectByType<OverworldWaterZones>();
-            if (water != null && water.LakeDefinitions != null && water.LakeDefinitions.Count > 0)
-            {
-                lakes = water.LakeDefinitions;
-            }
-
-            return new VegetationClearance(disks, roadSamples, RoadClearRadius, RoadFalloff, lakes);
+            return new VegetationClearance(
+                disks, roadSamples, RoadClearRadius, RoadFalloffMeters,
+                roadMinAtCore: GrassMask.RoadLawnMinAtCenter);
         }
 
         private static bool SpawnPrefab(
@@ -939,6 +918,11 @@ namespace GameDev.EditorTools
             }
 
             instance.transform.localScale = Vector3.one * (targetHeightMeters / height);
+        }
+
+        public static void ClearDensityDebugOverlayIfPresent()
+        {
+            ClearDebugOverlay();
         }
 
         private static void ClearDebugOverlay()

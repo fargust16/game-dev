@@ -1,2 +1,93 @@
 # Root helper logs
 unity-create.log
+
+# Local tool outputs / retired binaries
+tools/_host_out/
+tools/_retired_mapmagic/
+tools/**/*.dll.retired
+tools/**/*.log
+
+# ---------------------------------------------------------------------------
+# Third-party Asset Store / vendor packs (import locally; do not author here)
+# Registry: unity/Assets/Plans/ASSET_LIBRARY_REFERENCE.md
+# First-party stay tracked: Scripts, Plans, Settings, Scenes, Materials, Art,
+# Characters, Input, Prefabs, Tests, Shaders (project), URP*.asset
+# ---------------------------------------------------------------------------
+unity/Assets/3DForge/
+unity/Assets/8K Skybox Pack Free/
+unity/Assets/AlchemyLabProps/
+unity/Assets/Blink/
+unity/Assets/Cursors/
+unity/Assets/EmaceArt/
+unity/Assets/Footsteps - Essentials/
+unity/Assets/FourEvilDragonsHP/
+unity/Assets/Free Pack/
+unity/Assets/GUI_Parts/
+unity/Assets/Kevin Iglesias/
+unity/Assets/Low-Poly Medieval Market/
+unity/Assets/Low-Poly Weapons/
+unity/Assets/MapMagic/
+unity/Assets/Modern GDR - Free icons pack/
+unity/Assets/Modular European House/
+unity/Assets/Modular Victorian City/
+unity/Assets/PinwheelStudio/
+unity/Assets/Polytope Studio/
+unity/Assets/Rowlan/
+unity/Assets/Skybox/
+unity/Assets/Stylized Trees Pack/
+unity/Assets/Vefects/
+unity/Assets/Voices - Essentials/
+unity/Assets/WaterWorks/
+unity/Assets/Plugins/Digital Dust/
+unity/Assets/Houidisoft technology/
+
+# Vendor folder metas (keep ignore when folder absent)
+unity/Assets/3DForge.meta
+unity/Assets/8K Skybox Pack Free.meta
+unity/Assets/AlchemyLabProps.meta
+unity/Assets/Blink.meta
+unity/Assets/Cursors.meta
+unity/Assets/EmaceArt.meta
+unity/Assets/Footsteps - Essentials.meta
+unity/Assets/FourEvilDragonsHP.meta
+unity/Assets/Free Pack.meta
+unity/Assets/GUI_Parts.meta
+unity/Assets/Kevin Iglesias.meta
+unity/Assets/Low-Poly Medieval Market.meta
+unity/Assets/Low-Poly Weapons.meta
+unity/Assets/MapMagic.meta
+unity/Assets/Modern GDR - Free icons pack.meta
+unity/Assets/Modular European House.meta
+unity/Assets/Modular Victorian City.meta
+unity/Assets/PinwheelStudio.meta
+unity/Assets/Polytope Studio.meta
+unity/Assets/Rowlan.meta
+unity/Assets/Skybox.meta
+unity/Assets/Stylized Trees Pack.meta
+unity/Assets/Vefects.meta
+unity/Assets/Voices - Essentials.meta
+unity/Assets/WaterWorks.meta
+
+# Vendor metas / leftover plugin installs
+unity/Assets/Houidisoft technology.meta
+unity/Assets/Plugins/Digital Dust.meta
+unity/Assets/Plugins/PrimeTween/
+unity/Assets/Plugins/PrimeTween.meta
+
+# MicroSplat vendor packages (import locally; not authored in-repo)
+unity/Packages/com.jbooth.microsplat.core/
+unity/Packages/com.jbooth.microsplat.urp6p3/
+
+# Generated Vista / scene bake (regenerate in Editor — do not author)
+unity/Assets/Scenes/Overworld_Generator Biomes/
+unity/Assets/Scenes/Overworld_Generator Terrains/
+unity/Assets/Scenes/Overworld_Generator Biomes.meta
+unity/Assets/Scenes/Overworld_Generator Terrains.meta
+unity/Assets/Settings/Vista/OverworldTerrainData_*.asset
+unity/Assets/Settings/Vista/OverworldTerrainData_*.asset.meta
+unity/Assets/Settings/Vista/TerrainData_*.asset
+unity/Assets/Settings/Vista/TerrainData_*.asset.meta
+unity/Assets/Settings/Vista/MicroSplatData/
+unity/Assets/Settings/Vista/MicroSplatData.meta
+unity/Assets/Settings/Vista/SandDebug/
+unity/Assets/Settings/Vista/SandDebug.meta

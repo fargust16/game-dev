@@ -20,9 +20,9 @@ Hand-authored single MountainBiome covering the whole grid remains a useful visu
 
 ## Goal
 
-Replace the radial “pancake” island (`IslandBaseRelief` × elliptical `IslandOccupancy` + per-lake OCW planes) with a geological heightfield around a fixed **Sea Level**, and **one** horizontal water plane that is both ocean and inland lakes.
+Replace the radial “pancake” island with a geological heightfield around a fixed **Sea Level**, and **one** horizontal **ocean** water plane.
 
-Quality bar: terrain continues under water; lakes are closed depressions intersecting Sea Level; no radial mound; no per-lake water GameObjects. **Vertical relief must match the golden Vista Mountain bake**, not a 220 m flattened remap.
+Quality bar: terrain continues under water; no radial mound; **no inland lake/river generation in V0** (removed 2026-08-15). **Vertical relief must match the golden Vista Mountain bake**, not a flattened remap.
 
 ---
 
@@ -37,7 +37,7 @@ Quality bar: terrain continues under water; lakes are closed depressions interse
 | Mountains | Vista Mountain template SoT |
 | Grid | `2×2` tiles × 1400 m = **2800 m** world extent |
 | Vista biomes | Golden: one Mountain LPB, `Space.Local`, template pos/scale — silhouette via anchors/falloff; see [VISTA_OVERWORLD_REFERENCE.md](VISTA_OVERWORLD_REFERENCE.md) |
-| Lakes | Floor `< SeaLevel`, rim `≥ SeaLevel + LakeSafetyMarginMeters`; flood-fill must not reach world border |
+| Inland lakes / rivers | **Removed from V0 code** — redesign later |
 | Water visual | One `WorldWater` (WaterWorks plane + `Assets/Settings/Water/OverworldWater.mat` teal clone) |
 
 ---
@@ -50,7 +50,7 @@ WorldSeed forks
   → LPB_IslandBase: IslandPlateau_TerrainGraph + harmonic asymmetric anchors + SoftFalloff mask,
       plateau worldHeight ~55 m (ASL ~30–55, not a 90 m mesa), Replace + LayerWeightMaps
   → LPB_Mountain_i (1–3): elongated ellipse anchors + wide Outer falloff, Raise delta ~480–580 m
-  → (later) LPB_Lake / River / Forest / Meadow / Swamp / Field / City (order bands 20–49)
+  → (later) Forest / Meadow / Swamp / Field / City (order bands 30–49); lake/river LPBs deferred with hydro redesign
   → Vista GenerateAll → remap cache onto tiles
   → SyncFromGpu + ForceTileSize (1400, 700, 1400)
   → CoastalBeachShelf directed ≤12° profile + SmoothCoastBand (no terrace / no flood-ring ladder)
@@ -69,7 +69,7 @@ WorldSeed forks
 6. Terrain grid stays 2×2 for streaming/LOD; unique tile names for MicroSplat.
 7. Full automated contract: [VISTA_OVERWORLD_REFERENCE.md](VISTA_OVERWORLD_REFERENCE.md) § Automated bake contract.
 8. Terrain shading SoT: C# splat (`MS_Moss_Fields` / `MS_Shore_Sand` / `MS_Cliff_Rock` / `MS_Rock_Cliff`) → Convert + URP adapter; disable `_HYBRIDHEIGHTBLEND`. Surface operator guide: [OVERWORLD_VISUAL_DIRECTION.md](OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces.
-9. Secondary LPBs: menu `GameDev/Overworld/Vista/Spawn Secondary LPB Scaffold` — order bands Hydro 20–29 / Eco 30–39 / Civ 40–49.
+9. Secondary LPBs: menu `GameDev/Overworld/Vista/Spawn Secondary LPB Scaffold` — Eco 30–39 / Civ 40–49 (no hydro placeholders).
 10. **Island Outer falloff ≈ 420 local m**; plateau worldHeight ≈ **55 m** (ASL ~30–55). Short falloff or ~90 m plateau recreates the mesa “cake” rim.
 
 ### Seed forks
@@ -77,7 +77,7 @@ WorldSeed forks
 | Fork | Role |
 |------|------|
 | `terrain.islandbase` | **`LocalProceduralBiome.seed` only** (Args.SEED). Leave Mountain graph node seeds. |
-| `terrain.island` / `lake.place` | Future framing / lakes after height SoT is locked |
+| `terrain.island` | Framing helpers when needed |
 
 No `UnityEngine.Random` — only `WorldSeed.Fork` → `System.Random`.
 
@@ -118,7 +118,7 @@ Always set resolution first, then pin `size = (OverworldTileMeters, heightBudget
 | **One Click Add Water** | Demoted — unused stylized fallback; do not spawn per-lake OCW planes |
 | `Water_Volume` renderer feature | Stay stubbed (Unity 6) — do not enqueue |
 
-Rivers: existing `RiverMeshBuilder` / `RiverTerrainCarver` with `SSR_Water`. Never carve bed ≤ Sea Level except inside the coastal mouth band (`RiverMouthSeaBandMeters`). Skip paths that would drain a closed basin to the ocean.
+Inland rivers/lakes: **not generated**. Ocean plane only.
 
 ---
 
@@ -130,9 +130,9 @@ After generate (height SoT):
 - 2×2 seams continuous under one LPB
 - `size=(1400,700,1400)` (or agreed budget), not 22400
 
-Island / lake validation (after framing redesign):
+Validation:
 
-- Border ocean / closed lakes as designed
+- Border ocean as designed
 - Exactly one `WorldWater`
 
 Debug: `IslandGeographyDebug` / menu PNGs when framing returns.
@@ -146,4 +146,4 @@ Debug: `IslandGeographyDebug` / menu PNGs when framing returns.
 - Multi-tile continents
 - Procedural anchor rings with stronger coast noise (V0 already uses seeded 16-gon)
 - Custom grass (replace Vista detail)
-- Closed inland lakes that do not fight the Mountain+anchors height SoT
+- Inland lake/river redesign (not a restore of removed MapMagic-era placers)

@@ -18,7 +18,6 @@ namespace GameDev.EditorTools
         private WorldGenSettings settings = WorldGenSettings.Default;
         private Vector2 scroll;
         private bool foldTerrain = true;
-        private bool foldLakes = true;
         private bool foldRoads = true;
         private bool foldPoi = true;
         private bool foldVegetation;
@@ -98,11 +97,9 @@ namespace GameDev.EditorTools
             settings.RunSurface = EditorGUILayout.Toggle("Surface", settings.RunSurface);
             settings.RunZones = EditorGUILayout.Toggle("Zones", settings.RunZones);
             settings.RunMountains = EditorGUILayout.Toggle("Mountains", settings.RunMountains);
-            settings.RunLakes = EditorGUILayout.Toggle("Lakes", settings.RunLakes);
             settings.RunMarkers = EditorGUILayout.Toggle("Markers", settings.RunMarkers);
             settings.RunSettlements = EditorGUILayout.Toggle("Settlements", settings.RunSettlements);
             settings.RunRoads = EditorGUILayout.Toggle("Roads", settings.RunRoads);
-            settings.RunWaterMeshes = EditorGUILayout.Toggle("Water Meshes", settings.RunWaterMeshes);
             settings.RunTrees = EditorGUILayout.Toggle("Trees", settings.RunTrees);
             settings.RunUndergrowth = EditorGUILayout.Toggle("Undergrowth", settings.RunUndergrowth);
             settings.RunGrass = EditorGUILayout.Toggle("Grass", settings.RunGrass);
@@ -127,11 +124,9 @@ namespace GameDev.EditorTools
             settings.RunSurface = on;
             settings.RunZones = on;
             settings.RunMountains = on;
-            settings.RunLakes = on;
             settings.RunMarkers = on;
             settings.RunSettlements = on;
             settings.RunRoads = on;
-            settings.RunWaterMeshes = on;
             settings.RunTrees = on;
             settings.RunUndergrowth = on;
             settings.RunGrass = on;
@@ -145,31 +140,8 @@ namespace GameDev.EditorTools
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.HelpBox(
-                    "Terrain shape comes from the MapMagic Overworld graph (seeded forks). " +
-                    "Mountains / Zones toggles rebuild the graph with TerrainBakeFlags.",
-                    MessageType.None);
-                EditorGUI.indentLevel--;
-            }
-
-            foldLakes = EditorGUILayout.Foldout(foldLakes, "LAKES", true);
-            if (foldLakes)
-            {
-                EditorGUI.indentLevel++;
-                settings.LakeCount = EditorGUILayout.IntSlider(
-                    "Lake Count", settings.LakeCount, WorldScale.LakeMinCount, 6);
-                settings.LakeSize = EditorGUILayout.Slider("Lake Size", settings.LakeSize, 0f, 1f);
-                settings.ShapeIrregularity = EditorGUILayout.Slider(
-                    "Shape Irregularity", settings.ShapeIrregularity, 0f, 1f);
-                settings.TerrainConformity = EditorGUILayout.Slider(
-                    "Terrain Conformity", settings.TerrainConformity, 0f, 1f);
-                settings.WaterInsetMeters = EditorGUILayout.Slider(
-                    "Water Inset Width (m)", settings.WaterInsetMeters, 1.0f, 2.5f);
-                settings.WaterDepthOffsetMeters = EditorGUILayout.Slider(
-                    "Water Depth Offset (m)", settings.WaterDepthOffsetMeters, 0.75f, 2.5f);
-                settings.MaxDepthMeters = EditorGUILayout.Slider(
-                    "Max Depth (m)", settings.MaxDepthMeters, 8f, 48f);
-                EditorGUILayout.HelpBox(
-                    "Mountain occupancy hard-rejects ridge sites. Fewer lakes beat a sheet through a mountain.",
+                    "Terrain shape comes from Vista / Unity Terrain (seeded forks). " +
+                    "Mountains / Zones toggles rebuild with TerrainBakeFlags.",
                     MessageType.None);
                 EditorGUI.indentLevel--;
             }
@@ -232,7 +204,6 @@ namespace GameDev.EditorTools
             }
 
             EditorGUILayout.LabelField("Seed:", def.Seed.ToString());
-            EditorGUILayout.LabelField("Lakes:", def.LakeCount.ToString());
             EditorGUILayout.LabelField("Roads:", $"{def.RoadLengthKilometers:F1} km");
             EditorGUILayout.LabelField("POI:", def.PoiCount.ToString());
         }
@@ -276,17 +247,15 @@ namespace GameDev.EditorTools
             }
 
             // Older prefs without step flags deserialize as false — treat all-false as Default on.
-            if (!settings.RunSurface && !settings.RunLakes && !settings.RunRoads && !settings.RunTrees)
+            if (!settings.RunSurface && !settings.RunRoads && !settings.RunTrees)
             {
                 var d = WorldGenSettings.Default;
                 settings.RunSurface = d.RunSurface;
                 settings.RunZones = d.RunZones;
                 settings.RunMountains = d.RunMountains;
-                settings.RunLakes = d.RunLakes;
                 settings.RunMarkers = d.RunMarkers;
                 settings.RunSettlements = d.RunSettlements;
                 settings.RunRoads = d.RunRoads;
-                settings.RunWaterMeshes = d.RunWaterMeshes;
                 settings.RunTrees = d.RunTrees;
                 settings.RunUndergrowth = d.RunUndergrowth;
                 settings.RunGrass = d.RunGrass;

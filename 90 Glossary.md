@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.43
+Version: 0.44
 
 Status: Draft
 
@@ -774,9 +774,15 @@ Tunables for packed-earth road alphamap paint: soft edge width (0.5–1.5 m), be
 
 ---
 
+## SeaLevelOceanSampler
+
+`IWaterSampler` that reports water when terrain height is at or below Sea Level. Used by roads / POI / vegetation after inland lake/river systems were removed. See `World/Water/SeaLevelOceanSampler.cs`.
+
+---
+
 ## Sea Level
 
-World Y of the single water plane (`WorldScale.SeaLevelMeters`, default **24 m**). Full-square terrain continues under this as shelf/bathymetry; dry island sits above; inland lakes are closed depressions intersecting the same plane. WaterWorks `WorldWater` is placed here.
+World Y of the single **ocean** water plane (`WorldScale.SeaLevelMeters`, default **24 m**). Full-square terrain continues under this as shelf/bathymetry; dry island sits above. WaterWorks `WorldWater` is placed here. Inland lake intersection is **not** generated in V0.
 
 ---
 
@@ -794,7 +800,7 @@ Post-geography height pass (`IslandOccupancy`) that **only** enforces tile-borde
 
 ## WorldWater
 
-Single overworld water GameObject (WaterWorks `Water_Plane` + `SSR_Water`) under `OverworldWater`, Y = Sea Level, covering the tile. Ocean and inland lakes share this plane. No per-lake water objects.
+Single overworld ocean GameObject (WaterWorks `Water_Plane` + `SSR_Water`) under `OverworldWater`, Y = Sea Level, covering the tile. V0 has no inland lake/river meshes.
 
 ---
 
@@ -830,6 +836,8 @@ Third-party stylized water pack (OCW). **Demoted** — unused stylized fallback.
 
 ## Lake Safety Margin
 
+**(Retired V0 — inland lake generation removed 2026-08-15; kept for historical reading.)**
+
 Metres above Sea Level that lake rims must maintain (`WorldScale.LakeSafetyMarginMeters`, ~6 m) so the single water plane cannot spill to the ocean.
 
 ## POI Placement Profile
@@ -858,17 +866,21 @@ Metres subtracted from a **low shore-rim percentile** (not the average) after he
 
 ## World Definition
 
-Aggregate snapshot of one overworld generation: `WorldSeed`, `WorldGenSettings`, lakes (`LakeDefinition[]`), POIs (stable sorted markers), roads (`RoadDefinition[]`), and stats (lake count, road km, POI count). Scene holder: `OverworldWorldState`. Downstream systems read this instead of re-running placers. See [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
+Aggregate snapshot of one overworld generation: `WorldSeed`, `WorldGenSettings`, POIs (stable sorted markers), roads (`RoadDefinition[]`), and stats (road km, POI count). Scene holder: `OverworldWorldState`. Downstream systems read this instead of re-running placers. See [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
 
 ---
 
 ## Lake Placement Score
+
+**(Retired V0 — inland lake generation removed 2026-08-15; kept for historical reading.)**
 
 Score used to pick lake sites from macro terrain: enclosing basin walls + low slope + low variance + edge distance − excavation − mountain/cliff. Hard-rejects sites that would destroy mountains or sit mid-slope / near map edge. Full-silhouette **Mountain Occupancy** (`BiomeId.Mountain`) is an additional hard reject beyond the local score window. Replaces naive `-height + rng` ranking. See `DistributedLakePlacer` / [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
 
 ---
 
 ## Max Lake Terrain Modification
+
+**(Retired V0 — inland lake generation removed 2026-08-15; kept for historical reading.)**
 
 Cap (metres) on how far any heightmap sample may be dug below the pre-basin surface when applying a lake bowl (`WorldScale.LakeMaxTerrainModificationMeters`). Prevents mountain flanks from being excavated into cliffs. Candidates that would require more dig should be rejected at placement, not forced.
 
@@ -894,7 +906,7 @@ Equal-size 3×3 partition of the overworld tile used for TownApproach and second
 
 ## Pipeline Step
 
-One Generate/Clear procedure in the overworld Editor pipeline (`IOverworldStep`): Surface, Zones, Mountains, Lakes, Markers, Settlements, Roads, WaterMeshes, Trees, Undergrowth, Grass, Player. Output is a pure function of `WorldSeed.Fork(step)`, upstream artifacts, and `WorldGenSettings`. Skipping a step must not advance another step's fork. See [WORLD_GENERATION_PIPELINE.md](unity/Assets/Plans/WORLD_GENERATION_PIPELINE.md) §5.
+One Generate/Clear procedure in the overworld Editor pipeline: Surface, Zones, Mountains, Markers, Settlements, Roads, Trees, Undergrowth, Grass, Player (plus ensure-ocean). Lakes/WaterMeshes steps **removed** 2026-08-15. Output is a pure function of `WorldSeed.Fork(step)`, upstream artifacts, and `WorldGenSettings`. See [WORLD_GENERATION_PIPELINE.md](unity/Assets/Plans/WORLD_GENERATION_PIPELINE.md) §5.
 
 ---
 
@@ -905,5 +917,7 @@ Editor menu under `GameDev/Overworld/Part-Gen/<Step>/` that runs the same Genera
 ---
 
 ## Mountain Occupancy
+
+**(Retired V0 — inland lake generation removed 2026-08-15; kept for historical reading.)**
 
 Hard rule for lake placement: no water silhouette cell may sit on `BiomeId.Mountain` (or steep highland). Soft-pass and min-count helpers must not violate it — fewer lakes beat a sheet through a ridge. Water meshes also safety-clip mountain cells above the water plane. See [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).

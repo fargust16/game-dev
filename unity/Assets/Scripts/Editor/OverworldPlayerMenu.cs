@@ -2,35 +2,40 @@
 using System.Collections.Generic;
 using System.Linq;
 using GameDev.Player;
+using GameDev.World;
 using GameDev.World.Poi;
 using GameDev.World.Seed;
 using GameDev.World.Settlement;
+using GameDev.World.Terrain;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using WorldSeed = GameDev.World.Seed.WorldSeed;
 
 namespace GameDev.EditorTools
 {
     /// <summary>
-    /// Wires the Blender-imported Char_UEZ model up to Human Basic Motions locomotion clips (see
-    /// ASSET_LIBRARY_REFERENCE.md - locked default for Locomotion V0) so it can walk/run/sprint/jump
-    /// around the Overworld terrain: configure the FBX as a Humanoid rig, build a locomotion Animator
-    /// Controller (Idle/Walk/Run/Sprint 1D blend tree + a Jump-Begin/Fall/Land sub-sequence) from the
-    /// Male clip set, then spawn the character with a CharacterController + OverworldPlayerController
-    /// on top of the generated terrain and point the existing SimpleFollowCamera at it.
+    /// Wires the Kevin Iglesias Human Character Dummy prefab up to Human Basic Motions locomotion
+    /// clips (see ASSET_LIBRARY_REFERENCE.md - locked default for Locomotion V0) so it can
+    /// walk/run/sprint/jump around the Overworld terrain: ensure the Dummy FBX is a Humanoid rig,
+    /// build a locomotion Animator Controller (Idle/Walk/Run/Sprint 1D blend tree + a
+    /// Jump-Begin/Fall/Land sub-sequence) from the Male clip set, then spawn the prefab with a
+    /// CharacterController + OverworldPlayerController on top of the generated terrain and point
+    /// the existing follow camera at it.
     /// <para>
-    /// Step 1 (Humanoid rig) can only be verified so far by script - avatar auto-mapping depends on
-    /// how closely Char_UEZ's bone names/hierarchy match Unity's Humanoid template, which a custom
-    /// Blender export won't always hit. If the avatar doesn't come back valid, open
-    /// Assets/Characters/Char_UEZ.fbx's Rig import tab and use "Configure Avatar" to fix any
-    /// unmapped bones by hand before running the remaining steps.
+    /// Prefer the HumanDummy_M White prefab (already Humanoid) for spawn. Step 1 configures the
+    /// underlying FBX as Humanoid if needed — open its Rig tab and use "Configure Avatar" only if
+    /// auto-mapping fails.
     /// </para>
     /// </summary>
     public static class OverworldPlayerMenu
     {
-        private const string CharacterFbxPath = "Assets/Characters/Char_UEZ.fbx";
+        private const string CharacterPrefabPath =
+            "Assets/Kevin Iglesias/Human Character Dummy/Prefabs/HumanDummy_M White.prefab";
+        private const string CharacterFbxPath =
+            "Assets/Kevin Iglesias/Human Character Dummy/Models/HumanCharacterDummy_M.fbx";
         private const string ControllerPath = "Assets/Settings/OverworldPlayerAnimator.controller";
         private const string PlayerObjectName = "OverworldPlayer";
 
@@ -51,7 +56,7 @@ namespace GameDev.EditorTools
             SpawnOrUpdatePlayerInScene();
         }
 
-        [MenuItem("GameDev/Overworld/Player/1) Configure Char_UEZ As Humanoid")]
+        [MenuItem("GameDev/Overworld/Player/1) Configure Dummy As Humanoid")]
         public static void ConfigureCharacterAsHumanoid()
         {
             if (!(AssetImporter.GetAtPath(CharacterFbxPath) is ModelImporter importer))
@@ -68,13 +73,13 @@ namespace GameDev.EditorTools
             if (avatar == null || !avatar.isValid || !avatar.isHuman)
             {
                 Debug.LogWarning(
-                    "[Overworld] Char_UEZ did not auto-map cleanly as Humanoid. Select the FBX, open " +
+                    "[Overworld] Human Character Dummy did not auto-map cleanly as Humanoid. Select the FBX, open " +
                     "the Rig tab, click 'Configure Avatar' and fix any unmapped bones by hand, then " +
                     "re-run 'Setup Player (All Steps)'.");
                 return;
             }
 
-            Debug.Log("[Overworld] Char_UEZ configured and auto-mapped as a valid Humanoid avatar.");
+            Debug.Log("[Overworld] Human Character Dummy configured and auto-mapped as a valid Humanoid avatar.");
         }
 
         [MenuItem("GameDev/Overworld/Player/2) Build Locomotion Animator Controller")]
@@ -167,10 +172,10 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Player/3) Spawn Or Update Player In Scene")]
         public static void SpawnOrUpdatePlayerInScene()
         {
-            var characterAsset = AssetDatabase.LoadAssetAtPath<GameObject>(CharacterFbxPath);
+            var characterAsset = AssetDatabase.LoadAssetAtPath<GameObject>(CharacterPrefabPath);
             if (characterAsset == null)
             {
-                Debug.LogError($"[Overworld] No model at '{CharacterFbxPath}'.");
+                Debug.LogError($"[Overworld] No prefab at '{CharacterPrefabPath}'.");
                 return;
             }
 
@@ -249,11 +254,11 @@ namespace GameDev.EditorTools
             ConfigureCharacterAsHumanoid();
             BuildLocomotionAnimatorController();
 
-            var mapMagic = Object.FindFirstObjectByType<MapMagic.Core.MapMagicObject>();
             IReadOnlyList<PoiMarker> markers = System.Array.Empty<PoiMarker>();
-            if (mapMagic != null)
+            var state = OverworldWorldState.Find();
+            if (state?.Definition?.Pois != null && state.Definition.Pois.Count > 0)
             {
-                markers = OverworldWorldPlan.GetOrBuildPois(mapMagic, new Den.Tools.Coord(0, 0));
+                markers = state.Definition.Pois;
             }
 
             var towns = new List<PoiMarker>();
@@ -275,7 +280,7 @@ namespace GameDev.EditorTools
             var rng = seed.Fork("player.spawn");
             var pick = towns[rng.Next(0, towns.Count)];
             var spawn = pick.Position;
-            var anchor = Object.FindFirstObjectByType<OverworldSettlementAnchor>();
+            var anchor = Object.FindAnyObjectByType<OverworldSettlementAnchor>();
             if (anchor != null && anchor.ApproachId == pick.Id.Value)
             {
                 spawn = anchor.Position;
@@ -342,10 +347,10 @@ namespace GameDev.EditorTools
 
         private static bool TryFindGroundHeight(Vector3 xz, out float groundY)
         {
-            var origin = new Vector3(xz.x, 5000f, xz.z);
-            if (Physics.Raycast(origin, Vector3.down, out var hit, 10000f))
+            var terrain = OverworldTerrainAccess.FindTerrain();
+            if (terrain != null && terrain.terrainData != null)
             {
-                groundY = hit.point.y;
+                groundY = terrain.SampleHeight(new Vector3(xz.x, 0f, xz.z)) + terrain.transform.position.y;
                 return true;
             }
 
@@ -360,16 +365,13 @@ namespace GameDev.EditorTools
         /// strips any leftover SimpleFollowCamera from an older run so the two don't fight over the
         /// transform every LateUpdate.
         /// <para>
-        /// Also forces Solid Color clear instead of Skybox: this lab scene was created via
-        /// EditorSceneManager.NewScene(EmptyScene, ...), which has no Skybox material assigned in
-        /// RenderSettings - a Camera left on its AddComponent default (Clear Flags = Skybox) then
-        /// renders flat gray in Play mode instead of erroring, which is easy to mistake for "nothing
-        /// is being rendered" when it's really just a missing sky.
+        /// Uses Skybox clear flags so the overworld atmosphere renders; far clip plane is left as
+        /// already configured (terrain setup uses a long far plane for vista distance).
         /// </para>
         /// </summary>
         private static void EnsureFollowCamera(Transform target)
         {
-            var cameraObject = Camera.main != null ? Camera.main.gameObject : Object.FindFirstObjectByType<Camera>()?.gameObject;
+            var cameraObject = Camera.main != null ? Camera.main.gameObject : Object.FindAnyObjectByType<Camera>()?.gameObject;
             if (cameraObject == null)
             {
                 cameraObject = new GameObject("Player Follow Camera");
@@ -382,8 +384,7 @@ namespace GameDev.EditorTools
                 camera = cameraObject.AddComponent<Camera>();
             }
 
-            camera.clearFlags = CameraClearFlags.SolidColor;
-            camera.backgroundColor = new Color(0.55f, 0.75f, 0.95f);
+            camera.clearFlags = CameraClearFlags.Skybox;
 
             var staleFollowCamera = cameraObject.GetComponent<SimpleFollowCamera>();
             if (staleFollowCamera != null)
@@ -423,3 +424,4 @@ namespace GameDev.EditorTools
     }
 }
 #endif
+

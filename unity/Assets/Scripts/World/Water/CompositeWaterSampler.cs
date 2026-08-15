@@ -4,7 +4,7 @@ namespace GameDev.World.Water
 {
     /// <summary>
     /// Combines several <see cref="IWaterSampler"/>s (e.g. lakes + rivers) behind one query, first
-    /// hit wins - lets callers that only ever asked "is this scene's <see cref="OverworldWaterZones"/>
+    /// hit wins - lets callers that only ever asked "is this scene's <see cref="IWaterSampler"/>
     /// telling me there's water here" (POI placement, road costing, settlement dry-ground search)
     /// keep asking exactly that shape of question without knowing rivers exist as a separate system.
     /// Null entries are skipped, so a caller can build one of these before every source is guaranteed

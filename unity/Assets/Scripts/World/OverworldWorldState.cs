@@ -14,7 +14,7 @@ namespace GameDev.World
 
         public static OverworldWorldState FindOrCreate()
         {
-            var existing = Object.FindFirstObjectByType<OverworldWorldState>();
+            var existing = Object.FindAnyObjectByType<OverworldWorldState>();
             if (existing != null)
             {
                 return existing;
@@ -25,7 +25,7 @@ namespace GameDev.World
         }
 
         public static OverworldWorldState Find() =>
-            Object.FindFirstObjectByType<OverworldWorldState>();
+            Object.FindAnyObjectByType<OverworldWorldState>();
 
         public void SetDefinition(WorldDefinition definition)
         {

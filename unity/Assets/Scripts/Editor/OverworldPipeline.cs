@@ -1,8 +1,9 @@
 #if UNITY_EDITOR
-using Den.Tools;
+using System.Collections;
 using GameDev.World;
 using GameDev.World.Terrain;
-using MapMagic.Core;
+using Pinwheel.Vista;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,16 +15,38 @@ namespace GameDev.EditorTools
     /// </summary>
     public static class OverworldPipeline
     {
+        private static EditorCoroutine s_runningGenerate;
+
+        /// <summary>True while Generate All coroutine is in flight (Vista wait included).</summary>
+        public static bool IsGenerateAllRunning => s_runningGenerate != null;
+
+        [InitializeOnLoadMethod]
+        private static void ResetGenerateLockOnDomainReload()
+        {
+            s_runningGenerate = null;
+        }
+
+        [MenuItem("GameDev/Overworld/Cancel Generate All Lock", false, 3)]
+        public static void CancelGenerateAllLock()
+        {
+            s_runningGenerate = null;
+            var manager = Object.FindAnyObjectByType<VistaManager>();
+            if (manager != null)
+            {
+                manager.CancelGeneration();
+            }
+
+            Debug.Log("[Overworld] Generate All lock cleared.");
+        }
+
         public static readonly OverworldPipelineStepId[] OrderedSteps =
         {
             OverworldPipelineStepId.Surface,
             OverworldPipelineStepId.Zones,
             OverworldPipelineStepId.Mountains,
-            OverworldPipelineStepId.Lakes,
             OverworldPipelineStepId.Markers,
             OverworldPipelineStepId.Settlements,
             OverworldPipelineStepId.Roads,
-            OverworldPipelineStepId.WaterMeshes,
             OverworldPipelineStepId.Trees,
             OverworldPipelineStepId.Undergrowth,
             OverworldPipelineStepId.Grass,
@@ -59,109 +82,107 @@ namespace GameDev.EditorTools
             PoiMarkerMenu.ClearMarkers();
             WaterZoneMenu.ClearWaterZones();
             WaterZoneMenu.ClearRiverZones();
+            WaterZoneMenu.EnsureOceanOcWPlane();
             OverworldTerrainMenu.ClearTerrainOnly();
+            CancelGenerateAllLock();
         }
 
         /// <summary>Entry used by World Generator window and menu shortcuts.</summary>
         public static void GenerateAll(int seed, WorldGenSettings settings)
         {
-            settings.Clamp();
-            OverworldTerrainMenu.ActiveSettings = settings;
-            var state = OverworldWorldState.FindOrCreate();
-            state.SetDefinition(new WorldDefinition
+            if (s_runningGenerate != null)
             {
-                Seed = seed,
-                Settings = settings,
-            });
+                Debug.LogWarning(
+                    "[Overworld] Generate All already running — wait for Vista, or use " +
+                    "GameDev/Overworld/Cancel Generate All Lock if it is stuck.");
+                return;
+            }
 
-            var total = OverworldGenTiming.Start();
+            s_runningGenerate = EditorCoroutineUtility.StartCoroutineOwnerless(GenerateAllRoutine(seed, settings));
+        }
 
-            // Surface+Zones+Mountains share one MapMagic bake when any of them run.
-            var bakeTerrain = settings.RunSurface || settings.RunZones || settings.RunMountains;
-            if (bakeTerrain)
+        private static IEnumerator GenerateAllRoutine(int seed, WorldGenSettings settings)
+        {
+            try
             {
-                var flags = TerrainBakeFlags.None;
-                if (settings.RunMountains)
+                settings.Clamp();
+                OverworldTerrainMenu.ActiveSettings = settings;
+                var state = OverworldWorldState.FindOrCreate();
+                state.SetDefinition(new WorldDefinition
                 {
-                    flags |= TerrainBakeFlags.IncludeMountains;
+                    Seed = seed,
+                    Settings = settings,
+                });
+
+                var total = OverworldGenTiming.Start();
+
+                // Surface+Zones+Mountains share one Vista terrain bake when any of them run.
+                var bakeTerrain = settings.RunSurface || settings.RunZones || settings.RunMountains;
+                if (bakeTerrain)
+                {
+                    var flags = TerrainBakeFlags.None;
+                    if (settings.RunMountains)
+                    {
+                        flags |= TerrainBakeFlags.IncludeMountains;
+                    }
+
+                    if (settings.RunZones)
+                    {
+                        flags |= TerrainBakeFlags.IncludeZoneTextures;
+                    }
+
+                    var surfaceSw = OverworldGenTiming.Start();
+                    yield return OverworldTerrainMenu.GenerateSurfaceRoutine(seed, flags);
+                    OverworldGenTiming.Log("surface+zones+mountains", OverworldGenTiming.StopMs(surfaceSw));
                 }
 
-                if (settings.RunZones)
+                if (settings.RunMarkers)
                 {
-                    flags |= TerrainBakeFlags.IncludeZoneTextures;
+                    OverworldGenTiming.Time("markers.plan", () => OverworldWorldPlan.BuildAndStorePois());
                 }
 
-                // Surface height is always required when mountains/zones bake.
-                OverworldGenTiming.Time("surface+zones+mountains", () =>
-                    OverworldTerrainMenu.GenerateSurface(seed, flags));
-            }
-
-            if (settings.RunLakes)
-            {
-                OverworldGenTiming.Time("lakes.plan", GenerateLakesPlan);
-            }
-
-            if (settings.RunMarkers)
-            {
-                OverworldGenTiming.Time("markers.plan", () =>
+                if (settings.RunSettlements)
                 {
-                    var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
-                    if (mapMagic != null)
-                    {
-                        OverworldWorldPlan.BuildAndStorePois(mapMagic, new Coord(0, 0));
-                    }
-                });
-            }
+                    OverworldGenTiming.Time("settlement", SettlementOverworldMenu.PlaceSettlementAtTownApproach);
+                }
 
-            if (settings.RunSettlements)
-            {
-                OverworldGenTiming.Time("settlement", SettlementOverworldMenu.PlaceSettlementAtTownApproach);
-            }
-
-            if (settings.RunRoads)
-            {
-                OverworldGenTiming.Time("roads+deform", RoadNetworkMenu.BuildRoadNetworkWithLandscapePlanner);
-            }
-
-            if (settings.RunWaterMeshes)
-            {
-                OverworldGenTiming.Time("water.meshes", () =>
+                if (settings.RunRoads)
                 {
-                    var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
-                    if (mapMagic != null)
-                    {
-                        WaterZoneMenu.ApplyDeformAndMeshes(
-                            mapMagic, new Coord(0, 0), carveLakes: false, carveRivers: true);
-                    }
-                });
-            }
+                    OverworldGenTiming.Time("roads+deform", RoadNetworkMenu.BuildRoadNetworkWithLandscapePlanner);
+                }
+                WaterZoneMenu.EnsureOceanOcWPlane();
 
-            if (settings.RunMarkers)
+                if (settings.RunMarkers)
+                {
+                    OverworldGenTiming.Time("markers.visuals", PoiMarkerMenu.PlaceMarkers);
+                }
+
+                if (settings.RunTrees)
+                {
+                    OverworldGenTiming.Time("trees", VegetationScatterMenu.ScatterTrees);
+                }
+
+                if (settings.RunUndergrowth)
+                {
+                    OverworldGenTiming.Time("undergrowth", VegetationScatterMenu.ScatterUndergrowth);
+                }
+
+                if (settings.RunGrass)
+                {
+                    OverworldGenTiming.Time("grass", VegetationScatterMenu.BakeGrassOnly);
+                }
+
+                if (settings.RunPlayer)
+                {
+                    OverworldGenTiming.Time("player", OverworldPlayerMenu.SpawnPlayerAtTown);
+                }
+
+                OverworldGenTiming.Log("full-overworld", OverworldGenTiming.StopMs(total), $"seed={seed}");
+            }
+            finally
             {
-                OverworldGenTiming.Time("markers.visuals", PoiMarkerMenu.PlaceMarkers);
+                s_runningGenerate = null;
             }
-
-            if (settings.RunTrees)
-            {
-                OverworldGenTiming.Time("trees", VegetationScatterMenu.ScatterTrees);
-            }
-
-            if (settings.RunUndergrowth)
-            {
-                OverworldGenTiming.Time("undergrowth", VegetationScatterMenu.ScatterUndergrowth);
-            }
-
-            if (settings.RunGrass)
-            {
-                OverworldGenTiming.Time("grass", VegetationScatterMenu.BakeGrassOnly);
-            }
-
-            if (settings.RunPlayer)
-            {
-                OverworldGenTiming.Time("player", OverworldPlayerMenu.SpawnPlayerAtTown);
-            }
-
-            OverworldGenTiming.Log("full-overworld", OverworldGenTiming.StopMs(total), $"seed={seed}");
         }
 
         public static void GenerateStep(OverworldPipelineStepId step)
@@ -191,10 +212,6 @@ namespace GameDev.EditorTools
                             : OverworldTerrainMenu.DefaultSeed,
                         CurrentBakeFlags() | TerrainBakeFlags.IncludeMountains);
                     break;
-                case OverworldPipelineStepId.Lakes:
-                    // Part-Gen lakes: place + carve + mesh for quick iteration.
-                    GenerateLakesStandalone();
-                    break;
                 case OverworldPipelineStepId.Markers:
                     PoiMarkerMenu.PlaceMarkers();
                     break;
@@ -204,17 +221,6 @@ namespace GameDev.EditorTools
                 case OverworldPipelineStepId.Roads:
                     RoadNetworkMenu.BuildRoadNetworkWithLandscapePlanner();
                     break;
-                case OverworldPipelineStepId.WaterMeshes:
-                {
-                    var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
-                    if (mapMagic != null)
-                    {
-                        WaterZoneMenu.ApplyDeformAndMeshes(
-                            mapMagic, new Coord(0, 0), carveLakes: false, carveRivers: true);
-                    }
-
-                    break;
-                }
                 case OverworldPipelineStepId.Trees:
                     VegetationScatterMenu.ScatterTrees();
                     break;
@@ -261,10 +267,6 @@ namespace GameDev.EditorTools
                     }
 
                     break;
-                case OverworldPipelineStepId.Lakes:
-                    WaterZoneMenu.ClearWaterZones();
-                    WaterZoneMenu.ClearRiverZones();
-                    break;
                 case OverworldPipelineStepId.Markers:
                     PoiMarkerMenu.ClearMarkers();
                     break;
@@ -273,9 +275,6 @@ namespace GameDev.EditorTools
                     break;
                 case OverworldPipelineStepId.Roads:
                     RoadNetworkMenu.ClearRoadNetwork();
-                    break;
-                case OverworldPipelineStepId.WaterMeshes:
-                    WaterZoneMenu.ClearWaterMeshesOnly();
                     break;
                 case OverworldPipelineStepId.Trees:
                     VegetationScatterMenu.ClearTrees();
@@ -295,31 +294,7 @@ namespace GameDev.EditorTools
         private static TerrainBakeFlags CurrentBakeFlags()
         {
             return OverworldTerrainMenu.LastBakeFlags;
-        }
-
-        private static void GenerateLakesPlan()
-        {
-            var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
-            if (mapMagic == null || mapMagic.graph == null)
-            {
-                return;
-            }
-
-            WaterZoneMenu.GenerateForTile(mapMagic, new Coord(0, 0), deferTerrainDeformAndMeshes: true);
-        }
-
-        private static void GenerateLakesStandalone()
-        {
-            var mapMagic = Object.FindFirstObjectByType<MapMagicObject>();
-            if (mapMagic == null || mapMagic.graph == null)
-            {
-                return;
-            }
-
-            WaterZoneMenu.GenerateForTile(mapMagic, new Coord(0, 0), deferTerrainDeformAndMeshes: false);
-        }
-
-        private static void ClearDownstreamOfTerrain()
+        }        private static void ClearDownstreamOfTerrain()
         {
             OverworldPlayerMenu.ClearPlayer();
             VegetationScatterMenu.ClearVegetation();

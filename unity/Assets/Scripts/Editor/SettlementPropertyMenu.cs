@@ -123,7 +123,7 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Settlement/Clear Block Properties")]
         public static void Clear()
         {
-            var lab = Object.FindFirstObjectByType<SettlementPropertyLab>();
+            var lab = Object.FindAnyObjectByType<SettlementPropertyLab>();
             if (lab == null)
             {
                 Debug.LogWarning("[SettlementProperty] No SettlementPropertyLab in scene.");
@@ -163,7 +163,7 @@ namespace GameDev.EditorTools
             else if (!File.Exists(ScenePath))
                 ShellSandboxMenu.OpenOrCreateScene();
 
-            var lab = Object.FindFirstObjectByType<SettlementPropertyLab>();
+            var lab = Object.FindAnyObjectByType<SettlementPropertyLab>();
             if (lab != null)
                 return lab;
 

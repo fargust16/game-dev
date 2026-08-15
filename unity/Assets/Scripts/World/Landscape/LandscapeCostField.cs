@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using GameDev.World.Terrain;
-using GameDev.World.Water;
 using UnityEngine;
 using WorldScale = GameDev.World.WorldScale;
 
@@ -57,8 +56,7 @@ namespace GameDev.World.Landscape
             float sizeZ,
             float cellSize,
             Func<float, float, float> heightAtWorld,
-            Func<float, float, BiomeId> biomeAtWorld,
-            IReadOnlyList<LakeDefinition> lakes)
+            Func<float, float, BiomeId> biomeAtWorld)
         {
             CellSize = Mathf.Max(cellSize, 4f);
             OriginX = originX;
@@ -89,7 +87,7 @@ namespace GameDev.World.Landscape
                     var i = Index(x, z);
                     height[i] = heightAtWorld(wx, wz);
                     biome[i] = (byte)biomeAtWorld(wx, wz);
-                    distToLake[i] = SampleLakeDistance(wx, wz, lakes);
+                    distToLake[i] = -9999f;
                 }
             }
 
@@ -484,25 +482,6 @@ namespace GameDev.World.Landscape
             return Vector2.Distance(p, a + ab * t);
         }
 
-        private static float SampleLakeDistance(float wx, float wz, IReadOnlyList<LakeDefinition> lakes)
-        {
-            if (lakes == null || lakes.Count == 0)
-            {
-                return -1e6f;
-            }
-
-            var best = float.NegativeInfinity;
-            for (var i = 0; i < lakes.Count; i++)
-            {
-                var d = lakes[i].WaterShoreSignedDistance(wx, wz);
-                if (d > best)
-                {
-                    best = d;
-                }
-            }
-
-            return best;
-        }
 
         private int Index(int x, int z) => z * Width + x;
 

@@ -3,9 +3,9 @@ Shader "GameDev/Overworld/Grass"
     Properties
     {
         _BaseMap("Base Map", 2D) = "white" {}
-        _BaseColor("Base Color", Color) = (0.34, 0.46, 0.26, 1)
+        _BaseColor("Base Color", Color) = (0.40, 0.58, 0.28, 1)
         _Cutoff("Alpha Cutoff", Range(0, 1)) = 0.15
-        _ColorVariation("Color Variation", Range(0, 1)) = 0.28
+        _ColorVariation("Color Variation", Range(0, 1)) = 0.32
         _DryEdgeColor("Dry Edge Color", Color) = (0.42, 0.36, 0.22, 1)
     }
 
@@ -42,6 +42,8 @@ Shader "GameDev/Overworld/Grass"
             SAMPLER(sampler_BaseMap);
             TEXTURE2D(_OverworldRoadLawnMask);
             SAMPLER(sampler_OverworldRoadLawnMask);
+            TEXTURE2D(_OverworldGrassTintMask);
+            SAMPLER(sampler_OverworldGrassTintMask);
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _BaseMap_ST;
@@ -62,6 +64,8 @@ Shader "GameDev/Overworld/Grass"
             float4 _OverworldRoadLawnMask_World;
             // x = height reduce, y = density reduce, z = tilt, w = dry tint
             float4 _OverworldGrassEdgeParams;
+            float4 _OverworldGrassTintMask_World;
+            float _OverworldGrassTintStrength;
 
             struct Attributes
             {
@@ -100,6 +104,19 @@ Shader "GameDev/Overworld/Grass"
                 }
 
                 return SAMPLE_TEXTURE2D_LOD(_OverworldRoadLawnMask, sampler_OverworldRoadLawnMask, uv, 0).r;
+            }
+
+            float3 SampleGrassTint(float2 worldXZ)
+            {
+                float2 size = max(_OverworldGrassTintMask_World.zw, float2(1e-3, 1e-3));
+                float2 uv = (worldXZ - _OverworldGrassTintMask_World.xy) / size;
+                if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0 || _OverworldGrassTintStrength < 1e-3)
+                {
+                    return _BaseColor.rgb;
+                }
+
+                float3 tint = SAMPLE_TEXTURE2D_LOD(_OverworldGrassTintMask, sampler_OverworldGrassTintMask, uv, 0).rgb;
+                return lerp(_BaseColor.rgb, tint, saturate(_OverworldGrassTintStrength));
             }
 
             Varyings vert(Attributes input)
@@ -171,7 +188,8 @@ Shader "GameDev/Overworld/Grass"
                 float dither = Hash21(floor(input.positionWS.xz * 6.0));
                 clip(densKeep - dither * 0.98);
 
-                float3 tint = lerp(_BaseColor.rgb, _BaseColor.rgb * float3(0.92, 1.05, 0.7),
+                float3 baseTint = SampleGrassTint(input.positionWS.xz);
+                float3 tint = lerp(baseTint, baseTint * float3(0.92, 1.05, 0.7),
                                   input.colorHash * _ColorVariation);
                 float mud = Hash21(floor(input.positionWS.xz * 0.35 + 4.2));
                 tint = lerp(tint, tint * float3(0.85, 0.9, 0.65), mud * 0.3 * _ColorVariation);

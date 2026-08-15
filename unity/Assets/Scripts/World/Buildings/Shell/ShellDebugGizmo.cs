@@ -28,7 +28,7 @@ namespace GameDev.World.Buildings.Shell
             _floors = shell.Dna.FloorCount;
             _wealth = shell.Dna.Wealth;
             _massing = shell.Dna.Massing.ToString();
-            _hasPortal = shell.Portal.HasValue;
+            _hasPortal = shell.HasPortal;
             _boundsCenter = shell.LocalBounds.center;
             _boundsSize = shell.LocalBounds.size;
             _street = shell.Street;

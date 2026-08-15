@@ -13,7 +13,7 @@ namespace GameDev.World.Vegetation.Tests
             // ~6 clumps/m² with 1.2 m mesh — lawn in meadows; forests thin via mask.
             var perSq = 1f / (GrassDistribution.CellMeters * GrassDistribution.CellMeters);
             Assert.Greater(perSq, 5f);
-            Assert.Less(perSq, 8f);
+            Assert.Less(perSq, 12f);
         }
 
         [Test]

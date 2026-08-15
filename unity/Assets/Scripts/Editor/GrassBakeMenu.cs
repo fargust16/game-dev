@@ -20,7 +20,7 @@ namespace GameDev.EditorTools
         private const string MaterialAssetPath = "Assets/Settings/OverworldGrass.mat";
 
         public static GrassField Bake(
-            MapMagicBiomeSampler sampler,
+            IBiomeSampler sampler,
             UnityEngine.Terrain terrain,
             IWaterSampler water,
             VegetationClearance clearance,

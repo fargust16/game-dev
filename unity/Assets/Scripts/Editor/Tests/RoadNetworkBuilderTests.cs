@@ -230,7 +230,7 @@ namespace GameDev.World.Roads.Tests
             var grid = new RoadGridSpec(0f, 0f, 40, 40, 10f);
             float Height(float x, float z) => 10f;
             BiomeId Biome(float x, float z) => BiomeId.Meadow;
-            var field = new LandscapeCostField(0f, 0f, 400f, 400f, 10f, Height, Biome, lakes: null);
+            var field = new LandscapeCostField(0f, 0f, 400f, 400f, 10f, Height, Biome);
 
             var nodes = new List<Vector2>
             {
@@ -279,7 +279,7 @@ namespace GameDev.World.Roads.Tests
             var grid = new RoadGridSpec(0f, 0f, 40, 40, 10f);
             float Height(float x, float z) => 10f;
             BiomeId Biome(float x, float z) => BiomeId.Meadow;
-            var field = new LandscapeCostField(0f, 0f, 400f, 400f, 10f, Height, Biome, lakes: null);
+            var field = new LandscapeCostField(0f, 0f, 400f, 400f, 10f, Height, Biome);
 
             var nodes = new List<Vector2>
             {

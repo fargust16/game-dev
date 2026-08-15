@@ -1,7 +1,7 @@
-namespace GameDev.World
+﻿namespace GameDev.World
 {
     /// <summary>
-    /// Single world-scale table: character → vegetation → lakes/shores → relief → chunks.
+    /// Single world-scale table: character â†’ vegetation â†’ lakes/shores â†’ relief â†’ chunks.
     /// All overworld placers/scatter/player sizing should read these constants instead of
     /// inventing independent fudge factors.
     /// </summary>
@@ -37,30 +37,30 @@ namespace GameDev.World
 
         /// <summary>
         /// Horizontal recess (InsetWidth): water sheet expands past the visual shore under banks.
-        /// Spec 1.0–2.5 m — prefer larger over visible gaps / floating edges.
+        /// Spec 1.0â€“2.5 m â€” prefer larger over visible gaps / floating edges.
         /// </summary>
         public const float WaterOverlapMeters = 1.75f;
 
-        /// <summary>Legacy alias — prefer <see cref="WaterOverlapMeters"/> (positive expand).</summary>
+        /// <summary>Legacy alias â€” prefer <see cref="WaterOverlapMeters"/> (positive expand).</summary>
         public const float WaterShoreInsetMeters = -WaterOverlapMeters;
 
         /// <summary>
         /// Vertical recess (InsetDepth): dry shore must sit at least this far above the water plane.
-        /// Spec 0.5–1.5 m.
+        /// Spec 0.5â€“1.5 m.
         /// </summary>
         public const float WaterInsetDepthMeters = 1.0f;
 
         /// <summary>
-        /// Extra depth on steep shores: effectiveInset = base + slope * this (slope ≈ rise/run).
+        /// Extra depth on steep shores: effectiveInset = base + slope * this (slope â‰ˆ rise/run).
         /// </summary>
         public const float WaterInsetSlopeFactor = 2.5f;
 
-        /// <summary>Extra dig margin beyond overlap (spec Buffer 0.2–0.5 m).</summary>
+        /// <summary>Extra dig margin beyond overlap (spec Buffer 0.2â€“0.5 m).</summary>
         public const float WaterInsetBufferMeters = 0.35f;
 
         /// <summary>
         /// Water plane vs average dry shore:
-        /// <c>WaterLevel = AvgShore − WaterDepthOffset</c> (≥ InsetDepth so the sheet stays buried).
+        /// <c>WaterLevel = AvgShore âˆ’ WaterDepthOffset</c> (â‰¥ InsetDepth so the sheet stays buried).
         /// </summary>
         public const float WaterDepthOffsetMeters = 1.25f;
 
@@ -70,10 +70,10 @@ namespace GameDev.World
         /// </summary>
         public const float LakeBasinExpandMeters = WaterOverlapMeters + WaterInsetBufferMeters;
 
-        /// <summary>Hard reject when average slope in the footprint exceeds this (~9°).</summary>
+        /// <summary>Hard reject when average slope in the footprint exceeds this (~9Â°).</summary>
         public const float LakeRejectAvgSlope = 0.16f;
 
-        /// <summary>Hard reject when any sample slope exceeds this (~20°).</summary>
+        /// <summary>Hard reject when any sample slope exceeds this (~20Â°).</summary>
         public const float LakeRejectMaxSlope = 0.36f;
 
         /// <summary>Hard reject when high-terrain mass penalty exceeds this (mountain flank).</summary>
@@ -107,8 +107,8 @@ namespace GameDev.World
         /// <summary>Minimum distance from map/usable edge to a lake center.</summary>
         public const float LakeEdgeMinDistanceMeters = 160f;
 
-        /// <summary>Guaranteed minimum lake count per overworld island.</summary>
-        public const int LakeMinCount = 2;
+        /// <summary>Guaranteed minimum lake count per overworld island (1 inland lake is valid).</summary>
+        public const int LakeMinCount = 1;
 
         /// <summary>
         /// Preferred upper lake count. Actual count is seed-derived in
@@ -117,15 +117,30 @@ namespace GameDev.World
         public const int LakePreferredMaxCount = 3;
 
         /// <summary>
+        /// Inland lake water plane must sit at least this far above <see cref="SeaLevelMeters"/>
+        /// so a river outlet can drain to the ocean without sharing the ocean sheet.
+        /// </summary>
+        public const float InlandLakeMinAboveSeaMeters = 8f;
+
+        /// <summary>
+        /// Soft target radius band for the primary inland lake (readable from overview, not half-island).
+        /// </summary>
+        public const float InlandLakeTargetRadiusMinMeters = 90f;
+
+        /// <summary>See <see cref="InlandLakeTargetRadiusMinMeters"/>.</summary>
+        public const float InlandLakeTargetRadiusMaxMeters = 140f;
+
+        /// <summary>
         /// Terrain around a closed lake rim must stay above
         /// <c>SeaLevel + LakeSafetyMargin</c> so the single water plane cannot spill to the ocean.
+        /// Elevated inland lakes with an outlet skip this seal path.
         /// </summary>
         public const float LakeSafetyMarginMeters = 6f;
 
         /// <summary>Minimum inland water-region area (heightmap cells) to count as a valid lake.</summary>
         public const int LakeMinCells = 48;
 
-        // Area-fraction size tiers (of tile area) → equivalent radius via √(A/π).
+        // Area-fraction size tiers (of tile area) â†’ equivalent radius via âˆš(A/Ï€).
         public const float LakeSmallAreaFracMin = 0.005f;
         public const float LakeSmallAreaFracMax = 0.02f;
         public const float LakeMediumAreaFracMin = 0.02f;
@@ -134,9 +149,9 @@ namespace GameDev.World
         public const float LakeLargeAreaFracMax = 0.12f;
 
         // --- Rivers ---
-        public const float RiverSourceWidthMeters = 4f;
-        public const float RiverMouthWidthMeters = 22f;
-        public const float RiverBankWidthMeters = 10f;
+        public const float RiverSourceWidthMeters = 7f;
+        public const float RiverMouthWidthMeters = 28f;
+        public const float RiverBankWidthMeters = 14f;
         public const float RiverWidthGrowthExponent = 1.3f;
 
         // --- Roads (LandscapePlanner corridor) ---
@@ -181,15 +196,15 @@ namespace GameDev.World
 
         /// <summary>
         /// Outer falloff each per-tile Vista biome extends past the tile edge so neighboring
-        /// caches soft-blend. Keeps LPB footprint near demo scale (~tile + 2×overlap), not the
+        /// caches soft-blend. Keeps LPB footprint near demo scale (~tile + 2Ã—overlap), not the
         /// full world extent (world-extent biomes OOM simulation nodes).
         /// </summary>
         public const float VistaBiomeSeamOverlapMeters = 80f;
 
-        /// <summary>Full overworld width (tileCountX × tile size).</summary>
+        /// <summary>Full overworld width (tileCountX Ã— tile size).</summary>
         public static float WorldExtentXMeters => OverworldTileMeters * OverworldTileCountX;
 
-        /// <summary>Full overworld depth (tileCountZ × tile size).</summary>
+        /// <summary>Full overworld depth (tileCountZ Ã— tile size).</summary>
         public static float WorldExtentZMeters => OverworldTileMeters * OverworldTileCountZ;
 
         public const float ChunkSizeMeters = 64f;
@@ -210,8 +225,8 @@ namespace GameDev.World
         public const float IslandOceanMarginMeters = 280f;
 
         /// <summary>
-        /// Typical horizontal width of the directed coast transition (sea → green terrain).
-        /// Geometry SoT: <c>CoastalBeachShelf</c> (≤12° profile + coast-band smooth).
+        /// Typical horizontal width of the directed coast transition (sea â†’ green terrain).
+        /// Geometry SoT: <c>CoastalBeachShelf</c> (â‰¤12Â° profile + coast-band smooth).
         /// </summary>
         public const float CoastShelfWidthMeters = 200f;
 
@@ -221,7 +236,7 @@ namespace GameDev.World
         public const float BeachWidthMeters = 80f;
 
         /// <summary>
-        /// Snow line as metres above <see cref="SeaLevelMeters"/> (not a raw 0–1 heightmap fraction).
+        /// Snow line as metres above <see cref="SeaLevelMeters"/> (not a raw 0â€“1 heightmap fraction).
         /// </summary>
         public const float SnowLineMeters = 95f;
 
@@ -240,7 +255,7 @@ namespace GameDev.World
         /// <summary>Preferred peak count lower bound.</summary>
         public const int PeakPreferredMinCount = 1;
 
-        /// <summary>Preferred peak count upper bound (1–3 natural mountains).</summary>
+        /// <summary>Preferred peak count upper bound (1â€“3 natural mountains).</summary>
         public const int PeakPreferredMaxCount = 2;
 
         /// <summary>Minimum world-space distance between major peaks / massifs.</summary>

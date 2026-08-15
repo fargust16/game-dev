@@ -115,7 +115,7 @@ namespace GameDev.World
 
         private void RefreshPresentation()
         {
-            var landmarks = FindObjectsByType<LandmarkMarker>(FindObjectsSortMode.None);
+            var landmarks = FindObjectsByType<LandmarkMarker>();
             foreach (var landmark in landmarks)
             {
                 var labelTf = landmark.transform.Find("WorldLabel");

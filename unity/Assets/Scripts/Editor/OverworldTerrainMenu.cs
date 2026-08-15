@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using System.Collections;
 using System.IO;
 using System.Reflection;
@@ -22,7 +22,7 @@ using WorldSeed = GameDev.World.Seed.WorldSeed;
 namespace GameDev.EditorTools
 {
     /// <summary>
-    /// Overworld terrain bake: 2×2 tiles + multi-LPB stack (island base + Mountain LPBs) + water.
+    /// Overworld terrain bake: 2Ã—2 tiles + multi-LPB stack (island base + Mountain LPBs) + water.
     /// </summary>
     public static class OverworldTerrainMenu
     {
@@ -89,7 +89,7 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>
-        /// Diagnostic: Vista sample MountainRange on 2×2 tiles, no C# framing/lakes/StampIT.
+        /// Diagnostic: Vista sample MountainRange on 2Ã—2 tiles, no C# framing/lakes/StampIT.
         /// </summary>
         [MenuItem("GameDev/Overworld/Vista/Bake Demo MountainRange As-Is (2x2)")]
         public static void BakeDemoMountainRangeAsIs()
@@ -133,7 +133,7 @@ namespace GameDev.EditorTools
             CreateSunLight();
             ApplySkyboxAndEnvironment();
             EditorCoroutineUtility.StartCoroutineOwnerless(GenerateSurfaceRoutine(seed, TerrainBakeFlags.Full));
-            // Scene save happens after first generate completes inside the routine when path is empty — keep immediate save of empty+sun.
+            // Scene save happens after first generate completes inside the routine when path is empty â€” keep immediate save of empty+sun.
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddToBuildSettings(ScenePath);
         }
@@ -173,7 +173,7 @@ namespace GameDev.EditorTools
             var sky = AssetDatabase.LoadAssetAtPath<Material>(SkyboxDaytimePath);
             if (sky != null)
             {
-                // Rotate so HDRI sun disk matches Directional Light (~-35° yaw).
+                // Rotate so HDRI sun disk matches Directional Light (~-35Â° yaw).
                 if (sky.HasProperty("_Rotation"))
                 {
                     sky.SetFloat("_Rotation", 325f);
@@ -395,7 +395,7 @@ namespace GameDev.EditorTools
             EnsureVistaFolder();
 
             // Pass 1: resolution then pin tile metres (Unity keeps m/px on res change:
-            // 1400@33 → 22400@513 if size is not reset after heightmapResolution).
+            // 1400@33 â†’ 22400@513 if size is not reset after heightmapResolution).
             for (var tz = 0; tz < tileCount.y; tz++)
             {
                 for (var tx = 0; tx < tileCount.x; tx++)
@@ -497,11 +497,11 @@ namespace GameDev.EditorTools
                 }
             }
 
-            // Island ~100 + Raise delta 480–580 → peaks typically 450–600 ASL.
+            // Island ~100 + Raise delta 480â€“580 â†’ peaks typically 450â€“600 ASL.
             if (globalMaxY < 380f)
             {
                 Debug.LogWarning(
-                    $"[MountainLPB] Peak height only {globalMaxY:F0}m (want ~450–600 with Raise). " +
+                    $"[MountainLPB] Peak height only {globalMaxY:F0}m (want ~450â€“600 with Raise). " +
                     "Check MountainMassif graph + mountain scaleY.");
             }
             else
@@ -509,11 +509,11 @@ namespace GameDev.EditorTools
                 Debug.Log($"[MountainLPB] Global max height after Vista = {globalMaxY:F0}m");
             }
 
-            // Soft directed coast transition (no flat sand terrace / no 360° ring).
+            // Soft directed coast transition (no flat sand terrace / no 360Â° ring).
             if (!demoAsIs)
             {
                 CoastalBeachShelf.ApplyAll(terrains, seed);
-                // Per-tile beach flood cannot match shared edges — stitch before splat.
+                // Per-tile beach flood cannot match shared edges â€” stitch before splat.
                 TerrainTileSeams.DiagnoseAndWarn(terrains, "after-beach-pre-stitch");
                 TerrainTileSeams.StitchHeights(terrains);
                 TerrainTileSeams.WireNeighbors(terrains);
@@ -524,7 +524,7 @@ namespace GameDev.EditorTools
                 }
             }
 
-            // Degree-based MS_* splat (Vista TextureOutputs left white after Convert on 2×2).
+            // Degree-based MS_* splat (Vista TextureOutputs left white after Convert on 2Ã—2).
             // Coast sand from directed beach mask + height; MicroSplat Convert without HybridHeightBlend.
             OverworldMicroSplatSetup.PaintOrPreserveVistaSplats(terrains, seed);
             OverworldMicroSplatSetup.ConvertAllTilesToMicroSplat(terrains, seed);
@@ -539,7 +539,7 @@ namespace GameDev.EditorTools
 
             EnsureOceanSurface();
 
-            // Grass SoT: Polytope PT_Grass_02 via GPU GrassField — not VSP / Vista DetailDensity.
+            // Grass SoT: Polytope PT_Grass_02 via GPU GrassField â€” not VSP / Vista DetailDensity.
             VegetationScatterMenu.BakeGrassOnly();
         }
 
@@ -597,8 +597,8 @@ namespace GameDev.EditorTools
                     halfZ);
                 Debug.Log(
                     $"[VistaDemo] World biome: graph=MountainRange (sample copy) extent=" +
-                    $"{WorldScale.WorldExtentXMeters:F0}×{WorldScale.WorldExtentZMeters:F0}m " +
-                    $"sharedSeed={biomeSeed} → {WorldScale.OverworldTileCountX}×" +
+                    $"{WorldScale.WorldExtentXMeters:F0}Ã—{WorldScale.WorldExtentZMeters:F0}m " +
+                    $"sharedSeed={biomeSeed} â†’ {WorldScale.OverworldTileCountX}Ã—" +
                     $"{WorldScale.OverworldTileCountZ} tiles");
                 return;
             }
@@ -721,7 +721,7 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>
-        /// Seeded irregular island polygon → local anchors + Outer falloff.
+        /// Seeded irregular island polygon â†’ local anchors + Outer falloff.
         /// </summary>
         private static void ApplyInsetSquareIslandAnchors(LocalProceduralBiome biome)
         {
@@ -770,7 +770,7 @@ namespace GameDev.EditorTools
             {
                 erosion.erosionRate = Mathf.Clamp(erosion.erosionRate * 0.55f, 0f, 100f);
                 erosion.iterationCount = Mathf.Max(80, Mathf.RoundToInt(erosion.iterationCount * 0.65f));
-                // Keep sim canvas ≤512 for large island biomes (Vista caps at graph resolution).
+                // Keep sim canvas â‰¤512 for large island biomes (Vista caps at graph resolution).
                 if (erosion.featureSize < 6)
                 {
                     erosion.featureSize = 6;
@@ -837,7 +837,7 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>
-        /// Tall peaks (400–600 m): do NOT rewrite existing Curves (that crushed peaks to ~0.4 → ~190 m).
+        /// Tall peaks (400â€“600 m): do NOT rewrite existing Curves (that crushed peaks to ~0.4 â†’ ~190 m).
         /// Inject one peak-boost Curve before HeightOutput; use full height budget for Y scale.
         /// </summary>
         private static void ApplyTallPeakGraphHints(TerrainGraph graph)
@@ -932,7 +932,7 @@ namespace GameDev.EditorTools
             }
 
             var boost = new CurveNode();
-            // Raw ~0.45–0.55 mid → high; raw foothills ~0.25 → near 0 (under island shelf).
+            // Raw ~0.45â€“0.55 mid â†’ high; raw foothills ~0.25 â†’ near 0 (under island shelf).
             boost.curve = new AnimationCurve(
                 new Keyframe(0f, 0f, 0f, 0f),
                 new Keyframe(0.22f, 0f, 0f, 0f),
@@ -953,7 +953,7 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>
-        /// After Generate: log acceptance checks (size 1400×700, island land%, height budget, 4 anchors).
+        /// After Generate: log acceptance checks (size 1400Ã—700, island land%, height budget, 4 anchors).
         /// </summary>
         [MenuItem("GameDev/Overworld/Vista/Validate Mountain Bake Acceptance")]
         public static void ValidateMountainBakeAcceptance()
@@ -963,7 +963,7 @@ namespace GameDev.EditorTools
             var manager = Object.FindAnyObjectByType<VistaManager>();
             if (manager == null)
             {
-                Debug.LogError("[MountainBiome] Validate: no VistaManager — run Generate first.");
+                Debug.LogError("[MountainBiome] Validate: no VistaManager â€” run Generate first.");
                 return;
             }
 
@@ -1032,7 +1032,7 @@ namespace GameDev.EditorTools
                     {
                         Debug.LogError(
                             $"[MountainBiome] Validate FAIL: tile[{i}] landAboveSea={landPct:F1}% " +
-                            "(~full tile — inset-rect Outer falloff likely missing)");
+                            "(~full tile â€” inset-rect Outer falloff likely missing)");
                         ok = false;
                     }
                 }
@@ -1069,12 +1069,12 @@ namespace GameDev.EditorTools
 
             if (ok)
             {
-                Debug.Log("[MountainBiome] Validate PASS — size/height/anchors/island land% OK.");
+                Debug.Log("[MountainBiome] Validate PASS â€” size/height/anchors/island land% OK.");
             }
         }
 
         /// <summary>
-        /// Working copy of Vista sample MountainRange — never mutate the package asset.
+        /// Working copy of Vista sample MountainRange â€” never mutate the package asset.
         /// </summary>
         private static TerrainGraph LoadOrCopyDemoMountainRangeGraph()
         {
@@ -1095,7 +1095,7 @@ namespace GameDev.EditorTools
             if (!AssetDatabase.CopyAsset(DemoMountainRangeSourcePath, DemoMountainRangeWorkingPath))
             {
                 Debug.LogError(
-                    $"[VistaDemo] Failed to copy MountainRange → {DemoMountainRangeWorkingPath}");
+                    $"[VistaDemo] Failed to copy MountainRange â†’ {DemoMountainRangeWorkingPath}");
                 return null;
             }
 
@@ -1123,7 +1123,7 @@ namespace GameDev.EditorTools
             biome.baseResolution = 1024;
             biome.terrainGraph = sharedGraph;
 
-            // Identity scale: anchors carry real metres (Blank ±500 × scale=extent was the OOM bug).
+            // Identity scale: anchors carry real metres (Blank Â±500 Ã— scale=extent was the OOM bug).
             biome.transform.localPosition = worldCenter;
             biome.transform.localRotation = Quaternion.identity;
             biome.transform.localScale = Vector3.one;
@@ -1135,7 +1135,7 @@ namespace GameDev.EditorTools
                 new Vector3(halfExtentX, 0f, halfExtentZ),
                 new Vector3(halfExtentX, 0f, -halfExtentZ),
             };
-            // No outer falloff — footprint is exactly the world; tiles cover the same area.
+            // No outer falloff â€” footprint is exactly the world; tiles cover the same area.
             biome.falloffDirection = FalloffDirection.Inner;
             biome.falloffDistance = 0f;
 
@@ -1155,14 +1155,14 @@ namespace GameDev.EditorTools
             EnsureVistaUnityEvents(manager);
             var task = manager.GenerateAll();
             var start = EditorApplication.timeSinceStartup;
-            // Mountain biome graphs are heavy; do not Thread.Sleep — that blocks EditorCoroutines.
+            // Mountain biome graphs are heavy; do not Thread.Sleep â€” that blocks EditorCoroutines.
             const double timeoutSeconds = 300.0;
             while (task != null && !task.isCompleted)
             {
                 if (EditorApplication.timeSinceStartup - start > timeoutSeconds)
                 {
                     Debug.LogWarning(
-                        "[Overworld] Vista generation timed out — cancelling. " +
+                        "[Overworld] Vista generation timed out â€” cancelling. " +
                         "Partial height will not be used; re-run Generate after checking the Vista console.");
                     manager.CancelGeneration();
                     yield break;
@@ -1377,8 +1377,8 @@ namespace GameDev.EditorTools
 
         public static Material EnsureOverworldTerrainMaterial()
         {
-            // Never assign bare Shader.Find("MicroSplat/MicroSplat") — that shader has no
-            // diffuse arrays and reads as blown-white. Convert → MicroSplatTerrain.Sync sets
+            // Never assign bare Shader.Find("MicroSplat/MicroSplat") â€” that shader has no
+            // diffuse arrays and reads as blown-white. Convert â†’ MicroSplatTerrain.Sync sets
             // the real generated material. Until then use URP TerrainLit.
             var existing = AssetDatabase.LoadAssetAtPath<Material>(TerrainMaterialPath);
             if (existing != null && existing.shader != null && existing.shader.name == TerrainShaderName)
