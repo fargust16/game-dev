@@ -41,6 +41,14 @@ namespace GameDev.EditorTools
 
         public const int MountainAnchorCount = 28;
 
+        /// <summary>
+        /// Graph resolution per massif LPB. Also the ceiling on HydraulicErosion2's sim canvas
+        /// (<c>min(2048, baseResolution)</c>), so lowering this coarsens drainage, not just detail.
+        /// If a bake gets too slow, cut erosion/talus iterations in
+        /// <see cref="MountainMassifGraphBuilder"/> before touching this.
+        /// </summary>
+        public const int MountainBaseResolution = 1024;
+
         /// <summary>Major axis of ridge ellipse (local metres).</summary>
         public const float MountainMajorAxisMin = 900f;
         public const float MountainMajorAxisMax = 1200f;
@@ -256,7 +264,11 @@ namespace GameDev.EditorTools
             biome.transform.position = worldPos;
             biome.transform.localRotation = Quaternion.identity;
             biome.transform.localScale = new Vector3(scale, 1f, scale);
-            biome.baseResolution = 512;
+            // 512 over a ~2500 m massif is 4.9 m/px — coarser than the 1400 m / 513 (2.73 m/px) terrain
+            // it is resampled onto, which is half of why the massif read as a smoothed cone. It also
+            // caps HydraulicErosion2's sim canvas (min(2048, baseResolution)) at 192 px, so drainage
+            // could only ever be a coarse radial comb. 1024 → 2.4 m/px and a ~424 px erosion canvas.
+            biome.baseResolution = MountainBaseResolution;
             biome.order = OrderMountainBase + index;
             biome.dataMask = BiomeDataMask.HeightMap | BiomeDataMask.HoleMap | BiomeDataMask.LayerWeightMaps;
             biome.terrainGraph = massifGraph;

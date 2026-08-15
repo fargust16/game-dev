@@ -240,6 +240,14 @@
         /// </summary>
         public const float SnowLineMeters = 95f;
 
+        /// <summary>
+        /// Snow line for the massif splat, as metres above <see cref="SeaLevelMeters"/>.
+        /// Distinct from <see cref="SnowLineMeters"/> (95 m), which puts the line at 119 m ASL —
+        /// near the foot of a 500-580 m peak, so a real white layer at that height would bury the
+        /// whole mountain. This one leaves roughly the top quarter snow-capped.
+        /// </summary>
+        public const float AlpineSnowLineMeters = 430f;
+
         /// <summary>How far below sea the outer shelf floor settles (metres of water column at tile edge).</summary>
         public const float OceanShelfDepthMeters = 22f;
 
