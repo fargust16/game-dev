@@ -91,3 +91,26 @@ unity/Assets/Settings/Vista/MicroSplatData/
 unity/Assets/Settings/Vista/MicroSplatData.meta
 unity/Assets/Settings/Vista/SandDebug/
 unity/Assets/Settings/Vista/SandDebug.meta
+
+# Local editor / agent noise (do not author)
+.vscode/
+AGENTS.md.bak
+LEAN-CTX.md
+.cursorrules
+.cursor/rules/lean-ctx.mdc
+unity/*.log
+unity/ShellTestLog.txt
+unity/Assets/Char_UEZ.fbx
+unity/Assets/Char_UEZ.fbx.meta
+unity/Assets/Debug/
+unity/Assets/Debug.meta
+unity/Assets/_Disabled/
+unity/Assets/_Disabled.meta
+unity/Assets/VistaExported/
+unity/Assets/VistaExported.meta
+
+# Unity lighting bake for Overworld_Generator (rebake in Editor)
+unity/Assets/Scenes/Overworld_Generator/LightingData.asset
+unity/Assets/Scenes/Overworld_Generator/LightingData.asset.meta
+unity/Assets/Scenes/Overworld_Generator/ReflectionProbe-*.exr
+unity/Assets/Scenes/Overworld_Generator/ReflectionProbe-*.exr.meta
