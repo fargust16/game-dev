@@ -582,54 +582,6 @@ MonoBehaviour:
       min: -3.4028235e+38
       max: 3.4028235e+38
   - m_id:
-      m_nodeId: 7a62158c-279c-4864-adbb-8ca6338a7abe
-      m_propertyName: treeTemplate
-    m_label: Tree Template
-    m_description: 
-    m_groupName: Vegetation
-    m_enumTypeName: 
-    m_objectTypeName: Pinwheel.Vista.TreeTemplate, Pinwheel.Vista.Runtime, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-    m_propertyType: 110
-    m_intValueRange:
-      min: -2147483648
-      max: 2147483647
-    m_floatValueRange:
-      min: -3.4028235e+38
-      max: 3.4028235e+38
-  - m_id:
-      m_nodeId: cea869e6-476d-40bd-b5d8-423ce968c232
-      m_propertyName: detailTemplate
-    m_label: Grass Template (Unity)
-    m_description: 
-    m_groupName: Vegetation
-    m_enumTypeName: 
-    m_objectTypeName: Pinwheel.Vista.DetailTemplate, Pinwheel.Vista.Runtime, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-    m_propertyType: 110
-    m_intValueRange:
-      min: -2147483648
-      max: 2147483647
-    m_floatValueRange:
-      min: -3.4028235e+38
-      max: 3.4028235e+38
-  - m_id:
-      m_nodeId: YTAXHD97
-      m_propertyName: detailTemplate
-    m_label: Grass Template (Polaris)
-    m_description: 
-    m_groupName: Vegetation
-    m_enumTypeName: 
-    m_objectTypeName: Pinwheel.Vista.DetailTemplate, Pinwheel.Vista.Runtime, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-    m_propertyType: 110
-    m_intValueRange:
-      min: -2147483648
-      max: 2147483647
-    m_floatValueRange:
-      min: -3.4028235e+38
-      max: 3.4028235e+38
-  - m_id:
       m_nodeId: U5RO4BPV
       m_propertyName: outLow
     m_label: Min Height
@@ -690,14 +642,14 @@ MonoBehaviour:
       min: -3.4028235e+38
       max: 3.4028235e+38
   m_debugConfigs:
-    m_resolution: 1024
+    m_resolution: 512
     m_worldBounds:
       serializedVersion: 2
-      x: -35.355347
-      y: -35.355347
-      width: 2070.7107
-      height: 2070.7107
-    m_terrainHeight: 500
-    m_seed: 159
+      x: 0
+      y: 0
+      width: 1686.9612
+      height: 1988.3153
+    m_terrainHeight: 700
+    m_seed: 353890158
     m_shouldOutputTempHeight: 0
   m_allowSplitExecution: 1

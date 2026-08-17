@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &123019691
+--- !u!1 &136047494
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,30 +127,166 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 123019692}
+  - component: {fileID: 136047495}
+  - component: {fileID: 136047498}
+  - component: {fileID: 136047497}
+  - component: {fileID: 136047496}
   m_Layer: 0
-  m_Name: OverworldWater
+  m_Name: LPB_IslandBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &123019692
+--- !u!4 &136047495
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 123019691}
+  m_GameObject: {fileID: 136047494}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 500, y: 0, z: 500}
+  m_LocalScale: {x: 1.05, y: 0.07857143, z: 1.05}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 352881672}
-  m_Father: {fileID: 0}
+  m_Children: []
+  m_Father: {fileID: 1938742828}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &136047496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 136047494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95bdfb504ff468b48a584897b922ede2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.SetBiomeHeightOnSpawn
+  m_worldHeight: 55
+--- !u!114 &136047497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 136047494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc5739ce0cc134648abea1274b6f9c4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &136047498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 136047494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c05938ebcb84ab4ebf1959f34e51c8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_order: 0
+  m_terrainGraph: {fileID: 11400000, guid: 11fc114f3ac0cf746b52aa7ad0e76f70, type: 2}
+  m_space: 1
+  m_dataMask: 35
+  m_baseResolution: 512
+  m_seed: 528436158
+  m_biomeMaskResolution: 512
+  m_biomeMaskGraph: {fileID: 11400000, guid: 793d868c4e415bd4fa252fdf4cbda4b8, type: 2}
+  m_anchors:
+  - {x: 1482.8264, y: 0, z: 862.949}
+  - {x: 1506.8912, y: 0, z: 978.33203}
+  - {x: 1511.9592, y: 0, z: 1102.8458}
+  - {x: 1493.6737, y: 0, z: 1232.6605}
+  - {x: 1448.5698, y: 0, z: 1361.9327}
+  - {x: 1375.0231, y: 0, z: 1483.1682}
+  - {x: 1273.9929, y: 0, z: 1588.0227}
+  - {x: 1149.3632, y: 0, z: 1668.4072}
+  - {x: 1007.7687, y: 0, z: 1717.6846}
+  - {x: 857.9076, y: 0, z: 1731.7085}
+  - {x: 709.4581, y: 0, z: 1709.4857}
+  - {x: 571.80597, y: 0, z: 1653.317}
+  - {x: 452.8404, y: 0, z: 1568.39}
+  - {x: 358.05014, y: 0, z: 1461.9104}
+  - {x: 290.08765, y: 0, z: 1341.9674}
+  - {x: 248.85945, y: 0, z: 1216.37}
+  - {x: 232.07805, y: 0, z: 1091.6904}
+  - {x: 236.11765, y: 0, z: 972.68994}
+  - {x: 256.95538, y: 0, z: 862.1997}
+  - {x: 290.9804, y: 0, z: 761.4174}
+  - {x: 335.50543, y: 0, z: 670.492}
+  - {x: 388.9052, y: 0, z: 589.20166}
+  - {x: 450.40945, y: 0, z: 517.53723}
+  - {x: 519.66425, y: 0, z: 456.04486}
+  - {x: 596.22815, y: 0, z: 405.86252}
+  - {x: 679.16815, y: 0, z: 368.48483}
+  - {x: 766.8779, y: 0, z: 345.36197}
+  - {x: 857.15845, y: 0, z: 337.48575}
+  - {x: 947.5179, y: 0, z: 345.10782}
+  - {x: 1035.5771, y: 0, z: 367.6881}
+  - {x: 1119.4283, y: 0, z: 404.09076}
+  - {x: 1197.8186, y: 0, z: 452.96246}
+  - {x: 1270.0729, y: 0, z: 513.16254}
+  - {x: 1335.7675, y: 0, z: 584.0881}
+  - {x: 1394.2385, y: 0, z: 665.7607}
+  - {x: 1444.0836, y: 0, z: 758.6063}
+  m_falloffDirection: 0
+  m_falloffDistance: 420
+  m_falloffAnchors:
+  - {x: 1886.4033, y: 0, z: 746.6489}
+  - {x: 1923.7104, y: 0, z: 926.74036}
+  - {x: 1931.4421, y: 0, z: 1123.6815}
+  - {x: 1901.8524, y: 0, z: 1331.6056}
+  - {x: 1828.4768, y: 0, z: 1541.0155}
+  - {x: 1707.8324, y: 0, z: 1739.3673}
+  - {x: 1540.8221, y: 0, z: 1912.3716}
+  - {x: 1333.5128, y: 0, z: 2045.8843}
+  - {x: 1097.0084, y: 0, z: 2128.0945}
+  - {x: 846.2986, y: 0, z: 2151.548}
+  - {x: 598.2365, y: 0, z: 2114.4917}
+  - {x: 369.08392, y: 0, z: 2021.1536}
+  - {x: 172.22491, y: 0, z: 1880.888}
+  - {x: 16.575592, y: 0, z: 1706.4408}
+  - {x: -94.03302, y: 0, z: 1511.8241}
+  - {x: -160.50874, y: 0, z: 1310.2726}
+  - {x: -187.39854, y: 0, z: 1112.6521}
+  - {x: -181.33615, y: 0, z: 926.5127}
+  - {x: -149.35715, y: 0, z: 755.8507}
+  - {x: -97.40491, y: 0, z: 601.55237}
+  - {x: -29.335419, y: 0, z: 462.42676}
+  - {x: 53.341644, y: 0, z: 336.6208}
+  - {x: 150.93338, y: 0, z: 223.0647}
+  - {x: 264.43707, y: 0, z: 122.489655}
+  - {x: 394.20892, y: 0, z: 37.639435}
+  - {x: 538.8727, y: 0, z: -27.39035}
+  - {x: 694.831, y: 0, z: -68.412415}
+  - {x: 856.5562, y: 0, z: -82.513824}
+  - {x: 1017.5739, y: 0, z: -69.00827}
+  - {x: 1171.7935, y: 0, z: -29.609161}
+  - {x: 1314.6893, y: 0, z: 32.239746}
+  - {x: 1443.9203, y: 0, z: 112.61853}
+  - {x: 1559.1625, y: 0, z: 208.48694}
+  - {x: 1661.228, y: 0, z: 318.61603}
+  - {x: 1750.75, y: 0, z: 443.7257}
+  - {x: 1826.8734, y: 0, z: 585.7713}
+  m_cleanUpMode: 0
+  m_biomeMaskAdjustments: []
+  m_blendOptions:
+    m_heightMapBlendMode: 0
+    m_textureBlendMode: 0
+    m_meshDensityBlendMode: 0
+    m_holeMapBlendMode: 0
+    m_populationBlendMode: 0
+    m_useTransformForHeightBlend: 1
+  m_textureInputs: []
+  m_positionInputs: []
+  m_guid: PL33VFU1
+  m_propertyOverrides: []
 --- !u!1 &175756389
 GameObject:
   m_ObjectHideFlags: 0
@@ -260,7 +396,81 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &192705251
+--- !u!1001 &181745291
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1750437927}
+    m_Modifications:
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 280
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 280
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1400
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1400
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371084, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: m_Name
+      value: WorldWater
+      objectReference: {fileID: 0}
+    - target: {fileID: 6013632388104371086, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9a6e09c1b1010cf4e97082d51496607b, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+--- !u!4 &181745292 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
+  m_PrefabInstance: {fileID: 181745291}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &291347881
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -268,61 +478,146 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 192705253}
-  - component: {fileID: 192705252}
+  - component: {fileID: 291347882}
+  - component: {fileID: 291347886}
+  - component: {fileID: 291347885}
+  - component: {fileID: 291347884}
+  - component: {fileID: 291347883}
   m_Layer: 0
-  m_Name: OverworldGrass
+  m_Name: OverworldTerrain_0_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
---- !u!114 &192705252
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 192705251}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: edc3321b45f389042801a6e338c7f766, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameDev.World.Vegetation.GrassField
-  grassMesh: {fileID: -4435434709360095332, guid: 8c71f03fcb0c13644a30696cafc5cda8, type: 3}
-  grassMaterial: {fileID: 2100000, guid: 19846ddbac9122d4c94f56f3981ee917, type: 2}
-  worldSeed: 36110437
-  tileMinX: 0
-  tileMinZ: 0
-  tileSizeX: 2800
-  tileSizeZ: 2800
-  offsetMacroX: 6769.6787
-  offsetMacroZ: 279.03644
-  offsetMesoX: 2938.0703
-  offsetMesoZ: 268.49628
-  offsetThicketX: 8799.537
-  offsetThicketZ: 8368.115
-  offsetGrassX: 8514.468
-  offsetGrassZ: 1015.7869
-  bakeConfigured: 1
-  windDir: {x: 1, y: 0.35}
-  windStrength: 0.22
-  windSpeed: 1.1
---- !u!4 &192705253
+--- !u!4 &291347882
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 192705251}
+  m_GameObject: {fileID: 291347881}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 1400}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1259832010}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &291347883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291347881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6525fd4a9fb974b7f878dee70144de99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: JBooth.MicroSplat.Core::JBooth.MicroSplat.MicroSplatTerrain
+  templateMaterial: {fileID: 2100000, guid: 7048c3d66b874194fb0a450e317a7949, type: 2}
+  blendMat: {fileID: 0}
+  blendMatInstance: {fileID: 0}
+  keywordSO: {fileID: 11400000, guid: 6b93e7dbcb033b54ab319dbf034cfff7, type: 2}
+  perPixelNormal: {fileID: 0}
+  streamTexture: {fileID: 0}
+  propData: {fileID: 11400000, guid: 6941e3391734a4747bb39a4e207e246b, type: 2}
+  terrain: {fileID: 291347886}
+  baseMapShader: {fileID: 4800000, guid: 68945fc8d6ec44644871c5dd632be2ed, type: 3}
+  customControl0: {fileID: 0}
+  customControl1: {fileID: 0}
+  customControl2: {fileID: 0}
+  customControl3: {fileID: 0}
+  customControl4: {fileID: 0}
+  customControl5: {fileID: 0}
+  customControl6: {fileID: 0}
+  customControl7: {fileID: 0}
+  patchBoundsMultiplier: {x: 1, y: 1, z: 1}
+  reenabled: 0
+  importSplatMaps: []
+--- !u!114 &291347884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291347881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 573c207eacf916343898009fefa81793, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.UnityTerrain.TerrainTile
+  m_managerId: M5J46ENM
+  m_terrainLayers:
+  - {fileID: 8574412962073106934, guid: 1d30f3b7e5aa63a4b9070e90589419a9, type: 2}
+  - {fileID: 8574412962073106934, guid: 78c3fa646068f3b4a8bd4247deeaed2b, type: 2}
+  - {fileID: 8574412962073106934, guid: 89d680924bebfd9418c417085178d40a, type: 2}
+  - {fileID: 8574412962073106934, guid: 161ffdbebb5907347bfbe45c7c2bd691, type: 2}
+  - {fileID: 8574412962073106934, guid: 11b993dccc3d44348a5783d5ff6db875, type: 2}
+  - {fileID: 8574412962073106934, guid: 3d5e7a7e9324f924a8abd286e2c30f13, type: 2}
+--- !u!154 &291347885
+TerrainCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291347881}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_TerrainData: {fileID: 15600000, guid: 5b817cb39d6786b4398c4d5ed33e2443, type: 2}
+  m_EnableTreeColliders: 1
+--- !u!218 &291347886
+Terrain:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291347881}
+  m_Enabled: 1
+  serializedVersion: 6
+  m_TerrainData: {fileID: 15600000, guid: 5b817cb39d6786b4398c4d5ed33e2443, type: 2}
+  m_TreeDistance: 5000
+  m_TreeBillboardDistance: 50
+  m_TreeCrossFadeLength: 5
+  m_TreeMaximumFullLODCount: 50
+  m_DetailObjectDistance: 80
+  m_DetailObjectDensity: 1
+  m_HeightmapPixelError: 5
+  m_SplatMapDistance: 99999
+  m_HeightmapMinimumLODSimplification: 0
+  m_HeightmapMaximumLOD: 0
+  m_ShadowCastingMode: 2
+  m_DrawHeightmap: 1
+  m_DrawInstanced: 1
+  m_DrawTreesAndFoliage: 1
+  m_StaticShadowCaster: 0
+  m_IgnoreQualitySettings: 0
+  m_ReflectionProbeUsage: 1
+  m_MaterialTemplate: {fileID: 0}
+  m_BakeLightProbesForTrees: 1
+  m_PreserveTreePrototypeLayers: 0
+  m_DeringLightProbesForTrees: 1
+  m_ReceiveGI: 1
+  m_ScaleInLightmap: 0.018285714
+  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
+  m_GroupingID: 0
+  m_RenderingLayerMask: 1
+  m_AllowAutoConnect: 1
+  m_EnableHeightmapRayTracing: 1
+  m_EnableTreesAndDetailsRayTracing: 0
+  m_EnableHeightmapLODFrustumCulling: 1
+  m_TreeMotionVectorModeOverride: 3
 --- !u!1 &311829719
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,80 +774,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!1001 &352881671
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 123019692}
-    m_Modifications:
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 280
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 280
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 1400
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 24
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 1400
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371084, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: m_Name
-      value: WorldWater
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013632388104371086, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 9a6e09c1b1010cf4e97082d51496607b, type: 2}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
---- !u!4 &352881672 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6013632388104371080, guid: 6e0965b76baec374d9a8e0c82f9033cb, type: 3}
-  m_PrefabInstance: {fileID: 352881671}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &597265331
 GameObject:
   m_ObjectHideFlags: 0
@@ -602,7 +823,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &599134768
+--- !u!1 &646346456
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -610,61 +831,147 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 599134770}
-  - component: {fileID: 599134769}
+  - component: {fileID: 646346457}
+  - component: {fileID: 646346461}
+  - component: {fileID: 646346460}
+  - component: {fileID: 646346459}
+  - component: {fileID: 646346458}
   m_Layer: 0
-  m_Name: VistaManager
+  m_Name: OverworldTerrain_1_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
---- !u!114 &599134769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 599134768}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ffcde294171ce848a0fab5e05b4e530, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.VistaManager
-  m_beforeGeneratingUnityCallback:
-    m_PersistentCalls:
-      m_Calls: []
-  m_afterGeneratingUnityCallback:
-    m_PersistentCalls:
-      m_Calls: []
-  m_id: JB804CY9
-  m_terrainMaxHeight: 700
-  m_heightMapResolution: 513
-  m_textureResolution: 512
-  m_detailDensityMapResolution: 1024
-  m_shouldCullBiomes: 1
-  m_missingGeometryAction: 1
-  m_missingTextureAction: 1
-  m_missingPopulationAction: 1
-  m_objectToSpawnPerFrame: 20
---- !u!4 &599134770
+--- !u!4 &646346457
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 599134768}
+  m_GameObject: {fileID: 646346456}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 1400, y: 0, z: 1400}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1009305599}
-  - {fileID: 881379129}
-  m_Father: {fileID: 0}
+  m_Children: []
+  m_Father: {fileID: 1259832010}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &881379128
+--- !u!114 &646346458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646346456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6525fd4a9fb974b7f878dee70144de99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: JBooth.MicroSplat.Core::JBooth.MicroSplat.MicroSplatTerrain
+  templateMaterial: {fileID: 2100000, guid: 7048c3d66b874194fb0a450e317a7949, type: 2}
+  blendMat: {fileID: 0}
+  blendMatInstance: {fileID: 0}
+  keywordSO: {fileID: 11400000, guid: 6b93e7dbcb033b54ab319dbf034cfff7, type: 2}
+  perPixelNormal: {fileID: 0}
+  streamTexture: {fileID: 0}
+  propData: {fileID: 11400000, guid: 6941e3391734a4747bb39a4e207e246b, type: 2}
+  terrain: {fileID: 646346461}
+  baseMapShader: {fileID: 4800000, guid: 68945fc8d6ec44644871c5dd632be2ed, type: 3}
+  customControl0: {fileID: 0}
+  customControl1: {fileID: 0}
+  customControl2: {fileID: 0}
+  customControl3: {fileID: 0}
+  customControl4: {fileID: 0}
+  customControl5: {fileID: 0}
+  customControl6: {fileID: 0}
+  customControl7: {fileID: 0}
+  patchBoundsMultiplier: {x: 1, y: 1, z: 1}
+  reenabled: 0
+  importSplatMaps: []
+--- !u!114 &646346459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646346456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 573c207eacf916343898009fefa81793, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.UnityTerrain.TerrainTile
+  m_managerId: M5J46ENM
+  m_terrainLayers:
+  - {fileID: 8574412962073106934, guid: 1d30f3b7e5aa63a4b9070e90589419a9, type: 2}
+  - {fileID: 8574412962073106934, guid: 78c3fa646068f3b4a8bd4247deeaed2b, type: 2}
+  - {fileID: 8574412962073106934, guid: 89d680924bebfd9418c417085178d40a, type: 2}
+  - {fileID: 8574412962073106934, guid: 161ffdbebb5907347bfbe45c7c2bd691, type: 2}
+  - {fileID: 8574412962073106934, guid: 11b993dccc3d44348a5783d5ff6db875, type: 2}
+  - {fileID: 8574412962073106934, guid: 3d5e7a7e9324f924a8abd286e2c30f13, type: 2}
+--- !u!154 &646346460
+TerrainCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646346456}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_TerrainData: {fileID: 15600000, guid: e8af41d8e17aa4d4e9ddf3328b526472, type: 2}
+  m_EnableTreeColliders: 1
+--- !u!218 &646346461
+Terrain:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646346456}
+  m_Enabled: 1
+  serializedVersion: 6
+  m_TerrainData: {fileID: 15600000, guid: e8af41d8e17aa4d4e9ddf3328b526472, type: 2}
+  m_TreeDistance: 5000
+  m_TreeBillboardDistance: 50
+  m_TreeCrossFadeLength: 5
+  m_TreeMaximumFullLODCount: 50
+  m_DetailObjectDistance: 80
+  m_DetailObjectDensity: 1
+  m_HeightmapPixelError: 5
+  m_SplatMapDistance: 99999
+  m_HeightmapMinimumLODSimplification: 0
+  m_HeightmapMaximumLOD: 0
+  m_ShadowCastingMode: 2
+  m_DrawHeightmap: 1
+  m_DrawInstanced: 1
+  m_DrawTreesAndFoliage: 1
+  m_StaticShadowCaster: 0
+  m_IgnoreQualitySettings: 0
+  m_ReflectionProbeUsage: 1
+  m_MaterialTemplate: {fileID: 0}
+  m_BakeLightProbesForTrees: 1
+  m_PreserveTreePrototypeLayers: 0
+  m_DeringLightProbesForTrees: 1
+  m_ReceiveGI: 1
+  m_ScaleInLightmap: 0.018285714
+  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
+  m_GroupingID: 0
+  m_RenderingLayerMask: 1
+  m_AllowAutoConnect: 1
+  m_EnableHeightmapRayTracing: 1
+  m_EnableTreesAndDetailsRayTracing: 0
+  m_EnableHeightmapLODFrustumCulling: 1
+  m_TreeMotionVectorModeOverride: 3
+--- !u!1 &883474142
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -672,10 +979,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 881379129}
-  - component: {fileID: 881379132}
-  - component: {fileID: 881379131}
-  - component: {fileID: 881379130}
+  - component: {fileID: 883474143}
+  - component: {fileID: 883474146}
+  - component: {fileID: 883474145}
+  - component: {fileID: 883474144}
   m_Layer: 0
   m_Name: LPB_Mountain_0
   m_TagString: Untagged
@@ -683,53 +990,53 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &881379129
+--- !u!4 &883474143
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 881379128}
+  m_GameObject: {fileID: 883474142}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1228.5203, y: 0, z: 1565.1272}
-  m_LocalScale: {x: 1.142268, y: 0.70073485, z: 1.142268}
+  m_LocalPosition: {x: 1499.406, y: 0, z: 1607.7322}
+  m_LocalScale: {x: 1.0163143, y: 0.81473285, z: 1.0163143}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 599134770}
+  m_Father: {fileID: 1938742828}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &881379130
+--- !u!114 &883474144
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 881379128}
+  m_GameObject: {fileID: 883474142}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95bdfb504ff468b48a584897b922ede2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.SetBiomeHeightOnSpawn
-  m_worldHeight: 490.5144
---- !u!114 &881379131
+  m_worldHeight: 570.313
+--- !u!114 &883474145
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 881379128}
+  m_GameObject: {fileID: 883474142}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc5739ce0cc134648abea1274b6f9c4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &881379132
+--- !u!114 &883474146
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 881379128}
+  m_GameObject: {fileID: 883474142}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c05938ebcb84ab4ebf1959f34e51c8f, type: 3}
@@ -740,69 +1047,69 @@ MonoBehaviour:
   m_space: 1
   m_dataMask: 35
   m_baseResolution: 512
-  m_seed: 203072190
+  m_seed: 1726385050
   m_biomeMaskResolution: 512
   m_biomeMaskGraph: {fileID: 11400000, guid: 793d868c4e415bd4fa252fdf4cbda4b8, type: 2}
   m_anchors:
-  - {x: 417.48535, y: 0, z: 179.84326}
-  - {x: 391.98285, y: 0, z: 212.84702}
-  - {x: 356.22336, y: 0, z: 242.04248}
-  - {x: 306.45053, y: 0, z: 266.59164}
-  - {x: 236.96886, y: 0, z: 283.09723}
-  - {x: 143.35097, y: 0, z: 286.421}
-  - {x: 25.586052, y: 0, z: 271.45038}
-  - {x: -110.16099, y: 0, z: 235.14029}
-  - {x: -251.97739, y: 0, z: 178.02219}
-  - {x: -384.7426, y: 0, z: 104.572586}
-  - {x: -493.86234, y: 0, z: 22.28306}
-  - {x: -568.81335, y: 0, z: -60.213314}
-  - {x: -605.2231, y: 0, z: -135.24402}
-  - {x: -604.83105, y: 0, z: -197.6528}
-  - {x: -573.5515, y: 0, z: -245.29373}
-  - {x: -518.59985, y: 0, z: -278.40985}
-  - {x: -445.9513, y: 0, z: -298.30524}
-  - {x: -359.15594, y: 0, z: -305.9838}
-  - {x: -259.85107, y: 0, z: -301.38977}
-  - {x: -149.51617, y: 0, z: -283.56396}
-  - {x: -31.451447, y: 0, z: -251.5827}
-  - {x: 88.1189, y: 0, z: -205.77002}
-  - {x: 200.48608, y: 0, z: -148.53952}
-  - {x: 296.3623, y: 0, z: -84.389984}
-  - {x: 368.4596, y: 0, z: -18.970997}
-  - {x: 413.58746, y: 0, z: 42.42577}
-  - {x: 433.2801, y: 0, z: 96.30684}
-  - {x: 432.58813, y: 0, z: 141.70491}
+  - {x: -566.0941, y: 0, z: -104.48962}
+  - {x: -558.8801, y: 0, z: -170.26833}
+  - {x: -517.054, y: 0, z: -229.3262}
+  - {x: -440.81177, y: 0, z: -275.59967}
+  - {x: -335.60104, y: 0, z: -303.83072}
+  - {x: -211.75662, y: 0, z: -310.96774}
+  - {x: -82.52362, y: 0, z: -297.0653}
+  - {x: 38.945057, y: 0, z: -265.30527}
+  - {x: 142.5904, y: 0, z: -221.08762}
+  - {x: 223.38872, y: 0, z: -170.49759}
+  - {x: 281.5666, y: 0, z: -118.69701}
+  - {x: 321.08704, y: 0, z: -68.81373}
+  - {x: 347.06647, y: 0, z: -21.698158}
+  - {x: 363.16937, y: 0, z: 23.431932}
+  - {x: 369.98874, y: 0, z: 67.783905}
+  - {x: 364.97467, y: 0, z: 111.75006}
+  - {x: 343.8199, y: 0, z: 154.1454}
+  - {x: 302.62616, y: 0, z: 192.20653}
+  - {x: 239.89926, y: 0, z: 222.30205}
+  - {x: 157.5597, y: 0, z: 241.01108}
+  - {x: 60.63194, y: 0, z: 246.09613}
+  - {x: -44.129555, y: 0, z: 236.97838}
+  - {x: -149.97487, y: 0, z: 214.57329}
+  - {x: -251.44455, y: 0, z: 180.6458}
+  - {x: -344.67096, y: 0, z: 137.0575}
+  - {x: -426.67535, y: 0, z: 85.30975}
+  - {x: -494.15958, y: 0, z: 26.622238}
+  - {x: -542.5676, y: 0, z: -37.49533}
   m_falloffDirection: 0
   m_falloffDistance: 520
   m_falloffAnchors:
-  - {x: 869.4043, y: 0, z: 437.07715}
-  - {x: 764.57306, y: 0, z: 575.5818}
-  - {x: 637.46594, y: 0, z: 679.424}
-  - {x: 482.66565, y: 0, z: 755.8239}
-  - {x: 306.62567, y: 0, z: 798.41064}
-  - {x: 119.71054, y: 0, z: 805.8833}
-  - {x: -74.61373, y: 0, z: 781.7052}
-  - {x: -274.7839, y: 0, z: 728.3941}
-  - {x: -475.39374, y: 0, z: 647.5806}
-  - {x: -667.8536, y: 0, z: 540.7471}
-  - {x: -844.3804, y: 0, z: 406.3887}
-  - {x: -999.55237, y: 0, z: 231.1008}
-  - {x: -1112.3752, y: 0, z: -20.367416}
-  - {x: -1102.5747, y: 0, z: -348.15588}
-  - {x: -934.07874, y: 0, z: -620.02045}
-  - {x: -723.4091, y: 0, z: -756.37756}
-  - {x: -537.90607, y: 0, z: -810.1102}
-  - {x: -370.07742, y: 0, z: -825.86914}
-  - {x: -206.2808, y: 0, z: -818.623}
-  - {x: -39.920197, y: 0, z: -791.8835}
-  - {x: 129.75758, y: 0, z: -745.96277}
-  - {x: 299.43353, y: 0, z: -680.89746}
-  - {x: 463.53156, y: 0, z: -597.1006}
-  - {x: 616.5265, y: 0, z: -494.13974}
-  - {x: 754.60034, y: 0, z: -367.24573}
-  - {x: 871.87994, y: 0, z: -203.27325}
-  - {x: 945.99554, y: 0, z: 9.572426}
-  - {x: 942.617, y: 0, z: 243.04858}
+  - {x: -1082.7045, y: 0, z: -45.212875}
+  - {x: -1045.0449, y: 0, z: -354.77814}
+  - {x: -871.51953, y: 0, z: -609.79193}
+  - {x: -645.13995, y: 0, z: -753.77325}
+  - {x: -418.3743, y: 0, z: -817.20056}
+  - {x: -198.86218, y: 0, z: -830.80786}
+  - {x: 11.31501, y: 0, z: -808.5282}
+  - {x: 207.19835, y: 0, z: -757.3325}
+  - {x: 383.32773, y: 0, z: -682.00574}
+  - {x: 535.3645, y: 0, z: -586.51575}
+  - {x: 659.6753, y: 0, z: -475.67572}
+  - {x: 754.0539, y: 0, z: -356.80624}
+  - {x: 821.1655, y: 0, z: -235.31003}
+  - {x: 867.3054, y: 0, z: -104.03133}
+  - {x: 889.8899, y: 0, z: 57.642548}
+  - {x: 863.529, y: 0, z: 259.5459}
+  - {x: 759.7046, y: 0, z: 466.29913}
+  - {x: 594.78784, y: 0, z: 622.3711}
+  - {x: 411.04852, y: 0, z: 713.32947}
+  - {x: 229.05063, y: 0, z: 756.07324}
+  - {x: 51.68827, y: 0, z: 766.0192}
+  - {x: -120.65799, y: 0, z: 751.3162}
+  - {x: -286.48724, y: 0, z: 716.33453}
+  - {x: -444.3304, y: 0, z: 663.5485}
+  - {x: -594.0368, y: 0, z: 593.3651}
+  - {x: -736.9497, y: 0, z: 502.5984}
+  - {x: -874.33777, y: 0, z: 381.39618}
+  - {x: -1000.8407, y: 0, z: 208.23997}
   m_cleanUpMode: 0
   m_biomeMaskAdjustments: []
   m_blendOptions:
@@ -943,7 +1250,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!1 &1009305598
+--- !u!1 &1231405710
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -951,157 +1258,141 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1009305599}
-  - component: {fileID: 1009305602}
-  - component: {fileID: 1009305601}
-  - component: {fileID: 1009305600}
+  - component: {fileID: 1231405711}
+  - component: {fileID: 1231405714}
+  - component: {fileID: 1231405713}
+  - component: {fileID: 1231405712}
   m_Layer: 0
-  m_Name: LPB_IslandBase
+  m_Name: LPB_Mountain_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1009305599
+--- !u!4 &1231405711
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1009305598}
+  m_GameObject: {fileID: 1231405710}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 500, y: 0, z: 500}
-  m_LocalScale: {x: 1.05, y: 0.07857143, z: 1.05}
+  m_LocalPosition: {x: 1141.1241, y: 0, z: 1181.6459}
+  m_LocalScale: {x: 0.38850322, y: 0.25762263, z: 0.38850322}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 599134770}
+  m_Father: {fileID: 1938742828}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1009305600
+--- !u!114 &1231405712
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1009305598}
+  m_GameObject: {fileID: 1231405710}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95bdfb504ff468b48a584897b922ede2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.SetBiomeHeightOnSpawn
-  m_worldHeight: 55
---- !u!114 &1009305601
+  m_worldHeight: 180.33583
+--- !u!114 &1231405713
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1009305598}
+  m_GameObject: {fileID: 1231405710}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc5739ce0cc134648abea1274b6f9c4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1009305602
+--- !u!114 &1231405714
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1009305598}
+  m_GameObject: {fileID: 1231405710}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c05938ebcb84ab4ebf1959f34e51c8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_order: 0
-  m_terrainGraph: {fileID: 11400000, guid: 11fc114f3ac0cf746b52aa7ad0e76f70, type: 2}
+  m_order: 11
+  m_terrainGraph: {fileID: 11400000, guid: 23c5eca60aaeffd4581372f902a9471c, type: 2}
   m_space: 1
   m_dataMask: 35
   m_baseResolution: 512
-  m_seed: 1267714575
+  m_seed: 700801222
   m_biomeMaskResolution: 512
   m_biomeMaskGraph: {fileID: 11400000, guid: 793d868c4e415bd4fa252fdf4cbda4b8, type: 2}
   m_anchors:
-  - {x: 1378.9304, y: 0, z: 857.53687}
-  - {x: 1374.2819, y: 0, z: 949.1671}
-  - {x: 1356.3635, y: 0, z: 1040.4014}
-  - {x: 1325.8237, y: 0, z: 1130.3809}
-  - {x: 1282.778, y: 0, z: 1218.5487}
-  - {x: 1226.6346, y: 0, z: 1304.164}
-  - {x: 1156.2258, y: 0, z: 1385.747}
-  - {x: 1070.2642, y: 0, z: 1460.6353}
-  - {x: 968.0343, y: 0, z: 1524.8158}
-  - {x: 850.16, y: 0, z: 1573.1432}
-  - {x: 721.0872, y: 0, z: 1596.7499}
-  - {x: 592.515, y: 0, z: 1581.2456}
-  - {x: 477.62247, y: 0, z: 1520.8422}
-  - {x: 384.1397, y: 0, z: 1428.3564}
-  - {x: 316.2955, y: 0, z: 1318.6593}
-  - {x: 270.19775, y: 0, z: 1201.4473}
-  - {x: 238.43425, y: 0, z: 1085.2235}
-  - {x: 223.80952, y: 0, z: 971.7047}
-  - {x: 228.55219, y: 0, z: 859.4994}
-  - {x: 242.4478, y: 0, z: 747.81854}
-  - {x: 258.7642, y: 0, z: 635.2488}
-  - {x: 289.8528, y: 0, z: 526.7955}
-  - {x: 351.02783, y: 0, z: 434.23596}
-  - {x: 440.24414, y: 0, z: 366.83292}
-  - {x: 544.32336, y: 0, z: 325.68127}
-  - {x: 651.4839, y: 0, z: 305.66214}
-  - {x: 755.4799, y: 0, z: 301.35242}
-  - {x: 854.5372, y: 0, z: 309.88922}
-  - {x: 948.3289, y: 0, z: 330.07724}
-  - {x: 1036.4541, y: 0, z: 361.51117}
-  - {x: 1118.0406, y: 0, z: 404.21957}
-  - {x: 1191.6256, y: 0, z: 458.19138}
-  - {x: 1255.319, y: 0, z: 522.95087}
-  - {x: 1307.1613, y: 0, z: 597.3177}
-  - {x: 1345.5402, y: 0, z: 679.4207}
-  - {x: 1369.5149, y: 0, z: 766.9476}
+  - {x: 140.59142, y: 0, z: -261.63055}
+  - {x: 149.31824, y: 0, z: -227.72174}
+  - {x: 148.88231, y: 0, z: -185.63312}
+  - {x: 141.72134, y: 0, z: -140.14316}
+  - {x: 130.09496, y: 0, z: -94.13759}
+  - {x: 115.32148, y: 0, z: -48.507286}
+  - {x: 97.59925, y: 0, z: -2.9581056}
+  - {x: 76.42922, y: 0, z: 42.727627}
+  - {x: 51.38989, y: 0, z: 87.609085}
+  - {x: 22.870274, y: 0, z: 129.2018}
+  - {x: -7.599518, y: 0, z: 163.96642}
+  - {x: -37.58382, y: 0, z: 188.436}
+  - {x: -64.43909, y: 0, z: 200.44843}
+  - {x: -86.15213, y: 0, z: 199.89937}
+  - {x: -101.92771, y: 0, z: 188.65034}
+  - {x: -112.24476, y: 0, z: 169.6146}
+  - {x: -118.342995, y: 0, z: 145.4293}
+  - {x: -121.36594, y: 0, z: 117.32688}
+  - {x: -121.55617, y: 0, z: 84.74928}
+  - {x: -117.89156, y: 0, z: 45.927826}
+  - {x: -108.37028, y: 0, z: -0.78020436}
+  - {x: -90.86889, y: 0, z: -55.36299}
+  - {x: -64.2393, y: 0, z: -115.11754}
+  - {x: -29.185513, y: 0, z: -174.61356}
+  - {x: 11.468205, y: 0, z: -226.76575}
+  - {x: 53.26911, y: 0, z: -264.66333}
+  - {x: 91.23325, y: 0, z: -283.48456}
+  - {x: 121.1472, y: 0, z: -281.7766}
   m_falloffDirection: 0
-  m_falloffDistance: 420
+  m_falloffDistance: 520
   m_falloffAnchors:
-  - {x: 1798.7837, y: 0, z: 846.43414}
-  - {x: 1791.1443, y: 0, z: 1000.4091}
-  - {x: 1762.1858, y: 0, z: 1148.6063}
-  - {x: 1714.1743, y: 0, z: 1290.3303}
-  - {x: 1647.8242, y: 0, z: 1426.2534}
-  - {x: 1561.9498, y: 0, z: 1557.0745}
-  - {x: 1453.9006, y: 0, z: 1682.0402}
-  - {x: 1320.6277, y: 0, z: 1797.8564}
-  - {x: 1160.0612, y: 0, z: 1898.3472}
-  - {x: 968.243, y: 0, z: 1976.202}
-  - {x: 733.8714, y: 0, z: 2016.5553}
-  - {x: 467.5874, y: 0, z: 1982.2357}
-  - {x: 229.49278, y: 0, z: 1859.7104}
-  - {x: 55.541626, y: 0, z: 1689.9349}
-  - {x: -59.241974, y: 0, z: 1506.7327}
-  - {x: -128.38287, y: 0, z: 1333.8613}
-  - {x: -173.40489, y: 0, z: 1167.6161}
-  - {x: -195.8033, y: 0, z: 989.7345}
-  - {x: -190.00146, y: 0, z: 824.67334}
-  - {x: -173.7947, y: 0, z: 691.7633}
-  - {x: -151.8721, y: 0, z: 547.05676}
-  - {x: -91.63336, y: 0, z: 351.10168}
-  - {x: 44.837616, y: 0, z: 146.7511}
-  - {x: 234.56183, y: 0, z: 0.64334106}
-  - {x: 428.00992, y: 0, z: -77.891754}
-  - {x: 604.10333, y: 0, z: -111.65677}
-  - {x: 764.8348, y: 0, z: -118.543396}
-  - {x: 916.881, y: 0, z: -105.45792}
-  - {x: 1063.3154, y: 0, z: -73.875885}
-  - {x: 1204.809, y: 0, z: -23.270142}
-  - {x: 1340.2632, y: 0, z: 47.82495}
-  - {x: 1466.4343, y: 0, z: 140.57504}
-  - {x: 1578.4541, y: 0, z: 254.65308}
-  - {x: 1671.0117, y: 0, z: 387.52527}
-  - {x: 1739.7427, y: 0, z: 534.4919}
-  - {x: 1782.3125, y: 0, z: 689.5002}
+  - {x: 594.47345, y: 0, z: -515.3845}
+  - {x: 665.5307, y: 0, z: -290.36908}
+  - {x: 667.08154, y: 0, z: -142.39459}
+  - {x: 651.16547, y: 0, z: -35.89972}
+  - {x: 629.7972, y: 0, z: 49.72934}
+  - {x: 605.1912, y: 0, z: 125.92788}
+  - {x: 576.0448, y: 0, z: 200.73245}
+  - {x: 539.7127, y: 0, z: 278.88095}
+  - {x: 493.3459, y: 0, z: 361.60712}
+  - {x: 433.5527, y: 0, z: 448.16876}
+  - {x: 353.57037, y: 0, z: 538.0737}
+  - {x: 235.33812, y: 0, z: 631.0574}
+  - {x: 37.677826, y: 0, z: 710.32306}
+  - {x: -250.89183, y: 0, z: 693.11414}
+  - {x: -491.48816, y: 0, z: 533.09576}
+  - {x: -596.7096, y: 0, z: 358.5427}
+  - {x: -630.2116, y: 0, z: 237.02902}
+  - {x: -640.53625, y: 0, z: 146.6902}
+  - {x: -641.0497, y: 0, z: 61.804398}
+  - {x: -632.2372, y: 0, z: -30.548164}
+  - {x: -611.46497, y: 0, z: -132.29361}
+  - {x: -576.65845, y: 0, z: -240.85832}
+  - {x: -526.47455, y: 0, z: -353.31607}
+  - {x: -459.1581, y: 0, z: -467.0577}
+  - {x: -369.6362, y: 0, z: -580.54456}
+  - {x: -239.63937, y: 0, z: -694.3197}
+  - {x: -12.894951, y: 0, z: -792.9522}
+  - {x: 337.9572, y: 0, z: -754.42175}
   m_cleanUpMode: 0
   m_biomeMaskAdjustments: []
   m_blendOptions:
-    m_heightMapBlendMode: 0
+    m_heightMapBlendMode: 1
     m_textureBlendMode: 0
     m_meshDensityBlendMode: 0
     m_holeMapBlendMode: 0
@@ -1111,7 +1402,7 @@ MonoBehaviour:
   m_positionInputs: []
   m_guid: PL33VFU1
   m_propertyOverrides: []
---- !u!1 &1047488166
+--- !u!1 &1259832009
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1119,155 +1410,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1047488167}
-  - component: {fileID: 1047488171}
-  - component: {fileID: 1047488170}
-  - component: {fileID: 1047488169}
-  - component: {fileID: 1047488168}
-  m_Layer: 0
-  m_Name: OverworldTerrain_1_1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
---- !u!4 &1047488167
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1047488166}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1400, y: 0, z: 1400}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1458367987}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1047488168
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1047488166}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6525fd4a9fb974b7f878dee70144de99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: JBooth.MicroSplat.Core::JBooth.MicroSplat.MicroSplatTerrain
-  templateMaterial: {fileID: 2100000, guid: 8992322a633ea224987a7d13a8c89de1, type: 2}
-  blendMat: {fileID: 0}
-  blendMatInstance: {fileID: 0}
-  keywordSO: {fileID: 11400000, guid: d236422252f808a4f83176dbaa48458d, type: 2}
-  perPixelNormal: {fileID: 0}
-  streamTexture: {fileID: 0}
-  propData: {fileID: 11400000, guid: 22b6f65dfb21f974296d564d5d370a96, type: 2}
-  terrain: {fileID: 1047488171}
-  baseMapShader: {fileID: 4800000, guid: cc4083b72ab066a4ca075d523bc638b4, type: 3}
-  customControl0: {fileID: 0}
-  customControl1: {fileID: 0}
-  customControl2: {fileID: 0}
-  customControl3: {fileID: 0}
-  customControl4: {fileID: 0}
-  customControl5: {fileID: 0}
-  customControl6: {fileID: 0}
-  customControl7: {fileID: 0}
-  patchBoundsMultiplier: {x: 1, y: 1, z: 1}
-  reenabled: 0
-  importSplatMaps: []
---- !u!114 &1047488169
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1047488166}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 573c207eacf916343898009fefa81793, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.UnityTerrain.TerrainTile
-  m_managerId: JB804CY9
-  m_terrainLayers:
-  - {fileID: 8574412962073106934, guid: 1d30f3b7e5aa63a4b9070e90589419a9, type: 2}
-  - {fileID: 8574412962073106934, guid: 78c3fa646068f3b4a8bd4247deeaed2b, type: 2}
-  - {fileID: 8574412962073106934, guid: 89d680924bebfd9418c417085178d40a, type: 2}
-  - {fileID: 8574412962073106934, guid: 161ffdbebb5907347bfbe45c7c2bd691, type: 2}
-  - {fileID: 8574412962073106934, guid: 11b993dccc3d44348a5783d5ff6db875, type: 2}
-  - {fileID: 8574412962073106934, guid: 3d5e7a7e9324f924a8abd286e2c30f13, type: 2}
---- !u!154 &1047488170
-TerrainCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1047488166}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_TerrainData: {fileID: 15600000, guid: e8af41d8e17aa4d4e9ddf3328b526472, type: 2}
-  m_EnableTreeColliders: 1
---- !u!218 &1047488171
-Terrain:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1047488166}
-  m_Enabled: 1
-  serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: e8af41d8e17aa4d4e9ddf3328b526472, type: 2}
-  m_TreeDistance: 5000
-  m_TreeBillboardDistance: 50
-  m_TreeCrossFadeLength: 5
-  m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 80
-  m_DetailObjectDensity: 1
-  m_HeightmapPixelError: 5
-  m_SplatMapDistance: 99999
-  m_HeightmapMinimumLODSimplification: 0
-  m_HeightmapMaximumLOD: 0
-  m_ShadowCastingMode: 2
-  m_DrawHeightmap: 1
-  m_DrawInstanced: 1
-  m_DrawTreesAndFoliage: 1
-  m_StaticShadowCaster: 0
-  m_IgnoreQualitySettings: 0
-  m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 0}
-  m_BakeLightProbesForTrees: 1
-  m_PreserveTreePrototypeLayers: 0
-  m_DeringLightProbesForTrees: 1
-  m_ReceiveGI: 1
-  m_ScaleInLightmap: 0.018285714
-  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
-  m_GroupingID: 0
-  m_RenderingLayerMask: 1
-  m_AllowAutoConnect: 1
-  m_EnableHeightmapRayTracing: 1
-  m_EnableTreesAndDetailsRayTracing: 0
-  m_EnableHeightmapLODFrustumCulling: 1
-  m_TreeMotionVectorModeOverride: 3
---- !u!1 &1458367986
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1458367987}
+  - component: {fileID: 1259832010}
   m_Layer: 0
   m_Name: Terrains
   m_TagString: Untagged
@@ -1275,26 +1418,26 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1458367987
+--- !u!4 &1259832010
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1458367986}
+  m_GameObject: {fileID: 1259832009}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1722356246}
-  - {fileID: 1461446266}
-  - {fileID: 2037237895}
-  - {fileID: 1047488167}
+  - {fileID: 1714111618}
+  - {fileID: 291347882}
+  - {fileID: 1439560599}
+  - {fileID: 646346457}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1461446265
+--- !u!1 &1439560598
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1302,338 +1445,11 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1461446266}
-  - component: {fileID: 1461446270}
-  - component: {fileID: 1461446269}
-  - component: {fileID: 1461446268}
-  - component: {fileID: 1461446267}
-  m_Layer: 0
-  m_Name: OverworldTerrain_0_1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
---- !u!4 &1461446266
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1461446265}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1400}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1458367987}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1461446267
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1461446265}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6525fd4a9fb974b7f878dee70144de99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: JBooth.MicroSplat.Core::JBooth.MicroSplat.MicroSplatTerrain
-  templateMaterial: {fileID: 2100000, guid: 8992322a633ea224987a7d13a8c89de1, type: 2}
-  blendMat: {fileID: 0}
-  blendMatInstance: {fileID: 0}
-  keywordSO: {fileID: 11400000, guid: d236422252f808a4f83176dbaa48458d, type: 2}
-  perPixelNormal: {fileID: 0}
-  streamTexture: {fileID: 0}
-  propData: {fileID: 11400000, guid: 22b6f65dfb21f974296d564d5d370a96, type: 2}
-  terrain: {fileID: 1461446270}
-  baseMapShader: {fileID: 4800000, guid: cc4083b72ab066a4ca075d523bc638b4, type: 3}
-  customControl0: {fileID: 0}
-  customControl1: {fileID: 0}
-  customControl2: {fileID: 0}
-  customControl3: {fileID: 0}
-  customControl4: {fileID: 0}
-  customControl5: {fileID: 0}
-  customControl6: {fileID: 0}
-  customControl7: {fileID: 0}
-  patchBoundsMultiplier: {x: 1, y: 1, z: 1}
-  reenabled: 0
-  importSplatMaps: []
---- !u!114 &1461446268
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1461446265}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 573c207eacf916343898009fefa81793, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.UnityTerrain.TerrainTile
-  m_managerId: JB804CY9
-  m_terrainLayers:
-  - {fileID: 8574412962073106934, guid: 1d30f3b7e5aa63a4b9070e90589419a9, type: 2}
-  - {fileID: 8574412962073106934, guid: 78c3fa646068f3b4a8bd4247deeaed2b, type: 2}
-  - {fileID: 8574412962073106934, guid: 89d680924bebfd9418c417085178d40a, type: 2}
-  - {fileID: 8574412962073106934, guid: 161ffdbebb5907347bfbe45c7c2bd691, type: 2}
-  - {fileID: 8574412962073106934, guid: 11b993dccc3d44348a5783d5ff6db875, type: 2}
-  - {fileID: 8574412962073106934, guid: 3d5e7a7e9324f924a8abd286e2c30f13, type: 2}
---- !u!154 &1461446269
-TerrainCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1461446265}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_TerrainData: {fileID: 15600000, guid: 5b817cb39d6786b4398c4d5ed33e2443, type: 2}
-  m_EnableTreeColliders: 1
---- !u!218 &1461446270
-Terrain:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1461446265}
-  m_Enabled: 1
-  serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: 5b817cb39d6786b4398c4d5ed33e2443, type: 2}
-  m_TreeDistance: 5000
-  m_TreeBillboardDistance: 50
-  m_TreeCrossFadeLength: 5
-  m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 80
-  m_DetailObjectDensity: 1
-  m_HeightmapPixelError: 5
-  m_SplatMapDistance: 99999
-  m_HeightmapMinimumLODSimplification: 0
-  m_HeightmapMaximumLOD: 0
-  m_ShadowCastingMode: 2
-  m_DrawHeightmap: 1
-  m_DrawInstanced: 1
-  m_DrawTreesAndFoliage: 1
-  m_StaticShadowCaster: 0
-  m_IgnoreQualitySettings: 0
-  m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 0}
-  m_BakeLightProbesForTrees: 1
-  m_PreserveTreePrototypeLayers: 0
-  m_DeringLightProbesForTrees: 1
-  m_ReceiveGI: 1
-  m_ScaleInLightmap: 0.018285714
-  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
-  m_GroupingID: 0
-  m_RenderingLayerMask: 1
-  m_AllowAutoConnect: 1
-  m_EnableHeightmapRayTracing: 1
-  m_EnableTreesAndDetailsRayTracing: 0
-  m_EnableHeightmapLODFrustumCulling: 1
-  m_TreeMotionVectorModeOverride: 3
---- !u!1 &1722356245
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1722356246}
-  - component: {fileID: 1722356250}
-  - component: {fileID: 1722356249}
-  - component: {fileID: 1722356248}
-  - component: {fileID: 1722356247}
-  m_Layer: 0
-  m_Name: OverworldTerrain_0_0
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
---- !u!4 &1722356246
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1722356245}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1458367987}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1722356247
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1722356245}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6525fd4a9fb974b7f878dee70144de99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: JBooth.MicroSplat.Core::JBooth.MicroSplat.MicroSplatTerrain
-  templateMaterial: {fileID: 2100000, guid: 8992322a633ea224987a7d13a8c89de1, type: 2}
-  blendMat: {fileID: 0}
-  blendMatInstance: {fileID: 0}
-  keywordSO: {fileID: 11400000, guid: d236422252f808a4f83176dbaa48458d, type: 2}
-  perPixelNormal: {fileID: 0}
-  streamTexture: {fileID: 0}
-  propData: {fileID: 11400000, guid: 22b6f65dfb21f974296d564d5d370a96, type: 2}
-  terrain: {fileID: 1722356250}
-  baseMapShader: {fileID: 4800000, guid: cc4083b72ab066a4ca075d523bc638b4, type: 3}
-  customControl0: {fileID: 0}
-  customControl1: {fileID: 0}
-  customControl2: {fileID: 0}
-  customControl3: {fileID: 0}
-  customControl4: {fileID: 0}
-  customControl5: {fileID: 0}
-  customControl6: {fileID: 0}
-  customControl7: {fileID: 0}
-  patchBoundsMultiplier: {x: 1, y: 1, z: 1}
-  reenabled: 0
-  importSplatMaps: []
---- !u!114 &1722356248
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1722356245}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 573c207eacf916343898009fefa81793, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.UnityTerrain.TerrainTile
-  m_managerId: JB804CY9
-  m_terrainLayers:
-  - {fileID: 8574412962073106934, guid: 1d30f3b7e5aa63a4b9070e90589419a9, type: 2}
-  - {fileID: 8574412962073106934, guid: 78c3fa646068f3b4a8bd4247deeaed2b, type: 2}
-  - {fileID: 8574412962073106934, guid: 89d680924bebfd9418c417085178d40a, type: 2}
-  - {fileID: 8574412962073106934, guid: 161ffdbebb5907347bfbe45c7c2bd691, type: 2}
-  - {fileID: 8574412962073106934, guid: 11b993dccc3d44348a5783d5ff6db875, type: 2}
-  - {fileID: 8574412962073106934, guid: 3d5e7a7e9324f924a8abd286e2c30f13, type: 2}
---- !u!154 &1722356249
-TerrainCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1722356245}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_TerrainData: {fileID: 15600000, guid: 902cc0d13fa731c48bce03d42932d2ee, type: 2}
-  m_EnableTreeColliders: 1
---- !u!218 &1722356250
-Terrain:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1722356245}
-  m_Enabled: 1
-  serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: 902cc0d13fa731c48bce03d42932d2ee, type: 2}
-  m_TreeDistance: 5000
-  m_TreeBillboardDistance: 50
-  m_TreeCrossFadeLength: 5
-  m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 80
-  m_DetailObjectDensity: 1
-  m_HeightmapPixelError: 5
-  m_SplatMapDistance: 99999
-  m_HeightmapMinimumLODSimplification: 0
-  m_HeightmapMaximumLOD: 0
-  m_ShadowCastingMode: 2
-  m_DrawHeightmap: 1
-  m_DrawInstanced: 1
-  m_DrawTreesAndFoliage: 1
-  m_StaticShadowCaster: 0
-  m_IgnoreQualitySettings: 0
-  m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 0}
-  m_BakeLightProbesForTrees: 1
-  m_PreserveTreePrototypeLayers: 0
-  m_DeringLightProbesForTrees: 1
-  m_ReceiveGI: 1
-  m_ScaleInLightmap: 0.018285714
-  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
-  m_GroupingID: 0
-  m_RenderingLayerMask: 1
-  m_AllowAutoConnect: 1
-  m_EnableHeightmapRayTracing: 1
-  m_EnableTreesAndDetailsRayTracing: 0
-  m_EnableHeightmapLODFrustumCulling: 1
-  m_TreeMotionVectorModeOverride: 3
---- !u!1 &1751507969
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1751507970}
-  m_Layer: 0
-  m_Name: OverworldVegetation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1751507970
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1751507969}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2037237894
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2037237895}
-  - component: {fileID: 2037237899}
-  - component: {fileID: 2037237898}
-  - component: {fileID: 2037237897}
-  - component: {fileID: 2037237896}
+  - component: {fileID: 1439560599}
+  - component: {fileID: 1439560603}
+  - component: {fileID: 1439560602}
+  - component: {fileID: 1439560601}
+  - component: {fileID: 1439560600}
   m_Layer: 0
   m_Name: OverworldTerrain_1_0
   m_TagString: Untagged
@@ -1641,42 +1457,42 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
   m_IsActive: 1
---- !u!4 &2037237895
+--- !u!4 &1439560599
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2037237894}
+  m_GameObject: {fileID: 1439560598}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1400, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1458367987}
+  m_Father: {fileID: 1259832010}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2037237896
+--- !u!114 &1439560600
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2037237894}
+  m_GameObject: {fileID: 1439560598}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6525fd4a9fb974b7f878dee70144de99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: JBooth.MicroSplat.Core::JBooth.MicroSplat.MicroSplatTerrain
-  templateMaterial: {fileID: 2100000, guid: 8992322a633ea224987a7d13a8c89de1, type: 2}
+  templateMaterial: {fileID: 2100000, guid: 7048c3d66b874194fb0a450e317a7949, type: 2}
   blendMat: {fileID: 0}
   blendMatInstance: {fileID: 0}
-  keywordSO: {fileID: 11400000, guid: d236422252f808a4f83176dbaa48458d, type: 2}
+  keywordSO: {fileID: 11400000, guid: 6b93e7dbcb033b54ab319dbf034cfff7, type: 2}
   perPixelNormal: {fileID: 0}
   streamTexture: {fileID: 0}
-  propData: {fileID: 11400000, guid: 22b6f65dfb21f974296d564d5d370a96, type: 2}
-  terrain: {fileID: 2037237899}
-  baseMapShader: {fileID: 4800000, guid: cc4083b72ab066a4ca075d523bc638b4, type: 3}
+  propData: {fileID: 11400000, guid: 6941e3391734a4747bb39a4e207e246b, type: 2}
+  terrain: {fileID: 1439560603}
+  baseMapShader: {fileID: 4800000, guid: 68945fc8d6ec44644871c5dd632be2ed, type: 3}
   customControl0: {fileID: 0}
   customControl1: {fileID: 0}
   customControl2: {fileID: 0}
@@ -1688,19 +1504,19 @@ MonoBehaviour:
   patchBoundsMultiplier: {x: 1, y: 1, z: 1}
   reenabled: 0
   importSplatMaps: []
---- !u!114 &2037237897
+--- !u!114 &1439560601
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2037237894}
+  m_GameObject: {fileID: 1439560598}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 573c207eacf916343898009fefa81793, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.UnityTerrain.TerrainTile
-  m_managerId: JB804CY9
+  m_managerId: M5J46ENM
   m_terrainLayers:
   - {fileID: 8574412962073106934, guid: 1d30f3b7e5aa63a4b9070e90589419a9, type: 2}
   - {fileID: 8574412962073106934, guid: 78c3fa646068f3b4a8bd4247deeaed2b, type: 2}
@@ -1708,13 +1524,13 @@ MonoBehaviour:
   - {fileID: 8574412962073106934, guid: 161ffdbebb5907347bfbe45c7c2bd691, type: 2}
   - {fileID: 8574412962073106934, guid: 11b993dccc3d44348a5783d5ff6db875, type: 2}
   - {fileID: 8574412962073106934, guid: 3d5e7a7e9324f924a8abd286e2c30f13, type: 2}
---- !u!154 &2037237898
+--- !u!154 &1439560602
 TerrainCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2037237894}
+  m_GameObject: {fileID: 1439560598}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -1728,13 +1544,13 @@ TerrainCollider:
   serializedVersion: 2
   m_TerrainData: {fileID: 15600000, guid: 2e8d25a4e75f08d4b941157776e77dba, type: 2}
   m_EnableTreeColliders: 1
---- !u!218 &2037237899
+--- !u!218 &1439560603
 Terrain:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2037237894}
+  m_GameObject: {fileID: 1439560598}
   m_Enabled: 1
   serializedVersion: 6
   m_TerrainData: {fileID: 15600000, guid: 2e8d25a4e75f08d4b941157776e77dba, type: 2}
@@ -1769,6 +1585,343 @@ Terrain:
   m_EnableTreesAndDetailsRayTracing: 0
   m_EnableHeightmapLODFrustumCulling: 1
   m_TreeMotionVectorModeOverride: 3
+--- !u!1 &1442251106
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1442251108}
+  - component: {fileID: 1442251107}
+  m_Layer: 0
+  m_Name: OverworldGrass
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1442251107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442251106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edc3321b45f389042801a6e338c7f766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameDev.World.Vegetation.GrassField
+  grassMesh: {fileID: -4435434709360095332, guid: 8c71f03fcb0c13644a30696cafc5cda8, type: 3}
+  grassMaterial: {fileID: 2100000, guid: 19846ddbac9122d4c94f56f3981ee917, type: 2}
+  worldSeed: 408453
+  tileMinX: 0
+  tileMinZ: 0
+  tileSizeX: 2800
+  tileSizeZ: 2800
+  offsetMacroX: 2090.5208
+  offsetMacroZ: 7488.0693
+  offsetMesoX: 3429.4233
+  offsetMesoZ: 8843.733
+  offsetThicketX: 9626.28
+  offsetThicketZ: 3747.9966
+  offsetGrassX: 552.4415
+  offsetGrassZ: 9342.2
+  bakeConfigured: 1
+  windDir: {x: 1, y: 0.35}
+  windStrength: 0.22
+  windSpeed: 1.1
+--- !u!4 &1442251108
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442251106}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1714111617
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1714111618}
+  - component: {fileID: 1714111622}
+  - component: {fileID: 1714111621}
+  - component: {fileID: 1714111620}
+  - component: {fileID: 1714111619}
+  m_Layer: 0
+  m_Name: OverworldTerrain_0_0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &1714111618
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714111617}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1259832010}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1714111619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714111617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6525fd4a9fb974b7f878dee70144de99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: JBooth.MicroSplat.Core::JBooth.MicroSplat.MicroSplatTerrain
+  templateMaterial: {fileID: 2100000, guid: 7048c3d66b874194fb0a450e317a7949, type: 2}
+  blendMat: {fileID: 0}
+  blendMatInstance: {fileID: 0}
+  keywordSO: {fileID: 11400000, guid: 6b93e7dbcb033b54ab319dbf034cfff7, type: 2}
+  perPixelNormal: {fileID: 0}
+  streamTexture: {fileID: 0}
+  propData: {fileID: 11400000, guid: 6941e3391734a4747bb39a4e207e246b, type: 2}
+  terrain: {fileID: 1714111622}
+  baseMapShader: {fileID: 4800000, guid: 68945fc8d6ec44644871c5dd632be2ed, type: 3}
+  customControl0: {fileID: 0}
+  customControl1: {fileID: 0}
+  customControl2: {fileID: 0}
+  customControl3: {fileID: 0}
+  customControl4: {fileID: 0}
+  customControl5: {fileID: 0}
+  customControl6: {fileID: 0}
+  customControl7: {fileID: 0}
+  patchBoundsMultiplier: {x: 1, y: 1, z: 1}
+  reenabled: 0
+  importSplatMaps: []
+--- !u!114 &1714111620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714111617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 573c207eacf916343898009fefa81793, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.UnityTerrain.TerrainTile
+  m_managerId: M5J46ENM
+  m_terrainLayers:
+  - {fileID: 8574412962073106934, guid: 1d30f3b7e5aa63a4b9070e90589419a9, type: 2}
+  - {fileID: 8574412962073106934, guid: 78c3fa646068f3b4a8bd4247deeaed2b, type: 2}
+  - {fileID: 8574412962073106934, guid: 89d680924bebfd9418c417085178d40a, type: 2}
+  - {fileID: 8574412962073106934, guid: 161ffdbebb5907347bfbe45c7c2bd691, type: 2}
+  - {fileID: 8574412962073106934, guid: 11b993dccc3d44348a5783d5ff6db875, type: 2}
+  - {fileID: 8574412962073106934, guid: 3d5e7a7e9324f924a8abd286e2c30f13, type: 2}
+--- !u!154 &1714111621
+TerrainCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714111617}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_TerrainData: {fileID: 15600000, guid: 902cc0d13fa731c48bce03d42932d2ee, type: 2}
+  m_EnableTreeColliders: 1
+--- !u!218 &1714111622
+Terrain:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714111617}
+  m_Enabled: 1
+  serializedVersion: 6
+  m_TerrainData: {fileID: 15600000, guid: 902cc0d13fa731c48bce03d42932d2ee, type: 2}
+  m_TreeDistance: 5000
+  m_TreeBillboardDistance: 50
+  m_TreeCrossFadeLength: 5
+  m_TreeMaximumFullLODCount: 50
+  m_DetailObjectDistance: 80
+  m_DetailObjectDensity: 1
+  m_HeightmapPixelError: 5
+  m_SplatMapDistance: 99999
+  m_HeightmapMinimumLODSimplification: 0
+  m_HeightmapMaximumLOD: 0
+  m_ShadowCastingMode: 2
+  m_DrawHeightmap: 1
+  m_DrawInstanced: 1
+  m_DrawTreesAndFoliage: 1
+  m_StaticShadowCaster: 0
+  m_IgnoreQualitySettings: 0
+  m_ReflectionProbeUsage: 1
+  m_MaterialTemplate: {fileID: 0}
+  m_BakeLightProbesForTrees: 1
+  m_PreserveTreePrototypeLayers: 0
+  m_DeringLightProbesForTrees: 1
+  m_ReceiveGI: 1
+  m_ScaleInLightmap: 0.018285714
+  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
+  m_GroupingID: 0
+  m_RenderingLayerMask: 1
+  m_AllowAutoConnect: 1
+  m_EnableHeightmapRayTracing: 1
+  m_EnableTreesAndDetailsRayTracing: 0
+  m_EnableHeightmapLODFrustumCulling: 1
+  m_TreeMotionVectorModeOverride: 3
+--- !u!1 &1750437926
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1750437927}
+  m_Layer: 0
+  m_Name: OverworldWater
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1750437927
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1750437926}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 181745292}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1938742826
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1938742828}
+  - component: {fileID: 1938742827}
+  m_Layer: 0
+  m_Name: VistaManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1938742827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1938742826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ffcde294171ce848a0fab5e05b4e530, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.VistaManager
+  m_beforeGeneratingUnityCallback:
+    m_PersistentCalls:
+      m_Calls: []
+  m_afterGeneratingUnityCallback:
+    m_PersistentCalls:
+      m_Calls: []
+  m_id: M5J46ENM
+  m_terrainMaxHeight: 700
+  m_heightMapResolution: 513
+  m_textureResolution: 512
+  m_detailDensityMapResolution: 1024
+  m_shouldCullBiomes: 1
+  m_missingGeometryAction: 1
+  m_missingTextureAction: 1
+  m_missingPopulationAction: 1
+  m_objectToSpawnPerFrame: 20
+--- !u!4 &1938742828
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1938742826}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 136047495}
+  - {fileID: 883474143}
+  - {fileID: 1231405711}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2075201847
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2075201848}
+  m_Layer: 0
+  m_Name: OverworldVegetation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2075201848
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075201847}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1778,8 +1931,8 @@ SceneRoots:
   - {fileID: 176497317}
   - {fileID: 597265333}
   - {fileID: 175756391}
-  - {fileID: 599134770}
-  - {fileID: 1458367987}
-  - {fileID: 123019692}
-  - {fileID: 1751507970}
-  - {fileID: 192705253}
+  - {fileID: 1938742828}
+  - {fileID: 1259832010}
+  - {fileID: 1750437927}
+  - {fileID: 2075201848}
+  - {fileID: 1442251108}
