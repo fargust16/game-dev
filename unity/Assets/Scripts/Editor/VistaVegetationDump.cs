@@ -90,11 +90,15 @@ namespace GameDev.EditorTools
                         }
                     }
                 }
+
+                ExportDetailDensityMaps(terrain, data, res);
             }
 
             var message =
                 $"[Vegetation] After bake: treePrototypes={treePrototypes} trees={treeInstances} " +
-                $"detailPrototypes={detailPrototypes} detailInstances={detailInstances}";
+                $"detailPrototypes={detailPrototypes} detailInstances={detailInstances}. " +
+                $"Per-tile density maps exported to '{DetailDumpFolder}' — a total says grass exists, " +
+                "only the map says where it does not.";
 
             if (detailPrototypes == 0 || detailInstances == 0)
             {
@@ -357,6 +361,67 @@ namespace GameDev.EditorTools
 
             var size = bounds.size;
             return Mathf.Max(size.x, Mathf.Max(size.y, size.z));
+        }
+
+        /// <summary>Scratch folder outside Assets for the exported density maps.</summary>
+        private const string DetailDumpFolder = "VistaDetailDump";
+
+        /// <summary>
+        /// Writes each detail layer's density map as a PNG, white = maximum density.
+        /// </summary>
+        /// <remarks>
+        /// The instance total answers "is there grass at all"; it cannot answer "why is there no
+        /// grass *here*", and that is the question that actually gets asked. The map can: lay it
+        /// against where the forest stands and the answer is immediate — holes that follow the tree
+        /// stands mean something upstream is removing grass under canopy, holes that follow neither
+        /// the stands nor the terrain mean the density map was written incompletely (the writer bug
+        /// in playbook 2.8), and a full map means the grass is placed and the problem is rendering.
+        /// </remarks>
+        private static void ExportDetailDensityMaps(
+            UnityEngine.Terrain terrain, TerrainData data, int res)
+        {
+            if (res < 2 || data.detailPrototypes.Length == 0)
+            {
+                return;
+            }
+
+            var projectRoot = System.IO.Directory.GetParent(Application.dataPath).FullName;
+            var folder = System.IO.Path.Combine(projectRoot, DetailDumpFolder);
+            System.IO.Directory.CreateDirectory(folder);
+
+            for (var i = 0; i < data.detailPrototypes.Length; i++)
+            {
+                var layer = data.GetDetailLayer(0, 0, res, res, i);
+                var peak = 1;
+                for (var y = 0; y < res; y++)
+                {
+                    for (var x = 0; x < res; x++)
+                    {
+                        if (layer[y, x] > peak)
+                        {
+                            peak = layer[y, x];
+                        }
+                    }
+                }
+
+                var texture = new Texture2D(res, res, TextureFormat.RGB24, mipChain: false);
+                var pixels = new Color32[res * res];
+                for (var y = 0; y < res; y++)
+                {
+                    for (var x = 0; x < res; x++)
+                    {
+                        var v = (byte)Mathf.Clamp(Mathf.RoundToInt(255f * layer[y, x] / peak), 0, 255);
+                        pixels[y * res + x] = new Color32(v, v, v, 255);
+                    }
+                }
+
+                texture.SetPixels32(pixels);
+                texture.Apply(updateMipmaps: false);
+                var file = System.IO.Path.Combine(
+                    folder, $"{terrain.name}_detail{i}_peak{peak}.png");
+                System.IO.File.WriteAllBytes(file, texture.EncodeToPNG());
+                Object.DestroyImmediate(texture);
+            }
         }
     }
 }
