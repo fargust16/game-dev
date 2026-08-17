@@ -189,30 +189,34 @@ island, so the coastline reads as straight chords.
 
 ---
 
-## 10. Sand covers 60–70 % of every tile
+## 10. RESOLVED — "sand covers 70 % of the island" was a measurement-scope error
 
-`Dump Layer Weights`, seed 110201, all four tiles:
+**There is no sand defect. Do not narrow the beach band.**
 
-| Tile | sand share | saturated (weight ≥ 0.9) |
-|---|---|---|
-| 1_1 | 60.8 % | 50.2 % |
-| 0_0 | 64.8 % | 56.9 % |
-| 0_1 | 70.5 % | 55.8 % |
-| 1_0 | 62.3 % | 41.3 % |
+`Dump Layer Weights` reported sand at 60–70 % per tile, saturated on 41–57 %, and that was recorded
+here as a defect. It was wrong: the dump averaged over **every painted pixel including the seabed**,
+and `SeaFloorGraphBuilder` paints Sand as its *unconnected Weight Blend base* — so every submerged
+pixel is sand by construction. Dry land is only 27–52 % of a tile, so the ocean dominated the number.
 
-Sand sits at Weight Blend priority 3 in `IslandPlateauGraphBuilder.BuildSurfaceStage`, above soil and
-rock, so wherever it saturates it erases them — grass is down to 16–22 % and soil to 1–2 %. This is
-the same failure the project already fixed once for soil ("soil covering 45–75 % of the island"), now
-reappearing on a different layer, and it is the likeliest explanation for the washed-out cream cast
-over the whole island in the reference screenshot.
+Measured again restricted to pixels above sea level, seed 110201:
 
-The band is `LowAltitudeCurve(0.03, 0.10)` over the **normalized** graph height, and the island's
-land is bottom-heavy: the height histogram shows 27–38 % of dry land inside the lowest tenth of the
-24 → 331 m span. A band meant as a beach is therefore covering the plateau.
+| Tile | land % | grass | **sand** | soil | cliff | rock |
+|---|---|---|---|---|---|---|
+| 0_0 | 35.9 | 0.435 | **0.082** | 0.039 | 0.132 | 0.267 |
+| 0_1 | 26.5 | 0.535 | **0.133** | 0.040 | 0.195 | 0.062 |
+| 1_1 | 36.8 | 0.526 | **0.079** | 0.049 | 0.096 | 0.223 |
+| 1_0 | 52.4 | 0.387 | **0.315** | 0.024 | 0.034 | 0.216 |
 
-Related to item 9 but independent of it: this is a surface-weight problem, not a shaping one, and it
-can be fixed without rebuilding the geometry. It is still a look decision — narrowing the band
-changes the island's colour everywhere — so agree the target before changing it.
+Sand on land averages 0.08–0.13 with saturation under 1.5 % on three tiles — a beach, which is what
+it is for. Grass leads everywhere at 0.39–0.54. The outlier is tile 1_0 at 0.315, and that tile is
+52 % land with the lowest relief, so its coast band is genuinely wide; still not a blanket.
+
+`VistaLayerWeightDump` now prints an `ON LAND` row per layer and the dry-land fraction. **Compare
+layers on those rows.** Whole-tile shares are not comparable between a layer that only exists on
+land and one that is the seabed's base.
+
+If the island still reads as too pale, look at the layer *assets* — `Overworld_Grass` albedo and its
+11 m tiling — or at the lighting, not at the masks.
 
 ---
 

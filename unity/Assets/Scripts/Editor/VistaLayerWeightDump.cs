@@ -145,6 +145,19 @@ namespace GameDev.EditorTools
             var pixels = res * res;
             var covered = 0;
 
+            // Dry land is tracked separately, because whole-tile shares answer the wrong question.
+            // The seabed graph paints Sand as its unconnected Weight Blend base, so every submerged
+            // pixel is sand by construction — a tile that is mostly ocean reports "sand covers 65 %"
+            // and it means nothing about how the island looks. Only the land column is comparable
+            // between layers.
+            var landSum = new double[channels];
+            var landSaturated = new int[channels];
+            var landPixels = 0;
+            var heightRes = data.heightmapResolution;
+            var heights = data.GetHeights(0, 0, heightRes, heightRes);
+            var sizeY = data.size.y;
+            var terrainY = terrain.transform.position.y;
+
             for (var z = 0; z < res; z++)
             {
                 for (var x = 0; x < res; x++)
@@ -165,6 +178,15 @@ namespace GameDev.EditorTools
                     if (pixelSum < sumMin) sumMin = pixelSum;
                     if (pixelSum > sumMax) sumMax = pixelSum;
 
+                    // Alphamap and heightmap have different resolutions; map by normalized position.
+                    var hz = Mathf.Clamp(Mathf.RoundToInt(z * (heightRes - 1f) / (res - 1f)), 0, heightRes - 1);
+                    var hx = Mathf.Clamp(Mathf.RoundToInt(x * (heightRes - 1f) / (res - 1f)), 0, heightRes - 1);
+                    var isLand = heights[hz, hx] * sizeY + terrainY > GameDev.World.WorldScale.SeaLevelMeters;
+                    if (isLand)
+                    {
+                        landPixels++;
+                    }
+
                     for (var c = 0; c < channels; c++)
                     {
                         var w = maps[z, x, c];
@@ -172,6 +194,17 @@ namespace GameDev.EditorTools
                         if (w < min[c]) min[c] = w;
                         if (w > max[c]) max[c] = w;
                         histogram[c, BucketOf(w)]++;
+
+                        if (!isLand)
+                        {
+                            continue;
+                        }
+
+                        landSum[c] += w;
+                        if (w >= 0.9f)
+                        {
+                            landSaturated[c]++;
+                        }
                     }
                 }
             }
@@ -205,7 +238,19 @@ namespace GameDev.EditorTools
                     $"    [{c}] {name}: avg={avg:F3} max={max[c]:F3} share={share:F1}% " +
                     $"| zero={nearZero:F1}% saturated={saturated:F1}%");
                 report.AppendLine($"        {FormatHistogram(histogram, c, covered)}");
+
+                if (landPixels > 0)
+                {
+                    report.AppendLine(
+                        $"        ON LAND: avg={landSum[c] / landPixels:F3} " +
+                        $"saturated={100.0 * landSaturated[c] / landPixels:F1}%");
+                }
             }
+
+            report.AppendLine(
+                $"    dry land = {100f * landPixels / Mathf.Max(1, covered):F1}% of painted pixels " +
+                "— compare layers on the ON LAND rows, not the whole-tile ones: the seabed graph " +
+                "paints Sand as its Weight Blend base, so every submerged pixel is sand by design.");
 
             AppendHeightHistogram(data, report);
 

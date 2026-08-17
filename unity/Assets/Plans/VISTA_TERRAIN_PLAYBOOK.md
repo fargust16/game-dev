@@ -550,6 +550,11 @@ metres-as-multiplier values — reports everything else, and changes nothing els
 2. **`GameDev/Overworld/Vista/Dump Layer Weights`** — per tile: layer stack, per-layer histogram with
    `zero%`/`saturated%`, weight sum on painted pixels, land-height distribution, one PNG per layer.
    An average cannot tell a soft gradient from a saturated blanket; the histogram can.
+   **Read the `ON LAND` row, not the whole-tile one.** The seabed graph paints Sand as its
+   unconnected Weight Blend base, so every submerged pixel is sand by construction and dry land is
+   only 27–52 % of a tile. Averaging over the whole tile once produced "sand covers 70 % of the
+   island", which was recorded as a defect and was purely the ocean — on land sand is 0.08–0.13.
+   Whole-tile shares are not comparable between a land layer and the seabed's base.
 3. **`GameDev/Overworld/Vista/Dump Vegetation State`** — per tile, the whole vegetation chain with a
    number at each link: template valid → prototype accepted by Unity (`DetailPrototype.Validate`,
    material instancing) → density actually written into the detail layer → instance size in metres →
