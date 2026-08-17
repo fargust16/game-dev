@@ -242,6 +242,30 @@ If the island still reads as too pale, look at the layer *assets* — `Overworld
 
 ---
 
+## 10a. Re-tune vegetation density AFTER the banding is fixed
+
+Grass coverage is fragmented, and the exported density map (`Dump Vegetation State` →
+`unity/VistaDetailDump/`) shows the holes following **the terrain banding**, not the tree stands and
+not any distance from the camera. The mechanism is direct: ground cover is gated on the grass
+*weight*, which is `Π(1 − other layers)`, so wherever the banded terrain raises rock, cliff or soil,
+grass drops under its floor and disappears in stripes.
+
+This is item 9 surfacing through the surface weights into vegetation — not a separate defect, and not
+fixable by tuning the floor. Any value is a compromise between two symptoms:
+
+| Green floor | Instances | Symptom |
+|---|---|---|
+| 0.06 (before) | 4 595 634 | grass on beach sand, past the waterline, on vertical mountain faces |
+| 0.30 (now) | 1 821 735 | clean edges, but coverage broken into stripes by the banding |
+
+The slope mask and the dry-land gate now handle cliffs and water independently of the floor, so once
+the banding is gone the floor can come back down — probably to ~0.20 — without the grass returning
+to the beach. **Re-measure then; do not tune it before.** Trees are less sensitive (29 735 placed
+after grouping into forest types) because a `ScatterNode` samples its mask against a per-point
+random, so a merely-low mask still places some.
+
+---
+
 ## 11. One tile carries 9 terrain layers; URP TerrainLit renders 8
 
 Measured on tile `OverworldTerrain_1_0`, which is the tile the settlement landed on:

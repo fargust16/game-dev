@@ -146,9 +146,16 @@ namespace GameDev.EditorTools
         {
             var detail = VistaGraphBuild.AddDetailNoise(graph, scale: 1200f, seed: 110);
             var mass = VistaGraphBuild.AddMassNoise(graph, scale: 1900f, seed: 277);
+            var fine = VistaGraphBuild.AddFineNoise(
+                graph, scale: VistaGraphBuild.FineNoiseScaleMeters, seed: 431);
 
             var shape = new CombineNode { mode = CombineNode.Mode.Multiply };
             graph.AddNode(shape);
+
+            // Third noise, as the reference has. Without it the island has no content below ~100 m
+            // and its last surviving octave reads as banding — see AddFineNoise.
+            var roughen = new CombineNode { mode = CombineNode.Mode.Multiply };
+            graph.AddNode(roughen);
 
             var levels = VistaGraphBuild.AddReferenceLevels(graph);
 
@@ -170,7 +177,9 @@ namespace GameDev.EditorTools
 
             VistaGraphBuild.Connect(graph, detail.id, detail.outputSlot.id, shape.id, shape.backgroundSlot.id);
             VistaGraphBuild.Connect(graph, mass.id, mass.outputSlot.id, shape.id, shape.foregroundSlot.id);
-            VistaGraphBuild.Connect(graph, shape.id, shape.outputSlot.id, levels.id, levels.inputSlot.id);
+            VistaGraphBuild.Connect(graph, shape.id, shape.outputSlot.id, roughen.id, roughen.backgroundSlot.id);
+            VistaGraphBuild.Connect(graph, fine.id, fine.outputSlot.id, roughen.id, roughen.foregroundSlot.id);
+            VistaGraphBuild.Connect(graph, roughen.id, roughen.outputSlot.id, levels.id, levels.inputSlot.id);
             VistaGraphBuild.Connect(graph, levels.id, levels.outputSlot.id, shelf.id, shelf.inputSlot.id);
             VistaGraphBuild.Connect(
                 graph, shelf.id, shelf.outputSlot.id, macroErosion.id, macroErosion.inputHeightSlot.id);

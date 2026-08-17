@@ -113,9 +113,16 @@ namespace GameDev.EditorTools
         {
             var ridges = VistaGraphBuild.AddDetailNoise(graph, scale: 750f, seed: 17);
             var mass = VistaGraphBuild.AddMassNoise(graph, scale: 1000f, seed: 91);
+            var fine = VistaGraphBuild.AddFineNoise(
+                graph, scale: VistaGraphBuild.FineNoiseScaleMeters, seed: 53);
 
             var shape = new CombineNode { mode = CombineNode.Mode.Multiply };
             graph.AddNode(shape);
+
+            // The reference's third noise. Our 750/1000 pair already matches it exactly; this was
+            // the one node still missing — see VistaGraphBuild.AddFineNoise.
+            var roughen = new CombineNode { mode = CombineNode.Mode.Multiply };
+            graph.AddNode(roughen);
 
             var levels = VistaGraphBuild.AddReferenceLevels(graph);
 
@@ -130,7 +137,9 @@ namespace GameDev.EditorTools
 
             VistaGraphBuild.Connect(graph, ridges.id, ridges.outputSlot.id, shape.id, shape.backgroundSlot.id);
             VistaGraphBuild.Connect(graph, mass.id, mass.outputSlot.id, shape.id, shape.foregroundSlot.id);
-            VistaGraphBuild.Connect(graph, shape.id, shape.outputSlot.id, levels.id, levels.inputSlot.id);
+            VistaGraphBuild.Connect(graph, shape.id, shape.outputSlot.id, roughen.id, roughen.backgroundSlot.id);
+            VistaGraphBuild.Connect(graph, fine.id, fine.outputSlot.id, roughen.id, roughen.foregroundSlot.id);
+            VistaGraphBuild.Connect(graph, roughen.id, roughen.outputSlot.id, levels.id, levels.inputSlot.id);
             VistaGraphBuild.Connect(
                 graph, levels.id, levels.outputSlot.id, macroErosion.id, macroErosion.inputHeightSlot.id);
             VistaGraphBuild.Connect(

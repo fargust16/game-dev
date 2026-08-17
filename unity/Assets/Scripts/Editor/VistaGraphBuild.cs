@@ -258,6 +258,42 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>
+        /// The reference's <b>third</b> noise: fine roughness across the whole landform.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// We had two noises where <c>Mountain_TerrainGraphTemplate</c> has three, and the missing
+        /// one is why the terrain banded. Amplitude decays as <c>persistence^i</c>, so at the detail
+        /// noise's 0.382 the octaves run 1, 0.38, 0.15, 0.056, 0.021 — by the fourth there is
+        /// essentially nothing left, and the fourth octave of a 1200 m noise is ~105 m. That is
+        /// exactly the period `Dump Terrain Geometry` measured as the dominant banding: with no
+        /// content below it, the last octave with any amplitude *is* the terrain's texture, and one
+        /// spatial frequency repeated across a landform reads as stripes.
+        /// </para>
+        /// <para>
+        /// This noise fills that gap. <c>persistence 0.728</c> is nearly double the detail noise's,
+        /// so its eight octaves stay strong all the way down — 200 m to sub-metre with amplitudes
+        /// 1, 0.73, 0.53, 0.39, 0.28 — which gives the surface continuous spectral content instead
+        /// of one dominant wavelength. Both values are the reference's, not ours.
+        /// </para>
+        /// </remarks>
+        public static NoiseNode AddFineNoise(TerrainGraph graph, float scale, int seed)
+        {
+            var node = new NoiseNode
+            {
+                scale = scale,
+                seed = seed,
+                persistence = 0.728f,
+            };
+            ApplyNoiseDiagnosticOverrides(node);
+            graph.AddNode(node);
+            return node;
+        }
+
+        /// <summary>Scale of <see cref="AddFineNoise"/>, the reference's value.</summary>
+        public const float FineNoiseScaleMeters = 200f;
+
+        /// <summary>
         /// The reference's single broad lobe: one octave, deciding where the landform has mass.
         /// </summary>
         public static NoiseNode AddMassNoise(TerrainGraph graph, float scale, int seed)
