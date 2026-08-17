@@ -474,11 +474,40 @@ Tuning is a **forward** change to the graph, and the knobs are named here so nob
 | grass density | `grassDensity` `Levels(inLow 0.06, inHigh 0.5)` | `AddVegetationStage` |
 | grass thinned under canopy | **not wired** — ground cover ignores `CanopyMask` today | `AddVegetationStage` |
 | tree count per species | `spacing`, and `threshold` on the cluster gate | `AddCanopySpecies` |
+| how evenly woodland covers the island | `threshold` (lower = more cover) | the `stands` list |
+| which species grow together | **shared** `clusterScale` + `clusterSeed` | the `stands` list |
 
-Note the fifth row: ground cover currently has **no** canopy interaction at all, so grass is placed
-under trees exactly as densely as in the open. If grass looks absent under a canopy, that is a
-rendering or density question, not the canopy mask — check `Dump Vegetation State` and
-`detailObjectDistance` before changing the graph.
+Note the fifth row: ground cover has **no** canopy interaction at all, so grass is placed under trees
+exactly as densely as in the open. If grass looks absent under a canopy, that is a rendering
+question, not the canopy mask — see 5.0.1.
+
+### 5.0.1 Where each layer is allowed to grow
+
+Every vegetation layer is a gate on `GreenAreaMask` plus, for most of them, a slope rule. The floors
+are what decide which ground each layer reaches, and they only make sense read together:
+
+| Layer | Green floor | Max slope | Reaches |
+|---|---|---|---|
+| Canopy | 0.333 | 28° island / 34° massif | proper green ground only |
+| Understory | 0.20 | canopy + 8° | plus the fringe, but gated by `CanopyMask` |
+| **Ground cover** | **0.30** | **32°** | meadow, slightly wider and steeper than forest |
+| Rock dressing | inverse green ≥ 0.55 | none | bare ground only |
+
+**Grass used to be 0.06 with no slope rule at all**, and that single pair of omissions produced every
+"grass where it should not be" report at once: grass on beach sand, grass past the waterline inside
+the falloff ring, and grass on vertical mountain faces. Ground that is mostly sand, mostly rock or
+mostly drowned still reaches 0.06 green, and nothing was checking the angle. Trees never had the
+problem because their floor was five times higher.
+
+If a layer appears somewhere it should not, check its floor against this table before touching masks.
+
+### 5.0.2 "No grass in the forest" is almost always `detailObjectDistance`
+
+Terrain details draw only within `detailObjectDistance`, which is 250 m — Unity's maximum — while
+trees draw to 5000 m. From anywhere but close up, that reads as a forest standing on bare ground,
+with a **circular** grass boundary at constant distance from the camera that follows neither the
+tree line nor the terrain. The tell is exactly that: an arc that ignores every feature it crosses.
+Walk up to the trees before concluding the graph is wrong.
 
 
 
@@ -518,9 +547,12 @@ and SpeedTree assets, and Vista leaves it at zero.
 
 Polytope only, for now — see 2.5 for why the Stylized pack cannot be a terrain tree as shipped.
 
-- **Cluster, do not scatter.** Scattering every species from the same density field gives evenly
-  spaced lone trees. Multiply the green mask by a coarse noise thresholded hard, one noise per
-  species — that produces forest masses with real gaps.
+- **Cluster, do not scatter — but cluster by forest type, not by species.** Scattering every species
+  from the same density field gives evenly spaced lone trees. Giving each species its *own*
+  independent field is the opposite mistake: five masks that agree nowhere, so nothing reads as a
+  kind of wood and the gaps between them multiply into bare island. Members of one forest type share
+  a cluster field and differ only in threshold, so the dominant species carries the stand and the
+  second fills in inside it; different types use different fields and meet at an edge.
 - `prefabVariants` is variation **within** a species. Different species need different templates and
   different cluster masks, otherwise they sprinkle evenly.
 - `TerrainTile` implements `IDetailDensityPopulator` but **not** a detail-instance populator, so the

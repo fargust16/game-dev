@@ -547,34 +547,58 @@ namespace GameDev.EditorTools
             // scaleVariation is wide on purpose: it is what separates saplings from old growth, and
             // a forest of one size reads as wallpaper however good the trees are.
             //
-            // The two tinted species sit on the same prefab as their parent with a different cluster
-            // seed, so the greens interleave as stands rather than alternating tree by tree. Their
-            // thresholds are a little higher, which keeps the base colour dominant.
+            // Species are grouped into **forest types**, not scattered independently. Five species
+            // each rolling their own cluster noise is what produced the "everything mixes, and the
+            // island is bare between patches" look: five independent masks agree nowhere, so no
+            // stand reads as a kind of wood, and five high thresholds multiply into large empty
+            // gaps.
+            //
+            // Instead, the members of one forest type share a cluster field (same scale, same
+            // seed) and differ only in threshold, so the dominant species covers the stand and the
+            // second fills in inside it — a pine wood with paler pines through it, a broadleaf wood
+            // with darker crowns through it. The two types use different fields, so conifer and
+            // broadleaf occupy different parts of the island and meet at an edge.
+            //
+            // Thresholds are also lower than before. They are compared against noise stretched to
+            // [0,1], so 0.30 keeps roughly the upper 70 % of each field rather than the upper 40 %,
+            // and the island gets continuous woodland with clearings instead of isolated islands of
+            // trees. Age comes from scaleVariation, which is why it is wide: one stand carries
+            // saplings and old growth together.
+            const float coniferCluster = 640f;
+            const int coniferSeed = 11;
+            const float broadleafCluster = 520f;
+            const int broadleafSeed = 37;
+
             var stands = new System.Collections.Generic.List<LevelsNode>
             {
+                // --- Coniferous wood: dominant pine, paler pine threaded through the same stand ---
                 AddCanopySpecies(
                     graph, VistaVegetationTemplates.Species.Pine,
-                    clusterScale: 420f, clusterSeed: seed + 11, threshold: 0.38f,
+                    clusterScale: coniferCluster, clusterSeed: seed + coniferSeed, threshold: 0.30f,
                     treeMaxSlopeDegrees, spacing: 16f, seed: seed + 101,
                     maxScale: 2.6f, scaleVariation: 0.55f), // 9.2 m prefab -> 10.8…23.8 m
                 AddCanopySpecies(
                     graph, VistaVegetationTemplates.Species.PinePale,
-                    clusterScale: 230f, clusterSeed: seed + 19, threshold: 0.58f,
-                    treeMaxSlopeDegrees, spacing: 18f, seed: seed + 104,
+                    clusterScale: coniferCluster, clusterSeed: seed + coniferSeed, threshold: 0.46f,
+                    treeMaxSlopeDegrees, spacing: 22f, seed: seed + 104,
                     maxScale: 2.3f, scaleVariation: 0.5f),
+
+                // --- Broadleaf wood: dominant fruit tree, deeper-green crowns inside the stand ---
                 AddCanopySpecies(
                     graph, VistaVegetationTemplates.Species.Fruit,
-                    clusterScale: 360f, clusterSeed: seed + 37, threshold: 0.45f,
+                    clusterScale: broadleafCluster, clusterSeed: seed + broadleafSeed, threshold: 0.32f,
                     treeMaxSlopeDegrees, spacing: 20f, seed: seed + 102,
                     maxScale: 2.45f, scaleVariation: 0.5f), // 7.8 m prefab -> 9.6…19.1 m
                 AddCanopySpecies(
                     graph, VistaVegetationTemplates.Species.FruitDeep,
-                    clusterScale: 200f, clusterSeed: seed + 53, threshold: 0.6f,
-                    treeMaxSlopeDegrees, spacing: 22f, seed: seed + 105,
+                    clusterScale: broadleafCluster, clusterSeed: seed + broadleafSeed, threshold: 0.48f,
+                    treeMaxSlopeDegrees, spacing: 24f, seed: seed + 105,
                     maxScale: 2.2f, scaleVariation: 0.45f),
+
+                // --- Orchard: deliberately the rare one, its own small field, pruned and even-sized ---
                 AddCanopySpecies(
                     graph, VistaVegetationTemplates.Species.Orchard,
-                    clusterScale: 260f, clusterSeed: seed + 73, threshold: 0.62f,
+                    clusterScale: 240f, clusterSeed: seed + 73, threshold: 0.58f,
                     treeMaxSlopeDegrees, spacing: 26f, seed: seed + 103,
                     maxScale: 1.6f, scaleVariation: 0.3f), // 7.8 m prefab -> 8.7…12.5 m, pruned orchard
             };
@@ -584,29 +608,80 @@ namespace GameDev.EditorTools
             AddRockDressing(graph, seed + 301);
 
             // --- Ground cover ---
-            // The window starts near zero on purpose. The reference biome's 0.442…0.804 was written
-            // for its own green source, and against ours it is a window that can miss entirely: a
-            // detail layer has no scatter step to soften a mask that never reaches the floor, so
-            // "slightly too high a floor" and "no grass anywhere on the island" are the same
-            // outcome. Trees survived the same mask only because their own floor is lower.
-            // Grass saturates at half green, so ordinary meadow is fully covered.
+            // Grass used to be the one vegetation layer with **no floor worth the name and no slope
+            // rule at all**: a 0.06 green floor against the canopy's 0.333, and no GeometryMask.
+            // Those two omissions produced every "grass where it should not be" report at once —
+            // grass on the beach sand, grass past the waterline in the falloff ring, and grass on
+            // vertical mountain faces — because 0.06 green is reached by ground that is mostly sand,
+            // mostly rock, or mostly drowned, and nothing was checking the angle it sat on.
+            //
+            // The floor now sits just under the canopy's, so meadow reaches a little further than
+            // forest and stops well before bare ground. The slope rule is the same idea as the
+            // canopy's, a few degrees more generous: grass holds on a hillside, not on a cliff.
             if (!includeGroundCover)
             {
                 return;
             }
 
             var greenForGrass = AddGetVar(graph, VarGreenAreaMask);
-            var grassDensity = new LevelsNode { inLow = 0.06f, inMid = 0.5f, inHigh = 0.5f };
+            var grassDensity = new LevelsNode
+            {
+                inLow = GrassGreenFloor,
+                inMid = 0.5f,
+                inHigh = 0.55f,
+            };
+
+            var heightForGrass = AddGetVar(graph, VarHeightMap);
+            var grassTerrain = new GeometryMaskNode
+            {
+                blendMode = GeometryMaskNode.BlendMode.Multiply,
+                enableHeightMask = false,
+                enableSlopeMask = true,
+                minAngle = 0f,
+                maxAngle = GrassMaxSlopeDegrees,
+                slopeTransition = ConstantCurve(),
+                enableDirectionMask = false,
+            };
+
+            var grassOnSlope = new CombineNode { mode = CombineNode.Mode.Multiply };
             var grassOut = new DetailDensityOutputNode
             {
                 detailTemplate = VistaVegetationTemplates.LoadOrCreateMeadowGrass(),
             };
 
             graph.AddNode(grassDensity);
+            graph.AddNode(grassTerrain);
+            graph.AddNode(grassOnSlope);
             graph.AddNode(grassOut);
+
             Connect(graph, greenForGrass.id, greenForGrass.outputSlot.id, grassDensity.id, grassDensity.inputSlot.id);
-            Connect(graph, grassDensity.id, grassDensity.outputSlot.id, grassOut.id, grassOut.inputSlot.id);
+            Connect(graph, heightForGrass.id, heightForGrass.outputSlot.id, grassTerrain.id, grassTerrain.inputSlot.id);
+            Connect(
+                graph, grassDensity.id, grassDensity.outputSlot.id,
+                grassOnSlope.id, grassOnSlope.backgroundSlot.id);
+            Connect(
+                graph, grassTerrain.id, grassTerrain.outputSlot.id,
+                grassOnSlope.id, grassOnSlope.foregroundSlot.id);
+            Connect(graph, grassOnSlope.id, grassOnSlope.outputSlot.id, grassOut.id, grassOut.inputSlot.id);
         }
+
+        /// <summary>
+        /// Green weight below which ground cover is not placed.
+        /// </summary>
+        /// <remarks>
+        /// Just under <c>AddCanopySpecies</c>'s 0.333, so meadow reaches slightly further than
+        /// forest and still stops before sand, rock and the drowned falloff ring — all three of
+        /// which sit well under a third green. The old 0.06 is what put grass on the beach and in
+        /// the water.
+        /// </remarks>
+        private const float GrassGreenFloor = 0.30f;
+
+        /// <summary>
+        /// Steepest ground that still grows grass. A few degrees above the canopy's limit, so a
+        /// meadow runs a little higher up a hillside than the trees do, and nothing grows on a
+        /// mountain face.
+        /// </summary>
+        private const float GrassMaxSlopeDegrees = 32f;
 
         /// <summary>
         /// Publishes where the canopy stands are, feathered outwards, as <see cref="VarCanopyMask"/>.
