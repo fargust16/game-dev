@@ -119,3 +119,24 @@ unity/ShellTestLog.txt
 
 # Editor backups
 *.bak
+
+# ---------------------------------------------------------------------------
+# Code-generated assets: fully determined by source, nothing to author in them.
+# Rebuilt by Create/Recreate Vegetation Templates and the player setup menu.
+# The create-if-missing assets beside these stay tracked on purpose -- biome
+# template prefabs, terrain graphs, terrain layers and the tree/detail
+# templates carry Inspector tuning that code seeds once and must never restamp,
+# so ignoring them would silently reset a world to code defaults on clone.
+# ---------------------------------------------------------------------------
+unity/Assets/Settings/Vista/Vegetation/Overworld_GrassDetail.prefab
+unity/Assets/Settings/Vista/Vegetation/Overworld_GrassDetail.prefab.meta
+unity/Assets/Settings/Vista/Vegetation/Overworld_GrassDetail.mat
+unity/Assets/Settings/Vista/Vegetation/Overworld_GrassDetail.mat.meta
+unity/Assets/Settings/Vista/Vegetation/Tints/
+unity/Assets/Settings/Vista/Vegetation/Tints.meta
+unity/Assets/Settings/OverworldPlayerAnimator.controller
+unity/Assets/Settings/OverworldPlayerAnimator.controller.meta
+
+# Baked lighting for the overworld scene
+unity/Assets/Scenes/Overworld_Generator/
+unity/Assets/Scenes/Overworld_Generator.meta
