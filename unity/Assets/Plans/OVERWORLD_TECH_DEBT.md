@@ -6,6 +6,28 @@ for work that is understood but not done.
 
 ---
 
+## 0. Roads are disabled in the default pipeline
+
+`WorldGenSettings.Default.RunRoads = false` as of 2026-08-17. The step is off for two independent
+reasons, and both have to be fixed before turning it back on:
+
+- **It does not produce usable routes.** Observed in the scene: several near-parallel roads between
+  the same pair of points, crossing each other, instead of one route per pair. A spanning tree over
+  32 nodes should give 31 edges with no duplicates; the last run reported `main=4 branch=27
+  corridors=31`, so the count is right and the *geometry* is wrong — the paths themselves wander and
+  overlap. Item 8 is one confirmed mechanism (softening emits points it never validated); it is
+  probably not the only one.
+- **It costs ~90 % of Generate All** (item 1), which makes every unrelated world iteration slow.
+
+Everything else still runs: ocean, terrain, vegetation, POI markers, settlement and player. Turn the
+step back on from `GameDev/Overworld/World Generator` when working on roads specifically.
+
+Note for whoever picks this up: POI markers now place across all four tiles (32 of 32 instead of 5),
+so the planner sees roughly six times the node count it was last tuned against. Re-measure before
+optimising.
+
+---
+
 ## 1. Road planning takes 141 s — blocking
 
 `[Gen] step=roads.plan ms=140970 | grid 110x110 cells, 32 nodes`

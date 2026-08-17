@@ -151,7 +151,7 @@ Target architecture in §2 is the long-term map. **This section is the Editor bu
 | Mountains | Same Vista bake with the massif LPBs spawned from `LPB_Mountain.prefab` (Raise) | `terrain.mountain.place`, `terrain.mountain.{i}`, `terrain.mountain.ring.{i}` | Re-bake Surface without mountain LPBs | Same as Surface | `RunMountains` |
 | Markers | POI plan + marker visuals | `poi.{kind}.{i}`, `poi-visual` | POI root | Settlements, roads | `RunMarkers` |
 | Settlements | TownApproach fabric + `OverworldSettlementAnchor` | `settlement` | Settlement root | Roads | `RunSettlements` |
-| Roads | Network + `RoadCorridorDeformer` (corridor conform + surface paint) | none (deterministic) | Road root | — | `RunRoads` |
+| Roads | Network + `RoadCorridorDeformer` (corridor conform + surface paint) | none (deterministic) | Road root | — | `RunRoads` — **off by default**, see [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) item 0 |
 | Player | Character at a TownApproach | `player.spawn` | Player object | — | `RunPlayer` |
 
 **Surface and Mountains are not additive prefabs.** They share one **Vista** terrain bake, selected by `TerrainBakeFlags.IncludeMountains`. Changing either **must cascade-clear** downstream placement — stale content on a new heightmap is worse than an empty tile. MapMagic graphs are retired. Re-ensure the ocean plane after every terrain clear.
@@ -159,6 +159,8 @@ Target architecture in §2 is the long-term map. **This section is the Editor bu
 **Vegetation is not a pipeline step.** Canopy, understory, ground cover and rocks are written by the terrain graphs during Surface. There is no Trees or Undergrowth step and no `vegetation` seed fork.
 
 **Full Generate All order:** Surface (+Mountains) → Markers → Settlements → Roads → Ensure Ocean → Marker visuals → Player. Settlement must precede Roads so the road network can route to `OverworldSettlementAnchor` rather than to the raw POI marker.
+
+**Roads are currently skipped**, so a default Generate All is ocean + terrain + vegetation + POI + settlement + player. The order above is unchanged; only the flag is off.
 
 **Menu:** `GameDev/Overworld/Generate All`, `Clear All`, `Part-Gen/<Step>/Generate|Clear`, `World Generator` (step checkboxes + knobs). Debug menus stay under `Debug/`.
 

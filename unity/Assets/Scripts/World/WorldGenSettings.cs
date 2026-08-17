@@ -48,7 +48,11 @@ namespace GameDev.World
             RunMountains = true,
             RunMarkers = true,
             RunSettlements = true,
-            RunRoads = true,
+            // Roads are off by default: the network is ~90 % of Generate All and the paths it
+            // produces are not usable — parallel duplicate routes that cross each other instead of
+            // one route per pair. See OVERWORLD_TECH_DEBT.md items 1 and 8. Turn the step back on
+            // from the World Generator window when working on it.
+            RunRoads = false,
             RunPlayer = true,
         };
 

@@ -453,6 +453,35 @@ nothing like it.
 
 ## 5. Vegetation
 
+### 5.0 The current vegetation is ACCEPTED — do not revert it
+
+The whole graph-placed vegetation stack landed in commit `4b05f08` *Restore Vista authority over
+vegetation*, which also **deleted** the CPU scatter system it replaced (`VegetationScatterMenu`,
+`GrassField`, `GrassDistribution`, `VegetationEcology`, `GrassMask`, `TreePlacement`).
+
+**"Revert vegetation to how it was" is not an available action.** Going back before `4b05f08`
+restores a second grass system, which the locked architecture forbids (`AGENTS.md`: *Vegetation =
+Vista graph placement only … there is no second grass system*). Anyone asked to revert it should say
+so and propose a targeted change instead.
+
+Tuning is a **forward** change to the graph, and the knobs are named here so nobody goes looking:
+
+| Want | Knob | Where |
+|---|---|---|
+| fewer / more bushes overall | `ScatterNode.spacing` (currently 9 m) | `AddUnderstory` |
+| bushes hug the trees more or less tightly | `BlurNode.radius` on the canopy mask (8 px ≈ 35 m) | `PublishCanopyMask` |
+| bushes thinner but not absent between stands | `patches` `outLow` (0.4) | `AddUnderstory` |
+| grass density | `grassDensity` `Levels(inLow 0.06, inHigh 0.5)` | `AddVegetationStage` |
+| grass thinned under canopy | **not wired** — ground cover ignores `CanopyMask` today | `AddVegetationStage` |
+| tree count per species | `spacing`, and `threshold` on the cluster gate | `AddCanopySpecies` |
+
+Note the fifth row: ground cover currently has **no** canopy interaction at all, so grass is placed
+under trees exactly as densely as in the open. If grass looks absent under a canopy, that is a
+rendering or density question, not the canopy mask — check `Dump Vegetation State` and
+`detailObjectDistance` before changing the graph.
+
+
+
 **Everything is placed by the terrain graph. There is no GameObject scatter pass.** The old
 `VegetationScatterMenu` and its CPU mask cluster (`GrassMask`, `VegetationEcology`,
 `VegetationClearance`, `GrassExclusion`, `RoadLawnMask`, `TreePlacement`, `VegetationDensity`) are
