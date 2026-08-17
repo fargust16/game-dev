@@ -1,10 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using GameDev.World;
-using GameDev.World.Seed;
-using GameDev.World.Terrain;
 using Pinwheel.Vista;
-using Pinwheel.Vista.Graph;
 using UnityEditor;
 using UnityEngine;
 using WorldSeed = GameDev.World.Seed.WorldSeed;
@@ -13,353 +10,332 @@ using Random = System.Random;
 namespace GameDev.EditorTools
 {
     /// <summary>
-    /// Multi-LPB overworld bake: island shelf + 1–3 Mountain massif LPBs (one LPB = one massif).
-    /// Geology → Hydrology → Ecology → Civilization order bands (mountains = 10–19 Raise).
+    /// World composition for the overworld: which biomes exist, where they sit, and what silhouette
+    /// they have. Everything else about a biome belongs to its template prefab.
     /// </summary>
+    /// <remarks>
+    /// This is the orchestration layer and nothing more. It spawns the two native Vista biome
+    /// templates (<see cref="OverworldBiomeTemplates"/>) and then sets only what is genuinely a
+    /// per-world decision: the seed, the XZ placement, and the anchor silhouette.
+    /// <para>
+    /// It deliberately does <b>not</b> write biome height, area, blend options, data mask,
+    /// resolution or order — those are serialized on the prefab and edited in the Inspector.
+    /// <see cref="SetBiomeHeightOnSpawn"/> and <see cref="SetBiomeAreaOnSpawn"/> have already run by
+    /// the time this code sees the biome, and their results are read, never replaced.
+    /// </para>
+    /// <para>
+    /// The one thing Vista's area component cannot express is a non-rectangular outline. So the
+    /// rectangle it wrote is treated as the authoritative <em>extent</em>, and the seeded coastline
+    /// or ridge silhouette is inscribed inside it. Changing Set Biome Area On Spawn in the Inspector
+    /// therefore still changes the biome's size, exactly as expected.
+    /// </para>
+    /// </remarks>
     public static class OverworldLpbBake
     {
-        private const string BlankBiomeTemplatePath =
-            "Assets/PinwheelStudio/Vista/Personal/BiomeTemplates/Blank/Blank_BiomeTemplate.asset";
-
         public const int IslandAnchorCount = 36;
-        public const float IslandRadiusNoiseFrac = 0.04f;
-
-        /// <summary>
-        /// Outer coast ramp. Must be wide enough for ≤15° geology (~Δh/tan15°).
-        /// Beach vs cliff comes from asymmetric solid anchors, not a shorter falloff.
-        /// </summary>
-        public const float IslandFalloffLocalMeters = 420f;
-
-        /// <summary>
-        /// Graph 1.0 = this ASL. Keep plains in the ~30–65 m band so sea→land
-        /// can be a gentle ramp (not a 90 m mesa wall).
-        /// </summary>
-        public const float BasePlateauWorldHeightMeters = 55f;
-
-        public const float BaseLocalPos = 500f;
-        public const float BaseLocalScaleXz = 1.05f;
-
         public const int MountainAnchorCount = 28;
 
-        /// <summary>
-        /// Graph resolution per massif LPB. Also the ceiling on HydraulicErosion2's sim canvas
-        /// (<c>min(2048, baseResolution)</c>), so lowering this coarsens drainage, not just detail.
-        /// If a bake gets too slow, cut erosion/talus iterations in
-        /// <see cref="MountainMassifGraphBuilder"/> before touching this.
-        /// </summary>
-        public const int MountainBaseResolution = 1024;
+        /// <summary>How far the coastline may wander in or out, as a fraction of the extent.</summary>
+        private const float IslandRadiusNoiseFrac = 0.04f;
 
-        /// <summary>Major axis of ridge ellipse (local metres).</summary>
-        public const float MountainMajorAxisMin = 900f;
-        public const float MountainMajorAxisMax = 1200f;
-
-        /// <summary>Minor axis of ridge ellipse (local metres).</summary>
-        public const float MountainMinorAxisMin = 350f;
-        public const float MountainMinorAxisMax = 550f;
-
-        /// <summary>Wide geological transition into IslandBase (not the mountain slope itself).</summary>
-        public const float MountainFalloffLocalMeters = 520f;
-
-        public const float MountainLpbScaleMin = 0.9f;
-        public const float MountainLpbScaleMax = 1.15f;
-
-        /// <summary>
-        /// Raise delta (world m) added onto island shelf. Peak ASL ≈ island (~90) + ~0.85×delta.
-        /// </summary>
-        public const float MountainPeakDeltaMinMeters = 480f;
-        public const float MountainPeakDeltaMaxMeters = 580f;
-
-        public const int OrderIslandBase = 0;
-        public const int OrderMountainBase = 10;
+        /// <summary>Secondary massifs are foothills, not twin peaks.</summary>
+        private const float SecondaryMassifScale = 0.38f;
 
         public static void SpawnIslandAndMountainStack(VistaManager manager, int seed)
         {
-            SpawnBaseIslandBlankLpb(manager, seed);
+            SpawnSeaFloorLpb(manager, seed);
+            SpawnBaseIslandLpb(manager, seed);
             SpawnSeededMountainLpbs(manager, seed);
         }
 
-        private static void SpawnBaseIslandBlankLpb(VistaManager manager, int seed)
+        /// <summary>
+        /// The seabed under the whole world, so the island has something to blend down to.
+        /// </summary>
+        /// <remarks>
+        /// Nothing to place and nothing to shape: <see cref="SnapBiomeToTilesOnSpawn"/> on the
+        /// template already fitted the polygon to every tile the manager owns, at whatever world size
+        /// the project runs. Only the seed is ours.
+        /// </remarks>
+        private static void SpawnSeaFloorLpb(VistaManager manager, int seed)
         {
-            var template = AssetDatabase.LoadAssetAtPath<BiomeTemplate>(BlankBiomeTemplatePath);
-            string templateError = null;
-            if (template == null || !template.IsValid(out templateError))
+            var template = OverworldBiomeTemplates.EnsureSeaFloorTemplate();
+            if (template == null)
             {
-                Debug.LogError(
-                    $"[IslandBase] Blank template missing/invalid at {BlankBiomeTemplatePath}: {templateError}");
                 return;
             }
 
-            var spawnContext = new BiomeTemplateSpawnContext(manager);
-            var spawnedRoot = BiomeTemplateSpawner.Spawn(template, spawnContext);
-            RenameOwnedObjects(spawnContext, "IslandBase");
-            OverworldTerrainMenu.PersistSpawnedOwnedObjectsPublic(spawnedRoot, spawnContext);
-
-            var biome = spawnedRoot.GetComponentInChildren<LocalProceduralBiome>(true);
+            var biome = SpawnBiome(manager, template, "SeaFloor", "LPB_SeaFloor");
             if (biome == null)
             {
-                Debug.LogError("[IslandBase] Spawned Blank has no LocalProceduralBiome.");
                 return;
             }
 
-            biome.gameObject.name = "LPB_IslandBase";
-            biome.space = Space.Self;
-            biome.transform.localPosition = new Vector3(BaseLocalPos, 0f, BaseLocalPos);
-            biome.transform.localRotation = Quaternion.identity;
-            biome.transform.localScale = new Vector3(BaseLocalScaleXz, 1f, BaseLocalScaleXz);
-            biome.baseResolution = 512;
-            biome.order = OrderIslandBase;
-            biome.dataMask = BiomeDataMask.HeightMap | BiomeDataMask.HoleMap | BiomeDataMask.LayerWeightMaps;
+            biome.seed = new WorldSeed(seed).Fork("terrain.seafloor").Next();
+            LogBiome("SeaFloor", biome);
+        }
 
-            var plateauGraph = IslandPlateauGraphBuilder.LoadOrRebuild();
-            if (plateauGraph == null)
+        /// <summary>
+        /// Re-runs the spawn components on the biomes already in the scene, then regenerates.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <see cref="SetBiomeHeightOnSpawn"/> and <see cref="SetBiomeAreaOnSpawn"/> are one-shots:
+        /// they write <c>transform.localScale.y</c> and the anchor polygon at spawn time and then
+        /// never look at their own fields again. Editing <c>World Height</c> on a biome that is
+        /// already in the scene therefore does nothing until something re-applies it — this does,
+        /// using Vista's own components rather than a parallel height path.
+        /// </para>
+        /// <para>
+        /// Area is re-applied through <see cref="SetBiomeAreaOnSpawn"/>, which writes a rectangle,
+        /// so the organic silhouette is re-inscribed afterwards exactly as the bake does it.
+        /// </para>
+        /// <para>
+        /// A full Generate still respawns from the template prefabs, so this is for iteration; the
+        /// durable place to change a value is the prefab.
+        /// </para>
+        /// </remarks>
+        [MenuItem("GameDev/Overworld/Vista/Apply Biome Inspector Settings + Regenerate")]
+        public static void ApplyInspectorSettingsMenu()
+        {
+            var manager = Object.FindAnyObjectByType<VistaManager>();
+            if (manager == null)
             {
-                Debug.LogError("[IslandBase] Failed to build IslandPlateau_TerrainGraph.");
+                Debug.LogWarning("[Overworld] No VistaManager in the scene.");
                 return;
             }
 
-            biome.terrainGraph = plateauGraph;
-            biome.biomeMaskGraph = SoftFalloffMaskGraphBuilder.LoadOrRebuild();
+            var biomes = manager.GetComponentsInChildren<LocalProceduralBiome>(true);
+            if (biomes.Length == 0)
+            {
+                Debug.LogWarning("[Overworld] No Local Procedural Biomes under the manager.");
+                return;
+            }
 
-            var heightOnSpawn = biome.GetComponent<SetBiomeHeightOnSpawn>();
-            if (heightOnSpawn == null)
-                heightOnSpawn = biome.gameObject.AddComponent<SetBiomeHeightOnSpawn>();
-            heightOnSpawn.worldHeight = BasePlateauWorldHeightMeters;
-            heightOnSpawn.ApplyHeight(manager);
+            var seed = OverworldTerrainMenu.LastSeed;
+            var massifIndex = 0;
+            for (var i = 0; i < biomes.Length; i++)
+            {
+                var biome = biomes[i];
+                var isIsland = biome.gameObject.name.IndexOf(
+                    "Island", System.StringComparison.OrdinalIgnoreCase) >= 0;
+                // The seabed is snapped to the tiles on purpose — a silhouette would carve holes in
+                // the world floor.
+                var isSeaFloor = biome.gameObject.name.IndexOf(
+                    "SeaFloor", System.StringComparison.OrdinalIgnoreCase) >= 0;
 
-            biome.seed = new WorldSeed(seed).Fork("terrain.islandbase").Next();
-            ApplySeededNaturalIslandAnchors(biome, seed);
+                var height = biome.GetComponent<SetBiomeHeightOnSpawn>();
+                if (height != null)
+                {
+                    height.ApplyHeight(manager);
+                }
 
-            var opts = biome.blendOptions;
-            opts.heightMapBlendMode = BiomeBlendOptions.HeightBlendMode.Replace;
-            opts.textureBlendMode = BiomeBlendOptions.TextureBlendMode.Replace;
-            opts.useTransformForHeightBlend = true;
-            biome.blendOptions = opts;
+                var snap = biome.GetComponent<SnapBiomeToTilesOnSpawn>();
+                if (snap != null)
+                {
+                    snap.SnapToTiles(manager);
+                }
 
+                var area = biome.GetComponent<SetBiomeAreaOnSpawn>();
+                if (area != null)
+                {
+                    area.ApplyArea();
+                    biome.anchors = isIsland
+                        ? BuildIslandSilhouette(biome, seed)
+                        : BuildMassifSilhouette(biome, seed, massifIndex);
+                }
+
+                if (!isIsland && !isSeaFloor)
+                {
+                    massifIndex++;
+                }
+
+                LogBiome($"Re-applied {biome.gameObject.name}", biome);
+            }
+
+            manager.Generate(manager.GetTiles());
             Debug.Log(
-                $"[IslandBase] Plateau LPB order=0 plateauH={BasePlateauWorldHeightMeters:F0} " +
-                $"scaleY={biome.transform.localScale.y:F3} " +
-                $"graph={plateauGraph.name} anchors={biome.anchors?.Length ?? 0} " +
-                $"falloff={IslandFalloffLocalMeters:F0} maskGraph={(biome.biomeMaskGraph != null)} " +
-                $"seed={biome.seed}");
+                $"[Overworld] Re-applied Inspector settings on {biomes.Length} biome(s) and requested " +
+                "a regenerate. Note: a full Generate All respawns from the template prefabs, so put " +
+                "the value you want to keep on the prefab.");
+        }
+
+        private static void SpawnBaseIslandLpb(VistaManager manager, int seed)
+        {
+            var template = OverworldBiomeTemplates.EnsureIslandTemplate();
+            if (template == null)
+            {
+                return;
+            }
+
+            var biome = SpawnBiome(manager, template, "IslandBase", "LPB_IslandBase");
+            if (biome == null)
+            {
+                return;
+            }
+
+            var center = WorldCenter();
+            biome.transform.position = new Vector3(center.x, biome.transform.position.y, center.z);
+            biome.seed = new WorldSeed(seed).Fork("terrain.islandbase").Next();
+            biome.anchors = BuildIslandSilhouette(biome, seed);
+
+            LogBiome("IslandBase", biome);
         }
 
         private static void SpawnSeededMountainLpbs(VistaManager manager, int seed)
         {
-            var template = AssetDatabase.LoadAssetAtPath<BiomeTemplate>(BlankBiomeTemplatePath);
-            string templateError = null;
-            if (template == null || !template.IsValid(out templateError))
+            var template = OverworldBiomeTemplates.EnsureMountainTemplate();
+            if (template == null)
             {
-                Debug.LogError(
-                    $"[MountainLPB] Blank template missing/invalid at {BlankBiomeTemplatePath}: {templateError}");
                 return;
             }
 
-            var massifGraph = MountainMassifGraphBuilder.LoadOrRebuild();
-            if (massifGraph == null)
-            {
-                Debug.LogError("[MountainLPB] Failed to build MountainMassif_TerrainGraph.");
-                return;
-            }
-
-            var maskGraph = SoftFalloffMaskGraphBuilder.LoadOrRebuild();
             var rng = new WorldSeed(seed).Fork("terrain.mountain.place");
-            // Prefer a single major massif; rarely a second drastically smaller foothill.
+            // Prefer a single major massif; occasionally a much smaller second one.
             var targetCount = rng.NextDouble() < 0.72
                 ? 1
                 : Mathf.Min(2, WorldScale.PeakPreferredMaxCount);
-            var cliffYaw = SampleCliffCoastYawRadians(seed);
-            Debug.Log(
-                $"[MountainLPB] Target massifs={targetCount} (prefer 1 major; 2nd is small). " +
-                $"cliffYaw={cliffYaw * Mathf.Rad2Deg:F0}° seed={seed}");
+            var cliffYaw = CliffCoastYawRadians(seed);
 
-            var center = new Vector3(
-                WorldScale.WorldExtentXMeters * 0.5f,
-                0f,
-                WorldScale.WorldExtentZMeters * 0.5f);
-            var usableRadius = Mathf.Min(WorldScale.WorldExtentXMeters, WorldScale.WorldExtentZMeters) * 0.5f
-                               - WorldScale.IslandOceanMarginMeters - 280f;
-            usableRadius = Mathf.Max(200f, usableRadius);
+            var center = WorldCenter();
+            var usableRadius = Mathf.Max(
+                200f,
+                Mathf.Min(WorldScale.WorldExtentXMeters, WorldScale.WorldExtentZMeters) * 0.5f
+                - WorldScale.IslandOceanMarginMeters - 280f);
 
             var placed = new List<Vector3>(targetCount);
             for (var i = 0; i < targetCount; i++)
             {
-                Vector3 worldPos = default;
-                var ok = false;
-                for (var attempt = 0; attempt < 32; attempt++)
-                {
-                    // Major massif sits on the cliff/mountain coast; foothills stay random.
-                    float angle;
-                    if (i == 0 && attempt < 12)
-                    {
-                        angle = cliffYaw + ((float)rng.NextDouble() - 0.5f) * 0.9f;
-                    }
-                    else
-                    {
-                        angle = (float)rng.NextDouble() * Mathf.PI * 2f;
-                    }
-
-                    var dist = usableRadius * (0.12f + 0.5f * (float)rng.NextDouble());
-                    worldPos = center + new Vector3(Mathf.Cos(angle) * dist, 0f, Mathf.Sin(angle) * dist);
-                    ok = true;
-                    for (var p = 0; p < placed.Count; p++)
-                    {
-                        if (Vector3.Distance(worldPos, placed[p]) < WorldScale.PeakMinSeparationMeters)
-                        {
-                            ok = false;
-                            break;
-                        }
-                    }
-
-                    if (ok)
-                        break;
-                }
-
-                if (!ok)
+                if (!TryPlaceMassif(rng, center, usableRadius, cliffYaw, i, placed, out var worldPos))
                 {
                     Debug.LogWarning($"[MountainLPB] Could not place massif index={i} (separation).");
                     continue;
                 }
 
                 placed.Add(worldPos);
-                SpawnOneMountainLpb(manager, template, massifGraph, maskGraph, seed, i, worldPos, rng);
+                var biome = SpawnBiome(manager, template, $"Mountain_{i}", $"LPB_Mountain_{i}");
+                if (biome == null)
+                {
+                    continue;
+                }
+
+                // Offset from the order authored on the prefab, so several instances of the same
+                // template stack deterministically without discarding the Inspector value.
+                biome.order += i;
+                biome.transform.position = new Vector3(worldPos.x, biome.transform.position.y, worldPos.z);
+                biome.seed = new WorldSeed(seed).Fork($"terrain.mountain.{i}").Next();
+                biome.anchors = BuildMassifSilhouette(biome, seed, i);
+
+                LogBiome($"MountainLPB {biome.gameObject.name}", biome);
             }
 
             Debug.Log(
-                $"[MountainLPB] Spawned {placed.Count}/{targetCount} massif LPB(s) from seed={seed}");
+                $"[MountainLPB] Spawned {placed.Count}/{targetCount} massif LPB(s), " +
+                $"cliffYaw={cliffYaw * Mathf.Rad2Deg:F0}° seed={seed}");
         }
 
-        private static void SpawnOneMountainLpb(
-            VistaManager manager,
-            BiomeTemplate template,
-            TerrainGraph massifGraph,
-            BiomeMaskGraph maskGraph,
-            int worldSeed,
+        private static bool TryPlaceMassif(
+            Random rng,
+            Vector3 center,
+            float usableRadius,
+            float cliffYaw,
             int index,
-            Vector3 worldPos,
-            Random rng)
+            List<Vector3> placed,
+            out Vector3 worldPos)
+        {
+            worldPos = default;
+            for (var attempt = 0; attempt < 32; attempt++)
+            {
+                // The major massif sits on the cliff coast; foothills go anywhere.
+                var angle = index == 0 && attempt < 12
+                    ? cliffYaw + ((float)rng.NextDouble() - 0.5f) * 0.9f
+                    : (float)rng.NextDouble() * Mathf.PI * 2f;
+
+                var dist = usableRadius * (0.12f + 0.5f * (float)rng.NextDouble());
+                worldPos = center + new Vector3(Mathf.Cos(angle) * dist, 0f, Mathf.Sin(angle) * dist);
+
+                var ok = true;
+                for (var p = 0; p < placed.Count; p++)
+                {
+                    if (Vector3.Distance(worldPos, placed[p]) < WorldScale.PeakMinSeparationMeters)
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+
+                if (ok)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static LocalProceduralBiome SpawnBiome(
+            VistaManager manager, BiomeTemplate template, string ownedPrefix, string biomeName)
         {
             var spawnContext = new BiomeTemplateSpawnContext(manager);
             var spawnedRoot = BiomeTemplateSpawner.Spawn(template, spawnContext);
-            RenameOwnedObjects(spawnContext, $"Mountain_{index}");
+            RenameOwnedObjects(spawnContext, ownedPrefix);
             OverworldTerrainMenu.PersistSpawnedOwnedObjectsPublic(spawnedRoot, spawnContext);
 
             var biome = spawnedRoot.GetComponentInChildren<LocalProceduralBiome>(true);
             if (biome == null)
-                return;
-
-            var scale = Mathf.Lerp(MountainLpbScaleMin, MountainLpbScaleMax, (float)rng.NextDouble());
-            var peakDelta = Mathf.Lerp(
-                MountainPeakDeltaMinMeters,
-                MountainPeakDeltaMaxMeters,
-                (float)rng.NextDouble());
-            // Secondary massif: drastically smaller foothill, not a twin peak.
-            if (index > 0)
             {
-                scale *= 0.38f;
-                peakDelta *= 0.32f;
+                Debug.LogError($"[Overworld] Template '{template.name}' spawned no LocalProceduralBiome.");
+                return null;
             }
 
-            biome.gameObject.name = $"LPB_Mountain_{index}";
-            biome.space = Space.Self;
-            biome.transform.position = worldPos;
-            biome.transform.localRotation = Quaternion.identity;
-            biome.transform.localScale = new Vector3(scale, 1f, scale);
-            // 512 over a ~2500 m massif is 4.9 m/px — coarser than the 1400 m / 513 (2.73 m/px) terrain
-            // it is resampled onto, which is half of why the massif read as a smoothed cone. It also
-            // caps HydraulicErosion2's sim canvas (min(2048, baseResolution)) at 192 px, so drainage
-            // could only ever be a coarse radial comb. 1024 → 2.4 m/px and a ~424 px erosion canvas.
-            biome.baseResolution = MountainBaseResolution;
-            biome.order = OrderMountainBase + index;
-            biome.dataMask = BiomeDataMask.HeightMap | BiomeDataMask.HoleMap | BiomeDataMask.LayerWeightMaps;
-            biome.terrainGraph = massifGraph;
-            biome.biomeMaskGraph = maskGraph;
-            biome.seed = new WorldSeed(worldSeed).Fork($"terrain.mountain.{index}").Next();
-
-            var heightOnSpawn = biome.GetComponent<SetBiomeHeightOnSpawn>();
-            if (heightOnSpawn == null)
-                heightOnSpawn = biome.gameObject.AddComponent<SetBiomeHeightOnSpawn>();
-            heightOnSpawn.worldHeight = peakDelta;
-            heightOnSpawn.ApplyHeight(manager);
-
-            biome.transform.position = new Vector3(worldPos.x, 0f, worldPos.z);
-            var yScale = biome.transform.localScale.y;
-            biome.transform.localScale = new Vector3(scale, yScale, scale);
-
-            // Also shrink secondary mountain anchors.
-            if (index > 0)
-            {
-                ApplyOrganicMountainAnchors(biome, worldSeed, index);
-                var anchors = biome.anchors;
-                if (anchors != null)
-                {
-                    for (var a = 0; a < anchors.Length; a++)
-                        anchors[a] *= 0.45f;
-                    biome.anchors = anchors;
-                }
-            }
-            else
-            {
-                ApplyOrganicMountainAnchors(biome, worldSeed, index);
-            }
-
-            var opts = biome.blendOptions;
-            // Raise = additive geology on IslandBase (graph periphery ≈ 0 → soft foothills).
-            opts.heightMapBlendMode = BiomeBlendOptions.HeightBlendMode.Raise;
-            opts.textureBlendMode = BiomeBlendOptions.TextureBlendMode.Replace;
-            opts.useTransformForHeightBlend = true;
-            biome.blendOptions = opts;
-
-            Debug.Log(
-                $"[MountainLPB] {biome.gameObject.name} massif world=({worldPos.x:F0},{worldPos.z:F0}) " +
-                $"deltaH={peakDelta:F0} scaleXZ={scale:F2} scaleY={yScale:F3} " +
-                $"falloff={MountainFalloffLocalMeters:F0} Raise order={biome.order} seed={biome.seed}");
-        }
-
-        public static void ApplySeededNaturalIslandAnchors(LocalProceduralBiome biome, int worldSeed)
-        {
-            if (biome == null)
-                return;
-            biome.falloffDirection = FalloffDirection.Outer;
-            biome.falloffDistance = IslandFalloffLocalMeters;
-            biome.anchors = BuildSeededNaturalIslandLocalAnchors(biome.transform, worldSeed);
-        }
-
-        public static void ApplyOrganicMountainAnchors(
-            LocalProceduralBiome biome,
-            int worldSeed,
-            int index)
-        {
-            if (biome == null)
-                return;
-            biome.falloffDirection = FalloffDirection.Outer;
-            biome.falloffDistance = MountainFalloffLocalMeters;
-            biome.anchors = BuildOrganicMountainLocalAnchors(biome.transform, worldSeed, index);
+            biome.gameObject.name = biomeName;
+            return biome;
         }
 
         /// <summary>
-        /// Asymmetric island: cliff solid toward mountain coast, beach solid inset opposite
-        /// so Outer falloff becomes a sand shelf on one side only.
+        /// Reads the half-extents of whatever rectangle the biome's area component produced.
         /// </summary>
-        public static Vector3[] BuildSeededNaturalIslandLocalAnchors(Transform biomeTransform, int worldSeed)
+        /// <remarks>
+        /// Returns false when the biome has no usable polygon, in which case the caller must leave
+        /// the anchors alone rather than invent an extent of its own.
+        /// </remarks>
+        private static bool TryGetAuthoredExtent(
+            LocalProceduralBiome biome, out float halfWidth, out float halfLength)
         {
-            if (biomeTransform == null)
-                return System.Array.Empty<Vector3>();
+            halfWidth = 0f;
+            halfLength = 0f;
+            var anchors = biome.anchors;
+            if (anchors == null || anchors.Length < 3)
+            {
+                Debug.LogWarning(
+                    $"[Overworld] '{biome.gameObject.name}' has no anchor polygon after spawn — " +
+                    "add a Set Biome Area On Spawn (or Snap Biome To Tiles On Spawn) to its prefab.");
+                return false;
+            }
 
-            var center = new Vector3(
-                WorldScale.WorldExtentXMeters * 0.5f,
-                0f,
-                WorldScale.WorldExtentZMeters * 0.5f);
+            for (var i = 0; i < anchors.Length; i++)
+            {
+                halfWidth = Mathf.Max(halfWidth, Mathf.Abs(anchors[i].x));
+                halfLength = Mathf.Max(halfLength, Mathf.Abs(anchors[i].z));
+            }
 
-            var falloffWorld = IslandFalloffLocalMeters * BaseLocalScaleXz + 12f;
-            var half = Mathf.Min(WorldScale.WorldExtentXMeters, WorldScale.WorldExtentZMeters) * 0.5f;
-            var softRim = falloffWorld + 8f;
-            var maxCliffSolid = Mathf.Max(200f, half - softRim);
-            // Beach solid inset so Outer falloff becomes a long sand shelf (not a mesa wall).
-            // Keep enough solid for a walkable plain; wider falloff already softens the rim.
-            var maxBeachSolid = Mathf.Max(480f, maxCliffSolid - falloffWorld * 0.85f);
-            var baseRadius = maxCliffSolid / 1.04f;
-            var cliffYaw = SampleCliffCoastYawRadians(worldSeed);
+            return halfWidth > 1f && halfLength > 1f;
+        }
 
+        /// <summary>
+        /// An organic coastline inscribed in the authored extent: harmonics plus seeded noise, with
+        /// the cliff-facing side reaching further out than the beach side.
+        /// </summary>
+        private static Vector3[] BuildIslandSilhouette(LocalProceduralBiome biome, int worldSeed)
+        {
+            return TryGetAuthoredExtent(biome, out var halfWidth, out var halfLength)
+                ? BuildIslandSilhouette(halfWidth, halfLength, worldSeed)
+                : biome.anchors;
+        }
+
+        /// <inheritdoc cref="BuildIslandSilhouette(LocalProceduralBiome,int)"/>
+        public static Vector3[] BuildIslandSilhouette(float halfWidth, float halfLength, int worldSeed)
+        {
+            var cliffYaw = CliffCoastYawRadians(worldSeed);
             var rng = new WorldSeed(worldSeed).Fork("terrain.islandring");
             var a1 = 0.16f + 0.06f * (float)rng.NextDouble();
             var a2 = 0.07f + 0.06f * (float)rng.NextDouble();
@@ -368,67 +344,52 @@ namespace GameDev.EditorTools
             var phi2 = (float)rng.NextDouble() * Mathf.PI * 2f;
             var phi3 = (float)rng.NextDouble() * Mathf.PI * 2f;
 
-            var localAnchors = new Vector3[IslandAnchorCount];
+            var anchors = new Vector3[IslandAnchorCount];
             for (var i = 0; i < IslandAnchorCount; i++)
             {
-                var angle = (Mathf.PI * 2f * i) / IslandAnchorCount;
-                // 1 = cliff/mountain coast, 0 = beach coast (opposite).
+                var angle = Mathf.PI * 2f * i / IslandAnchorCount;
+
+                // 1 = cliff coast, 0 = beach coast on the opposite side. The beach side pulls in so
+                // the Outer falloff has room to become a shelf instead of a wall.
                 var cliffFacing = 0.5f + 0.5f * Mathf.Cos(angle - cliffYaw);
-                cliffFacing = cliffFacing * cliffFacing; // bias toward hard cliff vs soft beach
-                var radiusCap = Mathf.Lerp(maxBeachSolid, maxCliffSolid, cliffFacing);
+                cliffFacing *= cliffFacing;
+                var reach = Mathf.Lerp(0.72f, 1f, cliffFacing);
 
                 var harmonic = 1f
                                + a1 * Mathf.Cos(angle + phi1)
                                + a2 * Mathf.Cos(2f * angle + phi2)
                                + a3 * Mathf.Cos(3f * angle + phi3);
                 var noise = ((float)rng.NextDouble() * 2f - 1f) * IslandRadiusNoiseFrac;
-                var radius = Mathf.Min(radiusCap, baseRadius * Mathf.Max(0.55f, harmonic + noise));
-                var world = center + new Vector3(
-                    Mathf.Cos(angle) * radius,
+                var t = Mathf.Clamp(reach * Mathf.Max(0.55f, harmonic + noise), 0.2f, 1f);
+
+                anchors[i] = new Vector3(
+                    Mathf.Cos(angle) * halfWidth * t,
                     0f,
-                    Mathf.Sin(angle) * radius);
-                world.x = Mathf.Clamp(world.x, falloffWorld, WorldScale.WorldExtentXMeters - falloffWorld);
-                world.z = Mathf.Clamp(world.z, falloffWorld, WorldScale.WorldExtentZMeters - falloffWorld);
-                localAnchors[i] = biomeTransform.InverseTransformPoint(world);
+                    Mathf.Sin(angle) * halfLength * t);
             }
 
-            SmoothClosedPolygonInPlace(localAnchors, passes: 2);
-            for (var i = 0; i < localAnchors.Length; i++)
-            {
-                var world = biomeTransform.TransformPoint(localAnchors[i]);
-                world.x = Mathf.Clamp(world.x, falloffWorld, WorldScale.WorldExtentXMeters - falloffWorld);
-                world.z = Mathf.Clamp(world.z, falloffWorld, WorldScale.WorldExtentZMeters - falloffWorld);
-                localAnchors[i] = biomeTransform.InverseTransformPoint(world);
-            }
-
-            Debug.Log(
-                $"[IslandBase] Coast asymmetry cliffYaw={cliffYaw * Mathf.Rad2Deg:F0}° " +
-                $"cliffSolid≤{maxCliffSolid:F0} beachSolid≤{maxBeachSolid:F0} " +
-                $"falloff={IslandFalloffLocalMeters:F0} sea={WorldScale.SeaLevelMeters:F0}");
-
-            return localAnchors;
-        }
-
-        /// <summary>Shared seeded yaw: cliff/mountain coast (beach is opposite).</summary>
-        private static float SampleCliffCoastYawRadians(int worldSeed)
-        {
-            return CoastalBeachShelf.SampleCliffCoastYawRadians(worldSeed);
+            SmoothClosedPolygonInPlace(anchors, passes: 2);
+            return anchors;
         }
 
         /// <summary>
-        /// Ridge-like irregular ellipse (not a circular stamp). Random yaw + edge harmonics.
+        /// A ridge-shaped ellipse inscribed in the authored extent, rotated to a seeded yaw.
         /// </summary>
-        public static Vector3[] BuildOrganicMountainLocalAnchors(
-            Transform biomeTransform,
-            int worldSeed,
-            int index)
+        private static Vector3[] BuildMassifSilhouette(
+            LocalProceduralBiome biome, int worldSeed, int index)
         {
-            if (biomeTransform == null)
-                return System.Array.Empty<Vector3>();
+            if (!TryGetAuthoredExtent(biome, out var halfMajor, out var halfMinor))
+            {
+                return biome.anchors;
+            }
+
+            if (index > 0)
+            {
+                halfMajor *= SecondaryMassifScale;
+                halfMinor *= SecondaryMassifScale;
+            }
 
             var rng = new WorldSeed(worldSeed).Fork($"terrain.mountain.ring.{index}");
-            var major = Mathf.Lerp(MountainMajorAxisMin, MountainMajorAxisMax, (float)rng.NextDouble()) * 0.5f;
-            var minor = Mathf.Lerp(MountainMinorAxisMin, MountainMinorAxisMax, (float)rng.NextDouble()) * 0.5f;
             var yaw = (float)rng.NextDouble() * Mathf.PI * 2f;
             var cosY = Mathf.Cos(yaw);
             var sinY = Mathf.Sin(yaw);
@@ -437,27 +398,59 @@ namespace GameDev.EditorTools
             var phi1 = (float)rng.NextDouble() * Mathf.PI * 2f;
             var phi2 = (float)rng.NextDouble() * Mathf.PI * 2f;
 
-            var localAnchors = new Vector3[MountainAnchorCount];
+            var anchors = new Vector3[MountainAnchorCount];
             for (var i = 0; i < MountainAnchorCount; i++)
             {
-                var angle = (Mathf.PI * 2f * i) / MountainAnchorCount;
-                var harmonic = 1f + a1 * Mathf.Cos(angle + phi1) + a2 * Mathf.Cos(2f * angle + phi2);
-                var ex = Mathf.Cos(angle) * major * harmonic;
-                var ez = Mathf.Sin(angle) * minor * harmonic;
-                // Rotate ellipse in local XZ.
-                var lx = ex * cosY - ez * sinY;
-                var lz = ex * sinY + ez * cosY;
-                localAnchors[i] = new Vector3(lx, 0f, lz);
+                var angle = Mathf.PI * 2f * i / MountainAnchorCount;
+                // Keep the harmonic mean at 1 so the ridge stays inside the authored extent.
+                var harmonic = 1f / (1f + a1 + a2)
+                               * (1f + a1 * Mathf.Cos(angle + phi1) + a2 * Mathf.Cos(2f * angle + phi2));
+                var ex = Mathf.Cos(angle) * halfMajor * harmonic;
+                var ez = Mathf.Sin(angle) * halfMinor * harmonic;
+                anchors[i] = new Vector3(ex * cosY - ez * sinY, 0f, ex * sinY + ez * cosY);
             }
 
-            SmoothClosedPolygonInPlace(localAnchors, passes: 2);
-            return localAnchors;
+            SmoothClosedPolygonInPlace(anchors, passes: 2);
+            return anchors;
+        }
+
+        /// <summary>Seeded yaw of the cliff coast; the beach coast is the opposite side.</summary>
+        public static float CliffCoastYawRadians(int worldSeed)
+        {
+            var rng = new WorldSeed(worldSeed).Fork("terrain.coast.yaw");
+            return (float)rng.NextDouble() * Mathf.PI * 2f;
+        }
+
+        private static Vector3 WorldCenter()
+        {
+            return new Vector3(
+                WorldScale.WorldExtentXMeters * 0.5f,
+                0f,
+                WorldScale.WorldExtentZMeters * 0.5f);
+        }
+
+        private static void LogBiome(string tag, LocalProceduralBiome biome)
+        {
+            var height = biome.GetComponent<SetBiomeHeightOnSpawn>();
+            var area = biome.GetComponent<SetBiomeAreaOnSpawn>();
+            Debug.Log(
+                $"[{tag}] order={biome.order} " +
+                $"worldHeight={(height != null ? height.worldHeight.ToString("F0") : "n/a")} " +
+                $"worldArea={(area != null ? area.worldArea.ToString("F0") : "n/a")} " +
+                $"scaleY={biome.transform.localScale.y:F3} " +
+                $"graph={(biome.terrainGraph != null ? biome.terrainGraph.name : "NULL")} " +
+                $"maskGraph={(biome.biomeMaskGraph != null)} anchors={biome.anchors?.Length ?? 0} " +
+                $"falloff={biome.falloffDistance:F0} seed={biome.seed} " +
+                "(height/area/blend come from the template prefab)");
         }
 
         private static void SmoothClosedPolygonInPlace(Vector3[] points, int passes)
         {
             if (points == null || points.Length < 3 || passes <= 0)
+            {
                 return;
+            }
+
             var scratch = new Vector3[points.Length];
             for (var pass = 0; pass < passes; pass++)
             {
@@ -465,22 +458,30 @@ namespace GameDev.EditorTools
                 {
                     var prev = points[(i - 1 + points.Length) % points.Length];
                     var next = points[(i + 1) % points.Length];
-                    scratch[i] = (prev * 0.25f) + (points[i] * 0.5f) + (next * 0.25f);
+                    scratch[i] = prev * 0.25f + points[i] * 0.5f + next * 0.25f;
                 }
 
                 for (var i = 0; i < points.Length; i++)
+                {
                     points[i] = scratch[i];
+                }
             }
         }
 
         private static void RenameOwnedObjects(BiomeTemplateSpawnContext context, string prefix)
         {
             if (context == null)
+            {
                 return;
+            }
+
             foreach (var data in context.ownedObjects)
             {
                 if (data == null)
+                {
                     continue;
+                }
+
                 data.name = $"{prefix}_{data.name}";
             }
         }

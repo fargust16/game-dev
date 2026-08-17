@@ -47,9 +47,6 @@ namespace GameDev.EditorTools
             OverworldPipelineStepId.Markers,
             OverworldPipelineStepId.Settlements,
             OverworldPipelineStepId.Roads,
-            OverworldPipelineStepId.Trees,
-            OverworldPipelineStepId.Undergrowth,
-            OverworldPipelineStepId.Grass,
             OverworldPipelineStepId.Player,
         };
 
@@ -75,8 +72,6 @@ namespace GameDev.EditorTools
             }
 
             OverworldPlayerMenu.ClearPlayer();
-            VegetationScatterMenu.ClearVegetation();
-            GrassBakeMenu.Clear();
             SettlementOverworldMenu.ClearSettlement();
             RoadNetworkMenu.ClearRoadNetwork();
             PoiMarkerMenu.ClearMarkers();
@@ -157,21 +152,8 @@ namespace GameDev.EditorTools
                     OverworldGenTiming.Time("markers.visuals", PoiMarkerMenu.PlaceMarkers);
                 }
 
-                if (settings.RunTrees)
-                {
-                    OverworldGenTiming.Time("trees", VegetationScatterMenu.ScatterTrees);
-                }
-
-                if (settings.RunUndergrowth)
-                {
-                    OverworldGenTiming.Time("undergrowth", VegetationScatterMenu.ScatterUndergrowth);
-                }
-
-                if (settings.RunGrass)
-                {
-                    OverworldGenTiming.Time("grass", VegetationScatterMenu.BakeGrassOnly);
-                }
-
+                // Canopy is produced by the Surface step: the biome graphs' TREE OUTPUT writes Unity
+                // TreeInstances during the Vista bake. There is no separate tree pass any more.
                 if (settings.RunPlayer)
                 {
                     OverworldGenTiming.Time("player", OverworldPlayerMenu.SpawnPlayerAtTown);
@@ -221,15 +203,6 @@ namespace GameDev.EditorTools
                 case OverworldPipelineStepId.Roads:
                     RoadNetworkMenu.BuildRoadNetworkWithLandscapePlanner();
                     break;
-                case OverworldPipelineStepId.Trees:
-                    VegetationScatterMenu.ScatterTrees();
-                    break;
-                case OverworldPipelineStepId.Undergrowth:
-                    VegetationScatterMenu.ScatterUndergrowth();
-                    break;
-                case OverworldPipelineStepId.Grass:
-                    VegetationScatterMenu.BakeGrassOnly();
-                    break;
                 case OverworldPipelineStepId.Player:
                     OverworldPlayerMenu.SpawnPlayerAtTown();
                     break;
@@ -276,15 +249,6 @@ namespace GameDev.EditorTools
                 case OverworldPipelineStepId.Roads:
                     RoadNetworkMenu.ClearRoadNetwork();
                     break;
-                case OverworldPipelineStepId.Trees:
-                    VegetationScatterMenu.ClearTrees();
-                    break;
-                case OverworldPipelineStepId.Undergrowth:
-                    VegetationScatterMenu.ClearUndergrowth();
-                    break;
-                case OverworldPipelineStepId.Grass:
-                    GrassBakeMenu.Clear();
-                    break;
                 case OverworldPipelineStepId.Player:
                     OverworldPlayerMenu.ClearPlayer();
                     break;
@@ -294,11 +258,11 @@ namespace GameDev.EditorTools
         private static TerrainBakeFlags CurrentBakeFlags()
         {
             return OverworldTerrainMenu.LastBakeFlags;
-        }        private static void ClearDownstreamOfTerrain()
+        }
+
+        private static void ClearDownstreamOfTerrain()
         {
             OverworldPlayerMenu.ClearPlayer();
-            VegetationScatterMenu.ClearVegetation();
-            GrassBakeMenu.Clear();
             SettlementOverworldMenu.ClearSettlement();
             RoadNetworkMenu.ClearRoadNetwork();
             PoiMarkerMenu.ClearMarkers();

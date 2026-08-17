@@ -14,9 +14,19 @@ namespace GameDev.EditorTools
     {
         public const string GraphAssetPath = "Assets/Settings/Vista/SoftFalloff_BiomeMaskGraph.asset";
 
-        [MenuItem("GameDev/Overworld/Vista/Rebuild Soft Falloff Mask Graph")]
+        [MenuItem("GameDev/Overworld/Vista/Rebuild Soft Falloff Mask Graph (destructive)")]
         public static void RebuildMenu()
         {
+            if (!EditorUtility.DisplayDialog(
+                    "Rebuild the soft falloff biome mask graph?",
+                    "This re-authors SoftFalloff_BiomeMaskGraph from code, in place. Every edit made in " +
+                    "the Vista graph editor is lost; references to the asset are kept.",
+                    "Rebuild",
+                    "Cancel"))
+            {
+                return;
+            }
+
             var graph = Rebuild();
             if (graph == null)
                 return;
@@ -25,27 +35,25 @@ namespace GameDev.EditorTools
             Debug.Log($"[SoftFalloffMask] Rebuilt at {GraphAssetPath}");
         }
 
-        public static BiomeMaskGraph LoadOrRebuild()
+        /// <summary>Loads the authored mask graph. Never rebuilds — the asset is the source of truth.</summary>
+        public static BiomeMaskGraph Load()
         {
             var graph = AssetDatabase.LoadAssetAtPath<BiomeMaskGraph>(GraphAssetPath);
-            if (graph != null &&
-                graph.GetNode<FalloffDetailNode>() != null &&
-                graph.GetNode<OutputNode>() != null)
+            if (graph == null)
             {
-                var detail = graph.GetNode<FalloffDetailNode>() as FalloffDetailNode;
-                if (detail != null && detail.detailMultiplier <= 0.35f)
-                    return graph;
+                Debug.LogWarning(
+                    $"[SoftFalloffMask] No mask graph at {GraphAssetPath} — biome edges will be hard. " +
+                    "Run GameDev/Overworld/Vista/Rebuild Soft Falloff Mask Graph (destructive) once.");
             }
 
-            return Rebuild();
+            return graph;
         }
 
+        /// <summary>Re-authors the asset from code, discarding any Inspector edits.</summary>
         public static BiomeMaskGraph Rebuild()
         {
             EnsureFolder("Assets/Settings");
             EnsureFolder("Assets/Settings/Vista");
-            if (AssetDatabase.LoadAssetAtPath<BiomeMaskGraph>(GraphAssetPath) != null)
-                AssetDatabase.DeleteAsset(GraphAssetPath);
 
             var graph = ScriptableObject.CreateInstance<BiomeMaskGraph>();
             graph.name = "SoftFalloff_BiomeMaskGraph";
@@ -83,10 +91,8 @@ namespace GameDev.EditorTools
             Connect(graph, falloffDetail.id, falloffDetail.outputSlot.id, output.id, output.inputSlot.id);
 
             graph.Validate();
-            AssetDatabase.CreateAsset(graph, GraphAssetPath);
-            EditorUtility.SetDirty(graph);
-            AssetDatabase.SaveAssets();
-            return graph;
+            // Overwrite in place so the asset GUID survives — see VistaGraphBuild.SaveGraph.
+            return VistaGraphBuild.SaveGraph(graph, GraphAssetPath);
         }
 
         private static void Connect(

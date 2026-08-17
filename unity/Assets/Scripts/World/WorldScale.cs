@@ -1,4 +1,4 @@
-﻿namespace GameDev.World
+namespace GameDev.World
 {
     /// <summary>
     /// Single world-scale table: character â†’ vegetation â†’ lakes/shores â†’ relief â†’ chunks.
@@ -12,6 +12,11 @@
         public const float CharacterRadiusMeters = 0.3f;
 
         // --- Vegetation ---
+        // Target sizes in world metres, for judging whether a result looks right against the
+        // 1.8 m character. They are NOT Unity prototype values: TreeInstance.heightScale and
+        // DetailPrototype.minHeight are multipliers on the source prefab, so a prefab's own metre
+        // size has to be divided out first. Passing one of these straight into a prototype field
+        // asks for 5 % of a mesh instead of 5 cm of grass, which renders as nothing at all.
         public const float TreeMatureMinMeters = 12f;
         public const float TreeMatureMaxMeters = 25f;
         public const float TreeYoungMinMeters = 8f;
@@ -225,8 +230,8 @@
         public const float IslandOceanMarginMeters = 280f;
 
         /// <summary>
-        /// Typical horizontal width of the directed coast transition (sea â†’ green terrain).
-        /// Geometry SoT: <c>CoastalBeachShelf</c> (â‰¤12Â° profile + coast-band smooth).
+        /// Typical horizontal width of the coast transition, for gameplay and layout queries.
+        /// Coast <em>geometry</em> is authored in IslandPlateau_TerrainGraph plus the biome falloff.
         /// </summary>
         public const float CoastShelfWidthMeters = 200f;
 
@@ -234,19 +239,6 @@
         /// Typical dry-sand band width above sea level (material paint guide).
         /// </summary>
         public const float BeachWidthMeters = 80f;
-
-        /// <summary>
-        /// Snow line as metres above <see cref="SeaLevelMeters"/> (not a raw 0â€“1 heightmap fraction).
-        /// </summary>
-        public const float SnowLineMeters = 95f;
-
-        /// <summary>
-        /// Snow line for the massif splat, as metres above <see cref="SeaLevelMeters"/>.
-        /// Distinct from <see cref="SnowLineMeters"/> (95 m), which puts the line at 119 m ASL —
-        /// near the foot of a 500-580 m peak, so a real white layer at that height would bury the
-        /// whole mountain. This one leaves roughly the top quarter snow-capped.
-        /// </summary>
-        public const float AlpineSnowLineMeters = 430f;
 
         /// <summary>How far below sea the outer shelf floor settles (metres of water column at tile edge).</summary>
         public const float OceanShelfDepthMeters = 22f;

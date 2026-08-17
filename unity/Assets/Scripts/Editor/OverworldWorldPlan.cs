@@ -65,14 +65,21 @@ namespace GameDev.EditorTools
             def ??= EnsureDefinition(OverworldTerrainMenu.LastSeed, settings);
 
             var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
-            var tileSize = WorldScale.OverworldTileMeters;
+            // The whole world, not tile (0,0). The overworld is 2x2 tiles of 1400 m and the island
+            // sits at the world centre, so planning over one tile searched the bottom-left quadrant
+            // only — which is mostly ocean. On a seed whose dry land happened to fall outside it,
+            // every candidate landed in water and the run produced zero markers, hence no roads, no
+            // settlements and no player. Seeds that "worked" were the ones where the quadrant
+            // happened to catch enough coast.
+            var worldSizeX = WorldScale.WorldExtentXMeters;
+            var worldSizeZ = WorldScale.WorldExtentZMeters;
             var chunks = OverworldTileChunks.CoveringTile(
-                0, 0, tileSize, tileSize, OverworldTileChunks.DefaultMarginMeters);
+                0, 0, worldSizeX, worldSizeZ, OverworldTileChunks.DefaultMarginMeters);
             var margin = OverworldTileChunks.DefaultMarginMeters;
             var minX = margin;
             var minZ = margin;
-            var usableSizeX = tileSize - 2f * margin;
-            var usableSizeZ = tileSize - 2f * margin;
+            var usableSizeX = worldSizeX - 2f * margin;
+            var usableSizeZ = worldSizeZ - 2f * margin;
             float HeightMeters(float x, float z) => sampler.SampleWorldHeight(x, z);
             var analysis = new LandscapeCostField(
                 minX, minZ, usableSizeX, usableSizeZ,

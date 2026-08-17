@@ -15,34 +15,34 @@ MonoBehaviour:
   m_nodeData:
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.InputNode
-    jsonData: '{"m_groupId":"","m_id":"0HNYRMDA","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_outputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":100,\"m_type\":1,\"m_name\":\"\"}","version":1},"m_inputName":"Biome
+    jsonData: '{"m_groupId":"","m_id":"S4ROKPF7","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_outputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":100,\"m_type\":1,\"m_name\":\"\"}","version":1},"m_inputName":"Biome
       Mask Input","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.NoiseNode
-    jsonData: '{"m_groupId":"","m_id":"KTF909Z0","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_offset":{"x":0.0,"y":0.0},"m_scale":900.0,"m_lacunarity":2.0999999046325685,"m_persistence":0.4000000059604645,"m_layerCount":3,"m_mode":1,"m_seed":71,"m_layerDerivativeMode":1,"m_flipSign":true,"m_warpMode":1,"m_warpAngleMin":-360.0,"m_warpAngleMax":360.0,"m_warpIntensity":1.2000000476837159,"m_remapCurve":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.0,"value":0.15000000596046449,"inSlope":0.0,"outSlope":0.7000000476837158,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":1.0,"value":0.8500000238418579,"inSlope":0.7000000476837158,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4},"m_applyRemapPerLayer":true}'
+    jsonData: '{"m_groupId":"","m_id":"7CSK1H27","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_offset":{"x":0.0,"y":0.0},"m_scale":900.0,"m_lacunarity":2.0999999046325685,"m_persistence":0.4000000059604645,"m_layerCount":3,"m_mode":1,"m_seed":71,"m_layerDerivativeMode":1,"m_flipSign":true,"m_warpMode":1,"m_warpAngleMin":-360.0,"m_warpAngleMax":360.0,"m_warpIntensity":1.2000000476837159,"m_remapCurve":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.0,"value":0.15000000596046449,"inSlope":0.0,"outSlope":0.7000000476837158,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":1.0,"value":0.8500000238418579,"inSlope":0.7000000476837158,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4},"m_applyRemapPerLayer":true}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.FalloffDetailNode
-    jsonData: '{"m_groupId":"","m_id":"YYC9BCT9","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_detailMultiplier":0.2800000011920929}'
+    jsonData: '{"m_groupId":"","m_id":"FDAEKWM9","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_detailMultiplier":0.2800000011920929}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.OutputNode
-    jsonData: '{"m_groupId":"","m_id":"I8NFW7WQ","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_inputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":0,\"m_type\":0,\"m_name\":\"\"}","version":1},"m_outputName":"Biome
+    jsonData: '{"m_groupId":"","m_id":"ZRQM89ST","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_inputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":0,\"m_type\":0,\"m_name\":\"\"}","version":1},"m_outputName":"Biome
       Mask Output","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
     version: 1
   m_edgeData:
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"OCVCYZY2","m_outputSlot":{"m_nodeId":"0HNYRMDA","m_slotId":100},"m_inputSlot":{"m_nodeId":"YYC9BCT9","m_slotId":0}}'
+    jsonData: '{"m_id":"0Y8M7BP0","m_outputSlot":{"m_nodeId":"S4ROKPF7","m_slotId":100},"m_inputSlot":{"m_nodeId":"FDAEKWM9","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"ZU26OJCC","m_outputSlot":{"m_nodeId":"KTF909Z0","m_slotId":100},"m_inputSlot":{"m_nodeId":"YYC9BCT9","m_slotId":1}}'
+    jsonData: '{"m_id":"9KPAIUGZ","m_outputSlot":{"m_nodeId":"7CSK1H27","m_slotId":100},"m_inputSlot":{"m_nodeId":"FDAEKWM9","m_slotId":1}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"4P0LJTSX","m_outputSlot":{"m_nodeId":"YYC9BCT9","m_slotId":100},"m_inputSlot":{"m_nodeId":"I8NFW7WQ","m_slotId":0}}'
+    jsonData: '{"m_id":"6JGIH62S","m_outputSlot":{"m_nodeId":"FDAEKWM9","m_slotId":100},"m_inputSlot":{"m_nodeId":"ZRQM89ST","m_slotId":0}}'
     version: 1
   m_groupData: []
   m_stickyNoteData: []
