@@ -117,7 +117,33 @@ that location.
 
 ---
 
-## 7. Smaller items
+## 7. The overworld scene is half generated and versions like it
+
+`Assets/Scenes/Overworld_Generator.unity` produced **416 386 changed lines** in one commit. Every
+`Generate All` rewrites it, so the history records bakes rather than decisions and any merge on the
+scene is hopeless.
+
+It cannot simply be ignored, because it is two things in one file:
+
+| Authored — must survive a clone | Generated — rewritten every bake |
+|---|---|
+| `VistaManager` and its settings | terrain tiles and their `TerrainData` |
+| directional light, sky, camera rig | spawned LPB instances |
+| `WorldGenSettings` / seed state | POI markers, settlement greybox, roads, bridges |
+| ocean plane | the player object |
+
+The fix is to separate them: move the authored scaffolding into a prefab (or a small additive scene)
+that is versioned, and let `Generate All` build everything else into a scene that is not. The
+generated side is already reproducible — the seed is logged with every run and the terrain data,
+graph clones and baked lighting are ignored — so the only thing standing in the way is that the
+scaffolding has never been extracted.
+
+Until that happens, treat scene diffs as noise and never resolve a conflict in them by hand:
+regenerate from the seed instead.
+
+---
+
+## 8. Smaller items
 
 - `PoiMarkerMenu` doc comments still reference the deleted `VegetationScatterMenu`.
 - `Species.Orchard` uses the apple prefab only; pears and plums are unused because Vista Personal
