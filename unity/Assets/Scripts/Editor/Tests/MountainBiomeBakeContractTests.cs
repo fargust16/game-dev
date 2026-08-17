@@ -7,6 +7,8 @@ namespace GameDev.World.Terrain.Tests
 {
     public sealed class MountainBiomeBakeContractTests
     {
+        private const float HalfExtent = 940f;
+
         [Test]
         public void HeightBudget_Is700()
         {
@@ -14,67 +16,52 @@ namespace GameDev.World.Terrain.Tests
         }
 
         [Test]
-        public void NaturalIsland_LocalAnchors_AreIrregularAndInscribed()
+        public void IslandSilhouette_IsIrregularAndInsideTheAuthoredExtent()
         {
-            var go = new GameObject("NaturalIslandAnchorTest");
-            try
+            var anchors = OverworldLpbBake.BuildIslandSilhouette(
+                HalfExtent, HalfExtent, OverworldTerrainMenu.DefaultSeed);
+            Assert.AreEqual(OverworldLpbBake.IslandAnchorCount, anchors.Length);
+
+            var radii = new float[anchors.Length];
+            for (var i = 0; i < anchors.Length; i++)
             {
-                go.transform.localPosition = new Vector3(500f, 0f, 500f);
-                go.transform.localRotation = Quaternion.identity;
-                go.transform.localScale = new Vector3(1.05f, 1f, 1.05f);
-                var local = OverworldLpbBake.BuildSeededNaturalIslandLocalAnchors(
-                    go.transform,
-                    OverworldTerrainMenu.DefaultSeed);
-                Assert.AreEqual(OverworldLpbBake.IslandAnchorCount, local.Length);
-
-                var center = new Vector3(
-                    WorldScale.WorldExtentXMeters * 0.5f,
-                    0f,
-                    WorldScale.WorldExtentZMeters * 0.5f);
-                var radii = new float[local.Length];
-                for (var i = 0; i < local.Length; i++)
-                {
-                    var world = go.transform.TransformPoint(local[i]);
-                    Assert.AreEqual(0f, world.y, 0.01f);
-                    Assert.Greater(world.x, 0f);
-                    Assert.Less(world.x, WorldScale.WorldExtentXMeters);
-                    Assert.Greater(world.z, 0f);
-                    Assert.Less(world.z, WorldScale.WorldExtentZMeters);
-                    radii[i] = Vector2.Distance(
-                        new Vector2(world.x, world.z),
-                        new Vector2(center.x, center.z));
-                }
-
-                var minR = Mathf.Min(radii);
-                var maxR = Mathf.Max(radii);
-                Assert.Greater(maxR - minR, 20f, "coast should vary with seed (not a perfect circle/square)");
+                Assert.AreEqual(0f, anchors[i].y, 0.01f);
+                // The silhouette must stay inside whatever Set Biome Area On Spawn authored,
+                // otherwise changing the area in the Inspector would stop controlling the size.
+                Assert.LessOrEqual(Mathf.Abs(anchors[i].x), HalfExtent + 0.01f);
+                Assert.LessOrEqual(Mathf.Abs(anchors[i].z), HalfExtent + 0.01f);
+                radii[i] = new Vector2(anchors[i].x, anchors[i].z).magnitude;
             }
-            finally
+
+            Assert.Greater(
+                Mathf.Max(radii) - Mathf.Min(radii),
+                20f,
+                "coast should vary with seed (not a perfect circle/square)");
+        }
+
+        [Test]
+        public void IslandSilhouette_ScalesWithTheAuthoredExtent()
+        {
+            var small = OverworldLpbBake.BuildIslandSilhouette(400f, 400f, 110201);
+            var large = OverworldLpbBake.BuildIslandSilhouette(800f, 800f, 110201);
+
+            for (var i = 0; i < small.Length; i++)
             {
-                Object.DestroyImmediate(go);
+                Assert.AreEqual(small[i].x * 2f, large[i].x, 0.01f);
+                Assert.AreEqual(small[i].z * 2f, large[i].z, 0.01f);
             }
         }
 
         [Test]
-        public void NaturalIsland_SameSeed_IsDeterministic()
+        public void IslandSilhouette_SameSeed_IsDeterministic()
         {
-            var go = new GameObject("NaturalIslandDet");
-            try
+            var a = OverworldLpbBake.BuildIslandSilhouette(HalfExtent, HalfExtent, 110201);
+            var b = OverworldLpbBake.BuildIslandSilhouette(HalfExtent, HalfExtent, 110201);
+            Assert.AreEqual(a.Length, b.Length);
+            for (var i = 0; i < a.Length; i++)
             {
-                go.transform.localPosition = new Vector3(500f, 0f, 500f);
-                go.transform.localScale = new Vector3(1.05f, 1f, 1.05f);
-                var a = OverworldLpbBake.BuildSeededNaturalIslandLocalAnchors(go.transform, 110201);
-                var b = OverworldLpbBake.BuildSeededNaturalIslandLocalAnchors(go.transform, 110201);
-                Assert.AreEqual(a.Length, b.Length);
-                for (var i = 0; i < a.Length; i++)
-                {
-                    Assert.AreEqual(a[i].x, b[i].x, 1e-5f);
-                    Assert.AreEqual(a[i].z, b[i].z, 1e-5f);
-                }
-            }
-            finally
-            {
-                Object.DestroyImmediate(go);
+                Assert.AreEqual(a[i].x, b[i].x, 1e-5f);
+                Assert.AreEqual(a[i].z, b[i].z, 1e-5f);
             }
         }
     }

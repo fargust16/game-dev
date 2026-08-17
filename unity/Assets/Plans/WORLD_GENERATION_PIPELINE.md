@@ -61,7 +61,6 @@ All natural objects share one metre relationship via `GameDev.World.WorldScale` 
 | Tile / chunk | 1400 / 64 |
 | Terrain height budget | ~220 |
 | Sea level (ocean plane) | `WorldScale.SeaLevelMeters` (~32) |
-| Snow line above sea | `WorldScale.SnowLineMeters` (~95) |
 
 Do not scale prefabs independently — placers read `WorldScale`. Lake shores use analytic `LakeSilhouette` SDF (trig wobble), not the 3 m occupancy raster. Geometric pipeline: [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md). Generation timing logs as `[Gen] step=... ms=...` from `OverworldGenTiming`.
 
@@ -72,12 +71,12 @@ Do not scale prefabs independently — placers read `WorldScale`. Lake shores us
 | # | Stage | Produces | Maps to (17) | V0 status |
 |---|-------|----------|---------------|-----------|
 | 1 | World Layout | Continents/islands/coastline | New — not in `17` yet | **Natural island-in-ocean** — Vista `NaturalIsland` graph + `IslandNaturalGeography` + slim `IslandOccupancy` + WaterWorks `WorldWater` at `SeaLevelMeters`. See [NATURAL_ISLAND_GENERATOR.md](NATURAL_ISLAND_GENERATOR.md). Multi-tile continents still deferred. |
-| 2 | Macro Terrain | Mountains/plains/valleys/plateaus | `W.2 Terrain/Biome` | **Vista Personal** `NaturalIsland_TerrainGraph` + C# layered geography (anti-pancake). MapMagic recipe **retired**. Height sample = `Terrain.SampleHeight` / `VistaTerrainSampler`. Tile 1400×1400; height budget ~220 m. |
+| 2 | Macro Terrain | Mountains/plains/valleys/plateaus | `W.2 Terrain/Biome` | **Vista Personal** `IslandPlateau_TerrainGraph` + `MountainMassif_TerrainGraph` (Vista reference biome architecture; see `VISTA_OVERWORLD_REFERENCE.md`). MapMagic recipe **retired**. Height sample = `Terrain.SampleHeight` / `VistaTerrainSampler`. Tile 1400×1400; height budget ~220 m. |
 | 3 | Hydrology | **Deferred** — V0 ocean plane only; inland lake/river gen removed 2026-08-15 | W.2 / W.2b | Ocean = one WaterWorks WorldWater. Future inland hydro = redesign. |
 | 4 | Biomes | Meadow/Forest/Swamp/Highland/Mountain from **height + slope + moisture + temperature + distance-to-water**, not height alone | `W.2 Terrain/Biome` (`IBiomeSampler`) | **Height + slope + moisture** via `VistaTerrainSampler` + `BiomeClassifier` (area-fraction bands still apply). Moisture noise forked from `WorldSeed.Fork("biome")`. Temperature / distance-to-water deferred. |
 | 5 | Terrain Shaping | Cliffs, terraces, local erosion detail | `W.2`/`W.4` | Handled inside **Vista** biome graphs / stamps (StampIT for detail); MapMagic `Erosion200`/`Terrace200` recipe retired. |
-| 6 | Terrain Material | Grass/rock/mud/sand/snow from biome+slope+moisture+water-distance | `W.4` dressing / new card | **MicroSplat** layers (or TerrainLit + MS example maps until URP adapter) + `TerrainBiomePalette` remaps. Custom `GameDev/Overworld/Terrain` **deleted**. Snow gated by `SeaLevel + SnowLine` metres. Spec: [OVERWORLD_VISUAL_DIRECTION.md](OVERWORLD_VISUAL_DIRECTION.md). |
-| 7 | Vegetation | Ecological Forest/Shrub/Grass density fields; trees/shrubs/flowers Prefab scatter; **GPU grass carpet** (`GrassField`) | `W.2`/`W.4` dressing | Done for V0 — large forest masses, trunk colliders, 12–25 m trees, near-full GPU grass cover (see Iteration 07) |
+| 6 | Terrain Material | Grass/sand/soil/cliff/rock from the terrain graphs' morphology masks | `W.4` dressing / new card | Weights from the graphs' `Weight Blend` → `TEXTURE OUTPUT`; material = URP **TerrainLit** over the five canonical layers (`OverworldTerrainLayers`). **No C# painting, no MicroSplat.** Custom `GameDev/Overworld/Terrain` **deleted**. Spec: [OVERWORLD_VISUAL_DIRECTION.md](OVERWORLD_VISUAL_DIRECTION.md). |
+| 7 | Vegetation | Canopy + grass from the graphs' `TREE OUTPUT` / `DETAIL DENSITY OUTPUT`; shrubs/flowers/rocks Prefab scatter | `W.2`/`W.4` dressing | Done for V0 — forest masses and grass placed by Vista, trunk colliders, 12–25 m trees (see Iteration 07) |
 | 8 | World Features | Ruins/caves/camps/shrines as POI markers | `W.4 POI Placement` | Started — `PoiKind` list already includes ruin/camp/shrine/town approach/cave mouth |
 | 9 | Roads | Cost-field path + vertical profile + corridor conform (not canyon cut) | `W.5 Settlement` | **LandscapePlanner** — `LandscapeCostField` (slope³ + earthwork), hierarchical MST, `RoadCorridorDeformer`, see [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md) |
 | 10 | Settlements | Location choice (flat + water + road access) → `W.5` | `W.5 Settlement` | **S6–S8:** TownApproach dry fabric + District Mix + street props (`SETTLEMENT_PROPERTY_V0.md`) |
@@ -107,13 +106,13 @@ Rows 1, 3, 6, 9 don't have a System Card yet in `17` — add one when that wave 
 
 | It. | Deliverable | Status |
 |-----|-------------|--------|
-| 01 | Heightmap only (large-scale terrain, no biomes) | **Natural island geology** — `NaturalIsland_TerrainGraph` + `IslandNaturalGeography` (replaces radial `IslandBaseRelief`). Height queries: `VistaTerrainSampler` → `Terrain.SampleHeight`. See [NATURAL_ISLAND_GENERATOR.md](NATURAL_ISLAND_GENERATOR.md). |
+| 01 | Heightmap only (large-scale terrain, no biomes) | **Natural island geology** — `IslandPlateau_TerrainGraph` + `MountainMassif_TerrainGraph` under `OverworldLpbBake`. Height queries: `VistaTerrainSampler` → `Terrain.SampleHeight`. See [NATURAL_ISLAND_GENERATOR.md](NATURAL_ISLAND_GENERATOR.md). |
 | 02 | Landmass (ocean/islands/coastline) | **Warped island mask + WaterWorks WorldWater** at `SeaLevelMeters`. Multi-tile continents still deferred. |
 | 03 | Terrain layers (large/medium/small feature scales) | **Vista graph + StampIT** for detail stamps. Small-scale paint/detail must not break biome sampling smoothness. |
 | 04 | Biomes (Meadow/Forest/Mountain/Swamp/Coast) | **`VistaTerrainSampler` + `BiomeClassifier`** (height+slope+moisture). Temperature / distance-to-water deferred. |
 | 05 | Water | **Ocean only (V0).** Inland lakes/rivers deferred. |
-| 06 | Terrain materials (grass/dirt/rock/sand/mud/snow) | **MicroSplat** example layers (TerrainLit fallback until URP adapter) under `Assets/Settings/TerrainLayers/MicroSplat/`. Custom `GameDev/Overworld/Terrain` deleted. Snow ≈ `SeaLevel + SnowLine`. Spec: [OVERWORLD_VISUAL_DIRECTION.md](OVERWORLD_VISUAL_DIRECTION.md) |
-| 07 | Vegetation (trees/bushes/grass/flowers/rocks) | **Ecological density + GPU grass carpet** — `VegetationEcology` macro/meso Forest/Shrub/Grass fields. Trees/shrubs/flowers/rocks still Prefab scatter; **grass is GPU coverage** via `GrassMask` → `GrassDistribution` (short/tall **0.3–1.5 m**, density floor 0.3, sparse road residual) → `GrassField` + tint map + `Graphics.RenderMeshInstanced` (`GameDev/Overworld/Grass`). No GameObject per blade. Settlement fabric persisted on `OverworldSettlementAnchor` for street/pad exclusion (`GrassExclusion`). Seed fork `"grass"`. Pipeline vegetation **last**. EditMode: `VegetationEcologyTests`, `VegetationClearanceTests`, `GrassMaskTests`, `GrassDistributionTests`, `OverworldVisualDirectionTests`, `TreePlacementTests` |
+| 06 | Terrain materials (grass/sand/soil/cliff/rock) | Five canonical `TerrainLayer` assets under `Assets/Settings/TerrainLayers/Overworld/`, bound by both terrain graphs and rendered by URP TerrainLit. Vista owns the layer array and the alphamaps. No snow layer in V0. Spec: [OVERWORLD_VISUAL_DIRECTION.md](OVERWORLD_VISUAL_DIRECTION.md) |
+| 07 | Vegetation (trees/bushes/grass/flowers/rocks) | **Canopy and grass come from the terrain graphs** — `GreenAreaMask` → `Levels`/`GeometryMask` → `Scatter` → `TREE OUTPUT` / `DETAIL DENSITY OUTPUT`, with `Forest_TreeTemplate` / `Meadow_DetailTemplate` content. Shrubs/flowers/rocks stay Prefab scatter driven by `VegetationEcology` macro/meso fields, with settlement fabric on `OverworldSettlementAnchor` for street/pad exclusion (`GrassExclusion`). The old CPU grass carpet (`GrassMask` → `GrassDistribution` → `GrassField`) is **deleted**. Pipeline vegetation **last**. EditMode: `VegetationEcologyTests`, `VegetationClearanceTests`, `GrassMaskTests`, `OverworldVisualDirectionTests`, `TreePlacementTests` |
 | 08 | POIs (caves/ruins/resource areas) | **Profile-driven placement** — `PoiPlacementEngine` + `PoiPlacementCatalog` / per-kind `PoiPlacementProfile` (hard/soft/relation/footprint). Demo quota still from `PoiDemoScenario` (5 TownApproach, 3 Shrine, 10 Camp, 5 Landmark). TownApproach scores a circular footprint (slope / flatness / height variance); Shrine / Camp / Landmark use isolation, forest-edge, and scenic cues. `StubPoiPlacer` remains the `IPoiPlacer` facade. `PoiMarkerMenu` still spawns props/buildings. See [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md) and [17](../../../17%20Game%20Systems%20Architecture.md) W.4. |
 | 09 | Roads (graph + terrain cost + river crossings + mountain passes) | **LandscapePlanner** — `LandscapeCostField` nonlinear cost (slope³, excavation^2.5) + existing-road paint discount; growing Prim Primary network among TownApproach (snap to accepted corridors) then Secondary attach to whole network; `RoadTier` Primary/Secondary/Local (Local deferred); `EnsureMinimumConnectivity` (degree ≥ 1); `RoadVerticalProfile` + `RoadCorridorDeformer`; bridges rivers only. See [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md). |
 
@@ -124,7 +123,7 @@ Rows 1, 3, 6, 9 don't have a System Card yet in `17` — add one when that wave 
 | 11 | Buildings (Building DNA / Piece-Based Assembly) | Not started, deferred by `15` |
 | 12 | Streaming (chunks, async, LOD, unload) | `ChunkCoord` math done; async/LOD not started |
 
-**Where we actually are:** Natural island generator (Vista + `IslandNaturalGeography` + WaterWorks `WorldWater`) + MicroSplat/TerrainLit layers for V0 surface; hydrology / roads / POI / settlement / vegetation still on the LandscapePlanner rails. Multi-tile continents and MicroSplat URP adapter remain open.
+**Where we actually are:** Vista-native island generator (two LPBs from biome templates + WaterWorks `WorldWater`) with URP TerrainLit over the five canonical layers; hydrology / roads / POI / settlement / prefab vegetation still on the LandscapePlanner rails. Multi-tile continents remain open.
 
 **One-button pipeline:** `WorldGeneratorWindow` / `OverworldPipeline.GenerateAll` runs the Editor pipeline steps below (skip mask from `WorldGenSettings`). Part-Gen menu items call the same step methods. **Whenever a future iteration adds a new Overworld menu step, register it as an `IOverworldStep`.**
 
@@ -138,13 +137,12 @@ Target architecture in §2 is the long-term map. **This section is the Editor bu
 |------|----------|---------|-------|----------------------|-----------|
 | Surface | Vista.Generate + `IslandOccupancy` (height on Unity Terrain) | `terrain.*` without masses/ridge/terrace | Rebuild Vista without mountains; clears downstream | Lakes, markers, settlements, roads, vegetation, grass, player | `RunSurface` |
 | Zones | Terrain alphamap / biome paint | (deterministic from height+moisture) | Neutral ground layers | None (paint only) | `RunZones` |
-| Mountains | Same Vista bake with mountain emphasis + rock/snow hints | `terrain.masses`, `terrain.ridge`, `terrain.terrace`, `terrain.highland-terrace` | Rebuild Surface without mountain layers | Same as Surface | `RunMountains` |
+| Mountains | Same Vista bake; massif LPBs spawned from `LPB_Mountain.prefab` with Raise blending | `terrain.mountain.*` | Rebuild Surface without mountain LPBs | Same as Surface | `RunMountains` |
 | Markers | POI plan + visuals | `poi.{kind}.{i}` | POI root | Settlements, roads, veg clearance | `RunMarkers` |
 | Settlements | TownApproach fabric + anchor | `settlement` | Settlement root | Roads, veg | `RunSettlements` |
 | Roads | Network + `TerrainDeformer` (road corridors) | none (deterministic) | Road root | Grass lawn | `RunRoads` |
 | Trees | Tree prefabs | `vegetation` | Trees child only | — | `RunTrees` |
 | Undergrowth | Shrubs / flowers / rocks | `vegetation.shrubs` | Shrubs/Flowers/Rocks children | — | `RunUndergrowth` |
-| Grass | GPU `GrassField` | `grass` | GrassField objects | — | `RunGrass` |
 | Player | Character at a TownApproach | `player.spawn` | Player object | — | `RunPlayer` |
 
 **Surface / Zones / Mountains are not additive prefabs.** They share one **Vista** terrain bake with `TerrainBakeFlags` (`IncludeMountains`, `IncludeZoneTextures`). Changing Surface or Mountains **must cascade-clear** downstream placement — stale content on a new heightmap is worse than an empty tile. MapMagic graphs are retired. Re-ensure ocean after terrain clear.

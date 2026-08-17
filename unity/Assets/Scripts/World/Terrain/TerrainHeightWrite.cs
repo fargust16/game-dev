@@ -3,39 +3,30 @@ using UnityEngine;
 namespace GameDev.World.Terrain
 {
     /// <summary>
-    /// CPU heightmap writes after Vista GPU populate (<c>SyncControl.None</c>).
-    /// Sync first so queued GPU→CPU copies cannot wipe later <see cref="TerrainData.SetHeights"/>.
+    /// Tile plumbing around Vista's GPU populate: heightmap read-back, resolution/size pinning and
+    /// range logging.
     /// </summary>
+    /// <remarks>
+    /// Nothing here shapes terrain. Vista owns the heights; this only keeps the Unity-side tile
+    /// container consistent and reports what Vista produced.
+    /// </remarks>
     public static class TerrainHeightWrite
     {
-        public static void ForceBudgetSize(UnityEngine.Terrain terrain)
-        {
-            if (terrain == null || terrain.terrainData == null)
-            {
-                return;
-            }
-
-            var data = terrain.terrainData;
-            var size = data.size;
-            // Unity keeps heightmapScale when resolution changes, so size can inflate
-            // (e.g. 1400@33 → 22400@513). Always pin overworld tile XZ + vertical budget.
-            var needXz =
-                Mathf.Abs(size.x - WorldScale.OverworldTileMeters) > 0.01f ||
-                Mathf.Abs(size.z - WorldScale.OverworldTileMeters) > 0.01f;
-            var needY = Mathf.Abs(size.y - WorldScale.TerrainHeightBudgetMeters) > 0.01f;
-            if (needXz || needY)
-            {
-                data.size = new Vector3(
-                    WorldScale.OverworldTileMeters,
-                    WorldScale.TerrainHeightBudgetMeters,
-                    WorldScale.OverworldTileMeters);
-            }
-        }
+        /// <summary>Detail map resolution and patch size for the overworld tiles.</summary>
+        private const int DetailResolution = 512;
+        private const int DetailResolutionPerPatch = 16;
 
         /// <summary>
         /// Set heightmap resolution then pin world metres. Resolution-first avoids Unity
         /// preserving old metres-per-pixel and exploding tile size (1400→22400).
         /// </summary>
+        /// <remarks>
+        /// Safe to call after generation: every setter here is guarded against a no-op write.
+        /// That guard is not cosmetic — <c>TerrainData.SetDetailResolution</c> and the
+        /// <c>heightmapResolution</c> setter both <b>discard existing data</b>. Calling them
+        /// unconditionally after Vista finished erased the detail layers it had just written, which
+        /// is why grass never appeared: the graph produced it and this wiped it a moment later.
+        /// </remarks>
         public static void ForceTileResolutionAndSize(UnityEngine.Terrain terrain, int heightmapResolution)
         {
             if (terrain == null || terrain.terrainData == null)
@@ -49,16 +40,23 @@ namespace GameDev.World.Terrain
                 data.heightmapResolution = heightmapResolution;
             }
 
-            data.SetDetailResolution(512, 16);
-            data.size = new Vector3(
+            if (data.detailResolution != DetailResolution ||
+                data.detailResolutionPerPatch != DetailResolutionPerPatch)
+            {
+                data.SetDetailResolution(DetailResolution, DetailResolutionPerPatch);
+            }
+
+            var size = new Vector3(
                 WorldScale.OverworldTileMeters,
                 WorldScale.TerrainHeightBudgetMeters,
                 WorldScale.OverworldTileMeters);
+            if (data.size != size)
+            {
+                data.size = size;
+            }
         }
 
-        /// <summary>
-        /// Pull any pending Vista GPU height into CPU before we overwrite with SetHeights.
-        /// </summary>
+        /// <summary>Pull Vista's GPU heightmap into the CPU copy so reads see the real terrain.</summary>
         public static void SyncFromGpu(UnityEngine.Terrain terrain)
         {
             if (terrain == null || terrain.terrainData == null)
@@ -67,23 +65,6 @@ namespace GameDev.World.Terrain
             }
 
             terrain.terrainData.SyncHeightmap();
-        }
-
-        public static void Commit(UnityEngine.Terrain terrain, float[,] heights)
-        {
-            if (terrain == null || terrain.terrainData == null || heights == null)
-            {
-                return;
-            }
-
-            var data = terrain.terrainData;
-            data.SetHeights(0, 0, heights);
-            data.SyncHeightmap();
-            var collider = terrain.GetComponent<TerrainCollider>();
-            if (collider != null)
-            {
-                collider.terrainData = data;
-            }
         }
 
         public static void LogRange(UnityEngine.Terrain terrain, string step)

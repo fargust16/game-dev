@@ -29,6 +29,11 @@ namespace GameDev.EditorTools
     /// underlying FBX as Humanoid if needed — open its Rig tab and use "Configure Avatar" only if
     /// auto-mapping fails.
     /// </para>
+    /// <para>
+    /// The dummy ships with Built-in Render Pipeline materials, which URP does not draw at all, so
+    /// the character is invisible in the scene until they are converted — see
+    /// <see cref="UrpMaterialUpgrade"/>.
+    /// </para>
     /// </summary>
     public static class OverworldPlayerMenu
     {
@@ -52,6 +57,7 @@ namespace GameDev.EditorTools
         public static void SetupPlayer()
         {
             ConfigureCharacterAsHumanoid();
+            UrpMaterialUpgrade.UpgradeCharacterMaterialsMenu();
             BuildLocomotionAnimatorController();
             SpawnOrUpdatePlayerInScene();
         }
@@ -82,8 +88,30 @@ namespace GameDev.EditorTools
             Debug.Log("[Overworld] Human Character Dummy configured and auto-mapped as a valid Humanoid avatar.");
         }
 
-        [MenuItem("GameDev/Overworld/Player/2) Build Locomotion Animator Controller")]
+        /// <summary>
+        /// Builds the locomotion controller if it is missing, and leaves it alone otherwise.
+        /// </summary>
+        /// <remarks>
+        /// This used to delete and recreate the asset on every run, including every Generate All.
+        /// Deleting an <c>AnimatorController</c> that a live <c>Animator</c> in the open scene still
+        /// references leaves that reference dangling, and the next domain reload throws
+        /// <c>NullReferenceException</c> from <c>UnityEditor.Graphs.Edge.WakeUp</c> — the legacy
+        /// graph behind the controller waking up on an edge whose asset is gone. Entering play mode
+        /// is when it surfaces.
+        /// </remarks>
+        [MenuItem("GameDev/Overworld/Player/2) Build Locomotion Animator Controller (if missing)")]
         public static void BuildLocomotionAnimatorController()
+        {
+            if (AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath) != null)
+            {
+                return;
+            }
+
+            RebuildLocomotionAnimatorController();
+        }
+
+        [MenuItem("GameDev/Overworld/Player/Rebuild Locomotion Animator Controller (destructive)")]
+        public static void RebuildLocomotionAnimatorController()
         {
             EnsureSettingsFolder();
 
@@ -166,7 +194,40 @@ namespace GameDev.EditorTools
 
             EditorUtility.SetDirty(controller);
             AssetDatabase.SaveAssets();
+            ReattachControllerToPlayer(controller);
             Debug.Log($"[Overworld] Locomotion Animator Controller built at '{ControllerPath}'.");
+        }
+
+        /// <summary>
+        /// Points the player in the scene at the freshly built controller.
+        /// </summary>
+        /// <remarks>
+        /// Rebuilding deletes the old asset, and every <c>Animator</c> already referencing it is left
+        /// holding a destroyed object. That is both symptoms at once: the legacy graph behind the
+        /// controller throws <c>NullReferenceException</c> from <c>UnityEditor.Graphs.Edge.WakeUp</c>
+        /// on the next domain reload, and at runtime the controller reads as absent, so every
+        /// <c>SetFloat</c>/<c>SetBool</c> in <c>OverworldPlayerController.Update</c> warns once per
+        /// frame — thousands of lines. Reassigning here closes the window; running the rebuild
+        /// <em>after</em> spawning the player was what opened it.
+        /// </remarks>
+        private static void ReattachControllerToPlayer(RuntimeAnimatorController controller)
+        {
+            var player = GameObject.Find(PlayerObjectName);
+            if (player == null)
+            {
+                return;
+            }
+
+            var animator = player.GetComponent<Animator>();
+            if (animator == null)
+            {
+                return;
+            }
+
+            animator.runtimeAnimatorController = controller;
+            EditorUtility.SetDirty(animator);
+            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            Debug.Log("[Overworld] Re-pointed the player's Animator at the rebuilt controller.");
         }
 
         [MenuItem("GameDev/Overworld/Player/3) Spawn Or Update Player In Scene")]

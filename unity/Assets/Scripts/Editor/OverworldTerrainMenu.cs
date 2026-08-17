@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using System.Collections;
 using System.IO;
 using System.Reflection;
@@ -30,21 +30,10 @@ namespace GameDev.EditorTools
         private const string TerrainMaterialPath = "Assets/Settings/OverworldTerrain.mat";
         private const string SkyboxDaytimePath = "Assets/Skybox/Materials/Skybox_Daytime.mat";
         private const string VistaGraphsFolder = "Assets/Settings/Vista";
-        private const string MountainBiomeTemplatePath =
-            "Assets/PinwheelStudio/Vista/Personal/BiomeTemplates/Mountain/Mountain_BiomeTemplate.asset";
-        private const string BlankBiomeTemplatePath =
-            "Assets/PinwheelStudio/Vista/Personal/BiomeTemplates/Blank/Blank_BiomeTemplate.asset";
         private const string DemoMountainRangeSourcePath =
             "Assets/PinwheelStudio/Vista/Personal/Samples/Graphs/MountainRange.asset";
         private const string DemoMountainRangeWorkingPath =
             "Assets/Settings/Vista/Demo_MountainRange_AsIs.asset";
-
-        private const int IslandAnchorCount = 16;
-        private const float IslandRadiusNoiseFrac = 0.12f;
-        private const float MountainLocalPos = 500f;
-        private const float MountainLocalScaleXz = 1.05f;
-        private const float MountainLpbScaleMin = 0.22f;
-        private const float MountainLpbScaleMax = 0.38f;
 
         public const string TerrainShaderName = "Universal Render Pipeline/Terrain/Lit";
         public const string DeprecatedOverworldTerrainShaderName = "GameDev/Overworld/Terrain";
@@ -123,7 +112,6 @@ namespace GameDev.EditorTools
                 }
             }
 
-            OverworldMicroSplatSetup.DeleteMicroSplatCache();
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
         }
 
@@ -349,8 +337,6 @@ namespace GameDev.EditorTools
 
             WaterZoneMenu.ClearWaterZones();
             WaterZoneMenu.ClearRiverZones();
-            VegetationScatterMenu.ClearVegetation();
-            GrassBakeMenu.Clear();
             PoiMarkerMenu.ClearMarkers();
             RoadNetworkMenu.ClearRoadNetwork();
             SettlementOverworldMenu.ClearSettlement();
@@ -359,8 +345,6 @@ namespace GameDev.EditorTools
             var vistaSw = OverworldGenTiming.Start();
             yield return GenerateVistaTerrainRoutine(seed, flags);
             OverworldGenTiming.Log("terrain.vista", OverworldGenTiming.StopMs(vistaSw));
-
-            VegetationScatterMenu.ClearDensityDebugOverlayIfPresent();
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
             OverworldGenTiming.Log("terrain.total", OverworldGenTiming.StopMs(total), $"seed={seed} flags={flags}");
@@ -460,14 +444,15 @@ namespace GameDev.EditorTools
                 AssetDatabase.DeleteAsset(legacyData);
             }
 
+            VistaDetailDensityRelay.Reset();
             SpawnVistaBiomes(manager, seed, flags);
             yield return WaitForVistaGeneration(manager);
 
             var terrains = OverworldTerrainAccess.FindTerrains();
-            var demoAsIs = (flags & TerrainBakeFlags.VistaDemoAsIs) != 0;
 
-            // V0 post-pass: keep Vista Mountain height SoT. No IslandNaturalGeography /
-            // boundary / StampIT / SealLeakingBasins / alpine-coast splat hints.
+            // Read-back only. Vista owns the heightmap; this loop pulls it off the GPU, pins the
+            // resolution Unity expects, and measures the result so a mis-authored biome height is
+            // reported instead of silently corrected.
             var globalMaxY = 0f;
             for (var i = 0; i < terrains.Length; i++)
             {
@@ -497,50 +482,104 @@ namespace GameDev.EditorTools
                 }
             }
 
-            // Island ~100 + Raise delta 480â€“580 â†’ peaks typically 450â€“600 ASL.
-            if (globalMaxY < 380f)
+            // Reported, never corrected. The expected peak is the plateau's Set Biome Height On
+            // Spawn plus the massif's, both authored on the template prefabs; if this number looks
+            // wrong, those two values (or the graphs) are what to change.
+            Debug.Log($"[Overworld] Global max terrain height after Vista = {globalMaxY:F0}m");
+
+            // Seams are Vista's own job: TerrainTile.MatchSeams averages shared height and alphamap
+            // edges against each neighbour. Nothing here re-shapes or re-paints the tiles.
+            MatchVistaSeams(terrains);
+            ApplyTerrainRenderDistances(terrains);
+
+            // Vista's own detail writer loses the density map in the editor; this writes the map it
+            // produced. See VistaDetailDensityRelay for what was measured before adding it.
+            VistaDetailDensityRelay.Apply();
+
+            Debug.Log(
+                $"[Overworld] Vista bake done: tiles={terrains.Length} " +
+                $"extent={WorldScale.WorldExtentXMeters:F0}m " +
+                $"height={WorldScale.TerrainHeightBudgetMeters:F0} " +
+                "(terrain shape, surface weights and vegetation all from the terrain graphs)");
+
+            VistaVegetationDump.LogSummary(terrains);
+            EnsureOceanSurface();
+        }
+
+        /// <summary>
+        /// Averages shared tile edges through Vista's own <c>TerrainTile.MatchSeams</c>.
+        /// </summary>
+        /// <remarks>
+        /// Neighbour wiring has to happen first — <c>MatchSeams</c> reads <c>Terrain.leftNeighbor</c>
+        /// and friends to decide which edges to blend.
+        /// </remarks>
+        /// <summary>
+        /// Draw distances for the terrain's own tree and detail renderers.
+        /// </summary>
+        /// <remarks>
+        /// Unity draws terrain details within <c>detailObjectDistance</c> only, and that defaults to
+        /// 80 m — so grass exists in the data and is simply never rendered when the camera is looking
+        /// at the island from above. 250 m is the engine's maximum. These are view settings on the
+        /// Terrain component, not generation: they change what you see, never what Vista produced.
+        /// </remarks>
+        private static void ApplyTerrainRenderDistances(UnityEngine.Terrain[] terrains)
+        {
+            if (terrains == null)
             {
-                Debug.LogWarning(
-                    $"[MountainLPB] Peak height only {globalMaxY:F0}m (want ~450â€“600 with Raise). " +
-                    "Check MountainMassif graph + mountain scaleY.");
-            }
-            else
-            {
-                Debug.Log($"[MountainLPB] Global max height after Vista = {globalMaxY:F0}m");
+                return;
             }
 
-            // Soft directed coast transition (no flat sand terrace / no 360Â° ring).
-            if (!demoAsIs)
+            for (var i = 0; i < terrains.Length; i++)
             {
-                CoastalBeachShelf.ApplyAll(terrains, seed);
-                // Per-tile beach flood cannot match shared edges â€” stitch before splat.
-                TerrainTileSeams.DiagnoseAndWarn(terrains, "after-beach-pre-stitch");
-                TerrainTileSeams.StitchHeights(terrains);
-                TerrainTileSeams.WireNeighbors(terrains);
-                for (var i = 0; i < terrains.Length; i++)
+                var terrain = terrains[i];
+                if (terrain == null)
                 {
-                    if (terrains[i] != null)
-                        TerrainHeightWrite.LogRange(terrains[i], $"after-beach[{i}]");
+                    continue;
+                }
+
+                terrain.detailObjectDistance = 250f;
+                terrain.detailObjectDensity = 1f;
+                terrain.treeDistance = 5000f;
+                terrain.treeBillboardDistance = 200f;
+                terrain.drawTreesAndFoliage = true;
+
+                // Geometry LOD and the low-resolution basemap are both distance-driven, and both
+                // show as banding across a large gentle surface: the mesh simplifies in strips, and
+                // past basemapDistance the terrain stops using the real splat blend. The island is
+                // 2.2 km across and mostly flat, so the defaults (pixel error 5, basemap 1000 m) put
+                // every wide view firmly in that regime. Ground level looked clean while the aerial
+                // view striped, which is the signature of a distance artifact rather than geometry.
+                terrain.heightmapPixelError = 1f;
+                terrain.basemapDistance = 20000f;
+            }
+        }
+
+        private static void MatchVistaSeams(UnityEngine.Terrain[] terrains)
+        {
+            if (terrains == null || terrains.Length < 2)
+            {
+                return;
+            }
+
+            UnityEngine.Terrain.SetConnectivityDirty();
+            for (var i = 0; i < terrains.Length; i++)
+            {
+                if (terrains[i] != null)
+                {
+                    terrains[i].allowAutoConnect = true;
                 }
             }
 
-            // Degree-based MS_* splat (Vista TextureOutputs left white after Convert on 2Ã—2).
-            // Coast sand from directed beach mask + height; MicroSplat Convert without HybridHeightBlend.
-            OverworldMicroSplatSetup.PaintOrPreserveVistaSplats(terrains, seed);
-            OverworldMicroSplatSetup.ConvertAllTilesToMicroSplat(terrains, seed);
-
-            Debug.Log(
-                demoAsIs
-                    ? $"[VistaDemo] As-is MountainRange bake done: tiles={terrains.Length} " +
-                      $"extent={WorldScale.WorldExtentXMeters:F0}m (no C# framing/lakes/StampIT)"
-                    : $"[MountainBiome] Vista bake done: tiles={terrains.Length} " +
-                      $"extent={WorldScale.WorldExtentXMeters:F0}m height={WorldScale.TerrainHeightBudgetMeters:F0} " +
-                      $"(directed coast + MicroSplat Convert)");
-
-            EnsureOceanSurface();
-
-            // Grass SoT: Polytope PT_Grass_02 via GPU GrassField â€” not VSP / Vista DetailDensity.
-            VegetationScatterMenu.BakeGrassOnly();
+            for (var i = 0; i < terrains.Length; i++)
+            {
+                var tile = terrains[i] != null
+                    ? terrains[i].GetComponent<Pinwheel.Vista.UnityTerrain.TerrainTile>()
+                    : null;
+                if (tile != null)
+                {
+                    tile.MatchSeams();
+                }
+            }
         }
 
         /// <summary>
@@ -606,77 +645,10 @@ namespace GameDev.EditorTools
             OverworldLpbBake.SpawnIslandAndMountainStack(manager, seed);
         }
 
-        public static void StripVistaPopulationOutputsPublic(TerrainGraph graph) =>
-            StripVistaPopulationOutputs(graph);
-
         public static void PersistSpawnedOwnedObjectsPublic(
             GameObject spawnedRoot,
             BiomeTemplateSpawnContext context) =>
             PersistSpawnedOwnedObjects(spawnedRoot, context);
-
-        public static void ApplySharpPeakGraphHintsPublic(TerrainGraph graph) =>
-            ApplySharpPeakGraphHints(graph);
-
-        public static void ApplySoftMountainGraphHintsPublic(TerrainGraph graph) =>
-            ApplySoftMountainGraphHints(graph);
-
-        public static void ApplyTallPeakGraphHintsPublic(TerrainGraph graph) =>
-            ApplyTallPeakGraphHints(graph);
-
-        /// <summary>
-        /// Remove tree/detail/object outputs from our working graph clones.
-        /// </summary>
-        private static void StripVistaPopulationOutputs(TerrainGraph graph)
-        {
-            if (graph == null)
-            {
-                return;
-            }
-
-            var path = AssetDatabase.GetAssetPath(graph);
-            if (!string.IsNullOrEmpty(path) &&
-                path.Replace('\\', '/').Contains("/PinwheelStudio/Vista/Personal/BiomeTemplates/"))
-            {
-                Debug.LogError(
-                    $"[MountainBiome] Refusing to strip population nodes on package template: {path}");
-                return;
-            }
-
-            var ids = new System.Collections.Generic.List<string>();
-            foreach (var n in graph.GetNodesOfType<TreeOutputNode>())
-            {
-                ids.Add(n.id);
-            }
-
-            foreach (var n in graph.GetNodesOfType<DetailInstanceOutputNode>())
-            {
-                ids.Add(n.id);
-            }
-
-            foreach (var n in graph.GetNodesOfType<DetailDensityOutputNode>())
-            {
-                ids.Add(n.id);
-            }
-
-            foreach (var n in graph.GetNodesOfType<ObjectOutputNode>())
-            {
-                ids.Add(n.id);
-            }
-
-            if (ids.Count == 0)
-            {
-                return;
-            }
-
-            for (var i = 0; i < ids.Count; i++)
-            {
-                graph.RemoveNode(ids[i]);
-            }
-
-            EditorUtility.SetDirty(graph);
-            AssetDatabase.SaveAssets();
-            Debug.Log($"[MountainBiome] Stripped {ids.Count} population output node(s) from {graph.name}");
-        }
 
         /// <summary>
         /// Persist in-memory graph clones from template spawn into <see cref="VistaGraphsFolder"/>.
@@ -718,238 +690,6 @@ namespace GameDev.EditorTools
             {
                 AssetDatabase.SaveAssets();
             }
-        }
-
-        /// <summary>
-        /// Seeded irregular island polygon â†’ local anchors + Outer falloff.
-        /// </summary>
-        private static void ApplyInsetSquareIslandAnchors(LocalProceduralBiome biome)
-        {
-            OverworldLpbBake.ApplySeededNaturalIslandAnchors(biome, DefaultSeed);
-        }
-
-        /// <summary>Seeded natural island coast (not a fixed square).</summary>
-        public static Vector3[] BuildInsetSquareIslandLocalAnchors(Transform biomeTransform)
-        {
-            return OverworldLpbBake.BuildSeededNaturalIslandLocalAnchors(biomeTransform, DefaultSeed);
-        }
-
-        public static Vector3[] BuildSeededNaturalIslandLocalAnchors(Transform biomeTransform, int worldSeed)
-        {
-            return OverworldLpbBake.BuildSeededNaturalIslandLocalAnchors(biomeTransform, worldSeed);
-        }
-
-        /// <summary>
-        /// Sharper peaks on working Mountain graph clones only.
-        /// </summary>
-        private static void ApplySharpPeakGraphHints(TerrainGraph graph)
-        {
-            if (graph == null)
-            {
-                return;
-            }
-
-            var path = AssetDatabase.GetAssetPath(graph);
-            if (!string.IsNullOrEmpty(path) &&
-                path.Replace('\\', '/').Contains("/PinwheelStudio/Vista/Personal/BiomeTemplates/"))
-            {
-                Debug.LogError(
-                    $"[MountainBiome] Refusing sharp-peak tweaks on package template: {path}");
-                return;
-            }
-
-            var ridgeTouched = 0;
-            foreach (var ridge in graph.GetNodesOfType<RidgedMountainNode>())
-            {
-                ridge.ridgeIntensity = Mathf.Clamp(ridge.ridgeIntensity * 1.35f, 0f, 20f);
-                ridgeTouched++;
-            }
-
-            var erosionTouched = 0;
-            foreach (var erosion in graph.GetNodesOfType<HydraulicErosionNode2>())
-            {
-                erosion.erosionRate = Mathf.Clamp(erosion.erosionRate * 0.55f, 0f, 100f);
-                erosion.iterationCount = Mathf.Max(80, Mathf.RoundToInt(erosion.iterationCount * 0.65f));
-                // Keep sim canvas â‰¤512 for large island biomes (Vista caps at graph resolution).
-                if (erosion.featureSize < 6)
-                {
-                    erosion.featureSize = 6;
-                }
-
-                erosionTouched++;
-            }
-
-            if (ridgeTouched > 0 || erosionTouched > 0)
-            {
-                EditorUtility.SetDirty(graph);
-                Debug.Log(
-                    $"[MountainBiome] Sharp-peak hints: ridges={ridgeTouched} erosionNodes={erosionTouched}");
-            }
-        }
-
-        /// <summary>
-        /// Softer foothills for multi-LPB mountains: more hydraulic smoothing, no ridge boost.
-        /// </summary>
-        private static void ApplySoftMountainGraphHints(TerrainGraph graph)
-        {
-            if (graph == null)
-            {
-                return;
-            }
-
-            var path = AssetDatabase.GetAssetPath(graph);
-            if (!string.IsNullOrEmpty(path) &&
-                path.Replace('\\', '/').Contains("/PinwheelStudio/Vista/Personal/BiomeTemplates/"))
-            {
-                Debug.LogError(
-                    $"[MountainBiome] Refusing soft-mountain tweaks on package template: {path}");
-                return;
-            }
-
-            var ridgeTouched = 0;
-            // Soft foothills: mild ridges + more erosion (need visible peaks after Y-sink).
-            foreach (var ridge in graph.GetNodesOfType<RidgedMountainNode>())
-            {
-                ridge.ridgeIntensity = Mathf.Clamp(ridge.ridgeIntensity * 1.05f, 0f, 20f);
-                ridgeTouched++;
-            }
-
-            var erosionTouched = 0;
-            foreach (var erosion in graph.GetNodesOfType<HydraulicErosionNode2>())
-            {
-                erosion.erosionRate = Mathf.Clamp(erosion.erosionRate * 1.15f, 0f, 100f);
-                erosion.depositionRate = Mathf.Clamp(erosion.depositionRate * 1.2f, 0f, 10f);
-                erosion.iterationCount = Mathf.Max(120, Mathf.RoundToInt(erosion.iterationCount * 1.1f));
-                if (erosion.featureSize < 8)
-                {
-                    erosion.featureSize = 8;
-                }
-
-                erosionTouched++;
-            }
-
-            if (ridgeTouched > 0 || erosionTouched > 0)
-            {
-                EditorUtility.SetDirty(graph);
-                Debug.Log(
-                    $"[MountainBiome] Soft-mountain hints: ridges={ridgeTouched} erosionNodes={erosionTouched}");
-            }
-        }
-
-        /// <summary>
-        /// Tall peaks (400â€“600 m): do NOT rewrite existing Curves (that crushed peaks to ~0.4 â†’ ~190 m).
-        /// Inject one peak-boost Curve before HeightOutput; use full height budget for Y scale.
-        /// </summary>
-        private static void ApplyTallPeakGraphHints(TerrainGraph graph)
-        {
-            if (graph == null)
-            {
-                return;
-            }
-
-            var path = AssetDatabase.GetAssetPath(graph);
-            if (!string.IsNullOrEmpty(path) &&
-                path.Replace('\\', '/').Contains("/PinwheelStudio/Vista/Personal/BiomeTemplates/"))
-            {
-                Debug.LogError(
-                    $"[MountainBiome] Refusing tall-peak tweaks on package template: {path}");
-                return;
-            }
-
-            var ridgeTouched = 0;
-            foreach (var ridge in graph.GetNodesOfType<RidgedMountainNode>())
-            {
-                ridge.ridgeIntensity = Mathf.Clamp(Mathf.Max(ridge.ridgeIntensity, 8f) * 1.25f, 0f, 20f);
-                ridgeTouched++;
-            }
-
-            var erosionTouched = 0;
-            foreach (var erosion in graph.GetNodesOfType<HydraulicErosionNode2>())
-            {
-                erosion.erosionRate = Mathf.Clamp(erosion.erosionRate * 0.7f, 0f, 100f);
-                erosion.depositionRate = Mathf.Clamp(erosion.depositionRate * 0.65f, 0f, 10f);
-                erosion.iterationCount = Mathf.Max(80, Mathf.RoundToInt(erosion.iterationCount * 0.8f));
-                if (erosion.featureSize < 6)
-                {
-                    erosion.featureSize = 6;
-                }
-
-                erosionTouched++;
-            }
-
-            var boostInjected = InjectPeakBoostCurveBeforeHeightOutput(graph);
-
-            EditorUtility.SetDirty(graph);
-            Debug.Log(
-                $"[MountainBiome] Tall-peak hints: ridges={ridgeTouched} erosion={erosionTouched} " +
-                $"peakBoostCurve={boostInjected}");
-        }
-
-        /// <summary>
-        /// Contrast curve: squash foothills, lift mid-high (legacy Mountain-template bake path).
-        /// Modular massifs use Raise + MountainMassif graph instead.
-        /// </summary>
-        private static bool InjectPeakBoostCurveBeforeHeightOutput(TerrainGraph graph)
-        {
-            var heightNodes = graph.GetNodesOfType<HeightOutputNode>();
-            if (heightNodes == null || heightNodes.Count == 0)
-            {
-                return false;
-            }
-
-            var heightOut = heightNodes[0];
-            var edges = graph.GetEdges();
-            IEdge incoming = null;
-            for (var i = 0; i < edges.Count; i++)
-            {
-                var edge = edges[i];
-                if (edge == null)
-                {
-                    continue;
-                }
-
-                if (edge.inputSlot.nodeId == heightOut.id &&
-                    edge.inputSlot.slotId == heightOut.inputSlot.id)
-                {
-                    incoming = edge;
-                    break;
-                }
-            }
-
-            if (incoming == null)
-            {
-                return false;
-            }
-
-            // Already injected on a previous bake of this owned clone.
-            var srcNode = graph.GetNode(incoming.outputSlot.nodeId);
-            if (srcNode is CurveNode existing &&
-                existing.curve != null &&
-                existing.curve.length >= 4 &&
-                Mathf.Abs(existing.curve.Evaluate(0.5f) - 0.85f) < 0.05f)
-            {
-                return false;
-            }
-
-            var boost = new CurveNode();
-            // Raw ~0.45â€“0.55 mid â†’ high; raw foothills ~0.25 â†’ near 0 (under island shelf).
-            boost.curve = new AnimationCurve(
-                new Keyframe(0f, 0f, 0f, 0f),
-                new Keyframe(0.22f, 0f, 0f, 0f),
-                new Keyframe(0.38f, 0.12f, 0.8f, 0.8f),
-                new Keyframe(0.5f, 0.85f, 2.5f, 2.5f),
-                new Keyframe(0.65f, 0.97f, 0.4f, 0.4f),
-                new Keyframe(1f, 1f, 0f, 0f));
-
-            graph.AddNode(boost);
-            graph.RemoveEdge(incoming.id);
-            graph.AddEdge(new Edge(
-                new SlotRef(incoming.outputSlot.nodeId, incoming.outputSlot.slotId),
-                new SlotRef(boost.id, boost.inputSlot.id)));
-            graph.AddEdge(new Edge(
-                new SlotRef(boost.id, boost.outputSlot.id),
-                new SlotRef(heightOut.id, heightOut.inputSlot.id)));
-            return true;
         }
 
         /// <summary>
@@ -1044,19 +784,20 @@ namespace GameDev.EditorTools
                 Debug.LogError("[MountainBiome] Validate FAIL: no LocalProceduralBiome in scene.");
                 ok = false;
             }
-            else if (biome.anchors == null || biome.anchors.Length != IslandAnchorCount)
+            else if (biome.anchors == null || biome.anchors.Length < 3)
             {
                 Debug.LogError(
                     $"[MountainBiome] Validate FAIL: anchors={biome.anchors?.Length ?? 0} " +
-                    $"expected {IslandAnchorCount}");
+                    "(the biome has no usable polygon)");
                 ok = false;
             }
-            else if (biome.falloffDirection != FalloffDirection.Outer ||
-                     Mathf.Abs(biome.falloffDistance - OverworldLpbBake.IslandFalloffLocalMeters) > 0.01f)
+            else if (biome.falloffDirection != FalloffDirection.Outer || biome.falloffDistance <= 0f)
             {
+                // Falloff itself is authored on the template prefab; only assert it is an outward
+                // ramp at all, so the island rim can reach the waterline.
                 Debug.LogError(
                     $"[MountainBiome] Validate FAIL: falloff={biome.falloffDirection}/" +
-                    $"{biome.falloffDistance} expected Outer/{OverworldLpbBake.IslandFalloffLocalMeters}");
+                    $"{biome.falloffDistance} expected an Outer falloff with a positive distance");
                 ok = false;
             }
 
@@ -1177,187 +918,6 @@ namespace GameDev.EditorTools
             }
         }
 
-        private static void ApplyAlpineSnowHint(UnityEngine.Terrain terrain, TerrainBakeFlags flags)
-        {
-            if ((flags & TerrainBakeFlags.IncludeZoneTextures) == 0 || terrain.terrainData == null)
-            {
-                return;
-            }
-
-            // Soft snow layer on gentle peaks above SnowLineMeters using MicroSplat/example-friendly layers
-            // when present; otherwise skip paint (geometry already has alpine from Mountain biome).
-            var layers = terrain.terrainData.terrainLayers;
-            if (layers == null || layers.Length == 0)
-            {
-                return;
-            }
-
-            // Find a layer whose name suggests snow; if none, leave Vista paint as-is.
-            var snowIndex = -1;
-            for (var i = 0; i < layers.Length; i++)
-            {
-                if (layers[i] != null && layers[i].name.ToLowerInvariant().Contains("snow"))
-                {
-                    snowIndex = i;
-                    break;
-                }
-            }
-
-            if (snowIndex < 0)
-            {
-                return;
-            }
-
-            var data = terrain.terrainData;
-            var alphamapW = data.alphamapWidth;
-            var alphamapH = data.alphamapHeight;
-            var maps = data.GetAlphamaps(0, 0, alphamapW, alphamapH);
-            var sizeY = data.size.y;
-            var snow01 = Mathf.Clamp01(
-                (WorldScale.SeaLevelMeters + WorldScale.SnowLineMeters) / Mathf.Max(0.01f, sizeY));
-            var heights = data.GetHeights(0, 0, data.heightmapResolution, data.heightmapResolution);
-
-            for (var y = 0; y < alphamapH; y++)
-            {
-                var v = y / (float)(alphamapH - 1);
-                for (var x = 0; x < alphamapW; x++)
-                {
-                    var u = x / (float)(alphamapW - 1);
-                    var hx = Mathf.RoundToInt(u * (data.heightmapResolution - 1));
-                    var hz = Mathf.RoundToInt(v * (data.heightmapResolution - 1));
-                    var h = heights[hz, hx];
-                    if (h < snow01)
-                    {
-                        continue;
-                    }
-
-                    var strength = Mathf.InverseLerp(snow01, Mathf.Min(1f, snow01 + 0.12f), h);
-                    strength *= strength;
-                    // Skip very steep: compare neighbors.
-                    var hL = heights[hz, Mathf.Max(0, hx - 1)];
-                    var hR = heights[hz, Mathf.Min(data.heightmapResolution - 1, hx + 1)];
-                    var slope = Mathf.Abs(hR - hL) * sizeY;
-                    if (slope > 0.55f)
-                    {
-                        continue;
-                    }
-
-                    var sum = 0f;
-                    for (var l = 0; l < layers.Length; l++)
-                    {
-                        if (l == snowIndex)
-                        {
-                            maps[y, x, l] = Mathf.Lerp(maps[y, x, l], 1f, strength);
-                        }
-                        else
-                        {
-                            maps[y, x, l] *= 1f - strength;
-                        }
-
-                        sum += maps[y, x, l];
-                    }
-
-                    if (sum > 1e-5f)
-                    {
-                        for (var l = 0; l < layers.Length; l++)
-                        {
-                            maps[y, x, l] /= sum;
-                        }
-                    }
-                }
-            }
-
-            data.SetAlphamaps(0, 0, maps);
-        }
-
-        /// <summary>Paint shore sand near sea level on gentle coastal slopes (MicroSplat shore_sand layer).</summary>
-        private static void ApplyCoastSplatHint(UnityEngine.Terrain terrain, TerrainBakeFlags flags)
-        {
-            if ((flags & TerrainBakeFlags.IncludeZoneTextures) == 0 || terrain.terrainData == null)
-            {
-                return;
-            }
-
-            var layers = terrain.terrainData.terrainLayers;
-            if (layers == null || layers.Length == 0)
-            {
-                return;
-            }
-
-            var sandIndex = -1;
-            for (var i = 0; i < layers.Length; i++)
-            {
-                if (layers[i] != null && layers[i].name.ToLowerInvariant().Contains("shore"))
-                {
-                    sandIndex = i;
-                    break;
-                }
-            }
-
-            if (sandIndex < 0)
-            {
-                return;
-            }
-
-            var data = terrain.terrainData;
-            var alphamapW = data.alphamapWidth;
-            var alphamapH = data.alphamapHeight;
-            var maps = data.GetAlphamaps(0, 0, alphamapW, alphamapH);
-            var sizeY = data.size.y;
-            var sea01 = Mathf.Clamp01(WorldScale.SeaLevelMeters / Mathf.Max(0.01f, sizeY));
-            var beachTop01 = Mathf.Clamp01(
-                (WorldScale.SeaLevelMeters + WorldScale.BeachWidthMeters) / Mathf.Max(0.01f, sizeY));
-            var heights = data.GetHeights(0, 0, data.heightmapResolution, data.heightmapResolution);
-
-            for (var y = 0; y < alphamapH; y++)
-            {
-                var v = y / (float)(alphamapH - 1);
-                for (var x = 0; x < alphamapW; x++)
-                {
-                    var u = x / (float)(alphamapW - 1);
-                    var hx = Mathf.RoundToInt(u * (data.heightmapResolution - 1));
-                    var hz = Mathf.RoundToInt(v * (data.heightmapResolution - 1));
-                    var h = heights[hz, hx];
-                    if (h < sea01 - 0.01f || h > beachTop01)
-                    {
-                        continue;
-                    }
-
-                    var strength = 1f - Mathf.Abs(Mathf.InverseLerp(sea01, beachTop01, h) - 0.35f) * 1.4f;
-                    strength = Mathf.Clamp01(strength);
-                    if (strength < 0.05f)
-                    {
-                        continue;
-                    }
-
-                    var sum = 0f;
-                    for (var l = 0; l < layers.Length; l++)
-                    {
-                        if (l == sandIndex)
-                        {
-                            maps[y, x, l] = Mathf.Lerp(maps[y, x, l], 1f, strength);
-                        }
-                        else
-                        {
-                            maps[y, x, l] *= 1f - strength;
-                        }
-
-                        sum += maps[y, x, l];
-                    }
-
-                    if (sum > 1e-5f)
-                    {
-                        for (var l = 0; l < layers.Length; l++)
-                        {
-                            maps[y, x, l] /= sum;
-                        }
-                    }
-                }
-            }
-
-            data.SetAlphamaps(0, 0, maps);
-        }
-
         public static void EnsureOceanSurface()
         {
             WaterZoneMenu.EnsureOceanOcWPlane();
@@ -1377,9 +937,10 @@ namespace GameDev.EditorTools
 
         public static Material EnsureOverworldTerrainMaterial()
         {
-            // Never assign bare Shader.Find("MicroSplat/MicroSplat") â€” that shader has no
-            // diffuse arrays and reads as blown-white. Convert â†’ MicroSplatTerrain.Sync sets
-            // the real generated material. Until then use URP TerrainLit.
+            // URP TerrainLit is the terrain material for the overworld. It reads the TerrainLayer
+            // assets Vista binds through the graphs' Texture Outputs — albedo, normal, UV tiling,
+            // smoothness and diffuse remap all come from those assets and are tuned in the
+            // Inspector, never from generation code.
             var existing = AssetDatabase.LoadAssetAtPath<Material>(TerrainMaterialPath);
             if (existing != null && existing.shader != null && existing.shader.name == TerrainShaderName)
             {

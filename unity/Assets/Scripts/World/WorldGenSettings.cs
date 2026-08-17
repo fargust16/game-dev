@@ -29,9 +29,7 @@ namespace GameDev.World
         public bool RunMarkers;
         public bool RunSettlements;
         public bool RunRoads;
-        public bool RunTrees;
-        public bool RunUndergrowth;
-        public bool RunGrass;
+        /// <summary>Legacy prefab canopy. The biome graphs place trees during Surface.</summary>
         public bool RunPlayer;
 
         public static WorldGenSettings Default => new WorldGenSettings
@@ -54,9 +52,6 @@ namespace GameDev.World
             RunMarkers = true,
             RunSettlements = true,
             RunRoads = true,
-            RunTrees = true,
-            RunUndergrowth = true,
-            RunGrass = true,
             RunPlayer = true,
         };
 
@@ -86,9 +81,6 @@ namespace GameDev.World
                 case OverworldPipelineStepId.Markers: return RunMarkers;
                 case OverworldPipelineStepId.Settlements: return RunSettlements;
                 case OverworldPipelineStepId.Roads: return RunRoads;
-                case OverworldPipelineStepId.Trees: return RunTrees;
-                case OverworldPipelineStepId.Undergrowth: return RunUndergrowth;
-                case OverworldPipelineStepId.Grass: return RunGrass;
                 case OverworldPipelineStepId.Player: return RunPlayer;
                 default: return true;
             }
@@ -104,9 +96,6 @@ namespace GameDev.World
         Markers,
         Settlements,
         Roads,
-        Trees,
-        Undergrowth,
-        Grass,
         Player,
     }
 }

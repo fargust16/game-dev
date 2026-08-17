@@ -100,9 +100,6 @@ namespace GameDev.EditorTools
             settings.RunMarkers = EditorGUILayout.Toggle("Markers", settings.RunMarkers);
             settings.RunSettlements = EditorGUILayout.Toggle("Settlements", settings.RunSettlements);
             settings.RunRoads = EditorGUILayout.Toggle("Roads", settings.RunRoads);
-            settings.RunTrees = EditorGUILayout.Toggle("Trees", settings.RunTrees);
-            settings.RunUndergrowth = EditorGUILayout.Toggle("Undergrowth", settings.RunUndergrowth);
-            settings.RunGrass = EditorGUILayout.Toggle("Grass", settings.RunGrass);
             settings.RunPlayer = EditorGUILayout.Toggle("Player", settings.RunPlayer);
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("All On"))
@@ -127,9 +124,6 @@ namespace GameDev.EditorTools
             settings.RunMarkers = on;
             settings.RunSettlements = on;
             settings.RunRoads = on;
-            settings.RunTrees = on;
-            settings.RunUndergrowth = on;
-            settings.RunGrass = on;
             settings.RunPlayer = on;
         }
 
@@ -247,7 +241,7 @@ namespace GameDev.EditorTools
             }
 
             // Older prefs without step flags deserialize as false — treat all-false as Default on.
-            if (!settings.RunSurface && !settings.RunRoads && !settings.RunTrees)
+            if (!settings.RunSurface && !settings.RunRoads && !settings.RunPlayer)
             {
                 var d = WorldGenSettings.Default;
                 settings.RunSurface = d.RunSurface;
@@ -256,9 +250,6 @@ namespace GameDev.EditorTools
                 settings.RunMarkers = d.RunMarkers;
                 settings.RunSettlements = d.RunSettlements;
                 settings.RunRoads = d.RunRoads;
-                settings.RunTrees = d.RunTrees;
-                settings.RunUndergrowth = d.RunUndergrowth;
-                settings.RunGrass = d.RunGrass;
                 settings.RunPlayer = d.RunPlayer;
             }
 

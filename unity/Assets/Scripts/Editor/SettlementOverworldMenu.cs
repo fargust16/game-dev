@@ -91,11 +91,10 @@ namespace GameDev.EditorTools
         private static TerrainLayer EnsureDustTerrainLayer()
         {
             const string path = "Assets/Settings/TerrainLayers/Dirt_Settlement_Dust.terrainlayer";
+            // Look (albedo remap, tiling) belongs to the layer asset and is tuned in the Inspector.
             var existing = AssetDatabase.LoadAssetAtPath<TerrainLayer>(path);
             if (existing != null)
             {
-                TerrainBiomePalette.Apply(existing, TerrainBiomePalette.Dust, TerrainBiomePalette.AlbedoTileMeters);
-                EditorUtility.SetDirty(existing);
                 return existing;
             }
 
@@ -118,7 +117,6 @@ namespace GameDev.EditorTools
 
             var layer = Object.Instantiate(source);
             layer.name = "Dirt_Settlement_Dust";
-            TerrainBiomePalette.Apply(layer, TerrainBiomePalette.Dust, TerrainBiomePalette.AlbedoTileMeters);
             AssetDatabase.CreateAsset(layer, path);
             AssetDatabase.SaveAssets();
             return layer;

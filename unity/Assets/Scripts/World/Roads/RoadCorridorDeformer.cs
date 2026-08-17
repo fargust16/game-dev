@@ -22,6 +22,12 @@ namespace GameDev.World.Roads
             if (terrain == null || terrain.terrainData == null || roads == null || roads.Count == 0)
                 return;
 
+#if UNITY_EDITOR
+            // Split so the [Gen] log distinguishes "stamping heights" from "repainting alphamaps".
+            // The roads step dominates Generate All and the two halves have nothing in common:
+            // one is bounded by corridor length, the other by alphamap resolution times layer count.
+            var heightTimer = System.Diagnostics.Stopwatch.StartNew();
+#endif
             var data = terrain.terrainData;
             var resolution = data.heightmapResolution;
             var heights = data.GetHeights(0, 0, resolution, resolution);
@@ -42,8 +48,24 @@ namespace GameDev.World.Roads
 
             data.SetHeights(0, 0, heights);
 
+#if UNITY_EDITOR
+            heightTimer.Stop();
+            UnityEngine.Debug.Log(
+                $"[Gen] step=roads.heights ms={heightTimer.ElapsedMilliseconds} | " +
+                $"{roads.Count} corridors, heightmap {resolution}x{resolution}");
+            var paintTimer = System.Diagnostics.Stopwatch.StartNew();
+#endif
+
             if (centerLayer != null)
                 RoadSurfacePaint.Paint(terrain, roads, centerLayer, edgeLayer, gravelLayer);
+
+#if UNITY_EDITOR
+            paintTimer.Stop();
+            UnityEngine.Debug.Log(
+                $"[Gen] step=roads.paint ms={paintTimer.ElapsedMilliseconds} | " +
+                $"alphamap {data.alphamapResolution}x{data.alphamapResolution}, " +
+                $"{data.terrainLayers.Length} layers");
+#endif
 
             var collider = terrain.GetComponent<TerrainCollider>();
             if (collider != null)

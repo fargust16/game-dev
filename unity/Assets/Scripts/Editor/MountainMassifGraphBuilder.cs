@@ -1,202 +1,268 @@
 #if UNITY_EDITOR
-using System.IO;
 using Pinwheel.Vista;
 using Pinwheel.Vista.Graph;
 using UnityEditor;
 using UnityEngine;
+using SurfaceLayer = GameDev.EditorTools.OverworldTerrainLayers.SurfaceLayer;
 
 namespace GameDev.EditorTools
 {
     /// <summary>
-    /// One mountain massif as a <b>height delta</b> for Raise blend: foothills near 0,
-    /// ridge/peaks in the core — not a dome shaped by Outer falloff alone.
+    /// One mountain massif as a <b>height delta</b> for Raise blend, built on the architecture of
+    /// Vista's own <c>Mountain_TerrainGraphTemplate</c>: two noise scales → shaping → hydraulic
+    /// erosion, then surface masks derived from the <c>Height Map</c> / <c>ErosionMask</c> variables.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The massif is additive geology on top of <c>LPB_IslandBase</c>, so the graph must stay near 0
+    /// at the periphery — otherwise Raise stamps a plateau instead of foothills. That is what the
+    /// foothill curve does; it sits where the reference graph has a plain <c>Levels</c>.
+    /// </para>
+    /// <para>
+    /// Everything works in the graph's normalized 0..1 delta height. How many metres that is comes
+    /// from the biome's <c>Set Biome Height On Spawn</c> value on the template prefab, so a change
+    /// there rescales the massif without touching this file.
+    /// </para>
+    /// <para>
+    /// The asset is authored once and then owned by the designer. The bake only ever
+    /// <see cref="Load"/>s it; <see cref="Rebuild"/> is an explicit, confirmed menu action.
+    /// </para>
+    /// </remarks>
     public static class MountainMassifGraphBuilder
     {
         public const string GraphAssetPath = "Assets/Settings/Vista/MountainMassif_TerrainGraph.asset";
-        public const int ExpectedTextureOutputs = 4;
-        /// <summary>Bump to force LoadOrRebuild when peak curve / maxHeight changes.</summary>
-        public const float ExpectedBodyMaxHeight = 1f;
 
-        private const string GrassLayerPath = "Assets/Settings/TerrainLayers/Grass_Fields.terrainlayer";
-        private const string SoilLayerPath = "Assets/Settings/TerrainLayers/Dirt_Scaled.terrainlayer";
-        private const string RockLayerPath = "Assets/Settings/TerrainLayers/MicroSplat/MS_Rock_Cliff.terrainlayer";
-        private const string CliffLayerPath = "Assets/Settings/TerrainLayers/Cliff_Rock.terrainlayer";
+        /// <summary>Foothill skirt: the bottom slice of the massif, where green can grow.</summary>
+        private const float FoothillTop01 = 0.28f;
 
-        [MenuItem("GameDev/Overworld/Vista/Rebuild Mountain Massif Graph")]
+        /// <summary>Weight Blend priority slots. One per canonical surface layer.</summary>
+        private const int WeightBlendLayers = OverworldTerrainLayers.CanonicalLayerCount;
+
+        [MenuItem("GameDev/Overworld/Vista/Rebuild Mountain Massif Graph (destructive)")]
         public static void RebuildMenu()
         {
-            var graph = Rebuild();
-            if (graph == null)
-                return;
-            Selection.activeObject = graph;
-            EditorGUIUtility.PingObject(graph);
-            Debug.Log($"[MountainMassif] Rebuilt ridge+foothills graph at {GraphAssetPath}");
-        }
-
-        public static TerrainGraph LoadOrRebuild()
-        {
-            var graph = AssetDatabase.LoadAssetAtPath<TerrainGraph>(GraphAssetPath);
-            if (graph != null &&
-                graph.GetNode<HeightOutputNode>() != null &&
-                graph.GetNode<GenericMountainNode>() != null &&
-                graph.GetNodesOfType<TextureOutputNode>().Count >= ExpectedTextureOutputs)
+            if (!EditorUtility.DisplayDialog(
+                    "Rebuild the mountain massif terrain graph?",
+                    "This re-authors MountainMassif_TerrainGraph from code, in place. Every edit made in " +
+                    "the Vista graph editor is lost; references to the asset are kept.",
+                    "Rebuild",
+                    "Cancel"))
             {
-                var body = graph.GetNode<GenericMountainNode>() as GenericMountainNode;
-                if (body != null && Mathf.Abs(body.maxHeight - ExpectedBodyMaxHeight) < 0.01f)
-                    return graph;
+                return;
             }
 
-            return Rebuild();
+            var graph = Rebuild();
+            if (graph == null)
+            {
+                return;
+            }
+
+            Selection.activeObject = graph;
+            EditorGUIUtility.PingObject(graph);
+            Debug.Log($"[MountainMassif] Rebuilt graph at {GraphAssetPath}");
         }
 
+        /// <summary>Loads the authored graph. Never rebuilds — the asset is the source of truth.</summary>
+        public static TerrainGraph Load()
+        {
+            var graph = AssetDatabase.LoadAssetAtPath<TerrainGraph>(GraphAssetPath);
+            if (graph == null)
+            {
+                Debug.LogError(
+                    $"[MountainMassif] No terrain graph at {GraphAssetPath}. " +
+                    "Run GameDev/Overworld/Vista/Rebuild Mountain Massif Graph (destructive) once.");
+            }
+
+            return graph;
+        }
+
+        /// <summary>Re-authors the asset from code, discarding any Inspector edits.</summary>
         public static TerrainGraph Rebuild()
         {
-            EnsureFolder("Assets/Settings");
-            EnsureFolder("Assets/Settings/Vista");
-            if (AssetDatabase.LoadAssetAtPath<TerrainGraph>(GraphAssetPath) != null)
-                AssetDatabase.DeleteAsset(GraphAssetPath);
+            VistaGraphBuild.EnsureFolder("Assets/Settings/Vista");
 
             var graph = ScriptableObject.CreateInstance<TerrainGraph>();
             graph.name = "MountainMassif_TerrainGraph";
 
-            // Macro mass — periphery low so Raise does not stamp a plateau; core reaches ~1.
-            var body = new GenericMountainNode();
-            body.mountainScale = 900f;
-            body.peakVariationScale = 1200f;
-            body.minHeight = 0f;
-            body.maxHeight = 1f;
-            body.seed = 17;
-
-            // Secondary ridges / 2–5 peak hints (legacy RidgedMountain — one instance only).
-            var ridges = new RidgedMountainNode();
-            ridges.scale = 420f;
-            ridges.ridgeIntensity = 8f;
-            ridges.seed = 91;
-
-            var addRidges = new CombineNode();
-            addRidges.mode = CombineNode.Mode.Add;
-            addRidges.backgroundMultiplier = 1f;
-            addRidges.foregroundMultiplier = 0.35f;
-
-            // Foothills stay low at the rim; mid→peak rises hard so Raise delta actually shows.
-            var foothillCurve = new CurveNode();
-            foothillCurve.curve = new AnimationCurve(
-                new Keyframe(0f, 0f, 0f, 0.2f),
-                new Keyframe(0.18f, 0.05f, 0.4f, 0.4f),
-                new Keyframe(0.4f, 0.32f, 1.2f, 1.2f),
-                new Keyframe(0.62f, 0.72f, 1.4f, 1.4f),
-                new Keyframe(0.82f, 0.94f, 0.6f, 0.6f),
-                new Keyframe(1f, 1f, 0f, 0f));
-
-            // Single HydraulicErosion2 — dual instances share temp RT names and look like "fangs".
-            var erosion = new HydraulicErosionNode2();
-            erosion.featureSize = 12;
-            erosion.iterationCount = 140;
-            erosion.rainRate = 6f;
-            erosion.erosionRate = 6f;
-            erosion.depositionRate = 0.3f;
-            erosion.evaporationRate = 10f;
-            erosion.useBorderFade = true;
-
-            var heightOut = new HeightOutputNode();
-
-            // Textures: foothill grass/soil → rock → cliff (mountain graph must paint grass so
-            // Texture Replace under Raise does not wipe island greens to bare rock).
-            var soilSlope = new SlopeMaskNode();
-            soilSlope.minAngle = 8f;
-            soilSlope.maxAngle = 32f;
-            soilSlope.transition = Utilities.EaseInOutCurve();
-
-            var rockSlope = new SlopeMaskNode();
-            rockSlope.minAngle = 20f;
-            rockSlope.maxAngle = 48f;
-            rockSlope.transition = Utilities.EaseInOutCurve();
-
-            var cliffSlope = new SlopeMaskNode();
-            cliffSlope.minAngle = 38f;
-            cliffSlope.maxAngle = 85f;
-            cliffSlope.transition = Utilities.EaseInOutCurve();
-
-            var weightBlend = new WeightBlendNode();
-            weightBlend.layerCount = 4;
-
-            var grassOut = new TextureOutputNode();
-            grassOut.order = 0;
-            grassOut.terrainLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(GrassLayerPath);
-
-            var soilOut = new TextureOutputNode();
-            soilOut.order = 1;
-            soilOut.terrainLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(SoilLayerPath);
-
-            var rockOut = new TextureOutputNode();
-            rockOut.order = 2;
-            rockOut.terrainLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RockLayerPath);
-
-            var cliffOut = new TextureOutputNode();
-            cliffOut.order = 3;
-            cliffOut.terrainLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(CliffLayerPath);
-
-            graph.AddNode(body);
-            graph.AddNode(ridges);
-            graph.AddNode(addRidges);
-            graph.AddNode(foothillCurve);
-            graph.AddNode(erosion);
-            graph.AddNode(heightOut);
-            graph.AddNode(soilSlope);
-            graph.AddNode(rockSlope);
-            graph.AddNode(cliffSlope);
-            graph.AddNode(weightBlend);
-            graph.AddNode(grassOut);
-            graph.AddNode(soilOut);
-            graph.AddNode(rockOut);
-            graph.AddNode(cliffOut);
-
-            Connect(graph, body.id, body.outputSlot.id, addRidges.id, addRidges.backgroundSlot.id);
-            Connect(graph, ridges.id, ridges.outputSlot.id, addRidges.id, addRidges.foregroundSlot.id);
-            Connect(graph, addRidges.id, addRidges.outputSlot.id, foothillCurve.id, foothillCurve.inputSlot.id);
-            Connect(graph, foothillCurve.id, foothillCurve.outputSlot.id, erosion.id, erosion.inputHeightSlot.id);
-            Connect(graph, erosion.id, erosion.outputHeightSlot.id, heightOut.id, heightOut.inputSlot.id);
-
-            Connect(graph, erosion.id, erosion.outputHeightSlot.id, soilSlope.id, soilSlope.inputSlot.id);
-            Connect(graph, erosion.id, erosion.outputHeightSlot.id, rockSlope.id, rockSlope.inputSlot.id);
-            Connect(graph, erosion.id, erosion.outputHeightSlot.id, cliffSlope.id, cliffSlope.inputSlot.id);
-
-            Connect(graph, soilSlope.id, soilSlope.outputSlot.id, weightBlend.id, weightBlend.inputSlots[1].id);
-            Connect(graph, rockSlope.id, rockSlope.outputSlot.id, weightBlend.id, weightBlend.inputSlots[2].id);
-            Connect(graph, cliffSlope.id, cliffSlope.outputSlot.id, weightBlend.id, weightBlend.inputSlots[3].id);
-
-            Connect(graph, weightBlend.id, weightBlend.outputSlots[0].id, grassOut.id, grassOut.inputSlot.id);
-            Connect(graph, weightBlend.id, weightBlend.outputSlots[1].id, soilOut.id, soilOut.inputSlot.id);
-            Connect(graph, weightBlend.id, weightBlend.outputSlots[2].id, rockOut.id, rockOut.inputSlot.id);
-            Connect(graph, weightBlend.id, weightBlend.outputSlots[3].id, cliffOut.id, cliffOut.inputSlot.id);
+            BuildTerrainStage(graph);
+            var surface = BuildSurfaceStage(graph);
+            // Green source = the grass weight (Weight Blend layer 2), so canopy follows the paint.
+            VistaGraphBuild.AddVegetationStage(
+                graph,
+                surface,
+                surface.outputSlots[2].id,
+                treeMaxSlopeDegrees: 34f,
+                seed: 7713,
+                includeGroundCover: false);
 
             graph.Validate();
-            AssetDatabase.CreateAsset(graph, GraphAssetPath);
-            EditorUtility.SetDirty(graph);
-            AssetDatabase.SaveAssets();
-            return graph;
+            // Overwrite in place so the asset GUID survives and the biome template prefabs keep
+            // pointing at it.
+            return VistaGraphBuild.SaveGraph(graph, GraphAssetPath);
         }
 
-        private static void Connect(
+        /// <summary>
+        /// The reference biome's height recipe, with only the feature scales changed.
+        /// </summary>
+        /// <remarks>
+        /// Detail noise × broad mass noise → the reference's <c>Levels</c> → hydraulic erosion. Every
+        /// node keeps the reference's own values; the massif's elongated footprint comes from the LPB
+        /// anchors and falloff mask, and its height from Set Biome Height On Spawn.
+        /// </remarks>
+        private static void BuildTerrainStage(TerrainGraph graph)
+        {
+            var ridges = VistaGraphBuild.AddDetailNoise(graph, scale: 750f, seed: 17);
+            var mass = VistaGraphBuild.AddMassNoise(graph, scale: 1000f, seed: 91);
+
+            var shape = new CombineNode { mode = CombineNode.Mode.Multiply };
+            graph.AddNode(shape);
+
+            var levels = VistaGraphBuild.AddReferenceLevels(graph);
+
+            // Two passes, as the reference has: macro drainage, then fine detail. The erosion mask
+            // comes off the second one, which is far less eager to call terrain "bare soil".
+            var macroErosion = VistaGraphBuild.AddMacroErosion(graph);
+            var microErosion = VistaGraphBuild.AddMicroErosion(graph);
+
+            var setHeight = VistaGraphBuild.AddSetVar(graph, VistaGraphBuild.VarHeightMap);
+            var heightOut = new HeightOutputNode();
+            graph.AddNode(heightOut);
+
+            VistaGraphBuild.Connect(graph, ridges.id, ridges.outputSlot.id, shape.id, shape.backgroundSlot.id);
+            VistaGraphBuild.Connect(graph, mass.id, mass.outputSlot.id, shape.id, shape.foregroundSlot.id);
+            VistaGraphBuild.Connect(graph, shape.id, shape.outputSlot.id, levels.id, levels.inputSlot.id);
+            VistaGraphBuild.Connect(
+                graph, levels.id, levels.outputSlot.id, macroErosion.id, macroErosion.inputHeightSlot.id);
+            VistaGraphBuild.Connect(
+                graph, macroErosion.id, macroErosion.outputHeightSlot.id,
+                microErosion.id, microErosion.inputHeightSlot.id);
+
+            VistaGraphBuild.Connect(
+                graph, microErosion.id, microErosion.outputHeightSlot.id, setHeight.id, setHeight.inputSlot.id);
+            VistaGraphBuild.Connect(
+                graph, setHeight.id, setHeight.outputSlot.id, heightOut.id, heightOut.inputSlot.id);
+
+            VistaGraphBuild.PublishErosionMask(graph, microErosion);
+        }
+
+        /// <summary>
+        /// The five canonical surface layers, reproducing the reference biome's mask topology.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Weight Blend stacks its inputs: output i is <c>in[i] * Π(1 - in[j])</c> for every j above
+        /// i, so the <b>last</b> connected layer wins and layer 0 is the base. Layer 0 is left
+        /// unconnected on purpose — Weight Blend fills it white, which is what makes the weights sum
+        /// to 1. Blend priority is rock (base) → soil → grass → sand (unused) → cliff, mirroring the
+        /// reference's rock → soil → moss → grass → ridge stack.
+        /// </para>
+        /// <para>
+        /// Sand has no place on a massif, but its output is still emitted so this graph and the
+        /// island graph produce the same layer stack on every tile. Its Weight Blend input stays
+        /// unconnected, which Vista reads as black.
+        /// </para>
+        /// </remarks>
+        /// <returns>The Weight Blend node; the caller picks the slot the vegetation stage reads.</returns>
+        private static WeightBlendNode BuildSurfaceStage(TerrainGraph graph)
+        {
+            // --- Soil: sediment settles in the drainage (reference layer 1) ---
+            var erosionForSoil = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarErosionMask);
+            var soil = VistaGraphBuild.AddSoilLevels(graph);
+
+            // --- Grass: hollows low on the massif (reference layer 2: Concave → Smooth → height) ---
+            var heightForGrass = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarHeightMap);
+            var hollows = new ConcaveNode { epsilon = 0.31f, tolerance = 3 };
+            var hollowsSmooth = new SmoothNode { iterationCount = 30 };
+            var heightForFoothill = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarHeightMap);
+            var foothillBand = new CurveNode
+            {
+                curve = VistaGraphBuild.LowAltitudeCurve(FoothillTop01 * 0.5f, FoothillTop01),
+            };
+            var grass = new CombineNode { mode = CombineNode.Mode.Multiply };
+
+            // --- Cliff: the reference's ridge highlight — invert the erosion mask, with flat
+            //     ground removed first so the low-activity skirt does not read as bare stone ---
+            var erosionForRidge = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarErosionMask);
+            var ridgeErosion = new CurveNode { curve = VistaGraphBuild.ErosionPresenceCurve() };
+            var heightForFlat = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarHeightMap);
+            // Flat gate, verbatim from the reference: a constant transition, because SlopeMask
+            // already hard-gates at min/max and the default plateau curve would zero out 0° ground.
+            var flatGround = new SlopeMaskNode
+            {
+                minAngle = 0f,
+                maxAngle = 3f,
+                transition = VistaGraphBuild.ConstantCurve(),
+            };
+            var ridgeOrFlat = new CombineNode { mode = CombineNode.Mode.Max };
+            var cliff = VistaGraphBuild.AddInvert(graph);
+
+            var weightBlend = new WeightBlendNode { layerCount = WeightBlendLayers };
+
+            graph.AddNode(hollows);
+            graph.AddNode(hollowsSmooth);
+            graph.AddNode(foothillBand);
+            graph.AddNode(grass);
+            graph.AddNode(ridgeErosion);
+            graph.AddNode(flatGround);
+            graph.AddNode(ridgeOrFlat);
+            graph.AddNode(weightBlend);
+
+            var outputs = VistaGraphBuild.AddCanonicalTextureOutputs(graph);
+
+            VistaGraphBuild.Connect(
+                graph, erosionForSoil.id, erosionForSoil.outputSlot.id, soil.id, soil.inputSlot.id);
+
+            VistaGraphBuild.Connect(
+                graph, heightForGrass.id, heightForGrass.outputSlot.id, hollows.id, hollows.inputSlot.id);
+            VistaGraphBuild.Connect(
+                graph, hollows.id, hollows.outputSlot.id, hollowsSmooth.id, hollowsSmooth.inputSlot.id);
+            VistaGraphBuild.Connect(
+                graph, heightForFoothill.id, heightForFoothill.outputSlot.id,
+                foothillBand.id, foothillBand.inputSlot.id);
+            VistaGraphBuild.Connect(
+                graph, hollowsSmooth.id, hollowsSmooth.outputSlot.id, grass.id, grass.backgroundSlot.id);
+            VistaGraphBuild.Connect(
+                graph, foothillBand.id, foothillBand.outputSlot.id, grass.id, grass.foregroundSlot.id);
+
+            VistaGraphBuild.Connect(
+                graph, erosionForRidge.id, erosionForRidge.outputSlot.id,
+                ridgeErosion.id, ridgeErosion.inputSlot.id);
+            VistaGraphBuild.Connect(
+                graph, heightForFlat.id, heightForFlat.outputSlot.id, flatGround.id, flatGround.inputSlot.id);
+            VistaGraphBuild.Connect(
+                graph, ridgeErosion.id, ridgeErosion.outputSlot.id,
+                ridgeOrFlat.id, ridgeOrFlat.backgroundSlot.id);
+            VistaGraphBuild.Connect(
+                graph, flatGround.id, flatGround.outputSlot.id, ridgeOrFlat.id, ridgeOrFlat.foregroundSlot.id);
+            VistaGraphBuild.Connect(
+                graph, ridgeOrFlat.id, ridgeOrFlat.outputSlot.id, cliff.id, cliff.inputSlot.id);
+
+            // Layer 0 (rock) intentionally unconnected — Weight Blend defaults it to white.
+            VistaGraphBuild.Connect(graph, soil.id, soil.outputSlot.id, weightBlend.id, weightBlend.inputSlots[1].id);
+            VistaGraphBuild.Connect(graph, grass.id, grass.outputSlot.id, weightBlend.id, weightBlend.inputSlots[2].id);
+            // Weight Blend input 3 (sand) stays unconnected: black on a massif.
+            VistaGraphBuild.Connect(graph, cliff.id, cliff.outputSlot.id, weightBlend.id, weightBlend.inputSlots[4].id);
+
+            ConnectBlendToOutput(graph, weightBlend, 0, outputs, SurfaceLayer.Rock);
+            ConnectBlendToOutput(graph, weightBlend, 1, outputs, SurfaceLayer.Soil);
+            ConnectBlendToOutput(graph, weightBlend, 2, outputs, SurfaceLayer.Grass);
+            ConnectBlendToOutput(graph, weightBlend, 3, outputs, SurfaceLayer.Sand);
+            ConnectBlendToOutput(graph, weightBlend, 4, outputs, SurfaceLayer.Cliff);
+
+            return weightBlend;
+        }
+
+        /// <summary>Routes one Weight Blend priority slot to the canonical layer it paints.</summary>
+        private static void ConnectBlendToOutput(
             TerrainGraph graph,
-            string outNodeId,
-            int outSlotId,
-            string inNodeId,
-            int inSlotId)
+            WeightBlendNode weightBlend,
+            int blendLayer,
+            TextureOutputNode[] outputs,
+            SurfaceLayer layer)
         {
-            graph.AddEdge(new Edge(new SlotRef(outNodeId, outSlotId), new SlotRef(inNodeId, inSlotId)));
-        }
-
-        private static void EnsureFolder(string path)
-        {
-            if (AssetDatabase.IsValidFolder(path))
-                return;
-            var parent = Path.GetDirectoryName(path)?.Replace('\\', '/');
-            var name = Path.GetFileName(path);
-            if (!string.IsNullOrEmpty(parent) && !AssetDatabase.IsValidFolder(parent))
-                EnsureFolder(parent);
-            AssetDatabase.CreateFolder(parent, name);
+            var output = outputs[(int)layer];
+            VistaGraphBuild.Connect(
+                graph, weightBlend.id, weightBlend.outputSlots[blendLayer].id, output.id, output.inputSlot.id);
         }
     }
 }

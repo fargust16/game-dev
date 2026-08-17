@@ -7,7 +7,6 @@ using GameDev.World.Roads;
 using GameDev.World.Settlement;
 using GameDev.World.Streaming;
 using GameDev.World.Terrain;
-using GameDev.World.Vegetation;
 using GameDev.World.Water;
 using UnityEditor;
 using UnityEngine;
@@ -56,12 +55,14 @@ private const float BridgeSpanDetectionThresholdMeters = GridCellSizeMeters * 1.
             IWaterSampler waterZones = SeaLevelOceanSampler.FromTerrain(terrain);
             var heightSampler = new TerrainWorldHeightSampler(terrain);
 
+            // World extent, not one tile — the road grid has to reach every POI, and those are
+            // planned across the whole 2x2 world. A tile-sized grid silently clipped the network to
+            // the bottom-left quadrant. See the note in OverworldWorldPlan.BuildAndStorePois.
             var margin = OverworldTileChunks.DefaultMarginMeters;
-            var tileSize = WorldScale.OverworldTileMeters;
             var minX = margin;
             var minZ = margin;
-            var usableSizeX = tileSize - 2f * margin;
-            var usableSizeZ = tileSize - 2f * margin;
+            var usableSizeX = WorldScale.WorldExtentXMeters - 2f * margin;
+            var usableSizeZ = WorldScale.WorldExtentZMeters - 2f * margin;
             float HeightMeters(float x, float z) => sampler.SampleWorldHeight(x, z);
 
             var settings = OverworldTerrainMenu.ActiveSettings;
@@ -108,17 +109,28 @@ if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y
 
             bool CanBridgeSpan(Vector2 from, Vector2 to) => false;
 
+            // The roads step is ~90 % of Generate All, and the per-step timing above only says
+            // "roads". These sub-timings say which half: searching for routes, or writing them into
+            // the terrain. Same [Gen] format, so they read inline with the rest.
             var planner = new LandscapePlanner();
-            planner.BuildCostField(
-                minX, minZ, usableSizeX, usableSizeZ,
-                HeightMeters,
-                (x, z) => sampler.SampleBiome(x, z),
-                WorldScale.LandscapeCostCellMeters);
+            OverworldGenTiming.Time(
+                "roads.costfield",
+                () => planner.BuildCostField(
+                    minX, minZ, usableSizeX, usableSizeZ,
+                    HeightMeters,
+                    (x, z) => sampler.SampleBiome(x, z),
+                    WorldScale.LandscapeCostCellMeters),
+                $"{usableSizeX:F0}x{usableSizeZ:F0}m at {WorldScale.LandscapeCostCellMeters}m cells");
+
             ApplyRoadSettings(planner.CostField, settings);
             RoadPathSimplifier.ActiveMinTurnRadiusMeters = settings.TurnRadiusMeters;
             RoadPathSimplifier.ActiveMaxHeadingChangeDegrees =
                 Mathf.Clamp(180f / Mathf.Max(settings.TurnRadiusMeters, 1f) * 8f, 12f, 40f);
-            planner.PlanRoads(nodes, isHub, grid, HeightMeters, CanBridgeSpan);
+
+            OverworldGenTiming.Time(
+                "roads.plan",
+                () => planner.PlanRoads(nodes, isHub, grid, HeightMeters, CanBridgeSpan),
+                $"grid {width}x{height} cells, {nodes.Count} nodes");
 
             var segments = planner.Segments;
             if (segments.Count == 0)
@@ -144,6 +156,7 @@ if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y
             }
 
             var dryRoadDefs = new List<RoadDefinition>();
+            var profileTimer = OverworldGenTiming.Start();
             for (var si = 0; si < segments.Count; si++)
             {
                 var segment = segments[si];
@@ -179,26 +192,32 @@ if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y
                 }
             }
 
+            OverworldGenTiming.Log(
+                "roads.profiles",
+                OverworldGenTiming.StopMs(profileTimer),
+                $"{segments.Count} segments -> {dryRoadDefs.Count} corridors, " +
+                $"{clearanceSamples.Count} clearance samples");
+
             if (terrain != null)
             {
                 var centerLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadCenterLayerPath);
                 var edgeLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadEdgeLayerPath);
                 var gravelLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadGravelLayerPath);
-                ApplyRoadLayerLooks(centerLayer, edgeLayer, gravelLayer);
-                TerrainDeformer.Apply(
-                    terrain,
-                    dryRoadDefs,
-                    centerLayer,
-                    gravelLayer,
-                    edgeLayer);
+                OverworldGenTiming.Time(
+                    "roads.deform+paint",
+                    () => TerrainDeformer.Apply(
+                        terrain,
+                        dryRoadDefs,
+                        centerLayer,
+                        gravelLayer,
+                        edgeLayer),
+                    $"terrain '{terrain.name}'");
             }
 
             ClearRoadNetwork();
             var root = new GameObject(RootObjectName);
             var clearance = root.AddComponent<OverworldRoadClearance>();
             clearance.SetSamples(clearanceSamples);
-            RoadLawnMask.BakeFromScene();
-            GrassTintMask.BakeFromScene();
 
             var bridgePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BridgePrefabPath);
             for (var i = 0; i < bridgeSpans.Count; i++)
@@ -243,7 +262,6 @@ if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y
                 return;
             }
 
-            ApplyRoadLayerLooks(centerLayer, edgeLayer, gravelLayer);
             RoadSurfacePaint.PaintFromClearanceSamples(
                 terrain,
                 clearance.Samples,
@@ -252,8 +270,6 @@ if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y
                 centerLayer,
                 edgeLayer,
                 gravelLayer);
-            RoadLawnMask.BakeFromScene();
-            GrassTintMask.BakeFromScene();
             SceneView.RepaintAll();
         }
 
@@ -264,30 +280,6 @@ if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y
             if (root != null)
             {
                 Object.DestroyImmediate(root);
-            }
-        }
-
-        private static void ApplyRoadLayerLooks(
-            TerrainLayer centerLayer,
-            TerrainLayer edgeLayer,
-            TerrainLayer gravelLayer)
-        {
-            if (centerLayer != null)
-            {
-                TerrainBiomePalette.Apply(centerLayer, TerrainBiomePalette.RoadCenter, 8f);
-                EditorUtility.SetDirty(centerLayer);
-            }
-
-            if (edgeLayer != null)
-            {
-                TerrainBiomePalette.Apply(edgeLayer, TerrainBiomePalette.RoadEdge, 10f);
-                EditorUtility.SetDirty(edgeLayer);
-            }
-
-            if (gravelLayer != null)
-            {
-                TerrainBiomePalette.Apply(gravelLayer, TerrainBiomePalette.RoadGravel, 7f);
-                EditorUtility.SetDirty(gravelLayer);
             }
         }
 

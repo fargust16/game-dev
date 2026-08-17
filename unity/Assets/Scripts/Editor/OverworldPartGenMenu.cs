@@ -66,24 +66,6 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Part-Gen/Roads/Clear", false, BasePriority + 61)]
         public static void RoadsClear() => OverworldPipeline.ClearStep(OverworldPipelineStepId.Roads);
 
-        [MenuItem("GameDev/Overworld/Part-Gen/Trees/Generate", false, BasePriority + 80)]
-        public static void TreesGenerate() => OverworldPipeline.GenerateStep(OverworldPipelineStepId.Trees);
-
-        [MenuItem("GameDev/Overworld/Part-Gen/Trees/Clear", false, BasePriority + 81)]
-        public static void TreesClear() => OverworldPipeline.ClearStep(OverworldPipelineStepId.Trees);
-
-        [MenuItem("GameDev/Overworld/Part-Gen/Undergrowth/Generate", false, BasePriority + 90)]
-        public static void UndergrowthGenerate() => OverworldPipeline.GenerateStep(OverworldPipelineStepId.Undergrowth);
-
-        [MenuItem("GameDev/Overworld/Part-Gen/Undergrowth/Clear", false, BasePriority + 91)]
-        public static void UndergrowthClear() => OverworldPipeline.ClearStep(OverworldPipelineStepId.Undergrowth);
-
-        [MenuItem("GameDev/Overworld/Part-Gen/Grass/Generate", false, BasePriority + 100)]
-        public static void GrassGenerate() => OverworldPipeline.GenerateStep(OverworldPipelineStepId.Grass);
-
-        [MenuItem("GameDev/Overworld/Part-Gen/Grass/Clear", false, BasePriority + 101)]
-        public static void GrassClear() => OverworldPipeline.ClearStep(OverworldPipelineStepId.Grass);
-
         [MenuItem("GameDev/Overworld/Part-Gen/Player/Generate", false, BasePriority + 110)]
         public static void PlayerGenerate() => OverworldPipeline.GenerateStep(OverworldPipelineStepId.Player);
 
