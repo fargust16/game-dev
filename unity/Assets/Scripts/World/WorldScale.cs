@@ -1,10 +1,17 @@
 namespace GameDev.World
 {
     /// <summary>
-    /// Single world-scale table: character â†’ vegetation â†’ lakes/shores â†’ relief â†’ chunks.
+    /// Single world-scale table: character -> vegetation -> roads -> relief -> chunks.
     /// All overworld placers/scatter/player sizing should read these constants instead of
     /// inventing independent fudge factors.
     /// </summary>
+    /// <remarks>
+    /// V0 water is the ocean plane only. Inland lake and river generation was removed, and with it
+    /// every Lake*/River*/Water-inset constant this table used to carry. Future hydrology is a
+    /// redesign from first principles - see "14 World Generation Roadmap" section
+    /// "Future Hydrology / River Generation" - so do not reintroduce those constants here in
+    /// anticipation of it.
+    /// </remarks>
     public static class WorldScale
     {
         // --- Character (base unit) ---
@@ -33,131 +40,6 @@ namespace GameDev.World
 
         public const float FlowerMinMeters = 0.1f;
         public const float FlowerMaxMeters = 1f;
-
-        // --- Hydrology ---
-        public const float LakeRadiusMinMeters = 70f;
-        public const float LakeRadiusMaxMeters = 220f;
-        public const float LakeBasinDepthMinMeters = 12f;
-        public const float LakeBasinDepthMaxMeters = 26f;
-
-        /// <summary>
-        /// Horizontal recess (InsetWidth): water sheet expands past the visual shore under banks.
-        /// Spec 1.0â€“2.5 m â€” prefer larger over visible gaps / floating edges.
-        /// </summary>
-        public const float WaterOverlapMeters = 1.75f;
-
-        /// <summary>Legacy alias â€” prefer <see cref="WaterOverlapMeters"/> (positive expand).</summary>
-        public const float WaterShoreInsetMeters = -WaterOverlapMeters;
-
-        /// <summary>
-        /// Vertical recess (InsetDepth): dry shore must sit at least this far above the water plane.
-        /// Spec 0.5â€“1.5 m.
-        /// </summary>
-        public const float WaterInsetDepthMeters = 1.0f;
-
-        /// <summary>
-        /// Extra depth on steep shores: effectiveInset = base + slope * this (slope â‰ˆ rise/run).
-        /// </summary>
-        public const float WaterInsetSlopeFactor = 2.5f;
-
-        /// <summary>Extra dig margin beyond overlap (spec Buffer 0.2â€“0.5 m).</summary>
-        public const float WaterInsetBufferMeters = 0.35f;
-
-        /// <summary>
-        /// Water plane vs average dry shore:
-        /// <c>WaterLevel = AvgShore âˆ’ WaterDepthOffset</c> (â‰¥ InsetDepth so the sheet stays buried).
-        /// </summary>
-        public const float WaterDepthOffsetMeters = 1.25f;
-
-        /// <summary>
-        /// Basin dig expands beyond water shore iso (overlap + buffer) so the sheet always sits
-        /// inside the excavated bowl.
-        /// </summary>
-        public const float LakeBasinExpandMeters = WaterOverlapMeters + WaterInsetBufferMeters;
-
-        /// <summary>Hard reject when average slope in the footprint exceeds this (~9Â°).</summary>
-        public const float LakeRejectAvgSlope = 0.16f;
-
-        /// <summary>Hard reject when any sample slope exceeds this (~20Â°).</summary>
-        public const float LakeRejectMaxSlope = 0.36f;
-
-        /// <summary>Hard reject when high-terrain mass penalty exceeds this (mountain flank).</summary>
-        public const float LakeRejectHighPenalty = 0.8f;
-
-        /// <summary>
-        /// Max metres any single heightmap sample may be dug for a lake basin (placement / banks).
-        /// Interior bowl may use <see cref="LakeInteriorMaxDigMeters"/> so the sheet stays one body.
-        /// </summary>
-        public const float LakeMaxTerrainModificationMeters = 18f;
-
-        /// <summary>
-        /// Interior-only dig cap. Must exceed typical hillside offset so a ridge cannot split the lake.
-        /// </summary>
-        public const float LakeInteriorMaxDigMeters = 36f;
-
-        /// <summary>Minimum water column inside the shore (metres below waterY).</summary>
-        public const float LakeMinInteriorWaterMeters = 2.5f;
-
-        /// <summary>
-        /// Max fill in the shore-overlap ring only (not the interior). Raises downhill banks so the
-        /// unchanged flat water sheet sits under terrain instead of hanging over a valley.
-        /// </summary>
-        public const float LakeShoreLipFillMaxMeters = 16f;
-
-        /// <summary>
-        /// Reject when height range in footprint exceeds this with mountain mass present.
-        /// </summary>
-        public const float LakeRejectHeightRangeMeters = 28f;
-
-        /// <summary>Minimum distance from map/usable edge to a lake center.</summary>
-        public const float LakeEdgeMinDistanceMeters = 160f;
-
-        /// <summary>Guaranteed minimum lake count per overworld island (1 inland lake is valid).</summary>
-        public const int LakeMinCount = 1;
-
-        /// <summary>
-        /// Preferred upper lake count. Actual count is seed-derived in
-        /// <c>[LakeMinCount, LakePreferredMaxCount]</c>.
-        /// </summary>
-        public const int LakePreferredMaxCount = 3;
-
-        /// <summary>
-        /// Inland lake water plane must sit at least this far above <see cref="SeaLevelMeters"/>
-        /// so a river outlet can drain to the ocean without sharing the ocean sheet.
-        /// </summary>
-        public const float InlandLakeMinAboveSeaMeters = 8f;
-
-        /// <summary>
-        /// Soft target radius band for the primary inland lake (readable from overview, not half-island).
-        /// </summary>
-        public const float InlandLakeTargetRadiusMinMeters = 90f;
-
-        /// <summary>See <see cref="InlandLakeTargetRadiusMinMeters"/>.</summary>
-        public const float InlandLakeTargetRadiusMaxMeters = 140f;
-
-        /// <summary>
-        /// Terrain around a closed lake rim must stay above
-        /// <c>SeaLevel + LakeSafetyMargin</c> so the single water plane cannot spill to the ocean.
-        /// Elevated inland lakes with an outlet skip this seal path.
-        /// </summary>
-        public const float LakeSafetyMarginMeters = 6f;
-
-        /// <summary>Minimum inland water-region area (heightmap cells) to count as a valid lake.</summary>
-        public const int LakeMinCells = 48;
-
-        // Area-fraction size tiers (of tile area) â†’ equivalent radius via âˆš(A/Ï€).
-        public const float LakeSmallAreaFracMin = 0.005f;
-        public const float LakeSmallAreaFracMax = 0.02f;
-        public const float LakeMediumAreaFracMin = 0.02f;
-        public const float LakeMediumAreaFracMax = 0.05f;
-        public const float LakeLargeAreaFracMin = 0.05f;
-        public const float LakeLargeAreaFracMax = 0.12f;
-
-        // --- Rivers ---
-        public const float RiverSourceWidthMeters = 7f;
-        public const float RiverMouthWidthMeters = 28f;
-        public const float RiverBankWidthMeters = 14f;
-        public const float RiverWidthGrowthExponent = 1.3f;
 
         // --- Roads (LandscapePlanner corridor) ---
         public const float RoadPrimaryWidthMeters = 4f;
@@ -201,15 +83,15 @@ namespace GameDev.World
 
         /// <summary>
         /// Outer falloff each per-tile Vista biome extends past the tile edge so neighboring
-        /// caches soft-blend. Keeps LPB footprint near demo scale (~tile + 2Ã—overlap), not the
+        /// caches soft-blend. Keeps LPB footprint near demo scale (~tile + 2x overlap), not the
         /// full world extent (world-extent biomes OOM simulation nodes).
         /// </summary>
         public const float VistaBiomeSeamOverlapMeters = 80f;
 
-        /// <summary>Full overworld width (tileCountX Ã— tile size).</summary>
+        /// <summary>Full overworld width (tileCountX x tile size).</summary>
         public static float WorldExtentXMeters => OverworldTileMeters * OverworldTileCountX;
 
-        /// <summary>Full overworld depth (tileCountZ Ã— tile size).</summary>
+        /// <summary>Full overworld depth (tileCountZ x tile size).</summary>
         public static float WorldExtentZMeters => OverworldTileMeters * OverworldTileCountZ;
 
         public const float ChunkSizeMeters = 64f;
@@ -255,16 +137,10 @@ namespace GameDev.World
         /// <summary>Preferred peak count lower bound.</summary>
         public const int PeakPreferredMinCount = 1;
 
-        /// <summary>Preferred peak count upper bound (1â€“3 natural mountains).</summary>
+        /// <summary>Preferred peak count upper bound (1-3 natural mountains).</summary>
         public const int PeakPreferredMaxCount = 2;
 
         /// <summary>Minimum world-space distance between major peaks / massifs.</summary>
         public const float PeakMinSeparationMeters = 480f;
-
-        /// <summary>
-        /// Mouth band: river carve may go at/below Sea Level only within this many metres of the ocean
-        /// (cells with landMask near 0 / near coastline). Inland beds stay above Sea Level.
-        /// </summary>
-        public const float RiverMouthSeaBandMeters = 90f;
     }
 }

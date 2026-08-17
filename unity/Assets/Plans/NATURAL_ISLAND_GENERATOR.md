@@ -22,7 +22,7 @@ Hand-authored single MountainBiome covering the whole grid remains a useful visu
 
 Replace the radial “pancake” island with a geological heightfield around a fixed **Sea Level**, and **one** horizontal **ocean** water plane.
 
-Quality bar: terrain continues under water; no radial mound; **no inland lake/river generation in V0** (removed 2026-08-15). **Vertical relief must match the golden Vista Mountain bake**, not a flattened remap.
+Quality bar: terrain continues under water; no radial mound; **no inland lake/river generation in V0** (removed 2026-08-15). **Vertical relief must match the golden Vista Mountain bake**, not a flattened remap — and it must reach that quality inside a 512 px biome canvas.
 
 ---
 
@@ -30,14 +30,14 @@ Quality bar: terrain continues under water; no radial mound; **no inland lake/ri
 
 | Concept | Rule |
 |---------|------|
-| `SeaLevel` | `WorldScale.SeaLevelMeters` (32). Single water Y. |
-| Heightfield | **Vista Mountain biome graph** (scene golden) — not stripped NaturalIsland graph |
-| Vertical budget | **500 m** locked — `WorldScale.TerrainHeightBudgetMeters` = VistaManager / tile `size.y` |
-| Island mask | **Vista LPB Anchors + Outer Falloff** (biome mask). Not C# `IslandNaturalGeography`. |
-| Mountains | Vista Mountain template SoT |
-| Grid | `2×2` tiles × 1400 m = **2800 m** world extent |
-| Vista biomes | Golden: one Mountain LPB, `Space.Local`, template pos/scale — silhouette via anchors/falloff; see [VISTA_OVERWORLD_REFERENCE.md](VISTA_OVERWORLD_REFERENCE.md) |
-| Inland lakes / rivers | **Removed from V0 code** — redesign later |
+| `SeaLevel` | `WorldScale.SeaLevelMeters` = **24**. Single water Y. |
+| Heightfield | `IslandPlateau_TerrainGraph` + `MountainMassif_TerrainGraph`, both built on the Vista Mountain template's **architecture** — not on its numbers, which are authored for a 1024 px canvas |
+| Vertical budget | **700 m** locked — `WorldScale.TerrainHeightBudgetMeters` = VistaManager / tile `size.y` |
+| Island mask | **Vista LPB Anchors + Outer Falloff** (biome mask). Not C# `IslandNaturalGeography`, which is deleted. |
+| Mountains | 1–2 `LPB_Mountain_n` with `HeightBlendMode.Raise` |
+| Grid | `2×2` tiles × 1400 m = **2800 m** world extent — this is the playable V0 world |
+| Biome canvas | **512 px, Vista Personal hard cap** — the resolution ceiling on island shape |
+| Inland lakes / rivers | **Removed from V0 code** — a future redesign from first principles, not a restore |
 | Water visual | One `WorldWater` (WaterWorks plane + `Assets/Settings/Water/OverworldWater.mat` teal clone) |
 
 ---
@@ -47,17 +47,20 @@ Quality bar: terrain continues under water; no radial mound; **no inland lake/ri
 ```text
 WorldSeed forks
   → VistaManager (terrainMaxHeight = 700) + Unity Terrain grid 2×2 (1400 m, size.y = 700)
-  → LPB_IslandBase: IslandPlateau_TerrainGraph + harmonic asymmetric anchors + SoftFalloff mask,
-      plateau worldHeight ~55 m (ASL ~30–55, not a 90 m mesa), Replace + LayerWeightMaps
-  → LPB_Mountain_i (1–3): elongated ellipse anchors + wide Outer falloff, Raise delta ~480–580 m
-  → (later) Forest / Meadow / Swamp / Field / City (order bands 30–49); lake/river LPBs deferred with hydro redesign
+  → LPB_SeaFloor: SeaFloor_TerrainGraph + SnapBiomeToTiles, worldHeight 20 m, Replace — the world floor
+  → LPB_IslandBase: IslandPlateau_TerrainGraph + 36 harmonic asymmetric anchors + SoftFalloff mask,
+      worldHeight 140 m at biome Y = 24 (sea level), Replace + LayerWeightMaps
+  → LPB_Mountain_i (1–2): 28 elongated ellipse anchors + wide Outer falloff (520), Raise delta 530 m
   → Vista GenerateAll → remap cache onto tiles
+      (height + 5 layer weights + tree instances + detail density, all from the graphs)
   → SyncFromGpu + ForceTileSize (1400, 700, 1400)
-  → CoastalBeachShelf directed ≤12° profile + SmoothCoastBand (no terrace / no flood-ring ladder)
-  → C# height-band coast splat (ASL Sea+0…Sea+16; underwater near-land) → MicroSplat Convert **without** HybridHeightBlend
-  → WorldWater at SeaLevel (OverworldWater.mat)
-  → GrassField (Polytope PT_Grass_02, full 2800×2800)
+  → TerrainTile.MatchSeams (Vista native)
+  → WorldWater at SeaLevel (OverworldWater.mat) — ocean only
 ```
+
+**No post-Vista terrain pass.** `CoastalBeachShelf`, the C# height-band coast splat, MicroSplat
+Convert, `IslandOccupancy` and `GrassField` are all deleted. Roads and settlements are the one
+sanctioned downstream writer, and they append their own layers without touching biome indices 0–4.
 
 ### Continuity rules
 

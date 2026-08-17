@@ -1,10 +1,10 @@
 # 14 World Generation Roadmap
 
-Version: 0.12
+Version: 0.13
 
 Status: Draft
 
-Last Updated: 2026-08-09
+Last Updated: 2026-08-17
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
@@ -99,6 +99,69 @@ Each phase = its own plan + commit series. Prefer updating this file’s “Wher
 
 ---
 
+# Island Shaping Rebuild (open, diagnosed)
+
+The island's shaping stage produces directional banding — ridges elongated east-west with a
+repeating ~101 m spacing. Vista's own sample graph is clean through the identical pipeline, so the
+target is reachable; the cause is our shaping recipe as a whole, not a parameter.
+
+Eight hypotheses were tested and killed by measurement, so the next agent starts from evidence
+rather than from a hunch. Do not re-run those experiments — read the record first:
+`unity/Assets/Plans/ISLAND_SHAPING_REBUILD.md`.
+
+The fix changes how every island on every seed looks, so it is an art decision and needs the user's
+sign-off on a bake, not on a diff.
+
+---
+
+# Future Hydrology / River Generation
+
+**Not in V0. Not scheduled. Design is intentionally open.**
+
+V0 water is **one ocean plane** (`WorldWater` at `WorldScale.SeaLevelMeters`). There is no inland
+lake or river generator, and there must not be one until this item is properly designed.
+
+## The previous attempts were discarded, not archived
+
+Several inland-hydrology implementations were built and removed: lake site selection and basin
+digging, river tracing and spline/ribbon meshes, per-lake water objects, `WaterZone_*` scene
+hierarchies, and the settings that fed them. They repeatedly produced architectural complexity,
+hidden dependencies, duplicated systems and bugs, and they made terrain generation harder to change.
+
+They are **not an architectural foundation**. Do not resurrect `LakeDefinition`, `RiverTracer`, the
+water-zone menu architecture, or any of the deleted constants because they look convenient. Starting
+from that code is what made every previous attempt fail the same way.
+
+## What a real system would have to model
+
+A future design should be worked out from first principles, roughly along this chain:
+
+```text
+source → flow direction → drainage basin → terrain valley → river channel
+       → lake / depression relationship → water surface
+       → downstream terrain and ecology consequences
+       → roads, bridges, crossings → POI placement
+```
+
+The quality bar is the one already stated in `WORLD_GENERATION_PIPELINE.md`: **rivers reshape
+terrain**. Path → valley → depression → bed → water, in that order. A blue spline laid on unmodified
+terrain is not hydrology.
+
+## Constraints any design must respect
+
+- **Vista owns terrain height.** A river that carves the heightfield has to do it inside the Vista
+  graph or as a sanctioned Vista biome (e.g. a `Lower`-blend LPB), not as a C# post-pass.
+- **Vista Personal caps the biome canvas at 512 px.** A channel narrower than the canvas cell
+  (~5 m on the island biome) cannot be represented as biome height at all — that constraint has to
+  be part of the design, not discovered during implementation.
+- Determinism: same seed → same watercourses, and re-seeding hydrology must not move the mountains.
+- Roads already plan around water through `SeaLevelOceanSampler`; any inland water must enter road
+  cost and bridging through that same interface rather than a parallel one.
+
+Write a plan document before writing code.
+
+---
+
 # Superseded pre-pivot order (archive)
 
 ```text
@@ -113,7 +176,7 @@ Do **not** resume this order unless the user explicitly overrides [16](16%20Arch
 
 1. Read [16 Architecture Pivot](16%20Architecture%20Pivot.md), then [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), then this file.
 2. **Next implementation default:** `unity/Assets/Plans/OVERWORLD_V0_PLAN.md` (W0.1→W0.9). Do not extend OrganicTown C1 continuous path.
-3. Keep style: no inheritance tricks; deterministic `WorldSeed` forks; human-scale metres; chunk **64 m**; stub **~512 m**.
+3. Keep style: no inheritance tricks; deterministic `WorldSeed` forks; human-scale metres; chunk **64 m**; playable overworld **2800 × 2800 m**.
 4. Confirm design forks with the user before changing locked architecture above.
 5. After a documentation or milestone step: commit when the user asks (human steers git).
 
@@ -121,6 +184,7 @@ Do **not** resume this order unless the user explicitly overrides [16](16%20Arch
 
 # Explicitly Out (until later phases)
 
+- Inland lakes and rivers (see § Future Hydrology / River Generation)
 - Survival harvest / base-building loop
 - Full Valheim-scale map
 - Marketplace tactics kit as architecture

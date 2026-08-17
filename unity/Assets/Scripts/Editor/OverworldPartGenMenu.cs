@@ -36,12 +36,6 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Part-Gen/Surface/Clear", false, BasePriority + 1)]
         public static void SurfaceClear() => OverworldPipeline.ClearStep(OverworldPipelineStepId.Surface);
 
-        [MenuItem("GameDev/Overworld/Part-Gen/Zones/Generate", false, BasePriority + 10)]
-        public static void ZonesGenerate() => OverworldPipeline.GenerateStep(OverworldPipelineStepId.Zones);
-
-        [MenuItem("GameDev/Overworld/Part-Gen/Zones/Clear", false, BasePriority + 11)]
-        public static void ZonesClear() => OverworldPipeline.ClearStep(OverworldPipelineStepId.Zones);
-
         [MenuItem("GameDev/Overworld/Part-Gen/Mountains/Generate", false, BasePriority + 20)]
         public static void MountainsGenerate() => OverworldPipeline.GenerateStep(OverworldPipelineStepId.Mountains);
 

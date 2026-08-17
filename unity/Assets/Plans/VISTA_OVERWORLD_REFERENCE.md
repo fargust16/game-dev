@@ -25,9 +25,9 @@ When wiring Vista from C#, prefer the **official API docs** above over guessing 
 
 | Object | Role |
 |--------|------|
-| `VistaManager` | Owns generate; `terrainMaxHeight = 500`, `heightMapResolution = 513`, `textureResolution = 512` |
+| `VistaManager` | Owns generate; `terrainMaxHeight = 700`, `heightMapResolution = 513`, `textureResolution = 512` |
 | `Terrains` root | Unity Terrain grid |
-| `Terrain_0_0` … `Terrain_1_1` | Positions `(0\|1400, 0, 0\|1400)`; tile size **1400×1400**, height **500** |
+| `OverworldTerrain_0_0` … `OverworldTerrain_1_1` | Positions `(0\|1400, 0, 0\|1400)`; tile size **1400×1400**, height **700** |
 | `MountainBiome (Cloned from Template)` | Child of VistaManager — single covering LPB |
 | Graph asset | `Assets/Scenes/Overworld_Generator Biomes/Mountain_TerrainGraph 1.asset` (clone of Mountain template, not our stripped NaturalIsland graph) |
 | Terrain data | `Assets/Scenes/Overworld_Generator Terrains/Terrain_*_TerrainData.asset` |
@@ -40,7 +40,7 @@ Do **not** mutate package templates under `PinwheelStudio/Vista/Personal/BiomeTe
 
 | Field | Golden value | Notes |
 |-------|--------------|-------|
-| `terrainMaxHeight` | **700** (automated bake) | Vertical SoT for tiles + graph height normalization. Hand golden scene may still show 500 until re-baked. |
+| `terrainMaxHeight` | **700** | Vertical SoT for tiles + graph height normalization. Set from `WorldScale.TerrainHeightBudgetMeters` on every bake. |
 | `heightMapResolution` | 513 | Per-tile heightmap |
 | `textureResolution` | 512 | Splat |
 | `detailDensityMapResolution` | 512 | Ignore for now (grass later) |
@@ -69,7 +69,7 @@ Scene object: `MountainBiome (Cloned from Template)`.
 | `terrainGraph` | scene clone `Mountain_TerrainGraph 1` | Full Mountain template graph (noise + dual `HydraulicErosionNode2` + texture/weight paths). **Not** `NaturalIsland_TerrainGraph`. |
 | `space` | **Local (0)** | Graph `WORLD_BOUNDS` in biome-local space; remaps to world via transform |
 | `seed` | **159** (editable) | Biome-level seed → graph `Args.SEED` (see Seed section) |
-| `baseResolution` | **512** | Cache resolution in biome bounds (prefab default was 1024; 512 is fine for iteration) |
+| `baseResolution` | **512** | Cache resolution across the biome's own bounds. **This is Vista Personal's hard cap** (`Constants.RES_MAX`), not a choice — 1K/2K/4K need Indie or Pro, which is not a project dependency. Every node in the graph runs at this resolution. |
 | `biomeMaskResolution` | 512 | Polygon mask RT |
 | `dataMask` | `-1` (all) | Height + textures + population channels from graph |
 | `order` | 0 | Only biome today |
@@ -175,8 +175,12 @@ Automation: write an inset rectangle (4 corners) into `biome.anchors` — same O
 
 1. Shape anchors until dry footprint is right.
 2. Raise `falloffDistance` until coast is a shelf, not a wall.
-3. Keep `WorldWater` at Sea Level 32 — outside mask (~height 0) sits underwater.
+3. Keep `WorldWater` at Sea Level **24** — outside the mask (~height 0) sits underwater.
 4. Re-Generate after every change.
+
+**Falloff costs resolution.** The biome canvas covers `area + 2 × falloffDistance`, so widening the
+falloff spreads the same 512 px over more ground. The island's 180 m falloff already turns a 2240 m
+area into 2600 m of bounds — 5.08 m/px instead of 4.38.
 
 ### Do not
 
@@ -217,22 +221,28 @@ Population: `Replace` (one ecosystem wins per pixel) vs `Coexist` (layer trees/g
 ### Recommended V1 stack (Geology → Hydrology → Ecology → Civilization)
 
 ```text
-order 0     LPB_IslandBase   IslandPlateau graph + harmonic asymmetric anchors + SoftFalloff mask
-                             Height Replace + LayerWeightMaps; plateau worldHeight ~55 m (ASL ~30–55)
-order 10–19 LPB_Mountain_i   MountainMassif (ridge+foothills delta) + elongated ellipse anchors
-                             Height Raise + wide Outer falloff (~520) + SoftFalloff mask
-order 20–29 Lakes / Rivers   Lower (not spawned yet — scaffold only)
-order 30–39 Forest / Meadow / Swamp / Fields   surface; height off or soft Lower for swamp
-order 40–49 City / Village ground   textures (+ light flatten later)
+order  0    LPB_SeaFloor     SeaFloor graph + SnapBiomeToTiles, no falloff
+                             Height Replace + LayerWeightMaps; worldHeight 20 m — the world floor
+order 10    LPB_IslandBase   IslandPlateau graph + harmonic asymmetric anchors + SoftFalloff mask
+                             Height Replace + LayerWeightMaps; worldHeight 140 m, biome Y = 24 (sea)
+order 20+   LPB_Mountain_i   MountainMassif delta + elongated ellipse anchors, one order per massif
+                             Height Raise + wide Outer falloff (520) + SoftFalloff mask; worldHeight 530 m
 ```
 
-**Automated bake** (`OverworldLpbBake`): IslandPlateau base + 1–3 Mountain LPBs with **Raise** (not KeepHigher stamp). Secondary menu: `Spawn Secondary LPB Scaffold` (orders 20–40).
+Hydrology, ecology and civilization bands are **not** in the stack: V0 water is one ocean plane,
+vegetation is emitted by the two land graphs themselves, and settlements/roads append their layers
+after the bake. Do not add a Lower-blend water biome — see
+[14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md) §
+Future Hydrology / River Generation.
 
-**Coast:** entirely graph + falloff. `IslandPlateau_TerrainGraph` remaps land into the top 45% of the biome height, and the LPB's **Outer falloff** drags the rim under water; the coastline silhouette comes from the seeded anchor polygon inscribed in `SetBiomeAreaOnSpawn.worldArea`. Sand is a normalized low-altitude `Curve` band multiplied by a small noise (to break the contour ring), painted as Weight Blend priority 3. There is **no** post-generation C# coast pass — `CoastalBeachShelf` was deleted. Falloff distance and the plateau height are Inspector fields on `LPB_IslandBase.prefab`.
+**Automated bake** (`OverworldLpbBake.SpawnIslandAndMountainStack`): SeaFloor + IslandPlateau base +
+1–2 Mountain LPBs with **Raise** (not a KeepHigher stamp).
+
+**Coast:** entirely graph + falloff. `IslandPlateau_TerrainGraph` biases its distribution toward high ground with a `Curve` (`ShelfCurve`) so the island reads as a plateau, and the LPB's **Outer falloff** drags the rim under water; the coastline silhouette comes from the seeded anchor polygon inscribed in `SetBiomeAreaOnSpawn.worldArea`, and the biome sits at world `Y = SeaLevelMeters` so its low ground is not drowned. Sand is a normalized low-altitude `Curve` band multiplied by a small noise (to break the contour ring), painted as Weight Blend priority 3. There is **no** post-generation C# coast pass — `CoastalBeachShelf` was deleted. Falloff distance and the plateau height are Inspector fields on `LPB_IslandBase.prefab`.
 
 **Mask shapes:** Island = radius harmonics (not near-circle); Mountain = irregular ellipse + yaw; never one universal circular mask for every biome type.
 
-**Mountain graph contract:** periphery ≈ 0 (foothills — held by the foothill `Curve` plus the LPB falloff mask), peaks small area, single `HydraulicErosionNode2`, TextureOutputs include foothill grass/soil so Texture Replace under Raise does not wipe greens. Height space is **delta** metres above the island, never ASL — height masks there are fractions of `OverworldLpbBake.MountainPeakDeltaMinMeters`.
+**Mountain graph contract:** periphery ≈ 0 so `Raise` produces foothills rather than a stamped plateau — held by the `Levels` floor (`outLow 0.05`) plus the LPB's wide Outer falloff mask. Peaks cover a small area; two `HydraulicErosionNode2` passes (macro then micro), with the erosion mask read off the **second**. TextureOutputs include foothill grass/soil so Texture Replace under Raise does not wipe the greens. Height space is **delta** above the island, never ASL, and every altitude band is a fraction of the normalized graph height — never an absolute metre threshold.
 
 ---
 
@@ -272,7 +282,7 @@ All typed `Pinwheel.Vista.Graph.MaskSlot`.
 | `NoiseNode` x2 (750/8 oct, 1000/1 oct, Perlin01) | macro + mezzo form | none / mask | the whole base shape from **two** noise fields | x2 in both graphs, **no domain warp** |
 | `CombineNode(Multiply)` | mix the two scales | 2 masks / mask | "generic mountain shape" | x1 |
 | `LevelsNode` out 0.05..1 | amplitude normalize | mask / mask | exposed as Min/Max Height | island `Curve`+`Remap` (ASL 30–55); mountain foothill `Curve` (Raise-delta contract) |
-| `HydraulicErosionNode2` x2 (200 iter) | macro + micro drainage | height / height + soil | one pass yields **both** relief and the erosion mask | x1 each (see deviations) |
+| `HydraulicErosionNode2` x2 (200 iter) | macro + micro drainage | height / height + soil | one pass yields **both** relief and the erosion mask | **x2 each** — macro at the node's own defaults, micro with its own feature size (see deviations) |
 | `SetVariableNode "Height Map"` | publish height | height / var | the stage interface | yes, both |
 | `CurveNode` then `SetVariableNode "ErosionMask"` | publish flow | soil out / var | shaped once, read by every surface mask | yes, both |
 | `GetVariableNode` x9 | read without a wire | var / mask | stages stay independent | yes, both |
@@ -305,8 +315,9 @@ All typed `Pinwheel.Vista.Graph.MaskSlot`.
 
 | Deviation | Reason |
 |---|---|
-| One `HydraulicErosionNode2` instead of two | Two instances share temp RT names and produce the "fangs" artifact. |
-| Mountain: foothill `Curve` where the reference has `Levels` | The massif is a **height delta under `HeightBlendMode.Raise`**; a flat periphery would make Raise stamp a plateau. |
+| Erosion **feature sizes** are ours, not the reference's (macro 8 m, micro 6 m) | The reference is authored on a 1024 px canvas; Vista Personal caps ours at 512, so its feature sizes do not transfer. The sim canvas is `clamp(biomeWidth / featureSize, 32, min(2048, 512))`, and a request above 512 px is silently clamped — which carves grid-aligned rills instead of drainage. At the current biome sizes 8 m → 328 px and 6 m → 440 px, so neither pass is clamped. Recheck these numbers whenever a biome's area or falloff changes. |
+| Micro pass runs 100 iterations, half the reference's 200 | Rill instability grows with iteration count on a coarse grid, and our grid is half the reference's. |
+| Mountain: plain `Levels` with `outLow 0.05` where the periphery must approach 0 | The massif is a **height delta under `HeightBlendMode.Raise`**; a flat periphery would make Raise stamp a plateau, so the falloff mask does the rest of the work. |
 | Island: `Curve` + `Remap 0–1` where the reference has `Levels` | Remap is auto-levels: it stretches whatever range the shaping produced across the full 0..1. `Set Biome Height On Spawn` then decides how many metres that is, and sea level cuts the coastline out of the low ground. A remap **floor** (the old 0.55) left ~25 m of relief on a 55 m biome and forced the falloff to do all the coastal shaping — do not reintroduce one. |
 | `SetVariable "GreenAreaMask"` without `Combine(Max)` | The reference has two green layers; we have one. A node with nothing to combine is a decorative node. |
 | Mountain rock is the unconnected base layer; no separate "Rock Peak" layer | The reference has two rock textures; our canonical stack has one. Base fill gives the same result with five fewer nodes. |
@@ -321,36 +332,46 @@ All typed `Pinwheel.Vista.Graph.MaskSlot`.
 
 ### Graph shape
 
+Authored by `IslandPlateauGraphBuilder` / `MountainMassifGraphBuilder`; the asset is the source of
+truth and the numbers below must be read back from it after any rebuild.
+
 ```text
 IslandPlateau_TerrainGraph
-  Noise(2400, 3 oct) ---+
-                        +-- Combine(Mul) -> Curve(shelf) -> Remap(0.55-1.0) -> HydraulicErosion2(fs 24, 90 it)
-  Noise(600, 4 oct) ----+                                                       |- height -> Set "Height Map" -> HEIGHT OUTPUT
-                                                                                +- soil   -> Curve -> Set "ErosionMask"
+  Noise(1200, 8 oct, remapPerLayer) --+
+                                      +-- Combine(Mul) -> Levels(outLow .05) -> Curve(shelf)
+  Noise(1900, 1 oct) ----------------+                        |
+                                      HydraulicErosion2(macro: fs 8, 200 it, default preset)
+                                                              |
+                                      HydraulicErosion2(micro: fs 6, 100 it, ramps 10/300)
+                                                              |- height -> Set "Height Map" -> HEIGHT OUTPUT
+                                                              +- soil   -> Curve(linear) -> Set "ErosionMask"
 
   Weight Blend(5) priority base->top:
-    0 grass (unconnected = white base)
-    1 rock   OneMinus( Max( Curve(ErosionMask), SlopeMask(0-4) ) )   -> Texture Output "Rock"
+    0 grass  (unconnected = white base)                               -> Texture Output "Grass"
+    1 rock   OneMinus( Max( Curve(ErosionMask), SlopeMask(0-4) ) )    -> Texture Output "Rock"
     2 soil   Levels(ErosionMask)                                      -> Texture Output "Soil"
     3 sand   Curve(HeightMap, low band) x Noise(95)                   -> Texture Output "Sand"
-    4 cliff  SlopeMask(38-62)                                         -> Texture Output "Cliff"
-    (blend slot 0)                                                    -> Texture Output "Grass"
-  Vegetation: Weight Blend layer 0 -> Set "GreenAreaMask" -> trees (Levels x GeometryMask(slope) -> Scatter 30 m)
-              + grass (Levels -> DETAIL DENSITY OUTPUT)
+    4 cliff  SlopeMask(38-90, rising curve)                           -> Texture Output "Cliff"
+  Vegetation: Weight Blend layer 0 x DryLandGate(BiomeMask) -> Set "GreenAreaMask"
+              -> 5 canopy species (own cluster noise each) -> Set "CanopyMask"
+              -> understory (gated by blurred CanopyMask), rocks (inverse green), ground cover
 
 MountainMassif_TerrainGraph
-  Noise(900, 8 oct) ----+
-                        +-- Combine(Mul) -> Curve(foothill) -> HydraulicErosion2(fs 12, 140 it)
-  Noise(1200, 1 oct) ---+                                       |- height -> Set "Height Map" -> HEIGHT OUTPUT
-                                                                +- soil   -> Curve -> Set "ErosionMask"
+  Noise(750, 8 oct, remapPerLayer) ---+
+                                      +-- Combine(Mul) -> Levels(outLow .05)
+  Noise(1000, 1 oct) ----------------+                        |
+                                      HydraulicErosion2(macro) -> HydraulicErosion2(micro)
+                                                              |- height -> Set "Height Map" -> HEIGHT OUTPUT
+                                                              +- soil   -> Curve(linear) -> Set "ErosionMask"
 
   Weight Blend(5) priority base->top:
-    0 rock  (unconnected = white base)                                -> Texture Output "Rock"
+    0 rock   (unconnected = white base)                               -> Texture Output "Rock"
     1 soil   Levels(ErosionMask)                                      -> Texture Output "Soil"
     2 grass  Concave -> Smooth  x  Curve(HeightMap, foothill band)    -> Texture Output "Grass"
     3 sand   (unconnected = black, emitted for stack parity)          -> Texture Output "Sand"
     4 cliff  OneMinus( Max( Curve(ErosionMask), SlopeMask(0-3) ) )    -> Texture Output "Cliff"
-  Vegetation: Weight Blend layer 2 -> Set "GreenAreaMask" -> same shape as the island graph
+  Vegetation: Weight Blend layer 2 -> same shape as the island graph, minus ground cover
+              (two graphs emitting the same DetailTemplate send Vista down its merge path)
 
 Both graphs emit all five canonical Texture Outputs with order = (int)SurfaceLayer, so every tile's
 terrainLayers array is [Grass, Sand, Soil, Cliff, Rock] regardless of which biomes covered it.
@@ -423,12 +444,13 @@ Plains are not a separate C# biome: they are **low regions of the same heightfie
 
 | Our automated path | Golden scene |
 |--------------------|--------------|
-| Custom `NaturalIsland_TerrainGraph` (stripped Noise+Ridge+single erosion) | Full **Mountain template** graph clone |
-| `terrainMaxHeight` / tile Y = **220** | **500** |
-| `Space.World` + metre anchors + `localScale=1` + falloff 0 | Template **Local** + prefab pos/scale + Outer falloff 50 + covering anchors |
-| Heavy C# framing + lake carve after Vista | **Leave Vista height alone** (no pancake framing) |
+| Custom `NaturalIsland_TerrainGraph` (stripped Noise+Ridge+single erosion) | Full Mountain-template **architecture**, reproduced in `IslandPlateauGraphBuilder` / `MountainMassifGraphBuilder` |
+| `terrainMaxHeight` / tile Y = **220** | **700** |
+| `Space.World` + metre anchors + `localScale=1` + falloff 0 | Template **Local** + prefab pos/scale + Outer falloff + seeded anchor ring |
+| Heavy C# framing + lake carve after Vista | **Leave Vista height alone** (no pancake framing, no inland hydrology) |
 | Mutating node seeds via InjectSeeds | Drive **`biome.seed` only** |
-| Assumed dual Hydraulic always OOMs/clashes | Dual `HydraulicErosionNode2` works in Mountain template at 2×2 / 2800 m |
+| Assumed dual Hydraulic always OOMs/clashes | Two `HydraulicErosionNode2` passes run fine at 2×2 / 2800 m; the reference has two |
+| Copying the reference's numbers as well as its topology | Reference numbers are authored for a **1024 px** canvas; on Personal's 512 they have to be re-derived |
 
 Root visual failures:
 
@@ -448,7 +470,10 @@ Root visual failures:
    - terrain shape and surface distribution → the two Terrain Graph assets in `Assets/Settings/Vista/`;
    - surface look (albedo, normal, UV tiling, smoothness) → the five `TerrainLayer` assets in
      `Assets/Settings/TerrainLayers/Overworld/`;
-   - vegetation content → `Forest_TreeTemplate` / `Meadow_DetailTemplate`.
+   - vegetation content → the templates in `Assets/Settings/Vista/Vegetation/`
+     (`Pine_`, `PinePale_`, `Fruit_`, `FruitDeep_`, `Orchard_`, `Undergrowth_`, `Rock_TreeTemplate`,
+     `Meadow_DetailTemplate`) — one prefab per template, because Vista Personal ignores
+     `prefabVariants`.
 4. `GameDev/Overworld/Generate All`.
 5. When materials look wrong, run `GameDev/Overworld/Vista/Dump Layer Weights` **before** touching the
    graph: it prints each tile's layer stack and the per-pixel weight sum (must be ≈1) and exports one
@@ -464,36 +489,36 @@ Contract for `GameDev/Overworld/Generate Terrain From Seed` (`OverworldTerrainMe
 
 | Step | Rule |
 |------|------|
-| Template | `Assets/PinwheelStudio/Vista/Personal/BiomeTemplates/Mountain/Mountain_BiomeTemplate.asset` |
+| Templates | Our own, in `Assets/Settings/Vista/BiomeTemplates/`: `SeaFloor_`, `IslandBase_`, `Mountain_BiomeTemplate.asset` + their `LPB_*.prefab`. Authored once by `OverworldBiomeTemplates`; **never** edit the package templates under `PinwheelStudio/.../BiomeTemplates/`. |
 | API | `BiomeTemplateSpawner.Spawn(template, new BiomeTemplateSpawnContext(manager))` under VistaManager |
-| Graph clone | Persist owned `TerrainGraph` clones from spawn context to `Assets/Settings/Vista/` (e.g. `MountainBiome_Mountain_TerrainGraph.asset`). **Never** edit package templates under `BiomeTemplates/`. |
-| Transform | `Space.Local`, `localPosition=(500,0,500)`, `localScale=(1.05,1,1.05)` |
-| Height | `VistaManager.terrainMaxHeight` = `SetBiomeHeightOnSpawn.worldHeight` = `WorldScale.TerrainHeightBudgetMeters` = **700** |
-| Seed | `biome.seed = WorldSeed(seed).Fork("terrain.islandbase").Next()` only — leave graph node seeds |
-| Sharp peaks | Working graph clone under `Assets/Settings/Vista/` — prefer ridge bias / less soft erosion; never edit package templates |
+| Graph clone | Persist owned `TerrainGraph` clones from the spawn context to `Assets/Settings/Vista/` (`IslandBase_IslandPlateau_TerrainGraph.asset`, `Mountain_0_MountainMassif_TerrainGraph.asset`, …) |
+| Height | `VistaManager.terrainMaxHeight` = `WorldScale.TerrainHeightBudgetMeters` = **700**; each biome's own height is `SetBiomeHeightOnSpawn.worldHeight` on its prefab (seabed 20, island 140, massif 530) |
+| Seed | `biome.seed` from the matching named fork only (`terrain.seafloor` / `terrain.islandbase` / `terrain.mountain.{i}`) — never touch graph node seeds |
+| What the bake may write | **Only** seed, XZ position, and the anchor silhouette. Height, area, order, `dataMask`, `blendOptions`, `baseResolution` and `localScale` belong to the prefab. |
 
 ### Local ↔ world anchors
 
-LPB transform as above. World point → local:
+World point → local: `local = biome.transform.InverseTransformPoint(world)`;
+back again: `biome.transform.TransformPoint(local)`.
 
-```text
-local = biome.transform.InverseTransformPoint(world)
-```
+`SetBiomeAreaOnSpawn` writes a centred **rectangle** into `biome.anchors`; `OverworldLpbBake` then
+treats that rectangle as the authoritative *extent* and inscribes an organic silhouette inside it, so
+changing `worldArea` in the Inspector still changes the biome's size.
 
-Local → world: `biome.transform.TransformPoint(local)`.
-
-V1 island is an **inset rectangle** in **world XZ**, then converted to local. After assign: `falloffDirection=Outer`, `falloffDistance≈120`, `RecalculateFalloffAnchors()`.
-
-### V1 island constants (inset square)
+### Island / massif silhouettes (`OverworldLpbBake`)
 
 | Constant | Value |
 |----------|-------|
-| `anchorCount` | 4 (rectangle corners) |
-| Margin (world) | `IslandOceanMarginMeters` (280) from world edge |
-| Solid rectangle | `(margin … extent−margin)` on XZ inside 0…2800 |
-| `falloffDistance` | 120 (local units; soft drowned rim into `WorldWater`) |
-| `falloffDirection` | Outer |
-| Shape | Square island — not N-gon ring |
+| Island anchors | **36**, radius harmonics (3 terms) + seeded noise, Chaikin-smoothed ×2 |
+| Island asymmetry | Cliff coast reaches to 1.0, the opposite beach coast pulls in to 0.72, yaw from `terrain.coast.yaw` |
+| Island area / falloff | `SetBiomeAreaOnSpawn.worldArea` **2240 m**, `falloffDistance` **180** — on the prefab |
+| Massif anchors | **28**, irregular ellipse (2 harmonics) rotated to a seeded yaw, smoothed ×2 |
+| Massif area / falloff | **1050 × 450 m**, `falloffDistance` **520**; a second massif is scaled to 0.38 |
+| Massif count / spacing | 1 (72 % of seeds) or 2, at least `PeakMinSeparationMeters` (480) apart |
+| `falloffDirection` | Outer, on both |
+
+Never a square island and never one universal circular mask — and remember that widening a falloff
+spends biome-canvas resolution (see the falloff note above).
 
 ### Post-pass matrix
 
@@ -510,17 +535,27 @@ V1 island is an **inset rectangle** in **world XZ**, then converted to local. Af
 | C# coast pass (`CoastalBeachShelf`) | **Off** — deleted |
 | Custom seam stitcher (`TerrainTileSeams`) | **Off** — deleted |
 | `IslandNaturalGeography` / `IslandOccupancy` / StampIT | **Off** — deleted |
+| Inland lake / river generation | **Off** — deleted; V0 water is the ocean plane only |
 
 ### Population / vegetation
 
-- Both biomes request the full `BiomeDataMask` (height, hole, layer weights, tree instances, detail
-  density) on the template prefab — Vista discards any graph stage the mask does not ask for.
-- Canopy SoT: the graphs' **TREE OUTPUT** with `Forest_TreeTemplate` (Polytope pine + fruit variants).
-- Grass SoT: the graphs' **DETAIL DENSITY OUTPUT** with `Meadow_DetailTemplate`
-  (Polytope Lowpoly `PT_Grass_02`), rendered by Unity's terrain detail pass. `GrassField`,
-  `GrassDistribution` and `VistaDetailDensity` are deleted — do not reintroduce a second placer.
-- Prefab shrubs / flowers / rocks stay in `VegetationScatterMenu` (GameObjects, not terrain data).
+- The two land biomes request the full `BiomeDataMask` (height, hole, layer weights, tree instances,
+  detail density) on the template prefab — Vista discards any graph stage the mask does not ask for.
+  The seabed deliberately asks for height + layer weights only, so Vista does not try to pull
+  vegetation outputs its graph does not have.
+- Canopy SoT: the graphs' **TREE OUTPUT**, one template per species (Vista Personal ignores
+  `prefabVariants`, so a colour or fruit variant has to be its own species with its own cluster
+  noise).
+- Understory and rock dressing: also **TREE OUTPUT** — bushes gated by the blurred `CanopyMask`,
+  rocks driven by the inverse of `GreenAreaMask`.
+- Ground cover: the island graph's **DETAIL DENSITY OUTPUT** with `Meadow_DetailTemplate`
+  (Polytope Lowpoly `PT_Grass_02`), rendered by Unity's terrain detail pass. The massif opts out —
+  two graphs emitting the same `DetailTemplate` send Vista down its merge path.
+- `VegetationScatterMenu`, `GrassField`, `GrassDistribution` and `VistaDetailDensity` are **deleted**.
+  There is no GameObject scatter pass — do not reintroduce a second placer.
 - Vegetation Studio Pro: **deprecated**; Rowlan VSP Extensions stay under `Assets/_Disabled/`.
+- **Vegetation is accepted for V0** on all four tiles. Touch it only to repair a regression a terrain
+  change caused.
 
 ### Acceptance checklist
 
@@ -535,9 +570,17 @@ V1 island is an **inset rectangle** in **world XZ**, then converted to local. Af
   the console reports overwriting it.
 - Changing `Set Biome Area On Spawn` changes the biome footprint.
 - An edit to a Terrain Graph asset survives `Generate All`.
+- `Dump Terrain Geometry`: no axis-aligned banding above the noise floor, and no dominant
+  autocorrelation lag matching a canvas cell size (island 5.08 m, massif 4.08 m, erosion sims 5.9 /
+  7.9 m). Judge at close, medium and distant views plus the four tile boundaries — a close-up alone
+  decides nothing.
+- The console reports no `Hydraulic Erosion 2: Feature Size … needs a … px sim canvas` warning. If it
+  does, a biome grew and its feature size now clamps.
 
 ## Documentation checks
 
 - Glossary **Vista Biome** / island framing points here.
 - Height budget 700 locked in `WorldScale.TerrainHeightBudgetMeters` and `VistaManager.terrainMaxHeight`.
 - Island framing Open Question resolved: Anchors + Falloff.
+- Vista Personal's 512 px biome canvas is stated here, in `VISTA_TERRAIN_PLAYBOOK.md` §2.4,
+  `OVERWORLD_V0_PLAN.md` and `AGENTS.md`. Raising it is not an accepted fix for a terrain artifact.

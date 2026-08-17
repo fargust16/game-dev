@@ -85,28 +85,28 @@ namespace GameDev.World.Roads.Tests
         [Test]
         public void BuildNetwork_StraightLineBlockedButDetourExists_StillConnects()
         {
-            // Regression for the real bug: two POIs directly across a lake from each other, where
-            // the straight line between them is fully submerged but a route around the lake's edge
+            // Regression for the real bug: two POIs on opposite sides of an impassable band, where
+            // the straight line between them is fully blocked but a route around the band's edge
             // exists. An MST that only estimates edge weight along the straight line (the original,
             // buggy implementation) would have marked this pair as unreachable and produced zero
             // roads even though a real path exists - BuildNetwork now runs actual A* per pair, so it
-            // must find the detour.
+            // must find the detour. (A sea inlet is the V0 case; the test only needs infinite cost.)
             var grid = new RoadGridSpec(0f, 0f, 35, 10, 10f);
             var nodes = new List<Vector2> { new Vector2(10f, 50f), new Vector2(340f, 50f) };
 
-            // "Lake" blocks a rectangle 220m wide in x (wider than RoadCost.MaxBridgeSpanMeters, so
+            // The impassable band blocks a rectangle 220m wide in x (wider than RoadCost.MaxBridgeSpanMeters, so
             // a direct bridge can't shortcut it) and 60m tall in z - both nodes sit exactly on the
             // blocked z row, so the direct line is blocked end to end and open only above/below.
             float Cost(float x, float z) => x > 50f && x < 270f && z > 20f && z < 80f ? float.PositiveInfinity : 1f;
 
             var segments = RoadNetworkBuilder.BuildNetwork(nodes, grid, Cost);
 
-            Assert.AreEqual(1, segments.Count, "a detour around the lake exists and must be found");
+            Assert.AreEqual(1, segments.Count, "a detour around the band exists and must be found");
             foreach (var p in segments[0].Points)
             {
                 if (p.x > 50f && p.x < 270f)
                 {
-                    Assert.IsTrue(p.y <= 20f || p.y >= 80f, "the route must cross the lake band only where it's actually open, not bridge straight across");
+                    Assert.IsTrue(p.y <= 20f || p.y >= 80f, "the route must cross the band only where it is actually open, not bridge straight across");
                 }
             }
         }

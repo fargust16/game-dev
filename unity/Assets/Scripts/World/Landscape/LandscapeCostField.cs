@@ -8,9 +8,15 @@ namespace GameDev.World.Landscape
 {
     /// <summary>
     /// Precomputed landscape characteristics + nonlinear road traversal cost.
-    /// Roads minimize distance + slope³ + earthwork + lake/mountain penalties — not shortest path.
+    /// Roads minimize distance + slope³ + earthwork + mountain/forest penalties — not shortest path.
     /// Accepted road corridors can be painted so later A* reuses them instead of running parallel.
     /// </summary>
+    /// <remarks>
+    /// Water is not part of the cost field. V0 has no inland water bodies, and the ocean is handled
+    /// upstream by <c>SeaLevelOceanSampler</c> when the planner splits a route into dry runs and
+    /// bridge spans. If inland hydrology ever returns it must enter road cost through that same
+    /// interface rather than a second distance field here.
+    /// </remarks>
     public sealed class LandscapeCostField
     {
         public const float BlockedCost = float.PositiveInfinity;
@@ -27,7 +33,6 @@ namespace GameDev.World.Landscape
         public float CurvatureWeight { get; set; } = 2f;
         public float MountainPenalty { get; set; } = 12f;
         public float ForestPenalty { get; set; } = 1.2f;
-        public float LakeShorePenalty { get; set; } = 4f;
         public float AllowedEarthworkDepth { get; set; } = WorldScale.RoadAllowedEarthworkDepthMeters;
         public float MaxCutDepth { get; set; } = WorldScale.RoadMaxCutDepthMeters;
         public float MaxFillHeight { get; set; } = WorldScale.RoadMaxFillHeightMeters;
@@ -44,7 +49,6 @@ namespace GameDev.World.Landscape
         private readonly float[] slope01;
         private readonly float[] curvature;
         private readonly float[] roughness;
-        private readonly float[] distToLake;
         private readonly float[] existingRoadDist;
         private readonly float[] heightBlur;
         private readonly byte[] biome;
@@ -68,7 +72,6 @@ namespace GameDev.World.Landscape
             slope01 = new float[n];
             curvature = new float[n];
             roughness = new float[n];
-            distToLake = new float[n];
             existingRoadDist = new float[n];
             heightBlur = new float[n];
             biome = new byte[n];
@@ -87,7 +90,6 @@ namespace GameDev.World.Landscape
                     var i = Index(x, z);
                     height[i] = heightAtWorld(wx, wz);
                     biome[i] = (byte)biomeAtWorld(wx, wz);
-                    distToLake[i] = -9999f;
                 }
             }
 
@@ -113,12 +115,8 @@ namespace GameDev.World.Landscape
         public BiomeId SampleBiome(float worldX, float worldZ) =>
             (BiomeId)biome[ClampIndex(worldX, worldZ)];
 
-        /// <summary>Positive inside water shore; negative outside (metres).</summary>
-        public float SampleDistToLake(float worldX, float worldZ) =>
-            distToLake[ClampIndex(worldX, worldZ)];
-
         /// <summary>
-        /// Circular footprint stats for POI / lake orientation (world metres radius).
+        /// Circular footprint stats for POI siting (world metres radius).
         /// </summary>
         public FootprintStats SampleFootprint(float worldX, float worldZ, float radiusMeters)
         {
@@ -329,12 +327,6 @@ namespace GameDev.World.Landscape
         public float Evaluate(float worldX, float worldZ, float desiredRoadHeight)
         {
             var i = ClampIndex(worldX, worldZ);
-            var lakeDist = distToLake[i];
-            if (lakeDist >= 0f)
-            {
-                return BlockedCost;
-            }
-
             var terrainH = height[i];
             var excavation = Mathf.Max(0f, terrainH - desiredRoadHeight);
             var fill = Mathf.Max(0f, desiredRoadHeight - terrainH);
@@ -354,14 +346,7 @@ namespace GameDev.World.Landscape
                 ? ForestPenalty * (0.5f + roughness[i])
                 : 0f;
 
-            var shore = 0f;
-            if (lakeDist > -40f && lakeDist < 0f)
-            {
-                var near = 1f + lakeDist / 40f;
-                shore = LakeShorePenalty * near * near * (0.35f + slope);
-            }
-
-            var cost = 1f + slopeCost + cutCost + fillCost + curveCost + mountain + forest + shore;
+            var cost = 1f + slopeCost + cutCost + fillCost + curveCost + mountain + forest;
             var roadDist = existingRoadDist[i];
             if (roadDist < ExistingCorridorHalfWidth)
             {

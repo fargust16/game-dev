@@ -108,9 +108,10 @@ unity/Assets/Settings/Vista/Mountain_*_TerrainGraph.asset.meta
 unity/Assets/Settings/Vista/SeaFloor_SeaFloor_TerrainGraph.asset
 unity/Assets/Settings/Vista/SeaFloor_SeaFloor_TerrainGraph.asset.meta
 
-# Diagnostic output. VistaLayerDump is written by Dump Layer Weights, outside
-# Assets on purpose so the exports never show up as project churn.
+# Diagnostic output, written by the Dump menus outside Assets on purpose so the
+# exports never show up as project churn.
 unity/VistaLayerDump/
+unity/VistaTerrainDump/
 unity/Assets/VistaExported/
 unity/Assets/VistaExported.meta
 

@@ -40,6 +40,15 @@ namespace GameDev.EditorTools
         public const int DefaultSeed = 110201;
 
         public static int LastSeed { get; private set; }
+
+        /// <summary>
+        /// Records the seed without baking, for the batch harness's measure-only mode.
+        /// </summary>
+        /// <remarks>
+        /// The bake is what normally sets <see cref="LastSeed"/>, and every downstream planner reads
+        /// it. Measuring an existing terrain and then dressing it would otherwise plan from seed 0.
+        /// </remarks>
+        public static void SetLastSeedForBatchDiagnostics(int seed) => LastSeed = seed;
         public static WorldGenSettings ActiveSettings { get; set; } = WorldGenSettings.Default;
         public static TerrainBakeFlags LastBakeFlags { get; private set; } = TerrainBakeFlags.Full;
 
@@ -336,7 +345,6 @@ namespace GameDev.EditorTools
             ApplySkyboxAndEnvironment();
 
             WaterZoneMenu.ClearWaterZones();
-            WaterZoneMenu.ClearRiverZones();
             PoiMarkerMenu.ClearMarkers();
             RoadNetworkMenu.ClearRoadNetwork();
             SettlementOverworldMenu.ClearSettlement();
@@ -609,10 +617,15 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>
-        /// Default: spawn Mountain biome template under VistaManager (Local pos/scale), drive
-        /// <c>biome.seed</c> only, apply inset-rectangle Outer falloff. Diagnostic VistaDemoAsIs
-        /// still uses the sample MountainRange graph copy.
+        /// Spawns the overworld biome stack: seabed + island, plus the massifs when
+        /// <see cref="TerrainBakeFlags.IncludeMountains"/> is set.
         /// </summary>
+        /// <remarks>
+        /// Baking without the mountains is a real configuration, not a no-op: it is the reference
+        /// bake for terrain diagnostics, because it isolates the island graph from the massif's
+        /// Raise blend. The diagnostic <see cref="TerrainBakeFlags.VistaDemoAsIs"/> path replaces
+        /// the whole stack with Vista's own sample graph instead.
+        /// </remarks>
         private static void SpawnVistaBiomes(VistaManager manager, int seed, TerrainBakeFlags flags)
         {
             EnsureVistaFolder();
@@ -642,7 +655,14 @@ namespace GameDev.EditorTools
                 return;
             }
 
-            OverworldLpbBake.SpawnIslandAndMountainStack(manager, seed);
+            var includeMountains = (flags & TerrainBakeFlags.IncludeMountains) != 0;
+            OverworldLpbBake.SpawnIslandAndMountainStack(manager, seed, includeMountains);
+            if (!includeMountains)
+            {
+                Debug.Log(
+                    "[Overworld] Baking the island without massifs (TerrainBakeFlags.IncludeMountains " +
+                    "is off). Terrain geometry is the island graph alone.");
+            }
         }
 
         public static void PersistSpawnedOwnedObjectsPublic(

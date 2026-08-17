@@ -90,6 +90,6 @@ Primary and Secondary use the same attach primitive: min connection cost onto an
 
 Bake order above is unchanged for non-hydro steps. Color / splat / road lawn / grass / ocean numbers live in [OVERWORLD_VISUAL_DIRECTION.md](OVERWORLD_VISUAL_DIRECTION.md):
 
-- Zones paint soft biome masks; roads paint packed bed + soft edge after corridors.
-- GPU grass and WaterWorks SSR_Water **ocean** material read the same world after deform.
-- Terrain render = MicroSplat Convert + URP6.3.
+- Surface weights come from the Vista graphs' Weight Blend; roads paint packed bed + soft edge **after** the bake, appending their own layers without reordering or repainting canonical indices 0–4.
+- Vegetation (graph-placed) and the WaterWorks SSR_Water **ocean** material read the same world after deform.
+- Terrain render = **URP TerrainLit** over the five canonical `TerrainLayer` assets Vista binds. MicroSplat is out of the pipeline — do not reintroduce it.

@@ -79,12 +79,162 @@ just written, which is why grass never appeared for several iterations.
 
 ### 2.4 Vista Personal caps the biome canvas at 512 px
 
-1K/2K/4K are Indie/Pro only. The reference biome is authored at 1024, so **its erosion feature sizes
-do not transfer**. A `featureSize` finer than `biomeWidth / 512` is silently clamped and the flow
-simulation carves grid-aligned parallel rills — the corduroy striping.
+`Constants.RES_MAX` returns 512 and `HM_RES_MAX` returns 513 unless a runtime component registers an
+override callback — and nothing in the Personal package ever does. 1K/2K/4K are Indie/Pro only.
 
-The node tells you: *"Feature Size 2 m needs a 1000 px sim canvas, above the 512 px budget."*
-Never ignore that line. `VistaGraphBuild.MinFeatureSizeMeters` is the floor for our biome sizes.
+**This is a design constraint, not a bug to route around.** Buying Vista Indie is not a project
+dependency, and *"raise the resolution"* is not an accepted answer to a terrain artifact. The
+question is always: what is the best terrain we can get inside 512 px?
+
+Two separate consequences, and they are easy to confuse:
+
+**(a) The canvas is the shape ceiling.** A biome's canvas covers `worldArea + 2 × falloffDistance`,
+and **every** node in the graph runs at that resolution (`ImageNodeExtension.CalculateResolution`;
+our nodes are all `RelativeToMainInput` × 1). So:
+
+| Biome | Bounds (authored ceiling) | m/px at 512 | Measured |
+|---|---|---|---|
+| `LPB_IslandBase` | 2240 + 2 × 180 = 2600 m | 5.08 | **4.89** (2503 m) |
+| `LPB_Mountain_n` | 1050 + 2 × 520 = 2090 m (X) | 4.08 | **3.71** (1902 m) |
+| `LPB_SeaFloor` | snapped to the whole world, 5600 m | — | **10.94** |
+| Tile heightmap, for comparison | 1400 m at 513 px | — | 2.73 |
+
+The authored column is the ceiling from `SetBiomeAreaOnSpawn` plus falloff; the measured column is
+what `Dump Terrain Geometry` reports, and it is smaller because the seeded silhouette is inscribed
+*inside* the authored rectangle. **Trust the dump, not the arithmetic** — it reads the scene.
+
+The island canvas is **~1.9× coarser than the terrain heightmap it writes into**. No graph feature
+smaller than ~5 m can exist, and asking for one produces grid artifacts rather than detail. The only
+lever that buys m/px without a licence upgrade is a **smaller biome footprint** — reduce
+`worldArea`, or the falloff, on the template prefab.
+
+**(b) The erosion sim canvas is capped by the same number.**
+`simResolution = clamp(biomeWidth / featureSize, 32, min(2048, outputResolution))`, and
+`outputResolution` here is the biome's 512. A `featureSize` finer than `biomeWidth / 512` is
+silently clamped, and a clamped flow simulation carves grid-aligned parallel rills.
+
+At the current biome sizes nothing is clamped: on the island's measured 2503 m, macro
+`featureSize 8` asks for 313 px and micro `featureSize 6` asks for 418 px, both under 512.
+**So a clamped sim is not, today, the explanation for striping** — measure before assuming it is.
+`VistaGraphBuild.MinFeatureSizeMeters` holds the floor, and these numbers must be rechecked whenever
+a biome's area or falloff changes.
+
+### 2.4a What the banding actually is — four hypotheses killed by measurement
+
+All figures from `Dump Terrain Geometry`, seed 110201, via the headless harness in 2.4b.
+
+| Hypothesis | Test | Result |
+|---|---|---|
+| Clamped erosion sim carves grid rills | arithmetic + console | **Dead.** Macro asks 313 px, micro 418 px, cap is 512. Nothing clamps, and the node logs no warning. |
+| Biome-canvas facets show through | period vs canvas m/px | **Dead.** Canvases are 5.01 / 3.19 / 10.94 m/px; every real peak is 20–60x coarser. |
+| The massifs' Raise blend causes it | bake with `IncludeMountains` off | **Dead.** The anisotropy is present without massifs (ratios 0.57–0.71) and the axis-aligned share is *higher* — up to 30 % — so the massifs partly mask it. It is the island graph. |
+| Erosion is under-iterated | macro 200 vs 500 iterations, island-only | **Dead.** Every number moved by <0.02; peak height identical at 115 m. Iterations are not the lever. |
+| Erosion causes it at all | erosion nodes **bypassed**, island-only | **Dead — and it is the decisive one.** The banding *survives* bypass and gets slightly **stronger**: curvature ratio 0.71/0.59/0.57/0.67 becomes 0.65/0.52/0.50/0.63, the axis-aligned share is unchanged tile for tile (30/19/25/14), and the ~101 m spacing down Z is *clearer* than with erosion (r up to 0.24). Erosion is not the source; if anything it softens the structure. |
+| 16-bit heightmap quantisation terracing | height budget 700 m vs 400 m, island-only | **Dead, despite a very good-looking coincidence.** `TerrainData` stores heights as 16-bit, so at a 700 m budget one step is `700/65535 = 0.0107 m` — which is *exactly* the smallest mean \|d2x\| measured on any tile, and terraces on a gently N-S-tilted plateau would run E-W. But dropping the budget to 400 m should have pulled that floor to 0.0061 m and it only reached 0.0090, and the curvature **ratio got worse on all four tiles** (0.57/0.67/0.59/0.71 → 0.52/0.62/0.51/0.64). Quantisation contributes a little; it does not drive the banding, and shrinking the budget is not a fix. |
+
+**The banding comes from the shaping stage — the two `NoiseNode`s and what follows them — not from
+erosion, not from the massifs, and not from any resolution limit.**
+
+What survives measurement, on the island graph with erosion bypassed:
+
+- curvature **1.5–2.0x stronger across the slope than along it**, on every tile (ratio 0.50–0.65),
+  i.e. ridges consistently elongated east-west;
+- a repeating spacing down **Z** dominated by **~101 m on all four tiles**, with ~186 m and ~85 m
+  behind it, all well above the noise floor;
+- **nothing above the noise floor along X**;
+- orientation 14–30 % axis-aligned against a 17 % even-spread baseline.
+
+The ~101 m figure is the lead. `AddDetailNoise` runs `scale 1200` with lacunarity 2.25 over 8
+octaves, so the octave sizes are 1200 / 533 / 237 / **105** / 47 / 21 / 9.3 / 4.1 m — the measured
+dominant period is octave 4 to within 4 %.
+
+**Look at the curvature PNG before theorising further.** The numbers describe the banding but the
+image identifies it: on the default settings the land reads as **horizontal scan-lines at row
+resolution**, not as landform undulation. Two things are visible there that no statistic surfaced:
+
+- the stripes are single-row, which points at a row-wise write or resample rather than at anything
+  the graph computes;
+- **the coastline breaks into straight chords** — the 36-anchor silhouette is under-tessellated for
+  a 2.2 km island and reads as a polygon. That is a separate, easily fixed defect: raise
+  `OverworldLpbBake.IslandAnchorCount`.
+
+The one lever that measurably moves the banding is `layerDerivativeMode = Pow` instead of the
+default `Linear` (ratios 0.50–0.71 → 0.65–0.92, and the ~101 m periodicity drops below the noise
+floor). But `Pow` divides scale and amplitude by `lacunarity^i` *at every step*, so only the first
+two or three octaves survive — it removes the banding by removing the detail that carries it, and
+peak height barely moves (115 m → 112 m). That is an art trade, not a fix.
+
+### 2.4c The control that settles it: Vista's own graph on the same tiles
+
+`-overworldDemoGraph true` bakes Vista's sample MountainRange over the same 2x2 grid, through the
+same biome canvas, the same 512 px cap, the same 16-bit heightmap and the same dump. Result:
+
+| Measure | Our island graph | Vista's sample graph |
+|---|---|---|
+| Curvature ratio | 0.50–0.71, **same direction on every tile** | 0.87 / 0.97 / 0.84 / 1.50 — isotropic, and the one outlier leans the *other* way |
+| Axis-aligned share (17 % = even) | 14–30 % | 17 / 19 / 18 / 19 % — flat |
+| Z-period peaks vs stencil floor | **above** the floor (101 m at r≈0.24) | every peak **below** the floor (0.09–0.22 vs floors 0.46–0.57) — no periodicity at all |
+
+Its curvature map is dendritic: branching drainage radiating in every direction, no stripes.
+
+**So the pipeline is innocent and the instrument is validated.** The biome-canvas resample, the
+16-bit heightmap, the tile write and this dump all produce clean isotropic terrain when the graph
+feeding them is clean. The banding is in `IslandPlateau_TerrainGraph`, and — since erosion is
+already excluded by 2.4a — specifically in its **shaping stage**: two `NoiseNode`s →
+`Combine(Multiply)` → `Levels` → `ShelfCurve`.
+
+### 2.4d Every lever helps a little; none of them is the cause
+
+Two shaping-stage parameters have been isolated by bake-and-measure. Both improve the curvature
+ratio, neither comes near the reference, and both work by *removing relief*, not by removing an
+artifact:
+
+| Change | Ratio (4 tiles) | Peak height | Verdict |
+|---|---|---|---|
+| baseline (island only) | 0.57 / 0.59 / 0.67 / 0.71 | 115 m | the banding |
+| `layerDerivativeMode = Pow` | 0.65 / 0.78 / 0.89 / 0.92 | 112 m | best single lever — but only 2–3 of 8 octaves survive `Pow`, so it deletes the detail that carried the banding |
+| `ShelfCurve` → identity | 0.64 / 0.65 / 0.76 / 0.78 | 94 m | +0.05…0.11, and the plateau stops being a plateau |
+| **Vista's sample graph** | **0.84 / 0.87 / 0.97 / 1.50** | — | what clean looks like |
+
+The pattern across every experiment is the same: **anything that reduces high-frequency content in
+the height field improves the ratio proportionally, and nothing removes the banding outright.** That
+is the signature of a property emerging from the shaping recipe as a whole, not of one mis-set
+parameter — which also explains why seven single-cause hypotheses all died.
+
+**Conclusion, and the open decision.** The island's shaping stage — `AddDetailNoise` (8 octaves,
+`persistence 0.382`, `flipSign`, `applyRemapPerLayer` with a `(0.1,0)→(1,1)` curve) multiplied by a
+one-octave mass noise, then `Levels`, then `ShelfCurve` — is our own recipe, not the reference's, and
+it is what produces the banding. Vista's sample graph, built on a different recipe through the exact
+same pipeline, is clean. Fixing this means **re-deriving the island shaping stage from the reference
+graph** rather than tuning a constant, and it changes how every island on every seed looks. That is
+an art decision; do not make it silently, and do not spend more bake time on single-parameter
+sweeps — the table above shows what they are worth.
+
+### 2.4b Measure headlessly, and never with `-nographics`
+
+`OverworldBatchDiagnostics.BakeAndDump` bakes terrain only and dumps the geometry report, so an A/B
+is two commands rather than two afternoons:
+
+```
+Unity.exe -batchmode -projectPath <project> \
+  -executeMethod GameDev.EditorTools.OverworldBatchDiagnostics.BakeAndDump \
+  -overworldSeed 110201 -overworldMountains false -overworldRebuildGraphs true -logFile out.log
+```
+
+Two things that will waste a run:
+
+- **`-nographics` silently produces a completely flat world.** It forces `GfxDevice: Null`, Vista's
+  compute shaders throw on `ComputeShader.SetTexture`, and the bake finishes "successfully" with
+  every tile at height 0.0. The dump reports `<flat>` on all four tiles, which reads like a
+  generation bug rather than a missing GPU. Omit the flag.
+- **`-quit` kills the bake mid-generation**, because it is an editor coroutine that needs the editor
+  loop to tick. The harness exits the process itself when it is done.
+
+Changing a `*GraphBuilder` and forgetting `-overworldRebuildGraphs true` measures the old graph
+twice and looks exactly like a null result.
+
+The node tells you when it does bite: *"Feature Size 2 m needs a 1000 px sim canvas, above the 512 px
+budget."* Never ignore that line.
 
 ### 2.5 Trees and details want **opposite** prefab shapes
 
@@ -384,19 +534,32 @@ metres-as-multiplier values — reports everything else, and changes nothing els
 
 ## 6. Diagnostics — measure before changing
 
-1. **`GameDev/Overworld/Vista/Dump Layer Weights`** — per tile: layer stack, per-layer histogram with
+1. **`GameDev/Overworld/Vista/Dump Terrain Geometry`** — per tile: height range, land %, curvature
+   energy per axis, the dominant banding **period in metres**, a gradient-orientation histogram, and
+   height/slope/curvature PNGs. It also prints the m/px of every biome canvas in the scene, so a
+   measured period can be held against the grid that would explain it. Use it before touching a
+   graph: "it looks striped" is not a measurement, and every candidate cause looks identical from an
+   aerial screenshot. Two traps it now guards against:
+   - **The stencil floor.** A three-point second difference correlates with itself at lags 1–2
+     whatever the terrain does. The first run reported a "dominant 5.5 m period" on all four tiles,
+     which is exactly lag 2 at 2.73 m/px. Peaks are now scanned from lag 3 and the floor is printed
+     beside them — **a peak below the floor is noise, not a feature**.
+   - **Anisotropy is not alignment.** Curvature can be stronger along one axis simply because the
+     landform is elongated. The orientation histogram is the test for a grid: rills locked to a
+     simulation grid pile up in the bins around 0° and 90°.
+2. **`GameDev/Overworld/Vista/Dump Layer Weights`** — per tile: layer stack, per-layer histogram with
    `zero%`/`saturated%`, weight sum on painted pixels, land-height distribution, one PNG per layer.
    An average cannot tell a soft gradient from a saturated blanket; the histogram can.
-2. **`GameDev/Overworld/Vista/Dump Vegetation State`** — per tile, the whole vegetation chain with a
+3. **`GameDev/Overworld/Vista/Dump Vegetation State`** — per tile, the whole vegetation chain with a
    number at each link: template valid → prototype accepted by Unity (`DetailPrototype.Validate`,
    material instancing) → density actually written into the detail layer → instance size in metres →
    drawn at this distance. Every one of those failures looks identical from the scene view ("there is
    no grass"); the first line that reads zero is the one that matters.
-3. **`Window/Vista/Diagnostics/Session Viewer`** — Vista's own recorder. Captures **every node's
+4. **`Window/Vista/Diagnostics/Session Viewer`** — Vista's own recorder. Captures **every node's
    output** as an image. This is the fastest way to see whether a mask is wrong before the weights
    are even blended. Use it first.
-4. Node previews in the Vista graph editor.
-5. The console. Vista warns about clamped simulations and rejected prototypes in plain English, and
+5. Node previews in the Vista graph editor.
+6. The console. Vista warns about clamped simulations and rejected prototypes in plain English, and
    both warnings turned out to be exact descriptions of a bug we were hunting blind.
 
 ---

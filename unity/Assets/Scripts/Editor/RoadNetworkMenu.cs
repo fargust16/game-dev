@@ -198,7 +198,10 @@ if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y
                 $"{segments.Count} segments -> {dryRoadDefs.Count} corridors, " +
                 $"{clearanceSamples.Count} clearance samples");
 
-            if (terrain != null)
+            // Every tile a corridor crosses, not just tile (0,0) — the network spans the whole
+            // 2800 m world, so a single-tile deform left three quarters of the roads unsurfaced.
+            var terrains = OverworldTerrainAccess.FindTerrains();
+            if (terrains.Length > 0)
             {
                 var centerLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadCenterLayerPath);
                 var edgeLayer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(RoadEdgeLayerPath);
@@ -206,12 +209,12 @@ if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y
                 OverworldGenTiming.Time(
                     "roads.deform+paint",
                     () => TerrainDeformer.Apply(
-                        terrain,
+                        terrains,
                         dryRoadDefs,
                         centerLayer,
                         gravelLayer,
                         edgeLayer),
-                    $"terrain '{terrain.name}'");
+                    $"{terrains.Length} tile(s)");
             }
 
             ClearRoadNetwork();

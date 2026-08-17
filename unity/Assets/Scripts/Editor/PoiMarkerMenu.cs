@@ -97,6 +97,8 @@ namespace GameDev.EditorTools
         {
             VistaTileSync.WaitForTerrainReady();
 
+            // Only a presence check and a source for the flat ocean level; every per-marker query
+            // below resolves the tile that actually contains the point.
             var terrain = OverworldTerrainAccess.FindTerrain();
             if (terrain == null)
             {
@@ -120,7 +122,10 @@ namespace GameDev.EditorTools
 
             foreach (var marker in markers)
             {
-                if (!TrySampleTerrainHeight(terrain, marker.Position.x, marker.Position.z, out var y))
+                // Against the whole tile grid, not tile (0,0): markers are planned across the full
+                // 2800 m world, so a single-tile bounds check discards three quarters of them.
+                if (!OverworldTerrainAccess.TrySampleHeightWorld(
+                        marker.Position.x, marker.Position.z, out var y))
                 {
                     skippedNoSurface++;
                     continue;
@@ -219,26 +224,6 @@ namespace GameDev.EditorTools
             {
                 Object.DestroyImmediate(root);
             }
-        }
-
-        private static bool TrySampleTerrainHeight(UnityEngine.Terrain terrain, float x, float z, out float y)
-        {
-            if (terrain == null || terrain.terrainData == null)
-            {
-                y = 0f;
-                return false;
-            }
-
-            var pos = terrain.transform.position;
-            var size = terrain.terrainData.size;
-            if (x < pos.x || z < pos.z || x > pos.x + size.x || z > pos.z + size.z)
-            {
-                y = 0f;
-                return false;
-            }
-
-            y = terrain.SampleHeight(new Vector3(x, 0f, z)) + pos.y;
-            return true;
         }
 
         private static GameObject PickPrefab(PoiKind kind, BiomeId biome, System.Random rng)

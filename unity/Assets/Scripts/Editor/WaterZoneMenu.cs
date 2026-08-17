@@ -7,12 +7,16 @@ using Object = UnityEngine.Object;
 namespace GameDev.EditorTools
 {
     /// <summary>
-    /// Ocean plane only. Inland lake/river generation removed.
+    /// The overworld's only water: one WaterWorks plane at <see cref="WorldScale.SeaLevelMeters"/>.
     /// </summary>
+    /// <remarks>
+    /// V0 has no inland lakes or rivers, so there is nothing here but the ocean sheet. Future
+    /// hydrology is a redesign from first principles — see "14 World Generation Roadmap" section
+    /// "Future Hydrology / River Generation" — and must not start from this file.
+    /// </remarks>
     public static class WaterZoneMenu
     {
         private const string RootObjectName = "OverworldWater";
-        private const string RiverRootObjectName = "OverworldRivers";
         private const string WorldWaterObjectName = "WorldWater";
         private const string WaterWorksPlanePrefabPath = "Assets/WaterWorks/Water_Plane.prefab";
         private const string OverworldWaterMaterialPath = "Assets/Settings/Water/OverworldWater.mat";
@@ -20,27 +24,15 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Ensure Ocean Plane", false, 40)]
         public static void EnsureOceanMenu() => EnsureOceanOcWPlane();
 
+        /// <summary>Removes the water root entirely; the next bake re-creates the ocean.</summary>
         public static void ClearWaterZones()
         {
             var root = GameObject.Find(RootObjectName);
             if (root != null)
                 Object.DestroyImmediate(root);
-            ClearRiverZones();
         }
 
-        public static void ClearRiverZones()
-        {
-            foreach (var name in new[]
-                     {
-                         RiverRootObjectName, "OverworldRivers_Vista", "VistaHydroRivers"
-                     })
-            {
-                var go = GameObject.Find(name);
-                if (go != null)
-                    Object.DestroyImmediate(go);
-            }
-        }
-
+        /// <summary>Drops everything under the water root except the ocean sheet itself.</summary>
         public static void ClearWaterMeshesOnly()
         {
             var root = GameObject.Find(RootObjectName);
@@ -55,10 +47,7 @@ namespace GameDev.EditorTools
                 var child = root.transform.GetChild(i).gameObject;
                 if (child.name == WorldWaterObjectName)
                     continue;
-                if (child.name.StartsWith("Lake_") ||
-                    child.name.StartsWith("River_") ||
-                    child.name.StartsWith("WaterZone_"))
-                    Object.DestroyImmediate(child);
+                Object.DestroyImmediate(child);
             }
 
             EnsureOceanOcWPlane();
@@ -70,16 +59,13 @@ namespace GameDev.EditorTools
             if (waterRoot == null)
                 waterRoot = new GameObject(RootObjectName);
 
+            // Anything under the root that is not the ocean sheet is left over from an older bake.
             for (var i = waterRoot.transform.childCount - 1; i >= 0; i--)
             {
                 var child = waterRoot.transform.GetChild(i).gameObject;
                 if (child.name == WorldWaterObjectName)
                     continue;
-                if (child.name == "Ocean" ||
-                    child.name.StartsWith("WaterZone_") ||
-                    child.name.StartsWith("Lake_") ||
-                    child.name.StartsWith("River_"))
-                    Object.DestroyImmediate(child);
+                Object.DestroyImmediate(child);
             }
 
             var waterTf = waterRoot.transform.Find(WorldWaterObjectName);

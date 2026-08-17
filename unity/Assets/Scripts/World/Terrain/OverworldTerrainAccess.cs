@@ -98,6 +98,56 @@ namespace GameDev.World.Terrain
 
         public static float WorldExtentZMeters() => WorldScale.WorldExtentZMeters;
 
+        /// <summary>
+        /// Finds the tile containing a world XZ point, or null when the point is off the grid.
+        /// </summary>
+        public static UnityEngine.Terrain FindTileAt(float worldX, float worldZ)
+        {
+            var terrains = FindTerrains();
+            for (var i = 0; i < terrains.Length; i++)
+            {
+                var t = terrains[i];
+                if (t == null || t.terrainData == null)
+                {
+                    continue;
+                }
+
+                var pos = t.transform.position;
+                var size = t.terrainData.size;
+                if (worldX < pos.x || worldZ < pos.z ||
+                    worldX > pos.x + size.x || worldZ > pos.z + size.z)
+                {
+                    continue;
+                }
+
+                return t;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Height at a world XZ point, reporting whether the point is on the terrain grid at all.
+        /// </summary>
+        /// <remarks>
+        /// The world is 2x2 tiles, so anything that bounds-checks against a single tile silently
+        /// discards three quarters of it — that is what dropped 27 of 32 POI markers as "no
+        /// surface". Prefer this over <see cref="SampleHeightWorld"/> wherever "off the grid" and
+        /// "at height zero" mean different things.
+        /// </remarks>
+        public static bool TrySampleHeightWorld(float worldX, float worldZ, out float worldY)
+        {
+            var terrain = FindTileAt(worldX, worldZ);
+            if (terrain == null)
+            {
+                worldY = 0f;
+                return false;
+            }
+
+            worldY = terrain.SampleHeight(new Vector3(worldX, 0f, worldZ)) + terrain.transform.position.y;
+            return true;
+        }
+
         /// <summary>Sample height in world XZ across the tile grid.</summary>
         public static float SampleHeightWorld(float worldX, float worldZ)
         {
@@ -131,6 +181,13 @@ namespace GameDev.World.Terrain
                    fallback.transform.position.y;
         }
 
+        /// <summary>
+        /// Sampler over the whole tile grid, or null when no terrain exists yet.
+        /// </summary>
+        /// <remarks>
+        /// The terrain passed in is only a fallback for points off the grid;
+        /// <see cref="VistaTerrainSampler"/> resolves the containing tile for every query.
+        /// </remarks>
         public static VistaTerrainSampler CreateSampler(int moistureSeed = 0)
         {
             var terrain = FindTerrain();

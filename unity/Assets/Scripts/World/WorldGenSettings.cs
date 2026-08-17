@@ -24,12 +24,10 @@ namespace GameDev.World
         public float MinimumPoiDistanceMeters;
 
         public bool RunSurface;
-        public bool RunZones;
         public bool RunMountains;
         public bool RunMarkers;
         public bool RunSettlements;
         public bool RunRoads;
-        /// <summary>Legacy prefab canopy. The biome graphs place trees during Surface.</summary>
         public bool RunPlayer;
 
         public static WorldGenSettings Default => new WorldGenSettings
@@ -47,7 +45,6 @@ namespace GameDev.World
             LandmarkCount = 9,
             MinimumPoiDistanceMeters = 64f,
             RunSurface = true,
-            RunZones = true,
             RunMountains = true,
             RunMarkers = true,
             RunSettlements = true,
@@ -76,7 +73,6 @@ namespace GameDev.World
             switch (step)
             {
                 case OverworldPipelineStepId.Surface: return RunSurface;
-                case OverworldPipelineStepId.Zones: return RunZones;
                 case OverworldPipelineStepId.Mountains: return RunMountains;
                 case OverworldPipelineStepId.Markers: return RunMarkers;
                 case OverworldPipelineStepId.Settlements: return RunSettlements;
@@ -91,7 +87,6 @@ namespace GameDev.World
     public enum OverworldPipelineStepId
     {
         Surface,
-        Zones,
         Mountains,
         Markers,
         Settlements,

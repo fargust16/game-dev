@@ -102,11 +102,6 @@ namespace GameDev.World.Poi
                 for (var x = minX + step * 0.5f; x < minX + SectorSizeX; x += step)
                 {
                     total++;
-                    if (analysis.SampleDistToLake(x, z) > -12f)
-                    {
-                        continue;
-                    }
-
                     if (analysis.SampleSlope01(x, z) > maxSlope01)
                     {
                         continue;

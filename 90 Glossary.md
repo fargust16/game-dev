@@ -356,7 +356,7 @@ Placeholder name for the Vertical Slice district: a poor/industrial urban area o
 
 ## Overworld Chunk
 
-Seeded exploration zone of the overworld (biome, terrain, POI slots, creature spawns). **V0 chunk size = 64 m**; stub playable area ~512 m with chunk API as if infinite. Streamed/chunked intent like Valheim-shaped worlds. No harvest loop as core progression. See [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
+Seeded exploration zone of the overworld (biome, terrain, POI slots, creature spawns). **V0 chunk size = 64 m**; the V0 playable world is **2800 × 2800 m** (2×2 Vista terrain tiles of 1400 m), with the chunk API written as if the world can expand. Streamed/chunked intent like Valheim-shaped worlds. No harvest loop as core progression. See [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
 
 ---
 
@@ -764,7 +764,7 @@ Static remaps and albedo tile sizes for overworld `TerrainLayer` assets (Fields,
 
 ## RoadSurfaceStyle
 
-Tunables for packed-earth road alphamap paint: soft edge width (0.5–1.5 m), bed/transition coverage, gravel/ruts. Kept in sync with `GrassMask` road lawn (sparse residual at center, not bald). See `RoadSurfacePaint`.
+Tunables for packed-earth road alphamap paint: soft edge width (0.5–1.5 m), bed/transition coverage, gravel/ruts. Roads append their own `TerrainLayer`s **after** the Vista bake and must never reorder or repaint the canonical biome indices 0–4. See `RoadSurfacePaint`.
 
 ---
 
@@ -788,13 +788,13 @@ World Y of the single **ocean** water plane (`WorldScale.SeaLevelMeters`, defaul
 
 ## Coastal Height Transition
 
-Directed post-Vista height pass (`CoastalBeachShelf`): profile targets **≤12°** over a wide band; island plains sit at **~55 m** ASL. Softens the rim, then **coast-band height smooth** removes flood-ring terraces (sawtooth rock faces). Sand splat uses strong shore weights + multi-pass shore↔grass feather; MicroSplat Convert **without** `_HYBRIDHEIGHTBLEND`. Debug: `GameDev/Overworld/Debug/Diagnose Sand Pipeline`.
+How the island reaches the waterline. **Entirely Vista, no post-pass** — `IslandPlateau_TerrainGraph` biases its distribution toward high ground and the LPB's **Outer falloff** drags the rim under sea level; the coastline silhouette is the seeded anchor polygon. Sand is a normalized low-altitude `Curve` band × a small noise, painted as Weight Blend priority 3, so the beach follows the graph's low ground rather than a contour ring. The old directed post-Vista height pass (`CoastalBeachShelf`) and its C# splat painter are **deleted**; do not reintroduce a post-generation coast pass. See [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md).
 
 ---
 
 ## Island Occupancy
 
-Post-geography height pass (`IslandOccupancy`) that **only** enforces tile-border submersion below Sea Level (`MinimumSubmersionMeters` / shelf floor). Island silhouette and geology come from Vista LPB Anchors + Outer Falloff (not a radial pancake). Legacy `IslandNaturalGeography` is not used in the V0 Vista bake path.
+**Deleted.** Was a post-geography C# height pass enforcing tile-border submersion. Border submersion is now `LPB_SeaFloor` plus the island biome's Outer falloff, and the silhouette is the seeded anchor polygon — all inside Vista. `IslandNaturalGeography` is deleted with it. Historical term only; do not reintroduce a post-generation height pass.
 
 ---
 
@@ -812,13 +812,13 @@ Third-party URP water pack (`Assets/WaterWorks/`). Overworld SoT for the single 
 
 ## Vista Biome
 
-Pinwheel Vista Personal `LocalProceduralBiome`. **Quality SoT:** multi-LPB stack on `Overworld_Generator` — [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md). Height budget **700 m**. Order bands: Geology (IslandBase Replace + Mountain **Raise**) → Hydrology → Ecology → Civilization. Island silhouette = **harmonic asymmetric Anchors + Outer Falloff + SoftFalloff BiomeMaskGraph**; coast = **directed CoastalBeachShelf** (no terrace ring); mountains = elongated ellipse anchors + wide falloff (not circular KeepHigher stamps). Drive layout with **`biome.seed`**. Terrain shading = C# coast/degree splat → MicroSplat Convert + URP6.3 **without** `_HYBRIDHEIGHTBLEND`; grass = Polytope Lowpoly `PT_Grass_02` via `GrassField`. Water look = `Assets/Settings/Water/OverworldWater.mat` (clone of WaterWorks SSR_Water).
+Pinwheel Vista Personal `LocalProceduralBiome`. **Quality SoT:** the multi-LPB stack on `Overworld_Generator` — [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md). Height budget **700 m** over 2×2 tiles of 1400 m. Stack: `LPB_SeaFloor` (order 0, Replace) → `LPB_IslandBase` (order 10, Replace) → `LPB_Mountain_n` (order 20+, **Raise**). Island silhouette = **harmonic asymmetric Anchors + Outer Falloff + SoftFalloff BiomeMaskGraph**; coast is graph + falloff with no post-pass; mountains = elongated ellipse anchors + wide falloff (not circular KeepHigher stamps). Drive layout with **`biome.seed`** only — never mutate graph node seeds. Terrain shading = the graphs' Weight Blend → five canonical `TerrainLayer`s → **URP TerrainLit**; MicroSplat is out of the pipeline. Vegetation is placed by the graphs themselves. **`baseResolution` is capped at 512 px by Vista Personal** — the resolution ceiling on terrain shape. Water look = `Assets/Settings/Water/OverworldWater.mat` (clone of WaterWorks SSR_Water).
 
 ---
 
 ## Terrain Surface Stack
 
-V0 overworld TerrainLayers painted by `OverworldMicroSplatSetup` then Converted to MicroSplat: **0 grass** (`MS_Moss_Fields`), **1 sand** (`MS_Shore_Sand`), **2 cliff** (`MS_Cliff_Rock`), **3 rock** (`MS_Rock_Cliff`). Dry sand = **ASL height band** (Sea+0…Sea+30) + spatial noise (breaks contour rings); underwater sand = near-land only; soft multi-pass alphamap blur. Coast geometry: `CoastalBeachShelf` ≤12° + SmoothCoastBand. Operator rules: [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces. Never `_HYBRIDHEIGHTBLEND` on this bake.
+The five canonical overworld `TerrainLayer` assets in `Assets/Settings/TerrainLayers/Overworld/`, owned by `OverworldTerrainLayers.SurfaceLayer`: **0 Grass, 1 Sand, 2 Soil, 3 Cliff, 4 Rock**. Both terrain graphs emit all five `TextureOutputNode`s with `order = (int)SurfaceLayer`, so every tile's stack is identical whichever biomes covered it; **Vista writes `terrainData.terrainLayers` per tile and C# never assigns it**. Weights come from each graph's `Weight Blend` (output i = `in[i] × Π(1 − in[j])` for j > i, layer 0 left unconnected so the weights sum to 1). Rendered by **URP TerrainLit** — MicroSplat is out of the pipeline, and there is no C# splat painting. Roads and settlements may append their own layers afterwards but must never reorder or repaint indices 0–4. Diagnostics: `GameDev/Overworld/Vista/Dump Layer Weights`. Operator rules: [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces.
 
 ---
 
@@ -834,11 +834,13 @@ Third-party stylized water pack (OCW). **Demoted** — unused stylized fallback.
 
 ---
 
-## Lake Safety Margin
+## Inland Hydrology
 
-**(Retired V0 — inland lake generation removed 2026-08-15; kept for historical reading.)**
+**Retired.** Inland lake and river generation was removed from V0 on 2026-08-15, and the constants, placers, scorers, basin diggers, water-zone meshes and their glossary entries were deleted with it. V0 water is **one ocean plane** (see **Sea Level**).
 
-Metres above Sea Level that lake rims must maintain (`WorldScale.LakeSafetyMarginMeters`, ~6 m) so the single water plane cannot spill to the ocean.
+The deleted implementations are **not** a foundation to build on — that is the explicit lesson recorded in [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) § Future Hydrology / River Generation, which also states what a future system would have to model. Do not reintroduce `LakeDefinition`, `RiverTracer`, `WaterZone_*` hierarchies, or `WorldScale.Lake*` / `River*` / water-inset constants.
+
+---
 
 ## POI Placement Profile
 
@@ -846,43 +848,9 @@ Per-`PoiKind` hard constraints, soft preferences, relation rules, and optional f
 
 ---
 
-## Water Overlap
-
-Metres the water sheet expands beyond the lake shore iso so the mesh sinks under terrain banks (`WorldScale.WaterOverlapMeters`, ~1.75 m — InsetWidth). Basin dig expands further by buffer (`LakeBasinExpandMeters` = overlap + `WaterInsetBufferMeters`). World Generator UI label **Water Inset Width (m)** maps to this overlap (positive expand under banks — not a shrink). Prefer larger values over visible gaps or floating water edges.
-
----
-
-## Water Inset Depth
-
-Vertical recess of the water plane under dry shore (`WorldScale.WaterInsetDepthMeters`, ~1.0 m). Shore shelf dig targets `waterY + InsetDepth`; steep shores add `slope * WaterInsetSlopeFactor` (capped at 1.5 m). Freeboard / spill helpers use at least this depth.
-
----
-
-## Water Depth Offset
-
-Metres subtracted from a **low shore-rim percentile** (not the average) after headroom: `WaterLevel = LowRim − max(WaterDepthOffset, WaterInsetDepth)` (`WorldScale.WaterDepthOffsetMeters`, ~1.25 m). Average rim left the plane floating over downhill shores; low-rim spill keeps banks above the sheet. Downhill gaps get a capped shore-lip fill; the water mesh stays a flat sheet with **mountain safety-clip** where terrain sits above water on mountain cells. A shore-strip blur removes heightmap stairs at the bank.
-
----
-
 ## World Definition
 
 Aggregate snapshot of one overworld generation: `WorldSeed`, `WorldGenSettings`, POIs (stable sorted markers), roads (`RoadDefinition[]`), and stats (road km, POI count). Scene holder: `OverworldWorldState`. Downstream systems read this instead of re-running placers. See [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
-
----
-
-## Lake Placement Score
-
-**(Retired V0 — inland lake generation removed 2026-08-15; kept for historical reading.)**
-
-Score used to pick lake sites from macro terrain: enclosing basin walls + low slope + low variance + edge distance − excavation − mountain/cliff. Hard-rejects sites that would destroy mountains or sit mid-slope / near map edge. Full-silhouette **Mountain Occupancy** (`BiomeId.Mountain`) is an additional hard reject beyond the local score window. Replaces naive `-height + rng` ranking. See `DistributedLakePlacer` / [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
-
----
-
-## Max Lake Terrain Modification
-
-**(Retired V0 — inland lake generation removed 2026-08-15; kept for historical reading.)**
-
-Cap (metres) on how far any heightmap sample may be dug below the pre-basin surface when applying a lake bowl (`WorldScale.LakeMaxTerrainModificationMeters`). Prevents mountain flanks from being excavated into cliffs. Candidates that would require more dig should be rejected at placement, not forced.
 
 ---
 

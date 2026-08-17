@@ -408,15 +408,9 @@ namespace GameDev.EditorTools
 
         private static bool TryFindGroundHeight(Vector3 xz, out float groundY)
         {
-            var terrain = OverworldTerrainAccess.FindTerrain();
-            if (terrain != null && terrain.terrainData != null)
-            {
-                groundY = terrain.SampleHeight(new Vector3(xz.x, 0f, xz.z)) + terrain.transform.position.y;
-                return true;
-            }
-
-            groundY = 0f;
-            return false;
+            // Resolve the tile under the spawn point: sampling tile (0,0) for a town on any other
+            // tile drops the player from the sky, or into the ground.
+            return OverworldTerrainAccess.TrySampleHeightWorld(xz.x, xz.z, out groundY);
         }
 
         /// <summary>Genshin-style close third-person orbit (GameDev.Player.OverworldThirdPersonCamera)

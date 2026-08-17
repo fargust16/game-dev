@@ -79,10 +79,18 @@ namespace GameDev.EditorTools
             mat.color = new Color(0.9f, 0.85f, 0.1f);
             mr.sharedMaterial = mat;
 
+            // Paint on whichever tile the fabric actually landed on. The dry-ground search can move
+            // a settlement up to ~192 m from its POI marker, which is easily across a tile edge, and
+            // painting tile (0,0) unconditionally put the dust somewhere the town is not.
             var dustLayer = EnsureDustTerrainLayer();
-            if (dustLayer != null && terrain != null)
+            if (dustLayer != null)
             {
-                SettlementDustPaint.Paint(terrain, fabric, dustLayer);
+                var dustTerrain =
+                    OverworldTerrainAccess.FindTileAt(placedAt.x, placedAt.z) ?? terrain;
+                if (dustTerrain != null)
+                {
+                    SettlementDustPaint.Paint(dustTerrain, fabric, dustLayer);
+                }
             }
 
             Selection.activeGameObject = root;
@@ -183,7 +191,6 @@ namespace GameDev.EditorTools
                 {
                     var n = t.name;
                     if (n.StartsWith("OverworldWater")
-                        || n.StartsWith("WaterZone_")
                         || n.StartsWith(RootObjectName)
                         || n.StartsWith("OverworldPoi")
                         || n.StartsWith("OverworldVegetation"))

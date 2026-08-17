@@ -42,7 +42,6 @@ namespace GameDev.EditorTools
         public static readonly OverworldPipelineStepId[] OrderedSteps =
         {
             OverworldPipelineStepId.Surface,
-            OverworldPipelineStepId.Zones,
             OverworldPipelineStepId.Mountains,
             OverworldPipelineStepId.Markers,
             OverworldPipelineStepId.Settlements,
@@ -76,7 +75,6 @@ namespace GameDev.EditorTools
             RoadNetworkMenu.ClearRoadNetwork();
             PoiMarkerMenu.ClearMarkers();
             WaterZoneMenu.ClearWaterZones();
-            WaterZoneMenu.ClearRiverZones();
             WaterZoneMenu.EnsureOceanOcWPlane();
             OverworldTerrainMenu.ClearTerrainOnly();
             CancelGenerateAllLock();
@@ -111,8 +109,8 @@ namespace GameDev.EditorTools
 
                 var total = OverworldGenTiming.Start();
 
-                // Surface+Zones+Mountains share one Vista terrain bake when any of them run.
-                var bakeTerrain = settings.RunSurface || settings.RunZones || settings.RunMountains;
+                // Surface and Mountains share one Vista terrain bake when either of them runs.
+                var bakeTerrain = settings.RunSurface || settings.RunMountains;
                 if (bakeTerrain)
                 {
                     var flags = TerrainBakeFlags.None;
@@ -121,14 +119,9 @@ namespace GameDev.EditorTools
                         flags |= TerrainBakeFlags.IncludeMountains;
                     }
 
-                    if (settings.RunZones)
-                    {
-                        flags |= TerrainBakeFlags.IncludeZoneTextures;
-                    }
-
                     var surfaceSw = OverworldGenTiming.Start();
                     yield return OverworldTerrainMenu.GenerateSurfaceRoutine(seed, flags);
-                    OverworldGenTiming.Log("surface+zones+mountains", OverworldGenTiming.StopMs(surfaceSw));
+                    OverworldGenTiming.Log("surface+mountains", OverworldGenTiming.StopMs(surfaceSw));
                 }
 
                 if (settings.RunMarkers)
@@ -174,18 +167,15 @@ namespace GameDev.EditorTools
             switch (step)
             {
                 case OverworldPipelineStepId.Surface:
+                    // Honour the Mountains checkbox rather than silently dropping the massifs:
+                    // re-baking the surface on its own should not change what the world contains.
                     OverworldTerrainMenu.GenerateSurface(
                         OverworldTerrainMenu.LastSeed != 0
                             ? OverworldTerrainMenu.LastSeed
                             : OverworldTerrainMenu.DefaultSeed,
-                        TerrainBakeFlags.None);
-                    break;
-                case OverworldPipelineStepId.Zones:
-                    OverworldTerrainMenu.GenerateSurface(
-                        OverworldTerrainMenu.LastSeed != 0
-                            ? OverworldTerrainMenu.LastSeed
-                            : OverworldTerrainMenu.DefaultSeed,
-                        CurrentBakeFlags() | TerrainBakeFlags.IncludeZoneTextures);
+                        settings.RunMountains
+                            ? TerrainBakeFlags.IncludeMountains
+                            : TerrainBakeFlags.None);
                     break;
                 case OverworldPipelineStepId.Mountains:
                     OverworldTerrainMenu.GenerateSurface(
@@ -214,25 +204,18 @@ namespace GameDev.EditorTools
             switch (step)
             {
                 case OverworldPipelineStepId.Surface:
-                case OverworldPipelineStepId.Zones:
                 case OverworldPipelineStepId.Mountains:
-                    // Cascade: height change invalidates everything derived.
+                    // Cascade: a height change invalidates everything derived from it.
                     ClearDownstreamOfTerrain();
                     if (step == OverworldPipelineStepId.Mountains)
                     {
+                        // Clearing only the massifs means re-baking the island without them,
+                        // not tearing the terrain down.
                         OverworldTerrainMenu.GenerateSurface(
                             OverworldTerrainMenu.LastSeed != 0
                                 ? OverworldTerrainMenu.LastSeed
                                 : OverworldTerrainMenu.DefaultSeed,
                             CurrentBakeFlags() & ~TerrainBakeFlags.IncludeMountains);
-                    }
-                    else if (step == OverworldPipelineStepId.Zones)
-                    {
-                        OverworldTerrainMenu.GenerateSurface(
-                            OverworldTerrainMenu.LastSeed != 0
-                                ? OverworldTerrainMenu.LastSeed
-                                : OverworldTerrainMenu.DefaultSeed,
-                            CurrentBakeFlags() & ~TerrainBakeFlags.IncludeZoneTextures);
                     }
                     else
                     {
@@ -267,7 +250,6 @@ namespace GameDev.EditorTools
             RoadNetworkMenu.ClearRoadNetwork();
             PoiMarkerMenu.ClearMarkers();
             WaterZoneMenu.ClearWaterZones();
-            WaterZoneMenu.ClearRiverZones();
         }
     }
 }

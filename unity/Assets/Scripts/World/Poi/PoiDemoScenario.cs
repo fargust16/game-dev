@@ -12,9 +12,12 @@ namespace GameDev.World.Poi
     /// </summary>
     public static class PoiDemoScenario
     {
+        // Mirrors WorldGenSettings.Default, which is what BuildRequests() actually reads. Keep the
+        // two in step: these constants exist so tests and docs have one name to quote.
         public const int TownApproachCount = 5;
         public const int ShrineCount = 9;
         public const int CampCount = 9;
+        public const int LandmarkCount = 9;
 
         private static readonly BiomeId[] AllBiomes =
         {

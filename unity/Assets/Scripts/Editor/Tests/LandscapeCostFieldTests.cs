@@ -26,7 +26,7 @@ namespace GameDev.World.Landscape.Tests
         }
 
         [Test]
-        public void CostField_BlocksInsideLakeAndPenalizesSteep()
+        public void CostField_PenalizesSteepGround()
         {
             // Quadratic bowl → steeper near edges.
             float Height(float x, float z) => (z * z) * 0.002f;

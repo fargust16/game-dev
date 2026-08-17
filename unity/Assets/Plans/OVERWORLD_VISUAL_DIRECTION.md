@@ -2,7 +2,7 @@
 
 **Status:** Draft  
 **Date:** 2026-08-15  
-**Related:** [WORLD_GENERATION_PIPELINE.md](WORLD_GENERATION_PIPELINE.md), [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md), [VISTA_OVERWORLD_REFERENCE.md](VISTA_OVERWORLD_REFERENCE.md), [NATURAL_ISLAND_GENERATOR.md](NATURAL_ISLAND_GENERATOR.md), `RoadSurfaceStyle`, `GrassMask`, `OverworldTerrainLayers`, `OverworldBiomeTemplates`
+**Related:** [WORLD_GENERATION_PIPELINE.md](WORLD_GENERATION_PIPELINE.md), [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md), [VISTA_OVERWORLD_REFERENCE.md](VISTA_OVERWORLD_REFERENCE.md), [NATURAL_ISLAND_GENERATOR.md](NATURAL_ISLAND_GENERATOR.md), `RoadSurfaceStyle`, `OverworldTerrainLayers`, `OverworldBiomeTemplates`, `VistaVegetationTemplates`
 
 Art-direction behavior for overworld color, splat, roads, grass, water, and grading. Numbers below are **guides**, not mandatory literals — the visual result wins.
 
@@ -121,9 +121,9 @@ Full island geology contract: [NATURAL_ISLAND_GENERATOR.md](NATURAL_ISLAND_GENER
 
 ## Island / ocean framing
 
-- Full **square** Unity Terrain (1400 m); Vista + `IslandNaturalGeography` build geology; slim `IslandOccupancy` sinks the **border** below **Sea Level**.
-- **One** water plane = **WaterWorks** `WorldWater` at `SeaLevelMeters` (ocean + inland lakes as closed basins). No per-lake water objects. OCW demoted to fallback.
-- Spec: [NATURAL_ISLAND_GENERATOR.md](NATURAL_ISLAND_GENERATOR.md).
+- **2 × 2** Unity Terrain tiles of 1400 m = a **2800 m** world. Geology is entirely Vista: `LPB_SeaFloor` under everything, `LPB_IslandBase` shaped by a seeded anchor ring plus Outer falloff, `LPB_Mountain_n` raised on top. `IslandNaturalGeography` / `IslandOccupancy` are **deleted** — no C# framing pass sinks the border.
+- **One** water plane = **WaterWorks** `WorldWater` at `SeaLevelMeters` (24 m). **Ocean only** — V0 has no inland lakes or rivers. No per-lake water objects. OCW demoted to fallback.
+- Spec: [VISTA_OVERWORLD_REFERENCE.md](VISTA_OVERWORLD_REFERENCE.md).
 
 ## Resolution audit (1400 m tile, Vista heightmap ~513)
 
@@ -239,9 +239,8 @@ the visual target; tune it on the template and in the graph, not in C#.
 |-------|-------|
 | Shallow / shore | Muted blue-green / teal, clearer |
 | Deep | Dark blue-green |
-| Swamp lakes | Separate olive murk |
 
-**Stack:** WaterWorks `WorldWater` plane only — at `SeaLevelMeters`; lakes are terrain depressions intersecting the same plane. No per-lake meshes. OCW demoted. Avoid plastic cyan.
+**Stack:** WaterWorks `WorldWater` plane only — one sheet at `SeaLevelMeters`, ocean only. No inland water bodies and no per-lake meshes in V0. OCW demoted. Avoid plastic cyan.
 
 ## Sky / lighting / grading
 
@@ -268,7 +267,7 @@ the visual target; tune it on the template and in the graph, not in C#.
 - Entering a new 64 m grass chunk does not hitch (~<=1 bake/frame)
 - Terrain render = URP TerrainLit over Vista's layer array; not MicroSplat, not `GameDev/Overworld/Terrain`
 - Material transitions follow terrain morphology; no contour rings, no isolated colour patches
-- Water = WaterWorks `WorldWater` at Sea Level; island shelf below sea reads as ocean; inland lakes = closed basins
+- Water = one WaterWorks `WorldWater` plane at Sea Level; the island shelf below sea reads as ocean; there are no inland water bodies in V0
 
 ## Verification
 

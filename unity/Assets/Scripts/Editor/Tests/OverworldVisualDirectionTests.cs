@@ -30,17 +30,6 @@ namespace GameDev.World.Terrain.Tests
         }
 
         [Test]
-        public void LakeWater_ShallowIsBrighterAndMoreCyanThanDeep()
-        {
-            var shallow = new Color(0.22f, 0.48f, 0.46f);
-            var deep = new Color(0.06f, 0.16f, 0.22f);
-            var shallowLum = 0.2126f * shallow.r + 0.7152f * shallow.g + 0.0722f * shallow.b;
-            var deepLum = 0.2126f * deep.r + 0.7152f * deep.g + 0.0722f * deep.b;
-            Assert.Greater(shallowLum, deepLum);
-            Assert.Greater(shallow.g + shallow.b, shallow.r * 2f);
-        }
-
-        [Test]
         public void SettlementDust_SoftRect_FadesOutside()
         {
             var core = GameDev.World.Settlement.SettlementDustPaint.SoftRectCoverage(

@@ -27,7 +27,7 @@ namespace GameDev.World.Roads.Tests
         }
 
         [Test]
-        public void SoftenNatural_CannotCrossBlockedLakeBand()
+        public void SoftenNatural_CannotCrossImpassableBand()
         {
             var path = new List<Vector2>
             {

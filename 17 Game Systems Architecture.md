@@ -65,7 +65,9 @@ Interior ── Confront ──┘
 | Default | Value |
 |---------|-------|
 | Chunk size | **64 m** |
-| Overworld V0 playable stub | **~512 m** edge (chunk API as if infinite) |
+| Overworld V0 playable world | **2800 × 2800 m** — 2×2 Vista tiles of 1400 m (chunk API as if infinite) |
+| Terrain height budget / sea level | **700 m** / **24 m** |
+| Vista biome canvas | **512 px** — Vista Personal hard cap; terrain graphs are designed around it, never against it |
 | Interior / Arena load | **Single-scene swap** (additive later) |
 | OrganicTown / TownGridBaker continuous path | **Deprecated** — archive only, not a reuse source ([13](13%20City%20Generation.md)) |
 | Combat depth in near-term | Arena V0 TB skeleton + Theme Pack greybox; BG3-depth is long-horizon |
@@ -191,7 +193,7 @@ flowchart LR
 | **Multiplayer** | Interest management per player focus; authority may validate chunk residency; payload = seed-derived or delta overrides. |
 | **Performance** | Hard budget: build/teardown amortized; never hitch on many chunks same frame — queue work. |
 | **Extensibility** | Pluggable builders (terrain, props, POI visuals) register as composers; streamer stays thin. |
-| **V1 scope / Deferred** | V0: ~512 m stub, ring streaming around editor/player focus. Deferred: async jobs, LOD, infinite travel polish. |
+| **V1 scope / Deferred** | V0: `ChunkCoord` / `OverworldTileChunks` math at 64 m over the 2800 m world. Deferred: the streamer itself, async jobs, LOD, infinite travel polish. |
 | **Owning folder** | `unity/Assets/Scripts/World/Streaming/` |
 
 ## W.2b Landscape Planner (roads + ocean exclusion)

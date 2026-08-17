@@ -155,13 +155,6 @@ namespace GameDev.World.Poi
                             continue;
                         }
 
-                        if (analysis != null &&
-                            analysis.SampleDistToLake(c.Center.x, c.Center.z) >
-                            -profile.MinDistanceToLakeMeters)
-                        {
-                            continue;
-                        }
-
                         var score = Score(
                             c, profile, preferred, sameKind, townCenters, analysis, poiRng,
                             sectors, resolvedSector, sectorAnchor, request.IsMainHub);
@@ -319,12 +312,6 @@ namespace GameDev.World.Poi
 
             if (analysis != null)
             {
-                var lake = analysis.SampleDistToLake(c.Center.x, c.Center.z);
-                if (lake > -profile.MinDistanceToLakeMeters)
-                {
-                    return false;
-                }
-
                 var slope = analysis.SampleSlope01(c.Center.x, c.Center.z);
                 if (slope > profile.MaxSlope01)
                 {

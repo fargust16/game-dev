@@ -18,7 +18,6 @@ namespace GameDev.World.Poi
             var town = new PoiPlacementProfile(PoiKind.TownApproach, new[] { BiomeId.Meadow })
             {
                 MaxSlope01 = 0.30f, // ~8°
-                MinDistanceToLakeMeters = 24f,
                 MinDistanceToSameKindMeters = 280f,
                 RejectMountainBiome = true,
                 FootprintRadiusMeters = 48f,
@@ -32,7 +31,6 @@ namespace GameDev.World.Poi
             var shrine = new PoiPlacementProfile(PoiKind.Shrine, new[] { BiomeId.Forest, BiomeId.Mountain })
             {
                 MaxSlope01 = 0.55f,
-                MinDistanceToLakeMeters = 12f,
                 MinDistanceToSameKindMeters = 160f,
                 MinDistanceToTownMeters = 120f,
                 FootprintRadiusMeters = 16f,
@@ -46,7 +44,6 @@ namespace GameDev.World.Poi
             var camp = new PoiPlacementProfile(PoiKind.Camp, new[] { BiomeId.Meadow, BiomeId.Forest })
             {
                 MaxSlope01 = 0.40f,
-                MinDistanceToLakeMeters = 16f,
                 MinDistanceToSameKindMeters = 90f,
                 MinDistanceToTownMeters = 80f,
                 FootprintRadiusMeters = 20f,
@@ -62,7 +59,6 @@ namespace GameDev.World.Poi
             })
             {
                 MaxSlope01 = 0.85f,
-                MinDistanceToLakeMeters = 8f,
                 MinDistanceToSameKindMeters = 180f,
                 FootprintRadiusMeters = 24f,
                 PreferScenicWeight = 4f,
@@ -75,7 +71,6 @@ namespace GameDev.World.Poi
             var ruin = new PoiPlacementProfile(PoiKind.Ruin, new[] { BiomeId.Forest, BiomeId.Meadow })
             {
                 MaxSlope01 = 0.45f,
-                MinDistanceToLakeMeters = 12f,
                 MinDistanceToSameKindMeters = 140f,
                 FootprintRadiusMeters = 20f,
                 PreferIsolationWeight = 2f,
@@ -86,7 +81,6 @@ namespace GameDev.World.Poi
             var cave = new PoiPlacementProfile(PoiKind.CaveMouth, new[] { BiomeId.Mountain })
             {
                 MaxSlope01 = 0.90f,
-                MinDistanceToLakeMeters = 20f,
                 MinDistanceToSameKindMeters = 160f,
                 FootprintRadiusMeters = 16f,
                 PreferElevatedWeight = 2f,

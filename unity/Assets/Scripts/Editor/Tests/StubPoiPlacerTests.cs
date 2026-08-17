@@ -214,14 +214,18 @@ namespace GameDev.World.Poi.Tests
             Assert.AreEqual(PoiDemoScenario.TownApproachCount, requests.Count(r => r.Kind == PoiKind.TownApproach));
             Assert.AreEqual(PoiDemoScenario.ShrineCount, requests.Count(r => r.Kind == PoiKind.Shrine));
             Assert.AreEqual(PoiDemoScenario.CampCount, requests.Count(r => r.Kind == PoiKind.Camp));
-            Assert.AreEqual(5, requests.Count(r => r.Kind == PoiKind.Landmark), "one landmark per biome");
+            Assert.AreEqual(
+                PoiDemoScenario.LandmarkCount,
+                requests.Count(r => r.Kind == PoiKind.Landmark));
 
+            // Landmarks cycle through the biome list, so however many are requested, every biome
+            // must still be represented — that is what stops them clustering in one band.
             var landmarkBiomes = requests
                 .Where(r => r.Kind == PoiKind.Landmark)
                 .SelectMany(r => r.PreferredBiomes)
                 .Distinct()
                 .ToList();
-            Assert.AreEqual(5, landmarkBiomes.Count, "each biome should get its own distinct landmark request");
+            Assert.AreEqual(5, landmarkBiomes.Count, "each biome should get at least one landmark request");
         }
 
         private static float MinPairwiseDistanceXZ(IReadOnlyList<PoiMarker> markers)

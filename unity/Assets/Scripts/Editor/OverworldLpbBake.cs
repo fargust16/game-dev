@@ -41,11 +41,23 @@ namespace GameDev.EditorTools
         /// <summary>Secondary massifs are foothills, not twin peaks.</summary>
         private const float SecondaryMassifScale = 0.38f;
 
-        public static void SpawnIslandAndMountainStack(VistaManager manager, int seed)
+        /// <summary>
+        /// Spawns the world's biome stack: seabed, island, and optionally the massifs.
+        /// </summary>
+        /// <param name="includeMountains">
+        /// When false, only the seabed and island are spawned. That is the reference bake for
+        /// terrain diagnostics — it isolates the island graph from the massif's Raise blend — and
+        /// it is what <c>TerrainBakeFlags.IncludeMountains</c> switches off.
+        /// </param>
+        public static void SpawnIslandAndMountainStack(
+            VistaManager manager, int seed, bool includeMountains = true)
         {
             SpawnSeaFloorLpb(manager, seed);
             SpawnBaseIslandLpb(manager, seed);
-            SpawnSeededMountainLpbs(manager, seed);
+            if (includeMountains)
+            {
+                SpawnSeededMountainLpbs(manager, seed);
+            }
         }
 
         /// <summary>

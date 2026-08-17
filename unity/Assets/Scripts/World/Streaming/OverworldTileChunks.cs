@@ -5,17 +5,13 @@ namespace GameDev.World.Streaming
 {
     /// <summary>
     /// Chunk coordinates covering one overworld tile, inset from the raw tile edge by a
-    /// shared margin. The last strip near a tile's border has less reliable derived data -
-    /// VistaHydro height-field sampling already skips a margin there so its neighbour
-    /// lookups never read out-of-bounds height (an out-of-bounds read is a synthetic +Infinity
-    /// "wall" that would otherwise bias basin shapes near the border) - so a lake that visually
-    /// reaches the tile edge can still have its flood mask stop just short of it. POI placement and
-    /// road routing must stay out of that same strip, or they end up treating "we don't actually
-    /// know if this is dry ground or lake" as free, walkable terrain (observed: a road hugging the
-    /// tile edge in a straight line, cutting across what read on screen as open lake, because the
-    /// water system had no flood data there to flag it as blocked). Centralised here (rather than
-    /// each menu picking its own margin) so POI placement, road routing, and water generation all
-    /// agree on where the tile's reliably-sampled interior actually starts.
+    /// shared margin. Derived data is least reliable in the last strip before a border: anything
+    /// that needs a neighbour sample (slope, curvature, roughness) has no neighbour to read there,
+    /// and a clamped or out-of-bounds read is not the same measurement as an interior one. POI
+    /// placement and road routing must stay out of that strip rather than treat "we do not really
+    /// know what this ground is" as free, walkable terrain. Centralised here - rather than each
+    /// menu picking its own margin - so every consumer agrees on where the tile's
+    /// reliably-sampled interior starts.
     /// </summary>
     public static class OverworldTileChunks
     {

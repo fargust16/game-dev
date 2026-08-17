@@ -252,6 +252,7 @@ namespace GameDev.EditorTools
                     new UnityEngine.Keyframe(0.1f, 0f, 0f, 0f),
                     new UnityEngine.Keyframe(1f, 1f, 0f, 0f)),
             };
+            ApplyNoiseDiagnosticOverrides(node);
             graph.AddNode(node);
             return node;
         }
@@ -267,8 +268,18 @@ namespace GameDev.EditorTools
                 seed = seed,
                 layerCount = 1,
             };
+            ApplyNoiseDiagnosticOverrides(node);
             graph.AddNode(node);
             return node;
+        }
+
+        /// <summary>Applies whatever diagnostic noise overrides are set, and nothing otherwise.</summary>
+        private static void ApplyNoiseDiagnosticOverrides(NoiseNode node)
+        {
+            if (NoiseDerivativeOverride.HasValue)
+            {
+                node.layerDerivativeMode = NoiseDerivativeOverride.Value;
+            }
         }
 
         /// <summary>
@@ -294,18 +305,71 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>
+        /// Iterations of the macro erosion pass. The reference's value; see
+        /// <see cref="AddMacroErosion"/> for why raising it was tried and rejected.
+        /// </summary>
+        public const int MacroErosionIterations = 200;
+
+        /// <summary>
+        /// Diagnostic only: author the erosion nodes bypassed, so a rebuild produces the shaping
+        /// stage alone.
+        /// </summary>
+        /// <remarks>
+        /// The one experiment that separates "the noise made this structure" from "erosion made
+        /// it" — Vista's default <c>Bypass</c> forwards the first input slot to the first output
+        /// slot, and on <c>HydraulicErosionNode2</c> those are Height in and Height out, so the
+        /// shaping passes through untouched. The soil output goes empty, which blanks
+        /// <see cref="VarErosionMask"/> and therefore the surface weights: this flag is for
+        /// measuring <em>geometry</em>, never for a bake anyone looks at.
+        /// <para>
+        /// It is deliberately not persisted anywhere. Set it from the batch harness for one run and
+        /// restore the graph assets afterwards — leaving a graph authored with erosion bypassed
+        /// would be indistinguishable from a broken bake.
+        /// </para>
+        /// </remarks>
+        public static bool BypassErosionForDiagnostics { get; set; }
+
+        /// <summary>
+        /// Diagnostic only: author the noise nodes with a non-default octave falloff.
+        /// </summary>
+        /// <remarks>
+        /// <c>Linear</c> is the node default and a standard fBm — octave <c>i</c> has scale
+        /// <c>scale / lacunarity^i</c> and amplitude <c>persistence^i</c>. <c>Pow</c> divides by
+        /// <c>lacunarity^i</c> *each step*, so scale and amplitude collapse super-exponentially and
+        /// only the first two or three octaves contribute anything. Null leaves the default alone.
+        /// <para>
+        /// Set from the batch harness for one run, and restore the graph assets afterwards.
+        /// </para>
+        /// </remarks>
+        public static NoiseNode.LayerDerivativeMode? NoiseDerivativeOverride { get; set; }
+
+        /// <summary>
         /// The reference's first erosion pass: broad drainage carved into the raw noise.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The node's own Macro preset, with the two values the reference changes. Everything else —
         /// rain 10, erosion 10, featureSize 8, ramps 5/100 — is the default and stays the default.
+        /// </para>
+        /// <para>
+        /// <b>Raising the iteration count does not fix the banding — measured, not assumed.</b> The
+        /// standing theory was that our 320 px sim canvas (the biome is 2566 m wide and Vista
+        /// Personal caps the canvas at 512, where the reference had ~1000 px) left too few
+        /// iterations for neighbouring channels to capture each other, so the flow only scratched
+        /// parallel rills down the slope. An A/B at 200 vs 500 iterations, island-only, seed 110201,
+        /// moved every measured number by less than 0.02: curvature ratio 0.59/0.71/0.57/0.67 became
+        /// 0.59/0.70/0.59/0.66, the axis-aligned share was unchanged on all four tiles, and the peak
+        /// height was identical at 115 m. Iterations are not the lever — do not spend bake time on
+        /// them again without a new reason.
+        /// </para>
         /// </remarks>
         public static HydraulicErosionNode2 AddMacroErosion(TerrainGraph graph)
         {
             var node = new HydraulicErosionNode2
             {
-                iterationCount = 200,
+                iterationCount = MacroErosionIterations,
                 sedimentCapacity = 50f,
+                isBypassed = BypassErosionForDiagnostics,
             };
             graph.AddNode(node);
             return node;
@@ -351,6 +415,7 @@ namespace GameDev.EditorTools
                 featureSize = MinFeatureSizeMeters,
                 depositRamp = 10f,
                 drainageRamp = 300f,
+                isBypassed = BypassErosionForDiagnostics,
             };
             graph.AddNode(node);
             return node;

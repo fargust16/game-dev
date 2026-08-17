@@ -15,7 +15,6 @@ namespace GameDev.World.Poi
         // Hard constraints (reject if violated). Negative = disabled.
         public float MinHeight01 { get; set; } = 0.12f;
         public float MaxSlope01 { get; set; } = 1f;
-        public float MinDistanceToLakeMeters { get; set; } = 8f;
         public float MinDistanceToSameKindMeters { get; set; } = 64f;
         public float MinDistanceToTownMeters { get; set; } = -1f;
         public bool RejectMountainBiome { get; set; }

@@ -56,6 +56,19 @@ namespace GameDev.EditorTools
         /// <summary>Weight Blend priority slots. One per canonical surface layer.</summary>
         private const int WeightBlendLayers = OverworldTerrainLayers.CanonicalLayerCount;
 
+        /// <summary>
+        /// Diagnostic only: author the shaping stage with <see cref="ShelfCurve"/> replaced by a
+        /// straight pass-through.
+        /// </summary>
+        /// <remarks>
+        /// The plateau bias is the one hand-drawn curve in the height path, and it works by
+        /// compressing the upper half of the distribution — which is most of the island. This flag
+        /// isolates it, so a bake can answer whether that compression is what turns real relief into
+        /// contour-following bands. Set it from the batch harness for one run and restore the graph
+        /// assets afterwards; an island authored without the curve is not a plateau any more.
+        /// </remarks>
+        public static bool BypassShelfCurveForDiagnostics { get; set; }
+
         [MenuItem("GameDev/Overworld/Vista/Rebuild Island Plateau Graph (destructive)")]
         public static void RebuildMenu()
         {
@@ -139,7 +152,12 @@ namespace GameDev.EditorTools
 
             var levels = VistaGraphBuild.AddReferenceLevels(graph);
 
-            var shelf = new CurveNode { curve = ShelfCurve() };
+            var shelf = new CurveNode
+            {
+                curve = BypassShelfCurveForDiagnostics
+                    ? AnimationCurve.Linear(0f, 0f, 1f, 1f)
+                    : ShelfCurve(),
+            };
             graph.AddNode(shelf);
 
             // Two passes, as the reference has — see the note in MountainMassifGraphBuilder.

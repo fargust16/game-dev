@@ -118,7 +118,7 @@ A Vertical Slice in Lower Veil fantasy with 2 selectable factions (Wardens / Vei
 [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — System Cards + Track backlog. Spatial locks remain in [16](16%20Architecture%20Pivot.md).
 
 **Overworld V0 size / chunk / scene load defaults?**  
-Chunk = **64 m**; stub playable ≈ **512 m** with infinite-capable chunk API; Interior and Arena V0 use **single-scene swap** (additive later). Documented in [17](17%20Game%20Systems%20Architecture.md) and `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`.
+Chunk = **64 m**; playable world = **2800 × 2800 m** (2×2 Vista tiles of 1400 m, height budget 700 m, sea level 24 m) with an infinite-capable chunk API; Interior and Arena V0 use **single-scene swap** (additive later). Documented in [17](17%20Game%20Systems%20Architecture.md) and `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`.
 
 **What generation mechanism produces World / Settlement / Building / Interior content?**  
 **Piece-Based Assembly**: small hand-authored Pieces carrying Snap Sockets, snapped together deterministically small → large. **Exterior Shell Grammar** builds overworld fabric (most buildings never get a Room Graph). **Interior Piece Assembly** runs only for `InteriorPolicy.Portal` buildings. Reference model: Valheim's room/dungeon piece system. Not an algorithmic subdivision solver, not the retired OrganicTown continuous-mesh generator. Documented in [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
@@ -130,10 +130,10 @@ No. [13 City Generation](13%20City%20Generation.md) is Deprecated: not viable (n
 **700 m** — `WorldScale.TerrainHeightBudgetMeters` matches VistaManager `terrainMaxHeight` and tile `size.y`. Documented in [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md).
 
 **How is the island / ocean silhouette framed?**  
-Harmonic asymmetric LPB **Anchors** + **Outer Falloff (~420 local m)** + **SoftFalloff BiomeMaskGraph** on `LPB_IslandBase` (order 0, IslandPlateau graph, Height Replace, rolling plains **~55 m** / ASL ~30–55). Soft coast via `CoastalBeachShelf` ≤12° + SmoothCoastBand into `WorldWater` at Sea Level **24 m**. Surface paint: grass / sand / cliff / rock — **dry sand by ASL** (Sea+0…Sea+16); underwater near-land; no `_HYBRIDHEIGHTBLEND`. Mountains are **separate** LPBs (order 10–19) with elongated ellipse anchors, wide falloff, and **Raise** height delta — not circular KeepHigher stamps and not one Mountain graph for the whole island. Order bands: Geology → Hydrology → Ecology → Civilization. Documented in [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md) and [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces.
+36 harmonic asymmetric LPB **Anchors** + **Outer Falloff (180 m)** + **SoftFalloff BiomeMaskGraph** on `LPB_IslandBase` (order 10, IslandPlateau graph, Height Replace, `worldHeight` 140 m, biome Y at sea level), sitting on `LPB_SeaFloor` (order 0). The coast is graph shaping + falloff with **no post-Vista pass** — the rim fades under `WorldWater` at Sea Level **24 m**. Surface paint comes from the graphs' Weight Blend over the five canonical layers; sand is a normalized low-altitude band × noise, not an ASL metre band. Mountains are **separate** LPBs (order 20+) with 28 elongated ellipse anchors, wide falloff (520) and **Raise** height delta — not circular KeepHigher stamps and not one Mountain graph for the whole island. Documented in [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md) and [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces.
 
 **Overworld height / island framing?**  
-**700 m** height budget; IslandPlateau ~55 m plains + mountain Raise LPBs; ocean Sea Level **24 m**. Documented in Vista / NATURAL_ISLAND plans.
+**700 m** height budget; `LPB_IslandBase` at 140 m over a 20 m seabed, plus mountain Raise LPBs at 530 m; ocean Sea Level **24 m**. Biome canvas capped at **512 px** by Vista Personal. Documented in the Vista / NATURAL_ISLAND plans.
 
 **V0 inland lakes / rivers?**  
 **Removed from code (2026-08-15).** V0 ships **ocean only** (`WorldWater` at Sea Level). No `LakeDefinition` / `RiverTracer` / lake pipeline steps. Future inland hydro is a redesign. Alpine multi-plane lakes stay deferred; single Sea Level ocean plane is the locked V0 water model.
@@ -260,7 +260,7 @@ How are secrets generated?
 
 Can secrets vanish forever?
 
-What is the V1 overworld target size (km / play minutes edge-to-edge) **beyond** the V0 stub (~512 m / 64 m chunks already locked in [17](17%20Game%20Systems%20Architecture.md))?
+What is the V1 overworld target size (km / play minutes edge-to-edge) **beyond** the V0 world (2800 × 2800 m / 64 m chunks already locked in [17](17%20Game%20Systems%20Architecture.md))? Note the measured budget: ~2.5–3 km² of dry land fits two large cities; three with real travel between them needs 4–6 km², i.e. 3×3 tiles or 2×2 at 2000 m — growing the world, not just the island.
 
 ## Procedural Buildings / Scenes
 

@@ -95,7 +95,6 @@ namespace GameDev.EditorTools
 
             EditorGUI.indentLevel++;
             settings.RunSurface = EditorGUILayout.Toggle("Surface", settings.RunSurface);
-            settings.RunZones = EditorGUILayout.Toggle("Zones", settings.RunZones);
             settings.RunMountains = EditorGUILayout.Toggle("Mountains", settings.RunMountains);
             settings.RunMarkers = EditorGUILayout.Toggle("Markers", settings.RunMarkers);
             settings.RunSettlements = EditorGUILayout.Toggle("Settlements", settings.RunSettlements);
@@ -119,7 +118,6 @@ namespace GameDev.EditorTools
         private void SetAllSteps(bool on)
         {
             settings.RunSurface = on;
-            settings.RunZones = on;
             settings.RunMountains = on;
             settings.RunMarkers = on;
             settings.RunSettlements = on;
@@ -134,8 +132,9 @@ namespace GameDev.EditorTools
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.HelpBox(
-                    "Terrain shape comes from Vista / Unity Terrain (seeded forks). " +
-                    "Mountains / Zones toggles rebuild with TerrainBakeFlags.",
+                    "Terrain shape comes from Vista (seeded forks). Surface and Mountains are one " +
+                    "bake: the Mountains toggle selects TerrainBakeFlags.IncludeMountains, and " +
+                    "turning it off bakes the island alone.",
                     MessageType.None);
                 EditorGUI.indentLevel--;
             }
@@ -245,7 +244,6 @@ namespace GameDev.EditorTools
             {
                 var d = WorldGenSettings.Default;
                 settings.RunSurface = d.RunSurface;
-                settings.RunZones = d.RunZones;
                 settings.RunMountains = d.RunMountains;
                 settings.RunMarkers = d.RunMarkers;
                 settings.RunSettlements = d.RunSettlements;

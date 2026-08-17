@@ -143,7 +143,116 @@ regenerate from the seed instead.
 
 ---
 
-## 8. Smaller items
+## 8. Road softening emits points it never validated — failing test, mechanism known
+
+`RoadPathSimplifierTests.SoftenNatural_CannotCrossImpassableBand` fails: a softened road segment
+crosses a cell whose cost is `+Infinity`. This predates the stabilization pass — it is not caused by
+the hydrology removal, and the test only crosses cost-infinite cells, so it does not depend on
+inland water existing.
+
+Two places emit a point other than the one they checked:
+
+1. **`LimitHeadingChange`** (`RoadPathSimplifier.cs`, corner-split branch) validates the chord
+   `a → mid → c` where `mid = (a + c) / 2`, and then inserts **`Vector2.Lerp(b, mid, 0.55f)`** — a
+   different point. Nothing establishes that the segments through the inserted point are clear.
+2. **`ChaikinSafe`** validates each source segment `a → b` and the two cut points `q` (25 %) and `r`
+   (75 %) on it, then emits `… q_i, r_i, q_{i+1} …`. The pair **`r_i → q_{i+1}` spans the corner at
+   `b`** and is never checked. That is the classic Chaikin corner-cutting hazard: cutting a corner
+   that hugs an obstacle moves the path into it.
+
+Both are the same bug class — *validate the geometry you actually emit* — and the fix in each case
+is local: check the segment through the candidate point and fall back to keeping the original
+corner. It is deliberately **not** applied here because it changes generated road geometry on every
+seed, and this milestone's road work was scoped to the multi-tile writers.
+
+Do not "fix" this by loosening the test. A road crossing impassable ground is the defect.
+
+---
+
+## 9. Island shaping produces directional banding — diagnosed, fix is an art decision
+
+The island's terrain bands east-west with a repeating ~101 m / ~186 m spacing. Measured: curvature
+ratio 0.57–0.71 on all four tiles where Vista's own sample graph, on the same pipeline, reports
+0.84–1.50 with no periodicity at all.
+
+Eight hypotheses were tested and killed, including every resolution, erosion and quantisation
+explanation the documentation used to assert. The cause is the island's shaping recipe as a whole,
+not a parameter — so the fix is a rebuild of that stage against the reference graph, and it changes
+how every island looks.
+
+Full record, including what not to re-test and how to verify a rebuild:
+**[ISLAND_SHAPING_REBUILD.md](ISLAND_SHAPING_REBUILD.md)**. Evidence with numbers:
+[VISTA_TERRAIN_PLAYBOOK.md](VISTA_TERRAIN_PLAYBOOK.md) §2.4a–2.4d.
+
+Cheap unrelated fix found alongside it: `OverworldLpbBake.IslandAnchorCount` is 36 for a 2.2 km
+island, so the coastline reads as straight chords.
+
+---
+
+## 10. Sand covers 60–70 % of every tile
+
+`Dump Layer Weights`, seed 110201, all four tiles:
+
+| Tile | sand share | saturated (weight ≥ 0.9) |
+|---|---|---|
+| 1_1 | 60.8 % | 50.2 % |
+| 0_0 | 64.8 % | 56.9 % |
+| 0_1 | 70.5 % | 55.8 % |
+| 1_0 | 62.3 % | 41.3 % |
+
+Sand sits at Weight Blend priority 3 in `IslandPlateauGraphBuilder.BuildSurfaceStage`, above soil and
+rock, so wherever it saturates it erases them — grass is down to 16–22 % and soil to 1–2 %. This is
+the same failure the project already fixed once for soil ("soil covering 45–75 % of the island"), now
+reappearing on a different layer, and it is the likeliest explanation for the washed-out cream cast
+over the whole island in the reference screenshot.
+
+The band is `LowAltitudeCurve(0.03, 0.10)` over the **normalized** graph height, and the island's
+land is bottom-heavy: the height histogram shows 27–38 % of dry land inside the lowest tenth of the
+24 → 331 m span. A band meant as a beach is therefore covering the plateau.
+
+Related to item 9 but independent of it: this is a surface-weight problem, not a shaping one, and it
+can be fixed without rebuilding the geometry. It is still a look decision — narrowing the band
+changes the island's colour everywhere — so agree the target before changing it.
+
+---
+
+## 11. One tile carries 9 terrain layers; URP TerrainLit renders 8
+
+Measured on tile `OverworldTerrain_1_0`, which is the tile the settlement landed on:
+
+```
+[0..4] the five canonical biome layers
+[5]    Dirt_Settlement_Dust
+[6]    Dirt_Road_Center
+[7]    Dirt_Road_Edge
+[8]    Road_Gravel      <- past the ceiling, silently not rendered
+```
+
+The other three tiles have 8 layers because they get roads but no settlement dust. The playbook
+predicted this (§9); it is now reproduced with evidence.
+
+Two consequences: `Road_Gravel` does not render on whichever tile holds the settlement, and the tile
+stacks disagree, so any code that assumes a layer index is the same across tiles is wrong there.
+
+Fix direction: roads and settlement between them append four layers onto a five-layer base, which
+cannot fit. Either merge the road layers (centre/edge/gravel is three assets for one road surface),
+or paint dust into an existing layer instead of adding one.
+
+---
+
+## 12. Weight sum drops to 0.25 on two tiles
+
+`weight sum on painted pixels: min=0.251` on `OverworldTerrain_0_0` and `min=0.255` on
+`OverworldTerrain_0_1`, against an expected ≈1.000 (average is fine at 0.998). Weight Blend only
+guarantees the sum when layer 0 is the unconnected white base, which it is, so the shortfall comes
+from something downstream — most likely the road/settlement paint writing into a tile whose weights
+it does not renormalise, at the same pixels where the stack overflows in item 11.
+
+Not visible in the average; only the histogram's `min` catches it. Worth resolving together with 11.
+
+---
+
+## 13. Smaller items
 
 - `PoiMarkerMenu` doc comments still reference the deleted `VegetationScatterMenu`.
 - `Species.Orchard` uses the apple prefab only; pears and plums are unused because Vista Personal
