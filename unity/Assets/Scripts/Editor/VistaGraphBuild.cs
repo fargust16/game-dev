@@ -316,7 +316,39 @@ namespace GameDev.EditorTools
             {
                 node.layerDerivativeMode = NoiseDerivativeOverride.Value;
             }
+
+            if (DisableNoiseRemapPerLayerForDiagnostics)
+            {
+                node.applyRemapPerLayer = false;
+                node.remapCurve = UnityEngine.AnimationCurve.Linear(0f, 0f, 1f, 1f);
+            }
+
+            if (DisableNoiseFlipSignForDiagnostics)
+            {
+                node.flipSign = false;
+            }
         }
+
+        /// <summary>
+        /// Diagnostic only: author the noise nodes without the per-octave remap.
+        /// </summary>
+        /// <remarks>
+        /// The prime suspect for the east-west anisotropy. <c>applyRemapPerLayer</c> runs every
+        /// octave through the remap curve *before* the sum, and our curve clips the bottom 10 % of
+        /// each one — a strongly non-linear per-octave operation, and the most plausible way an
+        /// isotropic Perlin field acquires a preferred direction. The one graph that measured
+        /// isotropic does not have this field set at all.
+        /// </remarks>
+        public static bool DisableNoiseRemapPerLayerForDiagnostics { get; set; }
+
+        /// <summary>
+        /// Diagnostic only: author the noise nodes without the alternating octave sign.
+        /// </summary>
+        /// <remarks>
+        /// Second suspect, same reasoning: <c>flipSign</c> negates every other octave before the
+        /// sum, and it is likewise absent from the graph that measured isotropic.
+        /// </remarks>
+        public static bool DisableNoiseFlipSignForDiagnostics { get; set; }
 
         /// <summary>
         /// The reference's post-noise <c>Levels</c>: a gentle floor lift, not a contrast stretch.

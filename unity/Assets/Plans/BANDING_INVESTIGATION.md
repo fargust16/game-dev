@@ -101,7 +101,41 @@ and **absent** from the only graph that measured clean. That is consistent with 
 result that moved the number: `layerDerivativeMode = Pow` improved it to 0.65–0.92, and `Pow` is what
 an absent field deserializes to.
 
-### Next test, and it is a single bake
+### Both named suspects tested — and the second one named the real mechanism
+
+| Test (no silhouette + erosion bypassed) | Residual ratio | Orientation peak |
+|---|---|---|
+| baseline | 0.37 / 0.50 / 0.50 / 0.40 | bins 5–6 (75–105°) |
+| `applyRemapPerLayer` off | 0.38 / 0.36 / 0.51 / 0.50 | bins 5–6, unchanged |
+| **`flipSign` off** | 0.37 / 0.39 / **0.74 / 0.58** | **bins 0 and 11 on two tiles — rotated 90°** |
+
+`applyRemapPerLayer` is not the cause: nothing moved.
+
+`flipSign` is not the cause either, but it did something far more informative — it **rotated the
+preferred direction**. Two of four tiles flipped from east–west ridges to north–south ones, and the
+curvature magnitude collapsed by an order of magnitude (|d2x| 0.09–0.41 → 0.022–0.026).
+
+A setting that *rotates* an anisotropy is not creating it. It is selecting which axis an anisotropy
+that is already there lands on. That points at the one thing common to every octave regardless of
+settings: **Perlin gradient noise on a square lattice**. Stacked octaves on a shared lattice align to
+its axes, and `flipSign` decides which.
+
+### Next test: domain warp
+
+`NoiseNode` has `warpMode` (None / Angular / Directional) with `warpIntensity`, and **every noise in
+this project uses None** — as does the graph that measured isotropic. Domain warping is the standard
+remedy for lattice-aligned gradient noise: it displaces the sample position by another noise field,
+so features stop following the lattice.
+
+Our own playbook rules it out on cost grounds — *"Warp is the most expensive knob on the node, and
+the plateau/massif profile comes from the shaping curve"* — a decision made about performance that
+was never tested against this defect.
+
+Test `warpMode = Angular` at a modest `warpIntensity` on the no-silhouette + erosion-bypassed
+configuration. If the ratio moves toward 1.0 and the orientation histogram flattens, that is the
+answer, and the remaining question is only what it costs per bake.
+
+### Earlier next-test note, now superseded
 
 Disable `applyRemapPerLayer` (and its remap curve), then `flipSign`, one at a time, on the
 no-silhouette + erosion-bypassed configuration — the cleanest signal available. Expect the ratio to
