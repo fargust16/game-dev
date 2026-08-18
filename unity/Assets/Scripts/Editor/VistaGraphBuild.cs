@@ -327,6 +327,11 @@ namespace GameDev.EditorTools
             {
                 node.flipSign = false;
             }
+            if (NoiseWarpForDiagnostics.HasValue)
+            {
+                node.warpMode = NoiseWarpForDiagnostics.Value;
+                node.warpIntensity = NoiseWarpIntensityForDiagnostics;
+            }
         }
 
         /// <summary>
@@ -349,6 +354,21 @@ namespace GameDev.EditorTools
         /// sum, and it is likewise absent from the graph that measured isotropic.
         /// </remarks>
         public static bool DisableNoiseFlipSignForDiagnostics { get; set; }
+
+        /// <summary>
+        /// Diagnostic only: displace the noise sample position by another noise field.
+        /// </summary>
+        /// <remarks>
+        /// The standard remedy for lattice-aligned gradient noise, and the last untested suspect.
+        /// Every noise in this project uses <c>WarpMode.None</c>; the playbook rules warp out on
+        /// cost grounds, a decision about bake time that was never tested against this defect.
+        /// Turning off <c>flipSign</c> only *rotated* the anisotropy, which is what a lattice
+        /// artifact does — warp is what breaks the lattice.
+        /// </remarks>
+        public static NoiseNode.WarpMode? NoiseWarpForDiagnostics { get; set; }
+
+        /// <summary>Warp strength used with <see cref="NoiseWarpForDiagnostics"/>.</summary>
+        public static float NoiseWarpIntensityForDiagnostics { get; set; } = 1f;
 
         /// <summary>
         /// The reference's post-noise <c>Levels</c>: a gentle floor lift, not a contrast stretch.

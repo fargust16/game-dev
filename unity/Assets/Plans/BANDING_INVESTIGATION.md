@@ -120,7 +120,35 @@ that is already there lands on. That points at the one thing common to every oct
 settings: **Perlin gradient noise on a square lattice**. Stacked octaves on a shared lattice align to
 its axes, and `flipSign` decides which.
 
-### Next test: domain warp
+### Domain warp tested — helps, does not solve
+
+`warpMode = Angular`, `warpIntensity 1`, same clean configuration: **0.49 / 0.62 / 0.48 / 0.58**
+against a 0.37 / 0.50 / 0.50 / 0.40 baseline. A real improvement of roughly +0.1, and the orientation
+peak stays in bins 5-6. Worth keeping in mind as a partial mitigation, but it is not the mechanism,
+and a higher intensity was not tried.
+
+### The strongest signal in all the data is octave count — and it is still untested
+
+Ranking every experiment by how much it moved the ratio:
+
+| Change | Ratio | Note |
+|---|---|---|
+| `layerDerivativeMode = Pow` | **0.65 – 0.92** | best result of the whole investigation |
+| domain warp Angular | 0.49 – 0.62 | modest |
+| `flipSign` off | 0.37 – 0.74 | rotates rather than removes |
+| `applyRemapPerLayer` off | 0.36 – 0.51 | nothing |
+| reference noise scales | 0.28 – 0.49 | worse |
+
+`Pow` divides scale and amplitude by `lacunarity^i` at *every* step, so only the first two or three
+octaves contribute anything — it is, in effect, an octave-count reduction. And the one graph that
+measured isotropic uses **`layerCount = 4`**, not 8.
+
+That is the same variable arriving from two independent directions, and nothing has tested it
+directly. **Next: `layerCount = 4` on the detail and fine noises, clean configuration.** If the ratio
+lands near `Pow`'s 0.65-0.92 while keeping the amplitude that `Pow` throws away, the mechanism is
+octaves stacking on a shared lattice and the fix is to stop at four.
+
+### Superseded next-test note
 
 `NoiseNode` has `warpMode` (None / Angular / Directional) with `warpIntensity`, and **every noise in
 this project uses None** — as does the graph that measured isotropic. Domain warping is the standard

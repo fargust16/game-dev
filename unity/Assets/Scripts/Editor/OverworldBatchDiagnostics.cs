@@ -47,6 +47,8 @@ namespace GameDev.EditorTools
         private const string NoSilhouetteArg = "-overworldIslandNoSilhouette";
         private const string NoRemapArg = "-overworldNoiseNoRemapPerLayer";
         private const string NoFlipArg = "-overworldNoiseNoFlipSign";
+        private const string WarpArg = "-overworldNoiseWarp";
+        private const string WarpIntensityArg = "-overworldNoiseWarpIntensity";
         private const string LayerDumpArg = "-overworldLayerDump";
 
         /// <summary>Generous ceiling; a terrain-only bake is minutes, not tens of minutes.</summary>
@@ -76,6 +78,15 @@ namespace GameDev.EditorTools
                 ReadBoolArg(NoSilhouetteArg, false);
             VistaGraphBuild.DisableNoiseRemapPerLayerForDiagnostics = ReadBoolArg(NoRemapArg, false);
             VistaGraphBuild.DisableNoiseFlipSignForDiagnostics = ReadBoolArg(NoFlipArg, false);
+            var warpRaw = ReadArg(WarpArg);
+            if (!string.IsNullOrEmpty(warpRaw) &&
+                System.Enum.TryParse<Pinwheel.Vista.Graph.NoiseNode.WarpMode>(
+                    warpRaw, ignoreCase: true, out var warpMode))
+            {
+                VistaGraphBuild.NoiseWarpForDiagnostics = warpMode;
+                VistaGraphBuild.NoiseWarpIntensityForDiagnostics =
+                    float.TryParse(ReadArg(WarpIntensityArg), out var wi) ? wi : 1f;
+            }
 
             var exportPng = ReadBoolArg(ExportPngArg, defaultValue: false);
             var skipBake = ReadBoolArg(SkipBakeArg, defaultValue: false);
