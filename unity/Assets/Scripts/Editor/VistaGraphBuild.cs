@@ -333,6 +333,11 @@ namespace GameDev.EditorTools
                 node.layerCount = NoiseLayerCountForDiagnostics.Value;
             }
 
+            if (NoiseLacunarityForDiagnostics.HasValue && node.layerCount > 1)
+            {
+                node.lacunarity = NoiseLacunarityForDiagnostics.Value;
+            }
+
             if (NoiseWarpForDiagnostics.HasValue)
             {
                 node.warpMode = NoiseWarpForDiagnostics.Value;
@@ -388,6 +393,19 @@ namespace GameDev.EditorTools
         /// </para>
         /// </remarks>
         public static int? NoiseLayerCountForDiagnostics { get; set; }
+
+        /// <summary>
+        /// Diagnostic only: the ratio between successive octave scales.
+        /// </summary>
+        /// <remarks>
+        /// The variable the evidence actually points at. Cutting octaves made the banding worse and
+        /// <c>Pow</c> made it better, and the difference between them is not how many octaves survive
+        /// but how far apart their scales are: Linear steps by a constant 2.25 while Pow diverges
+        /// (2.25, 5.1, 11.4, 51). Evenly spaced octaves on one lattice reinforce its axes. Raising
+        /// lacunarity separates them the way Pow does **without** collapsing amplitude, which is what
+        /// made Pow unusable as a fix rather than a diagnostic.
+        /// </remarks>
+        public static float? NoiseLacunarityForDiagnostics { get; set; }
 
         /// <summary>Warp strength used with <see cref="NoiseWarpForDiagnostics"/>.</summary>
         public static float NoiseWarpIntensityForDiagnostics { get; set; } = 1f;

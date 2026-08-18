@@ -48,6 +48,7 @@ namespace GameDev.EditorTools
         private const string NoRemapArg = "-overworldNoiseNoRemapPerLayer";
         private const string NoFlipArg = "-overworldNoiseNoFlipSign";
         private const string OctavesArg = "-overworldNoiseOctaves";
+        private const string LacunarityArg = "-overworldNoiseLacunarity";
         private const string WarpArg = "-overworldNoiseWarp";
         private const string WarpIntensityArg = "-overworldNoiseWarpIntensity";
         private const string LayerDumpArg = "-overworldLayerDump";
@@ -82,6 +83,8 @@ namespace GameDev.EditorTools
             var octavesRaw = ReadArg(OctavesArg);
             VistaGraphBuild.NoiseLayerCountForDiagnostics =
                 int.TryParse(octavesRaw, out var oct) ? oct : (int?)null;
+            VistaGraphBuild.NoiseLacunarityForDiagnostics =
+                float.TryParse(ReadArg(LacunarityArg), out var lac) ? lac : (float?)null;
             var warpRaw = ReadArg(WarpArg);
             if (!string.IsNullOrEmpty(warpRaw) &&
                 System.Enum.TryParse<Pinwheel.Vista.Graph.NoiseNode.WarpMode>(

@@ -178,6 +178,49 @@ but without collapsing amplitude, which is what made `Pow` unusable.
 
 If a higher lacunarity reaches Pow's 0.65–0.92 while keeping the relief, that is the fix.
 
+### Lacunarity tested — falsified too, and that closes the graph-tuning avenue
+
+`lacunarity 3.5`, 8 octaves, Linear, clean configuration: **0.40 / 0.50 / 0.45 / 0.49** against a
+0.37 / 0.50 / 0.50 / 0.40 baseline. Within noise. Octave spacing is not the variable either.
+
+### Re-reading `Pow` once more — and this time it explains everything
+
+`Pow` divides scale by `lacunarity^i` at step *i*, so the divisor compounds: after eight octaves the
+scale has been divided by `lacunarity^(0+1+…+7)` = `lacunarity^28`. From about the third octave the
+sample positions are far below one canvas pixel, so those octaves return **uncorrelated values — white
+noise, which is isotropic by definition.**
+
+So `Pow` never fixed the anisotropy. It *diluted the measurement* by adding an isotropic
+high-frequency component on top of the same anisotropic base. That is the same thing the third noise
+did (magnitude up, ratio unchanged) and the mirror image of `layerCount 4` (detail removed, ratio
+worse).
+
+Every result in the table is now consistent under one statement:
+
+> **The anisotropy of the base octaves is untouched by every graph-level parameter tried. Only the
+> amount of isotropic fine detail sitting on top of it moves the number.**
+
+That makes it a property of Vista's Perlin implementation at these scales, not a misconfiguration of
+our graph — which is why nine parameters in a row did nothing.
+
+### Where that leaves the defect
+
+Graph tuning is exhausted as an avenue. What remains, in order of cost:
+
+1. **Accept it and dilute it deliberately.** More isotropic fine detail is what visually breaks the
+   banding, and it is the one thing that demonstrably works. The third noise already does this; a
+   fourth, finer one would do more. This treats the symptom knowingly, which is different from doing
+   it by accident.
+2. **Replace the noise source.** A different node — or a warp field driven by a second noise at a
+   different rotation — attacks the lattice directly. Domain warp gave +0.1 at intensity 1 and higher
+   intensities were never tried; that is the cheapest untested item left.
+3. **Accept it as-is.** The ratio has never been shown to correspond to anything a player would
+   notice; the original complaint was about *visible stripes*, and phenomenon A — the one that
+   produced them — is fixed. Nobody has yet looked at the current terrain and said it still stripes.
+
+**Do 3 before 1 or 2.** The whole investigation has been driven by a number, and the number's link to
+the visible defect was never re-checked after A was solved.
+
 ### Superseded next-test note
 
 `NoiseNode` has `warpMode` (None / Angular / Directional) with `warpIntensity`, and **every noise in
