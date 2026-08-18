@@ -43,6 +43,7 @@ namespace GameDev.EditorTools
         private const string SkipBakeArg = "-overworldSkipBake";
         private const string DemoGraphArg = "-overworldDemoGraph";
         private const string BypassShelfArg = "-overworldBypassShelfCurve";
+        private const string RefShapingArg = "-overworldReferenceShaping";
         private const string DressingArg = "-overworldDressing";
         private const string NoSilhouetteArg = "-overworldIslandNoSilhouette";
         private const string NoRemapArg = "-overworldNoiseNoRemapPerLayer";
@@ -76,6 +77,8 @@ namespace GameDev.EditorTools
             VistaGraphBuild.NoiseDerivativeOverride = ReadNoiseDerivativeArg();
             IslandPlateauGraphBuilder.BypassShelfCurveForDiagnostics =
                 ReadBoolArg(BypassShelfArg, false);
+            IslandPlateauGraphBuilder.ReferenceShapingForDiagnostics =
+                ReadBoolArg(RefShapingArg, false);
             OverworldLpbBake.IslandWithoutSilhouetteForDiagnostics =
                 ReadBoolArg(NoSilhouetteArg, false);
             VistaGraphBuild.DisableNoiseRemapPerLayerForDiagnostics = ReadBoolArg(NoRemapArg, false);

@@ -6,6 +6,93 @@
 
 ---
 
+## CONCLUSION — measured on 10 seeds, graph tuning is exhausted
+
+**The anisotropy is systematic, not seed luck, and thirteen graph parameters plus the reference's
+own topology have failed to move it.** This section is the summary; the experiment log below it is
+the evidence.
+
+### The 10-seed measurement
+
+Current committed graph, full configuration (mountains on, real silhouette), residual ratio per tile
+— 1.0 is isotropic:
+
+| Seed | mean | min | max | |
+|---|---|---|---|---|
+| 110201 | 0.69 | 0.56 | 0.81 | banded |
+| 20260817 | 0.88 | 0.83 | 0.91 | clean |
+| 7739521 | 0.53 | 0.50 | 0.57 | banded |
+| 1 | 0.69 | 0.42 | 0.90 | banded |
+| 42 | 0.80 | 0.68 | 1.07 | borderline |
+| 999 | 0.71 | 0.53 | 0.82 | borderline |
+| 20260101 | 0.74 | 0.58 | 0.86 | borderline |
+| 555777 | 0.68 | 0.55 | 0.86 | banded |
+| 31337 | 0.75 | 0.38 | 1.15 | borderline |
+| 8080808 | 0.54 | 0.38 | 0.74 | banded |
+
+**40 tiles: mean 0.699, median 0.700, min 0.38, max 1.15, σ 0.189. Five seeds of ten below 0.70;
+nineteen tiles of forty below 0.70.**
+
+### A correction, because it was recorded here as fact
+
+An earlier three-seed reading concluded that **110201 was an unlucky seed** and that twelve
+experiments had therefore been tuned against an unrepresentative case. **That was wrong.** Across ten
+seeds the mean is 0.699 and 110201 measures 0.69 — dead average. The outlier was 20260817 at 0.88,
+which got lucky. Every prior negative result stands, and was measured on a representative world.
+
+What the ten seeds *do* show is variance: σ 0.189, individual tiles from 0.38 to 1.15. On one world
+some tiles are isotropic and others band hard. It is a strongly varying property of particular noise
+realisations, not a uniform offset.
+
+### The reference-topology A/B — it does not fix it
+
+Reading `Mountain_TerrainGraphTemplate`'s **wiring** (not its node list, which is all anyone had
+checked) gives a height path simpler than ours:
+
+```
+Noise(750, 8 oct) x Noise(1000, 1 oct) -> Levels(0, 0.5, 1, outLow 0.05) -> erosion x2
+```
+
+Our `Levels` already matches it exactly. What differs is the noise scales and our extra `ShelfCurve`.
+Replacing all of it at once, three seeds, full configuration:
+
+| Seed | current | reference topology |
+|---|---|---|
+| 110201 | 0.69 | 0.57 (worse) |
+| 20260817 | 0.88 | 0.89 |
+| 7739521 | 0.53 | 0.71 (better) |
+| **mean** | **0.698** | **0.724** |
+
++0.026 against a 0.50–0.96 spread, and the sign flips by seed. Not a fix. The curvature PNGs still
+show the same horizontal scan-lines on land in both arms.
+
+Reproduce with `-overworldReferenceShaping true` (diagnostic flag, default off, graph assets
+unchanged).
+
+### One real defect found along the way
+
+`Noise(200, 8 oct, persistence 0.728)` **belongs in the reference's surface stage, not its height
+path.** Commit `a0df10e` multiplied it into height on the assumption it belonged there — my error.
+That is what cost 38 m of peak height, and the reference-topology arm recovers it (peak 173–181 m →
+177–205 m). Worth fixing on its own, separately from anything about banding.
+
+### Where this leaves it
+
+Graph tuning is closed: thirteen parameters and the complete reference topology. Two honest options
+remain.
+
+1. **Replace the noise source** — not a parameter but the node: a different noise type, domain warp
+   at a much higher intensity (1.0 gave +0.1 and higher was never tried), or two noise fields
+   composed at rotated coordinate systems. This is the only avenue that attacks the lattice directly.
+2. **Accept and document it.** 0.70 is measurable, but nobody has checked whether it is *visible*
+   since phenomenon A — the missing spectral content, which is what produced the stripes people
+   actually complained about — was fixed.
+
+**Do 2 before 1.** Thirteen experiments chased a number whose link to the visible defect has not been
+re-checked since A was solved.
+
+---
+
 ## Where we actually are
 
 Two separate phenomena were being measured as one, and only one of them is solved.

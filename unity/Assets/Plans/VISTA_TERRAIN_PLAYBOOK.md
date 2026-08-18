@@ -119,7 +119,24 @@ At the current biome sizes nothing is clamped: on the island's measured 2503 m, 
 `VistaGraphBuild.MinFeatureSizeMeters` holds the floor, and these numbers must be rechecked whenever
 a biome's area or falloff changes.
 
-### 2.4a What the banding actually is — four hypotheses killed by measurement
+### 2.4a What the banding actually is
+
+**Concluded.** Full log, the 10-seed measurement and every negative result live in
+[BANDING_INVESTIGATION.md](BANDING_INVESTIGATION.md). Short version, so nobody restarts it here:
+
+- Measured over **40 tiles on 10 seeds**: mean residual curvature ratio **0.699** (1.0 = isotropic),
+  σ 0.189, five seeds of ten below 0.70. Systematic, not seed luck.
+- **Thirteen graph parameters and the reference graph's complete height topology** have failed to
+  move it. Erosion, the 512 px cap, tile resampling, heightmap quantisation, the massifs, the island
+  silhouette, biome aspect, noise scale, `applyRemapPerLayer`, `flipSign`, octave count and
+  lacunarity are all ruled out **by bake and measurement**, not by argument.
+- The one thing that ever moved the number — `layerDerivativeMode = Pow` — did so by pushing later
+  octaves below one canvas pixel, where they return white noise. It diluted the measurement rather
+  than fixing the surface.
+
+Do not re-test any of the above. The remaining avenue is replacing the noise *source*, not tuning it.
+
+### 2.4a-legacy — the four hypotheses killed first
 
 All figures from `Dump Terrain Geometry`, seed 110201, via the headless harness in 2.4b.
 

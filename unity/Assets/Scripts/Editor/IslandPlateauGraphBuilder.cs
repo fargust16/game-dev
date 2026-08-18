@@ -69,6 +69,22 @@ namespace GameDev.EditorTools
         /// </remarks>
         public static bool BypassShelfCurveForDiagnostics { get; set; }
 
+        /// <summary>
+        /// Diagnostic only: build the reference graph's height path instead of ours.
+        /// </summary>
+        /// <remarks>
+        /// Reading <c>Mountain_TerrainGraphTemplate</c>'s wiring — as opposed to its node list, which
+        /// is all anyone had checked — shows a shaping stage simpler than ours:
+        /// <c>Noise(750, 8 oct) x Noise(1000, 1 oct) -> Levels -> erosion</c>. No plateau curve, and
+        /// the third noise it owns feeds the **surface** stage, not height.
+        /// <para>
+        /// This flag swaps all three at once, because all three together are what "the reference
+        /// topology" means. If it removes the banding, bisecting which one carries the effect is a
+        /// separate run — bundling is what let this defect survive twelve experiments.
+        /// </para>
+        /// </remarks>
+        public static bool ReferenceShapingForDiagnostics { get; set; }
+
         [MenuItem("GameDev/Overworld/Vista/Rebuild Island Plateau Graph (destructive)")]
         public static void RebuildMenu()
         {
@@ -144,28 +160,42 @@ namespace GameDev.EditorTools
         /// </remarks>
         private static void BuildTerrainStage(TerrainGraph graph)
         {
-            var detail = VistaGraphBuild.AddDetailNoise(graph, scale: 1200f, seed: 110);
-            var mass = VistaGraphBuild.AddMassNoise(graph, scale: 1900f, seed: 277);
-            var fine = VistaGraphBuild.AddFineNoise(
-                graph, scale: VistaGraphBuild.FineNoiseScaleMeters, seed: 431);
+            var reference = ReferenceShapingForDiagnostics;
+            var detail = VistaGraphBuild.AddDetailNoise(
+                graph, scale: reference ? 750f : 1200f, seed: 110);
+            var mass = VistaGraphBuild.AddMassNoise(
+                graph, scale: reference ? 1000f : 1900f, seed: 277);
+            // The reference keeps its third noise out of the height path entirely — it feeds the
+            // surface stage. Ours multiplies it into height, which is what cost 38 m of peak.
+            var fine = reference
+                ? null
+                : VistaGraphBuild.AddFineNoise(
+                    graph, scale: VistaGraphBuild.FineNoiseScaleMeters, seed: 431);
 
             var shape = new CombineNode { mode = CombineNode.Mode.Multiply };
             graph.AddNode(shape);
 
-            // Third noise, as the reference has. Without it the island has no content below ~100 m
-            // and its last surviving octave reads as banding — see AddFineNoise.
-            var roughen = new CombineNode { mode = CombineNode.Mode.Multiply };
-            graph.AddNode(roughen);
+            CombineNode roughen = null;
+            if (fine != null)
+            {
+                roughen = new CombineNode { mode = CombineNode.Mode.Multiply };
+                graph.AddNode(roughen);
+            }
 
             var levels = VistaGraphBuild.AddReferenceLevels(graph);
 
-            var shelf = new CurveNode
+            // The plateau bias is ours alone; the reference goes straight from Levels to erosion.
+            CurveNode shelf = null;
+            if (!reference)
             {
-                curve = BypassShelfCurveForDiagnostics
-                    ? AnimationCurve.Linear(0f, 0f, 1f, 1f)
-                    : ShelfCurve(),
-            };
-            graph.AddNode(shelf);
+                shelf = new CurveNode
+                {
+                    curve = BypassShelfCurveForDiagnostics
+                        ? AnimationCurve.Linear(0f, 0f, 1f, 1f)
+                        : ShelfCurve(),
+                };
+                graph.AddNode(shelf);
+            }
 
             // Two passes, as the reference has — see the note in MountainMassifGraphBuilder.
             var macroErosion = VistaGraphBuild.AddMacroErosion(graph);
@@ -177,12 +207,34 @@ namespace GameDev.EditorTools
 
             VistaGraphBuild.Connect(graph, detail.id, detail.outputSlot.id, shape.id, shape.backgroundSlot.id);
             VistaGraphBuild.Connect(graph, mass.id, mass.outputSlot.id, shape.id, shape.foregroundSlot.id);
-            VistaGraphBuild.Connect(graph, shape.id, shape.outputSlot.id, roughen.id, roughen.backgroundSlot.id);
-            VistaGraphBuild.Connect(graph, fine.id, fine.outputSlot.id, roughen.id, roughen.foregroundSlot.id);
-            VistaGraphBuild.Connect(graph, roughen.id, roughen.outputSlot.id, levels.id, levels.inputSlot.id);
-            VistaGraphBuild.Connect(graph, levels.id, levels.outputSlot.id, shelf.id, shelf.inputSlot.id);
+            if (roughen != null)
+            {
+                VistaGraphBuild.Connect(
+                    graph, shape.id, shape.outputSlot.id, roughen.id, roughen.backgroundSlot.id);
+                VistaGraphBuild.Connect(
+                    graph, fine.id, fine.outputSlot.id, roughen.id, roughen.foregroundSlot.id);
+                VistaGraphBuild.Connect(
+                    graph, roughen.id, roughen.outputSlot.id, levels.id, levels.inputSlot.id);
+            }
+            else
+            {
+                VistaGraphBuild.Connect(
+                    graph, shape.id, shape.outputSlot.id, levels.id, levels.inputSlot.id);
+            }
+
+            // Levels -> shelf -> erosion when the plateau bias is present, Levels -> erosion when it
+            // is not; either way erosion sees one upstream node.
+            var beforeErosion = shelf != null ? (ImageNodeBase)shelf : levels;
+            if (shelf != null)
+            {
+                VistaGraphBuild.Connect(
+                    graph, levels.id, levels.outputSlot.id, shelf.id, shelf.inputSlot.id);
+            }
+
             VistaGraphBuild.Connect(
-                graph, shelf.id, shelf.outputSlot.id, macroErosion.id, macroErosion.inputHeightSlot.id);
+                graph, beforeErosion.id,
+                shelf != null ? shelf.outputSlot.id : levels.outputSlot.id,
+                macroErosion.id, macroErosion.inputHeightSlot.id);
             VistaGraphBuild.Connect(
                 graph, macroErosion.id, macroErosion.outputHeightSlot.id,
                 microErosion.id, microErosion.inputHeightSlot.id);

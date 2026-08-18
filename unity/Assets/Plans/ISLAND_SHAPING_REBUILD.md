@@ -7,6 +7,26 @@
 
 ---
 
+## STATUS UPDATE — the premise of this document has been disproved
+
+This iteration was written on the belief that our shaping recipe bands and Vista's does not, so
+re-deriving ours from the reference would fix it. **That has now been tested and it does not.**
+
+Baking the reference's actual height topology — read from its wiring, not its node list — moved the
+mean ratio from 0.698 to 0.724 across three seeds, with the sign flipping by seed, and the curvature
+maps still show the same scan-lines. Separately, a 10-seed measurement puts the defect at mean 0.699
+with σ 0.189, i.e. systematic rather than a property of our particular recipe.
+
+See [BANDING_INVESTIGATION.md](BANDING_INVESTIGATION.md) § CONCLUSION. **Do not start this rebuild
+expecting it to remove the banding.** What remains valid below is the description of the defect and
+the verification tooling; the proposed fix is not.
+
+One genuine defect did come out of it: the reference keeps its third noise in the **surface** stage,
+and we multiply it into **height**. That is worth correcting on its own — it costs ~38 m of peak
+height — and has nothing to do with the banding.
+
+---
+
 ## The problem, stated precisely
 
 The overworld island shows directional banding: ridges consistently elongated east-west, with a
