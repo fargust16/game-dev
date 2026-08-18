@@ -44,6 +44,7 @@ namespace GameDev.EditorTools
         private const string DemoGraphArg = "-overworldDemoGraph";
         private const string BypassShelfArg = "-overworldBypassShelfCurve";
         private const string DressingArg = "-overworldDressing";
+        private const string NoSilhouetteArg = "-overworldIslandNoSilhouette";
         private const string LayerDumpArg = "-overworldLayerDump";
 
         /// <summary>Generous ceiling; a terrain-only bake is minutes, not tens of minutes.</summary>
@@ -69,6 +70,8 @@ namespace GameDev.EditorTools
             VistaGraphBuild.NoiseDerivativeOverride = ReadNoiseDerivativeArg();
             IslandPlateauGraphBuilder.BypassShelfCurveForDiagnostics =
                 ReadBoolArg(BypassShelfArg, false);
+            OverworldLpbBake.IslandWithoutSilhouetteForDiagnostics =
+                ReadBoolArg(NoSilhouetteArg, false);
 
             var exportPng = ReadBoolArg(ExportPngArg, defaultValue: false);
             var skipBake = ReadBoolArg(SkipBakeArg, defaultValue: false);

@@ -33,6 +33,44 @@ Two specific errors to carry forward:
    in *two* ways at once: a different shaping recipe **and** no island silhouette — it covers the
    whole square with falloff 0. Its isotropy may be entirely due to the second.
 
+## RESULTS — steps 1 and 2 are done, and both hypotheses were wrong
+
+**Step 1 (instrument) — built, and it falsified its own premise.** The dump now reports a residual
+ratio from the height field with a 40 m box blur subtracted. On the island it tracks the plain ratio
+almost exactly:
+
+| Tile | plain | residual |
+|---|---|---|
+| a | 0.54 | 0.56 |
+| b | 0.39 | 0.38 |
+| c | 0.51 | 0.51 |
+| d | 0.59 | 0.60 |
+
+So the anisotropy is **not** the island's dome leaking into the measurement. It is in the ridge
+texture itself, and every number recorded in the earlier experiments was valid after all.
+
+**Step 2 (confound) — the mask is innocent; it is the graph.** Our island graph baked with a square
+world-covering footprint and falloff 0 — the demo graph's exact configuration — is not merely still
+anisotropic, it is **more** so:
+
+| | residual ratio, 4 tiles | axis-aligned share |
+|---|---|---|
+| with silhouette | 0.56 / 0.38 / 0.51 / 0.60 | 17–22 % |
+| **without silhouette** | **0.45 / 0.34 / 0.36 / 0.40** | **22–30 %** |
+
+And the orientation histogram sharpens into a spike: bins 5–6 (75–105°) carry 21–25 % each against
+~5 % elsewhere. Gradients pointing along Z means slopes facing north–south, which means **ridges
+running east–west** — now unambiguous rather than inferred.
+
+Two candidates die with this result: the elongated anchor polygon, and the `reach = Lerp(0.72, 1, …)`
+asymmetry built into `BuildIslandSilhouette`. **Step 3 is therefore skipped.** Go to step 4.
+
+One more candidate can be crossed off from data already collected: **biome aspect ratio**. The massif
+biome is 1050 × 450 — far more elongated than the island — and bakes *less* anisotropic (0.63–0.91)
+than the island alone. Stretching a square canvas over a non-square biome is not the mechanism.
+
+---
+
 ## Step 1 — Fix the instrument before running any more bakes
 
 Until this is done, no result about B means anything.

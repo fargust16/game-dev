@@ -38,6 +38,19 @@ namespace GameDev.EditorTools
         /// <summary>How far the coastline may wander in or out, as a fraction of the extent.</summary>
         private const float IslandRadiusNoiseFrac = 0.04f;
 
+        /// <summary>
+        /// Diagnostic only: give the island a square, world-covering footprint with no falloff.
+        /// </summary>
+        /// <remarks>
+        /// The control that separates "our graph bands" from "our island *shape* bands". Vista's
+        /// sample graph was called clean, but it differs from ours in two ways at once — a different
+        /// recipe and no silhouette, since it covers the whole square with falloff 0. This makes our
+        /// own graph match the second condition so the first can be tested on its own. The visible
+        /// surface is <c>mask x graphHeight</c>, and our mask is a deliberately asymmetric polygon,
+        /// so it is a live suspect for the directional bias.
+        /// </remarks>
+        public static bool IslandWithoutSilhouetteForDiagnostics { get; set; }
+
         /// <summary>Secondary massifs are foothills, not twin peaks.</summary>
         private const float SecondaryMassifScale = 0.38f;
 
@@ -188,7 +201,27 @@ namespace GameDev.EditorTools
             var center = WorldCenter();
             biome.transform.position = new Vector3(center.x, biome.transform.position.y, center.z);
             biome.seed = new WorldSeed(seed).Fork("terrain.islandbase").Next();
-            biome.anchors = BuildIslandSilhouette(biome, seed);
+
+            if (IslandWithoutSilhouetteForDiagnostics)
+            {
+                var halfX = WorldScale.WorldExtentXMeters * 0.5f;
+                var halfZ = WorldScale.WorldExtentZMeters * 0.5f;
+                biome.anchors = new[]
+                {
+                    new Vector3(-halfX, 0f, -halfZ),
+                    new Vector3(-halfX, 0f, halfZ),
+                    new Vector3(halfX, 0f, halfZ),
+                    new Vector3(halfX, 0f, -halfZ),
+                };
+                biome.falloffDistance = 0f;
+                Debug.LogWarning(
+                    "[IslandBase] DIAGNOSTIC: square world-covering footprint, no falloff. " +
+                    "There is no island and no coast — this bake is for measurement only.");
+            }
+            else
+            {
+                biome.anchors = BuildIslandSilhouette(biome, seed);
+            }
 
             LogBiome("IslandBase", biome);
         }

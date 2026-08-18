@@ -266,6 +266,7 @@ namespace GameDev.EditorTools
                 $"    height {minY:F1}..{maxY:F1} m, {100f * aboveSea / (res * res):F1}% above sea " +
                 $"({sea:F0} m)");
 
+            AppendResidualAnisotropy(report, heights, res, size.y, metresPerCell);
             AppendCurvatureEnergy(report, curveX, curveZ, res, "interior", interior: true);
             AppendCurvatureEnergy(report, curveX, curveZ, res, "seam    ", interior: false);
             AppendDominantPeriod(report, curveX, res, metresPerCell, alongX: true);
@@ -277,6 +278,109 @@ namespace GameDev.EditorTools
                 ExportMaps(heights, curveX, curveZ, res, size, tileIndex, terrain.name, outputFolder);
             }
         }
+
+        /// <summary>
+        /// Anisotropy of the **high-passed** surface: ridge direction with the landform removed.
+        /// </summary>
+        /// <remarks>
+        /// The plain curvature ratio below sums landform and texture together, and an island that is
+        /// simply wider than it is tall produces a lopsided ratio by shape alone — no artifact
+        /// required. Nine experiments were judged against that number before anyone noticed.
+        /// <para>
+        /// This subtracts a box-blurred copy of the height field and measures the residual, so it
+        /// answers the question that was actually being asked: do the *ridges* run one way, once the
+        /// island's own dome is taken out? Read the two numbers together — if they disagree, the
+        /// plain one was measuring the outline.
+        /// </para>
+        /// </remarks>
+        private static void AppendResidualAnisotropy(
+            StringBuilder report, float[,] heights, int res, float heightMetres, float metresPerCell)
+        {
+            var radius = Mathf.Max(2, Mathf.RoundToInt(HighPassRadiusMeters / metresPerCell));
+            var lo = SeamCells + 1 + radius;
+            var hi = res - SeamCells - 1 - radius;
+            if (hi - lo < 8)
+            {
+                report.AppendLine("    residual: <tile too small for the high-pass window>");
+                return;
+            }
+
+            // Separable box blur; the residual is what the blur could not explain.
+            var blurred = new float[res, res];
+            var rowSum = new float[res, res];
+            for (var z = 0; z < res; z++)
+            {
+                for (var x = 0; x < res; x++)
+                {
+                    float acc = 0;
+                    var n = 0;
+                    for (var k = -radius; k <= radius; k++)
+                    {
+                        var xi = x + k;
+                        if (xi < 0 || xi >= res)
+                        {
+                            continue;
+                        }
+
+                        acc += heights[z, xi];
+                        n++;
+                    }
+
+                    rowSum[z, x] = acc / n;
+                }
+            }
+
+            for (var z = 0; z < res; z++)
+            {
+                for (var x = 0; x < res; x++)
+                {
+                    float acc = 0;
+                    var n = 0;
+                    for (var k = -radius; k <= radius; k++)
+                    {
+                        var zi = z + k;
+                        if (zi < 0 || zi >= res)
+                        {
+                            continue;
+                        }
+
+                        acc += rowSum[zi, x];
+                        n++;
+                    }
+
+                    blurred[z, x] = acc / n;
+                }
+            }
+
+            double sumX = 0, sumZ = 0;
+            var count = 0;
+            for (var z = lo; z < hi; z++)
+            {
+                for (var x = lo; x < hi; x++)
+                {
+                    float R(int zz, int xx) => (heights[zz, xx] - blurred[zz, xx]) * heightMetres;
+                    sumX += Mathf.Abs(R(z, x - 1) - 2f * R(z, x) + R(z, x + 1));
+                    sumZ += Mathf.Abs(R(z - 1, x) - 2f * R(z, x) + R(z + 1, x));
+                    count++;
+                }
+            }
+
+            if (count == 0)
+            {
+                report.AppendLine("    residual: <no cells>");
+                return;
+            }
+
+            var mx = sumX / count;
+            var mz = sumZ / count;
+            var ratio = mz > 1e-9 ? mx / mz : 0.0;
+            report.AppendLine(
+                $"    RESIDUAL (high-pass {HighPassRadiusMeters:F0} m) |d2x|={mx:F4} |d2z|={mz:F4} " +
+                $"ratio={ratio:F2} ({DescribeAnisotropy(ratio)})");
+        }
+
+        /// <summary>Blur radius that separates landform from ridge texture.</summary>
+        private const float HighPassRadiusMeters = 40f;
 
         /// <summary>
         /// Mean |curvature| per axis. A strong asymmetry is the signature of grid-aligned banding.
