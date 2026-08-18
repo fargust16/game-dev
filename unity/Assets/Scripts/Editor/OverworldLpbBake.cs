@@ -103,6 +103,16 @@ namespace GameDev.EditorTools
         /// </remarks>
         public static bool IslandLocalSpaceForDiagnostics { get; set; }
 
+        /// <summary>Overrides the island biome's baseResolution.</summary>
+        /// <remarks>
+        /// Dismissed early because the reference also ships 512, but baseResolution is not only the
+        /// canvas: it caps the erosion sim, <c>clamp(biomeWidth / featureSize, 32,
+        /// min(2048, baseResolution))</c>. Equalising the canvas in metres per pixel left that cap
+        /// where it was. Vista's own sample, baked through our write path at 1024, measures 0.79
+        /// against our LPB's 0.48 at 512.
+        /// </remarks>
+        public static int? IslandBaseResolutionForDiagnostics { get; set; }
+
         /// <summary>Secondary massifs are foothills, not twin peaks.</summary>
         private const float SecondaryMassifScale = 0.38f;
 
@@ -281,6 +291,13 @@ namespace GameDev.EditorTools
                 Debug.LogWarning(
                     $"[IslandBase] DIAGNOSTIC worldHeight override -> {target:F0} m "
                     + $"(scaleY {scale.y:F3}).");
+            }
+
+            if (IslandBaseResolutionForDiagnostics.HasValue)
+            {
+                biome.baseResolution = IslandBaseResolutionForDiagnostics.Value;
+                Debug.LogWarning(
+                    $"[IslandBase] DIAGNOSTIC baseResolution -> {biome.baseResolution}.");
             }
 
             if (IslandLocalSpaceForDiagnostics)
