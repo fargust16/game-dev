@@ -92,6 +92,17 @@ namespace GameDev.EditorTools
         /// </remarks>
         public static bool SkipIslandMaskGraphForDiagnostics { get; set; }
 
+        /// <summary>Puts the island biome in Local space, as the Vista reference is.</summary>
+        /// <remarks>
+        /// The reference biome carries <c>m_space: 0</c>; ours carries <c>m_space: 1</c>. NoiseNode
+        /// samples <c>localToWorldPos(localPos) / scale</c>, so the space setting decides the frame
+        /// the whole noise field is laid out in. It is the one property still separating the two
+        /// after the mask, footprint, canvas density, baseResolution, height budget, seabed and mask
+        /// graph were each cleared -- and the transform scales are uniform on both sides, so a
+        /// non-uniform horizontal stretch is already ruled out.
+        /// </remarks>
+        public static bool IslandLocalSpaceForDiagnostics { get; set; }
+
         /// <summary>Secondary massifs are foothills, not twin peaks.</summary>
         private const float SecondaryMassifScale = 0.38f;
 
@@ -270,6 +281,12 @@ namespace GameDev.EditorTools
                 Debug.LogWarning(
                     $"[IslandBase] DIAGNOSTIC worldHeight override -> {target:F0} m "
                     + $"(scaleY {scale.y:F3}).");
+            }
+
+            if (IslandLocalSpaceForDiagnostics)
+            {
+                biome.space = Space.Self;
+                Debug.LogWarning("[IslandBase] DIAGNOSTIC: biome space -> Self (reference uses it).");
             }
 
             if (SkipIslandMaskGraphForDiagnostics)
