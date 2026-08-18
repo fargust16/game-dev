@@ -65,6 +65,8 @@ namespace GameDev.EditorTools
         private const string NoMaskGraphArg = "-overworldSkipIslandMaskGraph";
         private const string LocalSpaceArg = "-overworldIslandLocalSpace";
         private const string BaseResArg = "-overworldIslandBaseResolution";
+        private const string KeepSceneArg = "-overworldKeepSceneBiomes";
+        private const string NoIslandArg = "-overworldSkipIslandLpb";
 
         /// <summary>Generous ceiling; a terrain-only bake is minutes, not tens of minutes.</summary>
         private const double TimeoutSeconds = 900.0;
@@ -111,6 +113,9 @@ namespace GameDev.EditorTools
                 float.TryParse(ReadArg(NoiseOffsetArg), out var off)
                     ? new UnityEngine.Vector2(off, off)
                     : (UnityEngine.Vector2?)null;
+            OverworldTerrainMenu.PreserveSceneBiomesForDiagnostics =
+                ReadBoolArg(KeepSceneArg, false);
+            OverworldLpbBake.SkipIslandLpbForDiagnostics = ReadBoolArg(NoIslandArg, false);
             OverworldLpbBake.IslandBaseResolutionForDiagnostics =
                 int.TryParse(ReadArg(BaseResArg), out var br) ? br : (int?)null;
             OverworldLpbBake.IslandLocalSpaceForDiagnostics = ReadBoolArg(LocalSpaceArg, false);

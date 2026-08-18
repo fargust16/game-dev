@@ -97,6 +97,17 @@ namespace GameDev.EditorTools
                 GenerateSurfaceRoutine(DefaultSeed, TerrainBakeFlags.VistaDemoAsIs));
         }
 
+        /// <summary>Keeps the VistaManager and the biomes already in the scene.</summary>
+        /// <remarks>
+        /// The bake normally destroys the manager outright, which takes the Wizard's MountainBiome
+        /// with it -- that is why it never contaminated a measurement, and also why "just use their
+        /// biome" was never actually tried. Reproducing its ten properties on our own LPB one at a
+        /// time failed on all ten, so this keeps the biome itself instead of copying its settings.
+        /// Terrains are still destroyed; the bake recreates its own tiles for the preserved biome
+        /// to generate into.
+        /// </remarks>
+        public static bool PreserveSceneBiomesForDiagnostics { get; set; }
+
         public static void ClearTerrainOnly()
         {
             var manager = Object.FindAnyObjectByType<VistaManager>();
@@ -104,7 +115,15 @@ namespace GameDev.EditorTools
             {
                 // Cancel in-flight editor coroutines before destroying the manager (avoids NRE in ProcessBiomesProgressive).
                 manager.CancelGeneration();
-                Object.DestroyImmediate(manager.gameObject);
+                if (PreserveSceneBiomesForDiagnostics)
+                {
+                    Debug.LogWarning(
+                        "[Overworld] DIAGNOSTIC: keeping the scene's VistaManager and its biomes.");
+                }
+                else
+                {
+                    Object.DestroyImmediate(manager.gameObject);
+                }
             }
 
             var terrainsRoot = GameObject.Find(OverworldTerrainAccess.TerrainsRootName);

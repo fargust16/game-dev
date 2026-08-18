@@ -113,6 +113,9 @@ namespace GameDev.EditorTools
         /// </remarks>
         public static int? IslandBaseResolutionForDiagnostics { get; set; }
 
+        /// <summary>Does not spawn our island biome, leaving whatever is already in the scene.</summary>
+        public static bool SkipIslandLpbForDiagnostics { get; set; }
+
         /// <summary>Secondary massifs are foothills, not twin peaks.</summary>
         private const float SecondaryMassifScale = 0.38f;
 
@@ -137,7 +140,14 @@ namespace GameDev.EditorTools
             {
                 SpawnSeaFloorLpb(manager, seed);
             }
-            SpawnBaseIslandLpb(manager, seed);
+            if (SkipIslandLpbForDiagnostics)
+            {
+                Debug.LogWarning("[IslandBase] DIAGNOSTIC: island biome not spawned.");
+            }
+            else
+            {
+                SpawnBaseIslandLpb(manager, seed);
+            }
             if (includeMountains)
             {
                 SpawnSeededMountainLpbs(manager, seed);
