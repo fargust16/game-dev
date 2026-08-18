@@ -60,6 +60,9 @@ namespace GameDev.EditorTools
         private const string PostStackCurveArg = "-overworldPostStackCurve";
         private const string RefDetailArg = "-overworldReferenceDetailNoise";
         private const string IslandHeightArg = "-overworldIslandWorldHeight";
+        private const string NoSeaFloorArg = "-overworldSkipSeaFloor";
+        private const string BiomeWidthArg = "-overworldIslandBiomeWidth";
+        private const string NoMaskGraphArg = "-overworldSkipIslandMaskGraph";
 
         /// <summary>Generous ceiling; a terrain-only bake is minutes, not tens of minutes.</summary>
         private const double TimeoutSeconds = 900.0;
@@ -106,6 +109,11 @@ namespace GameDev.EditorTools
                 float.TryParse(ReadArg(NoiseOffsetArg), out var off)
                     ? new UnityEngine.Vector2(off, off)
                     : (UnityEngine.Vector2?)null;
+            OverworldLpbBake.SkipIslandMaskGraphForDiagnostics =
+                ReadBoolArg(NoMaskGraphArg, false);
+            OverworldLpbBake.IslandBiomeWidthForDiagnostics =
+                float.TryParse(ReadArg(BiomeWidthArg), out var bw) ? bw : (float?)null;
+            OverworldLpbBake.SkipSeaFloorForDiagnostics = ReadBoolArg(NoSeaFloorArg, false);
             OverworldLpbBake.IslandWorldHeightForDiagnostics =
                 float.TryParse(ReadArg(IslandHeightArg), out var ih) ? ih : (float?)null;
             OverworldLpbBake.IslandWithoutSilhouetteForDiagnostics =

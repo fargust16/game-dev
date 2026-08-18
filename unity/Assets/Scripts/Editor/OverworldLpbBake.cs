@@ -62,6 +62,36 @@ namespace GameDev.EditorTools
         /// </remarks>
         public static float? IslandWorldHeightForDiagnostics { get; set; }
 
+        /// <summary>Spawns the stack without the seabed biome underneath the island.</summary>
+        /// <remarks>
+        /// The Vista reference is a single biome with nothing below it; we blend the island (order
+        /// 10) over a 5600 m seabed (order 0). That blend is one of the two structural differences
+        /// left between the two after the mask, footprint, baseResolution and height budget were
+        /// each measured and cleared.
+        /// </remarks>
+        public static bool SkipSeaFloorForDiagnostics { get; set; }
+
+        /// <summary>Overrides the island biome's square extent, in metres.</summary>
+        /// <remarks>
+        /// The last structural difference from the Vista reference. Its biome is 4700 m across a
+        /// 2800 m world, so it overhangs the edges and only ~305 of its 512 canvas pixels land on
+        /// the world -- 9.18 m/px. Ours is cut to the world and spends all 512 there, 5.47 m/px.
+        /// Ours is the finer canvas and ours is the one that bands, which matches the earlier
+        /// finding that fewer octaves banded coarser rather than less: the more fine detail the
+        /// graph resolves onto the axis-aligned world lattice, the stronger the hatch.
+        /// </remarks>
+        public static float? IslandBiomeWidthForDiagnostics { get; set; }
+
+        /// <summary>Detaches the island biome's mask graph.</summary>
+        /// <remarks>
+        /// The Vista reference runs with <c>m_biomeMaskGraph: {fileID: 0}</c> -- no mask graph at
+        /// all -- while we attach SoftFalloff_BiomeMaskGraph. The mask multiplies the height field
+        /// whatever falloffDistance is set to, so it stamps straight onto the terrain, and it is the
+        /// last structural difference left after the mask polygon, footprint, canvas density,
+        /// baseResolution, height budget and the seabed underneath were each measured and cleared.
+        /// </remarks>
+        public static bool SkipIslandMaskGraphForDiagnostics { get; set; }
+
         /// <summary>Secondary massifs are foothills, not twin peaks.</summary>
         private const float SecondaryMassifScale = 0.38f;
 
@@ -76,7 +106,16 @@ namespace GameDev.EditorTools
         public static void SpawnIslandAndMountainStack(
             VistaManager manager, int seed, bool includeMountains = true)
         {
-            SpawnSeaFloorLpb(manager, seed);
+            if (SkipSeaFloorForDiagnostics)
+            {
+                Debug.LogWarning(
+                    "[SeaFloor] DIAGNOSTIC: seabed biome skipped; the world below the island is "
+                    + "whatever the terrain defaults to.");
+            }
+            else
+            {
+                SpawnSeaFloorLpb(manager, seed);
+            }
             SpawnBaseIslandLpb(manager, seed);
             if (includeMountains)
             {
@@ -233,10 +272,18 @@ namespace GameDev.EditorTools
                     + $"(scaleY {scale.y:F3}).");
             }
 
-            if (IslandWithoutSilhouetteForDiagnostics)
+            if (SkipIslandMaskGraphForDiagnostics)
             {
-                var halfX = WorldScale.WorldExtentXMeters * 0.5f;
-                var halfZ = WorldScale.WorldExtentZMeters * 0.5f;
+                biome.biomeMaskGraph = null;
+                Debug.LogWarning(
+                    "[IslandBase] DIAGNOSTIC: mask graph detached; the biome contributes its raw "
+                    + "graph output with no falloff shaping.");
+            }
+
+            if (IslandWithoutSilhouetteForDiagnostics || IslandBiomeWidthForDiagnostics.HasValue)
+            {
+                var halfX = (IslandBiomeWidthForDiagnostics ?? WorldScale.WorldExtentXMeters) * 0.5f;
+                var halfZ = (IslandBiomeWidthForDiagnostics ?? WorldScale.WorldExtentZMeters) * 0.5f;
                 biome.anchors = new[]
                 {
                     new Vector3(-halfX, 0f, -halfZ),
@@ -245,6 +292,14 @@ namespace GameDev.EditorTools
                     new Vector3(halfX, 0f, -halfZ),
                 };
                 biome.falloffDistance = 0f;
+
+                // The canvas is sized from worldArea, so moving the anchors alone would leave m/px
+                // untouched and measure nothing.
+                var areaComponent = biome.GetComponent<SetBiomeAreaOnSpawn>();
+                if (areaComponent != null)
+                {
+                    areaComponent.worldArea = new Vector2(halfX * 2f, halfZ * 2f);
+                }
                 Debug.LogWarning(
                     "[IslandBase] DIAGNOSTIC: square world-covering footprint, no falloff. " +
                     "There is no island and no coast — this bake is for measurement only.");
