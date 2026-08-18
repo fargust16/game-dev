@@ -85,6 +85,98 @@ namespace GameDev.EditorTools
         /// </remarks>
         public static bool ReferenceShapingForDiagnostics { get; set; }
 
+        /// <summary>
+        /// Replaces the per-octave remap with a single one applied after the octaves are summed.
+        /// </summary>
+        /// <remarks>
+        /// `applyRemapPerLayer` runs every octave through the remap curve *before* it is summed,
+        /// and that is what draws the visible axis-aligned striping. Simply turning it off drops
+        /// the curve entirely (the shader never applies it otherwise) and lets the un-flipped
+        /// 8-octave sum run past 1.0, so the plateau clips flat. This normalises the sum by the
+        /// amplitude series first, then applies the same curve once, at the top of the stack.
+        /// </remarks>
+        public static bool PostStackNormaliseForDiagnostics { get; set; }
+
+        /// <summary>
+        /// Builds the detail noise the way Vista's own sample graph does, in the full chain.
+        /// </summary>
+        /// <remarks>
+        /// 4 octaves, persistence 0.333, no flipSign, no per-layer remap. This is the only noise
+        /// configuration that has ever measured clean here (0.975 against our 0.527), but until now
+        /// it could only be reached through <see cref="NoiseProbe.ReferenceDetail"/>, which returns
+        /// early and never builds a terrain. Pair it with the post-stack normalise: its amplitude
+        /// series sums past 1.0 too, and an un-normalised sum clips the plateau flat.
+        /// </remarks>
+        public static bool ReferenceDetailNoiseForDiagnostics { get; set; }
+
+        /// <summary>Shape of the single post-stack curve, once the octaves are summed.</summary>
+        public enum PostStackCurve
+        {
+            /// <summary>No curve at all: the normalise alone. The control arm.</summary>
+            None,
+
+            /// <summary>
+            /// The original per-octave curve, (0.1,0)->(1,1) with flat tangents.
+            /// </summary>
+            /// <remarks>
+            /// Not a normalisation but a contrast amplifier: it zeroes everything under 0.1 and
+            /// stretches the middle, which lifts the sum's residual directional bias back into
+            /// view. Measured to reintroduce the striping even applied once.
+            /// </remarks>
+            Shelf,
+
+            /// <summary>
+            /// Monotonic (0,0)->(1,1) with flat tangents: a smoothstep. Restores mid-range contrast
+            /// without a dead shelf, so nothing is clipped to a constant.
+            /// </summary>
+            Smooth,
+        }
+
+        /// <summary>Which curve <see cref="PostStackNormaliseForDiagnostics"/> applies.</summary>
+        public static PostStackCurve PostStackCurveForDiagnostics { get; set; } = PostStackCurve.Shelf;
+
+
+        /// <summary>
+        /// Diagnostic only: publish a raw noise signal as the height map, bypassing everything else.
+        /// </summary>
+        /// <remarks>
+        /// Isolates the noise source from `Levels`, `ShelfCurve` and both erosion passes, so the
+        /// banding can be measured on the signal that produces it rather than on the finished
+        /// terrain. Surface and vegetation stages still run and still read `Height Map`; their output
+        /// is meaningless in this mode and is not to be looked at.
+        /// </remarks>
+        public enum NoiseProbe
+        {
+            /// <summary>Normal graph.</summary>
+            Off,
+            /// <summary>The 8-octave detail noise alone.</summary>
+            Detail,
+            /// <summary>The single-octave mass noise alone.</summary>
+            Mass,
+            /// <summary>Detail x Mass, which is what the shaping stage actually starts from.</summary>
+            Product,
+            /// <summary>Detail with the sample graph's settings: 4 octaves, no flipSign, no remap.</summary>
+            ReferenceDetail,
+
+            /// <summary>Output of `Levels`, i.e. the product after the amplitude normalise.</summary>
+            AfterLevels,
+
+            /// <summary>Output of `ShelfCurve`, i.e. the shaping stage complete, before erosion.</summary>
+            AfterShelf,
+
+            /// <summary>Output of the macro erosion pass, before the micro pass.</summary>
+            AfterMacroErosion,
+        }
+
+        /// <summary>Diagnostic only. See <see cref="NoiseProbe"/>.</summary>
+        public static NoiseProbe NoiseProbeForDiagnostics { get; set; } = NoiseProbe.Off;
+
+        /// <summary>Diagnostic only: overrides the detail noise scale for the scale sweep.</summary>
+        public static float? DetailNoiseScaleForDiagnostics { get; set; }
+
+        /// <summary>Diagnostic only: translates the noise sample position, to test lattice locking.</summary>
+        public static UnityEngine.Vector2? NoiseOffsetForDiagnostics { get; set; }
+
         [MenuItem("GameDev/Overworld/Vista/Rebuild Island Plateau Graph (destructive)")]
         public static void RebuildMenu()
         {
@@ -125,28 +217,24 @@ namespace GameDev.EditorTools
             return graph;
         }
 
-        /// <summary>Re-authors the asset from code, discarding any Inspector edits.</summary>
+        /// <summary>Clones Vista's Mountains template onto the island graph asset.</summary>
+        /// <remarks>
+        /// <para>
+        /// STEP 1 of the additive rebuild: the template goes in untouched -- its own height chain,
+        /// its own surface stage, its own vegetation -- and only the LPB wrapper around it is ours.
+        /// That isolates one question: does our biome footprint, falloff mask and height budget band
+        /// a graph that measures clean on its own? Compare the dump against
+        /// Assets/Plans/VISTA_REFERENCE_BASELINE.md before adding anything else.
+        /// </para>
+        /// <para>
+        /// The island silhouette now comes from the LPB mask alone. The plateau bias that used to
+        /// live in the height path (ShelfCurve) is gone with the rest of the hand-authored chain.
+        /// </para>
+        /// </remarks>
         public static TerrainGraph Rebuild()
         {
-            VistaGraphBuild.EnsureFolder("Assets/Settings/Vista");
-
-            var graph = ScriptableObject.CreateInstance<TerrainGraph>();
-            graph.name = "IslandPlateau_TerrainGraph";
-
-            BuildTerrainStage(graph);
-            var surface = BuildSurfaceStage(graph);
-            // Green source = the grass weight (Weight Blend layer 0), so canopy follows the paint.
-            VistaGraphBuild.AddVegetationStage(
-                graph,
-                surface,
-                surface.outputSlots[0].id,
-                treeMaxSlopeDegrees: 28f,
-                seed: 4021);
-
-            graph.Validate();
-            // Overwrite in place so the asset GUID survives and the biome template prefabs keep
-            // pointing at it.
-            return VistaGraphBuild.SaveGraph(graph, GraphAssetPath);
+            return VistaGraphBuild.RebuildFromTemplate(
+                VistaGraphBuild.MountainTemplateGraphPath, GraphAssetPath);
         }
 
         /// <summary>
@@ -161,10 +249,66 @@ namespace GameDev.EditorTools
         private static void BuildTerrainStage(TerrainGraph graph)
         {
             var reference = ReferenceShapingForDiagnostics;
-            var detail = VistaGraphBuild.AddDetailNoise(
-                graph, scale: reference ? 750f : 1200f, seed: 110);
+            var probe = NoiseProbeForDiagnostics;
+            var detailScale = DetailNoiseScaleForDiagnostics ?? (reference ? 750f : 1200f);
+            var detail = probe == NoiseProbe.ReferenceDetail || ReferenceDetailNoiseForDiagnostics
+                ? VistaGraphBuild.AddSampleGraphDetailNoise(graph, detailScale, seed: 110)
+                : VistaGraphBuild.AddDetailNoise(graph, scale: detailScale, seed: 110);
+            // The detail signal the rest of the chain sees. Normally the noise node itself; with
+            // the post-stack candidate, the noise passed through normalise -> curve.
+            ImageNodeBase detailSrc = detail;
+            var detailSlot = detail.outputSlot.id;
+            if (PostStackNormaliseForDiagnostics)
+            {
+                // Sum of the amplitude series the shader accumulates: 1, p, p^2 ... p^(n-1). With
+                // flipSign off every octave adds, so this is the true ceiling of the raw sum.
+                var amplitudeSum = 0f;
+                var amplitude = 1f;
+                for (var i = 0; i < detail.layerCount; i++)
+                {
+                    amplitudeSum += amplitude;
+                    amplitude *= detail.persistence;
+                }
+
+                // Remap maps [0,1] onto [min,max], so max = 1/sum divides the sum back into [0,1].
+                var normalise = new RemapNode { min = 0f, max = 1f / amplitudeSum };
+                graph.AddNode(normalise);
+
+                VistaGraphBuild.Connect(
+                    graph, detail.id, detail.outputSlot.id, normalise.id, normalise.inputSlot.id);
+                detailSrc = normalise;
+                detailSlot = normalise.outputSlot.id;
+
+                if (PostStackCurveForDiagnostics != PostStackCurve.None)
+                {
+                    var shapeCurve = new CurveNode
+                    {
+                        curve = PostStackCurveForDiagnostics == PostStackCurve.Shelf
+                            ? new AnimationCurve(
+                                new Keyframe(0.1f, 0f, 0f, 0f), new Keyframe(1f, 1f, 0f, 0f))
+                            : new AnimationCurve(
+                                new Keyframe(0f, 0f, 0f, 0f), new Keyframe(1f, 1f, 0f, 0f)),
+                    };
+                    graph.AddNode(shapeCurve);
+                    VistaGraphBuild.Connect(
+                        graph, normalise.id, normalise.outputSlot.id,
+                        shapeCurve.id, shapeCurve.inputSlot.id);
+                    detailSrc = shapeCurve;
+                    detailSlot = shapeCurve.outputSlot.id;
+                }
+                Debug.LogWarning(
+                    $"[IslandPlateau] Post-stack normalise ON: sum={amplitudeSum:F4} over "
+                    + $"{detail.layerCount} octaves, curve={PostStackCurveForDiagnostics}.");
+            }
+
             var mass = VistaGraphBuild.AddMassNoise(
                 graph, scale: reference ? 1000f : 1900f, seed: 277);
+
+            if (NoiseOffsetForDiagnostics.HasValue)
+            {
+                detail.offset = NoiseOffsetForDiagnostics.Value;
+                mass.offset = NoiseOffsetForDiagnostics.Value;
+            }
             // The reference keeps its third noise out of the height path entirely — it feeds the
             // surface stage. Ours multiplies it into height, which is what cost 38 m of peak.
             var fine = reference
@@ -197,6 +341,42 @@ namespace GameDev.EditorTools
                 graph.AddNode(shelf);
             }
 
+            // --- Noise probe: publish the raw signal and stop. Nothing below runs. ---
+            var isEarlyProbe = probe == NoiseProbe.Detail || probe == NoiseProbe.Mass ||
+                probe == NoiseProbe.Product || probe == NoiseProbe.ReferenceDetail;
+            if (isEarlyProbe)
+            {
+                var probeSet = VistaGraphBuild.AddSetVar(graph, VistaGraphBuild.VarHeightMap);
+                var probeOut = new HeightOutputNode();
+                graph.AddNode(probeOut);
+
+                if (probe == NoiseProbe.Product)
+                {
+                    VistaGraphBuild.Connect(
+                        graph, detailSrc.id, detailSlot, shape.id, shape.backgroundSlot.id);
+                    VistaGraphBuild.Connect(
+                        graph, mass.id, mass.outputSlot.id, shape.id, shape.foregroundSlot.id);
+                    VistaGraphBuild.Connect(
+                        graph, shape.id, shape.outputSlot.id, probeSet.id, probeSet.inputSlot.id);
+                }
+                else
+                {
+                    var src = probe == NoiseProbe.Mass ? (ImageNodeBase)mass : detail;
+                    VistaGraphBuild.Connect(
+                        graph, src.id,
+                        probe == NoiseProbe.Mass ? mass.outputSlot.id : detail.outputSlot.id,
+                        probeSet.id, probeSet.inputSlot.id);
+                }
+
+                VistaGraphBuild.Connect(
+                    graph, probeSet.id, probeSet.outputSlot.id, probeOut.id, probeOut.inputSlot.id);
+                Debug.LogWarning(
+                    $"[IslandPlateau] NOISE PROBE {probe}: raw noise is the height map. Levels, " +
+                    "ShelfCurve and erosion are all bypassed; surface and vegetation output is " +
+                    "meaningless.");
+                return;
+            }
+
             // Two passes, as the reference has — see the note in MountainMassifGraphBuilder.
             var macroErosion = VistaGraphBuild.AddMacroErosion(graph);
             var microErosion = VistaGraphBuild.AddMicroErosion(graph);
@@ -205,7 +385,7 @@ namespace GameDev.EditorTools
             var heightOut = new HeightOutputNode();
             graph.AddNode(heightOut);
 
-            VistaGraphBuild.Connect(graph, detail.id, detail.outputSlot.id, shape.id, shape.backgroundSlot.id);
+            VistaGraphBuild.Connect(graph, detailSrc.id, detailSlot, shape.id, shape.backgroundSlot.id);
             VistaGraphBuild.Connect(graph, mass.id, mass.outputSlot.id, shape.id, shape.foregroundSlot.id);
             if (roughen != null)
             {
@@ -239,8 +419,32 @@ namespace GameDev.EditorTools
                 graph, macroErosion.id, macroErosion.outputHeightSlot.id,
                 microErosion.id, microErosion.inputHeightSlot.id);
 
+            // --- Stage probe: publish an intermediate instead of the finished height. ---
+            // The whole chain is still built and still executes; only what feeds Height Map
+            // changes, so each stage is measured through the identical downstream machinery.
+            ImageNodeBase stageSrc = microErosion;
+            var stageSlot = microErosion.outputHeightSlot.id;
+            if (probe == NoiseProbe.AfterLevels)
+            {
+                stageSrc = levels; stageSlot = levels.outputSlot.id;
+            }
+            else if (probe == NoiseProbe.AfterShelf && shelf != null)
+            {
+                stageSrc = shelf; stageSlot = shelf.outputSlot.id;
+            }
+            else if (probe == NoiseProbe.AfterMacroErosion)
+            {
+                stageSrc = macroErosion; stageSlot = macroErosion.outputHeightSlot.id;
+            }
+
+            if (probe != NoiseProbe.Off)
+            {
+                Debug.LogWarning($"[IslandPlateau] STAGE PROBE {probe}: Height Map is an "
+                    + "intermediate, not the finished terrain.");
+            }
+
             VistaGraphBuild.Connect(
-                graph, microErosion.id, microErosion.outputHeightSlot.id, setHeight.id, setHeight.inputSlot.id);
+                graph, stageSrc.id, stageSlot, setHeight.id, setHeight.inputSlot.id);
             VistaGraphBuild.Connect(
                 graph, setHeight.id, setHeight.outputSlot.id, heightOut.id, heightOut.inputSlot.id);
 

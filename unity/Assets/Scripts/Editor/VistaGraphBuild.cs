@@ -290,6 +290,31 @@ namespace GameDev.EditorTools
             return node;
         }
 
+        /// <summary>
+        /// The noise settings of `Demo_MountainRange_AsIs`, the one graph that measured isotropic.
+        /// </summary>
+        /// <remarks>
+        /// Four octaves, persistence 0.333, and — this is the point — **no** `flipSign` and **no**
+        /// `applyRemapPerLayer`, both of which our detail noise sets. Diagnostic only: it exists so
+        /// the sample graph's noise can be measured through our pipeline, isolating the settings from
+        /// everything else that differs between the two graphs.
+        /// </remarks>
+        public static NoiseNode AddSampleGraphDetailNoise(TerrainGraph graph, float scale, int seed)
+        {
+            var node = new NoiseNode
+            {
+                scale = scale,
+                seed = seed,
+                layerCount = 4,
+                persistence = 0.333f,
+                flipSign = false,
+                applyRemapPerLayer = false,
+            };
+            ApplyNoiseDiagnosticOverrides(node);
+            graph.AddNode(node);
+            return node;
+        }
+
         /// <summary>Scale of <see cref="AddFineNoise"/>, the reference's value.</summary>
         public const float FineNoiseScaleMeters = 200f;
 
@@ -1230,6 +1255,103 @@ namespace GameDev.EditorTools
         /// silently becomes "Missing". <c>EditorUtility.CopySerialized</c> overwrites the existing
         /// object's contents in place instead, which is what keeps those references alive.
         /// </remarks>
+        /// <summary>Vista Wizard's Mountains biome — the graph the overworld is rebuilt from.</summary>
+        public const string MountainTemplateGraphPath =
+            "Assets/PinwheelStudio/Vista/Personal/BiomeTemplates/Mountain/" +
+            "Mountain_TerrainGraphTemplate.asset";
+
+        private const string TemplateScratchPath =
+            "Assets/Settings/Vista/__FromTemplate_Scratch.asset";
+
+        /// <summary>
+        /// Clones a Vista template graph onto <paramref name="targetPath"/>, applying
+        /// <paramref name="patch"/> to the clone before it is written.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The copy is <see cref="AssetDatabase.CopyAsset"/>, i.e. a file copy, so the clone carries
+        /// every node and every wire the template has. That is the entire point: transcribing the
+        /// Mountains template into C# by hand reproduced about a third of it — three of its four
+        /// Levels, none of its three Curves, neither HeightMask, no Concave, no Smooth — and one
+        /// noise ended up in the height path where the template puts it in the surface stage. Two
+        /// days of banding experiments were run against that partial copy.
+        /// </para>
+        /// <para>
+        /// The clone lands on a scratch asset first and is then copied into the existing target with
+        /// <see cref="EditorUtility.CopySerialized"/>, so the target keeps its GUID and the biome
+        /// template prefabs that reference it keep resolving.
+        /// </para>
+        /// </remarks>
+        public static TerrainGraph RebuildFromTemplate(
+            string templatePath, string targetPath, System.Action<TerrainGraph> patch = null)
+        {
+            EnsureFolder("Assets/Settings/Vista");
+            if (AssetDatabase.LoadAssetAtPath<TerrainGraph>(templatePath) == null)
+            {
+                UnityEngine.Debug.LogError($"[VistaGraphBuild] No template graph at {templatePath}.");
+                return null;
+            }
+
+            AssetDatabase.DeleteAsset(TemplateScratchPath);
+            if (!AssetDatabase.CopyAsset(templatePath, TemplateScratchPath))
+            {
+                UnityEngine.Debug.LogError(
+                    $"[VistaGraphBuild] Failed to copy {templatePath} -> {TemplateScratchPath}.");
+                return null;
+            }
+
+            AssetDatabase.SaveAssets();
+            var working = AssetDatabase.LoadAssetAtPath<TerrainGraph>(TemplateScratchPath);
+            if (working == null)
+            {
+                UnityEngine.Debug.LogError($"[VistaGraphBuild] Copy at {TemplateScratchPath} did not load.");
+                return null;
+            }
+
+            patch?.Invoke(working);
+            working.Validate();
+            working.name = System.IO.Path.GetFileNameWithoutExtension(targetPath);
+            EditorUtility.SetDirty(working);
+            AssetDatabase.SaveAssets();
+
+            var existing = AssetDatabase.LoadAssetAtPath<TerrainGraph>(targetPath);
+            if (existing == null)
+            {
+                AssetDatabase.CopyAsset(TemplateScratchPath, targetPath);
+                AssetDatabase.DeleteAsset(TemplateScratchPath);
+                AssetDatabase.SaveAssets();
+                return AssetDatabase.LoadAssetAtPath<TerrainGraph>(targetPath);
+            }
+
+            EditorUtility.CopySerialized(working, existing);
+            existing.name = System.IO.Path.GetFileNameWithoutExtension(targetPath);
+            EditorUtility.SetDirty(existing);
+            AssetDatabase.DeleteAsset(TemplateScratchPath);
+            AssetDatabase.SaveAssets();
+            return existing;
+        }
+
+        /// <summary>Strips a template's own vegetation so ours can take its place.</summary>
+        public static void RemoveTemplateVegetation(TerrainGraph graph)
+        {
+            var doomed = new System.Collections.Generic.List<string>();
+            foreach (var node in graph.GetNodes())
+            {
+                if (node is ScatterNode || node is TreeOutputNode ||
+                    node is DetailDensityOutputNode || node is DetailInstanceOutputNode)
+                {
+                    doomed.Add(node.id);
+                }
+            }
+
+            foreach (var id in doomed)
+            {
+                graph.RemoveNode(id);
+            }
+
+            UnityEngine.Debug.Log($"[VistaGraphBuild] Removed {doomed.Count} template vegetation node(s).");
+        }
+
         public static TAsset SaveGraph<TAsset>(TAsset built, string assetPath)
             where TAsset : UnityEngine.ScriptableObject
         {
