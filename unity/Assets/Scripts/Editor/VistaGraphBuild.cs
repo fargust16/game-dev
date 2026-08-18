@@ -327,6 +327,12 @@ namespace GameDev.EditorTools
             {
                 node.flipSign = false;
             }
+            // Only the multi-octave noises; the mass noise is deliberately one octave.
+            if (NoiseLayerCountForDiagnostics.HasValue && node.layerCount > 1)
+            {
+                node.layerCount = NoiseLayerCountForDiagnostics.Value;
+            }
+
             if (NoiseWarpForDiagnostics.HasValue)
             {
                 node.warpMode = NoiseWarpForDiagnostics.Value;
@@ -366,6 +372,22 @@ namespace GameDev.EditorTools
         /// artifact does — warp is what breaks the lattice.
         /// </remarks>
         public static NoiseNode.WarpMode? NoiseWarpForDiagnostics { get; set; }
+
+        /// <summary>
+        /// Diagnostic only: how many octaves the multi-octave noises stack.
+        /// </summary>
+        /// <remarks>
+        /// The last untested lead, and the strongest signal in the data. The best result of the whole
+        /// investigation was <c>layerDerivativeMode = Pow</c>, which collapses scale and amplitude by
+        /// <c>lacunarity^i</c> at every step and so leaves only two or three octaves contributing —
+        /// an octave-count reduction under another name. The one graph that measured isotropic uses
+        /// <c>layerCount = 4</c> against our 8. Two independent routes to the same variable.
+        /// <para>
+        /// If four octaves reach Pow's ratio while keeping the amplitude Pow throws away, the
+        /// mechanism is octaves reinforcing a shared lattice.
+        /// </para>
+        /// </remarks>
+        public static int? NoiseLayerCountForDiagnostics { get; set; }
 
         /// <summary>Warp strength used with <see cref="NoiseWarpForDiagnostics"/>.</summary>
         public static float NoiseWarpIntensityForDiagnostics { get; set; } = 1f;

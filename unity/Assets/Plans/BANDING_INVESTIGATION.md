@@ -148,6 +148,36 @@ directly. **Next: `layerCount = 4` on the detail and fine noises, clean configur
 lands near `Pow`'s 0.65-0.92 while keeping the amplitude that `Pow` throws away, the mechanism is
 octaves stacking on a shared lattice and the fix is to stop at four.
 
+### Octave count tested — falsified, and it reframes the whole table
+
+`layerCount = 4` on the multi-octave noises, clean configuration: **0.23 / 0.26 / 0.32 / 0.32**
+against a 0.37 / 0.50 / 0.50 / 0.40 baseline, with the axis-aligned share rising to 24–36 %.
+
+**Fewer octaves make it worse, not better.** The prediction was the opposite, and it was wrong.
+
+That forces a re-reading of the one result everything was hanging on. `Pow` was treated as "octave
+count reduction under another name" — it is not. Both change how many octaves matter, but they
+change the *scale progression* differently:
+
+| | Octave scales from 1200 m |
+|---|---|
+| Linear (ours), 8 octaves | 1200, 533, 237, 105, 47, 21, 9.3, 4.1 — evenly spaced, ratio 2.25 |
+| Linear, 4 octaves | 1200, 533, 237, 105 — same spacing, high frequencies simply gone |
+| **Pow** | 1200, 533, 105, 9.2, 0.18 — ratios 2.25, 5.1, 11.4, 51: **rapidly diverging** |
+
+Cutting to four keeps the even spacing and removes the fine detail; the ratio worsens. `Pow` keeps
+widely separated scales; the ratio improves. So the variable that matters is not *how many* octaves
+but **how their scales are spaced** — evenly spaced octaves on a shared lattice reinforce its axes,
+widely separated ones do not.
+
+### What to test next, given that
+
+Change the spacing without changing anything else: **raise `lacunarity`** from 2.25 toward 3–4 on the
+multi-octave noises, keeping 8 octaves and `Linear`. That separates the octaves the way `Pow` does
+but without collapsing amplitude, which is what made `Pow` unusable.
+
+If a higher lacunarity reaches Pow's 0.65–0.92 while keeping the relief, that is the fix.
+
 ### Superseded next-test note
 
 `NoiseNode` has `warpMode` (None / Angular / Directional) with `warpIntensity`, and **every noise in
