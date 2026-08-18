@@ -71,6 +71,51 @@ than the island alone. Stretching a square canvas over a non-square biome is not
 
 ---
 
+## RESULTS — step 4: it is the NoiseNode settings
+
+**The raw noise product is anisotropic on its own.** Baked with no silhouette *and* erosion
+bypassed — leaving only `noise x noise x noise -> Levels -> ShelfCurve` — the ratio is 0.37–0.50 with
+the same 75–105° orientation spike. `Levels` and `CurveNode` are pointwise and cannot create
+direction, so the anisotropy is produced inside `NoiseNode`.
+
+Noise **scale** is not the lever: setting the island to the reference's 750/1000 made it *worse*
+(0.28–0.49 against 0.34–0.45). Reverted.
+
+**And the comparison that drove this whole investigation was between three different graphs.** The
+graph measured clean is `Demo_MountainRange_AsIs` (from `Samples/Graphs/MountainRange.asset`). The
+parameters quoted throughout the playbook as "the reference's own values" were read from
+`Mountain_TerrainGraphTemplate`, which was never baked or measured. They are not the same graph:
+
+| | Our island | `Demo_MountainRange` (measured clean) | `Mountain_TerrainGraphTemplate` (never measured) |
+|---|---|---|---|
+| Noise nodes | 3 | 2 | 3 |
+| Octaves | 8 | **4** | 8 |
+| Persistence | 0.382 | 0.333 | 0.382 |
+| `flipSign` | **true** | **absent** | true |
+| `applyRemapPerLayer` | **true** | **absent** | true |
+| Erosion node | `HydraulicErosionNode2` | `HydraulicErosionNode` | `HydraulicErosionNode` |
+
+The two settings our documentation insists on — `flipSign` and `applyRemapPerLayer`, described as
+"what gives the reference its ridged character" — are serialized **true** in the template we copied
+and **absent** from the only graph that measured clean. That is consistent with the one earlier
+result that moved the number: `layerDerivativeMode = Pow` improved it to 0.65–0.92, and `Pow` is what
+an absent field deserializes to.
+
+### Next test, and it is a single bake
+
+Disable `applyRemapPerLayer` (and its remap curve), then `flipSign`, one at a time, on the
+no-silhouette + erosion-bypassed configuration — the cleanest signal available. Expect the ratio to
+move toward 1.0 if either is the cause.
+
+If it is `applyRemapPerLayer`: the per-octave curve clips the bottom 10 % of every octave before the
+sum, which is a strongly non-linear per-octave operation and the most plausible way an isotropic
+Perlin field acquires a preferred direction.
+
+**Do not treat the playbook's noise-defaults rule as settled while this is open.** It was written
+from a graph nobody measured.
+
+---
+
 ## Step 1 — Fix the instrument before running any more bakes
 
 Until this is done, no result about B means anything.
