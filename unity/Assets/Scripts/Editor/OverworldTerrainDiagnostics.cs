@@ -217,6 +217,9 @@ namespace GameDev.EditorTools
             var metresPerCell = size.x / (res - 1);
             var heights = data.GetHeights(0, 0, res, res);
 
+            ReportQuantisation(report, heights, res, size.y);
+            ReportDistribution(report, heights, res);
+
             report.AppendLine(
                 $"  tile {tileIndex} '{terrain.name}' pos={terrain.transform.position} " +
                 $"size=({size.x:F0},{size.y:F0},{size.z:F0}) heightmap={res} " +
@@ -719,6 +722,126 @@ namespace GameDev.EditorTools
             System.IO.Directory.CreateDirectory(folder);
             return folder;
         }
+        /// <summary>Counts how many distinct height values a tile actually contains.</summary>
+        /// <remarks>
+        /// A continuous surface stored in floats has nearly one distinct value per sample. A
+        /// surface carried through a low-precision buffer somewhere upstream snaps to a lattice,
+        /// and the terraces that follow read as contour lines -- which is what the "banding" looks
+        /// like once it is rendered instead of reduced to a curvature ratio. The step is reported
+        /// in metres so it can be compared against the spacing visible in the scene.
+        /// </remarks>
+        private static void ReportQuantisation(
+            System.Text.StringBuilder report, float[,] heights, int res, float heightMetres)
+        {
+            var seen = new System.Collections.Generic.HashSet<float>();
+            var samples = 0;
+            for (var z = SeamCells; z < res - SeamCells; z++)
+            {
+                for (var x = SeamCells; x < res - SeamCells; x++)
+                {
+                    seen.Add(heights[z, x]);
+                    samples++;
+                }
+            }
+
+            var sorted = new System.Collections.Generic.List<float>(seen);
+            sorted.Sort();
+
+            // The median gap, not the smallest: a handful of near-duplicate floats would drag the
+            // minimum to zero and hide a lattice that every other pair sits on.
+            var gaps = new System.Collections.Generic.List<float>(sorted.Count);
+            for (var i = 1; i < sorted.Count; i++)
+            {
+                gaps.Add(sorted[i] - sorted[i - 1]);
+            }
+
+            gaps.Sort();
+            var medianGap = gaps.Count > 0 ? gaps[gaps.Count / 2] : 0f;
+            var levels = medianGap > 0f ? Mathf.RoundToInt(1f / medianGap) : 0;
+
+            report.AppendLine(
+                $"    QUANTISATION: {sorted.Count} distinct heights over {samples} samples "
+                + $"({100f * sorted.Count / samples:F2}%), median step={medianGap:F8} 01-units "
+                + $"= {medianGap * heightMetres:F3} m => ~{levels} levels "
+                + "(a continuous float surface reads near 100% distinct)");
+
+            // A lattice on its own is harmless -- Unity always stores 16-bit. What makes it
+            // *visible* is flat runs: consecutive samples landing on the same level, which read as
+            // contour terraces. Real relief steps every cell or two, so the run length is the
+            // discriminator, and it is measured along both axes because the artifact is directional.
+            ReportFlatRuns(report, heights, res, "X", alongX: true);
+            ReportFlatRuns(report, heights, res, "Z", alongX: false);
+        }
+
+        /// <summary>Mean length, in cells, of a run of samples sharing one quantised height.</summary>
+        private static void ReportFlatRuns(
+            System.Text.StringBuilder report, float[,] heights, int res, string axis, bool alongX)
+        {
+            long runs = 0;
+            long cells = 0;
+            var longest = 0;
+            for (var a = SeamCells; a < res - SeamCells; a++)
+            {
+                var run = 1;
+                for (var b = SeamCells + 1; b < res - SeamCells; b++)
+                {
+                    var prev = alongX ? heights[a, b - 1] : heights[b - 1, a];
+                    var cur = alongX ? heights[a, b] : heights[b, a];
+                    if (cur == prev)
+                    {
+                        run++;
+                        continue;
+                    }
+
+                    runs++;
+                    cells += run;
+                    longest = Mathf.Max(longest, run);
+                    run = 1;
+                }
+
+                runs++;
+                cells += run;
+                longest = Mathf.Max(longest, run);
+            }
+
+            report.AppendLine(
+                $"    FLAT RUNS along {axis}: mean={(double)cells / runs:F2} cells, "
+                + $"longest={longest} (1.0 = every cell a new level, i.e. no terracing)");
+        }
+
+        /// <summary>Percentiles of the raw 0..1 height, for matching one signal against another.</summary>
+        /// <remarks>
+        /// Two noise stacks can share a min and a max and still distribute their mass completely
+        /// differently, which is exactly what dropping the per-octave remap does. Percentiles are
+        /// what a post-stack normalisation has to match, so they are what gets printed.
+        /// </remarks>
+        private static void ReportDistribution(
+            System.Text.StringBuilder report, float[,] heights, int res)
+        {
+            var v = new System.Collections.Generic.List<float>((res - 2 * SeamCells) * (res - 2 * SeamCells));
+            for (var z = SeamCells; z < res - SeamCells; z++)
+            {
+                for (var x = SeamCells; x < res - SeamCells; x++)
+                {
+                    v.Add(heights[z, x]);
+                }
+            }
+
+            v.Sort();
+            float At(float q) => v[Mathf.Clamp(Mathf.RoundToInt(q * (v.Count - 1)), 0, v.Count - 1)];
+            var mean = 0.0;
+            for (var i = 0; i < v.Count; i++)
+            {
+                mean += v[i];
+            }
+
+            mean /= v.Count;
+            report.AppendLine(
+                $"    DISTRIBUTION (01 units): min={At(0f):F4} p05={At(0.05f):F4} p25={At(0.25f):F4} "
+                + $"p50={At(0.5f):F4} p75={At(0.75f):F4} p95={At(0.95f):F4} max={At(1f):F4} "
+                + $"mean={mean:F4}");
+        }
+
     }
 }
 #endif

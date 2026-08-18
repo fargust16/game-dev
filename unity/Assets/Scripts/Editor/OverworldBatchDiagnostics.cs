@@ -44,6 +44,9 @@ namespace GameDev.EditorTools
         private const string DemoGraphArg = "-overworldDemoGraph";
         private const string BypassShelfArg = "-overworldBypassShelfCurve";
         private const string RefShapingArg = "-overworldReferenceShaping";
+        private const string ProbeArg = "-overworldNoiseProbe";
+        private const string DetailScaleArg = "-overworldDetailScale";
+        private const string NoiseOffsetArg = "-overworldNoiseOffset";
         private const string DressingArg = "-overworldDressing";
         private const string NoSilhouetteArg = "-overworldIslandNoSilhouette";
         private const string NoRemapArg = "-overworldNoiseNoRemapPerLayer";
@@ -53,6 +56,10 @@ namespace GameDev.EditorTools
         private const string WarpArg = "-overworldNoiseWarp";
         private const string WarpIntensityArg = "-overworldNoiseWarpIntensity";
         private const string LayerDumpArg = "-overworldLayerDump";
+        private const string PostStackArg = "-overworldPostStackNormalise";
+        private const string PostStackCurveArg = "-overworldPostStackCurve";
+        private const string RefDetailArg = "-overworldReferenceDetailNoise";
+        private const string IslandHeightArg = "-overworldIslandWorldHeight";
 
         /// <summary>Generous ceiling; a terrain-only bake is minutes, not tens of minutes.</summary>
         private const double TimeoutSeconds = 900.0;
@@ -77,8 +84,30 @@ namespace GameDev.EditorTools
             VistaGraphBuild.NoiseDerivativeOverride = ReadNoiseDerivativeArg();
             IslandPlateauGraphBuilder.BypassShelfCurveForDiagnostics =
                 ReadBoolArg(BypassShelfArg, false);
+            IslandPlateauGraphBuilder.PostStackNormaliseForDiagnostics =
+                ReadBoolArg(PostStackArg, false);
+            IslandPlateauGraphBuilder.ReferenceDetailNoiseForDiagnostics =
+                ReadBoolArg(RefDetailArg, false);
+            IslandPlateauGraphBuilder.PostStackCurveForDiagnostics =
+                System.Enum.TryParse<IslandPlateauGraphBuilder.PostStackCurve>(
+                    ReadArg(PostStackCurveArg) ?? "", ignoreCase: true, out var curveMode)
+                    ? curveMode
+                    : IslandPlateauGraphBuilder.PostStackCurve.Shelf;
             IslandPlateauGraphBuilder.ReferenceShapingForDiagnostics =
                 ReadBoolArg(RefShapingArg, false);
+            IslandPlateauGraphBuilder.NoiseProbeForDiagnostics =
+                System.Enum.TryParse<IslandPlateauGraphBuilder.NoiseProbe>(
+                    ReadArg(ProbeArg) ?? "", ignoreCase: true, out var probeMode)
+                    ? probeMode
+                    : IslandPlateauGraphBuilder.NoiseProbe.Off;
+            IslandPlateauGraphBuilder.DetailNoiseScaleForDiagnostics =
+                float.TryParse(ReadArg(DetailScaleArg), out var ds) ? ds : (float?)null;
+            IslandPlateauGraphBuilder.NoiseOffsetForDiagnostics =
+                float.TryParse(ReadArg(NoiseOffsetArg), out var off)
+                    ? new UnityEngine.Vector2(off, off)
+                    : (UnityEngine.Vector2?)null;
+            OverworldLpbBake.IslandWorldHeightForDiagnostics =
+                float.TryParse(ReadArg(IslandHeightArg), out var ih) ? ih : (float?)null;
             OverworldLpbBake.IslandWithoutSilhouetteForDiagnostics =
                 ReadBoolArg(NoSilhouetteArg, false);
             VistaGraphBuild.DisableNoiseRemapPerLayerForDiagnostics = ReadBoolArg(NoRemapArg, false);

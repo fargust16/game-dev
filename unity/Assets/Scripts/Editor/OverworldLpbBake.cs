@@ -51,6 +51,17 @@ namespace GameDev.EditorTools
         /// </remarks>
         public static bool IslandWithoutSilhouetteForDiagnostics { get; set; }
 
+        /// <summary>Overrides the island biome's vertical extent, in metres.</summary>
+        /// <remarks>
+        /// The prefab ships 140 m against a 700 m tile budget, so the island occupies a fifth of the
+        /// heightmap range and its fine detail lands within one or two 16-bit quantisation steps
+        /// (21 mm at 700 m). The Vista reference carries the same detail at roughly ten steps. This
+        /// exists to test whether the banding is rounding noise from a signal too small for the
+        /// heightmap, which every earlier experiment would have missed -- they judged a curvature
+        /// ratio, which is invariant to vertical scale and therefore blind to exactly this.
+        /// </remarks>
+        public static float? IslandWorldHeightForDiagnostics { get; set; }
+
         /// <summary>Secondary massifs are foothills, not twin peaks.</summary>
         private const float SecondaryMassifScale = 0.38f;
 
@@ -201,6 +212,26 @@ namespace GameDev.EditorTools
             var center = WorldCenter();
             biome.transform.position = new Vector3(center.x, biome.transform.position.y, center.z);
             biome.seed = new WorldSeed(seed).Fork("terrain.islandbase").Next();
+
+            if (IslandWorldHeightForDiagnostics.HasValue)
+            {
+                // Both the component and the transform: SetBiomeHeightOnSpawn has already applied
+                // its value by now, so the scale is what actually changes the bake, and the
+                // component is updated so the spawn log does not lie about it.
+                var target = IslandWorldHeightForDiagnostics.Value;
+                var heightComponent = biome.GetComponent<SetBiomeHeightOnSpawn>();
+                if (heightComponent != null)
+                {
+                    heightComponent.worldHeight = target;
+                }
+
+                var scale = biome.transform.localScale;
+                scale.y = target / WorldScale.TerrainHeightBudgetMeters;
+                biome.transform.localScale = scale;
+                Debug.LogWarning(
+                    $"[IslandBase] DIAGNOSTIC worldHeight override -> {target:F0} m "
+                    + $"(scaleY {scale.y:F3}).");
+            }
 
             if (IslandWithoutSilhouetteForDiagnostics)
             {
