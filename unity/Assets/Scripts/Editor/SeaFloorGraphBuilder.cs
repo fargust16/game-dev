@@ -84,6 +84,15 @@ namespace GameDev.EditorTools
             return VistaGraphBuild.SaveGraph(graph, GraphAssetPath);
         }
 
+        /// <summary>Top of the noise shelf, as a fraction of the biome's 34 m.</summary>
+        private const float ShelfCeiling = 0.42f;
+
+        /// <summary>Top of the central rise. Just under the 24 m waterline, never above it.</summary>
+        private const float DomeCeiling = 0.66f;
+
+        /// <summary>How far the rise reaches, in normalised biome units.</summary>
+        private const float DomeRadius = 0.5f;
+
         private static void BuildTerrainStage(TerrainGraph graph)
         {
             // Broad, low-frequency swells. Nothing at island scale — this is the shelf the island
@@ -94,7 +103,42 @@ namespace GameDev.EditorTools
             var shape = new CombineNode { mode = CombineNode.Mode.Multiply };
             graph.AddNode(shape);
 
-            var levels = VistaGraphBuild.AddReferenceLevels(graph);
+            // The shelf is held well under the 24 m waterline; the dome below is what decides how
+            // close to it the seabed comes.
+            var levels = new LevelsNode
+            {
+                inLow = 0f,
+                inMid = 0.5f,
+                inHigh = 1f,
+                outLow = 0.02f,
+                outHigh = ShelfCeiling,
+            };
+            graph.AddNode(levels);
+
+            // A broad rise under the middle of the world. The island's falloff ring used to drop
+            // from its own floor straight into deep water, which is what made the coast a wall; with
+            // the seabed brought up to just under the waterline the same ring lands on a shallow
+            // shelf instead and reads as a beach. Raising the falloff distance would have done it
+            // too, but that widens the biome rather than shaping the ground it sits on.
+            var dome = new RadialGradientNode
+            {
+                center = new Vector2(0.5f, 0.5f),
+                radius = DomeRadius,
+            };
+            graph.AddNode(dome);
+
+            var domeHeight = new LevelsNode
+            {
+                inLow = 0f,
+                inMid = 0.5f,
+                inHigh = 1f,
+                outLow = 0f,
+                outHigh = DomeCeiling,
+            };
+            graph.AddNode(domeHeight);
+
+            var shelfOrDome = new CombineNode { mode = CombineNode.Mode.Max };
+            graph.AddNode(shelfOrDome);
 
             var setHeight = VistaGraphBuild.AddSetVar(graph, VistaGraphBuild.VarHeightMap);
             var heightOut = new HeightOutputNode();
@@ -104,7 +148,16 @@ namespace GameDev.EditorTools
             VistaGraphBuild.Connect(graph, mass.id, mass.outputSlot.id, shape.id, shape.foregroundSlot.id);
             VistaGraphBuild.Connect(graph, shape.id, shape.outputSlot.id, levels.id, levels.inputSlot.id);
             VistaGraphBuild.Connect(
-                graph, levels.id, levels.outputSlot.id, setHeight.id, setHeight.inputSlot.id);
+                graph, dome.id, dome.outputSlot.id, domeHeight.id, domeHeight.inputSlot.id);
+            VistaGraphBuild.Connect(
+                graph, levels.id, levels.outputSlot.id,
+                shelfOrDome.id, shelfOrDome.backgroundSlot.id);
+            VistaGraphBuild.Connect(
+                graph, domeHeight.id, domeHeight.outputSlot.id,
+                shelfOrDome.id, shelfOrDome.foregroundSlot.id);
+            VistaGraphBuild.Connect(
+                graph, shelfOrDome.id, shelfOrDome.outputSlot.id,
+                setHeight.id, setHeight.inputSlot.id);
             VistaGraphBuild.Connect(
                 graph, setHeight.id, setHeight.outputSlot.id, heightOut.id, heightOut.inputSlot.id);
         }

@@ -256,28 +256,28 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.GetVariableNode
-    jsonData: '{"m_groupId":"","m_id":"CRVWETVH","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_outputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":100,\"m_type\":1,\"m_name\":\"\"}","version":1},"m_varName":"Height
+    jsonData: '{"m_groupId":"","m_id":"NGGN80LV","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_outputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":100,\"m_type\":1,\"m_name\":\"\"}","version":1},"m_varName":"Height
       Map","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.HeightMaskNode
-    jsonData: '{"m_groupId":"","m_id":"LJJLO2DQ","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_minHeight":24.0,"m_maxHeight":40.0,"m_transition":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.0,"value":0.0,"inSlope":0.0,"outSlope":1.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":1.0,"value":1.0,"inSlope":1.0,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4}}'
+    jsonData: '{"m_groupId":"","m_id":"PNOFHX16","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_minHeight":24.0,"m_maxHeight":40.0,"m_transition":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.0,"value":0.0,"inSlope":0.0,"outSlope":1.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":1.0,"value":1.0,"inSlope":1.0,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.CombineNode
-    jsonData: '{"m_groupId":"","m_id":"NAO2E4CC","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
+    jsonData: '{"m_groupId":"","m_id":"DHDLOSX1","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.CombineNode
-    jsonData: '{"m_groupId":"","m_id":"TYAAGGPZ","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
+    jsonData: '{"m_groupId":"","m_id":"0V4EV7F5","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.CombineNode
-    jsonData: '{"m_groupId":"","m_id":"Y1023AQD","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
+    jsonData: '{"m_groupId":"","m_id":"NUXCC15M","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.CombineNode
-    jsonData: '{"m_groupId":"","m_id":"26O1XX8V","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
+    jsonData: '{"m_groupId":"","m_id":"8A2HWCDH","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
     version: 1
   m_edgeData:
   - typeInfo:
@@ -498,55 +498,55 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"TFBXFEEU","m_outputSlot":{"m_nodeId":"CRVWETVH","m_slotId":100},"m_inputSlot":{"m_nodeId":"LJJLO2DQ","m_slotId":0}}'
+    jsonData: '{"m_id":"Z7VLHOIS","m_outputSlot":{"m_nodeId":"NGGN80LV","m_slotId":100},"m_inputSlot":{"m_nodeId":"PNOFHX16","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"HSZURBY4","m_outputSlot":{"m_nodeId":"H3VX72WM","m_slotId":100},"m_inputSlot":{"m_nodeId":"NAO2E4CC","m_slotId":0}}'
+    jsonData: '{"m_id":"JJSMYHQL","m_outputSlot":{"m_nodeId":"H3VX72WM","m_slotId":100},"m_inputSlot":{"m_nodeId":"DHDLOSX1","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"I27S7Z7S","m_outputSlot":{"m_nodeId":"LJJLO2DQ","m_slotId":100},"m_inputSlot":{"m_nodeId":"NAO2E4CC","m_slotId":1}}'
+    jsonData: '{"m_id":"MGAUFP09","m_outputSlot":{"m_nodeId":"PNOFHX16","m_slotId":100},"m_inputSlot":{"m_nodeId":"DHDLOSX1","m_slotId":1}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"XYFS2L4B","m_outputSlot":{"m_nodeId":"NAO2E4CC","m_slotId":100},"m_inputSlot":{"m_nodeId":"cea869e6-476d-40bd-b5d8-423ce968c232","m_slotId":0}}'
+    jsonData: '{"m_id":"LF3FRGTN","m_outputSlot":{"m_nodeId":"DHDLOSX1","m_slotId":100},"m_inputSlot":{"m_nodeId":"cea869e6-476d-40bd-b5d8-423ce968c232","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"Z4TW1EKY","m_outputSlot":{"m_nodeId":"cea869e6-476d-40bd-b5d8-423ce968c232","m_slotId":100},"m_inputSlot":{"m_nodeId":"TYAAGGPZ","m_slotId":0}}'
+    jsonData: '{"m_id":"3J0495TY","m_outputSlot":{"m_nodeId":"cea869e6-476d-40bd-b5d8-423ce968c232","m_slotId":100},"m_inputSlot":{"m_nodeId":"0V4EV7F5","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"75WDIYM5","m_outputSlot":{"m_nodeId":"LJJLO2DQ","m_slotId":100},"m_inputSlot":{"m_nodeId":"TYAAGGPZ","m_slotId":1}}'
+    jsonData: '{"m_id":"C3BNK51R","m_outputSlot":{"m_nodeId":"PNOFHX16","m_slotId":100},"m_inputSlot":{"m_nodeId":"0V4EV7F5","m_slotId":1}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"D91ABOGP","m_outputSlot":{"m_nodeId":"TYAAGGPZ","m_slotId":100},"m_inputSlot":{"m_nodeId":"9E46C44L","m_slotId":0}}'
+    jsonData: '{"m_id":"M2TPJG3G","m_outputSlot":{"m_nodeId":"0V4EV7F5","m_slotId":100},"m_inputSlot":{"m_nodeId":"9E46C44L","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"JG5AQ684","m_outputSlot":{"m_nodeId":"7R9E6MUI","m_slotId":100},"m_inputSlot":{"m_nodeId":"Y1023AQD","m_slotId":0}}'
+    jsonData: '{"m_id":"OBII3C8Y","m_outputSlot":{"m_nodeId":"7R9E6MUI","m_slotId":100},"m_inputSlot":{"m_nodeId":"NUXCC15M","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"T31SV0T6","m_outputSlot":{"m_nodeId":"LJJLO2DQ","m_slotId":100},"m_inputSlot":{"m_nodeId":"Y1023AQD","m_slotId":1}}'
+    jsonData: '{"m_id":"P79FAQ8K","m_outputSlot":{"m_nodeId":"PNOFHX16","m_slotId":100},"m_inputSlot":{"m_nodeId":"NUXCC15M","m_slotId":1}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"82D7KONS","m_outputSlot":{"m_nodeId":"Y1023AQD","m_slotId":100},"m_inputSlot":{"m_nodeId":"HVKGH9GD","m_slotId":0}}'
+    jsonData: '{"m_id":"47EYUR7C","m_outputSlot":{"m_nodeId":"NUXCC15M","m_slotId":100},"m_inputSlot":{"m_nodeId":"HVKGH9GD","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"JWUE0RV4","m_outputSlot":{"m_nodeId":"7250RGUJ","m_slotId":100},"m_inputSlot":{"m_nodeId":"26O1XX8V","m_slotId":0}}'
+    jsonData: '{"m_id":"1F5V60E2","m_outputSlot":{"m_nodeId":"7250RGUJ","m_slotId":100},"m_inputSlot":{"m_nodeId":"8A2HWCDH","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"XI1XOA8O","m_outputSlot":{"m_nodeId":"LJJLO2DQ","m_slotId":100},"m_inputSlot":{"m_nodeId":"26O1XX8V","m_slotId":1}}'
+    jsonData: '{"m_id":"NWR80M8I","m_outputSlot":{"m_nodeId":"PNOFHX16","m_slotId":100},"m_inputSlot":{"m_nodeId":"8A2HWCDH","m_slotId":1}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"KY4C9T1K","m_outputSlot":{"m_nodeId":"26O1XX8V","m_slotId":100},"m_inputSlot":{"m_nodeId":"PQ2H1Q0H","m_slotId":0}}'
+    jsonData: '{"m_id":"ZA39F39E","m_outputSlot":{"m_nodeId":"8A2HWCDH","m_slotId":100},"m_inputSlot":{"m_nodeId":"PQ2H1Q0H","m_slotId":0}}'
     version: 1
   m_groupData:
   - typeInfo:
