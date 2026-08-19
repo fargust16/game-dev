@@ -223,6 +223,10 @@ MonoBehaviour:
       fullName: Pinwheel.Vista.Graph.ScatterNode
     jsonData: '{"m_groupId":"2AZWAMC7","m_id":"CKZTCW8H","m_visualState":{"m_position":{"x":1734.6468505859375,"y":2426.14501953125},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_spacing":{"x":30.0,"y":30.0},"m_spreadCount":7,"m_spreadDistance":0.05000000074505806,"m_keepSourcePoints":true,"m_densityMultiplier":1.0,"m_seed":0}'
     version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.LevelsNode
+    jsonData: '{"m_groupId":"","m_id":"R35N4NPU","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_inLow":0.0,"m_inMid":0.5,"m_inHigh":1.0,"m_outLow":0.3499999940395355,"m_outHigh":0.550000011920929}'
+    version: 1
   m_edgeData:
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
@@ -330,10 +334,6 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"IESBROWU","m_outputSlot":{"m_nodeId":"db9fb535-6391-481b-8720-015a9027108f","m_slotId":100},"m_inputSlot":{"m_nodeId":"c3ca7510-6055-4dbe-a13a-14103c6aeca0","m_slotId":0}}'
-    version: 1
-  - typeInfo:
-      fullName: Pinwheel.Vista.Graph.Edge
     jsonData: '{"m_id":"68JDW1OZ","m_outputSlot":{"m_nodeId":"1WDAOTHY","m_slotId":100},"m_inputSlot":{"m_nodeId":"ABUY9O91","m_slotId":0}}'
     version: 1
   - typeInfo:
@@ -415,6 +415,14 @@ MonoBehaviour:
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
     jsonData: '{"m_id":"19093OT9","m_outputSlot":{"m_nodeId":"U5RO4BPV","m_slotId":100},"m_inputSlot":{"m_nodeId":"9T3579EY","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"YJAPB1AG","m_outputSlot":{"m_nodeId":"db9fb535-6391-481b-8720-015a9027108f","m_slotId":100},"m_inputSlot":{"m_nodeId":"R35N4NPU","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"WYL6RTS2","m_outputSlot":{"m_nodeId":"R35N4NPU","m_slotId":100},"m_inputSlot":{"m_nodeId":"c3ca7510-6055-4dbe-a13a-14103c6aeca0","m_slotId":0}}'
     version: 1
   m_groupData:
   - typeInfo:

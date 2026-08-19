@@ -234,7 +234,64 @@ namespace GameDev.EditorTools
         public static TerrainGraph Rebuild()
         {
             return VistaGraphBuild.RebuildFromTemplate(
-                VistaGraphBuild.MountainTemplateGraphPath, GraphAssetPath);
+                VistaGraphBuild.MountainTemplateGraphPath, GraphAssetPath, FlattenAndLift);
+        }
+
+        /// <summary>Island floor above the sea line, as a fraction of the biome's vertical extent.</summary>
+        /// <remarks>
+        /// Sea level is 24 m and the island LPB is 140 m tall, so 24/140 is the waterline. This sits
+        /// above it so the shore is beach rather than shallows -- trees were standing in water.
+        /// </remarks>
+        private const float IslandFloor = 0.35f;
+
+        /// <summary>Island ceiling. The gap to <see cref="IslandFloor"/> is all the relief there is.</summary>
+        /// <remarks>
+        /// The template is a mountain generator, so used raw it grows a massif in the middle of the
+        /// island. Compressing its output into a narrow band turns those peaks into rolling ground
+        /// and leaves the actual mountains to LPB_Mountain_0, which runs the same template at its own
+        /// scale. The shape is the template's throughout; only its amplitude changes.
+        /// </remarks>
+        private const float IslandCeiling = 0.55f;
+
+        /// <summary>
+        /// Inserts one <see cref="LevelsNode"/> between the template's height chain and its output.
+        /// </summary>
+        private static void FlattenAndLift(TerrainGraph graph)
+        {
+            var outputs = graph.GetNodesOfType<HeightOutputNode>();
+            if (outputs.Count == 0)
+            {
+                Debug.LogError("[IslandPlateau] Template has no HeightOutputNode; nothing to patch.");
+                return;
+            }
+
+            var heightOut = outputs[0];
+            var incoming = graph.GetEdges().Find(e => e.inputSlot.nodeId == heightOut.id);
+            if (incoming == null)
+            {
+                Debug.LogError("[IslandPlateau] HeightOutputNode has no input edge; nothing to patch.");
+                return;
+            }
+
+            var upstreamNodeId = incoming.outputSlot.nodeId;
+            var upstreamSlotId = incoming.outputSlot.slotId;
+            graph.RemoveEdge(incoming.id);
+
+            var levels = new LevelsNode
+            {
+                inLow = 0f,
+                inMid = 0.5f,
+                inHigh = 1f,
+                outLow = IslandFloor,
+                outHigh = IslandCeiling,
+            };
+            graph.AddNode(levels);
+
+            VistaGraphBuild.Connect(graph, upstreamNodeId, upstreamSlotId, levels.id, levels.inputSlot.id);
+            VistaGraphBuild.Connect(
+                graph, levels.id, levels.outputSlot.id, heightOut.id, heightOut.inputSlot.id);
+            Debug.Log(
+                $"[IslandPlateau] Height output remapped to [{IslandFloor:F2}, {IslandCeiling:F2}].");
         }
 
         /// <summary>
