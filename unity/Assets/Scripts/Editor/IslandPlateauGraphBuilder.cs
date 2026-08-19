@@ -262,6 +262,38 @@ namespace GameDev.EditorTools
         /// DarkGreenAreaMask, grass reads the two added together, and none of those chains touch the
         /// height map at all.
         /// </remarks>
+        /// <summary>New floor for the island's height Levels, as a fraction of the 140 m biome.</summary>
+        /// <remarks>
+        /// The authored graph maps its height to [0.22, 0.70], a floor of 31 m against a 24 m
+        /// waterline. The falloff ring therefore has to climb 31 m in its 100 m, which is the steep
+        /// coast. Dropping the floor shortens that climb without touching the ceiling, so the
+        /// interior keeps the relief it has -- compressing both ends is what produced a pancake
+        /// last time.
+        /// </remarks>
+        private const float IslandFloor = 0.14f;
+
+        /// <summary>The ceiling the authored graph carries, used to find the node to edit.</summary>
+        private const float AuthoredIslandCeiling = 0.70f;
+
+        /// <summary>Lowers the floor of the island's height Levels, leaving its ceiling alone.</summary>
+        private static void LowerIslandFloor(TerrainGraph graph)
+        {
+            var levels = graph.GetNodesOfType<LevelsNode>()
+                .Find(n => Mathf.Approximately(n.outHigh, AuthoredIslandCeiling));
+            if (levels == null)
+            {
+                Debug.LogError(
+                    "[IslandPlateau] No height Levels with the authored ceiling; floor not lowered.");
+                return;
+            }
+
+            var was = levels.outLow;
+            levels.outLow = IslandFloor;
+            Debug.Log(
+                $"[IslandPlateau] Island floor {was:F2} -> {IslandFloor:F2} "
+                + $"({was * 140f:F0} m -> {IslandFloor * 140f:F0} m against a 24 m waterline).");
+        }
+
         /// <summary>Height band the authored graph's own layer masks are moved onto.</summary>
         /// <remarks>
         /// They ship at 0-150 and 0-100, which is above everything the island reaches, so they
@@ -349,6 +381,7 @@ namespace GameDev.EditorTools
 
         private static void RetargetVegetation(TerrainGraph graph)
         {
+            LowerIslandFloor(graph);
             LowerLayerHeightMasks(graph);
             GateVegetationByHeight(graph);
             // The authored graph already carries the height Levels, the grass-painted stone slots and
