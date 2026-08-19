@@ -704,6 +704,19 @@ namespace GameDev.EditorTools
         /// object's contents in place instead, which is what keeps those references alive.
         /// </remarks>
         /// <summary>Vista Wizard's Mountains biome — the graph the overworld is rebuilt from.</summary>
+        /// <summary>The island graph as authored in the Vista editor, kept as our source.</summary>
+        /// <remarks>
+        /// Hand-tuned in the graph editor and copied out of the spawn folder, which the bake
+        /// overwrites. It carries the whole island recipe: the height Levels at [0.22, 0.70], the
+        /// stone slots already painted as grass, the rock-highlight branch removed, and the five
+        /// Weight Blend layers split into two green zones -- GreenAreaMask over slots 4 and 3,
+        /// DarkGreenAreaMask over 2 and 1 -- so two tree species land on different ground.
+        /// Cloning it rather than re-authoring it in C# is the point: transcribing a Vista graph by
+        /// hand is what produced two days of wrong answers. See the graph rule in AGENTS.md.
+        /// </remarks>
+        public const string AuthoredIslandGraphPath =
+            "Assets/Settings/Vista/Templates/IslandBase_Authored_TerrainGraph.asset";
+
         public const string MountainTemplateGraphPath =
             "Assets/PinwheelStudio/Vista/Personal/BiomeTemplates/Mountain/" +
             "Mountain_TerrainGraphTemplate.asset";
@@ -794,12 +807,18 @@ namespace GameDev.EditorTools
         /// </para>
         /// </remarks>
         public static void RetargetTemplateVegetation(
-            TerrainGraph graph, VistaVegetationTemplates.Species canopy, bool includeGroundCover = true)
+            TerrainGraph graph,
+            VistaVegetationTemplates.Species[] canopy,
+            bool includeGroundCover = true)
         {
+            // One species per Tree Output, in order. The authored island graph has two, fed by two
+            // green masks over different Weight Blend layers, which is what puts the species on
+            // different ground; a graph with one output simply gets the first species.
             var trees = 0;
             foreach (var node in graph.GetNodesOfType<TreeOutputNode>())
             {
-                node.treeTemplate = VistaVegetationTemplates.LoadOrCreateCanopyTree(canopy);
+                node.treeTemplate = VistaVegetationTemplates.LoadOrCreateCanopyTree(
+                    canopy[trees % canopy.Length]);
                 trees++;
             }
 
@@ -837,7 +856,7 @@ namespace GameDev.EditorTools
 
             UnityEngine.Debug.Log(
                 $"[VistaGraphBuild] Retargeted {trees} tree, {details} detail and {props} prop "
-                + $"output(s) seen (canopy {canopy}; props left as the template's).");
+                + $"output(s) retargeted (canopy {string.Join(", ", canopy)}).");
         }
 
         public static TAsset SaveGraph<TAsset>(TAsset built, string assetPath)

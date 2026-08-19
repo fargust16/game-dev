@@ -266,10 +266,6 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"P7T5792H","m_outputSlot":{"m_nodeId":"784574d3-d07b-41c3-9b9c-0550bebf6dd4","m_slotId":101},"m_inputSlot":{"m_nodeId":"7f2479e9-8bce-43db-804b-b72ecd240348","m_slotId":0}}'
-    version: 1
-  - typeInfo:
-      fullName: Pinwheel.Vista.Graph.Edge
     jsonData: '{"m_id":"3N6KSXI7","m_outputSlot":{"m_nodeId":"U6EN1D3R","m_slotId":100},"m_inputSlot":{"m_nodeId":"784574d3-d07b-41c3-9b9c-0550bebf6dd4","m_slotId":1}}'
     version: 1
   - typeInfo:
@@ -416,42 +412,46 @@ MonoBehaviour:
       fullName: Pinwheel.Vista.Graph.Edge
     jsonData: '{"m_id":"19093OT9","m_outputSlot":{"m_nodeId":"U5RO4BPV","m_slotId":100},"m_inputSlot":{"m_nodeId":"9T3579EY","m_slotId":0}}'
     version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"W8KSJA9S","m_outputSlot":{"m_nodeId":"784574d3-d07b-41c3-9b9c-0550bebf6dd4","m_slotId":101},"m_inputSlot":{"m_nodeId":"7f2479e9-8bce-43db-804b-b72ecd240348","m_slotId":0}}'
+    version: 1
   m_groupData:
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Group
-    jsonData: '{"m_id":"RSL60E8T","m_title":"","m_position":{"serializedVersion":"2","x":-153.59979248046876,"y":-74.39999389648438,"width":NaN,"height":NaN}}'
+    jsonData: '{"m_id":"RSL60E8T","m_title":"","m_position":{"serializedVersion":"2","x":659.3333129882813,"y":423.3333435058594,"width":588.6666870117188,"height":259.3333435058594}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Group
-    jsonData: '{"m_id":"7PA7LAYX","m_title":"","m_position":{"serializedVersion":"2","x":162.40008544921876,"y":-30.39990234375,"width":NaN,"height":NaN}}'
+    jsonData: '{"m_id":"7PA7LAYX","m_title":"","m_position":{"serializedVersion":"2","x":286.0,"y":698.0000610351563,"width":962.0,"height":342.00006103515627}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Group
-    jsonData: '{"m_id":"NVUR5JPZ","m_title":"","m_position":{"serializedVersion":"2","x":4.799896240234375,"y":-56.7996826171875,"width":NaN,"height":NaN}}'
+    jsonData: '{"m_id":"NVUR5JPZ","m_title":"","m_position":{"serializedVersion":"2","x":258.6666564941406,"y":1060.6666259765625,"width":989.3333740234375,"height":514.6666259765625}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Group
-    jsonData: '{"m_id":"9H9XMFMD","m_title":"","m_position":{"serializedVersion":"2","x":198.39987182617188,"y":-94.936279296875,"width":NaN,"height":NaN}}'
+    jsonData: '{"m_id":"9H9XMFMD","m_title":"","m_position":{"serializedVersion":"2","x":249.3333282470703,"y":1599.333251953125,"width":998.6666870117188,"height":458.6666259765625}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Group
-    jsonData: '{"m_id":"TFTTN27R","m_title":"","m_position":{"serializedVersion":"2","x":0.0,"y":0.0,"width":NaN,"height":NaN}}'
+    jsonData: '{"m_id":"TFTTN27R","m_title":"","m_position":{"serializedVersion":"2","x":598.6666870117188,"y":-171.99993896484376,"width":613.3333129882813,"height":345.3333435058594}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Group
-    jsonData: '{"m_id":"4VGLHBMU","m_title":"","m_position":{"serializedVersion":"2","x":0.0,"y":0.0,"width":NaN,"height":NaN}}'
+    jsonData: '{"m_id":"4VGLHBMU","m_title":"","m_position":{"serializedVersion":"2","x":1335.3333740234375,"y":-171.33331298828126,"width":418.0,"height":344.66668701171877}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Group
-    jsonData: '{"m_id":"2P1261XO","m_title":"","m_position":{"serializedVersion":"2","x":0.0,"y":0.0,"width":NaN,"height":NaN}}'
+    jsonData: '{"m_id":"2P1261XO","m_title":"","m_position":{"serializedVersion":"2","x":1858.6666259765625,"y":-171.99993896484376,"width":365.3333740234375,"height":345.3333435058594}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Group
-    jsonData: '{"m_id":"2AZWAMC7","m_title":"","m_position":{"serializedVersion":"2","x":0.0,"y":0.0,"width":NaN,"height":NaN}}'
+    jsonData: '{"m_id":"2AZWAMC7","m_title":"","m_position":{"serializedVersion":"2","x":1182.66650390625,"y":2366.666748046875,"width":913.3333740234375,"height":383.333251953125}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Group
-    jsonData: '{"m_id":"5MRD0ODE","m_title":"","m_position":{"serializedVersion":"2","x":-486.4000244140625,"y":-299.2001953125,"width":NaN,"height":NaN}}'
+    jsonData: '{"m_id":"5MRD0ODE","m_title":"","m_position":{"serializedVersion":"2","x":1112.6666259765625,"y":2812.666748046875,"width":980.6666259765625,"height":373.333251953125}}'
     version: 1
   m_stickyNoteData:
   - typeInfo:
@@ -729,9 +729,9 @@ MonoBehaviour:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 1686.9612
-      height: 1988.3153
+      width: 2167.046
+      height: 2278.29
     m_terrainHeight: 700
-    m_seed: 353890158
+    m_seed: 1572975779
     m_shouldOutputTempHeight: 0
   m_allowSplitExecution: 1

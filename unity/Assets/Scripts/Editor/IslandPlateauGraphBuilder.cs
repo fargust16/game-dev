@@ -234,187 +234,25 @@ namespace GameDev.EditorTools
         public static TerrainGraph Rebuild()
         {
             return VistaGraphBuild.RebuildFromTemplate(
-                VistaGraphBuild.MountainTemplateGraphPath, GraphAssetPath, FlattenAndLift);
+                VistaGraphBuild.AuthoredIslandGraphPath, GraphAssetPath, RetargetVegetation);
         }
-
-        /// <summary>Island floor above the sea line, as a fraction of the biome's vertical extent.</summary>
-        /// <remarks>
-        /// Sea level is 24 m and the island LPB is 140 m tall, so 0.171 is the waterline. This sits
-        /// just above it: high enough that trees do not stand in water, low enough that the coast is
-        /// a beach rather than the sea wall a bigger lift produced.
-        /// </remarks>
-        private const float IslandFloor = 0.22f;
-
-        /// <summary>Island ceiling. The gap to <see cref="IslandFloor"/> is all the relief there is.</summary>
-        /// <remarks>
-        /// The template is a mountain generator, so used raw it grows a massif in the middle of the
-        /// island; the actual mountains belong to LPB_Mountain_0, which runs the same template at its
-        /// own scale. Compressing to a narrow band fixed that but flattened the island into a pancake,
-        /// because the thing that read as "mountain" was mostly the cliff and rock paint, not the
-        /// relief. With those layers off the ground can keep real height variation, so this band is
-        /// wide enough to be a landscape. The shape is the template's throughout; only its amplitude
-        /// changes.
-        /// </remarks>
-        private const float IslandCeiling = 0.70f;
 
         /// <summary>
         /// Inserts one <see cref="LevelsNode"/> between the template's height chain and its output.
         /// </summary>
-        private static void FlattenAndLift(TerrainGraph graph)
+        private static void RetargetVegetation(TerrainGraph graph)
         {
-            var outputs = graph.GetNodesOfType<HeightOutputNode>();
-            if (outputs.Count == 0)
-            {
-                Debug.LogError("[IslandPlateau] Template has no HeightOutputNode; nothing to patch.");
-                return;
-            }
-
-            var heightOut = outputs[0];
-            var incoming = graph.GetEdges().Find(e => e.inputSlot.nodeId == heightOut.id);
-            if (incoming == null)
-            {
-                Debug.LogError("[IslandPlateau] HeightOutputNode has no input edge; nothing to patch.");
-                return;
-            }
-
-            var upstreamNodeId = incoming.outputSlot.nodeId;
-            var upstreamSlotId = incoming.outputSlot.slotId;
-            graph.RemoveEdge(incoming.id);
-
-            var levels = new LevelsNode
-            {
-                inLow = 0f,
-                inMid = 0.5f,
-                inHigh = 1f,
-                outLow = IslandFloor,
-                outHigh = IslandCeiling,
-            };
-            graph.AddNode(levels);
-
-            VistaGraphBuild.Connect(graph, upstreamNodeId, upstreamSlotId, levels.id, levels.inputSlot.id);
-            VistaGraphBuild.Connect(
-                graph, levels.id, levels.outputSlot.id, heightOut.id, heightOut.inputSlot.id);
-            Debug.Log(
-                $"[IslandPlateau] Height output remapped to [{IslandFloor:F2}, {IslandCeiling:F2}].");
-
-            // Erosion stays. It was taken out because its channels read as streaks, but those were
-            // the template painting stone along them -- fixed by SilenceRockLayers -- and the
-            // template drives its ground-cover density from ErosionMask, so removing the passes left
-            // the island with no grass at all while the only grass in the bake came from the massif.
-            // RemoveErosion is kept below for the day the trade is worth making deliberately.
-            SilenceRockLayers(graph);
+            // The authored graph already carries the height Levels, the grass-painted stone slots and
+            // the two green zones. All that is left is whose trees grow in them.
             VistaGraphBuild.RetargetTemplateVegetation(
-                graph, VistaVegetationTemplates.Species.Fruit);
+                graph,
+                new[]
+                {
+                    VistaVegetationTemplates.Species.Fruit,
+                    VistaVegetationTemplates.Species.Pine,
+                });
         }
 
-        /// <summary>Takes the hydraulic erosion passes out of the island's height chain.</summary>
-        /// <remarks>
-        /// <para>
-        /// The template is a mountain biome and erodes hard, which on flat island ground reads as
-        /// streaks rather than as drainage. Each pass is spliced out: whatever fed its height input
-        /// is wired to whatever its height output fed, then the node goes.
-        /// </para>
-        /// <para>
-        /// This costs the surface stage its erosion-driven paint. The template derives three of its
-        /// five layers from EroisonMask -- soil in the drainage, grass in the drainage, and the peak
-        /// highlight -- and with no erosion those masks come out empty, leaving the Weight Blend's
-        /// unconnected base to cover the ground. That is the intended trade here, not an oversight.
-        /// </para>
-        /// </remarks>
-        private static void RemoveErosion(TerrainGraph graph)
-        {
-            var passes = graph.GetNodesOfType<HydraulicErosionNode2>();
-            foreach (var pass in passes)
-            {
-                var edges = graph.GetEdges();
-                var incoming = edges.Find(
-                    e => e.inputSlot.nodeId == pass.id && e.inputSlot.slotId == pass.inputHeightSlot.id);
-                if (incoming == null)
-                {
-                    continue;
-                }
-
-                var upstreamNode = incoming.outputSlot.nodeId;
-                var upstreamSlot = incoming.outputSlot.slotId;
-                var outgoing = edges.FindAll(
-                    e => e.outputSlot.nodeId == pass.id &&
-                         e.outputSlot.slotId == pass.outputHeightSlot.id);
-
-                foreach (var edge in outgoing)
-                {
-                    VistaGraphBuild.Connect(
-                        graph, upstreamNode, upstreamSlot, edge.inputSlot.nodeId, edge.inputSlot.slotId);
-                }
-
-                graph.RemoveNode(pass.id);
-            }
-
-            Debug.Log($"[IslandPlateau] Spliced out {passes.Count} hydraulic erosion pass(es).");
-        }
-
-        /// <summary>Weight Blend slots the template paints stone into.</summary>
-        /// <remarks>
-        /// Read off the graph, not guessed: slot 0 is grey stone and slot 4 is white rock, while 1,
-        /// 2 and 3 are soil, moss and grass. An earlier pass filtered on TextureOutputNode.order --
-        /// how our own builder identifies layers -- and silenced nothing, because all five of the
-        /// template's outputs carry order 0. The slot feeding the output is the only discriminator.
-        /// </remarks>
-        private static readonly int[] RockBlendSlots = { 0, 4 };
-
-        /// <summary>Turns the island's stone layers into ground that grass and trees grow on.</summary>
-        /// <remarks>
-        /// The template is a mountain biome and paints stone across anything with slope, which is
-        /// what made the island read as a rock field. Bypassing those outputs would leave bare holes
-        /// in the paint, so instead each one is pointed at the canonical Grass layer and its weight
-        /// is folded into GreenAreaMask, which is what every vegetation stage downstream reads. The
-        /// ground keeps its relief and gains cover instead of losing paint. Stone stays live on
-        /// LPB_Mountain_0, which runs the same template where cliffs belong.
-        /// </remarks>
-        private static void SilenceRockLayers(TerrainGraph graph)
-        {
-            var blends = graph.GetNodesOfType<WeightBlendNode>();
-            if (blends.Count == 0)
-            {
-                Debug.LogError("[IslandPlateau] Template has no Weight Blend; cannot retarget rock.");
-                return;
-            }
-
-            var blend = blends[0];
-            var grass = OverworldTerrainLayers.GetCanonicalLayer(
-                OverworldTerrainLayers.SurfaceLayer.Grass);
-            var edges = graph.GetEdges();
-            var greened = 0;
-
-            foreach (var slotIndex in RockBlendSlots)
-            {
-                if (slotIndex >= blend.outputSlots.Length)
-                {
-                    continue;
-                }
-
-                var slotId = blend.outputSlots[slotIndex].id;
-                foreach (var edge in edges)
-                {
-                    if (edge.outputSlot.nodeId != blend.id || edge.outputSlot.slotId != slotId)
-                    {
-                        continue;
-                    }
-
-                    var target = graph.GetNode(edge.inputSlot.nodeId) as TextureOutputNode;
-                    if (target == null)
-                    {
-                        continue;
-                    }
-
-                    target.terrainLayer = grass;
-                    greened++;
-                }
-            }
-
-            Debug.Log(
-                $"[IslandPlateau] Repainted {greened} stone output(s) as grass "
-                + $"(blend slots {string.Join(", ", RockBlendSlots)}).");
-        }
     }
 }
 #endif

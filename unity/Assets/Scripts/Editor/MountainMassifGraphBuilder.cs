@@ -93,7 +93,9 @@ namespace GameDev.EditorTools
                 // No ground cover: the massif is rock and scree above the treeline, and grass on it
                 // was Vista's, not ours.
                 graph => VistaGraphBuild.RetargetTemplateVegetation(
-                    graph, VistaVegetationTemplates.Species.Pine, includeGroundCover: false));
+                    graph,
+                    new[] { VistaVegetationTemplates.Species.Pine },
+                    includeGroundCover: false));
         }
 
         /// <summary>Routes one Weight Blend priority slot to the canonical layer it paints.</summary>
