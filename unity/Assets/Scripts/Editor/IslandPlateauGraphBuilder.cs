@@ -239,19 +239,23 @@ namespace GameDev.EditorTools
 
         /// <summary>Island floor above the sea line, as a fraction of the biome's vertical extent.</summary>
         /// <remarks>
-        /// Sea level is 24 m and the island LPB is 140 m tall, so 24/140 is the waterline. This sits
-        /// above it so the shore is beach rather than shallows -- trees were standing in water.
+        /// Sea level is 24 m and the island LPB is 140 m tall, so 0.171 is the waterline. This sits
+        /// just above it: high enough that trees do not stand in water, low enough that the coast is
+        /// a beach rather than the sea wall a bigger lift produced.
         /// </remarks>
-        private const float IslandFloor = 0.35f;
+        private const float IslandFloor = 0.22f;
 
         /// <summary>Island ceiling. The gap to <see cref="IslandFloor"/> is all the relief there is.</summary>
         /// <remarks>
         /// The template is a mountain generator, so used raw it grows a massif in the middle of the
-        /// island. Compressing its output into a narrow band turns those peaks into rolling ground
-        /// and leaves the actual mountains to LPB_Mountain_0, which runs the same template at its own
-        /// scale. The shape is the template's throughout; only its amplitude changes.
+        /// island; the actual mountains belong to LPB_Mountain_0, which runs the same template at its
+        /// own scale. Compressing to a narrow band fixed that but flattened the island into a pancake,
+        /// because the thing that read as "mountain" was mostly the cliff and rock paint, not the
+        /// relief. With those layers off the ground can keep real height variation, so this band is
+        /// wide enough to be a landscape. The shape is the template's throughout; only its amplitude
+        /// changes.
         /// </remarks>
-        private const float IslandCeiling = 0.55f;
+        private const float IslandCeiling = 0.70f;
 
         /// <summary>
         /// Inserts one <see cref="LevelsNode"/> between the template's height chain and its output.
@@ -292,6 +296,33 @@ namespace GameDev.EditorTools
                 graph, levels.id, levels.outputSlot.id, heightOut.id, heightOut.inputSlot.id);
             Debug.Log(
                 $"[IslandPlateau] Height output remapped to [{IslandFloor:F2}, {IslandCeiling:F2}].");
+
+            SilenceRockLayers(graph);
+        }
+
+        /// <summary>Stops the island painting cliff and rock, whatever its relief does.</summary>
+        /// <remarks>
+        /// The template is a mountain biome and paints grey stone across anything with slope, which
+        /// is what made the island read as a rock field rather than as land. Bypassing the two
+        /// outputs leaves their weight unwritten and Unity normalises what remains, so grass, sand
+        /// and soil cover the ground. Cliff and rock stay live on LPB_Mountain_0, where they belong.
+        /// </remarks>
+        private static void SilenceRockLayers(TerrainGraph graph)
+        {
+            var silenced = 0;
+            foreach (var node in graph.GetNodesOfType<TextureOutputNode>())
+            {
+                // Canonical order: 0 Grass, 1 Sand, 2 Soil, 3 Cliff, 4 Rock.
+                if (node.order < (int)OverworldTerrainLayers.SurfaceLayer.Cliff)
+                {
+                    continue;
+                }
+
+                node.isBypassed = true;
+                silenced++;
+            }
+
+            Debug.Log($"[IslandPlateau] Bypassed {silenced} rock/cliff texture output(s).");
         }
 
         /// <summary>

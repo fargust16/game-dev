@@ -225,7 +225,7 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.LevelsNode
-    jsonData: '{"m_groupId":"","m_id":"R35N4NPU","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_inLow":0.0,"m_inMid":0.5,"m_inHigh":1.0,"m_outLow":0.3499999940395355,"m_outHigh":0.550000011920929}'
+    jsonData: '{"m_groupId":"","m_id":"OOZ2TW4M","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_inLow":0.0,"m_inMid":0.5,"m_inHigh":1.0,"m_outLow":0.2199999988079071,"m_outHigh":0.699999988079071}'
     version: 1
   m_edgeData:
   - typeInfo:
@@ -418,11 +418,11 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"YJAPB1AG","m_outputSlot":{"m_nodeId":"db9fb535-6391-481b-8720-015a9027108f","m_slotId":100},"m_inputSlot":{"m_nodeId":"R35N4NPU","m_slotId":0}}'
+    jsonData: '{"m_id":"DJ2T2K2I","m_outputSlot":{"m_nodeId":"db9fb535-6391-481b-8720-015a9027108f","m_slotId":100},"m_inputSlot":{"m_nodeId":"OOZ2TW4M","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"WYL6RTS2","m_outputSlot":{"m_nodeId":"R35N4NPU","m_slotId":100},"m_inputSlot":{"m_nodeId":"c3ca7510-6055-4dbe-a13a-14103c6aeca0","m_slotId":0}}'
+    jsonData: '{"m_id":"2H9HBVS4","m_outputSlot":{"m_nodeId":"OOZ2TW4M","m_slotId":100},"m_inputSlot":{"m_nodeId":"c3ca7510-6055-4dbe-a13a-14103c6aeca0","m_slotId":0}}'
     version: 1
   m_groupData:
   - typeInfo:
