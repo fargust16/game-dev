@@ -60,7 +60,7 @@ MonoBehaviour:
   - {x: 500, y: 0, z: 500}
   - {x: 500, y: 0, z: -500}
   m_falloffDirection: 0
-  m_falloffDistance: 180
+  m_falloffDistance: 460
   m_falloffAnchors:
   - {x: -627.27924, y: 0, z: -627.27924}
   - {x: -627.27924, y: 0, z: 627.27924}
@@ -104,4 +104,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ea3bb84107d3794e9f1d5b6441e20de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.SetBiomeAreaOnSpawn
-  m_worldArea: {x: 2240, y: 2240}
+  m_worldArea: {x: 1680, y: 1680}
