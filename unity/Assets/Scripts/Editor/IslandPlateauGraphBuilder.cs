@@ -247,10 +247,10 @@ namespace GameDev.EditorTools
         /// beach, and that painting is wanted -- it is only the grass and trees standing in it that
         /// are not.
         /// </remarks>
-        private const float VegetationFloorMetres = 24f;
+        private const float VegetationFloorMetres = 15f;
 
         /// <summary>Highest ground vegetation is allowed on. Above the biome, i.e. no ceiling.</summary>
-        private const float VegetationFloorTopMetres = 40f;
+        private const float VegetationFloorTopMetres = 22f;
 
         /// <summary>
         /// Multiplies every vegetation output by one height mask, so nothing grows on the sand.
@@ -262,6 +262,33 @@ namespace GameDev.EditorTools
         /// DarkGreenAreaMask, grass reads the two added together, and none of those chains touch the
         /// height map at all.
         /// </remarks>
+        /// <summary>Height band the authored graph's own layer masks are moved onto.</summary>
+        /// <remarks>
+        /// They ship at 0-150 and 0-100, which is above everything the island reaches, so they
+        /// never bite -- which is why grass and trees were standing in the water however the
+        /// vegetation gate was set. Moving them onto the band the terrain actually occupies is what
+        /// makes any height rule in this graph mean something.
+        /// </remarks>
+        private const float LayerMaskFloor = 15f;
+
+        private const float LayerMaskCeiling = 50f;
+
+        /// <summary>Moves the template's layer height masks onto the band the island occupies.</summary>
+        private static void LowerLayerHeightMasks(TerrainGraph graph)
+        {
+            var moved = 0;
+            foreach (var mask in graph.GetNodesOfType<HeightMaskNode>())
+            {
+                mask.minHeight = LayerMaskFloor;
+                mask.maxHeight = LayerMaskCeiling;
+                moved++;
+            }
+
+            Debug.Log(
+                $"[IslandPlateau] Moved {moved} layer height mask(s) to "
+                + $"{LayerMaskFloor:F0}-{LayerMaskCeiling:F0} m.");
+        }
+
         private static void GateVegetationByHeight(TerrainGraph graph)
         {
             var heightVar = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarHeightMap);
@@ -322,6 +349,7 @@ namespace GameDev.EditorTools
 
         private static void RetargetVegetation(TerrainGraph graph)
         {
+            LowerLayerHeightMasks(graph);
             GateVegetationByHeight(graph);
             // The authored graph already carries the height Levels, the grass-painted stone slots and
             // the two green zones. All that is left is whose trees grow in them.
