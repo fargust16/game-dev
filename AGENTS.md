@@ -329,6 +329,8 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - Do not design a best strategy, perfect build, or free power.
 - Do not use failure that only wastes time.
 - Do not contradict higher-level documents silently.
+- Do not grow a Vista terrain graph. The biome templates already solve tree scatter, detail density and surface weights; when the shipped system does the job, change what it is pointed at, never build a parallel one beside it. A hand-built vegetation stage of sixty nodes once replaced a Scatter and one Tree Output that needed nothing but a different tree template, and it silently produced no ground cover at all for several bakes.
+- Keep graph edits to a light polish: retarget a template reference, change a Levels range, bypass an output. Anything that adds a subgraph needs the user to agree first, in writing, and needs a reason the template cannot already do it.
 
 ---
 

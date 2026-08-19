@@ -92,8 +92,8 @@ namespace GameDev.EditorTools
                 GraphAssetPath,
                 // No ground cover: the massif is rock and scree above the treeline, and grass on it
                 // was Vista's, not ours.
-                graph => VistaGraphBuild.ReplaceTemplateVegetation(
-                    graph, treeMaxSlopeDegrees: 34f, seed: 7713, includeGroundCover: false));
+                graph => VistaGraphBuild.RetargetTemplateVegetation(
+                    graph, VistaVegetationTemplates.Species.Pine, includeGroundCover: false));
         }
 
         /// <summary>

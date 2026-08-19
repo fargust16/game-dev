@@ -299,8 +299,8 @@ namespace GameDev.EditorTools
 
             RemoveErosion(graph);
             SilenceRockLayers(graph);
-            VistaGraphBuild.ReplaceTemplateVegetation(
-                graph, treeMaxSlopeDegrees: 28f, seed: 4021);
+            VistaGraphBuild.RetargetTemplateVegetation(
+                graph, VistaVegetationTemplates.Species.Fruit);
         }
 
         /// <summary>Takes the hydraulic erosion passes out of the island's height chain.</summary>

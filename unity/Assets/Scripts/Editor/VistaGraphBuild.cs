@@ -85,26 +85,6 @@ namespace GameDev.EditorTools
             Connect(graph, input.id, input.outputSlot.id, setMask.id, setMask.inputSlot.id);
         }
 
-        /// <summary>
-        /// The part of the biome that is safely inland of the falloff ring.
-        /// </summary>
-        /// <remarks>
-        /// The mask runs 1 in the solid interior and 0 outside the falloff. The waterline sits
-        /// somewhere in between — for the island's numbers, around 0.55 — so anything below
-        /// <see cref="DryLandMaskFloor"/> is shoreline or sea and must stay bare.
-        /// </remarks>
-        public static LevelsNode AddDryLandGate(TerrainGraph graph)
-        {
-            var node = new LevelsNode
-            {
-                inLow = DryLandMaskFloor,
-                inMid = 0.5f,
-                inHigh = DryLandMaskFloor + 0.12f,
-            };
-            graph.AddNode(node);
-            return node;
-        }
-
         /// <summary>Biome-mask value below which the blended surface dips under sea level.</summary>
         private const float DryLandMaskFloor = 0.68f;
 
@@ -188,23 +168,6 @@ namespace GameDev.EditorTools
             }
 
             return new UnityEngine.AnimationCurve(keys.ToArray());
-        }
-
-        /// <summary>
-        /// A flat 1.0 transition, which turns a <c>SlopeMaskNode</c> into a plain gate.
-        /// </summary>
-        /// <remarks>
-        /// <c>SlopeMask.shader</c> computes <c>(angle &gt;= min) * (angle &lt;= max) * curve(t)</c>, so the
-        /// band edges are already hard. <c>Utilities.EaseInOutCurve</c> is a plateau that reaches 0 at
-        /// both ends of the range — fine for a band floating inside the slope domain, but it zeroes a
-        /// mask that starts at 0°. A flat-ground gate needs this curve, exactly as Vista's reference
-        /// biome does for its <c>SlopeMask(0..3°)</c>.
-        /// </remarks>
-        public static UnityEngine.AnimationCurve ConstantCurve()
-        {
-            return new UnityEngine.AnimationCurve(
-                new UnityEngine.Keyframe(0f, 1f, 0f, 0f),
-                new UnityEngine.Keyframe(1f, 1f, 0f, 0f));
         }
 
         /// <summary>
@@ -644,186 +607,6 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>
-        /// The vegetation stage from Vista's reference biome: publish where the surface reads green,
-        /// then place trees and grass from that variable instead of from a second procedural system.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// <c>greenSource</c> is the graph's green texture weight — the biome paints a surface, and
-        /// vegetation follows the paint. Trees additionally pass a <c>GeometryMask</c> so they stay
-        /// off peaks and off cliff faces.
-        /// </para>
-        /// <para>
-        /// The Polaris branch of the reference (<c>DetailInstanceOutputNode</c> behind another
-        /// <c>Scatter</c>) is deliberately not built: <c>TerrainTile</c> implements
-        /// <c>IDetailDensityPopulator</c> but not a detail-instance populator, so on Unity terrain
-        /// those two nodes would compute a buffer nothing ever reads.
-        /// </para>
-        /// </remarks>
-        /// <param name="includeGroundCover">
-        /// Whether this biome emits the meadow detail layer. Two graphs outputting the <em>same</em>
-        /// Detail Template give Vista two density maps per tile for one template, which sends it down
-        /// its merge path instead of the direct one — and merging is where the map stopped reaching
-        /// the terrain. Alpine scree has no business growing meadow grass anyway, so the massif opts
-        /// out and the island keeps it.
-        /// </param>
-        public static void AddVegetationStage(
-            TerrainGraph graph,
-            ImageNodeBase greenSource,
-            int greenSourceOutputSlotId,
-            float treeMaxSlopeDegrees,
-            int seed,
-            bool includeGroundCover = true)
-        {
-            // Everything downstream reads GreenAreaMask, so gating it here keeps every vegetation
-            // layer — canopy, understory, rocks, grass — off the drowned part of the falloff ring.
-            PublishBiomeMask(graph);
-            var dryLand = AddDryLandGate(graph);
-            var maskForVegetation = AddGetVar(graph, VarBiomeMask);
-            var greenOnDryLand = new CombineNode { mode = CombineNode.Mode.Multiply };
-            graph.AddNode(greenOnDryLand);
-
-            var setGreen = AddSetVar(graph, VarGreenAreaMask);
-            Connect(graph, maskForVegetation.id, maskForVegetation.outputSlot.id, dryLand.id, dryLand.inputSlot.id);
-            Connect(graph, greenSource.id, greenSourceOutputSlotId, greenOnDryLand.id, greenOnDryLand.backgroundSlot.id);
-            Connect(graph, dryLand.id, dryLand.outputSlot.id, greenOnDryLand.id, greenOnDryLand.foregroundSlot.id);
-            Connect(graph, greenOnDryLand.id, greenOnDryLand.outputSlot.id, setGreen.id, setGreen.inputSlot.id);
-
-            // Three canopy species, each confined to its own patches by its own cluster noise, so the
-            // forest reads as stands of one kind meeting stands of another instead of an even
-            // three-way mix. Rising thresholds make each successive species rarer.
-            // Scale figures are multiples of the source prefab, and the prefabs are not the same
-            // size: the Polytope pine measures 9.2 m and the fruit tree 7.8 m at scale 1. The
-            // comment on each line is the resulting world height band, which is the number worth
-            // reviewing — a forest reads as majestic when the canopy is well above head height and
-            // the trunks are tall enough to walk under.
-            // scaleVariation is wide on purpose: it is what separates saplings from old growth, and
-            // a forest of one size reads as wallpaper however good the trees are.
-            //
-            // Species are grouped into **forest types**, not scattered independently. Five species
-            // each rolling their own cluster noise is what produced the "everything mixes, and the
-            // island is bare between patches" look: five independent masks agree nowhere, so no
-            // stand reads as a kind of wood, and five high thresholds multiply into large empty
-            // gaps.
-            //
-            // Instead, the members of one forest type share a cluster field (same scale, same
-            // seed) and differ only in threshold, so the dominant species covers the stand and the
-            // second fills in inside it — a pine wood with paler pines through it, a broadleaf wood
-            // with darker crowns through it. The two types use different fields, so conifer and
-            // broadleaf occupy different parts of the island and meet at an edge.
-            //
-            // Thresholds are also lower than before. They are compared against noise stretched to
-            // [0,1], so 0.30 keeps roughly the upper 70 % of each field rather than the upper 40 %,
-            // and the island gets continuous woodland with clearings instead of isolated islands of
-            // trees. Age comes from scaleVariation, which is why it is wide: one stand carries
-            // saplings and old growth together.
-            // Cluster scale is measured against the island, not against the world: the biome runs
-            // 1680 m, so the old 640 m and 520 m fields fitted barely two or three stands across the
-            // whole of it, which is what produced one solid forest beside one bare plain. Roughly
-            // halving them puts five or six stands on the island instead, so woodland and clearing
-            // alternate at a scale a player walks through rather than one they stand inside.
-            const float coniferCluster = 320f;
-            const int coniferSeed = 11;
-            const float broadleafCluster = 260f;
-            const int broadleafSeed = 37;
-
-            var stands = new System.Collections.Generic.List<LevelsNode>
-            {
-                // --- Coniferous wood: dominant pine, paler pine threaded through the same stand ---
-                AddCanopySpecies(
-                    graph, VistaVegetationTemplates.Species.Pine,
-                    clusterScale: coniferCluster, clusterSeed: seed + coniferSeed, threshold: 0.22f,
-                    treeMaxSlopeDegrees, spacing: 16f, seed: seed + 101,
-                    maxScale: 2.6f, scaleVariation: 0.55f), // 9.2 m prefab -> 10.8…23.8 m
-                AddCanopySpecies(
-                    graph, VistaVegetationTemplates.Species.PinePale,
-                    clusterScale: coniferCluster, clusterSeed: seed + coniferSeed, threshold: 0.38f,
-                    treeMaxSlopeDegrees, spacing: 22f, seed: seed + 104,
-                    maxScale: 2.3f, scaleVariation: 0.5f),
-
-                // --- Broadleaf wood: dominant fruit tree, deeper-green crowns inside the stand ---
-                AddCanopySpecies(
-                    graph, VistaVegetationTemplates.Species.Fruit,
-                    clusterScale: broadleafCluster, clusterSeed: seed + broadleafSeed, threshold: 0.24f,
-                    treeMaxSlopeDegrees, spacing: 20f, seed: seed + 102,
-                    maxScale: 2.45f, scaleVariation: 0.5f), // 7.8 m prefab -> 9.6…19.1 m
-                AddCanopySpecies(
-                    graph, VistaVegetationTemplates.Species.FruitDeep,
-                    clusterScale: broadleafCluster, clusterSeed: seed + broadleafSeed, threshold: 0.40f,
-                    treeMaxSlopeDegrees, spacing: 24f, seed: seed + 105,
-                    maxScale: 2.2f, scaleVariation: 0.45f),
-
-                // --- Orchard: deliberately the rare one, its own small field, pruned and even-sized ---
-                AddCanopySpecies(
-                    graph, VistaVegetationTemplates.Species.Orchard,
-                    clusterScale: 240f, clusterSeed: seed + 73, threshold: 0.58f,
-                    treeMaxSlopeDegrees, spacing: 26f, seed: seed + 103,
-                    maxScale: 1.6f, scaleVariation: 0.3f), // 7.8 m prefab -> 8.7…12.5 m, pruned orchard
-            };
-
-            PublishCanopyMask(graph, stands);
-            AddUnderstory(graph, treeMaxSlopeDegrees, seed + 201);
-            AddRockDressing(graph, seed + 301);
-
-            // --- Ground cover ---
-            // Grass used to be the one vegetation layer with **no floor worth the name and no slope
-            // rule at all**: a 0.06 green floor against the canopy's 0.333, and no GeometryMask.
-            // Those two omissions produced every "grass where it should not be" report at once —
-            // grass on the beach sand, grass past the waterline in the falloff ring, and grass on
-            // vertical mountain faces — because 0.06 green is reached by ground that is mostly sand,
-            // mostly rock, or mostly drowned, and nothing was checking the angle it sat on.
-            //
-            // The floor now sits just under the canopy's, so meadow reaches a little further than
-            // forest and stops well before bare ground. The slope rule is the same idea as the
-            // canopy's, a few degrees more generous: grass holds on a hillside, not on a cliff.
-            if (!includeGroundCover)
-            {
-                return;
-            }
-
-            var greenForGrass = AddGetVar(graph, VarGreenAreaMask);
-            var grassDensity = new LevelsNode
-            {
-                inLow = GrassGreenFloor,
-                inMid = 0.5f,
-                inHigh = 0.55f,
-            };
-
-            var heightForGrass = AddGetVar(graph, VarHeightMap);
-            var grassTerrain = new GeometryMaskNode
-            {
-                blendMode = GeometryMaskNode.BlendMode.Multiply,
-                enableHeightMask = false,
-                enableSlopeMask = true,
-                minAngle = 0f,
-                maxAngle = GrassMaxSlopeDegrees,
-                slopeTransition = ConstantCurve(),
-                enableDirectionMask = false,
-            };
-
-            var grassOnSlope = new CombineNode { mode = CombineNode.Mode.Multiply };
-            var grassOut = new DetailDensityOutputNode
-            {
-                detailTemplate = VistaVegetationTemplates.LoadOrCreateMeadowGrass(),
-            };
-
-            graph.AddNode(grassDensity);
-            graph.AddNode(grassTerrain);
-            graph.AddNode(grassOnSlope);
-            graph.AddNode(grassOut);
-
-            Connect(graph, greenForGrass.id, greenForGrass.outputSlot.id, grassDensity.id, grassDensity.inputSlot.id);
-            Connect(graph, heightForGrass.id, heightForGrass.outputSlot.id, grassTerrain.id, grassTerrain.inputSlot.id);
-            Connect(
-                graph, grassDensity.id, grassDensity.outputSlot.id,
-                grassOnSlope.id, grassOnSlope.backgroundSlot.id);
-            Connect(
-                graph, grassTerrain.id, grassTerrain.outputSlot.id,
-                grassOnSlope.id, grassOnSlope.foregroundSlot.id);
-            Connect(graph, grassOnSlope.id, grassOnSlope.outputSlot.id, grassOut.id, grassOut.inputSlot.id);
-        }
-
-        /// <summary>
         /// Green weight below which ground cover is not placed.
         /// </summary>
         /// <remarks>
@@ -840,50 +623,6 @@ namespace GameDev.EditorTools
         /// mountain face.
         /// </summary>
         private const float GrassMaxSlopeDegrees = 32f;
-
-        /// <summary>
-        /// Publishes where the canopy stands are, feathered outwards, as <see cref="VarCanopyMask"/>.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// The species masks are combined with <c>Max</c> rather than added: a pixel is "under
-        /// canopy" if <em>any</em> species stands there, and adding would push overlaps past 1 and
-        /// make the seams between stands denser than the stands themselves.
-        /// </para>
-        /// <para>
-        /// The blur is the point of the whole node. A hard canopy mask would put scrub strictly
-        /// under the trees and stop dead at the last trunk; feathering it lets the understory spill
-        /// past the stand and thin out with distance, which is what a real wood edge does. The
-        /// radius is in pixels of the biome canvas — at 512 px across 2240 m, 8 px is roughly 35 m.
-        /// </para>
-        /// </remarks>
-        private static void PublishCanopyMask(
-            TerrainGraph graph, System.Collections.Generic.List<LevelsNode> allStands)
-        {
-            var stands = allStands.FindAll(stand => stand != null);
-            if (stands.Count == 0)
-            {
-                return;
-            }
-
-            ImageNodeBase merged = stands[0];
-            var mergedSlotId = stands[0].outputSlot.id;
-            for (var i = 1; i < stands.Count; i++)
-            {
-                var union = new CombineNode { mode = CombineNode.Mode.Max };
-                graph.AddNode(union);
-                Connect(graph, merged.id, mergedSlotId, union.id, union.backgroundSlot.id);
-                Connect(graph, stands[i].id, stands[i].outputSlot.id, union.id, union.foregroundSlot.id);
-                merged = union;
-                mergedSlotId = union.outputSlot.id;
-            }
-
-            var feather = new BlurNode { radius = 8 };
-            graph.AddNode(feather);
-            var setCanopy = AddSetVar(graph, VarCanopyMask);
-            Connect(graph, merged.id, mergedSlotId, feather.id, feather.inputSlot.id);
-            Connect(graph, feather.id, feather.outputSlot.id, setCanopy.id, setCanopy.inputSlot.id);
-        }
 
         /// <summary>
         /// Rocks on the rugged ground, where the green mask is weakest.
@@ -957,284 +696,6 @@ namespace GameDev.EditorTools
             Connect(
                 graph, scatterNoise.id, scatterNoise.outputSlot.id, clumping.id, clumping.foregroundSlot.id);
             Connect(graph, clumping.id, clumping.outputSlot.id, scatter.id, scatter.densityInputSlot.id);
-            Connect(graph, scatter.id, scatter.outputSlot.id, output.id, output.positionInputSlot.id);
-        }
-
-        /// <summary>
-        /// One canopy species, confined to its own irregular patches.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// The clustering is the point. Scattering every species from the same density field gives
-        /// evenly spaced lone trees — the grid-like look — because each point is drawn independently
-        /// from one distribution. Multiplying the green mask by a <em>coarse</em> noise thresholded
-        /// hard instead produces forest masses with real gaps: dense inside a patch, empty between
-        /// patches, and ragged at the edges because the noise is.
-        /// </para>
-        /// <para>
-        /// <paramref name="threshold"/> is what turns a smooth noise into stands: higher means fewer,
-        /// smaller, sparser patches, which is how a species reads as occasional rather than dominant.
-        /// </para>
-        /// <para>
-        /// Size is set here rather than on the template because Unity terrain trees ignore
-        /// <c>TreeTemplate.baseScale</c> — <c>TerrainTile.ParseTreeInstances</c> copies
-        /// <c>TreeInstance.heightScale</c> straight out of the instance buffer, so the only levers
-        /// are <c>TreeOutputNode</c>'s scale multipliers and the scale mask inputs beside them.
-        /// </para>
-        /// </remarks>
-        /// <param name="maxScale">
-        /// Multiple of the source prefab for the largest instance of this species.
-        /// </param>
-        /// <param name="scaleVariation">
-        /// How far below <paramref name="maxScale"/> the smallest instance drops, as a fraction.
-        /// The variation is driven by a coarse noise sampled at each instance, so size correlates
-        /// with position: old growth in one part of a stand, saplings in another, which is how a
-        /// forest avoids the cloned look of one scale repeated everywhere.
-        /// </param>
-        /// <returns>
-        /// The species' cluster gate, so the caller can union the stands into
-        /// <see cref="VarCanopyMask"/>; <see langword="null"/> when the species has no usable
-        /// template.
-        /// </returns>
-        private static LevelsNode AddCanopySpecies(
-            TerrainGraph graph,
-            VistaVegetationTemplates.Species species,
-            float clusterScale,
-            int clusterSeed,
-            float threshold,
-            float treeMaxSlopeDegrees,
-            float spacing,
-            int seed,
-            float maxScale,
-            float scaleVariation)
-        {
-            var template = VistaVegetationTemplates.LoadOrCreateCanopyTree(species);
-            if (template == null)
-            {
-                return null;
-            }
-
-            var green = AddGetVar(graph, VarGreenAreaMask);
-            // Thins the canopy out of the faint green fringe so forest edges are not a uniform haze.
-            var density = new LevelsNode { inLow = 0.333f, inMid = 0.569f, inHigh = 0.521f };
-
-            var cluster = new NoiseNode { scale = clusterScale, seed = clusterSeed, layerCount = 3 };
-            graph.AddNode(cluster);
-
-            // Stretched to [0,1] before it is thresholded, for the reason in the NoiseNode note on
-            // NoiseWorkingLow. Without this the threshold is compared against a bell that never
-            // leaves [0.35, 0.65], so anything above 0.65 gates the species out of the world
-            // entirely — that is why the orchard produced zero instances on all four tiles while
-            // pine at 0.42 produced thousands.
-            var clusterRange = new LevelsNode { inLow = NoiseWorkingLow, inMid = 0.5f, inHigh = NoiseWorkingHigh };
-            graph.AddNode(clusterRange);
-
-            // Hard shoulder: below the threshold there is no stand at all, which is what makes the
-            // clearings between patches read as clearings.
-            var clusterGate = new LevelsNode
-            {
-                inLow = threshold,
-                inMid = 0.5f,
-                inHigh = UnityEngine.Mathf.Min(1f, threshold + 0.16f),
-            };
-
-            var height = AddGetVar(graph, VarHeightMap);
-            var terrain = new GeometryMaskNode
-            {
-                blendMode = GeometryMaskNode.BlendMode.Multiply,
-                enableHeightMask = false,
-                enableSlopeMask = true,
-                minAngle = 0f,
-                maxAngle = treeMaxSlopeDegrees,
-                slopeTransition = ConstantCurve(),
-                enableDirectionMask = false,
-            };
-
-            var greenTimesCluster = new CombineNode { mode = CombineNode.Mode.Multiply };
-            var mask = new CombineNode { mode = CombineNode.Mode.Multiply };
-            var scatter = new ScatterNode
-            {
-                spacing = new UnityEngine.Vector2(spacing, spacing),
-                spreadCount = 7,
-                spreadDistance = 0.05f,
-                keepSourcePoints = true,
-                seed = seed,
-            };
-            var output = new TreeOutputNode
-            {
-                treeTemplate = template,
-                seed = seed,
-                verticalScaleMultiplier = maxScale,
-                horizontalScaleMultiplier = maxScale,
-            };
-
-            // The scale mask multiplies the multiplier, so it has to stay inside [0,1] — hence a
-            // band from 1-variation to 1 rather than a curve around 1. One mask feeds both axes so
-            // instances scale uniformly; splitting them would stretch trunks.
-            var sizeNoise = new NoiseNode { scale = 55f, seed = seed + 7, layerCount = 2 };
-            graph.AddNode(sizeNoise);
-
-            // The input range has to be stretched before the band is applied. Vista's noise is
-            // `1 - (perlin * 0.5 + 0.5)` (Noise.shader), and Perlin almost never reaches ±1, so the
-            // raw output is a bell roughly inside [0.35, 0.65] rather than a sweep across [0,1].
-            // Mapping that straight onto the size band traverses only the middle sixth of it: with
-            // outLow 0.67 every tree came out between 0.78 and 0.88 of full size, which is the
-            // "all the trees are the same height" look. Stretching [0.35,0.65] to [0,1] first is
-            // what makes the band mean what it says.
-            var sizeBand = new LevelsNode
-            {
-                inLow = NoiseWorkingLow,
-                inMid = 0.5f,
-                inHigh = NoiseWorkingHigh,
-                outLow = UnityEngine.Mathf.Clamp01(1f - scaleVariation),
-                outHigh = 1f,
-            };
-
-            graph.AddNode(density);
-            graph.AddNode(clusterGate);
-            graph.AddNode(terrain);
-            graph.AddNode(greenTimesCluster);
-            graph.AddNode(mask);
-            graph.AddNode(sizeBand);
-            graph.AddNode(scatter);
-            graph.AddNode(output);
-
-            Connect(graph, sizeNoise.id, sizeNoise.outputSlot.id, sizeBand.id, sizeBand.inputSlot.id);
-            Connect(
-                graph, sizeBand.id, sizeBand.outputSlot.id,
-                output.id, output.verticalScaleInputSlot.id);
-            Connect(
-                graph, sizeBand.id, sizeBand.outputSlot.id,
-                output.id, output.horizontalScaleInputSlot.id);
-
-            Connect(graph, green.id, green.outputSlot.id, density.id, density.inputSlot.id);
-            Connect(graph, cluster.id, cluster.outputSlot.id, clusterRange.id, clusterRange.inputSlot.id);
-            Connect(graph, clusterRange.id, clusterRange.outputSlot.id, clusterGate.id, clusterGate.inputSlot.id);
-            Connect(
-                graph, density.id, density.outputSlot.id,
-                greenTimesCluster.id, greenTimesCluster.backgroundSlot.id);
-            Connect(
-                graph, clusterGate.id, clusterGate.outputSlot.id,
-                greenTimesCluster.id, greenTimesCluster.foregroundSlot.id);
-
-            Connect(graph, height.id, height.outputSlot.id, terrain.id, terrain.inputSlot.id);
-            Connect(
-                graph, greenTimesCluster.id, greenTimesCluster.outputSlot.id,
-                mask.id, mask.backgroundSlot.id);
-            Connect(graph, terrain.id, terrain.outputSlot.id, mask.id, mask.foregroundSlot.id);
-            Connect(graph, mask.id, mask.outputSlot.id, scatter.id, scatter.densityInputSlot.id);
-            Connect(graph, scatter.id, scatter.outputSlot.id, output.id, output.positionInputSlot.id);
-
-            return clusterGate;
-        }
-
-        /// <summary>
-        /// Bushes around and under the canopy stands.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Scrub belongs to the trees. Driving it from its own patch noise — worse, from the
-        /// <em>inverse</em> of one, which is what this did — spreads bushes evenly across open
-        /// ground and puts most of them where there are no trees at all. That is both the wrong
-        /// place and far too many of them: at 7 m spacing over open meadow the island ends up
-        /// carpeted.
-        /// </para>
-        /// <para>
-        /// Reading <see cref="VarCanopyMask"/> instead ties the understory to the stands, and
-        /// because that mask is blurred the density falls off outwards, so bushes thicken under the
-        /// trees and thin into the clearing rather than stopping at a hard line.
-        /// </para>
-        /// </remarks>
-        private static void AddUnderstory(TerrainGraph graph, float treeMaxSlopeDegrees, int seed)
-        {
-            var template = VistaVegetationTemplates.LoadOrCreateUndergrowthBush();
-            if (template == null)
-            {
-                return;
-            }
-
-            var green = AddGetVar(graph, VarGreenAreaMask);
-            var density = new LevelsNode { inLow = 0.2f, inMid = 0.5f, inHigh = 0.6f };
-
-            // Breaks the ring of scrub into clumps so it does not read as a hedge around every
-            // stand. Coarse enough that a clump covers several bushes.
-            var patchNoise = new NoiseNode { scale = 60f, seed = seed, layerCount = 2 };
-            graph.AddNode(patchNoise);
-            // outLow well above zero so the patches thin the scrub rather than erase it. Three
-            // masks multiply into this density — green, patches, canopy — and a factor that reaches
-            // zero anywhere wins outright, which is how the understory went from carpeting the
-            // island to being hard to find.
-            var patches = new LevelsNode
-            {
-                inLow = NoiseWorkingLow,
-                inMid = 0.5f,
-                inHigh = NoiseWorkingHigh,
-                outLow = 0.4f,
-                outHigh = 1f,
-            };
-            graph.AddNode(patches);
-
-            var canopy = AddGetVar(graph, VarCanopyMask);
-            var nearCanopy = new CombineNode { mode = CombineNode.Mode.Multiply };
-            graph.AddNode(nearCanopy);
-
-            var height = AddGetVar(graph, VarHeightMap);
-            var terrain = new GeometryMaskNode
-            {
-                blendMode = GeometryMaskNode.BlendMode.Multiply,
-                enableHeightMask = false,
-                enableSlopeMask = true,
-                minAngle = 0f,
-                maxAngle = treeMaxSlopeDegrees + 8f,
-                slopeTransition = ConstantCurve(),
-                enableDirectionMask = false,
-            };
-
-            var greenTimesPatches = new CombineNode { mode = CombineNode.Mode.Multiply };
-            var mask = new CombineNode { mode = CombineNode.Mode.Multiply };
-            // 9 m rather than the original 7 m. Spacing is the point grid the density mask thins, so
-            // it sets the ceiling on how many bushes can exist. 7 m carpeted the island only because
-            // the mask let scrub grow everywhere; now that the canopy mask confines it to the stands,
-            // the ceiling can come back up or there is nothing under the trees.
-            var scatter = new ScatterNode
-            {
-                spacing = new UnityEngine.Vector2(9f, 9f),
-                spreadCount = 7,
-                spreadDistance = 0.05f,
-                keepSourcePoints = true,
-                seed = seed,
-            };
-            var output = new TreeOutputNode { treeTemplate = template, seed = seed };
-
-            graph.AddNode(density);
-            graph.AddNode(terrain);
-            graph.AddNode(greenTimesPatches);
-            graph.AddNode(mask);
-            graph.AddNode(scatter);
-            graph.AddNode(output);
-
-            Connect(graph, green.id, green.outputSlot.id, density.id, density.inputSlot.id);
-            Connect(graph, patchNoise.id, patchNoise.outputSlot.id, patches.id, patches.inputSlot.id);
-            Connect(
-                graph, density.id, density.outputSlot.id,
-                greenTimesPatches.id, greenTimesPatches.backgroundSlot.id);
-            Connect(
-                graph, patches.id, patches.outputSlot.id,
-                greenTimesPatches.id, greenTimesPatches.foregroundSlot.id);
-
-            // The canopy mask goes in last so nothing downstream can dilute it: wherever there is no
-            // stand nearby, the product is zero and no bush is placed at all.
-            Connect(
-                graph, greenTimesPatches.id, greenTimesPatches.outputSlot.id,
-                nearCanopy.id, nearCanopy.backgroundSlot.id);
-            Connect(graph, canopy.id, canopy.outputSlot.id, nearCanopy.id, nearCanopy.foregroundSlot.id);
-
-            Connect(graph, height.id, height.outputSlot.id, terrain.id, terrain.inputSlot.id);
-            Connect(
-                graph, nearCanopy.id, nearCanopy.outputSlot.id,
-                mask.id, mask.backgroundSlot.id);
-            Connect(graph, terrain.id, terrain.outputSlot.id, mask.id, mask.foregroundSlot.id);
-            Connect(graph, mask.id, mask.outputSlot.id, scatter.id, scatter.densityInputSlot.id);
             Connect(graph, scatter.id, scatter.outputSlot.id, output.id, output.positionInputSlot.id);
         }
 
@@ -1336,62 +797,53 @@ namespace GameDev.EditorTools
             return existing;
         }
 
-        /// <summary>Swaps a cloned template's vegetation for ours, over the whole dry biome.</summary>
+        /// <summary>Points a cloned template's vegetation outputs at our templates.</summary>
         /// <remarks>
         /// <para>
-        /// Both overworld graphs clone Vista's Mountains template, so both arrive carrying its four
-        /// tree prototypes and its grass, placed by its own Scatter nodes. Doing this to one graph
-        /// and not the other is why a bake showed our trees and Vista's in the same world.
+        /// The template already scatters trees and ground cover, and it does it well. All that is
+        /// ours about the vegetation is which prefab comes out, so this reassigns the template
+        /// references on the output nodes and touches nothing else -- no new nodes, no new masks,
+        /// no second placement system running beside the one that ships.
         /// </para>
         /// <para>
-        /// The template's GreenAreaMask publisher goes too: two nodes setting one variable is
-        /// ambiguous, and its source is the erosion-driven moss and grass slots, which are empty in
-        /// any graph that has had its erosion passes removed. <see cref="AddVegetationStage"/>
-        /// republishes the variable as greenSource x dryLand(BiomeMask), so feeding it the biome
-        /// mask makes every dry part of the biome plantable and nothing in the shallows.
+        /// It replaces a hand-built stage of some sixty nodes that duplicated exactly this, was far
+        /// harder to read than the graph it sat next to, and quietly emitted no ground cover at all.
+        /// See the graph rule in AGENTS.md.
         /// </para>
         /// </remarks>
-        public static void ReplaceTemplateVegetation(
-            TerrainGraph graph, float treeMaxSlopeDegrees, int seed, bool includeGroundCover = true)
+        public static void RetargetTemplateVegetation(
+            TerrainGraph graph, VistaVegetationTemplates.Species canopy, bool includeGroundCover = true)
         {
-            RemoveTemplateVegetation(graph);
-
-            var templateGreen = graph.GetNodesOfType<SetVariableNode>()
-                .Find(n => n.varName == VarGreenAreaMask);
-            if (templateGreen != null)
+            var trees = 0;
+            foreach (var node in graph.GetNodesOfType<TreeOutputNode>())
             {
-                graph.RemoveNode(templateGreen.id);
+                node.treeTemplate = VistaVegetationTemplates.LoadOrCreateCanopyTree(canopy);
+                trees++;
             }
 
-            // AddVegetationStage wants an image node and GetVariableNode is not one, so the mask
-            // passes through a gate on its way. The stage applies the same gate again downstream;
-            // applying it twice costs nothing and keeps the source a single node.
-            var maskVar = AddGetVar(graph, VarBiomeMask);
-            var green = AddDryLandGate(graph);
-            Connect(graph, maskVar.id, maskVar.outputSlot.id, green.id, green.inputSlot.id);
-            AddVegetationStage(
-                graph, green, green.outputSlot.id, treeMaxSlopeDegrees, seed, includeGroundCover);
-        }
-
-        /// <summary>Strips a template's own vegetation so ours can take its place.</summary>
-        public static void RemoveTemplateVegetation(TerrainGraph graph)
-        {
-            var doomed = new System.Collections.Generic.List<string>();
-            foreach (var node in graph.GetNodes())
+            var details = 0;
+            foreach (var node in graph.GetNodesOfType<DetailDensityOutputNode>())
             {
-                if (node is ScatterNode || node is TreeOutputNode ||
-                    node is DetailDensityOutputNode || node is DetailInstanceOutputNode)
+                if (!includeGroundCover)
                 {
-                    doomed.Add(node.id);
+                    node.isBypassed = true;
+                    continue;
                 }
+
+                node.detailTemplate = VistaVegetationTemplates.LoadOrCreateMeadowGrass();
+                details++;
             }
 
-            foreach (var id in doomed)
+            var props = 0;
+            foreach (var node in graph.GetNodesOfType<DetailInstanceOutputNode>())
             {
-                graph.RemoveNode(id);
+                node.treeTemplate = VistaVegetationTemplates.LoadOrCreateUndergrowthBush();
+                props++;
             }
 
-            UnityEngine.Debug.Log($"[VistaGraphBuild] Removed {doomed.Count} template vegetation node(s).");
+            UnityEngine.Debug.Log(
+                $"[VistaGraphBuild] Retargeted {trees} tree, {details} detail and {props} prop "
+                + $"output(s) to our templates (canopy {canopy}).");
         }
 
         public static TAsset SaveGraph<TAsset>(TAsset built, string assetPath)
