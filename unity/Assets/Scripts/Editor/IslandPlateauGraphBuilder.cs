@@ -300,391 +300,68 @@ namespace GameDev.EditorTools
             SilenceRockLayers(graph);
         }
 
-        /// <summary>Stops the island painting cliff and rock, whatever its relief does.</summary>
+        /// <summary>Weight Blend slots the template paints stone into.</summary>
         /// <remarks>
-        /// The template is a mountain biome and paints grey stone across anything with slope, which
-        /// is what made the island read as a rock field rather than as land. Bypassing the two
-        /// outputs leaves their weight unwritten and Unity normalises what remains, so grass, sand
-        /// and soil cover the ground. Cliff and rock stay live on LPB_Mountain_0, where they belong.
+        /// Read off the graph, not guessed: slot 0 is grey stone and slot 4 is white rock, while 1,
+        /// 2 and 3 are soil, moss and grass. An earlier pass filtered on TextureOutputNode.order --
+        /// how our own builder identifies layers -- and silenced nothing, because all five of the
+        /// template's outputs carry order 0. The slot feeding the output is the only discriminator.
+        /// </remarks>
+        private static readonly int[] RockBlendSlots = { 0, 4 };
+
+        /// <summary>Turns the island's stone layers into ground that grass and trees grow on.</summary>
+        /// <remarks>
+        /// The template is a mountain biome and paints stone across anything with slope, which is
+        /// what made the island read as a rock field. Bypassing those outputs would leave bare holes
+        /// in the paint, so instead each one is pointed at the canonical Grass layer and its weight
+        /// is folded into GreenAreaMask, which is what every vegetation stage downstream reads. The
+        /// ground keeps its relief and gains cover instead of losing paint. Stone stays live on
+        /// LPB_Mountain_0, which runs the same template where cliffs belong.
         /// </remarks>
         private static void SilenceRockLayers(TerrainGraph graph)
         {
-            var silenced = 0;
-            foreach (var node in graph.GetNodesOfType<TextureOutputNode>())
+            var blends = graph.GetNodesOfType<WeightBlendNode>();
+            if (blends.Count == 0)
             {
-                // Canonical order: 0 Grass, 1 Sand, 2 Soil, 3 Cliff, 4 Rock.
-                if (node.order < (int)OverworldTerrainLayers.SurfaceLayer.Cliff)
+                Debug.LogError("[IslandPlateau] Template has no Weight Blend; cannot retarget rock.");
+                return;
+            }
+
+            var blend = blends[0];
+            var grass = OverworldTerrainLayers.GetCanonicalLayer(
+                OverworldTerrainLayers.SurfaceLayer.Grass);
+            var edges = graph.GetEdges();
+            var greened = 0;
+
+            foreach (var slotIndex in RockBlendSlots)
+            {
+                if (slotIndex >= blend.outputSlots.Length)
                 {
                     continue;
                 }
 
-                node.isBypassed = true;
-                silenced++;
-            }
-
-            Debug.Log($"[IslandPlateau] Bypassed {silenced} rock/cliff texture output(s).");
-        }
-
-        /// <summary>
-        /// The reference biome's height recipe at island scale, plus one deliberate deviation.
-        /// </summary>
-        /// <remarks>
-        /// Detail noise × broad mass noise → the reference's <c>Levels</c> → hydraulic erosion, all on
-        /// the reference's own values. The one departure is <see cref="ShelfCurve"/>, which biases the
-        /// distribution toward high ground so the island reads as a plateau rather than as a mountain
-        /// range — that is our world design, and it is the only hand-drawn curve in the height path.
-        /// </remarks>
-        private static void BuildTerrainStage(TerrainGraph graph)
-        {
-            var reference = ReferenceShapingForDiagnostics;
-            var probe = NoiseProbeForDiagnostics;
-            var detailScale = DetailNoiseScaleForDiagnostics ?? (reference ? 750f : 1200f);
-            var detail = probe == NoiseProbe.ReferenceDetail || ReferenceDetailNoiseForDiagnostics
-                ? VistaGraphBuild.AddSampleGraphDetailNoise(graph, detailScale, seed: 110)
-                : VistaGraphBuild.AddDetailNoise(graph, scale: detailScale, seed: 110);
-            // The detail signal the rest of the chain sees. Normally the noise node itself; with
-            // the post-stack candidate, the noise passed through normalise -> curve.
-            ImageNodeBase detailSrc = detail;
-            var detailSlot = detail.outputSlot.id;
-            if (PostStackNormaliseForDiagnostics)
-            {
-                // Sum of the amplitude series the shader accumulates: 1, p, p^2 ... p^(n-1). With
-                // flipSign off every octave adds, so this is the true ceiling of the raw sum.
-                var amplitudeSum = 0f;
-                var amplitude = 1f;
-                for (var i = 0; i < detail.layerCount; i++)
+                var slotId = blend.outputSlots[slotIndex].id;
+                foreach (var edge in edges)
                 {
-                    amplitudeSum += amplitude;
-                    amplitude *= detail.persistence;
-                }
-
-                // Remap maps [0,1] onto [min,max], so max = 1/sum divides the sum back into [0,1].
-                var normalise = new RemapNode { min = 0f, max = 1f / amplitudeSum };
-                graph.AddNode(normalise);
-
-                VistaGraphBuild.Connect(
-                    graph, detail.id, detail.outputSlot.id, normalise.id, normalise.inputSlot.id);
-                detailSrc = normalise;
-                detailSlot = normalise.outputSlot.id;
-
-                if (PostStackCurveForDiagnostics != PostStackCurve.None)
-                {
-                    var shapeCurve = new CurveNode
+                    if (edge.outputSlot.nodeId != blend.id || edge.outputSlot.slotId != slotId)
                     {
-                        curve = PostStackCurveForDiagnostics == PostStackCurve.Shelf
-                            ? new AnimationCurve(
-                                new Keyframe(0.1f, 0f, 0f, 0f), new Keyframe(1f, 1f, 0f, 0f))
-                            : new AnimationCurve(
-                                new Keyframe(0f, 0f, 0f, 0f), new Keyframe(1f, 1f, 0f, 0f)),
-                    };
-                    graph.AddNode(shapeCurve);
-                    VistaGraphBuild.Connect(
-                        graph, normalise.id, normalise.outputSlot.id,
-                        shapeCurve.id, shapeCurve.inputSlot.id);
-                    detailSrc = shapeCurve;
-                    detailSlot = shapeCurve.outputSlot.id;
+                        continue;
+                    }
+
+                    var target = graph.GetNode(edge.inputSlot.nodeId) as TextureOutputNode;
+                    if (target == null)
+                    {
+                        continue;
+                    }
+
+                    target.terrainLayer = grass;
+                    greened++;
                 }
-                Debug.LogWarning(
-                    $"[IslandPlateau] Post-stack normalise ON: sum={amplitudeSum:F4} over "
-                    + $"{detail.layerCount} octaves, curve={PostStackCurveForDiagnostics}.");
             }
 
-            var mass = VistaGraphBuild.AddMassNoise(
-                graph, scale: reference ? 1000f : 1900f, seed: 277);
-
-            if (NoiseOffsetForDiagnostics.HasValue)
-            {
-                detail.offset = NoiseOffsetForDiagnostics.Value;
-                mass.offset = NoiseOffsetForDiagnostics.Value;
-            }
-            // The reference keeps its third noise out of the height path entirely — it feeds the
-            // surface stage. Ours multiplies it into height, which is what cost 38 m of peak.
-            var fine = reference
-                ? null
-                : VistaGraphBuild.AddFineNoise(
-                    graph, scale: VistaGraphBuild.FineNoiseScaleMeters, seed: 431);
-
-            var shape = new CombineNode { mode = CombineNode.Mode.Multiply };
-            graph.AddNode(shape);
-
-            CombineNode roughen = null;
-            if (fine != null)
-            {
-                roughen = new CombineNode { mode = CombineNode.Mode.Multiply };
-                graph.AddNode(roughen);
-            }
-
-            var levels = VistaGraphBuild.AddReferenceLevels(graph);
-
-            // The plateau bias is ours alone; the reference goes straight from Levels to erosion.
-            CurveNode shelf = null;
-            if (!reference)
-            {
-                shelf = new CurveNode
-                {
-                    curve = BypassShelfCurveForDiagnostics
-                        ? AnimationCurve.Linear(0f, 0f, 1f, 1f)
-                        : ShelfCurve(),
-                };
-                graph.AddNode(shelf);
-            }
-
-            // --- Noise probe: publish the raw signal and stop. Nothing below runs. ---
-            var isEarlyProbe = probe == NoiseProbe.Detail || probe == NoiseProbe.Mass ||
-                probe == NoiseProbe.Product || probe == NoiseProbe.ReferenceDetail;
-            if (isEarlyProbe)
-            {
-                var probeSet = VistaGraphBuild.AddSetVar(graph, VistaGraphBuild.VarHeightMap);
-                var probeOut = new HeightOutputNode();
-                graph.AddNode(probeOut);
-
-                if (probe == NoiseProbe.Product)
-                {
-                    VistaGraphBuild.Connect(
-                        graph, detailSrc.id, detailSlot, shape.id, shape.backgroundSlot.id);
-                    VistaGraphBuild.Connect(
-                        graph, mass.id, mass.outputSlot.id, shape.id, shape.foregroundSlot.id);
-                    VistaGraphBuild.Connect(
-                        graph, shape.id, shape.outputSlot.id, probeSet.id, probeSet.inputSlot.id);
-                }
-                else
-                {
-                    var src = probe == NoiseProbe.Mass ? (ImageNodeBase)mass : detail;
-                    VistaGraphBuild.Connect(
-                        graph, src.id,
-                        probe == NoiseProbe.Mass ? mass.outputSlot.id : detail.outputSlot.id,
-                        probeSet.id, probeSet.inputSlot.id);
-                }
-
-                VistaGraphBuild.Connect(
-                    graph, probeSet.id, probeSet.outputSlot.id, probeOut.id, probeOut.inputSlot.id);
-                Debug.LogWarning(
-                    $"[IslandPlateau] NOISE PROBE {probe}: raw noise is the height map. Levels, " +
-                    "ShelfCurve and erosion are all bypassed; surface and vegetation output is " +
-                    "meaningless.");
-                return;
-            }
-
-            // Two passes, as the reference has — see the note in MountainMassifGraphBuilder.
-            var macroErosion = VistaGraphBuild.AddMacroErosion(graph);
-            var microErosion = VistaGraphBuild.AddMicroErosion(graph);
-
-            var setHeight = VistaGraphBuild.AddSetVar(graph, VistaGraphBuild.VarHeightMap);
-            var heightOut = new HeightOutputNode();
-            graph.AddNode(heightOut);
-
-            VistaGraphBuild.Connect(graph, detailSrc.id, detailSlot, shape.id, shape.backgroundSlot.id);
-            VistaGraphBuild.Connect(graph, mass.id, mass.outputSlot.id, shape.id, shape.foregroundSlot.id);
-            if (roughen != null)
-            {
-                VistaGraphBuild.Connect(
-                    graph, shape.id, shape.outputSlot.id, roughen.id, roughen.backgroundSlot.id);
-                VistaGraphBuild.Connect(
-                    graph, fine.id, fine.outputSlot.id, roughen.id, roughen.foregroundSlot.id);
-                VistaGraphBuild.Connect(
-                    graph, roughen.id, roughen.outputSlot.id, levels.id, levels.inputSlot.id);
-            }
-            else
-            {
-                VistaGraphBuild.Connect(
-                    graph, shape.id, shape.outputSlot.id, levels.id, levels.inputSlot.id);
-            }
-
-            // Levels -> shelf -> erosion when the plateau bias is present, Levels -> erosion when it
-            // is not; either way erosion sees one upstream node.
-            var beforeErosion = shelf != null ? (ImageNodeBase)shelf : levels;
-            if (shelf != null)
-            {
-                VistaGraphBuild.Connect(
-                    graph, levels.id, levels.outputSlot.id, shelf.id, shelf.inputSlot.id);
-            }
-
-            VistaGraphBuild.Connect(
-                graph, beforeErosion.id,
-                shelf != null ? shelf.outputSlot.id : levels.outputSlot.id,
-                macroErosion.id, macroErosion.inputHeightSlot.id);
-            VistaGraphBuild.Connect(
-                graph, macroErosion.id, macroErosion.outputHeightSlot.id,
-                microErosion.id, microErosion.inputHeightSlot.id);
-
-            // --- Stage probe: publish an intermediate instead of the finished height. ---
-            // The whole chain is still built and still executes; only what feeds Height Map
-            // changes, so each stage is measured through the identical downstream machinery.
-            ImageNodeBase stageSrc = microErosion;
-            var stageSlot = microErosion.outputHeightSlot.id;
-            if (probe == NoiseProbe.AfterLevels)
-            {
-                stageSrc = levels; stageSlot = levels.outputSlot.id;
-            }
-            else if (probe == NoiseProbe.AfterShelf && shelf != null)
-            {
-                stageSrc = shelf; stageSlot = shelf.outputSlot.id;
-            }
-            else if (probe == NoiseProbe.AfterMacroErosion)
-            {
-                stageSrc = macroErosion; stageSlot = macroErosion.outputHeightSlot.id;
-            }
-
-            if (probe != NoiseProbe.Off)
-            {
-                Debug.LogWarning($"[IslandPlateau] STAGE PROBE {probe}: Height Map is an "
-                    + "intermediate, not the finished terrain.");
-            }
-
-            VistaGraphBuild.Connect(
-                graph, stageSrc.id, stageSlot, setHeight.id, setHeight.inputSlot.id);
-            VistaGraphBuild.Connect(
-                graph, setHeight.id, setHeight.outputSlot.id, heightOut.id, heightOut.inputSlot.id);
-
-            VistaGraphBuild.PublishErosionMask(graph, microErosion);
-        }
-
-        /// <summary>
-        /// Lifts the middle of the distribution so most of the island is high plain.
-        /// </summary>
-        /// <remarks>
-        /// Gentle on purpose. The previous version clamped the top half flat, which is what turned
-        /// the plateau into a featureless slab; this only biases, it does not clip.
-        /// </remarks>
-        private static AnimationCurve ShelfCurve()
-        {
-            return new AnimationCurve(
-                new Keyframe(0f, 0f, 0f, 0f),
-                new Keyframe(0.45f, 0.6f, 1f, 1f),
-                new Keyframe(1f, 1f, 0.55f, 0.55f));
-        }
-
-        /// <summary>
-        /// The five canonical surface layers, every mask derived from terrain morphology.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Weight Blend stacks its inputs: output i is <c>in[i] * Π(1 - in[j])</c> for every j above
-        /// i, so the <b>last</b> connected layer wins and layer 0 is the base. Layer 0 is left
-        /// unconnected on purpose — Weight Blend fills it white, which is the only thing that makes
-        /// the five weights sum to exactly 1. Blend priority here is grass (base) → rock → soil →
-        /// sand → cliff.
-        /// </para>
-        /// <para>
-        /// Altitude gates are curves over the normalized height map, not <c>HeightMaskNode</c>
-        /// metres, so they keep their meaning when the biome's Set Biome Height On Spawn changes.
-        /// Slope is used once, for sheer faces only: two adjacent slope bands used as independent
-        /// layers draw contour rings across a rolling plateau.
-        /// </para>
-        /// </remarks>
-        /// <returns>The grass weight, which the vegetation stage publishes as GreenAreaMask.</returns>
-        private static WeightBlendNode BuildSurfaceStage(TerrainGraph graph)
-        {
-            // --- Rock: exposed ridges, the reference's inverted-erosion highlight ---
-            var erosionForRock = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarErosionMask);
-            var rockErosion = new CurveNode { curve = VistaGraphBuild.ErosionPresenceCurve() };
-
-            // Flat ground is not "un-eroded ridge", it is just flat. Combining it in before the
-            // invert removes the false rock the low-activity plains would otherwise pick up.
-            var heightForFlat = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarHeightMap);
-            var flatGround = new SlopeMaskNode
-            {
-                minAngle = 0f,
-                maxAngle = 4f,
-                transition = VistaGraphBuild.ConstantCurve(),
-            };
-            var ridgeOrFlat = new CombineNode { mode = CombineNode.Mode.Max };
-            var rock = VistaGraphBuild.AddInvert(graph);
-
-            // --- Soil: sediment settles in the drainage lines ---
-            var erosionForSoil = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarErosionMask);
-            var soil = VistaGraphBuild.AddSoilLevels(graph);
-
-            // --- Sand: the low ground the coast forms on ---
-            var heightForShore = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarHeightMap);
-            var shoreBand = new CurveNode
-            {
-                curve = VistaGraphBuild.LowAltitudeCurve(ShoreFullUntil01, ShoreZeroAt01),
-            };
-
-            // Breaks the contour line a plain altitude band would otherwise draw around the island.
-            var sandBreakup = new NoiseNode
-            {
-                scale = 95f,
-                layerCount = 2,
-                seed = 613,
-                remapCurve = AnimationCurve.Linear(0f, 0.45f, 1f, 1f),
-            };
-            var sand = new CombineNode { mode = CombineNode.Mode.Multiply };
-
-            // --- Cliff: sheer faces only, on top of everything else ---
-            // The band runs to 90° because that is the physical limit, not a design choice; the curve
-            // fades it in between 38° and ~62° and then holds, so vertical faces stay cliff.
-            var heightForCliff = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarHeightMap);
-            var cliff = new SlopeMaskNode
-            {
-                minAngle = 38f,
-                maxAngle = 90f,
-                transition = VistaGraphBuild.RisingBandCurve(0.46f),
-            };
-
-            var weightBlend = new WeightBlendNode { layerCount = WeightBlendLayers };
-
-            graph.AddNode(rockErosion);
-            graph.AddNode(flatGround);
-            graph.AddNode(ridgeOrFlat);
-            graph.AddNode(shoreBand);
-            graph.AddNode(sandBreakup);
-            graph.AddNode(sand);
-            graph.AddNode(cliff);
-            graph.AddNode(weightBlend);
-
-            var outputs = VistaGraphBuild.AddCanonicalTextureOutputs(graph);
-
-            VistaGraphBuild.Connect(
-                graph, erosionForRock.id, erosionForRock.outputSlot.id, rockErosion.id, rockErosion.inputSlot.id);
-            VistaGraphBuild.Connect(
-                graph, heightForFlat.id, heightForFlat.outputSlot.id, flatGround.id, flatGround.inputSlot.id);
-            VistaGraphBuild.Connect(
-                graph, rockErosion.id, rockErosion.outputSlot.id, ridgeOrFlat.id, ridgeOrFlat.backgroundSlot.id);
-            VistaGraphBuild.Connect(
-                graph, flatGround.id, flatGround.outputSlot.id, ridgeOrFlat.id, ridgeOrFlat.foregroundSlot.id);
-            VistaGraphBuild.Connect(
-                graph, ridgeOrFlat.id, ridgeOrFlat.outputSlot.id, rock.id, rock.inputSlot.id);
-
-            VistaGraphBuild.Connect(
-                graph, erosionForSoil.id, erosionForSoil.outputSlot.id, soil.id, soil.inputSlot.id);
-
-            VistaGraphBuild.Connect(
-                graph, heightForShore.id, heightForShore.outputSlot.id, shoreBand.id, shoreBand.inputSlot.id);
-            VistaGraphBuild.Connect(graph, shoreBand.id, shoreBand.outputSlot.id, sand.id, sand.backgroundSlot.id);
-            VistaGraphBuild.Connect(
-                graph, sandBreakup.id, sandBreakup.outputSlot.id, sand.id, sand.foregroundSlot.id);
-
-            VistaGraphBuild.Connect(
-                graph, heightForCliff.id, heightForCliff.outputSlot.id, cliff.id, cliff.inputSlot.id);
-
-            // Layer 0 (grass) intentionally unconnected — Weight Blend defaults it to white.
-            VistaGraphBuild.Connect(graph, rock.id, rock.outputSlot.id, weightBlend.id, weightBlend.inputSlots[1].id);
-            VistaGraphBuild.Connect(graph, soil.id, soil.outputSlot.id, weightBlend.id, weightBlend.inputSlots[2].id);
-            VistaGraphBuild.Connect(graph, sand.id, sand.outputSlot.id, weightBlend.id, weightBlend.inputSlots[3].id);
-            VistaGraphBuild.Connect(graph, cliff.id, cliff.outputSlot.id, weightBlend.id, weightBlend.inputSlots[4].id);
-
-            ConnectBlendToOutput(graph, weightBlend, 0, outputs, SurfaceLayer.Grass);
-            ConnectBlendToOutput(graph, weightBlend, 1, outputs, SurfaceLayer.Rock);
-            ConnectBlendToOutput(graph, weightBlend, 2, outputs, SurfaceLayer.Soil);
-            ConnectBlendToOutput(graph, weightBlend, 3, outputs, SurfaceLayer.Sand);
-            ConnectBlendToOutput(graph, weightBlend, 4, outputs, SurfaceLayer.Cliff);
-
-            return weightBlend;
-        }
-
-        /// <summary>Routes one Weight Blend priority slot to the canonical layer it paints.</summary>
-        private static void ConnectBlendToOutput(
-            TerrainGraph graph,
-            WeightBlendNode weightBlend,
-            int blendLayer,
-            TextureOutputNode[] outputs,
-            SurfaceLayer layer)
-        {
-            var output = outputs[(int)layer];
-            VistaGraphBuild.Connect(
-                graph, weightBlend.id, weightBlend.outputSlots[blendLayer].id, output.id, output.inputSlot.id);
+            Debug.Log(
+                $"[IslandPlateau] Repainted {greened} stone output(s) as grass "
+                + $"(blend slots {string.Join(", ", RockBlendSlots)}).");
         }
     }
 }
