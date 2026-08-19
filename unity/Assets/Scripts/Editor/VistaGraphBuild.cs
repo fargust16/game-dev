@@ -607,24 +607,6 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>
-        /// Green weight below which ground cover is not placed.
-        /// </summary>
-        /// <remarks>
-        /// Just under <c>AddCanopySpecies</c>'s 0.333, so meadow reaches slightly further than
-        /// forest and still stops before sand, rock and the drowned falloff ring — all three of
-        /// which sit well under a third green. The old 0.06 is what put grass on the beach and in
-        /// the water.
-        /// </remarks>
-        private const float GrassGreenFloor = 0.30f;
-
-        /// <summary>
-        /// Steepest ground that still grows grass. A few degrees above the canopy's limit, so a
-        /// meadow runs a little higher up a hillside than the trees do, and nothing grows on a
-        /// mountain face.
-        /// </summary>
-        private const float GrassMaxSlopeDegrees = 32f;
-
-        /// <summary>
         /// Rocks on the rugged ground, where the green mask is weakest.
         /// </summary>
         /// <remarks>
@@ -821,12 +803,15 @@ namespace GameDev.EditorTools
                 trees++;
             }
 
+            // Removed, not bypassed, when ground cover is unwanted: a bypassed output node still
+            // registers its prototype on the terrain, which is how Vista's own GrassDetail kept
+            // appearing in the bake report after both density outputs had been retargeted.
             var details = 0;
             foreach (var node in graph.GetNodesOfType<DetailDensityOutputNode>())
             {
                 if (!includeGroundCover)
                 {
-                    node.isBypassed = true;
+                    graph.RemoveNode(node.id);
                     continue;
                 }
 
@@ -834,16 +819,25 @@ namespace GameDev.EditorTools
                 details++;
             }
 
+            // The instance output carries a DetailTemplate too, and it is where Vista's own
+            // GrassDetail was still reaching the terrain after the density output had been
+            // retargeted -- which is why a bake reported our meadow and drew theirs.
             var props = 0;
             foreach (var node in graph.GetNodesOfType<DetailInstanceOutputNode>())
             {
-                node.treeTemplate = VistaVegetationTemplates.LoadOrCreateUndergrowthBush();
+                if (!includeGroundCover)
+                {
+                    graph.RemoveNode(node.id);
+                    continue;
+                }
+
+                node.detailTemplate = VistaVegetationTemplates.LoadOrCreateMeadowGrass();
                 props++;
             }
 
             UnityEngine.Debug.Log(
                 $"[VistaGraphBuild] Retargeted {trees} tree, {details} detail and {props} prop "
-                + $"output(s) to our templates (canopy {canopy}).");
+                + $"output(s) seen (canopy {canopy}; props left as the template's).");
         }
 
         public static TAsset SaveGraph<TAsset>(TAsset built, string assetPath)

@@ -297,7 +297,11 @@ namespace GameDev.EditorTools
             Debug.Log(
                 $"[IslandPlateau] Height output remapped to [{IslandFloor:F2}, {IslandCeiling:F2}].");
 
-            RemoveErosion(graph);
+            // Erosion stays. It was taken out because its channels read as streaks, but those were
+            // the template painting stone along them -- fixed by SilenceRockLayers -- and the
+            // template drives its ground-cover density from ErosionMask, so removing the passes left
+            // the island with no grass at all while the only grass in the bake came from the massif.
+            // RemoveErosion is kept below for the day the trade is worth making deliberately.
             SilenceRockLayers(graph);
             VistaGraphBuild.RetargetTemplateVegetation(
                 graph, VistaVegetationTemplates.Species.Fruit);
