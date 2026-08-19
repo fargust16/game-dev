@@ -77,28 +77,18 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>Re-authors the asset from code, discarding any Inspector edits.</summary>
+        /// <summary>Clones Vista's Mountains template onto the massif graph asset.</summary>
+        /// <remarks>
+        /// This graph was the last thing still hand-authored, and it was the banding. The island was
+        /// switched to a byte-for-byte clone of the Wizard template and rendered clean; the massif
+        /// kept calling AddDetailNoise, which carries flipSign and applyRemapPerLayer -- the two
+        /// settings measured to draw the axis-aligned hatch -- so a single world showed the new graph
+        /// and the old one side by side, and only the massif striped.
+        /// </remarks>
         public static TerrainGraph Rebuild()
         {
-            VistaGraphBuild.EnsureFolder("Assets/Settings/Vista");
-
-            var graph = ScriptableObject.CreateInstance<TerrainGraph>();
-            graph.name = "MountainMassif_TerrainGraph";
-
-            BuildTerrainStage(graph);
-            var surface = BuildSurfaceStage(graph);
-            // Green source = the grass weight (Weight Blend layer 2), so canopy follows the paint.
-            VistaGraphBuild.AddVegetationStage(
-                graph,
-                surface,
-                surface.outputSlots[2].id,
-                treeMaxSlopeDegrees: 34f,
-                seed: 7713,
-                includeGroundCover: false);
-
-            graph.Validate();
-            // Overwrite in place so the asset GUID survives and the biome template prefabs keep
-            // pointing at it.
-            return VistaGraphBuild.SaveGraph(graph, GraphAssetPath);
+            return VistaGraphBuild.RebuildFromTemplate(
+                VistaGraphBuild.MountainTemplateGraphPath, GraphAssetPath);
         }
 
         /// <summary>
