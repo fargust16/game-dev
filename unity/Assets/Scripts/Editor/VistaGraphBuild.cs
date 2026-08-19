@@ -717,9 +717,14 @@ namespace GameDev.EditorTools
             // and the island gets continuous woodland with clearings instead of isolated islands of
             // trees. Age comes from scaleVariation, which is why it is wide: one stand carries
             // saplings and old growth together.
-            const float coniferCluster = 640f;
+            // Cluster scale is measured against the island, not against the world: the biome runs
+            // 1680 m, so the old 640 m and 520 m fields fitted barely two or three stands across the
+            // whole of it, which is what produced one solid forest beside one bare plain. Roughly
+            // halving them puts five or six stands on the island instead, so woodland and clearing
+            // alternate at a scale a player walks through rather than one they stand inside.
+            const float coniferCluster = 320f;
             const int coniferSeed = 11;
-            const float broadleafCluster = 520f;
+            const float broadleafCluster = 260f;
             const int broadleafSeed = 37;
 
             var stands = new System.Collections.Generic.List<LevelsNode>
@@ -727,24 +732,24 @@ namespace GameDev.EditorTools
                 // --- Coniferous wood: dominant pine, paler pine threaded through the same stand ---
                 AddCanopySpecies(
                     graph, VistaVegetationTemplates.Species.Pine,
-                    clusterScale: coniferCluster, clusterSeed: seed + coniferSeed, threshold: 0.30f,
+                    clusterScale: coniferCluster, clusterSeed: seed + coniferSeed, threshold: 0.22f,
                     treeMaxSlopeDegrees, spacing: 16f, seed: seed + 101,
                     maxScale: 2.6f, scaleVariation: 0.55f), // 9.2 m prefab -> 10.8…23.8 m
                 AddCanopySpecies(
                     graph, VistaVegetationTemplates.Species.PinePale,
-                    clusterScale: coniferCluster, clusterSeed: seed + coniferSeed, threshold: 0.46f,
+                    clusterScale: coniferCluster, clusterSeed: seed + coniferSeed, threshold: 0.38f,
                     treeMaxSlopeDegrees, spacing: 22f, seed: seed + 104,
                     maxScale: 2.3f, scaleVariation: 0.5f),
 
                 // --- Broadleaf wood: dominant fruit tree, deeper-green crowns inside the stand ---
                 AddCanopySpecies(
                     graph, VistaVegetationTemplates.Species.Fruit,
-                    clusterScale: broadleafCluster, clusterSeed: seed + broadleafSeed, threshold: 0.32f,
+                    clusterScale: broadleafCluster, clusterSeed: seed + broadleafSeed, threshold: 0.24f,
                     treeMaxSlopeDegrees, spacing: 20f, seed: seed + 102,
                     maxScale: 2.45f, scaleVariation: 0.5f), // 7.8 m prefab -> 9.6…19.1 m
                 AddCanopySpecies(
                     graph, VistaVegetationTemplates.Species.FruitDeep,
-                    clusterScale: broadleafCluster, clusterSeed: seed + broadleafSeed, threshold: 0.48f,
+                    clusterScale: broadleafCluster, clusterSeed: seed + broadleafSeed, threshold: 0.40f,
                     treeMaxSlopeDegrees, spacing: 24f, seed: seed + 105,
                     maxScale: 2.2f, scaleVariation: 0.45f),
 
@@ -1329,6 +1334,43 @@ namespace GameDev.EditorTools
             AssetDatabase.DeleteAsset(TemplateScratchPath);
             AssetDatabase.SaveAssets();
             return existing;
+        }
+
+        /// <summary>Swaps a cloned template's vegetation for ours, over the whole dry biome.</summary>
+        /// <remarks>
+        /// <para>
+        /// Both overworld graphs clone Vista's Mountains template, so both arrive carrying its four
+        /// tree prototypes and its grass, placed by its own Scatter nodes. Doing this to one graph
+        /// and not the other is why a bake showed our trees and Vista's in the same world.
+        /// </para>
+        /// <para>
+        /// The template's GreenAreaMask publisher goes too: two nodes setting one variable is
+        /// ambiguous, and its source is the erosion-driven moss and grass slots, which are empty in
+        /// any graph that has had its erosion passes removed. <see cref="AddVegetationStage"/>
+        /// republishes the variable as greenSource x dryLand(BiomeMask), so feeding it the biome
+        /// mask makes every dry part of the biome plantable and nothing in the shallows.
+        /// </para>
+        /// </remarks>
+        public static void ReplaceTemplateVegetation(
+            TerrainGraph graph, float treeMaxSlopeDegrees, int seed, bool includeGroundCover = true)
+        {
+            RemoveTemplateVegetation(graph);
+
+            var templateGreen = graph.GetNodesOfType<SetVariableNode>()
+                .Find(n => n.varName == VarGreenAreaMask);
+            if (templateGreen != null)
+            {
+                graph.RemoveNode(templateGreen.id);
+            }
+
+            // AddVegetationStage wants an image node and GetVariableNode is not one, so the mask
+            // passes through a gate on its way. The stage applies the same gate again downstream;
+            // applying it twice costs nothing and keeps the source a single node.
+            var maskVar = AddGetVar(graph, VarBiomeMask);
+            var green = AddDryLandGate(graph);
+            Connect(graph, maskVar.id, maskVar.outputSlot.id, green.id, green.inputSlot.id);
+            AddVegetationStage(
+                graph, green, green.outputSlot.id, treeMaxSlopeDegrees, seed, includeGroundCover);
         }
 
         /// <summary>Strips a template's own vegetation so ours can take its place.</summary>

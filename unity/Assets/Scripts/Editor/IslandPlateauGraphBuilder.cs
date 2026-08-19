@@ -299,50 +299,8 @@ namespace GameDev.EditorTools
 
             RemoveErosion(graph);
             SilenceRockLayers(graph);
-            UseOurVegetation(graph);
-        }
-
-        /// <summary>Swaps the template's vegetation for ours, covering the whole dry island.</summary>
-        /// <remarks>
-        /// <para>
-        /// Two problems, one fix. The template ships four tree prototypes placed by its own Scatter
-        /// nodes, so the island carried Vista's trees and not our twenty-eight; and those scatter
-        /// masks left bare patches that no amount of repainting the ground would fill, because trees
-        /// never keyed off the texture layers at all.
-        /// </para>
-        /// <para>
-        /// AddVegetationStage publishes GreenAreaMask itself, as greenSource x dryLand(BiomeMask),
-        /// so handing it the biome mask as the source makes every dry part of the island green and
-        /// nothing in the shallows. The template's own publisher is removed first -- two nodes
-        /// setting one variable is ambiguous, and its source was the erosion-driven moss and grass
-        /// slots, which are empty now that the erosion passes are gone.
-        /// </para>
-        /// </remarks>
-        private static void UseOurVegetation(TerrainGraph graph)
-        {
-            VistaGraphBuild.RemoveTemplateVegetation(graph);
-
-            var templateGreen = graph.GetNodesOfType<SetVariableNode>()
-                .Find(n => n.varName == VistaGraphBuild.VarGreenAreaMask);
-            if (templateGreen != null)
-            {
-                graph.RemoveNode(templateGreen.id);
-            }
-
-            // AddVegetationStage wants an image node, and GetVariableNode is not one, so the mask
-            // passes through a gate on its way. The gate is the same one the stage applies again
-            // downstream; applying it twice costs nothing and keeps the source a single node.
-            var maskVar = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarBiomeMask);
-            var green = VistaGraphBuild.AddDryLandGate(graph);
-            VistaGraphBuild.Connect(
-                graph, maskVar.id, maskVar.outputSlot.id, green.id, green.inputSlot.id);
-            VistaGraphBuild.AddVegetationStage(
-                graph,
-                green,
-                green.outputSlot.id,
-                treeMaxSlopeDegrees: 28f,
-                seed: 4021);
-            Debug.Log("[IslandPlateau] Template vegetation replaced with ours over the dry biome.");
+            VistaGraphBuild.ReplaceTemplateVegetation(
+                graph, treeMaxSlopeDegrees: 28f, seed: 4021);
         }
 
         /// <summary>Takes the hydraulic erosion passes out of the island's height chain.</summary>

@@ -88,7 +88,12 @@ namespace GameDev.EditorTools
         public static TerrainGraph Rebuild()
         {
             return VistaGraphBuild.RebuildFromTemplate(
-                VistaGraphBuild.MountainTemplateGraphPath, GraphAssetPath);
+                VistaGraphBuild.MountainTemplateGraphPath,
+                GraphAssetPath,
+                // No ground cover: the massif is rock and scree above the treeline, and grass on it
+                // was Vista's, not ours.
+                graph => VistaGraphBuild.ReplaceTemplateVegetation(
+                    graph, treeMaxSlopeDegrees: 34f, seed: 7713, includeGroundCover: false));
         }
 
         /// <summary>
