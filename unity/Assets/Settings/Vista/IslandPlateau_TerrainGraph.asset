@@ -254,6 +254,31 @@ MonoBehaviour:
       fullName: Pinwheel.Vista.Graph.CombineNode
     jsonData: '{"m_groupId":"ZR4I19GE","m_id":"7250RGUJ","m_visualState":{"m_position":{"x":3287.832763671875,"y":1758.18212890625},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
     version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.GetVariableNode
+    jsonData: '{"m_groupId":"","m_id":"CRVWETVH","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_outputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":100,\"m_type\":1,\"m_name\":\"\"}","version":1},"m_varName":"Height
+      Map","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.HeightMaskNode
+    jsonData: '{"m_groupId":"","m_id":"LJJLO2DQ","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_minHeight":24.0,"m_maxHeight":40.0,"m_transition":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.0,"value":0.0,"inSlope":0.0,"outSlope":1.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":1.0,"value":1.0,"inSlope":1.0,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.CombineNode
+    jsonData: '{"m_groupId":"","m_id":"NAO2E4CC","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.CombineNode
+    jsonData: '{"m_groupId":"","m_id":"TYAAGGPZ","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.CombineNode
+    jsonData: '{"m_groupId":"","m_id":"Y1023AQD","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.CombineNode
+    jsonData: '{"m_groupId":"","m_id":"26O1XX8V","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
+    version: 1
   m_edgeData:
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
@@ -345,10 +370,6 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"K0XE0N0U","m_outputSlot":{"m_nodeId":"cea869e6-476d-40bd-b5d8-423ce968c232","m_slotId":100},"m_inputSlot":{"m_nodeId":"9E46C44L","m_slotId":0}}'
-    version: 1
-  - typeInfo:
-      fullName: Pinwheel.Vista.Graph.Edge
     jsonData: '{"m_id":"RMCJ5EGA","m_outputSlot":{"m_nodeId":"9E46C44L","m_slotId":100},"m_inputSlot":{"m_nodeId":"YTAXHD97","m_slotId":0}}'
     version: 1
   - typeInfo:
@@ -405,10 +426,6 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"DT18LNYM","m_outputSlot":{"m_nodeId":"7R9E6MUI","m_slotId":100},"m_inputSlot":{"m_nodeId":"HVKGH9GD","m_slotId":0}}'
-    version: 1
-  - typeInfo:
-      fullName: Pinwheel.Vista.Graph.Edge
     jsonData: '{"m_id":"G31X4HB1","m_outputSlot":{"m_nodeId":"784574d3-d07b-41c3-9b9c-0550bebf6dd4","m_slotId":100},"m_inputSlot":{"m_nodeId":"2dc562cf-23f6-4614-9b74-679423674a8b","m_slotId":0}}'
     version: 1
   - typeInfo:
@@ -434,10 +451,6 @@ MonoBehaviour:
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
     jsonData: '{"m_id":"GRUI2MPC","m_outputSlot":{"m_nodeId":"QWM6FZCW","m_slotId":100},"m_inputSlot":{"m_nodeId":"7R9E6MUI","m_slotId":0}}'
-    version: 1
-  - typeInfo:
-      fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"FRNGD4Z0","m_outputSlot":{"m_nodeId":"H3VX72WM","m_slotId":100},"m_inputSlot":{"m_nodeId":"cea869e6-476d-40bd-b5d8-423ce968c232","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
@@ -485,7 +498,55 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"AIVY3F06","m_outputSlot":{"m_nodeId":"7250RGUJ","m_slotId":100},"m_inputSlot":{"m_nodeId":"PQ2H1Q0H","m_slotId":0}}'
+    jsonData: '{"m_id":"TFBXFEEU","m_outputSlot":{"m_nodeId":"CRVWETVH","m_slotId":100},"m_inputSlot":{"m_nodeId":"LJJLO2DQ","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"HSZURBY4","m_outputSlot":{"m_nodeId":"H3VX72WM","m_slotId":100},"m_inputSlot":{"m_nodeId":"NAO2E4CC","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"I27S7Z7S","m_outputSlot":{"m_nodeId":"LJJLO2DQ","m_slotId":100},"m_inputSlot":{"m_nodeId":"NAO2E4CC","m_slotId":1}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"XYFS2L4B","m_outputSlot":{"m_nodeId":"NAO2E4CC","m_slotId":100},"m_inputSlot":{"m_nodeId":"cea869e6-476d-40bd-b5d8-423ce968c232","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"Z4TW1EKY","m_outputSlot":{"m_nodeId":"cea869e6-476d-40bd-b5d8-423ce968c232","m_slotId":100},"m_inputSlot":{"m_nodeId":"TYAAGGPZ","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"75WDIYM5","m_outputSlot":{"m_nodeId":"LJJLO2DQ","m_slotId":100},"m_inputSlot":{"m_nodeId":"TYAAGGPZ","m_slotId":1}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"D91ABOGP","m_outputSlot":{"m_nodeId":"TYAAGGPZ","m_slotId":100},"m_inputSlot":{"m_nodeId":"9E46C44L","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"JG5AQ684","m_outputSlot":{"m_nodeId":"7R9E6MUI","m_slotId":100},"m_inputSlot":{"m_nodeId":"Y1023AQD","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"T31SV0T6","m_outputSlot":{"m_nodeId":"LJJLO2DQ","m_slotId":100},"m_inputSlot":{"m_nodeId":"Y1023AQD","m_slotId":1}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"82D7KONS","m_outputSlot":{"m_nodeId":"Y1023AQD","m_slotId":100},"m_inputSlot":{"m_nodeId":"HVKGH9GD","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"JWUE0RV4","m_outputSlot":{"m_nodeId":"7250RGUJ","m_slotId":100},"m_inputSlot":{"m_nodeId":"26O1XX8V","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"XI1XOA8O","m_outputSlot":{"m_nodeId":"LJJLO2DQ","m_slotId":100},"m_inputSlot":{"m_nodeId":"26O1XX8V","m_slotId":1}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"KY4C9T1K","m_outputSlot":{"m_nodeId":"26O1XX8V","m_slotId":100},"m_inputSlot":{"m_nodeId":"PQ2H1Q0H","m_slotId":0}}'
     version: 1
   m_groupData:
   - typeInfo:

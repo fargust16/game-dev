@@ -240,8 +240,89 @@ namespace GameDev.EditorTools
         /// <summary>
         /// Inserts one <see cref="LevelsNode"/> between the template's height chain and its output.
         /// </summary>
+        /// <summary>Lowest ground vegetation is allowed on, in the biome's own metres.</summary>
+        /// <remarks>
+        /// Sea level is 24 m, and between the waterline and this the shore is bare sand. The gate
+        /// belongs on the vegetation outputs and not on the Weight Blend layers: the layers paint the
+        /// beach, and that painting is wanted -- it is only the grass and trees standing in it that
+        /// are not.
+        /// </remarks>
+        private const float VegetationFloorMetres = 24f;
+
+        /// <summary>Highest ground vegetation is allowed on. Above the biome, i.e. no ceiling.</summary>
+        private const float VegetationFloorTopMetres = 40f;
+
+        /// <summary>
+        /// Multiplies every vegetation output by one height mask, so nothing grows on the sand.
+        /// </summary>
+        /// <remarks>
+        /// The authored graph gates nothing by height on the vegetation side. Its three height masks
+        /// sit inside Weight Blend layers 2, 3 and 4, they all start at 0, and they cut from the top
+        /// -- they keep paint off the peaks, not off the beach. Trees read GreenAreaMask and
+        /// DarkGreenAreaMask, grass reads the two added together, and none of those chains touch the
+        /// height map at all.
+        /// </remarks>
+        private static void GateVegetationByHeight(TerrainGraph graph)
+        {
+            var heightVar = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarHeightMap);
+            var aboveSand = new HeightMaskNode
+            {
+                minHeight = VegetationFloorMetres,
+                maxHeight = VegetationFloorTopMetres,
+
+                // The curve is the mask, not a falloff applied to one: min and max only say which
+                // height band the curve is stretched across, and the value outside the band is the
+                // clamped end of the curve. A constant 1 therefore passes everything, which is why
+                // two earlier bakes came out bit-identical to having no gate at all. A 0-to-1 ramp
+                // gives bare sand below the waterline band and full vegetation above it.
+                transition = AnimationCurve.Linear(0f, 0f, 1f, 1f),
+            };
+            graph.AddNode(aboveSand);
+            VistaGraphBuild.Connect(
+                graph, heightVar.id, heightVar.outputSlot.id, aboveSand.id, aboveSand.inputSlot.id);
+
+            // The gate goes on the density, never after a Scatter: a Scatter emits a point buffer
+            // rather than a mask, and multiplying that by a height mask does not thin the trees, it
+            // corrupts them -- a first attempt gated the Tree Outputs and lost nine tenths of the
+            // trees and a whole species while the grass, which has no Scatter in its density path,
+            // came through untouched.
+            var gated = 0;
+            foreach (var output in graph.GetNodes())
+            {
+                if (!(output is ScatterNode || output is DetailDensityOutputNode))
+                {
+                    continue;
+                }
+
+                var incoming = graph.GetEdges().Find(e => e.inputSlot.nodeId == output.id);
+                if (incoming == null)
+                {
+                    continue;
+                }
+
+                var upstreamNode = incoming.outputSlot.nodeId;
+                var upstreamSlot = incoming.outputSlot.slotId;
+                var inputSlot = incoming.inputSlot.slotId;
+                graph.RemoveEdge(incoming.id);
+
+                var gate = new CombineNode { mode = CombineNode.Mode.Multiply };
+                graph.AddNode(gate);
+                VistaGraphBuild.Connect(
+                    graph, upstreamNode, upstreamSlot, gate.id, gate.backgroundSlot.id);
+                VistaGraphBuild.Connect(
+                    graph, aboveSand.id, aboveSand.outputSlot.id, gate.id, gate.foregroundSlot.id);
+                VistaGraphBuild.Connect(graph, gate.id, gate.outputSlot.id, output.id, inputSlot);
+                gated++;
+            }
+
+            Debug.Log(
+                $"[IslandPlateau] {gated} vegetation output(s) gated above "
+                + $"{VegetationFloorMetres:F0}-{VegetationFloorTopMetres:F0} m.");
+        }
+
         private static void RetargetVegetation(TerrainGraph graph)
         {
+            GateVegetationByHeight(graph);
             // The authored graph already carries the height Levels, the grass-painted stone slots and
             // the two green zones. All that is left is whose trees grow in them.
             VistaGraphBuild.RetargetTemplateVegetation(
