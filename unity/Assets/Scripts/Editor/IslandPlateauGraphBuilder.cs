@@ -297,7 +297,94 @@ namespace GameDev.EditorTools
             Debug.Log(
                 $"[IslandPlateau] Height output remapped to [{IslandFloor:F2}, {IslandCeiling:F2}].");
 
+            RemoveErosion(graph);
             SilenceRockLayers(graph);
+            GreenTheWholeIsland(graph);
+        }
+
+        /// <summary>Makes every dry part of the island count as green area.</summary>
+        /// <remarks>
+        /// <para>
+        /// The template builds GreenAreaMask from a Combine(Max) over Weight Blend slots 2 and 3 --
+        /// the moss and grass it paints into drainage -- and every vegetation stage downstream reads
+        /// that variable. So the ground repainted from stone stayed bare: it looked like grass but
+        /// did not count as green. Removing erosion makes it worse, because both of those slots are
+        /// erosion-driven and go empty, which would leave the island with no vegetation at all.
+        /// </para>
+        /// <para>
+        /// So the mask is redefined as the biome itself, gated to dry land: the falloff ring runs 1
+        /// inland and 0 outside, and AddDryLandGate cuts it at the waterline so nothing is planted
+        /// in the shallows. Grass and trees then cover all of the island and none of the sea.
+        /// </para>
+        /// </remarks>
+        private static void GreenTheWholeIsland(TerrainGraph graph)
+        {
+            var setGreen = graph.GetNodesOfType<SetVariableNode>()
+                .Find(n => n.varName == VistaGraphBuild.VarGreenAreaMask);
+            if (setGreen == null)
+            {
+                Debug.LogError("[IslandPlateau] Template publishes no GreenAreaMask; cannot widen it.");
+                return;
+            }
+
+            foreach (var edge in graph.GetEdges().FindAll(e => e.inputSlot.nodeId == setGreen.id))
+            {
+                graph.RemoveEdge(edge.id);
+            }
+
+            VistaGraphBuild.PublishBiomeMask(graph);
+            var mask = VistaGraphBuild.AddGetVar(graph, VistaGraphBuild.VarBiomeMask);
+            var dryLand = VistaGraphBuild.AddDryLandGate(graph);
+            VistaGraphBuild.Connect(
+                graph, mask.id, mask.outputSlot.id, dryLand.id, dryLand.inputSlot.id);
+            VistaGraphBuild.Connect(
+                graph, dryLand.id, dryLand.outputSlot.id, setGreen.id, setGreen.inputSlot.id);
+            Debug.Log("[IslandPlateau] GreenAreaMask widened to the whole dry biome.");
+        }
+
+        /// <summary>Takes the hydraulic erosion passes out of the island's height chain.</summary>
+        /// <remarks>
+        /// <para>
+        /// The template is a mountain biome and erodes hard, which on flat island ground reads as
+        /// streaks rather than as drainage. Each pass is spliced out: whatever fed its height input
+        /// is wired to whatever its height output fed, then the node goes.
+        /// </para>
+        /// <para>
+        /// This costs the surface stage its erosion-driven paint. The template derives three of its
+        /// five layers from EroisonMask -- soil in the drainage, grass in the drainage, and the peak
+        /// highlight -- and with no erosion those masks come out empty, leaving the Weight Blend's
+        /// unconnected base to cover the ground. That is the intended trade here, not an oversight.
+        /// </para>
+        /// </remarks>
+        private static void RemoveErosion(TerrainGraph graph)
+        {
+            var passes = graph.GetNodesOfType<HydraulicErosionNode2>();
+            foreach (var pass in passes)
+            {
+                var edges = graph.GetEdges();
+                var incoming = edges.Find(
+                    e => e.inputSlot.nodeId == pass.id && e.inputSlot.slotId == pass.inputHeightSlot.id);
+                if (incoming == null)
+                {
+                    continue;
+                }
+
+                var upstreamNode = incoming.outputSlot.nodeId;
+                var upstreamSlot = incoming.outputSlot.slotId;
+                var outgoing = edges.FindAll(
+                    e => e.outputSlot.nodeId == pass.id &&
+                         e.outputSlot.slotId == pass.outputHeightSlot.id);
+
+                foreach (var edge in outgoing)
+                {
+                    VistaGraphBuild.Connect(
+                        graph, upstreamNode, upstreamSlot, edge.inputSlot.nodeId, edge.inputSlot.slotId);
+                }
+
+                graph.RemoveNode(pass.id);
+            }
+
+            Debug.Log($"[IslandPlateau] Spliced out {passes.Count} hydraulic erosion pass(es).");
         }
 
         /// <summary>Weight Blend slots the template paints stone into.</summary>

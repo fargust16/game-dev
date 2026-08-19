@@ -200,14 +200,6 @@ MonoBehaviour:
     jsonData: '{"m_groupId":"TFTTN27R","m_id":"F5I5CSDW","m_visualState":{"m_position":{"x":822.1968383789063,"y":-111.72337341308594},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
     version: 1
   - typeInfo:
-      fullName: Pinwheel.Vista.Graph.HydraulicErosionNode2
-    jsonData: '{"m_groupId":"4VGLHBMU","m_id":"9T3579EY","m_visualState":{"m_position":{"x":1360.800048828125,"y":-112.0000228881836},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_iterationCount":200,"m_iterationPerFrame":50,"m_useAutoIterationPerFrame":true,"m_rainRate":10.0,"m_rainOverTime":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.25,"value":1.0,"inSlope":0.0,"outSlope":-2.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":0.75,"value":0.0,"inSlope":-2.0,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4},"m_sedimentCapacity":50.0,"m_erosionRate":10.0,"m_depositionRate":0.30000001192092898,"m_evaporationRate":10.0,"m_featureSize":8,"m_useBorderFade":false,"m_depositRamp":5.0,"m_drainageRamp":100.0}'
-    version: 1
-  - typeInfo:
-      fullName: Pinwheel.Vista.Graph.HydraulicErosionNode2
-    jsonData: '{"m_groupId":"4VGLHBMU","m_id":"FJ8NBGJR","m_visualState":{"m_position":{"x":1571.19970703125,"y":-112.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_iterationCount":200,"m_iterationPerFrame":50,"m_useAutoIterationPerFrame":true,"m_rainRate":10.0,"m_rainOverTime":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.5,"value":1.0,"inSlope":0.0,"outSlope":-2.857142686843872,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":0.8500000238418579,"value":0.0,"inSlope":-2.857142686843872,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4},"m_sedimentCapacity":50.0,"m_erosionRate":5.0,"m_depositionRate":0.10000000149011612,"m_evaporationRate":10.0,"m_featureSize":2,"m_useBorderFade":false,"m_depositRamp":10.0,"m_drainageRamp":300.0}'
-    version: 1
-  - typeInfo:
       fullName: Pinwheel.Vista.Graph.CurveNode
     jsonData: '{"m_groupId":"2P1261XO","m_id":"TY604X54","m_visualState":{"m_position":{"x":1883.999755859375,"y":-33.20002746582031},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_curve":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.0,"value":0.0,"inSlope":0.0,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":1.0,"value":1.0,"inSlope":1.0156230926513672,"outSlope":1.0156230926513672,"tangentMode":0,"weightedMode":0,"inWeight":0.9870129823684692,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4}}'
     version: 1
@@ -225,7 +217,24 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.LevelsNode
-    jsonData: '{"m_groupId":"","m_id":"TWOG3TNC","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_inLow":0.0,"m_inMid":0.5,"m_inHigh":1.0,"m_outLow":0.2199999988079071,"m_outHigh":0.699999988079071}'
+    jsonData: '{"m_groupId":"","m_id":"SHUUZAFB","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_inLow":0.0,"m_inMid":0.5,"m_inHigh":1.0,"m_outLow":0.2199999988079071,"m_outHigh":0.699999988079071}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.InputNode
+    jsonData: '{"m_groupId":"","m_id":"2XQVQ806","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_outputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":100,\"m_type\":1,\"m_name\":\"\"}","version":1},"m_inputName":"Biome
+      Mask Input","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.SetVariableNode
+    jsonData: '{"m_groupId":"","m_id":"3UVAT1WD","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_inputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":0,\"m_type\":0,\"m_name\":\"\"}","version":1},"m_varName":"BiomeMask","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.GetVariableNode
+    jsonData: '{"m_groupId":"","m_id":"M1GHD2O3","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_outputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":100,\"m_type\":1,\"m_name\":\"\"}","version":1},"m_varName":"BiomeMask","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.LevelsNode
+    jsonData: '{"m_groupId":"","m_id":"YSQPGHQ1","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_inLow":0.6800000071525574,"m_inMid":0.5,"m_inHigh":0.800000011920929,"m_outLow":0.0,"m_outHigh":1.0}'
     version: 1
   m_edgeData:
   - typeInfo:
@@ -275,10 +284,6 @@ MonoBehaviour:
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
     jsonData: '{"m_id":"3N6KSXI7","m_outputSlot":{"m_nodeId":"U6EN1D3R","m_slotId":100},"m_inputSlot":{"m_nodeId":"784574d3-d07b-41c3-9b9c-0550bebf6dd4","m_slotId":1}}'
-    version: 1
-  - typeInfo:
-      fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"BYZCW2HC","m_outputSlot":{"m_nodeId":"K1CXARQY","m_slotId":100},"m_inputSlot":{"m_nodeId":"48102131-41ed-4910-a700-f3bb845586e2","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
@@ -366,14 +371,6 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"CZ04KV1B","m_outputSlot":{"m_nodeId":"9T3579EY","m_slotId":100},"m_inputSlot":{"m_nodeId":"FJ8NBGJR","m_slotId":0}}'
-    version: 1
-  - typeInfo:
-      fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"BKD2XUT7","m_outputSlot":{"m_nodeId":"FJ8NBGJR","m_slotId":101},"m_inputSlot":{"m_nodeId":"TY604X54","m_slotId":0}}'
-    version: 1
-  - typeInfo:
-      fullName: Pinwheel.Vista.Graph.Edge
     jsonData: '{"m_id":"THTYSP7Z","m_outputSlot":{"m_nodeId":"TY604X54","m_slotId":100},"m_inputSlot":{"m_nodeId":"531cfd33-5afe-427a-8e2c-361c9913a05f","m_slotId":0}}'
     version: 1
   - typeInfo:
@@ -383,10 +380,6 @@ MonoBehaviour:
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
     jsonData: '{"m_id":"0NTY8E7K","m_outputSlot":{"m_nodeId":"JIKIUPIV","m_slotId":100},"m_inputSlot":{"m_nodeId":"784574d3-d07b-41c3-9b9c-0550bebf6dd4","m_slotId":4}}'
-    version: 1
-  - typeInfo:
-      fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"PXNEOU54","m_outputSlot":{"m_nodeId":"FJ8NBGJR","m_slotId":100},"m_inputSlot":{"m_nodeId":"db9fb535-6391-481b-8720-015a9027108f","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
@@ -414,15 +407,27 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"19093OT9","m_outputSlot":{"m_nodeId":"U5RO4BPV","m_slotId":100},"m_inputSlot":{"m_nodeId":"9T3579EY","m_slotId":0}}'
+    jsonData: '{"m_id":"0EEFPB8G","m_outputSlot":{"m_nodeId":"db9fb535-6391-481b-8720-015a9027108f","m_slotId":100},"m_inputSlot":{"m_nodeId":"SHUUZAFB","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"53VUGBQH","m_outputSlot":{"m_nodeId":"db9fb535-6391-481b-8720-015a9027108f","m_slotId":100},"m_inputSlot":{"m_nodeId":"TWOG3TNC","m_slotId":0}}'
+    jsonData: '{"m_id":"TI2BNYW6","m_outputSlot":{"m_nodeId":"SHUUZAFB","m_slotId":100},"m_inputSlot":{"m_nodeId":"c3ca7510-6055-4dbe-a13a-14103c6aeca0","m_slotId":0}}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.Edge
-    jsonData: '{"m_id":"QND8UROF","m_outputSlot":{"m_nodeId":"TWOG3TNC","m_slotId":100},"m_inputSlot":{"m_nodeId":"c3ca7510-6055-4dbe-a13a-14103c6aeca0","m_slotId":0}}'
+    jsonData: '{"m_id":"O3D1QTLA","m_outputSlot":{"m_nodeId":"U5RO4BPV","m_slotId":100},"m_inputSlot":{"m_nodeId":"db9fb535-6391-481b-8720-015a9027108f","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"W6Q7GQ7J","m_outputSlot":{"m_nodeId":"2XQVQ806","m_slotId":100},"m_inputSlot":{"m_nodeId":"3UVAT1WD","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"FX98P1GD","m_outputSlot":{"m_nodeId":"M1GHD2O3","m_slotId":100},"m_inputSlot":{"m_nodeId":"YSQPGHQ1","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"7QFO15A5","m_outputSlot":{"m_nodeId":"YSQPGHQ1","m_slotId":100},"m_inputSlot":{"m_nodeId":"48102131-41ed-4910-a700-f3bb845586e2","m_slotId":0}}'
     version: 1
   m_groupData:
   - typeInfo:
@@ -701,36 +706,6 @@ MonoBehaviour:
     m_floatValueRange:
       min: 0.5
       max: 1
-  - m_id:
-      m_nodeId: 9T3579EY
-      m_propertyName: iterationCount
-    m_label: Macro
-    m_description: 
-    m_groupName: Erosion
-    m_enumTypeName: 
-    m_objectTypeName: 
-    m_propertyType: 0
-    m_intValueRange:
-      min: 1
-      max: 1000
-    m_floatValueRange:
-      min: -3.4028235e+38
-      max: 3.4028235e+38
-  - m_id:
-      m_nodeId: FJ8NBGJR
-      m_propertyName: iterationCount
-    m_label: Micro
-    m_description: 
-    m_groupName: Erosion
-    m_enumTypeName: 
-    m_objectTypeName: 
-    m_propertyType: 0
-    m_intValueRange:
-      min: 1
-      max: 500
-    m_floatValueRange:
-      min: -3.4028235e+38
-      max: 3.4028235e+38
   m_debugConfigs:
     m_resolution: 1024
     m_worldBounds:
