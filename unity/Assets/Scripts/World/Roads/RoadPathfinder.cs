@@ -44,10 +44,17 @@ namespace GameDev.World.Roads
             List<Vector2> pathOut,
             out float totalCost,
             Func<float, float, float> heightMetersAtWorld = null,
-            Func<Vector2, Vector2, bool> canBridgeSpan = null)
+            Func<Vector2, Vector2, bool> canBridgeSpan = null,
+            float minCostPerMetre = 1f,
+            RoadSearchLandmarks landmarks = null)
         {
             pathOut.Clear();
             totalCost = 0f;
+
+            // A caller that knows its cost function can go below 1 per metre says so; anything else
+            // keeps the plain-distance heuristic. Clamped because a value above 1 would overestimate
+            // (the defect this parameter exists to fix) and a negative one is meaningless.
+            minCostPerMetre = Mathf.Clamp(minCostPerMetre, 0f, 1f);
 
             if (!grid.TryWorldToCell(startWorld.x, startWorld.y, out var startX, out var startZ) ||
                 !grid.TryWorldToCell(goalWorld.x, goalWorld.y, out var goalX, out var goalZ))
@@ -70,7 +77,7 @@ namespace GameDev.World.Roads
             gScore[startIndex] = 0f;
 
             var open = new BinaryHeap(count);
-            open.Push(startIndex, Heuristic(grid, startX, startZ, goalX, goalZ));
+            open.Push(startIndex, Heuristic(grid, startX, startZ, goalX, goalZ, minCostPerMetre, landmarks));
 
             var found = false;
             while (open.Count > 0)
@@ -118,20 +125,13 @@ namespace GameDev.World.Roads
                     if (float.IsPositiveInfinity(neighborCost))
                     {
                         TryBridge(grid, costAtWorld, canBridgeSpan, cx, cz, dx, dz, currentIndex, currentCenter,
-                            goalX, goalZ, gScore, cameFrom, visited, open);
+                            goalX, goalZ, gScore, cameFrom, visited, open, minCostPerMetre, landmarks);
                         continue;
                     }
 
-                    var stepDistance = dx != 0 && dz != 0 ? grid.CellSize * 1.41421356f : grid.CellSize;
-                    var stepCost = stepDistance * 0.5f * (currentCost + neighborCost);
-
-                    if (heightMetersAtWorld != null)
-                    {
-                        var currentHeight = heightMetersAtWorld(currentCenter.x, currentCenter.y);
-                        var neighborHeight = heightMetersAtWorld(neighborCenter.x, neighborCenter.y);
-                        var grade = (neighborHeight - currentHeight) / stepDistance;
-                        stepCost *= RoadCost.GradeMultiplier(grade);
-                    }
+                    var stepCost = StepCost(
+                        grid, dx, dz, currentCost, neighborCost, currentCenter, neighborCenter,
+                        heightMetersAtWorld);
 
                     var tentative = gScore[currentIndex] + stepCost;
                     if (tentative >= gScore[neighborIndex])
@@ -141,7 +141,7 @@ namespace GameDev.World.Roads
 
                     gScore[neighborIndex] = tentative;
                     cameFrom[neighborIndex] = currentIndex;
-                    open.Push(neighborIndex, tentative + Heuristic(grid, nx, nz, goalX, goalZ));
+                    open.Push(neighborIndex, tentative + Heuristic(grid, nx, nz, goalX, goalZ, minCostPerMetre, landmarks));
                 }
             }
 
@@ -167,14 +167,66 @@ namespace GameDev.World.Roads
             return true;
         }
 
-        // Admissible: BaseCost=1 (flat, unblocked ground) is the cheapest possible per-meter cost
-        // (see RoadCost - every other biome/slope combination, including bridging, costs strictly
-        // more), so plain Euclidean distance never overestimates the true remaining cost.
-        private static float Heuristic(RoadGridSpec grid, int ax, int az, int bx, int bz)
+        /// <summary>Cost of one grid step, and the single place that formula lives.</summary>
+        /// <remarks>
+        /// <see cref="RoadSearchLandmarks"/> measures its distance tables with this same method, so
+        /// the tables and the search can never drift onto two different cost models.
+        /// </remarks>
+        public static float StepCost(
+            RoadGridSpec grid,
+            int dx,
+            int dz,
+            float currentCost,
+            float neighborCost,
+            Vector2 currentCenter,
+            Vector2 neighborCenter,
+            Func<float, float, float> heightMetersAtWorld)
+        {
+            var stepDistance = dx != 0 && dz != 0 ? grid.CellSize * 1.41421356f : grid.CellSize;
+            var stepCost = stepDistance * 0.5f * (currentCost + neighborCost);
+            if (heightMetersAtWorld == null)
+            {
+                return stepCost;
+            }
+
+            var currentHeight = heightMetersAtWorld(currentCenter.x, currentCenter.y);
+            var neighborHeight = heightMetersAtWorld(neighborCenter.x, neighborCenter.y);
+            var grade = (neighborHeight - currentHeight) / stepDistance;
+            return stepCost * RoadCost.GradeMultiplier(grade);
+        }
+
+        // Euclidean distance priced at the cheapest metre the caller's cost function can produce.
+        //
+        // The scale is not decoration. A* is only guaranteed to return the cheapest route when the
+        // heuristic never overestimates the remaining cost, and distance in metres only satisfies
+        // that while no metre costs less than 1. LandscapeCostField breaks exactly that: within
+        // ExistingCorridorHalfWidth of an accepted road it multiplies the (>= 1) terrain cost by
+        // ExistingCorridorDiscount, which production sets to 0.15. Unscaled, the heuristic then
+        // overprices any route that would reuse a corridor, and the search settles for the straight
+        // line instead - measured at up to 46 % above the true optimum on a painted field, and it
+        // defeated the corridor reuse the discount exists to create.
+        //
+        // Scaling by that same floor restores both properties. Admissible: every metre costs at
+        // least minCostPerMetre, so minCostPerMetre * distance can never exceed what remains.
+        // Consistent: for one step, h(a) - h(b) <= minCostPerMetre * |a - b| <= the step's cost,
+        // because per-point cost >= minCostPerMetre and GradeMultiplier only ever multiplies up.
+        // Consistency is the part that matters here - it is why the closed set below stays sound
+        // and no node ever needs reopening.
+        private static float Heuristic(
+            RoadGridSpec grid, int ax, int az, int bx, int bz, float minCostPerMetre,
+            RoadSearchLandmarks landmarks)
         {
             var dx = (ax - bx) * grid.CellSize;
             var dz = (az - bz) * grid.CellSize;
-            return Mathf.Sqrt(dx * dx + dz * dz);
+            var distanceBound = Mathf.Sqrt(dx * dx + dz * dz) * minCostPerMetre;
+            if (landmarks == null)
+            {
+                return distanceBound;
+            }
+
+            // Both bounds are admissible, so the larger of the two is the better admissible one.
+            var landmarkBound = landmarks.LowerBound(grid.Index(ax, az), grid.Index(bx, bz));
+            return landmarkBound > distanceBound ? landmarkBound : distanceBound;
         }
 
         // Scans cell-by-cell from (cx,cz) in direction (dx,dz) - skipping the already-known-
@@ -190,7 +242,9 @@ namespace GameDev.World.Roads
             int cx, int cz, int dx, int dz,
             int currentIndex, Vector2 currentCenter,
             int goalX, int goalZ,
-            float[] gScore, int[] cameFrom, bool[] visited, BinaryHeap open)
+            float[] gScore, int[] cameFrom, bool[] visited, BinaryHeap open,
+            float minCostPerMetre,
+            RoadSearchLandmarks landmarks)
         {
             for (var span = 2; ; span++)
             {
@@ -232,7 +286,7 @@ namespace GameDev.World.Roads
                 {
                     gScore[farIndex] = tentative;
                     cameFrom[farIndex] = currentIndex;
-                    open.Push(farIndex, tentative + Heuristic(grid, fx, fz, goalX, goalZ));
+                    open.Push(farIndex, tentative + Heuristic(grid, fx, fz, goalX, goalZ, minCostPerMetre, landmarks));
                 }
 
                 return;

@@ -269,6 +269,8 @@ namespace GameDev.EditorTools
                 $"    height {minY:F1}..{maxY:F1} m, {100f * aboveSea / (res * res):F1}% above sea " +
                 $"({sea:F0} m)");
 
+            ReportShelfProfile(report, heights, res, size.y, metresPerCell);
+            ReportReachability(report, heights, res, size.y, metresPerCell);
             AppendResidualAnisotropy(report, heights, res, size.y, metresPerCell);
             AppendCurvatureEnergy(report, curveX, curveZ, res, "interior", interior: true);
             AppendCurvatureEnergy(report, curveX, curveZ, res, "seam    ", interior: false);
@@ -280,6 +282,222 @@ namespace GameDev.EditorTools
             {
                 ExportMaps(heights, curveX, curveZ, res, size, tileIndex, terrain.name, outputFolder);
             }
+        }
+
+        /// <summary>Slope bands the dry-land histogram is bucketed into, in degrees.</summary>
+        private static readonly float[] SlopeBands = { 5f, 15f, 30f, 45f, 60f, 90f };
+
+        /// <summary>
+        /// Is the plateau stepped, and how hard are the steps?
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The instrument for the terrace stage. A smooth island puts nearly all of its dry land
+        /// under 15 deg and almost nothing over 45; a terraced one is bimodal - flat treads plus a
+        /// distinct population of risers past 45 deg, which is also the slope a character stops
+        /// being able to walk up. The share in the last two bands is therefore both "are the
+        /// shelves there" and "how much of the island did they cost".
+        /// </para>
+        /// <para>
+        /// The existing quantisation and flat-run lines cannot answer this. They look for
+        /// bit-identical heights, and any erosion pass downstream of a terrace perturbs every cell,
+        /// so a perfectly good staircase reads to them as a continuous surface.
+        /// </para>
+        /// </remarks>
+        private static void ReportShelfProfile(
+            StringBuilder report, float[,] heights, int res, float heightMetres, float metresPerCell)
+        {
+            var sea = WorldScale.SeaLevelMeters;
+            var counts = new int[SlopeBands.Length];
+            var dryCount = 0;
+
+            for (var z = 1; z < res - 1; z++)
+            {
+                for (var x = 1; x < res - 1; x++)
+                {
+                    if (heights[z, x] * heightMetres <= sea)
+                    {
+                        continue;
+                    }
+
+                    dryCount++;
+                    var gx = (heights[z, x + 1] - heights[z, x - 1]) * heightMetres
+                             / (2f * metresPerCell);
+                    var gz = (heights[z + 1, x] - heights[z - 1, x]) * heightMetres
+                             / (2f * metresPerCell);
+                    var degrees = Mathf.Atan(Mathf.Sqrt(gx * gx + gz * gz)) * Mathf.Rad2Deg;
+
+                    for (var b = 0; b < SlopeBands.Length; b++)
+                    {
+                        if (degrees <= SlopeBands[b] || b == SlopeBands.Length - 1)
+                        {
+                            counts[b]++;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (dryCount == 0)
+            {
+                report.AppendLine("    slope bands: <no dry land on this tile>");
+                return;
+            }
+
+            var line = new StringBuilder("    slope bands on dry land:");
+            var low = 0f;
+            for (var b = 0; b < SlopeBands.Length; b++)
+            {
+                line.Append(
+                    $" {low:F0}-{SlopeBands[b]:F0}={100f * counts[b] / dryCount:F1}%");
+                low = SlopeBands[b];
+            }
+
+            var risers = counts[SlopeBands.Length - 1] + counts[SlopeBands.Length - 2];
+            line.Append($" | risers(>45deg)={100f * risers / dryCount:F1}%");
+            report.AppendLine(line.ToString());
+        }
+
+        /// <summary>
+        /// Steepest slope a character can walk up, in degrees.
+        /// </summary>
+        /// <remarks>
+        /// Unity's <c>CharacterController.slopeLimit</c> default, which
+        /// <see cref="GameDev.Player.OverworldPlayerController"/> leaves alone, and the same figure
+        /// a default NavMesh agent bakes with. Not the same threshold as
+        /// <c>RoadCost.MaxWalkableGrade</c> (0.45, i.e. 24 deg), which is about comfortable roads,
+        /// not about whether a person can get up there at all.
+        /// </remarks>
+        private const float WalkableSlopeDegrees = 45f;
+
+        /// <summary>How far above the waterline the flood fill is seeded from.</summary>
+        private const float ShoreBandMetres = 4f;
+
+        /// <summary>
+        /// Can a character actually reach every piece of dry land, walking from the shore?
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Terracing the plateau buys the multi-level island the reference has, and it can just as
+        /// easily buy a shelf ringed by cliffs with no way up - which no screenshot shows and no
+        /// player would forgive. Height range and slope histograms cannot tell those apart: both
+        /// worlds have the same distribution of steep cells. Only connectivity can.
+        /// </para>
+        /// <para>
+        /// A 4-connected flood fill from the shore, crossing an edge only where the rise over one
+        /// cell is inside <see cref="WalkableSlopeDegrees"/>. Diagonals are left out on purpose:
+        /// they are longer, so allowing them would pass slopes a character cannot climb.
+        /// </para>
+        /// <para>
+        /// Per tile, seeded from the shore only, so a shelf whose ramp lies on the neighbouring
+        /// tile reads as unreachable here. That is why the border count is printed next to it - a
+        /// stranded region that touches the tile edge is probably seam truncation, and one that
+        /// does not is a real trap.
+        /// </para>
+        /// </remarks>
+        private static void ReportReachability(
+            StringBuilder report, float[,] heights, int res, float heightMetres, float metresPerCell)
+        {
+            var sea = WorldScale.SeaLevelMeters;
+            var maxRise = metresPerCell * Mathf.Tan(WalkableSlopeDegrees * Mathf.Deg2Rad);
+
+            var dry = new bool[res * res];
+            var reached = new bool[res * res];
+            var queue = new System.Collections.Generic.Queue<int>();
+            var dryCount = 0;
+
+            for (var z = 0; z < res; z++)
+            {
+                for (var x = 0; x < res; x++)
+                {
+                    var i = z * res + x;
+                    var h = heights[z, x] * heightMetres;
+                    if (h <= sea)
+                    {
+                        continue;
+                    }
+
+                    dry[i] = true;
+                    dryCount++;
+                    if (h <= sea + ShoreBandMetres)
+                    {
+                        reached[i] = true;
+                        queue.Enqueue(i);
+                    }
+                }
+            }
+
+            if (dryCount == 0)
+            {
+                report.AppendLine("    reachable: <no dry land on this tile>");
+                return;
+            }
+
+            if (queue.Count == 0)
+            {
+                report.AppendLine(
+                    $"    reachable: <no shore on this tile> ({dryCount} dry cells, all above "
+                    + $"{sea + ShoreBandMetres:F0} m)");
+                return;
+            }
+
+            var reachedCount = queue.Count;
+            while (queue.Count > 0)
+            {
+                var i = queue.Dequeue();
+                var x = i % res;
+                var z = i / res;
+                var h = heights[z, x] * heightMetres;
+
+                for (var dir = 0; dir < 4; dir++)
+                {
+                    var nx = x + (dir == 0 ? 1 : dir == 1 ? -1 : 0);
+                    var nz = z + (dir == 2 ? 1 : dir == 3 ? -1 : 0);
+                    if (nx < 0 || nx >= res || nz < 0 || nz >= res)
+                    {
+                        continue;
+                    }
+
+                    var n = nz * res + nx;
+                    if (!dry[n] || reached[n])
+                    {
+                        continue;
+                    }
+
+                    if (Mathf.Abs(heights[nz, nx] * heightMetres - h) > maxRise)
+                    {
+                        continue;
+                    }
+
+                    reached[n] = true;
+                    reachedCount++;
+                    queue.Enqueue(n);
+                }
+            }
+
+            var stranded = dryCount - reachedCount;
+            var strandedOnBorder = 0;
+            for (var z = 0; z < res; z++)
+            {
+                for (var x = 0; x < res; x++)
+                {
+                    var i = z * res + x;
+                    if (!dry[i] || reached[i])
+                    {
+                        continue;
+                    }
+
+                    if (x == 0 || z == 0 || x == res - 1 || z == res - 1)
+                    {
+                        strandedOnBorder++;
+                    }
+                }
+            }
+
+            report.AppendLine(
+                $"    reachable: {100f * reachedCount / dryCount:F1}% of dry land from the shore "
+                + $"at <={WalkableSlopeDegrees:F0} deg ({stranded} cell(s) stranded, "
+                + $"{strandedOnBorder} of them on the tile border)");
         }
 
         /// <summary>
@@ -672,6 +890,12 @@ namespace GameDev.EditorTools
                 res, outputFolder, $"tile{tileIndex}_{tileName}_height.png",
                 (x, z) => (heights[z, x] - minH) / span);
 
+            // Absolute, not min-max normalised: two bakes are only comparable cell by cell if the
+            // scale does not move under them.
+            WritePng16(
+                res, outputFolder, $"tile{tileIndex}_{tileName}_height16.png",
+                (x, z) => heights[z, x]);
+
             // Curvature is signed: mid grey is flat, so a facet edge reads as a line either way.
             WritePng(
                 res, outputFolder, $"tile{tileIndex}_{tileName}_curvature.png",
@@ -687,6 +911,35 @@ namespace GameDev.EditorTools
                     var gz = (heights[zi + 1, xi] - heights[zi - 1, xi]) * size.y / (2f * metresPerCell);
                     return Mathf.Atan(Mathf.Sqrt(gx * gx + gz * gz)) * Mathf.Rad2Deg / 90f;
                 });
+        }
+
+        /// <summary>Height at 16 bits, packed R = high byte, G = low byte.</summary>
+        /// <remarks>
+        /// Additive: the 8-bit dumps beside it keep their encoding, so the images in
+        /// Assets/Plans/VistaReferenceBaseline stay comparable. It exists because the 8-bit height
+        /// dump quantises to about 0.48 m per level on this island, which is coarser than several
+        /// of the things worth measuring - the overrange knee compresses 2.2 m into roughly 0.5 m,
+        /// and at 8 bits that whole feature is one level wide and unreadable.
+        /// </remarks>
+        private static void WritePng16(
+            int res, string outputFolder, string fileName, System.Func<int, int, float> sample)
+        {
+            var texture = new Texture2D(res, res, TextureFormat.RGB24, mipChain: false);
+            var pixels = new Color32[res * res];
+            for (var z = 0; z < res; z++)
+            {
+                for (var x = 0; x < res; x++)
+                {
+                    var v = Mathf.Clamp(Mathf.RoundToInt(sample(x, z) * 65535f), 0, 65535);
+                    pixels[z * res + x] = new Color32((byte)(v >> 8), (byte)(v & 0xFF), 0, 255);
+                }
+            }
+
+            texture.SetPixels32(pixels);
+            texture.Apply(updateMipmaps: false);
+            System.IO.File.WriteAllBytes(
+                System.IO.Path.Combine(outputFolder, fileName), texture.EncodeToPNG());
+            Object.DestroyImmediate(texture);
         }
 
         private static void WritePng(

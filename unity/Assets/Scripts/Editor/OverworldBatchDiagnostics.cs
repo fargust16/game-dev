@@ -179,8 +179,11 @@ namespace GameDev.EditorTools
                         "before using this world for anything.");
                 }
 
+                VistaExecutionProbe.Attach("IslandPlateau");
                 IslandPlateauGraphBuilder.Rebuild();
                 MountainMassifGraphBuilder.Rebuild();
+                ShelfPlateauGraphBuilder.Rebuild();
+                SoftFalloffMaskGraphBuilder.RebuildShelf();
             }
 
             OverworldTerrainMenu.OpenOrCreateScene();

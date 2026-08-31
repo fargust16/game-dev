@@ -71,6 +71,14 @@ namespace GameDev.World.Terrain
                 return all;
             }
 
+            // FindObjectsByType returns scene order, which is not guaranteed to be stable between
+            // runs. The terrain itself never depended on it - five identical bakes produced
+            // byte-identical heightmaps - but the diagnostic tile index did, so the tileN_ prefix
+            // on a dump named a different tile from one bake to the next. Comparing two bakes by
+            // that prefix therefore compared two different tiles, which is what produced the
+            // "same seed, 93.3 % then 99.8 %" reading: those were tiles 0_1 and 1_0, not one tile
+            // changing. Sorting by name makes every caller's ordering reproducible.
+            list.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
             return list.ToArray();
         }
 

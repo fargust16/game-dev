@@ -45,9 +45,33 @@ namespace GameDev.World.Roads.Tests
             var steepMeadow = RoadCost.Evaluate(BiomeId.Meadow, 0.95f, isSubmerged: false);
             var steepHighland = RoadCost.Evaluate(BiomeId.Highland, 0.95f, isSubmerged: false);
 
-            Assert.Greater(mountainFlat, steepMeadow * 0.5f);
-            Assert.IsTrue(RoadCost.IsHardObstacleCost(mountainFlat));
+            // Skirting is a price signal, not a rule: a mountain has to out-cost the worst
+            // non-mountain ground so the search takes a detour whenever one exists.
+            Assert.Greater(mountainFlat, steepMeadow);
+            Assert.Greater(mountainFlat, steepHighland);
             Assert.Greater(steepHighland, RoadCost.BaseCost);
+
+            // And it stays a price. Mountains are traversable terrain; only water, earthwork past
+            // the limits and grade at or above MaxWalkableGrade refuse a route outright.
+            Assert.IsFalse(
+                float.IsPositiveInfinity(mountainFlat),
+                "a mountain is expensive to cross, never impassable");
+            Assert.IsTrue(
+                float.IsPositiveInfinity(RoadCost.GradeMultiplier(RoadCost.MaxWalkableGrade)),
+                "grade is what actually blocks a route");
+        }
+
+        [Test]
+        public void IsHardObstacleCost_FlagsMountainForTheSmoother_WhileItStaysTraversable()
+        {
+            // Two different questions about the same cell, and they are allowed to disagree.
+            // IsHardObstacleCost answers "may smoothing move a road onto this ground", which is no
+            // for a mountain. Whether the planner may route there is answered by the cost being
+            // finite, which it is.
+            var mountainFlat = RoadCost.Evaluate(BiomeId.Mountain, 0f, isSubmerged: false);
+
+            Assert.IsTrue(RoadCost.IsHardObstacleCost(mountainFlat));
+            Assert.IsFalse(float.IsPositiveInfinity(mountainFlat));
         }
 
         [Test]

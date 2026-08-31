@@ -29,7 +29,7 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.TextureOutputNode
-    jsonData: '{"m_groupId":"","m_id":"2dc562cf-23f6-4614-9b74-679423674a8b","m_visualState":{"m_position":{"x":1915.998779296875,"y":657.399658203125},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_order":0}'
+    jsonData: '{"m_groupId":"","m_id":"2dc562cf-23f6-4614-9b74-679423674a8b","m_visualState":{"m_position":{"x":1915.998779296875,"y":657.399658203125},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_order":4}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.GetVariableNode
@@ -58,7 +58,7 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.TextureOutputNode
-    jsonData: '{"m_groupId":"","m_id":"7f2479e9-8bce-43db-804b-b72ecd240348","m_visualState":{"m_position":{"x":1915.998291015625,"y":857.3994750976563},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_order":0}'
+    jsonData: '{"m_groupId":"","m_id":"7f2479e9-8bce-43db-804b-b72ecd240348","m_visualState":{"m_position":{"x":1915.998291015625,"y":857.3994750976563},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_order":2}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.SetVariableNode
@@ -106,7 +106,7 @@ MonoBehaviour:
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.TextureOutputNode
-    jsonData: '{"m_groupId":"","m_id":"CVRJA7UQ","m_visualState":{"m_position":{"x":1915.9998779296875,"y":1454.400634765625},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_order":0}'
+    jsonData: '{"m_groupId":"","m_id":"CVRJA7UQ","m_visualState":{"m_position":{"x":1915.9998779296875,"y":1454.400634765625},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_order":3}'
     version: 1
   - typeInfo:
       fullName: Pinwheel.Vista.Graph.GetVariableNode
@@ -499,17 +499,17 @@ MonoBehaviour:
   m_stickyImageData: []
   m_objectReferences:
   - m_key: 2dc562cf-23f6-4614-9b74-679423674a8b.m_terrainLayer
-    m_target: {fileID: 8574412962073106934, guid: 237f42e8fe5acba4e877b4759b71fb02, type: 2}
+    m_target: {fileID: 8574412962073106934, guid: bb6512df7658cb24dbcce4d67173ade9, type: 2}
   - m_key: 80d3a0a9-75d1-4c36-a5b7-6b8c49e23bcf.m_terrainLayer
-    m_target: {fileID: 8574412962073106934, guid: 62067b147cf46c04f9063a3ed57c1cd8, type: 2}
+    m_target: {fileID: 8574412962073106934, guid: fbcb7689ac19e734b9c6a1176cd83def, type: 2}
   - m_key: 7f2479e9-8bce-43db-804b-b72ecd240348.m_terrainLayer
-    m_target: {fileID: 8574412962073106934, guid: 6c1f4d62653c6814e9c0db45e6aef5ea, type: 2}
+    m_target: {fileID: 8574412962073106934, guid: a7cfc60b7ed05a74ca480f33407e4ac1, type: 2}
   - m_key: 7a62158c-279c-4864-adbb-8ca6338a7abe.m_treeTemplate
     m_target: {fileID: 11400000, guid: 8d40d8300cb96a94eb9a3f93031fb2b1, type: 2}
   - m_key: CVRJA7UQ.m_terrainLayer
-    m_target: {fileID: 8574412962073106934, guid: ba427773956c3364f8cd25ed51a85a77, type: 2}
+    m_target: {fileID: 8574412962073106934, guid: 50ef70961e323514ab6c2f0132bbc427, type: 2}
   - m_key: 1CFJB7LV.m_terrainLayer
-    m_target: {fileID: 8574412962073106934, guid: c10a83caf3976434ab8cb28c4c9d00bc, type: 2}
+    m_target: {fileID: 8574412962073106934, guid: fbcb7689ac19e734b9c6a1176cd83def, type: 2}
   m_exposedProperties:
   - m_id:
       m_nodeId: 2dc562cf-23f6-4614-9b74-679423674a8b

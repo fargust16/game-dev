@@ -46,6 +46,49 @@ namespace GameDev.World.Roads
         private const int MaxRepairAttemptsPerRound = 20;
         private const float JunctionSampleStepMeters = 20f;
 
+        /// <summary>
+        /// ALT bounds for this run, or null when the caller only handed over a cost delegate and
+        /// there is no field to measure.
+        /// </summary>
+        /// <remarks>
+        /// Created per call rather than cached anywhere static: the table belongs to one field and
+        /// one grid, and outliving either of them is exactly the bug worth designing out.
+        /// </remarks>
+        private static RoadSearchLandmarks Landmarks(
+            RoadGridSpec grid, LandscapeCostField costField, Func<float, float, float> heightMetersAtWorld)
+        {
+            return costField != null ? new RoadSearchLandmarks(grid, costField, heightMetersAtWorld) : null;
+        }
+
+        /// <summary>
+        /// The cheapest metre <paramref name="costField"/> can charge, which is what
+        /// <see cref="RoadPathfinder"/> needs to keep its heuristic from overestimating.
+        /// </summary>
+        /// <remarks>
+        /// The terrain term of <c>LandscapeCostField.Evaluate</c> is <c>1 + non-negative</c>, so the
+        /// only thing that can price a metre below 1 is the existing-corridor discount, and it
+        /// bottoms out at exactly <c>ExistingCorridorDiscount</c>. Read live rather than copied:
+        /// <c>ApplyRoadSettings</c> derives that value from <c>ParallelRoadPenalty</c>, so a cached
+        /// constant would drift away from the field the search is actually walking. Callers that
+        /// hand in a bare cost delegate get 1, which is the historical behaviour.
+        /// </remarks>
+        /// <summary>What the smoother must ask about the ground, as opposed to what A* prices.</summary>
+        /// <remarks>
+        /// RoadPathSimplifier uses its cost delegate for exactly one thing - SegmentClear and
+        /// IsHardObstacleCost - so what it needs is a passability oracle, not a construction cost.
+        /// Handing it the A* delegate let ExistingCorridorDiscount decide passability: a mountain
+        /// beside an accepted road priced at 0.15x and stopped reading as an obstacle, which made
+        /// obstacle status depend on which roads Prim happened to accept first. Falls back to the
+        /// caller's delegate when there is no cost field - the Func-only overloads and the tests
+        /// pass cost functions that have no discount to strip.
+        /// </remarks>
+        private static Func<float, float, float> Passability(
+            LandscapeCostField costField, Func<float, float, float> costAtWorld) =>
+            costField == null ? costAtWorld : (x, z) => costField.TerrainCostAtTerrain(x, z);
+
+        private static float MinCostPerMetre(LandscapeCostField costField) =>
+            costField != null ? Mathf.Clamp(costField.ExistingCorridorDiscount, 0f, 1f) : 1f;
+
         public static List<RoadSegment> BuildNetwork(
             IReadOnlyList<Vector2> nodes,
             RoadGridSpec grid,
@@ -53,7 +96,9 @@ namespace GameDev.World.Roads
             Func<float, float, float> heightMetersAtWorld = null,
             Func<Vector2, Vector2, bool> canBridgeSpan = null)
         {
-            return BuildMst(nodes, grid, costAtWorld, heightMetersAtWorld, RoadTier.Primary, canBridgeSpan);
+            return BuildMst(
+                nodes, grid, costAtWorld, heightMetersAtWorld, RoadTier.Primary, canBridgeSpan, 1f,
+                landmarks: null, passabilityAtWorld: costAtWorld);
         }
 
         /// <param name="isHub">Per-node hub flag (true = TownApproach). Non-hubs become Secondary.</param>
@@ -97,10 +142,15 @@ namespace GameDev.World.Roads
             LandscapeCostField costField)
         {
             var segments = new List<RoadSegment>();
+            var minCostPerMetre = MinCostPerMetre(costField);
+            var landmarks = Landmarks(grid, costField, heightMetersAtWorld);
+            var passabilityAtWorld = Passability(costField, costAtWorld);
             var n = nodes.Count;
             if (n < 2 || isHub == null || isHub.Count != n)
             {
-                return BuildNetwork(nodes, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan);
+                return BuildMst(
+                    nodes, grid, costAtWorld, heightMetersAtWorld, RoadTier.Primary, canBridgeSpan,
+                    minCostPerMetre, landmarks, passabilityAtWorld);
             }
 
             var hubs = new List<int>();
@@ -116,11 +166,13 @@ namespace GameDev.World.Roads
             {
                 GrowPrimNetwork(
                     hubs, nodes, segments, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan,
-                    costField, RoadTier.Primary);
+                    costField, RoadTier.Primary, minCostPerMetre, landmarks);
             }
             else if (hubs.Count == 0)
             {
-                return BuildNetwork(nodes, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan);
+                return BuildMst(
+                    nodes, grid, costAtWorld, heightMetersAtWorld, RoadTier.Primary, canBridgeSpan,
+                    minCostPerMetre, landmarks, passabilityAtWorld);
             }
 
             for (var i = 0; i < n; i++)
@@ -130,9 +182,11 @@ namespace GameDev.World.Roads
                     continue;
                 }
 
+                landmarks?.EnsureFresh();
                 if (!TryAttachToNetwork(
                         nodes[i], i, segments, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan,
-                        RoadTier.Secondary, acceptAnyTier: true, out var branch))
+                        RoadTier.Secondary, acceptAnyTier: true, minCostPerMetre, landmarks,
+                        passabilityAtWorld, out var branch))
                 {
                     continue;
                 }
@@ -163,6 +217,9 @@ namespace GameDev.World.Roads
                 return;
             }
 
+            var minCostPerMetre = MinCostPerMetre(costField);
+            var landmarks = Landmarks(grid, costField, heightMetersAtWorld);
+            var passabilityAtWorld = Passability(costField, costAtWorld);
             var degree = new int[nodes.Count];
             for (var i = 0; i < segments.Count; i++)
             {
@@ -186,9 +243,11 @@ namespace GameDev.World.Roads
                     continue;
                 }
 
+                landmarks?.EnsureFresh();
                 if (TryAttachToNetwork(
                         nodes[i], i, segments, grid, costAtWorld, heightMetersAtWorld, canBridgeSpan,
-                        RoadTier.Secondary, acceptAnyTier: true, out var branch))
+                        RoadTier.Secondary, acceptAnyTier: true, minCostPerMetre, landmarks,
+                        passabilityAtWorld, out var branch))
                 {
                     segments.Add(branch);
                     degree[i]++;
@@ -209,7 +268,7 @@ namespace GameDev.World.Roads
                     var path = new List<Vector2>();
                     if (!RoadPathfinder.TryFindPath(
                             grid, costAtWorld, nodes[i], nodes[j], path, out var cost,
-                            heightMetersAtWorld, canBridgeSpan))
+                            heightMetersAtWorld, canBridgeSpan, minCostPerMetre, landmarks))
                     {
                         continue;
                     }
@@ -225,7 +284,7 @@ namespace GameDev.World.Roads
                 if (bestPath != null && bestJ >= 0)
                 {
                     var seg = new RoadSegment(
-                        i, bestJ, FinalizePath(bestPath, costAtWorld, grid.CellSize), RoadTier.Secondary);
+                        i, bestJ, FinalizePath(bestPath, passabilityAtWorld, grid.CellSize), RoadTier.Secondary);
                     segments.Add(seg);
                     degree[i]++;
                     Paint(costField, seg.Points);
@@ -242,8 +301,11 @@ namespace GameDev.World.Roads
             Func<float, float, float> heightMetersAtWorld,
             Func<Vector2, Vector2, bool> canBridgeSpan,
             LandscapeCostField costField,
-            RoadTier tier)
+            RoadTier tier,
+            float minCostPerMetre,
+            RoadSearchLandmarks landmarks)
         {
+            var passabilityAtWorld = Passability(costField, costAtWorld);
             var connected = new HashSet<int> { hubs[0] };
             var remaining = new HashSet<int>();
             for (var i = 1; i < hubs.Count; i++)
@@ -253,6 +315,9 @@ namespace GameDev.World.Roads
 
             while (remaining.Count > 0)
             {
+                // Each accepted hub repaints the field, so the tables have to catch up before the
+                // next round of searches reads them.
+                landmarks?.EnsureFresh();
                 var bestCost = float.PositiveInfinity;
                 var bestHub = -1;
                 RoadSegment bestSeg = default;
@@ -264,13 +329,15 @@ namespace GameDev.World.Roads
                     if (segments.Count > 0 &&
                         TryAttachToNetwork(
                             nodes[hub], hub, segments, grid, costAtWorld, heightMetersAtWorld,
-                            canBridgeSpan, tier, acceptAnyTier: false, out var snapSeg))
+                            canBridgeSpan, tier, acceptAnyTier: false, minCostPerMetre, landmarks,
+                            passabilityAtWorld, out var snapSeg))
                     {
                         var snapCost = EstimatePathCost(snapSeg.Points, costAtWorld);
                         // Also compare a direct route to the nearest connected hub.
                         var directOk = TryBestHubLink(
                             hub, connected, nodes, grid, costAtWorld, heightMetersAtWorld,
-                            canBridgeSpan, tier, out var directSeg, out var directCost);
+                            canBridgeSpan, tier, minCostPerMetre, landmarks, passabilityAtWorld,
+                            out var directSeg, out var directCost);
 
                         var useSnap = true;
                         if (directOk)
@@ -305,7 +372,8 @@ namespace GameDev.World.Roads
 
                     if (TryBestHubLink(
                             hub, connected, nodes, grid, costAtWorld, heightMetersAtWorld,
-                            canBridgeSpan, tier, out var linkSeg, out var linkCost) &&
+                            canBridgeSpan, tier, minCostPerMetre, landmarks, passabilityAtWorld,
+                            out var linkSeg, out var linkCost) &&
                         linkCost < bestCost)
                     {
                         bestCost = linkCost;
@@ -336,6 +404,9 @@ namespace GameDev.World.Roads
             Func<float, float, float> heightMetersAtWorld,
             Func<Vector2, Vector2, bool> canBridgeSpan,
             RoadTier tier,
+            float minCostPerMetre,
+            RoadSearchLandmarks landmarks,
+            Func<float, float, float> passabilityAtWorld,
             out RoadSegment segment,
             out float cost)
         {
@@ -349,7 +420,7 @@ namespace GameDev.World.Roads
                 var path = new List<Vector2>();
                 if (!RoadPathfinder.TryFindPath(
                         grid, costAtWorld, nodes[hub], nodes[other], path, out var c,
-                        heightMetersAtWorld, canBridgeSpan))
+                        heightMetersAtWorld, canBridgeSpan, minCostPerMetre, landmarks))
                 {
                     continue;
                 }
@@ -368,7 +439,7 @@ namespace GameDev.World.Roads
             }
 
             segment = new RoadSegment(
-                hub, bestOther, FinalizePath(bestPath, costAtWorld, grid.CellSize), tier);
+                hub, bestOther, FinalizePath(bestPath, passabilityAtWorld, grid.CellSize), tier);
             return true;
         }
 
@@ -385,6 +456,9 @@ namespace GameDev.World.Roads
             Func<Vector2, Vector2, bool> canBridgeSpan,
             RoadTier tier,
             bool acceptAnyTier,
+            float minCostPerMetre,
+            RoadSearchLandmarks landmarks,
+            Func<float, float, float> passabilityAtWorld,
             out RoadSegment segment)
         {
             segment = default;
@@ -392,6 +466,18 @@ namespace GameDev.World.Roads
             List<Vector2> bestPath = null;
             var bestJunction = poi;
             var bestAnchor = branchIndex;
+
+            // Junction samples are taken every JunctionSampleStepMeters along the accepted
+            // polylines, which is finer than the search grid, so roughly a third of them land in a
+            // cell some earlier sample already asked about. Repeating the search for those is pure
+            // waste: RoadPathfinder.TryFindPath reads goalWorld only through
+            // RoadGridSpec.TryWorldToCell and works from the cell index afterwards, so two samples
+            // in one cell get the same cost and the same path, to the bit.
+            //
+            // The table is deliberately local to this call. PaintExistingRoad rewrites the cost
+            // field's corridor distances between attachments, so an entry carried across one would
+            // answer with a route priced against a network that no longer exists.
+            var pathByGoalCell = new Dictionary<long, (bool Found, float Cost, List<Vector2> Path)>();
 
             for (var s = 0; s < network.Count; s++)
             {
@@ -409,9 +495,9 @@ namespace GameDev.World.Roads
                 foreach (var sample in SamplePolyline(seg.Points, JunctionSampleStepMeters))
                 {
                     var path = new List<Vector2>();
-                    if (!RoadPathfinder.TryFindPath(
+                    if (!TryFindPathToGoalCell(
                             grid, costAtWorld, poi, sample, path, out var cost,
-                            heightMetersAtWorld, canBridgeSpan))
+                            heightMetersAtWorld, canBridgeSpan, minCostPerMetre, landmarks, pathByGoalCell))
                     {
                         continue;
                     }
@@ -442,9 +528,66 @@ namespace GameDev.World.Roads
             segment = new RoadSegment(
                 branchIndex,
                 bestAnchor,
-                FinalizePath(bestPath, costAtWorld, grid.CellSize),
+                FinalizePath(bestPath, passabilityAtWorld, grid.CellSize),
                 tier);
             return true;
+        }
+
+        /// <summary>
+        /// <see cref="RoadPathfinder.TryFindPath"/>, answered from <paramref name="cache"/> when an
+        /// earlier goal fell in the same grid cell.
+        /// </summary>
+        /// <remarks>
+        /// Exact, not approximate. <c>TryFindPath</c> consumes <c>goalWorld</c> only to derive
+        /// <c>(goalX, goalZ)</c> via <see cref="RoadGridSpec.TryWorldToCell"/>; the heuristic, the
+        /// goal test and the reconstructed path are all expressed in cell indices and cell centres
+        /// afterwards. With the start point and the cost field both fixed for the duration of one
+        /// attachment, the cell pair determines the result completely.
+        /// <para>
+        /// The caller keeps its own list, and the cache keeps a private copy, so nothing here
+        /// aliases the polyline the caller may later trim to the junction point.
+        /// </para>
+        /// </remarks>
+        private static bool TryFindPathToGoalCell(
+            RoadGridSpec grid,
+            Func<float, float, float> costAtWorld,
+            Vector2 poi,
+            Vector2 sample,
+            List<Vector2> path,
+            out float cost,
+            Func<float, float, float> heightMetersAtWorld,
+            Func<Vector2, Vector2, bool> canBridgeSpan,
+            float minCostPerMetre,
+            RoadSearchLandmarks landmarks,
+            Dictionary<long, (bool Found, float Cost, List<Vector2> Path)> cache)
+        {
+            if (!grid.TryWorldToCell(sample.x, sample.y, out var cellX, out var cellZ))
+            {
+                // Off the grid: TryFindPath refuses it anyway, and there is no cell to key on.
+                return RoadPathfinder.TryFindPath(
+                    grid, costAtWorld, poi, sample, path, out cost, heightMetersAtWorld, canBridgeSpan,
+                    minCostPerMetre, landmarks);
+            }
+
+            var key = ((long)cellZ << 32) | (uint)cellX;
+            if (cache.TryGetValue(key, out var cached))
+            {
+                cost = cached.Cost;
+                path.Clear();
+                if (!cached.Found)
+                {
+                    return false;
+                }
+
+                path.AddRange(cached.Path);
+                return true;
+            }
+
+            var found = RoadPathfinder.TryFindPath(
+                grid, costAtWorld, poi, sample, path, out cost, heightMetersAtWorld, canBridgeSpan,
+                minCostPerMetre, landmarks);
+            cache[key] = (found, cost, new List<Vector2>(path));
+            return found;
         }
 
         private static IEnumerable<Vector2> SamplePolyline(IReadOnlyList<Vector2> points, float stepMeters)
@@ -506,7 +649,10 @@ namespace GameDev.World.Roads
             Func<float, float, float> costAtWorld,
             Func<float, float, float> heightMetersAtWorld,
             RoadTier tier,
-            Func<Vector2, Vector2, bool> canBridgeSpan = null)
+            Func<Vector2, Vector2, bool> canBridgeSpan,
+            float minCostPerMetre,
+            RoadSearchLandmarks landmarks,
+            Func<float, float, float> passabilityAtWorld)
         {
             var segments = new List<RoadSegment>();
             var n = nodes.Count;
@@ -523,7 +669,7 @@ namespace GameDev.World.Roads
                 var path = new List<Vector2>();
                 if (RoadPathfinder.TryFindPath(
                         grid, costAtWorld, nodes[a], nodes[b], path, out var cost,
-                        heightMetersAtWorld, canBridgeSpan))
+                        heightMetersAtWorld, canBridgeSpan, minCostPerMetre, landmarks))
                 {
                     weighted.Add((cost, a, b, path));
                 }
@@ -540,11 +686,12 @@ namespace GameDev.World.Roads
 
                 union.Union(edge.A, edge.B);
                 segments.Add(new RoadSegment(
-                    edge.A, edge.B, FinalizePath(edge.Path, costAtWorld, grid.CellSize), tier));
+                    edge.A, edge.B, FinalizePath(edge.Path, passabilityAtWorld, grid.CellSize), tier));
             }
 
             RepairDisconnectedComponents(
-                nodes, grid, costAtWorld, heightMetersAtWorld, union, segments, tier, canBridgeSpan);
+                nodes, grid, costAtWorld, heightMetersAtWorld, union, segments, tier, canBridgeSpan,
+                minCostPerMetre, landmarks, passabilityAtWorld);
 
             return segments;
         }
@@ -588,10 +735,14 @@ namespace GameDev.World.Roads
             UnionFind union,
             List<RoadSegment> segments,
             RoadTier tier,
-            Func<Vector2, Vector2, bool> canBridgeSpan)
+            Func<Vector2, Vector2, bool> canBridgeSpan,
+            float minCostPerMetre,
+            RoadSearchLandmarks landmarks,
+            Func<float, float, float> passabilityAtWorld)
         {
             while (TryMergeOneComponent(
-                       nodes, grid, costAtWorld, heightMetersAtWorld, union, segments, tier, canBridgeSpan))
+                       nodes, grid, costAtWorld, heightMetersAtWorld, union, segments, tier, canBridgeSpan,
+                       minCostPerMetre, landmarks, passabilityAtWorld))
             {
             }
         }
@@ -604,7 +755,10 @@ namespace GameDev.World.Roads
             UnionFind union,
             List<RoadSegment> segments,
             RoadTier tier,
-            Func<Vector2, Vector2, bool> canBridgeSpan)
+            Func<Vector2, Vector2, bool> canBridgeSpan,
+            float minCostPerMetre,
+            RoadSearchLandmarks landmarks,
+            Func<float, float, float> passabilityAtWorld)
         {
             var n = nodes.Count;
             var groups = new Dictionary<int, List<int>>();
@@ -655,14 +809,14 @@ namespace GameDev.World.Roads
                 var path = new List<Vector2>();
                 if (!RoadPathfinder.TryFindPath(
                         grid, costAtWorld, nodes[candidate.A], nodes[candidate.B], path, out _,
-                        heightMetersAtWorld, canBridgeSpan))
+                        heightMetersAtWorld, canBridgeSpan, minCostPerMetre, landmarks))
                 {
                     continue;
                 }
 
                 union.Union(candidate.A, candidate.B);
                 segments.Add(new RoadSegment(
-                    candidate.A, candidate.B, FinalizePath(path, costAtWorld, grid.CellSize), tier));
+                    candidate.A, candidate.B, FinalizePath(path, passabilityAtWorld, grid.CellSize), tier));
                 return true;
             }
 

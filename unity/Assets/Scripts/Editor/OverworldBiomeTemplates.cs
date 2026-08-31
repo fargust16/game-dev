@@ -32,6 +32,30 @@ namespace GameDev.EditorTools
         public const string MountainTemplatePath = TemplatesFolder + "/Mountain_BiomeTemplate.asset";
         public const string MountainPrefabPath = TemplatesFolder + "/LPB_Mountain.prefab";
 
+        /// <summary>
+        /// The relief tiers from <c>Assets/Plans/WORLD_RELIEF_PRINCIPLES.md</c>, one prefab each.
+        /// </summary>
+        /// <remarks>
+        /// Separate prefabs rather than one prefab with a height the bake overwrites, for two
+        /// reasons that happen to agree. The engine one: <c>OverworldLpbBake</c> may write only
+        /// seed, XZ and the anchor silhouette - height, area and falloff belong to the prefab, so
+        /// per-instance height has to come from per-instance templates. The design one: the relief
+        /// rules call for a small fixed set of archetypes with the seed choosing which goes where,
+        /// not a continuous random height range, because that is what keeps the chaos controlled
+        /// and stops the island becoming a staircase.
+        /// </remarks>
+        public enum ShelfArchetype
+        {
+            /// <summary>T3 outcrop: a rock you walk around, not up.</summary>
+            Outcrop,
+
+            /// <summary>T2 shelf: the common step, big enough to stand a camp on.</summary>
+            Shelf,
+
+            /// <summary>T2 plateau: the large one, a district in its own right.</summary>
+            Plateau,
+        }
+
         /// <summary>Height/area/order seeds written when a template prefab is first created.</summary>
         /// <remarks>
         /// These are the values a fresh prefab starts at, not the values the world runs at. After
@@ -58,6 +82,39 @@ namespace GameDev.EditorTools
         /// </summary>
         private const float SeaFloorInitialWorldHeightMeters = 20f;
 
+        /// <summary>Height, footprint and falloff per shelf archetype, in metres.</summary>
+        /// <remarks>
+        /// The falloff is the cliff. A shelf's canvas covers <c>area + 2 x falloff</c> at 512 px, so
+        /// the Outcrop resolves at 126 m / 512 = 0.25 m/px and the Plateau at 476 m / 512 =
+        /// 0.93 m/px. The graph then squeezes the height transition into roughly a third of the
+        /// falloff width, which puts the Plateau's 32 m drop across ~16 m of ground - 63 degrees.
+        /// Widening the falloff softens the cliff; narrowing it past the canvas cell aliases the
+        /// rim into a staircase.
+        /// <para>
+        /// Heights keep the tiers 2.5x apart: 9 m against 20 m and 32 m. Nothing sits between them,
+        /// which is the rule that stops the shapes reading as one muddy scale.
+        /// </para>
+        /// </remarks>
+        private static (float height, float extent, float falloff) ShelfSpec(ShelfArchetype a)
+        {
+            switch (a)
+            {
+                case ShelfArchetype.Outcrop: return (9f, 90f, 18f);
+                case ShelfArchetype.Plateau: return (32f, 380f, 48f);
+                default: return (20f, 220f, 34f);
+            }
+        }
+
+        /// <summary>Half the authored footprint of a shelf archetype, in metres.</summary>
+        /// <remarks>
+        /// Read from the same table the prefab is built from, so placement cannot drift away from
+        /// the geometry. Asking a spawned biome instead means spawning it before knowing whether
+        /// there is room for it, and un-spawning a Vista biome is not a thing you want to do: its
+        /// root is shared with the manager.
+        /// </remarks>
+        public static float ShelfHalfExtent(ShelfArchetype archetype) =>
+            ShelfSpec(archetype).extent * 0.5f;
+
         private const float MountainInitialWorldHeightMeters = 530f;
         private const float MountainInitialMajorAxisMeters = 1050f;
         private const float MountainInitialMinorAxisMeters = 450f;
@@ -70,6 +127,9 @@ namespace GameDev.EditorTools
 
         /// <summary>Geology → hydrology → ecology order band: the plateau sits on the seabed.</summary>
         public const int OrderIslandBase = 10;
+
+        /// <summary>Shelves raise the island floor; the massif still raises over them.</summary>
+        public const int OrderShelf = 15;
 
         /// <summary>Massifs raise the plateau, so they sit above it in the blend order.</summary>
         public const int OrderMountainBase = 20;
@@ -106,10 +166,22 @@ namespace GameDev.EditorTools
                 MountainMassifGraphBuilder.Rebuild();
             }
 
+            if (AssetDatabase.LoadAssetAtPath<TerrainGraph>(
+                    ShelfPlateauGraphBuilder.GraphAssetPath) == null)
+            {
+                ShelfPlateauGraphBuilder.Rebuild();
+            }
+
             if (AssetDatabase.LoadAssetAtPath<BiomeMaskGraph>(
                     SoftFalloffMaskGraphBuilder.GraphAssetPath) == null)
             {
                 SoftFalloffMaskGraphBuilder.Rebuild();
+            }
+
+            if (AssetDatabase.LoadAssetAtPath<BiomeMaskGraph>(
+                    SoftFalloffMaskGraphBuilder.ShelfGraphAssetPath) == null)
+            {
+                SoftFalloffMaskGraphBuilder.RebuildShelf();
             }
 
             VistaVegetationTemplates.CreateIfMissingMenu();
@@ -123,6 +195,16 @@ namespace GameDev.EditorTools
             var seaFloor = EnsureSeaFloorTemplate();
             var island = EnsureIslandTemplate();
             var mountain = EnsureMountainTemplate();
+            var shelves = 0;
+            foreach (ShelfArchetype archetype in System.Enum.GetValues(typeof(ShelfArchetype)))
+            {
+                if (EnsureShelfTemplate(archetype) != null)
+                {
+                    shelves++;
+                }
+            }
+
+            Debug.Log($"[Overworld] {shelves} shelf archetype template(s) ready.");
             Debug.Log(
                 $"[Overworld] Biome templates ready: seaFloor={(seaFloor != null ? seaFloor.name : "FAILED")} " +
                 $"island={(island != null ? island.name : "FAILED")} " +
@@ -308,6 +390,67 @@ namespace GameDev.EditorTools
                     MountainInitialMajorAxisMeters, MountainInitialMinorAxisMeters);
 
                 return SavePrefabAndTemplate(go, MountainPrefabPath, MountainTemplatePath);
+            }
+            finally
+            {
+                Object.DestroyImmediate(go);
+            }
+        }
+
+        public static string ShelfTemplatePath(ShelfArchetype a) =>
+            $"{TemplatesFolder}/Shelf{a}_BiomeTemplate.asset";
+
+        public static string ShelfPrefabPath(ShelfArchetype a) =>
+            $"{TemplatesFolder}/LPB_Shelf{a}.prefab";
+
+        /// <summary>Loads one shelf archetype's template, creating it from the table when absent.</summary>
+        public static BiomeTemplate EnsureShelfTemplate(ShelfArchetype archetype)
+        {
+            var templatePath = ShelfTemplatePath(archetype);
+            var existing = AssetDatabase.LoadAssetAtPath<BiomeTemplate>(templatePath);
+            if (existing != null && existing.IsValid(out _))
+            {
+                RepairGraphReferences(existing, ShelfPlateauGraphBuilder.Load());
+                return existing;
+            }
+
+            var graph = ShelfPlateauGraphBuilder.Load();
+            if (graph == null)
+            {
+                Debug.LogError(
+                    "[Overworld] Cannot create a shelf template: ShelfPlateau_TerrainGraph is "
+                    + "missing. Run GameDev/Overworld/Vista/Rebuild Shelf Plateau Graph "
+                    + "(destructive) first.");
+                return null;
+            }
+
+            var spec = ShelfSpec(archetype);
+            var go = new GameObject($"LPB_Shelf{archetype}");
+            try
+            {
+                var biome = go.AddComponent<LocalProceduralBiome>();
+                biome.space = Space.Self;
+                biome.order = OrderShelf;
+                biome.baseResolution = InitialBaseResolution;
+                biome.terrainGraph = graph;
+                biome.biomeMaskGraph = SoftFalloffMaskGraphBuilder.LoadShelf();
+                biome.falloffDirection = FalloffDirection.Outer;
+                biome.falloffDistance = spec.falloff;
+                biome.dataMask = FullDataMask();
+
+                var options = biome.blendOptions;
+                // Raise, like the massif: a shelf adds a step onto whatever the island already put
+                // there. Replace would cut a hole in the meadow wherever the shelf sits lower than
+                // the ground it lands on, which on a domed island is most of the coast side.
+                options.heightMapBlendMode = BiomeBlendOptions.HeightBlendMode.Raise;
+                options.textureBlendMode = BiomeBlendOptions.TextureBlendMode.Replace;
+                biome.blendOptions = options;
+
+                go.AddComponent<SetBiomeHeightOnSpawn>().worldHeight = spec.height;
+                go.AddComponent<SetBiomeAreaOnSpawn>().worldArea =
+                    new Vector2(spec.extent, spec.extent);
+
+                return SavePrefabAndTemplate(go, ShelfPrefabPath(archetype), templatePath);
             }
             finally
             {

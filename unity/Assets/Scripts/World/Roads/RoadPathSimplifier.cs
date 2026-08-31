@@ -8,6 +8,15 @@ namespace GameDev.World.Roads
     /// Softens A* polylines into natural curves: light stair cleanup + Chaikin corner-cutting that
     /// refuses to cut through lakes/mountains. Not a taut string-pull (that made artificial chords).
     /// </summary>
+    /// <remarks>
+    /// Every stage here reads its delegate through <see cref="SegmentClear"/> and
+    /// <see cref="RoadCost.IsHardObstacleCost"/> and nowhere else, so what it wants is a passability
+    /// oracle, not a construction cost. Callers must pass the undiscounted terrain cost - see
+    /// <c>LandscapeCostField.TerrainCostAtTerrain</c>. Passing the A* cost delegate instead let the
+    /// corridor discount decide passability, which made a mountain stop being an obstacle as soon as
+    /// a road was painted next to it. Mountains are traversable terrain priced high, not blocked;
+    /// this predicate exists to stop smoothing from moving a road into ground the search avoided.
+    /// </remarks>
     public static class RoadPathSimplifier
     {
         /// <summary>Set from WorldGenSettings before planning; metres of preferred turn radius.</summary>
@@ -18,7 +27,7 @@ namespace GameDev.World.Roads
 
         public static List<Vector2> SoftenNatural(
             IReadOnlyList<Vector2> path,
-            Func<float, float, float> costAtWorld,
+            Func<float, float, float> passabilityAtWorld,
             float sampleStepMeters)
         {
             var result = new List<Vector2>();
@@ -27,24 +36,24 @@ namespace GameDev.World.Roads
                 return result;
             }
 
-            if (path.Count <= 2 || costAtWorld == null)
+            if (path.Count <= 2 || passabilityAtWorld == null)
             {
                 result.AddRange(path);
                 return result;
             }
 
-            var cleaned = CollapseGridStairs(path, costAtWorld, sampleStepMeters);
-            var softened = ChaikinSafe(cleaned, costAtWorld, sampleStepMeters, iterations: 2);
-            return LimitHeadingChange(softened, costAtWorld, sampleStepMeters);
+            var cleaned = CollapseGridStairs(path, passabilityAtWorld, sampleStepMeters);
+            var softened = ChaikinSafe(cleaned, passabilityAtWorld, sampleStepMeters, iterations: 2);
+            return LimitHeadingChange(softened, passabilityAtWorld, sampleStepMeters);
         }
 
         /// <summary>
         /// Soft-clamp sharp corners: if heading change exceeds the limit for the segment length,
-        /// insert a midpoint (when the chord stays clear) so the road arcs instead of kinking.
+        /// insert a point (when its own segments stay clear) so the road arcs instead of kinking.
         /// </summary>
         public static List<Vector2> LimitHeadingChange(
             IReadOnlyList<Vector2> path,
-            Func<float, float, float> costAtWorld,
+            Func<float, float, float> passabilityAtWorld,
             float sampleStepMeters)
         {
             if (path == null || path.Count < 3)
@@ -84,12 +93,17 @@ namespace GameDev.World.Roads
                         continue;
                     }
 
-                    // Split the corner with a chord midpoint when clear.
+                    // Split the corner, but validate the point that actually ships rather than the
+                    // chord it came from. The inserted point sits 45 % of the way back from mid
+                    // towards the original corner, so a clear a -> mid -> c says nothing about it:
+                    // it can still bulge into whatever b was hugging. `next` always holds at least
+                    // pts[0], so its last entry is the point this one will follow once emitted.
                     var mid = (a + c) * 0.5f;
-                    if (SegmentClear(a, mid, costAtWorld, step) &&
-                        SegmentClear(mid, c, costAtWorld, step))
+                    var candidate = Vector2.Lerp(b, mid, 0.55f);
+                    if (SegmentClear(next[next.Count - 1], candidate, passabilityAtWorld, step) &&
+                        SegmentClear(candidate, c, passabilityAtWorld, step))
                     {
-                        next.Add(Vector2.Lerp(b, mid, 0.55f));
+                        next.Add(candidate);
                     }
                     else
                     {
@@ -107,9 +121,9 @@ namespace GameDev.World.Roads
         /// <summary>Legacy name — now softens rather than taut-pulling.</summary>
         public static List<Vector2> StringPull(
             IReadOnlyList<Vector2> path,
-            Func<float, float, float> costAtWorld,
+            Func<float, float, float> passabilityAtWorld,
             float sampleStepMeters) =>
-            SoftenNatural(path, costAtWorld, sampleStepMeters);
+            SoftenNatural(path, passabilityAtWorld, sampleStepMeters);
 
         /// <summary>
         /// Drop intermediate vertices that lie nearly on the chord of neighbours when the chord
@@ -117,7 +131,7 @@ namespace GameDev.World.Roads
         /// </summary>
         public static List<Vector2> CollapseGridStairs(
             IReadOnlyList<Vector2> path,
-            Func<float, float, float> costAtWorld,
+            Func<float, float, float> passabilityAtWorld,
             float sampleStepMeters)
         {
             var pts = new List<Vector2>(path);
@@ -157,7 +171,7 @@ namespace GameDev.World.Roads
                     continue;
                 }
 
-                if (SegmentClear(a, c, costAtWorld, step))
+                if (SegmentClear(a, c, passabilityAtWorld, step))
                 {
                     keep[i] = false;
                 }
@@ -177,7 +191,7 @@ namespace GameDev.World.Roads
 
         public static List<Vector2> ChaikinSafe(
             IReadOnlyList<Vector2> path,
-            Func<float, float, float> costAtWorld,
+            Func<float, float, float> passabilityAtWorld,
             float sampleStepMeters,
             int iterations)
         {
@@ -198,9 +212,9 @@ namespace GameDev.World.Roads
                     var b = cur[i + 1];
                     var q = Vector2.Lerp(a, b, 0.25f);
                     var r = Vector2.Lerp(a, b, 0.75f);
-                    if (!SegmentClear(a, b, costAtWorld, step) ||
-                        RoadCost.IsHardObstacleCost(costAtWorld(q.x, q.y)) ||
-                        RoadCost.IsHardObstacleCost(costAtWorld(r.x, r.y)))
+                    if (!SegmentClear(a, b, passabilityAtWorld, step) ||
+                        RoadCost.IsHardObstacleCost(passabilityAtWorld(q.x, q.y)) ||
+                        RoadCost.IsHardObstacleCost(passabilityAtWorld(r.x, r.y)))
                     {
                         // Keep the original corner — do not cut into an obstacle.
                         if (i > 0)
@@ -225,13 +239,13 @@ namespace GameDev.World.Roads
         public static bool SegmentClear(
             Vector2 a,
             Vector2 b,
-            Func<float, float, float> costAtWorld,
+            Func<float, float, float> passabilityAtWorld,
             float sampleStepMeters)
         {
             var dist = Vector2.Distance(a, b);
             if (dist < 0.01f)
             {
-                return !RoadCost.IsHardObstacleCost(costAtWorld(a.x, a.y));
+                return !RoadCost.IsHardObstacleCost(passabilityAtWorld(a.x, a.y));
             }
 
             var step = Mathf.Max(sampleStepMeters, 1f);
@@ -240,7 +254,7 @@ namespace GameDev.World.Roads
             {
                 var t = s / (float)samples;
                 var p = Vector2.Lerp(a, b, t);
-                if (RoadCost.IsHardObstacleCost(costAtWorld(p.x, p.y)))
+                if (RoadCost.IsHardObstacleCost(passabilityAtWorld(p.x, p.y)))
                 {
                     return false;
                 }

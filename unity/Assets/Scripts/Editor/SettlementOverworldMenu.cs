@@ -96,9 +96,29 @@ namespace GameDev.EditorTools
             Selection.activeGameObject = root;
         }
 
+        /// <summary>The layer the settlement's streets, pads and gardens are painted into.</summary>
+        /// <remarks>
+        /// This is the road edge layer, not a settlement-specific one. URP TerrainLit draws eight
+        /// terrain layers and the settlement tile was asking for nine, so one of them was never
+        /// going to be drawn; the two cheapest to merge were these, because Dirt_Settlement_Dust
+        /// and Dirt_Road_Edge already shared their diffuse texture, their normal map, their 10x10
+        /// tiling and their smoothness. Only tileOffset, specular and normalScale differed.
+        /// <para>
+        /// The road edge's values are the ones kept. It is the more finished of the two - it has
+        /// specular response and a stronger normal - and it carries roughly nine times the painted
+        /// area, so preserving it preserves the more visible surface. The settlement ground gains a
+        /// little surface definition rather than losing any.
+        /// </para>
+        /// <para>
+        /// One behavioural consequence worth knowing: the two used to occupy separate channels, so
+        /// a road crossing settlement ground wrote into its own. Now they share one, and because
+        /// the settlement paints before the roads, a road over a pad simply wins. Both wanted the
+        /// same material there, so the result reads the same - but it is a merge, not a rename.
+        /// </para>
+        /// </remarks>
         private static TerrainLayer EnsureDustTerrainLayer()
         {
-            const string path = "Assets/Settings/TerrainLayers/Dirt_Settlement_Dust.terrainlayer";
+            const string path = "Assets/Settings/TerrainLayers/Dirt_Road_Edge.terrainlayer";
             // Look (albedo remap, tiling) belongs to the layer asset and is tuned in the Inspector.
             var existing = AssetDatabase.LoadAssetAtPath<TerrainLayer>(path);
             if (existing != null)

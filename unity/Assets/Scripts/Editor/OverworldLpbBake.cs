@@ -148,10 +148,10 @@ namespace GameDev.EditorTools
             {
                 SpawnBaseIslandLpb(manager, seed);
             }
-            if (includeMountains)
-            {
-                SpawnSeededMountainLpbs(manager, seed);
-            }
+            var massifs = includeMountains
+                ? SpawnSeededMountainLpbs(manager, seed)
+                : new List<Vector3>();
+            SpawnSeededShelfLpbs(manager, seed, massifs);
         }
 
         /// <summary>
@@ -356,12 +356,12 @@ namespace GameDev.EditorTools
             LogBiome("IslandBase", biome);
         }
 
-        private static void SpawnSeededMountainLpbs(VistaManager manager, int seed)
+        private static List<Vector3> SpawnSeededMountainLpbs(VistaManager manager, int seed)
         {
             var template = OverworldBiomeTemplates.EnsureMountainTemplate();
             if (template == null)
             {
-                return;
+                return new List<Vector3>();
             }
 
             var rng = new WorldSeed(seed).Fork("terrain.mountain.place");
@@ -406,6 +406,7 @@ namespace GameDev.EditorTools
             Debug.Log(
                 $"[MountainLPB] Spawned {placed.Count}/{targetCount} massif LPB(s), " +
                 $"cliffYaw={cliffYaw * Mathf.Rad2Deg:F0}° seed={seed}");
+            return placed;
         }
 
         private static bool TryPlaceMassif(
@@ -544,6 +545,243 @@ namespace GameDev.EditorTools
             }
 
             SmoothClosedPolygonInPlace(anchors, passes: 2);
+            return anchors;
+        }
+
+        // -------------------------------------------------------------------------------------
+        // Shelves
+        // -------------------------------------------------------------------------------------
+
+        /// <summary>How many of each shelf archetype the island carries.</summary>
+        /// <remarks>
+        /// The tier counts from <c>Assets/Plans/WORLD_RELIEF_PRINCIPLES.md</c>, at the low end of
+        /// their ranges. Every shelf is a full 512 px biome, so the count is a bake-time budget as
+        /// much as a design one - raise it only with a measured bake time next to it.
+        /// </remarks>
+        private static readonly (OverworldBiomeTemplates.ShelfArchetype archetype, int count)[]
+            ShelfPlan =
+            {
+                // Phase 1: all zero. The stepped levels now come from the island's own
+                // heightfield (IslandPlateauGraphBuilder.AddGeologicalStrata), and a Raise-blended
+                // biome on top of that would be the isolated-blob failure all over again. The
+                // system is kept, not deleted: the T3 outcrop tier may still earn its place once
+                // the geology is judged on its own.
+                (OverworldBiomeTemplates.ShelfArchetype.Plateau, 0),
+                (OverworldBiomeTemplates.ShelfArchetype.Shelf, 0),
+                (OverworldBiomeTemplates.ShelfArchetype.Outcrop, 0),
+            };
+
+        /// <summary>Anchors on a shelf outline. Enough to resolve the ramp spur.</summary>
+        private const int ShelfAnchorCount = 40;
+
+        /// <summary>
+        /// Fraction of the authored extent the shelf body uses, leaving room for the spur.
+        /// </summary>
+        /// <remarks>
+        /// Vista inscribes the anchor polygon in the authored area, so the spur has to be paid for
+        /// out of the body rather than added on top of it - otherwise the tip is clipped and the
+        /// ramp ends in mid-air.
+        /// </remarks>
+        private const float ShelfBodyFraction = 0.72f;
+
+        /// <summary>Angular half-width of the ramp spur, in radians.</summary>
+        private const float ShelfSpurHalfWidth = 0.42f;
+
+        /// <summary>How far out the shelves are allowed, as a fraction of the usable radius.</summary>
+        private const float ShelfLandwardFraction = 0.70f;
+
+        /// <summary>Keep-out radius around a massif centre, in metres.</summary>
+        /// <remarks>
+        /// The massif is 1050 x 450 m with a 520 m falloff and blends with Raise, so anything it
+        /// covers it also buries. A shelf inside that skirt is bake time spent on geometry nobody
+        /// will ever see.
+        /// </remarks>
+        private const float ShelfMassifKeepOutMeters = 620f;
+
+        /// <summary>
+        /// Scatters the stepped plateaus that give the island its levels.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Controlled chaos, in the sense the relief rules mean it: the seed picks <b>which</b>
+        /// archetype goes <b>where</b>, and nothing else. Heights, footprints and falloffs come
+        /// from the three template prefabs and never vary per instance, so every bake produces the
+        /// same island grammar in a different arrangement.
+        /// </para>
+        /// <para>
+        /// Largest first. Dart-throwing with a minimum separation degenerates when the big shapes
+        /// go last - they run out of room, fail their attempts and quietly under-deliver the tier
+        /// that carries the silhouette.
+        /// </para>
+        /// </remarks>
+        private static void SpawnSeededShelfLpbs(
+            VistaManager manager, int seed, List<Vector3> massifs)
+        {
+            var rng = new WorldSeed(seed).Fork("terrain.shelf.place");
+            var center = WorldCenter();
+
+            // Inside the coast, outside the surf: a shelf whose foot is under water is a reef.
+            var usableRadius = Mathf.Max(
+                200f,
+                Mathf.Min(WorldScale.WorldExtentXMeters, WorldScale.WorldExtentZMeters) * 0.5f
+                - WorldScale.IslandOceanMarginMeters - WorldScale.CoastShelfWidthMeters);
+
+            var placed = new List<(Vector3 pos, float radius)>();
+            var index = 0;
+            var spawned = 0;
+            var refused = 0;
+
+            foreach (var entry in ShelfPlan)
+            {
+                var template = OverworldBiomeTemplates.EnsureShelfTemplate(entry.archetype);
+                if (template == null)
+                {
+                    continue;
+                }
+
+                var radius = OverworldBiomeTemplates.ShelfHalfExtent(entry.archetype);
+                for (var i = 0; i < entry.count; i++, index++)
+                {
+                    // Place first, spawn second. A Vista biome shares its root with the manager, so
+                    // there is no safe way to take one back once it exists - an early version of
+                    // this spawned and then destroyed the refusals, and took the whole world with
+                    // them: four tiles of flat zero and not one error in the log.
+                    if (!TryPlaceShelf(rng, center, usableRadius, radius, massifs, placed,
+                            out var worldPos))
+                    {
+                        refused++;
+                        continue;
+                    }
+
+                    var biome = SpawnBiome(
+                        manager, template, $"Shelf_{index}", $"LPB_Shelf_{index}");
+                    if (biome == null)
+                    {
+                        continue;
+                    }
+
+                    placed.Add((worldPos, radius));
+                    biome.transform.position = new Vector3(
+                        worldPos.x, biome.transform.position.y, worldPos.z);
+                    biome.seed = new WorldSeed(seed).Fork($"terrain.shelf.{index}").Next();
+                    biome.anchors = BuildShelfSilhouette(biome, seed, index);
+                    spawned++;
+                }
+            }
+
+            Debug.Log(
+                $"[ShelfLPB] Spawned {spawned} shelf LPB(s), {refused} refused for separation "
+                + $"(plan {string.Join(", ", System.Array.ConvertAll(ShelfPlan, e => $"{e.archetype}x{e.count}"))}), "
+                + $"seed={seed}");
+        }
+
+        /// <summary>Blue-noise dart throw: inside the island, clear of its neighbours and the massif.</summary>
+        private static bool TryPlaceShelf(
+            Random rng,
+            Vector3 center,
+            float usableRadius,
+            float radius,
+            List<Vector3> massifs,
+            List<(Vector3 pos, float radius)> placed,
+            out Vector3 worldPos)
+        {
+            worldPos = default;
+            for (var attempt = 0; attempt < 48; attempt++)
+            {
+                var angle = (float)rng.NextDouble() * Mathf.PI * 2f;
+
+                // sqrt on the radial coordinate keeps the density even across the disc; without it
+                // everything crowds the centre, which is also where the massif is.
+                //
+                // The 0.70 is not slack, it is the island's narrow side. BuildIslandSilhouette
+                // pulls the coast in to 0.72 of the authored extent where it faces away from the
+                // cliff, so a shelf placed on the nominal radius lands in open water on that
+                // bearing - a bake at 0.92 put four of them in the sea as reefs.
+                var dist = usableRadius * Mathf.Sqrt((float)rng.NextDouble())
+                           * ShelfLandwardFraction;
+                worldPos = center + new Vector3(Mathf.Cos(angle) * dist, 0f, Mathf.Sin(angle) * dist);
+
+                var ok = true;
+                for (var m = 0; m < massifs.Count && ok; m++)
+                {
+                    ok = Vector3.Distance(worldPos, massifs[m]) >= ShelfMassifKeepOutMeters;
+                }
+
+                for (var p = 0; p < placed.Count && ok; p++)
+                {
+                    // Below 1, so neighbours are allowed to overlap. That is the point: two
+                    // shelves of different archetypes that share ground produce a two-step cascade
+                    // for free, because Raise takes the max. The floor is what stops them becoming
+                    // one concentric tower - centres closer than 0.9 of the summed radii lose both
+                    // silhouettes into a single mound.
+                    var minimum = (placed[p].radius + radius) * 0.9f;
+                    ok = Vector3.Distance(worldPos, placed[p].pos) >= minimum;
+                }
+
+                if (ok)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>An organic blob with one tapering spur, which is the way up.</summary>
+        /// <remarks>
+        /// <para>
+        /// The spur is the whole traversability design. Vista's Outer falloff is a uniform ring
+        /// around the polygon, so where the polygon is wider than twice the falloff the mask
+        /// reaches 1 and the graph builds a full-height wall - and where it tapers to less than
+        /// that, the mask peaks below 1 and the shelf runs out as a tongue instead. That tongue is
+        /// a ramp, its gradient set by how fast the polygon narrows, and its direction is drawn per
+        /// instance from the seed.
+        /// </para>
+        /// <para>
+        /// It is also the honest landform. A mesa is not a clean oval: scarp retreat is uneven and
+        /// leaves a spur running down from one flank, which is exactly where a person would climb.
+        /// </para>
+        /// </remarks>
+        private static Vector3[] BuildShelfSilhouette(
+            LocalProceduralBiome biome, int worldSeed, int index)
+        {
+            if (!TryGetAuthoredExtent(biome, out var halfMajor, out var halfMinor))
+            {
+                return biome.anchors;
+            }
+
+            var rng = new WorldSeed(worldSeed).Fork($"terrain.shelf.ring.{index}");
+            var spurYaw = (float)rng.NextDouble() * Mathf.PI * 2f;
+            // Deliberately stronger harmonics than the massif uses. A mesa outline is not an
+            // oval: scarp retreat eats into it unevenly, and a clean ellipse with a point on it
+            // reads as a hockey puck no matter how good the cliff is.
+            var a1 = 0.18f + 0.12f * (float)rng.NextDouble();
+            var a2 = 0.10f + 0.08f * (float)rng.NextDouble();
+            var phi1 = (float)rng.NextDouble() * Mathf.PI * 2f;
+            var phi2 = (float)rng.NextDouble() * Mathf.PI * 2f;
+            var spurReach = 1f - ShelfBodyFraction;
+
+            var anchors = new Vector3[ShelfAnchorCount];
+            for (var i = 0; i < ShelfAnchorCount; i++)
+            {
+                var angle = Mathf.PI * 2f * i / ShelfAnchorCount;
+                var harmonic = 1f / (1f + a1 + a2)
+                               * (1f + a1 * Mathf.Cos(angle + phi1)
+                                     + a2 * Mathf.Cos(2f * angle + phi2));
+
+                var delta = Mathf.DeltaAngle(angle * Mathf.Rad2Deg, spurYaw * Mathf.Rad2Deg)
+                            * Mathf.Deg2Rad;
+                var lobe = Mathf.Exp(-(delta * delta) / (ShelfSpurHalfWidth * ShelfSpurHalfWidth));
+
+                var scale = ShelfBodyFraction * harmonic + spurReach * lobe;
+                anchors[i] = new Vector3(
+                    Mathf.Cos(angle) * halfMajor * scale,
+                    0f,
+                    Mathf.Sin(angle) * halfMinor * scale);
+            }
+
+            // One pass only. Two rounds the spur off, and the spur is the point.
+            SmoothClosedPolygonInPlace(anchors, passes: 1);
             return anchors;
         }
 

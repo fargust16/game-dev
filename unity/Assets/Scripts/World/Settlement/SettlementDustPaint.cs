@@ -46,6 +46,11 @@ namespace GameDev.World.Settlement
 
             var data = terrain.terrainData;
             var dustIndex = EnsureLayerIndex(data, dustLayer);
+            if (dustIndex < 0)
+            {
+                return;
+            }
+
             data = terrain.terrainData;
 
             var resolution = data.alphamapResolution;
@@ -301,6 +306,9 @@ namespace GameDev.World.Settlement
             alphamaps[z, x, dustIndex] = coverage;
         }
 
+        /// <summary>Terrain layers URP TerrainLit can actually draw: Splat0..3 plus one add pass.</summary>
+        private const int MaxRenderedTerrainLayers = 8;
+
         private static int EnsureLayerIndex(TerrainData data, TerrainLayer layer)
         {
             var layers = data.terrainLayers;
@@ -310,6 +318,20 @@ namespace GameDev.World.Settlement
                 {
                     return i;
                 }
+            }
+
+            // URP TerrainLit draws eight terrain layers: one _Control texture feeds Splat0..Splat3
+            // and a single TERRAIN_SPLAT_ADDPASS feeds four more. Appending a ninth used to
+            // succeed silently and then never render, which is how three road layers went missing
+            // on the settlement tile for as long as they did. Refusing is not worse than that -
+            // the paint was invisible either way - but it is loud.
+            if (layers.Length >= MaxRenderedTerrainLayers)
+            {
+                UnityEngine.Debug.LogError(
+                    $"[SettlementDustPaint] Terrain '{data.name}' already carries {layers.Length} terrain "
+                    + $"layers and URP renders {MaxRenderedTerrainLayers}; refusing to append "
+                    + $"'{(layer != null ? layer.name : "null")}'. It would not have been drawn.");
+                return -1;
             }
 
             var expanded = new TerrainLayer[layers.Length + 1];

@@ -134,6 +134,15 @@ a biome's area or falloff changes.
   octaves below one canvas pixel, where they return white noise. It diluted the measurement rather
   than fixing the surface.
 
+- **The clamped micro-erosion pass is not it either** (tested 2026-08-29, seed 110201). Both
+  templates ship the micro pass at `featureSize 2` while the island resolves at 5.01 m/px and the
+  massif at 3.19, so both ask the sim for ~800-1000 px and are clamped to 512 - a documented rill
+  generator (2.4). Raising both to `featureSize 6` drops the sim to 272 px, i.e. the sim genuinely
+  ran on a different grid: tree count moved 16 488 -> 16 321, so the terrain did change. The
+  artifact did not. Residual ratios 0.62/0.73/0.60/0.58 -> 0.62/0.73/0.61/0.56, dominant periods
+  identical to the metre, orientation histograms bit-identical on three tiles of four, and the
+  massif's slope map is indistinguishable by eye. Reverted.
+
 Do not re-test any of the above. The remaining avenue is replacing the noise *source*, not tuning it.
 
 ### 2.4a-legacy — the four hypotheses killed first
@@ -253,6 +262,73 @@ twice and looks exactly like a null result.
 The node tells you when it does bite: *"Feature Size 2 m needs a 1000 px sim canvas, above the 512 px
 budget."* Never ignore that line.
 
+### 2.12 The shelf terrace stage, and the six traps it walked into
+
+The island plateau carries a masked `TerraceNode` between the template's two hydraulic passes, so
+the meadow is broken by rocky steps with a cliff on one side and a walkable ramp on the other. It is
+built in `IslandPlateauGraphBuilder.AddShelfTerraces`. Everything below was measured, one headless
+bake at a time; each item is a bake that came back looking like nothing had changed.
+
+**The stage.** `Noise(520 m, 1 octave, angular warp)` → `Levels[0.36 … 0.52]` = shelf regions;
+`DirectionMask(200° ± 60°, inverted falloff)` on the **pre-erosion** height = the dip slope;
+their product is the terrace mask. `Terrace.shader` resolves to `lerp(original, quantised, mask)`,
+so a soft mask edge is a ramp and a hard one is a wall — never threshold this mask.
+
+1. **The island's graph zero is 43.6 m above the sea, not at it.** `LPB_IslandBase` sits at
+   y = sea level with `useTransformForHeightBlend`, and the height Levels map onto [0.14, 0.70] of a
+   140 m biome, so world height is `43.6 + 78.4v`. The coast is drawn by the biome mask ramping the
+   island into the sea floor across the falloff ring — **not** by low graph height. A 38 m floor on
+   the terrace's height mask, added to protect the beach, sat at v = 0.27, above nine tenths of the
+   island, and the bake came back bit-smooth.
+
+2. **Metre parameters are the biome's metres.** `TerrainGraphUtilities.RequestBiomeData` sets
+   `configs.terrainHeight = biomeWorldBounds.size.y`, i.e. `localScale.y × terrainMaxHeight` = 140 m
+   for the island, not the manager's 700. `TerraceNode.stepHeight`, `HeightMaskNode.min/maxHeight`
+   and `FlattenNode.targetHeight` all divide by it. (`LPBInputProvider.GetDebugConfigs` uses 700,
+   but that path is the graph editor's preview only.)
+
+3. **A terrace ahead of the erosion passes is erased.** Vista's own Mesa template puts it there, and
+   copying that placement produced a surface indistinguishable from no terrace at all: our macro
+   pass runs `erosionRate 10 / depositionRate 0.3` against Mesa's `10 / 10`, so it scours where Mesa
+   fills. Behind both passes the steps survive but arrive raw. **Between** them the micro pass, at a
+   fifth of the erosion rate, cuts gullies into the risers and leaves the treads.
+
+4. **Multi-octave noise cannot carry a `Levels` threshold.** `Noise.shader` sums the octaves and
+   closes with `sign(n) * tex2D(_RemapTex, abs(n))`, whose lookup clamps at 1. Three Perlin01 octaves
+   at persistence 0.45 sum to a bell on 0..1.65, so the top of the field arrives flattened to exactly
+   1 and the rest is squeezed into a narrow band — two bakes bracketed it at roughly 0.60–0.72. A
+   window under that saturates the mask to 1 and terraces the whole island into contour rings; a
+   window over it is dead. **One octave** is a bell on 0..1 centred at 0.5, and a window on it means
+   what it says.
+
+5. **`RemapNode` did not rescue it.** Auto-levelling the field to its real min..max is the textbook
+   fix for trap 4, and with `RemapNode` in the chain the shelf mask measured an exact zero in three
+   bakes at three different windows, while the same terrace with no mask worked. Root cause not
+   established; the window is set against the noise's own arithmetic instead.
+
+6. **Slope and height masks return 0 *outside* their band, not the clamped end.**
+   `blendSlopeValue = (angle >= min) * (angle <= max) * curve(t)`. A cliff mask with `maxAngle 60`
+   therefore leaves the steepest faces unpainted — the ceiling has to be 90 and the transition curve
+   has to rise and then hold. Vista's default `EaseInOutCurve` fails the same way at the other end:
+   it returns to 0 at t = 1.
+
+**Where the shelves currently do not show.** With `LPB_Mountain` in the stack the terrace stops
+registering entirely — full-stack bakes with and without it are identical to the last digit, tree
+count included. Without the massif (sea floor still in) the same graph moves the 15–30° band from
+5.2 → 8.9, 2.2 → 3.1, 9.5 → 15.1, 5.0 → 7.5 % of dry land and the canopy from 11 982 to 14 263
+trees. The massif is order 20, `Raise`, 530 m over a 1050 × 450 m area with a **520 m falloff** —
+a skirt wider than the massif itself, and comparable to the island's entire 78 m of relief. See §9.
+
+**Measuring it.** `OverworldTerrainDiagnostics` reports two lines per tile for this stage:
+`slope bands on dry land` (a terrace is bimodal — flat treads plus risers past 45°) and
+`reachable` (a flood fill from the shore across edges inside 45°, which is the only thing that
+tells a shelf from a trap). The older `QUANTISATION` and `FLAT RUNS` lines cannot see a terrace at
+all: they look for bit-identical heights, and any erosion pass downstream perturbs every cell.
+
+**Do not compare dump images across bakes by filename.** `VistaTerrainDump` and `VistaLayerDump`
+are not cleared between runs and the `tile{N}_` prefix is bake order, which changes — the same
+tile is `tile1_` in one run and `tile3_` in the next. Two "readouts" in this investigation were
+stale files from a different experiment. Delete the folders before a bake you intend to look at.
 ### 2.5 Trees and details want **opposite** prefab shapes
 
 | Prototype | Unity requires on the prefab **root** | Breaks on |
@@ -692,9 +768,16 @@ Defects with measurements attached live in **[OVERWORLD_TECH_DEBT.md](OVERWORLD_
 road planning at 141 s, the single-terrain assumption, the detail-density relay, the Animator
 exception. This list is the terrain-shaped remainder.
 
-- Roads and settlements append their own `TerrainLayer`s after generation. That is sanctioned, but
-  they must never reorder or repaint biome layer indices 0–4. One tile was observed carrying 9
-  layers, past URP TerrainLit's ceiling of 8 — the ninth silently does not render.
+- **The mountain massif buries the island's shelves.** `LPB_Mountain` is order 20, `Raise`, 530 m
+  over 1050 x 450 m with a **520 m falloff** - a skirt wider than the massif and worth more relief
+  than the whole island's 78 m band. With it in the stack the terrace stage measures identical to
+  having no terrace at all, tree count included; without it the same graph steps the plateau
+  clearly (see 2.12). The falloff is the suspect lever, and it lives on the template prefab, which
+  the bake is forbidden to write - so it is a deliberate design change, not a code fix.
+- Layer count per tile is now **7** (`Overworld_{Grass,Sand,Soil,Cliff,Rock}` plus the two shared
+  Vista grass samples), under URP TerrainLit's ceiling of 8. It was 10 before the massif's three
+  duplicate rock and sediment samples were retargeted onto the canonical set. Roads and settlements
+  append their own layers after generation and still must never reorder or repaint indices 0-4.
 - The beach is graph-low-ground, not a true waterline band — see 3.4.
 - Stylized Trees Pack prefabs need root LOD Groups before they can be terrain trees. Until then the
   canopy is Polytope-only and the pack sits unused.

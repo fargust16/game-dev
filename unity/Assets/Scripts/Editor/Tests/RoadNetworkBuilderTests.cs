@@ -253,24 +253,139 @@ namespace GameDev.World.Roads.Tests
                 nodes, isHub, grid, field, Height);
             Assert.GreaterOrEqual(segments.Count, 2);
 
-            RoadSegment spur = default;
-            var foundSpur = false;
+            var touchesMidHub = false;
             foreach (var seg in segments)
             {
-                if (seg.NodeA != 2 && seg.NodeB != 2)
+                if (seg.NodeA == 2 || seg.NodeB == 2)
+                {
+                    touchesMidHub = true;
+                    break;
+                }
+            }
+
+            Assert.IsTrue(touchesMidHub, "the mid hub must end up connected to the network");
+
+            // What this test is really about: the painted corridor gets reused instead of a second
+            // road being laid beside it. It used to assert that instead through the length of the
+            // shortest segment touching the mid hub, on the assumption that the hub ends up a leaf
+            // hanging off the trunk. That assumption is not part of the contract - which hub Prim
+            // reaches first is decided by path cost, and the mid hub becomes a trunk endpoint the
+            // moment its route is priced correctly. Length also cannot tell the two apart: with the
+            // discount switched off entirely the same measurement reads 188.9 m against a healthy
+            // 183.4 m, so it would wave through the very regression it was written to catch.
+            //
+            // These two measure the contract directly. Corridor reuse is the discriminating one:
+            // 95.2 % with the discount live, 44.0 % without it.
+            var corridor = new List<Vector2> { nodes[0], nodes[1] };
+            MeasureNetwork(segments, nodes, corridor, out var nearCorridor, out var alongsideAnother);
+
+            Assert.Greater(nearCorridor, 0.80f,
+                "most of the network should run on the painted corridor rather than beside it");
+            Assert.Less(alongsideAnother, 0.05f,
+                "no road should run parallel to another road away from its junctions");
+        }
+
+        /// <summary>
+        /// Fractions of total network length that (a) hug <paramref name="corridor"/> and (b) run
+        /// close to a <em>different</em> segment away from any node.
+        /// </summary>
+        private static void MeasureNetwork(
+            IReadOnlyList<RoadSegment> segments,
+            IReadOnlyList<Vector2> nodes,
+            IReadOnlyList<Vector2> corridor,
+            out float nearCorridorFraction,
+            out float alongsideAnotherFraction)
+        {
+            const float CorridorTolerance = 15f;
+            const float ParallelTolerance = 25f;
+            const float JunctionRadius = 40f;
+            const float SampleStep = 2f;
+
+            var total = 0f;
+            var nearCorridor = 0f;
+            var alongside = 0f;
+
+            for (var s = 0; s < segments.Count; s++)
+            {
+                var points = segments[s].Points;
+                if (points == null || points.Count < 2)
                 {
                     continue;
                 }
 
-                if (!foundSpur || EstimateLen(seg) < EstimateLen(spur))
+                for (var i = 0; i < points.Count - 1; i++)
                 {
-                    spur = seg;
-                    foundSpur = true;
+                    var a = points[i];
+                    var b = points[i + 1];
+                    var length = Vector2.Distance(a, b);
+                    if (length < 1e-4f)
+                    {
+                        continue;
+                    }
+
+                    var steps = Mathf.Max(1, Mathf.FloorToInt(length / SampleStep));
+                    var share = length / steps;
+                    for (var k = 0; k < steps; k++)
+                    {
+                        var p = Vector2.Lerp(a, b, (k + 0.5f) / steps);
+                        total += share;
+                        if (DistanceToPolyline(p, corridor) <= CorridorTolerance)
+                        {
+                            nearCorridor += share;
+                        }
+
+                        var atJunction = false;
+                        for (var n = 0; n < nodes.Count; n++)
+                        {
+                            if (Vector2.Distance(p, nodes[n]) < JunctionRadius)
+                            {
+                                atJunction = true;
+                                break;
+                            }
+                        }
+
+                        if (atJunction)
+                        {
+                            continue;
+                        }
+
+                        for (var other = 0; other < segments.Count; other++)
+                        {
+                            if (other == s || segments[other].Points == null)
+                            {
+                                continue;
+                            }
+
+                            if (DistanceToPolyline(p, segments[other].Points) < ParallelTolerance)
+                            {
+                                alongside += share;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
-            Assert.IsTrue(foundSpur);
-            Assert.Less(EstimateLen(spur), 120f, "mid hub should snap with a short connector, not a parallel run");
+            total = Mathf.Max(total, 1e-4f);
+            nearCorridorFraction = nearCorridor / total;
+            alongsideAnotherFraction = alongside / total;
+        }
+
+        private static float DistanceToPolyline(Vector2 p, IReadOnlyList<Vector2> polyline)
+        {
+            var best = float.MaxValue;
+            for (var i = 0; i < polyline.Count - 1; i++)
+            {
+                var a = polyline[i];
+                var ab = polyline[i + 1] - a;
+                var lengthSquared = ab.sqrMagnitude;
+                var closest = lengthSquared < 1e-8f
+                    ? a
+                    : a + (ab * Mathf.Clamp01(Vector2.Dot(p - a, ab) / lengthSquared));
+                best = Mathf.Min(best, Vector2.Distance(p, closest));
+            }
+
+            return best;
         }
 
         [Test]
@@ -310,22 +425,6 @@ namespace GameDev.World.Roads.Tests
 
             Assert.GreaterOrEqual(primary, 1);
             Assert.AreEqual(1, secondary, "one secondary spur for the non-town POI");
-        }
-
-        private static float EstimateLen(RoadSegment seg)
-        {
-            if (seg.Points == null || seg.Points.Count < 2)
-            {
-                return float.PositiveInfinity;
-            }
-
-            var len = 0f;
-            for (var i = 0; i < seg.Points.Count - 1; i++)
-            {
-                len += Vector2.Distance(seg.Points[i], seg.Points[i + 1]);
-            }
-
-            return len;
         }
     }
 }

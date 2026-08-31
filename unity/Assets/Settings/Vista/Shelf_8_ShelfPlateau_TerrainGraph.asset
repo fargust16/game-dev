@@ -1,0 +1,190 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd3d01eddcedb04c8e9bd76ec8c3819, type: 3}
+  m_Name: Shelf_8_ShelfPlateau_TerrainGraph
+  m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.Graph.TerrainGraph
+  m_nodeData:
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.InputNode
+    jsonData: '{"m_groupId":"","m_id":"5Y4J5XCE","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_outputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":100,\"m_type\":1,\"m_name\":\"\"}","version":1},"m_inputName":"Biome
+      Mask Input","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.LevelsNode
+    jsonData: '{"m_groupId":"","m_id":"JYYPKB6Z","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_inLow":0.30000001192092898,"m_inMid":0.46000000834465029,"m_inHigh":0.6200000047683716,"m_outLow":0.0,"m_outHigh":1.0}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.NoiseNode
+    jsonData: '{"m_groupId":"","m_id":"CEHPCX80","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_offset":{"x":0.0,"y":0.0},"m_scale":70.0,"m_lacunarity":2.25,"m_persistence":0.33500000834465029,"m_layerCount":1,"m_mode":1,"m_seed":4211,"m_layerDerivativeMode":1,"m_flipSign":false,"m_warpMode":1,"m_warpAngleMin":-360.0,"m_warpAngleMax":360.0,"m_warpIntensity":0.5,"m_remapCurve":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.0,"value":0.0,"inSlope":0.0,"outSlope":1.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":1.0,"value":1.0,"inSlope":1.0,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4},"m_applyRemapPerLayer":false}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.LevelsNode
+    jsonData: '{"m_groupId":"","m_id":"EWOWM3VI","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_inLow":0.0,"m_inMid":0.5,"m_inHigh":1.0,"m_outLow":0.8999999761581421,"m_outHigh":1.0}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.CombineNode
+    jsonData: '{"m_groupId":"","m_id":"DEGZB1F8","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.SetVariableNode
+    jsonData: '{"m_groupId":"","m_id":"OTC4KPXR","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_inputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":0,\"m_type\":0,\"m_name\":\"\"}","version":1},"m_varName":"Height
+      Map","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.HeightOutputNode
+    jsonData: '{"m_groupId":"","m_id":"YJ23NT3F","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.GetVariableNode
+    jsonData: '{"m_groupId":"","m_id":"AFFHOE3I","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_outputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":100,\"m_type\":1,\"m_name\":\"\"}","version":1},"m_varName":"Height
+      Map","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.SlopeMaskNode
+    jsonData: '{"m_groupId":"","m_id":"6NG2B4S0","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_minAngle":30.0,"m_maxAngle":90.0,"m_transition":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.0,"value":0.0,"inSlope":0.0,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":0.25,"value":1.0,"inSlope":0.0,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":1.0,"value":1.0,"inSlope":0.0,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.WeightBlendNode
+    jsonData: '{"m_groupId":"","m_id":"HXHTBA6P","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_inputSlots":[{"m_id":0,"m_type":0,"m_name":"Layer
+      0"},{"m_id":1,"m_type":0,"m_name":"Layer 1"}],"m_outputSlots":[{"m_id":100,"m_type":1,"m_name":"Layer
+      0"},{"m_id":101,"m_type":1,"m_name":"Layer 1"}],"m_layerCount":2}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.TextureOutputNode
+    jsonData: '{"m_groupId":"","m_id":"1VTR3ORI","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_order":0}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.TextureOutputNode
+    jsonData: '{"m_groupId":"","m_id":"K14TRA1I","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_order":3}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.MathNode
+    jsonData: '{"m_groupId":"","m_id":"ELQC759A","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_maths":[{"m_enabled":true,"m_number":1.0,"m_ops":4}]}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.NoiseNode
+    jsonData: '{"m_groupId":"","m_id":"YMOE9JBM","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_offset":{"x":0.0,"y":0.0},"m_scale":90.0,"m_lacunarity":2.25,"m_persistence":0.33500000834465029,"m_layerCount":1,"m_mode":1,"m_seed":9137,"m_layerDerivativeMode":1,"m_flipSign":false,"m_warpMode":1,"m_warpAngleMin":-360.0,"m_warpAngleMax":360.0,"m_warpIntensity":0.5,"m_remapCurve":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.0,"value":0.0,"inSlope":0.0,"outSlope":1.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":1.0,"value":1.0,"inSlope":1.0,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4},"m_applyRemapPerLayer":false}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.CombineNode
+    jsonData: '{"m_groupId":"","m_id":"O0J7LWDJ","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_mode":2,"m_backgroundMultiplier":1.0,"m_foregroundMultiplier":1.0,"m_maskMultiplier":1.0}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.DetailDensityOutputNode
+    jsonData: '{"m_groupId":"","m_id":"5D14K1OB","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_densityMultiplier":1.0}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.LevelsNode
+    jsonData: '{"m_groupId":"","m_id":"2RWP2RWG","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_inLow":0.5199999809265137,"m_inMid":0.6600000262260437,"m_inHigh":0.800000011920929,"m_outLow":0.0,"m_outHigh":1.0}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.ScatterNode
+    jsonData: '{"m_groupId":"","m_id":"GX4YEO91","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_spacing":{"x":24.0,"y":24.0},"m_spreadCount":7,"m_spreadDistance":0.05000000074505806,"m_keepSourcePoints":true,"m_densityMultiplier":1.0,"m_seed":0}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.TreeOutputNode
+    jsonData: '{"m_groupId":"","m_id":"I7U1Z430","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_densityMultiplier":1.0,"m_verticalScaleMultiplier":1.0,"m_horizontalScaleMultiplier":1.0,"m_minRotation":-360.0,"m_maxRotation":360.0,"m_rotationMultiplier":1.0,"m_seed":0}'
+    version: 1
+  m_edgeData:
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"1EQ5JUQ7","m_outputSlot":{"m_nodeId":"5Y4J5XCE","m_slotId":100},"m_inputSlot":{"m_nodeId":"JYYPKB6Z","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"V5EXP1HQ","m_outputSlot":{"m_nodeId":"CEHPCX80","m_slotId":100},"m_inputSlot":{"m_nodeId":"EWOWM3VI","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"CN63YXF2","m_outputSlot":{"m_nodeId":"JYYPKB6Z","m_slotId":100},"m_inputSlot":{"m_nodeId":"DEGZB1F8","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"XKTXD7BD","m_outputSlot":{"m_nodeId":"EWOWM3VI","m_slotId":100},"m_inputSlot":{"m_nodeId":"DEGZB1F8","m_slotId":1}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"OWOXM422","m_outputSlot":{"m_nodeId":"DEGZB1F8","m_slotId":100},"m_inputSlot":{"m_nodeId":"OTC4KPXR","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"A7EMM4GQ","m_outputSlot":{"m_nodeId":"DEGZB1F8","m_slotId":100},"m_inputSlot":{"m_nodeId":"YJ23NT3F","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"AGO10R2F","m_outputSlot":{"m_nodeId":"AFFHOE3I","m_slotId":100},"m_inputSlot":{"m_nodeId":"6NG2B4S0","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"45G1UF3N","m_outputSlot":{"m_nodeId":"6NG2B4S0","m_slotId":100},"m_inputSlot":{"m_nodeId":"HXHTBA6P","m_slotId":1}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"9LVXG7UK","m_outputSlot":{"m_nodeId":"HXHTBA6P","m_slotId":100},"m_inputSlot":{"m_nodeId":"1VTR3ORI","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"TOC0Y2QC","m_outputSlot":{"m_nodeId":"HXHTBA6P","m_slotId":101},"m_inputSlot":{"m_nodeId":"K14TRA1I","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"V2WXX5CR","m_outputSlot":{"m_nodeId":"6NG2B4S0","m_slotId":100},"m_inputSlot":{"m_nodeId":"ELQC759A","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"VY5D6B72","m_outputSlot":{"m_nodeId":"ELQC759A","m_slotId":100},"m_inputSlot":{"m_nodeId":"O0J7LWDJ","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"VOZCO328","m_outputSlot":{"m_nodeId":"YMOE9JBM","m_slotId":100},"m_inputSlot":{"m_nodeId":"O0J7LWDJ","m_slotId":1}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"R8VJNZ4Q","m_outputSlot":{"m_nodeId":"O0J7LWDJ","m_slotId":100},"m_inputSlot":{"m_nodeId":"5D14K1OB","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"IEM4PDVA","m_outputSlot":{"m_nodeId":"O0J7LWDJ","m_slotId":100},"m_inputSlot":{"m_nodeId":"2RWP2RWG","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"KLK8TX41","m_outputSlot":{"m_nodeId":"2RWP2RWG","m_slotId":100},"m_inputSlot":{"m_nodeId":"GX4YEO91","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"X0UNAEJ4","m_outputSlot":{"m_nodeId":"GX4YEO91","m_slotId":100},"m_inputSlot":{"m_nodeId":"I7U1Z430","m_slotId":0}}'
+    version: 1
+  m_groupData: []
+  m_stickyNoteData: []
+  m_stickyImageData: []
+  m_objectReferences:
+  - m_key: 1VTR3ORI.m_terrainLayer
+    m_target: {fileID: 8574412962073106934, guid: fbcb7689ac19e734b9c6a1176cd83def, type: 2}
+  - m_key: K14TRA1I.m_terrainLayer
+    m_target: {fileID: 8574412962073106934, guid: 50ef70961e323514ab6c2f0132bbc427, type: 2}
+  - m_key: 5D14K1OB.m_detailTemplate
+    m_target: {fileID: 11400000, guid: 5299af690c220a146b58420f1a585fb3, type: 2}
+  - m_key: I7U1Z430.m_treeTemplate
+    m_target: {fileID: 11400000, guid: 8d40d8300cb96a94eb9a3f93031fb2b1, type: 2}
+  m_exposedProperties: []
+  m_debugConfigs:
+    m_resolution: 512
+    m_worldBounds:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1000
+      height: 1000
+    m_terrainHeight: 600
+    m_seed: 1234
+    m_shouldOutputTempHeight: 0
+  m_allowSplitExecution: 1

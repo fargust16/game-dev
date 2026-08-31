@@ -90,12 +90,48 @@ namespace GameDev.EditorTools
             return VistaGraphBuild.RebuildFromTemplate(
                 VistaGraphBuild.MountainTemplateGraphPath,
                 GraphAssetPath,
-                // No ground cover: the massif is rock and scree above the treeline, and grass on it
-                // was Vista's, not ours.
-                graph => VistaGraphBuild.RetargetTemplateVegetation(
-                    graph,
-                    new[] { VistaVegetationTemplates.Species.Pine },
-                    includeGroundCover: false));
+                Patch);
+        }
+
+        /// <summary>
+        /// Weight Blend priority slot -> canonical layer, lowest slot first.
+        /// <c>null</c> keeps the template's own layer.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The template paints five Vista sample layers: Rock Base, Sediment, Grass Dark,
+        /// Grass Light, Rock Convex. Three of them duplicate rock and soil the canonical stack
+        /// already carries, and every distinct layer costs a slot in
+        /// <c>terrainData.terrainLayers</c>, which Vista rewrites per tile from the union of the
+        /// covering biomes. Sea floor, island and massif were emitting ten between them, against
+        /// URP TerrainLit's ceiling of eight.
+        /// </para>
+        /// <para>
+        /// The two greens are deliberately left alone. They are the same two assets the island
+        /// paints, so they are already shared and cost nothing extra - and collapsing both onto one
+        /// canonical grass would put two Texture Outputs on a single layer, where the second would
+        /// contend with the first rather than add to it.
+        /// </para>
+        /// </remarks>
+        private static readonly SurfaceLayer?[] CanonicalBlendLayers =
+        {
+            SurfaceLayer.Rock,   // Rock Base   - the unconnected white base
+            SurfaceLayer.Soil,   // Sediment    - settles in the drainages
+            null,                // Grass Dark  - shared with the island
+            null,                // Grass Light - shared with the island
+            SurfaceLayer.Cliff,  // Rock Convex - the sheer faces
+        };
+
+        private static void Patch(TerrainGraph graph)
+        {
+            // No ground cover: the massif is rock and scree above the treeline, and grass on it
+            // was Vista's, not ours.
+            VistaGraphBuild.RetargetTemplateVegetation(
+                graph,
+                new[] { VistaVegetationTemplates.Species.Pine },
+                includeGroundCover: false);
+            VistaGraphBuild.RetargetTextureOutputsToCanonical(graph, CanonicalBlendLayers);
+            VistaGraphBuild.ReplaceSampleGrassWithCanonical(graph);
         }
 
         /// <summary>Routes one Weight Blend priority slot to the canonical layer it paints.</summary>

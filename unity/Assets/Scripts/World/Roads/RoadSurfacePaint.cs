@@ -25,6 +25,11 @@ namespace GameDev.World.Roads
 
             var data = terrain.terrainData;
             var centerIndex = EnsureLayerIndex(data, centerLayer);
+            if (centerIndex < 0)
+            {
+                return;
+            }
+
             var edgeIndex = edgeLayer != null ? EnsureLayerIndex(data, edgeLayer) : -1;
             var gravelIndex = gravelLayer != null ? EnsureLayerIndex(data, gravelLayer) : -1;
 
@@ -251,6 +256,11 @@ namespace GameDev.World.Roads
 
             var data = terrain.terrainData;
             var centerIndex = EnsureLayerIndex(data, centerLayer);
+            if (centerIndex < 0)
+            {
+                return;
+            }
+
             var edgeIndex = edgeLayer != null ? EnsureLayerIndex(data, edgeLayer) : -1;
             var gravelIndex = gravelLayer != null ? EnsureLayerIndex(data, gravelLayer) : -1;
             data = terrain.terrainData;
@@ -461,6 +471,9 @@ namespace GameDev.World.Roads
             return edge * outer;
         }
 
+        /// <summary>Terrain layers URP TerrainLit can actually draw: Splat0..3 plus one add pass.</summary>
+        private const int MaxRenderedTerrainLayers = 8;
+
         private static int EnsureLayerIndex(TerrainData data, TerrainLayer layer)
         {
             var layers = data.terrainLayers;
@@ -470,6 +483,20 @@ namespace GameDev.World.Roads
                 {
                     return i;
                 }
+            }
+
+            // URP TerrainLit draws eight terrain layers: one _Control texture feeds Splat0..Splat3
+            // and a single TERRAIN_SPLAT_ADDPASS feeds four more. Appending a ninth used to
+            // succeed silently and then never render, which is how three road layers went missing
+            // on the settlement tile for as long as they did. Refusing is not worse than that -
+            // the paint was invisible either way - but it is loud.
+            if (layers.Length >= MaxRenderedTerrainLayers)
+            {
+                UnityEngine.Debug.LogError(
+                    $"[RoadSurfacePaint] Terrain '{data.name}' already carries {layers.Length} terrain "
+                    + $"layers and URP renders {MaxRenderedTerrainLayers}; refusing to append "
+                    + $"'{(layer != null ? layer.name : "null")}'. It would not have been drawn.");
+                return -1;
             }
 
             var expanded = new TerrainLayer[layers.Length + 1];

@@ -56,6 +56,70 @@ namespace GameDev.World.Roads.Tests
         }
 
         [Test]
+        public void LimitHeadingChange_KeepsCornerWhenTheInsertedPointIsNotClear()
+        {
+            // The corner isolated from the band case above. Splitting it used to be decided on the
+            // chord a -> mid -> c, but the point that actually gets inserted sits 45 % of the way
+            // back towards the corner and dips into the band, so the road shipped a segment that
+            // nothing had ever checked.
+            var a = new Vector2(32.5f, 25f);
+            var b = new Vector2(37.5f, 17.5f);
+            var c = new Vector2(42.5f, 13.188f);
+            var path = new List<Vector2> { a, b, c };
+
+            float Cost(float x, float z) =>
+                x > 35f && x < 65f && z > 20f ? float.PositiveInfinity : 1f;
+
+            RoadPathSimplifier.ActiveMinTurnRadiusMeters = 18f;
+            RoadPathSimplifier.ActiveMaxHeadingChangeDegrees = 28f;
+
+            // The chord the old code measured is clear both ways — that is what fooled it.
+            var mid = (a + c) * 0.5f;
+            Assert.IsTrue(RoadPathSimplifier.SegmentClear(a, mid, Cost, 4f), "chord a -> mid is clear");
+            Assert.IsTrue(RoadPathSimplifier.SegmentClear(mid, c, Cost, 4f), "chord mid -> c is clear");
+
+            // The point it emitted instead is not reachable from a.
+            var inserted = Vector2.Lerp(b, mid, 0.55f);
+            Assert.IsFalse(
+                RoadPathSimplifier.SegmentClear(a, inserted, Cost, 4f),
+                "the segment into the inserted point is blocked — this is the case under test");
+
+            var limited = RoadPathSimplifier.LimitHeadingChange(path, Cost, 4f);
+
+            Assert.AreEqual(b, limited[1], "an unvalidated point must not replace the corner");
+            for (var i = 0; i < limited.Count - 1; i++)
+            {
+                Assert.IsTrue(
+                    RoadPathSimplifier.SegmentClear(limited[i], limited[i + 1], Cost, 4f),
+                    "every emitted segment must be one that was validated");
+            }
+        }
+
+        [Test]
+        public void LimitHeadingChange_StillSoftensWhenTheInsertedPointIsClear()
+        {
+            // Same corner and thresholds with the obstacle removed: the stage must still soften.
+            var a = new Vector2(32.5f, 25f);
+            var b = new Vector2(37.5f, 17.5f);
+            var c = new Vector2(42.5f, 13.188f);
+            var path = new List<Vector2> { a, b, c };
+
+            float Cost(float x, float z) => 1f;
+
+            RoadPathSimplifier.ActiveMinTurnRadiusMeters = 18f;
+            RoadPathSimplifier.ActiveMaxHeadingChangeDegrees = 28f;
+
+            var limited = RoadPathSimplifier.LimitHeadingChange(path, Cost, 4f);
+
+            var expected = Vector2.Lerp(b, (a + c) * 0.5f, 0.55f);
+            Assert.AreEqual(3, limited.Count);
+            Assert.AreEqual(a, limited[0]);
+            Assert.AreEqual(c, limited[limited.Count - 1]);
+            Assert.AreEqual(expected.x, limited[1].x, 0.001f, "the softened point still ships");
+            Assert.AreEqual(expected.y, limited[1].y, 0.001f, "the softened point still ships");
+        }
+
+        [Test]
         public void LimitHeadingChange_SoftensSharpCorner()
         {
             var path = new List<Vector2>

@@ -721,6 +721,14 @@ namespace GameDev.EditorTools
             "Assets/PinwheelStudio/Vista/Personal/BiomeTemplates/Mountain/" +
             "Mountain_TerrainGraphTemplate.asset";
 
+        private const string SampleGrassDarkPath =
+            "Assets/PinwheelStudio/Vista/Personal/Samples/TerrainLayers/Grass Dark/"
+            + "Grass_Dark_VistaSample.terrainlayer";
+
+        private const string SampleGrassLightPath =
+            "Assets/PinwheelStudio/Vista/Personal/Samples/TerrainLayers/Grass Light/"
+            + "Grass_Light_VistaSample.terrainlayer";
+
         private const string TemplateScratchPath =
             "Assets/Settings/Vista/__FromTemplate_Scratch.asset";
 
@@ -857,6 +865,130 @@ namespace GameDev.EditorTools
             UnityEngine.Debug.Log(
                 $"[VistaGraphBuild] Retargeted {trees} tree, {details} detail and {props} prop "
                 + $"output(s) retargeted (canopy {string.Join(", ", canopy)}).");
+        }
+
+        /// <summary>
+        /// Points a cloned template's Weight Blend texture outputs at our canonical layer assets.
+        /// </summary>
+        /// <param name="graph">The cloned graph, patched in place.</param>
+        /// <param name="byBlendLayer">
+        /// One entry per Weight Blend priority slot, lowest first. A <c>null</c> entry leaves that
+        /// slot's layer alone, which is how a template layer we already share is kept.
+        /// </param>
+        /// <remarks>
+        /// <para>
+        /// URP TerrainLit draws at most eight <c>TerrainLayer</c>s, and Vista rewrites
+        /// <c>terrainData.terrainLayers</c> per tile from the distinct layers every covering biome
+        /// produced. Sea floor, island and massif between them were emitting <b>ten</b> — the three
+        /// biomes each shipped their template's own rock and sediment samples alongside our
+        /// canonical set. Retargeting the duplicates, rather than adding an eleventh, is what keeps
+        /// a tile under the ceiling.
+        /// </para>
+        /// <para>
+        /// The slot index comes from the edge, not from node order: Weight Blend output slot ids are
+        /// <c>WeightBlendNode.MAX_LAYER + i</c>, so the layer a Texture Output paints is whichever
+        /// slot feeds it. Node order in the asset is authoring order and means nothing.
+        /// </para>
+        /// </remarks>
+        /// <summary>Points every Vista sample grass output at our canonical grass layer.</summary>
+        /// <remarks>
+        /// URP TerrainLit renders eight terrain layers: one _Control texture drives Splat0..Splat3
+        /// and a single TERRAIN_SPLAT_ADDPASS drives four more. Vista builds each tile's layer
+        /// array from the union of every covering biome's outputs, and the roads and settlement
+        /// then append four more on top. Measured on a dressed bake that came to eleven layers on
+        /// the settlement tile and ten elsewhere, so three road layers were silently not drawn.
+        /// <para>
+        /// The two sample layers are the cheapest two slots to reclaim: nothing references them by
+        /// name, no system consumes their identity, and they carry 0.0-5.6 % of the weight
+        /// depending on the tile. What is lost is the massif's two-tone grass, which collapses into
+        /// one shade. That is a deliberate trade, not an oversight.
+        /// </para>
+        /// <para>
+        /// Substitution is by layer identity rather than by blend-layer index on purpose. The
+        /// island graph's blend semantics are not what the reference document describes any more -
+        /// it was replaced wholesale by the authored template - so "wherever the sample grass is
+        /// painted, paint the canonical grass" is the only mapping that cannot be wrong. Two
+        /// outputs landing on one layer is fine: Vista keys the tile array on distinct layers and
+        /// their weights add into the same channel.
+        /// </para>
+        /// </remarks>
+        public static void ReplaceSampleGrassWithCanonical(TerrainGraph graph)
+        {
+            var dark = AssetDatabase.LoadAssetAtPath<UnityEngine.TerrainLayer>(SampleGrassDarkPath);
+            var light = AssetDatabase.LoadAssetAtPath<UnityEngine.TerrainLayer>(SampleGrassLightPath);
+            if (dark == null && light == null)
+            {
+                UnityEngine.Debug.LogWarning(
+                    "[VistaGraphBuild] Neither Vista sample grass layer resolved; nothing replaced.");
+                return;
+            }
+
+            var canonical =
+                OverworldTerrainLayers.GetCanonicalLayer(OverworldTerrainLayers.SurfaceLayer.Grass);
+            var replaced = 0;
+            foreach (var output in graph.GetNodesOfType<TextureOutputNode>())
+            {
+                var layer = output.terrainLayer;
+                if (layer == null || (layer != dark && layer != light))
+                {
+                    continue;
+                }
+
+                output.terrainLayer = canonical;
+                output.order = (int)OverworldTerrainLayers.SurfaceLayer.Grass;
+                replaced++;
+            }
+
+            UnityEngine.Debug.Log(
+                $"[VistaGraphBuild] Replaced {replaced} Vista sample grass output(s) with the "
+                + "canonical grass layer.");
+        }
+
+        public static void RetargetTextureOutputsToCanonical(
+            TerrainGraph graph,
+            OverworldTerrainLayers.SurfaceLayer?[] byBlendLayer)
+        {
+            var weightBlends = graph.GetNodesOfType<WeightBlendNode>();
+            var weightBlend = weightBlends.Count > 0 ? weightBlends[0] : null;
+            if (weightBlend == null)
+            {
+                UnityEngine.Debug.LogError(
+                    "[VistaGraphBuild] No Weight Blend node; texture outputs not retargeted.");
+                return;
+            }
+
+            var retargeted = 0;
+            foreach (var edge in graph.GetEdges())
+            {
+                if (edge.outputSlot.nodeId != weightBlend.id)
+                {
+                    continue;
+                }
+
+                if (!(graph.GetNode(edge.inputSlot.nodeId) is TextureOutputNode output))
+                {
+                    continue;
+                }
+
+                var blendLayer = edge.outputSlot.slotId - WeightBlendNode.MAX_LAYER;
+                if (blendLayer < 0 || blendLayer >= byBlendLayer.Length)
+                {
+                    continue;
+                }
+
+                var layer = byBlendLayer[blendLayer];
+                if (layer == null)
+                {
+                    continue;
+                }
+
+                output.terrainLayer = OverworldTerrainLayers.GetCanonicalLayer(layer.Value);
+                output.order = (int)layer.Value;
+                retargeted++;
+            }
+
+            UnityEngine.Debug.Log(
+                $"[VistaGraphBuild] Retargeted {retargeted} texture output(s) to canonical layers.");
         }
 
         public static TAsset SaveGraph<TAsset>(TAsset built, string assetPath)

@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 885f42b7bfbb6db48a46bb46d31f1f8a, type: 3}
+  m_Name: SoftFalloffShelf_BiomeMaskGraph
+  m_EditorClassIdentifier: Pinwheel.Vista.Runtime::Pinwheel.Vista.Graph.BiomeMaskGraph
+  m_nodeData:
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.InputNode
+    jsonData: '{"m_groupId":"","m_id":"B3VZQAG5","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_outputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":100,\"m_type\":1,\"m_name\":\"\"}","version":1},"m_inputName":"Biome
+      Mask Input","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.NoiseNode
+    jsonData: '{"m_groupId":"","m_id":"KLWG5NL9","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_offset":{"x":0.0,"y":0.0},"m_scale":55.0,"m_lacunarity":2.0999999046325685,"m_persistence":0.4000000059604645,"m_layerCount":3,"m_mode":1,"m_seed":613,"m_layerDerivativeMode":1,"m_flipSign":true,"m_warpMode":1,"m_warpAngleMin":-360.0,"m_warpAngleMax":360.0,"m_warpIntensity":1.2000000476837159,"m_remapCurve":{"serializedVersion":"2","m_Curve":[{"serializedVersion":"3","time":0.0,"value":0.15000000596046449,"inSlope":0.0,"outSlope":0.7000000476837158,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0},{"serializedVersion":"3","time":1.0,"value":0.8500000238418579,"inSlope":0.7000000476837158,"outSlope":0.0,"tangentMode":0,"weightedMode":0,"inWeight":0.0,"outWeight":0.0}],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4},"m_applyRemapPerLayer":true}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.FalloffDetailNode
+    jsonData: '{"m_groupId":"","m_id":"OUPX7GGS","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_resolutionOverride":1,"m_resolutionMultiplier":1.0,"m_resolutionAbsolute":1024,"m_detailMultiplier":0.44999998807907107}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.OutputNode
+    jsonData: '{"m_groupId":"","m_id":"58LMHAQK","m_visualState":{"m_position":{"x":0.0,"y":0.0},"m_collapsed":false},"m_shouldSplitExecution":false,"m_isBypassed":false,"m_inputSlotData":{"typeInfo":{"fullName":"Pinwheel.Vista.Graph.MaskSlot"},"jsonData":"{\"m_id\":0,\"m_type\":0,\"m_name\":\"\"}","version":1},"m_outputName":"Biome
+      Mask Output","m_slotTypeName":"Pinwheel.Vista.Graph.MaskSlot"}'
+    version: 1
+  m_edgeData:
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"T1M1GZQZ","m_outputSlot":{"m_nodeId":"B3VZQAG5","m_slotId":100},"m_inputSlot":{"m_nodeId":"OUPX7GGS","m_slotId":0}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"YW1PLXH7","m_outputSlot":{"m_nodeId":"KLWG5NL9","m_slotId":100},"m_inputSlot":{"m_nodeId":"OUPX7GGS","m_slotId":1}}'
+    version: 1
+  - typeInfo:
+      fullName: Pinwheel.Vista.Graph.Edge
+    jsonData: '{"m_id":"COHW7ZLM","m_outputSlot":{"m_nodeId":"OUPX7GGS","m_slotId":100},"m_inputSlot":{"m_nodeId":"58LMHAQK","m_slotId":0}}'
+    version: 1
+  m_groupData: []
+  m_stickyNoteData: []
+  m_stickyImageData: []
+  m_objectReferences: []
+  m_exposedProperties: []
+  m_debugConfigs:
+    m_resolution: 512
+    m_worldBounds:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1000
+      height: 1000
+    m_terrainHeight: 600
+    m_seed: 1234
+    m_shouldOutputTempHeight: 0
+  m_allowSplitExecution: 1

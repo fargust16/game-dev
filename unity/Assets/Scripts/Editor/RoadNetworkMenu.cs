@@ -63,7 +63,25 @@ private const float BridgeSpanDetectionThresholdMeters = GridCellSizeMeters * 1.
             var minZ = margin;
             var usableSizeX = WorldScale.WorldExtentXMeters - 2f * margin;
             var usableSizeZ = WorldScale.WorldExtentZMeters - 2f * margin;
-            float HeightMeters(float x, float z) => sampler.SampleWorldHeight(x, z);
+            // Height memo for the A* grid. RoadPathfinder asks for elevation only at
+            // RoadGridSpec.CellCenter points, twice per neighbour edge, and every one of those
+            // calls used to run OverworldTerrainAccess.SampleHeightWorld - which scans the scene
+            // with FindObjectsByType<Terrain> before it samples anything. One measured plan made
+            // ~152 M of those calls resolving to at most 12 100 distinct cells.
+            //
+            // The memo is keyed on an EXACT coordinate match against the cell centre, never on
+            // "the point falls inside the grid". LandscapeCostField samples the same rectangle on
+            // its own 10 m lattice, and answering those from a 25 m cell would collapse 6.25
+            // samples onto one height and wreck the slope, curvature and roughness it derives.
+            // Anything that is not bitwise a cell centre - cost field lattice, softened polyline
+            // points in RoadVerticalProfile - falls through to the sampler unchanged.
+            var memoGrid = default(RoadGridSpec);
+            float[] memoHeights = null;
+
+            float HeightMeters(float x, float z) =>
+                memoHeights != null && TryExactCellIndex(memoGrid, x, z, out var memoIndex)
+                    ? memoHeights[memoIndex]
+                    : sampler.SampleWorldHeight(x, z);
 
             var settings = OverworldTerrainMenu.ActiveSettings;
             settings.Clamp();
@@ -106,6 +124,11 @@ if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y
             var width = Mathf.Max(1, Mathf.FloorToInt(usableSizeX / GridCellSizeMeters));
             var height = Mathf.Max(1, Mathf.FloorToInt(usableSizeZ / GridCellSizeMeters));
             var grid = new RoadGridSpec(minX, minZ, width, height, GridCellSizeMeters);
+
+            // Arm the memo described above. Until this point HeightMeters is the plain sampler, so
+            // nothing before it can read a half-filled table.
+            memoGrid = grid;
+            memoHeights = BuildCellHeightMemo(grid, sampler);
 
             bool CanBridgeSpan(Vector2 from, Vector2 to) => false;
 
@@ -478,6 +501,53 @@ if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y
 
                 return found;
             }
+        }
+
+        /// <summary>Terrain height at every <see cref="RoadGridSpec"/> cell centre, sampled once.</summary>
+        private static float[] BuildCellHeightMemo(RoadGridSpec grid, VistaTerrainSampler sampler)
+        {
+            var heights = new float[grid.CellCount];
+            for (var cz = 0; cz < grid.Height; cz++)
+            {
+                for (var cx = 0; cx < grid.Width; cx++)
+                {
+                    var center = grid.CellCenter(cx, cz);
+                    heights[grid.Index(cx, cz)] = sampler.SampleWorldHeight(center.x, center.y);
+                }
+            }
+
+            return heights;
+        }
+
+        /// <summary>
+        /// Index of the cell whose centre is <em>exactly</em> (<paramref name="x"/>,
+        /// <paramref name="z"/>), or false when the point is anything else.
+        /// </summary>
+        /// <remarks>
+        /// Bitwise equality against <see cref="RoadGridSpec.CellCenter"/>, deliberately: a
+        /// containment test would answer for every point in the cell, and the cost field samples
+        /// this same rectangle on a finer lattice. Every rejection - out of range, off centre, a
+        /// NaN that fails the comparison - is a fall-through to the real sampler, so a miss costs
+        /// time and never an answer.
+        /// </remarks>
+        private static bool TryExactCellIndex(RoadGridSpec grid, float x, float z, out int index)
+        {
+            index = -1;
+            var cx = Mathf.FloorToInt((x - grid.MinX) / grid.CellSize);
+            var cz = Mathf.FloorToInt((z - grid.MinZ) / grid.CellSize);
+            if (cx < 0 || cx >= grid.Width || cz < 0 || cz >= grid.Height)
+            {
+                return false;
+            }
+
+            var center = grid.CellCenter(cx, cz);
+            if (center.x != x || center.y != z)
+            {
+                return false;
+            }
+
+            index = grid.Index(cx, cz);
+            return true;
         }
 
         private static void ApplyRoadSettings(LandscapeCostField field, WorldGenSettings settings)

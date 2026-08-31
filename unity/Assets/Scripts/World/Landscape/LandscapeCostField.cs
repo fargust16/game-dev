@@ -39,6 +39,15 @@ namespace GameDev.World.Landscape
         public float MaxGrade { get; set; } = WorldScale.RoadMaxGrade;
         public float MaxGradeChange { get; set; } = WorldScale.RoadMaxGradeChange;
 
+        /// <summary>Bumped whenever anything that changes an existing cost is applied.</summary>
+        /// <remarks>
+        /// <see cref="RoadSearchLandmarks"/> measures distances against a particular state of this
+        /// field. Painting a corridor only makes cells cheaper, so a table built before the paint
+        /// would report distances larger than the truth and stop being a lower bound. This counter
+        /// is how the table notices.
+        /// </remarks>
+        public int Version { get; private set; }
+
         public float MaxGradeChangeOrDefault() =>
             MaxGradeChange > 0f ? MaxGradeChange : WorldScale.RoadMaxGradeChange;
         public float DetourTolerance { get; set; } = WorldScale.RoadDetourTolerance;
@@ -292,6 +301,8 @@ namespace GameDev.World.Landscape
 
             var half = halfWidthMeters > 0f ? halfWidthMeters : ExistingCorridorHalfWidth;
             var pad = half + CellSize;
+
+            Version++;
             for (var s = 0; s < polylineXZ.Count - 1; s++)
             {
                 var a = polylineXZ[s];
@@ -327,6 +338,42 @@ namespace GameDev.World.Landscape
         public float Evaluate(float worldX, float worldZ, float desiredRoadHeight)
         {
             var i = ClampIndex(worldX, worldZ);
+            var cost = TerrainCostAt(i, desiredRoadHeight);
+            var roadDist = existingRoadDist[i];
+            if (roadDist < ExistingCorridorHalfWidth)
+            {
+                var t = 1f - roadDist / Mathf.Max(ExistingCorridorHalfWidth, 0.01f);
+                var discount = Mathf.Lerp(1f, ExistingCorridorDiscount, t * t);
+                cost *= discount;
+            }
+
+            return cost;
+        }
+
+        /// <summary>
+        /// What the ground itself costs, before <see cref="ExistingCorridorDiscount"/> is applied.
+        /// </summary>
+        /// <remarks>
+        /// Read passability from here, never from <see cref="Evaluate"/>. The corridor discount says
+        /// a route sharing an accepted corridor is cheaper to *build*; it multiplies the whole value,
+        /// so a mountain cell that reads as a hard obstacle on open ground stopped reading as one once
+        /// a road was painted beside it. Whether ground can carry a road is a property of the ground,
+        /// not of what was built next to it, and it must not depend on which roads Prim happened to
+        /// accept first. Construction cost and passability are different questions and this is the
+        /// answer to the second one; the formula itself lives in one place either way.
+        /// </remarks>
+        public float TerrainCost(float worldX, float worldZ, float desiredRoadHeight) =>
+            TerrainCostAt(ClampIndex(worldX, worldZ), desiredRoadHeight);
+
+        public float EvaluateAtTerrain(float worldX, float worldZ) =>
+            Evaluate(worldX, worldZ, SampleHeight(worldX, worldZ));
+
+        /// <summary>Undiscounted terrain cost at the existing ground height.</summary>
+        public float TerrainCostAtTerrain(float worldX, float worldZ) =>
+            TerrainCost(worldX, worldZ, SampleHeight(worldX, worldZ));
+
+        private float TerrainCostAt(int i, float desiredRoadHeight)
+        {
             var terrainH = height[i];
             var excavation = Mathf.Max(0f, terrainH - desiredRoadHeight);
             var fill = Mathf.Max(0f, desiredRoadHeight - terrainH);
@@ -346,20 +393,8 @@ namespace GameDev.World.Landscape
                 ? ForestPenalty * (0.5f + roughness[i])
                 : 0f;
 
-            var cost = 1f + slopeCost + cutCost + fillCost + curveCost + mountain + forest;
-            var roadDist = existingRoadDist[i];
-            if (roadDist < ExistingCorridorHalfWidth)
-            {
-                var t = 1f - roadDist / Mathf.Max(ExistingCorridorHalfWidth, 0.01f);
-                var discount = Mathf.Lerp(1f, ExistingCorridorDiscount, t * t);
-                cost *= discount;
-            }
-
-            return cost;
+            return 1f + slopeCost + cutCost + fillCost + curveCost + mountain + forest;
         }
-
-        public float EvaluateAtTerrain(float worldX, float worldZ) =>
-            Evaluate(worldX, worldZ, SampleHeight(worldX, worldZ));
 
         public float EvaluateEdge(float x0, float z0, float x1, float z1)
         {

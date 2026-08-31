@@ -6,6 +6,25 @@ for work that is understood but not done.
 
 ---
 
+## P0 — OPEN / EXTERNAL DEPENDENCY. Vista terrain generation is bistable
+
+The same project, seed and code produce one of exactly two worlds; the second is ~+36 m
+higher across a third of the map. Reproducible in fresh Unity processes, roughly 30 % of
+full bakes. Investigated across phases 2G-2P and escalated to the vendor: the graph,
+execution plan, seed and configuration are provably identical in both states, and every
+local fix or validator candidate was tested and rejected.
+
+**This blocks nothing, but it invalidates single-bake evidence.** Any full-stack
+measurement must be repeated until the tile hashes match the canonical reference, or
+reported for both states. Island-only bakes have been stable throughout.
+
+Full record: [VISTA_BISTABLE_TERRAIN.md](VISTA_BISTABLE_TERRAIN.md).
+Vendor draft: [VISTA_BISTABLE_BUG_REPORT.md](VISTA_BISTABLE_BUG_REPORT.md).
+
+Not fixed. Not worked around. Do not mark resolved without a vendor response.
+
+---
+
 ## 0. Roads are disabled in the default pipeline
 
 `WorldGenSettings.Default.RunRoads = false` as of 2026-08-17. The step is off for two independent
@@ -28,37 +47,63 @@ optimising.
 
 ---
 
-## 1. Road planning takes 141 s — blocking
+## 1. RESOLVED — road planning took 141 s, and the search was returning the wrong route
 
-`[Gen] step=roads.plan ms=140970 | grid 110x110 cells, 32 nodes`
+`roads.plan` is **5.3 s** on the real scene, down from 261.5 s measured at the start of the
+investigation, and the routes it returns are now provably the cheapest ones. Three separate defects
+were behind that, found in this order.
 
-The whole roads step is 141 s of a 149 s `Generate All`. Every other part of it is noise:
+**The height sampler was re-scanning the scene.** `RoadPathfinder` asks for elevation twice per
+neighbour edge, and the delegate it was handed ran `OverworldTerrainAccess.SampleHeightWorld`, which
+calls `FindObjectsByType<Terrain>` before it samples anything. One measured plan made **69 230 938**
+such calls resolving to at most 12 100 distinct grid cells. `RoadNetworkMenu` now precomputes the
+height at every cell centre once and answers from that table, matching on exact coordinates rather
+than cell containment — the cost field samples the same rectangle on a finer 10 m lattice, and
+answering those from a 25 m cell would have wrecked the slope and curvature derived from them.
+Sampler calls fell to 13 224 and the output was bitwise identical.
 
-| Sub-step | Time |
-|---|---|
-| `roads.costfield` | 301 ms |
-| **`roads.plan`** | **140 970 ms** |
-| `roads.profiles` | 3 ms |
-| `roads.heights` | 20 ms |
-| `roads.paint` | 26 ms |
+**A third of the searches were duplicates.** Junction samples are taken every 20 m along accepted
+polylines, which is finer than the 25 m search grid, so many land in a cell an earlier sample already
+asked about. `TryFindPath` reads the goal only through `TryWorldToCell`, so two samples in one cell
+must produce the same answer; `TryAttachToNetwork` now caches by goal cell for the duration of one
+attachment. 36.2 % fewer A* calls, again bitwise identical output.
 
-**This is not a workload problem.** 110×110 is 12 100 cells; a grid that size with 32 nodes should
-plan in milliseconds. The cost is inside `LandscapePlanner.PlanRoads` →
-`RoadNetworkBuilder.BuildHierarchicalNetwork` / `EnsureMinimumConnectivity`.
+**The heuristic was not admissible.** This one changed results, not just timing. Straight-line
+distance in metres assumes no metre costs less than 1, and the comment above `Heuristic` said so
+explicitly. `LandscapeCostField` breaks that: within `ExistingCorridorHalfWidth` of an accepted road
+it multiplies the (>= 1) terrain cost by `ExistingCorridorDiscount`, which production sets to 0.15.
+The heuristic therefore overpriced any route that would reuse a corridor, and the search settled for
+the straight line — measured at up to 46 % above the true optimum on a painted field, 5 of 40
+searches wrong on the real terrain. Worse, it defeated the corridor reuse the discount exists to
+create.
 
-It scaled far worse than area: widening the planning region from one tile to the world (2× per axis,
-4× area) took the step from 12.6 s to 141 s — roughly 11×, not 4×. That superlinearity is the thing
-to find.
+Two fixes were tried. Scaling the heuristic by the discount (`h = 0.15 x euclidean`) is admissible
+and consistent, and it made the search exact — but only 1 % of cells actually cost less than 1 per
+metre, so every estimate was divided by 6.67 to accommodate them and `roads.plan` went from 9.9 s to
+18.0 s. **That is not what shipped.** `RoadSearchLandmarks` replaced it: ALT bounds from four
+deterministic farthest-point landmarks, `max over L of |d(L,n) - d(L,goal)|`. Admissible by the
+triangle inequality, which applies because the edge cost is symmetric (per-point costs are averaged
+and `RoadCost.GradeMultiplier` takes the absolute grade), and monotone, so the closed set stays sound
+and no node needs reopening.
 
-Where to look first:
-- how many searches `BuildHierarchicalNetwork` runs — all-pairs over 32 nodes is 496 searches, and
-  if each is a full-grid Dijkstra without an early exit that alone is 6M node pops per pass;
-- whether `EnsureMinimumConnectivity` re-plans from scratch per node instead of reusing the field;
-- whether `CostField.EvaluateAtTerrain` is called per neighbour visit rather than cached per cell —
-  it closes over `sampler.SampleWorldHeight`, so a cache miss is a terrain sample.
+Verified: exact against Dijkstra on the real terrain and at discounts 0.05 / 0.15 / 0.50, zero cost
+mismatches; 0 overestimates over 4 000 cells and 0 monotonicity violations over 29 488 edges; the
+network is bitwise identical to the scalar-bound version, 31 segments, one component, no duplicate
+pairs, loops or crossings; three consecutive plans byte-for-byte equal.
 
-Sub-step timers are already in place (`RoadNetworkMenu`, `RoadCorridorDeformer`); add one more
-inside `BuildHierarchicalNetwork` per search and the answer should fall out in one run.
+Two traps worth remembering. The distance tables must be `double`: `GradeMultiplier` lets distances
+reach 1.2e8 while edges can cost 25, and `float` quantisation at that magnitude turned a 332.232 edge
+into a 336.000 drop and broke monotonicity. And the tables measure one `LandscapeCostField.Version` —
+painting only makes cells cheaper, so a table built before a repaint starts overestimating.
+`EnsureFresh` is the guard, and `LowerBound` returns 0 rather than answer from a stale table.
+
+The scalar bound is still there as the floor under the landmark bound. It wins 0.04 % of the time
+with fresh tables, but it is the only estimate available when a table has been invalidated or when
+neither endpoint can reach a landmark, and it is what the `Func`-only overloads use.
+
+What did not get fixed: `roads.plan` still runs thousands of searches because `TryAttachToNetwork`
+starts a full A* per 20 m polyline sample, and each search allocates ~109 KB of scratch arrays.
+Reducing that changes road geometry on every seed, so it is a separate decision — see item 0.
 
 ---
 
@@ -165,29 +210,113 @@ regenerate from the seed instead.
 
 ---
 
-## 8. Road softening emits points it never validated — failing test, mechanism known
+## 8. RESOLVED — road softening emitted points it never validated
 
-`RoadPathSimplifierTests.SoftenNatural_CannotCrossImpassableBand` fails: a softened road segment
-crosses a cell whose cost is `+Infinity`. This predates the stabilization pass — it is not caused by
-the hydrology removal, and the test only crosses cost-infinite cells, so it does not depend on
-inland water existing.
+`RoadPathSimplifierTests.SoftenNatural_CannotCrossImpassableBand` passes, and the whole EditMode
+suite is green at **206/206**.
 
-Two places emit a point other than the one they checked:
+**Root cause: `LimitHeadingChange` validated different geometry from the geometry it emitted.**
+Splitting a corner was decided on the chord `a -> mid -> c` with `mid = (a + c) / 2`, but the point
+that actually went into the polyline was `Lerp(b, mid, 0.55)` — 45 % of the way back from `mid`
+towards the original corner, and therefore outside the chord that had just been cleared, on the side
+where `b` was hugging the obstacle. Neither segment through the emitted point was ever checked.
 
-1. **`LimitHeadingChange`** (`RoadPathSimplifier.cs`, corner-split branch) validates the chord
-   `a → mid → c` where `mid = (a + c) / 2`, and then inserts **`Vector2.Lerp(b, mid, 0.55f)`** — a
-   different point. Nothing establishes that the segments through the inserted point are clear.
-2. **`ChaikinSafe`** validates each source segment `a → b` and the two cut points `q` (25 %) and `r`
-   (75 %) on it, then emits `… q_i, r_i, q_{i+1} …`. The pair **`r_i → q_{i+1}` spans the corner at
-   `b`** and is never checked. That is the classic Chaikin corner-cutting hazard: cutting a corner
-   that hugs an obstacle moves the path into it.
+The failure needs two passes and a densified input, which is why the stage looks clean in isolation:
+`LimitHeadingChange` alone on the raw path produced 0 violations, `ChaikinSafe` alone produced 0, and
+only `Chaikin -> Limit` produced 2. The exact corner, from the second pass:
 
-Both are the same bug class — *validate the geometry you actually emit* — and the fix in each case
-is local: check the segment through the candidate point and fall back to keeping the original
-corner. It is deliberately **not** applied here because it changes generated road geometry on every
-seed, and this milestone's road work was scoped to the multi-tile writers.
+```
+a = (32.5, 25)   b = (37.5, 17.5)   c = (42.5, 13.188)   mid = (37.5, 19.094)
+  CHECKED   a -> mid    clear
+  CHECKED   mid -> c    clear
+  EMITTED   Lerp(b, mid, 0.55) = (37.5, 18.377)
+  NEVER CHECKED  a -> emitted   BLOCKED
+```
 
-Do not "fix" this by loosening the test. A road crossing impassable ground is the defect.
+**The fix validates the candidate that actually ships:** the segment from the previously emitted
+point (not the original `a` — on the second pass they differ) to the candidate, and from the
+candidate to `c`. If either is blocked the original corner is kept, which is what the negative branch
+already did. Same two `SegmentClear` calls per split as before.
+
+Nothing else moved. Thresholds, the two-pass structure, endpoint handling, traversal order, return
+shape and smoothing strength are all unchanged; per-function hashes confirm `SoftenNatural`,
+`CollapseGridStairs`, `ChaikinSafe`, `SegmentClear` and `ClosestPointOnPolyline` are byte-identical,
+as are `RoadPathfinder.cs`, `RoadNetworkBuilder.cs` and `RoadCost.cs`.
+
+Verified. Two regression tests were added — a negative one that first asserts the *old* chord was
+clear (so the old code had every reason to split) and that the emitted segment is blocked, then
+requires the corner to survive; and a positive one on the same corner without the obstacle, proving
+softening still happens. On the real terrain, with no bake: smoothing introduced **zero** violations,
+topology held at 31 segments / 31 distinct pairs / 0 duplicates / 0 self loops / one component, and
+the network came out bitwise identical — 1168 points, 7801.5430 m, all 43 softened polylines
+byte-for-byte equal, deviation 0.00 m. Repeated runs reproduce the same fingerprints. Softening cost
+the same 8599 cost-function calls before and after, so there is no measurable performance change.
+
+Worth knowing: on the current seed the fix changes nothing at all, because no corner split there ran
+into an obstacle. Its value is on seeds where one does, and the synthetic tests are what protect it.
+
+**Two structural risks in the same class were confirmed during the audit and deliberately left
+alone. They were not part of this fix.**
+
+- `ChaikinSafe` validates each source segment `a -> b` and the cut points `q` (25 %) and `r` (75 %)
+  on it, then emits `... q_i, r_i, q_{i+1} ...`. The span `r_i -> q_{i+1}` crosses the corner at `b`
+  and is never checked — the classic corner-cutting hazard. It did not fire on the failing test or
+  on the real terrain, but the mechanism is present.
+- `CollapseGridStairs` computes `keep[]` against the *original* points and then drops all of them in
+  one pass, so two consecutive removals emit a chord that neither validation covered. Proven on a
+  minimal case: from `(0,0) (4,1) (8,1) (12,0)` with a spike at `x in [7.5,8.5]`, both interior
+  points are individually droppable against clear chords and the emitted `(0,0) -> (12,0)` is
+  blocked. On the real terrain the stage is currently a no-op — 0 points dropped of 579, because the
+  12.5 m sampling step puts the 43.75 m chord gate below the 50 m span of two grid steps.
+
+One more finding from the audit, unrelated to softening: A* refuses only `+Infinity`, while
+`SegmentClear` refuses anything at or above `MountainCost * 0.85 = 11.9`. A diagonal grid step can
+therefore pass between two cheap cells whose shared corner — a point A* never evaluates — sits above
+that threshold. That is the source of the single remaining violation on the real terrain (a 35.4 m
+span whose midpoint costs 12.119). It predates the softening fix and survives it. The half of that
+finding that was a defect is resolved below; the rest is the contract working as intended.
+
+---
+
+## 8a. RESOLVED — passability depended on the corridor discount
+
+**Road passability contract (approved 2026-08-31).** Mountains are traversable terrain, not hard
+obstacles. Roads may pass through them; the planner prefers cheaper ground — passes, contours,
+switchbacks — over a direct expensive climb, and it does that by price, not by refusal. Only three
+things block a route outright: water / `+Infinity`, earthwork beyond `MaxCutDepth` / `MaxFillHeight`,
+and grade at or above `MaxWalkableGrade`. `MountainPenalty` and `MountainCost` stay soft.
+
+Against that contract one thing was a genuine defect. `LandscapeCostField.Evaluate` multiplies the
+whole cost by `ExistingCorridorDiscount` near an accepted road, and `RoadPathSimplifier` was handed
+that same value to answer `RoadCost.IsHardObstacleCost`. A flat mountain costs 13 and reads as an
+obstacle; at 0.15 it costs 1.95 and stops reading as one. Obstacle status therefore depended on which
+roads Prim happened to accept first — a passability predicate cannot be order-dependent, and painting
+a road cannot make ground carry a road that could not carry one before.
+
+The split is now explicit. `LandscapeCostField.TerrainCost` / `TerrainCostAtTerrain` answer what the
+ground itself costs, before any discount; `Evaluate` / `EvaluateAtTerrain` keep answering what it
+costs to build there, discount included, and A* still reads those. The arithmetic in `Evaluate` is
+unchanged — the terms were extracted into `TerrainCostAt` and the discount reapplied in the same
+order — so the search sees exactly the values it saw before. `RoadNetworkBuilder` carries a
+`passabilityAtWorld` oracle to `FinalizePath`; every stage of `RoadPathSimplifier` reads its delegate
+only through `SegmentClear` and `IsHardObstacleCost`, so what it always wanted was passability, and
+its parameter is now named for that.
+
+Verified. EditMode **210/210**. On the real terrain the network is bitwise identical — fingerprint
+`6ED317F9BCEF93EE`, 31 segments, 31 distinct pairs, 0 duplicates, 0 self loops, one component, 0
+crossings, 1168 points, 7801.536 m, 0 segments changed, deviation 0.00 m — because that map holds
+only 18 mountain cells and no road runs near them. Where the defect was visible it changes what it
+should: on seed 110201, 2 segments differ and spans crossing obstacle ground drop from 133 to 131.
+Across discounts 0.05 / 0.15 / 0.50 / 1.00 the terrain cost stays 13.000 and the obstacle verdict
+stays true, while construction cost moves 8.798 → 13.000. Three repeated plans give the same
+fingerprint. A*, the ALT landmarks, B2 and `RoadCost` are untouched.
+
+Still open, both recorded during the audit and deliberately not fixed here:
+`LandscapeCostField.Evaluate`'s `BlockedCost` branch is unreachable through `EvaluateAtTerrain`
+(it passes `SampleHeight(x, z)` as the desired road height, so excavation and fill are identically
+zero — measured 0 infinite cells in 12 100 across nine configurations), which leaves A*'s
+`IsPositiveInfinity` check dead in production; and `AsPathCostFunc()` is dead code whose body reads
+`return float.IsPositiveInfinity(c) ? c : c`.
 
 ---
 
@@ -310,3 +439,7 @@ Not visible in the average; only the histogram's `min` catches it. Worth resolvi
 - Vegetation Pass phases 4–6 from the original spec are not started: flowers and small plants,
   further environmental dressing, LOD/culling budgets.
 - URP shadow distance is at its default, so the 20 m canopies only shade nearby ground.
+- `RoadPathfinder.TryFindPath` now takes 10 parameters, five of which (`costField`, `heightMetersAtWorld`,
+  `isBlocked`, `minCostPerMetre`, `landmarks`) always travel together from `RoadNetworkBuilder`. They
+  want to be one search-context struct. Left alone deliberately: the road search was in flight and a
+  signature change touches every caller including 11 test sites, so it is worth doing on its own.
