@@ -1,7 +1,7 @@
 # World Generation Pipeline — Target Architecture
 
 **Status:** Draft
-**Date:** 2026-08-15
+**Date:** 2026-08-31
 **Applies to:** Track W (World Gen), all waves after Overworld V0
 **Related:** [OVERWORLD_V0_PLAN.md](OVERWORLD_V0_PLAN.md) (current iteration), [OVERWORLD_VISUAL_DIRECTION.md](OVERWORLD_VISUAL_DIRECTION.md), [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md), [ASSET_LIBRARY_REFERENCE.md](ASSET_LIBRARY_REFERENCE.md), [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md), [14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
 
@@ -106,7 +106,7 @@ Rows 1, 3, 6, 9 don't have a System Card yet in `17` — add one when that wave 
 - **Terrain masks are data, not throwaway locals.** Height/slope/moisture read through `VistaTerrainSampler` (Unity Terrain + classifier) so biome/material/vegetation/road rules share one surface.
 - **Rivers reshape terrain.** Path → valley → depression → bed → water, in that order. A blue spline laid on unmodified terrain is not hydrology. Not implemented in V0 — this is the bar any future attempt has to clear.
 - **Biome is not just a texture switch.** It should also drive terrain shape tendencies, vegetation density, and (later) POI placement rules — see `W.2`'s relation to `W.4`/`W.6` dressing.
-- **Roads are pathfinding, not lines.** Lowest-cost path respecting slope, rivers (bridges), and mountains (passes) — never straight through a mountain.
+- **Roads are pathfinding, not lines.** Lowest-cost path respecting slope, rivers (bridges), and mountains (passes) — never straight through a mountain. Decided 2026-08-31: **a mountain is traversable terrain priced high, never a hard obstacle** — «never straight through» is about the direct expensive climb, not about the ground being forbidden. Full wording in [90 Glossary](../../../90%20Glossary.md) § Road Passability.
 - **Settlements are shaped by terrain**, not a flat square with houses dropped on it — matches `W.5`'s "layout intents: road hints, plot footprints, district tags" wording already in `17`.
 - **Chunk generation must be a pure function of world coordinates** (`Height = f(worldX, worldZ, seed)`), never local-to-chunk coordinates. Already how `ChunkCoord` and `VistaTerrainSampler` / `Terrain.SampleHeight` world-space queries are built — keep it that way for every future sampler. The same rule applies to **tiles**: a world-dressing pass must resolve the tile that contains a point, never assume tile (0,0).
 - **Generation is not persistence.** Regenerable structure (heightmap, biome bands, vegetation placement) is never saved; only player-caused deltas (felled tree, built structure) are. Matches `X.3 Save System`'s existing "never dump regenerable chunk meshes" rule.

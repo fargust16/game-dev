@@ -61,7 +61,7 @@ namespace GameDev.World.Settlement
 
                 var r = go.GetComponent<Renderer>();
                 if (r != null)
-                    r.sharedMaterial = CreateTint(ColorFor(seg));
+                    r.sharedMaterial = GeneratedTintMaterials.Get(ColorFor(seg));
 
                 var col = go.GetComponent<Collider>();
                 if (col != null)
@@ -94,7 +94,7 @@ namespace GameDev.World.Settlement
 
             var r = go.GetComponent<Renderer>();
             if (r != null)
-                r.sharedMaterial = CreateTint(new Color(0.42f, 0.36f, 0.3f, 1f));
+                r.sharedMaterial = GeneratedTintMaterials.Get(new Color(0.42f, 0.36f, 0.3f, 1f));
         }
 
         private static void SpawnProps(PropertySpec prop, Transform parent)
@@ -115,7 +115,7 @@ namespace GameDev.World.Settlement
 
                 var r = go.GetComponent<Renderer>();
                 if (r != null)
-                    r.sharedMaterial = CreateTint(p.Tint);
+                    r.sharedMaterial = GeneratedTintMaterials.Get(p.Tint);
 
                 var col = go.GetComponent<Collider>();
                 if (col != null)
@@ -151,7 +151,7 @@ namespace GameDev.World.Settlement
 
                 var r = go.GetComponent<Renderer>();
                 if (r != null)
-                    r.sharedMaterial = CreateTint(p.Tint);
+                    r.sharedMaterial = GeneratedTintMaterials.Get(p.Tint);
 
                 var col = go.GetComponent<Collider>();
                 if (col != null)
@@ -206,25 +206,6 @@ namespace GameDev.World.Settlement
                 case BoundaryStyle.Wall: return new Color(0.62f, 0.58f, 0.52f, 1f);
                 default: return Color.gray;
             }
-        }
-
-        private static Material CreateTint(Color tint)
-        {
-            var shader = Shader.Find("Universal Render Pipeline/Lit");
-            if (shader == null)
-                shader = Shader.Find("Standard");
-            if (shader == null)
-                shader = Shader.Find("Sprites/Default");
-            var mat = shader != null
-                ? new Material(shader)
-                : new Material(Shader.Find("Hidden/InternalErrorShader"));
-            if (mat.HasProperty("_BaseColor"))
-                mat.SetColor("_BaseColor", tint);
-            if (mat.HasProperty("_Color"))
-                mat.SetColor("_Color", tint);
-            else
-                mat.color = tint;
-            return mat;
         }
     }
 }

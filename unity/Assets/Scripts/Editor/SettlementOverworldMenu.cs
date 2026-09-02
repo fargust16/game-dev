@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using GameDev.World;
 using GameDev.World.Buildings.Shell;
 using GameDev.World.Poi;
 using GameDev.World.Settlement;
@@ -34,6 +35,8 @@ namespace GameDev.EditorTools
             // Must clear before height probes — otherwise Raycast hits prior shells/cylinder and
             // SnapFabric lifts the whole town into the air.
             ClearSettlement();
+            // One generation, one set of shared materials — see GeneratedTintMaterials.
+            GeneratedTintMaterials.Reset();
             var height = new RaycastWorldHeightSampler();
 
             if (!SettlementApproachBinder.TryCreateDryFabricNearApproach(
@@ -116,7 +119,9 @@ namespace GameDev.EditorTools
         /// same material there, so the result reads the same - but it is a merge, not a rename.
         /// </para>
         /// </remarks>
-        private static TerrainLayer EnsureDustTerrainLayer()
+        /// <remarks>Internal, not private, so the merge above is covered by a regression test
+        /// rather than only by this comment.</remarks>
+        internal static TerrainLayer EnsureDustTerrainLayer()
         {
             const string path = "Assets/Settings/TerrainLayers/Dirt_Road_Edge.terrainlayer";
             // Look (albedo remap, tiling) belongs to the layer asset and is tuned in the Inspector.

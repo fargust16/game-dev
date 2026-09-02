@@ -184,29 +184,98 @@ that location.
 
 ---
 
-## 7. The overworld scene is half generated and versions like it
+## 7. OPEN / BLOCKED BY P0 — the overworld scene versions its generated state
 
-`Assets/Scenes/Overworld_Generator.unity` produced **416 386 changed lines** in one commit. Every
-`Generate All` rewrites it, so the history records bakes rather than decisions and any merge on the
-scene is hopeless.
+`Assets/Scenes/Overworld_Generator.unity` is two things in one file: a small authored scaffolding
+that must survive a clone, and the generated world, which every `Generate All` rewrites. Both are
+versioned, so the history records bakes rather than decisions and no merge on the scene is possible.
 
-It cannot simply be ignored, because it is two things in one file:
+That contradicts an accepted decision in `AGENTS.md`: *generation is not persistence — regenerable
+structure is never saved, only player-caused deltas are.*
 
-| Authored — must survive a clone | Generated — rewritten every bake |
-|---|---|
-| `VistaManager` and its settings | terrain tiles and their `TerrainData` |
-| directional light, sky, camera rig | spawned LPB instances |
-| `WorldGenSettings` / seed state | POI markers, settlement greybox, roads, bridges |
-| ocean plane | the player object |
+**Measured, and still valid.** Between two consecutive commits of the scene:
 
-The fix is to separate them: move the authored scaffolding into a prefab (or a small additive scene)
-that is versioned, and let `Generate All` build everything else into a scene that is not. The
-generated side is already reproducible — the seed is logged with every run and the terrain data,
-graph clones and baked lighting are ignored — so the only thing standing in the way is that the
-scaffolding has never been extracted.
+```
+fileID anchors surviving a regeneration ..... 23 of 10 515  (0.2 %)
+scene lines re-issued with identical content  345 575 of 391 195  (88.3 %)
+scene lines that are genuinely new content ..  45 620  (11.7 %)
+scene blobs in the measured history ......... 56, ~186 MB raw, of a 310 MB .git
+```
 
-Until that happens, treat scene diffs as noise and never resolve a conflict in them by hand:
+The 23 survivors are the authored scaffolding, and they are the real boundary — not the table this
+entry used to carry. They are: the four scene-level settings blocks, `SceneRoots`, and five
+GameObjects with their components — `OverworldReflectionProbe`, `OverworldWorldState`,
+`Review Camera`, `OverworldVolume`, `Sun`. Note that `VistaManager` is **not** among them: it is
+present in the scene but recreated like everything else.
+
+**The one confirmed remaining root cause is unstable object identity.** `ClearMarkers()` and
+`ClearSettlement()` destroy their roots and everything is created again, so Unity issues fresh
+`fileID` anchors; every reference between objects carries those numbers, and the whole file rewrites.
+The mechanism is deterministic and owned by our own Editor code — it is not a Vista symptom.
+
+**Item 7a is a mitigation, not a resolution.** It halved the file by removing duplicated materials.
+It did not touch identity: the remaining ~200 000 lines still re-issue under new anchors on every
+generation. The churn *fraction* after 7a has not been measured, and there is reason to expect it did
+not improve — materials were the part most likely to be content-identical, and 7a removed them.
+
+**A follow-up audit found no further small defect.** After 7a the generated content is clean: zero
+duplicate spawns (1 857 distinct name/parent/transform tuples over 1 857 GameObjects), colliders
+exactly as designed (walls keep them, windows and corners do not), no debug roots, and the 48-line
+`MeshRenderer` block is entirely Unity defaults — our code sets only `m_Materials` in it. What
+remains is per-object engine overhead on 1 843 legitimately distinct generated objects, dominated by
+`MeshRenderer` at roughly 47 % of the post-7a file.
+
+Full resolution therefore needs an architectural decision, and **none of these is approved** —
+they are the options an approval would choose between: incremental generation that reuses objects
+instead of recreating them; prefab-based serialisation, where an instance stores overrides rather
+than every component; mesh aggregation; or a different persistence/versioning policy.
+
+**Removing the generated scene from Git is blocked by P0.** Without the scene in version control the
+only way back to the canonical world is to regenerate it, and Vista's bistability means roughly 30 %
+of full bakes produce the other world. The canonical world would not be safely recoverable.
+
+Until this is decided, treat scene diffs as noise and never resolve a conflict in them by hand:
 regenerate from the seed instead.
+
+---
+
+## 7a. MITIGATED — generated placeholder geometry duplicated its materials
+
+Every shell piece and settlement feature called `new Material(...)` of its own. One measured scene
+carried **1 799 inline materials with 62 distinct definitions** — one shader, one keyword set, one
+texture set, one float set, one set of GI flags, and only `_BaseColor` and `m_CustomRenderQueue`
+varying. At 119 lines each that was 214 081 lines, **54.7 %** of the file.
+
+`GeneratedTintMaterials` now caches by `(tint, renderQueue)` — both axes, because the opening pieces
+raise the queue to 3001 so their plaques draw after the walls, and keying on colour alone would merge
+a wall with a window. Sharing is safe because nothing mutates these materials after they reach a
+renderer: every property write happens before the caller assigns `sharedMaterial`, and no renderer
+goes through `renderer.material`, so Unity does not clone them either.
+
+Lifetime is one generation. `Reset()` runs where a generation step clears its previous output, and
+every lookup re-checks liveness anyway — a Material whose scene was closed compares equal to null and
+is replaced rather than handed back.
+
+Measured on a controlled real-scene generation of the POI and settlement steps only (no bake, no
+Vista, no terrain regeneration):
+
+```
+inline !u!21 Material blocks .... 1 799 -> 60
+scene lines .................... 401 161 -> 200 236   (-50.1 %)
+scene bytes .................... 11 043 449 -> 5 529 930
+mesh renderers in that run ..... 1 876 (more than the baseline's 1 846)
+null sharedMaterial ............ 0
+```
+
+That generation rolled a different settlement — batchmode reported `seed=0` — so the object counts
+are not comparable to the committed scene and the scene was restored afterwards. The material result
+holds regardless: 60 blocks were measured against *more* renderers than the baseline had.
+
+EditMode was 210/210 at that phase, including eight new tests covering shared identity, distinct
+tints, distinct queues, exact properties, cache reset, replacement of a destroyed material, and two
+renderers sharing one material safely.
+
+**This does not resolve item 7.** It removes duplicated content; identity churn is untouched.
 
 ---
 
@@ -280,7 +349,7 @@ finding that was a defect is resolved below; the rest is the contract working as
 
 ## 8a. RESOLVED — passability depended on the corridor discount
 
-**Road passability contract (approved 2026-08-31).** Mountains are traversable terrain, not hard
+**Road passability contract (approved 2026-08-31 — see [90 Glossary](../../../90%20Glossary.md) § Road Passability).** Mountains are traversable terrain, not hard
 obstacles. Roads may pass through them; the planner prefers cheaper ground — passes, contours,
 switchbacks — over a direct expensive climb, and it does that by price, not by refusal. Only three
 things block a route outright: water / `+Infinity`, earthwork beyond `MaxCutDepth` / `MaxFillHeight`,
@@ -395,39 +464,97 @@ random, so a merely-low mask still places some.
 
 ---
 
-## 11. One tile carries 9 terrain layers; URP TerrainLit renders 8
+## 11. RESOLVED — the settlement tile wanted a ninth terrain layer
 
-Measured on tile `OverworldTerrain_1_0`, which is the tile the settlement landed on:
+URP TerrainLit draws **eight** terrain layers: one `_Control` texture feeds Splat0..Splat3 and a
+single `TERRAIN_SPLAT_ADDPASS` feeds four more. The tile the settlement landed on was asking for
+nine, so one of them was never going to be drawn, and the one that lost was `Road_Gravel`.
+
+**The settlement no longer owns a layer.** `SettlementOverworldMenu.EnsureDustTerrainLayer` returns
+`Dirt_Road_Edge` rather than creating `Dirt_Settlement_Dust`, so the stack now reads:
 
 ```
 [0..4] the five canonical biome layers
-[5]    Dirt_Settlement_Dust
-[6]    Dirt_Road_Center
-[7]    Dirt_Road_Edge
-[8]    Road_Gravel      <- past the ceiling, silently not rendered
+[5]    Dirt_Road_Center
+[6]    Dirt_Road_Edge      <- the settlement paints its streets, pads and gardens here too
+[7]    Road_Gravel
 ```
 
-The other three tiles have 8 layers because they get roads but no settlement dust. The playbook
-predicted this (§9); it is now reproduced with evidence.
+The merge is deliberate, not a rename. The two layers already shared their diffuse texture, normal
+map, 10x10 tiling and smoothness; only `tileOffset`, specular and `normalScale` differed, and the
+road edge's values are the ones kept — it is the more finished of the two and carries roughly nine
+times the painted area. One behavioural consequence: the two used to occupy separate channels, so a
+road crossing settlement ground wrote into its own. They now share one, and because the settlement
+paints before the roads, a road over a pad simply wins. Both wanted the same material there.
 
-Two consequences: `Road_Gravel` does not render on whichever tile holds the settlement, and the tile
-stacks disagree, so any code that assumes a layer index is the same across tiles is wrong there.
+Every reachable combination now fits, which follows from `EnsureLayerIndex` merging by `TerrainLayer`
+asset identity rather than by name:
 
-Fix direction: roads and settlement between them append four layers onto a five-layer base, which
-cannot fit. Either merge the road layers (centre/edge/gravel is three assets for one road surface),
-or paint dust into an existing layer instead of adding one.
+| Tile | Layers |
+|---|---|
+| roads only | 5 canonical + centre + edge + gravel = **8** |
+| settlement only | 5 canonical + edge (as dust) = **6** |
+| roads and settlement | 5 canonical + centre + edge (shared) + gravel = **8** |
+
+Order does not matter: whichever step runs first appends the edge layer, and the second finds it.
+
+Both live appenders — `RoadSurfacePaint.EnsureLayerIndex` and `SettlementDustPaint.EnsureLayerIndex`
+— also refuse to append past eight and log an error rather than adding a layer that would not be
+drawn. `Road_Gravel` is no longer displaced.
+
+`TerrainLayerBudgetTests` protects all of this against a well-meaning rename: it drives the real
+`RoadSurfacePaint.Paint` and the real `EnsureDustTerrainLayer`, and asserts that dust resolves to the
+road edge asset, that either execution order gives the same stack, that eight is never exceeded, that
+canonical indices 0-4 do not move, that a ninth append is refused without touching the alphamap, that
+repainting does not reorder, and that a missing edge or gravel layer still paints the road.
+
+The budget is now exactly full at 8 of 8. A ninth surface — a path type, a field, snow on the road —
+would reopen this, and there is **no priority rule** anywhere in the project to decide which layer
+loses; nothing in any canonical or draft document ranks road layers against settlement layers. That
+decision would have to be made before another layer is added.
+
+Two loose ends, neither load-bearing. The `Dirt_Settlement_Dust.terrainlayer` asset is still tracked
+and no longer loaded by any code. And if `Dirt_Road_Edge.terrainlayer` were ever missing,
+`EnsureDustTerrainLayer`'s fallback clones `Dirt_Scaled`, names the clone `Dirt_Settlement_Dust` and
+writes it to the road-edge path — an asset whose name disagrees with its file. The branch is
+unreachable while the asset exists.
 
 ---
 
-## 12. Weight sum drops to 0.25 on two tiles
+## 12. RESOLVED on the live path — weight sum collapse
 
-`weight sum on painted pixels: min=0.251` on `OverworldTerrain_0_0` and `min=0.255` on
-`OverworldTerrain_0_1`, against an expected ≈1.000 (average is fine at 0.998). Weight Blend only
-guarantees the sum when layer 0 is the unconnected white base, which it is, so the shortfall comes
-from something downstream — most likely the road/settlement paint writing into a tile whose weights
-it does not renormalise, at the same pixels where the stack overflows in item 11.
+The recorded symptom was `weight sum on painted pixels: min=0.251` on `OverworldTerrain_0_0` and
+`min=0.255` on `OverworldTerrain_0_1` against an expected ~1.000. It was attributed to the paint not
+renormalising, and to item 11.
 
-Not visible in the average; only the histogram's `min` catches it. Worth resolving together with 11.
+Neither holds for the code that actually runs. **Both live writers measure the real sum of the other
+channels and rescale to it**, so they not only preserve a sum of 1, they repair a pixel that arrives
+below it:
+
+- `RoadSurfacePaint.WriteRoadPixel` — `keep = 1 - roadSum`, then loops the non-road layers to get
+  `otherSum` and scales them by `keep / otherSum`.
+- `SettlementDustPaint.WritePixel` — the same shape around `coverage`.
+
+Verified numerically on transcriptions of both: a pixel seeded at 0.25 comes back at exactly 1.0000
+through either writer.
+
+**The one formula that does not preserve the sum is in dead code.** `RoadTerrainCarver` assumes
+`otherSum = 1 - current` instead of measuring it, which holds only if the pixel already sums to 1 —
+the same 0.25 pixel comes back at 0.55. But `RoadTerrainCarver.Carve` has **zero callers** outside
+its own file; production uses only its `DensifyPolyline` helper. The path that writes alphamaps and
+appends layers there never runs.
+
+Item 11 does not cause this either: appending a layer leaves the sum alone, because Unity zeroes the
+new channel.
+
+The recorded 0.251 predates the current code and could not be reproduced against it. Do not reopen
+this on account of the dead carver — if that code is ever revived, its normalisation and its missing
+layer-budget guard both need fixing first, and that is a separate decision.
+
+One residual path in the live writers is worth knowing: if every other channel is already zero,
+`otherSum` falls under the `1e-5` guard and the sum ends at the coverage value rather than 1. It is
+not reachable in practice, because `BedCoverage` caps road weight at 0.9 and leaves the rest
+distributed — but that reasoning is an argument, not a measurement.
 
 ---
 
@@ -443,3 +570,26 @@ Not visible in the average; only the histogram's `min` catches it. Worth resolvi
   `isBlocked`, `minCostPerMetre`, `landmarks`) always travel together from `RoadNetworkBuilder`. They
   want to be one search-context struct. Left alone deliberately: the road search was in flight and a
   signature change touches every caller including 11 test sites, so it is worth doing on its own.
+- **Generated material lifecycle.** `GeneratedTintMaterials.Reset()` clears the cache but does not
+  destroy the Materials it was holding. They were created with `new Material(...)`, are not assets,
+  and after a reset nothing references them from the scene graph — so they are not serialised, but
+  they are also not collected until a domain reload. This is a runtime/session lifetime question, not
+  a serialisation one, and it is unrelated to item 7. Not measured: no leak size was established,
+  only the mechanism. Independent of P0, small, and testable (count live Materials across repeated
+  generations).
+- **FIXED — no `.gitattributes`.** The repository had none, and `core.autocrlf = true` came from
+  Git-for-Windows' *system* config, so normalisation was decided by whichever Git each contributor
+  installed rather than by the project. The policy is now four rules: `* text=auto`, plus explicit
+  `binary` for `*.png`, `*.fbx` and `*.tgz` — the only binary types actually tracked. No `eol` rules,
+  no merge driver, no generic Unity template: none of those was justified by the audit.
+  <br>Every tracked text blob was **already LF** — all ~1 010 of them scanned, zero CR bytes, the
+  400 000-line scene included — so the file records the existing state rather than changing it. A
+  controlled `git add --renormalize` (run against a throwaway index so the working tree was never
+  staged) touched **no** existing file: the scene did not appear despite carrying 401 161 CR bytes in
+  the working tree, and no binary asset appeared. Index EOL counts before and after are identical at
+  `lf=1010, -text=16, none=2`.
+  <br>What it prevents: this working tree currently holds 830 732 CR bytes across 338 files, 788 454
+  of them in the two `.unity` scenes. Committed by a Git with `autocrlf=false` — the default off
+  Windows — those would have entered the index and rewritten the scene end to end.
+  <br>**This does not resolve item 7.** It removes one way of making that churn worse; the identity
+  churn item 7 is about is untouched.

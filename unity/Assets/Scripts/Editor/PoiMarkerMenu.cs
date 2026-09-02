@@ -107,6 +107,8 @@ namespace GameDev.EditorTools
             }
 
             ClearMarkers();
+            // One generation, one set of shared materials — see GeneratedTintMaterials.
+            GameDev.World.GeneratedTintMaterials.Reset();
             var root = new GameObject(RootObjectName);
 
             var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);

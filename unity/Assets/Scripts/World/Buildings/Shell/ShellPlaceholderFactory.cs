@@ -4,6 +4,9 @@ namespace GameDev.World.Buildings.Shell
 {
     public static class ShellPlaceholderFactory
     {
+        /// <summary>Openings draw after walls so the thin plaques are not hidden by them.</summary>
+        private const int OpeningRenderQueue = 3001;
+
         public static GameObject SpawnShellRoot(ShellInstance shell, Transform parent, string name)
         {
             var root = new GameObject(name);
@@ -25,11 +28,14 @@ namespace GameDev.World.Buildings.Shell
                 var r = go.GetComponent<Renderer>();
                 if (r != null)
                 {
-                    var mat = CreateTintMaterial(p.Tint);
                     // Openings are thin facade plaques — draw after walls so they are not hidden.
-                    if (IsOpeningCategory(p.Category))
-                        mat.renderQueue = 3001;
-                    r.sharedMaterial = mat;
+                    // Tint and queue are the whole difference between these materials, so they are
+                    // also the whole cache key; see GeneratedTintMaterials.
+                    r.sharedMaterial = GeneratedTintMaterials.Get(
+                        p.Tint,
+                        IsOpeningCategory(p.Category)
+                            ? OpeningRenderQueue
+                            : GeneratedTintMaterials.ShaderRenderQueue);
                 }
 
                 // Drop colliders on decorative small pieces to keep sandbox light.
@@ -69,23 +75,6 @@ namespace GameDev.World.Buildings.Shell
                    || c == ExteriorPieceCategory.Door
                    || c == ExteriorPieceCategory.Shopfront
                    || c == ExteriorPieceCategory.AtticWindow;
-        }
-
-        private static Material CreateTintMaterial(Color tint)
-        {
-            var shader = Shader.Find("Universal Render Pipeline/Lit");
-            if (shader == null)
-                shader = Shader.Find("Standard");
-            if (shader == null)
-                shader = Shader.Find("Sprites/Default");
-            var mat = shader != null ? new Material(shader) : new Material(Shader.Find("Hidden/InternalErrorShader"));
-            if (mat.HasProperty("_BaseColor"))
-                mat.SetColor("_BaseColor", tint);
-            if (mat.HasProperty("_Color"))
-                mat.SetColor("_Color", tint);
-            else
-                mat.color = tint;
-            return mat;
         }
     }
 }

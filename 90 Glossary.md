@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.44
+Version: 0.45
 
 Status: Draft
 
-Last Updated: 2026-08-15
+Last Updated: 2026-08-31
 
 Depends On:
 All Canonical Documents
@@ -735,6 +735,14 @@ Work in progress.
 ## Deprecated
 
 Historical documentation kept for reference.
+
+---
+
+## Road Passability
+
+Which ground a road may occupy, as opposed to what that ground costs to build on. **Mountain terrain is traversable, not a hard obstacle.** Roads may cross it; the planner is expected to prefer cheaper ground — passes, contours, switchbacks — over a direct expensive climb, and it expresses that preference as **price, not refusal**. `MountainPenalty` and `MountainCost` are soft costs and must never become `+Infinity` merely because the biome is Mountain. Only three conditions block a route outright: water / `+Infinity`, earthwork beyond `MaxCutDepth` / `MaxFillHeight`, and grade at or above `MaxWalkableGrade`.
+
+Passability is a property of the ground and never of what was built beside it. `ExistingCorridorDiscount` expresses corridor-reuse preference in **construction cost only** and must not reach any hard-obstacle predicate — read passability from `LandscapeCostField.TerrainCost` / `TerrainCostAtTerrain` (undiscounted) and construction cost from `Evaluate` / `EvaluateAtTerrain` (discounted, what A* prices). **Approved but not Canonical** — reviewed and approved by the project owner 2026-08-31; awaits only a Canonical host document. Source: [WORLD_GENERATION_PIPELINE.md](unity/Assets/Plans/WORLD_GENERATION_PIPELINE.md) §3; see [AGENTS.md](AGENTS.md) § Accepted Draft Decisions and [99 Open Questions](99%20Open%20Questions.md) § Resolved Decisions.
 
 ---
 

@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.25
+Version: 0.26
 
 Status: Draft
 
-Last Updated: 2026-08-15
+Last Updated: 2026-08-31
 
 Depends On:
 All Canonical Documents
@@ -137,6 +137,10 @@ No. [13 City Generation](13%20City%20Generation.md) is Deprecated: not viable (n
 
 **V0 inland lakes / rivers?**  
 **Removed from code (2026-08-15).** V0 ships **ocean only** (`WorldWater` at Sea Level). No `LakeDefinition` / `RiverTracer` / lake pipeline steps. Future inland hydro is a redesign. Alpine multi-plane lakes stay deferred; single Sea Level ocean plane is the locked V0 water model.
+
+**May a road cross mountain terrain?**  
+**Yes — mountain terrain is traversable, not a hard obstacle.** The planner prefers cheaper ground (passes, contours, switchbacks) over a direct expensive climb and expresses that as price, not refusal; `MountainPenalty` / `MountainCost` stay soft and must not become `+Infinity` because the biome is Mountain. Only water / `+Infinity`, earthwork beyond `MaxCutDepth` / `MaxFillHeight`, and grade at or above `MaxWalkableGrade` block a route outright. `ExistingCorridorDiscount` is construction cost only and must never change passability. Reviewed and approved by the project owner 2026-08-31, from [WORLD_GENERATION_PIPELINE.md](unity/Assets/Plans/WORLD_GENERATION_PIPELINE.md) §3 «Roads are pathfinding, not lines … mountains (passes) — never straight through a mountain». Glossary: [90 Glossary](90%20Glossary.md) § Road Passability. Agent rule: [AGENTS.md](AGENTS.md) § Accepted Draft Decisions. **Approved but not Canonical:** the owner review required by `001 Documentation Standards` § Promotion Rules is granted and every other promotion requirement is met; what is missing is a host, because no Canonical document covers world generation and the document carrying the statement is Draft with unrelated content.
+
 
 ---
 

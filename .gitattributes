@@ -1,0 +1,11 @@
+# The repository decides normalisation, not each machine's Git installer.
+# core.autocrlf currently comes from Git-for-Windows' system config, so without this
+# file the policy is whatever a contributor happened to install. Every tracked text
+# blob is already LF, so this records the existing state rather than changing it.
+* text=auto
+
+# Auto-detection already classifies these correctly. Stating them keeps a future file
+# of the same type safe if it happens to carry no NUL byte in its first 8000 bytes.
+*.png binary
+*.fbx binary
+*.tgz binary
