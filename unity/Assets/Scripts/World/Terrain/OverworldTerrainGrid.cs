@@ -14,9 +14,9 @@ namespace GameDev.World.Terrain
     /// a correctly configured, empty tile grid that downstream systems can query.
     /// </para>
     /// <para>
-    /// It exists so that "who owns the Unity Terrain" and "who fills it with relief" become two
-    /// separate questions. Vista currently answers both; with this, it only answers the second, and
-    /// a future generator can answer the second differently without touching any of this.
+    /// It exists so that "who owns the Unity Terrain" and "who fills it with relief" stay two
+    /// separate questions: this answers the first, and <see cref="OverworldTerrainBuilder"/> fills the
+    /// tiles from TerrainGen without touching any of this.
     /// </para>
     /// </remarks>
     public static class OverworldTerrainGrid
@@ -24,13 +24,13 @@ namespace GameDev.World.Terrain
         /// <summary>Heightmap resolution the overworld tiles are pinned to (2^n + 1).</summary>
         public const int DefaultHeightmapResolution = 513;
 
-        /// <summary>Alphamap (splat) resolution - matches <c>VistaManager.textureResolution</c>.</summary>
+        /// <summary>Alphamap (splat) resolution per tile.</summary>
         public const int DefaultAlphamapResolution = 512;
 
-        /// <summary>Detail map resolution - matches <see cref="TerrainHeightWrite"/>.</summary>
+        /// <summary>Detail map resolution per tile.</summary>
         public const int DefaultDetailResolution = 512;
 
-        /// <summary>Detail patch size - matches <see cref="TerrainHeightWrite"/>.</summary>
+        /// <summary>Detail patch size per tile.</summary>
         public const int DefaultDetailResolutionPerPatch = 16;
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace GameDev.World.Terrain
             public Vector3 TileSize => new Vector3(TileMeters, HeightBudgetMeters, TileMeters);
         }
 
-        /// <summary>Tile object name, shared with the Vista bake so diagnostics read the same.</summary>
+        /// <summary>Tile object name, stable so diagnostics and tools can find tiles by name.</summary>
         public static string TileName(int x, int z) => $"OverworldTerrain_{x}_{z}";
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace GameDev.World.Terrain
         /// <param name="layers">
         /// Existing <c>TerrainLayer</c> assets to bind. Optional; when given, the alphamap is set to
         /// a flat weight of 1 on layer 0 so the tile renders one surface. That is a base state, not
-        /// painting - a weight distribution that means anything needs a terrain/biome generator.
+        /// painting - the real weights are written by <see cref="OverworldTerrainBuilder"/>.
         /// </param>
         /// <param name="material">Terrain material template (URP TerrainLit). Optional.</param>
         public static UnityEngine.Terrain[] Create(
@@ -105,7 +105,7 @@ namespace GameDev.World.Terrain
                     }
 
                     // Unity Terrain pivots at its lower-left corner, so the grid grows along +X/+Z
-                    // from the parent - the same layout the Vista-created grid uses.
+                    // from the parent.
                     go.transform.localPosition =
                         new Vector3(x * spec.TileMeters, 0f, z * spec.TileMeters);
 
@@ -134,13 +134,28 @@ namespace GameDev.World.Terrain
         public static TerrainData CreateTerrainData(Spec spec, TerrainLayer[] layers = null)
         {
             var data = new TerrainData();
+            Configure(data, spec, layers);
+            return data;
+        }
 
+        /// <summary>
+        /// Resets <paramref name="data"/> to a configured, empty tile: correct metres, resolutions and
+        /// layer stack, no trees, no ground cover, every height zero.
+        /// </summary>
+        /// <remarks>
+        /// Works on a fresh <c>TerrainData</c> and on an existing asset alike, so a re-bake can refill
+        /// the asset a scene already references instead of replacing it.
+        /// </remarks>
+        public static void Configure(TerrainData data, Spec spec, TerrainLayer[] layers = null)
+        {
             // Resolution first, then metres. Unity preserves metres-per-pixel across a resolution
             // change, so setting size first and resolution second explodes the tile
-            // (1400 m at 33 -> 22400 m at 513). Same ordering as TerrainHeightWrite.
+            // (1400 m at 33 -> 22400 m at 513).
             data.heightmapResolution = spec.HeightmapResolution;
             data.size = spec.TileSize;
+            data.SetHeights(0, 0, new float[spec.HeightmapResolution, spec.HeightmapResolution]);
             data.alphamapResolution = spec.AlphamapResolution;
+            data.treeInstances = System.Array.Empty<TreeInstance>();
             data.SetDetailResolution(DefaultDetailResolution, DefaultDetailResolutionPerPatch);
             data.SetDetailScatterMode(DetailScatterMode.InstanceCountMode);
 
@@ -149,8 +164,6 @@ namespace GameDev.World.Terrain
                 data.terrainLayers = layers;
                 SetFlatBaseWeights(data);
             }
-
-            return data;
         }
 
         /// <summary>
@@ -158,9 +171,8 @@ namespace GameDev.World.Terrain
         /// </summary>
         /// <remarks>
         /// The minimum a tile needs in order to render one surface instead of an undefined blend. It
-        /// is not a material pass: a weight distribution that means anything (grass vs sand vs
-        /// cliff) is a function of relief and biome, and there is no relief and no biome generator
-        /// on this path yet.
+        /// is not a material pass: the weights that mean something are written by
+        /// <see cref="OverworldTerrainBuilder"/> from the relief.
         /// </remarks>
         public static void SetFlatBaseWeights(TerrainData data)
         {

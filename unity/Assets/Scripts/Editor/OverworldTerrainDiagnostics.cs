@@ -2,7 +2,6 @@
 using System.Text;
 using GameDev.World;
 using GameDev.World.Terrain;
-using Pinwheel.Vista;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -11,7 +10,7 @@ using UnityEngine.SceneManagement;
 namespace GameDev.EditorTools
 {
     /// <summary>
-    /// Read-only inspection of the terrain geometry Vista produced, aimed at one question:
+    /// Read-only inspection of the baked terrain geometry, aimed at one question:
     /// <b>is the visible banding an artifact, and of what?</b>
     /// </summary>
     /// <remarks>
@@ -21,25 +20,23 @@ namespace GameDev.EditorTools
     /// of the banding and whether it is aligned to the world axes:
     /// </para>
     /// <list type="bullet">
-    /// <item>a biome-canvas facet repeats at the biome's own m/px and is axis-aligned;</item>
-    /// <item>an erosion rill repeats near the erosion sim's m/px and is axis-aligned;</item>
+    /// <item>a resampling facet repeats at a map's own m/px and is axis-aligned;</item>
     /// <item>real drainage has no single period and no preferred axis.</item>
     /// </list>
     /// <para>
     /// So this dump reports the dominant autocorrelation lag of the curvature field, in metres,
-    /// alongside the m/px of every biome and erosion pass actually in the scene — put the two next
-    /// to each other and the cause names itself. It also separates interior cells from the tile
+    /// alongside the m/px of every terrain map actually in the scene — put the two next to each
+    /// other and the cause names itself. It also separates interior cells from the tile
     /// border, because seam blending is not an interior artifact.
     /// </para>
     /// <para>
-    /// Nothing here writes to the terrain. PNGs go to a scratch folder outside <c>Assets</c>, the
-    /// same convention <see cref="VistaLayerWeightDump"/> uses, so the dump never shows up as
-    /// project churn.
+    /// Nothing here writes to the terrain. PNGs go to a scratch folder outside <c>Assets</c>, so the
+    /// dump never shows up as project churn.
     /// </para>
     /// </remarks>
     public static class OverworldTerrainDiagnostics
     {
-        private const string DumpFolder = "VistaTerrainDump";
+        private const string DumpFolder = "TerrainDump";
 
         /// <summary>Cells at each tile edge treated as seam rather than interior.</summary>
         private const int SeamCells = 2;
@@ -58,10 +55,10 @@ namespace GameDev.EditorTools
         /// <summary>Orientation histogram resolution: 12 bins of 15 degrees over 0..180.</summary>
         private const int OrientationBins = 12;
 
-        [MenuItem("GameDev/Overworld/Vista/Dump Terrain Geometry")]
+        [MenuItem("GameDev/Overworld/Terrain/Dump Terrain Geometry")]
         public static void DumpMenu() => Dump(exportPng: true);
 
-        [MenuItem("GameDev/Overworld/Vista/Dump Terrain Geometry (log only)")]
+        [MenuItem("GameDev/Overworld/Terrain/Dump Terrain Geometry (log only)")]
         public static void DumpLogOnlyMenu() => Dump(exportPng: false);
 
         public static void Dump(bool exportPng)
@@ -120,79 +117,30 @@ namespace GameDev.EditorTools
         /// The resolution every later number has to be compared against.
         /// </summary>
         /// <remarks>
-        /// Read from the scene rather than hardcoded: the whole point is that these figures move
-        /// when a biome's area or falloff changes, and a stale table would send the next reader
-        /// chasing the wrong stage.
+        /// Read from the tiles rather than hardcoded, so a changed resolution cannot leave a stale
+        /// table behind.
         /// </remarks>
         private static void AppendResolutionBudget(StringBuilder report)
         {
             report.AppendLine();
-            report.AppendLine("  Resolution budget (Vista Personal caps the biome canvas at 512 px):");
+            report.AppendLine("  Resolution budget:");
 
-            var manager = Object.FindAnyObjectByType<VistaManager>();
-            if (manager != null)
+            var terrain = OverworldTerrainAccess.FindTerrain();
+            if (terrain == null || terrain.terrainData == null)
             {
-                var tileMetres = WorldScale.OverworldTileMeters;
-                var hmRes = Mathf.Max(2, manager.heightMapResolution);
-                report.AppendLine(
-                    $"    tile heightmap   {hmRes} px over {tileMetres:F0} m " +
-                    $"-> {tileMetres / (hmRes - 1):F2} m/px");
-            }
-
-            var biomes = Object.FindObjectsByType<LocalProceduralBiome>(FindObjectsSortMode.None);
-            if (biomes == null || biomes.Length == 0)
-            {
-                report.AppendLine("    <no Local Procedural Biomes in the scene>");
+                report.AppendLine("    <no terrain in the scene>");
                 return;
             }
 
-            for (var i = 0; i < biomes.Length; i++)
-            {
-                var biome = biomes[i];
-                if (biome == null)
-                {
-                    continue;
-                }
-
-                if (!TryEstimateBiomeWidth(biome, out var widthMetres))
-                {
-                    report.AppendLine($"    {biome.name,-18} <no usable anchor polygon>");
-                    continue;
-                }
-
-                var res = Mathf.Max(1, biome.baseResolution);
-                report.AppendLine(
-                    $"    {biome.name,-18} {res} px over ~{widthMetres:F0} m " +
-                    $"-> {widthMetres / res:F2} m/px  (falloff {biome.falloffDistance:F0})");
-            }
-
+            var data = terrain.terrainData;
+            var tileMetres = data.size.x;
+            var hmRes = Mathf.Max(2, data.heightmapResolution);
             report.AppendLine(
-                "    erosion sim canvas = clamp(biomeWidth / featureSize, 32, min(2048, baseResolution));");
+                $"    tile heightmap   {hmRes} px over {tileMetres:F0} m -> {tileMetres / (hmRes - 1):F2} m/px");
             report.AppendLine(
-                "    a featureSize finer than biomeWidth/baseResolution is clamped and carves grid rills.");
-        }
-
-        /// <summary>
-        /// Approximate world width of a biome's canvas: anchor extent plus falloff on both sides.
-        /// </summary>
-        private static bool TryEstimateBiomeWidth(LocalProceduralBiome biome, out float widthMetres)
-        {
-            widthMetres = 0f;
-            var anchors = biome.anchors;
-            if (anchors == null || anchors.Length < 3)
-            {
-                return false;
-            }
-
-            var halfWidth = 0f;
-            for (var i = 0; i < anchors.Length; i++)
-            {
-                halfWidth = Mathf.Max(halfWidth, Mathf.Abs(anchors[i].x));
-            }
-
-            var scaleX = Mathf.Abs(biome.transform.lossyScale.x);
-            widthMetres = 2f * (halfWidth * scaleX + biome.falloffDistance);
-            return widthMetres > 1f;
+                $"    tile alphamap    {data.alphamapResolution} px -> {tileMetres / Mathf.Max(1, data.alphamapResolution - 1):F2} m/px");
+            report.AppendLine(
+                $"    tile details     {data.detailResolution} px -> {tileMetres / Mathf.Max(1, data.detailResolution):F2} m/px");
         }
 
         private static void DumpTile(
@@ -915,8 +863,8 @@ namespace GameDev.EditorTools
 
         /// <summary>Height at 16 bits, packed R = high byte, G = low byte.</summary>
         /// <remarks>
-        /// Additive: the 8-bit dumps beside it keep their encoding, so the images in
-        /// Assets/Plans/VistaReferenceBaseline stay comparable. It exists because the 8-bit height
+        /// Additive: the 8-bit dumps beside it keep their encoding, so earlier images stay
+        /// comparable. It exists because the 8-bit height
         /// dump quantises to about 0.48 m per level on this island, which is coarser than several
         /// of the things worth measuring - the overrange knee compresses 2.2 m into roughly 0.5 m,
         /// and at 8 bits that whole feature is one level wide and unreadable.

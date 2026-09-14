@@ -26,9 +26,9 @@ Adding a tree must not reshape roads; adding a POI kind must not move existing T
 Editor executable order (also §5 in [WORLD_GENERATION_PIPELINE.md](WORLD_GENERATION_PIPELINE.md)):
 
 1. Init `WorldSeed` + `WorldGenSettings` → `WorldDefinition`
-2. Surface height (`Vista.Generate` + island framing; optional mountain emphasis via `TerrainBakeFlags`)
+2. Surface height (terrain bake from TerrainGen; massifs included via `TerrainBakeFlags.IncludeMountains`)
 3. Zones (alphamap / biome paint)
-4. Mountains (rebuild Vista bake with mountain flags — cascade-clears downstream)
+4. Mountains (the same terrain bake with the massif flag — cascade-clears downstream)
 5. Terrain analysis (height, slope, curvature, roughness) via `LandscapeCostField`
 6. POI placement once via `PoiPlacementEngine` + 3×3 `WorldSectorMap` → stable `Pois[]`
 7. Settlement (TownApproach from recorded plan)
@@ -90,6 +90,6 @@ Primary and Secondary use the same attach primitive: min connection cost onto an
 
 Bake order above is unchanged for non-hydro steps. Color / splat / road lawn / grass / ocean numbers live in [OVERWORLD_VISUAL_DIRECTION.md](OVERWORLD_VISUAL_DIRECTION.md):
 
-- Surface weights come from the Vista graphs' Weight Blend; roads paint packed bed + soft edge **after** the bake, appending their own layers without reordering or repainting canonical indices 0–4.
-- Vegetation (graph-placed) and the WaterWorks SSR_Water **ocean** material read the same world after deform.
-- Terrain render = **URP TerrainLit** over the five canonical `TerrainLayer` assets Vista binds. MicroSplat is out of the pipeline — do not reintroduce it.
+- Surface weights come from the terrain bake's world-space surface rules; roads paint packed bed + soft edge **after** the bake, appending their own layers without reordering or repainting canonical indices 0–4.
+- Vegetation (placed by the terrain bake) and the WaterWorks SSR_Water **ocean** material read the same world after deform.
+- Terrain render = **URP TerrainLit** over the five canonical `TerrainLayer` assets the terrain bake assigns. MicroSplat is out of the pipeline — do not reintroduce it.

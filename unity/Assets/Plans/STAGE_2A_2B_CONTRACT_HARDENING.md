@@ -268,7 +268,7 @@ culmination).
 Stage 1: untouched          Stage 3: not started        Vegetation: untouched
 Stage 2: untouched          Hydrology: untouched        Roads / POIs: untouched
 Stage 2A: contract only     TerrainData: untouched      Settlements: untouched
-Stage 2B: consumes it       Vista: untouched            Scene: untouched
+Stage 2B: consumes it       Terrain bake: untouched     Scene: untouched
                             Materials: untouched        Packages: untouched
 ```
 

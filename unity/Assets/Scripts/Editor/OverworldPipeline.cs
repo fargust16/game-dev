@@ -2,7 +2,6 @@
 using System.Collections;
 using GameDev.World;
 using GameDev.World.Terrain;
-using Pinwheel.Vista;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -17,7 +16,7 @@ namespace GameDev.EditorTools
     {
         private static EditorCoroutine s_runningGenerate;
 
-        /// <summary>True while Generate All coroutine is in flight (Vista wait included).</summary>
+        /// <summary>True while the Generate All coroutine is in flight.</summary>
         public static bool IsGenerateAllRunning => s_runningGenerate != null;
 
         [InitializeOnLoadMethod]
@@ -30,12 +29,6 @@ namespace GameDev.EditorTools
         public static void CancelGenerateAllLock()
         {
             s_runningGenerate = null;
-            var manager = Object.FindAnyObjectByType<VistaManager>();
-            if (manager != null)
-            {
-                manager.CancelGeneration();
-            }
-
             Debug.Log("[Overworld] Generate All lock cleared.");
         }
 
@@ -43,6 +36,7 @@ namespace GameDev.EditorTools
         {
             OverworldPipelineStepId.Surface,
             OverworldPipelineStepId.Mountains,
+            OverworldPipelineStepId.Hydrology,
             OverworldPipelineStepId.Markers,
             OverworldPipelineStepId.Settlements,
             OverworldPipelineStepId.Roads,
@@ -74,6 +68,7 @@ namespace GameDev.EditorTools
             SettlementOverworldMenu.ClearSettlement();
             RoadNetworkMenu.ClearRoadNetwork();
             PoiMarkerMenu.ClearMarkers();
+            HydrologyMenu.Clear();
             WaterZoneMenu.ClearWaterZones();
             WaterZoneMenu.EnsureOceanOcWPlane();
             OverworldTerrainMenu.ClearTerrainOnly();
@@ -86,7 +81,7 @@ namespace GameDev.EditorTools
             if (s_runningGenerate != null)
             {
                 Debug.LogWarning(
-                    "[Overworld] Generate All already running — wait for Vista, or use " +
+                    "[Overworld] Generate All already running — wait for it to finish, or use " +
                     "GameDev/Overworld/Cancel Generate All Lock if it is stuck.");
                 return;
             }
@@ -109,7 +104,8 @@ namespace GameDev.EditorTools
 
                 var total = OverworldGenTiming.Start();
 
-                // Surface and Mountains share one Vista terrain bake when either of them runs.
+                // Surface and Mountains are one terrain bake: the Mountains toggle only decides whether
+                // TerrainGen's massif uplift is part of the relief.
                 var bakeTerrain = settings.RunSurface || settings.RunMountains;
                 if (bakeTerrain)
                 {
@@ -122,6 +118,27 @@ namespace GameDev.EditorTools
                     var surfaceSw = OverworldGenTiming.Start();
                     yield return OverworldTerrainMenu.GenerateSurfaceRoutine(seed, flags);
                     OverworldGenTiming.Log("surface+mountains", OverworldGenTiming.StopMs(surfaceSw));
+                }
+
+                // Hydrology has to follow the terrain and precede everything placed on it: markers,
+                // settlements and roads all read water through IWaterSampler, and the carve moves
+                // the ground they are placed against.
+                if (settings.RunHydrology && bakeTerrain)
+                {
+                    var flags = TerrainBakeFlags.None;
+                    if (settings.RunMountains)
+                    {
+                        flags |= TerrainBakeFlags.IncludeMountains;
+                    }
+
+                    yield return HydrologyMenu.GenerateRoutine(
+                        seed, HydrologyMenu.ActiveSettings, flags);
+                }
+                else if (settings.RunHydrology)
+                {
+                    Debug.LogWarning(
+                        "[Hydrology] Skipped: the step reads drainage off a finished bake, so it "
+                        + "cannot run when the terrain step is off.");
                 }
 
                 if (settings.RunMarkers)
@@ -145,8 +162,8 @@ namespace GameDev.EditorTools
                     OverworldGenTiming.Time("markers.visuals", PoiMarkerMenu.PlaceMarkers);
                 }
 
-                // Canopy is produced by the Surface step: the biome graphs' TREE OUTPUT writes Unity
-                // TreeInstances during the Vista bake. There is no separate tree pass any more.
+                // Canopy and ground cover are produced by the Surface step, which writes Unity tree
+                // instances and detail layers during the terrain bake. There is no separate tree pass.
                 if (settings.RunPlayer)
                 {
                     OverworldGenTiming.Time("player", OverworldPlayerMenu.SpawnPlayerAtTown);
@@ -183,6 +200,9 @@ namespace GameDev.EditorTools
                             ? OverworldTerrainMenu.LastSeed
                             : OverworldTerrainMenu.DefaultSeed,
                         CurrentBakeFlags() | TerrainBakeFlags.IncludeMountains);
+                    break;
+                case OverworldPipelineStepId.Hydrology:
+                    HydrologyMenu.GenerateMenu();
                     break;
                 case OverworldPipelineStepId.Markers:
                     PoiMarkerMenu.PlaceMarkers();
@@ -223,6 +243,9 @@ namespace GameDev.EditorTools
                     }
 
                     break;
+                case OverworldPipelineStepId.Hydrology:
+                    HydrologyMenu.Clear();
+                    break;
                 case OverworldPipelineStepId.Markers:
                     PoiMarkerMenu.ClearMarkers();
                     break;
@@ -249,6 +272,7 @@ namespace GameDev.EditorTools
             SettlementOverworldMenu.ClearSettlement();
             RoadNetworkMenu.ClearRoadNetwork();
             PoiMarkerMenu.ClearMarkers();
+            HydrologyMenu.Clear();
             WaterZoneMenu.ClearWaterZones();
         }
     }

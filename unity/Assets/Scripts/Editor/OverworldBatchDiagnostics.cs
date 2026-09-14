@@ -1,9 +1,12 @@
 #if UNITY_EDITOR
 using System.Collections;
+using GameDev.World;
 using GameDev.World.Terrain;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace GameDev.EditorTools
 {
@@ -13,22 +16,19 @@ namespace GameDev.EditorTools
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Terrain questions are answered by comparing two bakes, and comparing two bakes by hand is
-    /// slow enough that it does not get done — which is how "the striping is the clamped erosion
-    /// sim" survived in the documentation without anyone measuring it. This runs the terrain step
-    /// only (no POI, settlement or roads, which are ~90 % of a full Generate All) and then dumps the
-    /// geometry report.
+    /// Terrain questions are answered by comparing two bakes, and comparing two bakes by hand is slow
+    /// enough that it does not get done. This runs the terrain step (optionally hydrology and the
+    /// dressing steps) and then dumps the geometry report.
     /// </para>
     /// <para>
-    /// <b>Must run without <c>-quit</c>.</b> The Vista bake is an editor coroutine, so it needs the
-    /// editor loop to tick; <c>-quit</c> would exit the moment this method returns and kill it
-    /// mid-generation. This method exits the process itself when the bake and the dump are done.
+    /// <b>Must run without <c>-quit</c>.</b> The pipeline steps are editor coroutines, so they need the
+    /// editor loop to tick; this method exits the process itself when the work is done.
     /// </para>
     /// <example>
     /// <code>
-    /// Unity.exe -batchmode -nographics -projectPath &lt;project&gt; \
+    /// Unity.exe -batchmode -projectPath &lt;project&gt; \
     ///   -executeMethod GameDev.EditorTools.OverworldBatchDiagnostics.BakeAndDump \
-    ///   -overworldSeed 110201 -overworldMountains false -logFile out.log
+    ///   -overworldSeed 110201 -overworldMountains true -logFile out.log
     /// </code>
     /// </example>
     /// </remarks>
@@ -36,185 +36,109 @@ namespace GameDev.EditorTools
     {
         private const string SeedArg = "-overworldSeed";
         private const string MountainsArg = "-overworldMountains";
-        private const string RebuildArg = "-overworldRebuildGraphs";
-        private const string BypassErosionArg = "-overworldBypassErosion";
-        private const string NoiseDerivativeArg = "-overworldNoiseDerivative";
         private const string ExportPngArg = "-overworldExportPng";
         private const string SkipBakeArg = "-overworldSkipBake";
-        private const string DemoGraphArg = "-overworldDemoGraph";
-        private const string BypassShelfArg = "-overworldBypassShelfCurve";
-        private const string RefShapingArg = "-overworldReferenceShaping";
-        private const string ProbeArg = "-overworldNoiseProbe";
-        private const string DetailScaleArg = "-overworldDetailScale";
-        private const string NoiseOffsetArg = "-overworldNoiseOffset";
-        private const string DressingArg = "-overworldDressing";
-        private const string NoSilhouetteArg = "-overworldIslandNoSilhouette";
-        private const string NoRemapArg = "-overworldNoiseNoRemapPerLayer";
-        private const string NoFlipArg = "-overworldNoiseNoFlipSign";
-        private const string OctavesArg = "-overworldNoiseOctaves";
-        private const string LacunarityArg = "-overworldNoiseLacunarity";
-        private const string WarpArg = "-overworldNoiseWarp";
-        private const string WarpIntensityArg = "-overworldNoiseWarpIntensity";
-        private const string LayerDumpArg = "-overworldLayerDump";
-        private const string PostStackArg = "-overworldPostStackNormalise";
-        private const string PostStackCurveArg = "-overworldPostStackCurve";
-        private const string RefDetailArg = "-overworldReferenceDetailNoise";
-        private const string IslandHeightArg = "-overworldIslandWorldHeight";
-        private const string NoSeaFloorArg = "-overworldSkipSeaFloor";
-        private const string BiomeWidthArg = "-overworldIslandBiomeWidth";
-        private const string NoMaskGraphArg = "-overworldSkipIslandMaskGraph";
-        private const string LocalSpaceArg = "-overworldIslandLocalSpace";
-        private const string BaseResArg = "-overworldIslandBaseResolution";
-        private const string KeepSceneArg = "-overworldKeepSceneBiomes";
-        private const string NoIslandArg = "-overworldSkipIslandLpb";
 
-        /// <summary>Generous ceiling; a terrain-only bake is minutes, not tens of minutes.</summary>
+        /// <summary>Run the hydrology step after the bake, so the dump measures carved terrain.</summary>
+        private const string HydrologyArg = "-overworldHydrology";
+
+        /// <summary>
+        /// Bake the terrain twice in one process and report how far the second differs.
+        /// </summary>
+        /// <remarks>
+        /// Hydrology is a two-pass system, so before any of its numbers can be trusted it has to be
+        /// possible to ask whether two consecutive bakes of the same world already disagree.
+        /// </remarks>
+        private const string DoubleBakeArg = "-overworldDoubleBake";
+
+        private const string DressingArg = "-overworldDressing";
+
+        /// <summary>Generous ceiling for a terrain-only bake.</summary>
         private const double TimeoutSeconds = 900.0;
 
         public static void BakeAndDump()
         {
             var seed = ReadIntArg(SeedArg, OverworldTerrainMenu.DefaultSeed);
-            var mountains = ReadBoolArg(MountainsArg, defaultValue: true);
-            var rebuild = ReadBoolArg(RebuildArg, defaultValue: false);
-
-            // The control that tells our graphs apart from the pipeline: bake Vista's own sample
-            // graph over the same tiles and measure it the same way. If the reference shows the
-            // same artifact, the artifact is not ours.
-            var flags = ReadBoolArg(DemoGraphArg, defaultValue: false)
-                ? TerrainBakeFlags.VistaDemoAsIs
-                : mountains
-                    ? TerrainBakeFlags.IncludeMountains
-                    : TerrainBakeFlags.None;
-
-            // Only meaningful together with a rebuild: these are read while the graph is authored.
-            VistaGraphBuild.BypassErosionForDiagnostics = ReadBoolArg(BypassErosionArg, false);
-            VistaGraphBuild.NoiseDerivativeOverride = ReadNoiseDerivativeArg();
-            IslandPlateauGraphBuilder.BypassShelfCurveForDiagnostics =
-                ReadBoolArg(BypassShelfArg, false);
-            IslandPlateauGraphBuilder.PostStackNormaliseForDiagnostics =
-                ReadBoolArg(PostStackArg, false);
-            IslandPlateauGraphBuilder.ReferenceDetailNoiseForDiagnostics =
-                ReadBoolArg(RefDetailArg, false);
-            IslandPlateauGraphBuilder.PostStackCurveForDiagnostics =
-                System.Enum.TryParse<IslandPlateauGraphBuilder.PostStackCurve>(
-                    ReadArg(PostStackCurveArg) ?? "", ignoreCase: true, out var curveMode)
-                    ? curveMode
-                    : IslandPlateauGraphBuilder.PostStackCurve.Shelf;
-            IslandPlateauGraphBuilder.ReferenceShapingForDiagnostics =
-                ReadBoolArg(RefShapingArg, false);
-            IslandPlateauGraphBuilder.NoiseProbeForDiagnostics =
-                System.Enum.TryParse<IslandPlateauGraphBuilder.NoiseProbe>(
-                    ReadArg(ProbeArg) ?? "", ignoreCase: true, out var probeMode)
-                    ? probeMode
-                    : IslandPlateauGraphBuilder.NoiseProbe.Off;
-            IslandPlateauGraphBuilder.DetailNoiseScaleForDiagnostics =
-                float.TryParse(ReadArg(DetailScaleArg), out var ds) ? ds : (float?)null;
-            IslandPlateauGraphBuilder.NoiseOffsetForDiagnostics =
-                float.TryParse(ReadArg(NoiseOffsetArg), out var off)
-                    ? new UnityEngine.Vector2(off, off)
-                    : (UnityEngine.Vector2?)null;
-            OverworldTerrainMenu.PreserveSceneBiomesForDiagnostics =
-                ReadBoolArg(KeepSceneArg, false);
-            OverworldLpbBake.SkipIslandLpbForDiagnostics = ReadBoolArg(NoIslandArg, false);
-            OverworldLpbBake.IslandBaseResolutionForDiagnostics =
-                int.TryParse(ReadArg(BaseResArg), out var br) ? br : (int?)null;
-            OverworldLpbBake.IslandLocalSpaceForDiagnostics = ReadBoolArg(LocalSpaceArg, false);
-            OverworldLpbBake.SkipIslandMaskGraphForDiagnostics =
-                ReadBoolArg(NoMaskGraphArg, false);
-            OverworldLpbBake.IslandBiomeWidthForDiagnostics =
-                float.TryParse(ReadArg(BiomeWidthArg), out var bw) ? bw : (float?)null;
-            OverworldLpbBake.SkipSeaFloorForDiagnostics = ReadBoolArg(NoSeaFloorArg, false);
-            OverworldLpbBake.IslandWorldHeightForDiagnostics =
-                float.TryParse(ReadArg(IslandHeightArg), out var ih) ? ih : (float?)null;
-            OverworldLpbBake.IslandWithoutSilhouetteForDiagnostics =
-                ReadBoolArg(NoSilhouetteArg, false);
-            VistaGraphBuild.DisableNoiseRemapPerLayerForDiagnostics = ReadBoolArg(NoRemapArg, false);
-            VistaGraphBuild.DisableNoiseFlipSignForDiagnostics = ReadBoolArg(NoFlipArg, false);
-            var octavesRaw = ReadArg(OctavesArg);
-            VistaGraphBuild.NoiseLayerCountForDiagnostics =
-                int.TryParse(octavesRaw, out var oct) ? oct : (int?)null;
-            VistaGraphBuild.NoiseLacunarityForDiagnostics =
-                float.TryParse(ReadArg(LacunarityArg), out var lac) ? lac : (float?)null;
-            var warpRaw = ReadArg(WarpArg);
-            if (!string.IsNullOrEmpty(warpRaw) &&
-                System.Enum.TryParse<Pinwheel.Vista.Graph.NoiseNode.WarpMode>(
-                    warpRaw, ignoreCase: true, out var warpMode))
-            {
-                VistaGraphBuild.NoiseWarpForDiagnostics = warpMode;
-                VistaGraphBuild.NoiseWarpIntensityForDiagnostics =
-                    float.TryParse(ReadArg(WarpIntensityArg), out var wi) ? wi : 1f;
-            }
-
+            var flags = ReadBoolArg(MountainsArg, defaultValue: true)
+                ? TerrainBakeFlags.IncludeMountains
+                : TerrainBakeFlags.None;
             var exportPng = ReadBoolArg(ExportPngArg, defaultValue: false);
             var skipBake = ReadBoolArg(SkipBakeArg, defaultValue: false);
 
             Debug.Log(
-                $"[BatchDiag] seed={seed} mountains={mountains} rebuildGraphs={rebuild} " +
-                $"bypassErosion={VistaGraphBuild.BypassErosionForDiagnostics} " +
-                $"noiseDerivative={VistaGraphBuild.NoiseDerivativeOverride?.ToString() ?? "default"} " +
-                $"bypassShelfCurve={IslandPlateauGraphBuilder.BypassShelfCurveForDiagnostics} " +
-                $"exportPng={exportPng} skipBake={skipBake} flags={flags}");
-            EditorCoroutineUtility.StartCoroutineOwnerless(
-                Run(seed, flags, rebuild, exportPng, skipBake));
+                $"[BatchDiag] seed={seed} flags={flags} exportPng={exportPng} skipBake={skipBake} " +
+                $"hydrology={ReadBoolArg(HydrologyArg, defaultValue: false)}");
+            EditorCoroutineUtility.StartCoroutineOwnerless(Run(seed, flags, exportPng, skipBake));
         }
 
-        private static IEnumerator Run(
-            int seed, TerrainBakeFlags flags, bool rebuildGraphs, bool exportPng, bool skipBake)
+        private static IEnumerator Run(int seed, TerrainBakeFlags flags, bool exportPng, bool skipBake)
         {
             var exitCode = 0;
             var started = EditorApplication.timeSinceStartup;
-
-            // Changing a *GraphBuilder does nothing until the asset is re-authored from it, so an
-            // A/B on graph parameters has to rebuild or it silently measures the old graph twice.
-            if (rebuildGraphs)
-            {
-                Debug.LogWarning(
-                    "[BatchDiag] Rebuilding terrain graph assets from code — this discards any edit " +
-                    "made in the Vista graph editor.");
-                if (VistaGraphBuild.BypassErosionForDiagnostics)
-                {
-                    Debug.LogWarning(
-                        "[BatchDiag] Erosion nodes authored BYPASSED. Geometry is the shaping stage " +
-                        "alone and the surface weights are meaningless — restore the graph assets " +
-                        "before using this world for anything.");
-                }
-
-                VistaExecutionProbe.Attach("IslandPlateau");
-                IslandPlateauGraphBuilder.Rebuild();
-                MountainMassifGraphBuilder.Rebuild();
-                ShelfPlateauGraphBuilder.Rebuild();
-                SoftFalloffMaskGraphBuilder.RebuildShelf();
-            }
 
             OverworldTerrainMenu.OpenOrCreateScene();
 
             if (skipBake)
             {
-                // Measure the terrain that is already on disk — useful for exporting images from a
-                // bake that has already been paid for.
-                Debug.Log("[BatchDiag] Skipping the bake; measuring the existing terrain.");
-
                 // The bake is what normally records the seed, so without this the dressing below
                 // would plan POIs from seed 0 and quietly measure a different world.
+                Debug.Log("[BatchDiag] Skipping the bake; measuring the existing terrain.");
                 OverworldTerrainMenu.SetLastSeedForBatchDiagnostics(seed);
             }
             else
             {
-                // The bake routine is what the pipeline itself yields on, so this measures the same
-                // terrain a normal Generate All would produce.
                 yield return OverworldTerrainMenu.GenerateSurfaceRoutine(seed, flags);
 
                 if (EditorApplication.timeSinceStartup - started > TimeoutSeconds)
                 {
-                    Debug.LogError(
-                        "[BatchDiag] Bake exceeded the timeout; the dump below may be partial.");
+                    Debug.LogError("[BatchDiag] Bake exceeded the timeout; the dump below may be partial.");
                     exitCode = 1;
                 }
             }
 
-            // POI -> settlement -> roads -> player. All synchronous, unlike the Vista bake, and run
-            // in the pipeline's own order: roads must follow the settlement so they can route to
-            // where the fabric actually landed.
+            if (ReadBoolArg(DoubleBakeArg, defaultValue: false))
+            {
+                var before = HydrologyTerrainGrid.BuildFromScene();
+                yield return OverworldTerrainMenu.GenerateSurfaceRoutine(seed, flags);
+                var after = HydrologyTerrainGrid.BuildFromScene();
+
+                if (before == null || after == null || before.CellCount != after.CellCount)
+                {
+                    Debug.LogError("[BatchDiag] double bake: the terrain could not be compared.");
+                }
+                else
+                {
+                    var worst = 0f;
+                    var worstAt = Vector2.zero;
+                    var sum = 0.0;
+                    for (var i = 0; i < before.CellCount; i++)
+                    {
+                        var delta = Mathf.Abs(after.Heights[i] - before.Heights[i]);
+                        sum += delta;
+                        if (delta > worst)
+                        {
+                            worst = delta;
+                            worstAt = before.PositionXZ(i);
+                        }
+                    }
+
+                    Debug.Log(
+                        $"[BatchDiag] double bake, no hydrology: max delta {worst:F2} m at {worstAt}, " +
+                        $"mean {sum / before.CellCount:F3} m over {before.CellCount} cells.");
+                }
+            }
+
+            // Between the bake and the dressing, exactly where the pipeline puts it: the carve moves
+            // the ground that POIs and settlements are then placed against.
+            if (ReadBoolArg(HydrologyArg, defaultValue: false))
+            {
+                var hydrologyStart = EditorApplication.timeSinceStartup;
+                yield return HydrologyMenu.GenerateRoutine(seed, HydrologyMenu.ActiveSettings, flags);
+                Debug.Log($"[BatchDiag] hydrology done in {EditorApplication.timeSinceStartup - hydrologyStart:F0}s");
+            }
+
+            // POI -> settlement -> roads -> markers -> player, in the pipeline's own order: roads must
+            // follow the settlement so they can route to where the fabric actually landed.
             if (ReadBoolArg(DressingArg, defaultValue: false))
             {
                 var dressingStart = EditorApplication.timeSinceStartup;
@@ -223,42 +147,53 @@ namespace GameDev.EditorTools
                 RoadNetworkMenu.BuildRoadNetworkWithLandscapePlanner();
                 PoiMarkerMenu.PlaceMarkers();
                 OverworldPlayerMenu.SpawnPlayerAtTown();
-                Debug.Log(
-                    $"[BatchDiag] dressing done in " +
-                    $"{EditorApplication.timeSinceStartup - dressingStart:F0}s");
+                Debug.Log($"[BatchDiag] dressing done in {EditorApplication.timeSinceStartup - dressingStart:F0}s");
             }
 
             OverworldTerrainDiagnostics.Dump(exportPng);
 
-            // Runs here rather than as its own batch invocation because VistaLayerWeightDump does
-            // not open the overworld scene itself — on its own it reports "no terrains".
-            if (ReadBoolArg(LayerDumpArg, defaultValue: false))
-            {
-                VistaLayerWeightDump.Dump(exportPng);
-            }
-
-            Debug.Log(
-                $"[BatchDiag] done in {EditorApplication.timeSinceStartup - started:F0}s " +
-                $"seed={seed} flags={flags}");
+            Debug.Log($"[BatchDiag] done in {EditorApplication.timeSinceStartup - started:F0}s seed={seed} flags={flags}");
             EditorApplication.Exit(exitCode);
         }
 
-        private static Pinwheel.Vista.Graph.NoiseNode.LayerDerivativeMode? ReadNoiseDerivativeArg()
+        /// <summary>
+        /// Regenerates the overworld scene through Generate All with the default settings and saves it.
+        /// </summary>
+        /// <remarks>
+        /// The scene is generated output, so it is rebuilt by the pipeline rather than edited. Same
+        /// command line as <see cref="BakeAndDump"/>; only <c>-overworldSeed</c> is read.
+        /// </remarks>
+        public static void GenerateAllAndSave()
         {
-            var raw = ReadArg(NoiseDerivativeArg);
-            if (string.IsNullOrEmpty(raw))
+            var seed = ReadIntArg(SeedArg, OverworldTerrainMenu.DefaultSeed);
+            Debug.Log($"[BatchDiag] generate all and save, seed={seed}");
+            EditorCoroutineUtility.StartCoroutineOwnerless(RunGenerateAllAndSave(seed));
+        }
+
+        private static IEnumerator RunGenerateAllAndSave(int seed)
+        {
+            var started = EditorApplication.timeSinceStartup;
+            OverworldTerrainMenu.OpenOrCreateScene();
+            OverworldPipeline.GenerateAll(seed, WorldGenSettings.Default);
+
+            while (OverworldPipeline.IsGenerateAllRunning)
             {
-                return null;
+                if (EditorApplication.timeSinceStartup - started > TimeoutSeconds)
+                {
+                    Debug.LogError("[BatchDiag] Generate All exceeded the timeout; the scene was not saved.");
+                    EditorApplication.Exit(1);
+                    yield break;
+                }
+
+                yield return null;
             }
 
-            if (System.Enum.TryParse<Pinwheel.Vista.Graph.NoiseNode.LayerDerivativeMode>(
-                    raw, ignoreCase: true, out var mode))
-            {
-                return mode;
-            }
-
-            Debug.LogWarning($"[BatchDiag] Unknown {NoiseDerivativeArg} '{raw}' — using the default.");
-            return null;
+            var scene = SceneManager.GetActiveScene();
+            var saved = EditorSceneManager.SaveScene(scene);
+            Debug.Log(
+                $"[BatchDiag] generate all done in {EditorApplication.timeSinceStartup - started:F0}s " +
+                $"seed={seed} saved={saved} scene={scene.path}");
+            EditorApplication.Exit(saved ? 0 : 1);
         }
 
         private static int ReadIntArg(string name, int fallback)

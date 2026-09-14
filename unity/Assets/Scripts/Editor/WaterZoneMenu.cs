@@ -7,12 +7,14 @@ using Object = UnityEngine.Object;
 namespace GameDev.EditorTools
 {
     /// <summary>
-    /// The overworld's only water: one WaterWorks plane at <see cref="WorldScale.SeaLevelMeters"/>.
+    /// The overworld's ocean: one WaterWorks plane at <see cref="WorldScale.SeaLevelMeters"/>.
     /// </summary>
     /// <remarks>
-    /// V0 has no inland lakes or rivers, so there is nothing here but the ocean sheet. Future
-    /// hydrology is a redesign from first principles — see "14 World Generation Roadmap" section
-    /// "Future Hydrology / River Generation" — and must not start from this file.
+    /// The ocean sheet and nothing else. Inland rivers and lakes are drawn by
+    /// <c>InlandWaterMeshBuilder</c> from a generated <c>HydrologyDefinition</c>, parented under this
+    /// file's <c>OverworldWater</c> root so one clear takes all water down together. Geography is
+    /// decided there and read here — nothing in this file should ever become the record of where
+    /// water is, which is exactly what sank the removed first attempt.
     /// </remarks>
     public static class WaterZoneMenu
     {
@@ -59,11 +61,15 @@ namespace GameDev.EditorTools
             if (waterRoot == null)
                 waterRoot = new GameObject(RootObjectName);
 
-            // Anything under the root that is not the ocean sheet is left over from an older bake.
+            // Anything under the root that is neither the ocean sheet nor the generated inland water
+            // is left over from an older bake. The inland root has to survive: the pipeline calls
+            // this again after roads, long after hydrology built its meshes, and clearing it there
+            // would delete every river and lake in the world.
             for (var i = waterRoot.transform.childCount - 1; i >= 0; i--)
             {
                 var child = waterRoot.transform.GetChild(i).gameObject;
-                if (child.name == WorldWaterObjectName)
+                if (child.name == WorldWaterObjectName
+                    || child.name == InlandWaterMeshBuilder.InlandRootName)
                     continue;
                 Object.DestroyImmediate(child);
             }

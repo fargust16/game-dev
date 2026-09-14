@@ -230,7 +230,7 @@ sample per probed width along a curve of some ninety points. Stage 2B is unchang
 ## 10. Scope
 
 ```
-Stage 1: untouched          Stage 2B: untouched        Vista: untouched
+Stage 1: untouched          Stage 2B: untouched        Terrain bake: untouched
 Stage 2: untouched          Stage 3: not started       Scene: untouched
 Hydrology: untouched        TerrainData: untouched     Packages: untouched
 ```

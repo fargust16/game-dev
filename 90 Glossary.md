@@ -356,7 +356,7 @@ Placeholder name for the Vertical Slice district: a poor/industrial urban area o
 
 ## Overworld Chunk
 
-Seeded exploration zone of the overworld (biome, terrain, POI slots, creature spawns). **V0 chunk size = 64 m**; the V0 playable world is **2800 × 2800 m** (2×2 Vista terrain tiles of 1400 m), with the chunk API written as if the world can expand. Streamed/chunked intent like Valheim-shaped worlds. No harvest loop as core progression. See [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
+Seeded exploration zone of the overworld (biome, terrain, POI slots, creature spawns). **V0 chunk size = 64 m**; the V0 playable world is **2800 × 2800 m** (2×2 Unity Terrain tiles of 1400 m), with the chunk API written as if the world can expand. Streamed/chunked intent like Valheim-shaped worlds. No harvest loop as core progression. See [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
 
 ---
 
@@ -772,7 +772,7 @@ Static remaps and albedo tile sizes for overworld `TerrainLayer` assets (Fields,
 
 ## RoadSurfaceStyle
 
-Tunables for packed-earth road alphamap paint: soft edge width (0.5–1.5 m), bed/transition coverage, gravel/ruts. Roads append their own `TerrainLayer`s **after** the Vista bake and must never reorder or repaint the canonical biome indices 0–4. See `RoadSurfacePaint`.
+Tunables for packed-earth road alphamap paint: soft edge width (0.5–1.5 m), bed/transition coverage, gravel/ruts. Roads append their own `TerrainLayer`s **after** the terrain bake and must never reorder or repaint the canonical biome indices 0–4. See `RoadSurfacePaint`.
 
 ---
 
@@ -796,13 +796,13 @@ World Y of the single **ocean** water plane (`WorldScale.SeaLevelMeters`, defaul
 
 ## Coastal Height Transition
 
-How the island reaches the waterline. **Entirely Vista, no post-pass** — `IslandPlateau_TerrainGraph` biases its distribution toward high ground and the LPB's **Outer falloff** drags the rim under sea level; the coastline silhouette is the seeded anchor polygon. Sand is a normalized low-altitude `Curve` band × a small noise, painted as Weight Blend priority 3, so the beach follows the graph's low ground rather than a contour ring. The old directed post-Vista height pass (`CoastalBeachShelf`) and its C# splat painter are **deleted**; do not reintroduce a post-generation coast pass. See [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md).
+How the island reaches the waterline. **Entirely TerrainGen, no post-pass** — the Stage 1 landmass owns the coastline and its seabed, and the terrain bake writes that relief unchanged. The shore surface is a world-space rule: ground below the vegetation floor (27.0 → 28.4 m) is sand, and seabed rock is suppressed at the 24 m waterline so coastal land never receives it. The old directed coast height pass (`CoastalBeachShelf`) is **deleted**; do not reintroduce a post-generation coast height pass. See [OVERWORLD_TERRAIN_ARCHITECTURE.md](unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md).
 
 ---
 
 ## Island Occupancy
 
-**Deleted.** Was a post-geography C# height pass enforcing tile-border submersion. Border submersion is now `LPB_SeaFloor` plus the island biome's Outer falloff, and the silhouette is the seeded anchor polygon — all inside Vista. `IslandNaturalGeography` is deleted with it. Historical term only; do not reintroduce a post-generation height pass.
+**Deleted.** Was a post-geography C# height pass enforcing tile-border submersion. Border submersion and the silhouette now belong to TerrainGen's Stage 1 landmass. `IslandNaturalGeography` is deleted with it. Historical term only; do not reintroduce a post-generation height pass.
 
 ---
 
@@ -814,19 +814,19 @@ Single overworld ocean GameObject (WaterWorks `Water_Plane` + `SSR_Water`) under
 
 ## WaterWorks
 
-Third-party URP water pack (`Assets/WaterWorks/`). Overworld SoT for the single water plane. `Water_Volume` renderer feature is stubbed for Unity 6 — do not enqueue. Not a river/waterfall mesh kit. See [ASSET_LIBRARY_REFERENCE.md](unity/Assets/Plans/ASSET_LIBRARY_REFERENCE.md) and [NATURAL_ISLAND_GENERATOR.md](unity/Assets/Plans/NATURAL_ISLAND_GENERATOR.md).
+Third-party URP water pack (`Assets/WaterWorks/`). Overworld SoT for the single water plane. `Water_Volume` renderer feature is stubbed for Unity 6 — do not enqueue. Not a river/waterfall mesh kit. See [ASSET_LIBRARY_REFERENCE.md](unity/Assets/Plans/ASSET_LIBRARY_REFERENCE.md) and [OVERWORLD_TERRAIN_ARCHITECTURE.md](unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md).
 
 ---
 
-## Vista Biome
+## Terrain Bake
 
-Pinwheel Vista Personal `LocalProceduralBiome`. **Quality SoT:** the multi-LPB stack on `Overworld_Generator` — [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md). Height budget **700 m** over 2×2 tiles of 1400 m. Stack: `LPB_SeaFloor` (order 0, Replace) → `LPB_IslandBase` (order 10, Replace) → `LPB_Mountain_n` (order 20+, **Raise**). Island silhouette = **harmonic asymmetric Anchors + Outer Falloff + SoftFalloff BiomeMaskGraph**; coast is graph + falloff with no post-pass; mountains = elongated ellipse anchors + wide falloff (not circular KeepHigher stamps). Drive layout with **`biome.seed`** only — never mutate graph node seeds. Terrain shading = the graphs' Weight Blend → five canonical `TerrainLayer`s → **URP TerrainLit**; MicroSplat is out of the pipeline. Vegetation is placed by the graphs themselves. **`baseResolution` is capped at 512 px by Vista Personal** — the resolution ceiling on terrain shape. Water look = `Assets/Settings/Water/OverworldWater.mat` (clone of WaterWorks SSR_Water).
+The overworld terrain pipeline: **TerrainGen → Unity `TerrainData` → Unity Terrain**. `OverworldTerrainBake` creates the 2×2 tiles of 1400 m (height budget **700 m**), evaluates TerrainGen's authoritative relief onto one world lattice, applies a pending hydrology carve, and writes heights, surface weights, trees and ground cover through `TerrainData`'s own API. Surface and vegetation are project-owned world-space rules (`TerrainSurfaceRules`, `TerrainVegetationRules`); randomness is stateless per world cell from the world seed. Seams are exact by construction. Terrain shading = five canonical `TerrainLayer`s → **URP TerrainLit**; MicroSplat is out of the pipeline. Water look = `Assets/Settings/Water/OverworldWater.mat` (clone of WaterWorks SSR_Water). See [OVERWORLD_TERRAIN_ARCHITECTURE.md](unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md).
 
 ---
 
 ## Terrain Surface Stack
 
-The five canonical overworld `TerrainLayer` assets in `Assets/Settings/TerrainLayers/Overworld/`, owned by `OverworldTerrainLayers.SurfaceLayer`: **0 Grass, 1 Sand, 2 Soil, 3 Cliff, 4 Rock**. Both terrain graphs emit all five `TextureOutputNode`s with `order = (int)SurfaceLayer`, so every tile's stack is identical whichever biomes covered it; **Vista writes `terrainData.terrainLayers` per tile and C# never assigns it**. Weights come from each graph's `Weight Blend` (output i = `in[i] × Π(1 − in[j])` for j > i, layer 0 left unconnected so the weights sum to 1). Rendered by **URP TerrainLit** — MicroSplat is out of the pipeline, and there is no C# splat painting. Roads and settlements may append their own layers afterwards but must never reorder or repaint indices 0–4. Diagnostics: `GameDev/Overworld/Vista/Dump Layer Weights`. Operator rules: [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces.
+The five canonical overworld `TerrainLayer` assets in `Assets/Settings/TerrainLayers/Overworld/`, in `TerrainSurfaceLayer` order: **0 Grass, 1 Sand, 2 Soil, 3 Cliff, 4 Rock**. The terrain bake assigns the same array to every tile and `TerrainSurfaceClassifier` writes weights in the same order: shore → sand, open land → grass, drainage → soil, ridges / high massif ground / bare steep ground → rock, sheer faces → cliff, each applied by priority cover so the weights sum to 1. Rendered by **URP TerrainLit** — MicroSplat is out of the pipeline. Roads and settlements may append their own layers afterwards but must never reorder or repaint indices 0–4. Diagnostics: `GameDev/Overworld/Terrain/Dump Terrain Geometry` and `OverworldTerrainValidation`. Operator rules: [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces.
 
 ---
 

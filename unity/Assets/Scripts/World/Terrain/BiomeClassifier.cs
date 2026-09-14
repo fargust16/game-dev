@@ -4,7 +4,7 @@ namespace GameDev.World.Terrain
 {
     /// <summary>
     /// V0 multi-axis classification (WORLD_GENERATION_PIPELINE.md): height + slope + moisture.
-    /// Height is sea-relative 0..1 from <see cref="VistaTerrainSampler"/> (ocean shelf does not
+    /// Height is sea-relative 0..1 from <see cref="OverworldTerrainSampler"/> (ocean shelf does not
     /// steal the Swamp band). Thresholds keep Green walkable/buildable while Highland/Mountain
     /// own dramatic relief above sea. Temperature / distance-to-water remain deferred.
     /// </summary>

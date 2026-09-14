@@ -106,9 +106,9 @@ intended so the planner's answer can be *checked* rather than merely trusted.
   height**, **valleys that start in the middle of a slope with nothing above them**.
 - "Every slope must drain somewhere. A closed basin with no outlet is a bug unless it is a lake."
 
-`Plans/BANDING_INVESTIGATION.md` records a curvature-ratio isotropy measure (1.0 isotropic) used to
-diagnose directional bias in the old noise pipeline. Stage 3 will be measured against it; this pass
-does not change it.
+`OverworldTerrainDiagnostics` (*Dump Terrain Geometry*) reports a curvature-ratio isotropy measure
+(1.0 isotropic), first used to diagnose directional bias in the old noise pipeline. Stage 3 will be
+measured against it; this pass does not change it.
 
 ### 1.6 Diagnostics that already exist
 
@@ -579,7 +579,7 @@ coastal gate from the same place Stage 2A and 2B do, so all three stages agree o
 | **Subtractive** | `H₃ ≤ H₂` everywhere, and `H₃ ≥ H₁` on land | ground raised, or cut below the base island |
 | **Massif continuity** | Every massif has ≥ 1 spur per flank where its flank is long enough to hold one | a massif with no ridge structure |
 | **Slope bands** | ≥ 95 % reachable at ≤ 45°, 6–15 % > 45°, ≥ 35 % < 5° — the existing targets, unchanged | outside the bands |
-| **Isotropy** | Curvature ratio measured as in `BANDING_INVESTIGATION.md`, no worse than Stage 2's | a directional bias appearing at Stage 3 |
+| **Isotropy** | Curvature ratio from `OverworldTerrainDiagnostics`, no worse than Stage 2's | a directional bias appearing at Stage 3 |
 | **Determinism** | Same seed → identical field hash and identical structure | any difference |
 | **Stage 1 / Stage 2 immutability** | Stage 1 hashes unchanged; `CertifiedCore`, certified width and massif envelope unchanged | any change |
 
@@ -750,7 +750,7 @@ Stage 1        untouched — frozen, hash-pinned
 Stage 2 / 2A / 2B  untouched — no specification number changed, no reinterpretation
 Stage 4        not started — HydrologyPlanner unchanged, consumed read-only for validation
 Stage 5        not started — no T2 plateaus, T3 outcrops or surface detail
-TerrainData    untouched      Vista untouched        Scene untouched
+TerrainData    untouched      Terrain bake untouched Scene untouched
 Materials, vegetation, roads, POI, settlements  untouched
 Packages       untouched      Tests unchanged in this pass
 ```

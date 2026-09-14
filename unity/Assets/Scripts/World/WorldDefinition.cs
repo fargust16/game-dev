@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GameDev.World.Hydrology;
 using GameDev.World.Poi;
 using GameDev.World.Roads;
 using UnityEngine;
@@ -22,8 +23,22 @@ namespace GameDev.World
         public IReadOnlyList<RoadDefinition> Roads { get; private set; } =
             Array.Empty<RoadDefinition>();
 
+        /// <summary>
+        /// Inland water for this world: rivers, lakes and waterfall candidates.
+        /// </summary>
+        /// <remarks>
+        /// The geographic truth, not the rendering. Meshes, gizmos and <c>IWaterSampler</c> all read
+        /// from here; nothing writes back through them. Keeping that one-way is what the removed
+        /// per-lake scene objects got wrong — they became the record of where water was, and every
+        /// other system had to go through the scene to find out.
+        /// </remarks>
+        public HydrologyDefinition Hydrology { get; private set; } = HydrologyDefinition.Empty;
+
         public int PoiCount => Pois.Count;
         public float RoadLengthKilometers { get; private set; }
+        public int RiverReachCount => Hydrology.Reaches.Count;
+        public int LakeCount => Hydrology.Lakes.Count;
+        public float RiverLengthKilometers => Hydrology.TotalRiverLengthKilometers;
 
         public void SetPois(IReadOnlyList<PoiMarker> pois)
         {
@@ -36,6 +51,11 @@ namespace GameDev.World
             var list = new List<PoiMarker>(pois);
             list.Sort(CompareMarkers);
             Pois = list;
+        }
+
+        public void SetHydrology(HydrologyDefinition hydrology)
+        {
+            Hydrology = hydrology ?? HydrologyDefinition.Empty;
         }
 
         public void SetRoads(IReadOnlyList<RoadDefinition> roads)

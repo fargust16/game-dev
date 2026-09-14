@@ -25,6 +25,24 @@ namespace GameDev.World
 
         public bool RunSurface;
         public bool RunMountains;
+
+        /// <summary>
+        /// Analyse drainage and carve the river valleys into the terrain.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Costs a second terrain bake: the analysis needs finished relief to read, and its carve is
+        /// subtracted from the terrain before the surface and vegetation are derived. Turning it off
+        /// leaves the world exactly as it was before hydrology existed.
+        /// </para>
+        /// <para>
+        /// <b>Off by default.</b> The carve is subtracted directly from the terrain lattice before the
+        /// surface and vegetation are derived. Turning hydrology on by default is a separate decision,
+        /// taken once a carved world has been reviewed. See <c>HYDROLOGY_GENERATION_PLAN.md</c>.
+        /// </para>
+        /// </remarks>
+        public bool RunHydrology;
+
         public bool RunMarkers;
         public bool RunSettlements;
         public bool RunRoads;
@@ -46,6 +64,7 @@ namespace GameDev.World
             MinimumPoiDistanceMeters = 64f,
             RunSurface = true,
             RunMountains = true,
+            RunHydrology = false,
             RunMarkers = true,
             RunSettlements = true,
             // Roads are off by default: the network is ~90 % of Generate All and the paths it
@@ -78,6 +97,7 @@ namespace GameDev.World
             {
                 case OverworldPipelineStepId.Surface: return RunSurface;
                 case OverworldPipelineStepId.Mountains: return RunMountains;
+                case OverworldPipelineStepId.Hydrology: return RunHydrology;
                 case OverworldPipelineStepId.Markers: return RunMarkers;
                 case OverworldPipelineStepId.Settlements: return RunSettlements;
                 case OverworldPipelineStepId.Roads: return RunRoads;
@@ -92,6 +112,7 @@ namespace GameDev.World
     {
         Surface,
         Mountains,
+        Hydrology,
         Markers,
         Settlements,
         Roads,

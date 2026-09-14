@@ -65,9 +65,9 @@ Interior ── Confront ──┘
 | Default | Value |
 |---------|-------|
 | Chunk size | **64 m** |
-| Overworld V0 playable world | **2800 × 2800 m** — 2×2 Vista tiles of 1400 m (chunk API as if infinite) |
+| Overworld V0 playable world | **2800 × 2800 m** — 2×2 Unity Terrain tiles of 1400 m (chunk API as if infinite) |
 | Terrain height budget / sea level | **700 m** / **24 m** |
-| Vista biome canvas | **512 px** — Vista Personal hard cap; terrain graphs are designed around it, never against it |
+| Terrain resolution | heightmap **513**, alphamap **512**, details **512** per tile — written by the terrain bake from TerrainGen ([OVERWORLD_TERRAIN_ARCHITECTURE](unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md)) |
 | Interior / Arena load | **Single-scene swap** (additive later) |
 | OrganicTown / TownGridBaker continuous path | **Deprecated** — archive only, not a reuse source ([13](13%20City%20Generation.md)) |
 | Combat depth in near-term | Arena V0 TB skeleton + Theme Pack greybox; BG3-depth is long-horizon |
@@ -178,7 +178,7 @@ flowchart LR
 | **Multiplayer** | Same seed → same samples on all peers; no per-frame sync of heightfields. |
 | **Performance** | Sampling must be O(1) / cheap noise; cache per-chunk if builders need grids. |
 | **Extensibility** | Swap noise implementation behind `IBiomeSampler`; add moisture/temperature channels later. |
-| **V1 scope / Deferred** | V0: multi-LPB island + mountains + ocean. Deferred: inland hydro redesign, cliffs, full Valheim-scale biomes. |
+| **V1 scope / Deferred** | V0: TerrainGen island + massifs + ocean, baked into Unity Terrain. Deferred: inland hydrology by default, full Valheim-scale biomes. |
 | **Owning folder** | `unity/Assets/Scripts/World/Terrain/` |
 
 ## W.3 Chunk Streaming

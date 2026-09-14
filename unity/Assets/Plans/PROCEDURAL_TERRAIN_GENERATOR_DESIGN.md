@@ -1,12 +1,19 @@
 # Procedural Terrain Generator — Architecture Design
 
-**Status:** **Approved by the project owner 2026-09-05.** Nothing in this document is implemented yet;
-implementation proceeds stage by stage through "Recommended Implementation Stages" below, behind
-`WorldGenSettings.TerrainSource == Generator`, which stays off by default until Stage 9 passes.
-Stage 5 is a go/no-go gate — see [OPEN] 1.
+**Status:** **Approved by the project owner 2026-09-05.** Implementation proceeds stage by stage through
+"Recommended Implementation Stages" below. Stage 5 is a go/no-go gate — see [OPEN] 1.
+
+> **Status update 2026-09-13 — terrain representation.** TerrainGen is now the only terrain authority.
+> Its structural field (Stage 1 landmass + Stage 2 massif uplift, `StructuralElevation`) is baked
+> straight into Unity `TerrainData` — heights, surface weights, trees and ground cover — by the
+> Unity-native terrain bake described in [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md).
+> The external terrain pipeline this design was written against has been **removed**, so there is no
+> `TerrainSource` switch and no second path: statements below about "the current pipeline", its
+> shaping recipe or its carve describe the state on 2026-09-05. Stage 3C/3D/3E topology remains
+> frozen and is not yet part of the baked field.
 **Date:** 2026-09-05
 **Applies to:** Track W (World Gen), terrain relief ownership
-**Related:** [UNITY_TERRAIN_MIGRATION_SPIKE.md](UNITY_TERRAIN_MIGRATION_SPIKE.md), [WORLD_RELIEF_PRINCIPLES.md](WORLD_RELIEF_PRINCIPLES.md), [HYDROLOGY_GENERATION_PLAN.md](HYDROLOGY_GENERATION_PLAN.md), [ISLAND_SHAPING_REBUILD.md](ISLAND_SHAPING_REBUILD.md), [BANDING_INVESTIGATION.md](BANDING_INVESTIGATION.md), [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md), [WORLD_GENERATION_PIPELINE.md](WORLD_GENERATION_PIPELINE.md), [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md)
+**Related:** [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md), [WORLD_RELIEF_PRINCIPLES.md](WORLD_RELIEF_PRINCIPLES.md), [HYDROLOGY_GENERATION_PLAN.md](HYDROLOGY_GENERATION_PLAN.md), [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md), [WORLD_GENERATION_PIPELINE.md](WORLD_GENERATION_PIPELINE.md), [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md)
 
 Claims are tagged the way [HYDROLOGY_GENERATION_PLAN.md](HYDROLOGY_GENERATION_PLAN.md) tags them,
 so a later reader can separate evidence from judgement:
@@ -37,19 +44,20 @@ Four decisions carry the design:
    analysis (`HydrologyPlanner`) already takes a plain `float[]` height field and returns geography.
    The generator feeds it the *preliminary* field, and the rivers, lakes and valleys it returns are
    then carved into that same field before any terrain is written. **[CONCLUSION]** The blocker that
-   stopped hydrology shipping — a fifth Vista biome moving the terrain by itself — disappears
-   entirely, because with the generator there is no Vista biome and no post-bake repair: the carve is
-   simply part of producing the field.
+   stopped hydrology shipping — an extra biome in the external pipeline moving the terrain by
+   itself — disappears entirely, because with the generator there is no external biome and no
+   post-bake repair: the carve is simply part of producing the field.
 3. **The ridge network and the drainage network are duals.** Spurs are generated as an explicit
    branching skeleton; the space between spurs is a valley by construction; drainage then decides
    which of those valleys actually carries water. That is what makes "why is this river here" answerable.
-4. **The generator produces relief only.** Surface weights, vegetation and materials stay Vista's.
-   **This design therefore does not reach Vista removal**, and says so rather than implying it.
+4. **The generator produces relief only.** Surface weights, vegetation and materials are not the
+   generator's. *(Since 2026-09-13 they are produced by the Unity-native terrain bake from world-space
+   rules — see the status update above.)*
 
-The anti-goal is concrete and already measured here: the current Vista shaping recipe produces
-directional banding with a curvature ratio of 0.57–0.71 where 1.0 is isotropic, and eight
-single-cause hypotheses were killed by experiment **[FACT: ISLAND_SHAPING_REBUILD.md,
-BANDING_INVESTIGATION.md]**. A structure-first model has no global noise field to band. That is the
+The anti-goal is concrete and was measured here: the external pipeline's island shaping recipe
+produced directional banding with a curvature ratio of 0.57–0.71 where 1.0 is isotropic, and eight
+single-cause hypotheses were killed by experiment (the investigation records were removed with that
+pipeline on 2026-09-13). A structure-first model has no global noise field to band. That is the
 central hypothesis of this design, it is unproven, and Stage 5 is where it gets falsified or confirmed
 by the diagnostic that already exists.
 
@@ -80,8 +88,8 @@ by the diagnostic that already exists.
 share their edge row, so the world lattice is **1025 × 1025**. Alphamaps land on the same pitch.
 
 **[FACT]** Vertical quantisation is documented in-repo as **~21 mm at a 700 m budget**
-(`OverworldLpbBake` diagnostic remarks; Unity stores heights in 16 bits over half the normalised
-range). Any relief feature must be well above that or it is rounding noise.
+(Unity stores heights in 16 bits over half the normalised range; the terrain bake measures a worst
+error of 1.07 cm against the field — half a step). Any relief feature must be well above that or it is rounding noise.
 
 **[CONCLUSION]** The finest representable horizontal feature is ~2.73 m, and a wall spanning 1–2
 pixels is the steepest slope the container can hold. A 20 m drop over 2 px ≈ 74°. Cliffs are
@@ -105,13 +113,13 @@ spike. New code must use the fully qualified `Seed.WorldSeed`.
 
 ## Terrain access and the downstream contract
 
-**[FACT]** After the migration spike (`UNITY_TERRAIN_MIGRATION_SPIKE.md`), the runtime tree
-`Assets/Scripts/World/` contains **zero** `Pinwheel` references. `OverworldTerrainAccess` discovers
+**[FACT]** After the 2026-09-05 migration spike, the runtime tree `Assets/Scripts/World/` contained
+**zero** references to the external terrain package. `OverworldTerrainAccess` discovers
 tiles by the project-owned `OverworldTerrainTile` marker (or the `Terrains` parent name), and
 `OverworldTerrainGrid` creates the tile grid with no third-party code.
 
 **[FACT]** Everything downstream reads `UnityEngine.Terrain` / `TerrainData` through
-`OverworldTerrainAccess` and `VistaTerrainSampler` (which, despite its name, contains no Vista code).
+`OverworldTerrainAccess` and `OverworldTerrainSampler`.
 Verified consumers: `LandscapeCostField`, `RoadPathfinder`, `RoadCorridorDeformer`,
 `PoiPlacementEngine` / `StubPoiPlacer`, `SettlementSiteValidator` / `SettlementTerrainConform` /
 `SettlementDustPaint`, `SeaLevelOceanSampler`, `InlandWaterSampler`, `HydrologyTerrainGrid`,
@@ -135,24 +143,24 @@ IWorldSeed) → Result` runs priority-flood depression fill → D8 → flow accu
 reach network → Strahler order → waterfall candidates → validation.
 
 **[FACT]** `HydrologyGrid` is constructed from `(originX, originZ, width, height, cellSize, float[]
-heights, seaLevel)`. It needs no terrain, no scene and no Vista.
+heights, seaLevel)`. It needs no terrain and no scene.
 
 **[FACT]** It shipped and was measured on the real island, seed 110201: 6 river systems, 26 reaches,
 17 tributaries, 16 sources, 2 terrain-derived lakes, 38 waterfall candidates, 6.03 km of river,
 identical across separate Unity processes, every reach validated to reach the ocean.
 
-**[FACT]** The **carve** is what is blocked. Adding a fifth `LocalProceduralBiome` moves the terrain
+**[FACT]** The **carve** was what was blocked. Adding a fifth biome to the external pipeline moved the terrain
 by itself: with the carve texture zeroed, and again with the height input physically disconnected,
 and again with the blend flipped from `Lower` to `Raise`, the world drops identically from 393 m to
-357 m, up to 38.41 m of movement at the same coordinate. Two bakes without hydrology are
-bit-identical, so this is neither the carve field nor the documented bistability
-(`HYDROLOGY_GENERATION_PLAN.md` §19).
+357 m, up to 38.41 m of movement at the same coordinate. Two bakes without hydrology were
+bit-identical, so this was not the carve field. *(Resolved 2026-09-13: the carve is now a depth field
+the Unity-native terrain bake applies to its lattice — `HYDROLOGY_GENERATION_PLAN.md` §8.)*
 
 **[CONCLUSION]** The algorithms are sound and independent of terrain provenance. The *integration
-architecture* — carving through a Vista biome because "Vista owns terrain height" — is what failed,
+architecture* — carving through an external biome because "the external pipeline owns terrain height" — is what failed,
 and it is exactly the constraint that stops existing when the project owns the height field.
 
-## Design intent that survives Vista
+## Design intent that survives the external pipeline
 
 **[FACT]** `WORLD_RELIEF_PRINCIPLES.md` is a sourced, numeric statement of what makes relief read as
 a place. It is engine-independent and should be treated as the quality specification for the new
@@ -174,11 +182,11 @@ generator:
   land under 5° **≥ 35 %**; distinct `TerrainLayer` per tile ≤ 7. 45° is not aesthetic — it is
   `CharacterController.slopeLimit` and the default NavMesh agent slope.
 
-**[FACT]** `ISLAND_SHAPING_REBUILD.md` records the isotropy target and the tooling that measures it:
+**[FACT]** The island shaping investigation (2026-08) recorded the isotropy target and the tooling that measures it:
 curvature ratio within roughly 0.85–1.20 on every tile with no consistent direction, no Z- or
 X-period peak above the stencil floor, axis-aligned orientation share near the 17 % even-spread
 baseline, curvature PNG showing branching drainage rather than scan-lines — accepted on three seeds.
-Vista's own sample graph scores 0.84 / 0.87 / 0.97 / 1.50; ours scores 0.57–0.71.
+The external package's own sample terrain scored 0.84 / 0.87 / 0.97 / 1.50; the project's recipe scored 0.57–0.71.
 
 **[CONCLUSION]** The project already owns both the quality bar and the measurement harness for it.
 The new generator does not need a new definition of "good"; it needs to pass the one that exists.
@@ -190,11 +198,9 @@ The new generator does not need a new definition of "good"; it needs to pass the
 ```
 OverworldPipeline.GenerateAllRoutine          (Editor coroutine, WorldGenSettings step mask)
   │
-  ├─ Surface + Mountains  ── one Vista bake ──▶ heights, alphamaps, trees, detail
-  │     OverworldTerrainMenu.GenerateVistaTerrainRoutine
-  │       VistaManager + UnityTerrainSystem.CreateTerrainGrid + TerrainHeightWrite
-  │       OverworldLpbBake.SpawnIslandAndMountainStack   (LPB_SeaFloor, LPB_IslandBase, LPB_Mountain_n)
-  │       WaitForVistaGeneration → SyncFromGpu → MatchSeams → VistaDetailDensityRelay
+  ├─ Surface + Mountains  ── one external-pipeline bake ──▶ heights, alphamaps, trees, detail
+  │     (2026-09-05 state; replaced 2026-09-13 by OverworldTerrainBake — TerrainGen field →
+  │      OverworldTerrainField → OverworldTerrainBuilder → TerrainData)
   │
   ├─ Hydrology   (OFF by default — analysis works, carve blocked)
   ├─ Markers     OverworldWorldPlan.BuildAndStorePois → StubPoiPlacer + LandscapeCostField
@@ -204,7 +210,7 @@ OverworldPipeline.GenerateAllRoutine          (Editor coroutine, WorldGenSetting
 
                        everything above reads terrain through
                                        │
-                          OverworldTerrainAccess / VistaTerrainSampler
+                          OverworldTerrainAccess / OverworldTerrainSampler
                                        │
                           UnityEngine.Terrain / TerrainData
 ```
@@ -223,10 +229,10 @@ analysis, `OverworldGenTiming`, `OverworldTerrainDiagnostics`, `ChunkCoord` / `O
 | System | State | Why it must not be revived |
 |---|---|---|
 | `RiverTracer`, `LakeDefinition`, `WaterZone_*` hierarchies, per-lake water objects | Deleted | **[FACT]** `14 World Generation Roadmap.md`: they produced architectural complexity, hidden dependencies, duplicated systems and made terrain harder to change. Explicitly forbidden to resurrect. |
-| The Vista `LPB_Hydrology` carve (four `Lower`-blend biomes + carve textures) | Built, blocked | The fifth biome moves the terrain with its height output disconnected. This is the *integration*, not the analysis. Superseded by owning the height field. |
-| Vista island shaping recipe (`IslandPlateauGraphBuilder`, `AddMassNoise` / `AddDetailNoise`, `ShelfCurve`) | Working but banded | Curvature ratio 0.57–0.71, systematic across 10 seeds (σ 0.189). **This is the noise-soup failure mode the new design exists to avoid.** Do not port the recipe. |
-| `IslandNaturalGeography`, `IslandOccupancy`, `NaturalIsland_TerrainGraph`, `CoastalBeachShelf`, `GrassField`, `VegetationScatterMenu`, MapMagic recipe, MicroSplat, OrganicTown, VSP | Deleted / retired | Recorded as retired in `WORLD_GENERATION_PIPELINE.md` and `NATURAL_ISLAND_GENERATOR.md`. |
-| `VistaTerrainSampler.SampleMoisture01` | Working but wrong | Unseeded Perlin; discards its `moistureSeed`, so moisture is identical across seeds. A known defect, not a contract to preserve. |
+| The external-pipeline hydrology carve (four `Lower`-blend biomes + carve textures) | Removed 2026-09-13 | The fifth biome moves the terrain with its height output disconnected. This is the *integration*, not the analysis. Superseded by owning the height field. |
+| The external pipeline's island shaping recipe (C#-built terrain graphs, mass/detail noise, shelf curve) | Removed 2026-09-13; was banded | Curvature ratio 0.57–0.71, systematic across 10 seeds (σ 0.189). **This is the noise-soup failure mode the new design exists to avoid.** Do not port the recipe. |
+| `IslandNaturalGeography`, `IslandOccupancy`, `CoastalBeachShelf`, `GrassField`, `VegetationScatterMenu`, MapMagic recipe, MicroSplat, OrganicTown, VSP | Deleted / retired | Recorded as retired in `WORLD_GENERATION_PIPELINE.md`. |
+| `OverworldTerrainSampler.SampleMoisture01` | Working but wrong | Unseeded Perlin; discards its `moistureSeed`, so moisture is identical across seeds. A known defect, not a contract to preserve. |
 
 **Useful material inside otherwise-legacy documents** — keep the algorithm, drop the architecture:
 
@@ -235,8 +241,8 @@ analysis, `OverworldGenTiming`, `OverworldTerrainDiagnostics`, `ChunkCoord` / `O
   initiation, per-system pruning), §11 (ocean-outlet invariant), §16 (validation rules). All of this
   is terrain-independent and all of it is already implemented and tested.
 - `WORLD_RELIEF_PRINCIPLES.md` in full.
-- `ISLAND_SHAPING_REBUILD.md` §"What has already been ruled out" — eight dead hypotheses; do not
-  re-test them.
+- The eight banding hypotheses ruled out on the external pipeline (resolution, erosion, quantisation and
+  noise explanations) — do not re-test them against TerrainGen without new evidence.
 
 ---
 
@@ -262,14 +268,14 @@ analysis, `OverworldGenTiming`, `OverworldTerrainDiagnostics`, `ChunkCoord` / `O
 
 # Non-Goals
 
-- **Not a graph editor, node system, or Vista replacement framework.**
-- **Not a generic provider / adapter / DI hierarchy.** The switch between terrain sources is one
-  enum field, and it is justified in "Vista Migration Strategy" rather than assumed.
+- **Not a graph editor, node system, or external-terrain-pipeline replacement framework.**
+- **Not a generic provider / adapter / DI hierarchy.** There is one terrain source and no switch —
+  see "Terrain Representation".
 - **Not a noise library evaluation.** Noise is a bounded perturbation, never the model.
 - **Not a material, alphamap, vegetation, biome, road, POI or settlement system.** The generator
   produces relief and hydrology geography. Nothing else.
 - **Not a restore of any deleted hydrology code.**
-- **Not Vista removal.** See "Vista Migration Strategy" for why that is out of reach here.
+- **Not the surface and vegetation bake.** That is the terrain bake's job — see "Terrain Representation".
 - **Not real-time or streaming generation.** The world is 2800 × 2800 m and is generated in one pass.
 - **Not multi-tile continents.** Deferred, but the design records what would break.
 - **Not an implementation.** No code, no prototype, no heightmap, no noise, in this task.
@@ -296,7 +302,7 @@ Two vocabulary items used everywhere:
 
 **Rejected: radial falloff and harmonic anchor rings.** **[FACT]** The current island is a 36-anchor
 harmonic ring plus an outer falloff, and it produces visible straight chords (~60 m of shore per
-anchor) that Chaikin smoothing cannot hide (`ISLAND_SHAPING_REBUILD.md`). More fundamentally, any
+anchor) that Chaikin smoothing cannot hide. More fundamentally, any
 `radius(θ)` function is star-shaped about its centre: it cannot express a bay that curls back, a
 peninsula with a neck, or a lagoon behind a spit. Those are the shapes that make a coast read as
 geography.
@@ -339,7 +345,7 @@ three seeds.
 
 ## Mountain Systems
 
-**Rejected: independent mountain blobs.** The current model places 1–2 `LPB_Mountain` biomes at seeded
+**Rejected: independent mountain blobs.** The external pipeline placed 1–2 mountain biomes at seeded
 positions with elliptical anchor rings. They are independent objects; nothing connects them to the
 landmass or to each other, which is why the world reads as "an island with mountains on it" rather
 than as an island *shaped by* its mountains.
@@ -493,8 +499,8 @@ reason not to — it is the one part of the hydrology work that was measured and
 
 1. **Its input is now the generator's preliminary field**, not `terrainData.GetHeights`. `HydrologyGrid`
    already takes a `float[]`; the adapter is one constructor call. `HydrologyTerrainGrid` (the
-   Editor-side tile reader) stops being on the path for the generator, and stays for the Vista path.
-2. **Its output is now consumed by the generator**, not by a Vista biome. This is the whole difference.
+   Editor-side tile reader) stops being on the path for the generator.
+2. **Its output is now consumed by the generator**, not by an external biome. This is the whole difference.
 
 **One correctness point worth restating** because it will matter with a new terrain: *below sea level*
 is not *the ocean*. `HydrologyGrid.BuildOceanMask` floods from the world border through submerged
@@ -609,7 +615,7 @@ The brief asks for the ordering to be evaluated rather than assumed. Three quest
 
 **Does hydrology need one pass, iterative passes, or a data model that allows modification before the
 bake?** — **The third.** One pass is enough *because* the model is a field the generator owns and can
-modify before writing. That is precisely what the Vista architecture could not do, and why it needed
+modify before writing. That is precisely what the external-pipeline architecture could not do, and why it needed
 two bakes and a blend-based carve. **[CONCLUSION]** The two-pass structure in
 `HYDROLOGY_GENERATION_PLAN.md` §7 was a consequence of *where the information lived*, not of the
 problem. Owning the field collapses it.
@@ -704,7 +710,7 @@ coordinates and each tile is a **window** into it — tile `(tx, tz)` takes rows
 
 Consequences:
 
-- **Seam continuity** is not achieved by matching, blending or `MatchSeams`. There is nothing to match.
+- **Seam continuity** is not achieved by matching, blending or a seam-stitching pass. There is nothing to match.
 - **Tile-order independence** is not a property to test for in the generator — no code is per tile.
   It is still tested (S1, D2 below), because the test is what stops a future change reintroducing
   per-tile generation.
@@ -758,8 +764,8 @@ generator, published on `WorldDefinition` beside `Hydrology` for the same reason
 downstream systems read one truth rather than re-deriving it. Pure C#, no `UnityEngine` dependency
 beyond `Vector2` — the same rule that makes the hydrology package testable without a scene.
 
-**No downstream system may *require* it in V1.** That is what keeps the Vista path viable: a world
-baked by Vista has an empty `WorldStructure`, and everything must still work.
+**No downstream system may *require* it in V1.** A world baked from the structural field alone has an
+empty `WorldStructure`, and everything must still work.
 
 ## `WorldHeightField` — the one intermediate representation
 
@@ -798,10 +804,12 @@ history (`WaterZone_*`, per-lake objects) records what that costs.
 
 ## `WorldGenSettings` additions
 
-Two fields, no more:
+One field, no more:
 
-- `TerrainSource Source` — `Vista` (default) | `Generator`. Justified in the migration section.
 - `int GeneratorVersion` — so a deliberate change of geography is identifiable.
+
+*(A `TerrainSource` switch was proposed here for coexistence with the external pipeline. It was never
+built, and with that pipeline removed there is nothing to switch between.)*
 
 Generator tuning (feature budgets, tier tables, profile control points, refinement amplitude) belongs
 in a `TerrainGenSettings` struct alongside `HydrologySettings`, for the same reason
@@ -823,7 +831,7 @@ WorldStructure → WorldHeightField (1025²) → [drainage, carve] → final fie
 
 **Writing.** For tile `(tx, tz)`: `h01 = Mathf.Clamp01(worldY / data.size.y)` with `size.y = 700`,
 into `float[513, 513]`, one `SetHeights(0, 0, …)` per tile. Note `GetHeights`/`SetHeights` are indexed
-`[z, x]` — **[FACT]** the convention `TerrainHeightWrite.LogRange` already uses.
+`[z, x]` — **[FACT]** the convention `OverworldTerrainBuilder` uses.
 
 **Grid creation is not the generator's job.** `OverworldTerrainGrid.Create(parent, spec, layers,
 material)` already builds the tiles, stamps `OverworldTerrainTile`, sets resolutions, collider and
@@ -836,13 +844,12 @@ neighbours. The generator receives the tiles and fills them.
 
 **Clamping and the height budget.** The field must be asserted within `[0, 700]` before writing, not
 clamped silently. A structure that overshoots is a budgeting bug and must be reported — **[FACT]** the
-existing Vista path already logs `Global max terrain height after Vista` for exactly this reason, and
-deliberately reports rather than corrects.
+terrain bake reports `ClampedHeightSamples` for exactly this reason, and deliberately reports rather
+than corrects.
 
 **What the generator does *not* write:** alphamaps, `terrainLayers`, trees, detail density. Those
-remain Vista's, and a generator-produced tile has whatever `OverworldTerrainGrid` gave it — the five
-canonical layers with a flat weight on layer 0. That is the honest state, and it is the reason Vista
-removal is not in this design.
+belong to the terrain bake, which derives them from world-space rules over the same lattice —
+[OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md) §3–§5.
 
 ---
 
@@ -851,7 +858,7 @@ removal is not in this design.
 | System | Receives | Needs modification? |
 |---|---|---|
 | `OverworldTerrainAccess` | `Terrain` / `TerrainData`, tiles stamped by `OverworldTerrainGrid` | **No** |
-| `VistaTerrainSampler` (height / slope / biome) | `SampleHeight`, `GetInterpolatedNormal` | **No.** Its Vista-flavoured *name* is misleading; renaming is optional churn |
+| `OverworldTerrainSampler` (height / slope / biome) | `SampleHeight`, `GetInterpolatedNormal` | **No** |
 | `BiomeClassifier` | sea-relative height + slope + moisture | **No**, but see below |
 | `SeaLevelOceanSampler` | a height delegate | **Yes — pre-existing defect.** `FromTerrain` closes over a *single* tile (**[FACT]** `OverworldWaterSamplers` remarks; `HYDROLOGY_GENERATION_PLAN.md` §2.3 [OPEN]). Today the island is centred and the bug is partly masked; a generator producing real coast on all four tiles will expose it |
 | `InlandWaterSampler` / `CompositeWaterSampler` | `HydrologyDefinition` | **No.** They finally stop being empty by default |
@@ -861,16 +868,16 @@ removal is not in this design.
 | Settlements (`SettlementSiteValidator`, `SettlementTerrainConform`, `OverworldSettlementAnchor`) | ground Y, water level, flatness | **No** contract change; needs T2 plateau tops to exist as flat nodes |
 | Player spawn (`OverworldPlayerMenu`) | a TownApproach marker + ground | **No** |
 | Chunking (`ChunkCoord`, `OverworldTileChunks`) | world coordinates | **No** |
-| Terrain material / vegetation | alphamaps, `terrainLayers`, trees, detail | **Yes — and this is the gap.** Nothing outside Vista writes them |
+| Terrain material / vegetation | alphamaps, `terrainLayers`, trees, detail | **Closed 2026-09-13** — written by the terrain bake (`TerrainSurfaceRules`, `TerrainVegetationRules`) |
 
 **The one design goal that is fully met:** no downstream system can tell which generator produced the
-terrain, because none of them asks. **[FACT]** verified in the migration spike — zero `Pinwheel`
-references in `Assets/Scripts/World/`, and 14 contract tests pass against a Vista-free terrain.
+terrain, because none of them asks. **[FACT]** verified in the 2026-09-05 migration spike — no external
+terrain package references in `Assets/Scripts/World/`, and contract tests passed against a plain Unity terrain.
 
 **Two contracts that would need work, stated plainly rather than deferred silently:**
 
 1. `SeaLevelOceanSampler.FromTerrain` single-tile closure — a small, independent fix.
-2. Surface weights and vegetation — not small, not in scope, and the reason Vista stays.
+2. Surface weights and vegetation — implemented by the terrain bake on 2026-09-13.
 
 **One opportunity, not a requirement:** `BiomeClassifier`'s moisture is an unseeded Perlin field that
 discards its seed. `HydrologyDefinition` is the natural replacement (distance-to-water), and
@@ -940,7 +947,7 @@ demonstrates that a pure-C# geography layer is testable on synthetic fields
 
 ## What must still be looked at by a human
 
-Numbers cannot answer these, and the acceptance rule from `ISLAND_SHAPING_REBUILD.md` — show a bake,
+Numbers cannot answer these, and the project's acceptance rule for terrain shape — show a bake,
 not a diff, on three seeds — applies:
 
 - Does the T1 massif read as *the* landmark from the shore?
@@ -989,44 +996,25 @@ decide. **[FACT]** the road planner's 261 s → 5.3 s recovery came from finding
 
 ---
 
-# Vista Migration Strategy
+# Terrain Representation
+
+**Implemented 2026-09-13.** The external terrain pipeline is removed and there is one path:
 
 ```
-today          Vista ──▶ heights, alphamaps, trees, detail ──▶ TerrainData ──▶ downstream
-
-this design    Generator ──▶ heights ──────────────────────┐
-                                                           ├──▶ TerrainData ──▶ downstream
-               Vista ─────▶ alphamaps, trees, detail ──────┘        (still needed)
-
-eventual       Generator + surface/vegetation pass ────────▶ TerrainData ──▶ downstream
-               (out of scope here)
+TerrainGen (StructuralElevation) ──▶ OverworldTerrainField ──▶ OverworldTerrainBuilder ──▶ TerrainData ──▶ downstream
+                                      (+ hydrology carve)       heights, weights, trees, details
 ```
 
-**The switch is one field.** `WorldGenSettings.TerrainSource` = `Vista` (default) | `Generator`.
-`OverworldPipeline` branches once, at the Surface step; both branches end at the same
-`OverworldTerrainGrid` tiles. No provider interface, no registry, no adapter — one enum and one `if`,
-which is the smallest thing that lets both paths coexist and lets the generator be off by default until
-it earns being on.
+- **No switch.** No `TerrainSource`, no provider interface, no fallback bake. The terrain bake reads
+  TerrainGen unconditionally.
+- **The generator stays pure.** TerrainGen does not reference Unity terrain types or the bake; the
+  bake consumes its field and never changes it (the canonical seed's field hash is pinned by test).
+- **Surface and vegetation** come from world-space rules in the bake, not from the generator.
+- **Stage boundary.** The baked field is Stage 1 + Stage 2 today. Stage 3 onwards joins the field
+  through `StructuralElevation` when those stages are unfrozen; the bake needs no change for it.
 
-**The generator must not reference Vista.** Not a type, not a namespace, not an asset path. It must
-compile and its tests must pass with the package absent.
-
-**Vista stays.** It is the only source of surface weights and vegetation, it produces the current
-shipped world, and removing it is a separate decision with its own prerequisites.
-
-**Prerequisites for Vista removal — none of which this design delivers:**
-
-1. A surface-weight pass. Nothing outside Vista writes alphamaps or `terrainLayers`.
-2. A vegetation pass. `TREE OUTPUT` / `DETAIL DENSITY OUTPUT` have no replacement.
-3. **[FACT]** The canonical `TerrainLayer` assets point at textures inside
-   `Assets/PinwheelStudio/Vista/Personal/Samples/TerrainLayers/` (verified by GUID in the migration
-   spike). Deleting the package breaks the layer albedo and normals with no compile error. This one is
-   cheap and independent — do it early, regardless.
-4. Scene migration: `VistaManager`, `LPB_SeaFloor`, `LPB_IslandBase` and four `TerrainTile` components
-   become missing scripts. The `Terrain`, `TerrainCollider` and `TerrainData` assets survive intact.
-
-**[CONCLUSION]** Vista removal is **not** the last stage of this design. It is a separate project that
-this design unblocks by half.
+Full contract, tile model, rules, determinism and tests:
+[OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md).
 
 ---
 
@@ -1056,7 +1044,7 @@ Unresolved on purpose. Each names how it gets answered.
    Stage 9. Whether to retune the generator or the consumers is a decision for that stage, not now.
 9. **[OPEN] Does the estuary coastal profile need the drainage result, or is basin geometry enough?**
    The ordering refinement in "Generation Order" assumes it needs drainage. *Answered by:* Stage 7.
-10. **[OPEN] Surface weights and vegetation.** Entirely unanswered here, and the gate on Vista removal.
+10. **Surface weights and vegetation.** Answered 2026-09-13 by the terrain bake; rule values are open authoring decisions (`OVERWORLD_TECH_DEBT.md` item 14).
 
 ---
 
@@ -1071,17 +1059,16 @@ Unresolved on purpose. Each names how it gets answered.
 | **Downstream tuning breaks** (POI floor, road grades, settlement flatness) | Medium | P1–P4 at Stage 9; the generator is off by default until they pass |
 | **Determinism drift** across Unity versions or machines | Medium | D1 world hash as a permanent test; `IWorldSeed` is the single replacement point |
 | **Scope creep into a framework** | Medium | The non-goals list; one enum instead of a provider hierarchy; `WorldStructure` is data with no behaviour |
-| **The design is large and could stall half-built** | Medium | Ten stages, each independently testable and reversible, all behind a default-off switch; the Vista path is never disturbed |
-| **Vista bistability (P0)** confuses A/B comparison during migration | Low for the generator | **[FACT]** it affects Vista bakes only; the generator has no GPU stage. It does mean any "before" measurement must be repeated until tile hashes match |
+| **The design is large and could stall half-built** | Medium | Ten stages, each independently testable; each stage's output is inspectable on its own before the next is built |
 | **Someone reintroduces per-tile generation** for streaming | Low, high cost | S1/S2 tests exist precisely to fail loudly |
 
 ---
 
 # Recommended Implementation Stages
 
-Derived from the design, not from a template. Every stage is behind
-`WorldGenSettings.TerrainSource == Generator`, which is **off by default**, so every stage is reversible
-by not selecting it. No stage requires the whole generator. No stage modifies the Vista path.
+Derived from the design, not from a template. No stage requires the whole generator. *(The original
+plan put every stage behind a default-off `TerrainSource` switch beside the external pipeline; that
+pipeline is removed and the terrain bake reads TerrainGen directly.)*
 
 **Stage 0 — primitives and the inspection harness.** `WorldHeightField`; deterministic seeded
 primitives (blue-noise point sets, Voronoi partition, polyline distance with bucketing, profile curve
@@ -1117,29 +1104,27 @@ No carve. Rivers and lakes exist as data and gizmos only. *Tests:* H1–H3 (alre
 whole analysis already exists and is tested.*
 
 **Stage 7 — carve.** Valley + channel + lake basin subtraction; estuary coastal profile; the
-validation re-run. *Tests:* H4–H8. *Answers:* [OPEN] 5 and 9. **The stage that the Vista architecture
+validation re-run. *Tests:* H4–H8. *Answers:* [OPEN] 5 and 9. **The stage that the external-pipeline architecture
 could not reach.**
 
-**Stage 8 — TerrainData integration.** `TerrainSource` switch in `WorldGenSettings` and one branch in
-`OverworldPipeline`; per-tile window write. *Tests:* S1–S3, D1 end to end, D3 against the 700 m budget.
+**Stage 8 — TerrainData integration.** *Delivered early, 2026-09-13, for the Stage 1 + 2 field:*
+`OverworldTerrainBake` writes one world lattice into the tile windows, with no switch. *Tests:* S1–S3, D1 end to end, D3 against the 700 m budget.
 
 **Stage 9 — downstream validation.** Run cost field, POI, settlement, roads, water samplers and player
 spawn against generator terrain; compare against the current world's acceptance ranges. *Tests:*
 P1–P4, G8, and the full 309-test EditMode suite as a regression gate. *Answers:* [OPEN] 8. *Output:* a
 decision on whether to retune the generator or the consumers.
 
-**Stage 10 — surface and vegetation gap analysis.** **Not Vista removal.** Establish precisely what a
-non-Vista tile lacks, re-point the canonical `TerrainLayer` textures out of the Vista samples folder
-(cheap, independent, do it any time), and produce the design for a surface-weight pass. Vista removal
-is a separate project gated on that design.
+**Stage 10 — surface and vegetation.** *Delivered 2026-09-13* by the terrain bake: world-space surface
+rules, tree instances and ground cover, canonical layer textures moved to `Assets/Art/Terrain/SurfaceLayers/`.
+What remains is art review of the authoring defaults.
 
 ---
 
 ## Related Documents
 
-- [UNITY_TERRAIN_MIGRATION_SPIKE.md](UNITY_TERRAIN_MIGRATION_SPIKE.md) — the seam this design writes into
+- [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md) — how the field becomes Unity terrain
 - [WORLD_RELIEF_PRINCIPLES.md](WORLD_RELIEF_PRINCIPLES.md) — the quality specification, engine-independent
 - [HYDROLOGY_GENERATION_PLAN.md](HYDROLOGY_GENERATION_PLAN.md) — the drainage algorithm this design reuses, and the carve architecture it replaces
-- [ISLAND_SHAPING_REBUILD.md](ISLAND_SHAPING_REBUILD.md) / [BANDING_INVESTIGATION.md](BANDING_INVESTIGATION.md) — the measured failure this design exists to avoid
-- [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) — Vista bistability (P0), road defects
+- [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) — road defects, terrain authoring defaults
 - [WORLD_GENERATION_PIPELINE.md](WORLD_GENERATION_PIPELINE.md) — pipeline steps, seed forks, world scale

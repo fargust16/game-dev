@@ -4,9 +4,10 @@ What makes generated terrain read as a place rather than as noise, and the rules
 to. Sources are listed at the bottom; every rule here is either taken from one of them or is the
 numeric form we chose for it.
 
-This document is **why**. The Vista-specific *how* — node semantics, resolution limits, the traps —
-lives in [VISTA_TERRAIN_PLAYBOOK.md](VISTA_TERRAIN_PLAYBOOK.md). When the two disagree about a
-number, this file states the intent and the playbook states what the engine can actually deliver.
+This document is **why**. The *how* — the terrain generator's stages and the Unity terrain bake —
+lives in [PROCEDURAL_TERRAIN_GENERATOR_DESIGN.md](PROCEDURAL_TERRAIN_GENERATOR_DESIGN.md) and
+[OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md). When they disagree about a
+number, this file states the intent and those documents state what the pipeline actually delivers.
 
 ---
 
@@ -165,28 +166,21 @@ design is built on that one number.
 
 ## 7. How this lands on our island
 
-The island is `LPB_IslandBase` — a 2400 m plateau biome spanning 43.6–122 m of world height. It is
-**T0**: the ground the tiers sit on, and it is not what carries the relief.
+The relief tiers belong to **TerrainGen**, and the terrain bake writes whatever TerrainGen produces
+without adding relief of its own. **T0** is the Stage 1 island floor and **T1** is the Stage 2 massif
+uplift; both exist today. **T2 plateaus and T3 outcrops are not implemented.** When they are, they are
+TerrainGen stages that add to the structural field — never a scene-level stamp, a second height writer
+or a post-bake pass.
 
-| Tier | Implementation | Blend | Order |
-|---|---|---|---|
-| T0 island floor | `LPB_IslandBase` (unchanged) | Replace | 10 |
-| T2 plateau | `LPB_Shelf` ×6–10 | **Raise** | 15 |
-| T3 outcrop | `LPB_Shelf` ×12–20, small archetype | **Raise** | 16 |
-| T1 massif | `LPB_Mountain` ×1 | Raise | 20 |
+| Tier | Source | State |
+|---|---|---|
+| T0 island floor | TerrainGen Stage 1 landmass | built |
+| T1 massif | TerrainGen Stage 2 massif uplift | built |
+| T2 plateau | a future TerrainGen stage | not built |
+| T3 outcrop | a future TerrainGen stage | not built |
 
-**Why separate LPBs and not more nodes in the island graph.** Three measured reasons:
-
-1. **Resolution.** The island biome resolves at 2600 m / 512 px = **5.0 m/px**, so no feature of its
-   can be narrower than 5 m. A 300 m shelf with a 40 m falloff resolves at 380 m / 512 px =
-   **0.74 m/px** — seven times finer. A 20 m wall over 1–2 px is ~1.5 m horizontal, i.e. essentially
-   vertical. The island graph physically cannot produce a cliff; a small biome can.
-2. **Height is metres.** `SetBiomeHeightOnSpawn.worldHeight = 25` is 25 m. Inside the island graph the
-   same intent passes through four transforms and came out an order of magnitude wrong.
-3. **Locality.** A graph operation applies everywhere its mask is non-zero, which is how the terrace
-   ended up ringing the whole island. A biome has a boundary by construction.
-
-**Placement rules for the shelves** (the "controlled chaos" of §5, made concrete):
+**Placement rules for plateaus and outcrops** (the "controlled chaos" of §5, made concrete), for the
+stage that implements them:
 
 - Blue-noise sample inside the island silhouette, minimum separation **1.6 × footprint**.
 - Reject any position within **250 m** of the massif's footprint — T1 owns its own skirt.
@@ -197,20 +191,17 @@ The island is `LPB_IslandBase` — a 2400 m plateau biome spanning 43.6–122 m 
 - Each shelf's **ramp direction is its own yaw**, drawn per instance from the seed — so ramps do not
   all face the same compass point, which is what a single global dip direction produced.
 
-**Shelf graph shape** (small, one archetype per parameter set):
+**Shelf shape intent:**
 
 ```
-flat top (low-amplitude noise)
-  -> Levels: sharp shoulder            = the caprock
-  -> hydraulic erosion, short          = gullies in the wall, talus at the foot
-  -> SlopeMask < 25 deg  -> grass  + trees   (top)
-  -> SlopeMask > 35 deg  -> Overworld_Cliff  (wall)
-  -> AxialGradient along local +X, subtracted -> the ramp on one flank
+flat top (low-amplitude relief)
+  -> sharp shoulder                    = the caprock
+  -> short erosion                     = gullies in the wall, talus at the foot
+  -> a ramp on one flank, along the shelf's own yaw
 ```
 
-All layers are canonical (`Overworld_Grass`, `Overworld_Cliff`), so the per-tile layer count does not
-grow. Trees and grass come from the shelf's own graph outputs using the existing
-`VistaVegetationTemplates` species, so a plateau top is meadow with trees on it, not bare rock.
+The surface needs no new layer: the terrain bake's world-space rules already give a gentle top grass
+and trees and a wall past the angle of repose rock or cliff, over the five canonical layers.
 
 ---
 

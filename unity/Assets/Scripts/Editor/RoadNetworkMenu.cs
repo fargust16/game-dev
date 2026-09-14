@@ -43,7 +43,7 @@ private const float BridgeSpanDetectionThresholdMeters = GridCellSizeMeters * 1.
         /// </summary>
         public static void BuildRoadNetworkWithLandscapePlanner()
         {
-            VistaTileSync.WaitForTerrainReady();
+            OverworldTerrainReady.WaitForTerrainReady();
 
             var terrain = OverworldTerrainAccess.FindTerrain();
             var sampler = OverworldTerrainAccess.CreateSampler(OverworldTerrainMenu.LastSeed);
@@ -52,7 +52,7 @@ private const float BridgeSpanDetectionThresholdMeters = GridCellSizeMeters * 1.
                 return;
             }
 
-            IWaterSampler waterZones = SeaLevelOceanSampler.FromTerrain(terrain);
+            IWaterSampler waterZones = OverworldWaterSamplers.ForCurrentWorld(terrain);
             var heightSampler = new TerrainWorldHeightSampler(terrain);
 
             // World extent, not one tile — the road grid has to reach every POI, and those are
@@ -504,7 +504,7 @@ if (waterZones != null && waterZones.TryGetWaterLevel(x, z, out var waterY) && y
         }
 
         /// <summary>Terrain height at every <see cref="RoadGridSpec"/> cell centre, sampled once.</summary>
-        private static float[] BuildCellHeightMemo(RoadGridSpec grid, VistaTerrainSampler sampler)
+        private static float[] BuildCellHeightMemo(RoadGridSpec grid, OverworldTerrainSampler sampler)
         {
             var heights = new float[grid.CellCount];
             for (var cz = 0; cz < grid.Height; cz++)

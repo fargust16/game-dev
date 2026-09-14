@@ -421,7 +421,7 @@ namespace GameDev.EditorTools
         /// transform every LateUpdate.
         /// <para>
         /// Uses Skybox clear flags so the overworld atmosphere renders; far clip plane is left as
-        /// already configured (terrain setup uses a long far plane for vista distance).
+        /// already configured (terrain setup uses a long far plane for long view distances).
         /// </para>
         /// </summary>
         private static void EnsureFollowCamera(Transform target)

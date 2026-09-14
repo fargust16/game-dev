@@ -1,0 +1,70 @@
+=== seed 110201: massifs=1 ===
+  massif 0: axisLen=999.4 smoothLen=999.4 ratio=1.00005 arcDrift=0.0m
+    certifiedCore=[0.200,0.800] coreInterval=[0.200,0.800] coreToEndM=[200,200]
+    reach=446 usableW=280 halfW=280 reachHeadroom=166
+  land=28240 owned=28240 clampedS=6416 (22.7%) clampedMaxDistFromTip=1248m
+  frameGap worst=0.11m at=(1780, 1300) d=5m | band<=W=0.11 W..reach=0.11 >reach=0.11
+  coarseSearch: flankSignDisagreements=0 worst|dS|=0.0254
+  continuity: worstArcJump=657m at=(2120, 350) d=980m | flankFlips=153 awayFromAxis=25
+  coastRings=1
+
+=== seed 424242: massifs=1 ===
+  massif 0: axisLen=1303.4 smoothLen=1303.4 ratio=1.00004 arcDrift=0.0m
+    certifiedCore=[0.231,0.738] coreInterval=[0.231,0.738] coreToEndM=[301,341]
+    reach=446 usableW=270 halfW=270 reachHeadroom=176
+  land=28210 owned=28210 clampedS=7645 (27.1%) clampedMaxDistFromTip=1117m
+  frameGap worst=0.11m at=(960, 1150) d=405m | band<=W=0.11 W..reach=0.11 >reach=0.11
+  coarseSearch: flankSignDisagreements=0 worst|dS|=0.3780
+  continuity: worstArcJump=531m at=(330, 1650) d=904m | flankFlips=274 awayFromAxis=103
+  coastRings=2
+    islet 1: area=63441sqm centroid=(2197, 454) owner=Massif/0 d=985m
+
+=== seed 20260905: massifs=1 ===
+  massif 0: axisLen=1704.5 smoothLen=1704.6 ratio=1.00004 arcDrift=0.1m
+    certifiedCore=[0.294,0.871] coreInterval=[0.294,0.820] coreToEndM=[501,221]
+    reach=449 usableW=280 halfW=280 reachHeadroom=169
+  land=30214 owned=30214 clampedS=3333 (11.0%) clampedMaxDistFromTip=766m
+  frameGap worst=0.11m at=(1180, 880) d=295m | band<=W=0.11 W..reach=0.11 >reach=0.11
+  coarseSearch: flankSignDisagreements=0 worst|dS|=0.0000
+  continuity: worstArcJump=890m at=(1200, 390) d=781m | flankFlips=272 awayFromAxis=46
+  coastRings=1
+
+=== seed 7: massifs=1 ===
+  massif 0: axisLen=1167.7 smoothLen=1167.8 ratio=1.00002 arcDrift=0.0m
+    certifiedCore=[0.276,0.983] coreInterval=[0.276,0.820] coreToEndM=[322,20]
+    reach=461 usableW=280 halfW=280 reachHeadroom=181
+  land=29661 owned=29661 clampedS=10458 (35.3%) clampedMaxDistFromTip=1269m
+  frameGap worst=0.11m at=(1960, 1000) d=565m | band<=W=0.11 W..reach=0.11 >reach=0.11
+  coarseSearch: flankSignDisagreements=0 worst|dS|=0.0000
+  continuity: worstArcJump=404m at=(750, 1580) d=772m | flankFlips=193 awayFromAxis=63
+  coastRings=1
+
+=== seed 101010: massifs=1 ===
+  massif 0: axisLen=1706.4 smoothLen=1706.5 ratio=1.00004 arcDrift=0.1m
+    certifiedCore=[0.671,0.906] coreInterval=[0.671,0.820] coreToEndM=[1144,161]
+    reach=352 usableW=200 halfW=200 reachHeadroom=152
+  land=30651 owned=30651 clampedS=2417 (7.9%) clampedMaxDistFromTip=891m
+  frameGap worst=0.14m at=(1010, 1840) d=382m | band<=W=0.14 W..reach=0.14 >reach=0.14
+  coarseSearch: flankSignDisagreements=0 worst|dS|=0.0000
+  continuity: worstArcJump=1592m at=(640, 500) d=886m | flankFlips=227 awayFromAxis=21
+  coastRings=1
+
+=== seed 20261231: massifs=1 ===
+  massif 0: axisLen=892.0 smoothLen=892.0 ratio=1.00000 arcDrift=0.0m
+    certifiedCore=[0.000,0.844] coreInterval=[0.180,0.820] coreToEndM=[0,139]
+    reach=inf usableW=270 halfW=270 reachHeadroom=inf
+  land=28063 owned=28063 clampedS=13303 (47.4%) clampedMaxDistFromTip=1221m
+  frameGap worst=0.00m at=(1070, 1150) d=336m | band<=W=0.00 W..reach=0.00 >reach=0.00
+  coarseSearch: flankSignDisagreements=0 worst|dS|=0.0000
+  continuity: worstArcJump=10m at=(1150, 590) d=881m | flankFlips=195 awayFromAxis=92
+  coastRings=2
+    islet 1: area=54297sqm centroid=(2269, 853) owner=Massif/0 d=1026m
+
+=== seed 1337: massifs=0 ===
+
+=== seed 256: massifs=0 ===
+
+=== seed 777: massifs=0 ===
+
+=== seed 31337: massifs=0 ===
+

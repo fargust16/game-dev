@@ -12,7 +12,7 @@ namespace GameDev.EditorTools
 {
     /// <summary>
     /// Overworld V0 POI groundwork (WORLD_GENERATION_PIPELINE.md Iteration 08 / OVERWORLD_V0_PLAN
-    /// W0.6): runs <see cref="StubPoiPlacer"/> over the current Vista terrain tile's chunk range and
+    /// W0.6): runs <see cref="StubPoiPlacer"/> over the current terrain tile's chunk range and
     /// drops a visual per placed POI, grounded via <c>Terrain.SampleHeight</c> (same pattern as
     /// VegetationScatterMenu — Physics raycasts miss when tile height exceeds the old 400m ray). Most kinds get a real Low Poly Environment/Village prop (see
     /// ASSET_LIBRARY_REFERENCE.md - no dedicated ruin/shrine/cave asset exists, so each reuses the
@@ -22,7 +22,7 @@ namespace GameDev.EditorTools
     /// settlement fabrics) as a stand-in - an Elite mansion for a city, a Poor house for a camp -
     /// until real settlement placement replaces these markers outright. Candidate chunks cover the
     /// actual generated tile extent rather than the doc's illustrative 512m-centered-on-origin stub,
-    /// since our tile is currently a single ~1400m Vista overworld tile, not the real W0.5 chunk streamer.
+    /// since our tile is currently a single ~1400m overworld tile, not the real W0.5 chunk streamer.
     /// </summary>
     public static class PoiMarkerMenu
     {
@@ -95,7 +95,7 @@ namespace GameDev.EditorTools
         [MenuItem("GameDev/Overworld/Place POI Markers")]
         public static void PlaceMarkers()
         {
-            VistaTileSync.WaitForTerrainReady();
+            OverworldTerrainReady.WaitForTerrainReady();
 
             // Only a presence check and a source for the flat ocean level; every per-marker query
             // below resolves the tile that actually contains the point.
@@ -113,7 +113,7 @@ namespace GameDev.EditorTools
 
             var worldSeed = new WorldSeed(OverworldTerrainMenu.LastSeed);
             var markers = OverworldWorldPlan.GetOrBuildPois();
-            IWaterSampler waterZones = SeaLevelOceanSampler.FromTerrain(terrain);
+            IWaterSampler waterZones = OverworldWaterSamplers.ForCurrentWorld(terrain);
 
             var visualRng = worldSeed.Fork("poi-visual");
             var buildingArchetypes = ShellCatalogFactory.CreateDefaultArchetypes();

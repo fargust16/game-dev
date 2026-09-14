@@ -31,7 +31,7 @@ namespace GameDev.EditorTools
             {
                 return;
             }
-            IWaterSampler water = SeaLevelOceanSampler.FromTerrain(terrain);
+            IWaterSampler water = OverworldWaterSamplers.ForCurrentWorld(terrain);
             // Must clear before height probes — otherwise Raycast hits prior shells/cylinder and
             // SnapFabric lifts the whole town into the air.
             ClearSettlement();

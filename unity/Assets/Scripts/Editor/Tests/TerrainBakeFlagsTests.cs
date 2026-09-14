@@ -9,9 +9,9 @@ namespace GameDev.World.Terrain.Tests
     /// </summary>
     /// <remarks>
     /// These flags were set by <c>OverworldPipeline</c> and never read, so "Mountains off" still
-    /// spawned massifs and the "Zones" step was a full duplicate bake with no effect. The
-    /// behavioural half is asserted in the editor (an island-only bake spawns no
-    /// <c>LPB_Mountain_*</c>); this fixture guards the wiring that made it possible to go unnoticed.
+    /// baked massifs and the "Zones" step was a full duplicate bake with no effect. The behavioural
+    /// half is asserted by the terrain bake tests (an island-only bake has no massif uplift); this
+    /// fixture guards the wiring that made it possible to go unnoticed.
     /// </remarks>
     public sealed class TerrainBakeFlagsTests
     {
@@ -36,13 +36,6 @@ namespace GameDev.World.Terrain.Tests
         }
 
         [Test]
-        public void DiagnosticDemoFlag_IsDistinctFromMountains()
-        {
-            Assert.AreNotEqual(TerrainBakeFlags.IncludeMountains, TerrainBakeFlags.VistaDemoAsIs);
-            Assert.IsTrue((TerrainBakeFlags.Full & TerrainBakeFlags.VistaDemoAsIs) == 0);
-        }
-
-        [Test]
         public void EveryPipelineStep_HasASkipFlag()
         {
             // A step that IsStepEnabled does not know about cannot be skipped from the window, and
@@ -50,6 +43,7 @@ namespace GameDev.World.Terrain.Tests
             var allOff = WorldGenSettings.Default;
             allOff.RunSurface = false;
             allOff.RunMountains = false;
+            allOff.RunHydrology = false;
             allOff.RunMarkers = false;
             allOff.RunSettlements = false;
             allOff.RunRoads = false;

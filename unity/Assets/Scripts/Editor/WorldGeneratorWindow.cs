@@ -96,6 +96,7 @@ namespace GameDev.EditorTools
             EditorGUI.indentLevel++;
             settings.RunSurface = EditorGUILayout.Toggle("Surface", settings.RunSurface);
             settings.RunMountains = EditorGUILayout.Toggle("Mountains", settings.RunMountains);
+            settings.RunHydrology = EditorGUILayout.Toggle("Hydrology", settings.RunHydrology);
             settings.RunMarkers = EditorGUILayout.Toggle("Markers", settings.RunMarkers);
             settings.RunSettlements = EditorGUILayout.Toggle("Settlements", settings.RunSettlements);
             settings.RunRoads = EditorGUILayout.Toggle("Roads", settings.RunRoads);
@@ -119,6 +120,7 @@ namespace GameDev.EditorTools
         {
             settings.RunSurface = on;
             settings.RunMountains = on;
+            settings.RunHydrology = on;
             settings.RunMarkers = on;
             settings.RunSettlements = on;
             settings.RunRoads = on;
@@ -132,7 +134,7 @@ namespace GameDev.EditorTools
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.HelpBox(
-                    "Terrain shape comes from Vista (seeded forks). Surface and Mountains are one " +
+                    "Terrain shape comes from TerrainGen (seeded). Surface and Mountains are one " +
                     "bake: the Mountains toggle selects TerrainBakeFlags.IncludeMountains, and " +
                     "turning it off bakes the island alone.",
                     MessageType.None);
@@ -179,8 +181,8 @@ namespace GameDev.EditorTools
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.HelpBox(
-                    "Trees use Fork(\"vegetation\"); undergrowth Fork(\"vegetation.shrubs\"); " +
-                    "grass Fork(\"grass\"). Clear trees does not clear grass.",
+                    "Trees and ground cover are written by the terrain bake (Surface step) from " +
+                    "TerrainVegetationRules, seeded by the terrain.vegetation.* streams.",
                     MessageType.None);
                 EditorGUI.indentLevel--;
             }
@@ -199,6 +201,15 @@ namespace GameDev.EditorTools
             EditorGUILayout.LabelField("Seed:", def.Seed.ToString());
             EditorGUILayout.LabelField("Roads:", $"{def.RoadLengthKilometers:F1} km");
             EditorGUILayout.LabelField("POI:", def.PoiCount.ToString());
+
+            var hydrology = def.Hydrology;
+            EditorGUILayout.LabelField(
+                "Rivers:",
+                $"{hydrology.Stats.OceanOutletCount} systems, {def.RiverReachCount} reaches, " +
+                $"{def.RiverLengthKilometers:F1} km");
+            EditorGUILayout.LabelField(
+                "Lakes:",
+                $"{def.LakeCount} (waterfall candidates {hydrology.Waterfalls.Count})");
         }
 
         private static void DrawPoiLegend()

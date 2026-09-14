@@ -153,7 +153,7 @@ namespace GameDev.World.TerrainGen
         /// <remarks>
         /// WORLD_RELIEF_PRINCIPLES puts T1 at 250-530 m over a 1000-2000 m footprint. Our island's
         /// equivalent diameter is about 1900 m, so the top of that band would blanket it; and the
-        /// world Vista currently ships peaks at roughly 330 m. These numbers sit around that
+        /// previously shipped world peaked at roughly 330 m. These numbers sit around that
         /// measurement rather than at the table's ceiling.
         /// </remarks>
         public float CrestHeightMinMeters;

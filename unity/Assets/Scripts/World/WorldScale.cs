@@ -6,11 +6,12 @@ namespace GameDev.World
     /// inventing independent fudge factors.
     /// </summary>
     /// <remarks>
-    /// V0 water is the ocean plane only. Inland lake and river generation was removed, and with it
-    /// every Lake*/River*/Water-inset constant this table used to carry. Future hydrology is a
-    /// redesign from first principles - see "14 World Generation Roadmap" section
-    /// "Future Hydrology / River Generation" - so do not reintroduce those constants here in
-    /// anticipation of it.
+    /// This table carries the ocean, and only the ocean: <see cref="SeaLevelMeters"/> and the coast
+    /// shaping around it. Inland hydrology arrived in 2026-09 and deliberately did <b>not</b> put
+    /// its thresholds here - channel widths, valley depths, lake minimums and the carve budget all
+    /// live in <c>HydrologySettings</c>, where they can be tuned per generation. The old Lake*/River*
+    /// constants this table used to carry are what made the removed first attempt impossible to
+    /// change, so keep new hydrology numbers out of here.
     /// </remarks>
     public static class WorldScale
     {
@@ -72,7 +73,7 @@ namespace GameDev.World
         public const float LandscapeCostCellMeters = 10f;
 
         // --- Macro geography ---
-        /// <summary>Edge length of one Unity Terrain tile (Vista grid cell).</summary>
+        /// <summary>Edge length of one Unity Terrain tile.</summary>
         public const float OverworldTileMeters = 1400f;
 
         /// <summary>Tiles along world +X.</summary>
@@ -80,13 +81,6 @@ namespace GameDev.World
 
         /// <summary>Tiles along world +Z.</summary>
         public const int OverworldTileCountZ = 2;
-
-        /// <summary>
-        /// Outer falloff each per-tile Vista biome extends past the tile edge so neighboring
-        /// caches soft-blend. Keeps LPB footprint near demo scale (~tile + 2x overlap), not the
-        /// full world extent (world-extent biomes OOM simulation nodes).
-        /// </summary>
-        public const float VistaBiomeSeamOverlapMeters = 80f;
 
         /// <summary>Full overworld width (tileCountX x tile size).</summary>
         public static float WorldExtentXMeters => OverworldTileMeters * OverworldTileCountX;
@@ -113,7 +107,7 @@ namespace GameDev.World
 
         /// <summary>
         /// Typical horizontal width of the coast transition, for gameplay and layout queries.
-        /// Coast <em>geometry</em> is authored in IslandPlateau_TerrainGraph plus the biome falloff.
+        /// Coast <em>geometry</em> is TerrainGen's (Stage 1 coastline and <c>CoastHeightModel</c>).
         /// </summary>
         public const float CoastShelfWidthMeters = 200f;
 
@@ -131,7 +125,7 @@ namespace GameDev.World
         /// </summary>
         public const float MinimumSubmersionMeters = 1.5f;
 
-        /// <summary>Minimum major peaks per island (seeded Mountain LPBs).</summary>
+        /// <summary>Minimum major peaks per island.</summary>
         public const int PeakMinCount = 1;
 
         /// <summary>Preferred peak count lower bound.</summary>

@@ -2,7 +2,7 @@
 
 **Status:** Draft  
 **Date:** 2026-08-15  
-**Related:** [WORLD_GENERATION_PIPELINE.md](WORLD_GENERATION_PIPELINE.md), [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md), [VISTA_OVERWORLD_REFERENCE.md](VISTA_OVERWORLD_REFERENCE.md), [NATURAL_ISLAND_GENERATOR.md](NATURAL_ISLAND_GENERATOR.md), `RoadSurfaceStyle`, `OverworldTerrainLayers`, `OverworldBiomeTemplates`, `VistaVegetationTemplates`
+**Related:** [WORLD_GENERATION_PIPELINE.md](WORLD_GENERATION_PIPELINE.md), [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md), [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md), `RoadSurfaceStyle`, `OverworldTerrainLayers`, `TerrainSurfaceRules`, `TerrainVegetationRules`, `OverworldVegetationAssets`
 
 Art-direction behavior for overworld color, splat, roads, grass, water, and grading. Numbers below are **guides**, not mandatory literals — the visual result wins.
 
@@ -21,42 +21,42 @@ Desired feel: one warm living fantasy world with soft joins — not four hard-co
 
 ## Terrain surfaces (V0)
 
-**SoT weights:** the Vista biome graphs' `Weight Blend` → `TEXTURE OUTPUT` (`IslandPlateauGraphBuilder`,
-`MountainMassifGraphBuilder`). Every mask is derived from the graph variables `Height Map` / `ErosionMask`.  
-**SoT material:** URP **TerrainLit** (`OverworldTerrain.mat`) over the `TerrainLayer` assets Vista binds.
-MicroSplat is **out of the pipeline** — no Convert, no keyword surgery, no texture arrays.  
-**SoT layer array:** Vista, per tile (`TerrainTile.PopulateLayerWeights`). **C# never assigns
-`terrainData.terrainLayers` and never writes alphamaps.**  
-**SoT coast geometry:** `IslandPlateau_TerrainGraph` + the LPB Outer falloff. There is no C# coast pass.  
-**Diagnostics:** `GameDev/Overworld/Vista/Dump Layer Weights` — per-tile layer stack, per-layer
-min/avg/max, per-pixel weight sum (must be ≈1) and one PNG per layer.
+**SoT weights:** `TerrainSurfaceRules` evaluated by `TerrainSurfaceClassifier` at every alphamap texel and
+written by `OverworldTerrainBuilder` with `SetAlphamaps`. Every mask is a world quantity — height in
+metres, slope in degrees, drainage area in square metres, convexity in metres, massif uplift in metres.
+Full rule table: [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md) §3.
+**SoT material:** URP **TerrainLit** (`OverworldTerrain.mat`) over the five canonical `TerrainLayer` assets.
+MicroSplat is **out of the pipeline** — no Convert, no keyword surgery, no texture arrays.
+**SoT layer array:** the terrain bake assigns the same five layers to every tile before it paints.
+**SoT coast geometry:** TerrainGen Stage 1. There is no coast pass in the bake.
+**Diagnostics:** `OverworldTerrainValidation.RunBatch` — per-tile alphamap hashes, per-texel weight sums
+(must be ≈1), seams, and layer texture paths.
 
-### Weight Blend contract
+### Priority cover
 
-`WeightsBlend.Blend` gives `output[i] = in[i] * Π(1 - in[j])` for every j above i. Consequences:
+The classifier applies the layers in priority order — **sand → soil → rock → cliff** over a grass base —
+and each one covers what lies under it by its own mask: every weight is scaled by `1 − mask`, then the
+layer gains `mask`. Consequences:
 
-- the **last** connected layer wins — blend index is priority, not identity;
-- **layer 0 must stay unconnected**, so Vista fills it white; that is the only thing making the weights
-  sum to 1, and nothing downstream normalizes them;
+- a higher-priority layer wins where masks overlap; the order is the rule, not the asset index;
+- the five weights sum to one by construction, so nothing downstream normalizes them;
 - overlapping masks are fine and expected — higher layers simply erode lower ones.
 
 ### Canonical layer stack
 
 Five shared `TerrainLayer` assets in `Assets/Settings/TerrainLayers/Overworld/`. The single factory is
-`OverworldTerrainLayers.EnsureCanonicalLayers()` / `GetCanonicalLayer(SurfaceLayer)`; both builders bind
-`TextureOutputNode.terrainLayer` from there, and `TextureOutputNode.order` **is** the index below.
-Vista merges biome layers by asset identity, so both graphs must agree — and **both emit all five**,
-so every tile ends up with the same array.
+`OverworldTerrainLayers.EnsureCanonicalLayers()` / `GetCanonicalLayer(TerrainSurfaceLayer)`, and the
+enum value **is** the index below. Textures live under `Assets/Art/Terrain/SurfaceLayers/`.
 
-| Index | Layer asset | Island mask (blend priority) | Mountain mask (blend priority) |
-|-------|-------------|------------------------------|--------------------------------|
-| 0 | `Overworld_Grass` | base fill — blend layer 0, unconnected (0) | `Concave` → `Smooth` × foothill curve (2) |
-| 1 | `Overworld_Sand` | low-altitude curve × breakup noise (3) | unconnected → black (3) |
-| 2 | `Overworld_Soil` | `Levels(ErosionMask)` — drainage (2) | `Levels(ErosionMask)` — drainage (1) |
-| 3 | `Overworld_Cliff` | `SlopeMask` 38–62° (4) | `OneMinus(Max(Curve(Erosion), SlopeMask 0–3°))` — ridges (4) |
-| 4 | `Overworld_Rock` | `OneMinus(Max(Curve(Erosion), SlopeMask 0–4°))` — ridges (1) | base fill — blend layer 0, unconnected (0) |
+| Index | Layer asset | Mask |
+|-------|-------------|------|
+| 0 | `Overworld_Grass` | base — whatever the layers above leave |
+| 1 | `Overworld_Sand` | ground below the vegetation floor (full below 27.0 m, none above 28.4 m), seabed included |
+| 2 | `Overworld_Soil` | upstream drainage area 20 000 → 150 000 m² on dry land, slope ≤ 30° |
+| 3 | `Overworld_Cliff` | sheer dry faces, 50° → 58° |
+| 4 | `Overworld_Rock` | the strongest of: sloped seabed below 22–24 m; high massif ground 110 → 230 m; massif ridges; dry ground past the angle of repose, 35° → 42° |
 
-**No snow layer in V0.** The old `MS_Snow_Peak` was the Vista `Sand2` texture faked white through
+**No snow layer in V0.** An earlier snow layer was a sand texture faked white through
 `TerrainLayer.diffuseRemapMin/Max` — fields MicroSplat never read, which is why the massif rendered as
 warm cream sand. Re-add a snow layer only when a real snow texture is imported.
 
@@ -65,34 +65,31 @@ the layer asset**. Never set it from generation code, and never build a parallel
 
 ### Surface rules (operators)
 
-1. **Material placement must follow terrain morphology.** Drainage → soil, hollows → grass, sheer faces
-   → cliff, ridges → rock, shore → sand. If it reads as coloured patches projected onto the terrain,
-   the mask is wrong — not the shader, and not the amount of noise.
-2. **Altitude bands are normalized**, expressed as `Curve`/`Levels` over the `Height Map` variable.
-   `HeightMaskNode` compares against the biome's own world height, so metre thresholds drift the moment
-   `Set Biome Height On Spawn` changes.
-3. **Slope once per graph, sheer faces only.** Two adjacent slope bands as independent layers draw
-   concentric contour rings — that was the old cliff 32–70° + rock 14–32° pair.
-4. **Never add noise to hide a mask problem.** Diagnose with Dump Layer Weights first: wrong weights are
-   a graph problem, wrong layer order is an integration problem, and they need opposite fixes.
+1. **Material placement must follow terrain morphology.** Drainage → soil, open land → grass, sheer faces
+   → cliff, ridges and bare steep ground → rock, shore → sand. If it reads as coloured patches projected
+   onto the terrain, the mask is wrong — not the shader, and not the amount of noise.
+2. **Thresholds are world quantities**, stored on `TerrainSurfaceRules` and labelled measured or
+   authoring default. No normalised per-biome heights.
+3. **Slope is true world slope.** A steep-rock band and a cliff band are one ordered pair of the same
+   slope quantity, not two independent layers drawing concentric contour rings.
+4. **Never add noise to hide a mask problem.** Diagnose with the validation batch first: wrong weights are
+   a rule problem, wrong layer order is an integration problem, and they need opposite fixes.
 5. **Mountain rock may stay steep**; do not flatten massifs for material joins
    ([rule 5](#how-to-read-this--the-reference-sheets)).
-6. Plateau height and island extent are Inspector fields on `LPB_IslandBase.prefab`
-   (`Set Biome Height On Spawn`, `Set Biome Area On Spawn`), not constants in C#.
+6. **Coastal land never gets seabed rock** — the seabed rock mask is zero at the 24 m waterline.
 
 ### Bake order (surfaces)
 
 ```text
-Vista LPB bake — heights (IslandBase Replace + Mountain Raise)
-             + layer weights (graph Weight Blend → 5 TEXTURE OUTPUTs per biome)
-             + trees (graph TREE OUTPUT → Unity TreeInstances)
-             + grass density (graph DETAIL DENSITY OUTPUT → Unity terrain details)
-  → SyncFromGpu + pin tile resolution/size
-  → TerrainTile.MatchSeams (Vista native)
+TerrainGen field → one world lattice (height, uplift, coast distance, slope, convexity, drainage)
+  → [optional hydrology carve]
+  → heights (SetHeights) → layer weights (SetAlphamaps) → trees (SetTreeInstances)
+    → ground cover (SetDetailLayer)
   → EnsureOceanSurface
 ```
 
-That is the whole surface pipeline. Nothing paints, reshapes or recolours after Vista.
+That is the whole surface pipeline. Roads and settlements append their own layers afterwards; nothing
+else paints, reshapes or recolours. Tile seams are exact by construction — there is no stitching pass.
 
 ### Root causes (coast surfaces — do not reintroduce)
 
@@ -104,10 +101,10 @@ That is the whole surface pipeline. Nothing paints, reshapes or recolours after 
 | Sawtooth / “ladder” rock at sand edge | Integer flood distance terraces + rock on step faces | `SmoothCoastBand` after carve; stronger shore↔grass feather |
 | Sand ring / donut only | Flood-distance or hard ASL contour paint | Dry sand by ASL + Perlin threshold noise; multi-pass blur |
 | Contour “staircase” sand↔grass | Hard height threshold + weak feather | Wider fade (≈30 m) + noise ±7 m + SoftenAllLayerBlends |
-| Black/white diagonal tile crack | Per-tile beach/splat blur + no `SetNeighbors` | `TerrainTileSeams` stitch + WireNeighbors; WARNING logs maxΔh / maxΔsplat |
+| Black/white diagonal tile crack | Per-tile beach/splat blur + no `SetNeighbors` | One world lattice + rules that depend on world position only; `SetNeighbors` on the grid |
 | Sand in alphamap but Scene looks green | shoreMax ≲0.4 or control not synced | Force shore ≥0.8 near shoreline; Convert → re-paint → SyncAll |
 
-Full island geology contract: [NATURAL_ISLAND_GENERATOR.md](NATURAL_ISLAND_GENERATOR.md), [VISTA_OVERWORLD_REFERENCE.md](VISTA_OVERWORLD_REFERENCE.md).
+Full terrain contract: [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md).
 
 ---
 
@@ -116,16 +113,16 @@ Full island geology contract: [NATURAL_ISLAND_GENERATOR.md](NATURAL_ISLAND_GENER
 - Bright, cohesive, warm-but-natural palette (saturated, not neon).
 - Soft biome transitions (~tens of metres) via displace-before-threshold + blur + 30–60 m noise.
 - Grass on green dry land with min density > 0; type/density change, not hard cutouts.
-- Grass reads as the same ecosystem as the ground under it (both come from the graph's green mask).
+- Grass reads as the same ecosystem as the ground under it (both come from the terrain bake's grass weight).
 - City/outskirts = settlement Dust splat with soft edges, not a new `BiomeId`.
 
 ## Island / ocean framing
 
-- **2 × 2** Unity Terrain tiles of 1400 m = a **2800 m** world. Geology is entirely Vista: `LPB_SeaFloor` under everything, `LPB_IslandBase` shaped by a seeded anchor ring plus Outer falloff, `LPB_Mountain_n` raised on top. `IslandNaturalGeography` / `IslandOccupancy` are **deleted** — no C# framing pass sinks the border.
+- **2 × 2** Unity Terrain tiles of 1400 m = a **2800 m** world. Geology is TerrainGen's: the Stage 1 island floor and coastline with the Stage 2 massif uplift on top, baked unchanged into Unity `TerrainData`. `IslandNaturalGeography` / `IslandOccupancy` are **deleted** — no framing pass sinks the border.
 - **One** water plane = **WaterWorks** `WorldWater` at `SeaLevelMeters` (24 m). **Ocean only** — V0 has no inland lakes or rivers. No per-lake water objects. OCW demoted to fallback.
-- Spec: [VISTA_OVERWORLD_REFERENCE.md](VISTA_OVERWORLD_REFERENCE.md).
+- Spec: [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md).
 
-## Resolution audit (1400 m tile, Vista heightmap ~513)
+## Resolution audit (1400 m tile, heightmap 513)
 
 | Map | Resolution | ≈ m / px | Notes |
 |-----|------------|----------|-------|
@@ -142,7 +139,7 @@ Do **not** chase soft edges by jumping to 2k–4k alphamaps. Fix SDF / threshold
 | Symptom | Cause | Fix |
 |---------|--------|-----|
 | Scalloped / stepped road edges | Clearance samples stamped as disks (6 m spacing) | Segment SDF + denser samples (~1.25 m) |
-| Contour “ladder” on mountains | Threshold on raw height only | Displace height with noise **before** paint Threshold; blur paint masks — height graph unchanged |
+| Contour “ladder” on mountains | Threshold on raw height only | Displace height with noise **before** paint Threshold; blur paint masks — relief unchanged |
 | Hard grass / tint seams | Ecology/tint from hard `BiomeId` | `EvaluateSoft` / `TintSoft` blend neighbor Classify bands |
 | Sub-pixel road shoulders | Lawn mask ~2 m/px | Lawn bake ~1536 on tile (~1 m/px) |
 | Distant gray/white wash | `RenderSettings.fog` + heavy ColorAdjustments / SMH | Fog **off**; mild grade only |
@@ -150,7 +147,7 @@ Do **not** chase soft edges by jumping to 2k–4k alphamaps. Fix SDF / threshold
 | Full-tile rectangle overlay | `OverworldVegetationDebug` Quad | Cleared on Generate Surface |
 | Road staircase | Soft rim 1.2 m << alphamap px (~2.7 m) | `SoftRimMeters` >= **2.5 alphamap texels**; lower TransitionCoverage |
 | Huge gravel on flats | `highlandBandMask` height-only from GreenMax | Slope gate + higher gravel floor (paint only) |
-| Hitch on chunk entry | A second CPU grass system baking chunks during rendering | Grass is Unity terrain detail from the graph's density map |
+| Hitch on chunk entry | A second CPU grass system baking chunks during rendering | Grass is a Unity terrain detail layer written once by the terrain bake |
 
 ## Performance budget
 
@@ -167,9 +164,10 @@ Colors come from the `TerrainLayer` assets themselves (see § Terrain surfaces).
   `diffuseTexture`/`normalMapTexture` only — `diffuseRemapMin/Max`, `tileSize` and `smoothness` are
   dropped. Every albedo tweak we made through those fields was invisible in the shader, which is how a
   sand texture ended up rendering as "snow" on the massif.
-- **Bake SoT:** Vista assigns both the layer array and the alphamaps; nothing runs after it.
-- **Grass SoT:** the graphs' `DETAIL DENSITY OUTPUT` with `Meadow_DetailTemplate` (Polytope Lowpoly
-  `PT_Grass_02`), rendered by Unity's terrain detail pass. Not a second GPU grass system. Not
+- **Bake SoT:** the terrain bake assigns both the layer array and the alphamaps; only roads and
+  settlements append after it.
+- **Grass SoT:** the terrain bake's detail layer over the Polytope Lowpoly `PT_Grass_02` mesh
+  (`OverworldVegetationAssets`), rendered by Unity's terrain detail pass. Not a second GPU grass system. Not
   Vegetation Studio Pro (deprecated for this project).
 - Custom `GameDev/Overworld/Terrain` fork is **deleted** — do not recreate or assign it.
 - Albedo tile sizes stay **8-16 m**; remaps stay on `TerrainLayer.diffuseRemap*`. Both are Inspector
@@ -204,7 +202,7 @@ Mask blend: green/dirt soft (`bandBlend` ~ **0.10-0.12**); highland/rock use `hi
 - No snow layer in V0 — see § Terrain surfaces. Re-add one only with a real snow texture.
 - No concentric rings — joins follow morphology (erosion, concavity, normalized height), never
   geometric altitude circles.
-- Massif height and footprint are Inspector fields on `LPB_Mountain.prefab`, not constants in C#.
+- Massif height and footprint are TerrainGen's (`MassifSettings`); the surface bake never reshapes them.
 
 ## Roads
 
@@ -217,7 +215,7 @@ Height corridor widths stay in `WorldScale` (Primary 4 m + shoulder 2.5 m, etc.)
 
 Grass: **0 on packed bed**; lawn only in soft shoulder (`RoadLawnMinAtCenter = 0`). Pads/water stay clear.
 
-Avoid stepped height LOD — keep terrain pixel error / smoothing as Vista / Unity Terrain already does.
+Avoid stepped height LOD — keep terrain pixel error / smoothing as Unity Terrain already does.
 
 ## Grass
 
@@ -229,9 +227,10 @@ Avoid stepped height LOD — keep terrain pixel error / smoothing as Vista / Uni
 | Scatter / jitter | **0.3–0.6** |
 | Types | short, tall, poppies (Meadow), rocks (highland) |
 
-Placement comes from the terrain graphs' `GreenAreaMask` → `Levels` → `DETAIL DENSITY OUTPUT`, rendered
-by Unity's terrain detail pass. Sizes live on `Meadow_DetailTemplate` (Inspector). The table above is
-the visual target; tune it on the template and in the graph, not in C#.
+Placement comes from `TerrainVegetationRules`: instances per detail cell = peak count × vegetation gate ×
+grass weight × patchiness, none on slopes past 35°, rendered by Unity's terrain detail pass. Size range
+lives on the detail prototype built by `OverworldVegetationAssets`. The table above is the visual target;
+tune it on the rule values, and record whether a value is measured or an authoring default.
 
 ## Water
 
@@ -265,7 +264,7 @@ the visual target; tune it on the template and in the graph, not in C#.
 - No grass on packed road bed
 - Gravel/rock only on foothill/steep rises (not flat plains)
 - Entering a new 64 m grass chunk does not hitch (~<=1 bake/frame)
-- Terrain render = URP TerrainLit over Vista's layer array; not MicroSplat, not `GameDev/Overworld/Terrain`
+- Terrain render = URP TerrainLit over the terrain bake's layer array; not MicroSplat, not `GameDev/Overworld/Terrain`
 - Material transitions follow terrain morphology; no contour rings, no isolated colour patches
 - Water = one WaterWorks `WorldWater` plane at Sea Level; the island shelf below sea reads as ocean; there are no inland water bodies in V0
 
@@ -273,7 +272,7 @@ the visual target; tune it on the template and in the graph, not in C#.
 
 EditMode: SoftRim >=2.5 texels, `RoadLawnMinAtCenter==0`, island silhouette inscribed in the authored
 biome area, highland slope gate, OCW water, dust soft rect.
-Diagnostic: `Dump Layer Weights` — identical five-layer stack on every tile, per-pixel weight sum ≈1.
+Diagnostic: `OverworldTerrainValidation.RunBatch` — identical five-layer stack on every tile, per-texel weight sum ≈1.
 Visual: Generate All → island-in-ocean, HDRI sky, soft shadows, warm fields, cooler forest, soft joins,
 muted teal shallows, materials that follow the terrain rather than sit on it.
 

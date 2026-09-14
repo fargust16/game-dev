@@ -7,7 +7,7 @@ namespace GameDev.World.Landscape
     /// <summary>
     /// Applies planned landscape deformations. Road corridors are the only kind: terrain lerps
     /// toward the road profile across road / shoulder / outer blend zones, and nothing else in the
-    /// pipeline is allowed to rewrite Vista's heightmap after the bake.
+    /// pipeline is allowed to rewrite the baked heightmap after the bake.
     /// </summary>
     public static class TerrainDeformer
     {

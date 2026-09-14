@@ -152,7 +152,7 @@ the evidence without removing the seam.
 - The terrain generator (Stage 1 through Stage 3C), its tests and its plan documents are the body of
   work being frozen here.
 - Seventeen tracked files were modified before Stage 3C began and belong to a separate inland
-  hydrology / Vista workstream. They are untouched and are not part of this freeze.
+  hydrology / terrain-bake workstream. They are untouched and are not part of this freeze.
 - Further uncommitted work in the tree belongs to that hydrology workstream and to a Unity Terrain
   migration spike. Both are out of scope and untouched.
 - `TerrainGenDump/` is generated diagnostic output and is not part of the repository.

@@ -181,7 +181,7 @@ No specification number needs to move. No Stage 1 change is implied.
 ## 6. Scope
 
 ```
-Stage 1: untouched          Stage 2B: untouched        Vista: untouched
+Stage 1: untouched          Stage 2B: untouched        Terrain bake: untouched
 Stage 2: untouched          Stage 3: not started       Scene: untouched
 Stage 2A: untouched         Hydrology: untouched       Packages: untouched
 ```

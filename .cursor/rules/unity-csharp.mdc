@@ -29,5 +29,5 @@ using Random = System.Random;
 
 - ScriptableObjects = immutable defs only; no runtime state.
 - Shell / overworld gen stays deterministic: same seed + stream id → same sequence.
-- Overworld height backend = **Vista Personal** + `Terrain.SampleHeight` / `VistaTerrainSampler` (not MapMagic DirectMatrices).
+- Overworld height backend = **TerrainGen** baked into Unity `TerrainData`; read it with `Terrain.SampleHeight` / `OverworldTerrainSampler` (not MapMagic DirectMatrices).
 - Prefer plain C# services over MonoBehaviour “managers” for generation cores.

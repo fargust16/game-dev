@@ -7,16 +7,10 @@ namespace GameDev.World.Terrain
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Tile discovery used to key off Vista's own <c>TerrainTile</c> component, which made
-    /// <see cref="OverworldTerrainAccess"/> — and therefore every downstream planner that reads
-    /// height, slope or bounds — unable to see a terrain Vista had not baked. That was the single
-    /// hard Vista type reference left in the runtime tree.
-    /// </para>
-    /// <para>
     /// This component carries no generation data and no behaviour. It says only "this Terrain is
-    /// part of the overworld grid, and it sits at this tile coordinate". Vista's bake stamps it on
-    /// its own tiles, and so does <see cref="OverworldTerrainGrid"/>, so both paths are discovered
-    /// by one rule.
+    /// part of the overworld grid, and it sits at this tile coordinate". <see cref="OverworldTerrainGrid"/>
+    /// stamps it on every tile, so <see cref="OverworldTerrainAccess"/> and every downstream planner
+    /// discover tiles by one rule.
     /// </para>
     /// </remarks>
     [DisallowMultipleComponent]

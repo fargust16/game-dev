@@ -35,7 +35,6 @@ unity/Assets/MapMagic/
 unity/Assets/Modern GDR - Free icons pack/
 unity/Assets/Modular European House/
 unity/Assets/Modular Victorian City/
-unity/Assets/PinwheelStudio/
 unity/Assets/Polytope Studio/
 unity/Assets/Rowlan/
 unity/Assets/Skybox/
@@ -64,7 +63,6 @@ unity/Assets/MapMagic.meta
 unity/Assets/Modern GDR - Free icons pack.meta
 unity/Assets/Modular European House.meta
 unity/Assets/Modular Victorian City.meta
-unity/Assets/PinwheelStudio.meta
 unity/Assets/Polytope Studio.meta
 unity/Assets/Rowlan.meta
 unity/Assets/Skybox.meta
@@ -83,38 +81,14 @@ unity/Assets/Plugins/PrimeTween.meta
 unity/Packages/com.jbooth.microsplat.core/
 unity/Packages/com.jbooth.microsplat.urp6p3/
 
-# Generated Vista / scene bake (regenerate in Editor — do not author)
-unity/Assets/Scenes/Overworld_Generator Biomes/
-unity/Assets/Scenes/Overworld_Generator Terrains/
-unity/Assets/Scenes/Overworld_Generator Biomes.meta
-unity/Assets/Scenes/Overworld_Generator Terrains.meta
-unity/Assets/Settings/Vista/OverworldTerrainData_*.asset
-unity/Assets/Settings/Vista/OverworldTerrainData_*.asset.meta
-unity/Assets/Settings/Vista/TerrainData_*.asset
-unity/Assets/Settings/Vista/TerrainData_*.asset.meta
-unity/Assets/Settings/Vista/MicroSplatData/
-unity/Assets/Settings/Vista/MicroSplatData.meta
-unity/Assets/Settings/Vista/SandDebug/
-unity/Assets/Settings/Vista/SandDebug.meta
+# Generated terrain bake (regenerate in Editor — do not author)
+unity/Assets/Settings/Terrain/OverworldTerrainData_*.asset
+unity/Assets/Settings/Terrain/OverworldTerrainData_*.asset.meta
 
-# Per-biome terrain graph clones. Vista clones the authored graph once per
-# spawned LPB and names it <BiomeName>_<GraphName>, so the set changes with the
-# seed (Mountain_1_* only exists when two massifs spawn) and every bake rewrites
-# them. The authored originals next to them stay tracked.
-unity/Assets/Settings/Vista/IslandBase_*_TerrainGraph.asset
-unity/Assets/Settings/Vista/IslandBase_*_TerrainGraph.asset.meta
-unity/Assets/Settings/Vista/Mountain_*_TerrainGraph.asset
-unity/Assets/Settings/Vista/Mountain_*_TerrainGraph.asset.meta
-unity/Assets/Settings/Vista/SeaFloor_SeaFloor_TerrainGraph.asset
-unity/Assets/Settings/Vista/SeaFloor_SeaFloor_TerrainGraph.asset.meta
-
-# Diagnostic output, written by the Dump menus outside Assets on purpose so the
-# exports never show up as project churn.
-unity/VistaLayerDump/
-unity/VistaTerrainDump/
-unity/VistaDetailDump/
-unity/Assets/VistaExported/
-unity/Assets/VistaExported.meta
+# Diagnostic output, written by the dump and validation tools outside Assets on
+# purpose so the exports never show up as project churn.
+unity/TerrainDump/
+unity/TerrainValidation/
 
 # Quarantined vendor code, kept on disk and deliberately out of the build.
 unity/Assets/_Disabled/
@@ -129,18 +103,13 @@ unity/ShellTestLog.txt
 
 # ---------------------------------------------------------------------------
 # Code-generated assets: fully determined by source, nothing to author in them.
-# Rebuilt by Create/Recreate Vegetation Templates and the player setup menu.
-# The create-if-missing assets beside these stay tracked on purpose -- biome
-# template prefabs, terrain graphs, terrain layers and the tree/detail
-# templates carry Inspector tuning that code seeds once and must never restamp,
+# Rebuilt by Rebuild Vegetation Assets and the player setup menu.
+# The create-if-missing assets beside these stay tracked on purpose -- terrain
+# layers carry Inspector tuning that code seeds once and must never restamp,
 # so ignoring them would silently reset a world to code defaults on clone.
 # ---------------------------------------------------------------------------
-unity/Assets/Settings/Vista/Vegetation/Overworld_GrassDetail.prefab
-unity/Assets/Settings/Vista/Vegetation/Overworld_GrassDetail.prefab.meta
-unity/Assets/Settings/Vista/Vegetation/Overworld_GrassDetail.mat
-unity/Assets/Settings/Vista/Vegetation/Overworld_GrassDetail.mat.meta
-unity/Assets/Settings/Vista/Vegetation/Tints/
-unity/Assets/Settings/Vista/Vegetation/Tints.meta
+unity/Assets/Settings/Terrain/Vegetation/
+unity/Assets/Settings/Terrain/Vegetation.meta
 unity/Assets/Settings/OverworldPlayerAnimator.controller
 unity/Assets/Settings/OverworldPlayerAnimator.controller.meta
 

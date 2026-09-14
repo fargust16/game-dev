@@ -118,7 +118,7 @@ A Vertical Slice in Lower Veil fantasy with 2 selectable factions (Wardens / Vei
 [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — System Cards + Track backlog. Spatial locks remain in [16](16%20Architecture%20Pivot.md).
 
 **Overworld V0 size / chunk / scene load defaults?**  
-Chunk = **64 m**; playable world = **2800 × 2800 m** (2×2 Vista tiles of 1400 m, height budget 700 m, sea level 24 m) with an infinite-capable chunk API; Interior and Arena V0 use **single-scene swap** (additive later). Documented in [17](17%20Game%20Systems%20Architecture.md) and `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`.
+Chunk = **64 m**; playable world = **2800 × 2800 m** (2×2 Unity Terrain tiles of 1400 m, height budget 700 m, sea level 24 m) with an infinite-capable chunk API; Interior and Arena V0 use **single-scene swap** (additive later). Documented in [17](17%20Game%20Systems%20Architecture.md) and `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`.
 
 **What generation mechanism produces World / Settlement / Building / Interior content?**  
 **Piece-Based Assembly**: small hand-authored Pieces carrying Snap Sockets, snapped together deterministically small → large. **Exterior Shell Grammar** builds overworld fabric (most buildings never get a Room Graph). **Interior Piece Assembly** runs only for `InteriorPolicy.Portal` buildings. Reference model: Valheim's room/dungeon piece system. Not an algorithmic subdivision solver, not the retired OrganicTown continuous-mesh generator. Documented in [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
@@ -127,13 +127,13 @@ Chunk = **64 m**; playable world = **2800 × 2800 m** (2×2 Vista tiles of 1400 
 No. [13 City Generation](13%20City%20Generation.md) is Deprecated: not viable (not modular, not optimized, did not read as a real city), not a bridge, not extended. Only generic non-city-specific ideas (deterministic `WorldSeed` fork-by-name) carry forward.
 
 **Overworld terrain height budget?**  
-**700 m** — `WorldScale.TerrainHeightBudgetMeters` matches VistaManager `terrainMaxHeight` and tile `size.y`. Documented in [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md).
+**700 m** — `WorldScale.TerrainHeightBudgetMeters` is the tile `size.y`. Documented in [OVERWORLD_TERRAIN_ARCHITECTURE.md](unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md).
 
 **How is the island / ocean silhouette framed?**  
-36 harmonic asymmetric LPB **Anchors** + **Outer Falloff (180 m)** + **SoftFalloff BiomeMaskGraph** on `LPB_IslandBase` (order 10, IslandPlateau graph, Height Replace, `worldHeight` 140 m, biome Y at sea level), sitting on `LPB_SeaFloor` (order 0). The coast is graph shaping + falloff with **no post-Vista pass** — the rim fades under `WorldWater` at Sea Level **24 m**. Surface paint comes from the graphs' Weight Blend over the five canonical layers; sand is a normalized low-altitude band × noise, not an ASL metre band. Mountains are **separate** LPBs (order 20+) with 28 elongated ellipse anchors, wide falloff (520) and **Raise** height delta — not circular KeepHigher stamps and not one Mountain graph for the whole island. Documented in [VISTA_OVERWORLD_REFERENCE.md](unity/Assets/Plans/VISTA_OVERWORLD_REFERENCE.md) and [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces.
+By TerrainGen: the Stage 1 landmass owns the silhouette, coast and seabed, and Stage 2 adds the massifs as uplift on top of it. The terrain bake writes that relief unchanged — **no post-generation coast pass** — and the rim meets `WorldWater` at Sea Level **24 m**. The shore surface is a world-space rule over the five canonical layers: sand below the vegetation floor (27.0 → 28.4 m), seabed rock suppressed at the waterline. Documented in [OVERWORLD_TERRAIN_ARCHITECTURE.md](unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md) and [OVERWORLD_VISUAL_DIRECTION.md](unity/Assets/Plans/OVERWORLD_VISUAL_DIRECTION.md) § Terrain surfaces.
 
 **Overworld height / island framing?**  
-**700 m** height budget; `LPB_IslandBase` at 140 m over a 20 m seabed, plus mountain Raise LPBs at 530 m; ocean Sea Level **24 m**. Biome canvas capped at **512 px** by Vista Personal. Documented in the Vista / NATURAL_ISLAND plans.
+**700 m** height budget; the island and its massifs come from TerrainGen (peaks around 350 m on the canonical seeds); ocean Sea Level **24 m**; heightmap 513 per 1400 m tile (2.73 m). Documented in [OVERWORLD_TERRAIN_ARCHITECTURE.md](unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md).
 
 **V0 inland lakes / rivers?**  
 **Removed from code (2026-08-15).** V0 ships **ocean only** (`WorldWater` at Sea Level). No `LakeDefinition` / `RiverTracer` / lake pipeline steps. Future inland hydro is a redesign. Alpine multi-plane lakes stay deferred; single Sea Level ocean plane is the locked V0 water model.
@@ -282,7 +282,7 @@ Should Local road stubs be generated as a third Prim pass after Secondary, or on
 
 When do `PoiPlacementProfile` C# catalog entries move into ScriptableObject immutable defs for authoring? ([17](17%20Game%20Systems%20Architecture.md) W.4)
 
-What asset/API provides waterfall meshes if inland hydro returns later? (Deferred with lake/river redesign.) ([NATURAL_ISLAND_GENERATOR.md](unity/Assets/Plans/NATURAL_ISLAND_GENERATOR.md))
+What asset/API provides waterfall meshes if inland hydro returns later? ([HYDROLOGY_GENERATION_PLAN.md](unity/Assets/Plans/HYDROLOGY_GENERATION_PLAN.md))
 
 ---
 

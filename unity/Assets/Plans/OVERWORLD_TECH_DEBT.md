@@ -1,27 +1,12 @@
 # Overworld tech debt
 
 Known defects with measurements, so the next session starts from numbers rather than a hunch.
-Terrain-specific traps live in [VISTA_TERRAIN_PLAYBOOK.md](VISTA_TERRAIN_PLAYBOOK.md); this file is
-for work that is understood but not done.
+The terrain architecture and its Unity traps live in
+[OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md); this file is for work that is
+understood but not done.
 
----
-
-## P0 — OPEN / EXTERNAL DEPENDENCY. Vista terrain generation is bistable
-
-The same project, seed and code produce one of exactly two worlds; the second is ~+36 m
-higher across a third of the map. Reproducible in fresh Unity processes, roughly 30 % of
-full bakes. Investigated across phases 2G-2P and escalated to the vendor: the graph,
-execution plan, seed and configuration are provably identical in both states, and every
-local fix or validator candidate was tested and rejected.
-
-**This blocks nothing, but it invalidates single-bake evidence.** Any full-stack
-measurement must be repeated until the tile hashes match the canonical reference, or
-reported for both states. Island-only bakes have been stable throughout.
-
-Full record: [VISTA_BISTABLE_TERRAIN.md](VISTA_BISTABLE_TERRAIN.md).
-Vendor draft: [VISTA_BISTABLE_BUG_REPORT.md](VISTA_BISTABLE_BUG_REPORT.md).
-
-Not fixed. Not worked around. Do not mark resolved without a vendor response.
+Items P0, 4, 9, 10 and 10a described defects of the removed terrain pipeline and were deleted with it
+on 2026-09-13. The remaining numbers are kept so existing references stay valid.
 
 ---
 
@@ -137,19 +122,6 @@ also what exposed items 1 and 2 — 4× the area for the planner, and markers ou
 
 ---
 
-## 4. Vista's detail-density writer does not land in the editor
-
-`VistaDetailDensityRelay` writes the density map Vista produces, because Vista's own progressive
-writer loses it. Fully documented in the playbook (§2.8) with the measurements that justify it.
-
-It is a vendor workaround, not a design: placement is entirely the terrain graph's. Delete the file
-if a Vista update fixes `TerrainTile.PopulateDetailDensityProgressive`, and re-check by toggling
-`GameDev/Overworld/Vista/Detail Density Relay (workaround)` off and looking at `detailInstances`.
-
-Diagnostics that pin it, both off by default: `Probe Detail Density Maps`, `Dump Vegetation State`.
-
----
-
 ## 5. `NullReferenceException` at `UnityEditor.Graphs.Edge.WakeUp` on entering play mode
 
 Still reproducing. Two facts stand against each other and neither has been made to fit:
@@ -179,12 +151,14 @@ street/pad/garden zones, and settlement sites are chosen on flat ground. The veg
 grass texture weight, which is weakest exactly where soil and sand dominate — flat low ground. If so
 the two systems simply prefer the same terrain from opposite directions and it is not an artifact.
 
-To settle it: `Dump Layer Weights` exports one PNG per layer; look for a hole in the grass weight at
-that location.
+To settle it: `OverworldTerrainValidation.RunBatch -terrainRaw` writes the baked alphamaps and detail
+layers per tile; look for a hole in the grass weight or the detail layer at that location. Note that the
+terrain bake now places trees and ground cover before settlement paint runs, so a hole that appears
+only after the Settlements step is not a bake output.
 
 ---
 
-## 7. OPEN / BLOCKED BY P0 — the overworld scene versions its generated state
+## 7. OPEN — the overworld scene versions its generated state
 
 `Assets/Scenes/Overworld_Generator.unity` is two things in one file: a small authored scaffolding
 that must survive a clone, and the generated world, which every `Generate All` rewrites. Both are
@@ -205,13 +179,12 @@ scene blobs in the measured history ......... 56, ~186 MB raw, of a 310 MB .git
 The 23 survivors are the authored scaffolding, and they are the real boundary — not the table this
 entry used to carry. They are: the four scene-level settings blocks, `SceneRoots`, and five
 GameObjects with their components — `OverworldReflectionProbe`, `OverworldWorldState`,
-`Review Camera`, `OverworldVolume`, `Sun`. Note that `VistaManager` is **not** among them: it is
-present in the scene but recreated like everything else.
+`Review Camera`, `OverworldVolume`, `Sun`.
 
 **The one confirmed remaining root cause is unstable object identity.** `ClearMarkers()` and
 `ClearSettlement()` destroy their roots and everything is created again, so Unity issues fresh
 `fileID` anchors; every reference between objects carries those numbers, and the whole file rewrites.
-The mechanism is deterministic and owned by our own Editor code — it is not a Vista symptom.
+The mechanism is deterministic and owned by our own Editor code — it is not a terrain-generation symptom.
 
 **Item 7a is a mitigation, not a resolution.** It halved the file by removing duplicated materials.
 It did not touch identity: the remaining ~200 000 lines still re-issue under new anchors on every
@@ -230,9 +203,13 @@ they are the options an approval would choose between: incremental generation th
 instead of recreating them; prefab-based serialisation, where an instance stores overrides rather
 than every component; mesh aggregation; or a different persistence/versioning policy.
 
-**Removing the generated scene from Git is blocked by P0.** Without the scene in version control the
-only way back to the canonical world is to regenerate it, and Vista's bistability means roughly 30 %
-of full bakes produce the other world. The canonical world would not be safely recoverable.
+**The former blocker on removing the generated scene from Git is gone.** It was that the removed
+terrain pipeline produced one of two different worlds in fresh processes, so the canonical world could
+not be regenerated reliably. The Unity-native terrain bake produces bit-identical heights, alphamaps,
+tree instances and detail layers across fresh processes (see
+[UNITY_NATIVE_TERRAIN_MIGRATION_REPORT.md](UNITY_NATIVE_TERRAIN_MIGRATION_REPORT.md)). That covers the
+terrain only: fresh-process determinism of the placement steps (POIs, settlement, roads, player) was not
+re-measured, and the policy decision itself is still unapproved.
 
 Until this is decided, treat scene diffs as noise and never resolve a conflict in them by hand:
 regenerate from the seed instead.
@@ -256,8 +233,8 @@ Lifetime is one generation. `Reset()` runs where a generation step clears its pr
 every lookup re-checks liveness anyway — a Material whose scene was closed compares equal to null and
 is replaced rather than handed back.
 
-Measured on a controlled real-scene generation of the POI and settlement steps only (no bake, no
-Vista, no terrain regeneration):
+Measured on a controlled real-scene generation of the POI and settlement steps only (no terrain
+bake, no terrain regeneration):
 
 ```
 inline !u!21 Material blocks .... 1 799 -> 60
@@ -389,81 +366,6 @@ zero — measured 0 infinite cells in 12 100 across nine configurations), which 
 
 ---
 
-## 9. Island shaping produces directional banding — diagnosed, fix is an art decision
-
-The island's terrain bands east-west with a repeating ~101 m / ~186 m spacing. Measured: curvature
-ratio 0.57–0.71 on all four tiles where Vista's own sample graph, on the same pipeline, reports
-0.84–1.50 with no periodicity at all.
-
-Eight hypotheses were tested and killed, including every resolution, erosion and quantisation
-explanation the documentation used to assert. The cause is the island's shaping recipe as a whole,
-not a parameter — so the fix is a rebuild of that stage against the reference graph, and it changes
-how every island looks.
-
-Full record, including what not to re-test and how to verify a rebuild:
-**[ISLAND_SHAPING_REBUILD.md](ISLAND_SHAPING_REBUILD.md)**. Evidence with numbers:
-[VISTA_TERRAIN_PLAYBOOK.md](VISTA_TERRAIN_PLAYBOOK.md) §2.4a–2.4d.
-
-Cheap unrelated fix found alongside it: `OverworldLpbBake.IslandAnchorCount` is 36 for a 2.2 km
-island, so the coastline reads as straight chords.
-
----
-
-## 10. RESOLVED — "sand covers 70 % of the island" was a measurement-scope error
-
-**There is no sand defect. Do not narrow the beach band.**
-
-`Dump Layer Weights` reported sand at 60–70 % per tile, saturated on 41–57 %, and that was recorded
-here as a defect. It was wrong: the dump averaged over **every painted pixel including the seabed**,
-and `SeaFloorGraphBuilder` paints Sand as its *unconnected Weight Blend base* — so every submerged
-pixel is sand by construction. Dry land is only 27–52 % of a tile, so the ocean dominated the number.
-
-Measured again restricted to pixels above sea level, seed 110201:
-
-| Tile | land % | grass | **sand** | soil | cliff | rock |
-|---|---|---|---|---|---|---|
-| 0_0 | 35.9 | 0.435 | **0.082** | 0.039 | 0.132 | 0.267 |
-| 0_1 | 26.5 | 0.535 | **0.133** | 0.040 | 0.195 | 0.062 |
-| 1_1 | 36.8 | 0.526 | **0.079** | 0.049 | 0.096 | 0.223 |
-| 1_0 | 52.4 | 0.387 | **0.315** | 0.024 | 0.034 | 0.216 |
-
-Sand on land averages 0.08–0.13 with saturation under 1.5 % on three tiles — a beach, which is what
-it is for. Grass leads everywhere at 0.39–0.54. The outlier is tile 1_0 at 0.315, and that tile is
-52 % land with the lowest relief, so its coast band is genuinely wide; still not a blanket.
-
-`VistaLayerWeightDump` now prints an `ON LAND` row per layer and the dry-land fraction. **Compare
-layers on those rows.** Whole-tile shares are not comparable between a layer that only exists on
-land and one that is the seabed's base.
-
-If the island still reads as too pale, look at the layer *assets* — `Overworld_Grass` albedo and its
-11 m tiling — or at the lighting, not at the masks.
-
----
-
-## 10a. Re-tune vegetation density AFTER the banding is fixed
-
-Grass coverage is fragmented, and the exported density map (`Dump Vegetation State` →
-`unity/VistaDetailDump/`) shows the holes following **the terrain banding**, not the tree stands and
-not any distance from the camera. The mechanism is direct: ground cover is gated on the grass
-*weight*, which is `Π(1 − other layers)`, so wherever the banded terrain raises rock, cliff or soil,
-grass drops under its floor and disappears in stripes.
-
-This is item 9 surfacing through the surface weights into vegetation — not a separate defect, and not
-fixable by tuning the floor. Any value is a compromise between two symptoms:
-
-| Green floor | Instances | Symptom |
-|---|---|---|
-| 0.06 (before) | 4 595 634 | grass on beach sand, past the waterline, on vertical mountain faces |
-| 0.30 (now) | 1 821 735 | clean edges, but coverage broken into stripes by the banding |
-
-The slope mask and the dry-land gate now handle cliffs and water independently of the floor, so once
-the banding is gone the floor can come back down — probably to ~0.20 — without the grass returning
-to the beach. **Re-measure then; do not tune it before.** Trees are less sensitive (29 735 placed
-after grouping into forest types) because a `ScatterNode` samples its mask against a per-point
-random, so a merely-low mask still places some.
-
----
-
 ## 11. RESOLVED — the settlement tile wanted a ninth terrain layer
 
 URP TerrainLit draws **eight** terrain layers: one `_Control` texture feeds Splat0..Splat3 and a
@@ -561,8 +463,9 @@ distributed — but that reasoning is an argument, not a measurement.
 ## 13. Smaller items
 
 - `PoiMarkerMenu` doc comments still reference the deleted `VegetationScatterMenu`.
-- `Species.Orchard` uses the apple prefab only; pears and plums are unused because Vista Personal
-  ignores `prefabVariants` (playbook §5). They would need their own species entries.
+- `TerrainTreeSpecies.Orchard` uses the apple prefab only; the pear and plum Polytope trees are not
+  prototypes. They would need their own species entries in `TerrainTreeSpecies` and
+  `OverworldVegetationAssets`.
 - Vegetation Pass phases 4–6 from the original spec are not started: flowers and small plants,
   further environmental dressing, LOD/culling budgets.
 - URP shadow distance is at its default, so the 20 m canopies only shade nearby ground.
@@ -575,7 +478,7 @@ distributed — but that reasoning is an argument, not a measurement.
   and after a reset nothing references them from the scene graph — so they are not serialised, but
   they are also not collected until a domain reload. This is a runtime/session lifetime question, not
   a serialisation one, and it is unrelated to item 7. Not measured: no leak size was established,
-  only the mechanism. Independent of P0, small, and testable (count live Materials across repeated
+  only the mechanism. Small, and testable (count live Materials across repeated
   generations).
 - **FIXED — no `.gitattributes`.** The repository had none, and `core.autocrlf = true` came from
   Git-for-Windows' *system* config, so normalisation was decided by whichever Git each contributor
@@ -593,3 +496,53 @@ distributed — but that reasoning is an argument, not a measurement.
   Windows — those would have entered the index and rewritten the scene end to end.
   <br>**This does not resolve item 7.** It removes one way of making that churn worse; the identity
   churn item 7 is about is untouched.
+
+---
+
+## 14. Terrain surface and vegetation values are authoring defaults
+
+The Unity-native terrain bake (2026-09-13) implements the project's own surface and vegetation rules in
+world units. Where the project had a rule but no number, the value is an **authoring default**, labelled
+as such on `TerrainSurfaceRules` / `TerrainVegetationRules` and in
+[OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md) §3–§5. They need art review, not
+code work:
+
+- soil drainage area 20 000 → 150 000 m²;
+- massif rock by height 110 → 230 m and ridge convexity 1.5 → 5 m;
+- steep rock 35 → 42° and cliff 50 → 58°. On seed 110201 the 110–230 m massif band reads cliff 0.48 /
+  rock 0.49 / grass 0.03, because the massif flanks are steep (slope p10 44°, p50 54°, p90 61°); the
+  split between cliff and rock is exactly what these two bands decide;
+- grove noise, species split, tree probability and grass density. Seed 110201 places 11 552 trees and
+  3 796 453 detail instances; the removed pipeline placed 15 852 trees on the same seed.
+
+Changing any of them changes every bake that reads it; re-record the validation hashes afterwards.
+
+## 15. Soil is drainage-driven, not erosion deposition
+
+Soil follows D8 upstream drainage area on the depression-filled terrain lattice. The project has no
+erosion field, so soil as **erosion deposition** is not modelled. If TerrainGen gains an erosion or
+sediment stage, soil should read it instead of drainage.
+
+## 16. Terrain authority evaluation dominates the bake
+
+On seed 110201 the terrain bake spends ~23.5 s evaluating TerrainGen onto the 1025 × 1025 lattice and
+under 1.1 s on everything Unity-side (heights 37 ms, derived fields 164 ms, alphamaps ~540 ms, trees
+~50 ms, details ~240 ms). The evaluation is single-threaded and per-vertex. It is correct and
+deterministic; it is also the only part of the bake worth optimising, and any optimisation must keep
+the pinned TerrainGen field hash.
+
+## 17. Terrain surface textures need a licence check
+
+The five canonical layers use textures in `Assets/Art/Terrain/SurfaceLayers/`, carried over from the
+removed terrain pipeline's sample content with their import settings and GUIDs. Their store metadata
+was stripped on copy. Confirm the licence permits shipping them outside that package, or replace them,
+before committing the folder.
+
+## 18. Legacy terrain layers reference missing textures
+
+Pre-existing, unrelated to the terrain bake: `Assets/Settings/TerrainLayers/` holds legacy layers —
+`Dirt_Road_Center`, `Dirt_Road_Edge`, `Road_Gravel`, `Dirt_Scaled`, `Dirt_Swamp`,
+`Dirt_Settlement_Dust`, `Grass_Fields`, `Grass_Forest`, `Gravel_*`, `Cliff_Rock`, `CliffBright_Scaled`,
+`GrassGreen_Scaled`, `GrassYellow_Scaled`, `Snow_*` — whose diffuse texture GUIDs resolve to no asset in
+the project. The road and settlement layers among them are live (items 11 and 12), so roads paint with
+an untextured layer. The GUIDs were not in the removed terrain package either.

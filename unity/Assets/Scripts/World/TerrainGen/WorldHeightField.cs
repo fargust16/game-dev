@@ -87,7 +87,7 @@ namespace GameDev.World.TerrainGen
             set => Heights[z * Width + x] = value;
         }
 
-        /// <summary>Slope as <c>1 - normal.y</c>, matching <c>VistaTerrainSampler.SampleSlope01</c>.</summary>
+        /// <summary>Slope as <c>1 - normal.y</c>, matching <c>OverworldTerrainSampler.SampleSlope01</c>.</summary>
         /// <remarks>
         /// Central differences, one-sided at the border. Reported for diagnostics only - the
         /// canonical slope for downstream systems still comes from Unity Terrain once the field is

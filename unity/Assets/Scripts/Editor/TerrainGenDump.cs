@@ -27,7 +27,7 @@ namespace GameDev.EditorTools
     /// generator output into the same place as authored content.
     /// </para>
     /// <para>
-    /// Nothing here touches <c>TerrainData</c>, the scene, Vista, or any downstream system. The
+    /// Nothing here touches <c>TerrainData</c>, the scene, or any downstream system. The
     /// generator produces a height field and stops.
     /// </para>
     /// </remarks>

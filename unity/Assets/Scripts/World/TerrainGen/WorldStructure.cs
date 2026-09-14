@@ -19,8 +19,8 @@ namespace GameDev.World.TerrainGen
     /// <c>Vector2</c>, so it is testable without a scene.
     /// </para>
     /// <para>
-    /// No downstream system may require it. A world baked by Vista has no structure at all, and
-    /// everything has to keep working — that is what keeps the legacy path viable.
+    /// No downstream system may require it. A terrain that did not come from this structure has
+    /// none, and everything has to keep working when it is absent.
     /// </para>
     /// </remarks>
     public sealed class WorldStructure

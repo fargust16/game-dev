@@ -4,12 +4,17 @@ using Object = UnityEngine.Object;
 namespace GameDev.World.Terrain
 {
     /// <summary>
-    /// Scene lookup for overworld Unity Terrains owned by Vista (1..N tiles in a grid).
+    /// Scene lookup for the overworld Unity Terrain tiles (1..N in a grid).
     /// </summary>
+    /// <remarks>
+    /// The canonical terrain access point for every downstream system: roads, POI placement,
+    /// settlements, biome classification, water and hydrology analysis all reach the ground through
+    /// here. It answers in terms of <c>UnityEngine.Terrain</c> and <c>TerrainData</c> only, so it
+    /// does not care which tool filled the heightmap - see <see cref="OverworldTerrainTile"/>.
+    /// </remarks>
     public static class OverworldTerrainAccess
     {
         public const string TerrainsRootName = "Terrains";
-        public const string VistaManagerName = "VistaManager";
 
         public static UnityEngine.Terrain FindTerrain()
         {
@@ -59,7 +64,10 @@ namespace GameDev.World.Terrain
                     continue;
                 }
 
-                if (t.GetComponent<Pinwheel.Vista.UnityTerrain.TerrainTile>() != null ||
+                // Membership of the overworld grid, not authorship of its heights. The grid stamps
+                // OverworldTerrainTile on every tile, and the parent-name rule also recognises tiles
+                // created before the marker existed.
+                if (t.GetComponent<OverworldTerrainTile>() != null ||
                     (t.transform.parent != null && t.transform.parent.name == TerrainsRootName))
                 {
                     list.Add(t);
@@ -194,12 +202,12 @@ namespace GameDev.World.Terrain
         /// </summary>
         /// <remarks>
         /// The terrain passed in is only a fallback for points off the grid;
-        /// <see cref="VistaTerrainSampler"/> resolves the containing tile for every query.
+        /// <see cref="OverworldTerrainSampler"/> resolves the containing tile for every query.
         /// </remarks>
-        public static VistaTerrainSampler CreateSampler(int moistureSeed = 0)
+        public static OverworldTerrainSampler CreateSampler(int moistureSeed = 0)
         {
             var terrain = FindTerrain();
-            return terrain != null ? new VistaTerrainSampler(terrain, moistureSeed) : null;
+            return terrain != null ? new OverworldTerrainSampler(terrain, moistureSeed) : null;
         }
     }
 }

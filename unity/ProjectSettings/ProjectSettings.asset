@@ -588,7 +588,7 @@ PlayerSettings:
   webWasm2023: 1
   webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
-    Standalone: MAPMAGIC2;MM_NATIVE;__MICROSPLAT__;VISTA
+    Standalone: MAPMAGIC2;MM_NATIVE;__MICROSPLAT__
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

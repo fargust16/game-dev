@@ -99,27 +99,34 @@ Each phase = its own plan + commit series. Prefer updating this file’s “Wher
 
 ---
 
-# Island Shaping Rebuild (open, diagnosed)
+# Island Shaping Rebuild (superseded)
 
-The island's shaping stage produces directional banding — ridges elongated east-west with a
-repeating ~101 m spacing. Vista's own sample graph is clean through the identical pipeline, so the
-target is reachable; the cause is our shaping recipe as a whole, not a parameter.
-
-Eight hypotheses were tested and killed by measurement, so the next agent starts from evidence
-rather than from a hunch. Do not re-run those experiments — read the record first:
-`unity/Assets/Plans/ISLAND_SHAPING_REBUILD.md`.
-
-The fix changes how every island on every seed looks, so it is an art decision and needs the user's
-sign-off on a bake, not on a diff.
+The directional-banding investigation belonged to the previous external terrain pipeline's island
+shaping stage. That stage no longer exists: the overworld relief is TerrainGen's authoritative field,
+written straight into Unity `TerrainData`
+(`unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md`). Whether the TerrainGen relief has banding
+of its own has not been measured; judge it on a bake, not by analogy with the removed pipeline.
 
 ---
 
-# Future Hydrology / River Generation
+# Hydrology / River Generation
 
-**Not in V0. Not scheduled. Design is intentionally open.**
+**Designed and built 2026-09-03; the carve now lands directly in the terrain lattice.** Full design:
+`unity/Assets/Plans/HYDROLOGY_GENERATION_PLAN.md`.
 
-V0 water is **one ocean plane** (`WorldWater` at `WorldScale.SeaLevelMeters`). There is no inland
-lake or river generator, and there must not be one until this item is properly designed.
+The drainage analysis ships and is measured: rivers with tributaries, terrain-derived lakes,
+waterfall candidates, water meshes and an `IWaterSampler` seam for roads. It runs as the `Hydrology`
+pipeline step between Mountains and Markers, as a **two-pass** bake — the analysis reads the finished
+relief off `TerrainData`, and the second terrain bake subtracts the planned carve from the terrain
+lattice before the surface and vegetation are derived. TerrainGen never reads the carve back.
+
+**`RunHydrology` is off by default.** The earlier blocker — the carve not landing — belonged to the
+removed external terrain pipeline; the direct lattice carve replaces it and is verified on seed 110201
+(delivered cut within 0.02 m of the plan, nothing outside it moved by more than 0.02 m). A carved world
+has not yet been reviewed visually, so turning the step on by default is a separate decision.
+
+The constraints below were the brief the design had to satisfy, and all of them held; they are kept
+because any future change to hydrology still has to satisfy them.
 
 ## The previous attempts were discarded, not archived
 
@@ -132,9 +139,9 @@ They are **not an architectural foundation**. Do not resurrect `LakeDefinition`,
 water-zone menu architecture, or any of the deleted constants because they look convenient. Starting
 from that code is what made every previous attempt fail the same way.
 
-## What a real system would have to model
+## What the system models
 
-A future design should be worked out from first principles, roughly along this chain:
+Worked out from first principles, along this chain:
 
 ```text
 source → flow direction → drainage basin → terrain valley → river channel
@@ -149,16 +156,24 @@ terrain is not hydrology.
 
 ## Constraints any design must respect
 
-- **Vista owns terrain height.** A river that carves the heightfield has to do it inside the Vista
-  graph or as a sanctioned Vista biome (e.g. a `Lower`-blend LPB), not as a C# post-pass.
-- **Vista Personal caps the biome canvas at 512 px.** A channel narrower than the canvas cell
-  (~5 m on the island biome) cannot be represented as biome height at all — that constraint has to
-  be part of the design, not discovered during implementation.
+- **TerrainGen owns terrain relief; the terrain bake owns the carve.** A river lowers the terrain
+  lattice inside the bake (`HydrologyBake.ApplyPendingCarve`), after TerrainGen and before the surface
+  and vegetation are derived — never as a pass over finished `TerrainData`, and never fed back into
+  TerrainGen.
+- **The heightmap resolves 2.73 m per vertex** (513 over 1400 m). A channel narrower than that cannot
+  be represented as terrain height — that constraint has to be part of the design.
 - Determinism: same seed → same watercourses, and re-seeding hydrology must not move the mountains.
 - Roads already plan around water through `SeaLevelOceanSampler`; any inland water must enter road
   cost and bridging through that same interface rather than a parallel one.
 
-Write a plan document before writing code.
+Written before the code: `unity/Assets/Plans/HYDROLOGY_GENERATION_PLAN.md`.
+
+## What is still out
+
+Riverbed material and clearing vegetation from the channel are V2 — the carve only lowers the
+lattice, so surface and vegetation rules treat a channel like any other low ground.
+Waterfall **rendering** is out; only the candidates are derived. Bridges, moisture and
+distance-to-water remain future consumers.
 
 ---
 
@@ -184,7 +199,8 @@ Do **not** resume this order unless the user explicitly overrides [16](16%20Arch
 
 # Explicitly Out (until later phases)
 
-- Inland lakes and rivers (see § Future Hydrology / River Generation)
+- Riverbed material, vegetation clearing in the channel, and waterfall rendering
+  (see § Hydrology / River Generation)
 - Survival harvest / base-building loop
 - Full Valheim-scale map
 - Marketplace tactics kit as architecture

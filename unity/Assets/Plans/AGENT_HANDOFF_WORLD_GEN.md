@@ -34,8 +34,8 @@ Do not skip ahead to Valheim-scale polish or collapse phases into one uncontroll
 ## Locked V0 engineering defaults (from 17)
 
 - Chunk size: **64 m**
-- Playable overworld: **2800 × 2800 m** (2×2 Vista tiles of 1400 m, height budget 700 m, sea level 24 m)
-- Vista biome canvas: **512 px** — Vista Personal's hard cap, and a design constraint, not a budget item
+- Playable overworld: **2800 × 2800 m** (2×2 Unity Terrain tiles of 1400 m, height budget 700 m, sea level 24 m)
+- Terrain: TerrainGen relief baked into Unity `TerrainData` — heightmap 513, alphamap 512 per tile ([OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md))
 - Interior / Arena load: **single-scene swap** until a later wave
 
 ## First commands for a new agent
