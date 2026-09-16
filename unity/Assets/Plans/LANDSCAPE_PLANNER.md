@@ -14,7 +14,9 @@ Plan POIs / roads against shared terrain analysis, then conform road corridors o
 
 ```
 WorldSeed
- ├── terrain.* / biome / vegetation / vegetation.shrubs / grass / settlement / player.spawn
+ ├── terrain.*           (TerrainGen stages and the bake's surface/vegetation noise — the
+ │                      authoritative list is §1 of WORLD_GENERATION_PIPELINE.md)
+ ├── settlement / player.spawn
  ├── poi.{kind}.{index}  (tie-break / jitter for one marker)
  └── roads              (no RNG — deterministic cost field + A*)
 ```
@@ -27,7 +29,7 @@ Editor executable order (also §5 in [WORLD_GENERATION_PIPELINE.md](WORLD_GENERA
 
 1. Init `WorldSeed` + `WorldGenSettings` → `WorldDefinition`
 2. Surface height (terrain bake from TerrainGen; massifs included via `TerrainBakeFlags.IncludeMountains`)
-3. Zones (alphamap / biome paint)
+3. Zones (alphamap / surface weights — written by the same terrain bake, not a separate pass)
 4. Mountains (the same terrain bake with the massif flag — cascade-clears downstream)
 5. Terrain analysis (height, slope, curvature, roughness) via `LandscapeCostField`
 6. POI placement once via `PoiPlacementEngine` + 3×3 `WorldSectorMap` → stable `Pois[]`
@@ -35,7 +37,8 @@ Editor executable order (also §5 in [WORLD_GENERATION_PIPELINE.md](WORLD_GENERA
 8. Growing Primary/Secondary roads → `TerrainDeformer` (road corridors only)
 9. Ensure ocean `WorldWater` at Sea Level
 10. POI marker visuals (no re-place)
-11. Trees → Undergrowth → GPU grass (separate forks / clears)
+11. Trees and ground cover — **not a pipeline step since 2026-09-13**: the terrain bake writes tree
+    instances and Unity detail layers from world-space rules (there is no CPU/GPU grass system)
 12. Player at a seeded TownApproach (Human Character Dummy + Human Basic Motions)
 
 ## Key types

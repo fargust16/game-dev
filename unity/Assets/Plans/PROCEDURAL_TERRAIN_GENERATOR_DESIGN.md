@@ -11,6 +11,34 @@
 > `TerrainSource` switch and no second path: statements below about "the current pipeline", its
 > shaping recipe or its carve describe the state on 2026-09-05. Stage 3C/3D/3E topology remains
 > frozen and is not yet part of the baked field.
+
+> **Status update 2026-09-16 — where the implementation actually stands.** The code's stage names are
+> finer than the list in "Recommended Implementation Stages" below, which was written in 2026-09-05
+> terms. The mapping, so a reader does not look for stages that were never built under those names:
+>
+> | Implemented (code, frozen by hashes) | This document's stage list |
+> |---|---|
+> | Stage 1 landmass and coastline (`Stage1LandmassGenerator`) | Stage 1 |
+> | Stage 2A macro structure, 2B massifs (`MacroPlates`, `MountainMassif`) | Stage 2 |
+> | Stage 3A ownership, 3B spurs, 3C valley topology and trajectories, 3D/3E structural basins and outlets | Stage 3 |
+> | Stage 3F valley carve — **not implemented**, see [PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md](PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md) | part of Stage 7 |
+> | Stage 4A island relief (plate blocks, knolls, massif apron) — implemented dump-first, **not** in the authority path, see [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md) and its revision R1 | the floor half of Stage 4 |
+> | Stage 4B plateaus and walls, 4C raised coast — not started | the rest of Stage 4 |
+> | Unity-native terrain bake of Stage 1 + 2 | Stage 8, delivered early |
+> | Hydrology analysis and carve on the lattice (`HydrologyBake.ApplyPendingCarve`), step off by default | Stages 6 and 7 for water |
+>
+> Two design positions below have moved with it:
+>
+> - **Stage 5's "single band-limited, structure-modulated noise field"** is not what Stage 4A did. The
+>   relief that fills the empty 70–110 m band is positive structural relief owned by plates, crustal
+>   cells and the massif frame; noise has no role in it. The isotropy gate ([OPEN] 1) survives as a
+>   test (curvature ratio 0.85–1.20, measured 0.96–1.01 on Stage 4A), but a refinement *noise* stage is
+>   no longer the way the design expects relief to arrive.
+> - **"Stage 4 — terraces and structural basins"** split: the structural basins shipped with Stage
+>   3D/3E, the T2 plateaus are Stage 4B, and the floor relief Stage 4A added was not in this plan at
+>   all — it came from measuring the baked island and finding a 70–110 m band that held 0.1–7.8 % of
+>   land.
+
 **Date:** 2026-09-05
 **Applies to:** Track W (World Gen), terrain relief ownership
 **Related:** [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md), [WORLD_RELIEF_PRINCIPLES.md](WORLD_RELIEF_PRINCIPLES.md), [HYDROLOGY_GENERATION_PLAN.md](HYDROLOGY_GENERATION_PLAN.md), [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md), [WORLD_GENERATION_PIPELINE.md](WORLD_GENERATION_PIPELINE.md), [LANDSCAPE_PLANNER.md](LANDSCAPE_PLANNER.md)
@@ -198,11 +226,13 @@ The new generator does not need a new definition of "good"; it needs to pass the
 ```
 OverworldPipeline.GenerateAllRoutine          (Editor coroutine, WorldGenSettings step mask)
   │
-  ├─ Surface + Mountains  ── one external-pipeline bake ──▶ heights, alphamaps, trees, detail
-  │     (2026-09-05 state; replaced 2026-09-13 by OverworldTerrainBake — TerrainGen field →
-  │      OverworldTerrainField → OverworldTerrainBuilder → TerrainData)
+  ├─ Surface + Mountains  ── OverworldTerrainBake ──▶ heights, alphamaps, trees, detail
+  │     TerrainGen StructuralElevation (Stage 1 + 2) → OverworldTerrainField →
+  │     OverworldTerrainBuilder → TerrainData. Stage 3C-3E topology and Stage 4A relief
+  │     exist but are not read by the bake.
   │
-  ├─ Hydrology   (OFF by default — analysis works, carve blocked)
+  ├─ Hydrology   (OFF by default — analysis and the lattice carve both work:
+  │               HydrologyBake.ApplyPendingCarve)
   ├─ Markers     OverworldWorldPlan.BuildAndStorePois → StubPoiPlacer + LandscapeCostField
   ├─ Settlements SettlementOverworldMenu → OverworldSettlementAnchor
   ├─ Roads       (OFF by default — see OVERWORLD_TECH_DEBT items 0 and 8)
@@ -1091,10 +1121,13 @@ terrain.**
 
 **Stage 4 — terraces and structural basins.** T2 plateaus (flat top + wall + talus + ramp), T3
 outcrops, structural basins. *Tests:* G3, G5, G8, plus the first `OverworldGenTiming` measurements.
-*Why here:* basins must exist before drainage can find lakes.
+*Why here:* basins must exist before drainage can find lakes. *(Split in the implementation: structural
+basins shipped as Stage 3D/3E; the island's floor relief shipped as Stage 4A in 2026-09-16; T2 plateaus
+are Stage 4B and not started.)*
 
 **Stage 5 — refinement, and the isotropy checkpoint.** The single band-limited, structure-modulated
-field. *Tests:* **G7** on three seeds, G8. *Answers:* [OPEN] 1 and 6. **This is a go/no-go gate: if
+field. *(Superseded as the source of floor relief — see the 2026-09-16 status update. The isotropy gate
+stays; the noise term is not scheduled.)* *Tests:* **G7** on three seeds, G8. *Answers:* [OPEN] 1 and 6. **This is a go/no-go gate: if
 isotropy fails and cannot be recovered by reducing refinement, the ridge model itself needs revision
 before anything downstream is built on it.**
 
@@ -1104,7 +1137,8 @@ No carve. Rivers and lakes exist as data and gizmos only. *Tests:* H1–H3 (alre
 whole analysis already exists and is tested.*
 
 **Stage 7 — carve.** Valley + channel + lake basin subtraction; estuary coastal profile; the
-validation re-run. *Tests:* H4–H8. *Answers:* [OPEN] 5 and 9. **The stage that the external-pipeline architecture
+validation re-run. *(Water half delivered 2026-09-13 as the hydrology lattice carve; the structural
+valley half is Stage 3F, still a preflight.)* *Tests:* H4–H8. *Answers:* [OPEN] 5 and 9. **The stage that the external-pipeline architecture
 could not reach.**
 
 **Stage 8 — TerrainData integration.** *Delivered early, 2026-09-13, for the Stage 1 + 2 field:*

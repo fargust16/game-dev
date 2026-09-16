@@ -3,6 +3,9 @@
 A spec pass and a 29-seed measurement. No generator behaviour was changed; the only new file is a
 read-only editor diagnostic. Stage 3 not started. Nothing committed or pushed.
 
+> **Dated record.** Written 2026-09-08. Stage 3A–3E and Stage 4A have shipped since; the contract and
+> the 29-seed measurements below still describe Stage 1 → Stage 2B, which is frozen.
+
 Date: 2026-09-08 · 29 seeds (the canonical five plus the 24-seed robustness spread)
 
 ---

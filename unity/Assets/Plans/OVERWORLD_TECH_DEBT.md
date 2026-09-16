@@ -546,3 +546,30 @@ Pre-existing, unrelated to the terrain bake: `Assets/Settings/TerrainLayers/` ho
 `GrassGreen_Scaled`, `GrassYellow_Scaled`, `Snow_*` — whose diffuse texture GUIDs resolve to no asset in
 the project. The road and settlement layers among them are live (items 11 and 12), so roads paint with
 an untextured layer. The GUIDs were not in the removed terrain package either.
+
+## 19. OPEN — four Stage 4A acceptance tests are red until revision R1 lands
+
+Stage 4A island relief is committed dump-first (`IslandRelief*`, `TerrainGenIslandReliefDump`,
+`TerrainGenStage4ATests`) and is **not** read by the bake, so nothing in the world changes. Its own
+suite, however, ships red: four of thirteen tests fail, deliberately unignored, because the causes are
+in the design and not in the code.
+
+| Test | Failure, measured on the canonical seeds | Cause |
+|---|---|---|
+| `S8_NoClosedDepressions` | 1337: 0.67 m over 1 555 m²; 777: 0.29 m over 1 323 m² | positive relief that falls inland at Stage 1's zero-slope rings (30/100/200/440/800 m) digs a trough; a 40-seed sweep puts the rate at 15/40 seeds, up to 2.32 m |
+| `S10_ApronIsMonotoneAlongOutwardRays` | 9–20 of 64 rays per massif world rise outward, worst 3.01 m; up to 3.62 m of apron exists beyond the massif axis reach | `MountainMassif.Project` is unique only inside the axis reach; the apron has no domain condition |
+| `S11_ValleyTrajectoriesStayCarvable` | 110201 adverse sum 8.04 m (budget 7.2); 20260905 plate + apron 1.77 m (budget 1.5) | the adverse *sum* is not a cut depth, and the H1-based gate amplifies a climb already present in H2 |
+| `S11_BasinOutletsStayOutlets` | `R4A` rises downstream of outlets on two seeds | `R4A` is a fill, not a flow path |
+
+[PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md)
+derives the corrections (an inland slope budget with a proof, an apron projection domain, and physical
+trajectory and outlet invariants) and lists the implementation delta in its §18. Two residual items stay
+open after it:
+
+- **massif-foot depressions** — 6 of 40 non-canonical seeds, 0.33–2.32 m, inside the massif influence
+  zone and its lee; frozen H2 has one itself on seed 1019. Owner: Stage 3F carve / Stage 4B piedmont.
+- **apron zone share** — 25.3 % and 29.8 % of land on 424242 and 20260905 against a 25 % target, and the
+  apron still reads as a ring around the massif.
+
+Until R1 is implemented, "the full EditMode suite is green" is not true of this repository, and a red
+Stage 4A test is expected rather than a regression to chase.

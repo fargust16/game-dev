@@ -57,8 +57,9 @@ enum value **is** the index below. Textures live under `Assets/Art/Terrain/Surfa
 | 4 | `Overworld_Rock` | the strongest of: sloped seabed below 22–24 m; high massif ground 110 → 230 m; massif ridges; dry ground past the angle of repose, 35° → 42° |
 
 **No snow layer in V0.** An earlier snow layer was a sand texture faked white through
-`TerrainLayer.diffuseRemapMin/Max` — fields MicroSplat never read, which is why the massif rendered as
-warm cream sand. Re-add a snow layer only when a real snow texture is imported.
+`TerrainLayer.diffuseRemapMin/Max`, which the renderer of the time ignored — the massif came out warm
+cream sand. Nothing sets a diffuse remap from code today. Re-add a snow layer only when a real snow
+texture is imported.
 
 Layer appearance (albedo, normal, UV tiling, smoothness, diffuse remap) is an **Inspector property of
 the layer asset**. Never set it from generation code, and never build a parallel stack after the bake.
@@ -136,17 +137,24 @@ Do **not** chase soft edges by jumping to 2k–4k alphamaps. Fix SDF / threshold
 
 ## Root causes we already hit (do not reintroduce)
 
+> **Read as history where the symbols are gone (checked 2026-09-16).** Rows whose cause or fix names
+> `EvaluateSoft` / `TintSoft`, `OverworldVegetationDebug`, `highlandBandMask` or a lawn bake describe the
+> removed terrain pipeline and the pre-bake ecology code; those symbols no longer exist. Keep the
+> *symptom* column — it is the list of failures to watch for — and expect to diagnose a recurrence
+> against `TerrainSurfaceRules` / `TerrainVegetationRules` instead. Rows about roads, settlement paint,
+> fog and grading still name live code.
+
 | Symptom | Cause | Fix |
 |---------|--------|-----|
 | Scalloped / stepped road edges | Clearance samples stamped as disks (6 m spacing) | Segment SDF + denser samples (~1.25 m) |
 | Contour “ladder” on mountains | Threshold on raw height only | Displace height with noise **before** paint Threshold; blur paint masks — relief unchanged |
-| Hard grass / tint seams | Ecology/tint from hard `BiomeId` | `EvaluateSoft` / `TintSoft` blend neighbor Classify bands |
-| Sub-pixel road shoulders | Lawn mask ~2 m/px | Lawn bake ~1536 on tile (~1 m/px) |
+| Hard grass / tint seams | Ecology/tint from hard `BiomeId` | *(historical: `EvaluateSoft` / `TintSoft` are gone; the bake's surface rules blend by world quantity instead)* |
+| Sub-pixel road shoulders | Lawn mask ~2 m/px | *(historical: no lawn bake exists; road shoulders are alphamap texels, see the road rows)* |
 | Distant gray/white wash | `RenderSettings.fog` + heavy ColorAdjustments / SMH | Fog **off**; mild grade only |
 | Hard rectangular painted region | `SettlementDustPaint` axis pads/streets with hard coverage | Soft rect falloff (~2.25 m) + mild noise |
-| Full-tile rectangle overlay | `OverworldVegetationDebug` Quad | Cleared on Generate Surface |
+| Full-tile rectangle overlay | `OverworldVegetationDebug` Quad | *(historical: the debug quad and its clear-up are both gone)* |
 | Road staircase | Soft rim 1.2 m << alphamap px (~2.7 m) | `SoftRimMeters` >= **2.5 alphamap texels**; lower TransitionCoverage |
-| Huge gravel on flats | `highlandBandMask` height-only from GreenMax | Slope gate + higher gravel floor (paint only) |
+| Huge gravel on flats | `highlandBandMask` height-only from GreenMax | *(historical: the mask belonged to the removed pipeline; today gravel is a road layer only)* |
 | Hitch on chunk entry | A second CPU grass system baking chunks during rendering | Grass is a Unity terrain detail layer written once by the terrain bake |
 
 ## Performance budget

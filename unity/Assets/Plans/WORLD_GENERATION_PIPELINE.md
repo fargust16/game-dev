@@ -30,6 +30,9 @@ WorldSeed
  ├── terrain.macro.*            (TerrainGen Stage 2A: plates, drift, stress)
  ├── terrain.range.*            (TerrainGen Stage 2A: uplift belts and branches)
  ├── terrain.massif.{i}         (TerrainGen Stage 2B: per-massif shape)
+ ├── terrain.ridge.*            (TerrainGen Stage 3B/3D: spur stations, shapes, secondary spurs)
+ ├── terrain.relief.knoll       (TerrainGen Stage 4A: per-crust-site knoll resistance and yaw jitter;
+ │                               terrain.relief.edge / .plateau.* / .outcrop.* / .coast.* reserved, unused)
  ├── terrain.surface.shore      (terrain bake: shore-line noise)
  ├── terrain.surface.rock       (terrain bake: massif rock-line noise)
  ├── terrain.vegetation.groves  (terrain bake: grove mask)
@@ -48,6 +51,11 @@ Trees and ground cover are placed **by the terrain bake**, not by a separate pip
 streams are `TerrainHash` keys forked from the world seed and evaluated statelessly per world cell, so
 a cell's tree does not depend on which tile or in which order it is evaluated — see
 [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md) §7.
+
+Stage 4A island relief (`terrain.relief.knoll`) is implemented but **not** part of the terrain today:
+it is evaluated by its editor dump only, and the bake still writes Stage 1 + Stage 2 —
+see [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)
+and its [revision R1](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md).
 
 Inland hydrology is generated as of 2026-09-03 through the `hydrology` seed stream — see
 [HYDROLOGY_GENERATION_PLAN.md](HYDROLOGY_GENERATION_PLAN.md), and

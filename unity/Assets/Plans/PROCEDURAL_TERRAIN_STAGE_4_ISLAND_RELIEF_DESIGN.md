@@ -1,7 +1,9 @@
 # Procedural Terrain — Stage 4 Island Relief Design (Stage 4A)
 
-**Status:** Design. **No production code, test, tool, scene, setting or generated asset was changed.**
-**Date:** 2026-09-14
+**Status:** **Implemented dump-first and partly superseded.** The design below was coded as written
+(variant C6) and committed on 2026-09-16 as `IslandRelief*`, the editor dump and thirteen acceptance
+tests; the layer is **not** wired into `TerrainAuthorityField`.
+**Date:** 2026-09-14 (status header 2026-09-16)
 **Baseline:** HEAD `b677f26` ("Bake TerrainGen straight into Unity TerrainData and remove the external
 terrain pipeline"), working tree clean. *The task brief names HEAD `7c882c1` with the migration
 uncommitted; the migration has since been committed as `b677f26`. Nothing else differs.*
@@ -14,6 +16,29 @@ uncommitted; the migration has since been committed as `b677f26`. Nothing else d
 [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md),
 [UNITY_NATIVE_TERRAIN_MIGRATION_REPORT.md](UNITY_NATIVE_TERRAIN_MIGRATION_REPORT.md),
 [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md).
+
+> **Revision R1 (2026-09-16) supersedes parts of this document.**
+> Measuring the implementation — and a 40-seed sweep this design never ran — falsified three of its
+> rules. Where this file and
+> [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md)
+> disagree, **the revision wins**:
+>
+> - **§5.4 / §12.2 "all terms ≥ 0 removes ring lips" is false.** Positivity bounds the value, not the
+>   inland derivative; any term that falls inland at a Stage 1 zero-slope ring digs a trough. C6 has
+>   depressions on 1337 and 777 and on 15 of 40 non-canonical seeds. R1 replaces the rule with an
+>   inland slope budget (a new `M(d)` coastal-floor term, edge widths and junction radii derived from
+>   it, knoll amplitudes capped by what is left) and proves the result instead of measuring it.
+> - **§7.2 apron reach has no domain condition.** Beyond the massif axis reach `MountainMassif.Project`
+>   is not unique, so the apron rises outward there. R1 adds `W_eff = clamp(R_axis − δ − toe, 0, W)`.
+> - **§19.2 S10 and S11 measure the wrong quantities.** R1 puts S10 on the ungated apron surface, S11
+>   on the single climb of `R4A` plus the incision Stage 3F actually needs below Stage 1, and restates
+>   the Stage 3E outlet checks.
+> - **§5.2 plate levels** get a lowland reservation (§9 of R1): whole-plate ranks leave 5.6–15 % lowland
+>   on three canonical seeds.
+> - Unchanged and still authoritative here: the geographic hierarchy (§4), the reasons for choosing C6
+>   over A/B/N (§3), the knoll and apron *shape* rules, determinism and the tile contract (§13, §14).
+>
+> The numbers in §11 and §19 are the C6 measurements; R1 §15 carries the revised ones.
 
 Claim tags as in the other TerrainGen documents: **[FACT]** read from code or measured on the production
 path, **[PROTO]** measured on the offline prototype described in §1 (real Stage 1/2A/2B structure,
@@ -303,7 +328,8 @@ nobody authored.
 | `NoMassifUpliftScale` | 1.4 | §8 |
 | `MinPlateLandAreaSqm` | 150 000 | the prototype's slivers are 0.01–0.09 km²; real districts ≥ 0.22 km² |
 
-**Why no lowering.** [PROTO] Every mean-zero or negative term tried (A, N) creates closed depressions,
+**Why no lowering.** *(The conclusion stands; the rule derived from it in §12.2 does not — R1 §2.)*
+[PROTO] Every mean-zero or negative term tried (A, N) creates closed depressions,
 and analysis says why: `CoastHeightModel` is smoothstepped per span, so the datum has **zero slope at
 200 m and 440 m inland** and along its medial crest; any term that rises towards the coast there makes a
 lip. Lowlands therefore stand at the datum and are low *relative to* the raised plates; genuinely lowered
@@ -609,6 +635,8 @@ Baseline (preflight method) → prototype C6 (110201 / 424242; 1337 at ×1.4) �
 ### 12.1 Contract
 
 1. **Stage 4A creates no closed depression.** Declared basins exist only from Stage 3F.
+   *(R1 §4.2 narrows this to a provable scope: no depression outside the massif influence zone and its
+   lee; inside it the massif foot is Stage 3F's, and frozen H2 has such a depression itself.)*
 2. Every land point drains to the sea on `H4A`: the priority-flood fill of `H4A` from the ocean differs
    from `H4A` by at most the micro tolerance.
 3. **Tolerance:** a filled component counts if its max fill depth ≥ **0.25 m** *and* its area ≥ **100 m²**.
@@ -622,7 +650,7 @@ Baseline (preflight method) → prototype C6 (110201 / 424242; 1337 at ×1.4) �
 
 | Rule | Mechanism it removes | Evidence [PROTO] |
 |---|---|---|
-| all terms ≥ 0 | lips against the datum's zero-slope rings (200 m, 440 m) and medial crest | A: 4–5 depressions; N: 35–40 |
+| ~~all terms ≥ 0~~ **false, see R1 §2** | lips against the datum's zero-slope rings (200 m, 440 m) and medial crest | A: 4–5 depressions; N: 35–40 |
 | convergent boundaries are one-sided block edges, not two-sided belts | strike troughs | B/C1: 1337 depression 0.41–0.48 m |
 | junction relaxation (450 m) | notch at a lowland wedge's apex | 0.86 → 0.43 → 0 m |
 | a level-0 plate must have ≥ 150 m of coast frontage | lowland without outlet | (no case on 3 seeds; structural necessity) |
@@ -913,10 +941,10 @@ TerrainGen)" everywhere, and to refinement as "refinement (after 3F)".
 | S5 | two builds in one process and six fresh processes give identical relief hashes |
 | S6 | Stage 1 golden hashes, Stage 2B field hashes (`1de91e469513054b`, `9d9d7b3c2560bc36`), full Stage 3 suite, and `OverworldTerrainBakeTests`' pinned authority hash unchanged (4A is not yet on the production path) |
 | S7 | perturbing only `terrain.relief.knoll` changes only `Knoll`; plates, junctions and apron identical |
-| S8 | depressions (≥ 0.25 m and ≥ 100 m²) = 0 via `HydrologyGrid` + `DepressionFill`; micro count reported |
+| S8 | depressions (≥ 0.25 m and ≥ 100 m²) = 0 via `HydrologyGrid` + `DepressionFill`; micro count reported — **fails on 1337 and 777; split into S8-A / S8-M / S8-C by R1 §14** |
 | S9 | every knoll ≤ `CorridorIncisionMeters`; every apron fill ≤ 0.18 × crest |
-| S10 | apron monotone non-increasing along 64 outward rays per massif |
-| S11 | along every Stage 3C final trajectory: plate + apron adverse rise ≤ 1.5 m, `R4A` adverse rise ≤ 7.2 m, no single climb above `CorridorIncisionMeters`; at every Stage 3E outlet, `R4A` non-increasing in the outlet's downstream direction |
+| S10 | apron monotone non-increasing along 64 outward rays per massif — **fails; R1 §6 moves the check to the ungated apron surface and its projection domain** |
+| S11 | along every Stage 3C final trajectory: plate + apron adverse rise ≤ 1.5 m, `R4A` adverse rise ≤ 7.2 m, no single climb above `CorridorIncisionMeters`; at every Stage 3E outlet, `R4A` non-increasing in the outlet's downstream direction | **Fails on 110201 (adverse sum) and 20260905 (plate step); R1 §7-§8 replace the quantities.**
 
 **Geometric (seed-level, from the dump):** the "Target" column of §11 for 110201, 424242, 1337; the
 no-massif column for 1337, 256, 777.

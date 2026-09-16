@@ -9,6 +9,28 @@ Read-only architectural audit. No Stage 3F code exists and none is written here.
 > pipeline this audit describes as the owner of the shipping heightmap has been removed. The findings
 > below are kept as the state at the time of the audit; the Stage 3F questions about `H3`, basins and
 > the carve remain open.
+>
+> **Update 2026-09-16 — Stage 3F now carves against `H4A`, not `H2`.** A positive relief layer sits
+> between Stage 2 and the carve: Stage 4A island relief (plate districts, knolls, massif apron),
+> implemented dump-first and not yet in the authority path
+> ([design](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md),
+> [revision R1](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md)). Three things follow for
+> Stage 3F, each measured in R1:
+>
+> - **The incision Stage 3F needs below Stage 1 never grows.** `R4A ≥ 0` raises the running minimum
+>   along a trajectory, so `max(0, H1 − min H4A)` is ≤ its value on `H2` — measured increase 0.000 m on
+>   all seven canonical seeds. What Stage 4A adds above Stage 1 is inside the carve allowance already
+>   written in `Stage3Field` (`max(0, above − floor) + CorridorIncisionMeters`).
+> - **The corridor depth budget applies to the single climb, not to a sum.** Stage 4A's own contract is
+>   `climb(R4A) ≤ CorridorIncisionMeters`, so a corridor crossing Stage 4A relief stays a T3 trough.
+> - **Massif-foot drainage is Stage 3F's (or Stage 4B's), not Stage 4A's.** R1 proves Stage 4A cannot
+>   dig a closed depression outside the massif influence zone, and measures 6 of 40 seeds with a
+>   0.33–2.32 m depression inside it — the inland-facing foot where the frozen Stage 2B flank meets a
+>   Stage 1 zero-slope ring. Frozen `H2` has one of its own on seed 1019. A strike trough along the
+>   massif foot is the landform; draining it is a carve question.
+> - One more measurement worth carrying: on `H2` alone, trajectory V5 of seed 110201 already needs
+>   8.57 m of incision below Stage 1, above the 7.2 m bound. That is a Stage 3C/3F matter, not Stage 4A's
+>   — the relief layer lowers it to 0.78 m.
 
 ---
 

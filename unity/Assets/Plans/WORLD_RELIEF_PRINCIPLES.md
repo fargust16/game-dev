@@ -44,6 +44,20 @@ below T3, above nothing, and therefore reads as corduroy rather than as landform
 random range, and a form may stack on another only if the parent is a strictly higher tier. T3 on
 T2, T2 on the island floor, T1 alone. Two levels of stacking maximum.
 
+**Amendment 2026-09-16 — T0 floor relief is ground, not a tier.** The rule as written left the island
+floor perfectly flat, and a flat floor is what made the baked island read as an extruded coastline: the
+70–110 m band held 0.1–7.8 % of land. Stage 4A adds *floor relief* — macro-plate districts (uplift 18 m,
+25 m on a world without a massif, 0.4–1.0 km² each, tops 0–5°, edges spread over 110–378 m of half-width),
+knolls on the raised districts, and an apron at the massif foot. It is **not** a fourth landform tier and
+must not become one: it has no wall, no flat-top-behind-a-scarp signature and no fixed height table — it
+is the ground's own long-wavelength variation, and what separates it from T2 is **slope**, not height. A
+T2 plateau is a flat shelf behind a wall; an 18 m district step spread over a few hundred metres is a
+ramp you walk up without noticing. The 2.5× separation rule still governs everything *standing on* the
+floor: the district step is ≥ 2.5 × the tallest knoll.
+See [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)
+§4 and [its revision R1](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md), which caps knoll
+height by the same slope budget that keeps the floor drainable (≈ 3–4 m instead of 4–7.2 m).
+
 ---
 
 ## 2. Differential erosion is what makes a cliff
