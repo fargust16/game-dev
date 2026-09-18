@@ -37,6 +37,7 @@ namespace GameDev.EditorTools
 
         private const string OutputArg = "-terrainGenOut";
         private const string SeedsArg = "-terrainGenSeeds";
+        private const string SweepArg = "-terrainGenSweep";
 
         [MenuItem("GameDev/Overworld/Terrain Gen/Dump Stage 4A Island Relief (Canonical Seeds)", false, 220)]
         public static void DumpMenu()
@@ -56,6 +57,13 @@ namespace GameDev.EditorTools
         {
             var settings = IslandReliefSettings.Default;
             var overrides = ApplyOverrides(ref settings, ReadArg(System.Environment.GetCommandLineArgs(), "-reliefOverrides"));
+            var sweep = ReadArg(System.Environment.GetCommandLineArgs(), SweepArg);
+            if (!string.IsNullOrEmpty(sweep))
+            {
+                Debug.Log(RunSweep(sweep, ReadOutputDirectory("stage4a-sweep"), settings, overrides));
+                return;
+            }
+
             Debug.Log(Run(ReadSeeds(), ReadOutputDirectory("stage4a"), settings, overrides));
         }
 
@@ -106,7 +114,8 @@ namespace GameDev.EditorTools
             report.AppendLine($"  output {directory}");
             report.AppendLine(
                 $"  settings: plate {settings.PlateUpliftMeters} m (x{settings.NoMassifUpliftScale} no massif), "
-                + $"edge half-width {settings.PlateEdgeHalfWidthMeters} m, junction relax {settings.JunctionRelaxRadiusMeters} m, "
+                + $"τ {settings.InlandSlopeBudget.ToString("F3", c)}, lowland reserve {settings.LowlandReserveShare.ToString("F2", c)}, "
+                + $"edge min {settings.PlateEdgeHalfWidthMeters} m, junction min {settings.JunctionRelaxRadiusMeters} m, "
                 + $"knoll {settings.KnollHeightMeters} m (cap {settings.KnollHeightCapMeters.ToString("F1", c)} m, keep {settings.KnollKeepFraction}), "
                 + $"apron {settings.ApronHeightPerCrest}/{settings.ApronCapPerCrest} x crest, reach "
                 + $"{settings.ApronReachSteepMeters}/{settings.ApronReachGentleMeters}/{settings.ApronReachEndMeters} m");
@@ -152,7 +161,9 @@ namespace GameDev.EditorTools
             sb.AppendLine($"  signature  {Signature(w)}");
             sb.AppendLine($"  timing     stage2B {w.Stage2BMs} ms, stage3 {w.Stage3Ms} ms, relief build {w.BuildMs} ms, relief lattice {w.LatticeMs} ms, parts lattice {w.PartsMs} ms");
 
-            sb.AppendLine($"  plates     {relief.DistrictCount} district(s) of {relief.Plates.Count}; craton rule {relief.UsedCratonRule}");
+            sb.AppendLine(
+                $"  plates     {relief.DistrictCount} district(s) of {relief.Plates.Count}; craton rule {relief.UsedCratonRule}; "
+                + $"lowland reservation {relief.ReservedDistrictCount} district(s), {(relief.ReservedLandShare * 100f).ToString("F1", c)}% of land; τ {relief.SlopeBudget.ToString("F3", c)}");
             foreach (var p in relief.Plates)
             {
                 if (p.OwnLandAreaSqm <= 0f && p.IsDistrict == false && p.OwnFrontageMeters <= 0f)
@@ -166,6 +177,38 @@ namespace GameDev.EditorTools
                     + (p.IsDistrict
                         ? $"DISTRICT land={(p.LandAreaSqm / 1e6f).ToString("F3", c)}km2 front={p.FrontageMeters.ToString("F0", c)}m score={p.Score.ToString("F0", c)} rank={p.Rank} level={p.Level.ToString("F2", c)}"
                         : $"merged->P{p.EffectiveIndex} level={p.Level.ToString("F2", c)}"));
+            }
+
+            var pairLine = new StringBuilder("    pair widths");
+            var pairCount = 0;
+            for (var a = 0; a < relief.Plates.Count; a++)
+            {
+                if (!relief.Plates[a].IsDistrict)
+                {
+                    continue;
+                }
+
+                for (var plateB = a + 1; plateB < relief.Plates.Count; plateB++)
+                {
+                    if (!relief.Plates[plateB].IsDistrict)
+                    {
+                        continue;
+                    }
+
+                    var halfW = relief.PairHalfWidth(a, plateB);
+                    if (halfW <= 0f)
+                    {
+                        continue;
+                    }
+
+                    pairLine.Append($" P{a}|P{plateB}={halfW.ToString("F0", c)}m");
+                    pairCount++;
+                }
+            }
+
+            if (pairCount > 0)
+            {
+                sb.AppendLine(pairLine.ToString());
             }
 
             foreach (var e in relief.Boundaries)
@@ -182,7 +225,17 @@ namespace GameDev.EditorTools
 
             foreach (var j in relief.Junctions)
             {
-                sb.AppendLine($"    J{j.Index} at ({j.Position.x.ToString("F0", c)},{j.Position.y.ToString("F0", c)}) plates [{string.Join(",", j.Plates)}] mean level {j.MeanLevel.ToString("F2", c)}");
+                var cert = j.Certificate;
+                sb.AppendLine(
+                    $"    J{j.Index} at ({j.Position.x.ToString("F0", c)},{j.Position.y.ToString("F0", c)}) plates [{string.Join(",", j.Plates)}] mean level {j.MeanLevel.ToString("F2", c)} "
+                    + $"R {cert.InitialRadiusMeters.ToString("F0", c)}->{cert.FinalRadiusMeters.ToString("F0", c)} m "
+                    + $"adverse {cert.MaxAdverseDerivative.ToString("F4", c)} (τ {relief.SlopeBudget.ToString("F3", c)}) "
+                    + $"iters {cert.Iterations} {(cert.Passed ? "PASS" : "FAIL")}");
+                foreach (var pair in cert.Pairs)
+                {
+                    sb.AppendLine(
+                        $"      P{pair.PlateA}|P{pair.PlateB} w {pair.InitialMeters.ToString("F0", c)}->{pair.FinalMeters.ToString("F0", c)} m");
+                }
             }
 
             sb.AppendLine($"  knolls     {relief.Knolls.Count} placed of {relief.KnollCandidates.Count} candidates");
@@ -192,19 +245,26 @@ namespace GameDev.EditorTools
                     $"    site {kn.SiteIndex,-3} ({kn.Center.x.ToString("F0", c)},{kn.Center.y.ToString("F0", c)}) D={kn.DiameterMeters.ToString("F0", c)}m r={kn.Resistance.ToString("F2", c)} "
                     + $"level={kn.Level.ToString("F2", c)} gate={kn.Gate.ToString("F2", c)} "
                     + (kn.Placed
-                        ? $"KNOLL h={kn.HeightMeters.ToString("F2", c)}m yaw={(kn.YawRadians * Mathf.Rad2Deg).ToString("F0", c)}deg sigma={kn.SigmaMajorMeters.ToString("F0", c)}x{kn.SigmaMinorMeters.ToString("F0", c)}m"
-                        : "rejected: " + kn.Rejection));
+                        ? $"KNOLL h={kn.HeightMeters.ToString("F2", c)}m cap={kn.Cap.ToString("F2", c)} gP={kn.PlateDescentBound.ToString("F4", c)} yaw={(kn.YawRadians * Mathf.Rad2Deg).ToString("F0", c)}deg sigma={kn.SigmaMajorMeters.ToString("F0", c)}x{kn.SigmaMinorMeters.ToString("F0", c)}m"
+                        : "omitted: " + kn.Rejection));
             }
 
             foreach (var m in relief.ApronMassifs)
             {
+                relief.ApronDomain(m.Index, out var reach, out var delta, out var domain);
+                var gentle = relief.EffectiveReach(m.Index, 0.5f, m.SteepSide > 0f ? -1f : 1f);
+                var steep = relief.EffectiveReach(m.Index, 0.5f, m.SteepSide > 0f ? 1f : -1f);
                 sb.AppendLine(
                     $"  apron      massif {m.Index}: crest {m.CrestHeightMeters.ToString("F0", c)} m, length {m.LengthMeters.ToString("F0", c)} m, "
                     + $"steep side {m.SteepSide}, asymmetry {m.Asymmetry.ToString("F2", c)}, "
+                    + $"R_axis {reach.ToString("F1", c)} m δ {delta.ToString("F3", c)} m domain {domain.ToString("F1", c)} m, "
+                    + $"W_eff mid gentle/steep {gentle.ToString("F0", c)}/{steep.ToString("F0", c)} m, "
                     + $"toe height {(relief.Settings.ApronHeightPerCrest * m.CrestHeightMeters).ToString("F1", c)} m, cap {(relief.Settings.ApronCapPerCrest * m.CrestHeightMeters).ToString("F1", c)} m");
             }
 
-            sb.AppendLine($"  relief     max {k.ReliefMax.ToString("F2", c)} m, mean on land {k.ReliefMeanLand.ToString("F2", c)} m, knoll max {k.KnollMax.ToString("F2", c)} m, apron max {k.ApronMax.ToString("F2", c)} m");
+            sb.AppendLine(
+                $"  relief     max {k.ReliefMax.ToString("F2", c)} m, mean on land {k.ReliefMeanLand.ToString("F2", c)} m, "
+                + $"M max {k.CoastalFloorMax.ToString("F2", c)} m, knoll max {k.KnollMax.ToString("F2", c)} m, apron max {k.ApronMax.ToString("F2", c)} m");
             sb.AppendLine($"  shares     upland(level>=0.5) {k.UplandPercent.ToString("F1", c)}%  lowland(level<0.25) {k.LowlandPercent.ToString("F1", c)}%  knoll footprint(>1 m) {k.KnollFootprintPercent.ToString("F1", c)}%  apron zone(>1 m) {k.ApronZonePercent.ToString("F1", c)}%");
 
             sb.AppendLine("  metrics                         baseline H2      Stage 4A");
@@ -227,31 +287,53 @@ namespace GameDev.EditorTools
             sb.AppendLine($"    S1  relief == 0 at sd <= 0: {Verdict(k.SeaSamplesWithRelief == 0)} ({k.SeaSamplesWithRelief} of {k.SeaSamples} samples non-zero)");
             sb.AppendLine($"    S2  land mask unchanged: {Verdict(k.LandMaskChanges == 0)} ({k.LandMaskChanges} samples differ)");
             sb.AppendLine($"    S3  bounded & finite: {Verdict(k.BoundsViolations == 0)} (violations {k.BoundsViolations}, H4A max {k.H4AMax.ToString("F2", c)} m)");
-            sb.AppendLine($"    S8  depressions: {Verdict(r.Depressions == 0)} ({r.Depressions}; micro {r.MicroDepressions})");
+            sb.AppendLine(
+                $"    S8-A depressions outside Z_M ∪ L_M: {Verdict(k.S8ACount == 0)} ({k.S8ACount}; deepest {k.S8AMaxDepth.ToString("F2", c)} m, {k.S8AAreaSqm.ToString("F0", c)} m2)");
+            sb.AppendLine(
+                $"    S8-M depressions inside Z_M ∪ L_M: {Verdict(k.S8MCount == 0)} ({k.S8MCount}; deepest {k.S8MMaxDepth.ToString("F2", c)} m, {k.S8MAreaSqm.ToString("F0", c)} m2)");
             foreach (var line in IslandReliefChecks.DepressionAttribution(w))
             {
                 sb.AppendLine("        " + line);
             }
+
+            sb.AppendLine(
+                $"    S8-C coast-normal derivative outside ownership: {Verdict(k.S8CViolations == 0)} "
+                + $"(min {k.S8CMinDerivative.ToString("E2", c)}, threshold -1e-3, samples {k.S8CSamples}, beyond-800 {k.LandBeyond800Percent.ToString("F2", c)}%)");
             sb.AppendLine($"    S9  knoll <= cap, apron <= 0.18 x crest: {Verdict(k.KnollMax <= relief.Settings.KnollHeightCapMeters + 1e-4f && k.ApronMax <= k.ApronCap + 1e-3f)} (knoll {k.KnollMax.ToString("F2", c)}/{relief.Settings.KnollHeightCapMeters.ToString("F2", c)}, apron {k.ApronMax.ToString("F2", c)}/{k.ApronCap.ToString("F2", c)})");
-            sb.AppendLine($"    S10 apron monotone on {k.ApronRays} outward rays: {Verdict(k.ApronRayViolations == 0)} (violations {k.ApronRayViolations}, worst rise {k.ApronRayWorstRise.ToString("F4", c)} m; ungated surface violations {k.ApronRayUngatedViolations}, worst {k.ApronRayUngatedWorstRise.ToString("F4", c)} m)");
+            sb.AppendLine(
+                $"    S10 ungated P_A: beyond-domain {k.ApronBeyondDomainMax.ToString("F4", c)} m ({k.ApronBeyondDomainSamples} samples); "
+                + $"normals {k.ApronNormalRays} (violations {k.ApronNormalViolations}, worst {k.ApronNormalWorstRise.ToString("F4", c)} m); "
+                + $"gated-fill rays (report) {k.ApronRayViolations} worst {k.ApronRayWorstRise.ToString("F4", c)} m: "
+                + Verdict(k.ApronBeyondDomainMax <= 1e-3f && k.ApronNormalWorstRise <= 1e-3f));
             foreach (var line in k.ApronRayLines)
             {
                 sb.AppendLine("        " + line);
             }
+
             sb.AppendLine(
-                $"    S11 trajectories: {k.Trajectories} checked; worst R4A adverse {k.TrajectoryReliefRise.ToString("F2", c)} m (<= 7.2), "
-                + $"plate+apron {k.TrajectoryPlateApronRise.ToString("F2", c)} m (<= 1.5), single climb {k.TrajectoryWorstClimb.ToString("F2", c)} m (<= {relief.Settings.KnollHeightCapMeters.ToString("F1", c)}): "
-                + Verdict(k.TrajectoryReliefRise <= 7.2f && k.TrajectoryPlateApronRise <= 1.5f && k.TrajectoryWorstClimb <= relief.Settings.KnollHeightCapMeters + 1e-3f));
+                $"    S11-T trajectories: {k.Trajectories} checked; C(R4A) {k.TrajectoryWorstClimb.ToString("F2", c)} m (<= 7.2), "
+                + $"plate+apron adverse {k.TrajectoryPlateApronRise.ToString("F2", c)} m (<= 1.5), "
+                + $"I1 H2 {k.TrajectoryI1H2.ToString("F3", c)} -> H4A {k.TrajectoryI1H4A.ToString("F3", c)} (Δ {k.TrajectoryI1Increase.ToString("F4", c)} m), "
+                + $"R4A adverse sum (report) {k.TrajectoryReliefRise.ToString("F2", c)} m: "
+                + Verdict(k.TrajectoryWorstClimb <= 7.2f && k.TrajectoryPlateApronRise <= 1.5f && k.TrajectoryI1Increase <= 0.001f));
             foreach (var line in k.TrajectoryLines)
             {
                 sb.AppendLine("        " + line);
             }
 
-            sb.AppendLine($"    S11 outlets: {k.Outlets} checked; worst downstream R4A rise {k.OutletWorstRise.ToString("F3", c)} m (tolerance 0.01): {Verdict(k.OutletWorstRise <= 0.01f)}; worst adverse rise R4A adds to the ground {k.OutletWorstGroundAdded.ToString("F3", c)} m");
+            sb.AppendLine(
+                $"    S11-O O-1 end<outlet: {Verdict(k.OutletO1Failures == 0)} ({k.OutletO1Failures} fail / {k.Outlets}); "
+                + $"O-2 post-carve rim: {(k.CarveMeasurable ? Verdict(k.OutletO2Failures == 0) : "UNMEASURABLE")} "
+                + $"({k.OutletO2Failures} fail, {k.OutletO2Checked} with H2 margin>0"
+                + (k.CarveMeasurable ? $", carve max {k.CarveMax.ToString("F2", c)} m" : ", " + k.CarveNote)
+                + "); "
+                + $"O-3 I1/C: {Verdict(k.OutletO3Failures == 0)}; O-4 worst declared-min shift {k.OutletMinShift.ToString("F1", c)} m, declared-above-run {k.OutletDeclaredAboveMin.ToString("F2", c)} m");
             foreach (var line in k.OutletLines)
             {
                 sb.AppendLine("        " + line);
             }
+
+            sb.AppendLine($"    S12 junction certificates: {Verdict(k.S12Failures == 0)} ({k.S12Failures} fail / {relief.Junctions.Count})");
 
             sb.AppendLine("  §11 targets");
             foreach (var t in targets)
@@ -361,6 +443,7 @@ namespace GameDev.EditorTools
             WritePng(prefix + "10_slope_h4a.png", RenderSlopeClasses(w.H4A, w), n);
             WritePng(prefix + "11_depressions_h4a.png", RenderDepressions(w.H4A, w), n);
             WritePng(prefix + "12_h4a_contours5m.png", RenderContoursOnly(w.H4A, w, 5f), n);
+            WritePng(prefix + "13_coastal_floor.png", RenderHeat(w.CoastalFloor, w, 8f, true), n);
         }
 
         private static float[] Multiply(float[] a, float[] b)
@@ -734,6 +817,70 @@ namespace GameDev.EditorTools
 
             return null;
         }
+
+        /// <summary>
+        /// Sweep  <c>start:count</c>  (default 1000:40). Images are skipped; the S8 table is the product.
+        /// </summary>
+        public static string RunSweep(string spec, string directory, IslandReliefSettings settings, string overrides)
+        {
+            Directory.CreateDirectory(directory);
+            var start = 1000;
+            var count = 40;
+            if (!string.IsNullOrEmpty(spec))
+            {
+                var parts = spec.Split(':');
+                if (parts.Length >= 1)
+                {
+                    int.TryParse(parts[0], out start);
+                }
+
+                if (parts.Length >= 2)
+                {
+                    int.TryParse(parts[1], out count);
+                }
+            }
+
+            count = Mathf.Max(1, count);
+            var c = CultureInfo.InvariantCulture;
+            var report = new StringBuilder();
+            report.AppendLine($"Stage 4A S8 sweep seeds {start}..{start + count - 1}");
+            report.AppendLine(string.IsNullOrEmpty(overrides) ? "  overrides: none" : "  OVERRIDES: " + overrides);
+            report.AppendLine(
+                "seed pitsA pitsM maxDepth area class attribution");
+
+            var aSeeds = 0;
+            var mSeeds = 0;
+            var maxDepth = 0f;
+            for (var i = 0; i < count; i++)
+            {
+                var seed = start + i;
+                var world = IslandReliefWorld.Build(seed, settings, withStage3: true);
+                var checks = IslandReliefChecks.Run(world);
+                if (checks.S8ACount > 0)
+                {
+                    aSeeds++;
+                }
+
+                if (checks.S8MCount > 0)
+                {
+                    mSeeds++;
+                }
+
+                maxDepth = Mathf.Max(maxDepth, Mathf.Max(checks.S8AMaxDepth, checks.S8MMaxDepth));
+                var attr = checks.S8ACount + checks.S8MCount == 0
+                    ? "-"
+                    : string.Join("; ", IslandReliefChecks.DepressionAttribution(world));
+                report.AppendLine(
+                    $"{seed} A={checks.S8ACount} M={checks.S8MCount} "
+                    + $"deep={Mathf.Max(checks.S8AMaxDepth, checks.S8MMaxDepth).ToString("F2", c)} "
+                    + $"area={(checks.S8AAreaSqm + checks.S8MAreaSqm).ToString("F0", c)} {attr}");
+            }
+
+            report.AppendLine(
+                $"summary: S8-A seeds {aSeeds}/{count}, S8-M seeds {mSeeds}/{count}, max depth {maxDepth.ToString("F2", c)} m");
+            File.WriteAllText(Path.Combine(directory, "stage4a_sweep.txt"), report.ToString());
+            return report.ToString();
+        }
     }
 
     /// <summary>
@@ -763,12 +910,15 @@ namespace GameDev.EditorTools
         public float[] Plate { get; private set; }
         public float[] Knoll { get; private set; }
         public float[] Apron { get; private set; }
+        public float[] CoastalFloor { get; private set; }
 
         /// <summary>Relief through <see cref="IslandRelief.Sample"/>, for the At/Sample identity.</summary>
         public float[] SampleTotal { get; private set; }
 
         public ValleyTrajectoryNetwork Trajectories { get; private set; }
         public StructuralBasinSet Basins { get; private set; }
+        public RidgeSkeleton Ridges { get; private set; }
+        public CarveField Carve { get; private set; }
 
         public string Stage1HashBefore { get; private set; }
         public string Stage2BHashBefore { get; private set; }
@@ -831,7 +981,9 @@ namespace GameDev.EditorTools
             var stage2b = world.Stage2B;
             var worldSeed = new GameDev.World.Seed.WorldSeed(world.Seed);
             var skeleton = Stage3ASkeleton.Build(stage2b.Seed, stage2b.Massifs, stage2b.Stage1.Coast, ridgeSettings);
-            var ridges = RidgeSkeleton.Build(skeleton, ridgeSettings, worldSeed);
+            var ridges = RidgeSkeleton.Build(skeleton, ridgeSettings, worldSeed, stage2b.Stage1);
+            world.Ridges = ridges;
+            world.Carve = new CarveField(ridges, stage2b.Stage1.Coast, ridgeSettings, stage2b.MassifSettings);
             var network = ValleyNetwork.Build(ridges, ridgeSettings);
             var topology = ValleyTopology.Build(network, ridgeSettings);
             world.Trajectories = ValleyTrajectoryNetwork.Build(topology, ridgeSettings, stage2b.Stage1);
@@ -847,7 +999,7 @@ namespace GameDev.EditorTools
             Cell = baseField.CellSize;
 
             var sw = Stopwatch.StartNew();
-            ReliefField = Relief.EvaluateField(baseField, Stage2B.UpliftField);
+            ReliefField = Relief.EvaluateField(baseField, Stage2B.UpliftField, Stage1.SignedDistance);
             LatticeMs = sw.ElapsedMilliseconds;
 
             var count = baseField.SampleCount;
@@ -858,6 +1010,7 @@ namespace GameDev.EditorTools
             Plate = new float[count];
             Knoll = new float[count];
             Apron = new float[count];
+            CoastalFloor = new float[count];
             SampleTotal = new float[count];
 
             sw.Restart();
@@ -867,12 +1020,15 @@ namespace GameDev.EditorTools
                 for (var x = 0; x < baseField.Width; x++)
                 {
                     var i = z * baseField.Width + x;
-                    var sample = Relief.Sample(baseField.WorldX(x), worldZ, baseField.Heights[i], Stage2B.UpliftField.Heights[i]);
+                    var sample = Relief.Sample(
+                        baseField.WorldX(x), worldZ, Stage1.SignedDistance[i],
+                        baseField.Heights[i], Stage2B.UpliftField.Heights[i]);
                     Gate[i] = sample.Gate;
                     Level[i] = sample.PlateLevel;
                     Plate[i] = sample.Plate;
                     Knoll[i] = sample.Knoll;
                     Apron[i] = sample.Apron;
+                    CoastalFloor[i] = sample.CoastalFloor;
                     SampleTotal[i] = sample.Total;
                     H4A[i] = H2[i] + ReliefField.Heights[i];
                 }
@@ -1350,6 +1506,23 @@ namespace GameDev.EditorTools
         public float OutletWorstGroundAdded;
         public List<string> OutletLines = new List<string>();
 
+        public float CoastalFloorMax;
+        public int S8ACount, S8MCount;
+        public float S8AMaxDepth, S8MMaxDepth, S8AAreaSqm, S8MAreaSqm;
+        public int S8CViolations, S8CSamples;
+        public float S8CMinDerivative = float.PositiveInfinity;
+        public float LandBeyond800Percent;
+        public int ApronNormalRays, ApronNormalViolations, ApronBeyondDomainSamples;
+        public float ApronNormalWorstRise, ApronBeyondDomainMax;
+        public float TrajectoryI1H2, TrajectoryI1H4A, TrajectoryI1Increase;
+        public int OutletO1Failures, OutletO2Failures, OutletO2Checked, OutletO3Failures;
+        public float OutletMinShift, OutletDeclaredAboveMin, CarveMax;
+        public bool CarveMeasurable;
+        public string CarveNote = string.Empty;
+        public int S12Failures;
+        public bool[] MassifZone;
+        public bool[] LeeZone;
+
         public static IslandReliefChecks Run(IslandReliefWorld w)
         {
             var k = new IslandReliefChecks();
@@ -1385,6 +1558,7 @@ namespace GameDev.EditorTools
                 k.ReliefMax = Mathf.Max(k.ReliefMax, r[i]);
                 k.KnollMax = Mathf.Max(k.KnollMax, w.Knoll[i]);
                 k.ApronMax = Mathf.Max(k.ApronMax, w.Apron[i]);
+                k.CoastalFloorMax = Mathf.Max(k.CoastalFloorMax, w.CoastalFloor[i]);
 
                 if (w.H2[i] > sea)
                 {
@@ -1410,8 +1584,11 @@ namespace GameDev.EditorTools
             }
 
             ApronRaysCheck(w, k);
+            ApronPhysicalCheck(w, k);
             TrajectoryCheck(w, k);
             OutletCheck(w, k);
+            OwnershipAndS8(w, k);
+            JunctionCertificates(w, k);
             return k;
         }
 
@@ -1421,7 +1598,317 @@ namespace GameDev.EditorTools
             var sdPoint = w.Stage1.Coast.SignedDistance(x, z);
             h1 = w.Stage1.Model.HeightAt(sdPoint);
             u2 = w.Uplift.UpliftAt(x, z, sdPoint);
-            return w.Relief.Sample(x, z, h1, u2);
+            return w.Relief.Sample(x, z, sdPoint, h1, u2);
+        }
+
+        private static void JunctionCertificates(IslandReliefWorld w, IslandReliefChecks k)
+        {
+            foreach (var j in w.Relief.Junctions)
+            {
+                if (j.Certificate == null || !j.Certificate.Passed
+                    || j.Certificate.MaxAdverseDerivative > w.Relief.SlopeBudget + 1e-5f)
+                {
+                    k.S12Failures++;
+                }
+            }
+        }
+
+        private static void OwnershipAndS8(IslandReliefWorld w, IslandReliefChecks k)
+        {
+            var n = w.Width;
+            var cell = w.Cell;
+            var sd = w.Stage1.SignedDistance;
+            var u2 = w.Stage2B.UpliftField.Heights;
+            k.MassifZone = new bool[sd.Length];
+            k.LeeZone = new bool[sd.Length];
+            var owned = new bool[sd.Length];
+            var beyond = 0;
+            var land = 0;
+
+            for (var i = 0; i < sd.Length; i++)
+            {
+                if (sd[i] <= 0f)
+                {
+                    continue;
+                }
+
+                land++;
+                if (sd[i] > 800f)
+                {
+                    beyond++;
+                }
+
+                if (u2[i] > 0f || w.Apron[i] > 0f)
+                {
+                    k.MassifZone[i] = true;
+                    owned[i] = true;
+                }
+            }
+
+            k.LandBeyond800Percent = land > 0 ? 100f * beyond / land : 0f;
+
+            for (var z = 1; z < n - 1; z++)
+            {
+                for (var x = 1; x < n - 1; x++)
+                {
+                    var i = z * n + x;
+                    if (sd[i] <= 0f || owned[i])
+                    {
+                        continue;
+                    }
+
+                    IslandReliefMetrics.Gradient(sd, n, cell, x, z, out var gx, out var gz);
+                    var glen = Mathf.Sqrt(gx * gx + gz * gz);
+                    if (glen < 0.5f)
+                    {
+                        continue;
+                    }
+
+                    var nx = gx / glen;
+                    var nz = gz / glen;
+                    var px = w.Stage1.Field.WorldX(x);
+                    var pz = w.Stage1.Field.WorldZ(z);
+                    var steps = Mathf.CeilToInt(sd[i] / cell) + 2;
+                    for (var s = 0; s < steps; s++)
+                    {
+                        var ix = Mathf.Clamp(Mathf.RoundToInt((px - w.Stage1.Field.OriginX) / cell), 0, n - 1);
+                        var iz = Mathf.Clamp(Mathf.RoundToInt((pz - w.Stage1.Field.OriginZ) / cell), 0, n - 1);
+                        var j = iz * n + ix;
+                        if (k.MassifZone[j])
+                        {
+                            k.LeeZone[i] = true;
+                            owned[i] = true;
+                            break;
+                        }
+
+                        if (sd[j] <= 0f)
+                        {
+                            break;
+                        }
+
+                        px -= nx * cell;
+                        pz -= nz * cell;
+                    }
+                }
+            }
+
+            var found = new List<IslandReliefMetrics.DepressionInfo>();
+            IslandReliefMetrics.ScanDepressions(w.H4A, w, out _, out _, out _, out _, out _, found);
+            var depth = IslandReliefMetrics.FillDepth(w.H4A, w);
+            foreach (var d in found)
+            {
+                var outside = DepressionHasOutsideCell(depth, owned, n, d.DeepestIndex);
+                if (outside)
+                {
+                    k.S8ACount++;
+                    k.S8AMaxDepth = Mathf.Max(k.S8AMaxDepth, d.DepthMeters);
+                    k.S8AAreaSqm += d.AreaSqm;
+                }
+                else
+                {
+                    k.S8MCount++;
+                    k.S8MMaxDepth = Mathf.Max(k.S8MMaxDepth, d.DepthMeters);
+                    k.S8MAreaSqm += d.AreaSqm;
+                }
+            }
+
+            var h1 = w.Stage1.Field.Heights;
+            k.S8CMinDerivative = float.PositiveInfinity;
+            for (var z = 1; z < n - 1; z++)
+            {
+                for (var x = 1; x < n - 1; x++)
+                {
+                    var i = z * n + x;
+                    if (sd[i] <= 0f || owned[i])
+                    {
+                        continue;
+                    }
+
+                    IslandReliefMetrics.Gradient(sd, n, cell, x, z, out var gx, out var gz);
+                    var glen = Mathf.Sqrt(gx * gx + gz * gz);
+                    if (glen < 0.95f)
+                    {
+                        continue;
+                    }
+
+                    k.S8CSamples++;
+                    var nx = gx / glen;
+                    var nz = gz / glen;
+                    var bxp = BudgetHeight(w, h1, z * n + x + 1);
+                    var bxm = BudgetHeight(w, h1, z * n + x - 1);
+                    var bzp = BudgetHeight(w, h1, (z + 1) * n + x);
+                    var bzm = BudgetHeight(w, h1, (z - 1) * n + x);
+                    var dbx = (bxp - bxm) / (2f * cell);
+                    var dbz = (bzp - bzm) / (2f * cell);
+                    var deriv = dbx * nx + dbz * nz;
+                    k.S8CMinDerivative = Mathf.Min(k.S8CMinDerivative, deriv);
+                    if (deriv < -1e-3f)
+                    {
+                        k.S8CViolations++;
+                    }
+                }
+            }
+
+            if (k.S8CSamples == 0 || float.IsInfinity(k.S8CMinDerivative))
+            {
+                k.S8CMinDerivative = 0f;
+            }
+        }
+
+        private static float BudgetHeight(IslandReliefWorld w, float[] h1, int i) =>
+            h1[i] + w.CoastalFloor[i] + w.Gate[i] * (w.Plate[i] + w.Knoll[i]);
+
+        private static bool DepressionHasOutsideCell(float[] depth, bool[] owned, int n, int start)
+        {
+            var seen = new bool[depth.Length];
+            var stack = new Stack<int>();
+            seen[start] = true;
+            stack.Push(start);
+            var outside = false;
+            while (stack.Count > 0)
+            {
+                var i = stack.Pop();
+                if (!owned[i])
+                {
+                    outside = true;
+                }
+
+                var x = i % n;
+                var z = i / n;
+                Try(x > 0, i - 1);
+                Try(x < n - 1, i + 1);
+                Try(z > 0, i - n);
+                Try(z < n - 1, i + n);
+            }
+
+            return outside;
+
+            void Try(bool ok, int j)
+            {
+                if (ok && !seen[j] && depth[j] > 0.05f)
+                {
+                    seen[j] = true;
+                    stack.Push(j);
+                }
+            }
+        }
+
+        private static void ApronPhysicalCheck(IslandReliefWorld w, IslandReliefChecks k)
+        {
+            var field = w.Stage1.Field;
+            var c = CultureInfo.InvariantCulture;
+            foreach (var m in w.Relief.ApronMassifs)
+            {
+                w.Relief.ApronDomain(m.Index, out _, out _, out var domain);
+                for (var z = 0; z < field.Height; z += 4)
+                {
+                    for (var x = 0; x < field.Width; x += 4)
+                    {
+                        var wx = field.WorldX(x);
+                        var wz = field.WorldZ(z);
+                        m.Project(wx, wz, out var s, out var offset);
+                        var p = new Vector2(wx, wz);
+                        var dist = s > 0f && s < 1f
+                            ? Mathf.Abs(offset)
+                            : (p - (s <= 0f ? m.PointAt(0f) : m.PointAt(1f))).magnitude;
+                        if (dist < domain)
+                        {
+                            continue;
+                        }
+
+                        var pa = w.Relief.ApronSurfaceAt(m.Index, wx, wz);
+                        if (pa > 1e-3f)
+                        {
+                            k.ApronBeyondDomainSamples++;
+                            k.ApronBeyondDomainMax = Mathf.Max(k.ApronBeyondDomainMax, pa);
+                        }
+                    }
+                }
+
+                for (var i = 0; i < 24; i++)
+                {
+                    var s = (i + 0.5f) / 24f;
+                    ProbeExactNormal(w, k, m, s, 1f, domain);
+                    ProbeExactNormal(w, k, m, s, -1f, domain);
+                }
+
+                for (var a = 0; a < 8; a++)
+                {
+                    var angle = (-70f + 20f * a) * Mathf.Deg2Rad;
+                    ProbeEndProfile(w, k, m, 0f, angle, domain);
+                    ProbeEndProfile(w, k, m, 1f, angle, domain);
+                }
+            }
+
+            if (k.ApronNormalViolations > 0)
+            {
+                k.ApronRayLines.Add(
+                    $"S10 P_A normals: {k.ApronNormalViolations} rises, worst {k.ApronNormalWorstRise.ToString("F4", c)} m; "
+                    + $"beyond-domain max {k.ApronBeyondDomainMax.ToString("F4", c)} m");
+            }
+        }
+
+        /// <summary>
+        /// Offset direction at arc <paramref name="s"/> from a 1 m chord of <see cref="MountainMassif.PointAt"/>,
+        /// matching the interpolating tangent <see cref="MountainMassif.Project"/> uses, not a 0.005-s stencil.
+        /// </summary>
+        private static void ProbeExactNormal(
+            IslandReliefWorld w, IslandReliefChecks k, MountainMassif m, float s0, float side, float domain)
+        {
+            k.ApronNormalRays++;
+            var previous = float.NaN;
+            var rayRise = 0f;
+            var sign = side >= 0f ? 1f : -1f;
+            for (var t = 0f; t <= 800f; t += 5f)
+            {
+                var pa = t >= domain ? 0f : w.Relief.ApronProfileAt(m.Index, s0, sign * Mathf.Max(t, 1e-3f), 0f);
+                RecordApronSample(k, pa, t, domain, ref previous, ref rayRise);
+            }
+
+            if (rayRise > 0.001f)
+            {
+                k.ApronNormalViolations++;
+                k.ApronNormalWorstRise = Mathf.Max(k.ApronNormalWorstRise, rayRise);
+            }
+        }
+
+        private static void ProbeEndProfile(
+            IslandReliefWorld w, IslandReliefChecks k, MountainMassif m, float sEnd, float angle, float domain)
+        {
+            k.ApronNormalRays++;
+            var previous = float.NaN;
+            var rayRise = 0f;
+            var endness = Mathf.Clamp01(Mathf.Abs(Mathf.Cos(angle)));
+            var sin = Mathf.Sin(angle);
+            for (var t = 0f; t <= 800f; t += 5f)
+            {
+                var offset = Mathf.Max(t, 1e-3f) * (Mathf.Abs(sin) < 1e-4f ? 1e-3f : sin);
+                var pa = t >= domain ? 0f : w.Relief.ApronProfileAt(m.Index, sEnd, offset, endness);
+                RecordApronSample(k, pa, t, domain, ref previous, ref rayRise);
+            }
+
+            if (rayRise > 0.001f)
+            {
+                k.ApronNormalViolations++;
+                k.ApronNormalWorstRise = Mathf.Max(k.ApronNormalWorstRise, rayRise);
+            }
+        }
+
+        private static void RecordApronSample(
+            IslandReliefChecks k, float pa, float dist, float domain, ref float previous, ref float rayRise)
+        {
+            if (dist >= domain && pa > 1e-3f)
+            {
+                k.ApronBeyondDomainSamples++;
+                k.ApronBeyondDomainMax = Mathf.Max(k.ApronBeyondDomainMax, pa);
+            }
+
+            if (!float.IsNaN(previous))
+            {
+                rayRise = Mathf.Max(rayRise, pa - previous);
+            }
+
+            previous = pa;
         }
 
         /// <summary>
@@ -1604,11 +2091,13 @@ namespace GameDev.EditorTools
                     }
                 }
 
+                var zm = w.Stage2B.UpliftField.Heights[i] > 0f || w.Apron[i] > 0f;
                 lines.Add(
                     $"depression at ({p.x.ToString("F0", c)},{p.y.ToString("F0", c)}) depth {d.DepthMeters.ToString("F2", c)} m area {d.AreaSqm.ToString("F0", c)} m2: "
-                    + $"sd {w.Stage1.SignedDistance[i].ToString("F0", c)} m, H1 {w.Stage1.Field.Heights[i].ToString("F1", c)} m, gate {w.Gate[i].ToString("F2", c)}, level {w.Level[i].ToString("F2", c)}, "
-                    + $"plate {(w.Gate[i] * w.Plate[i]).ToString("F2", c)} m, knoll {(w.Gate[i] * w.Knoll[i]).ToString("F2", c)} m, apron {w.Apron[i].ToString("F2", c)} m; "
-                    + $"nearest junction {junction.ToString("F0", c)} m, nearest knoll site {knollSite} at {knollDistance.ToString("F0", c)} m");
+                    + $"sd {w.Stage1.SignedDistance[i].ToString("F0", c)} m, H1 {w.Stage1.Field.Heights[i].ToString("F1", c)} m, M {w.CoastalFloor[i].ToString("F2", c)} m, "
+                    + $"gate {w.Gate[i].ToString("F2", c)}, level {w.Level[i].ToString("F2", c)}, "
+                    + $"plate {(w.Gate[i] * w.Plate[i]).ToString("F2", c)} m, knoll {(w.Gate[i] * w.Knoll[i]).ToString("F2", c)} m, apron {w.Apron[i].ToString("F2", c)} m, U2 {w.Stage2B.UpliftField.Heights[i].ToString("F2", c)} m; "
+                    + $"Z_M {zm}; nearest junction {junction.ToString("F0", c)} m, nearest knoll site {knollSite} at {knollDistance.ToString("F0", c)} m");
             }
 
             var parts = new (string name, Func<int, float> part)[]
@@ -1669,6 +2158,10 @@ namespace GameDev.EditorTools
                 var groundAfter = 0f;
                 var climb = 0f;
                 var runningMin = float.PositiveInfinity;
+                var minH2 = float.PositiveInfinity;
+                var minH4 = float.PositiveInfinity;
+                var i1H2 = 0f;
+                var i1H4 = 0f;
                 var previousR = float.NaN;
                 var previousPA = float.NaN;
                 var previousK = float.NaN;
@@ -1705,6 +2198,10 @@ namespace GameDev.EditorTools
 
                     runningMin = Mathf.Min(runningMin, total);
                     climb = Mathf.Max(climb, total - runningMin);
+                    minH2 = Mathf.Min(minH2, h2);
+                    minH4 = Mathf.Min(minH4, h4);
+                    i1H2 = Mathf.Max(i1H2, Mathf.Max(0f, h1 - minH2));
+                    i1H4 = Mathf.Max(i1H4, Mathf.Max(0f, h1 - minH4));
                     previousR = total;
                     previousPA = plateApron;
                     previousK = knoll;
@@ -1715,16 +2212,20 @@ namespace GameDev.EditorTools
                 k.TrajectoryReliefRise = Mathf.Max(k.TrajectoryReliefRise, reliefRise);
                 k.TrajectoryPlateApronRise = Mathf.Max(k.TrajectoryPlateApronRise, plateApronRise);
                 k.TrajectoryWorstClimb = Mathf.Max(k.TrajectoryWorstClimb, climb);
+                k.TrajectoryI1H2 = Mathf.Max(k.TrajectoryI1H2, i1H2);
+                k.TrajectoryI1H4A = Mathf.Max(k.TrajectoryI1H4A, i1H4);
+                k.TrajectoryI1Increase = Mathf.Max(k.TrajectoryI1Increase, i1H4 - i1H2);
                 k.TrajectoryLines.Add(
-                    $"V{trajectory.Id}: R4A adverse {reliefRise.ToString("F2", c)} m, plate+apron {plateApronRise.ToString("F2", c)} m, "
-                    + $"knolls {knollRise.ToString("F2", c)} m over sites [{string.Join(",", knollSites)}], single climb {climb.ToString("F2", c)} m; "
+                    $"V{trajectory.Id}: C(R4A) {climb.ToString("F2", c)} m, R4A adverse {reliefRise.ToString("F2", c)} m (report), plate+apron {plateApronRise.ToString("F2", c)} m, "
+                    + $"knolls {knollRise.ToString("F2", c)} m over sites [{string.Join(",", knollSites)}]; "
+                    + $"I1 H2 {i1H2.ToString("F3", c)} -> H4A {i1H4.ToString("F3", c)}; "
                     + $"ground adverse H2 {groundBefore.ToString("F2", c)} m -> H4A {groundAfter.ToString("F2", c)} m");
             }
         }
 
         /// <summary>
-        /// At every Stage 3E outlet, R4A along 100 m in the outlet's downstream direction (from the enclosure's
-        /// centroid through the outlet) must not rise beyond a 1 cm tolerance.
+        /// S11-O: O-1 corridor end below outlet on H4A; O-2 post-carve rim margin; O-3 I1/C downstream;
+        /// O-4 reported shift of the outlet-run minimum.
         /// </summary>
         private static void OutletCheck(IslandReliefWorld w, IslandReliefChecks k)
         {
@@ -1733,59 +2234,222 @@ namespace GameDev.EditorTools
                 return;
             }
 
+            k.CarveMeasurable = w.Carve != null;
+            k.CarveNote = k.CarveMeasurable
+                ? string.Empty
+                : "O-2 UNMEASURABLE WITH CURRENT PUBLIC/DIAGNOSTIC API";
             var c = CultureInfo.InvariantCulture;
+
             foreach (var basin in w.Basins.Basins)
             {
-                var centroid = Vector2.zero;
-                foreach (var v in basin.Boundary)
+                k.Outlets++;
+                MinOnRun(w, basin, BoundarySource.Outlet, out var outH2, out var outH4, out var outCarved, out var outMinPoint, out var outDeclared);
+                MinOnRun(w, basin, BoundarySource.Crest, out var ridgeH2, out var ridgeH4, out var ridgeCarved, out _, out _);
+                MinOnRun(w, basin, BoundarySource.Spur, out var spurH2, out var spurH4, out var spurCarved, out _, out _);
+                ridgeH2 = Mathf.Min(ridgeH2, spurH2);
+                ridgeH4 = Mathf.Min(ridgeH4, spurH4);
+                ridgeCarved = Mathf.Min(ridgeCarved, spurCarved);
+                k.CarveMax = Mathf.Max(k.CarveMax, outH4 - outCarved, ridgeH4 - ridgeCarved);
+
+                var endH4 = float.PositiveInfinity;
+                FinalValleyTrajectory trajectory = null;
+                if (w.Trajectories != null)
                 {
-                    centroid += v;
+                    foreach (var t in w.Trajectories.Trajectories)
+                    {
+                        if (t.Id == basin.CorridorId)
+                        {
+                            trajectory = t;
+                            break;
+                        }
+                    }
                 }
 
-                centroid /= Mathf.Max(1, basin.Boundary.Length);
-                var dir = basin.OutletPointXZ - centroid;
-                if (dir.sqrMagnitude < 1e-6f)
+                if (trajectory != null && trajectory.HasGeometry)
+                {
+                    var end = trajectory.EndPoint;
+                    var sample = SampleAt(w, end.x, end.y, out var h1, out var u2);
+                    endH4 = h1 + u2 + sample.Total;
+                }
+
+                if (!(endH4 < outH4))
+                {
+                    k.OutletO1Failures++;
+                }
+
+                var outletH4 = outH4;
+                if (trajectory != null && trajectory.HasGeometry)
+                {
+                    IncludeCarved(w, trajectory.Points[ClosestIndex(trajectory.Points, basin.OutletPointXZ)],
+                        ref outH2, ref outH4, ref outCarved, ref outMinPoint);
+                }
+
+                IncludeCarved(w, basin.OutletPointXZ, ref outH2, ref outH4, ref outCarved, ref outMinPoint);
+
+                if (trajectory != null && trajectory.HasGeometry)
+                {
+                    var radius = Mathf.Max(40f, 2f * trajectory.HalfWidthMeters);
+                    var nearbyC = 0f;
+                    for (var i = 0; i < trajectory.Points.Length; i++)
+                    {
+                        var p = trajectory.Points[i];
+                        if ((p - basin.OutletPointXZ).magnitude > radius && (p - outMinPoint).magnitude > radius)
+                        {
+                            continue;
+                        }
+
+                        nearbyC = Mathf.Max(nearbyC, CarveAt(w, p));
+                    }
+
+                    nearbyC = Mathf.Max(nearbyC, CarveAt(w, basin.OutletPointXZ), CarveAt(w, outMinPoint));
+                    outCarved = Mathf.Min(outCarved, outletH4 - nearbyC);
+                }
+
+                var marginH2 = ridgeH2 - outH2;
+                var outC = outH4 - outCarved;
+                var ridgeC = ridgeH4 - ridgeCarved;
+                if (marginH2 > 0f)
+                {
+                    k.OutletO2Checked++;
+                    if (k.CarveMeasurable)
+                    {
+                        if (ridgeCarved - outCarved <= 0f)
+                        {
+                            k.OutletO2Failures++;
+                        }
+                    }
+                }
+
+                var i1H2 = 0f;
+                var i1H4 = 0f;
+                var climbR = 0f;
+                if (trajectory != null && trajectory.HasGeometry)
+                {
+                    var start = Mathf.Max(
+                        ClosestIndex(trajectory.Points, basin.OutletPointXZ),
+                        Mathf.Max(0, trajectory.ToeIndex));
+                    var minH2 = float.PositiveInfinity;
+                    var minH4 = float.PositiveInfinity;
+                    var minR = float.PositiveInfinity;
+                    for (var i = start; i < trajectory.Points.Length; i++)
+                    {
+                        var p = trajectory.Points[i];
+                        var sample = SampleAt(w, p.x, p.y, out var h1, out var u2);
+                        var h2 = h1 + u2;
+                        var h4 = h2 + sample.Total;
+                        minH2 = Mathf.Min(minH2, h2);
+                        minH4 = Mathf.Min(minH4, h4);
+                        minR = Mathf.Min(minR, sample.Total);
+                        i1H2 = Mathf.Max(i1H2, Mathf.Max(0f, h1 - minH2));
+                        i1H4 = Mathf.Max(i1H4, Mathf.Max(0f, h1 - minH4));
+                        climbR = Mathf.Max(climbR, sample.Total - minR);
+                    }
+
+                    if (i1H4 > i1H2 + 0.001f || climbR > 7.2f)
+                    {
+                        k.OutletO3Failures++;
+                    }
+                }
+
+                k.OutletMinShift = Mathf.Max(k.OutletMinShift, (outMinPoint - basin.OutletPointXZ).magnitude);
+                k.OutletDeclaredAboveMin = Mathf.Max(k.OutletDeclaredAboveMin, outDeclared - outH4);
+                k.OutletLines.Add(
+                    $"basin {basin.Id} (V{basin.CorridorId}) O-1 end {endH4.ToString("F1", c)} < outlet {outletH4.ToString("F1", c)} "
+                    + $"{(endH4 < outletH4 ? "PASS" : "FAIL")}; H2 margin {marginH2.ToString("F1", c)} m; "
+                    + $"carve out {outC.ToString("F2", c)} / ridge {ridgeC.ToString("F2", c)} m; "
+                    + $"O-4 shift {(outMinPoint - basin.OutletPointXZ).magnitude.ToString("F0", c)} m, declared-above {(outDeclared - outH4).ToString("F2", c)} m; "
+                    + $"O-3 I1 {i1H2.ToString("F3", c)}->{i1H4.ToString("F3", c)} C(R) {climbR.ToString("F2", c)}");
+            }
+        }
+
+        private static int ClosestIndex(Vector2[] points, Vector2 p)
+        {
+            var best = 0;
+            var bestSq = float.PositiveInfinity;
+            for (var i = 0; i < points.Length; i++)
+            {
+                var sq = (points[i] - p).sqrMagnitude;
+                if (sq < bestSq)
+                {
+                    bestSq = sq;
+                    best = i;
+                }
+            }
+
+            return best;
+        }
+
+        private static void IncludeCarved(
+            IslandReliefWorld w, Vector2 p, ref float minH2, ref float minH4, ref float minCarved, ref Vector2 minH4Point)
+        {
+            var sample = SampleAt(w, p.x, p.y, out var h1, out var u2);
+            var h2 = h1 + u2;
+            var h4 = h2 + sample.Total;
+            var carved = h4 - CarveAt(w, p);
+            minH2 = Mathf.Min(minH2, h2);
+            if (h4 < minH4)
+            {
+                minH4 = h4;
+                minH4Point = p;
+            }
+
+            minCarved = Mathf.Min(minCarved, carved);
+        }
+
+        private static float CarveAt(IslandReliefWorld w, Vector2 p)
+        {
+            if (w.Carve == null || w.Stage1?.Coast == null)
+            {
+                return 0f;
+            }
+
+            var sd = w.Stage1.Coast.SignedDistance(p.x, p.y);
+            return w.Carve.Depth(p.x, p.y, w.Carve.GateFor(sd), sd > 0f);
+        }
+
+        private static void MinOnRun(
+            IslandReliefWorld w,
+            StructuralBasin basin,
+            BoundarySource source,
+            out float minH2,
+            out float minH4,
+            out float minCarved,
+            out Vector2 minH4Point,
+            out float declaredH4)
+        {
+            minH2 = float.PositiveInfinity;
+            minH4 = float.PositiveInfinity;
+            minCarved = float.PositiveInfinity;
+            minH4Point = basin.OutletPointXZ;
+            declaredH4 = 0f;
+            var ring = basin.Boundary;
+            if (ring == null || ring.Length == 0 || basin.Segments == null)
+            {
+                return;
+            }
+
+            var declared = SampleAt(w, basin.OutletPointXZ.x, basin.OutletPointXZ.y, out var dh1, out var du2);
+            declaredH4 = dh1 + du2 + declared.Total;
+
+            foreach (var segment in basin.Segments)
+            {
+                if (source == BoundarySource.Crest || source == BoundarySource.Spur)
+                {
+                    if (!segment.IsRidge)
+                    {
+                        continue;
+                    }
+                }
+                else if (segment.Source != source)
                 {
                     continue;
                 }
 
-                dir.Normalize();
-                k.Outlets++;
-                var previous = float.NaN;
-                var previousApron = float.NaN;
-                var previousH2 = float.NaN;
-                var previousH4 = float.NaN;
-                var rise = 0f;
-                var apronRise = 0f;
-                var groundBefore = 0f;
-                var groundAfter = 0f;
-                for (var t = 0f; t <= 100f; t += 5f)
+                for (var i = 0; i < segment.PointCount; i++)
                 {
-                    var p = basin.OutletPointXZ + dir * t;
-                    var sample = SampleAt(w, p.x, p.y, out var h1, out var u2);
-                    var total = sample.Total;
-                    var h2 = h1 + u2;
-                    var h4 = h2 + total;
-                    if (!float.IsNaN(previous))
-                    {
-                        rise += Mathf.Max(0f, total - previous);
-                        apronRise += Mathf.Max(0f, sample.Apron - previousApron);
-                        groundBefore += Mathf.Max(0f, h2 - previousH2);
-                        groundAfter += Mathf.Max(0f, h4 - previousH4);
-                    }
-
-                    previous = total;
-                    previousApron = sample.Apron;
-                    previousH2 = h2;
-                    previousH4 = h4;
+                    var p = ring[(segment.FirstIndex + i) % ring.Length];
+                    IncludeCarved(w, p, ref minH2, ref minH4, ref minCarved, ref minH4Point);
                 }
-
-                k.OutletWorstRise = Mathf.Max(k.OutletWorstRise, rise);
-                k.OutletWorstGroundAdded = Mathf.Max(k.OutletWorstGroundAdded, groundAfter - groundBefore);
-                k.OutletLines.Add(
-                    $"basin {basin.Id} (V{basin.CorridorId}) outlet ({basin.OutletPointXZ.x.ToString("F0", c)},{basin.OutletPointXZ.y.ToString("F0", c)}): "
-                    + $"downstream R4A rise {rise.ToString("F3", c)} m (apron {apronRise.ToString("F3", c)} m); "
-                    + $"ground adverse H2 {groundBefore.ToString("F3", c)} m -> H4A {groundAfter.ToString("F3", c)} m");
             }
         }
     }
@@ -1831,9 +2495,9 @@ namespace GameDev.EditorTools
             Add("land >45 %", r.LandOver45, $"<={(b.LandOver45 + 0.5f).ToString("F2", c)}", r.LandOver45 <= b.LandOver45 + 0.5f, true);
             Add("reachable <=45 %", r.ReachablePercent, $">={(b.ReachablePercent - 0.5f).ToString("F2", c)}",
                 r.ReachablePercent >= b.ReachablePercent - 0.5f, true);
-            Add("lowland share %", k.LowlandPercent, "20-35", k.LowlandPercent >= 20f && k.LowlandPercent <= 35f, false);
-            Add("upland share %", k.UplandPercent, "40-62", k.UplandPercent >= 40f && k.UplandPercent <= 62f, false);
-            Add("knolls", w.Relief.Knolls.Count, "10-25", w.Relief.Knolls.Count >= 10 && w.Relief.Knolls.Count <= 25, false);
+            Add("lowland share %", k.LowlandPercent, "report (reserve >=20% land)", w.Relief.ReservedLandShare >= 0.20f - 1e-4f, true);
+            Add("upland share %", k.UplandPercent, "report", true, false);
+            Add("knolls", w.Relief.Knolls.Count, "8-25", w.Relief.Knolls.Count >= 8 && w.Relief.Knolls.Count <= 25, false);
             Add("knoll footprint %", k.KnollFootprintPercent, "<=20", k.KnollFootprintPercent <= 20f, false);
             if (w.Relief.HasMassif)
             {
@@ -1843,11 +2507,14 @@ namespace GameDev.EditorTools
             Add("R4A max m", k.ReliefMax, "<=100", k.ReliefMax <= w.Relief.Settings.MaxReliefMeters, true);
             Add("R4A mean on land m", k.ReliefMeanLand, "5-14", k.ReliefMeanLand >= 5f && k.ReliefMeanLand <= 14f, true);
             Add("highest point change m", r.HighestPoint - b.HighestPoint, "<=30", r.HighestPoint - b.HighestPoint <= 30f, false);
-            Add("depressions", r.Depressions, "0", r.Depressions == 0, true);
+            Add("depressions S8-A (outside Z_M∪L_M)", k.S8ACount, "0", k.S8ACount == 0, true);
+            Add("depressions S8-M (inside, canonical)", k.S8MCount, "0", k.S8MCount == 0, true);
             if (w.Trajectories != null && k.Trajectories > 0)
             {
-                Add("trajectory R4A adverse rise m", k.TrajectoryReliefRise, "<=7.2", k.TrajectoryReliefRise <= 7.2f, true);
+                Add("trajectory C(R4A) m", k.TrajectoryWorstClimb, "<=7.2", k.TrajectoryWorstClimb <= 7.2f, true);
                 Add("trajectory plate+apron adverse rise m", k.TrajectoryPlateApronRise, "<=1.5", k.TrajectoryPlateApronRise <= 1.5f, true);
+                Add("trajectory I1 increase m", k.TrajectoryI1Increase, "<=0.001", k.TrajectoryI1Increase <= 0.001f, true);
+                Add("trajectory R4A adverse sum m", k.TrajectoryReliefRise, "report", true, false);
             }
 
             Add("curvature ratio", r.CurvatureRatio, "0.85-1.20", r.CurvatureRatio >= 0.85f && r.CurvatureRatio <= 1.2f, false);

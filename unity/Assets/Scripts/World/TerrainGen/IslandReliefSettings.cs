@@ -35,15 +35,34 @@ namespace GameDev.World.TerrainGen
         /// </remarks>
         public float NoMassifUpliftScale;
 
-        /// <summary>Half the width of a block edge, measured perpendicular to the plate boundary, metres.</summary>
-        /// <remarks>
-        /// The level changes along one smoothstep across twice this distance, so the steepest slope an
-        /// edge adds is <c>1.5 * PlateUpliftMeters / (2 * this)</c>: about 7 degrees at the defaults.
-        /// </remarks>
+        /// <summary>
+        /// Minimum half-width of a block edge, metres. Pair <c>k,j</c> uses
+        /// <c>max(this, 1.5 · U · m · |λ_k − λ_j| / (2τ))</c> so the steepest edge descent is ≤ τ.
+        /// </summary>
         public float PlateEdgeHalfWidthMeters;
 
-        /// <summary>Radius over which the level field relaxes towards the mean at an on-land junction, metres.</summary>
+        /// <summary>
+        /// Minimum radius over which the level field relaxes towards the mean at an on-land junction, metres.
+        /// Each junction uses <c>max(this, 1.5 · U · m · max|λ − λ̄| / τ)</c>, then a build-time certificate.
+        /// </summary>
         public float JunctionRelaxRadiusMeters;
+
+        /// <summary>
+        /// Inland slope budget τ, metres of rise per metre inland. Defaulted from Stage 1's interior
+        /// (<c>InteriorRiseMeters / InteriorScaleMeters</c>).
+        /// </summary>
+        public float InlandSlopeBudget;
+
+        /// <summary>
+        /// Lowest-scoring districts share level 0 until they hold at least this fraction of island land.
+        /// </summary>
+        public float LowlandReserveShare;
+
+        /// <summary>World-aligned sampling step of the junction certificate, metres.</summary>
+        public float JunctionCertificationStepMeters;
+
+        /// <summary>Largest number of times a junction may widen itself during certification.</summary>
+        public float JunctionCertificationMaxIterations;
 
         /// <summary>Land a plate needs before it is a district rather than a sliver, square metres.</summary>
         public float MinPlateLandAreaSqm;
@@ -123,6 +142,11 @@ namespace GameDev.World.TerrainGen
             NoMassifUpliftScale = 1.4f,
             PlateEdgeHalfWidthMeters = 110f,
             JunctionRelaxRadiusMeters = 450f,
+            InlandSlopeBudget = TerrainGenSettings.Default.InteriorRiseMeters
+                                / TerrainGenSettings.Default.InteriorScaleMeters,
+            LowlandReserveShare = 0.20f,
+            JunctionCertificationStepMeters = 5f,
+            JunctionCertificationMaxIterations = 8f,
             MinPlateLandAreaSqm = 150000f,
             ConvergentMinLandLengthMeters = 150f,
             MinLowlandFrontageMeters = 150f,
@@ -156,6 +180,10 @@ namespace GameDev.World.TerrainGen
             NoMassifUpliftScale = Mathf.Clamp(NoMassifUpliftScale, 1f, 3f);
             PlateEdgeHalfWidthMeters = Mathf.Clamp(PlateEdgeHalfWidthMeters, 10f, 600f);
             JunctionRelaxRadiusMeters = Mathf.Clamp(JunctionRelaxRadiusMeters, 0f, 2000f);
+            InlandSlopeBudget = Mathf.Clamp(InlandSlopeBudget, 1e-4f, 0.25f);
+            LowlandReserveShare = Mathf.Clamp01(LowlandReserveShare);
+            JunctionCertificationStepMeters = Mathf.Clamp(JunctionCertificationStepMeters, 1f, 50f);
+            JunctionCertificationMaxIterations = Mathf.Clamp(JunctionCertificationMaxIterations, 1f, 32f);
             MinPlateLandAreaSqm = Mathf.Clamp(MinPlateLandAreaSqm, 0f, 4e6f);
             ConvergentMinLandLengthMeters = Mathf.Clamp(ConvergentMinLandLengthMeters, 0f, 4000f);
             MinLowlandFrontageMeters = Mathf.Clamp(MinLowlandFrontageMeters, 0f, 10000f);

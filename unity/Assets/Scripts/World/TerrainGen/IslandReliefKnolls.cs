@@ -27,7 +27,9 @@ namespace GameDev.World.TerrainGen
         /// <summary>Whether the block keeps a knoll.</summary>
         public bool Placed { get; internal set; }
 
-        /// <summary>Why it did not, when it did not: "gate", "level" or "resistance".</summary>
+        /// <summary>
+        /// Why it did not, when it did not: Gate, Level, Resistance, Budget or MassifBody.
+        /// </summary>
         public string Rejection { get; internal set; }
 
         /// <summary>Direction of the major axis, radians from +X towards +Z.</summary>
@@ -38,6 +40,12 @@ namespace GameDev.World.TerrainGen
 
         /// <summary>Peak height of the knoll, metres; zero when not placed.</summary>
         public float HeightMeters { get; internal set; }
+
+        /// <summary>Slope-budget amplitude cap, metres. Zero when omitted for budget.</summary>
+        public float Cap { get; internal set; }
+
+        /// <summary>Analytic upper bound of the plate term's inland descent over the support, m/m.</summary>
+        public float PlateDescentBound { get; internal set; }
     }
 
     public sealed partial class IslandRelief
@@ -62,18 +70,13 @@ namespace GameDev.World.TerrainGen
 
         /// <summary>
         /// One candidate per land crust site; a candidate keeps a knoll when it stands on a raised plate,
-        /// clear of the outer coastal band, and its block drew enough resistance.
+        /// clear of the outer coastal band, off the massif body, and inside the inland slope budget.
         /// </summary>
         /// <remarks>
         /// <para>
         /// <b>The draw is made for every land site, from its own fork</b>
         /// (<c>Fork(terrain.relief.knoll, siteIndex)</c>), before eligibility is known, so a change in who
-        /// is eligible can never shift another site's numbers.
-        /// </para>
-        /// <para>
-        /// The knoll is elongated along the fall line of the floor it stands on - Stage 1 plus the gated
-        /// plate uplift, measured by central differences at the centroid - so the swales between knolls
-        /// lead downslope instead of closing into hollows.
+        /// is eligible can never shift another site's numbers. Both draws are taken for every land site.
         /// </para>
         /// </remarks>
         private void BuildKnolls(Seed.IWorldSeed worldSeed, Stage1Result stage1)
@@ -116,24 +119,43 @@ namespace GameDev.World.TerrainGen
 
                 if (gate < Settings.KnollMinGate)
                 {
-                    candidate.Rejection = "gate";
+                    candidate.Rejection = "Gate";
                     continue;
                 }
 
                 if (level < Settings.KnollMinLevel)
                 {
-                    candidate.Rejection = "level";
+                    candidate.Rejection = "Level";
                     continue;
                 }
 
                 if (resistance < 1f - Settings.KnollKeepFraction)
                 {
-                    candidate.Rejection = "resistance";
+                    candidate.Rejection = "Resistance";
+                    continue;
+                }
+
+                if (OnMassifBody(center.x, center.y))
+                {
+                    candidate.Rejection = "MassifBody";
+                    continue;
+                }
+
+                var sigmaMajor = Settings.KnollMajorSigmaPerDiameter * diameter;
+                var sigmaMinor = Settings.KnollMinorSigmaPerDiameter * diameter;
+                var support = 3f * sigmaMajor;
+                var gP = PlateDescentBound(center, support);
+                candidate.PlateDescentBound = gP;
+                var cap = (SlopeBudget - gP) * sigmaMinor / KnollMaxSlopeCoefficient;
+                candidate.Cap = cap;
+                if (cap <= 0f)
+                {
+                    candidate.Rejection = "Budget";
                     continue;
                 }
 
                 var height = Settings.KnollHeightMeters * (0.6f + 0.4f * resistance) * (0.5f + 0.5f * level);
-                height = Mathf.Min(height, Settings.KnollHeightCapMeters);
+                height = Mathf.Min(height, Settings.KnollHeightCapMeters, cap);
 
                 var gradientX = (FloorAt(stage1, center.x + step, center.y) - FloorAt(stage1, center.x - step, center.y))
                                 / (2f * step);
@@ -146,8 +168,8 @@ namespace GameDev.World.TerrainGen
 
                 candidate.Placed = true;
                 candidate.YawRadians = yaw;
-                candidate.SigmaMajorMeters = Settings.KnollMajorSigmaPerDiameter * diameter;
-                candidate.SigmaMinorMeters = Settings.KnollMinorSigmaPerDiameter * diameter;
+                candidate.SigmaMajorMeters = sigmaMajor;
+                candidate.SigmaMinorMeters = sigmaMinor;
                 candidate.HeightMeters = height;
                 placed.Add(candidate);
             }
@@ -178,21 +200,83 @@ namespace GameDev.World.TerrainGen
             }
         }
 
-        /// <summary>The floor a knoll stands on: Stage 1 plus the gated plate uplift.</summary>
+        private bool OnMassifBody(float worldX, float worldZ)
+        {
+            for (var i = 0; i < apronMassifs.Length; i++)
+            {
+                if (apronMassifs[i].Evaluate(worldX, worldZ) > 0f)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Analytic upper bound of the plate term's inland descent over a disc, from the pair bands
+        /// and certified junction maxima the disc intersects.
+        /// </summary>
+        private float PlateDescentBound(Vector2 center, float supportRadius)
+        {
+            var bound = 0f;
+            var count = siteX.Length;
+            var u = PlateUpliftMeters;
+            for (var k = 0; k < count; k++)
+            {
+                for (var j = k + 1; j < count; j++)
+                {
+                    var w = pairHalfWidth[k * count + j];
+                    if (w <= 0.0)
+                    {
+                        continue;
+                    }
+
+                    var dxk = center.x - siteX[k];
+                    var dzk = center.y - siteZ[k];
+                    var dxj = center.x - siteX[j];
+                    var dzj = center.y - siteZ[j];
+                    var delta = Math.Abs((dxj * dxj + dzj * dzj) - (dxk * dxk + dzk * dzk))
+                                * inverseTwoSpan[k * count + j];
+                    if (delta > w + supportRadius)
+                    {
+                        continue;
+                    }
+
+                    var dLambda = Math.Abs(plateLevel[k] - plateLevel[j]);
+                    var slope = 1.5 * u * dLambda / (2.0 * w);
+                    bound = Mathf.Max(bound, (float)slope);
+                }
+            }
+
+            for (var i = 0; i < junctions.Length; i++)
+            {
+                var radius = junctions[i].RadiusMeters + supportRadius;
+                if ((junctions[i].Position - center).sqrMagnitude > radius * radius)
+                {
+                    continue;
+                }
+
+                var certified = junctions[i].Certificate != null
+                    ? junctions[i].Certificate.MaxAdverseDerivative
+                    : 0f;
+                bound = Mathf.Max(bound, certified);
+            }
+
+            return Mathf.Min(SlopeBudget, Mathf.Max(0f, bound));
+        }
+
+        /// <summary>The floor a knoll stands on: Stage 1 plus M plus the gated plate uplift.</summary>
         private float FloorAt(Stage1Result stage1, float worldX, float worldZ)
         {
-            var h1 = stage1.HeightAt(worldX, worldZ);
-            return h1 + GateFor(h1) * PlateUpliftMeters * LevelAt(worldX, worldZ);
+            var sd = stage1.Coast.SignedDistance(worldX, worldZ);
+            var h1 = stage1.Model.HeightAt(sd);
+            return h1 + CoastalFloorAt(sd) + GateFor(h1) * PlateUpliftMeters * LevelAt(worldX, worldZ);
         }
 
         /// <summary>
         /// Knoll height at a point before the gate: the tallest of the compact kernels covering it.
         /// </summary>
-        /// <remarks>
-        /// <c>a (1 − q/9)³</c> with <c>q = (u/σ_major)² + (v/σ_minor)²</c>, exactly zero from three sigmas
-        /// out. Combined by maximum, never summed: a point is on one knoll's slope, overlapping kernels never
-        /// stack into a taller hill, and the result does not depend on the order knolls are visited in.
-        /// </remarks>
         private float KnollAt(float worldX, float worldZ)
         {
             var best = 0f;

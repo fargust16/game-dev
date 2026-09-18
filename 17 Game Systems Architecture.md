@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft
 
-Last Updated: 2026-08-15
+Last Updated: 2026-09-18
 
 Depends On:
 [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -178,7 +178,7 @@ flowchart LR
 | **Multiplayer** | Same seed → same samples on all peers; no per-frame sync of heightfields. |
 | **Performance** | Sampling must be O(1) / cheap noise; cache per-chunk if builders need grids. |
 | **Extensibility** | Swap noise implementation behind `IBiomeSampler`; add moisture/temperature channels later. |
-| **V1 scope / Deferred** | V0: TerrainGen island + massifs + ocean, baked into Unity Terrain. Deferred: inland hydrology by default, full Valheim-scale biomes, **Stage 4A island floor relief** (built and measured, not yet connected to the authority field — [revision R1](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md) first). |
+| **V1 scope / Deferred** | V0: TerrainGen island + massifs + ocean, baked into Unity Terrain. Deferred: inland hydrology by default, full Valheim-scale biomes, **Stage 4A island floor relief** (R1 implemented dump-first, tests green, not yet connected to the authority field — [design](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)). |
 | **Owning folder** | `unity/Assets/Scripts/World/Terrain/` |
 
 ## W.3 Chunk Streaming

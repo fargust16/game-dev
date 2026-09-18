@@ -22,7 +22,7 @@
 > | Stage 2A macro structure, 2B massifs (`MacroPlates`, `MountainMassif`) | Stage 2 |
 > | Stage 3A ownership, 3B spurs, 3C valley topology and trajectories, 3D/3E structural basins and outlets | Stage 3 |
 > | Stage 3F valley carve — **not implemented**, see [PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md](PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md) | part of Stage 7 |
-> | Stage 4A island relief (plate blocks, knolls, massif apron) — implemented dump-first, **not** in the authority path, see [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md) and its revision R1 | the floor half of Stage 4 |
+> | Stage 4A island relief (`M` + plate blocks + knolls + massif apron) — R1 implemented dump-first, tests green, **not** in the authority path, see [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md) | the floor half of Stage 4 |
 > | Stage 4B plateaus and walls, 4C raised coast — not started | the rest of Stage 4 |
 > | Unity-native terrain bake of Stage 1 + 2 | Stage 8, delivered early |
 > | Hydrology analysis and carve on the lattice (`HydrologyBake.ApplyPendingCarve`), step off by default | Stages 6 and 7 for water |

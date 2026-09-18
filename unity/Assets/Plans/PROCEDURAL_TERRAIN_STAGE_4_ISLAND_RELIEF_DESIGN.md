@@ -1,12 +1,11 @@
 # Procedural Terrain — Stage 4 Island Relief Design (Stage 4A)
 
-**Status:** **Implemented dump-first and partly superseded.** The design below was coded as written
-(variant C6) and committed on 2026-09-16 as `IslandRelief*`, the editor dump and thirteen acceptance
-tests; the layer is **not** wired into `TerrainAuthorityField`.
-**Date:** 2026-09-14 (status header 2026-09-16)
-**Baseline:** HEAD `b677f26` ("Bake TerrainGen straight into Unity TerrainData and remove the external
-terrain pipeline"), working tree clean. *The task brief names HEAD `7c882c1` with the migration
-uncommitted; the migration has since been committed as `b677f26`. Nothing else differs.*
+**Status:** **Implemented dump-first (revision R1).** Variant C6 was coded 2026-09-16; R1's delta
+(inland slope budget, derived plate widths with certified junctions, budgeted knolls, apron projection
+domain, corrected S8/S10/S11) is in the same files. The layer is **not** wired into
+`TerrainAuthorityField`. Production heights remain `StructuralElevation` (H2).
+**Date:** 2026-09-16
+**Baseline:** C6 implementation committed as `f7a7c56`; documentation follow-up `9573b0d`.
 **Answers:** [NATIVE_ISLAND_SHAPE_PREFLIGHT.md](NATIVE_ISLAND_SHAPE_PREFLIGHT.md) §16 step 1.
 **Related:** [WORLD_RELIEF_PRINCIPLES.md](WORLD_RELIEF_PRINCIPLES.md),
 [PROCEDURAL_TERRAIN_GENERATOR_DESIGN.md](PROCEDURAL_TERRAIN_GENERATOR_DESIGN.md),
@@ -16,29 +15,14 @@ uncommitted; the migration has since been committed as `b677f26`. Nothing else d
 [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md),
 [UNITY_NATIVE_TERRAIN_MIGRATION_REPORT.md](UNITY_NATIVE_TERRAIN_MIGRATION_REPORT.md),
 [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md).
+**Change record:** [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md)
+(R-1…R-10). This file is the living contract; the revision stays as the argument.
 
-> **Revision R1 (2026-09-16) supersedes parts of this document.**
-> Measuring the implementation — and a 40-seed sweep this design never ran — falsified three of its
-> rules. Where this file and
-> [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md)
-> disagree, **the revision wins**:
->
-> - **§5.4 / §12.2 "all terms ≥ 0 removes ring lips" is false.** Positivity bounds the value, not the
->   inland derivative; any term that falls inland at a Stage 1 zero-slope ring digs a trough. C6 has
->   depressions on 1337 and 777 and on 15 of 40 non-canonical seeds. R1 replaces the rule with an
->   inland slope budget (a new `M(d)` coastal-floor term, edge widths and junction radii derived from
->   it, knoll amplitudes capped by what is left) and proves the result instead of measuring it.
-> - **§7.2 apron reach has no domain condition.** Beyond the massif axis reach `MountainMassif.Project`
->   is not unique, so the apron rises outward there. R1 adds `W_eff = clamp(R_axis − δ − toe, 0, W)`.
-> - **§19.2 S10 and S11 measure the wrong quantities.** R1 puts S10 on the ungated apron surface, S11
->   on the single climb of `R4A` plus the incision Stage 3F actually needs below Stage 1, and restates
->   the Stage 3E outlet checks.
-> - **§5.2 plate levels** get a lowland reservation (§9 of R1): whole-plate ranks leave 5.6–15 % lowland
->   on three canonical seeds.
-> - Unchanged and still authoritative here: the geographic hierarchy (§4), the reasons for choosing C6
->   over A/B/N (§3), the knoll and apron *shape* rules, determinism and the tile contract (§13, §14).
->
-> The numbers in §11 and §19 are the C6 measurements; R1 §15 carries the revised ones.
+> **R1 is folded in.** C6's "all terms ≥ 0 removes ring lips" is false (positivity does not bound the
+> inland derivative). The live formula is `R4A = M(d) + Γ·(P + K) + A` with τ-derived pair widths,
+> certified junctions, knoll amplitude caps, and an apron domain `W_eff`. S8-A/M/C, S10 (ungated
+> `P_A`), S11-T/O and S12 are the acceptance tests. Hierarchy (§4), C6 over A/B/N (§3), knoll/apron
+> *shape*, determinism and the tile contract (§13, §14) are unchanged. Production stays disconnected.
 
 Claim tags as in the other TerrainGen documents: **[FACT]** read from code or measured on the production
 path, **[PROTO]** measured on the offline prototype described in §1 (real Stage 1/2A/2B structure,
@@ -49,24 +33,27 @@ design decision, **[OPEN]** deliberately unresolved.
 reading as an extruded coastline and starts reading as a fantasy island, without becoming procedural
 noise?
 
-**Short answer.** Three positive-only relief terms, each owned by one existing geological structure and
-living at one scale, gated to exactly zero at the shore:
+**Short answer.** Three positive-only structural terms plus a 1-D coastal floor, each owned by one
+existing geological structure (or by Stage 1's own profile), gated so the land mask cannot move:
 
-1. **Plate-block uplift** (macro plates, ~1 km): each land plate stands at a level set by its role in
-   the island's collision; block edges follow the plate boundaries. This is what creates **uplands and
-   lowlands**, and it works identically on worlds without a massif.
-2. **Knolls** (crustal blocks, ~275 m): the resistant cores of selected crustal cells, only on raised
-   plates, never taller than the valley incision Stage 3F is allowed. This is the **rolling-hill** layer.
-3. **Massif apron** (massif frame): a talus-and-piedmont fill around the foot of the frozen Stage 2B
-   body, longer along the axis than across it. This is the **foothill** layer.
+1. **Coastal floor `M(d)`** (Stage 1 profile): a monotone 1-D integral that gives `H1 + M` an inland
+   slope of at least `τ = InteriorRise / InteriorScale = 0.05`. This is the **ring-lip** proof, not a
+   landform.
+2. **Plate-block uplift** (macro plates, ~1 km): each land plate stands at a rank level with a
+   **lowland reservation** (≥ 20 % of land at level 0); pair edge widths and junction radii are derived
+   from τ and certified. This is what creates **uplands and lowlands**.
+3. **Knolls** (crustal blocks, ~275 m): resistant cores of selected crustal cells, only on raised
+   plates, off the massif body, amplitude-capped by the slope budget left over. This is the
+   **rolling-hill** layer. The analytic `g_P` bound currently leaves **zero knolls** on the seven
+   canonical seeds (report, not a retune).
+4. **Massif apron** (massif frame): a talus-and-piedmont fill around the Stage 2B foot, domain-limited
+   to `R_axis − δ` so `MountainMassif.Project` stays unique. This is the **foothill** layer.
 
-`H = H1 + U2 + R4A` today, `− C3F` later. No term lowers land, so no coastline, ocean sample or Stage 1–3
-structure can move. Noise has no role in Stage 4A v1. Measured on the prototype, the chosen parameters
-fill the empty 70–110 m band (4.6 / 6.7 / 0.2 % → 24.6 / 20.3 / 24.4 %), break the coast-distance
-roof (gradient aligned with the coast normal on 95–99 % of the interior → 48–65 %), create no closed
-depression on any of the three seeds, and do not regress reachability. What Stage 4A cannot do — and
-must not be asked to do — is break the massif's ring wall (Stage 3F / 2B) or give a no-massif world a
-landmark (Stage 4B).
+`H4A = H1 + U2 + R4A`, `R4A = M + Γ·(P + K) + A`; future `H = H4A − C3F`. No term lowers land. Noise
+has no role in Stage 4A v1. Unity dump on the seven canonical seeds: 70–110 m band 15–26 %, S8-A/S8-M
+= 0, S10 beyond-domain = 0, S11-T/O and S12 pass. What Stage 4A cannot do — and must not be asked to
+do — is break the massif's ring wall (Stage 3F / 2B), drain massif-foot pits inside `Z_M ∪ L_M`
+(sweep residual, Stage 3F / 4B), or give a no-massif world a landmark (Stage 4B).
 
 ---
 
@@ -259,11 +246,14 @@ P(x) = PlateUpliftMeters · m_world · Λ(x)
 
 - `Λ(x) ∈ [0, 1]` is the **level field**: every land plate `k` carries a level `λ_k`; inside a plate
   `Λ = λ_k`; across a plate boundary the level blends with a smoothstep of the perpendicular distance to
-  that boundary segment, half-width `PlateEdgeHalfWidthMeters = 110 m` (10–90 % over ~200 m).
-- **Junction relaxation.** Within `JunctionRelaxRadiusMeters = 450 m` of an on-land plate junction
-  (`MacroPlates.Junctions` inside the land polygon), `Λ` relaxes smoothly towards the mean level of the
-  plates meeting there: `Λ ← Λ + (1 − S(r/450))·(λ̄_j − Λ)`. [PROTO] Without it 1337 carries a 0.86 m
-  depression at the apex of its lowland wedge; with 300 m it is 0.43 m; with 450 m it is gone.
+  that boundary segment. Pair half-width
+  `w_kj = max(PlateEdgeHalfWidthMeters, 1.5·U·m·|λ_k − λ_j|/(2τ))` so the steepest edge descent is
+  ≤ τ (**R-2**). `PlateEdgeHalfWidthMeters = 110 m` is the **minimum**.
+- **Junction relaxation.** Each on-land junction uses
+  `R_J = max(JunctionRelaxRadiusMeters, 1.5·U·m·max|λ − λ̄|/τ)`, then a 5 m world-aligned certificate
+  of `−∂(ΓP)/∂n` (≤ 8 iterations, scale radius and incident widths by `max/τ`) so the discrete inland
+  derivative stays ≤ τ (**R-3**). `JunctionRelaxRadiusMeters = 450 m` is the **minimum**. [PROTO] Without
+  any relaxation 1337 carries a 0.86 m depression at the apex of its lowland wedge.
 - `m_world = 1` on a world with at least one massif, `NoMassifUpliftScale = 1.4` on a world without
   (§8).
 - Plates with less than `MinPlateLandAreaSqm = 150 000 m²` of land are merged into the neighbour they
@@ -278,8 +268,10 @@ and runs at least `ConvergentMinLandLengthMeters = 150 m` over land:
   lower plate index;
 - `score_upper += L_b`, `score_lower −= L_b`, where `L_b` is the boundary's on-land length.
 
-Levels are the **rank** of the scores, normalised: lowest `λ = 0`, highest `λ = 1`, the rest evenly
-between; ties by plate index. Special cases:
+Levels are a **bounded rank with lowland reservation** (**R-9**): walk the sorted scores; the smallest
+prefix whose land share reaches `LowlandReserveShare = 0.20` takes level 0 (the frontage rule still
+applies to that prefix's first member); the remainder is ranked evenly over `(0, 1]`. Ties by plate
+index. Special cases:
 
 | Case | Rule | Why |
 |---|---|---|
@@ -299,41 +291,55 @@ On both massif worlds the rule puts the massif on the edge between an upland and
 massif's own steep flank (Stage 2B `SteepSide`) facing the lowland — a coherent tilted-block reading that
 nobody authored.
 
-### 5.3 Shore fade and the "zero at the shore" proof
+### 5.3 Shore fade, coastal floor, and the "zero at the shore" proof
 
 ```
 Γ(x) = S( clamp01( (H1(x) − SeaLevel) / CoastalRiseMeters ) )        S = smoothstep, CoastalRise = 26 m
+M(d) = ∫₀^d max(0, τ − H1'(u)) du     d > 0;  M(d ≤ 0) = 0 exactly
+τ    = InteriorRiseMeters / InteriorScaleMeters                       = 0.05
 ```
 
 - `Γ` is exactly 0 wherever `H1 ≤ SeaLevel`, i.e. at and seaward of the shoreline, and 1 from the top of
-  the coastal rise (200 m inland). It follows Stage 1's own profile, so added slope is proportional to
-  the datum's and vanishes where the datum's does.
+  the coastal rise (200 m inland). It follows Stage 1's own profile.
+- `M` is a 1-D table (step 0.5 m from `CoastHeightModel.HeightAt`) so `H1 + M` has inland slope ≥ τ
+  wherever `H1` is already above sea. **Applied coastal floor is zero wherever `H1 ≤ SeaLevel`**, so `M`
+  cannot lift a seaward or lagoon cell across the land mask (S1, S2). **R-1.**
 - [PROTO] The alternative, a linear gate at 60–340 m or 150–400 m, builds a second coast-parallel ramp in
   the interior and cuts flat ground to 15–32 % of land. The chosen gate concentrates the upland's descent
   in the coastal band, where uplands meet the sea as 10–20° bluffs — the raised coast Stage 4C will
   characterise.
 - At the vegetation floor (27 m, ~30 m inland) `Γ ≈ 0.04`: the sand band moves by well under a metre.
 
-**Invariants, by construction:** every term is `≥ 0`; `Γ = 0` and `U2 = 0` seaward; therefore
-`R4A = 0` exactly at and seaward of the shore, `H4A ≥ H2 > SeaLevel` on all land, the land mask
-`{H > SeaLevel}` is bit-identical, and no island can appear or disappear.
+**Invariants, by construction:** `M(d ≤ 0) = 0`; applied `M = 0` wherever `H1 ≤ SeaLevel`; `Γ = 0` and
+`U2 = 0` seaward; every other term is `≥ 0`; therefore `R4A = 0` exactly at and seaward of the shore,
+`H4A ≥ H2` on land that `H2` already holds above sea, the land mask `{H > SeaLevel}` is bit-identical,
+and no island can appear or disappear. Positivity alone does **not** prevent ring lips — that is `M` and
+the τ budget.
 
 ### 5.4 Numbers and why
 
 | Setting | Value | Justification |
 |---|---|---|
-| `PlateUpliftMeters` | **18 m** | ≥ 2.5 × the tallest knoll (7.2 m) so the two never muddy; the Stage 1 interior rise is 30 m, so an upland roughly doubles the interior relief without rivalling a 20–40 m T2 plateau standing on it; [PROTO] puts upland interiors at 80–95 m, i.e. in the empty band |
-| `PlateEdgeHalfWidthMeters` | 110 m | maximum added slope `1.5 × 18 / 220 ≈ 0.12` (7°) — an edge you can walk and read, not a scarp |
-| `JunctionRelaxRadiusMeters` | 450 m | smallest radius with no depression on the three seeds [PROTO] |
+| `PlateUpliftMeters` | **18 m** | ≥ 2.5 × the tallest knoll cap (7.2 m) so the two never muddy; the Stage 1 interior rise is 30 m, so an upland roughly doubles the interior relief without rivalling a 20–40 m T2 plateau standing on it |
+| `PlateEdgeHalfWidthMeters` | **110 m minimum** | pair width is `max(110, 1.5·U·m·Δλ/(2τ))` so added slope ≤ τ (**R-2**) |
+| `JunctionRelaxRadiusMeters` | **450 m minimum** | derived `R_J` plus a 5 m certificate ≤ 8 iterations (**R-3**) |
+| `InlandSlopeBudget` τ | **0.05** | `InteriorRise / InteriorScale`; `Clamp` to `(0, 0.25]` |
+| `LowlandReserveShare` | **0.20** | design's own lower bound on open plains (**R-9**) |
 | `NoMassifUpliftScale` | 1.4 | §8 |
 | `MinPlateLandAreaSqm` | 150 000 | the prototype's slivers are 0.01–0.09 km²; real districts ≥ 0.22 km² |
 
-**Why no lowering.** *(The conclusion stands; the rule derived from it in §12.2 does not — R1 §2.)*
-[PROTO] Every mean-zero or negative term tried (A, N) creates closed depressions,
+**Why no lowering.** [PROTO] Every mean-zero or negative term tried (A, N) creates closed depressions,
 and analysis says why: `CoastHeightModel` is smoothstepped per span, so the datum has **zero slope at
 200 m and 440 m inland** and along its medial crest; any term that rises towards the coast there makes a
 lip. Lowlands therefore stand at the datum and are low *relative to* the raised plates; genuinely lowered
 ground is a declared basin and belongs to Stage 3F.
+
+**Why positivity is not enough (R-1).** The C6 rule "all terms ≥ 0 removes ring lips" is false: a
+positive term that *falls inland* at a zero-slope ring digs a trough of depth ≈ `g²/(2κ)`. C6 measured
+that on 1337 (0.67 m) and 777 (0.29 m) and on 15/40 sweep seeds. The inland slope budget (`M`, τ-derived
+widths, knoll cap) makes `H1 + M + Γ·(P + K)` non-increasing towards the sea along every coast-normal
+segment **outside the massif influence zone and its lee** — a proof, not a tuning. Massif-foot pits
+inside `Z_M ∪ L_M` stay Stage 3F / 4B (**R-10**).
 
 ---
 
@@ -346,22 +352,31 @@ K(x) = max_i  a_i · (1 − q_i(x)/9)³₊          q_i = (u/σ_major,i)² + (v/
 ```
 
 One **candidate** per land crust site `i` (`CrustalPartition.SiteCentroid`, diameter `D_i` from its cell
-count). A candidate becomes a knoll only if all hold at its centroid:
+count). **Both RNG draws are taken for every land site before any eligibility test** (stream
+`terrain.relief.knoll`). A candidate becomes a knoll only if all hold at its centroid:
 
-- `Λ ≥ KnollMinLevel = 0.34` — knolls stand on raised plates; lowland plains stay open (the negative
-  space `WORLD_RELIEF_PRINCIPLES` §5 budgets for);
+- `Λ ≥ KnollMinLevel = 0.34` — knolls stand on raised plates; lowland plains stay open;
 - `Γ ≥ 0.5` — not in the outer coastal band;
-- its resistance draw `r_i ≥ 1 − KnollKeepFraction` (keep 0.55–0.65).
+- its resistance draw `r_i ≥ 1 − KnollKeepFraction` (keep 0.55–0.65);
+- `MountainMassif.Evaluate(centroid) == 0` — not on the massif body (**R-4**);
+- amplitude after the slope-budget cap is `> 0`.
+
+Omission reasons recorded on the candidate: `Gate` / `Level` / `Resistance` / `Budget` / `MassifBody`.
 
 Shape and height:
 
 | Property | Rule | Value |
 |---|---|---|
-| height | `a_i = KnollHeightMeters · (0.6 + 0.4 r_i) · (0.5 + 0.5 Λ)`, clamped to `RidgeSettings.CorridorIncisionMeters` | 6.5 m nominal, ≤ **7.2 m** |
+| height | `a_i = KnollHeightMeters · (0.6 + 0.4 r_i) · (0.5 + 0.5 Λ)`, then `a ≤ (τ − g_P)·σ_minor/0.5726`, clamped to `RidgeSettings.CorridorIncisionMeters` | 6.5 m nominal, ≤ **7.2 m** hard, **τ-capped** (**R-4**) |
 | footprint | `σ_major = 0.22 D`, `σ_minor = 0.14 D`; compact kernel, zero outside `q = 9` | ≈ 60 × 38 m σ → **160 × 100 m at half height**, 360 × 230 m support |
 | orientation | fall line of `H1 + Γ·P` at the centroid, from central differences at ±60 m, plus a ±20° draw | elongated **down**slope, like interfluves |
 | combination | **max**, not sum | bounded by one knoll; order-independent in floating point |
-| maximum slope | `≈ 0.53 a / σ_minor` | ≈ 5° |
+| maximum slope | `≈ 0.5726 a / σ_minor` (the cap coefficient) | the cap keeps knoll descent inside the leftover budget |
+
+`g_P` is the analytic plate-descent bound over the knoll's support disc (pair bands plus certified
+junction maxima). **Unity R1:** this bound left `a ≤ 0` on every canonical candidate (45–49 per seed,
+0 placed). That is a residual of the proof, not a per-seed retune; the rolling-hill visual is absent
+until a later kernel (asymmetric inland tail, R1 §16 R3) is designed.
 
 ### 6.2 Why this reads as hills and not noise
 
@@ -382,8 +397,9 @@ Shape and height:
 
 ### 6.3 Interaction
 
-On uplands knolls add 4–7 m to the 18 m plate top; on the apron they are suppressed where
-`Γ·P_A > 0`; they are the **only** Stage 4A term that rises along a Stage 3C trajectory (§9).
+On uplands knolls would add a few metres to the 18 m plate top; on the apron they are suppressed where
+`Γ·P_A > 0`; they are the **only** Stage 4A term that can rise along a Stage 3C trajectory (§9). With
+zero knolls placed, plate + apron adverse is the whole S11-T story on the canonical seeds.
 
 ---
 
@@ -410,12 +426,17 @@ In the massif's own frame (`MountainMassif.Project`, read-only):
 
 - `ρ` — metres beyond the toe: `|offset| − HalfWidthAt(s) · sideFactor`, with `sideFactor` the same
   steep/gentle blend `MountainMassif.Evaluate` uses; beyond the ends, distance past the end point;
-- `W = lerp(W_gentle 180 m, W_steep 110 m, steepWeight)`, then `lerp(W, W_end 280 m, endness)` with
-  `endness` = cosine between the direction from the end point and the end tangent — **constant along
-  every outward ray**;
+- `W` = lerp(`W_gentle` 180 m, `W_steep` 110 m, steepWeight), then lerp(`W`, `W_end` 280 m, endness);
+- **Domain (R-5).** `δ = Δ² / (8 R_axis)` from the axis sample spacing; `W_eff = clamp(R_axis − δ − toe, 0, W)`,
+  `h_eff = h · W_eff / W`; `P_A ≡ 0` for `dist ≥ R_axis − δ`. Talus keeps unscaled `h`. This is the
+  uniqueness domain of `MountainMassif.Project`.
 - `h(s) = 0.09 · Crest · (0.55 + 0.45 · CrestAt(s)/Crest)`, `c(s) = 0.18 · Crest · (same factor)`;
 - `ApronBlendMeters = 10` using `MountainUpliftModel.SmoothMax` (blend capped by the smaller input, so
   `A = P_A` exactly where `U2 = 0`).
+
+**S10 (R-6)** is on the **ungated physical profile** `ApronProfileAt(s, offset, endness)` along exact
+projection normals (24 stations × 2 sides + 16 end-caps), 1 mm, and exact zero beyond the domain. Gated
+fill along world-space rays is report-only (the gate itself can rise inland).
 
 It is a **fill**: wherever the wall stands above the apron surface, `A = 0` and the massif is untouched;
 where the apron surface stands above the wall's lower flank, the ground is raised to it. That is the
@@ -456,9 +477,10 @@ heads (Stage 3F) or a wider, lower Stage 2B body (preflight C7). Stage 4A must n
 ### 7.6 Stage 3 spurs and basins
 
 The apron sits exactly where Stage 3C trajectories leave the massif and where Stage 3E outlets lie
-(61–97 m). Because the apron is monotone along outward rays, a trajectory leaving the massif descends
-the apron and an outlet gap stays an outlet. Stage 3F will cut valleys into it and turn the skirt into
-lobes between spurs. The apron does not read Stage 3; §9 and §19 check the interaction.
+(61–97 m). The ungated apron is monotone along projection normals and zero beyond `R_axis − δ` (S10);
+a trajectory leaving the massif can still climb the **gated fill** as Γ rises, which is why S11 uses
+the physical single-climb of `R4A` and the incision theorem, not "apron monotone on H4A". Stage 3F will
+cut valleys into the skirt. The apron does not read Stage 3; §9 and §19 check the interaction.
 
 ---
 
@@ -547,12 +569,17 @@ toe — on the real Stage 3C final trajectories, worst trajectory per seed:
 | 110201 | 1.33 m | 7.75 m | **0.00** | 0.84 m | 5.70 m |
 | 424242 | 0.87 m | 4.82 m | **0.00** | 0.17 m | 3.40 m |
 
-The apron and the plates are valley-compatible by construction; knolls are the only obstacle. A single
-knoll never exceeds what 3F may cut; the "knolls alone" sum can pass 7.2 m when a trajectory crosses two
-of them, and in the full relief part of it is absorbed by the plate descent. Criterion (§19): along
-every trajectory, plate + apron adverse rise ≤ 1.5 m, `R4A` adverse rise ≤ 7.2 m, and no single climb
-taller than `CorridorIncisionMeters`. **[OPEN] option 4A-K2**, not in v1: exclude knolls from 3C corridors. That
-would make Stage 4A read Stage 3; it is held back so 4A stays independent of the stage 3F will unfreeze.
+The apron and the plates are valley-compatible by construction; knolls are the only obstacle when they
+exist. A single knoll never exceeds what 3F may cut; the C6 "knolls alone" sum can pass 7.2 m when a
+trajectory crosses two of them. Criterion (**R-7**, S11-T): along every trajectory, plate + apron
+adverse rise ≤ 1.5 m, **single climb** `C(R4A) ≤ 7.2 m`, and `I₁(H4A) ≤ I₁(H2)` (theorem: `R4A ≥ 0`
+cannot increase the incision Stage 3F needs below Stage 1). The R4A *adverse sum* is report-only — it
+is not a cut depth. **[OPEN] option 4A-K2**, not in v1: exclude knolls from 3C corridors. That would
+make Stage 4A read Stage 3; it is held back so 4A stays independent of the stage 3F will unfreeze.
+
+Outlet checks (**R-8**, S11-O) are physical, not "`R4A` non-increasing downstream": O-1 corridor end
+below the outlet on H4A; O-2 rim-margin after `CarveField` at the declared outlet; O-3 `I₁`/`C` along
+the outlet run from `max(ClosestIndex, ToeIndex)`; O-4 declared-min shift reported.
 
 ### 9.4 Keeping 3F visible
 
@@ -628,35 +655,73 @@ Baseline (preflight method) → prototype C6 (110201 / 424242; 1337 at ×1.4) �
 | curvature ratio (isotropy) | 0.98 → 1.00 | 1.01 → 0.96 | 1.00 → 1.01 | 0.85–1.20, no grid period | generator design G7 |
 | authority time | 23.2 s | 23.8 s | 23.6 s | ≤ +15 % | preflight §18 |
 
+**Unity R1 dump** (`D:\Hobby\game-dev\stage4a-dumps\canonical`, 2026-09-16). Structural tests S1–S12
+are green. Geometric targets that R1 §15 already called residuals stay report-only — not retuned.
+
+| Seed | 70–110 m | p50 / p90 | LR med / p90 | spread | aligned | low / up | knolls | apron zone | pits |
+|---|---|---|---|---|---|---|---|---|---|
+| 110201 | 4.6 → **25.3** | 58 / 108 | 4.2 / 8.8 | 6.9 | 73.6 | 28.4 / 54.2 | **0** | 16.0 | 0 |
+| 424242 | 6.7 → **23.1** | 58 / 120 | 4.9 / 9.4 | 7.9 | 68.1 | 26.8 / 54.0 | **0** | **25.7** | 0 |
+| 20260905 | 7.8 → **21.3** | 63 / 155 | 5.2 / 11.5 | 10.0 | 62.7 | 18.2 / 52.5 | **0** | **30.3** | 0 |
+| 7 | 5.0 → **15.4** | 54 / 111 | 4.9 / 9.0 | 8.1 | 73.1 | 19.1 / 55.3 | **0** | 17.3 | 0 |
+| 1337 | 0.2 → **26.5** | 55 / 79 | 3.9 / 8.3 | 5.3 | 67.1 | 23.6 / **64.8** | **0** | — | 0 |
+| 256 | 0.1 → **22.9** | **51** / 78 | 4.0 / 8.7 | 6.4 | 67.8 | 36.5 / 51.1 | **0** | — | 0 |
+| 777 | 0.0 → **17.9** | 53 / 77 | **3.50** / 7.5 | 5.3 | **77.2** | 35.0 / 49.3 | **0** | — | 0 |
+
+Report-only misses vs the C6 bands (R1 §15 predicted most of them): coast-aligned 110201 / 424242 / 7 /
+777; apron zone 424242 / 20260905; 1337 upland 64.8 %; 256 p50 51 m; 777 LR median 3.50 m (hard band
+≥ 3.5, reports as fail at equality in the dump); **zero knolls on every seed** (soft 8–25) — harsher
+than R1's harness prediction of 9–19 because junction certification was not in those numbers.
+Junction certificates: all PASS, 1 iteration, radii stayed at the 450 m minimum.
+
+Changed numeric targets vs C6:
+
+| Metric | C6 target | R1 target |
+|---|---|---|
+| depressions | 0 anywhere | **S8-A** 0 outside `Z_M ∪ L_M` (every seed); **S8-M** 0 inside on the 7 canonical seeds |
+| lowland / upland share | 20–35 / 40–62 % | **report**; gate = reserved land ≥ 20 % |
+| knolls | 10–25, height 4–7.2 m | 8–25, height ≤ `τ·σ_minor/0.5726`; **measured 0** |
+| plate edge | ~200 m | derived per pair, added slope ≤ τ |
+| adverse rise, R4A | ≤ 7.2 m sum | **single climb** ≤ 7.2 m; sum reported |
+| apron zone | ≤ 25 % | unchanged (still exceeded on 424242 / 20260905) |
+
 ---
 
 ## 12. Closed depressions
 
 ### 12.1 Contract
 
-1. **Stage 4A creates no closed depression.** Declared basins exist only from Stage 3F.
-   *(R1 §4.2 narrows this to a provable scope: no depression outside the massif influence zone and its
-   lee; inside it the massif foot is Stage 3F's, and frozen H2 has such a depression itself.)*
-2. Every land point drains to the sea on `H4A`: the priority-flood fill of `H4A` from the ocean differs
-   from `H4A` by at most the micro tolerance.
-3. **Tolerance:** a filled component counts if its max fill depth ≥ **0.25 m** *and* its area ≥ **100 m²**.
-   The hydrology lake thresholds (`MinLakeAreaSqm = 4 000`, `MinLakeDepthMeters = 1.5`) are an order of
-   magnitude looser, so no 4A depression can ever become a lake. Micro components below the tolerance are
-   reported (count, max depth), not failed.
-4. A failure is **fixed at the source** (a construction rule or a setting) and re-measured. Stage 4A has no
-   fill, repair or re-planning pass.
+1. **S8-A (hard, every seed).** No closed depression (≥ 0.25 m and ≥ 100 m²) with any cell outside the
+   massif influence zone and its lee (`Z_M ∪ L_M`, `U2 > 0 || A > 0`, lee = nearest-shore segment).
+   Proven by the inland slope budget, not measured into existence (**R-10**).
+2. **S8-M (hard on the 7 canonical seeds; reported on the sweep).** Depressions entirely inside
+   `Z_M ∪ L_M` are massif-foot / apron class. Frozen H2 has one itself on sweep seed 1019. Owner:
+   Stage 3F / Stage 4B.
+3. **S8-C (hard).** On the 1025² lattice, outside `Z_M ∪ L_M`, `∂(H1 + M + Γ(P + K))/∂n` along the
+   coast-distance gradient (`|∇d| ≥ 0.95`) is `≥ −1·10⁻³`.
+4. **Tolerance:** a filled component counts if its max fill depth ≥ **0.25 m** *and* its area ≥ **100 m²**.
+   Micro components below that are reported, not failed.
+5. A failure is **fixed at the source**. Stage 4A has no fill, repair or re-planning pass. Junction
+   certification samples the analytic level field; it never reads a raster of terrain.
 
-### 12.2 Construction rules (why the contract is expected to hold)
+### 12.2 Construction rules (R-1…R-10)
 
-| Rule | Mechanism it removes | Evidence [PROTO] |
-|---|---|---|
-| ~~all terms ≥ 0~~ **false, see R1 §2** | lips against the datum's zero-slope rings (200 m, 440 m) and medial crest | A: 4–5 depressions; N: 35–40 |
-| convergent boundaries are one-sided block edges, not two-sided belts | strike troughs | B/C1: 1337 depression 0.41–0.48 m |
-| junction relaxation (450 m) | notch at a lowland wedge's apex | 0.86 → 0.43 → 0 m |
-| a level-0 plate must have ≥ 150 m of coast frontage | lowland without outlet | (no case on 3 seeds; structural necessity) |
-| apron reach constant along outward rays | apron rising outwards | C3: 0.60 m → 0 |
-| knolls: compact kernels, max-combined, ≥ 200 m apart, downslope elongation | rims closing between hills | knolls alone: 0 |
-| `NoMassifUpliftScale ≤ 1.4` | junction depression growing with amplitude | ×1.6: 449 m² at 0.27 m |
+| Rule | What it does |
+|---|---|
+| **R-1** inland slope budget `M(d)` | `H1 + M` has inland slope ≥ τ; ring lips from falling terms are absorbed |
+| **R-2** pair half-width `w_kj = max(w₀, 1.5·U·m·Δλ/(2τ))` | steepest plate edge descent ≤ τ |
+| **R-3** derived `R_J` + 5 m certificate ≤ 8 iterations | discrete `−∂(ΓP)/∂n` ≤ τ at junctions (S12) |
+| **R-4** knoll cap `a ≤ (τ − g_P)·σ_minor/0.5726`; no knoll on massif body | knolls stay inside leftover budget |
+| **R-5** `W_eff = clamp(R_axis − δ − toe, 0, W)`, `P_A ≡ 0` beyond `R − δ` | projection uniqueness |
+| **R-6** S10 on ungated `P_A` along exact normals, 1 mm | gate rise is not an apron defect |
+| **R-7** S11-T: `C(R4A) ≤ 7.2`, plate+apron ≤ 1.5, `I₁(H4A) ≤ I₁(H2)` | adverse *sum* is not a cut depth |
+| **R-8** S11-O O-1…O-4 with real `CarveField` | outlets are H4A + carve properties, not R4A monotonicity |
+| **R-9** lowland reservation ≥ 20 % of land at level 0 | whole-plate rank left 5.6–15 % lowland |
+| **R-10** S8 scope = S8-A / S8-M | massif-foot pits are not Stage 4A's to guarantee |
+
+Kept from C6: convergent boundaries are one-sided; level-0 needs ≥ 150 m coast frontage; knolls
+max-combined and ≥ 200 m apart; `NoMassifUpliftScale ≤ 1.4`. The struck C6 rule "all terms ≥ 0
+removes ring lips" is not a construction rule.
 
 ### 12.3 How it is checked (no hydrology dependency in 4A)
 
@@ -717,37 +782,40 @@ Rules:
 
 ## 15. API
 
-Proposed, **not implemented**. Only what the dump, tests and the later integration need.
+**Implemented** in `IslandRelief*.cs` / `IslandElevation.cs`. Dump, tests and (later) integration consume
+this surface. Production `TerrainAuthorityField` does not.
 
 ```csharp
 namespace GameDev.World.TerrainGen
 {
-    /// Immutable numbers for Stage 4A. Separate struct for the same reason MassifSettings is:
-    /// Stage 1 and 2 are frozen by hash and their determinism runs through their own settings types.
     public struct IslandReliefSettings
     {
-        public float PlateUpliftMeters;            // 18
-        public float NoMassifUpliftScale;          // 1.4
-        public float PlateEdgeHalfWidthMeters;     // 110
-        public float JunctionRelaxRadiusMeters;    // 450
-        public float MinPlateLandAreaSqm;          // 150 000
-        public float ConvergentMinLandLengthMeters;// 150
-        public float MinLowlandFrontageMeters;     // 150
-        public float KnollHeightMeters;            // 6.5, clamped to RidgeSettings.CorridorIncisionMeters
-        public float KnollKeepFraction;            // 0.6
-        public float KnollMinLevel;                // 0.34
-        public float KnollMajorSigmaPerDiameter;   // 0.22
-        public float KnollMinorSigmaPerDiameter;   // 0.14
-        public float KnollYawJitterDegrees;        // 20
-        public float ApronHeightPerCrest;          // 0.09
-        public float ApronCapPerCrest;             // 0.18
-        public float ApronReachGentleMeters;       // 180
-        public float ApronReachSteepMeters;        // 110
-        public float ApronReachEndMeters;          // 280
-        public float ApronTalusDegrees;            // 22
-        public float ApronBlendMeters;             // 10
-        public float ApronEndHeightFloor;          // 0.55
-        public float MaxReliefMeters;              // 100 — asserted, never clamped
+        public float PlateUpliftMeters;                 // 18
+        public float NoMassifUpliftScale;               // 1.4
+        public float PlateEdgeHalfWidthMeters;          // 110 — minimum (R-2)
+        public float JunctionRelaxRadiusMeters;         // 450 — minimum (R-3)
+        public float InlandSlopeBudget;                 // τ = InteriorRise/InteriorScale, Clamp (0, 0.25]
+        public float LowlandReserveShare;               // 0.20 (R-9)
+        public float JunctionCertificationStepMeters;   // 5
+        public float JunctionCertificationMaxIterations;// 8
+        public float MinPlateLandAreaSqm;               // 150 000
+        public float ConvergentMinLandLengthMeters;     // 150
+        public float MinLowlandFrontageMeters;          // 150
+        public float KnollHeightMeters;                 // 6.5
+        public float KnollKeepFraction;                 // 0.6
+        public float KnollMinLevel;                     // 0.34
+        public float KnollMajorSigmaPerDiameter;        // 0.22
+        public float KnollMinorSigmaPerDiameter;        // 0.14
+        public float KnollYawJitterDegrees;             // 20
+        public float ApronHeightPerCrest;               // 0.09
+        public float ApronCapPerCrest;                  // 0.18
+        public float ApronReachGentleMeters;            // 180
+        public float ApronReachSteepMeters;             // 110
+        public float ApronReachEndMeters;               // 280
+        public float ApronTalusDegrees;                 // 22
+        public float ApronBlendMeters;                  // 10
+        public float ApronEndHeightFloor;               // 0.55
+        public float MaxReliefMeters;                   // 100 — asserted, never clamped
         public static IslandReliefSettings Default { get; }
         public void Clamp();
     }
@@ -756,106 +824,103 @@ namespace GameDev.World.TerrainGen
     {
         public static IslandRelief Build(
             GameDev.World.Seed.IWorldSeed worldSeed,
-            Stage1Result stage1,                    // coast datum, crust partition, land raster
-            MacroPlates plates,                     // from Stage2AResult.Plates
-            IReadOnlyList<MountainMassif> massifs,  // may be empty
+            Stage1Result stage1,
+            MacroPlates plates,
+            IReadOnlyList<MountainMassif> massifs,
             IslandReliefSettings settings);
 
-        /// Relief in metres, >= 0, exactly 0 at and seaward of the shore.
-        /// stage1Height and upliftMeters are the caller's already-evaluated H1 and U2 at (x, z).
-        public float At(float worldX, float worldZ, float stage1Height, float upliftMeters);
+        // signedDistance is Stage 1 signed coast distance (positive inland). Applied M is 0 when H1 ≤ sea.
+        public float At(float worldX, float worldZ, float signedDistance, float stage1Height, float upliftMeters);
+        public IslandReliefSample Sample(float worldX, float worldZ, float signedDistance, float stage1Height, float upliftMeters);
+        public WorldHeightField EvaluateField(WorldHeightField stage1Field, WorldHeightField upliftField, float[] signedDistance);
 
-        /// The same value with its parts, for the dump and tests.
-        public IslandReliefSample Sample(float worldX, float worldZ, float stage1Height, float upliftMeters);
+        public float SlopeBudget { get; }
+        public float PairHalfWidth(int k, int j);
+        public bool InfluenceZone(float worldX, float worldZ, float upliftMeters); // U2 > 0 || A > 0
+        public float CoastalFloorAt(float signedDistance);                         // raw 1-D M(d)
 
-        public IReadOnlyList<ReliefPlate> Plates { get; }        // index, land area, frontage, score, level
-        public IReadOnlyList<ReliefJunction> Junctions { get; }  // position, member plates, mean level
-        public IReadOnlyList<ReliefKnoll> Knolls { get; }        // site index, centre, yaw, sigmas, height
+        public IReadOnlyList<ReliefPlate> Plates { get; }
+        public IReadOnlyList<ReliefJunction> Junctions { get; }   // Certificate: initial/final R, widths, max adverse, iters, pass
+        public IReadOnlyList<ReliefKnoll> Knolls { get; }
+        public IReadOnlyList<ReliefKnoll> KnollCandidates { get; } // Rejection: Gate/Level/Resistance/Budget/MassifBody
         public bool HasMassif { get; }
+
+        public float EffectiveReach(int massifIndex, float s, float side);
+        public float ApronProfileAt(int massifIndex, float s, float signedOffset, float endness); // S10
     }
 
     public readonly struct IslandReliefSample
     {
-        public float Gate { get; }        // Γ
-        public float PlateLevel { get; }  // Λ
-        public float Plate { get; }       // Γ·P
-        public float Knoll { get; }       // Γ·K
-        public float Apron { get; }       // A
-        public float Total { get; }       // R4A
-    }
-
-    public static class IslandElevation
-    {
-        /// H4A = StructuralElevation.At + relief, with H1, the coast distance and U2 evaluated once.
-        public static float At(Stage1Result stage1, MassifUpliftModel uplift, IslandRelief relief,
-                               float worldX, float worldZ);
+        public float Gate { get; }          // Γ
+        public float PlateLevel { get; }    // Λ
+        public float CoastalFloor { get; }  // applied M
+        public float Plate { get; }         // P (ungated)
+        public float Knoll { get; }         // K (ungated)
+        public float Apron { get; }         // A
+        public float Total { get; }         // M + Γ·(P+K) + A
     }
 }
 ```
 
-Why exactly these:
-
-- `At` takes `stage1Height` and `upliftMeters` because the gate needs `H1` and the apron needs `U2`,
-  and the caller has both; recomputing them would double the coast-distance query that already
-  dominates the bake (tech debt 16).
-- `Sample` exists because tests must assert each part at the shore and the dump must image each part.
-  It is not for the bake.
-- The three structure lists are what "why is this hill here" is answered from, and what the dump prints.
-- **Not proposed:** an interface, a provider, a component registry, a ScriptableObject profile (a later,
-  separate authoring step, preflight M8), publishing the structure on `WorldDefinition`, or a breakdown
-  exposed to `TerrainSurfaceRules` (the apron is floor, and the rules classify it by slope as they
-  should).
+`IslandElevation.At` computes signed distance once and passes it into `relief.At`. Point and lattice
+share `Stage1Result.SignedDistance` (S4 includes `M`).
 
 ---
 
 ## 16. Expected visual result
 
-The prototype's top-down relief and hillshade images support the descriptions below. Its untextured
-voxel renders did not separate 4A from baseline at eye level or from 300 m, so **visual acceptance
-requires the eye-level capture the preflight lists as M9**. The honest expectation: Stage 4A changes
-how the island *reads when you walk it* much more than how it looks from the air.
+**Unity R1 dump images** (canonical 13 maps × 7 seeds, 2026-09-16). Eye-level capture (preflight M9)
+is still required before integration. Stage 4A changes how the island *reads when you walk it* more
+than how it looks from the air; without knolls the walk currently lacks the rolling-hill beat.
 
 ### 110201
 
 - **Silhouette:** unchanged (Stage 1).
-- **Shore → lowland:** the southern bays open onto a broad plain at 30–65 m (the lower plate) that runs
-  inland to the foot of the massif. The west arm stands a step higher (level 0.33–0.67).
-- **Lowland → upland:** crossing to the north, the ground climbs a ~200 m-wide, ~7° edge onto the
-  northern upland (the upper plate), whose top sits at 80–95 m with a dozen 4–7 m knolls elongated
-  downslope towards the north coast. The north coast becomes a raised shore with 10–20° bluffs.
-- **Upland → foothills → massif:** from the north the upland rises into a long piedmont (≈180 m, ≤ 16°),
-  then a 22° talus, and the massif's gentle flank emerges from it at 110–130 m instead of from a
-  63 m plain. From the south the lowland meets the massif's steep flank with only a short, steep apron —
-  the scarp faces the lowland. Along strike, foothill tails reach 280 m past both ends.
-- **What stops reading:** the nested coast-parallel rings and the straight medial roof creases across the
-  north; the hard corner at the massif's foot.
-- **What still reads:** a massif crown ringed by > 45° ground (until 3F/2B).
+- **Plates:** reserved southern lowland (level 0, 32 % of land) vs NE upland (level 1). Pair widths
+  110–270 m; both junctions certified at 450 m, 1 iteration, PASS.
+- **Massif / apron:** the massif still landmarks the east-centre. The apron is a closed fill around
+  the foot (zone 16.0 %, `W_eff` mid 123/110 m, domain 445.8 m). Transition from lowland (south) to
+  the steep flank is readable; the north piedmont is shorter than C6's 180 m gentle reach.
+- **Knolls:** none. `06_knolls_gated` is empty. Interior variation is plate levels + `M` rings only.
+- **What still reads:** coast-parallel Stage 1 rings (now with `M`); massif crown wall; junction discs
+  as circular blends on the structure map.
 
 ### 424242
 
-- The massif runs N–S west of centre. **West and south** stand as uplands with ~20 knolls; the
-  **north-east** plate is the lowland plain, and the massif's steep eastern flank faces it.
-- The apron wraps the whole massif; on the gentle west side it merges into the upland, on the east it is a
-  short steep skirt. **Watch item:** in the relief image the apron reads as a continuous ring (§20 R4).
-- The islet is untouched in practice (`Γ < 0.5`, no knolls).
+- Massif N–S west of centre. Apron is a **closed ring** (zone **25.7 %**, R1 residual R4). Islet
+  untouched. Interior plates readable; no knoll blobs.
+
+### 20260905
+
+- Larger massif, apron zone **30.3 %**, concentric bands around the body. Lowland 18.2 % (reserved
+  land 23.9 % — the reservation fired; gate is reserved share, not the visual Λ<0.25 share). No knolls.
+
+### 7
+
+- Horseshoe island, massif north-centre, apron zone 17.3 %. Plate terraces on the SW/SE arms. Traj
+  plate+apron 1.44 m (under 1.5). No knolls.
 
 ### 1337 (no massif)
 
-- A **south-western highland** (25 m block, knolls) and a **north-eastern middle plateau** (12 m) meet a
-  **south-eastern lowland** that opens onto three coasts. The highland's eastern edge follows the
-  convergent south arm as a straight ~800 m edge (edge-warp candidate, §10).
-- The highest ground moves from "wherever the coast is farthest" (72 m) to the highland (86 m).
-- **Not delivered by 4A:** a landmark visible from everywhere. That arrives with T2 plateaus (4B).
+- SW highland vs NE middle vs SE lowland, reservation applied, upland **64.8 %** (three-district
+  middle rank at 0.5 — R1 residual R5). Straight bisector edges remain (R6). Highest point 72 → 85 m.
+- Ring-100 pit of C6 is gone (S8-A/M = 0).
+
+### 256 / 777 (no massif)
+
+- 256: interior plateau with plate facets, reserved lowland east/south (36.5 %), p50 51 m.
+- 777: broad southern/eastern plain (lowland 35.0 %), western highland; coast-aligned **77.2 %**
+  (no-massif limit 70 %). C6 ring-200 pit gone.
 
 ### The sequence the player walks
 
-| Transition | Before | After 4A |
+| Transition | Before | After R1 |
 |---|---|---|
-| shore → lowland | beach ramp, then the same ramp | beach ramp, then an open plain at datum |
-| lowland → hills | none | an edge onto raised ground, knolls appearing over its rim |
-| hills → upland | none | the knolls sit on the upland top; swales between them lead downslope |
-| upland → foothills | none | a piedmont that steepens into talus |
-| foothills → massif | a 60° wall from a flat plain | the wall emerges from talus 40–70 m above the plain (still a wall above that) |
+| shore → lowland | beach ramp, then the same ramp | beach ramp, then an open plain at datum (`M` is a few metres, not a landform) |
+| lowland → upland | none | a τ-width edge onto a raised district |
+| upland interior | coast-distance roof | plate top; **no knolls yet** |
+| upland → foothills | none | a domain-limited piedmont that still reads as a ring on some seeds |
+| foothills → massif | a 60° wall from a flat plain | the wall emerges from talus (still a wall above that) |
 
 ---
 
@@ -872,7 +937,7 @@ how the island *reads when you walk it* much more than how it looks from the air
 | silhouette is a cell-growth union with a blocky rhythm | outline has no macro intent | D1 (Stage 1 reopening), after 4A images |
 | one onshore profile on every shore | uniform coast | Stage 4C (additive, zero at the shore) |
 | 200 m coastal transition = 54–59 % of land | 4A relief is partial over half the island | acceptable; revisit in D1 only if 4C still reads ramp-dominated |
-| per-span smoothstep leaves zero-slope rings at 200 m and 440 m | negative relief would lip | removed as a problem by the positive-only rule |
+| per-span smoothstep leaves zero-slope rings at 200 m and 440 m | a falling 4A term would lip | inland slope budget `M` + τ (**R-1**); Stage 1 stays frozen |
 | constant 36 % land fraction | similar island sizes | D1 |
 
 - Reopening Stage 1 later costs 5 golden hashes and a Stage 2A–3E re-audit; Stage 4A re-evaluates
@@ -937,28 +1002,31 @@ TerrainGen)" everywhere, and to refinement as "refinement (after 3F)".
 | S1 | `R4A == 0` (exact) at every lattice sample with signed coast distance ≤ 0 |
 | S2 | land mask of `H4A` bit-identical to that of `H2`; land components unchanged |
 | S3 | `0 ≤ R4A ≤ MaxReliefMeters`; `H4A ≤ 700 m`; no NaN / infinity |
-| S4 | `IslandRelief.At` equals the bulk lattice value bit for bit (full lattice on one seed, 10 000 samples on the rest) |
+| S4 | `IslandRelief.At` equals the bulk lattice value bit for bit, **including applied `M`** (full lattice on one seed, 10 000 samples on the rest) |
 | S5 | two builds in one process and six fresh processes give identical relief hashes |
 | S6 | Stage 1 golden hashes, Stage 2B field hashes (`1de91e469513054b`, `9d9d7b3c2560bc36`), full Stage 3 suite, and `OverworldTerrainBakeTests`' pinned authority hash unchanged (4A is not yet on the production path) |
-| S7 | perturbing only `terrain.relief.knoll` changes only `Knoll`; plates, junctions and apron identical |
-| S8 | depressions (≥ 0.25 m and ≥ 100 m²) = 0 via `HydrologyGrid` + `DepressionFill`; micro count reported — **fails on 1337 and 777; split into S8-A / S8-M / S8-C by R1 §14** |
+| S7 | perturbing only `terrain.relief.knoll` changes only `Knoll`; plates, junctions, apron and **coastal floor** identical |
+| S8-A | depressions with any cell outside `Z_M ∪ L_M` = 0 (hard, every seed) |
+| S8-M | depressions entirely inside `Z_M ∪ L_M` = 0 on the 7 canonical seeds (hard); sweep reported |
+| S8-C | `∂(H1 + M + Γ(P+K))/∂n ≥ −1·10⁻³` outside `Z_M ∪ L_M` (`|∇d| ≥ 0.95`) |
 | S9 | every knoll ≤ `CorridorIncisionMeters`; every apron fill ≤ 0.18 × crest |
-| S10 | apron monotone non-increasing along 64 outward rays per massif — **fails; R1 §6 moves the check to the ungated apron surface and its projection domain** |
-| S11 | along every Stage 3C final trajectory: plate + apron adverse rise ≤ 1.5 m, `R4A` adverse rise ≤ 7.2 m, no single climb above `CorridorIncisionMeters`; at every Stage 3E outlet, `R4A` non-increasing in the outlet's downstream direction | **Fails on 110201 (adverse sum) and 20260905 (plate step); R1 §7-§8 replace the quantities.**
+| S10 | ungated `P_A`: 0 beyond `R − δ`; non-increasing along exact projection normals, 1 mm (**R-6**) |
+| S11-T | per Stage 3C trajectory: `C(R4A) ≤ 7.2 m`; plate + apron adverse ≤ 1.5 m; `I₁(H4A) ≤ I₁(H2) + 1 mm` (**R-7**) |
+| S11-O | O-1, O-2 (`CarveField`), O-3 hard; O-4 reported (**R-8**) |
+| S12 | every on-land junction certificate: max `−∂(ΓP)/∂n` ≤ τ (**R-3**) |
 
-**Geometric (seed-level, from the dump):** the "Target" column of §11 for 110201, 424242, 1337; the
-no-massif column for 1337, 256, 777.
+Unity 2026-09-16: `TerrainGenStage4ATests` **16/16**; full EditMode **571/571**; Stage 2B hashes unchanged.
+
+**Geometric (seed-level, from the dump):** §11 Unity R1 table. Soft/report-only misses are not defects
+to tune away.
 
 **Visual (human review of dump images, then eye-level captures before integration):**
 
-- the interior no longer reads as nested coast-parallel rings; medial creases no longer dominate;
 - at least one upland and one lowland are nameable on every seed, with a visible edge between them;
-- knolls read as hills on raised ground, not as a texture, and not on the plains;
-- the massif rises out of foothills on at least its gentle flank and along strike; no horizontal bench,
-  no concentric ring dominating;
+- knolls *would* read as hills on raised ground — **currently 0 placed**;
+- the massif rises out of an apron; the apron still reads as a ring on 424242 / 20260905 (Stage 3F / 4B);
 - a no-massif world shows a highland / plateau / plain hierarchy;
-- no pattern that repeats at a fixed spacing; no ruled straight edge longer than ~800 m without a
-  structural reason visible in the plate image.
+- no pattern that repeats at a fixed spacing; straight bisector edges remain (R6).
 
 ---
 
@@ -967,11 +1035,11 @@ no-massif column for 1337, 256, 777.
 | # | Risk | Mitigation |
 |---|---|---|
 | R1 | Relief reads as a "raised island" rather than districts | levels are rank-normalised (a lowland always exists); knolls only on uplands; review against §19.2 visual |
-| R2 | Depressions appear on seeds the prototype did not cover | seven-seed S8; rules in §12.2; failure fixed at the source |
-| R3 | Flat share too low on seeds with long upland coasts (424242: 24.9 %) | levers: `PlateUpliftMeters` 14–20, apron reaches, `KnollKeepFraction`; 4B restores flat tops; island-level ≥ 35 % is re-checked after 4B |
-| R4 | The apron reads as a ring and sits at its 25 % area limit (424242) | lever: apron height × `(0.6 + 0.4 (1 − Λ_side))` so the upland side is buried less, or shorter reaches; 3F valleys lobe it |
-| R5 | Straight plate edges read as ruled lines (1337 south arm) | optional edge warp (§10), off by default, separate decision |
-| R6 | Knolls obstruct 3F valleys | bound ≤ 7.2 m; S11; option 4A-K2 |
+| R2 | Massif-foot depressions inside `Z_M ∪ L_M` on non-canonical seeds | S8-M hard on canonical; sweep reported; owner Stage 3F / 4B (R1 §16 R1) |
+| R3 | Flat share too low on seeds with long upland coasts | 4B restores flat tops; island-level ≥ 35 % is re-checked after 4B |
+| R4 | The apron reads as a ring; zone 25.7 / 30.3 % on 424242 / 20260905 | O-2 guards drainage; ring appearance owned by Stage 3F valleys and Stage 4B |
+| R5 | Straight plate edges read as ruled lines (1337) | optional edge warp (§10), off by default |
+| R6 | Analytic knoll bound places **zero knolls** | accepted residual of the S8 proof; later asymmetric kernel (R1 §16 R3), not a 4A retune |
 | R7 | Owners expect 4A to fix reachability or give 1337 a landmark | stated as non-goals (§7.5, §8); owners: 3F / 2B / 4B |
 | R8 | Downstream tuning drifts (POI `MinHeight01`, settlement flatness, surface bands) | integration step runs markers and settlements and compares with the 32 POIs placed today |
 | R9 | Authority time grows (massif `Project` evaluated again for the apron) | ≤ +15 % budget; reuse the uplift's projection only if measured necessary, never at the cost of the pinned hash |
@@ -991,17 +1059,19 @@ apron (massif frame). Positive only, shore-gated, no noise, one stream.
 ```
 H4A(x) = H1(x) + U2(x) + R4A(x)                          (future: H(x) = H4A(x) − C3F(x))
 
-R4A(x) = Γ(x) · [ P(x) + K(x) ] + A(x)
+R4A(x) = M(d) + Γ(x) · [ P(x) + K(x) ] + A(x)            applied M = 0 wherever H1 ≤ Sea
 
+M(d)   = ∫₀^d max(0, τ − H1'(u)) du     d > 0;  0 at and seaward of the shore
+τ      = InteriorRiseMeters / InteriorScaleMeters        (= 0.05)
 Γ(x)   = smoothstep( clamp01( (H1(x) − SeaLevel) / CoastalRiseMeters ) )
-P(x)   = PlateUpliftMeters · m_world · Λ(x)               m_world = 1 (massif world) | 1.4 (no massif)
-Λ(x)   = plate level λ_k blended across boundaries (half-width 110 m), relaxed to the junction mean
-         within 450 m of on-land junctions; λ = rank of net overriding length at convergent boundaries
-K(x)   = max_i a_i (1 − q_i(x)/9)³₊ over eligible crust sites (Λ ≥ 0.34, Γ ≥ 0.5, r_i ≥ 0.4)
+P(x)   = PlateUpliftMeters · m_world · Λ(x)               m_world = 1 | 1.4
+Λ(x)   = reserved rank; pair widths w_kj = max(w₀, 1.5·U·m·Δλ/(2τ));
+         junction R_J derived and certified (S12)
+K(x)   = max_i a_i (1 − q_i(x)/9)³₊ , a ≤ (τ − g_P)·σ_minor/0.5726,
+         no knoll on massif body or when a ≤ 0
 A(x)   = SmoothMax(U2, Γ·P_A, 10 m) − U2
-P_A    = h(s)(1 − ρ/W)²  (ρ ≥ 0)   |   min(h(s) + tan 22°·(−ρ), c(s))  (ρ < 0)
-         h = 0.09·Crest·f(s), c = 0.18·Crest·f(s), f = 0.55 + 0.45·CrestAt(s)/Crest
-         W = 110 (steep) … 180 (gentle) … 280 m (along strike), constant along outward rays
+P_A    = h_eff(s)(1 − ρ/W_eff)²  (ρ ≥ 0)   |   talus (ρ < 0, unscaled h)
+         W_eff = clamp(R_axis − δ − toe, 0, W);  P_A ≡ 0 beyond R_axis − δ
 ```
 
 ### Proposed settings
@@ -1012,10 +1082,11 @@ P_A    = h(s)(1 − ρ/W)²  (ρ ≥ 0)   |   min(h(s) + tan 22°·(−ρ), c(s)
 
 | Term | Height | Scale | Share of land |
 |---|---|---|---|
-| plate uplift | 0–18 m (25 m no-massif) | plates 0.4–1 km², edges ~200 m | uplands 40–62 %, lowlands 20–35 % |
-| knolls | 4–7.2 m | 160 × 100 m half-height, ≥ 200 m apart, 10–25 per island | 10–20 % |
-| apron | fill to 26–52 m | 110 / 180 / 280 m reach | ≤ 25 % |
-| total `R4A` | mean 5–14 m, max ≤ 60 m expected, ≤ 100 m asserted | | |
+| coastal floor `M` | 0–4.7 m on canonical land | 1-D in `d`, rings of Stage 1 | everywhere inland of the shore (zero where H1 ≤ sea) |
+| plate uplift | 0–18 m (25 m no-massif) | plates 0.4–1 km², edges 110–270 m | uplands / lowlands **reported**; reserved land ≥ 20 % |
+| knolls | τ-capped; **0 placed** on canonical | 160 × 100 m half-height when present | 0 % |
+| apron | fill to 26–52 m | `W_eff` ≤ `R_axis − δ` | 16–30 % (424242 / 20260905 over 25 %) |
+| total `R4A` | mean 7–13 m, max ≤ 53 m measured, ≤ 100 m asserted | | |
 
 ### Deterministic streams
 
@@ -1057,11 +1128,11 @@ P_A    = h(s)(1 − ρ/W)²  (ρ ≥ 0)   |   min(h(s) + tan 22°·(−ρ), c(s)
 
 ### Implementation, then integration — two separate steps
 
-**Step 1 — Stage 4A implementation (TerrainGen only, dump-first).** New files above. Nothing on the
-production path calls them. Accept on §19.2 for seven seeds plus human review of the dump images.
-Production heights, the pinned authority hash and the saved scene stay bit-identical.
+**Step 1 — Stage 4A implementation (TerrainGen only, dump-first).** **Done (C6 then R1).** Nothing on
+the production path calls these files. Accept on §19.2 for seven seeds plus human review of the dump
+images. Production heights, the pinned authority hash and the saved scene stay bit-identical.
 
-**Step 2 — integration (separate, reviewable).**
+**Step 2 — integration (separate, reviewable). Not started.**
 
 1. `TerrainAuthorityField` builds `IslandRelief` from the Stage 1, Stage 2A plates and massifs it
    already has, and `HeightAt` / `Sample` return `IslandElevation.At` (`includeMassifs: false` keeps the
@@ -1082,18 +1153,20 @@ Production heights, the pinned authority hash and the saved scene stay bit-ident
 
 ```
 CURRENT STATE:  PASS
-DESIGN:         READY
+DESIGN:         R1 FOLDED IN
 STAGE 1:        KEEP FROZEN
 STAGE 3A–3E:    FROZEN
 NATIVE TERRAIN: PASS
-STAGE 4A:       READY FOR IMPLEMENTATION
+STAGE 4A:       IMPLEMENTED DUMP-FIRST (R1); NOT ON TerrainAuthorityField
+                tests 16/16, EditMode 571/571, canonical S8-A/M/C S10 S11-T/O S12 green
 
 RECOMMENDED NEXT STEP:
-Implement Stage 4A as new TerrainGen files only — IslandReliefSettings, IslandRelief, IslandElevation,
-TerrainGenIslandReliefDump and TerrainGenStage4ATests — dump-first, without switching
-TerrainAuthorityField, and accept it on §19.2 for 110201, 424242, 20260905, 7, 1337, 256 and 777.
+Do not wire TerrainAuthorityField. Residuals (zero knolls, apron ring/zone, massif-foot sweep pits,
+report-only metric misses) are owned by Stage 3F / 4B or a later knoll-kernel revision, not by a
+4A retune. Integration remains the separate Step 2.
 ```
 
-Owner confirmations requested at the dump review (none blocks Step 1): positive-only relief (§5.4);
-the Stage 4A-level flat-ground threshold (§11, "land < 5°"); edge warp on/off (§10); option 4A-K2 (§9.3);
-the `GeneratorVersion` bump at integration (§21).
+Owner confirmations still open at integration (none blocks remaining disconnected): positive-only
+relief (§5.4); the Stage 4A-level flat-ground threshold (§11, "land < 5°"); edge warp on/off (§10);
+option 4A-K2 (§9.3); the `GeneratorVersion` bump at integration (§21); whether a later knoll kernel
+may relax the analytic `g_P` bound (R1 §16 R3).

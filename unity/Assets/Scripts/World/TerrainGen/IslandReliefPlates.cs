@@ -58,6 +58,37 @@ namespace GameDev.World.TerrainGen
         public int LowerPlate { get; internal set; }
     }
 
+    /// <summary>Certified half-width of one pair of plates incident at a junction.</summary>
+    public readonly struct JunctionPairWidth
+    {
+        public int PlateA { get; }
+        public int PlateB { get; }
+        public float InitialMeters { get; }
+        public float FinalMeters { get; }
+
+        public JunctionPairWidth(int plateA, int plateB, float initialMeters, float finalMeters)
+        {
+            PlateA = plateA;
+            PlateB = plateB;
+            InitialMeters = initialMeters;
+            FinalMeters = finalMeters;
+        }
+    }
+
+    /// <summary>
+    /// Discrete construction certificate for one on-land junction: the 5 m sampled inland derivative
+    /// of ΓP, not a proof of the continuous field.
+    /// </summary>
+    public sealed class JunctionCertificate
+    {
+        public float InitialRadiusMeters { get; internal set; }
+        public float FinalRadiusMeters { get; internal set; }
+        public float MaxAdverseDerivative { get; internal set; }
+        public int Iterations { get; internal set; }
+        public bool Passed { get; internal set; }
+        public JunctionPairWidth[] Pairs { get; internal set; } = Array.Empty<JunctionPairWidth>();
+    }
+
     /// <summary>An on-land junction of at least three districts, where the level field relaxes.</summary>
     public sealed class ReliefJunction
     {
@@ -71,6 +102,11 @@ namespace GameDev.World.TerrainGen
 
         /// <summary>Mean level of those districts: what the field relaxes towards.</summary>
         public float MeanLevel { get; internal set; }
+
+        /// <summary>Certified relaxation radius, metres.</summary>
+        public float RadiusMeters { get; internal set; }
+
+        public JunctionCertificate Certificate { get; internal set; }
     }
 
     public sealed partial class IslandRelief
@@ -97,11 +133,12 @@ namespace GameDev.World.TerrainGen
         private ReliefBoundary[] boundaries = Array.Empty<ReliefBoundary>();
         private ReliefJunction[] junctions = Array.Empty<ReliefJunction>();
 
-        // Evaluation data: plate sites, the level each carries, and 1 / (2 |p_k − p_j|) per ordered pair.
+        // Evaluation data: plate sites, the level each carries, 1 / (2 |p_k − p_j|) and w_kj per pair.
         private double[] siteX = Array.Empty<double>();
         private double[] siteZ = Array.Empty<double>();
         private float[] plateLevel = Array.Empty<float>();
         private double[] inverseTwoSpan = Array.Empty<double>();
+        private double[] pairHalfWidth = Array.Empty<double>();
         private bool anyLevel;
 
         private void BuildPlates(Stage1Result stage1, MacroPlates macro)
@@ -123,12 +160,12 @@ namespace GameDev.World.TerrainGen
             MeasureBoundaries(stage1.Coast, macro);
             MergeSlivers(macro);
             AssignLevels();
-            BuildJunctions(stage1.Coast, macro);
 
             siteX = new double[count];
             siteZ = new double[count];
             plateLevel = new float[count];
             inverseTwoSpan = new double[count * count];
+            pairHalfWidth = new double[count * count];
             for (var k = 0; k < count; k++)
             {
                 siteX[k] = macro.Sites[k].x;
@@ -150,15 +187,26 @@ namespace GameDev.World.TerrainGen
                     var dz = siteZ[j] - siteZ[k];
                     var span = Math.Sqrt(dx * dx + dz * dz);
                     inverseTwoSpan[k * count + j] = span > 1e-3 ? 1.0 / (2.0 * span) : 0.0;
+                    pairHalfWidth[k * count + j] = DerivedPairHalfWidth(plateLevel[k], plateLevel[j]);
                 }
             }
+
+            BuildJunctions(stage1.Coast, macro);
+            CertifyJunctions();
+        }
+
+        private double DerivedPairHalfWidth(float lambdaK, float lambdaJ)
+        {
+            var delta = Math.Abs(lambdaK - lambdaJ);
+            var derived = 1.5 * PlateUpliftMeters * delta / (2.0 * Math.Max(1e-6, SlopeBudget));
+            return Math.Max(Settings.PlateEdgeHalfWidthMeters, derived);
         }
 
         /// <summary>
         /// Land per plate on a 10 m raster: the coastline's own scanline predicate, the plates' own
         /// nearest-site rule.
         /// </summary>
-        private void MeasureLand(CoastQuery coast, MacroPlates macro)
+        private void MeasureLand(CoastQuery coastQuery, MacroPlates macro)
         {
             var cells = Mathf.RoundToInt(WorldScale.WorldExtentXMeters / PlateLandRasterMeters);
             var rows = Mathf.RoundToInt(WorldScale.WorldExtentZMeters / PlateLandRasterMeters);
@@ -169,7 +217,7 @@ namespace GameDev.World.TerrainGen
             for (var z = 0; z < rows; z++)
             {
                 var worldZ = (z + 0.5f) * PlateLandRasterMeters;
-                coast.RowCrossings(worldZ, crossings);
+                coastQuery.RowCrossings(worldZ, crossings);
                 for (var x = 0; x < cells; x++)
                 {
                     var worldX = (x + 0.5f) * PlateLandRasterMeters;
@@ -186,12 +234,12 @@ namespace GameDev.World.TerrainGen
             }
         }
 
-        private void MeasureFrontage(CoastQuery coast, MacroPlates macro)
+        private void MeasureFrontage(CoastQuery coastQuery, MacroPlates macro)
         {
             var frontage = new double[plates.Length];
-            for (var r = 0; r < coast.Rings.Count; r++)
+            for (var r = 0; r < coastQuery.Rings.Count; r++)
             {
-                var ring = coast.Rings[r];
+                var ring = coastQuery.Rings[r];
                 if (ring == null || ring.Length < 2)
                 {
                     continue;
@@ -212,7 +260,7 @@ namespace GameDev.World.TerrainGen
             }
         }
 
-        private void MeasureBoundaries(CoastQuery coast, MacroPlates macro)
+        private void MeasureBoundaries(CoastQuery coastQuery, MacroPlates macro)
         {
             boundaries = new ReliefBoundary[macro.Boundaries.Length];
             var crossings = new List<float>(16);
@@ -226,7 +274,7 @@ namespace GameDev.World.TerrainGen
                 for (var i = 0; i < steps; i++)
                 {
                     var p = Vector2.LerpUnclamped(b.A, b.B, (i + 0.5f) / steps);
-                    coast.RowCrossings(p.y, crossings);
+                    coastQuery.RowCrossings(p.y, crossings);
                     if (CoastQuery.InsideFromSortedCrossings(crossings, p.x))
                     {
                         inside++;
@@ -251,12 +299,6 @@ namespace GameDev.World.TerrainGen
         /// Plates with too little land become part of the neighbouring district they share the most land
         /// boundary with.
         /// </summary>
-        /// <remarks>
-        /// A sliver is an accident of where a partition bisector happened to clip the coast, not a
-        /// district. Plates with no land at all are read the same way so the level field near the coast
-        /// takes the level of the land it touches. Fallbacks, in order, when no boundary to a district
-        /// crosses land: the longest boundary to a district, then the nearest district site.
-        /// </remarks>
         private void MergeSlivers(MacroPlates macro)
         {
             for (var k = 0; k < plates.Length; k++)
@@ -350,7 +392,8 @@ namespace GameDev.World.TerrainGen
         }
 
         /// <summary>
-        /// Levels from each district's role in the island's collision, ranked and normalised. No RNG.
+        /// Levels from each district's role in the island's collision, ranked with a lowland reservation.
+        /// No RNG.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -360,9 +403,9 @@ namespace GameDev.World.TerrainGen
         /// district with the most land stands highest.
         /// </para>
         /// <para>
-        /// Ranking rather than scaling by score is what guarantees an island with two or more districts
-        /// always has both a lowland (level 0) and an upland (level 1). A single district has nothing to
-        /// stand above, so every level is 0 and the plate term vanishes.
+        /// The lowest-scoring prefix of districts whose land reaches
+        /// <see cref="IslandReliefSettings.LowlandReserveShare"/> shares level 0. Remaining districts
+        /// are ranked evenly over (0, 1]. The frontage rule still applies to the prefix's first member.
         /// </para>
         /// </remarks>
         private void AssignLevels()
@@ -423,15 +466,12 @@ namespace GameDev.World.TerrainGen
                 plates[k].Score = UsedCratonRule ? plates[k].LandAreaSqm : (float)score[k];
             }
 
-            // Ascending score; equal scores rank the lower plate index lower.
             districts.Sort((a, b) =>
             {
                 var byScore = plates[a].Score.CompareTo(plates[b].Score);
                 return byScore != 0 ? byScore : a.CompareTo(b);
             });
 
-            // The lowest district must reach the sea, or its lowland would be a basin with no outlet. The
-            // lowest-ranked district that does takes rank 0; everything below it moves up one rank.
             if (districts.Count > 1 && plates[districts[0]].FrontageMeters < Settings.MinLowlandFrontageMeters)
             {
                 for (var i = 1; i < districts.Count; i++)
@@ -448,11 +488,44 @@ namespace GameDev.World.TerrainGen
                 }
             }
 
+            var totalLand = 0.0;
             for (var i = 0; i < districts.Count; i++)
+            {
+                totalLand += plates[districts[i]].LandAreaSqm;
+            }
+
+            var reservedCount = 0;
+            var reservedLand = 0.0;
+            var need = Settings.LowlandReserveShare * totalLand;
+            if (districts.Count > 0 && need > 0.0)
+            {
+                for (var i = 0; i < districts.Count; i++)
+                {
+                    reservedLand += plates[districts[i]].LandAreaSqm;
+                    reservedCount = i + 1;
+                    if (reservedLand >= need || reservedCount == districts.Count)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            ReservedDistrictCount = reservedCount;
+            ReservedLandShare = totalLand > 0.0 ? (float)(reservedLand / totalLand) : 0f;
+
+            for (var i = 0; i < reservedCount; i++)
             {
                 var k = districts[i];
                 plates[k].Rank = i;
-                plates[k].Level = districts.Count > 1 ? i / (float)(districts.Count - 1) : 0f;
+                plates[k].Level = 0f;
+            }
+
+            var remaining = districts.Count - reservedCount;
+            for (var i = 0; i < remaining; i++)
+            {
+                var k = districts[reservedCount + i];
+                plates[k].Rank = reservedCount + i;
+                plates[k].Level = (i + 1) / (float)remaining;
             }
 
             for (var k = 0; k < plates.Length; k++)
@@ -466,10 +539,10 @@ namespace GameDev.World.TerrainGen
         }
 
         /// <summary>On-land junctions of three or more districts, in a fixed positional order.</summary>
-        private void BuildJunctions(CoastQuery coast, MacroPlates macro)
+        private void BuildJunctions(CoastQuery coastQuery, MacroPlates macro)
         {
             var list = new List<ReliefJunction>();
-            if (Settings.JunctionRelaxRadiusMeters <= 0f)
+            if (Settings.JunctionRelaxRadiusMeters <= 0f && SlopeBudget <= 0f)
             {
                 junctions = list.ToArray();
                 return;
@@ -492,24 +565,40 @@ namespace GameDev.World.TerrainGen
                 }
 
                 var position = macro.Junctions[v];
-                if (!coast.IsInside(position.x, position.y))
+                if (!coastQuery.IsInside(position.x, position.y))
                 {
                     continue;
                 }
 
                 members.Sort();
                 var sum = 0.0;
+                var maxDelta = 0.0;
                 for (var i = 0; i < members.Count; i++)
                 {
                     sum += plates[members[i]].Level;
                 }
+
+                var mean = sum / members.Count;
+                for (var i = 0; i < members.Count; i++)
+                {
+                    maxDelta = Math.Max(maxDelta, Math.Abs(plates[members[i]].Level - mean));
+                }
+
+                var derived = 1.5 * PlateUpliftMeters * maxDelta / Math.Max(1e-6, SlopeBudget);
+                var radius = Math.Max(Settings.JunctionRelaxRadiusMeters, derived);
 
                 list.Add(new ReliefJunction
                 {
                     Index = v,
                     Position = position,
                     Plates = members.ToArray(),
-                    MeanLevel = (float)(sum / members.Count),
+                    MeanLevel = (float)mean,
+                    RadiusMeters = (float)radius,
+                    Certificate = new JunctionCertificate
+                    {
+                        InitialRadiusMeters = (float)radius,
+                        FinalRadiusMeters = (float)radius,
+                    },
                 });
             }
 
@@ -528,6 +617,175 @@ namespace GameDev.World.TerrainGen
             junctions = list.ToArray();
         }
 
+        /// <summary>
+        /// Discrete certificate: sample −∂(ΓP)/∂n on a 5 m lattice and widen the junction until the
+        /// measured inland descent is ≤ τ, or eight iterations expire.
+        /// </summary>
+        private void CertifyJunctions()
+        {
+            var step = Mathf.Max(1f, Settings.JunctionCertificationStepMeters);
+            var maxIter = Mathf.Max(1, Mathf.RoundToInt(Settings.JunctionCertificationMaxIterations));
+            var count = siteX.Length;
+
+            for (var j = 0; j < junctions.Length; j++)
+            {
+                var junction = junctions[j];
+                var members = junction.Plates;
+                var initialPairs = SnapshotIncidentWidths(members, count);
+                var iterations = 0;
+                var maxAdverse = 0f;
+                var passed = false;
+
+                for (var iter = 0; iter < maxIter; iter++)
+                {
+                    iterations = iter + 1;
+                    maxAdverse = SampleJunctionAdverse(junction, step);
+                    if (maxAdverse <= SlopeBudget + 1e-6f)
+                    {
+                        passed = true;
+                        break;
+                    }
+
+                    var scale = maxAdverse / Mathf.Max(1e-6f, SlopeBudget);
+                    junction.RadiusMeters *= scale;
+                    ScaleIncidentWidths(members, count, scale);
+                }
+
+                if (!passed)
+                {
+                    maxAdverse = SampleJunctionAdverse(junction, step);
+                    passed = maxAdverse <= SlopeBudget + 1e-6f;
+                }
+
+                var finalPairs = new JunctionPairWidth[initialPairs.Length];
+                for (var p = 0; p < initialPairs.Length; p++)
+                {
+                    var a = initialPairs[p].PlateA;
+                    var b = initialPairs[p].PlateB;
+                    finalPairs[p] = new JunctionPairWidth(
+                        a, b, initialPairs[p].InitialMeters, (float)pairHalfWidth[a * count + b]);
+                }
+
+                junction.Certificate = new JunctionCertificate
+                {
+                    InitialRadiusMeters = junction.Certificate.InitialRadiusMeters,
+                    FinalRadiusMeters = junction.RadiusMeters,
+                    MaxAdverseDerivative = maxAdverse,
+                    Iterations = iterations,
+                    Passed = passed,
+                    Pairs = finalPairs,
+                };
+            }
+        }
+
+        private JunctionPairWidth[] SnapshotIncidentWidths(int[] members, int count)
+        {
+            var list = new List<JunctionPairWidth>();
+            for (var a = 0; a < members.Length; a++)
+            {
+                for (var b = a + 1; b < members.Length; b++)
+                {
+                    var i = members[a];
+                    var j = members[b];
+                    var w = (float)pairHalfWidth[i * count + j];
+                    list.Add(new JunctionPairWidth(i, j, w, w));
+                }
+            }
+
+            return list.ToArray();
+        }
+
+        private void ScaleIncidentWidths(int[] members, int count, float scale)
+        {
+            for (var a = 0; a < members.Length; a++)
+            {
+                for (var b = a + 1; b < members.Length; b++)
+                {
+                    var i = members[a];
+                    var j = members[b];
+                    pairHalfWidth[i * count + j] *= scale;
+                    pairHalfWidth[j * count + i] *= scale;
+                }
+            }
+        }
+
+        private float SampleJunctionAdverse(ReliefJunction junction, float step)
+        {
+            var maxW = 0.0;
+            var count = siteX.Length;
+            for (var a = 0; a < junction.Plates.Length; a++)
+            {
+                for (var b = a + 1; b < junction.Plates.Length; b++)
+                {
+                    maxW = Math.Max(maxW, pairHalfWidth[junction.Plates[a] * count + junction.Plates[b]]);
+                }
+            }
+
+            var radius = junction.RadiusMeters + (float)maxW;
+            var origin = junction.Position;
+            var minX = origin.x - radius;
+            var maxX = origin.x + radius;
+            var minZ = origin.y - radius;
+            var maxZ = origin.y + radius;
+            var worst = 0f;
+
+            for (var z = minZ; z <= maxZ; z += step)
+            {
+                for (var x = minX; x <= maxX; x += step)
+                {
+                    var dx = x - origin.x;
+                    var dz = z - origin.y;
+                    if (dx * dx + dz * dz > radius * radius)
+                    {
+                        continue;
+                    }
+
+                    var sd = coast.SignedDistance(x, z);
+                    if (sd <= 0f)
+                    {
+                        continue;
+                    }
+
+                    var deriv = GatedPlateInlandDerivative(x, z, step);
+                    if (deriv < 0f)
+                    {
+                        worst = Mathf.Max(worst, -deriv);
+                    }
+                }
+            }
+
+            return worst;
+        }
+
+        /// <summary>∂(ΓP)/∂n by 5 m central differences along the signed-distance gradient.</summary>
+        private float GatedPlateInlandDerivative(float worldX, float worldZ, float step)
+        {
+            var ddx = coast.SignedDistance(worldX + step, worldZ) - coast.SignedDistance(worldX - step, worldZ);
+            var ddz = coast.SignedDistance(worldX, worldZ + step) - coast.SignedDistance(worldX, worldZ - step);
+            var len = Mathf.Sqrt(ddx * ddx + ddz * ddz);
+            if (len < 1e-4f)
+            {
+                return 0f;
+            }
+
+            var nx = ddx / len;
+            var nz = ddz / len;
+            var plus = GatedPlate(worldX + step * nx, worldZ + step * nz);
+            var minus = GatedPlate(worldX - step * nx, worldZ - step * nz);
+            return (plus - minus) / (2f * step);
+        }
+
+        private float GatedPlate(float worldX, float worldZ)
+        {
+            var sd = coast.SignedDistance(worldX, worldZ);
+            if (sd <= 0f)
+            {
+                return 0f;
+            }
+
+            return GateFor(heightModel.HeightAt(sd)) * PlateUpliftMeters * LevelAt(worldX, worldZ);
+        }
+
         private static void AddDistinct(List<int> list, int value)
         {
             if (!list.Contains(value))
@@ -537,24 +795,9 @@ namespace GameDev.World.TerrainGen
         }
 
         /// <summary>
-        /// The level field Λ at a world point: plate levels blended across the actual plate boundaries, then
-        /// relaxed at on-land junctions.
+        /// The level field Λ at a world point: plate levels blended across the actual plate boundaries,
+        /// then relaxed at on-land junctions.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Each plate's soft membership is the product, over every other site, of a smoothstep of the signed
-        /// perpendicular distance to their bisector - which is the line the boundary segment lies on. Deep
-        /// inside a cell every factor is 1 and Λ is the plate's level; across a single boundary the two
-        /// memberships are one smoothstep and its complement over twice
-        /// <see cref="IslandReliefSettings.PlateEdgeHalfWidthMeters"/>, so the edge is one smooth ramp with
-        /// no step and no landing. Near a junction the products blend all the plates involved and stay
-        /// continuous from every side, which a per-boundary sum does not.
-        /// </para>
-        /// <para>
-        /// Sums run in plate index order and junctions in their fixed order, so the value does not depend
-        /// on evaluation order in floating point.
-        /// </para>
-        /// </remarks>
         private float LevelAt(float worldX, float worldZ)
         {
             var count = siteX.Length;
@@ -563,7 +806,6 @@ namespace GameDev.World.TerrainGen
                 return 0f;
             }
 
-            var halfWidth = (double)Settings.PlateEdgeHalfWidthMeters;
             Span<double> distanceSq = stackalloc double[count];
             for (var k = 0; k < count; k++)
             {
@@ -584,7 +826,12 @@ namespace GameDev.World.TerrainGen
                         continue;
                     }
 
-                    // Signed distance to the bisector of k and j, positive on k's side.
+                    var halfWidth = pairHalfWidth[k * count + j];
+                    if (halfWidth <= 0.0)
+                    {
+                        continue;
+                    }
+
                     var delta = (distanceSq[j] - distanceSq[k]) * inverseTwoSpan[k * count + j];
                     if (delta >= halfWidth)
                     {
@@ -612,9 +859,14 @@ namespace GameDev.World.TerrainGen
 
             var level = total > 0.0 ? (float)(weighted / total) : 0f;
 
-            var radius = Settings.JunctionRelaxRadiusMeters;
             for (var i = 0; i < junctions.Length; i++)
             {
+                var radius = junctions[i].RadiusMeters;
+                if (radius <= 0f)
+                {
+                    continue;
+                }
+
                 var offset = new Vector2(worldX, worldZ) - junctions[i].Position;
                 var distance = offset.magnitude;
                 if (distance >= radius)

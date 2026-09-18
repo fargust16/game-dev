@@ -7,7 +7,8 @@ using UnityEngine;
 namespace GameDev.World.TerrainGen.Tests
 {
     /// <summary>
-    /// Stage 4A: the island-floor relief (PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md §19.2).
+    /// Stage 4A: the island-floor relief (PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md §19.2,
+    /// revision R1).
     /// </summary>
     /// <remarks>
     /// <para>
@@ -152,13 +153,19 @@ namespace GameDev.World.TerrainGen.Tests
                     var signedDistance = w.Stage1.Coast.SignedDistance(worldX, worldZ);
                     var h1 = w.Stage1.Model.HeightAt(signedDistance);
                     var u2 = w.Uplift.UpliftAt(worldX, worldZ, signedDistance);
-                    var point = w.Relief.At(worldX, worldZ, h1, u2);
+                    var point = w.Relief.At(worldX, worldZ, signedDistance, h1, u2);
                     var elevation = IslandElevation.At(w.Stage1, w.Uplift, w.Relief, worldX, worldZ);
+                    var sample = w.Relief.Sample(worldX, worldZ, signedDistance, h1, u2);
+                    var floor = h1 <= WorldScale.SeaLevelMeters
+                        ? 0f
+                        : w.Relief.CoastalFloorAt(signedDistance);
 
                     var ok = h1 == field.Heights[i]
                              && u2 == w.Stage2B.UpliftField.Heights[i]
                              && point == w.ReliefField.Heights[i]
                              && point == w.SampleTotal[i]
+                             && point == sample.Total
+                             && floor == sample.CoastalFloor
                              && elevation == w.H4A[i];
                     if (ok)
                     {
@@ -181,16 +188,16 @@ namespace GameDev.World.TerrainGen.Tests
         }
 
         [Test]
-        public void S4_TotalIsGateTimesFloorPlusApron()
+        public void S4_TotalIsCoastalFloorPlusGateTimesFloorPlusApron()
         {
             foreach (var w in worlds)
             {
                 for (var i = 0; i < w.H2.Length; i += 7)
                 {
-                    var expected = w.Gate[i] * (w.Plate[i] + w.Knoll[i]) + w.Apron[i];
+                    var expected = w.CoastalFloor[i] + w.Gate[i] * (w.Plate[i] + w.Knoll[i]) + w.Apron[i];
                     if (expected != w.SampleTotal[i])
                     {
-                        Assert.Fail($"seed {w.Seed} sample {i}: total {w.SampleTotal[i]} is not Gate*(Plate+Knoll)+Apron {expected}");
+                        Assert.Fail($"seed {w.Seed} sample {i}: total {w.SampleTotal[i]} is not M+Gate*(Plate+Knoll)+Apron {expected}");
                     }
                 }
             }
@@ -207,7 +214,7 @@ namespace GameDev.World.TerrainGen.Tests
                 var again = IslandRelief.Build(
                     new GameDev.World.Seed.WorldSeed(w.Seed), w.Stage1, w.Stage2B.Plates, w.Stage2B.Massifs,
                     IslandReliefSettings.Default);
-                var field = again.EvaluateField(w.Stage1.Field, w.Stage2B.UpliftField);
+                var field = again.EvaluateField(w.Stage1.Field, w.Stage2B.UpliftField, w.Stage1.SignedDistance);
                 Assert.AreEqual(w.ReliefField.Hash(), field.Hash(), $"seed {w.Seed}: relief hash differs between two builds");
                 AssertSameStructure(w.Relief, again, $"seed {w.Seed}");
             }
@@ -346,12 +353,13 @@ namespace GameDev.World.TerrainGen.Tests
                 {
                     var x = field.WorldX(i % field.Width);
                     var z = field.WorldZ(i / field.Width);
-                    var original = w.Relief.Sample(x, z, field.Heights[i], w.Stage2B.UpliftField.Heights[i]);
-                    var moved = perturbed.Sample(x, z, field.Heights[i], w.Stage2B.UpliftField.Heights[i]);
+                    var original = w.Relief.Sample(x, z, w.Stage1.Coast.SignedDistance(x, z), field.Heights[i], w.Stage2B.UpliftField.Heights[i]);
+                    var moved = perturbed.Sample(x, z, w.Stage1.Coast.SignedDistance(x, z), field.Heights[i], w.Stage2B.UpliftField.Heights[i]);
                     Assert.AreEqual(original.Plate, moved.Plate, $"seed {w.Seed}: plate term moved at sample {i}");
                     Assert.AreEqual(original.PlateLevel, moved.PlateLevel, $"seed {w.Seed}: level moved at sample {i}");
                     Assert.AreEqual(original.Apron, moved.Apron, $"seed {w.Seed}: apron moved at sample {i}");
                     Assert.AreEqual(original.Gate, moved.Gate, $"seed {w.Seed}: gate moved at sample {i}");
+                    Assert.AreEqual(original.CoastalFloor, moved.CoastalFloor, $"seed {w.Seed}: coastal floor moved at sample {i}");
                     knollChanged |= original.Knoll != moved.Knoll;
                 }
 
@@ -372,15 +380,15 @@ namespace GameDev.World.TerrainGen.Tests
         // ---------- S8 ----------
 
         [Test]
-        public void S8_NoClosedDepressions()
+        public void S8A_NoQualifyingDepressionsOutsideMassifOwnership()
         {
             var report = new List<string>();
             var failures = 0;
             foreach (var w in worlds)
             {
-                IslandReliefMetrics.ScanDepressions(w.H4A, w, out var count, out var area, out var deepest, out var micro, out var microMax);
-                report.Add($"seed {w.Seed}: depressions {count} ({area:F0} m2, deepest {deepest:F2} m), micro {micro} (<= {microMax:F2} m)");
-                if (count > 0)
+                var checks = IslandReliefChecks.Run(w);
+                report.Add($"seed {w.Seed}: S8-A {checks.S8ACount} (deepest {checks.S8AMaxDepth:F2} m, {checks.S8AAreaSqm:F0} m2)");
+                if (checks.S8ACount > 0)
                 {
                     failures++;
                     report.AddRange(IslandReliefChecks.DepressionAttribution(w));
@@ -388,10 +396,45 @@ namespace GameDev.World.TerrainGen.Tests
             }
 
             TestContext.WriteLine(string.Join("\n", report));
-            Assert.AreEqual(
-                0, failures,
-                $"closed depressions >= {IslandReliefMetrics.DepressionMinDepthMeters} m and >= {IslandReliefMetrics.DepressionMinAreaSqm} m2:\n  "
-                + string.Join("\n  ", report));
+            Assert.AreEqual(0, failures, "S8-A qualifying depressions outside Z_M ∪ L_M:\n  " + string.Join("\n  ", report));
+        }
+
+        [Test]
+        public void S8M_NoQualifyingDepressionsInsideMassifOwnershipOnCanonicalSeeds()
+        {
+            var report = new List<string>();
+            var failures = 0;
+            foreach (var w in worlds)
+            {
+                var checks = IslandReliefChecks.Run(w);
+                report.Add($"seed {w.Seed}: S8-M {checks.S8MCount} (deepest {checks.S8MMaxDepth:F2} m, {checks.S8MAreaSqm:F0} m2)");
+                if (checks.S8MCount > 0)
+                {
+                    failures++;
+                    report.AddRange(IslandReliefChecks.DepressionAttribution(w));
+                }
+            }
+
+            TestContext.WriteLine(string.Join("\n", report));
+            Assert.AreEqual(0, failures, "S8-M qualifying depressions inside Z_M ∪ L_M on canonical seeds:\n  " + string.Join("\n  ", report));
+        }
+
+        [Test]
+        public void S8C_CoastNormalDerivativeOutsideOwnership()
+        {
+            var failures = new List<string>();
+            foreach (var w in worlds)
+            {
+                var checks = IslandReliefChecks.Run(w);
+                TestContext.WriteLine(
+                    $"seed {w.Seed}: S8-C min deriv {checks.S8CMinDerivative:E3} over {checks.S8CSamples} samples, beyond-800 {checks.LandBeyond800Percent:F2}%");
+                if (checks.S8CViolations > 0)
+                {
+                    failures.Add($"seed {w.Seed}: {checks.S8CViolations} samples with ∂B/∂n < -1e-3 (min {checks.S8CMinDerivative:E3})");
+                }
+            }
+
+            Assert.IsEmpty(failures, string.Join("\n  ", failures));
         }
 
         // ---------- S9 ----------
@@ -448,20 +491,21 @@ namespace GameDev.World.TerrainGen.Tests
         // ---------- S10 ----------
 
         [Test]
-        public void S10_ApronIsMonotoneAlongOutwardRays()
+        public void S10_UngatedApronPhysicalProfile()
         {
             var failures = new List<string>();
             foreach (var w in worlds)
             {
                 var checks = IslandReliefChecks.Run(w);
-                Assert.AreEqual(
-                    64 * w.Relief.ApronMassifs.Count, checks.ApronRays, $"seed {w.Seed}: ray count");
-                if (checks.ApronRayViolations > 0)
+                TestContext.WriteLine(
+                    $"seed {w.Seed}: S10 beyond-domain {checks.ApronBeyondDomainMax:F4} m ({checks.ApronBeyondDomainSamples} samples); "
+                    + $"normals {checks.ApronNormalViolations}/{checks.ApronNormalRays} worst {checks.ApronNormalWorstRise:F4} m; "
+                    + $"gated-fill (report) {checks.ApronRayViolations} worst {checks.ApronRayWorstRise:F4} m");
+                if (checks.ApronBeyondDomainMax > 0.001f || checks.ApronNormalWorstRise > 0.001f)
                 {
                     failures.Add(
-                        $"seed {w.Seed}: apron rises outwards on {checks.ApronRayViolations} rays, worst {checks.ApronRayWorstRise:F4} m "
-                        + $"(ungated surface: {checks.ApronRayUngatedViolations} rays, worst {checks.ApronRayUngatedWorstRise:F4} m)\n    "
-                        + string.Join("\n    ", checks.ApronRayLines));
+                        $"seed {w.Seed}: P_A beyond domain {checks.ApronBeyondDomainMax:F4} m, "
+                        + $"normal rises {checks.ApronNormalViolations} worst {checks.ApronNormalWorstRise:F4} m");
                 }
             }
 
@@ -471,20 +515,23 @@ namespace GameDev.World.TerrainGen.Tests
         // ---------- S11 ----------
 
         [Test]
-        public void S11_ValleyTrajectoriesStayCarvable()
+        public void S11T_ValleyTrajectoriesStayCarvable()
         {
             var failures = new List<string>();
             foreach (var w in worlds)
             {
                 var checks = IslandReliefChecks.Run(w);
+                TestContext.WriteLine(
+                    $"seed {w.Seed}: C(R4A) {checks.TrajectoryWorstClimb:F2} m, plate+apron {checks.TrajectoryPlateApronRise:F2} m, "
+                    + $"I1 Δ {checks.TrajectoryI1Increase:F4} m, R4A adverse sum {checks.TrajectoryReliefRise:F2} m (report)");
                 var pass = checks.TrajectoryPlateApronRise <= 1.5f
-                           && checks.TrajectoryReliefRise <= 7.2f
-                           && checks.TrajectoryWorstClimb <= w.Relief.Settings.KnollHeightCapMeters + 1e-3f;
+                           && checks.TrajectoryWorstClimb <= 7.2f + 1e-3f
+                           && checks.TrajectoryI1Increase <= 0.001f;
                 if (!pass)
                 {
                     failures.Add(
-                        $"seed {w.Seed}: R4A adverse {checks.TrajectoryReliefRise:F2} m (<= 7.2), plate+apron {checks.TrajectoryPlateApronRise:F2} m (<= 1.5), "
-                        + $"single climb {checks.TrajectoryWorstClimb:F2} m\n    " + string.Join("\n    ", checks.TrajectoryLines));
+                        $"seed {w.Seed}: C(R4A) {checks.TrajectoryWorstClimb:F2} m (<= 7.2), plate+apron {checks.TrajectoryPlateApronRise:F2} m (<= 1.5), "
+                        + $"I1 increase {checks.TrajectoryI1Increase:F4} m\n    " + string.Join("\n    ", checks.TrajectoryLines));
                 }
             }
 
@@ -492,17 +539,39 @@ namespace GameDev.World.TerrainGen.Tests
         }
 
         [Test]
-        public void S11_BasinOutletsStayOutlets()
+        public void S11O_BasinOutletsStayOutlets()
         {
             var failures = new List<string>();
             foreach (var w in worlds)
             {
                 var checks = IslandReliefChecks.Run(w);
-                if (checks.OutletWorstRise > 0.01f)
+                TestContext.WriteLine(
+                    $"seed {w.Seed}: O-1 fail {checks.OutletO1Failures}/{checks.Outlets}; "
+                    + $"O-2 {(checks.CarveMeasurable ? checks.OutletO2Failures.ToString() : checks.CarveNote)} / {checks.OutletO2Checked}; "
+                    + $"O-3 fail {checks.OutletO3Failures}; O-4 shift {checks.OutletMinShift:F1} m");
+                if (checks.OutletO1Failures > 0 || checks.OutletO3Failures > 0
+                    || (checks.CarveMeasurable && checks.OutletO2Failures > 0))
                 {
                     failures.Add(
-                        $"seed {w.Seed}: R4A rises {checks.OutletWorstRise:F3} m downstream of an outlet; adverse rise it adds to the ground "
-                        + $"{checks.OutletWorstGroundAdded:F3} m\n    " + string.Join("\n    ", checks.OutletLines));
+                        $"seed {w.Seed}: O-1 {checks.OutletO1Failures}, O-2 {checks.OutletO2Failures} (measurable {checks.CarveMeasurable}), O-3 {checks.OutletO3Failures}\n    "
+                        + string.Join("\n    ", checks.OutletLines));
+                }
+            }
+
+            Assert.IsEmpty(failures, string.Join("\n  ", failures));
+        }
+
+        [Test]
+        public void S12_JunctionCertificatesPass()
+        {
+            var failures = new List<string>();
+            foreach (var w in worlds)
+            {
+                var checks = IslandReliefChecks.Run(w);
+                TestContext.WriteLine($"seed {w.Seed}: S12 {checks.S12Failures} fail / {w.Relief.Junctions.Count} junctions");
+                if (checks.S12Failures > 0)
+                {
+                    failures.Add($"seed {w.Seed}: {checks.S12Failures} junction certificates failed");
                 }
             }
 

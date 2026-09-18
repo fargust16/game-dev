@@ -547,29 +547,33 @@ Pre-existing, unrelated to the terrain bake: `Assets/Settings/TerrainLayers/` ho
 the project. The road and settlement layers among them are live (items 11 and 12), so roads paint with
 an untextured layer. The GUIDs were not in the removed terrain package either.
 
-## 19. OPEN — four Stage 4A acceptance tests are red until revision R1 lands
+## 19. CLOSED — Stage 4A revision R1 is implemented; the layer stays disconnected
 
-Stage 4A island relief is committed dump-first (`IslandRelief*`, `TerrainGenIslandReliefDump`,
-`TerrainGenStage4ATests`) and is **not** read by the bake, so nothing in the world changes. Its own
-suite, however, ships red: four of thirteen tests fail, deliberately unignored, because the causes are
-in the design and not in the code.
+Stage 4A island relief is dump-first (`IslandRelief*`, `TerrainGenIslandReliefDump`,
+`TerrainGenStage4ATests`) and is **not** read by the bake, so nothing in the world changes. Revision
+R1 (inland slope budget `M`, τ-derived pair widths, certified junctions, knoll amplitude cap, apron
+projection domain, physical S8/S10/S11) landed 2026-09-16.
 
-| Test | Failure, measured on the canonical seeds | Cause |
-|---|---|---|
-| `S8_NoClosedDepressions` | 1337: 0.67 m over 1 555 m²; 777: 0.29 m over 1 323 m² | positive relief that falls inland at Stage 1's zero-slope rings (30/100/200/440/800 m) digs a trough; a 40-seed sweep puts the rate at 15/40 seeds, up to 2.32 m |
-| `S10_ApronIsMonotoneAlongOutwardRays` | 9–20 of 64 rays per massif world rise outward, worst 3.01 m; up to 3.62 m of apron exists beyond the massif axis reach | `MountainMassif.Project` is unique only inside the axis reach; the apron has no domain condition |
-| `S11_ValleyTrajectoriesStayCarvable` | 110201 adverse sum 8.04 m (budget 7.2); 20260905 plate + apron 1.77 m (budget 1.5) | the adverse *sum* is not a cut depth, and the H1-based gate amplifies a climb already present in H2 |
-| `S11_BasinOutletsStayOutlets` | `R4A` rises downstream of outlets on two seeds | `R4A` is a fill, not a flow path |
+Unity 6000.5.7f1: `TerrainGenStage4ATests` **16/16**; full EditMode **571/571**; Stage 2B hashes
+`1de91e469513054b` (110201) and `9d9d7b3c2560bc36` (424242) unchanged. Canonical S8-A / S8-M / S8-C,
+S10, S11-T, S11-O and S12 pass on all seven seeds.
 
-[PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md)
-derives the corrections (an inland slope budget with a proof, an apron projection domain, and physical
-trajectory and outlet invariants) and lists the implementation delta in its §18. Two residual items stay
-open after it:
+Residuals that are **not** defects to chase in 4A:
 
-- **massif-foot depressions** — 6 of 40 non-canonical seeds, 0.33–2.32 m, inside the massif influence
-  zone and its lee; frozen H2 has one itself on seed 1019. Owner: Stage 3F carve / Stage 4B piedmont.
-- **apron zone share** — 25.3 % and 29.8 % of land on 424242 and 20260905 against a 25 % target, and the
-  apron still reads as a ring around the massif.
+- **zero knolls** on all 7 canonical seeds (45–49 candidates omitted Gate/Level/Resistance/Budget/MassifBody).
+  The analytic `g_P` bound left `a ≤ 0`. Soft target 8–25 fails. Owner: a later knoll kernel (R1 §16 R3).
+- **apron ring / zone share** — 25.7 % and 30.3 % of land on 424242 and 20260905 against a 25 % target;
+  the apron still reads as a ring. Owner: Stage 3F valleys / Stage 4B piedmont.
+- **report-only metric misses** R1 §15 already named: 777 coast-aligned 77.2 % (no-massif limit 70 %),
+  256 p50 51 m, 1337 upland 64.8 %, 110201/424242/7 coast-aligned over the massif ≤65 % band.
+- **massif-foot depressions** — Unity sweep 1000–1039: **S8-A 0/40**, **S8-M 6/40**, max 2.32 m
+  (seeds 1006, 1013, 1019, 1026, 1027, 1038; all `Z_M`, apron and/or U2 at the deepest cell). Frozen
+  H2 has one itself on seed 1019. Owner: Stage 3F / Stage 4B. Any **S8-A** failure on the sweep is a
+  4A defect.
 
-Until R1 is implemented, "the full EditMode suite is green" is not true of this repository, and a red
-Stage 4A test is expected rather than a regression to chase.
+Wiring Stage 4A into `TerrainAuthorityField` remains a separate reviewable step (GeneratorVersion bump,
+re-pinned hashes, scene regeneration). A red Stage 4A test is now a regression.
+
+See [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)
+and the change record
+[PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md).

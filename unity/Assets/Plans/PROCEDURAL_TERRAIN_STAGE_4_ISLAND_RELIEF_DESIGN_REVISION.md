@@ -1,13 +1,13 @@
 # Procedural Terrain — Stage 4A Island Relief: Design Revision R1
 
-**Status:** Design revision. **No production code, test, tool, scene, setting, golden hash or generated
-asset was changed.** Stage 4A stays dump-first and disconnected from `TerrainAuthorityField`.
-**Date:** 2026-09-15
+**Status:** Change record. **Implemented dump-first 2026-09-16** in `IslandRelief*.cs`,
+`IslandElevation.cs`, `TerrainGenIslandReliefDump.cs`, `TerrainGenStage4ATests.cs`. Folded into
+[PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md).
+Stage 4A stays disconnected from `TerrainAuthorityField`.
+**Date:** 2026-09-15 (implementation 2026-09-16)
 **Revises:** [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)
 (“the design”, variant C6). Section numbers `§n` without a file name refer to *this* document; `D§n` to the design.
-**Baseline:** HEAD `b677f26`; the Stage 4A C6 implementation (`IslandRelief*.cs`, `IslandElevation.cs`,
-`TerrainGenIslandReliefDump.cs`, `TerrainGenStage4ATests.cs`) is present as untracked files and was **read
-only**.
+**Baseline:** HEAD `b677f26`; the Stage 4A C6 implementation was read, then R1's §18 delta applied.
 
 Claim tags:
 
@@ -646,7 +646,8 @@ A    = SmoothMax(U2, Γ·P_A, ApronBlendMeters) − U2,
 
 ## 13. Updated API requirements
 
-Proposed, **not implemented**.
+**Implemented 2026-09-16** (see the design §15 for the live surface). The list below is the R1 contract
+that was coded.
 
 - `IslandReliefSettings`
   - add `LowlandReserveShare` (0.20);
@@ -770,7 +771,10 @@ Per seed:
 
 ## 18. Exact implementation delta required
 
-Only after this revision is accepted. Files are the existing untracked Stage 4A files.
+**Done 2026-09-16** on the committed C6 files. Unity 6000.5.7f1: Stage 4A 16/16, EditMode 571/571,
+canonical S8-A/M/C S10 S11-T/O S12 green, sweep S8-A 0/40 S8-M 6/40. Residuals (zero knolls, apron
+ring/zone, report-only metric misses) recorded in `OVERWORLD_TECH_DEBT.md` item 19. Production path
+untouched.
 
 1. **`IslandReliefSettings.cs`** — add `InlandSlopeBudget`, `LowlandReserveShare`,
    `JunctionCertificationStepMeters`, `JunctionCertificationMaxIterations`; defaults and `Clamp` as §13;

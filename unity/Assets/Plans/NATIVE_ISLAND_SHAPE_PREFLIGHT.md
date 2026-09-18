@@ -463,14 +463,13 @@ read uplift today. They must never become a reason to change relief.
 
 ## 16. Proposed next implementation step
 
-> **Done, 2026-09-16.** Step 1 became
-> [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md);
-> steps 2 and 3 are committed (`IslandRelief*`, the dump, thirteen tests), four of those tests fail on
-> design-level causes and
-> [revision R1](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md) derives the fixes. Step 4
-> still holds: `TerrainAuthorityField` is untouched. The relief structure chosen was macro-plate blocks
-> plus knoll cores plus a massif apron — not crust-block tilt. The measured effect on the questions this
-> preflight raised is in R1 §15.
+> **Done, 2026-09-18.** Step 1 became
+> [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md).
+> Steps 2 and 3 shipped as C6, then revision R1 (inland slope budget, apron domain, physical S8/S10/S11):
+> 16/16 Stage 4A tests, full EditMode green. Step 4 still holds: `TerrainAuthorityField` is untouched.
+> The relief structure chosen was macro-plate blocks plus knoll cores plus a massif apron — not
+> crust-block tilt. Unity R1 numbers are in the design §11; residuals in
+> [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) item 19.
 
 **[PROPOSAL] Stage 4A — island-floor relief, TerrainGen-only, dump-first.**
 

@@ -1,10 +1,10 @@
 # 14 World Generation Roadmap
 
-Version: 0.13
+Version: 0.14
 
 Status: Draft
 
-Last Updated: 2026-08-17
+Last Updated: 2026-09-18
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
@@ -114,21 +114,22 @@ of its own has not been measured; judge it on a bake, not by analogy with the re
 **What replaced the shaping stage.** Measuring the baked island showed the flaw the old recipe had hidden
 with noise: the relief was a function of coast distance. 95–99 % of the interior had its height gradient
 aligned with the coast normal, and the 70–110 m band — the whole middle of the island — held 0.1–7.8 % of
-the land. TerrainGen Stage 4A adds the missing floor relief from structures that already exist: macro-plate
-districts (uplands and lowlands), knolls on the raised districts from crustal cell cores, and an apron at
-the foot of the Stage 2B massif. Every term is positive and gated to zero at the shore, so no coastline and
-no Stage 1–3E structure moves.
+the land. TerrainGen Stage 4A adds the missing floor relief from structures that already exist: a 1-D
+coastal floor `M(d)`, macro-plate districts (uplands and lowlands, with a 20 % lowland reservation),
+knolls on the raised districts from crustal cell cores (slope-budget capped; none placed on the
+canonical seeds), and an apron at the foot of the Stage 2B massif, domain-limited to the axis reach.
+Every term is gated so the land mask cannot move.
 
-**Status 2026-09-16.** Implemented, measured by its own editor dump on seven canonical seeds, and **not
-wired into the terrain**: the bake still writes Stage 1 + Stage 2 only. The band fills to 15–27 %, the
-coast-distance roof breaks to 49–67 %, and four of the layer's thirteen acceptance tests are red on
-design-level causes. The revision that derives the fixes — an inland slope budget with a proof instead of
-a tuned width, a projection domain for the apron, and physical trajectory/outlet invariants — is
-`unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md`.
+**Status 2026-09-18.** Revision R1 is implemented dump-first: `TerrainGenStage4ATests` 16/16, full
+EditMode 571/571, canonical S8-A/S8-M/S8-C/S10/S11/S12 green, sweep 1000–1039 S8-A 0/40 and S8-M 6/40.
+**Not wired into the terrain**: the bake still writes Stage 1 + Stage 2 only. Residuals (zero knolls,
+apron ring/zone, massif-foot pits, report-only metric misses) are in
+`unity/Assets/Plans/OVERWORLD_TECH_DEBT.md` item 19. Living contract:
+`unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md`.
 
-**Next decision, in order:** implement revision R1 → re-measure the dump → then, as a separate reviewable
-step, connect Stage 4A to `TerrainAuthorityField` (one line, a `GeneratorVersion` bump, re-pinned hashes,
-scene regeneration). Stage 3F (the structural valley carve) and Stage 4B/4C are after that.
+**Next decision:** connect Stage 4A to `TerrainAuthorityField` as a separate reviewable step
+(`GeneratorVersion` bump, re-pinned hashes, scene regeneration). Stage 3F (the structural valley carve)
+and Stage 4B/4C are after that.
 
 ---
 

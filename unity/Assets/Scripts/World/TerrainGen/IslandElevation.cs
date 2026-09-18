@@ -21,11 +21,6 @@ namespace GameDev.World.TerrainGen
         /// <c>H4A = StructuralElevation.At + relief</c>, with the coast distance, <c>H1</c> and <c>U2</c>
         /// evaluated once.
         /// </summary>
-        /// <remarks>
-        /// The structural part is <see cref="StructuralElevation.At"/>'s expression term for term -
-        /// <c>Model.HeightAt(signed distance) + UpliftAt(signed distance)</c> - so it equals that value
-        /// exactly, and the relief is added to it rather than folded into it.
-        /// </remarks>
         public static float At(
             Stage1Result stage1, MassifUpliftModel uplift, IslandRelief relief, float worldX, float worldZ)
         {
@@ -33,12 +28,14 @@ namespace GameDev.World.TerrainGen
             var island = stage1.Model.HeightAt(signedDistance);
             if (uplift == null)
             {
-                return relief == null ? island : island + relief.At(worldX, worldZ, island, 0f);
+                return relief == null ? island : island + relief.At(worldX, worldZ, signedDistance, island, 0f);
             }
 
             var lift = uplift.UpliftAt(worldX, worldZ, signedDistance);
             var structural = island + lift;
-            return relief == null ? structural : structural + relief.At(worldX, worldZ, island, lift);
+            return relief == null
+                ? structural
+                : structural + relief.At(worldX, worldZ, signedDistance, island, lift);
         }
 
         public static float At(Stage1Result stage1, MassifUpliftModel uplift, IslandRelief relief, Vector2 p) =>

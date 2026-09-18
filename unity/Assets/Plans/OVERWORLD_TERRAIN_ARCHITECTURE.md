@@ -7,8 +7,7 @@
 [OVERWORLD_VISUAL_DIRECTION.md](OVERWORLD_VISUAL_DIRECTION.md) (look and surface intent),
 [HYDROLOGY_GENERATION_PLAN.md](HYDROLOGY_GENERATION_PLAN.md) (inland water),
 [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)
-+ [revision R1](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md) (the relief layer that is
-not in this path yet).
+(R1 implemented dump-first; the relief layer is not in this path yet).
 
 ---
 
@@ -45,10 +44,10 @@ and the accepted massifs exactly as the generator does and evaluates
 `StructuralElevation.At = stage1.HeightAt + uplift.UpliftAt(signed coast distance)`. The bake changes
 the *sink* of that field, never the field: the canonical seed's field hash is pinned by test.
 TerrainGen's Stage 3C/3D/3E topology is frozen and is not read by the bake, and neither is
-**Stage 4A island relief** (`IslandRelief`, `IslandElevation`): it is implemented and measured
-dump-first, and connecting it to `TerrainAuthorityField` is a separate, later decision that waits on
-[PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md).
-What is in the terrain today is Stage 1 + Stage 2 only.
+**Stage 4A island relief** (`IslandRelief`, `IslandElevation`): revision R1 is implemented dump-first
+(EditMode green; residuals in [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) item 19). Connecting it
+to `TerrainAuthorityField` is a separate, later decision. What is in the terrain today is Stage 1 +
+Stage 2 only.
 
 **Unity owns the representation.** Heights, weights, trees and details live in `TerrainData` and are
 rendered by Unity's own terrain systems. Every downstream consumer — roads, POIs, settlements, water

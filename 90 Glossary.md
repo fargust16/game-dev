@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.45
+Version: 0.46
 
 Status: Draft
 
-Last Updated: 2026-08-31
+Last Updated: 2026-09-18
 
 Depends On:
 All Canonical Documents
@@ -826,7 +826,7 @@ The overworld terrain pipeline: **TerrainGen → Unity `TerrainData` → Unity T
 
 ## Island Relief (Stage 4A)
 
-TerrainGen's floor relief: what makes the island's middle read as geography instead of as an extruded coastline. Three positive terms over the Stage 1 + Stage 2 field, each owned by a structure that already exists — **plate-block uplift** (macro-plate districts: uplands and lowlands, 18 m, 25 m on a world without a massif), **knolls** (resistant cores of crustal cells, on raised districts only) and the **massif apron** (talus and piedmont at the Stage 2B foot) — all gated to exactly zero at and seaward of the shore, so no coastline moves. `H4A = H1 + U2 + R4A`; the future valley carve subtracts from it. Noise has no role. **Implemented dump-first and not part of the terrain**: the bake does not read it, and connecting it is a separate step that waits on revision R1 (an inland slope budget that makes the layer provably drainable, an apron projection domain, physical Stage 3 invariants). See [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md) and [its revision](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md).
+TerrainGen's floor relief: what makes the island's middle read as geography instead of as an extruded coastline. Composition `H4A = H1 + U2 + R4A` with `R4A = M(d) + Γ·(P + K) + A`: a 1-D **coastal floor** `M` that gives the Stage 1 profile an inland slope of at least τ = 0.05, **plate-block uplift** (macro-plate districts with a 20 % lowland reservation), **knolls** (resistant crustal cores, slope-budget capped; none placed on the canonical seeds under the analytic bound) and the **massif apron** (talus and piedmont, domain-limited to the massif axis reach). All gated so the land mask cannot move. Noise has no role. **Implemented dump-first and not part of the terrain**: the bake still reads Stage 1 + Stage 2 only; connecting Stage 4A is a separate integration step. See [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md) (R1 folded in) and [the revision change record](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md).
 
 ---
 

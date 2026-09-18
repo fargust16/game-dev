@@ -55,8 +55,8 @@ T2 plateau is a flat shelf behind a wall; an 18 m district step spread over a fe
 ramp you walk up without noticing. The 2.5× separation rule still governs everything *standing on* the
 floor: the district step is ≥ 2.5 × the tallest knoll.
 See [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)
-§4 and [its revision R1](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md), which caps knoll
-height by the same slope budget that keeps the floor drainable (≈ 3–4 m instead of 4–7.2 m).
+§4. R1 caps knoll height by the same slope budget that keeps the floor drainable; the analytic bound
+currently places **no knolls** on the canonical seeds (design residual, not a retune).
 
 ---
 
