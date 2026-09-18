@@ -547,16 +547,38 @@ Pre-existing, unrelated to the terrain bake: `Assets/Settings/TerrainLayers/` ho
 the project. The road and settlement layers among them are live (items 11 and 12), so roads paint with
 an untextured layer. The GUIDs were not in the removed terrain package either.
 
-## 19. CLOSED — Stage 4A revision R1 is implemented; the layer stays disconnected
+## 19. CLOSED — Stage 4A revision R1 is the production terrain authority
 
-Stage 4A island relief is dump-first (`IslandRelief*`, `TerrainGenIslandReliefDump`,
-`TerrainGenStage4ATests`) and is **not** read by the bake, so nothing in the world changes. Revision
-R1 (inland slope budget `M`, τ-derived pair widths, certified junctions, knoll amplitude cap, apron
-projection domain, physical S8/S10/S11) landed 2026-09-16.
+Stage 4A island relief (`IslandRelief*`, `IslandElevation`) **is the terrain** as of 2026-09-18:
+`TerrainAuthorityField` evaluates `IslandElevation` (`H4A = H1 + U2 + R4A`) at `GeneratorVersion` 2.
+Revision R1 (inland slope budget `M`, τ-derived pair widths, certified junctions, knoll amplitude cap,
+apron projection domain, physical S8/S10/S11) landed 2026-09-16 dump-first and was connected unchanged.
 
-Unity 6000.5.7f1: `TerrainGenStage4ATests` **16/16**; full EditMode **571/571**; Stage 2B hashes
-`1de91e469513054b` (110201) and `9d9d7b3c2560bc36` (424242) unchanged. Canonical S8-A / S8-M / S8-C,
-S10, S11-T, S11-O and S12 pass on all seven seeds.
+Unity 6000.5.7f1: `TerrainGenStage4ATests` **16/16**; full EditMode **572/572**; Stage 2B hashes
+`1de91e469513054b` (110201) and `9d9d7b3c2560bc36` (424242) unchanged, Stage 1 golden hashes unchanged.
+Canonical S8-A / S8-M / S8-C, S10, S11-T, S11-O and S12 pass on all seven seeds.
+
+**The switch moved the world and nothing else.** The production authority reproduces the dump-first
+`H4A` lattice hash **exactly on all seven canonical seeds** (110201 `e2bad571f4af76c7`, 424242
+`2076ecf78a34483b`, 20260905 `4b7ae0f5a6cfaae8`, 7 `6a7ad6edd08db7d9`, 1337 `f86e8c15d7105be2`,
+256 `a218e07fe1b2cd74`, 777 `48012b8c997a54df`), which is what proves Stage 2A's macro plates and
+Stage 2B's are one thing; `AuthorityField_IsTheSameH4AFieldStage4AWasAcceptedOn` pins it. The pinned
+authority hash moved `7614bd2ed819` → `a09953a3bdb3` and the 110201 world signature
+`c08574603378` → `656405ea477a`, both measured, never authored. Bake acceptance: height vs TerrainGen
+max 0.0107 m over 1 052 676 samples (the 16-bit bound), 0 clamped samples, all four seams 0.0000.
+
+**Stage 3D/3E keep declaring basins and outlets on `StructuralElevation` (`H2`)** — the surface their
+topology was frozen against. Stage 3F carves `H = H4A − C3F` after this layer. Repointing Stage 3 at
+`H4A` is not a cleanup; it would move frozen topology.
+
+**Performance.** Authority time is dominated by junction certification, not by per-point evaluation:
+the `H4A` lattice is about half the cost of the old `H2` lattice because `IslandElevation` evaluates the
+signed coast distance once where `StructuralElevation` evaluated it twice. Measured totals (stages +
+relief build + lattice, ms): 110201 24 541 → 23 321, 424242 24 368 → 23 642, 7 23 096 → 18 983,
+20260905 25 487 → 30 128, 1337 24 089 → 34 776, 256 23 144 → 33 021, **777 21 932 → 53 342**. Three of
+seven seeds got faster; 777 is the outlier because junction J7 needs 5 certification iterations over a
+disc that grows to ~1330 m at 5 m sampling. Cutting that is a separate optimisation task, not a 4A
+retune — see item 20.
 
 Residuals that are **not** defects to chase in 4A:
 
@@ -566,14 +588,36 @@ Residuals that are **not** defects to chase in 4A:
   the apron still reads as a ring. Owner: Stage 3F valleys / Stage 4B piedmont.
 - **report-only metric misses** R1 §15 already named: 777 coast-aligned 77.2 % (no-massif limit 70 %),
   256 p50 51 m, 1337 upland 64.8 %, 110201/424242/7 coast-aligned over the massif ≤65 % band.
+- **curvature ratio (isotropy)** outside the 0.85–1.20 gate on four seeds — 110201 0.76, 424242 1.30,
+  20260905 0.80, 7 1.45 (1337 0.99, 256 1.02, 777 0.97). D§11 expected 0.96–1.01. The gate is a dump
+  metric, not a test. Owner: the same straight-bisector edge anisotropy as R1 §16 R6.
 - **massif-foot depressions** — Unity sweep 1000–1039: **S8-A 0/40**, **S8-M 6/40**, max 2.32 m
   (seeds 1006, 1013, 1019, 1026, 1027, 1038; all `Z_M`, apron and/or U2 at the deepest cell). Frozen
   H2 has one itself on seed 1019. Owner: Stage 3F / Stage 4B. Any **S8-A** failure on the sweep is a
   4A defect.
 
-Wiring Stage 4A into `TerrainAuthorityField` remains a separate reviewable step (GeneratorVersion bump,
-re-pinned hashes, scene regeneration). A red Stage 4A test is now a regression.
+A red Stage 4A test is now a terrain regression, not a pending decision.
 
 See [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)
 and the change record
 [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md).
+
+---
+
+## 20. OPEN — Stage 4A junction certification dominates the bake on some seeds
+
+`IslandRelief.Build` costs 3.6–39.5 s depending on the seed, against 5.5–6.6 s for all of Stage 1 +
+Stage 2A + massifs. The cost is `SampleJunctionAdverse`: it rasterises a disc of radius
+`R_J + max w` at `JunctionCertificationStepMeters` = 5 m and pays ~7 `CoastQuery.SignedDistance` calls
+plus 2 `LevelAt` per sample, and it re-rasterises the whole disc on every widening iteration. No-massif
+worlds run `PlateUpliftMeters × 1.4`, which inflates the derived widths and radii; on seed 777 junction
+J7 iterates 5 times with the disc growing to ~1330 m, which is the 39.5 s.
+
+Known, unexercised opportunities — **measure before changing anything, and do not touch the certified
+geometry**: `CoastQuery.IsInside` allocates a `List<float>` per call (pre-existing, but 4A multiplies
+the call count); `GatedPlateInlandDerivative` recomputes the centre sample's signed distance it was
+already given; the disc is re-rasterised in full per iteration instead of incrementally; land is tested
+per sample after the distance has already been paid for.
+
+This is an editor-time cost, once per bake, and it does not touch runtime. It is a correctness-neutral
+optimisation: any change here must leave every canonical `H4A` hash in item 19 bit-identical.

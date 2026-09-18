@@ -12,8 +12,10 @@ Read-only architectural audit. No Stage 3F code exists and none is written here.
 >
 > **Update 2026-09-18 — Stage 3F now carves against `H4A`, not `H2`.** A positive relief layer sits
 > between Stage 2 and the carve: Stage 4A island relief (coastal floor `M`, plate districts, knolls,
-> massif apron), R1 implemented dump-first and not yet in the authority path
-> ([design](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)). Three things follow for Stage 3F,
+> massif apron), R1 and **the production terrain authority** since 2026-09-18
+> ([design](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)). Note that Stage 3D/3E still declare
+> their basins and outlets on `StructuralElevation` (`H2`) — reconciling the two levels is Stage 3F's
+> job, not a repointing of Stage 3. Three things follow for Stage 3F,
 > each measured in R1 and re-checked in Unity:
 >
 > - **The incision Stage 3F needs below Stage 1 never grows.** `R4A ≥ 0` raises the running minimum

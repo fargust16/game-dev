@@ -17,9 +17,10 @@
 seed
   │
   ▼
-TerrainGen ─────────────── authoritative relief (Stage 1 landmass + Stage 2 massif uplift)
-  │                        TerrainAuthorityField → StructuralElevation
-  │                        (Stage 3C-3E topology and Stage 4A relief exist, are not read here)
+TerrainGen ─────────────── authoritative relief (Stage 1 landmass + Stage 2 massif uplift
+  │                        + Stage 4A island relief)
+  │                        TerrainAuthorityField → IslandElevation → H4A
+  │                        (Stage 3C-3E topology exists and is not read here)
   ▼
 OverworldTerrainField ──── one world-spanning vertex lattice: height, uplift, coast distance,
   │                        then slope, convexity, drainage — all world units
@@ -39,15 +40,18 @@ Unity Terrain ──────────── URP TerrainLit, five canonica
 There is **one** production path. No fallback, no alternate bake, no external terrain generator and
 no compatibility layer. Nothing reads `TerrainData` back into TerrainGen.
 
-**Terrain authority.** TerrainGen owns the relief. `TerrainAuthorityField` builds Stage 1, Stage 2A
-and the accepted massifs exactly as the generator does and evaluates
-`StructuralElevation.At = stage1.HeightAt + uplift.UpliftAt(signed coast distance)`. The bake changes
-the *sink* of that field, never the field: the canonical seed's field hash is pinned by test.
-TerrainGen's Stage 3C/3D/3E topology is frozen and is not read by the bake, and neither is
-**Stage 4A island relief** (`IslandRelief`, `IslandElevation`): revision R1 is implemented dump-first
-(EditMode green; residuals in [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) item 19). Connecting it
-to `TerrainAuthorityField` is a separate, later decision. What is in the terrain today is Stage 1 +
-Stage 2 only.
+**Terrain authority.** TerrainGen owns the relief. `TerrainAuthorityField` builds Stage 1, Stage 2A,
+the accepted massifs and **Stage 4A island relief** (`IslandRelief`) exactly as the generator does, and
+evaluates `IslandElevation.At = H4A = H1 + U2 + R4A`. The bake changes the *sink* of that field, never
+the field: the canonical seed's field hash is pinned by test. `R4A` is non-negative and exactly zero at
+and seaward of the shore, so Stage 4A moved no coastline and no ocean sample when it arrived.
+TerrainGen's Stage 3C/3D/3E topology is frozen and is not read by the bake; Stage 3D/3E keep declaring
+their basins and outlets on `StructuralElevation` (`H2`), the surface they were frozen against, and the
+future Stage 3F carve composes after Stage 4A as `H = H4A − C3F`. Residuals Stage 4A ships with are in
+[OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) item 19 and are owned by Stage 3F / Stage 4B.
+
+`includeMassifs: false` stays the Stage 1-only reference surface: without Stage 2A there are no macro
+plates for Stage 4A to stand on.
 
 **Unity owns the representation.** Heights, weights, trees and details live in `TerrainData` and are
 rendered by Unity's own terrain systems. Every downstream consumer — roads, POIs, settlements, water

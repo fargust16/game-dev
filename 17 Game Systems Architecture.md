@@ -178,7 +178,7 @@ flowchart LR
 | **Multiplayer** | Same seed → same samples on all peers; no per-frame sync of heightfields. |
 | **Performance** | Sampling must be O(1) / cheap noise; cache per-chunk if builders need grids. |
 | **Extensibility** | Swap noise implementation behind `IBiomeSampler`; add moisture/temperature channels later. |
-| **V1 scope / Deferred** | V0: TerrainGen island + massifs + ocean, baked into Unity Terrain. Deferred: inland hydrology by default, full Valheim-scale biomes, **Stage 4A island floor relief** (R1 implemented dump-first, tests green, not yet connected to the authority field — [design](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)). |
+| **V1 scope / Deferred** | V0: TerrainGen island + massifs + **Stage 4A island floor relief** + ocean, baked into Unity Terrain (R1 is the authority field since 2026-09-18, `GeneratorVersion` 2 — [design](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)). Deferred: inland hydrology by default, full Valheim-scale biomes, Stage 3F valley carve, Stage 4B plateaus. |
 | **Owning folder** | `unity/Assets/Scripts/World/Terrain/` |
 
 ## W.3 Chunk Streaming

@@ -466,7 +466,9 @@ read uplift today. They must never become a reason to change relief.
 > **Done, 2026-09-18.** Step 1 became
 > [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md).
 > Steps 2 and 3 shipped as C6, then revision R1 (inland slope budget, apron domain, physical S8/S10/S11):
-> 16/16 Stage 4A tests, full EditMode green. Step 4 still holds: `TerrainAuthorityField` is untouched.
+> 16/16 Stage 4A tests, full EditMode green. Step 4 is done too: `TerrainAuthorityField` evaluates
+> `IslandElevation` (`H4A`) as of 2026-09-18, `GeneratorVersion` 2, authority hash re-pinned from
+> measurement.
 > The relief structure chosen was macro-plate blocks plus knoll cores plus a massif apron — not
 > crust-block tilt. Unity R1 numbers are in the design §11; residuals in
 > [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) item 19.
@@ -592,11 +594,10 @@ CURRENT STATE:            PASS
 ARCHITECTURE:             PASS
 FROZEN STAGES:            PASS
 NATIVE TERRAIN PATH:      PASS
-ISLAND SHAPE READINESS:   NEEDS DESIGN
-RECOMMENDED NEXT STEP:    Stage 4A island-floor relief — a new additive TerrainGen stage (new files only,
-                          dump + tests, zero at the shore, composed after the frozen StructuralElevation),
-                          designed and measured on 110201 / 424242 / 1337 before TerrainAuthorityField is
-                          switched.
+ISLAND SHAPE READINESS:   DELIVERED (Stage 4A R1 is the authority since 2026-09-18)
+RECOMMENDED NEXT STEP:    Stage 3F structural valley carve (H = H4A − C3F), then Stage 4B plateaus.
+                          The island-floor residuals Stage 4A ships with are owned there, not by a
+                          Stage 4A retune — OVERWORLD_TECH_DEBT.md item 19.
 ```
 
 **Verification of this preflight** (fresh processes, 2026-09-14): focused EditMode run

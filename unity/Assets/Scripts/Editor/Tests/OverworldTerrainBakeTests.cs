@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using GameDev.EditorTools;
+using GameDev.World.TerrainGen;
 using NUnit.Framework;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -23,10 +24,29 @@ namespace GameDev.World.Terrain.Tests
         private const int CanonicalSeed = 110201;
 
         /// <summary>
-        /// MD5 (first six bytes) of the authoritative field on a 256² grid over the world, recorded before
-        /// the terrain pipeline was rebuilt on it. Pins that TerrainGen's relief did not move.
+        /// MD5 (first six bytes) of the authoritative field on a 256² grid over the world. Pins that
+        /// TerrainGen's relief did not move.
         /// </summary>
-        private const string CanonicalAuthorityHash = "7614bd2ed819";
+        /// <remarks>
+        /// Measured from the production authority, not authored. It was <c>7614bd2ed819</c> while the
+        /// authority was Stage 2 alone (<c>H2 = H1 + U2</c>); Stage 4A becoming the authority moved it to
+        /// the value below (<c>H4A = H1 + U2 + R4A</c>). A change here is only ever a recorded
+        /// measurement after a deliberate generator change, never an edit to make a test pass.
+        /// </remarks>
+        private const string CanonicalAuthorityHash = "a09953a3bdb3";
+
+        /// <summary>
+        /// FNV-1a of the H4A lattice for the canonical seed, as <see cref="TerrainGenIslandReliefDump"/>
+        /// recorded it while Stage 4A was still dump-first.
+        /// </summary>
+        /// <remarks>
+        /// The production authority builds Stage 4A from its own Stage 2A plates and massifs; the dump
+        /// builds it from Stage 2B's. Both are the same <c>MacroPlates.Build</c> and the same
+        /// <c>MountainMassif.Build</c> over the same accepted axes, so the two fields must be one field.
+        /// This pins that, so the production path can never quietly drift from the layer that was
+        /// accepted on the dump.
+        /// </remarks>
+        private const string CanonicalDumpH4AHash = "e2bad571f4af76c7";
 
         /// <summary>
         /// Unity stores heights in 16 bits over half the normalised range (a 2.14 cm step on a 700 m tile)
@@ -101,6 +121,25 @@ namespace GameDev.World.Terrain.Tests
             }
 
             Assert.AreEqual(CanonicalAuthorityHash, Hash(values), "TerrainGen's authoritative relief moved");
+        }
+
+        [Test]
+        public void AuthorityField_IsTheSameH4AFieldStage4AWasAcceptedOn()
+        {
+            var lattice = WorldHeightField.ForWorld(TerrainGenSettings.Default.FieldResolution);
+            for (var z = 0; z < lattice.Height; z++)
+            {
+                var worldZ = lattice.WorldZ(z);
+                var row = z * lattice.Width;
+                for (var x = 0; x < lattice.Width; x++)
+                {
+                    lattice.Heights[row + x] = Authority.HeightAt(lattice.WorldX(x), worldZ);
+                }
+            }
+
+            Assert.AreEqual(
+                CanonicalDumpH4AHash, lattice.Hash(),
+                "the production authority is no longer the H4A field Stage 4A was accepted on");
         }
 
         [Test]

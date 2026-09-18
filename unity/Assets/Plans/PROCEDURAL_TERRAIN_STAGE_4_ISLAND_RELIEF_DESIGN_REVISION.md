@@ -695,7 +695,7 @@ Numerical targets (D§11) — changes only:
 | depressions | 0 anywhere | S8-A / S8-M above | §4.2 scope |
 | lowland share (`Λ < 0.25`) | 20–35 % | **report**; gate = the reservation rule is applied (reserved land ≥ 20 %) | whole-plate quantisation (§9.3) |
 | upland share | 40–62 % | report | same |
-| knolls | 10–25, height 4–7.2 m | 8–25, height ≤ `τ·σ_minor/0.5726` | §11.3, §16 R3 |
+| knolls | 10–25, height 4–7.2 m | 8–25, height ≤ `(τ − g_P)·σ_minor/0.5726` per §4.1 item 4 | §11.3, §16 R3 |
 | plate edge | ~200 m, ≤ 8° added | derived per pair, added slope ≤ τ | R-2 |
 | adverse rise, R4A | ≤ 7.2 m | single climb ≤ 7.2 m; adverse reported | R-7 |
 | apron zone | ≤ 25 % | unchanged (still exceeded on 424242 / 20260905, §16 R4) | — |

@@ -22,7 +22,7 @@
 > | Stage 2A macro structure, 2B massifs (`MacroPlates`, `MountainMassif`) | Stage 2 |
 > | Stage 3A ownership, 3B spurs, 3C valley topology and trajectories, 3D/3E structural basins and outlets | Stage 3 |
 > | Stage 3F valley carve — **not implemented**, see [PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md](PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md) | part of Stage 7 |
-> | Stage 4A island relief (`M` + plate blocks + knolls + massif apron) — R1 implemented dump-first, tests green, **not** in the authority path, see [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md) | the floor half of Stage 4 |
+> | Stage 4A island relief (`M` + plate blocks + knolls + massif apron) — R1, tests green, **the authority path since 2026-09-18**, see [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md) | the floor half of Stage 4 |
 > | Stage 4B plateaus and walls, 4C raised coast — not started | the rest of Stage 4 |
 > | Unity-native terrain bake of Stage 1 + 2 | Stage 8, delivered early |
 > | Hydrology analysis and carve on the lattice (`HydrologyBake.ApplyPendingCarve`), step off by default | Stages 6 and 7 for water |
@@ -32,7 +32,8 @@
 > - **Stage 5's "single band-limited, structure-modulated noise field"** is not what Stage 4A did. The
 >   relief that fills the empty 70–110 m band is positive structural relief owned by plates, crustal
 >   cells and the massif frame; noise has no role in it. The isotropy gate ([OPEN] 1) survives as a
->   test (curvature ratio 0.85–1.20, measured 0.96–1.01 on Stage 4A), but a refinement *noise* stage is
+>   test (curvature ratio 0.85–1.20; R1 measures 0.76–1.45, outside the gate on 110201, 424242,
+>   20260905 and 7 — a reported residual, not a test), but a refinement *noise* stage is
 >   no longer the way the design expects relief to arrive.
 > - **"Stage 4 — terraces and structural basins"** split: the structural basins shipped with Stage
 >   3D/3E, the T2 plateaus are Stage 4B, and the floor relief Stage 4A added was not in this plan at
@@ -227,9 +228,9 @@ The new generator does not need a new definition of "good"; it needs to pass the
 OverworldPipeline.GenerateAllRoutine          (Editor coroutine, WorldGenSettings step mask)
   │
   ├─ Surface + Mountains  ── OverworldTerrainBake ──▶ heights, alphamaps, trees, detail
-  │     TerrainGen StructuralElevation (Stage 1 + 2) → OverworldTerrainField →
-  │     OverworldTerrainBuilder → TerrainData. Stage 3C-3E topology and Stage 4A relief
-  │     exist but are not read by the bake.
+  │     TerrainGen IslandElevation (H4A = Stage 1 + 2 + 4A) → OverworldTerrainField →
+  │     OverworldTerrainBuilder → TerrainData. Stage 3C-3E topology exists but is not
+  │     read by the bake.
   │
   ├─ Hydrology   (OFF by default — analysis and the lattice carve both work:
   │               HydrologyBake.ApplyPendingCarve)

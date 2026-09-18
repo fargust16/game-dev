@@ -219,7 +219,10 @@ namespace GameDev.World.TerrainGen
 
         public static TerrainGenSettings Default => new TerrainGenSettings
         {
-            GeneratorVersion = 1,
+            // 2: Stage 4A island relief became the terrain authority, so a seed that produced one world
+            // under version 1 produces a different, taller-floored one now. The field is informational -
+            // it enters no hash and no RNG stream - so every Stage 1-3E hash stays exactly where it was.
+            GeneratorVersion = 2,
 
             FieldResolution = 1025,
 

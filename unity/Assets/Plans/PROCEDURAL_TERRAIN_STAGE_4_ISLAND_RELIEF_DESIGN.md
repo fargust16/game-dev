@@ -1132,7 +1132,7 @@ P_A    = h_eff(s)(1 − ρ/W_eff)²  (ρ ≥ 0)   |   talus (ρ < 0, unscaled h)
 the production path calls these files. Accept on §19.2 for seven seeds plus human review of the dump
 images. Production heights, the pinned authority hash and the saved scene stay bit-identical.
 
-**Step 2 — integration (separate, reviewable). Not started.**
+**Step 2 — integration (separate, reviewable). Done 2026-09-18.**
 
 1. `TerrainAuthorityField` builds `IslandRelief` from the Stage 1, Stage 2A plates and massifs it
    already has, and `HeightAt` / `Sample` return `IslandElevation.At` (`includeMassifs: false` keeps the
@@ -1157,16 +1157,23 @@ DESIGN:         R1 FOLDED IN
 STAGE 1:        KEEP FROZEN
 STAGE 3A–3E:    FROZEN
 NATIVE TERRAIN: PASS
-STAGE 4A:       IMPLEMENTED DUMP-FIRST (R1); NOT ON TerrainAuthorityField
-                tests 16/16, EditMode 571/571, canonical S8-A/M/C S10 S11-T/O S12 green
+STAGE 4A:       PRODUCTION TERRAIN AUTHORITY (R1, connected 2026-09-18, GeneratorVersion 2)
+                tests 16/16, EditMode 572/572, canonical S8-A/M/C S10 S11-T/O S12 green
+                production H4A == dump-first H4A on all seven canonical seeds
 
-RECOMMENDED NEXT STEP:
-Do not wire TerrainAuthorityField. Residuals (zero knolls, apron ring/zone, massif-foot sweep pits,
-report-only metric misses) are owned by Stage 3F / 4B or a later knoll-kernel revision, not by a
-4A retune. Integration remains the separate Step 2.
+NEXT:
+Stage 3F (valley carve, H = H4A − C3F) and Stage 4B (plateaus, piedmont). Residuals (zero knolls,
+apron ring/zone, coast-aligned gradient, curvature ratio, massif-foot sweep pits, report-only metric
+misses) are owned there or by a later knoll-kernel revision — never by a 4A retune.
 ```
 
-Owner confirmations still open at integration (none blocks remaining disconnected): positive-only
-relief (§5.4); the Stage 4A-level flat-ground threshold (§11, "land < 5°"); edge warp on/off (§10);
-option 4A-K2 (§9.3); the `GeneratorVersion` bump at integration (§21); whether a later knoll kernel
-may relax the analytic `g_P` bound (R1 §16 R3).
+Step 2 was carried out unchanged: `TerrainAuthorityField` builds `IslandRelief` from the Stage 1,
+Stage 2A plates and massifs it already had, `HeightAt` / `Sample` return `IslandElevation.At`,
+`includeMassifs: false` kept the Stage 1-only reference surface, `GeneratorVersion` went 1 → 2, and the
+authority hash was re-pinned from measurement (`7614bd2ed819` → `a09953a3bdb3`). Nothing in
+`OverworldTerrainField`, `OverworldTerrainBuilder` or the bake changed.
+
+Owner confirmations carried into the connected layer, none of them blocking: positive-only relief
+(§5.4); the Stage 4A-level flat-ground threshold (§11, "land < 5°"); edge warp on/off (§10);
+option 4A-K2 (§9.3); whether a later knoll kernel may relax the analytic `g_P` bound (R1 §16 R3).
+The `GeneratorVersion` bump (§21) is done.

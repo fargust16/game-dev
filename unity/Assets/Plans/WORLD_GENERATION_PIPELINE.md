@@ -52,8 +52,8 @@ streams are `TerrainHash` keys forked from the world seed and evaluated stateles
 a cell's tree does not depend on which tile or in which order it is evaluated — see
 [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md) §7.
 
-Stage 4A island relief (`terrain.relief.knoll`) is R1-implemented dump-first but **not** part of the
-terrain today: it is evaluated by its editor dump only, and the bake still writes Stage 1 + Stage 2 —
+Stage 4A island relief (`terrain.relief.knoll`) is **the terrain** as of 2026-09-18: `TerrainAuthorityField`
+evaluates `IslandElevation` and the bake writes `H4A = H1 + U2 + R4A` —
 see [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md).
 
 Inland hydrology is generated as of 2026-09-03 through the `hydrology` seed stream — see

@@ -109,7 +109,7 @@ of its own has not been measured; judge it on a bake, not by analogy with the re
 
 ---
 
-# Island Relief — TerrainGen Stage 4A (built, not connected)
+# Island Relief — TerrainGen Stage 4A (the terrain)
 
 **What replaced the shaping stage.** Measuring the baked island showed the flaw the old recipe had hidden
 with noise: the relief was a function of coast distance. 95–99 % of the interior had its height gradient
@@ -120,16 +120,18 @@ knolls on the raised districts from crustal cell cores (slope-budget capped; non
 canonical seeds), and an apron at the foot of the Stage 2B massif, domain-limited to the axis reach.
 Every term is gated so the land mask cannot move.
 
-**Status 2026-09-18.** Revision R1 is implemented dump-first: `TerrainGenStage4ATests` 16/16, full
-EditMode 571/571, canonical S8-A/S8-M/S8-C/S10/S11/S12 green, sweep 1000–1039 S8-A 0/40 and S8-M 6/40.
-**Not wired into the terrain**: the bake still writes Stage 1 + Stage 2 only. Residuals (zero knolls,
-apron ring/zone, massif-foot pits, report-only metric misses) are in
-`unity/Assets/Plans/OVERWORLD_TECH_DEBT.md` item 19. Living contract:
-`unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md`.
+**Status 2026-09-18.** Revision R1 is **the production terrain authority**: `TerrainAuthorityField`
+evaluates `IslandElevation` (`H4A = H1 + U2 + R4A`) at `GeneratorVersion` 2. `TerrainGenStage4ATests`
+16/16, full EditMode 572/572, canonical S8-A/S8-M/S8-C/S10/S11/S12 green, sweep 1000–1039 S8-A 0/40 and
+S8-M 6/40. The production field reproduces the dump-first `H4A` hash exactly on all seven canonical
+seeds, which is what closed the question of whether Stage 2A's plates and Stage 2B's are the same
+plates. Residuals (zero knolls, apron ring/zone, coast-aligned gradient, curvature ratio, massif-foot
+pits) are in `unity/Assets/Plans/OVERWORLD_TECH_DEBT.md` item 19, owned by Stage 3F / Stage 4B. Living
+contract: `unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md`.
 
-**Next decision:** connect Stage 4A to `TerrainAuthorityField` as a separate reviewable step
-(`GeneratorVersion` bump, re-pinned hashes, scene regeneration). Stage 3F (the structural valley carve)
-and Stage 4B/4C are after that.
+**Next:** Stage 3F (the structural valley carve, `H = H4A − C3F`), then Stage 4B/4C. Stage 3D/3E keep
+declaring their basins and outlets on `StructuralElevation` (`H2`) — the surface they were frozen
+against — so Stage 3F is what reconciles the two levels.
 
 ---
 
