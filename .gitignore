@@ -90,6 +90,11 @@ unity/Assets/Settings/Terrain/OverworldTerrainData_*.asset.meta
 unity/TerrainDump/
 unity/TerrainValidation/
 
+# The terrain-gen dumps write renders and per-run reports here. Only the regenerable
+# output is ignored: unity/TerrainGenDump/stage3a_audit.txt is a kept audit and stays.
+unity/TerrainGenDump/**/*.png
+unity/TerrainGenDump/**/*_report.txt
+
 # Quarantined vendor code, kept on disk and deliberately out of the build.
 unity/Assets/_Disabled/
 unity/Assets/_Disabled.meta

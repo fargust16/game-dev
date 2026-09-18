@@ -466,5 +466,42 @@ matched to its declaration within a stated tolerance.
 | **B2a** | intermontane side boundaries have no ridge provenance | §15.4 |
 | **B2b** | no inter-massif corridor exists, though the design's data model says there is one | §15.4 — touches frozen Stage 3B |
 | **B4** | a basin's depth has no authoritative bound | §15.3 |
-| **B5** *(new)* | terrain-gen has no runtime consumer and no path to the shipping surface | §15.1 |
-| **B6** *(new)* | F1 cannot proceed without a scoped unfreeze of Stage 3C | §15.2 |
+| ~~**B5**~~ **CLOSED** | terrain-gen has no runtime consumer and no path to the shipping surface | §15.1 answered: `TerrainAuthorityField` is the authority and evaluates `IslandElevation` (`H4A`) as of 2026-09-18 |
+| **B6** | F1 cannot proceed without a scoped unfreeze of Stage 3C | §15.2 |
+| **B7** *(new)* | the carvability guarantee and the carve are not on the same curve | S11-T bounds the climb along Slice C's `FinalValleyTrajectory`; `CarveField` cuts along the legacy `ValleyCorridor` trajectory. Measured consequence in §19 |
+| **B8** *(new)* | a massif-free world has no valleys at all | corridors come from massif spurs only, so 1337 / 256 / 777 carry zero corridors and Stage 3F leaves them bit-identical to `H4A` |
+
+---
+
+## 19. F0 measurement — the carve composed against `H4A` [MEASURED-U]
+
+`CarvedElevation` (`H3F = H4A − C3F`) with `CarveField` bound as Stage 3C binds it today, dump-first,
+Unity 6000.5.7f1. No frozen file was edited and nothing production changed. This exists to price the
+§15.2 unfreeze before it is spent.
+
+| seed | corridors | carve max | land touched | coast-aligned `H4A` → `H3F` | curvature | pits |
+|---|---|---|---|---|---|---|
+| 110201 | 9 | 68.2 m | 33.1 % | 73.6 → **52.7** | 0.76 → 1.17 | 19 (≤ 3.00 m) |
+| 424242 | 9 | 66.6 m | 33.5 % | 68.1 → **58.9** | 1.30 → 0.96 | 5 (≤ 2.60 m) |
+| 20260905 | 11 | 74.8 m | 36.0 % | 63.1 → **46.6** | 0.80 → 0.92 | 6 (≤ 1.31 m) |
+| 7 | 9 | 70.1 m | 30.1 % | 73.0 → **59.0** | 1.45 → — | 5 |
+| 1337 / 256 / 777 | **0** | 0 | 0 % | unchanged | unchanged | 0 |
+
+**What it settles.** Cutting the declared structure into the island moves the metric Stage 4A could not:
+the coast-aligned gradient share falls 9–21 points, and 20260905 clears the ≤ 65 % band Stage 4A failed
+on four seeds. The curvature ratio moves *into* the 0.85–1.20 gate on 110201 and 424242, and
+reachability improves on every seed. The character change is real, not marginal.
+
+**What it exposes.**
+
+- **B7.** 5–19 qualifying depressions appear where `H4A` had none. Classifying them against declared
+  basins is exactly the independent scan F3 specifies and is not done here.
+- **B8.** Three of seven canonical seeds get nothing at all.
+- **Shape.** Carve max is 66–75 m but the mean over carved ground is 4.5–5.9 m: the depth sits in
+  compact excavations at the corridor heads on the massif flanks, with only faint traces downstream
+  across the island floor. That distribution is the likely source of B7 and the reason the lowland
+  gains less than the massif does. Note `CorridorIncisionMeters` = 7.2 m bounds only the cut *below*
+  Stage 1 — the total carve is dominated by the uplift term, which is why it reaches 68 m on a flank.
+
+**What it does not settle.** Whether re-binding to Slice C changes any of the above. That is F1, it needs
+§15.2, and this measurement is the argument for spending it rather than a substitute for it.

@@ -621,3 +621,28 @@ per sample after the distance has already been paid for.
 
 This is an editor-time cost, once per bake, and it does not touch runtime. It is a correctness-neutral
 optimisation: any change here must leave every canonical `H4A` hash in item 19 bit-identical.
+
+---
+
+## 21. OPEN — Stage 3F F0: the carve and its guarantee are on different curves
+
+Stage 3F exists dump-first as `CarvedElevation` (`H3F = H4A − C3F`), `TerrainGenStage3FDump` and
+`TerrainGenStage3FTests`. Production is untouched: `TerrainAuthorityField` still evaluates
+`IslandElevation`. The F0 measurement is in
+[PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md](PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md) §19.
+
+Three things it found, none of them a Stage 4A defect:
+
+- **B7 — the carvability guarantee does not cover the carve.** Stage 4A's S11-T bounds the single climb
+  along Slice C's `FinalValleyTrajectory`; `CarveField` cuts along the legacy `ValleyCorridor`
+  trajectory. 5–19 qualifying depressions (≤ 3.0 m) appear on the four massif seeds where `H4A` had
+  none. Whether they sit inside declared basins needs the independent scan Stage 3F F3 specifies.
+- **B8 — massif-free worlds have no valleys.** Corridors come from massif spurs only, so 1337, 256 and
+  777 carry zero corridors and `H3F` is bit-identical to `H4A` there. Three of seven canonical seeds
+  get no Stage 3F relief at all.
+- **Carve shape.** Max 66–75 m but 4.5–5.9 m mean over carved ground: the depth is in compact
+  excavations at corridor heads on massif flanks, with faint traces downstream. The island floor gains
+  much less than the massif does.
+
+Do not treat B7 or B8 as licence to retune Stage 4A. Both are Stage 3C/3F questions, and B8 may be a
+Stage 4B one.
