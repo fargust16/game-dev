@@ -94,6 +94,7 @@ unity/TerrainValidation/
 # output is ignored: unity/TerrainGenDump/stage3a_audit.txt is a kept audit and stays.
 unity/TerrainGenDump/**/*.png
 unity/TerrainGenDump/**/*_report.txt
+unity/TerrainGenDump/**/*_sweep.txt
 
 # Quarantined vendor code, kept on disk and deliberately out of the build.
 unity/Assets/_Disabled/

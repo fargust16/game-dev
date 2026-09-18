@@ -467,9 +467,10 @@ matched to its declaration within a stated tolerance.
 | **B2b** | no inter-massif corridor exists, though the design's data model says there is one | §15.4 — touches frozen Stage 3B |
 | **B4** | a basin's depth has no authoritative bound | §15.3 |
 | ~~**B5**~~ **CLOSED** | terrain-gen has no runtime consumer and no path to the shipping surface | §15.1 answered: `TerrainAuthorityField` is the authority and evaluates `IslandElevation` (`H4A`) as of 2026-09-18 |
-| **B6** | F1 cannot proceed without a scoped unfreeze of Stage 3C | §15.2 |
-| **B7** *(new)* | the carvability guarantee and the carve are not on the same curve | S11-T bounds the climb along Slice C's `FinalValleyTrajectory`; `CarveField` cuts along the legacy `ValleyCorridor` trajectory. Measured consequence in §19 |
-| **B8** *(new)* | a massif-free world has no valleys at all | corridors come from massif spurs only, so 1337 / 256 / 777 carry zero corridors and Stage 3F leaves them bit-identical to `H4A` |
+| ~~**B6**~~ **CLOSED** | F1 cannot proceed without a scoped unfreeze of Stage 3C | §15.2 granted and spent: the unfreeze was API-only, §20 |
+| ~~**B7**~~ **CLOSED** | the carvability guarantee and the carve are not on the same curve | F1 put them on one curve. Measured adverse climb along the Slice C trajectories in `H3F`: **1.94 / 1.96 / 2.56 / 2.29 m** against the 7.2 m bound. The remaining depressions are *not* centreline monotonicity failures — see §20 |
+| **B8** | a massif-free world has no valleys at all | corridors come from massif spurs only, so 1337 / 256 / 777 carry zero corridors and Stage 3F leaves them bit-identical to `H4A` |
+| **B9** *(new)* | 4–18 qualifying depressions survive the correct binding | they persist with Slice C geometry and small centreline climb, so their cause is off-centreline — corridor/corridor `SmoothMax` or the cross-section meeting Stage 4A relief. F3's independent scan is what classifies them against declared basins |
 
 ---
 
@@ -505,3 +506,70 @@ reachability improves on every seed. The character change is real, not marginal.
 
 **What it does not settle.** Whether re-binding to Slice C changes any of the above. That is F1, it needs
 §15.2, and this measurement is the argument for spending it rather than a substitute for it.
+
+---
+
+## 20. F1 — the carve re-bound to Slice C [MEASURED-U]
+
+The scoped unfreeze §15.2 asked for, spent and no wider. Stage 3F now cuts along
+`FinalValleyTrajectory`; production is still `IslandElevation`.
+
+**What the unfreeze bought, exactly.** `IValleyCarveCurve` names the nine members `CarveField.DepthOf`
+reads. `ValleyCorridor` implements it with one alias (`HasCarveGeometry`). `FinalValleyTrajectory`
+implements it with `Project` and `Bounds` written over its own `Points`, mirroring
+`ValleyCorridor`'s line for line, and carries the corridor's `HeadS` across unchanged so a consumer
+cutting along the curve can read the crest above its head. `CarveField` is typed to the interface and
+keeps its `RidgeSkeleton` constructor, so Stage 3C's dump and Stage 4A's S11-O are untouched.
+**No trajectory sample, termination, width, confluence, ordering or RNG draw moved** — pinned by
+`F1_Stage3CTopologyAndTrajectoryGeometryAreUnchanged`.
+
+**Width.** Both paths call the same `ValleyTrajectoryBuilder.CorridorHalfWidthMeters`; Slice C
+evaluates it at its own toe arc. F1 uses Slice C's `HalfWidthMeters` rather than borrowing the
+corridor's, so no interpretation had to be invented.
+
+**Domain.** `Project` clamps arc into `[0, LengthMeters]` by construction, so the carve cannot run past
+a declared endpoint through a projection fallback. Per-trajectory `endCarve` is 0.00 m on every `Coast`
+termination and non-zero only on `Merge`, which is the tributary handing over rather than stopping dead.
+The eight Stage 3C terminal-apron crossings are untouched.
+
+| seed | trajectories | F1 max | worst \|F1−F0\| | coast-aligned | curvature | pits F0 → F1 | max climb |
+|---|---|---|---|---|---|---|---|
+| 110201 | 9 | 67.76 m | 5.08 m | 73.6 → 52.7 | 0.76 → 1.17 | 19 → **18** | 1.94 m |
+| 424242 | 9 | 66.64 m | **0.00 m** | 68.1 → 58.9 | 1.30 → 0.96 | 5 → 5 | 1.96 m |
+| 20260905 | 11 | 74.75 m | 6.28 m | 63.1 → 45.2 | 0.80 → 0.92 | 6 → **4** | 2.56 m |
+| 7 | 9 | 69.55 m | 1.87 m | 73.0 → 59.1 | 1.45 → — | 5 → 5 | 2.29 m |
+| 1337 / 256 / 777 | 0 | — | 0.00 m | unchanged | unchanged | 0 → 0 | — |
+
+**What it settles.** B7 is closed: the bound and the carve are one curve, and the measured climb is
+1.94–2.56 m inside a 7.2 m budget. B6 is closed.
+
+**What it does not.** The re-bind is a *localised* correction — the two geometries are bit-identical on
+424242 and differ only where one trajectory's continuation changed elsewhere (on 20260905, a single
+region at the south-west massif foot). It is the right binding, not a new visual result, and it does not
+remove the depressions: **B9** records that they survive the correct geometry, so their cause is
+off-centreline. F2 remains blocked on B4, and B8 is untouched.
+
+### 20.1 Sweep 1000–1039 after F1 [MEASURED-U]
+
+`TerrainGenStage3FDump.RunSweep`, forty seeds, no images, no seed looked at individually.
+
+**Contract violations: 0/40.** No trajectory refused to project, no arc ran past a declared end, no
+sample outside every trajectory's own half-width was carved, and nothing was carved at or seaward of
+the shore. Stage 4A's own sweep is byte-identical to its pre-F1 run: **S8-A 0/40, S8-M 6/40, max
+2.32 m**, so the scoped unfreeze moved nothing Stage 4A depends on.
+
+**One number worth carrying, stated for what it is.** The sweep also walks each trajectory and records
+the largest step-to-step rise of the finished `H3F` ground — "does the carved valley actually run
+downhill". Worst over forty seeds is **7.66 m** (seed 1032; 1017 is 7.31 m, the other 38 are below
+7.20 m). Canonical seeds are 1.94–2.56 m.
+
+This is **not** an S11-T failure and must not be read as one. S11-T bounds
+`max(R4A − running min R4A)` — Stage 4A's *relief* contribution along the trajectory — and it is green.
+The sweep figure is the *ground's* adverse rise after carving, a different quantity. It is compared
+against `CorridorIncisionMeters` only because that is the budget the trough term has to spend, so a
+climb above it is ground the corridor cannot cut through. Two seeds in forty are in that state.
+
+Together with B9 — a mean of 4.8 extra qualifying depressions per sweep seed, worst 11 — this says the
+same thing twice: **the carve descends correctly along its centreline but does not yet guarantee a
+drained valley.** Both belong to F3's independent verification and, where a declared basin is involved,
+to F2. Neither is licence to change Stage 3C geometry or Stage 4A.

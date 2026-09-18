@@ -200,7 +200,7 @@ namespace GameDev.World.TerrainGen
     /// object; what a corridor is here is the interval it occupies and the two ridges that bound it.
     /// </para>
     /// </remarks>
-    public sealed class ValleyCorridor
+    public sealed class ValleyCorridor : IValleyCarveCurve
     {
         public int Id { get; }
 
@@ -263,6 +263,9 @@ namespace GameDev.World.TerrainGen
         public bool TerminatesCleanly => Termination != ValleyTermination.Unresolved;
 
         public bool HasTrajectory => Floor.Length >= 2;
+
+        /// <summary><see cref="IValleyCarveCurve"/>'s name for <see cref="HasTrajectory"/>.</summary>
+        public bool HasCarveGeometry => HasTrajectory;
 
         /// <summary>The head on the crest.</summary>
         public Vector2 HeadPoint => Floor[0];

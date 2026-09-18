@@ -86,16 +86,37 @@ namespace GameDev.World.TerrainGen
             new[] { 0f, 0.5f, 1f },
             new[] { 0f, 1f, 1f });
 
-        private readonly RidgeSkeleton ridges;
         private readonly RidgeSettings settings;
         private readonly CoastQuery coast;
         private readonly float gateMeters;
         private readonly float blendMeters;
 
         private readonly CorridorIndex index;
+        private readonly IReadOnlyList<IValleyCarveCurve> curves;
+        private readonly IReadOnlyList<MountainMassif> massifs;
 
+        /// <summary>
+        /// The carve along Stage 3C's own corridors — the binding every existing caller uses.
+        /// </summary>
         public CarveField(
             RidgeSkeleton ridges,
+            CoastQuery coast,
+            RidgeSettings settings,
+            MassifSettings massifSettings)
+            : this(ridges.Valleys, ridges.Ownership.Massifs, coast, settings, massifSettings)
+        {
+        }
+
+        /// <summary>
+        /// The same carve along any settled valley geometry — Slice C's trajectories, in particular.
+        /// </summary>
+        /// <remarks>
+        /// One model, one set of profiles, one budget; only the curve it is keyed to differs. A second
+        /// carve algorithm is exactly what this overload exists to avoid.
+        /// </remarks>
+        public CarveField(
+            IReadOnlyList<IValleyCarveCurve> curves,
+            IReadOnlyList<MountainMassif> massifs,
             CoastQuery coast,
             RidgeSettings settings,
             MassifSettings massifSettings)
@@ -103,14 +124,18 @@ namespace GameDev.World.TerrainGen
             settings.Clamp();
             massifSettings.Clamp();
 
-            this.ridges = ridges;
+            this.curves = curves;
+            this.massifs = massifs;
             this.coast = coast;
             this.settings = settings;
             gateMeters = Mathf.Max(1f, massifSettings.CoastGateMeters);
             blendMeters = Mathf.Max(1f, massifSettings.MassifBlendMeters);
 
-            index = new CorridorIndex(ridges.Valleys, settings);
+            index = new CorridorIndex(curves, settings);
         }
+
+        /// <summary>The valley curves this carve is keyed to.</summary>
+        public IReadOnlyList<IValleyCarveCurve> Curves => curves;
 
         /// <summary>How deep the valley structure cuts at a world point, metres, never negative.</summary>
         public float Depth(float worldX, float worldZ) =>
@@ -139,7 +164,7 @@ namespace GameDev.World.TerrainGen
             var depth = 0f;
             for (var i = 0; i < candidates.Count; i++)
             {
-                var one = DepthOf(ridges.Valleys[candidates[i]], p);
+                var one = DepthOf(curves[candidates[i]], p);
                 if (one <= 0f)
                 {
                     continue;
@@ -157,9 +182,9 @@ namespace GameDev.World.TerrainGen
         }
 
         /// <summary>How deep one corridor cuts at a point, before the coastal gate.</summary>
-        public float DepthOf(ValleyCorridor corridor, Vector2 p)
+        public float DepthOf(IValleyCarveCurve corridor, Vector2 p)
         {
-            if (!corridor.HasTrajectory || corridor.LengthMeters <= 1e-3f)
+            if (!corridor.HasCarveGeometry || corridor.LengthMeters <= 1e-3f)
             {
                 return 0f;
             }
@@ -178,7 +203,7 @@ namespace GameDev.World.TerrainGen
             var w = Mathf.Clamp01(across / halfWidth);
             var a = Mathf.Clamp01(arc / corridor.LengthMeters);
 
-            var massif = ridges.Ownership.Massifs[corridor.MassifIndex];
+            var massif = massifs[corridor.MassifIndex];
 
             // Where the massif part of the trajectory has got to, as a fraction of its own length.
             var toe = corridor.ToeArcMeters;
@@ -207,7 +232,7 @@ namespace GameDev.World.TerrainGen
         /// that narrowed along its length would put a second longitudinal profile into the geometry,
         /// and the depth profile is already the one that decides how the valley fades.
         /// </remarks>
-        private static float HalfWidthAt(ValleyCorridor corridor, float arcMeters) =>
+        private static float HalfWidthAt(IValleyCarveCurve corridor, float arcMeters) =>
             corridor.HalfWidthMeters;
 
         /// <summary>The massif's own uplift at a world point, metres.</summary>
@@ -215,7 +240,7 @@ namespace GameDev.World.TerrainGen
             massif.Evaluate(p.x, p.y);
 
         /// <summary>How high the crest is above this corridor's head, as a fraction of the peak.</summary>
-        private static float ReliefOf(MountainMassif massif, ValleyCorridor corridor) =>
+        private static float ReliefOf(MountainMassif massif, IValleyCarveCurve corridor) =>
             massif.CrestHeightMeters > 1e-3f
                 ? Mathf.Clamp01(massif.CrestAt(corridor.HeadS) / massif.CrestHeightMeters)
                 : 1f;
@@ -251,7 +276,7 @@ namespace GameDev.World.TerrainGen
             private readonly int width;
             private readonly int height;
 
-            public CorridorIndex(IReadOnlyList<ValleyCorridor> corridors, RidgeSettings settings)
+            public CorridorIndex(IReadOnlyList<IValleyCarveCurve> corridors, RidgeSettings settings)
             {
                 width = Mathf.CeilToInt(WorldScale.WorldExtentXMeters / BucketMeters) + 1;
                 height = Mathf.CeilToInt(WorldScale.WorldExtentZMeters / BucketMeters) + 1;
@@ -260,7 +285,7 @@ namespace GameDev.World.TerrainGen
                 for (var i = 0; i < corridors.Count; i++)
                 {
                     var corridor = corridors[i];
-                    if (!corridor.HasTrajectory)
+                    if (!corridor.HasCarveGeometry)
                     {
                         continue;
                     }

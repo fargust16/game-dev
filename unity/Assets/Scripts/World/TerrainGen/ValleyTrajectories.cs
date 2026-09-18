@@ -13,7 +13,7 @@ namespace GameDev.World.TerrainGen
     /// to the channel that survived, and appears exactly once, on that channel. This is what makes
     /// the set of trajectories a network rather than a pile of overlapping curves.
     /// </remarks>
-    public sealed class FinalValleyTrajectory
+    public sealed class FinalValleyTrajectory : IValleyCarveCurve
     {
         /// <summary>Same identity as the corridor it came from. Slice C invents no new valleys.</summary>
         public int Id { get; }
@@ -44,6 +44,18 @@ namespace GameDev.World.TerrainGen
 
         public float HalfWidthMeters { get; }
 
+        /// <summary>
+        /// The massif arc parameter the corridor heads from, carried across from it unchanged.
+        /// </summary>
+        /// <remarks>
+        /// Slice C does not derive this and does not alter it: it is the frozen corridor's own
+        /// <c>HeadS</c>, carried so a consumer that cuts along this curve can read the crest above its
+        /// head without having to hold the corridor as well.
+        /// </remarks>
+        public float HeadS { get; }
+
+        public bool HasCarveGeometry => HasGeometry;
+
         public float LengthMeters => Cumulative.Length > 0 ? Cumulative[Cumulative.Length - 1] : 0f;
 
         /// <summary>Arc length at the massif foot, metres.</summary>
@@ -68,8 +80,10 @@ namespace GameDev.World.TerrainGen
             int[] tributaryIds,
             int downstreamId,
             ValleyTermination termination,
-            float halfWidthMeters)
+            float halfWidthMeters,
+            float headS)
         {
+            HeadS = headS;
             Id = id;
             MassifIndex = massifIndex;
             FlankSign = flankSign;
@@ -110,6 +124,78 @@ namespace GameDev.World.TerrainGen
 
             var d = Points[index + 1] - Points[index];
             return d.sqrMagnitude < 1e-10f ? Vector2.zero : d.normalized;
+        }
+
+        /// <summary>
+        /// A world point in this trajectory's own frame: arc along it, distance across it.
+        /// </summary>
+        /// <remarks>
+        /// The same projection <see cref="ValleyCorridor.Project"/> performs, over this curve's own
+        /// samples: a bounded linear scan of the segments, no allocation, no dependence on evaluation
+        /// order. Nothing about the geometry changes — this only makes the settled curve answerable in
+        /// the frame the carve has always worked in.
+        /// </remarks>
+        public bool Project(Vector2 p, out float arcMeters, out float acrossMeters)
+        {
+            arcMeters = 0f;
+            acrossMeters = float.PositiveInfinity;
+
+            if (Points.Length < 2)
+            {
+                return false;
+            }
+
+            var bestSq = float.PositiveInfinity;
+            var bestSegment = 0;
+            var bestT = 0f;
+
+            for (var i = 0; i + 1 < Points.Length; i++)
+            {
+                var a = Points[i];
+                var b = Points[i + 1];
+                var ab = b - a;
+                var lengthSq = ab.sqrMagnitude;
+                var t = lengthSq < 1e-8f ? 0f : Mathf.Clamp01(Vector2.Dot(p - a, ab) / lengthSq);
+                var q = a + ab * t;
+                var sq = (p - q).sqrMagnitude;
+                if (sq >= bestSq)
+                {
+                    continue;
+                }
+
+                bestSq = sq;
+                bestSegment = i;
+                bestT = t;
+            }
+
+            arcMeters = Mathf.Lerp(Cumulative[bestSegment], Cumulative[bestSegment + 1], bestT);
+            acrossMeters = Mathf.Sqrt(bestSq);
+            return true;
+        }
+
+        /// <summary>Axis-aligned bounds of the trajectory, inflated by a pad.</summary>
+        public Rect Bounds(float padMeters)
+        {
+            if (Points.Length == 0)
+            {
+                return Rect.zero;
+            }
+
+            var minX = float.PositiveInfinity;
+            var minZ = float.PositiveInfinity;
+            var maxX = float.NegativeInfinity;
+            var maxZ = float.NegativeInfinity;
+
+            for (var i = 0; i < Points.Length; i++)
+            {
+                minX = Mathf.Min(minX, Points[i].x);
+                minZ = Mathf.Min(minZ, Points[i].y);
+                maxX = Mathf.Max(maxX, Points[i].x);
+                maxZ = Mathf.Max(maxZ, Points[i].y);
+            }
+
+            return Rect.MinMaxRect(
+                minX - padMeters, minZ - padMeters, maxX + padMeters, maxZ + padMeters);
         }
     }
 
@@ -168,6 +254,18 @@ namespace GameDev.World.TerrainGen
             Trunks = trunks;
             Stats = stats;
         }
+
+        /// <summary>
+        /// The carve cut along these trajectories rather than along the corridors they refine.
+        /// </summary>
+        /// <remarks>
+        /// The same <see cref="CarveField"/> model, keyed to the geometry Slice C settled on. Stage 3F
+        /// reads the valley through this, so the settled curve is the only valley geometry that reaches
+        /// a height field.
+        /// </remarks>
+        public CarveField BuildCarve(CoastQuery coast, RidgeSettings settings, MassifSettings massifSettings) =>
+            new CarveField(
+                Trajectories, Topology.Network.Ridges.Ownership.Massifs, coast, settings, massifSettings);
 
         public int RootOf(int id) => Topology.RootOf(id);
 
@@ -256,7 +354,7 @@ namespace GameDev.World.TerrainGen
                     trajectories[i] = new FinalValleyTrajectory(
                         corridor.Id, corridor.MassifIndex, corridor.FlankSign, points.ToArray(),
                         toeIndex, System.Array.Empty<int>(), System.Array.Empty<int>(), -1,
-                        ValleyTermination.Unresolved, halfWidth);
+                        ValleyTermination.Unresolved, halfWidth, corridor.HeadS);
                     continue;
                 }
 
@@ -297,7 +395,8 @@ namespace GameDev.World.TerrainGen
 
                 trajectories[i] = new FinalValleyTrajectory(
                     corridor.Id, corridor.MassifIndex, corridor.FlankSign, points.ToArray(), toeIndex,
-                    confluenceIndices, tributaryIds, downstreamId, termination, halfWidth);
+                    confluenceIndices, tributaryIds, downstreamId, termination, halfWidth,
+                    corridor.HeadS);
             }
 
             var trunks = new List<int>();

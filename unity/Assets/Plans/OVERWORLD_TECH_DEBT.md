@@ -624,19 +624,29 @@ optimisation: any change here must leave every canonical `H4A` hash in item 19 b
 
 ---
 
-## 21. OPEN — Stage 3F F0: the carve and its guarantee are on different curves
+## 21. OPEN — Stage 3F: valleys reach the island, basins do not
 
 Stage 3F exists dump-first as `CarvedElevation` (`H3F = H4A − C3F`), `TerrainGenStage3FDump` and
 `TerrainGenStage3FTests`. Production is untouched: `TerrainAuthorityField` still evaluates
-`IslandElevation`. The F0 measurement is in
-[PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md](PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md) §19.
+`IslandElevation`. F0 (corridor-bound) is §19 of
+[PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md](PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md); **F1, which
+re-bound the carve to Slice C's `FinalValleyTrajectory` under an API-only Stage 3C unfreeze, is §20.**
+Slice C is now the only valley geometry that reaches a height field.
 
-Three things it found, none of them a Stage 4A defect:
+Findings, none of them a Stage 4A defect:
 
-- **B7 — the carvability guarantee does not cover the carve.** Stage 4A's S11-T bounds the single climb
-  along Slice C's `FinalValleyTrajectory`; `CarveField` cuts along the legacy `ValleyCorridor`
-  trajectory. 5–19 qualifying depressions (≤ 3.0 m) appear on the four massif seeds where `H4A` had
-  none. Whether they sit inside declared basins needs the independent scan Stage 3F F3 specifies.
+- ~~**B7**~~ **CLOSED by F1.** The carve is now keyed to Slice C's `FinalValleyTrajectory`, so the
+  bound and the carve are one curve. Measured adverse climb along those trajectories in `H3F`:
+  1.94 / 1.96 / 2.56 / 2.29 m against the 7.2 m budget.
+- **B9 — the carve descends but does not guarantee drainage.** Sweep 1000–1039: 0/40 contract
+  violations (no bad projection, nothing outside a trajectory's half-width, nothing carved at sea, no
+  arc past a declared end), but a mean of 4.8 extra qualifying depressions per seed, worst 11, and on
+  2 of 40 seeds the finished ground still rises up to 7.66 m along a trajectory — more than the
+  `CorridorIncisionMeters` budget the trough has to spend. That figure is the *ground's* adverse rise,
+  **not** S11-T, which bounds `max(R4A − running min R4A)` and is green. 4–18 qualifying depressions (≤ 3.0 m) remain on
+  the four massif seeds where `H4A` had none, with centreline climb well inside budget, so their cause
+  is off-centreline — corridor/corridor `SmoothMax` or the cross-section meeting Stage 4A relief.
+  Classifying them against declared basins is the independent scan Stage 3F F3 specifies.
 - **B8 — massif-free worlds have no valleys.** Corridors come from massif spurs only, so 1337, 256 and
   777 carry zero corridors and `H3F` is bit-identical to `H4A` there. Three of seven canonical seeds
   get no Stage 3F relief at all.
@@ -644,5 +654,6 @@ Three things it found, none of them a Stage 4A defect:
   excavations at corridor heads on massif flanks, with faint traces downstream. The island floor gains
   much less than the massif does.
 
-Do not treat B7 or B8 as licence to retune Stage 4A. Both are Stage 3C/3F questions, and B8 may be a
-Stage 4B one.
+Do not treat B8 or B9 as licence to retune Stage 4A. Both are Stage 3C/3F questions, and B8 may be a
+Stage 4B one. **F2 (basin realisation) stays blocked on B4**, a basin's depth bound, which is still an
+owner decision.
