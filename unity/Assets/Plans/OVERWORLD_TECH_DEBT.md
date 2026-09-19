@@ -638,7 +638,19 @@ Findings, none of them a Stage 4A defect:
 - ~~**B7**~~ **CLOSED by F1.** The carve is now keyed to Slice C's `FinalValleyTrajectory`, so the
   bound and the carve are one curve. Measured adverse climb along those trajectories in `H3F`:
   1.94 / 1.96 / 2.56 / 2.29 m against the 7.2 m budget.
-- **B9 — the carve descends but does not guarantee drainage.** Sweep 1000–1039: 0/40 contract
+- **B9 — CONFIRMED OPEN by F3, and the mechanism is named.** Independent verification
+  (`Stage3FVerification`, preflight §21) walks the finished ground along each declared valley and
+  classifies every local low. Canonical: 110201 **4 CLOSED, worst 6.32 m**; 424242 **1, 0.71 m**;
+  20260905 and 7 none. Sweep 1000–1039: **30/40 seeds, 96 CLOSED**, worst 42.06 m. `H3F ≤ H4A` holds
+  at 0 violations. Two mechanisms, both measured: **M1**, the rise is inherited from `H4A` and exceeds
+  the carve's own cap — 110201 trajectory 5 has an 8.00 m rise against a 7.20 m `CorridorIncisionMeters`
+  budget it spends in full, leaving 6.32 m; **M2**, `TroughProfile` peaks at the toe and decays
+  downstream, so it can create a barrier where `H4A` had none (trajectory 3: 0.30 → 1.85 m). M1
+  dominates — the carve reduces the rise on 6 of 9 trajectories on 110201. Valley **width** decides the
+  outcome: where a low drains around its barrier the cross-valley floor is metres below it, where it
+  closes the cross-section is flat, and the narrowest corridor on the seed is one of the closed ones.
+  Fixing this means changing `CorridorIncisionMeters`, the trough shape, or Stage 4A's relief — none of
+  which F3 is entitled to do. Sweep 1000–1039: 0/40 contract
   violations (no bad projection, nothing outside a trajectory's half-width, nothing carved at sea, no
   arc past a declared end), but a mean of 4.8 extra qualifying depressions per seed, worst 11, and on
   2 of 40 seeds the finished ground still rises up to 7.66 m along a trajectory — more than the

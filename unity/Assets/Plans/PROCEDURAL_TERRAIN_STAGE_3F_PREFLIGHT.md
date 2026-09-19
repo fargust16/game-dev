@@ -573,3 +573,65 @@ Together with B9 — a mean of 4.8 extra qualifying depressions per sweep seed, 
 same thing twice: **the carve descends correctly along its centreline but does not yet guarantee a
 drained valley.** Both belong to F3's independent verification and, where a declared basin is involved,
 to F2. Neither is licence to change Stage 3C geometry or Stage 4A.
+
+---
+
+## 21. F3 — independent drainage verification [MEASURED-U]
+
+`Stage3FVerification`, `TerrainGenStage3FVerifyDump`, `TerrainGenStage3FVerificationTests`. Verification
+only: no carve, no geometry, no setting and no production file was changed. Production is still
+`IslandElevation`.
+
+**Independence.** Nothing in the verifier consults `CarveField` — not its profiles, its budget or its
+index. It samples two surfaces, `IslandElevation` for the island and a delegate for the finished ground,
+and derives the carve as `H4A − H3F`. The one shared primitive is `FinalValleyTrajectory.Project`,
+because the question is about the declared valley and that is what declares it.
+`V1_ASyntheticClosedHollowIsReported` proves the verifier can fail its subject: a hollow cut into a
+draining ramp must come back `Closed`, and the ramp without it must not.
+
+### 21.1 What it found
+
+| seed | trajectories | drained | drainable | **CLOSED** | basin | worst CLOSED |
+|---|---|---|---|---|---|---|
+| 110201 | 9 | 3 | 7 | **4** | 0 | **6.32 m** |
+| 424242 | 9 | 3 | 4 | **1** | 0 | 0.71 m |
+| 20260905 | 11 | 4 | 3 | 0 | 1 | — |
+| 7 | 9 | 6 | 8 | 0 | 2 | — |
+| 1337 / 256 / 777 | 0 | — | — | — | — | no corridors |
+
+Sweep 1000–1039: **30 of 40 seeds carry a CLOSED low, 96 in total**, worst **42.06 m** (seed 1032,
+trajectory 8). `H3F ≤ H4A` holds at **0 violations** everywhere. Only **1 of the 96** has its barrier on
+the last sample of a `Merge` trajectory, where the verifier stops without following the trunk — so that
+scope limit accounts for one case, not the finding.
+
+### 21.2 Two mechanisms, both measured
+
+**M1 — inherited, and larger than the budget.** 110201 trajectory 5 carries an **8.00 m** adverse rise in
+`H4A`; `maxCarve` on it is **7.20 m**, exactly `CorridorIncisionMeters`. The trough spends its whole
+budget and **6.32 m** of barrier remains. On seed 1032 trajectory 8 the same story at scale: 48.02 m in
+`H4A` against 6.70 m of carve, leaving 42.06 m. The carve cannot remove a rise larger than its own cap.
+
+**M2 — induced by the trough's shape.** `TroughProfile` peaks at the toe and decays downstream, so it
+lowers the upstream end of a corridor more than the downstream end and can *create* a barrier where
+`H4A` had almost none: 110201 trajectory 3 goes 0.30 → 1.85 m, trajectory 4 goes 1.33 → 2.43 m.
+
+Across the four massif seeds the carve *reduces* the adverse rise far more often than it adds to it
+(on 110201, 6 trajectories of 9 improve by 0.79–3.30 m), so M1 dominates: **the barrier is mostly Stage
+4A's relief, not the carve's doing.**
+
+### 21.3 Width is what decides
+
+`DrainableWithinTrajectory` is common (7 / 4 / 3 / 8). The separation is clean: where a low drains
+around the barrier, the valley floor across its width is well below it (110201 trajectory 7: barrier
+67.16 m, cross-valley floor 59.59 m). Where it closes, the cross-section is nearly flat at the barrier
+(trajectory 4: 37.89 m against 37.79 m). The narrowest corridor on the seed — trajectory 4, half-width
+18 m — is one of the closed ones. **A wide valley routes around its own barrier; a narrow one cannot.**
+
+### 21.4 One number that is not F3's to answer
+
+On sweep seed 1032, S11-T measured over its own toe→end range reads **19.64 m** on trajectory 8 and
+7.59 m on trajectory 7, against the 7.2 m bound. S11-T is a hard contract on the **seven canonical
+seeds only**, and it is green there. This says Stage 4A's carvability bound is not universally satisfied
+off the canonical set — a Stage 4A/3C question, recorded and not acted on. The figure comes from F3's
+arc resampling, which reproduces Stage 4A's 3.10 m as 3.09 m on 110201 but differs by more on shorter
+trajectories, so confirm it with Stage 4A's own harness before treating it as exact.
