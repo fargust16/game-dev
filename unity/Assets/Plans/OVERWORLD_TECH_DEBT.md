@@ -666,6 +666,16 @@ Findings, none of them a Stage 4A defect:
   excavations at corridor heads on massif flanks, with faint traces downstream. The island floor gains
   much less than the massif does.
 
+**B10 (new) — Stage 4A's own S11-T, S11-O O-3 and plate+apron bounds fail on sweep seed 1032.**
+Stage 4A's unmodified harness reports `C(R4A) 19.64 m` against ≤ 7.2 m (trajectory 8; trajectory 7 is
+7.59 m), `plate+apron adverse 21.34 m` against ≤ 1.5 m, and `S11-O O-3: FAIL`. All three are asserted by
+test on the **seven canonical seeds only**, where they pass, so nothing caught this. Cross-validated
+against an independent reproduction on Stage 4A's own stations — see
+[PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md](PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md) §21.4. This sits
+**upstream of Stage 3F**: the carve cannot remove a rise larger than its own budget, and it is the
+measured cause of B9's M1. Whether the canonical set should widen, or the bounds should hold off it, is
+an owner decision. Do not fix it by changing the carve.
+
 Do not treat B8 or B9 as licence to retune Stage 4A. Both are Stage 3C/3F questions, and B8 may be a
 Stage 4B one. **F2 (basin realisation) stays blocked on B4**, a basin's depth bound, which is still an
 owner decision.

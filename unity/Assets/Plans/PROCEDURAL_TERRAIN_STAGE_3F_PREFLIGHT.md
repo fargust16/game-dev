@@ -627,11 +627,33 @@ around the barrier, the valley floor across its width is well below it (110201 t
 (trajectory 4: 37.89 m against 37.79 m). The narrowest corridor on the seed — trajectory 4, half-width
 18 m — is one of the closed ones. **A wide valley routes around its own barrier; a narrow one cannot.**
 
-### 21.4 One number that is not F3's to answer
+### 21.4 S11-T on seed 1032 — cross-validated and CONFIRMED
 
-On sweep seed 1032, S11-T measured over its own toe→end range reads **19.64 m** on trajectory 8 and
-7.59 m on trajectory 7, against the 7.2 m bound. S11-T is a hard contract on the **seven canonical
-seeds only**, and it is green there. This says Stage 4A's carvability bound is not universally satisfied
-off the canonical set — a Stage 4A/3C question, recorded and not acted on. The figure comes from F3's
-arc resampling, which reproduces Stage 4A's 3.10 m as 3.09 m on 110201 but differs by more on shorter
-trajectories, so confirm it with Stage 4A's own harness before treating it as exact.
+Stage 4A's own harness, run unmodified on seed 1032, prints:
+
+```
+S11-T trajectories: 9 checked; C(R4A) 19.64 m (<= 7.2) ... : FAIL
+    V7: C(R4A) 7.59 m
+    V8: C(R4A) 19.64 m
+```
+
+**The 19.64 m is Stage 4A's own number, not an F3 artefact.** The same run also reports
+`plate+apron adverse 21.34 m` against a 1.5 m bound and `S11-O O-3: FAIL`. S11-T, S11-O and the
+plate+apron bound are asserted by test on the **seven canonical seeds only**, where they are green, so
+none of this was ever caught off that set.
+
+**Why F3 first differed, isolated by experiment.** Four combinations were measured — Stage 4A's stations
+and F3's, each with Stage 4A's `Relief.Sample().Total` and F3's `H4A − H2`. The R4A *source* changed
+nothing on any trajectory of 1032, 110201 or 7. The **station set** was the whole difference: post-toe
+vertices are spaced from the toe arc, F3 resampled from the head, and the two grids coincide only when
+the toe arc is a whole number of steps. Seed 1032 trajectory 8 has `toeArc = 220 m` against a 20 m step,
+so the grids coincided and both read 19.64 m exactly; seed 7 trajectory 0 has `toeArc = 352 m`, an 8 m
+shift, which is the 1.06 → 1.78 m discrepancy.
+
+`Stage3FVerification.ReliefClimbAtVertices` now samples Stage 4A's own stations, so the reproduction is
+exact by construction and `V7_S11TReproducesStage4AsOwnPerTrajectoryValues` pins all nine trajectories
+of 110201 against the published values.
+
+One observation recorded and deliberately not acted on: F3's interpolated stations found a **higher**
+peak between Stage 4A's vertices on seed 7 (1.78 m against 1.06 m), so sampling only at vertices can
+under-report the continuous maximum. That is a property of Stage 4A's harness, which is frozen.

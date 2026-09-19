@@ -249,6 +249,42 @@ namespace GameDev.World.TerrainGen.Tests
             Assert.IsTrue(anyToeInsideBudget, "no trajectory on the canonical seed measured a toe-range climb inside budget");
         }
 
+        // ---------- V7 ----------
+
+        [Test]
+        public void V7_S11TReproducesStage4AsOwnPerTrajectoryValues()
+        {
+            // Stage 4A's dump published these for seed 110201 (C(R4A) per trajectory, toe to end). The
+            // reproduction samples the same stations - the raw vertices from ToeIndex - so it has to
+            // land on the same numbers, not merely near them. Resampling by arc instead shifted the
+            // stations wherever the toe arc was not a whole number of steps and moved V5 by 0.01 m and
+            // seed 7's V0 by 0.72 m.
+            var published = new Dictionary<int, float>
+            {
+                { 0, 0.00f }, { 1, 0.00f }, { 2, 0.00f }, { 3, 0.01f }, { 4, 0.28f },
+                { 5, 3.10f }, { 6, 0.60f }, { 7, 0.00f }, { 8, 0.20f },
+            };
+
+            var report = new List<string>();
+            foreach (var t in world.Trajectories.Trajectories)
+            {
+                if (!t.HasGeometry || !published.TryGetValue(t.Id, out var expected))
+                {
+                    continue;
+                }
+
+                var measured = Stage3FVerification.ReliefClimbAtVertices(
+                    t, world.Stage1, world.Uplift, world.Relief);
+                report.Add($"V{t.Id}: published {expected:F2} m, reproduced {measured:F2} m");
+                Assert.AreEqual(
+                    expected, measured, 0.005f,
+                    $"V{t.Id}: the S11-T reproduction no longer matches Stage 4A's published value");
+            }
+
+            TestContext.WriteLine(string.Join("\n", report));
+            Assert.AreEqual(published.Count, report.Count, "not every published trajectory was checked");
+        }
+
         // ---------- V6 ----------
 
         [Test]

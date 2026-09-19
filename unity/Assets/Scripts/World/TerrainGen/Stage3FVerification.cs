@@ -292,8 +292,6 @@ namespace GameDev.World.TerrainGen
             profile.AdverseRiseIsland = riseIsland;
             profile.ReliefRiseFullArc = fullArcClimb;
 
-            // S11-T starts at the toe, not the head. Reproduced over the same range so the number here
-            // can be checked against Stage 4A's own rather than resembling it.
             profile.ToeArcMeters = trajectory.ToeArcMeters;
             var toe = 0;
             while (toe < profile.Arc.Length - 1 && profile.Arc[toe] < trajectory.ToeArcMeters)
@@ -301,13 +299,45 @@ namespace GameDev.World.TerrainGen
                 toe++;
             }
 
-            Running(profile.Relief, toe, out var climbFromToe, out _);
             Running(profile.H3F, toe, out var finishedFromToe, out _);
-            profile.S11TClimb = climbFromToe;
             profile.AdverseRiseFinishedFromToe = finishedFromToe;
+
+            // S11-T is reproduced on Stage 4A's own stations - the raw polyline vertices from ToeIndex -
+            // and not on this profile's resampling. The two grids only coincide when the toe arc is a
+            // whole number of steps: the vertices are spaced from the toe, the resampling from the head,
+            // so a toe arc of 352 m against a 20 m step shifts every station by 8 m and moved the
+            // measured climb by 0.72 m on seed 7. Sampling where Stage 4A samples makes this an exact
+            // reproduction rather than a close one.
+            profile.S11TClimb = ReliefClimbAtVertices(trajectory, stage1, uplift, relief);
 
             Classify(profile, trajectory, basins);
             return profile;
+        }
+
+        /// <summary>
+        /// `max(R4A − running min R4A)` over the trajectory's own vertices from <c>ToeIndex</c>.
+        /// </summary>
+        /// <remarks>
+        /// Stage 4A's S11-T, on Stage 4A's stations. It reads <c>R4A</c> as
+        /// <c>IslandElevation − StructuralElevation</c> rather than through the relief sample, which was
+        /// measured to make no difference on any canonical or sweep trajectory — the station set is what
+        /// the two implementations disagreed about, and this removes that disagreement.
+        /// </remarks>
+        public static float ReliefClimbAtVertices(
+            FinalValleyTrajectory trajectory, Stage1Result stage1, MassifUpliftModel uplift, IslandRelief relief)
+        {
+            var climb = 0f;
+            var runningMin = float.PositiveInfinity;
+            for (var i = Mathf.Max(0, trajectory.ToeIndex); i < trajectory.Points.Length; i++)
+            {
+                var p = trajectory.Points[i];
+                var r = IslandElevation.At(stage1, uplift, relief, p.x, p.y)
+                        - StructuralElevation.At(stage1, uplift, p.x, p.y);
+                runningMin = Mathf.Min(runningMin, r);
+                climb = Mathf.Max(climb, r - runningMin);
+            }
+
+            return climb;
         }
 
         /// <summary>World point at an arc length, with the direction of travel there.</summary>
