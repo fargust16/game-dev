@@ -657,3 +657,80 @@ of 110201 against the published values.
 One observation recorded and deliberately not acted on: F3's interpolated stations found a **higher**
 peak between Stage 4A's vertices on seed 7 (1.78 m against 1.06 m), so sampling only at vertices can
 under-report the continuous maximum. That is a property of Stage 4A's harness, which is frozen.
+
+---
+
+## 22. B10 root cause — the S11-T bound is not satisfiable by construction [MEASURED-U]
+
+Diagnosis only. Nothing was changed: not a formula, not a threshold, not a parameter.
+
+### 22.1 The mechanism, in closed form
+
+Stage 4A's gate is a function of Stage 1's height — `Γ = smoothstep(clamp01((H1 − sea) / CoastalRiseMeters))`
+— and the plate term is `Γ · U · Λ`. So along any curve,
+
+```
+ΔR4A  ≈  ΔΓ · U · Λ   +   ΔΛ · U · Γ   +   ΔM
+```
+
+Both leading terms scale with `U = PlateUpliftMeters = 18 m`. **S11-T's bound is 7.2 m**
+(`CorridorIncisionMeters`), and `R4A`'s own range on a level-1.0 district is `U + M ≈ 19.7 m`. A
+trajectory that traverses either the full gate band or the full level range therefore exceeds the bound
+**by construction**, whatever the local slope budget does.
+
+Seed 1032 trajectory 8, at the two stations S11-T compares:
+
+| | S | sd | H1 | Γ | M | Λ | Γ·P | A | R4A |
+|---|---|---|---|---|---|---|---|---|---|
+| running min | 600 | **3 m** | 24.07 | **0.000** | 0.077 | 1.0 | **0.000** | 0 | **0.077** |
+| maximum | 960 | 248 m | 51.38 | 1.000 | 1.715 | 1.0 | **18.000** | 0 | **19.715** |
+
+`19.715 − 0.077 = 19.64 m`, the reported value. The apron is zero, there are no knolls, and the plate
+level does not change: the whole climb is the gate recovering. The trajectory grazes the shoreline —
+where `Γ = 0` is Stage 4A's own S1 guarantee — and turns back inland, where the full plate uplift is
+equally required.
+
+### 22.2 Two mechanisms, separated by measurement
+
+`GateTraverseFromToe` (`dGate`) tells them apart:
+
+| seed | traj | dGate | sdExcursion | H1 rise | S11-T | mechanism |
+|---|---|---|---|---|---|---|
+| 1032 | V8 | **1.00** | 262 m | 28.39 m | **19.64** | gate recovery, `ΔΓ·U·Λ` |
+| 1032 | V7 | **0.36** | 136 m | 12.31 m | **7.59** | gate recovery |
+| 1032 | V6 | 0.00 | 0 m | 0.00 m | 5.38 | level crossing, `Λ 0.549 → 0.866` |
+| 110201 | V5 | 0.00 | 187 m | 8.57 m | 3.10 | level crossing |
+
+### 22.3 Why the local certificates do not catch it
+
+Every local invariant R1 carries is a derivative **along the coast-distance gradient**: S8-C asserts
+`∂(H1 + M + Γ(P+K))/∂n ≥ −10⁻³`, S12 asserts `−∂(ΓP)/∂n ≤ τ` at junctions. S11-T is a derivative
+**along a trajectory**. Going inland, `Γ·P` *increases* — R1 requires it to. S11-T counts that increase
+as adverse. **The two contracts are in direct tension and R1 contains nothing that reconciles them.**
+
+On seed 1032 all three junctions certified at `R 450 → 450` in one iteration with adverse 0.0246–0.0464
+against τ = 0.05, and the apron is ordinary (`R = 459.9`, `δ = 0.107`, domain 459.8, `W_eff` 110/180).
+Nothing is anomalous; the seed is simply geometrically unlucky.
+
+### 22.4 The implementation is faithful to R1
+
+Checked against the written formulas on seed 1032, not assumed:
+
+| rule | R1 | measured |
+|---|---|---|
+| pair half-width | `max(w₀, 1.5·U·\|λk−λj\|/(2τ))` = `max(110, 270·Δλ)` | matches |
+| junction radius | `max(R₀, 1.5·U·max\|λ−λ̄\|/τ)` = `max(450, 540·max\|λ−λ̄\|)`; J12 → 315 → **450** | matches |
+| apron sagitta | `δ = Δ²/(8R)`; `0.107 = 19.8²/(8·459.9)` at the 20 m axis step | matches |
+| gate | `smoothstep(clamp01((H1−sea)/26))` | matches |
+| `M` | 1-D table, `∫max(0, τ−H1′)` | matches |
+
+No deviation found.
+
+### 22.5 Classification
+
+**DESIGN/CONTRACT GAP, and TEST-COVERAGE GAP.** Not an implementation bug.
+
+The gap: R1 bounds the inland derivative and requires relief to grow inland, while S11-T bounds the
+trajectory-wise rise at a value below `R4A`'s own range. The coverage gap: the canonical seven contain
+no trajectory that traverses the gate band — their largest `H1` rise after closest approach is 8.57 m
+against 1032's 28.39 m, 3.3× beyond anything they sample.

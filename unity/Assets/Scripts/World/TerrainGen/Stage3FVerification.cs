@@ -157,6 +157,24 @@ namespace GameDev.World.TerrainGen
         /// <summary>Arc length at the massif foot, metres.</summary>
         public float ToeArcMeters { get; internal set; }
 
+        /// <summary>
+        /// `max(d − running min d)` downstream of the toe, metres: how far the trajectory turns back
+        /// inland after approaching the coast.
+        /// </summary>
+        /// <remarks>
+        /// This and <see cref="Stage1RiseFromToe"/> are what S11-T actually tracks. Stage 4A's gate is a
+        /// function of <c>H1</c>, so a trajectory that runs to the shore and back inland drives Γ from 0
+        /// to 1 and <c>R4A</c> from nothing to the full plate uplift. The climb S11-T measures is then
+        /// <c>ΔΓ · U · Λ + ΔM</c>, which no local slope budget can prevent — see B10.
+        /// </remarks>
+        public float CoastDistanceExcursionMeters { get; internal set; }
+
+        /// <summary>`max(H1 − running min H1)` downstream of the toe, metres.</summary>
+        public float Stage1RiseFromToe { get; internal set; }
+
+        /// <summary>Largest Γ traverse downstream of the toe: `max(Γ − running min Γ)`.</summary>
+        public float GateTraverseFromToe { get; internal set; }
+
         public int LocalMinimaCount { get; internal set; }
 
         public int LocalMaximaCount { get; internal set; }
@@ -309,6 +327,11 @@ namespace GameDev.World.TerrainGen
             // measured climb by 0.72 m on seed 7. Sampling where Stage 4A samples makes this an exact
             // reproduction rather than a close one.
             profile.S11TClimb = ReliefClimbAtVertices(trajectory, stage1, uplift, relief);
+            GateTraverse(
+                trajectory, stage1, out var sdExcursion, out var h1Rise, out var gateTraverse);
+            profile.CoastDistanceExcursionMeters = sdExcursion;
+            profile.Stage1RiseFromToe = h1Rise;
+            profile.GateTraverseFromToe = gateTraverse;
 
             Classify(profile, trajectory, basins);
             return profile;
@@ -338,6 +361,47 @@ namespace GameDev.World.TerrainGen
             }
 
             return climb;
+        }
+
+        /// <summary>
+        /// How far the trajectory turns back inland after its closest approach to the coast, and what
+        /// that does to Stage 1's height and to Stage 4A's gate.
+        /// </summary>
+        /// <remarks>
+        /// Measured on the trajectory's own vertices from <c>ToeIndex</c>, the stations S11-T uses. The
+        /// gate is <c>smoothstep(clamp01((H1 − sea) / CoastalRiseMeters))</c>, so this is the whole of
+        /// what drives a gated term up along a corridor.
+        /// </remarks>
+        public static void GateTraverse(
+            FinalValleyTrajectory trajectory, Stage1Result stage1,
+            out float coastDistanceExcursion, out float stage1Rise, out float gateTraverse)
+        {
+            coastDistanceExcursion = 0f;
+            stage1Rise = 0f;
+            gateTraverse = 0f;
+
+            var minSd = float.PositiveInfinity;
+            var minH1 = float.PositiveInfinity;
+            var minGate = float.PositiveInfinity;
+            var sea = WorldScale.SeaLevelMeters;
+            var rise = Mathf.Max(1e-3f, stage1.Settings.CoastalRiseMeters);
+
+            for (var i = Mathf.Max(0, trajectory.ToeIndex); i < trajectory.Points.Length; i++)
+            {
+                var p = trajectory.Points[i];
+                var sd = stage1.Coast.SignedDistance(p.x, p.y);
+                var h1 = stage1.Model.HeightAt(sd);
+                var u = Mathf.Clamp01((h1 - sea) / rise);
+                var gate = u * u * (3f - 2f * u);
+
+                minSd = Mathf.Min(minSd, sd);
+                minH1 = Mathf.Min(minH1, h1);
+                minGate = Mathf.Min(minGate, gate);
+
+                coastDistanceExcursion = Mathf.Max(coastDistanceExcursion, sd - minSd);
+                stage1Rise = Mathf.Max(stage1Rise, h1 - minH1);
+                gateTraverse = Mathf.Max(gateTraverse, gate - minGate);
+            }
         }
 
         /// <summary>World point at an arc length, with the direction of travel there.</summary>

@@ -676,6 +676,30 @@ against an independent reproduction on Stage 4A's own stations — see
 measured cause of B9's M1. Whether the canonical set should widen, or the bounds should hold off it, is
 an owner decision. Do not fix it by changing the carve.
 
+**Root cause, diagnosed 2026-09-30 — DESIGN/CONTRACT GAP plus TEST-COVERAGE GAP, not an
+implementation bug.** Stage 4A's gate is a function of Stage 1's height, so along any curve
+`ΔR4A ≈ ΔΓ·U·Λ + ΔΛ·U·Γ + ΔM`, and both leading terms scale with `U = 18 m`. **S11-T's bound is
+7.2 m while `R4A`'s own range on a level-1.0 district is `U + M ≈ 19.7 m`**, so a trajectory traversing
+either the gate band or the level range exceeds the bound by construction. On 1032 V8 the trajectory
+grazes the shore (`sd = 3 m`, where `Γ = 0` is Stage 4A's own S1 guarantee) and turns 262 m back inland
+(`Γ = 1`, full 18 m plate uplift): 19.715 − 0.077 = 19.64 m, apron zero, no knolls, level unchanged.
+
+Every local invariant R1 carries is a derivative **along the coast-distance gradient** (S8-C, S12);
+S11-T is a derivative **along a trajectory**. Going inland `Γ·P` must increase, and S11-T counts that as
+adverse — the two contracts are in direct tension and R1 reconciles nothing. All three junctions on 1032
+certified at `R 450 → 450` in one iteration, and the apron is ordinary; the seed is geometrically
+unlucky, not malformed. The written formulas were checked against the code on this seed and match.
+
+Coverage: the canonical seven contain no trajectory that traverses the gate band — their largest Stage 1
+rise after closest approach is 8.57 m against 1032's 28.39 m. `Stage3FVerification` now reports
+`GateTraverseFromToe`, `CoastDistanceExcursionMeters` and `Stage1RiseFromToe`, which separate the two
+mechanisms: `dGate > 0` is gate recovery (1032 V8 1.00 → 19.64 m, V7 0.36 → 7.59 m), `dGate = 0` is a
+plate-level crossing (1032 V6 ΔΛ 0.317 → 5.38 m). Full analysis:
+[PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md](PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md) §22.
+
+No remedy is chosen. The candidates differ in kind — widen the canonical set, restate S11-T as a bound
+on something the construction can guarantee, or cap `U·Λ` — and the last would move every world.
+
 Do not treat B8 or B9 as licence to retune Stage 4A. Both are Stage 3C/3F questions, and B8 may be a
 Stage 4B one. **F2 (basin realisation) stays blocked on B4**, a basin's depth bound, which is still an
 owner decision.

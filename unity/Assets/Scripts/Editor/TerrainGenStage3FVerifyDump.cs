@@ -197,13 +197,15 @@ namespace GameDev.EditorTools
                 + $"ambiguous {Count(counts, DrainageState.Ambiguous)}");
 
             sb.AppendLine(
-                "  id  term         len_m  toe_m  half_m  S11T(toe)  R4Afull  riseH4A  riseH3F  riseH3F(toe)  atS_m  maxCarve  min/max  findings");
+                "  id  term         len_m  toe_m  half_m  S11T(toe)  dGate  sdExc_m  h1Rise_m  R4Afull  riseH4A  riseH3F  riseH3F(toe)  atS_m  maxCarve  min/max  findings");
             foreach (var p in profiles)
             {
                 sb.AppendLine(
                     $"  {p.TrajectoryId,-3} {p.Termination,-12} {p.LengthMeters.ToString("F0", c),6} "
                     + $"{p.ToeArcMeters.ToString("F0", c),6} {p.HalfWidthMeters.ToString("F0", c),7} "
-                    + $"{p.S11TClimb.ToString("F2", c),10} {p.ReliefRiseFullArc.ToString("F2", c),8} "
+                    + $"{p.S11TClimb.ToString("F2", c),10} {p.GateTraverseFromToe.ToString("F2", c),6} "
+                    + $"{p.CoastDistanceExcursionMeters.ToString("F0", c),8} {p.Stage1RiseFromToe.ToString("F2", c),9} "
+                    + $"{p.ReliefRiseFullArc.ToString("F2", c),8} "
                     + $"{p.AdverseRiseIsland.ToString("F2", c),8} {p.AdverseRiseFinished.ToString("F2", c),8} "
                     + $"{p.AdverseRiseFinishedFromToe.ToString("F2", c),13} "
                     + $"{p.AdverseRiseArcMeters.ToString("F0", c),6} {p.MaxCarveMeters.ToString("F2", c),9} "
