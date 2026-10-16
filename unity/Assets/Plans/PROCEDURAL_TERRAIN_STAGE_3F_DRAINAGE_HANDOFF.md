@@ -1,8 +1,40 @@
-# Procedural Terrain — Stage 3F Drainage Causal Investigation, Handoff
+# Procedural Terrain — Stage 3F Drainage and Valley Carve, Research Handoff
+
+Version: 0.4
+
+Status: Draft — research record. Nothing in it is an approved design decision.
+
+Last Updated: 2026-10-16
+
+Depends On:
+[PROCEDURAL_TERRAIN_STAGE_3_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_3_DESIGN.md),
+[PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md](PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md),
+[PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md),
+[WORLD_RELIEF_PRINCIPLES.md](WORLD_RELIEF_PRINCIPLES.md), [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md)
+
+Referenced By:
+[99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Stage 3F valley carve,
+[OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) item 21
+
+---
+
+## 0. Phases at a glance
+
+| phase | date | question | outcome | sections |
+|---|---|---|---|---|
+| 1 causal investigation | 2026-10-14 | why does Stage 3F produce closed valleys, and which are Stage 3F's to own | mechanisms and owners named; recorded in commit `5a05b13` | §§1–8 |
+| 2 landform decision (D1–D3) | 2026-10-14 | which drainage invariant, which valley geometry, where the 7.2 m bound applies | measured against plan-view drainage (S8, research requirement D1): no axial variant satisfies it; depth does not buy it | §9 |
+| 3 planar carving | 2026-10-15 – 16 | can a carve that works on the 2-D surface avoid new depressions and keep natural form | E-family hybrid meets D1 (independently verified); conflicts between the requirements recorded | §10 |
+| 4 thalweg shift | 2026-10-16 | can the carve floor move to the `H4A` low inside the existing corridor | no — the low lies outside the corridor at 79.5 % of plain stations; F is not worth prototyping | §11 |
+
+Methods shared by phases 2–4: §12. Current position and open decisions: §13. Reading order: §8.
+Production code, public API, tests, Stage 4A, the frozen Stage 1–3E files and the Stage 3C
+trajectories are unchanged through all four phases.
 
 ## 1. Status and scope
 
-**Investigation phase COMPLETE. No production code was written, changed or committed.**
+**Phase 1 (causal investigation, 2026-10-14) — complete. No production code was written or changed.**
+Phases 2–4 are recorded in §§9–11.
 
 The phase answered one question: *why does Stage 3F produce closed valleys, and which of them are
 Stage 3F's to own?* It did so entirely through read-only counterfactual probes that were deleted
@@ -172,6 +204,17 @@ cap** (T1 deepens 12). **All four residual closures drain at `A_max = 7.2 m`** �
 break is fixable inside the existing tier amplitude. And strict feasibility is *not* required for
 the benefit: at 30 m only 145/261 satisfy the rule yet the outcome already equals the uncapped one.
 
+**Correction (phase 2, verified against the original sweep script and its data).** `A_max` capped the
+whole carve, mountain term included: on 1 780 of 3 394 stations above the toe the shipping carve
+exceeded 7.2 m and was clipped, so the 7.2 m row describes flattened massif valleys, not the shipping
+amplitude. The "carve p50 / p90 / max" columns are the per-trajectory mountain-head maxima
+(21.35 / 56.56 / 75.63 m). "Inherited" counts variant lows matched within 40 m, not distinct `H4A`
+closures: at 7.2 m the 36 inherited lows match 25 distinct `H4A` closures (11 of them carry more
+than one match), which is why inherited + removed is 47 in that row and 37 in the others. The sweep
+is one-dimensional — self-only carve, cross-valley minimum approximated by a uniform shift. Phase 2
+re-measures the question on the plan-view surface (§9), where all 36 `H4A` closures turn out to be
+route closures, not depressions.
+
 ## 4. Causal model
 
 | mechanism | role | evidence | owner |
@@ -224,18 +267,18 @@ that the knee of the drainage curve sits at 12 m.
 **Not fixable within the current depth limit.** The deep inherited closures: 1032/8 needs 26.9 m of
 carve to satisfy the rule and still reads 40.8 m at `A_max = 7.2`; 1017/2 needs 55.8 m; 1023/5 needs
 68.8 m and has no closure to fix. At 7.2 m the envelope leaves 36 inherited closures and 293.4 m of
-inherited barrier depth untouched.
+inherited barrier depth untouched. *(Phase 2: these are axial route closures — the declared
+trajectory crossing rising ground — and none of them is a plan-view depression of `H4A`; see §9.)*
 
 ## 6. Repository state
 
 ```
-HEAD                e9c69d0  Diagnose Stage 4A B10 contract failure
-production          UNCHANGED — no file under Assets/Scripts was modified in this phase
-working tree        clean;  git diff --check clean
-commits / pushes    none
+HEAD                5a05b13  Close Stage 3F drainage causal investigation (phase 1, this handoff)
+production          UNCHANGED through phases 1–4 — no file under Assets/Scripts was modified
+phases 2–4          no repository file changed; every probe ran outside the repository (§12)
 ```
 
-Test baseline, last verified at the close of this phase: **Stage 4A 16/16 · Stage 3F 16/16 ·
+Test baseline, last verified at the close of phase 1: **Stage 4A 16/16 · Stage 3F 16/16 ·
 F3 7/7 · full EditMode 595/595** (0 failed, 0 skipped). All probes were temporary Editor-only files
 (`ZZTemp*Probe.cs`) deleted after each run; `TerrainGenDump/` output was removed from the repository.
 
@@ -244,7 +287,7 @@ phases. The §3.6 sweep and the T0/T1/T3 reference rows were **re-measured** fro
 §3.1–3.5 are carried from the earlier measurements and were not re-run. Regenerating them costs one
 read-only probe of roughly 20–40 minutes.
 
-## 7. Decisions for the next phase
+## 7. Decisions left open by phase 1
 
 1. **Whether the drainage invariant is adopted at all, and at what amplitude.** The sweep makes the
    trade explicit: 7.2 m buys 75 CLOSED and all four residual fixes but leaves every inherited
@@ -262,15 +305,275 @@ read-only probe of roughly 20–40 minutes.
 Nothing in 1–5 is settled, and no implementation path for 1 has been shown to be architecturally
 admissible.
 
+**What phases 2–4 measured against these decisions** (still not decisions):
+
+1. The amplitude question is the wrong question. Drainage is a plan-view property; on the plan-view
+   S8 scan no axial envelope satisfies it at 7.2 m or 12 m, and 12 m buys nothing there (§9).
+   Plan-view drainage is reached at the 7.2 m plain bound by a 2-D construction (§10). The 12–20 m
+   "knee" came from a sweep that also clipped the mountain carve (§3.6 correction).
+2. `SmoothMax` accounts for about 18 of 205 plan-view depressions of the axial yield variant and
+   makes the plain carve exceed 7.25 m on about 13 ha; holding the 7.2 m plain bound needs a hard
+   maximum (§§9–10).
+3. Every corrected variant of phase 3 leaves no depression within 60 m of the 29 confluences
+   (`H3F`: 24). Shifting the trunk floor sideways breaks the confluence again (§11).
+4. The axial `CLOSED` classifier is diagnostic only: on `H4A` all 36 are route closures with no
+   plan-view depression. Plan-view S8 plus an independent scanner replaces it as the drainage
+   measure (§12).
+5. Unchanged.
+
 ## 8. Entry point for the next agent
 
-Read, in order: this document; `PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md` (§§19–22 for B4/B7/B8/B9/
-B10); `OVERWORLD_TECH_DEBT.md` items 19–21 and B10; `PROCEDURAL_TERRAIN_STAGE_3_DESIGN.md` line 575
-for the invariant that this phase showed to be wrong; `PROCEDURAL_TERRAIN_STAGE_3C_VALLEY_FORENSICS.md`
-§"Three properties" for the proof whose premise Stage 4A removed. Then read `CarveField.cs`,
-`CarvedElevation.cs` and `Stage3FVerification.cs` — the formulas in §2 are quoted from them and the
-classifier's decision tree is what every count in §3 means.
+Read, in order: §0 and §13 of this document; §12 for what every number means; §§9–11 for the
+evidence; then §§1–7 for the phase-1 causal model. Background: `PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md`
+(§§19–22 for B4/B7/B8/B9/B10); `OVERWORLD_TECH_DEBT.md` items 19–21 and B10;
+`PROCEDURAL_TERRAIN_STAGE_3_DESIGN.md` line 575 for the invariant phase 1 showed to be wrong;
+`PROCEDURAL_TERRAIN_STAGE_3C_VALLEY_FORENSICS.md` §"Three properties" for the proof whose premise
+Stage 4A removed. Code: `CarveField.cs`, `CarvedElevation.cs`, `Stage3FVerification.cs`,
+`DepressionFill.cs`, and `IslandReliefMetrics` in `TerrainGenIslandReliefDump.cs` (the S8 scan).
 
-Start from decision 1 in §7, phrased as a landform question: **is a valley of 12–20 m incision
-acceptable for tier T3, or does drainage have to be bought some other way than depth?** Everything
-else in §7 is cheaper and can follow.
+Open decisions are listed in [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain —
+Stage 3F valley carve. Start from the route-barrier policy and the admissibility of a band-local
+raster correction (§13): every candidate in §10 depends on them.
+
+## 9. Phase 2 — landform decision (D1–D3), 2026-10-14
+
+**Research requirements set by the project owner for this phase** (requirements for the experiment,
+not approved Stage 3F invariants):
+
+- **D1 — plan-view drainage.** Stage 3F creates no new significant plan-view depression (S8, §12)
+  relative to `H4A` outside explicitly permitted basins and does not deepen inherited ones. The
+  axial `CLOSED` classifier is an auxiliary diagnostic, not a substitute.
+- **D2 — behaviour where the allowed incision is exceeded.** The carve yields to the island instead
+  of cutting an unbounded gorge — a hypothesis for visual checking.
+- **D3 — scope of the bound.** The 7.2 m `CorridorIncisionMeters` bound applies to incision on the
+  plain below the massif toe; it does not bound the mountain carve.
+
+**Surfaces.** `H4A`; `H3F` (production `CarvedElevation`); **P7 / P12** — the axial drainage envelope
+`C[i] = min(max(C1[i], C[i−1] + ΔH4A, 0), bound[i])` at 2 m stations, `C1` the production self-only
+axis carve, `bound` the production allowance and sea margin, plus `max(A, C1)` only at arc ≥ toe
+(`A` = 7.2 / 12 m); **Y7** — P7 followed by a backward yield `G[i] = max(F[i], min(G[i+1], H4A[i] −
+Cm[i]))`: the floor never sits below what it drains to along the axis and never above `H4A` minus
+the mountain term; a tributary is bounded by its trunk's floor at the confluence. A variant enters
+2-D by adding `Across(1 − w) · Δ(arc)` to each corridor's own term inside the unchanged aggregation;
+with `Δ = 0` the evaluator reproduces production `CarvedElevation` bit for bit on every seed.
+Diagnostics: **Y7max** (Y7 with a hard maximum instead of `SmoothMax`), **Y7fill** (`min(H4A,
+priority-flood fill of Y7)`), **M0** (mountain term only: production code with
+`CorridorIncisionMeters = 0`).
+
+| surface | S8 created (plain / flank) | depth sum / p50 / max | ≥ 2 m | axial CLOSED (in S8 depression / route only) | interior gaps (trajectories) |
+|---|---|---|---|---|---|
+| `H4A` | 6 own (S8-M, max 2.32 m) | — | — | 36 (0 / 36) | — |
+| `H3F` | 211 (114 / 97) | 252.7 / 0.90 / 5.27 m | 31 | 96 (63 / 33) | 3 (3) |
+| P7 | 222 (131 / 91) | 210.9 / 0.71 / 5.31 m | 18 | 110 (66 / 44) | 19 (18) |
+| P12 | 217 (126 / 91) | 179.9 / 0.63 / 3.27 m | 11 | 67 (43 / 24) | 19 (18) |
+| Y7 | 205 (114 / 91) | 142.7 / 0.55 / 3.27 m | 2 | 34 (12 / 21) | 36 (29) |
+| Y7max | 187 (96 / 91) | 125.9 / 0.55 / 3.27 m | 2 | 21 (2 / 19) | 36 (29) |
+| Y7fill | 0 by construction | — | — | 21 (0 / 21) | 37 (30) |
+| M0 | 59 (0 / 59) | 72.2 / 1.07 / 4.62 m | 10 | 40 (4 / 34) | — |
+
+Inherited depressions deepened by more than 0.05 m: `H3F` 1, M0 3 (all on the flank: 1013, 1026,
+1038), every other surface 0.
+
+Measured:
+
+- **Every axial closure of `H4A` is a route closure.** None of the 36 lies in a plan-view
+  depression; `H4A` is plan-view drainable except its six S8-M depressions. The inherited closures
+  are places where a declared trajectory crosses rising ground, and water leaves sideways.
+- **Plan-view creation is robust to the thresholds and the matching rule.** Over depth 0.10–0.50 m
+  and area 0–400 m², `H3F` creates 142–246 and Y7 111–256; the three matching rules differ by ±1.
+- **Mechanisms.** The mountain term alone creates 59 depressions, all on the flank, on 27 of 32
+  massif seeds. The trough floor follows `H4A`'s lateral slope, so the carved cross-section low sits
+  5–12 m off the axis (1023/4, 1032/6, 1010/0) while `H4A`'s own low lies outside the corridor.
+  `SmoothMax` accounts for about 18 (Y7 → Y7max).
+- **Depth does not buy plan-view drainage.** P12 creates 217 against P7's 222 and `H3F`'s 211. It
+  spends depth above 7.25 m on 8.9 % of the plain valley length (112 trajectories); `H3F` already
+  exceeds 7.25 m on 4.2 % through `SmoothMax`.
+- **The yield's gaps sit on trajectories that touch the coast and turn back inland**: 24 of 29
+  (all 7 with `dGate` ≥ 0.5, 17 of 36 with 0 < `dGate` < 0.5, 5 of 218 with `dGate` = 0).
+- The forward envelope also deepens the flank wherever `H4A` rises along the axis: 183 of 261
+  trajectories, p90 2.2 m, max 14.4 m.
+- Traversability barely moves: land steeper than 45° and reachable land change by ≤ 0.06 percentage
+  points; carve-made plain walls above 45° appear on 0–1 stations per half-width bin. The analytic
+  `AcrossProfile` reaches 45° at a depth of about 0.37 half-widths, which the 2.73 m lattice smooths.
+
+Visual judgement (hillshade, not in-engine): 12 m cuts read as straight railway-like cuttings
+(1032/8); the yield splits route-barrier valleys into segments that restart abruptly mid-slope.
+
+Phase-2 conclusion: no axial variant satisfies D1. Plan-view drainage is a property of the 2-D
+construction, not of the amplitude.
+
+## 10. Phase 3 — planar carving and natural valley preservation, 2026-10-15 – 16
+
+**Research requirements set by the owner for this phase:** (1) no new significant plan-view
+depression relative to `H4A` by an independent S8 scan, except explicitly permitted basins; (2) no
+deepening of inherited depressions; (3) keep the natural thalweg and cross-section form; (4) keep
+valley continuity where the valley should continue; (5) no reappearing segments and no artificial
+ditches; (6) keep the 7.2 m plain incision bound and assess the mountain carve separately; (7) do not
+worsen traversability or coastal geometry. Whether all seven are compatible was part of the
+question.
+
+### 10.1 What Y7fill does, and at what cost
+
+- Priority-flood raises every carve-made depression to its spill level. Because `H4A` is drainable,
+  an uncarved cell always has a drainage path, so the fill can only change carved cells. Measured:
+  0 uncarved cells changed and 0 cells outside the corridors; every change lies within 0.93
+  half-widths (≤ 115 m) of the axis; 28.53 ha, 87 646 m³, raise ≤ 3.27 m.
+- It removes 205 depressions at a median of 138 m³ each. 81 % of them have their bottom off the
+  valley floor (`w` > 0.2) — the lateral-tilt mechanism.
+- **Side effect:** flat, lake-bed floors on the filled patches. Y7's gaps stay (the fill does not
+  touch the route).
+- **Local equivalence:** filling each carved component from its own uncarved ring (outlet height =
+  `H4A`'s own spill level) reproduces the global fill exactly — 0 cells differ.
+- **Achievable without any fill:** variant A removes 204 of the 205 at the same places.
+
+### 10.2 Variants
+
+- **A — planar floor reference.** `c(p) = Across(1 − w) · min(D(arc), max(0, H4A(p) − F(arc)))`,
+  `D` / `F` the Y7 axis carve and floor, hard maximum between corridors: the carve never cuts below
+  the axis floor at its own arc.
+- **B1 / B2 — `H3F` plus band-local correction.** B1 fills each carved component locally. B2 first
+  breaches: a least-cost path from each pit bottom to lower ground inside the carved component,
+  lowered linearly, refused where the plain bound or the allowance would be exceeded; the rest is
+  filled.
+- **C — A plus valley termination.** Below the toe the carve ends at the first stretch under 1 m that
+  would reappear (≥ 1 m) further down; nothing downstream is carved. Trajectories are not changed.
+- **D (diagnostic)** — production terms bounded by the production axis floor, hard maximum, then a
+  band-local fill.
+- **E — hybrid.** Production terms on the massif, A's template on the plain, blended by smoothstep
+  over 60 m below the toe, hard maximum, then a band-local fill. **Epre** is E before the fill.
+
+| | S8 created (IDS) | massif carve vs `H3F` | plain > 7.25 m | interior gaps (trajectories) | correction |
+|---|---|---|---|---|---|
+| `H3F` | 211 (209) | — | 13.0 ha | 3 (3) | — |
+| A | 2 (2) | −23 %, up to 35.7 m shallower | 0 | 44 (35) | none |
+| B1 | 0 (0) | unchanged | 12.1 ha | 3 (3) | fill 336 171 m³ |
+| B2 | 0 (0) | unchanged | 12.2 ha | 3 (3) | 564 breaches (248 refused by the bound), 12 581 m³ lowered (≤ 4.95 m), fill 218 795 m³ |
+| C | 2 (2) | −23 % | 0 | 13 (12) | 30 trajectories terminated, 13.3 km = 8.5 % of plain valley length |
+| D | 0 (0); 183 before fill | −20 % | 0 | 15 (12) | fill 380 846 m³ |
+| **E** | **0 (0)**; 100 before fill (2 plain, 98 flank) | unchanged (77.97 vs 78.06 Mm³) | 0 | 39 (30) | fill 41 261 m³ |
+
+Further measurements:
+
+- A's two residual depressions (0.26 and 0.27 m) sit on an outer valley wall where the corridor
+  contains a lateral `H4A` crest — the one case the floor-reference argument does not cover.
+- All 30 terminations of C are inland (none within 30 m of the coast); 26 of them are on trajectories
+  with `dGate` > 0.
+- 50 of E's 100 pre-fill flank depressions lie inside declared Stage 3E cirques (`H3F`: 49 of 211).
+- **Natural low:** `H4A`'s cross-section minimum within ±1.5 half-widths lies inside the corridor at
+  19 % of plain stations. The carved low sits off the valley floor (`w` > 0.2) at 71–72 % of stations
+  for `H3F` and B, 52–54 % for A, C and E.
+- **Confluences (29):** `H3F` 24 depressions within 60 m, every corrected variant 0. **Coast:** `H3F`
+  31 within 200 m of the shore, corrected variants 0. **Plate-level crossings:** `H3F` 6, corrected 0.
+- **Traversability:** B and E unchanged; A, C and D +0.09 percentage points of land steeper than
+  45° and −0.4 points of minimum reachability.
+- Axial `CLOSED` (diagnostic): `H4A` 36, `H3F` 97, A 16, C 22, E 21, B1 57, B2 64.
+
+Visual judgement (hillshade, not in-engine): A and C leave a thin dark step at the massif toe where
+the floor rule cuts the Stage 4A apron ring, and they change the flank grooves; B2's breach channels
+read as narrow zig-zag notches; B1 leaves flat "bulbs" at tributary ends; Y7, A and E split
+route-barrier valleys into segments that restart abruptly; C ends them mid-plain.
+
+**Conflicts recorded.** (a) A natural thalweg and frozen trajectories (measured in §11). (b) Where a
+declared route rises more than the plain bound can cut, only a gap, a termination or a flat-filled
+continuation exists: continuity, no reappearance, the 7.2 m bound and D1 cannot all hold there.
+(c) Reshaping the flank structurally (A, C, D) removes the mountain-term depressions but deforms
+the mountain valleys; keeping the production flank needs a correction step.
+
+Phase-3 recommendation (not approved): an **E-family hybrid** for the next prototype.
+
+## 11. Phase 4 — thalweg shift inside the corridor (E against F), 2026-10-16
+
+**F.** On the plain the cross-section centre moves toward the `H4A` minimum within the existing
+half-width; the profile becomes asymmetric, each side spanning from the shifted line to its own
+corridor edge; the 7.2 m forward envelope and the yield are recomputed along the shifted line on
+analytic `H4A`; the massif part is E's. Shift ≤ 0.6 half-widths, ±50 m moving average, lateral drift
+≤ 1:8 (authoring defaults). **G** tests sensitivity: shift ≤ 0.8, ±10 m, drift ≤ 1:4. With zero shift
+F reproduces E on every metric. Fpre and Gpre contain no fill; F and G apply E's band-local fill for
+a like-for-like D1 comparison.
+
+**Where the natural low is** (2 m plain stations): within 0.6 half-widths of the axis 13.5 %; inside
+the corridor beyond 0.6 7.0 %; **outside the corridor 79.5 %**. At half of the stations the
+in-corridor minimum is the corridor edge itself. The low line is coherent (20 m change: median 0;
+side flips 2.6 %). 222 of 261 trajectories have most plain stations with the low outside; 245 reach
+the 0.6 limit.
+
+| | E | F | G |
+|---|---|---|---|
+| S8 created before fill, plain / flank (IDS) | 100: 2 / 98 (98) | 106: 8 / 98 (104) | 105: 7 / 98 (103) |
+| after the fill, S8 / IDS | 0 / 0 | 0 / 0 | 0 / 0 |
+| fill on the plain | 6 435 m³ | 10 379 m³ | 11 165 m³ |
+| carved low from the axis, median | 0.26 half-widths | 0.64 | 0.80 |
+| carve cut into the natural low where it is reachable | 31 % | 25 % | 29 % |
+| shifted line within 0.1 half-widths of the low where reachable | — | 23 % | 36 % |
+| plain carve volume | 38.34 Mm³ | +3.2 % | +5.4 % |
+| relocation against E, raised / lowered | — | 8.97 / 10.19 Mm³ | 10.08 / 12.14 Mm³ |
+| interior gaps (trajectories) | 39 (30) | 52 (41) | 55 (44) |
+| carve-made plain walls > 45° | 2 | 61 (45 at half-width < 25 m) | 236 |
+| depressions within 60 m of confluences before fill | 0 | 6 | 7 |
+
+All three keep the plain bound (max 7.22 m, nothing above 7.25 m). Land steeper than 45°: 4.278 /
+4.281 / 4.293 %; minimum reachability 91.297 / 91.279 / 91.277 %.
+
+Visual judgement: F and G move the groove toward the corridor edge instead of reshaping it. In
+narrow corridors it becomes an edge trench with a serrated wall (1010/0: 47–50° against 33° for E).
+At 1014/2 the shifted trunk floor leaves the tributary's junction. The segmentation of 1032/8 is
+unchanged.
+
+**Conclusion.** Inside the existing corridor the natural thalweg is out of reach at about 80 % of
+plain stations, and where it is reachable F does not cut into it more often than E. F is not worth
+prototyping. **Conflict recorded:** keeping the natural thalweg, keeping the Stage 3C trajectories and
+keeping the corridor width are mutually exclusive on this data.
+
+## 12. Methods and reproducibility (phases 2–4)
+
+- **Environment.** Unity 6000.5.7f1 in batch mode on a minimal standalone project outside the
+  repository. It holds copies of `World/TerrainGen`, `World/Seed`, `World/Town/Geometry`,
+  `WorldScale.cs` and `HydrologyGrid` / `DepressionFill` / `HydrologySettings` at HEAD `5a05b13`, an
+  empty package manifest, and the probe under `Assets/Editor`. Before every run the seven canonical
+  `H4A` hashes match: 110201 `e2bad571f4af76c7`, 424242 `2076ecf78a34483b`, 20260905
+  `4b7ae0f5a6cfaae8`, 7 `6a7ad6edd08db7d9`, 1337 `f86e8c15d7105be2`, 256 `a218e07fe1b2cd74`,
+  777 `48012b8c997a54df`.
+- **A .NET build of the same sources is not a substitute.** Stage 1 already differs by 1–3 cm, and
+  three sweep seeds (1014, 1035, 1037) get different trajectories. It is useful only for debugging
+  probe code.
+- **Population.** Seeds 1000–1039: 32 carry a massif, 261 trajectories. Focus trajectories 1023/4,
+  1032/8, 1014/2, 1010/0, 1032/6 and 1010/1; the last two were picked by rules fixed before the run
+  (largest S11-T with `dGate` = 0; longest plain without any closure, gap or depression).
+- **S8 scan** — `IslandReliefMetrics.FillDepth` + `ScanDepressions`: priority flood (ε 1 mm,
+  8-neighbour, outlets = the connectivity-checked ocean and the world border); depth = fill − height on
+  land; 4-connected components deeper than 0.05 m; significant at ≥ 0.25 m and ≥ 100 m²; lattice
+  1025² at 2.734 m.
+- **IDS, the independent scan.** Cells sorted by height and merged with a union-find; when a component
+  without an outlet joins one with an outlet, the merging cell's height becomes the spill level of
+  all its members. Same connectivity and component rule, no epsilon, separate code. S8 and IDS agree
+  within ±4 on every surface. A variant built with priority flood (B, D, E, F, G) counts as meeting
+  D1 only through IDS.
+- **Matching against `H4A`.** By overlap of component cells: inherited when a significant `H4A`
+  component is overlapped, deepened when deeper by more than 0.05 m. A 2-cell dilation and a
+  deepest-cell distance of 40 m change the counts by ±1.
+- **Plain and massif.** Along a trajectory, plain means arc ≥ `FinalValleyTrajectory.ToeArcMeters`;
+  for volumes, a cell is plain when `U2` ≤ 0.1 m. Ambiguities: overlapping corridors at confluences,
+  the Stage 4A apron beyond the toe counts as plain, and `SmoothMax` can exceed a per-corridor cap.
+- **Integrity.** Carve on the axis every 5 m; under 1 m counts as absent; a gap is an absent stretch
+  with carve ≥ 1 m on both sides. Phase 2 sampled analytic surfaces, phases 3–4 the lattice
+  (bilinear) — hence Y7fill 37 / 36 gaps and `H3F` 96 / 97 axial closures.
+- **Thalweg.** Plain stations every 20 m; the cross-section is sampled at 2 m over ±1.5 half-widths.
+- **Walls.** The steepest lattice slope (central differences) between 0.1 and 1.0 half-widths; a wall
+  is carve-made when `H4A` is at or below 45° there.
+- **Probes.** The probe sources and their data were temporary and are not kept in the repository; the
+  definitions above are enough to rebuild them. Phase 3's sweep ran as two Unity runs with identical
+  code and identical hashes, after a session interruption.
+
+## 13. Current position and open decisions
+
+- Production is unchanged; Stage 3F remains an experimental downstream carve.
+- **Measured:** plan-view drainage at the 7.2 m plain bound is reachable without raising the bound —
+  a planar floor reference on the plain plus a band-local correction on the massif flank (E),
+  verified by an independent scanner. Axial envelopes, extra depth and an in-corridor thalweg shift
+  do not reach it.
+- **Recommended next prototype (not approved): the E family.**
+  - Plain: the floor-referenced template with a hard maximum, driven by per-arc arrays.
+  - Massif: the production carve with a band-local correction.
+  - An explicit policy for routes that rise more than the bound allows.
+- Decisions the owner has to take first are listed in
+  [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Stage 3F valley carve.

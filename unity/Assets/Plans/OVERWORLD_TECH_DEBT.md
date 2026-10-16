@@ -703,3 +703,27 @@ on something the construction can guarantee, or cap `U·Λ` — and the last wou
 Do not treat B8 or B9 as licence to retune Stage 4A. Both are Stage 3C/3F questions, and B8 may be a
 Stage 4B one. **F2 (basin realisation) stays blocked on B4**, a basin's depth bound, which is still an
 owner decision.
+
+**Note 2026-10-16 — the axial `CLOSED` count is not the drainage measure.** Research phases 1–4 in
+[PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md)
+(§§9–13, seeds 1000–1039) change how B9 reads. Nothing above is withdrawn as a measurement, and no
+production code changed.
+
+- **All 36 axial `CLOSED` lows of `H4A` are route closures.** None lies inside a plan-view (S8)
+  depression; water leaves the trajectory sideways. M1 describes declared trajectories crossing
+  rising ground, not basins. Treat `Stage3FVerification`'s `CLOSED` as a diagnostic, not as the defect
+  count.
+- **The plan-view measure:** production `H3F` creates **211** new significant S8 depressions relative
+  to `H4A` on the 32 massif seeds (209 by an independent union-find scan). The main mechanisms are the
+  trough floor following `H4A`'s lateral slope (the cross-section low sits 5–12 m off the axis), the
+  mountain term (59 on its own) and `SmoothMax` (about 18).
+- **"Fixing this means changing `CorridorIncisionMeters`, the trough shape, or Stage 4A's relief" does
+  not hold for plan-view drainage.** A 12 m bound creates 217 against 222 at 7.2 m. An E-family hybrid
+  (a floor-referenced plain carve plus a band-local correction on the massif flank) reaches zero new
+  depressions at the 7.2 m plain bound, confirmed by the independent scan — a research result, not an
+  approved remedy.
+- **B10's rise does not make basins by itself** — `H4A` has only six significant S8 depressions on the
+  sweep. What it produces is route-barrier valleys: the gaps and terminations on trajectories with
+  `dGate` > 0 (handoff §§9–10). B10 and B4 are otherwise unchanged by this research.
+
+Open decisions: [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Stage 3F valley carve.

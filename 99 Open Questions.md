@@ -1,16 +1,16 @@
 # 99 Open Questions
 
-Version: 0.26
+Version: 0.27
 
 Status: Draft
 
-Last Updated: 2026-08-31
+Last Updated: 2026-10-16
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md)
 
 ---
 
@@ -283,6 +283,32 @@ Should Local road stubs be generated as a third Prim pass after Secondary, or on
 When do `PoiPlacementProfile` C# catalog entries move into ScriptableObject immutable defs for authoring? ([17](17%20Game%20Systems%20Architecture.md) W.4)
 
 What asset/API provides waterfall meshes if inland hydro returns later? ([HYDROLOGY_GENERATION_PLAN.md](unity/Assets/Plans/HYDROLOGY_GENERATION_PLAN.md))
+
+## Terrain — Stage 3F valley carve
+
+Research record: [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md) (phases 1–4, 2026-10-14 – 16; §13 is the current position). Production terrain is unchanged and Stage 3F stays an experimental downstream carve; these questions block the next Stage 3F prototype, not the current bake. D1–D3 below were research requirements set by the owner for the experiments, not approved invariants. The measured counts are robust to the S8 thresholds and the matching rule (handoff §9), so the answers are design choices, not threshold tuning.
+
+Is plan-view drainage (D1) a Stage 3F acceptance invariant — no new significant S8 depression relative to `H4A` outside permitted basins and no deepening of inherited ones — with the axial `CLOSED` classifier kept as a diagnostic only? Production `H3F` creates 211 such depressions on seeds 1000–1039; all 36 axial closures of `H4A` are route closures, not basins (handoff §9).
+
+When a Stage 3F candidate itself uses priority flood, does D1 have to be confirmed by an independent scanner (sort + union-find, separate code) as the test oracle? (handoff §12)
+
+Is 7.2 m (`CorridorIncisionMeters`) a bound on plain incision below the massif toe only, with the mountain carve bounded separately (D3)? Deeper plain cuts do not buy drainage — 12 m creates 217 depressions against 222 at 7.2 m — and read as railway cuttings (handoff §9).
+
+Is a band-local raster correction admissible inside TerrainGen — a fill confined to carved cells inside the corridors, with outlet heights taken from `H4A`? The recommended E hybrid needs it on the massif flank (41 261 m³ over 32 massif seeds). It makes the carved surface depend on the lattice rather than only on world position. Without it the flank must be reshaped (variants A / C / D: 20–23 % less mountain carve, deformed mountain valleys) (handoff §10).
+
+Where do the per-arc arrays of a floor-referenced carve (floor and allowed depth along the arc) live: as immutable Stage 3F data next to `FinalValleyTrajectory`, or recomputed on every evaluation? (handoff §13)
+
+Should `SmoothMax` between overlapping corridors become a hard maximum? It accounts for about 18 depressions and lifts plain incision above 7.25 m on 4.2 % of plain valley length (handoff §§9–10).
+
+Route-barrier policy: where a declared trajectory rises more than the plain bound can cut, does the valley stop and restart downstream (gap), end (termination), or continue as a flat-filled floor? Continuity, no reappearing segments, the 7.2 m bound and D1 cannot all hold there (handoff §10).
+
+Should the carve stop at the first approach to the coast on trajectories that touch the shore and turn back inland (`dGate` > 0)? They carry 24 of the 29 trajectories with gaps under the axial yield and 26 of the 30 terminations of variant C (handoff §§9–10).
+
+Are declared Stage 3E cirques permitted basins under D1? 50 of the hybrid's 100 pre-fill flank depressions lie inside them. Their depth bound is still B4 (`PROCEDURAL_TERRAIN_STAGE_3E_PREFLIGHT.md` §22.3) and their realisation F2 (`PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md` §15) (handoff §10).
+
+Natural thalweg against frozen trajectories: `H4A`'s cross-section low lies outside the existing corridor at about 80 % of plain stations, and shifting the floor inside the corridor does not reach it (variant F; the handoff recommends against prototyping it). Accept the axis-centred valley, widen the corridor, reopen the frozen Stage 3C trajectory geometry, or derive plain valleys from `H4A` flow instead of declared trajectories? (handoff §11)
+
+Should the mountain term be redesigned so the massif flank drains without a correction step? On its own it creates 59 flank depressions on 27 of 32 massif seeds (handoff §9).
 
 ---
 
