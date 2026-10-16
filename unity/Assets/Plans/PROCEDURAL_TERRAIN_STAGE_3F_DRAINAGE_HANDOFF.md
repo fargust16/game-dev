@@ -1,6 +1,6 @@
 # Procedural Terrain — Stage 3F Drainage and Valley Carve, Research Handoff
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft — research record. Nothing in it is an approved design decision.
 
@@ -26,10 +26,13 @@ Referenced By:
 | 2 landform decision (D1–D3) | 2026-10-14 | which drainage invariant, which valley geometry, where the 7.2 m bound applies | measured against plan-view drainage (S8, research requirement D1): no axial variant satisfies it; depth does not buy it | §9 |
 | 3 planar carving | 2026-10-15 – 16 | can a carve that works on the 2-D surface avoid new depressions and keep natural form | E-family hybrid meets D1 (independently verified); conflicts between the requirements recorded | §10 |
 | 4 thalweg shift | 2026-10-16 | can the carve floor move to the `H4A` low inside the existing corridor | no — the low lies outside the corridor at 79.5 % of plain stations; F is not worth prototyping | §11 |
+| 5 decision memo + technical check | 2026-10-16 | is a band-local raster correction workable; how does it depend on the lattice; what do valley-ending rules cost | 4-connected correction holds on the lattice and on any triangulation; not resolution-invariant; no ending rule tested is a solution | §§14–15 |
+| 6 isolated prototype of E | 2026-10-16 | does E with a 4-connected correction on the 1025 lattice meet the acceptance criteria | yes on the lattice; the prototype's mixed point-query contract fails continuity and between-node subtractivity, a lattice-only reading does not | §16 |
 
-Methods shared by phases 2–4: §12. Current position and open decisions: §13. Reading order: §8.
+Methods shared by phases 2–4: §12; phases 5–6 reuse them (§15, §16). Current position and open
+decisions: §17 (§13 is the position after phase 4). Reading order: §8.
 Production code, public API, tests, Stage 4A, the frozen Stage 1–3E files and the Stage 3C
-trajectories are unchanged through all four phases.
+trajectories are unchanged through all six phases.
 
 ## 1. Status and scope
 
@@ -323,8 +326,9 @@ admissible.
 
 ## 8. Entry point for the next agent
 
-Read, in order: §0 and §13 of this document; §12 for what every number means; §§9–11 for the
-evidence; then §§1–7 for the phase-1 causal model. Background: `PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md`
+Read, in order: §0 and §17 of this document; §16 for the prototype and §15 for the technical check;
+§12 for what every number means; §§9–11 for the evidence behind E; then §§1–7 for the phase-1
+causal model. Background: `PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md`
 (§§19–22 for B4/B7/B8/B9/B10); `OVERWORLD_TECH_DEBT.md` items 19–21 and B10;
 `PROCEDURAL_TERRAIN_STAGE_3_DESIGN.md` line 575 for the invariant phase 1 showed to be wrong;
 `PROCEDURAL_TERRAIN_STAGE_3C_VALLEY_FORENSICS.md` §"Three properties" for the proof whose premise
@@ -332,8 +336,9 @@ Stage 4A removed. Code: `CarveField.cs`, `CarvedElevation.cs`, `Stage3FVerificat
 `DepressionFill.cs`, and `IslandReliefMetrics` in `TerrainGenIslandReliefDump.cs` (the S8 scan).
 
 Open decisions are listed in [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain —
-Stage 3F valley carve. Start from the route-barrier policy and the admissibility of a band-local
-raster correction (§13): every candidate in §10 depends on them.
+Stage 3F valley carve. Start from the point-query contract and the valley-ending semantics (§17):
+the correction itself is measured; those two decisions are what stands between the prototype and a
+production design.
 
 ## 9. Phase 2 — landform decision (D1–D3), 2026-10-14
 
@@ -564,7 +569,7 @@ keeping the corridor width are mutually exclusive on this data.
   definitions above are enough to rebuild them. Phase 3's sweep ran as two Unity runs with identical
   code and identical hashes, after a session interruption.
 
-## 13. Current position and open decisions
+## 13. Position after phase 4 (superseded by §17)
 
 - Production is unchanged; Stage 3F remains an experimental downstream carve.
 - **Measured:** plan-view drainage at the 7.2 m plain bound is reachable without raising the bound —
@@ -577,3 +582,151 @@ keeping the corridor width are mutually exclusive on this data.
   - An explicit policy for routes that rise more than the bound allows.
 - Decisions the owner has to take first are listed in
   [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Stage 3F valley carve.
+
+## 14. Phase 5a — decision memo and the owner's working decisions, 2026-10-16
+
+The memo compared three ways to make the E-family drain in plan view and three ways to treat routes
+that cannot keep descending:
+
+- **Correction.** A band-local raster correction on a fixed lattice before the bake (recommended);
+  an analytic correction (not demonstrated: the closest analytic constructions, A and D, still leave
+  depressions or reshape the flank, §10); no correction with a weaker D1 (would need the
+  "no closed basins" rule of `WORLD_RELIEF_PRINCIPLES.md` amended). Argued, then measured in §15: a
+  4-connected priority flood stays drainable on any triangulation of the lattice and under
+  aligned bilinear refinement, an 8-connected one does not have to; the fill is 1-Lipschitz in the
+  heights, and a monotone 16-bit quantisation cannot create a depression.
+- **Routes.** Gap, termination or flat-filled continuation, with coastal turn-backs treated
+  separately. Ending a valley's geometry is a Stage 3F realisation fact; it does not change Stage 3C
+  topology.
+
+**Working decisions for the research prototype (owner, 2026-10-16; research only, not production):**
+canonical `FieldResolution` = 1025; 4-connected band-local priority flood; in corrected cells the
+corrected lattice is authoritative and point queries are bilinear on it; corrected height ≤ `H4A`;
+Stage 3C untouched; no automatic `Mouth` or `Barrier` — `Declared` ends, gaps measured and shown.
+
+## 15. Phase 5b — technical check, 2026-10-16
+
+Unity 6000.5.7f1, sources at HEAD (production code as at `5a05b13`), canonical hashes matched. The
+probe reproduced phase-3 E bit for bit. Seeds 110201, 424242, 20260905, 7, 1010, 1014, 1023, 1032
+(70 trajectories, 41.9 km of plain valley).
+
+**Connectivity, 1025.** E8 (phase 3) and E4 both create 0 significant depressions under S8, an
+8- and a 4-connected independent scan, and both uniform triangulations; also after 16-bit
+quantisation and after aligned bilinear refinement to 2049. Counterexamples: E8 on a 513 lattice read
+4-connected — 4 depressions (0.29–0.41 m); either variant read as "analytic Epre at 2049 plus the
+interpolated raise" — 2 (8-connected) / 3 (4-connected) depressions of 0.25–0.32 m, all on the flank.
+E4 fills 15 577 m³ against E8's 14 191 m³ (+9.8 %): 89 places where only a diagonal drained,
+≤ 0.18 m, never lower than E8.
+
+**Resolution** (structures fixed from the 1025 build, lattices point-evaluated). D1 holds when the
+correction is recomputed natively at 513, 1025 and 2049. The surfaces do not converge: E8 fills
+12 243 / 14 191 / 16 928 m³, E4 13 932 / 15 577 / 19 599 m³; common nodes differ by up to 0.30–0.32 m
+(513 → 1025) and 0.17–0.23 m (1025 → 2049); raised components exist at one resolution only (E4
+1025 → 2049: 11 coarse-only, 26 fine-only). Changing `FieldResolution` literally also moves Stage 3C
+trajectories by up to 3.7 m (the trajectory builder reads the Stage 1 lattice gradient); `H4A` itself
+does not change. The correction costs 0.3 s per seed at 1025 and 1.4 s at 2049, against 11 s and 43 s
+to evaluate the lattice.
+
+**Valley ends** (E8, 1025; 19 / 12 / 8 trajectories have `dGate` > 0 / 0.01 / 0.05):
+
+| rule | ends (Mouth / Barrier) | gaps on the lattice (stations) | valley length lost vs E | ends ≤ 30 m / > 50 m from the shore |
+|---|---|---|---|---|
+| Declared | 0 | 13 on 11 trajectories, 1 615 m (11) | 0 | — |
+| Mouth, > 0.01 | 12 / 0 | 4 (3) | 1 930 m (4.6 %) | 3 / 8 |
+| Barrier | 0 / 10 | 4 (0) | 1 765 m (4.2 %) | 0 / 10 |
+| Mouth + Barrier, > 0.01 | 6 / 9 | 3 (0) | 2 645 m (6.3 %) | 0 / 15 |
+
+- `Mouth` as defined (the running minimum of the Stage 4A gate before it recovers) is not a mouth:
+  8 of the 12 ends lie 60–160 m inland on the coastal slope, cutting off a valley up to 3–4 m deep,
+  while the trajectory reaches the sea later at its declared end; only 3 ends lie within 30 m of the
+  shore.
+- `Barrier` is stable (no end moved under a ±2 cm perturbation of `H4A`) and creates no depression,
+  but turns gaps into lost length and ends valleys 52–342 m inland. Worst case: 110201/5, a 95 m gap
+  becomes 610 m lost.
+- The lattice gaps left after an ending rule (3–4) are reading artefacts — neighbouring corridors
+  re-carving the axis, or the carve hovering at 1 m — with 0 gaps on the corridor's own stations.
+- Plain incision by arc class: ≤ 7.200 m on the plain (arc ≥ toe + 60 m). The 7.218 m maximum seen on
+  cells with `U2` ≤ 0.1 m lies above the toe by arc, where the production allowance applies.
+
+## 16. Phase 6 — isolated prototype of E, 2026-10-16
+
+**Prototype.** E's carve with `Declared` ends; a 4-connected band-local priority flood on the 1025
+lattice (carved components only, outlets at `H4A`'s own spill level, result `min(H4A, fill)`); a cell
+is *corrected* when any corner was raised; the point query is bilinear on the corrected lattice in
+corrected cells and E's analytic carve elsewhere (R1, the working contract). Built dump-first in a
+standalone Unity project, outside the repository. Population: seeds 1000–1039 plus the seven
+canonical seeds — 47 seeds, 36 with valleys, 299 trajectories.
+
+| check | result |
+|---|---|
+| Canonical `H4A` hashes | 8 / 8 match |
+| Corrected lattice, rebuilt in the same process / in a second Unity process | identical hash on 47 / 47 and 47 / 47 |
+| New significant depressions vs `H4A` at 1025 (S8, 8- and 4-connected IDS, both triangulations) | 0; 0 deepened. Before correction: 117 (S8); `H3F`: 243 |
+| Point query sampled at 2049 (S8, IDS8, IDS4) | 0 new |
+| Inherited `H4A` depressions (6) | 3 kept unchanged (1006, 1019, 1027), 3 filled (1013, 1026, 1038) — they lie inside carved components |
+| Nodes above `H4A` / land–sea mask changes / changed sea nodes | 0 / 0 / 0; the `min(H4A, ·)` clamp acted on 4 nodes |
+| Point query at every node vs the lattice | 0 bit mismatches |
+| Plain incision by arc class | plain (arc ≥ toe + 60 m) ≤ 7.200 m, blend ≤ 7.208 m; cells above the toe with `U2` ≤ 0.1 m up to 7.223 m (50 cells > 7.21 m; `H3F` there up to 8.55 m) |
+| Massif carve volume | 91.638 vs `H3F` 91.755 Mm³ (−0.13 %) |
+| Correction volume | 57 370 m³ (seeds 1000–1039: 46 714 m³ vs 41 261 m³ for phase-3 E8, +13.2 %); max raise 4.37 m; flank 47 191 m³, plain 10 026 m³, blend 154 m³; within 200 m of the shore 2 245 m³ (max 0.45 m); within 60 m of junctions 253 m³ (max 0.16 m) |
+| Against the technical check (8 seeds) | volume, max raise and all 78 raised components identical |
+| Traversability | land > 45°: 4.475 % (`H3F`, Epre and E alike); minimum reachability 91.297 % vs `H3F` 91.301 %; carve-made plain walls 2 (`H3F` 3). Per seed, E exceeds `H3F` by more than 0.01 percentage points on 1010 (+0.012) and 1034 (+0.015) — from the plain template, before correction |
+| Junctions (31) | 0 depressions within 60 m; 3 tributaries reach their junction with < 1 m of carve on E, Epre and `H3F` alike |
+| Toe transition | axis-carve step per 5 m in the 60 m blend ≤ 0.68 m (Epre 0.67, `H3F` 0.42); the correction adds none |
+| `Declared` gaps | 41 on 34 trajectories, 4 645 m, all on the plain, 36 on coastal turn-backs; shown, not removed |
+
+**Gaps are not masked.** On 16 seeds the lattice before and after correction gives identical gaps on
+every trajectory. Gap lists differ only between *readings*: analytic against lattice changes 17
+trajectories — boundaries move 5–25 m, two short gaps (10–20 m) appear, and 1016/5's 250 m gap reads
+as a valley tail on the lattice.
+
+**The working point-query contract (R1) fails two checks between nodes.**
+
+- Continuity: across the edges of corrected cells the bilinear side and the analytic side differ by
+  up to 1.09 m (seed 1026); 73 of 112 440 edge samples exceed 25 cm; tile seams (x, z = 1 400 m) up to
+  0.53 m where a corrected edge lies on the seam. The jump is the analytic carve's curvature along an
+  edge whose two nodes were not raised — it does not depend on the size of the correction.
+- Subtractivity: 28 samples of the 2049 sampling lie more than 1 mm above analytic `H4A`, up to
+  6.8 cm (1038) — bilinear on a raised node set against an analytic surface that is concave between
+  nodes.
+
+**Diagnostic readings beside R1** (16 seeds: the eight above plus 1000, 1006, 1016, 1020, 1026, 1030,
+1037, 1038; the prototype itself unchanged):
+
+| reading | new depressions at 2049 | jumps at corrected-cell edges | above its own `H4A` reading | Declared gaps vs the uncorrected lattice |
+|---|---|---|---|---|
+| R1 — prototype contract | 0 | up to 1.09 m | 28 samples > 1 mm (analytic `H4A`) | — (mixed reading) |
+| R2 — bilinear on the final lattice everywhere | 0 | 0 by construction | 0 (bilinear `H4A`) | identical on every trajectory |
+| R4 — R1 clamped by analytic `H4A` | 0 | up to 1.09 m | 0 | — |
+
+R2 gives up the analytic sub-lattice detail outside corrected cells — mean 4 mm, worst-seed p99
+5.5 cm, up to 5.36 m on a steep slope in seed 7 — which a 2.73 m heightmap cannot store anyway; the bake,
+`OverworldTerrainField` and the terrain collider already read the lattice. Visually, a filled pit is a
+flat terrace (up to 4.4 m deep, on the massif flank); under R1 its outline shows as a step, under R2 it
+blends.
+
+**Implementation note.** Point/lattice bit-identity under Unity's Mono depends on code shape: reading
+a value back from an `out` parameter changed float rounding by 1–2 ulp on ~1.4 % of nodes. Production
+`IslandElevation.At` is unaffected; a production point query must share one function with the lattice
+evaluator, as `CarvedElevation` already does.
+
+**Method.** Unity 6000.5.7f1 standalone project outside the repository, sources copied at HEAD; S8 and
+the independent scanner as in §12, extended with a 4-connected scan and two uniform triangulations;
+the 2049 sampling places one sample at each lattice node, edge midpoint and cell centre. Probe
+sources and data were temporary and are not kept in the repository.
+
+## 17. Current position and open decisions
+
+- Production is unchanged; Stage 3F remains an experimental downstream carve, and E is a research
+  prototype.
+- **Measured on the canonical 1025 lattice:** E with a 4-connected band-local correction creates no
+  new planar depression (independent scanner), deepens none, stays at or below `H4A`, keeps the land
+  mask, keeps the plain incision at 7.200 m, moves the massif carve by −0.13 % and is deterministic
+  across processes. It is not resolution-invariant; 1025 is canonical by decision.
+- **Not met as specified:** the mixed point-query contract (R1) is discontinuous at corrected-cell
+  edges (up to 1.09 m) and exceeds analytic `H4A` between nodes (up to 6.8 cm). A lattice-only reading
+  (R2) meets both and is what the heightmap stores — it is a contract change, not adopted.
+- **Still open by design:** `Declared` gaps (41 on 34 of 299 trajectories) until the valley-ending
+  semantics is decided; `Mouth` as defined is rejected by measurement, `Barrier` has a measured price.
+- Decisions for the owner: [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Stage 3F
+  valley carve.
