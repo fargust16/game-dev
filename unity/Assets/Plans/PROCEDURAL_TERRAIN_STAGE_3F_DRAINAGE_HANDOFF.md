@@ -1,6 +1,6 @@
 # Procedural Terrain — Stage 3F Drainage and Valley Carve, Research Handoff
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft — research record. Nothing in it is an approved design decision; §22 is a set of
 proposed contracts awaiting owner review.
@@ -773,7 +773,11 @@ survive `SetHeights` → `GetHeights` exactly, other denominators do not. On a 7
 
 **Result.** The served surface is the **triangle reading of the quantised lattice**: each cell split
 along its SW→NE diagonal, (x0, z0) → (x0+1, z0+1); for local coordinates u ≥ v the triangle
-(h00, h10, h11), otherwise (h00, h11, h01); tile-edge vertices shared exactly. A point on the seam
+(h00, h10, h11), otherwise (h00, h11, h01); tile-edge vertices shared exactly. Notation: world x points
+east and z north (Unity's +x and +z); `step` is the lattice spacing (1400 m / 512 = 2.734375 m);
+x0 = ⌊x / step⌋, z0 = ⌊z / step⌋, u = x / step − x0, v = z / step − z0; h_ij is the stored height of node
+(x0 + i, z0 + j), so h10 is the eastern neighbour of h00 and h01 the northern one. A point with u = v
+lies on the shared diagonal, where both triangles give the same height. A point on the seam
 gives identical heights from both tiles. The bilinear reading (R2 in §16) is not what Unity serves; the
 mixed reading (R1) is neither. On the triangle reading E keeps every §16 invariant, and the R1
 discontinuity cannot occur, because a lattice-only reading has no analytic side to jump to.
@@ -932,6 +936,18 @@ offsets only (14 / 42 and 15 / 42); both are "not passable" claims and stand.
 - Nothing flows from E or `TerrainData` back into TerrainGen.
 - The structural channels the surface rules read (`UpliftAt`, signed coast distance) stay structural
   and are declared as such.
+- E reads the valley geometry through the existing binding: Stage 3F cuts along the frozen
+  `FinalValleyTrajectory` via `ValleyTrajectoryNetwork.BuildCarve`, the API-only Stage 3C unfreeze that
+  F1 already spent (`PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md` §20). The contract needs no new unfreeze
+  and changes no frozen type.
+- **E is not `H3F`, pending approval.** `H3F = H4A − C3F` (`CarvedElevation`, §2) is the subtractive
+  carve along the corridors. E = min(`H4A`, fill(Epre)): Epre joins the production massif terms to a
+  floor-referenced plain template with a hard maximum and a 60 m blend below the toe (§10.2), and the
+  fill is the band-local correction (§16). Both lie at or below `H4A`. The statements that Stage 3F carves
+  `H = H4A − C3F` — [AGENTS.md](../../../AGENTS.md) § Accepted Draft Decisions, «Terrain guardrails»;
+  [90 Glossary](../../../90%20Glossary.md) § Island Relief (Stage 4A); §2 above — describe the existing Stage 3F code; they stay unchanged until
+  this contract is approved and are updated in the same documentation transaction (99 Open Questions,
+  3F-1). Where E enters the bake is 3F-25.
 
 **22.2 Height query.** The final surface is read as the **triangle reading of the quantised final
 lattice** (§18): node heights as `TerrainData` stores them, each cell split SW→NE, tile-edge vertices
@@ -949,9 +965,13 @@ depends on the direction).
   inaccessible.
 - Descent-only links exist (descent passes every tested slope) and are not part of the contract.
 
-**22.5 Prohibited for physical decisions** (walkability, footing, spawn, gating): slope readings D2,
-D3 and D6; D4 outside its own uses (road cost, POI site scoring); D7. D3 remains the candidate slope for
-surface and vegetation classification (§23 question). This contract changes no rule threshold.
+**22.5 Prohibited for physical decisions** — a character's walkability, an object's footing, spawn
+and a character's access gating: slope readings D2, D3, D6 and D7; D4 is not used for them either and
+keeps its own uses, road cost and POI site scoring. **Road passability is not a physical decision in
+this sense** and stays governed by the approved Road Passability contract ([90 Glossary](../../../90%20Glossary.md)
+§ Road Passability; [AGENTS.md](../../../AGENTS.md) § Accepted Draft Decisions), which reads grades and slope on
+`LandscapeCostField`; this contract does not touch it. D3 remains the candidate slope for surface and
+vegetation classification (99 Open Questions, 3F-21). This contract changes no rule threshold.
 
 **22.6 Applicability.** Unity 6000.5.7f1, Windows Editor, Mono, Play Mode in batch mode; 2×2 tiles of
 1400 m, heightmap 513, height budget 700 m, `TerrainCollider`; the controller values and movement
@@ -963,24 +983,31 @@ until it is re-measured.
 
 **22.7 Jump accessibility.** A separate notion: what the production jump reaches. Measured
 unconstrained by slope up to 70° on every tested surface; no graph model describes it. Whether steep
-walls should stop a jumping player is a game-design decision (Open Questions).
+walls should stop a jumping player is a game-design decision (99 Open Questions, 3F-20).
 
 ## 23. Current position and open decisions (supersedes §17)
 
 - Production is unchanged; Stage 3F remains an experimental downstream carve and E a research
-  prototype. E is not connected to the bake, and `CarveField` is still bound to the frozen trajectories.
+  prototype. E is not connected to the bake. Stage 3F's carve still cuts along the frozen
+  `FinalValleyTrajectory` through `ValleyTrajectoryNetwork.BuildCarve` (preflight §20), and E uses that
+  binding unchanged.
 - **Measured since §17:** the served surface is the triangle reading (§18), E keeps its invariants on
   it, and the R1 defect has no counterpart on a lattice-only reading; slope readings are mapped and
   measured (§19); physical connectivity and footing are measured (§20); the production controller
   agrees with T-edge wherever T-edge claims a passage (§21).
 - **Proposed for approval:** §22.
-- **Questions that block a dump-first stage 1:** drainage invariant (requirement D1) and its oracle,
-  band-local correction in production, point-query contract, `FieldResolution` as world identity, hard
-  maximum against `SmoothMax`, per-arc data, filling of inherited depressions, flat-filled pits, the
-  final-surface separation.
-- **Questions that block enabling E in production:** valley-ending semantics, the walking-connectivity
-  contract and the prohibition of §22.5, jump and barriers, the classification and biome slope source.
-- **Later:** valley mouths, cirques as basins, natural thalweg, mountain-term redesign, vertex passages
-  and the uncertain zone, descent-only links.
+- **Twelve questions block a dump-first stage 1:** the final-surface separation (3F-1), the drainage
+  invariant (requirement D1, 3F-2) and its oracle (3F-3), the plain incision bound by arc class (3F-4),
+  band-local correction in production (3F-5), the point-query contract (3F-6), `FieldResolution` as
+  world identity (3F-7), per-arc data (3F-8), hard maximum against `SmoothMax` (3F-9), filling of
+  inherited depressions (3F-10), flat-filled pits (3F-11) and cirques as permitted basins (3F-14).
+  3F-10, 3F-11 and 3F-14, and the arc-class coverage of the bound in 3F-4, are the owner's call;
+  3F-14 carries a proposed research mode for stage-1 dumps, which is not a decision.
+- **Eight questions block enabling E in production:** valley-ending semantics (3F-12), the traversability
+  criterion (3F-17), the walking-connectivity contract (3F-18) and the prohibition of §22.5 (3F-19),
+  jump and barriers (3F-20, the owner's call), the classification and biome slope source (3F-21,
+  3F-22), and where E enters the bake (3F-25).
+- **Five questions may follow later:** valley mouths (3F-13), natural thalweg (3F-15), mountain-term
+  redesign (3F-16), vertex passages and the uncertain zone (3F-23), descent-only links (3F-24).
 - Options, consequences and recommendations for each: [99 Open Questions](../../../99%20Open%20Questions.md)
   § Terrain — Stage 3F valley carve.

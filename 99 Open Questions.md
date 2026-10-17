@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.29
+Version: 0.30
 
 Status: Draft
 
@@ -290,11 +290,12 @@ Research record: [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/
 
 **Working decisions for the research prototype only (owner, 2026-10-16; not production decisions):** canonical `FieldResolution` = 1025; 4-connected band-local priority flood; in corrected cells the corrected lattice is authoritative and point queries are bilinear on it; corrected height ≤ `H4A`; Stage 3C untouched; `Declared` valley ends only. The isolated prototype built on them is recorded in handoff §16. The bilinear point query is contradicted by a later measurement — Unity serves triangles (handoff §18) — and is reopened in 3F-6, not changed here.
 
-**How to read the entries.** Each question keeps its original wording, then lists options, their measured consequences and an agent recommendation. A recommendation is not a decision. Three questions — filling inherited depressions (3F-10), flat-filled pits (3F-11) and jump and barriers (3F-20) — carry no recommendation: they are the owner's call. Tags: **[stage 1]** must be answered before a dump-first stage 1 of E is implemented; **[production]** before E is enabled in the production bake; **[later]** may follow.
+**How to read the entries.** Each question keeps its original wording, then lists options, their measured consequences and an agent recommendation. A recommendation is not a decision. Four questions — filling inherited depressions (3F-10), flat-filled pits (3F-11), cirques as permitted basins (3F-14) and jump and barriers (3F-20) — carry no recommendation: they are the owner's call. So does one part of 3F-4: which arc classes the 7.2 m bound covers. Tags: **[stage 1]** must be answered before a dump-first stage 1 of E is implemented; **[production]** before E is enabled in the production bake; **[later]** may follow. Of the 25 questions, twelve are **[stage 1]** (3F-1 to 3F-11 and 3F-14), eight **[production]** (3F-12, 3F-17 to 3F-22 and 3F-25) and five **[later]** (3F-13, 3F-15, 3F-16, 3F-23, 3F-24). A *research mode* noted under a question is a proposed way for stage-1 dumps to measure around an open answer; it is not a decision and does not make the question non-blocking.
 
 **3F-1. Final surface and structural height. [stage 1]** Should `H4A` stay the structural height that Stages 1–4A, the frozen Stage 3C trajectories, Stage 3D/3E topology and structural diagnostics read, with E a separate final surface — the only height written to `TerrainData` — and nothing flowing from E back into TerrainGen? (handoff §22.1)
 - *Options:* (a) the separation of handoff §22.1; (b) E replaces `H4A` as `TerrainAuthorityField`'s height.
 - *Consequences:* (a) frozen stages stay bit-identical and keep their meaning; two named heights must be kept apart, and `OverworldTerrainValidation`, which today compares tiles with `TerrainAuthorityField`, must compare them with E. (b) changes the authority's meaning, breaks the statement that Stage 4A is the authority and lets downstream data reach the frozen stages.
+- *Note, pending this answer:* E is not `H3F`. `H3F = H4A − C3F` (`CarvedElevation`, handoff §2) is the subtractive carve along the corridors; E = min(`H4A`, fill(Epre)), where Epre joins the production massif terms to a floor-referenced plain template with a hard maximum and a 60 m blend below the toe (handoff §10.2) and the fill is the band-local correction (handoff §16). Both lie at or below `H4A`. The statements that Stage 3F carves `H = H4A − C3F` — [AGENTS.md](AGENTS.md) § Accepted Draft Decisions, «Terrain guardrails»; [90 Glossary](90%20Glossary.md) § Island Relief (Stage 4A); handoff §2 — describe the existing Stage 3F code and stay as they are until this contract is approved; on approval they are updated in the same documentation transaction. Where E enters the bake is 3F-25.
 - *Agent recommendation:* (a).
 
 **3F-2. Drainage invariant (D1). [stage 1]** Is plan-view drainage (D1) a Stage 3F acceptance invariant — no new significant S8 depression relative to `H4A` outside permitted basins and no deepening of inherited ones — with the axial `CLOSED` classifier kept as a diagnostic only? Production `H3F` creates 211 such depressions on seeds 1000–1039; all 36 axial closures of `H4A` are route closures, not basins (handoff §9). The prototype of E meets it on 47 seeds at 1025 (handoff §16).
@@ -307,15 +308,16 @@ Research record: [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/
 - *Consequences:* (a) a test-only scanner to maintain; a fault in the flood cannot certify itself. (b) cheaper, and a fault in the flood certifies itself.
 - *Agent recommendation:* (a), with a triangle-graph scan added, because the served surface is triangles (handoff §18).
 
-**3F-4. Plain incision bound (D3). [stage 1]** Is 7.2 m (`CorridorIncisionMeters`) a bound on plain incision below the massif toe only, with the mountain carve bounded separately (D3)? Deeper plain cuts do not buy drainage — 12 m creates 217 depressions against 222 at 7.2 m — and read as railway cuttings (handoff §9).
+**3F-4. Plain incision bound (D3). [stage 1] — arc-class coverage is the owner's call.** Is 7.2 m (`CorridorIncisionMeters`) a bound on plain incision below the massif toe only, with the mountain carve bounded separately (D3)? Deeper plain cuts do not buy drainage — 12 m creates 217 depressions against 222 at 7.2 m — and read as railway cuttings (handoff §9).
 - *Options:* (a) plain only, mountain bounded separately; (b) one bound everywhere; (c) a deeper plain bound.
-- *Consequences:* (a) as prototyped: 7.200 m on the float lattice, 7.2066 m on the served surface after 16-bit storage (handoff §18), so a check needs one storage step of tolerance; (b) caps the massif valleys; (c) buys no drainage and reads as cuttings.
-- *Agent recommendation:* (a), checked on the float lattice with a 1.07 cm tolerance on the served surface.
+- *Consequences:* (a) as prototyped, measured by arc class (handoff §16): plain (arc ≥ toe + 60 m) ≤ 7.200 m on the float lattice and 7.2066 m on the served surface after 16-bit storage (handoff §18); the 60 m blend below the toe ≤ 7.208 m; cells above the toe with `U2` ≤ 0.1 m up to 7.223 m (50 cells above 7.21 m). Whether the 7.2 m bound covers the blend and those above-toe cells, or only the plain class, is part of this question; a check on the served surface needs one storage step (1.07 cm) of tolerance. (b) caps the massif valleys; (c) buys no drainage and reads as cuttings.
+- *Agent recommendation:* (a) for the plain/mountain split, with the acceptance check stated per arc class: the plain class against 7.2 m on the float lattice and within 1.07 cm on the served surface; the blend and the above-toe cells reported against whichever bound this answer assigns them.
+- *No recommendation* on which arc classes the 7.2 m bound covers — the plain class only, or also the 60 m blend (7.208 m measured) and the above-toe cells (up to 7.223 m): that is the owner's call.
 
 **3F-5. Band-local correction in production. [stage 1]** Is a band-local raster correction admissible in production TerrainGen — a fill confined to carved cells inside the corridors, with outlet heights taken from `H4A`? Adopted for research only (4-connected, 1025). Measured: it holds on the lattice, on any triangulation, after 16-bit quantisation and under aligned bilinear refinement, deterministically across processes; it is not resolution-invariant (common nodes differ by up to 0.32 m between 513, 1025 and 2049) and costs 0.3 s per seed (handoff §§15–16). Without it the flank must be reshaped (variants A / C / D: 20–23 % less mountain carve, deformed mountain valleys) (handoff §10).
 - *Options:* (a) admit it as prototyped; (b) reshape the flank (A / C / D); (c) no correction, accept the depressions.
 - *Consequences:* (a) meets D1 on the lattice and on the served surface (handoff §§16, 18), ties the world to its resolution (3F-7) and makes flat-filled pits (3F-11); (b) 20–23 % less mountain carve; (c) fails D1 (3F-2).
-- *Agent recommendation:* (a), subject to the owner's answers on 3F-10 and 3F-11.
+- *Agent recommendation:* (a), subject to the owner's answers on 3F-10, 3F-11 and 3F-14.
 
 **3F-6. Point-query contract. [stage 1]** Point-query contract of a corrected surface: keep the mixed reading (bilinear on the corrected lattice in corrected cells, the analytic carve elsewhere — the prototype's working contract) or read the final lattice bilinearly everywhere? The mixed reading jumps by up to 1.09 m across corrected-cell edges (0.53 m on tile seams) and exceeds analytic `H4A` between nodes by up to 6.8 cm; the lattice-only reading has neither defect, creates no depression, leaves `Declared` gaps exactly as the uncorrected lattice has them, and gives up analytic sub-lattice detail a 1025 heightmap cannot store anyway (mean 4 mm, up to 5.36 m on a steep slope). The bake, `OverworldTerrainField` and the terrain collider already read the lattice (handoff §16). **Measured since (handoff §18):** Unity serves neither reading. `Terrain.SampleHeight` and the collider read the quantised lattice as triangles split SW→NE (≤ 0.4 mm); bilinear differs from that by up to 2.59 m at the centres of twisted cells.
 - *Options:* (a) mixed reading R1; (b) bilinear on the final lattice; (c) triangle reading of the quantised final lattice.
@@ -327,10 +329,10 @@ Research record: [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/
 - *Consequences:* (a) deterministic worlds; changing heightmap resolution means a new world; (b) would need resolution invariance, which was measured absent.
 - *Agent recommendation:* (a).
 
-**3F-8. Per-arc data. [stage 1]** Where do the per-arc arrays of a floor-referenced carve (floor and allowed depth along the arc) live: as immutable Stage 3F data next to `FinalValleyTrajectory`, or recomputed on every evaluation? (handoff §13) `CarveField` is bound to the frozen `ValleyCorridor` trajectories; binding to `FinalValleyTrajectory` is a scoped Stage 3C unfreeze (`PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md` §15.2).
-- *Options:* (a) recomputed inside the Stage 3F module from the frozen trajectories on each evaluation; (b) immutable data next to `FinalValleyTrajectory`; (c) immutable data stored with the frozen trajectories.
-- *Consequences:* (a) no new persisted data and no unfreeze, at an evaluation cost; (b) requires the re-binding; (c) attaches new data to frozen code.
-- *Agent recommendation:* (a) for stage 1; revisit only with an approved re-binding.
+**3F-8. Per-arc data. [stage 1]** Where do the per-arc arrays of a floor-referenced carve (floor and allowed depth along the arc) live: as immutable Stage 3F data next to `FinalValleyTrajectory`, or recomputed on every evaluation? (handoff §13) Stage 3F already cuts along `FinalValleyTrajectory`: the scoped Stage 3C unfreeze asked for in `PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md` §15.2 was granted and spent, API-only, by F1 (preflight §20) — `CarveField` is typed to `IValleyCarveCurve` and keeps its `RidgeSkeleton` constructor, `ValleyTrajectoryNetwork.BuildCarve` builds the carve along `FinalValleyTrajectory`, and no trajectory sample, termination, width or ordering moved. The prototype of E used that binding.
+- *Options:* (a) recomputed inside the Stage 3F module from `FinalValleyTrajectory` through its existing API on each evaluation; (b) immutable data stored on or next to `FinalValleyTrajectory`.
+- *Consequences:* (a) no new persisted data and no new unfreeze, at an evaluation cost; (b) adds data to a frozen Stage 3C type, beyond the API-only unfreeze F1 spent, so it needs a new scoped unfreeze.
+- *Agent recommendation:* (a) for stage 1; revisit only with an approved new unfreeze.
 
 **3F-9. Hard maximum between corridors. [stage 1]** Should `SmoothMax` between overlapping corridors become a hard maximum? It accounts for about 18 depressions and lifts plain incision above 7.25 m on 4.2 % of plain valley length (handoff §§9–10).
 - *Options:* (a) a hard maximum inside E's composition, `CarveField.Depth` unchanged; (b) change `CarveField` itself; (c) keep `SmoothMax`.
@@ -344,7 +346,7 @@ Research record: [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/
 
 **3F-11. Flat-filled pits. [stage 1] — owner's call.** Are flat-filled pits an acceptable landform? The correction turns flank pits into flat terraces up to 4.4 m deep (57 370 m³ over 47 seeds, 82 % on the massif flank); with inland water they would be lake sites, which ties this to the Stage 3E basin question above (handoff §16).
 - *Options:* (a) accept the terraces; (b) reject them — reshape the flank (A / C / D) or redesign the mountain term (3F-16); (c) accept them only where they become lake sites.
-- *Consequences:* (a) flat steps up to 4.4 m deep on the massif flank; (b) 20–23 % less mountain carve, or a redesign; (c) depends on inland water, which V0 does not have.
+- *Consequences:* (a) flat steps up to 4.4 m deep on the massif flank, more of them if cirque pits are filled too (3F-14); (b) 20–23 % less mountain carve, or a redesign; (c) depends on inland water, which V0 does not have.
 - *No recommendation.*
 
 **3F-12. Valley-ending semantics. [production]** Route-barrier policy (valley-ending semantics): where a declared trajectory rises more than the plain bound can cut, does the valley stop and restart downstream (gap), end (termination), or continue as a flat-filled floor? Continuity, no reappearing segments, the 7.2 m bound and D1 cannot all hold there (handoff §10). Measured on 8 seeds: ending at the first barrier is stable and creates no depression but loses 4.2 % of plain valley length and ends valleys 52–342 m inland; the prototype keeps `Declared` ends and shows 41 gaps on 34 of 299 trajectories, 36 of them on coastal turn-backs (handoff §§15–16).
@@ -356,9 +358,12 @@ Research record: [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/
 - *Options:* (a) no mouth rule in V0; (b) design a new mouth variant.
 - *Agent recommendation:* (a); a new variant is its own research item.
 
-**3F-14. Cirques as permitted basins. [later]** Are declared Stage 3E cirques permitted basins under D1? 50 of the hybrid's 100 pre-fill flank depressions lie inside them. Their depth bound is still B4 (`PROCEDURAL_TERRAIN_STAGE_3E_PREFLIGHT.md` §22.3) and their realisation F2 (`PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md` §15) (handoff §10).
-- *Options:* (a) not permitted in V0 — the correction fills them like any carved pit; (b) permitted — the correction leaves them, and their depth bound B4 and realisation F2 must be decided first.
-- *Agent recommendation:* (a) for V0, decided together with the Stage 3E basin question.
+**3F-14. Cirques as permitted basins. [stage 1] — owner's call.** Are declared Stage 3E cirques permitted basins under D1? 50 of the hybrid's 100 pre-fill flank depressions lie inside them. Their depth bound is still B4 (`PROCEDURAL_TERRAIN_STAGE_3E_PREFLIGHT.md` §22.3) and their realisation F2 (`PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md` §15) (handoff §10).
+- *Why stage 1:* the answer decides what the correction does inside declared cirques, so a stage-1 implementation that picks either behaviour would answer this question by itself. It also meets 3F-11: a cirque pit the correction fills becomes a flat terrace.
+- *Options:* (a) not permitted — the correction fills them like any carved pit, as the prototype does; (b) permitted — the correction leaves them, which needs their depth bound B4 and realisation F2 decided first.
+- *Consequences:* (a) no basins on the flank, more flat-filled terraces (3F-11); (b) the D1 check needs the declared cirques as permitted basins, and E waits for B4 and F2.
+- *No recommendation.*
+- *Research mode for stage-1 dumps (proposed, not a decision):* compute E both ways — the prototype's fill everywhere, and with depressions inside declared cirques left unfilled — and report for each the depressions inside and outside cirques, their depth, area and volume, and the terraces made. Tests whose verdict depends on the answer stay marked pending. Nothing from either variant reaches the bake.
 
 **3F-15. Natural thalweg. [later]** Natural thalweg against frozen trajectories: `H4A`'s cross-section low lies outside the existing corridor at about 80 % of plain stations, and shifting the floor inside the corridor does not reach it (variant F; the handoff recommends against prototyping it). Accept the axis-centred valley, widen the corridor, reopen the frozen Stage 3C trajectory geometry, or derive plain valleys from `H4A` flow instead of declared trajectories? (handoff §11)
 - *Consequences:* every option except the axis-centred valley reopens frozen Stage 3C geometry or replaces declared trajectories.
@@ -377,7 +382,7 @@ Research record: [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/
 - *Consequences:* (a) no false "passable" was observed (handoff §21), and the gap to reality is named; (b) one false "passable" observed (a vertex step on 1034 `H4A`); (c) declares about 25 thousand m² on 1010 `H4A` inaccessible that the controller walks; (d) leaves E's access effects and POI decisions without a basis.
 - *Agent recommendation:* (a).
 
-**3F-19. Slope readings banned from physical decisions. [production]** Adopt handoff §22.5: slope readings D2 (`GetInterpolatedNormal`), D3 (`OverworldTerrainField.SlopeDegreesAt`) and D6 (`OverworldTerrainDiagnostics` reachability) are never used for walkability, footing, spawn or gating.
+**3F-19. Slope readings banned from physical decisions. [production]** Adopt handoff §22.5: slope readings D2 (`GetInterpolatedNormal`), D3 (`OverworldTerrainField.SlopeDegreesAt`), D6 (`OverworldTerrainDiagnostics` reachability) and D7 (the analytic `H4A` gradient) are never used for a character's walkability, an object's footing, spawn or a character's access gating; D4 (`LandscapeCostField`'s 10 m slope) is not used for them either and keeps its own uses. Road passability is not a physical decision in this sense: it stays governed by the approved Road Passability contract ([90 Glossary](90%20Glossary.md) § Road Passability; § Resolved Decisions above), whose grades and slope on `LandscapeCostField` this question does not touch. POI site scoring keeps D4.
 - *Options:* (a) adopt; (b) allow D3 as an approximation.
 - *Consequences:* (b) judged on identical routes, D3 was wrong 8 times — 5 false "passable", 3 false "not passable" (handoff §21).
 - *Agent recommendation:* (a).
@@ -408,6 +413,11 @@ Research record: [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/
 **3F-24. Descent-only links. [later; depends on 3F-20]** Descent passes every tested slope, so one-way links exist.
 - *Options:* (a) ignore them while the jump stays as it is; (b) a directed exit check if walls become barriers.
 - *Agent recommendation:* follow 3F-20.
+
+**3F-25. Where E enters the bake. [production]** Where does E enter the production bake, and how does that keep one production terrain pipeline and one terrain authority (handoff §2; [AGENTS.md](AGENTS.md) § Accepted Draft Decisions, «Overworld terrain stack» and «Terrain guardrails»)? A dump-first stage 1 does not touch the bake and does not depend on this answer.
+- *Options:* (a) TerrainGen's Stage 3F computes E; `TerrainAuthorityField` keeps evaluating `H4A` for structural use, and the bake replaces the world lattice with E after `OverworldTerrainField.FromAuthority`, the way the sanctioned hydrology carve already lowers that lattice; (b) `TerrainAuthorityField` itself evaluates E; (c) a separate final-surface authority object.
+- *Consequences:* (a) TerrainGen stays the only authority and nothing flows back into it; in the same change `OverworldTerrainValidation` compares tiles with E, `GeneratorVersion` moves (3F-7), the bake's heightmap resolution (513 per tile) and `FieldResolution` (1025 per world) are tied in code — today they are two unconnected constants — the pending hydrology carve is re-examined because it would lower E (hydrology is outside the measured scope, handoff §22.6), and the statements noted under 3F-1 are updated. (b) conflicts with 3F-1 (a). (c) conflicts with "no second terrain authority" (handoff §2).
+- *Agent recommendation:* (a).
 
 ---
 

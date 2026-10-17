@@ -726,4 +726,13 @@ production code changed.
   sweep. What it produces is route-barrier valleys: the gaps and terminations on trajectories with
   `dGate` > 0 (handoff §§9–10). B10 and B4 are otherwise unchanged by this research.
 
+**Note 2026-10-17 — stale XML documentation in `CarvedElevation`.** The `<remarks>` of
+`World/TerrainGen/CarvedElevation.cs` still say the carve is read "as `CarveField` binds it today — to
+the frozen `ValleyCorridor` trajectories, not to Slice C's `FinalValleyTrajectory`", and that re-binding
+"is deliberately not done here". F1 (preflight §20) did re-bind it, API-only: `CarveField` is typed to
+`IValleyCarveCurve`, and `ValleyTrajectoryNetwork.BuildCarve` builds the carve along
+`FinalValleyTrajectory`, as the top of this item says. The comment misled the Stage 3F documentation
+stage once (99 Open Questions 3F-8, corrected in v0.30). Fix it the next time `CarvedElevation.cs` is
+touched — it is a production-code change and is not made from documentation work.
+
 Open decisions: [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Stage 3F valley carve.

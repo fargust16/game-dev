@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.47
+Version: 0.48
 
 Status: Draft
 
@@ -838,13 +838,13 @@ TerrainGen's floor relief: what makes the island's middle read as geography inst
 
 ## Final Terrain Surface
 
-**Proposed — owner review pending.** The one height written to `TerrainData`: a lattice on the canonical world grid, at or below `H4A` at every node, read as a **Triangle Reading**. Stage 3F's E would be it; today the bake writes `H4A`, and E is a research prototype not connected to the bake. Nothing flows from it back into TerrainGen. Handoff §22.1–22.2; 3F-1, 3F-6.
+**Proposed — owner review pending.** The one height written to `TerrainData`: a lattice on the canonical world grid, at or below `H4A` at every node, read as a **Triangle Reading**. Stage 3F's E would be it; today the bake writes `H4A`, and E is a research prototype not connected to the bake. Nothing flows from it back into TerrainGen. E is not `H3F`: `H3F = H4A − C3F` is the existing Stage 3F carve, E = min(`H4A`, fill(Epre)) adds a floor-referenced plain template and a band-local correction; the statement under **Island Relief (Stage 4A)** that Stage 3F carves `H = H4A − C3F` after it describes the existing code and changes only if 3F-1 is approved. Handoff §22.1–22.2; 3F-1, 3F-6, 3F-25.
 
 ---
 
 ## Triangle Reading
 
-How Unity serves the height between heightmap nodes, measured (handoff §18): nodes as `TerrainData` stores them (integer steps of `size.y / 32766`, 2.136 cm on a 700 m tile), each cell split along its **SW→NE** diagonal, (x0, z0) → (x0+1, z0+1) — for local coordinates u ≥ v the triangle (h00, h10, h11), otherwise (h00, h11, h01) — with tile-edge vertices shared exactly. `Terrain.SampleHeight` and the `TerrainCollider` match it within 0.4 mm; bilinear interpolation does not (up to 2.59 m at twisted cell centres). **Proposed** as the point-query contract of the **Final Terrain Surface** (3F-6).
+How Unity serves the height between heightmap nodes, measured (handoff §18): nodes as `TerrainData` stores them (integer steps of `size.y / 32766`, 2.136 cm on a 700 m tile), each cell split along its **SW→NE** diagonal, (x0, z0) → (x0+1, z0+1) — for local coordinates u ≥ v the triangle (h00, h10, h11), otherwise (h00, h11, h01) — with tile-edge vertices shared exactly. World x points east and z north; with lattice spacing `step`, x0 = ⌊x / step⌋, z0 = ⌊z / step⌋, u = x / step − x0, v = z / step − z0, and h_ij is the stored height of node (x0 + i, z0 + j). `Terrain.SampleHeight` and the `TerrainCollider` match it within 0.4 mm; bilinear interpolation does not (up to 2.59 m at twisted cell centres). **Proposed** as the point-query contract of the **Final Terrain Surface** (3F-6).
 
 ---
 
@@ -874,13 +874,13 @@ How Unity serves the height between heightmap nodes, measured (handoff §18): no
 
 ## Jump Accessibility
 
-What the production jump (`jumpHeight` 1.2 m, gravity −18, jump while grounded) reaches — separate from walking connectivity. Measured unconstrained by slope up to 70° on every tested surface; no graph model describes it (handoff §21). Whether steep walls should stop a jumping player is open: [99 Open Questions](99%20Open%20Questions.md) 3F-20.
+**Proposed — owner review pending** as a notion separate from walking connectivity (handoff §22.7); the measurement below is recorded, not proposed. What the production jump (`jumpHeight` 1.2 m, gravity −18, jump while grounded) reaches — separate from walking connectivity. Measured unconstrained by slope up to 70° on every tested surface; no graph model describes it (handoff §21). Whether steep walls should stop a jumping player is open: [99 Open Questions](99%20Open%20Questions.md) 3F-20.
 
 ---
 
 ## Slope Reading
 
-Labels for the ways the code reads slope (handoff §19), unrelated to the Stage 3F research requirements D1–D3: **T** — the served triangle's gradient (collider, `CharacterController`); **D2** — `TerrainData.GetInterpolatedNormal` (Sobel vertex normals, tile-local; `OverworldTerrainSampler.SampleSlope01`, biome); **D3** — `OverworldTerrainField.SlopeDegreesAt` (central differences, 5.47 m base; surface and vegetation rules); **D4** — `LandscapeCostField`'s 10 m slope (road cost, POI site scoring); **D5** — TerrainGen diagnostics (`WorldHeightField.Slope01`, `Stage3Field.Reachable`); **D6** — `OverworldTerrainDiagnostics` reachability (per-axis node steps, passes faces up to 54.7°); **D7** — the analytic `H4A` gradient. **Proposed:** only T decides walkability, footing, spawn or gating; D2, D3 and D6 never do (3F-19).
+Labels for the ways the code reads slope (handoff §19), unrelated to the Stage 3F research requirements D1–D3: **T** — the served triangle's gradient (collider, `CharacterController`); **D2** — `TerrainData.GetInterpolatedNormal` (Sobel vertex normals, tile-local; `OverworldTerrainSampler.SampleSlope01`, biome); **D3** — `OverworldTerrainField.SlopeDegreesAt` (central differences, 5.47 m base; surface and vegetation rules); **D4** — `LandscapeCostField`'s 10 m slope (road cost, POI site scoring); **D5** — TerrainGen diagnostics (`WorldHeightField.Slope01`, `Stage3Field.Reachable`); **D6** — `OverworldTerrainDiagnostics` reachability (per-axis node steps, passes faces up to 54.7°); **D7** — the analytic `H4A` gradient. **Proposed:** only T decides a character's walkability, an object's footing, spawn or a character's access gating; D2, D3, D6 and D7 never do, and D4 keeps only its own uses, road cost and POI site scoring (3F-19). Road passability is not affected: it stays under the approved **Road Passability** contract.
 
 ---
 
