@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.40
+Version: 0.41
 
 Status: Draft
 
-Last Updated: 2026-09-18
+Last Updated: 2026-10-17
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -364,6 +364,13 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 
 When the user shares vision instead of a direct Open Question answer, synthesise a clear Draft answer, challenge contradictions, then write it into documents only after confirmation.
 
+# Proposed Decisions Awaiting Owner Review
+
+Not accepted decisions. They are recorded so agents know what is under review; do not implement them and do not cite them as approved.
+
+- **Stage 3F physical-surface contract** ([handoff](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md) §22; [99 Open Questions](99%20Open%20Questions.md) 3F-1, 3F-6, 3F-18, 3F-19): `H4A` stays the **Structural Height** and E would be the **Final Terrain Surface**, the only height written to `TerrainData`, with nothing flowing back into TerrainGen; the final surface is read as the **Triangle Reading** of the quantised lattice (SW→NE split); a **Walkable Triangle** is strictly below 45°; **T-edge Connectivity** is the conservative lower bound of guaranteed walking connectivity, **T-vertex Connectivity** an experimental upper bound, the land between them the **Uncertain Connectivity Zone**; slope readings D2, D3 and D6 never decide walkability, footing, spawn or gating; **Jump Accessibility** is a separate notion. Terms: [90 Glossary](90%20Glossary.md).
+- **Guard rails while these are open** (restating rules already in force, no new decision): E is not connected to `OverworldTerrainBake` or `TerrainAuthorityField`; `CarveField` stays bound to the frozen Stage 3C trajectories; Stage 1–4A and the Stage 3C trajectories stay unchanged; add no new physical use of slope readings D2, D3 or D6 pending 3F-19. Questions 3F-10 (filling inherited depressions), 3F-11 (flat-filled pits) and 3F-20 (jump and barriers) are the owner's — present options and consequences, never a recommendation dressed as a decision. The measured walking contract holds only for the configuration in handoff §22.6; a change to the Unity version, the terrain layout, the `CharacterController` values or the movement and jump constants voids it until re-measured.
+
 # Next Design Priority
 
 Current active design layer:
@@ -372,6 +379,7 @@ Current active design layer:
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
 4. Architecture Pivot locked in [16](16%20Architecture%20Pivot.md). Systems map in [17](17%20Game%20Systems%20Architecture.md). Next implementation default: **Overworld V0** (`OVERWORLD_V0_PLAN.md`, iterations W0.1–W0.9) — not OrganicTown C1. Buildings: [15](15%20Procedural%20Building%20Generation.md) Exterior Shell Grammar (sandbox lab parallel OK) + Interior Piece Assembly for Portal buildings only.
+5. Stage 3F (prototype E): the documentation stage is under owner review. A dump-first stage 1 — E built and verified through dumps and tests, off the production path — may start only after every **[stage 1]** question in [99 Open Questions](99%20Open%20Questions.md) § Terrain — Stage 3F valley carve is answered; enabling E in the bake waits for the **[production]** questions.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

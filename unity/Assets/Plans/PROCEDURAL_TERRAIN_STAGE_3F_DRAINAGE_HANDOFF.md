@@ -1,10 +1,11 @@
 # Procedural Terrain — Stage 3F Drainage and Valley Carve, Research Handoff
 
-Version: 0.5
+Version: 0.6
 
-Status: Draft — research record. Nothing in it is an approved design decision.
+Status: Draft — research record. Nothing in it is an approved design decision; §22 is a set of
+proposed contracts awaiting owner review.
 
-Last Updated: 2026-10-16
+Last Updated: 2026-10-17
 
 Depends On:
 [PROCEDURAL_TERRAIN_STAGE_3_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_3_DESIGN.md),
@@ -14,6 +15,8 @@ Depends On:
 
 Referenced By:
 [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Stage 3F valley carve,
+[90 Glossary](../../../90%20Glossary.md) § Final Terrain Surface and the terms after it,
+[AGENTS.md](../../../AGENTS.md) § Proposed Decisions Awaiting Owner Review,
 [OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) item 21
 
 ---
@@ -28,11 +31,16 @@ Referenced By:
 | 4 thalweg shift | 2026-10-16 | can the carve floor move to the `H4A` low inside the existing corridor | no — the low lies outside the corridor at 79.5 % of plain stations; F is not worth prototyping | §11 |
 | 5 decision memo + technical check | 2026-10-16 | is a band-local raster correction workable; how does it depend on the lattice; what do valley-ending rules cost | 4-connected correction holds on the lattice and on any triangulation; not resolution-invariant; no ending rule tested is a solution | §§14–15 |
 | 6 isolated prototype of E | 2026-10-16 | does E with a 4-connected correction on the 1025 lattice meet the acceptance criteria | yes on the lattice; the prototype's mixed point-query contract fails continuity and between-node subtractivity, a lattice-only reading does not | §16 |
+| 7 the served surface | 2026-10-16 – 17 | how does Unity read heights between nodes, and does E keep its invariants on that reading | `SampleHeight` and the collider read triangles split SW→NE on the quantised lattice, not bilinear; E keeps every §16 invariant on that reading | §18 |
+| 8 slopes and surface rules | 2026-10-17 | which slope each consumer reads, and how far each reading is from the served triangles | seven slope readings in the code; the smoothed ones (D2, D3, D4) are close on gentle ground and far on steep, twisted and E-made geometry; E changes the rules' output 4–10× more than the definitions differ | §19 |
+| 9 physical connectivity and tree footing | 2026-10-17 | reachability on the triangle graph, H4A against E; where trees actually stand | E raises T-edge reachability from 94.53 % to 95.04 % of land; single passages within ±1° of 45° decide 17–34 thousand m² on 5 of 8 seeds; D6 over-reports; no tree stands on a triangle steeper than 45° | §20 |
+| 10 the production `CharacterController` in Play Mode | 2026-10-17 | which graph model describes the real controller | sharp limit at 45° (44.995° always walks, 45.005° never); T-edge never claimed a passage the controller failed; vertex passages walk in 10 of 11 steep-touching cases; D3 is wrong both ways; jumping climbs every tested slope up to 70° | §21 |
 
-Methods shared by phases 2–4: §12; phases 5–6 reuse them (§15, §16). Current position and open
-decisions: §17 (§13 is the position after phase 4). Reading order: §8.
+Methods shared by phases 2–4: §12; phases 5–6 reuse them (§15, §16); phases 7–10 state their own
+(§§18–21). Proposed contracts: §22. Current position and open decisions: §23 (§13 is the position
+after phase 4, §17 after phase 6). Reading order: §8.
 Production code, public API, tests, Stage 4A, the frozen Stage 1–3E files and the Stage 3C
-trajectories are unchanged through all six phases.
+trajectories are unchanged through all ten phases.
 
 ## 1. Status and scope
 
@@ -715,7 +723,7 @@ the independent scanner as in §12, extended with a 4-connected scan and two uni
 the 2049 sampling places one sample at each lattice node, edge midpoint and cell centre. Probe
 sources and data were temporary and are not kept in the repository.
 
-## 17. Current position and open decisions
+## 17. Position after phase 6 (superseded by §23)
 
 - Production is unchanged; Stage 3F remains an experimental downstream carve, and E is a research
   prototype.
@@ -730,3 +738,249 @@ sources and data were temporary and are not kept in the repository.
   semantics is decided; `Mouth` as defined is rejected by measurement, `Barrier` has a measured price.
 - Decisions for the owner: [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Stage 3F
   valley carve.
+
+## 18. Phase 7 — the surface Unity actually serves, 2026-10-16 – 17
+
+**Question.** Between lattice nodes, what height does Unity serve to `Terrain.SampleHeight` and to the
+`TerrainCollider` — and does E keep the §16 invariants on that reading?
+
+**Method.** Standalone Unity 6000.5.7f1 project outside the repository, sources copied at HEAD. `H4A`
+and E written through `OverworldTerrainBuilder.WriteHeights` onto tiles made by
+`OverworldTerrainGrid.Create`. Readers compared: `Terrain.SampleHeight`, `TerrainCollider.Raycast`,
+bilinear interpolation, and the two triangle splits of a cell. Samples on lattice nodes, edges, both
+diagonals, steep and twisted cells, tile seams and random points; seeds 110201, 424242, 20260905, 7,
+1010, 1026, 1034, 1038 (169–184 thousand points per seed and surface). Depressions scanned with S8,
+4- and 8-connected IDS and a triangle-graph scanner (TriA) on the quantised lattice, and on the
+triangle surface sampled at twice the lattice resolution.
+
+| check | `H4A` | E |
+|---|---|---|
+| `SampleHeight` − triangle reading (SW→NE split) | ≤ 0.364 mm | ≤ 0.364 mm |
+| collider raycast − triangle reading | ≤ 0.319 mm | ≤ 0.323 mm |
+| collider raycast − `SampleHeight` | ≤ 0.389 mm | ≤ 0.389 mm |
+| `SampleHeight` − bilinear | up to 2.590 m (centres of twisted cells) | up to 2.585 m |
+| stored node − float lattice | ≤ 1.070 cm on every seed | ≤ 1.070 cm |
+| shared tile-edge vertices differing between tiles | 0 | 0 |
+| E above `H4A`: quantised nodes / triangle reading / `SampleHeight` > 0.1 mm / raycast > 1 mm | — | 0 / 0 / 0 / 0 |
+| new or deepened depressions (S8, IDS4, IDS8, TriA; lattice and triangle surface at 2×) | — | 0 / 0; two inherited `H4A` depressions removed (1026, 1038) |
+| `Declared` gaps on the triangle, bilinear and `SampleHeight` readings | — | 6 on 6 trajectories, 520 m, identical |
+| maximum plain carve on the served surface | — | 7.2066 m (7.200 m before quantisation) |
+| E lattice hash over two builds; production `FromAuthority` vs prototype `H4A`; E field vs prototype E | — | equal; 0 and 0 bit mismatches |
+
+**Storage step.** Unity stores a height as an integer of `size.y / 32766`: normalised values `m / 32766`
+survive `SetHeights` → `GetHeights` exactly, other denominators do not. On a 700 m tile that is
+2.136 cm, which is the ≤ 1.07 cm rounding above.
+
+**Result.** The served surface is the **triangle reading of the quantised lattice**: each cell split
+along its SW→NE diagonal, (x0, z0) → (x0+1, z0+1); for local coordinates u ≥ v the triangle
+(h00, h10, h11), otherwise (h00, h11, h01); tile-edge vertices shared exactly. A point on the seam
+gives identical heights from both tiles. The bilinear reading (R2 in §16) is not what Unity serves; the
+mixed reading (R1) is neither. On the triangle reading E keeps every §16 invariant, and the R1
+discontinuity cannot occur, because a lattice-only reading has no analytic side to jump to.
+
+## 19. Phase 8 — slopes, normals and surface rules on the served surface, 2026-10-17
+
+**Slope readings in the code.** The labels below are used from here on. They are unrelated to the
+research requirements D1–D3 of §9 (drainage, geometry, plain bound); where both could be meant, this
+record writes "slope reading D2" and "requirement D1".
+
+| label | where it is read | computation | what it describes |
+|---|---|---|---|
+| T | `TerrainCollider` → `CharacterController` | gradient of the served triangle | the surface a character stands on |
+| D2 | `TerrainData.GetInterpolatedNormal` → `OverworldTerrainSampler.SampleSlope01` → `BiomeClassifier` (Mountain at `1 − n.y` ≥ 0.5, i.e. 60°) | Sobel 3×3 vertex normals of the quantised tile heightmap, bilinear between vertices (matches to p99 < 0.001° inside a tile); tile-local | smoothed; discontinuous at tile seams |
+| D3 | `OverworldTerrainField.SlopeDegreesAt` → `TerrainSurfaceClassifier`, `TreeChance`, `GrassCount` | central differences on the float lattice (5.47 m base), node magnitudes interpolated bilinearly | smoothed; world-continuous |
+| D4 | `LandscapeCostField` slope → POI `MaxSlope01`, road cost | central differences of `SampleHeight` at 10 m cell centres, grade / 0.47 | the 10 m scale, by design |
+| D5 | `WorldHeightField.Slope01`, `Stage3Field.Reachable` | central differences on TerrainGen lattices | structural diagnostics |
+| D6 | `OverworldTerrainDiagnostics.ReportReachability` | per tile, 4-connected flood over nodes, each axis step limited to `cell · tan 45°` | passes faces up to 54.7° (arctan √2); truncated at seams |
+| D7 | analytic `H4A` gradient | — | read by no consumer; differs from the lattice by p95 55–58° in steep cells |
+
+`WorldHeightField.Slope01`'s comment says it matches `SampleSlope01` "to the resampling error"; it uses
+central differences against D2's Sobel kernel, and neither is T.
+
+**Measured against T** (8 seeds, ~176 thousand points per seed and surface). A point on a cell edge,
+diagonal or node touches 2–6 triangles; the reference there is every incident triangle weighted by the
+share of the neighbourhood it covers. |Δ slope|, degrees, mean / worst-seed p95 / p99:
+
+| reading | random points, `H4A` | random points, E | steep cells | E walls | corrected-zone edges (E) |
+|---|---|---|---|---|---|
+| D3 | 0.21 / 0.65 / 1.50 | 0.23 / 0.74 / 2.09 | p95 ≈ 26 | p95 7.1 | p95 17.8 |
+| D2 | 0.20 / 0.66 / 1.65 | 0.23 / 0.76 / 2.26 | p95 ≈ 26 | p95 7.6 | p95 17.2 |
+| D4 | 0.35 / 1.34 / 4.09 | 0.42 / 1.69 / 5.20 | p95 ≈ 37 | p95 14.9 | p95 33.0 |
+
+- Collider normal against the incident triangles: ≤ 0.001° everywhere.
+- D2 at a seam: the same point read from the two tiles differs by p95 2.7–3.3°, p99 7.5–7.9°,
+  up to 47.6°.
+- The two triangles of one cell meet at mean 0.34–0.38°, p99 3.1–4.2°, up to 80°. Grass detail cells
+  are evaluated exactly on that diagonal.
+- **Exhaustive land area** where D3 and T fall on opposite sides of a threshold: 28° 0.25 % (`H4A`) /
+  0.34 % (E); 35° 0.16 / 0.21 %; 45° 0.107 / 0.155 %; 60° 0.081 / 0.101 %. The share of land above 45°
+  agrees within 0.03 percentage points; D3 under-reports the steepest tail (≈ 7 % of the area above
+  60°).
+- **Production rules on the `H4A` field against the E field**, every land alphamap texel, grass cell
+  and tree cell, same stream keys: the dominant surface layer changes on 1.22 % of texels (4.38 % within
+  two cells of an E change), the grass count on 1.50 % (4.46 %), tree placement on 0.415 % (1.26 %).
+  That is 4–10× the D3-against-T disagreement.
+- The vegetation height gate (27.0 → 28.4 m) read bilinearly against the triangle reading differs by
+  more than 0.1 on 6 of ~1.6 million samples.
+
+**Result.** D2, D3 and D4 are smoothed readings: close to T on gentle ground, far from it on steep,
+twisted and E-made geometry, and none of them describes what a character stands on. The change E
+makes to the surface rules is a real relief change and dominates the definition difference.
+
+## 20. Phase 9 — physical connectivity on the triangle graph, and tree footing, 2026-10-17
+
+**Definitions, fixed before the runs.** One graph node per triangle of the quantised lattice (2 097 152
+per world). Land: triangle centroid above 24 m. Walkable: slope ≤ 45° in this phase (§21 makes the
+limit strict). **T-edge:** moves across shared edges; **T-vertex:** also across shared vertices.
+Sources: walkable land triangles sharing an edge with ocean, the water connected to the world border.
+Undirected — mutual reachability. Seam vertices compared bit for bit in all 16 seed-surface
+combinations: 0 differences, so a seam edge is an ordinary shared edge.
+
+| share of land reachable (8 seeds, area-weighted) | T-edge | T-vertex | D3 on the same graph | D6 per tile (production) | D6 on the world lattice |
+|---|---|---|---|---|---|
+| `H4A` | 94.53 % | 94.64 % | 94.63 % | 98.00 % of dry nodes | 98.96 % |
+| E | 95.04 % | 95.05 % | 94.91 % | 98.04 % | 98.82 % |
+
+- D6 on the world lattice reaches 3.5–4.2 % of dry nodes that T-edge does not, and never the reverse;
+  per tile it also misses 0.33 % at seams.
+- **`H4A` → E (T-edge):** no land lost to water; new obstacles 95 324 m² over 8 seeds — 91.8 % on E-wall
+  cells (carve ≥ 2 m, E slope ≥ 25°) in carve-only zones, 0.3 % within two cells of a corrected-zone
+  boundary, none inside corrected zones or outside the carve; removed obstacles 130 506 m². Isolated
+  walkable area shrinks on 7 of 8 seeds while the count of small pockets grows on 6; every component E
+  strands touches a new obstacle.
+- **Robustness:** a 2×2 and 4×4 pixel raster per cell agrees with the graph within 0.013 percentage
+  points on 7 seeds; land as "all vertices above 24 m" moves the share by −0.02 to −0.07 points;
+  D6-style seeding (all land below 28 m) moves it by 0.
+- **Bottleneck search** (minimax path from the shore): passages whose steepest triangle lies within
+  ±1° of 45° decide 17–34 thousand m² on 5 of 8 seeds — 110201 E 44.907° (32 214 m², E wall, carve
+  14.4 m), 424242 E 44.926° (17 077 m²), 424242 `H4A` 46.064° (23 687 m²), 1010 `H4A` 45.005° (25 174 m²;
+  44.497° through a vertex), 1010 E 46.664° (carve 0.07 m at the passage), 1026 E 45.460° (17 327 m²),
+  1034 `H4A` 44.139° (30 038 m²). A 0.1° change of the limit moves up to 1.2 % of a seed's land.
+- **Tree footing** (production `PlaceTrees`, unchanged rules; dummy prototypes without colliders):
+  snapped base against the triangle ≤ 0.03 mm, against the collider ≤ 0.08 mm; collider normal against
+  the triangle ≤ 0.03°. Trees on triangles steeper than 45°: none on either surface. Steeper than 28°:
+  15 of 104 585 (`H4A`), 58 of 105 078 (E), 40 of them on E-wall cells, all with D3 below 28° as the rule
+  requires. `TreeInstance` carries yaw only, so trunks stand vertical by API. Ground within 0.5 m of a
+  base lies up to 0.45 m below it.
+
+## 21. Phase 10 — the production `CharacterController` in Play Mode, 2026-10-17
+
+**Method.** Play Mode in a batch-mode editor; terrain written through the production path
+(`OverworldTerrainGrid.Create` + `OverworldTerrainBuilder.WriteHeights`). `OverworldPlayerController.Update`
+copied line by line — run 4.5 m/s, sprint 7.5 m/s, `speedDamping` 5, `jumpHeight` 1.2 m, `gravity` −18,
+grounded stick −2 m/s, one `Move` per `Update` — with scripted world-space input toward waypoints in
+place of camera-relative WASD. The controller as `OverworldPlayerMenu` builds it: height 1.8 m, radius
+0.3 m, centre 0.9 m, `skinWidth` 0.03 m, `stepOffset` 0.4 m, `slopeLimit` and `minMoveDistance` at the
+Unity defaults 45° and 0.001. Variants: run, sprint, and run with a jump when progress stalls. Time steps
+1/30, 1/60, 1/120 s and a repeat. Calibration ramps put every node on an exact multiple of the stored
+step, so each ramp triangle has its designed slope exactly.
+
+**Calibration.**
+
+| surface | walking (run, sprint) | jumping | descent |
+|---|---|---|---|
+| planar 44.0–44.995° (three grid directions, oblique 30° and 60°, three start offsets) | always | always | always |
+| exactly 45.000° | depends on the direction: stops at 0, 10.8 or 23–24 m; oblique on the diagonal passes; identical on every repeat | always | always |
+| planar 45.005–70° | never | always (28 jumps for 38 m at 45.1°, 71 for 105 m at 70°) | always |
+| folds of 30–80° with faces ≤ 40°, on the cell diagonal or a node column, along and across | always | always | always |
+| one or two rows of cells at 46–70° on the production lattice | never | always | always |
+| short faces on a 0.25 m grid (not production geometry) | ≤ 0.41 m high always; ≥ 0.45 m never | always | always |
+
+Contact normals on 44.9° ramps reach 46.8–48.6° at triangle edges without stopping the walker, so the
+reported contact normal is no predictor. Outcomes are identical across all time steps and repeats.
+
+**Critical passages and model paths** (seeds 110201, 424242, 1010, 1026, 1034; the seven passages of
+§20; seven start offsets per run). Round 1 walked one route per passage on both surfaces. Round 2 walked
+each model's own minimax path within 15 m of that route — 56 paths, vertex steps through the shared
+vertex — in 7 056 runs. A claim "passable" counts as met when walking reaches the goal both ways in
+every run; "not passable" when some direction never succeeds.
+
+| model | own path: claims met | passable claims met | same route, judged by each criterion: agree / false "passable" / false "not passable" |
+|---|---|---|---|
+| T-edge | 14 / 14 | 4 / 4 | 48 / 0 / 6 |
+| T-vertex | 13 / 14 | 4 / 5 | 53 / 1 / 0 |
+| D3 on edges | 13 / 14 | 3 / 4 | 46 / 5 / 3 (D3 over both graphs) |
+| D3 with vertex steps | 11 / 14 | 2 / 5 | |
+
+Two same-route cases stay undetermined: descent on paths steeper than 45° succeeds from some start
+offsets only (14 / 42 and 15 / 42); both are "not passable" claims and stand.
+
+- **1010 `H4A`, explained.** The T-edge path must climb a 45.005° triangle, and the controller stops
+  there, as calibration predicts. The T-vertex path passes it through vertices — touching faces of
+  45.005–45.46°, the 45.005° triangle among them — and walks both ways in 42 of 42 runs. D3's paths cross 45.003° and 45.005° triangles that
+  D3 reads as 44.76–44.89°. The region is reachable on foot; T-edge's "not passable" is the model's
+  exclusion of vertex steps.
+- **1034 on E, explained.** The round-1 route was built on `H4A`; on E it crosses 27.6 m of triangles
+  steeper than 45° (up to 46.65°). Every model's own path on E (steepest 42.9–43.9°) walks both ways in
+  42 of 42 runs.
+- **Vertex steps, open.** Eleven vertex steps on walked paths touch a triangle steeper than 45°
+  (45.02–45.89°). Ten pass both ways; one (1034 `H4A`, 45.413°) stops every ascent and lets every
+  descent through. Neither the touched slope nor the heading against its uphill direction separates
+  the two outcomes. The outcome is deterministic but no tested model predicts it.
+- **Jumping:** every one of the 56 paths, both ways.
+- **Stability:** outcomes identical across 1/30, 1/60 and 1/120 s and the repeat; end positions within
+  1 mm on the passages.
+
+## 22. Proposed contracts — owner review pending, nothing here is approved
+
+**22.1 Structural height and final surface.**
+- `H4A` (`IslandElevation`, evaluated by `TerrainAuthorityField`) stays the **structural height**.
+  Stages 1–4A, the frozen Stage 3C trajectories and Stage 3D/3E topology (declared on `H2`) read
+  structural surfaces only and never E.
+- E is the **final surface**: a lattice on the canonical world grid with E ≤ `H4A` at every node. It is
+  the only height written to `TerrainData`.
+- Nothing flows from E or `TerrainData` back into TerrainGen.
+- The structural channels the surface rules read (`UpliftAt`, signed coast distance) stay structural
+  and are declared as such.
+
+**22.2 Height query.** The final surface is read as the **triangle reading of the quantised final
+lattice** (§18): node heights as `TerrainData` stores them, each cell split SW→NE, tile-edge vertices
+shared. `Terrain.SampleHeight` and the collider are this reading. Bilinear and analytic readings are not
+the surface; a production point query and the lattice evaluator share one function (§16).
+
+**22.3 Walkable triangle.** Slope strictly below 45° (§21: 44.995° always walks, 45.005° never, 45.000°
+depends on the direction).
+
+**22.4 Walking connectivity.**
+- **T-edge** — conservative lower bound of guaranteed walking connectivity, both ways, in the
+  configuration of §22.6. Observed on the tested sample, not proved island-wide.
+- **T-vertex** — experimental upper bound; it does not guarantee walkability.
+- **Uncertain zone** — reachable by T-vertex and not by T-edge; read as neither accessible nor
+  inaccessible.
+- Descent-only links exist (descent passes every tested slope) and are not part of the contract.
+
+**22.5 Prohibited for physical decisions** (walkability, footing, spawn, gating): slope readings D2,
+D3 and D6; D4 outside its own uses (road cost, POI site scoring); D7. D3 remains the candidate slope for
+surface and vegetation classification (§23 question). This contract changes no rule threshold.
+
+**22.6 Applicability.** Unity 6000.5.7f1, Windows Editor, Mono, Play Mode in batch mode; 2×2 tiles of
+1400 m, heightmap 513, height budget 700 m, `TerrainCollider`; the controller values and movement
+constants of §21; time steps 1/30–1/120 s; scripted input. Graph statistics on 8 seeds; Play Mode on 5
+seeds, 7 passages and 56 paths plus the calibration surfaces. **Not covered:** player builds and IL2CPP,
+other platforms and Unity versions, analog input and human route choice, tree and object colliders,
+roads, hydrology, water and swimming, rendered LOD. A change to any listed parameter voids the contract
+until it is re-measured.
+
+**22.7 Jump accessibility.** A separate notion: what the production jump reaches. Measured
+unconstrained by slope up to 70° on every tested surface; no graph model describes it. Whether steep
+walls should stop a jumping player is a game-design decision (Open Questions).
+
+## 23. Current position and open decisions (supersedes §17)
+
+- Production is unchanged; Stage 3F remains an experimental downstream carve and E a research
+  prototype. E is not connected to the bake, and `CarveField` is still bound to the frozen trajectories.
+- **Measured since §17:** the served surface is the triangle reading (§18), E keeps its invariants on
+  it, and the R1 defect has no counterpart on a lattice-only reading; slope readings are mapped and
+  measured (§19); physical connectivity and footing are measured (§20); the production controller
+  agrees with T-edge wherever T-edge claims a passage (§21).
+- **Proposed for approval:** §22.
+- **Questions that block a dump-first stage 1:** drainage invariant (requirement D1) and its oracle,
+  band-local correction in production, point-query contract, `FieldResolution` as world identity, hard
+  maximum against `SmoothMax`, per-arc data, filling of inherited depressions, flat-filled pits, the
+  final-surface separation.
+- **Questions that block enabling E in production:** valley-ending semantics, the walking-connectivity
+  contract and the prohibition of §22.5, jump and barriers, the classification and biome slope source.
+- **Later:** valley mouths, cirques as basins, natural thalweg, mountain-term redesign, vertex passages
+  and the uncertain zone, descent-only links.
+- Options, consequences and recommendations for each: [99 Open Questions](../../../99%20Open%20Questions.md)
+  § Terrain — Stage 3F valley carve.

@@ -1,16 +1,16 @@
 # 90 Glossary
 
-Version: 0.46
+Version: 0.47
 
 Status: Draft
 
-Last Updated: 2026-09-18
+Last Updated: 2026-10-17
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md)
 
 ---
 
@@ -827,6 +827,60 @@ The overworld terrain pipeline: **TerrainGen → Unity `TerrainData` → Unity T
 ## Island Relief (Stage 4A)
 
 TerrainGen's floor relief: what makes the island's middle read as geography instead of as an extruded coastline. Composition `H4A = H1 + U2 + R4A` with `R4A = M(d) + Γ·(P + K) + A`: a 1-D **coastal floor** `M` that gives the Stage 1 profile an inland slope of at least τ = 0.05, **plate-block uplift** (macro-plate districts with a 20 % lowland reservation), **knolls** (resistant crustal cores, slope-budget capped; none placed on the canonical seeds under the analytic bound) and the **massif apron** (talus and piedmont, domain-limited to the massif axis reach). All gated so the land mask cannot move. Noise has no role. **The production terrain authority since 2026-09-18** (`GeneratorVersion` 2): `TerrainAuthorityField` evaluates `IslandElevation`, so the bake, the surface rules and vegetation all read `H4A`. Stage 3D/3E still declare their basins and outlets on `StructuralElevation` (`H2`), the surface they were frozen against; Stage 3F carves `H = H4A − C3F` after this layer. See [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md) (R1 folded in) and [the revision change record](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN_REVISION.md).
+
+---
+
+## Structural Height
+
+**Proposed — owner review pending.** The TerrainGen surfaces that structural stages are built and frozen against: `H1`, `H2` (`StructuralElevation`) and `H4A` (`IslandElevation`, what `TerrainAuthorityField` evaluates). Stages 1–4A, the frozen Stage 3C trajectories, Stage 3D/3E topology and structural diagnostics read structural height only — never the **Final Terrain Surface**. See [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md) §22.1 and [99 Open Questions](99%20Open%20Questions.md) § Terrain — Stage 3F, 3F-1.
+
+---
+
+## Final Terrain Surface
+
+**Proposed — owner review pending.** The one height written to `TerrainData`: a lattice on the canonical world grid, at or below `H4A` at every node, read as a **Triangle Reading**. Stage 3F's E would be it; today the bake writes `H4A`, and E is a research prototype not connected to the bake. Nothing flows from it back into TerrainGen. Handoff §22.1–22.2; 3F-1, 3F-6.
+
+---
+
+## Triangle Reading
+
+How Unity serves the height between heightmap nodes, measured (handoff §18): nodes as `TerrainData` stores them (integer steps of `size.y / 32766`, 2.136 cm on a 700 m tile), each cell split along its **SW→NE** diagonal, (x0, z0) → (x0+1, z0+1) — for local coordinates u ≥ v the triangle (h00, h10, h11), otherwise (h00, h11, h01) — with tile-edge vertices shared exactly. `Terrain.SampleHeight` and the `TerrainCollider` match it within 0.4 mm; bilinear interpolation does not (up to 2.59 m at twisted cell centres). **Proposed** as the point-query contract of the **Final Terrain Surface** (3F-6).
+
+---
+
+## Walkable Triangle
+
+**Proposed — owner review pending.** A triangle of the **Triangle Reading** whose slope is **strictly below 45°**. Measured with the production `CharacterController` (handoff §21): planar 44.995° always walks, 45.005° never, exactly 45.000° depends on the direction of approach. Descent works on any tested slope; this term is about walking up. 3F-18.
+
+---
+
+## T-edge Connectivity
+
+**Proposed — owner review pending.** Walking connectivity on the graph of **Walkable Triangle**s of land, moving only across shared edges, from walkable land triangles that share an edge with the ocean. Undirected: it describes routes walkable both ways. The proposed **conservative lower bound of guaranteed walking connectivity** in the verified configuration — no false "passable" was observed (handoff §§20–21) — not a proof for every island. Not to be read as exact: the controller also walks some vertex passages T-edge excludes (**Uncertain Connectivity Zone**). 3F-18.
+
+---
+
+## T-vertex Connectivity
+
+**Proposed — owner review pending.** **T-edge Connectivity** plus moves through a shared vertex. An **experimental upper bound**: it does not guarantee walkability — one vertex step adjacent to a 45.41° face stopped every ascent (handoff §21). 3F-18, 3F-23.
+
+---
+
+## Uncertain Connectivity Zone
+
+**Proposed — owner review pending.** Land reachable by **T-vertex Connectivity** and not by **T-edge Connectivity**. Read as neither accessible nor inaccessible until vertex passages are studied (3F-23); measured example: about 25 thousand m² on seed 1010 that T-edge excludes and the controller walks.
+
+---
+
+## Jump Accessibility
+
+What the production jump (`jumpHeight` 1.2 m, gravity −18, jump while grounded) reaches — separate from walking connectivity. Measured unconstrained by slope up to 70° on every tested surface; no graph model describes it (handoff §21). Whether steep walls should stop a jumping player is open: [99 Open Questions](99%20Open%20Questions.md) 3F-20.
+
+---
+
+## Slope Reading
+
+Labels for the ways the code reads slope (handoff §19), unrelated to the Stage 3F research requirements D1–D3: **T** — the served triangle's gradient (collider, `CharacterController`); **D2** — `TerrainData.GetInterpolatedNormal` (Sobel vertex normals, tile-local; `OverworldTerrainSampler.SampleSlope01`, biome); **D3** — `OverworldTerrainField.SlopeDegreesAt` (central differences, 5.47 m base; surface and vegetation rules); **D4** — `LandscapeCostField`'s 10 m slope (road cost, POI site scoring); **D5** — TerrainGen diagnostics (`WorldHeightField.Slope01`, `Stage3Field.Reachable`); **D6** — `OverworldTerrainDiagnostics` reachability (per-axis node steps, passes faces up to 54.7°); **D7** — the analytic `H4A` gradient. **Proposed:** only T decides walkability, footing, spawn or gating; D2, D3 and D6 never do (3F-19).
 
 ---
 
