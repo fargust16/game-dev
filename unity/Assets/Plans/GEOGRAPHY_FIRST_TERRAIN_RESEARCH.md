@@ -1,10 +1,13 @@
 # Geography-First Terrain Research — Expressive Fantasy Geography
 
-Version: 0.1
+Version: 0.2
 
-Status: Draft — research record. Nothing in it is an approved decision. The target geography (§4),
-the stage responsibility map (§5), the acceptance suite (§7), the Geometry-First Review mode (§3) and
-the experiment roadmap (§9) are **proposals awaiting owner review**.
+Status: Draft — research record. One owner decision applies: **GEO-6 answered (a), build both**
+(2026-10-18), so the read-only tooling G0 and G1 now exists as Editor-only code
+(`Editor/TerrainGenGeographyDump.cs`, `Editor/GeometryFirstReview.cs`) and its measurements are in §§3.6,
+7.6 and 10. Everything else is unchanged in status: the target geography (§4), the stage responsibility
+map (§5), the acceptance suite and its thresholds (§7, GEO-7) and the rest of the roadmap (§9) are
+**proposals awaiting owner review**.
 
 Last Updated: 2026-10-18
 
@@ -59,7 +62,11 @@ smallest responsible next experiment?
    54–59 % of the land within 200 m of the coast where every relief term is gated toward zero. Scale and
    the coast gate are owner-level constraints, not tuning (§1.4, 99 Open Questions GEO-1, GEO-4).
 5. The smallest useful next steps are read-only: a geography metrics baseline (G0) and an isolated,
-   heights-only Geometry-First Review tool (G1). Neither touches production (§9).
+   heights-only Geometry-First Review tool (G1). Neither touches production (§9). **Both are built**
+   (GEO-6 (a)); the baseline is in §7.6: on all seven canonical seeds the island's drainage has at
+   most Strahler order 2, no saddle lies on the main divide, the declared crests and spurs coincide
+   with a water-parting line on 0.6–2.0 % of their length, and the single-dome detector flags five of
+   seven seeds — the other two by one indicator each.
 
 **Claim tags.**
 
@@ -134,7 +141,7 @@ remnants of the Stage 2 envelope between carved valleys; outside the massif Stag
 | | value |
 |---|---|
 | land height p5 / p25 / p50 / p75 / p90 / p99 | 25 / 39 / 58 / 78 / 108 / 326 m |
-| land in 24–50 / 50–70 / 70–110 / 110–230 / 230+ m | 39.7 / 25.3 / 25.3 / 5.9 / 3.8 % (the last derived as the remainder) |
+| land in 24–50 / 50–70 / 70–110 / 110–230 / 230+ m | 39.7 / 25.3 / 25.3 / 5.9 / 3.7 % (the last measured by G0; first derived as the remainder, 3.8 %) |
 | highest point | 364.8 m (single massif, crest uplift 284 m) |
 | knolls placed | 0 of 48 candidates |
 | plate districts | 4, levels 0 / 0.33 / 0.67 / 1.0 → 0 / 6 / 12 / 18 m |
@@ -170,8 +177,10 @@ straight medial-axis creases across the floor and one oval massif ringed by its 
    would realise them, is experimental (§6).
 5. **Drainage has nothing to converge on.** **[PRIOR]** On the `H2` relief of 110201 the hydrology
    analysis found 8 short coastal rivers, 0 tributaries, 0 lakes, 2.05 km of river, and soil weight
-   0.001 on land (`HYDROLOGY_GENERATION_PLAN.md` §17; `NATIVE_ISLAND_SHAPE_PREFLIGHT.md` §4). **Not
-   re-measured on `H4A`**; G0 (§9) measures it.
+   0.001 on land (`HYDROLOGY_GENERATION_PLAN.md` §17; `NATIVE_ISLAND_SHAPE_PREFLIGHT.md` §4).
+   **[MEASURED] on `H4A` by G0** (§7.6): 110201 has 8 systems, 0 tributaries, 0 lakes and 1.95 km of
+   river — Stage 4A changed almost nothing here; across the seven canonical seeds 5–11 systems,
+   0–4 tributaries, Strahler order ≤ 2, 0.84–2.51 km of river.
 
 ### 1.4 Limitations by kind
 
@@ -183,7 +192,7 @@ straight medial-axis creases across the floor and one oval massif ringed by its 
 | **Topology** | valleys exist only on massif flanks (B8: massif-free worlds have none); no inter-massif corridor concept (B2b); declared trajectories cross rising ground (36 route closures on `H4A`, seeds 1000–1039) | 3F preflight §§9, 18; handoff §9 | Stage 3B/3C (frozen) |
 | **Hydrology** | two unreconciled carves: Stage 3F along declared trajectories, `HydrologyBake` along D8 reaches; no tributary structure on the dome; the documented policy is fill-then-spill with every system reaching the ocean | `HYDROLOGY_GENERATION_PLAN.md` §§9, 11; §6 here | Stage 3F × hydrology |
 | **Bake** | none for shape (≤ 1.07 cm, exact seams). Cost: authority evaluation dominates | §2.1 | — |
-| **Presentation** | the only review camera is a 2 800 m top-down view; dumps are top-down analytic images; production textures, vegetation (11 747 trees, 3.9 M detail instances on 110201) and the ocean plane hide or confound geometry; no standardised oblique or eye-level capture exists | `NATIVE_ISLAND_SHAPE_PREFLIGHT.md` §4 C/M9; §2 here | tooling (G1) |
+| **Presentation** | the only review camera is a 2 800 m top-down view; dumps are top-down analytic images; production textures, vegetation (11 747 trees, 3.9 M detail instances on 110201) and the ocean plane hide or confound geometry; no standardised oblique or eye-level capture existed before G1 (§3.6) | `NATIVE_ISLAND_SHAPE_PREFLIGHT.md` §4 C/M9; §2 here | tooling (G1, built) |
 
 ### 1.5 Experiments that can run without changing production
 
@@ -274,15 +283,15 @@ From the brief, restated as checkable properties of a **Geometry-First Review** 
 | Option | What it is | Verdict |
 |---|---|---|
 | A. TerrainGen dumps only | top-down hillshade, slope, contour and structure PNGs (exists) | **keep as the first gate**; insufficient alone: no oblique, silhouette or eye-level reading |
-| B. **Isolated review tool** | an Editor-only tool that builds tiles in memory with `OverworldTerrainGrid.Create(…, layers, neutralMaterial)`, writes heights with `OverworldTerrainBuilder.WriteHeights`, never calls `PaintSurface`, `PlaceTrees`, `PlaceGrass` or the ocean step, renders the camera set to PNG outside `Assets` and discards the scene | **recommended** |
+| B. **Isolated review tool** | an Editor-only tool that builds tiles in memory with `OverworldTerrainGrid.Create(…, layers, neutralMaterial)`, writes heights with `OverworldTerrainBuilder.WriteHeights`, never calls `PaintSurface`, `PlaceTrees`, `PlaceGrass` or the ocean step, renders the camera set to PNG outside `Assets` and discards the scene | **built** after GEO-6 (a) — `GeometryFirstReview` (§3.6) |
 | C. Toggle the production scene | `drawTreesAndFoliage = false`, hide `WorldWater`, swap the material, disable the volume in `Overworld_Generator.unity` | **rejected** — edits a versioned scene that already churns (tech debt item 7) and risks shipping a diagnostic state |
 | D. A "diagnostic" flag in the bake | skip vegetation inside `OverworldTerrainBake` | **rejected** — a second, optional bake path; AGENTS.md forbids optional bake paths |
 
 **[FACT]** Option B needs no production code change: `OverworldTerrainGrid.Create` already takes the
 material and layer array, `WriteHeights` and `OverworldTerrainField.FromSamples` are public, and the
-Stage 3F phase 7 research wrote heights onto tiles exactly this way. It adds new Editor-only files (a
-tool, a neutral material and optionally a diagnostic shader) — that is implementation and waits for
-approval (G1, §9).
+Stage 3F phase 7 research wrote heights onto tiles exactly this way. **As built** it added two Editor
+files and no asset: the neutral layer, texture and material exist in memory only, and no diagnostic
+shader was needed (§3.6).
 
 ### 3.3 Proposed data flow
 
@@ -348,6 +357,53 @@ Rules for the loop:
   the 1000–1039 sweep, as every earlier stage did. The no-massif seeds are mandatory: a geography that only
   works where Stage 2A certifies a massif fails on 4 of 29 worlds.
 - **Automated checks before eyes.** T1 metrics (§7) gate T2 review; T2 review gates any document change.
+
+### 3.6 Geometry-First Review as built (G1)
+
+Built 2026-10-18 after GEO-6 (a). Entry `GameDev.EditorTools.GeometryFirstReview.RunBatch`
+(`-geoReviewSeeds a,b`, `-geoReviewOut <dir>`, optionally `-geoReviewLattice <file> -geoReviewCandidate
+<id>` for a 1025 × 1025 little-endian float32 lattice); menu *GameDev/Overworld/Terrain Gen/Geometry-First
+Review G1*, which asks to save the open scene first and reopens it afterwards. The data flow is §3.3's:
+`IslandReliefWorld` (dump path) → lattice (`H4A` or the file) → `OverworldTerrainField.FromSamples`
+(nearest lattice vertex, nothing re-evaluated) → `OverworldTerrainGrid.Create` with one neutral layer and
+material → `OverworldTerrainBuilder.WriteHeights` per tile → cameras → PNG + JSON. It opens an untitled
+scene, never calls `PaintSurface`, `PlaceTrees`, `PlaceGrass`, the ocean step, `CreateAsset` or
+`SaveScene`, and destroys everything it made.
+
+| §3.1 requirement | As built |
+|---|---|
+| 1 neutral material | URP `Terrain/Lit`; one in-memory `TerrainLayer` over a 4 × 4 texture RGB 160/160/154 with **alpha 0**: `Terrain/Lit` and its basemap read smoothness from the diffuse alpha, and an opaque texture rendered the first run as specular plastic. Instanced per-pixel normals on. No colour ramp — the dumps already give top-down slope and contour images |
+| 2 nothing but ground | `drawTreesAndFoliage` off; the scene holds the tiles, one sun, one camera and the contour ribbon |
+| 3 no shader extras | post-processing, anti-aliasing, MSAA and HDR off on the camera; fog off, no skybox, reflection intensity 0, terrain reflection probes off |
+| 4 no water surface | the seabed renders as neutral ground; the 24 m contour (marching squares on the lattice) is an unlit ribbon 0.5 m above sea level, 3 m wide in V1–V3, 1.5 m in V4, 0.5 m in V5 |
+| 5 fixed light | directional `Euler(42, −35, 0)`, intensity 1.2, soft shadows, flat ambient 0.40/0.41/0.43. `URP_Pipeline.asset` holds `shadowDistance` 350 m, which leaves the distant views unshadowed, so the tool sets it per view **in memory** and restores it in `finally`; the asset is never marked dirty and its MD5 is unchanged (§10) |
+| 6 fixed cameras | table below; every pose, near/far plane, resolution, shadow distance and a pixel hash go to `review_<seed>_<candidate>.json` |
+| 7 overlays | V6: fill depth > 0.05 m orange, D8 channel cells (≥ 30 000 m²) blue, the G0 flow-divide skeleton red (main divide bright), hydrology reaches navy by Strahler order, ocean outlets yellow, massif crest lines and primary spurs magenta, Stage 3C trajectories cyan, Stage 3E basin outlines green |
+| 8 any lattice | yes; the JSON carries the lattice hash, which for `H4A` equals the pinned hash |
+
+| View | As built | Moves with the reviewed lattice |
+|---|---|---|
+| V1 | orthographic, 2048 × 2048, half-size 1400 m, straight down from (1400, 1500, 1400), north up | no |
+| V2 / V3 | 1920 × 1080, FOV 40°, `c + 1.8 r` at bearing 225° / 45°, 900 m, looking at `c` on sea level | no |
+| V4 | 1920 × 1080, FOV 50°, the Stage 1 land point at bearing 180°, 0.6 `r` (walked toward `c` until Stage 1 land), 120 m above the served surface, looking at `c` on sea level | camera height |
+| V5 | 1920 × 1080, FOV 60°, the Stage 1 land point at bearing 270°, 0.5 `r`, eye 1.7 m above the served surface, looking level toward `c` | camera height |
+| V6 | V1 plus the overlays | overlays |
+| V7–V9 | not built (secondary, feature-anchored) | — |
+
+The served surface is `Terrain.SampleHeight`. V4's FOV and look target, V5's level look, the ribbon
+widths and the overlay colours are **authoring defaults** added at build; §3.4 left them open.
+
+**[MEASURED]** Per seed the scene takes 0.14–0.19 s and the five renders plus V6 0.65–0.89 s, against
+12–44 s of world build and ~0.6 s of drainage analysis: G1 adds about one second to a T1 dump. Two fresh
+processes over the seven canonical seeds wrote 42 PNG and 7 JSON files that are byte-identical. The JSON
+records the graphics device (Direct3D 12); identity is shown on one machine and driver, not across GPUs.
+
+**[INTERPRETED — agent reading of V2/V3/V5, owner review pending]** On every massif seed the island is one
+flat-topped lens (a mesa with a continuous steep ring) standing on a low dome, its foot ringed by the
+apron step that V5 shows as a sharp lip (on 424242 a flat bench all round); on 424242, 20260905 and 7
+the massif carries two culminations on one body, joined by a col far above the floor. The
+massif-free seeds are a near-flat dome whose only visible structure is the concentric coastal-rise rings
+and straight medial-axis creases. All seven read as §1.3's "flat island with one convex elevation".
 
 ---
 
@@ -689,34 +745,35 @@ Columns: **baseline** — measured value today, with source; **proposed initial 
 default with its reasoning, to calibrate; **owner threshold** — a value that would gate acceptance and
 needs approval. No proposed target is a gate until GEO-7 is answered. Numbers inside the metric
 *definitions* (window sizes, prominences, areas, distances) are **authoring defaults** in world units, to
-be confirmed or replaced in G0; none is measured.
+be confirmed or replaced in G0; none is measured. G0 kept them; §7.6 names the three definitions it changed
+and why.
 
 ### 7.1 Macro-relief
 
 | Id | Metric (definition) | Baseline | Proposed initial target | Owner threshold |
 |---|---|---|---|---|
-| M1 | hypsometry: land share in 24–50 / 50–70 / 70–110 / 110–230 / 230+ m, and p50 / p90 | 110201 `H4A`: 39.7 / 25.3 / 25.3 / 5.9 / 3.8 %, p50 58 m, p90 108 m **[MEASURED]**; 1337: 41.5 / 32.0 / 26.5 / 0 / 0 % | land above 110 m well beyond today's ~10 % so that a highland region exists; calibrate on G3 candidates and reference DEMs | needed (GEO-7) |
-| M2 | relief regions: connected components of land whose height exceeds a 600 m-window median by ≥ the plate step (18 m), area ≥ 0.1 km² | not measured — G0 | ≥ 2 on massif worlds, ≥ 1 elsewhere | needed |
-| M3 | **single-dome detector**: (a) coast-aligned gradient share of the interior floor; (b) R² of floor height against coast distance; (c) summits with topographic prominence ≥ 30 m; (d) share of land above p90 in its largest connected component | (a) 73.6 % / 66.8 % **[MEASURED]** (110201 / 1337); (b)–(d) not measured — G0 | flag the failure mode when (a) > 65 %, (b) high, (c) ≤ 1 and (d) ≈ 100 % together; the 65 % is Stage 4A's existing target, the rest calibrate in G0 | needed |
-| M4 | ridge network: ridge lines from divide extraction (D8 basin boundaries on the filled surface); total length, longest connected ridge, branch count, crest-height coefficient of variation | not measured — G0 | branching present on massif worlds; non-uniform crests (`WORLD_RELIEF_PRINCIPLES.md` §3 bans uniform crests) | needed |
-| M5 | saddles and passes: saddle points of the merge tree with prominence ≥ 15 m; passes = saddles on the main divide joining two valley heads | not measured — G0 | ≥ 1 pass on each major divide (rule 3) | needed |
-| M6 | silhouette and coast: crenulation; share of shoreline whose land rises ≥ 15 m within 60 m (cliff coast); headland and cove counts | crenulation 1.35–1.46 **[PRIOR]**; cliff share expected ~0 under the coast gate — G0 | cliff share > 0 only if GEO-4 allows it | needed |
+| M1 | hypsometry: land share in 24–50 / 50–70 / 70–110 / 110–230 / 230+ m, and p50 / p90 | 110201 `H4A`: 39.7 / 25.3 / 25.3 / 5.9 / 3.7 %, p50 58 m, p90 108 m; 1337: 41.5 / 32.0 / 26.5 / 0 / 0 %. Canonical seven: land above 110 m 9.6–18.7 % on massif worlds, 0 % on the three massif-free ones; p90 108–155 m / 75–78 m **[MEASURED, G0 §7.6]** | land above 110 m well beyond today's ~10 % so that a highland region exists; calibrate on G3 candidates and reference DEMs | needed (GEO-7) |
+| M2 | relief regions: connected components of land whose height exceeds a 600 m-window median by ≥ the plate step (18 m), area ≥ 0.1 km² | 1 region (0.29–0.32 km²) on 110201, 424242, 7; 2 on 20260905 (0.21, 0.18 km²); **0** on 1337, 256, 777 **[MEASURED]** | ≥ 2 on massif worlds, ≥ 1 elsewhere | needed |
+| M3 | **single-dome detector**: (a) coast-aligned gradient share of the interior floor; (b) R² of floor height against coast distance; (c) summits with topographic prominence ≥ 30 m; (d) share of land above p90 in its largest connected component | (a) 63.1–77.2 %; (b) 0.858–0.913; (c) 1–2 summits ≥ 30 m, of them **1 separate** on every seed; (d) 1.000 on six seeds, 0.893 on 256. The detector as built (§7.6) flags **5 of 7** — 20260905 escapes on (a) alone, 256 on (d) alone **[MEASURED]** | flag the failure mode when (a) > 65 %, (b) high, (c) ≤ 1 and (d) ≈ 100 % together; the 65 % is Stage 4A's existing target, the rest calibrate in G0 | needed |
+| M4 | ridge network: ridge lines from divide extraction (D8 basin boundaries on the filled surface); total length, longest connected ridge, branch count, crest-height coefficient of variation | flow-divide skeleton 7.0–11.8 km, longest 0.98–4.76 km, 4–11 branch points; it traces the floor's medial-axis creases, not the massif crest; crest CV 1.12–1.49 (massif) / 0.60–0.73 (massif-free); expressed 13–25 % on every seed **[MEASURED]** | branching present on massif worlds; non-uniform crests (`WORLD_RELIEF_PRINCIPLES.md` §3 bans uniform crests) | needed |
+| M5 | saddles and passes: saddle points of the merge tree with prominence ≥ 15 m; passes = saddles on the main divide joining two valley heads | 1 saddle ≥ 15 m on 424242, 20260905 and 7 — the col between two culminations of one massif, 213–222 m; 0 elsewhere; **0 passes** on the main divide on all seven **[MEASURED]** | ≥ 1 pass on each major divide (rule 3) | needed |
+| M6 | silhouette and coast: crenulation; share of shoreline whose land rises ≥ 15 m within 60 m (cliff coast); headland and cove counts | crenulation 1.33–1.59 (Stage 1 statistic); cliff share 0.7–3.7 % on massif worlds, 0 % massif-free; headlands 0–2, coves 0–1 at R = 100 m **[MEASURED]** | cliff share > 0 only if GEO-4 allows it | needed |
 
 ### 7.2 Drainage and basins
 
 | Id | Metric | Baseline | Proposed initial target | Owner threshold |
 |---|---|---|---|---|
-| D-a | watershed consistency: share of declared divide length within 2 lattice steps of a D8 basin boundary | not measured | high; the exact share calibrates in G0 | needed |
-| D-b | tributary structure: Strahler orders, bifurcation ratio, Hack exponent of trunk length against basin area | `H2` 110201: 8 systems, 0 tributaries **[PRIOR]**; `H4A` not measured | order ≥ 3 on the largest system; literature references for calibration only — bifurcation ratio 3–5 in many real networks ([Strahler number](https://en.wikipedia.org/wiki/Strahler_number)), Hack exponent slightly below 0.6 ([Hack's law](https://en.wikipedia.org/wiki/Hack%27s_law)) | needed |
-| D-c | downstream continuity under the stated surface convention (priority flood ε 1 mm, 8-connected, on the quantised lattice; checked again on the triangle reading) | existing `HydrologyValidator` rules | 0 uphill reaches, 0 cycles (existing) | existing |
-| D-d | closed depressions: S8 (≥ 0.25 m and ≥ 100 m²) + independent IDS, outside permitted basins | `H4A` 0 on canonical, 6/40 sweep inside `Z_M ∪ L_M` **[PRIOR]** | 0 new outside permitted basins (requirement D1 as researched) | 3F-2 and the basin policies |
-| D-e | river/valley alignment: share of reach length inside declared valleys; channel incision depth relative to the valley floor | not measured | high alignment; reported until GEO-3 | needed |
+| D-a | watershed consistency: share of declared divide length within 2 lattice steps of a D8 basin boundary (as built: of a flow-divide cell, §7.6) | **0.6–2.0 %** on the four massif seeds; n/a without a massif **[MEASURED]** | high; the exact share calibrates in G0 | needed |
+| D-b | tributary structure: Strahler orders, bifurcation ratio, Hack exponent of trunk length against basin area | `H2` 110201: 8 systems, 0 tributaries **[PRIOR]**; `H4A`: 110201 8 systems, 0 tributaries, 1.95 km; canonical 5–11 systems, 0–4 tributaries, Strahler ≤ 2; bifurcation and Hack exponent not interpretable at 7–15 reaches **[MEASURED]** | order ≥ 3 on the largest system; literature references for calibration only — bifurcation ratio 3–5 in many real networks ([Strahler number](https://en.wikipedia.org/wiki/Strahler_number)), Hack exponent slightly below 0.6 ([Hack's law](https://en.wikipedia.org/wiki/Hack%27s_law)) | needed |
+| D-c | downstream continuity under the stated surface convention (priority flood ε 1 mm, 8-connected, on the quantised lattice; checked again on the triangle reading) | lattice: flow tree complete and validation PASS on all seven **[MEASURED]**; triangle reading not run | 0 uphill reaches, 0 cycles (existing) | existing |
+| D-d | closed depressions: S8 (≥ 0.25 m and ≥ 100 m²) + independent IDS, outside permitted basins | `H4A` 0 on all seven canonical; sweep 6/40 worlds with one depression each, deepest 2.32 m — the six seeds tech debt item 19 lists **[MEASURED]** | 0 new outside permitted basins (requirement D1 as researched) | 3F-2 and the basin policies |
+| D-e | river/valley alignment: share of reach length inside declared valleys; channel incision depth relative to the valley floor | 20–82 % of river node length inside a Stage 3C half-width on the four massif seeds; n/a without a massif; incision n/a on `H4A` **[MEASURED]** | high alignment; reported until GEO-3 | needed |
 
 ### 7.3 Geometry and traversal
 
 | Id | Metric | Baseline | Proposed initial target | Owner threshold |
 |---|---|---|---|---|
-| T-a | slope bands of all land: < 5°, 5–15°, 15–30°, 30–45°, > 45° | 110201 `H4A`: < 5° 37.2 %, > 45° 5.7 % **[MEASURED]** | existing finished-island targets: ≥ 35 % below 5°, 6–15 % above 45° (`WORLD_RELIEF_PRINCIPLES.md` §6) | existing |
+| T-a | slope bands of all land: < 5°, 5–15°, 15–30°, 30–45°, > 45° | 110201 `H4A`: < 5° 37.2 %, > 45° 5.7 %; canonical < 5° 25.4–54.1 %, > 45° 0–7.4 % (0 % on the three massif-free seeds) **[MEASURED]** | existing finished-island targets: ≥ 35 % below 5°, 6–15 % above 45° (`WORLD_RELIEF_PRINCIPLES.md` §6) | existing |
 | T-b | walking connectivity: T-edge reachable share and the uncertain zone (T-vertex − T-edge) | `H4A` 94.53 %, E 95.04 % over 8 seeds **[PRIOR]** | ≥ 95 % (existing principle, read on T-edge) | 3F-17, 3F-18 |
 | T-c | passages and bottlenecks: minimax steepest triangle along the best path from the shore to each region; area decided by passages within ±1° of 45° | 17–34 thousand m² on 5 of 8 seeds **[PRIOR]** | reported, never hidden | 3F-20, 3F-23 |
 | T-d | seams and tile artefacts | 0.0000 m **[MEASURED]** | 0 (existing) | existing |
@@ -739,12 +796,96 @@ a human" list, extended to the hierarchy.
 
 ### 7.5 Calibration
 
-- **Against today:** G0 measures every "not measured" baseline on the canonical seeds and the sweep.
+- **Against today:** G0 measured every "not measured" baseline on the canonical seeds and the sweep (§7.6).
 - **Against reference geography:** real digital elevation models of small mountainous islands, scaled to
   the island footprint, give hypsometry, ridge, saddle and drainage figures to compare with. Which DEMs to
   use is part of G2; none were used here.
 - **Against the visual reference:** §4.1 readings, checked on V2–V5 captures; no metric is fitted to a
   screenshot.
+
+### 7.6 G0 baseline on production `H4A` — measured 2026-10-18
+
+`GameDev.EditorTools.TerrainGenGeographyDump.DumpBatch` (`-geoSeeds`, `-geoSweep start:count`,
+`-geoOut`) on `IslandReliefWorld` with `IslandReliefSettings.Default`, the hydrology package read-only on a
+copy of the lattice. The report prints every definition with its authoring defaults; the numbers here are
+**[MEASURED]**. Every `H4A` hash equals the value pinned in tech debt item 19, so this is production.
+
+| seed | massifs | > 110 m % | M2 | M3 (a) % | (b) η² | (c) all / separate | (d) | single dome | M4 skeleton km / longest km / branches | M5 saddles / passes | cliff % | D-a % | D-b systems / tributaries / order / km | D-e % | T-a < 5° / > 45° % |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 110201 | 1 | 9.6 | 1 | 73.6 | 0.913 | 1 / 1 | 1.000 | **flag** | 9.05 / 2.49 / 6 | 0 / 0 | 1.7 | 0.6 | 8 / 0 / 1 / 1.95 | 31 | 37.2 / 5.7 |
+| 424242 | 1 | 12.8 | 1 | 68.1 | 0.910 | 2 / 1 | 1.000 | **flag** | 9.36 / 1.60 / 9 | 1 / 0 | 0.7 | 1.2 | 5 / 2 / 2 / 1.14 | 20 | 27.9 / 6.6 |
+| 20260905 | 1 | 18.7 | 2 | 63.1 | 0.858 | 2 / 1 | 1.000 | no — (a) | 7.01 / 0.98 / 4 | 1 / 0 | 1.7 | 2.0 | 11 / 4 / 2 / 2.51 | 67 | 25.4 / 7.4 |
+| 7 | 1 | 10.6 | 1 | 73.0 | 0.877 | 2 / 1 | 1.000 | **flag** | 9.90 / 1.87 / 4 | 1 / 0 | 3.7 | 1.8 | 7 / 0 / 1 / 1.09 | 82 | 30.4 / 5.4 |
+| 1337 | 0 | 0 | 0 | 66.8 | 0.888 | 1 / 1 | 1.000 | **flag** | 9.79 / 4.76 / 11 | 0 / 0 | 0 | n/a | 8 / 2 / 2 / 1.54 | n/a | 49.9 / 0.0 |
+| 256 | 0 | 0 | 0 | 67.8 | 0.877 | 1 / 1 | 0.893 | no — (d) | 11.76 / 3.84 / 10 | 0 / 0 | 0 | n/a | 10 / 0 / 1 / 0.84 | n/a | 44.3 / 0.0 |
+| 777 | 0 | 0 | 0 | 77.2 | 0.913 | 1 / 1 | 1.000 | **flag** | 10.89 / 2.67 / 11 | 0 / 0 | 0 | n/a | 10 / 2 / 2 / 1.38 | n/a | 54.1 / 0.0 |
+
+D-c (flow tree complete, planner validation) passes and D-d counts 0 S8 depressions on all seven. M6
+headlands 0–2 and coves 0–1 per seed at R = 100 m. Per seed G0 adds ~0.6 s of drainage analysis and
+1.1–1.5 s of metrics to a 12–45 s world build.
+
+**Sweep 1000–1039** (`-geoSweep 1000:40`, one process, 875 s, worst seed 82 s; no pinned hashes exist for
+these seeds). 32 worlds carry one massif, 8 none, none two.
+
+| metric | massif worlds (32) | massif-free worlds (8) |
+|---|---|---|
+| land above 110 m | 2.6–20.0 % | 0 % |
+| M2 relief regions | 1 on every world | 0 on every world |
+| M3 separate summits / all summits ≥ 30 m | 1 on every world / 2 on 11 worlds (two culminations) | 1 / 1 |
+| M3 (a) / (b) / (d) | 56.4–78.4 % / 0.839–0.948 / 1.000 | 55.9–97.3 % / 0.857–0.935 / 0.508–1.000 |
+| single dome flagged | 17 (15 escape on (a) alone) | 6 (one on (a), one on (d)) |
+| M5 saddles ≥ 15 m / passes on the main divide | 0–2 / 1 on 4 worlds | 0 / 0 |
+| D-a | 0.7–6.7 % | n/a |
+| D-b | Strahler ≤ 2 on every world; over all 40 worlds 1–16 systems, 0–8 tributaries, 0.08–3.64 km of river | Strahler ≤ 2 |
+| D-d S8 | 6 worlds with one depression each — 1006, 1013, 1019, 1026, 1027, 1038, deepest 2.32 m | 0 |
+| cliff share / land > 45° | 0–6.7 % / 1.9–8.5 % | 0 / 0 |
+
+D-c passes on all 40. **D-d reproduces tech debt item 19 exactly** — the same six seeds and the same
+2.32 m — through G0's own pipeline, which cross-checks the S8 measurement. The detector flags 23 of 40:
+16 misses fail (a) alone and one fails (d) alone; a "three of four" rule would flag all 40. That the
+escape is (a) on 16 worlds says Stage 4A's 65 % target is not a dome criterion; it is recorded for GEO-7,
+not acted on.
+
+**Definitions as built, and what changed after the first run.** Three definitions moved from §§7.1–7.2's
+wording during G0; the first two moved **after** the first canonical run, so they are calibrated on these
+seven seeds and are not independent evidence:
+
+1. **M3 (c)** first counted every summit with prominence ≥ 30 m. That counted the two culminations of one
+   massif on 424242, 20260905 and 7 as two summits (prominence 80–98 m, joined by a col at 213–222 m) and
+   left those seeds unflagged, although G1 shows one body (§3.6). As built, (c) counts **separate**
+   summits — key col below the land p90 — and the report keeps the literal count beside it.
+2. **M4** was first built as stream-link catchment boundaries (channels from 30 000 m²). On `H4A` D8 flow
+   barely converges — 1.5–2.8 km of channel cells per island — so most land drains to the sea without
+   meeting a channel and the boundaries missed most parting lines, the massif crest included. As built, a
+   cell is a **flow divide** when, along one lattice axis, both neighbours drain away from it (D8 within
+   45°), and the mask is thinned (Zhang–Suen) to a skeleton that carries length, components, branch
+   points (crossing number ≥ 3) and the main divide. The first-run figures (3.9–9.1 km, 3–18 branches) are
+   superseded.
+3. **D-a** measures declared divides against the flow-divide mask (within 2 lattice steps), not against
+   basin boundaries.
+
+**Readings [CONCLUSION]:**
+
+- **The detector flags 5 of the 7 seeds the G1 captures show as single-dome** (§3.6). 20260905 escapes on
+  (a) alone (63.1 % against Stage 4A's 65 %, which was set as a success target for floor relief, not as a
+  dome criterion) and 256 on (d) alone (0.893 against 0.95: its top decile splits in two). A "three of
+  four" rule would flag all seven; it is not adopted, because it would be chosen after seeing the data.
+  Which rule and which thresholds gate anything is GEO-7.
+- **Water parts on the floor, not on the mountains.** D-a is 0.6–2.0 %: the massif crown is flat across,
+  so D8 runs along the crest instead of away from it, and the Stage 3B spurs have no relief in `H4A`
+  (Stage 3 is not in the height, §1.2). The flow-divide skeleton traces the straight medial-axis creases
+  of the coast-distance datum — the "extruded coastline" of §1.3 read from drainage.
+- **No mountain system.** No seed has a second separate summit, and no significant saddle lies on the main
+  divide (M5 passes 0); the only saddles ≥ 15 m are cols between the culminations of one massif. Massif-free
+  seeds have no relief region (M2 0) and no land above 110 m.
+- **Drainage stays coastal.** Strahler order ≤ 2, ≤ 4 tributaries, 0.84–2.51 km of river: §1.3 item 5
+  holds on `H4A`. Bifurcation ratios (6–11) and Hack exponents (0.70–2.79) are computed over 7–15
+  reaches and are not interpretable at that count; they become meaningful only on a relief with a
+  network.
+- **Coast.** Shore land rising ≥ 15 m within 60 m exists on massif worlds (0.7–3.7 % of the shoreline) and
+  nowhere else; where it lies was not inspected. The coast gate still forbids sea cliffs (GEO-4).
+- **Slopes.** Massif-free seeds carry 0 % of land above 45°, below the 6–15 % finished-island target of
+  `WORLD_RELIEF_PRINCIPLES.md` §6; massif seeds 5.4–7.4 %, which the massif-free zeros place on the massif and its apron.
 
 ---
 
@@ -769,8 +910,8 @@ document.
 
 | Step | What | Depends on | Risk | Completion criteria |
 |---|---|---|---|---|
-| **G0** | Geography metrics baseline: an Editor-only dump computing §7 M1–M6, D-a–D-e, T-a on `H4A` (and on `H3F`, where it exists) for the canonical seeds and the 1000–1039 sweep, reusing the dump lattice path and the hydrology package read-only | none | metric definitions are themselves proposals; a weak definition can mislead | numbers recorded here for every "not measured" baseline; the single-dome detector flags production `H4A` on the seeds a human would flag; process repeatable (identical report in two processes); `git status` clean apart from the new Editor file |
-| **G1** | Geometry-First Review tool (§3): heights-only in-memory tiles, neutral material, camera set, overlays, PNG + JSON outside `Assets` | none (parallel with G0) | render cost unmeasured; URP Terrain Lit with a single neutral layer may still need a diagnostic shader for slope colours | identical images and camera records for the same lattice in two processes; production scene hash and tile assets unchanged; V1–V6 produced for `H4A` and E (when E is available) |
+| **G0** | Geography metrics baseline: an Editor-only dump computing §7 M1–M6, D-a–D-e, T-a on `H4A` (and on `H3F`, where it exists) for the canonical seeds and the 1000–1039 sweep, reusing the dump lattice path and the hydrology package read-only | none | metric definitions are themselves proposals; a weak definition can mislead | numbers recorded here for every "not measured" baseline; the single-dome detector flags production `H4A` on the seeds a human would flag; process repeatable (identical report in two processes); `git status` clean apart from the new Editor file. **Built 2026-10-18** (`TerrainGenGeographyDump`): baselines in §7.6, report byte-identical in two processes, `git status` adds only the Editor files. `H3F` was not measured (G0 ran on `H4A` only). **Partly met:** the detector flags 5 of the 7 seeds G1 shows as single-dome (23 of 40 on the sweep); its rule is GEO-7's to settle |
+| **G1** | Geometry-First Review tool (§3): heights-only in-memory tiles, neutral material, camera set, overlays, PNG + JSON outside `Assets` | none (parallel with G0) | render cost unmeasured; URP Terrain Lit with a single neutral layer may still need a diagnostic shader for slope colours | identical images and camera records for the same lattice in two processes; production scene hash and tile assets unchanged; V1–V6 produced for `H4A` and E (when E is available). **Built 2026-10-18** (`GeometryFirstReview`, §3.6): images and records byte-identical in two processes, scene and tile assets unchanged, V1–V6 for `H4A` on the seven canonical seeds; no diagnostic shader needed; render ≈ 1 s per seed. **E not reviewed:** it lives outside the repository; the tool reads it through `-geoReviewLattice` once exported |
 | **G2** | Target adoption: owner review of §4 against G0 numbers and G1 images; choice of reference DEMs; answers to GEO-1, GEO-2, GEO-4, GEO-7 | G0, G1 | the target is reopened after evidence; that is the point | 99 Open Questions entries answered or explicitly deferred; §4 and §7 revised to v0.2 with approved and still-proposed parts separated |
 | **G3** | Upstream relief candidates, dump-first and standalone (the 3F phases method): compare §5.2 options (a)–(c) as fields with their ridge **and** valley skeletons; no wiring | G0, G1, GEO-2 | design scope grows; the frozen Stage 3 topology may prove incompatible with any good candidate | one candidate passes the M-series and D-d on ≥ 5 of 7 canonical seeds including a no-massif seed, keeps the land mask, adds no undeclared depression, and passes owner review of V2–V5 |
 | **G4** | Placement decision: a design document stating where the chosen mechanism lives, what unfreezes, the version bump and the re-audit cost | G3 | an unfreeze of Stage 2B or 3A–3C | owner approval (GEO-3); nothing implemented before it |
@@ -794,6 +935,19 @@ Run on 2026-10-18, Unity 6000.5.7f1 (Windows, batch mode), no editor open on the
 
 **Not run:** the EditMode test suite — no code changed. All outputs (images, reports, logs) live in the
 session scratchpad, outside the repository.
+
+**G0 and G1 (second pass, same day, same HEAD; GEO-6 (a)).** The two Editor files were authored, compiled
+with no error or warning, and run in the main checkout with no editor open on the project.
+
+| Check | Command | Result |
+|---|---|---|
+| G0, canonical seeds, two fresh processes | `-executeMethod GameDev.EditorTools.TerrainGenGeographyDump.DumpBatch -geoOut <scratch>` | exit 0 twice; `geography_report.txt` (MD5 `859708b2…`), `geography_metrics.json` (`587dce02…`) and the seven structure PNGs byte-identical; all seven `H4A` hashes PASS against item 19 |
+| G0 sweep | `… -geoSweep 1000:40 -geoOut <scratch>` | exit 0; 40 seeds in 875 s; S8 result equal to item 19 (§7.6) |
+| G1, canonical seeds, two fresh processes | `-executeMethod GameDev.EditorTools.GeometryFirstReview.RunBatch -geoReviewSeeds 110201,424242,20260905,7,1337,256,777 -geoReviewOut <scratch>` | exit 0 twice; 42 PNG and 7 JSON byte-identical; every lattice hash equals the pinned `H4A` hash. A first G1 run was discarded before these two: the opaque neutral texture made the ground specular and the contour ribbon half-hidden (both fixed, §3.6) |
+| Working tree | before the first run: copies and MD5 of `Overworld_Generator.unity` and its `.meta`, the four gitignored tile assets, the gitignored `Scenes/Overworld_Generator/` folder (lighting data, probes), `URP_Pipeline.asset`, `URP_Renderer.asset`, every `ProjectSettings/*.asset` and `packages-lock.json` | all 39 MD5s identical after four G0 and three G1 processes; `git status` adds only `TerrainGenGeographyDump.cs`, `GeometryFirstReview.cs` and their `.meta` beside this research's uncommitted documents |
+
+**Not run:** the EditMode suite — the pass adds two Editor files and changes no tested code. **Not
+reviewed:** E, which is not in the repository (§9 G1).
 
 ---
 

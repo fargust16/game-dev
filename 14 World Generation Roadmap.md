@@ -1,6 +1,6 @@
 # 14 World Generation Roadmap
 
-Version: 0.15
+Version: 0.16
 
 Status: Draft
 
@@ -153,7 +153,9 @@ What this changes in the order above: **nothing yet.** The research concludes th
 geography (a mountain system, lowland trunk valleys, relief on massif-free worlds, cliff coasts) is
 upstream of Stage 3F, which carves drainage into a coherent relief but cannot create one. The next steps
 it proposes are read-only and isolated — a geography metrics baseline (G0) and a heights-only
-Geometry-First Review tool (G1) — and each waits for the owner's go-ahead (GEO-6). Stage 3F research
+Geometry-First Review tool (G1). The owner approved both (GEO-6 (a), 2026-10-18) and both are built as
+Editor-only tooling; neither changes the order above. Their baseline (research record §7.6) is the
+evidence for the owner's review of the target (G2). Stage 3F research
 continues on the parts that survive any upstream decision (research record §6.3).
 
 ---

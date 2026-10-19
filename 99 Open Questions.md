@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.31
+Version: 0.32
 
 Status: Draft
 
@@ -140,6 +140,9 @@ By TerrainGen: the Stage 1 landmass owns the silhouette, coast and seabed, and S
 
 **May a road cross mountain terrain?**  
 **Yes — mountain terrain is traversable, not a hard obstacle.** The planner prefers cheaper ground (passes, contours, switchbacks) over a direct expensive climb and expresses that as price, not refusal; `MountainPenalty` / `MountainCost` stay soft and must not become `+Infinity` because the biome is Mountain. Only water / `+Infinity`, earthwork beyond `MaxCutDepth` / `MaxFillHeight`, and grade at or above `MaxWalkableGrade` block a route outright. `ExistingCorridorDiscount` is construction cost only and must never change passability. Reviewed and approved by the project owner 2026-08-31, from [WORLD_GENERATION_PIPELINE.md](unity/Assets/Plans/WORLD_GENERATION_PIPELINE.md) §3 «Roads are pathfinding, not lines … mountains (passes) — never straight through a mountain». Glossary: [90 Glossary](90%20Glossary.md) § Road Passability. Agent rule: [AGENTS.md](AGENTS.md) § Accepted Draft Decisions. **Approved but not Canonical:** the owner review required by `001 Documentation Standards` § Promotion Rules is granted and every other promotion requirement is met; what is missing is a host, because no Canonical document covers world generation and the document carrying the statement is Draft with unrelated content.
+
+**May the geography-first tooling — the metrics baseline G0 and the Geometry-First Review G1 — be built?**  
+**Yes, both** — answered (a) by the project owner on 2026-10-18 (GEO-6). Both are Editor-only and read-only: no production code, bake, production scene or frozen file changes, and every output lands outside `Assets`. Built the same day as `Editor/TerrainGenGeographyDump.cs` (G0) and `Editor/GeometryFirstReview.cs` (G1); measurements in [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §§3.6, 7.6, 10. The answer covers the tooling only: the target geography, the acceptance thresholds (GEO-7) and GEO-1 … GEO-5 stay open.
 
 
 ---
@@ -431,7 +434,7 @@ Research record: [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRA
 **GEO-2. Mountain budget. [before G3]** `WORLD_RELIEF_PRINCIPLES.md` §1 sets the T1 massif count at 1 per island (2 max), and Stage 2A accepts at most 2 axes 600 m apart, each needing a 200 m-half-width body 200 m clear of the coast — which in practice yields one unbranched massif (25 of 29 audited worlds) or none (4). Is the target one *connected, branched* mountain system (compatible with a count of 1 if T1 names the system), several separate ranges (the rule and the room both change), or the current single massif with richer realisation?
 - *Options:* (a) one branched system counted as one T1; (b) several separate T1 ranges; (c) keep the single massif and add relief only below it.
 - *Consequences:* (a) keeps the tier table's count and needs branching that production Stage 2B does not have — branch ranges exist only in the superseded belt model; (b) needs room the island lacks today (GEO-1) and the missing intermontane concept (3F preflight B2a/B2b); (c) leaves the single-dome failure mode in place on every massif world and does nothing for the four massif-free worlds in 29.
-- *No recommendation* until G0 has measured the baseline.
+- *No recommendation* until G0 has measured the baseline. *G0 has now measured it* (research record §7.6: one separate summit and no pass on the main divide on every canonical seed); a recommendation is not added here — the owner reviews G0 and G1 first (G2).
 
 **GEO-3. Where the mountain system lives. [after G3; decided in G4]** If the system grows beyond today's massif: (a) a revision of Stage 2B into a branched system; (b) a new positive stage composed after `H2`, as Stage 4A was; (c) a geography skeleton generating ridges and valleys together for the whole island, of which today's massif plus Stage 3A–3C is a special case.
 - *Consequences:* (a) moves every Stage 3 input; needs the 29-seed re-audit and a `GeneratorVersion` bump; (b) keeps frozen stages bit-identical but leaves the new ridges without their dual valleys, because Stage 3C derives valleys from the massif frame only; (c) coherent by construction and the largest change — it supersedes frozen Stage 3A–3C geometry through an owner-approved unfreeze.
@@ -447,12 +450,12 @@ Research record: [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRA
 - *Consequences:* (a) basins appear only as filled flats or dry hollows; (b) needs B4 (basin depth) and Stage 3F F2, plus inland water rendering, outside V0; (c) also changes the hydrology validator's ocean-outlet invariant.
 - *No recommendation.*
 
-**GEO-6. Geometry-first tooling. [before G0 and G1]** May the read-only geography metrics dump (G0) and the isolated, heights-only Geometry-First Review tool (G1) be built as Editor-only tooling? Neither changes production code, the bake, the production scene or a frozen file; both write outside `Assets`.
+**GEO-6. Geometry-first tooling. [before G0 and G1] — ANSWERED 2026-10-18: (a) build both** (project owner; moved to § Resolved Decisions; G0 and G1 built the same day). May the read-only geography metrics dump (G0) and the isolated, heights-only Geometry-First Review tool (G1) be built as Editor-only tooling? Neither changes production code, the bake, the production scene or a frozen file; both write outside `Assets`.
 - *Options:* (a) build both; (b) G0 only; (c) neither — keep top-down dumps only.
 - *Consequences:* (a) standard oblique and eye-level captures on a neutral material for every candidate; new Editor files to maintain; (b) numbers without views; (c) geography judged from top-down images, the gap the native preflight already recorded (M9).
 - *Agent recommendation:* (a).
 
-**GEO-7. Target and acceptance thresholds. [after G0]** Is the target geography of the research record §4 the accepted direction, and which of the proposed metrics of §7 become gates, with which thresholds? Until then every proposed target is reported, never gating.
+**GEO-7. Target and acceptance thresholds. [after G0 — G0 has run, baseline in the research record §7.6]** Is the target geography of the research record §4 the accepted direction, and which of the proposed metrics of §7 become gates, with which thresholds? Until then every proposed target is reported, never gating.
 - *Options:* (a) adopt after G0 and G1 evidence; (b) adopt now; (c) revise the target first.
 - *Agent recommendation:* (a).
 

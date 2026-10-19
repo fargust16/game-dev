@@ -1,6 +1,6 @@
 # 90 Glossary
 
-Version: 0.49
+Version: 0.50
 
 Status: Draft
 
@@ -892,7 +892,7 @@ Labels for the ways the code reads slope (handoff §19), unrelated to the Stage 
 
 ## Geometry-First Review
 
-**Proposed — owner review pending (GEO-6).** A diagnostic presentation of a terrain lattice for judging geography without materials: heights only, written into tiles that are never saved; a neutral material; no vegetation, props, roads, water surface, fog or post-processing; one fixed sun; a fixed camera set anchored on Stage 1 so captures of different algorithm versions on one seed are comparable; overlays for slope, contours, watersheds, drainage and declared structure. It reads any lattice (production `H4A`, a Stage 3F candidate, an experiment) and decides no height. It is not a bake mode and not a second terrain path. See [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §3.
+**Tooling approved (GEO-6 (a), 2026-10-18); built as `Editor/GeometryFirstReview.cs`.** A diagnostic presentation of a terrain lattice for judging geography without materials: heights only, written into tiles that are never saved; a neutral material; no vegetation, props, roads, water surface, fog or post-processing; one fixed sun; a fixed camera set anchored on Stage 1 so captures of different algorithm versions on one seed are comparable; overlays for slope, contours, watersheds, drainage and declared structure. It reads any lattice (production `H4A`, a Stage 3F candidate, an experiment) and decides no height. It is not a bake mode and not a second terrain path. Its camera set and presentation as built are in [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §3.6; the geography target it serves is still proposed. See §3.
 
 ---
 
