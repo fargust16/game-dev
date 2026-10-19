@@ -7,7 +7,9 @@
 [OVERWORLD_VISUAL_DIRECTION.md](OVERWORLD_VISUAL_DIRECTION.md) (look and surface intent),
 [HYDROLOGY_GENERATION_PLAN.md](HYDROLOGY_GENERATION_PLAN.md) (inland water),
 [PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md)
-(R1 implemented dump-first; the relief layer is not in this path yet).
+(R1, on this path since 2026-09-18 — §1),
+[GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) (research and proposals on the
+island's geography; changes nothing here).
 
 ---
 

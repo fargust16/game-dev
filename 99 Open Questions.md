@@ -1,16 +1,16 @@
 # 99 Open Questions
 
-Version: 0.30
+Version: 0.31
 
 Status: Draft
 
-Last Updated: 2026-10-17
+Last Updated: 2026-10-18
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md)
 
 ---
 
@@ -417,6 +417,43 @@ Research record: [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/
 **3F-25. Where E enters the bake. [production]** Where does E enter the production bake, and how does that keep one production terrain pipeline and one terrain authority (handoff §2; [AGENTS.md](AGENTS.md) § Accepted Draft Decisions, «Overworld terrain stack» and «Terrain guardrails»)? A dump-first stage 1 does not touch the bake and does not depend on this answer.
 - *Options:* (a) TerrainGen's Stage 3F computes E; `TerrainAuthorityField` keeps evaluating `H4A` for structural use, and the bake replaces the world lattice with E after `OverworldTerrainField.FromAuthority`, the way the sanctioned hydrology carve already lowers that lattice; (b) `TerrainAuthorityField` itself evaluates E; (c) a separate final-surface authority object.
 - *Consequences:* (a) TerrainGen stays the only authority and nothing flows back into it; in the same change `OverworldTerrainValidation` compares tiles with E, `GeneratorVersion` moves (3F-7), the bake's heightmap resolution (513 per tile) and `FieldResolution` (1025 per world) are tied in code — today they are two unconnected constants — the pending hydrology carve is re-examined because it would lower E (hydrology is outside the measured scope, handoff §22.6), and the statements noted under 3F-1 are updated. (b) conflicts with 3F-1 (a). (c) conflicts with "no second terrain authority" (handoff §2).
+- *Agent recommendation:* (a).
+
+## Terrain — Geography-first world shape
+
+Research record: [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) (2026-10-18). Production terrain is unchanged. These questions decide what geography the island is meant to have and where it is generated; they do not reopen the Stage 3F questions above, which keep their wording and owners. Tags name the roadmap step of the research record §9 that the answer must precede. A recommendation is not a decision.
+
+**GEO-1. Geographic scale. [before G2]** Must the target geography — a connected mountain system with several ridges, passes, foothills, lowland corridors and varied coasts — fit the locked V0 world (2800 × 2800 m; land 32–40 % of it, measured 2.61–3.16 km²; inscribed radius 410–781 m; 54–59 % of the land within 200 m of the coast)? Linked to the existing Exploration question on the V1 overworld size; this one asks only whether geography is a reason to answer it now.
+- *Options:* (a) fit the V0 world, using game-scale compression; (b) grow the world or the land fraction before geography work; (c) decide after G3 shows what fits.
+- *Consequences:* (a) one connected system with two to four major ridges looks plausible; two separate ranges with an intermontane basin do not fit the current Stage 2A rules; (b) moves Stage 1 golden hashes and every downstream tuning, and touches the locked V0 defaults in [17](17%20Game%20Systems%20Architecture.md); (c) G3 runs on today's footprint and may answer (a) by measurement.
+- *Agent recommendation:* (c).
+
+**GEO-2. Mountain budget. [before G3]** `WORLD_RELIEF_PRINCIPLES.md` §1 sets the T1 massif count at 1 per island (2 max), and Stage 2A accepts at most 2 axes 600 m apart, each needing a 200 m-half-width body 200 m clear of the coast — which in practice yields one unbranched massif (25 of 29 audited worlds) or none (4). Is the target one *connected, branched* mountain system (compatible with a count of 1 if T1 names the system), several separate ranges (the rule and the room both change), or the current single massif with richer realisation?
+- *Options:* (a) one branched system counted as one T1; (b) several separate T1 ranges; (c) keep the single massif and add relief only below it.
+- *Consequences:* (a) keeps the tier table's count and needs branching that production Stage 2B does not have — branch ranges exist only in the superseded belt model; (b) needs room the island lacks today (GEO-1) and the missing intermontane concept (3F preflight B2a/B2b); (c) leaves the single-dome failure mode in place on every massif world and does nothing for the four massif-free worlds in 29.
+- *No recommendation* until G0 has measured the baseline.
+
+**GEO-3. Where the mountain system lives. [after G3; decided in G4]** If the system grows beyond today's massif: (a) a revision of Stage 2B into a branched system; (b) a new positive stage composed after `H2`, as Stage 4A was; (c) a geography skeleton generating ridges and valleys together for the whole island, of which today's massif plus Stage 3A–3C is a special case.
+- *Consequences:* (a) moves every Stage 3 input; needs the 29-seed re-audit and a `GeneratorVersion` bump; (b) keeps frozen stages bit-identical but leaves the new ridges without their dual valleys, because Stage 3C derives valleys from the massif frame only; (c) coherent by construction and the largest change — it supersedes frozen Stage 3A–3C geometry through an owner-approved unfreeze.
+- *No recommendation* before G3 measures candidates. Ridges and valleys must be designed as duals under any option (`PROCEDURAL_TERRAIN_STAGE_3_DESIGN.md` §3.1).
+
+**GEO-4. Coast contract. [before Stage 4C and G6]** Every relief term today is exactly zero at and seaward of the shore and gated over the 200 m coastal rise, so the land meets the sea on one gentle profile everywhere. The reference shows cliff coasts, terraced coves and headlands. Should relief be allowed to rise steeply immediately inland of an unchanged shoreline?
+- *Options:* (a) keep the gate; coastal character only within it (Stage 4C as designed); (b) allow steep relief just inland of the shore with the land mask bit-identical; (c) allow the shoreline itself to move (a Stage 1 reopening).
+- *Consequences:* (a) no sea cliffs or headlands; (b) a new coastal contract and new tests that the mask does not move; road, POI and settlement siting near the shore must be re-measured; (c) moves golden hashes and every downstream input.
+- *No recommendation.*
+
+**GEO-5. Basin and inland-water policy for the geography target. [before G6]** The hydrology design, whose MVP the owner approved on 2026-09-03 ([HYDROLOGY_GENERATION_PLAN.md](unity/Assets/Plans/HYDROLOGY_GENERATION_PLAN.md) §§1, 9, 17), routes every river system to the ocean and fills every closed depression to its spill level (no endorheic basin); V0 water is ocean only. Does the geography target keep that, or does it include lakes in declared basins, endorheic basins, or both? This sits beside 3F-10, 3F-11 and 3F-14 and does not answer them.
+- *Options:* (a) keep fill-then-spill and ocean outlets; (b) lakes in declared basins with outlets; (c) also endorheic basins.
+- *Consequences:* (a) basins appear only as filled flats or dry hollows; (b) needs B4 (basin depth) and Stage 3F F2, plus inland water rendering, outside V0; (c) also changes the hydrology validator's ocean-outlet invariant.
+- *No recommendation.*
+
+**GEO-6. Geometry-first tooling. [before G0 and G1]** May the read-only geography metrics dump (G0) and the isolated, heights-only Geometry-First Review tool (G1) be built as Editor-only tooling? Neither changes production code, the bake, the production scene or a frozen file; both write outside `Assets`.
+- *Options:* (a) build both; (b) G0 only; (c) neither — keep top-down dumps only.
+- *Consequences:* (a) standard oblique and eye-level captures on a neutral material for every candidate; new Editor files to maintain; (b) numbers without views; (c) geography judged from top-down images, the gap the native preflight already recorded (M9).
+- *Agent recommendation:* (a).
+
+**GEO-7. Target and acceptance thresholds. [after G0]** Is the target geography of the research record §4 the accepted direction, and which of the proposed metrics of §7 become gates, with which thresholds? Until then every proposed target is reported, never gating.
+- *Options:* (a) adopt after G0 and G1 evidence; (b) adopt now; (c) revise the target first.
 - *Agent recommendation:* (a).
 
 ---

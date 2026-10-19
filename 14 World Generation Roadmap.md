@@ -1,10 +1,10 @@
 # 14 World Generation Roadmap
 
-Version: 0.14
+Version: 0.15
 
 Status: Draft
 
-Last Updated: 2026-09-18
+Last Updated: 2026-10-18
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
@@ -132,6 +132,29 @@ contract: `unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_4_ISLAND_RELIEF_DESIGN.md
 **Next:** Stage 3F (the structural valley carve, `H = H4A − C3F`), then Stage 4B/4C. Stage 3D/3E keep
 declaring their basins and outlets on `StructuralElevation` (`H2`) — the surface they were frozen
 against — so Stage 3F is what reconciles the two levels.
+
+---
+
+# Geography-first research (2026-10-18) — proposals, nothing approved
+
+The baked island reads as a flat island with one convex elevation, and that is what the production
+composition produces: `H1` is a function of coast distance only (a 24 → ~73 m dome), `U2` is at most one
+unbranched massif (none on 4 of 29 audited worlds), and Stage 4A adds bounded floor relief with no
+ridge, valley or second high region. Ridges, valleys and basins exist only as Stage 3 structure or in the
+experimental Stage 3F carve. Measured on seed 110201: land p50 58 m, p90 108 m, ~10 % of land above
+110 m; ~90 % of the bake time is TerrainGen evaluation, so a neutral review material is a legibility
+change, not a speed change.
+
+Research record, target geography, stage responsibility map, acceptance suite and experiment roadmap:
+`unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md`. Owner questions: [99 Open Questions](99%20Open%20Questions.md)
+§ Terrain — Geography-first world shape (GEO-1 … GEO-7).
+
+What this changes in the order above: **nothing yet.** The research concludes that most of the missing
+geography (a mountain system, lowland trunk valleys, relief on massif-free worlds, cliff coasts) is
+upstream of Stage 3F, which carves drainage into a coherent relief but cannot create one. The next steps
+it proposes are read-only and isolated — a geography metrics baseline (G0) and a heights-only
+Geometry-First Review tool (G1) — and each waits for the owner's go-ahead (GEO-6). Stage 3F research
+continues on the parts that survive any upstream decision (research record §6.3).
 
 ---
 

@@ -35,6 +35,13 @@ bigger, which is free scale for nothing.
 | **T2 Plateau** | Climbable shelf. Districts, view points, settlement ground. | 18–40 m | 150–450 m | **6–10** |
 | **T3 Outcrop** | Reference detail. Cover, silhouette, "that rock". | 5–12 m | 40–90 m | **12–20** |
 
+**Under review 2026-10-18 — the T1 count.** The geography-first research reads the target as a
+connected mountain system with several major ridges and passes, not a single lens massif, and asks
+whether "1 (2 max)" counts that system as one T1 or must change
+([99 Open Questions](../../../99%20Open%20Questions.md) GEO-2;
+[GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §4). Until the owner answers,
+the row above stands as written.
+
 **The separation rule: adjacent tiers must differ by at least 2.5× in height.** T2 tops out at 40 m,
 T3 tops out at 12 m — a 3.3× gap. Anything that lands between the tiers muddies both and is
 forbidden. This is the rule the terrace stage broke: it produced ~1.7 m steps everywhere, which is

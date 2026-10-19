@@ -531,6 +531,16 @@ under 1.1 s on everything Unity-side (heights 37 ms, derived fields 164 ms, alph
 deterministic; it is also the only part of the bake worth optimising, and any optimisation must keep
 the pinned TerrainGen field hash.
 
+**Re-measured 2026-10-18 on the `H4A` authority** (seed 110201, fresh batch process, signature
+`656405ea477a`): authority 22 876 ms of a 25 304 ms surface step (90 %); heights 35, derived 158,
+alphamaps 539, trees 49, details 245 ms. The TerrainGen-only dump evaluates the identical `H4A` (same
+hash) in ~15 s — Stage 1 + 2A + 2B fields 7.4 s, Stage 4A build 6.8 s, relief lattice 0.7 s — so roughly
+8 s of the authority time is the per-vertex point-query pass in `OverworldTerrainField.FromAuthority`,
+which recomputes the signed coast distance at every vertex instead of reusing Stage 1's lattice (derived
+by subtraction, not instrumented). Detail and context:
+[GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §2. No optimisation is
+proposed there; the hash rule above still binds any later one.
+
 ## 17. Terrain surface textures need a licence check
 
 The five canonical layers use textures in `Assets/Art/Terrain/SurfaceLayers/`, carried over from the
@@ -736,3 +746,21 @@ stage once (99 Open Questions 3F-8, corrected in v0.30). Fix it the next time `C
 touched — it is a production-code change and is not made from documentation work.
 
 Open decisions: [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Stage 3F valley carve.
+
+---
+
+## 22. OPEN — stale Stage 4A status text in code
+
+Found by the geography-first audit (2026-10-18). Both describe the state before 2026-09-18, when Stage 4A
+became the production authority; neither affects a computed value.
+
+- `World/TerrainGen/IslandElevation.cs` `<remarks>`: "`TerrainAuthorityField` does not call it until
+  Stage 4A has passed its own acceptance; the production height is still `StructuralElevation.At`."
+  `TerrainAuthorityField.HeightAt` and `Sample` evaluate `IslandElevation` today.
+- `Editor/TerrainGenIslandReliefDump.cs` report header: "NOT connected to TerrainAuthorityField:
+  production heights are still StructuralElevation (H2)." Printed on every Stage 4A dump, including the
+  2026-10-18 run whose `H4A` hashes equal the production ones.
+
+Fix both the next time those files are touched; this is a code change and is not made from
+documentation work (same treatment as the `CarvedElevation` note under item 21). Record:
+[GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §8.

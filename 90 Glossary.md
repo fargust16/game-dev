@@ -1,16 +1,16 @@
 # 90 Glossary
 
-Version: 0.48
+Version: 0.49
 
 Status: Draft
 
-Last Updated: 2026-10-17
+Last Updated: 2026-10-18
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md)
 
 ---
 
@@ -881,6 +881,18 @@ How Unity serves the height between heightmap nodes, measured (handoff §18): no
 ## Slope Reading
 
 Labels for the ways the code reads slope (handoff §19), unrelated to the Stage 3F research requirements D1–D3: **T** — the served triangle's gradient (collider, `CharacterController`); **D2** — `TerrainData.GetInterpolatedNormal` (Sobel vertex normals, tile-local; `OverworldTerrainSampler.SampleSlope01`, biome); **D3** — `OverworldTerrainField.SlopeDegreesAt` (central differences, 5.47 m base; surface and vegetation rules); **D4** — `LandscapeCostField`'s 10 m slope (road cost, POI site scoring); **D5** — TerrainGen diagnostics (`WorldHeightField.Slope01`, `Stage3Field.Reachable`); **D6** — `OverworldTerrainDiagnostics` reachability (per-axis node steps, passes faces up to 54.7°); **D7** — the analytic `H4A` gradient. **Proposed:** only T decides a character's walkability, an object's footing, spawn or a character's access gating; D2, D3, D6 and D7 never do, and D4 keeps only its own uses, road cost and POI site scoring (3F-19). Road passability is not affected: it stays under the approved **Road Passability** contract.
+
+---
+
+## Geographic Hierarchy
+
+**Proposed — owner review pending.** The levels the overworld's geography is described and checked in, each caused by and placed relative to the level above it: **level 0** island footprint, **level 1** relief regions (highlands, uplands, lowland plains and corridors), **level 2** mountain system (main divide, culminations, saddles, major and subsidiary ridges, spur-toe foothills), **level 3** valley and drainage system, **level 4** landforms (plateaus, escarpments, outcrops, knolls, basins), **level 5** coast, **level 6** water. Not a set of generators and not a new terrain authority: a vocabulary for what TerrainGen's stages must jointly produce, with relationship rules such as "one divide tree", "valleys are complements of ridges" and "coasts are caused by what stands behind them". Its **single-dome failure** is an island whose height is essentially a function of coast distance plus one mound. Distinct from the relief *tiers* T1–T3 of `WORLD_RELIEF_PRINCIPLES.md`, which classify forms by height and footprint, and from the heights `H1`, `H2`, `H4A`, which are surfaces, not levels. See [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §4 and [99 Open Questions](99%20Open%20Questions.md) GEO-2, GEO-7.
+
+---
+
+## Geometry-First Review
+
+**Proposed — owner review pending (GEO-6).** A diagnostic presentation of a terrain lattice for judging geography without materials: heights only, written into tiles that are never saved; a neutral material; no vegetation, props, roads, water surface, fog or post-processing; one fixed sun; a fixed camera set anchored on Stage 1 so captures of different algorithm versions on one seed are comparable; overlays for slope, contours, watersheds, drainage and declared structure. It reads any lattice (production `H4A`, a Stage 3F candidate, an experiment) and decides no height. It is not a bake mode and not a second terrain path. See [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §3.
 
 ---
 

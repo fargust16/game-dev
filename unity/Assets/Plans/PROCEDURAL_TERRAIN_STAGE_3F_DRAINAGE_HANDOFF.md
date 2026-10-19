@@ -1,11 +1,11 @@
 # Procedural Terrain — Stage 3F Drainage and Valley Carve, Research Handoff
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft — research record. Nothing in it is an approved design decision; §22 is a set of
 proposed contracts awaiting owner review.
 
-Last Updated: 2026-10-17
+Last Updated: 2026-10-18
 
 Depends On:
 [PROCEDURAL_TERRAIN_STAGE_3_DESIGN.md](PROCEDURAL_TERRAIN_STAGE_3_DESIGN.md),
@@ -17,7 +17,8 @@ Referenced By:
 [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Stage 3F valley carve,
 [90 Glossary](../../../90%20Glossary.md) § Final Terrain Surface and the terms after it,
 [AGENTS.md](../../../AGENTS.md) § Proposed Decisions Awaiting Owner Review,
-[OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) item 21
+[OVERWORLD_TECH_DEBT.md](OVERWORLD_TECH_DEBT.md) item 21,
+[GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §6
 
 ---
 
@@ -38,7 +39,7 @@ Referenced By:
 
 Methods shared by phases 2–4: §12; phases 5–6 reuse them (§15, §16); phases 7–10 state their own
 (§§18–21). Proposed contracts: §22. Current position and open decisions: §23 (§13 is the position
-after phase 4, §17 after phase 6). Reading order: §8.
+after phase 4, §17 after phase 6). Place in the geography-first programme: §24. Reading order: §8.
 Production code, public API, tests, Stage 4A, the frozen Stage 1–3E files and the Stage 3C
 trajectories are unchanged through all ten phases.
 
@@ -1011,3 +1012,27 @@ walls should stop a jumping player is a game-design decision (99 Open Questions,
   redesign (3F-16), vertex passages and the uncertain zone (3F-23), descent-only links (3F-24).
 - Options, consequences and recommendations for each: [99 Open Questions](../../../99%20Open%20Questions.md)
   § Terrain — Stage 3F valley carve.
+
+## 24. Stage 3F within the geography-first programme, 2026-10-18
+
+A geography-first audit ([GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md))
+read this record against the island the project wants: a mountain system with ridges, passes, foothills,
+lowland valleys and varied coasts. It changes no measurement, proposal or question here. What it adds:
+
+- **Stage 3F should carve drainage into a coherent relief, not create one.** It is subtractive and
+  bounded and cuts along frozen Stage 3C trajectories derived from one massif. Of the issues this record
+  measured, four are failures of that declared geometry against the relief — the 36 route closures of
+  `H4A`, B10's unsatisfiable S11-T, the thalweg outside the corridor (§11) and no valleys on massif-free
+  worlds (B8) — and the massif-foot depressions are a relief landform. Those belong upstream
+  (99 Open Questions GEO-2, GEO-3); the carve-made depressions, `SmoothMax`, the trough profile,
+  confluences and the `U2`/`R4A` factorisation stay Stage 3F's (research record §6.1).
+- **Scope while the upstream question is open** (research record §6.3): continue what survives any
+  upstream decision — the plan-view oracle (3F-2, 3F-3), the band-local correction (3F-5), the final
+  surface and point-query contract (3F-1, 3F-6, 3F-25), the walking contract (3F-18, 3F-19); hold
+  trajectory-bound tuning (3F-12, 3F-13, 3F-15) until GEO-3 is answered.
+- **One added exit criterion, proposed:** re-run the E-family acceptance on the first accepted upstream
+  relief before any production design of Stage 3F.
+- **Owner-only questions re-verified** against 99 Open Questions v0.30 on 2026-10-18: 3F-10, 3F-11 and
+  3F-14 [stage 1], the arc-class coverage in 3F-4 [stage 1] and 3F-20 [production] remain the owner's
+  call with no recommendation; the research record §6.4 lists, for each, an experiment that would
+  narrow it without deciding it.
