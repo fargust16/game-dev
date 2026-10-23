@@ -35,12 +35,30 @@ bigger, which is free scale for nothing.
 | **T2 Plateau** | Climbable shelf. Districts, view points, settlement ground. | 18–40 m | 150–450 m | **6–10** |
 | **T3 Outcrop** | Reference detail. Cover, silhouette, "that rock". | 5–12 m | 40–90 m | **12–20** |
 
-**Under review 2026-10-18 — the T1 count.** The geography-first research reads the target as a
-connected mountain system with several major ridges and passes, not a single lens massif, and asks
-whether "1 (2 max)" counts that system as one T1 or must change
-([99 Open Questions](../../../99%20Open%20Questions.md) GEO-2;
-[GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §4). Until the owner answers,
-the row above stands as written.
+~~**Under review 2026-10-18 — the T1 count.**~~ **Resolved 2026-10-21 — the T1 count (GEO-2 (a), owner
+direction from the approved target D6).** T1 names the island's **mountain system**: one connected,
+branching system with a main divide, several culminations, branch ridges, spurs and passes counts as **one
+T1**. Its culminations and ridges are parts of that one form, not separate T1s; the 2.5× separation rule is
+a rule between tiers and is not applied among them. The row is unchanged: count 1 (2 max) — D6's target is
+one dominant system — and its heights and footprint are a provisional Draft classification, not a production
+gate and not re-measured against D6 ([99 Open Questions](../../../99%20Open%20Questions.md) GEO-2;
+[GEOGRAPHY_POST_G3C_REVIEW.md](GEOGRAPHY_POST_G3C_REVIEW.md) §2.2). Research note: G3c's systems topped out at
+253–308 m above sea level, near or below the 250 m floor in relief above local ground; whether D6's
+dominant mountains need more of the 700 m budget is measured on the next model, not settled by this row.
+
+**Plateaus in the approved target — principle resolved 2026-10-21, contract proposed (GEO-8).** The owner
+approved the target geography D6 ([GEOGRAPHY_TARGET_BRIEF_G2.md](GEOGRAPHY_TARGET_BRIEF_G2.md) §9): one
+dominant branching mountain system and several large plateaus integrated into ridges and foothills, with
+readable tops and cliff or escarpment edges; on 2026-10-21 the owner added that traversal is mixed. Such
+plateaus may exceed the T2 row (18–40 m) and fall between T2 and T1. **Resolved (owner direction):** a
+geography candidate is not rejected solely for that, and a tier label never decides traversal — whether a
+face blocks the player is read from steepness and walking connectivity and decided under 3F-20.
+**Proposed, not decided:** keep the T2 row for district-scale shelves and treat a large plateau as a
+region-level form outside this table, separated from T1 by form and subordinate to the mountain system, with
+the 2.5× rule applying to forms standing on it (GEO-8 option (c); 90 Glossary § Large Plateau). Its numbers
+are research items. **For production design the table and the 2.5× rule stand as written** until this
+document is deliberately revised ([99 Open Questions](../../../99%20Open%20Questions.md) GEO-8;
+[GEOGRAPHY_POST_G3C_REVIEW.md](GEOGRAPHY_POST_G3C_REVIEW.md) §2.7).
 
 **The separation rule: adjacent tiers must differ by at least 2.5× in height.** T2 tops out at 40 m,
 T3 tops out at 12 m — a 3.3× gap. Anything that lands between the tiers muddies both and is
@@ -100,7 +118,10 @@ V0 water is the ocean plane only, so this section is a **constraint on shapes we
 feature list:
 
 1. Every slope must drain somewhere. A closed basin with no outlet is a bug unless it is a lake, and
-   we have no lakes in V0 — so no closed basins.
+   we have no lakes in V0 — so no closed basins. *Basin policy for the geography target (GEO-5 (b),
+   2026-10-21):* a lake may exist only in a **declared basin** — an enclosure the geography declares, with
+   a spill point and one outlet to the ocean; any undeclared closed depression stays a defect, and there
+   are no endorheic basins (90 Glossary § Declared Basin). V0 water is still the ocean only.
 2. **Scarps are future waterfall sites.** A waterfall forms where flow crosses a hard/soft boundary —
    exactly our plateau edges. So plateau rim heights must **vary**: a set of shelves all at the same
    altitude gives every future waterfall the same drop and reads as a tiled asset.
@@ -155,6 +176,16 @@ obstacle course.
 
 Measured by `OverworldTerrainDiagnostics` on every bake. A change that breaks one of these is a
 regression regardless of how it looks in a screenshot.
+
+**GEO-7 — classification resolved 2026-10-21 (owner direction).** For the geography target, hard gates
+are the requirements with direct gameplay or topological meaning (settlement and POI capacity, routes
+between regions, reachability, no accidental topological defects, rivers to designated outlets), the
+owner's review at three scales judges composition, and morphology figures are diagnostics; flat land is
+never rewarded for its own sake. So the "≥ 35 % under 5°" and "6–15 % steeper than 45°" rows below are
+**not** targets for geography candidates; reachability stays a gate there (exceptions declared, 3F-20)
+([99 Open Questions](../../../99%20Open%20Questions.md) GEO-7;
+[GEOGRAPHY_POST_G3C_REVIEW.md](GEOGRAPHY_POST_G3C_REVIEW.md) §2.6). **For production bakes of today's
+`H4A`, this table keeps its role as a regression check, as written.**
 
 | Criterion | Threshold | Reported by |
 |---|---|---|

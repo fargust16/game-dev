@@ -1,10 +1,10 @@
 # 14 World Generation Roadmap
 
-Version: 0.16
+Version: 0.30
 
 Status: Draft
 
-Last Updated: 2026-10-18
+Last Updated: 2026-10-24 (G3e Step 1 ended not ready; report accepted, Step 1 closed. 2026-10-23: LMC named G3e; C8, C9 decided. LMC specification v0.4 approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC Step 1 readiness check; design note approved as the research plan. Earlier: LMC technical specification approved; Step 1 not authorised. Earlier: checked on G3c data. 2026-10-21: LMC design note v0.2, the owner's revision; post-G3c review: GEO decisions, model research plan; G3c results; G2 review)
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
@@ -147,7 +147,7 @@ change, not a speed change.
 
 Research record, target geography, stage responsibility map, acceptance suite and experiment roadmap:
 `unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md`. Owner questions: [99 Open Questions](99%20Open%20Questions.md)
-§ Terrain — Geography-first world shape (GEO-1 … GEO-7).
+§ Terrain — Geography-first world shape (GEO-1 … GEO-8).
 
 What this changes in the order above: **nothing yet.** The research concludes that most of the missing
 geography (a mountain system, lowland trunk valleys, relief on massif-free worlds, cliff coasts) is
@@ -157,6 +157,111 @@ Geometry-First Review tool (G1). The owner approved both (GEO-6 (a), 2026-10-18)
 Editor-only tooling; neither changes the order above. Their baseline (research record §7.6) is the
 evidence for the owner's review of the target (G2). Stage 3F research
 continues on the parts that survive any upstream decision (research record §6.3).
+
+**G3, 2026-10-19 — research, commissioned by the owner before GEO-2 was answered** (research record §11).
+One candidate tested the hypothesis "a connected branched mountain system, designed with its valleys,
+fits the current island": a skeleton built from Stage 1's coast geometry (spine, two branches, spurs)
+replaces the Stage 2B massif and its apron, valleys are carved between the spurs to a monotone floor, and
+everything is an uncommitted Editor-only research dump measured with G0 and G1 against production `H4A`.
+On all seven canonical seeds, the three massif-free ones included: two or three culminations, one or two
+saddles, single-dome flag 5/7 → 0/7, land above 110 m 22.6–29.7 %, no depression, land mask and ocean
+unchanged, deterministic across processes. Not achieved: a drainage network (Strahler ≤ 2, as before), a
+lowland corridor, and flat land (12–16 % below 5°, against 25–54 % today). Production, the bake, the
+scene, frozen stages and every pinned hash are unchanged. **Proposed next (isolated, needs no owner
+decision): G3b**, a converging valley network on the same skeleton; GEO-1 … GEO-5 and GEO-7 stay open,
+and G3 approves no architecture.
+
+**G3b, 2026-10-19 … 20 — research** (research record §12): a converging valley tree on the G3 skeleton gives
+every seed a lowland corridor and doubles tributaries, but Strahler stays 2 on all seven, land below 5° is
+15–17 % and 12 shallow S8 depressions appear on four seeds; ~~the limit is the footprint and the coast gate
+(GEO-1, GEO-4), not valley topology~~ **[corrected 2026-10-20]** the measured limits are the coastal
+transition (the gated coast-distance ramp) and the construction; the footprint was not varied and is a
+hypothesis (research record §13.2). The next step was the owner's review (G2), not another candidate.
+Production and every pinned hash are unchanged.
+
+**G2, 2026-10-20 — owner review** ([GEOGRAPHY_TARGET_BRIEF_G2.md](unity/Assets/Plans/GEOGRAPHY_TARGET_BRIEF_G2.md)).
+The owner approved the **target geography D6** from a concept image
+([`References/G2_target_island_concept_2026-10-20.webp`](References/G2_target_island_concept_2026-10-20.webp) — a
+project reference inspired by DragonSword: Awakening's visual direction, not an official map): a regional
+geography with a dominant branching mountain system, several plateaus integrated into ridges and
+foothills, barriers and routes designed together, deliberate valleys, lowlands and plains, rivers to
+designated outlets, coasts caused by their hinterland, room for 3–5 settlements and many POIs, judged at
+island, regional and player scale. A G2 diagnostic found **no coastal settlement site on any surface
+measured, production `H4A` included** (brief §4.2). **Next: G3c** — research only, region-first, on two
+footprints (today's, and about 40 % more land in the same 2.8 km world), each with a fixed shoreline and a
+coastal profile that varies by segment; method, parameters, metrics and the comparison rule are fixed in
+brief §8.3 before any run, and ~~**the run awaits the owner's go-ahead**~~ the owner gave the go-ahead the same day (G3c ran, next paragraph). G3c compares two specific
+contours; coastline variety and the separation of area from shape are a later stage (G3d). What this changes in the order
+above: still nothing — production stays `H4A`, and the placement decision (G4, GEO-3) comes after G3c.
+
+**G3c, 2026-10-20 … 21 — ran on the owner's go-ahead** (research record
+[§14](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md); Editor-only, uncommitted research code). A
+region-first construction — regions on the fixed land mask, a drainage tree grown from designated outlets,
+a surface rising from rivers and shore, a highland envelope, composed plateaus, a per-segment coastal
+profile — was calibrated on seeds 110201 and 1337, frozen, and evaluated on ten held-out seeds over
+contour A (today's, 2.83 km²) and contour B (3.82 km², +35 %, also a different shape). **Neither contour
+passed** the pre-registered rule: A met every reading R1–R8 on 2 of 10 seeds, B on none; B added 31–43 %
+buildable lowland but with worse hygiene, so it is not a material improvement. By the rule, **the world
+is not grown on this evidence.** What held on all twenty lattices: a capital plus four further settlement
+sites, at least one coastal — against none on any surface in G2. What failed: R3 (merged buildable
+patches), R5 (the hydrology planner's own validation), R7 on B (climbing river axes), R1 (a single
+summit); visually, whale-back ridges on A, drum-like plateaus and planar facets on both. **Next: the
+owner's review of G3c** (research record §14.11) before any further experiment. What this changes in the
+order above: nothing — production stays `H4A`, and every pinned hash is unchanged.
+
+**Post-G3c review, 2026-10-21** ([GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md);
+documentation only). G3c is recorded as completed research that failed acceptance — not proof that
+region-first geography is invalid, not evidence that land area limits anything. Its lessons: distance-field
+surfaces give facets and whale-backs, overlay plateaus read as drums, class-switched coasts give a continuous
+cliff band. Decisions, with statuses: **GEO-1 resolved** (owner direction) — no resizing on this evidence,
+today's footprint is the baseline for further research, a revisit trigger is recorded, a 3 × 3 world stays a
+travel-pacing decision; **GEO-2 resolved** — one branching mountain system counts as one T1; GEO-3 research
+continues under option (c), production placement still at G4; GEO-4 — varied, hinterland-caused coasts are
+the target, the production contract is open; GEO-5 — lakes only in declared basins with one outlet; GEO-7 —
+hard gates are gameplay and topological requirements, composition is judged in the owner's review,
+morphology metrics are diagnostics; GEO-8 — a candidate is never rejected only for exceeding the T2 row,
+tier labels never decide traversal, and a region-level **Large Plateau** form is proposed; **GEO-9** added
+(geography provides regions and candidate areas; placement chooses sites and never reshapes terrain to meet
+a count). **Next, awaiting the owner:** an isolated comparison of two landform syntheses — structure fields
+with a fluvial steady state, and a generalised skeleton strip partition — on one shared typed-region layout,
+contour A only (provisional label *LMC*). G3d comes after a promising model. What this changes in the order
+above: nothing — production stays `H4A`.
+
+**LMC step 0, 2026-10-21.** The owner approved the pair **S-LM3 + S-LM1 on one shared LM2 region layout**,
+and the comparison's design note is written
+([GEOGRAPHY_LMC_DESIGN_NOTE.md](unity/Assets/Plans/GEOGRAPHY_LMC_DESIGN_NOTE.md)), and the owner revised it
+the same day (v0.2; v0.3 extends R5 to designated outlets on the owner's decision; the note governs): contour A only; calibration 110201 and 1337, held-out 1005–1014; one LM2
+layout per seed shared by both syntheses; hard gates R4, R5, R7, R8, R9, R10; indirect indicators R1, R2, R6;
+Q1–Q9 for the G3c failure modes; a blinded review at three scales; a method passes only with all hard gates and
+the owner's composition acceptance each on ≥ 7 of 10 held-out seeds. Seven explicit owner decisions (its §12)
+come before any code, including a metrics specification and the S-LM3 model contract. Production stays `H4A`.
+
+**LMC technical specification, 2026-10-22.** The owner supports the design note as the research direction and has not
+authorised code or calibration. The specification
+([GEOGRAPHY_LMC_TECHNICAL_SPEC.md](unity/Assets/Plans/GEOGRAPHY_LMC_TECHNICAL_SPEC.md)) fixes the elevation definitions
+(world-height datum), the S-LM3 model contract, the S-LM1 ownership rule, the gate and Q1–Q9 calculations and their
+review-flag levels, and was checked on G3c's twenty historical lattices and on analytic surfaces with read-only
+scripts — no generation. 10 of 13 pre-registered checks held; three failed expectations led to corrections of the
+plateau edge height, the route-detour metric and the flag policy (K1–K3). ~~Next: the owner's approval of the
+specification, then the Step 1 go-ahead as a separate decision.~~ **Approved by the owner the same day** (§12 items
+1–4: world-height datum, K1, the S-LM3 contract as an experimental model, gates with K2, the flag levels, layout
+validation, the S-LM1 ownership rule). Next: the Step 1 go-ahead, still not given. Production stays `H4A`.
+
+**LMC Step 1 readiness, 2026-10-22.** The owner approved the design note (v0.5) as the research plan, kept Step 1 as a
+separate stage that needs explicit authorisation, and kept LMC as the working name (the official ID is chosen before
+implementation). The readiness check
+([GEOGRAPHY_LMC_STEP1_READINESS.md](unity/Assets/Plans/GEOGRAPHY_LMC_STEP1_READINESS.md)) found four items to settle
+first — R8 covers only verified plateau tops where the plan asks for every designated top; no verified detector for
+the whale-back; no diagnostic for slope clustering at a cap; no reference values yet on G3c's calibration grids for
+the continuity check — and lists eight conditions (C1–C8) for the authorisation. Production stays `H4A`.
+*2026-10-23:* conditions C2–C5 prepared with read-only checks on existing G3c data — amendments A1 (R8) and A3 (slope
+diagnostics) proposed for approval, the whale-back measure failed its check (option (b), judging it in the review, is
+recommended), the calibration-grid reference recorded; a ninth condition (C9) asks where the reference data is kept.
+The owner then approved A1 and A3 and chose option (b) — the specification is v0.4, and the whale-back is judged in the
+visual review. ~~Open before Step 1: the official ID (C1), the commit policy (C8) and the reference data (C9).~~ Decided the
+same day: the experiment is **G3e** (working name LMC); its code is not committed during Step 1 (the commit question
+returns before the freeze); the reference data is kept outside the repository at
+`D:\Hobby\game-dev\research-data\lmc-reference\`. ~~Only the explicit Step 1 authorisation remains.~~ Step 1 was authorised on 2026-10-23 and **ended not ready** on 2026-10-24 after eleven calibration runs: no synthesis passes every hard gate on the calibration seeds, so there is no freeze and no held-out evaluation ([GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md](unity/Assets/Plans/GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md)). The owner accepted the report and closed Step 1. Production terrain is unaffected.
 
 ---
 

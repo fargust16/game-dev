@@ -1,16 +1,16 @@
 # 90 Glossary
 
-Version: 0.50
+Version: 0.52
 
 Status: Draft
 
-Last Updated: 2026-10-18
+Last Updated: 2026-10-21 (Large Plateau proposed; Declared Basin; Geographic Hierarchy after the post-G3c review)
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md)
 
 ---
 
@@ -886,7 +886,19 @@ Labels for the ways the code reads slope (handoff §19), unrelated to the Stage 
 
 ## Geographic Hierarchy
 
-**Proposed — owner review pending.** The levels the overworld's geography is described and checked in, each caused by and placed relative to the level above it: **level 0** island footprint, **level 1** relief regions (highlands, uplands, lowland plains and corridors), **level 2** mountain system (main divide, culminations, saddles, major and subsidiary ridges, spur-toe foothills), **level 3** valley and drainage system, **level 4** landforms (plateaus, escarpments, outcrops, knolls, basins), **level 5** coast, **level 6** water. Not a set of generators and not a new terrain authority: a vocabulary for what TerrainGen's stages must jointly produce, with relationship rules such as "one divide tree", "valleys are complements of ridges" and "coasts are caused by what stands behind them". Its **single-dome failure** is an island whose height is essentially a function of coast distance plus one mound. Distinct from the relief *tiers* T1–T3 of `WORLD_RELIEF_PRINCIPLES.md`, which classify forms by height and footprint, and from the heights `H1`, `H2`, `H4A`, which are surfaces, not levels. See [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §4 and [99 Open Questions](99%20Open%20Questions.md) GEO-2, GEO-7.
+**Vocabulary proposed — owner review pending; the target it serves was approved on 2026-10-20** as D6 in [GEOGRAPHY_TARGET_BRIEF_G2.md](unity/Assets/Plans/GEOGRAPHY_TARGET_BRIEF_G2.md) §9 (a regional geography with a landform grammar, from the owner's concept image — a project reference, not an official DragonSword: Awakening map). The levels the overworld's geography is described and checked in, each caused by and placed relative to the level above it: **level 0** island footprint, **level 1** relief regions (highlands, uplands, lowland plains and corridors), **level 2** mountain system (main divide, culminations, saddles, major and subsidiary ridges, spur-toe foothills), **level 3** valley and drainage system, **level 4** landforms (plateaus, escarpments, outcrops, knolls, basins), **level 5** coast, **level 6** water. Not a set of generators and not a new terrain authority: a vocabulary for what TerrainGen's stages must jointly produce, with relationship rules such as "one divide tree", "valleys are complements of ridges" and "coasts are caused by what stands behind them". Its **single-dome failure** is an island whose height is essentially a function of coast distance plus one mound. Distinct from the relief *tiers* T1–T3 of `WORLD_RELIEF_PRINCIPLES.md`, which classify forms by height and footprint, and from the heights `H1`, `H2`, `H4A`, which are surfaces, not levels. Since the post-G3c review (2026-10-21): the level-2 mountain system is what the relief tier T1 names — one branching system counts as one T1 (GEO-2, resolved); whether D6's large plateaus become a region-level class outside the tier table is proposed, not decided (**Large Plateau**, GEO-8). See [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §§4, 13, [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md) §2 and [99 Open Questions](99%20Open%20Questions.md) GEO-2, GEO-7, GEO-8.
+
+---
+
+## Large Plateau
+
+**Proposed — owner confirmation required (GEO-8 option (c), 2026-10-21).** A plateau of the approved target D6 that is a **relief-region form** (Geographic Hierarchy level 1), not a relief tier: a readable top behind an escarpment on part of its rim, joined to a ridge or foothill on another part, subordinate to the mountain system (its top below the system's main culminations; never the landmark). Separated from T1 by form rather than by the 2.5× height rule, as T0 floor relief is separated from T2 by slope; the 2.5× rule applies to forms standing on it. Distinct from a **T2** plateau, the district-scale climbable shelf of `WORLD_RELIEF_PRINCIPLES.md` §1, whose row is unchanged. A tier or form label says nothing about traversal: whether its escarpment blocks the player is read from steepness and walking connectivity and decided under 3F-20. Its height range, top area, count and subordination margin are research items. See [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md) §2.7 and [99 Open Questions](99%20Open%20Questions.md) GEO-8.
+
+---
+
+## Declared Basin
+
+**Policy resolved 2026-10-21 (GEO-5 (b), evidence-backed policy).** A closed basin the geography itself declares — its enclosure, spill point and one outlet continuing to the ocean — such as an intermontane hollow, a cirque or a plateau-top hollow. Only a declared basin may hold a lake (surface at the spill level, uncarved outlet sill, `HYDROLOGY_GENERATION_PLAN.md` §9) or be realised as a filled flat (3F-10, 3F-11, 3F-14 decide realisation). Any closed depression that is not declared is a defect — an accidental pit under the S8 rule — even when the hydrology analysis's fill-then-spill would report it as a lake. Stage 3E's structural basins are declared basins of today's structure. No endorheic basin: the ocean-outlet invariant stays. V0 water remains ocean only. See [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md) §2.5 and [99 Open Questions](99%20Open%20Questions.md) GEO-5.
 
 ---
 
