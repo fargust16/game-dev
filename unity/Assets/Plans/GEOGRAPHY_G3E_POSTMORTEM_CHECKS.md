@@ -1,14 +1,17 @@
 # G3e-PM — Post-Mortem Coverage Checks and the S-LM1 Look: Pre-Registration
 
-Version: 0.1
+Version: 0.2
 
-Status: Draft — **pre-registration awaiting the owner's authorisation.** The owner approved the plan on 2026-10-24
+Status: Draft — **run and closed on 2026-10-24: H = FAIL by §7 (accepted by the owner), the S-LM1 line stopped under §8;
+results in §13.** §§0–12 below are the frozen pre-registration, unchanged. *As frozen:* pre-registration awaiting the
+owner's authorisation. The owner approved the plan on 2026-10-24
 (checks D1–D5 and the decision table of §8). **Nothing is authorised to run**: no script, no Unity process and no
 output exist for it until the separate authorisation of §11. Working name **G3e-PM**; an official ID, if one is wanted,
 is the owner's. It changes no definition, threshold, flag level, passage rule, construction code or measurement code.
 Once authorised, §§0–12 are frozen (§9); results are appended in §13 and never written into §§0–12.
 
-Last Updated: 2026-10-24 (v0.1: written after the owner approved the plan; not run)
+Last Updated: 2026-10-24 (v0.2: results appended in §13 — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1, the S-LM1 line
+stopped; §§0–12 unchanged. v0.1: written after the owner approved the plan; not run)
 
 Depends On:
 [GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md](GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md) (§§3, 4, 7),
@@ -460,6 +463,119 @@ data or their checksums; a commit or push beyond A0.
 
 ## 13. Results
 
-*Empty until the authorised run. Planned subsections: 13.1 the look (the owner's record); 13.2 D1 ledger and coverage,
-with D2, D3 and D4; 13.3 H — PASS, FAIL or INCONCLUSIVE; 13.4 the decision memo (one row of §8); 13.5 deviations, if
-any.*
+*Appended 2026-10-24 after the run. §§0–12 are unchanged since the freeze (v0.1, SHA-256
+bb3a21d185a94289b91374c96c9c3cf57b07d497a28c3d79788d121ca2cb79b9; frozen copy in `research-data\g3e-pm\prereg\`). Every
+record named below lies under `D:\Hobby\game-dev\research-data\g3e-pm\`, with SHA-256 manifests; the owner's texts are kept
+verbatim in `gates\`, read-only.*
+
+Three results are kept apart throughout: the **registered D1 result (INCONCLUSIVE)**, the **outcome of H by §7 (FAIL,
+accepted by the owner)** and **DEV-1, a one-run deviation** that completed the ledger. None replaces another.
+
+### 13.1 Timeline
+
+| UTC, 2026-10-24 | Step | Record |
+|---|---|---|
+| 12:48 | authorisation A0–A3; this document frozen; A0: commit `ad9f428` pushed | `prereg\` |
+| 12:48:57 | inputs verified: run 11 105 / 105, lmc-reference 48 / 48, code = run 11 snapshot | `checks\inputs_before.txt` |
+| 12:49–12:55 | D5, two fresh Unity processes | `views_1\`, `views_2\`, `checks\d5_validity.txt` |
+| 12:59:16 | D1–D4 scripts hashed, not executed | `scripts\SHA256SUMS.scripts.txt` |
+| 14:11:02 | Gate A — the owner's blind ratings fixed | `gates\gateA_record.md`, `gateA_scores.json` |
+| 14:11:10 | the X/Y key opened | `gates\key_opened.txt` |
+| 14:33:51 | the owner's verdict: **continue** | `gates\verdict.md` |
+| 14:34–14:35 | D1–D4, two runs (run_a, run_b) | `checks\run_a\`, `run_b\`, `RESULTS.md` |
+| 16:56:53 | the owner accepts **H = FAIL by §7** | `gates\decision_H.md` |
+| 17:02:20 | Q-O1-a answered; DEV-1 authorised | `gates\decision_O1a_and_deviation.md` |
+| 17:03:55 | DEV-1 rationale and diff hashed, before the run | `dev1\DEV-1.md`, `DEV-1.diff` |
+| 17:04 | DEV-1, one run | `dev1\out\`, `RESULTS_DEV-1.md` |
+| 18:48:19 | the owner's contract decisions; **the S-LM1 line stops (§8)** | `gates\decision_contracts_stop.md` |
+
+### 13.2 D5 and the owner's look
+
+**D5 valid.** Exit 0 twice; protected manifest 73 / 73 before and after twice; both layouts equal to run 11 (V-L8) twice;
+192 output files per process, of which only the six G1 `review_timings.txt` differ (wall-clock) — every image is
+byte-identical. The views step does not compare the pinned hashes; G1 logged the `H4A` 110201 lattice it rendered as
+`e2bad571f4af76c7`, equal to the pinned value.
+
+**Gate A** (blind; M meets, P partly, F fails; D6 points 1–8):
+
+| Seed | Panel | Synthesis (key opened after fixing) | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 110201 | Y | **S-LM1** | F | P | P | P | P | P | P | P |
+| 1337 | Y | **S-LM1** | F | P | P | P | P | P | P | P |
+| 110201 | X | S-LM3 (closed configuration) | M | M | P | F | P | P | P | P |
+| 1337 | X | S-LM3 (closed configuration) | M | M | P | F | P | P | P | P |
+
+S-LM1 met no D6 point and failed point 1 on both seeds. The X panels show the unconverged last iterate of the S-LM3
+configuration closed in review §12; their ratings belong to a separate S-LM3 research line and enter nothing in H. The
+owner's notes: walls, steps and striped slopes in X; over-smoothed forms in Y; two near-dark player frames (110201 X
+`player_GND-PASS`, 1337 Y `player_GND-CAP`) — a limitation of the view set, not examined. Verdict on the S-LM1 line:
+**continue**.
+
+### 13.3 D1–D4 — the registered run
+
+Run twice (14:34–14:35Z), exit 0, all twelve outputs byte-identical; scripts, inputs and order as registered.
+
+- **D1 — registered result: INCONCLUSIVE.** V1 (the S8 replica) failed on both seeds: the four recorded depressions per
+  seed were found at their positions, but only one of four within the tolerances — replica depths 0.01–0.03 m lower, areas
+  up to 105 m² smaller. V2–V5 held. By §6.2 D1 stopped and attributed no item. Cause, from code reading after the run: the
+  C# reading fills with `DepressionFill` (1 mm epsilon); the quoted replica has none. Stage 09 is not bit-equal to the final
+  lattice on either seed (rule 1 used the final lattice; the cause was not examined).
+- **D2** — plateau 1's top on 110201: 10.2 % of the top vertex-reachable, mostly near its edge; the centroid's component
+  (91 % of the top) and the whole ramp strip are not shore-reachable; the cheapest crossing is two ≈ 88.8° triangles between
+  the top and corridor ground at (916, 2157–2160). Classification "other (B1 alone)": I-1 covered by B1.
+- **D3** — 110201 *feasible only leniently* (F-min yes; the full footprint leaves no candidate in any case); 1337
+  *feasible*; tops of 150 000 m² fit on neither seed; the 60–120 m class only under F-min. No seed infeasible.
+- **D4** — I-2…I-5 (110201, R5): each exit point already drains to an undesignated shore on the base B (stage 04), and no
+  later stage brings it back; exits 155–249 m from the sea; owner **O1**, uncovered. I-2 and I-3 share one exit point.
+
+### 13.4 The outcome of H
+
+| | Result | Basis |
+|---|---|---|
+| registered D1 output | **INCONCLUSIVE** | §6.2: the validity failure stops D1. The script applied this stop without §7's precedence |
+| **H by §7** | **FAIL** | I-2…I-5 are uncovered (O1, by D4, whose own validity held); "FAIL takes precedence over INCONCLUSIVE". **Accepted by the owner** |
+
+### 13.5 DEV-1 — a one-run deviation (not the registered D1)
+
+Authorised to complete §8's list of outside owners. One line of the quoted `flood()` changed to DepressionFill's rule
+(`max(h, v + 0.001)`), recorded and hashed before the run; every other script, input, criterion and the order unchanged;
+one run, so no determinism repeat. Ties by vertex index and float64 arithmetic still differ from DepressionFill.
+
+- V1 holds on both seeds (the replica equals the record); V2–V5 hold.
+- Ledger: covered 15, uncovered 15, unattributed 0. Outside owners **O1** (I-2…I-5 by D4; 8 climbs by rule 1),
+  **O4** (I-7, I-28), **O5** (I-6). Inside B: B1/B2 (I-1, I-8, I-9, I-22…I-25), B3 (I-15), B4 (I-10…I-13, I-17, I-27,
+  I-30). 110201: 12 uncovered; 1337: 3.
+- **A property of rule 1 found here:** for valley axes inside the mountain region it names O1 from the base's climb at
+  stage 04, which the mountain stage replaces; for those eight climbs (I-14, I-16, I-18…I-21, I-26, I-29) the mechanism is
+  not determined (O1 through the toe, B3, O3 or O6 remain possible).
+
+### 13.6 Decision memo (§8)
+
+**Row applied: continue × FAIL.** The owner's contract decisions on the outside owners (2026-10-24): K1 / O1 — the S-LM1
+base kept unchanged (option A; B1, B2, C not implemented in this line); K2 / O4 — no monotonicity requirement for u or the
+crest; K3 / O5 — no downstream running minimum on valley floors. The contracts are kept, so by §8 **the S-LM1 line stops.**
+This is a research-line decision, not a claim that these mechanisms can never be revised. Recorded with it: Q-O1-a
+answered *No* — a base where the coastal surface decides heights beyond the coastal band width is treated as a potential
+deviation from spec §6 (confining it alone is not shown to fix R5); the owner's preliminary preference for B1, given only
+for a continuation, lapses with the stop. K4 (plateau ownership under §6) and K5 (rule 1 on mountain axes) stay open,
+unneeded for this line. Next, by §8's stop row and only with its own plan: revisit the landform families (post-G3c review
+§4, §5.7) or a changed S-LM3 law; G3d stays deferred.
+
+### 13.7 Deviations and clarifications (§9)
+
+1. Blind protocol: ratings fixed, then the key opened, then the verdict (§6.1 left the order open).
+2. The sheets were delivered as files: the browser pane shows files outside the project only as static snapshots.
+3. The agent viewed one sheet before the look, only to confirm that it rendered; no judgement was given.
+4. Choices where §§6.2–6.5 were silent are stated in each script's docstring (D2 precedence, D3's exact strip test, D4's
+   overlapping catchments, D1's item locations).
+5. `d1_ledger.py` reports H = INCONCLUSIVE on any validity stop without §7's precedence; the script was not changed — H was
+   decided by §7's text (13.4).
+6. The stdout logs carry the console code page (— and §) and CRLF; content otherwise equal to the outputs.
+7. DEV-1 (13.5), authorised by the owner. Its diff was first written with a broken escape, caught by compilation before any
+   run and rewritten from the original. A verification command after DEV-1 first ran in the wrong folder and printed
+   "FAILED open or read"; rerun in the right folders — unchanged.
+
+### 13.8 What G3e-PM does not show
+
+No held-out result, and nothing about island size or GEO-3's option (c). It does not show that S-LM1's mechanisms cannot
+be revised, that S-LM3 converges (its X panels are an unconverged iterate), or how the eight rule-1 climbs arise.

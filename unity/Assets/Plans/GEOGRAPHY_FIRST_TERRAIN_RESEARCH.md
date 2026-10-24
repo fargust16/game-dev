@@ -1,6 +1,6 @@
 # Geography-First Terrain Research — Expressive Fantasy Geography
 
-Version: 0.16
+Version: 0.17
 
 Status: Draft — research record. Owner decisions that apply: **GEO-6 answered (a), build both**
 (2026-10-18), so the read-only tooling G0 and G1 now exists as Editor-only code
@@ -18,7 +18,7 @@ that is not authorised. The stage responsibility map (§5) and the rest of the r
 **proposals awaiting owner review**; the classification of the acceptance suite (§7) follows GEO-7's
 decision record. The footprint attribution of §§11–12 was corrected on 2026-10-20 (§13.2).
 
-Last Updated: 2026-10-24 (v0.16: the post-mortem checks G3e-PM pre-registered, plan approved, not run, §16; v0.15: G3e Step 1 ended not ready, §16; v0.14, 2026-10-23: LMC named G3e, C8 and C9 decided, §§9, 15; v0.13: LMC specification v0.4 approved, §15; v0.12: LMC Step 1 conditions C2–C5 prepared, §15; v0.11: LMC design note approved, Step 1 readiness check, §15; v0.10: LMC technical specification approved, §15; v0.9: LMC technical specification and its check on G3c data, §15; v0.8: LMC design note v0.2 recorded, §15; v0.7: post-G3c review, §15; v0.6: G3c results, §14; v0.5: G2 outcome and corrections, §13)
+Last Updated: 2026-10-24 (v0.17: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped, §16; v0.16: the post-mortem checks G3e-PM pre-registered, plan approved, not run, §16; v0.15: G3e Step 1 ended not ready, §16; v0.14, 2026-10-23: LMC named G3e, C8 and C9 decided, §§9, 15; v0.13: LMC specification v0.4 approved, §15; v0.12: LMC Step 1 conditions C2–C5 prepared, §15; v0.11: LMC design note approved, Step 1 readiness check, §15; v0.10: LMC technical specification approved, §15; v0.9: LMC technical specification and its check on G3c data, §15; v0.8: LMC design note v0.2 recorded, §15; v0.7: post-G3c review, §15; v0.6: G3c results, §14; v0.5: G2 outcome and corrections, §13)
 
 Depends On:
 [AGENTS.md](../../../AGENTS.md), [14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md),
@@ -1837,6 +1837,25 @@ the LM2 plateau-siting amendment on contour A, plateau 1's access on 110201 and 
 Its hypothesis is that every item has an owner within a bounded set (LM2 plateau siting, S-LM1's plateau stage, valley
 stations, axis declaration); its pre-registered decision table ends in continue with an exact package, contract decisions
 first, or stop S-LM1. It changes no code and no definition; running it needs the owner's separate authorisation.
+*(Authorised and run the same day — next paragraph.)*
+
+**G3e-PM outcome (2026-10-24) — the S-LM1 line stopped.** Results in §13 of
+[GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md); records outside the repository at
+`D:\Hobby\game-dev\research-data\g3e-pm\`. In the owner's blind look S-LM1 met no D6 point and failed point 1 (a dominant
+branching mountain system) on both seeds; the other panel was the closed S-LM3 configuration, whose ratings belong to a
+separate line. Three results are kept apart:
+- **registered D1: INCONCLUSIVE** — a validity check of the S8 replica failed (the replica lacked `DepressionFill`'s 1 mm
+  fill epsilon), so D1 stopped;
+- **H: FAIL by §7**, accepted by the owner — on 110201 all four elevated systems already reach undesignated shores on
+  S-LM1's base surface (D4), and FAIL takes precedence;
+- **DEV-1, a one-run deviation** with the epsilon — it completed the ledger: 15 of 30 items covered; outside owners S-LM1's
+  base, its flank coordinate u and its valley cross-profile.
+
+The owner kept those three contracts, so by the pre-registered decision table **the current S-LM1 line stops** — a
+research-line decision, not a claim that the mechanisms can never be revised. Also recorded: a base on which the coastal
+surface decides heights beyond the coastal band width is treated as a potential deviation from the specification's §6.
+Nothing here concerns island size or GEO-3's option (c). Next, only with its own plan: revisit the landform families
+(post-G3c review §4) or a changed S-LM3 law; G3d stays deferred.
 
 ## Related documents
 
