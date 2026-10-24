@@ -1,6 +1,6 @@
 # Geography-First Terrain Research — Expressive Fantasy Geography
 
-Version: 0.17
+Version: 0.18
 
 Status: Draft — research record. Owner decisions that apply: **GEO-6 answered (a), build both**
 (2026-10-18), so the read-only tooling G0 and G1 now exists as Editor-only code
@@ -8,17 +8,20 @@ Status: Draft — research record. Owner decisions that apply: **GEO-6 answered 
 7.6 and 10; and **the target geography D6, approved 2026-10-20** in
 [GEOGRAPHY_TARGET_BRIEF_G2.md](GEOGRAPHY_TARGET_BRIEF_G2.md) §9 from the owner's concept image (§13), which
 supersedes the §4 *proposal* as the target wherever they differ. **G3 ran as owner-commissioned research on
-2026-10-19** (§11): one candidate mountain system, isolated in an uncommitted Editor-only research file,
+2026-10-19** (§11): one candidate mountain system, isolated in an ~~uncommitted~~ Editor-only research file *(committed 2026-10-24)*,
 measured against `H4A`; it approves nothing. **G3b followed on 2026-10-19 … 20** (§12): a converging valley
 tree on the same skeleton, in the same file; it approves nothing either. **G3c ran on 2026-10-20 … 21** under
 the owner's go-ahead (§14; brief §8.3, D8): neither contour passed the pre-registered rule; it approves
 nothing. **The post-G3c review (2026-10-21, §15)** recorded G3c as completed research that failed acceptance,
 settled GEO-1 and GEO-2, classified GEO-3 … GEO-8, added GEO-9, and proposed a landform-model comparison
-that is not authorised. The stage responsibility map (§5) and the rest of the roadmap (§9) remain
+~~that is not authorised~~. That comparison ran as **G3e (LMC)**: Step 1 (2026-10-23 … 24) ended not ready and
+S-LM3 was closed with a negative result; the post-mortem checks **G3e-PM** then stopped the S-LM1 line under their §8 —
+registered D1 INCONCLUSIVE, H FAIL under §7, DEV-1 a one-run deviation (§16). No G3e model is a production candidate;
+production stays `H4A`. The stage responsibility map (§5) and the rest of the roadmap (§9) remain
 **proposals awaiting owner review**; the classification of the acceptance suite (§7) follows GEO-7's
 decision record. The footprint attribution of §§11–12 was corrected on 2026-10-20 (§13.2).
 
-Last Updated: 2026-10-24 (v0.17: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped, §16; v0.16: the post-mortem checks G3e-PM pre-registered, plan approved, not run, §16; v0.15: G3e Step 1 ended not ready, §16; v0.14, 2026-10-23: LMC named G3e, C8 and C9 decided, §§9, 15; v0.13: LMC specification v0.4 approved, §15; v0.12: LMC Step 1 conditions C2–C5 prepared, §15; v0.11: LMC design note approved, Step 1 readiness check, §15; v0.10: LMC technical specification approved, §15; v0.9: LMC technical specification and its check on G3c data, §15; v0.8: LMC design note v0.2 recorded, §15; v0.7: post-G3c review, §15; v0.6: G3c results, §14; v0.5: G2 outcome and corrections, §13)
+Last Updated: 2026-10-24 (v0.18: the status paragraph brought up to G3e and G3e-PM; v0.17: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped, §16; v0.16: the post-mortem checks G3e-PM pre-registered, plan approved, not run, §16; v0.15: G3e Step 1 ended not ready, §16; v0.14, 2026-10-23: LMC named G3e, C8 and C9 decided, §§9, 15; v0.13: LMC specification v0.4 approved, §15; v0.12: LMC Step 1 conditions C2–C5 prepared, §15; v0.11: LMC design note approved, Step 1 readiness check, §15; v0.10: LMC technical specification approved, §15; v0.9: LMC technical specification and its check on G3c data, §15; v0.8: LMC design note v0.2 recorded, §15; v0.7: post-G3c review, §15; v0.6: G3c results, §14; v0.5: G2 outcome and corrections, §13)
 
 Depends On:
 [AGENTS.md](../../../AGENTS.md), [14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md),

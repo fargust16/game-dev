@@ -1,16 +1,16 @@
 # GEOGRAPHY_LMC_DESIGN_NOTE.md
 
-**Status:** Step 0 — design proposal  
+**Status:** Step 0 — design proposal *(closed: Step 1 ran 2026-10-23 … 24 and ended not ready; agent review note 12)*  
 **Working experiment name:** LMC  
 **Official experiment ID:** ~~Not assigned~~ **G3e** (assigned by the owner 2026-10-23, condition C1; agent review note 11)  
 **Authorization:** S-LM3 + S-LM1 approved for comparison on a shared LM2 regional layout  
-**Current phase:** Design only. No implementation or generation runs authorized by this note.  
+**Current phase:** Design only. No implementation or generation runs authorized by this note. *(Step 1 was authorised separately on 2026-10-23 and closed not ready on 2026-10-24; the S-LM1 line was stopped after G3e-PM — agent review note 12.)*  
 **Production status:** Unchanged  
-**Git status:** No commit or push authorized
+**Git status:** ~~No commit or push authorized~~ committed to `main` on the owner's decision of 2026-10-24 (agent review note 12)
 
-Version: 0.8
+Version: 0.9
 
-Last Updated: 2026-10-23 (v0.8: the official ID G3e in the header field, agent review note 11 — C1, C8, C9 decided;
+Last Updated: 2026-10-24 (v0.9: agent review note 12 — Step 1 authorised, ended not ready and closed; the commit; G3e-PM and the stop of the S-LM1 line; the header fields Status, Current phase and Git status annotated; the owner's text otherwise unchanged. v0.8: the official ID G3e in the header field, agent review note 11 — C1, C8, C9 decided;
 otherwise the owner's text unchanged. v0.7: agent review note 10 — R8, slope diagnostics and the whale-back settled in the
 specification v0.4; the owner's text unchanged. v0.6: agent review note 9 — the note (v0.5) approved as the research plan, Step 1 not
 authorised, LMC kept as the working name; the owner's text unchanged. v0.5: agent review note 8 — the specification
@@ -36,7 +36,10 @@ Referenced By:
 [GEOGRAPHY_LMC_TECHNICAL_SPEC.md](GEOGRAPHY_LMC_TECHNICAL_SPEC.md);
 [GEOGRAPHY_LMC_STEP1_READINESS.md](GEOGRAPHY_LMC_STEP1_READINESS.md);
 [99 Open Questions](../../../99%20Open%20Questions.md) GEO-3, GEO-7, GEO-8;
-[14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md); [AGENTS.md](../../../AGENTS.md)
+[14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md); [AGENTS.md](../../../AGENTS.md);
+[GEOGRAPHY_LMC_STEP1_RUN5_REVIEW.md](GEOGRAPHY_LMC_STEP1_RUN5_REVIEW.md);
+[GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md](GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md);
+[GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md)
 
 ---
 
@@ -523,3 +526,15 @@ the owner's text since v0.2 — R5 in §7.1 — was made on the owner's decision
     because §9's freeze record asks for a source revision. **C9:** the reference data — the Python reference
     implementation, its results and G3c's four calibration grids with their report — is copied, MD5-verified, to
     `D:\Hobby\game-dev\research-data\lmc-reference\` outside the repository. Step 1 itself is still not authorised.
+12. **2026-10-23 … 24 — Step 1, its closure and G3e-PM (agent record; the owner's text above is unchanged).** Step 1 was
+    authorised by the owner on 2026-10-23 within C6–C7 ([readiness](GEOGRAPHY_LMC_STEP1_READINESS.md) §§4, 6). After
+    eleven calibration runs neither synthesis passed every hard gate on either calibration seed; the owner accepted the
+    [not-ready report](GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md) and closed Step 1 on 2026-10-24 — no Step 2, no freeze, no held-out evaluation;
+    the seeds 1005–1014 and 1015–1024 were never generated. As §11 asks for "neither method passes", the report
+    separates shared from representation-specific failure modes; the passage rule of §7.5 was never applied. S-LM3 was
+    closed with a negative result (its receiver iteration did not converge; review §12): it is an experimental
+    representation that failed calibration, **not a production candidate**. C8 was overtaken: with no freeze, the owner
+    had the backlog committed to `main` on 2026-10-24. The post-mortem checks followed — [G3e-PM](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md) §13:
+    the **registered D1 result is INCONCLUSIVE**; **H is FAIL under its §7** (accepted by the owner); **DEV-1** was a
+    one-run deviation that completed the list of contract owners; the owner kept S-LM1's contracts, so **the S-LM1 line
+    is stopped** under its §8 — a research-line decision. G3d stays deferred. Nothing in G3e changes production terrain.

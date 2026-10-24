@@ -1,11 +1,12 @@
 # G3e (LMC) — Step 1 Not-Ready Report
 
-Version: 0.2
+Version: 0.3
 
 Status: **Accepted by the owner on 2026-10-24 — G3e Step 1 is closed as not ready.** Written the same day from the
-preserved Step 1 data only; no new run and no generation. It authorises nothing further.
+preserved Step 1 data only; no new run and no generation. It authorises nothing further. **Addendum v0.3 (§9)** records
+corrections found by a later audit and what followed; the accepted text of §§1–8 is unchanged.
 
-Last Updated: 2026-10-24 (v0.2: accepted by the owner; Step 1 closed; the backlog committed to `main` step by step)
+Last Updated: 2026-10-24 (v0.3: addendum §9 — corrections and later facts, G3e-PM and the stop of the S-LM1 line; §§1–8 unchanged. v0.2: accepted by the owner; Step 1 closed; the backlog committed to `main` step by step)
 
 Depends On:
 [GEOGRAPHY_LMC_DESIGN_NOTE.md](GEOGRAPHY_LMC_DESIGN_NOTE.md) (§§7.5, 9, 11),
@@ -18,7 +19,8 @@ Referenced By:
 [GEOGRAPHY_LMC_STEP1_READINESS.md](GEOGRAPHY_LMC_STEP1_READINESS.md),
 [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §16,
 [99 Open Questions](../../../99%20Open%20Questions.md) GEO-3, [14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md),
-[AGENTS.md](../../../AGENTS.md)
+[AGENTS.md](../../../AGENTS.md),
+[GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md)
 
 ---
 
@@ -169,3 +171,50 @@ The layout amendment that would address these (review §17.5 (a)) was not author
 | Freeze package | **not prepared** — Step 1 is not ready |
 | Commit | **done on the owner's decision (2026-10-24)**: the backlog since 2026-10-19 committed to `main` step by step and pushed — G3/G3b code, G2 brief and concept reference, G3c code, the post-G3c review, the LMC design documents, the G3e code, the G3e record, then the shared documents |
 | Documentation | the run-by-run review (§§1–24), the specification (§14), the readiness check, `AGENTS.md`, 99 Open Questions (GEO-3), the roadmap and the research record updated; no new project term, so the Glossary is unchanged |
+
+## 9. Addendum (2026-10-24, v0.3) — corrections and what followed
+
+Written after the report was accepted. **§§1–8 above are unchanged and keep their standing as accepted**; this section
+corrects statements a later audit found inaccurate or incomplete and records later facts. Sources: the run-by-run
+review, run 11's preserved readings, and the post-mortem checks [G3e-PM](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md) (§13 there;
+records at `D:\Hobby\game-dev\research-data\g3e-pm\`).
+
+### 9.1 Corrections
+
+| Where | Statement | Correction |
+|---|---|---|
+| §§1, 2 | "four separately authorised fixes" | three construction fixes (ramp rule (b), protection (b), T1) and **M-1, a measurement rule** applied to both syntheses that changed no gate verdict |
+| §3, R5 on 110201 | "(not analysed in Step 1)" | analysed on run 5 (review §5; §7.4: "a contract question, not a defect to patch"). G3e-PM's D4 located it on run 11: all four elevated systems already reach undesignated shores on S-LM1's base surface |
+| §5 | "The layout LM2 is valid on both calibration seeds" | valid by V-L1 … V-L8, which test neither the ramp's land nor the plateau's write footprint (review §17.1). G3e-PM's D3: a footprint-and-ramp siting rule is feasible on 1337, and on 110201 only with the lenient footprint |
+| §7 item 3 (a) | the layout amendment "addresses … 1337's plateau pools" | not by design: the layout does not see S-LM1's valleys (review §17.5 (a)). G3e-PM assigned those pools to S-LM1's plateau stage |
+| §7 recommendation | "(a) and (b) together are the smallest change that addresses the remaining failures at their source" | not supported: G3e-PM's completed ledger (DEV-1) leaves owners outside both — S-LM1's base, its flank coordinate u, its valley cross-profile |
+| §8, determinism | "not done — due only after a justified candidate" | also item 7 of the authorised Step 1 scope (readiness C7). Bit-equality across fresh processes was observed along the way (review §§11.1, 14.2, 16.2, 18.2, 20.1) |
+
+### 9.2 Facts the report left out
+
+- **110201 regressed after run 3.** S-LM1 passed R4, R8, R9 and R10 there in run 3 and failed R4, R8 and R9 from run 4 on
+  (review §§2, 4).
+- **Report-only readings of run 11** (no gate): Q7 flagged on both seeds — on 1337 a cliff share of 54.5 % and one cliff run
+  over 53.9 % of the shoreline; on 110201 a longest cliff run of 17.1 %. Q2 θ 0.011 and 0.061 (G3c's median 0.49). D-cap
+  peaks at configured angles (110201: 8.62 at 10°, 4.14 at 2°). Q9: 11 named S-LM1 construction fixes and 3 layout fixes,
+  against G3c's 18.
+- **R2 against R8 on 110201's plateau 1** — two definitions, not a contradiction: R2 counts any vertex of the painted top as
+  reachable, R8 tests the vertex nearest its centroid (`TerrainGenLmcMeasure.cs`, lines 2303 and 890). G3e-PM: 10.2 % of
+  the top is reachable, mostly near its edge.
+
+### 9.3 What followed
+
+The post-mortem checks G3e-PM ran on 2026-10-24. Four results, kept apart:
+
+| Result | State |
+|---|---|
+| owner's blind look | S-LM1 met no D6 point and failed point 1 (a dominant branching mountain system) on both seeds |
+| registered D1 | **INCONCLUSIVE** — a validity check of its S8 replica failed |
+| H under its §7 | **FAIL** — accepted by the owner |
+| DEV-1 | **a one-run deviation** that completed the list of contract owners |
+
+The owner kept S-LM1's contracts, so **the S-LM1 line is stopped** under its §8 — a research-line decision, not a claim
+that the mechanisms can never be revised. Options (a)–(c) of §7 item 3 are therefore closed for S-LM1. Option (d), S-LM3
+with a changed law, remains only as a separate research line with its own plan. S-LM3 as closed is **not** a production
+candidate: the panel the owner rated higher in the blind look was its unconverged last iterate. Production stays `H4A`;
+G3d stays deferred.

@@ -1,28 +1,28 @@
 # LMC — Technical Specification
 
-Version: 0.5.3
+Version: 0.5.4
 
 Experiment: **G3e** (official ID, assigned by the owner 2026-10-23); working name LMC. Reference data for the
 continuity check: `D:\Hobby\game-dev\research-data\lmc-reference\` (owner's decision C9; MD5 manifest there).
 
 Status: Draft — **approved by the owner (v0.3 on 2026-10-22; amendments A1 and A3 and option (b) for the whale-back on
-2026-10-23, written in as v0.4; amendment M-1 on 2026-10-23, v0.5 §14); Step 1 authorised 2026-10-23 and in
-progress.** v0.4 adds: R8 over every declared plateau top (A1, §7.1); the
+2026-10-23, written in as v0.4; amendment M-1 on 2026-10-23, v0.5 §14); Step 1 authorised 2026-10-23 ~~and in
+progress~~, ended not ready and closed 2026-10-24; G3e-PM followed and the S-LM1 line is stopped (§15).** v0.4 adds: R8 over every declared plateau top (A1, §7.1); the
 report-only slope diagnostics D-cap (with K5) and D-reg (A3, §7.3); Q4m as a report-only crest measure (with K4), and
 the whale-back judged in the owner's visual review with neither Q4 nor Q4m flagged (option (b), §§8, 8.1). The owner approved
 the world-height datum and §2 with K1, the S-LM3 model contract as an experimental representation, the gate
 calculations with K2, the Q flag levels of §8.1, the layout validation and the S-LM1 ownership rule. These are now
-fixed for LMC and never change to make a synthesis pass (§0). Writing LMC code and running calibration still need the
-design note's Step 1 go-ahead. *Status as checked (v0.2):* checked on historical data, awaiting the owner's approval.
+fixed for LMC and never change to make a synthesis pass (§0). ~~Writing LMC code and running calibration still need the
+design note's Step 1 go-ahead.~~ *(Given 2026-10-23; §15.)* *Status as checked (v0.2):* checked on historical data, awaiting the owner's approval.
 The owner supports the LMC design
 note v0.3 as the research direction and has **not** authorised code or calibration (2026-10-22). This specification
 completes what the note requires before Step 1 — the elevation definitions (note §6), the S-LM3 model contract (§4.1,
 §12 item 7), the S-LM1 overlap rule (§5.2), the exact gate and Q1–Q9 calculations (§7, §12 item 6), the views (§8),
 the freeze record and file breakdown (§§9–10) — and checks it on **historical G3c data only** (§11): 10 of 13
 pre-registered checks held, 3 expectations failed, and the failures led to three corrections (K1–K3, §11.5). Where it
-and the design note differ, **the note governs**. Nothing here is implemented; no generation ran for it.
+and the design note differ, **the note governs**. ~~Nothing here is implemented; no generation ran for it.~~ *(As of v0.3. The Step 1 code implemented §§4–8 and §14; §15.)*
 
-Last Updated: 2026-10-23 (v0.5.3: §14 — the implementation accepted by the owner with caveats; the 150 m radius
+Last Updated: 2026-10-24 (v0.5.4: status — Step 1 closed not ready, G3e-PM, the S-LM1 line stopped; §15 records what the owner decided and what stays open about §§5–6, as annotations; no definition, threshold, flag level or rule changed. v0.5.3: §14 — the implementation accepted by the owner with caveats; the 150 m radius
 stays. v0.5.2: §14 — implemented in the Step 1 measurement code and verified in run 7.
 v0.5.1: §14 — the full rule checked on the preserved Step 1 lattices; the code not yet
 changed. v0.5: amendment M-1 — the pass col rule — approved by the owner as a specification rule,
@@ -34,7 +34,7 @@ the approved content is unchanged. v0.3: approved by the owner, §12 items 1–4
 K1–K3, §§11.4–11.5; v0.1: written and hashed before any computation)
 
 Depends On:
-[GEOGRAPHY_LMC_DESIGN_NOTE.md](GEOGRAPHY_LMC_DESIGN_NOTE.md) (v0.3),
+[GEOGRAPHY_LMC_DESIGN_NOTE.md](GEOGRAPHY_LMC_DESIGN_NOTE.md) (v0.3 — the owner's text; agent notes to v0.9),
 [GEOGRAPHY_LMC_TECHNICAL_DRAFT.md](GEOGRAPHY_LMC_TECHNICAL_DRAFT.md) (source material),
 [GEOGRAPHY_POST_G3C_REVIEW.md](GEOGRAPHY_POST_G3C_REVIEW.md) (§§1, 3),
 [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) (§§7.6, 14),
@@ -49,7 +49,10 @@ Referenced By:
 [GEOGRAPHY_LMC_STEP1_READINESS.md](GEOGRAPHY_LMC_STEP1_READINESS.md);
 [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §15;
 [99 Open Questions](../../../99%20Open%20Questions.md) GEO-7; [AGENTS.md](../../../AGENTS.md);
-[14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md)
+[14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md);
+[GEOGRAPHY_LMC_STEP1_RUN5_REVIEW.md](GEOGRAPHY_LMC_STEP1_RUN5_REVIEW.md);
+[GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md](GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md);
+[GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md)
 
 ---
 
@@ -674,3 +677,29 @@ use the exact declared positions. The earlier substitution is gone.
 *Accepted by the owner with caveats (2026-10-23, review §15.1):* the implementation is accepted on the grounds of run 7.
 **The 150 m radius stays**: the sensitivity at the window's edge (review §14.4) is a known property of the rule, and on
 the data in hand it changed no verdict.
+
+---
+
+## 15. Status after G3e Step 1 and G3e-PM (2026-10-24) — annotations; no rule changed
+
+Nothing in §§0–14 is amended by this section. It records what happened to the experiment and what the owner decided or
+left open about the construction contracts, so that the approved text is not read as current status.
+
+- **Step 1** was authorised on 2026-10-23 and closed not ready on 2026-10-24 ([not-ready report](GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md)): no synthesis passed every
+  hard gate on either calibration seed; no Step 2, freeze or held-out evaluation. The definitions of §§2–3 and §§7–8 were
+  never changed; M-1 (§14) was implemented and accepted.
+- **S-LM3 (§5)** was approved as an *experimental* representation only. Its receiver iteration did not converge, and it was
+  closed with a negative result (review §12). It is **not a production candidate**; any production placement stays
+  GEO-3's G4 question. PD-1, the working interpretation of §5.3 (review §9), closed with it.
+- **G3e-PM** ([G3e-PM](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md) §13): the **registered D1 result is INCONCLUSIVE**; **H is FAIL under its §7** (accepted by the
+  owner); **DEV-1** was a one-run deviation; the owner kept S-LM1's contracts, so **the S-LM1 line is stopped** under its §8.
+- **About §6, as the owner decided or left it (2026-10-24):**
+  - *the S-LM1 base* — the Step 1 code takes min(drainage surface, coastal surface) on all land (Q9 #6), so the coastal
+    surface decides heights beyond the coastal band width. The owner did **not** accept this as a reading of §6's
+    ownership rule (Q-O1-a): a potential deviation of the implementation. Confining it alone is not shown to fix R5. The
+    owner kept the contract (K1, option A) for the stopped line;
+  - *"valley floors keep a running minimum downstream"* — the Step 1 code does not apply it to S-LM1's valley axes
+    (Q9 #11; its premise refuted in review §21.3). The owner kept the contract unchanged (K3);
+  - *the flank coordinate u and the crest term* — no monotonicity requirement was added (K2);
+  - *the plateau stage's max() overlay beyond the painted band* — whether it is a permitted reading of §6 was never
+    answered (review §17.3 item 4; G3e-PM K4). Open.

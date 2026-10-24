@@ -1,21 +1,22 @@
 # G3e (LMC) — Step 1 Readiness Check
 
-Version: 0.23
+Version: 0.24
 
 Status: Draft — **a checklist for the owner's separate Step 1 authorisation; it authorises nothing.** Prepared on
 2026-10-22 after the owner approved the design note (v0.5, as the research plan) and the technical specification
 (v0.3), kept Step 1 unauthorised, and kept "LMC" as the working name. It reconciles the plan, the specification and the
 metrics, lists what remains unverified, and states the exact conditions under which Step 1 could be authorised. No
-code, Unity run, generation or production change was made for it.
+code, Unity run, generation or production change was made for it. *Historical since 2026-10-24: Step 1 was authorised
+on 2026-10-23 and closed not ready on 2026-10-24 (§6); this checklist governs nothing further.*
 
-Last Updated: 2026-10-24 (v0.23: report accepted; Step 1 closed. v0.22: Step 1 ends not ready — the report. v0.21: run 11 — T1 implemented and verified; gates unchanged. v0.20, 2026-10-23: run 11 — T1 — pre-registered, not authorised. v0.19: decision note on a continuous toe and the R7(c) axis reading. v0.18: recording run 10 done; the toe is the main cause. v0.17: (b) kept; recording run 10 pre-registered, not authorised. v0.16: run 9 — option (b) implemented; check passes; new pools where outflow stays raised. v0.15: rule (b) kept; decision note on plateau placement. v0.14: run 8 — ramp rule (b) implemented; its check fails for causes outside the ramp. v0.13: owner decisions after run 7 — M-1 accepted with caveats; ramp (b) next. v0.12: run 7 — M-1 implemented in the measurement code and verified. v0.11: the full M-1 rule checked on preserved data. v0.10: M-1 approved as a specification rule, spec v0.5 §14. v0.9: S-LM1 ramp rule (b) accepted, not implemented. v0.8: S-LM3 closed with a negative result, option (a). v0.7: diagnostic run 6 authorised, run and analysed. v0.6: the owner's decisions on PD-1, Q9 #9/#14, M-1, #12. v0.5: Step 1 state after five calibration runs — results preserved, run 5 reviewed, three decisions
+Last Updated: 2026-10-24 (v0.24: marked historical — §1 as the state of 2026-10-22; the outcomes of C7 item 7 and C8 recorded in §6; G3e-PM; no condition changed. v0.23: report accepted; Step 1 closed. v0.22: Step 1 ends not ready — the report. v0.21: run 11 — T1 implemented and verified; gates unchanged. v0.20, 2026-10-23: run 11 — T1 — pre-registered, not authorised. v0.19: decision note on a continuous toe and the R7(c) axis reading. v0.18: recording run 10 done; the toe is the main cause. v0.17: (b) kept; recording run 10 pre-registered, not authorised. v0.16: run 9 — option (b) implemented; check passes; new pools where outflow stays raised. v0.15: rule (b) kept; decision note on plateau placement. v0.14: run 8 — ramp rule (b) implemented; its check fails for causes outside the ramp. v0.13: owner decisions after run 7 — M-1 accepted with caveats; ramp (b) next. v0.12: run 7 — M-1 implemented in the measurement code and verified. v0.11: the full M-1 rule checked on preserved data. v0.10: M-1 approved as a specification rule, spec v0.5 §14. v0.9: S-LM1 ramp rule (b) accepted, not implemented. v0.8: S-LM3 closed with a negative result, option (a). v0.7: diagnostic run 6 authorised, run and analysed. v0.6: the owner's decisions on PD-1, Q9 #9/#14, M-1, #12. v0.5: Step 1 state after five calibration runs — results preserved, run 5 reviewed, three decisions
 returned to the owner. v0.4: C1 — ID G3e, C8 — commit decided before the freeze, C9 — reference data copied outside
 the repository; every pre-authorisation condition met. v0.3: C2–C4 done — A1, A3 and option (b) approved, spec v0.4; open C1, C8, C9. v0.2: C2–C5 prepared on the owner's request — amendments A1–A3 in spec §13, checks on existing
 G3c data, the calibration reference; C9 added; §6 state. v0.1: 2026-10-22)
 
 Depends On:
-[GEOGRAPHY_LMC_DESIGN_NOTE.md](GEOGRAPHY_LMC_DESIGN_NOTE.md) (v0.6 — the owner's text of v0.3 plus agent notes),
-[GEOGRAPHY_LMC_TECHNICAL_SPEC.md](GEOGRAPHY_LMC_TECHNICAL_SPEC.md) (v0.3),
+[GEOGRAPHY_LMC_DESIGN_NOTE.md](GEOGRAPHY_LMC_DESIGN_NOTE.md) (v0.6 when written — the owner's text of v0.3 plus agent notes; now v0.9),
+[GEOGRAPHY_LMC_TECHNICAL_SPEC.md](GEOGRAPHY_LMC_TECHNICAL_SPEC.md) (v0.3 when written; now v0.5.4),
 [GEOGRAPHY_POST_G3C_REVIEW.md](GEOGRAPHY_POST_G3C_REVIEW.md) (§3.3),
 [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) (§§9, 14),
 [AGENTS.md](../../../AGENTS.md)
@@ -25,7 +26,9 @@ Referenced By:
 [GEOGRAPHY_LMC_DESIGN_NOTE.md](GEOGRAPHY_LMC_DESIGN_NOTE.md) (agent review note 9);
 [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §15;
 [99 Open Questions](../../../99%20Open%20Questions.md) GEO-3; [AGENTS.md](../../../AGENTS.md);
-[14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md)
+[14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md);
+[GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md](GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md);
+[GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md)
 
 ---
 
@@ -38,10 +41,11 @@ Referenced By:
 | Design note as the research plan | owner, 2026-10-22 | **approved (v0.5)** |
 | Technical specification §12 items 1–4 — world-height datum, K1, S-LM3 as an experimental model, gates with K2, flag levels §8.1, layout validation, S-LM1 ownership | owner, 2026-10-22 | **approved (v0.3)** |
 | Elevation targets, plateau edge classes, metric specification, S-LM3 contract (note §12 items 4–7) | owner, via the specification | approved |
-| Step 1 — implementation and calibration | owner, 2026-10-22 | **not authorised** |
+| Step 1 — implementation and calibration | owner, 2026-10-22 | **not authorised** *(authorised 2026-10-23; closed not ready 2026-10-24 — §6)* |
 | Experiment name | owner, 2026-10-22; 2026-10-23 | **LMC is the working name**; the official ID ~~is chosen by the repository's rules before implementation~~ is **G3e** (C1, 2026-10-23) |
 
-Until Step 1 is authorised: no LMC code, no Unity run, no terrain generation, no production change.
+Until Step 1 is authorised: no LMC code, no Unity run, no terrain generation, no production change. *(The state on
+2026-10-22; superseded by §6.)*
 
 ---
 
@@ -105,7 +109,8 @@ Step 1 can be authorised when every condition below is met or explicitly waived 
 | **C5** | **F4** done: Python reference values on the ~~two~~ G3c calibration grids recorded with their input hashes. *2026-10-23: **done** on the four `s30-med` grids (A and B × 110201, 1337); continuity with G3c's record 4 of 4; reference table in spec §13.5* | agent, read-only | yes — done |
 | **C6** | **Protected-file manifest** fixed: the 64 files G3c hashed (tile assets and `Settings/Terrain/`, the production scene, its folder and `.meta`, URP pipeline and renderer, every `ProjectSettings/*.asset`, `packages-lock.json`, the G0, G1 and G3 sources) plus G3c's four research files and their `.meta`; MD5 before and after every run; abort on any change. `git status` may show only LMC's six files, their `.meta` and documentation. | agent; owner confirms | yes |
 | **C7** | **Step 1 scope** stated in the authorisation (below) | owner | — |
-| **C8** | **Commit policy** for LMC's code (D9 is open; every G-series research file so far stayed uncommitted) | owner | yes |
+| **C8** | **Commit policy** for LMC's code (D9 is open; every G-series research file so far stayed uncommitted) *(2026-10-24: overtaken — the backlog, LMC's code
+included, was committed to `main` on the owner's decision; §6)* | owner | yes |
 | **C9** *(added 2026-10-23)* | **Keep the reference data**: the Python reference scripts and raw results (`…/scratchpad/lmc_spec/`, `…/scratchpad/lmc_c2c5/`) and the G3c grids they read (`…/scratchpad/g3c/eval/`, `…/screen/`) live in a temporary session folder; Step 1's continuity check needs them. Either the owner names a persistent place outside `Assets` to copy them to, or the check relies only on the values written into spec §§11.4, 13.5 | owner | yes |
 
 **Step 1 scope to authorise (C7)** — exactly:
@@ -235,3 +240,13 @@ and plateau pools remain, and no gate changed state. The next step is the owner'
 asked for the not-ready report: **[GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md](GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md)** — Step 1 ends without a candidate for Step 2; no freeze, no
 held-out evaluation; the commit (C8) and any follow-up are the owner's decisions. *Then* the owner accepted the
 report and **closed Step 1 as not ready** (2026-10-24); the backlog was committed to `main` step by step.
+
+*Outcomes of two conditions, recorded 2026-10-24.* **C7 item 7** (repeat the calibration runs in a fresh process for
+determinism) was not performed as a step of its own: the not-ready report defers it to a justified candidate, and none
+existed. Bit-equality across fresh processes was observed along the way — diagnostic run 6 reproduced the lattices of
+runs 4 and 5 bit for bit, and runs 7–11 reproduced every stage they did not change (review §§11.1, 14.2, 16.2, 18.2,
+20.1). **C8** was overtaken: with no freeze, the owner had the backlog committed to `main` on 2026-10-24.
+
+*Then, the same day:* the post-mortem checks [G3e-PM](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md) (§13 there) — the **registered
+D1 result is INCONCLUSIVE**, **H is FAIL under its §7** (accepted by the owner), **DEV-1** was a one-run deviation, and
+the owner kept S-LM1's contracts, so **the S-LM1 line is stopped** under its §8. This checklist authorises nothing further.
