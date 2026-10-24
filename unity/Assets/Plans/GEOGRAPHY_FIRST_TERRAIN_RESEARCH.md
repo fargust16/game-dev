@@ -1,6 +1,6 @@
 # Geography-First Terrain Research — Expressive Fantasy Geography
 
-Version: 0.15
+Version: 0.16
 
 Status: Draft — research record. Owner decisions that apply: **GEO-6 answered (a), build both**
 (2026-10-18), so the read-only tooling G0 and G1 now exists as Editor-only code
@@ -18,7 +18,7 @@ that is not authorised. The stage responsibility map (§5) and the rest of the r
 **proposals awaiting owner review**; the classification of the acceptance suite (§7) follows GEO-7's
 decision record. The footprint attribution of §§11–12 was corrected on 2026-10-20 (§13.2).
 
-Last Updated: 2026-10-24 (v0.15: G3e Step 1 ended not ready, §16; v0.14, 2026-10-23: LMC named G3e, C8 and C9 decided, §§9, 15; v0.13: LMC specification v0.4 approved, §15; v0.12: LMC Step 1 conditions C2–C5 prepared, §15; v0.11: LMC design note approved, Step 1 readiness check, §15; v0.10: LMC technical specification approved, §15; v0.9: LMC technical specification and its check on G3c data, §15; v0.8: LMC design note v0.2 recorded, §15; v0.7: post-G3c review, §15; v0.6: G3c results, §14; v0.5: G2 outcome and corrections, §13)
+Last Updated: 2026-10-24 (v0.16: the post-mortem checks G3e-PM pre-registered, plan approved, not run, §16; v0.15: G3e Step 1 ended not ready, §16; v0.14, 2026-10-23: LMC named G3e, C8 and C9 decided, §§9, 15; v0.13: LMC specification v0.4 approved, §15; v0.12: LMC Step 1 conditions C2–C5 prepared, §15; v0.11: LMC design note approved, Step 1 readiness check, §15; v0.10: LMC technical specification approved, §15; v0.9: LMC technical specification and its check on G3c data, §15; v0.8: LMC design note v0.2 recorded, §15; v0.7: post-G3c review, §15; v0.6: G3c results, §14; v0.5: G2 outcome and corrections, §13)
 
 Depends On:
 [AGENTS.md](../../../AGENTS.md), [14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md),
@@ -40,6 +40,7 @@ Referenced By:
 [GEOGRAPHY_POST_G3C_REVIEW.md](GEOGRAPHY_POST_G3C_REVIEW.md),
 [GEOGRAPHY_LMC_DESIGN_NOTE.md](GEOGRAPHY_LMC_DESIGN_NOTE.md),
 [GEOGRAPHY_LMC_TECHNICAL_SPEC.md](GEOGRAPHY_LMC_TECHNICAL_SPEC.md),
+[GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md),
 [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Geography-first world shape,
 [90 Glossary](../../../90%20Glossary.md) § Geographic Hierarchy and § Geometry-First Review,
 [14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md),
@@ -1828,6 +1829,15 @@ record is [GEOGRAPHY_LMC_STEP1_RUN5_REVIEW.md](GEOGRAPHY_LMC_STEP1_RUN5_REVIEW.m
   failures come from where the shared layout puts plateaus (across drainage lines; one ramp toward a sea cliff) and from
   where S-LM1 puts its valleys relative to the base.
 
+**Post-mortem checks G3e-PM (2026-10-24) — plan approved by the owner, not run.** A single pass on the preserved run-11
+data and one views-only Unity step, pre-registered in
+[GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md): the owner's first look at S-LM1 at three scales
+(no S-LM1 image existed), then a ledger of the 30 hard-gate failure items of run 11 with their owners, the feasibility of
+the LM2 plateau-siting amendment on contour A, plateau 1's access on 110201 and the routing of 110201's elevated systems.
+Its hypothesis is that every item has an owner within a bounded set (LM2 plateau siting, S-LM1's plateau stage, valley
+stations, axis declaration); its pre-registered decision table ends in continue with an exact package, contract decisions
+first, or stop S-LM1. It changes no code and no definition; running it needs the owner's separate authorisation.
+
 ## Related documents
 
 - [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md) — the production terrain contract
@@ -1843,4 +1853,5 @@ record is [GEOGRAPHY_LMC_STEP1_RUN5_REVIEW.md](GEOGRAPHY_LMC_STEP1_RUN5_REVIEW.m
 - [GEOGRAPHY_LMC_STEP1_READINESS.md](GEOGRAPHY_LMC_STEP1_READINESS.md) — the readiness check and conditions for authorising LMC's Step 1
 - [GEOGRAPHY_LMC_STEP1_RUN5_REVIEW.md](GEOGRAPHY_LMC_STEP1_RUN5_REVIEW.md) — the run-by-run record and decisions of G3e Step 1
 - [GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md](GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md) — G3e Step 1's not-ready report
+- [GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md](GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md) — G3e-PM, the post-mortem checks: pre-registration (plan approved, not run)
 - [99 Open Questions](../../../99%20Open%20Questions.md) § Terrain — Geography-first world shape (GEO-1 … GEO-8)
