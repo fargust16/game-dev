@@ -1,14 +1,17 @@
 # G3f — Regional Geography Architecture: Phase Proposal
 
-Version: 0.2
+Version: 0.3
 
-Status: Draft — **phase plan. The owner approved the phase (D-1) and its architecture hypothesis (D-2) on 2026-10-25,
-and authorised step A of §14.1** (this document in the repository, pointers in 14, 99 and AGENTS.md). Decisions D-3 …
-D-12 and steps B and C of §14.1 are **open**: no code, no terrain generation, no Unity run and no read-only check is
-authorised. The text of v0.1 is unchanged except where the decision record below and §§12–13 say so.
+Status: Draft — **phase plan. Every owner decision D-1 … D-12 is taken (2026-10-25) and recorded in the decision record
+below**; where a decision and the text of §§1–14 differ, the decision governs, and the affected places carry a marker
+"→ D-x". **Decisions on content are not authorisations to execute.** Authorised so far: step A of §14.1 (this document
+and its pointers) and the recording of D-3 … D-12 (this version and its pointers in 14, 99 and AGENTS.md). Not
+authorised: the D-9 documentation package (law 11 in 17 and 14, the Glossary, GEO-11's record), the D-12 package,
+WP0, WP1, code, Unity, terrain generation, experiments and any production change.
 
-Last Updated: 2026-10-25 (v0.2: the owner's decisions D-1 and D-2 and the step-A authorisation recorded; §12 adjusted to
-them; GEO-11 widened to law 11. v0.1, 2026-10-24: the proposal)
+Last Updated: 2026-10-25 (v0.3: the owner's decisions D-3 … D-12 recorded verbatim with the texts they refer to; markers
+"→ D-x" at the places they change; §13 updated. v0.2: D-1, D-2 and the step-A authorisation recorded; §12 adjusted;
+GEO-11 widened to law 11. v0.1, 2026-10-24: the proposal)
 
 Depends On:
 [AGENTS.md](../../../AGENTS.md), [000 Project Rules](../../../000%20Project%20Rules.md),
@@ -37,18 +40,136 @@ Referenced By:
 
 ## Decision record
 
-**The owner's words, 2026-10-25 (verbatim):**
+### The owner's words (verbatim)
+
+**2026-10-25 — D-1, D-2 and step A:**
 
 > Одобряю фазу G3f (D-1, D-2) и шаг A из §14.1: внеси план в репозиторий с записью моих решений, обнови 14, 99,
 > AGENTS, закоммить и запушь. Решения D-3…D-12 сообщу отдельно.
+
+**2026-10-25 — D-3 … D-12:**
+
+> Решения владельца по G3f D-3…D-12:
+> D-3: принять в изменённой формулировке
+> D-4: сохранить R-F после аналитических проверок U-F; исправить цель сравнения
+> D-5: принять с условиями, указанными в пакете
+> D-6(b): A
+> D-6(c): A
+> D-6(e): A
+> D-7: принять
+> D-8: принять только для исследования
+> D-9: принять новую формулировку закона 11
+> D-9 W.2: отложить
+> D-10: принять протокол слепой оценки
+> D-11: бюджеты — диагностика; production limits на G4
+> D-12: принять отдельный документационный пакет без изменений кода
+>
+> Это решения по содержанию, не разрешение на исполнение. Отдельное разрешение на запись в репозиторий, WP0, WP1, код,
+> Unity, генерацию, эксперименты, commit и push не предоставлено.
+
+**2026-10-25 — confirmations:**
+
+> Подтверждаю D-6 (a) разделение B1, (d) 5+5 по классу плато, (f) seeds, (g) уникальные метки; D-4: A1 на U-F и R-F,
+> при ничьей — более простой вариант. Это тоже решения по содержанию, не разрешение на исполнение.
+
+**2026-10-25 — step 1 (this recording):**
+
+> Разрешаю шаг 1: записать решения D-3…D-12 дословно в план (v0.3) и указатели 14, 99, AGENTS, затем одним коммитом
+> закоммитить и запушить в main. Пакеты D-9 и D-12, WP0 и WP1 этим не разрешены.
+
+### The texts the decisions refer to (verbatim)
+
+The decisions refer to the agent's decision package `G3f_D3-D12_decision_package.md` (2026-10-25), kept outside the
+repository. The passages they accept are copied here verbatim, in the language the owner read them in, so that this
+document stands alone. They bind only through the owner's words above.
+
+- **D-3** — «Разрешаю описать в WP1 отдельную исследовательскую линию речного закона, изменённого относительно S-LM3
+  (L-1…L-7). Обязательно: закрытая конфигурация S-LM3 не возобновляется и её код не используется; дерево приёмников
+  строится один раз из плана, без итераций; все крупные водоразделы задаются планом; боковое ограничение только понижает
+  и не создаёт ям и стока через водоразделы; критерии и лимиты — общие с другими кандидатами. Stage 3 §16 на
+  экспериментальном уровне неприменим при этом условии. WP0, утверждение WP1, код и генерация — отдельными
+  разрешениями.»
+- **D-4** — the package's text: «Ядро — C0 и U-F. R-F сохраняется, но реализуется только после аналитических проверок U-F;
+  его цель — "гребни задаёт план, синтез по единицам", а не "изоляция сборки". A1 проверяется на U-F и R-F. При ничьей
+  выбирается более простой вариант. U-P — только если D-3 отклонён.» The owner decided it in their own words above;
+  the U-P clause is moot because D-3 was accepted.
+- **D-5** — «Contour A; окно 513 × 513 узлов (1 400 м) при 2,734375 м внутри решётки мира 1 025²; фикстура агента по
+  записям G3e с вариантами по seed. В WP1: (1) грубые водосборные единицы на весь остров для контекста C0; (2) фикстура
+  валидна по построению; F5 — слот у берега и устья долины, азимут рампы выбирает построитель плана в пределах P4; S2
+  считает только авторские правки фикстуры; (3) окно и ориентация — по C0-3.»
+- **D-6 (a)** — «B1 делится на две проверки. **Проверка стока** — процессный гейт для всех кандидатов, включая C0: на
+  итоговой поверхности ни одна вершина не стекает по D8 через границу типа Divide (заявленные переходы стока
+  исключены). **Проверка целей** — отдельное чтение: отклонения кульминаций, перевала и края плато от целей плана.»
+- **D-6 (b), option A** — «**A — диагностика для всех + флаг для осмотра**, если значение вне *утверждённого диапазона*
+  (330–430 м; 40–80 м; класс края).»
+- **D-6 (c), option A** — «**A — гейт:** доля суши сектора *вне заявленных полос уступов и обрывов*, достижимая по T-edge
+  от берега, ≥ уже записанных 95 %.»
+- **D-6 (d)** — «10 отложенных вариантов — по 5 на каждый класс плато. Класс задаётся по позиции seed в
+  зарегистрированном списке; остальные параметры тянутся из seed. Правило 7 из 10 не меняется; результат дополнительно
+  сообщается по классам.»
+- **D-6 (e), option A** — «**A — детерминированная перевыборка** из того же именованного потока с ограниченным числом
+  попыток (число фиксируется до WP1). Каждая попытка записывается. Сверх лимита вариант помечается «план невалиден» и
+  считается проваленным **для всех кандидатов**; знаменатель остаётся 10.» With it: «Для калибровки: невалидный план —
+  это правка фикстуры; S2 считает только авторские правки.»
+- **D-6 (f)** — «Калибровка — только 110201 и 1337 (по два класса плато). Отложенные варианты G3f — диапазон,
+  проверенный в C0-4 (предложено 5001–5010, резерв 5011–5020). Seeds 1005–1024 в G3f не генерируются, не просматриваются
+  и не используются — они оставлены для проверки на всём острове.»
+- **D-6 (g)** — «В WP1 все метки G3f получают префикс, исключающий совпадения с S8, B1/B2/C, O1, A1, K1–K5, P1–P8,
+  D1–D9, C0».
+- **D-7** — «`main`; документы — по шагам, код — одним коммитом на одобренный WP; данные — только в `research-data`;
+  freeze ссылается на SHA коммита.»
+- **D-8** — «Глобальный расчёт по сетке разрешён исследовательским кандидатам G3f (GEO-11 ч. 1 (a)). Производственное
+  использование — только решением на G4 после проверки времени и памяти на сид относительно `H4A`, детерминизма между
+  машинами, позиции по чанкам и сетевой передаче, локальности и контракта 3F-25.»
+- **D-9** — the accepted wording of law 11 (for law 11 of 17 and Locked Architecture item 7 of 14), as Markdown source;
+  its links are relative to the repository root, where 17 and 14 live:
+
+  ```text
+  11. **Piece-Based Assembly, small → large.** Settlement, Building/Interior and other world content placed on the
+  terrain compose from small hand-authored Pieces with Snap Sockets (Valheim-style room/dungeon piece model), never from
+  a whole hand-tuned continuous mesh or an algorithmic subdivision solver. Binding for Track W's placed content and
+  [15](15%20Procedural%20Building%20Generation.md); the retired OrganicTown continuous pipeline
+  ([13](13%20City%20Generation.md)) is not a reuse source. **The terrain height field is not assembled from Pieces:** it
+  is TerrainGen's deterministic world-spanning field written into Unity `TerrainData` under the terrain stack of
+  [AGENTS.md](AGENTS.md) and `OVERWORLD_TERRAIN_ARCHITECTURE.md`. Which relief model TerrainGen uses is decided there
+  (99 Open Questions GEO-3, GEO-11), not by this law.
+  ```
+
+  Until the D-9 documentation package is authorised and applied, 17 and 14 still carry the old text. The W.2 correction
+  of 17 is **deferred**.
+- **D-10** — «Слепо, с запечатанным ключом и порядком по seed; сначала абсолютные оценки каждой панели по пунктам D6,
+  потом сравнение; агент не высказывается до фиксации оценок; один пресет света; эталоны подписаны и не оцениваются.»
+- **D-11** — «Бюджеты §9.5 — диагностика с записанным методом экстраполяции; производственные лимиты — на G4 по измерениям
+  на всём острове относительно `H4A`.»
+- **D-12** — «Отдельный doc-коммит с пометками: заголовок 14 и "GEO-1 … GEO-8", шапка post-G3c review, D9 брифа G2; в
+  tech debt 22 добавить `IslandRelief.cs:77–78`. Комментарии в коде не трогать.»
+
+### What the decisions change in this plan (summary; the quoted texts govern)
+
+| Decision | Content | Places it changes |
+|---|---|---|
+| D-3 | a new research line with a changed fluvial law, to be described in WP1; the closed S-LM3 configuration and its code are not used; receivers built once from the plan; every major divide declared by the plan; the lateral constraint only lowers, makes no pit and no flow across a divide; the same criteria and caps as the other candidates; Stage 3 §16 not applicable at the experimental level under that condition | §6.4 (U-F, R-F), §7 WP6 |
+| D-4 | core C0 + U-F; R-F kept, implemented only after U-F's analytic checks, its purpose "crests set by the plan, synthesis per unit" (not "isolating assembly"); A1 on U-F and R-F; a tie goes to the simpler candidate | §6.4, §7 WP7, §9.2 A1, §10.3 |
+| D-5 | contour A; a 513 × 513-vertex window (1 400 m) at 2.734375 m in the 1 025² world lattice; the agent's fixture with seeded variants; in WP1 coarse whole-island units for C0's context, the fixture valid by construction (F5 a slot by the coast and a valley mouth, the ramp bearing chosen by the plan builder within P4), S2 counting only authored fixture corrections, window and orientation by C0-3 | §5.4, §6.2, §6.3, §10.4 S2 |
+| D-6 | (a) B1 split into a flow check (a process gate for every candidate, C0 included) and a target reading; (b) targets a diagnostic with a review flag outside the approved ranges; (c) a gate: the share of sector land outside declared escarpment and cliff bands reachable from the shore on T-edge ≥ the recorded 95 %; (d) held-out variants 5 per plateau class; (e) an invalid seeded plan redrawn deterministically within a cap fixed before WP1, past the cap failed for every candidate; (f) calibration 110201 and 1337 only, held-out from the range C0-4 verifies, 1005–1024 not used in G3f; (g) unique G3f labels in WP1 | §6.6, §9.1, §9.2, §10.2 |
+| D-7 | `main`; documents by step, code one commit per approved work package; data only in `research-data`; the freeze cites a commit | §12 |
+| D-8 | a global lattice solve allowed for G3f's research candidates (GEO-11 part 1 (a)); production use only by a G4 decision after the listed checks | §2.2 row 7, §5.5 |
+| D-9 | the new wording of law 11 accepted; its documentation package (17, 14, the Glossary, GEO-11's record) is a separate, not yet authorised step; W.2 deferred | §2.2 row 10, §12 |
+| D-10 | blind review with a sealed key; absolute ratings first; the agent silent until ratings are fixed; one light preset | §9.7 |
+| D-11 | the budgets of §9.5 are diagnostics; production limits at G4 | §9.5, §11.2 |
+| D-12 | a separate documentation package without code changes; not yet authorised | §2.2 row 9, §12 |
+
+### State
 
 | Item | State |
 |---|---|
 | D-1 the phase | **approved** — official ID **G3f**, working name RGA; scope §1, gates §10.1 |
 | D-2 the architecture hypothesis | **approved as the hypothesis to test** (§4) — not as an architecture decision; that is G-6 |
-| D-3 … D-12 | **open** — the owner will answer them separately |
-| D-13 the first authorised step | **step A authorised** (§14.1); steps B (WP0) and C (WP1) not yet |
-| Gates (§10.1) | G-1 and G-2 passed for the phase and the hypothesis; the candidate set and D-3 (part of G-2) stay open; G-3 … G-7 not reached |
+| D-3 … D-12 | **decided on content, 2026-10-25** (above) |
+| D-13 the first authorised step | step A **done**; the recording of D-3 … D-12 (step 1) **done** in this version; steps B (WP0) and C (WP1) **not authorised** |
+| Gates (§10.1) | G-1 and G-2 passed, the candidate set and D-3 included; G-3 … G-7 not reached |
+| Open before WP1 | the values the decisions leave to WP1: the fix and run caps, the redraw cap (D-6 (e)), the M / P / F levels of the review |
+| Not authorised | the D-9 and D-12 documentation packages, WP0, WP1, code, Unity, terrain generation, experiments, any production change |
 
 Nothing in this record authorises code, terrain generation, a Unity run, a read-only check of preserved data or any
 production change. The terms of §0 stay proposed; they enter the Glossary only at G-3 (§12).
@@ -144,10 +265,10 @@ and `fae8f28`. Its critical findings were re-checked on `main` for this proposal
 | 4 | S-LM1's base lets the coastal surface decide heights beyond the coastal band (Q-O1-a answered *No*) | `TerrainGenLmcSkeleton.cs:368–374`: `zC = BaseLevel + max(0, sd)·t`, `B = min(zE, zC)` over all land, no band width | holds |
 | 5 | LM2 reserves less than the synthesis writes; its validation tests neither the ramp's land nor a write footprint | specification §4.3 (V-L6); run-by-run review §§17.1–17.2 | holds |
 | 6 | **New.** S-LM1 as built is not a point function: it uses distance transforms, weighted geodesics and a conjugate-gradient toe solve over the lattice | `TerrainGenLmcSkeleton.cs:121–122, 156, 349, 506` | the "best production fit as an analytic point function" argument (post-G3c review §4.8; design note §5.3) did not survive implementation |
-| 7 | **New.** Production consumes the terrain authority only as a world-spanning lattice | the only callers of `TerrainAuthorityField` are the bake, the validation and the bake tests; `OverworldTerrainField.FromSamples` samples once per lattice vertex | a global lattice solve is compatible with the bake contract; seams stay exact |
+| 7 | **New.** Production consumes the terrain authority only as a world-spanning lattice | the only callers of `TerrainAuthorityField` are the bake, the validation and the bake tests; `OverworldTerrainField.FromSamples` samples once per lattice vertex | a global lattice solve is compatible with the bake contract; seams stay exact. → D-8: allowed for research only; production at G4 |
 | 8 | **New.** Surface and vegetation rules read TerrainGen's massif uplift `U2` | `TerrainSurfaceRules.MassifUplift*`, `TerrainVegetationRules.PineUplift*`, `TerrainSurfaceClassifier.cs:66` | any replacement authority must supply an equivalent channel (production plan item) |
-| 9 | Audit leftovers still stale | post-G3c review header "Nothing is implemented or run"; G2 brief D9 "uncommitted"; roadmap heading "Geography-first research … — proposals, nothing approved" and "GEO-1 … GEO-8"; `IslandElevation.cs:10` (tech debt item 22) | still present — optional housekeeping (§12) |
-| 10 | **New.** Law 11 of [17](../../../17%20Game%20Systems%20Architecture.md) makes Piece-Based Assembly binding for Track W "World … generation", while the terrain authority is a continuous field; the W.2 card still says "noise / band rules" | `17` law 11 and W.2 | a documentation ambiguity in a locked law — owner clarification (§13 D-9) |
+| 9 | Audit leftovers still stale | post-G3c review header "Nothing is implemented or run"; G2 brief D9 "uncommitted"; roadmap heading "Geography-first research … — proposals, nothing approved" and "GEO-1 … GEO-8"; `IslandElevation.cs:10` (tech debt item 22) | still present — optional housekeeping (§12). → D-12: a separate documentation package without code changes, not yet authorised |
+| 10 | **New.** Law 11 of [17](../../../17%20Game%20Systems%20Architecture.md) makes Piece-Based Assembly binding for Track W "World … generation", while the terrain authority is a continuous field; the W.2 card still says "noise / band rules" | `17` law 11 and W.2 | a documentation ambiguity in a locked law — owner clarification (§13 D-9). → D-9: the new wording accepted; its documentation package not yet authorised; W.2 deferred |
 
 ### 2.3 What the record says about the central question
 
@@ -301,6 +422,7 @@ unit id and one region code per vertex — is what synthesis reads, so "one owne
 2. Stress fixture + seed → Geography Plan (vectors) → raster (units, regions) → **validator P1–P8**; on failure nothing
    is synthesised and the failure is logged.
 3. Control surface (C0) over the whole island = the context outside the sector; candidates write the sector only.
+   → D-5: the fixture declares coarse drainage units for the whole island (WP1).
 4. Embedding into the world lattice (sector = candidate, rest = context; sea from Stage 1).
 5. Readings restricted to the sector (§9), the production hydrology planner on the whole lattice (R5ʳ, R10).
 6. Views anchored on the plan (identical cameras for every candidate of a variant).
@@ -311,6 +433,7 @@ unit id and one region code per vertex — is what synthesis reads, so "one owne
 `seed → Stage 1 (frozen) → Geography Plan (grammar instantiation) → validator → surface synthesis (world lattice) →
 [hydrology carve, optional, unchanged] → OverworldTerrainField.FromSamples (the plan lattice; plus the uplift
 replacement channel) → bake (unchanged)`. One production path; no fallback, no alternate bake (AGENTS.md).
+→ D-8: a global lattice solve is allowed for research only; any production use is a G4 decision.
 
 ### 5.6 Regions versus tiles; merging into one field
 
@@ -382,6 +505,9 @@ divide; its seaward side holds cliff-capable and low shore; it covers the north-
 run-11 plateau 1 and its ramp to the sea cliff lay (around world (850–1 000, 2 150–2 300) m), so that historical panels
 at the same cameras show the failures the fixture stresses.
 
+→ D-5: this domain and resolution are approved; the window and its orientation are fixed by C0-3 (WP0) before WP1
+freezes.
+
 ### 6.3 The stress fixture
 
 | Id | Feature | Stresses (where it failed) |
@@ -400,18 +526,26 @@ top area, position among three declared slots on the branch flank, rim shares wi
 outlets; 3–4 tributaries and their heads; outlet position along its low segment (±60 m **[AUTHORING]**); coastal band
 widths within each intent's range **[AUTHORING]**.
 
+→ D-5: the fixture is valid by construction — F5 is a slot by the coast and a valley mouth, and the plan builder chooses
+the ramp bearing within P4; it also declares coarse drainage units for the whole island. → D-6 (e): a seeded variant
+whose plan fails the validator is redrawn deterministically within a cap fixed before WP1; past the cap it fails for
+every candidate.
+
 ### 6.4 Candidates and references, under identical conditions
 
 | Id | Surface | Represents | Status |
 |---|---|---|---|
 | **C0 control** | per unit, a constrained cost-distance from the outlet scaled by region; no law | plan + the simplest geometric synthesis (the G3c lineage) | required; also the tree source and the context |
 | **U-F** | plan + **unified** drainage-tree synthesis; crests emergent | option D | required; needs D-3 |
-| **R-F** | the same tree and law, **per unit** with crest and boundary heights prescribed by the plan; units concatenated | option B's regional assembly | required; needs D-3 |
+| **R-F** | the same tree and law, **per unit** with crest and boundary heights prescribed by the plan; units concatenated | option B's regional assembly | required; needs D-3. → D-4: implemented only after U-F's analytic checks |
 | U-P | plan + geometric profiles per region with partition-of-unity blending | option C done with single ownership | optional (WP-O1); the default if D-3 is declined |
 | ref `H4A` | production 110201, same cameras | option A as it exists | reference, labelled, not rated |
 | ref G3e | run-11 S-LM1 and the closed S-LM3 lattices of 110201, same cameras | history | calibration only, labelled, not rated |
 
-U-F and R-F share the tree and the law, so their comparison isolates assembly; C0 against U-F isolates the law.
+~~U-F and R-F share the tree and the law, so their comparison isolates assembly;~~ C0 against U-F isolates the law.
+→ D-4: U-F and R-F differ in two factors — the assembly and who sets the crest heights — so their comparison is
+"crests set by the plan, synthesis per unit" against U-F, not an isolated test of assembly; assembly exactness (A1) is
+checked on both.
 
 **Law contract for U-F and R-F** (required properties; equations and parameters in WP1, checked analytically first):
 
@@ -444,6 +578,10 @@ nothing.
 | held-out | **5001–5010** **[PROPOSAL]** | verified unused before the freeze (WP0, C0-4); never generated before the freeze record exists |
 | reserve | **5011–5020** | only if an evaluation is invalidated by a post-freeze change |
 | untouched | **1005–1024** | kept for the island-scale evaluation of the production plan's first stage |
+
+→ D-6 (d), (f): the ten held-out variants are 5 per plateau class (the class set by the seed's position in the
+registered list); calibration uses 110201 and 1337 only; held-out seeds come from the range C0-4 verifies; 1005–1024 are
+not generated, viewed or used in G3f.
 
 ### 6.7 Steps
 
@@ -479,7 +617,8 @@ Order of dependency: `WP0 → WP1 → [G-3] → WP2 → (WP3 ∥ WP4) → [G-4b]
   cause. C0-3: two or three candidate sector windows on contour A measured (land, shoreline, divide-to-coast depth) and
   one chosen by §6.2's rules. C0-4: the seed range 5001–5020 checked as unused in the repository and in research data.
   C0-5: run-11 readings that fall inside the chosen sector — the continuity targets for WP3.
-- *Depends on:* G-1 and an authorisation of read-only checks.
+- *Depends on:* G-1 and an authorisation of read-only checks. → D-3, D-5, D-6 (f) set its scope: C0-1 is needed (D-3
+  accepted), C0-3 and C0-5 follow D-5, C0-4 checks the range of D-6 (f). WP0 itself is not yet authorised.
 - *Outputs:* `research-data\g3f\wp0\` — `stress_catalogue.md`, `window.md`, `seed_check.txt`, `c0-1_walls.md`,
   `continuity_targets.json`, scripts, SHA-256 manifests.
 - *Verification:* scripts hashed before execution; two runs byte-identical; inputs (run 11 105/105, lmc-reference 48/48,
@@ -526,7 +665,8 @@ Order of dependency: `WP0 → WP1 → [G-3] → WP2 → (WP3 ∥ WP4) → [G-4b]
   writer); determinism; complete readings.
 - *Complete when:* U-F runs on the calibration variants; every defect is logged.
 
-**WP7 — R-F synthesis and assembly tests** *(code; needs D-3)*
+**WP7 — R-F synthesis and assembly tests** *(code; needs D-3; → D-4: only after U-F's analytic checks in WP6, its
+purpose "crests set by the plan, synthesis per unit"; A1 also on U-F)*
 - *Verification:* gate A1 — two unit orders give byte-identical lattices; one unit's parameters changed alters no vertex
   outside it and its descendants.
 - *Complete when:* A1 is measured, pass or fail.
@@ -628,13 +768,16 @@ pinned values; held-out seeds absent from every output before the freeze.
 | R9ʳ routes | every declared route's endpoints in one T-edge component; detour, steepest triangle and an alternative reported **[CARRIED, K2]** | all connected |
 | R10 planner | `HydrologyPlanner.Plan(grid, HydrologySettings.Default, seed)` on the embedded lattice | `Succeeded` |
 
+→ D-6 (c): one more hard gate — the share of sector land outside declared escarpment and cliff bands that is reachable
+from the shore on T-edge is at least the 95 % recorded in `WORLD_RELIEF_PRINCIPLES.md` §6.
+
 ### 9.2 Process gates
 
 | Gate | Reading | Pass |
 |---|---|---|
 | O1 single writer | the write log | every sector land vertex written exactly once, by its unit; nothing outside the sector written |
-| B1 boundary contract | D8 on the final surface; targets | 0 vertices draining across a divide (declared flow crossings excepted); culminations ±2 m, pass ±5 m, plateau edge class ±2 m |
-| A1 assembly (R-F) | two unit orders; one unit perturbed | byte-identical lattices; no change outside the perturbed unit and its descendants |
+| B1 boundary contract | D8 on the final surface; targets | 0 vertices draining across a divide (declared flow crossings excepted); culminations ±2 m, pass ±5 m, plateau edge class ±2 m. → D-6 (a), (b): split — the flow check stays a gate for every candidate, C0 included; the targets become a diagnostic reading with a review flag outside the approved ranges (330–430 m; 40–80 m; the edge class) |
+| A1 assembly (R-F) | two unit orders; one unit perturbed | byte-identical lattices; no change outside the perturbed unit and its descendants. → D-4: measured on U-F and R-F |
 | determinism | two fresh processes | lattices, readings and plan byte-identical |
 | protection | §8.4 | unchanged |
 
@@ -665,6 +808,9 @@ hashed before and after; every output folder carries a SHA-256 manifest.
 End-to-end per variant ≤ 60 s; synthesis extrapolated to the whole island ≤ 30 s single-threaded (today's authority:
 22.9 s; S-LM3 with 30 iterations: 19.5–19.8 s; S-LM1: 2.6–2.7 s); peak managed memory ≤ 512 MB (one float64 field on
 the world lattice is 8.4 MB).
+
+→ D-11: these budgets are diagnostics, reported with the extrapolation method; production limits are set at G4 from
+island-scale measurements against `H4A`.
 
 ### 9.6 Settlement suitability
 
@@ -705,6 +851,9 @@ diagnostics. Settlement size classes, slope and spacing stay provisional (D2).
   are fixed and change none of them. The concept image guides composition only; no count, size or height is read from
   it.
 - **Blinding** is nominal when a candidate has a recognisable signature; that is recorded as a limitation.
+- → D-10: blind with a sealed key and a seeded order; absolute ratings of each panel per D6 point first, comparison
+  after; the agent gives no assessment before the ratings are fixed; one light preset; references labelled and not
+  rated.
 
 ### 9.8 What is already approved and what needs the owner
 
@@ -747,11 +896,15 @@ The owner's preference against the control is recorded. **Simplicity rule:** if 
 preferred unless the owner's review prefers the candidate ([000](../../../000%20Project%20Rules.md): choose the simpler
 expandable system).
 
+→ D-6 (c), (d), (e): the hard gates include the reachability-share gate (§9.1); the ten held-out variants are 5 per
+plateau class, results also reported per class; a variant whose plan stays invalid past the redraw cap counts as failed
+for every candidate, and the denominator stays 10.
+
 ### 10.3 Architecture decision rule (G-6)
 
 | Outcome | Decision proposed to the owner |
 |---|---|
-| U-F and R-F pass; the review prefers neither | Geography Plan + **per-unit** synthesis (locality, plan-owned crests, per-unit regeneration) |
+| U-F and R-F pass; the review prefers neither | ~~Geography Plan + **per-unit** synthesis (locality, plan-owned crests, per-unit regeneration)~~ → D-4: the simpler candidate |
 | U-F passes, R-F fails | Geography Plan + **unified** synthesis; regions remain planning and ownership units only |
 | R-F passes, U-F fails | Geography Plan + per-unit synthesis with designed boundaries |
 | only C0 passes | Geography Plan + the simple surface; the law is recorded as adding nothing yet |
@@ -763,7 +916,7 @@ expandable system).
 | # | Condition | Action |
 |---|---|---|
 | S1 | a protected file or pinned hash changes | stop at once; report; nothing further runs |
-| S2 | the fixture fails the validator after 2 logged plan corrections | stop at G-4a: the plan concept is defective; report |
+| S2 | the fixture fails the validator after 2 logged plan corrections | stop at G-4a: the plan concept is defective; report. → D-5, D-6 (e): only authored corrections of the fixture count; redraws of seeded variants are governed by the redraw cap |
 | S3 | the harness cannot reproduce the continuity targets | stop; a harness fix is measurement code and needs its own authorisation |
 | S4 | a candidate needs a 7th named fix or a 6th calibration run | that candidate stops; recorded as not ready |
 | S5 | no candidate passes every hard gate on all four calibration variants | no freeze; a not-ready report (design note §11 style) |
@@ -842,16 +995,16 @@ budgets are reported and become gates only if the owner says so.
 
 | Document | Change | When | Proposed version / status |
 |---|---|---|---|
-| `unity/Assets/Plans/GEOGRAPHY_G3F_PHASE_PLAN.md` (new) | this proposal, with the owner's decisions recorded verbatim | first authorised step — **done 2026-10-25** | v0.2, Draft — phase plan as approved |
+| `unity/Assets/Plans/GEOGRAPHY_G3F_PHASE_PLAN.md` (new) | this proposal, with the owner's decisions recorded verbatim | first authorised step — **done 2026-10-25**; D-3 … D-12 recorded in v0.3 (**done 2026-10-25**) | v0.3, Draft — phase plan with every decision recorded |
 | `unity/Assets/Plans/GEOGRAPHY_G3F_TECHNICAL_SPEC.md` (new) | WP1 | before any code | v0.1 Draft → approved at G-3 |
 | G3f calibration review, report (new) | WP8–WP10 | later | Draft |
 | [14 World Generation Roadmap](../../../14%20World%20Generation%20Roadmap.md) | a G3f paragraph (**done 2026-10-25**); the stale heading and "GEO-1 … GEO-8" only with D-12 | first step; D-12 | 0.33 |
 | [99 Open Questions](../../../99%20Open%20Questions.md) | GEO-3: a G3f line; new **GEO-10** (ownership model: drainage units, regions, regional assembly) and **GEO-11** (the terrain authority's form: may it be a global lattice solve rather than a point function, and does law 11 of 17 govern the terrain height field — D-8, D-9) (**done 2026-10-25**) | first step | 0.53 |
 | [90 Glossary](../../../90%20Glossary.md) | Geography Plan, Drainage Unit, Boundary Contract, Write Footprint, Stress Fixture — only once approved | G-3 | minor version |
 | [AGENTS.md](../../../AGENTS.md) | "Proposed Decisions Awaiting Owner Review": the G3f proposal; after each gate what is authorised; Next Design Priority item 6 | first step (**done 2026-10-25**), then per gate | 0.78 … |
-| [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md) | law 11's scope; the W.2 data-flow line | only on the owner's decision D-9 (a locked law) | 0.9 |
+| [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md) | law 11's scope; the W.2 data-flow line | only on the owner's decision D-9 (a locked law). → D-9: the wording is accepted (decision record) — it goes into law 11 of 17, item 7 of 14, the Glossary and GEO-11's record as one package that is **not yet authorised**; the W.2 line is deferred | 0.9 |
 | [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) | §9 roadmap row for G3f (**done 2026-10-25**); a results section at the end | first step; G-6 | 0.19 … |
-| [GEOGRAPHY_POST_G3C_REVIEW.md](GEOGRAPHY_POST_G3C_REVIEW.md), [GEOGRAPHY_TARGET_BRIEF_G2.md](GEOGRAPHY_TARGET_BRIEF_G2.md) | the stale header line; D9 "uncommitted" annotated | optional (D-12) | 0.5.1 each |
+| [GEOGRAPHY_POST_G3C_REVIEW.md](GEOGRAPHY_POST_G3C_REVIEW.md), [GEOGRAPHY_TARGET_BRIEF_G2.md](GEOGRAPHY_TARGET_BRIEF_G2.md) | the stale header line; D9 "uncommitted" annotated | optional (D-12). → D-12: accepted as a separate documentation package without code changes — with the heading and "GEO-1 … GEO-8" of 14 and `IslandRelief.cs:77–78` added to tech-debt item 22; **not yet authorised** | 0.5.1 each |
 | [WORLD_RELIEF_PRINCIPLES.md](WORLD_RELIEF_PRINCIPLES.md), [OVERWORLD_TERRAIN_ARCHITECTURE.md](OVERWORLD_TERRAIN_ARCHITECTURE.md) | none in G3f | — | — |
 | `.cursor/rules/` | checked at G-3; changed only if the process changes | G-3 | — |
 
@@ -866,17 +1019,17 @@ documents, agent rules) and is committed and pushed as one step (Git History Dut
 |---|---|---|---|
 | D-1 | the phase | approve G3f (working name RGA), its scope (§1) and gates (§10.1) / revise / reject | approve — **approved 2026-10-25** |
 | D-2 | the architecture hypothesis | hybrid of §4 to be tested; regions as ownership units, tiles as representation | approve as a hypothesis, not as a decision — **approved 2026-10-25 as a hypothesis** |
-| D-3 | **the fluvial family with a changed law** (L-1 … L-7) | authorise it as G3e-PM §8's "changed S-LM3 law" line, with confirmation that Stage 3 §16's rejection of flow-derived structure does not apply at the experimental level to a tree built from a designed plan / decline | authorise; the evidence is E6–E7. If declined, U-P becomes the candidate law |
-| D-4 | candidate set | C0 + U-F + R-F; U-P optional | C0 + U-F + R-F; U-P only as the fallback |
-| D-5 | domain and fixture | contour A, one 513² window chosen in WP0, a fixture authored by the agent from the G3e record, seeded variants; WP-O2 optional | approve; WP-O2 only if the owner wants a second topology early |
-| D-6 | criteria to freeze in WP1 | §9.8's new rows: regional gates, process gates, diagnostics, form, pass and decision rules, caps, seeds; 1005–1024 untouched | approve the list for WP1 to specify |
-| D-7 | commit policy | each documentation step and each code package to `main` (Editor-only, isolated) / a research branch | `main`, as the G3e backlog was; the freeze record cites a commit |
-| D-8 | representation | allow a global lattice solve for the research candidates now; production at G4 | allow for research (finding 7) |
-| D-9 | law 11 of 17 | clarify that Piece-Based Assembly governs placed content (settlements, buildings, interiors, props) and the terrain height field follows AGENTS.md's terrain stack / state otherwise | clarify; it is a locked law, so only the owner can |
-| D-10 | visual review | blind with a sealed key; references labelled; nominal blinding accepted; second light preset yes/no | blind; one light preset |
-| D-11 | budgets | §9.5 as reported diagnostics / as gates | reported diagnostics |
-| D-12 | housekeeping | apply the remaining stale-line fixes (§2.2 row 9) as their own commit / leave | apply, separately |
-| D-13 | **the first authorised step** | §14.1 steps A–C (documentation and read-only checks; no code) | approve A; B and C may follow in order — **A authorised 2026-10-25; B and C open** |
+| D-3 | **the fluvial family with a changed law** (L-1 … L-7) | authorise it as G3e-PM §8's "changed S-LM3 law" line, with confirmation that Stage 3 §16's rejection of flow-derived structure does not apply at the experimental level to a tree built from a designed plan / decline | authorise; the evidence is E6–E7. If declined, U-P becomes the candidate law — **decided 2026-10-25: accepted in the modified wording (decision record)** |
+| D-4 | candidate set | C0 + U-F + R-F; U-P optional | C0 + U-F + R-F; U-P only as the fallback — **decided 2026-10-25: core C0 + U-F; R-F after U-F's analytic checks, purpose corrected; A1 on both; a tie goes to the simpler** |
+| D-5 | domain and fixture | contour A, one 513² window chosen in WP0, a fixture authored by the agent from the G3e record, seeded variants; WP-O2 optional | approve; WP-O2 only if the owner wants a second topology early — **decided 2026-10-25: accepted with the package's conditions** |
+| D-6 | criteria to freeze in WP1 | §9.8's new rows: regional gates, process gates, diagnostics, form, pass and decision rules, caps, seeds; 1005–1024 untouched | approve the list for WP1 to specify — **decided 2026-10-25: (a) B1 split, (b) A, (c) A, (d) 5 + 5, (e) A, (f) seeds, (g) unique labels** |
+| D-7 | commit policy | each documentation step and each code package to `main` (Editor-only, isolated) / a research branch | `main`, as the G3e backlog was; the freeze record cites a commit — **decided 2026-10-25: accepted** |
+| D-8 | representation | allow a global lattice solve for the research candidates now; production at G4 | allow for research (finding 7) — **decided 2026-10-25: research only** |
+| D-9 | law 11 of 17 | clarify that Piece-Based Assembly governs placed content (settlements, buildings, interiors, props) and the terrain height field follows AGENTS.md's terrain stack / state otherwise | clarify; it is a locked law, so only the owner can — **decided 2026-10-25: the new wording accepted; W.2 deferred; the documentation package not yet authorised** |
+| D-10 | visual review | blind with a sealed key; references labelled; nominal blinding accepted; second light preset yes/no | blind; one light preset — **decided 2026-10-25: the blind-review protocol accepted** |
+| D-11 | budgets | §9.5 as reported diagnostics / as gates | reported diagnostics — **decided 2026-10-25: diagnostics; production limits at G4** |
+| D-12 | housekeeping | apply the remaining stale-line fixes (§2.2 row 9) as their own commit / leave | apply, separately — **decided 2026-10-25: a separate documentation package without code changes; not yet authorised** |
+| D-13 | **the first authorised step** | §14.1 steps A–C (documentation and read-only checks; no code) | approve A; B and C may follow in order — **A authorised 2026-10-25; B and C open**; the recording of D-3 … D-12 authorised and done (v0.3) |
 
 If any decision stays open, nothing that depends on it starts; the agent reports the blocking item and waits.
 
@@ -896,6 +1049,10 @@ Each sub-step is one commit and push, and starts only when the owner has authori
 - **B. WP0** exactly as §7 describes: Python 3 with numpy in `research-data\g3f\wp0\scripts\`, scripts hashed before
   running, inputs verified before and after, two runs compared; nothing in the repository changes.
 - **C. WP1** — the technical specification with the analytic checks; present it for approval (G-3). Nothing further.
+
+→ State, 2026-10-25: A is done; the recording of D-3 … D-12 (v0.3) is done; B and C are **not authorised**. When
+authorised, B runs in the scope D-3, D-5 and D-6 (f) set (§7 WP0), and C carries every decision of the decision record,
+including the values left to WP1 and the unique labels of D-6 (g).
 
 ### 14.2 First code slice — WP2, plan only (after G-3)
 
@@ -973,3 +1130,8 @@ changed, committed or pushed; no held-out seed was read; the repository is as it
 **v0.2 (step A, 2026-10-25).** This document was placed in the repository with the decision record above; 14, 99
 (GEO-3, GEO-10, GEO-11), AGENTS.md and the research record's §9 point to it. No code, terrain, Unity run, read-only check
 or production file was touched; the audit's remaining stale lines (§2.2 row 9) were left for D-12.
+
+**v0.3 (step 1, 2026-10-25).** The owner's decisions D-3 … D-12 and the texts they refer to were recorded verbatim in the
+decision record; markers "→ D-x" were added where they change §§1–14; §13 records each decision; 14, 99 and AGENTS.md
+point to them. No other document, no code, no terrain, no Unity run and no read-only check was touched; the D-9 and D-12
+packages were not applied.

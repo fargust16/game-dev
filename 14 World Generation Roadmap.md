@@ -1,10 +1,10 @@
 # 14 World Generation Roadmap
 
-Version: 0.33
+Version: 0.34
 
 Status: Draft
 
-Last Updated: 2026-10-25 (G3f, regional geography architecture: the phase plan approved — D-1, D-2 — and recorded; only step A authorised. 2026-10-24: G3e-PM ran: H FAIL; the S-LM1 line stopped. G3e-PM post-mortem checks pre-registered, plan approved, not run. G3e Step 1 ended not ready; report accepted, Step 1 closed. 2026-10-23: LMC named G3e; C8, C9 decided. LMC specification v0.4 approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC Step 1 readiness check; design note approved as the research plan. Earlier: LMC technical specification approved; Step 1 not authorised. Earlier: checked on G3c data. 2026-10-21: LMC design note v0.2, the owner's revision; post-G3c review: GEO decisions, model research plan; G3c results; G2 review)
+Last Updated: 2026-10-25 (G3f: the owner's decisions D-3 … D-12 on content recorded in the phase plan v0.3; none authorises execution. Earlier: G3f, regional geography architecture: the phase plan approved — D-1, D-2 — and recorded; only step A authorised. 2026-10-24: G3e-PM ran: H FAIL; the S-LM1 line stopped. G3e-PM post-mortem checks pre-registered, plan approved, not run. G3e Step 1 ended not ready; report accepted, Step 1 closed. 2026-10-23: LMC named G3e; C8, C9 decided. LMC specification v0.4 approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC Step 1 readiness check; design note approved as the research plan. Earlier: LMC technical specification approved; Step 1 not authorised. Earlier: checked on G3c data. 2026-10-21: LMC design note v0.2, the owner's revision; post-G3c review: GEO decisions, model research plan; G3c results; G2 review)
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
@@ -273,7 +273,15 @@ control surface, a unified synthesis and a per-unit synthesis under identical co
 held-out variants — then an architecture decision and, only if one is adopted, a production implementation plan as the
 input to G4. Decisions D-3 … D-12 (among them whether a drainage-tree law of the S-LM3 family may be the candidate law)
 are open, and only step A — the plan and these pointers — is authorised: no code, generation, Unity run or read-only
-check. What this changes in the order above: nothing; production stays `H4A`, G3d waits.
+check. What this changes in the order above: nothing; production stays `H4A`, G3d waits. *Later the same day* the owner
+decided D-3 … D-12 on content (the plan's decision record, v0.3): a changed fluvial law of the S-LM3 family may be
+described in WP1 as a new research line — the closed S-LM3 configuration is not resumed; the candidates are C0 and U-F,
+with R-F only after U-F's analytic checks; the domain is contour A with a 513 × 513-vertex window; the criteria for WP1
+include a split flow check, targets as diagnostics and a reachability-share gate; commits go to `main`; a global lattice
+solve is allowed for research only; the new wording of law 11 is accepted, its documentation package not yet authorised
+and the W.2 line deferred; the review is blind; the budgets are diagnostics; the stale-line package is accepted without
+code changes. These are decisions on content: WP0, WP1, code, Unity, generation and the two documentation packages each
+still need their own authorisation.
 
 ---
 
