@@ -1,10 +1,10 @@
 # 14 World Generation Roadmap
 
-Version: 0.32
+Version: 0.33
 
 Status: Draft
 
-Last Updated: 2026-10-24 (G3e-PM ran: H FAIL; the S-LM1 line stopped. G3e-PM post-mortem checks pre-registered, plan approved, not run. G3e Step 1 ended not ready; report accepted, Step 1 closed. 2026-10-23: LMC named G3e; C8, C9 decided. LMC specification v0.4 approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC Step 1 readiness check; design note approved as the research plan. Earlier: LMC technical specification approved; Step 1 not authorised. Earlier: checked on G3c data. 2026-10-21: LMC design note v0.2, the owner's revision; post-G3c review: GEO decisions, model research plan; G3c results; G2 review)
+Last Updated: 2026-10-25 (G3f, regional geography architecture: the phase plan approved — D-1, D-2 — and recorded; only step A authorised. 2026-10-24: G3e-PM ran: H FAIL; the S-LM1 line stopped. G3e-PM post-mortem checks pre-registered, plan approved, not run. G3e Step 1 ended not ready; report accepted, Step 1 closed. 2026-10-23: LMC named G3e; C8, C9 decided. LMC specification v0.4 approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC Step 1 readiness check; design note approved as the research plan. Earlier: LMC technical specification approved; Step 1 not authorised. Earlier: checked on G3c data. 2026-10-21: LMC design note v0.2, the owner's revision; post-G3c review: GEO decisions, model research plan; G3c results; G2 review)
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
@@ -262,6 +262,18 @@ visual review. ~~Open before Step 1: the official ID (C1), the commit policy (C8
 same day: the experiment is **G3e** (working name LMC); its code is not committed during Step 1 (the commit question
 returns before the freeze); the reference data is kept outside the repository at
 `D:\Hobby\game-dev\research-data\lmc-reference\`. ~~Only the explicit Step 1 authorisation remains.~~ Step 1 was authorised on 2026-10-23 and **ended not ready** on 2026-10-24 after eleven calibration runs: no synthesis passes every hard gate on the calibration seeds, so there is no freeze and no held-out evaluation ([GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md](unity/Assets/Plans/GEOGRAPHY_LMC_STEP1_NOT_READY_REPORT.md)). The owner accepted the report and closed Step 1. Production terrain is unaffected. *2026-10-24:* the owner approved the plan of the post-mortem checks **G3e-PM** — a first look at S-LM1 at three scales and read-only checks of who owns each remaining failure — pre-registered in [GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md](unity/Assets/Plans/GEOGRAPHY_G3E_POSTMORTEM_CHECKS.md); it builds nothing and runs only on the owner's separate authorisation. Its outcome decides whether the S-LM1 line continues with an exact package, needs contract decisions first, or stops. *Outcome, the same day* (§13 there): the registered D1 result is INCONCLUSIVE, H is FAIL by §7 (accepted by the owner), and a one-run deviation (DEV-1) completed the list of contract owners; the owner kept S-LM1's contracts, so **the current S-LM1 line stops**. Next, only with its own plan: revisit the landform families or a changed S-LM3 law; G3d waits. Production terrain is unaffected.
+
+**G3f — regional geography architecture, 2026-10-25** ([GEOGRAPHY_G3F_PHASE_PLAN.md](unity/Assets/Plans/GEOGRAPHY_G3F_PHASE_PLAN.md)).
+The owner approved the phase (D-1; official ID G3f, working name RGA) and its architecture **as the hypothesis to test**
+(D-2): a seeded landform grammar is instantiated into one authoritative **Geography Plan** in which every land vertex has
+exactly one height owner — a declared drainage unit whose boundaries are divides — and every landform reserves everything
+it writes; one drainage-consistent surface synthesis reads the plan; regions divide the problem, tiles only the
+representation. It is to be tested first in a bounded regional prototype on contour A at production resolution — a
+control surface, a unified synthesis and a per-unit synthesis under identical conditions, with calibration, a freeze and
+held-out variants — then an architecture decision and, only if one is adopted, a production implementation plan as the
+input to G4. Decisions D-3 … D-12 (among them whether a drainage-tree law of the S-LM3 family may be the candidate law)
+are open, and only step A — the plan and these pointers — is authorised: no code, generation, Unity run or read-only
+check. What this changes in the order above: nothing; production stays `H4A`, G3d waits.
 
 ---
 
