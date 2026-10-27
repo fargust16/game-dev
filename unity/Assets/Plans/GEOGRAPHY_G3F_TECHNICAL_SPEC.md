@@ -570,3 +570,60 @@ all > 70° triangles lie outside the bands) — the premise of L-3 holds. C0-3: 
 ## 16. Results
 
 *(appended by run; definitions above are not edited after the freeze)*
+
+### 16.1 Calibration run 1 [MEASURED]
+
+Code commit `a5bcdd6` (`research-data/g3f/calib/run1/commit.txt`, file hashes `SHA256SUMS.code.txt`); four
+calibration variants × three candidates, the whole run twice in fresh processes (copies `a` and `b`, started
+2026-10-27 22:37 and 22:43 UTC), the `hydro` step on both copies, views, renders and sealed blind sheets on copy `a`
+(122 sheets, 488 renders; the agent checked only that the files exist and are non-empty). Every plan validated at
+attempt 0. About 170 s of Python per variant and copy (plan 11 s, context 5 s, synthesis 7–21 s per candidate, readings
+15–18 s, assembly 26–40 s); `hydro` ≈ 0.3 s per lattice. Records: `research-data/g3f/calib/run1/` (`gate_table.md`,
+`compare.txt`, `MANIFEST`, the diagnosis scripts in `diag/`).
+
+**GF-D** 92 of 92 files identical between the copies; **GF-P** every Unity process 85 / 85 before and after. A
+comparison-tool correction was made before any gate was read from it (T1 below).
+
+| Variant | GF-C0 | GF-UF | GF-RF |
+|---|---|---|---|
+| 110201 short | every gate | every gate | every gate |
+| 110201 tall | **R8** | **R8** | **R4, R5, R7, R10** |
+| 1337 short | **R8** | every gate | every gate |
+| 1337 tall | **R8** | **R8** | every gate |
+
+Freeze rule (§11.2): GF-C0 1 of 4, GF-UF 2 of 4, GF-RF 3 of 4 — **no candidate qualifies after run 1.** GF-O, GF-B,
+R7 (a) and (c), R9 and RS (≥ 99.5 %) hold everywhere; GF-A for GF-RF local and order-invariant on all four (GF-UF
+relabel-invariant, not local, as designed). GF-T flags the main culmination outside 330–430 m on every lattice (the
+feasibility clamp of §4.2, ≈ 294–299 m).
+
+**Failures and their classes** (mission §5 F):
+
+1. *GF-C0 and GF-UF, R8 — M2 not realised* (model insufficiency). The highest mountain vertex within 150 m of M2 sits on
+   the reading disc's edge, 148 m west (293, 660), with prominence 0 (GF-UF 1337 tall: 17.8 m < 30 m). With D1
+   emergent, the crest is lowest near M2 and rises west to the coast end (x ≈ 262: GF-UF tall 269 m, GF-C0 tall 241 m)
+   before a ≈ 200 m drop to the fringe: the far western ends of catchments A and C — the farthest points of their trees
+   from O1 and O3 — become their highest ground and invert the plan's D1 profile. In the short variants GF-UF realises
+   M2 93 m east of the declared point with prominence 38 m (an 8 m margin). This is the situation D-4 named as R-F's
+   purpose ("crests set by the plan").
+2. *GF-RF, 110201 tall, R10 (and R5, R7 (b), which read the failed planner)* (model insufficiency). The planner's
+   validation stopped at "reach_12 flows uphill at node 1: 63.76 m to 88.93 m". The report-only diagnosis (T2) shows
+   node 1 sampling the D1 crest vertex (317, 662) at 177.1 m between trench vertices at 67.7 m. Traced step by step
+   (`diag/trace.py`): S7b capped (300, 662) from its law height 254.2 m to 67.7 m — the cap of a vertex next to D1's
+   low coast end, carried down a tree path that runs east **along D1's foot toward M2** — and the lateral constraint then
+   lowered the flanks from that trench (C side the same way). It is systematic: in all four GF-RF lattices 79–107 D1
+   crest vertices stand more than 30 m above both flanks (maximum 107–118 m), and S7b carves ≈ 10 000 vertices per
+   variant; R10 failed where the planner's smoothed nodes happened to touch the wall.
+3. *GF-RF, 110201 tall, R4 — no capital* (invalid input). The best 150 m disc within 170 m of the reserve centre has
+   10.24 % unbuildable ground (≤ 10 % required; 1337 tall passes at 9.71 %). Computed from the plan alone
+   (`diag/reserve_fit.py`), **36.6–38.1 % of the fixture's reserve core disc lies under the 35° cones of the planned
+   crests** (M1 ≈ 294 m at 428 m, D2 ≈ 170 m at 246 m), so the capital has to shift ≈ 120 m south-west — where the tall
+   ramp lands (the builder takes the landing nearest the reserve, outside its 170 m disc).
+4. Diagnostic, not a gate: in GF-C0 and GF-UF the Sector crest stands > 30 m above the sector side at 226–325
+   vertices (emergent, it takes the context's height near M1). Not addressed.
+
+**Tool corrections (no reading changed):** T1 — `calib/compare_runs.py` hashed JSON files whole, so the timing field
+`seconds` of the synthesis, context and hydro logs counted as differences (33 "different"); GF-D's definition excepts
+timing, so the tool now drops that field and skips logs and step input lists (they name each copy's own paths); the
+first output is kept as `compare_raw.txt`. T2 — the Unity `hydro` step reports, for an uphill validation failure, the
+failing reach's nodes (position, bed, lattice height nearest and bilinear, filled height); report-only, after
+G3e's `DiagnoseR10`.
