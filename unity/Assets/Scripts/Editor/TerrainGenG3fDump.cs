@@ -145,6 +145,7 @@ namespace GameDev.EditorTools
                 json.Append(",\"succeeded\":").Append(result.Succeeded ? "true" : "false");
                 json.Append(",\"failure\":\"").Append(result.Failure).Append("\",\"message\":\"").Append(Escape(result.Message)).Append('"');
                 json.Append(",\"seconds\":").Append(watch.Elapsed.TotalSeconds.ToString("F2", inv));
+                if (!result.Succeeded) json.Append(",\"diagnosis\":\"").Append(Escape(DiagnoseUphill(h, n, cell, seed, result.Message))).Append('"');
                 json.Append(",\"reaches\":[");
                 if (result.Succeeded)
                 {
@@ -183,6 +184,52 @@ namespace GameDev.EditorTools
                 json.Append("]}");
                 File.WriteAllText(Path.Combine(outDir, "hydro_" + label + ".json"), json.ToString());
                 log.AppendLine($"hydro {label} seed {seed}: {(result.Succeeded ? "Succeeded" : result.Failure + " " + result.Message)} ({watch.Elapsed.TotalSeconds.ToString("F1", inv)} s)");
+            }
+        }
+
+        /// <summary>Report-only (G3e's DiagnoseR10, carried): for an "uphill" validation failure, rebuild the river
+        /// network the planner validated and report the failing reach's nodes — position, bed, lattice height at the
+        /// nearest vertex and bilinear — so the reading can be classed. Changes no reading.</summary>
+        private static string DiagnoseUphill(float[] h, int n, float cell, int seed, string message)
+        {
+            var mm = System.Text.RegularExpressions.Regex.Match(message ?? "", @"(\S+) flows uphill at node (\d+): ([\d.]+) m to ([\d.]+) m");
+            if (!mm.Success) return "no uphill-node message to diagnose";
+            try
+            {
+                var inv = CultureInfo.InvariantCulture;
+                var settings = HydrologySettings.Default;
+                settings.Clamp();
+                var grid = new HydrologyGrid(0f, 0f, n, n, cell, (float[])h.Clone(), WorldScale.SeaLevelMeters);
+                var ocean = grid.BuildOceanMask();
+                var filled = DepressionFill.Fill(grid, ocean);
+                var dirs = FlowRouting.ComputeD8(grid, filled, ocean);
+                var acc = FlowRouting.Accumulate(grid, dirs, ocean, out _);
+                var lakeField = BasinExtraction.Extract(grid, filled, ocean, settings);
+                var rng = new GameDev.World.Seed.WorldSeed(seed).Fork(RiverNetworkBuilder.SeedStream);
+                var network = RiverNetworkBuilder.Build(grid, filled, ocean, dirs, acc, lakeField, settings, rng);
+                var node = int.Parse(mm.Groups[2].Value, inv);
+                foreach (var reach in network.Reaches)
+                {
+                    if (reach.Id.ToString() != mm.Groups[1].Value) continue;
+                    var sb = new StringBuilder();
+                    sb.Append(reach.Id).Append(" source ").Append(reach.IsSource).Append(" nodes ").Append(reach.Nodes.Count).Append(':');
+                    for (var k = Math.Max(0, node - 3); k < Math.Min(reach.Nodes.Count, node + 4); k++)
+                    {
+                        var p = reach.Nodes[k].PositionXZ;
+                        var x = Mathf.Clamp(Mathf.RoundToInt(p.x / cell), 0, n - 1);
+                        var z = Mathf.Clamp(Mathf.RoundToInt(p.y / cell), 0, n - 1);
+                        sb.AppendFormat(inv, " [{0}] ({1:F1},{2:F1}) v({3},{4}) bed {5:F2} nearest {6:F2} bilinear {7:F2} filled {8:F2};",
+                            k, p.x, p.y, x, z, reach.Nodes[k].BedElevation, h[z * n + x], G3cMeasure.Bilinear(h, n, cell, p), filled[z * n + x]);
+                    }
+
+                    return sb.ToString();
+                }
+
+                return "reach not found when the network was rebuilt";
+            }
+            catch (Exception e)
+            {
+                return "diagnosis failed: " + e.Message;
             }
         }
 

@@ -68,6 +68,11 @@ class Params:
         self.axis_halo = 1.5 * C        # m
         self.axis_alpha = 1.0           # cost grows by (1 + alpha * min(D_axis, axis_span) / axis_span)
         self.axis_span = 300.0          # m
+        # plan guide (S1; calibration fix F1): inside a catchment, a tree edge whose flow climbs the guide G -- the
+        # 35-degree cone of the planned crest profiles, max_q [c(q) - D * flank], read from the plan only -- adds
+        # guide_climb per metre of climb to the search priority, so drainage leaves a planned crest across its flank
+        # instead of running along its foot toward a higher crest segment [A]
+        self.guide_climb = 2.0
         # fluvial law (S3, GF-UF / GF-RF) [A]: theta and A_c as G3e spec §5.2; cap 35 deg (= the lateral bound)
         self.theta = 0.45
         self.a_c = 2000.0               # m2
@@ -200,9 +205,11 @@ def _allowed(zc, zp, same_plateau):
 def build_tree(R, P, seed=0):
     """Receivers built once from the plan (L-1): a Dijkstra from each unit's roots over its own vertices.
 
-    Cost per metre: region weight x axis attraction; ties by (cost, stateless hash, index). Fringe units use a
-    uniform cost. Returns recv (flat, -1 for roots and non-unit vertices), order (roots first, increasing cost),
-    cost (flat cost distance) and step length per vertex."""
+    Cost per metre: region weight x axis attraction; ties by (priority, stateless hash, index). Fringe units use a
+    uniform cost. Inside catchments an edge whose flow climbs the plan guide G (P.guide_climb) adds guide_climb x
+    the climb to the search priority. Returns recv (flat, -1 for roots and non-unit vertices), order (roots first,
+    increasing priority), cost (flat weighted length along the tree, without the guide term) and step length per
+    vertex."""
     n0, n1, cell = R.n0, R.n1, R.cell
     n = n0 * n1
     unit = R.unit.reshape(-1).tolist()
@@ -238,6 +245,14 @@ def build_tree(R, P, seed=0):
             w[i] = base * (1.0 + P.axis_alpha * min(d, P.axis_span) / P.axis_span)
     down = R.axis_down() if R.axes else {}
     key = stream_key("research.g3f.synth.tree", seed)
+    guide = [0.0] * n
+    if P.guide_climb > 0.0:
+        planned = crest_target_field(R, P)
+        cone = _crest_cone(R, P, {int(i): float(planned[i]) for i in np.flatnonzero(~np.isnan(planned))},
+                           lambda j: unit[j] >= 0 and kinds[unit[j]] == CATCHMENT)
+        for j, v in cone.items():
+            guide[j] = v
+    prio = [math.inf] * n
     cost = [math.inf] * n
     recv = [-1] * n
     steplen = [0.0] * n
@@ -245,6 +260,7 @@ def build_tree(R, P, seed=0):
     roots = np.flatnonzero(R.root.reshape(-1)).tolist()
     for i in roots:
         if unit[i] >= 0:
+            prio[i] = 0.0
             cost[i] = 0.0
             heap.append((0.0, vhash(key, i), i))
     heapq.heapify(heap)
@@ -270,9 +286,11 @@ def build_tree(R, P, seed=0):
                 continue
             if j in down and down[j] != i:
                 continue
-            nd = d + L * 0.5 * (w[i] + w[j])
-            if nd < cost[j]:
-                cost[j] = nd
+            wl = L * 0.5 * (w[i] + w[j])
+            nd = d + wl + P.guide_climb * max(0.0, guide[i] - guide[j])
+            if nd < prio[j]:
+                prio[j] = nd
+                cost[j] = cost[i] + wl
                 recv[j] = i
                 steplen[j] = L
                 heapq.heappush(heap, (nd, vhash(key, j), j))
