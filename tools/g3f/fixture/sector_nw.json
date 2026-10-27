@@ -1,0 +1,428 @@
+{
+ "id": "GF-FIX-NW-1",
+ "about": "G3f stress fixture on contour A, north-west sector (WP0 C0-3). World metres (x east, z north). Authored by the agent from the G3e record (D-5). Topology fixed; seeded variant parameters per the G3f technical specification, section 5.",
+ "sector": {
+  "P_s": [
+   516,
+   441
+  ],
+  "P_n": [
+   600,
+   887
+  ],
+  "seed_vertex": [
+   300,
+   700
+  ],
+  "window_origin": [
+   111,
+   420
+  ],
+  "window_size": 513
+ },
+ "nodes": {
+  "M1": {
+   "kind": "culmination",
+   "role": "main",
+   "on_sector_boundary_z": 1870.0
+  },
+  "S1": {
+   "kind": "pass",
+   "role": "pass",
+   "at": [
+    1170.0,
+    1845.0
+   ],
+   "flanks": [
+    "M1",
+    "M2"
+   ]
+  },
+  "M2": {
+   "kind": "culmination",
+   "role": "secondary",
+   "at": [
+    950.0,
+    1815.0
+   ]
+  },
+  "E1": {
+   "kind": "ridge_end",
+   "snap_shore": [
+    645.0,
+    1800.0
+   ]
+  },
+  "H": {
+   "kind": "ridge_end",
+   "snap_shore": [
+    1445.0,
+    2470.0
+   ]
+  }
+ },
+ "divides": {
+  "D1": {
+   "role": "main divide",
+   "points": [
+    "M1",
+    [
+     1420.0,
+     1865.0
+    ],
+    [
+     1300.0,
+     1855.0
+    ],
+    "S1",
+    [
+     1060.0,
+     1835.0
+    ],
+    "M2",
+    [
+     800.0,
+     1805.0
+    ],
+    "E1"
+   ]
+  },
+  "D2": {
+   "role": "branch ridge",
+   "points": [
+    "M1",
+    [
+     1490.0,
+     2000.0
+    ],
+    [
+     1460.0,
+     2150.0
+    ],
+    [
+     1450.0,
+     2300.0
+    ],
+    "H"
+   ]
+  }
+ },
+ "units": {
+  "A": {
+   "seed": [
+    1210.0,
+    2150.0
+   ],
+   "outlet": "O1"
+  },
+  "B": {
+   "seed": [
+    1530.0,
+    2250.0
+   ],
+   "outlet": "O2"
+  },
+  "C": {
+   "seed": [
+    1150.0,
+    1600.0
+   ],
+   "outlet": "O3"
+  }
+ },
+ "outlets": {
+  "O1": {
+   "snap_shore": [
+    1095.0,
+    2392.0
+   ],
+   "half_length_m": 30.0
+  },
+  "O2": {
+   "snap_shore": [
+    1585.0,
+    2460.0
+   ],
+   "half_length_m": 30.0
+  },
+  "O3": {
+   "snap_shore": [
+    1080.0,
+    1445.0
+   ],
+   "half_length_m": 30.0
+  }
+ },
+ "axes": {
+  "A_trunk": {
+   "unit": "A",
+   "points": [
+    [
+     1180.0,
+     1960.0
+    ],
+    [
+     1200.0,
+     2100.0
+    ],
+    [
+     1160.0,
+     2250.0
+    ],
+    [
+     1120.0,
+     2340.0
+    ],
+    "O1"
+   ]
+  },
+  "A_t1": {
+   "unit": "A",
+   "points": [
+    [
+     1050.0,
+     1905.0
+    ],
+    [
+     1120.0,
+     1990.0
+    ]
+   ],
+   "joins": "A_trunk"
+  },
+  "A_t2": {
+   "unit": "A",
+   "points": [
+    [
+     1420.0,
+     2005.0
+    ],
+    [
+     1320.0,
+     2050.0
+    ]
+   ],
+   "joins": "A_trunk"
+  },
+  "A_t3": {
+   "unit": "A",
+   "points": [
+    [
+     985.0,
+     2000.0
+    ],
+    [
+     1060.0,
+     1975.0
+    ]
+   ],
+   "joins": "A_t1",
+   "from_rim_outlet": true
+  },
+  "A_t4": {
+   "unit": "A",
+   "points": [
+    [
+     800.0,
+     2250.0
+    ],
+    [
+     950.0,
+     2300.0
+    ],
+    [
+     1060.0,
+     2320.0
+    ]
+   ],
+   "joins": "A_trunk",
+   "optional": true
+  },
+  "B_v": {
+   "unit": "B",
+   "points": [
+    [
+     1500.0,
+     2050.0
+    ],
+    [
+     1510.0,
+     2200.0
+    ],
+    [
+     1530.0,
+     2350.0
+    ],
+    "O2"
+   ]
+  },
+  "C_trunk": {
+   "unit": "C",
+   "points": [
+    [
+     1200.0,
+     1780.0
+    ],
+    [
+     1150.0,
+     1650.0
+    ],
+    [
+     1100.0,
+     1530.0
+    ],
+    "O3"
+   ]
+  },
+  "C_t1": {
+   "unit": "C",
+   "points": [
+    [
+     1450.0,
+     1750.0
+    ],
+    [
+     1330.0,
+     1680.0
+    ]
+   ],
+   "joins": "C_trunk"
+  },
+  "C_t2": {
+   "unit": "C",
+   "points": [
+    [
+     900.0,
+     1755.0
+    ],
+    [
+     980.0,
+     1650.0
+    ]
+   ],
+   "joins": "C_trunk"
+  }
+ },
+ "reserve": {
+  "centre": [
+   1210.0,
+   2150.0
+  ],
+  "radius_m": 170.0,
+  "core_m": 150.0
+ },
+ "lowland_discs": [
+  {
+   "unit": "B",
+   "centre": [
+    1560.0,
+    2420.0
+   ],
+   "radius_m": 110.0
+  }
+ ],
+ "plateau": {
+  "unit": "A",
+  "slots": [
+   [
+    885.0,
+    1995.0
+   ],
+   [
+    900.0,
+    2025.0
+   ],
+   [
+    870.0,
+    1985.0
+   ]
+  ],
+  "joint_toward": "D1",
+  "access_from": "reserve"
+ },
+ "routes": {
+  "R1": {
+   "from": "reserve",
+   "via": [
+    "S1"
+   ],
+   "to": [
+    1060.0,
+    1560.0
+   ],
+   "role": "lowland A to lowland C over the declared pass"
+  },
+  "R2": {
+   "from": "reserve",
+   "to": "plateau_top",
+   "role": "lowland A to the plateau top by its ramp"
+  }
+ },
+ "context": {
+  "divides": {
+   "K0": {
+    "points": [
+     "M1",
+     [
+      1750.0,
+      1830.0
+     ],
+     [
+      1950.0,
+      1600.0
+     ],
+     [
+      2000.0,
+      1300.0
+     ],
+     [
+      1950.0,
+      1000.0
+     ],
+     [
+      1900.0,
+      800.0
+     ]
+    ],
+    "snap_end_shore": [
+     1925.0,
+     620.0
+    ]
+   },
+   "K1": {
+    "points": [
+     [
+      1750.0,
+      1830.0
+     ],
+     [
+      1900.0,
+      2050.0
+     ],
+     [
+      2050.0,
+      2250.0
+     ]
+    ],
+    "snap_end_shore": [
+     2110.0,
+     2330.0
+    ]
+   }
+  },
+  "units": {
+   "KN": [
+    1800.0,
+    2150.0
+   ],
+   "KE": [
+    2250.0,
+    1500.0
+   ],
+   "KW": [
+    1650.0,
+    1100.0
+   ]
+  }
+ }
+}
