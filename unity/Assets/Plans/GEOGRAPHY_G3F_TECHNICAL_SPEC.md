@@ -667,3 +667,55 @@ hard gate on all four; GF-C0 failed R8 on all four; GF-UF failed R8 on 110201 ta
 tall (its M2 sits near the 30 m prominence threshold either way). The analytic checks of §14.1 still hold with F1
 (`dev_ac`: no pit, no crossing, write log exact, lateral excess ≤ 0, climbs 0, GF-RF order-invariant and local).
 The measurement code is unchanged, so the continuity check (§14.3) was not repeated.
+
+### 16.3 Calibration run 2 [MEASURED]
+
+Code commit `6122b99` (fixes F1 and F2 of §16.2; `research-data/g3f/calib/run2/`), the same protocol as run 1: copies
+`a` and `b` in fresh processes (started 2026-10-27 23:16 and 23:19 UTC), `hydro` on both, views and sealed sheets on
+`a` (131 sheets, 517 renders; existence and size checked only). Every plan validated at attempt 0; 127–142 s of Python
+per variant and copy. **GF-D** 92 of 92 files identical; **GF-P** every Unity process 85 / 85 before and after.
+
+| Variant | GF-C0 | GF-UF | GF-RF |
+|---|---|---|---|
+| 110201 short | **R8** | every gate | every gate |
+| 110201 tall | **R8** | **R8** | every gate |
+| 1337 short | **R8** | **R8** | every gate |
+| 1337 tall | **R8** | every gate | every gate |
+
+Freeze rule (§11.2): **GF-RF passes every hard and process gate on all four variants (GF-A local and
+order-invariant on all four) — it qualifies.** GF-UF 2 of 4, GF-C0 0 of 4 — neither qualifies.
+
+- *F1's effect:* GF-RF's D1 crest vertices more than 30 m above both flanks: 4, 18, 6, 0 (maximum 25–42 m) against
+  81–135 (maximum 107–118 m) in run 1; the planner succeeds on every GF-RF lattice. S7b still carves 13 800–16 200
+  vertices per GF-RF variant (the caps now run down flanks, not along crest feet).
+- *F2's effect:* GF-RF capitals at (408–412, 818), 3–7 vertices from the new reserve centre; every candidate finds a
+  capital and a coastal site on every variant.
+- *GF-RF readings:* M1 294–299 m (GF-T flags it below 330–430 m, the feasibility clamp), M2 230–242 m on target, the
+  pass col 85–93 m, pass offset 51–68 m, RS 99.6–99.8 %.
+- *Residuals (diagnostics, no gate):* 10–13 % of GF-RF's declared lowland is at ≥ 30° (GF-C0 / GF-UF 1–3 %): the
+  planned crests' 35° flank cones reach into declared lowland; the 18 residual D1 walls on 110201 tall.
+- *GF-UF:* its R8 result moved with F1 on two variants (110201 short and 1337 tall now pass; 1337 short now fails):
+  the emergent D1 still rises west of M2, and on 1337 tall the vertex read as M2 is 110 m west of the declared point
+  (prominence 91 m). Failure 1 of §16.1 stands. GF-C0's M2 is never realised.
+
+### 16.4 Freeze and the held-out procedure (fixed before any held-out seed is generated)
+
+**Frozen: GF-RF** in the configuration of `6122b99` (`Params` and `A` as written to `params.json`, fixture SHA-256
+`5e8066e9…abcc6`); the freeze record `research-data/g3f/freeze/FREEZE.md` lists the hashes and is written before any
+held-out seed. **GF-C0** runs alongside as the control; GF-UF is not frozen (it runs, as the runner runs every
+candidate, and its held-out readings are reported as a diagnostic only). Fixes used: 2 of 6; runs used: 2 of 5.
+The owner's blind calibration review (G-5a) has not taken place; the sheets of runs 1 and 2 are prepared and sealed.
+
+*Inputs.* Seeds 5001–5010 in ascending order, class by position (5001, 5003, 5005, 5007, 5009 short; 5002, 5004,
+5006, 5008, 5010 tall); contour A, the same fixture and window; the reserve 5011–5020 only after an invalidating
+post-freeze change (GF-S7); 1005–1024 never.
+
+*Procedure.* `heldout/run_heldout.sh` into `heldout/a`, then again into `heldout/b` (fresh processes);
+`heldout/unity_steps_heldout.sh` on both (hydro; views and sheets on `a`); `calib/compare_runs.py a b` (GF-D);
+`heldout/evaluate_heldout.py` (part (1) of §12, per candidate and per class). No change of code, parameter, fixture,
+definition or threshold after any held-out result; a defect found then is reported, not fixed (GF-S7).
+
+*Criteria (§12, unchanged).* Part (1): every hard gate (GF-R4, R5, R7, R8, R9, R10, RS) and every process gate
+(GF-O, GF-B, GF-D, GF-P, GF-A) on ≥ 7 of 10 variants; a plan-invalid variant counts as failed. Part (2): the owner's
+blind review — it cannot happen inside the mission, so **no candidate can be declared passed by this evaluation**;
+part (1) is reported as measured.
