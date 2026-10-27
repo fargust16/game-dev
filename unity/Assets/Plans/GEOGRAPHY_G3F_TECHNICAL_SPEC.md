@@ -1,6 +1,6 @@
 # G3f — Technical Specification (WP1)
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft — **written under the owner's G3f mission authorisation (2026-10-25,
 `research-data/g3f/gates/mission_authorization_2026-10-25.md`), not approved at gate G-3.** It fixes everything the G3f
@@ -9,8 +9,9 @@ gates and diagnostics, the views and review form, the protocol, the pass and dec
 developed. Criteria marked **[NEW]** are applied as pre-registered research criteria under the mission; they are not
 approved criteria until the owner says so (phase plan §9.8). Nothing here touches production.
 
-Last Updated: 2026-10-27 (v0.1: written after WP0 and the development of the research package; before any registered
-calibration run)
+Last Updated: 2026-10-28 (v0.2: calibration run 1 recorded (§16.1); named fixes F1 and F2 registered before run 2 (§16.2) —
+§4.1 GF-F6 and §7.1 step 1 changed accordingly. v0.1, 2026-10-27: written after WP0 and the development of the research
+package; before any registered calibration run)
 
 Depends On:
 [GEOGRAPHY_G3F_PHASE_PLAN.md](GEOGRAPHY_G3F_PHASE_PLAN.md) v0.3 (its decision record governs),
@@ -135,7 +136,7 @@ Authored by the agent from the G3e record (D-5), data in `tools/g3f/fixture/sect
 | GF-F3 | the declared pass is **S1 on D1**, with route **R1** from the settlement reserve in lowland A over S1 to lowland C (1 060, 1 560) | pass corridor over a plateau (X3), M-1 |
 | GF-F4 | unit **A**: trunk to **O1** (north bay) with tributaries A_t1, A_t2, the rim stream A_t3 and (seeded) A_t4; unit **B**: valley B_v to **O2**; unit **C**: trunk to **O3** (south bay head) with C_t1, C_t2 | converging valleys, climbs toward mouths (X6), R5 (X5) |
 | GF-F5 | one plateau in unit A on D1's north flank near M2 (three slots), joint toward D1, escarpment elsewhere, rim outlet 1 toward A_t3, a seeded second rim outlet, and a **ramp chosen by the plan builder** (§4.2) landing in lowland A; its west side faces the west coast | write footprints (X2), ramp to cliff (X1), drums |
-| GF-F6 | lowland A with the **settlement reserve** (centre (1 210, 2 150) m, radius 170 m, capital core 150 m) near O1; lowland C at O3; a lowland disc at O2 | settlement capacity beside a mountain foot |
+| GF-F6 | lowland A with the **settlement reserve** (centre (1 135, 2 242) m — moved by fix F2, §16.2, from (1 210, 2 150) m — radius 170 m, capital core 150 m) near O1; lowland C at O3; a lowland disc at O2 | settlement capacity beside a mountain foot |
 | GF-F7 | coastal band with intents low (outlets ± 70 m, lowland hinterland), rocky (upland hinterland, E1), cliff (mountain hinterland, the headland H); band widths seeded per intent; the mountain foot within 200 m of the shore near P_s and H | coastal capture (X5), cliff bands |
 
 **Deviations from the phase plan §6.3, decided while authoring (before any validator run is registered):**
@@ -241,7 +242,10 @@ A crest vertex that has no non-crest land neighbour takes the highest adjacent c
 ### 7.1 Shared steps (every candidate)
 
 1. **Tree (L-1)** — built once from the plan, never from heights: a Dijkstra from each unit's roots over its own
-   vertices, 8 neighbours, edge cost `length · (w_u + w_v) / 2`, ties by (cost, stateless hash, index). Weight per
+   vertices, 8 neighbours, edge cost `length · (w_u + w_v) / 2`, ties by (priority, stateless hash, index); inside a
+   catchment an edge whose flow climbs the **plan guide** `G` — the 35° cone of the planned crest profiles,
+   `max_q [c(q) − D · tan 35°]`, read from the plan only — adds `2 × climb` (m) to the search priority (fix F1,
+   §16.2; the recorded cost, which GF-C0 reads, stays the weighted length along the tree). Weight per
    metre **[AUTHORING]**: lowland 0.005, corridor 0.01, upland 0.10, mountain 0.45, plateau top 0.01, band 1.0, ramp
    0.25; × 0.5 within 4.1 m of a declared axis, otherwise × (1 + min(D_axis, 300 m) / 300 m); fringe units uniform.
    Declared axes are **forced tree paths**: an axis vertex can only receive from its downstream axis neighbour. Zone
@@ -627,3 +631,39 @@ timing, so the tool now drops that field and skips logs and step input lists (th
 first output is kept as `compare_raw.txt`. T2 — the Unity `hydro` step reports, for an uphill validation failure, the
 failing reach's nodes (position, bed, lattice height nearest and bilinear, filled height); report-only, after
 G3e's `DiagnoseR10`.
+
+### 16.2 Named fixes before calibration run 2
+
+Registered before run 2, each with its hypothesis and the readings it addresses (§11.1). Both change shared steps, so
+each counts for every candidate: **fixes used 2 of 6 per candidate; runs used 1 of 5.** No gate, reading, threshold or
+seed changes.
+
+**F1 — plan-guided tree (S1; `Params.guide_climb` = 2.0 per metre of climb [AUTHORING]).** A catchment tree edge
+whose flow climbs the guide `G` (the 35° cone of the planned crest profiles of S, D1 and D2; plan only, the same for
+every candidate) costs 2 × the climb in the Dijkstra priority. *Hypothesis:* GF-RF's D1 walls and the trench that broke
+R10 on 110201 tall come from tree paths that run along the foot of a planned crest toward a higher crest segment and
+carry the S7b cap of the crest's low end downstream; priced climbs make those paths leave the crest across its flank,
+so no trench runs along a crest foot. *Addresses:* GF-RF R10 (with R5, R7 (b)) on 110201 tall; the crest-wall
+diagnostic. *Expected:* GF-RF's D1 crest vertices > 30 m above both flanks near zero; no gate regresses. The value
+2.0 was set once and not varied.
+
+**F2 — the settlement reserve where the plan leaves its core flat (fixture; authored correction 1 — counted under the
+S2 limit as well, conservatively).** Reserve centre (1 210, 2 150) → (1 135, 2 242) m: the stride-2 vertex within
+170 m of the old centre that minimises the share of the 150 m core disc lying under the planned crests' 35° cones, on a
+crest line, in a plateau footprint or at sea, computed on the four calibration plans from plan quantities only
+(`calib/run1/diag/reserve_fit.py`; best (415–417, 820–822) on all four, 0.4–4.1 % against 36.6–38.1 % at the old
+centre). *Hypothesis:* R4 failed on GF-RF 110201 tall because the fixture put the reserve core under its own crests'
+cones, pushing the capital toward the tall ramp; with the reserve where the plan leaves its core flat, the ramp is kept
+out of it (the builder forbids the reserve disc) and the capital disc fits for every candidate. *Addresses:* GF-RF R4
+on 110201 tall. Routes R1 and R2 and the P-SITE view start at the new centre.
+
+**Not fixed:** GF-UF's and GF-C0's R8 (failure 1 of §16.1) — the emergent divide's inversion is the reason D-4 gave
+for GF-RF, and GF-C0 is the control; no candidate-specific change was made for them.
+
+**Development trials (disclosed; calibration seeds only, not registered runs).** `dev_f1` (F1 alone; 110201 tall,
+1337 short; hydro on three lattices): GF-RF's D1 walls > 30 m fell to 4–6 vertices (maximum 33 m), the planner
+succeeded on GF-RF 110201 tall. `dev_f2` (F1 + F2; all four variants, no assembly; hydro on all): GF-RF passed every
+hard gate on all four; GF-C0 failed R8 on all four; GF-UF failed R8 on 110201 tall and 1337 short and passed on 1337
+tall (its M2 sits near the 30 m prominence threshold either way). The analytic checks of §14.1 still hold with F1
+(`dev_ac`: no pit, no crossing, write log exact, lateral excess ≤ 0, climbs 0, GF-RF order-invariant and local).
+The measurement code is unchanged, so the continuity check (§14.3) was not repeated.
