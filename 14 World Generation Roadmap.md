@@ -1,10 +1,10 @@
 # 14 World Generation Roadmap
 
-Version: 0.35
+Version: 0.36
 
 Status: Draft
 
-Last Updated: 2026-10-27 (G3f: the owner's research mission (2026-10-25); WP0 done; the technical specification and the research package written. Earlier: G3f: the owner's decisions D-3 … D-12 on content recorded in the phase plan v0.3; none authorises execution. Earlier: G3f, regional geography architecture: the phase plan approved — D-1, D-2 — and recorded; only step A authorised. 2026-10-24: G3e-PM ran: H FAIL; the S-LM1 line stopped. G3e-PM post-mortem checks pre-registered, plan approved, not run. G3e Step 1 ended not ready; report accepted, Step 1 closed. 2026-10-23: LMC named G3e; C8, C9 decided. LMC specification v0.4 approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC Step 1 readiness check; design note approved as the research plan. Earlier: LMC technical specification approved; Step 1 not authorised. Earlier: checked on G3c data. 2026-10-21: LMC design note v0.2, the owner's revision; post-G3c review: GEO decisions, model research plan; G3c results; G2 review)
+Last Updated: 2026-10-28 (G3f: calibration (two runs, fixes F1, F2), GF-RF frozen, held-out part (1) 8 of 10; the owner's blind review pending. Earlier: G3f: the owner's research mission (2026-10-25); WP0 done; the technical specification and the research package written. Earlier: G3f: the owner's decisions D-3 … D-12 on content recorded in the phase plan v0.3; none authorises execution. Earlier: G3f, regional geography architecture: the phase plan approved — D-1, D-2 — and recorded; only step A authorised. 2026-10-24: G3e-PM ran: H FAIL; the S-LM1 line stopped. G3e-PM post-mortem checks pre-registered, plan approved, not run. G3e Step 1 ended not ready; report accepted, Step 1 closed. 2026-10-23: LMC named G3e; C8, C9 decided. LMC specification v0.4 approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC Step 1 readiness check; design note approved as the research plan. Earlier: LMC technical specification approved; Step 1 not authorised. Earlier: checked on G3c data. 2026-10-21: LMC design note v0.2, the owner's revision; post-G3c review: GEO decisions, model research plan; G3c results; G2 review)
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
@@ -281,7 +281,7 @@ include a split flow check, targets as diagnostics and a reachability-share gate
 solve is allowed for research only; the new wording of law 11 is accepted, its documentation package not yet authorised
 and the W.2 line deferred; the review is blind; the budgets are diagnostics; the stale-line package is accepted without
 code changes. These are decisions on content: WP0, WP1, code, Unity, generation and the two documentation packages each
-still need their own authorisation. *Since 2026-10-25:* the owner authorised an autonomous research mission (WP0 to the final report, research only; production excluded). WP0 is done; the technical specification ([GEOGRAPHY_G3F_TECHNICAL_SPEC.md](unity/Assets/Plans/GEOGRAPHY_G3F_TECHNICAL_SPEC.md), Draft, not approved at G-3) and the research package (`tools/g3f/`, `TerrainGenG3fDump.cs`) are written; nothing touches the production terrain.
+still need their own authorisation. *Since 2026-10-25:* the owner authorised an autonomous research mission (WP0 to the final report, research only; production excluded). WP0 is done; the technical specification ([GEOGRAPHY_G3F_TECHNICAL_SPEC.md](unity/Assets/Plans/GEOGRAPHY_G3F_TECHNICAL_SPEC.md), Draft, not approved at G-3) and the research package (`tools/g3f/`, `TerrainGenG3fDump.cs`) are written; nothing touches the production terrain. *2026-10-28:* Calibration run 1 (no candidate qualified), named fixes F1 (a plan-guided tree) and F2 (the reserve moved), run 2: GF-RF passed every hard and process gate on all four calibration variants and was frozen; held-out 5001–5010: GF-RF part (1) of the pass rule holds, 8 of 10 (failures 5003, an axis mouth across a bay, and 5006, plan invalid); GF-UF 4 of 10 (diagnostic), GF-C0 0 of 10; the owner's blind review (part (2)) has not taken place, so nothing is declared passed (specification §16). Production is unchanged; any production use is a G4 decision.
 
 ---
 

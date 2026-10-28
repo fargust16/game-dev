@@ -1,6 +1,6 @@
 # G3f — Regional Geography Architecture: Phase Proposal
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft — **phase plan. Every owner decision D-1 … D-12 is taken (2026-10-25) and recorded in the decision record
 below**; where a decision and the text of §§1–14 differ, the decision governs, and the affected places carry a marker
@@ -9,7 +9,7 @@ and its pointers) and the recording of D-3 … D-12 (this version and its pointe
 authorised: the D-9 documentation package (law 11 in 17 and 14, the Glossary, GEO-11's record), the D-12 package,
 WP0, WP1, code, Unity, terrain generation, experiments and any production change.
 
-Last Updated: 2026-10-27 (v0.4: the owner's mission authorisation of 2026-10-25 recorded in the state table; WP0 done, the WP1 specification and the research package written under it. v0.3: the owner's decisions D-3 … D-12 recorded verbatim with the texts they refer to; markers
+Last Updated: 2026-10-28 (v0.5: calibration, the freeze of GF-RF and the held-out evaluation recorded in the state table — results in the specification §16; the owner's blind review not yet held. v0.4: the owner's mission authorisation of 2026-10-25 recorded in the state table; WP0 done, the WP1 specification and the research package written under it. v0.3: the owner's decisions D-3 … D-12 recorded verbatim with the texts they refer to; markers
 "→ D-x" at the places they change; §13 updated. v0.2: D-1, D-2 and the step-A authorisation recorded; §12 adjusted;
 GEO-11 widened to law 11. v0.1, 2026-10-24: the proposal)
 
@@ -172,8 +172,10 @@ document stands alone. They bind only through the owner's words above.
 | Not authorised | ~~the D-9 and D-12 documentation packages, WP0, WP1, code, Unity, terrain generation, experiments, any production change~~ *(superseded 2026-10-25 by the mission, next row)* the D-9 and D-12 documentation packages; any production change |
 | **Mission (2026-10-25)** | the owner authorised an autonomous research mission from WP0 to the final report — the specification, research code, Unity runs, calibration and the held-out evaluation under this plan's limits, commits and pushes to `main`; production, a change of an approved decision and the D-9 / D-12 packages excluded (verbatim: `research-data/g3f/gates/mission_authorization_2026-10-25.md`) |
 | WP0 | **done 2026-10-25** — `research-data/g3f/wp0/RESULTS.md` (C0-1 expectation met; window (111, 420); 5001–5020 unused; continuity targets) |
-| WP1 | **written 2026-10-27 under the mission** — [GEOGRAPHY_G3F_TECHNICAL_SPEC.md](GEOGRAPHY_G3F_TECHNICAL_SPEC.md) v0.1 (Draft, not approved at G-3); limits fixed before it (`gates/limits_before_wp1.md`: fixes 6, runs 5, redraws 10); analytic checks and continuity pass |
+| WP1 | **written 2026-10-27 under the mission** — [GEOGRAPHY_G3F_TECHNICAL_SPEC.md](GEOGRAPHY_G3F_TECHNICAL_SPEC.md) v0.1, now v0.3 with the results (Draft, not approved at G-3); limits fixed before it (`gates/limits_before_wp1.md`: fixes 6, runs 5, redraws 10); analytic checks and continuity pass |
 | Code | `tools/g3f/` (Python research package) and `TerrainGenG3fDump.cs` (Unity steps) — a deviation from §8.1's file list, argued in the specification §13 |
+| WP8 calibration | **2 runs of 5, 2 fixes of 6 per candidate** (2026-10-27/28): run 1 — no candidate qualified (GF-C0 1/4, GF-UF 2/4, GF-RF 3/4); F1 plan-guided tree, F2 the reserve moved (authored correction 1); run 2 — **GF-RF qualified (4/4), frozen** (`research-data/g3f/freeze/FREEZE.md`); GF-UF 2/4, GF-C0 0/4. The blind calibration review (G-5a) not held; sheets sealed |
+| WP9 held-out | **run 2026-10-27/28** on 5001–5010 (class by position): GF-RF **8 of 10** — part (1) of the pass rule holds; failures 5003 (an axis mouth across a bay, every candidate) and 5006 (plan invalid; F2 costs tall plateaus room); GF-UF 4/10, GF-C0 0/10; GF-D 209/209, GF-P 85/85; one machine. Part (2), the owner's blind review (G-5b), pending — **no candidate declared passed**; G-6 not reached |
 
 Nothing in this record authorises code, terrain generation, a Unity run, a read-only check of preserved data or any
 production change. The terms of §0 stay proposed; they enter the Glossary only at G-3 (§12).
