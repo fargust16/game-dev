@@ -1,6 +1,6 @@
 # G3f — Technical Specification (WP1)
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft — **written under the owner's G3f mission authorisation (2026-10-25,
 `research-data/g3f/gates/mission_authorization_2026-10-25.md`), not approved at gate G-3.** It fixes everything the G3f
@@ -9,7 +9,7 @@ gates and diagnostics, the views and review form, the protocol, the pass and dec
 developed. Criteria marked **[NEW]** are applied as pre-registered research criteria under the mission; they are not
 approved criteria until the owner says so (phase plan §9.8). Nothing here touches production.
 
-Last Updated: 2026-10-28 (v0.2: calibration run 1 recorded (§16.1); named fixes F1 and F2 registered before run 2 (§16.2) —
+Last Updated: 2026-10-28 (v0.3: calibration run 2, the freeze of GF-RF and the held-out evaluation recorded (§§16.3–16.6). v0.2: calibration run 1 recorded (§16.1); named fixes F1 and F2 registered before run 2 (§16.2) —
 §4.1 GF-F6 and §7.1 step 1 changed accordingly. v0.1, 2026-10-27: written after WP0 and the development of the research
 package; before any registered calibration run)
 
@@ -719,3 +719,57 @@ definition or threshold after any held-out result; a defect found then is report
 (GF-O, GF-B, GF-D, GF-P, GF-A) on ≥ 7 of 10 variants; a plan-invalid variant counts as failed. Part (2): the owner's
 blind review — it cannot happen inside the mission, so **no candidate can be declared passed by this evaluation**;
 part (1) is reported as measured.
+
+### 16.5 Held-out evaluation [MEASURED]
+
+Freeze record `research-data/g3f/freeze/FREEZE.md` written 2026-10-27 23:35:58 UTC (HEAD `85e202e`, code identical to
+`6122b99`, specification SHA-256 `ce93ecd6…8ed77` at the freeze); then seeds 5001–5010 in fresh processes, copy `a`
+from 23:36 and copy `b` from 23:43 UTC, `hydro` on both, views and sealed sheets on `a` (284 sheets, 1 129 renders;
+existence checked only). **GF-D** 209 of 209 files identical (the views folder, rendered once, is outside the copy
+comparison — a tool note, `calib/compare_runs.py`); **GF-P** every Unity process 85 / 85 before and after, the pinned
+production hashes confirmed. Records: `research-data/g3f/heldout/` (`heldout_table.md`, `compare.txt`, `MANIFEST`).
+
+| Seed | Class | GF-C0 | GF-UF | GF-RF (frozen) |
+|---|---|---|---|---|
+| 5001 | short | R8 | R8 | every gate |
+| 5002 | tall | R8 | every gate | every gate |
+| 5003 | short | R4, R5, R7, R8, R10 | R4, R5, R7, R10 | **R4, R5, R7, R10** |
+| 5004 | tall | R8 | R8 | every gate |
+| 5005 | short | R8 | every gate | every gate |
+| 5006 | tall | plan invalid | plan invalid | **plan invalid** |
+| 5007 | short | R8 | R8 | every gate |
+| 5008 | tall | R8 | every gate | every gate |
+| 5009 | short | R8 | R8 | every gate |
+| 5010 | tall | R8 | every gate | every gate |
+
+**Part (1) of the pass rule (§12): GF-RF 8 of 10 (short 4 of 5, tall 4 of 5) — holds** (≥ 7 of 10). GF-UF 4 of 10
+and GF-C0 0 of 10 (diagnostic and control). GF-A for GF-RF local and order-invariant on all nine valid variants (0
+vertices outside the perturbed unit change). **Part (2), the owner's blind review, has not taken place; no candidate
+is declared passed.** GF-RF's readings on the nine valid variants: M1 295–298 m (GF-T flag: below 330–430 m), M2
+215–242 m, pass offset 60–90 m (GF-T flags 5003, 5007, 5010 above 80 m), RS 99.65–99.86 %, 8–12 % of declared
+lowland at ≥ 30° (diagnostic).
+
+**The two failures (reported, not fixed — GF-S7; classes as mission §5 F):**
+
+- *5003 short, every candidate — invalid input (a plan-builder defect).* With O1 shifted 41 m west, the A_trunk axis
+  enters O1 along the mouth strip from an inner mouth point (364, 849) whose straight segment to O1 crosses the bay.
+  The axis carve, walking from source to mouth, must fall below the sea vertices on that segment, so it lowers 1 765
+  contour-land vertices to ≤ 24 m (x 352–400, z 828–887): the land becomes an enclosed water body the planner rejects
+  (R10: "drains into lake_0, which has no outlet"; R5 and R7 (b) with it), the axis reading climbs 24.86 m from the bay
+  floor to the outlet (R7 (c)), and no 150 m capital disc keeps 150 m from water (R4; best 17 % unbuildable, water
+  75 m away). The validator has no check that an axis stays on land. Not caused by F1 or F2.
+- *5006 tall, every candidate — plan invalid after 10 attempts (diagnostic of F2).* Nine of the ten attempts fail
+  GF-V4 (footprint overlaps — the plateau footprint or its axis buffer against the reserve disc in several), four GF-V3.
+  Over the held-out set 19 of 28 attempts were invalid (calibration runs 1–2: 0 of 4). A post-freeze counterfactual
+  (`heldout/v4_breakdown.py`, plans only, no synthesis, report only) with the pre-F2 reserve centre makes 5006 valid
+  at attempt 2 and 5002 and 5010 valid at attempt 0: **F2 moved the reserve toward the plateau slots and costs tall
+  plateaus room** — it was fitted to the four calibration plans and generalises imperfectly.
+
+### 16.6 Limits of this evidence
+
+One machine (Windows 11, Python 3.13, Unity 6000.5.7f1): determinism is shown as **repeatability on this machine**
+only, not across machines. One fixture on one sector of contour A, a 513 × 513 window — not island scale; GF-RF was
+never run on the island. F1 and F2 were developed on the calibration variants (§16.2) with two development trials;
+F2's held-out side effect is above. GF-UF was not frozen; its held-out row is a diagnostic. The blind review (G-5a,
+G-5b) has not happened; sheets are sealed. The GF-T flag on M1 (≈ 296 m against 330–430 m) holds on every variant: the
+D6 summit band is not reached in this sector at the walkability bound (§15.1 change 9).
