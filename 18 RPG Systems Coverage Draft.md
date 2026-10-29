@@ -1,6 +1,6 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.2
+Version: 0.3
 Status: Draft
 Last Updated: 2026-10-29
 
@@ -181,6 +181,15 @@ The owner describes a progression model driven by actions and experience in the 
 - **Pathway stages are separate from ordinary development.** The current vision is that characters begin without a Pathway stage; taking the relevant potion initiates a Pathway at stage 9, with later advancement through its stages. The potion changes attributes and grants some skills or capabilities, subtly signalling what matters for that Pathway. This must be reconciled with the existing [05 Progression](05%20Progression.md) before becoming canonical.
 - **Potion effects should be legible.** After taking a Pathway potion, the player should be able to notice which attributes changed and which skills/capabilities became available, without necessarily receiving an explicit tutorial telling them how to build the character.
 
+## Owner decisions — attributes, skills, and feedback
+
+The owner has approved the following working principles for this draft:
+
+- **Both attributes and skills grow through practice.** An action directly develops its relevant skill and can also develop appropriate general attributes. The size, conditions, and limits of each contribution remain to be designed.
+- **Use concrete individual skills as the default model.** Examples include tree-felling, gathering, running, swimming, and specific crafts. Whether any skills should be grouped or have sub-specialisations remains open; the initial design should not default to broad categories such as “Athletics” or “Crafting” when a distinct skill is meaningful.
+- **Show progress without revealing the formulas.** The interface should make attribute changes and skill progression visible, while keeping exact growth calculations hidden. Players should be able to infer patterns from action and outcome rather than being told the optimal build.
+- These are draft design decisions, not implementation authorisation. Anti-abuse, diminishing returns, action-to-attribute mappings, and the exact feedback presentation remain open.
+
 ## Initial questions for the next design steps
 
 1. What is the conceptual difference between a general attribute and a skill in this game?
@@ -197,6 +206,7 @@ The owner describes a progression model driven by actions and experience in the 
 ## Provisional status
 
 - Owner's broad design direction: captured in this draft.
+- Owner-approved principles: both attributes and skills grow through practice; concrete individual skills are the default; changes are visible without exposing growth formulas.
 - Exact attributes and skill categories: open.
 - Growth and diminishing-return model: open.
 - Anti-abuse rules: requirement identified; mechanism open.
@@ -229,7 +239,7 @@ The following are review states, not claims about the current map.
 |---|---|---|
 | Map hierarchy and direct relationships | Not audited | Inspect the live map and identify its data source |
 | Shared Character model for player and NPC | Proposed | Compare against existing actor/NPC/character definitions |
-| Attributes and checks | Owner's direction captured; detailed design open | Agree the conceptual attribute model and check resolution |
+| Attributes and checks | Owner's direction and three principles captured; detailed design open | Agree the conceptual attribute model and check resolution |
 | Skills and abilities | Candidate inventory captured; action-based growth direction captured | Define skill taxonomy after attributes/checks |
 | Pathways and advancement requirements | Existing foundation; integration open | Audit [05 Progression](05%20Progression.md) and dependent nodes |
 | Items, inventory, equipment | Candidate inventory captured | Audit map and existing architecture cards |
