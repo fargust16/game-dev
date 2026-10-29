@@ -1,0 +1,618 @@
+[
+  {
+    "systemId": "core-loop",
+    "profile": "foundation",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "Назначение цикла прочитано в 00.1."
+      },
+      "rules": {
+        "state": "covered",
+        "evidence": "Шесть шагов и пять правил цикла прочитаны."
+      },
+      "scenarios": {
+        "state": "partially-covered",
+        "evidence": "Шаги называют типы ситуаций. Отдельного прохождения нет."
+      },
+      "dependencies": {
+        "state": "partially-covered",
+        "evidence": "Цикл называет виды действия. Поздние системы на него опираются уже своими документами."
+      },
+      "limits": {
+        "state": "covered",
+        "evidence": "Сила не отменяет выбор, единственного билда нет, потеря не обнуляет смысл опыта."
+      },
+      "unresolved": {
+        "state": "not-assessed",
+        "evidence": "В 99 нет раздела Core Loop. Отсутствие списка не доказывает, что дыр нет."
+      }
+    }
+  },
+  {
+    "systemId": "meta-loop",
+    "profile": "foundation",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "Назначение трёх вложенных циклов прочитано в 00.2."
+      },
+      "rules": {
+        "state": "covered",
+        "evidence": "Прочитаны границы: сила жизни кончается, понимание переносится, мир может погибнуть."
+      },
+      "scenarios": {
+        "state": "partially-covered",
+        "evidence": "Есть схемы циклов и примеры того, что может сохраниться. Полной жизни нет."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Жизнь персонажа внутри мета-цикла дальше расписана в 07."
+      },
+      "limits": {
+        "state": "covered",
+        "evidence": "Мир нельзя остановить навсегда, и после гибели мира новые жизни в нём не идут."
+      },
+      "unresolved": {
+        "state": "not-assessed",
+        "evidence": "Хвост 00.2 после списка наследия в этот импорт не входил."
+      }
+    }
+  },
+  {
+    "systemId": "world-laws",
+    "profile": "simulation",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "02 прямо определяет системные законы мира независимо от лора."
+      },
+      "entities": {
+        "state": "partially-covered",
+        "evidence": "Названы Balance, Faction Influence, Main Goals, Operations, Side Events, Symptoms, World Seed. Таблицы симптомов нет."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "Первый закон и сдвиг Influence записаны. Восстановление, победа фракции и сотрудничество открыты."
+      },
+      "feedback": {
+        "state": "partially-covered",
+        "evidence": "Игрок читает Symptoms, не метр. Соответствие полос и симптомов открыто."
+      },
+      "scenarios": {
+        "state": "not-assessed",
+        "evidence": "Раздел Collapse в этот проход целиком не переносился, поэтому сценарий конца мира не оценивался."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "02 говорит, что будущие фракции, поселения, экономика и последствия зависят от этого документа."
+      },
+      "limits": {
+        "state": "partially-covered",
+        "evidence": "Игрок не замораживает мир. Числовые диапазоны Difficulty Pressure открыты."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Высокий приоритет 99 перечисляет дыры, но не закрывает их."
+      }
+    }
+  },
+  {
+    "systemId": "decision-engine",
+    "profile": "choice",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "Единственный вопрос 03 прочитан: что делает важный выбор интересным."
+      },
+      "actions": {
+        "state": "partially-covered",
+        "evidence": "Пять осей приняты. В текст 03 этого импорта вошли Attention и Approach, не все оси целиком."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "Пять проверок интересного выбора и правило двух осей записаны. Словарь Opportunity Cost открыт."
+      },
+      "scenarios": {
+        "state": "partially-covered",
+        "evidence": "Примеры Attention помечены как незапертое воплощение."
+      },
+      "costs": {
+        "state": "partially-covered",
+        "evidence": "Цена объявлена обязательной. Как её показать без перегруза, открыто."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "03 говорит, что лор, магия, фракции, бой и квесты позже воплощают этот двигатель, а не заменяют его."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Два высоких вопроса 99 остаются открытыми."
+      }
+    }
+  },
+  {
+    "systemId": "approaches",
+    "profile": "choice",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "06 отвечает, как действовать, не делая бой ответом по умолчанию."
+      },
+      "actions": {
+        "state": "covered",
+        "evidence": "Шесть имён и их бытовой смысл прочитаны в таблице V1."
+      },
+      "rules": {
+        "state": "covered",
+        "evidence": "Шесть правил дизайна прочитаны, включая запрет стирать методы через Pathway."
+      },
+      "scenarios": {
+        "state": "not-assessed",
+        "evidence": "Разделы Convince, Threaten, Exchange, Veil и Withdraw целиком не переносились."
+      },
+      "costs": {
+        "state": "partially-covered",
+        "evidence": "Цена обязательна для каждого метода. Сколько поддержки нужно, чтобы метод ощущался живым, открыто."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Документ прямо подчинён Decision Engine и кормит будущие бой, диалог, скрытность и обмен."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Три высоких вопроса 99 остаются, включая границу Threaten и Confront."
+      }
+    }
+  },
+  {
+    "systemId": "points-of-interest",
+    "profile": "exploration",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "04 объясняет, как события появляются в мире без постоянной симуляции каждой сцены."
+      },
+      "entities": {
+        "state": "partially-covered",
+        "evidence": "Есть POI, Active Window, ленивая активация и разрешение без игрока. Длительности окон открыты."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "Пропуск меняет мир. Точные сроки и число одновременных Marked POI открыты."
+      },
+      "feedback": {
+        "state": "partially-covered",
+        "evidence": "Маркер может быть виден или только находим. Подача срочности открыта."
+      },
+      "scenarios": {
+        "state": "not-assessed",
+        "evidence": "Карточки 11.1 и дальнейшие примеры 04 в импорт не входили."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Точки зависят от законов мира и доставляют Side Events. Сведения и часы связаны отдельными записями."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Три высоких вопроса 99 по точкам открыты."
+      }
+    }
+  },
+  {
+    "systemId": "information-sources",
+    "profile": "exploration",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "09 отвечает, откуда берётся сведение и как оно кормит любопытство, а не чеклист."
+      },
+      "entities": {
+        "state": "partially-covered",
+        "evidence": "99 называет виды источников и относит их к 09. Правила перехода Hinted → Marked при этом открыты, а полный текст 09 не переносился."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "Прочитаны неполнота и право источника ошибаться. Пороги лжи и перехода Hinted → Marked открыты."
+      },
+      "feedback": {
+        "state": "partially-covered",
+        "evidence": "Запрет всезнающего маркера есть. Конкретный интерфейс слуха не описан в прочитанном фрагменте."
+      },
+      "scenarios": {
+        "state": "not-assessed",
+        "evidence": "Примеры доски, бармена и слуха в прочитанный фрагмент не входили."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Текст прямо кормит Attention, POI, Approaches и Player Knowledge."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Четыре высоких вопроса раздела остаются открытыми."
+      }
+    }
+  },
+  {
+    "systemId": "progression",
+    "profile": "character",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "05 запрещает рост через общий уровень и ставит любопытство выше силы."
+      },
+      "entities": {
+        "state": "partially-covered",
+        "evidence": "Есть Pathway, ступени 9–7, Bargain. Порогов и имён содержания нет."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "Четыре шага роста прочитаны. Смена пути и конфликт Bargain с поведением открыты."
+      },
+      "costs": {
+        "state": "partially-covered",
+        "evidence": "Цена силы заявлена. Конкретная цена ступеней не задана."
+      },
+      "scenarios": {
+        "state": "not-assessed",
+        "evidence": "Содержание путей в документ сознательно не входит и в импорт не добавлялось."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Рост связан с Faction nudge, Bargain и концом жизни."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Четыре высоких вопроса 99 открыты."
+      }
+    }
+  },
+  {
+    "systemId": "character-life",
+    "profile": "character",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "07 отвечает, как следующий человек входит в мир, не превращая смерть в перезагрузку."
+      },
+      "entities": {
+        "state": "partially-covered",
+        "evidence": "Названы Death Gap, Legacy Cache, Soft Memory, Starting Faction. Длина и размер открыты."
+      },
+      "rules": {
+        "state": "covered",
+        "evidence": "Шесть центральных правил начала и конца жизни прочитаны."
+      },
+      "costs": {
+        "state": "partially-covered",
+        "evidence": "Обычные остатки не гарантированы. Предел размера тайника открыт."
+      },
+      "scenarios": {
+        "state": "not-assessed",
+        "evidence": "Поток смерти и диалоги Soft Memory целиком не переносились."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Жизнь зависит от Meta Loop, Progression и фракций первой жизни."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Четыре высоких вопроса раздела Character открыты."
+      }
+    }
+  },
+  {
+    "systemId": "confront",
+    "profile": "combat",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "08 прямо говорит, что это ограждение, а не боевая библия."
+      },
+      "actions": {
+        "state": "partially-covered",
+        "evidence": "Ход Move + Action + Bonus и среда как глаголы названы. Цены и инициатива открыты."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "Сетка только на арене, диагонали без срезания углов, провал не пустой. Полосы шанса не заданы."
+      },
+      "feedback": {
+        "state": "missing",
+        "evidence": "Читаемость перехода на арену — открытый вопрос, а не описанный приём."
+      },
+      "limits": {
+        "state": "covered",
+        "evidence": "Нет опыта за убийства, нет абстрактной добычи, бой не лучшая выплата, вне исследования нет добровольного пошагового режима."
+      },
+      "scenarios": {
+        "state": "not-assessed",
+        "evidence": "Готовых аренных сцен в импорт не входило."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Бой зависит от Approaches и от пространственного замка."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Семь высоких вопросов Confront / Turn Economy открыты."
+      }
+    }
+  },
+  {
+    "systemId": "spatial-structure",
+    "profile": "spatial",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "16 отвечает, как разрезать игру на доводимые куски, не бросая Decision Engine и Approaches."
+      },
+      "structure": {
+        "state": "covered",
+        "evidence": "Прочитаны три вида сцен и арена."
+      },
+      "rules": {
+        "state": "covered",
+        "evidence": "Таблица Locked Decisions прочитана целиком."
+      },
+      "limits": {
+        "state": "covered",
+        "evidence": "Отменённые замки старого пути прочитаны, включая OrganicTown и пошаговый режим вне боя."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Подача подчиняет генерацию и Confront. Движок зафиксирован в 12."
+      },
+      "research-boundary": {
+        "state": "not-applicable",
+        "evidence": "Исследование рельефа не меняет этот пространственный замок и живёт в генерации мира."
+      },
+      "unresolved": {
+        "state": "not-assessed",
+        "evidence": "Хвост 16 после начала графа сцен в этот импорт не входил, поэтому новые дыры внутри файла не объявлялись."
+      }
+    }
+  },
+  {
+    "systemId": "world-generation",
+    "profile": "spatial",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "14 — передача порядка работ, и сам документ так себя называет."
+      },
+      "structure": {
+        "state": "partially-covered",
+        "evidence": "Трек W и сборка зданий прочитаны по назначению. Тела всех карточек W не переносились."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "Overworld V0 — следующий путь. D6 задаёт цель. Числа с картинки брать нельзя."
+      },
+      "limits": {
+        "state": "covered",
+        "evidence": "OrganicTown не источник. Песочница оболочек не заменяет Overworld V0."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Порядок подчинён 16 и карте 17."
+      },
+      "research-boundary": {
+        "state": "covered",
+        "evidence": "G3f на момент шапки 14 не объявлен пройденным. Производственный рельеф не сменён. Stage 3F экспериментален."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Размер V1, сроки сборки и вопросы 3F открыты. D6 при этом уже принят как цель."
+      }
+    }
+  },
+  {
+    "systemId": "world-time",
+    "profile": "thin",
+    "criteria": {
+      "purpose": {
+        "state": "partially-covered",
+        "evidence": "Есть одна ответственность карточки X.1, не документ времени."
+      },
+      "responsibilities": {
+        "state": "partially-covered",
+        "evidence": "Часы для окон POI и расписаний, отдельно от времени кадра."
+      },
+      "dependencies": {
+        "state": "partially-covered",
+        "evidence": "POI уже меряют окно мировым временем. Остальные потребители часов не разбирались."
+      },
+      "scope": {
+        "state": "partially-covered",
+        "evidence": "Карточка тонкая. Рамок V1 для календаря в прочитанном фрагменте нет."
+      },
+      "unresolved": {
+        "state": "not-assessed",
+        "evidence": "Отдельного вопроса о длине дня в импортированном списке нет."
+      }
+    }
+  },
+  {
+    "systemId": "actors",
+    "profile": "thin",
+    "criteria": {
+      "purpose": {
+        "state": "partially-covered",
+        "evidence": "Трек A раздаёт владение и прямо говорит, что механика не должна обогнать Decision Engine и срез."
+      },
+      "responsibilities": {
+        "state": "partially-covered",
+        "evidence": "Прочитаны три карточки: личности, поведение вне боя, диалог."
+      },
+      "dependencies": {
+        "state": "partially-covered",
+        "evidence": "Диалог зависит от сведений и интерфейса. Это указано в карточке, не расписано."
+      },
+      "scope": {
+        "state": "covered",
+        "evidence": "Все три карточки отложены. Срез может расставить NPC руками."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Спецификации населения нет, и это видно по статусу карточек."
+      }
+    }
+  },
+  {
+    "systemId": "quests",
+    "profile": "thin",
+    "criteria": {
+      "purpose": {
+        "state": "partially-covered",
+        "evidence": "Одна карточка: последовательности Decision Nodes, не коридор наград."
+      },
+      "responsibilities": {
+        "state": "partially-covered",
+        "evidence": "Зона ответственности прочитана. Графа квеста нет."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Ворота названы явно: устойчивость черновика Decision Engine."
+      },
+      "scope": {
+        "state": "covered",
+        "evidence": "Сначала ручное содержание среза. Процедурные квесты позже."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Отдельной спецификации нет. Side Events не надо считать вторым квестом: они уже POI."
+      }
+    }
+  },
+  {
+    "systemId": "economy",
+    "profile": "thin",
+    "criteria": {
+      "purpose": {
+        "state": "partially-covered",
+        "evidence": "Цены как Symptoms, не симуляция ради себя."
+      },
+      "responsibilities": {
+        "state": "partially-covered",
+        "evidence": "Карточка обещает запрос доступности. Формулы нет."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Ворота World Laws названы и в 02, и в 17."
+      },
+      "scope": {
+        "state": "covered",
+        "evidence": "Срез оставляет пару цен. Глубокие рынки отнесены дальше V1."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Два средних вопроса экономики открыты."
+      }
+    }
+  },
+  {
+    "systemId": "inventory",
+    "profile": "character",
+    "criteria": {
+      "purpose": {
+        "state": "partially-covered",
+        "evidence": "Есть роль контейнера, нет обещания игроку о том, как вещи ощущаются."
+      },
+      "entities": {
+        "state": "partially-covered",
+        "evidence": "Контейнеры и слоты названы. Предметов нет."
+      },
+      "rules": {
+        "state": "missing",
+        "evidence": "Кроме диегетической добычи и потери инвентаря со смертью правил вещей нет."
+      },
+      "costs": {
+        "state": "not-assessed",
+        "evidence": "Цена переноса и ограничения Legacy Cache для вещей не оценивались: их нет в карточке."
+      },
+      "scenarios": {
+        "state": "missing",
+        "evidence": "Сцены получения, потери и передачи вещи не найдены в прочитанных карточках."
+      },
+      "dependencies": {
+        "state": "partially-covered",
+        "evidence": "Есть связь с сохранением, Confront и смертью жизни."
+      },
+      "unresolved": {
+        "state": "not-assessed",
+        "evidence": "В 99 нет раздела инвентаря. Это не доказательство полноты."
+      }
+    }
+  },
+  {
+    "systemId": "crafting",
+    "profile": "thin",
+    "criteria": {
+      "purpose": {
+        "state": "partially-covered",
+        "evidence": "Карточка задаёт диегетические рецепты и цену силы. Это не принятый крафт."
+      },
+      "responsibilities": {
+        "state": "partially-covered",
+        "evidence": "Зона ответственности — одна строка карточки."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Инвентарь назван зависимостью."
+      },
+      "scope": {
+        "state": "covered",
+        "evidence": "Карточка отложена. Глубокий крафт вынесен из среза."
+      },
+      "unresolved": {
+        "state": "not-assessed",
+        "evidence": "Отдельных вопросов крафта в импортированном 99 нет."
+      }
+    }
+  },
+  {
+    "systemId": "alchemy",
+    "profile": "proposed",
+    "criteria": {
+      "purpose": {
+        "state": "missing",
+        "evidence": "Назначение алхимии в прочитанных документах не найдено."
+      },
+      "source-exists": {
+        "state": "missing",
+        "evidence": "Отдельного дизайн-документа нет."
+      },
+      "nearest-questions": {
+        "state": "covered",
+        "evidence": "Три вопроса Magic хранятся рядом и не выдаются за систему зелий."
+      }
+    }
+  },
+  {
+    "systemId": "vertical-slice",
+    "profile": "scope",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "Вопрос успеха среза прочитан: другой подход, а не ещё опыта."
+      },
+      "included": {
+        "state": "partially-covered",
+        "evidence": "99 задаёт две фракции, три POI, сведения, арену и один Bargain. Карточки 11.1 не переносились, поэтому состав точек не оценивался по тексту."
+      },
+      "excluded": {
+        "state": "covered",
+        "evidence": "Scope Out прочитан, включая глубокий крафт, смерть-наследника и коллапс."
+      },
+      "teaching": {
+        "state": "covered",
+        "evidence": "Три шага Attention, Allegiance и Bargain прочитаны."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Два высоких вопроса среза открыты."
+      }
+    }
+  }
+]

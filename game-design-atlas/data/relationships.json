@@ -1,0 +1,280 @@
+[
+  {
+    "id": "rel-meta-core",
+    "fromId": "meta-loop",
+    "toId": "core-loop",
+    "type": "shared-rule",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-00-2",
+      "src-00-1"
+    ],
+    "explanation": "Meta Loop содержит жизнь персонажа. Внутри неё повторяется Core Loop: исследование, выборы, последствия. Смерть замыкает жизнь и открывает наследие."
+  },
+  {
+    "id": "rel-decision-core",
+    "fromId": "decision-engine",
+    "toId": "core-loop",
+    "type": "shared-rule",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-03",
+      "src-00-1"
+    ],
+    "explanation": "Decision Engine говорит, каким должен быть важный выбор внутри цикла одной жизни. Он не заменяет сам цикл."
+  },
+  {
+    "id": "rel-approaches-decision",
+    "fromId": "approaches",
+    "toId": "decision-engine",
+    "type": "shared-rule",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-06",
+      "src-03"
+    ],
+    "explanation": "Approach — одна из пяти осей. Шесть имён V1 принадлежат этой оси, а не отдельной игре поверх неё."
+  },
+  {
+    "id": "rel-confront-approaches",
+    "fromId": "confront",
+    "toId": "approaches",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-08",
+      "src-06"
+    ],
+    "explanation": "Confront — один из шести Approaches. Ограждение боя существует, чтобы этот метод не стал лучшей выплатой по умолчанию."
+  },
+  {
+    "id": "rel-poi-laws",
+    "fromId": "points-of-interest",
+    "toId": "world-laws",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-04",
+      "src-99"
+    ],
+    "explanation": "POI доставляют Side Events. Side Event может сдвинуть Faction Influence и при пропуске всё ещё меняет мир."
+  },
+  {
+    "id": "rel-info-poi",
+    "fromId": "information-sources",
+    "toId": "points-of-interest",
+    "type": "data-flow",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-09"
+    ],
+    "explanation": "Источники сведений намекают на POI или открывают их. Они не заменяют сами точки."
+  },
+  {
+    "id": "rel-info-decision",
+    "fromId": "information-sources",
+    "toId": "decision-engine",
+    "type": "influence",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-09"
+    ],
+    "explanation": "Сведения кормят ось Attention: игрок решает, заняться неизвестным или пройти мимо."
+  },
+  {
+    "id": "rel-poi-time",
+    "fromId": "points-of-interest",
+    "toId": "world-time",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-04",
+      "src-17"
+    ],
+    "explanation": "Active Window меряется мировым временем. Карточка часов это подтверждает как потребность. Сами часы ещё не спроектированы."
+  },
+  {
+    "id": "rel-progression-approaches",
+    "fromId": "progression",
+    "toId": "approaches",
+    "type": "influence",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-06"
+    ],
+    "explanation": "Pathway смещает выбор Approach, но не имеет права стереть остальные методы."
+  },
+  {
+    "id": "rel-life-meta",
+    "fromId": "character-life",
+    "toId": "meta-loop",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-07",
+      "src-00-2"
+    ],
+    "explanation": "07 разворачивает смерть и следующего персонажа внутри правила Meta Loop: мир не замирает, сила жизни не переносится."
+  },
+  {
+    "id": "rel-life-progression",
+    "fromId": "character-life",
+    "toId": "progression",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-07"
+    ],
+    "explanation": "Смерть кончает ступень Pathway этой жизни. Рост не переживает персонажа живым героем."
+  },
+  {
+    "id": "rel-life-laws",
+    "fromId": "character-life",
+    "toId": "world-laws",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-07",
+      "src-02"
+    ],
+    "explanation": "Только первая жизнь мира начинается внутри Starting Faction и видит её Main Goal. Это правило жизни опирается на фракции законов мира."
+  },
+  {
+    "id": "rel-confront-space",
+    "fromId": "confront",
+    "toId": "spatial-structure",
+    "type": "shared-rule",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-16",
+      "src-10-1"
+    ],
+    "explanation": "Бой живёт на отдельной арене. Сетка не является правдой оверворлда и интерьера."
+  },
+  {
+    "id": "rel-worldgen-space",
+    "fromId": "world-generation",
+    "toId": "spatial-structure",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-14",
+      "src-16"
+    ],
+    "explanation": "Порядок генерации подчинён трём видам сцен. Непрерывный город в одной сцене больше не путь по умолчанию."
+  },
+  {
+    "id": "rel-quests-decision",
+    "fromId": "quests",
+    "toId": "decision-engine",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-17"
+    ],
+    "explanation": "Квестовая карточка ждёт устойчивости Decision Engine. Пока это ворота, а не готовые квесты."
+  },
+  {
+    "id": "rel-economy-laws",
+    "fromId": "economy",
+    "toId": "world-laws",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-02",
+      "src-17"
+    ],
+    "explanation": "Цены и доступ задуманы как Symptoms Influence. Отдельной экономики, которая не читает законы мира, документы не разрешают."
+  },
+  {
+    "id": "rel-confront-inventory",
+    "fromId": "confront",
+    "toId": "inventory",
+    "type": "influence",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-17",
+      "src-99"
+    ],
+    "explanation": "Добыча Confront только та, которой владела цель. Инвентарь как система предметов этим правилом ограничен, но сам ещё не описан."
+  },
+  {
+    "id": "rel-slice-poi",
+    "fromId": "vertical-slice",
+    "toId": "points-of-interest",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-11",
+      "src-99"
+    ],
+    "explanation": "99 задаёт первому доказательству три POI и две фракции Lower Veil. Карточки этих точек лежат в 11.1 и в атлас не переносились."
+  },
+  {
+    "id": "rel-slice-confront",
+    "fromId": "vertical-slice",
+    "toId": "confront",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-11"
+    ],
+    "explanation": "Срез обязан показать аренный ход Move + Action + Bonus и не включает добровольный пошаговый режим в исследовании."
+  },
+  {
+    "id": "rel-laws-actors",
+    "fromId": "world-laws",
+    "toId": "actors",
+    "type": "influence",
+    "evidence": "inferred",
+    "origin": "imported",
+    "sourceIds": [
+      "src-02",
+      "src-17"
+    ],
+    "explanation": "02 говорит, что фракция имеет доступ к последователям, и масштаб зависит от Influence. Карточки NPC этого не разворачивают. Связь выведена из двух документов, а не записана как дизайн населения."
+  },
+  {
+    "id": "rel-crafting-inventory",
+    "fromId": "crafting",
+    "toId": "inventory",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-17"
+    ],
+    "explanation": "Отложенная карточка крафта называет инвентарь зависимостью. Это не значит, что рецепты уже есть."
+  },
+  {
+    "id": "rel-worldgen-poi",
+    "fromId": "world-generation",
+    "toId": "points-of-interest",
+    "type": "data-flow",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-17"
+    ],
+    "explanation": "Трек W расставляет геометрические якоря POI. Игровые окна и пропуск точек принадлежат POI Director и документу 04, не генератору ландшафта."
+  }
+]

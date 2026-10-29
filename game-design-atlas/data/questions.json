@@ -1,0 +1,638 @@
+[
+  {
+    "id": "q-wl-recover",
+    "text": "Can Balance partially recover without player intervention?",
+    "systemIds": [
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-symptoms",
+    "text": "What exact Symptoms correspond to each band of Faction Influence?",
+    "systemIds": [
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-win",
+    "text": "What determines the concrete winning / terminal condition of each faction?",
+    "systemIds": [
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-cooperate",
+    "text": "Can multiple factions unintentionally cooperate?",
+    "systemIds": [
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-difficulty",
+    "text": "What are the V1 numeric ranges for Difficulty Pressure?",
+    "systemIds": [
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-de-hidden",
+    "text": "When and how do Hidden consequences become discoverable across one Character Life versus across Legacy?",
+    "systemIds": [
+      "decision-engine"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-de-cost",
+    "text": "What is the V1 readable vocabulary for communicating Opportunity Cost without UI overload?",
+    "systemIds": [
+      "decision-engine"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-poi-duration",
+    "text": "What exact in-world durations belong to Brief / Short / Standard / Long / Persistent in V1?",
+    "systemIds": [
+      "points-of-interest"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-poi-urgency",
+    "text": "How exactly does the UI/map express urgency without becoming a stressful quest-timer game?",
+    "systemIds": [
+      "points-of-interest"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-poi-count",
+    "text": "How many active Marked POIs should a V1 district show at once?",
+    "systemIds": [
+      "points-of-interest"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-info-tips",
+    "text": "How many tips should a V1 district generate per day from boards / bartenders / rumours?",
+    "systemIds": [
+      "information-sources"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-info-upgrade",
+    "text": "When does a tip upgrade from Hinted to Marked by rule?",
+    "systemIds": [
+      "information-sources"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-info-false",
+    "text": "How much false or slanted information is healthy in V1 before trust collapses?",
+    "systemIds": [
+      "information-sources"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-info-persistent",
+    "text": "Can a Persistent POI still be finite without feeling like a fake timer?",
+    "systemIds": [
+      "information-sources",
+      "points-of-interest"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-pr-thresholds",
+    "text": "What are the exact V1 Conduct Progress thresholds for stages 9 → 8 and 8 → 7?",
+    "systemIds": [
+      "progression"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-pr-nudge",
+    "text": "How strongly may a Starting Faction nudge before it becomes a soft lock?",
+    "systemIds": [
+      "progression",
+      "character-life"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-pr-bargain",
+    "text": "How do External Power Bargains interact with Pathway conduct when they pull in opposite directions?",
+    "systemIds": [
+      "progression"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-pr-switch",
+    "text": "What happens if a character tries to abandon or switch Pathways after stage 9?",
+    "systemIds": [
+      "progression"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-ap-support",
+    "text": "How much V1 support does each Approach need before it feels real (skills, UI verbs, simple checks)?",
+    "systemIds": [
+      "approaches"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-ap-threaten",
+    "text": "When does Threaten escalate into Confront by rule rather than by writer taste?",
+    "systemIds": [
+      "approaches",
+      "confront"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-ap-bound",
+    "text": "Should Bound Path get a light Rite/Invoke extension in V1, or remain under Exchange until V2?",
+    "systemIds": [
+      "approaches"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cf-transition",
+    "text": "How diegetic / readable is the transition into a Combat Arena (fade, cut, warning) without spoiling Attention teaching?",
+    "systemIds": [
+      "confront"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cf-theme",
+    "text": "How closely must an arena Theme Pack match the source location before it feels unfair or immersion-breaking?",
+    "systemIds": [
+      "confront"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cf-offer",
+    "text": "How often may important nodes offer Confront as one option versus scenes that begin already in Confront?",
+    "systemIds": [
+      "confront",
+      "decision-engine"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cf-initiative",
+    "text": "Exact initiative formula and Move Speed units / cells per Move for V1 arenas?",
+    "systemIds": [
+      "confront"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cf-diagonal",
+    "text": "Diagonal move cost on arenas: 1 or 1.5?",
+    "systemIds": [
+      "confront"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cf-vault",
+    "text": "Exact fail chance bands for vault/climb on arenas in V1?",
+    "systemIds": [
+      "confront"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cf-dash",
+    "text": "Is Bonus-to-Dash enabled in V1 or deferred?",
+    "systemIds": [
+      "confront"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-vs-props",
+    "text": "What exact prop/language checklist best communicates early radio/steam novelty without turning the slice into a tech museum?",
+    "systemIds": [
+      "vertical-slice"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "scope",
+    "origin": "imported"
+  },
+  {
+    "id": "q-vs-crown",
+    "text": "How visible should crown/nobility pressure be inside Lower Veil without adding a third faction?",
+    "systemIds": [
+      "vertical-slice",
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "scope",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cl-gap",
+    "text": "What exact V1 length is the Death Gap in days?",
+    "systemIds": [
+      "character-life"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cl-cache",
+    "text": "How large may a Legacy Cache be before it undermines death?",
+    "systemIds": [
+      "character-life"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cl-entry",
+    "text": "What is the minimal Faction Entry pattern reusable by all V1 factions?",
+    "systemIds": [
+      "character-life",
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cl-memory",
+    "text": "How many Soft Memory dialogue hooks are required in V1 versus optional flavour?",
+    "systemIds": [
+      "character-life",
+      "actors"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-magic-origin",
+    "text": "Where does mystical power originate?",
+    "systemIds": [
+      "alchemy"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Magic",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-magic-vanish",
+    "text": "Can power disappear?",
+    "systemIds": [
+      "alchemy"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Magic",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-magic-world",
+    "text": "Can the world lose magic?",
+    "systemIds": [
+      "alchemy",
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Magic",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-fac-emerge",
+    "text": "How do factions emerge?",
+    "systemIds": [
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Factions",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-fac-die",
+    "text": "Can factions disappear naturally?",
+    "systemIds": [
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Factions",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-fac-recover",
+    "text": "Can civilizations recover?",
+    "systemIds": [
+      "world-laws",
+      "meta-loop"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Factions",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-ec-price",
+    "text": "How exactly do Influence-controlled niches set prices and availability?",
+    "systemIds": [
+      "economy",
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Economy",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-ec-resources",
+    "text": "How do resources disappear?",
+    "systemIds": [
+      "economy"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Economy",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-ex-secrets",
+    "text": "How are secrets generated?",
+    "systemIds": [
+      "points-of-interest",
+      "world-generation"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Exploration",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-ex-vanish",
+    "text": "Can secrets vanish forever?",
+    "systemIds": [
+      "points-of-interest"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Exploration",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-ex-size",
+    "text": "What is the V1 overworld target size (km / play minutes edge-to-edge) beyond the V0 world (2800 × 2800 m / 64 m chunks already locked in 17)? The same entry notes a measured budget: about 2.5–3 km² of dry land fits two large cities; three with real travel between them needs 4–6 km². That means growing the world, not just the island.",
+    "systemIds": [
+      "world-generation"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Exploration",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-bg-replace",
+    "text": "When does Piece-Based Assembly fully replace the single hand-placed Interior V0 template scene as authority for Interior Scenes? The mechanism itself is locked; only the V0 to V1 timing is open.",
+    "systemIds": [
+      "world-generation"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Procedural Buildings",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-bg-load",
+    "text": "When does additive interior/arena load replace the V0 single-scene swap? The V0 default is locked in 17; the V1 timing is open.",
+    "systemIds": [
+      "world-generation",
+      "spatial-structure"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Procedural Buildings",
+    "status": "open",
+    "priority": "medium",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-stage-3f",
+    "text": "99 holds Stage 3F valley-carve questions 3F-1 through 3F-25. They are research and production-terrain questions. They are not current gameplay-design blockers. Production terrain stays unchanged, Stage 3F stays experimental, and an agent recommendation in that section is not a decision.",
+    "systemIds": [
+      "world-generation"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Medium Priority — Terrain, Stage 3F",
+    "status": "open",
+    "priority": null,
+    "sourceKind": "technical-research",
+    "origin": "atlas-annotation"
+  }
+]

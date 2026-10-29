@@ -1,0 +1,34 @@
+{
+  "id": "inventory",
+  "order": 17,
+  "name": "Inventory",
+  "title": "Контейнеры, слоты и диегетическая добыча",
+  "category": "character",
+  "summary": "Отдельного документа предметов нет. Карточки P.1 и P.2 описывают контейнеры и слоты экипировки и повторяют запрет недиегетической добычи из Confront. Для среза объём назван минимальным, когда он понадобится.",
+  "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
+  "points": [
+    {
+      "text": "Состояние инвентаря сохраняется целиком и принадлежит персонажу.",
+      "sourceId": "src-17"
+    },
+    {
+      "text": "07 забирает личный инвентарь вместе со смертью жизни: он не продолжается живым героем.",
+      "sourceId": "src-07"
+    }
+  ],
+  "gaps": [
+    "Нет списка предметов, веса, слотов по типам и правил переноса в Legacy Cache."
+  ],
+  "sourceIds": [
+    "src-17",
+    "src-08"
+  ],
+  "designMaturity": "idea-only",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 1000,
+  "y": 570
+}

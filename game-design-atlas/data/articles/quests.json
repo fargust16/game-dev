@@ -1,0 +1,34 @@
+{
+  "id": "quests",
+  "order": 15,
+  "name": "Quests",
+  "title": "Последовательности узлов, не коридор наград",
+  "category": "exploration",
+  "summary": "Отдельной спецификации квестов нет. Карточка Q.1 говорит, что квест — данные из Decision Nodes, не коридор наград, и ждёт устойчивости черновика Decision Engine. Side Events уже живут как POI, а не как второй вид квеста.",
+  "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
+  "points": [
+    {
+      "text": "Зависимости карточки: Decision Engine, POI Director, фракции. Процедурные квесты — после того, как ручные графы докажут оси.",
+      "sourceId": "src-17"
+    },
+    {
+      "text": "Q.3 отдельно держит игровой POI Director и геометрическую расстановку маркеров.",
+      "sourceId": "src-17"
+    }
+  ],
+  "gaps": [
+    "Нет структуры квестового графа, состояний и примеров сверх одной карточки."
+  ],
+  "sourceIds": [
+    "src-17",
+    "src-99"
+  ],
+  "designMaturity": "idea-only",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 560,
+  "y": 410
+}

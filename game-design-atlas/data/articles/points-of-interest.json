@@ -1,0 +1,41 @@
+{
+  "id": "points-of-interest",
+  "order": 6,
+  "name": "POI",
+  "title": "Ленивые точки с окном жизни",
+  "category": "exploration",
+  "summary": "Points of Interest упаковывают Side Events, находки и Decision Nodes так, чтобы игра не симулировала каждую сцену постоянно. Тяжёлая сцена начинается при входе в зону. У точки есть Active Window в мировом времени. Если игрок не пришёл, точка разрешается без него и всё ещё может изменить мир.",
+  "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
+  "points": [
+    {
+      "text": "World Seed и World Engine создают POI. Маркер может быть виден или только находимым.",
+      "sourceId": "src-04"
+    },
+    {
+      "text": "Ведьмак 3 и Cyberpunk 2077 названы ориентиром подачи карты. Логику их квестов документ не копирует.",
+      "sourceId": "src-04"
+    },
+    {
+      "text": "Side Events доставляются как временные POI с ленивой активацией и разрешением без игрока, взвешенным Influence.",
+      "sourceId": "src-99"
+    }
+  ],
+  "gaps": [
+    "Нет длительностей Brief / Short / Standard / Long / Persistent для V1.",
+    "Не решено, как карта показывает срочность и не становится игрой таймеров.",
+    "Не задано, сколько Marked POI одновременно показывает район V1."
+  ],
+  "sourceIds": [
+    "src-04",
+    "src-99"
+  ],
+  "designMaturity": "partially-specified",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "lastDocumentUpdate": "2026-08-05",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 560,
+  "y": 250
+}

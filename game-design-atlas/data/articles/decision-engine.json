@@ -1,0 +1,44 @@
+{
+  "id": "decision-engine",
+  "order": 4,
+  "name": "Decision Engine",
+  "title": "Почему важный выбор интересен",
+  "category": "choice",
+  "summary": "Decision Engine задаёт правила интересного выбора, а не лор, магию, фракции, бой или квесты. Важный выбор показывает больше одного живого пути, оставляет неполноту при достаточной опоре для рассуждения, берёт цену, меняет мир и учит даже болью. Пять осей: Attention, Approach, Allegiance, Commitment, Bargain.",
+  "scenarioNote": "Примеры Attention в 03 прямо названы примерами воплощения, а не запертым содержанием.",
+  "points": [
+    {
+      "text": "Если выбор не проходит эти проверки, это шум или фальшивый выбор.",
+      "sourceId": "src-03"
+    },
+    {
+      "text": "Attention — заняться неизвестным или отложить. Игнор реален, потому что мир идёт дальше и возможность может исчезнуть.",
+      "sourceId": "src-03"
+    },
+    {
+      "text": "Approach — как действовать, когда живы несколько способов. Confront не универсально лучший.",
+      "sourceId": "src-03"
+    },
+    {
+      "text": "V1 сначала учит Attention вместе с Approach. Bargain — второй большой урок. Важный узел требует минимум двух осей.",
+      "sourceId": "src-99"
+    }
+  ],
+  "gaps": [
+    "Не задан словарь, которым V1 показывает Opportunity Cost без перегруза интерфейса.",
+    "Не задано, когда скрытые последствия становятся читаемыми внутри одной жизни и через Legacy.",
+    "Полный текст осей Allegiance, Commitment и Bargain в этот импорт не переносился."
+  ],
+  "sourceIds": [
+    "src-03",
+    "src-99"
+  ],
+  "designMaturity": "partially-specified",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 780,
+  "y": 410
+}

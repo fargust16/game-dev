@@ -1,0 +1,41 @@
+{
+  "id": "progression",
+  "order": 8,
+  "name": "Progression",
+  "title": "Рост без полоски опыта",
+  "category": "character",
+  "summary": "Персонаж растёт не уровнем. Он идёт по Pathway, узнаёт требования ступени, собирает знание формулы и цену этого мира и принимает Bargain перехода. V1 держит три Pathway и только ступени 9, 8 и 7. Имена лора и полные списки документ откладывает.",
+  "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
+  "points": [
+    {
+      "text": "Нет полоски опыта и общего level-up.",
+      "sourceId": "src-05"
+    },
+    {
+      "text": "Starting Faction мягко наклоняет к одному Pathway. Pathway можно получить и через Bargain, квест или находку. Pathless остаётся законным. Это не тюрьма.",
+      "sourceId": "src-99"
+    },
+    {
+      "text": "Внешние силы, церкви и проклятия — всегда Bargains с читаемой, часто отложенной и растущей ценой.",
+      "sourceId": "src-99"
+    }
+  ],
+  "gaps": [
+    "Нет порогов Conduct Progress для 9→8 и 8→7.",
+    "Не задана сила наклона Starting Faction, после которой это уже мягкий замок.",
+    "Не решено, что будет, если Bargains и поведение Pathway тянут в разные стороны, и можно ли сменить Pathway после ступени 9."
+  ],
+  "sourceIds": [
+    "src-05",
+    "src-99"
+  ],
+  "designMaturity": "partially-specified",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "lastDocumentUpdate": "2026-08-05",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 1000,
+  "y": 90
+}

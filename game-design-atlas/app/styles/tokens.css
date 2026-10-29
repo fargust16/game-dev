@@ -1,0 +1,54 @@
+/* Colors and type. Change font sizes here when the whole atlas should read larger or smaller. */
+
+:root {
+  color-scheme: dark;
+  --bg: #0c1118;
+  --bg-raise: #141c27;
+  --bg-sunken: #0a0e14;
+  --line: #2a3848;
+  --line-strong: #3d5166;
+  --text: #f3ecdf;
+  --muted: #a9b6c6;
+  --faint: #7e8b9c;
+  --gold: #e4c48a;
+  --gold-dim: #a68455;
+  --danger: #e08b7a;
+  --ok: #8fcea8;
+  --warn: #e0b15c;
+  --info: #8eb8d8;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  --foundation: #e4c48a;
+  --world: #7dcaa6;
+  --exploration: #79b7d6;
+  --choice: #d7a15a;
+  --combat: #e07a5f;
+  --character: #c4a2de;
+  --society: #d6c36a;
+  --scope: #9aafc4;
+  --proposed: #b7a89a;
+  --font: "Segoe UI", "Helvetica Neue", sans-serif;
+  --serif: Palatino, "Palatino Linotype", Georgia, serif;
+  --font-size: 18px;
+  --prose-size: 21px;
+  --small-size: 15px;
+  --article-width: 1040px;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; max-width: 100%; }
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 500px at 20% -10%, rgba(228, 196, 138, 0.08), transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font: var(--font-size)/1.5 var(--font);
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+img { max-width: 100%; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+a { color: var(--info); }

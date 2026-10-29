@@ -1,0 +1,34 @@
+{
+  "id": "crafting",
+  "order": 18,
+  "name": "Crafting",
+  "title": "Рецепты с ценой, пока отложены",
+  "category": "proposed",
+  "summary": "Это не утверждённая система крафта. Есть отложенная карточка E.3: диегетические рецепты, сила с ценой, без ядра «собери ресурсы в оверворлде V0». Глубокий крафт явно вынесен из Vertical Slice.",
+  "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
+  "points": [
+    {
+      "text": "Карточка зависит от инвентаря и необязательно от экономики. Станции позже могут быть POI.",
+      "sourceId": "src-17"
+    },
+    {
+      "text": "11 в Scope Out пишет deep crafting среди того, чего в срезе нет.",
+      "sourceId": "src-11"
+    }
+  ],
+  "gaps": [
+    "Нет рецептов, станций и правила, чем крафт отличается от Bargain прогрессии."
+  ],
+  "sourceIds": [
+    "src-17",
+    "src-11"
+  ],
+  "designMaturity": "idea-only",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "proposed": true,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 780,
+  "y": 570
+}

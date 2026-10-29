@@ -1,0 +1,87 @@
+/* System article. Wording comes from data/articles/<id>.json. */
+
+.crumbs { margin: 0 0 16px; color: var(--faint); font-size: var(--small-size); }
+.crumbs a { color: var(--gold); text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+.quiet { margin: 12px 0 0; color: var(--faint); font-size: var(--small-size); line-height: 1.5; }
+
+.page.reading { max-width: var(--article-width); }
+.page.reading h1 {
+  font-size: 52px;
+  line-height: 1.08;
+  margin-bottom: 12px;
+}
+.page.reading .lede {
+  font-family: var(--serif);
+  font-size: 26px;
+  line-height: 1.35;
+  color: var(--text);
+  margin: 0;
+}
+.page.reading .section { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); }
+.page.reading .section h2 {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+.prose p, .prose-line, .rationale {
+  font-family: var(--serif);
+  font-size: var(--prose-size);
+  line-height: 1.65;
+  margin: 0 0 1rem;
+  color: var(--text);
+  overflow-wrap: break-word;
+}
+.rationale { color: var(--muted); }
+.prose-list { margin: 0; padding-left: 1.3rem; }
+.prose-list li {
+  font-family: var(--serif);
+  font-size: var(--prose-size);
+  line-height: 1.6;
+  margin: 0 0 0.8rem;
+}
+.toc { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 20px 0 6px; }
+.toc-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--gold);
+  cursor: pointer;
+  font-size: var(--small-size);
+}
+.toc-link:hover { text-decoration: underline; }
+.jumps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 24px 0 6px;
+}
+.jump {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  min-height: 96px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(20, 28, 39, 0.72);
+  color: var(--text);
+  text-decoration: none;
+}
+.jump:hover { border-color: var(--gold-dim); }
+.jump.dashed { border-style: dashed; }
+.jump strong { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--text); }
+.jump-kicker, .jump-note { color: var(--faint); font-size: var(--small-size); }
+.rel {
+  margin: 0 0 28px;
+  padding: 2px 0 2px 18px;
+  border-left: 3px solid var(--gold-dim);
+  min-width: 0;
+}
+.rel h3 { margin: 0 0 6px; font-family: var(--serif); font-size: 28px; font-weight: 600; }
+.rel h3 a { color: var(--gold); text-decoration: none; }
+.rel h3 a:hover { text-decoration: underline; }
+.arrow { margin: 0 0 4px; color: var(--muted); font-size: var(--small-size); }
+.links { margin: 10px 0 0; overflow-wrap: anywhere; }

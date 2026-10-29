@@ -1,0 +1,45 @@
+{
+  "id": "world-laws",
+  "order": 3,
+  "name": "World Laws",
+  "title": "Баланс, фракции и читаемые симптомы",
+  "category": "world",
+  "summary": "Мир стремится сохранить Balance, а разумные существа его смещают. Balance — скрытое динамическое равновесие, не шкала для игрока. Faction Influence растёт от Main Goals и сдвигается Side Events и выбором Allegiance. Игрок читает Symptoms. Модель лёгкая и намеренно без имён богов и списков заклинаний.",
+  "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
+  "points": [
+    {
+      "text": "Никакая фракция на самом деле не хранит Balance. Игрок может сместить или ненадолго удержать условия, но не заморозить мир.",
+      "sourceId": "src-02"
+    },
+    {
+      "text": "World Seed задаёт стартовые условия, стартовый Influence, активные Main Goals, Side Events и приоритеты World Engine.",
+      "sourceId": "src-02"
+    },
+    {
+      "text": "Завершённая Main Goal поднимает Influence, читаемо меняет мир и облегчает следующие Operations.",
+      "sourceId": "src-02"
+    },
+    {
+      "text": "Точные таблицы Symptoms, условие победы фракции, восстановление Balance без игрока и числа Difficulty Pressure в 99 всё ещё открыты.",
+      "sourceId": "src-99"
+    }
+  ],
+  "gaps": [
+    "Нет таблицы Symptoms по полосам Influence.",
+    "Нет конкретного условия победы или конца для фракции.",
+    "Не решено, восстанавливается ли Balance без игрока и могут ли фракции невольно сотрудничать."
+  ],
+  "sourceIds": [
+    "src-02",
+    "src-99"
+  ],
+  "designMaturity": "partially-specified",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "lastDocumentUpdate": "2026-08-05",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 340,
+  "y": 90
+}

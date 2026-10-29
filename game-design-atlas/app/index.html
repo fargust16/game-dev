@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game Design Atlas</title>
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/map.css">
+  <link rel="stylesheet" href="styles/lists.css">
+  <link rel="stylesheet" href="styles/reading.css">
+  <link rel="stylesheet" href="styles/gallery.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 2 L28 16 L16 30 L4 16 Z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M16 7 L23 16 L16 25 L9 16 Z" fill="currentColor" opacity="0.85"/>
+      </svg>
+      <div>
+        <p class="brand-title">The Unseen Order</p>
+        <p class="brand-sub">Game Design Atlas <span class="version">v0.1</span></p>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#/map" data-view="map">Карта систем</a>
+      <a href="#/list" data-view="list">Список систем</a>
+      <a href="#/questions" data-view="questions">Открытые вопросы</a>
+      <a href="#/sources" data-view="sources">Документы</a>
+      <a href="#/references" data-view="references">Референсы</a>
+      <a href="#/decisions" data-view="decisions">Журнал решений</a>
+      <a href="#/audit" data-view="audit">Аудит</a>
+    </nav>
+    <div class="search-wrap">
+      <input id="search" type="search" placeholder="Поиск систем, документов, идей…" autocomplete="off">
+      <div id="search-results" class="search-results" hidden></div>
+    </div>
+  </header>
+  <p id="banner" class="banner"></p>
+  <div class="workspace">
+    <aside id="sidebar" class="sidebar"></aside>
+    <main id="main" class="main"></main>
+    <aside id="detail" class="detail"></aside>
+  </div>
+  <script src="js/model.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/graph.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/views/system.js"></script>
+  <script src="js/views/gallery.js"></script>
+  <script src="js/views/browse.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

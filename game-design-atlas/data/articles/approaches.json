@@ -1,0 +1,41 @@
+{
+  "id": "approaches",
+  "order": 5,
+  "name": "Approaches",
+  "title": "Шесть способов действовать",
+  "category": "choice",
+  "summary": "Approaches — набор методов на Decision Node, где есть больше одного живого хода. Это не система боя, диалога или скрытности: те документы должны воплощать эти методы. V1 держит шесть имён: Confront, Convince, Threaten, Exchange, Veil, Withdraw.",
+  "scenarioNote": "Таблица V1 даёт бытовой смысл каждого имени. Полные разделы всех шести методов в этот импорт не переносились.",
+  "points": [
+    {
+      "text": "Бой — один Approach и никогда не универсально лучшая выплата. У каждого метода есть цена. Провал на важном узле всё равно должен что-то давать.",
+      "sourceId": "src-06"
+    },
+    {
+      "text": "Pathway смещает Approaches, но не стирает остальные. Player Knowledge улучшает суждение, а не даёт плоский бонус к шансу.",
+      "sourceId": "src-06"
+    },
+    {
+      "text": "Важный узел обычно предлагает минимум два Approach или один Approach плюс Withdraw, если нет редкого учебного ограничения.",
+      "sourceId": "src-06"
+    }
+  ],
+  "gaps": [
+    "Не решено, сколько поддержки V1 нужно каждому Approach, чтобы он ощущался настоящим.",
+    "Нет правила, когда Threaten становится Confront.",
+    "Не решено, получает ли Bound Path лёгкое Rite/Invoke в V1 или остаётся внутри Exchange до V2."
+  ],
+  "sourceIds": [
+    "src-06",
+    "src-99"
+  ],
+  "designMaturity": "partially-specified",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "lastDocumentUpdate": "2026-08-07",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 780,
+  "y": 250
+}

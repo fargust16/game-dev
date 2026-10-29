@@ -1,0 +1,304 @@
+{
+  "foundation": {
+    "label": "Основание",
+    "criteria": [
+      {
+        "id": "purpose",
+        "label": "Назначение и опыт игрока"
+      },
+      {
+        "id": "rules",
+        "label": "Правила и переходы"
+      },
+      {
+        "id": "scenarios",
+        "label": "Сценарии и примеры"
+      },
+      {
+        "id": "dependencies",
+        "label": "Связи с другими системами"
+      },
+      {
+        "id": "limits",
+        "label": "Границы и цена ошибки"
+      },
+      {
+        "id": "unresolved",
+        "label": "Незакрытые решения видны"
+      }
+    ]
+  },
+  "simulation": {
+    "label": "Симуляция мира",
+    "criteria": [
+      {
+        "id": "purpose",
+        "label": "Назначение"
+      },
+      {
+        "id": "entities",
+        "label": "Сущности и их свойства"
+      },
+      {
+        "id": "rules",
+        "label": "Правила, состояния, переходы"
+      },
+      {
+        "id": "feedback",
+        "label": "Как игрок это читает"
+      },
+      {
+        "id": "scenarios",
+        "label": "Сценарии"
+      },
+      {
+        "id": "dependencies",
+        "label": "Зависимости"
+      },
+      {
+        "id": "limits",
+        "label": "Пределы и краевые случаи"
+      },
+      {
+        "id": "unresolved",
+        "label": "Незакрытые решения видны"
+      }
+    ]
+  },
+  "choice": {
+    "label": "Выбор",
+    "criteria": [
+      {
+        "id": "purpose",
+        "label": "Назначение"
+      },
+      {
+        "id": "actions",
+        "label": "Действия и варианты"
+      },
+      {
+        "id": "rules",
+        "label": "Правила"
+      },
+      {
+        "id": "scenarios",
+        "label": "Примеры"
+      },
+      {
+        "id": "costs",
+        "label": "Цена, риск, отказ"
+      },
+      {
+        "id": "dependencies",
+        "label": "Зависимости"
+      },
+      {
+        "id": "unresolved",
+        "label": "Незакрытые решения видны"
+      }
+    ]
+  },
+  "exploration": {
+    "label": "Исследование",
+    "criteria": [
+      {
+        "id": "purpose",
+        "label": "Назначение"
+      },
+      {
+        "id": "entities",
+        "label": "Сущности"
+      },
+      {
+        "id": "rules",
+        "label": "Правила и сроки"
+      },
+      {
+        "id": "feedback",
+        "label": "Обратная связь игроку"
+      },
+      {
+        "id": "scenarios",
+        "label": "Сценарии"
+      },
+      {
+        "id": "dependencies",
+        "label": "Зависимости"
+      },
+      {
+        "id": "unresolved",
+        "label": "Незакрытые решения видны"
+      }
+    ]
+  },
+  "character": {
+    "label": "Персонаж",
+    "criteria": [
+      {
+        "id": "purpose",
+        "label": "Назначение"
+      },
+      {
+        "id": "entities",
+        "label": "Сущности и свойства"
+      },
+      {
+        "id": "rules",
+        "label": "Правила"
+      },
+      {
+        "id": "costs",
+        "label": "Цена и потеря"
+      },
+      {
+        "id": "scenarios",
+        "label": "Сценарии"
+      },
+      {
+        "id": "dependencies",
+        "label": "Зависимости"
+      },
+      {
+        "id": "unresolved",
+        "label": "Незакрытые решения видны"
+      }
+    ]
+  },
+  "combat": {
+    "label": "Confront",
+    "criteria": [
+      {
+        "id": "purpose",
+        "label": "Зачем существует бой"
+      },
+      {
+        "id": "actions",
+        "label": "Действия хода"
+      },
+      {
+        "id": "rules",
+        "label": "Правила арены"
+      },
+      {
+        "id": "feedback",
+        "label": "Как бой предъявляется"
+      },
+      {
+        "id": "limits",
+        "label": "Ограждения, чтобы бой не стал всей игрой"
+      },
+      {
+        "id": "scenarios",
+        "label": "Сценарии"
+      },
+      {
+        "id": "dependencies",
+        "label": "Зависимости"
+      },
+      {
+        "id": "unresolved",
+        "label": "Незакрытые решения видны"
+      }
+    ]
+  },
+  "spatial": {
+    "label": "Пространство и генерация",
+    "criteria": [
+      {
+        "id": "purpose",
+        "label": "Назначение"
+      },
+      {
+        "id": "structure",
+        "label": "Сцены, порядок, состав"
+      },
+      {
+        "id": "rules",
+        "label": "Зафиксированные правила"
+      },
+      {
+        "id": "limits",
+        "label": "Что путь запрещает"
+      },
+      {
+        "id": "dependencies",
+        "label": "Зависимости"
+      },
+      {
+        "id": "research-boundary",
+        "label": "Граница исследования и производства"
+      },
+      {
+        "id": "unresolved",
+        "label": "Незакрытые решения видны"
+      }
+    ]
+  },
+  "thin": {
+    "label": "Тонкая карточка",
+    "criteria": [
+      {
+        "id": "purpose",
+        "label": "Зачем карточка существует"
+      },
+      {
+        "id": "responsibilities",
+        "label": "Зона ответственности"
+      },
+      {
+        "id": "dependencies",
+        "label": "От чего зависит"
+      },
+      {
+        "id": "scope",
+        "label": "Рамки V1 или явная отсрочка"
+      },
+      {
+        "id": "unresolved",
+        "label": "Незакрытые решения видны"
+      }
+    ]
+  },
+  "proposed": {
+    "label": "Пробел без документа",
+    "criteria": [
+      {
+        "id": "purpose",
+        "label": "Есть ли назначение системы"
+      },
+      {
+        "id": "source-exists",
+        "label": "Есть ли дизайн-документ"
+      },
+      {
+        "id": "nearest-questions",
+        "label": "Ближайшие вопросы отделены от спецификации"
+      }
+    ]
+  },
+  "scope": {
+    "label": "Рамки среза",
+    "criteria": [
+      {
+        "id": "purpose",
+        "label": "Что срез доказывает"
+      },
+      {
+        "id": "included",
+        "label": "Что входит"
+      },
+      {
+        "id": "excluded",
+        "label": "Что сознательно снаружи"
+      },
+      {
+        "id": "teaching",
+        "label": "Порядок обучения"
+      },
+      {
+        "id": "unresolved",
+        "label": "Незакрытые решения видны"
+      }
+    ]
+  }
+}

@@ -1,0 +1,381 @@
+[
+  {
+    "id": "d-balance",
+    "statement": "Faction Influence changes Balance. It rises mainly when Main Goals complete and also shifts through Side Events and Allegiance.",
+    "rationale": "Так 99 закрывает вопрос, что именно двигает Balance, и отсылает к 02.",
+    "alternatives": "",
+    "systemIds": [
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-02"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-operations",
+    "statement": "The World Engine picks the next faction operation from the World Seed starting state, the current Main Goal, requirements, and eligible Operations.",
+    "rationale": "Закрыто в 99 и записано в 02. Это не обещание симулировать каждого NPC.",
+    "alternatives": "",
+    "systemIds": [
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-02"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-symptoms",
+    "statement": "The player reads Faction Influence through Symptoms, not a meter. Exact stage-to-symptom tables remain open.",
+    "rationale": "Закрыт способ чтения. Таблица симптомов сознательно не закрыта.",
+    "alternatives": "",
+    "systemIds": [
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-first-faction",
+    "statement": "Only the first character in a new world begins with a Starting Faction. Later characters begin Factionless and earn Faction Entry.",
+    "rationale": "Записано в 07.",
+    "alternatives": "",
+    "systemIds": [
+      "character-life",
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-07"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-axes",
+    "statement": "The five decision axes are Attention, Approach, Allegiance, Commitment, and Bargain.",
+    "rationale": "99 помечает оси принятыми.",
+    "alternatives": "",
+    "systemIds": [
+      "decision-engine"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-03"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-teaching",
+    "statement": "V1 teaches Attention first, with Approach beside it. Bargain is the second major lesson.",
+    "rationale": "Записано в 03 по указанию 99.",
+    "alternatives": "",
+    "systemIds": [
+      "decision-engine"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-03"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-two-axis",
+    "statement": "An important Decision Node uses at least two axes. A one-axis moment is allowed only as non-major onboarding.",
+    "rationale": "Записано в 03.1 по указанию 99. Сам шаблон 03.1 в атлас целиком не переносился.",
+    "alternatives": "",
+    "systemIds": [
+      "decision-engine"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-03-1"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-side-events",
+    "statement": "Side Events are not free bonuses. They are delivered as timed Points of Interest.",
+    "rationale": "Две закрытые записи 99: содержание события и способ доставки.",
+    "alternatives": "",
+    "systemIds": [
+      "points-of-interest",
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-04"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-knowledge",
+    "statement": "Player Knowledge improves reasoning, places, methods, and prediction. It is not primarily a success-rate bonus.",
+    "rationale": "Закрыто в 99. Сила Pathway остаётся прогрессией с ценой и Bargain.",
+    "alternatives": "",
+    "systemIds": [
+      "decision-engine",
+      "progression"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-approaches",
+    "statement": "V1 has six Approaches: Confront, Convince, Threaten, Exchange, Veil, and Withdraw. Confront must not have the universal best payoff.",
+    "rationale": "Имена и запрет лучшей выплаты закрыты. Объём поддержки каждого метода в V1 открыт.",
+    "alternatives": "",
+    "systemIds": [
+      "approaches",
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-06"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-pathways",
+    "statement": "V1 has three Pathways and only stages 9, 8, and 7. A Pathway is a nudge or a discovery, not a prison. Pathless remains valid.",
+    "rationale": "Закрыто в 99 и записано в 05. Пороги ступеней открыты.",
+    "alternatives": "",
+    "systemIds": [
+      "progression"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-05"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-death",
+    "statement": "Death ends that Character Life. A fixed short Death Gap follows, Player Knowledge survives, and there is no bloodline power. The length of the gap in days is still open.",
+    "rationale": "Существование паузы закрыто. Число дней открыто отдельным вопросом.",
+    "alternatives": "",
+    "systemIds": [
+      "character-life",
+      "meta-loop"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-07"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-legacy",
+    "statement": "A simple V1 Legacy Cache can be prepared on purpose and leaves a map marker for the next life. Ordinary leftovers are not guaranteed.",
+    "rationale": "Закрыто как возможность. Размер тайника, после которого смерть пустеет, открыт.",
+    "alternatives": "",
+    "systemIds": [
+      "character-life"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-07"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-confront-fence",
+    "statement": "Confront does not grant experience for kills, does not use abstract loot tables, and is not the universal best payoff.",
+    "rationale": "Ограждение из 08, повторённое в закрытых вопросах 99.",
+    "alternatives": "",
+    "systemIds": [
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-08"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-arena",
+    "statement": "V1 Confront is turn-based on a thematic Combat Arena. There is no voluntary turn-based mode during free exploration.",
+    "rationale": "Подача закрыта. Формулы инициативы и цены клетки открыты.",
+    "alternatives": "",
+    "systemIds": [
+      "confront",
+      "spatial-structure"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-16"
+    ],
+    "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
+  },
+  {
+    "id": "d-spatial",
+    "statement": "The spatial lock is a seeded overworld, free third-person movement, separate interiors without a grid, and Confront on an arena.",
+    "rationale": "16 называет это запертыми решениями поворота 2026-08-07. Статус файла остаётся Draft.",
+    "alternatives": "Непрерывная сеточная правда мира, сеточное движение по оверворлду, интерьеры OrganicTown в той же сцене, пошаговый режим на месте и вне боя.",
+    "systemIds": [
+      "spatial-structure",
+      "world-generation",
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-16"
+    ],
+    "date": "2026-08-07",
+    "dateNote": "Дата поворота, как она названа в 16. Это не отдельный сертификат поверх документа."
+  },
+  {
+    "id": "d-unity",
+    "statement": "The engine for this phase is Unity with URP and C#. Arena grid combat is custom. Godot 4 was considered and rejected for this phase.",
+    "rationale": "12 записывает выбор и отклонённую альтернативу. Отдельную дату в прочитанном фрагменте не беру.",
+    "alternatives": "Godot 4.",
+    "systemIds": [
+      "spatial-structure"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-12"
+    ],
+    "dateNote": "Дата в прочитанном фрагменте 12 не указана."
+  },
+  {
+    "id": "d-d6",
+    "statement": "Target geography D6 is approved. It is defined by the owner's concept image and the D6 wording in section 9 of the G2 brief. The image does not supply numeric requirements, and production terrain is unchanged.",
+    "rationale": "Одобрение цели не является разрешением менять производственный рельеф.",
+    "alternatives": "",
+    "systemIds": [
+      "world-generation"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-g2"
+    ],
+    "date": "2026-10-20",
+    "dateNote": "Дата одобрения D6, записанная в G2 brief."
+  },
+  {
+    "id": "d-organictown",
+    "statement": "OrganicTown and the retired greybox milestone are not sources for the current path.",
+    "rationale": "13 и 11.2 помечены Deprecated. 15 прямо запрещает брать 13 как источник. 14 ведёт следующий шаг в Overworld V0.",
+    "alternatives": "",
+    "systemIds": [
+      "world-generation",
+      "spatial-structure"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-13",
+      "src-11-2",
+      "src-15",
+      "src-14"
+    ],
+    "dateNote": "Дата снятия в эту запись не копировалась: статусы документов уже Deprecated."
+  },
+  {
+    "id": "d-slice-fence",
+    "statement": "The Vertical Slice leaves out deep crafting, Death Gap, successor characters, Legacy Cache, World Collapse, and more than two factions.",
+    "rationale": "Это граница среза, не запрет думать о крафте и наследстве позже.",
+    "alternatives": "",
+    "systemIds": [
+      "vertical-slice",
+      "crafting",
+      "character-life"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-11"
+    ],
+    "dateNote": "Список прочитан в Scope Out документа 11. Отдельную дату пункта не беру."
+  },
+  {
+    "id": "d-v0-world",
+    "statement": "Overworld V0 is a 2800 × 2800 m world of 64 m chunks, with a 700 m height budget and sea level at 24 m. Interior and Arena V0 load by swapping the whole scene.",
+    "rationale": "Число прочитано в закрытом блоке 99. Там оно отнесено к 17 и плану Overworld V0; сам план в эту запись заново не сверялся.",
+    "alternatives": "",
+    "systemIds": [
+      "world-generation",
+      "spatial-structure"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99"
+    ],
+    "dateNote": "Дата отдельной строкой в прочитанном блоке 99 не стоит. Запись отнесена к 17 и плану Overworld V0."
+  },
+  {
+    "id": "d-piece-assembly",
+    "statement": "World, settlement, building, and interior content is produced by Piece-Based Assembly: small hand-authored pieces snapped together. It is not an algorithmic floor-plan solver and not the retired OrganicTown generator.",
+    "rationale": "99 закрывает механизм. Открыт только момент, когда сборка сменяет единственный ручной интерьер V0.",
+    "alternatives": "Алгоритмический решатель планировок; непрерывный генератор OrganicTown.",
+    "systemIds": [
+      "world-generation"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-15"
+    ],
+    "dateNote": "Дата механизма в прочитанном блоке 99 не выделена."
+  },
+  {
+    "id": "d-slice-shape",
+    "statement": "The first playable proof is a Lower Veil vertical slice with two selectable factions (Wardens / Veinmarket), three POIs, information sources, arena Confront, and one Bargain tease. Placeholder names may change. Death Gap is outside the slice.",
+    "rationale": "99 закрывает состав доказательства и прямо разрешает сменить имена-заполнители.",
+    "alternatives": "",
+    "systemIds": [
+      "vertical-slice",
+      "points-of-interest",
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-99",
+      "src-11"
+    ],
+    "dateNote": "Дата строки в прочитанном блоке 99 не стоит."
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "id": "vertical-slice",
+  "order": 20,
+  "name": "Vertical Slice",
+  "title": "Малый кусок, который доказывает фантазию",
+  "category": "scope",
+  "summary": "Vertical Slice — не вся игра. После 30–60 минут игрок должен хотеть другой подход или другой след, а не ещё опыта. Рабочее место среза — Lower Veil District. Игрок там — первый персонаж нового мира и получает мягкую опору Starting Faction.",
+  "scenarioNote": "Рекомендованный критический путь в 11 начинается сразу после прочитанного Scope Out и в этот импорт целиком не входил.",
+  "points": [
+    {
+      "text": "Порядок обучения: рано Attention и Approach через доску или бармена; в середине вилка Allegiance; поздно один намёк Bargain, от которого можно отказаться.",
+      "sourceId": "src-11"
+    },
+    {
+      "text": "Confront среза всегда грузит тематическую арену. В свободном исследовании пошагового режима нет. На арене ход Move + Action + Bonus.",
+      "sourceId": "src-11"
+    },
+    {
+      "text": "Карта README кратко называет доказательство так: один район, три POI, аренный пошаговый бой. Это строка карты документов, не заново сверенный абзац внутри 11.",
+      "sourceId": "src-readme"
+    },
+    {
+      "text": "99 закрывает форму первого доказательства: фантазия Lower Veil, две выбираемые фракции (Wardens / Veinmarket), три POI, Information Sources, аренный Confront, один намёк Bargain. Имена-заполнители могут смениться. Death Gap в срез не входит.",
+      "sourceId": "src-99"
+    }
+  ],
+  "gaps": [
+    "Карточки 11.1 в этот импорт не переносились.",
+    "Открыты чеклист раннего радио и пара и видимость давления короны в Lower Veil без третьей фракции."
+  ],
+  "sourceIds": [
+    "src-11",
+    "src-readme",
+    "src-99"
+  ],
+  "designMaturity": "partially-specified",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "lastDocumentUpdate": "2026-08-07",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 340,
+  "y": 570
+}

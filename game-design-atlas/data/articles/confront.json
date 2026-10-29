@@ -1,0 +1,49 @@
+{
+  "id": "confront",
+  "order": 10,
+  "name": "Confront",
+  "title": "Бой как один Approach, на арене",
+  "category": "combat",
+  "summary": "Confront — открытая сила. Документ 08 — ограждение до боевой библии: если бой становится самым безопасным, богатым или познавательным ходом по умолчанию, дизайн сломан. V1 показывает его пошаговым режимом на отдельной Combat Arena. Сетка не действует в оверворлде и интерьерах.",
+  "scenarioNote": "Полных боевых сцен в импорт не входило. 11 требует Break Away и Spare/Yield в Confront похищения и/или ареста, но сами сцены здесь не расписаны.",
+  "points": [
+    {
+      "text": "Запрещены опыт за убийства, абстрактные таблицы добычи и универсально лучшая выплата.",
+      "sourceId": "src-99"
+    },
+    {
+      "text": "Ход V1 на арене — Turn Action Economy. Ориентир ясности — Baldur's Gate 3 и Fallout 1/2, не обещание повторить их целиком.",
+      "sourceId": "src-10"
+    },
+    {
+      "text": "На арене путь и Move идут по клеткам. Environment Actions — ходовые глаголы с ценой и шансом провала. Провал не пустое «ничего».",
+      "sourceId": "src-10-1"
+    },
+    {
+      "text": "Добровольный пошаговый режим вне боя снят.",
+      "sourceId": "src-16"
+    }
+  ],
+  "gaps": [
+    "Нет формулы инициативы и цены клетки Move.",
+    "Не выбрана цена диагонали: 1 или 1.5.",
+    "Нет полос провала для vault/climb и решения по Bonus-to-Dash.",
+    "Не решено, как читаемо переносить игрока на арену и насколько Theme Pack обязан совпадать с местом."
+  ],
+  "sourceIds": [
+    "src-08",
+    "src-10",
+    "src-10-1",
+    "src-16",
+    "src-99"
+  ],
+  "designMaturity": "partially-specified",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "lastDocumentUpdate": "2026-08-07",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 1000,
+  "y": 410
+}

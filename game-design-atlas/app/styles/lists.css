@@ -1,0 +1,66 @@
+/* Shared text pages: list, questions, documents, decisions, audit. */
+
+.page {
+  max-width: var(--article-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: 36px clamp(16px, 3vw, 40px) 88px;
+}
+.page h1 { font-family: var(--serif); font-weight: 600; font-size: 44px; margin: 0 0 10px; }
+.lede { color: var(--muted); font-size: 20px; line-height: 1.45; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  color: var(--muted);
+  font-size: var(--small-size);
+}
+.chip.gold { color: var(--gold); border-color: var(--gold-dim); }
+.chip.ok { color: var(--ok); }
+.chip.warn { color: var(--warn); }
+.chip.bad { color: var(--danger); }
+.note, .callout {
+  padding: 12px 14px;
+  border-left: 3px solid var(--gold-dim);
+  background: rgba(228, 196, 138, 0.06);
+  color: var(--muted);
+}
+.callout strong { color: var(--text); }
+ul.clean { margin: 8px 0; padding-left: 1.2rem; }
+ul.clean li { margin: 8px 0; }
+.card-list { display: grid; gap: 12px; }
+.card, .row-card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: rgba(20, 28, 39, 0.65);
+  overflow-wrap: break-word;
+}
+.row-card { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 10px; align-items: start; }
+.meta { color: var(--faint); font-size: var(--small-size); }
+.table-wrap { padding: 16px; min-width: 0; }
+table { width: 100%; border-collapse: collapse; }
+th, td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+th { color: var(--muted); font-weight: 600; font-size: var(--small-size); }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover { background: rgba(228, 196, 138, 0.05); }
+.bar {
+  height: 8px;
+  background: #243041;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.bar > span { display: block; height: 100%; background: var(--gold); }
+.audit-line { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; margin: 8px 0; }
+.audit-read .audit-line { padding: 12px 0; border-bottom: 1px solid var(--line); align-items: start; }

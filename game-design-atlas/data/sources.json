@@ -1,0 +1,244 @@
+[
+  {
+    "id": "src-readme",
+    "title": "README",
+    "path": "README.md",
+    "documentStatus": "No status field",
+    "sourceType": "index",
+    "note": "Карта документов. У файла нет поля Status, поэтому он не назван ни Canonical, ни Draft."
+  },
+  {
+    "id": "src-00",
+    "title": "00 Vision",
+    "path": "00 Vision.md",
+    "documentStatus": "Canonical",
+    "sourceType": "design-document",
+    "note": "Канон философии. В этот импорт текст заново не пересказывался."
+  },
+  {
+    "id": "src-00-1",
+    "title": "00.1 Core Loop",
+    "path": "00.1 Core Loop.md",
+    "documentStatus": "Canonical",
+    "sourceType": "design-document",
+    "note": "Цикл одной жизни персонажа."
+  },
+  {
+    "id": "src-00-2",
+    "title": "00.2 Meta Loop",
+    "path": "00.2 Meta Loop.md",
+    "documentStatus": "Canonical",
+    "sourceType": "design-document",
+    "note": "Жизнь персонажа, жизнь мира и путь игрока."
+  },
+  {
+    "id": "src-00-5",
+    "title": "00.5 Design Pillars",
+    "path": "00.5 Design Pillars.md",
+    "documentStatus": "Canonical",
+    "sourceType": "design-document",
+    "note": "Столпы. В этот импорт текст заново не пересказывался."
+  },
+  {
+    "id": "src-01",
+    "title": "01 Player Experience",
+    "path": "01 Player Experience.md",
+    "documentStatus": "Canonical",
+    "sourceType": "design-document",
+    "note": "Опыт игрока. В этот импорт текст заново не пересказывался."
+  },
+  {
+    "id": "src-02",
+    "title": "02 World Laws",
+    "path": "02 World Laws.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Законы мира, Balance, Faction Influence, Symptoms."
+  },
+  {
+    "id": "src-03",
+    "title": "03 Decision Engine",
+    "path": "03 Decision Engine.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Что делает важный выбор интересным."
+  },
+  {
+    "id": "src-03-1",
+    "title": "03.1 Decision Node Template",
+    "path": "03.1 Decision Node Template.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Карточка одного важного выбора. В этот импорт шаблон целиком не переносился."
+  },
+  {
+    "id": "src-04",
+    "title": "04 Points of Interest",
+    "path": "04 Points of Interest.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Ленивые точки интереса с Active Window."
+  },
+  {
+    "id": "src-05",
+    "title": "05 Progression",
+    "path": "05 Progression.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Рост без полоски опыта."
+  },
+  {
+    "id": "src-06",
+    "title": "06 Approaches",
+    "path": "06 Approaches.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Шесть способов действовать."
+  },
+  {
+    "id": "src-07",
+    "title": "07 Character Life",
+    "path": "07 Character Life.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Смерть, Death Gap, Legacy Cache, Soft Memory."
+  },
+  {
+    "id": "src-08",
+    "title": "08 Confront Constraints",
+    "path": "08 Confront Constraints.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Ограждение боя, не боевая библия."
+  },
+  {
+    "id": "src-09",
+    "title": "09 Information Sources",
+    "path": "09 Information Sources.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Частичные и пристрастные источники сведений."
+  },
+  {
+    "id": "src-10",
+    "title": "10 Turn Action Economy",
+    "path": "10 Turn Action Economy.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Ход на Combat Arena."
+  },
+  {
+    "id": "src-10-1",
+    "title": "10.1 Grid World and Environment Actions",
+    "path": "10.1 Grid World and Environment Actions.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Сетка только на арене."
+  },
+  {
+    "id": "src-11",
+    "title": "11 Vertical Slice",
+    "path": "11 Vertical Slice.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Первый играбельный кусок, не вся игра."
+  },
+  {
+    "id": "src-11-1",
+    "title": "11.1 Vertical Slice POIs",
+    "path": "11.1 Vertical Slice POIs.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Карточки POI среза. В этот импорт не переносились."
+  },
+  {
+    "id": "src-11-2",
+    "title": "11.2 Milestone S0 Greybox",
+    "path": "11.2 Milestone S0 Greybox.md",
+    "documentStatus": "Deprecated",
+    "sourceType": "retired",
+    "retired": true,
+    "note": "Снятый серый ящик района. Не источник текущего среза."
+  },
+  {
+    "id": "src-12",
+    "title": "12 Engine Choice",
+    "path": "12 Engine Choice.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Движок Unity, URP."
+  },
+  {
+    "id": "src-13",
+    "title": "13 City Generation",
+    "path": "13 City Generation.md",
+    "documentStatus": "Deprecated",
+    "sourceType": "retired",
+    "retired": true,
+    "note": "Снятый путь OrganicTown. Не источник для нового дизайна."
+  },
+  {
+    "id": "src-14",
+    "title": "14 World Generation Roadmap",
+    "path": "14 World Generation Roadmap.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Порядок работ после поворота. Не отчёт о готовой генерации."
+  },
+  {
+    "id": "src-15",
+    "title": "15 Procedural Building Generation",
+    "path": "15 Procedural Building Generation.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Piece-Based Assembly для оболочек и интерьеров."
+  },
+  {
+    "id": "src-16",
+    "title": "16 Architecture Pivot",
+    "path": "16 Architecture Pivot.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Пространственный замок трёх видов сцен. Файл всё ещё Draft."
+  },
+  {
+    "id": "src-17",
+    "title": "17 Game Systems Architecture",
+    "path": "17 Game Systems Architecture.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Карта инженерных треков. Карточка владения — не полная спецификация."
+  },
+  {
+    "id": "src-90",
+    "title": "90 Glossary",
+    "path": "90 Glossary.md",
+    "documentStatus": "Draft",
+    "sourceType": "glossary",
+    "note": "Словарь. Термины в атласе оставлены как в документах."
+  },
+  {
+    "id": "src-99",
+    "title": "99 Open Questions",
+    "path": "99 Open Questions.md",
+    "documentStatus": "Draft",
+    "sourceType": "questions",
+    "note": "Закрытые решения и открытые вопросы. Блок Stage 3F — исследование рельефа, не дыры игрового дизайна."
+  },
+  {
+    "id": "src-g2",
+    "title": "G2 Target Geography Brief",
+    "path": "unity/Assets/Plans/GEOGRAPHY_TARGET_BRIEF_G2.md",
+    "documentStatus": "Draft",
+    "sourceType": "research-brief",
+    "note": "D6 одобрен 2026-10-20. Производственный рельеф этим брифом не заменён."
+  },
+  {
+    "id": "src-agents",
+    "title": "AGENTS.md",
+    "path": "AGENTS.md",
+    "documentStatus": "Draft",
+    "sourceType": "process",
+    "note": "Операционные правила агентов. Не дизайн игровой системы."
+  }
+]

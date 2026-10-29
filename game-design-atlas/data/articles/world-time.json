@@ -1,0 +1,34 @@
+{
+  "id": "world-time",
+  "order": 13,
+  "name": "World time",
+  "title": "Часы мира, не часы кадра",
+  "category": "world",
+  "summary": "В 17 есть тонкая карточка X.1: игровые часы для окон POI и расписаний. Это не обёртка над временем кадра. Отдельного дизайн-документа календаря нет, поэтому система на карте только как названная потребность.",
+  "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
+  "points": [
+    {
+      "text": "Карточка обещает IWorldClock и события дня или фазы.",
+      "sourceId": "src-17"
+    },
+    {
+      "text": "Active Window у POI уже измеряется игровым мировым временем, значит часы кому-то нужны. Сами часы этим не спроектированы.",
+      "sourceId": "src-04"
+    }
+  ],
+  "gaps": [
+    "Нет длины дня, фаз и того, кто имеет право двигать часы."
+  ],
+  "sourceIds": [
+    "src-17",
+    "src-04"
+  ],
+  "designMaturity": "idea-only",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 340,
+  "y": 250
+}

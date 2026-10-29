@@ -1,0 +1,40 @@
+{
+  "id": "economy",
+  "order": 16,
+  "name": "Economy",
+  "title": "Цены как симптомы Influence",
+  "category": "society",
+  "summary": "Экономика в 17 — не симуляция ради симуляции. Доступность и цены должны читаться как Symptoms Influence. Карточка закрыта воротами World Laws. Как именно ниши ставят цену, в 99 всё ещё открыто.",
+  "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
+  "points": [
+    {
+      "text": "02 заранее говорит, что будущие системы экономики зависят от законов мира.",
+      "sourceId": "src-02"
+    },
+    {
+      "text": "E.2 зависит от фракций. Более глубокие рынки отнесены к V2 и дальше.",
+      "sourceId": "src-17"
+    },
+    {
+      "text": "Срез пускает не симуляцию, а пару цен и замков доступа.",
+      "sourceId": "src-11"
+    }
+  ],
+  "gaps": [
+    "Нет правила, как ниша Influence ставит цену и доступность.",
+    "Не задано, как ресурсы исчезают."
+  ],
+  "sourceIds": [
+    "src-17",
+    "src-02",
+    "src-99"
+  ],
+  "designMaturity": "idea-only",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 560,
+  "y": 570
+}
