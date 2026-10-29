@@ -1,6 +1,6 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.1
+Version: 0.2
 Status: Draft
 Last Updated: 2026-10-29
 
@@ -57,7 +57,7 @@ A shared model for playable characters and NPCs, with role-specific rules for pl
 
 - **Attributes:** define the character's core qualities, ranges, starting values, and the actions or requirements each attribute affects.
 - **Derived statistics:** define computed values such as health, movement, initiative, accuracy, evasion, resistances, perception, and carrying capacity.
-- **Skills and checks:** define trained capabilities, check resolution, difficulty, modifiers, and how attributes affect success or quality.
+- **Skills and checks:** define trained capabilities, check resolution, difficulty, modifiers, and how attributes affect success.
 - **Abilities:** define active/passive powers, prerequisites, costs, targeting, effects, duration, scaling, and counterplay.
 - **Character state and conditions:** define wounds, temporary effects, illness, impairment, buffs/debuffs, and their stacking and removal rules.
 - **Character progression:** define all forms of growth without assuming a generic XP/level system.
@@ -164,6 +164,48 @@ Combat is a distinct arena-based mode under the current architecture; it must no
 - **UI and player feedback:** define character sheet, inventory, quest log, dialogue, map, combat UI, and how hidden rules are communicated fairly.
 - **Balance and validation:** define formula ownership, test cases, scaling boundaries, edge cases, and dominant-strategy checks.
 
+# First detailed design pass: character attributes, skills, and action-based progression
+
+## Owner's current vision — captured, not yet fully specified
+
+The owner describes a progression model driven by actions and experience in the ordinary sense of lived practice, not by a generic XP pool, character level-ups, or manually distributed attribute points.
+
+- **No conventional character levels or freely allocated level-up points.** A character develops by performing actions and living through their consequences. Pathway stages remain a distinct progression track.
+- **Two linked development layers.** General attributes (provisional examples: strength, endurance, intelligence, perception, luck, wisdom) describe broad capabilities. Skills (provisional examples: tree-felling, gathering, running, swimming, crafting) describe practiced activities. The final attribute list and skill taxonomy are open.
+- **Actions can develop skills and attributes.** Repeated practice improves the relevant skill and may also develop one or more broad attributes where the action provides a credible training stimulus.
+- **Skills have practical consequences.** Greater skill may improve speed, efficiency, quality, yield, or the chance to discover rarer results, where appropriate to that skill.
+- **Attributes support related actions even without specialized practice.** For example, high strength should make a character more effective at felling trees even if the tree-felling skill is low. Relevant attributes may also make a related skill easier or faster to develop.
+- **Action-specific contribution limits.** An activity should have a bounded or diminishing contribution to general attributes. Tree-felling may develop strength up to a point, after which other kinds of effort are needed or its contribution becomes very small. The exact curves and caps remain open.
+- **Anti-abuse is a system requirement.** Repeating trivial or deliberately self-inflicted loops (such as taking damage and healing repeatedly) must not provide unlimited health or attribute growth. Meaningful effort, challenge, risk, and diminishing returns may be part of the eventual solution; no exact formula is decided here.
+- **Progress should be perceptible without direct coaching.** The interface can show changed attribute values and newly acquired skills. The game need not explicitly tell the player which stat to raise; the player can infer a Pathway's tendencies from the changes caused by its potion and later actions.
+- **Pathway stages are separate from ordinary development.** The current vision is that characters begin without a Pathway stage; taking the relevant potion initiates a Pathway at stage 9, with later advancement through its stages. The potion changes attributes and grants some skills or capabilities, subtly signalling what matters for that Pathway. This must be reconciled with the existing [05 Progression](05%20Progression.md) before becoming canonical.
+- **Potion effects should be legible.** After taking a Pathway potion, the player should be able to notice which attributes changed and which skills/capabilities became available, without necessarily receiving an explicit tutorial telling them how to build the character.
+
+## Initial questions for the next design steps
+
+1. What is the conceptual difference between a general attribute and a skill in this game?
+2. Which candidate attributes are genuinely useful and distinct, rather than overlapping labels?
+3. Are all skills discovered by action, or can teachers, books, Pathways, or tools unlock them directly?
+4. What constitutes meaningful practice: repetitions, time, effort, challenge, risk, successful outcomes, or a combination?
+5. How should a skill's growth affect speed, yield, quality, rare finds, and failure?
+6. Which actions can train each general attribute, and when does their contribution diminish?
+7. How should health, endurance, injuries, rest, and recovery develop without rewarding abuse?
+8. What feedback should the interface provide immediately versus through gradual observation?
+9. How do potion-granted attribute changes and skills interact with ordinary action-based development and Pathway requirements?
+10. How do NPCs use the same underlying model while generating and updating their development behind the scenes?
+
+## Provisional status
+
+- Owner's broad design direction: captured in this draft.
+- Exact attributes and skill categories: open.
+- Growth and diminishing-return model: open.
+- Anti-abuse rules: requirement identified; mechanism open.
+- Feedback and UI: direction captured; presentation open.
+- Relationship with existing Pathway progression: requires explicit reconciliation.
+- Live interactive map hierarchy and its source data: not yet audited in this pass.
+
+---
+
 # Initial review order
 
 This is a proposed design/review order, not an implementation schedule. Reorder only after checking dependencies and discussing trade-offs.
@@ -187,8 +229,8 @@ The following are review states, not claims about the current map.
 |---|---|---|
 | Map hierarchy and direct relationships | Not audited | Inspect the live map and identify its data source |
 | Shared Character model for player and NPC | Proposed | Compare against existing actor/NPC/character definitions |
-| Attributes and checks | Not designed in this pass | First detailed design session |
-| Skills and abilities | Candidate inventory captured | Review after attributes/checks |
+| Attributes and checks | Owner's direction captured; detailed design open | Agree the conceptual attribute model and check resolution |
+| Skills and abilities | Candidate inventory captured; action-based growth direction captured | Define skill taxonomy after attributes/checks |
 | Pathways and advancement requirements | Existing foundation; integration open | Audit [05 Progression](05%20Progression.md) and dependent nodes |
 | Items, inventory, equipment | Candidate inventory captured | Audit map and existing architecture cards |
 | Combat | Existing constraints and turn economy; full rules open | Audit [08](08%20Confront%20Constraints.md), [10](10%20Turn%20Action%20Economy.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md), [16](16%20Architecture%20Pivot.md) |
