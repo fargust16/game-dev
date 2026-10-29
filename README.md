@@ -59,6 +59,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [12 Engine Choice](12%20Engine%20Choice.md) | Draft | Engine locked: Unity URP, free 3P + custom arena grid TB |
 | [16 Architecture Pivot](16%20Architecture%20Pivot.md) | Draft | Spatial authority: Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront |
 | [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) | Draft | Systems map, dependency DAG, micro-iteration backlog |
+| [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md) | Draft | Candidate RPG systems, hierarchical map principles, review order, and coverage checklist |
 | [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) | Draft | Post-pivot world-gen order; Piece-Based Assembly |
 | [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) | Draft | Buildings/interiors via Piece-Based Assembly (small → large) |
 
@@ -131,6 +132,8 @@ This repository is currently a design bible. Implementation begins only after th
     ↓
 17 Game Systems Architecture
     ↓
+18 RPG Systems Coverage Draft
+    ↓
 Future systems
 ```
 
@@ -172,6 +175,7 @@ Draft foundations in active refinement:
 - [12 Engine Choice](12%20Engine%20Choice.md) — Unity locked: free 3P + custom arena grid TB
 - [16 Architecture Pivot](16%20Architecture%20Pivot.md) — Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront (BG3 / Fallout 1–2 feel)
 - [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — systems map, dependency DAG, micro-iteration backlog
+- [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md) — working coverage checklist; review one system at a time, starting with attributes and checks
 - [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) / [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) — world/settlement/building generation via **Piece-Based Assembly**: small hand-authored pieces snapped small → large (Valheim-style), not the retired [13 City Generation](13%20City%20Generation.md) prototype
 
 Not yet designing as content:
