@@ -8,7 +8,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [05 Progression](05%20Progression.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
 
 Referenced By:
-[README](README.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), future system design documents, specification-map data
+[README](README.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md), future system design documents, specification-map data
 
 ---
 
