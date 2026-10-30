@@ -7,7 +7,7 @@ Status: Draft
 Last Updated: 2026-10-30
 
 Depends On:
-[000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
+[000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
 
 Referenced By:
 [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), future NPC AI, encounter, settlement, world-event, and simulation specifications.
@@ -28,9 +28,9 @@ The central principle is that the world continues to exist and change independen
 
 - The world uses one shared game-time source. Systems must not maintain unrelated clocks for combat, NPCs, conditions, activities, or world events.
 - **One world time tick represents one in-game minute.**
-- The same game-time unit applies in free exploration and tactical combat.
+- The same game-time unit (one in-game minute) is the intended measure for free exploration, timed activities, and condition durations. The relationship between combat rounds and the wider world clock is pending clarification.
 - The one-minute tick is a game-time unit, not necessarily one minute of real elapsed time.
-- The real-time-to-game-time conversion rate is not yet decided. A faster-than-real-time world clock (for example, one game minute passing in roughly 15–20 real seconds) was discussed as an initial possibility, but is not approved.
+- **Initial pacing proposal: one game tick (one in-game minute) passes every 10 seconds of real time**, making a 24-hour game day last four real hours. This is the current owner-preferred starting value; it remains tunable after playtesting.
 - The shared clock continues across transitions between free exploration and tactical combat. Entering or leaving combat must not reset or discard elapsed time or the current partial tick.
 
 ## Tick boundary
@@ -44,6 +44,44 @@ At each one-minute boundary, the world performs a coordinated update of relevant
 - resolving scheduled or pending simulation work.
 
 A tick boundary is a shared reevaluation point, not a requirement that every NPC discard its current task and invent a new one. NPCs normally continue their current intention until it is completed, invalidated, or new information gives them a reason to change it.
+
+# Real-time activities and interaction pauses
+
+During ordinary free exploration, the shared game clock advances continuously at the current proposed rate of one game tick per 10 real seconds.
+
+## Gathering and resource nodes
+
+- Gathering is an interruptible repeated action, not a single locked animation or a mandatory full-duration task.
+- A resource node (tree, mineral deposit, plant patch, fishing spot, etc.) contains a finite available resource reserve.
+- Each gathering cycle has an animation/action duration and yields a quantity of the relevant resource. The node is depleted when its reserve is exhausted.
+- The player may stop gathering at any time; starting a gathering action does not commit the player to deplete the node.
+- Strength and relevant profession skill may affect yield per cycle according to their respective system rules. Exact duration, yield, and node reserve are data-driven and remain to be designed.
+- Special and rare finds may be included in gathering reward tables. Their availability and probability depend on the particular resource node/location, material or species, and relevant profession skill. Rare locations may contain distinctive resources or items.
+- Fishing is a periodic catch action rather than a fishing minigame. At each completed fishing interval, the player receives a catch determined by the fishing location and relevant skill. Possible catches include ordinary fish, miscellaneous items, and fishing-specific rare finds.
+
+## Trading and dialogue
+
+- Direct dialogue with an NPC pauses the world simulation, allowing the player to consider dialogue choices without NPC schedules or world events advancing.
+- A shop/trading interface that interacts with a merchant's shop or stock rather than holding a direct conversation with the NPC does not pause the world.
+- Shops and merchants operate according to their schedules and availability. If a shop closes or its merchant leaves while the player is using its interface, the interface may close and the transaction ends.
+- NPCs are not indefinitely reserved for the player. An NPC may spend only a limited period waiting or engaging with the player before leaving or returning to their own goals. The exact default interaction window and inactivity timeout remain open.
+
+## Crafting
+
+- Crafting recipes have defined durations expressed in game-time units or fractions of a tick.
+- Simple items and small batches should complete quickly; quantity and recipe complexity affect duration.
+- Ordinary complex crafting may take up to a small number of ticks, but should not create long real-time waits.
+- The current target is that even the most complex ordinary craft should take no more than about six game ticks (approximately one real minute at the proposed time scale).
+- Exceptional high-stakes alchemical recipes, such as a potion that raises a Pathway stage, may use the full six-tick preparation period and may include a dedicated quality-sensitive minigame. This is a special recipe category, not a baseline crafting requirement.
+- The quality and effectiveness relationship for such potions remains to be designed.
+
+## Sleep and rest
+
+- Sleep advances game time by a substantial continuous interval, initially around 6–8 in-game hours.
+- NPCs also have sleep/rest needs and schedules; sleep is part of the living-world simulation rather than a player-only time skip.
+- The player may choose when to sleep, subject to the character's needs and circumstances.
+- During sleep, time-dependent world systems continue to advance and events may occur.
+- Exact sleep duration, interruptions, recovery, and NPC sleep scheduling remain open.
 
 # 2. Continuous execution and event-driven reactions
 
@@ -85,12 +123,12 @@ Detailed settlement capacity, refugee logistics, faction policy, and NPC reassig
 
 # 4. Tactical combat uses the shared clock
 
-## Approved direction: round-based time
+## Provisional direction: round-based combat time
 
-- A complete tactical combat round, in which all currently participating combatants have had their opportunity to act in initiative order, advances the shared world clock by **one in-game minute**.
+- A complete tactical combat round, in which all currently participating combatants have had their opportunity to act in initiative order, advances combat-condition time by **one tick**. Whether it also advances the wider world clock is pending owner clarification.
 - The player's real-world deliberation time does not advance game time under the currently selected model.
 - This is the preferred initial model (Variant A). A real-time action deadline or hybrid real-time combat clock is not part of the current design.
-- The world continues to process relevant events and external simulation while combat is underway. Tactical combat is not a separate time bubble.
+- **Conflict requiring owner clarification:** the earlier approved design allowed the wider world to continue progressing during combat so reinforcements could approach and join. The latest owner direction says the world pauses during tactical combat. These cannot both be true without a specific exception or deferred-arrival rule. Do not implement either interpretation until this is resolved.
 - If combat ends partway through a world-time tick, the player returns to free control immediately. The shared clock is not reset; the remaining portion of the current tick continues to be accounted for.
 
 ## Combatants joining an active encounter
