@@ -7,7 +7,7 @@ Status: Draft
 Last Updated: 2026-09-18
 
 Depends On:
-[16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
+[16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
 
 Referenced By:
 [AGENTS.md](AGENTS.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`, `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`, `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md`
@@ -478,11 +478,11 @@ flowchart LR
 | **V1 scope / Deferred** | Arena V0 fixed greybox grid. |
 | **Owning folder** | `unity/Assets/Scripts/Confront/Grid/` |
 
-## C.5 Turn Action Economy
+## C.5 Tactical Combat Action Economy
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Move + Action + short Bonus on arenas only ([10](10%20Turn%20Action%20Economy.md)). Not a full BG3 ruleset in V0. |
+| **Responsibilities** | Initiative order and AP pool with variable costs and retained AP for defensive reactions ([10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md)). Not a full BG3 ruleset in V0. |
 | **Dependencies** | Arena Grid, Encounter participants. |
 | **Public interfaces** | `ITurnEconomy { void BeginEncounter; void SubmitIntent; event TurnAdvanced; }` |
 | **Data flow** | Initiative → intents → resolve → next → end → Residue. |
@@ -717,12 +717,12 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 | **Responsibilities** | One authoritative game clock for all time-dependent systems; one world tick = one in-game minute; coordinates tick-boundary reevaluation while supporting event-driven reactions between boundaries. |
 | **Dependencies** | None as a clock authority; consumers subscribe through explicit interfaces/events. |
 | **Public interfaces** | `IWorldClock`; tick-boundary and time-advanced events. Exact contracts remain open. |
-| **Data flow** | Shared clock → world tick events → NPC tasks, timed conditions, activities, schedules, and other time-dependent systems. Combat advances the clock by complete tactical rounds. |
+| **Data flow** | Shared clock → world tick events → NPC tasks, timed conditions, activities, schedules, and other time-dependent systems. Combat advances the shared clock by one tick after each complete tactical round, not during an individual turn. |
 | **Save/load** | Persist game time and partial-tick progress so scene transitions and combat do not reset elapsed time. Exact representation remains open. |
 | **Multiplayer** | One authoritative clock. |
 | **Performance** | Coarse tick-boundary updates plus event-driven reactions; avoid forcing every NPC to fully replan every tick. |
 | **Extensibility** | Calendar, day/night, schedules, long-running activities, and abstracted distant simulation. |
-| **V1 scope / Deferred** | Design authority: [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md). One-minute game tick and round-based combat time approved as initial model. Real-time conversion and simulation detail remain open. |
+| **V1 scope / Deferred** | Design authority: [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md). One-minute game tick, 10 real seconds per tick as the initial pacing, and one shared tick after each complete combat round are the current owner-approved direction. Sleep, healing, conditions, and world simulation are specified in the same authority. Remaining formulas and simulation detail stay open. |
 | **Owning folder** | `unity/Assets/Scripts/World/Time/` |
 
 ## X.2 Weather
