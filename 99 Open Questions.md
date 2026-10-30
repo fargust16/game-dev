@@ -103,7 +103,10 @@ Turn-Based Mode on a **thematic Combat Arena** scene (BG3 / Fallout 1–2 feel).
 Through reusable Information Sources with bias and partial truth: boards, newspapers, bartenders, rumours, faction contacts, witnesses, physical traces, Soft Memory. Documented in [09 Information Sources](09%20Information%20Sources.md).
 
 **What is the combat action economy?**  
-An AP pool with variable action costs and retained end-of-turn AP for defensive reactions, as defined in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
+Combat uses Initiative and an AP pool with variable action costs and retained end-of-turn AP for defensive reactions, as defined in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md). The shared world advances by one tick after each complete round, not during individual turns ([18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)).
+
+**How do sleep, healing, and First Aid work?**  
+Sleep advances approximately 6–8 in-game hours while the world continues simulating; it can be interrupted and is not guaranteed safe. It fully restores ordinary HP only when no active condition blocks recovery. Poison and Bleeding may naturally end through per-tick probability checks, but sleep does not guarantee their removal. First Aid treats specific conditions and injuries; doctors and specialists provide more complete treatment. No HP-restoring potions are planned. Exact rates, probabilities, injury categories, comfort bonuses, and treatment recipes remain open in [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md).
 
 **What is the spatial model?**  
 Free third-person overworld and interior scenes; square grid + Environment Actions on arenas only. Documented in [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md).
