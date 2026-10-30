@@ -198,8 +198,9 @@ OrganicTown is not viable (not modular, not optimized, did not read as a real ci
 | Doc | Role after pivot |
 |-----|------------------|
 | [08](08%20Confront%20Constraints.md) | Constraints stay; presentation = arena |
-| [10](10%20Turn%20Action%20Economy.md) | Economy **only on arenas** |
+| [10.2](10.2%20Combat%20System%20Draft.md) | Initiative + AP combat economy on arenas only |
 | [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Arena grid + arena Environment Actions |
+| [18](18%20World%20Time%20and%20Living%20Simulation.md) | Shared world clock and living-world simulation |
 | [11](11%20Vertical%20Slice.md) | Prove overworld stub → interior → arena → return |
 | [12](12%20Engine%20Choice.md) | Free 3P + arena grid architecture |
 | [13](13%20City%20Generation.md) | Legacy / mood reference |
