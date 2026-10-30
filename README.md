@@ -50,6 +50,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [05 Progression](05%20Progression.md) | Draft | Pathways 9→7, Conduct Progress, External Power Bargains |
 | [06 Approaches](06%20Approaches.md) | Draft | Confront, Convince, Threaten, Exchange, Veil, Withdraw |
 | [07 Character Life](07%20Character%20Life.md) | Draft | Death Gap, Factionless successors, Legacy Cache, Soft Memory |
+| [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) | Draft | Attribute/skill growth, effective preparation, secondary modifiers, Luck, and three-outcome checks |
 | [08 Confront Constraints](08%20Confront%20Constraints.md) | Draft | Hard fence around combat so it cannot become the whole game |
 | [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
 | [10 Turn Action Economy](10%20Turn%20Action%20Economy.md) | Draft | Move + Action + Bonus for turn-based V1, arenas only |
@@ -166,6 +167,7 @@ Draft foundations in active refinement:
 - [05 Progression](05%20Progression.md) — 3 Pathways, stages 9→7, churches/entities as Bargains
 - [06 Approaches](06%20Approaches.md) — six methods of acting; combat is not the default best
 - [07 Character Life](07%20Character%20Life.md) — death gap, factionless later lives, legacy cache
+- [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) — action-based attribute/skill growth and shared probability-check foundation
 - [08 Confront Constraints](08%20Confront%20Constraints.md) — combat fence: no XP, diegetic loot, real alternatives
 - [09 Information Sources](09%20Information%20Sources.md) — how the player learns without omniscient markers
 - [10 Turn Action Economy](10%20Turn%20Action%20Economy.md) — Move + Action + Bonus in turn-based mode
@@ -175,7 +177,7 @@ Draft foundations in active refinement:
 - [12 Engine Choice](12%20Engine%20Choice.md) — Unity locked: free 3P + custom arena grid TB
 - [16 Architecture Pivot](16%20Architecture%20Pivot.md) — Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront (BG3 / Fallout 1–2 feel)
 - [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — systems map, dependency DAG, micro-iteration backlog
-- [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md) — working coverage checklist; review one system at a time, starting with attributes and checks
+- [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md) — working coverage checklist; attribute/check foundations are documented, with the base success curve next
 - [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) / [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) — world/settlement/building generation via **Piece-Based Assembly**: small hand-authored pieces snapped small → large (Valheim-style), not the retired [13 City Generation](13%20City%20Generation.md) prototype
 
 Not yet designing as content:

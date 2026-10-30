@@ -1,16 +1,16 @@
 # 90 Glossary
 
-Version: 0.52
+Version: 0.53
 
 Status: Draft
 
-Last Updated: 2026-10-21 (Large Plateau proposed; Declared Basin; Geographic Hierarchy after the post-G3c review)
+Last Updated: 2026-10-30 (character attributes, skills, and action-check terminology added)
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md)
 
 ---
 
@@ -969,3 +969,40 @@ Editor menu under `GameDev/Overworld/Part-Gen/<Step>/` that runs the same Genera
 **(Retired V0 — inland lake generation removed 2026-08-15; kept for historical reading.)**
 
 Hard rule for lake placement: no water silhouette cell may sit on `BiomeId.Mountain` (or steep highland). Soft-pass and min-count helpers must not violate it — fewer lakes beat a sheet through a ridge. Water meshes also safety-clip mountain cells above the water plane. See [LANDSCAPE_PLANNER.md](unity/Assets/Plans/LANDSCAPE_PLANNER.md).
+
+
+## Attribute
+
+A broad character quality that affects multiple actions and derived capabilities. The seven attributes are Strength, Endurance, Dexterity, Perception, Intelligence, Will, and Luck. Each has its own progression track; the agreed attribute range is 1–100. See [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
+
+## Skill
+
+A trained, individually progressing capability associated with one or more actions or professions. Skills develop independently from attributes through relevant practice. A skill is not a global character level. See [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
+
+## Primary Attribute
+
+The principal general character quality used by a particular action check.
+
+## Primary Skill
+
+The principal trained capability used by a particular action check, where the action has a relevant skill.
+
+## Secondary Attribute
+
+An additional attribute that may provide a small positive modifier to an action check. Secondary attributes have equal weight, cannot reduce the baseline chance, and collectively provide at most a 10% relative increase to base success probability.
+
+## Effective Primary Preparation
+
+The arithmetic mean of an action's primary attribute and primary skill, expressed on a comparable task-difficulty scale. It is compared with the action's difficulty to determine baseline success probability. The exact probability curve remains open.
+
+## Task Difficulty
+
+The difficulty rating assigned to an action, resource, or challenge. It is compared with effective primary preparation; a mismatch affects effectiveness and outcome probability.
+
+## Luck Modifier
+
+A separate relative modifier derived from Luck. It multiplies an existing probability rather than adding fixed percentage points. Its exact scaling and caps remain open.
+
+## Critical Success
+
+A mutually exclusive exceptional outcome within a successful action check, determined as a conditional share of successful attempts rather than an independent roll layered on top of normal success.

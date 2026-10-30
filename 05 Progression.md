@@ -1,10 +1,10 @@
 # 05 Progression
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
-Last Updated: 2026-08-05
+Last Updated: 2026-10-30
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
@@ -30,7 +30,7 @@ It does **not** define lore names, full spell lists, or all pathway stages. Thos
 
 # Central Rule
 
-There is no experience bar and no generic level-up.
+There is no character-wide experience bar and no generic character level-up. Ordinary attributes and individual skills have their own action-based progression tracks, defined in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md). This ordinary development is separate from Pathway stages.
 
 A character grows by:
 
@@ -42,6 +42,11 @@ A character grows by:
 
 Player Knowledge survives worlds.
 Character Pathway power dies with the Character Life, except as Legacy traces and remembered methods.
+
+
+# Ordinary Attribute and Skill Development
+
+Ordinary character development is based on practising actions. Attributes and individual skills have separate progress tracks; relevant actions develop them automatically. This does not create a global character level or replace Pathway advancement. See [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
 
 # Pathway
 
@@ -277,6 +282,7 @@ Any Progression feature must answer yes:
 
 # Related Documents
 
+- [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md)
 - [03 Decision Engine](03%20Decision%20Engine.md)
 - [02 World Laws](02%20World%20Laws.md)
 - [04 Points of Interest](04%20Points%20of%20Interest.md)

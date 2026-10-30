@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 0.81
+Version: 0.82
 
 Status: Draft
 
-Last Updated: 2026-10-28 (G3f under the mission: calibration (2 runs, fixes F1, F2), GF-RF frozen, held-out part (1) 8 of 10; the owner's blind review pending; nothing declared passed; production unchanged. Earlier: G3f: the owner's autonomous research mission (2026-10-25) recorded; WP0 done; the technical specification and the research package written. Earlier: G3f: the owner's decisions D-3 … D-12 on content recorded — phase plan v0.3; none authorises execution; the D-9 and D-12 documentation packages, WP0 and WP1 not authorised. Earlier: G3f — regional geography architecture: the owner approved the phase (D-1) and its architecture as the hypothesis to test (D-2); only step A of its plan is authorised; D-3 … D-12 open; GEO-10, GEO-11 added. 2026-10-24: G3e-PM ran: registered D1 INCONCLUSIVE, H FAIL by §7 (accepted), a one-run deviation DEV-1; the owner kept S-LM1's contracts, so the S-LM1 line is stopped. Earlier: G3e-PM: the post-mortem checks pre-registered, plan approved by the owner, not run; nothing runs without a separate authorisation. Earlier: G3e: the not-ready report accepted, Step 1 closed; the backlog since 2026-10-19 committed to main step by step. Earlier: Step 1 ends not ready — report written; T1 kept. Earlier: run 11 — T1, the harmonic toe — implemented and verified, review §23. Earlier: T1 pre-registered, review §22. Earlier: decision note on a continuous toe and the R7(c) axis reading, review §21. Earlier: recording run 10 — the toe is the main cause, review §20. Earlier: (b) kept; run 10 pre-registered, review §19. Earlier: run 9 — option (b) implemented, its check passes; new pools where outflow stays raised. Earlier: rule (b) kept as implemented; decision note on plateau placement, review §17. Earlier: run 8 — ramp rule (b) implemented; its check fails for causes outside the ramp. Earlier: M-1 implementation accepted with caveats, 150 m kept; ramp rule (b) next with a fourth criterion. Earlier: run 7 — M-1 implemented in the measurement code and verified; gates unchanged. Earlier: the full M-1 rule checked on the preserved lattices. Earlier: M-1 approved as a specification rule, spec v0.5 §14. Earlier: S-LM1 ramp rule (b) accepted, not implemented. Earlier: S-LM3 closed with a negative result, option (a); S-LM1 continues alone. Earlier: G3e diagnostic run 6 done — recording only, #14 reverted, results in the run-5 review §11. Earlier: G3e Step 1 after five calibration runs: no synthesis accepted; owner decisions on PD-1, Q9 #9/#14, M-1 and #12; no run or code change without a separate authorisation. Earlier: Step 1 authorised within C6–C7. Earlier: LMC is G3e; C8 commit before the freeze; C9 reference data outside the repository; only the Step 1 authorisation remains. Earlier: LMC specification v0.4 — A1, A3 and the whale-back option (b) approved; open C1, C8, C9; Step 1 not authorised. Earlier: C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; LMC kept as the working name; Step 1 readiness check written; Step 1 not authorised. Earlier: LMC technical specification approved, §12 items 1–4. Earlier: drafted and checked on historical G3c data. 2026-10-21: LMC design note v0.2 — the owner's revision; LMC pair S-LM3 + S-LM1 approved. Earlier: post-G3c review; G3c ran; G2: target geography D6 approved)
+Last Updated: 2026-10-30 (character attributes/skills/action-check foundation documented; G3f under the mission: calibration (2 runs, fixes F1, F2), GF-RF frozen, held-out part (1) 8 of 10; the owner's blind review pending; nothing declared passed; production unchanged. Earlier: G3f: the owner's autonomous research mission (2026-10-25) recorded; WP0 done; the technical specification and the research package written. Earlier: G3f: the owner's decisions D-3 … D-12 on content recorded — phase plan v0.3; none authorises execution; the D-9 and D-12 documentation packages, WP0 and WP1 not authorised. Earlier: G3f — regional geography architecture: the owner approved the phase (D-1) and its architecture as the hypothesis to test (D-2); only step A of its plan is authorised; D-3 … D-12 open; GEO-10, GEO-11 added. 2026-10-24: G3e-PM ran: registered D1 INCONCLUSIVE, H FAIL by §7 (accepted), a one-run deviation DEV-1; the owner kept S-LM1's contracts, so the S-LM1 line is stopped. Earlier: G3e-PM: the post-mortem checks pre-registered, plan approved by the owner, not run; nothing runs without a separate authorisation. Earlier: G3e: the not-ready report accepted, Step 1 closed; the backlog since 2026-10-19 committed to main step by step. Earlier: Step 1 ends not ready — report written; T1 kept. Earlier: run 11 — T1, the harmonic toe — implemented and verified, review §23. Earlier: T1 pre-registered, review §22. Earlier: decision note on a continuous toe and the R7(c) axis reading, review §21. Earlier: recording run 10 — the toe is the main cause, review §20. Earlier: (b) kept; run 10 pre-registered, review §19. Earlier: run 9 — option (b) implemented, its check passes; new pools where outflow stays raised. Earlier: rule (b) kept as implemented; decision note on plateau placement, review §17. Earlier: run 8 — ramp rule (b) implemented; its check fails for causes outside the ramp. Earlier: M-1 implementation accepted with caveats, 150 m kept; ramp rule (b) next with a fourth criterion. Earlier: run 7 — M-1 implemented in the measurement code and verified; gates unchanged. Earlier: the full M-1 rule checked on the preserved lattices. Earlier: M-1 approved as a specification rule, spec v0.5 §14. Earlier: S-LM1 ramp rule (b) accepted, not implemented. Earlier: S-LM3 closed with a negative result, option (a); S-LM1 continues alone. Earlier: G3e diagnostic run 6 done — recording only, #14 reverted, results in the run-5 review §11. Earlier: G3e Step 1 after five calibration runs: no synthesis accepted; owner decisions on PD-1, Q9 #9/#14, M-1 and #12; no run or code change without a separate authorisation. Earlier: Step 1 authorised within C6–C7. Earlier: LMC is G3e; C8 commit before the freeze; C9 reference data outside the repository; only the Step 1 authorisation remains. Earlier: LMC specification v0.4 — A1, A3 and the whale-back option (b) approved; open C1, C8, C9; Step 1 not authorised. Earlier: C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; LMC kept as the working name; Step 1 readiness check written; Step 1 not authorised. Earlier: LMC technical specification approved, §12 items 1–4. Earlier: drafted and checked on historical G3c data. 2026-10-21: LMC design note v0.2 — the owner's revision; LMC pair S-LM3 + S-LM1 approved. Earlier: post-G3c review; G3c ran; G2: target geography D6 approved)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -82,6 +82,8 @@ Always respect this order:
         ↓
 07 Character Life
         ↓
+07.1 Character Attributes, Skills, and Action Checks
+        ↓
 08 Confront Constraints
         ↓
 09 Information Sources
@@ -146,6 +148,7 @@ If a contradiction appears, stop and explain it before continuing.
 - 05 Progression
 - 06 Approaches
 - 07 Character Life
+- 07.1 Character Attributes, Skills, and Action Checks
 - 08 Confront Constraints
 - 09 Information Sources
 - 10.1 Grid World and Environment Actions
@@ -276,6 +279,8 @@ Do not commit secrets. Do not rewrite published history unless the user explicit
 
 After every finalized discussion, check:
 
+- When the owner approves a coherent, independently documentable slice of a system, record it immediately before moving to the next dependent design question. Do not wait for the entire parent system to be complete. Mark unresolved items explicitly in Open Questions and continue from that documented boundary.
+
 - Does Glossary require updates?
 - Do Open Questions require updates?
 - Do dependencies between documents change?
@@ -287,6 +292,8 @@ Mention these checks explicitly in the working summary.
 ## Documentation Transaction
 
 A documentation update is complete only when:
+
+0. Every newly approved, independently documentable design slice is recorded promptly; do not leave agreed decisions only in chat while continuing into dependent questions.
 
 1. target document is updated;
 2. Glossary is updated if terminology changed;

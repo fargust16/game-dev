@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.56
+Version: 0.57
 
 Status: Draft
 
-Last Updated: 2026-10-28 (GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-10-30 (character attributes/action checks documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -71,6 +71,26 @@ Starting Faction soft-nudges toward one Pathway; Pathway may also be gained thro
 
 **What belongs in the first Progression draft?**  
 Pathway rules plus churches/entities as External Power Bargains. Lore names, full lists, and stages below 7 come later.
+
+## Character Attributes, Skills, and Action Checks
+
+**Are there global character levels or a character-wide XP bar?**  
+No. Each attribute and individual skill has its own action-based progression track. Ordinary development is separate from Pathway stages. See [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
+
+**What is the attribute range?**  
+Seven attributes use 1–100. Levels 1–99 are ordinary progression; 100 is an exceptional apex requiring special criteria. Attribute bands are not automatically Pathway stages or skill levels.
+
+**How do primary attributes and skills combine for an action check?**  
+They have equal importance. Effective primary preparation is their arithmetic mean on a comparable task-difficulty scale. A high attribute can help a character enter a new profession, but it does not make the character a professional master. There is no additional mismatch penalty beyond the average.
+
+**How do secondary attributes affect success?**  
+Only positively. All applicable secondary attributes have equal weight; together they can add at most 10% of base success probability, applied relatively, not as percentage points. Low secondary values never reduce the baseline chance.
+
+**How does Luck affect probability?**  
+Luck is separate from the secondary-attribute bonus. It modifies existing probabilities relatively, not by adding fixed percentage points. It may separately affect overall success and conditional critical chance. Exact scaling remains open.
+
+**What are the three action outcomes?**  
+Failure, normal success, and critical success are mutually exclusive and sum to 100%. Critical chance is conditional on success, not a separate independent roll. Gathering animation cycles are individual attempts.
 
 ## Approaches
 
@@ -208,6 +228,24 @@ How strongly may a Starting Faction nudge before it becomes a soft lock?
 How do External Power Bargains interact with Pathway conduct when they pull in opposite directions?
 
 What happens if a character tries to abandon or switch Pathways after stage 9?
+
+## Character Attributes and Action Checks
+
+What is the base success-probability curve for each difference between effective primary preparation and task difficulty? This is the next design step after the 2026-10-30 documentation pass.
+
+How are attribute and skill values normalised to a common task-equivalent scale if their progression tracks use different numeric scales?
+
+How do secondary-attribute values map to the positive bonus, and what thresholds/aggregation produce the agreed maximum of +10% relative to base success?
+
+What are the Luck-to-relative-modifier curves, caps, and separate effects on overall success, critical chance, rare drops, and other probability checks?
+
+What are the base critical chances and exact factors that influence them?
+
+What are the exact attribute/skill XP costs, nonlinear growth curve, residual XP floor, failure XP, and critical-success XP?
+
+How are the shared check rules reconciled with combat's attack-specific multi-attribute formulas?
+
+What are the exceptional requirements and unique benefit for attribute 100?
 
 ## Approaches
 
