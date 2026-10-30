@@ -1,6 +1,6 @@
 # 17 Game Systems Architecture
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft
 
@@ -714,15 +714,15 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Game clock for POI windows, schedules; not Unity `Time` wrapper only — world time. |
-| **Dependencies** | None. |
-| **Public interfaces** | `IWorldClock`. |
-| **Data flow** | Tick → day/phase events. |
-| **Save/load** | Persist clock. |
-| **Multiplayer** | Authority clock. |
-| **Performance** | Coarse. |
-| **Extensibility** | Calendars. |
-| **V1 scope / Deferred** | Stub when POI Director needs it. |
+| **Responsibilities** | One authoritative game clock for all time-dependent systems; one world tick = one in-game minute; coordinates tick-boundary reevaluation while supporting event-driven reactions between boundaries. |
+| **Dependencies** | None as a clock authority; consumers subscribe through explicit interfaces/events. |
+| **Public interfaces** | `IWorldClock`; tick-boundary and time-advanced events. Exact contracts remain open. |
+| **Data flow** | Shared clock → world tick events → NPC tasks, timed conditions, activities, schedules, and other time-dependent systems. Combat advances the clock by complete tactical rounds. |
+| **Save/load** | Persist game time and partial-tick progress so scene transitions and combat do not reset elapsed time. Exact representation remains open. |
+| **Multiplayer** | One authoritative clock. |
+| **Performance** | Coarse tick-boundary updates plus event-driven reactions; avoid forcing every NPC to fully replan every tick. |
+| **Extensibility** | Calendar, day/night, schedules, long-running activities, and abstracted distant simulation. |
+| **V1 scope / Deferred** | Design authority: [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md). One-minute game tick and round-based combat time approved as initial model. Real-time conversion and simulation detail remain open. |
 | **Owning folder** | `unity/Assets/Scripts/World/Time/` |
 
 ## X.2 Weather
