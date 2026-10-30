@@ -50,7 +50,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [05 Progression](05%20Progression.md) | Draft | Pathways 9→7, Conduct Progress, External Power Bargains |
 | [06 Approaches](06%20Approaches.md) | Draft | Confront, Convince, Threaten, Exchange, Veil, Withdraw |
 | [07 Character Life](07%20Character%20Life.md) | Draft | Death Gap, Factionless successors, Legacy Cache, Soft Memory |
-| [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) | Draft | Attribute/skill growth, effective preparation, secondary modifiers, Luck, and three-outcome checks |
+| [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) | Draft | Attribute/skill growth, effective preparation, secondary modifiers, Luck, and three-outcome checks |\n| [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) | Draft | Derived resources, combat values, movement, carrying load, and contextual capabilities |
 | [08 Confront Constraints](08%20Confront%20Constraints.md) | Draft | Hard fence around combat so it cannot become the whole game |
 | [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
 | [10 Turn Action Economy](10%20Turn%20Action%20Economy.md) | Draft | Move + Action + Bonus for turn-based V1, arenas only |
