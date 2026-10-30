@@ -1,10 +1,10 @@
 # 07 Character Life
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
-Last Updated: 2026-08-05
+Last Updated: 2026-10-30
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md)
@@ -28,6 +28,7 @@ It answers:
 2. Character power, Pathway stage, and personal inventory do not continue as a living hero.
 3. The world continues and advances during a fixed short death gap.
 4. Player Knowledge survives.
+5. Ordinary attributes and skill development belong to the deceased Character Life and do not transfer to a successor.
 5. Legacy may be recovered, but ordinary leftovers are never fully guaranteed.
 6. The next character is a new person in a changed world, not a respawn.
 
@@ -185,7 +186,7 @@ New world emphasises Player Knowledge without the same local residue.
 |--------|-------------------------|
 | World Engine | Advances during Death Gap |
 | Points of Interest | Many expire or resolve unattended during Death Gap |
-| Progression | Pathway stage dies with the character; methods remain as Player Knowledge |
+| Progression | Pathway stage and ordinary character-specific attribute/skill development end with the character; methods remain as Player Knowledge |
 | Approaches | Soft Memory and Faction Entry are often Convince / Exchange / Threaten / Veil problems |
 | Decision Engine | Investigating a previous life is Attention + Allegiance + Commitment |
 
@@ -235,6 +236,7 @@ After death, the player should feel:
 - [00.2 Meta Loop](00.2%20Meta%20Loop.md)
 - [02 World Laws](02%20World%20Laws.md)
 - [05 Progression](05%20Progression.md)
+- [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md)
 - [04 Points of Interest](04%20Points%20of%20Interest.md)
 - [90 Glossary](90%20Glossary.md)
 - [99 Open Questions](99%20Open%20Questions.md)

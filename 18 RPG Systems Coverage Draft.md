@@ -1,8 +1,8 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.4
+Version: 0.5
 Status: Draft
-Last Updated: 2026-10-29
+Last Updated: 2026-10-30
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [05 Progression](05%20Progression.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
@@ -217,6 +217,10 @@ The owner has approved the following working principles for this draft:
 
 ---
 
+# Completed design slice — attributes and action checks (2026-10-30)
+
+The first review-order item has progressed from broad direction to a documented foundational draft. The owner-approved principles are recorded in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md). The base success-probability curve is intentionally still open and is the next design step. This update records design progress only; it does not authorise implementation or claim that the full Character system is complete.
+
 # Initial review order
 
 This is a proposed design/review order, not an implementation schedule. Reorder only after checking dependencies and discussing trade-offs.
@@ -240,7 +244,7 @@ The following are review states, not claims about the current map.
 |---|---|---|
 | Map hierarchy and direct relationships | Not audited | Inspect the live map and identify its data source |
 | Shared Character model for player and NPC | Proposed | Compare against existing actor/NPC/character definitions |
-| Attributes and checks | Owner's direction and three principles captured; detailed design open | Agree the conceptual attribute model and check resolution |
+| Attributes and checks | Shared foundational draft written; attributes, task-equivalent primary preparation, secondary bonuses, Luck model, and three outcomes have owner-approved principles | Define the base success-probability curve, then tune remaining open coefficients and reconcile combat-specific checks; see [07.1](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) |
 | Skills and abilities | Candidate inventory captured; action-based growth direction captured | Define skill taxonomy after attributes/checks |
 | Pathways and advancement requirements | Existing foundation; integration open | Audit [05 Progression](05%20Progression.md) and dependent nodes |
 | Items, inventory, equipment | Candidate inventory captured | Audit map and existing architecture cards |
