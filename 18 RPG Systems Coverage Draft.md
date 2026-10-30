@@ -8,7 +8,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [05 Progression](05%20Progression.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
 
 Referenced By:
-[README](README.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md), future system design documents, specification-map data
+[README](README.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), future system design documents, specification-map data
 
 ---
 
@@ -56,7 +56,7 @@ These are candidate groupings for the global map. Names are provisional and may 
 A shared model for playable characters and NPCs, with role-specific rules for player-facing control versus autonomous simulation.
 
 - **Attributes:** define the character's core qualities, ranges, starting values, and the actions or requirements each attribute affects.
-- **Derived statistics:** define computed values such as health, movement, initiative, accuracy, evasion, resistances, perception, and carrying capacity.
+- **Derived statistics:** defined in [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md): resources (HP, Stamina, Will Power), combat values (Accuracy, Evasion, Physical/Magical Defence, Initiative, AP), movement, carrying load, and contextual Detection/Stealth. Detailed formulas remain open.
 - **Skills and checks:** define trained capabilities, check resolution, difficulty, modifiers, and how attributes affect success.
 - **Abilities:** define active/passive powers, prerequisites, costs, targeting, effects, duration, scaling, and counterplay.
 - **Character state and conditions:** define wounds, temporary effects, illness, impairment, buffs/debuffs, and their stacking and removal rules.
