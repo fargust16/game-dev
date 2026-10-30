@@ -294,27 +294,15 @@ Rewards that exist because a target carried or guarded them, not because a fight
 
 ---
 
-## Turn-Based Mode
+## Tactical Combat
 
-Deliberate paced control mode used only for Confront, on a **Combat Arena** scene ([16 Architecture Pivot](16%20Architecture%20Pivot.md)). Never available voluntarily during free exploration and never begins in the current overworld/interior location. Reference feel from Baldur's Gate 3 / Fallout 1–2 without requiring feature parity.
+Turn-based combat used only for Confront on a square-grid **Combat Arena** scene. Combatants act in Initiative order and spend Action Points (AP) on movement, attacks, abilities, and other actions. The shared world advances by one tick after each complete combat round, not during individual turns. See [08 Confront Constraints](08%20Confront%20Constraints.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), and [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md).
 
 ---
 
 ## Combat Action Economy
 
 Combat uses an Action Point (AP) pool. At the start of a character's turn, the character receives a fresh AP pool; actions have variable AP costs. Unspent AP at turn end remains available only for defensive reactions outside the character's turn, then expires when the character's next turn begins. See [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
-
----
-
-## Action
-
-The main thing a character does on their turn: strike, persuade, threaten, deal, sneak attempt, Break Away, Spare, and other decisive verbs.
-
----
-
-## Bonus
-
-A small extra act on a turn from a short V1 list, such as a quick item or brief adjacent interact.
 
 ---
 
