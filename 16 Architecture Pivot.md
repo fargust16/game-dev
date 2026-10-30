@@ -7,7 +7,7 @@ Status: Draft
 Last Updated: 2026-08-09
 
 Depends On:
-[00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
+[00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
 
 Referenced By:
 [AGENTS.md](AGENTS.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), future overworld / interior / arena micro-plans
@@ -168,7 +168,7 @@ When Confront locks in:
 
 1. Capture source theme (e.g. `StreetFog`, `Tavern`, `Cellar`, `Woods`).
 2. Load / generate a **Combat Arena** from that Theme Pack.
-3. Run Turn Action Economy (Move + Action + Bonus) on a square grid.
+3. Run the AP-based combat system defined in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) on a square grid.
 4. Resolve win / Break Away / Yield-Spare / death.
 5. Return to source scene; apply residue (no XP-from-kills — [08](08%20Confront%20Constraints.md) still binds).
 
@@ -238,7 +238,7 @@ Each ticket should get its own micro-plan before code.
 # Related Documents
 
 - [08 Confront Constraints](08%20Confront%20Constraints.md)
-- [10 Turn Action Economy](10%20Turn%20Action%20Economy.md)
+- [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md)
 - [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md)
 - [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
 - [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md)
