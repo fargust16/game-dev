@@ -86,9 +86,11 @@ Always respect this order:
         ↓
 09 Information Sources
         ↓
-10 Turn Action Economy
-        ↓
 10.1 Grid World and Environment Actions
+        ↓
+10.2 Combat System Draft
+        ↓
+18 World Time and Living Simulation
         ↓
 11 Vertical Slice
         ↓
