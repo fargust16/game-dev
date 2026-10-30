@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.57
+Version: 0.58
 
 Status: Draft
 
-Last Updated: 2026-10-30 (character attributes/action checks documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-10-30 (derived character statistics and Will Power resource documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -91,6 +91,18 @@ Luck is separate from the secondary-attribute bonus. It modifies existing probab
 
 **What are the three action outcomes?**  
 Failure, normal success, and critical success are mutually exclusive and sum to 100%. Critical chance is conditional on success, not a separate independent roll. Gathering animation cycles are individual attempts.
+
+**What is the derived-statistics structure?**
+The agreed register and principles are in [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). Derived values are calculated from attributes, skills, equipment, Pathways, abilities, conditions, and context; they are not additional independent progression tracks by default.
+
+**How does magical ability capacity work?**
+The Will attribute determines the maximum capacity of a shared visible Will Power resource. Pathways determine which abilities are available; Will determines how much ability use the character can support. The resource recovers slowly (directional proposal: about 1% of maximum per 10 world ticks) and is expected to refill during sleep if no effect is damaging or suppressing Will. See [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). Exact formulas, costs, and Will-damage rules remain open.
+
+**How is carrying load handled?**
+Strength determines Carrying Capacity. Four graduated bands are agreed: Normal, High, Overloaded, and Critical Overload. Thresholds and consequences remain open.
+
+**How is defence represented?**
+Two derived defence values are agreed: Physical Defence and Magical Defence. Special mechanics such as blocking, parrying, barriers, absorption, or reflection may come from specific equipment and abilities rather than universal extra stats.
 
 ## Approaches
 
@@ -231,21 +243,33 @@ What happens if a character tries to abandon or switch Pathways after stage 9?
 
 ## Character Attributes and Action Checks
 
-What is the base success-probability curve for each difference between effective primary preparation and task difficulty? This is the next design step after the 2026-10-30 documentation pass.
-
 How are attribute and skill values normalised to a common task-equivalent scale if their progression tracks use different numeric scales?
-
-How do secondary-attribute values map to the positive bonus, and what thresholds/aggregation produce the agreed maximum of +10% relative to base success?
-
-What are the Luck-to-relative-modifier curves, caps, and separate effects on overall success, critical chance, rare drops, and other probability checks?
-
-What are the base critical chances and exact factors that influence them?
-
-What are the exact attribute/skill XP costs, nonlinear growth curve, residual XP floor, failure XP, and critical-success XP?
 
 How are the shared check rules reconciled with combat's attack-specific multi-attribute formulas?
 
+What are the exact attribute/skill XP costs, nonlinear growth curve, residual XP floor, failure XP, and critical-success XP?
+
 What are the exceptional requirements and unique benefit for attribute 100?
+
+## Derived Character Statistics
+
+What are the exact formulas and scales for Maximum HP, Maximum Stamina, and Maximum Will Power?
+
+What are the exact ability costs and how do they vary among Pathways and ability types?
+
+How do effects damage or suppress Will: temporary effective-attribute reduction, maximum-pool reduction, current-resource loss, or a combination? What are duration, treatment, and recovery rules?
+
+What are the exact Movement Speed formula and separate world/arena units?
+
+What are the Carrying Capacity formula, thresholds for Normal / High / Overloaded / Critical Overload, and consequences of each band?
+
+What are the Accuracy and Evasion formulas and their reconciliation with the shared action-check model?
+
+What are the Physical/Magical Defence conversion curves, caps, stacking, and penetration rules?
+
+What are the exact recovery rules for HP, Stamina, Will Power, and individual negative conditions?
+
+Which derived values are shown to the player at different Intelligence levels?
 
 ## Approaches
 
