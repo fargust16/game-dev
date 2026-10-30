@@ -188,7 +188,7 @@ Rules:
 6. On Confront end (win, Break Away, Yield/Spare resolution, or death), return to the source scene and apply residue.
 7. V1 stays simple: readable turns, clear actions, solo-shippable depth. Do not chase full BG3 feature parity.
 
-This locks presentation. The minimal action skeleton lives in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md). Arena spatial truth is a square grid with Environment Actions; see [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md).
+This locks presentation. The tactical action economy is defined by Initiative, Action Points (AP), variable AP costs, and defensive reactions in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md). Arena spatial truth is a square grid with Environment Actions; see [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md).
 
 # Escalation Rules
 
