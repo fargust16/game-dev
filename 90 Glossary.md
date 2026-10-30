@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md)
 
 ---
 
@@ -300,9 +300,9 @@ Deliberate paced control mode used only for Confront, on a **Combat Arena** scen
 
 ---
 
-## Turn Action Economy
+## Combat Action Economy
 
-V1 turn structure: Move + Action + optional short Bonus list. Used in Confront and non-combat Turn-Based Mode.
+Combat uses an Action Point (AP) pool. At the start of a character's turn, the character receives a fresh AP pool; actions have variable AP costs. Unspent AP at turn end remains available only for defensive reactions outside the character's turn, then expires when the character's next turn begins. See [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
 
 ---
 
@@ -380,7 +380,7 @@ Separate scene (or equivalent isolated space) entered from an overworld door/por
 
 ## Combat Arena
 
-Dedicated Turn-Based Confront scene with square-grid Move + Action + Bonus. Chosen from a Theme Pack matching the source location mood; not a 1:1 clone of exploration geometry. Return applies residue. See [08](08%20Confront%20Constraints.md) and [16](16%20Architecture%20Pivot.md).
+Dedicated turn-based Confront scene using the AP-based combat system. Chosen from a Theme Pack matching the source location mood; not a 1:1 clone of exploration geometry. Return applies residue. See [08](08%20Confront%20Constraints.md) and [16](16%20Architecture%20Pivot.md).
 
 ---
 
