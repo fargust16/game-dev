@@ -10,7 +10,7 @@ Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md), [GEOGRAPHY_LMC_DESIGN_NOTE.md](unity/Assets/Plans/GEOGRAPHY_LMC_DESIGN_NOTE.md), [GEOGRAPHY_LMC_TECHNICAL_SPEC.md](unity/Assets/Plans/GEOGRAPHY_LMC_TECHNICAL_SPEC.md), [GEOGRAPHY_LMC_STEP1_READINESS.md](unity/Assets/Plans/GEOGRAPHY_LMC_STEP1_READINESS.md), [GEOGRAPHY_G3F_PHASE_PLAN.md](unity/Assets/Plans/GEOGRAPHY_G3F_PHASE_PLAN.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md), [GEOGRAPHY_LMC_DESIGN_NOTE.md](unity/Assets/Plans/GEOGRAPHY_LMC_DESIGN_NOTE.md), [GEOGRAPHY_LMC_TECHNICAL_SPEC.md](unity/Assets/Plans/GEOGRAPHY_LMC_TECHNICAL_SPEC.md), [GEOGRAPHY_LMC_STEP1_READINESS.md](unity/Assets/Plans/GEOGRAPHY_LMC_STEP1_READINESS.md), [GEOGRAPHY_G3F_PHASE_PLAN.md](unity/Assets/Plans/GEOGRAPHY_G3F_PHASE_PLAN.md)
 
 ---
 
@@ -102,8 +102,8 @@ Turn-Based Mode on a **thematic Combat Arena** scene (BG3 / Fallout 1–2 feel).
 **How does the player learn about POIs and world pressure?**  
 Through reusable Information Sources with bias and partial truth: boards, newspapers, bartenders, rumours, faction contacts, witnesses, physical traces, Soft Memory. Documented in [09 Information Sources](09%20Information%20Sources.md).
 
-**What is the V1 turn structure?**  
-Move + Action + optional short Bonus **on Combat Arenas only**. Documented in [10 Turn Action Economy](10%20Turn%20Action%20Economy.md).
+**What is the combat action economy?**  
+An AP pool with variable action costs and retained end-of-turn AP for defensive reactions, as defined in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
 
 **What is the spatial model?**  
 Free third-person overworld and interior scenes; square grid + Environment Actions on arenas only. Documented in [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md).
