@@ -110,7 +110,7 @@ Which imported (and pending) third-party packages serve which System Card is tra
 | **W — World Gen** | WorldSeed, Terrain/Biome, Chunk Streaming, POI Placement, Settlement, Building/Shell, Interior Gen, Dungeon Gen, Spawn Tables | **Yes — Overworld V0 first** |
 | **L — Locomotion** | Input, Movement, Camera, Animation (locomotion) | After Overworld V0 |
 | **I — Interior Rails** | Portal/Door, Scene Transition, Interior Runtime | After Locomotion V0 |
-| **C — Confront** | Encounter Lock, Arena Loader, Theme Packs, Arena Grid, Turn Action Economy, Residue | After Interior V0 |
+| **C — Confront** | Encounter Lock, Arena Loader, Theme Packs, Arena Grid, Tactical Combat Action Economy, Residue | After Interior V0 |
 | **A — Actors** | NPC Gen, AI (non-combat), Dialogue | Design cards; code later |
 | **Q — Quest / Info** | Quest Gen, Information Sources, POI Director | Design cards; Decision Engine gate |
 | **E — Economy / Factions** | Economy, Factions, Crafting | Design cards; World Laws gate |
