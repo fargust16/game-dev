@@ -271,7 +271,7 @@
     "path": "18 World Time and Living Simulation.md",
     "documentStatus": "Draft",
     "sourceType": "design-document",
-    "note": "Shared world-time model used by item creation and Enchanting durations."
+    "note": "Shared world-time source; one-minute ticks, combat-round advancement, and six-tick Alchemy brewing duration."
   },
   {
     "id": "src-19",
@@ -280,5 +280,13 @@
     "documentStatus": "Draft",
     "sourceType": "design-document",
     "note": "Owner-approved item-system direction, six-step Enchanting progression, and explicit open questions."
+  },
+  {
+    "id": "src-20",
+    "title": "20 Alchemy and Potioncraft",
+    "path": "20 Alchemy and Potioncraft.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Owner-approved potion-only profession, mandatory advancement potions, World Seed recipe discovery, six-tick brewing, and open mini-game/skill rules."
   }
 ]

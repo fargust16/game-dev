@@ -62,8 +62,9 @@ This repository is currently a design bible. Implementation begins only after th
 | [16 Architecture Pivot](16%20Architecture%20Pivot.md) | Draft | Spatial authority: Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront |
 | [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) | Draft | Systems map, dependency DAG, micro-iteration backlog |
 | [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md) | Draft | RPG coverage map and linked character-system drafts |
-| [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md) | Draft | Shared world-time rules for crafting and simulation |
+| [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md) | Draft | Shared world-time rules for crafting, brewing, and simulation |
 | [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) | Draft | Modifier generation, weight-only inventory, durability, loot, and six Enchanting steps |
+| [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md) | Draft | Required potion-only profession for Pathway advancement |
 | [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) | Draft | Post-pivot world-gen order; Piece-Based Assembly |
 | [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) | Draft | Buildings/interiors via Piece-Based Assembly (small → large) |
 
@@ -145,6 +146,8 @@ This repository is currently a design bible. Implementation begins only after th
 18 RPG Systems Coverage Draft
     ↓
 19 Items, Crafting, Inventory, Equipment, and Enchanting
+    ↓
+20 Alchemy and Potioncraft
     ↓
 Future systems
 ```

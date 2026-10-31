@@ -4,7 +4,7 @@
   "name": "World Laws",
   "title": "Баланс, фракции и читаемые симптомы",
   "category": "world",
-  "summary": "Мир стремится сохранить Balance, а разумные существа его смещают. Balance — скрытое динамическое равновесие, не шкала для игрока. Faction Influence растёт от Main Goals и сдвигается Side Events и выбором Allegiance. Игрок читает Symptoms. Модель лёгкая и намеренно без имён богов и списков заклинаний.",
+  "summary": "Мир стремится сохранить Balance, а разумные существа его смещают. Balance остаётся скрытым динамическим равновесием, которое читается через Symptoms. Три союзные церковные Major Factions противостоят культу запечатанного существа нулевой ступени, чьё возвращение может закончиться уничтожением планеты. В основе силы потусторонних лежат древние космические силы. Текущая игра охватывает одно государство; механика концовки и влияние на королевскую власть остаются открытыми.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
@@ -20,6 +20,10 @@
       "sourceId": "src-02"
     },
     {
+      "text": "The sealed Stage 0 being can manifest, attack other powerful beings and people, and ultimately destroy the planet; player death after its manifestation ends the playable story without a successor, even if the being is later defeated.",
+      "sourceId": "src-02"
+    },
+    {
       "text": "Точные таблицы Symptoms, условие победы фракции, восстановление Balance без игрока и числа Difficulty Pressure в 99 всё ещё открыты.",
       "sourceId": "src-99"
     }
@@ -27,7 +31,8 @@
   "gaps": [
     "Нет таблицы Symptoms по полосам Influence.",
     "Нет конкретного условия победы или конца для фракции.",
-    "Не решено, восстанавливается ли Balance без игрока и могут ли фракции невольно сотрудничать."
+    "Не решено, восстанавливается ли Balance без игрока и могут ли фракции невольно сотрудничать.",
+    "Не заданы точные условия и момент манифестации существа, состав и исход финального столкновения, связь победы с продолжением кампании и роль королевской власти."
   ],
   "sourceIds": [
     "src-02",
@@ -36,7 +41,7 @@
   "designMaturity": "partially-specified",
   "decisionState": "unresolved",
   "documentStatus": "Draft",
-  "lastDocumentUpdate": "2026-08-05",
+  "lastDocumentUpdate": "2026-10-31",
   "proposed": false,
   "implementationMaturity": "unknown",
   "proseOrigin": "atlas-annotation",

@@ -1,13 +1,13 @@
 # Game Design Atlas
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
-Last Updated: 2026-10-29
+Last Updated: 2026-10-31
 
 Depends On:
-[00.1 Core Loop](../00.1%20Core%20Loop.md), [00.2 Meta Loop](../00.2%20Meta%20Loop.md), [02 World Laws](../02%20World%20Laws.md), [03 Decision Engine](../03%20Decision%20Engine.md), [04 Points of Interest](../04%20Points%20of%20Interest.md), [05 Progression](../05%20Progression.md), [06 Approaches](../06%20Approaches.md), [07 Character Life](../07%20Character%20Life.md), [08 Confront Constraints](../08%20Confront%20Constraints.md), [09 Information Sources](../09%20Information%20Sources.md), [11 Vertical Slice](../11%20Vertical%20Slice.md), [16 Architecture Pivot](../16%20Architecture%20Pivot.md), [17 Game Systems Architecture](../17%20Game%20Systems%20Architecture.md), [99 Open Questions](../99%20Open%20Questions.md)
+[00.1 Core Loop](../00.1%20Core%20Loop.md), [00.2 Meta Loop](../00.2%20Meta%20Loop.md), [02 World Laws](../02%20World%20Laws.md), [03 Decision Engine](../03%20Decision%20Engine.md), [04 Points of Interest](../04%20Points%20of%20Interest.md), [05 Progression](../05%20Progression.md), [06 Approaches](../06%20Approaches.md), [07 Character Life](../07%20Character%20Life.md), [08 Confront Constraints](../08%20Confront%20Constraints.md), [09 Information Sources](../09%20Information%20Sources.md), [11 Vertical Slice](../11%20Vertical%20Slice.md), [16 Architecture Pivot](../16%20Architecture%20Pivot.md), [17 Game Systems Architecture](../17%20Game%20Systems%20Architecture.md), [20 Alchemy and Potioncraft](../20%20Alchemy%20and%20Potioncraft.md), [99 Open Questions](../99%20Open%20Questions.md)
 
 Referenced By:
 Local design workspace only
@@ -78,7 +78,7 @@ The JSON is not canon. A decision added here stays `origin: new` until someone d
 
 Implementation status starts as unknown. The workspace does not infer code progress from a design document.
 
-Alchemy is a proposed gap because no alchemy design document was found. Crafting is only a deferred card, and deep crafting is outside the vertical slice.
+Alchemy is now an approved potion-only profession required for Pathway advancement; its foundation is in [20 Alchemy and Potioncraft](../20%20Alchemy%20and%20Potioncraft.md). Its mini-game, learning path, recipes, V1 scope, and balance remain open. Deep equipment crafting remains outside the Vertical Slice unless separately approved.
 
 Stage 3F questions are classified as technical research. They are not gameplay-design blockers.
 

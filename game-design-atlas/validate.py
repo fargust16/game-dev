@@ -263,8 +263,16 @@ def validate(atlas, repo_root):
         errors.append("article order values must be unique")
 
     alchemy = next((s for s in systems if s["id"] == "alchemy"), None)
-    if alchemy and not alchemy.get("proposed"):
-        errors.append("alchemy must stay proposed until a design document exists")
+    alchemy_source = next(
+        (source for source in atlas["sources"] if source.get("path") == "20 Alchemy and Potioncraft.md"),
+        None,
+    )
+    if alchemy and alchemy_source and alchemy.get("proposed"):
+        errors.append("documented alchemy must not remain marked as a proposed gap")
+    if alchemy and not alchemy_source and not alchemy.get("proposed"):
+        errors.append("alchemy cannot be accepted without its design document")
+    if alchemy and alchemy_source and alchemy_source.get("id") not in alchemy.get("sourceIds", []):
+        errors.append("alchemy article must cite its design document")
     return errors
 
 

@@ -340,5 +340,44 @@
       "src-07-2"
     ],
     "explanation": "Item Creation skill, Perception, and Luck affect modifier-count probability; Strength sets the starting comfortable carrying capacity of 20 kg + Strength."
+  },
+  {
+    "id": "rel-alchemy-progression",
+    "fromId": "alchemy",
+    "toId": "progression",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-20",
+      "src-05"
+    ],
+    "explanation": "Every character must learn Alchemy before Pathway advancement, and each transition requires its correct potion."
+  },
+  {
+    "id": "rel-alchemy-world-time",
+    "fromId": "alchemy",
+    "toId": "world-time",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-20",
+      "src-18-time"
+    ],
+    "explanation": "Potion brewing uses the shared clock and takes six world ticks; the mini-game's timing interaction remains unresolved."
+  },
+  {
+    "id": "rel-alchemy-character",
+    "fromId": "alchemy",
+    "toId": "character-model",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-20",
+      "src-07-1"
+    ],
+    "explanation": "Alchemy is a required profession learned by each character; its specific skill progression and attribute mappings remain open."
   }
 ]

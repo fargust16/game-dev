@@ -1,16 +1,16 @@
 # 02 World Laws
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft
 
-Last Updated: 2026-10-31 (primary antagonist and minor-faction examples recorded; finale, branches, generation, and alchemy scope remain open. Earlier: three cooperating major-faction roles and Stage 0 premise recorded.)
+Last Updated: 2026-10-31 (antagonist return/destruction phases, permanent no-successor rule after manifestation, cosmic-power premise, and one-state scope recorded; finale resolution and royal influence remain open. Earlier: primary antagonist and minor-faction examples recorded.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md)
 
 Referenced By:
-[03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [07 Character Life](07%20Character%20Life.md), [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), [AGENTS.md](AGENTS.md), Future world, faction, consequence, progression, and collapse-system design.
+[03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [07 Character Life](07%20Character%20Life.md), [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), [AGENTS.md](AGENTS.md), Future world, faction, consequence, progression, and collapse-system design.
 
 ---
 
@@ -18,7 +18,7 @@ Referenced By:
 
 This document defines the systemic laws governing the world itself, independent of lore. It is the design basis for world-state changes, faction behaviour, readable consequences, and world collapse. Future faction, settlement, economy, and consequence systems must depend on this document.
 
-The document deliberately defines a lightweight, expandable model. It does not prescribe fictional faction identities, settings, gods, or spell lists.
+The document deliberately defines a lightweight, expandable model. It records owner-approved setting premises where they govern world-state design, while leaving detailed lore, named gods, spell lists, and belief/sanity mechanisms to future scope.
 
 # First Law
 
@@ -62,7 +62,7 @@ The setting has world-shaping **Major Factions** and smaller **Minor Factions**.
 
 ## Owner-approved setting direction: three cooperating major factions
 
-The world already has multiple people at Pathway Stage 0, regarded as divine-level beings. This is a setting premise, not a designed progression system: how they reached Stage 0, how belief or anchors preserve their sanity, and how their churches formed remain outside the current system scope.
+The world already has multiple people at Pathway Stage 0, regarded as divine-level beings. This is a setting premise, not a designed progression system. The setting premise is that supernatural power in the living world ultimately comes from ancient cosmic powers; as a practitioner advances, those powers can take greater notice and seek to reclaim what came from them. The returned antagonist is an insane Stage 0 being through which that influence can act. The exact beings, means of influence, origins of individual Pathways, and belief/anchor/sanity mechanisms remain outside current system scope.
 
 Three large, church-associated Major Factions form one cooperative side that the player may support. They help one another while keeping distinct roles and areas of influence. They are not the world's only factions. The primary opposing Major Faction is outlined below; its branches and other hostile groups remain future design work. The labels below describe roles only, not final faction names.
 
@@ -76,19 +76,25 @@ The first two factions are concentrated near one another; the third is oriented 
 
 These role descriptions are original project placeholders. References to familiar religious structures or other fiction are comparative inspiration only; do not reuse distinctive names, symbols, doctrine, or lore from those sources.
 
+## Political and playable-world scope
+
+The current playable setting covers one state with several cities. A monarch and ordinary political institutions exist alongside the supernatural factions; a royal institution has been influenced by the primary opposing force, but the nature of that influence and whether it constitutes a distinct faction remain undecided. Neighbouring states exist in the wider world and may be mentioned, but their territories, systems, and simulation are outside the current playable scope.
+
 ## Primary opposing Major Faction: the Sealed Stage 0 Being
 
 A separate, ancient Stage 0 being lost its sanity and became the object of a widespread opposing faith. It is shut away on a divine plane and cannot currently enter the world of living people. Its followers remain devoted. Some call it the **True God**; others call it the **False God**. These are rival in-world beliefs, not settled authorial labels: followers interpret its altered, incomprehensible and hostile state as the being's wrath against the world.
 
-This Major Faction's central goal is to bring the being back into the living world. If it returns and the other interested powers cannot stop it, that is one possible world-ending catastrophe and a negative ending. The followers include practitioners at multiple Pathway stages, including Stages 1, 2, and 3. Their exact hierarchy, branches, operations, and return conditions remain open.
+This Major Faction's central goal is to bring the being back into the living world. Its followers understand the being's hostile transformation as an expression of anger; the setting-level cause is that ancient cosmic powers influence the insane being and seek to reclaim supernatural power through it. If unopposed after returning, it first turns against other powerful beings and factions, then destroys people and eventually its own followers, whom it can sense through their connection to it. Its ultimate act is to destroy the planet through a final ritual or comparable act, potentially sacrificing itself; the exact mechanism is not defined. Followers include practitioners at multiple Pathway stages, including Stages 1, 2, and 3. Their exact hierarchy, branches, operations, and return conditions remain open.
 
-One possible positive resolution is to stop the return plan before it succeeds. The player might dismantle its followers or persuade some to abandon it; these are example approaches, not a closed list of quests or a prescribed moral route.
+The player may oppose this threat before or after the being returns: disrupt the followers' plans, persuade or turn followers away, interrupt its emergence, or confront the manifested being. A successful prevention or defeat is the positive resolution of this threat. The player may join a large defence or confrontation assembled by allied factions, or keep acting elsewhere while the world responds; the confrontation is not mandatory. These are possible approaches, not a closed quest list or a prescribed moral route. The earlier idea of a mind-controlled ideal world is withdrawn and is not a current ending.
 
-### Candidate finale concept — unresolved
+### Return, confrontation, and world destruction
 
-If the being returns, a final confrontation involving the factions and other powers with a stake in the outcome is a possible finale. The current concept treats the being as vastly stronger than the assembled opposition (possibly by roughly an order of magnitude); the player's prior help and the selected difficulty could affect the result. The participant list, whether this battle is mandatory, and all difficulty, combat, and outcome rules remain undecided. No numerical model is established here.
+The threat has distinct states: the followers prepare the return; the being begins to manifest; and, if it fully returns, it can pursue its destructive plan in the living world. The player can try to stop it at any of these points. After its return, allied faction leaders and forces may assemble to oppose it, including in a battle to defend a settlement or reach the site of its final act. The player can take part or continue other actions elsewhere while the threat advances.
 
-Preventing this catastrophe could resolve the world's main conflict positively, but it does not settle the existing finite-world law. Whether that resolution ends the world, leaves it to reach a later terminal state, or uses another form of closure remains open.
+If no one stops it, the being may destroy the other powerful beings and factions, then people and its own followers, before carrying out the act that destroys the planet. The player's playable story can end earlier: once the being has manifested, the player's death is defeat and no same-world successor appears, even if the being is later defeated. The game does not need to follow that character's death with a view of the planet's destruction.
+
+The previous rough concept of the being overpowering the assembled opposition remains an unresolved balance hypothesis, not a fixed number or outcome. Exact manifestation gates, finale participants, battle timing, victory conditions, and whether victory closes the campaign or lets the surviving current character continue remain open; defeat never restores same-world successors after manifestation. Preventing or defeating this threat does not by itself remove the world's finite life-cycle rule; how a positive resolution relates to later world collapse remains open.
 
 ## Candidate beneficial Minor Factions
 
@@ -96,7 +102,7 @@ These are owner-provided examples of smaller groups the player could discover or
 
 | Working role | Current concept |
 |---|---|
-| **Covert alchemical network** | A secretive, difficult-to-access group focused on potions, ingredients, formulas, and alchemical research. It offers work such as finding rare ingredients or lost formulas and can provide useful knowledge. It covertly shelters or organizes practitioners who operate outside the major oversight faction's law, gives them work, and helps them develop. Its head is generated as a Stage 2 or Stage 3 practitioner; never Stage 0 or Stage 1. This is a full-game world premise, not a requirement to include Stage 2 or 3 in V1; V1 remains limited to Stages 9–7. Leadership may vary between worlds. Its activities are treated as unlawful because they indirectly support unregistered practitioners and the circulation of supernatural capability. This setting concept does not establish a third player-facing crafting profession; potion and item rules must remain compatible with [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) until the owner decides otherwise. |
+| **Covert alchemical network** | A secretive, difficult-to-access group focused on potions, ingredients, formulas, and alchemical research. It offers work such as finding rare ingredients or lost formulas and can provide useful knowledge. It covertly shelters or organizes practitioners who operate outside the major oversight faction's law, gives them work, and helps them develop. Its head is generated as a Stage 2 or Stage 3 practitioner; never Stage 0 or Stage 1. This is a full-game world premise, not a requirement to include Stage 2 or 3 in V1; V1 remains limited to Stages 9–7. Leadership may vary between worlds. Its activities are treated as unlawful because they indirectly support unregistered practitioners and the circulation of supernatural capability. Alchemy is now a separate, potion-only profession; its rules are in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md). |
 | **Healing and medical association** | A more open group with a discoverable base. It combines ordinary medicine with research and treatment involving supernatural forces, and studies loss of sanity and ways to protect mental stability. It has both lawful and unlawful practitioners and no single unified leader. This research concerns observable practitioner health and treatment; it does not define the out-of-scope Stage 0 belief/anchor mechanism. |
 
 Other beneficial or harmful Minor Factions may exist. Additional hostile groups that seek supernatural rule over ordinary people, reject or destroy the human world, or pursue another obscure goal are reserved for a later design pass; they are not defined factions yet.
@@ -249,11 +255,11 @@ As a Major Faction's Influence grows, it occupies niches: better access, better 
 
 # World Collapse
 
-A world never ends because of a timer. It ends because Balance has been irreversibly broken: one Major Faction's dominant Influence and completed Main Goals push the world into a terminal state. The sealed Stage 0 being's return is also a possible terminal catastrophe.
+A world never ends because of a timer. Irreversible Balance failure can push it into a terminal state, and an unopposed return of the sealed Stage 0 being can physically destroy the planet. The two are distinct world-ending routes.
 
-The player may delay collapse, redirect which terminal state occurs, or accelerate collapse. The player can never prevent collapse forever. This preserves the finite-world Meta Loop while giving choices meaningful consequences.
+The player may delay collapse, redirect which terminal state occurs, or accelerate collapse. The player's defeat after the being manifests can occur before physical destruction: no successor life is available, while the world catastrophe may continue beyond the playable character.
 
-Whether Balance can partially recover without the player, how a positive resolution to the sealed being's threat fits the finite-world law, and each Major Faction's exact terminal condition remain open questions. No implementation may invent answers before they are documented.
+Whether defeating or preventing the being's return closes the campaign or lets the player continue until another terminal state, how Balance can recover without the player, and each Major Faction's exact terminal condition remain open. No implementation may invent answers before they are documented.
 
 # Knowledge
 
@@ -282,5 +288,5 @@ Detailed curse, blessing, and pathway systems belong to future Progression / Mag
 - **Design Pillars:** Compatible. Side Events are forks, not free loot; Difficulty raises challenge without erasing curiosity.
 - **Player Experience:** Compatible. Hidden Influence shifts reward understanding; Yield Threshold and eavesdropping support inventive Approaches.
 - **Decision Engine:** Compatible. Intervention and Side Events instantiate Attention, Approach, Allegiance, Commitment, and Bargain.
-- **Glossary:** Updated for Stage 0 Being, Major Faction, Minor Faction, and seven independent Difficulty Settings; faction names remain placeholders.
-- **Open Questions:** Updated for the allied Major Factions, sealed Stage 0 antagonist, candidate minor groups, the positive-ending/finite-world tension, and the open generation model.
+- **Glossary:** Updated for the ancient cosmic powers, antagonist manifestation, playable-state scope, and Alchemy terms; faction names remain placeholders.
+- **Open Questions:** Updated for antagonist phases and defeat, royal influence, one-state scope, Alchemy, and the finite-world relationship.

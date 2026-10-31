@@ -581,19 +581,35 @@
   },
   {
     "systemId": "alchemy",
-    "profile": "proposed",
+    "profile": "character",
     "criteria": {
       "purpose": {
-        "state": "missing",
-        "evidence": "Назначение алхимии в прочитанных документах не найдено."
-      },
-      "source-exists": {
-        "state": "missing",
-        "evidence": "Отдельного дизайн-документа нет."
-      },
-      "nearest-questions": {
         "state": "covered",
-        "evidence": "Три вопроса Magic хранятся рядом и не выдаются за систему зелий."
+        "evidence": "20 defines Alchemy as a potion-only profession required before Pathway advancement."
+      },
+      "entities": {
+        "state": "partially-covered",
+        "evidence": "Formulas, ingredients, advancement potions, and core capability areas are named; detailed skill unlocks and any other potion categories remain open."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "Every transition needs the correct potion; recipes vary by World Seed; brewing takes six shared-clock ticks and includes a mini-game. Discovery and outcome rules remain open."
+      },
+      "costs": {
+        "state": "partially-covered",
+        "evidence": "Ingredient requirements and brewing time create costs, but recipe quantities, ingredient loss, and failure consequences are unresolved."
+      },
+      "scenarios": {
+        "state": "missing",
+        "evidence": "No end-to-end formula discovery, ingredient gathering, and brewing scenario has been authored."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Alchemy depends on Pathway progression, character skills, and the shared world clock, documented in 05, 07.1, and 18."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "The unresolved decisions are explicitly listed in 20 Alchemy and Potioncraft."
       }
     }
   },

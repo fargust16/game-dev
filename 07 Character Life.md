@@ -1,10 +1,10 @@
 # 07 Character Life
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
-Last Updated: 2026-10-30
+Last Updated: 2026-10-31 (player death permanently ends same-world succession after the Stage 0 being manifests.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md)
@@ -26,11 +26,12 @@ It answers:
 
 1. Character death ends that Character Life permanently.
 2. Character power, Pathway stage, and personal inventory do not continue as a living hero.
-3. The world continues and advances during a fixed short death gap.
-4. Player Knowledge survives.
-5. Ordinary attributes and skill development belong to the deceased Character Life and do not transfer to a successor.
-5. Legacy may be recovered, but ordinary leftovers are never fully guaranteed.
-6. The next character is a new person in a changed world, not a respawn.
+3. Before the sealed Stage 0 being manifests in the living world, the world advances during a fixed short Death Gap and may receive a successor.
+4. Once the being manifests in the living world, player-character death is terminal defeat for that world’s playable story; no successor appears, even if the being is later defeated.
+5. Player Knowledge survives.
+6. Ordinary attributes and skill development belong to the deceased Character Life and do not transfer to a successor.
+7. Legacy may be recovered, but ordinary leftovers are never fully guaranteed.
+8. A successor is a new person in a changed world, not a respawn.
 
 # First Character in a World
 
@@ -46,16 +47,14 @@ This is the only life that begins already inside a faction.
 
 # Death
 
-When the character dies:
+When the character dies, the Character Life and its personal staged Pathway power end. The body, carried items, open actions, and local scene become world residue; no successor automatically inherits the former character’s carried/equipped items or extracted modifier instances.
 
-1. the Character Life ends;
-2. personal staged Pathway power ends with that life;
-3. the body, carried items, open actions, and local scene become world residue; the successor does not automatically inherit the former character's carried/equipped items or extracted modifier instances;
-4. a fixed **Death Gap** begins;
-5. during the Death Gap the game resolves world advancement without player control;
-6. after the gap, the player creates a new character for the same world, or may start a new world instead.
+The next step depends on the state of the primary opposing being:
 
-Death is not an instant reload of the same person.
+- **Before its return to the living world:** a fixed Death Gap begins, world advancement resolves without player control, and the player may create a new character for the same world or start a new world.
+- **After it has manifested:** the current playable story ends in defeat if the player character dies. There is no successor and no further same-world Character Life, even if the being has since been defeated. The world may continue beyond the player’s point of view.
+
+Death is not an instant reload of the same person. The manifestation event that activates this permanent no-successor rule remains open in [99 Open Questions](99%20Open%20Questions.md). Whether the campaign closes after the being is defeated, or continues with the surviving current character, also remains open.
 
 # Death Gap
 

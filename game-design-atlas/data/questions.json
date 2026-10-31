@@ -450,9 +450,9 @@
   },
   {
     "id": "q-magic-origin",
-    "text": "Where does mystical power originate?",
+    "text": "What exact means do ancient cosmic powers use to influence practitioners and reclaim supernatural power?",
     "systemIds": [
-      "alchemy"
+      "world-laws"
     ],
     "sourceId": "src-99",
     "sectionTitle": "Medium Priority — Magic",
@@ -465,7 +465,7 @@
     "id": "q-magic-vanish",
     "text": "Can power disappear?",
     "systemIds": [
-      "alchemy"
+      "world-laws"
     ],
     "sourceId": "src-99",
     "sectionTitle": "Medium Priority — Magic",
@@ -478,7 +478,6 @@
     "id": "q-magic-world",
     "text": "Can the world lose magic?",
     "systemIds": [
-      "alchemy",
       "world-laws"
     ],
     "sourceId": "src-99",

@@ -1,14 +1,14 @@
 # 19 Items, Crafting, Inventory, Equipment, and Enchanting
 
-Version: 0.2
+Version: 0.3
 Status: Draft — owner-confirmed rules with delegated starting-balance formulas; content tables, operation costs, and selected edge cases remain open
-Last Updated: 2026-10-31
+Last Updated: 2026-10-31 (profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
 
 Referenced By:
-[07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), [README](README.md)
+[07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), [README](README.md)
 
 ---
 
@@ -19,7 +19,7 @@ This draft consolidates owner-approved direction for item bases, Item Creation, 
 # 1. Character foundation and item-related skills
 
 - There is no global character level. Attributes and skills have separate progression tracks; ordinary skill progression is distinct from Pathway stages.
-- The only confirmed item-crafting professions are **Item Creation** and **Enchanting**. Luck and Perception are attributes, not professions. No separate crafting profession exists for each material or equipment family.
+- The item/equipment-crafting professions are **Item Creation** and **Enchanting**. **Alchemy** is a separate, potion-only profession defined in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md); it does not create equipment or modify items. Luck and Perception are attributes, not professions. No separate crafting profession exists for each material or equipment family.
 - **Item Creation** creates equipment from bases and required resources. Its skill is the primary influence on modifier count; the starting probability formula is in §3.
 - **Luck** and **Perception** affect modifier count as specified in §3. Neither changes a base's fixed modifier-type weights. Luck also follows the shared probability rule in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md); fixed weighted item tables are not rewritten by Luck.
 - **Enchanting** performs the operations in §5. Learning the profession grants the first operation; later skill thresholds unlock the next operations in order. Enchanting skill shifts tier outcomes in its own random operations but does not change modifier-type weights. The exact unlock levels remain open.

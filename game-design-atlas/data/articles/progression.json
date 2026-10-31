@@ -4,7 +4,7 @@
   "name": "Progression",
   "title": "Рост без полоски опыта",
   "category": "character",
-  "summary": "Pathway stages are distinct from ordinary independently progressing attributes and skills. 07.1/07.2 govern character growth and derived statistics; Item Creation and Enchanting are individual skills whose item-system effects are described in 19. Pathway potion requirements and Bargains remain governed here.",
+  "summary": "Pathway stages are distinct from ordinary independently progressing attributes and skills. 07.1/07.2 govern character growth and derived statistics; Item Creation and Enchanting are equipment professions described in 19. Alchemy is a separate potion-only profession that every character must learn before advancing; each transition requires the correct potion as described in 20.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
@@ -26,6 +26,10 @@
     {
       "text": "Enchanting skill unlocks six operations in sequence; exact skill thresholds remain open.",
       "sourceId": "src-19"
+    },
+    {
+      "text": "Alchemy is mandatory before Pathway advancement; the correct potion grants its stage deterministically.",
+      "sourceId": "src-20"
     }
   ],
   "gaps": [
@@ -37,7 +41,8 @@
     "src-05",
     "src-99",
     "src-07-1",
-    "src-19"
+    "src-19",
+    "src-20"
   ],
   "designMaturity": "partially-specified",
   "decisionState": "unresolved",

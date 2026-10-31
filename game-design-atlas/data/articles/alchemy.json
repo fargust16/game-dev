@@ -2,30 +2,38 @@
   "id": "alchemy",
   "order": 19,
   "name": "Alchemy",
-  "title": "Alchemy is not a confirmed item-crafting profession",
-  "category": "proposed",
-  "summary": "No separate alchemy profession is confirmed in the current item-crafting scope. Item Creation and Enchanting are the two confirmed item-crafting professions. Existing Magic questions in 99 concern mystical power, not recipes; any distinct alchemy system needs its own approval.",
-  "scenarioNote": "Сценария нет, потому что системы в источниках нет.",
+  "title": "Potion-only profession required for Pathway advancement",
+  "category": "character",
+  "summary": "Alchemy is separate from equipment Item Creation and Enchanting. Every character must learn it before Pathway-stage advancement, and every transition requires the correct Alchemy-brewed potion. Brewing takes six world ticks and includes a mini-game; the timing interaction and detailed outcomes remain open.",
+  "scenarioNote": "A correct advancement potion grants its target stage deterministically; no brewing scenario is authored yet.",
   "points": [
     {
-      "text": "Only Item Creation and Enchanting are confirmed item-crafting professions.",
-      "sourceId": "src-19"
+      "text": "Alchemy is a separate potion-only profession required before Pathway-stage advancement; formula decoding, ingredient identification/search/gathering, and brewing are its approved capability areas.",
+      "sourceId": "src-20"
     },
     {
-      "text": "The Magic questions in 99 do not establish alchemy recipes or a profession.",
-      "sourceId": "src-99"
+      "text": "Every Pathway transition requires the correct potion; consuming it grants the target stage deterministically.",
+      "sourceId": "src-05"
+    },
+    {
+      "text": "Potion brewing takes six world-time ticks and includes a mini-game; how that mini-game interacts with the shared clock remains open.",
+      "sourceId": "src-18-time"
     }
   ],
   "gaps": [
-    "No approved alchemy profession, recipes, quality rules, or risk model are documented; whether any separate system exists remains open."
+    "Learning and skill progression, ability unlocks, formula/ingredient discovery, mini-game and failure outcomes, potion categories, V1 inclusion, and numeric balance remain open."
   ],
   "sourceIds": [
-    "src-19",
+    "src-20",
+    "src-05",
+    "src-18-time",
+    "src-07-1",
     "src-99"
   ],
-  "designMaturity": "idea-only",
-  "decisionState": "unresolved",
-  "proposed": true,
+  "designMaturity": "partially-specified",
+  "decisionState": "accepted",
+  "documentStatus": "Draft",
+  "proposed": false,
   "implementationMaturity": "unknown",
   "proseOrigin": "atlas-annotation",
   "x": 1000,

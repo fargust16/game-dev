@@ -4,27 +4,33 @@
   "name": "World time",
   "title": "Часы мира, не часы кадра",
   "category": "world",
-  "summary": "В 17 есть тонкая карточка X.1: игровые часы для окон POI и расписаний. Это не обёртка над временем кадра. Отдельного дизайн-документа календаря нет, поэтому система на карте только как названная потребность.",
+  "summary": "18 World Time and Living Simulation defines one shared clock: one tick is one in-game minute, with an initial pace of one tick per 10 real seconds. Alchemy brewing takes six world ticks and includes a mini-game; its interaction with the shared clock remains open.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
-      "text": "Карточка обещает IWorldClock и события дня или фазы.",
-      "sourceId": "src-17"
+      "text": "The shared clock uses one-minute world ticks; the initial authoring pace is one tick per 10 real seconds, and each completed combat round advances one tick.",
+      "sourceId": "src-18-time"
     },
     {
-      "text": "Active Window у POI уже измеряется игровым мировым временем, значит часы кому-то нужны. Сами часы этим не спроектированы.",
+      "text": "Active Window у POI измеряется игровым мировым временем.",
       "sourceId": "src-04"
+    },
+    {
+      "text": "Alchemy brewing takes six world ticks and includes a mini-game; whether the mini-game adds time or pauses the clock remains open.",
+      "sourceId": "src-20"
     }
   ],
   "gaps": [
-    "Нет длины дня, фаз и того, кто имеет право двигать часы."
+    "Детальные фазы суток, полномочия систем на сдвиг часов, расписания NPC и точное взаимодействие мини-игры с шестью тактами остаются открыты."
   ],
   "sourceIds": [
-    "src-17",
-    "src-04"
+    "src-18-time",
+    "src-04",
+    "src-20",
+    "src-17"
   ],
-  "designMaturity": "idea-only",
-  "decisionState": "unresolved",
+  "designMaturity": "partially-specified",
+  "decisionState": "accepted",
   "documentStatus": "Draft",
   "proposed": false,
   "implementationMaturity": "unknown",

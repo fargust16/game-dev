@@ -1,8 +1,8 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.9
+Version: 0.10
 Status: Draft
-Last Updated: 2026-10-31 (Primary opposing Stage 0 faction and two candidate minor factions captured in 02; endings, branches, and generation model remain open.)
+Last Updated: 2026-10-31 (manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [99 Open Questions](99%20Open%20Questions.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
@@ -367,7 +367,7 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 
 - Keep action families broad and recognisable rather than creating a separate action/skill for every situation.
 - Keep Running, Jumping, Sneaking/Stealth, and (provisionally) Climbing as compact movement/action concepts.
-- Confirm Item Creation and Enchanting as the two item-crafting professions; exact skill thresholds and effects are in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md).
+- Confirm Item Creation and Enchanting as equipment/item-crafting professions; Alchemy is a separate potion-only profession required for Pathway advancement, with its foundation in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
 - Identification/Appraisal remains a skill candidate, not a confirmed item-crafting profession.
 - Keep Lockpicking as a candidate skill.
 - Add stealing as a gameplay action; whether its skill is Theft or Sleight of Hand remains open.
@@ -383,7 +383,7 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 - Whether Climbing is included in V1 and how it will be implemented.
 - Which attributes are trained by each action versus merely used to resolve it.
 - Whether combat weapon proficiency, Evasion, and Blocking are skills or are resolved through attributes, equipment, and combat actions.
-- Whether any separate consumable-making, alchemy, or talisman-crafting skill exists; it is not one of the two confirmed item-crafting professions.
+- Alchemy's learning path, skill progression, ability unlocks, potion categories, recipe/ingredient discovery, and whether a learned character must personally brew each advancement potion; see [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
 - How Identification reveals rarity, quality, description, and artefact/mineral properties.
 - How a Hidden Cache Search skill affects audio/visual cues and whether that cue fits the intended exploration experience.
 - Which candidate actions and professions are required for V1 versus deferred.
@@ -393,7 +393,7 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 
 - Action/skill/attribute relationship inventory: first owner-reviewed pass recorded; still provisional.
 - Seven attributes: owner-approved in [07.1](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md); action mappings remain provisional.
-- Item-crafting professions: Item Creation and Enchanting only; the former separate craft-profession candidate list is retired.
+- Equipment/item-crafting professions: Item Creation and Enchanting; Alchemy is a distinct potion-only profession required for Pathway advancement.
 - Exploration: generic observation removed; dedicated trap skills removed for now; lockpicking and theft retained as candidates.
 - Combat: melee, ranged, and supernatural ability tracks identified; full combat/ability design deferred.
 - Numeric formulas, exact growth rules, caps, anti-abuse mechanism, and V1 scope remain open.
