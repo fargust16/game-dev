@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.62
+Version: 0.63
 
 Status: Draft
 
-Last Updated: 2026-10-31 (Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-10-31 (Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -71,6 +71,12 @@ Starting Faction soft-nudges toward one Pathway; Pathway may also be gained thro
 
 **What belongs in the first Progression draft?**  
 Pathway rules plus churches/entities as External Power Bargains. Lore names, full lists, and stages below 7 come later.
+
+**What preparation is required for a Pathway-stage transition?**  
+Each transition requires exactly two primary attributes and one secondary attribute. The two primary attributes are stable across all stages of a Pathway; the secondary attribute is selected per World Seed for each Pathway-stage combination and remains fixed within that world. Requirements are evaluated for the target stage. Primary deficits cause substantially greater additional Sanity loss than secondary deficits; any shortfall causes a penalty, which grows with the gap. See [05 Progression](05%20Progression.md).
+
+**Is Pathway advancement itself random, and what happens when sanity is lost?**  
+No transition success roll: consuming the correct potion always grants the target stage. The mandatory transition Sanity cost and any preparation penalty are subtracted from current Sanity. If sanity is lost, advancement remains successful, but the character becomes a game-controlled creature in the world rather than an ordinary player character. At stages 9–6 the creature is human-shaped (zombie-like). At stages 5–0 a Pathway- and stage-specific mystical form becomes possible, but is only a chance; the character may remain human-shaped. See [05 Progression](05%20Progression.md).
 
 ## Character Attributes, Skills, and Action Checks
 
@@ -240,6 +246,12 @@ Can a Persistent POI still be finite without feeling like a fake timer?
 ## Progression
 
 What are the exact V1 Conduct Progress thresholds for stages 9 → 8 and 8 → 7?
+
+What are the exact primary/secondary attribute thresholds for each Pathway-stage transition, including the final secondary-band offset mapping?
+
+What are the mandatory Sanity costs for each transition, the preparation-penalty curve, and the exact rule for retaining sanity at the resulting Sanity value?
+
+For stages 5–0, what is the probability of mystical transformation after sanity loss, and what are the exact creature forms for each Pathway and stage?
 
 How strongly may a Starting Faction nudge before it becomes a soft lock?
 
