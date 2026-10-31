@@ -1,10 +1,10 @@
 # 000 Project Rules
 
-Version: 1.16
+Version: 1.17
 
 Status: Canonical
 
-Last Updated: 2026-08-09
+Last Updated: 2026-10-31
 
 Depends On:
 —
@@ -94,6 +94,14 @@ Every new document must respect the following hierarchy.
 
 ↓
 
+07.1 Character Attributes, Skills, and Action Checks
+
+↓
+
+07.2 Derived Character Statistics
+
+↓
+
 08 Confront Constraints
 
 ↓
@@ -102,11 +110,11 @@ Every new document must respect the following hierarchy.
 
 ↓
 
-10 Turn Action Economy
+10.1 Grid World and Environment Actions
 
 ↓
 
-10.1 Grid World and Environment Actions
+10.2 Combat System Draft
 
 ↓
 
@@ -143,6 +151,18 @@ Every new document must respect the following hierarchy.
 ↓
 
 17 Game Systems Architecture
+
+↓
+
+18 World Time and Living Simulation
+
+↓
+
+18 RPG Systems Coverage Draft
+
+↓
+
+19 Items, Crafting, Inventory, Equipment, and Enchanting
 
 ↓
 

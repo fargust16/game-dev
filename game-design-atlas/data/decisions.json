@@ -377,5 +377,123 @@
       "src-11"
     ],
     "dateNote": "Дата строки в прочитанном блоке 99 не стоит."
+  },
+  {
+    "id": "d-item-professions",
+    "statement": "Item Creation and Enchanting are the only confirmed item-crafting professions; separate crafting professions for material families are retired.",
+    "rationale": "The owner consolidated equipment making into one general profession and kept Enchanting separate.",
+    "alternatives": "",
+    "systemIds": [
+      "crafting",
+      "enchanting"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19"
+    ],
+    "dateNote": "Owner confirmed 2026-10-31; exact skill thresholds remain open."
+  },
+  {
+    "id": "d-item-mod-count",
+    "statement": "Item Creation skill primarily controls modifier-count probability; Luck and Perception add to it. These factors do not change fixed base-specific modifier-type weights.",
+    "rationale": "Character factors affect how many modifiers an item receives; each base retains its own immutable type weights.",
+    "alternatives": "",
+    "systemIds": [
+      "itemisation",
+      "crafting",
+      "character-model"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19",
+      "src-07-1"
+    ],
+    "dateNote": "Owner confirmed 2026-10-31; the probability formula remains open."
+  },
+  {
+    "id": "d-item-groups",
+    "statement": "Items may have at most three major and three minor modifiers; group assignment is random, full reforge preserves the existing group distribution, and insertion requires a free slot in the extracted modifier's group.",
+    "rationale": "This retains the 3+3 structure and disallows insertion when the target group has no capacity.",
+    "alternatives": "",
+    "systemIds": [
+      "itemisation",
+      "enchanting"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19"
+    ],
+    "dateNote": "Owner confirmed 2026-10-31; exact random group distribution remains open."
+  },
+  {
+    "id": "d-enchant-progression",
+    "statement": "Enchanting unlocks six cumulative steps: random modifier addition, full reforge, locking, extraction/insertion, tier raising, and numeric-value change.",
+    "rationale": "The current operation ladder is explicit while numeric skill thresholds and operation costs remain unresolved.",
+    "alternatives": "",
+    "systemIds": [
+      "enchanting",
+      "progression"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19",
+      "src-05"
+    ],
+    "dateNote": "Owner confirmed 2026-10-31; exact skill levels remain open."
+  },
+  {
+    "id": "d-enchant-transfer",
+    "statement": "Extraction destroys its source item and creates one non-copyable modifier instance; one insertion consumes it, preserves identity/tier/group, rerolls numeric value, and locks it.",
+    "rationale": "The modifier is transferred once as a physical instance rather than learned or copied.",
+    "alternatives": "",
+    "systemIds": [
+      "enchanting",
+      "inventory"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19"
+    ],
+    "dateNote": "Owner confirmed 2026-10-31; exact ingredients and base compatibility remain open."
+  },
+  {
+    "id": "d-item-zero-durability",
+    "statement": "At zero durability an item remains present, becomes broken and unusable, and can be repaired.",
+    "rationale": "Zero durability changes usability rather than deleting the item.",
+    "alternatives": "",
+    "systemIds": [
+      "itemisation",
+      "inventory"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19",
+      "src-10"
+    ],
+    "dateNote": "Owner confirmed 2026-10-31; repair costs and categories remain open."
+  },
+  {
+    "id": "d-item-loot",
+    "statement": "Ordinary monsters drop ingredients only; an NPC death leaves a random half of the NPC's current equipment recoverable. Transformed NPC-monster item drops remain undecided.",
+    "rationale": "Loot remains diegetic while separating ordinary monster harvesting from NPC equipment recovery.",
+    "alternatives": "",
+    "systemIds": [
+      "itemisation",
+      "confront",
+      "actors"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19",
+      "src-08"
+    ],
+    "dateNote": "Owner confirmed 2026-10-31; odd-count rounding and transformed-NPC rules remain open."
   }
 ]

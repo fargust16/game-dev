@@ -634,5 +634,133 @@
     "priority": null,
     "sourceKind": "technical-research",
     "origin": "atlas-annotation"
+  },
+  {
+    "id": "q-itm-count-curve",
+    "text": "What modifier-count curve maps Item Creation skill plus Luck and Perception to 0–6 modifiers?",
+    "systemIds": [
+      "itemisation",
+      "crafting",
+      "character-model"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-itm-groups",
+    "text": "What probability distribution assigns major/minor groups within the 3+3 limits, and how does random addition choose a legal group?",
+    "systemIds": [
+      "itemisation",
+      "enchanting"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-itm-tables",
+    "text": "What are the base/stage modifier-type weights, tier tables, numeric ranges, and duplicate constraints?",
+    "systemIds": [
+      "itemisation",
+      "crafting",
+      "enchanting"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-enchant-unlocks",
+    "text": "At which Enchanting skill levels/stages does each of the six operations unlock?",
+    "systemIds": [
+      "enchanting"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-enchant-costs",
+    "text": "What costs, ingredient lists, stations, and world-time durations apply to each Enchanting operation?",
+    "systemIds": [
+      "enchanting",
+      "world-time"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-enchant-value",
+    "text": "Does value-only change target one unlocked modifier or all unlocked modifiers, and does it preserve the modifier tier?",
+    "systemIds": [
+      "enchanting"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-item-repair",
+    "text": "Which item categories use durability, and what wear rates, repair methods, costs, and times apply?",
+    "systemIds": [
+      "itemisation",
+      "inventory"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-item-loot",
+    "text": "How is the recoverable half rounded for an NPC with an odd number of equipped items, and will transformed NPC-monsters exist and drop items?",
+    "systemIds": [
+      "itemisation",
+      "actors",
+      "confront"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-item-storage",
+    "text": "What are the final item base catalogue, inventory dimensions, stash capacity, footprints, compatibility, and carrying-capacity formula?",
+    "systemIds": [
+      "itemisation",
+      "inventory",
+      "character-model"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
   }
 ]

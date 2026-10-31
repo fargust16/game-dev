@@ -1,0 +1,44 @@
+{
+  "id": "character-model",
+  "order": 21,
+  "name": "Character Model",
+  "title": "Attributes, skills, and derived statistics",
+  "category": "character",
+  "summary": "07.1 defines seven attributes, independent skills, and checks; 07.2 defines derived values. Item Creation skill primarily determines modifier-count probability, with Luck and Perception added. Exact progression and coefficients remain open.",
+  "scenarioNote": "No full player/NPC development scenario was audited.",
+  "points": [
+    {
+      "text": "No global character level; attributes and skills progress independently through relevant actions.",
+      "sourceId": "src-07-1"
+    },
+    {
+      "text": "Seven attributes and the base success curve are owner-approved; remaining mappings/coefficient values are open.",
+      "sourceId": "src-07-1"
+    },
+    {
+      "text": "Strength primarily contributes to Carrying Capacity; exact weight/capacity formula remains open.",
+      "sourceId": "src-07-2"
+    },
+    {
+      "text": "Item Creation skill plus Luck and Perception affect modifier-count probability, not fixed base type weights.",
+      "sourceId": "src-19"
+    }
+  ],
+  "gaps": [
+    "Full skill catalogue, action mappings, growth values, carry-capacity formula, and modifier-count curve."
+  ],
+  "sourceIds": [
+    "src-07-1",
+    "src-07-2",
+    "src-19"
+  ],
+  "designMaturity": "partially-specified",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 120,
+  "y": 730,
+  "lastDocumentUpdate": "2026-10-31"
+}

@@ -1,6 +1,6 @@
 # 18 World Time and Living Simulation
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
@@ -10,7 +10,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 
 Referenced By:
-[10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), future NPC AI, encounter, settlement, medical, and world-event specifications.
+[10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), future NPC AI, encounter, settlement, medical, and world-event specifications.
 
 ---
 
@@ -66,14 +66,13 @@ During ordinary free exploration, the shared game clock advances continuously at
 - Shops and merchants operate according to their schedules and availability. If a shop closes or its merchant leaves while the player is using its interface, the interface may close and the transaction ends.
 - NPCs are not indefinitely reserved for the player. An NPC may spend only a limited period waiting or engaging with the player before leaving or returning to their own goals. The exact default interaction window and inactivity timeout remain open.
 
-## Crafting
+## Item creation and Enchanting
 
-- Crafting recipes have defined durations expressed in game-time units or fractions of a tick.
-- Simple items and small batches should complete quickly; quantity and recipe complexity affect duration.
-- Ordinary complex crafting may take up to a small number of ticks, but should not create long real-time waits.
-- The current target is that even the most complex ordinary craft should take no more than about six game ticks (approximately one real minute at the proposed time scale).
-- Exceptional high-stakes alchemical recipes, such as a potion that raises a Pathway stage, may use the full six-tick preparation period and may include a dedicated quality-sensitive minigame. This is a special recipe category, not a baseline crafting requirement.
-- The quality and effectiveness relationship for such potions remains to be designed.
+- Item-creation recipes and Enchanting operations use the shared world-time model; their duration is not a separate clock.
+- The existing target remains that ordinary complex crafting should not create long waits (currently no more than about six world ticks as a design target). Item Creation recipe timing must follow this shared rule.
+- Enchanting operation durations, including modifier addition, reforging, locking, extraction/insertion, tier increase, and value change, are open.
+- The earlier high-stakes potion example is only an example of an advancement-related recipe; it does not establish a third item-crafting profession. Its quality/effectiveness rules remain open.
+- Item bases, costs, modifier operations, and the current profession scope are described in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md).
 
 # 3. Sleep, rest, and sleep safety
 

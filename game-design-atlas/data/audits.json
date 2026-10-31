@@ -516,58 +516,58 @@
     "profile": "character",
     "criteria": {
       "purpose": {
-        "state": "partially-covered",
-        "evidence": "Есть роль контейнера, нет обещания игроку о том, как вещи ощущаются."
+        "state": "covered",
+        "evidence": "19 defines item containers, equipment, durability, item ownership, and the link to Character Life."
       },
       "entities": {
         "state": "partially-covered",
-        "evidence": "Контейнеры и слоты названы. Предметов нет."
+        "evidence": "Grid inventory, stackable goods, currency, equipment slots, item bases, and single-use extracted modifiers are identified; exact catalogues are open."
       },
       "rules": {
-        "state": "missing",
-        "evidence": "Кроме диегетической добычи и потери инвентаря со смертью правил вещей нет."
+        "state": "partially-covered",
+        "evidence": "Stacking, two universal hands, shared necklace/amulet slot, zero-durability break/repair, and item persistence boundaries are recorded."
       },
       "costs": {
-        "state": "not-assessed",
-        "evidence": "Цена переноса и ограничения Legacy Cache для вещей не оценивались: их нет в карточке."
+        "state": "partially-covered",
+        "evidence": "Item Creation and Enchanting require resources; exact operation costs and repair costs remain open."
       },
       "scenarios": {
-        "state": "missing",
-        "evidence": "Сцены получения, потери и передачи вещи не найдены в прочитанных карточках."
+        "state": "partially-covered",
+        "evidence": "NPC equipment recovery, ordinary monster ingredients, item extraction, and insertion are described; odd-count and edge cases remain open."
       },
       "dependencies": {
-        "state": "partially-covered",
-        "evidence": "Есть связь с сохранением, Confront и смертью жизни."
+        "state": "covered",
+        "evidence": "Inventory links carrying capacity, Character Life, Confront loot, and item/Enchanting operations."
       },
       "unresolved": {
-        "state": "not-assessed",
-        "evidence": "В 99 нет раздела инвентаря. Это не доказательство полноты."
+        "state": "partially-covered",
+        "evidence": "Dimensions, footprints, weight/capacity formula, compatibility, and extracted-instance persistence remain open."
       }
     }
   },
   {
     "systemId": "crafting",
-    "profile": "thin",
+    "profile": "character",
     "criteria": {
       "purpose": {
-        "state": "partially-covered",
-        "evidence": "Карточка задаёт диегетические рецепты и цену силы. Это не принятый крафт."
+        "state": "covered",
+        "evidence": "19 defines Item Creation and distinguishes it from Enchanting."
       },
       "responsibilities": {
-        "state": "partially-covered",
-        "evidence": "Зона ответственности — одна строка карточки."
+        "state": "covered",
+        "evidence": "Item Creation builds all equipment categories from bases/resources; Enchanting owns modifier manipulation."
       },
       "dependencies": {
         "state": "covered",
-        "evidence": "Инвентарь назван зависимостью."
+        "evidence": "Item Creation depends on skills, Luck/Perception, base tables, resources, inventory, and world time."
       },
       "scope": {
-        "state": "covered",
-        "evidence": "Карточка отложена. Глубокий крафт вынесен из среза."
+        "state": "partially-covered",
+        "evidence": "Two item-crafting professions are confirmed; the Vertical Slice still defers deep crafting."
       },
       "unresolved": {
-        "state": "not-assessed",
-        "evidence": "Отдельных вопросов крафта в импортированном 99 нет."
+        "state": "partially-covered",
+        "evidence": "Base catalogue, recipes, count curve, resources/costs, timings, and V1 scope remain open."
       }
     }
   },
@@ -612,6 +612,108 @@
       "unresolved": {
         "state": "partially-covered",
         "evidence": "Два высоких вопроса среза открыты."
+      }
+    }
+  },
+  {
+    "systemId": "character-model",
+    "profile": "character",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "07.1/07.2 define the character foundation and derived-statistics layer."
+      },
+      "entities": {
+        "state": "covered",
+        "evidence": "Seven attributes, independent skills, derived resources, Pathway stages, and item-related profession skills are identified."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "Attribute/skill growth and action-check principles are approved; Item Creation/Luck/Perception affect modifier-count probability."
+      },
+      "costs": {
+        "state": "partially-covered",
+        "evidence": "XP structure is shared, but values and item-count coefficients remain open."
+      },
+      "scenarios": {
+        "state": "partially-covered",
+        "evidence": "Combat, crafting, carrying capacity, and item-count relationships are described across linked drafts."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Progression, derived stats, itemisation, combat, and time dependencies are linked."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Full skill catalogue, action mappings, growth values, and modifier-count coefficients remain open."
+      }
+    }
+  },
+  {
+    "systemId": "itemisation",
+    "profile": "character",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "19 consolidates bases, modifiers, quality, durability, and loot."
+      },
+      "entities": {
+        "state": "partially-covered",
+        "evidence": "Base families, item stages, modifier groups/tiers, and rarity bands are specified; catalogues are incomplete."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "0–6 modifiers, 3+3 caps, fixed base weights, count-derived quality, and item-stage tier direction are specified."
+      },
+      "costs": {
+        "state": "partially-covered",
+        "evidence": "Stage resources are established; exact recipes/costs and repair costs remain open."
+      },
+      "scenarios": {
+        "state": "partially-covered",
+        "evidence": "Addition, reforge, extraction/insertion, NPC gear recovery, and ordinary-monster ingredient-only loot are described."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Character skills/stats, inventory, time, Character Life, Confront, and combat equipment use are linked."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Base tables, distributions, quality nuance, durability, loot edge cases, footprints, and compatibility remain open."
+      }
+    }
+  },
+  {
+    "systemId": "enchanting",
+    "profile": "character",
+    "criteria": {
+      "purpose": {
+        "state": "covered",
+        "evidence": "19 defines Enchanting as a separate profession with six cumulative operations."
+      },
+      "entities": {
+        "state": "covered",
+        "evidence": "Random addition, full reforge, locking, extraction/insertion, tier raising, and numeric-value change are listed."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "Group preservation/capacity, permanent locks, single-use transfer, and locked-value behavior are recorded."
+      },
+      "costs": {
+        "state": "partially-covered",
+        "evidence": "Specific extraction/insertion ingredients are required; exact costs, operation resources, and timing are open."
+      },
+      "scenarios": {
+        "state": "partially-covered",
+        "evidence": "The item-transfer lifecycle and no-slot rejection are described; edge cases remain open."
+      },
+      "dependencies": {
+        "state": "covered",
+        "evidence": "Enchanting depends on skill progression, item bases/tables, inventory, and shared world time."
+      },
+      "unresolved": {
+        "state": "partially-covered",
+        "evidence": "Unlock thresholds, tables, ingredients/costs, locked tier eligibility, and numeric target scope remain open."
       }
     }
   }

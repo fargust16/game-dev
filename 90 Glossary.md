@@ -1,16 +1,16 @@
 # 90 Glossary
 
-Version: 0.53
+Version: 0.54
 
 Status: Draft
 
-Last Updated: 2026-10-30 (character attributes, skills, and action-check terminology added)
+Last Updated: 2026-10-31 (item, modifier, and Enchanting terminology added)
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md)
+All Documentation, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [13 City Generation](13%20City%20Generation.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md)
 
 ---
 
@@ -1006,3 +1006,26 @@ A separate relative modifier derived from Luck. It multiplies an existing probab
 ## Critical Success
 
 A mutually exclusive exceptional outcome within a successful action check, determined as a conditional share of successful attempts rather than an independent roll layered on top of normal success.
+
+
+## Itemisation and Enchanting
+
+**Item base** — A defined item identity with foundational properties and a modifier-weight table. A base may be used at an item stage when its required materials are available. See [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md).
+
+**Item stage** — The item's stage on the 9-to-0 item progression scale. It affects applicable resources and modifier-tier probabilities. It is distinct from a Character's Pathway stage and a skill progression step.
+
+**Major / minor modifier** — One of two modifier groups. An item can hold at most three of each. Group assignment is random, subject to the capacity limit; a modifier keeps its group when reforged or transferred.
+
+**Modifier tier** — A strength band of a modifier, numbered 9 through 0; tier 0 is strongest under the current design. A modifier's numeric value is rolled within its tier's range.
+
+**Full reforge** — An Enchanting operation that regenerates every unlocked modifier's identity, tier, and value while preserving total count and major/minor group distribution. Locked modifiers remain unchanged.
+
+**Locked modifier** — A modifier protected from full reforge. Locks are permanent and irreversible under the current direction; successive locks on one item cost more. An inserted modifier is locked.
+
+**Extracted modifier instance** — One non-copyable physical instance extracted from an item. It preserves identity, tier, and major/minor group but not numeric value; insertion consumes it and is allowed only when the target has a free slot in that group.
+
+**Broken item** — An item at zero durability. It remains present, is unusable, and can be repaired.
+
+**Item Creation** — The general profession that creates equipment from bases and resources; its skill primarily affects modifier-count probability, with Luck and Perception as additional factors.
+
+**Enchanting** — The profession that unlocks random addition, full reforge, locking, extraction/insertion, tier raising, and numerical-value changes in progression order.

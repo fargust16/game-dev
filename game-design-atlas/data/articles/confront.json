@@ -4,7 +4,7 @@
   "name": "Confront",
   "title": "Бой как один Approach, на арене",
   "category": "combat",
-  "summary": "Confront — открытая сила. Документ 08 — ограждение до боевой библии: если бой становится самым безопасным, богатым или познавательным ходом по умолчанию, дизайн сломан. V1 показывает его пошаговым режимом на отдельной Combat Arena. Сетка не действует в оверворлде и интерьерах.",
+  "summary": "Confront — открытая сила. Документ 08 — ограждение до боевой библии: если бой становится самым безопасным, богатым или познавательным ходом по умолчанию, дизайн сломан. V1 показывает его пошаговым режимом на отдельной Combat Arena. Сетка не действует в оверворлде и интерьерах. Ordinary monsters yield ingredients only; NPC death leaves a random half of current equipment recoverable. Odd-count rounding and transformed-NPC-monster drops remain open.",
   "scenarioNote": "Полных боевых сцен в импорт не входило. 11 требует Break Away и Spare/Yield в Confront похищения и/или ареста, но сами сцены здесь не расписаны.",
   "points": [
     {
@@ -12,7 +12,7 @@
       "sourceId": "src-99"
     },
     {
-      "text": "Ход V1 на арене — Turn Action Economy. Ориентир ясности — Baldur's Gate 3 и Fallout 1/2, не обещание повторить их целиком.",
+      "text": "The current combat action-economy authority is 10.2; the older Move + Action + Bonus draft is retired.",
       "sourceId": "src-10"
     },
     {
@@ -22,6 +22,10 @@
     {
       "text": "Добровольный пошаговый режим вне боя снят.",
       "sourceId": "src-16"
+    },
+    {
+      "text": "Ordinary monsters yield ingredients only; NPC death yields a random recoverable half of current equipment; transformed NPC-monster item drops remain open.",
+      "sourceId": "src-19"
     }
   ],
   "gaps": [
@@ -35,12 +39,13 @@
     "src-10",
     "src-10-1",
     "src-16",
-    "src-99"
+    "src-99",
+    "src-19"
   ],
   "designMaturity": "partially-specified",
   "decisionState": "unresolved",
   "documentStatus": "Draft",
-  "lastDocumentUpdate": "2026-08-07",
+  "lastDocumentUpdate": "2026-10-31",
   "proposed": false,
   "implementationMaturity": "unknown",
   "proseOrigin": "atlas-annotation",

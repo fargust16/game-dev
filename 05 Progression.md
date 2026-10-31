@@ -1,6 +1,6 @@
 # 05 Progression
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
 
 Referenced By:
-[06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), Future pathway content, church/entity bargains, character growth, and combat tuning.
+[06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), future pathway content, church/entity bargains, character growth, and combat tuning.
 
 ---
 

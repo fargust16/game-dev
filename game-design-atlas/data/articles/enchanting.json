@@ -1,0 +1,48 @@
+{
+  "id": "enchanting",
+  "order": 23,
+  "name": "Enchanting",
+  "title": "Six-step modifier manipulation profession",
+  "category": "character",
+  "summary": "Enchanting progresses through random modifier addition; full reforge; permanent locking; one-time extraction/insertion; raising one modifier's tier; and changing numeric values on unlocked modifiers. Type weights stay fixed per base; thresholds, ingredients, costs, time, and some operation scopes remain open.",
+  "scenarioNote": "One extracted modifier is a single-use instance; extraction destroys its source item.",
+  "points": [
+    {
+      "text": "Six operations unlock in sequence from learning the profession; exact skill levels remain open.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "Full reforge regenerates all unlocked modifiers while preserving count and group distribution; locked modifiers stay unchanged.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "Locks are permanent; successive locks cost more; inserted modifiers are locked.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "Extraction preserves identity, tier, and group but not numeric value, destroys the source item, and allows one insertion into a matching free group slot.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "No separate delete or replace operation exists.",
+      "sourceId": "src-19"
+    }
+  ],
+  "gaps": [
+    "Unlock thresholds, costs/ingredients/time, random-add group choice, base compatibility, tier-improvement eligibility, and numeric target scope."
+  ],
+  "sourceIds": [
+    "src-19",
+    "src-07-1",
+    "src-18-time"
+  ],
+  "designMaturity": "partially-specified",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 1000,
+  "y": 730,
+  "lastDocumentUpdate": "2026-10-31"
+}

@@ -1,6 +1,6 @@
 # 17 Game Systems Architecture
 
-Version: 0.9
+Version: 1.0
 
 Status: Draft
 
@@ -10,7 +10,7 @@ Depends On:
 [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
 
 Referenced By:
-[AGENTS.md](AGENTS.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`, `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`, `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md`
+[AGENTS.md](AGENTS.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`, `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`, `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md`
 
 ---
 
@@ -642,20 +642,20 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 | **V1 scope / Deferred** | **Gate:** World Laws. |
 | **Owning folder** | `unity/Assets/Scripts/Economy/` |
 
-## E.3 Crafting
+## E.3 Item Creation and Enchanting
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Diegetic recipes; priced power; no harvest-core from overworld V0. |
-| **Dependencies** | Inventory, Economy (optional). |
-| **Public interfaces** | `ICraftingService`. |
-| **Data flow** | Ingredients → result + costs. |
-| **Save/load** | Unlocks. |
-| **Multiplayer** | Host craft. |
-| **Performance** | UI bound. |
-| **Extensibility** | Stations as POIs. |
-| **V1 scope / Deferred** | Deferred. |
-| **Owning folder** | `unity/Assets/Scripts/Crafting/` |
+| **Responsibilities** | Item Creation builds equipment from bases/resources. Enchanting performs the six modifier operations described in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
+| **Dependencies** | Inventory/equipment, item-related character skills, world time; Economy is optional. |
+| **Public interfaces** | No implementation interface is approved by this design update. The current draft's `ICraftingService` remains a provisional architecture proposal. |
+| **Data flow** | Selected base + required materials → item with generated modifier count, group, types, tiers, and values. Enchanting resources → one unlocked modifier operation. |
+| **Save/load** | Preserve item base/stage, modifiers and lock states, durability, and any single-use extracted modifier instance while it exists in a character's inventory; death/legacy fate remains governed by item and Character Life rules. |
+| **Multiplayer** | Host-authoritative direction remains a provisional architecture assumption. |
+| **Performance** | Data/UI-bound; final content size is open. |
+| **Extensibility** | Additional bases, modifier tables, and operation costs are data-driven design needs; no content catalogue is approved here. |
+| **V1 scope / Deferred** | Item creation and Enchanting are documented, but remain deferred from the current Vertical Slice's deep-crafting scope. |
+| **Owning folder** | The existing `unity/Assets/Scripts/Crafting/` proposal is provisional; implementation folders/interfaces are not approved by this documentation update. |
 
 ---
 
@@ -665,8 +665,8 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Item containers; equipment slots; diegetic loot only in Confront ([08](08%20Confront%20Constraints.md)). |
-| **Dependencies** | Save; content item defs (immutable SO). |
+| **Responsibilities** | Grid inventory, stacking, equipment slots, durability state, and diegetic loot boundaries in [08](08%20Confront%20Constraints.md) and [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
+| **Dependencies** | Save; content item definitions; [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md); [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
 | **Public interfaces** | `IInventory`, `IEquipment`. |
 | **Data flow** | Pickup/equip → state → UI. |
 | **Save/load** | Full. |
@@ -680,8 +680,8 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Pathway stages 9→7; no XP level-ups ([05](05%20Progression.md)). |
-| **Dependencies** | Progression design docs; Factions soft nudge. |
+| **Responsibilities** | Pathway stages 9→7 and ordinary independently progressing attributes/skills; no global character XP level. Item Creation and Enchanting skills follow [07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) and [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
+| **Dependencies** | [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md); Factions soft nudge. |
 | **Public interfaces** | `IPathwayProgress`. |
 | **Data flow** | Conduct → stage; Bargains may grant. |
 | **Save/load** | Full. |

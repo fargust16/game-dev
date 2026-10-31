@@ -1,16 +1,16 @@
 # 08 Confront Constraints
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft
 
-Last Updated: 2026-08-07
+Last Updated: 2026-10-31
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 
 Referenced By:
-[16 Architecture Pivot](16%20Architecture%20Pivot.md), Future combat system, weapon content, and encounter tuning.
+[16 Architecture Pivot](16%20Architecture%20Pivot.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), future combat system, weapon content, and encounter tuning.
 
 ---
 
@@ -68,13 +68,12 @@ V1 may also allow costly escapes, yields, or mercies, but design must not rely o
 
 ## 3. Loot is diegetic
 
-Combat rewards are not loot tables from nowhere.
+Combat rewards come from the world and from what the defeated target actually had; a fight does not create an abstract reward table or completion chest.
 
-A defeated target yields:
-
-- what they carried;
-- what they were guarding;
-- what the scene logically contains.
+- Ordinary monsters yield ingredients only and do not drop finished equipment or other ordinary items.
+- On NPC death, a randomly selected half of the NPC's current equipment remains recoverable, under the current item rules in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). Exact rounding for an odd number of items remains open.
+- Whether transformed NPCs can exist as monsters remains open. If they do, they may drop items; the exact rules remain open.
+- Other carried or guarded goods and scene contents follow their established diegetic rules.
 
 No “combat completion chest” that exists only because a fight ended.
 

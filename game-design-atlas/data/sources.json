@@ -121,11 +121,11 @@
   },
   {
     "id": "src-10",
-    "title": "10 Turn Action Economy",
-    "path": "10 Turn Action Economy.md",
+    "title": "10.2 Combat System Draft",
+    "path": "10.2 Combat System Draft.md",
     "documentStatus": "Draft",
     "sourceType": "design-document",
-    "note": "Ход на Combat Arena."
+    "note": "Current combat-system and turn-action authority; the former 10 Turn Action Economy draft is retired."
   },
   {
     "id": "src-10-1",
@@ -240,5 +240,45 @@
     "documentStatus": "Draft",
     "sourceType": "process",
     "note": "Операционные правила агентов. Не дизайн игровой системы."
+  },
+  {
+    "id": "src-07-1",
+    "title": "07.1 Character Attributes, Skills, and Action Checks",
+    "path": "07.1 Character Attributes, Skills, and Action Checks.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Seven attributes, independent skill tracks, action checks, and item-count character-factor roles."
+  },
+  {
+    "id": "src-07-2",
+    "title": "07.2 Derived Character Statistics",
+    "path": "07.2 Derived Character Statistics.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Derived resources, combat values, carrying capacity, and related formulas."
+  },
+  {
+    "id": "src-18-rpg",
+    "title": "18 RPG Systems Coverage Draft",
+    "path": "18 RPG Systems Coverage Draft.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "RPG coverage map; current item rules are consolidated in 19."
+  },
+  {
+    "id": "src-18-time",
+    "title": "18 World Time and Living Simulation",
+    "path": "18 World Time and Living Simulation.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Shared world-time model used by item creation and Enchanting durations."
+  },
+  {
+    "id": "src-19",
+    "title": "19 Items, Crafting, Inventory, Equipment, and Enchanting",
+    "path": "19 Items, Crafting, Inventory, Equipment, and Enchanting.md",
+    "documentStatus": "Draft",
+    "sourceType": "design-document",
+    "note": "Owner-approved item-system direction, six-step Enchanting progression, and explicit open questions."
   }
 ]

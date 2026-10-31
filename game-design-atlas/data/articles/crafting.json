@@ -1,34 +1,44 @@
 {
   "id": "crafting",
   "order": 18,
-  "name": "Crafting",
-  "title": "Рецепты с ценой, пока отложены",
+  "name": "Item Creation",
+  "title": "Item Creation: one general equipment profession",
   "category": "proposed",
-  "summary": "Это не утверждённая система крафта. Есть отложенная карточка E.3: диегетические рецепты, сила с ценой, без ядра «собери ресурсы в оверворлде V0». Глубокий крафт явно вынесен из Vertical Slice.",
+  "summary": "Item Creation is the single profession that creates all equipment families from selected bases and resources. Its skill primarily sets modifier-count probabilities; Luck and Perception add to that probability. Base-specific modifier-type weights stay fixed. Enchanting is a separate profession.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
-      "text": "Карточка зависит от инвентаря и необязательно от экономики. Станции позже могут быть POI.",
-      "sourceId": "src-17"
+      "text": "Item Creation creates all armour, weapons, jewellery, and accessories; material families do not each have a separate crafting profession.",
+      "sourceId": "src-19"
     },
     {
-      "text": "11 в Scope Out пишет deep crafting среди того, чего в срезе нет.",
+      "text": "The skill primarily influences modifier count (0–6); Luck and Perception are additional influences and do not alter base modifier-type weights.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "The selected base/stage supplies fixed modifier-type weights and applicable tier tables.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "The Vertical Slice still defers deep crafting; this design update does not authorise implementation.",
       "sourceId": "src-11"
     }
   ],
   "gaps": [
-    "Нет рецептов, станций и правила, чем крафт отличается от Bargain прогрессии."
+    "Exact skill thresholds, modifier-count curve, Luck/Perception coefficients, base catalogue, recipes, costs, and timing remain open."
   ],
   "sourceIds": [
-    "src-17",
+    "src-19",
+    "src-07-1",
     "src-11"
   ],
-  "designMaturity": "idea-only",
+  "designMaturity": "partially-specified",
   "decisionState": "unresolved",
   "documentStatus": "Draft",
-  "proposed": true,
+  "proposed": false,
   "implementationMaturity": "unknown",
   "proseOrigin": "atlas-annotation",
   "x": 780,
-  "y": 570
+  "y": 570,
+  "lastDocumentUpdate": "2026-10-31"
 }

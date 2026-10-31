@@ -1,16 +1,16 @@
 # 99 Open Questions
 
-Version: 0.73
+Version: 0.74
 
 Status: Draft
 
-Last Updated: 2026-10-31 (Crafting mastery smoothly shifts the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-10-31 (Item Creation/Enchanting progression, slot limits, durability at zero, and loot distinctions documented. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md), [GEOGRAPHY_LMC_DESIGN_NOTE.md](unity/Assets/Plans/GEOGRAPHY_LMC_DESIGN_NOTE.md), [GEOGRAPHY_LMC_TECHNICAL_SPEC.md](unity/Assets/Plans/GEOGRAPHY_LMC_TECHNICAL_SPEC.md), [GEOGRAPHY_LMC_STEP1_READINESS.md](unity/Assets/Plans/GEOGRAPHY_LMC_STEP1_READINESS.md), [GEOGRAPHY_G3F_PHASE_PLAN.md](unity/Assets/Plans/GEOGRAPHY_G3F_PHASE_PLAN.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md), [GEOGRAPHY_LMC_DESIGN_NOTE.md](unity/Assets/Plans/GEOGRAPHY_LMC_DESIGN_NOTE.md), [GEOGRAPHY_LMC_TECHNICAL_SPEC.md](unity/Assets/Plans/GEOGRAPHY_LMC_TECHNICAL_SPEC.md), [GEOGRAPHY_LMC_STEP1_READINESS.md](unity/Assets/Plans/GEOGRAPHY_LMC_STEP1_READINESS.md), [GEOGRAPHY_G3F_PHASE_PLAN.md](unity/Assets/Plans/GEOGRAPHY_G3F_PHASE_PLAN.md)
 
 ---
 
@@ -78,35 +78,21 @@ Each transition requires exactly two primary attributes and one secondary attrib
 **Is Pathway advancement itself random, and what happens when sanity is lost?**  
 No transition success roll: consuming the correct potion always grants the target stage. The mandatory transition Sanity cost and any preparation penalty are subtracted from current Sanity. If sanity is lost, advancement remains successful, but the character becomes a game-controlled creature in the world rather than an ordinary player character. At stages 9–6 the creature is human-shaped (zombie-like). At stages 5–0 a Pathway- and stage-specific mystical form becomes possible, but is only a chance; the character may remain human-shaped. See [05 Progression](05%20Progression.md).
 
-## Items, Inventory, and Equipment
+## Items, Inventory, Equipment, Item Creation, and Enchanting
 
-**How is ordinary item quality determined?**  
-By total modifier count, not by a separate independent rarity roll: Normal = 0 modifiers; Magic = 1–2; Rare = 3; Epic = 4; Legendary = 5–6. Six is the maximum. Unique items are a separate bespoke category.
+The current item-system rules are consolidated in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). Owner-approved direction recorded there includes:
 
-**How does crafting skill affect item quality?**  
-When an ordinary item is crafted, its modifier count is randomly generated from 0 to 6, and quality follows directly from that count. The relevant profession's skill/mastery affects only the probability distribution for modifier count, smoothly shifting it toward more modifiers as mastery rises. Once the count is rolled, each modifier is selected randomly using the table for the chosen base and its item stage. That table determines modifier-type weights and tier probabilities; higher-stage items favour stronger tiers, but even a stage-9 item can theoretically roll the strongest tier. Profession skill/mastery does not change the chance of any particular modifier type or tier. The numerical value within the selected tier's range is random and independent of skill/mastery and other character factors. Exact count curves and base/stage modifier tables remain open. Once created, the item's modifier count and quality are fixed.
+- Item Creation and Enchanting are the only confirmed item-crafting professions. Item Creation creates all equipment families; material families do not have separate crafting professions.
+- An ordinary item has 0–6 modifiers, with no more than three major and three minor. Major/minor assignment is random within those limits; six modifiers must be 3+3. Full reforge preserves total count and group distribution.
+- Quality is derived from modifier count: Normal 0; Magic 1–2; Rare 3; Epic 4; Legendary 5–6. Unique items are bespoke. Enchanting can add a random modifier if the item has capacity, and quality is recalculated from the new count.
+- Item Creation skill primarily determines modifier-count probability; Luck and Perception add to that probability. Base-specific modifier-type weights are fixed and cannot be influenced by character stats or skills.
+- Base and stage determine the applicable type/tier tables. Enchanting skill affects tier outcomes, not base-specific type weights. Strongest tier remains possible without a hard item-stage cap.
+- Enchanting unlocks six operations in order: random modifier addition; full reforge; permanent locking; extraction/insertion; raising one modifier's tier; changing numerical values of unlocked modifiers. No separate delete or replace operation exists.
+- Extraction removes exactly one unlocked modifier and destroys the source item. The extracted instance preserves identity, tier, and group but not numeric value; it is single-use. Insertion requires a free slot of that same group, rolls a new value, consumes the instance, and locks the inserted modifier.
+- At zero durability, an item remains present, becomes broken/unusable, and can be repaired.
+- Ordinary monsters yield ingredients only. NPC death leaves a random half of current equipment recoverable. Transformed NPC-monster existence and item drops remain undecided.
 
-**How is NPC equipment handled?**  
-NPCs receive equipment as part of their generated/assigned build, role, and individual characteristics, not through a random loot roll on death. They may have any quality, may be incompletely equipped, and need not follow player crafting progression. Only some equipment may be recoverable after death; alternatively, the player may negotiate or demand an item in exchange for sparing the NPC. Exact recovery rules and non-NPC acquisition sources remain open.
-
-## Items, Inventory, and Equipment
-
-**Must each modifier be separately discovered or learned before a profession can reforge it?**  
-No. There is no per-modifier learning requirement. Reforging operations become available through profession mastery: standard reforging is intended to unlock at an advanced mastery stage, and permanent modifier locking at an expert stage. Once unlocked, the character can work with all modifiers eligible for the relevant item base. Exact mastery thresholds remain open.
-
-**Are modifier types restricted to particular armour or weapon bases?**  
-No hard class restrictions are intended. Modifier appearance is weighted by base-item family/type: fitting modifiers are much more likely, while off-archetype modifiers remain possible but rarer. Cloth, leather, and heavy/metal armour should each favour different attribute and combat themes; weapon families likewise favour effects suited to their use. Exact weight tables remain open.
-
-**Can professions increase an existing item's rarity or add more modifiers?**  
-No. An item's base properties, rarity, and number of modifier slots are established when the item is generated or created. Professions cannot raise its rarity or add modifier slots; they can only alter existing, unlocked modifiers through reforging. A player seeking a different modifier capacity or a higher-potential item must obtain or create another item.
-
-
-
-**Does profession mastery impose a hard cap on the modifier tier obtainable through reforging?**  
-No. Once the reforging recipe is unlocked, all modifier tiers from 9 through 0 remain possible. Profession mastery changes the probability distribution in favour of stronger tiers; it does not impose a hard tier ceiling. Even a low-mastery crafter may very rarely roll a level-0 modifier. Exact probability curves remain open.
-
-**How does modifier reforging and locking work?**  
-A standard reforging operation fully regenerates every currently unlocked modifier: its type, level/tier (9 through 0), and numerical value are all rolled anew according to the applicable probabilities and constraints. It does not preserve any of those properties from the previous modifier. The operation cost is independent of the number of modifiers changed. A separate locking operation permanently and irreversibly protects one chosen modifier. Any number of modifiers may be locked, but each successive lock on the same item costs substantially more resources. There is no single-modifier reroll operation: to reroll only one modifier, the player must lock all the others first. Exact costs, time, and lock-cost growth remain open. See [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md).
+See [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) for the full operation boundaries, inventory/equipment model, and unresolved design questions.
 
 ## Character Attributes, Skills, and Action Checks
 
@@ -349,29 +335,22 @@ What exact prop/language checklist best communicates early radio/steam novelty w
 
 How visible should crown/nobility pressure be inside Lower Veil without adding a third faction?
 
-## Items, Inventory, and Equipment
+## Items, Inventory, Equipment, Item Creation, and Enchanting
 
-The owner-approved direction is a compact base-item catalogue with compatible, procedurally selected modifiers, inspired by Path of Exile. Base families include cloth, leather, and heavy/metal armour across core equipment slots, plus a limited set of weapon families. The intended modifier structure has up to three primary and three secondary modifiers. Unique-style items are separately authored and may have Pathway-specific, playstyle-changing effects. See [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md).
+The full open-question list is §7 of [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). The highest-priority unresolved items are:
 
-What are the exact definitions and hierarchy of Normal, Magic, Rare, Epic, Unique, and Legendary rarity labels? Which labels are generated from bases/modifiers, and which are reserved for separately authored unique items?
+- Item Creation skill thresholds for base stages and the modifier-count curve; exact Luck/Perception contributions.
+- Major/minor assignment probabilities and how random Enchanting addition selects a legal group.
+- Base/stage modifier-type weights, tier curves, numeric ranges, duplicate restrictions, and base compatibility for extracted modifiers.
+- Enchanting rank thresholds for all six steps; costs, ingredient lists, stations, and operation times.
+- Tier-raising step size/lock eligibility; value-change target scope and whether the tier is retained.
+- Whether every successful addition must increase the displayed rarity label. The existing count mapping has multiple counts in the same label band.
+- Which items use durability, wear rates, repair method/material/cost/time; whether broken items can be enchanted or extracted from.
+- NPC half-equipment rounding, other carried items, and whether transformed NPC-monsters exist and may drop items.
+- Final item base catalogue, inventory grid/stash, footprints, equipment compatibility/requirements, and carrying-capacity formula.
+- Fate of an extracted modifier instance across storage, death, and Character Life changes; item sources beyond the rules already stated.
 
-What are the exact rules for major/minor modifier slots, compatibility, and generation constraints? How many mechanical bases are included in V1, given the provisional plan to begin with one base family per armour-material profession and expand visual variety if AI-assisted model generation is practical?
-
-How many base families and visual variants are required for V1, and which armour slots and weapon families are included?
-
-How are non-NPC item acquisition sources (for example, selected monsters and chests) generated, and how does critical success affect acquisition? Which NPC equipment pieces can survive/be recovered after death, and how is this determined?
-
-What are the exact major/minor modifier pools, modifier tiers and value ranges, and base-specific appearance-weight tables? Which base families should strongly favour particular modifier themes, and how rare should off-archetype combinations be?
-
-How exactly do item stage and base identity determine modifier-type weights and tier probabilities, including the no-hard-ceiling rule that allows even a stage-9 item to roll the strongest tier? Separately, what role, if any, do attribute requirements play in modifier generation?
-
-At which exact profession mastery thresholds do standard reforging and permanent modifier locking unlock, and how do those thresholds relate to the existing skill progression stages? What exact probability distribution maps each crafting-skill/mastery value to a randomly generated modifier count from 0 to 6, including how the distribution shifts toward five-/six-modifier outcomes as mastery rises?
-
-What are the exact probability tables and constraints used when standard reforging regenerates each unlocked modifier's type, level/tier, and numerical value? How are the modifier-type and tier probability tables authored for each base item at each item stage? What exact modifier-count probability curve maps profession skill/mastery to outcomes from 0 to 6? What are the resource costs and time requirements for standard reforging and permanent modifier locking, and what is the growth curve for successive lock costs?
-
-How do item modifiers interact with crafting, enchantment, identification/appraisal, equipment requirements, durability, and Pathway abilities?
-
-How are stackable resources/consumables represented versus individually instantiated equipment and unique items? What are the final inventory grid dimensions, stash capacity, and item footprint sizes?
+The Vertical Slice continues to defer deep crafting.
 
 ## Character
 

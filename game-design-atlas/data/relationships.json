@@ -213,7 +213,7 @@
       "src-17",
       "src-99"
     ],
-    "explanation": "Добыча Confront только та, которой владела цель. Инвентарь как система предметов этим правилом ограничен, но сам ещё не описан."
+    "explanation": "Diegetic Confront rewards flow into inventory. Ordinary monsters yield ingredients only; NPC death leaves a random recoverable half of current equipment under 19. Exact edge cases remain open."
   },
   {
     "id": "rel-slice-poi",
@@ -276,5 +276,69 @@
       "src-17"
     ],
     "explanation": "Трек W расставляет геометрические якоря POI. Игровые окна и пропуск точек принадлежат POI Director и документу 04, не генератору ландшафта."
+  },
+  {
+    "id": "rel-itemcreation-character",
+    "fromId": "crafting",
+    "toId": "character-model",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19",
+      "src-07-1"
+    ],
+    "explanation": "Item Creation skill, Luck, and Perception jointly determine modifier-count probability; the character model defines their progression and check foundation."
+  },
+  {
+    "id": "rel-enchanting-inventory",
+    "fromId": "enchanting",
+    "toId": "inventory",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19"
+    ],
+    "explanation": "Enchanting changes item modifiers and consumes resources; extraction destroys a source item and insertion consumes a single-use modifier instance."
+  },
+  {
+    "id": "rel-enchanting-character",
+    "fromId": "enchanting",
+    "toId": "character-model",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19",
+      "src-07-1"
+    ],
+    "explanation": "Enchanting operations unlock along an independently progressing profession skill track."
+  },
+  {
+    "id": "rel-itemisation-inventory",
+    "fromId": "itemisation",
+    "toId": "inventory",
+    "type": "shared-rule",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19"
+    ],
+    "explanation": "Item base, modifier capacity, quality, durability, and loot determine the items represented and stored in inventory."
+  },
+  {
+    "id": "rel-itemisation-character",
+    "fromId": "itemisation",
+    "toId": "character-model",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19",
+      "src-07-1",
+      "src-07-2"
+    ],
+    "explanation": "Item Creation skill/Luck/Perception affect modifier-count probability; Strength primarily contributes to Carrying Capacity."
   }
 ]

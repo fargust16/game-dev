@@ -4,7 +4,7 @@
   "name": "Progression",
   "title": "Рост без полоски опыта",
   "category": "character",
-  "summary": "Персонаж растёт не уровнем. Он идёт по Pathway, узнаёт требования ступени, собирает знание формулы и цену этого мира и принимает Bargain перехода. V1 держит три Pathway и только ступени 9, 8 и 7. Имена лора и полные списки документ откладывает.",
+  "summary": "Pathway stages are distinct from ordinary independently progressing attributes and skills. 07.1/07.2 govern character growth and derived statistics; Item Creation and Enchanting are individual skills whose item-system effects are described in 19. Pathway potion requirements and Bargains remain governed here.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
@@ -18,6 +18,14 @@
     {
       "text": "Внешние силы, церкви и проклятия — всегда Bargains с читаемой, часто отложенной и растущей ценой.",
       "sourceId": "src-99"
+    },
+    {
+      "text": "Attributes and individual skills use separate action-based tracks, not a global character level or Pathway stage.",
+      "sourceId": "src-07-1"
+    },
+    {
+      "text": "Enchanting skill unlocks six operations in sequence; exact skill thresholds remain open.",
+      "sourceId": "src-19"
     }
   ],
   "gaps": [
@@ -27,12 +35,14 @@
   ],
   "sourceIds": [
     "src-05",
-    "src-99"
+    "src-99",
+    "src-07-1",
+    "src-19"
   ],
   "designMaturity": "partially-specified",
   "decisionState": "unresolved",
   "documentStatus": "Draft",
-  "lastDocumentUpdate": "2026-08-05",
+  "lastDocumentUpdate": "2026-10-31",
   "proposed": false,
   "implementationMaturity": "unknown",
   "proseOrigin": "atlas-annotation",

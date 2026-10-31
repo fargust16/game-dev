@@ -1,0 +1,48 @@
+{
+  "id": "itemisation",
+  "order": 22,
+  "name": "Itemisation",
+  "title": "Bases, modifier groups, tiers, quality, and loot",
+  "category": "character",
+  "summary": "19 consolidates fixed base-specific weights; 0–6 modifiers; random major/minor assignment within 3+3; count-based quality; stage/tier direction; repairable zero-durability items; and monster/NPC loot boundaries.",
+  "scenarioNote": "Exact base and loot tables remain open.",
+  "points": [
+    {
+      "text": "Each base/stage has fixed modifier-type weights; character skills/stats cannot change them.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "Item Creation skill plus Luck and Perception set modifier-count probability; count determines quality band.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "Major/minor assignment is random within caps; reforge preserves total count and group distribution.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "Insertion requires a free slot in the extracted modifier's own group.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "Ordinary monsters yield ingredients only; NPC deaths leave a randomly selected recoverable half of current equipment.",
+      "sourceId": "src-19"
+    }
+  ],
+  "gaps": [
+    "Base tables, group probabilities, quality-band nuance, durability, loot edge cases, footprints, compatibility, and carry formula."
+  ],
+  "sourceIds": [
+    "src-19",
+    "src-07-2",
+    "src-08"
+  ],
+  "designMaturity": "partially-specified",
+  "decisionState": "unresolved",
+  "documentStatus": "Draft",
+  "proposed": false,
+  "implementationMaturity": "unknown",
+  "proseOrigin": "atlas-annotation",
+  "x": 780,
+  "y": 730,
+  "lastDocumentUpdate": "2026-10-31"
+}

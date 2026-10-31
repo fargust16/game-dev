@@ -2,20 +2,25 @@
   "id": "alchemy",
   "order": 19,
   "name": "Alchemy",
-  "title": "Пробел: документа алхимии нет",
+  "title": "Alchemy is not a confirmed item-crafting profession",
   "category": "proposed",
-  "summary": "Среди прочитанных дизайн-документов отдельной алхимии нет. Ближайший текст — три вопроса раздела Magic в 99: откуда мистическая сила, может ли она исчезнуть и может ли мир потерять магию. Эти вопросы не спецификация зелий.",
+  "summary": "No separate alchemy profession is confirmed in the current item-crafting scope. Item Creation and Enchanting are the two confirmed item-crafting professions. Existing Magic questions in 99 concern mystical power, not recipes; any distinct alchemy system needs its own approval.",
   "scenarioNote": "Сценария нет, потому что системы в источниках нет.",
   "points": [
     {
-      "text": "Вопросы Magic стоят в среднем приоритете 99 и не описывают рецепты, качество или риск приготовления.",
+      "text": "Only Item Creation and Enchanting are confirmed item-crafting professions.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "The Magic questions in 99 do not establish alchemy recipes or a profession.",
       "sourceId": "src-99"
     }
   ],
   "gaps": [
-    "Нет сущностей, правил, цены и примеров алхимии, потому что нет документа."
+    "No approved alchemy profession, recipes, quality rules, or risk model are documented; whether any separate system exists remains open."
   ],
   "sourceIds": [
+    "src-19",
     "src-99"
   ],
   "designMaturity": "idea-only",
@@ -24,5 +29,6 @@
   "implementationMaturity": "unknown",
   "proseOrigin": "atlas-annotation",
   "x": 1000,
-  "y": 730
+  "y": 730,
+  "lastDocumentUpdate": "2026-10-31"
 }

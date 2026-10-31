@@ -2,33 +2,48 @@
   "id": "inventory",
   "order": 17,
   "name": "Inventory",
-  "title": "Контейнеры, слоты и диегетическая добыча",
+  "title": "Grid inventory, equipment, durability, and item-life ownership",
   "category": "character",
-  "summary": "Отдельного документа предметов нет. Карточки P.1 и P.2 описывают контейнеры и слоты экипировки и повторяют запрет недиегетической добычи из Confront. Для среза объём назван минимальным, когда он понадобится.",
+  "summary": "Item rules are documented in 19. The current design has a variable-footprint grid, stackable materials/consumables, separate currency, equipment slots, and repairable zero-durability items. Exact dimensions and weights remain open.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
-      "text": "Состояние инвентаря сохраняется целиком и принадлежит персонажу.",
-      "sourceId": "src-17"
+      "text": "Materials/stackable consumables stack; ordinary equipment/accessories are individual; currency is outside the grid.",
+      "sourceId": "src-19"
     },
     {
-      "text": "07 забирает личный инвентарь вместе со смертью жизни: он не продолжается живым героем.",
+      "text": "The character has two universal hand slots and a shared necklace/amulet slot; full compatibility remains open.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "At zero durability an item remains, is broken/unusable, and can be repaired.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "Inventory belongs to the current Character Life; death and Legacy Cache boundaries remain in 07.",
       "sourceId": "src-07"
+    },
+    {
+      "text": "Strength is the primary source of Carrying Capacity; the formula remains open.",
+      "sourceId": "src-07-2"
     }
   ],
   "gaps": [
-    "Нет списка предметов, веса, слотов по типам и правил переноса в Legacy Cache."
+    "Final grid/stash dimensions, footprints, weight/capacity formula, requirements, and extracted-modifier persistence remain open."
   ],
   "sourceIds": [
-    "src-17",
+    "src-19",
+    "src-07",
+    "src-07-2",
     "src-08"
   ],
-  "designMaturity": "idea-only",
+  "designMaturity": "partially-specified",
   "decisionState": "unresolved",
   "documentStatus": "Draft",
   "proposed": false,
   "implementationMaturity": "unknown",
   "proseOrigin": "atlas-annotation",
   "x": 1000,
-  "y": 570
+  "y": 570,
+  "lastDocumentUpdate": "2026-10-31"
 }

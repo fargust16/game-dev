@@ -1,8 +1,8 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.5
+Version: 0.6
 Status: Draft
-Last Updated: 2026-10-30
+Last Updated: 2026-10-31
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [05 Progression](05%20Progression.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
@@ -84,34 +84,9 @@ Existing progression foundations must be audited and extended, not replaced by a
 - **Item acquisition and loss:** define loot, quest rewards, trade, theft, confiscation, death, and legacy.
 - **Durability and maintenance:** assess whether repair, wear, and degradation belong in V1 or should be deferred.
 
-### Owner's itemisation direction — items, crafting, enchantment, and inventory
+### Itemisation and Enchanting authority
 
-The item system takes selected structural inspiration from Path of Exile 2, but uses the project's own simplified rules. Do not import unrelated PoE mechanics by default.
-
-- **Item bases and stages:** each item is created from a defined base with foundational properties. A base has a stage (9 through 0); the player may craft any lower-stage base they can supply the corresponding materials for, even after reaching higher profession mastery. Higher-stage crafting uses more varied and harder-to-obtain ordinary resources and a rare ingredient of the corresponding stage.
-- **Item creation profession:** the former separate blacksmithing, leatherworking, and tailoring professions are consolidated into one general Item Creation profession. It creates all equipment categories: armour, weapons, rings, amulets/necklaces, and other accessories. Item categories/material families include cloth, leather, chain/chainmail, and plate/metal. The initial number of mechanical bases is intentionally kept small; the current conservative starting point is one base per major armour/material family, with additional bases and visual variants deferred until AI-assisted model generation feasibility is assessed.
-- **Enchanting profession:** a separate Enchanting profession handles modifier manipulation and related recipes. Item Creation does not reforge or directly manipulate existing modifiers.
-- **Modifier count:** an ordinary crafted item receives a random count from 0 to 6. Item Creation skill/mastery affects only the probability distribution of this count, smoothly shifting it toward more modifiers as mastery rises. It does not affect which modifier types or tiers are selected, or their numerical values. Quality follows from total count: Normal = 0; Magic = 1–2; Rare = 3; Epic = 4; Legendary = 5–6.
-- **Major and minor modifier groups:** every item can have at most three major and at most three minor modifiers. There is no separate pool, semantic distinction, or weighted preference between the two groups. Once total modifier count is rolled, the assignment of those modifiers to major versus minor is random, subject only to the three-per-group maximum. Six modifiers necessarily means three major and three minor. Four modifiers may be distributed in any valid combination; the same capacity constraint applies to every other count. The assignment is not affected by base, stage, skill, or other factors.
-- **Modifier selection and tiers:** after modifier count and major/minor assignment are determined, modifier identities and tiers are randomly selected using the probability table for the specific base and item stage. Each base has its own table at each stage. These tables determine which modifier types are more or less likely and the tier distribution; higher-stage items favour stronger tiers. There is no hard tier ceiling: even a stage-9 item can theoretically roll the strongest tier. Item Creation skill does not change the probability of any particular modifier type or tier.
-- **Modifier values:** each selected modifier's numerical value is rolled randomly within the permitted range for its selected tier. The value is independent of profession skill, base stage, and other character factors.
-- **Rare crafting ingredient and naming:** creating an item requires ordinary base resources plus one rare ingredient of the item's stage. The ordinary resources and rare ingredient can be gathered or purchased. Any rare ingredient of the required stage is valid; its identity affects only the item's generated name, not its base properties, modifier pool, weights, or generated stats. The rare ingredient is consumed.
-- **Enchanting operations:** Enchanting currently has four operations: full reforging, modifier locking, modifier extraction, and modifier insertion. There is no separate modifier deletion or replacement operation. Operations unlock progressively by Enchanting skill stage: full reforging first, locking later, and extraction/insertion at a still later stage, provisionally around stage 7 or 6. Exact unlock stages remain open. Each operation has a universal rule and its own ingredient requirements; ingredient lists are not unique to each modifier.
-- **Full reforging (owner-confirmed):** rerolls every modifier that is not locked, while preserving total modifier count and the existing number of major and minor modifiers. For example, an item with three major and two minor modifiers, one major locked, retains that 3+2 distribution: the locked major remains unchanged, while the other two major and both minor modifiers are regenerated. New modifier types use the target base/stage weights. Enchanting skill shifts the tier probability toward stronger tiers, without changing type weights. Values are random within the selected tier's range.
-- **Modifier locking:** a chosen modifier can be protected from full reforging. Locked modifiers cannot be extracted. The lock is permanent and irreversible under the current direction. Exact costs and whether successive locks become more expensive remain open.
-- **Modifier extraction:** exactly one chosen modifier can be extracted from an item; the source item is then destroyed. Extraction requires specified ingredients. The extracted modifier is retained as one non-copyable instance of its type and tier, not as a learned recipe. It keeps its tier but not its numerical value. A locked modifier cannot be extracted.
-- **Modifier insertion:** the extracted modifier can be inserted into another item using its own required ingredients. On insertion, a new numerical value is randomly rolled within the retained tier's range. The extracted instance is then consumed and disappears; it cannot be copied or inserted again. An inserted modifier becomes locked and cannot later be extracted.
-- **Insertion limits:** an extracted major modifier can only be inserted where fewer than three major modifiers are present; the same rule applies to minor modifiers. The maximum remains three major and three minor. Insertion cannot exceed six total modifiers. The extracted modifier retains its major/minor group.
-- **Item repair and durability:** durability decreases through use and damage (for example, armour wears from received hits and weapons from use). Durability does not gradually reduce item statistics. At zero durability, the item becomes unusable and grants none of its properties or bonuses. It is not permanently destroyed and can be repaired at any time by spending basic resources of the type used to create it. Exact repair quantities and durability loss rates remain open.
-- **Monster acquisition and harvesting:** monsters do not drop finished equipment. They provide ordinary resources and valuable ingredients, and may provide food/cooking ingredients such as meat. Each creature provides a basic set of ingredients by default. A separate learned monster-harvesting/butchering capability is required to obtain a fuller set of materials from a creature. The exact skill/profession classification and yields remain open.
-- **Chest acquisition:** chests may contain a broad random selection of contents, including equipment, notes, ingredients, materials, money, and other items. Chests have rarity tiers assigned as part of world placement/generation. Chests farther from the character's initial area and in more dangerous locations tend to have higher rarity and better loot. Exact rarity probabilities and loot tables remain open.
-- **NPC equipment and death:** NPC equipment is generated/assigned as part of the NPC's build, role, and individual characteristics. NPCs are more likely to carry items matching their own stage, but may have higher-stage items as exceptions. On NPC death, approximately half of their carried/equipped items remain recoverable; the rest are considered destroyed, taken by a deity, or otherwise unavailable. Exact rounding/selection rules remain open.
-- **Inventory stacking:** all materials and stackable consumables stack, including potions, keys, lockpicks, bandages, crafting ingredients, and similar consumables. Ordinary equipment and accessories never stack, even when their base and modifiers are identical. Currency is stored separately from the ordinary grid inventory.
-- **Inventory grid and storage:** the inventory uses a grid with variable item footprints, inspired by Path of Exile 2. The owner prefers a relatively generous carrying grid and a separate home stash/chest. Provisional footprint examples: one-handed weapons and one-handed staves occupy 3 cells; two-handed weapons and staves occupy 8; shoulder armour and trousers occupy 6; belts occupy 2; shields occupy 6. These are reference examples, not a complete final footprint table.
-- **Equipment hands and slots:** the character has two universal hand slots. One-handed weapons, shields, talismans, books, and other off-hand items can occupy either compatible hand; two-handed weapons occupy both. A bow or crossbow occupies one hand while its arrows/bolts occupy the other hand as ammunition. Staffs and other explicitly two-handed weapons occupy both hands. Armour/accessory slots include head, body, shoulders, gloves, belt, trousers, boots, two rings, and one necklace/amulet slot. Necklace and amulet are one slot, not two. Exact compatibility and the final equipment-slot catalogue remain open.
-- **Unique items:** unique items remain a separate, bespoke item category and will be designed independently.
-
-This is a recorded design direction, not yet a complete implementation specification. Exact base catalogues, item-stage tables, modifier-count probability curves, enchantment recipes/costs, durability rates, harvesting yields, chest loot tables, NPC recovery selection, inventory dimensions, and V1 scope remain open.
+The detailed item, Item Creation, inventory, equipment, durability, loot, and Enchanting rules are consolidated in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). That document records owner-approved rules and explicitly separates unresolved costs, tables, and thresholds. It replaces conflicting itemisation notes in this coverage draft. Use [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) as the current item-system specification.
 
 ## D. Combat and confrontation
 
@@ -166,7 +141,7 @@ Combat is a distinct arena-based mode under the current architecture; it must no
 - **Currency and value:** define currencies, item value, scarcity, and regional variation.
 - **Trade and merchants:** define stock, prices, access, negotiation, and merchant attitudes.
 - **World economy:** assess the minimum viable model for production, supply, demand, faction resources, and event-driven changes.
-- **Crafting and alchemy:** define recipes, tools, requirements, inputs, quality, discovery, and failure.
+- **Item Creation and Enchanting:** define bases, resources, modifiers, inventory, equipment, and operations in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md).
 - **Repair and storage:** define maintenance and persistent storage if included in scope.
 
 ## J. Supernatural powers and their price
@@ -220,35 +195,15 @@ The owner has approved the following working principles for this draft:
 - **Show progress without revealing the formulas.** The interface should make attribute changes and skill progression visible, while keeping exact growth calculations hidden. Players should be able to infer patterns from action and outcome rather than being told the optimal build.
 - These are draft design decisions, not implementation authorisation. Anti-abuse, diminishing returns, action-to-attribute mappings, and the exact feedback presentation remain open.
 
-## Initial questions for the next design steps
+## Initial questions and current status
 
-1. What is the conceptual difference between a general attribute and a skill in this game?
-2. Which candidate attributes are genuinely useful and distinct, rather than overlapping labels?
-3. Are all skills discovered by action, or can teachers, books, Pathways, or tools unlock them directly?
-4. What constitutes meaningful practice: repetitions, time, effort, challenge, risk, successful outcomes, or a combination?
-5. How should a skill's growth affect speed, yield, quality, rare finds, and failure?
-6. Which actions can train each general attribute, and when does their contribution diminish?
-7. How should health, endurance, injuries, rest, and recovery develop without rewarding abuse?
-8. What feedback should the interface provide immediately versus through gradual observation?
-9. How do potion-granted attribute changes and skills interact with ordinary action-based development and Pathway requirements?
-10. How do NPCs use the same underlying model while generating and updating their development behind the scenes?
+This section began as an attribute/skill question inventory. Most foundational rules now have a dedicated home in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) and [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md); item rules are in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). Do not treat the historical candidate list as current authority.
 
-## Provisional status
+Still-open items include the full skill catalogue and discovery rules, action-to-attribute/skill mappings, practice and anti-abuse curves, combat-check reconciliation, UI disclosure thresholds, and exact item-count/Enchanting probability curves. Track them in the relevant draft and [99 Open Questions](99%20Open%20Questions.md).
 
-- Owner's broad design direction: captured in this draft.
-- Owner-approved principles: both attributes and skills grow through practice; concrete individual skills are the default; changes are visible without exposing growth formulas.
-- Exact attributes and skill categories: open.
-- Growth and diminishing-return model: open.
-- Anti-abuse rules: requirement identified; mechanism open.
-- Feedback and UI: direction captured; presentation open.
-- Relationship with existing Pathway progression: requires explicit reconciliation.
-- Live interactive map hierarchy and its source data: not yet audited in this pass.
+# Completed design slice — attributes and action checks (2026-10-31)
 
----
-
-# Completed design slice — attributes and action checks (2026-10-30)
-
-The first review-order item has progressed from broad direction to a documented foundational draft. The owner-approved principles are recorded in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md). The base success-probability curve is intentionally still open and is the next design step. This update records design progress only; it does not authorise implementation or claim that the full Character system is complete.
+The character foundation is recorded in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) and [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). The base success-probability curve and shared Luck/Perception roles are owner-approved; remaining coefficients and system-specific conversions are open. Item rules are in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). This records design progress only and does not authorise implementation or claim that every Character system is complete.
 
 # Initial review order
 
@@ -273,21 +228,21 @@ The following are review states, not claims about the current map.
 |---|---|---|
 | Map hierarchy and direct relationships | Not audited | Inspect the live map and identify its data source |
 | Shared Character model for player and NPC | Proposed | Compare against existing actor/NPC/character definitions |
-| Attributes and checks | Shared foundational draft written; attributes, task-equivalent primary preparation, secondary bonuses, Luck model, and three outcomes have owner-approved principles | Define the base success-probability curve, then tune remaining open coefficients and reconcile combat-specific checks; see [07.1](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) |
+| Attributes and checks | Seven attributes, independent skills, approved probability curve, secondary bonuses, Luck, and three outcomes documented | Tune remaining coefficients and reconcile combat-specific checks; see [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) and [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) |
 | Skills and abilities | Candidate inventory captured; action-based growth direction captured | Define skill taxonomy after attributes/checks |
 | Pathways and advancement requirements | Existing foundation; integration open | Audit [05 Progression](05%20Progression.md) and dependent nodes |
-| Items, inventory, equipment | Candidate inventory captured | Audit map and existing architecture cards |
-| Combat | Existing constraints and turn economy; full rules open | Audit [08](08%20Confront%20Constraints.md), [10](10%20Turn%20Action%20Economy.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md), [16](16%20Architecture%20Pivot.md) |
+| Items, inventory, equipment | Owner-approved rules consolidated in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) | Close catalogues, probability curves, costs, capacities, and timing in §7 of that draft |
+| Combat | Existing constraints and turn economy; full rules open | Audit [08](08%20Confront%20Constraints.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2](10.2%20Combat%20System%20Draft.md), [16](16%20Architecture%20Pivot.md) |
 | NPCs and creatures | Partial architecture references | Audit actor/spawn/AI cards |
 | Quests, POIs, information | Existing foundations; integration open | Audit [03](03%20Decision%20Engine.md), [04](04%20Points%20of%20Interest.md), [09](09%20Information%20Sources.md) |
 | Factions and relationships | Existing world/faction foundations; depth open | Audit [02 World Laws](02%20World%20Laws.md) and [05 Progression](05%20Progression.md) |
-| Economy and crafting | Mentioned architecturally; mechanics open | Determine V1 minimum after core item/resource rules |
+| Economy and item crafting | Item Creation and Enchanting foundations documented | Resolve economy, resource availability, and V1 scope after core item rules |
 | World simulation and generation | Significant existing documentation | Preserve current authority and audit only missing gameplay interfaces |
 | Shared rules, save, UI, balance | Partial architectural coverage | Audit system cards and cross-system contracts |
 
 # Constraints and open design questions
 
-- Attribute names, ranges, formulas, and allocation rules are not decided by this draft.
+- Attribute names and ranges are set in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md); exact growth and action mappings remain open.
 - The exact relationship between attributes, skills, abilities, Pathway requirements, equipment bonuses, and temporary effects must be designed explicitly.
 - The game must not quietly acquire a generic kill-XP/level-up loop; any progression proposal must be checked against [05 Progression](05%20Progression.md) and the project pillars.
 - The NPC model must share the underlying Character foundation without requiring player-facing progression/UI for every NPC.
@@ -312,7 +267,7 @@ This is a preliminary relationship inventory for design discussion, not a comple
 - The listed attributes are candidates for influence, not confirmed formulas or a promise that each action always increases them.
 - No numerical values, coefficients, progression thresholds, caps, or exact check formulas are specified here.
 
-The current candidate attribute set is **Strength, Endurance, Dexterity, Perception, Intelligence, Will, and Luck**. These remain subject to review against the completed action inventory.
+The current seven attributes are **Strength, Endurance, Dexterity, Perception, Intelligence, Will, and Luck**, as documented in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md). The action inventory below remains provisional.
 
 ## 1. Movement and physical actions
 
@@ -337,21 +292,16 @@ The current candidate attribute set is **Strength, Endurance, Dexterity, Percept
 | Catch fish | Fishing | Dexterity, Perception, Intelligence (candidates) | One profession/skill for fishing activities. |
 | Find hidden stashes, chests, and concealed objects | Hidden Cache Search (working name) | Perception, Luck | Skill may improve the chance or strength of an in-world audio/visual cue when a cache is nearby. This is a candidate mechanic, not a confirmed UI design. |
 
-## 3. Crafting professions
+## 3. Item-crafting professions
 
-These are profession-like skills. Their exact recipes, tools, quality rules, and V1 scope will be designed separately.
+The only confirmed item-crafting professions are:
 
-| Action | Candidate skill | Candidate attribute influences | Notes |
-|---|---|---|---|
-| Make clothing and work with fabric | Tailoring | Dexterity, Intelligence | Confirmed as a profession candidate. |
-| Process hides and make leather goods | Leatherworking | Dexterity, Intelligence | Confirmed as a profession candidate. |
-| Forge weapons, tools, and metal goods | Blacksmithing | Strength, Dexterity, Endurance | Confirmed as a profession candidate. |
-| Make jewellery | Jewellery Making | Dexterity, Intelligence | Confirmed as a profession candidate. |
-| Cook food and meals | Cooking | Dexterity, Intelligence | Explicitly included by the owner. |
-| Brew potions and alchemical mixtures | Alchemy | Intelligence, Dexterity | Explicitly included by the owner. |
-| Enchant items | Enchanting | Intelligence; other influences TBD | Explicitly included by the owner. Exact relationship with Pathways and supernatural power remains open. |
-| Create talismans | Talisman Crafting (candidate) | Intelligence, Dexterity (candidates) | May overlap with Enchanting or Alchemy; do not create as a separate skill until its distinct gameplay role is established. |
-| Identify items, herbs, minerals, and artefacts | Identification / Appraisal (working name) | Intelligence, Perception | A profession-like skill. Greater skill should reduce the chance that an item remains unidentified and may reveal quality, rarity, properties, and description. Exact appraisal versus identification split is open. |
+| Profession | Confirmed scope | Character-factor relationship |
+|---|---|---|
+| Item Creation | Creates armour, weapons, rings, necklaces/amulets, and other accessories from item bases and resources | Item Creation skill primarily controls modifier-count probability; Luck and Perception add to that probability. Exact formula: [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
+| Enchanting | Adds random modifiers, reforges, locks, extracts/inserts, raises modifier tier, and changes modifier values as six progression steps unlock | Skill unlocks operations and affects tier outcomes; it cannot change a base's fixed modifier-type weights. |
+
+Separate tailoring, leatherworking, blacksmithing, jewellery-making, cooking, and alchemy are not current confirmed item-crafting professions. Do not reintroduce the retired craft-profession list. Other gameplay skills or consumable systems require their own approval and specification.
 
 ## 4. Social and dialogue actions
 
@@ -417,16 +367,15 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 
 - Keep action families broad and recognisable rather than creating a separate action/skill for every situation.
 - Keep Running, Jumping, Sneaking/Stealth, and (provisionally) Climbing as compact movement/action concepts.
-- Use profession-like skills for Woodcutting, Mining, Herbalism, creature resource harvesting, and Fishing.
-- Add Cooking, Alchemy, and Enchanting.
-- Keep Identification/Appraisal as a profession-like skill for learning item, artefact, herb, and mineral properties.
+- Confirm Item Creation and Enchanting as the two item-crafting professions; exact skill thresholds and effects are in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md).
+- Identification/Appraisal remains a skill candidate, not a confirmed item-crafting profession.
 - Keep Lockpicking as a candidate skill.
 - Add stealing as a gameplay action; whether its skill is Theft or Sleight of Hand remains open.
 - Do not add a generic Observation skill or separate Trap Detection/Trap Disarming skills at this stage.
 - Reading documents does not require a dedicated skill.
 - Hidden-cache discovery may use Perception and Luck, with a possible skill-based proximity cue.
 - Combat includes melee, ranged, and supernatural abilities; supernatural abilities need a separate design pass.
-- The current seven attributes remain candidates; no final attribute list or formulas are locked.
+- Seven attributes are owner-approved in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md); action mappings and exact formulas remain open.
 
 ### Still open
 
@@ -434,7 +383,7 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 - Whether Climbing is included in V1 and how it will be implemented.
 - Which attributes are trained by each action versus merely used to resolve it.
 - Whether combat weapon proficiency, Evasion, and Blocking are skills or are resolved through attributes, equipment, and combat actions.
-- Whether Talisman Crafting is a distinct profession or part of Enchanting/Alchemy.
+- Whether any separate consumable-making, alchemy, or talisman-crafting skill exists; it is not one of the two confirmed item-crafting professions.
 - How Identification reveals rarity, quality, description, and artefact/mineral properties.
 - How a Hidden Cache Search skill affects audio/visual cues and whether that cue fits the intended exploration experience.
 - Which candidate actions and professions are required for V1 versus deferred.
@@ -443,8 +392,8 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 ## Provisional status update
 
 - Action/skill/attribute relationship inventory: first owner-reviewed pass recorded; still provisional.
-- Candidate attribute list: seven working candidates; not final.
-- Profession list: Woodcutting, Mining, Herbalism, creature resource harvesting, Fishing, Tailoring, Leatherworking, Blacksmithing, Jewellery Making, Cooking, Alchemy, Enchanting, and Identification/Appraisal captured as candidates.
+- Seven attributes: owner-approved in [07.1](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md); action mappings remain provisional.
+- Item-crafting professions: Item Creation and Enchanting only; the former separate craft-profession candidate list is retired.
 - Exploration: generic observation removed; dedicated trap skills removed for now; lockpicking and theft retained as candidates.
 - Combat: melee, ranged, and supernatural ability tracks identified; full combat/ability design deferred.
 - Numeric formulas, exact growth rules, caps, anti-abuse mechanism, and V1 scope remain open.
