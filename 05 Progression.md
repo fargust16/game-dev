@@ -153,7 +153,7 @@ Generated character populations should nevertheless remain plausible and gradual
 
 - As Pathway stage advances (toward Stage 0), the typical attribute level should trend upward.
 - Distributions for adjacent stages may overlap. A character on a lower stage can be stronger in ordinary attributes or skills than an individual on the next higher stage.
-- The overlap should be controlled rather than extreme: the typical Stage 9 character should not have implausibly exceptional attributes compared with the typical Pathless or Stage 10-range character population. In particular, high attributes should not become common among ordinary NPCs merely because they possess Stage 9.
+- The overlap should be controlled rather than extreme: the typical Stage 9 character should not have implausibly exceptional attributes compared with the typical Pathless character or newly advanced Stage 9 character. In particular, high attributes should not become common among ordinary NPCs merely because they possess Stage 9.
 - Stage distribution and attribute/skill distribution are related but distinct generation decisions. World difficulty may shift how frequently higher stages and stronger characters are generated, but it must not change the canonical formulas or make all characters at a stage equally strong.
 
 A character's social role, influence, agenda, and likelihood of appearing in a local encounter are determined by world and actor systems, not by Pathway stage alone. Very high-stage figures should be rare and their presence in the world should follow their role and agenda rather than arbitrary local spawning.
