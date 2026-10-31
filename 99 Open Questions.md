@@ -84,7 +84,7 @@ No transition success roll: consuming the correct potion always grants the targe
 By total modifier count, not by a separate independent rarity roll: Normal = 0 modifiers; Magic = 1–2; Rare = 3; Epic = 4; Legendary = 5–6. Six is the maximum. Unique items are a separate bespoke category.
 
 **How does crafting skill affect item quality?**  
-When an ordinary item is crafted, its modifier count is randomly generated from 0 to 6, and quality follows directly from that count. The relevant profession's skill/mastery smoothly shifts the probability distribution toward higher modifier counts as mastery rises: zero-modifier Normal items are relatively common at low mastery, while five-/six-modifier Legendary items are initially very unlikely and become progressively more likely with greater mastery. Skill/mastery also shifts the probability distribution of generated modifier tiers toward stronger tiers (0 is strongest, 9 weakest), so higher skill improves both the chance of more modifiers and the chance of stronger modifiers. Neither modifier count nor tier is hard-gated by mastery; all outcomes remain theoretically possible at every mastery level, with probabilities changing smoothly. Modifier type is selected independently from a fixed, predefined probability distribution for the specific base item. Those type weights never change with profession skill/mastery, attributes, item level, buffs, or any other gameplay factor; no action can improve the relative chance of a chosen modifier type. The numerical value within the selected tier's permitted range is random and independent of profession skill/mastery and other generation factors. Exact probability curves remain open. Once created, the item's modifier count and quality are fixed.
+When an ordinary item is crafted, its modifier count is randomly generated from 0 to 6, and quality follows directly from that count. The relevant profession's skill/mastery affects only the probability distribution for modifier count, smoothly shifting it toward more modifiers as mastery rises. Once the count is rolled, each modifier is selected randomly using the table for the chosen base and its item stage. That table determines modifier-type weights and tier probabilities; higher-stage items favour stronger tiers, but even a stage-9 item can theoretically roll the strongest tier. Profession skill/mastery does not change the chance of any particular modifier type or tier. The numerical value within the selected tier's range is random and independent of skill/mastery and other character factors. Exact count curves and base/stage modifier tables remain open. Once created, the item's modifier count and quality are fixed.
 
 **How is NPC equipment handled?**  
 NPCs receive equipment as part of their generated/assigned build, role, and individual characteristics, not through a random loot roll on death. They may have any quality, may be incompletely equipped, and need not follow player crafting progression. Only some equipment may be recoverable after death; alternatively, the player may negotiate or demand an item in exchange for sparing the NPC. Exact recovery rules and non-NPC acquisition sources remain open.
@@ -355,7 +355,7 @@ The owner-approved direction is a compact base-item catalogue with compatible, p
 
 What are the exact definitions and hierarchy of Normal, Magic, Rare, Epic, Unique, and Legendary rarity labels? Which labels are generated from bases/modifiers, and which are reserved for separately authored unique items?
 
-What are the exact rules for primary and secondary modifier slots, compatibility, weighting, and generation constraints per base family?
+What are the exact rules for major/minor modifier slots, compatibility, and generation constraints? How many mechanical bases are included in V1, given the provisional plan to begin with one base family per armour-material profession and expand visual variety if AI-assisted model generation is practical?
 
 How many base families and visual variants are required for V1, and which armour slots and weapon families are included?
 
@@ -363,15 +363,15 @@ How are non-NPC item acquisition sources (for example, selected monsters and che
 
 What are the exact major/minor modifier pools, modifier tiers and value ranges, and base-specific appearance-weight tables? Which base families should strongly favour particular modifier themes, and how rare should off-archetype combinations be?
 
-How exactly does base-item level shift the probability distribution across modifier tiers without imposing a hard tier ceiling? Separately, what role, if any, do attribute requirements play in modifier generation?
+How exactly do item stage and base identity determine modifier-type weights and tier probabilities, including the no-hard-ceiling rule that allows even a stage-9 item to roll the strongest tier? Separately, what role, if any, do attribute requirements play in modifier generation?
 
 At which exact profession mastery thresholds do standard reforging and permanent modifier locking unlock, and how do those thresholds relate to the existing skill progression stages? What exact probability distribution maps each crafting-skill/mastery value to a randomly generated modifier count from 0 to 6, including how the distribution shifts toward five-/six-modifier outcomes as mastery rises?
 
-What are the exact probability tables and constraints used when standard reforging regenerates each unlocked modifier's type, level/tier, and numerical value? How are the fixed modifier-type probability tables authored for each base item, and what are the exact tier probability curves for profession mastery? What are the resource costs and time requirements for standard reforging and permanent modifier locking, and what is the growth curve for successive lock costs?
+What are the exact probability tables and constraints used when standard reforging regenerates each unlocked modifier's type, level/tier, and numerical value? How are the modifier-type and tier probability tables authored for each base item at each item stage? What exact modifier-count probability curve maps profession skill/mastery to outcomes from 0 to 6? What are the resource costs and time requirements for standard reforging and permanent modifier locking, and what is the growth curve for successive lock costs?
 
 How do item modifiers interact with crafting, enchantment, identification/appraisal, equipment requirements, durability, and Pathway abilities?
 
-How are stackable resources/consumables represented versus individually instantiated equipment and unique items?
+How are stackable resources/consumables represented versus individually instantiated equipment and unique items? What are the final inventory grid dimensions, stash capacity, and item footprint sizes?
 
 ## Character
 
