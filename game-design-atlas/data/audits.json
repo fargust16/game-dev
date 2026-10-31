@@ -551,23 +551,31 @@
     "criteria": {
       "purpose": {
         "state": "covered",
-        "evidence": "19 defines Item Creation and distinguishes it from Enchanting."
+        "evidence": "19 defines Item Creation and separates it from Enchanting."
       },
-      "responsibilities": {
-        "state": "covered",
-        "evidence": "Item Creation builds all equipment categories from bases/resources; Enchanting owns modifier manipulation."
+      "entities": {
+        "state": "partially-covered",
+        "evidence": "Item Creation, Enchanting, bases, resources, modifier groups, tiers, and item stages are identified; the base and modifier catalogues remain incomplete."
+      },
+      "rules": {
+        "state": "partially-covered",
+        "evidence": "19 specifies Item Creation stage gates and the modifier-count formula, but the full base/type/tier tables and group distribution remain open."
+      },
+      "costs": {
+        "state": "partially-covered",
+        "evidence": "Base resources and Enchanting ingredients are required; exact recipes, costs, stations, and operation times remain open."
+      },
+      "scenarios": {
+        "state": "partially-covered",
+        "evidence": "Item generation and the six Enchanting operation flows are documented; a complete player-facing crafting scenario is not yet specified."
       },
       "dependencies": {
         "state": "covered",
-        "evidence": "Item Creation count formula uses skill, Perception, and Luck; base type weights remain fixed. 07.1 defines shared Luck and attribute rules."
-      },
-      "scope": {
-        "state": "partially-covered",
-        "evidence": "Two item-crafting professions are confirmed; the Vertical Slice still defers deep crafting."
+        "evidence": "Item Creation depends on character skills/attributes, base tables, resources, inventory, and world time; Enchanting also depends on modifier state and progression."
       },
       "unresolved": {
         "state": "partially-covered",
-        "evidence": "Base catalogue/weights, tier tables, group distributions, resource recipes/costs, timings, and final balance remain open."
+        "evidence": "Base catalogue/weights, tier tables, group probabilities, recipes, costs, timing, and later balance tuning remain open."
       }
     }
   },
