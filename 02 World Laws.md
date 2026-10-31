@@ -1,10 +1,10 @@
 # 02 World Laws
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
-Last Updated: 2026-08-05
+Last Updated: 2026-10-31
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md)
@@ -176,20 +176,25 @@ Later characters in the same world begin Factionless and must earn membership th
 
 A member may later betray, defect, or realign. Allegiance change is real and costly: Influence, access, Symptoms, and available paths all change.
 
-## Difficulty Pressure
+## Difficulty Settings
 
-World Difficulty modifies non-player factions at world creation:
+The previous single World Difficulty scale (Easy / Normal / Hard / Hell) is superseded by **seven independent difficulty sliders**. The player can tune distinct aspects of the world separately; a single setting must not silently bundle unrelated effects.
 
-| Difficulty | Pressure |
-|------------|----------|
-| Easy | Pressure favours the first character's Starting Faction at world creation |
-| Normal | Slight pressure favours opposing factions |
-| Hard | Strong pressure favours opposing factions |
-| Hell | Severe pressure favours opposing factions |
+The agreed sliders are:
 
-Difficulty must create challenge through Influence, Operation frequency, follower strength, economic disadvantage, and Symptom harshness. It must not invent unknowable randomness or erase the value of Knowledge.
+1. **Combat Difficulty** — changes the generated power distribution of opponents and dangerous creatures. Higher settings make higher attributes and higher Pathway stages more common among generated threats. It does not multiply HP, damage, defence, or other canonical statistics, and does not introduce difficulty-specific character formulas.
+2. **World Inhabitants** — controls the quantity, density, diversity, prevalence, and activity of creatures and NPCs. This is independent of their power: a dense world can contain weak inhabitants, while a sparse world can contain dangerous ones.
+3. **Resource Gathering** — controls resource availability and the conditions, difficulty, and yield of gathering.
+4. **Crafting** — controls recipe requirements, including ingredient quantities and the possible inclusion or increased likelihood of rarer components at higher settings. It does not change crafting time. The allowable output-quality range is not changed by this slider.
+5. **Economy** — controls market conditions such as assortment, prices, stock, availability, and access to goods and services. Faction Influence remains the primary driver of local economic conditions.
+6. **Equipment Quality** — controls the prevalence and availability of equipment by quality and rarity; higher settings can make rare and high-quality items less common.
+7. **Wear and Maintenance** — controls equipment wear and the burden or availability of repair and maintenance.
 
-Exact numeric bonuses remain an implementation detail for a later tuning pass. The directional rule above is binding for design.
+These sliders affect world-generation conditions, distributions, availability, and costs. They do not create alternative versions of the underlying character, action-check, progression, or item-effectiveness formulas. Where a slider changes generated character strength, the same canonical attributes, skills, Pathway rules, and derived-stat formulas apply to player characters and non-player actors alike.
+
+Combat Difficulty and World Inhabitants are orthogonal: one controls the power profile of generated threats, the other controls how many inhabitants exist and how varied or active they are. Economy and Equipment Quality are also distinct: Economy governs market conditions and access; Equipment Quality governs the quality/rarity distribution of equipment entering the world and its markets.
+
+Exact slider ranges, presets, numerical distributions, and interactions remain open for later design and tuning. The old Easy / Normal / Hard / Hell faction-pressure direction is not retained as a bundled global difficulty model; faction pressure and Operation behaviour must be specified through their owning systems and any explicitly assigned settings.
 
 # Economy Hook
 
