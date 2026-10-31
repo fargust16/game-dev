@@ -59,7 +59,7 @@ A shared model for playable characters and NPCs, with role-specific rules for pl
 - **Derived statistics:** defined in [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md): resources (HP, Stamina, Will Power), combat values (Accuracy, Evasion, Physical/Magical Defence, Initiative, AP), movement, carrying load, and contextual Detection/Stealth. Detailed formulas remain open.
 - **Skills and checks:** define trained capabilities, check resolution, difficulty, modifiers, and how attributes affect success.
 - **Abilities:** define active/passive powers, prerequisites, costs, targeting, effects, duration, scaling, and counterplay.
-- **Character state and conditions:** define wounds, temporary effects, illness, impairment, buffs/debuffs, and their stacking and removal rules.
+- **Character state and conditions:** define wounds, temporary effects, illness, impairment, buffs/debuffs, and their stacking and removal rules. The shared Will / Will Power / Sanity model is defined in [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), including the transformation at Sanity 0.
 - **Character progression:** define all forms of growth without assuming a generic XP/level system.
 - **Character life and death:** connect the character's lifetime to death, successor creation, legacy, and world state.
 - **NPC profile and autonomy:** define how NPC characters are generated, equipped, assigned capabilities, and simulated behind the scenes.
