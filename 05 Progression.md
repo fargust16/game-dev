@@ -141,7 +141,7 @@ Each Pathway has deterministic, predefined requirements for each of its stages. 
 
 Advancement to the next stage grants a predefined baseline package associated with that stage. Depending on the Pathway and stage, this package may include increases to specified core attributes, skills, abilities, and/or mystical capabilities. The exact packages are not defined here.
 
-The attribute requirements are not caps on ordinary development. They are advancement criteria and preparation targets. A character who advances without being sufficiently prepared may still complete the transition, but risks losing some Sanity; being better prepared reduces that risk. The exact eligibility boundary, preparation margin, Sanity-loss calculation, and whether any conditions can prevent a transition remain open.
+The attribute requirements are not caps on ordinary development. They define the intended preparation profile for advancement. Falling short of that profile does not by itself prevent the character from advancing: the character can still complete the transition, but insufficient preparation increases the Sanity loss. Better preparation reduces that risk. The exact preparation margin and Sanity-loss calculation remain open.
 
 The Pathway's stage requirements and advancement benefits are deterministic within that Pathway's design; they are not randomly rolled per character or changed by the world-difficulty setting.
 
@@ -153,7 +153,7 @@ Generated character populations should nevertheless remain plausible and gradual
 
 - As Pathway stage advances (toward Stage 0), the typical attribute level should trend upward.
 - Distributions for adjacent stages may overlap. A character on a lower stage can be stronger in ordinary attributes or skills than an individual on the next higher stage.
-- The overlap should be controlled rather than extreme: the typical Stage 9 character should not have implausibly exceptional attributes compared with the typical Pathless character or newly advanced Stage 9 character. In particular, high attributes should not become common among ordinary NPCs merely because they possess Stage 9.
+- The overlap should be controlled rather than extreme: ordinary NPCs on Stage 9 should typically have modest, plausible attributes rather than exceptional values. High attributes may occur through individual development, but must remain uncommon among ordinary inhabitants; stage membership alone must not imply unusually high attributes.
 - Stage distribution and attribute/skill distribution are related but distinct generation decisions. World difficulty may shift how frequently higher stages and stronger characters are generated, but it must not change the canonical formulas or make all characters at a stage equally strong.
 
 A character's social role, influence, agenda, and likelihood of appearing in a local encounter are determined by world and actor systems, not by Pathway stage alone. Very high-stage figures should be rare and their presence in the world should follow their role and agenda rather than arbitrary local spawning.
