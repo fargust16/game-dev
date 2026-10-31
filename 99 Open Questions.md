@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.75
+Version: 0.76
 
 Status: Draft
 
-Last Updated: 2026-10-31 (Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-10-31 (three cooperating major factions and Stage 0 setting premise recorded; registration, secrecy, patron, and slice-mapping questions added. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -32,8 +32,13 @@ Through everyday Symptoms: trade, services, encounters, rumours, otherworldly pr
 **Starting faction?**  
 Only the first character in a new world begins with a Starting Faction. Later characters begin Factionless and must earn Faction Entry. Documented in [07 Character Life](07%20Character%20Life.md).
 
-**Difficulty direction?**  
-Easy favours the player's faction; Normal slightly favours opponents; Hard and Hell strongly favour opponents. Exact numbers remain open below.
+**Difficulty settings?**
+
+Seven independent sliders replace the old bundled Easy / Normal / Hard / Hell scale. No bundled faction-pressure direction remains; whether individual settings affect faction pressure is open. Documented in [02 World Laws](02%20World%20Laws.md).
+
+**What broad faction structure is established for this setting?**
+
+Three major, church-associated factions already exist around the setting's Stage 0 divine-level beings. They cooperate, have distinct internal-order, industry/research, and external-security roles, and form one positive side the player may support. Their origin and the belief/anchor/sanity mechanism are out of scope. The opposing side is a separate design slice. Role direction is recorded in [02 World Laws](02%20World%20Laws.md); authority, patron links, secrecy, and the content and consequences of their Main Goals remain open.
 
 ## Decision Engine
 
@@ -235,7 +240,17 @@ What determines the concrete winning / terminal condition of each faction?
 
 Can multiple factions unintentionally cooperate?
 
-What are the V1 numeric ranges for Difficulty Pressure?
+Which of the seven independent difficulty sliders, if any, affects faction starting Influence, operation frequency, or generated faction strength? The old bundled Easy / Normal / Hard / Hell faction-pressure rule is retired.
+
+How are the three cooperating factions connected to Stage 0 beings and churches; is that relationship one-to-one?
+
+What formal or informal arrangement coordinates their cooperation and defines their jurisdiction boundaries?
+
+How does universal practitioner registration coexist with the third faction's tolerance of lawful unregistered practitioners, especially outside its maritime/frontier sphere?
+
+Which supernatural-derived products or services reach ordinary people through the industry faction, and how is occult secrecy preserved?
+
+Do the three factions keep distinct, sometimes competing Main Goals, or share a common goal? What costs and conflicts keep this positively framed side from being a universal best answer?
 
 ## Decision Engine
 
@@ -337,6 +352,8 @@ What exact prop/language checklist best communicates early radio/steam novelty w
 
 How visible should crown/nobility pressure be inside Lower Veil without adding a third faction?
 
+How, if at all, do Wardens and Veinmarket from the current slice map onto the three cooperating major-faction roles? Keep them as separate placeholders until the owner decides.
+
 ## Items, Inventory, Equipment, Item Creation, and Enchanting
 
 The full open-question list is §7 of [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). Remaining item questions are:
@@ -377,7 +394,7 @@ Can the world lose magic?
 
 ## Factions
 
-How do factions emerge?
+For the three cooperating major factions, their existence around churches associated with Stage 0 beings is a setting premise; their origin, anchors, and faith/sanity mechanism are out of scope. The emergence of the opposing side and any other factions remains open.
 
 Can factions disappear naturally?
 

@@ -1,16 +1,16 @@
 # 02 World Laws
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft
 
-Last Updated: 2026-10-31
+Last Updated: 2026-10-31 (three cooperating major-faction roles and Stage 0 premise recorded; names, relationships, and opposing side remain open)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md)
 
 Referenced By:
-[03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [07 Character Life](07%20Character%20Life.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), Future world, faction, consequence, progression, and collapse-system design.
+[03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [07 Character Life](07%20Character%20Life.md), [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), [AGENTS.md](AGENTS.md), Future world, faction, consequence, progression, and collapse-system design.
 
 ---
 
@@ -55,6 +55,22 @@ The seed determines, at minimum:
 The seed must change details enough that memorised answers from a previous world do not solve the next one. Player Knowledge still transfers as methods of reading and intervening, not as a solved checklist.
 
 # Factions
+
+## Owner-approved setting direction: three cooperating major factions
+
+The world already has multiple people at Pathway Stage 0, regarded as divine-level beings. This is a setting premise, not a designed progression system: how they reached Stage 0, how belief or anchors preserve their sanity, and how their churches formed remain outside the current system scope.
+
+Three large, church-associated factions form one cooperative side that the player may support. They help one another while keeping distinct roles and areas of influence. These are not the world's only factions; the opposing side is a separate design slice. The labels below describe roles only, not final faction names.
+
+| Working role | Owner-approved direction |
+|---|---|
+| **Internal order and supernatural oversight** | A hierarchical, church-backed institution responsible for safety and order among practitioners. It requires everyone who gains a supernatural Pathway stage to register that stage and report to the institution to be recognized as an official practitioner. Its doctrine is that unregistered practitioners should not exist. Historically it resisted unauthorized entry into this sphere and could suppress or destroy unregistered practitioners; it has become more tolerant, while registration remains the expectation. Its forces patrol districts, cities, roads, and sometimes travel between cities or beyond them. |
+| **Artifice, industry, and research** | A largely independent institution focused on creating and modifying items and artifacts, mechanisms, field research, archaeology, and recovering old artifacts and secrets. It seeks practical uses for supernatural forces, artifacts, and ingredients that can improve ordinary life. It does not generally police practitioners, but may support the first faction when needed. |
+| **External and maritime security** | A publicly visible, hard-edged military-like institution focused on exploration, frontier and maritime security, sea routes, inter-island travel and supply, and small settlements outside established state control. It is comparatively tolerant of unregistered practitioners when they are not engaged in illegal activity. |
+
+The first two factions are concentrated near one another; the third is oriented toward oceans, routes, islands, and outlying settlements. Exact borders, jurisdiction, church-to-patron mapping, and the formal shape of their cooperation remain open. Their beneficial framing does not cancel the existing Balance and Price of Power principles: each still pursues goals that change the world and may create costs or conflicts.
+
+These role descriptions are original project placeholders. References to familiar religious structures or other fiction are comparative inspiration only; do not reuse distinctive names, symbols, doctrine, or lore from those sources.
 
 Each faction owns:
 
@@ -237,5 +253,5 @@ Detailed curse, blessing, and pathway systems belong to future Progression / Mag
 - **Design Pillars:** Compatible. Side Events are forks, not free loot; Difficulty raises challenge without erasing curiosity.
 - **Player Experience:** Compatible. Hidden Influence shifts reward understanding; Yield Threshold and eavesdropping support inventive Approaches.
 - **Decision Engine:** Compatible. Intervention and Side Events instantiate Attention, Approach, Allegiance, Commitment, and Bargain.
-- **Glossary:** Updated for Seed, Main Goal, Side Event, Starting Faction, Difficulty Pressure, Yield Threshold.
-- **Open Questions:** Resolved Influence/Balance driver, Engine selection basis, symptom direction, starting faction, difficulty direction; recovery and terminal win details remain open.
+- **Glossary:** Updated for Stage 0 Being and seven independent Difficulty Settings; faction role labels remain descriptive placeholders.
+- **Open Questions:** Updated for the three cooperating faction roles, registration, jurisdiction, secrecy, and patron relationships; collapse and faction outcome details remain open.

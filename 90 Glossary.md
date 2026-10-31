@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.55
+Version: 0.56
 
 Status: Draft
 
-Last Updated: 2026-10-31 (item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-10-31 (Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -202,9 +202,9 @@ Lightweight world remembrance of a previous character through rumours, dialogue 
 
 ---
 
-## Difficulty Pressure
+## Difficulty Settings
 
-World creation rule that adjusts non-player faction advantage by difficulty: Easy favours the player's Starting Faction; Normal slightly favours opponents; Hard and Hell strongly favour opponents.
+Seven independent world-generation sliders for combat difficulty, inhabitants, resource gathering, crafting, economy, equipment quality, and wear/maintenance. They do not form one bundled Easy / Normal / Hard / Hell scale; faction-pressure interactions remain with their owning systems.
 
 ---
 
@@ -687,6 +687,10 @@ A staged character-growth track distinct by way of acting. V1 has three Pathways
 ## Stage
 
 A numbered depth on a Pathway. Lower numbers are deeper advancements with sharper prices. V1 uses 9, 8, and 7 only.
+
+## Stage 0 Being
+
+A person who has reached Pathway Stage 0 and is regarded as divine-level in the setting. Existing Stage 0 beings are a setting premise; Stage 0 progression, anchors, and the belief/sanity mechanism are out of scope. See [02 World Laws](02%20World%20Laws.md).
 
 ---
 
