@@ -289,7 +289,7 @@ The current candidate attribute set is **Strength, Endurance, Dexterity, Percept
 
 | Action | Candidate skill | Candidate attribute influences | Notes |
 |---|---|---|---|
-| Run | Running | Endurance, Dexterity | Running practice may develop Running and relevant attributes. Carrying a full inventory can make running more tiring or restricted. |
+| Accelerated run / sprint | Running | Endurance, Dexterity | Accelerated running consumes Stamina; ordinary walking and ordinary running do not. Carrying a high or overloaded load increases exertion cost. |
 | Jump | Jumping | Strength, Dexterity | Skill may improve jump capability within reasonable physical limits; do not create separate skills for different obstacles. |
 | Climb | Climbing | Strength, Endurance, Dexterity | Include as a candidate pending scope/implementation assessment. One skill covers climbable walls, fences, rocks, and similar surfaces. |
 | Sneak | Stealth | Dexterity, Perception | Skill progression should reflect meaningful stealth practice, especially where detection is possible, not simply toggling a stance in a safe empty area. |
