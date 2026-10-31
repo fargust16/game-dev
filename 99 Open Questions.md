@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.74
+Version: 0.75
 
 Status: Draft
 
-Last Updated: 2026-10-31 (Item Creation/Enchanting progression, slot limits, durability at zero, and loot distinctions documented. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-10-31 (Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -80,19 +80,21 @@ No transition success roll: consuming the correct potion always grants the targe
 
 ## Items, Inventory, Equipment, Item Creation, and Enchanting
 
-The current item-system rules are consolidated in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). Owner-approved direction recorded there includes:
+The current rules and resolved decisions are consolidated in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md).
 
-- Item Creation and Enchanting are the only confirmed item-crafting professions. Item Creation creates all equipment families; material families do not have separate crafting professions.
-- An ordinary item has 0–6 modifiers, with no more than three major and three minor. Major/minor assignment is random within those limits; six modifiers must be 3+3. Full reforge preserves total count and group distribution.
-- Quality is derived from modifier count: Normal 0; Magic 1–2; Rare 3; Epic 4; Legendary 5–6. Unique items are bespoke. Enchanting can add a random modifier if the item has capacity, and quality is recalculated from the new count.
-- Item Creation skill primarily determines modifier-count probability; Luck and Perception add to that probability. Base-specific modifier-type weights are fixed and cannot be influenced by character stats or skills.
-- Base and stage determine the applicable type/tier tables. Enchanting skill affects tier outcomes, not base-specific type weights. Strongest tier remains possible without a hard item-stage cap.
-- Enchanting unlocks six operations in order: random modifier addition; full reforge; permanent locking; extraction/insertion; raising one modifier's tier; changing numerical values of unlocked modifiers. No separate delete or replace operation exists.
-- Extraction removes exactly one unlocked modifier and destroys the source item. The extracted instance preserves identity, tier, and group but not numeric value; it is single-use. Insertion requires a free slot of that same group, rolls a new value, consumes the instance, and locks the inserted modifier.
-- At zero durability, an item remains present, becomes broken/unusable, and can be repaired.
-- Ordinary monsters yield ingredients only. NPC death leaves a random half of current equipment recoverable. Transformed NPC-monster existence and item drops remain undecided.
+- Item Creation and Enchanting are the only confirmed item-crafting professions. Luck and Perception are attributes, not professions.
+- Item Creation skill levels 1, 11, 21, …, 91 unlock item stages 9, 8, …, 0. Its delegated starting formula generates 0–6 modifiers; Perception adds up to 10% relative chance and Luck applies the shared universal multiplier. Fixed base type weights are unaffected.
+- Each base gives favored modifier types higher weights and other types lower weights. Higher item stages increase the weight of stronger modifier tiers without a hard tier ceiling. Exact tables/ranges and duplicate constraints remain open.
+- Major/minor limits remain 3+3. Group assignment is random; the exact valid-split distribution and random-add group choice remain open.
+- Quality is count-based: Normal 0; Magic 1–2; Rare 3; Epic 4; Legendary 5–6; Unique is separate. The category changes only when a count crosses a band; colour directions are specified in 19.
+- Enchanting unlocks six steps in order: random addition; full reforge; locking; extraction/insertion; raising one tier; changing values of all unlocked modifiers while preserving identity and tier. Numeric skill thresholds and operation costs remain open.
+- Insertion accepts any base only when it has a free slot in the modifier's own group. A broken item cannot be enchanted, but an unlocked modifier may be extracted from it; extraction destroys the source.
+- The bag inventory has unlimited item entries and no grid footprints; weight is the only carrying limit, with a Strength-based capacity and zero-weight gold.
+- Durability applies to hand equipment, the worn armour set, and gathering tools; jewellery and belts have none. Repair uses some ordinary creation ingredients and no rare ingredient.
+- Ordinary monsters drop ingredients only. NPC equipped items are checked independently at a 35% base chance, modified by the current looter's Luck; Perception does not affect recovery. Transformed-NPC drops remain undecided.
+- Death does not automatically transfer the former character's carried/equipped inventory or extracted modifier instances. A former character found as a world actor and defeated uses the same NPC equipment-recovery rule; Legacy Cache eligibility remains open.
 
-See [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) for the full operation boundaries, inventory/equipment model, and unresolved design questions.
+See [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) for the full specification and the remaining system questions.
 
 ## Character Attributes, Skills, and Action Checks
 
@@ -109,7 +111,7 @@ They have equal importance. Effective primary preparation is their arithmetic me
 Only positively. All applicable secondary attributes have equal weight; together they can add at most 10% of base success probability, applied relatively, not as percentage points. Low secondary values never reduce the baseline chance.
 
 **How does Luck affect probability?**  
-Luck is separate from the secondary-attribute bonus. It modifies existing probabilities relatively, not by adding fixed percentage points. It may separately affect overall success and conditional critical chance. Exact scaling remains open.
+Luck is separate from the secondary-attribute bonus and uses the shared relative formula `P_after = min(0.99, P_before × (1 + Luck / 100))` for declared probability checks. Luck may modify overall success and conditional critical chance separately, and does not rewrite fixed weighted content tables. See [07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md).
 
 **What are the three action outcomes?**  
 Failure, normal success, and critical success are mutually exclusive and sum to 100%. Critical chance is conditional on success, not a separate independent roll. Gathering animation cycles are individual attempts.
@@ -127,7 +129,7 @@ Will is the ordinary 1–100 attribute; Will Power is a separate visible spendab
 Sanity is a separate 0–100 mental-integrity measure, distinct from Will and Will Power. Its bands are 100 Stable, 70–99 Mild disturbance, 40–69 Significant disturbance, 10–39 Severe disturbance, 1–9 Critical, and 0 Loss of sanity. Shared Will mitigation is \(D_{sanity}=D_{base}\times100/(100+Will)\). Full-exhaustion damage is \(D_0\times S\times100/(100+Will)\). Ordinary Will Power recovery and sleep do not restore Sanity. At zero, the character permanently loses human personality and becomes a game-controlled creature in the world; this is distinct from death. See [07.2](07.2%20Derived%20Character%20Statistics.md). Exact band symptoms/penalties, D₀, source-specific mitigation, and recovery methods/rates remain open.
 
 **How is carrying load handled?**
-Strength determines Carrying Capacity. Four graduated bands are agreed: Normal, High, Overloaded, and Critical Overload. Thresholds and consequences remain open.
+Comfortable Carrying Capacity is `20 kg + Strength`; load bands are Normal ≤100%, High >100–125%, Overloaded >125–150%, and Critical Overload >150–200%. Pickup above 200% is blocked. Exact exertion multipliers and additional movement/check/combat penalties remain open. See [07.2](07.2%20Derived%20Character%20Statistics.md).
 
 **How is defence represented?**
 Two derived defence values are agreed: Physical Defence and Magical Defence. Special mechanics such as blocking, parrying, barriers, absorption, or reflection may come from specific equipment and abilities rather than universal extra stats.
@@ -295,7 +297,7 @@ How do effects damage or suppress Will: temporary effective-attribute reduction,
 
 What are the exact Movement Speed formula and separate world/arena units?
 
-What are the Carrying Capacity formula, thresholds for Normal / High / Overloaded / Critical Overload, and consequences of each band? Load increases Stamina expenditure during exertion, substantially so in Overloaded and Critical Overload states; exact thresholds and multipliers remain open.
+Which additional movement, check, or combat penalties (if any) should apply in High / Overloaded / Critical Overload states? The starting capacity formula, 100/125/150/200% thresholds, and pickup hard limit are specified in [07.2](07.2%20Derived%20Character%20Statistics.md); exertion-cost multipliers remain open.
 
 What are the Accuracy and Evasion formulas and their reconciliation with the shared action-check model?
 
@@ -337,26 +339,25 @@ How visible should crown/nobility pressure be inside Lower Veil without adding a
 
 ## Items, Inventory, Equipment, Item Creation, and Enchanting
 
-The full open-question list is §7 of [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). The highest-priority unresolved items are:
+The full open-question list is §7 of [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). Remaining item questions are:
 
-- Item Creation skill thresholds for base stages and the modifier-count curve; exact Luck/Perception contributions.
-- Major/minor assignment probabilities and how random Enchanting addition selects a legal group.
-- Base/stage modifier-type weights, tier curves, numeric ranges, duplicate restrictions, and base compatibility for extracted modifiers.
-- Enchanting rank thresholds for all six steps; costs, ingredient lists, stations, and operation times.
-- Tier-raising step size/lock eligibility; value-change target scope and whether the tier is retained.
-- Whether every successful addition must increase the displayed rarity label. The existing count mapping has multiple counts in the same label band.
-- Which items use durability, wear rates, repair method/material/cost/time; whether broken items can be enchanted or extracted from.
-- NPC half-equipment rounding, other carried items, and whether transformed NPC-monsters exist and may drop items.
-- Final item base catalogue, inventory grid/stash, footprints, equipment compatibility/requirements, and carrying-capacity formula.
-- Fate of an extracted modifier instance across storage, death, and Character Life changes; item sources beyond the rules already stated.
+- Confirm whether base-favored modifier types are independent of major/minor group (this draft treats them independently); finish the base catalogue, favored-type weights, stage/tier tables, numeric ranges, and duplicate constraints.
+- Major/minor valid-split probabilities and random Enchanting addition's choice among groups with free slots.
+- Enchanting skill levels that unlock Steps 2–6; operation costs, ingredients, stations/requirements, and world-time durations.
+- Whether tier raising advances one tier and whether a locked modifier can be targeted.
+- Exact durability wear rates and repair method, station, ordinary-ingredient fraction, and duration.
+- Home-stash capacity/storage policy; full item weights by base, material, tool, and consumable; final equipment slot compatibility and requirements.
+- Which items may be placed in or inherited from a Legacy Cache, including extracted modifier instances.
+- Whether transformed NPCs exist as monsters and their item drops; rules for non-equipment carried goods and other non-combat item acquisition.
+- Exact colour values, icons, and accessible UI presentation for the agreed quality colours.
 
-The Vertical Slice continues to defer deep crafting.
+The item-count formula, Item Creation stage gates, starting carrying capacity/weight model, NPC recovery formula, count-to-quality bands, insertion rule, value-change scope, durability categories, and repair ingredient class are defined in [19]. The Vertical Slice continues to defer deep crafting.
 
 ## Character
 
 What exact V1 length is the Death Gap in days?
 
-How large may a Legacy Cache be before it undermines death?
+How large may a Legacy Cache be before it undermines death, and which items (including extracted modifier instances) may be stored and reliably inherited?
 
 What is the minimal Faction Entry pattern reusable by all V1 factions?
 

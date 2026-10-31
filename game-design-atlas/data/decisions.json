@@ -380,8 +380,8 @@
   },
   {
     "id": "d-item-professions",
-    "statement": "Item Creation and Enchanting are the only confirmed item-crafting professions; separate crafting professions for material families are retired.",
-    "rationale": "The owner consolidated equipment making into one general profession and kept Enchanting separate.",
+    "statement": "Item Creation and Enchanting are the only confirmed item-crafting professions; Luck and Perception are attributes, not professions. Separate profession tracks for equipment material families are retired.",
+    "rationale": "One general Item Creation profession creates all equipment families; Enchanting manipulates modifiers. Luck and Perception affect modifier count but do not create item types or change base weights.",
     "alternatives": "",
     "systemIds": [
       "crafting",
@@ -392,12 +392,12 @@
     "sourceIds": [
       "src-19"
     ],
-    "dateNote": "Owner confirmed 2026-10-31; exact skill thresholds remain open."
+    "dateNote": "Owner-confirmed 2026-10-31."
   },
   {
     "id": "d-item-mod-count",
-    "statement": "Item Creation skill primarily controls modifier-count probability; Luck and Perception add to it. These factors do not change fixed base-specific modifier-type weights.",
-    "rationale": "Character factors affect how many modifiers an item receives; each base retains its own immutable type weights.",
+    "statement": "For each of six potential modifier slots, p = min(0.99, (0.10 + 0.60×((ItemCreation−1)/99)) × (1 + 0.10×((Perception−1)/99)) × (1 + Luck/100)); total count is Binomial(6,p). Character factors do not change fixed modifier-type weights.",
+    "rationale": "Starting balance formula selected under the owner's delegation: Item Creation is the main influence, Perception adds up to 10% relatively, and Luck uses the shared universal probability multiplier.",
     "alternatives": "",
     "systemIds": [
       "itemisation",
@@ -410,7 +410,7 @@
       "src-19",
       "src-07-1"
     ],
-    "dateNote": "Owner confirmed 2026-10-31; the probability formula remains open."
+    "dateNote": "Owner delegated formula and threshold selection 2026-10-31; initial values are subject to later balance testing."
   },
   {
     "id": "d-item-groups",
@@ -430,8 +430,8 @@
   },
   {
     "id": "d-enchant-progression",
-    "statement": "Enchanting unlocks six cumulative steps: random modifier addition, full reforge, locking, extraction/insertion, tier raising, and numeric-value change.",
-    "rationale": "The current operation ladder is explicit while numeric skill thresholds and operation costs remain unresolved.",
+    "statement": "Learning Enchanting grants Step 1; later skill thresholds unlock six cumulative operations in order: random modifier addition, full reforge, locking, extraction/insertion, tier raising, and numeric-value change.",
+    "rationale": "The owner specified the operation ladder and delegated the initial Item Creation thresholds; numeric Enchanting unlock levels and costs remain open.",
     "alternatives": "",
     "systemIds": [
       "enchanting",
@@ -443,12 +443,12 @@
       "src-19",
       "src-05"
     ],
-    "dateNote": "Owner confirmed 2026-10-31; exact skill levels remain open."
+    "dateNote": "Owner-confirmed ladder 2026-10-31; exact skill levels remain open."
   },
   {
     "id": "d-enchant-transfer",
-    "statement": "Extraction destroys its source item and creates one non-copyable modifier instance; one insertion consumes it, preserves identity/tier/group, rerolls numeric value, and locks it.",
-    "rationale": "The modifier is transferred once as a physical instance rather than learned or copied.",
+    "statement": "Extraction destroys its source item and creates one non-copyable modifier instance; one insertion consumes it, preserves identity/tier/group, rerolls numeric value, locks it, and can target any base only if a free slot exists in that modifier's own group. Extraction is allowed from a broken item.",
+    "rationale": "The modifier is transferred once as a physical instance; insertion is governed by group capacity rather than base compatibility.",
     "alternatives": "",
     "systemIds": [
       "enchanting",
@@ -459,12 +459,12 @@
     "sourceIds": [
       "src-19"
     ],
-    "dateNote": "Owner confirmed 2026-10-31; exact ingredients and base compatibility remain open."
+    "dateNote": "Owner-confirmed 2026-10-31; exact ingredients/time remain open."
   },
   {
     "id": "d-item-zero-durability",
-    "statement": "At zero durability an item remains present, becomes broken and unusable, and can be repaired.",
-    "rationale": "Zero durability changes usability rather than deleting the item.",
+    "statement": "At zero durability an item remains present and becomes broken/unusable. Durability applies to hand equipment, worn armour, and resource-gathering tools; jewellery/belts have none. Repair uses some ordinary creation ingredients and no rare ingredient. Broken items cannot be enchanted except for extraction.",
+    "rationale": "Zero durability changes usability rather than deleting the item; repair does not require rare ingredients; extraction is the sole Enchanting exception for broken items.",
     "alternatives": "",
     "systemIds": [
       "itemisation",
@@ -476,12 +476,12 @@
       "src-19",
       "src-10"
     ],
-    "dateNote": "Owner confirmed 2026-10-31; repair costs and categories remain open."
+    "dateNote": "Owner-confirmed 2026-10-31; wear and repair parameters remain open."
   },
   {
     "id": "d-item-loot",
-    "statement": "Ordinary monsters drop ingredients only; an NPC death leaves a random half of the NPC's current equipment recoverable. Transformed NPC-monster item drops remain undecided.",
-    "rationale": "Loot remains diegetic while separating ordinary monster harvesting from NPC equipment recovery.",
+    "statement": "Ordinary monsters drop ingredients only. Each NPC equipped item is independently recoverable at p=min(0.99,0.35×(1+current looter Luck/100)); Perception does not affect the roll. A former player character encountered as a world actor uses the same rule when defeated.",
+    "rationale": "The 35% base chance and independent item rolls implement the owner's request for a variable NPC recovery amount affected by Luck only; no fixed half or rounding is used.",
     "alternatives": "",
     "systemIds": [
       "itemisation",
@@ -494,6 +494,105 @@
       "src-19",
       "src-08"
     ],
-    "dateNote": "Owner confirmed 2026-10-31; odd-count rounding and transformed-NPC rules remain open."
+    "dateNote": "Owner-confirmed loot direction and delegated starting formula 2026-10-31; transformed-NPC-monster drops remain open."
+  },
+  {
+    "id": "d-item-stage-gates",
+    "statement": "Item Creation skill levels 1, 11, 21, …, 91 unlock item stages 9, 8, 7, …, 0; an item may always be crafted at a lower stage if its materials are supplied.",
+    "rationale": "Delegated starting thresholds provide ten skill bands aligned with the ten item stages.",
+    "alternatives": "",
+    "systemIds": [
+      "crafting",
+      "itemisation"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19"
+    ],
+    "dateNote": "Selected under owner's delegation 2026-10-31; initial balance may be tuned."
+  },
+  {
+    "id": "d-item-quality-colors",
+    "statement": "Quality is Normal 0 (grey/desaturated), Magic 1–2 (green), Rare 3 (cyan/light blue), Epic 4 (purple), Legendary 5–6 (yellow-orange); Unique is separate and red. The label changes only when modifier count crosses a category boundary.",
+    "rationale": "Count bands and color directions are owner-confirmed; exact colour values and UI treatment remain open.",
+    "alternatives": "",
+    "systemIds": [
+      "itemisation",
+      "inventory"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19"
+    ],
+    "dateNote": "Owner-confirmed 2026-10-31."
+  },
+  {
+    "id": "d-item-weight-inventory",
+    "statement": "Personal inventory is an unlimited bag with equal-size item entries and no grid/footprint limit; weight is the only carrying limit, and gold weighs zero. Comfortable capacity is 20 kg + Strength, with a hard carry limit at 200% of capacity.",
+    "rationale": "The owner selected a bag-style interface and delegated starting weights/capacity thresholds.",
+    "alternatives": "",
+    "systemIds": [
+      "inventory",
+      "character-model"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19",
+      "src-07-2"
+    ],
+    "dateNote": "Owner direction and delegated starting balance 2026-10-31."
+  },
+  {
+    "id": "d-item-mod-weight-tiers",
+    "statement": "Every base gives favored modifier types higher fixed weights and all other types lower, nonzero weights; higher item stages increase the weight of stronger tiers without a hard tier ceiling. Character factors do not change the type weights.",
+    "rationale": "Base tables express preference as probability, while item stage shifts tier probability; no generation-weight preference is a compatibility restriction.",
+    "alternatives": "",
+    "systemIds": [
+      "itemisation",
+      "crafting",
+      "enchanting"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19"
+    ],
+    "dateNote": "Owner-confirmed direction 2026-10-31; exact tables remain open."
+  },
+  {
+    "id": "d-item-value-change",
+    "statement": "The numeric-value operation rerolls the values of all unlocked modifiers, preserving modifier identity, group, and tier; locked modifiers are unchanged.",
+    "rationale": "This operation changes values only and does not change the modifier set or tier.",
+    "alternatives": "",
+    "systemIds": [
+      "enchanting"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19"
+    ],
+    "dateNote": "Owner-confirmed 2026-10-31."
+  },
+  {
+    "id": "d-player-item-death",
+    "statement": "A new Character Life does not automatically inherit the prior character's carried/equipped inventory or extracted modifier instances. If the former character exists as a world actor and is defeated, its current equipment uses the ordinary per-item NPC recovery rule; Legacy Cache contents are separate.",
+    "rationale": "Death does not transfer the prior character's carried inventory. Intentional Legacy Cache eligibility remains a distinct unresolved boundary.",
+    "alternatives": "",
+    "systemIds": [
+      "character-life",
+      "inventory",
+      "enchanting"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-19",
+      "src-07"
+    ],
+    "dateNote": "Owner-confirmed 2026-10-31; Legacy Cache eligible contents remain open."
   }
 ]

@@ -51,7 +51,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [06 Approaches](06%20Approaches.md) | Draft | Confront, Convince, Threaten, Exchange, Veil, Withdraw |
 | [07 Character Life](07%20Character%20Life.md) | Draft | Death Gap, Factionless successors, Legacy Cache, Soft Memory |
 | [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) | Draft | Seven attributes, skill growth, item-count factors, and shared action checks |
-| [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) | Draft | Derived resources, combat values, movement, carrying load, and contextual capabilities |
+| [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) | Draft | Derived resources, combat values, movement, and Strength-based carrying limits |
 | [08 Confront Constraints](08%20Confront%20Constraints.md) | Draft | Hard fence around combat so it cannot become the whole game |
 | [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
 | [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Draft | Combat Arena grid + vault/climb/window verbs |
@@ -63,7 +63,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) | Draft | Systems map, dependency DAG, micro-iteration backlog |
 | [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md) | Draft | RPG coverage map and linked character-system drafts |
 | [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md) | Draft | Shared world-time rules for crafting and simulation |
-| [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) | Draft | Item creation, modifier rules, inventory, durability, loot, and six Enchanting steps |
+| [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) | Draft | Modifier generation, weight-only inventory, durability, loot, and six Enchanting steps |
 | [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) | Draft | Post-pivot world-gen order; Piece-Based Assembly |
 | [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) | Draft | Buildings/interiors via Piece-Based Assembly (small → large) |
 
@@ -178,8 +178,8 @@ Draft foundations in active refinement:
 - [05 Progression](05%20Progression.md) — 3 Pathways, stages 9→7, churches/entities as Bargains
 - [06 Approaches](06%20Approaches.md) — six methods of acting; combat is not the default best
 - [07 Character Life](07%20Character%20Life.md) — death gap, factionless later lives, legacy cache
-- [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) — seven attributes, independent skill growth, modifier-count factors, and shared checks
-- [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) — derived resources, carrying capacity, and combat values
+- [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) — seven attributes, independent skill growth, Item Creation factors, and shared checks
+- [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) — derived resources, carrying limits, and combat values
 - [08 Confront Constraints](08%20Confront%20Constraints.md) — combat fence: no XP, diegetic loot, real alternatives
 - [09 Information Sources](09%20Information%20Sources.md) — how the player learns without omniscient markers
 - [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) — grid-native world + env verbs
@@ -190,7 +190,7 @@ Draft foundations in active refinement:
 - [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — systems map, dependency DAG, micro-iteration backlog
 - [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md) — RPG coverage checklist; character foundation and item-system authority are cross-linked
 - [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md) — shared tick and operation-time model
-- [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) — item bases, professions, modifiers, inventory, loot, and Enchanting progression
+- [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) — item bases, modifier rolls, weight-only inventory, loot, and Enchanting progression
 - [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) / [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) — world/settlement/building generation via **Piece-Based Assembly**: small hand-authored pieces snapped small → large (Valheim-style), not the retired [13 City Generation](13%20City%20Generation.md) prototype
 
 Not yet designing as content:

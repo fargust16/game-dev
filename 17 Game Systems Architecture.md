@@ -1,6 +1,6 @@
 # 17 Game Systems Architecture
 
-Version: 1.0
+Version: 1.1
 
 Status: Draft
 
@@ -650,7 +650,7 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 | **Dependencies** | Inventory/equipment, item-related character skills, world time; Economy is optional. |
 | **Public interfaces** | No implementation interface is approved by this design update. The current draft's `ICraftingService` remains a provisional architecture proposal. |
 | **Data flow** | Selected base + required materials → item with generated modifier count, group, types, tiers, and values. Enchanting resources → one unlocked modifier operation. |
-| **Save/load** | Preserve item base/stage, modifiers and lock states, durability, and any single-use extracted modifier instance while it exists in a character's inventory; death/legacy fate remains governed by item and Character Life rules. |
+| **Save/load** | Preserve item base/stage, modifiers and lock states, durability, and single-use extracted instances. A successor does not automatically inherit carried/equipped items; intentional Legacy Cache contents are a separate rule, with eligible contents still open. |
 | **Multiplayer** | Host-authoritative direction remains a provisional architecture assumption. |
 | **Performance** | Data/UI-bound; final content size is open. |
 | **Extensibility** | Additional bases, modifier tables, and operation costs are data-driven design needs; no content catalogue is approved here. |
@@ -665,7 +665,7 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Grid inventory, stacking, equipment slots, durability state, and diegetic loot boundaries in [08](08%20Confront%20Constraints.md) and [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
+| **Responsibilities** | Unlimited weight-limited bag inventory, stacking, equipment slots, durability state, and diegetic loot boundaries in [08](08%20Confront%20Constraints.md) and [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). No grid footprints or item-count cap. |
 | **Dependencies** | Save; content item definitions; [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md); [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
 | **Public interfaces** | `IInventory`, `IEquipment`. |
 | **Data flow** | Pickup/equip → state → UI. |

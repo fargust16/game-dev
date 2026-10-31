@@ -1,6 +1,6 @@
 # 08 Confront Constraints
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
@@ -71,7 +71,7 @@ V1 may also allow costly escapes, yields, or mercies, but design must not rely o
 Combat rewards come from the world and from what the defeated target actually had; a fight does not create an abstract reward table or completion chest.
 
 - Ordinary monsters yield ingredients only and do not drop finished equipment or other ordinary items.
-- On NPC death, a randomly selected half of the NPC's current equipment remains recoverable, under the current item rules in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). Exact rounding for an odd number of items remains open.
+- On NPC death, each equipped item independently has a base 35% recovery chance, modified by the current looter's Luck under the shared rule in [07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md); Perception does not affect this roll. There is no guaranteed half or rounding. The same rule applies to a former player character encountered as a world actor and defeated; see [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md).
 - Whether transformed NPCs can exist as monsters remains open. If they do, they may drop items; the exact rules remain open.
 - Other carried or guarded goods and scene contents follow their established diegetic rules.
 

@@ -2,9 +2,9 @@
   "id": "actors",
   "order": 14,
   "name": "Actors",
-  "title": "NPC, поведение вне боя, диалог",
+  "title": "NPCs, behavior, dialogue, and equipment recovery",
   "category": "society",
-  "summary": "Трек A в 17 раздаёт владение: личности NPC из семени и слота, поведение исследования, разговор без всезнающего журнала. Карточки прямо отложены. Это не спецификация населения. NPC equipment recovery is partly specified in 19; transformed NPC-monsters and their drops remain unresolved.",
+  "summary": "NPC equipment recovery is resolved per equipped item using a 35% base chance and the current looter's Luck; transformed NPC-monster drops remain open.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
@@ -20,7 +20,7 @@
       "sourceId": "src-17"
     },
     {
-      "text": "NPC equipment is assigned as part of its build. On death a randomly selected half of current equipment is recoverable; odd-count rounding remains open.",
+      "text": "Each piece of current NPC equipment is checked independently at a 35% base chance, modified by the current looter's Luck; Perception does not affect the result. No fixed half or rounding is used.",
       "sourceId": "src-19"
     }
   ],

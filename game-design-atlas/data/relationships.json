@@ -213,7 +213,7 @@
       "src-17",
       "src-99"
     ],
-    "explanation": "Diegetic Confront rewards flow into inventory. Ordinary monsters yield ingredients only; NPC death leaves a random recoverable half of current equipment under 19. Exact edge cases remain open."
+    "explanation": "Diegetic Confront rewards flow into the weight-only inventory. Ordinary monsters yield ingredients only; each NPC equipped item is checked independently under the base-35% recovery chance modified by the current looter's Luck. Transformed-NPC drops remain open."
   },
   {
     "id": "rel-slice-poi",
@@ -288,7 +288,7 @@
       "src-19",
       "src-07-1"
     ],
-    "explanation": "Item Creation skill, Luck, and Perception jointly determine modifier-count probability; the character model defines their progression and check foundation."
+    "explanation": "Item Creation skill sets the base modifier-count probability; Perception adds up to 10% relatively and Luck uses the shared multiplier. None changes fixed base type weights."
   },
   {
     "id": "rel-enchanting-inventory",
@@ -325,7 +325,7 @@
     "sourceIds": [
       "src-19"
     ],
-    "explanation": "Item base, modifier capacity, quality, durability, and loot determine the items represented and stored in inventory."
+    "explanation": "Item base, modifier capacity, quality, weight, durability, and loot determine the items represented and stored in the unlimited weight-limited bag."
   },
   {
     "id": "rel-itemisation-character",
@@ -339,6 +339,6 @@
       "src-07-1",
       "src-07-2"
     ],
-    "explanation": "Item Creation skill/Luck/Perception affect modifier-count probability; Strength primarily contributes to Carrying Capacity."
+    "explanation": "Item Creation skill, Perception, and Luck affect modifier-count probability; Strength sets the starting comfortable carrying capacity of 20 kg + Strength."
   }
 ]

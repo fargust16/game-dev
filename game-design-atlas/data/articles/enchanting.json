@@ -4,11 +4,11 @@
   "name": "Enchanting",
   "title": "Six-step modifier manipulation profession",
   "category": "character",
-  "summary": "Enchanting progresses through random modifier addition; full reforge; permanent locking; one-time extraction/insertion; raising one modifier's tier; and changing numeric values on unlocked modifiers. Type weights stay fixed per base; thresholds, ingredients, costs, time, and some operation scopes remain open.",
+  "summary": "Enchanting has six cumulative steps: random modifier addition; full reforge; locking; extraction/insertion; raising one modifier's tier; and rerolling values of all unlocked modifiers while preserving identity/tier. Inserted modifiers need a free slot in their own group, and broken-item extraction is allowed.",
   "scenarioNote": "One extracted modifier is a single-use instance; extraction destroys its source item.",
   "points": [
     {
-      "text": "Six operations unlock in sequence from learning the profession; exact skill levels remain open.",
+      "text": "Learning the profession grants random addition; later skill thresholds unlock full reforge, locking, extraction/insertion, tier raising, and value change in sequence.",
       "sourceId": "src-19"
     },
     {
@@ -16,11 +16,11 @@
       "sourceId": "src-19"
     },
     {
-      "text": "Locks are permanent; successive locks cost more; inserted modifiers are locked.",
+      "text": "Extraction destroys its source (even if broken) and creates one single-use instance; insertion into any base requires a free slot in that same modifier group and locks the inserted modifier.",
       "sourceId": "src-19"
     },
     {
-      "text": "Extraction preserves identity, tier, and group but not numeric value, destroys the source item, and allows one insertion into a matching free group slot.",
+      "text": "Value change rerolls all unlocked numeric values within their existing tiers and preserves identities/groups/tiers; locked modifiers are unchanged.",
       "sourceId": "src-19"
     },
     {
@@ -29,7 +29,7 @@
     }
   ],
   "gaps": [
-    "Unlock thresholds, costs/ingredients/time, random-add group choice, base compatibility, tier-improvement eligibility, and numeric target scope."
+    "Unlock thresholds after Step 1, operation costs/ingredients/time, random-add group choice, exact tables, and whether tier raising can target a locked modifier remain open."
   ],
   "sourceIds": [
     "src-19",

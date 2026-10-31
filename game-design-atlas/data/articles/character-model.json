@@ -4,7 +4,7 @@
   "name": "Character Model",
   "title": "Attributes, skills, and derived statistics",
   "category": "character",
-  "summary": "07.1 defines seven attributes, independent skills, and checks; 07.2 defines derived values. Item Creation skill primarily determines modifier-count probability, with Luck and Perception added. Exact progression and coefficients remain open.",
+  "summary": "07.1 defines seven attributes, independent skills, and checks; 07.2 defines derived values. The delegated Item Creation count formula uses skill, Perception, and Luck; Strength sets the starting weight capacity. Exact XP curves and unrelated system formulas remain open.",
   "scenarioNote": "No full player/NPC development scenario was audited.",
   "points": [
     {
@@ -16,16 +16,16 @@
       "sourceId": "src-07-1"
     },
     {
-      "text": "Strength primarily contributes to Carrying Capacity; exact weight/capacity formula remains open.",
+      "text": "Strength-based Comfortable Capacity is 20 kg + Strength; the load bands run to a 200% hard carry limit. Exact exertion/other penalties remain open.",
       "sourceId": "src-07-2"
     },
     {
-      "text": "Item Creation skill plus Luck and Perception affect modifier-count probability, not fixed base type weights.",
+      "text": "Item Creation skill, Perception, and Luck affect modifier-count probability under the formula in 19; fixed base type weights remain unchanged.",
       "sourceId": "src-19"
     }
   ],
   "gaps": [
-    "Full skill catalogue, action mappings, growth values, carry-capacity formula, and modifier-count curve."
+    "Full skill catalogue, action mappings, growth values, and carrying exertion/other penalties remain open; modifier-count and carrying-capacity formulas are specified."
   ],
   "sourceIds": [
     "src-07-1",

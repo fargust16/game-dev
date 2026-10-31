@@ -636,23 +636,8 @@
     "origin": "atlas-annotation"
   },
   {
-    "id": "q-itm-count-curve",
-    "text": "What modifier-count curve maps Item Creation skill plus Luck and Perception to 0–6 modifiers?",
-    "systemIds": [
-      "itemisation",
-      "crafting",
-      "character-model"
-    ],
-    "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
-    "sourceKind": "gameplay-design",
-    "origin": "imported"
-  },
-  {
     "id": "q-itm-groups",
-    "text": "What probability distribution assigns major/minor groups within the 3+3 limits, and how does random addition choose a legal group?",
+    "text": "What probability distribution assigns major/minor groups within the 3+3 limits, and how does random Enchanting addition choose among groups that have free slots?",
     "systemIds": [
       "itemisation",
       "enchanting"
@@ -666,7 +651,7 @@
   },
   {
     "id": "q-itm-tables",
-    "text": "What are the base/stage modifier-type weights, tier tables, numeric ranges, and duplicate constraints?",
+    "text": "Confirm whether base-favored modifier types are independent of major/minor group (the current draft treats them independently). What is the final base catalogue and its favored-type weights, stage/tier tables, numeric ranges, and duplicate constraints?",
     "systemIds": [
       "itemisation",
       "crafting",
@@ -681,7 +666,7 @@
   },
   {
     "id": "q-enchant-unlocks",
-    "text": "At which Enchanting skill levels/stages does each of the six operations unlock?",
+    "text": "Which Enchanting skill levels unlock Steps 2–6 after learning Enchanting grants Step 1?",
     "systemIds": [
       "enchanting"
     ],
@@ -694,7 +679,7 @@
   },
   {
     "id": "q-enchant-costs",
-    "text": "What costs, ingredient lists, stations, and world-time durations apply to each Enchanting operation?",
+    "text": "What costs, ingredient lists, stations/requirements, and world-time durations apply to each Enchanting operation?",
     "systemIds": [
       "enchanting",
       "world-time"
@@ -707,21 +692,8 @@
     "origin": "imported"
   },
   {
-    "id": "q-enchant-value",
-    "text": "Does value-only change target one unlocked modifier or all unlocked modifiers, and does it preserve the modifier tier?",
-    "systemIds": [
-      "enchanting"
-    ],
-    "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
-    "sourceKind": "gameplay-design",
-    "origin": "imported"
-  },
-  {
     "id": "q-item-repair",
-    "text": "Which item categories use durability, and what wear rates, repair methods, costs, and times apply?",
+    "text": "What are the durability wear rates and exact repair method/station, ordinary-ingredient fraction, and duration? Repair uses no rare ingredients.",
     "systemIds": [
       "itemisation",
       "inventory"
@@ -735,7 +707,7 @@
   },
   {
     "id": "q-item-loot",
-    "text": "How is the recoverable half rounded for an NPC with an odd number of equipped items, and will transformed NPC-monsters exist and drop items?",
+    "text": "Will transformed NPCs exist as monsters, and what items may they drop? What rules govern non-equipment carried goods and other non-combat item acquisition?",
     "systemIds": [
       "itemisation",
       "actors",
@@ -750,11 +722,53 @@
   },
   {
     "id": "q-item-storage",
-    "text": "What are the final item base catalogue, inventory dimensions, stash capacity, footprints, compatibility, and carrying-capacity formula?",
+    "text": "What is the home-stash capacity/storage policy, and what are the final equipment slots, compatibility/requirements, and full item weights by base/material/tool/consumable?",
     "systemIds": [
       "itemisation",
       "inventory",
       "character-model"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-enchant-tier-target",
+    "text": "Does tier raising advance exactly one tier step, and may it target a locked modifier?",
+    "systemIds": [
+      "enchanting"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-item-cache",
+    "text": "Which items may be stored in or reliably inherited from a Legacy Cache, including extracted modifier instances?",
+    "systemIds": [
+      "character-life",
+      "inventory",
+      "enchanting"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-item-colors",
+    "text": "What exact colour values, icons, and accessible UI treatment accompany the agreed item quality colour categories?",
+    "systemIds": [
+      "itemisation",
+      "inventory"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority",

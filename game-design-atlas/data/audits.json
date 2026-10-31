@@ -281,11 +281,11 @@
       },
       "rules": {
         "state": "covered",
-        "evidence": "Шесть центральных правил начала и конца жизни прочитаны."
+        "evidence": "07 defines death and no automatic transfer of carried/equipped items; if the former character exists as an actor and is defeated, current equipment follows 19's NPC recovery rule. Legacy Cache item eligibility remains open."
       },
       "costs": {
         "state": "partially-covered",
-        "evidence": "Обычные остатки не гарантированы. Предел размера тайника открыт."
+        "evidence": "Ordinary residue is not inherited automatically; the Legacy Cache is a separate reliable channel, with size and eligible contents still open."
       },
       "scenarios": {
         "state": "not-assessed",
@@ -315,7 +315,7 @@
       },
       "rules": {
         "state": "partially-covered",
-        "evidence": "Сетка только на арене, диагонали без срезания углов, провал не пустой. Полосы шанса не заданы."
+        "evidence": "08 and 19 define ingredient-only ordinary-monster drops and independent NPC equipment recovery using the current looter's Luck; transformed-NPC-monster rules remain open."
       },
       "feedback": {
         "state": "missing",
@@ -521,11 +521,11 @@
       },
       "entities": {
         "state": "partially-covered",
-        "evidence": "Grid inventory, stackable goods, currency, equipment slots, item bases, and single-use extracted modifiers are identified; exact catalogues are open."
+        "evidence": "Unlimited weight-only bag, equal-size entries, stackable goods, zero-weight currency, equipment slots, item bases, and single-use extracted modifiers are identified; catalogues and stash remain open."
       },
       "rules": {
         "state": "partially-covered",
-        "evidence": "Stacking, two universal hands, shared necklace/amulet slot, zero-durability break/repair, and item persistence boundaries are recorded."
+        "evidence": "Stacking, two universal hands, shared necklace/amulet slot, Strength-based carrying formula/load bands, repairable broken items, no rare repair ingredients, and Character Life boundaries are recorded."
       },
       "costs": {
         "state": "partially-covered",
@@ -533,7 +533,7 @@
       },
       "scenarios": {
         "state": "partially-covered",
-        "evidence": "NPC equipment recovery, ordinary monster ingredients, item extraction, and insertion are described; odd-count and edge cases remain open."
+        "evidence": "NPC equipment recovery is per item under the base-35% Luck formula; ordinary monster ingredients, extraction from broken items, and insertion capacity are described."
       },
       "dependencies": {
         "state": "covered",
@@ -541,7 +541,7 @@
       },
       "unresolved": {
         "state": "partially-covered",
-        "evidence": "Dimensions, footprints, weight/capacity formula, compatibility, and extracted-instance persistence remain open."
+        "evidence": "Home stash, full item weights, equipment compatibility, wear/repair parameters, and Legacy Cache item eligibility remain open."
       }
     }
   },
@@ -559,7 +559,7 @@
       },
       "dependencies": {
         "state": "covered",
-        "evidence": "Item Creation depends on skills, Luck/Perception, base tables, resources, inventory, and world time."
+        "evidence": "Item Creation count formula uses skill, Perception, and Luck; base type weights remain fixed. 07.1 defines shared Luck and attribute rules."
       },
       "scope": {
         "state": "partially-covered",
@@ -567,7 +567,7 @@
       },
       "unresolved": {
         "state": "partially-covered",
-        "evidence": "Base catalogue, recipes, count curve, resources/costs, timings, and V1 scope remain open."
+        "evidence": "Base catalogue/weights, tier tables, group distributions, resource recipes/costs, timings, and final balance remain open."
       }
     }
   },
@@ -629,11 +629,11 @@
       },
       "rules": {
         "state": "partially-covered",
-        "evidence": "Attribute/skill growth and action-check principles are approved; Item Creation/Luck/Perception affect modifier-count probability."
+        "evidence": "Attribute/skill growth and shared checks are approved; Item Creation has a defined count formula using Item Creation skill, Perception, and Luck."
       },
       "costs": {
         "state": "partially-covered",
-        "evidence": "XP structure is shared, but values and item-count coefficients remain open."
+        "evidence": "XP progression values remain open, while Item Creation count/stage starting formulas are specified in 19."
       },
       "scenarios": {
         "state": "partially-covered",
@@ -645,7 +645,7 @@
       },
       "unresolved": {
         "state": "partially-covered",
-        "evidence": "Full skill catalogue, action mappings, growth values, and modifier-count coefficients remain open."
+        "evidence": "Full skill catalogue, action mappings, growth values, and carrying exertion/other penalties remain open; Item Creation count and stage formulas are specified."
       }
     }
   },
@@ -663,7 +663,7 @@
       },
       "rules": {
         "state": "partially-covered",
-        "evidence": "0–6 modifiers, 3+3 caps, fixed base weights, count-derived quality, and item-stage tier direction are specified."
+        "evidence": "19 specifies 0–6 modifiers, 3+3 caps, fixed favored base type weights, delegated count formula, count-based quality/colours, stage-based tier weighting, weight inventory, and per-item NPC recovery."
       },
       "costs": {
         "state": "partially-covered",
@@ -671,7 +671,7 @@
       },
       "scenarios": {
         "state": "partially-covered",
-        "evidence": "Addition, reforge, extraction/insertion, NPC gear recovery, and ordinary-monster ingredient-only loot are described."
+        "evidence": "Addition, reforge, extraction/insertion (including broken-source exception), NPC equipment recovery, and ordinary-monster ingredient-only loot are described."
       },
       "dependencies": {
         "state": "covered",
@@ -679,7 +679,7 @@
       },
       "unresolved": {
         "state": "partially-covered",
-        "evidence": "Base tables, distributions, quality nuance, durability, loot edge cases, footprints, and compatibility remain open."
+        "evidence": "Final base/type/tier/content tables, group distributions, repair parameters, stash/weights, transformed-NPC loot, and remaining acquisition edge cases are open."
       }
     }
   },
@@ -697,7 +697,7 @@
       },
       "rules": {
         "state": "partially-covered",
-        "evidence": "Group preservation/capacity, permanent locks, single-use transfer, and locked-value behavior are recorded."
+        "evidence": "Six operation scopes, group capacity, permanent locks, single-use transfer to any base with a free same-group slot, broken-source extraction, and all-unlocked value rerolls preserving tier are recorded."
       },
       "costs": {
         "state": "partially-covered",
@@ -713,7 +713,7 @@
       },
       "unresolved": {
         "state": "partially-covered",
-        "evidence": "Unlock thresholds, tables, ingredients/costs, locked tier eligibility, and numeric target scope remain open."
+        "evidence": "Unlock thresholds, tables, ingredients/costs/time, tier-raising step/lock eligibility, and random-add group choice remain open."
       }
     }
   }

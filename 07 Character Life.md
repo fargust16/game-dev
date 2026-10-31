@@ -1,6 +1,6 @@
 # 07 Character Life
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft
 
@@ -50,7 +50,7 @@ When the character dies:
 
 1. the Character Life ends;
 2. personal staged Pathway power ends with that life;
-3. the body, carried items, open actions, and local scene become world residue;
+3. the body, carried items, open actions, and local scene become world residue; the successor does not automatically inherit the former character's carried/equipped items or extracted modifier instances;
 4. a fixed **Death Gap** begins;
 5. during the Death Gap the game resolves world advancement without player control;
 6. after the gap, the player creates a new character for the same world, or may start a new world instead.
@@ -121,7 +121,7 @@ As in Meta Loop, ordinary leftovers may include:
 - faction/quest pressure already in motion;
 - NPC fates and local rumours.
 
-These are recoverable in principle, never guaranteed. NPCs may loot, move, sell, or destroy them during the Death Gap or later.
+These remain subject to world fate and are not transferred automatically into the next character's inventory. NPCs may loot, move, sell, or destroy them during the Death Gap or later. The defined way to recover the former character's current equipment is to encounter that former character as a world actor and defeat it; then the per-item NPC equipment-recovery rule in [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) applies.
 
 ## Intentional Legacy Cache
 
@@ -136,8 +136,9 @@ V1 supports one simple intentional preparation tool:
 V1 rule:
 
 - the next character can see the Legacy Cache marker;
-- the cache is the reliable inheritance channel;
-- it should remain small/limited so it does not become a full gear pipeline that erases death.
+- the cache is the reliable intentional inheritance channel, separate from anything merely carried or equipped at death;
+- it should remain small/limited so it does not become a full gear pipeline that erases death;
+- the exact eligible contents, including extracted modifier instances, remain open and are tracked in [99 Open Questions](99%20Open%20Questions.md).
 
 Ordinary unprotected loot remains uncertain. The intentional cache is the player's deliberate Continuity tool.
 

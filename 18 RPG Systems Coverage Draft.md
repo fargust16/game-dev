@@ -1,6 +1,6 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.6
+Version: 0.7
 Status: Draft
 Last Updated: 2026-10-31
 
@@ -86,7 +86,7 @@ Existing progression foundations must be audited and extended, not replaced by a
 
 ### Itemisation and Enchanting authority
 
-The detailed item, Item Creation, inventory, equipment, durability, loot, and Enchanting rules are consolidated in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). That document records owner-approved rules and explicitly separates unresolved costs, tables, and thresholds. It replaces conflicting itemisation notes in this coverage draft. Use [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) as the current item-system specification.
+The detailed item, Item Creation, inventory, equipment, durability, loot, and Enchanting rules are consolidated in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). That document records owner-confirmed rules and the starting balance formulas delegated for completion. It replaces conflicting itemisation notes in this coverage draft. Use [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) as the current item-system specification.
 
 ## D. Combat and confrontation
 
@@ -231,7 +231,7 @@ The following are review states, not claims about the current map.
 | Attributes and checks | Seven attributes, independent skills, approved probability curve, secondary bonuses, Luck, and three outcomes documented | Tune remaining coefficients and reconcile combat-specific checks; see [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) and [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) |
 | Skills and abilities | Candidate inventory captured; action-based growth direction captured | Define skill taxonomy after attributes/checks |
 | Pathways and advancement requirements | Existing foundation; integration open | Audit [05 Progression](05%20Progression.md) and dependent nodes |
-| Items, inventory, equipment | Owner-approved rules consolidated in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) | Close catalogues, probability curves, costs, capacities, and timing in §7 of that draft |
+| Items, inventory, equipment | Owner-approved rules and initial balance formulas consolidated in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) | Complete content tables, group distributions, costs, stash rules, wear/repair details, and operation timing in §7 of that draft |
 | Combat | Existing constraints and turn economy; full rules open | Audit [08](08%20Confront%20Constraints.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2](10.2%20Combat%20System%20Draft.md), [16](16%20Architecture%20Pivot.md) |
 | NPCs and creatures | Partial architecture references | Audit actor/spawn/AI cards |
 | Quests, POIs, information | Existing foundations; integration open | Audit [03](03%20Decision%20Engine.md), [04](04%20Points%20of%20Interest.md), [09](09%20Information%20Sources.md) |
@@ -301,7 +301,7 @@ The only confirmed item-crafting professions are:
 | Item Creation | Creates armour, weapons, rings, necklaces/amulets, and other accessories from item bases and resources | Item Creation skill primarily controls modifier-count probability; Luck and Perception add to that probability. Exact formula: [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
 | Enchanting | Adds random modifiers, reforges, locks, extracts/inserts, raises modifier tier, and changes modifier values as six progression steps unlock | Skill unlocks operations and affects tier outcomes; it cannot change a base's fixed modifier-type weights. |
 
-Separate tailoring, leatherworking, blacksmithing, jewellery-making, cooking, and alchemy are not current confirmed item-crafting professions. Do not reintroduce the retired craft-profession list. Other gameplay skills or consumable systems require their own approval and specification.
+No separate crafting profession exists for each material or equipment family; keep the item-crafting profession list limited to the two roles above. Other gameplay skills or consumable systems require their own approval and specification.
 
 ## 4. Social and dialogue actions
 

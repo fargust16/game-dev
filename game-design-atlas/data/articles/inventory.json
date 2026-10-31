@@ -2,34 +2,38 @@
   "id": "inventory",
   "order": 17,
   "name": "Inventory",
-  "title": "Grid inventory, equipment, durability, and item-life ownership",
+  "title": "Weight-only bag inventory, equipment, durability, and item-life ownership",
   "category": "character",
-  "summary": "Item rules are documented in 19. The current design has a variable-footprint grid, stackable materials/consumables, separate currency, equipment slots, and repairable zero-durability items. Exact dimensions and weights remain open.",
+  "summary": "Personal inventory is an unlimited bag with equal-size entries; there is no grid or footprint cap, and weight is the only carrying limit. Comfortable capacity is 20 kg + Strength with a 200% hard limit; gold weighs zero. The home stash policy remains open.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
-      "text": "Materials/stackable consumables stack; ordinary equipment/accessories are individual; currency is outside the grid.",
+      "text": "Every carried item, including equipped gear, contributes its weight; currency weighs zero. Equal-size UI entries do not consume variable grid footprints.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "The initial armor, accessory, and hand-item weights are listed in 19; every specific base/tool/material/consumable still needs an explicit content weight.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "Durability applies to hand equipment, worn armour, and gathering tools; jewellery and belts have none. Repair uses ordinary creation ingredients and no rare ingredient.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "A broken item is unusable but remains present; it cannot be enchanted except for extraction from an unlocked modifier.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "NPC current equipment is recoverable per item under the base-35% Luck formula; death does not automatically transfer a former character's carried/equipped inventory. Legacy Cache is separate.",
       "sourceId": "src-19"
     },
     {
       "text": "The character has two universal hand slots and a shared necklace/amulet slot; full compatibility remains open.",
       "sourceId": "src-19"
-    },
-    {
-      "text": "At zero durability an item remains, is broken/unusable, and can be repaired.",
-      "sourceId": "src-19"
-    },
-    {
-      "text": "Inventory belongs to the current Character Life; death and Legacy Cache boundaries remain in 07.",
-      "sourceId": "src-07"
-    },
-    {
-      "text": "Strength is the primary source of Carrying Capacity; the formula remains open.",
-      "sourceId": "src-07-2"
     }
   ],
   "gaps": [
-    "Final grid/stash dimensions, footprints, weight/capacity formula, requirements, and extracted-modifier persistence remain open."
+    "Home-stash capacity/storage policy, full per-base item weights, equipment compatibility/requirements, wear/repair parameters, and Legacy Cache item eligibility remain open."
   ],
   "sourceIds": [
     "src-19",

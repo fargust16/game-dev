@@ -4,28 +4,32 @@
   "name": "Item Creation",
   "title": "Item Creation: one general equipment profession",
   "category": "proposed",
-  "summary": "Item Creation is the single profession that creates all equipment families from selected bases and resources. Its skill primarily sets modifier-count probabilities; Luck and Perception add to that probability. Base-specific modifier-type weights stay fixed. Enchanting is a separate profession.",
+  "summary": "Item Creation is the single profession that creates all equipment families from selected bases and resources. Its starting modifier-count formula uses the skill as the main input, Perception as up to a 10% relative bonus, and the shared Luck multiplier; fixed base type weights are unaffected. Enchanting is a separate profession.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
-      "text": "Item Creation creates all armour, weapons, jewellery, and accessories; material families do not each have a separate crafting profession.",
+      "text": "Item Creation creates all armour, weapons, jewellery, and accessories from bases/resources; separate material-family crafting professions are retired.",
       "sourceId": "src-19"
     },
     {
-      "text": "The skill primarily influences modifier count (0–6); Luck and Perception are additional influences and do not alter base modifier-type weights.",
+      "text": "Skill levels 1, 11, …, 91 unlock item stages 9, 8, …, 0; any lower stage remains craftable when materials are supplied.",
       "sourceId": "src-19"
     },
     {
-      "text": "The selected base/stage supplies fixed modifier-type weights and applicable tier tables.",
+      "text": "Six independent modifier-slot trials use p=min(0.99,(0.10+0.60×((ItemCreation−1)/99))×(1+0.10×((Perception−1)/99))×(1+Luck/100)); type weights remain fixed per base.",
       "sourceId": "src-19"
     },
     {
-      "text": "The Vertical Slice still defers deep crafting; this design update does not authorise implementation.",
+      "text": "Higher item stages increase the weight of stronger modifier tiers; no hard tier ceiling applies.",
+      "sourceId": "src-19"
+    },
+    {
+      "text": "The Vertical Slice still defers deep crafting; this update does not authorise implementation.",
       "sourceId": "src-11"
     }
   ],
   "gaps": [
-    "Exact skill thresholds, modifier-count curve, Luck/Perception coefficients, base catalogue, recipes, costs, and timing remain open."
+    "Final base catalogue, per-base favored modifier types and weights, stage/tier tables, numeric ranges, recipes, resource costs, timing, and later balance tuning remain open."
   ],
   "sourceIds": [
     "src-19",

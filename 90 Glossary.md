@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.54
+Version: 0.55
 
 Status: Draft
 
-Last Updated: 2026-10-31 (item, modifier, and Enchanting terminology added)
+Last Updated: 2026-10-31 (item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -993,7 +993,7 @@ An additional attribute that may provide a small positive modifier to an action 
 
 ## Effective Primary Preparation
 
-The arithmetic mean of an action's primary attribute and primary skill, expressed on a comparable task-difficulty scale. It is compared with the action's difficulty to determine baseline success probability. The exact probability curve remains open.
+The arithmetic mean of an action's primary attribute and primary skill, expressed on a comparable task-difficulty scale. It is compared with the action's difficulty to determine baseline success probability using the shared curve in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md).
 
 ## Task Difficulty
 
@@ -1001,7 +1001,7 @@ The difficulty rating assigned to an action, resource, or challenge. It is compa
 
 ## Luck Modifier
 
-A separate relative modifier derived from Luck. It multiplies an existing probability rather than adding fixed percentage points. Its exact scaling and caps remain open.
+The universal relative probability modifier: `P_after = min(0.99, P_before × (1 + Luck / 100))`. It does not rewrite fixed item-weight tables. See [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md).
 
 ## Critical Success
 
@@ -1024,8 +1024,14 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Extracted modifier instance** — One non-copyable physical instance extracted from an item. It preserves identity, tier, and major/minor group but not numeric value; insertion consumes it and is allowed only when the target has a free slot in that group.
 
-**Broken item** — An item at zero durability. It remains present, is unusable, and can be repaired.
+**Broken item** — An item at zero durability. It remains present and unusable, can be repaired with some ordinary creation ingredients, and cannot be enchanted except for extracting an unlocked modifier.
 
-**Item Creation** — The general profession that creates equipment from bases and resources; its skill primarily affects modifier-count probability, with Luck and Perception as additional factors.
+**Item Creation** — The general profession that creates equipment from bases and resources. Skill level primarily sets modifier-count probability; Perception provides up to a 10% relative increase and Luck applies the shared multiplier. Base-specific modifier-type weights remain fixed.
 
 **Enchanting** — The profession that unlocks random addition, full reforge, locking, extraction/insertion, tier raising, and numerical-value changes in progression order.
+
+**Weight-only inventory** — An unlimited bag with no grid capacity or variable item footprints. Every item has the same-size inventory entry; total carried weight, including equipped items, is limited by Strength-based capacity. Gold weighs zero.
+
+**Comfortable Carrying Capacity** — The starting weight a character can carry without exceeding the Normal load band. Under the current balance rule it is `20 kg + Strength`; the hard carry limit is twice that amount.
+
+**Quality colour** — The agreed display colour family for item category: Normal grey/desaturated, Magic green, Rare cyan/light blue, Epic purple, Legendary yellow-orange, Unique red. Exact colour values and final UI treatment remain open.

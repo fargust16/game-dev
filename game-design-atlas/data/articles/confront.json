@@ -4,7 +4,7 @@
   "name": "Confront",
   "title": "Бой как один Approach, на арене",
   "category": "combat",
-  "summary": "Confront — открытая сила. Документ 08 — ограждение до боевой библии: если бой становится самым безопасным, богатым или познавательным ходом по умолчанию, дизайн сломан. V1 показывает его пошаговым режимом на отдельной Combat Arena. Сетка не действует в оверворлде и интерьерах. Ordinary monsters yield ingredients only; NPC death leaves a random half of current equipment recoverable. Odd-count rounding and transformed-NPC-monster drops remain open.",
+  "summary": "Confront — открытая сила. Документ 08 — ограждение до боевой библии: если бой становится самым безопасным, богатым или познавательным ходом по умолчанию, дизайн сломан. V1 показывает его пошаговым режимом на отдельной Combat Arena. Сетка не действует в оверворлде и интерьерах. Ordinary monsters yield ingredients only; Each NPC equipped item has an independent 35% base recovery chance modified by the current looter's Luck; transformed-NPC-monster drops remain open.",
   "scenarioNote": "Полных боевых сцен в импорт не входило. 11 требует Break Away и Spare/Yield в Confront похищения и/или ареста, но сами сцены здесь не расписаны.",
   "points": [
     {
@@ -24,7 +24,7 @@
       "sourceId": "src-16"
     },
     {
-      "text": "Ordinary monsters yield ingredients only; NPC death yields a random recoverable half of current equipment; transformed NPC-monster item drops remain open.",
+      "text": "NPC equipped items are checked independently at a 35% base chance under the shared Luck multiplier; no fixed half or rounding. Transformed-NPC-monster drops remain open.",
       "sourceId": "src-19"
     }
   ],
