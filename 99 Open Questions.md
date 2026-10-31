@@ -1,6 +1,6 @@
 # 99 Open Questions
 
-Version: 0.59
+Version: 0.60
 
 Status: Draft
 
@@ -95,8 +95,11 @@ Failure, normal success, and critical success are mutually exclusive and sum to 
 **What is the derived-statistics structure?**
 The agreed register and principles are in [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). Derived values are calculated from attributes, skills, equipment, Pathways, abilities, conditions, and context; they are not additional independent progression tracks by default.
 
-**How does magical ability capacity work?**
-The Will attribute determines the maximum capacity of a shared visible Will Power resource. Pathways determine which abilities are available; Will determines how much ability use the character can support. The resource recovers slowly (directional proposal: about 1% of maximum per 10 world ticks) and is expected to refill during sleep if no effect is damaging or suppressing Will. See [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). Exact formulas, costs, and Will-damage rules remain open.
+**How do Will and Will Power work?**
+Will is the ordinary 1–100 attribute; Will Power is a separate visible spendable resource. Pathways determine ability access, while Will determines capacity. Maximum Will Power is \((20+0.8\times Will)\times S\), with S determined by Pathway stage (9→0 multipliers: 1.00, 1.15, 1.32, 1.52, 1.75, 2.01, 2.31, 2.66, 3.06, 3.52). Ordinary regeneration is about 1% per 10 world ticks; sleep normally fully restores it. Full exhaustion grants one modest Will XP reward per continuous episode and causes Sanity damage. See [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). Ability costs, exact XP eligibility, D₀, and effect-specific Will damage remain open.
+
+**How does Sanity work?**
+Sanity is a separate 0–100 mental-integrity measure, distinct from Will and Will Power. Its bands are 100 Stable, 70–99 Mild disturbance, 40–69 Significant disturbance, 10–39 Severe disturbance, 1–9 Critical, and 0 Loss of sanity. Shared Will mitigation is \(D_{sanity}=D_{base}\times100/(100+Will)\). Full-exhaustion damage is \(D_0\times S\times100/(100+Will)\). Ordinary Will Power recovery and sleep do not restore Sanity. At zero, the character permanently loses human personality and becomes a game-controlled creature in the world; this is distinct from death. See [07.2](07.2%20Derived%20Character%20Statistics.md). Exact band symptoms/penalties, D₀, source-specific mitigation, and recovery methods/rates remain open.
 
 **How is carrying load handled?**
 Strength determines Carrying Capacity. Four graduated bands are agreed: Normal, High, Overloaded, and Critical Overload. Thresholds and consequences remain open.
@@ -255,9 +258,9 @@ What are the exceptional requirements and unique benefit for attribute 100?
 
 What are the exact formulas and scales for Maximum HP, Maximum Stamina, and Maximum Will Power? Maximum Stamina is primarily derived from Endurance; its formula remains open.
 
-What are the exact ability costs and how do they vary among Pathways and ability types?
+What are the exact ability costs and how do they vary among Pathways and ability types? The initial balance bands are approximately 10–20% of maximum Will Power for ordinary abilities, 25–40% for powerful abilities, and 50–80% for exceptional abilities; individual abilities define actual costs.
 
-How do effects damage or suppress Will: temporary effective-attribute reduction, maximum-pool reduction, current-resource loss, or a combination? What are duration, treatment, and recovery rules?
+How do effects damage or suppress Will: temporary effective-attribute reduction, maximum-pool reduction, current-resource loss, or a combination? What are duration, treatment, and recovery rules? What are the exact Will XP reward and meaningful-expenditure eligibility for full exhaustion?
 
 What are the exact Movement Speed formula and separate world/arena units?
 
@@ -267,7 +270,7 @@ What are the Accuracy and Evasion formulas and their reconciliation with the sha
 
 What are the Physical/Magical Defence conversion curves, caps, stacking, and penetration rules?
 
-What are the exact recovery rules for HP, Will Power, and individual negative conditions? Stamina recovery is fixed at 5% of maximum per world tick while not performing Stamina-consuming exertion; exact modifiers/blockers remain open.
+What are the exact recovery rules for HP, Will Power, and individual negative conditions? What exact items, abilities, treatments, safe activities, or rare events restore Sanity, and at what rates? Stamina recovery is fixed at 5% of maximum per world tick while not performing Stamina-consuming exertion; exact modifiers/blockers remain open.
 
 Which derived values are shown to the player at different Intelligence levels?
 
