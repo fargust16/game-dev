@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.61
+Version: 0.62
 
 Status: Draft
 
-Last Updated: 2026-10-31 (Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-10-31 (Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -253,7 +253,7 @@ How are attribute and skill values normalised to a common task-equivalent scale 
 
 How are the shared check rules reconciled with combat's attack-specific multi-attribute formulas?
 
-What are the exact attribute/skill XP costs, nonlinear growth curve, residual XP floor, failure XP, and critical-success XP?
+What are the exact numeric values for the shared attribute/skill progression system: base XP by task-difficulty stage, the ten-stage Δ_XP modifier table, the nonlinear XP required for each next track level, the residual floor, and the outcome modifiers for failure, normal success, and critical success? The agreed structure is universal across activity types and independent of Pathway stage; see [07.1](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
 
 What are the exceptional requirements and unique benefit for attribute 100?
 
@@ -273,7 +273,7 @@ What are the Accuracy and Evasion formulas and their reconciliation with the sha
 
 What are the Physical/Magical Defence conversion curves, caps, stacking, and penetration rules?
 
-What are the exact recovery rules for HP, Will Power, and individual negative conditions? What exact items, abilities, treatments, safe activities, or rare events restore Sanity, and at what rates? Stamina recovery is fixed at 5% of maximum per world tick while not performing Stamina-consuming exertion; exact modifiers/blockers remain open.
+What are the exact recovery rules for Will Power and individual negative conditions? Ordinary HP recovery is fixed at 1% of maximum HP per 10 world ticks unless blocked; see [07.2](07.2%20Derived%20Character%20Statistics.md). What exact items, abilities, treatments, safe activities, or rare events restore Sanity, and at what rates? Stamina recovery is fixed at 5% of maximum per world tick while not performing Stamina-consuming exertion; exact modifiers/blockers remain open.
 
 Which derived values are shown to the player at different Intelligence levels?
 
