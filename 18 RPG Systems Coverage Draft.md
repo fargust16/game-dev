@@ -294,7 +294,7 @@ The current candidate attribute set is **Strength, Endurance, Dexterity, Percept
 | Climb | Climbing | Strength, Endurance, Dexterity | Include as a candidate pending scope/implementation assessment. One skill covers climbable walls, fences, rocks, and similar surfaces. |
 | Sneak | Stealth | Dexterity, Perception | Skill progression should reflect meaningful stealth practice, especially where detection is possible, not simply toggling a stance in a safe empty area. |
 | Move while overloaded | Carrying Capacity / Load Carrying (working name) | Strength, Endurance | Inventory weight is relative to character capacity; “heavy item” is not a separate item category required by this rule. |
-| Ordinary movement / sustained physical effort | No dedicated skill decided | Endurance may develop | Do not create a Walking skill without a clear gameplay need. |
+| Ordinary walking and ordinary running | No dedicated skill decided | Endurance may develop through appropriate exertion rules | Neither ordinary walking nor ordinary running consumes Stamina. Accelerated running does. Do not create a Walking skill without a clear gameplay need. |
 | Strike or attempt to break a supported object using a suitable held item | No universal “destruction” skill decided | Strength; possibly Dexterity | Only explicitly supported objects can be broken; this does not imply that everything in the world is destructible. |
 
 ## 2. Gathering and resource extraction
