@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.56
+Version: 0.57
 
 Status: Draft
 
-Last Updated: 2026-10-31 (Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-10-31 (Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -60,7 +60,7 @@ A finite simulation containing civilizations, factions and history.
 
 ## World Seed
 
-The generation input that determines a world's starting conditions, faction states, Main Goal details, Side Events, and related variation.
+The generation input that determines a world's starting conditions, Major Faction states and Main Goal details, Side Events, and related variation.
 
 ---
 
@@ -126,31 +126,31 @@ A world that eventually reaches its end.
 
 ## Balance
 
-Dynamic equilibrium of competing world conditions. It constantly shifts and cannot be permanently preserved by any faction. It changes primarily through Faction Influence.
+Dynamic equilibrium of competing world conditions. It constantly shifts and cannot be permanently preserved by any Major Faction. It changes primarily through Faction Influence.
 
 ---
 
 ## World Engine
 
-A lightweight system that periodically attempts eligible faction operations and applies their readable consequences. It does not simulate entire civilizations.
+A lightweight system that periodically attempts eligible Major Faction operations and applies their readable consequences. It does not simulate entire civilizations.
 
 ---
 
 ## Operation
 
-A single faction action with conditions and possible outcomes: success, failure, interruption by the player or another faction, or failure caused by an observable world event.
+A single action by a Major Faction with conditions and possible outcomes: success, failure, interruption by the player or another faction, or failure caused by an observable world event.
 
 ---
 
 ## Main Goal
 
-A faction's primary objective drawn from a limited pool. Seed changes details such as place, time, and actors. Completion raises Faction Influence and reshapes the world.
+A Major Faction's primary world-shaping objective drawn from a limited pool. The World Seed changes details such as place, time, and actors. Completion raises Faction Influence and reshapes the world.
 
 ---
 
 ## Side Event
 
-A seed-generated secondary situation. It offers useful but forked outcomes, shifts Influence, may open or close paths, and never exists as pure free power.
+A seed-generated secondary situation. It offers useful but forked outcomes, can shift Major Faction Influence, can open or close paths, and never exists as pure free power.
 
 ---
 
@@ -162,7 +162,25 @@ Observable changes through which the player reads hidden faction activity and in
 
 ## Faction Influence
 
-The hidden current capacity of a faction to pursue its long-term goals and make operations available. Higher Influence strengthens followers, attempt frequency, artifacts, and economic niche control. It is communicated through Symptoms, not a player-facing value.
+The hidden current capacity of a Major Faction to pursue its world-shaping goals and make operations available. Higher Influence strengthens followers, attempt frequency, artifacts, and economic niche control. It is communicated through Symptoms, not a player-facing value.
+
+---
+
+## Major Faction
+
+A faction with world-scale goals, tracked through Faction Influence and the World Engine, that can directly affect Balance and World Collapse.
+
+---
+
+## Minor Faction
+
+A smaller group pursuing bounded local needs and interests. It may be beneficial or harmful and can support or oppose a Major Faction, but it has no own world-ending objective and is not a direct driver of World Collapse.
+
+---
+
+## True God / False God
+
+Competing in-world titles used by followers for the sealed Stage 0 Being. Neither title settles the being's objective nature or the setting's moral interpretation of it.
 
 ---
 
@@ -216,7 +234,7 @@ An NPC's internal point at which survival matters enough to offer information or
 
 ## World Collapse
 
-The terminal transition of a world after Balance is irreversibly broken and a dominant faction achieves its objective. It is caused by world state, never by a timer.
+The terminal transition of a world after Balance is irreversibly broken and a Major Faction's objective dominates. The sealed Stage 0 Being's return is one possible terminal catastrophe. World Collapse is caused by world state, never by a timer.
 
 ---
 

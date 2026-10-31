@@ -1,16 +1,16 @@
 # 99 Open Questions
 
-Version: 0.76
+Version: 0.77
 
 Status: Draft
 
-Last Updated: 2026-10-31 (three cooperating major factions and Stage 0 setting premise recorded; registration, secrecy, patron, and slice-mapping questions added. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-10-31 (sealed Stage 0 antagonist, major/minor distinction, and two candidate minor factions recorded; finale and generation remain open. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md), [GEOGRAPHY_LMC_DESIGN_NOTE.md](unity/Assets/Plans/GEOGRAPHY_LMC_DESIGN_NOTE.md), [GEOGRAPHY_LMC_TECHNICAL_SPEC.md](unity/Assets/Plans/GEOGRAPHY_LMC_TECHNICAL_SPEC.md), [GEOGRAPHY_LMC_STEP1_READINESS.md](unity/Assets/Plans/GEOGRAPHY_LMC_STEP1_READINESS.md), [GEOGRAPHY_G3F_PHASE_PLAN.md](unity/Assets/Plans/GEOGRAPHY_G3F_PHASE_PLAN.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md), [GEOGRAPHY_LMC_DESIGN_NOTE.md](unity/Assets/Plans/GEOGRAPHY_LMC_DESIGN_NOTE.md), [GEOGRAPHY_LMC_TECHNICAL_SPEC.md](unity/Assets/Plans/GEOGRAPHY_LMC_TECHNICAL_SPEC.md), [GEOGRAPHY_LMC_STEP1_READINESS.md](unity/Assets/Plans/GEOGRAPHY_LMC_STEP1_READINESS.md), [GEOGRAPHY_G3F_PHASE_PLAN.md](unity/Assets/Plans/GEOGRAPHY_G3F_PHASE_PLAN.md)
 
 ---
 
@@ -24,7 +24,7 @@ These were answered in design discussion and written into Draft documents. They 
 Faction Influence, raised mainly by completed Main Goals and shifted by Side Events / Allegiance choices. Documented in [02 World Laws](02%20World%20Laws.md).
 
 **How does the World Engine choose the next faction operation?**  
-From World Seed starting state plus each faction's current Main Goal, requirements, and eligible Operations. Documented in [02 World Laws](02%20World%20Laws.md).
+From the World Seed starting state plus each Major Faction's current Main Goal, requirements, and eligible Operations. Documented in [02 World Laws](02%20World%20Laws.md).
 
 **How does the player read Influence without a meter?**  
 Through everyday Symptoms: trade, services, encounters, rumours, otherworldly pressure, and related world changes. Exact stage-to-symptom tables remain open below.
@@ -38,7 +38,7 @@ Seven independent sliders replace the old bundled Easy / Normal / Hard / Hell sc
 
 **What broad faction structure is established for this setting?**
 
-Three major, church-associated factions already exist around the setting's Stage 0 divine-level beings. They cooperate, have distinct internal-order, industry/research, and external-security roles, and form one positive side the player may support. Their origin and the belief/anchor/sanity mechanism are out of scope. The opposing side is a separate design slice. Role direction is recorded in [02 World Laws](02%20World%20Laws.md); authority, patron links, secrecy, and the content and consequences of their Main Goals remain open.
+Three church-associated Major Factions already exist around Stage 0 beings and cooperate as one side the player may support, with internal-order, industry/research, and external-security roles. A separate, widespread opposing Major Faction follows an ancient Stage 0 being that lost its sanity, is sealed on a divine plane, and cannot enter the living world. Followers call it the True God or False God and seek to return it; its return is a possible world-ending threat. Two candidate beneficial Minor Factions are also captured: a covert alchemical network and a healing/medical association. Minor Factions pursue local needs rather than world-ending goals. The origin and belief/anchor/sanity mechanics of Stage 0 beings remain out of scope. See [02 World Laws](02%20World%20Laws.md); the finale, finite-world resolution, faction branches, and minor-faction generation remain open.
 
 ## Decision Engine
 
@@ -236,7 +236,15 @@ Can Balance partially recover without player intervention?
 
 What exact Symptoms correspond to each band of Faction Influence?
 
-What determines the concrete winning / terminal condition of each faction?
+What determines the concrete winning / terminal condition of each Major Faction?
+
+How does stopping the sealed being's return produce a positive resolution while preserving the finite-world rule?
+
+Which player interventions and allied factions can change the possible final confrontation if the being returns, and can it be avoided by stopping the plan earlier?
+
+What does the selected difficulty change in that confrontation? Balance formulas and numerical tuning are deferred until the concept is settled.
+
+How can Minor Factions support or obstruct Major Factions without becoming direct World Collapse drivers?
 
 Can multiple factions unintentionally cooperate?
 
@@ -250,7 +258,9 @@ How does universal practitioner registration coexist with the third faction's to
 
 Which supernatural-derived products or services reach ordinary people through the industry faction, and how is occult secrecy preserved?
 
-Do the three factions keep distinct, sometimes competing Main Goals, or share a common goal? What costs and conflicts keep this positively framed side from being a universal best answer?
+Do the three allied Major Factions keep distinct, sometimes competing Main Goals, or share a common goal? What costs and conflicts keep this positively framed side from being a universal best answer?
+
+Should Minor Factions be a fully authored roster or be generated from authored templates with seed-dependent leaders, bases, needs, and operations? Which parts require fixed hand-authored content?
 
 ## Decision Engine
 
@@ -354,10 +364,13 @@ How visible should crown/nobility pressure be inside Lower Veil without adding a
 
 How, if at all, do Wardens and Veinmarket from the current slice map onto the three cooperating major-faction roles? Keep them as separate placeholders until the owner decides.
 
+Does the primary opposing Major Faction appear in V1, and if so, only through hints or limited presence?
+
 ## Items, Inventory, Equipment, Item Creation, and Enchanting
 
 The full open-question list is §7 of [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). Remaining item questions are:
 
+- Decide whether the alchemical network's potions remain NPC/item content under the existing Item Creation rules or imply an owner-approved change to the current rule that Item Creation and Enchanting are the only item-crafting professions.
 - Confirm whether base-favored modifier types are independent of major/minor group (this draft treats them independently); finish the base catalogue, favored-type weights, stage/tier tables, numeric ranges, and duplicate constraints.
 - Major/minor valid-split probabilities and random Enchanting addition's choice among groups with free slots.
 - Enchanting skill levels that unlock Steps 2–6; operation costs, ingredients, stations/requirements, and world-time durations.
@@ -394,7 +407,7 @@ Can the world lose magic?
 
 ## Factions
 
-For the three cooperating major factions, their existence around churches associated with Stage 0 beings is a setting premise; their origin, anchors, and faith/sanity mechanism are out of scope. The emergence of the opposing side and any other factions remains open.
+The three allied Major Factions, the primary opposing Major Faction centred on a sealed Stage 0 being, and two candidate beneficial Minor Factions are now recorded in [02 World Laws](02%20World%20Laws.md). Other hostile branches, the full minor-faction roster, and the authored-versus-generated content model remain open. Stage 0 origin, anchors, and faith/sanity mechanics remain out of scope.
 
 Can factions disappear naturally?
 

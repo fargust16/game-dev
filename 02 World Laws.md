@@ -1,10 +1,10 @@
 # 02 World Laws
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft
 
-Last Updated: 2026-10-31 (three cooperating major-faction roles and Stage 0 premise recorded; names, relationships, and opposing side remain open)
+Last Updated: 2026-10-31 (primary antagonist and minor-faction examples recorded; finale, branches, generation, and alchemy scope remain open. Earlier: three cooperating major-faction roles and Stage 0 premise recorded.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md)
@@ -30,7 +30,7 @@ This is the primary world law. The world responds to accumulated disruption, whi
 
 Balance is a **dynamic equilibrium**, not a static or ideal state. It constantly shifts as the world and its actors change. A temporary stabilisation is possible; permanent equilibrium is not.
 
-No faction truly preserves Balance. Every faction pursues its own long-term goals and thereby pushes the world toward one of many extreme states. The player can also shift, redirect, or temporarily stabilise conditions, but cannot freeze the world in place.
+No Major Faction truly preserves Balance. Each pursues its own world-shaping goals and pushes the world toward possible terminal states. Minor Factions pursue bounded interests; they may support or obstruct Major Factions and change local conditions, but do not directly drive World Collapse. The player can shift, redirect, or temporarily stabilise conditions, but cannot freeze the world in place.
 
 Balance is a hidden systemic condition. It is inferred through the world rather than displayed as a single player-facing meter.
 
@@ -38,7 +38,7 @@ Balance is a hidden systemic condition. It is inferred through the world rather 
 
 Balance shifts primarily through **Faction Influence**.
 
-Faction Influence rises when a faction completes Main Goals and can also shift through Side Events and player Allegiance choices. Higher Influence makes a faction harder to oppose and more able to reshape everyday life. Accumulated Influence of competing factions is the pressure that eventually breaks Balance into World Collapse.
+Faction Influence for Major Factions rises when a Major Faction completes Main Goals and can also shift through Side Events and player Allegiance choices. Higher Influence makes a Major Faction harder to oppose and more able to reshape everyday life. Accumulated Faction Influence among competing Major Factions is one pressure that can break Balance into World Collapse; the sealed being's return is a distinct possible catastrophe.
 
 # World Seed
 
@@ -56,11 +56,15 @@ The seed must change details enough that memorised answers from a previous world
 
 # Factions
 
+## Major and minor factions
+
+The setting has world-shaping **Major Factions** and smaller **Minor Factions**. Major Factions have long-term goals that can directly affect world Balance and World Collapse; the existing Faction Influence and World Engine model below applies to them. Minor Factions pursue narrower needs and interests. They can be beneficial or harmful, independent or aligned with a Major Faction, and can still shape local events or help a larger side. They do not have their own world-ending objective and are not direct drivers of World Collapse. How their local actions feed into Major Faction Influence remains open.
+
 ## Owner-approved setting direction: three cooperating major factions
 
 The world already has multiple people at Pathway Stage 0, regarded as divine-level beings. This is a setting premise, not a designed progression system: how they reached Stage 0, how belief or anchors preserve their sanity, and how their churches formed remain outside the current system scope.
 
-Three large, church-associated factions form one cooperative side that the player may support. They help one another while keeping distinct roles and areas of influence. These are not the world's only factions; the opposing side is a separate design slice. The labels below describe roles only, not final faction names.
+Three large, church-associated Major Factions form one cooperative side that the player may support. They help one another while keeping distinct roles and areas of influence. They are not the world's only factions. The primary opposing Major Faction is outlined below; its branches and other hostile groups remain future design work. The labels below describe roles only, not final faction names.
 
 | Working role | Owner-approved direction |
 |---|---|
@@ -72,7 +76,32 @@ The first two factions are concentrated near one another; the third is oriented 
 
 These role descriptions are original project placeholders. References to familiar religious structures or other fiction are comparative inspiration only; do not reuse distinctive names, symbols, doctrine, or lore from those sources.
 
-Each faction owns:
+## Primary opposing Major Faction: the Sealed Stage 0 Being
+
+A separate, ancient Stage 0 being lost its sanity and became the object of a widespread opposing faith. It is shut away on a divine plane and cannot currently enter the world of living people. Its followers remain devoted. Some call it the **True God**; others call it the **False God**. These are rival in-world beliefs, not settled authorial labels: followers interpret its altered, incomprehensible and hostile state as the being's wrath against the world.
+
+This Major Faction's central goal is to bring the being back into the living world. If it returns and the other interested powers cannot stop it, that is one possible world-ending catastrophe and a negative ending. The followers include practitioners at multiple Pathway stages, including Stages 1, 2, and 3. Their exact hierarchy, branches, operations, and return conditions remain open.
+
+One possible positive resolution is to stop the return plan before it succeeds. The player might dismantle its followers or persuade some to abandon it; these are example approaches, not a closed list of quests or a prescribed moral route.
+
+### Candidate finale concept — unresolved
+
+If the being returns, a final confrontation involving the factions and other powers with a stake in the outcome is a possible finale. The current concept treats the being as vastly stronger than the assembled opposition (possibly by roughly an order of magnitude); the player's prior help and the selected difficulty could affect the result. The participant list, whether this battle is mandatory, and all difficulty, combat, and outcome rules remain undecided. No numerical model is established here.
+
+Preventing this catastrophe could resolve the world's main conflict positively, but it does not settle the existing finite-world law. Whether that resolution ends the world, leaves it to reach a later terminal state, or uses another form of closure remains open.
+
+## Candidate beneficial Minor Factions
+
+These are owner-provided examples of smaller groups the player could discover or support. Their working descriptions are not final names or complete system rules.
+
+| Working role | Current concept |
+|---|---|
+| **Covert alchemical network** | A secretive, difficult-to-access group focused on potions, ingredients, formulas, and alchemical research. It offers work such as finding rare ingredients or lost formulas and can provide useful knowledge. It covertly shelters or organizes practitioners who operate outside the major oversight faction's law, gives them work, and helps them develop. Its head is generated as a Stage 2 or Stage 3 practitioner; never Stage 0 or Stage 1. This is a full-game world premise, not a requirement to include Stage 2 or 3 in V1; V1 remains limited to Stages 9–7. Leadership may vary between worlds. Its activities are treated as unlawful because they indirectly support unregistered practitioners and the circulation of supernatural capability. This setting concept does not establish a third player-facing crafting profession; potion and item rules must remain compatible with [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) until the owner decides otherwise. |
+| **Healing and medical association** | A more open group with a discoverable base. It combines ordinary medicine with research and treatment involving supernatural forces, and studies loss of sanity and ways to protect mental stability. It has both lawful and unlawful practitioners and no single unified leader. This research concerns observable practitioner health and treatment; it does not define the out-of-scope Stage 0 belief/anchor mechanism. |
+
+Other beneficial or harmful Minor Factions may exist. Additional hostile groups that seek supernatural rule over ordinary people, reject or destroy the human world, or pursue another obscure goal are reserved for a later design pass; they are not defined factions yet.
+
+Under the existing world-simulation model, each Major Faction owns:
 
 - one or more Main Goals drawn from a limited pool;
 - available Operations;
@@ -80,11 +109,11 @@ Each faction owns:
 - conditions required to execute each Operation;
 - access to followers, mentors, artifacts, and economic niches scaled by Influence.
 
-Factions pursue Main Goals independently of the player. The player may participate, interfere, ignore, support, or betray.
+Major Factions pursue Main Goals independently of the player. The player may participate, interfere, ignore, support, or betray.
 
 ## Main Goals
 
-Main Goals come from a **limited pool**.
+Major Faction Main Goals come from a **limited pool**.
 
 The seed changes details such as:
 
@@ -94,7 +123,7 @@ The seed changes details such as:
 - required conditions;
 - local dressing of the same underlying goal type.
 
-When a faction completes a Main Goal:
+When a Major Faction completes a Main Goal:
 
 1. its Faction Influence increases;
 2. the world changes in a readable way under that Influence;
@@ -118,9 +147,9 @@ Valid Side Event outcomes include allies, mentors, consumables, clues, artifacts
 
 # World Engine
 
-The World Engine is a lightweight scheduler of consequential faction actions. It does **not** simulate civilizations, populations, or every NPC decision.
+The World Engine is a lightweight scheduler of consequential Major Faction actions. It does **not** simulate civilizations, populations, or every NPC decision.
 
-At defined world intervals, the World Engine inspects each faction's current Main Goal, requirements, and eligible Operations, then attempts an eligible Operation. This keeps the simulation bounded, legible, and feasible for a solo developer while allowing the world to evolve without the player.
+At defined world intervals, the World Engine inspects each Major Faction's current Main Goal, requirements, and eligible Operations, then attempts an eligible Operation. This keeps the simulation bounded, legible, and feasible for a solo developer while allowing the world to evolve without the player.
 
 Operations may include, for example:
 
@@ -216,15 +245,15 @@ Exact slider ranges, presets, numerical distributions, and interactions remain o
 
 Economy is an expression of Faction Influence.
 
-As a faction's Influence grows, it occupies niches: better access, better prices for allies, worse prices or closed services for opponents, stronger artifacts and support. Detailed economy simulation is deferred, but future economy design must treat Influence as the primary driver rather than an isolated shop spreadsheet.
+As a Major Faction's Influence grows, it occupies niches: better access, better prices for allies, worse prices or closed services for opponents, stronger artifacts and support. Detailed economy simulation is deferred, but future economy design must treat Influence as the primary driver rather than an isolated shop spreadsheet.
 
 # World Collapse
 
-A world never ends because of a timer. It ends because Balance has been irreversibly broken: dominant Faction Influence and completed Main Goals push the world into a terminal state.
+A world never ends because of a timer. It ends because Balance has been irreversibly broken: one Major Faction's dominant Influence and completed Main Goals push the world into a terminal state. The sealed Stage 0 being's return is also a possible terminal catastrophe.
 
 The player may delay collapse, redirect which terminal state occurs, or accelerate collapse. The player can never prevent collapse forever. This preserves the finite-world Meta Loop while giving choices meaningful consequences.
 
-Whether Balance can partially recover without the player, and the exact terminal win condition per faction identity, remain open questions. No implementation may invent answers before they are documented.
+Whether Balance can partially recover without the player, how a positive resolution to the sealed being's threat fits the finite-world law, and each Major Faction's exact terminal condition remain open questions. No implementation may invent answers before they are documented.
 
 # Knowledge
 
@@ -253,5 +282,5 @@ Detailed curse, blessing, and pathway systems belong to future Progression / Mag
 - **Design Pillars:** Compatible. Side Events are forks, not free loot; Difficulty raises challenge without erasing curiosity.
 - **Player Experience:** Compatible. Hidden Influence shifts reward understanding; Yield Threshold and eavesdropping support inventive Approaches.
 - **Decision Engine:** Compatible. Intervention and Side Events instantiate Attention, Approach, Allegiance, Commitment, and Bargain.
-- **Glossary:** Updated for Stage 0 Being and seven independent Difficulty Settings; faction role labels remain descriptive placeholders.
-- **Open Questions:** Updated for the three cooperating faction roles, registration, jurisdiction, secrecy, and patron relationships; collapse and faction outcome details remain open.
+- **Glossary:** Updated for Stage 0 Being, Major Faction, Minor Faction, and seven independent Difficulty Settings; faction names remain placeholders.
+- **Open Questions:** Updated for the allied Major Factions, sealed Stage 0 antagonist, candidate minor groups, the positive-ending/finite-world tension, and the open generation model.

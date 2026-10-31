@@ -1,14 +1,14 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.8
+Version: 0.9
 Status: Draft
-Last Updated: 2026-10-31 (Three cooperating major-faction roles captured in 02; relationships, scope, and slice mapping remain open.)
+Last Updated: 2026-10-31 (Primary opposing Stage 0 faction and two candidate minor factions captured in 02; endings, branches, and generation model remain open.)
 
 Depends On:
-[000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
+[000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [99 Open Questions](99%20Open%20Questions.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md)
 
 Referenced By:
-[README](README.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [02 World Laws](02%20World%20Laws.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), future system design documents, specification-map data
+[README](README.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [02 World Laws](02%20World%20Laws.md), [99 Open Questions](99%20Open%20Questions.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), future system design documents, specification-map data
 
 ---
 
@@ -235,7 +235,7 @@ The following are review states, not claims about the current map.
 | Combat | Existing constraints and turn economy; full rules open | Audit [08](08%20Confront%20Constraints.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2](10.2%20Combat%20System%20Draft.md), [16](16%20Architecture%20Pivot.md) |
 | NPCs and creatures | Partial architecture references | Audit actor/spawn/AI cards |
 | Quests, POIs, information | Existing foundations; integration open | Audit [03](03%20Decision%20Engine.md), [04](04%20Points%20of%20Interest.md), [09](09%20Information%20Sources.md) |
-| Factions and relationships | Three cooperating major-faction roles captured in [02 World Laws](02%20World%20Laws.md); opposing side, jurisdiction, patron links, registration/secrecy conflicts, goals, relationships, and slice mapping remain open | Continue owner-led design; then define faction-system rules and reconcile the Lower Veil slice |
+| Factions and relationships | Three allied Major Factions, the primary opposing Stage 0-led Major Faction, and two candidate beneficial Minor Factions captured in [02 World Laws](02%20World%20Laws.md) | Resolve finale/finite-world relationship, hostile branches, minor-faction generation and system boundaries, then map factions to the Lower Veil slice |
 | Economy and item crafting | Item Creation and Enchanting foundations documented | Resolve economy, resource availability, and V1 scope after core item rules |
 | World simulation and generation | Significant existing documentation | Preserve current authority and audit only missing gameplay interfaces |
 | Shared rules, save, UI, balance | Partial architectural coverage | Audit system cards and cross-system contracts |
