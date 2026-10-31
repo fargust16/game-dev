@@ -1,6 +1,6 @@
 # 05 Progression
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft
 
@@ -143,6 +143,16 @@ Advancement to the next stage grants a predefined baseline package associated wi
 
 The attribute requirements are not caps on ordinary development. They define the intended preparation profile for advancement. Falling short of that profile does not by itself prevent the character from advancing: the character can still complete the transition, but insufficient preparation increases the Sanity loss. Better preparation reduces that risk. The exact preparation margin and Sanity-loss calculation remain open.
 
+Each Pathway-stage transition has exactly **two primary attributes** and **one secondary attribute** as its preparation requirements:
+
+- The two primary attributes are fixed for the entire Pathway and express its stable identity. For each target stage, both must reach that stage's prescribed attribute band.
+- The secondary attribute is selected per World Seed for each Pathway-stage combination. It may differ between worlds, but remains fixed within a given world.
+- The secondary requirement is lower than the primary requirements. Its exact band offset by target stage must follow the agreed stage-group mapping; numeric attribute thresholds and the final band mapping remain to be specified.
+- Shortfalls in either primary attribute add a substantially larger Sanity penalty than a shortfall in the secondary attribute. Any shortfall adds some penalty, and a larger gap produces a larger penalty.
+- Requirements are evaluated against the target stage being entered, not the stage being left.
+
+The exact attribute-to-band thresholds and numeric penalty curve remain open.
+
 The Pathway's stage requirements and advancement benefits are deterministic within that Pathway's design; they are not randomly rolled per character or changed by the world-difficulty setting.
 
 ## Character Strength Within and Across Stages
@@ -211,6 +221,29 @@ Possible prices include, according to Pathway and stage:
 - future loss of control risk at deeper stages.
 
 Refusal of a ready advancement is valid and sometimes wise.
+
+
+# Sanity Loss and Loss of Character Control
+
+Pathway advancement itself is deterministic: consuming the correct advancement potion completes the stage transition. There is no random success/failure roll for the transition.
+
+The transition's Sanity cost is resolved in this order:
+
+1. Consume the correct potion and advance to the target stage.
+2. Calculate the mandatory Sanity cost for that Pathway-stage transition. This cost applies even with ideal preparation.
+3. Calculate the additional preparation penalty from any attribute shortfalls. Primary-attribute deficits weigh substantially more than the secondary-attribute deficit; larger gaps cause larger penalties.
+4. Subtract both costs from current Sanity and determine whether the character retains their sanity.
+
+Conceptually: `Sanity_after = Sanity_before − Mandatory_Transition_Cost − Preparation_Penalty`.
+
+Losing sanity does **not** cancel or reverse the advancement. The character receives the new stage but permanently ceases to be an ordinary player-controlled character. The former character remains in the world as a game-controlled monster/creature. This is a loss of character control, not ordinary death.
+
+The creature's form depends on the stage reached:
+
+- **Stages 9–6:** the default outcome is a human-shaped zombie. It is treated as a monster by game systems while retaining a human-like appearance and movement.
+- **Stages 5–0:** a mystical monster form becomes possible. The form is specific to the character's Pathway and reached stage, but this transformation is only a chance, not an automatic consequence. The character may instead remain a human-shaped zombie.
+
+The exact mandatory Sanity costs, preparation-penalty curve, sanity-retention threshold/probability, and probability of a mystical form remain open.
 
 # External Power: Churches and Entities
 
