@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.65
+Version: 0.66
 
 Status: Draft
 
-Last Updated: 2026-10-31 (Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-10-31 (Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -77,6 +77,14 @@ Each transition requires exactly two primary attributes and one secondary attrib
 
 **Is Pathway advancement itself random, and what happens when sanity is lost?**  
 No transition success roll: consuming the correct potion always grants the target stage. The mandatory transition Sanity cost and any preparation penalty are subtracted from current Sanity. If sanity is lost, advancement remains successful, but the character becomes a game-controlled creature in the world rather than an ordinary player character. At stages 9–6 the creature is human-shaped (zombie-like). At stages 5–0 a Pathway- and stage-specific mystical form becomes possible, but is only a chance; the character may remain human-shaped. See [05 Progression](05%20Progression.md).
+
+## Items, Inventory, and Equipment
+
+**Can professions increase an existing item's rarity or add more modifiers?**  
+No. An item's base properties, rarity, and number of modifier slots are established when the item is generated or created. Professions cannot raise its rarity or add modifier slots; they can only alter existing, unlocked modifiers through reforging. A player seeking a different modifier capacity or a higher-potential item must obtain or create another item.
+
+**How does modifier reforging and locking work?**  
+A standard reforging operation randomly changes every currently unlocked modifier on the item. Its operation cost is independent of the number of modifiers changed. A separate locking operation permanently and irreversibly protects one chosen modifier. Any number of modifiers may be locked, but each successive lock on the same item costs substantially more resources. There is no single-modifier reroll operation: to reroll only one modifier, the player must lock all the others first. Exact costs, time, and lock-cost growth remain open. See [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md).
 
 ## Character Attributes, Skills, and Action Checks
 
@@ -339,7 +347,7 @@ How do base-item level and attribute requirements constrain eligible modifier ti
 
 What are the profession-specific modifier-learning rules: how does a character discover/learn a modifier, what does mastery unlock, and how are eligible reforging outcomes and tier ranges determined?
 
-What exact resource costs, randomisation rules, and safeguards apply to reforging, including whether a reforged item can lose or replace multiple modifiers at once?
+What are the exact resource costs and time requirements for standard reforging and permanent modifier locking? What is the growth curve for successive lock costs, and how does it avoid making either full locking or repeated full reforging trivially optimal?
 
 How do item modifiers interact with crafting, enchantment, identification/appraisal, equipment requirements, durability, and Pathway abilities?
 
