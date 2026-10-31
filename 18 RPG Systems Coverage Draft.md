@@ -84,6 +84,22 @@ Existing progression foundations must be audited and extended, not replaced by a
 - **Item acquisition and loss:** define loot, quest rewards, trade, theft, confiscation, death, and legacy.
 - **Durability and maintenance:** assess whether repair, wear, and degradation belong in V1 or should be deferred.
 
+### Owner's itemisation direction — base items and modifiers
+
+The intended model takes its structural inspiration from **Path of Exile**, while deliberately using a much smaller base-item catalogue.
+
+- **Base items:** equipment begins from a defined base type with its own foundational properties. The catalogue should cover the main gameplay and equipment archetypes without attempting PoE-scale breadth.
+- **Armour bases:** the initial broad families are cloth, leather, and heavy/metal armour. Each family has bases for the relevant equipment slots, such as boots, trousers, belt, body armour, helmet, gloves, and shoulder pieces.
+- **Weapon bases:** a compact set of recognisable weapon families, including examples such as dagger, sword, shield, spear, bow, and staff. The catalogue may include several visual/base variants within a family (for example, different iron sword forms) to avoid excessive repetition without multiplying mechanics unnecessarily.
+- **Modifiers:** generated properties are added to a base item. The intended structure has up to three primary and three secondary modifiers, following the broad modifier model the owner likes in Path of Exile. Exact terminology, slot rules, pools, and whether every rarity can use the full count remain open.
+- **Modifier pools:** modifiers are specific to compatible base families/types rather than one unrestricted pool for every item. Modifiers may represent enchantments or other additional properties; exact categories and generation constraints remain to be designed.
+- **Rarity:** the discussed rarity vocabulary is Normal, Magic, Rare, Epic, Unique, and Legendary. The owner wants modifier count/content to drive the rarity of procedurally generated base items. Epic/Legendary/Unique-style items are also intended as a separate hand-authored content class rather than simply another ordinary base with random modifiers; the exact boundary and hierarchy among these labels need clarification.
+- **Unique items:** these are separately authored items with their own defining properties and potentially build-/playstyle-changing effects. Some may be associated with particular Pathways. They are not required to fit the ordinary base-item catalogue.
+- **Visual variety:** base families should have modest visual variants. The intended asset workflow should allow an AI-assisted prompt to generate model variants within defined base families while preserving readable silhouettes and shared item identity.
+- **Acquisition:** random base-item drops may come from NPCs, selected monsters, and selected chests. Drop eligibility/chance and item rarity are distinct layers: the chance to receive an item and the chance for a successful drop to be a rarer item are separate questions. The owner connected critical success with rarer outcomes, but exact drop/check rules and probabilities remain open.
+
+This is a recorded design direction, not a completed item-generation specification. Inventory stacking, item-instance identity, exact modifier generation, numerical rarity rules, crafting/identification interactions, and V1 content scope remain open.
+
 ## D. Combat and confrontation
 
 Combat is a distinct arena-based mode under the current architecture; it must not make combat the default best solution.
