@@ -1,10 +1,10 @@
 # 05 Progression
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft
 
-Last Updated: 2026-10-30
+Last Updated: 2026-10-31
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
@@ -125,6 +125,38 @@ Each stage requires:
 3. the correct formula knowledge for this World Seed;
 4. the correct ingredients / conditions for this World Seed;
 5. acceptance of that stage's Bargain / price.
+
+# Pathway Stages and Ordinary Character Development
+
+Pathway stages and ordinary character development are **separate, interacting dimensions** of character power.
+
+- Ordinary attributes and individual skills can be developed continuously through their own action-based progression tracks, whether or not the character has a Pathway.
+- Pathway stages do not cap, unlock, or otherwise limit ordinary attribute or skill progression.
+- A Pathless character can therefore develop attributes and skills to levels comparable with a character on Stage 9. The Pathless character does not gain the Pathway's mystical abilities or stage-granted powers, so comparable ordinary statistics do not imply identical overall capabilities.
+- A character's Pathway stage is not a character level and does not determine their exact attributes or skills.
+
+## Stage Requirements and Advancement Benefits
+
+Each Pathway has deterministic, predefined requirements for each of its stages. These requirements specify the relevant attributes and their required levels; the exact attributes and numeric thresholds are to be designed separately for each Pathway and stage.
+
+Advancement to the next stage grants a predefined baseline package associated with that stage. Depending on the Pathway and stage, this package may include increases to specified core attributes, skills, abilities, and/or mystical capabilities. The exact packages are not defined here.
+
+The attribute requirements are not caps on ordinary development. They are advancement criteria and preparation targets. A character who advances without being sufficiently prepared may still complete the transition, but risks losing some Sanity; being better prepared reduces that risk. The exact eligibility boundary, preparation margin, Sanity-loss calculation, and whether any conditions can prevent a transition remain open.
+
+The Pathway's stage requirements and advancement benefits are deterministic within that Pathway's design; they are not randomly rolled per character or changed by the world-difficulty setting.
+
+## Character Strength Within and Across Stages
+
+Characters at the same Pathway stage may have different attributes and skills because their ordinary development, experience, and histories differ. Stage membership must not assign every character an identical or narrowly fixed stat block.
+
+Generated character populations should nevertheless remain plausible and gradual:
+
+- As Pathway stage advances (toward Stage 0), the typical attribute level should trend upward.
+- Distributions for adjacent stages may overlap. A character on a lower stage can be stronger in ordinary attributes or skills than an individual on the next higher stage.
+- The overlap should be controlled rather than extreme: the typical Stage 9 character should not have implausibly exceptional attributes compared with the typical Pathless or Stage 10-range character population. In particular, high attributes should not become common among ordinary NPCs merely because they possess Stage 9.
+- Stage distribution and attribute/skill distribution are related but distinct generation decisions. World difficulty may shift how frequently higher stages and stronger characters are generated, but it must not change the canonical formulas or make all characters at a stage equally strong.
+
+A character's social role, influence, agenda, and likelihood of appearing in a local encounter are determined by world and actor systems, not by Pathway stage alone. Very high-stage figures should be rare and their presence in the world should follow their role and agenda rather than arbitrary local spawning.
 
 # Between-Stage Progress
 
