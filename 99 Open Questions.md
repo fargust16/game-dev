@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.58
+Version: 0.59
 
 Status: Draft
 
-Last Updated: 2026-10-30 (derived character statistics and Will Power resource documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-10-31 (Stamina expenditure and recovery rules agreed; derived character statistics and Will Power resource documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -253,7 +253,7 @@ What are the exceptional requirements and unique benefit for attribute 100?
 
 ## Derived Character Statistics
 
-What are the exact formulas and scales for Maximum HP, Maximum Stamina, and Maximum Will Power?
+What are the exact formulas and scales for Maximum HP, Maximum Stamina, and Maximum Will Power? Maximum Stamina is primarily derived from Endurance; its formula remains open.
 
 What are the exact ability costs and how do they vary among Pathways and ability types?
 
@@ -261,13 +261,13 @@ How do effects damage or suppress Will: temporary effective-attribute reduction,
 
 What are the exact Movement Speed formula and separate world/arena units?
 
-What are the Carrying Capacity formula, thresholds for Normal / High / Overloaded / Critical Overload, and consequences of each band?
+What are the Carrying Capacity formula, thresholds for Normal / High / Overloaded / Critical Overload, and consequences of each band? Load increases Stamina expenditure during exertion, substantially so in Overloaded and Critical Overload states; exact thresholds and multipliers remain open.
 
 What are the Accuracy and Evasion formulas and their reconciliation with the shared action-check model?
 
 What are the Physical/Magical Defence conversion curves, caps, stacking, and penetration rules?
 
-What are the exact recovery rules for HP, Stamina, Will Power, and individual negative conditions?
+What are the exact recovery rules for HP, Will Power, and individual negative conditions? Stamina recovery is fixed at 5% of maximum per world tick while not performing Stamina-consuming exertion; exact modifiers/blockers remain open.
 
 Which derived values are shown to the player at different Intelligence levels?
 
