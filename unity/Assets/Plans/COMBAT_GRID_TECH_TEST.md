@@ -122,7 +122,7 @@ The terrain assets are gitignored and date from 2026-10-18, a month after the sc
 
 | Result | Next step |
 |---|---|
-| G1–G6 pass | Grid technology holds. Take the edge rule to the owner, then build Phase B |
+| G1–G6 pass | Grid technology holds. The owner set the edge rule on 2026-11-02: the grid follows the player. Next is Phase B |
 | G1 or G2 fails | Try batched queries, then a smaller reach or a grid fixed at the start of a fight |
 | G4 fails | Find the cause in the reading before any change to the rules |
 | Large pass difference | Production pieces need colliders or a semantic reading, which is its own decision |

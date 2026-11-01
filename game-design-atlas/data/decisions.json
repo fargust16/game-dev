@@ -1008,7 +1008,7 @@
   },
   {
     "id": "d-combat-in-place",
-    "statement": "Confront runs in place on a Combat Grid that forms around the player from real geometry and reaches 20 cells in every direction; fights the player cannot see are simulated by tick without a grid. The Combat Arena and Theme Packs are retired. Interiors stay separate scenes with their own grid, and a fight follows through a door like a level change in Fallout. A round is one tick. Walls that block the view become transparent outlines.",
+    "statement": "Confront runs in place on a Combat Grid that forms around the player from real geometry reaches 20 cells in every direction, and follows the player every step; fights the player cannot see are simulated by tick without a grid. The Combat Arena and Theme Packs are retired. Interiors stay separate scenes with their own grid, and a fight follows through a door like a level change in Fallout. A round is one tick. Walls that block the view become transparent outlines.",
     "rationale": "Owner's intended combat. It restores in-location Turn-Based Mode, which was cancelled in 2026-08 as too expensive; the grid exists only during Confront.",
     "alternatives": "",
     "systemIds": [

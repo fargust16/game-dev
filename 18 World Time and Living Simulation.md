@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.11
+Version: 0.12
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-01 (fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-02 (fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -317,7 +317,7 @@ Information transmission is not automatic universal knowledge. Each channel need
 14. How are timed condition durations and early-removal probabilities finalised?
 15. What is the final encounter escape distance and how is it measured on the grid?
 16. How are actors inserted into Initiative when they arrive during an active round?
-17. How does the Combat Grid handle arrivals, departures, pursuit, and re-engagement across a whole city?
+17. A fighter who leaves the Combat Grid drops into simulation, and one who comes inside appears on it from the next round. How do pursuit and re-engagement work across a whole city?
 18. What information can each communication channel transmit, to whom, how quickly, and with what limits?
 19. How are NPC goals, task selection, danger assessment, refuge selection, and return decisions governed?
 20. How much of the world is simulated in detail at once, and how are distant or unloaded NPCs abstracted without losing important consequences?
