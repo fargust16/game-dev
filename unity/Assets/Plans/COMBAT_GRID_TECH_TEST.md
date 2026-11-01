@@ -16,7 +16,7 @@ The test decides nothing about combat rules. It changes no production code, scen
 
 ## State
 
-Phase A has run: see Results. Phase B is built and checked by script, and waits for the owner's look.
+Closed. The owner accepted the results on 2026-11-02, and CC-33 is resolved. See Decisions.
 
 ## Running Phase A
 
@@ -137,6 +137,16 @@ Colours: pale blue is open, yellow is low cover, orange is high cover, white is 
 **Checked by script** (`D:\Hobby\game-dev\research-data\combat-grid\lab_2`, four camera angles and a walk): 1353 cells around the player, the grid moved 7 times over 8 m with the last move at 1.8 ms, and the building in the way was replaced by its outline.
 
 **Not checked:** the keys and mouse, which only a person can press; how the view feels; fighters crossing the grid's edge, because the lab has no NPCs. The character's model does not appear in the script's snapshots, for a reason not yet established.
+
+## Decisions
+
+Owner, 2026-11-02:
+
+- The grid is built during a real fight, by whichever way is cheaper.
+- **Reach 20 is the cheaper way.** At 4.8 µs a cell, a 300 × 300 m city is 54 times the cells, about 0.4 s in one go, against 8 ms at the start and about 1.2 ms a step. That figure is an estimate from Phase A, not a measurement.
+- The slice uses 20 cells. It can grow to 30 if 20 proves too few.
+- 50 cells is the plan for later. By the same numbers it would cost about 50 ms to build and about 6 ms a step, mostly the search, which would then have to become incremental. Measure this before adopting it.
+- Fences, boundaries, lamps, props, and trees get colliders. This is implementation work in Wave C of [17](../../../17%20Game%20Systems%20Architecture.md), and it also changes free movement.
 
 ## What the result decides
 

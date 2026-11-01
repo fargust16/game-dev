@@ -1310,15 +1310,15 @@
   },
   {
     "id": "q-cc-33",
-    "text": "CC-33. Phase A shows the grid builds from generated terrain and buildings in about 8 ms with no hand correction, and it follows the player. Do pieces with no collider get one, do trees become obstacles, and how do the camera and transparent walls work?",
+    "text": "CC-33. Resolved: the technical test holds. The grid has 1 m cells, is built during a real fight, reaches 20 cells in the slice, and follows the player; 50 cells is the plan for later.",
     "systemIds": [
       "confront",
       "spatial-structure"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "technical-research",
     "origin": "imported"
   },

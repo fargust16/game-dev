@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 1.9
+Version: 1.10
 
 Status: Draft
 
-Last Updated: 2026-11-02 (Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
+Last Updated: 2026-11-02 (CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
 
 Depends On:
 [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -444,7 +444,7 @@ flowchart LR
 | **Multiplayer** | Authoritative grid on host. |
 | **Performance** | The grid reaches 20 cells from the player in every direction. Measured in the batch-mode Editor: a full build takes about 8 ms and a one-cell step about 1.2 ms ([test](unity/Assets/Plans/COMBAT_GRID_TECH_TEST.md)). |
 | **Extensibility** | Multi-level grids later. |
-| **V1 scope / Deferred** | Combat Grid V0 on the slice's city. **Gate:** CC-33. |
+| **V1 scope / Deferred** | Combat Grid V0 on the slice's city, at 20 cells. The gate, CC-33, is passed. A reach of 50 cells is planned for later. |
 | **Owning folder** | `unity/Assets/Scripts/Confront/Grid/` |
 
 ## C.5 Tactical Combat Action Economy
@@ -823,6 +823,7 @@ Detail acceptance: [OVERWORLD_V0_PLAN.md](unity/Assets/Plans/OVERWORLD_V0_PLAN.m
 |----|-----------|---------|
 | C0.1 | `IEncounterLock` stub trigger | Starts Confront |
 | C0.2 | `ICombatGrid` over a test scene | Walkable cells from real geometry |
+| C0.2a | Colliders on fences, boundaries, lamps, props, and trees | The grid and free movement both meet them |
 | C0.3 | `ITurnEconomy` skeleton | End encounter → free movement |
 | C0.4 | `IResidueApplier` stub | Marker/flag in the scene |
 

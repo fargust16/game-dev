@@ -1,10 +1,10 @@
 # 15 Procedural Building Generation
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Confront runs in place, so generated buildings feed the Combat Grid.)
+Last Updated: 2026-11-02 (fences, boundaries, lamps, and props need colliders. Earlier: Confront runs in place, so generated buildings feed the Combat Grid.)
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [90 Glossary](90%20Glossary.md)
@@ -101,7 +101,7 @@ Room Graph (assembly result)
 Vertical / openings / dress / secrets / gameplay bindings
 ```
 
-Confront runs in place on a Combat Grid built from the scene ([16](16%20Architecture%20Pivot.md)), so generated pieces must carry what the grid needs (CC-33).
+Confront runs in place on a Combat Grid built from the scene ([16](16%20Architecture%20Pivot.md)), so generated pieces must carry what the grid needs. Fences, boundaries, lamps, and props get colliders, which they lack today.
 
 ## Hard rules
 

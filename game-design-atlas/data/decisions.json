@@ -1008,7 +1008,7 @@
   },
   {
     "id": "d-combat-in-place",
-    "statement": "Confront runs in place on a Combat Grid that forms around the player from real geometry reaches 20 cells in every direction, and follows the player every step; fights the player cannot see are simulated by tick without a grid. The Combat Arena and Theme Packs are retired. Interiors stay separate scenes with their own grid, and a fight follows through a door like a level change in Fallout. A round is one tick. Walls that block the view become transparent outlines.",
+    "statement": "Confront runs in place on a Combat Grid that forms around the player from real geometry reaches 20 cells in every direction, and follows the player every step; fights the player cannot see are simulated by tick without a grid. The Combat Arena and Theme Packs are retired. Interiors stay separate scenes with their own grid, and a fight follows through a door like a level change in Fallout. A round is one tick. Walls that block the view become transparent outlines. The grid is built during a real fight, at 20 cells in the slice, with 50 cells planned for later.",
     "rationale": "Owner's intended combat. It restores in-location Turn-Based Mode, which was cancelled in 2026-08 as too expensive; the grid exists only during Confront.",
     "alternatives": "",
     "systemIds": [
@@ -1129,5 +1129,20 @@
       "src-21"
     ],
     "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-cover-ranged-only",
+    "statement": "Cover works only against ranged attacks, magical or by weapon, because it is a problem of aiming. It gives no advantage in melee. A fence is Half Cover, a small hindrance. Trees are obstacles and cover, and fences, boundaries, lamps, props, and trees get colliders.",
+    "rationale": "Keeps cover readable and gives melee a reason to close the distance.",
+    "alternatives": "",
+    "systemIds": [
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-10-1"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-02."
   }
 ]
