@@ -50,9 +50,9 @@ Ordinary character development is based on practising actions. Attributes and in
 
 # Arcana
 
-A **Arcana** is a long character-growth track with tiered advancements.
+An **Arcana** is a long character-growth track with ten Limits.
 
-The Vertical Slice offers one or two Arcana to the player ([05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md)).
+The Vertical Slice offers two Arcana to the player ([05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md)).
 
 The set must remain expandable later. New Arcana may be added if each one creates a distinct way of acting, not merely a different damage type.
 
@@ -74,7 +74,7 @@ An Arcana is not a perfect build. It is a commitment with closed doors.
 
 ## The 22 Arcana
 
-The game has **22 Arcana**, one for each Major Arcana archetype of the Tarot. An Arcana is what this document calls an Arcana. Each has ten **Limits**, the Limits of this document, tied to the ten Sephiroth, and each Limit has its own name. The tables, faction assignments, and attribute profiles are in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
+The game has **22 Arcana**, one for each Major Arcana archetype of the Tarot. Each has ten **Limits**, tied to the ten Sephiroth, and each Limit has its own name. The tables, faction assignments, and attribute profiles are in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
 
 The sealed being and the Spirit General belong to the Emperor Arcana. Other cult followers belong to the Emperor, Empress, or Hierophant Arcana.
 
@@ -328,7 +328,7 @@ Player Knowledge must not become a hidden +success% table that deletes decision 
 
 ## V1
 
-- one or two player Arcana with different styles of play;
+- two player Arcana with different styles of play;
 - player Limits 9 → 8 only, with Limit 7 for NPCs;
 - one joinable faction;
 - alternative Arcana acquisition via Bargain / quest / discovery;

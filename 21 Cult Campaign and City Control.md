@@ -285,7 +285,7 @@ A character far below Limit 2 cannot win a stat race. A General falls in one of 
 
 - by numbers, alongside an allied force;
 - after a disrupted ritual, which strips most of the strength from the General and all the cultists, so they are more likely to retreat than to keep fighting;
-- by a character who has reached Stage 2, or Stage 3 with good statistics and strategy.
+- by a character who has reached Limit 2, or Limit 3 with good statistics and strategy.
 
 Artifacts may help. They are tightly controlled, go only to trusted members with high standing, and some are dangerous to Sanity. They are unique items for later design.
 
@@ -400,7 +400,7 @@ Known risks:
 - **Content cost of ritual conditions.** Conditions that differ every time need a set of authored parts that the World Seed combines, which is a real load for a solo developer (CC-8).
 - **Slice scope.** The slice's required mechanics pull many undesigned systems into the first build (CC-29, CC-32, CC-33).
 - **Emptied cities after manifestation.** If captured cities lose their residents, the world after manifestation has few people, services, or quests left (CC-20).
-- **Time to reach a General.** Direct defeat takes Stage 2, or Stage 3 with good statistics and strategy, inside a 15–20 day campaign. A Stage 7 character has a 1.32 stage multiplier against a General's 2.66 ([07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md)). If the player cannot get deep enough in time, allied numbers and disrupted rituals carry that whole path (CC-10).
+- **Time to reach a General.** Direct defeat takes Limit 2, or Limit 3 with good statistics and strategy, inside a 15–20 day campaign. A Limit 7 character has a 1.32 Limit multiplier against a General's 2.66 ([07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md)). If the player cannot get deep enough in time, allied numbers and disrupted rituals carry that whole path (CC-10).
 - **Terrain evidence.** The target world and city count sit outside the conditions of the terrain research so far (CC-2).
 
 # 13. Scope
