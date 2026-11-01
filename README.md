@@ -56,7 +56,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
 | [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Draft | Combat Arena grid + vault/climb/window verbs |
 | [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) | Draft | Combat rules, equipment, and durability boundary |
-| [11 Vertical Slice](11%20Vertical%20Slice.md) | Draft | First playable proof: 1 district, 3 POIs, arena TB combat |
+| [11 Vertical Slice](11%20Vertical%20Slice.md) | Draft | First playable proof: 1 city, Stages 9–7, one General's invasion and ritual |
 | [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) | Draft | Full cards for arrest, collectors, soot-stair trace |
 | [12 Engine Choice](12%20Engine%20Choice.md) | Draft | Engine locked: Unity URP, free 3P + custom arena grid TB |
 | [16 Architecture Pivot](16%20Architecture%20Pivot.md) | Draft | Spatial authority: Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront |
@@ -190,7 +190,7 @@ Draft foundations in active refinement:
 - [09 Information Sources](09%20Information%20Sources.md) — how the player learns without omniscient markers
 - [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) — grid-native world + env verbs
 - [11 Vertical Slice](11%20Vertical%20Slice.md) — first playable proof plan
-- [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) — detailed Lower Veil encounter cards
+- [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) — detailed Lower Veil encounter cards from the earlier district slice
 - [12 Engine Choice](12%20Engine%20Choice.md) — Unity locked: free 3P + custom arena grid TB
 - [16 Architecture Pivot](16%20Architecture%20Pivot.md) — Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront (BG3 / Fallout 1–2 feel)
 - [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — systems map, dependency DAG, micro-iteration backlog

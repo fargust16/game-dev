@@ -1,10 +1,10 @@
 # 20 Alchemy and Potioncraft
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft — owner-approved foundation; skill progression, mini-game, recipes, and balance remain open
 
-Last Updated: 2026-10-31
+Last Updated: 2026-11-01 (potion-making included in the Vertical Slice.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -51,7 +51,7 @@ The six-tick duration and the presence of a mini-game are approved. Whether the 
 - The only potion category confirmed by this foundation is the Pathway advancement potion. Other potion categories and effects are not yet specified.
 - This document does not introduce HP-restoring potions or supersede current recovery rules.
 - No recipe table, formula-decoding formula, ingredient-search probability, potion quality model, or numeric cost is established here.
-- Alchemy's inclusion in the Vertical Slice is not yet approved; V1 progression currently covers Stages 9–7.
+- The Vertical Slice includes potion-making in a limited form ([11 Vertical Slice](11%20Vertical%20Slice.md)); V1 progression covers Stages 9–7.
 
 # 5. Open design questions
 

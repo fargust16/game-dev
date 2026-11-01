@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 1.4
+Version: 1.5
 
 Status: Draft
 
-Last Updated: 2026-11-01 (the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
+Last Updated: 2026-11-01 (Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
 
 Depends On:
 [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -640,7 +640,7 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 | **Multiplayer** | Shared world state. |
 | **Performance** | Coarse per-city ledger; characters instantiated on player entry (proposed, CC-15). |
 | **Extensibility** | More General behaviours and force types as data. |
-| **V1 scope / Deferred** | **Gate:** 21 and CC-11. Not in the Vertical Slice. |
+| **V1 scope / Deferred** | **Gate:** 21. The Vertical Slice needs one General's invasion and ritual in one city ([11](11%20Vertical%20Slice.md)); City Control across cities comes later. |
 | **Owning folder** | `unity/Assets/Scripts/Factions/` |
 
 ## E.2 Economy
@@ -670,7 +670,7 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 | **Multiplayer** | Host-authoritative direction remains a provisional architecture assumption. |
 | **Performance** | Data/UI-bound; final content size is open. |
 | **Extensibility** | Additional bases, modifier tables, and operation costs are data-driven design needs; no content catalogue is approved here. |
-| **V1 scope / Deferred** | Item creation and Enchanting are documented, but remain deferred from the current Vertical Slice's deep-crafting scope. |
+| **V1 scope / Deferred** | Item creation and Enchanting are documented. The Vertical Slice includes crafting in a limited form ([11](11%20Vertical%20Slice.md)). |
 | **Owning folder** | The existing `unity/Assets/Scripts/Crafting/` proposal is provisional; implementation folders/interfaces are not approved by this documentation update. |
 
 ---

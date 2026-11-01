@@ -1,13 +1,13 @@
 # 11 Vertical Slice
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft
 
-Last Updated: 2026-08-07
+Last Updated: 2026-11-01 (owner redefined the slice as one city at Stages 9–7 built around one General's invasion and ritual; retired combat references replaced with 10.2.)
 
 Depends On:
-[000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10 Turn Action Economy](10%20Turn%20Action%20Economy.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
+[000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
 
 Referenced By:
 [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), Future prototype milestones and first playable implementation planning.
@@ -24,6 +24,23 @@ It is a proof that the systems feel like this project, not like a generic RPG wi
 Success question:
 
 > After 30–60 minutes, does the player say “I want to try another approach / another lead,” rather than “I need more XP”?
+
+# Slice redefinition (owner-approved, 2026-11-01)
+
+This section governs. Where the older sections below disagree with it, this section wins until they are reworked (CC-24 … CC-26 in [99 Open Questions](99%20Open%20Questions.md)).
+
+The first version and the Vertical Slice are the same build:
+
+- **Place:** one specific city, not necessarily the capital, and not a single district.
+- **Territory:** the city plus a small area outside it, enough to gather resources, craft, and make potions.
+- **Stages:** the player stays at Stages 9–7. Allies and enemies may be deeper.
+- **Story:** on day 3–5 one General invades the city. It leaves after 15–20 ticks, and then the cult attempts the ritual.
+- **Ending:** the player either stops the ritual and wins, or the ritual succeeds and the player loses.
+- **The General:** those 15–20 ticks let the player feel its strength and even die to it in a direct fight. The main battle is against its followers.
+- **Stopping the ritual:** dialogue checks through deception, persuasion, or intimidation remain available.
+- **Mechanics:** most mechanics are implemented, in a limited form.
+
+This replaces the earlier limits of one district, exactly three POIs, deferred crafting, and a cult that does not appear. The era, mood, Approaches, and arena rules below stay in force.
 
 # Slice Fantasy
 
@@ -67,6 +84,8 @@ The slice must prove all of the following:
 9. Solo scope — one developer (with AI) can prototype it without a content army.
 
 # Scope In
+
+This section and those down to Content Budget were written for the earlier district slice.
 
 ## World
 
@@ -155,7 +174,7 @@ Turn-Based Mode / arena requirements:
 
 - Confront always loads a **thematic Combat Arena** (not in-location TB);
 - no voluntary Turn-Based Mode during free exploration;
-- Move + Action + Bonus economy on the arena only;
+- the Initiative and AP economy of [10.2](10.2%20Combat%20System%20Draft.md) on the arena only;
 - Break Away and Spare/Yield available in the abduction and/or arrest Confront;
 - at least one Theme Pack used (e.g. street or alley).
 
@@ -178,7 +197,6 @@ Not in the Vertical Slice:
 - many districts;
 - newspaper network;
 - full church pantheon;
-- deep crafting;
 - more than 2 factions;
 - procedural POI generation (hand-authored only);
 - perfect BG3 feature parity.
@@ -259,7 +277,7 @@ Post-pivot S0 target:
 ## Milestone S3 — Combat Arena
 
 - Confront loads a thematic Combat Arena;
-- Move + Action + Bonus on arena grid only;
+- the Initiative and AP economy of [10.2](10.2%20Combat%20System%20Draft.md) on the arena grid only;
 - one simple enemy type;
 - Break Away + Spare/Yield stubs;
 - return to source scene with residue stub.
@@ -317,6 +335,7 @@ If the budget grows, cut content before cutting systems proof.
 - [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md)
 - [04 Points of Interest](04%20Points%20of%20Interest.md)
 - [08 Confront Constraints](08%20Confront%20Constraints.md)
-- [10 Turn Action Economy](10%20Turn%20Action%20Economy.md)
+- [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md)
+- [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
 - [09 Information Sources](09%20Information%20Sources.md)
 - [99 Open Questions](99%20Open%20Questions.md)

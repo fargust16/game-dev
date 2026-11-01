@@ -78,7 +78,7 @@ The JSON is not canon. A decision added here stays `origin: new` until someone d
 
 Implementation status starts as unknown. The workspace does not infer code progress from a design document.
 
-Alchemy is now an approved potion-only profession required for Pathway advancement; its foundation is in [20 Alchemy and Potioncraft](../20%20Alchemy%20and%20Potioncraft.md). Its mini-game, learning path, recipes, V1 scope, and balance remain open. Deep equipment crafting remains outside the Vertical Slice unless separately approved.
+Alchemy is now an approved potion-only profession required for Pathway advancement; its foundation is in [20 Alchemy and Potioncraft](../20%20Alchemy%20and%20Potioncraft.md). Its mini-game, learning path, recipes, V1 scope, and balance remain open. The Vertical Slice includes crafting and potions in a limited form.
 
 Stage 3F questions are classified as technical research. They are not gameplay-design blockers.
 

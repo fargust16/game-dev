@@ -1,10 +1,10 @@
 # 05 Progression
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
+Last Updated: 2026-11-01 (deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
@@ -114,7 +114,7 @@ V1 implements only:
 
 Stages `6 → 0` are reserved for later documents and content. No implementation may assume their full rules yet.
 
-World actors at deeper stages, such as the Stage 2 Cult Generals of [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), are a full-game world premise. They do not widen the stages available to the player in V1.
+World actors at deeper stages, such as the Stage 2 Cult Generals of [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), can appear in V1 as allies and enemies. They do not widen the stages available to the player.
 
 ## Stage Occupancy Rule
 

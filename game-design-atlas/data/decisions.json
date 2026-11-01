@@ -881,5 +881,82 @@
       "src-21"
     ],
     "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-slice-redefined",
+    "statement": "The Vertical Slice is one city and a small territory at Stages 9–7, with most mechanics in a limited form. A General invades on day 3–5, leaves after 15–20 ticks, and the player either stops the ritual and wins or loses. Allies and enemies may be deeper.",
+    "rationale": "The first build should already show the war's core: a General, followers, and a ritual to stop.",
+    "alternatives": "",
+    "systemIds": [
+      "vertical-slice",
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-11"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-cult-pace",
+    "statement": "An eighth Difficulty Setting, Cult Pace, controls how fast Cult Forces generate followers and so how fast the cult advances.",
+    "rationale": "It does not fit the other seven sliders, and the rule forbids bundling unrelated effects.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-02"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-place-of-power-decay",
+    "statement": "A Place of Power keeps its force for one game day after its city is liberated, so a last-minute liberation does not stop manifestation.",
+    "rationale": "Closes a stealth dash during the attack on the capital.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-force-numbers",
+    "statement": "A full city or sortie is about 20 followers of different stages; a city a General has just left holds about 10. The Spirit General generates fastest with weaker followers and strikes first on day 3–5, the Raiding General is in the middle on day 5–7, and the Holding General is slowest on day 7–8.",
+    "rationale": "Keeps the load reasonable and staggers the first strikes.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-general-defeat",
+    "statement": "A General falls to allied numbers, after a disrupted ritual, or to a character at Stage 2, or Stage 3 with good statistics and strategy. Allied forces can kill Generals without the player: rarely on the middle setting, and all three at the lowest setting, where the game wins by itself.",
+    "rationale": "There is no special weapon; artifacts are later design.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
   }
 ]

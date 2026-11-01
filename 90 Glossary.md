@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.64
+Version: 0.65
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-01 (Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -222,7 +222,7 @@ Lightweight world remembrance of a previous character through rumours, dialogue 
 
 ## Difficulty Settings
 
-Seven independent world-generation sliders for combat difficulty, inhabitants, resource gathering, crafting, economy, equipment quality, and wear/maintenance. They do not form one bundled Easy / Normal / Hard / Hell scale; faction-pressure interactions remain with their owning systems. Campaign pace depends on difficulty, and the setting that owns it remains open.
+Eight independent world-generation sliders for combat difficulty, inhabitants, resource gathering, crafting, economy, equipment quality, wear/maintenance, and Cult Pace. They do not form one bundled Easy / Normal / Hard / Hell scale; faction-pressure interactions remain with their owning systems. Cult Pace controls how fast Cult Forces generate followers and so how fast the cult advances.
 
 ---
 
@@ -326,13 +326,13 @@ Combat uses an Action Point (AP) pool. At the start of a character's turn, the c
 
 ## Vertical Slice
 
-The smallest playable prototype that proves the game fantasy and core systems without building the full game.
+The smallest playable prototype that proves the game fantasy and core systems without building the full game. It is one city and a small territory at Stages 9–7, built around one General's invasion and a ritual the player must stop.
 
 ---
 
 ## Lower Veil District
 
-Placeholder name for the Vertical Slice district: a poor/industrial urban area of medicine, night routes, factory pressure, and Warden order.
+Placeholder name for the district of the earlier, district-sized Vertical Slice: a poor/industrial urban area of medicine, night routes, factory pressure, and Warden order.
 
 ---
 
@@ -1064,7 +1064,7 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Cult Ritual** — A timed operation of the opposing faction through which it captures a city and turns it into a Place of Power. Its current campaign window is six in-game hours (360 World Ticks), with no player-facing numeric countdown; the operation resolves through faction action when the window ends. Its place within City Capture, its effect on the city, its schedule, concurrency limits, and detailed interruption rules remain open.
 
-**Place of Power** — A captured city prepared for the manifestation, with its residents kept alive as future sacrifices. Nobody in the world knows this purpose, and the player learns it only at manifestation. A Place of Power needs no visible mark.
+**Place of Power** — A captured city prepared for the manifestation, with its residents kept alive as future sacrifices. Nobody in the world knows this purpose, and the player learns it only at manifestation. A Place of Power needs no visible mark and keeps its force for one game day after its city is liberated.
 
 **Cult Retreat** — The collective flight of cult followers from every point of a city at once, triggered by the death of a senior left in charge or by losses that leave them a dangerous minority. They can be chased and killed while they stay in the fight, and they head for the nearest city under Cult Control or scatter outside the walls.
 

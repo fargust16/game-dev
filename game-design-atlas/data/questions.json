@@ -53,7 +53,7 @@
   },
   {
     "id": "q-wl-difficulty",
-    "text": "What exact force values and odds produce the agreed final-fight direction: allies win at the lowest Combat Difficulty, Normal is near-even with a slight enemy advantage, and higher settings increasingly favour the enemy? Do the other six sliders affect support or outcome?",
+    "text": "What exact force values and odds produce the agreed final-fight direction: allies win at the lowest Combat Difficulty, Normal is near-even with a slight enemy advantage, and higher settings increasingly favour the enemy? Do the other seven sliders affect support or outcome?",
     "systemIds": [
       "world-laws"
     ],
@@ -929,7 +929,7 @@
   },
   {
     "id": "q-cc-4",
-    "text": "CC-4. Resolved: a Cult Sortie begins and the ritual starts trying to run, followers are cleared, the six-hour ritual completes, and a garrison stays.",
+    "text": "CC-4. Resolved: order, six-hour window, and garrison sizes are decided.",
     "systemIds": [
       "cult-campaign"
     ],
@@ -968,7 +968,7 @@
   },
   {
     "id": "q-cc-7",
-    "text": "CC-7. Ownership and the two-day ritual wait are decided. Does the wait count per city, per General, or for the whole cult? Does a sortie against an Unclaimed city need a fight? Does a garrison's death set its General back?",
+    "text": "CC-7. Ownership, the two-day wait per city, and the one-day force of a Place of Power are decided. Does a sortie against an Unclaimed city need a fight, and does a garrison's death set its General back?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1007,7 +1007,7 @@
   },
   {
     "id": "q-cc-10",
-    "text": "CC-10. How does the player predict which city the Spirit General comes out in, how is the Raiding General found between sorties, and how can a character far below Stage 2 defeat a General?",
+    "text": "CC-10. The ways to defeat a General are decided. How does a seer's prediction reach a player outside a faction, how is the Raiding General found, and can a player reach Stage 2–3 within 15–20 game days?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1020,20 +1020,20 @@
   },
   {
     "id": "q-cc-11",
-    "text": "CC-11. Is the war for cities part of V1, given the player stage limit and the Vertical Slice scope?",
+    "text": "CC-11. Resolved: V1 is the one-city slice; allies and enemies may be deeper than Stages 9–7.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "scope",
     "origin": "imported"
   },
   {
     "id": "q-cc-12",
-    "text": "CC-12. Followers appear near each General and a certain number launches a sortie. At which stages, how often, with what cap, how many make a sortie or a garrison, and do the Generals differ in rate?",
+    "text": "CC-12. The order of rates, first sortie days, and force sizes are decided. What are the exact rates, the stage mix of each General's followers, and any cap?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1059,20 +1059,20 @@
   },
   {
     "id": "q-cc-14",
-    "text": "CC-14. The direction of sortie odds is set. Which setting owns campaign pace and those odds: an eighth slider, Combat Difficulty, or World Inhabitants?",
+    "text": "CC-14. Resolved: the eighth slider, Cult Pace, owns campaign pace. Its range and steps are open.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-cc-15",
-    "text": "CC-15. How is a sortie's result against a city's defence calculated, is a per-city follower ledger the right model, and can allied groups kill a General without the player?",
+    "text": "CC-15. A sortie's result depends on the city's defence and allied forces can kill a General. How is that comparison calculated, and is a per-city follower ledger the right model?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1085,7 +1085,7 @@
   },
   {
     "id": "q-cc-16",
-    "text": "CC-16. How do allied factions choose what to defend, and do they liberate cities on their own?",
+    "text": "CC-16. Factions usually act alone and unite when weak. How does each of the three differ, and how does each choose its next city?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1098,7 +1098,7 @@
   },
   {
     "id": "q-cc-17",
-    "text": "CC-17. Can the smaller rituals be sabotaged, does the cult restart at once after a broken capital ritual, how long is that ritual, can the capital be attacked before the gate opens, and how does the cult move on liberated cities after manifestation?",
+    "text": "CC-17. A city liberated less than a game day earlier still counts. How does the final battle with three Generals run, can the smaller rituals be disrupted, how long is the capital ritual, and what follows a broken one?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1185,6 +1185,47 @@
     "status": "open",
     "priority": "high",
     "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-24",
+    "text": "CC-24. Day 3–5 is about 8–14 real hours, while the slice still asks for a verdict after 30–60 minutes. Does the slice keep the campaign's clock or compress the wait?",
+    "systemIds": [
+      "vertical-slice",
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "scope",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-25",
+    "text": "CC-25. In the slice the ritual is attempted after the General leaves, while in the campaign it starts with the attack. Is this a slice simplification, which General invades, and does the six-hour window apply?",
+    "systemIds": [
+      "vertical-slice",
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-26",
+    "text": "CC-26. Which city is the slice, which factions appear, what becomes of Lower Veil, Wardens, Veinmarket, and the three POI cards, and which mechanics count as the 'most' that must be built?",
+    "systemIds": [
+      "vertical-slice"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "scope",
     "origin": "imported"
   }
 ]
