@@ -640,7 +640,7 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 | **Multiplayer** | Shared world state. |
 | **Performance** | Coarse per-city ledger; characters instantiated on player entry (proposed, CC-15). |
 | **Extensibility** | More General behaviours and force types as data. |
-| **V1 scope / Deferred** | **Gate:** 21. The Vertical Slice needs one General's invasion and ritual in one city ([11](11%20Vertical%20Slice.md)); City Control across cities comes later. |
+| **V1 scope / Deferred** | **Gate:** 21. The Vertical Slice needs the Spirit General's invasion and ritual in one city ([11](11%20Vertical%20Slice.md)); City Control across cities comes later. |
 | **Owning folder** | `unity/Assets/Scripts/Factions/` |
 
 ## E.2 Economy
@@ -670,7 +670,7 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 | **Multiplayer** | Host-authoritative direction remains a provisional architecture assumption. |
 | **Performance** | Data/UI-bound; final content size is open. |
 | **Extensibility** | Additional bases, modifier tables, and operation costs are data-driven design needs; no content catalogue is approved here. |
-| **V1 scope / Deferred** | Item creation and Enchanting are documented. The Vertical Slice includes crafting in a limited form ([11](11%20Vertical%20Slice.md)). |
+| **V1 scope / Deferred** | Item creation and Enchanting are documented. The Vertical Slice includes Item Creation in a limited form and excludes Enchanting ([11](11%20Vertical%20Slice.md)). |
 | **Owning folder** | The existing `unity/Assets/Scripts/Crafting/` proposal is provisional; implementation folders/interfaces are not approved by this documentation update. |
 
 ---

@@ -1,54 +1,64 @@
 # 11 Vertical Slice
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft
 
-Last Updated: 2026-11-01 (owner redefined the slice as one city at Stages 9–7 built around one General's invasion and ritual; retired combat references replaced with 10.2.)
+Last Updated: 2026-11-01 (rewritten for the owner's one-city slice: the Spirit General's invasion on day 1–2, a ritual the player stops or loses to, one joinable faction with two or three Pathways, and the required mechanics. Earlier: owner redefined the slice as one city at Stages 9–7; retired combat references replaced with 10.2.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
 
 Referenced By:
-[11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), Future prototype milestones and first playable implementation planning.
+[11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [11.2 Milestone S0 Greybox](11.2%20Milestone%20S0%20Greybox.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), Future prototype milestones and first playable implementation planning.
 
 ---
 
 # Purpose
 
-This document defines the **Vertical Slice**: the smallest playable piece that proves the game fantasy.
+This document defines the **Vertical Slice**: the first version of the game and the smallest playable piece that proves its fantasy.
 
 It is not the full game.
 It is a proof that the systems feel like this project, not like a generic RPG with stickers.
 
 Success question:
 
-> After 30–60 minutes, does the player say “I want to try another approach / another lead,” rather than “I need more XP”?
+> After one run, does the player say “I want to try another approach / another lead,” rather than “I need more XP”?
 
-# Slice redefinition (owner-approved, 2026-11-01)
+A run lasts one to two game days before the invasion plus the fight for the ritual, about 3–6 real hours.
 
-This section governs. Where the older sections below disagree with it, this section wins until they are reworked (CC-24 … CC-26 in [99 Open Questions](99%20Open%20Questions.md)).
+# Slice Story
 
-The first version and the Vertical Slice are the same build:
+The owner approved this story on 2026-11-01.
 
-- **Place:** one specific city, not necessarily the capital, and not a single district.
-- **Territory:** the city plus a small area outside it, enough to gather resources, craft, and make potions.
-- **Stages:** the player stays at Stages 9–7. Allies and enemies may be deeper.
-- **Story:** on day 3–5 one General invades the city. It leaves after 15–20 ticks, and then the cult attempts the ritual.
+- **Place:** one city, not necessarily the capital, and a small area outside it, enough to gather resources, craft, and make potions.
+- **Opening:** the player has one to two game days of ordinary life in the city.
+- **Invasion:** after those days the Spirit General comes out in the city with its followers, and the ritual starts at once.
+- **The General leaves:** after 15–20 ticks it returns to the Spirit World and leaves the ritual to its followers. It cannot be hunted afterwards.
+- **The final fight:** the main battle is against its followers.
 - **Ending:** the player either stops the ritual and wins, or the ritual succeeds and the player loses.
-- **The General:** those 15–20 ticks let the player feel its strength and even die to it in a direct fight. The main battle is against its followers.
-- **Stopping the ritual:** dialogue checks through deception, persuasion, or intimidation remain available.
-- **Mechanics:** most mechanics are implemented, in a limited form.
 
-This replaces the earlier limits of one district, exactly three POIs, deferred crafting, and a cult that does not appear. The era, mood, Approaches, and arena rules below stay in force.
+The slice uses the campaign's rules from [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md): one rule for how a ritual starts and stops, in a world of one city.
+
+## The General in the slice
+
+The preferred version lets a player who feels ready fight the General on a later run and see how strong it is, and even die to it.
+
+If building a Stage 2 opponent is too much for the first version, the General appears, casts a spell without attacking, and leaves after the same 15–20 ticks. This fallback is approved.
+
+## Stopping the ritual
+
+- Kill everyone conducting it.
+- Kill the senior who started it.
+- Sneak to the ritual site, or pass dialogue checks through deception, persuasion, or intimidation, while the cult has not fully taken the city.
+
+The conditions differ from run to run.
 
 # Slice Fantasy
 
-Working title for the slice setting:
+The slice takes place in one city. **Lower Veil District** is one of its districts: a dense urban area at the edge of legality, medicine, factories, and night disappearances.
 
-**Lower Veil District** — one dense urban district at the edge of legality, medicine, factories, and night disappearances.
-
-The player is the **first character in a new world**, so they receive a Starting Faction soft foothold.
+The player is the **first character in a new world**.
 
 No final lore names are locked here. Placeholder faction labels are scaffolding only.
 
@@ -81,16 +91,31 @@ The slice must prove all of the following:
 6. Scene split — overworld free 3P + at least one separate interior scene (no grid).
 7. World residue — tomorrow looks different because of today.
 8. Priced power tease — at least one Bargain-shaped offer or refusal.
-9. Solo scope — one developer (with AI) can prototype it without a content army.
+9. The war's core — a General, its followers, and a ritual the player can stop in more than one way.
+10. Preparation matters — what the player gathered, crafted, brewed, and learned in the first days changes the fight for the ritual.
+11. Solo scope — one developer (with AI) can prototype it without a content army.
 
 # Scope In
 
-This section and those down to Content Budget were written for the earlier district slice.
+## Required mechanics
+
+Each of these is implemented in a limited form:
+
+- free exploration of the city and the area outside it;
+- gathering;
+- Item Creation;
+- Alchemy;
+- combat;
+- dialogue with checks;
+- stealth;
+- world time;
+- sleep.
 
 ## World
 
 - Seeded **overworld stub** (Valheim-shaped, small): walkable terrain + biome tint + POI markers ([16](16%20Architecture%20Pivot.md)).
-- Lower Veil fantasy locations as **exterior POIs / shells** plus **separate interior scenes** where needed:
+- One city with a small territory outside it. It does not need the 3×3 target world of [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
+- Lower Veil locations as **exterior POIs / shells** plus **separate interior scenes** where needed:
   - street / alley hub (overworld);
   - tavern (door → interior scene);
   - apothecary shop front (+ optional interior);
@@ -103,21 +128,18 @@ This section and those down to Content Budget were written for the earlier distr
 
 ## Factions
 
-- 2 factions only in the slice:
-  - **Wardens** (order / patrol / seizure framing);
-  - **Veinmarket** (soft underworld / mixture / night-route framing).
-- Player Starting Faction: **both available as a creation choice** for the slice.
-- Soft Pathway nudge:
-  - Wardens → Open Path lean;
-  - Veinmarket → Veiled Path lean.
-- Bound Path is only teased by one Bargain offer, not fully implemented as a progression track in the slice.
+- **One joinable faction:** the internal-order faction of [02 World Laws](02%20World%20Laws.md), the hidden police of practitioners. It gives access to two or three Pathways.
+- **Wardens** (order / patrol / seizure framing) and **Veinmarket** (soft underworld / mixture / night-route framing) stay as local groups.
+- **The cult** appears through the Spirit General and its followers.
+- Members of other factions are optional.
 
 ## Character / Progression
 
 - First-character rules only.
-- Character begins Pathless or at Pathway stage **9** if they accept the faction soft initiation in-slice.
-- No stage 8/7 completion required for slice success.
-- One formula lead or church/entity whisper may appear as a Bargain tease.
+- The player stays at Stages 9–7. Allies and enemies may be deeper.
+- The joinable faction opens two or three Pathways.
+- The potions of other Pathways can be sought independently.
+- One Bargain offer remains as a priced tease.
 
 ## Information Sources
 
@@ -133,7 +155,7 @@ Newspaper and Soft Memory are optional stretch goals.
 
 ## Points of Interest
 
-Exactly three authored POIs. Full cards live in [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md).
+The three authored POIs of the first days stay as side events. Full cards live in [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md).
 
 ### POI A — Brass-Number Arrest at Harrow & Tincture
 
@@ -154,14 +176,21 @@ Exactly three authored POIs. Full cards live in [11.1 Vertical Slice POIs](11.1%
 ### POI C — Soot Stair Trace
 
 - Type: Trace / Clue
-- Window: Standard
+- Window: until the invasion
 - Axes: Attention + Approach (+ Bargain tease)
 - Appears after A or B resolves (participated or missed)
 - Teaches: world continues; A+B linkage; Physical Trace reading; priced black-drop Bargain
 
+### The invasion
+
+- Type: Operation Echo
+- Window: the ritual's window
+- Axes: Attention + Approach + Commitment
+- Teaches: the world's threat, preparation, and more than one way to stop a ritual
+
 ## Approaches and Confront
 
-All six Approaches must appear at least once across the three POIs:
+All six Approaches must appear at least once across the slice:
 
 - Confront
 - Convince
@@ -183,21 +212,22 @@ Turn-Based Mode / arena requirements:
 1. Early: Attention + Approach via board/bartender → choose a lead.
 2. Mid: Allegiance fork in POI A or B.
 3. Late tease: one Bargain offer (refuse remains valid).
+4. Final test: the invasion asks the player to use what they prepared.
 
 # Scope Out
 
 Not in the Vertical Slice:
 
-- full 3 Pathway content to stage 7;
-- Death Gap and successor characters (explicitly out of this slice);
-- Factionless later-life flow;
+- Enchanting;
+- Death Gap and successor characters;
 - Legacy Cache;
-- World Collapse;
+- Pathway change;
+- Factionless later-life flow;
+- several cities, City Control between cities, and the Capital Gate;
+- manifestation and World Collapse;
 - economy simulation beyond a couple of prices/access locks;
-- many districts;
 - newspaper network;
 - full church pantheon;
-- more than 2 factions;
 - procedural POI generation (hand-authored only);
 - perfect BG3 feature parity.
 
@@ -206,9 +236,9 @@ Not in the Vertical Slice:
 Recommended critical path for proving the fantasy:
 
 ```text
-Arrive in Lower Veil District
+Arrive in the city
         ↓
-Read board + talk to bartender
+Read board + talk to bartender; gather, craft, brew, join the faction or not
         ↓
 Choose POI A or B first (Attention / Commitment)
         ↓
@@ -216,14 +246,18 @@ Resolve with any Approach set (not only Confront)
         ↓
 See residue next day / later that night
         ↓
-Follow POI C Trace
+Follow POI C Trace; meet one Bargain tease and accept or refuse
         ↓
-Meet one Bargain tease and accept or refuse
+Day 1–2: the Spirit General comes out in the city and the ritual starts
         ↓
-Stop: slice complete
+15–20 ticks later the General leaves
+        ↓
+Fight, sneak, or talk through the followers to the ritual
+        ↓
+Stop the ritual and win, or lose to it
 ```
 
-Side optional: do both A and B if windows allow; missing one still completes the slice if residue + Trace teach the lesson.
+Side optional: do both A and B if windows allow; missing one still completes the run if residue + Trace teach the lesson.
 
 # Success Criteria
 
@@ -235,6 +269,8 @@ The slice passes if playtesters can honestly say most of:
 4. “I wanted to know what the trace meant.”
 5. “Fighting felt deliberate in turns, not like a grind.”
 6. “The power offer felt risky to take.”
+7. “What I prepared changed how the ritual fight went.”
+8. “I want to try stopping the ritual another way.”
 
 Hard fail conditions:
 
@@ -286,10 +322,22 @@ Post-pivot S0 target:
 ## Milestone S4 — Trace + Bargain tease
 
 - POI C from Aftermath;
-- one Bargain offer node;
-- slice end screen / checkpoint.
+- one Bargain offer node.
 
-## Milestone S5 — Polish pass
+## Milestone S5 — Preparation loop
+
+- gathering, Item Creation, and Alchemy in a limited form;
+- sleep and the shared clock across the first days;
+- the joinable faction and its two or three Pathways.
+
+## Milestone S6 — Invasion
+
+- the Spirit General comes out on day 1–2 and leaves after 15–20 ticks;
+- the ritual site, its guards, and its senior;
+- the ways to stop the ritual, including stealth and dialogue checks;
+- win and loss endings.
+
+## Milestone S7 — Polish pass
 
 - readability of urgency;
 - fail/valuable failure checks;
@@ -301,41 +349,47 @@ Keep intentionally tiny:
 
 | Piece | V1 slice count |
 |-------|----------------|
-| Districts | 1 |
-| Factions | 2 |
-| Main authored POIs | 3 |
+| Cities | 1 |
+| Districts with authored POIs | 1 (Lower Veil) |
+| Joinable factions | 1 |
+| Local groups | 2 |
+| Main authored POIs | 3 + the invasion |
 | Named talk NPCs | 6–10 |
-| Enemy archetypes | 1–2 |
-| Pathway stages required | 0–1 (stage 9 optional) |
+| Enemy archetypes | 2–3 |
+| Generals | 1 |
+| Pathways | 2–3 |
+| Pathway stages | 9–7 |
 | Bargain teases | 1 |
 
 If the budget grows, cut content before cutting systems proof.
 
 # Confirmed Slice Decisions
 
-1. **District:** Lower Veil District kept as the slice setting/placeholder.
+1. **Place:** one city, with Lower Veil as one of its districts. Its name is open.
 2. **Mood/era:** Lord of the Mysteries-like industrial-occult transition (18–19th century social structure + early machines), not a plot/lore copy.
-3. **Starting Faction:** both Wardens and Veinmarket are selectable.
-4. **Death Gap:** fully out of this Vertical Slice.
-5. **Names:** all placeholder names may be renamed later.
+3. **Faction:** only the internal-order faction is joinable, with two or three Pathways; Wardens and Veinmarket are local groups.
+4. **Timing:** the Spirit General comes out after one to two game days.
+5. **Death Gap, Legacy Cache, Pathway change, and Enchanting:** out of this Vertical Slice.
+6. **Names:** all placeholder names may be renamed later.
 
 # Documentation Review
 
 - **Architecture Pivot:** Slice delivery follows overworld → interior → arena rails.
 - **Vision / Player Experience:** Slice targets curiosity, tense choice, agency, residue, priced power tease.
-- **POI / Information / Approaches / Turn Economy:** Directly implemented in miniature (TB on arenas only).
-- **Progression / Character Life:** Only first-life foothold and Bargain tease; later-life systems deferred. Death Gap excluded from slice scope.
+- **POI / Information / Approaches / Combat:** Directly implemented in miniature (TB on arenas only).
+- **Progression / Character Life:** First-life foothold only. Stages 9–7 for the player; allies and enemies may be deeper. Later-life systems are excluded.
+- **Cult Campaign:** The slice uses the campaign's ritual rules in one city ([21](21%20Cult%20Campaign%20and%20City%20Control.md)).
 - **Era mood:** Compatible with priced mystery and social inequality without requiring high-fantasy gloss.
-- **Solo scope:** Content budget and milestones are intentionally small.
+- **Solo scope:** The required mechanics are many, so each stays in a limited form, and content stays small. Open items are CC-27 and CC-28 in [99 Open Questions](99%20Open%20Questions.md).
 - **Glossary / Open Questions:** Confirmations recorded as resolved.
 
 # Related Documents
 
 - [16 Architecture Pivot](16%20Architecture%20Pivot.md)
+- [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
 - [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md)
 - [04 Points of Interest](04%20Points%20of%20Interest.md)
 - [08 Confront Constraints](08%20Confront%20Constraints.md)
 - [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md)
-- [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
 - [09 Information Sources](09%20Information%20Sources.md)
 - [99 Open Questions](99%20Open%20Questions.md)

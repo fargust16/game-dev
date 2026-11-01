@@ -1189,35 +1189,48 @@
   },
   {
     "id": "q-cc-24",
-    "text": "CC-24. Day 3–5 is about 8–14 real hours, while the slice still asks for a verdict after 30–60 minutes. Does the slice keep the campaign's clock or compress the wait?",
+    "text": "CC-24. Resolved: the Spirit General comes out after one to two game days, so a run lasts about 3–6 real hours.",
     "systemIds": [
       "vertical-slice",
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "scope",
     "origin": "imported"
   },
   {
     "id": "q-cc-25",
-    "text": "CC-25. In the slice the ritual is attempted after the General leaves, while in the campaign it starts with the attack. Is this a slice simplification, which General invades, and does the six-hour window apply?",
+    "text": "CC-25. Resolved: one rule covers the slice and the campaign. The ritual starts with the attack, and the Spirit General leaves after 15–20 ticks; a General that does not attack is an approved fallback.",
     "systemIds": [
       "vertical-slice",
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-cc-26",
-    "text": "CC-26. Which city is the slice, which factions appear, what becomes of Lower Veil, Wardens, Veinmarket, and the three POI cards, and which mechanics count as the 'most' that must be built?",
+    "text": "CC-26. Resolved: the required mechanics, the one joinable faction, Lower Veil as a district, and the three POIs as side events are decided.",
+    "systemIds": [
+      "vertical-slice"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
+    "sourceKind": "scope",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-27",
+    "text": "CC-27. Which stage can a player reach in 3–6 real hours, how many followers invade, how many allies stand with the player, how long is the slice ritual's window, and does a slice General fight or use the fallback?",
     "systemIds": [
       "vertical-slice"
     ],
@@ -1226,6 +1239,19 @@
     "status": "open",
     "priority": "high",
     "sourceKind": "scope",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-28",
+    "text": "CC-28. Does the character begin in the joinable faction or join through Faction Entry, which Pathways does it open, what happens on death in a run, and what are the Pathways and the city called?",
+    "systemIds": [
+      "vertical-slice"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
     "origin": "imported"
   }
 ]

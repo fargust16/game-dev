@@ -1,10 +1,10 @@
 # 05 Progression
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft
 
-Last Updated: 2026-11-01 (deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
+Last Updated: 2026-11-01 (the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
@@ -86,7 +86,7 @@ When a character has a faction (the world's first character via Starting Faction
 
 Factionless characters receive no faction Pathway nudge until they earn membership.
 
-In later versions a faction may soft-nudge toward more than one Pathway. V1 keeps the nudge to one.
+In V1 the one joinable faction opens two or three Pathways, and the potions of other Pathways can be sought independently ([11 Vertical Slice](11%20Vertical%20Slice.md)).
 
 ## Alternative acquisition
 
@@ -316,7 +316,7 @@ Player Knowledge must not become a hidden +success% table that deletes decision 
 
 - 3 Pathways by way of acting;
 - stages 9 → 8 → 7 only;
-- soft Starting Faction nudge to one Pathway;
+- one joinable faction that opens two or three Pathways;
 - alternative Pathway acquisition via Bargain / quest / discovery;
 - simple Conduct Progress;
 - seed-varying formulas/ingredients;
@@ -327,8 +327,7 @@ Player Knowledge must not become a hidden +success% table that deletes decision 
 
 - richer contextual Conduct requirements;
 - more interaction between External Power and Pathway dissonance;
-- clearer Symptom language for advancement side effects;
-- optional second soft-nudge options from some factions.
+- clearer Symptom language for advancement side effects.
 
 ## V3
 
