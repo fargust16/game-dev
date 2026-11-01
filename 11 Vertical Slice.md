@@ -1,10 +1,10 @@
 # 11 Vertical Slice
 
-Version: 0.12
+Version: 0.13
 
 Status: Draft
 
-Last Updated: 2026-11-01 (allies fight the main force and leave the ritual to the player; Combat Grid forms around the player. Earlier: a ritual lasts one in-game hour. Earlier: combat runs in place across the city; the slice's two Arcana are chosen. Earlier: one or two Arcana with different styles, the first-day trial, and recipes outside the faction recorded. Earlier: balance and start settled: Stage 8 as the player's limit, 8–10 enemies, the six-hour window, a Factionless start, and three named Pathways. Earlier: rewritten for the owner's one-city slice: the Spirit General's invasion on day 1–2, a ritual the player stops or loses to, one joinable faction with two or three Pathways, and the required mechanics. Earlier: owner redefined the slice as one city at Stages 9–7; retired combat references replaced with 10.2.)
+Last Updated: 2026-11-01 (slice forces set: 5 allies, 3 at the ritual, 5–7 in the main force; allied directive recorded. Earlier: allies fight the main force and leave the ritual to the player; Combat Grid forms around the player. Earlier: a ritual lasts one in-game hour. Earlier: combat runs in place across the city; the slice's two Arcana are chosen. Earlier: one or two Arcana with different styles, the first-day trial, and recipes outside the faction recorded. Earlier: balance and start settled: Stage 8 as the player's limit, 8–10 enemies, the six-hour window, a Factionless start, and three named Pathways. Earlier: rewritten for the owner's one-city slice: the Spirit General's invasion on day 1–2, a ritual the player stops or loses to, one joinable faction with two or three Pathways, and the required mechanics. Earlier: owner redefined the slice as one city at Stages 9–7; retired combat references replaced with 10.2.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -48,10 +48,10 @@ If building a Limit 2 opponent is too much for the first version, the General ap
 
 ## The fight
 
-- 8–10 enemies take part.
-- Allies are drawn into the fight with the main force, in numbers that make the two sides about equal once the player is counted. The player's presence must change the result.
-- Only the player goes for the ritual: allies do not understand it.
-- The city is the battlefield, and the ritual runs in one part of it. The Combat Grid forms around the player, and fights elsewhere are simulated. A combat round is one tick, so its 60-tick window is up to 60 rounds, or ten real minutes of free exploration. If the player stops it in time, the run is won.
+- 8–10 enemies take part: 3 stay at the ritual, and the other 5–7 go on towards the city centre.
+- 5 allied defenders meet that main force, so the two sides are about equal once the player is counted. The player's presence must change the result.
+- Allies can mark the ritual's approximate place on the map when asked. Their directive is the main force first, so only the player can choose to go for the ritual first.
+- The city is the battlefield, and the ritual runs in one part of it. The Combat Grid forms around the player, and fights elsewhere are simulated. A combat round is one tick, so its 60-tick window is up to 60 rounds, or ten real minutes of free exploration. If the player stops it in time, the run is won. The player's Limits 9–8 are too low to undo a completed ritual, so here it means defeat.
 
 ## Stopping the ritual
 
@@ -397,7 +397,7 @@ If the budget grows, cut content before cutting systems proof.
 - **Progression / Character Life:** One Factionless life per run. The player reaches Limits 9–8; Limit 7 is for NPCs, and allies and enemies may be deeper. Later-life systems are excluded.
 - **Cult Campaign:** The slice uses the campaign's ritual rules in one city ([21](21%20Cult%20Campaign%20and%20City%20Control.md)).
 - **Era mood:** Compatible with priced mystery and social inequality without requiring high-fantasy gloss.
-- **Solo scope:** The required mechanics are many, so each stays in a limited form, and content stays small. The open items are CC-29, CC-32, and CC-33 in [99 Open Questions](99%20Open%20Questions.md).
+- **Solo scope:** The required mechanics are many, so each stays in a limited form, and content stays small. The open items are CC-29 and CC-33 in [99 Open Questions](99%20Open%20Questions.md).
 - **Glossary / Open Questions:** Confirmations recorded as resolved.
 
 # Related Documents

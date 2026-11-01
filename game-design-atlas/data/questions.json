@@ -1098,7 +1098,7 @@
   },
   {
     "id": "q-cc-17",
-    "text": "CC-17. A city liberated less than a game day earlier still counts. How does the final battle with three Generals run, can the smaller rituals be disrupted, how long is the capital ritual, and what follows a broken one?",
+    "text": "CC-17. A liberated city whose ritual has not been undone still counts. How does the final battle with three Generals run, can the smaller rituals be disrupted, how long is the capital ritual, and what follows a broken one?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1310,7 +1310,7 @@
   },
   {
     "id": "q-cc-33",
-    "text": "CC-33. How far does a grid around the player reach, what happens at its edge, how is it built from generated terrain and buildings without hand correction, and how do the camera and transparent walls work?",
+    "text": "CC-33. The grid reaches 20 cells from the player. What is the cell size, what happens at its edge, how is it built from generated terrain and buildings without hand correction, and how do the camera and transparent walls work?",
     "systemIds": [
       "confront",
       "spatial-structure"
@@ -1324,7 +1324,7 @@
   },
   {
     "id": "q-cc-34",
-    "text": "CC-34. Resolved: the ritual runs alongside the capture, and an allied general or authorised person undoes a completed ritual within 60 ticks of reaching its site.",
+    "text": "CC-34. Resolved: the ritual runs alongside the capture, and a defender of Limit 5 or deeper who knows the method undoes a completed ritual within 60 ticks of reaching its site.",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1350,7 +1350,7 @@
   },
   {
     "id": "q-cc-36",
-    "text": "CC-36. Who may undo a ritual, can a player in the faction do it, does this shorten a liberated Place of Power's one-day force, where is the ritual site, and what counts as dominating by numbers?",
+    "text": "CC-36. Does a liberated city stay a Place of Power until its ritual is undone? Can a cult follower of Limit 5 undo anything? Can the undoing be interrupted? Where is the site, and what counts as dominating by numbers?",
     "systemIds": [
       "cult-campaign"
     ],

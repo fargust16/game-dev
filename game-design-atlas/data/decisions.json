@@ -916,8 +916,8 @@
   },
   {
     "id": "d-place-of-power-decay",
-    "statement": "A Place of Power keeps its force for one game day after its city is liberated, so a last-minute liberation does not stop manifestation.",
-    "rationale": "Closes a stealth dash during the attack on the capital.",
+    "statement": "A completed ritual is reset only by Ritual Undoing: a defender of Limit 5 or deeper who knows the method does it within 60 ticks of reaching the site. Allied factions have the method, and an outsider earns it through trust as a quest reward. The earlier rule of one game day is withdrawn.",
+    "rationale": "Makes reaching the site a task of its own, and a reward for joining or earning a faction's trust.",
     "alternatives": "",
     "systemIds": [
       "cult-campaign"
@@ -1008,7 +1008,7 @@
   },
   {
     "id": "d-combat-in-place",
-    "statement": "Confront runs in place on a Combat Grid that forms around the player from real geometry; fights the player cannot see are simulated by tick without a grid. The Combat Arena and Theme Packs are retired. Interiors stay separate scenes with their own grid, and a fight follows through a door like a level change in Fallout. A round is one tick. Walls that block the view become transparent outlines.",
+    "statement": "Confront runs in place on a Combat Grid that forms around the player from real geometry and reaches 20 cells in every direction; fights the player cannot see are simulated by tick without a grid. The Combat Arena and Theme Packs are retired. Interiors stay separate scenes with their own grid, and a fight follows through a door like a level change in Fallout. A round is one tick. Walls that block the view become transparent outlines.",
     "rationale": "Owner's intended combat. It restores in-location Turn-Based Mode, which was cancelled in 2026-08 as too expensive; the grid exists only during Confront.",
     "alternatives": "",
     "systemIds": [
@@ -1102,8 +1102,8 @@
   },
   {
     "id": "d-ritual-tracks",
-    "statement": "The ritual and the capture are two tracks. Allied defenders do not understand rituals and fight the main force, so only the player goes after a ritual. An allied general or another authorised person undoes a completed ritual within 60 ticks of reaching its site.",
-    "rationale": "Keeps stealth and dialogue as answers, and gives allied leaders a role in a city that held.",
+    "statement": "The ritual and the capture are two tracks. Allies know a ritual is running and roughly where, but their directive is the main force first, because a ritual has no victims. Only the player can choose to go for the ritual first. A Cult Retreat ends a running ritual: the order reaches every follower at once, and those conducting it leave without fighting.",
+    "rationale": "Keeps stealth and dialogue as answers while a defence without the player can still stop the ritual at the middle difficulty.",
     "alternatives": "",
     "systemIds": [
       "cult-campaign"
