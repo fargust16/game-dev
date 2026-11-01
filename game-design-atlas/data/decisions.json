@@ -1117,7 +1117,7 @@
   },
   {
     "id": "d-retreat-force-balance",
-    "statement": "Cult followers retreat when a calculated balance of force is against them and they see no way to change it, as in strategy games such as Heroes of Might and Magic. If retreat has no chance either, they stay and take as many allied followers as they can, because the cult recovers quickly and the allies slowly. A ritual group that still believes it can win stays and finishes the ritual.",
+    "statement": "Every group, cult or allied, decides whether to fight from a Force Estimate over the strength of each side, as in Heroes of Might and Magic and Space Rangers 2. Defenders may flee or stay out of a hopeless fight. Cult followers flee only when it is very strongly against them, and fight on if retreat has no chance either. A senior's death or a disrupted ritual counts only through the strength it changes.",
     "rationale": "A lone surviving ally does not end a ritual, and the cult's choices follow from its asymmetric recovery.",
     "alternatives": "",
     "systemIds": [
