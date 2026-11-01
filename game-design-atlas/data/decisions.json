@@ -757,7 +757,7 @@
   },
   {
     "id": "d-capture-order",
-    "statement": "City Capture begins with a Cult Sortie. The ritual starts trying to run, other factions' followers are cleared, the six-hour ritual completes, and a garrison stays.",
+    "statement": "City Capture begins with a Cult Sortie. The ritual starts trying to run, other factions' followers are cleared, the one-hour ritual completes, and a garrison stays.",
     "rationale": "Fixes when the player and allies can still intervene.",
     "alternatives": "",
     "systemIds": [
@@ -884,7 +884,7 @@
   },
   {
     "id": "d-slice-redefined",
-    "statement": "The Vertical Slice is one city and a small territory. The player starts without a faction, may join the internal-order faction through a first-day investigation of a disappearance, finds one or two potions for two styles of play, and reaches Limits 9–8; Limit 7 is for NPCs. The Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and 8–10 followers hold the ritual for its six-hour window, against allies that make the sides about equal. The player stops it and wins, or loses; death ends the run. Required in a limited form: exploration, gathering, Item Creation, Alchemy, combat, dialogue with checks, stealth, time, sleep. Out: Enchanting, Death Gap, Legacy Cache, Arcana change.",
+    "statement": "The Vertical Slice is one city and a small territory. The player starts without a faction, may join the internal-order faction through a first-day investigation of a disappearance, finds one or two potions for two styles of play, and reaches Limits 9–8; Limit 7 is for NPCs. The Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and 8–10 followers hold the ritual for its one-hour window, against allies that make the sides about equal. The player stops it and wins, or loses; death ends the run. Required in a limited form: exploration, gathering, Item Creation, Alchemy, combat, dialogue with checks, stealth, time, sleep. Out: Enchanting, Death Gap, Legacy Cache, Arcana change.",
     "rationale": "The first build should already show the war's core: a General, followers, and a ritual to stop.",
     "alternatives": "",
     "systemIds": [
@@ -1040,8 +1040,8 @@
   },
   {
     "id": "d-place-window",
-    "statement": "A ritual's window stays 360 ticks, up to 360 rounds in a fight, and may shrink to 60 ticks after testing.",
-    "rationale": "To be checked in the real game.",
+    "statement": "A ritual lasts one in-game hour: 60 ticks, ten real minutes of free exploration, or up to 60 rounds in a fight.",
+    "rationale": "Replaces the earlier six-hour window; one in-game hour suits the expected battle length.",
     "alternatives": "",
     "systemIds": [
       "cult-campaign",
@@ -1051,6 +1051,52 @@
     "origin": "imported",
     "sourceIds": [
       "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-world-between-rounds",
+    "statement": "While Turn-Based Mode runs, everything outside the fight stands still and lives one tick at the end of each round. Ordinary NPCs hide, and defenders who can fight go to it. A character leaves the fight about 10 cells from the nearest enemy.",
+    "rationale": "Unlike Baldur's Gate 3, the world keeps one clock.",
+    "alternatives": "",
+    "systemIds": [
+      "world-time",
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-18-time"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-battle-scale",
+    "statement": "Battles should last about as long as an army battle in Heroes of Might and Magic III or Olden Era, and NPCs act quickly by fixed rules.",
+    "rationale": "Keeps fights of 15–20 combatants playable.",
+    "alternatives": "",
+    "systemIds": [
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-08"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-secondary-fixed",
+    "statement": "An Arcana's secondary attribute is fixed. It does not change by Limit or by World Seed.",
+    "rationale": "Replaces the earlier per-seed rule.",
+    "alternatives": "",
+    "systemIds": [
+      "progression"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-05-1"
     ],
     "dateNote": "Owner-approved answers, 2026-11-01."
   }

@@ -929,7 +929,7 @@
   },
   {
     "id": "q-cc-4",
-    "text": "CC-4. Resolved: order, six-hour window, and garrison sizes are decided.",
+    "text": "CC-4. Resolved: order, one-hour window, and garrison sizes are decided.",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1230,7 +1230,7 @@
   },
   {
     "id": "q-cc-27",
-    "text": "CC-27. Resolved: Limit 9 is certain, Limit 8 takes directed effort, Limit 7 is for NPCs; 8–10 enemies with about equal sides; the six-hour window stays.",
+    "text": "CC-27. Resolved: Limit 9 is certain, Limit 8 takes directed effort, Limit 7 is for NPCs; 8–10 enemies with about equal sides; the one-hour window stays.",
     "systemIds": [
       "vertical-slice"
     ],
@@ -1283,7 +1283,7 @@
   },
   {
     "id": "q-cc-31",
-    "text": "CC-31. The owner's corrections are applied. Three names still repeat (Отвес, Устав, Озарение), four attribute profiles are still identical, and does the fixed secondary attribute replace the per-seed rule?",
+    "text": "CC-31. All 220 Limit names are unique and the secondary attribute is fixed per Arcana. Four attribute profiles are still identical and are resolved with CC-35.",
     "systemIds": [
       "progression"
     ],
@@ -1296,21 +1296,21 @@
   },
   {
     "id": "q-cc-32",
-    "text": "CC-32. The whole city is the battlefield and a round is one tick. Does the whole city enter Turn-Based Mode, what do NPCs outside the fight do, what happens at a door into an interior scene, and do 360 rounds stay?",
+    "text": "CC-32. Resolved: the world lives one tick per round, ordinary NPCs hide, defenders go to the fight, and a character leaves it about 10 cells from the nearest enemy.",
     "systemIds": [
       "vertical-slice",
       "confront"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-cc-33",
-    "text": "CC-33. How is a Combat Grid built over terrain slopes and generated buildings, how large can it be, and what must generated pieces carry? In-location combat was cancelled once as too expensive, so this needs a technical test.",
+    "text": "CC-33. How is a grid built from generated terrain and buildings without hand correction, how do multi-floor cells work, what does the tactical camera do among buildings, and can a building's inside stay in the same space as the street?",
     "systemIds": [
       "confront",
       "spatial-structure"
@@ -1320,6 +1320,32 @@
     "status": "open",
     "priority": "high",
     "sourceKind": "technical-research",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-34",
+    "text": "CC-34. Does the ritual run alongside the attack, with faction leaders able to undo a completed ritual in about an in-game hour, or can it begin only when no resistance remains?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-35",
+    "text": "CC-35. Which faction does each of the other 16 Arcana belong to, what are their Limit 0 states, and how are the four identical attribute profiles separated?",
+    "systemIds": [
+      "progression"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
     "origin": "imported"
   }
 ]

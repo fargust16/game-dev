@@ -1,10 +1,10 @@
 # 21 Cult Campaign and City Control
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft — owner-approved direction, incomplete specification
 
-Last Updated: 2026-11-01 (the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
+Last Updated: 2026-11-01 (a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07 Character Life](07%20Character%20Life.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -24,7 +24,7 @@ Three kinds of statement appear below:
 
 - **Owner-approved** statements are decisions recorded from the owner's concept and answers of 2026-11-01.
 - **Working readings** are how this document interprets the owner's words where they leave a gap. They hold until the owner confirms or replaces them.
-- **Open** items are listed in [99 Open Questions](99%20Open%20Questions.md) § Cult Campaign and City Control under the IDs CC-1 … CC-33. No implementation may invent answers to them.
+- **Open** items are listed in [99 Open Questions](99%20Open%20Questions.md) § Cult Campaign and City Control under the IDs CC-1 … CC-35. No implementation may invent answers to them.
 
 # 1. Campaign shape
 
@@ -73,7 +73,7 @@ These follow from existing values. They are planning figures, not measurements.
 |---|---|---|
 | Real time per game day with sleep | about 2.8 h | 17 waking game hours at 10 real minutes per game hour |
 | 40–50 real hours | about 14–18 game days | At 2.8 h per game day; 20 days is about 57 h |
-| Crossing the target world | about 93 ticks, 26% of a six-hour window | 4200 m at the 4.5 m/s run of the [G2 brief](unity/Assets/Plans/GEOGRAPHY_TARGET_BRIEF_G2.md) |
+| Crossing the target world | about 93 ticks, 155% of a one-hour ritual | 4200 m at the 4.5 m/s run of the [G2 brief](unity/Assets/Plans/GEOGRAPHY_TARGET_BRIEF_G2.md) |
 | Land at today's land share | about 6.4 km² | Today's 2.83 km² scaled by world area |
 | Distance between neighbouring cities | about 1 km, about 23 ticks | 7 cities evenly spread over that land; roads and relief lengthen it |
 | Unopposed capture rate | one city per 2.5–3.3 game days | 6 non-capital cities over 15–20 days |
@@ -119,7 +119,7 @@ Control changes only when City Capture or City Liberation completes, or when a f
 
 ## Owner-approved
 
-- **City Capture** begins with a Cult Sortie, and the ritual starts with the attack. The followers conducting it gather in one place, and the others keep people away from that place. The cult clears the city of every follower of other factions by driving them out or killing them, the six-hour ritual completes, and a garrison holds the city.
+- **City Capture** begins with a Cult Sortie. The followers conducting the ritual gather in one place, and the others keep people away from that place. The cult clears the city of every follower of other factions by driving them out or killing them, the one-hour ritual completes, and a garrison holds the city. How the ritual and the capture relate is open (CC-34).
 - A character can sneak to the ritual site, or try to kill everyone before the ritual completes.
 - The cult does not attack ordinary residents during City Capture. It targets followers.
 - **City Liberation** is symmetrical: every cult follower in the city is driven out or destroyed.
@@ -130,7 +130,16 @@ Control changes only when City Capture or City Liberation completes, or when a f
 
 ## The city as a battlefield (owner-approved)
 
-Confront runs in place, so a whole city becomes one battlefield and the ritual runs in one part of it ([16 Architecture Pivot](16%20Architecture%20Pivot.md)). A combat round is one tick, so a ritual's 360-tick window is up to 360 rounds for a character in the fight. The window may shrink to 60 ticks, ten real minutes, after testing.
+Confront runs in place, so a whole city becomes one battlefield and the ritual runs in one part of it ([16 Architecture Pivot](16%20Architecture%20Pivot.md)). A combat round is one tick, so a ritual's 60-tick window, one in-game hour or ten real minutes, is up to 60 rounds for a character in the fight.
+
+While Turn-Based Mode runs, the rest of the world stands still and lives one tick at the end of each round. Ordinary NPCs such as traders try to hide and get away from the fight. A defender who can fight, with full health and no order to retreat, goes to it by the nearest route.
+
+## Ritual and capture (open)
+
+Two versions are under consideration (CC-34):
+
+- **Parallel.** The ritual runs from the start of the attack, and the city may or may not fall. If the ritual completes in a city that held, faction leaders can undo it, in about an in-game hour.
+- **After the fight.** The ritual can begin only when no resistance remains in the city.
 
 ## Stopping a ritual (owner-approved)
 

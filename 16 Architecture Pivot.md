@@ -1,10 +1,10 @@
 # 16 Architecture Pivot
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
-Last Updated: 2026-11-01 (owner replaced the Combat Arena with combat in place on a Combat Grid.)
+Last Updated: 2026-11-01 (what failed in 2026-08 stated exactly; the world lives between rounds; the door question added to the technical test. Earlier: owner replaced the Combat Arena with combat in place on a Combat Grid.)
 
 Depends On:
 [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
@@ -54,7 +54,7 @@ Philosophy (`00`–`07`, Decision Engine, Approaches as choices, Confront *const
 |-------|------|
 | **Overworld** | Seeded Valheim-like zones/biomes/POIs/creatures; smaller than Valheim OK; **no** tree/rock harvest as core loop |
 | **Movement / camera** | Free third-person, Genshin-like locomotion feel (not feature parity); no top-down tactical overworld |
-| **Interiors** | Separate scenes; free third-person; **no grid** |
+| **Interiors** | Separate scenes; free third-person; no grid outside Confront; under review (CC-33) |
 | **Confront** | Runs **in place**, in the scene where it starts; Fallout 1/2 / BG3 turn feel; free movement returns with residue |
 | **Grid** | A square **Combat Grid** covers the surroundings during Confront and is gone afterwards; no grid truth outside Confront |
 | **Voluntary TB outside combat** | **Removed** |
@@ -74,7 +74,11 @@ The Combat Arena is cancelled. When Confront starts, the place the characters st
 
 This restores one lock the 2026-08-07 pivot cancelled, in-location Turn-Based Mode. The others stay cancelled: there is no grid truth outside Confront, buildings stay separate interior scenes, and exploration stays free third-person.
 
-The pivot cancelled in-location combat because its stack was too expensive: invisible walk blockers, two truths for visuals and gameplay, and town, combat, and interiors entangled. The difference now is that the grid is built on demand over existing geometry and is not the world's permanent truth. That risk is not yet proven and is tracked as CC-33.
+The record of why the pivot cancelled it: the stack was a permanent grid baked over one hand-tuned town, with enterable buildings in the same scene. Its known failures were "air walls" where hidden walls kept their cells, two truths for visuals and gameplay, and a `GridMap` bake that did not scale past one district ([13 City Generation](13%20City%20Generation.md)). None of this measured a grid over terrain, so it is not evidence against one.
+
+During Turn-Based Mode the rest of the world stands still and lives one tick at the end of each round.
+
+The owner wants a fight to carry through a door without a scene change, if this proves possible. That would change the separate-interior lock below. A technical test decides it and comes before further design (CC-33).
 
 # Scene Graph
 

@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-01 (tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-01 (the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -238,6 +238,7 @@ Detailed settlement capacity, refugee logistics, faction policy, and NPC reassig
 - **One complete combat round advances the shared world clock by exactly one world tick (one in-game minute).**
 - A round is complete only after every currently eligible participant has had their opportunity to act or has otherwise been resolved for that round.
 - **The world does not advance during an individual character's turn.** The player may consider and submit actions without real-time pressure.
+- While Turn-Based Mode runs, everything outside the fight stands still and lives only between rounds, one tick per round. This differs from Baldur's Gate 3, where the world outside a fight carries on. More ticks per round may come later.
 - Once the round ends, one tick passes and the wider simulation updates: NPCs move and act, schedules and timed conditions advance, events resolve, and nearby actors may approach the encounter.
 - Reinforcements may physically reach the combat area between rounds and join the active encounter. They receive Initiative and are inserted into the encounter order according to the insertion rule still to be specified.
 - The number of rounds is the duration of the encounter in world time: a typical even fight is expected to take roughly 10–15 rounds; a difficult fight may take 20–30; a very simple fight may take 3–5. These are pacing expectations, not hard encounter limits.
@@ -256,10 +257,11 @@ Allies, enemies, and other NPCs may join an active encounter when they physicall
 Combatants may attempt to flee rather than continue fighting. The player and NPCs should use the same underlying spatial escape principle.
 
 - The current proposal is that an actor can leave the tactical encounter after moving beyond a defined separation distance from the nearest hostile combatant.
-- A distance of **more than 10 grid cells** was suggested as an initial reference, not a final approved value.
+- A distance of **about 10 grid cells** from the nearest enemy ends the fight for that actor. This is the current rule, as in Baldur's Gate and Fallout.
 - Leaving the encounter removes that actor from active tactical participation; it does not necessarily end combat for the remaining participants.
 - If a fleeing actor is later found, pursued, or caught by a hostile actor, a new tactical encounter may begin.
 - NPCs may choose to flee when the threat is too great, using their judgement, goals, and available information.
+- During a fight, ordinary NPCs such as traders try to hide and get as far from it as they can. Defenders act on the situation: one who can fight, with full health and no order to retreat, goes to the fight by the nearest route.
 
 The exact escape measurement, line-of-sight rules, pursuit behaviour, and re-engagement conditions remain open. This rule must be reconciled with the Combat Grid rules in [16 Architecture Pivot](16%20Architecture%20Pivot.md).
 
@@ -281,7 +283,7 @@ Information transmission is not automatic universal knowledge. Each channel need
 # 9. Design constraints
 
 - One shared game clock is authoritative for all time-dependent systems.
-- One in-game minute is one world tick; the initial real-time pacing is 10 seconds per tick. A cult ritual's current six-hour window is 360 ticks: about one real hour only during uninterrupted free exploration; world-time pauses and turn-based deliberation can extend wall-clock duration.
+- One in-game minute is one world tick; the initial real-time pacing is 10 seconds per tick. A cult ritual lasts 60 ticks: ten real minutes during uninterrupted free exploration; world-time pauses and turn-based deliberation can extend wall-clock duration.
 - Allied and cult force generation run on the shared clock ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)).
 - Direct dialogue pauses the world; shop-stock interfaces do not.
 - Sleep advances 6–8 in-game hours and simulates the wider world throughout.

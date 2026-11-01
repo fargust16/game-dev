@@ -4,7 +4,7 @@
   "name": "World time",
   "title": "Часы мира, не часы кадра",
   "category": "world",
-  "summary": "18 World Time and Living Simulation defines one shared clock: one tick is one in-game minute, with an initial pace of one tick per 10 real seconds. The character receives a private daily action summary at each 1,440-tick day boundary, separately from public news transmitted through valid information channels. A six-hour ritual window is 360 ticks; paused dialogue and tactical deliberation extend its real elapsed time. Alchemy brewing takes six world ticks and includes a mini-game; its interaction with the shared clock remains open.",
+  "summary": "18 World Time and Living Simulation defines one shared clock: one tick is one in-game minute, with an initial pace of one tick per 10 real seconds. The character receives a private daily action summary at each 1,440-tick day boundary, separately from public news transmitted through valid information channels. A one-hour ritual window is 60 ticks; paused dialogue and tactical deliberation extend its real elapsed time. Alchemy brewing takes six world ticks and includes a mini-game; its interaction with the shared clock remains open.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
@@ -12,7 +12,7 @@
       "sourceId": "src-18-time"
     },
     {
-      "text": "Active Window у POI измеряется игровым мировым временем; для культовых ритуалов окно сейчас задано как шесть часов / 360 тиков.",
+      "text": "Active Window у POI измеряется игровым мировым временем; для культовых ритуалов окно сейчас задано как один час / 360 тиков.",
       "sourceId": "src-04"
     },
     {
