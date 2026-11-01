@@ -65,6 +65,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md) | Draft | Shared world-time rules for crafting, brewing, and simulation |
 | [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) | Draft | Modifier generation, weight-only inventory, durability, loot, and six Enchanting steps |
 | [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md) | Draft | Required potion-only profession for Pathway advancement |
+| [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) | Draft | War for cities: Cult Generals, capture, liberation, Capital Gate, force generation |
 | [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) | Draft | Post-pivot world-gen order; Piece-Based Assembly |
 | [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) | Draft | Buildings/interiors via Piece-Based Assembly (small → large) |
 
@@ -149,6 +150,8 @@ This repository is currently a design bible. Implementation begins only after th
     ↓
 20 Alchemy and Potioncraft
     ↓
+21 Cult Campaign and City Control
+    ↓
 Future systems
 ```
 
@@ -194,6 +197,7 @@ Draft foundations in active refinement:
 - [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md) — RPG coverage checklist; character foundation and item-system authority are cross-linked
 - [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md) — shared tick and operation-time model
 - [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) — item bases, modifier rolls, weight-only inventory, loot, and Enchanting progression
+- [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) — the pre-manifestation war for cities and its open questions
 - [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) / [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) — world/settlement/building generation via **Piece-Based Assembly**: small hand-authored pieces snapped small → large (Valheim-style), not the retired [13 City Generation](13%20City%20Generation.md) prototype
 
 Not yet designing as content:

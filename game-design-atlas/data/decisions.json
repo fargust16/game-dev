@@ -594,5 +594,83 @@
       "src-07"
     ],
     "dateNote": "Owner-confirmed 2026-10-31; Legacy Cache eligible contents remain open."
+  },
+  {
+    "id": "d-city-war",
+    "statement": "The pre-manifestation campaign is a war for cities. At world creation every city is allied; the cult captures cities by conducting rituals in them.",
+    "rationale": "Gives the threat a public, reversible progress that the player can read and fight.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved concept, 2026-11-01; recorded in 21."
+  },
+  {
+    "id": "d-capital-gate",
+    "statement": "The Capital Awakening Ritual can begin only when every other city is under Cult Control.",
+    "rationale": "Replaces the earlier required ritual count and tells the player that the capital is next.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved concept, 2026-11-01; recorded in 21."
+  },
+  {
+    "id": "d-capture-rule",
+    "statement": "City Capture removes every follower of other factions and holds the city, without attacking ordinary residents. City Liberation is symmetrical.",
+    "rationale": "Supersedes the earlier civilian-targeted ritual wording.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved concept, 2026-11-01; recorded in 21."
+  },
+  {
+    "id": "d-three-generals",
+    "statement": "Three Stage 2 Cult Generals lead the Cult Forces with different styles: a teleporting one, one that holds a zone and fights to the end, and one that raids from a base in neutral territory.",
+    "rationale": "Different enemy behaviour forces different player responses.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved concept, 2026-11-01; recorded in 21."
+  },
+  {
+    "id": "d-force-asymmetry",
+    "statement": "Allied forces are generated at world creation and replaced slowly; Cult Forces generate much faster and do not run out until the cult's leadership is destroyed. Campaign pace depends on difficulty.",
+    "rationale": "Owner's reference is the Dominator pressure curve in Space Rangers 2, as a comparison only.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "actors"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved concept, 2026-11-01; recorded in 21."
   }
 ]

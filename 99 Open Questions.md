@@ -1,16 +1,16 @@
 # 99 Open Questions
 
-Version: 0.80
+Version: 0.81
 
 Status: Draft
 
-Last Updated: 2026-11-01 (daily player summary/news-map channels, six-hour ritual windows, allied response, potential parallel operations, and fixed capital awakening/occupation loop recorded; ritual count/concurrency, off-screen resolution, command threshold, capture, destruction trigger, and post-campaign play remain open. Earlier: sealed Stage 0 antagonist, major/minor distinction, and two candidate minor factions recorded; finale and generation remain open. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-11-01 (the war for cities recorded: required-ritual count resolved by the Capital Gate; Cult Campaign block CC-1 … CC-19 added. Earlier: daily player summary/news-map channels, six-hour ritual windows, allied response, potential parallel operations, and fixed capital awakening/occupation loop recorded; ritual count/concurrency, off-screen resolution, command threshold, capture, destruction trigger, and post-campaign play remain open. Earlier: sealed Stage 0 antagonist, major/minor distinction, and two candidate minor factions recorded; finale and generation remain open. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
 
 Referenced By:
-Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md), [GEOGRAPHY_LMC_DESIGN_NOTE.md](unity/Assets/Plans/GEOGRAPHY_LMC_DESIGN_NOTE.md), [GEOGRAPHY_LMC_TECHNICAL_SPEC.md](unity/Assets/Plans/GEOGRAPHY_LMC_TECHNICAL_SPEC.md), [GEOGRAPHY_LMC_STEP1_READINESS.md](unity/Assets/Plans/GEOGRAPHY_LMC_STEP1_READINESS.md), [GEOGRAPHY_G3F_PHASE_PLAN.md](unity/Assets/Plans/GEOGRAPHY_G3F_PHASE_PLAN.md)
+Future Design, [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md), [AGENTS.md](AGENTS.md), [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/Plans/PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md), [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md), [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md), [GEOGRAPHY_LMC_DESIGN_NOTE.md](unity/Assets/Plans/GEOGRAPHY_LMC_DESIGN_NOTE.md), [GEOGRAPHY_LMC_TECHNICAL_SPEC.md](unity/Assets/Plans/GEOGRAPHY_LMC_TECHNICAL_SPEC.md), [GEOGRAPHY_LMC_STEP1_READINESS.md](unity/Assets/Plans/GEOGRAPHY_LMC_STEP1_READINESS.md), [GEOGRAPHY_G3F_PHASE_PLAN.md](unity/Assets/Plans/GEOGRAPHY_G3F_PHASE_PLAN.md)
 
 ---
 
@@ -38,7 +38,15 @@ Seven independent sliders replace the old bundled Easy / Normal / Hard / Hell sc
 
 **What broad faction structure is established for this setting?**
 
-Three church-associated Major Factions cooperate, with internal-order, industry/research, and external-security roles. The opposing Major Faction seeks to return an insane, sealed Stage 0 being, called the True God or False God by followers. Ancient cosmic powers are the setting-level source of supernatural power and seek to reclaim it through the returned being. If unopposed, it destroys other powerful beings and factions, then people and followers, and ultimately the planet through a later act distinct from its awakening. Before manifestation, the cult advances its return through civilian-targeted rituals at seed-selected locations; the player receives a private daily summary of their actions and learns about public events through daily news, rumours, notes, witnesses, traces, assignments, ambient NPC reports, or allied-faction briefings, without a global progress bar. Ritual windows target six in-game hours (360 World Ticks); all three allied Major Factions receive advance intelligence and send groups, and off-screen clashes resolve autonomously. Some difficulty configurations may permit parallel active rituals. After the required earlier successes, the final awakening ritual occurs at the fixed centre of the capital; if completed, the being remains there while the cult and allies contest the capital and cult forces move against free cities. The campaign ends either when the cult's effective command and ritual-coordination capacity is dismantled before manifestation, or when the manifested being is defeated; each route presents a rating. After manifestation, the being cannot be delayed or contained, player death is defeat with no same-world successor even if the being is later defeated, and allied followers may assist while the player can join or act elsewhere. The exact ritual threshold/concurrency, group resolution, command threshold, capture, planet-destruction trigger, final-fight composition, rating criteria, and post-campaign play remain open. A royal institution is influenced by the antagonist; its role and classification remain open. One state with several cities is playable; neighbouring states are background only. The former mind-controlled ideal-world outcome is withdrawn. Two beneficial Minor Factions remain examples: a covert alchemical network and a healing/medical association. Stage 0 belief/anchor/sanity mechanics remain out of scope. See [02 World Laws](02%20World%20Laws.md).
+Three church-associated Major Factions cooperate, with internal-order, industry/research, and external-security roles. The opposing Major Faction seeks to return an insane, sealed Stage 0 being, called the True God or False God by followers. Ancient cosmic powers are the setting-level source of supernatural power and seek to reclaim it through the returned being. If unopposed, it destroys other powerful beings and factions, then people and followers, and ultimately the planet through a later act distinct from its awakening. Before manifestation, the cult wages a war for the cities: three Stage 2 Cult Generals capture cities through rituals, removing other factions' followers without attacking ordinary residents, and the Capital Gate lets the final ritual begin only when every other city is under Cult Control. The player receives a private daily summary of their actions and learns about public events through daily news, rumours, notes, witnesses, traces, assignments, ambient NPC reports, or allied-faction briefings, without a global progress bar. Ritual windows target six in-game hours (360 World Ticks); all three allied Major Factions receive advance intelligence and send groups, and off-screen clashes resolve autonomously. Some difficulty configurations may permit parallel active rituals. Once the Capital Gate is open, the final awakening ritual occurs at the fixed centre of the capital; if completed, the being remains there while the cult and allies contest the capital and cult forces move against any liberated city. The campaign ends either when the cult's effective command and ritual-coordination capacity is dismantled before manifestation, or when the manifested being is defeated; each route presents a rating. After manifestation, the being cannot be delayed or contained, player death is defeat with no same-world successor even if the being is later defeated, and allied followers may assist while the player can join or act elsewhere. Ritual concurrency, group resolution, command threshold, capture, planet-destruction trigger, final-fight composition, rating criteria, and post-campaign play remain open. A royal institution is influenced by the antagonist; its role and classification remain open. One state with several cities is playable; neighbouring states are background only. The former mind-controlled ideal-world outcome is withdrawn. Two beneficial Minor Factions remain examples: a covert alchemical network and a healing/medical association. Stage 0 belief/anchor/sanity mechanics remain out of scope. See [02 World Laws](02%20World%20Laws.md) and [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
+
+**How many rituals must the cult complete before the capital?**
+
+There is no fixed count. The Capital Gate opens when every other city is under Cult Control, so the count follows the number of cities plus every recapture forced by City Liberation. Reported City Control replaces the hidden return threat. The number of cities is CC-2. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
+
+**How are the two sides' forces generated?**
+
+Asymmetrically. Allied forces are generated at world creation and replaced slowly at certain stages. Cult Forces generate much faster, are not tied to the population's general rules, and are not exhausted by killing rank-and-file followers; new followers keep appearing until the cult's leadership is destroyed. Campaign pace depends on difficulty. Rates and sources are CC-12 and CC-13; the owning setting is CC-14. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
 
 ## Decision Engine
 
@@ -244,29 +252,25 @@ What determines the concrete winning / terminal condition of each Major Faction?
 
 How does ending the campaign before manifestation relate to the world's later finite life-cycle?
 
-After manifestation, which state changes decide whether the cult holds the capital, how do allied groups repeatedly attempt to retake it, and how does the cult advance against other free cities? What event begins the being's separate planet-destruction rite if it remains undefeated?
+After manifestation, which state changes decide whether the cult holds the capital, and how do allied groups repeatedly attempt to retake it? What event begins the being's separate planet-destruction rite if it remains undefeated?
 
 Which allied leaders and follower groups take part in the capital confrontation, and what determines their composition, casualties, and surviving forces? The qualitative difficulty direction is set: allied forces are expected to win at the lowest Combat Difficulty; Normal is near-even with a slight enemy advantage; higher settings increasingly favour the enemy.
 
 What exact force values, odds, and tuning produce the agreed Combat Difficulty direction in the final confrontation, and do any of the other six sliders affect allied support or its outcome? Numerical balance is deferred until the concept is settled.
 
-How many earlier civilian-targeted rituals must succeed before the capital awakening (five is an example, not a decision), how are their locations and start times selected, which difficulty setting permits parallel active operations, and how does each autonomous outcome change the hidden return threat?
-
 Which public events enter the daily bulletin and faction/map presentation, how quickly do reports spread, and when does a source reveal an exact ritual site versus only a region? The private player summary includes the character's own actions regardless of publicity; its presentation and retention remain open.
 
-Which cult command roles and coordination capabilities must be removed to satisfy the pre-manifestation campaign ending?
-
-How are off-screen clashes between allied groups and cult teams resolved, and how much can other autonomous practitioners change ritual outcomes without direct player involvement?
+How much can other autonomous practitioners change ritual outcomes without direct player involvement?
 
 Which actions and scoring weights determine the final campaign rating?
 
-Beyond killing or capturing all responsible ritualists, which non-combat methods can stop a ritual? What custody, escape, and return-to-cult rules support taking ritualists alive?
+What custody, escape, and return-to-cult rules support taking ritualists alive? Non-combat methods are CC-8.
 
 How can Minor Factions support or obstruct Major Factions without becoming direct World Collapse drivers?
 
 Can multiple factions unintentionally cooperate?
 
-Which of the seven independent difficulty sliders, if any, affects faction starting Influence, operation frequency, or generated faction strength? The old bundled Easy / Normal / Hard / Hell faction-pressure rule is retired.
+Which of the seven independent difficulty sliders, if any, affects faction starting Influence? Campaign pace is CC-14. The old bundled Easy / Normal / Hard / Hell faction-pressure rule is retired.
 
 How are the three cooperating factions connected to Stage 0 beings and churches; is that relationship one-to-one?
 
@@ -279,6 +283,60 @@ Which supernatural-derived products or services reach ordinary people through th
 Do the three allied Major Factions keep distinct, sometimes competing Main Goals, or share a common goal? What costs and conflicts keep this positively framed side from being a universal best answer?
 
 Should Minor Factions be a fully authored roster or be generated from authored templates with seed-dependent leaders, bases, needs, and operations? Which parts require fixed hand-authored content?
+
+## Cult Campaign and City Control
+
+The rules are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md). The order below is the recommended working order: later blocks depend on earlier ones.
+
+### Scale and pace
+
+**CC-1 Campaign length.** How long should the campaign last if the player never intervenes, at the middle difficulty, in game days and real hours? One game day is four real hours of uninterrupted play. This sets every rate below and how much room exploration keeps.
+
+**CC-2 Cities and world scale.** How many cities exist, and which settlements count as cities? The V0 target is 3–5 settlements, which leaves 2–4 non-capital cities for three Generals. Crossing the 2.8 km world takes about 62 ticks, 17% of a six-hour ritual window. Does the campaign need a larger world, a shorter window, slower travel, or less emphasis on distance? This links to § Exploration's V1 overworld size question.
+
+### Capture and liberation
+
+**CC-3 Who counts.** Which actors must leave a city for capture or liberation to complete: Minor Faction members, unaffiliated practitioners, the player character? How does the rule avoid one hidden follower freezing a city?
+
+**CC-4 Capture sequence.** In what order do attack, clearing, holding, and the ritual happen? Does the six-hour window stay, and how long must a city be held? Can several captures run at once? Which garrison stays behind when a General leaves?
+
+**CC-5 What the ritual does.** The earlier draft targeted civilians; the cult no longer attacks ordinary residents. What does the ritual do to a city and its residents? Why does a city need followers removed before the ritual can complete?
+
+**CC-6 Life under Cult Control.** What changes in a captured city for residents, shops, services, law, and the player's access? Which Symptoms show it?
+
+**CC-7 After liberation.** Which allied faction takes a liberated city, how soon can the cult return, and what lasting gain keeps liberation from being time wasted on a city that falls again?
+
+**CC-8 Non-combat routes.** Beyond killing or capturing ritualists, how can followers be driven out or a ritual stopped through Convince, Threaten, Exchange, Veil, or Withdraw? [08 Confront Constraints](08%20Confront%20Constraints.md) requires real alternatives.
+
+### Generals and command
+
+**CC-9 The leader.** Does the reinforcement rule end when the three Generals fall, or does someone stand above them? Stage 1 followers exist and are deeper than Stage 2. Is a killed General replaced? This also answers which roles must be removed for the pre-manifestation ending.
+
+**CC-10 Counterplay.** How is each General located and stopped: limits on teleportation, the Holding General's zone, how the Raiding General's base is found? How can a character far below Stage 2 defeat a General at all?
+
+**CC-11 Scope.** Is the war for cities part of V1, given that V1 limits player stages to 9–7 and the Vertical Slice excludes the cult's campaign?
+
+### Force generation
+
+**CC-12 Cult generation.** Where do new followers appear, at which stages, how often, with what cap, and what is their in-world source? Does each Force gather separately, and how many followers launch an attack?
+
+**CC-13 Allied forces.** How many followers of each stage exist at world creation, which stages are replaced and how often, and does losing cities reduce replacement? Can a whole Major Faction die, and what happens to Faction Entry if it does?
+
+**CC-14 Difficulty ownership.** Which setting owns campaign pace: an eighth dedicated slider, Combat Difficulty, or World Inhabitants? The seven-slider rule forbids silently bundling unrelated effects, and Combat Difficulty already governs generated power.
+
+### Simulation
+
+**CC-15 Off-screen resolution.** How are clashes between allied groups and Cult Forces resolved, and is the per-city ledger of followers the right model?
+
+**CC-16 Allied behaviour.** How do the three allied factions choose what to defend, and do they liberate cities on their own? How do they share out shrinking forces?
+
+### Endgame edges
+
+**CC-17 Capital Gate edges.** What happens when a city is liberated while the Capital Awakening Ritual is running? Can the cult attack the capital by force before the gate opens? After manifestation, how does the cult move on liberated cities?
+
+**CC-18 Manifestation during a Death Gap.** If the character is dead and the being manifests before a successor enters, does the successor still appear?
+
+**CC-19 Joining the cult.** Can the player join or aid the cult? The first character's Starting Faction list and both campaign endings currently assume the opposite side.
 
 ## Decision Engine
 

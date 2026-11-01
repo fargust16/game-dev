@@ -778,13 +778,14 @@
   },
   {
     "id": "q-wl-ritual-schedule",
-    "text": "How many earlier civilian-targeted rituals must succeed before the capital awakening (five is only an example), how are locations and start times selected, which difficulty settings allow parallel operations, and how do autonomous outcomes change the hidden return threat?",
+    "text": "How many rituals must the cult complete before the capital? Resolved: no fixed count. The Capital Gate opens when every other city is under Cult Control. Scheduling and concurrency moved to CC-4; difficulty ownership to CC-14.",
     "systemIds": [
-      "world-laws"
+      "world-laws",
+      "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
     "priority": "high",
     "sourceKind": "gameplay-design",
     "origin": "imported"
@@ -806,9 +807,10 @@
   },
   {
     "id": "q-wl-command-ending",
-    "text": "Which cult command roles and coordination capabilities must be removed to complete the campaign before manifestation?",
+    "text": "Which cult command roles must be removed to complete the campaign before manifestation? Tracked as CC-9, which also asks whether anyone stands above the three Cult Generals.",
     "systemIds": [
-      "world-laws"
+      "world-laws",
+      "cult-campaign"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority",
@@ -832,7 +834,7 @@
   },
   {
     "id": "q-wl-npc-autonomy",
-    "text": "How are off-screen allied/cult clashes resolved, how do allied groups repeatedly attempt to retake the occupied capital while the cult advances against free cities, and how can other autonomous practitioners change those outcomes? What state triggers the separate planet-destruction rite?",
+    "text": "How much can other autonomous practitioners change ritual outcomes? What state triggers the separate planet-destruction rite? Off-screen clashes are tracked as CC-15, allied behaviour as CC-16.",
     "systemIds": [
       "world-laws",
       "actors"
@@ -881,6 +883,253 @@
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-1",
+    "text": "CC-1. How long should the campaign last without the player at the middle difficulty, in game days and real hours?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "scope",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-2",
+    "text": "CC-2. How many cities exist, which settlements count, and how does the campaign fit a world that takes about 62 ticks to cross?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "scope",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-3",
+    "text": "CC-3. Which actors must leave a city for capture or liberation to complete, and how does the rule avoid one hidden follower freezing a city?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-4",
+    "text": "CC-4. In what order do attack, clearing, holding, and the ritual happen; does the six-hour window stay; can captures overlap; what garrison stays?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-5",
+    "text": "CC-5. What does a ritual do to a city and its residents now that the cult does not attack them, and why must followers be removed first?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-6",
+    "text": "CC-6. What changes in a captured city for residents, shops, services, law, and player access, and which Symptoms show it?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-7",
+    "text": "CC-7. Which allied faction takes a liberated city, how soon can the cult return, and what lasting gain justifies liberation?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-8",
+    "text": "CC-8. How can followers be driven out or a ritual stopped through non-combat Approaches?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-9",
+    "text": "CC-9. Does the reinforcement rule end when the three Generals fall, or does someone stand above them? Is a killed General replaced?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-10",
+    "text": "CC-10. How is each General located and stopped, and how can a character far below Stage 2 defeat one?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-11",
+    "text": "CC-11. Is the war for cities part of V1, given the player stage limit and the Vertical Slice scope?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "scope",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-12",
+    "text": "CC-12. Where do new cult followers appear, at which stages, how often, with what cap, and what is their in-world source?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-13",
+    "text": "CC-13. What are allied starting forces and replacement rates, and can a whole Major Faction die?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-14",
+    "text": "CC-14. Which setting owns campaign pace: an eighth slider, Combat Difficulty, or World Inhabitants?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-15",
+    "text": "CC-15. How are off-screen clashes resolved, and is a per-city follower ledger the right model?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-16",
+    "text": "CC-16. How do allied factions choose what to defend, and do they liberate cities on their own?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-17",
+    "text": "CC-17. What happens when a city is liberated during the Capital Awakening Ritual, can the capital be attacked before the gate opens, and how does the cult move on liberated cities after manifestation?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-18",
+    "text": "CC-18. If the being manifests during a Death Gap, does the pending successor still appear?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-19",
+    "text": "CC-19. Can the player join or aid the cult?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
     "status": "open",
     "priority": "high",
     "sourceKind": "gameplay-design",

@@ -1,16 +1,16 @@
 # 08 Confront Constraints
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft
 
-Last Updated: 2026-10-31
+Last Updated: 2026-11-01 (Character Life row reconciled with post-manifestation defeat; 21 added as a dependent document.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 
 Referenced By:
-[16 Architecture Pivot](16%20Architecture%20Pivot.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), future combat system, weapon content, and encounter tuning.
+[16 Architecture Pivot](16%20Architecture%20Pivot.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), future combat system, weapon content, and encounter tuning.
 
 ---
 
@@ -214,7 +214,7 @@ Some scenes may begin already in Confront.
 | Approaches | Must not dominate Convince / Veil / Exchange / Withdraw |
 | Progression | May feed Open Path Conduct; never XP levels |
 | POI / World Laws | Fights can interrupt Operations, create Symptoms, open Traces |
-| Character Life | Death in Confront triggers Death Gap and Legacy rules |
+| Character Life | Before manifestation, death in Confront triggers Death Gap and Legacy rules; after it, death is terminal defeat |
 | Bargain / External Power | Curses or blessings may help or sabotage Confront later |
 
 # Anti-Patterns

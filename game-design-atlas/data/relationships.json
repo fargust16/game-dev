@@ -395,5 +395,96 @@
       "src-07-1"
     ],
     "explanation": "Alchemy is a required profession learned by each character; its specific skill progression and attribute mappings remain open."
+  },
+  {
+    "id": "rel-campaign-laws",
+    "fromId": "cult-campaign",
+    "toId": "world-laws",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21",
+      "src-02"
+    ],
+    "explanation": "02 задаёт законы кампании, а 21 держит её операционные правила: захват городов, Capital Gate и генерацию сил."
+  },
+  {
+    "id": "rel-campaign-time",
+    "fromId": "cult-campaign",
+    "toId": "world-time",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21",
+      "src-18-time"
+    ],
+    "explanation": "Окна ритуалов и генерация сил идут на общем мировом времени; место шестичасового окна внутри захвата открыто."
+  },
+  {
+    "id": "rel-campaign-poi",
+    "fromId": "cult-campaign",
+    "toId": "points-of-interest",
+    "type": "data-flow",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21",
+      "src-04"
+    ],
+    "explanation": "Ритуалы и столкновения приходят как POI, а захваченный город остаётся постоянным состоянием мира без Active Window."
+  },
+  {
+    "id": "rel-campaign-info",
+    "fromId": "cult-campaign",
+    "toId": "information-sources",
+    "type": "data-flow",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21",
+      "src-09"
+    ],
+    "explanation": "Смена контроля городов попадает к игроку через новости, слухи, брифинги и слой карты и служит публичным чтением кампании."
+  },
+  {
+    "id": "rel-campaign-confront",
+    "fromId": "cult-campaign",
+    "toId": "confront",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21",
+      "src-08"
+    ],
+    "explanation": "Изгнание последователей должно иметь реальные небоевые пути, иначе освобождение города нарушит ограничения Confront."
+  },
+  {
+    "id": "rel-campaign-life",
+    "fromId": "cult-campaign",
+    "toId": "character-life",
+    "type": "influence",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21",
+      "src-07"
+    ],
+    "explanation": "Война за города идёт в Death Gap, а завершение ритуала в столице запускает окончательное поражение при смерти."
+  },
+  {
+    "id": "rel-campaign-actors",
+    "fromId": "cult-campaign",
+    "toId": "actors",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21",
+      "src-05"
+    ],
+    "explanation": "Генералы — постоянные акторы, а последователи культа создаются с ускоренной генерацией, но по общим формулам персонажей."
   }
 ]

@@ -1,16 +1,16 @@
 # 03 Decision Engine
 
-Version: 0.2.1
+Version: 0.2.2
 
 Status: Draft
 
-Last Updated: 2026-08-05
+Last Updated: 2026-11-01 (retired World Difficulty wording replaced with the seven independent Difficulty Settings; 21 added as a dependent document.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md)
 
 Referenced By:
-[03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), Future quest, exploration, combat, progression, faction, magic, and economy design.
+[03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), Future quest, exploration, combat, progression, faction, magic, and economy design.
 
 ---
 
@@ -139,7 +139,7 @@ Side Events from [02 World Laws](02%20World%20Laws.md) are standard Allegiance n
 
 Only the first character in a world begins with a Starting Faction. Later characters begin Factionless until Faction Entry. Membership, betrayal, neutrality, and aid to rivals remain Allegiance decisions because access, Symptoms, and open paths change with them. Full rules live in [07 Character Life](07%20Character%20Life.md).
 
-World Difficulty changes opposing Faction Influence pressure at creation. It raises challenge; it does not invent a single correct strategy.
+Difficulty Settings are seven independent sliders ([02 World Laws](02%20World%20Laws.md)). They raise challenge; they do not invent a single correct strategy.
 
 # Information Before Choice
 
@@ -401,7 +401,7 @@ Systems designed before the Decision Engine tend to optimise content volume, com
 - **Meta Loop:** Compatible. Valuable failure and Knowledge preserve meaning across death and worlds; Legacy remains a Commitment/Allegiance residue.
 - **Design Pillars:** Compatible. Especially curiosity, priced power, knowledge over levels, incomplete playthroughs, meaningful experiments, no perfect builds, finite worlds.
 - **Player Experience:** Compatible. Supports curiosity, tense choice, agency, understandable surprise, loss with legacy, and return with understanding.
-- **World Laws:** Compatible. Side Events, intervention Approaches, Starting Faction, Difficulty Pressure, and Influence-driven Balance now align with the Decision Axes.
+- **World Laws:** Compatible. Side Events, intervention Approaches, Starting Faction, Difficulty Settings, and Influence-driven Balance now align with the Decision Axes.
 - **Glossary:** Updated for teaching order implications and related world terms.
 - **Open Questions:** Teaching axis and Knowledge role resolved; Hidden-consequence timing and Opportunity Cost vocabulary remain open.
 

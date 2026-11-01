@@ -1,16 +1,16 @@
 # 18 World Time and Living Simulation
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-01 (daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-01 (force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 
 Referenced By:
-[04 Points of Interest](04%20Points%20of%20Interest.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), future NPC AI, encounter, settlement, medical, and world-event specifications.
+[04 Points of Interest](04%20Points%20of%20Interest.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), future NPC AI, encounter, settlement, medical, and world-event specifications.
 
 ---
 
@@ -226,6 +226,7 @@ NPCs are not automatically deleted or considered dead when their home settlement
 - After reaching refuge, the NPC may take up appropriate activities or responsibilities there, subject to the settlement's conditions and the NPC's capabilities.
 - If the original settlement is liberated or becomes safe again, the NPC may decide to return.
 - Whether an NPC survives, escapes, finds refuge, or returns depends on the actual events and circumstances; none of these outcomes is guaranteed.
+- City Capture targets followers, not ordinary residents ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)). Followers may be driven out; residents may stay or leave by their own decision.
 
 Detailed settlement capacity, refugee logistics, faction policy, and NPC reassignment rules remain open for their respective system designs.
 
@@ -280,6 +281,7 @@ Information transmission is not automatic universal knowledge. Each channel need
 
 - One shared game clock is authoritative for all time-dependent systems.
 - One in-game minute is one world tick; the initial real-time pacing is 10 seconds per tick. A cult ritual's current six-hour window is 360 ticks: about one real hour only during uninterrupted free exploration; world-time pauses and turn-based deliberation can extend wall-clock duration.
+- Allied and cult force generation run on the shared clock ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)).
 - Direct dialogue pauses the world; shop-stock interfaces do not.
 - Sleep advances 6–8 in-game hours and simulates the wider world throughout.
 - Sleep can be interrupted by world events, including alarms and hostile attacks.

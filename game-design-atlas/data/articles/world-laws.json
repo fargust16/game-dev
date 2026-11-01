@@ -4,7 +4,7 @@
   "name": "World Laws",
   "title": "Баланс, фракции и читаемые симптомы",
   "category": "world",
-  "summary": "Мир стремится сохранить Balance, а разумные существа его смещают. Balance остаётся скрытым динамическим равновесием, которое читается через Symptoms. Три союзные церковные Major Factions противостоят культу запечатанного существа нулевой ступени. До манифестации культ проводит ритуалы над мирными жителями; у каждого шестичасовое окно без числового таймера для игрока. Союзные фракции получают разведданные и реагируют своими группами; некоторые настройки сложности могут разрешать параллельные операции. Игрок получает ежедневную сводку своих действий, новости о публичных событиях и интерактивную карту известных событий и качественного контроля фракций. Последний ритуал пробуждения фиксирован в центре столицы; после манифестации существо остаётся там, пока стороны борются за столицу и другие города. Кампанию можно завершить уничтожением командования культа до манифестации или победой над существом после неё; оба пути дают рейтинг. Конечное уничтожение планеты — отдельный последующий ритуал. В основе силы потусторонних лежат древние космические силы. Текущая игра охватывает одно государство; детали кампании и влияние на королевскую власть остаются открытыми.",
+  "summary": "Мир стремится сохранить Balance, а разумные существа его смещают. Balance остаётся скрытым динамическим равновесием, которое читается через Symptoms. Три союзные церковные Major Factions противостоят культу запечатанного существа нулевой ступени. До манифестации идёт война за города: при создании мира все города союзные, а три генерала культа второй ступени захватывают их ритуалами. Обычных жителей культ не трогает, но убирает из города всех последователей других фракций и удерживает его; освобождение города симметрично. Правило Capital Gate: последний ритуал пробуждения в центре столицы возможен только когда все остальные города под контролем культа. Союзные силы конечны и пополняются медленно, силы культа растут намного быстрее и не кончаются, пока не уничтожено руководство. Операционные правила вынесены в 21. Игрок получает ежедневную сводку своих действий, новости о публичных событиях и карту с качественным контролем городов. После манифестации существо остаётся в столице, пока стороны борются за неё и за освобождённые города. Кампанию можно завершить уничтожением командования культа до манифестации или победой над существом после неё; оба пути дают рейтинг. Конечное уничтожение планеты — отдельный последующий ритуал. В основе силы потусторонних лежат древние космические силы. Текущая игра охватывает одно государство.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
@@ -20,11 +20,11 @@
       "sourceId": "src-02"
     },
     {
-      "text": "The sealed Stage 0 being manifests when the final awakening ritual completes at the fixed centre of the capital, then remains there as cult and allied groups fight for control. The being can attack other powerful beings and people and ultimately perform a separate planet-destruction rite; after manifestation, player death ends the playable story without a successor, even if the being is later defeated. Earlier cult rituals target civilians, last six in-game hours, and are announced to all three allied Major Factions, which send groups whether or not the player joins. Some difficulty configurations may allow overlapping rituals. The player receives a private daily action summary; public news, ambient dialogue, and the map disclose only events available through valid channels, without a global ritual counter. Campaign completion is either dismantling the cult's effective command before manifestation or defeating the manifested being, followed by a rating.",
+      "text": "Before manifestation the campaign is a war for cities: every city starts allied, and three Stage 2 Cult Generals capture cities through rituals by removing other factions' followers and holding the city, without attacking ordinary residents. City Liberation is symmetrical. The Capital Gate lets the final awakening ritual begin at the fixed centre of the capital only when every other city is under Cult Control. Allied forces shrink; Cult Forces keep growing until the cult's leadership is destroyed. Rituals keep a six-hour window as the current target. The player receives a private daily action summary; public news, ambient dialogue, and the map disclose only events available through valid channels, without a numeric counter. After manifestation, player death ends the playable story without a successor, even if the being is later defeated. Campaign completion is either dismantling the cult's effective command before manifestation or defeating the manifested being, followed by a rating.",
       "sourceId": "src-02"
     },
     {
-      "text": "Точные таблицы Symptoms, восстановление Balance без игрока, условия завершения других Major Factions и числа Difficulty Pressure в 99 всё ещё открыты. Детали ритуального графика, командного порога, захвата, участия NPC в финале, рейтинга и посткампанийной игры тоже остаются открытыми.",
+      "text": "Точные таблицы Symptoms, восстановление Balance без игрока и условия завершения других Major Factions в 99 всё ещё открыты. Вопросы войны за города собраны в блоке CC-1 … CC-19; участие NPC в финале, рейтинг и посткампанийная игра тоже открыты.",
       "sourceId": "src-99"
     }
   ],
@@ -32,11 +32,12 @@
     "Нет таблицы Symptoms по полосам Influence.",
     "Не определены точные цели и условия завершения остальных Major Factions.",
     "Не решено, восстанавливается ли Balance без игрока и могут ли фракции невольно сотрудничать.",
-    "Открыты число успешных ранних ритуалов (пять — лишь пример), расписание и предел параллельности, расчёт off-screen столкновений, командный порог, захват и содержание пленных, точность карты (точка или регион), состав и точный баланс финала, критерии рейтинга, триггер отдельного ритуала уничтожения планеты, посткампанийная игра, связь победы с конечным жизненным циклом мира и роль королевской власти."
+    "Открыты блок CC-1 … CC-19 (длина кампании, число городов, правила захвата, руководство культа, генерация сил, ответственная настройка сложности), а также захват и содержание пленных, точность карты, состав и баланс финала, критерии рейтинга, триггер ритуала уничтожения планеты, посткампанийная игра, связь победы с конечным жизненным циклом мира и роль королевской власти."
   ],
   "sourceIds": [
     "src-02",
-    "src-99"
+    "src-99",
+    "src-21"
   ],
   "designMaturity": "partially-specified",
   "decisionState": "unresolved",

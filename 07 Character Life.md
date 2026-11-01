@@ -1,16 +1,16 @@
 # 07 Character Life
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft
 
-Last Updated: 2026-10-31 (player death permanently ends same-world succession after the Stage 0 being manifests.)
+Last Updated: 2026-11-01 (manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md)
 
 Referenced By:
-[08 Confront Constraints](08%20Confront%20Constraints.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), future character creation, death flow, legacy cache, and dialogue-memory design.
+[08 Confront Constraints](08%20Confront%20Constraints.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), future character creation, death flow, legacy cache, and dialogue-memory design.
 
 ---
 
@@ -54,7 +54,7 @@ The next step depends on the state of the primary opposing being:
 - **Before its return to the living world:** a fixed Death Gap begins, world advancement resolves without player control, and the player may create a new character for the same world or start a new world.
 - **After it has manifested:** the current playable story ends in defeat if the player character dies. There is no successor and no further same-world Character Life, even if the being has since been defeated. The world may continue beyond the player’s point of view.
 
-Death is not an instant reload of the same person. The manifestation event that activates this permanent no-successor rule remains open in [99 Open Questions](99%20Open%20Questions.md). Whether the campaign closes after the being is defeated, or continues with the surviving current character, also remains open.
+Death is not an instant reload of the same person. Manifestation is the completion of the Capital Awakening Ritual ([02 World Laws](02%20World%20Laws.md)). Whether a manifestation during a Death Gap denies the pending successor is open ([99 Open Questions](99%20Open%20Questions.md) CC-18). The campaign ends with a rating when the being is defeated; whether the surviving current character can continue afterward remains open.
 
 # Death Gap
 
@@ -65,7 +65,7 @@ Recommended V1 feel: a small number of days, long enough for the world to move, 
 During the Death Gap the systems must recompute world state from the current situation, including at least:
 
 - Active Window expiry and Unattended Resolution for relevant POIs;
-- eligible World Engine Operations that fit the elapsed days;
+- eligible World Engine Operations that fit the elapsed days, including City Capture and City Liberation;
 - Faction Influence residue from those resolutions;
 - visible Symptoms that the next character can read;
 - fate checks on ordinary non-intentional leftovers (body loot, open camps, unprotected items).

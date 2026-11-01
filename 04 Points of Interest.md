@@ -1,16 +1,16 @@
 # 04 Points of Interest
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
-Last Updated: 2026-11-01 (ritual operations use six-hour world-time windows without player-facing countdowns; public event sites and faction control are represented on the map.)
+Last Updated: 2026-11-01 (cult rituals belong to City Capture; a city under Cult Control is persistent world state, not a POI. Earlier: ritual operations use six-hour world-time windows without player-facing countdowns; public event sites and faction control are represented on the map.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md)
 
 Referenced By:
-[05 Progression](05%20Progression.md), [09 Information Sources](09%20Information%20Sources.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), Future map, exploration, side-event, quest, and world-presentation design.
+[05 Progression](05%20Progression.md), [09 Information Sources](09%20Information%20Sources.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), Future map, exploration, side-event, quest, and world-presentation design.
 
 ---
 
@@ -146,7 +146,9 @@ Active Windows create Commitment pressure: world-time is a scarce stock.
 
 ## Cult ritual operations
 
-A cult ritual is represented as a timed faction-operation POI. Its current campaign target window is **six in-game hours / 360 World Ticks** under the shared clock in [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md). The player sees no numeric countdown. News, faction contacts, ambient reports, known map entries, and local world activity communicate what their sources know and whether the operation is still underway; the map does not reveal an unreported secret operation. When the window expires, the factions resolve the operation without the player and its aftermath remains discoverable. See [02 World Laws](02%20World%20Laws.md) and [09 Information Sources](09%20Information%20Sources.md).
+A cult ritual is represented as a timed faction-operation POI inside City Capture or the Capital Awakening Ritual ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)). Its current campaign target window is **six in-game hours / 360 World Ticks** under the shared clock in [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md). The player sees no numeric countdown. News, faction contacts, ambient reports, known map entries, and local world activity communicate what their sources know and whether the operation is still underway; the map does not reveal an unreported secret operation. When the window expires, the factions resolve the operation without the player and its aftermath remains discoverable. See [02 World Laws](02%20World%20Laws.md) and [09 Information Sources](09%20Information%20Sources.md).
+
+A city under Cult Control is persistent world state, not a POI: it has no Active Window and stays captured until City Liberation completes. Discrete events inside it, such as a ritual, a clash, or an opening to act against its garrison, remain POIs.
 
 # Unattended Resolution
 

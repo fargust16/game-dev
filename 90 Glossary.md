@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.60
+Version: 0.61
 
 Status: Draft
 
-Last Updated: 2026-11-01 (daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-01 (City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -222,7 +222,7 @@ Lightweight world remembrance of a previous character through rumours, dialogue 
 
 ## Difficulty Settings
 
-Seven independent world-generation sliders for combat difficulty, inhabitants, resource gathering, crafting, economy, equipment quality, and wear/maintenance. They do not form one bundled Easy / Normal / Hard / Hell scale; faction-pressure interactions remain with their owning systems.
+Seven independent world-generation sliders for combat difficulty, inhabitants, resource gathering, crafting, economy, equipment quality, and wear/maintenance. They do not form one bundled Easy / Normal / Hard / Hell scale; faction-pressure interactions remain with their owning systems. Campaign pace depends on difficulty, and the setting that owns it remains open.
 
 ---
 
@@ -1062,9 +1062,23 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Manifestation of the Sealed Being** — The state in which the sealed Stage 0 being has returned to the living world. From manifestation onward, player-character death ends the playable story in defeat and no same-world successor appears, even if the being is later defeated.
 
-**Cult Ritual** — A timed operation of the opposing faction performed against ordinary civilians to advance the sealed being's return. Its current campaign window is six in-game hours (360 World Ticks), with no player-facing numeric countdown; the operation resolves through faction action when the window ends. Completion advances the hidden threat; disruption delays it. The number of required earlier rituals, their schedule, concurrency limits, and detailed interruption rules remain open.
+**Cult Ritual** — A timed operation of the opposing faction through which it captures a city. Its current campaign window is six in-game hours (360 World Ticks), with no player-facing numeric countdown; the operation resolves through faction action when the window ends. Its place within City Capture, its effect on the city, its schedule, concurrency limits, and detailed interruption rules remain open.
 
-**Capital Awakening Ritual** — The final cult ritual, held at the centre of the capital after the required earlier rituals succeed. Its completion manifests the sealed being there. It is distinct from the later planet-destruction rite.
+**City Control** — The state saying which side holds a city: Allied Control or Cult Control. It changes only when City Capture or City Liberation completes. Reported City Control is the player's public reading of campaign progress. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
+
+**City Capture** — The cult taking a city by removing every follower of other factions, by driving them out or killing them, and holding it. Ordinary residents are not attacked.
+
+**City Liberation** — The return of a city from Cult Control by driving out or destroying every cult follower in it.
+
+**Capital Gate** — The rule that the Capital Awakening Ritual can begin only when every other city is under Cult Control.
+
+**Follower** — A character who belongs to a Major Faction's forces. Ordinary residents are not followers. Whether other actors count for City Capture and City Liberation remains open.
+
+**Cult General** — One of three Stage 2 followers who each lead a Cult Force. Their working role labels are the Teleporting, Holding, and Raiding Generals; these are not final names.
+
+**Cult Force** — The followers led by one Cult General. Cult Forces generate much faster than allied forces and are not exhausted by killing rank-and-file followers.
+
+**Capital Awakening Ritual** — The final cult ritual, held at the centre of the capital once the Capital Gate is open. Its completion manifests the sealed being there. It is distinct from the later planet-destruction rite.
 
 **Planet-Destroying Ritual** — The separate act the manifested being eventually intends to perform to destroy the planet after attacking other powerful beings, factions, people, and its own followers. Its exact trigger and timing remain open.
 
