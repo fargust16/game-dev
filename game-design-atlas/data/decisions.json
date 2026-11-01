@@ -672,5 +672,87 @@
       "src-21"
     ],
     "dateNote": "Owner-approved concept, 2026-11-01; recorded in 21."
+  },
+  {
+    "id": "d-campaign-scale",
+    "statement": "At the middle difficulty the campaign lasts 15–20 game days, about 40–50 real hours. The target world is 3×3 tiles with 5–7 cities, ideally 7; only cities are cult targets.",
+    "rationale": "Leaves room for exploration, gathering, monsters, and crafting while the player works with what comes to hand. Replaces D6's 3–5 settlements and changes no production terrain.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "world-generation"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-ritual-purpose",
+    "statement": "Capture rituals turn cities into Places of Power and keep residents alive as sacrifices. At the capital ritual the people in captured cities die; manifestation succeeds only if every city was captured at that moment and the ritual was not interrupted.",
+    "rationale": "Explains why the cult spares residents and makes the war's real stakes a secret the player can uncover.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-cult-behaviour",
+    "statement": "Cult followers never hide, attack invaders at once, share a Cult Thought Link, and retreat collectively.",
+    "rationale": "Closes the single-hidden-follower deadlock for liberation and lets a garrison break without every follower dying.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "actors"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-stage-occupancy",
+    "statement": "While a Pathway's Stage 0 is occupied, that Pathway has no Stage 1; while it is unoccupied, it has at most three Stage 1 practitioners.",
+    "rationale": "A world law that explains why the cult's Generals stop at Stage 2 and stand at the top of its living hierarchy.",
+    "alternatives": "",
+    "systemIds": [
+      "progression",
+      "cult-campaign",
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-05",
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-spirit-world",
+    "statement": "The Spirit World is the other side of the real world. The sealed being is held there and the Teleporting General lives there; the General can be defeated only straight after teleporting in. The player cannot enter it for now.",
+    "rationale": "Replaces the earlier 'divine plane' wording and gives the Teleporting General a distinct counterplay.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
   }
 ]

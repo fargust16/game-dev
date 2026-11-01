@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.81
+Version: 0.82
 
 Status: Draft
 
-Last Updated: 2026-11-01 (the war for cities recorded: required-ritual count resolved by the Capital Gate; Cult Campaign block CC-1 … CC-19 added. Earlier: daily player summary/news-map channels, six-hour ritual windows, allied response, potential parallel operations, and fixed capital awakening/occupation loop recorded; ritual count/concurrency, off-screen resolution, command threshold, capture, destruction trigger, and post-campaign play remain open. Earlier: sealed Stage 0 antagonist, major/minor distinction, and two candidate minor factions recorded; finale and generation remain open. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-11-01 (owner answers recorded: campaign length, 3×3 target world, 5–7 cities, the rituals' purpose, the Stage Occupancy Rule; CC-1 … CC-3, CC-5, CC-9, CC-10, and CC-17 narrowed; CC-20 … CC-23 added; GEO-1 reopened by the campaign's gameplay requirement. Earlier: the war for cities recorded: required-ritual count resolved by the Capital Gate; Cult Campaign block CC-1 … CC-19 added. Earlier: daily player summary/news-map channels, six-hour ritual windows, allied response, potential parallel operations, and fixed capital awakening/occupation loop recorded; ritual count/concurrency, off-screen resolution, command threshold, capture, destruction trigger, and post-campaign play remain open. Earlier: sealed Stage 0 antagonist, major/minor distinction, and two candidate minor factions recorded; finale and generation remain open. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -43,6 +43,18 @@ Three church-associated Major Factions cooperate, with internal-order, industry/
 **How many rituals must the cult complete before the capital?**
 
 There is no fixed count. The Capital Gate opens when every other city is under Cult Control, so the count follows the number of cities plus every recapture forced by City Liberation. Reported City Control replaces the hidden return threat. The number of cities is CC-2. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
+
+**How long is the campaign, and on what map?**
+
+At the middle difficulty it lasts 15–20 game days, about 40–50 real hours, and player skill can shorten or lengthen it. The target world is 3 × 3 tiles, 4200 × 4200 m, with 5–7 cities, ideally 7. Only cities are cult targets. Pressure comes first from information, and distance adds to it. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §2.
+
+**Why does the cult spare ordinary residents?**
+
+A capture ritual turns a city into a Place of Power, and residents are needed alive as sacrifices. At the Capital Awakening Ritual, followers conduct smaller rituals in every captured city and the people there die. The purpose stays secret from ordinary residents. Manifestation succeeds only if every city was captured at the moment of the capital ritual and that ritual was not interrupted. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §§5–6.
+
+**Does anyone in the cult outrank the Generals?**
+
+No living follower. The Stage Occupancy Rule leaves no Stage 1 on a Pathway whose Stage 0 is occupied, and the sealed being occupies Stage 0. See [05 Progression](05%20Progression.md) and [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §7.
 
 **How are the two sides' forces generated?**
 
@@ -227,7 +239,8 @@ By TerrainGen: the Stage 1 landmass owns the silhouette, coast and seabed, and S
 **Yes, both** — answered (a) by the project owner on 2026-10-18 (GEO-6). Both are Editor-only and read-only: no production code, bake, production scene or frozen file changes, and every output lands outside `Assets`. Built the same day as `Editor/TerrainGenGeographyDump.cs` (G0) and `Editor/GeometryFirstReview.cs` (G1); measurements in [GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md](unity/Assets/Plans/GEOGRAPHY_FIRST_TERRAIN_RESEARCH.md) §§3.6, 7.6, 10. The answer covers the tooling only: the target geography, the acceptance thresholds (GEO-7) and GEO-1 … GEO-5 stay open.
 
 **Is geography a reason to change the world size or the land fraction now? (GEO-1)**  
-**No** — owner direction, 2026-10-21: a reasonable increase is permissible if justified, never merely because G3c failed. The V0 world and Stage 1's land-fraction band stay; today's footprint (contour A in controlled research) is the baseline for landform-model research; contour B is a tested candidate, not evidence that area limits anything. Reopened only when a landform model is promising on the baseline and an experiment that separates area from shape attributes its remaining failures to room, or a gameplay requirement (travel pacing D3, § Exploration size) calls for more land. A 3 × 3-tile world stays a separate travel-pacing decision. Record: [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md) §2.1.
+**No** — owner direction, 2026-10-21: a reasonable increase is permissible if justified, never merely because G3c failed. The V0 world and Stage 1's land-fraction band stay; today's footprint (contour A in controlled research) is the baseline for landform-model research; contour B is a tested candidate, not evidence that area limits anything. Reopened only when a landform model is promising on the baseline and an experiment that separates area from shape attributes its remaining failures to room, or a gameplay requirement (travel pacing D3, § Exploration size) calls for more land. A 3 × 3-tile world stays a separate travel-pacing decision. Record: [GEOGRAPHY_POST_G3C_REVIEW.md](unity/Assets/Plans/GEOGRAPHY_POST_G3C_REVIEW.md) §2.1.  
+**Reopened on 2026-11-01 by the gameplay clause:** the owner set a 3 × 3-tile target world for the campaign ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §2), which also answers travel pacing D3. This is a design target. The V0 world and all production terrain stay unchanged, and G3f's evidence does not extend to the larger world without its own plan (CC-2).
 
 **How many T1 forms does the target have? (GEO-2)**  
 **One branching mountain system, counted as one T1** — option (a), from the owner-approved target D6 (2026-10-20). Its culminations, ridges and spurs are parts of one T1 form; the count "1 (2 max)" and the row's numbers in `WORLD_RELIEF_PRINCIPLES.md` §1 are unchanged, a provisional Draft classification rather than a production gate. Record: review §2.2.
@@ -290,35 +303,35 @@ The rules are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%
 
 ### Scale and pace
 
-**CC-1 Campaign length.** How long should the campaign last if the player never intervenes, at the middle difficulty, in game days and real hours? One game day is four real hours of uninterrupted play. This sets every rate below and how much room exploration keeps.
+**CC-1 Tempo curve.** The length is decided: 15–20 game days at the middle difficulty. Is the pace even or accelerating, and how many quiet days come before the first city falls? Proposed: the first city falls on day 3–5, and later cities fall faster.
 
-**CC-2 Cities and world scale.** How many cities exist, and which settlements count as cities? The V0 target is 3–5 settlements, which leaves 2–4 non-capital cities for three Generals. Crossing the 2.8 km world takes about 62 ticks, 17% of a six-hour ritual window. Does the campaign need a larger world, a shorter window, slower travel, or less emphasis on distance? This links to § Exploration's V1 overworld size question.
+**CC-2 Cities and terrain.** The target is decided: 3 × 3 tiles and 5–7 cities, ideally 7. Does the count include the capital (working reading: yes), and what is the minimum distance between cities? What terrain plan delivers this, given that G3f and the earlier research ran in the 2.8 km world with 3–5 settlements?
 
 ### Capture and liberation
 
-**CC-3 Who counts.** Which actors must leave a city for capture or liberation to complete: Minor Faction members, unaffiliated practitioners, the player character? How does the rule avoid one hidden follower freezing a city?
+**CC-3 Who counts.** Cult followers never hide, so liberation cannot be frozen by one hidden cultist. Which actors must leave a city for capture to complete: allied followers in hiding, Minor Faction members, unaffiliated practitioners, the player character?
 
-**CC-4 Capture sequence.** In what order do attack, clearing, holding, and the ritual happen? Does the six-hour window stay, and how long must a city be held? Can several captures run at once? Which garrison stays behind when a General leaves?
+**CC-4 Capture sequence.** In what order do attack, clearing, holding, and the ritual happen? Does the six-hour window stay, and how long must a city be held? How large is the garrison that stays when a General leaves?
 
-**CC-5 What the ritual does.** The earlier draft targeted civilians; the cult no longer attacks ordinary residents. What does the ritual do to a city and its residents? Why does a city need followers removed before the ritual can complete?
+**CC-5 Resolved.** A capture ritual makes a city a Place of Power and keeps residents alive as sacrifices (§ Resolved Decisions). Its remaining questions are CC-20 and CC-21.
 
-**CC-6 Life under Cult Control.** What changes in a captured city for residents, shops, services, law, and the player's access? Which Symptoms show it?
+**CC-6 Life under Cult Control.** What changes in a captured city for residents, shops, services, law, and the player's access? Whom does the cult attack on sight: known enemies, followers, or any armed stranger? Which Symptoms show it?
 
 **CC-7 After liberation.** Which allied faction takes a liberated city, how soon can the cult return, and what lasting gain keeps liberation from being time wasted on a city that falls again?
 
-**CC-8 Non-combat routes.** Beyond killing or capturing ritualists, how can followers be driven out or a ritual stopped through Convince, Threaten, Exchange, Veil, or Withdraw? [08 Confront Constraints](08%20Confront%20Constraints.md) requires real alternatives.
+**CC-8 Non-combat routes.** Followers attack invaders at once and share a Thought Link. How can a garrison be broken or a ritual stopped through Convince, Threaten, Exchange, Veil, or Withdraw? [08 Confront Constraints](08%20Confront%20Constraints.md) requires real alternatives.
 
 ### Generals and command
 
-**CC-9 The leader.** Does the reinforcement rule end when the three Generals fall, or does someone stand above them? Stage 1 followers exist and are deeper than Stage 2. Is a killed General replaced? This also answers which roles must be removed for the pre-manifestation ending.
+**CC-9 The Generals' fall.** No living follower outranks the Generals. Does killing all three complete the pre-manifestation ending and stop reinforcement (working reading: yes)? Is a killed General replaced? What happens to a General's Force if only one or two have fallen?
 
-**CC-10 Counterplay.** How is each General located and stopped: limits on teleportation, the Holding General's zone, how the Raiding General's base is found? How can a character far below Stage 2 defeat a General at all?
+**CC-10 Counterplay.** The Teleporting General can be defeated only straight after teleporting in. How long is that window, and how does the player predict the arrival? How is the Raiding General's base found? Does the Holding General ever flee or move on (working reading: no)? How can a character far below Stage 2 defeat a General at all?
 
 **CC-11 Scope.** Is the war for cities part of V1, given that V1 limits player stages to 9–7 and the Vertical Slice excludes the cult's campaign?
 
 ### Force generation
 
-**CC-12 Cult generation.** Where do new followers appear, at which stages, how often, with what cap, and what is their in-world source? Does each Force gather separately, and how many followers launch an attack?
+**CC-12 Cult generation.** Where do new followers appear, at which stages, how often, with what cap, and what is their in-world source? Does each Force gather separately, and how many followers launch an attack or a second parallel ritual?
 
 **CC-13 Allied forces.** How many followers of each stage exist at world creation, which stages are replaced and how often, and does losing cities reduce replacement? Can a whole Major Faction die, and what happens to Faction Entry if it does?
 
@@ -332,11 +345,21 @@ The rules are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%
 
 ### Endgame edges
 
-**CC-17 Capital Gate edges.** What happens when a city is liberated while the Capital Awakening Ritual is running? Can the cult attack the capital by force before the gate opens? After manifestation, how does the cult move on liberated cities?
+**CC-17 Capital Gate edges.** A city liberated during the capital ritual breaks it (working reading). Does the cult restart at once, and how long is the capital ritual? Can the cult attack the capital by force before the gate opens? After manifestation, how does the cult move on liberated cities?
 
 **CC-18 Manifestation during a Death Gap.** If the character is dead and the being manifests before a successor enters, does the successor still appear?
 
 **CC-19 Joining the cult.** Can the player join or aid the cult? The first character's Starting Faction list and both campaign endings currently assume the opposite side.
+
+### Added by the owner's answers
+
+**CC-20 The sacrifice.** Who dies at manifestation: everyone in captured cities, the capital's residents, followers there, refugees? Does moving residents out of a captured city reduce the sacrifice or change the being's strength? What is left of the world and its services afterwards?
+
+**CC-21 Learning the secret.** The purpose of the rituals is hidden from residents but not from the player. Does the game state it, or does the player discover it through sources and carry it to later worlds as Player Knowledge?
+
+**CC-22 Occupied stages.** Which Pathways have an occupied Stage 0? Do all cult followers share the sealed being's Pathway? The three allied churches suggest their Pathways are occupied too, which would leave allied Stage 1 practitioners only on other Pathways.
+
+**CC-23 Cult Retreat trigger.** What makes followers decide to retreat, where do they go, and do they rejoin a Force? Do allied followers follow the same rule during a capture?
 
 ## Decision Engine
 
@@ -506,7 +529,7 @@ How are secrets generated?
 
 Can secrets vanish forever?
 
-What is the V1 overworld target size (km / play minutes edge-to-edge) **beyond** the V0 world (2800 × 2800 m / 64 m chunks already locked in [17](17%20Game%20Systems%20Architecture.md))? Note the measured budget: ~2.5–3 km² of dry land fits two large cities; three with real travel between them needs 4–6 km², i.e. 3×3 tiles or 2×2 at 2000 m — growing the world, not just the island.
+The target world size is decided: 3 × 3 tiles, 4200 × 4200 m ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §2). Whether V1 uses it is CC-11; the V0 world stays 2800 × 2800 m in [17](17%20Game%20Systems%20Architecture.md).
 
 ## Procedural Buildings / Scenes
 

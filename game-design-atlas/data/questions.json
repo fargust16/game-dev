@@ -890,7 +890,7 @@
   },
   {
     "id": "q-cc-1",
-    "text": "CC-1. How long should the campaign last without the player at the middle difficulty, in game days and real hours?",
+    "text": "CC-1. The length is decided: 15–20 game days at the middle difficulty. Is the pace even or accelerating, and how many quiet days come before the first city falls?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -903,7 +903,7 @@
   },
   {
     "id": "q-cc-2",
-    "text": "CC-2. How many cities exist, which settlements count, and how does the campaign fit a world that takes about 62 ticks to cross?",
+    "text": "CC-2. The target is decided: 3×3 tiles and 5–7 cities, ideally 7. Does the count include the capital, what is the minimum distance between cities, and what terrain plan delivers this?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -916,7 +916,7 @@
   },
   {
     "id": "q-cc-3",
-    "text": "CC-3. Which actors must leave a city for capture or liberation to complete, and how does the rule avoid one hidden follower freezing a city?",
+    "text": "CC-3. Cult followers never hide. Which actors must leave a city for capture to complete: hidden allied followers, Minor Faction members, unaffiliated practitioners, the player character?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -929,7 +929,7 @@
   },
   {
     "id": "q-cc-4",
-    "text": "CC-4. In what order do attack, clearing, holding, and the ritual happen; does the six-hour window stay; can captures overlap; what garrison stays?",
+    "text": "CC-4. In what order do attack, clearing, holding, and the ritual happen; does the six-hour window stay; how large is the garrison that stays?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -942,20 +942,20 @@
   },
   {
     "id": "q-cc-5",
-    "text": "CC-5. What does a ritual do to a city and its residents now that the cult does not attack them, and why must followers be removed first?",
+    "text": "CC-5. Resolved: a capture ritual makes a city a Place of Power and keeps residents alive as sacrifices. Remaining questions moved to CC-20 and CC-21.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-cc-6",
-    "text": "CC-6. What changes in a captured city for residents, shops, services, law, and player access, and which Symptoms show it?",
+    "text": "CC-6. What changes in a captured city for residents, shops, services, law, and player access; whom does the cult attack on sight; which Symptoms show it?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -981,7 +981,7 @@
   },
   {
     "id": "q-cc-8",
-    "text": "CC-8. How can followers be driven out or a ritual stopped through non-combat Approaches?",
+    "text": "CC-8. Followers attack invaders at once and share a Thought Link. How can a garrison be broken or a ritual stopped through non-combat Approaches?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -994,7 +994,7 @@
   },
   {
     "id": "q-cc-9",
-    "text": "CC-9. Does the reinforcement rule end when the three Generals fall, or does someone stand above them? Is a killed General replaced?",
+    "text": "CC-9. No living follower outranks the Generals. Does killing all three complete the pre-manifestation ending and stop reinforcement? Is a killed General replaced?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1007,7 +1007,7 @@
   },
   {
     "id": "q-cc-10",
-    "text": "CC-10. How is each General located and stopped, and how can a character far below Stage 2 defeat one?",
+    "text": "CC-10. How long is the Teleporting General's vulnerable window and how is the arrival predicted; how is the Raiding General's base found; does the Holding General ever move on; how can a character far below Stage 2 defeat a General?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1033,7 +1033,7 @@
   },
   {
     "id": "q-cc-12",
-    "text": "CC-12. Where do new cult followers appear, at which stages, how often, with what cap, and what is their in-world source?",
+    "text": "CC-12. Where do new cult followers appear, at which stages, how often, with what cap, and what is their in-world source? How many followers launch an attack or a second parallel ritual?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1098,7 +1098,7 @@
   },
   {
     "id": "q-cc-17",
-    "text": "CC-17. What happens when a city is liberated during the Capital Awakening Ritual, can the capital be attacked before the gate opens, and how does the cult move on liberated cities after manifestation?",
+    "text": "CC-17. Does the cult restart at once after a broken capital ritual, how long is that ritual, can the capital be attacked before the gate opens, and how does the cult move on liberated cities after manifestation?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1125,6 +1125,58 @@
   {
     "id": "q-cc-19",
     "text": "CC-19. Can the player join or aid the cult?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-20",
+    "text": "CC-20. Who dies at manifestation, does moving residents out reduce the sacrifice or change the being's strength, and what is left of the world afterwards?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-21",
+    "text": "CC-21. Does the game state the secret purpose of rituals, or does the player discover it and carry it to later worlds as Player Knowledge?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-22",
+    "text": "CC-22. Which Pathways have an occupied Stage 0, do all cult followers share the sealed being's Pathway, and where can allied Stage 1 practitioners exist?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-23",
+    "text": "CC-23. What makes followers retreat, where do they go, do they rejoin a Force, and do allied followers follow the same rule?",
     "systemIds": [
       "cult-campaign"
     ],

@@ -486,5 +486,30 @@
       "src-05"
     ],
     "explanation": "Генералы — постоянные акторы, а последователи культа создаются с ускоренной генерацией, но по общим формулам персонажей."
+  },
+  {
+    "id": "rel-campaign-worldgen",
+    "fromId": "cult-campaign",
+    "toId": "world-generation",
+    "type": "influence",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "explanation": "Кампания задаёт целевой мир 3×3 тайла и 5–7 городов; это игровая цель, рельефу нужен отдельный план."
+  },
+  {
+    "id": "rel-campaign-progression",
+    "fromId": "cult-campaign",
+    "toId": "progression",
+    "type": "shared-rule",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21",
+      "src-05"
+    ],
+    "explanation": "Правило занятости ступеней объясняет, почему генералы культа остаются на второй ступени и стоят во главе живой иерархии."
   }
 ]

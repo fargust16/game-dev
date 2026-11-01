@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-01 (force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-01 (Cult Thought Link recorded as an information channel. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -273,6 +273,7 @@ Potential information channels include:
 - **Familiars and observers:** a familiar or assigned watcher observes an area and reports what it detects.
 - **Direct perception:** an NPC hears, sees, or otherwise senses an event within the limits of its senses and circumstances.
 - **Specific abilities:** supernatural or other explicitly defined abilities can detect, monitor, or report particular events or areas.
+- **Cult Thought Link:** cult followers exchange thoughts at a distance. Followers in a city know where a fight is, and followers in the nearest city can learn of it. It reaches cult followers only ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)).
 - **Daily public news:** a publisher compiles significant events it learned about and broadcasts the issue at the in-game day boundary.
 
 Information transmission is not automatic universal knowledge. Each channel needs a sender/source, recipient or eligible audience, content, timing, and any relevant limits. NPCs may refer to a published event once it reaches their public-information audience; hidden operations remain limited to factions, witnesses, or other valid recipients. The detailed reporting and dialogue rules belong to [09 Information Sources](09%20Information%20Sources.md) and ability systems.

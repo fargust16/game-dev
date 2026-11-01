@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.61
+Version: 0.62
 
 Status: Draft
 
-Last Updated: 2026-11-01 (City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-01 (Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -1062,7 +1062,17 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Manifestation of the Sealed Being** — The state in which the sealed Stage 0 being has returned to the living world. From manifestation onward, player-character death ends the playable story in defeat and no same-world successor appears, even if the being is later defeated.
 
-**Cult Ritual** — A timed operation of the opposing faction through which it captures a city. Its current campaign window is six in-game hours (360 World Ticks), with no player-facing numeric countdown; the operation resolves through faction action when the window ends. Its place within City Capture, its effect on the city, its schedule, concurrency limits, and detailed interruption rules remain open.
+**Cult Ritual** — A timed operation of the opposing faction through which it captures a city and turns it into a Place of Power. Its current campaign window is six in-game hours (360 World Ticks), with no player-facing numeric countdown; the operation resolves through faction action when the window ends. Its place within City Capture, its effect on the city, its schedule, concurrency limits, and detailed interruption rules remain open.
+
+**Place of Power** — A captured city prepared for the manifestation, with its residents kept alive as future sacrifices. This purpose stays secret from ordinary residents. A Place of Power needs no visible mark.
+
+**Cult Retreat** — The collective flight of cult followers from every point of a city at once. They can be chased and killed, but at some point they get away.
+
+**Cult Thought Link** — A mental ability of cult followers to exchange thoughts at a distance. Followers in a city know where a fight is, and followers in the nearest city can come as reinforcements.
+
+**Spirit World** — The other side of the real world. The sealed being is held there, and the Teleporting General lives there. The player cannot enter it for now.
+
+**Stage Occupancy Rule** — While a Pathway's Stage 0 is occupied, that Pathway has no Stage 1; while it is unoccupied, that Pathway has at most three Stage 1 practitioners.
 
 **City Control** — The state saying which side holds a city: Allied Control or Cult Control. It changes only when City Capture or City Liberation completes. Reported City Control is the player's public reading of campaign progress. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
 
@@ -1074,11 +1084,11 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Follower** — A character who belongs to a Major Faction's forces. Ordinary residents are not followers. Whether other actors count for City Capture and City Liberation remains open.
 
-**Cult General** — One of three Stage 2 followers who each lead a Cult Force. Their working role labels are the Teleporting, Holding, and Raiding Generals; these are not final names.
+**Cult General** — One of three Stage 2 followers who each lead a Cult Force and together form the top of the cult's living hierarchy. Their working role labels are the Teleporting, Holding, and Raiding Generals; these are not final names.
 
 **Cult Force** — The followers led by one Cult General. Cult Forces generate much faster than allied forces and are not exhausted by killing rank-and-file followers.
 
-**Capital Awakening Ritual** — The final cult ritual, held at the centre of the capital once the Capital Gate is open. Its completion manifests the sealed being there. It is distinct from the later planet-destruction rite.
+**Capital Awakening Ritual** — The final cult ritual, held at the centre of the capital once the Capital Gate is open, with smaller rituals in every captured city at the same moment. The people there die as the sacrifice. It succeeds only if every city was captured at the moment of the ritual and the ritual was not interrupted. Its completion manifests the sealed being there. It is distinct from the later planet-destruction rite.
 
 **Planet-Destroying Ritual** — The separate act the manifested being eventually intends to perform to destroy the planet after attacking other powerful beings, factions, people, and its own followers. Its exact trigger and timing remain open.
 
