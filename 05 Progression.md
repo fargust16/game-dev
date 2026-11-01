@@ -1,10 +1,10 @@
 # 05 Progression
 
-Version: 0.11
+Version: 0.12
 
 Status: Draft
 
-Last Updated: 2026-11-01 (the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
+Last Updated: 2026-11-01 (22 Tarot-archetype Pathways recorded, with six named; the V1 player reaches Stages 9–8 and Stage 7 is for NPCs only. Earlier: the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
@@ -68,9 +68,32 @@ Design labels for V1 (not final lore names):
 | Veiled Path | stealth, eavesdropping, misdirection, unseen leverage | loud public dominance fantasy |
 | Bound Path | bargains, debts, rites, mediated power through others/entities | pure self-reliant no-debt fantasy |
 
-These labels are scaffolding. Lore names come later. The rule that matters: each Pathway should make some Approaches easier or more natural and make others costlier or more dissonant.
+These labels describe ways of acting. Pathway names are in the next section, and how they map onto these labels is open. The rule that matters: each Pathway should make some Approaches easier or more natural and make others costlier or more dissonant.
 
 A Pathway is not a perfect build. It is a commitment with closed doors.
+
+## The 22 Pathways
+
+The game has **22 Pathways**, one for each Major Arcana archetype of the Tarot. The archetype is where a Pathway ends. Pathways carry the project's own names.
+
+Six are named so far:
+
+| Side | Archetype | Pathway |
+|---|---|---|
+| Internal-order faction | The Fool | Path of Change |
+| Internal-order faction | The Magician | Path of the Creator |
+| Internal-order faction | The High Priestess | Path of the Veil |
+| Cult | The Empress | Path of the Source |
+| Cult | The Emperor | Path of the Sovereign |
+| Cult | The Hierophant | Path of Revelation |
+
+The sealed being and the Spirit General walk the Path of the Sovereign. Other cult followers may walk any of the cult's three Pathways.
+
+The remaining 16 Pathways are prepared after the Vertical Slice is proven.
+
+## Abilities
+
+Each Pathway has its own abilities. They cost Will Power and strengthen the user, weaken an enemy, or attack directly. Stages 9–7 have few of them, and not all are for combat. The abilities themselves are listed later (CC-29).
 
 # How a Pathway Is Obtained
 
@@ -86,7 +109,7 @@ When a character has a faction (the world's first character via Starting Faction
 
 Factionless characters receive no faction Pathway nudge until they earn membership.
 
-In V1 the one joinable faction opens two or three Pathways, and the potions of other Pathways can be sought independently ([11 Vertical Slice](11%20Vertical%20Slice.md)).
+In V1 the one joinable faction opens three Pathways, and the potions of other Pathways can be sought independently ([11 Vertical Slice](11%20Vertical%20Slice.md)).
 
 ## Alternative acquisition
 
@@ -108,9 +131,11 @@ Lower number means deeper advancement and sharper price.
 
 ## V1 stage scope
 
-V1 implements only:
+In V1 the player reaches only:
 
-`9 → 8 → 7`
+`9 → 8`
+
+Stage 9 is a certain goal within a Vertical Slice run, and Stage 8 takes directed effort. Stage 7 exists in V1 for NPCs only.
 
 Stages `6 → 0` are reserved for later documents and content. No implementation may assume their full rules yet.
 
@@ -315,8 +340,8 @@ Player Knowledge must not become a hidden +success% table that deletes decision 
 ## V1
 
 - 3 Pathways by way of acting;
-- stages 9 → 8 → 7 only;
-- one joinable faction that opens two or three Pathways;
+- player stages 9 → 8 only, with Stage 7 for NPCs;
+- one joinable faction that opens three Pathways;
 - alternative Pathway acquisition via Bargain / quest / discovery;
 - simple Conduct Progress;
 - seed-varying formulas/ingredients;
@@ -340,7 +365,7 @@ Player Knowledge must not become a hidden +success% table that deletes decision 
 
 Do not design yet inside this document:
 
-- final lore names of Pathways;
+- names of the remaining 16 Pathways;
 - complete ingredient encyclopedias;
 - full church pantheon;
 - named entity bestiary;

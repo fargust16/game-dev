@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.66
+Version: 0.67
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-01 (Pathway updated for the 22 Tarot archetypes and V1 player stages. Earlier: Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -326,7 +326,7 @@ Combat uses an Action Point (AP) pool. At the start of a character's turn, the c
 
 ## Vertical Slice
 
-The smallest playable prototype that proves the game fantasy and core systems without building the full game. It is one city and a small territory at Stages 9–7, built around the Spirit General's invasion on day 1–2 and a ritual the player must stop.
+The smallest playable prototype that proves the game fantasy and core systems without building the full game. It is one city and a small territory at player Stages 9–8, built around the Spirit General's invasion on day 1–2 and a ritual the player must stop.
 
 ---
 
@@ -698,7 +698,7 @@ Capability granted by otherworldly entities, churches, deities, or similar sourc
 
 ## Pathway
 
-A staged character-growth track distinct by way of acting. V1 has three Pathways and only stages 9 → 7. Lore names come later.
+A staged character-growth track distinct by way of acting. The game has 22, one for each Tarot Major Arcana archetype, under the project's own names. V1 has three player Pathways and player stages 9 → 8, with Stage 7 for NPCs only.
 
 ---
 

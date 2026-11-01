@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.86
+Version: 0.87
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Vertical Slice settled: CC-24, CC-25, and CC-26 resolved; CC-27 and CC-28 added. Earlier: owner's fourth answers recorded: CC-11, CC-14, and CC-16 resolved; CC-7, CC-10, CC-12, CC-15, and CC-17 narrowed; CC-24 … CC-26 added for the redefined Vertical Slice. Earlier: owner's third answers recorded: CC-1, CC-8, CC-18, and CC-21 resolved; CC-7, CC-10, CC-12, CC-14, CC-15, and CC-20 narrowed. Earlier: owner's second answers recorded: CC-4, CC-9, CC-21, and CC-23 resolved; CC-3, CC-6, CC-7, CC-8, CC-10, CC-13, CC-17, CC-20, and CC-22 narrowed; Divine Plane restored. Earlier: owner answers recorded: campaign length, 3×3 target world, 5–7 cities, the rituals' purpose, the Stage Occupancy Rule; CC-1 … CC-3, CC-5, CC-9, CC-10, and CC-17 narrowed; CC-20 … CC-23 added; GEO-1 reopened by the campaign's gameplay requirement. Earlier: the war for cities recorded: required-ritual count resolved by the Capital Gate; Cult Campaign block CC-1 … CC-19 added. Earlier: daily player summary/news-map channels, six-hour ritual windows, allied response, potential parallel operations, and fixed capital awakening/occupation loop recorded; ritual count/concurrency, off-screen resolution, command threshold, capture, destruction trigger, and post-campaign play remain open. Earlier: sealed Stage 0 antagonist, major/minor distinction, and two candidate minor factions recorded; finale and generation remain open. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-11-01 (22 Pathways recorded; CC-27 and CC-28 resolved; CC-22 narrowed; CC-29 added. Earlier: Vertical Slice settled: CC-24, CC-25, and CC-26 resolved; CC-27 and CC-28 added. Earlier: owner's fourth answers recorded: CC-11, CC-14, and CC-16 resolved; CC-7, CC-10, CC-12, CC-15, and CC-17 narrowed; CC-24 … CC-26 added for the redefined Vertical Slice. Earlier: owner's third answers recorded: CC-1, CC-8, CC-18, and CC-21 resolved; CC-7, CC-10, CC-12, CC-14, CC-15, and CC-20 narrowed. Earlier: owner's second answers recorded: CC-4, CC-9, CC-21, and CC-23 resolved; CC-3, CC-6, CC-7, CC-8, CC-10, CC-13, CC-17, CC-20, and CC-22 narrowed; Divine Plane restored. Earlier: owner answers recorded: campaign length, 3×3 target world, 5–7 cities, the rituals' purpose, the Stage Occupancy Rule; CC-1 … CC-3, CC-5, CC-9, CC-10, and CC-17 narrowed; CC-20 … CC-23 added; GEO-1 reopened by the campaign's gameplay requirement. Earlier: the war for cities recorded: required-ritual count resolved by the Capital Gate; Cult Campaign block CC-1 … CC-19 added. Earlier: daily player summary/news-map channels, six-hour ritual windows, allied response, potential parallel operations, and fixed capital awakening/occupation loop recorded; ritual count/concurrency, off-screen resolution, command threshold, capture, destruction trigger, and post-campaign play remain open. Earlier: sealed Stage 0 antagonist, major/minor distinction, and two candidate minor factions recorded; finale and generation remain open. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -110,10 +110,10 @@ As timed Points of Interest with lazy activation, readable Active Windows, and I
 ## Progression
 
 **How many Pathways in V1?**  
-Three, distinct by way of acting, expandable later. Documented in [05 Progression](05%20Progression.md).
+Three player Pathways, distinct by way of acting, out of 22 in the game, one for each Tarot Major Arcana archetype. The other 16 follow after the slice. Documented in [05 Progression](05%20Progression.md).
 
 **Which stages in V1?**  
-Only 9 → 8 → 7. Deeper stages later.
+The player reaches 9 → 8, and Stage 7 is for NPCs only. Deeper stages later.
 
 **How is a Pathway obtained?**  
 Starting Faction soft-nudges toward one Pathway; Pathway may also be gained through Bargain, quest, or discovery. Not a prison. Pathless remains valid.
@@ -230,7 +230,7 @@ Free third-person overworld and interior scenes; square grid + Environment Actio
 Unity locked. URP, C#, project folder `unity/`, free 3P + custom arena grid TB. Documented in [12 Engine Choice](12%20Engine%20Choice.md).
 
 **What is the first playable proof?**  
-A Vertical Slice of one city and a small territory at Stages 9–7, in which the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player either stops the ritual and wins or loses. It has one joinable faction with two or three Pathways, the three earlier POIs as side events, required mechanics in a limited form, and a Lord of the Mysteries-like industrial-era mood — delivered on overworld → interior → arena rails. Death Gap is out of slice scope. Placeholder names may change. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md) and [16](16%20Architecture%20Pivot.md).
+A Vertical Slice of one city and a small territory at player Stages 9–8, in which the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player either stops the ritual and wins or loses. It has one joinable faction with three Pathways, the three earlier POIs as side events, required mechanics in a limited form, and a Lord of the Mysteries-like industrial-era mood — delivered on overworld → interior → arena rails. Death Gap is out of slice scope. Placeholder names may change. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md) and [16](16%20Architecture%20Pivot.md).
 
 **Where do systems / interfaces / micro-iterations live?**  
 [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — System Cards + Track backlog. Spatial locks remain in [16](16%20Architecture%20Pivot.md).
@@ -351,7 +351,7 @@ The rules are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%
 
 **CC-10 Counterplay.** The ways to defeat a General are decided (21 §7). How does a seer's prediction reach a player outside a faction? How is the Raiding General found between sorties? Can a player reach Stage 2–3 within 15–20 game days, or do allied numbers and disrupted rituals carry that path?
 
-**CC-11 Resolved.** V1 is the one-city slice of [11 Vertical Slice](11%20Vertical%20Slice.md). Allies and enemies may be deeper than Stages 9–7.
+**CC-11 Resolved.** V1 is the one-city slice of [11 Vertical Slice](11%20Vertical%20Slice.md). Allies and enemies may be deeper than the player's stages.
 
 ### Force generation
 
@@ -381,7 +381,7 @@ The rules are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%
 
 **CC-21 Resolved.** The player learns the purpose only at manifestation (§ Resolved Decisions).
 
-**CC-22 Occupied stages.** The cult and the allied factions stop at Stage 2. Which Pathways have an occupied Stage 0, and does the World Seed vary them, so that a past world does not give the answer? Do all cult followers share the sealed being's Pathway? Which sources tell the character which Pathway belongs to which deity?
+**CC-22 Occupied stages.** Six Pathways are named ([05 Progression](05%20Progression.md)), and the allied factions stop at Stage 2. Which of the 22 have an occupied Stage 0, and does the World Seed vary that, so that a past world does not give the answer? If the Paths of the Source and of Revelation have a free Stage 0, can cultists reach Stage 1 there and outrank the Generals? Which Pathways do the other two Generals walk? Which sources tell the character which Pathway belongs to which deity?
 
 **CC-23 Resolved in principle.** Triggers and destinations are decided (§ Resolved Decisions). What share of losses counts as a dangerous minority, and do allied followers retreat by the same rule during a capture?
 
@@ -393,9 +393,11 @@ The rules are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%
 
 **CC-26 Resolved.** The required mechanics, the one joinable faction, Lower Veil as a district, and the three POIs as side events are decided (11).
 
-**CC-27 Slice balance.** Which stage can a player reach in 3–6 real hours, given Conduct Progress, formulas, ingredients, and Alchemy? How many followers invade, how many allies stand with the player, and how long is the slice ritual's window? Does a slice General fight or use the fallback?
+**CC-27 Resolved.** Stage 9 is a certain goal, Stage 8 takes directed effort, and Stage 7 is for NPCs. There are 8–10 enemies with enough allies for about equal sides, and the six-hour window stays (11).
 
-**CC-28 Slice start.** Does the character begin in the joinable faction as a Starting Faction, or join through Faction Entry? Which two or three Pathways does it open? What happens when the character dies in a run, and what are the Pathways and the city called?
+**CC-28 Resolved.** The character starts without a faction and may join through a first-day trial. Death ends the run, and the player starts again (11).
+
+**CC-29 Slice Pathways and start.** Which abilities do the three player Pathways have at Stages 9–8 and the NPCs at Stage 7? How do they map onto the Open, Veiled, and Bound labels? What can a character who does not join find, given that only six Pathways are named? What is the first-day trial? Does a Factionless start stay a slice exception, or replace Starting Faction in the full game? What is the city called?
 
 ## Decision Engine
 
@@ -423,7 +425,7 @@ Can a Persistent POI still be finite without feeling like a fake timer?
 
 ## Progression
 
-What are the exact V1 Conduct Progress thresholds for stages 9 → 8 and 8 → 7?
+What is the exact V1 Conduct Progress threshold for stage 9 → 8?
 
 What are the exact primary/secondary attribute thresholds for each Pathway-stage transition, including the final secondary-band offset mapping?
 
@@ -435,7 +437,7 @@ How strongly may a Starting Faction nudge before it becomes a soft lock?
 
 How do External Power Bargains interact with Pathway conduct when they pull in opposite directions?
 
-Is a seer Pathway one of the V1 Pathways, and how does it relate to the three design labels? What are the detailed rules for changing to an adjacent Pathway from Stage 5 and deeper, which Pathways are adjacent, and how large is the Sanity cost? Can a character abandon or switch a Pathway at shallower stages?
+Which of the 22 Pathways is the seer Pathway mentioned in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)? What are the detailed rules for changing to an adjacent Pathway from Stage 5 and deeper, which Pathways are adjacent, and how large is the Sanity cost? Can a character abandon or switch a Pathway at shallower stages?
 
 ## Character Attributes and Action Checks
 
@@ -499,7 +501,7 @@ How visible should crown/nobility pressure be inside Lower Veil without adding a
 
 Wardens and Veinmarket are local groups in the slice. Are they also parts of a Major Faction in the full game?
 
-The primary opposing Major Faction appears in V1 through the Spirit General's invasion. The remaining slice questions are CC-27 and CC-28.
+The primary opposing Major Faction appears in V1 through the Spirit General's invasion. The remaining slice question is CC-29.
 
 ## Items, Inventory, Equipment, Item Creation, Enchanting, and Alchemy
 

@@ -1020,7 +1020,7 @@
   },
   {
     "id": "q-cc-11",
-    "text": "CC-11. Resolved: V1 is the one-city slice; allies and enemies may be deeper than Stages 9–7.",
+    "text": "CC-11. Resolved: V1 is the one-city slice; allies and enemies may be deeper than the player's stages.",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1163,7 +1163,7 @@
   },
   {
     "id": "q-cc-22",
-    "text": "CC-22. The cult and allied factions stop at Stage 2. Which Pathways have an occupied Stage 0, does the World Seed vary them, do all cult followers share one Pathway, and which sources tell the character?",
+    "text": "CC-22. Six Pathways are named. Which of the 22 have an occupied Stage 0, does the World Seed vary that, can cultists reach Stage 1 on the Paths of the Source and of Revelation, and which Pathways do the other two Generals walk?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1230,22 +1230,36 @@
   },
   {
     "id": "q-cc-27",
-    "text": "CC-27. Which stage can a player reach in 3–6 real hours, how many followers invade, how many allies stand with the player, how long is the slice ritual's window, and does a slice General fight or use the fallback?",
+    "text": "CC-27. Resolved: Stage 9 is certain, Stage 8 takes directed effort, Stage 7 is for NPCs; 8–10 enemies with about equal sides; the six-hour window stays.",
     "systemIds": [
       "vertical-slice"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "scope",
     "origin": "imported"
   },
   {
     "id": "q-cc-28",
-    "text": "CC-28. Does the character begin in the joinable faction or join through Faction Entry, which Pathways does it open, what happens on death in a run, and what are the Pathways and the city called?",
+    "text": "CC-28. Resolved: the character starts without a faction and may join through a first-day trial; death ends the run.",
     "systemIds": [
       "vertical-slice"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-29",
+    "text": "CC-29. Which abilities do the three player Pathways have, how do they map onto the Open, Veiled, and Bound labels, what can a character outside the faction find, what is the first-day trial, and does a Factionless start stay a slice exception?",
+    "systemIds": [
+      "vertical-slice",
+      "progression"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority — Cult Campaign and City Control",

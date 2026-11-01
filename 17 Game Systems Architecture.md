@@ -696,7 +696,7 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Pathway stages 9→7 and ordinary independently progressing attributes/skills; no global character XP level. Item Creation and Enchanting skills follow [07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) and [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
+| **Responsibilities** | Pathway stages 9→8 for the player, Stage 7 for NPCs, and ordinary independently progressing attributes/skills; no global character XP level. Item Creation and Enchanting skills follow [07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) and [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
 | **Dependencies** | [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md); Factions soft nudge. |
 | **Public interfaces** | `IPathwayProgress`. |
 | **Data flow** | Conduct → stage; Bargains may grant. |

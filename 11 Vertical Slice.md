@@ -1,10 +1,10 @@
 # 11 Vertical Slice
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft
 
-Last Updated: 2026-11-01 (rewritten for the owner's one-city slice: the Spirit General's invasion on day 1–2, a ritual the player stops or loses to, one joinable faction with two or three Pathways, and the required mechanics. Earlier: owner redefined the slice as one city at Stages 9–7; retired combat references replaced with 10.2.)
+Last Updated: 2026-11-01 (balance and start settled: Stage 8 as the player's limit, 8–10 enemies, the six-hour window, a Factionless start, and three named Pathways. Earlier: rewritten for the owner's one-city slice: the Spirit General's invasion on day 1–2, a ritual the player stops or loses to, one joinable faction with two or three Pathways, and the required mechanics. Earlier: owner redefined the slice as one city at Stages 9–7; retired combat references replaced with 10.2.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -36,7 +36,7 @@ The owner approved this story on 2026-11-01.
 - **Invasion:** after those days the Spirit General comes out in the city with its followers, and the ritual starts at once.
 - **The General leaves:** after 15–20 ticks it returns to the Spirit World and leaves the ritual to its followers. It cannot be hunted afterwards.
 - **The final fight:** the main battle is against its followers.
-- **Ending:** the player either stops the ritual and wins, or the ritual succeeds and the player loses.
+- **Ending:** the player either stops the ritual and wins, or the ritual succeeds and the player loses. The character's death also ends the run, and the player starts again.
 
 The slice uses the campaign's rules from [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md): one rule for how a ritual starts and stops, in a world of one city.
 
@@ -45,6 +45,12 @@ The slice uses the campaign's rules from [21 Cult Campaign and City Control](21%
 The preferred version lets a player who feels ready fight the General on a later run and see how strong it is, and even die to it.
 
 If building a Stage 2 opponent is too much for the first version, the General appears, casts a spell without attacking, and leaves after the same 15–20 ticks. This fallback is approved.
+
+## The fight
+
+- 8–10 enemies take part.
+- Allies stand with the player, in numbers that make the two sides about equal once the player is counted. The player's presence must change the result.
+- The ritual keeps the campaign's six-hour window, one real hour of free exploration. If the player stops it in time, the run is won.
 
 ## Stopping the ritual
 
@@ -128,16 +134,16 @@ Each of these is implemented in a limited form:
 
 ## Factions
 
-- **One joinable faction:** the internal-order faction of [02 World Laws](02%20World%20Laws.md), the hidden police of practitioners. It gives access to two or three Pathways.
+- **One joinable faction:** the internal-order faction of [02 World Laws](02%20World%20Laws.md), the hidden police of practitioners. It gives access to three Pathways.
 - **Wardens** (order / patrol / seizure framing) and **Veinmarket** (soft underworld / mixture / night-route framing) stay as local groups.
-- **The cult** appears through the Spirit General and its followers.
+- **The cult** appears through the Spirit General and its followers, on the Paths of the Source, the Sovereign, and Revelation.
 - Members of other factions are optional.
 
 ## Character / Progression
 
-- First-character rules only.
-- The player stays at Stages 9–7. Allies and enemies may be deeper.
-- The joinable faction opens two or three Pathways.
+- The character starts without a faction. On the first day it can pass a trial to join the faction, or stay out and search alone. This is a slice exception to the Starting Faction rule of [07 Character Life](07%20Character%20Life.md).
+- Stage 9 is a certain goal in a run. Stage 8 takes directed effort. Stage 7 is for NPCs only. Allies and enemies may be deeper.
+- The faction opens the Path of Change, the Path of the Creator, and the Path of the Veil ([05 Progression](05%20Progression.md)).
 - The potions of other Pathways can be sought independently.
 - One Bargain offer remains as a priced tease.
 
@@ -328,12 +334,13 @@ Post-pivot S0 target:
 
 - gathering, Item Creation, and Alchemy in a limited form;
 - sleep and the shared clock across the first days;
-- the joinable faction and its two or three Pathways.
+- the joinable faction, its trial, and its three Pathways.
 
 ## Milestone S6 — Invasion
 
 - the Spirit General comes out on day 1–2 and leaves after 15–20 ticks;
 - the ritual site, its guards, and its senior;
+- 8–10 enemies and allied groups that keep the sides about equal;
 - the ways to stop the ritual, including stealth and dialogue checks;
 - win and loss endings.
 
@@ -357,8 +364,9 @@ Keep intentionally tiny:
 | Named talk NPCs | 6–10 |
 | Enemy archetypes | 2–3 |
 | Generals | 1 |
-| Pathways | 2–3 |
-| Pathway stages | 9–7 |
+| Player Pathways | 3 |
+| Cult Pathways | 3, NPC only |
+| Player stages | 9–8, with Stage 7 for NPCs |
 | Bargain teases | 1 |
 
 If the budget grows, cut content before cutting systems proof.
@@ -367,7 +375,7 @@ If the budget grows, cut content before cutting systems proof.
 
 1. **Place:** one city, with Lower Veil as one of its districts. Its name is open.
 2. **Mood/era:** Lord of the Mysteries-like industrial-occult transition (18–19th century social structure + early machines), not a plot/lore copy.
-3. **Faction:** only the internal-order faction is joinable, with two or three Pathways; Wardens and Veinmarket are local groups.
+3. **Faction:** only the internal-order faction is joinable, through a first-day trial, with three Pathways; Wardens and Veinmarket are local groups.
 4. **Timing:** the Spirit General comes out after one to two game days.
 5. **Death Gap, Legacy Cache, Pathway change, and Enchanting:** out of this Vertical Slice.
 6. **Names:** all placeholder names may be renamed later.
@@ -377,10 +385,10 @@ If the budget grows, cut content before cutting systems proof.
 - **Architecture Pivot:** Slice delivery follows overworld → interior → arena rails.
 - **Vision / Player Experience:** Slice targets curiosity, tense choice, agency, residue, priced power tease.
 - **POI / Information / Approaches / Combat:** Directly implemented in miniature (TB on arenas only).
-- **Progression / Character Life:** First-life foothold only. Stages 9–7 for the player; allies and enemies may be deeper. Later-life systems are excluded.
+- **Progression / Character Life:** One Factionless life per run. The player reaches Stages 9–8; Stage 7 is for NPCs, and allies and enemies may be deeper. Later-life systems are excluded.
 - **Cult Campaign:** The slice uses the campaign's ritual rules in one city ([21](21%20Cult%20Campaign%20and%20City%20Control.md)).
 - **Era mood:** Compatible with priced mystery and social inequality without requiring high-fantasy gloss.
-- **Solo scope:** The required mechanics are many, so each stays in a limited form, and content stays small. Open items are CC-27 and CC-28 in [99 Open Questions](99%20Open%20Questions.md).
+- **Solo scope:** The required mechanics are many, so each stays in a limited form, and content stays small. The open item is CC-29 in [99 Open Questions](99%20Open%20Questions.md).
 - **Glossary / Open Questions:** Confirmations recorded as resolved.
 
 # Related Documents

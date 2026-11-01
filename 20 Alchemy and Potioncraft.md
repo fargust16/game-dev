@@ -51,7 +51,7 @@ The six-tick duration and the presence of a mini-game are approved. Whether the 
 - The only potion category confirmed by this foundation is the Pathway advancement potion. Other potion categories and effects are not yet specified.
 - This document does not introduce HP-restoring potions or supersede current recovery rules.
 - No recipe table, formula-decoding formula, ingredient-search probability, potion quality model, or numeric cost is established here.
-- The Vertical Slice includes potion-making in a limited form ([11 Vertical Slice](11%20Vertical%20Slice.md)); V1 progression covers Stages 9–7.
+- The Vertical Slice includes potion-making in a limited form ([11 Vertical Slice](11%20Vertical%20Slice.md)); the V1 player reaches Stages 9–8.
 
 # 5. Open design questions
 
