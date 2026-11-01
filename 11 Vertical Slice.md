@@ -96,7 +96,7 @@ The slice must prove all of the following:
 3. Timed POIs — missing a window changes the world.
 4. Information Sources — board / bartender / rumour / trace beat omniscient markers.
 5. Combat in place — Confront turns the surroundings into a Combat Grid and returns to free movement with residue ([16 Architecture Pivot](16%20Architecture%20Pivot.md)).
-6. Scene split — overworld free 3P + at least one separate interior scene (no grid).
+6. Scene split — overworld free 3P + at least one separate interior scene, with its own grid during Confront.
 7. World residue — tomorrow looks different because of today.
 8. Priced power tease — at least one Bargain-shaped offer or refusal.
 9. The war's core — a General, its followers, and a ritual the player can stop in more than one way.
