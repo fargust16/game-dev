@@ -88,7 +88,7 @@ Interiors stay separate scenes. A fight carries through a door the way a change 
 
 Around a fight in the street, the camera can rotate. Walls that block the view become transparent, with only their outlines shown and without revealing the interior behind them.
 
-A technical test comes before further design (CC-33).
+A [technical test](unity/Assets/Plans/COMBAT_GRID_TECH_TEST.md) comes before further design (CC-33).
 
 # Scene Graph
 

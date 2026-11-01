@@ -51,6 +51,7 @@ If building a Limit 2 opponent is too much for the first version, the General ap
 - 8–10 enemies take part: 3 stay at the ritual, and the other 5–7 go on towards the city centre.
 - 5 allied defenders meet that main force, so the two sides are about equal once the player is counted. The player's presence must change the result.
 - Allies can mark the ritual's approximate place on the map when asked. Their directive is the main force first, so only the player can choose to go for the ritual first.
+- If the 5 allies could beat the main force alone inside the 60 ticks, the cult's retreat would stop the ritual and the player could win by waiting. Tuning must keep that from happening (CC-29).
 - The city is the battlefield, and the ritual runs in one part of it. The Combat Grid forms around the player, and fights elsewhere are simulated. A combat round is one tick, so its 60-tick window is up to 60 rounds, or ten real minutes of free exploration. If the player stops it in time, the run is won. The player's Limits 9–8 are too low to undo a completed ritual, so here it means defeat.
 
 ## Stopping the ritual

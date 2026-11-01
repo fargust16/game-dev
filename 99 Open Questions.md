@@ -405,7 +405,7 @@ The rules are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%
 
 **CC-32 Resolved.** During Turn-Based Mode the rest of the world lives one tick per round, ordinary NPCs hide, defenders go to the fight, and a character leaves it about 10 cells from the nearest enemy (18 World Time and Living Simulation).
 
-**CC-33 Combat Grid technology.** The grid reaches 20 cells from the player in every direction, and interiors stay separate scenes. What is the cell size, what happens when the player moves or a fighter crosses the edge, how is the grid built from generated terrain and buildings without hand correction, and how do the camera and transparent walls work? A technical test comes before further design.
+**CC-33 Combat Grid technology.** The grid reaches 20 cells from the player in every direction, and interiors stay separate scenes. What is the cell size, what happens when the player moves or a fighter crosses the edge, how is the grid built from generated terrain and buildings without hand correction, and how do the camera and transparent walls work? A technical test comes before further design ([plan](unity/Assets/Plans/COMBAT_GRID_TECH_TEST.md)).
 
 **CC-34 Resolved.** The ritual runs alongside the capture, and a defender of Limit 5 or deeper who knows the method undoes a completed ritual within 60 ticks of reaching its site (21 §4).
 
