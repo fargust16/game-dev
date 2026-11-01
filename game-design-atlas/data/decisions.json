@@ -757,7 +757,7 @@
   },
   {
     "id": "d-capture-order",
-    "statement": "City Capture begins with a Cult Sortie. The ritual starts trying to run, other factions' followers are cleared, the one-hour ritual completes, and a garrison stays.",
+    "statement": "City Capture begins with a Cult Sortie. The ritual runs alongside it: a group goes to the ritual site, guards protect it and then cut off the way, and the main force moves on to the city centre. A garrison stays after the capture.",
     "rationale": "Fixes when the player and allies can still intervene.",
     "alternatives": "",
     "systemIds": [
@@ -772,7 +772,7 @@
   },
   {
     "id": "d-ritual-sabotage",
-    "statement": "A ritual stops when everyone conducting it dies, when the senior who started it dies, or, only while the cult has not fully taken the city, when conditions that differ from ritual to ritual are met through persuasion, disguise, and strong dialogue checks. A new ritual can be held two game days after the previous one.",
+    "statement": "A ritual stops when everyone conducting it dies, when the senior who started it dies, or, only while the cult has not fully taken the city, when conditions that differ from ritual to ritual are met through persuasion, disguise, and strong dialogue checks. A disrupted ritual lowers the enemy's attributes, and it retreats unless it still dominates by numbers. A new ritual can be held two game days after the previous one.",
     "rationale": "Keeps non-combat routes for less warlike Arcana without a learned answer. A fallen city is combat only.",
     "alternatives": "",
     "systemIds": [
@@ -1008,7 +1008,7 @@
   },
   {
     "id": "d-combat-in-place",
-    "statement": "Confront runs in place: the surroundings become a Combat Grid built from real geometry, as in Baldur's Gate 3 or Fallout 2, and a whole city can be a battlefield. The Combat Arena and Theme Packs are retired. A round is one tick.",
+    "statement": "Confront runs in place on a Combat Grid that forms around the player from real geometry; fights the player cannot see are simulated by tick without a grid. The Combat Arena and Theme Packs are retired. Interiors stay separate scenes with their own grid, and a fight follows through a door like a level change in Fallout. A round is one tick. Walls that block the view become transparent outlines.",
     "rationale": "Owner's intended combat. It restores in-location Turn-Based Mode, which was cancelled in 2026-08 as too expensive; the grid exists only during Confront.",
     "alternatives": "",
     "systemIds": [
@@ -1097,6 +1097,21 @@
     "origin": "imported",
     "sourceIds": [
       "src-05-1"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-ritual-tracks",
+    "statement": "The ritual and the capture are two tracks. Allied defenders do not understand rituals and fight the main force, so only the player goes after a ritual. An allied general or another authorised person undoes a completed ritual within 60 ticks of reaching its site.",
+    "rationale": "Keeps stealth and dialogue as answers, and gives allied leaders a role in a city that held.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
     ],
     "dateNote": "Owner-approved answers, 2026-11-01."
   }

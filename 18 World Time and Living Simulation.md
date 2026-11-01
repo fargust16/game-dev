@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-01 (the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-01 (fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -239,6 +239,8 @@ Detailed settlement capacity, refugee logistics, faction policy, and NPC reassig
 - A round is complete only after every currently eligible participant has had their opportunity to act or has otherwise been resolved for that round.
 - **The world does not advance during an individual character's turn.** The player may consider and submit actions without real-time pressure.
 - While Turn-Based Mode runs, everything outside the fight stands still and lives only between rounds, one tick per round. This differs from Baldur's Gate 3, where the world outside a fight carries on. More ticks per round may come later.
+- Fights the player cannot see have no grid and are not rendered. They are simulated, one tick per round of the player's fight.
+- A player who enters a building with no enemy inside returns to ordinary in-game minutes. If an enemy follows, the fight resumes there ([16 Architecture Pivot](16%20Architecture%20Pivot.md)).
 - Once the round ends, one tick passes and the wider simulation updates: NPCs move and act, schedules and timed conditions advance, events resolve, and nearby actors may approach the encounter.
 - Reinforcements may physically reach the combat area between rounds and join the active encounter. They receive Initiative and are inserted into the encounter order according to the insertion rule still to be specified.
 - The number of rounds is the duration of the encounter in world time: a typical even fight is expected to take roughly 10–15 rounds; a difficult fight may take 20–30; a very simple fight may take 3–5. These are pacing expectations, not hard encounter limits.

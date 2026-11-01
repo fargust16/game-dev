@@ -1,10 +1,10 @@
 # 08 Confront Constraints
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Confront runs in place on a Combat Grid. Earlier: Character Life row reconciled with post-manifestation defeat; 21 added as a dependent document.)
+Last Updated: 2026-11-01 (the Combat Grid forms around the player; fights can follow through doors. Earlier: Confront runs in place on a Combat Grid. Earlier: Character Life row reconciled with post-manifestation defeat; 21 added as a dependent document.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -179,7 +179,7 @@ Reference feel, not feature parity:
 
 Rules:
 
-1. When Confront locks in, the surroundings become a **Combat Grid**. There is no separate battle scene.
+1. When Confront locks in, a **Combat Grid** forms around the player. Fights the player cannot see are simulated without a grid. In the street there is no separate battle scene; an interior is its own scene with its own grid.
 2. Real geometry is the battlefield: walls and surfaces give cover, vegetation can hide a character, and a whole city can be a battlefield.
 3. Turn-Based Mode exists **only during Confront**. There is no voluntary Turn-Based Mode during free exploration.
 4. Outside Confront, overworld and interior scenes stay free third-person ([16 Architecture Pivot](16%20Architecture%20Pivot.md)).

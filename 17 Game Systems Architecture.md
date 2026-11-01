@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 1.6
+Version: 1.7
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
+Last Updated: 2026-11-01 (Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
 
 Depends On:
 [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -436,7 +436,7 @@ flowchart LR
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Build square-grid spatial truth **during Confront** over the current scene; occupancy; cover and concealment; Environment Action tags ([10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md)). Removed when Confront ends. |
+| **Responsibilities** | Build square-grid spatial truth **during Confront, around the player**; occupancy; cover and concealment; Environment Action tags ([10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md)). Removed when Confront ends. Fights away from the player use simulation, not this grid. |
 | **Dependencies** | Encounter Lock; terrain, shell, and interior geometry. |
 | **Public interfaces** | `ICombatGrid { bool InBounds; bool IsWalkable; … }` |
 | **Data flow** | Scene geometry → grid → Turn Economy queries. |

@@ -1072,7 +1072,7 @@
   },
   {
     "id": "q-cc-15",
-    "text": "CC-15. A sortie's result depends on the city's defence and allied forces can kill a General. How is that comparison calculated, and is a per-city follower ledger the right model?",
+    "text": "CC-15. A sortie's result depends on the city's defence, allied forces can kill a General, and unseen fights are simulated by tick. How is that comparison calculated, and is a per-city ledger the right model?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1310,7 +1310,7 @@
   },
   {
     "id": "q-cc-33",
-    "text": "CC-33. How is a grid built from generated terrain and buildings without hand correction, how do multi-floor cells work, what does the tactical camera do among buildings, and can a building's inside stay in the same space as the street?",
+    "text": "CC-33. How far does a grid around the player reach, what happens at its edge, how is it built from generated terrain and buildings without hand correction, and how do the camera and transparent walls work?",
     "systemIds": [
       "confront",
       "spatial-structure"
@@ -1324,9 +1324,22 @@
   },
   {
     "id": "q-cc-34",
-    "text": "CC-34. Does the ritual run alongside the attack, with faction leaders able to undo a completed ritual in about an in-game hour, or can it begin only when no resistance remains?",
+    "text": "CC-34. Resolved: the ritual runs alongside the capture, and an allied general or authorised person undoes a completed ritual within 60 ticks of reaching its site.",
     "systemIds": [
       "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-35",
+    "text": "CC-35. Which faction does each of the other 16 Arcana belong to, what are their Limit 0 states, and how are the four identical attribute profiles separated?",
+    "systemIds": [
+      "progression"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority — Cult Campaign and City Control",
@@ -1336,10 +1349,10 @@
     "origin": "imported"
   },
   {
-    "id": "q-cc-35",
-    "text": "CC-35. Which faction does each of the other 16 Arcana belong to, what are their Limit 0 states, and how are the four identical attribute profiles separated?",
+    "id": "q-cc-36",
+    "text": "CC-36. Who may undo a ritual, can a player in the faction do it, does this shorten a liberated Place of Power's one-day force, where is the ritual site, and what counts as dominating by numbers?",
     "systemIds": [
-      "progression"
+      "cult-campaign"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority — Cult Campaign and City Control",

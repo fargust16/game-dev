@@ -1,10 +1,10 @@
 # 16 Architecture Pivot
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft
 
-Last Updated: 2026-11-01 (what failed in 2026-08 stated exactly; the world lives between rounds; the door question added to the technical test. Earlier: owner replaced the Combat Arena with combat in place on a Combat Grid.)
+Last Updated: 2026-11-01 (the Combat Grid forms around the player; interiors stay separate scenes; door and camera rules recorded. Earlier: what failed in 2026-08 stated exactly; the world lives between rounds; the door question added to the technical test. Earlier: owner replaced the Combat Arena with combat in place on a Combat Grid.)
 
 Depends On:
 [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
@@ -54,9 +54,9 @@ Philosophy (`00`–`07`, Decision Engine, Approaches as choices, Confront *const
 |-------|------|
 | **Overworld** | Seeded Valheim-like zones/biomes/POIs/creatures; smaller than Valheim OK; **no** tree/rock harvest as core loop |
 | **Movement / camera** | Free third-person, Genshin-like locomotion feel (not feature parity); no top-down tactical overworld |
-| **Interiors** | Separate scenes; free third-person; no grid outside Confront; under review (CC-33) |
+| **Interiors** | Separate scenes, like a change of level in Fallout; free third-person outside Confront; their own Combat Grid during it |
 | **Confront** | Runs **in place**, in the scene where it starts; Fallout 1/2 / BG3 turn feel; free movement returns with residue |
-| **Grid** | A square **Combat Grid** covers the surroundings during Confront and is gone afterwards; no grid truth outside Confront |
+| **Grid** | A square **Combat Grid** forms around the player during Confront and is gone afterwards; no grid truth outside Confront or away from the player |
 | **Voluntary TB outside combat** | **Removed** |
 
 ## Cancelled locks (pre-pivot)
@@ -70,7 +70,7 @@ Philosophy (`00`–`07`, Decision Engine, Approaches as choices, Confront *const
 
 # Combat in place (owner decision, 2026-11-01)
 
-The Combat Arena is cancelled. When Confront starts, the place the characters stand in becomes the battlefield: the space turns into grid cells, as in Baldur's Gate 3 or Fallout 2. Characters move over those cells, take cover behind walls and surfaces, hide in vegetation, and can leave the fight. A whole city can be a battlefield.
+The Combat Arena is cancelled. When Confront starts, the place the player stands in becomes the battlefield: the space around the player turns into grid cells, as in Baldur's Gate 3 or Fallout 2. Characters move over those cells, take cover behind walls and surfaces, hide in vegetation, and can leave the fight. A whole city can be a battlefield, with the rest of it simulated.
 
 This restores one lock the 2026-08-07 pivot cancelled, in-location Turn-Based Mode. The others stay cancelled: there is no grid truth outside Confront, buildings stay separate interior scenes, and exploration stays free third-person.
 
@@ -78,18 +78,28 @@ The record of why the pivot cancelled it: the stack was a permanent grid baked o
 
 During Turn-Based Mode the rest of the world stands still and lives one tick at the end of each round.
 
-The owner wants a fight to carry through a door without a scene change, if this proves possible. That would change the separate-interior lock below. A technical test decides it and comes before further design (CC-33).
+The Combat Grid forms only around the player, for everyone taking part there. Fights the player cannot see have no grid and are not rendered: they are simulated, tick by tick.
+
+Interiors stay separate scenes. A fight carries through a door the way a change of level does in Fallout:
+
+- Enemies follow the player into a building only if, by their target rules, the player is still their priority: no other enemy nearby and the door is the nearest valid way to the target.
+- While no enemy is inside with the player, time there runs in ordinary in-game minutes. If an enemy comes in, the fight resumes on the interior's own Combat Grid.
+- NPCs do not go into buildings on their own during a fight. Attackers and defenders do not hide in them: they leave beyond the city instead, and a defender who is inside comes out and joins the fight.
+
+Around a fight in the street, the camera can rotate. Walls that block the view become transparent, with only their outlines shown and without revealing the interior behind them.
+
+A technical test comes before further design (CC-33).
 
 # Scene Graph
 
 ```text
 Overworld (seeded biomes, free 3P)
     │
-    ├── door / portal ──► Interior Scene (free 3P, no grid)
+    ├── door / portal ──► Interior Scene (free 3P, own Combat Grid in Confront)
     │                         │
     │                         └── exit ──► Overworld (or nested interior later)
     │
-    └── Confront ──► Combat Grid over the current scene (TB)
+    └── Confront ──► Combat Grid around the player (TB)
                               │
 Interior ── Confront ─────────┘
                               │
@@ -98,10 +108,11 @@ Interior ── Confront ─────────┘
 
 Rules:
 
-1. Turn-Based Mode runs only during Confront, in the scene where it starts.
-2. The surroundings become the battlefield, using their real geometry for cover and movement.
+1. Turn-Based Mode runs only during Confront.
+2. A Combat Grid forms around the player from the scene's real geometry for cover and movement. Fights elsewhere are simulated without a grid.
 3. A character can leave the fight by moving away.
-4. When Confront ends, free movement returns with residue applied ([08](08%20Confront%20Constraints.md)).
+4. A fight can carry through a door into an interior scene, under the rules of the section above.
+5. When Confront ends, free movement returns with residue applied ([08](08%20Confront%20Constraints.md)).
 
 ---
 
@@ -177,7 +188,7 @@ not continuous Room Graph → in-world GridMap bake as the primary product.
 
 When Confront locks in:
 
-1. The surroundings become a Combat Grid built from the scene's geometry.
+1. A Combat Grid forms around the player from the scene's geometry.
 2. Run the AP-based combat system defined in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) on that grid.
 3. Characters can take cover, hide, and leave the fight.
 4. Resolve win / Break Away / Yield-Spare / death.
