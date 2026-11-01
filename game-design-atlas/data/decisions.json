@@ -723,7 +723,7 @@
   },
   {
     "id": "d-stage-occupancy",
-    "statement": "On every Pathway, including the player's, an occupied Stage 0 leaves no Stage 1, and an unoccupied one allows at most three Stage 1 practitioners. When someone reaches Stage 0, every Stage 1 practitioner of that Pathway moves back to Stage 2. Stage 2 has no limit.",
+    "statement": "On every Pathway, including the player's, an occupied Stage 0 leaves no Stage 1, and an unoccupied one allows at most three Stage 1 practitioners. When someone reaches Stage 0, every Stage 1 practitioner of that Pathway moves back to Stage 2. Stage 2 has no limit. A god occupies Limit 0 of one Arcana; a faction's other Arcana may have a free one.",
     "rationale": "A world law that prices following a god and explains why the cult and the allied factions stop at Stage 2.",
     "alternatives": "",
     "systemIds": [
@@ -884,7 +884,7 @@
   },
   {
     "id": "d-slice-redefined",
-    "statement": "The Vertical Slice is one city and a small territory. The player starts without a faction, may join the internal-order faction through a first-day trial, and reaches Stages 9–8; Stage 7 is for NPCs. The Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and 8–10 followers hold the ritual for its six-hour window, against allies that make the sides about equal. The player stops it and wins, or loses; death ends the run. Required in a limited form: exploration, gathering, Item Creation, Alchemy, combat, dialogue with checks, stealth, time, sleep. Out: Enchanting, Death Gap, Legacy Cache, Pathway change.",
+    "statement": "The Vertical Slice is one city and a small territory. The player starts without a faction, may join the internal-order faction through a first-day investigation of a disappearance, finds one or two potions for two styles of play, and reaches Stages 9–8; Stage 7 is for NPCs. The Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and 8–10 followers hold the ritual for its six-hour window, against allies that make the sides about equal. The player stops it and wins, or loses; death ends the run. Required in a limited form: exploration, gathering, Item Creation, Alchemy, combat, dialogue with checks, stealth, time, sleep. Out: Enchanting, Death Gap, Legacy Cache, Pathway change.",
     "rationale": "The first build should already show the war's core: a General, followers, and a ritual to stop.",
     "alternatives": "",
     "systemIds": [
@@ -961,8 +961,8 @@
   },
   {
     "id": "d-22-pathways",
-    "statement": "The game has 22 Pathways, one for each Tarot Major Arcana archetype, under the project's own names. Named so far: Path of Change (Fool), Path of the Creator (Magician), Path of the Veil (High Priestess) for the internal-order faction; Path of the Source (Empress), Path of the Sovereign (Emperor), Path of Revelation (Hierophant) for the cult. The other 16 follow after the slice.",
-    "rationale": "Gives Pathways a shared structure; each still has to differ by way of acting.",
+    "statement": "The game has 22 Arcana, one for each Tarot Major Arcana archetype, replacing the word Pathway. Each has ten Limits, replacing the word Stage, tied to the ten Sephiroth, with 220 names in all. Each Arcana has two primary attributes and one secondary attribute.",
+    "rationale": "Gives advancement a shared structure; each Arcana still has to differ by way of acting.",
     "alternatives": "",
     "systemIds": [
       "progression",
@@ -971,7 +971,38 @@
     "status": "accepted",
     "origin": "imported",
     "sourceIds": [
-      "src-05"
+      "src-05-1"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-abilities-per-limit",
+    "statement": "Each Limit grants two abilities, passive or active, combat or exploration, in a mix that differs by Arcana, and raises the Arcana's primary attributes. NPCs use the same abilities, so a Limit 7 NPC has about six.",
+    "rationale": "Fixed for the slice and may change later.",
+    "alternatives": "",
+    "systemIds": [
+      "progression"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-05-1"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-faction-arcana",
+    "statement": "The internal-order faction has the High Priestess, with an occupied Limit 0, and the Fool and Magician, with a free one. The cult has the Emperor, occupied by the sealed being, and the Empress and Hierophant.",
+    "rationale": "Shows a faction's god holding only one of its Arcana.",
+    "alternatives": "",
+    "systemIds": [
+      "progression",
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-05-1"
     ],
     "dateNote": "Owner-approved answers, 2026-11-01."
   }

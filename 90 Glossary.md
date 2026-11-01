@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.67
+Version: 0.68
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Pathway updated for the 22 Tarot archetypes and V1 player stages. Earlier: Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-01 (Arcana, Limit, and Sephira added; Stage Occupancy Rule corrected. Earlier: Pathway updated for the 22 Tarot archetypes and V1 player stages. Earlier: Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -698,7 +698,7 @@ Capability granted by otherworldly entities, churches, deities, or similar sourc
 
 ## Pathway
 
-A staged character-growth track distinct by way of acting. The game has 22, one for each Tarot Major Arcana archetype, under the project's own names. V1 has three player Pathways and player stages 9 → 8, with Stage 7 for NPCs only.
+The earlier word for an Arcana: a staged character-growth track distinct by way of acting. Older documents still use it. V1 has one or two player Arcana and player stages 9 → 8, with Stage 7 for NPCs only.
 
 ---
 
@@ -1073,6 +1073,12 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 **Divine Plane** — The unreachable realm where every Stage 0 being has been since a past cataclysm. They cannot materialise in the real world without a very great number of sacrifices.
 
 **Spirit World** — The other side of the real world, reachable by higher followers of Pathways. The Spirit General lives there. It is not the Divine Plane. The player cannot enter it for now.
+
+**Arcana** — One of 22 character-growth tracks, each a Tarot Major Arcana archetype, replacing the word Pathway. See [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
+
+**Limit** — One of ten steps within an Arcana, numbered 9 to 0, replacing the word Stage for supernatural advancement. Each has its own name and grants two abilities.
+
+**Sephira** — One of the ten Kabbalistic spheres that a Limit corresponds to, from Malkuth at Limit 9 to Keter at Limit 0.
 
 **Stage Occupancy Rule** — On every Pathway, while Stage 0 is occupied there is no Stage 1; while it is unoccupied there are at most three Stage 1 practitioners at a time. When someone reaches Stage 0, every Stage 1 practitioner of that Pathway moves back to Stage 2. Stage 2 has no limit.
 

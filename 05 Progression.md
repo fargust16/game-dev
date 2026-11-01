@@ -1,16 +1,16 @@
 # 05 Progression
 
-Version: 0.12
+Version: 0.13
 
 Status: Draft
 
-Last Updated: 2026-11-01 (22 Tarot-archetype Pathways recorded, with six named; the V1 player reaches Stages 9–8 and Stage 7 is for NPCs only. Earlier: the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
+Last Updated: 2026-11-01 (Pathways become Arcana and Stages become Limits, with content moved to 05.1; two abilities per Limit; Stage 1 demotion and occupancy corrected for faction Arcana. Earlier: 22 Tarot-archetype Pathways recorded, with six named; the V1 player reaches Stages 9–8 and Stage 7 is for NPCs only. Earlier: the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
 
 Referenced By:
-[06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), future pathway content, church/entity bargains, character growth, and combat tuning.
+[06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), future pathway content, church/entity bargains, character growth, and combat tuning.
 
 ---
 
@@ -52,7 +52,7 @@ Ordinary character development is based on practising actions. Attributes and in
 
 A **Pathway** is a long character-growth track with staged advancements.
 
-V1 uses **three Pathways**.
+The Vertical Slice offers one or two Arcana to the player ([05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md)).
 
 The set must remain expandable later. New Pathways may be added if each one creates a distinct way of acting, not merely a different damage type.
 
@@ -74,26 +74,15 @@ A Pathway is not a perfect build. It is a commitment with closed doors.
 
 ## The 22 Pathways
 
-The game has **22 Pathways**, one for each Major Arcana archetype of the Tarot. The archetype is where a Pathway ends. Pathways carry the project's own names.
+The game has **22 Arcana**, one for each Major Arcana archetype of the Tarot. An Arcana is what this document calls a Pathway. Each has ten **Limits**, the Stages of this document, tied to the ten Sephiroth, and each Limit has its own name. The tables, faction assignments, and attribute profiles are in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
 
-Six are named so far:
+The sealed being and the Spirit General belong to the Emperor Arcana. Other cult followers belong to the Emperor, Empress, or Hierophant Arcana.
 
-| Side | Archetype | Pathway |
-|---|---|---|
-| Internal-order faction | The Fool | Path of Change |
-| Internal-order faction | The Magician | Path of the Creator |
-| Internal-order faction | The High Priestess | Path of the Veil |
-| Cult | The Empress | Path of the Source |
-| Cult | The Emperor | Path of the Sovereign |
-| Cult | The Hierophant | Path of Revelation |
-
-The sealed being and the Spirit General walk the Path of the Sovereign. Other cult followers may walk any of the cult's three Pathways.
-
-The remaining 16 Pathways are prepared after the Vertical Slice is proven.
+The remaining 16 Arcana are prepared after the Vertical Slice is proven.
 
 ## Abilities
 
-Each Pathway has its own abilities. They cost Will Power and strengthen the user, weaken an enemy, or attack directly. Stages 9–7 have few of them, and not all are for combat. The abilities themselves are listed later (CC-29).
+Each Limit grants two abilities and raises the Arcana's primary attributes. Abilities can be passive or active, and combat or exploration, in a mix that differs by Arcana. Active abilities cost Will Power. NPCs use the same abilities as the player. The abilities themselves are listed later (CC-29).
 
 # How a Pathway Is Obtained
 
@@ -109,7 +98,7 @@ When a character has a faction (the world's first character via Starting Faction
 
 Factionless characters receive no faction Pathway nudge until they earn membership.
 
-In V1 the one joinable faction opens three Pathways, and the potions of other Pathways can be sought independently ([11 Vertical Slice](11%20Vertical%20Slice.md)).
+In the Vertical Slice a character can join the one joinable faction or find potion recipes alone, including the cult's ([11 Vertical Slice](11%20Vertical%20Slice.md)).
 
 ## Alternative acquisition
 
@@ -150,7 +139,7 @@ The deepest stages are limited on every Pathway, including the one the player ch
 - Stage 2 has no limit.
 - When someone reaches Stage 0, every Stage 1 practitioner of that Pathway moves back to Stage 2 automatically.
 
-This is a law of the world, not a difficulty or balance setting. It is why followers of a Stage 0 being stop at Stage 2, whether cult or allied.
+This is a law of the world, not a difficulty or balance setting. It is why followers on a god's own Arcana stop at Stage 2, whether cult or allied. A faction's other Arcana may have a free Stage 0 and so reach Stage 1.
 
 This is a price of following a god: a faction's Pathway probably has its Stage 0 occupied. The character does not know at first which Pathway belongs to which deity and must find out through dialogue and investigation, or take the risk and stop at Stage 2.
 
@@ -192,7 +181,7 @@ The attribute requirements are not caps on ordinary development. They define the
 Each Pathway-stage transition has exactly **two primary attributes** and **one secondary attribute** as its preparation requirements:
 
 - The two primary attributes are fixed for the entire Pathway and express its stable identity. For each target stage, both must reach that stage's prescribed attribute band.
-- The secondary attribute is selected per World Seed for each Pathway-stage combination. It may differ between worlds, but remains fixed within a given world.
+- The secondary attribute is selected per World Seed for each Pathway-stage combination. It may differ between worlds, but remains fixed within a given world. The table in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md) names one per Arcana, and how the two fit is open (CC-31).
 - The secondary requirement is lower than the primary requirements. Its exact band offset by target stage must follow the agreed stage-group mapping; numeric attribute thresholds and the final band mapping remain to be specified.
 - Shortfalls in either primary attribute add a substantially larger Sanity penalty than a shortfall in the secondary attribute. Any shortfall adds some penalty, and a larger gap produces a larger penalty.
 - Requirements are evaluated against the target stage being entered, not the stage being left.
@@ -339,9 +328,9 @@ Player Knowledge must not become a hidden +success% table that deletes decision 
 
 ## V1
 
-- 3 Pathways by way of acting;
+- one or two player Arcana with different styles of play;
 - player stages 9 → 8 only, with Stage 7 for NPCs;
-- one joinable faction that opens three Pathways;
+- one joinable faction;
 - alternative Pathway acquisition via Bargain / quest / discovery;
 - simple Conduct Progress;
 - seed-varying formulas/ingredients;
@@ -365,7 +354,7 @@ Player Knowledge must not become a hidden +success% table that deletes decision 
 
 Do not design yet inside this document:
 
-- names of the remaining 16 Pathways;
+- ability lists of the 22 Arcana;
 - complete ingredient encyclopedias;
 - full church pantheon;
 - named entity bestiary;

@@ -47,7 +47,8 @@ This repository is currently a design bible. Implementation begins only after th
 | [03 Decision Engine](03%20Decision%20Engine.md) | Draft | What makes player decisions interesting |
 | [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) | Draft | Practical card for designing one important choice |
 | [04 Points of Interest](04%20Points%20of%20Interest.md) | Draft | Timed map POIs, lazy activation, missed-event residue |
-| [05 Progression](05%20Progression.md) | Draft | 22 Pathways, V1 player stages 9→8, Conduct Progress, External Power Bargains |
+| [05 Progression](05%20Progression.md) | Draft | Advancement rules, V1 player stages 9→8, Conduct Progress, External Power Bargains |
+| [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md) | Draft | 22 Arcana, ten Limits, Limit names, attribute profiles, abilities per Limit |
 | [06 Approaches](06%20Approaches.md) | Draft | Confront, Convince, Threaten, Exchange, Veil, Withdraw |
 | [07 Character Life](07%20Character%20Life.md) | Draft | Death Gap, Factionless successors, Legacy Cache, Soft Memory |
 | [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) | Draft | Seven attributes, skill growth, item-count factors, and shared action checks |
@@ -109,6 +110,8 @@ This repository is currently a design bible. Implementation begins only after th
 04 Points of Interest
     ↓
 05 Progression
+    ↓
+05.1 Arcana and Limits
     ↓
 06 Approaches
     ↓
@@ -181,7 +184,7 @@ Draft foundations in active refinement:
 - [03 Decision Engine](03%20Decision%20Engine.md) — five axes; V1 teaches Attention + Approach, then Bargain
 - [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) — practical design card
 - [04 Points of Interest](04%20Points%20of%20Interest.md) — map delivery + Active Windows + lazy activation
-- [05 Progression](05%20Progression.md) — 22 Pathways, 3 in V1, player stages 9→8, churches/entities as Bargains
+- [05 Progression](05%20Progression.md) — advancement rules, player stages 9→8 in V1, churches/entities as Bargains
 - [06 Approaches](06%20Approaches.md) — six methods of acting; combat is not the default best
 - [07 Character Life](07%20Character%20Life.md) — death gap, factionless later lives, legacy cache
 - [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) — seven attributes, independent skill growth, Item Creation factors, and shared checks
