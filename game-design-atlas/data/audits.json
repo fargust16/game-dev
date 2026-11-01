@@ -93,7 +93,7 @@
       },
       "unresolved": {
         "state": "partially-covered",
-        "evidence": "99 перечисляет блок CC-1 … CC-32 и остальные детали: захват/содержание пленных, точность карты, состав и математику финала, рейтинг, планетарный ритуал, посткампанийную игру, конечную жизнь мира и роль королевской власти."
+        "evidence": "99 перечисляет блок CC-1 … CC-33 и остальные детали: захват/содержание пленных, точность карты, состав и математику финала, рейтинг, планетарный ритуал, посткампанийную игру, конечную жизнь мира и роль королевской власти."
       }
     }
   },
@@ -145,7 +145,7 @@
       },
       "rules": {
         "state": "covered",
-        "evidence": "Шесть правил дизайна прочитаны, включая запрет стирать методы через Pathway."
+        "evidence": "Шесть правил дизайна прочитаны, включая запрет стирать методы через Arcana."
       },
       "scenarios": {
         "state": "not-assessed",
@@ -243,7 +243,7 @@
       },
       "entities": {
         "state": "partially-covered",
-        "evidence": "Есть Pathway, ступени 9–7, Bargain. Порогов и имён содержания нет."
+        "evidence": "Есть Arcana, пределы 9–7, Bargain. Порогов и имён содержания нет."
       },
       "rules": {
         "state": "partially-covered",
@@ -251,7 +251,7 @@
       },
       "costs": {
         "state": "partially-covered",
-        "evidence": "Цена силы заявлена. Конкретная цена ступеней не задана."
+        "evidence": "Цена силы заявлена. Конкретная цена пределов не задана."
       },
       "scenarios": {
         "state": "not-assessed",
@@ -585,7 +585,7 @@
     "criteria": {
       "purpose": {
         "state": "covered",
-        "evidence": "20 defines Alchemy as a potion-only profession required before Pathway advancement."
+        "evidence": "20 defines Alchemy as a potion-only profession required before Arcana advancement."
       },
       "entities": {
         "state": "partially-covered",
@@ -605,7 +605,7 @@
       },
       "dependencies": {
         "state": "covered",
-        "evidence": "Alchemy depends on Pathway progression, character skills, and the shared world clock, documented in 05, 07.1, and 18."
+        "evidence": "Alchemy depends on Arcana progression, character skills, and the shared world clock, documented in 05, 07.1, and 18."
       },
       "unresolved": {
         "state": "partially-covered",
@@ -649,7 +649,7 @@
       },
       "entities": {
         "state": "covered",
-        "evidence": "Seven attributes, independent skills, derived resources, Pathway stages, and item-related profession skills are identified."
+        "evidence": "Seven attributes, independent skills, derived resources, Limits, and item-related profession skills are identified."
       },
       "rules": {
         "state": "partially-covered",
@@ -755,7 +755,7 @@
       },
       "rules": {
         "state": "partially-covered",
-        "evidence": "Порядок захвата, условия освобождения и манифестации, владение городом, саботаж ритуала, отступление, смысл ритуалов и правило ступеней записаны. Числа и механизм саботажа открыты (CC-8, CC-12, CC-13)."
+        "evidence": "Порядок захвата, условия освобождения и манифестации, владение городом, саботаж ритуала, отступление, смысл ритуалов и правило пределов записаны. Числа и механизм саботажа открыты (CC-8, CC-12, CC-13)."
       },
       "feedback": {
         "state": "partially-covered",
@@ -775,7 +775,7 @@
       },
       "unresolved": {
         "state": "covered",
-        "evidence": "Открытые пункты собраны в 99 как CC-1 … CC-32 в рабочем порядке; рабочие чтения отмечены в 21."
+        "evidence": "Открытые пункты собраны в 99 как CC-1 … CC-33 в рабочем порядке; рабочие чтения отмечены в 21."
       }
     }
   }

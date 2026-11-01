@@ -211,7 +211,7 @@
   },
   {
     "id": "q-pr-bargain",
-    "text": "How do External Power Bargains interact with Pathway conduct when they pull in opposite directions?",
+    "text": "How do External Power Bargains interact with Arcana conduct when they pull in opposite directions?",
     "systemIds": [
       "progression"
     ],
@@ -224,7 +224,7 @@
   },
   {
     "id": "q-pr-switch",
-    "text": "What happens if a character tries to abandon or switch Pathways after stage 9?",
+    "text": "What happens if a character tries to abandon or switch Arcana after stage 9?",
     "systemIds": [
       "progression"
     ],
@@ -264,7 +264,7 @@
   },
   {
     "id": "q-ap-bound",
-    "text": "Should Bound Path get a light Rite/Invoke extension in V1, or remain under Exchange until V2?",
+    "text": "Should Bound Style get a light Rite/Invoke extension in V1, or remain under Exchange until V2?",
     "systemIds": [
       "approaches"
     ],
@@ -277,7 +277,7 @@
   },
   {
     "id": "q-cf-transition",
-    "text": "How diegetic / readable is the transition into a Combat Arena (fade, cut, warning) without spoiling Attention teaching?",
+    "text": "How diegetic / readable is the transition into a Combat Grid (fade, cut, warning) without spoiling Attention teaching?",
     "systemIds": [
       "confront"
     ],
@@ -290,13 +290,13 @@
   },
   {
     "id": "q-cf-theme",
-    "text": "How closely must an arena Theme Pack match the source location before it feels unfair or immersion-breaking?",
+    "text": "Retired with the Combat Arena: fights now use the real scene.",
     "systemIds": [
       "confront"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
     "priority": "high",
     "sourceKind": "gameplay-design",
     "origin": "imported"
@@ -317,7 +317,7 @@
   },
   {
     "id": "q-cf-initiative",
-    "text": "Exact initiative formula and Move Speed units / cells per Move for V1 arenas?",
+    "text": "Exact initiative formula and Move Speed units / cells per Move on the Combat Grid?",
     "systemIds": [
       "confront"
     ],
@@ -330,7 +330,7 @@
   },
   {
     "id": "q-cf-diagonal",
-    "text": "Diagonal move cost on arenas: 1 or 1.5?",
+    "text": "Diagonal move cost on the Combat Grid: 1 or 1.5?",
     "systemIds": [
       "confront"
     ],
@@ -343,7 +343,7 @@
   },
   {
     "id": "q-cf-vault",
-    "text": "Exact fail chance bands for vault/climb on arenas in V1?",
+    "text": "Exact fail chance bands for vault/climb in V1?",
     "systemIds": [
       "confront"
     ],
@@ -609,7 +609,7 @@
   },
   {
     "id": "q-bg-load",
-    "text": "When does additive interior/arena load replace the V0 single-scene swap? The V0 default is locked in 17; the V1 timing is open.",
+    "text": "When does additive interior load replace the V0 single-scene swap? The V0 default is locked in 17; the V1 timing is open.",
     "systemIds": [
       "world-generation",
       "spatial-structure"
@@ -1007,7 +1007,7 @@
   },
   {
     "id": "q-cc-10",
-    "text": "CC-10. The ways to defeat a General are decided. How does a seer's prediction reach a player outside a faction, how is the Raiding General found, and can a player reach Stage 2–3 within 15–20 game days?",
+    "text": "CC-10. The ways to defeat a General are decided. How does a seer's prediction reach a player outside a faction, how is the Raiding General found, and can a player reach Limit 2–3 within 15–20 game days?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1163,7 +1163,7 @@
   },
   {
     "id": "q-cc-22",
-    "text": "CC-22. The High Priestess and Emperor have an occupied Limit 0, the Fool and Magician a free one. Are the Empress and Hierophant free, which Arcana do the other two Generals belong to, and does the World Seed vary this?",
+    "text": "CC-22. All three cult Arcana have an occupied Limit 0. Which Arcana do the other two Generals belong to, does the World Seed vary which Limit 0 are occupied, and which sources tell the character?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1230,7 +1230,7 @@
   },
   {
     "id": "q-cc-27",
-    "text": "CC-27. Resolved: Stage 9 is certain, Stage 8 takes directed effort, Stage 7 is for NPCs; 8–10 enemies with about equal sides; the six-hour window stays.",
+    "text": "CC-27. Resolved: Limit 9 is certain, Limit 8 takes directed effort, Limit 7 is for NPCs; 8–10 enemies with about equal sides; the six-hour window stays.",
     "systemIds": [
       "vertical-slice"
     ],
@@ -1256,7 +1256,7 @@
   },
   {
     "id": "q-cc-29",
-    "text": "CC-29. Which one or two Arcana does the slice offer, which abilities do they have, which Arcana do its enemies use, how much does a Limit raise attributes, and does a Factionless start stay a slice exception?",
+    "text": "CC-29. Which abilities do Жрица and Император have at Limits 9–7, which Arcana do the slice's enemies use, how much does a Limit raise attributes, and does an Uninitiated start stay a slice exception?",
     "systemIds": [
       "vertical-slice",
       "progression"
@@ -1270,20 +1270,20 @@
   },
   {
     "id": "q-cc-30",
-    "text": "CC-30. Should every document be renamed from Pathway and Stage to Arcana and Limit, and do the earlier Path names stay?",
+    "text": "CC-30. Resolved: Arcana and Limit are the only terms, and there are no path names.",
     "systemIds": [
       "progression"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "scope",
     "origin": "imported"
   },
   {
     "id": "q-cc-31",
-    "text": "CC-31. How are the repeated Limit names, names matching other terms, and identical attribute profiles resolved, is Will's dominance intended, and does the fixed secondary attribute replace the per-seed rule?",
+    "text": "CC-31. The owner's corrections are applied. Three names still repeat (Отвес, Устав, Озарение), four attribute profiles are still identical, and does the fixed secondary attribute replace the per-seed rule?",
     "systemIds": [
       "progression"
     ],
@@ -1296,7 +1296,7 @@
   },
   {
     "id": "q-cc-32",
-    "text": "CC-32. Is the invasion's final fight one arena or several, who is in it, where is the ritual site, how do reinforcements arrive, and how do stealth and dialogue checks connect to it?",
+    "text": "CC-32. The whole city is the battlefield and a round is one tick. Does the whole city enter Turn-Based Mode, what do NPCs outside the fight do, what happens at a door into an interior scene, and do 360 rounds stay?",
     "systemIds": [
       "vertical-slice",
       "confront"
@@ -1306,6 +1306,20 @@
     "status": "open",
     "priority": "high",
     "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-33",
+    "text": "CC-33. How is a Combat Grid built over terrain slopes and generated buildings, how large can it be, and what must generated pieces carry? In-location combat was cancelled once as too expensive, so this needs a technical test.",
+    "systemIds": [
+      "confront",
+      "spatial-structure"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "technical-research",
     "origin": "imported"
   }
 ]

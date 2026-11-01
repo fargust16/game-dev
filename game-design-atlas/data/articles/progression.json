@@ -4,7 +4,7 @@
   "name": "Progression",
   "title": "Рост без полоски опыта",
   "category": "character",
-  "summary": "Pathway stages are distinct from ordinary independently progressing attributes and skills. 07.1/07.2 govern character growth and derived statistics; Item Creation and Enchanting are equipment professions described in 19. Alchemy is a separate potion-only profession that every character must learn before advancing; each transition requires the correct potion as described in 20.",
+  "summary": "Limits are distinct from ordinary independently progressing attributes and skills. 07.1/07.2 govern character growth and derived statistics; Item Creation and Enchanting are equipment professions described in 19. Alchemy is a separate potion-only profession that every character must learn before advancing; each transition requires the correct potion as described in 20.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
@@ -12,7 +12,7 @@
       "sourceId": "src-05"
     },
     {
-      "text": "Starting Faction мягко наклоняет к одному Pathway. Pathway можно получить и через Bargain, квест или находку. Pathless остаётся законным. Это не тюрьма.",
+      "text": "Starting Faction мягко наклоняет к одному Arcana. Arcana можно получить и через Bargain, квест или находку. Uninitiated остаётся законным. Это не тюрьма.",
       "sourceId": "src-99"
     },
     {
@@ -20,7 +20,7 @@
       "sourceId": "src-99"
     },
     {
-      "text": "Attributes and individual skills use separate action-based tracks, not a global character level or Pathway stage.",
+      "text": "Attributes and individual skills use separate action-based tracks, not a global character level or Limit.",
       "sourceId": "src-07-1"
     },
     {
@@ -28,26 +28,26 @@
       "sourceId": "src-19"
     },
     {
-      "text": "Alchemy is mandatory before Pathway advancement; the correct potion grants its stage deterministically.",
+      "text": "Alchemy is mandatory before Arcana advancement; the correct potion grants its stage deterministically.",
       "sourceId": "src-20"
     },
     {
-      "text": "В первой версии игрок доходит до ступеней 9–8, а 7-я есть только у NPC. Способности стоят Will Power и усиливают, ослабляют или атакуют; их немного, и боевые не все.",
+      "text": "В первой версии игрок доходит до пределов 9–8, а 7-я есть только у NPC. Способности стоят Will Power и усиливают, ослабляют или атакуют; их немного, и боевые не все.",
       "sourceId": "src-05"
     },
     {
-      "text": "В игре 22 арканы по старшим арканам Таро, у каждой десять пределов по сефирам, от Малхут на 9-м до Кетер на нулевом, и у каждого предела своё имя. Арканы заменяют слово Pathway, пределы — Stage; старые документы пока используют прежние слова.",
+      "text": "Каждый предел даёт две способности и повышает основные характеристики аркана. Способности бывают пассивными и активными, боевыми и исследовательскими, а у NPC они те же, что у игрока.",
       "sourceId": "src-05-1"
     },
     {
-      "text": "Каждый предел даёт две способности и повышает основные характеристики аркана. Способности бывают пассивными и активными, боевыми и исследовательскими, а у NPC они те же, что у игрока.",
+      "text": "В игре 22 арканы по старшим арканам Таро, у каждой десять пределов по сефирам, от Малхут на 9-м до Кетер на нулевом, и у каждого предела своё имя. Отдельных путей и их названий нет.",
       "sourceId": "src-05-1"
     }
   ],
   "gaps": [
     "Нет порогов Conduct Progress для 9→8 и 8→7.",
     "Не задана сила наклона Starting Faction, после которой это уже мягкий замок.",
-    "Не решено, что будет, если Bargains и поведение Pathway тянут в разные стороны, и можно ли сменить Pathway после ступени 9."
+    "Не решено, что будет, если Bargains и поведение Arcana тянут в разные стороны, и можно ли сменить Arcana после пределы 9."
   ],
   "sourceIds": [
     "src-05",

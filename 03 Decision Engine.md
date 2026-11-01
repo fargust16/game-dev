@@ -322,9 +322,9 @@ Player Knowledge is what survives between Character Lives and worlds. It changes
 
 Character growth inside one life is not XP level-up. Detailed rules live in [05 Progression](05%20Progression.md):
 
-- Pathways distinct by way of acting;
-- V1 stages 9 → 7;
-- Conduct Progress between stages;
+- Arcana distinct by way of acting;
+- V1 Limits 9 → 7;
+- Conduct Progress between Limits;
 - seed-varying formulas and ingredients;
 - churches and entities as External Power Bargains;
 - decision space widened rather than one best build crowned.

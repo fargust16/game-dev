@@ -1,8 +1,8 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.11
+Version: 0.12
 Status: Draft
-Last Updated: 2026-11-01 (Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
+Last Updated: 2026-11-01 (terms renamed to Arcana and Limit. Earlier: Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [99 Open Questions](99%20Open%20Questions.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -64,16 +64,16 @@ A shared model for playable characters and NPCs, with role-specific rules for pl
 - **Character life and death:** connect the character's lifetime to death, successor creation, legacy, and world state.
 - **NPC profile and autonomy:** define how NPC characters are generated, equipped, assigned capabilities, and simulated behind the scenes.
 
-## B. Pathways and power progression
+## B. Arcana and power progression
 
 Existing progression foundations must be audited and extended, not replaced by a generic level system.
 
-- **Pathway identity and acquisition:** define how a character obtains a Pathway and how each Pathway changes the way they act.
-- **Stages and advancement requirements:** define eligibility, Conduct Progress, formula knowledge, ingredients/conditions, and Bargain/price.
+- **Arcana identity and acquisition:** define how a character obtains an Arcana and how each Arcana changes the way they act.
+- **Limits and advancement requirements:** define eligibility, Conduct Progress, formula knowledge, ingredients/conditions, and Bargain/price.
 - **Attribute and ability requirements:** investigate how abilities teach or imply the qualities needed for deeper advancement; requirements should be discoverable rather than explained as a solved checklist.
 - **Sources of attribute changes:** define permanent, temporary, conditional, and equipment-based changes, including whether and how they can satisfy advancement requirements.
-- **External power:** define blessings, entities, rituals, and other bargains, including benefits, costs, delayed consequences, and conflicts with Pathways.
-- **Pathway interactions and dissonance:** define compatibility, conflict, and consequences without enabling a free perfect build.
+- **External power:** define blessings, entities, rituals, and other bargains, including benefits, costs, delayed consequences, and conflicts with Arcana.
+- **Arcana interactions and dissonance:** define compatibility, conflict, and consequences without enabling a free perfect build.
 
 ## C. Items, inventory, and equipment
 
@@ -90,10 +90,10 @@ The detailed item, Item Creation, inventory, equipment, durability, loot, and En
 
 ## D. Combat and confrontation
 
-Combat is a distinct arena-based mode under the current architecture; it must not make combat the default best solution.
+Combat is a distinct turn-based mode in place under the current architecture; it must not make combat the default best solution.
 
 - **Encounter start and participants:** define how Confront begins and who is included.
-- **Arena spatial rules:** define grid, movement, terrain, cover, height, line of sight, and interaction with arena objects.
+- **Combat Grid spatial rules:** define grid, movement, terrain, cover, height, line of sight, and interaction with objects.
 - **Turn/action economy:** audit existing Move + Action + Bonus rules and define costs and turn order.
 - **Attack and damage resolution:** define hit checks, damage types, mitigation, critical outcomes, resistances, and attribute/ability scaling.
 - **Defence and survival:** define health, wounds, status effects, incapacitation, death, and recovery.
@@ -146,7 +146,7 @@ Combat is a distinct arena-based mode under the current architecture; it must no
 
 ## J. Supernatural powers and their price
 
-- **Power sources:** connect Pathways, blessings, entities, rituals, artifacts, and other sources to the Character/Ability model.
+- **Power sources:** connect Arcana, blessings, entities, rituals, artifacts, and other sources to the Character/Ability model.
 - **Bargains and blessings:** define offers, benefits, prices, obligations, refusal, and delayed escalation.
 - **Symptoms and side effects:** define observable and hidden consequences, duration, accumulation, detection, and effects on behaviour or checks.
 - **Rituals:** define knowledge, location, timing, components, participants, interruption, and failure.
@@ -174,16 +174,16 @@ Combat is a distinct arena-based mode under the current architecture; it must no
 
 The owner describes a progression model driven by actions and experience in the ordinary sense of lived practice, not by a generic XP pool, character level-ups, or manually distributed attribute points.
 
-- **No conventional character levels or freely allocated level-up points.** A character develops by performing actions and living through their consequences. Pathway stages remain a distinct progression track.
+- **No conventional character levels or freely allocated level-up points.** A character develops by performing actions and living through their consequences. Limits remain a distinct progression track.
 - **Two linked development layers.** General attributes (provisional examples: strength, endurance, intelligence, perception, luck, wisdom) describe broad capabilities. Skills (provisional examples: tree-felling, gathering, running, swimming, crafting) describe practiced activities. The final attribute list and skill taxonomy are open.
 - **Actions can develop skills and attributes.** Repeated practice improves the relevant skill and may also develop one or more broad attributes where the action provides a credible training stimulus.
 - **Skills have practical consequences.** Greater skill may improve speed, efficiency, quality, yield, or the chance to discover rarer results, where appropriate to that skill.
 - **Attributes support related actions even without specialized practice.** For example, high strength should make a character more effective at felling trees even if the tree-felling skill is low. Relevant attributes may also make a related skill easier or faster to develop.
 - **Action-specific contribution limits.** An activity should have a bounded or diminishing contribution to general attributes. Tree-felling may develop strength up to a point, after which other kinds of effort are needed or its contribution becomes very small. The exact curves and caps remain open.
 - **Anti-abuse is a system requirement.** Repeating trivial or deliberately self-inflicted loops (such as taking damage and healing repeatedly) must not provide unlimited health or attribute growth. Meaningful effort, challenge, risk, and diminishing returns may be part of the eventual solution; no exact formula is decided here.
-- **Progress should be perceptible without direct coaching.** The interface can show changed attribute values and newly acquired skills. The game need not explicitly tell the player which stat to raise; the player can infer a Pathway's tendencies from the changes caused by its potion and later actions.
-- **Pathway stages are separate from ordinary development.** The current vision is that characters begin without a Pathway stage; taking the relevant potion initiates a Pathway at stage 9, with later advancement through its stages. The potion changes attributes and grants some skills or capabilities, subtly signalling what matters for that Pathway. This must be reconciled with the existing [05 Progression](05%20Progression.md) before becoming canonical.
-- **Potion effects should be legible.** After taking a Pathway potion, the player should be able to notice which attributes changed and which skills/capabilities became available, without necessarily receiving an explicit tutorial telling them how to build the character.
+- **Progress should be perceptible without direct coaching.** The interface can show changed attribute values and newly acquired skills. The game need not explicitly tell the player which stat to raise; the player can infer an Arcana's tendencies from the changes caused by its potion and later actions.
+- **Limits are separate from ordinary development.** The current vision is that characters begin without a Limit; taking the relevant potion initiates an Arcana at Limit 9, with later advancement through its stages. The potion changes attributes and grants some skills or capabilities, subtly signalling what matters for that Arcana. This must be reconciled with the existing [05 Progression](05%20Progression.md) before becoming canonical.
+- **Potion effects should be legible.** After taking an Arcana potion, the player should be able to notice which attributes changed and which skills/capabilities became available, without necessarily receiving an explicit tutorial telling them how to build the character.
 
 ## Owner decisions — attributes, skills, and feedback
 
@@ -211,7 +211,7 @@ This is a proposed design/review order, not an implementation schedule. Reorder 
 
 1. **Character attributes and unified checks** — establish the foundational vocabulary and resolution rules before defining dependent mechanics.
 2. **Skills and abilities** — determine how attributes influence both combat and non-combat actions.
-3. **Pathways and advancement requirements** — connect abilities, attribute requirements, discoveries, formulas, ingredients, and price of power.
+3. **Arcana and advancement requirements** — connect abilities, attribute requirements, discoveries, formulas, ingredients, and price of power.
 4. **Items, inventory, and equipment** — define how item properties and equipment modify character state and requirements.
 5. **Combat system** — connect attributes, derived statistics, skills, abilities, equipment, AI, and confrontation consequences.
 6. **NPCs and creatures** — apply shared character rules to player-independent actors, with NPC-specific generation and simulation.
@@ -230,12 +230,12 @@ The following are review states, not claims about the current map.
 | Shared Character model for player and NPC | Proposed | Compare against existing actor/NPC/character definitions |
 | Attributes and checks | Seven attributes, independent skills, approved probability curve, secondary bonuses, Luck, and three outcomes documented | Tune remaining coefficients and reconcile combat-specific checks; see [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) and [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) |
 | Skills and abilities | Candidate inventory captured; action-based growth direction captured | Define skill taxonomy after attributes/checks |
-| Pathways and advancement requirements | Existing foundation; integration open | Audit [05 Progression](05%20Progression.md) and dependent nodes |
+| Arcana and advancement requirements | Existing foundation; integration open | Audit [05 Progression](05%20Progression.md) and dependent nodes |
 | Items, inventory, equipment | Owner-approved rules and initial balance formulas consolidated in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) | Complete content tables, group distributions, costs, stash rules, wear/repair details, and operation timing in §7 of that draft |
 | Combat | Existing constraints and turn economy; full rules open | Audit [08](08%20Confront%20Constraints.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2](10.2%20Combat%20System%20Draft.md), [16](16%20Architecture%20Pivot.md) |
 | NPCs and creatures | Partial architecture references | Audit actor/spawn/AI cards |
 | Quests, POIs, information | Existing foundations; integration open | Audit [03](03%20Decision%20Engine.md), [04](04%20Points%20of%20Interest.md), [09](09%20Information%20Sources.md) |
-| Factions and relationships | Three allied Major Factions, the primary opposing Stage 0-led Major Faction, and two candidate beneficial Minor Factions captured in [02 World Laws](02%20World%20Laws.md); the war for cities is in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) | Work through CC-1 … CC-32 in [99 Open Questions](99%20Open%20Questions.md), then resolve the finite-world relationship, hostile branches, minor-faction generation and system boundaries, and map factions to the Lower Veil slice |
+| Factions and relationships | Three allied Major Factions, the primary opposing Limit 0-led Major Faction, and two candidate beneficial Minor Factions captured in [02 World Laws](02%20World%20Laws.md); the war for cities is in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) | Work through CC-1 … CC-32 in [99 Open Questions](99%20Open%20Questions.md), then resolve the finite-world relationship, hostile branches, minor-faction generation and system boundaries, and map factions to the Lower Veil slice |
 | Economy and item crafting | Item Creation and Enchanting foundations documented | Resolve economy, resource availability, and V1 scope after core item rules |
 | World simulation and generation | Significant existing documentation | Preserve current authority and audit only missing gameplay interfaces |
 | Shared rules, save, UI, balance | Partial architectural coverage | Audit system cards and cross-system contracts |
@@ -243,7 +243,7 @@ The following are review states, not claims about the current map.
 # Constraints and open design questions
 
 - Attribute names and ranges are set in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md); exact growth and action mappings remain open.
-- The exact relationship between attributes, skills, abilities, Pathway requirements, equipment bonuses, and temporary effects must be designed explicitly.
+- The exact relationship between attributes, skills, abilities, Arcana requirements, equipment bonuses, and temporary effects must be designed explicitly.
 - The game must not quietly acquire a generic kill-XP/level-up loop; any progression proposal must be checked against [05 Progression](05%20Progression.md) and the project pillars.
 - The NPC model must share the underlying Character foundation without requiring player-facing progression/UI for every NPC.
 - Global map structure and direct edges must be checked against the actual site data before changing it.
@@ -326,7 +326,7 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 | Fight with ranged weapons | Ranged Weapon Proficiency (working name) | Dexterity, Perception | Whether bows, thrown weapons, and other ranged weapons are separate is undecided. |
 | Evade an attack | Evasion | Dexterity, Perception | Candidate skill; may instead be resolved from attributes and combat rules. |
 | Block an attack | Blocking | Strength, Dexterity | Candidate skill; may instead be a combat action governed by equipment and attributes. |
-| Use magical or Pathway abilities | Ability-specific system, not a generic “combat abilities” skill | Depends on the ability | A separate design pass must cover supernatural powers, costs, requirements, combat use, and non-combat use. Do not collapse all magic into one skill by default. |
+| Use magical or Arcana abilities | Ability-specific system, not a generic “combat abilities” skill | Depends on the ability | A separate design pass must cover supernatural powers, costs, requirements, combat use, and non-combat use. Do not collapse all magic into one skill by default. |
 | Maintain composure under combat pressure | No separate skill decided | Will | May be handled directly through Will and condition rules. |
 
 ## 6. Exploration and world interaction
@@ -367,7 +367,7 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 
 - Keep action families broad and recognisable rather than creating a separate action/skill for every situation.
 - Keep Running, Jumping, Sneaking/Stealth, and (provisionally) Climbing as compact movement/action concepts.
-- Confirm Item Creation and Enchanting as equipment/item-crafting professions; Alchemy is a separate potion-only profession required for Pathway advancement, with its foundation in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
+- Confirm Item Creation and Enchanting as equipment/item-crafting professions; Alchemy is a separate potion-only profession required for Arcana advancement, with its foundation in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
 - Identification/Appraisal remains a skill candidate, not a confirmed item-crafting profession.
 - Keep Lockpicking as a candidate skill.
 - Add stealing as a gameplay action; whether its skill is Theft or Sleight of Hand remains open.
@@ -387,13 +387,13 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 - How Identification reveals rarity, quality, description, and artefact/mineral properties.
 - How a Hidden Cache Search skill affects audio/visual cues and whether that cue fits the intended exploration experience.
 - Which candidate actions and professions are required for V1 versus deferred.
-- The interaction between ordinary skills, attributes, Pathways, and supernatural abilities.
+- The interaction between ordinary skills, attributes, Arcana, and supernatural abilities.
 
 ## Provisional status update
 
 - Action/skill/attribute relationship inventory: first owner-reviewed pass recorded; still provisional.
 - Seven attributes: owner-approved in [07.1](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md); action mappings remain provisional.
-- Equipment/item-crafting professions: Item Creation and Enchanting; Alchemy is a distinct potion-only profession required for Pathway advancement.
+- Equipment/item-crafting professions: Item Creation and Enchanting; Alchemy is a distinct potion-only profession required for Arcana advancement.
 - Exploration: generic observation removed; dedicated trap skills removed for now; lockpicking and theft retained as candidates.
 - Combat: melee, ranged, and supernatural ability tracks identified; full combat/ability design deferred.
 - Numeric formulas, exact growth rules, caps, anti-abuse mechanism, and V1 scope remain open.

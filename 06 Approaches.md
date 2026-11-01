@@ -1,10 +1,10 @@
 # 06 Approaches
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft
 
-Last Updated: 2026-08-07
+Last Updated: 2026-11-01 (Confront runs in place.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md)
@@ -41,7 +41,7 @@ An important Decision Node should usually offer at least two Approaches, or one 
 2. Every Approach has a cost, risk, or opportunity cost.
 3. Failure with an Approach must still be valuable when the node is important.
 4. Player Knowledge unlocks better judgment about which Approach fits, not a flat success-rate cheat.
-5. Pathways bias Approaches; they must not delete the others.
+5. Arcana bias Approaches; they must not delete the others.
 6. Keep the V1 set small enough for one developer.
 
 # V1 Approach Set
@@ -66,7 +66,7 @@ Open force or open physical resolution.
 - Strong when time is short and secrecy is already dead.
 - Costly in wounds, noise, legal heat, and burned relationships.
 - Must not be the only Approach that yields real Information or real rewards.
-- Presented in V1 through Turn-Based Mode on a thematic **Combat Arena** scene; see [08 Confront Constraints](08%20Confront%20Constraints.md) and [16 Architecture Pivot](16%20Architecture%20Pivot.md).
+- Presented in V1 through Turn-Based Mode in place on a **Combat Grid**; see [08 Confront Constraints](08%20Confront%20Constraints.md) and [16 Architecture Pivot](16%20Architecture%20Pivot.md).
 
 ## Convince
 
@@ -80,7 +80,7 @@ Social resolution through consent, trust, or shared logic.
 
 Social or physical pressure through fear.
 
-- Strong for Open Path conduct and desperate urgency.
+- Strong for Open Style conduct and desperate urgency.
 - Risks lasting enmity, false compliance, or escalation into Confront.
 - Yield Threshold moments often begin here or in Confront.
 
@@ -88,7 +88,7 @@ Social or physical pressure through fear.
 
 Resolution through trade.
 
-- Strong for Bound Path conduct and information markets.
+- Strong for Bound Style conduct and information markets.
 - Includes trading items, services, secrets, protection, or future debts.
 - A deal may itself be a Bargain if the price is powered or spiritual.
 
@@ -96,7 +96,7 @@ Resolution through trade.
 
 Resolution through limited visibility.
 
-- Strong for Veiled Path conduct and Active Window scouting.
+- Strong for Veiled Style conduct and Active Window scouting.
 - Includes stalking, eavesdropping, unnoticed movement, and hidden observation.
 - Failure is often "spotted," which can collapse into Threaten or Confront.
 
@@ -128,21 +128,21 @@ Rules from World Laws still apply:
 - an NPC may hit a Yield Threshold and offer information for survival;
 - Player Knowledge improves which method is wise, not which method is magically free.
 
-# Pathway Bias
+# Arcana Bias
 
 From [05 Progression](05%20Progression.md):
 
-| Pathway | Natural Approaches | Dissonant Approaches |
+| Arcana | Natural Approaches | Dissonant Approaches |
 |---------|--------------------|----------------------|
-| Open Path | Confront, Threaten, open Exchange | prolonged Veil as the main identity |
-| Veiled Path | Veil, quiet Exchange, selective Convince | constant public Confront |
-| Bound Path | Exchange, Convince/Threaten via patrons, mediated deals | pure Pathless self-reliance with no debts |
+| Open Style | Confront, Threaten, open Exchange | prolonged Veil as the main identity |
+| Veiled Style | Veil, quiet Exchange, selective Convince | constant public Confront |
+| Bound Style | Exchange, Convince/Threaten via patrons, mediated deals | pure Uninitiated self-reliance with no debts |
 
 Bias means:
 
 - Conduct Progress prefers some Approaches;
 - some tools/mentors appear more often;
-- dissonant Approaches remain possible with sharper cost or slower Pathway progress.
+- dissonant Approaches remain possible with sharper cost or slower Arcana progress.
 
 Bias must never mean "other Approaches are fake options."
 
@@ -180,14 +180,14 @@ Those systems may add depth only if they preserve the six Approaches as real cho
 - Six Approaches named and used in Decision Node / POI design.
 - Important nodes offer multiple Approaches or Approach + Withdraw.
 - Information can be gained without Confront.
-- Pathway bias affects Conduct Progress and opportunity frequency.
+- Arcana bias affects Conduct Progress and opportunity frequency.
 - Simple success/fail/complication outcomes are enough; no deep minigames required.
 
 ## V2
 
 - Soft support tools per Approach (skills, artifacts, mentors).
 - Richer Yield Threshold and spotted-Veil complications.
-- Light rite/Invoke support under Exchange or as an extension for Bound Path.
+- Light rite/Invoke support under Exchange or as an extension for Bound Style.
 
 ## V3
 

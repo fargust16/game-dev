@@ -1,10 +1,10 @@
 # 21 Cult Campaign and City Control
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft — owner-approved direction, incomplete specification
 
-Last Updated: 2026-11-01 (Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
+Last Updated: 2026-11-01 (the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07 Character Life](07%20Character%20Life.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -16,7 +16,7 @@ Referenced By:
 
 # Purpose and authority
 
-This document defines how the campaign advances before the sealed Stage 0 being manifests: how the cult takes the playable state city by city, how allied forces and the player push back, and how the world reaches the capital ritual with or without the player.
+This document defines how the campaign advances before the sealed Limit 0 being manifests: how the cult takes the playable state city by city, how allied forces and the player push back, and how the world reaches the capital ritual with or without the player.
 
 [02 World Laws](02%20World%20Laws.md) states the campaign's world-level laws. This document holds its operating rules. It is a design draft, not an implementation specification or implementation authorisation.
 
@@ -24,7 +24,7 @@ Three kinds of statement appear below:
 
 - **Owner-approved** statements are decisions recorded from the owner's concept and answers of 2026-11-01.
 - **Working readings** are how this document interprets the owner's words where they leave a gap. They hold until the owner confirms or replaces them.
-- **Open** items are listed in [99 Open Questions](99%20Open%20Questions.md) § Cult Campaign and City Control under the IDs CC-1 … CC-32. No implementation may invent answers to them.
+- **Open** items are listed in [99 Open Questions](99%20Open%20Questions.md) § Cult Campaign and City Control under the IDs CC-1 … CC-33. No implementation may invent answers to them.
 
 # 1. Campaign shape
 
@@ -128,6 +128,10 @@ Control changes only when City Capture or City Liberation completes, or when a f
 - A General does not have to be in a captured city. A General may also run from a fight, except the Holding General.
 - Rituals can run in parallel in two cities when the cult has gathered enough followers.
 
+## The city as a battlefield (owner-approved)
+
+Confront runs in place, so a whole city becomes one battlefield and the ritual runs in one part of it ([16 Architecture Pivot](16%20Architecture%20Pivot.md)). A combat round is one tick, so a ritual's 360-tick window is up to 360 rounds for a character in the fight. The window may shrink to 60 ticks, ten real minutes, after testing.
+
 ## Stopping a ritual (owner-approved)
 
 A ritual is stopped in one of three ways:
@@ -136,7 +140,7 @@ A ritual is stopped in one of three ways:
 - Kill the senior who started it. The ritual then counts as disrupted.
 - Meet the conditions set for that ritual: persuade cultists, pose as one of them or as a local, pretend to help and derail it. These are strong dialogue checks, such as Intelligence, or Intelligence against Will.
 
-The conditions differ from ritual to ritual, so the player cannot learn one answer and repeat it. They take planning, and they give less warlike Pathways a way to act.
+The conditions differ from ritual to ritual, so the player cannot learn one answer and repeat it. They take planning, and they give less warlike Arcana a way to act.
 
 The non-combat routes exist only while the cult has not fully taken the city. Once the city is cleared, a running ritual can be stopped only by fighting.
 
@@ -189,7 +193,7 @@ Who else counts for capture and liberation is open (CC-3), including Minor Facti
 
 ## Owner-approved
 
-A capture ritual turns a city into a **Place of Power** for the manifestation. Ordinary residents are needed alive as sacrifices, which is why the cult does not attack them. Materialising a Stage 0 being in the real world takes a very great number of sacrifices.
+A capture ritual turns a city into a **Place of Power** for the manifestation. Ordinary residents are needed alive as sacrifices, which is why the cult does not attack them. Materialising a Limit 0 being in the real world takes a very great number of sacrifices.
 
 A Place of Power needs no visible mark on the city. It keeps its force for one game day after its city is liberated: the city must be held for that day before its ritual counts as reset.
 
@@ -235,7 +239,7 @@ City Control is the campaign's public progress reading. It replaces the hidden r
 
 ## Owner-approved
 
-The cult's forces are divided into three **Cult Forces**, each led by a **Cult General**. All three Generals are Stage 2 followers. They share the objective of capturing cities through rituals and differ in how they act. Those differences require different responses from the player.
+The cult's forces are divided into three **Cult Forces**, each led by a **Cult General**. All three Generals are Limit 2 followers. They share the objective of capturing cities through rituals and differ in how they act. Those differences require different responses from the player.
 
 Each General can be stopped in a different place: one on the approach, one in a city it holds, and one only during a capture.
 
@@ -255,29 +259,29 @@ The owner's reference for the Spirit General is a *Space Rangers* enemy that tra
 
 These are two different places:
 
-- The **Spirit World** is the other side of the real world. Higher followers of Pathways can reach it, and the Spirit General lives there. The player cannot enter it for now.
-- The **Divine Plane** is unreachable. Since a past cataclysm, every Stage 0 being has been there, the sealed being included. They cannot materialise in the real world on their own and act through their followers.
+- The **Spirit World** is the other side of the real world. Higher followers of Arcana can reach it, and the Spirit General lives there. The player cannot enter it for now.
+- The **Divine Plane** is unreachable. Since a past cataclysm, every Limit 0 being has been there, the sealed being included. They cannot materialise in the real world on their own and act through their followers.
 
 The allied gods refused to sacrifice people to return. The sealed being's cult chose to do it.
 
-## Rank and the Stage Occupancy Rule
+## Rank and the Limit Occupancy Rule
 
 The cult has three Arcana: the Empress, the Emperor, and the Hierophant ([05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md)). The sealed being and the Spirit General belong to the Emperor Arcana. Other followers may belong to any of the three.
 
-The **Stage Occupancy Rule** of [05 Progression](05%20Progression.md) is why the Generals are Stage 2. While a Pathway's Stage 0 is occupied, that Pathway has no Stage 1. The sealed being occupies Stage 0 of the Emperor Arcana, so that Arcana stops at Stage 2. The same holds for a god's own Arcana on the allied side, while a faction's other Arcana may have a free Stage 0 and reach Stage 1.
+The **Limit Occupancy Rule** of [05 Progression](05%20Progression.md) is why the Generals are Limit 2. While an Arcana's Limit 0 is occupied, that Arcana has no Limit 1. The sealed being occupies Limit 0 of the Emperor Arcana, so that Arcana stops at Limit 2. The same holds for a god's own Arcana on the allied side, while a faction's other Arcana may have a free Limit 0 and reach Limit 1.
 
-The three Generals are therefore the top of the cult's living hierarchy. Above them stands only the sealed being. This holds only if the Empress and Hierophant Arcana also stop at Stage 2, which is open (CC-22).
+The three Generals are therefore the top of the cult's living hierarchy. Above them stands only the sealed being. The Empress and Hierophant Arcana stop at Limit 2 as well: their Limit 0 belongs to sane gods who want to use the True God's descent for their own ends.
 
 ## Working readings
 
 - A killed General is not replaced, because killing all three must remain able to end the campaign. Whether the cult's reinforcement slows as Generals fall is open (CC-9).
 - A General is a persistent named actor, not a generated follower.
 - The Holding General does not Break Away or offer a Yield. This is an exception for one actor, not a change to [08 Confront Constraints](08%20Confront%20Constraints.md).
-- The three behaviours are fixed archetypes across worlds. The World Seed varies who the Generals are, their bases, and their target order, so that a past world teaches how to read a General without solving the next one. Whether they vary by Pathway depends on CC-22.
+- The three behaviours are fixed archetypes across worlds. The World Seed varies who the Generals are, their bases, and their target order, so that a past world teaches how to read a General without solving the next one. Whether they vary by Arcana depends on CC-22.
 
 ## Defeating a General (owner-approved)
 
-A character far below Stage 2 cannot win a stat race. A General falls in one of these ways:
+A character far below Limit 2 cannot win a stat race. A General falls in one of these ways:
 
 - by numbers, alongside an allied force;
 - after a disrupted ritual, which strips most of the strength from the General and all the cultists, so they are more likely to retreat than to keep fighting;
@@ -285,11 +289,11 @@ A character far below Stage 2 cannot win a stat race. A General falls in one of 
 
 Artifacts may help. They are tightly controlled, go only to trusted members with high standing, and some are dangerous to Sanity. They are unique items for later design.
 
-Allied forces can kill a General without the player. On the middle setting this is rare, for example when a General attacks a city that holds an allied Stage 2 practitioner. At the lowest setting the game should win by itself: the allied side can kill all three Generals, so that a player who only wants to enjoy the world can do so.
+Allied forces can kill a General without the player. On the middle setting this is rare, for example when a General attacks a city that holds an allied Limit 2 practitioner. At the lowest setting the game should win by itself: the allied side can kill all three Generals, so that a player who only wants to enjoy the world can do so.
 
 ## Seers and the Spirit General
 
-Allied factions have otherworldly seers, and the player character may be one through a seer Pathway. Seers can predict where the Spirit General will come out, so forces can gather there first.
+Allied factions have otherworldly seers, and the player character may be one through a seer Arcana. Seers can predict where the Spirit General will come out, so forces can gather there first.
 
 ## The final attack
 
@@ -299,7 +303,7 @@ Before the capital, all three Generals attack together. They may fight in differ
 
 ## Owner-approved
 
-**Allied forces** are generated at world creation. During play, new followers of certain stages appear at a small periodic rate, in the cities their faction holds. Losses outpace replacement, so the allied side can dwindle over a long campaign.
+**Allied forces** are generated at world creation. During play, new followers of certain Limits appear at a small periodic rate, in the cities their faction holds. Losses outpace replacement, so the allied side can dwindle over a long campaign.
 
 **Cult Forces** generate much faster and are not tied to the general rules of the world's population. The system gives each General new followers automatically and periodically, near that General. The game does not need to explain where they were found.
 
@@ -325,7 +329,7 @@ The campaign has no calendar of attacks. First sorties fall on these days only b
 
 Later sorties come faster: about one every day or two across the three Generals.
 
-A full city or sortie is about 20 followers of different stages, with or without a General. A city a General has just left holds about 10. Fifty is too many.
+A full city or sortie is about 20 followers of different Limits, with or without a General. A city a General has just left holds about 10. Fifty is too many.
 
 A sortie can succeed or fail, depending on how strong the city's defence is:
 
@@ -336,11 +340,11 @@ After a capture, each General gathers its next force in its own way (§7), and t
 
 ## Working readings
 
-- "Not tied to the general rules" applies to how often followers appear and where they come from. It does not change character rules. Generated cult followers use the same attributes, skills, Pathway stages, and derived-statistic formulas as every other actor, as [02 World Laws](02%20World%20Laws.md) requires. They are generated at their stage and do not play through Alchemy or Conduct Progress.
+- "Not tied to the general rules" applies to how often followers appear and where they come from. It does not change character rules. Generated cult followers use the same attributes, skills, Limits, and derived-statistic formulas as every other actor, as [02 World Laws](02%20World%20Laws.md) requires. They are generated at their stage and do not play through Alchemy or Conduct Progress.
 
 ## Open
 
-Exact rates, stage mix, and cap are CC-12. Allied starting strength and replacement are CC-13.
+Exact rates, Limit mix, and cap are CC-12. Allied starting strength and replacement are CC-13.
 
 # 9. The player in the campaign
 
@@ -372,7 +376,7 @@ Captured and liberated cities must look different in the world. Their Symptoms a
 
 The campaign adds state that [02 World Laws](02%20World%20Laws.md) did not previously track: City Control, the forces present in each city, and three General actors.
 
-The World Engine remains an operation scheduler, not a population simulation. Proposed direction, subject to CC-15: each city keeps a coarse ledger of followers per faction and stage, and only instantiates characters when the player enters. This follows [04 Points of Interest](04%20Points%20of%20Interest.md)' Lazy Activation.
+The World Engine remains an operation scheduler, not a population simulation. Proposed direction, subject to CC-15: each city keeps a coarse ledger of followers per faction and Limit, and only instantiates characters when the player enters. This follows [04 Points of Interest](04%20Points%20of%20Interest.md)' Lazy Activation.
 
 An occupied city is persistent world state rather than a timed POI, because it has no Active Window. Discrete events inside it, such as a ritual or a clash, remain POIs.
 
@@ -394,7 +398,7 @@ Known risks:
 - **Constant urgency against curiosity.** A war with a visible front can crowd out exploration, the game's first pillar. The 15–20 day length, the quiet first days, and the 3×3 world are the response.
 - **Solo fight against a whole garrison.** The Cult Thought Link draws a city's followers to one fight. A lone character can meet all of them, so the size of a garrison and how they arrive decide whether solo liberation is possible (CC-4, CC-8).
 - **Content cost of ritual conditions.** Conditions that differ every time need a set of authored parts that the World Seed combines, which is a real load for a solo developer (CC-8).
-- **Slice scope.** The slice's required mechanics pull many undesigned systems into the first build (CC-29, CC-32).
+- **Slice scope.** The slice's required mechanics pull many undesigned systems into the first build (CC-29, CC-32, CC-33).
 - **Emptied cities after manifestation.** If captured cities lose their residents, the world after manifestation has few people, services, or quests left (CC-20).
 - **Time to reach a General.** Direct defeat takes Stage 2, or Stage 3 with good statistics and strategy, inside a 15–20 day campaign. A Stage 7 character has a 1.32 stage multiplier against a General's 2.66 ([07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md)). If the player cannot get deep enough in time, allied numbers and disrupted rituals carry that whole path (CC-10).
 - **Terrain evidence.** The target world and city count sit outside the conditions of the terrain research so far (CC-2).
@@ -403,7 +407,7 @@ Known risks:
 
 ## V1 (owner-approved)
 
-V1 is the one-city Vertical Slice of [11 Vertical Slice](11%20Vertical%20Slice.md): the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player either stops the ritual and wins or loses. The player reaches Stages 9–8, Stage 7 is for NPCs, and allies and enemies may be deeper. A General that does not attack is an approved fallback.
+V1 is the one-city Vertical Slice of [11 Vertical Slice](11%20Vertical%20Slice.md): the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player either stops the ritual and wins or loses. The player reaches Limits 9–8, Limit 7 is for NPCs, and allies and enemies may be deeper. A General that does not attack is an approved fallback.
 
 The following V2 and V3 split is proposed, not approved.
 
@@ -422,11 +426,11 @@ The following V2 and V3 split is proposed, not approved.
 # Documentation Review
 
 - **Vision / Pillars / Player Experience:** Compatible. The world acts without the player, and the player is not a chosen saviour. Curiosity under war pressure is a tracked risk (§12).
-- **World Laws:** Updated. City capture replaces the required-ritual count and the hidden return threat; the Divine Plane and the Spirit World are separate places; Stage 1 cult and allied followers are withdrawn; the pre-manifestation ending is killing all three Generals.
+- **World Laws:** Updated. City capture replaces the required-ritual count and the hidden return threat; the Divine Plane and the Spirit World are separate places; Limit 1 cult and allied followers are withdrawn; the pre-manifestation ending is killing all three Generals.
 - **Decision Engine:** Compatible once non-combat routes exist. Stale single-difficulty wording corrected.
 - **Points of Interest / Information Sources:** Updated for persistent occupied cities, public City Control, and the rituals' purpose, which no source reports.
-- **Progression:** Updated with the Stage Occupancy Rule for every Pathway and with Pathway change from Stage 5. Stage 2 Generals can appear in V1 and do not widen the player's stages.
-- **Vertical Slice:** Updated. The slice is one city with the Spirit General's invasion, under the same ritual rules; CC-29 and CC-32 track what is still undecided.
+- **Progression:** Updated with the Limit Occupancy Rule for every Arcana and with Arcana change from Limit 5. Limit 2 Generals can appear in V1 and do not widen the player's Limits.
+- **Vertical Slice:** Updated. The slice is one city with the Spirit General's invasion, under the same ritual rules; CC-29, CC-32, and CC-33 track what is still undecided.
 - **Character Life / Vision / Meta Loop:** Updated. Manifestation is the Capital Awakening Ritual's completion, and the Last Free City Rule is recorded in 07 and in Canonical 00 and 00.2.
 - **Confront:** Compatible in principle; §12 records the requirement for real alternatives.
 - **World Time:** Updated. The Cult Thought Link is a defined information channel.

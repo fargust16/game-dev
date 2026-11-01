@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-01 (residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-01 (tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -234,7 +234,7 @@ Detailed settlement capacity, refugee logistics, faction policy, and NPC reassig
 
 ## Owner-approved round/time relationship
 
-- Tactical combat takes place on the square-grid Combat Arena and uses the Initiative and AP turn order defined in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
+- Tactical combat takes place in place on the square Combat Grid and uses the Initiative and AP turn order defined in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
 - **One complete combat round advances the shared world clock by exactly one world tick (one in-game minute).**
 - A round is complete only after every currently eligible participant has had their opportunity to act or has otherwise been resolved for that round.
 - **The world does not advance during an individual character's turn.** The player may consider and submit actions without real-time pressure.
@@ -256,12 +256,12 @@ Allies, enemies, and other NPCs may join an active encounter when they physicall
 Combatants may attempt to flee rather than continue fighting. The player and NPCs should use the same underlying spatial escape principle.
 
 - The current proposal is that an actor can leave the tactical encounter after moving beyond a defined separation distance from the nearest hostile combatant.
-- A distance of **more than 10 arena cells** was suggested as an initial reference, not a final approved value.
+- A distance of **more than 10 grid cells** was suggested as an initial reference, not a final approved value.
 - Leaving the encounter removes that actor from active tactical participation; it does not necessarily end combat for the remaining participants.
 - If a fleeing actor is later found, pursued, or caught by a hostile actor, a new tactical encounter may begin.
 - NPCs may choose to flee when the threat is too great, using their judgement, goals, and available information.
 
-The exact escape measurement, line-of-sight rules, pursuit behaviour, and re-engagement conditions remain open. This rule must be reconciled with the arena transition and source-scene rules in [16 Architecture Pivot](16%20Architecture%20Pivot.md).
+The exact escape measurement, line-of-sight rules, pursuit behaviour, and re-engagement conditions remain open. This rule must be reconciled with the Combat Grid rules in [16 Architecture Pivot](16%20Architecture%20Pivot.md).
 
 # 8. Information and awareness
 
@@ -311,9 +311,9 @@ Information transmission is not automatic universal knowledge. Each channel need
 12. What exactly can First Aid treat or stabilise, and which injuries require a doctor or specialist?
 13. What are the exact HP/stamina recovery rules during sleep, including the timing of recovery when a blocking condition is removed partway through sleep?
 14. How are timed condition durations and early-removal probabilities finalised?
-15. What is the final encounter escape distance and how is it measured in the arena?
+15. What is the final encounter escape distance and how is it measured on the grid?
 16. How are actors inserted into Initiative when they arrive during an active round?
-17. How does the arena handle arrivals, departures, pursuit, and re-engagement without breaking the source-scene model?
+17. How does the Combat Grid handle arrivals, departures, pursuit, and re-engagement across a whole city?
 18. What information can each communication channel transmit, to whom, how quickly, and with what limits?
 19. How are NPC goals, task selection, danger assessment, refuge selection, and return decisions governed?
 20. How much of the world is simulated in detail at once, and how are distant or unloaded NPCs abstracted without losing important consequences?

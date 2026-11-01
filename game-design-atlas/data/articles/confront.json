@@ -4,7 +4,7 @@
   "name": "Confront",
   "title": "Бой как один Approach, на арене",
   "category": "combat",
-  "summary": "Confront — открытая сила. Документ 08 — ограждение до боевой библии: если бой становится самым безопасным, богатым или познавательным ходом по умолчанию, дизайн сломан. V1 показывает его пошаговым режимом на отдельной Combat Arena. Сетка не действует в оверворлде и интерьерах. Ordinary monsters yield ingredients only; Each NPC equipped item has an independent 35% base recovery chance modified by the current looter's Luck; transformed-NPC-monster drops remain open.",
+  "summary": "Confront — открытая сила. Документ 08 — ограждение до боевой библии: если бой становится самым безопасным, богатым или познавательным ходом по умолчанию, дизайн сломан. V1 показывает его пошаговым режимом на отдельной Combat Grid. Сетка не действует в оверворлде и интерьерах. Ordinary monsters yield ingredients only; Each NPC equipped item has an independent 35% base recovery chance modified by the current looter's Luck; transformed-NPC-monster drops remain open.",
   "scenarioNote": "Полных боевых сцен в импорт не входило. 11 требует Break Away и Spare/Yield в Confront похищения и/или ареста, но сами сцены здесь не расписаны.",
   "points": [
     {
@@ -26,13 +26,18 @@
     {
       "text": "NPC equipped items are checked independently at a 35% base chance under the shared Luck multiplier; no fixed half or rounding. Transformed-NPC-monster drops remain open.",
       "sourceId": "src-19"
+    },
+    {
+      "text": "Владелец отменил отдельную арену: Confront идёт на месте, окружающее пространство становится клетками, а целый город может быть полем боя. Тактика и укрытия берутся из реальной геометрии сцены.",
+      "sourceId": "src-99"
     }
   ],
   "gaps": [
     "Нет формулы инициативы и цены клетки Move.",
     "Не выбрана цена диагонали: 1 или 1.5.",
     "Нет полос провала для vault/climb и решения по Bonus-to-Dash.",
-    "Не решено, как читаемо переносить игрока на арену и насколько Theme Pack обязан совпадать с местом."
+    "Не решено, как читаемо переносить игрока на арену и насколько scene geometry обязан совпадать с местом.",
+    "Не проверено технически, как сетка строится поверх рельефа и созданных зданий (CC-33)."
   ],
   "sourceIds": [
     "src-08",

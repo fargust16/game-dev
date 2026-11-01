@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 0.88
+Version: 0.89
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Arcana and Limits recorded in 05.1; CC-22 and CC-29 narrowed; CC-30 … CC-32 added. Earlier: 22 Pathways recorded; CC-27 and CC-28 resolved; CC-22 narrowed; CC-29 added. Earlier: Vertical Slice settled: CC-24, CC-25, and CC-26 resolved; CC-27 and CC-28 added. Earlier: owner's fourth answers recorded: CC-11, CC-14, and CC-16 resolved; CC-7, CC-10, CC-12, CC-15, and CC-17 narrowed; CC-24 … CC-26 added for the redefined Vertical Slice. Earlier: owner's third answers recorded: CC-1, CC-8, CC-18, and CC-21 resolved; CC-7, CC-10, CC-12, CC-14, CC-15, and CC-20 narrowed. Earlier: owner's second answers recorded: CC-4, CC-9, CC-21, and CC-23 resolved; CC-3, CC-6, CC-7, CC-8, CC-10, CC-13, CC-17, CC-20, and CC-22 narrowed; Divine Plane restored. Earlier: owner answers recorded: campaign length, 3×3 target world, 5–7 cities, the rituals' purpose, the Stage Occupancy Rule; CC-1 … CC-3, CC-5, CC-9, CC-10, and CC-17 narrowed; CC-20 … CC-23 added; GEO-1 reopened by the campaign's gameplay requirement. Earlier: the war for cities recorded: required-ritual count resolved by the Capital Gate; Cult Campaign block CC-1 … CC-19 added. Earlier: daily player summary/news-map channels, six-hour ritual windows, allied response, potential parallel operations, and fixed capital awakening/occupation loop recorded; ritual count/concurrency, off-screen resolution, command threshold, capture, destruction trigger, and post-campaign play remain open. Earlier: sealed Stage 0 antagonist, major/minor distinction, and two candidate minor factions recorded; finale and generation remain open. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-11-01 (owner's table fixes and combat in place recorded: CC-22 and CC-30 resolved; CC-29, CC-31, and CC-32 narrowed; CC-33 added. Earlier: Arcana and Limits recorded in 05.1; CC-22 and CC-29 narrowed; CC-30 … CC-32 added. Earlier: 22 Pathways recorded; CC-27 and CC-28 resolved; CC-22 narrowed; CC-29 added. Earlier: Vertical Slice settled: CC-24, CC-25, and CC-26 resolved; CC-27 and CC-28 added. Earlier: owner's fourth answers recorded: CC-11, CC-14, and CC-16 resolved; CC-7, CC-10, CC-12, CC-15, and CC-17 narrowed; CC-24 … CC-26 added for the redefined Vertical Slice. Earlier: owner's third answers recorded: CC-1, CC-8, CC-18, and CC-21 resolved; CC-7, CC-10, CC-12, CC-14, CC-15, and CC-20 narrowed. Earlier: owner's second answers recorded: CC-4, CC-9, CC-21, and CC-23 resolved; CC-3, CC-6, CC-7, CC-8, CC-10, CC-13, CC-17, CC-20, and CC-22 narrowed; Divine Plane restored. Earlier: owner answers recorded: campaign length, 3×3 target world, 5–7 cities, the rituals' purpose, the Stage Occupancy Rule; CC-1 … CC-3, CC-5, CC-9, CC-10, and CC-17 narrowed; CC-20 … CC-23 added; GEO-1 reopened by the campaign's gameplay requirement. Earlier: the war for cities recorded: required-ritual count resolved by the Capital Gate; Cult Campaign block CC-1 … CC-19 added. Earlier: daily player summary/news-map channels, six-hour ritual windows, allied response, potential parallel operations, and fixed capital awakening/occupation loop recorded; ritual count/concurrency, off-screen resolution, command threshold, capture, destruction trigger, and post-campaign play remain open. Earlier: sealed Stage 0 antagonist, major/minor distinction, and two candidate minor factions recorded; finale and generation remain open. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -38,7 +38,7 @@ Eight independent sliders replace the old bundled Easy / Normal / Hard / Hell sc
 
 **What broad faction structure is established for this setting?**
 
-Three church-associated Major Factions cooperate, with internal-order, industry/research, and external-security roles. The opposing Major Faction seeks to return an insane, sealed Stage 0 being, called the True God or False God by followers. Ancient cosmic powers are the setting-level source of supernatural power and seek to reclaim it through the returned being. If unopposed, it destroys other powerful beings and factions, then people and followers, and ultimately the planet through a later act distinct from its awakening. Before manifestation, the cult wages a war for the cities: three Stage 2 Cult Generals capture cities through rituals, removing other factions' followers without attacking ordinary residents, and the Capital Gate lets the final ritual begin only when every other city is under Cult Control. The player receives a private daily summary of their actions and learns about public events through daily news, rumours, notes, witnesses, traces, assignments, ambient NPC reports, or allied-faction briefings, without a global progress bar. Ritual windows target six in-game hours (360 World Ticks); all three allied Major Factions receive advance intelligence and send groups, and off-screen clashes resolve autonomously. Some difficulty configurations may permit parallel active rituals. Once the Capital Gate is open, the final awakening ritual occurs at the fixed centre of the capital; if completed, the being remains there while the cult and allies contest the capital and cult forces move against any liberated city. The campaign ends either when all three Cult Generals are killed before manifestation, or when the manifested being is defeated; each route presents a rating. After manifestation, the being cannot be delayed or contained, player death is defeat with no same-world successor even if the being is later defeated, and allied followers may assist while the player can join or act elsewhere. Ritual concurrency, group resolution, capture, planet-destruction trigger, final-fight composition, rating criteria, and post-campaign play remain open. A royal institution is influenced by the antagonist; its role and classification remain open. One state with several cities is playable; neighbouring states are background only. The former mind-controlled ideal-world outcome is withdrawn. Two beneficial Minor Factions remain examples: a covert alchemical network and a healing/medical association. Stage 0 belief/anchor/sanity mechanics remain out of scope. See [02 World Laws](02%20World%20Laws.md) and [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
+Three church-associated Major Factions cooperate, with internal-order, industry/research, and external-security roles. The opposing Major Faction seeks to return an insane, sealed Limit 0 being, called the True God or False God by followers. Ancient cosmic powers are the setting-level source of supernatural power and seek to reclaim it through the returned being. If unopposed, it destroys other powerful beings and factions, then people and followers, and ultimately the planet through a later act distinct from its awakening. Before manifestation, the cult wages a war for the cities: three Limit 2 Cult Generals capture cities through rituals, removing other factions' followers without attacking ordinary residents, and the Capital Gate lets the final ritual begin only when every other city is under Cult Control. The player receives a private daily summary of their actions and learns about public events through daily news, rumours, notes, witnesses, traces, assignments, ambient NPC reports, or allied-faction briefings, without a global progress bar. Ritual windows target six in-game hours (360 World Ticks); all three allied Major Factions receive advance intelligence and send groups, and off-screen clashes resolve autonomously. Some difficulty configurations may permit parallel active rituals. Once the Capital Gate is open, the final awakening ritual occurs at the fixed centre of the capital; if completed, the being remains there while the cult and allies contest the capital and cult forces move against any liberated city. The campaign ends either when all three Cult Generals are killed before manifestation, or when the manifested being is defeated; each route presents a rating. After manifestation, the being cannot be delayed or contained, player death is defeat with no same-world successor even if the being is later defeated, and allied followers may assist while the player can join or act elsewhere. Ritual concurrency, group resolution, capture, planet-destruction trigger, final-fight composition, rating criteria, and post-campaign play remain open. A royal institution is influenced by the antagonist; its role and classification remain open. One state with several cities is playable; neighbouring states are background only. The former mind-controlled ideal-world outcome is withdrawn. Two beneficial Minor Factions remain examples: a covert alchemical network and a healing/medical association. Limit 0 belief/anchor/sanity mechanics remain out of scope. See [02 World Laws](02%20World%20Laws.md) and [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
 
 **How many rituals must the cult complete before the capital?**
 
@@ -58,7 +58,7 @@ Only at manifestation, so a player who wins before it never learns the purpose, 
 
 **Does anyone in the cult outrank the Generals, and how does the campaign end before manifestation? (CC-9)**
 
-No living follower outranks them. The Stage Occupancy Rule leaves no Stage 1 on a Pathway whose Stage 0 is occupied, on any Pathway, and this holds for the allied factions too. Killing all three Generals is the only pre-manifestation ending. See [05 Progression](05%20Progression.md) and [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §7.
+No living follower outranks them. The Limit Occupancy Rule leaves no Limit 1 on an Arcana whose Limit 0 is occupied, on any Arcana, and this holds for the allied factions too. Killing all three Generals is the only pre-manifestation ending. See [05 Progression](05%20Progression.md) and [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §7.
 
 **In what order is a city captured? (CC-4)**
 
@@ -82,7 +82,7 @@ The death of a senior left in charge, or losses that leave them a dangerous mino
 
 **How are the two sides' forces generated?**
 
-Asymmetrically. Allied forces are generated at world creation and replaced slowly at certain stages. Cult Forces generate much faster, are not tied to the population's general rules, and are not exhausted by killing rank-and-file followers; new followers keep appearing until the cult's leadership is destroyed. Campaign pace depends on difficulty. Rates and sources are CC-12 and CC-13; the owning setting is CC-14. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
+Asymmetrically. Allied forces are generated at world creation and replaced slowly at certain Limits. Cult Forces generate much faster, are not tied to the population's general rules, and are not exhausted by killing rank-and-file followers; new followers keep appearing until the cult's leadership is destroyed. Campaign pace depends on difficulty. Rates and sources are CC-12 and CC-13; the owning setting is CC-14. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
 
 ## Decision Engine
 
@@ -96,7 +96,7 @@ Attention first, Approach immediately with it; Bargain as the second major lesso
 No. They are Allegiance forks with useful different outcomes, hidden Influence residue, and possible path open/close effects.
 
 **What is Knowledge for?**  
-Player Knowledge unlocks reasoning, important places, methods, and prediction. It is not primarily a success-rate bonus. Character pathway power is Progression design constrained by Price of Power and Bargain.
+Player Knowledge unlocks reasoning, important places, methods, and prediction. It is not primarily a success-rate bonus. Character arcana power is Progression design constrained by Price of Power and Bargain.
 
 **External powers / churches / curses?**  
 Always Bargains with readable, often delayed escalating prices. Detailed systems deferred to content lists; rules documented in [05 Progression](05%20Progression.md).
@@ -109,34 +109,34 @@ As timed Points of Interest with lazy activation, readable Active Windows, and I
 
 ## Progression
 
-**How many Pathways in V1?**  
+**How many Arcana in V1?**  
 One or two player Arcana with different styles of play, out of 22 in the game, one for each Tarot Major Arcana archetype. The other 16 follow after the slice. Documented in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
 
-**Which stages in V1?**  
-The player reaches 9 → 8, and Stage 7 is for NPCs only. Deeper stages later.
+**Which Limits in V1?**  
+The player reaches 9 → 8, and Limit 7 is for NPCs only. Deeper Limits later.
 
-**How is a Pathway obtained?**  
-Starting Faction soft-nudges toward one Pathway; Pathway may also be gained through Bargain, quest, or discovery. Not a prison. Pathless remains valid.
+**How is an Arcana obtained?**  
+Starting Faction soft-nudges toward one Arcana; Arcana may also be gained through Bargain, quest, or discovery. Not a prison. Uninitiated remains valid.
 
 **What belongs in the first Progression draft?**  
-Pathway rules plus churches/entities as External Power Bargains. Lore names, full lists, and stages below 7 come later.
+Arcana rules plus churches/entities as External Power Bargains. Lore names, full lists, and Limits below 7 come later.
 
-**What is Alchemy's role in Pathway advancement?**
+**What is Alchemy's role in Arcana advancement?**
 
-Alchemy is a separate potion-only profession. Every character must learn it before advancing a Pathway stage, and each transition requires the correct Alchemy-brewed potion. Brewing takes six world ticks and includes a mini-game. See [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md); implementation details and balance remain open.
+Alchemy is a separate potion-only profession. Every character must learn it before advancing a Limit, and each transition requires the correct Alchemy-brewed potion. Brewing takes six world ticks and includes a mini-game. See [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md); implementation details and balance remain open.
 
-**What preparation is required for a Pathway-stage transition?**  
-Each transition requires exactly two primary attributes and one secondary attribute. The two primary attributes are stable across all stages of a Pathway; the secondary attribute is selected per World Seed for each Pathway-stage combination and remains fixed within that world. Requirements are evaluated for the target stage. Primary deficits cause substantially greater additional Sanity loss than secondary deficits; any shortfall causes a penalty, which grows with the gap. See [05 Progression](05%20Progression.md).
+**What preparation is required for a Limit transition?**  
+Each transition requires exactly two primary attributes and one secondary attribute. The two primary attributes are stable across all Limits of an Arcana; the secondary attribute is selected per World Seed for each Limit combination and remains fixed within that world. Requirements are evaluated for the target Limit. Primary deficits cause substantially greater additional Sanity loss than secondary deficits; any shortfall causes a penalty, which grows with the gap. See [05 Progression](05%20Progression.md).
 
-**Is Pathway advancement itself random, and what happens when sanity is lost?**  
-No transition success roll: consuming the correct potion always grants the target stage. The mandatory transition Sanity cost and any preparation penalty are subtracted from current Sanity. If sanity is lost, advancement remains successful, but the character becomes a game-controlled creature in the world rather than an ordinary player character. At stages 9–6 the creature is human-shaped (zombie-like). At stages 5–0 a Pathway- and stage-specific mystical form becomes possible, but is only a chance; the character may remain human-shaped. See [05 Progression](05%20Progression.md).
+**Is Arcana advancement itself random, and what happens when sanity is lost?**  
+No transition success roll: consuming the correct potion always grants the target Limit. The mandatory transition Sanity cost and any preparation penalty are subtracted from current Sanity. If sanity is lost, advancement remains successful, but the character becomes a game-controlled creature in the world rather than an ordinary player character. At Limits 9–6 the creature is human-shaped (zombie-like). At Limits 5–0 an Arcana- and stage-specific mystical form becomes possible, but is only a chance; the character may remain human-shaped. See [05 Progression](05%20Progression.md).
 
 ## Items, Inventory, Equipment, Item Creation, Enchanting, and Alchemy
 
 Item and equipment rules are consolidated in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md); potion profession rules are in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
 
-- Item Creation and Enchanting are equipment/item-crafting professions; Alchemy is a separate potion-only profession required for Pathway advancement. Luck and Perception are attributes, not professions.
-- Item Creation skill levels 1, 11, 21, …, 91 unlock item stages 9, 8, …, 0. Its delegated starting formula generates 0–6 modifiers; Perception adds up to 10% relative chance and Luck applies the shared universal multiplier. Fixed base type weights are unaffected.
+- Item Creation and Enchanting are equipment/item-crafting professions; Alchemy is a separate potion-only profession required for Arcana advancement. Luck and Perception are attributes, not professions.
+- Item Creation skill levels 1, 11, 21, …, 91 unlock item Limits 9, 8, …, 0. Its delegated starting formula generates 0–6 modifiers; Perception adds up to 10% relative chance and Luck applies the shared universal multiplier. Fixed base type weights are unaffected.
 - Each base gives favored modifier types higher weights and other types lower weights. Higher item stages increase the weight of stronger modifier tiers without a hard tier ceiling. Exact tables/ranges and duplicate constraints remain open.
 - Major/minor limits remain 3+3. Group assignment is random; the exact valid-split distribution and random-add group choice remain open.
 - Quality is count-based: Normal 0; Magic 1–2; Rare 3; Epic 4; Legendary 5–6; Unique is separate. The category changes only when a count crosses a band; colour directions are specified in 19.
@@ -152,10 +152,10 @@ See [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Encha
 ## Character Attributes, Skills, and Action Checks
 
 **Are there global character levels or a character-wide XP bar?**  
-No. Each attribute and individual skill has its own action-based progression track. Ordinary development is separate from Pathway stages. See [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
+No. Each attribute and individual skill has its own action-based progression track. Ordinary development is separate from Limits. See [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
 
 **What is the attribute range?**  
-Seven attributes use 1–100. Levels 1–99 are ordinary progression; 100 is an exceptional apex requiring special criteria. Attribute bands are not automatically Pathway stages or skill levels.
+Seven attributes use 1–100. Levels 1–99 are ordinary progression; 100 is an exceptional apex requiring special criteria. Attribute bands are not automatically Limits or skill levels.
 
 **How do primary attributes and skills combine for an action check?**  
 They have equal importance. Effective primary preparation is their arithmetic mean on a comparable task-difficulty scale. A high attribute can help a character enter a new profession, but it does not make the character a professional master. There is no additional mismatch penalty beyond the average.
@@ -170,13 +170,13 @@ Luck is separate from the secondary-attribute bonus and uses the shared relative
 Failure, normal success, and critical success are mutually exclusive and sum to 100%. Critical chance is conditional on success, not a separate independent roll. Gathering animation cycles are individual attempts.
 
 **What is the derived-statistics structure?**
-The agreed register and principles are in [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). Derived values are calculated from attributes, skills, equipment, Pathways, abilities, conditions, and context; they are not additional independent progression tracks by default.
+The agreed register and principles are in [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). Derived values are calculated from attributes, skills, equipment, Arcana, abilities, conditions, and context; they are not additional independent progression tracks by default.
 
-**How do maximum HP, Stamina, and Will Power scale with Pathway stage?**
-All three maximum resource pools use one universal Stage Multiplier S, regardless of Pathway type. A character without a Pathway uses S = 1.00. The agreed formulas are HPmax = (20 + 0.8 × Endurance) × S; Staminamax = (20 + 1.6 × Endurance) × S; and WPmax = (20 + 0.8 × Will) × S. The shared stage table is 9→0: 1.00, 1.15, 1.32, 1.52, 1.75, 2.01, 2.31, 2.66, 3.06, 3.52. Advancing a stage increases maximum capacity but does not automatically refill the current resource amount. See [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). Equipment/effect stacking order, Stamina action costs, and other detailed interactions remain open.
+**How do maximum HP, Stamina, and Will Power scale with Limit?**
+All three maximum resource pools use one universal Limit Multiplier S, regardless of Arcana type. A character without an Arcana uses S = 1.00. The agreed formulas are HPmax = (20 + 0.8 × Endurance) × S; Staminamax = (20 + 1.6 × Endurance) × S; and WPmax = (20 + 0.8 × Will) × S. The shared Limit table is 9→0: 1.00, 1.15, 1.32, 1.52, 1.75, 2.01, 2.31, 2.66, 3.06, 3.52. Advancing a stage increases maximum capacity but does not automatically refill the current resource amount. See [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). Equipment/effect stacking order, Stamina action costs, and other detailed interactions remain open.
 
 **How do Will and Will Power work?**
-Will is the ordinary 1–100 attribute; Will Power is a separate visible spendable resource. Pathways determine ability access, while Will determines capacity. Maximum Will Power is \((20+0.8\times Will)\times S\), with S determined by Pathway stage (9→0 multipliers: 1.00, 1.15, 1.32, 1.52, 1.75, 2.01, 2.31, 2.66, 3.06, 3.52). Ordinary regeneration is about 1% per 10 world ticks; sleep normally fully restores it. Full exhaustion grants one modest Will XP reward per continuous episode and causes Sanity damage. See [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). Ability costs, exact XP eligibility, D₀, and effect-specific Will damage remain open.
+Will is the ordinary 1–100 attribute; Will Power is a separate visible spendable resource. Arcana determine ability access, while Will determines capacity. Maximum Will Power is \((20+0.8\times Will)\times S\), with S determined by Limit (9→0 multipliers: 1.00, 1.15, 1.32, 1.52, 1.75, 2.01, 2.31, 2.66, 3.06, 3.52). Ordinary regeneration is about 1% per 10 world ticks; sleep normally fully restores it. Full exhaustion grants one modest Will XP reward per continuous episode and causes Sanity damage. See [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md). Ability costs, exact XP eligibility, D₀, and effect-specific Will damage remain open.
 
 **How does Sanity work?**
 Sanity is a separate 0–100 mental-integrity measure, distinct from Will and Will Power. Its bands are 100 Stable, 70–99 Mild disturbance, 40–69 Significant disturbance, 10–39 Severe disturbance, 1–9 Critical, and 0 Loss of sanity. Shared Will mitigation is \(D_{sanity}=D_{base}\times100/(100+Will)\). Full-exhaustion damage is \(D_0\times S\times100/(100+Will)\). Ordinary Will Power recovery and sleep do not restore Sanity. At zero, the character permanently loses human personality and becomes a game-controlled creature in the world; this is distinct from death. See [07.2](07.2%20Derived%20Character%20Statistics.md). Exact band symptoms/penalties, D₀, source-specific mitigation, and recovery methods/rates remain open.
@@ -212,7 +212,7 @@ Soft Memory: rumours, dialogue hooks, and opinion shifts. No bloodline power inh
 No. Confront constraints forbid XP-from-kills, abstract loot tables, and universal best payoff. Documented in [08 Confront Constraints](08%20Confront%20Constraints.md).
 
 **What is V1 Confront presentation?**  
-Turn-Based Mode on a **thematic Combat Arena** scene (BG3 / Fallout 1–2 feel). No voluntary Turn-Based Mode during free exploration. Documented in [08 Confront Constraints](08%20Confront%20Constraints.md) and [16 Architecture Pivot](16%20Architecture%20Pivot.md). *(Cancels prior in-location / outside-combat TB lock.)*
+Turn-Based Mode in place on a **Combat Grid** over the real scene (BG3 / Fallout 1–2 feel). No separate arena; no voluntary Turn-Based Mode during free exploration. Documented in [08 Confront Constraints](08%20Confront%20Constraints.md) and [16 Architecture Pivot](16%20Architecture%20Pivot.md). *(Decided by the owner on 2026-11-01; cancels the Combat Arena.)*
 
 **How does the player learn about POIs and world pressure?**  
 Through reusable Information Sources with bias and partial truth: boards, newspapers, bartenders, rumours, faction contacts, witnesses, physical traces, Soft Memory. Documented in [09 Information Sources](09%20Information%20Sources.md).
@@ -224,19 +224,19 @@ Combat uses Initiative and an AP pool with variable action costs and retained en
 Sleep advances approximately 6–8 in-game hours while the world continues simulating; it can be interrupted and is not guaranteed safe. It fully restores ordinary HP only when no active condition blocks recovery. Poison and Bleeding may naturally end through per-tick probability checks, but sleep does not guarantee their removal. First Aid treats specific conditions and injuries; doctors and specialists provide more complete treatment. No HP-restoring potions are planned. Exact rates, probabilities, injury categories, comfort bonuses, and treatment recipes remain open in [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md).
 
 **What is the spatial model?**  
-Free third-person overworld and interior scenes; square grid + Environment Actions on arenas only. Documented in [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md).
+Free third-person overworld and interior scenes; square grid + Environment Actions during Confront only. Documented in [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md).
 
 **Which engine?**  
-Unity locked. URP, C#, project folder `unity/`, free 3P + custom arena grid TB. Documented in [12 Engine Choice](12%20Engine%20Choice.md).
+Unity locked. URP, C#, project folder `unity/`, free 3P + custom Combat Grid TB. Documented in [12 Engine Choice](12%20Engine%20Choice.md).
 
 **What is the first playable proof?**  
-A Vertical Slice of one city and a small territory at player Stages 9–8, in which the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player either stops the ritual and wins or loses. It has one joinable faction with three Pathways, the three earlier POIs as side events, required mechanics in a limited form, and a Lord of the Mysteries-like industrial-era mood — delivered on overworld → interior → arena rails. Death Gap is out of slice scope. Placeholder names may change. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md) and [16](16%20Architecture%20Pivot.md).
+A Vertical Slice of one city and a small territory at player Limits 9–8, in which the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player either stops the ritual and wins or loses. It has one joinable faction with three Arcana, the three earlier POIs as side events, required mechanics in a limited form, and a Lord of the Mysteries-like industrial-era mood — delivered on overworld → interior → combat in place. Death Gap is out of slice scope. Placeholder names may change. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md) and [16](16%20Architecture%20Pivot.md).
 
 **Where do systems / interfaces / micro-iterations live?**  
 [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — System Cards + Track backlog. Spatial locks remain in [16](16%20Architecture%20Pivot.md).
 
 **Overworld V0 size / chunk / scene load defaults?**  
-Chunk = **64 m**; playable world = **2800 × 2800 m** (2×2 Unity Terrain tiles of 1400 m, height budget 700 m, sea level 24 m) with an infinite-capable chunk API; Interior and Arena V0 use **single-scene swap** (additive later). Documented in [17](17%20Game%20Systems%20Architecture.md) and `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`.
+Chunk = **64 m**; playable world = **2800 × 2800 m** (2×2 Unity Terrain tiles of 1400 m, height budget 700 m, sea level 24 m) with an infinite-capable chunk API; Interior V0 uses **single-scene swap** (additive later). Documented in [17](17%20Game%20Systems%20Architecture.md) and `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`.
 
 **What generation mechanism produces World / Settlement / Building / Interior content?**  
 **Piece-Based Assembly**: small hand-authored Pieces carrying Snap Sockets, snapped together deterministically small → large. **Exterior Shell Grammar** builds overworld fabric (most buildings never get a Room Graph). **Interior Piece Assembly** runs only for `InteriorPolicy.Portal` buildings. Reference model: Valheim's room/dungeon piece system. Not an algorithmic subdivision solver, not the retired OrganicTown continuous-mesh generator. Documented in [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md).
@@ -309,7 +309,7 @@ Can multiple factions unintentionally cooperate?
 
 Which of the eight independent difficulty sliders, if any, affects faction starting Influence? Campaign pace belongs to Cult Pace. The old bundled Easy / Normal / Hard / Hell faction-pressure rule is retired.
 
-How are the three cooperating factions connected to Stage 0 beings and churches; is that relationship one-to-one?
+How are the three cooperating factions connected to Limit 0 beings and churches; is that relationship one-to-one?
 
 What formal or informal arrangement coordinates their cooperation and defines their jurisdiction boundaries?
 
@@ -349,15 +349,15 @@ The rules are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%
 
 **CC-9 Resolved in principle.** Killing all three Generals is the only pre-manifestation ending (§ Resolved Decisions). What happens to a General's Force and to reinforcement when only one or two have fallen?
 
-**CC-10 Counterplay.** The ways to defeat a General are decided (21 §7). How does a seer's prediction reach a player outside a faction? How is the Raiding General found between sorties? Can a player reach Stage 2–3 within 15–20 game days, or do allied numbers and disrupted rituals carry that path?
+**CC-10 Counterplay.** The ways to defeat a General are decided (21 §7). How does a seer's prediction reach a player outside a faction? How is the Raiding General found between sorties? Can a player reach Limit 2–3 within 15–20 game days, or do allied numbers and disrupted rituals carry that path?
 
-**CC-11 Resolved.** V1 is the one-city slice of [11 Vertical Slice](11%20Vertical%20Slice.md). Allies and enemies may be deeper than the player's stages.
+**CC-11 Resolved.** V1 is the one-city slice of [11 Vertical Slice](11%20Vertical%20Slice.md). Allies and enemies may be deeper than the player's Limits.
 
 ### Force generation
 
-**CC-12 Cult generation.** The order of rates, first sortie days, and force sizes are decided (21 §8). What are the exact rates and the stage mix of each General's followers, and is there a cap?
+**CC-12 Cult generation.** The order of rates, first sortie days, and force sizes are decided (21 §8). What are the exact rates and the Limit mix of each General's followers, and is there a cap?
 
-**CC-13 Allied forces.** Replacement happens in cities a faction holds (21 §8). How many followers of each stage exist at world creation, and which stages are replaced and how often? Can a whole Major Faction die, and what happens to Faction Entry if it does?
+**CC-13 Allied forces.** Replacement happens in cities a faction holds (21 §8). How many followers of each Limit exist at world creation, and which Limits are replaced and how often? Can a whole Major Faction die, and what happens to Faction Entry if it does?
 
 **CC-14 Resolved.** The eighth slider, Cult Pace, owns campaign pace ([02 World Laws](02%20World%20Laws.md)). Its range and steps are open.
 
@@ -381,7 +381,7 @@ The rules are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%
 
 **CC-21 Resolved.** The player learns the purpose only at manifestation (§ Resolved Decisions).
 
-**CC-22 Occupied Limits.** The High Priestess and Emperor have an occupied Limit 0, and the Fool and Magician have a free one ([05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md)). Are the Empress and Hierophant free as well? If so, cultists can reach Limit 1 there and outrank the Generals. Which Arcana do the other two Generals belong to? Does the World Seed vary all this, so that a past world does not give the answer? Which sources tell the character which Arcana belongs to which deity?
+**CC-22 Occupied Limits.** All three cult Arcana have an occupied Limit 0, so the Generals are the top of the cult (05.1). Which Arcana do the other two Generals belong to? Does the World Seed vary which Limit 0 are occupied, so that a past world does not give the answer? Which sources tell the character which Arcana belongs to which deity?
 
 **CC-23 Resolved in principle.** Triggers and destinations are decided (§ Resolved Decisions). What share of losses counts as a dangerous minority, and do allied followers retreat by the same rule during a capture?
 
@@ -393,17 +393,19 @@ The rules are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%
 
 **CC-26 Resolved.** The required mechanics, the one joinable faction, Lower Veil as a district, and the three POIs as side events are decided (11).
 
-**CC-27 Resolved.** Stage 9 is a certain goal, Stage 8 takes directed effort, and Stage 7 is for NPCs. There are 8–10 enemies with enough allies for about equal sides, and the six-hour window stays (11).
+**CC-27 Resolved.** Limit 9 is a certain goal, Limit 8 takes directed effort, and Limit 7 is for NPCs. There are 8–10 enemies with enough allies for about equal sides, and the six-hour window stays (11).
 
 **CC-28 Resolved.** The character starts without a faction and may join through a first-day trial. Death ends the run, and the player starts again (11).
 
-**CC-29 Slice Arcana and abilities.** Which one or two Arcana does the slice offer, for one dialogue-and-stealth style and one confrontation style? Which abilities do they have, and which Arcana do the slice's enemies use? How much does a Limit raise primary attributes? How does a cult recipe change a character's approach? How do Arcana map onto the Open, Veiled, and Bound labels? Does a Factionless start stay a slice exception, or replace Starting Faction in the full game? What is the city called?
+**CC-29 Slice abilities.** The slice's Arcana are Жрица and Император (05.1). Which abilities do they have at Limits 9–7? Which Arcana do the slice's enemies use? How much does a Limit raise primary attributes? How do Arcana map onto the Open, Veiled, and Bound labels? Does an Uninitiated start stay a slice exception, or replace Starting Faction in the full game? What is the city called?
 
-**CC-30 Terms.** Should every document be renamed from Pathway and Stage to Arcana and Limit? Do the earlier names, such as Path of Change, stay alongside the Arcana names, and is the Magician's name Path of the Creator?
+**CC-30 Resolved.** Arcana and Limit are the only terms, and there are no path names. A character with no Arcana is Uninitiated, and the Open, Veiled, and Bound labels are styles.
 
-**CC-31 Table issues.** How are the five repeated Limit names, the names matching other terms, and the four identical attribute profiles resolved ([05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md))? Is it intended that Will is primary for 14 of 22 Arcana and Strength for one? Does the table's fixed secondary attribute replace the per-seed rule of [05 Progression](05%20Progression.md)?
+**CC-31 Table issues.** The owner's corrections are applied (05.1). Three names still repeat: Отвес, Устав, Озарение. Four attribute profiles are still identical. Does the table's fixed secondary attribute replace the per-seed rule of [05 Progression](05%20Progression.md)?
 
-**CC-32 The invasion as a scene.** Confront runs on a Combat Arena, while the invasion spreads over a city with a Thought Link, allies, and a ritual site. Is the final fight one arena or several, who is in it, where is the ritual site, how do reinforcements arrive, and how do stealth and dialogue checks connect to it?
+**CC-32 The invasion in place.** The whole city is the battlefield, and a round is one tick (21 §4). Does the whole city enter Turn-Based Mode, or only an area around the fight? What do NPCs outside it do? How does a character leave the fight, and what happens to a fight at a door into an interior scene? Do 360 rounds stay, or 60?
+
+**CC-33 Combat Grid technology.** How is a grid built over terrain slopes and generated buildings, how large can it be, and what must generated pieces carry? The 2026-08-07 pivot cancelled in-location combat as too expensive, so this needs a technical test before it is relied on.
 
 ## Decision Engine
 
@@ -431,19 +433,19 @@ Can a Persistent POI still be finite without feeling like a fake timer?
 
 ## Progression
 
-What is the exact V1 Conduct Progress threshold for stage 9 → 8?
+What is the exact V1 Conduct Progress threshold for Limit 9 → 8?
 
-What are the exact primary/secondary attribute thresholds for each Pathway-stage transition, including the final secondary-band offset mapping?
+What are the exact primary/secondary attribute thresholds for each Limit transition, including the final secondary-band offset mapping?
 
 What are the mandatory Sanity costs for each transition, the preparation-penalty curve, and the exact rule for retaining sanity at the resulting Sanity value?
 
-For stages 5–0, what is the probability of mystical transformation after sanity loss, and what are the exact creature forms for each Pathway and stage?
+For Limits 5–0, what is the probability of mystical transformation after sanity loss, and what are the exact creature forms for each Arcana and Limit?
 
 How strongly may a Starting Faction nudge before it becomes a soft lock?
 
-How do External Power Bargains interact with Pathway conduct when they pull in opposite directions?
+How do External Power Bargains interact with Arcana conduct when they pull in opposite directions?
 
-Which of the 22 Pathways is the seer Pathway mentioned in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)? Which of the 22 Arcana are adjacent, and what are the detailed rules for changing to an adjacent Pathway from Stage 5 and deeper, and how large is the Sanity cost? Can a character abandon or switch a Pathway at shallower stages?
+Which of the 22 Arcana is the seer Arcana mentioned in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)? Which of the 22 Arcana are adjacent, and what are the detailed rules for changing to an adjacent Arcana from Limit 5 and deeper, and how large is the Sanity cost? Can a character abandon or switch an Arcana at shallower Limits?
 
 ## Character Attributes and Action Checks
 
@@ -451,7 +453,7 @@ How are attribute and skill values normalised to a common task-equivalent scale 
 
 How are the shared check rules reconciled with combat's attack-specific multi-attribute formulas?
 
-What are the exact numeric values for the shared attribute/skill progression system: base XP by task-difficulty stage, the ten-stage Δ_XP modifier table, the nonlinear XP required for each next track level, the residual floor, and the outcome modifiers for failure, normal success, and critical success? The agreed structure is universal across activity types and independent of Pathway stage; see [07.1](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
+What are the exact numeric values for the shared attribute/skill progression system: base XP by task-difficulty stage, the ten-stage Δ_XP modifier table, the nonlinear XP required for each next track level, the residual floor, and the outcome modifiers for failure, normal success, and critical success? The agreed structure is universal across activity types and independent of Limit; see [07.1](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
 
 What are the exceptional requirements and unique benefit for attribute 100?
 
@@ -459,11 +461,11 @@ What are the exceptional requirements and unique benefit for attribute 100?
 
 What are the exact formulas and scales for Maximum HP, Maximum Stamina, and Maximum Will Power? Maximum Stamina is primarily derived from Endurance; its formula remains open.
 
-What are the exact ability costs and how do they vary among Pathways and ability types? The initial balance bands are approximately 10–20% of maximum Will Power for ordinary abilities, 25–40% for powerful abilities, and 50–80% for exceptional abilities; individual abilities define actual costs.
+What are the exact ability costs and how do they vary among Arcana and ability types? The initial balance bands are approximately 10–20% of maximum Will Power for ordinary abilities, 25–40% for powerful abilities, and 50–80% for exceptional abilities; individual abilities define actual costs.
 
 How do effects damage or suppress Will: temporary effective-attribute reduction, maximum-pool reduction, current-resource loss, or a combination? What are duration, treatment, and recovery rules? What are the exact Will XP reward and meaningful-expenditure eligibility for full exhaustion?
 
-What are the exact Movement Speed formula and separate world/arena units?
+What are the exact Movement Speed formula and separate world and Combat Grid units?
 
 Which additional movement, check, or combat penalties (if any) should apply in High / Overloaded / Critical Overload states? The starting capacity formula, 100/125/150/200% thresholds, and pickup hard limit are specified in [07.2](07.2%20Derived%20Character%20Statistics.md); exertion-cost multipliers remain open.
 
@@ -481,21 +483,19 @@ How much V1 support does each Approach need before it feels real (skills, UI ver
 
 When does Threaten escalate into Confront by rule rather than by writer taste?
 
-Should Bound Path get a light Rite/Invoke extension in V1, or remain under Exchange until V2?
+Should Bound Style get a light Rite/Invoke extension in V1, or remain under Exchange until V2?
 
 ## Confront / Turn Economy
 
-How diegetic / readable is the transition into a Combat Arena (fade, cut, warning) without spoiling Attention teaching?
-
-How closely must an arena Theme Pack match the source location before it feels unfair or immersion-breaking?
+How diegetic / readable is the transition into Turn-Based Mode (cut, warning) without spoiling Attention teaching?
 
 How often may important nodes offer Confront as one option versus scenes that begin already in Confront?
 
-Exact initiative formula and Move Speed units / cells per Move for V1 arenas?
+Exact initiative formula and Move Speed units / cells per Move on the Combat Grid?
 
-Diagonal move cost on arenas: 1 or 1.5?
+Diagonal move cost on the Combat Grid: 1 or 1.5?
 
-Exact fail chance bands for vault/climb on arenas in V1?
+Exact fail chance bands for vault/climb in V1?
 
 Is Bonus-to-Dash enabled in V1 or deferred?
 
@@ -507,7 +507,7 @@ How visible should crown/nobility pressure be inside Lower Veil without adding a
 
 Wardens and Veinmarket are local groups in the slice. Are they also parts of a Major Faction in the full game?
 
-The primary opposing Major Faction appears in V1 through the Spirit General's invasion. The remaining slice questions are CC-29 and CC-32.
+The primary opposing Major Faction appears in V1 through the Spirit General's invasion. The remaining slice questions are CC-29, CC-32, and CC-33.
 
 ## Items, Inventory, Equipment, Item Creation, Enchanting, and Alchemy
 
@@ -554,7 +554,7 @@ Can the world lose magic?
 
 ## Factions
 
-The three allied Major Factions, the opposing sealed Stage 0 being and its destruction plan, the royal institution's influence, and two candidate beneficial Minor Factions are recorded in [02 World Laws](02%20World%20Laws.md). Other hostile branches, the full minor-faction roster, and the authored-versus-generated content model remain open. Stage 0 belief/anchor/sanity mechanics remain out of scope.
+The three allied Major Factions, the opposing sealed Limit 0 being and its destruction plan, the royal institution's influence, and two candidate beneficial Minor Factions are recorded in [02 World Laws](02%20World%20Laws.md). Other hostile branches, the full minor-faction roster, and the authored-versus-generated content model remain open. Limit 0 belief/anchor/sanity mechanics remain out of scope.
 
 What role does the royal institution play, and how does the antagonist's influence over it operate?
 
@@ -580,7 +580,7 @@ The target world size is decided: 3 × 3 tiles, 4200 × 4200 m ([21 Cult Campaig
 
 When does Piece-Based Assembly fully replace the single hand-placed Interior V0 template scene as authority for Interior Scenes? (Mechanism itself is locked — see Resolved Decisions above; only the V0→V1 timing is open.) ([15](15%20Procedural%20Building%20Generation.md))
 
-When does additive interior/arena load replace V0 single-scene swap? (V0 default locked in [17](17%20Game%20Systems%20Architecture.md); V1+ timing open.)
+When does additive interior load replace V0 single-scene swap? (V0 default locked in [17](17%20Game%20Systems%20Architecture.md); V1+ timing open.)
 
 How aggressive may OccultLevel visual “wrongness” be in V1 without spoiling Veil / Attention teaching?
 
@@ -642,7 +642,7 @@ Research record: [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/
 **3F-8. Per-arc data. [stage 1]** Where do the per-arc arrays of a floor-referenced carve (floor and allowed depth along the arc) live: as immutable Stage 3F data next to `FinalValleyTrajectory`, or recomputed on every evaluation? (handoff §13) Stage 3F already cuts along `FinalValleyTrajectory`: the scoped Stage 3C unfreeze asked for in `PROCEDURAL_TERRAIN_STAGE_3F_PREFLIGHT.md` §15.2 was granted and spent, API-only, by F1 (preflight §20) — `CarveField` is typed to `IValleyCarveCurve` and keeps its `RidgeSkeleton` constructor, `ValleyTrajectoryNetwork.BuildCarve` builds the carve along `FinalValleyTrajectory`, and no trajectory sample, termination, width or ordering moved. The prototype of E used that binding.
 - *Options:* (a) recomputed inside the Stage 3F module from `FinalValleyTrajectory` through its existing API on each evaluation; (b) immutable data stored on or next to `FinalValleyTrajectory`.
 - *Consequences:* (a) no new persisted data and no new unfreeze, at an evaluation cost; (b) adds data to a frozen Stage 3C type, beyond the API-only unfreeze F1 spent, so it needs a new scoped unfreeze.
-- *Agent recommendation:* (a) for stage 1; revisit only with an approved new unfreeze.
+- *Agent recommendation:* (a) for Limit 1; revisit only with an approved new unfreeze.
 
 **3F-9. Hard maximum between corridors. [stage 1]** Should `SmoothMax` between overlapping corridors become a hard maximum? It accounts for about 18 depressions and lifts plain incision above 7.25 m on 4.2 % of plain valley length (handoff §§9–10).
 - *Options:* (a) a hard maximum inside E's composition, `CarveField.Depth` unchanged; (b) change `CarveField` itself; (c) keep `SmoothMax`.
@@ -662,7 +662,7 @@ Research record: [PROCEDURAL_TERRAIN_STAGE_3F_DRAINAGE_HANDOFF.md](unity/Assets/
 **3F-12. Valley-ending semantics. [production]** Route-barrier policy (valley-ending semantics): where a declared trajectory rises more than the plain bound can cut, does the valley stop and restart downstream (gap), end (termination), or continue as a flat-filled floor? Continuity, no reappearing segments, the 7.2 m bound and D1 cannot all hold there (handoff §10). Measured on 8 seeds: ending at the first barrier is stable and creates no depression but loses 4.2 % of plain valley length and ends valleys 52–342 m inland; the prototype keeps `Declared` ends and shows 41 gaps on 34 of 299 trajectories, 36 of them on coastal turn-backs (handoff §§15–16).
 - *Options:* (a) `Declared` gaps; (b) termination at the first barrier; (c) a flat-filled floor.
 - *Consequences:* (a) shows 41 gaps on 34 of 299 trajectories, identical on every height reading (handoff §18); (b) stable, 4.2 % less plain valley, valleys end inland; (c) breaks the plain bound or D1.
-- *Agent recommendation:* `Declared` for the dump-first stage 1 with every gap reported; decide before production.
+- *Agent recommendation:* `Declared` for the dump-first Limit 1 with every gap reported; decide before production.
 
 **3F-13. Valley mouths. [later]** Is a geometric valley-mouth rule wanted for trajectories that approach the coast and turn back inland? The rule tested — end at the running minimum of the Stage 4A gate — is not a mouth: 8 of 12 such ends lie 60–160 m inland with up to 3–4 m of valley cut off, while the trajectory reaches the sea later anyway (handoff §15). A different rule would be a new variant.
 - *Options:* (a) no mouth rule in V0; (b) design a new mouth variant.
@@ -844,9 +844,9 @@ Accessibility
 
 Mod support
 
-Pathway lore names and full church/entity catalogues
+Arcana lore names and full church/entity catalogues
 
-Stages 6 → 0 content
+Limits 6 → 0 content
 
 ---
 

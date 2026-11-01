@@ -47,7 +47,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [03 Decision Engine](03%20Decision%20Engine.md) | Draft | What makes player decisions interesting |
 | [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) | Draft | Practical card for designing one important choice |
 | [04 Points of Interest](04%20Points%20of%20Interest.md) | Draft | Timed map POIs, lazy activation, missed-event residue |
-| [05 Progression](05%20Progression.md) | Draft | Advancement rules, V1 player stages 9→8, Conduct Progress, External Power Bargains |
+| [05 Progression](05%20Progression.md) | Draft | Advancement rules, V1 player Limits 9→8, Conduct Progress, External Power Bargains |
 | [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md) | Draft | 22 Arcana, ten Limits, Limit names, attribute profiles, abilities per Limit |
 | [06 Approaches](06%20Approaches.md) | Draft | Confront, Convince, Threaten, Exchange, Veil, Withdraw |
 | [07 Character Life](07%20Character%20Life.md) | Draft | Death Gap, Factionless successors, Legacy Cache, Soft Memory |
@@ -55,17 +55,17 @@ This repository is currently a design bible. Implementation begins only after th
 | [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) | Draft | Derived resources, combat values, movement, and Strength-based carrying limits |
 | [08 Confront Constraints](08%20Confront%20Constraints.md) | Draft | Hard fence around combat so it cannot become the whole game |
 | [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
-| [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Draft | Combat Arena grid + vault/climb/window verbs |
+| [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Draft | Combat Grid + vault/climb/window verbs |
 | [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) | Draft | Combat rules, equipment, and durability boundary |
-| [11 Vertical Slice](11%20Vertical%20Slice.md) | Draft | First playable proof: 1 city, player Stages 9–8, one General's invasion and ritual |
+| [11 Vertical Slice](11%20Vertical%20Slice.md) | Draft | First playable proof: 1 city, player Limits 9–8, one General's invasion and ritual |
 | [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) | Draft | Full cards for arrest, collectors, soot-stair trace |
-| [12 Engine Choice](12%20Engine%20Choice.md) | Draft | Engine locked: Unity URP, free 3P + custom arena grid TB |
-| [16 Architecture Pivot](16%20Architecture%20Pivot.md) | Draft | Spatial authority: Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront |
+| [12 Engine Choice](12%20Engine%20Choice.md) | Draft | Engine locked: Unity URP, free 3P + custom Combat Grid TB |
+| [16 Architecture Pivot](16%20Architecture%20Pivot.md) | Draft | Spatial authority: Valheim-like overworld, Genshin-like free 3P, separate interiors, Confront in place |
 | [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) | Draft | Systems map, dependency DAG, micro-iteration backlog |
 | [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md) | Draft | RPG coverage map and linked character-system drafts |
 | [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md) | Draft | Shared world-time rules for crafting, brewing, and simulation |
 | [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) | Draft | Modifier generation, weight-only inventory, durability, loot, and six Enchanting steps |
-| [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md) | Draft | Required potion-only profession for Pathway advancement |
+| [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md) | Draft | Required potion-only profession for Arcana advancement |
 | [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) | Draft | War for cities: Cult Generals, capture, liberation, Capital Gate, force generation |
 | [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) | Draft | Post-pivot world-gen order; Piece-Based Assembly |
 | [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) | Draft | Buildings/interiors via Piece-Based Assembly (small → large) |
@@ -184,7 +184,7 @@ Draft foundations in active refinement:
 - [03 Decision Engine](03%20Decision%20Engine.md) — five axes; V1 teaches Attention + Approach, then Bargain
 - [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) — practical design card
 - [04 Points of Interest](04%20Points%20of%20Interest.md) — map delivery + Active Windows + lazy activation
-- [05 Progression](05%20Progression.md) — advancement rules, player stages 9→8 in V1, churches/entities as Bargains
+- [05 Progression](05%20Progression.md) — advancement rules, player Limits 9→8 in V1, churches/entities as Bargains
 - [06 Approaches](06%20Approaches.md) — six methods of acting; combat is not the default best
 - [07 Character Life](07%20Character%20Life.md) — death gap, factionless later lives, legacy cache
 - [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md) — seven attributes, independent skill growth, Item Creation factors, and shared checks
@@ -194,8 +194,8 @@ Draft foundations in active refinement:
 - [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) — grid-native world + env verbs
 - [11 Vertical Slice](11%20Vertical%20Slice.md) — first playable proof plan
 - [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) — detailed Lower Veil encounter cards from the earlier district slice
-- [12 Engine Choice](12%20Engine%20Choice.md) — Unity locked: free 3P + custom arena grid TB
-- [16 Architecture Pivot](16%20Architecture%20Pivot.md) — Valheim-like overworld, Genshin-like free 3P, separate interiors, arena Confront (BG3 / Fallout 1–2 feel)
+- [12 Engine Choice](12%20Engine%20Choice.md) — Unity locked: free 3P + custom Combat Grid TB
+- [16 Architecture Pivot](16%20Architecture%20Pivot.md) — Valheim-like overworld, Genshin-like free 3P, separate interiors, Confront in place (BG3 / Fallout 1–2 feel)
 - [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — systems map, dependency DAG, micro-iteration backlog
 - [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md) — RPG coverage checklist; character foundation and item-system authority are cross-linked
 - [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md) — shared tick and operation-time model

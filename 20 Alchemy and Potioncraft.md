@@ -1,10 +1,10 @@
 # 20 Alchemy and Potioncraft
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft — owner-approved foundation; skill progression, mini-game, recipes, and balance remain open
 
-Last Updated: 2026-11-01 (potion-making included in the Vertical Slice.)
+Last Updated: 2026-11-01 (terms renamed to Arcana and Limit. Earlier: potion-making included in the Vertical Slice.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -22,7 +22,7 @@ This document records the approved conceptual foundation for Alchemy. It does no
 
 Alchemy is a distinct profession whose domain is potions. It does not create equipment or alter item modifiers; those domains belong to Item Creation and Enchanting.
 
-A character must learn Alchemy before advancing to a higher Pathway stage. Every Pathway-stage transition requires the correct potion, prepared through Alchemy. A correct potion still grants its target stage deterministically under [05 Progression](05%20Progression.md); the brewing mini-game is not a second, undocumented transition roll.
+A character must learn Alchemy before advancing to a higher Limit. Every Limit transition requires the correct potion, prepared through Alchemy. A correct potion still grants its target Limit deterministically under [05 Progression](05%20Progression.md); the brewing mini-game is not a second, undocumented transition roll.
 
 The currently approved Alchemy capabilities are:
 
@@ -47,11 +47,11 @@ The six-tick duration and the presence of a mini-game are approved. Whether the 
 
 # 4. Boundaries
 
-- Alchemy is required before Pathway-stage advancement; Item Creation and Enchanting cannot substitute for it.
-- The only potion category confirmed by this foundation is the Pathway advancement potion. Other potion categories and effects are not yet specified.
+- Alchemy is required before Limit advancement; Item Creation and Enchanting cannot substitute for it.
+- The only potion category confirmed by this foundation is the Arcana advancement potion. Other potion categories and effects are not yet specified.
 - This document does not introduce HP-restoring potions or supersede current recovery rules.
 - No recipe table, formula-decoding formula, ingredient-search probability, potion quality model, or numeric cost is established here.
-- The Vertical Slice includes potion-making in a limited form ([11 Vertical Slice](11%20Vertical%20Slice.md)); the V1 player reaches Stages 9–8.
+- The Vertical Slice includes potion-making in a limited form ([11 Vertical Slice](11%20Vertical%20Slice.md)); the V1 player reaches Limits 9–8.
 
 # 5. Open design questions
 
@@ -61,7 +61,7 @@ The six-tick duration and the presence of a mini-game are approved. Whether the 
 4. How are formulas discovered and decoded, ingredients identified, and ingredient locations found?
 5. What is the brewing mini-game, and how do its outcomes affect ingredient loss, potion validity, and any potion quality?
 6. Does the mini-game occur within the six world ticks or extend the elapsed time? Does it pause, advance, or otherwise interact with the shared clock?
-7. Which potion categories beyond Pathway advancement exist, if any, and how do they respect the current prohibition on HP-restoring potions?
+7. Which potion categories beyond Arcana advancement exist, if any, and how do they respect the current prohibition on HP-restoring potions?
 8. Which parts of Alchemy are required in V1, including the 9→8 and 8→7 transitions?
 9. What recipe costs, station requirements, ingredient quantities, and numeric balance values should the later balance pass propose?
 

@@ -1,10 +1,10 @@
 # 08 Confront Constraints
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Character Life row reconciled with post-manifestation defeat; 21 added as a dependent document.)
+Last Updated: 2026-11-01 (Confront runs in place on a Combat Grid. Earlier: Character Life row reconciled with post-manifestation defeat; 21 added as a dependent document.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -53,7 +53,7 @@ Kills, wounds, and wins do not grant experience levels.
 
 They may:
 
-- contribute to Open Path Conduct Progress when appropriate;
+- contribute to Open Style Conduct Progress when appropriate;
 - create Legacy residue;
 - change Influence, Symptoms, and access;
 - drop only what the target actually carried or guarded.
@@ -124,14 +124,14 @@ V1 Confront must support:
 
 These preserve Decision Engine values inside combat, instead of reducing every fight to “delete HP to zero.”
 
-## 8. Pathway bias, not Pathway prison
+## 8. Arcana bias, not Arcana prison
 
-Open Path may favour Confront and Threaten for Conduct Progress.
+Open Style may favour Confront and Threaten for Conduct Progress.
 
 Veiled and Bound Paths may treat frequent open massacres as dissonant.
 
-No Pathway may make Confront impossible if the fiction demands it.
-No Pathway may make Confront free of price.
+No Arcana may make Confront impossible if the fiction demands it.
+No Arcana may make Confront free of price.
 
 # Costs of Confront
 
@@ -170,24 +170,24 @@ Not required in V1:
 
 ## Presentation mode
 
-V1 Confront uses **Turn-Based Mode on a Combat Arena scene**.
+V1 Confront uses **Turn-Based Mode in place**, on a Combat Grid over the scene where it starts.
 
 Reference feel, not feature parity:
 
 - Baldur's Gate 3 style initiative / turn order once conflict locks in;
-- Fallout 1/2 style deliberate tactical choice on a dedicated arena.
+- Fallout 1/2 style deliberate tactical choice on cells.
 
 Rules:
 
-1. When Confront locks in, the game transitions to a **Combat Arena** scene (load or additive — implementation later). Ordinary Confront is **not** resolved in-location on the overworld or interior exploration scene.
-2. The arena is chosen from a **Theme Pack** matching the source location mood (street, tavern, cellar, woods, …). It must feel thematically related; it need not clone exact exploration geometry.
-3. Turn-Based Mode exists **only on arenas**. There is no voluntary Turn-Based Mode during free exploration.
-4. Overworld and interior scenes stay free third-person ([16 Architecture Pivot](16%20Architecture%20Pivot.md)).
-5. Break Away, Yield/Spare, and other Decision Engine outcomes remain valid inside arena Turn-Based Mode.
-6. On Confront end (win, Break Away, Yield/Spare resolution, or death), return to the source scene and apply residue.
+1. When Confront locks in, the surroundings become a **Combat Grid**. There is no separate battle scene.
+2. Real geometry is the battlefield: walls and surfaces give cover, vegetation can hide a character, and a whole city can be a battlefield.
+3. Turn-Based Mode exists **only during Confront**. There is no voluntary Turn-Based Mode during free exploration.
+4. Outside Confront, overworld and interior scenes stay free third-person ([16 Architecture Pivot](16%20Architecture%20Pivot.md)).
+5. Break Away, Yield/Spare, and other Decision Engine outcomes remain valid in Turn-Based Mode. A character can also leave the fight by moving away.
+6. On Confront end (win, Break Away, Yield/Spare resolution, or death), free movement returns and residue applies.
 7. V1 stays simple: readable turns, clear actions, solo-shippable depth. Do not chase full BG3 feature parity.
 
-This locks presentation. The tactical action economy is defined by Initiative, Action Points (AP), variable AP costs, and defensive reactions in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md). Arena spatial truth is a square grid with Environment Actions; see [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md). The wider world advances by one shared tick after each complete combat round, not during an individual turn; see [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md).
+This locks presentation. The tactical action economy is defined by Initiative, Action Points (AP), variable AP costs, and defensive reactions in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md). Spatial truth during Confront is a square grid with Environment Actions; see [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md). The wider world advances by one shared tick after each complete combat round, not during an individual turn; see [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md).
 
 # Escalation Rules
 
@@ -212,7 +212,7 @@ Some scenes may begin already in Confront.
 |--------|----------------------|
 | Decision Engine | Confront is an Approach option with price |
 | Approaches | Must not dominate Convince / Veil / Exchange / Withdraw |
-| Progression | May feed Open Path Conduct; never XP levels |
+| Progression | May feed Open Style Conduct; never XP levels |
 | POI / World Laws | Fights can interrupt Operations, create Symptoms, open Traces |
 | Character Life | Before manifestation, death in Confront triggers Death Gap and Legacy rules; after it, death is terminal defeat |
 | Bargain / External Power | Curses or blessings may help or sabotage Confront later |
@@ -237,7 +237,7 @@ Forbidden design directions:
 - Simple fight resolution with Break Away and Yield/Spare.
 - Diegetic loot only.
 - Residue on world/factions.
-- Turn-Based Mode on a thematic Combat Arena for Confront only; free exploration outside arenas.
+- Turn-Based Mode in place on a Combat Grid for Confront only; free exploration otherwise.
 
 ## V2
 
@@ -269,7 +269,7 @@ If the honest answers collapse to “just fight,” redesign.
 - **Approaches:** Compatible. Confront is fenced so it cannot erase the other five.
 - **Progression / Character Life:** Compatible. No XP; death is real; Conduct may care about open violence.
 - **World Laws / POI:** Compatible. Fights are world events with Symptoms and possible Traces.
-- **Glossary / Open Questions:** Presentation locked to Combat Arena Turn-Based Mode ([16 Architecture Pivot](16%20Architecture%20Pivot.md)). Exact action economy numbers remain open.
+- **Glossary / Open Questions:** Presentation locked to Turn-Based Mode in place on a Combat Grid ([16 Architecture Pivot](16%20Architecture%20Pivot.md)). Exact action economy numbers remain open.
 
 # Related Documents
 

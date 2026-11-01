@@ -2,17 +2,17 @@
   "id": "alchemy",
   "order": 19,
   "name": "Alchemy",
-  "title": "Potion-only profession required for Pathway advancement",
+  "title": "Potion-only profession required for Arcana advancement",
   "category": "character",
-  "summary": "Alchemy is separate from equipment Item Creation and Enchanting. Every character must learn it before Pathway-stage advancement, and every transition requires the correct Alchemy-brewed potion. Brewing takes six world ticks and includes a mini-game; the timing interaction and detailed outcomes remain open.",
+  "summary": "Alchemy is separate from equipment Item Creation and Enchanting. Every character must learn it before Limit advancement, and every transition requires the correct Alchemy-brewed potion. Brewing takes six world ticks and includes a mini-game; the timing interaction and detailed outcomes remain open.",
   "scenarioNote": "A correct advancement potion grants its target stage deterministically; no brewing scenario is authored yet.",
   "points": [
     {
-      "text": "Alchemy is a separate potion-only profession required before Pathway-stage advancement; formula decoding, ingredient identification/search/gathering, and brewing are its approved capability areas.",
+      "text": "Alchemy is a separate potion-only profession required before Limit advancement; formula decoding, ingredient identification/search/gathering, and brewing are its approved capability areas.",
       "sourceId": "src-20"
     },
     {
-      "text": "Every Pathway transition requires the correct potion; consuming it grants the target stage deterministically.",
+      "text": "Every Arcana transition requires the correct potion; consuming it grants the target stage deterministically.",
       "sourceId": "src-05"
     },
     {

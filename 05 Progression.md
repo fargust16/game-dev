@@ -1,16 +1,16 @@
 # 05 Progression
 
-Version: 0.13
+Version: 0.14
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Pathways become Arcana and Stages become Limits, with content moved to 05.1; two abilities per Limit; Stage 1 demotion and occupancy corrected for faction Arcana. Earlier: 22 Tarot-archetype Pathways recorded, with six named; the V1 player reaches Stages 9–8 and Stage 7 is for NPCs only. Earlier: the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
+Last Updated: 2026-11-01 (terms renamed to Arcana and Limit. Earlier: Pathways become Arcana and Stages become Limits, with content moved to 05.1; two abilities per Limit; Stage 1 demotion and occupancy corrected for faction Arcana. Earlier: 22 Tarot-archetype Pathways recorded, with six named; the V1 player reaches Stages 9–8 and Stage 7 is for NPCs only. Earlier: the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
 
 Referenced By:
-[06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), future pathway content, church/entity bargains, character growth, and combat tuning.
+[06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), future arcana content, church/entity bargains, character growth, and combat tuning.
 
 ---
 
@@ -26,55 +26,55 @@ Progression must reinforce:
 - living finite worlds;
 - solo-achievable scope.
 
-It does **not** define lore names, full spell lists, or all pathway stages. Those come later as content that obeys this system.
+It does **not** define lore names, full spell lists, or all arcana Limits. Those come later as content that obeys this system.
 
 # Central Rule
 
-There is no character-wide experience bar and no generic character level-up. Ordinary attributes and individual skills have their own action-based progression tracks, defined in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md). This ordinary development is separate from Pathway stages.
+There is no character-wide experience bar and no generic character level-up. Ordinary attributes and individual skills have their own action-based progression tracks, defined in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md). This ordinary development is separate from Limits.
 
 A character grows by:
 
-1. walking a **Pathway**;
-2. discovering stage requirements;
+1. walking a **Arcana**;
+2. discovering Limit requirements;
 3. gathering seed-specific formula knowledge and ingredients;
 4. accepting the Bargain of advancement;
-5. changing how they act in the world between stages.
+5. changing how they act in the world between Limits.
 
 Player Knowledge survives worlds.
-Character Pathway power dies with the Character Life, except as Legacy traces and remembered methods.
+Character Arcana power dies with the Character Life, except as Legacy traces and remembered methods.
 
 
 # Ordinary Attribute and Skill Development
 
-Ordinary character development is based on practising actions. Attributes and individual skills have separate progress tracks; relevant actions develop them automatically. This does not create a global character level or replace Pathway advancement. See [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
+Ordinary character development is based on practising actions. Attributes and individual skills have separate progress tracks; relevant actions develop them automatically. This does not create a global character level or replace Arcana advancement. See [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
 
-# Pathway
+# Arcana
 
-A **Pathway** is a long character-growth track with staged advancements.
+A **Arcana** is a long character-growth track with tiered advancements.
 
 The Vertical Slice offers one or two Arcana to the player ([05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md)).
 
-The set must remain expandable later. New Pathways may be added if each one creates a distinct way of acting, not merely a different damage type.
+The set must remain expandable later. New Arcana may be added if each one creates a distinct way of acting, not merely a different damage type.
 
 ## Distinct by way of acting
 
-The three V1 Pathways are separated primarily by preferred Approaches and conduct, not by raw stronger numbers.
+The three V1 Arcana are separated primarily by preferred Approaches and conduct, not by raw stronger numbers.
 
 Design labels for V1 (not final lore names):
 
 | Design label | Preferred way of acting | Typical closed style |
 |--------------|-------------------------|----------------------|
-| Open Path | direct confrontation, open presence, intimidation, frontal deals | stealth-first invisibility fantasy |
-| Veiled Path | stealth, eavesdropping, misdirection, unseen leverage | loud public dominance fantasy |
-| Bound Path | bargains, debts, rites, mediated power through others/entities | pure self-reliant no-debt fantasy |
+| Open Style | direct confrontation, open presence, intimidation, frontal deals | stealth-first invisibility fantasy |
+| Veiled Style | stealth, eavesdropping, misdirection, unseen leverage | loud public dominance fantasy |
+| Bound Style | bargains, debts, rites, mediated power through others/entities | pure self-reliant no-debt fantasy |
 
-These labels describe ways of acting. Pathway names are in the next section, and how they map onto these labels is open. The rule that matters: each Pathway should make some Approaches easier or more natural and make others costlier or more dissonant.
+These labels describe ways of acting. Arcana names are in the next section, and how they map onto these labels is open. The rule that matters: each Arcana should make some Approaches easier or more natural and make others costlier or more dissonant.
 
-A Pathway is not a perfect build. It is a commitment with closed doors.
+An Arcana is not a perfect build. It is a commitment with closed doors.
 
-## The 22 Pathways
+## The 22 Arcana
 
-The game has **22 Arcana**, one for each Major Arcana archetype of the Tarot. An Arcana is what this document calls a Pathway. Each has ten **Limits**, the Stages of this document, tied to the ten Sephiroth, and each Limit has its own name. The tables, faction assignments, and attribute profiles are in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
+The game has **22 Arcana**, one for each Major Arcana archetype of the Tarot. An Arcana is what this document calls an Arcana. Each has ten **Limits**, the Limits of this document, tied to the ten Sephiroth, and each Limit has its own name. The tables, faction assignments, and attribute profiles are in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
 
 The sealed being and the Spirit General belong to the Emperor Arcana. Other cult followers belong to the Emperor, Empress, or Hierophant Arcana.
 
@@ -84,136 +84,136 @@ The remaining 16 Arcana are prepared after the Vertical Slice is proven.
 
 Each Limit grants two abilities and raises the Arcana's primary attributes. Abilities can be passive or active, and combat or exploration, in a mix that differs by Arcana. Active abilities cost Will Power. NPCs use the same abilities as the player. The abilities themselves are listed later (CC-29).
 
-# How a Pathway Is Obtained
+# How an Arcana Is Obtained
 
 A character does not begin locked in a prison.
 
 ## Soft faction nudge
 
-When a character has a faction (the world's first character via Starting Faction, or any later character after Faction Entry), that faction gently pushes toward **one** recommended Pathway:
+When a character has a faction (the world's first character via Starting Faction, or any later character after Faction Entry), that faction gently pushes toward **one** recommended Arcana:
 
 - through mentors, rites, rumours, starter clues, or early POIs;
 - never as the only mechanically possible path;
 - never as permanent moral ownership of the player.
 
-Factionless characters receive no faction Pathway nudge until they earn membership.
+Factionless characters receive no faction Arcana nudge until they earn membership.
 
 In the Vertical Slice a character can join the one joinable faction or find potion recipes alone, including the cult's ([11 Vertical Slice](11%20Vertical%20Slice.md)).
 
 ## Alternative acquisition
 
-A Pathway may also be obtained through:
+An Arcana may also be obtained through:
 
 - a Bargain;
 - a quest / Decision Node / POI chain;
 - discovery of a formula and a willing or dangerous initiator.
 
-Refusal remains valid. A character may remain Pathless longer, weaker in staged power but freer in Approaches.
+Refusal remains valid. A character may remain Uninitiated longer, weaker in tiered power but freer in Approaches.
 
-# Stages
+# Limits
 
-Pathways use descending stages inspired by the agreed progression fantasy:
+Arcana use descending Limits inspired by the agreed progression fantasy:
 
 `9 → 8 → 7 → ... → 0`
 
 Lower number means deeper advancement and sharper price.
 
-## V1 stage scope
+## V1 Limit scope
 
 In V1 the player reaches only:
 
 `9 → 8`
 
-Stage 9 is a certain goal within a Vertical Slice run, and Stage 8 takes directed effort. Stage 7 exists in V1 for NPCs only.
+Limit 9 is a certain goal within a Vertical Slice run, and Limit 8 takes directed effort. Limit 7 exists in V1 for NPCs only.
 
-Stages `6 → 0` are reserved for later documents and content. No implementation may assume their full rules yet.
+Limits `6 → 0` are reserved for later documents and content. No implementation may assume their full rules yet.
 
-World actors at deeper stages, such as the Stage 2 Cult Generals of [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), can appear in V1 as allies and enemies. They do not widen the stages available to the player.
+World actors at deeper Limits, such as the Limit 2 Cult Generals of [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), can appear in V1 as allies and enemies. They do not widen the Limits available to the player.
 
-## Stage Occupancy Rule
+## Limit Occupancy Rule
 
-The deepest stages are limited on every Pathway, including the one the player chooses:
+The deepest Limits are limited on every Arcana, including the one the player chooses:
 
-- While a Pathway's Stage 0 is occupied, that Pathway has no Stage 1.
-- While a Pathway's Stage 0 is unoccupied, that Pathway has at most three Stage 1 practitioners at a time.
-- Stage 2 has no limit.
-- When someone reaches Stage 0, every Stage 1 practitioner of that Pathway moves back to Stage 2 automatically.
+- While an Arcana's Limit 0 is occupied, that Arcana has no Limit 1.
+- While an Arcana's Limit 0 is unoccupied, that Arcana has at most three Limit 1 practitioners at a time.
+- Limit 2 has no limit.
+- When someone reaches Limit 0, every Limit 1 practitioner of that Arcana moves back to Limit 2 automatically.
 
-This is a law of the world, not a difficulty or balance setting. It is why followers on a god's own Arcana stop at Stage 2, whether cult or allied. A faction's other Arcana may have a free Stage 0 and so reach Stage 1.
+This is a law of the world, not a difficulty or balance setting. It is why followers on a god's own Arcana stop at Limit 2, whether cult or allied. A faction's other Arcana may have a free Limit 0 and so reach Limit 1.
 
-This is a price of following a god: a faction's Pathway probably has its Stage 0 occupied. The character does not know at first which Pathway belongs to which deity and must find out through dialogue and investigation, or take the risk and stop at Stage 2.
+This is a price of following a god: a faction's Arcana probably has its Limit 0 occupied. The character does not know at first which Arcana belongs to which deity and must find out through dialogue and investigation, or take the risk and stop at Limit 2.
 
-Which Pathways have an occupied Stage 0 is open ([99 Open Questions](99%20Open%20Questions.md) CC-22).
+Which Arcana have an occupied Limit 0 is open ([99 Open Questions](99%20Open%20Questions.md) CC-22).
 
-## Changing Pathway
+## Changing Arcana
 
-From Stage 5 and deeper, a character can change to an adjacent Pathway, for example when their own Stage 0 is occupied and an adjacent one is free. This costs much more Sanity than advancing along their own Pathway. The detailed rules come later.
+From Limit 5 and deeper, a character can change to an adjacent Arcana, for example when their own Limit 0 is occupied and an adjacent one is free. This costs much more Sanity than advancing along their own Arcana. The detailed rules come later.
 
 ## No skipping
 
 A character cannot drink or otherwise consume advancements from 9 straight to 0.
 
-Each stage requires:
+Each Limit requires:
 
-1. eligibility from the previous stage (or Pathless entry into 9);
-2. between-stage progress;
+1. eligibility from the previous Limit (or Uninitiated entry into 9);
+2. between-Limit progress;
 3. the correct formula knowledge for this World Seed;
 4. the correct ingredients / conditions for this World Seed;
-5. acceptance of that stage's Bargain / price.
+5. acceptance of that Limit's Bargain / price.
 
-# Pathway Stages and Ordinary Character Development
+# Limits and Ordinary Character Development
 
-Pathway stages and ordinary character development are **separate, interacting dimensions** of character power.
+Limits and ordinary character development are **separate, interacting dimensions** of character power.
 
-- Ordinary attributes and individual skills can be developed continuously through their own action-based progression tracks, whether or not the character has a Pathway.
-- Pathway stages do not cap, unlock, or otherwise limit ordinary attribute or skill progression.
-- A Pathless character can therefore develop attributes and skills to levels comparable with a character on Stage 9. The Pathless character does not gain the Pathway's mystical abilities or stage-granted powers, so comparable ordinary statistics do not imply identical overall capabilities.
-- A character's Pathway stage is not a character level and does not determine their exact attributes or skills.
+- Ordinary attributes and individual skills can be developed continuously through their own action-based progression tracks, whether or not the character has an Arcana.
+- Limits do not cap, unlock, or otherwise limit ordinary attribute or skill progression.
+- An Uninitiated character can therefore develop attributes and skills to levels comparable with a character on Limit 9. The Uninitiated character does not gain the Arcana's mystical abilities or Limit-granted powers, so comparable ordinary statistics do not imply identical overall capabilities.
+- A character's Limit is not a character level and does not determine their exact attributes or skills.
 
-## Stage Requirements and Advancement Benefits
+## Limit Requirements and Advancement Benefits
 
-Each Pathway has deterministic, predefined requirements for each of its stages. These requirements specify the relevant attributes and their required levels; the exact attributes and numeric thresholds are to be designed separately for each Pathway and stage.
+Each Arcana has deterministic, predefined requirements for each of its Limits. These requirements specify the relevant attributes and their required levels; the exact attributes and numeric thresholds are to be designed separately for each Arcana and Limit.
 
-Advancement to the next stage grants a predefined baseline package associated with that stage. Depending on the Pathway and stage, this package may include increases to specified core attributes, skills, abilities, and/or mystical capabilities. The exact packages are not defined here.
+Advancement to the next Limit grants a predefined baseline package associated with that Limit. Depending on the Arcana and Limit, this package may include increases to specified core attributes, skills, abilities, and/or mystical capabilities. The exact packages are not defined here.
 
 The attribute requirements are not caps on ordinary development. They define the intended preparation profile for advancement. Falling short of that profile does not by itself prevent the character from advancing: the character can still complete the transition, but insufficient preparation increases the Sanity loss. Better preparation reduces that risk. The exact preparation margin and Sanity-loss calculation remain open.
 
-Each Pathway-stage transition has exactly **two primary attributes** and **one secondary attribute** as its preparation requirements:
+Each Limit transition has exactly **two primary attributes** and **one secondary attribute** as its preparation requirements:
 
-- The two primary attributes are fixed for the entire Pathway and express its stable identity. For each target stage, both must reach that stage's prescribed attribute band.
-- The secondary attribute is selected per World Seed for each Pathway-stage combination. It may differ between worlds, but remains fixed within a given world. The table in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md) names one per Arcana, and how the two fit is open (CC-31).
-- The secondary requirement is lower than the primary requirements. Its exact band offset by target stage must follow the agreed stage-group mapping; numeric attribute thresholds and the final band mapping remain to be specified.
+- The two primary attributes are fixed for the entire Arcana and express its stable identity. For each target Limit, both must reach that Limit's prescribed attribute band.
+- The secondary attribute is selected per World Seed for each Limit combination. It may differ between worlds, but remains fixed within a given world. The table in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md) names one per Arcana, and how the two fit is open (CC-31).
+- The secondary requirement is lower than the primary requirements. Its exact band offset by target Limit must follow the agreed Limit-group mapping; numeric attribute thresholds and the final band mapping remain to be specified.
 - Shortfalls in either primary attribute add a substantially larger Sanity penalty than a shortfall in the secondary attribute. Any shortfall adds some penalty, and a larger gap produces a larger penalty.
-- Requirements are evaluated against the target stage being entered, not the stage being left.
+- Requirements are evaluated against the target Limit being entered, not the Limit being left.
 
 The exact attribute-to-band thresholds and numeric penalty curve remain open.
 
-The Pathway's stage requirements and advancement benefits are deterministic within that Pathway's design; they are not randomly rolled per character or changed by the world-difficulty setting.
+The Arcana's Limit requirements and advancement benefits are deterministic within that Arcana's design; they are not randomly rolled per character or changed by the world-difficulty setting.
 
-## Character Strength Within and Across Stages
+## Character Strength Within and Across Limits
 
-Characters at the same Pathway stage may have different attributes and skills because their ordinary development, experience, and histories differ. Stage membership must not assign every character an identical or narrowly fixed stat block.
+Characters at the same Limit may have different attributes and skills because their ordinary development, experience, and histories differ. Limit membership must not assign every character an identical or narrowly fixed stat block.
 
 Generated character populations should nevertheless remain plausible and gradual:
 
-- As Pathway stage advances (toward Stage 0), the typical attribute level should trend upward.
-- Distributions for adjacent stages may overlap. A character on a lower stage can be stronger in ordinary attributes or skills than an individual on the next higher stage.
-- The overlap should be controlled rather than extreme: ordinary NPCs on Stage 9 should typically have modest, plausible attributes rather than exceptional values. High attributes may occur through individual development, but must remain uncommon among ordinary inhabitants; stage membership alone must not imply unusually high attributes.
-- Stage distribution and attribute/skill distribution are related but distinct generation decisions. World difficulty may shift how frequently higher stages and stronger characters are generated, but it must not change the canonical formulas or make all characters at a stage equally strong.
+- As Limit advances (toward Limit 0), the typical attribute level should trend upward.
+- Distributions for adjacent Limits may overlap. A character on a lower Limit can be stronger in ordinary attributes or skills than an individual on the next higher Limit.
+- The overlap should be controlled rather than extreme: ordinary NPCs on Limit 9 should typically have modest, plausible attributes rather than exceptional values. High attributes may occur through individual development, but must remain uncommon among ordinary inhabitants; Limit membership alone must not imply unusually high attributes.
+- Limit distribution and attribute/skill distribution are related but distinct generation decisions. World difficulty may shift how frequently higher Limits and stronger characters are generated, but it must not change the canonical formulas or make all characters at a Limit equally strong.
 
-A character's social role, influence, agenda, and likelihood of appearing in a local encounter are determined by world and actor systems, not by Pathway stage alone. Very high-stage figures should be rare and their presence in the world should follow their role and agenda rather than arbitrary local spawning.
+A character's social role, influence, agenda, and likelihood of appearing in a local encounter are determined by world and actor systems, not by Limit alone. Very high-Limit figures should be rare and their presence in the world should follow their role and agenda rather than arbitrary local spawning.
 
-# Between-Stage Progress
+# Between-Limit Progress
 
-Between potions or equivalent advancements, the character must accumulate **Conduct Progress** for their Pathway.
+Between potions or equivalent advancements, the character must accumulate **Conduct Progress** for their Arcana.
 
 Conduct Progress is not XP from kills.
 
-It is evidence that the character is living the Pathway's way of acting:
+It is evidence that the character is living the Arcana's way of acting:
 
-- Open Path examples: open confrontation, intimidation, refusing unseen escape when a direct stand is available;
-- Veiled Path examples: stalking, eavesdropping, avoiding open identity, solving without public force;
-- Bound Path examples: making and honouring bargains, using mediated power, accepting debts deliberately.
+- Open Style examples: open confrontation, intimidation, refusing unseen escape when a direct stand is available;
+- Veiled Style examples: stalking, eavesdropping, avoiding open identity, solving without public force;
+- Bound Style examples: making and honouring bargains, using mediated power, accepting debts deliberately.
 
 ## Anti-guide rule
 
@@ -222,15 +222,15 @@ Conduct requirements must not collapse into a permanent solved checklist such as
 Rules:
 
 1. V1 requirements stay simple and readable.
-2. Higher future stages must become more contextual ("intimidate a stronger foe", "spare someone when killing is easier").
+2. Higher future Limits must become more contextual ("intimidate a stronger foe", "spare someone when killing is easier").
 3. World Seed may change which specific opportunities count.
-4. Acting against Pathway conduct is possible, but slows or endangers clean advancement and may create dissonant side effects.
+4. Acting against Arcana conduct is possible, but slows or endangers clean advancement and may create dissonant side effects.
 
 This keeps Player Knowledge valuable as judgment, not as a wiki route.
 
 # Formulas and Ingredients
 
-Advancement uses discoverable formulas and ingredients. Every character must learn Alchemy before making a Pathway-stage advancement, and each transition requires its correct Alchemy-brewed potion. Alchemy is potion-only and does not replace Item Creation or Enchanting. The profession foundation and brewing rules are in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
+Advancement uses discoverable formulas and ingredients. Every character must learn Alchemy before making a Limit advancement, and each transition requires its correct Alchemy-brewed potion. Alchemy is potion-only and does not replace Item Creation or Enchanting. The profession foundation and brewing rules are in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
 
 Rules:
 
@@ -244,45 +244,45 @@ This prevents autopilot multi-world clearing while preserving Knowledge as under
 
 # Bargain of Advancement
 
-Every stage advancement is a Bargain.
+Every Limit advancement is a Bargain.
 
-Possible prices include, according to Pathway and stage:
+Possible prices include, according to Arcana and Limit:
 
 - lasting vulnerability;
 - obligation;
 - visible or hidden Symptom attraction;
 - narrowed dialogue options;
 - bodily, social, or spiritual distortion;
-- future loss of control risk at deeper stages.
+- future loss of control risk at deeper Limits.
 
 Refusal of a ready advancement is valid and sometimes wise.
 
 
 # Sanity Loss and Loss of Character Control
 
-Pathway advancement itself is deterministic: consuming the correct advancement potion completes the stage transition. There is no random success/failure roll for the transition.
+Arcana advancement itself is deterministic: consuming the correct advancement potion completes the Limit transition. There is no random success/failure roll for the transition.
 
 The transition's Sanity cost is resolved in this order:
 
-1. Consume the correct potion and advance to the target stage.
-2. Calculate the mandatory Sanity cost for that Pathway-stage transition. This cost applies even with ideal preparation.
+1. Consume the correct potion and advance to the target Limit.
+2. Calculate the mandatory Sanity cost for that Limit transition. This cost applies even with ideal preparation.
 3. Calculate the additional preparation penalty from any attribute shortfalls. Primary-attribute deficits weigh substantially more than the secondary-attribute deficit; larger gaps cause larger penalties.
 4. Subtract both costs from current Sanity and determine whether the character retains their sanity.
 
 Conceptually: `Sanity_after = Sanity_before − Mandatory_Transition_Cost − Preparation_Penalty`.
 
-Losing sanity does **not** cancel or reverse the advancement. The character receives the new stage but permanently ceases to be an ordinary player-controlled character. The former character remains in the world as a game-controlled monster/creature. This is a loss of character control, not ordinary death.
+Losing sanity does **not** cancel or reverse the advancement. The character receives the new Limit but permanently ceases to be an ordinary player-controlled character. The former character remains in the world as a game-controlled monster/creature. This is a loss of character control, not ordinary death.
 
-The creature's form depends on the stage reached:
+The creature's form depends on the Limit reached:
 
-- **Stages 9–6:** the default outcome is a human-shaped zombie. It is treated as a monster by game systems while retaining a human-like appearance and movement.
-- **Stages 5–0:** a mystical monster form becomes possible. The form is specific to the character's Pathway and reached stage, but this transformation is only a chance, not an automatic consequence. The character may instead remain a human-shaped zombie.
+- **Limits 9–6:** the default outcome is a human-shaped zombie. It is treated as a monster by game systems while retaining a human-like appearance and movement.
+- **Limits 5–0:** a mystical monster form becomes possible. The form is specific to the character's Arcana and reached Limit, but this transformation is only a chance, not an automatic consequence. The character may instead remain a human-shaped zombie.
 
 The exact mandatory Sanity costs, preparation-penalty curve, sanity-retention threshold/probability, and probability of a mystical form remain open.
 
 # External Power: Churches and Entities
 
-Separate from Pathway staging, a character may seek power from:
+Separate from Arcana staging, a character may seek power from:
 
 - churches / deities;
 - otherworldly entities;
@@ -298,7 +298,7 @@ Rules:
 4. Early price may look minor.
 5. Later effects may distort behaviour, block some dialogues, interfere in conflict, or temporarily seize control.
 6. Refusal remains valid.
-7. External Power may support, conflict with, or corrupt a Pathway. It must never be free fuel for a perfect build.
+7. External Power may support, conflict with, or corrupt an Arcana. It must never be free fuel for a perfect build.
 
 V1 documents the rules above. Concrete pantheons, entity names, and blessing lists come later.
 
@@ -306,7 +306,7 @@ V1 documents the rules above. Concrete pantheons, entity names, and blessing lis
 
 Player Knowledge may help the player:
 
-- recognise Pathway tells and soft faction nudges;
+- recognise Arcana tells and soft faction nudges;
 - judge when a Bargain's delayed price is too sharp;
 - know how to search for formulas without knowing this seed's exact recipe;
 - understand that rescue-now versus trail-later choices also shape Conduct Progress;
@@ -318,35 +318,35 @@ Player Knowledge must not become a hidden +success% table that deletes decision 
 
 | Axis | Progression use |
 |------|-----------------|
-| Attention | noticing formula traces, church tells, entity lures, stage opportunities |
-| Approach | living a Pathway's way of acting; combat is only one method |
+| Attention | noticing formula traces, church tells, entity lures, Limit opportunities |
+| Approach | living an Arcana's way of acting; combat is only one method |
 | Allegiance | faction nudge, church loyalty, betrayal of a path's patrons |
 | Commitment | ingredients, debts, world-time spent on advancement |
-| Bargain | every stage-up and every external power offer |
+| Bargain | every Limit-up and every external power offer |
 
 # Solo Scope
 
 ## V1
 
 - one or two player Arcana with different styles of play;
-- player stages 9 → 8 only, with Stage 7 for NPCs;
+- player Limits 9 → 8 only, with Limit 7 for NPCs;
 - one joinable faction;
-- alternative Pathway acquisition via Bargain / quest / discovery;
+- alternative Arcana acquisition via Bargain / quest / discovery;
 - simple Conduct Progress;
 - seed-varying formulas/ingredients;
 - External Power Bargain rules for churches/entities without full content lists;
-- Pathless play remains possible.
+- Uninitiated play remains possible.
 
 ## V2
 
 - richer contextual Conduct requirements;
-- more interaction between External Power and Pathway dissonance;
+- more interaction between External Power and Arcana dissonance;
 - clearer Symptom language for advancement side effects.
 
 ## V3
 
-- stages below 7;
-- more Pathways, still distinct by acting style;
+- Limits below 7;
+- more Arcana, still distinct by acting style;
 - advanced delayed control-loss Bargains;
 - cross-life Legacy traces of failed or unfinished advancements.
 
@@ -358,8 +358,8 @@ Do not design yet inside this document:
 - complete ingredient encyclopedias;
 - full church pantheon;
 - named entity bestiary;
-- stages 6 → 0;
-- combat numeric balancing per stage.
+- Limits 6 → 0;
+- combat numeric balancing per Limit.
 
 # Design Validation
 
@@ -374,8 +374,8 @@ Any Progression feature must answer yes:
 # Documentation Review
 
 - **Vision / Pillars:** Compatible. Growth is discovery-priced commitment, not grind levels.
-- **Meta Loop:** Compatible. Player Knowledge transfers; character stage power does not flatten the next world.
-- **Decision Engine:** Compatible. Advancement and External Power are Bargain surfaces; Pathways bias Approaches without deleting alternatives.
+- **Meta Loop:** Compatible. Player Knowledge transfers; character Limit power does not flatten the next world.
+- **Decision Engine:** Compatible. Advancement and External Power are Bargain surfaces; Arcana bias Approaches without deleting alternatives.
 - **World Laws / POI:** Compatible. Formulas, churches, and entity offers can be delivered as timed discoveries and Decision Nodes.
 - **Glossary / Open Questions:** Updated; remaining content counts and exact Conduct tables stay open where needed.
 

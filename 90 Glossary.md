@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.68
+Version: 0.69
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Arcana, Limit, and Sephira added; Stage Occupancy Rule corrected. Earlier: Pathway updated for the 22 Tarot archetypes and V1 player stages. Earlier: Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-01 (Combat Grid replaces Combat Arena and Theme Pack; Arcana and Limit replace the earlier terms. Earlier: Arcana, Limit, and Sephira added; Stage Occupancy Rule corrected. Earlier: Pathway updated for the 22 Tarot archetypes and V1 player stages. Earlier: Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -180,7 +180,7 @@ A smaller group pursuing bounded local needs and interests. It may be beneficial
 
 ## True God / False God
 
-Competing in-world titles used by followers for the sealed Stage 0 Being. Neither title settles the being's objective nature or the setting's moral interpretation of it.
+Competing in-world titles used by followers for the sealed Limit 0 Being. Neither title settles the being's objective nature or the setting's moral interpretation of it.
 
 ---
 
@@ -234,7 +234,7 @@ An NPC's internal point at which survival matters enough to offer information or
 
 ## World Collapse
 
-The terminal transition of a world after Balance is irreversibly broken and a Major Faction's objective dominates. The sealed Stage 0 Being's return is one possible terminal catastrophe. World Collapse is caused by world state, never by a timer.
+The terminal transition of a world after Balance is irreversibly broken and a Major Faction's objective dominates. The sealed Limit 0 Being's return is one possible terminal catastrophe. World Collapse is caused by world state, never by a timer.
 
 ---
 
@@ -314,7 +314,7 @@ Rewards that exist because a target carried or guarded them, not because a fight
 
 ## Tactical Combat
 
-Turn-based combat used only for Confront on a square-grid **Combat Arena** scene. Combatants act in Initiative order and spend Action Points (AP) on movement, attacks, abilities, and other actions. The shared world advances by one tick after each complete combat round, not during individual turns. See [08 Confront Constraints](08%20Confront%20Constraints.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), and [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md).
+Turn-based combat used only for Confront, in place on a square **Combat Grid**. Combatants act in Initiative order and spend Action Points (AP) on movement, attacks, abilities, and other actions. The shared world advances by one tick after each complete round, not during an individual turn. See [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
 
 ---
 
@@ -326,7 +326,7 @@ Combat uses an Action Point (AP) pool. At the start of a character's turn, the c
 
 ## Vertical Slice
 
-The smallest playable prototype that proves the game fantasy and core systems without building the full game. It is one city and a small territory at player Stages 9–8, built around the Spirit General's invasion on day 1–2 and a ritual the player must stop.
+The smallest playable prototype that proves the game fantasy and core systems without building the full game. It is one city and a small territory at player Limits 9–8, built around the Spirit General's invasion on day 1–2 and a ritual the player must stop.
 
 ---
 
@@ -350,13 +350,13 @@ Placeholder name for a district of the Vertical Slice's city: a poor/industrial 
 
 ## Grid World
 
-**Pre-pivot term.** Post-pivot, square-grid gameplay truth applies on **Combat Arenas only**. Overworld and interiors are free third-person spaces. See [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md).
+**Pre-pivot term.** Square-grid gameplay truth now applies only during Confront, on a **Combat Grid**. Outside Confront, overworld and interiors are free third-person spaces. See [16 Architecture Pivot](16%20Architecture%20Pivot.md) and [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md).
 
 ---
 
 ## Architecture Pivot
 
-2026-08-07 presentation split: Valheim-like seeded overworld, Genshin-like free third-person move, separate interior scenes (no grid), Confront on thematic Combat Arenas. Authority: [16 Architecture Pivot](16%20Architecture%20Pivot.md).
+2026-08-07 presentation split: Valheim-like seeded overworld, Genshin-like free third-person move, separate interior scenes. Confront runs in place on a Combat Grid since 2026-11-01. Authority: [16 Architecture Pivot](16%20Architecture%20Pivot.md).
 
 ---
 
@@ -384,15 +384,9 @@ Separate scene (or equivalent isolated space) entered from an overworld door/por
 
 ---
 
-## Combat Arena
+## Combat Grid
 
-Dedicated turn-based Confront scene using the AP-based combat system. Chosen from a Theme Pack matching the source location mood; not a 1:1 clone of exploration geometry. Return applies residue. See [08](08%20Confront%20Constraints.md) and [16](16%20Architecture%20Pivot.md).
-
----
-
-## Theme Pack
-
-Greybox arena kit tagged by mood (street, tavern, cellar, woods, …) used when Confront starts. See [16 Architecture Pivot](16%20Architecture%20Pivot.md).
+The square grid that covers the surroundings during Confront, built from the scene's real geometry, so a whole city can be a battlefield. It replaces the retired Combat Arena. See [08](08%20Confront%20Constraints.md) and [16](16%20Architecture%20Pivot.md).
 
 ---
 
@@ -596,7 +590,7 @@ Long-term dress library: tileable materials, doors, windows, roof elements, trim
 
 ## Environment Action
 
-On **Combat Arenas**, a turn verb that uses tagged scenery — vault/jump, climb, mantle, breach — usually as an Action with readable failure costs. Overworld/interior interacts are diegetic continuous-space actions, not grid turn verbs.
+On the **Combat Grid**, a turn verb that uses tagged scenery — vault/jump, climb, mantle, breach — usually with readable failure costs. Overworld/interior interacts are diegetic continuous-space actions outside Confront.
 
 ---
 
@@ -696,37 +690,37 @@ Capability granted by otherworldly entities, churches, deities, or similar sourc
 
 ---
 
-## Pathway
+## Arcana
 
-The earlier word for an Arcana: a staged character-growth track distinct by way of acting. Older documents still use it. V1 has one or two player Arcana and player stages 9 → 8, with Stage 7 for NPCs only.
+One of 22 character-growth tracks, each a Tarot Major Arcana archetype, distinct by way of acting. It has ten Limits. V1 offers two to the player, with player Limits 9–8 and Limit 7 for NPCs only. See [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
 
 ---
 
-## Stage
+## Limit
 
-A numbered depth on a Pathway. Lower numbers are deeper advancements with sharper prices. V1 uses 9, 8, and 7 only.
+One of ten numbered depths within an Arcana, 9 to 0, each tied to a Sephira and with its own name. Each grants two abilities and raises primary attributes. Lower numbers are deeper advancements with sharper prices.
 
-## Stage 0 Being
+## Limit 0 Being
 
-A person who has reached Pathway Stage 0 and is regarded as divine-level in the setting. Existing Stage 0 beings are a setting premise; Stage 0 progression, anchors, and the belief/sanity mechanism are out of scope. See [02 World Laws](02%20World%20Laws.md).
+A person who has reached Limit 0 and is regarded as divine-level in the setting. Existing Limit 0 beings are a setting premise; Limit 0 progression, anchors, and the belief/sanity mechanism are out of scope. See [02 World Laws](02%20World%20Laws.md).
 
 ---
 
 ## Conduct Progress
 
-Between-stage advancement evidence earned by living a Pathway's way of acting. It is not kill-XP and must not become a permanently solved checklist.
+Between-Limit advancement evidence earned by living an Arcana's way of acting. It is not kill-XP and must not become a permanently solved checklist.
 
 ---
 
 ## Formula
 
-Discoverable advancement knowledge required for a Pathway stage. Concrete formulas vary by World Seed.
+Discoverable advancement knowledge required for a Limit. Concrete formulas vary by World Seed.
 
 ---
 
-## Pathless
+## Uninitiated
 
-A character state with no Pathway yet. Valid and sometimes freer, but without staged Pathway advancements.
+A character state with no Arcana yet. Valid and sometimes freer, but without Limit advancements.
 
 ---
 
@@ -1034,7 +1028,7 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Item base** — A defined item identity with foundational properties and a modifier-weight table. A base may be used at an item stage when its required materials are available. See [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md).
 
-**Item stage** — The item's stage on the 9-to-0 item progression scale. It affects applicable resources and modifier-tier probabilities. It is distinct from a Character's Pathway stage and a skill progression step.
+**Item stage** — The item's stage on the 9-to-0 item progression scale. It affects applicable resources and modifier-tier probabilities. It is distinct from a Character's Limit and a skill progression step.
 
 **Major / minor modifier** — One of two modifier groups. An item can hold at most three of each. Group assignment is random, subject to the capacity limit; a modifier keeps its group when reforged or transferred.
 
@@ -1058,9 +1052,9 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Quality colour** — The agreed display colour family for item category: Normal grey/desaturated, Magic green, Rare cyan/light blue, Epic purple, Legendary yellow-orange, Unique red. Exact colour values and final UI treatment remain open.
 
-**Alchemy** — A potion-only profession, separate from Item Creation and Enchanting. A character must learn it before Pathway-stage advancement. It discovers recipes, identifies and finds ingredients, and brews potions; its approved foundation is in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
+**Alchemy** — A potion-only profession, separate from Item Creation and Enchanting. A character must learn it before Limit advancement. It discovers recipes, identifies and finds ingredients, and brews potions; its approved foundation is in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
 
-**Manifestation of the Sealed Being** — The state in which the sealed Stage 0 being has returned to the living world. From manifestation onward, player-character death ends the playable story in defeat and no same-world successor appears, even if the being is later defeated.
+**Manifestation of the Sealed Being** — The state in which the sealed Limit 0 being has returned to the living world. From manifestation onward, player-character death ends the playable story in defeat and no same-world successor appears, even if the being is later defeated.
 
 **Cult Ritual** — A timed operation of the opposing faction through which it captures a city and turns it into a Place of Power. Its current campaign window is six in-game hours (360 World Ticks), with no player-facing numeric countdown; the operation resolves through faction action when the window ends. Its place within City Capture, its effect on the city, its schedule, concurrency limits, and detailed interruption rules remain open.
 
@@ -1070,17 +1064,13 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Cult Thought Link** — A mental ability of cult followers to exchange thoughts at a distance. Followers in a city know where a fight is, and followers in the nearest city can come as reinforcements.
 
-**Divine Plane** — The unreachable realm where every Stage 0 being has been since a past cataclysm. They cannot materialise in the real world without a very great number of sacrifices.
+**Divine Plane** — The unreachable realm where every Limit 0 being has been since a past cataclysm. They cannot materialise in the real world without a very great number of sacrifices.
 
-**Spirit World** — The other side of the real world, reachable by higher followers of Pathways. The Spirit General lives there. It is not the Divine Plane. The player cannot enter it for now.
-
-**Arcana** — One of 22 character-growth tracks, each a Tarot Major Arcana archetype, replacing the word Pathway. See [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
-
-**Limit** — One of ten steps within an Arcana, numbered 9 to 0, replacing the word Stage for supernatural advancement. Each has its own name and grants two abilities.
+**Spirit World** — The other side of the real world, reachable by higher followers of Arcana. The Spirit General lives there. It is not the Divine Plane. The player cannot enter it for now.
 
 **Sephira** — One of the ten Kabbalistic spheres that a Limit corresponds to, from Malkuth at Limit 9 to Keter at Limit 0.
 
-**Stage Occupancy Rule** — On every Pathway, while Stage 0 is occupied there is no Stage 1; while it is unoccupied there are at most three Stage 1 practitioners at a time. When someone reaches Stage 0, every Stage 1 practitioner of that Pathway moves back to Stage 2. Stage 2 has no limit.
+**Limit Occupancy Rule** — On every Arcana, while Limit 0 is occupied there is no Limit 1; while it is unoccupied there are at most three Limit 1 practitioners at a time. When someone reaches Limit 0, every Limit 1 practitioner of that Arcana moves back to Limit 2. Limit 2 has no limit.
 
 **Cult Sortie** — A General's attempt on a city, launched when it has gathered a certain number of followers. It can succeed or fail depending on the city's defence.
 
@@ -1098,7 +1088,7 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Follower** — A character who belongs to a Major Faction's forces. Ordinary residents are not followers. Whether other actors count for City Capture and City Liberation remains open.
 
-**Cult General** — One of three Stage 2 followers who each lead a Cult Force and together form the top of the cult's living hierarchy. Their working role labels are the Spirit, Holding, and Raiding Generals; these are not final names.
+**Cult General** — One of three Limit 2 followers who each lead a Cult Force and together form the top of the cult's living hierarchy. Their working role labels are the Spirit, Holding, and Raiding Generals; these are not final names.
 
 **Cult Force** — The followers led by one Cult General. Cult Forces generate much faster than allied forces and are not exhausted by killing rank-and-file followers.
 

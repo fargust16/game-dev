@@ -1,10 +1,10 @@
 # 11 Vertical Slice
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft
 
-Last Updated: 2026-11-01 (one or two Arcana with different styles, the first-day trial, and recipes outside the faction recorded. Earlier: balance and start settled: Stage 8 as the player's limit, 8–10 enemies, the six-hour window, a Factionless start, and three named Pathways. Earlier: rewritten for the owner's one-city slice: the Spirit General's invasion on day 1–2, a ritual the player stops or loses to, one joinable faction with two or three Pathways, and the required mechanics. Earlier: owner redefined the slice as one city at Stages 9–7; retired combat references replaced with 10.2.)
+Last Updated: 2026-11-01 (combat runs in place across the city; the slice's two Arcana are chosen. Earlier: one or two Arcana with different styles, the first-day trial, and recipes outside the faction recorded. Earlier: balance and start settled: Stage 8 as the player's limit, 8–10 enemies, the six-hour window, a Factionless start, and three named Pathways. Earlier: rewritten for the owner's one-city slice: the Spirit General's invasion on day 1–2, a ritual the player stops or loses to, one joinable faction with two or three Pathways, and the required mechanics. Earlier: owner redefined the slice as one city at Stages 9–7; retired combat references replaced with 10.2.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -44,13 +44,13 @@ The slice uses the campaign's rules from [21 Cult Campaign and City Control](21%
 
 The preferred version lets a player who feels ready fight the General on a later run and see how strong it is, and even die to it.
 
-If building a Stage 2 opponent is too much for the first version, the General appears, casts a spell without attacking, and leaves after the same 15–20 ticks. This fallback is approved.
+If building a Limit 2 opponent is too much for the first version, the General appears, casts a spell without attacking, and leaves after the same 15–20 ticks. This fallback is approved.
 
 ## The fight
 
 - 8–10 enemies take part.
 - Allies stand with the player, in numbers that make the two sides about equal once the player is counted. The player's presence must change the result.
-- The ritual keeps the campaign's six-hour window, one real hour of free exploration. If the player stops it in time, the run is won.
+- The whole city is the battlefield, and the ritual runs in one part of it. A combat round is one tick, so its 360-tick window is up to 360 rounds, or one real hour of free exploration. After testing it may shrink to 60 ticks, ten real minutes. If the player stops it in time, the run is won.
 
 ## Stopping the ritual
 
@@ -70,7 +70,7 @@ No final lore names are locked here. Placeholder faction labels are scaffolding 
 
 # Era and Mood
 
-Confirmed tone reference: the industrial-occult city feeling associated with *Lord of the Mysteries* — not a copy of its plot, Pathways, or lore names.
+Confirmed tone reference: the industrial-occult city feeling associated with *Lord of the Mysteries* — not a copy of its plot, Arcana, or lore names.
 
 The Vertical Slice should feel like a late **18th–19th century transition world**:
 
@@ -93,7 +93,7 @@ The slice must prove all of the following:
 2. Multiple Approaches — Confront is not the only profitable answer.
 3. Timed POIs — missing a window changes the world.
 4. Information Sources — board / bartender / rumour / trace beat omniscient markers.
-5. Combat Arena — Confront transitions to a thematic Turn-Based arena and returns with residue ([16 Architecture Pivot](16%20Architecture%20Pivot.md)).
+5. Combat in place — Confront turns the surroundings into a Combat Grid and returns to free movement with residue ([16 Architecture Pivot](16%20Architecture%20Pivot.md)).
 6. Scene split — overworld free 3P + at least one separate interior scene (no grid).
 7. World residue — tomorrow looks different because of today.
 8. Priced power tease — at least one Bargain-shaped offer or refusal.
@@ -142,9 +142,9 @@ Each of these is implemented in a limited form:
 ## Character / Progression
 
 - The character starts without a faction. On the first day it can pass a trial to join the faction, or stay out and search alone. This is a slice exception to the Starting Faction rule of [07 Character Life](07%20Character%20Life.md).
-- Stage 9 is a certain goal in a run. Stage 8 takes directed effort. Stage 7 is for NPCs only. Allies and enemies may be deeper.
-- The slice offers one or two potions, so that a run has two styles of play: one through dialogue and stealth, the other through confrontation ([05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md)).
-- A character outside the faction can find potion recipes too, including the cult's, with a somewhat different approach.
+- Limit 9 is a certain goal in a run. Limit 8 takes directed effort. Limit 7 is for NPCs only. Allies and enemies may be deeper.
+- The slice has two Arcana with different styles of play ([05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md)). The faction offers Жрица, for dialogue and stealth. The character can find Император alone, for confrontation.
+- The church has no next Limit for Император, so a character on it must seek the next Limit among the cultists. Both Arcana have an occupied Limit 0, so the player starts on a fork that can never reach Limit 0.
 - Each Limit grants two abilities. An NPC at Limit 7 has about six, the same abilities the player would have.
 
 ## The first-day trial
@@ -212,13 +212,13 @@ All six Approaches must appear at least once across the slice:
 - Veil
 - Withdraw
 
-Turn-Based Mode / arena requirements:
+Turn-Based Mode requirements:
 
-- Confront always loads a **thematic Combat Arena** (not in-location TB);
+- Confront always runs **in place** on a Combat Grid over the real scene;
 - no voluntary Turn-Based Mode during free exploration;
-- the Initiative and AP economy of [10.2](10.2%20Combat%20System%20Draft.md) on the arena only;
+- the Initiative and AP economy of [10.2](10.2%20Combat%20System%20Draft.md) during Confront only;
 - Break Away and Spare/Yield available in the abduction and/or arrest Confront;
-- at least one Theme Pack used (e.g. street or alley).
+- cover, concealment in vegetation, and leaving the fight by moving away.
 
 ## Decision / Teaching Order
 
@@ -234,7 +234,7 @@ Not in the Vertical Slice:
 - Enchanting;
 - Death Gap and successor characters;
 - Legacy Cache;
-- Pathway change;
+- Arcana change;
 - Factionless later-life flow;
 - several cities, City Control between cities, and the Capital Gate;
 - manifestation and World Collapse;
@@ -323,14 +323,14 @@ Post-pivot S0 target:
 
 **Implementation note (2026-08-06):** `DecisionNodeCatalog` + `DecisionNodeSession` (keys 1–5 / Esc). Six Approaches covered across A/B options. Confront remains a stub until S3 TB combat. Residue via `DistrictResidue` (labels + Merrin follow-up lines).
 
-## Milestone S3 — Combat Arena
+## Milestone S3 — Combat Grid
 
-- Confront loads a thematic Combat Arena;
-- the Initiative and AP economy of [10.2](10.2%20Combat%20System%20Draft.md) on the arena grid only;
+- Confront builds a Combat Grid over the current scene;
+- the Initiative and AP economy of [10.2](10.2%20Combat%20System%20Draft.md) on that grid only;
 - one simple enemy type;
 - Break Away + Spare/Yield stubs;
-- return to source scene with residue stub.
-- no voluntary TB outside arenas.
+- free movement returns with a residue stub.
+- no voluntary TB outside Confront.
 
 ## Milestone S4 — Trace + Bargain tease
 
@@ -371,8 +371,8 @@ Keep intentionally tiny:
 | Named talk NPCs | 6–10 |
 | Enemy archetypes | 2–3 |
 | Generals | 1 |
-| Player Arcana | 1–2 |
-| Player stages | 9–8, with Stage 7 for NPCs |
+| Player Arcana | 2 |
+| Player Limits | 9–8, with Limit 7 for NPCs |
 | Bargain teases | 1 |
 
 If the budget grows, cut content before cutting systems proof.
@@ -383,18 +383,18 @@ If the budget grows, cut content before cutting systems proof.
 2. **Mood/era:** Lord of the Mysteries-like industrial-occult transition (18–19th century social structure + early machines), not a plot/lore copy.
 3. **Faction:** only the internal-order faction is joinable, through a first-day trial; Wardens and Veinmarket are local groups.
 4. **Timing:** the Spirit General comes out after one to two game days.
-5. **Death Gap, Legacy Cache, Pathway change, and Enchanting:** out of this Vertical Slice.
+5. **Death Gap, Legacy Cache, Arcana change, and Enchanting:** out of this Vertical Slice.
 6. **Names:** all placeholder names may be renamed later.
 
 # Documentation Review
 
-- **Architecture Pivot:** Slice delivery follows overworld → interior → arena rails.
+- **Architecture Pivot:** Slice delivery follows overworld → interior → combat in place.
 - **Vision / Player Experience:** Slice targets curiosity, tense choice, agency, residue, priced power tease.
-- **POI / Information / Approaches / Combat:** Directly implemented in miniature (TB on arenas only).
-- **Progression / Character Life:** One Factionless life per run. The player reaches Stages 9–8; Stage 7 is for NPCs, and allies and enemies may be deeper. Later-life systems are excluded.
+- **POI / Information / Approaches / Combat:** Directly implemented in miniature (TB in place during Confront only).
+- **Progression / Character Life:** One Factionless life per run. The player reaches Limits 9–8; Limit 7 is for NPCs, and allies and enemies may be deeper. Later-life systems are excluded.
 - **Cult Campaign:** The slice uses the campaign's ritual rules in one city ([21](21%20Cult%20Campaign%20and%20City%20Control.md)).
 - **Era mood:** Compatible with priced mystery and social inequality without requiring high-fantasy gloss.
-- **Solo scope:** The required mechanics are many, so each stays in a limited form, and content stays small. The open items are CC-29 and CC-32 in [99 Open Questions](99%20Open%20Questions.md).
+- **Solo scope:** The required mechanics are many, so each stays in a limited form, and content stays small. The open items are CC-29, CC-32, and CC-33 in [99 Open Questions](99%20Open%20Questions.md).
 - **Glossary / Open Questions:** Confirmations recorded as resolved.
 
 # Related Documents

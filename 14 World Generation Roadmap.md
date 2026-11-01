@@ -1,10 +1,10 @@
 # 14 World Generation Roadmap
 
-Version: 0.37
+Version: 0.38
 
 Status: Draft
 
-Last Updated: 2026-11-01 (the campaign's 3×3 target world and 5–7 cities recorded; no change to the order or to production. Earlier: G3f: calibration (two runs, fixes F1, F2), GF-RF frozen, held-out part (1) 8 of 10; the owner's blind review pending. Earlier: G3f: the owner's research mission (2026-10-25); WP0 done; the technical specification and the research package written. Earlier: G3f: the owner's decisions D-3 … D-12 on content recorded in the phase plan v0.3; none authorises execution. Earlier: G3f, regional geography architecture: the phase plan approved — D-1, D-2 — and recorded; only step A authorised. 2026-10-24: G3e-PM ran: H FAIL; the S-LM1 line stopped. G3e-PM post-mortem checks pre-registered, plan approved, not run. G3e Step 1 ended not ready; report accepted, Step 1 closed. 2026-10-23: LMC named G3e; C8, C9 decided. LMC specification v0.4 approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC Step 1 readiness check; design note approved as the research plan. Earlier: LMC technical specification approved; Step 1 not authorised. Earlier: checked on G3c data. 2026-10-21: LMC design note v0.2, the owner's revision; post-G3c review: GEO decisions, model research plan; G3c results; G2 review)
+Last Updated: 2026-11-01 (Combat Grid replaces arenas in the roadmap. Earlier: the campaign's 3×3 target world and 5–7 cities recorded; no change to the order or to production. Earlier: G3f: calibration (two runs, fixes F1, F2), GF-RF frozen, held-out part (1) 8 of 10; the owner's blind review pending. Earlier: G3f: the owner's research mission (2026-10-25); WP0 done; the technical specification and the research package written. Earlier: G3f: the owner's decisions D-3 … D-12 on content recorded in the phase plan v0.3; none authorises execution. Earlier: G3f, regional geography architecture: the phase plan approved — D-1, D-2 — and recorded; only step A authorised. 2026-10-24: G3e-PM ran: H FAIL; the S-LM1 line stopped. G3e-PM post-mortem checks pre-registered, plan approved, not run. G3e Step 1 ended not ready; report accepted, Step 1 closed. 2026-10-23: LMC named G3e; C8, C9 decided. LMC specification v0.4 approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC Step 1 readiness check; design note approved as the research plan. Earlier: LMC technical specification approved; Step 1 not authorised. Earlier: checked on G3c data. 2026-10-21: LMC design note v0.2, the owner's revision; post-G3c review: GEO decisions, model research plan; G3c results; G2 review)
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -38,7 +38,7 @@ Locked in [16](16%20Architecture%20Pivot.md):
 - seeded Valheim-like overworld (scoped; no harvest loop);
 - free third-person locomotion (Genshin-like feel);
 - interiors as separate free-move scenes;
-- Confront → thematic Combat Arena (grid TB only there).
+- Confront → in place on a Combat Grid (grid TB only then).
 
 ## Game Systems Architecture ✅ (docs)
 
@@ -64,7 +64,7 @@ Detail plans remain under `unity/Assets/Plans/` with **Superseded** banners. Nei
 1. **Overworld** is the authoritative exploration space: world seed → biomes / zones / POIs / creature spawns ([16](16%20Architecture%20Pivot.md)).
 2. **Gameplay movement** on overworld and interiors is **free third-person**, not GridMap.
 3. **Interiors** are **separate scenes** (free move, no grid).
-4. **Confront** always uses a **Combat Arena** scene; grid + Turn Action Economy apply only there ([10](10%20Turn%20Action%20Economy.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md)).
+4. **Confront** runs in place on a **Combat Grid**; the grid and its action economy apply only then ([10.2](10.2%20Combat%20System%20Draft.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md)).
 5. **“Valheim-level”** means deterministic seeded world + biome diversity + streamed/chunked intent — **not** survival harvest, not AAA biomes art in V0.
 6. Pre-pivot OrganicTown continuous fabric is **deprecated** — not the next implementation default, and not a reuse source for the new pipeline ([13](13%20City%20Generation.md)).
 7. **Piece-Based Assembly, small → large.** World, settlement, and building generation compose from small hand-authored Pieces with Snap Sockets (Valheim-style), never from a whole hand-tuned continuous mesh or an algorithmic subdivision solver. Detail: [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md).
@@ -79,10 +79,9 @@ Architecture Pivot docs ✅
     → Overworld V0
         → Locomotion V0
             → Interior V0
-                → Arena V0
-                    → Theme Packs V0
-                        → Vertical Slice content on new rails
-                            → richer biomes / interior DNA / monsters
+                → Combat Grid V0
+                    → Vertical Slice content on new rails
+                        → richer biomes / interior DNA / monsters
 ```
 
 | Phase | Goal | Outcome | Depends on |
@@ -91,9 +90,8 @@ Architecture Pivot docs ✅
 | **Overworld V0** | Seeded stub world | Biome bands + terrain + 3–5 POI markers + spawn points; iterations **W0.1–W0.9** in [17](17%20Game%20Systems%20Architecture.md) / `OVERWORLD_V0_PLAN.md` | Pivot + systems map |
 | **Locomotion V0** | Free 3P feel | Controller + follow/orbit camera | Overworld V0 |
 | **Interior V0** | Scene transition | Door → interior → exit; free move | Locomotion V0 |
-| **Arena V0** | Confront presentation | Theme arena + TB skeleton + return + residue stub | Interior V0 |
-| **Theme Packs V0** | Arena variety | Street / tavern / woods greybox kits | Arena V0 |
-| **Slice content** | Lower Veil fantasy | POIs / tips / Decision Nodes on new rails | Theme Packs V0 |
+| **Combat Grid V0** | Confront presentation | Grid over the current scene + TB skeleton + residue stub | Interior V0 |
+| **Slice content** | One-city slice | POIs / tips / Decision Nodes on new rails | Combat Grid V0 |
 
 Each phase = its own plan + commit series. Prefer updating this file’s “Where We Stopped” when a phase completes.
 

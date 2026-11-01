@@ -1,10 +1,10 @@
 # 07 Character Life
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Last Free City Rule recorded. Earlier: manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
+Last Updated: 2026-11-01 (terms renamed to Arcana and Limit. Earlier: Last Free City Rule recorded. Earlier: manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md)
@@ -25,8 +25,8 @@ It answers:
 # Central Rules
 
 1. Character death ends that Character Life permanently.
-2. Character power, Pathway stage, and personal inventory do not continue as a living hero.
-3. Before the sealed Stage 0 being manifests in the living world, the world advances during a fixed short Death Gap and may receive a successor, provided at least one uncaptured city has no battle in it (the Last Free City Rule).
+2. Character power, Limit, and personal inventory do not continue as a living hero.
+3. Before the sealed Limit 0 being manifests in the living world, the world advances during a fixed short Death Gap and may receive a successor, provided at least one uncaptured city has no battle in it (the Last Free City Rule).
 4. Once the being manifests in the living world, player-character death is terminal defeat for that world’s playable story; no successor appears, even if the being is later defeated.
 5. Player Knowledge survives.
 6. Ordinary attributes and skill development belong to the deceased Character Life and do not transfer to a successor.
@@ -40,14 +40,14 @@ The first character created in a newly generated world receives a **Starting Fac
 That Starting Faction:
 
 - gives an initial understanding of the faction's current Main Goal;
-- soft-nudges toward one Pathway;
+- soft-nudges toward one Arcana;
 - is not a prison; defection remains possible later at a cost.
 
 This is the only life that begins already inside a faction.
 
 # Death
 
-When the character dies, the Character Life and its personal staged Pathway power end. The body, carried items, open actions, and local scene become world residue; no successor automatically inherits the former character’s carried/equipped items or extracted modifier instances.
+When the character dies, the Character Life and its personal Arcana power end. The body, carried items, open actions, and local scene become world residue; no successor automatically inherits the former character’s carried/equipped items or extracted modifier instances.
 
 The next step depends on the state of the primary opposing being:
 
@@ -93,7 +93,7 @@ This is an intentional penalty for continued play in a world already shaped by p
 To join a faction later, the character must pass a Faction Entry:
 
 - V1 form: a short quest / Decision Node chain / POI-backed trial;
-- success grants membership and then the normal soft Pathway nudge of that faction;
+- success grants membership and then the normal soft Arcana nudge of that faction;
 - failure may close easy entry, worsen opinion, or force another Approach later.
 
 No free faction swap menu.
@@ -105,7 +105,7 @@ When creating a successor character, the player may choose light identity option
 System-critical rules for V1:
 
 - starts Factionless if not the first character in the world;
-- starts Pathless unless a special documented exception appears later;
+- starts Uninitiated unless a special documented exception appears later;
 - inherits Player Knowledge only;
 - can see intentional Legacy Cache markers;
 - enters a world already changed by the Death Gap.
@@ -187,7 +187,7 @@ New world emphasises Player Knowledge without the same local residue.
 |--------|-------------------------|
 | World Engine | Advances during Death Gap |
 | Points of Interest | Many expire or resolve unattended during Death Gap |
-| Progression | Pathway stage and ordinary character-specific attribute/skill development end with the character; methods remain as Player Knowledge |
+| Progression | Limit and ordinary character-specific attribute/skill development end with the character; methods remain as Player Knowledge |
 | Approaches | Soft Memory and Faction Entry are often Convince / Exchange / Threaten / Veil problems |
 | Decision Engine | Investigating a previous life is Attention + Allegiance + Commitment |
 
@@ -228,7 +228,7 @@ After death, the player should feel:
 
 - **Meta Loop:** Compatible. Fixed gap, continued world, imperfect ordinary legacy, Knowledge survival.
 - **World Laws:** Compatible if Death Gap runs Operations / POI resolutions. Starting Faction rule updated for first life only.
-- **Progression:** Compatible. Power dies with life; faction membership and Pathway nudge are re-earned after the first life.
+- **Progression:** Compatible. Power dies with life; faction membership and Arcana nudge are re-earned after the first life.
 - **Decision Engine / Approaches:** Compatible. Faction Entry and Soft Memory create new decision surfaces.
 - **Glossary / Open Questions:** Updated for Death Gap, Factionless, Faction Entry, Legacy Cache, Soft Memory.
 

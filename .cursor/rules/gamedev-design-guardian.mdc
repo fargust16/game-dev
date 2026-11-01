@@ -24,10 +24,10 @@ No XP level-ups. V1 Progression: 1–2 of 22 Arcana by playstyle, player Limits 
 V1 Approaches: Confront, Convince, Threaten, Exchange, Veil, Withdraw. Combat is not the default best answer.
 First life gets Starting Faction; later lives are Factionless until Faction Entry. Fixed Death Gap. Legacy Cache + Soft Memory; no bloodline respawn.
 Confront constraints: no XP-from-kills, diegetic loot, real alternatives, Break Away / Yield-Spare, world residue required.
-V1 Confront: Turn-Based Mode on a thematic Combat Arena only; no voluntary TB during free exploration.
+V1 Confront: Turn-Based Mode in place on a Combat Grid; no voluntary TB during free exploration.
 Information Sources are partial and biased; no omniscient quest spoiler log.
-V1 turns: Move + Action + short Bonus **on arenas only**.
-Overworld + interiors: free third-person (Genshin-like feel). Grid is arena-only.
+V1 turns: Initiative and AP on the Combat Grid only.
+Overworld + interiors: free third-person (Genshin-like feel). Grid during Confront only.
 World gen: Valheim-like seeded overworld (scoped, no harvest loop). Next impl default: Overworld V0 per `17 Game Systems Architecture.md` / `unity/Assets/Plans/OVERWORLD_V0_PLAN.md` — not OrganicTown C1. Height SoT: **TerrainGen**, baked into Unity `TerrainData` (`OVERWORLD_TERRAIN_ARCHITECTURE.md`) — 2×2×1400, **height 700**; the island, coast and massifs are TerrainGen's relief, written unchanged; surfaces = grass/sand/soil/cliff/rock by world-space rules (`OVERWORLD_VISUAL_DIRECTION.md` § Terrain surfaces); terrain material = URP TerrainLit (MicroSplat out of the pipeline). V0 water: ocean only — one WaterWorks `WorldWater` at Sea Level 24 m (`OverworldWater.mat`); inland lake/river generation removed. Grass and trees: terrain bake detail layers and tree instances over Polytope Lowpoly prefabs (`PT_Grass_02`, pine and fruit trees). See `OVERWORLD_TERRAIN_ARCHITECTURE.md`, `16 Architecture Pivot.md`, `14 World Generation Roadmap.md`.
 Engine locked: Unity in `unity/` (URP, C#). Pre-pivot OrganicTown continuous path is archive.
 No monolithic managers; System Cards in `17`; ScriptableObjects = immutable data only; V0 chunk = 64 m.
@@ -53,7 +53,7 @@ Important choices also need Decision Engine checks: multiple viable options, val
 ## Solo systems
 
 Prefer elegant expandable systems over deep simulation. Every major system needs V1 / V2 / V3.
-Prefer isolatable AI tickets (overworld / interior / arena) over one continuous hybrid world.
+Prefer isolatable AI tickets (overworld / interior / combat) over one continuous hybrid world.
 
 ## Documentation transaction
 
@@ -68,7 +68,7 @@ When finalizing design: update target doc, Glossary, Open Questions, dependencie
 - Starting Faction with later defection; difficulty is eight independent sliders, not one faction-pressure scale.
 - External power is always a Bargain; Player Knowledge unlocks reasoning, not raw success rate.
 - When the user shares vision, synthesise Draft answers, challenge contradictions, write only after confirmation.
-- Architecture Pivot (2026-08-07): overworld + free 3P + separate interiors + arena Confront.
+- Architecture Pivot (2026-08-07, revised 2026-11-01): overworld + free 3P + separate interiors + Confront in place.
 - Game Systems Architecture (2026-08-07): full system registry in `17`; Overworld V0 micro-plan ready.
 - Cult campaign (2026-11-01): the pre-manifestation campaign is a war for cities; rules in `21`.
 

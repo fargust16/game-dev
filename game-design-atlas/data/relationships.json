@@ -114,7 +114,7 @@
     "sourceIds": [
       "src-06"
     ],
-    "explanation": "Pathway смещает выбор Approach, но не имеет права стереть остальные методы."
+    "explanation": "Arcana смещает выбор Approach, но не имеет права стереть остальные методы."
   },
   {
     "id": "rel-life-meta",
@@ -139,7 +139,7 @@
     "sourceIds": [
       "src-07"
     ],
-    "explanation": "Смерть кончает ступень Pathway этой жизни. Рост не переживает персонажа живым героем."
+    "explanation": "Смерть кончает предел Arcana этой жизни. Рост не переживает персонажа живым героем."
   },
   {
     "id": "rel-life-laws",
@@ -368,7 +368,7 @@
       "src-20",
       "src-05"
     ],
-    "explanation": "Every character must learn Alchemy before Pathway advancement, and each transition requires its correct potion."
+    "explanation": "Every character must learn Alchemy before Arcana advancement, and each transition requires its correct potion."
   },
   {
     "id": "rel-alchemy-world-time",
@@ -510,6 +510,6 @@
       "src-21",
       "src-05"
     ],
-    "explanation": "Правило занятости ступеней объясняет, почему генералы культа остаются на второй ступени и стоят во главе живой иерархии."
+    "explanation": "Правило занятости пределов объясняет, почему генералы культа остаются на второго предела и стоят во главе живой иерархии."
   }
 ]

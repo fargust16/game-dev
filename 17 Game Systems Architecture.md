@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 1.5
+Version: 1.6
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
+Last Updated: 2026-11-01 (Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
 
 Depends On:
 [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -30,7 +30,7 @@ Success question for agents:
 
 | Document | Authority |
 |----------|-----------|
-| [16 Architecture Pivot](16%20Architecture%20Pivot.md) | Scene graph, movement mode per scene, Confront → arena |
+| [16 Architecture Pivot](16%20Architecture%20Pivot.md) | Scene graph, movement mode per scene, Confront in place |
 | [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md) | Ordered world-gen phases / stop point |
 | [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md) | Exterior Shell Grammar + Interior Piece Assembly; Building DNA |
 | **This document (`17`)** | System registry, interfaces, save/MP/perf notes, iteration backlog |
@@ -56,7 +56,7 @@ Success question for agents:
 ```text
 Overworld (seeded, free 3P)
   ├── door/portal → Interior Scene (free 3P, no grid) → exit back
-  └── Confront → Combat Arena (grid TB) → return + residue
+  └── Confront → Combat Grid over the current scene (TB) → free movement + residue
 Interior ── Confront ──┘
 ```
 
@@ -69,9 +69,9 @@ Interior ── Confront ──┘
 | Campaign target world | **4200 × 4200 m** — 3×3 tiles of 1400 m, with 5–7 cities ([21](21%20Cult%20Campaign%20and%20City%20Control.md)). A game-design target: it changes no V0 default and authorises no production terrain work. |
 | Terrain height budget / sea level | **700 m** / **24 m** |
 | Terrain resolution | heightmap **513**, alphamap **512**, details **512** per tile — written by the terrain bake from TerrainGen ([OVERWORLD_TERRAIN_ARCHITECTURE](unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md)) |
-| Interior / Arena load | **Single-scene swap** (additive later) |
+| Interior load | **Single-scene swap** (additive later) |
 | OrganicTown / TownGridBaker continuous path | **Deprecated** — archive only, not a reuse source ([13](13%20City%20Generation.md)) |
-| Combat depth in near-term | Arena V0 TB skeleton + Theme Pack greybox; BG3-depth is long-horizon |
+| Combat depth in near-term | Combat Grid V0 TB skeleton; BG3-depth is long-horizon |
 
 ---
 
@@ -111,11 +111,11 @@ Which imported (and pending) third-party packages serve which System Card is tra
 | **W — World Gen** | WorldSeed, Terrain/Biome, Chunk Streaming, POI Placement, Settlement, Building/Shell, Interior Gen, Dungeon Gen, Spawn Tables | **Yes — Overworld V0 first** |
 | **L — Locomotion** | Input, Movement, Camera, Animation (locomotion) | After Overworld V0 |
 | **I — Interior Rails** | Portal/Door, Scene Transition, Interior Runtime | After Locomotion V0 |
-| **C — Confront** | Encounter Lock, Arena Loader, Theme Packs, Arena Grid, Tactical Combat Action Economy, Residue | After Interior V0 |
+| **C — Confront** | Encounter Lock, Combat Grid, Tactical Combat Action Economy, Residue | After Interior V0 |
 | **A — Actors** | NPC Gen, AI (non-combat), Dialogue | Design cards; code later |
 | **Q — Quest / Info** | Quest Gen, Information Sources, POI Director | Design cards; Decision Engine gate |
 | **E — Economy / Factions** | Economy, Factions, City Control and Force Generation, Crafting | Design cards; World Laws gate |
-| **P — Player** | Inventory, Equipment, Skills/Pathways, Alchemy and advancement potions, Character Life | Design cards; Progression gate; rules in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md) |
+| **P — Player** | Inventory, Equipment, Skills/Arcana, Alchemy and advancement potions, Character Life | Design cards; Progression gate; rules in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md) |
 | **X — Cross-cutting** | Time, Weather, Save, Networking, Audio, UI | Thin cards; Save/Net contracts early |
 
 ---
@@ -138,10 +138,8 @@ flowchart LR
   BuildingShell --> PortalDoor
   PortalDoor --> SceneTransition
   SceneTransition --> InteriorRuntime
-  EncounterLock --> ArenaLoader
-  ThemePacks --> ArenaLoader
-  ArenaLoader --> ArenaGrid
-  ArenaGrid --> TurnEconomy
+  EncounterLock --> CombatGrid
+  CombatGrid --> TurnEconomy
   TurnEconomy --> Residue
   SaveSystem --> WorldSeed
   Networking -.-> ChunkStream
@@ -283,7 +281,7 @@ flowchart LR
 | **Save/load** | Regenerable layout; persist clear flags / residues. |
 | **Multiplayer** | Same as interiors. |
 | **Performance** | Generate on enter; cap room count V1. |
-| **Extensibility** | Theme packs for dungeon moods; boss arenas still use Confront → Combat Arena, not dungeon mesh as grid. |
+| **Extensibility** | Piece sets for dungeon moods; boss fights use Confront in place on a Combat Grid. |
 | **V1 scope / Deferred** | Deferred past Interior V0; V0 only places cave mouth marker. |
 | **Owning folder** | `unity/Assets/Scripts/World/Dungeons/` |
 
@@ -423,60 +421,30 @@ flowchart LR
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Decide Confront start from diegetic triggers; capture source theme; forbid voluntary TB in exploration. |
+| **Responsibilities** | Decide Confront start from diegetic triggers; forbid voluntary TB in exploration. |
 | **Dependencies** | Spawn Tables / content triggers; Approaches rules ([06](06%20Approaches.md), [08](08%20Confront%20Constraints.md)). |
 | **Public interfaces** | `IEncounterLock { void TryBegin(EncounterRequest); event ConfrontStarted; }` |
-| **Data flow** | Trigger → theme tag + participants → Arena Loader. |
+| **Data flow** | Trigger → participants → Combat Grid. |
 | **Save/load** | Persist in-progress encounter id if mid-fight save allowed later. |
-| **Multiplayer** | Host starts encounter; all clients travel. |
+| **Multiplayer** | Host starts encounter. |
 | **Performance** | Event-driven. |
 | **Extensibility** | Ambush / scripted / Approach-chosen Confront share request type. |
-| **V1 scope / Deferred** | Arena V0: one stub trigger. |
+| **V1 scope / Deferred** | Combat Grid V0: one stub trigger. |
 | **Owning folder** | `unity/Assets/Scripts/Confront/` |
 
-## C.2 Arena Loader
+## C.2 Combat Grid
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Load Combat Arena via Scene Transition; select Theme Pack; hand off to Arena Grid. |
-| **Dependencies** | Encounter Lock, Theme Packs, Scene Transition. |
-| **Public interfaces** | `IArenaLoader { void Load(ConfrontContext); }` |
-| **Data flow** | Context → theme pick → Travel → arena bootstrap. |
-| **Save/load** | Context must be reconstructible. |
-| **Multiplayer** | Same arena scene id for party. |
-| **Performance** | V0 scene swap hitch OK. |
-| **Extensibility** | Procedural arena gen later behind same loader. |
-| **V1 scope / Deferred** | Arena V0 one greybox arena. |
-| **Owning folder** | `unity/Assets/Scripts/Confront/` |
-
-## C.3 Theme Packs
-
-| Field | Content |
-|-------|---------|
-| **Responsibilities** | Immutable kits: Street, Tavern, Cellar, Woods, Ruin, Factory floor — mood + cover props, not 1:1 clones. |
-| **Dependencies** | None (data). Consumed by Arena Loader. |
-| **Public interfaces** | `ThemePackId` + SO definitions (immutable). |
-| **Data flow** | Source theme tag → pack id → arena content. |
-| **Save/load** | Data assets only. |
-| **Multiplayer** | Identical pack ids. |
-| **Performance** | Small greybox. |
-| **Extensibility** | Add packs without code changes to loader. |
-| **V1 scope / Deferred** | Theme Packs V0 after Arena V0 skeleton. |
-| **Owning folder** | `unity/Assets/Scripts/Confront/ThemePacks/` + `Assets/Data/ThemePacks/` |
-
-## C.4 Arena Grid
-
-| Field | Content |
-|-------|---------|
-| **Responsibilities** | Square-grid spatial truth **only on arenas**; occupancy; Environment Action tags ([10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md)). |
-| **Dependencies** | Arena Loader / Theme Pack geometry. |
-| **Public interfaces** | `IArenaGrid { bool InBounds; bool IsWalkable; … }` |
-| **Data flow** | Arena bake/load → grid → Turn Economy queries. |
-| **Save/load** | Static grid regenerable; dynamic cover state if any. |
+| **Responsibilities** | Build square-grid spatial truth **during Confront** over the current scene; occupancy; cover and concealment; Environment Action tags ([10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md)). Removed when Confront ends. |
+| **Dependencies** | Encounter Lock; terrain, shell, and interior geometry. |
+| **Public interfaces** | `ICombatGrid { bool InBounds; bool IsWalkable; … }` |
+| **Data flow** | Scene geometry → grid → Turn Economy queries. |
+| **Save/load** | Regenerable from the scene; dynamic cover state if any. |
 | **Multiplayer** | Authoritative grid on host. |
-| **Performance** | Small grids V0. |
-| **Extensibility** | Multi-level arenas later. |
-| **V1 scope / Deferred** | Arena V0 fixed greybox grid. |
+| **Performance** | Grid size and rebuild cost are open (CC-33). |
+| **Extensibility** | Multi-level grids later. |
+| **V1 scope / Deferred** | Combat Grid V0 on the slice's city. **Gate:** CC-33. |
 | **Owning folder** | `unity/Assets/Scripts/Confront/Grid/` |
 
 ## C.5 Tactical Combat Action Economy
@@ -484,14 +452,14 @@ flowchart LR
 | Field | Content |
 |-------|---------|
 | **Responsibilities** | Initiative order and AP pool with variable costs and retained AP for defensive reactions ([10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md)). Not a full BG3 ruleset in V0. |
-| **Dependencies** | Arena Grid, Encounter participants. |
+| **Dependencies** | Combat Grid, Encounter participants. |
 | **Public interfaces** | `ITurnEconomy { void BeginEncounter; void SubmitIntent; event TurnAdvanced; }` |
 | **Data flow** | Initiative → intents → resolve → next → end → Residue. |
 | **Save/load** | Mid-encounter state if supported later. |
 | **Multiplayer** | Host resolves; clients show presentation. |
 | **Performance** | Turn-based; low frame cost. |
 | **Extensibility** | Deep systemic combat grows behind intents; Approaches remain first-class. |
-| **V1 scope / Deferred** | Arena V0 skeleton. BG3-depth long-horizon. |
+| **V1 scope / Deferred** | Combat Grid V0 skeleton. BG3-depth long-horizon. |
 | **Owning folder** | `unity/Assets/Scripts/Confront/Turns/` |
 
 ## C.6 Residue
@@ -506,7 +474,7 @@ flowchart LR
 | **Multiplayer** | Authority applies; replicate deltas. |
 | **Performance** | Sparse writes. |
 | **Extensibility** | Richer world memory later. |
-| **V1 scope / Deferred** | Arena V0 stub flag / marker. |
+| **V1 scope / Deferred** | Combat Grid V0 stub flag / marker. |
 | **Owning folder** | `unity/Assets/Scripts/Confront/Residue/` |
 
 ---
@@ -534,7 +502,7 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Exploration behaviours (idle, schedule, react to player Attention cues). Not arena TB AI. |
+| **Responsibilities** | Exploration behaviours (idle, schedule, react to player Attention cues). Not TB combat AI. |
 | **Dependencies** | NPC Gen, Movement (nav), Time. |
 | **Public interfaces** | Behaviour modules composed per NPC. |
 | **Data flow** | Blackboard → actions. |
@@ -692,18 +660,18 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 | **V1 scope / Deferred** | Minimal when slice needs it. |
 | **Owning folder** | `unity/Assets/Scripts/Player/Items/` |
 
-## P.3 Skills / Pathways
+## P.3 Skills / Arcana
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Pathway stages 9→8 for the player, Stage 7 for NPCs, and ordinary independently progressing attributes/skills; no global character XP level. Item Creation and Enchanting skills follow [07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) and [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
+| **Responsibilities** | Limits 9→8 for the player, Limit 7 for NPCs, and ordinary independently progressing attributes/skills; no global character XP level. Item Creation and Enchanting skills follow [07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) and [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md). |
 | **Dependencies** | [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md); Factions soft nudge. |
-| **Public interfaces** | `IPathwayProgress`. |
-| **Data flow** | Conduct → stage; Bargains may grant. |
+| **Public interfaces** | `IArcanaProgress`. |
+| **Data flow** | Conduct → Limit; Bargains may grant. |
 | **Save/load** | Full. |
 | **Multiplayer** | Per-character. |
 | **Performance** | Negligible. |
-| **Extensibility** | More pathways later. |
+| **Extensibility** | More arcana later. |
 | **V1 scope / Deferred** | **Gate:** Progression Draft. |
 | **Owning folder** | `unity/Assets/Scripts/Player/Progression/` |
 
@@ -798,7 +766,7 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 | **Multiplayer** | Local. |
 | **Performance** | Standard. |
 | **Extensibility** | Themeable UI. |
-| **V1 scope / Deferred** | Minimal HUD with locomotion/arena. |
+| **V1 scope / Deferred** | Minimal HUD with locomotion and combat. |
 | **Owning folder** | `unity/Assets/Scripts/UI/`, `unity/Assets/Scripts/Audio/` |
 
 ---
@@ -849,22 +817,20 @@ Detail acceptance: [OVERWORLD_V0_PLAN.md](unity/Assets/Plans/OVERWORLD_V0_PLAN.m
 | I0.3 | One interior greybox scene | Exit returns to overworld pose |
 | I0.4 | Free move in interior | No grid |
 
-## Wave C — Arena V0 + Theme Packs V0
+## Wave C — Combat Grid V0
 
 | ID | Component | Outcome |
 |----|-----------|---------|
-| C0.1 | `IEncounterLock` stub trigger | Captures theme tag |
-| C0.2 | `IArenaLoader` + one arena scene | Scene swap into arena |
-| C0.3 | `IArenaGrid` greybox | Walkable cells |
-| C0.4 | `ITurnEconomy` skeleton | End encounter → return |
-| C0.5 | `IResidueApplier` stub | Marker/flag in source |
-| C0.6 | Theme Packs V0 | Street / tavern / woods greybox kits |
+| C0.1 | `IEncounterLock` stub trigger | Starts Confront |
+| C0.2 | `ICombatGrid` over a test scene | Walkable cells from real geometry |
+| C0.3 | `ITurnEconomy` skeleton | End encounter → free movement |
+| C0.4 | `IResidueApplier` stub | Marker/flag in the scene |
 
 ## Later waves (named only)
 
 - Vertical Slice content on new rails ([11](11%20Vertical%20Slice.md))
 - Building DNA / Interior compiler phases ([15](15%20Procedural%20Building%20Generation.md))
-- NPC / Dialogue / Quest / Economy / Pathways code after respective design gates
+- NPC / Dialogue / Quest / Economy / Arcana code after respective design gates
 - Additive scene loading; richer biomes; networking transport
 
 ---
@@ -876,7 +842,7 @@ Detail acceptance: [OVERWORLD_V0_PLAN.md](unity/Assets/Plans/OVERWORLD_V0_PLAN.m
 - Voluntary Turn-Based Mode during exploration
 - Monolithic `GameManager` owning multiple domains
 - Runtime-random world structure (non-seeded)
-- Full BG3 combat feature parity in Arena V0
+- Full BG3 combat feature parity in Combat Grid V0
 - Marketplace tactics kit as architecture
 
 ---
@@ -894,8 +860,8 @@ Detail acceptance: [OVERWORLD_V0_PLAN.md](unity/Assets/Plans/OVERWORLD_V0_PLAN.m
 # Documentation Review
 
 - **Vision / Pillars:** Preserved — Curiosity, priced power, living finite world.
-- **16 Pivot:** Not reversed — free 3P overworld/interiors; grid arena-only; OrganicTown archive.
-- **02 / 03 gates:** Quest/Faction/Economy/Pathway cards are boundaries only until Draft foundations instantiate.
+- **16 Pivot:** Free 3P overworld/interiors stay; grid during Confront only; OrganicTown archive.
+- **02 / 03 gates:** Quest/Faction/Economy/Arcana cards are boundaries only until Draft foundations instantiate.
 - **Solo / AI shipability:** Micro-iterations W/L/I/C isolate products.
 
 ---

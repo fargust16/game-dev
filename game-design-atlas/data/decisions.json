@@ -131,7 +131,7 @@
   {
     "id": "d-knowledge",
     "statement": "Player Knowledge improves reasoning, places, methods, and prediction. It is not primarily a success-rate bonus.",
-    "rationale": "Закрыто в 99. Сила Pathway остаётся прогрессией с ценой и Bargain.",
+    "rationale": "Закрыто в 99. Сила Arcana остаётся прогрессией с ценой и Bargain.",
     "alternatives": "",
     "systemIds": [
       "decision-engine",
@@ -163,8 +163,8 @@
   },
   {
     "id": "d-pathways",
-    "statement": "V1 has three Pathways and only stages 9, 8, and 7. A Pathway is a nudge or a discovery, not a prison. Pathless remains valid.",
-    "rationale": "Закрыто в 99 и записано в 05. Пороги ступеней открыты.",
+    "statement": "V1 has three Arcana and only stages 9, 8, and 7. An Arcana is a nudge or a discovery, not a prison. Uninitiated remains valid.",
+    "rationale": "Закрыто в 99 и записано в 05. Пороги пределов открыты.",
     "alternatives": "",
     "systemIds": [
       "progression"
@@ -228,14 +228,14 @@
   },
   {
     "id": "d-arena",
-    "statement": "V1 Confront is turn-based on a thematic Combat Arena. There is no voluntary turn-based mode during free exploration.",
-    "rationale": "Подача закрыта. Формулы инициативы и цены клетки открыты.",
+    "statement": "V1 Confront is turn-based on a thematic Combat Grid. There is no voluntary turn-based mode during free exploration.",
+    "rationale": "Подача закрыта. Формулы инициативы и цены клетки открыты. Superseded on 2026-11-01 by combat in place.",
     "alternatives": "",
     "systemIds": [
       "confront",
       "spatial-structure"
     ],
-    "status": "accepted",
+    "status": "superseded",
     "origin": "imported",
     "sourceIds": [
       "src-99",
@@ -246,14 +246,14 @@
   {
     "id": "d-spatial",
     "statement": "The spatial lock is a seeded overworld, free third-person movement, separate interiors without a grid, and Confront on an arena.",
-    "rationale": "16 называет это запертыми решениями поворота 2026-08-07. Статус файла остаётся Draft.",
+    "rationale": "16 называет это запертыми решениями поворота 2026-08-07. Статус файла остаётся Draft. Its arena part was superseded on 2026-11-01 by combat in place.",
     "alternatives": "Непрерывная сеточная правда мира, сеточное движение по оверворлду, интерьеры OrganicTown в той же сцене, пошаговый режим на месте и вне боя.",
     "systemIds": [
       "spatial-structure",
       "world-generation",
       "confront"
     ],
-    "status": "accepted",
+    "status": "superseded",
     "origin": "imported",
     "sourceIds": [
       "src-16"
@@ -263,7 +263,7 @@
   },
   {
     "id": "d-unity",
-    "statement": "The engine for this phase is Unity with URP and C#. Arena grid combat is custom. Godot 4 was considered and rejected for this phase.",
+    "statement": "The engine for this phase is Unity with URP and C#. Combat Grid combat is custom. Godot 4 was considered and rejected for this phase.",
     "rationale": "12 записывает выбор и отклонённую альтернативу. Отдельную дату в прочитанном фрагменте не беру.",
     "alternatives": "Godot 4.",
     "systemIds": [
@@ -330,7 +330,7 @@
   },
   {
     "id": "d-v0-world",
-    "statement": "Overworld V0 is a 2800 × 2800 m world of 64 m chunks, with a 700 m height budget and sea level at 24 m. Interior and Arena V0 load by swapping the whole scene.",
+    "statement": "Overworld V0 is a 2800 × 2800 m world of 64 m chunks, with a 700 m height budget and sea level at 24 m. Interior V0 load by swapping the whole scene.",
     "rationale": "Число прочитано в закрытом блоке 99. Там оно отнесено к 17 и плану Overworld V0; сам план в эту запись заново не сверялся.",
     "alternatives": "",
     "systemIds": [
@@ -363,14 +363,14 @@
   {
     "id": "d-slice-shape",
     "statement": "The first playable proof is a Lower Veil vertical slice with two selectable factions (Wardens / Veinmarket), three POIs, information sources, arena Confront, and one Bargain tease. Placeholder names may change. Death Gap is outside the slice.",
-    "rationale": "99 закрывает состав доказательства и прямо разрешает сменить имена-заполнители.",
+    "rationale": "99 закрывает состав доказательства и прямо разрешает сменить имена-заполнители. Superseded on 2026-11-01 by the one-city slice.",
     "alternatives": "",
     "systemIds": [
       "vertical-slice",
       "points-of-interest",
       "confront"
     ],
-    "status": "accepted",
+    "status": "superseded",
     "origin": "imported",
     "sourceIds": [
       "src-99",
@@ -644,7 +644,7 @@
   },
   {
     "id": "d-three-generals",
-    "statement": "Three Stage 2 Cult Generals lead the Cult Forces with different styles: the Spirit General, who comes out of the Spirit World only in cities; the Holding General, who stays in a city until it has gathered enough for the next sortie and fights to the end; and the Raiding General, who walks in the open and gathers forces in neutral territory.",
+    "statement": "Three Limit 2 Cult Generals lead the Cult Forces with different styles: the Spirit General, who comes out of the Spirit World only in cities; the Holding General, who stays in a city until it has gathered enough for the next sortie and fights to the end; and the Raiding General, who walks in the open and gathers forces in neutral territory.",
     "rationale": "Different enemy behaviour forces different player responses.",
     "alternatives": "",
     "systemIds": [
@@ -723,8 +723,8 @@
   },
   {
     "id": "d-stage-occupancy",
-    "statement": "On every Pathway, including the player's, an occupied Stage 0 leaves no Stage 1, and an unoccupied one allows at most three Stage 1 practitioners. When someone reaches Stage 0, every Stage 1 practitioner of that Pathway moves back to Stage 2. Stage 2 has no limit. A god occupies Limit 0 of one Arcana; a faction's other Arcana may have a free one.",
-    "rationale": "A world law that prices following a god and explains why the cult and the allied factions stop at Stage 2.",
+    "statement": "On every Arcana, including the player's, an occupied Limit 0 leaves no Limit 1, and an unoccupied one allows at most three Limit 1 practitioners. When someone reaches Limit 0, every Limit 1 practitioner of that Arcana moves back to Limit 2. Limit 2 has no limit. A god occupies Limit 0 of one Arcana; a faction's other Arcana may have a free one.",
+    "rationale": "A world law that prices following a god and explains why the cult and the allied factions stop at Limit 2.",
     "alternatives": "",
     "systemIds": [
       "progression",
@@ -741,7 +741,7 @@
   },
   {
     "id": "d-spirit-world",
-    "statement": "The Divine Plane and the Spirit World are separate. Every Stage 0 being has been on the unreachable Divine Plane since a past cataclysm. The Spirit World is the other side of the real world, reachable by higher followers. The Spirit General lives there, comes out only in cities, and can be defeated only during a capture. The player cannot enter it for now.",
+    "statement": "The Divine Plane and the Spirit World are separate. Every Limit 0 being has been on the unreachable Divine Plane since a past cataclysm. The Spirit World is the other side of the real world, reachable by higher followers. The Spirit General lives there, comes out only in cities, and can be defeated only during a capture. The player cannot enter it for now.",
     "rationale": "Corrects two earlier readings: the merged places and teleportation across the map. Each General can now be stopped in a different place.",
     "alternatives": "",
     "systemIds": [
@@ -773,7 +773,7 @@
   {
     "id": "d-ritual-sabotage",
     "statement": "A ritual stops when everyone conducting it dies, when the senior who started it dies, or, only while the cult has not fully taken the city, when conditions that differ from ritual to ritual are met through persuasion, disguise, and strong dialogue checks. A new ritual can be held two game days after the previous one.",
-    "rationale": "Keeps non-combat routes for less warlike Pathways without a learned answer. A fallen city is combat only.",
+    "rationale": "Keeps non-combat routes for less warlike Arcana without a learned answer. A fallen city is combat only.",
     "alternatives": "",
     "systemIds": [
       "cult-campaign",
@@ -820,8 +820,8 @@
   },
   {
     "id": "d-pathway-change",
-    "statement": "From Stage 5 and deeper a character can change to an adjacent Pathway at a much larger Sanity cost than advancing along their own. Detailed rules come later.",
-    "rationale": "Gives a way out when a Pathway's Stage 0 is occupied.",
+    "statement": "From Limit 5 and deeper a character can change to an adjacent Arcana at a much larger Sanity cost than advancing along their own. Detailed rules come later.",
+    "rationale": "Gives a way out when a Arcana's Limit 0 is occupied.",
     "alternatives": "",
     "systemIds": [
       "progression"
@@ -884,7 +884,7 @@
   },
   {
     "id": "d-slice-redefined",
-    "statement": "The Vertical Slice is one city and a small territory. The player starts without a faction, may join the internal-order faction through a first-day investigation of a disappearance, finds one or two potions for two styles of play, and reaches Stages 9–8; Stage 7 is for NPCs. The Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and 8–10 followers hold the ritual for its six-hour window, against allies that make the sides about equal. The player stops it and wins, or loses; death ends the run. Required in a limited form: exploration, gathering, Item Creation, Alchemy, combat, dialogue with checks, stealth, time, sleep. Out: Enchanting, Death Gap, Legacy Cache, Pathway change.",
+    "statement": "The Vertical Slice is one city and a small territory. The player starts without a faction, may join the internal-order faction through a first-day investigation of a disappearance, finds one or two potions for two styles of play, and reaches Limits 9–8; Limit 7 is for NPCs. The Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and 8–10 followers hold the ritual for its six-hour window, against allies that make the sides about equal. The player stops it and wins, or loses; death ends the run. Required in a limited form: exploration, gathering, Item Creation, Alchemy, combat, dialogue with checks, stealth, time, sleep. Out: Enchanting, Death Gap, Legacy Cache, Arcana change.",
     "rationale": "The first build should already show the war's core: a General, followers, and a ritual to stop.",
     "alternatives": "",
     "systemIds": [
@@ -946,7 +946,7 @@
   },
   {
     "id": "d-general-defeat",
-    "statement": "A General falls to allied numbers, after a disrupted ritual, or to a character at Stage 2, or Stage 3 with good statistics and strategy. Allied forces can kill Generals without the player: rarely on the middle setting, and all three at the lowest setting, where the game wins by itself.",
+    "statement": "A General falls to allied numbers, after a disrupted ritual, or to a character at Limit 2, or Limit 3 with good statistics and strategy. Allied forces can kill Generals without the player: rarely on the middle setting, and all three at the lowest setting, where the game wins by itself.",
     "rationale": "There is no special weapon; artifacts are later design.",
     "alternatives": "",
     "systemIds": [
@@ -961,7 +961,7 @@
   },
   {
     "id": "d-22-pathways",
-    "statement": "The game has 22 Arcana, one for each Tarot Major Arcana archetype, replacing the word Pathway. Each has ten Limits, replacing the word Stage, tied to the ten Sephiroth, with 220 names in all. Each Arcana has two primary attributes and one secondary attribute.",
+    "statement": "The game has 22 Arcana, one for each Tarot Major Arcana archetype, and each has ten Limits tied to the ten Sephiroth, with 220 names in all. A character is an Arcana, a Limit, and that Limit's name. There are no separate paths or path names. Each Arcana has two primary attributes and one secondary attribute.",
     "rationale": "Gives advancement a shared structure; each Arcana still has to differ by way of acting.",
     "alternatives": "",
     "systemIds": [
@@ -992,7 +992,7 @@
   },
   {
     "id": "d-faction-arcana",
-    "statement": "The internal-order faction has the High Priestess, with an occupied Limit 0, and the Fool and Magician, with a free one. The cult has the Emperor, occupied by the sealed being, and the Empress and Hierophant.",
+    "statement": "The internal-order faction has the High Priestess, with an occupied Limit 0, and the Fool and Magician, with a free one. The cult has the Emperor, occupied by the sealed being, and the Empress and Hierophant, occupied by sane gods who want to use the True God's descent.",
     "rationale": "Shows a faction's god holding only one of its Arcana.",
     "alternatives": "",
     "systemIds": [
@@ -1003,6 +1003,54 @@
     "origin": "imported",
     "sourceIds": [
       "src-05-1"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-combat-in-place",
+    "statement": "Confront runs in place: the surroundings become a Combat Grid built from real geometry, as in Baldur's Gate 3 or Fallout 2, and a whole city can be a battlefield. The Combat Arena and Theme Packs are retired. A round is one tick.",
+    "rationale": "Owner's intended combat. It restores in-location Turn-Based Mode, which was cancelled in 2026-08 as too expensive; the grid exists only during Confront.",
+    "alternatives": "",
+    "systemIds": [
+      "confront",
+      "spatial-structure"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-08"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-slice-arcana",
+    "statement": "The slice's Arcana are Жрица, offered by the faction for dialogue and stealth, and Император, found alone for confrontation. A character on Император must seek the next Limit among the cultists. Both have an occupied Limit 0.",
+    "rationale": "Makes joining or going alone a choice of play style with a lasting cost.",
+    "alternatives": "",
+    "systemIds": [
+      "vertical-slice",
+      "progression"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-05-1"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-place-window",
+    "statement": "A ritual's window stays 360 ticks, up to 360 rounds in a fight, and may shrink to 60 ticks after testing.",
+    "rationale": "To be checked in the real game.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "world-time"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
     ],
     "dateNote": "Owner-approved answers, 2026-11-01."
   }

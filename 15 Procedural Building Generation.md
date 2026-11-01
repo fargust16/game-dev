@@ -1,10 +1,10 @@
 # 15 Procedural Building Generation
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft
 
-Last Updated: 2026-08-09
+Last Updated: 2026-11-01 (Confront runs in place, so generated buildings feed the Combat Grid.)
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [90 Glossary](90%20Glossary.md)
@@ -101,7 +101,7 @@ Room Graph (assembly result)
 Vertical / openings / dress / secrets / gameplay bindings
 ```
 
-Confront still uses arena Theme Packs ([16](16%20Architecture%20Pivot.md)) — not interior mesh as grid truth.
+Confront runs in place on a Combat Grid built from the scene ([16](16%20Architecture%20Pivot.md)), so generated pieces must carry what the grid needs (CC-33).
 
 ## Hard rules
 
@@ -266,7 +266,7 @@ DNA-gated after Room Graph; must leave world residue ([08](08%20Confront%20Const
 
 ## Interior Scene Compiler
 
-Piece graph → navigable free-move scene; portals back to overworld; arena Theme Pack suggestion only.
+Piece graph → navigable free-move scene; portals back to overworld.
 
 ---
 
