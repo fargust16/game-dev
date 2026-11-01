@@ -1,10 +1,10 @@
 # 21 Cult Campaign and City Control
 
-Version: 0.12
+Version: 0.13
 
 Status: Draft — owner-approved direction, incomplete specification
 
-Last Updated: 2026-11-01 (allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
+Last Updated: 2026-11-01 (a ritual lapses a game day after liberation; retreat follows a force estimate; ritual group numbers set. Earlier: allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07 Character Life](07%20Character%20Life.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -138,11 +138,11 @@ While Turn-Based Mode runs, the rest of the world stands still and lives one tic
 
 ## The ritual in a city (owner-approved)
 
-1. A group of cultists goes to the ritual site, while the rest of the force clears it quickly. The group is about 5–7 followers in the campaign, more for a harder ritual. These numbers are not fixed.
+1. A group of cultists goes to the ritual site, while the rest of the force clears it quickly. The group is about 5–7 followers in the campaign, more for a harder ritual, so about 13–15 of a full sortie go on. These numbers are not fixed, and each city has its own strength of defence.
 2. Guards protect the site, then move forward to cut off the way to it.
 3. The main force moves on into the city towards its centre.
 
-Allied defenders know that a ritual is running and roughly where. Their directive is to beat the main force first and deal with the ritual afterwards, because a ritual has no victims. Once the main force is beaten, they go to the ritual. If they manage this inside the 60 ticks, they can stop it before it completes.
+Allied defenders know that a ritual is running and roughly where. Their directive is to beat the main force first and deal with the ritual afterwards, because a ritual has no victims. Once the main force is beaten, they go to the ritual. If they manage this inside the 60 ticks, they can stop it before it completes. A ritual group that still believes it can win stays and finishes, so a lone surviving ally does not end a ritual.
 
 Only the player can choose to go for the ritual first.
 
@@ -155,16 +155,18 @@ The ritual runs alongside the capture, as two separate tracks:
 | | The city holds | The city falls |
 |---|---|---|
 | **Ritual stopped** | A full defence | The cult is in the city with no Place of Power; it waits two days, and the capital stays closed |
-| **Ritual completed** | A defender of Limit 5 or deeper undoes it | City Capture |
+| **Ritual completed** | It is undone, or it lapses a game day later | City Capture |
 
 ## Undoing a ritual (owner-approved)
 
-A completed ritual can be undone. This replaces the earlier rule of one game day.
+A ritual has to be maintained once every 24 game hours. In a liberated city nobody maintains it, so it lapses one game day after the liberation.
 
-A defender of Limit 5 or deeper who knows the method undoes a ritual within 60 ticks of reaching its site.
+There is a faster way. A defender of Limit 5 or deeper who knows the method undoes a ritual within 60 ticks of reaching its site.
 
 - The allied factions have their own method, so a player who joins a faction gets it and can use it from Limit 5.
 - A player outside the faction has to earn it. Once the player has its trust, the faction may reveal the method as a reward for a quest.
+
+Undoing is therefore a way to be quicker, not a requirement. A player who frees a city with no such ally free to come can simply wait the day.
 
 ## Stopping a ritual (owner-approved)
 
@@ -179,7 +181,7 @@ The conditions differ from ritual to ritual, so the player cannot learn one answ
 
 The non-combat routes exist only while the cult has not fully taken the city. Once the city is cleared, a running ritual can be stopped only by fighting.
 
-Once a ritual is disrupted, the attributes of the enemy's followers and General fall. They retreat unless they still dominate by numbers even with that penalty. Against a single intruder they may try to drive that person off or fight.
+Once a ritual is disrupted, the attributes of the enemy's followers and General fall. The force estimate of the Cult Retreat rule then counts that penalty, so they retreat unless they still dominate. Against a single intruder they may try to drive that person off or fight.
 
 A new ritual can be held in a city two game days after the previous one there, so that rituals do not run constantly. The city itself can be retaken at once, but the ritual must wait. While it waits, the city does not count as captured and does not open the capital.
 
@@ -187,7 +189,11 @@ A new ritual can be held in a city two game days after the previous one there, s
 
 Cult Retreat is collective: once followers start to flee, they flee from every point of the city at once.
 
-They retreat when a senior left in charge of the city dies, or when losses leave them in a dangerously small minority. The order reaches every follower at the same moment through the Cult Thought Link. They head for the nearest city under Cult Control or scatter outside the walls.
+They retreat when a senior left in charge of the city dies, or when the balance of force is against them and they see no way to change it. The order reaches every follower at the same moment through the Cult Thought Link.
+
+The balance is a calculation over the numbers on each side, as in strategy games such as Heroes of Might and Magic. If the followers judge that they cannot win, they prefer retreat to death. If they judge that retreat has no chance either, because they would be caught and killed, they stay and take as many allied followers with them as they can. They know the cult recovers quickly and the allies slowly.
+
+Retreating followers head for the nearest city under Cult Control or scatter outside the walls.
 
 The player can chase and kill them while staying close enough that they do not leave the fight. The separation rule of [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md) governs that distance. Past it, they get away.
 
@@ -223,7 +229,6 @@ Who else counts for capture and liberation is open (CC-3), including Minor Facti
 
 - A character who belongs to a known faction and agrees to the check is exposed and attacked.
 - A city's garrison is its followers plus one or more seniors left in charge.
-- A liberated city whose ritual has not been undone stays a Place of Power, with no time limit (CC-36).
 - The capital ritual cannot be undone, because its completion manifests the being.
 
 # 5. The secret purpose of rituals
@@ -232,7 +237,7 @@ Who else counts for capture and liberation is open (CC-3), including Minor Facti
 
 A capture ritual turns a city into a **Place of Power** for the manifestation. Ordinary residents are needed alive as sacrifices, which is why the cult does not attack them. Materialising a Limit 0 being in the real world takes a very great number of sacrifices.
 
-A Place of Power needs no visible mark on the city. Its ritual is reset by being undone (§4). The earlier rule of one game day is withdrawn.
+A Place of Power needs no visible mark on the city. It keeps its force after its city is liberated, until its ritual is undone or lapses a game day later (§4).
 
 Nobody in the world knows this purpose, and neither does a first-time player. Everyone sees rituals with no civilian victims, so the allied factions treat the rituals themselves with scepticism, even as they fight for their cities.
 
@@ -255,10 +260,10 @@ A player who wins before manifestation never learns the purpose. It stays a secr
 - The Capital Awakening Ritual can begin only when every other city is under Cult Control. This rule is the **Capital Gate**.
 - The cult therefore captures the other cities first.
 - The fall of the last other city tells the player that the capital is next.
-- The player can liberate cities, which closes the Capital Gate again once the city's ritual has been undone.
-- Manifestation succeeds only if every city was captured at the moment of the capital ritual and that ritual was not interrupted. A liberated city whose ritual has not been undone still counts, because its Place of Power keeps its force.
+- The player can liberate cities, which closes the Capital Gate again once the city's ritual has been undone or has lapsed.
+- Manifestation succeeds only if every city was captured at the moment of the capital ritual and that ritual was not interrupted. A liberated city whose ritual has neither been undone nor lapsed still counts, because its Place of Power keeps its force.
 
-A liberation alone therefore does not stop manifestation. A character who slips away during the attack on the capital and frees a city does not pull the capital's attackers back, and the capital ritual can still succeed.
+A last-minute liberation therefore does not stop manifestation. A character who slips away during the attack on the capital and frees a city does not pull the capital's attackers back, and the capital ritual can still succeed.
 
 What the cult does after a broken capital ritual is open (CC-17).
 
@@ -434,7 +439,6 @@ Known risks:
 
 - **Constant urgency against curiosity.** A war with a visible front can crowd out exploration, the game's first pillar. The 15–20 day length, the quiet first days, and the 3×3 world are the response.
 - **Solo fight against a whole garrison.** The Cult Thought Link draws a city's followers to one fight. A lone character can meet all of them, so the size of a garrison and how they arrive decide whether solo liberation is possible (CC-8).
-- **Undoing as a target.** A liberated city keeps counting for the cult until someone of Limit 5 or deeper undoes its ritual, so how many such allies survive shapes the late campaign (CC-36).
 - **Content cost of ritual conditions.** Conditions that differ every time need a set of authored parts that the World Seed combines, which is a real load for a solo developer (CC-8).
 - **Slice scope.** The slice's required mechanics pull many undesigned systems into the first build (CC-29, CC-32, CC-33).
 - **Emptied cities after manifestation.** If captured cities lose their residents, the world after manifestation has few people, services, or quests left (CC-20).

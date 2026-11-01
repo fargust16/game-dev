@@ -916,8 +916,8 @@
   },
   {
     "id": "d-place-of-power-decay",
-    "statement": "A completed ritual is reset only by Ritual Undoing: a defender of Limit 5 or deeper who knows the method does it within 60 ticks of reaching the site. Allied factions have the method, and an outsider earns it through trust as a quest reward. The earlier rule of one game day is withdrawn.",
-    "rationale": "Makes reaching the site a task of its own, and a reward for joining or earning a faction's trust.",
+    "statement": "A ritual must be maintained every 24 game hours, so in a liberated city it lapses a game day after the liberation. A defender of Limit 5 or deeper who knows the method undoes it sooner, within 60 ticks of reaching the site. Allied factions have the method, and an outsider earns it through trust as a quest reward.",
+    "rationale": "A last-minute liberation still does not stop manifestation, and a player with no ally nearby can simply wait the day.",
     "alternatives": "",
     "systemIds": [
       "cult-campaign"
@@ -1104,6 +1104,21 @@
     "id": "d-ritual-tracks",
     "statement": "The ritual and the capture are two tracks. Allies know a ritual is running and roughly where, but their directive is the main force first, because a ritual has no victims. Only the player can choose to go for the ritual first. A Cult Retreat ends a running ritual: the order reaches every follower at once, and those conducting it leave without fighting.",
     "rationale": "Keeps stealth and dialogue as answers while a defence without the player can still stop the ritual at the middle difficulty.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-retreat-force-balance",
+    "statement": "Cult followers retreat when a calculated balance of force is against them and they see no way to change it, as in strategy games such as Heroes of Might and Magic. If retreat has no chance either, they stay and take as many allied followers as they can, because the cult recovers quickly and the allies slowly. A ritual group that still believes it can win stays and finishes the ritual.",
+    "rationale": "A lone surviving ally does not end a ritual, and the cult's choices follow from its asymmetric recovery.",
     "alternatives": "",
     "systemIds": [
       "cult-campaign"
