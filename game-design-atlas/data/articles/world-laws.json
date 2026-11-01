@@ -4,7 +4,7 @@
   "name": "World Laws",
   "title": "Баланс, фракции и читаемые симптомы",
   "category": "world",
-  "summary": "Мир стремится сохранить Balance, а разумные существа его смещают. Balance остаётся скрытым динамическим равновесием, которое читается через Symptoms. Три союзные церковные Major Factions противостоят культу запечатанного существа нулевой ступени, чьё возвращение может закончиться уничтожением планеты. В основе силы потусторонних лежат древние космические силы. Текущая игра охватывает одно государство; механика концовки и влияние на королевскую власть остаются открытыми.",
+  "summary": "Мир стремится сохранить Balance, а разумные существа его смещают. Balance остаётся скрытым динамическим равновесием, которое читается через Symptoms. Три союзные церковные Major Factions противостоят культу запечатанного существа нулевой ступени, чьё возвращение может закончиться уничтожением планеты. До манифестации культ продвигает возвращение через ритуалы над мирными жителями; кампанию можно завершить разрушением его командования или победой над проявившимся существом, после чего игрок получает рейтинг. В основе силы потусторонних лежат древние космические силы. Текущая игра охватывает одно государство; детали кампании и влияние на королевскую власть остаются открытыми.",
   "scenarioNote": "Отдельный проигранный сценарий в этот импорт не входил.",
   "points": [
     {
@@ -20,19 +20,19 @@
       "sourceId": "src-02"
     },
     {
-      "text": "The sealed Stage 0 being can manifest, attack other powerful beings and people, and ultimately destroy the planet; player death after its manifestation ends the playable story without a successor, even if the being is later defeated.",
+      "text": "The sealed Stage 0 being can manifest, attack other powerful beings and people, and ultimately destroy the planet; after manifestation, player death ends the playable story without a successor, even if the being is later defeated. The cult advances the return through several civilian-targeted rituals; the player can learn of them from partial clues and faction briefings without a global progress bar, then end the campaign by dismantling the cult's effective command before manifestation or defeating the manifested being and receive a campaign rating.",
       "sourceId": "src-02"
     },
     {
-      "text": "Точные таблицы Symptoms, условие победы фракции, восстановление Balance без игрока и числа Difficulty Pressure в 99 всё ещё открыты.",
+      "text": "Точные таблицы Symptoms, восстановление Balance без игрока, условия завершения других Major Factions и числа Difficulty Pressure в 99 всё ещё открыты. Детали ритуального графика, командного порога, захвата, участия NPC в финале, рейтинга и посткампанийной игры тоже остаются открытыми.",
       "sourceId": "src-99"
     }
   ],
   "gaps": [
     "Нет таблицы Symptoms по полосам Influence.",
-    "Нет конкретного условия победы или конца для фракции.",
+    "Не определены точные цели и условия завершения остальных Major Factions.",
     "Не решено, восстанавливается ли Balance без игрока и могут ли фракции невольно сотрудничать.",
-    "Не заданы точные условия и момент манифестации существа, состав и исход финального столкновения, связь победы с продолжением кампании и роль королевской власти."
+    "Не задано точное событие манифестации, состав и вклад союзников в финальное столкновение, а также посткампанийная игра. Не определены число, расписание и зависимости ритуалов, командный порог для досрочного завершения, правила захвата, критерии рейтинга, связь завершения кампании с конечным жизненным циклом мира и роль королевской власти."
   ],
   "sourceIds": [
     "src-02",
@@ -41,7 +41,7 @@
   "designMaturity": "partially-specified",
   "decisionState": "unresolved",
   "documentStatus": "Draft",
-  "lastDocumentUpdate": "2026-10-31",
+  "lastDocumentUpdate": "2026-11-01",
   "proposed": false,
   "implementationMaturity": "unknown",
   "proseOrigin": "atlas-annotation",

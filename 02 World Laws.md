@@ -1,16 +1,16 @@
 # 02 World Laws
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft
 
-Last Updated: 2026-10-31 (antagonist return/destruction phases, permanent no-successor rule after manifestation, cosmic-power premise, and one-state scope recorded; finale resolution and royal influence remain open. Earlier: primary antagonist and minor-faction examples recorded.)
+Last Updated: 2026-11-01 (cult ritual campaign loop, two completion paths, hidden threat progress, and final rating direction recorded; event schedule, threshold for dismantling the cult's command, capture rules, and difficulty mapping remain open. Earlier: antagonist return/destruction phases, permanent no-successor rule after manifestation, cosmic-power premise, and one-state scope recorded; royal influence remains open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md)
 
 Referenced By:
-[03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [07 Character Life](07%20Character%20Life.md), [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), [AGENTS.md](AGENTS.md), Future world, faction, consequence, progression, and collapse-system design.
+[03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 RPG Systems Coverage Draft](18%20RPG%20Systems%20Coverage%20Draft.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), [AGENTS.md](AGENTS.md), Future world, faction, consequence, progression, and collapse-system design.
 
 ---
 
@@ -94,7 +94,23 @@ The threat has distinct states: the followers prepare the return; the being begi
 
 If no one stops it, the being may destroy the other powerful beings and factions, then people and its own followers, before carrying out the act that destroys the planet. The player's playable story can end earlier: once the being has manifested, the player's death is defeat and no same-world successor appears, even if the being is later defeated. The game does not need to follow that character's death with a view of the planet's destruction.
 
-The previous rough concept of the being overpowering the assembled opposition remains an unresolved balance hypothesis, not a fixed number or outcome. Exact manifestation gates, finale participants, battle timing, victory conditions, and whether victory closes the campaign or lets the surviving current character continue remain open; defeat never restores same-world successors after manifestation. Preventing or defeating this threat does not by itself remove the world's finite life-cycle rule; how a positive resolution relates to later world collapse remains open.
+The previous rough concept of the being overpowering the assembled opposition remains an unresolved balance hypothesis, not a fixed number or outcome. Exact manifestation gates, finale participants, battle timing, and the relationship between a positive campaign result and the world's later finite life-cycle remain open. Once manifestation has happened, defeating the being never restores same-world successors.
+
+### Campaign operations and completion
+
+The player's campaign goal is to prevent the sealed being from manifesting. Before that point, the cult advances its plan through several rituals performed against ordinary civilians. Completing a ritual advances the hidden return threat; disrupting it delays the return. The number of rituals, prerequisites, sites, ordering, preparation and active durations, and interval between operations remain open. Their sites and timing vary by World Seed within authored rules; exact distributions belong to later balance work.
+
+The player learns about operations through partial world evidence: newspapers, rumours, notes, witnesses, physical traces, assignments, and briefings from allied Major Factions. These use the existing [Information Sources](09%20Information%20Sources.md) and [Points of Interest](04%20Points%20of%20Interest.md) framework. Faction membership can provide an official briefing; a Factionless or independent character can still uncover external clues. The campaign does not show a global ritual-progress bar. Symptoms and discovered evidence communicate that the threat is changing.
+
+The current concept allows a ritual to be stopped by killing or capturing everyone responsible for conducting it. Not every operation has to become an open fight; other approaches may be designed. Some operations may be led by a Stage 1 cult practitioner or deputy who can withdraw if they believe the site is secure. This is a possible encounter pattern, not a universal rule. Capture, custody, escape, and exact non-combat interruption rules remain open under [08 Confront Constraints](08%20Confront%20Constraints.md).
+
+The current finale concept places a final summoning ritual in the capital, though whether that location is fixed or seed-selected remains open. If it completes, the being manifests in the living world. At that point the return cannot be delayed or contained; defeating it in the final boss encounter is the only way to end this threat. Allied gods cannot physically enter the living world, but their followers, including powerful Stage 1 and Stage 2 practitioners, may assist. The player may join the confrontation or continue acting elsewhere while it unfolds.
+
+The campaign has two completion paths: remove the cult's ability to direct followers and coordinate rituals before manifestation, or defeat the manifested being. Eliminating every rank-and-file follower is not required. The exact command threshold and which named or generated leaders count toward it remain open. When either path completes, the campaign ends and presents a rating of the player's record. The current rating direction includes disrupted cult operations, completed official assignments, and help to ordinary people. It is a campaign summary, not character XP or a real-time threat meter; its categories and scoring remain open.
+
+Other supernatural practitioners in the world pursue overlapping goals independently of the player and may also oppose the cult. Their autonomy, impact on ritual outcomes, and relationship to player-created campaign events remain open.
+
+The initial difficulty direction is tied to the **Combat Difficulty** slider: at its lowest value, allied forces should be able to defeat the manifested being without the player's participation; at a middle value, the fight is close with a slight advantage to the cult; and at its highest values, the cult is increasingly favoured. Compare these points while holding the other six sliders constant. Whether any other slider changes final-battle support or outcomes remains open. This is a balance hypothesis, not a bundled difficulty preset; exact mapping and results remain open.
 
 ## Candidate beneficial Minor Factions
 
@@ -287,6 +303,8 @@ Detailed curse, blessing, and pathway systems belong to future Progression / Mag
 - **Meta Loop:** Compatible. Seeded worlds stay finite; Knowledge transfers as method, not solved answers.
 - **Design Pillars:** Compatible. Side Events are forks, not free loot; Difficulty raises challenge without erasing curiosity.
 - **Player Experience:** Compatible. Hidden Influence shifts reward understanding; Yield Threshold and eavesdropping support inventive Approaches.
-- **Decision Engine:** Compatible. Intervention and Side Events instantiate Attention, Approach, Allegiance, Commitment, and Bargain.
-- **Glossary:** Updated for the ancient cosmic powers, antagonist manifestation, playable-state scope, and Alchemy terms; faction names remain placeholders.
-- **Open Questions:** Updated for antagonist phases and defeat, royal influence, one-state scope, Alchemy, and the finite-world relationship.
+- **Decision Engine:** Compatible. Ritual investigation and intervention can instantiate Attention, Approach, Allegiance, Commitment, and Bargain; specific decision nodes remain future work.
+- **Points of Interest / Information Sources:** Compatible. Ritual evidence uses partial sources and timed POIs, not an omniscient quest-progress bar.
+- **Confront:** Compatible in principle. Killing or accepting surrender is covered by existing constraints; capture and custody require additional design before use.
+- **Glossary:** Updated for cult rituals, the two campaign-completion routes, Campaign Rating, permanent post-manifestation death, ancient cosmic powers, playable-state scope, and Alchemy; faction names remain placeholders.
+- **Open Questions:** Updated for ritual events, ending the campaign by removing the cult's command, difficulty mapping, final-rating criteria, royal influence, one-state scope, and the finite-world relationship.

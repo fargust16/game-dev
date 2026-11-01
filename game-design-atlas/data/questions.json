@@ -53,7 +53,7 @@
   },
   {
     "id": "q-wl-difficulty",
-    "text": "What are the V1 numeric ranges for Difficulty Pressure?",
+    "text": "How should the Combat Difficulty slider's low, middle, and high values change the final confrontation, and do any of the other six sliders affect allied support or its outcome?",
     "systemIds": [
       "world-laws"
     ],
@@ -768,6 +768,116 @@
     "systemIds": [
       "itemisation",
       "inventory"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-ritual-schedule",
+    "text": "How many civilian-targeted rituals can occur in a world, what preparation and dependencies connect them, and how do completion or interruption change the hidden return threat?",
+    "systemIds": [
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-ritual-clues",
+    "text": "How do partial clues reveal active or missed cult rituals without a global progress meter?",
+    "systemIds": [
+      "world-laws",
+      "information-sources",
+      "points-of-interest"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-command-ending",
+    "text": "Which cult command roles and coordination capabilities must be removed to complete the campaign before manifestation?",
+    "systemIds": [
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-finale-site",
+    "text": "Is the final summoning site always the capital, or can the World Seed select another site?",
+    "systemIds": [
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-npc-autonomy",
+    "text": "How much can autonomous supernatural practitioners advance, disrupt, or complete cult operations without direct player involvement?",
+    "systemIds": [
+      "world-laws",
+      "actors"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-campaign-rating",
+    "text": "Which actions and scoring weights determine the final campaign rating?",
+    "systemIds": [
+      "world-laws"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-capture",
+    "text": "Which non-combat methods can interrupt a ritual, and what capture, custody, escape, and return-to-cult rules support taking ritualists alive?",
+    "systemIds": [
+      "world-laws",
+      "confront"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-wl-post-ending",
+    "text": "After the ending rating, can the surviving character continue in an epilogue or free-play state, and how does that relate to the world's finite life-cycle?",
+    "systemIds": [
+      "world-laws",
+      "character-life",
+      "meta-loop"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority",

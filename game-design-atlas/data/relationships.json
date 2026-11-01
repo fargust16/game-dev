@@ -60,9 +60,10 @@
     "origin": "imported",
     "sourceIds": [
       "src-04",
+      "src-02",
       "src-99"
     ],
-    "explanation": "POI доставляют Side Events. Side Event может сдвинуть Faction Influence и при пропуске всё ещё меняет мир."
+    "explanation": "POI доставляют Side Events и могут представить ритуальные инциденты из World Laws; сроки и последствия пропуска должны оставаться читаемыми через Active Window и unattended resolution."
   },
   {
     "id": "rel-info-poi",
@@ -72,9 +73,10 @@
     "evidence": "confirmed",
     "origin": "imported",
     "sourceIds": [
-      "src-09"
+      "src-09",
+      "src-02"
     ],
-    "explanation": "Источники сведений намекают на POI или открывают их. Они не заменяют сами точки."
+    "explanation": "Частичные источники — новости, слухи, заметки, свидетели, следы и фракционные контакты — намекают на POI или открывают их. Они не заменяют сами точки и не превращаются в глобальный журнал прогресса."
   },
   {
     "id": "rel-info-decision",
@@ -252,6 +254,19 @@
       "src-17"
     ],
     "explanation": "02 говорит, что фракция имеет доступ к последователям, и масштаб зависит от Influence. Карточки NPC этого не разворачивают. Связь выведена из двух документов, а не записана как дизайн населения."
+  },
+  {
+    "id": "rel-laws-confront",
+    "fromId": "world-laws",
+    "toId": "confront",
+    "type": "dependency",
+    "evidence": "confirmed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-02",
+      "src-08"
+    ],
+    "explanation": "02 допускает Confront как один из методов срыва ритуала. Убийство, пленение, содержание под стражей и побег должны укладываться в ограничения 08; правила захвата ещё не спроектированы."
   },
   {
     "id": "rel-crafting-inventory",

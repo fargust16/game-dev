@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.58
+Version: 0.59
 
 Status: Draft
 
-Last Updated: 2026-10-31 (Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-01 (cult ritual, campaign completion/rating, and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -1060,7 +1060,13 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Alchemy** — A potion-only profession, separate from Item Creation and Enchanting. A character must learn it before Pathway-stage advancement. It discovers recipes, identifies and finds ingredients, and brews potions; its approved foundation is in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
 
-**Manifestation of the Sealed Being** — The state in which the sealed Stage 0 being has returned to the living world. While it remains an active threat, player-character death is terminal defeat and no same-world successor appears.
+**Manifestation of the Sealed Being** — The state in which the sealed Stage 0 being has returned to the living world. From manifestation onward, player-character death ends the playable story in defeat and no same-world successor appears, even if the being is later defeated.
+
+**Cult Ritual** — A timed operation of the opposing faction performed against ordinary civilians to advance the sealed being's return. Completion advances the hidden threat; interruption delays it. Exact number, schedule, dependencies, and interruption rules remain open.
+
+**Campaign Completion** — The campaign ends either when the cult's ability to direct followers and coordinate rituals is removed before manifestation, or when the manifested being is defeated. Both routes present a Campaign Rating.
+
+**Campaign Rating** — A post-campaign summary of the player's record, including cult disruption, official assignments, and aid to ordinary people. It is not character XP or a threat meter; scoring categories and weights remain open.
 
 **Ancient Cosmic Powers** — The setting-level origin of supernatural power in the living world. They seek to reclaim that power and can take greater notice of practitioners as they advance; their identities and influence mechanisms are outside current system scope.
 
