@@ -389,7 +389,7 @@ Filter of [AGENTS.md](AGENTS.md):
 
 Known risks:
 
-- **Constant urgency against curiosity.** A war with a visible front can crowd out exploration, the game's first pillar. The 15–20 day length and the 3×3 world are the response; the tempo curve is still open (CC-1).
+- **Constant urgency against curiosity.** A war with a visible front can crowd out exploration, the game's first pillar. The 15–20 day length, the quiet first days, and the 3×3 world are the response.
 - **Solo fight against a whole garrison.** The Cult Thought Link draws a city's followers to one fight. A lone character can meet all of them, so the size of a garrison and how they arrive decide whether solo liberation is possible (CC-4, CC-8).
 - **Content cost of ritual conditions.** Conditions that differ every time need a set of authored parts that the World Seed combines, which is a real load for a solo developer (CC-8).
 - **Slice scope.** The slice's required mechanics pull many undesigned systems into the first build (CC-27, CC-28).
