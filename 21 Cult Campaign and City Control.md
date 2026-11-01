@@ -1,10 +1,10 @@
 # 21 Cult Campaign and City Control
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft — owner-approved direction, incomplete specification
 
-Last Updated: 2026-11-01 (owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
+Last Updated: 2026-11-01 (owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07 Character Life](07%20Character%20Life.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -33,10 +33,10 @@ World creation: every city is under allied control; the cult holds none
         ↓
 Allied forces start large and shrink; Cult Forces keep growing
         ↓
-A Cult Force gathers enough followers and moves on a city
+A General gathers enough followers and launches a Cult Sortie against a city
         ↓
-City Capture: attack, other factions' followers cleared, six-hour ritual,
-the city becomes a Place of Power and a garrison stays
+City Capture: the attack and the ritual begin, other factions' followers are cleared,
+the ritual completes, the city becomes a Place of Power and a garrison stays
         ↓
 Cult Control ←——— City Liberation returns the city ———→ the cult must take it again
         ↓
@@ -45,7 +45,7 @@ Every city except the capital is under Cult Control: the Capital Gate is open
 Capital Awakening Ritual at the fixed centre of the capital,
 with smaller rituals in every captured city
         ↓
-Residents of captured cities die as the sacrifice; the sealed being manifests
+Residents of the capital and of captured cities die as the sacrifice; the sealed being manifests
 ```
 
 The campaign runs without the player. The player may defend, liberate, hunt commanders, work for a faction, or do none of these. Every step above can happen off-screen.
@@ -58,16 +58,12 @@ The reference for the intended feel is the Dominator war in *Space Rangers 2*: a
 
 - At the middle difficulty the campaign lasts **15–20 game days, about 40–50 real hours**. Player skill can shorten or lengthen it within one difficulty, and other difficulty settings sit around this target.
 - The target world is **3×3 tiles of 1400 m, 4200 × 4200 m**.
-- The world has **5–7 cities, ideally 7**; 6 is also acceptable.
+- The world has **5–7 cities, ideally 7**; 6 is also acceptable. The count includes the capital, so 7 cities means the capital plus 6 others.
 - Villages and small settlements are not cult targets. Only cities are.
 - Cities stand far enough apart that a player who learns of a ritual has time to reach it, stop it, and then move on to the next city. Two neighbouring cities must not be clearable in one quick pass.
 - Pressure comes first from information, and distance adds to it.
 - The extra room gives time for exploration, gathering, monsters, and crafting. Secret places, chests, and formulas are scattered across the world.
 - The player works with what comes to hand, already aware of the time and the threat, and does not choose freely among every opportunity in the world. This is the basis of replayability.
-
-## Working reading
-
-The count of 5–7 includes the capital, so 7 cities means the capital plus 6 others.
 
 ## Derived figures
 
@@ -81,6 +77,7 @@ These follow from existing values. They are planning figures, not measurements.
 | Land at today's land share | about 6.4 km² | Today's 2.83 km² scaled by world area |
 | Distance between neighbouring cities | about 1 km, about 23 ticks | 7 cities evenly spread over that land; roads and relief lengthen it |
 | Unopposed capture rate | one city per 2.5–3.3 game days | 6 non-capital cities over 15–20 days |
+| Sortie cycle per General | about 5 game days | First sorties on day 4, all cities but the capital fallen by about day 16, three Generals, 60% of sorties succeed |
 
 ## Effect on geography
 
@@ -122,7 +119,7 @@ Control changes only when City Capture or City Liberation completes, or when a f
 
 ## Owner-approved
 
-- **City Capture** runs in a fixed order: the cult attacks, clears the city of every follower of other factions by driving them out or killing them, conducts a six-hour ritual that can still be stopped, and then holds the city with a garrison.
+- **City Capture** begins with a Cult Sortie. The ritual starts trying to run as soon as the capture begins. The cult clears the city of every follower of other factions by driving them out or killing them, the six-hour ritual completes, and a garrison holds the city.
 - The cult does not attack ordinary residents during City Capture. It targets followers.
 - **City Liberation** is symmetrical: every cult follower in the city is driven out or destroyed.
 - The player can attempt City Liberation alone or alongside a faction. City defence alongside a faction is also available.
@@ -130,13 +127,21 @@ Control changes only when City Capture or City Liberation completes, or when a f
 - A General does not have to be in a captured city. A General may also run from a fight, except the Holding General.
 - Rituals can run in parallel in two cities when the cult has gathered enough followers.
 
-## Ritual sabotage (owner-approved)
+## Stopping a ritual (owner-approved)
 
-A ritual is a concrete mechanism in the city. It can be sabotaged out of combat, without a fight.
+A ritual is stopped in one of three ways:
 
-Once a ritual is disrupted, everyone conducting it loses most of their power and cannot fight properly. They try to leave the city first. Against a single intruder they may try to drive that person off or fight. Against many people they most likely retreat.
+- Kill everyone conducting it.
+- Kill the senior who started it. The ritual then counts as disrupted.
+- Meet the conditions set for that ritual: persuade cultists, pose as one of them or as a local, pretend to help and derail it. These are strong dialogue checks, such as Intelligence, or Intelligence against Will.
 
-The cult cannot repeat the ritual straight away. How long it must wait is open (CC-7). What the mechanism is and what sabotage takes is open (CC-8).
+The conditions differ from ritual to ritual, so the player cannot learn one answer and repeat it. They take planning, and they give less warlike Pathways a way to act.
+
+The non-combat routes exist only while the cult has not fully taken the city. Once the city is cleared, a running ritual can be stopped only by fighting.
+
+Once a ritual is disrupted, everyone conducting it loses most of their power and cannot fight properly, and the enemy's strength falls. They try to leave the city first. Against a single intruder they may try to drive that person off or fight. Against many people they most likely retreat.
+
+A new ritual can be held two game days after the previous one, so that rituals do not run constantly. The city itself can be retaken at once, but the ritual must wait.
 
 ## Cult Retreat (owner-approved)
 
@@ -177,6 +182,7 @@ Who else counts for capture and liberation is open (CC-3), including Minor Facti
 ## Working readings
 
 - A character who belongs to a known faction and agrees to the check is exposed and attacked.
+- The two-day wait counts per city. A city retaken before it ends keeps its City Control value until a ritual completes there.
 - A city's garrison is its followers plus one or more seniors left in charge. Its numbers are open (CC-4).
 
 # 5. The secret purpose of rituals
@@ -191,13 +197,15 @@ Nobody in the world knows this purpose, and neither does a first-time player. Ev
 
 The player can only guess, until manifestation reveals what the rituals were for. That knowledge stays in the player's head. It carries to the next world as Player Knowledge and never as a mechanic: there are no dialogues to convince anyone of it.
 
-At the Capital Awakening Ritual, followers conduct smaller rituals in every captured city at the same moment, and the people there die as the sacrifice that manifests the being.
+At the Capital Awakening Ritual, followers conduct smaller rituals in every captured city at the same moment, and the people of those cities and of the capital die as the sacrifice that manifests the being.
 
 ## Change from the earlier draft
 
 The earlier draft described rituals as civilian-targeted. The cult's violence in a capture is now aimed at followers. Residents are spared until the final ritual, and their death is what the campaign is racing towards.
 
-The player cannot evacuate residents. Whether the capital's residents die too, and what the world looks like afterwards, is open (CC-20). Whether a player who wins before manifestation ever learns the secret is open (CC-21).
+The player cannot evacuate residents. Only a few people of the state survive. They are not simulated: the ending reports them. What play looks like after manifestation is open (CC-20).
+
+A player who wins before manifestation never learns the purpose. It stays a secret and a reason to play again.
 
 # 6. Capital Gate and manifestation
 
@@ -213,6 +221,10 @@ The player cannot evacuate residents. Whether the capital's residents die too, a
 
 Liberating a city while the capital ritual is running breaks the condition, so the ritual fails. What the cult does next is open (CC-17).
 
+## Last Free City Rule (owner-approved)
+
+A new character can appear only while at least one uncaptured city has no battle in it. A character who dies during the final attack, when the other cities have fallen and the last free city is under attack, has nowhere to return: that death is final, even before manifestation.
+
 ## Consequences
 
 The Capital Gate replaces the earlier undecided "required number of rituals". The number of rituals the cult needs is the number of non-capital cities plus every recapture forced by City Liberation.
@@ -225,7 +237,7 @@ City Control is the campaign's public progress reading. It replaces the hidden r
 
 The cult's forces are divided into three **Cult Forces**, each led by a **Cult General**. All three Generals are Stage 2 followers. They share the objective of capturing cities through rituals and differ in how they act. Those differences require different responses from the player.
 
-Generals prepare their next attack in an area outside the city, so that they cannot be killed early. The exception is the Holding General, who stays with its followers in the cities it captures.
+Each General can be stopped in a different place: one on the approach, one in a city it holds, and one only during a capture.
 
 Killing all three Generals is the only way to end the campaign before manifestation.
 
@@ -233,17 +245,17 @@ The labels below describe roles only. They are not final names.
 
 | Working label | Owner-approved behaviour | Can it be found? | What it asks of the player |
 |---|---|---|---|
-| **Teleporting General** | Lives in the Spirit World and teleports in to attack. Can be defeated only straight after teleporting, because for some time it cannot return. | Not in the real world. | Be at the arrival in time and win inside that window. |
-| **Holding General** | The warlike one. Stays in person with its followers in each city it captures. When it moves to the next city, it leaves only a small part behind and takes its main force along. Fights to the end. Hardest of the three in battle. | Yes. | Prepare for one decisive fight, or strike the weak garrisons it leaves behind. |
-| **Raiding General** | Captures a city, then leaves on foot for a base in neutral territory and raids from there. | Yes. | Find the base and break the raiding cycle. |
+| **Spirit General** | Lives in the Spirit World. After a capture it leaves all its followers in the city and returns there. For the next capture it comes out in a city together with its followers. It comes out only in cities. | Only during a capture, while the ritual runs. | Be at the ritual in time and win while it is out. |
+| **Holding General** | The warlike one. Stays with its followers in the city it captured until it has gathered enough for the next sortie, then moves on, leaving only a small part behind. Fights to the end. Hardest of the three in battle. | In the city it holds. | Prepare for one decisive fight, or strike the weak garrisons it leaves behind. |
+| **Raiding General** | Walks in the open. After a capture it leaves almost all its force in the city and goes off on foot with a few followers, then gathers a new force in neutral territory, where it has a base. | In neutral territory or on the approach. | Find it between sorties and stop it before it reaches a city. |
 
-The owner's reference for the Teleporting General is a *Space Rangers* enemy that travels through black holes. This is a comparison of feel only.
+The owner's reference for the Spirit General is a *Space Rangers* enemy that travels through black holes. This is a comparison of feel only.
 
 ## Spirit World and Divine Plane
 
 These are two different places:
 
-- The **Spirit World** is the other side of the real world. Higher followers of Pathways can reach it, and the Teleporting General lives there. The player cannot enter it for now.
+- The **Spirit World** is the other side of the real world. Higher followers of Pathways can reach it, and the Spirit General lives there. The player cannot enter it for now.
 - The **Divine Plane** is unreachable. Since a past cataclysm, every Stage 0 being has been there, the sealed being included. They cannot materialise in the real world on their own and act through their followers.
 
 The allied gods refused to sacrifice people to return. The sealed being's cult chose to do it.
@@ -258,6 +270,7 @@ The three Generals are therefore the top of the cult's living hierarchy. Above t
 
 - A killed General is not replaced, because killing all three must remain able to end the campaign. Whether the cult's reinforcement slows as Generals fall is open (CC-9).
 - A General is a persistent named actor, not a generated follower.
+- The Spirit General gathers its next force in the Spirit World.
 - The Holding General does not Break Away or offer a Yield. This is an exception for one actor, not a change to [08 Confront Constraints](08%20Confront%20Constraints.md).
 - The three behaviours are fixed archetypes across worlds. The World Seed varies who the Generals are, their bases, and their target order, so that a past world teaches how to read a General without solving the next one. Whether they vary by Pathway depends on CC-22.
 - Stage 2 Generals are a full-game world premise, in the same sense as the Stage 2–3 head of the covert alchemical network in [02 World Laws](02%20World%20Laws.md). They do not widen V1's Stages 9–7 player scope in [05 Progression](05%20Progression.md).
@@ -268,22 +281,32 @@ The three Generals are therefore the top of the cult's living hierarchy. Above t
 
 **Allied forces** are generated at world creation. During play, new followers of certain stages appear at a small periodic rate, in the cities their faction holds. Losses outpace replacement, so the allied side can dwindle over a long campaign.
 
-**Cult Forces** generate much faster and are not tied to the general rules of the world's population. They simply gain new followers periodically.
+**Cult Forces** generate much faster and are not tied to the general rules of the world's population. The system gives each General new followers automatically and periodically, near that General. The game does not need to explain where they were found.
 
 Killing rank-and-file cult followers never exhausts the cult. New followers keep appearing until its leadership is destroyed.
 
-When a Cult Force has gathered a certain number of followers, it attempts to capture a city and conduct a ritual there.
-
 Campaign pace depends on difficulty: harder settings make the cult advance faster.
+
+## Cult Sorties (owner-approved)
+
+A **Cult Sortie** is a General's attempt on a city. Each General launches one when it has gathered a certain number of followers.
+
+The campaign has no calendar of attacks. The first sorties start around day 3–5 only because that is when enough followers have appeared. Later sorties follow the same way.
+
+A sortie can succeed or fail, depending on how strong the city's defence is:
+
+- At the middle difficulty the attackers have the better chance, but the allied factions can still repel the cult without the player.
+- On harder settings a city is almost certain to fall unless someone interferes.
+
+After a capture, each General gathers its next force in its own way (§7), and the garrison stays behind.
 
 ## Working readings
 
 - "Not tied to the general rules" applies to how often followers appear and where they come from. It does not change character rules. Generated cult followers use the same attributes, skills, Pathway stages, and derived-statistic formulas as every other actor, as [02 World Laws](02%20World%20Laws.md) requires. They are generated at their stage and do not play through Alchemy or Conduct Progress.
-- The strength threshold belongs to each Cult Force, not to the cult as a whole.
 
 ## Open
 
-Spawn location, stage mix, cap, and the in-world source of new followers are CC-12. Allied starting strength and replacement are CC-13. Which difficulty setting owns campaign pace is CC-14: [02 World Laws](02%20World%20Laws.md) forbids a single slider from silently bundling unrelated effects, so this cannot be attached to a slider by default.
+Rates, stage mix, cap, and sortie size are CC-12. Allied starting strength and replacement are CC-13. Which difficulty setting owns campaign pace is CC-14: [02 World Laws](02%20World%20Laws.md) forbids a single slider from silently bundling unrelated effects, so this cannot be attached to a slider by default.
 
 # 9. The player in the campaign
 
@@ -328,7 +351,7 @@ Filter of [AGENTS.md](AGENTS.md):
 | Creates curiosity? | Yes. Rituals with no visible victims and each General's tells give the player something to guess at. |
 | Teaches about the world? | Yes: General behaviour, tells, and control patterns are prime Player Knowledge targets. |
 | Power has a price? | Partly. Fighting for a city costs time elsewhere; costs of allied help are open. |
-| Multiple options viable? | **Partly.** Ritual sabotage and stealth give real non-combat routes during a capture. Once a city has fallen, breaking its garrison is still combat only. [08 Confront Constraints](08%20Confront%20Constraints.md) requires real alternatives (CC-8). |
+| Multiple options viable? | **Yes, before a city falls.** Persuasion, disguise, and stealth are real routes during a capture. A fallen city is combat only by the owner's decision; [08 Confront Constraints](08%20Confront%20Constraints.md) accepts alternatives that come beforehand. |
 | Failure valuable? | **At risk.** Liberating a city that falls again the next day may only waste time. Liberation needs a lasting payoff (CC-7). |
 | World changes afterward? | Yes: control, residents, services, the Capital Gate, and the deaths at manifestation. |
 
@@ -336,7 +359,8 @@ Known risks:
 
 - **Constant urgency against curiosity.** A war with a visible front can crowd out exploration, the game's first pillar. The 15–20 day length and the 3×3 world are the response; the tempo curve is still open (CC-1).
 - **Solo fight against a whole garrison.** The Cult Thought Link draws a city's followers to one fight. A lone character can meet all of them, so the size of a garrison and how they arrive decide whether solo liberation is possible (CC-4, CC-8).
-- **Sabotage as a best strategy.** If one stealthy character can always break a ritual and send its conductors running, sabotage beats every other answer. The mechanism needs its own price and risk (CC-8).
+- **Content cost of ritual conditions.** Conditions that differ every time need a set of authored parts that the World Seed combines, which is a real load for a solo developer (CC-8).
+- **Simultaneous first strikes.** Three Generals reaching their numbers around the same day would take half the cities at once (CC-12).
 - **Emptied cities after manifestation.** If captured cities lose their residents, the world after manifestation has few people, services, or quests left (CC-20).
 - **Power gap.** A Stage 7 character facing a Stage 2 General has a 1.32 stage multiplier against 2.66, before abilities ([07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md)). Defeating a General needs a route other than a stat race (CC-10).
 - **Terrain evidence.** The target world and city count sit outside the conditions of the terrain research so far (CC-2).
@@ -371,7 +395,7 @@ The following V1/V2/V3 split is proposed, not approved. It depends on CC-11, inc
 - **Decision Engine:** Compatible once non-combat routes exist. Stale single-difficulty wording corrected.
 - **Points of Interest / Information Sources:** Updated for persistent occupied cities, public City Control, and the rituals' purpose, which no source reports.
 - **Progression:** Updated with the Stage Occupancy Rule for every Pathway and with Pathway change from Stage 5. Stage 2 Generals are a full-game premise and do not widen V1's player stages.
-- **Character Life:** Updated. Manifestation is the Capital Awakening Ritual's completion; a manifestation during a Death Gap is open (CC-18).
+- **Character Life / Vision / Meta Loop:** Updated. Manifestation is the Capital Awakening Ritual's completion, and the Last Free City Rule is recorded in 07 and in Canonical 00 and 00.2.
 - **Confront:** Compatible in principle; §12 records the requirement for real alternatives.
 - **World Time:** Updated. The Cult Thought Link is a defined information channel.
 - **World generation:** The 3×3 target and 5–7 cities are recorded in 14, 17, and GEO-1 without any production change.

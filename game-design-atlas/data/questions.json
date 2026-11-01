@@ -890,14 +890,14 @@
   },
   {
     "id": "q-cc-1",
-    "text": "CC-1. The length is decided: 15–20 game days at the middle difficulty. Is the pace even or accelerating, and how many quiet days come before the first city falls?",
+    "text": "CC-1. Resolved: tempo comes from generation, not a calendar. Numbers belong to CC-12.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "scope",
     "origin": "imported"
   },
@@ -929,7 +929,7 @@
   },
   {
     "id": "q-cc-4",
-    "text": "CC-4. Resolved: attack, clearing, a six-hour ritual that can still be stopped, then a garrison stays. Garrison numbers belong with CC-12.",
+    "text": "CC-4. Resolved: a Cult Sortie begins and the ritual starts trying to run, followers are cleared, the six-hour ritual completes, and a garrison stays.",
     "systemIds": [
       "cult-campaign"
     ],
@@ -968,7 +968,7 @@
   },
   {
     "id": "q-cc-7",
-    "text": "CC-7. Ownership is decided, including Unclaimed cities. How long must the cult wait before repeating a ritual there, how does it take an Unclaimed city, and what lasting gain justifies liberation?",
+    "text": "CC-7. Ownership and the two-day ritual wait are decided. Does the wait count per city, per General, or for the whole cult? Does a sortie against an Unclaimed city need a fight? Does a garrison's death set its General back?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -981,7 +981,7 @@
   },
   {
     "id": "q-cc-8",
-    "text": "CC-8. A ritual can be sabotaged without a fight. What is the mechanism and its price, and is there a non-combat way to break the garrison of a city that has already fallen?",
+    "text": "CC-8. Resolved in principle: rituals stop through their conductors' or senior's death or through changing conditions. Which authored parts make up those conditions, which checks apply, and how much enters V1?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1007,7 +1007,7 @@
   },
   {
     "id": "q-cc-10",
-    "text": "CC-10. How long is the Teleporting General's vulnerable window and how is the arrival predicted; how is the Raiding General's base found; how can a character far below Stage 2 defeat a General?",
+    "text": "CC-10. How does the player predict which city the Spirit General comes out in, how is the Raiding General found between sorties, and how can a character far below Stage 2 defeat a General?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1033,7 +1033,7 @@
   },
   {
     "id": "q-cc-12",
-    "text": "CC-12. Where do new cult followers appear, at which stages, how often, with what cap, and what is their in-world source? How many followers launch an attack or a second parallel ritual?",
+    "text": "CC-12. Followers appear near each General and a certain number launches a sortie. At which stages, how often, with what cap, how many make a sortie or a garrison, and do the Generals differ in rate?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1059,7 +1059,7 @@
   },
   {
     "id": "q-cc-14",
-    "text": "CC-14. Which setting owns campaign pace: an eighth slider, Combat Difficulty, or World Inhabitants?",
+    "text": "CC-14. The direction of sortie odds is set. Which setting owns campaign pace and those odds: an eighth slider, Combat Difficulty, or World Inhabitants?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1072,7 +1072,7 @@
   },
   {
     "id": "q-cc-15",
-    "text": "CC-15. How are off-screen clashes resolved, and is a per-city follower ledger the right model?",
+    "text": "CC-15. How is a sortie's result against a city's defence calculated, is a per-city follower ledger the right model, and can allied groups kill a General without the player?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1111,14 +1111,14 @@
   },
   {
     "id": "q-cc-18",
-    "text": "CC-18. If the being manifests during a Death Gap, does the pending successor still appear?",
+    "text": "CC-18. Resolved: the Last Free City Rule covers a manifestation during a Death Gap.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
@@ -1137,7 +1137,7 @@
   },
   {
     "id": "q-cc-20",
-    "text": "CC-20. Residents cannot be evacuated. Do the capital's residents die too, and what is left of the world afterwards?",
+    "text": "CC-20. The residents of the capital and of captured cities die. Does play continue after manifestation in a world without residents, or does it move straight to the final fight?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1150,14 +1150,14 @@
   },
   {
     "id": "q-cc-21",
-    "text": "CC-21. Resolved: the player learns the purpose only at manifestation. Is it shown to a player who wins before manifestation?",
+    "text": "CC-21. Resolved: the player learns the purpose only at manifestation; a player who wins before it never does.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },

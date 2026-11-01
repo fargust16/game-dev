@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.63
+Version: 0.64
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-01 (Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -1072,15 +1072,19 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Divine Plane** — The unreachable realm where every Stage 0 being has been since a past cataclysm. They cannot materialise in the real world without a very great number of sacrifices.
 
-**Spirit World** — The other side of the real world, reachable by higher followers of Pathways. The Teleporting General lives there. It is not the Divine Plane. The player cannot enter it for now.
+**Spirit World** — The other side of the real world, reachable by higher followers of Pathways. The Spirit General lives there. It is not the Divine Plane. The player cannot enter it for now.
 
 **Stage Occupancy Rule** — On every Pathway, while Stage 0 is occupied there is no Stage 1; while it is unoccupied there are at most three Stage 1 practitioners at a time. When someone reaches Stage 0, every Stage 1 practitioner of that Pathway moves back to Stage 2. Stage 2 has no limit.
+
+**Cult Sortie** — A General's attempt on a city, launched when it has gathered a certain number of followers. It can succeed or fail depending on the city's defence.
+
+**Last Free City Rule** — A new character can appear only while at least one uncaptured city has no battle in it. Otherwise a character's death is final, even before manifestation.
 
 **Unclaimed** — The City Control value of a city liberated with no allied faction present. The first allied faction whose follower arrives claims it.
 
 **City Control** — The state saying who holds a city: Allied Control by one allied Major Faction, Cult Control, or Unclaimed. It changes only when City Capture or City Liberation completes, or when a faction claims an Unclaimed city. Reported City Control is the player's public reading of campaign progress. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
 
-**City Capture** — The cult taking a city in a fixed order: attack, clearing every follower of other factions by driving them out or killing them, a six-hour ritual that can still be stopped, and a garrison left to hold it. Ordinary residents are not attacked.
+**City Capture** — The cult taking a city: a Cult Sortie begins, the ritual starts trying to run, every follower of other factions is driven out or killed, the six-hour ritual completes, and a garrison holds the city. Ordinary residents are not attacked.
 
 **City Liberation** — The return of a city from Cult Control by driving out or destroying every cult follower in it.
 
@@ -1088,11 +1092,11 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Follower** — A character who belongs to a Major Faction's forces. Ordinary residents are not followers. Whether other actors count for City Capture and City Liberation remains open.
 
-**Cult General** — One of three Stage 2 followers who each lead a Cult Force and together form the top of the cult's living hierarchy. Their working role labels are the Teleporting, Holding, and Raiding Generals; these are not final names.
+**Cult General** — One of three Stage 2 followers who each lead a Cult Force and together form the top of the cult's living hierarchy. Their working role labels are the Spirit, Holding, and Raiding Generals; these are not final names.
 
 **Cult Force** — The followers led by one Cult General. Cult Forces generate much faster than allied forces and are not exhausted by killing rank-and-file followers.
 
-**Capital Awakening Ritual** — The final cult ritual, held at the centre of the capital once the Capital Gate is open, with smaller rituals in every captured city at the same moment. The people there die as the sacrifice. It succeeds only if every city was captured at the moment of the ritual and the ritual was not interrupted. Its completion manifests the sealed being there. It is distinct from the later planet-destruction rite.
+**Capital Awakening Ritual** — The final cult ritual, held at the centre of the capital once the Capital Gate is open, with smaller rituals in every captured city at the same moment. The people of those cities and of the capital die as the sacrifice. It succeeds only if every city was captured at the moment of the ritual and the ritual was not interrupted. Its completion manifests the sealed being there. It is distinct from the later planet-destruction rite.
 
 **Planet-Destroying Ritual** — The separate act the manifested being eventually intends to perform to destroy the planet after attacking other powerful beings, factions, people, and its own followers. Its exact trigger and timing remain open.
 

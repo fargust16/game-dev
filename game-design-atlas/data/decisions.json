@@ -644,7 +644,7 @@
   },
   {
     "id": "d-three-generals",
-    "statement": "Three Stage 2 Cult Generals lead the Cult Forces with different styles: a teleporting one, one that holds a zone and fights to the end, and one that raids from a base in neutral territory.",
+    "statement": "Three Stage 2 Cult Generals lead the Cult Forces with different styles: the Spirit General, who comes out of the Spirit World only in cities; the Holding General, who stays in a city until it has gathered enough for the next sortie and fights to the end; and the Raiding General, who walks in the open and gathers forces in neutral territory.",
     "rationale": "Different enemy behaviour forces different player responses.",
     "alternatives": "",
     "systemIds": [
@@ -741,8 +741,8 @@
   },
   {
     "id": "d-spirit-world",
-    "statement": "The Divine Plane and the Spirit World are separate. Every Stage 0 being has been on the unreachable Divine Plane since a past cataclysm. The Spirit World is the other side of the real world, reachable by higher followers; the Teleporting General lives there and can be defeated only straight after teleporting in. The player cannot enter it for now.",
-    "rationale": "Corrects an earlier reading that merged the two places and gives the Teleporting General a distinct counterplay.",
+    "statement": "The Divine Plane and the Spirit World are separate. Every Stage 0 being has been on the unreachable Divine Plane since a past cataclysm. The Spirit World is the other side of the real world, reachable by higher followers. The Spirit General lives there, comes out only in cities, and can be defeated only during a capture. The player cannot enter it for now.",
+    "rationale": "Corrects two earlier readings: the merged places and teleportation across the map. Each General can now be stopped in a different place.",
     "alternatives": "",
     "systemIds": [
       "cult-campaign",
@@ -757,7 +757,7 @@
   },
   {
     "id": "d-capture-order",
-    "statement": "City Capture runs in order: attack, clearing of other factions' followers, a six-hour ritual that can still be stopped, then a garrison stays.",
+    "statement": "City Capture begins with a Cult Sortie. The ritual starts trying to run, other factions' followers are cleared, the six-hour ritual completes, and a garrison stays.",
     "rationale": "Fixes when the player and allies can still intervene.",
     "alternatives": "",
     "systemIds": [
@@ -772,8 +772,8 @@
   },
   {
     "id": "d-ritual-sabotage",
-    "statement": "A ritual is a concrete mechanism that can be sabotaged without a fight. Those conducting it then lose most of their power and try to leave, and the ritual cannot be repeated straight away.",
-    "rationale": "Gives a capture a real non-combat answer.",
+    "statement": "A ritual stops when everyone conducting it dies, when the senior who started it dies, or, only while the cult has not fully taken the city, when conditions that differ from ritual to ritual are met through persuasion, disguise, and strong dialogue checks. A new ritual can be held two game days after the previous one.",
+    "rationale": "Keeps non-combat routes for less warlike Pathways without a learned answer. A fallen city is combat only.",
     "alternatives": "",
     "systemIds": [
       "cult-campaign",
@@ -830,6 +830,55 @@
     "origin": "imported",
     "sourceIds": [
       "src-05"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-cult-sortie",
+    "statement": "Each General launches a Cult Sortie when generation has given it enough followers; no calendar sets attacks. A sortie can fail. At the middle difficulty attackers have the better chance but allies can repel them alone; on harder settings a city almost certainly falls unless someone interferes.",
+    "rationale": "Tempo emerges from the simulation, with the first sorties around day 3–5.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "actors"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-last-free-city",
+    "statement": "A new character can appear only while at least one uncaptured city has no battle in it. Otherwise a character's death is final, even before manifestation.",
+    "rationale": "There is nowhere left to return. Recorded in Canonical 00 Vision and 00.2 Meta Loop as well as 07 and 21.",
+    "alternatives": "",
+    "systemIds": [
+      "character-life",
+      "cult-campaign",
+      "meta-loop"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-07",
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-capital-sacrifice",
+    "statement": "At manifestation the residents of the capital and of captured cities die. Residents cannot be evacuated, and the ending reports only a few survivors without simulating them.",
+    "rationale": "A positive ending after manifestation still carries the cost of the sacrifice.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
     ],
     "dateNote": "Owner-approved answers, 2026-11-01."
   }

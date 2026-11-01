@@ -1,10 +1,10 @@
 # 07 Character Life
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft
 
-Last Updated: 2026-11-01 (manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
+Last Updated: 2026-11-01 (Last Free City Rule recorded. Earlier: manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md)
@@ -26,7 +26,7 @@ It answers:
 
 1. Character death ends that Character Life permanently.
 2. Character power, Pathway stage, and personal inventory do not continue as a living hero.
-3. Before the sealed Stage 0 being manifests in the living world, the world advances during a fixed short Death Gap and may receive a successor.
+3. Before the sealed Stage 0 being manifests in the living world, the world advances during a fixed short Death Gap and may receive a successor, provided at least one uncaptured city has no battle in it (the Last Free City Rule).
 4. Once the being manifests in the living world, player-character death is terminal defeat for that world’s playable story; no successor appears, even if the being is later defeated.
 5. Player Knowledge survives.
 6. Ordinary attributes and skill development belong to the deceased Character Life and do not transfer to a successor.
@@ -52,9 +52,10 @@ When the character dies, the Character Life and its personal staged Pathway powe
 The next step depends on the state of the primary opposing being:
 
 - **Before its return to the living world:** a fixed Death Gap begins, world advancement resolves without player control, and the player may create a new character for the same world or start a new world.
+- **When no uncaptured city is free of battle:** there is nowhere to return, so the death is final, even before manifestation. This is the Last Free City Rule ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)).
 - **After it has manifested:** the current playable story ends in defeat if the player character dies. There is no successor and no further same-world Character Life, even if the being has since been defeated. The world may continue beyond the player’s point of view.
 
-Death is not an instant reload of the same person. Manifestation is the completion of the Capital Awakening Ritual ([02 World Laws](02%20World%20Laws.md)). Whether a manifestation during a Death Gap denies the pending successor is open ([99 Open Questions](99%20Open%20Questions.md) CC-18). The campaign ends with a rating when the being is defeated; whether the surviving current character can continue afterward remains open.
+Death is not an instant reload of the same person. Manifestation is the completion of the Capital Awakening Ritual ([02 World Laws](02%20World%20Laws.md)). The campaign ends with a rating when the being is defeated; whether the surviving current character can continue afterward remains open.
 
 # Death Gap
 
