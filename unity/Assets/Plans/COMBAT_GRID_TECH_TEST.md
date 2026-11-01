@@ -16,7 +16,7 @@ The test decides nothing about combat rules. It changes no production code, scen
 
 ## State
 
-Phase A has run: see Results. Phase B is not built.
+Phase A has run: see Results. Phase B is built and checked by script, and waits for the owner's look.
 
 ## Running Phase A
 
@@ -33,11 +33,11 @@ It writes `summary.md`, `sites.csv`, and `maps/` into the output folder and clos
 | Phase | What | How |
 |---|---|---|
 | **A** | Build time, correctness, stability | `CombatGridProbe`, automatic, batch mode |
-| **B** | Grid overlay, camera rotation, transparent walls | A Play Mode lab for the owner to look at. Built after A, because A decides how the grid reads the world |
+| **B** | Grid overlay, camera rotation, transparent walls | `CombatGridLab`, a Play Mode lab for the owner to look at |
 
 ## Phase A setup
 
-- **Tool:** `Assets/Scripts/Editor/CombatGridProbe.cs`, Editor-only. It is research code, not the production grid.
+- **Tool:** `Assets/Scripts/Editor/CombatGridProbe.cs`, Editor-only, over the cell reading in `Assets/Scripts/Grid/CombatGridReader.cs`, which Phase B shares. It is research code, not the production grid.
 - **Scenes:** `Overworld_Generator` (production terrain, 2×2 tiles, a town generated in memory, see Deviation), and an unsaved flat scene with `ShellSandboxLab` Compare All Districts as the dense case. Neither is saved.
 - **Output:** `D:\Hobby\game-dev\research-data\combat-grid\`, outside the repository.
 - **Grid:** 41 × 41 cells, 20 each way from the player's cell. Square is the upper bound for a round grid.
@@ -90,18 +90,18 @@ Report-only: time by stage, reachable share by slope, levels per cell, phantom t
 
 ## Results
 
-Run 4 is the final run. Records are in `D:\Hobby\game-dev\research-data\combat-grid\run_1` … `run_4`. The gates never changed.
+Run 4 is the reference run. Run 5 repeats it after the reading moved to its own file, with identical readings. Records are in `D:\Hobby\game-dev\research-data\combat-grid\run_1` … `run_5`. The gates never changed.
 
 | Gate | Run 4 | Result |
 |---|---|---|
 | G1 full build | Median 8.0 ms, worst 15.4 ms | PASS |
-| G2 one-cell step | Median about 1.2 ms, worst 4.4 ms | PASS in runs 1, 2, 4. **FAIL in run 3, 9.8 ms** |
+| G2 one-cell step | Median about 1.2 ms, worst 4.4 ms | PASS in runs 1, 2, 4. **FAIL in run 3 (9.8 ms) and run 5 (9.0 ms)** |
 | G3 repeatability | Identical, and a moved grid equals a fresh one | PASS |
 | G4 truth | False pass 0.2 % of 1410, agreement 98.9 % of 1710 | PASS |
 | G5 air walls | 0 cells | PASS |
 | G6 hand correction | None | PASS |
 
-**G2 is not a clean pass.** One step in run 3 took 9.8 ms. The cause is not established. Run 4 counted garbage collections and found none in 3714 steps, with a slowest step of 4.4 ms, but run 3 had no such count.
+**G2 is not a clean pass.** Run 5 points to the cause: of 3714 steps exactly one had a garbage collection, that step took 9.0 ms, and the slowest step without one took 4.4 ms. Run 4 had no collection and no step above 4.4 ms. Run 3 did not count collections, so its 9.8 ms is only presumed to be the same. The reading is not what is slow: production code should allocate less per step, and this lab's reader allocates on every step.
 
 ### Deviation
 
@@ -117,6 +117,26 @@ The terrain assets are gitignored and date from 2026-10-18, a month after the sc
 - **False blocks** are 16 at 1 m, and every one is a thin prop such as a lamp or crate that the controller slides around. The grid is the stricter of the two, which suits a grid game.
 - **False passes** are 3 at 1 m, on slopes near the 45° limit and one in the town.
 - **Moving the grid is cheap.** A step costs about one seventh of a full build, so the grid can follow the player every cell.
+- **Characters must stay out of the reading.** The first lab run saw one cell, because the player's own capsule blocked the cells around it. The grid reads the place; who stands where is occupancy, a separate layer of data.
+
+## Phase B
+
+Menu: `GameDev/Combat Grid Test/Play Lab`. It opens `Overworld_Generator`, generates a town on the present terrain, gives every piece a collider, puts the player beside the buildings, and enters Play Mode. All of it is in memory, and the scene reloads from disk on leaving Play Mode.
+
+| Key | Action |
+|---|---|
+| G | Enter or leave the fight view |
+| WASD | Walk; the grid follows |
+| Q / E, right mouse | Turn the camera; right mouse also tilts it |
+| Mouse wheel | Zoom |
+
+Colours: pale blue is open, yellow is low cover, orange is high cover, white is the player's cell. The grid moves only when the player enters a new cell.
+
+**Transparent walls.** A building between the camera and the player turns into its foundation and the outlines of its ground-floor walls. The first version cut a hole in the pieces in the way, which showed the empty shell inside, so the whole building now goes.
+
+**Checked by script** (`D:\Hobby\game-dev\research-data\combat-grid\lab_2`, four camera angles and a walk): 1353 cells around the player, the grid moved 7 times over 8 m with the last move at 1.8 ms, and the building in the way was replaced by its outline.
+
+**Not checked:** the keys and mouse, which only a person can press; how the view feels; fighters crossing the grid's edge, because the lab has no NPCs. The character's model does not appear in the script's snapshots, for a reason not yet established.
 
 ## What the result decides
 
@@ -132,5 +152,4 @@ The terrain assets are gitignored and date from 2026-10-18, a month after the sc
 - Player builds and IL2CPP.
 - The real sizes of a slice city. The dense strip stands in for it.
 - Vegetation concealment and Environment Action tags.
-- Fighters crossing the grid's edge, which needs a design rule first.
-- The camera and transparent walls, which belong to Phase B.
+- Fighters crossing the grid's edge, which is now a rule but has no NPCs to test it with.

@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using GameDev.Grid;
 using GameDev.World;
 using GameDev.World.Buildings.Shell;
 using GameDev.World.Settlement;
@@ -39,29 +40,28 @@ namespace GameDev.EditorTools
     /// </remarks>
     public static class CombatGridProbe
     {
-        private const string OverworldScene = "Assets/Scenes/Overworld_Generator.unity";
+        internal const string OverworldScene = "Assets/Scenes/Overworld_Generator.unity";
         private const string OutArg = "-gridOut";
         private const string DefaultOut = "D:/Hobby/game-dev/research-data/combat-grid/run_1";
+        internal const string ShellsName = "SettlementShells";
         private const string AsBuilt = "as-built";
         private const string AllPieces = "all-pieces";
 
         private const int ProbeSeed = 20261101;
-        private const int Reach = 20;
+        private const int Reach = CombatGridReader.Reach;
         private const int RepeatBuilds = 5;
         private const int WalkSteps = 20;
         private const int PassableEdgeSamples = 30;
         private const int BlockedEdgeSamples = 15;
         private const int MinTownReachable = 100;
 
-        private const float SlopeLimitDegrees = 45f;
-        private const float StepOffset = 0.4f;
+        private const float SlopeLimitDegrees = CombatGridReader.SlopeLimitDegrees;
+        private const float StepOffset = CombatGridReader.StepOffset;
         private const float SkinWidth = 0.03f;
         private const float WalkTickMeters = 0.075f;
-        private const float LowCoverHeight = 0.7f;
-        private const float HighCoverHeight = 1.5f;
-        private const float TopY = WorldScale.TerrainHeightBudgetMeters + 20f;
-        private const float Radius = WorldScale.CharacterRadiusMeters;
-        private const float Height = WorldScale.CharacterHeightMeters;
+        private const float TopY = CombatGridReader.TopY;
+        private const float Radius = CombatGridReader.Radius;
+        private const float Height = CombatGridReader.Height;
 
         // Gates: authoring defaults, fixed before the first run.
         private const double FullMedianGateMs = 50.0;
@@ -70,7 +70,7 @@ namespace GameDev.EditorTools
         private const double FalsePassGate = 0.01;
         private const double AgreementGate = 0.95;
 
-        private const int Mask = Physics.DefaultRaycastLayers & ~(1 << 4);
+        private const int Mask = CombatGridReader.Mask;
 
         private static readonly float[] CellSizes = { 1f, 1.5f };
         private static readonly int[] DirX = { 1, -1, 0, 0 };
@@ -160,7 +160,7 @@ namespace GameDev.EditorTools
             Report report,
             string outDir)
         {
-            var reader = new GridReader(cell);
+            var reader = new CombatGridReader(cell);
             if (!reader.TryFindStart(site.Position, out var startX, out var startZ, out var startLevel))
             {
                 report.NoStart++;
@@ -168,14 +168,14 @@ namespace GameDev.EditorTools
             }
 
             // One build first, so the timings below do not include JIT and first-touch costs.
-            new GridReader(cell).Build(startX, startZ, startLevel);
+            new CombatGridReader(cell).Build(startX, startZ, startLevel);
 
             var row = new Row { Site = site, Cell = cell, Pass = pass };
             var fullMs = new List<double>();
-            var builds = new List<Window>();
+            var builds = new List<CombatGridWindow>();
             for (var i = 0; i < RepeatBuilds; i++)
             {
-                var fresh = new GridReader(cell);
+                var fresh = new CombatGridReader(cell);
                 var w = fresh.Build(startX, startZ, startLevel);
                 fullMs.Add(w.TotalMs);
                 builds.Add(w);
@@ -223,9 +223,9 @@ namespace GameDev.EditorTools
         /// <summary>Moves a cached grid one cell at a time, then compares it with a fresh build.</summary>
         private static void WalkTheGrid(Row row, int x, int z, int level, float cell)
         {
-            var moving = new GridReader(cell);
+            var moving = new CombatGridReader(cell);
             var window = moving.Build(x, z, level);
-            var visited = new HashSet<long> { GridReader.Pack(x, z, level) };
+            var visited = new HashSet<long> { CombatGridReader.Pack(x, z, level) };
             var stepMs = new List<double>();
 
             for (var step = 0; step < WalkSteps; step++)
@@ -237,7 +237,7 @@ namespace GameDev.EditorTools
 
                 x = nextX;
                 z = nextZ;
-                visited.Add(GridReader.Pack(x, z, level));
+                visited.Add(CombatGridReader.Pack(x, z, level));
                 var collections = GC.CollectionCount(0);
                 window = moving.Build(x, z, level);
                 stepMs.Add(window.TotalMs);
@@ -258,11 +258,11 @@ namespace GameDev.EditorTools
                 row.StepWorstMs = stepMs.Max();
             }
 
-            row.Stable = new GridReader(cell).Build(x, z, level).Hash == window.Hash;
+            row.Stable = new CombatGridReader(cell).Build(x, z, level).Hash == window.Hash;
         }
 
         private static bool TryNextCell(
-            Window window,
+            CombatGridWindow window,
             HashSet<long> visited,
             int x,
             int z,
@@ -274,9 +274,9 @@ namespace GameDev.EditorTools
             {
                 nextX = x + DirX[d];
                 nextZ = z + DirZ[d];
-                for (var l = 0; l < GridReader.MaxLevels; l++)
+                for (var l = 0; l < CombatGridReader.MaxLevels; l++)
                 {
-                    var key = GridReader.Pack(nextX, nextZ, l);
+                    var key = CombatGridReader.Pack(nextX, nextZ, l);
                     if (window.Reachable.Contains(key) && !visited.Contains(key))
                     {
                         level = l;
@@ -291,7 +291,7 @@ namespace GameDev.EditorTools
         }
 
         /// <summary>A failed clearance caused by a collider with nothing visible is an air wall.</summary>
-        private static void CountAirWalls(Row row, GridReader reader, Window window)
+        private static void CountAirWalls(Row row, CombatGridReader reader, CombatGridWindow window)
         {
             var overlap = new Collider[32];
             for (var dz = -Reach; dz <= Reach; dz++)
@@ -303,7 +303,7 @@ namespace GameDev.EditorTools
                     var column = reader.Column(ix, iz);
                     for (var l = 0; l < column.Length; l++)
                     {
-                        if (column[l].Standable || column[l].Reason != BlockReason.Clearance)
+                        if (column[l].Standable || column[l].Reason != CombatGridBlock.Clearance)
                         {
                             continue;
                         }
@@ -329,7 +329,7 @@ namespace GameDev.EditorTools
             }
         }
 
-        private static void CountTreeCells(Row row, Window window, List<Vector3> trees, float cell)
+        private static void CountTreeCells(Row row, CombatGridWindow window, List<Vector3> trees, float cell)
         {
             var extent = (Reach + 1) * cell;
             var centerX = (window.X + 0.5f) * cell;
@@ -345,9 +345,9 @@ namespace GameDev.EditorTools
                 row.TreesInWindow++;
                 var ix = Mathf.FloorToInt(tree.x / cell);
                 var iz = Mathf.FloorToInt(tree.z / cell);
-                for (var l = 0; l < GridReader.MaxLevels; l++)
+                for (var l = 0; l < CombatGridReader.MaxLevels; l++)
                 {
-                    if (window.Reachable.Contains(GridReader.Pack(ix, iz, l)))
+                    if (window.Reachable.Contains(CombatGridReader.Pack(ix, iz, l)))
                     {
                         row.TreesInReachableCells++;
                         break;
@@ -359,8 +359,8 @@ namespace GameDev.EditorTools
         /// <summary>Walks the real controller along sampled edges and compares it with the grid.</summary>
         private static void TestAgainstController(
             Row row,
-            GridReader reader,
-            Window window,
+            CombatGridReader reader,
+            CombatGridWindow window,
             Report report,
             Site site)
         {
@@ -377,7 +377,7 @@ namespace GameDev.EditorTools
 
             for (var tries = 0; tries < keys.Count * 8 && (passable < PassableEdgeSamples || blocked < BlockedEdgeSamples); tries++)
             {
-                GridReader.Unpack(keys[rng.Next(keys.Count)], out var ax, out var az, out var la);
+                CombatGridReader.Unpack(keys[rng.Next(keys.Count)], out var ax, out var az, out var la);
                 var d = rng.Next(4);
                 var bx = ax + DirX[d];
                 var bz = az + DirZ[d];
@@ -555,7 +555,7 @@ namespace GameDev.EditorTools
         /// <see cref="SettlementOverworldMenu.PlaceSettlementAtTownApproach"/> except for the dust
         /// paint, which would write to the TerrainData.
         /// </remarks>
-        private static GameObject RebuildTown()
+        internal static GameObject RebuildTown()
         {
             var stale = GameObject.Find("OverworldSettlement");
             if (stale != null)
@@ -582,12 +582,12 @@ namespace GameDev.EditorTools
                 new BuildingShellBinder(),
                 ShellCatalogFactory.CreateDefaultArchetypes(),
                 ShellCatalogFactory.CreateDefaultDistricts());
-            bridge.SpawnProperties(fabric, fabric.Pose.SettlementSeed, root.transform);
+            bridge.SpawnProperties(fabric, fabric.Pose.SettlementSeed, root.transform).name = ShellsName;
             PropertyFeatureSpawner.SpawnAll(fabric, root.transform);
             return root;
         }
 
-        private static Dictionary<string, int> AddMissingColliders(GameObject root)
+        internal static Dictionary<string, int> AddMissingColliders(GameObject root)
         {
             var added = new Dictionary<string, int>();
             var renderers = root.GetComponentsInChildren<MeshRenderer>();
@@ -761,7 +761,7 @@ namespace GameDev.EditorTools
                 var x = bounds.min.x + (float)rng.NextDouble() * bounds.size.x;
                 var z = bounds.min.z + (float)rng.NextDouble() * bounds.size.z;
                 var position = new Vector3(x, bounds.min.y, z);
-                var reader = new GridReader(1f);
+                var reader = new CombatGridReader(1f);
                 if (reader.TryFindStart(position, out var ix, out var iz, out var level)
                     && reader.Build(ix, iz, level).Reachable.Count >= MinTownReachable)
                 {
@@ -772,7 +772,7 @@ namespace GameDev.EditorTools
             return sites;
         }
 
-        private static void WriteMap(string path, GridReader reader, Window window)
+        private static void WriteMap(string path, CombatGridReader reader, CombatGridWindow window)
         {
             const int scale = 8;
             var side = (2 * Reach + 1) * scale;
@@ -805,12 +805,12 @@ namespace GameDev.EditorTools
             Object.DestroyImmediate(texture);
         }
 
-        private static Color MapColor(GridReader reader, Window window, int ix, int iz)
+        private static Color MapColor(CombatGridReader reader, CombatGridWindow window, int ix, int iz)
         {
             var column = reader.Column(ix, iz);
             for (var l = 0; l < column.Length; l++)
             {
-                if (!window.Reachable.Contains(GridReader.Pack(ix, iz, l)))
+                if (!window.Reachable.Contains(CombatGridReader.Pack(ix, iz, l)))
                 {
                     continue;
                 }
@@ -837,7 +837,7 @@ namespace GameDev.EditorTools
                 return Color.black;
             }
 
-            return column[column.Length - 1].Reason == BlockReason.Water
+            return column[column.Length - 1].Reason == CombatGridBlock.Water
                 ? new Color(0.1f, 0.2f, 0.5f)
                 : new Color(0.28f, 0.28f, 0.28f);
         }
@@ -876,27 +876,6 @@ namespace GameDev.EditorTools
             }
         }
 
-        private enum BlockReason
-        {
-            None = 0,
-            Water = 1,
-            Slope = 2,
-            Clearance = 3
-        }
-
-        private struct Surface
-        {
-            public float Y;
-            public bool Standable;
-            public BlockReason Reason;
-        }
-
-        private struct CoverRead
-        {
-            public int Low;
-            public int High;
-        }
-
         private sealed class Site
         {
             public readonly string ClassName;
@@ -909,24 +888,6 @@ namespace GameDev.EditorTools
                 Index = index;
                 Position = position;
             }
-        }
-
-        private sealed class Window
-        {
-            public int X;
-            public int Z;
-            public HashSet<long> Reachable;
-            public int Standable;
-            public int MultiLevel;
-            public int LowCover;
-            public int HighCover;
-            public double ColumnMs;
-            public double EdgeMs;
-            public double SearchMs;
-            public double CoverMs;
-            public ulong Hash;
-
-            public double TotalMs => ColumnMs + EdgeMs + SearchMs + CoverMs;
         }
 
         private sealed class ControllerCheck
@@ -944,464 +905,6 @@ namespace GameDev.EditorTools
                 controller.stepOffset = StepOffset;
                 controller.slopeLimit = SlopeLimitDegrees;
                 return controller;
-            }
-        }
-
-        /// <summary>
-        /// Reads world-aligned cells on demand and keeps them, so a moved grid only pays for new cells.
-        /// A cell's reading depends on its world position alone, never on where the grid started.
-        /// </summary>
-        private sealed class GridReader
-        {
-            public const int MaxLevels = 16;
-            private const int MaxHits = 32;
-            private const int CoordOffset = 32768;
-
-            private readonly float _cell;
-            private readonly Dictionary<long, Surface[]> _columns = new Dictionary<long, Surface[]>();
-            private readonly Dictionary<long, bool> _edges = new Dictionary<long, bool>();
-            private readonly Dictionary<long, CoverRead> _cover = new Dictionary<long, CoverRead>();
-            private readonly RaycastHit[] _hits = new RaycastHit[MaxHits];
-
-            public int OverflowColumns;
-            public int TerrainCoverRays;
-
-            public GridReader(float cell)
-            {
-                _cell = cell;
-            }
-
-            public static long Pack(int ix, int iz, int level)
-            {
-                return ((long)(ix + CoordOffset) << 20) | ((long)(iz + CoordOffset) << 4) | (uint)level;
-            }
-
-            public static void Unpack(long key, out int ix, out int iz, out int level)
-            {
-                ix = (int)(key >> 20) - CoordOffset;
-                iz = (int)((key >> 4) & 0xFFFF) - CoordOffset;
-                level = (int)(key & 0xF);
-            }
-
-            public Vector3 Center(int ix, int iz, float y)
-            {
-                return new Vector3((ix + 0.5f) * _cell, y, (iz + 0.5f) * _cell);
-            }
-
-            public Surface[] Column(int ix, int iz)
-            {
-                var key = Pack(ix, iz, 0);
-                if (!_columns.TryGetValue(key, out var column))
-                {
-                    column = ReadColumn(ix, iz);
-                    _columns[key] = column;
-                }
-
-                return column;
-            }
-
-            /// <summary>The nearest cell whose lowest standable surface can hold the player.</summary>
-            public bool TryFindStart(Vector3 position, out int ix, out int iz, out int level)
-            {
-                var cx = Mathf.FloorToInt(position.x / _cell);
-                var cz = Mathf.FloorToInt(position.z / _cell);
-                for (var ring = 0; ring <= Reach; ring++)
-                {
-                    for (var dz = -ring; dz <= ring; dz++)
-                    {
-                        for (var dx = -ring; dx <= ring; dx++)
-                        {
-                            if (Mathf.Max(Mathf.Abs(dx), Mathf.Abs(dz)) != ring)
-                            {
-                                continue;
-                            }
-
-                            var column = Column(cx + dx, cz + dz);
-                            for (var l = column.Length - 1; l >= 0; l--)
-                            {
-                                if (column[l].Standable)
-                                {
-                                    ix = cx + dx;
-                                    iz = cz + dz;
-                                    level = l;
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                ix = cx;
-                iz = cz;
-                level = 0;
-                return false;
-            }
-
-            public Window Build(int cx, int cz, int level)
-            {
-                var window = new Window { X = cx, Z = cz };
-
-                var started = Stopwatch.GetTimestamp();
-                for (var dz = -Reach; dz <= Reach; dz++)
-                {
-                    for (var dx = -Reach; dx <= Reach; dx++)
-                    {
-                        Column(cx + dx, cz + dz);
-                    }
-                }
-
-                window.ColumnMs = Lap(ref started);
-
-                for (var dz = -Reach; dz <= Reach; dz++)
-                {
-                    for (var dx = -Reach; dx <= Reach; dx++)
-                    {
-                        if (dx < Reach)
-                        {
-                            ReadEdges(cx + dx, cz + dz, cx + dx + 1, cz + dz);
-                        }
-
-                        if (dz < Reach)
-                        {
-                            ReadEdges(cx + dx, cz + dz, cx + dx, cz + dz + 1);
-                        }
-                    }
-                }
-
-                window.EdgeMs = Lap(ref started);
-
-                window.Reachable = Search(cx, cz, level);
-                window.SearchMs = Lap(ref started);
-
-                foreach (var key in window.Reachable)
-                {
-                    Unpack(key, out var ix, out var iz, out var l);
-                    var cover = Cover(ix, iz, l);
-                    window.LowCover += cover.Low != 0 ? 1 : 0;
-                    window.HighCover += cover.High != 0 ? 1 : 0;
-                }
-
-                window.CoverMs = Lap(ref started);
-
-                Summarise(window);
-                return window;
-            }
-
-            public bool EdgeBetween(int ax, int az, int la, int bx, int bz, int lb)
-            {
-                if (bx == ax + 1)
-                {
-                    return Edge(ax, az, la, 0, lb, bx, bz);
-                }
-
-                if (bx == ax - 1)
-                {
-                    return Edge(bx, bz, lb, 0, la, ax, az);
-                }
-
-                return bz == az + 1 ? Edge(ax, az, la, 1, lb, bx, bz) : Edge(bx, bz, lb, 1, la, ax, az);
-            }
-
-            /// <summary>What decides this edge: the height limit, a collider, or nothing.</summary>
-            public string DescribeEdge(Vector3 a, Vector3 b)
-            {
-                var delta = b - a;
-                var distance = delta.magnitude;
-                if (Mathf.Abs(delta.y) > _cell * Mathf.Tan(SlopeLimitDegrees * Mathf.Deg2Rad))
-                {
-                    return "height";
-                }
-
-                return Physics.CapsuleCast(
-                    a + Vector3.up * (StepOffset + Radius),
-                    a + Vector3.up * (Height - Radius),
-                    Radius,
-                    delta / distance,
-                    out var hit,
-                    distance,
-                    Mask,
-                    QueryTriggerInteraction.Ignore)
-                    ? hit.collider.name
-                    : "open";
-            }
-
-            public CoverRead Cover(int ix, int iz, int level)
-            {
-                var key = Pack(ix, iz, level);
-                if (_cover.TryGetValue(key, out var cover))
-                {
-                    return cover;
-                }
-
-                var ground = Center(ix, iz, Column(ix, iz)[level].Y);
-                for (var d = 0; d < 4; d++)
-                {
-                    var direction = new Vector3(DirX[d], 0f, DirZ[d]);
-                    if (CoverRay(ground + Vector3.up * LowCoverHeight, direction))
-                    {
-                        cover.Low |= 1 << d;
-                    }
-
-                    if (CoverRay(ground + Vector3.up * HighCoverHeight, direction))
-                    {
-                        cover.High |= 1 << d;
-                    }
-                }
-
-                _cover[key] = cover;
-                return cover;
-            }
-
-            private bool CoverRay(Vector3 origin, Vector3 direction)
-            {
-                if (!Physics.Raycast(origin, direction, out var hit, _cell * 0.75f, Mask, QueryTriggerInteraction.Ignore))
-                {
-                    return false;
-                }
-
-                if (hit.collider is TerrainCollider)
-                {
-                    TerrainCoverRays++;
-                    return false;
-                }
-
-                return true;
-            }
-
-            private Surface[] ReadColumn(int ix, int iz)
-            {
-                var origin = Center(ix, iz, TopY);
-                var count = Physics.RaycastNonAlloc(
-                    origin, Vector3.down, _hits, TopY, Mask, QueryTriggerInteraction.Ignore);
-                if (count == MaxHits)
-                {
-                    OverflowColumns++;
-                }
-
-                Array.Sort(_hits, 0, count, HitHeightOrder.Instance);
-
-                var surfaces = new List<Surface>(count);
-                for (var i = 0; i < count && surfaces.Count < MaxLevels; i++)
-                {
-                    var hit = _hits[i];
-                    if (surfaces.Count > 0 && Mathf.Abs(surfaces[surfaces.Count - 1].Y - hit.point.y) < 0.02f)
-                    {
-                        continue;
-                    }
-
-                    surfaces.Add(ReadSurface(hit));
-                }
-
-                return surfaces.ToArray();
-            }
-
-            private static Surface ReadSurface(RaycastHit hit)
-            {
-                var surface = new Surface { Y = hit.point.y, Reason = BlockReason.None, Standable = true };
-                if (hit.point.y < WorldScale.SeaLevelMeters)
-                {
-                    surface.Reason = BlockReason.Water;
-                }
-                else if (Vector3.Angle(hit.normal, Vector3.up) >= SlopeLimitDegrees)
-                {
-                    surface.Reason = BlockReason.Slope;
-                }
-                else if (Physics.CheckCapsule(
-                             hit.point + Vector3.up * (StepOffset + Radius),
-                             hit.point + Vector3.up * (Height - Radius),
-                             Radius,
-                             Mask,
-                             QueryTriggerInteraction.Ignore))
-                {
-                    surface.Reason = BlockReason.Clearance;
-                }
-
-                surface.Standable = surface.Reason == BlockReason.None;
-                return surface;
-            }
-
-            private void ReadEdges(int ax, int az, int bx, int bz)
-            {
-                var a = Column(ax, az);
-                var b = Column(bx, bz);
-                for (var la = 0; la < a.Length; la++)
-                {
-                    if (!a[la].Standable)
-                    {
-                        continue;
-                    }
-
-                    for (var lb = 0; lb < b.Length; lb++)
-                    {
-                        if (b[lb].Standable)
-                        {
-                            EdgeBetween(ax, az, la, bx, bz, lb);
-                        }
-                    }
-                }
-            }
-
-            /// <param name="direction">0 is +X and 1 is +Z; the key is always the lower cell.</param>
-            private bool Edge(int ax, int az, int la, int direction, int lb, int bx, int bz)
-            {
-                var key = (Pack(ax, az, la) << 5) | ((long)direction << 4) | (uint)lb;
-                if (_edges.TryGetValue(key, out var open))
-                {
-                    return open;
-                }
-
-                var a = Center(ax, az, Column(ax, az)[la].Y);
-                var b = Center(bx, bz, Column(bx, bz)[lb].Y);
-                var delta = b - a;
-                var distance = delta.magnitude;
-                open = Mathf.Abs(delta.y) <= _cell * Mathf.Tan(SlopeLimitDegrees * Mathf.Deg2Rad)
-                       && !Physics.CapsuleCast(
-                           a + Vector3.up * (StepOffset + Radius),
-                           a + Vector3.up * (Height - Radius),
-                           Radius,
-                           delta / distance,
-                           distance,
-                           Mask,
-                           QueryTriggerInteraction.Ignore);
-                _edges[key] = open;
-                return open;
-            }
-
-            private HashSet<long> Search(int cx, int cz, int level)
-            {
-                var reached = new HashSet<long> { Pack(cx, cz, level) };
-                var queue = new Queue<long>();
-                queue.Enqueue(Pack(cx, cz, level));
-
-                while (queue.Count > 0)
-                {
-                    Unpack(queue.Dequeue(), out var x, out var z, out var l);
-                    for (var d = 0; d < 4; d++)
-                    {
-                        Visit(cx, cz, x, z, l, x + DirX[d], z + DirZ[d], reached, queue);
-                    }
-
-                    for (var dx = -1; dx <= 1; dx += 2)
-                    {
-                        for (var dz = -1; dz <= 1; dz += 2)
-                        {
-                            VisitDiagonal(cx, cz, x, z, l, dx, dz, reached, queue);
-                        }
-                    }
-                }
-
-                return reached;
-            }
-
-            private void Visit(int cx, int cz, int x, int z, int l, int nx, int nz, HashSet<long> reached, Queue<long> queue)
-            {
-                if (!InWindow(cx, cz, nx, nz))
-                {
-                    return;
-                }
-
-                var column = Column(nx, nz);
-                for (var n = 0; n < column.Length; n++)
-                {
-                    if (column[n].Standable && EdgeBetween(x, z, l, nx, nz, n) && reached.Add(Pack(nx, nz, n)))
-                    {
-                        queue.Enqueue(Pack(nx, nz, n));
-                    }
-                }
-            }
-
-            /// <summary>No corner cutting: both side routes must reach the same diagonal surface.</summary>
-            private void VisitDiagonal(int cx, int cz, int x, int z, int l, int dx, int dz, HashSet<long> reached, Queue<long> queue)
-            {
-                var nx = x + dx;
-                var nz = z + dz;
-                if (!InWindow(cx, cz, nx, nz))
-                {
-                    return;
-                }
-
-                var column = Column(nx, nz);
-                for (var n = 0; n < column.Length; n++)
-                {
-                    if (column[n].Standable
-                        && Via(x, z, l, nx, z, nx, nz, n)
-                        && Via(x, z, l, x, nz, nx, nz, n)
-                        && reached.Add(Pack(nx, nz, n)))
-                    {
-                        queue.Enqueue(Pack(nx, nz, n));
-                    }
-                }
-            }
-
-            private bool Via(int ax, int az, int la, int mx, int mz, int bx, int bz, int lb)
-            {
-                var middle = Column(mx, mz);
-                for (var m = 0; m < middle.Length; m++)
-                {
-                    if (middle[m].Standable
-                        && EdgeBetween(ax, az, la, mx, mz, m)
-                        && EdgeBetween(mx, mz, m, bx, bz, lb))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
-            private static bool InWindow(int cx, int cz, int x, int z)
-            {
-                return Mathf.Abs(x - cx) <= Reach && Mathf.Abs(z - cz) <= Reach;
-            }
-
-            private void Summarise(Window window)
-            {
-                var hash = 14695981039346656037UL;
-                for (var dz = -Reach; dz <= Reach; dz++)
-                {
-                    for (var dx = -Reach; dx <= Reach; dx++)
-                    {
-                        var ix = window.X + dx;
-                        var iz = window.Z + dz;
-                        var column = Column(ix, iz);
-                        var standable = 0;
-                        for (var l = 0; l < column.Length; l++)
-                        {
-                            hash = Mix(hash, Mathf.RoundToInt(column[l].Y * 1000f));
-                            hash = Mix(hash, column[l].Standable ? 1 : 0);
-                            hash = Mix(hash, window.Reachable.Contains(Pack(ix, iz, l)) ? 1 : 0);
-                            standable += column[l].Standable ? 1 : 0;
-                        }
-
-                        window.Standable += standable > 0 ? 1 : 0;
-                        window.MultiLevel += standable > 1 ? 1 : 0;
-                    }
-                }
-
-                window.Hash = hash;
-            }
-
-            private static ulong Mix(ulong hash, int value)
-            {
-                return (hash ^ (uint)value) * 1099511628211UL;
-            }
-
-            private static double Lap(ref long started)
-            {
-                var now = Stopwatch.GetTimestamp();
-                var ms = (now - started) * 1000.0 / Stopwatch.Frequency;
-                started = now;
-                return ms;
-            }
-        }
-
-        private sealed class HitHeightOrder : IComparer<RaycastHit>
-        {
-            public static readonly HitHeightOrder Instance = new HitHeightOrder();
-
-            public int Compare(RaycastHit a, RaycastHit b)
-            {
-                return b.point.y.CompareTo(a.point.y);
             }
         }
 
