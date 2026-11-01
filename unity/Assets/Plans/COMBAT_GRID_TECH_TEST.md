@@ -2,7 +2,7 @@
 
 Status: Draft
 
-Last Updated: 2026-11-01
+Last Updated: 2026-11-02
 
 Authority: [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [10.1 Combat Grid and Environment Actions](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [99 Open Questions](../../../99%20Open%20Questions.md) CC-33
 
@@ -16,7 +16,7 @@ The test decides nothing about combat rules. It changes no production code, scen
 
 ## State
 
-Phase A is written and compiles against Unity 6000.5.7f1 with the Editor's Roslyn. It has not run yet, so nothing below is measured. Phase B is not built.
+Phase A has run: see Results. Phase B is not built.
 
 ## Running Phase A
 
@@ -38,7 +38,7 @@ It writes `summary.md`, `sites.csv`, and `maps/` into the output folder and clos
 ## Phase A setup
 
 - **Tool:** `Assets/Scripts/Editor/CombatGridProbe.cs`, Editor-only. It is research code, not the production grid.
-- **Scenes:** `Overworld_Generator` (production terrain, 2×2 tiles, one town), and an unsaved flat scene with `ShellSandboxLab` Compare All Districts as the dense case. Neither is saved.
+- **Scenes:** `Overworld_Generator` (production terrain, 2×2 tiles, a town generated in memory, see Deviation), and an unsaved flat scene with `ShellSandboxLab` Compare All Districts as the dense case. Neither is saved.
 - **Output:** `D:\Hobby\game-dev\research-data\combat-grid\`, outside the repository.
 - **Grid:** 41 × 41 cells, 20 each way from the player's cell. Square is the upper bound for a round grid.
 - **Cell size:** 1 m and 1.5 m, because CC-33 leaves it open.
@@ -87,6 +87,36 @@ All thresholds are authoring defaults. They are fixed before the first run and a
 | **G6** | Hand correction | None. No site has an override |
 
 Report-only: time by stage, reachable share by slope, levels per cell, phantom terrain cover, trees inside reachable cells, and the cells the two passes disagree on.
+
+## Results
+
+Run 4 is the final run. Records are in `D:\Hobby\game-dev\research-data\combat-grid\run_1` … `run_4`. The gates never changed.
+
+| Gate | Run 4 | Result |
+|---|---|---|
+| G1 full build | Median 8.0 ms, worst 15.4 ms | PASS |
+| G2 one-cell step | Median about 1.2 ms, worst 4.4 ms | PASS in runs 1, 2, 4. **FAIL in run 3, 9.8 ms** |
+| G3 repeatability | Identical, and a moved grid equals a fresh one | PASS |
+| G4 truth | False pass 0.2 % of 1410, agreement 98.9 % of 1710 | PASS |
+| G5 air walls | 0 cells | PASS |
+| G6 hand correction | None | PASS |
+
+**G2 is not a clean pass.** One step in run 3 took 9.8 ms. The cause is not established. Run 4 counted garbage collections and found none in 3714 steps, with a slowest step of 4.4 ms, but run 3 had no such count.
+
+### Deviation
+
+Runs 1 and 2 passed every gate, but their town class is **void as evidence about buildings**. The saved town stands 2–45 m above the ground, so its walls block nothing and the grid correctly read an open slope. The grid was right and the scene was wrong.
+
+The terrain assets are gitignored and date from 2026-10-18, a month after the scene was saved on 2026-09-18, and the height sampler prefers `TerrainCollider`. That points to a stale scene rather than a generator fault, though the old terrain no longer exists to prove it. From run 3 the probe generates the town in memory on the present terrain, with the production calls and without the dust paint, which would write to `TerrainData`. Those buildings stand on the ground. The saved scene has not been changed.
+
+### Findings
+
+- **1 m cells.** At 1.5 m, adding the missing pieces cut the dense strip's reachable cells from 785 to 616, with 1839 cells changing. At 1 m the same pass changed 34. Narrow gaps do not survive wide cells.
+- **Missing colliders.** Across ten town sites, 758 cells at 1 m are open as built and closed once every piece has a collider, about 5 % of a window. That is fences, boundaries, lamps, and props. Adding them cost under 1 ms per build.
+- **Trees are not obstacles.** 256 of the 272 trees near the sites stand in reachable cells. Trees have no colliders, so neither the grid nor the character meets them. G4 cannot see this, because the controller walks through them too.
+- **False blocks** are 16 at 1 m, and every one is a thin prop such as a lamp or crate that the controller slides around. The grid is the stricter of the two, which suits a grid game.
+- **False passes** are 3 at 1 m, on slopes near the 45° limit and one in the town.
+- **Moving the grid is cheap.** A step costs about one seventh of a full build, so the grid can follow the player every cell.
 
 ## What the result decides
 

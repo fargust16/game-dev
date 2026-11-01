@@ -1310,7 +1310,7 @@
   },
   {
     "id": "q-cc-33",
-    "text": "CC-33. The grid reaches 20 cells from the player. What is the cell size, what happens at its edge, how is it built from generated terrain and buildings without hand correction, and how do the camera and transparent walls work?",
+    "text": "CC-33. Phase A shows the grid builds from generated terrain and buildings in about 8 ms with no hand correction. What happens at its edge, do pieces with no collider get one, do trees become obstacles, and how do the camera and transparent walls work?",
     "systemIds": [
       "confront",
       "spatial-structure"

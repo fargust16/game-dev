@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using GameDev.World;
 using GameDev.World.Buildings.Shell;
+using GameDev.World.Settlement;
 using GameDev.World.Terrain;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -88,14 +89,10 @@ namespace GameDev.EditorTools
                 report.Controller = Calibrate();
 
                 EditorSceneManager.OpenScene(OverworldScene, OpenSceneMode.Single);
-                var town = GameObject.Find("OverworldSettlement");
-                if (town == null)
-                {
-                    throw new InvalidOperationException("The overworld scene has no settlement.");
-                }
-
-                HideDebugMarker(town);
+                var town = RebuildTown();
                 Physics.SyncTransforms();
+
+                WriteTownDiagnostics(town, outDir);
 
                 var trees = TreePositions();
                 var overworldSites = TerrainSites();
@@ -205,7 +202,7 @@ namespace GameDev.EditorTools
             WalkTheGrid(row, startX, startZ, startLevel, cell);
             CountAirWalls(row, reader, window);
             CountTreeCells(row, window, trees, cell);
-            TestAgainstController(row, reader, window, report.Controller, site);
+            TestAgainstController(row, reader, window, report, site);
 
             if (before != null)
             {
@@ -241,8 +238,17 @@ namespace GameDev.EditorTools
                 x = nextX;
                 z = nextZ;
                 visited.Add(GridReader.Pack(x, z, level));
+                var collections = GC.CollectionCount(0);
                 window = moving.Build(x, z, level);
                 stepMs.Add(window.TotalMs);
+                if (GC.CollectionCount(0) != collections)
+                {
+                    row.StepsWithCollection++;
+                }
+                else
+                {
+                    row.StepWorstCleanMs = Math.Max(row.StepWorstCleanMs, window.TotalMs);
+                }
             }
 
             row.Steps = stepMs.Count;
@@ -355,15 +361,15 @@ namespace GameDev.EditorTools
             Row row,
             GridReader reader,
             Window window,
-            ControllerCheck controller,
+            Report report,
             Site site)
         {
-            if (controller == null || !controller.Usable)
+            if (report.Controller == null || !report.Controller.Usable)
             {
                 return;
             }
 
-            var walker = controller.Create();
+            var walker = report.Controller.Create();
             var rng = new Random(ProbeSeed + site.Index * 31 + site.ClassName[0] * 1009);
             var keys = window.Reachable.OrderBy(k => k).ToList();
             var passable = 0;
@@ -397,6 +403,17 @@ namespace GameDev.EditorTools
                     var a = reader.Center(ax, az, reader.Column(ax, az)[la].Y);
                     var b = reader.Center(bx, bz, other[lb].Y);
                     var walks = Walks(walker, a, b);
+                    if (walks != gridSays)
+                    {
+                        walker.enabled = false;
+                        Physics.SyncTransforms();
+                        report.Disagreements.Add(string.Join(",", new object[]
+                        {
+                            site.ClassName, row.Pass, row.Cell, a.x, a.y, a.z, b.x, b.y, b.z,
+                            gridSays ? "false_pass" : "false_block", reader.DescribeEdge(a, b)
+                        }));
+                    }
+
                     if (gridSays)
                     {
                         passable++;
@@ -478,15 +495,96 @@ namespace GameDev.EditorTools
             return check;
         }
 
-        private static void HideDebugMarker(GameObject town)
+        /// <summary>Where each generated building stands against the ground under it.</summary>
+        private static void WriteTownDiagnostics(GameObject town, string outDir)
         {
-            foreach (Transform child in town.transform)
+            var text = new StringBuilder();
+            text.AppendLine("shell,x,z,min_y,max_y,ground_center,ground_min,ground_max,pieces,colliders,column");
+            var shells = town.GetComponentsInChildren<ShellDebugGizmo>();
+            for (var i = 0; i < shells.Length; i++)
             {
-                if (child.name.StartsWith("TownApproach_", StringComparison.Ordinal))
+                var renderers = shells[i].GetComponentsInChildren<MeshRenderer>();
+                if (renderers.Length == 0)
                 {
-                    child.gameObject.SetActive(false);
+                    continue;
                 }
+
+                var bounds = renderers[0].bounds;
+                for (var r = 1; r < renderers.Length; r++)
+                {
+                    bounds.Encapsulate(renderers[r].bounds);
+                }
+
+                var groundMin = float.MaxValue;
+                var groundMax = float.MinValue;
+                for (var sx = -1; sx <= 1; sx += 2)
+                {
+                    for (var sz = -1; sz <= 1; sz += 2)
+                    {
+                        var y = OverworldTerrainAccess.SampleHeightWorld(
+                            bounds.center.x + sx * bounds.extents.x,
+                            bounds.center.z + sz * bounds.extents.z);
+                        groundMin = Mathf.Min(groundMin, y);
+                        groundMax = Mathf.Max(groundMax, y);
+                    }
+                }
+
+                var origin = new Vector3(bounds.center.x, TopY, bounds.center.z);
+                var hits = Physics.RaycastAll(origin, Vector3.down, TopY, Mask, QueryTriggerInteraction.Ignore);
+                var column = string.Join(
+                    " ",
+                    hits.OrderByDescending(h => h.point.y).Select(h => $"{h.collider.name}@{h.point.y:F2}"));
+                text.AppendLine(string.Join(",", new object[]
+                {
+                    i, bounds.center.x, bounds.center.z, bounds.min.y, bounds.max.y,
+                    OverworldTerrainAccess.SampleHeightWorld(bounds.center.x, bounds.center.z),
+                    groundMin, groundMax, renderers.Length,
+                    shells[i].GetComponentsInChildren<Collider>().Length, column
+                }));
             }
+
+            File.WriteAllText(Path.Combine(outDir, "town_shells.csv"), text.ToString());
+        }
+
+        /// <summary>
+        /// Replaces the saved town with one generated on the terrain as it is now, in memory.
+        /// </summary>
+        /// <remarks>
+        /// The terrain assets were rebaked a month after the scene was saved, so the saved town
+        /// stands 2-45 m above the ground and its walls block nothing. This follows
+        /// <see cref="SettlementOverworldMenu.PlaceSettlementAtTownApproach"/> except for the dust
+        /// paint, which would write to the TerrainData.
+        /// </remarks>
+        private static GameObject RebuildTown()
+        {
+            var stale = GameObject.Find("OverworldSettlement");
+            if (stale != null)
+            {
+                Object.DestroyImmediate(stale);
+            }
+
+            var terrain = OverworldTerrainAccess.FindTerrain();
+            if (!SettlementApproachBinder.TryFindTownApproach(OverworldWorldPlan.GetOrBuildPois(), out var approach)
+                || !SettlementApproachBinder.TryCreateDryFabricNearApproach(
+                    approach,
+                    OverworldTerrainMenu.DefaultSeed,
+                    new TerrainHeightSampler(),
+                    OverworldWaterSamplers.ForCurrentWorld(terrain),
+                    out var fabric,
+                    out _))
+            {
+                throw new InvalidOperationException("No town could be placed on this terrain.");
+            }
+
+            GeneratedTintMaterials.Reset();
+            var root = new GameObject("CombatGridProbeTown");
+            var bridge = new SettlementShellBridge(
+                new BuildingShellBinder(),
+                ShellCatalogFactory.CreateDefaultArchetypes(),
+                ShellCatalogFactory.CreateDefaultDistricts());
+            bridge.SpawnProperties(fabric, fabric.Pose.SettlementSeed, root.transform);
+            PropertyFeatureSpawner.SpawnAll(fabric, root.transform);
+            return root;
         }
 
         private static Dictionary<string, int> AddMissingColliders(GameObject root)
@@ -770,6 +868,14 @@ namespace GameDev.EditorTools
             return null;
         }
 
+        private sealed class TerrainHeightSampler : IWorldHeightSampler
+        {
+            public bool TrySampleWorldY(float worldX, float worldZ, out float worldY)
+            {
+                return OverworldTerrainAccess.TrySampleHeightWorld(worldX, worldZ, out worldY);
+            }
+        }
+
         private enum BlockReason
         {
             None = 0,
@@ -994,6 +1100,29 @@ namespace GameDev.EditorTools
                 }
 
                 return bz == az + 1 ? Edge(ax, az, la, 1, lb, bx, bz) : Edge(bx, bz, lb, 1, la, ax, az);
+            }
+
+            /// <summary>What decides this edge: the height limit, a collider, or nothing.</summary>
+            public string DescribeEdge(Vector3 a, Vector3 b)
+            {
+                var delta = b - a;
+                var distance = delta.magnitude;
+                if (Mathf.Abs(delta.y) > _cell * Mathf.Tan(SlopeLimitDegrees * Mathf.Deg2Rad))
+                {
+                    return "height";
+                }
+
+                return Physics.CapsuleCast(
+                    a + Vector3.up * (StepOffset + Radius),
+                    a + Vector3.up * (Height - Radius),
+                    Radius,
+                    delta / distance,
+                    out var hit,
+                    distance,
+                    Mask,
+                    QueryTriggerInteraction.Ignore)
+                    ? hit.collider.name
+                    : "open";
             }
 
             public CoverRead Cover(int ix, int iz, int level)
@@ -1290,7 +1419,9 @@ namespace GameDev.EditorTools
             public double CoverMs;
             public double StepMedianMs;
             public double StepWorstMs;
+            public double StepWorstCleanMs;
             public int Steps;
+            public int StepsWithCollection;
             public int Standable;
             public int MultiLevel;
             public int Reachable;
@@ -1314,6 +1445,7 @@ namespace GameDev.EditorTools
         private sealed class Report
         {
             public readonly List<Row> Rows = new List<Row>();
+            public readonly List<string> Disagreements = new List<string>();
             public ControllerCheck Controller;
             public int NoStart;
 
@@ -1331,6 +1463,9 @@ namespace GameDev.EditorTools
             public void Write(string outDir)
             {
                 WriteCsv(Path.Combine(outDir, "sites.csv"));
+                File.WriteAllText(
+                    Path.Combine(outDir, "disagreements.csv"),
+                    "class,pass,cell,ax,ay,az,bx,by,bz,kind,decided_by\n" + string.Join("\n", Disagreements));
                 File.WriteAllText(Path.Combine(outDir, "summary.md"), Summary());
             }
 
@@ -1396,6 +1531,9 @@ namespace GameDev.EditorTools
                 var trees = Rows.Where(r => r.Pass == AllPieces && Mathf.Approximately(r.Cell, 1f)).ToList();
                 text.AppendLine($"Trees in reachable cells: {trees.Sum(r => r.TreesInReachableCells)} of {trees.Sum(r => r.TreesInWindow)} near the sites.");
                 text.AppendLine($"Hit buffer overflows: {Rows.Sum(r => r.OverflowColumns)}.");
+                text.AppendLine(
+                    $"Steps: {Rows.Sum(r => r.Steps)}, with a garbage collection: {Rows.Sum(r => r.StepsWithCollection)}, "
+                    + $"slowest with none: {F(Rows.Max(r => r.StepWorstCleanMs))} ms.");
                 return text.ToString();
             }
 
