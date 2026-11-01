@@ -1,16 +1,16 @@
 # 18 World Time and Living Simulation
 
-Version: 0.4
+Version: 0.6
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-10-31 (Alchemy brewing duration and mini-game noted; interaction timing remains open.)
+Last Updated: 2026-11-01 (daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
 
 Referenced By:
-[10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), future NPC AI, encounter, settlement, medical, and world-event specifications.
+[04 Points of Interest](04%20Points%20of%20Interest.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), future NPC AI, encounter, settlement, medical, and world-event specifications.
 
 ---
 
@@ -44,6 +44,8 @@ At each one-minute boundary, the world performs a coordinated update of relevant
 - resolving scheduled or pending simulation work.
 
 A tick boundary is a shared reevaluation point, not a requirement that every NPC discard its current task and invent a new one. NPCs normally continue their current intention until it is completed, invalidated, or new information gives them a reason to change it.
+
+An in-game calendar day spans 1,440 World Ticks. At the day boundary, the character receives a private daily summary of their own actions, alongside a public-news issue prepared from events that reached its publisher through valid channels. The private summary is not transmitted as NPC knowledge. News contents and player-facing presentation are defined in [09 Information Sources](09%20Information%20Sources.md).
 
 # 2. Real-time activities and interaction pauses
 
@@ -270,13 +272,14 @@ Potential information channels include:
 - **Familiars and observers:** a familiar or assigned watcher observes an area and reports what it detects.
 - **Direct perception:** an NPC hears, sees, or otherwise senses an event within the limits of its senses and circumstances.
 - **Specific abilities:** supernatural or other explicitly defined abilities can detect, monitor, or report particular events or areas.
+- **Daily public news:** a publisher compiles significant events it learned about and broadcasts the issue at the in-game day boundary.
 
-Information transmission is not automatic universal knowledge. Each channel needs a sender/source, recipient or eligible audience, content, timing, and any relevant limits. The detailed rules belong to the Information Sources and ability systems.
+Information transmission is not automatic universal knowledge. Each channel needs a sender/source, recipient or eligible audience, content, timing, and any relevant limits. NPCs may refer to a published event once it reaches their public-information audience; hidden operations remain limited to factions, witnesses, or other valid recipients. The detailed reporting and dialogue rules belong to [09 Information Sources](09%20Information%20Sources.md) and ability systems.
 
 # 9. Design constraints
 
 - One shared game clock is authoritative for all time-dependent systems.
-- One in-game minute is one world tick; the initial real-time pacing is 10 seconds per tick.
+- One in-game minute is one world tick; the initial real-time pacing is 10 seconds per tick. A cult ritual's current six-hour window is 360 ticks: about one real hour only during uninterrupted free exploration; world-time pauses and turn-based deliberation can extend wall-clock duration.
 - Direct dialogue pauses the world; shop-stock interfaces do not.
 - Sleep advances 6–8 in-game hours and simulates the wider world throughout.
 - Sleep can be interrupted by world events, including alarms and hostile attacks.
@@ -311,6 +314,10 @@ Information transmission is not automatic universal knowledge. Each channel need
 18. What information can each communication channel transmit, to whom, how quickly, and with what limits?
 19. How are NPC goals, task selection, danger assessment, refuge selection, and return decisions governed?
 20. How much of the world is simulated in detail at once, and how are distant or unloaded NPCs abstracted without losing important consequences?
+21. Which events qualify for the daily public-news issue, and which NPC audiences receive each report? The private player summary records the character's own actions regardless of publicity.
+22. How do public news, ambient NPC dialogue, and map markers stay synchronized without exposing hidden operations or numeric Influence, including report delay and exact-site versus region precision?
+23. How are off-screen allied and cult group clashes resolved and represented while keeping the simulation bounded?
+24. What interface presents the private daily summary, how much detail does it preserve, and how long can the player review past summaries?
 
 ---
 

@@ -1,16 +1,16 @@
 # 04 Points of Interest
 
-Version: 0.2
+Version: 0.4
 
 Status: Draft
 
-Last Updated: 2026-08-05
+Last Updated: 2026-11-01 (ritual operations use six-hour world-time windows without player-facing countdowns; public event sites and faction control are represented on the map.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md)
 
 Referenced By:
-[05 Progression](05%20Progression.md), [09 Information Sources](09%20Information%20Sources.md), Future map, exploration, side-event, quest, and world-presentation design.
+[05 Progression](05%20Progression.md), [09 Information Sources](09%20Information%20Sources.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), Future map, exploration, side-event, quest, and world-presentation design.
 
 ---
 
@@ -144,6 +144,10 @@ Rules:
 
 Active Windows create Commitment pressure: world-time is a scarce stock.
 
+## Cult ritual operations
+
+A cult ritual is represented as a timed faction-operation POI. Its current campaign target window is **six in-game hours / 360 World Ticks** under the shared clock in [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md). The player sees no numeric countdown. News, faction contacts, ambient reports, known map entries, and local world activity communicate what their sources know and whether the operation is still underway; the map does not reveal an unreported secret operation. When the window expires, the factions resolve the operation without the player and its aftermath remains discoverable. See [02 World Laws](02%20World%20Laws.md) and [09 Information Sources](09%20Information%20Sources.md).
+
 # Unattended Resolution
 
 If the player never participates:
@@ -169,7 +173,7 @@ Keep the first set small.
 | Trace / Clue | discovery that opens another POI | Attention + Approach |
 | Cache / Hidden Place | exploration reward with risk | Attention + Commitment |
 | Bargain Site | dangerous power / church / entity offer | Bargain + Commitment |
-| Operation Echo | residue or interrupt chance for a faction Operation | Attention + Allegiance |
+| Operation Echo | active faction Operation, intervention opportunity, or aftermath clue | Attention + Approach + Allegiance |
 
 Combat may appear inside a type. Combat is not a POI type by itself.
 
@@ -526,10 +530,12 @@ Lazy / timed POI valid? Yes
 # Documentation Review
 
 - **Vision / Pillars:** Compatible. Curiosity, timed commitment, living residue, and incomplete playthroughs are reinforced.
-- **World Laws:** Compatible if World Engine mainly schedules POIs/Operations rather than full scenes. Unattended resolution keeps Influence moving without the player.
+- **World Laws:** Compatible if World Engine mainly schedules POIs/Operations rather than full scenes. Ritual windows can overlap while each operation stays dormant until the player arrives; unattended resolution keeps Influence moving without the player.
 - **Decision Engine:** Compatible. POIs are delivery vehicles for Decision Nodes, not a replacement for axes.
 - **Solo scope:** Compatible. Dormant POIs are the V1 performance strategy.
-- **Glossary / Open Questions:** Updated for POI terms; exact UI urgency vocabulary and duration numbers remain open.
+- **World Time:** Ritual windows use the shared world clock; the six-hour window is a current campaign target, with exact tuning deferred.
+- **Information Sources:** Public reports and map entries may reveal operations without exposing hidden values.
+- **Glossary / Open Questions:** Updated for POI terms; general duration classes and exact UI urgency vocabulary remain open.
 
 # Related Documents
 

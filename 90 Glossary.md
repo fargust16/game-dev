@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.59
+Version: 0.60
 
 Status: Draft
 
-Last Updated: 2026-11-01 (cult ritual, campaign completion/rating, and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-01 (daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -1062,7 +1062,15 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Manifestation of the Sealed Being** — The state in which the sealed Stage 0 being has returned to the living world. From manifestation onward, player-character death ends the playable story in defeat and no same-world successor appears, even if the being is later defeated.
 
-**Cult Ritual** — A timed operation of the opposing faction performed against ordinary civilians to advance the sealed being's return. Completion advances the hidden threat; interruption delays it. Exact number, schedule, dependencies, and interruption rules remain open.
+**Cult Ritual** — A timed operation of the opposing faction performed against ordinary civilians to advance the sealed being's return. Its current campaign window is six in-game hours (360 World Ticks), with no player-facing numeric countdown; the operation resolves through faction action when the window ends. Completion advances the hidden threat; disruption delays it. The number of required earlier rituals, their schedule, concurrency limits, and detailed interruption rules remain open.
+
+**Capital Awakening Ritual** — The final cult ritual, held at the centre of the capital after the required earlier rituals succeed. Its completion manifests the sealed being there. It is distinct from the later planet-destruction rite.
+
+**Planet-Destroying Ritual** — The separate act the manifested being eventually intends to perform to destroy the planet after attacking other powerful beings, factions, people, and its own followers. Its exact trigger and timing remain open.
+
+**Daily Character Summary** — A private report delivered to the player at each in-game day boundary. It records the character's actions whether or not they became public knowledge.
+
+**Daily Public News** — A digest delivered at the in-game day boundary from events known to its publisher through valid information channels. Its reports may be partial, biased, or late; it does not reveal secret operations automatically.
 
 **Campaign Completion** — The campaign ends either when the cult's ability to direct followers and coordinate rituals is removed before manifestation, or when the manifested being is defeated. Both routes present a Campaign Rating.
 

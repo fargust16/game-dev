@@ -1,16 +1,16 @@
 # 09 Information Sources
 
-Version: 0.2
+Version: 0.4
 
 Status: Draft
 
-Last Updated: 2026-08-07
+Last Updated: 2026-11-01 (private daily action summary separated from public news; public event/map reporting and source-limited NPC awareness clarified.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md)
 
 Referenced By:
-Future dialogue, UI rumour, newspaper, notice-board, and discovery content.
+[18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), Future dialogue, UI rumour, newspaper, notice-board, and discovery content.
 
 ---
 
@@ -66,6 +66,8 @@ Printed public narrative.
 - Bias: owners, churches, or factions may slant the story.
 - Strong for teaching the player to read Symptoms over time.
 - Often weaker on exact map pins; stronger on Hinted regions and motive fragments.
+- A daily issue is prepared at the in-game day boundary and may summarize significant public events from the prior day, including completed or disrupted cult rituals, territorial changes, and player actions that entered public knowledge.
+- Reports can be incomplete, biased, or late; the bulletin never reveals an operation that has not reached a valid public or faction channel.
 
 ## 3. Bartender / Publican
 
@@ -83,6 +85,8 @@ Ambient or NPC chatter.
 - Good for: cheap Attention hooks and Soft Memory.
 - Low reliability; high curiosity.
 - Often creates Hinted state rather than Marked.
+- Ambient dialogue can repeat public reports after they spread, including ritual outcomes and faction movements.
+- It can hint at preparations before a ritual without exposing a hidden campaign counter.
 - Excellent for Death Gap aftermath and "collector" style pressure.
 
 ## 5. Faction Contact
@@ -140,6 +144,14 @@ Rules:
 - A source may warn that time is short without giving the exact pin.
 - Player Knowledge helps recognise which sources are usually biased or fertile.
 
+## Public news and map information
+
+At the in-game day boundary, the player receives a daily summary with their own actions and a broad public-news digest. The personal action summary includes what the character did even when it was not publicly observed. The public digest reports significant events available to its publisher, rather than exposing the World Engine's private state. Major confirmed events such as a completed or disrupted ritual are intended to enter broad public circulation; NPCs may mention them in ambient dialogue after the report reaches their eligible audience. Each NPC still needs a source of information under [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), and private operation details remain limited to valid recipients.
+
+The interactive map records publicly reported or personally discovered event locations. A qualitative faction layer may show where a faction retains or loses local presence/control. The map does not display numeric Faction Influence, a count of completed rituals, or unreported secret operations. Whether a report marks an exact site or only a region depends on its source and remains to be authored.
+
+Player actions appear in public reporting only when an eligible witness, record, or communication channel makes them known; the private daily summary still records them for the player. The bulletin and map complement the world's symptoms; they do not replace investigation or become a complete quest log.
+
 # Reliability and Bias
 
 Every V1 source type has a bias profile.
@@ -190,7 +202,7 @@ Exact UI chrome remains open. The design rule is: the player should be able to u
 
 | System | Role of Information Sources |
 |--------|-----------------------------|
-| Points of Interest | Main discovery and urgency channel |
+| Points of Interest | Main discovery and urgency channel; publishes known operation locations as event POIs |
 | World Laws | Translate Influence into readable tips and Symptoms |
 | Decision Engine | Tips create Attention and Partial Uncertainty |
 | Progression | Formula leads and church/entity whispers |
@@ -244,7 +256,9 @@ A new tip is good if:
 - **Decision Engine:** Compatible. Information narrows, does not erase, Partial Uncertainty.
 - **Approaches / Confront:** Compatible. Multiple extraction methods; violence is not the info king.
 - **Character Life / Progression:** Compatible. Factionless hardship and Formula leads both fit.
-- **Glossary / Open Questions:** Updated; exact UI and spawn density remain open.
+- **World Time:** The private player summary and public bulletin arrive at the in-game day boundary; NPC awareness still requires a valid information channel.
+- **World Laws / POIs:** Public reports and qualitative map changes expose consequences without disclosing hidden counters.
+- **Glossary / Open Questions:** Updated; public bulletin content, map precision, spread time, private-summary UI, and spawn density remain open.
 
 # Related Documents
 

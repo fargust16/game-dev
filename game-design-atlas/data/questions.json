@@ -53,7 +53,7 @@
   },
   {
     "id": "q-wl-difficulty",
-    "text": "How should the Combat Difficulty slider's low, middle, and high values change the final confrontation, and do any of the other six sliders affect allied support or its outcome?",
+    "text": "What exact force values and odds produce the agreed final-fight direction: allies win at the lowest Combat Difficulty, Normal is near-even with a slight enemy advantage, and higher settings increasingly favour the enemy? Do the other six sliders affect support or outcome?",
     "systemIds": [
       "world-laws"
     ],
@@ -778,7 +778,7 @@
   },
   {
     "id": "q-wl-ritual-schedule",
-    "text": "How many civilian-targeted rituals can occur in a world, what preparation and dependencies connect them, and how do completion or interruption change the hidden return threat?",
+    "text": "How many earlier civilian-targeted rituals must succeed before the capital awakening (five is only an example), how are locations and start times selected, which difficulty settings allow parallel operations, and how do autonomous outcomes change the hidden return threat?",
     "systemIds": [
       "world-laws"
     ],
@@ -791,7 +791,7 @@
   },
   {
     "id": "q-wl-ritual-clues",
-    "text": "How do partial clues reveal active or missed cult rituals without a global progress meter?",
+    "text": "Which public events enter the daily bulletin and map, how quickly do reports spread, and when does a source reveal an exact ritual site versus only a region? The private daily summary always records the player's own actions; its interface and retention remain open.",
     "systemIds": [
       "world-laws",
       "information-sources",
@@ -819,20 +819,20 @@
   },
   {
     "id": "q-wl-finale-site",
-    "text": "Is the final summoning site always the capital, or can the World Seed select another site?",
+    "text": "Where is the final awakening ritual held? It is fixed at the centre of the capital.",
     "systemIds": [
       "world-laws"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-wl-npc-autonomy",
-    "text": "How much can autonomous supernatural practitioners advance, disrupt, or complete cult operations without direct player involvement?",
+    "text": "How are off-screen allied/cult clashes resolved, how do allied groups repeatedly attempt to retake the occupied capital while the cult advances against free cities, and how can other autonomous practitioners change those outcomes? What state triggers the separate planet-destruction rite?",
     "systemIds": [
       "world-laws",
       "actors"
@@ -859,7 +859,7 @@
   },
   {
     "id": "q-wl-capture",
-    "text": "Which non-combat methods can interrupt a ritual, and what capture, custody, escape, and return-to-cult rules support taking ritualists alive?",
+    "text": "Beyond killing or capturing all responsible ritualists, which non-combat methods can stop a ritual, and what custody, escape, and return-to-cult rules support taking them alive?",
     "systemIds": [
       "world-laws",
       "confront"
