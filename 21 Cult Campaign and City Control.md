@@ -1,10 +1,10 @@
 # 21 Cult Campaign and City Control
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft — owner-approved direction, incomplete specification
 
-Last Updated: 2026-11-01 (campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
+Last Updated: 2026-11-01 (owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07 Character Life](07%20Character%20Life.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -35,8 +35,8 @@ Allied forces start large and shrink; Cult Forces keep growing
         ↓
 A Cult Force gathers enough followers and moves on a city
         ↓
-City Capture: other factions' followers are removed, the city is held,
-the ritual completes and the city becomes a Place of Power
+City Capture: attack, other factions' followers cleared, six-hour ritual,
+the city becomes a Place of Power and a garrison stays
         ↓
 Cult Control ←——— City Liberation returns the city ———→ the cult must take it again
         ↓
@@ -99,34 +99,67 @@ This is a game-design target. It authorises no production terrain work. The V0 e
 
 ## City Control
 
-**City Control** is the state saying which side holds a city. It has two values:
+**City Control** is the state saying who holds a city. It has three values:
 
-- **Allied Control** — the city is held by the allied side.
+- **Allied Control** — one allied Major Faction holds the city, and its new followers appear there as defenders.
 - **Cult Control** — the city was taken through City Capture and has not been liberated.
+- **Unclaimed** — the city was liberated and no faction holds it yet.
 
-Control changes only when City Capture or City Liberation completes. During an attack, the city keeps its current control.
+Control changes only when City Capture or City Liberation completes, or when a faction claims an Unclaimed city. During an attack, the city keeps its current control.
+
+## Who takes a liberated city (owner-approved)
+
+- The allied faction with the most followers in the city takes it.
+- A city liberated by the player alone is Unclaimed. The first allied faction whose follower arrives claims it, and that faction's followers then appear there as defenders.
+- Replacement of allied followers becomes possible in the city again.
 
 ## Working readings
 
 - "The whole world belongs to the allied factions" is read as "every city". Land between cities carries no City Control and stays neutral.
-- City Control is a side-level state. Which of the three allied Major Factions holds a given city, and whether a liberated city returns to the same one, is open (CC-7).
+- An Unclaimed city is not under Cult Control, so it keeps the Capital Gate closed. How the cult takes an Unclaimed city is open (CC-7).
 
 # 4. City Capture and City Liberation
 
 ## Owner-approved
 
-- **City Capture** requires the cult to remove every follower of other factions from the city, by driving them out or killing them, and to hold the city.
+- **City Capture** runs in a fixed order: the cult attacks, clears the city of every follower of other factions by driving them out or killing them, conducts a six-hour ritual that can still be stopped, and then holds the city with a garrison.
 - The cult does not attack ordinary residents during City Capture. It targets followers.
 - **City Liberation** is symmetrical: every cult follower in the city is driven out or destroyed.
 - The player can attempt City Liberation alone or alongside a faction. City defence alongside a faction is also available.
-- Killing every follower is not required. At some point cult followers may decide to retreat.
-- **Cult Retreat** is collective: once followers start to flee, they flee from every point of the city at once. The player can chase and finish them, but at some point they get away.
-- A General does not have to be in a captured city. A General may also run from a fight.
+- Killing every follower is not required. Cult followers may decide to retreat.
+- A General does not have to be in a captured city. A General may also run from a fight, except the Holding General.
 - Rituals can run in parallel in two cities when the cult has gathered enough followers.
 
-## Cult behaviour in a city
+## Ritual sabotage (owner-approved)
 
-Cult followers do not hide. They behave much like the Dominators: anyone who invades their city is attacked at once.
+A ritual is a concrete mechanism in the city. It can be sabotaged out of combat, without a fight.
+
+Once a ritual is disrupted, everyone conducting it loses most of their power and cannot fight properly. They try to leave the city first. Against a single intruder they may try to drive that person off or fight. Against many people they most likely retreat.
+
+The cult cannot repeat the ritual straight away. How long it must wait is open (CC-7). What the mechanism is and what sabotage takes is open (CC-8).
+
+## Cult Retreat (owner-approved)
+
+Cult Retreat is collective: once followers start to flee, they flee from every point of the city at once.
+
+They retreat when a senior left in charge of the city dies, or when losses leave them in a dangerously small minority. They head for the nearest city under Cult Control or scatter outside the walls.
+
+The player can chase and kill them while staying close enough that they do not leave the fight. The separation rule of [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md) governs that distance. Past it, they get away.
+
+## Life under Cult Control (owner-approved)
+
+A captured city is a closed combat zone, but residents and shops keep working, and cult followers patrol the streets.
+
+- Stealth is possible. A character who stays unnoticed can reach a stash or an NPC they need.
+- Once a character is noticed as an enemy, a fight begins and every follower in the city knows where they are. The choice is to fight or to run.
+- A stranger with no faction can walk through at some risk, because nobody knows them.
+- Followers sense a member of a known faction, approach, and demand a check through dialogue. Refusing starts a fight. A character who agrees and belongs to no faction may only be threatened.
+
+The dialogues themselves are later content.
+
+## Cult Thought Link
+
+Cult followers do not hide. They behave much like the Dominators and converge on any fight.
 
 The **Cult Thought Link** is a mental ability to exchange thoughts at a distance:
 
@@ -143,18 +176,20 @@ Who else counts for capture and liberation is open (CC-3), including Minor Facti
 
 ## Working readings
 
-- The cult must keep a garrison in a captured city. A city with no cult followers meets the liberation condition, so a force that leaves entirely loses the city. The garrison's size is open (CC-4).
-- The six-hour ritual window of [02 World Laws](02%20World%20Laws.md) stays the current target. It is read as the period the cult must hold the ritual while allied forces and the player can still interrupt it. Its order relative to clearing the city is open (CC-4).
+- A character who belongs to a known faction and agrees to the check is exposed and attacked.
+- A city's garrison is its followers plus one or more seniors left in charge. Its numbers are open (CC-4).
 
 # 5. The secret purpose of rituals
 
 ## Owner-approved
 
-A capture ritual turns a city into a **Place of Power** for the manifestation. Ordinary residents are needed alive as sacrifices, which is why the cult does not attack them.
-
-This purpose stays secret from ordinary residents for the whole campaign. It is not secret from the player.
+A capture ritual turns a city into a **Place of Power** for the manifestation. Ordinary residents are needed alive as sacrifices, which is why the cult does not attack them. Materialising a Stage 0 being in the real world takes a very great number of sacrifices.
 
 A Place of Power needs no visible mark on the city.
+
+Nobody in the world knows this purpose, and neither does a first-time player. Everyone sees rituals with no civilian victims, so the allied factions treat the rituals themselves with scepticism, even as they fight for their cities.
+
+The player can only guess, until manifestation reveals what the rituals were for. That knowledge stays in the player's head. It carries to the next world as Player Knowledge and never as a mechanic: there are no dialogues to convince anyone of it.
 
 At the Capital Awakening Ritual, followers conduct smaller rituals in every captured city at the same moment, and the people there die as the sacrifice that manifests the being.
 
@@ -162,7 +197,7 @@ At the Capital Awakening Ritual, followers conduct smaller rituals in every capt
 
 The earlier draft described rituals as civilian-targeted. The cult's violence in a capture is now aimed at followers. Residents are spared until the final ritual, and their death is what the campaign is racing towards.
 
-Who exactly dies, and what the world looks like afterwards, is open (CC-20). How the player learns the secret is open (CC-21).
+The player cannot evacuate residents. Whether the capital's residents die too, and what the world looks like afterwards, is open (CC-20). Whether a player who wins before manifestation ever learns the secret is open (CC-21).
 
 # 6. Capital Gate and manifestation
 
@@ -190,33 +225,40 @@ City Control is the campaign's public progress reading. It replaces the hidden r
 
 The cult's forces are divided into three **Cult Forces**, each led by a **Cult General**. All three Generals are Stage 2 followers. They share the objective of capturing cities through rituals and differ in how they act. Those differences require different responses from the player.
 
-Generals prepare their next attack in an area outside the city, so that they cannot be killed early. The exception is the Holding General, who stays in the city it captured.
+Generals prepare their next attack in an area outside the city, so that they cannot be killed early. The exception is the Holding General, who stays with its followers in the cities it captures.
+
+Killing all three Generals is the only way to end the campaign before manifestation.
 
 The labels below describe roles only. They are not final names.
 
 | Working label | Owner-approved behaviour | Can it be found? | What it asks of the player |
 |---|---|---|---|
 | **Teleporting General** | Lives in the Spirit World and teleports in to attack. Can be defeated only straight after teleporting, because for some time it cannot return. | Not in the real world. | Be at the arrival in time and win inside that window. |
-| **Holding General** | Arrives at one zone and stays in the city it captured, in person. Fights to the end. Hardest of the three in battle. | Yes. | Prepare for one decisive fight, or work around it. |
+| **Holding General** | The warlike one. Stays in person with its followers in each city it captures. When it moves to the next city, it leaves only a small part behind and takes its main force along. Fights to the end. Hardest of the three in battle. | Yes. | Prepare for one decisive fight, or strike the weak garrisons it leaves behind. |
 | **Raiding General** | Captures a city, then leaves on foot for a base in neutral territory and raids from there. | Yes. | Find the base and break the raiding cycle. |
 
 The owner's reference for the Teleporting General is a *Space Rangers* enemy that travels through black holes. This is a comparison of feel only.
 
-## Spirit World
+## Spirit World and Divine Plane
 
-The **Spirit World** is the other side of the real world. The sealed being is held there, and the cult works to manifest it from there. The Teleporting General lives there. The player cannot enter it for now.
+These are two different places:
+
+- The **Spirit World** is the other side of the real world. Higher followers of Pathways can reach it, and the Teleporting General lives there. The player cannot enter it for now.
+- The **Divine Plane** is unreachable. Since a past cataclysm, every Stage 0 being has been there, the sealed being included. They cannot materialise in the real world on their own and act through their followers.
+
+The allied gods refused to sacrifice people to return. The sealed being's cult chose to do it.
 
 ## Rank and the Stage Occupancy Rule
 
-The **Stage Occupancy Rule** of [05 Progression](05%20Progression.md) is why the Generals are Stage 2. While a Pathway's Stage 0 is occupied, that Pathway has no Stage 1. The sealed being occupies Stage 0, so its followers stop at Stage 2.
+The **Stage Occupancy Rule** of [05 Progression](05%20Progression.md) is why the Generals are Stage 2. While a Pathway's Stage 0 is occupied, that Pathway has no Stage 1. The sealed being occupies Stage 0, so its followers stop at Stage 2. The same holds for the allied factions, whose gods occupy Stage 0: they too stop at Stage 2.
 
 The three Generals are therefore the top of the cult's living hierarchy. Above them stands only the sealed being.
 
 ## Working readings
 
-- All three Generals dead satisfies the pre-manifestation completion path and ends cult reinforcement. Whether a killed General is replaced is open (CC-9).
+- A killed General is not replaced, because killing all three must remain able to end the campaign. Whether the cult's reinforcement slows as Generals fall is open (CC-9).
 - A General is a persistent named actor, not a generated follower.
-- The Holding General stays in its city and does not Break Away or offer a Yield. The owner's statement that a General may run from a fight applies to the other two. This is an exception for one actor, not a change to [08 Confront Constraints](08%20Confront%20Constraints.md).
+- The Holding General does not Break Away or offer a Yield. This is an exception for one actor, not a change to [08 Confront Constraints](08%20Confront%20Constraints.md).
 - The three behaviours are fixed archetypes across worlds. The World Seed varies who the Generals are, their bases, and their target order, so that a past world teaches how to read a General without solving the next one. Whether they vary by Pathway depends on CC-22.
 - Stage 2 Generals are a full-game world premise, in the same sense as the Stage 2–3 head of the covert alchemical network in [02 World Laws](02%20World%20Laws.md). They do not widen V1's Stages 9–7 player scope in [05 Progression](05%20Progression.md).
 
@@ -224,7 +266,7 @@ The three Generals are therefore the top of the cult's living hierarchy. Above t
 
 ## Owner-approved
 
-**Allied forces** are generated at world creation. During play, new followers of certain stages appear at a small periodic rate. Losses outpace replacement, so the allied side can dwindle over a long campaign.
+**Allied forces** are generated at world creation. During play, new followers of certain stages appear at a small periodic rate, in the cities their faction holds. Losses outpace replacement, so the allied side can dwindle over a long campaign.
 
 **Cult Forces** generate much faster and are not tied to the general rules of the world's population. They simply gain new followers periodically.
 
@@ -265,7 +307,7 @@ Knowing a city's control is not the same as knowing a General's position. How a 
 
 The Cult Thought Link is a defined channel under [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), not global NPC knowledge. It reaches cult followers only.
 
-No public source reports the purpose of the rituals. Ordinary residents and the public news do not know it.
+No source in the world reports the purpose of the rituals.
 
 Captured and liberated cities must look different in the world. Their Symptoms are part of CC-6.
 
@@ -283,10 +325,10 @@ Filter of [AGENTS.md](AGENTS.md):
 
 | Question | Result |
 |---|---|
-| Creates curiosity? | Yes. The secret of the rituals and each General's tells give the player something to work out. |
+| Creates curiosity? | Yes. Rituals with no visible victims and each General's tells give the player something to guess at. |
 | Teaches about the world? | Yes: General behaviour, tells, and control patterns are prime Player Knowledge targets. |
 | Power has a price? | Partly. Fighting for a city costs time elsewhere; costs of allied help are open. |
-| Multiple options viable? | **Not yet proven.** Attack on sight and the Cult Thought Link leave Convince, Exchange, and Veil no clear place inside a captured city. [08 Confront Constraints](08%20Confront%20Constraints.md) requires real alternatives (CC-8). |
+| Multiple options viable? | **Partly.** Ritual sabotage and stealth give real non-combat routes during a capture. Once a city has fallen, breaking its garrison is still combat only. [08 Confront Constraints](08%20Confront%20Constraints.md) requires real alternatives (CC-8). |
 | Failure valuable? | **At risk.** Liberating a city that falls again the next day may only waste time. Liberation needs a lasting payoff (CC-7). |
 | World changes afterward? | Yes: control, residents, services, the Capital Gate, and the deaths at manifestation. |
 
@@ -294,6 +336,7 @@ Known risks:
 
 - **Constant urgency against curiosity.** A war with a visible front can crowd out exploration, the game's first pillar. The 15–20 day length and the 3×3 world are the response; the tempo curve is still open (CC-1).
 - **Solo fight against a whole garrison.** The Cult Thought Link draws a city's followers to one fight. A lone character can meet all of them, so the size of a garrison and how they arrive decide whether solo liberation is possible (CC-4, CC-8).
+- **Sabotage as a best strategy.** If one stealthy character can always break a ritual and send its conductors running, sabotage beats every other answer. The mechanism needs its own price and risk (CC-8).
 - **Emptied cities after manifestation.** If captured cities lose their residents, the world after manifestation has few people, services, or quests left (CC-20).
 - **Power gap.** A Stage 7 character facing a Stage 2 General has a 1.32 stage multiplier against 2.66, before abilities ([07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md)). Defeating a General needs a route other than a stat race (CC-10).
 - **Terrain evidence.** The target world and city count sit outside the conditions of the terrain research so far (CC-2).
@@ -324,10 +367,10 @@ The following V1/V2/V3 split is proposed, not approved. It depends on CC-11, inc
 # Documentation Review
 
 - **Vision / Pillars / Player Experience:** Compatible. The world acts without the player, and the player is not a chosen saviour. Curiosity under war pressure is a tracked risk (§12).
-- **World Laws:** Updated. City capture replaces the required-ritual count and the hidden return threat; the sealed being is held in the Spirit World; Stage 1 cult followers are withdrawn.
+- **World Laws:** Updated. City capture replaces the required-ritual count and the hidden return threat; the Divine Plane and the Spirit World are separate places; Stage 1 cult and allied followers are withdrawn; the pre-manifestation ending is killing all three Generals.
 - **Decision Engine:** Compatible once non-combat routes exist. Stale single-difficulty wording corrected.
-- **Points of Interest / Information Sources:** Updated for persistent occupied cities, public City Control, and the secret purpose of rituals.
-- **Progression:** Updated with the Stage Occupancy Rule. Stage 2 Generals are a full-game premise and do not widen V1's player stages.
+- **Points of Interest / Information Sources:** Updated for persistent occupied cities, public City Control, and the rituals' purpose, which no source reports.
+- **Progression:** Updated with the Stage Occupancy Rule for every Pathway and with Pathway change from Stage 5. Stage 2 Generals are a full-game premise and do not widen V1's player stages.
 - **Character Life:** Updated. Manifestation is the Capital Awakening Ritual's completion; a manifestation during a Death Gap is open (CC-18).
 - **Confront:** Compatible in principle; §12 records the requirement for real alternatives.
 - **World Time:** Updated. The Cult Thought Link is a defined information channel.

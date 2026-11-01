@@ -4,7 +4,7 @@ Version: 0.8
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-01 (Cult Thought Link recorded as an information channel. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-01 (residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -226,7 +226,7 @@ NPCs are not automatically deleted or considered dead when their home settlement
 - After reaching refuge, the NPC may take up appropriate activities or responsibilities there, subject to the settlement's conditions and the NPC's capabilities.
 - If the original settlement is liberated or becomes safe again, the NPC may decide to return.
 - Whether an NPC survives, escapes, finds refuge, or returns depends on the actual events and circumstances; none of these outcomes is guaranteed.
-- City Capture targets followers, not ordinary residents ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)). Followers may be driven out; residents may stay or leave by their own decision.
+- City Capture targets followers, not ordinary residents ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)). Followers may be driven out. Ordinary residents and shops keep working in a captured city, and the player cannot evacuate them.
 
 Detailed settlement capacity, refugee logistics, faction policy, and NPC reassignment rules remain open for their respective system designs.
 

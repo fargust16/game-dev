@@ -1,10 +1,10 @@
 # 09 Information Sources
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft
 
-Last Updated: 2026-11-01 (the secret purpose of rituals excluded from public sources. Earlier: reported City Control recorded as the public reading of campaign progress. Earlier: private daily action summary separated from public news; public event/map reporting and source-limited NPC awareness clarified.)
+Last Updated: 2026-11-01 (the rituals' purpose excluded from every source until manifestation. Earlier: the secret purpose of rituals excluded from public sources. Earlier: reported City Control recorded as the public reading of campaign progress. Earlier: private daily action summary separated from public news; public event/map reporting and source-limited NPC awareness clarified.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md)
@@ -150,7 +150,7 @@ At the in-game day boundary, the player receives a daily summary with their own 
 
 The interactive map records publicly reported or personally discovered event locations. A qualitative faction layer shows reported City Control ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)) and where a faction retains or loses local presence. Reported City Control is the public reading of campaign progress: the fall of the last other city tells the player that the capital is next. The map does not display numeric Faction Influence, a count of completed rituals, or unreported secret operations. Whether a report marks an exact site or only a region depends on its source and remains to be authored.
 
-No public source reports the purpose of cult rituals. Ordinary residents and the public news do not know that captured cities are being prepared for sacrifice; how the player learns it is open ([99 Open Questions](99%20Open%20Questions.md) CC-21).
+No source in the world reports the purpose of cult rituals. Nobody knows that captured cities are being prepared for sacrifice. Sources report rituals with no civilian victims, and the player can only guess until manifestation reveals the purpose. No dialogue lets a later character convince NPCs of it ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)).
 
 Player actions appear in public reporting only when an eligible witness, record, or communication channel makes them known; the private daily summary still records them for the player. The bulletin and map complement the world's symptoms; they do not replace investigation or become a complete quest log.
 

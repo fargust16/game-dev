@@ -1,10 +1,10 @@
 # 05 Progression
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
+Last Updated: 2026-11-01 (Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
@@ -118,12 +118,22 @@ World actors at deeper stages, such as the Stage 2 Cult Generals of [21 Cult Cam
 
 ## Stage Occupancy Rule
 
-The deepest stages are limited per Pathway:
+The deepest stages are limited on every Pathway, including the one the player chooses:
 
 - While a Pathway's Stage 0 is occupied, that Pathway has no Stage 1.
-- While a Pathway's Stage 0 is unoccupied, that Pathway has at most three Stage 1 practitioners.
+- While a Pathway's Stage 0 is unoccupied, that Pathway has at most three Stage 1 practitioners at a time.
+- Stage 2 has no limit.
+- When someone reaches Stage 0, every Stage 1 practitioner of that Pathway moves back to Stage 2 automatically.
 
-This is a law of the world, not a difficulty or balance setting. It is why the sealed being's followers stop at Stage 2. Which Pathways have an occupied Stage 0 is open ([99 Open Questions](99%20Open%20Questions.md) CC-22).
+This is a law of the world, not a difficulty or balance setting. It is why followers of a Stage 0 being stop at Stage 2, whether cult or allied.
+
+This is a price of following a god: a faction's Pathway probably has its Stage 0 occupied. The character does not know at first which Pathway belongs to which deity and must find out through dialogue and investigation, or take the risk and stop at Stage 2.
+
+Which Pathways have an occupied Stage 0 is open ([99 Open Questions](99%20Open%20Questions.md) CC-22).
+
+## Changing Pathway
+
+From Stage 5 and deeper, a character can change to an adjacent Pathway, for example when their own Stage 0 is occupied and an adjacent one is free. This costs much more Sanity than advancing along their own Pathway. The detailed rules come later.
 
 ## No skipping
 

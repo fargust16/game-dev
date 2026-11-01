@@ -691,7 +691,7 @@
   },
   {
     "id": "d-ritual-purpose",
-    "statement": "Capture rituals turn cities into Places of Power and keep residents alive as sacrifices. At the capital ritual the people in captured cities die; manifestation succeeds only if every city was captured at that moment and the ritual was not interrupted.",
+    "statement": "Capture rituals turn cities into Places of Power and keep residents alive as sacrifices. Nobody in the world knows this, and the player learns it only at manifestation. At the capital ritual the people in captured cities die; manifestation succeeds only if every city was captured at that moment and the ritual was not interrupted.",
     "rationale": "Explains why the cult spares residents and makes the war's real stakes a secret the player can uncover.",
     "alternatives": "",
     "systemIds": [
@@ -723,8 +723,8 @@
   },
   {
     "id": "d-stage-occupancy",
-    "statement": "While a Pathway's Stage 0 is occupied, that Pathway has no Stage 1; while it is unoccupied, it has at most three Stage 1 practitioners.",
-    "rationale": "A world law that explains why the cult's Generals stop at Stage 2 and stand at the top of its living hierarchy.",
+    "statement": "On every Pathway, including the player's, an occupied Stage 0 leaves no Stage 1, and an unoccupied one allows at most three Stage 1 practitioners. When someone reaches Stage 0, every Stage 1 practitioner of that Pathway moves back to Stage 2. Stage 2 has no limit.",
+    "rationale": "A world law that prices following a god and explains why the cult and the allied factions stop at Stage 2.",
     "alternatives": "",
     "systemIds": [
       "progression",
@@ -741,8 +741,8 @@
   },
   {
     "id": "d-spirit-world",
-    "statement": "The Spirit World is the other side of the real world. The sealed being is held there and the Teleporting General lives there; the General can be defeated only straight after teleporting in. The player cannot enter it for now.",
-    "rationale": "Replaces the earlier 'divine plane' wording and gives the Teleporting General a distinct counterplay.",
+    "statement": "The Divine Plane and the Spirit World are separate. Every Stage 0 being has been on the unreachable Divine Plane since a past cataclysm. The Spirit World is the other side of the real world, reachable by higher followers; the Teleporting General lives there and can be defeated only straight after teleporting in. The player cannot enter it for now.",
+    "rationale": "Corrects an earlier reading that merged the two places and gives the Teleporting General a distinct counterplay.",
     "alternatives": "",
     "systemIds": [
       "cult-campaign",
@@ -752,6 +752,84 @@
     "origin": "imported",
     "sourceIds": [
       "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-capture-order",
+    "statement": "City Capture runs in order: attack, clearing of other factions' followers, a six-hour ritual that can still be stopped, then a garrison stays.",
+    "rationale": "Fixes when the player and allies can still intervene.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-ritual-sabotage",
+    "statement": "A ritual is a concrete mechanism that can be sabotaged without a fight. Those conducting it then lose most of their power and try to leave, and the ritual cannot be repeated straight away.",
+    "rationale": "Gives a capture a real non-combat answer.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-city-ownership",
+    "statement": "A liberated city goes to the allied faction with the most followers there. A city liberated by the player alone is Unclaimed until an allied follower arrives; that faction's followers then appear there as defenders.",
+    "rationale": "Ties allied replacement to held cities and gives liberation a concrete result.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-general-ending",
+    "statement": "Killing all three Cult Generals is the only way to end the campaign before manifestation.",
+    "rationale": "Replaces the undefined command threshold.",
+    "alternatives": "",
+    "systemIds": [
+      "cult-campaign",
+      "world-laws"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21",
+      "src-02"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-01."
+  },
+  {
+    "id": "d-pathway-change",
+    "statement": "From Stage 5 and deeper a character can change to an adjacent Pathway at a much larger Sanity cost than advancing along their own. Detailed rules come later.",
+    "rationale": "Gives a way out when a Pathway's Stage 0 is occupied.",
+    "alternatives": "",
+    "systemIds": [
+      "progression"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-05"
     ],
     "dateNote": "Owner-approved answers, 2026-11-01."
   }

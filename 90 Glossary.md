@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.62
+Version: 0.63
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-01 (Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -1064,19 +1064,23 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Cult Ritual** — A timed operation of the opposing faction through which it captures a city and turns it into a Place of Power. Its current campaign window is six in-game hours (360 World Ticks), with no player-facing numeric countdown; the operation resolves through faction action when the window ends. Its place within City Capture, its effect on the city, its schedule, concurrency limits, and detailed interruption rules remain open.
 
-**Place of Power** — A captured city prepared for the manifestation, with its residents kept alive as future sacrifices. This purpose stays secret from ordinary residents. A Place of Power needs no visible mark.
+**Place of Power** — A captured city prepared for the manifestation, with its residents kept alive as future sacrifices. Nobody in the world knows this purpose, and the player learns it only at manifestation. A Place of Power needs no visible mark.
 
-**Cult Retreat** — The collective flight of cult followers from every point of a city at once. They can be chased and killed, but at some point they get away.
+**Cult Retreat** — The collective flight of cult followers from every point of a city at once, triggered by the death of a senior left in charge or by losses that leave them a dangerous minority. They can be chased and killed while they stay in the fight, and they head for the nearest city under Cult Control or scatter outside the walls.
 
 **Cult Thought Link** — A mental ability of cult followers to exchange thoughts at a distance. Followers in a city know where a fight is, and followers in the nearest city can come as reinforcements.
 
-**Spirit World** — The other side of the real world. The sealed being is held there, and the Teleporting General lives there. The player cannot enter it for now.
+**Divine Plane** — The unreachable realm where every Stage 0 being has been since a past cataclysm. They cannot materialise in the real world without a very great number of sacrifices.
 
-**Stage Occupancy Rule** — While a Pathway's Stage 0 is occupied, that Pathway has no Stage 1; while it is unoccupied, that Pathway has at most three Stage 1 practitioners.
+**Spirit World** — The other side of the real world, reachable by higher followers of Pathways. The Teleporting General lives there. It is not the Divine Plane. The player cannot enter it for now.
 
-**City Control** — The state saying which side holds a city: Allied Control or Cult Control. It changes only when City Capture or City Liberation completes. Reported City Control is the player's public reading of campaign progress. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
+**Stage Occupancy Rule** — On every Pathway, while Stage 0 is occupied there is no Stage 1; while it is unoccupied there are at most three Stage 1 practitioners at a time. When someone reaches Stage 0, every Stage 1 practitioner of that Pathway moves back to Stage 2. Stage 2 has no limit.
 
-**City Capture** — The cult taking a city by removing every follower of other factions, by driving them out or killing them, and holding it. Ordinary residents are not attacked.
+**Unclaimed** — The City Control value of a city liberated with no allied faction present. The first allied faction whose follower arrives claims it.
+
+**City Control** — The state saying who holds a city: Allied Control by one allied Major Faction, Cult Control, or Unclaimed. It changes only when City Capture or City Liberation completes, or when a faction claims an Unclaimed city. Reported City Control is the player's public reading of campaign progress. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
+
+**City Capture** — The cult taking a city in a fixed order: attack, clearing every follower of other factions by driving them out or killing them, a six-hour ritual that can still be stopped, and a garrison left to hold it. Ordinary residents are not attacked.
 
 **City Liberation** — The return of a city from Cult Control by driving out or destroying every cult follower in it.
 
@@ -1096,7 +1100,7 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 
 **Daily Public News** — A digest delivered at the in-game day boundary from events known to its publisher through valid information channels. Its reports may be partial, biased, or late; it does not reveal secret operations automatically.
 
-**Campaign Completion** — The campaign ends either when the cult's ability to direct followers and coordinate rituals is removed before manifestation, or when the manifested being is defeated. Both routes present a Campaign Rating.
+**Campaign Completion** — The campaign ends either when all three Cult Generals are killed before manifestation, or when the manifested being is defeated. Both routes present a Campaign Rating.
 
 **Campaign Rating** — A post-campaign summary of the player's record, including cult disruption, official assignments, and aid to ordinary people. It is not character XP or a threat meter; scoring categories and weights remain open.
 
