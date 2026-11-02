@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.14
+Version: 0.15
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-02 (a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-02 (any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -63,8 +63,8 @@ During ordinary free exploration, the shared game clock advances continuously at
 
 ## Trading and dialogue
 
-- Direct dialogue with an NPC pauses the world simulation, allowing the player to consider dialogue choices without NPC schedules or world events advancing.
-- Exception: each line of a dialogue at the site of a running ritual costs one tick, because the ritual does not wait ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)).
+- Direct dialogue with an NPC pauses the world simulation, allowing the player to consider dialogue choices without NPC schedules or world events advancing. There are no exceptions, so the player never has to hurry through lines.
+- When a dialogue ends, one tick passes. This matches a combat round, which has no time limit and costs one tick when it ends. Working reading: a dialogue during a fight is covered by the round's tick.
 - A shop/trading interface that interacts with a merchant's shop or stock rather than holding a direct conversation with the NPC does not pause the world.
 - Shops and merchants operate according to their schedules and availability. If a shop closes or its merchant leaves while the player is using its interface, the interface may close and the transaction ends.
 - NPCs are not indefinitely reserved for the player. An NPC may spend only a limited period waiting or engaging with the player before leaving or returning to their own goals. The exact default interaction window and inactivity timeout remain open.
@@ -279,7 +279,7 @@ Potential information channels include:
 - **Familiars and observers:** a familiar or assigned watcher observes an area and reports what it detects.
 - **Direct perception:** an NPC hears, sees, or otherwise senses an event within the limits of its senses and circumstances.
 - **Specific abilities:** supernatural or other explicitly defined abilities can detect, monitor, or report particular events or areas.
-- **Cult Thought Link:** cult followers exchange thoughts at a distance. Followers in a city know where a fight is, and followers in the nearest city can learn of it. It reaches cult followers only ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)).
+- **Cult Thought Link:** orders from above and reports from below, in exceptional cases. A reported fight can draw the city's followers, and those of the nearest city. It reaches cult followers only ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)).
 - **Daily public news:** a publisher compiles significant events it learned about and broadcasts the issue at the in-game day boundary.
 
 Information transmission is not automatic universal knowledge. Each channel needs a sender/source, recipient or eligible audience, content, timing, and any relevant limits. NPCs may refer to a published event once it reaches their public-information audience; hidden operations remain limited to factions, witnesses, or other valid recipients. The detailed reporting and dialogue rules belong to [09 Information Sources](09%20Information%20Sources.md) and ability systems.
@@ -289,7 +289,7 @@ Information transmission is not automatic universal knowledge. Each channel need
 - One shared game clock is authoritative for all time-dependent systems.
 - One in-game minute is one world tick; the initial real-time pacing is 10 seconds per tick. A cult ritual lasts 60 ticks: ten real minutes during uninterrupted free exploration; world-time pauses and turn-based deliberation can extend wall-clock duration.
 - Allied and cult force generation run on the shared clock ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)).
-- Direct dialogue pauses the world; shop-stock interfaces do not.
+- Direct dialogue pauses the world and costs one tick when it ends; shop-stock interfaces do not pause it.
 - Sleep advances 6–8 in-game hours and simulates the wider world throughout.
 - Sleep can be interrupted by world events, including alarms and hostile attacks.
 - Sleep restores ordinary HP only when active conditions do not block recovery; it does not automatically cure injuries or curses.
