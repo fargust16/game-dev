@@ -24,10 +24,11 @@ BRACE_REDUCTION = 0.25
 SUPPORT_DEFENCE = 5
 SLEEP_ROUNDS = 3
 CONDUCTING_AP = 3
+STAGE_STEP = 0.35
 
 
 def stage_factor(stage):
-    return 1 + 0.35 * (9 - stage)
+    return 1 + STAGE_STEP * (9 - stage)
 
 
 @dataclass(frozen=True)
@@ -55,6 +56,21 @@ ARMOUR = {"none": (0, 0), "cloth": (3, 6), "leather": (8, 5), "chain": (16, 3), 
 
 def staged(weapon, stage):
     return Weapon(weapon.name, weapon.base, weapon.ap, weapon.ranged, stage, weapon.guard, weapon.guard_chance, weapon.guard_absorb, weapon.stealth_mult)
+
+
+@dataclass
+class Gear:
+    """What a fighter's modifiers add up to."""
+    damage: float = 0.0
+    accuracy: float = 0.0
+    crit: float = 0.0
+    crit_damage: float = 0.0
+    hp: float = 0.0
+    defence: float = 0.0
+    evasion: float = 0.0
+    ap: float = 0.0
+    initiative: float = 0.0
+    will: float = 0.0
 
 
 @dataclass(eq=False)
@@ -85,6 +101,7 @@ class Unit:
     exposed: bool = False
     frac: float = 0.0
     extra: dict = field(default_factory=dict)
+    gear: Gear = field(default_factory=Gear)
 
     def reset(self):
         self.hp = self.max_hp()
@@ -97,38 +114,38 @@ class Unit:
         self.frac = random.random()
 
     def max_hp(self):
-        return (20 + 0.8 * self.end) * LIMIT_S[self.limit]
+        return (20 + 0.8 * self.end) * LIMIT_S[self.limit] * (1 + self.gear.hp)
 
     def max_wp(self):
         return (20 + 0.8 * self.will) * LIMIT_S[self.limit]
 
     def ap(self):
-        whole = 10 + self.dex / 20 + self.frac
+        whole = 10 + self.dex / 20 + self.gear.ap + self.frac
         self.frac = whole - math.floor(whole)
         return math.floor(whole) - (CONDUCTING_AP if self.conducting else 0)
 
     def initiative(self):
-        return (self.dex + self.per) / 2 + random.randint(1, 20)
+        return (self.dex + self.per) / 2 + self.gear.initiative + random.randint(1, 20)
 
     def accuracy(self):
         if self.weapon.ranged:
-            return ((self.dex + self.per) / 2 + self.skill) / 2
-        return ((self.str + self.dex + self.per) / 3 + self.skill) / 2
+            return ((self.dex + self.per) / 2 + self.skill) / 2 + self.gear.accuracy
+        return ((self.str + self.dex + self.per) / 3 + self.skill) / 2 + self.gear.accuracy
 
     def evasion(self):
-        return 0 if self.asleep else (self.dex + self.per) / 2
+        return 0 if self.asleep else (self.dex + self.per) / 2 + self.gear.evasion
 
     def damage_roll(self):
         w = self.weapon
         power = 1 if w.ranged else 1 + self.str / 50
-        return w.base * stage_factor(w.stage) * power * random.uniform(0.85, 1.15)
+        return w.base * stage_factor(w.stage) * power * (1 + self.gear.damage) * random.uniform(0.85, 1.15)
 
     def crit_raw(self):
-        return (0.05 + 0.90 * (self.per - 1) / 99) * (1 + self.luck / 100)
+        return (0.05 + 0.90 * (self.per - 1) / 99 + self.gear.crit) * (1 + self.luck / 100)
 
     def defence(self, side=()):
         support = SUPPORT_DEFENCE if any("support" in u.abilities and u.hp > 0 and u is not self for u in side) else 0
-        return ARMOUR[self.armour][0] * stage_factor(self.armour_stage) + support
+        return ARMOUR[self.armour][0] * stage_factor(self.armour_stage) + support + self.gear.defence
 
     def can_spend(self, share):
         return self.wp > self.max_wp() * share
@@ -144,7 +161,7 @@ def hit_chance(a, t, bonus=0.0):
 
 
 def resist_check(a, t):
-    p = 0.50 + (max(a.intl, a.will) - t.will) / 100
+    p = 0.50 + (max(a.intl, a.will) - t.will - t.gear.will) / 100
     return random.random() < min(0.95, max(0.05, p * (1 + a.luck / 100)))
 
 
@@ -160,7 +177,7 @@ def strike(a, t, foes_of_t=(), side_of_t=(), bonus_crit=0.0, crit_extra=0.0, mul
     raw = a.crit_raw() + bonus_crit
     crit = 1.0
     if random.random() < min(0.95, raw):
-        crit = 1.5 + max(0, raw - 0.95) + crit_extra
+        crit = 1.5 + max(0, raw - 0.95) + crit_extra + a.gear.crit_damage
     damage = a.damage_roll() * crit * mult * (1 - mitigation(t.defence(side_of_t)))
     if t.brace:
         damage *= 1 - BRACE_REDUCTION

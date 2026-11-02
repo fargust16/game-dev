@@ -1,10 +1,10 @@
 # 20 Alchemy and Potioncraft
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft — owner-approved foundation; skill progression, mini-game, recipes, and balance remain open
 
-Last Updated: 2026-11-02 (the Alchemical Flask proposal noted. Earlier: the V1 question follows the slice's Limits. Earlier: terms renamed to Arcana and Limit. Earlier: potion-making included in the Vertical Slice.)
+Last Updated: 2026-11-02 (the Alchemical Flask rejected by the owner. Earlier: the Alchemical Flask proposal noted. Earlier: the V1 question follows the slice's Limits. Earlier: terms renamed to Arcana and Limit. Earlier: potion-making included in the Vertical Slice.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -61,7 +61,7 @@ The six-tick duration and the presence of a mini-game are approved. Whether the 
 4. How are formulas discovered and decoded, ingredients identified, and ingredient locations found?
 5. What is the brewing mini-game, and how do its outcomes affect ingredient loss, potion validity, and any potion quality?
 6. Does the mini-game occur within the six world ticks or extend the elapsed time? Does it pause, advance, or otherwise interact with the shared clock?
-7. Which potion categories beyond Arcana advancement exist, if any, and how do they respect the current prohibition on HP-restoring potions? A thrown Alchemical Flask is proposed in [10.2](10.2%20Combat%20System%20Draft.md) §5b and is not approved (CC-46).
+7. Which potion categories beyond Arcana advancement exist, if any, and how do they respect the current prohibition on HP-restoring potions? The owner rejected a thrown Alchemical Flask on 2026-11-02: no consumable may change a battle's result that much (CC-46).
 8. Which parts of Alchemy does the slice's limited form need, including the first potion and the 9→8 transition? Limit 7 is for NPCs only.
 9. What recipe costs, station requirements, ingredient quantities, and numeric balance values should the later balance pass propose?
 

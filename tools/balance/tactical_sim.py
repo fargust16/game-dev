@@ -6,8 +6,9 @@ fighters on cells. Melee fighters must walk, they are held by whoever stands nex
 to them, and every fighter picks targets by impact: how much harm the target does
 to its side, against how fast this fighter can bring it down.
 
-V0 is the configuration 10.2 reports. The other switches of Rules are the levers
-tried against headcount, kept so that the table of levers can be repeated.
+V0 is the configuration 10.2 reports, before items. The other switches of Rules
+are the levers tried against headcount, kept so that the table of levers can be
+repeated. item_sim.py dresses these fighters through Rules.outfit.
 
 Run: python tools/balance/tactical_sim.py [fights per line]
 """
@@ -34,12 +35,9 @@ CROWD_FACTOR = 0.5
 BREAK_OFF_FACTOR = 1.5
 ADJACENT_SHOT = 0.20
 OBJECTIVE_BONUS = 3.0
-FLASK_AP = 3
-FLASK_RANGE = 6
 STUN_AP = 2
 STUN_SKILL = 5
 SWEEP_AP = 2
-FLASK_VALUE = 4.0
 CONTROL_VALUE = {"sleep": 6.0, "stand": 3.0, "crush": 3.0, "support": 2.0}
 
 
@@ -61,18 +59,13 @@ class Rules:
     enemy_bonus: int = 0
     damage_scale: float = 1.0
     crit_bonus: float = 0.0
-    flasks: int = 0
-    flask_damage: float = 8.0
-    flask_limit: int = 8
-    carriers: int = 0
-    flask_min: int = 2
-    a_flask_min: int = 2
     stun: float = 0.0
     forces: tuple = (5, 5, 6, 6, 7)
     ranged: bool = False
     shift: int = 0
     sweep_skill: int = 0
     sweep_mult: float = 1.0
+    outfit: object = None
 
 
 def cheb(a, b):
@@ -98,17 +91,8 @@ class Fight:
         for u in a + b:
             u.intent = None
             u.skip = u.asleep = 0
-            if not wounded_a or u in b:
-                carrier = u.limit is not None and u.limit <= rules.flask_limit and not u.conducting
-                u.flasks = u.extra.get("flasks", rules.flasks if carrier else 0)
             u.threat = self.threat(u)
-        if rules.carriers:
-            for side in (a, b):
-                ranked = sorted((u for u in side if u.flasks and "flasks" not in u.extra), key=lambda u: u.limit)
-                for u in ranked[rules.carriers:]:
-                    u.flasks = 0
         self.leaders = [self.leader(a), self.leader(b)]
-        self.first_throw = None
 
     def leader(self, side):
         ranks = sorted(side, key=lambda u: 9 if u.limit is None else u.limit)
@@ -135,20 +119,20 @@ class Fight:
 
     def expected_blow(self, a, t):
         w = a.weapon
-        raw = w.base * c.stage_factor(w.stage) * (1 if w.ranged else 1 + a.str / 50) * self.r.damage_scale
+        raw = w.base * c.stage_factor(w.stage) * (1 if w.ranged else 1 + a.str / 50) * (1 + a.gear.damage) * self.r.damage_scale
         return self.chance(a, t, 0.0) * self.reduce(raw, t)
 
     def threat(self, u):
         foes = self.foes(u)
         harm = self.blows(u) * sum(self.expected_blow(u, f) for f in foes) / max(1, len(foes))
-        return harm + sum(CONTROL_VALUE.get(x, 0.0) for x in u.abilities) + FLASK_VALUE * u.flasks
+        return harm + sum(CONTROL_VALUE.get(x, 0.0) for x in u.abilities)
 
     def chance(self, a, t, bonus):
         p = 0.70 + self.r.skill_weight * (a.accuracy() - t.evasion()) / 100 + bonus
         return min(0.95, max(0.05, p * (1 + a.luck / 100)))
 
     def defence(self, t):
-        d = c.ARMOUR[t.armour][0] * c.stage_factor(t.armour_stage)
+        d = c.ARMOUR[t.armour][0] * c.stage_factor(t.armour_stage) + t.gear.defence
         if any("support" in u.abilities and u is not t and cheb(u, t) <= SUPPORT_RANGE for u in alive(self.own(t))):
             d += c.SUPPORT_DEFENCE
         return d
@@ -177,7 +161,7 @@ class Fight:
         if random.random() >= self.chance(a, t, bonus_hit):
             return False
         raw = a.crit_raw() + bonus_crit + self.r.crit_bonus
-        crit = 1.5 + max(0, raw - 0.95) + crit_extra if random.random() < min(0.95, raw) else 1.0
+        crit = 1.5 + max(0, raw - 0.95) + crit_extra + a.gear.crit_damage if random.random() < min(0.95, raw) else 1.0
         damage = self.reduce(a.damage_roll() * crit * mult * self.r.damage_scale, t)
         if t.brace:
             damage *= 1 - c.BRACE_REDUCTION
@@ -237,40 +221,8 @@ class Fight:
         self.cells[(x, y)] = u
         return ap - price
 
-    def splash(self, x, y):
-        return [v for v in alive(self.a + self.b) if max(abs(v.x - x), abs(v.y - y)) <= 1]
-
-    def throw_flask(self, u):
-        foes = alive(self.foes(u))
-        own = alive(self.own(u))
-        best, value = None, self.r.a_flask_min - 1 if u in self.a else self.r.flask_min - 1
-        for f in foes:
-            if cheb(u, f) > FLASK_RANGE:
-                continue
-            for dx in (-1, 0, 1):
-                for dy in (-1, 0, 1):
-                    hit = self.splash(f.x + dx, f.y + dy)
-                    score = sum(v in foes for v in hit) - 2 * sum(v in own for v in hit)
-                    if score > value:
-                        best, value = (f.x + dx, f.y + dy), score
-        if best is None:
-            return False
-        u.flasks -= 1
-        self.first_throw = self.first_throw or self.own(u)
-        for v in self.splash(*best):
-            dodged = random.random() >= self.chance(u, v, 0.0)
-            defence = c.ARMOUR[v.armour][1] * c.stage_factor(v.armour_stage)
-            v.hp -= self.r.flask_damage * random.uniform(0.85, 1.15) * (0.5 if dodged else 1.0) * (1 - c.mitigation(defence))
-            v.asleep = 0
-            if v.hp <= 0:
-                self.cells.pop((v.x, v.y), None)
-        return True
-
     def control(self, u, ap):
         foes = alive(self.foes(u))
-        if u.flasks and ap >= FLASK_AP and self.throw_flask(u):
-            ap -= FLASK_AP
-            foes = alive(self.foes(u))
         awake = [f for f in foes if not f.asleep and not f.skip]
         if "sleep" in u.abilities and len(awake) >= 2 and ap >= 5 and u.can_spend(c.POWERFUL):
             near = [f for f in awake if cheb(u, f) <= SPELL_RANGE]
@@ -443,7 +395,11 @@ def main_force(rules, size=None):
         units[n] = c.follower9()
     if rules.ranged:
         units[0].weapon = c.CROSSBOW
-    return stronger(units, rules.enemy_bonus)
+    return outfitted(rules, stronger(units, rules.enemy_bonus))
+
+
+def outfitted(rules, units):
+    return [rules.outfit(u) for u in units] if rules.outfit else units
 
 
 def allies():
@@ -465,7 +421,7 @@ def chain(rules, side, size=None, runs=None):
             continue
         start = max(rounds + 5, random.randint(15, 20))
         survivors = alive(a)
-        senior, one, two = stronger([c.follower8(), c.follower9(), c.follower9()], rules.enemy_bonus)
+        senior, one, two = outfitted(rules, stronger([c.follower8(), c.follower9(), c.follower9()], rules.enemy_bonus))
         for u in (senior, one, two):
             u.conducting = True
         winner = Fight(survivors, [senior, one, two], rules, objective=senior, wounded_a=True).run(60 - start)[1]
@@ -481,41 +437,30 @@ def duel(rules, a_fn, b_fn, runs=None):
     return wins / (runs or RUNS) * 100
 
 
-V0 = Rules(width=4, flasks=1, carriers=2, flask_damage=20.0, enemy_bonus=1, ranged=True)
-NO_FLASK = replace(V0, flasks=0)
+V0 = Rules(width=4, enemy_bonus=1, ranged=True)
 PLAIN = Rules()
 LEVERS = {
     "no space (combat_sim.py): base 38, +club +31, +L9 +32, +L8 +50": None,
-    "cells, target choice, no flask": NO_FLASK,
-    "wide street, 8 cells": replace(NO_FLASK, width=8),
-    "lane, 3 cells": replace(NO_FLASK, width=3),
-    "nearest target, both sides": replace(NO_FLASK, targeting="nearest"),
-    "random target, both sides": replace(NO_FLASK, targeting="random"),
-    "free to leave a fight": replace(NO_FLASK, escape_ap=0),
-    "flat armour": replace(NO_FLASK, armour="flat"),
-    "skill difference ×3": replace(NO_FLASK, skill_weight=3.0),
-    "damage ×1.5": replace(NO_FLASK, damage_scale=1.5),
-    "damage ×2": replace(NO_FLASK, damage_scale=2.0),
-    "critical chance +30": replace(NO_FLASK, crit_bonus=0.30),
-    "morale and leader": replace(NO_FLASK, morale=0.5, leader_weight=0.7),
-    "stun on 30 %": replace(NO_FLASK, stun=0.3),
-    "sweep at skill 10": replace(NO_FLASK, sweep_skill=10),
-    "cleave, two-handed": replace(NO_FLASK, cleave=True),
-    "one carrier a side, flask 20": replace(V0, carriers=1),
-    "two carriers, flask 15": replace(V0, flask_damage=15.0),
-    "two carriers, flask 20 (V0)": V0,
-    "two carriers, flask 20, cult +2": replace(V0, enemy_bonus=2),
-    "all of Limit 8 and deeper, flask 20": replace(V0, carriers=0),
+    "cells and target choice (V0)": V0,
+    "wide street, 8 cells": replace(V0, width=8),
+    "lane, 3 cells": replace(V0, width=3),
+    "nearest target, both sides": replace(V0, targeting="nearest"),
+    "random target, both sides": replace(V0, targeting="random"),
+    "free to leave a fight": replace(V0, escape_ap=0),
+    "flat armour": replace(V0, armour="flat"),
+    "skill difference ×3": replace(V0, skill_weight=3.0),
+    "damage ×1.5": replace(V0, damage_scale=1.5),
+    "damage ×2": replace(V0, damage_scale=2.0),
+    "critical chance +30": replace(V0, crit_bonus=0.30),
+    "morale and leader": replace(V0, morale=0.5, leader_weight=0.7),
+    "stun on 30 %": replace(V0, stun=0.3),
+    "sweep at skill 10": replace(V0, sweep_skill=10),
+    "cleave, two-handed": replace(V0, cleave=True),
 }
 
 
 def side():
     return archers()
-
-
-def carrying(u, flasks):
-    u.extra["flasks"] = flasks
-    return u
 
 
 def without_abilities(u):
@@ -555,16 +500,12 @@ def plains(n):
 SIDES = {
     "allies alone": side,
     "+ Limit 8, whole": lambda: side() + [c.ally8()],
-    "+ Limit 8 with a third flask": lambda: side() + [carrying(c.ally8(), 1)],
     "+ Limit 8, no Дрёма": lambda: side() + [without_abilities(c.ally8())],
     "+ Limit 9": lambda: side() + [c.ally9()],
     "+ Limit 9 with a bow": lambda: side() + [bowman(c.ally9())],
     "+ club": lambda: side() + [c.new_character()],
-    "+ club and a flask": lambda: side() + [carrying(c.new_character(), 1)],
     "+ hero of Limit 9": lambda: side() + [c.hero9()],
-    "+ hero of Limit 9, 2 flasks": lambda: side() + [carrying(c.hero9(), 2)],
     "+ hero of Limit 8": lambda: side() + [c.hero()],
-    "+ hero of Limit 8, 2 flasks": lambda: side() + [carrying(c.hero(), 2)],
     "allies in chain": lambda: equipped(armour="chain"),
     "allies in leather": lambda: equipped(armour="leather"),
     "Limit 8 with two-handed": lambda: equipped(c.TWO_HAND, only="A8"),
@@ -624,27 +565,13 @@ def shifted(shift):
 
 def careless(name):
     seeded(name)
-    return f"{name:<30} {chain(replace(V0, a_targeting=name.split()[-1], a_flask_min=1), side):5.1f}"
+    return f"{name:<30} {chain(replace(V0, a_targeting=name.split()[-1]), side):5.1f}"
 
 
 def duelled(name):
     seeded(name)
     a, b, rules = DUELS[name]
     return f"{name:<30} {duel(rules, a, b):5.1f}"
-
-
-def first_throw(_):
-    seeded("first")
-    wins = rounds = thrown = won = 0
-    for _ in range(RUNS):
-        a = side()
-        f = Fight(a, main_force(V0), V0)
-        r, w = f.run(55)
-        rounds += r
-        wins += w is a
-        thrown += f.first_throw is not None
-        won += f.first_throw is not None and w is f.first_throw
-    return f"main battle {wins / RUNS * 100:.1f} %, {rounds / RUNS:.1f} rounds; the side that throws first wins {won / max(1, thrown) * 100:.1f} %"
 
 
 def main():
@@ -657,8 +584,6 @@ def main():
         print("\n".join(pool.map(shifted, (-1, 1))))
         print("\nV0: allies who play badly, enemies who play well")
         print("\n".join(pool.map(careless, ("careless nearest", "careless random"))))
-        print("\nFirst throw")
-        print("\n".join(pool.map(first_throw, (0,))))
         print("\nSmall fights, first side wins")
         print("\n".join(pool.map(duelled, DUELS)))
 

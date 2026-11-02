@@ -1417,7 +1417,7 @@
   },
   {
     "id": "q-cc-41",
-    "text": "CC-41. Do Combat Numbers V0 hold with cover, facing, and magical attacks, how much range does each weapon have, which weapon skills exist, do conditions balance, is a shooter worth too much, what else answers the side that throws first, and should the campaign's kill table take in the cult's edge and the flask?",
+    "text": "CC-41. Do Combat Numbers V0 hold with cover, facing, and magical attacks, how much range does each weapon have, which weapon skills exist, do conditions balance, is a shooter worth too much, should an NPC that cannot reach an enemy this turn hold back, and should the campaign's kill table take in the cult's edge and Outfit V0?",
     "systemIds": [
       "confront"
     ],
@@ -1482,10 +1482,24 @@
   },
   {
     "id": "q-cc-46",
-    "text": "CC-46. Is a thrown Alchemical Flask a category Alchemy should have, who may throw one, how many does a group carry, what limits how many a player brings, what does one cost to brew, and how large a share of a fight's damage may it take?",
+    "text": "CC-46. Is a thrown Alchemical Flask a category Alchemy should have? Rejected by the owner on 2026-11-02.",
     "systemIds": [
       "confront",
       "alchemy"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "resolved",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-47",
+    "text": "CC-47. Is allied Limit 8 gear the right place for the allies' edge, is a quality step from 40 % to 1 % or 88 % wanted and what stops that gap arising, who makes soldiers' sets and can a player reach them in the slice, how much is a minor modifier worth, and is one fighter in a Legendary set beating five with no items the ceiling wanted?",
+    "systemIds": [
+      "confront",
+      "itemisation"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority — Cult Campaign and City Control",
