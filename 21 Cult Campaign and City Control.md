@@ -1,10 +1,10 @@
 # 21 Cult Campaign and City Control
 
-Version: 0.23
+Version: 0.24
 
 Status: Draft — owner-approved direction, incomplete specification
 
-Last Updated: 2026-11-02 (Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: the source of traces recorded; the slice's scheme lives in 11. Earlier: a conductor who fights loses 3 AP, owner-approved. Earlier: working reading: a conductor who fights loses 3 AP. Earlier: the Cult Thought Link carries orders and reports only; Посланник restored. Earlier: Ritual Weak Points added. Earlier: ritual dialogue checks are Final Checks. Earlier: dialogue checks follow 10.4. Earlier: stealth in a captured city follows 10.3. Earlier: the Force Estimate governs every side; a senior's death has no effect of its own. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate; ritual group numbers set. Earlier: allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
+Last Updated: 2026-11-02 (the owner's odds with no player and allied conduct recorded; Campaign Numbers V0 rebuilt on a whole war to manifestation or the death of the Generals. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: the source of traces recorded; the slice's scheme lives in 11. Earlier: a conductor who fights loses 3 AP, owner-approved. Earlier: working reading: a conductor who fights loses 3 AP. Earlier: the Cult Thought Link carries orders and reports only; Посланник restored. Earlier: Ritual Weak Points added. Earlier: ritual dialogue checks are Final Checks. Earlier: dialogue checks follow 10.4. Earlier: stealth in a captured city follows 10.3. Earlier: the Force Estimate governs every side; a senior's death has no effect of its own. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate; ritual group numbers set. Earlier: allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07 Character Life](07%20Character%20Life.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -24,7 +24,7 @@ Three kinds of statement appear below:
 
 - **Owner-approved** statements are decisions recorded from the owner's concept and answers of 2026-11-01.
 - **Working readings** are how this document interprets the owner's words where they leave a gap. They hold until the owner confirms or replaces them.
-- **Open** items are listed in [99 Open Questions](99%20Open%20Questions.md) § Cult Campaign and City Control under the IDs CC-1 … CC-36. No implementation may invent answers to them.
+- **Open** items are listed in [99 Open Questions](99%20Open%20Questions.md) § Cult Campaign and City Control under the IDs CC-1 … CC-44. No implementation may invent answers to them.
 
 # 1. Campaign shape
 
@@ -77,7 +77,8 @@ These follow from existing values. They are planning figures, not measurements.
 | Land at today's land share | about 6.4 km² | Today's 2.83 km² scaled by world area |
 | Distance between neighbouring cities | about 1 km, about 23 ticks | 7 cities evenly spread over that land; roads and relief lengthen it |
 | Unopposed capture rate | one city per 2.5–3.3 game days | 6 non-capital cities over 15–20 days |
-| Six non-capital cities fallen | about day 19 | Simulated with no player, day 14–25 in most worlds: Campaign Numbers V0, §8 |
+| Six non-capital cities fallen | about day 15 | Simulated with no player, in 64 % of wars, day 11–19 in most of them: Campaign Numbers V0, §8 |
+| The war decided | about day 19 | Simulated with no player, day 10–24 in most wars: Campaign Numbers V0, §8 |
 
 ## Effect on geography
 
@@ -144,7 +145,7 @@ While Turn-Based Mode runs, the rest of the world stands still and lives one tic
 
 Allied defenders know that a ritual is running and roughly where. Their directive is to beat the main force first and deal with the ritual afterwards, because a ritual has no victims. Once the main force is beaten, they go to the ritual. If they manage this inside the 60 ticks, they can stop it before it completes. A ritual group that still believes it can win stays and finishes, so a lone surviving ally does not end a ritual.
 
-Only the player can choose to go for the ritual first.
+Only the player can choose to go for the ritual first. The simulation's capital battle stretches this rule, and the owner has not confirmed that (§8, CC-17).
 
 The player can find the site by exploring the city. Once the invasion has begun, an allied NPC asked in dialogue can also mark its approximate place on the map.
 
@@ -356,7 +357,7 @@ The three Generals are therefore the top of the cult's living hierarchy. Above t
 
 - A killed General is not replaced, because killing all three must remain able to end the campaign. Whether the cult's reinforcement slows as Generals fall is open (CC-9).
 - A General is a persistent named actor, not a generated follower.
-- During a sortie the Spirit General stands at the ritual, while the Holding and Raiding Generals go with the main force. If every General stood at the ritual, a city would fall in 41 % of sorties, not 62 %, and the Gate would open on day 24 on average, not day 19 (CC-43).
+- During a sortie the Spirit General stands at the ritual, while the Holding and Raiding Generals go with the main force (CC-43).
 - The Holding General does not Break Away or offer a Yield. This is an exception for one actor, not a change to [08 Confront Constraints](08%20Confront%20Constraints.md).
 - The three behaviours are fixed archetypes across worlds. The World Seed varies who the Generals are, their bases, and their target order, so that a past world teaches how to read a General without solving the next one. Whether they vary by Arcana depends on CC-22.
 
@@ -370,7 +371,7 @@ A character far below Limit 2 cannot win a stat race. A General falls in one of 
 
 Artifacts may help. They are tightly controlled, go only to trusted members with high standing, and some are dangerous to Sanity. They are unique items for later design.
 
-Allied forces can kill a General without the player. On the middle setting this is rare, for example when a General attacks a city that holds an allied Limit 2 practitioner. At the lowest setting the game should win by itself: the allied side can kill all three Generals, so that a player who only wants to enjoy the world can do so.
+Allied forces can kill a General without the player, and on the middle setting they kill all three in about two wars of five (§8). The owner's odds of 2026-11-02 replace the earlier reading that this is rare at the middle setting. At the lowest setting the game should win by itself: the allied side can kill all three Generals, so that a player who only wants to enjoy the world can do so.
 
 ## Seers and the Spirit General
 
@@ -378,7 +379,7 @@ Allied factions have otherworldly seers, and the player character may be one thr
 
 ## The final attack
 
-Before the capital, all three Generals attack together. They may fight in different parts of the city, or in one place. This battle needs its own design (CC-17).
+Before the capital, all three Generals attack together. They may fight in different parts of the city, or in one place. This battle needs its own design (CC-17). The simulation's working model is in §8.
 
 # 8. Asymmetric force generation
 
@@ -395,6 +396,30 @@ Campaign pace depends on difficulty: harder settings make the cult advance faste
 ## Allied cooperation (owner-approved)
 
 Each allied faction acts in its own way. Factions usually act alone, gathering their own forces and liberating cities with them. When that is no longer possible and their forces are weak, they unite and attack together. Sometimes two factions move on a city at once.
+
+## Allied conduct (owner-approved)
+
+The world lives without the player, and both sides pursue their goals with the same seriousness. The cult captures cities, holds rituals, and ends with the final ritual in the capital. The allied side sees this and works against it.
+
+- Allied factions act on goals, as enemy NPCs do. They decide which city to free and with what forces, gather, and go. When a city is under attack they send extra forces to hold it. They make real attempts to retake captured cities while their forces allow, and at the end they try to hold the capital.
+- They cannot throw in everything, because they must defend the capital. Only a pool of their forces is free for this.
+- They post assignments for other factions, Factionless characters, and otherworldly people: freeing a city, for a stated reward. This is a **Liberation Contract**.
+- They want the Cult Generals dead as much as anyone, and they have Limit 2 generals of their own, the **Allied Generals**.
+- Their goddess on the Divine Plane can intervene now and then, with abilities up to Limit 0: a **Divine Blessing** or strengthening of one or several of her direct followers, perhaps a global strengthening. It is never constant attention.
+
+These events are how the war reaches the player. They give the character defences and liberations to join, so that the player takes part in the war and does not only explore.
+
+## Odds with no player (owner-approved)
+
+Simulations always run with no player, and the world they show lives on its own. Only the player's actions can turn these odds: gear, progression, the quality of those actions, how much the character helps in defences and liberations, and how far the character grows before the final round, possibly to Limit 2, on a par with a General.
+
+| Setting | Allied side wins | Cult wins |
+|---|---:|---:|
+| Low | Most wars | Few wars |
+| Middle | 40 % | 60 % |
+| Higher | 20 % | 80 %, and worse further up |
+
+At the middle setting the allied 40 % includes killing all three Generals. The slice aims at about the same 40/60 with no player, with no easier or harder variant for now ([11 Vertical Slice](11%20Vertical%20Slice.md)).
 
 ## Cult Sorties (owner-approved)
 
@@ -421,7 +446,23 @@ After a capture, each General gathers its next force in its own way (§7), and t
 
 ## Campaign Numbers V0 (authoring defaults)
 
-The owner left balance calculations to the agent on 2026-11-02. These values are checked by `tools/balance/campaign_sim.py`: a war with no player, 300 worlds for each setting, up to the day the Capital Gate opens. The final attack is left out, because its design is open (CC-17), and the Gate counts only cities under Cult Control. Every value here can change in playtest.
+The owner left balance calculations to the agent on 2026-11-02. These values are checked by `tools/balance/campaign_sim.py`: a whole war with no player, which ends in manifestation or with all three Generals dead. Manifestation counts as the cult's win here, because the fight against the being is not simulated. The Gate counts only cities under Cult Control. Every value here can change in playtest.
+
+### Results with no player
+
+Each row is 3000 wars. A figure from 500 wars moves by about two points.
+
+| Setting | Cult Pace | Cult followers | Cult General attributes | Allies win | Cult wins | Undecided on day 60 | War ends, median day |
+|---|---:|---|---:|---:|---:|---:|---:|
+| Lowest | ×0.5 | One Limit shallower | 55 | 98 % | 0 % | 2 % | 22.5 |
+| Low | ×0.75 | Half a Limit shallower | 70 | 70 % | 29 % | 1 % | 21 |
+| Middle | ×1 | As listed below | 75 | 42 % | 57 % | 1 % | 19 |
+| High | ×1.25 | Half a Limit deeper | 75 | 19 % | 78 % | 3 % | 16 |
+| Highest | ×1.5 | One and a quarter Limits deeper | 75 | 8 % | 90 % | 2 % | 12 |
+
+Half a Limit deeper means that half of the followers stand one Limit deeper, down to Limit 5.
+
+Working reading: these five settings move Cult Pace, Combat Difficulty, and at the low end the Generals' attributes together, so they are a ladder of presets, not the effect of one slider (CC-43).
 
 ### Cult Forces
 
@@ -431,8 +472,10 @@ The owner left balance calculations to the agent on 2026-11-02. These values are
 | Raiding | 4.0 | 50 % Limit 9, 35 % Limit 8, 15 % Limit 7 |
 | Holding | 2.8 | 35 % Limit 9, 40 % Limit 8, 20 % Limit 7, 5 % Limit 6 |
 
+- These are the rates with no city held. Each held city adds the base rate once more, so one city doubles it and three multiply it by four. Early runs without it lasted 28–40 days (working reading, CC-43).
 - A General launches a sortie at 18–22 followers, set by the seed. Six go to the ritual.
-- A force waiting for a target stops growing at 30.
+- A force waiting for a target stops growing at 30, and a city holds at most 30.
+- While a held city has fewer than 10 followers, half of a General's new followers go to it.
 - After a failed sortie a General waits one day.
 - The Holding General leaves 5 behind, and the Raiding General walks away with 3.
 
@@ -441,10 +484,33 @@ The owner left balance calculations to the agent on 2026-11-02. These values are
 - An ordinary city starts with 10 followers and the capital with 24, in the mix 55 % Limit 9, 30 % Limit 8, 12 % Limit 7, 3 % Limit 6.
 - Two Limit 5 and one Limit 4 stand in random cities, and one Limit 3 stands in the capital. The world starts with about 88 allied followers.
 - Each held city gains 0.35 followers a day, and the capital 0.7. Of these, 70 % are Limit 9 and the rest Limit 8.
-- When a city is attacked, every other non-capital city sends 6 % of its followers, about three in all. A seer's warning doubles that, on 30 % of the Spirit General's sorties.
-- Each day one faction's share of the spare followers, a third, may attack a city. A city keeps 8 at home and the capital 16. Below 40 % of the starting force the factions unite.
+- There are three Allied Generals, Limit 2 with attributes of 75 (working reading, CC-44).
+- About 20 outsiders can take a Liberation Contract, in the mix 60 % Limit 9, 30 % Limit 8, 10 % Limit 7. The pool regains 0.25 a day.
 
-An ordinary city holds about half of the "full city" of 20 named above. With 14 in an ordinary city the Gate opens on day 25 on average, and with 20 on day 31 in only a third of worlds, so the war outlasts its 15–20 days.
+An ordinary city holds about half of the "full city" of 20 named above.
+
+### Allied conduct in numbers
+
+The simulation runs one allied command for all three factions, a simplification of "Allied cooperation" above (CC-16).
+
+- **The free pool.** An ordinary city keeps 8 followers at home. The capital keeps 40 % of all allied followers, and at least 12. Everything above that is free.
+- **Defence.** When a city is attacked, the command draws free followers until its Force Estimate against the main force reaches about 0.9 to 1.1. If it cannot reach 0.9 it sends nobody, and the city fights alone.
+- **Liberation.** Once a day the command considers every captured city, a city with a General in it first, then the weakest garrison. It goes at an estimate of 1.75, or at 1.25 when at most one ordinary city is still free or the final attack is coming.
+- **Liberation Contract.** When the free pool falls short, the command hires 4 outsiders for that attempt. If it still falls short the contract is cancelled. Survivors return to the pool of outsiders.
+- **Allied Generals.** Two stay at home, so at most one is away, and it answers a call 30 % of the time. It joins a defence only against a General in the main force, and it goes first to a hunt or to a city a General holds. It rests half a day after a task. A General seeks out the rival General in a fight.
+- **Last General.** When one Cult General is left, every Allied General may leave, and seers and hunts work four times as often.
+- **Seers.** A warning comes on 15 % of the Spirit General's sorties, and an Allied General may then wait at the place. The Raiding General is found on 8 % of days and is hunted at an estimate of 1.2.
+- **Divine Blessing.** It multiplies a side's blows by 1.3 for one fight that has an Allied General, at most once in 2 days. A global strengthening is not simulated.
+
+### The final attack
+
+This is a working model, because the design of the final battle is open (CC-17).
+
+- One day after the Gate opens, the cult attacks the capital with every General still alive, every free force, and 60 % of each garrison. Twelve of them conduct the ritual.
+- The capital fights with everyone in it, every Allied General, and every outsider. A quarter of the defenders and one Allied General hold the capital's centre, where the ritual stands, and meet it at once. The rest meet the attackers and go to the ritual if they win in time.
+- If the ritual is stopped, the cult tries again two days later, as long as the Gate stays open.
+
+The second point stretches the rule of §4 that only the player can choose to go for the ritual first. Here the ritual stands at the fixed centre of a city the defenders already hold, so the model does not treat this as a choice. The owner has not confirmed that reading.
 
 ### Force Estimate and fights nobody sees
 
@@ -458,54 +524,50 @@ Force Estimate of A against B = (kills per tick of A × size of A) / (kills per 
 
 A table replaces a single strength value because hits are capped at 5 %, so a scalar cannot express a Limit 9 against a Limit 2. Above 1, side A should win. Each side rolls one luck factor for the fight, log-normal with a spread of 0.2. Wounds carry over between ticks.
 
-- Defenders stay out of a fight at an estimate below 0.35.
-- Allied factions attack a city only at 3.0 or more.
+- Defenders stay out of a fight at an estimate below 0.35, and allied forces break off below 0.25.
 - Cult Retreat comes when the cult's own estimate falls below 0.15. Those who retreat suffer 8 more ticks of attacks, and the Holding General never retreats.
 
-The ledger reproduces the two extremes of the tactical simulation: 5 Limit 5 against a General 87 % (tactical 87 %), and a Limit 8 against a Limit 9 98 % (93 %). It is harsher on defenders in small even fights: 5 allies against 5, 6, and 7 give 19, 4, and 1 %, against 47, 15, and 1 % in the tactical simulation, which has allied abilities the ledger does not.
+The ledger reproduces the two extremes of the tactical simulation: 5 Limit 5 against a General 87 % (tactical 87 %), and a Limit 8 against a Limit 9 98 % (93 %). It is harsher on defenders in small even fights. The slice's 5 allies against 5, 6, and 7 give 29, 8, and 1 %, against 78, 46, and 12 % in the tactical simulation, which has allied abilities the ledger does not. The campaign's odds were set on the ledger, so they carry this bias (CC-15).
 
 ### Results at the middle setting
 
+These are 500 wars from the default run.
+
 | Target | Result |
 |---|---|
-| First sorties on days 3–5, 5–7, 7–8 | Days 2.9–3.9, 4.5–6.0, 6.4–8.5 |
-| One sortie every 1–2 days | 10.3 sorties by day 18 |
-| 60 % of sorties succeed | 62 % |
-| Allies hold the first attempts | The first sortie takes its city in 5 % of worlds |
-| Six cities fallen about day 18 | Mean day 19, 10th to 90th percentile days 14–25, in 92 % of worlds within 40 days |
-| A General rarely dies to allies | 0.42 per world, all three in 3 % of worlds |
-| Losses outpace replacement | 88 allies at the start, 43 on day 15 |
-| Fifty followers is too many | The largest garrison was 34 |
+| First sorties on days 3–5, 5–7, 7–8 | Mean days 3.4, 5.5, 7.0 |
+| One sortie every 1–2 days | 12.6 sorties by day 18 |
+| Allies hold the first attempts | The first sortie takes its city in 14 % of worlds |
+| The war lasts 15–20 days | Median day 19, 10th to 90th percentile days 10–24. Allied wins come on days 9–20, and cult wins on days 17–26 |
+| Real attempts to retake cities | 5.2 liberations per war, and 4.8 of them succeed |
+| Allies hunt the Generals | 1.7 Cult Generals die per war, and 1.3 Allied Generals |
+| Help from outside | 2.4 Liberation Contracts and 3.5 Divine Blessings per war |
+| The final battle is a real fight | The Gate opens in 64 % of wars, on day 14.6 on average. There are 1.8 final attacks per war, and 1.2 are stopped |
+| Losses outpace replacement | 88 allies on day 0, 87 on day 5, 44 on day 10, 24 on day 15 |
+| Fifty followers is too many | The largest garrison is the cap of 30 |
 
-The ritual completes in 67 % of sorties, and allies liberate 1.8 cities per world.
+A city falls in 67 % of sorties, and the ritual completes in 77 %. At the Highest setting a city falls in 77 % of sorties, below the "almost certain" asked for above, because the allied response now counts (CC-43).
 
-### Cult Pace
+### One slider at a time
 
-Cult Pace multiplies the rates above, in five steps. Combat stays at the middle setting in this table.
+Each row changes one value from the middle setting. These are 500 wars each.
 
-| Cult Pace | Gate opens within 40 days | Mean day | 10th to 90th percentile |
-|---:|---:|---:|---:|
-| ×0.5 | 17 % of worlds | 35 | 31–40 |
-| ×0.75 | 82 % | 26.5 | 20–35 |
-| ×1 | 92 % | 19 | 14–25 |
-| ×1.25 | 96 % | 15 | 11–20 |
-| ×1.5 | 98 % | 13 | 9–17 |
+| Changed | Allies win | Cult wins | A city falls | War ends, median day |
+|---|---:|---:|---:|---:|
+| Cult Pace ×0.5 | 66 % | 28 % | 56 % | 30 |
+| Cult Pace ×0.75 | 49 % | 50 % | 63 % | 23 |
+| Cult Pace ×1.25 | 37 % | 62 % | 66 % | 17 |
+| Cult Pace ×1.5 | 35 % | 61 % | 70 % | 15 |
+| Followers one Limit shallower | 56 % | 43 % | 60 % | 20 |
+| Followers half a Limit shallower | 45 % | 55 % | 65 % | 20 |
+| Followers half a Limit deeper | 22 % | 76 % | 71 % | 18 |
+| Followers one and a quarter Limits deeper | 10 % | 87 % | 78 % | 15 |
 
-Cult Pace changes when cities fall, not whether they fall: a city falls in about 60 % of sorties at every step. Only Combat Difficulty moves that share. At ×0.5 neither side finishes in most worlds, so a slow pace alone does not win the game for the allies.
+Cult Pace mostly moves the length of the war, and Combat Difficulty mostly moves who wins it.
 
-### Combat Difficulty
+### The lowest setting
 
-Working reading: one step of Combat Difficulty moves the Limit mix of the Cult Forces one Limit deeper, up to Limit 5, and the lowest step moves it one Limit shallower.
-
-| Setting | A city falls | First sortie takes it | Gate, mean day |
-|---|---:|---:|---:|
-| Pace ×1, one step harder | 69 % | 21 % | 15 |
-| Pace ×1.25, one step harder | 69 % | 23 % | 12 |
-| Pace ×1.5, two steps harder | 86 % | 82 % | 7.6 |
-
-Two steps harder gives what §8 asks of harder settings, a city almost certain to fall. It also ends the war in about 8 game days, or about 21 real hours.
-
-The lowest setting needs more than a slow cult, because allied followers of Limit 6 or shallower hardly hurt a General. Working reading for it: Cult Pace ×0.5, followers one Limit shallower, the Generals' attributes at 45 instead of 75, and allied factions of Limit 5 and deeper all going to every attacked city. All three Generals then die in 100 % of worlds, on day 14.7 on average, and no city falls.
+The lowest setting needs more than a slow cult, because allied followers of Limit 6 or shallower hardly hurt a General. Working reading for it: the Generals' attributes fall to 55 (CC-43). All three Generals then die in 98 % of wars, on day 24.5 on average, and a city falls in 35 % of sorties.
 
 ## Working readings
 
@@ -513,7 +575,7 @@ The lowest setting needs more than a slow cult, because allied followers of Limi
 
 ## Open
 
-Exact rates, Limit mix, and cap are CC-12. Allied starting strength and replacement are CC-13.
+Exact rates, Limit mix, and cap are CC-12. Allied starting strength and replacement are CC-13. Allied Generals, Liberation Contracts, and the Divine Blessing are CC-44.
 
 # 9. The player in the campaign
 
@@ -525,7 +587,7 @@ The player may:
 - disrupt a ritual through the Approaches available at the site;
 - work elsewhere and let the war continue.
 
-None of these is mandatory, and the world does not wait. A player who does nothing reaches the outcome the World Engine produces for that difficulty, as [02 World Laws](02%20World%20Laws.md) describes for the capital confrontation.
+None of these is mandatory, and the world does not wait. The pressure to take part comes from the odds of §8: with no player the cult wins most wars from the middle setting up. A player who does nothing reaches the outcome the World Engine produces for that difficulty, as [02 World Laws](02%20World%20Laws.md) describes for the capital confrontation.
 
 As allied forces wear down, the player's share of the defence grows. This is a pressure that emerges from the war, not a chosen-one role: [01 Player Experience](01%20Player%20Experience.md) still applies.
 
@@ -571,6 +633,8 @@ Known risks:
 - **Emptied cities after manifestation.** If captured cities lose their residents, the world after manifestation has few people, services, or quests left (CC-20).
 - **Time to reach a General.** Direct defeat takes Limit 2, or Limit 3 with good statistics and strategy, inside a 15–20 day campaign. A Limit 7 character has a 1.32 Limit multiplier against a General's 2.66 ([07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md)). If the player cannot get deep enough in time, allied numbers and disrupted rituals carry that whole path (CC-10).
 - **Terrain evidence.** The target world and city count sit outside the conditions of the terrain research so far (CC-2).
+- **A war won without the player.** At the middle setting a player who does nothing still wins about two wars of five. That is the owner's chosen odds, and it means a passive run can end in a rating. The rating must show the difference (CC-43).
+- **The player as saviour.** "Only the player can turn the odds" must stay a matter of one more strong actor in a real war, not a chosen-one role. Allied Generals who kill Generals on their own are what keeps this true.
 
 # 13. Scope
 
@@ -584,13 +648,14 @@ The following V2 and V3 split is proposed, not approved.
 
 - Persuading a cult follower in dialogue that a ritual was pointless, so that the follower undoes it. This is an option for later and is not designed.
 - The full war: 5–7 cities, three Generals, City Control, and the Capital Gate.
+- Allied conduct: defence, liberation, the capital's reserve, Allied Generals, Liberation Contracts, and the Divine Blessing.
 - Coarse per-city force ledger; off-screen clashes resolved as bounded operations.
 - Public news and map control layer.
 
 ## V3
 
 - Richer city consequences: services, displacement, and return.
-- Allied counter-offensives and cross-city logistics.
+- Cross-city logistics.
 - Deeper interaction with Minor Factions and the royal institution.
 
 # Documentation Review

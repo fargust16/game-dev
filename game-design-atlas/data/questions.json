@@ -1046,7 +1046,7 @@
   },
   {
     "id": "q-cc-13",
-    "text": "CC-13. Working answer: Campaign Numbers V0 in 21 §8 give starting forces and replacement. Can a whole Major Faction die, and what happens to Faction Entry if it does?",
+    "text": "CC-13. Working answer: Campaign Numbers V0 in 21 §8 give starting forces and replacement, three Allied Generals, and a pool of outsiders. Can a whole Major Faction die, and what happens to Faction Entry if it does?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1085,7 +1085,7 @@
   },
   {
     "id": "q-cc-16",
-    "text": "CC-16. Factions usually act alone and unite when weak. How does each of the three differ, and how does each choose its next city?",
+    "text": "CC-16. Factions usually act alone and unite when weak, and they act on goals with a free pool of forces. Working answer for the simulation: one allied command for all three. How does each of the three differ, and how does each choose its next city?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1098,7 +1098,7 @@
   },
   {
     "id": "q-cc-17",
-    "text": "CC-17. A liberated city whose ritual has neither been undone nor lapsed still counts. How does the final battle with three Generals run, can the smaller rituals be disrupted, how long is the capital ritual, and what follows a broken one?",
+    "text": "CC-17. A liberated city whose ritual has neither been undone nor lapsed still counts. How does the final battle with three Generals run, can the smaller rituals be disrupted, how long is the capital ritual, and what follows a broken one? Working model for the simulation in 21 §8: the attack comes a day after the Gate opens, a quarter of the defenders start at the ritual, and a broken ritual is tried again after two days.",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1230,7 +1230,7 @@
   },
   {
     "id": "q-cc-27",
-    "text": "CC-27. Resolved: Limit 9 is certain, Limit 8 takes directed effort, Limit 7 is for NPCs; 8–10 enemies with about equal sides; the one-hour window stays.",
+    "text": "CC-27. Resolved: Limit 9 is certain, Limit 8 takes directed effort, Limit 7 is for NPCs; 8–10 enemies, with allies who stop the ritual about 40 % of the time with no player; the one-hour window stays.",
     "systemIds": [
       "vertical-slice"
     ],
@@ -1443,7 +1443,20 @@
   },
   {
     "id": "q-cc-43",
-    "text": "CC-43. Campaign Numbers V0 rest on three working readings: does the Spirit General stand at the ritual while the others go with the main force, does the lowest setting lower the Generals' attributes, and should the hardest combination end the war in about 8 game days?",
+    "text": "CC-43. The owner set the odds with no player, and Campaign Numbers V0 reach about 42/57 at the middle setting on working readings: where each General stands, whether each held city adds the base generation rate, whether low settings lower the Generals' attributes, whether the settings are one ladder of presets, whether the Highest setting should end the war around day 12, and how the rating shows that a passive player won.",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-44",
+    "text": "CC-44. How many Allied Generals are there and on which Arcana, which allied god is the goddess, what does a Divine Blessing do in rules and who can receive one, and who posts a Liberation Contract, what does it pay, and where do the outsiders come from?",
     "systemIds": [
       "cult-campaign"
     ],

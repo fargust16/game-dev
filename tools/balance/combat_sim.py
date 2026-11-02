@@ -242,9 +242,9 @@ def take_turn(u, own, enemy, rnd):
     u.reserve = ap
 
 
-def fight(side_a, side_b, max_rounds=60, opener=None, objective=None):
+def fight(side_a, side_b, max_rounds=60, opener=None, objective=None, wounded_a=False):
     units = side_a + side_b
-    for u in units:
+    for u in (side_b if wounded_a else units):
         u.reset()
     if opener is not None:
         hero_unit = side_a[0]
@@ -395,7 +395,7 @@ ritual(senior7, "senior L7, conductors L9, L9, conducting")
 ritual(follower8, "senior L8, conductors L9, L9, conducting")
 
 print("\nThe main battle, without and with the player")
-allies = lambda: [ally9(), ally9(), ally9(), ally8(), ally8()]
+allies = lambda: [ally9(), ally9(), ally8(), ally8(), ally8()]
 for n, force in [
     ("5 with L7", [follower9, follower9, follower8, follower8, senior7]),
     ("6 with L7", [follower9, follower9, follower9, follower8, follower8, senior7]),
@@ -410,6 +410,38 @@ def general():
     u = peer(2)
     return Unit("General", 2, u.str, u.end, u.dex, u.per, u.skill, will=u.will, weapon=staged(TWO_HAND, 2), armour="chain", armour_stage=2, abilities=("stand", "brace", "crush"))
 
+
+def slice_war(title, side, main_force):
+    """The whole chain: main force first, then the ritual, inside its 60 ticks."""
+    wins = 0
+    for _ in range(RUNS):
+        a = side()
+        rounds, winner = fight(a, main_force(), max_rounds=55)
+        if winner is not a:
+            continue
+        start = max(rounds + 5, random.randint(15, 20))
+        senior, one, two = follower8(), follower9(), follower9()
+        for u in (senior, one, two):
+            u.conducting = True
+        winner = fight(a, [senior, one, two], max_rounds=60 - start, objective=senior, wounded_a=True)[1]
+        wins += winner is a
+    print(f"{title:<52} ritual stopped {wins / RUNS * 100:5.1f} %")
+
+
+def enemy_main():
+    return [follower9() for _ in range(random.choice((2, 2, 3, 3, 4)))] + [follower8(), follower8(), senior7()]
+
+
+print("\nThe slice with no player: do the allies stop the ritual?")
+for name, group in [
+    ("3 L9, 2 L8", lambda: [ally9(), ally9(), ally9(), ally8(), ally8()]),
+    ("2 L9, 3 L8", lambda: [ally9(), ally9(), ally8(), ally8(), ally8()]),
+    ("1 L9, 4 L8", lambda: [ally9(), ally8(), ally8(), ally8(), ally8()]),
+    ("3 L9, 3 L8", lambda: [ally9(), ally9(), ally9(), ally8(), ally8(), ally8()]),
+    ("2 L9, 3 L8, Limit 9 hero", lambda: [ally9(), ally9(), ally8(), ally8(), ally8(), hero9()]),
+    ("2 L9, 3 L8, Limit 8 hero", lambda: [ally9(), ally9(), ally8(), ally8(), ally8(), hero()]),
+]:
+    slice_war(f"Allies {name}", group, enemy_main)
 
 print("\nThe Spirit General, Limit 2")
 g = general()

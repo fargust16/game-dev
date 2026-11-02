@@ -884,7 +884,7 @@
   },
   {
     "id": "d-slice-redefined",
-    "statement": "The Vertical Slice is one city and a small territory. The player starts without a faction, may join the internal-order faction through a first-day investigation of a disappearance, finds one or two potions for two styles of play, and reaches Limits 9–8; Limit 7 is for NPCs. The Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and 8–10 followers hold the ritual for its one-hour window, against allies that make the sides about equal. The player stops it and wins, or loses; death ends the run. Required in a limited form: exploration, gathering, Item Creation, Alchemy, combat, dialogue with checks, stealth, time, sleep. Out: Enchanting, Death Gap, Legacy Cache, Arcana change.",
+    "statement": "The Vertical Slice is one city and a small territory. The player starts without a faction, may join the internal-order faction through a first-day investigation of a disappearance, finds one or two potions for two styles of play, and reaches Limits 9–8; Limit 7 is for NPCs. The Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and 8–10 followers hold the ritual for its one-hour window, against allies who stop it about 40 % of the time with no player. The player stops it and wins, or loses; death ends the run. Required in a limited form: exploration, gathering, Item Creation, Alchemy, combat, dialogue with checks, stealth, time, sleep. Out: Enchanting, Death Gap, Legacy Cache, Arcana change.",
     "rationale": "The first build should already show the war's core: a General, followers, and a ritual to stop.",
     "alternatives": "",
     "systemIds": [
@@ -1284,8 +1284,8 @@
   },
   {
     "id": "d-combat-numbers-v0",
-    "statement": "Combat Numbers V0 are authoring defaults in 10.2 §5b: 70 % base hit, Accuracy against Evasion, 10 AP plus Dexterity / 20, weapons from 3 AP to 7 AP, defence / (defence + 50) reduction capped at 75 %, and a Will Contest from 50 %. In the slice the ritual group is a Limit 8 senior and two Limit 9 conductors, a Limit 7 follower leads the main force, and the 5 allies are three of Limit 9 and two of Limit 8.",
-    "rationale": "The owner left balance calculations to the agent. A simulation gives even duels between peers and even weapons, and it makes the main battle about equal once the player is counted, while an open assault on the ritual fails.",
+    "statement": "Combat Numbers V0 are authoring defaults in 10.2 §5b: 70 % base hit, Accuracy against Evasion, 10 AP plus Dexterity / 20, weapons from 3 AP to 7 AP, defence / (defence + 50) reduction capped at 75 %, and a Will Contest from 50 %. In the slice the ritual group is a Limit 8 senior and two Limit 9 conductors, a Limit 7 follower leads the main force, and the 5 allies are two of Limit 9 and three of Limit 8.",
+    "rationale": "The owner left balance calculations to the agent. A simulation gives even duels between peers and even weapons, and it gives the allies alone a 39 % chance of stopping the ritual, while an open assault on the ritual fails.",
     "alternatives": "A Limit 7 senior at the ritual, which leaves the best plan at 3 %.",
     "systemIds": [
       "confront"
@@ -1348,8 +1348,8 @@
   },
   {
     "id": "d-campaign-numbers-v0",
-    "statement": "Campaign Numbers V0 are authoring defaults in 21 §8, checked by a simulation of the war with no player. Off-screen fights run tick by tick over a per-city ledger of followers per Limit, using a kill table from Combat Numbers V0, and the Force Estimate is the square-law ratio over that table. Cult Pace runs from ×0.5 to ×1.5 in five steps.",
-    "rationale": "At the middle setting they give 10.3 sorties by day 18, 62 % of sorties taking a city, and the Capital Gate open on day 19 on average. A table replaces a single strength value because hit chances are capped.",
+    "statement": "Campaign Numbers V0 are authoring defaults in 21 §8, checked by a simulation of a whole war with no player, up to manifestation or the death of all three Generals. Off-screen fights run tick by tick over a per-city ledger of followers per Limit, using a kill table from Combat Numbers V0, and the Force Estimate is the square-law ratio over that table. Cult Pace runs from ×0.5 to ×1.5 in five steps, and a working ladder of five presets moves it with Combat Difficulty.",
+    "rationale": "At the middle setting they give 42 % allied wins and 57 % cult wins over 3000 wars, a median war of 19 days, and 5.2 liberation attempts per war. A table replaces a single strength value because hit chances are capped.",
     "alternatives": "A single strength value per Limit, which cannot express large Limit gaps, or a full tactical simulation of every unseen fight.",
     "systemIds": [
       "cult-campaign"
@@ -1360,5 +1360,35 @@
       "src-21"
     ],
     "dateNote": "Authoring defaults, 2026-11-02. The owner leaves balance calculations to the agent."
+  },
+  {
+    "id": "d-campaign-odds",
+    "statement": "Simulations never count the player. With no player the allied side wins at low settings, the middle setting is 40/60 in favour of the cult, higher settings are 20/80 and worse, and the slice is about 40/60 with no easier or harder variant for now. Only the player's actions can turn this.",
+    "rationale": "The war must press the player to take part, and the player's gear, progression, and choices must be what decides it.",
+    "alternatives": "Odds near even at the middle setting, which leave the player's help optional.",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner decision, 2026-11-02."
+  },
+  {
+    "id": "d-allied-conduct",
+    "statement": "Allied factions act on goals as enemy NPCs do: they choose a city and forces, reinforce a city under attack, retake cities while their forces allow, and hold the capital, so only a pool of forces is free. They post Liberation Contracts, have Limit 2 Allied Generals, and their goddess can give a Divine Blessing now and then.",
+    "rationale": "A one-sided war teaches nothing and gives the player no battles to join. Both sides must pursue their goals with the same seriousness.",
+    "alternatives": "A fixed allied reinforcement and a daily share of spare forces, the first simulation, which left the allies nearly passive.",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner decision, 2026-11-02. Its numbers are working readings."
   }
 ]
