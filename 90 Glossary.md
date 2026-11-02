@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.78
+Version: 0.79
 
 Status: Draft
 
-Last Updated: 2026-11-02 (Character Archetype updated. Earlier: Starting Faction retired; Character Archetype and Veilmouth added. Earlier: Half Cover added; Combat Grid updated. Earlier: Combat Grid follows the player. Earlier: Force Estimate added; Cult Retreat updated. Earlier: Place of Power, Ritual Undoing, and Cult Retreat updated. Earlier: Ritual Undoing added; Combat Grid, Cult Ritual, Place of Power, and Cult Retreat updated. Earlier: Combat Grid updated: around the player only. Earlier: Cult Ritual and City Capture updated for the one-hour ritual. Earlier: Combat Grid replaces Combat Arena and Theme Pack; Arcana and Limit replace the earlier terms. Earlier: Arcana, Limit, and Sephira added; Stage Occupancy Rule corrected. Earlier: Pathway updated for the 22 Tarot archetypes and V1 player stages. Earlier: Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-02 (stealth terms and Vigilance added. Earlier: Character Archetype updated. Earlier: Starting Faction retired; Character Archetype and Veilmouth added. Earlier: Half Cover added; Combat Grid updated. Earlier: Combat Grid follows the player. Earlier: Force Estimate added; Cult Retreat updated. Earlier: Place of Power, Ritual Undoing, and Cult Retreat updated. Earlier: Ritual Undoing added; Combat Grid, Cult Ritual, Place of Power, and Cult Retreat updated. Earlier: Combat Grid updated: around the player only. Earlier: Cult Ritual and City Capture updated for the one-hour ritual. Earlier: Combat Grid replaces Combat Arena and Theme Pack; Arcana and Limit replace the earlier terms. Earlier: Arcana, Limit, and Sephira added; Stage Occupancy Rule corrected. Earlier: Pathway updated for the 22 Tarot archetypes and V1 player stages. Earlier: Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -228,7 +228,7 @@ Lightweight world remembrance of a previous character through rumours, dialogue 
 
 ## Difficulty Settings
 
-Eight independent world-generation sliders for combat difficulty, inhabitants, resource gathering, crafting, economy, equipment quality, wear/maintenance, and Cult Pace. They do not form one bundled Easy / Normal / Hard / Hell scale; faction-pressure interactions remain with their owning systems. Cult Pace controls how fast Cult Forces generate followers and so how fast the cult advances.
+Nine independent world-generation sliders for combat difficulty, inhabitants, resource gathering, crafting, economy, equipment quality, wear/maintenance, and Cult Pace. They do not form one bundled Easy / Normal / Hard / Hell scale; faction-pressure interactions remain with their owning systems. Cult Pace controls how fast Cult Forces generate followers and so how fast the cult advances.
 
 ---
 
@@ -1075,6 +1075,14 @@ A mutually exclusive exceptional outcome within a successful action check, deter
 **Ritual Undoing** — Reversing a completed Cult Ritual at its site, sooner than it would lapse by itself. A defender of Limit 5 or deeper who knows the method does it within 60 ticks of reaching the site. Allied factions have the method, and a player outside them can earn it through trust as a quest reward. See [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md).
 
 **Cult Retreat** — The collective flight of cult followers from every point of a city at once, triggered by a Force Estimate very strongly against them. The order reaches every follower at once, and it ends a running ritual. Followers who see no chance of escaping stay and fight instead. They can be chased and killed while they stay in the fight, and they head for the nearest city under Cult Control or the nearest cult force.
+
+**Stealth Mode** — A special action in which the character crouches and stays hidden until someone notices it. See [10.3 Stealth and Detection](10.3%20Stealth%20and%20Detection.md).
+
+**Vision Cone** — The area an NPC sees: 10 cells deep, facing the way it looks, with an angle set by Vigilance.
+
+**Notice Meter** — The mark over an NPC that fills while the character is in its Vision Cone. When it is full, the NPC has noticed the character.
+
+**Vigilance** — The ninth Difficulty Setting, which sets the angle of Vision Cones.
 
 **Half Cover** — Cover that gives a small hindrance to ranged attacks, such as a fence. Cover of any kind gives no advantage in melee. See [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md).
 

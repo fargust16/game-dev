@@ -57,6 +57,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
 | [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Draft | Combat Grid + vault/climb/window verbs |
 | [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) | Draft | Combat rules, equipment, and durability boundary |
+| [10.3 Stealth and Detection](10.3%20Stealth%20and%20Detection.md) | Draft | Stealth Mode, Vision Cones, Notice Meters, crimes |
 | [11 Vertical Slice](11%20Vertical%20Slice.md) | Draft | First playable proof: 1 city, player Limits 9–8, one General's invasion and ritual |
 | [11.1 Vertical Slice POIs](11.1%20Vertical%20Slice%20POIs.md) | Draft | Full cards for arrest, collectors, soot-stair trace |
 | [12 Engine Choice](12%20Engine%20Choice.md) | Draft | Engine locked: Unity URP, free 3P + custom Combat Grid TB |
@@ -128,6 +129,8 @@ This repository is currently a design bible. Implementation begins only after th
 10.1 Grid World and Environment Actions
     ↓
 10.2 Combat System Draft
+    ↓
+10.3 Stealth and Detection
     ↓
 11 Vertical Slice
     ↓

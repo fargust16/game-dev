@@ -1,10 +1,10 @@
 # 06 Approaches
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Confront runs in place.)
+Last Updated: 2026-11-02 (Veil's rules live in 10.3. Earlier: Confront runs in place.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md)
@@ -97,7 +97,7 @@ Resolution through trade.
 Resolution through limited visibility.
 
 - Strong for Veiled Style conduct and Active Window scouting.
-- Includes stalking, eavesdropping, unnoticed movement, and hidden observation.
+- Includes stalking, eavesdropping, unnoticed movement, and hidden observation. Its rules are in [10.3 Stealth and Detection](10.3%20Stealth%20and%20Detection.md).
 - Failure is often "spotted," which can collapse into Threaten or Confront.
 
 ## Withdraw
@@ -167,7 +167,7 @@ Deferred to later system docs:
 
 - hit chances, stances, cooldowns, combat AI;
 - full dialogue trees and persuasion minigames;
-- stealth detection meters;
+- stealth detection meters, now in [10.3 Stealth and Detection](10.3%20Stealth%20and%20Detection.md);
 - economy price formulas for Exchange;
 - rite choreography and spell animation.
 
