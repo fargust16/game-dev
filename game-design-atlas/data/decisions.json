@@ -1,7 +1,7 @@
 [
   {
     "id": "d-balance",
-    "statement": "Faction Influence changes Balance. It rises mainly when Main Goals complete and also shifts through Side Events and Allegiance.",
+    "statement": "Faction Influence changes Balance. It is the reading of what a Major Faction controls and how much force it has, not a separate number. A completed Main Goal raises it, and Side Events and Allegiance change the war directly.",
     "rationale": "Так 99 закрывает вопрос, что именно двигает Balance, и отсылает к 02.",
     "alternatives": "",
     "systemIds": [
@@ -10,8 +10,9 @@
     "status": "accepted",
     "origin": "imported",
     "sourceIds": [
-      "src-99",
-      "src-02"
+      "src-02",
+      "src-21",
+      "src-99"
     ],
     "dateNote": "99 не ставит отдельную дату каждой закрытой записи. Запись уже внесена в Draft."
   },
@@ -1390,5 +1391,22 @@
       "src-21"
     ],
     "dateNote": "Owner decision, 2026-11-02. Its numbers are working readings."
+  },
+  {
+    "id": "d-influence-reading",
+    "statement": "Faction Influence is not a separate number. City Control and the followers in each city are the state, and a Side Event changes that state directly. Minor Factions and local groups have no Influence of their own.",
+    "rationale": "The war and the older Influence model were two unconnected accounts. One state means Side Events matter to the war and the simulation can test them.",
+    "alternatives": "Retiring Influence, which leaves Balance as lore and takes away the hidden residue of Side Events; keeping both layers, which is the most expensive for a solo project.",
+    "systemIds": [
+      "world-laws",
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-02",
+      "src-21"
+    ],
+    "dateNote": "Owner decision, 2026-11-02."
   }
 ]

@@ -1,10 +1,10 @@
 # 03 Decision Engine
 
-Version: 0.2.4
+Version: 0.2.5
 
 Status: Draft
 
-Last Updated: 2026-11-02 (nine Difficulty Settings. Earlier: the Starting Faction retired. Earlier: retired World Difficulty wording replaced with the independent Difficulty Settings; 21 added as a dependent document.)
+Last Updated: 2026-11-02 (Side Events change the war directly, and Faction Influence is read from it. Earlier: nine Difficulty Settings. Earlier: the Starting Faction retired. Earlier: retired World Difficulty wording replaced with the independent Difficulty Settings; 21 added as a dependent document.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md)
@@ -130,8 +130,8 @@ This order supports experimentation even when a Character Life ends. A new chara
 Side Events from [02 World Laws](02%20World%20Laws.md) are standard Allegiance nodes:
 
 - each major fork offers useful but different outcomes;
-- Faction Influence shifts a little toward the supported side;
-- the Influence shift stays hidden unless the player understands relevant affiliations;
+- the war shifts a little toward the supported side, and Faction Influence with it;
+- that shift stays hidden unless the player understands relevant affiliations;
 - the choice may open some paths and close others;
 - pure free bonuses without world residue are invalid.
 
@@ -155,7 +155,7 @@ Before an important decision, the player should have:
 
 ## What remains intentionally hidden
 
-- exact Faction Influence values;
+- the exact forces behind Faction Influence;
 - exact Balance state;
 - full outcome tables;
 - some delayed consequence chains;

@@ -1,10 +1,10 @@
 # 04 Points of Interest
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft
 
-Last Updated: 2026-11-01 (a ritual lasts one in-game hour. Earlier: cult rituals belong to City Capture; a city under Cult Control is persistent world state, not a POI. Earlier: ritual operations use six-hour world-time windows without player-facing countdowns; public event sites and faction control are represented on the map.)
+Last Updated: 2026-11-02 (unattended outcomes are weighted by the forces present and change the war directly. Earlier: a ritual lasts one in-game hour. Earlier: cult rituals belong to City Capture; a city under Cult Control is persistent world state, not a POI. Earlier: ritual operations use six-hour world-time windows without player-facing countdowns; public event sites and faction control are represented on the map.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md)
@@ -50,7 +50,7 @@ Important distinction:
 | World Engine | May create, modify, expire, or prioritise POIs and abstract Operations |
 | POI package | Remains dormant: no full scene, no crowd AI, no dialogue tree running |
 | Active Window timer | Still advances with player world-time |
-| Unattended resolution | When the window ends, the outcome is decided without the player and applied as Influence / Symptoms / path changes |
+| Unattended resolution | When the window ends, the outcome is decided without the player and applied as changes to forces, Symptoms, and paths |
 
 So:
 
@@ -58,7 +58,7 @@ So:
 - the hardware is not asked to stage every drama at once;
 - missed opportunities still matter.
 
-Unattended resolution must not be opaque coin-flip randomness. It is weighted by Faction Influence, local conditions, and the POI's designed outcome table, and it must leave Readable Consequences / Symptoms.
+Unattended resolution must not be opaque coin-flip randomness. It is weighted by the forces present, local conditions, and the POI's designed outcome table, and it must leave Readable Consequences / Symptoms.
 
 # Point of Interest
 
@@ -155,8 +155,8 @@ A city under Cult Control is persistent world state, not a POI: it has no Active
 If the player never participates:
 
 1. choose an outcome from the POI's designed unattended table;
-2. weight the table by Faction Influence and local state;
-3. apply Influence shifts, Symptoms, and path open/close effects;
+2. weight the table by the forces present and local state;
+3. apply changes to forces, Symptoms, and path open/close effects;
 4. expose enough aftermath that a curious player can reconstruct the story later.
 
 This preserves:
@@ -276,7 +276,7 @@ How the player learns urgency:
 - bartender says it will be "done by tomorrow either way"
 - if marked, map uses urgent Short-class presentation
 Unattended resolution summary:
-- weighted by local Guard Influence vs Soft-Market / underworld Influence
+- weighted by local Guard strength vs Soft-Market / underworld strength
 - common miss results: apothecary taken, shop sealed; or apothecary escapes and shop is looted
 Aftermath Symptom if missed:
 - closed shop boards / cheaper or rarer medicine / denser patrols / new rumour about "banned mixtures"
@@ -310,7 +310,7 @@ Relevant Player Knowledge that can help:
 
 ### 4. What stays hidden
 Hidden Influence or affiliations:
-- small Influence shift toward the helped side;
+- small shift in the war toward the helped side;
 - exact sponsors remain hidden unless the player understands the tells.
 
 Hidden delayed consequences:
@@ -361,7 +361,7 @@ What may close: both immediate mentor/medicine offers
 Failure result: not a soft reload fail; the world chooses and teaches the cost of delay
 
 ### 6. World residue
-Faction Influence shift: small hidden shift to the supported side, or to the unattended winner
+Shift in the war: small hidden shift to the supported side, or to the unattended winner
 Symptom changes: shop open/closed, medicine prices, patrol density, rumour tone
 Path open / path close: mentor path and mixture-clue path pressure each other
 Legacy potential: freed ally, sealed shop, or ruined storefront can persist after death
@@ -415,7 +415,7 @@ How the player learns urgency:
 - marked map uses Brief/urgent presentation;
 - if the player waits past 02:00, the marker resolves into aftermath.
 Unattended resolution summary:
-- weighted by abductor-side Influence vs local Guard / vigil Influence
+- weighted by abductor-side strength vs local Guard / vigil strength
 - common miss results: girls taken into a closed cart; or guards spoil the snatch and scatter both sides
 Aftermath Symptom if missed:
 - more fearful night streets; shuttered windows; a blood scrap or dropped glove; rumour of a "collector"
@@ -454,7 +454,7 @@ Relevant Player Knowledge that can help:
 ### 4. What stays hidden
 Hidden Influence or affiliations:
 - which faction or cult benefits from the abductions;
-- small Influence shift after the night resolves.
+- small shift in the war after the night resolves.
 
 Hidden delayed consequences:
 - whether tonight feeds a ritual, market, blackmail chain, or church purge;
@@ -505,7 +505,7 @@ What may close: rescue gratitude and the best live trail
 Failure result: not a reload fail; next day the district teaches what "collector" pressure looks like
 
 ### 6. World residue
-Faction Influence shift: small hidden shift toward abductor sponsor or toward the side that spoiled the route
+Shift in the war: small hidden shift toward abductor sponsor or toward the side that spoiled the route
 Symptom changes: night fear, shuttered windows, missing-person talk, patrol routes
 Path open / path close:
 - rescue path emphasises people and debts;
@@ -532,7 +532,7 @@ Lazy / timed POI valid? Yes
 # Documentation Review
 
 - **Vision / Pillars:** Compatible. Curiosity, timed commitment, living residue, and incomplete playthroughs are reinforced.
-- **World Laws:** Compatible if World Engine mainly schedules POIs/Operations rather than full scenes. Ritual windows can overlap while each operation stays dormant until the player arrives; unattended resolution keeps Influence moving without the player.
+- **World Laws:** Compatible if World Engine mainly schedules POIs/Operations rather than full scenes. Ritual windows can overlap while each operation stays dormant until the player arrives; unattended resolution keeps the war moving without the player.
 - **Decision Engine:** Compatible. POIs are delivery vehicles for Decision Nodes, not a replacement for axes.
 - **Solo scope:** Compatible. Dormant POIs are the V1 performance strategy.
 - **World Time:** Ritual windows use the shared world clock; the one-hour window is a current campaign target, with exact tuning deferred.

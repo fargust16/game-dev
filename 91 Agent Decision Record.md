@@ -1,10 +1,10 @@
 # 91 Agent Decision Record
 
-Version: 1.5
+Version: 1.6
 
 Status: Draft
 
-Last Updated: 2026-11-02 (the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
+Last Updated: 2026-11-02 (the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [AGENTS.md](AGENTS.md)
@@ -139,6 +139,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 # AGENTS.md Update History
 
 The notes of `AGENTS.md`, newest first.
+
+2026-11-02 (the owner's odds with no player and allied conduct recorded)
 
 2026-11-02 (Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved. Earlier: long decisions and the update history moved to [91 Agent Decision Record](91%20Agent%20Decision%20Record.md))
 

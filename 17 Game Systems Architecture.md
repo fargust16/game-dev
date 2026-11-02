@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 1.12
+Version: 1.13
 
 Status: Draft
 
-Last Updated: 2026-11-02 (Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
+Last Updated: 2026-11-02 (faction state holds forces and City Control; Influence is read from them. Earlier: Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
 
 Depends On:
 [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -587,8 +587,8 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 |-------|---------|
 | **Responsibilities** | Faction identity, Influence, Main Goals / Operations surface ([02](02%20World%20Laws.md)). |
 | **Dependencies** | WorldSeed, World Laws data. |
-| **Public interfaces** | `IFactionState` read model; commands for Influence shifts from residue/quests. |
-| **Data flow** | Seed → starting Influence → operations → Symptoms. |
+| **Public interfaces** | `IFactionState` read model; commands that change forces or City Control from residue/quests; Influence is read from that state. |
+| **Data flow** | Seed → starting forces → operations → Symptoms. |
 | **Save/load** | Full faction state. |
 | **Multiplayer** | Shared world state. |
 | **Performance** | Coarse ticks. |

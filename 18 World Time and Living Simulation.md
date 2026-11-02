@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.16
+Version: 0.17
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-02 (ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-02 (the question on reports names forces, not numeric Influence. Earlier: ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -324,7 +324,7 @@ Information transmission is not automatic universal knowledge. Each channel need
 19. How are NPC goals, task selection, danger assessment, refuge selection, and return decisions governed?
 20. How much of the world is simulated in detail at once, and how are distant or unloaded NPCs abstracted without losing important consequences?
 21. Which events qualify for the daily public-news issue, and which NPC audiences receive each report? The private player summary records the character's own actions regardless of publicity.
-22. How do public news, ambient NPC dialogue, and map markers stay synchronized without exposing hidden operations or numeric Influence, including report delay and exact-site versus region precision?
+22. How do public news, ambient NPC dialogue, and map markers stay synchronized without exposing hidden operations or exact forces, including report delay and exact-site versus region precision?
 23. How are off-screen allied and cult group clashes resolved and represented while keeping the simulation bounded?
 24. What interface presents the private daily summary, how much detail does it preserve, and how long can the player review past summaries?
 

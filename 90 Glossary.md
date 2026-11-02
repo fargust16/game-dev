@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.89
+Version: 0.90
 
 Status: Draft
 
-Last Updated: 2026-11-02 (Allied General, Divine Blessing, and Liberation Contract added. Earlier: Campaign Numbers V0 added. Earlier: Character Notes added. Earlier: Combat Numbers V0, Full Cover, Stage Factor, and Will Contest added. Earlier: Cult Thought Link corrected; Посланник restored. Earlier: Ritual Weak Point added. Earlier: Argument must be gained in this life. Earlier: Argument, Final Check, Proof Task, Danger, and Deeds Record added. Earlier: Social Check, Attitude, and Reputation added. Earlier: Alert added. Earlier: stealth terms and Vigilance added. Earlier: Character Archetype updated. Earlier: Starting Faction retired; Character Archetype and Veilmouth added. Earlier: Half Cover added; Combat Grid updated. Earlier: Combat Grid follows the player. Earlier: Force Estimate added; Cult Retreat updated. Earlier: Place of Power, Ritual Undoing, and Cult Retreat updated. Earlier: Ritual Undoing added; Combat Grid, Cult Ritual, Place of Power, and Cult Retreat updated. Earlier: Combat Grid updated: around the player only. Earlier: Cult Ritual and City Capture updated for the one-hour ritual. Earlier: Combat Grid replaces Combat Arena and Theme Pack; Arcana and Limit replace the earlier terms. Earlier: Arcana, Limit, and Sephira added; Stage Occupancy Rule corrected. Earlier: Pathway updated for the 22 Tarot archetypes and V1 player stages. Earlier: Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-02 (Faction Influence is read from the war, and a Side Event changes the war directly (owner-approved). Earlier: Allied General, Divine Blessing, and Liberation Contract added. Earlier: Campaign Numbers V0 added. Earlier: Character Notes added. Earlier: Combat Numbers V0, Full Cover, Stage Factor, and Will Contest added. Earlier: Cult Thought Link corrected; Посланник restored. Earlier: Ritual Weak Point added. Earlier: Argument must be gained in this life. Earlier: Argument, Final Check, Proof Task, Danger, and Deeds Record added. Earlier: Social Check, Attitude, and Reputation added. Earlier: Alert added. Earlier: stealth terms and Vigilance added. Earlier: Character Archetype updated. Earlier: Starting Faction retired; Character Archetype and Veilmouth added. Earlier: Half Cover added; Combat Grid updated. Earlier: Combat Grid follows the player. Earlier: Force Estimate added; Cult Retreat updated. Earlier: Place of Power, Ritual Undoing, and Cult Retreat updated. Earlier: Ritual Undoing added; Combat Grid, Cult Ritual, Place of Power, and Cult Retreat updated. Earlier: Combat Grid updated: around the player only. Earlier: Cult Ritual and City Capture updated for the one-hour ritual. Earlier: Combat Grid replaces Combat Arena and Theme Pack; Arcana and Limit replace the earlier terms. Earlier: Arcana, Limit, and Sephira added; Stage Occupancy Rule corrected. Earlier: Pathway updated for the 22 Tarot archetypes and V1 player stages. Earlier: Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -150,7 +150,7 @@ A Major Faction's primary world-shaping objective drawn from a limited pool. The
 
 ## Side Event
 
-A seed-generated secondary situation. It offers useful but forked outcomes, can shift Major Faction Influence, can open or close paths, and never exists as pure free power.
+A seed-generated secondary situation. It offers useful but forked outcomes, changes the war directly by a little and so Major Faction Influence, can open or close paths, and never exists as pure free power.
 
 ---
 
@@ -162,7 +162,7 @@ Observable changes through which the player reads hidden faction activity and in
 
 ## Faction Influence
 
-The hidden current capacity of a Major Faction to pursue its world-shaping goals and make operations available. Higher Influence strengthens followers, attempt frequency, artifacts, and economic niche control. It is communicated through Symptoms, not a player-facing value.
+The hidden reading of what a Major Faction controls and how much force it has, and so of its capacity to pursue its world-shaping goals and make operations available. It is not a separate number: City Control and the followers in each city are the state. Higher Influence shows as more followers, more frequent attempts, stronger artifacts, and control of economic niches. It is communicated through Symptoms, not a player-facing value. Minor Factions and local groups have none.
 
 ---
 
@@ -276,7 +276,7 @@ Performance and design rule: full encounter logic for a POI starts only when the
 
 ## Unattended Resolution
 
-Outcome applied when a POI's Active Window ends without player participation. Weighted by Faction Influence and local state, never by opaque meaningless randomness. Leaves Symptoms or other Readable Consequences.
+Outcome applied when a POI's Active Window ends without player participation. Weighted by the forces present and local state, never by opaque meaningless randomness. Leaves Symptoms or other Readable Consequences.
 
 ---
 

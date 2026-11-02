@@ -14,7 +14,7 @@
   },
   {
     "id": "q-wl-symptoms",
-    "text": "What exact Symptoms correspond to each band of Faction Influence?",
+    "text": "What exact Symptoms correspond to each state of a city's control and forces?",
     "systemIds": [
       "world-laws"
     ],
@@ -529,7 +529,7 @@
   },
   {
     "id": "q-ec-price",
-    "text": "How exactly do Influence-controlled niches set prices and availability?",
+    "text": "How exactly do a faction's control and forces set prices and availability?",
     "systemIds": [
       "economy",
       "world-laws"
@@ -1417,7 +1417,7 @@
   },
   {
     "id": "q-cc-41",
-    "text": "CC-41. Do Combat Numbers V0 hold on the Combat Grid with cover, facing, flanking, and target rules, how much range does each weapon have, which weapon skills exist, and do magical attacks and conditions balance?",
+    "text": "CC-41. Do Combat Numbers V0 hold on the Combat Grid with cover, facing, flanking, and target rules, how much range does each weapon have, which weapon skills exist, and do magical attacks and conditions balance? Does headcount decide the slice's fight on the Combat Grid as much as it does in the simulation?",
     "systemIds": [
       "confront"
     ],
@@ -1457,6 +1457,19 @@
   {
     "id": "q-cc-44",
     "text": "CC-44. How many Allied Generals are there and on which Arcana, which allied god is the goddess, what does a Divine Blessing do in rules and who can receive one, and who posts a Liberation Contract, what does it pay, and where do the outsiders come from?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-45",
+    "text": "CC-45. Which change does each fork of POI A and POI B leave at the invasion, does a lost Harrow close that trace source, can a Side Event change how fast a side replaces followers, do unattended outcomes cancel out, and how does a Minor Faction's Side Event reach the war?",
     "systemIds": [
       "cult-campaign"
     ],

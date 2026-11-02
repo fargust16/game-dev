@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 1.22
+Version: 1.23
 
 Status: Draft
 
-Last Updated: 2026-11-02 (the owner's odds with no player and allied conduct recorded)
+Last Updated: 2026-11-02 (Faction Influence is read from the war, and a Side Event changes the war directly)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -384,8 +384,8 @@ An entry marked † is the short binding form. Its full text is in [91 Agent Dec
 
 - Five Decision Axes are accepted: Attention, Approach, Allegiance, Commitment, Bargain.
 - V1 teaching order: Attention first, Approach with it; Bargain as second major lesson.
-- Balance moves through Faction Influence via Main Goals and Side Events.
-- Side Events are Allegiance forks, not free loot; they may open/close paths and hide small Influence shifts.
+- Balance moves through Faction Influence, which is no separate number: it is the reading of what a Major Faction controls and how much force it has. A Main Goal raises it, and a Side Event changes the war directly. Minor Factions and local groups have none.
+- Side Events are Allegiance forks, not free loot; they may open/close paths and hide small shifts in the war.
 - † **Campaign and world threat** ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)): three cooperating church-associated Major Factions (internal order, industry and artifact research, external and maritime security) form one side. The opposing Major Faction seeks to return an insane, sealed Limit 0 being called the True God or False God; ancient cosmic powers, the origin of supernatural power, seek to reclaim it through this being. Before manifestation the campaign is a war for cities: three Limit 2 Cult Generals capture cities by rituals, through Cult Sorties launched when generation gives them enough followers, never from a calendar. A ritual lasts one in-game hour, with no player-facing countdown and no global ritual counter. The cult never attacks ordinary residents: they are kept alive as sacrifices, a purpose nobody in the world knows and the player learns only at manifestation. Every group acts on a Force Estimate. The Capital Gate opens only when every other city is under Cult Control, and manifestation succeeds only if every city was captured at the moment of that uninterrupted final ritual. The campaign ends with a rating, by killing all three Generals before manifestation or by defeating the being after it. Cult Forces are replaced fast until the cult's leadership is destroyed, allied forces slowly; the eighth slider, Cult Pace, owns their pace. The campaign lasts 15–20 game days at the middle difficulty; the target world is 3×3 tiles with 5–7 cities, and only cities are cult targets. The player gets a private daily summary, and public events arrive through diegetic channels. One state is playable. The mind-controlled ideal-world ending is withdrawn, and Limit 0 belief/anchor/sanity mechanics are out of scope. Unresolved mechanics stay in [02 World Laws](02%20World%20Laws.md), [21](21%20Cult%20Campaign%20and%20City%20Control.md), and [99 Open Questions](99%20Open%20Questions.md); the document's Working readings are not owner decisions until confirmed.
 - Two owner-provided beneficial Minor Faction examples are recorded: a covert alchemical network whose full-game leader is Limit 2 or 3, never 0 or 1, and an open healing/medical association with lawful and unlawful practitioners and no single leader. Minor Factions pursue local needs and do not directly drive World Collapse. Other branches and the authored-versus-template generation model remain open.
 - The old bundled Easy / Normal / Hard / Hell faction-pressure rule is superseded by nine independent difficulty sliders in [02 World Laws](02%20World%20Laws.md). The eighth, Cult Pace, owns campaign pace, and the ninth, Vigilance, owns the angle of NPC sight; no other slider-to-faction-pressure relationship is settled yet.
@@ -450,7 +450,7 @@ Current active design layer:
 4. Architecture Pivot locked in [16](16%20Architecture%20Pivot.md). Systems map in [17](17%20Game%20Systems%20Architecture.md). Next implementation default: **Overworld V0** (`OVERWORLD_V0_PLAN.md`, iterations W0.1–W0.9) — not OrganicTown C1. Buildings: [15](15%20Procedural%20Building%20Generation.md) Exterior Shell Grammar (sandbox lab parallel OK) + Interior Piece Assembly for Portal buildings only.
 5. Stage 3F (prototype E): the documentation stage is under owner review. A dump-first stage 1 — E built and verified through dumps and tests, off the production path — may start only after every **[stage 1]** question in [99 Open Questions](99%20Open%20Questions.md) § Terrain — Stage 3F valley carve is answered; enabling E in the bake waits for the **[production]** questions.
 6. † Geography research (full text: *Geography-first research history* in the record). G0 and G1 are built, target D6 is approved, G3 to G3e ended without an accepted model, and G3f ran to its held-out evaluation. Next: the owner's blind review of the sealed sheets (G-5a/G-5b), then G-6; production only at G4. Any production terrain design waits for GEO-3's production placement and GEO-8's contract. Anything else needs its own plan.
-7. Cult campaign (2026-11-01): the active narrative design layer is [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md). Work through CC-1 … CC-44, where still open, in [99 Open Questions](99%20Open%20Questions.md) in their listed order. Working method with the owner: present open questions and the next path, take the owner's vision, then formalise it into project documentation.
+7. Cult campaign (2026-11-01): the active narrative design layer is [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md). Work through CC-1 … CC-45, where still open, in [99 Open Questions](99%20Open%20Questions.md) in their listed order. Working method with the owner: present open questions and the next path, take the owner's vision, then formalise it into project documentation.
 
 Do not start combat trees, quest lines, faction lore identities, or full economy simulation before the current Draft foundations are stable enough to instantiate.
 

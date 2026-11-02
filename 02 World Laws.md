@@ -1,10 +1,10 @@
 # 02 World Laws
 
-Version: 0.32
+Version: 0.33
 
 Status: Draft
 
-Last Updated: 2026-11-02 (stale slider count and question range corrected. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and the Divine Blessing referenced. Earlier: Cult Pace authoring defaults referenced. Earlier: Vigilance may later fold into a broader setting. Earlier: the ninth Difficulty Setting, Vigilance, added. Earlier: the Starting Faction retired. Earlier: the Force Estimate governs every side. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate. Earlier: allied directive and undoing from Limit 5 recorded; the one-day rule withdrawn. Earlier: allied factions defend cities and do not understand rituals; a ritual runs alongside the capture. Earlier: a ritual lasts one in-game hour; how it relates to capture is open. Earlier: all three cult Arcana occupied; ritual window read in rounds. Earlier: faction Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded. Earlier: eighth Difficulty Setting Cult Pace added; a Place of Power keeps its force for a day after liberation; the lowest setting wins without the player. Earlier: Cult Sorties, ritual stopping, the Last Free City Rule, and the capital's residents among the dead recorded. Earlier: Divine Plane history restored and separated from the Spirit World; allied Stage 1 withdrawn; killing all three Cult Generals set as the only pre-manifestation ending; ritual order, sabotage, and allied scepticism recorded. Earlier: Stage Occupancy Rule, the sacrificial purpose of rituals, and the manifestation condition recorded; Stage 1 cult followers withdrawn. Earlier: the pre-manifestation campaign recorded as a war for cities: Cult Generals, City Capture and Liberation, the Capital Gate, and asymmetric force generation; operating rules moved to 21; civilian targeting and the required-ritual count superseded. Earlier: daily character summary and public news, known-event map, allied mobilization, six-hour ritual windows, overlapping operations, fixed capital awakening, and post-manifestation occupation loop recorded; ritual threshold/concurrency, battle resolution, command threshold, capture, map granularity, rating, and post-campaign play remain open. Earlier: antagonist return/destruction phases, permanent no-successor rule after manifestation, cosmic-power premise, and one-state scope recorded; royal influence remains open.)
+Last Updated: 2026-11-02 (Faction Influence is read from the war, and a Side Event changes the war directly (owner-approved). Earlier: stale slider count and question range corrected. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and the Divine Blessing referenced. Earlier: Cult Pace authoring defaults referenced. Earlier: Vigilance may later fold into a broader setting. Earlier: the ninth Difficulty Setting, Vigilance, added. Earlier: the Starting Faction retired. Earlier: the Force Estimate governs every side. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate. Earlier: allied directive and undoing from Limit 5 recorded; the one-day rule withdrawn. Earlier: allied factions defend cities and do not understand rituals; a ritual runs alongside the capture. Earlier: a ritual lasts one in-game hour; how it relates to capture is open. Earlier: all three cult Arcana occupied; ritual window read in rounds. Earlier: faction Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded. Earlier: eighth Difficulty Setting Cult Pace added; a Place of Power keeps its force for a day after liberation; the lowest setting wins without the player. Earlier: Cult Sorties, ritual stopping, the Last Free City Rule, and the capital's residents among the dead recorded. Earlier: Divine Plane history restored and separated from the Spirit World; allied Stage 1 withdrawn; killing all three Cult Generals set as the only pre-manifestation ending; ritual order, sabotage, and allied scepticism recorded. Earlier: Stage Occupancy Rule, the sacrificial purpose of rituals, and the manifestation condition recorded; Stage 1 cult followers withdrawn. Earlier: the pre-manifestation campaign recorded as a war for cities: Cult Generals, City Capture and Liberation, the Capital Gate, and asymmetric force generation; operating rules moved to 21; civilian targeting and the required-ritual count superseded. Earlier: daily character summary and public news, known-event map, allied mobilization, six-hour ritual windows, overlapping operations, fixed capital awakening, and post-manifestation occupation loop recorded; ritual threshold/concurrency, battle resolution, command threshold, capture, map granularity, rating, and post-campaign play remain open. Earlier: antagonist return/destruction phases, permanent no-successor rule after manifestation, cosmic-power premise, and one-state scope recorded; royal influence remains open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md)
@@ -38,7 +38,9 @@ Balance is a hidden systemic condition. It is inferred through the world rather 
 
 Balance shifts primarily through **Faction Influence**.
 
-Faction Influence for Major Factions rises when a Major Faction completes Main Goals and can also shift through Side Events and player Allegiance choices. Higher Influence makes a Major Faction harder to oppose and more able to reshape everyday life. Accumulated Faction Influence among competing Major Factions is one pressure that can break Balance into World Collapse; the sealed being's return is a distinct possible catastrophe.
+**Faction Influence is not a separate number.** It is the reading of what a Major Faction controls and how much force it has (owner-approved, 2026-11-02). City Control and the followers in each city ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §§8, 11) are the state, and Influence is what they add up to. Higher Influence makes a Major Faction harder to oppose and more able to reshape everyday life. Accumulated Faction Influence among competing Major Factions is one pressure that can break Balance into World Collapse; the sealed being's return is a distinct possible catastrophe.
+
+Only what changes that state changes Influence. A completed Main Goal raises it, and a Side Event or an Allegiance choice changes the war directly, by a little: the followers in a city, how fast a side replaces them, or who holds what.
 
 # World Seed
 
@@ -47,7 +49,7 @@ Every world is created from a **World Seed**.
 The seed determines, at minimum:
 
 - starting world conditions;
-- starting Faction Influence values;
+- starting forces and City Control, from which Faction Influence is read;
 - which Main Goals are active and their concrete details;
 - Side Event generation;
 - priorities used by the World Engine.
@@ -58,7 +60,7 @@ The seed must change details enough that memorised answers from a previous world
 
 ## Major and minor factions
 
-The setting has world-shaping **Major Factions** and smaller **Minor Factions**. Major Factions have long-term goals that can directly affect world Balance and World Collapse; the existing Faction Influence and World Engine model below applies to them. Minor Factions pursue narrower needs and interests. They can be beneficial or harmful, independent or aligned with a Major Faction, and can still shape local events or help a larger side. They do not have their own world-ending objective and are not direct drivers of World Collapse. How their local actions feed into Major Faction Influence remains open.
+The setting has world-shaping **Major Factions** and smaller **Minor Factions**. Major Factions have long-term goals that can directly affect world Balance and World Collapse; the existing Faction Influence and World Engine model below applies to them. Minor Factions pursue narrower needs and interests. They can be beneficial or harmful, independent or aligned with a Major Faction, and can still shape local events or help a larger side. They do not have their own world-ending objective and are not direct drivers of World Collapse. They have no Faction Influence of their own, and neither have local groups: their actions count only through what they change in the war. How that works is open (CC-45).
 
 ## Owner-approved setting direction: three cooperating major factions
 
@@ -137,7 +139,7 @@ Under the existing world-simulation model, each Major Faction owns:
 
 - one or more Main Goals drawn from a limited pool;
 - available Operations;
-- current Faction Influence;
+- current forces and cities, read as Faction Influence;
 - conditions required to execute each Operation;
 - access to followers, mentors, artifacts, and economic niches scaled by Influence.
 
@@ -157,7 +159,7 @@ The seed changes details such as:
 
 When a Major Faction completes a Main Goal:
 
-1. its Faction Influence increases;
+1. what it controls or holds grows, so its Faction Influence rises;
 2. the world changes in a readable way under that Influence;
 3. future Operations become easier, more frequent, or better supported for that faction.
 
@@ -171,8 +173,8 @@ A Side Event is an Allegiance-bearing decision:
 
 - helping one side yields one benefit;
 - helping the other yields a different benefit;
-- Influence shifts a little toward the supported side;
-- the exact Influence shift stays hidden unless the player understands the faction affiliations involved;
+- the war shifts a little toward the supported side;
+- that shift stays hidden unless the player understands the faction affiliations involved;
 - the choice may open some paths and close others.
 
 Valid Side Event outcomes include allies, mentors, consumables, clues, artifacts, skills for followers, or Knowledge. The design rule is not "always a gift," but "always a meaningful fork with world residue."
