@@ -12,8 +12,6 @@ import random
 import sys
 from dataclasses import dataclass, field
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-
 LIMIT_S = {None: 1.00, 9: 1.00, 8: 1.15, 7: 1.32, 6: 1.52, 5: 1.75, 4: 2.01, 3: 2.31, 2: 2.66, 1: 3.06, 0: 3.52}
 RUNS = 4000
 CLOSE_IN_CELLS = 6
@@ -329,124 +327,130 @@ def peer(limit):
     return Unit(f"peer{limit}", limit, a, a, a, a, a, will=a, weapon=staged(ONE_HAND, limit), armour="chain", armour_stage=limit)
 
 
-print("One blow between peers, by Limit")
-for limit in (9, 8, 7, 5, 3, 2, 0):
-    u = peer(limit)
-    u.reset()
-    blow = u.weapon.base * stage_factor(u.weapon.stage) * (1 + u.str / 50) * (1 - mitigation(u.defence()))
-    print(f"  Limit {limit}: HP {u.max_hp():5.0f}  blow {blow:5.1f}  reduction {mitigation(u.defence()) * 100:3.0f} %  hit {hit_chance(u, u) * 100:3.0f} %  hits to kill {u.max_hp() / blow:4.1f}")
+def main():
+    print("One blow between peers, by Limit")
+    for limit in (9, 8, 7, 5, 3, 2, 0):
+        u = peer(limit)
+        u.reset()
+        blow = u.weapon.base * stage_factor(u.weapon.stage) * (1 + u.str / 50) * (1 - mitigation(u.defence()))
+        print(f"  Limit {limit}: HP {u.max_hp():5.0f}  blow {blow:5.1f}  reduction {mitigation(u.defence()) * 100:3.0f} %  hit {hit_chance(u, u) * 100:3.0f} %  hits to kill {u.max_hp() / blow:4.1f}")
 
-print("\nDuels of peers")
-for limit in (9, 8, 7, 5, 2, 0):
-    report(f"Peer L{limit} v peer L{limit}", [peer(limit)], [peer(limit)])
+    print("\nDuels of peers")
+    for limit in (9, 8, 7, 5, 2, 0):
+        report(f"Peer L{limit} v peer L{limit}", [peer(limit)], [peer(limit)])
 
-print("\nOne Limit step")
-report("L8 v L9", [follower8()], [follower9()])
-report("L8 v L9, L9", [follower8()], [follower9(), follower9()])
-report("L8 v L9, L9, L9", [follower8()], [follower9(), follower9(), follower9()])
-report("L7 v L8", [senior7()], [follower8()])
-report("L7 v L8, L8", [senior7()], [follower8(), follower8()])
+    print("\nOne Limit step")
+    report("L8 v L9", [follower8()], [follower9()])
+    report("L8 v L9, L9", [follower8()], [follower9(), follower9()])
+    report("L8 v L9, L9, L9", [follower8()], [follower9(), follower9(), follower9()])
+    report("L7 v L8", [senior7()], [follower8()])
+    report("L7 v L8, L8", [senior7()], [follower8(), follower8()])
 
-print("\nWeapons, no abilities, against a plain Limit 8 follower")
-plain = lambda: follower8(())
-report("Hero, one-hand", [hero(abilities=())], [plain()])
-report("Hero, one-hand, one blow and two parries", [hero(abilities=(), guarded=True)], [plain()])
-report("Hero, one-hand and shield", [hero(SHIELDED, abilities=())], [plain()])
-report("Hero, shield, one blow and two blocks", [hero(SHIELDED, abilities=(), guarded=True)], [plain()])
-report("Hero, two-hand", [hero(TWO_HAND, abilities=())], [plain()])
-report("Hero, dagger", [hero(DAGGER, abilities=())], [plain()])
-report("Hero, dagger, two blows and two parries", [hero(DAGGER, abilities=(), guarded=True)], [plain()])
-report("Hero, chain", [hero(ONE_HAND, "chain", abilities=())], [plain()])
-report("Priestess, bow", [priestess(())], [plain()])
-report("Priestess, crossbow", [priestess((), CROSSBOW)], [plain()])
+    print("\nWeapons, no abilities, against a plain Limit 8 follower")
+    plain = lambda: follower8(())
+    report("Hero, one-hand", [hero(abilities=())], [plain()])
+    report("Hero, one-hand, one blow and two parries", [hero(abilities=(), guarded=True)], [plain()])
+    report("Hero, one-hand and shield", [hero(SHIELDED, abilities=())], [plain()])
+    report("Hero, shield, one blow and two blocks", [hero(SHIELDED, abilities=(), guarded=True)], [plain()])
+    report("Hero, two-hand", [hero(TWO_HAND, abilities=())], [plain()])
+    report("Hero, dagger", [hero(DAGGER, abilities=())], [plain()])
+    report("Hero, dagger, two blows and two parries", [hero(DAGGER, abilities=(), guarded=True)], [plain()])
+    report("Hero, chain", [hero(ONE_HAND, "chain", abilities=())], [plain()])
+    report("Priestess, bow", [priestess(())], [plain()])
+    report("Priestess, crossbow", [priestess((), CROSSBOW)], [plain()])
 
-print("\nThe player, with abilities")
-report("New character v L9", [new_character()], [follower9()])
-report("Hero L9 v L9", [hero9()], [follower9()])
-report("Hero L8 v L8", [hero()], [follower8()])
-report("Hero L8 v L9, L9", [hero()], [follower9(), follower9()])
-report("Priestess L8 v L8", [priestess()], [follower8()])
-report("Hero L8 v L7", [hero()], [senior7()])
-report("Hero L8, stage 8 two-hand and chain v L7", [hero(TWO_HAND, "chain", 8)], [senior7()])
-s = senior7()
-report("The same, with a stealth attack", [hero(TWO_HAND, "chain", 8)], [s], opener=s)
+    print("\nThe player, with abilities")
+    report("New character v L9", [new_character()], [follower9()])
+    report("Hero L9 v L9", [hero9()], [follower9()])
+    report("Hero L8 v L8", [hero()], [follower8()])
+    report("Hero L8 v L9, L9", [hero()], [follower9(), follower9()])
+    report("Priestess L8 v L8", [priestess()], [follower8()])
+    report("Hero L8 v L7", [hero()], [senior7()])
+    report("Hero L8, stage 8 two-hand and chain v L7", [hero(TWO_HAND, "chain", 8)], [senior7()])
+    s = senior7()
+    report("The same, with a stealth attack", [hero(TWO_HAND, "chain", 8)], [s], opener=s)
 
 
-def ritual(senior, title):
-    print(f"\nThe ritual group: {title}")
-    for name, h, kind in [
-        ("Hero, stage 9 gear, open fight", hero(), None),
-        ("Hero, stage 8 gear, open fight", hero(TWO_HAND, "chain", 8), None),
-        ("Hero, stage 8 gear, stealth on a conductor", hero(TWO_HAND, "chain", 8), "conductor"),
-        ("Hero, stage 8 gear, stealth on the senior", hero(TWO_HAND, "chain", 8), "senior"),
-        ("Hero, dagger, stage 8, stealth on the senior", hero(DAGGER, "chain", 8), "senior"),
+    def ritual(senior, title):
+        print(f"\nThe ritual group: {title}")
+        for name, h, kind in [
+            ("Hero, stage 9 gear, open fight", hero(), None),
+            ("Hero, stage 8 gear, open fight", hero(TWO_HAND, "chain", 8), None),
+            ("Hero, stage 8 gear, stealth on a conductor", hero(TWO_HAND, "chain", 8), "conductor"),
+            ("Hero, stage 8 gear, stealth on the senior", hero(TWO_HAND, "chain", 8), "senior"),
+            ("Hero, dagger, stage 8, stealth on the senior", hero(DAGGER, "chain", 8), "senior"),
+        ]:
+            a = follower9()
+            b = follower9()
+            s = senior()
+            for u in (a, b, s):
+                u.conducting = True
+            target = {"conductor": a, "senior": s, None: None}[kind]
+            report(name + ", all", [h], [a, b, s], opener=target)
+            report(name + ", senior only", [h], [a, b, s], opener=target, objective=s)
+
+
+    ritual(senior7, "senior L7, conductors L9, L9, conducting")
+    ritual(follower8, "senior L8, conductors L9, L9, conducting")
+
+    print("\nThe main battle, without and with the player")
+    allies = lambda: [ally9(), ally9(), ally8(), ally8(), ally8()]
+    for n, force in [
+        ("5 with L7", [follower9, follower9, follower8, follower8, senior7]),
+        ("6 with L7", [follower9, follower9, follower9, follower8, follower8, senior7]),
+        ("7 with L7", [follower9, follower9, follower9, follower9, follower8, follower8, senior7]),
     ]:
-        a = follower9()
-        b = follower9()
-        s = senior()
-        for u in (a, b, s):
-            u.conducting = True
-        target = {"conductor": a, "senior": s, None: None}[kind]
-        report(name + ", all", [h], [a, b, s], opener=target)
-        report(name + ", senior only", [h], [a, b, s], opener=target, objective=s)
+        report(f"5 allies v {n}", allies(), [f() for f in force])
+        report(f"5 allies + hero L9 v {n}", allies() + [hero9()], [f() for f in force])
+        report(f"5 allies + hero L8 v {n}", allies() + [hero()], [f() for f in force])
 
 
-ritual(senior7, "senior L7, conductors L9, L9, conducting")
-ritual(follower8, "senior L8, conductors L9, L9, conducting")
-
-print("\nThe main battle, without and with the player")
-allies = lambda: [ally9(), ally9(), ally8(), ally8(), ally8()]
-for n, force in [
-    ("5 with L7", [follower9, follower9, follower8, follower8, senior7]),
-    ("6 with L7", [follower9, follower9, follower9, follower8, follower8, senior7]),
-    ("7 with L7", [follower9, follower9, follower9, follower9, follower8, follower8, senior7]),
-]:
-    report(f"5 allies v {n}", allies(), [f() for f in force])
-    report(f"5 allies + hero L9 v {n}", allies() + [hero9()], [f() for f in force])
-    report(f"5 allies + hero L8 v {n}", allies() + [hero()], [f() for f in force])
+    def general():
+        u = peer(2)
+        return Unit("General", 2, u.str, u.end, u.dex, u.per, u.skill, will=u.will, weapon=staged(TWO_HAND, 2), armour="chain", armour_stage=2, abilities=("stand", "brace", "crush"))
 
 
-def general():
-    u = peer(2)
-    return Unit("General", 2, u.str, u.end, u.dex, u.per, u.skill, will=u.will, weapon=staged(TWO_HAND, 2), armour="chain", armour_stage=2, abilities=("stand", "brace", "crush"))
+    def slice_war(title, side, main_force):
+        """The whole chain: main force first, then the ritual, inside its 60 ticks."""
+        wins = 0
+        for _ in range(RUNS):
+            a = side()
+            rounds, winner = fight(a, main_force(), max_rounds=55)
+            if winner is not a:
+                continue
+            start = max(rounds + 5, random.randint(15, 20))
+            senior, one, two = follower8(), follower9(), follower9()
+            for u in (senior, one, two):
+                u.conducting = True
+            winner = fight(a, [senior, one, two], max_rounds=60 - start, objective=senior, wounded_a=True)[1]
+            wins += winner is a
+        print(f"{title:<52} ritual stopped {wins / RUNS * 100:5.1f} %")
 
 
-def slice_war(title, side, main_force):
-    """The whole chain: main force first, then the ritual, inside its 60 ticks."""
-    wins = 0
-    for _ in range(RUNS):
-        a = side()
-        rounds, winner = fight(a, main_force(), max_rounds=55)
-        if winner is not a:
-            continue
-        start = max(rounds + 5, random.randint(15, 20))
-        senior, one, two = follower8(), follower9(), follower9()
-        for u in (senior, one, two):
-            u.conducting = True
-        winner = fight(a, [senior, one, two], max_rounds=60 - start, objective=senior, wounded_a=True)[1]
-        wins += winner is a
-    print(f"{title:<52} ritual stopped {wins / RUNS * 100:5.1f} %")
+    def enemy_main():
+        return [follower9() for _ in range(random.choice((2, 2, 3, 3, 4)))] + [follower8(), follower8(), senior7()]
 
 
-def enemy_main():
-    return [follower9() for _ in range(random.choice((2, 2, 3, 3, 4)))] + [follower8(), follower8(), senior7()]
+    print("\nThe slice with no player: do the allies stop the ritual?")
+    for name, group in [
+        ("3 L9, 2 L8", lambda: [ally9(), ally9(), ally9(), ally8(), ally8()]),
+        ("2 L9, 3 L8", lambda: [ally9(), ally9(), ally8(), ally8(), ally8()]),
+        ("1 L9, 4 L8", lambda: [ally9(), ally8(), ally8(), ally8(), ally8()]),
+        ("3 L9, 3 L8", lambda: [ally9(), ally9(), ally9(), ally8(), ally8(), ally8()]),
+        ("2 L9, 3 L8, Limit 9 hero", lambda: [ally9(), ally9(), ally8(), ally8(), ally8(), hero9()]),
+        ("2 L9, 3 L8, Limit 8 hero", lambda: [ally9(), ally9(), ally8(), ally8(), ally8(), hero()]),
+    ]:
+        slice_war(f"Allies {name}", group, enemy_main)
+
+    print("\nThe Spirit General, Limit 2")
+    g = general()
+    g.reset()
+    print(f"  HP {g.max_hp():.0f}, reduction {mitigation(g.defence()) * 100:.0f} %, blow on the hero {g.weapon.base * stage_factor(2) * (1 + g.str / 50) * (1 - mitigation(ARMOUR['chain'][0] * stage_factor(8))):.0f}")
+    report("Hero L8, best gear v General", [hero(TWO_HAND, "chain", 8)], [general()])
+    report("5 allies + hero v General", allies() + [hero()], [general()])
+    report("5 peers L5 v General", [peer(5) for _ in range(5)], [general()])
 
 
-print("\nThe slice with no player: do the allies stop the ritual?")
-for name, group in [
-    ("3 L9, 2 L8", lambda: [ally9(), ally9(), ally9(), ally8(), ally8()]),
-    ("2 L9, 3 L8", lambda: [ally9(), ally9(), ally8(), ally8(), ally8()]),
-    ("1 L9, 4 L8", lambda: [ally9(), ally8(), ally8(), ally8(), ally8()]),
-    ("3 L9, 3 L8", lambda: [ally9(), ally9(), ally9(), ally8(), ally8(), ally8()]),
-    ("2 L9, 3 L8, Limit 9 hero", lambda: [ally9(), ally9(), ally8(), ally8(), ally8(), hero9()]),
-    ("2 L9, 3 L8, Limit 8 hero", lambda: [ally9(), ally9(), ally8(), ally8(), ally8(), hero()]),
-]:
-    slice_war(f"Allies {name}", group, enemy_main)
-
-print("\nThe Spirit General, Limit 2")
-g = general()
-g.reset()
-print(f"  HP {g.max_hp():.0f}, reduction {mitigation(g.defence()) * 100:.0f} %, blow on the hero {g.weapon.base * stage_factor(2) * (1 + g.str / 50) * (1 - mitigation(ARMOUR['chain'][0] * stage_factor(8))):.0f}")
-report("Hero L8, best gear v General", [hero(TWO_HAND, "chain", 8)], [general()])
-report("5 allies + hero v General", allies() + [hero()], [general()])
-report("5 peers L5 v General", [peer(5) for _ in range(5)], [general()])
+if __name__ == "__main__":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+    main()

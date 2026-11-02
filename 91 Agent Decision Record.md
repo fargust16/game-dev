@@ -1,10 +1,10 @@
 # 91 Agent Decision Record
 
-Version: 1.6
+Version: 1.7
 
 Status: Draft
 
-Last Updated: 2026-11-02 (the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
+Last Updated: 2026-11-02 (group fights on the Combat Grid recorded, and the Alchemical Flask proposed. Earlier: the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [AGENTS.md](AGENTS.md)
@@ -60,11 +60,11 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 
 ## Combat numbers
 
-- Combat Numbers V0 are in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) §5b, checked by `tools/balance/combat_sim.py`. The owner leaves balance calculations to the agent (2026-11-02): calculate them, check them by simulation, and label them authoring defaults. In the slice the ritual group is a Limit 8 senior and two Limit 9 conductors, a Limit 7 follower leads the main force, and the 5 allies are two of Limit 9 and three of Limit 8. A conductor who fights goes on conducting and has 3 AP less each turn. The owner approved that rule on 2026-11-02. Campaign Numbers V0 are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §8, checked by `tools/balance/campaign_sim.py`. At the middle setting with no player the allied side wins 42 % of wars and the cult 57 %. They rest on working readings kept in CC-43 and CC-44.
+- Combat Numbers V0 are in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) §5b, checked by `tools/balance/combat_sim.py`, and group fights by `tools/balance/tactical_sim.py` with Target Rules V0 in §5a. The owner approved their direction on 2026-11-02: fighters close in on the nearest targets, a melee fighter tries for the shooters and attacks whoever it reaches on the way, and each side goes first for whoever brings the most to the fight and can actually be harmed. The owner also decided that even at the middle setting a cult fighter is a little stronger than an allied fighter of the same Limit; the working value is +1 to Strength, Endurance, Dexterity, Perception, and weapon skill. The owner leaves balance calculations to the agent (2026-11-02): calculate them, check them by simulation, and label them authoring defaults. In the slice the ritual group is a Limit 8 senior and two Limit 9 conductors, a Limit 7 follower leads the main force, and the 5 allies are two of Limit 9 and three of Limit 8. A conductor who fights goes on conducting and has 3 AP less each turn. The owner approved that rule on 2026-11-02. Campaign Numbers V0 are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §8, checked by `tools/balance/campaign_sim.py`. At the middle setting with no player the allied side wins 42 % of wars and the cult 57 %. They rest on working readings kept in CC-43 and CC-44.
 
 ## Campaign odds
 
-- Owner-approved on 2026-11-02, in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §8. Simulations always run with no player, and the world lives on its own. Both sides pursue their goals with the same seriousness. Allied factions act on goals as enemy NPCs do: they choose a city and forces, gather, and go; they reinforce a city under attack; they really try to retake captured cities while their forces allow; and they try to hold the capital at the end. They must defend the capital, so only a pool of forces is free. They post Liberation Contracts to other factions, Factionless characters, and otherworldly people. They have Limit 2 Allied Generals who want the Cult Generals dead. Their goddess on the Divine Plane can intervene now and then, with abilities up to Limit 0, through a Divine Blessing or strengthening of one or several direct followers, perhaps a global strengthening, never as constant attention. These events are how the war reaches the player. With no player the allied side wins at low settings, the middle setting is 40/60 in favour of the cult, and higher settings are 20/80 and worse. Only the player's actions can turn this: gear, progression, the quality of those actions, the help given in defences and liberations, and how far the character grows, possibly to Limit 2. The slice aims at about 40/60 with no player and has no easier or harder variant for now. The simulation gives 42/57 at the middle setting, 19/78 at the High setting, and 39 % for the slice's allies alone. Which numbers reach this are authoring defaults and working readings, kept in CC-43 and CC-44.
+- Owner-approved on 2026-11-02, in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §8. Simulations always run with no player, and the world lives on its own. Both sides pursue their goals with the same seriousness. Allied factions act on goals as enemy NPCs do: they choose a city and forces, gather, and go; they reinforce a city under attack; they really try to retake captured cities while their forces allow; and they try to hold the capital at the end. They must defend the capital, so only a pool of forces is free. They post Liberation Contracts to other factions, Factionless characters, and otherworldly people. They have Limit 2 Allied Generals who want the Cult Generals dead. Their goddess on the Divine Plane can intervene now and then, with abilities up to Limit 0, through a Divine Blessing or strengthening of one or several direct followers, perhaps a global strengthening, never as constant attention. These events are how the war reaches the player. With no player the allied side wins at low settings, the middle setting is 40/60 in favour of the cult, and higher settings are 20/80 and worse. Only the player's actions can turn this: gear, progression, the quality of those actions, the help given in defences and liberations, and how far the character grows, possibly to Limit 2. The slice aims at about 40/60 with no player and has no easier or harder variant for now. The simulation gives 42/57 at the middle setting, 19/78 at the High setting, and 40 % for the slice's allies alone. Which numbers reach this are authoring defaults and working readings, kept in CC-43 and CC-44.
 
 ## Dialogue
 
@@ -128,6 +128,10 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 
 ---
 
+## Alchemical Flask
+
+- Proposed on 2026-11-02 in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) §5b, and not approved. The owner asked that one more ally change the slice's odds less, and that active abilities be added if the simulation still showed one fighter doubling the chance. Of the rules tried on the Combat Grid only an attack on an area, kept with a group's deepest Limits, did this: one more club fell from +31 to +7 points and one more Limit 9 from +32 to +11. A thrown potion for 3 AP, at up to 6 cells, on 3 × 3 cells, for 20 magical damage, half on a miss, hits allies too, and is used up. The two deepest fighters of a group carry one each. Its price in the fight is 58 % of the damage and a battle of 5.9 rounds. The slice's working numbers assume it; without it the allies alone get 30 %. [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md) confirms only the advancement potion, so the category is the owner's decision, CC-46.
+
 # Next Design Priority
 
 ## Geography-first research history
@@ -139,6 +143,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 # AGENTS.md Update History
 
 The notes of `AGENTS.md`, newest first.
+
+2026-11-02 (Faction Influence is read from the war, and a Side Event changes the war directly)
 
 2026-11-02 (the owner's odds with no player and allied conduct recorded)
 

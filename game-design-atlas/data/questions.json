@@ -1417,7 +1417,7 @@
   },
   {
     "id": "q-cc-41",
-    "text": "CC-41. Do Combat Numbers V0 hold on the Combat Grid with cover, facing, flanking, and target rules, how much range does each weapon have, which weapon skills exist, and do magical attacks and conditions balance? Does headcount decide the slice's fight on the Combat Grid as much as it does in the simulation?",
+    "text": "CC-41. Do Combat Numbers V0 hold with cover, facing, and magical attacks, how much range does each weapon have, which weapon skills exist, do conditions balance, is a shooter worth too much, what else answers the side that throws first, and should the campaign's kill table take in the cult's edge and the flask?",
     "systemIds": [
       "confront"
     ],
@@ -1472,6 +1472,20 @@
     "text": "CC-45. Which change does each fork of POI A and POI B leave at the invasion, does a lost Harrow close that trace source, can a Side Event change how fast a side replaces followers, do unattended outcomes cancel out, and how does a Minor Faction's Side Event reach the war?",
     "systemIds": [
       "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-46",
+    "text": "CC-46. Is a thrown Alchemical Flask a category Alchemy should have, who may throw one, how many does a group carry, what limits how many a player brings, what does one cost to brew, and how large a share of a fight's damage may it take?",
+    "systemIds": [
+      "confront",
+      "alchemy"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority — Cult Campaign and City Control",

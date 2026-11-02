@@ -1285,8 +1285,8 @@
   },
   {
     "id": "d-combat-numbers-v0",
-    "statement": "Combat Numbers V0 are authoring defaults in 10.2 §5b: 70 % base hit, Accuracy against Evasion, 10 AP plus Dexterity / 20, weapons from 3 AP to 7 AP, defence / (defence + 50) reduction capped at 75 %, and a Will Contest from 50 %. In the slice the ritual group is a Limit 8 senior and two Limit 9 conductors, a Limit 7 follower leads the main force, and the 5 allies are two of Limit 9 and three of Limit 8.",
-    "rationale": "The owner left balance calculations to the agent. A simulation gives even duels between peers and even weapons, and it gives the allies alone a 39 % chance of stopping the ritual, while an open assault on the ritual fails.",
+    "statement": "Combat Numbers V0 are authoring defaults in 10.2 §5b: 70 % base hit, Accuracy against Evasion, 10 AP plus Dexterity / 20, weapons from 3 AP to 7 AP, defence / (defence + 50) reduction capped at 75 %, and a Will Contest from 50 %. In the slice the ritual group is a Limit 8 senior and two Limit 9 conductors, a Limit 7 follower leads the main force, and the 5 allies are two of Limit 9 and three of Limit 8. The two allied Limit 9 fighters have bows, one cult Limit 9 fighter has a crossbow, and a cult fighter has +1 over an allied fighter of the same Limit.",
+    "rationale": "The owner left balance calculations to the agent. A simulation gives even duels between peers and even weapons, and on the Combat Grid it gives the allies alone a 40 % chance of stopping the ritual, while an open assault on the ritual fails.",
     "alternatives": "A Limit 7 senior at the ritual, which leaves the best plan at 3 %.",
     "systemIds": [
       "confront"
@@ -1408,5 +1408,36 @@
       "src-21"
     ],
     "dateNote": "Owner decision, 2026-11-02."
+  },
+  {
+    "id": "d-target-rules-v0",
+    "statement": "NPCs close in on the nearest targets, a melee fighter tries for the shooters and attacks whoever it reaches on the way, and each side goes first for whoever brings the most to the fight and can actually be harmed. Working form: Target Impact and Held in 10.2 §5a.",
+    "rationale": "With no positions a fight is a race of total damage, and one more body decides it. The owner wants strategic decisions on both sides and enemies a little stronger than allies.",
+    "alternatives": "Nearest target only, which plays worse; machine-learning AI, which the owner ruled out.",
+    "systemIds": [
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-10"
+    ],
+    "dateNote": "Direction owner-approved, 2026-11-02; numbers are working readings."
+  },
+  {
+    "id": "d-alchemical-flask",
+    "statement": "A thrown potion that deals magical damage on 3 × 3 cells and hits allies too, carried by the two deepest fighters of a group.",
+    "rationale": "Of the rules tried on the Combat Grid only an attack on an area, kept with deep Limits, made one more fighter weigh little: +7 points for a club and +11 for a Limit 9, against +31 and +32 before.",
+    "alternatives": "Higher damage, which helps a little; morale, stun, sweep, and flat armour, which did not help; one flask a side, which keeps more melee and lets one body weigh more.",
+    "systemIds": [
+      "confront",
+      "alchemy"
+    ],
+    "status": "proposed",
+    "origin": "imported",
+    "sourceIds": [
+      "src-10"
+    ],
+    "dateNote": "Proposed 2026-11-02; awaiting the owner in CC-46."
   }
 ]
