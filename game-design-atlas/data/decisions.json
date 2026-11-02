@@ -1345,5 +1345,20 @@
       "src-11"
     ],
     "dateNote": "Owner-approved answers, 2026-11-02."
+  },
+  {
+    "id": "d-campaign-numbers-v0",
+    "statement": "Campaign Numbers V0 are authoring defaults in 21 §8, checked by a simulation of the war with no player. Off-screen fights run tick by tick over a per-city ledger of followers per Limit, using a kill table from Combat Numbers V0, and the Force Estimate is the square-law ratio over that table. Cult Pace runs from ×0.5 to ×1.5 in five steps.",
+    "rationale": "At the middle setting they give 10.3 sorties by day 18, 62 % of sorties taking a city, and the Capital Gate open on day 19 on average. A table replaces a single strength value because hit chances are capped.",
+    "alternatives": "A single strength value per Limit, which cannot express large Limit gaps, or a full tactical simulation of every unseen fight.",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Authoring defaults, 2026-11-02. The owner leaves balance calculations to the agent."
   }
 ]

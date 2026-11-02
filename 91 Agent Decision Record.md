@@ -1,10 +1,10 @@
 # 91 Agent Decision Record
 
-Version: 1.2
+Version: 1.3
 
 Status: Draft
 
-Last Updated: 2026-11-02 (traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
+Last Updated: 2026-11-02 (Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [AGENTS.md](AGENTS.md)
@@ -60,7 +60,7 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 
 ## Combat numbers
 
-- Combat Numbers V0 are in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) §5b, checked by `tools/balance/combat_sim.py`. The owner leaves balance calculations to the agent (2026-11-02): calculate them, check them by simulation, and label them authoring defaults. In the slice the ritual group is a Limit 8 senior and two Limit 9 conductors, a Limit 7 follower leads the main force, and the 5 allies are three of Limit 9 and two of Limit 8. A conductor who fights goes on conducting and has 3 AP less each turn. The owner approved that rule on 2026-11-02.
+- Combat Numbers V0 are in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) §5b, checked by `tools/balance/combat_sim.py`. The owner leaves balance calculations to the agent (2026-11-02): calculate them, check them by simulation, and label them authoring defaults. In the slice the ritual group is a Limit 8 senior and two Limit 9 conductors, a Limit 7 follower leads the main force, and the 5 allies are three of Limit 9 and two of Limit 8. A conductor who fights goes on conducting and has 3 AP less each turn. The owner approved that rule on 2026-11-02. Campaign Numbers V0 are in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §8, checked by `tools/balance/campaign_sim.py`. At the middle setting with no player they give 10.3 sorties by day 18, 62 % of sorties taking a city, and the Capital Gate open on day 19 on average. They rest on working readings kept in CC-43.
 
 ## Dialogue
 

@@ -1033,7 +1033,7 @@
   },
   {
     "id": "q-cc-12",
-    "text": "CC-12. The order of rates, first sortie days, and force sizes are decided. What are the exact rates, the stage mix of each General's followers, and any cap?",
+    "text": "CC-12. Working answer: Campaign Numbers V0 in 21 §8 give rates, Limit mixes, and a cap of 30. Do they hold in play with a player in the world?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1046,7 +1046,7 @@
   },
   {
     "id": "q-cc-13",
-    "text": "CC-13. Replacement happens in cities a faction holds. What are allied starting forces and replacement rates, and can a whole Major Faction die?",
+    "text": "CC-13. Working answer: Campaign Numbers V0 in 21 §8 give starting forces and replacement. Can a whole Major Faction die, and what happens to Faction Entry if it does?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1059,7 +1059,7 @@
   },
   {
     "id": "q-cc-14",
-    "text": "CC-14. Resolved: the eighth slider, Cult Pace, owns campaign pace. Its range and steps are open.",
+    "text": "CC-14. Resolved: the eighth slider, Cult Pace, owns campaign pace. Authoring defaults for its range and steps are ×0.5 to ×1.5 in five steps.",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1072,7 +1072,7 @@
   },
   {
     "id": "q-cc-15",
-    "text": "CC-15. A sortie's result depends on the city's defence, allied forces can kill a General, and unseen fights are simulated by tick. How is that comparison calculated, and is a per-city ledger the right model?",
+    "text": "CC-15. Working answer: a per-city ledger of followers per Limit and a kill table from Combat Numbers V0. The ledger is harsher on defenders than the tactical simulation in small even fights. Does that matter once the player sees both sides of one battle?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1350,7 +1350,7 @@
   },
   {
     "id": "q-cc-36",
-    "text": "CC-36. Can the undoing be interrupted? Where is the ritual site? How does the Force Estimate calculate, does difficulty change how boldly each side acts, and how many followers does each ritual need?",
+    "text": "CC-36. Can the undoing be interrupted? Where is the ritual site? The Force Estimate has a working calculation in 21 §8. Does difficulty change how boldly each side acts, and how many followers does each ritual need?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1431,6 +1431,19 @@
   {
     "id": "q-cc-42",
     "text": "CC-42. How many traces does a first-time player find, do four in the city fit into one to two game days, and how much can Character Notes hold before they work as a quest journal?",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-43",
+    "text": "CC-43. Campaign Numbers V0 rest on three working readings: does the Spirit General stand at the ritual while the others go with the main force, does the lowest setting lower the Generals' attributes, and should the hardest combination end the war in about 8 game days?",
     "systemIds": [
       "cult-campaign"
     ],

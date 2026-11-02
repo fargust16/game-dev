@@ -1,10 +1,10 @@
 # 21 Cult Campaign and City Control
 
-Version: 0.22
+Version: 0.23
 
 Status: Draft — owner-approved direction, incomplete specification
 
-Last Updated: 2026-11-02 (the source of traces recorded; the slice's scheme lives in 11. Earlier: a conductor who fights loses 3 AP, owner-approved. Earlier: working reading: a conductor who fights loses 3 AP. Earlier: the Cult Thought Link carries orders and reports only; Посланник restored. Earlier: Ritual Weak Points added. Earlier: ritual dialogue checks are Final Checks. Earlier: dialogue checks follow 10.4. Earlier: stealth in a captured city follows 10.3. Earlier: the Force Estimate governs every side; a senior's death has no effect of its own. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate; ritual group numbers set. Earlier: allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
+Last Updated: 2026-11-02 (Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: the source of traces recorded; the slice's scheme lives in 11. Earlier: a conductor who fights loses 3 AP, owner-approved. Earlier: working reading: a conductor who fights loses 3 AP. Earlier: the Cult Thought Link carries orders and reports only; Посланник restored. Earlier: Ritual Weak Points added. Earlier: ritual dialogue checks are Final Checks. Earlier: dialogue checks follow 10.4. Earlier: stealth in a captured city follows 10.3. Earlier: the Force Estimate governs every side; a senior's death has no effect of its own. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate; ritual group numbers set. Earlier: allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07 Character Life](07%20Character%20Life.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -77,7 +77,7 @@ These follow from existing values. They are planning figures, not measurements.
 | Land at today's land share | about 6.4 km² | Today's 2.83 km² scaled by world area |
 | Distance between neighbouring cities | about 1 km, about 23 ticks | 7 cities evenly spread over that land; roads and relief lengthen it |
 | Unopposed capture rate | one city per 2.5–3.3 game days | 6 non-capital cities over 15–20 days |
-| Six non-capital cities fallen | about day 18 | First sorties on days 3–8, then one sortie every 1–2 days across the Generals, 60% of sorties succeed |
+| Six non-capital cities fallen | about day 19 | Simulated with no player, day 14–25 in most worlds: Campaign Numbers V0, §8 |
 
 ## Effect on geography
 
@@ -215,7 +215,7 @@ How many Weak Points a campaign ritual has, and which further kinds exist, is op
 
 ## Force Estimate (owner-approved)
 
-Every group, cult or allied, decides whether to fight from a **Force Estimate**: a calculation over the strength of each side, as in strategy games such as Heroes of Might and Magic, and as the rangers of Space Rangers 2 do against the Dominators.
+Every group, cult or allied, decides whether to fight from a **Force Estimate**: a calculation over the strength of each side, as in strategy games such as Heroes of Might and Magic, and as the rangers of Space Rangers 2 do against the Dominators. The working calculation is in §8.
 
 - Defenders who see that the odds are too great may fight for a moment and then flee, flee at once, or never enter the fight.
 - Cult followers fight while they have a chance to win, and flee only when the balance is very strongly against them. Unlike the Dominators, they are people and can run. This rule may be dropped later.
@@ -356,6 +356,7 @@ The three Generals are therefore the top of the cult's living hierarchy. Above t
 
 - A killed General is not replaced, because killing all three must remain able to end the campaign. Whether the cult's reinforcement slows as Generals fall is open (CC-9).
 - A General is a persistent named actor, not a generated follower.
+- During a sortie the Spirit General stands at the ritual, while the Holding and Raiding Generals go with the main force. If every General stood at the ritual, a city would fall in 41 % of sorties, not 62 %, and the Gate would open on day 24 on average, not day 19 (CC-43).
 - The Holding General does not Break Away or offer a Yield. This is an exception for one actor, not a change to [08 Confront Constraints](08%20Confront%20Constraints.md).
 - The three behaviours are fixed archetypes across worlds. The World Seed varies who the Generals are, their bases, and their target order, so that a past world teaches how to read a General without solving the next one. Whether they vary by Arcana depends on CC-22.
 
@@ -418,6 +419,94 @@ A sortie can succeed or fail, depending on how strong the city's defence is:
 
 After a capture, each General gathers its next force in its own way (§7), and the garrison stays behind.
 
+## Campaign Numbers V0 (authoring defaults)
+
+The owner left balance calculations to the agent on 2026-11-02. These values are checked by `tools/balance/campaign_sim.py`: a war with no player, 300 worlds for each setting, up to the day the Capital Gate opens. The final attack is left out, because its design is open (CC-17), and the Gate counts only cities under Cult Control. Every value here can change in playtest.
+
+### Cult Forces
+
+| General | Followers per day | Limit mix |
+|---|---:|---|
+| Spirit | 6.0 | 75 % Limit 9, 25 % Limit 8 |
+| Raiding | 4.0 | 50 % Limit 9, 35 % Limit 8, 15 % Limit 7 |
+| Holding | 2.8 | 35 % Limit 9, 40 % Limit 8, 20 % Limit 7, 5 % Limit 6 |
+
+- A General launches a sortie at 18–22 followers, set by the seed. Six go to the ritual.
+- A force waiting for a target stops growing at 30.
+- After a failed sortie a General waits one day.
+- The Holding General leaves 5 behind, and the Raiding General walks away with 3.
+
+### Allied forces
+
+- An ordinary city starts with 10 followers and the capital with 24, in the mix 55 % Limit 9, 30 % Limit 8, 12 % Limit 7, 3 % Limit 6.
+- Two Limit 5 and one Limit 4 stand in random cities, and one Limit 3 stands in the capital. The world starts with about 88 allied followers.
+- Each held city gains 0.35 followers a day, and the capital 0.7. Of these, 70 % are Limit 9 and the rest Limit 8.
+- When a city is attacked, every other non-capital city sends 6 % of its followers, about three in all. A seer's warning doubles that, on 30 % of the Spirit General's sorties.
+- Each day one faction's share of the spare followers, a third, may attack a city. A city keeps 8 at home and the capital 16. Below 40 % of the starting force the factions unite.
+
+An ordinary city holds about half of the "full city" of 20 named above. With 14 in an ordinary city the Gate opens on day 25 on average, and with 20 on day 31 in only a third of worlds, so the war outlasts its 15–20 days.
+
+### Force Estimate and fights nobody sees
+
+A fight off-screen runs tick by tick over a ledger of followers per Limit. It uses a kill table built from Combat Numbers V0 ([10.2](10.2%20Combat%20System%20Draft.md) §5b):
+
+```text
+kills per tick of one i on one j = 0.62 × attacks × hit chance / hits to kill
+hits to kill = HP of j / (blow of i × (1 − reduction of j)), at least 1
+Force Estimate of A against B = (kills per tick of A × size of A) / (kills per tick of B × size of B)
+```
+
+A table replaces a single strength value because hits are capped at 5 %, so a scalar cannot express a Limit 9 against a Limit 2. Above 1, side A should win. Each side rolls one luck factor for the fight, log-normal with a spread of 0.2. Wounds carry over between ticks.
+
+- Defenders stay out of a fight at an estimate below 0.35.
+- Allied factions attack a city only at 3.0 or more.
+- Cult Retreat comes when the cult's own estimate falls below 0.15. Those who retreat suffer 8 more ticks of attacks, and the Holding General never retreats.
+
+The ledger reproduces the two extremes of the tactical simulation: 5 Limit 5 against a General 87 % (tactical 87 %), and a Limit 8 against a Limit 9 98 % (93 %). It is harsher on defenders in small even fights: 5 allies against 5, 6, and 7 give 19, 4, and 1 %, against 47, 15, and 1 % in the tactical simulation, which has allied abilities the ledger does not.
+
+### Results at the middle setting
+
+| Target | Result |
+|---|---|
+| First sorties on days 3–5, 5–7, 7–8 | Days 2.9–3.9, 4.5–6.0, 6.4–8.5 |
+| One sortie every 1–2 days | 10.3 sorties by day 18 |
+| 60 % of sorties succeed | 62 % |
+| Allies hold the first attempts | The first sortie takes its city in 5 % of worlds |
+| Six cities fallen about day 18 | Mean day 19, 10th to 90th percentile days 14–25, in 92 % of worlds within 40 days |
+| A General rarely dies to allies | 0.42 per world, all three in 3 % of worlds |
+| Losses outpace replacement | 88 allies at the start, 43 on day 15 |
+| Fifty followers is too many | The largest garrison was 34 |
+
+The ritual completes in 67 % of sorties, and allies liberate 1.8 cities per world.
+
+### Cult Pace
+
+Cult Pace multiplies the rates above, in five steps. Combat stays at the middle setting in this table.
+
+| Cult Pace | Gate opens within 40 days | Mean day | 10th to 90th percentile |
+|---:|---:|---:|---:|
+| ×0.5 | 17 % of worlds | 35 | 31–40 |
+| ×0.75 | 82 % | 26.5 | 20–35 |
+| ×1 | 92 % | 19 | 14–25 |
+| ×1.25 | 96 % | 15 | 11–20 |
+| ×1.5 | 98 % | 13 | 9–17 |
+
+Cult Pace changes when cities fall, not whether they fall: a city falls in about 60 % of sorties at every step. Only Combat Difficulty moves that share. At ×0.5 neither side finishes in most worlds, so a slow pace alone does not win the game for the allies.
+
+### Combat Difficulty
+
+Working reading: one step of Combat Difficulty moves the Limit mix of the Cult Forces one Limit deeper, up to Limit 5, and the lowest step moves it one Limit shallower.
+
+| Setting | A city falls | First sortie takes it | Gate, mean day |
+|---|---:|---:|---:|
+| Pace ×1, one step harder | 69 % | 21 % | 15 |
+| Pace ×1.25, one step harder | 69 % | 23 % | 12 |
+| Pace ×1.5, two steps harder | 86 % | 82 % | 7.6 |
+
+Two steps harder gives what §8 asks of harder settings, a city almost certain to fall. It also ends the war in about 8 game days, or about 21 real hours.
+
+The lowest setting needs more than a slow cult, because allied followers of Limit 6 or shallower hardly hurt a General. Working reading for it: Cult Pace ×0.5, followers one Limit shallower, the Generals' attributes at 45 instead of 75, and allied factions of Limit 5 and deeper all going to every attacked city. All three Generals then die in 100 % of worlds, on day 14.7 on average, and no city falls.
+
 ## Working readings
 
 - "Not tied to the general rules" applies to how often followers appear and where they come from. It does not change character rules. Generated cult followers use the same attributes, skills, Limits, and derived-statistic formulas as every other actor, as [02 World Laws](02%20World%20Laws.md) requires. They are generated at their stage and do not play through Alchemy or Conduct Progress.
@@ -456,7 +545,7 @@ Captured and liberated cities must look different in the world. Their Symptoms a
 
 The campaign adds state that [02 World Laws](02%20World%20Laws.md) did not previously track: City Control, the forces present in each city, and three General actors.
 
-The World Engine remains an operation scheduler, not a population simulation. Proposed direction, subject to CC-15: each city keeps a coarse ledger of followers per faction and Limit, and only instantiates characters when the player enters. This follows [04 Points of Interest](04%20Points%20of%20Interest.md)' Lazy Activation.
+The World Engine remains an operation scheduler, not a population simulation. Proposed direction, subject to CC-15: each city keeps a coarse ledger of followers per faction and Limit, and only instantiates characters when the player enters. Its working calculation is in §8. This follows [04 Points of Interest](04%20Points%20of%20Interest.md)' Lazy Activation.
 
 An occupied city is persistent world state rather than a timed POI, because it has no Active Window. Discrete events inside it, such as a ritual or a clash, remain POIs.
 
