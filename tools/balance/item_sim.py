@@ -4,11 +4,12 @@
 but no modifier types or values. This file tries a working catalogue of them, made
 as 19 §3 makes them. Every value here is an authoring default, not a rule. Soldiers
 differ a little by a random spread of attributes, and the rest of a fighter's
-strength comes from its items.
+strength comes from its items, which it buys in the shops both sides share.
 
 Run: python tools/balance/item_sim.py [fights per line] [section]
 """
 import io
+import math
 import random
 import sys
 import zlib
@@ -46,7 +47,8 @@ ALL_TYPES = tuple(VALUE)
 TIER_STEP = 0.5
 TIER_WEIGHTS = {9: ((9, 8, 7), (70, 25, 5)), 8: ((9, 8, 7, 6), (35, 40, 20, 5))}
 QUALITY = {"Normal": (0, 0), "Magic": (1, 2), "Rare": (3, 3), "Epic": (4, 4), "Legendary": (5, 6)}
-SOLDIER, OFFICER, MASTER = 26, 67, 95
+CITY, CAPITAL, FACTION = 26, 50, 75
+GIFT = (("Magic", "Rare", "Epic"), (70, 28, 2))
 
 
 @dataclass(frozen=True)
@@ -249,9 +251,9 @@ def grid_job(_):
 
 @dataclass(frozen=True)
 class Supply:
-    """The skill of the armourers who dress a rank: Limit 9, 8, and 7. None means no items."""
-    allies: tuple = (SOLDIER, OFFICER)
-    cult: tuple = (SOLDIER, SOLDIER, OFFICER)
+    """The Shop Skill a rank buys at: Limit 9, 8, and 7. None means no items."""
+    allies: tuple = (CITY, CAPITAL)
+    cult: tuple = (CITY, CITY, CAPITAL)
     bonus: int = 1
     scale: float = 1.0
     spread: int = SPREAD
@@ -288,28 +290,24 @@ MINORS = {
 SUPPLIES = {
     "as they are": V0,
     "no items at all": Supply(allies=(None, None), cult=(None, None, None)),
-    "allied armourers -20": Supply(allies=(6, 47)),
-    "allied armourers -10": Supply(allies=(16, 57)),
-    "allied armourers -5": Supply(allies=(21, 62)),
-    "allied armourers +5": Supply(allies=(31, 72)),
-    "allied armourers +10": Supply(allies=(36, 77)),
-    "allied armourers +20": Supply(allies=(46, 87)),
-    "cult armourers -20": Supply(cult=(6, 6, 47)),
-    "cult armourers -10": Supply(cult=(16, 16, 57)),
-    "cult armourers -5": Supply(cult=(21, 21, 62)),
-    "cult armourers +5": Supply(cult=(31, 31, 72)),
-    "cult armourers +10": Supply(cult=(36, 36, 77)),
-    "cult armourers +20": Supply(cult=(46, 46, 87)),
-    "allies a quality up": Supply(allies=(OFFICER, MASTER)),
-    "allies a quality down": Supply(allies=(1, SOLDIER)),
-    "cult a quality up": Supply(cult=(OFFICER, OFFICER, MASTER)),
-    "cult a quality down": Supply(cult=(1, 1, SOLDIER)),
-    "every rank dressed alike": Supply(cult=(SOLDIER, OFFICER, OFFICER)),
-    "half the cult Limit 9 better": Supply(cult=((SOLDIER, OFFICER), SOLDIER, OFFICER)),
-    "half the cult Limit 8 better": Supply(cult=(SOLDIER, (SOLDIER, OFFICER), OFFICER)),
-    "half the cult Limit 9 with no items": Supply(cult=((SOLDIER, None), SOLDIER, OFFICER)),
-    "half the cult Limit 8 with no items": Supply(cult=(SOLDIER, (SOLDIER, None), OFFICER)),
-    "cult Limit 7 with no items": Supply(cult=(SOLDIER, SOLDIER, None)),
+    "city shops -10": Supply(allies=(CITY - 10, CAPITAL), cult=(CITY - 10, CITY - 10, CAPITAL)),
+    "city shops -5": Supply(allies=(CITY - 5, CAPITAL), cult=(CITY - 5, CITY - 5, CAPITAL)),
+    "city shops +5": Supply(allies=(CITY + 5, CAPITAL), cult=(CITY + 5, CITY + 5, CAPITAL)),
+    "city shops +10": Supply(allies=(CITY + 10, CAPITAL), cult=(CITY + 10, CITY + 10, CAPITAL)),
+    "city shops +20": Supply(allies=(CITY + 20, CAPITAL), cult=(CITY + 20, CITY + 20, CAPITAL)),
+    "every shop +10": Supply(allies=(CITY + 10, CAPITAL + 10), cult=(CITY + 10, CITY + 10, CAPITAL + 10)),
+    "every shop +20": Supply(allies=(CITY + 20, CAPITAL + 20), cult=(CITY + 20, CITY + 20, CAPITAL + 20)),
+    "allies alone -10": Supply(allies=(CITY - 10, CAPITAL - 10)),
+    "allies alone +10": Supply(allies=(CITY + 10, CAPITAL + 10)),
+    "cult alone -10": Supply(cult=(CITY - 10, CITY - 10, CAPITAL - 10)),
+    "cult alone +10": Supply(cult=(CITY + 10, CITY + 10, CAPITAL + 10)),
+    "allied Limit 8 at the city shop": Supply(allies=(CITY, CITY)),
+    "cult Limit 8 at the capital": Supply(cult=(CITY, CAPITAL, CAPITAL)),
+    "half the cult Limit 9 at the capital": Supply(cult=((CITY, CAPITAL), CITY, CAPITAL)),
+    "half the cult Limit 9 with no items": Supply(cult=((CITY, None), CITY, CAPITAL)),
+    "half the cult Limit 8 with no items": Supply(cult=(CITY, (CITY, None), CAPITAL)),
+    "cult Limit 7 at the city shop": Supply(cult=(CITY, CITY, CITY)),
+    "cult Limit 7 with no items": Supply(cult=(CITY, CITY, None)),
     "no spread": Supply(spread=0),
     "spread ±4": Supply(spread=4),
     "modifiers ×0.75": Supply(scale=0.75),
@@ -328,15 +326,15 @@ def changed_one(limit, skill):
 
 
 ONE_FIGHTER = {
-    "one allied Limit 9 in an officer's set": lambda: changed_one(9, OFFICER),
-    "one allied Limit 8 in a master's set": lambda: changed_one(8, MASTER),
-    "one allied Limit 8 in a soldier's set": lambda: changed_one(8, SOLDIER),
+    "one allied Limit 9 at the capital's shop": lambda: changed_one(9, CAPITAL),
+    "one allied Limit 8 at the faction's shop": lambda: changed_one(8, FACTION),
+    "one allied Limit 8 at the city shop": lambda: changed_one(8, CITY),
     "one allied Limit 8 with no items": lambda: changed_one(8, None),
 }
 
 
 def looted(n, items):
-    return supplied(c.hero9(), SOLDIER, items, random.sample(list(SLOTS), n))
+    return supplied(c.hero9(), CITY, items, random.sample(list(SLOTS), n))
 
 
 def stage_8_two(items):
@@ -345,13 +343,18 @@ def stage_8_two(items):
     return supplied(u, 15, items, tuple(s for s in SLOTS if s not in ("weapon", "body")))
 
 
+def gift(u, items):
+    """Faction Gift: one weapon or body armour of a rolled quality."""
+    return item(u, random.choice(("weapon", "body")), random.choices(*GIFT)[0], items)
+
+
 PLAYER = {
     "club, no items": lambda i: c.new_character(),
     "club, own work, skill 5": lambda i: supplied(c.new_character(), 5, i),
     "club, own work, skill 15": lambda i: supplied(c.new_character(), 15, i),
     "club, a Rare weapon": lambda i: item(c.new_character(), "weapon", "Rare", i),
-    "club, soldier's set": lambda i: supplied(c.new_character(), SOLDIER, i),
-    "club, officer's set": lambda i: supplied(c.new_character(), OFFICER, i),
+    "club, city set": lambda i: supplied(c.new_character(), CITY, i),
+    "club, capital set": lambda i: supplied(c.new_character(), CAPITAL, i),
     "Limit 9, no items": lambda i: c.ally9(),
     "Limit 9, same as the allies": lambda i: V0.wears(V0.allies)(c.ally9()),
     "Limit 8, same as the allies": lambda i: V0.wears(V0.allies)(c.ally8()),
@@ -364,10 +367,17 @@ PLAYER = {
     "hero L9, whole set stage 8, best of 3": lambda i: supplied(c.hero9(), 15, i, tries=3, stage=8),
     "hero L9, 4 looted items": lambda i: looted(4, i),
     "hero L9, 8 looted items": lambda i: looted(8, i),
-    "hero L9, soldier's set": lambda i: supplied(c.hero9(), SOLDIER, i),
-    "hero L9, officer's set": lambda i: supplied(c.hero9(), OFFICER, i),
-    "hero L8, soldier's set": lambda i: supplied(c.hero(), SOLDIER, i),
-    "hero L8, officer's set": lambda i: supplied(c.hero(), OFFICER, i),
+    "hero L9, best of 5, skill 15": lambda i: supplied(c.hero9(), 15, i, tries=5),
+    "hero L9, best of 10, skill 15": lambda i: supplied(c.hero9(), 15, i, tries=10),
+    "hero L9, best of 5, skill 25": lambda i: supplied(c.hero9(), 25, i, tries=5),
+    "hero L9, Faction Gift": lambda i: gift(c.hero9(), i),
+    "hero L9, own work skill 15 and Gift": lambda i: gift(supplied(c.hero9(), 15, i), i),
+    "hero L9, city weapon and body": lambda i: supplied(c.hero9(), CITY, i, ("weapon", "body")),
+    "hero L9, city set": lambda i: supplied(c.hero9(), CITY, i),
+    "hero L9, city set and Gift": lambda i: gift(supplied(c.hero9(), CITY, i), i),
+    "hero L9, capital set": lambda i: supplied(c.hero9(), CAPITAL, i),
+    "hero L8, city set": lambda i: supplied(c.hero(), CITY, i),
+    "hero L8, capital set": lambda i: supplied(c.hero(), CAPITAL, i),
 }
 
 
@@ -409,6 +419,10 @@ RULES = {
     "street of 8 cells": dict(width=8),
     "one enemy a Limit weaker": dict(shift=-1),
     "one enemy a Limit stronger": dict(shift=1),
+    "critical hits ×1.5": dict(crit=1.5),
+    "no Wait": dict(wait=False),
+    "NPCs walk into reach": dict(hold=False),
+    "no Wait, no holding back, ×1.5": dict(wait=False, hold=False, crit=1.5),
 }
 
 
@@ -458,6 +472,31 @@ def forced_job(size):
     return row(f"main force of {size}", t.chain(V0.rules(), V0.side, size, RUNS))
 
 
+# How much a fighter who only stands in Defence wins against one who attacks.
+def defence_job(name):
+    seeded(f"defence {name}")
+    rules = replace(t.PLAIN, gap=2, turtle=True)
+
+    def fighter(weapon):
+        u = c.ally8()
+        u.weapon = weapon
+        return u
+    weapon = {"one-handed": c.ONE_HAND, "shield": c.SHIELDED, "two-handed": c.TWO_HAND, "dagger": c.DAGGER}[name]
+    return row(f"only Defence, {name}", t.duel(rules, lambda: [fighter(weapon)], lambda: [c.ally8()], RUNS))
+
+
+def binomial(skill):
+    p = 0.10 + 0.60 * (skill - 1) / 99
+    return [math.comb(6, k) * p ** k * (1 - p) ** (6 - k) for k in range(7)]
+
+
+# What a shelf holds at each Shop Skill, by quality. 19 §3 with no Luck or Perception.
+def stock_job(skill):
+    b = binomial(skill)
+    share = {"N": b[0], "M": b[1] + b[2], "R": b[3], "E": b[4], "L": b[5] + b[6]}
+    return f"skill {skill:3} " + " ".join(f"{k} {v * 100:5.2f}" for k, v in share.items())
+
+
 # Does the outfit keep fights to a length the ritual allows?
 def length_job(_):
     seeded("length")
@@ -488,6 +527,8 @@ SECTIONS = {
     "levers": (lever_job, list(LEVERS)),
     "rules": (rule_job, list(RULES)),
     "force": (forced_job, [5, 6, 7]),
+    "defence": (defence_job, ["one-handed", "shield", "two-handed", "dagger"]),
+    "stock": (stock_job, [5, 15, 26, 36, 46, 50, 60, 70, 75, 95]),
     "length": (length_job, [0]),
 }
 

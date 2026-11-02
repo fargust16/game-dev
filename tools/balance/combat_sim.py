@@ -25,6 +25,7 @@ SUPPORT_DEFENCE = 5
 SLEEP_ROUNDS = 3
 CONDUCTING_AP = 3
 STAGE_STEP = 0.35
+CRIT = 2.0
 
 
 def stage_factor(stage):
@@ -99,6 +100,9 @@ class Unit:
     asleep: int = 0
     brace: bool = False
     exposed: bool = False
+    stance: bool = False
+    struck: bool = False
+    held: int = -1
     frac: float = 0.0
     extra: dict = field(default_factory=dict)
     gear: Gear = field(default_factory=Gear)
@@ -177,7 +181,7 @@ def strike(a, t, foes_of_t=(), side_of_t=(), bonus_crit=0.0, crit_extra=0.0, mul
     raw = a.crit_raw() + bonus_crit
     crit = 1.0
     if random.random() < min(0.95, raw):
-        crit = 1.5 + max(0, raw - 0.95) + crit_extra + a.gear.crit_damage
+        crit = CRIT + max(0, raw - 0.95) + crit_extra + a.gear.crit_damage
     damage = a.damage_roll() * crit * mult * (1 - mitigation(t.defence(side_of_t)))
     if t.brace:
         damage *= 1 - BRACE_REDUCTION

@@ -1417,7 +1417,7 @@
   },
   {
     "id": "q-cc-41",
-    "text": "CC-41. Do Combat Numbers V0 hold with cover, facing, and magical attacks, how much range does each weapon have, which weapon skills exist, do conditions balance, is a shooter worth too much, should an NPC that cannot reach an enemy this turn hold back, and should the campaign's kill table take in the cult's edge and Outfit V0?",
+    "text": "CC-41. Do Combat Numbers V0 hold with cover, facing, and magical attacks, how much range does each weapon have, which weapon skills exist, do conditions balance, is a shooter worth too much, why do allies who take the nearest target do better than Target Rules V0, and should the campaign's kill table take in the cult's edge, Outfit V0, Wait, and critical hits at ×2?",
     "systemIds": [
       "confront"
     ],
@@ -1496,7 +1496,21 @@
   },
   {
     "id": "q-cc-47",
-    "text": "CC-47. Does anything stop the seed or a Side Event from changing a side's armourers, how many sets may one Side Event change, who makes each side's sets and where do the cult's come from, and how does a player reach a set inside the slice's days?",
+    "text": "CC-47. Who makes each side's sets, and can the world shift one side's supply? Closed by the owner on 2026-11-02: no armourers, and both sides buy in the same shops.",
+    "systemIds": [
+      "confront",
+      "itemisation"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "resolved",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-48",
+    "text": "CC-48. What do items, ingredients, and lessons cost, how much does a task pay, what sets the ceiling on crafting when time does not, how fast do Shop Skill and stages rise with World Age, does stock run out, what happens to the shops of a captured city, how does Faction Influence act on a shelf, how are territories balanced by stage and difficulty, and which details of the Faction Gift and the slice's Masters stand?",
     "systemIds": [
       "confront",
       "itemisation"

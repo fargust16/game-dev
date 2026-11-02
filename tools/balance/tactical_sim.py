@@ -4,7 +4,9 @@ combat_sim.py has no space: anyone can hit anyone, so a fight is a race of total
 damage against total HP, and one more body decides it. This model puts the same
 fighters on cells. Melee fighters must walk, they are held by whoever stands next
 to them, and every fighter picks targets by impact: how much harm the target does
-to its side, against how fast this fighter can bring it down.
+to its side, against how fast this fighter can bring it down. Fighters can wait to
+the end of the round, hold back from an enemy's reach, and stand in a Defensive
+Stance that answers an attacker with a Counterattack.
 
 V0 is the configuration 10.2 reports, before items. The other switches of Rules
 are the levers tried against headcount, kept so that the table of levers can be
@@ -38,6 +40,9 @@ OBJECTIVE_BONUS = 3.0
 STUN_AP = 2
 STUN_SKILL = 5
 SWEEP_AP = 2
+DEFENCE_EVASION = 0.015
+DEFENCE_GUARD = 0.03
+COUNTER_AP = 2
 CONTROL_VALUE = {"sleep": 6.0, "stand": 3.0, "crush": 3.0, "support": 2.0}
 
 
@@ -66,6 +71,13 @@ class Rules:
     sweep_skill: int = 0
     sweep_mult: float = 1.0
     outfit: object = None
+    crit: float = c.CRIT
+    wait: bool = True
+    hold: bool = True
+    turtle: bool = False
+    stance_evasion: float = DEFENCE_EVASION
+    stance_guard: float = DEFENCE_GUARD
+    counter_ap: int = COUNTER_AP
 
 
 def cheb(a, b):
@@ -91,6 +103,8 @@ class Fight:
         for u in a + b:
             u.intent = None
             u.skip = u.asleep = 0
+            u.stance = False
+            u.held = -1
             u.threat = self.threat(u)
         self.leaders = [self.leader(a), self.leader(b)]
 
@@ -149,7 +163,15 @@ class Fight:
         ax, ay = a.x - t.x, a.y - t.y
         return any(b is not a and cheb(b, t) == 1 and (b.x - t.x) * ax + (b.y - t.y) * ay < 0 for b in alive(self.own(a)))
 
-    def strike(self, a, t, bonus_crit=0.0, crit_extra=0.0, mult=1.0, unguarded=False):
+    def strike(self, a, t, bonus_crit=0.0, crit_extra=0.0, mult=1.0, unguarded=False, counter=False):
+        hit = self.landed(a, t, bonus_crit, crit_extra, mult, unguarded)
+        price = t.weapon.ap + self.r.counter_ap
+        if t.stance and t.hp > 0 and a.hp > 0 and not counter and not a.weapon.ranged and not t.weapon.ranged and t.reserve >= price:
+            t.reserve -= price
+            self.strike(t, a, counter=True)
+        return hit
+
+    def landed(self, a, t, bonus_crit, crit_extra, mult, unguarded):
         flank = self.flanked(a, t)
         bonus_hit = c.FLANK_HIT if flank else 0.0
         bonus_crit += c.FLANK_CRIT if flank else 0.0
@@ -158,16 +180,19 @@ class Fight:
             t.exposed = False
         if a.weapon.ranged and any(cheb(a, f) == 1 for f in alive(self.foes(a))):
             bonus_hit -= ADJACENT_SHOT
+        if t.stance:
+            bonus_hit -= self.r.stance_evasion * t.reserve
         if random.random() >= self.chance(a, t, bonus_hit):
             return False
         raw = a.crit_raw() + bonus_crit + self.r.crit_bonus
-        crit = 1.5 + max(0, raw - 0.95) + crit_extra + a.gear.crit_damage if random.random() < min(0.95, raw) else 1.0
+        crit = self.r.crit + max(0, raw - 0.95) + crit_extra + a.gear.crit_damage if random.random() < min(0.95, raw) else 1.0
         damage = self.reduce(a.damage_roll() * crit * mult * self.r.damage_scale, t)
         if t.brace:
             damage *= 1 - c.BRACE_REDUCTION
         if not unguarded and not a.weapon.ranged and t.weapon.guard and t.reserve >= c.REACTION_AP and not t.asleep and not t.skip:
+            guard = t.weapon.guard_chance * (1 + self.r.stance_guard * t.reserve if t.stance else 1)
             t.reserve -= c.REACTION_AP
-            if random.random() < t.weapon.guard_chance:
+            if random.random() < guard:
                 damage *= 1 - t.weapon.guard_absorb
         t.hp -= damage
         t.asleep = 0
@@ -251,6 +276,7 @@ class Fight:
         return ap
 
     def attack(self, u, t, ap):
+        u.struck = True
         foes = alive(self.foes(u))
         around = [f for f in foes if cheb(u, f) == 1]
         if self.r.sweep_skill and u.skill >= self.r.sweep_skill and len(around) >= 2 and ap >= u.weapon.ap + SWEEP_AP:
@@ -273,21 +299,53 @@ class Fight:
                 self.strike(u, random.choice(rest), mult=0.5)
         return u.weapon.ap
 
+    def full_ap(self, u):
+        return math.floor(10 + u.dex / 20 + u.gear.ap) - (c.CONDUCTING_AP if u.conducting else 0)
+
+    def waits(self, u, later):
+        """Wait if nothing is in reach now, and an enemy still to act will walk into reach."""
+        if not self.r.wait or u.weapon.ranged or u.conducting or u.skip or u.asleep:
+            return False
+        reach = self.full_ap(u) - u.weapon.ap
+        if any(cheb(u, f) - 1 <= reach for f in alive(self.foes(u))):
+            return False
+        return any(not f.weapon.ranged and cheb(u, f) - 1 - self.full_ap(f) <= reach for f in later if f.hp > 0 and f in self.foes(u))
+
+    def holds(self, u, ap):
+        """Nothing to strike this turn: do not walk into the reach of whoever still has to act."""
+        foes = alive(self.foes(u))
+        if not self.r.hold or u.conducting or u.struck or min(cheb(u, f) for f in foes) - 1 + u.weapon.ap <= ap:
+            return False
+        return any(f in self.pending and not f.weapon.ranged and cheb(u, f) - 2 <= self.full_ap(f) - f.weapon.ap for f in foes)
+
+    def stand(self, u, ap):
+        """Defence: no attack this turn, and the AP left pay for it until the next one."""
+        u.stance = True
+        u.reserve = ap
+
     def turn(self, u, rnd):
+        self.pending.discard(u)
         u.brace = False
+        u.stance = u.struck = False
         if u.skip or u.asleep:
             u.skip = max(0, u.skip - 1)
             u.asleep = max(0, u.asleep - 1)
             u.reserve = 0
+            u.held = -1
             return
-        ap = self.control(u, u.ap())
+        pool = u.ap() if u.held < 0 else min(u.held, u.reserve)
+        u.held = -1
+        ap = self.control(u, pool)
         if u.hp <= 0:
+            return
+        if self.r.turtle and u in self.a and any(cheb(u, f) == 1 for f in alive(self.foes(u))):
+            self.stand(u, ap)
             return
         cost = u.weapon.ap
         first = True
         while True:
             foes = alive(self.foes(u))
-            if not foes or ap < 1:
+            if not foes or ap < 1 or u.hp <= 0:
                 break
             if u.intent not in foes or first:
                 u.intent = self.best(u, foes, ap)
@@ -318,6 +376,9 @@ class Fight:
                 ap -= self.attack(u, t, ap)
                 first = False
                 continue
+            if not adjacent and self.holds(u, ap):
+                self.stand(u, ap)
+                return
             need = cheb(u, t) - 1
             if adjacent:
                 near = self.best(u, adjacent, ap)
@@ -344,10 +405,23 @@ class Fight:
         total = sum(max(0, u.hp) / u.max_hp() * c.LIMIT_S[u.limit] ** 2 for u in side)
         return total * (self.r.leader_weight if leader is not None and leader.hp <= 0 else 1.0)
 
+    def queue(self, order):
+        """Turns of a round. A fighter who waits acts after everyone, the lowest Initiative first."""
+        self.pending = set(order)
+        waiting = []
+        for i, u in enumerate(order):
+            if u.hp > 0 and self.waits(u, order[i + 1:]):
+                u.held = u.reserve = u.ap()
+                u.stance = False
+                waiting.append(u)
+            else:
+                yield u
+        yield from reversed(waiting)
+
     def run(self, max_rounds):
         order = sorted(self.a + self.b, key=lambda u: -u.initiative())
         for rnd in range(1, max_rounds + 1):
-            for u in order:
+            for u in self.queue(order):
                 if u.hp <= 0:
                     continue
                 if self.objective is not None and self.objective.hp <= 0:

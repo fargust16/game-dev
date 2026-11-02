@@ -1,10 +1,10 @@
 # 91 Agent Decision Record
 
-Version: 1.10
+Version: 1.11
 
 Status: Draft
 
-Last Updated: 2026-11-02 (the slice's numbers in Items in fights updated. Earlier: the allies' edge in items recorded. Earlier: the Alchemical Flask rejected by the owner, and items recorded as what decides fights. Earlier: group fights on the Combat Grid recorded, and the Alchemical Flask proposed. Earlier: the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
+Last Updated: 2026-11-02 (Shops and Masters, and Wait and Defensive Stance, recorded. Earlier: the slice's numbers in Items in fights updated. Earlier: the allies' edge in items recorded. Earlier: the Alchemical Flask rejected by the owner, and items recorded as what decides fights. Earlier: group fights on the Combat Grid recorded, and the Alchemical Flask proposed. Earlier: the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [AGENTS.md](AGENTS.md)
@@ -64,7 +64,17 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 
 ## Items in fights
 
-- Owner's direction, 2026-11-02: attributes differ only slightly, with nothing like ×2 between peers, and soldiers differ by a random spread. Preparation through whole sets of items decides fights, and items strengthen a character significantly. No single item or consumable may change a battle's result that much, so the Alchemical Flask, proposed the same day as a thrown potion with area damage, is rejected. The Modifier Catalogue in [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §2.4 and Outfit V0 in [10.2](10.2%20Combat%20System%20Draft.md) §5b are authoring defaults checked by `tools/balance/item_sim.py`: the allies alone stop the slice's ritual in about 40 % of runs, one more club adds 12 points against 27 with no items, and one Rare weapon on that fighter adds about 2. The owner decided on 2026-11-02 that the allies' edge stays with their Limit 8 fighters, who wear officer's sets against the cult's soldier's sets; a cult Limit 9 stays a little stronger than an allied one. The other open points are CC-47.
+- Owner's direction, 2026-11-02: attributes differ only slightly, with nothing like ×2 between peers, and soldiers differ by a random spread. Preparation through whole sets of items decides fights, and items strengthen a character significantly. No single item or consumable may change a battle's result that much, so the Alchemical Flask, proposed the same day as a thrown potion with area damage, is rejected. The Modifier Catalogue in [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §2.4 and Outfit V0 in [10.2](10.2%20Combat%20System%20Draft.md) §5b are authoring defaults checked by `tools/balance/item_sim.py`: the allies alone stop the slice's ritual in about 40 % of runs, one more club adds 12 points against 29 with no items, and one Rare weapon on that fighter adds about 2. The owner decided on 2026-11-02 that the allies' edge stays with their Limit 8 fighters, who buy from the capital's Master while the cult's buy at the city shop; a cult Limit 9 stays a little stronger than an allied one.
+
+## Shops and Masters
+
+- Owner's direction, 2026-11-02: every city has shops of equipment, potions, First Aid, ingredients, and resources, and their keepers are the Masters who teach those professions. The capital's Masters are stronger, and the industry and artifact research faction has a more advanced Master with a shop. Both sides buy in the same shops, so no armourers are needed and the origin of a fighter's items needs no explanation. Shelves improve with the age of the world, and a Legendary stays far rarer than anything else at the start. Ingredients and resources differ by what lies around each city, and territories will be balanced by stage and difficulty, but not in the slice. Joining a faction may bring a Faction Gift, an item or several to choose from, Magic or Rare and very rarely Epic, random by seed. In the slice the player reaches gear by gathering, crafting, tasks, buying, and theft, with Enchanting left out and a Legendary very unlikely but possible.
+- Working readings, not owner decisions: stock is made by the formula of [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §3 at a Shop Skill of 26 in a city, 50 for a capital Master, and 75 for the faction's Master, rising by 1 a game day. Open points are CC-48.
+
+## Wait and Defensive Stance
+
+- Owner-approved, 2026-11-02: as in Heroes III, a fighter can wait, moving its turn to the end of the round, where those who waited act lowest Initiative first. An NPC with higher Initiative that cannot reach an enemy now, but will once that enemy has walked closer, waits. A fighter can go into defence instead of attacking, which raises its chance to evade, block, or parry in proportion and must not become a best move, and it answers an attacker with a Counterattack. Critical hits are ×2.
+- Working readings in [10.2](10.2%20Combat%20System%20Draft.md) §5b: each AP held in a Defensive Stance adds 1.5 Evasion and 3 % to block or parry, and a Counterattack costs the weapon's attack plus 2 AP. Hold Back is the agent's addition, because Waiting alone let a side with three Initiative modifiers win 90 % of fights.
 
 ## Campaign odds
 
@@ -80,7 +90,7 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 
 ## Vertical Slice target
 
-- The first implementation target is [11 Vertical Slice](11%20Vertical%20Slice.md), redefined by the owner on 2026-11-01: one city and a small territory at player Limits 9–8; a Factionless character may join the faction through a first-day trial; the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player stops the ritual and wins or loses. Required mechanics in a limited form: free exploration, gathering, Item Creation, Alchemy, combat, dialogue with checks, stealth, time, sleep. Out: Enchanting, Death Gap, Legacy Cache, Arcana change. Allies and enemies may be deeper than the player's Limits.
+- The first implementation target is [11 Vertical Slice](11%20Vertical%20Slice.md), redefined by the owner on 2026-11-01: one city and a small territory at player Limits 9–8; a Factionless character may join the faction through a first-day trial; the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player stops the ritual and wins or loses. Required mechanics in a limited form: free exploration, gathering, Item Creation, Alchemy, First Aid, shops and gold, theft, combat, dialogue with checks, stealth, time, sleep. Out: Enchanting, Death Gap, Legacy Cache, Arcana change. Allies and enemies may be deeper than the player's Limits.
 
 ## Engine
 
@@ -143,6 +153,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 # AGENTS.md Update History
 
 The notes of `AGENTS.md`, newest first.
+
+2026-11-02 (items are made as 19 §3 makes them; Outfit V0 reads as the skill of a side's armourers)
 
 2026-11-02 (the allies' edge in items stays with their Limit 8 fighters)
 

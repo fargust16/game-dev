@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.17
+Version: 0.18
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-02 (the question on reports names forces, not numeric Influence. Earlier: ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-02 (a Master teaches First Aid and sells its supplies. Earlier: the question on reports names forces, not numeric Influence. Earlier: ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -175,7 +175,7 @@ These are initial design/balance values, not final tuned durations. Endurance ma
 
 ## First Aid and professional treatment
 
-First Aid is a profession focused on preparing and applying practical medical supplies, not a universal source of HP restoration.
+First Aid is a profession focused on preparing and applying practical medical supplies, not a universal source of HP restoration. A Master teaches it and sells its supplies ([19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.1).
 
 Potential First Aid products and actions include:
 

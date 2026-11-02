@@ -1443,7 +1443,7 @@
   {
     "id": "d-items-in-fights",
     "statement": "Attributes differ only slightly and soldiers have a random spread. Whole sets of items decide fights and strengthen a character significantly. No single item or consumable may change a battle's result that much. The allies' edge in items stays with their Limit 8 fighters.",
-    "rationale": "The owner rejected a flask that did 58 % of a battle's damage and wants fights played through items. With Outfit V0 the allies alone stay near 40 %, one more club adds 12 points against 27 with no items, and one Rare weapon on one fighter adds about 2.",
+    "rationale": "The owner rejected a flask that did 58 % of a battle's damage and wants fights played through items. With Outfit V0 the allies alone stay near 40 %, one more club adds 12 points against 29 with no items, and one Rare weapon on one fighter adds about 2.",
     "alternatives": "Attributes ×2 or ×3, which the owner refused; the Alchemical Flask, rejected.",
     "systemIds": [
       "confront",
@@ -1456,5 +1456,37 @@
       "src-19"
     ],
     "dateNote": "Direction owner-approved, 2026-11-02; values are authoring defaults, CC-47."
+  },
+  {
+    "id": "d-shops-and-masters",
+    "statement": "Every city has shops kept by Masters who teach their professions. Both sides buy in them, so no armourers exist. Shelves improve with the age of the world, and joining a faction may bring a Faction Gift.",
+    "rationale": "The owner wants items to need no separate explanation. Because the shops are shared, every shop +20 moves the slice by only 2 points, so the world cannot tilt one side's supply.",
+    "alternatives": "Armourers for each side, withdrawn by the owner.",
+    "systemIds": [
+      "confront",
+      "itemisation"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-10",
+      "src-19"
+    ],
+    "dateNote": "Direction owner-approved, 2026-11-02; Shop Skill values are authoring defaults, CC-48."
+  },
+  {
+    "id": "d-wait-and-defensive-stance",
+    "statement": "A fighter can wait to the end of the round, and those who waited act lowest Initiative first; NPCs use it. Instead of attacking, a fighter can take a Defensive Stance and answer with a Counterattack, which must not become a best move. Critical hits are ×2.",
+    "rationale": "Going first used to lose fights, at 26 %, and a set of critical hits was the weakest. With Waiting and Hold Back, Initiative wins 60 %, and a critical set 42-45 %. A fighter who only stands in a stance wins 38 %, or 49 % with a shield.",
+    "alternatives": "A Counterattack with no extra AP, where standing still with a shield won 64 %.",
+    "systemIds": [
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-10"
+    ],
+    "dateNote": "Rules owner-approved, 2026-11-02; values are authoring defaults, and Hold Back is a working reading."
   }
 ]

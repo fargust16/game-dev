@@ -1,8 +1,8 @@
 # 19 Items, Crafting, Inventory, Equipment, and Enchanting
 
-Version: 0.7
+Version: 0.8
 Status: Draft — owner-confirmed rules with delegated starting-balance formulas; content tables, operation costs, and selected edge cases remain open
-Last Updated: 2026-11-02 (catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
+Last Updated: 2026-11-02 (shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -101,7 +101,7 @@ Owner's direction, 2026-11-02: items strengthen a character significantly, and w
 | Ring | Damage, Critical chance, Critical damage, Will |
 | Necklace | Will, HP, Initiative, Accuracy |
 
-A whole set is 11 pieces. At the average of 1.5 modifiers an item it carries about 16, and at 3 about 33. By the formula of §3 the first needs Item Creation of about 26 and the second about 67, so Outfit V0 of [10.2](10.2%20Combat%20System%20Draft.md) §5b is read as a soldier's set and an officer's set, by the skill of the armourers who make them. A character with skill 1–10 averages under one modifier an item, and stage 8 at skill 11 adds more than the modifiers do. Critical chance and Critical damage here are item modifiers, not the separately levelled attributes that [07.2](07.2%20Derived%20Character%20Statistics.md) excludes.
+A whole set is 11 pieces. A set from a city shop, at Shop Skill 26 (§6.1), carries about 16 modifiers, and one from a capital Master, at 50, about 26. A character with skill 1–10 averages under one modifier an item. Critical chance and Critical damage here are item modifiers, not the separately levelled attributes that [07.2](07.2%20Derived%20Character%20Statistics.md) excludes.
 
 # 3. Item Creation
 
@@ -217,6 +217,34 @@ There is no separate delete or replace operation. Full reforge is the only curre
 - The same per-item rule applies if a former player character exists as a world actor and is defeated: its current equipment may be recovered using the current looter's Luck. A new Character Life does not automatically inherit the previous character's carried or equipped inventory or extracted modifier instances.
 - Chests and other placed world containers may contain equipment, notes, ingredients, materials, money, and other appropriate items. Their rarity and loot tables remain open; combat must not create a completion chest solely because a fight ended.
 - A Legacy Cache is a separate intentional storage/inheritance system. This inventory rule does not resolve which item types, especially extracted modifier instances, may be placed in or inherited from it; see [07 Character Life](07%20Character%20Life.md) and §7.
+
+## 6.1 Shops and Masters
+
+Owner's direction, 2026-11-02. Numbers are authoring defaults checked by `tools/balance/item_sim.py`, and readings marked as working are not owner decisions.
+
+- Every city has sellers of equipment, potions, First Aid supplies, ingredients, and crafting resources. There are no separate armourers: a shop is a shop, allied and cult fighters buy in the same ones, and where a fighter's items came from needs no other explanation.
+- A shop is kept by a **Master** of its trade, who also teaches that profession. The capital's Masters are stronger and stock more. The Major Faction of industry and artifact research has a more advanced Master, with a shop of their own.
+- **Stock** is made as any item is made (§3), at the **Shop Skill** of its Master, with no Perception or Luck. Quality therefore needs no table of its own, and a Legendary is always far rarer than anything else at the start:
+
+| Shop Skill | Who | Normal | Magic | Rare | Epic | Legendary |
+|---:|---|---:|---:|---:|---:|---:|
+| 26 | City shop, first day | 17.6 % | 65.2 % | 13.3 % | 3.4 % | 0.5 % |
+| 36 | City shop, day 10 | 10.6 % | 61.6 % | 19.8 % | 6.7 % | 1.3 % |
+| 46 | City shop, day 20 | 6.1 % | 54.0 % | 25.6 % | 11.4 % | 3.0 % |
+| 50 | Capital's Master, first day | 4.8 % | 50.3 % | 27.4 % | 13.6 % | 4.0 % |
+| 70 | Capital's Master, day 20 | 1.3 % | 29.8 % | 31.1 % | 25.1 % | 12.7 % |
+| 75 | Faction's Master, first day | 0.9 % | 24.9 % | 30.4 % | 27.7 % | 16.2 % |
+| 95 | Faction's Master, day 20 | 0.1 % | 9.6 % | 21.7 % | 32.9 % | 35.7 % |
+
+- **World Age.** The longer a world lives, the better its shelves. Working reading: Shop Skill rises by 1 a game day. Higher stages also reach the shelves as the world ages; the pace is open (CC-48). Because both sides buy from the same shelves, this barely tilts a fight: every shop +20 moves the slice by 2 points ([10.2](10.2%20Combat%20System%20Draft.md) §5b).
+- Ingredients for sale depend on which monsters prevail around the city, and crafting resources on the trees, metal veins, and other sources around it, so cities differ. The capital is a first-level city, so beginner resources prevail around it, and farther cities differ by the difficulty of their zones. Territories must be balanced by stage and difficulty, which the slice does not need (CC-48).
+- The Equipment Quality slider of [02](02%20World%20Laws.md) sets the base Shop Skill, and the Economy slider and Faction Influence set prices, stock, and access, as 02 requires (working reading).
+
+## 6.2 Faction Gift
+
+Owner's direction, 2026-11-02: a character who joins a faction may receive a **Faction Gift**, an item or several to choose from, weapons or armour, random and set by the World Seed. It is Magic or Rare, and Epic in very rare cases.
+
+Working readings: the offer is three items and the character takes one, at Magic 70 %, Rare 28 %, Epic 2 %. In the slice one Gift adds about 1 point to a Limit 9 hero, so it is a welcome, not a set.
 
 # 7. Open design questions
 

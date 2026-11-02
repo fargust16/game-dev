@@ -1,8 +1,8 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.15
+Version: 0.16
 Status: Draft
-Last Updated: 2026-11-02 (open items run to CC-46. Earlier: Evasion and Blocking follow 10.2; question range corrected. Earlier: Persuasion, Intimidation, and Deception confirmed in 10.4. Earlier: terms renamed to Arcana and Limit. Earlier: Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
+Last Updated: 2026-11-02 (open items run to CC-48; Masters of gathering exist in the slice. Earlier: open items run to CC-46. Earlier: Evasion and Blocking follow 10.2; question range corrected. Earlier: Persuasion, Intimidation, and Deception confirmed in 10.4. Earlier: terms renamed to Arcana and Limit. Earlier: Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [99 Open Questions](99%20Open%20Questions.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -282,6 +282,8 @@ The current seven attributes are **Strength, Endurance, Dexterity, Perception, I
 | Strike or attempt to break a supported object using a suitable held item | No universal “destruction” skill decided | Strength; possibly Dexterity | Only explicitly supported objects can be broken; this does not imply that everything in the world is destructible. |
 
 ## 2. Gathering and resource extraction
+
+The owner's list for the slice has a Master of each of Woodcutting, Mining, and Herbalism, on 2026-11-02 ([11](11%20Vertical%20Slice.md)). They remain candidate skills until gathering is specified.
 
 | Action | Candidate skill | Candidate attribute influences | Notes |
 |---|---|---|---|
