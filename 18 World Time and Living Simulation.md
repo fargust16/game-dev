@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.12
+Version: 0.13
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-02 (fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-02 (sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -90,6 +90,7 @@ During ordinary free exploration, the shared game clock advances continuously at
 
 - A completed, uninterrupted sleep session fully restores the character's ordinary HP **only if no active condition or other effect prevents health recovery**.
 - Sleep also restores stamina. The rate and additional benefits depend on sleep comfort; exact values remain open.
+- A completed sleep restores a little Sanity ([07.2](07.2%20Derived%20Character%20Statistics.md)). The amount is open.
 - If Poison remains active, health and stamina recovery remain blocked for as long as the poison condition persists.
 - If Bleeding remains active, it continues to remove health during sleep and can kill the character before waking.
 - If a recovery-blocking condition is removed partway through sleep, the corresponding recovery may begin from that point onward. A condition is never treated as removed merely because the character slept.

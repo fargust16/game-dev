@@ -180,7 +180,7 @@ Canonical documents are the source of truth — not chat history.
 
 Draft foundations in active refinement:
 
-- [02 World Laws](02%20World%20Laws.md) — Influence, Seed, Main Goals, Side Events, Symptoms, Starting Faction, Difficulty
+- [02 World Laws](02%20World%20Laws.md) — Influence, Seed, Main Goals, Side Events, Symptoms, Character Start, Difficulty
 - [03 Decision Engine](03%20Decision%20Engine.md) — five axes; V1 teaches Attention + Approach, then Bargain
 - [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md) — practical design card
 - [04 Points of Interest](04%20Points%20of%20Interest.md) — map delivery + Active Windows + lazy activation

@@ -1,10 +1,10 @@
 # 07 Character Life
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft
 
-Last Updated: 2026-11-01 (terms renamed to Arcana and Limit. Earlier: Last Free City Rule recorded. Earlier: manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
+Last Updated: 2026-11-02 (every character starts Uninitiated and Factionless; attribute start and Character Archetypes recorded; the Starting Faction retired. Earlier: terms renamed to Arcana and Limit. Earlier: Last Free City Rule recorded. Earlier: manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md)
@@ -33,17 +33,28 @@ It answers:
 7. Legacy may be recovered, but ordinary leftovers are never fully guaranteed.
 8. A successor is a new person in a changed world, not a respawn.
 
-# First Character in a World
+# Character Start
 
-The first character created in a newly generated world receives a **Starting Faction**.
+Every character, in the slice and in the full game, starts **Uninitiated** and **Factionless**. The owner decided this on 2026-11-02, and it retires the Starting Faction, which went to the first character of a world.
 
-That Starting Faction:
+## Attributes at the start
 
-- gives an initial understanding of the faction's current Main Goal;
-- soft-nudges toward one Arcana;
-- is not a prison; defection remains possible later at a cost.
+All seven attributes start at 1. The player then does one of two things, once in a life:
 
-This is the only life that begins already inside a faction.
+- spends a small pool of points by hand, about 7, one for each attribute;
+- or chooses a **Character Archetype**, a preset spread in a fixed order that gives slightly more than the pool, about 9.
+
+The owner has no fixed preference between them. Playtests decide which stays. The point counts are authoring defaults, and the slice's archetypes are open (CC-38).
+
+## Character Archetypes in the full game
+
+This is a direction for later, not V1:
+
+- Archetypes are assembled from templates by seed, so they are not a fixed list.
+- An archetype is a backstory and attributes, and it may add a faction, an Arcana, or both.
+- A new world offers at most Limit 9.
+- The longer a world has lived, and depending on its state, the deeper the Limits an archetype may carry.
+- Not every archetype has a Limit. Some only give higher attributes.
 
 # Death
 
@@ -75,18 +86,17 @@ Exact day count remains a tuning Open Question. The rule that the gap is fixed a
 
 # New Character After Death
 
-## Factionless penalty
+## Factionless
 
-Every character after the first in the same world begins **Factionless**.
+Every character begins **Factionless**.
 
 Factionless means:
 
-- no Starting Faction privileges;
 - no initial Main Goal briefing from a faction;
 - no soft faction mentor door already open;
 - joining any faction requires a **Faction Entry** challenge.
 
-This is an intentional penalty for continued play in a world already shaped by previous lives. It preserves the value of the first foothold and makes Allegiance earned.
+This makes Allegiance earned.
 
 ## Faction Entry
 
@@ -100,11 +110,11 @@ No free faction swap menu.
 
 ## Creation choices in V1
 
-When creating a successor character, the player may choose light identity options later defined by content.
+When creating a character, the player sets the starting attributes as above and may choose light identity options later defined by content.
 
 System-critical rules for V1:
 
-- starts Factionless if not the first character in the world;
+- starts Factionless;
 - starts Uninitiated unless a special documented exception appears later;
 - inherits Player Knowledge only;
 - can see intentional Legacy Cache markers;
@@ -195,8 +205,7 @@ New world emphasises Player Knowledge without the same local residue.
 
 ## V1
 
-- First character: Starting Faction.
-- Later characters: Factionless until Faction Entry quest/node.
+- Every character: Uninitiated and Factionless until Faction Entry quest/node.
 - Fixed short Death Gap with world resolution pass.
 - One intentional Legacy Cache with next-life map marker.
 - Lightweight Soft Memory flags for rumours / a few dialogue opinion hooks.
@@ -221,14 +230,14 @@ After death, the player should feel:
 1. loss of the person, not erasure of the story;
 2. curiosity about what the world did in the gap;
 3. desire to recover, reinterpret, or abandon Legacy;
-4. that the next foothold must be earned if they are no longer the first character;
+4. that a foothold must be earned;
 5. no urge that reload-as-same-person would have been the real design.
 
 # Documentation Review
 
 - **Meta Loop:** Compatible. Fixed gap, continued world, imperfect ordinary legacy, Knowledge survival.
-- **World Laws:** Compatible if Death Gap runs Operations / POI resolutions. Starting Faction rule updated for first life only.
-- **Progression:** Compatible. Power dies with life; faction membership and Arcana nudge are re-earned after the first life.
+- **World Laws:** Compatible if Death Gap runs Operations / POI resolutions. The Starting Faction is retired.
+- **Progression:** Compatible. Power dies with life; faction membership and Arcana nudge are earned in every life.
 - **Decision Engine / Approaches:** Compatible. Faction Entry and Soft Memory create new decision surfaces.
 - **Glossary / Open Questions:** Updated for Death Gap, Factionless, Faction Entry, Legacy Cache, Soft Memory.
 

@@ -197,7 +197,7 @@
   },
   {
     "id": "q-pr-nudge",
-    "text": "How strongly may a Starting Faction nudge before it becomes a soft lock?",
+    "text": "How strongly may a faction nudge before it becomes a soft lock?",
     "systemIds": [
       "progression",
       "character-life"
@@ -1256,15 +1256,15 @@
   },
   {
     "id": "q-cc-29",
-    "text": "CC-29. Which abilities do Жрица and Император have at Limits 9–7, which Arcana do the slice's enemies use, how much does a Limit raise attributes, and does an Uninitiated start stay a slice exception?",
+    "text": "CC-29. Resolved in principle: the slice's 12 abilities are in 05.1, cult followers use only Император and allies only Жрица, every character starts Uninitiated and Factionless, and the city is Veilmouth.",
     "systemIds": [
       "vertical-slice",
       "progression"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
@@ -1353,6 +1353,34 @@
     "text": "CC-36. Can the undoing be interrupted? Where is the ritual site? How does the Force Estimate calculate, does difficulty change how boldly each side acts, and how many followers does each ritual need?",
     "systemIds": [
       "cult-campaign"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-37",
+    "text": "CC-37. About 30 % of the target Limit's band is the direction, but taken literally it totals 165 on a 1–100 scale and removes training from about Limit 5. Which curve replaces it?",
+    "systemIds": [
+      "progression",
+      "character-life"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-38",
+    "text": "CC-38. How many points do the pool and an archetype give, which archetypes does the slice have, and which of the two stays after playtests?",
+    "systemIds": [
+      "progression",
+      "character-life"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority — Cult Campaign and City Control",

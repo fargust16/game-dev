@@ -1,10 +1,10 @@
 # 90 Glossary
 
-Version: 0.76
+Version: 0.77
 
 Status: Draft
 
-Last Updated: 2026-11-02 (Half Cover added; Combat Grid updated. Earlier: Combat Grid follows the player. Earlier: Force Estimate added; Cult Retreat updated. Earlier: Place of Power, Ritual Undoing, and Cult Retreat updated. Earlier: Ritual Undoing added; Combat Grid, Cult Ritual, Place of Power, and Cult Retreat updated. Earlier: Combat Grid updated: around the player only. Earlier: Cult Ritual and City Capture updated for the one-hour ritual. Earlier: Combat Grid replaces Combat Arena and Theme Pack; Arcana and Limit replace the earlier terms. Earlier: Arcana, Limit, and Sephira added; Stage Occupancy Rule corrected. Earlier: Pathway updated for the 22 Tarot archetypes and V1 player stages. Earlier: Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
+Last Updated: 2026-11-02 (Starting Faction retired; Character Archetype and Veilmouth added. Earlier: Half Cover added; Combat Grid updated. Earlier: Combat Grid follows the player. Earlier: Force Estimate added; Cult Retreat updated. Earlier: Place of Power, Ritual Undoing, and Cult Retreat updated. Earlier: Ritual Undoing added; Combat Grid, Cult Ritual, Place of Power, and Cult Retreat updated. Earlier: Combat Grid updated: around the player only. Earlier: Cult Ritual and City Capture updated for the one-hour ritual. Earlier: Combat Grid replaces Combat Arena and Theme Pack; Arcana and Limit replace the earlier terms. Earlier: Arcana, Limit, and Sephira added; Stage Occupancy Rule corrected. Earlier: Pathway updated for the 22 Tarot archetypes and V1 player stages. Earlier: Vertical Slice and Lower Veil District updated for the settled slice. Earlier: Cult Pace added; Vertical Slice, Difficulty Settings, and Place of Power updated. Earlier: Cult Sortie and Last Free City Rule added; Teleporting General renamed Spirit General. Earlier: Divine Plane and Unclaimed city added; Spirit World, Stage Occupancy Rule, City Control, Cult Retreat, and Campaign Completion corrected. Earlier: Place of Power, Cult Retreat, Cult Thought Link, Spirit World, and Stage Occupancy Rule recorded; rituals' sacrificial purpose and the manifestation condition added. Earlier: City Control, City Capture, City Liberation, Capital Gate, Follower, Cult General, and Cult Force recorded; Cult Ritual and Capital Awakening Ritual redefined for the war for cities. Earlier: daily player summary, public-news issue, six-hour cult-operation window, capital awakening, and separate planet-destruction rite terms recorded. Earlier: campaign completion/rating and permanent post-manifestation death terms recorded. Earlier: Alchemy, manifestation defeat, ancient cosmic powers, and playable-state scope terms recorded. Earlier: Major/Minor Faction terms and contested True God / False God titles recorded; Faction Influence scoped to Major Factions. Earlier: Stage 0 Being and seven-slider Difficulty Settings terms updated. Earlier: item, modifier, Enchanting, weight-only inventory, carrying-capacity, and quality-colour terminology updated)
 
 Depends On:
 All Canonical Documents
@@ -186,7 +186,13 @@ Competing in-world titles used by followers for the sealed Limit 0 Being. Neithe
 
 ## Starting Faction
 
-The faction granted only to the first character in a newly generated world. That character receives an initial understanding of the faction's current Main Goal and may later defect or realign at a real cost. Later lives begin Factionless.
+Retired on 2026-11-02. Every character now begins Uninitiated and Factionless.
+
+---
+
+## Character Archetype
+
+A preset start that gives slightly more attributes than the hand-spent pool, in a fixed order. In the full game, archetypes are assembled from templates by seed and may add a backstory, a faction, an Arcana, or both, and an older world may offer deeper Limits. See [07 Character Life](07%20Character%20Life.md).
 
 ---
 
@@ -330,9 +336,15 @@ The smallest playable prototype that proves the game fantasy and core systems wi
 
 ---
 
+## Veilmouth
+
+The Vertical Slice's city, at the mouth of the river Veil. The name can still change. The slice's water remains ocean only, so the river exists in the name for now.
+
+---
+
 ## Lower Veil District
 
-Placeholder name for a district of the Vertical Slice's city: a poor/industrial urban area of medicine, night routes, factory pressure, and Warden order.
+Placeholder name for a district of Veilmouth, on the lower reach of the Veil: a poor/industrial urban area of medicine, night routes, factory pressure, and Warden order.
 
 ---
 

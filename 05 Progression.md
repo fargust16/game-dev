@@ -1,10 +1,10 @@
 # 05 Progression
 
-Version: 0.15
+Version: 0.16
 
 Status: Draft
 
-Last Updated: 2026-11-01 (the secondary attribute is fixed per Arcana. Earlier: terms renamed to Arcana and Limit. Earlier: Pathways become Arcana and Stages become Limits, with content moved to 05.1; two abilities per Limit; Stage 1 demotion and occupancy corrected for faction Arcana. Earlier: 22 Tarot-archetype Pathways recorded, with six named; the V1 player reaches Stages 9–8 and Stage 7 is for NPCs only. Earlier: the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
+Last Updated: 2026-11-02 (Limit growth direction recorded; the Starting Faction retired. Earlier: the secondary attribute is fixed per Arcana. Earlier: terms renamed to Arcana and Limit. Earlier: Pathways become Arcana and Stages become Limits, with content moved to 05.1; two abilities per Limit; Stage 1 demotion and occupancy corrected for faction Arcana. Earlier: 22 Tarot-archetype Pathways recorded, with six named; the V1 player reaches Stages 9–8 and Stage 7 is for NPCs only. Earlier: the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
@@ -90,7 +90,7 @@ A character does not begin locked in a prison.
 
 ## Soft faction nudge
 
-When a character has a faction (the world's first character via Starting Faction, or any later character after Faction Entry), that faction gently pushes toward **one** recommended Arcana:
+When a character has a faction, after Faction Entry, that faction gently pushes toward **one** recommended Arcana:
 
 - through mentors, rites, rumours, starter clues, or early POIs;
 - never as the only mechanically possible path;
@@ -174,7 +174,7 @@ Limits and ordinary character development are **separate, interacting dimensions
 
 Each Arcana has deterministic, predefined requirements for each of its Limits. These requirements specify the relevant attributes and their required levels; the exact attributes and numeric thresholds are to be designed separately for each Arcana and Limit.
 
-Advancement to the next Limit grants a predefined baseline package associated with that Limit. Depending on the Arcana and Limit, this package may include increases to specified core attributes, skills, abilities, and/or mystical capabilities. The exact packages are not defined here.
+Advancement to the next Limit grants a predefined baseline package associated with that Limit. Depending on the Arcana and Limit, this package may include increases to specified core attributes, skills, abilities, and/or mystical capabilities. Both primary attributes rise by an amount that grows with depth, so the step between two Limits is felt in attributes as well as abilities ([05.1](05.1%20Arcana%20and%20Limits.md)). The rest of the packages are not defined here.
 
 The attribute requirements are not caps on ordinary development. They define the intended preparation profile for advancement. Falling short of that profile does not by itself prevent the character from advancing: the character can still complete the transition, but insufficient preparation increases the Sanity loss. Better preparation reduces that risk. The exact preparation margin and Sanity-loss calculation remain open.
 

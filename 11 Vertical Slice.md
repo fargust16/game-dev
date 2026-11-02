@@ -1,10 +1,10 @@
 # 11 Vertical Slice
 
-Version: 0.14
+Version: 0.15
 
 Status: Draft
 
-Last Updated: 2026-11-01 (allies may win without the player, which is a valid outcome. Earlier: slice forces set: 5 allies, 3 at the ritual, 5–7 in the main force; allied directive recorded. Earlier: allies fight the main force and leave the ritual to the player; Combat Grid forms around the player. Earlier: a ritual lasts one in-game hour. Earlier: combat runs in place across the city; the slice's two Arcana are chosen. Earlier: one or two Arcana with different styles, the first-day trial, and recipes outside the faction recorded. Earlier: balance and start settled: Stage 8 as the player's limit, 8–10 enemies, the six-hour window, a Factionless start, and three named Pathways. Earlier: rewritten for the owner's one-city slice: the Spirit General's invasion on day 1–2, a ritual the player stops or loses to, one joinable faction with two or three Pathways, and the required mechanics. Earlier: owner redefined the slice as one city at Stages 9–7; retired combat references replaced with 10.2.)
+Last Updated: 2026-11-02 (the city named; slice Arcana on each side set; abilities live in 05.1. Earlier: allies may win without the player, which is a valid outcome. Earlier: slice forces set: 5 allies, 3 at the ritual, 5–7 in the main force; allied directive recorded. Earlier: allies fight the main force and leave the ritual to the player; Combat Grid forms around the player. Earlier: a ritual lasts one in-game hour. Earlier: combat runs in place across the city; the slice's two Arcana are chosen. Earlier: one or two Arcana with different styles, the first-day trial, and recipes outside the faction recorded. Earlier: balance and start settled: Stage 8 as the player's limit, 8–10 enemies, the six-hour window, a Factionless start, and three named Pathways. Earlier: rewritten for the owner's one-city slice: the Spirit General's invasion on day 1–2, a ritual the player stops or loses to, one joinable faction with two or three Pathways, and the required mechanics. Earlier: owner redefined the slice as one city at Stages 9–7; retired combat references replaced with 10.2.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -31,7 +31,7 @@ A run lasts one to two game days before the invasion plus the fight for the ritu
 
 The owner approved this story on 2026-11-01.
 
-- **Place:** one city, not necessarily the capital, and a small area outside it, enough to gather resources, craft, and make potions.
+- **Place:** one city, Veilmouth, not necessarily the capital, and a small area outside it, enough to gather resources, craft, and make potions.
 - **Opening:** the player has one to two game days of ordinary life in the city.
 - **Invasion:** after those days the Spirit General comes out in the city with its followers, and the ritual starts at once.
 - **The General leaves:** after 15–20 ticks it returns to the Spirit World and leaves the ritual to its followers. It cannot be hunted afterwards.
@@ -64,7 +64,7 @@ The conditions differ from run to run.
 
 # Slice Fantasy
 
-The slice takes place in one city. **Lower Veil District** is one of its districts: a dense urban area at the edge of legality, medicine, factories, and night disappearances.
+The slice takes place in one city, **Veilmouth**, at the mouth of the river Veil. **Lower Veil District** is one of its districts: a dense urban area at the edge of legality, medicine, factories, and night disappearances.
 
 The player is the **first character in a new world**.
 
@@ -138,16 +138,16 @@ Each of these is implemented in a limited form:
 
 - **One joinable faction:** the internal-order faction of [02 World Laws](02%20World%20Laws.md), the hidden police of practitioners.
 - **Wardens** (order / patrol / seizure framing) and **Veinmarket** (soft underworld / mixture / night-route framing) stay as local groups.
-- **The cult** appears through the Spirit General and its followers, from the Emperor, Empress, and Hierophant Arcana.
+- **The cult** appears through the Spirit General and its followers, all of the Император Arcana in the slice. Allied followers are all of the Жрица Arcana.
 - Members of other factions are optional.
 
 ## Character / Progression
 
-- The character starts without a faction. On the first day it can pass a trial to join the faction, or stay out and search alone. This is a slice exception to the Starting Faction rule of [07 Character Life](07%20Character%20Life.md).
+- The character starts without a faction. On the first day it can pass a trial to join the faction, or stay out and search alone. It sets its attributes as [07 Character Life](07%20Character%20Life.md) describes.
 - Limit 9 is a certain goal in a run. Limit 8 takes directed effort. Limit 7 is for NPCs only. Allies and enemies may be deeper.
 - The slice has two Arcana with different styles of play ([05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md)). The faction offers Жрица, for dialogue and stealth. The character can find Император alone, for confrontation.
 - The church has no next Limit for Император, so a character on it must seek the next Limit among the cultists. Both Arcana have an occupied Limit 0, so the player starts on a fork that can never reach Limit 0.
-- Each Limit grants two abilities. An NPC at Limit 7 has about six, the same abilities the player would have.
+- Each Limit grants two abilities. An NPC at Limit 7 has six, the same abilities the player would have. They are listed in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
 
 ## The first-day trial
 
@@ -398,7 +398,7 @@ If the budget grows, cut content before cutting systems proof.
 - **Progression / Character Life:** One Factionless life per run. The player reaches Limits 9–8; Limit 7 is for NPCs, and allies and enemies may be deeper. Later-life systems are excluded.
 - **Cult Campaign:** The slice uses the campaign's ritual rules in one city ([21](21%20Cult%20Campaign%20and%20City%20Control.md)).
 - **Era mood:** Compatible with priced mystery and social inequality without requiring high-fantasy gloss.
-- **Solo scope:** The required mechanics are many, so each stays in a limited form, and content stays small. The open items are CC-29 and CC-33 in [99 Open Questions](99%20Open%20Questions.md).
+- **Solo scope:** The required mechanics are many, so each stays in a limited form, and content stays small. The open items are CC-37 and CC-38 in [99 Open Questions](99%20Open%20Questions.md).
 - **Glossary / Open Questions:** Confirmations recorded as resolved.
 
 # Related Documents

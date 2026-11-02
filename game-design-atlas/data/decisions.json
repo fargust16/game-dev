@@ -49,13 +49,13 @@
   {
     "id": "d-first-faction",
     "statement": "Only the first character in a new world begins with a Starting Faction. Later characters begin Factionless and earn Faction Entry.",
-    "rationale": "Записано в 07.",
+    "rationale": "Записано в 07. Superseded on 2026-11-02: every character starts Uninitiated and Factionless.",
     "alternatives": "",
     "systemIds": [
       "character-life",
       "world-laws"
     ],
-    "status": "accepted",
+    "status": "superseded",
     "origin": "imported",
     "sourceIds": [
       "src-99",
@@ -1142,6 +1142,53 @@
     "origin": "imported",
     "sourceIds": [
       "src-10-1"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-02."
+  },
+  {
+    "id": "d-character-start",
+    "statement": "Every character starts Uninitiated and Factionless, in the slice and the full game. All seven attributes start at 1, and the player spends a small pool once or picks a slightly stronger Character Archetype. In the full game archetypes are assembled from templates by seed.",
+    "rationale": "Keeps Allegiance earned in every life and leaves room for seeded starts later.",
+    "alternatives": "",
+    "systemIds": [
+      "character-life",
+      "progression"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-07"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-02."
+  },
+  {
+    "id": "d-slice-abilities",
+    "statement": "The slice has 12 abilities, six each for Жрица and Император at Limits 9–7. Cult followers use only Император and allies only Жрица. A failed ability spends its Will Power and has its own consequence; an ability aimed at the character has a drawback instead of a check.",
+    "rationale": "Failure stays valuable, and one set of abilities covers both sides of the slice.",
+    "alternatives": "",
+    "systemIds": [
+      "progression",
+      "vertical-slice"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-05-1"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-02."
+  },
+  {
+    "id": "d-sleep-sanity",
+    "statement": "A full sleep restores a little Sanity, replacing the earlier rule that sleep restores none. Reaching zero Will Power takes a little Sanity.",
+    "rationale": "Sanity stays a long pressure without being a one-way loss within a campaign.",
+    "alternatives": "",
+    "systemIds": [
+      "character-life"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-07-2"
     ],
     "dateNote": "Owner-approved answers, 2026-11-02."
   }
