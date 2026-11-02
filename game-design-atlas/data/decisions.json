@@ -1209,7 +1209,7 @@
   },
   {
     "id": "d-stealth",
-    "statement": "Stealth is a special action. NPCs have 10-cell Vision Cones whose angle Vigilance sets, and a Notice Meter fills by Stealth skill and Dexterity against Perception. Perception shows the meter and Intelligence the cones. Outside a fight allies break stealth too. A stealth attack adds 50 percentage points of critical chance and never stuns.",
+    "statement": "Stealth is a special action. NPCs have 10-cell Vision Cones whose angle Vigilance sets, and a Notice Meter fills by Stealth skill and Dexterity against Perception. Darkness adds to Stealth skill, and noise is not simulated. Perception shows the meter and Intelligence the cones. An NPC that loses sight of the character checks the last place and stays Alert. Outside a fight allies break stealth too. A stealth attack rolls to hit as usual, adds 50 percentage points of critical chance, and never stuns.",
     "rationale": "Gives Veil real rules, ties what the player can read to attributes, and keeps striking from hiding from answering every fight.",
     "alternatives": "Single checks of Dexterity against Perception, which are simpler but opaque.",
     "systemIds": [
@@ -1219,6 +1219,21 @@
     "origin": "imported",
     "sourceIds": [
       "src-10-3"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-02."
+  },
+  {
+    "id": "d-crit-overflow-damage",
+    "statement": "In combat, critical chance above the 95 % cap adds to the critical damage multiplier one to one, so an excess of 0.50 adds 0.5.",
+    "rationale": "A bonus past the cap keeps its worth, and a stealth attack rewards high Perception with harder hits instead of nothing.",
+    "alternatives": "Discarding the excess, which 07.1 already rejected.",
+    "systemIds": [
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-10"
     ],
     "dateNote": "Owner-approved answers, 2026-11-02."
   }
