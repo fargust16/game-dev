@@ -1313,5 +1313,37 @@
       "src-10"
     ],
     "dateNote": "Owner-approved answers, 2026-11-02."
+  },
+  {
+    "id": "d-weak-point-traces",
+    "statement": "Traces of a Ritual Weak Point were left by people who joined the General earlier, not by a hidden agent. Each Weak Point has two sources in the city and one during the invasion; any one opens it, and each further one adds +1. Only the run's two Weak Points leave traces, the first-day trial always leads past one, witnesses hide when the invasion starts, and a real Посланник does not appear in the slice.",
+    "rationale": "One source explains all four kinds and keeps the rule that followers never hide. Several sources stop a single clue from blocking a route, and a first run still shows that the option exists.",
+    "alternatives": "A hidden cult agent in the city, or false traces.",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-11",
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-02."
+  },
+  {
+    "id": "d-character-notes",
+    "statement": "Found facts go into Character Notes: short records with no hint of what they are for. They hold facts, not goals or solutions.",
+    "rationale": "The player keeps what was found without a quest journal that replaces reading the world.",
+    "alternatives": "No record at all, or a quest journal.",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-09",
+      "src-11"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-02."
   }
 ]

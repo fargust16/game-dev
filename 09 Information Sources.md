@@ -1,10 +1,10 @@
 # 09 Information Sources
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft
 
-Last Updated: 2026-11-02 (rumours carry Reputation. Earlier: Confront runs in place. Earlier: the rituals' purpose excluded from every source until manifestation. Earlier: the secret purpose of rituals excluded from public sources. Earlier: reported City Control recorded as the public reading of campaign progress. Earlier: private daily action summary separated from public news; public event/map reporting and source-limited NPC awareness clarified.)
+Last Updated: 2026-11-02 (Character Notes added. Earlier: rumours carry Reputation. Earlier: Confront runs in place. Earlier: the rituals' purpose excluded from every source until manifestation. Earlier: the secret purpose of rituals excluded from public sources. Earlier: reported City Control recorded as the public reading of campaign progress. Earlier: private daily action summary separated from public news; public event/map reporting and source-limited NPC awareness clarified.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md)
@@ -221,6 +221,7 @@ Exact UI chrome remains open. The design rule is: the player should be able to u
 - Newspaper / Faction Contact / Witness / Soft Memory appear in smaller numbers.
 - Tips can Hint or Mark POIs and communicate urgency.
 - No omniscient quest journal that replaces world reading.
+- **Character Notes** keep short records of what the character found, with no hint of what they are for. They hold facts, not goals or solutions ([11 Vertical Slice](11%20Vertical%20Slice.md)).
 
 ## V2
 

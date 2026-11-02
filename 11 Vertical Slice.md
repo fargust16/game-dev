@@ -1,10 +1,10 @@
 # 11 Vertical Slice
 
-Version: 0.20
+Version: 0.21
 
 Status: Draft
 
-Last Updated: 2026-11-02 (the groups of the slice's fight recorded from the combat simulation. Earlier: the ritual has two Ritual Weak Points. Earlier: the slice's dialogue needs Arguments, and it keeps Reputation and Danger. Earlier: dialogue checks live in 10.4. Earlier: stealth rules live in 10.3. Earlier: the city named; slice Arcana on each side set; abilities live in 05.1. Earlier: allies may win without the player, which is a valid outcome. Earlier: slice forces set: 5 allies, 3 at the ritual, 5–7 in the main force; allied directive recorded. Earlier: allies fight the main force and leave the ritual to the player; Combat Grid forms around the player. Earlier: a ritual lasts one in-game hour. Earlier: combat runs in place across the city; the slice's two Arcana are chosen. Earlier: one or two Arcana with different styles, the first-day trial, and recipes outside the faction recorded. Earlier: balance and start settled: Stage 8 as the player's limit, 8–10 enemies, the six-hour window, a Factionless start, and three named Pathways. Earlier: rewritten for the owner's one-city slice: the Spirit General's invasion on day 1–2, a ritual the player stops or loses to, one joinable faction with two or three Pathways, and the required mechanics. Earlier: owner redefined the slice as one city at Stages 9–7; retired combat references replaced with 10.2.)
+Last Updated: 2026-11-02 (traces of the Ritual Weak Points recorded. Earlier: the groups of the slice's fight recorded from the combat simulation. Earlier: the ritual has two Ritual Weak Points. Earlier: the slice's dialogue needs Arguments, and it keeps Reputation and Danger. Earlier: dialogue checks live in 10.4. Earlier: stealth rules live in 10.3. Earlier: the city named; slice Arcana on each side set; abilities live in 05.1. Earlier: allies may win without the player, which is a valid outcome. Earlier: slice forces set: 5 allies, 3 at the ritual, 5–7 in the main force; allied directive recorded. Earlier: allies fight the main force and leave the ritual to the player; Combat Grid forms around the player. Earlier: a ritual lasts one in-game hour. Earlier: combat runs in place across the city; the slice's two Arcana are chosen. Earlier: one or two Arcana with different styles, the first-day trial, and recipes outside the faction recorded. Earlier: balance and start settled: Stage 8 as the player's limit, 8–10 enemies, the six-hour window, a Factionless start, and three named Pathways. Earlier: rewritten for the owner's one-city slice: the Spirit General's invasion on day 1–2, a ritual the player stops or loses to, one joinable faction with two or three Pathways, and the required mechanics. Earlier: owner redefined the slice as one city at Stages 9–7; retired combat references replaced with 10.2.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -60,7 +60,42 @@ If building a Limit 2 opponent is too much for the first version, the General ap
 - Kill the senior who started it.
 - Exploit one of its two Ritual Weak Points, while the cult has not fully taken the city.
 
-The seed picks the two from the four kinds in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), so they differ from run to run. Each needs an Argument or a prepared item. The slice must therefore place traces of them in the first days, with no sign of what they are for, and allow more to be found during the invasion.
+The seed picks the two from the four kinds in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), so they differ from run to run. Each needs an Argument or a prepared item. The choice has its own key, so the city stays the same and the next run differs.
+
+## Traces of the Weak Points
+
+Owner-approved on 2026-11-02.
+
+The traces were left by people who joined the General earlier. Every follower was once an ordinary person, and left family, debts, purchases, belongings, and signs behind. No hidden agent of the cult works in the city before the invasion. The traces lie in the past and look like ordinary city life, with no sign of what they are for.
+
+- Each Weak Point has three sources of its Argument: two in the city before the invasion and one during it.
+- Any one source opens the option. Each further one adds +1, under the rule of [10.4](10.4%20Dialogue%20and%20Social%20Checks.md).
+- Only the run's two Weak Points leave traces. The slice has no false traces, though a trace can be misread.
+- The traces use places the slice already has: the Notice Board, the Soot & Bell, Harrow's apothecary, the Soot Stair, and the factory fence. The seed sets the people, items, and places.
+- When the invasion starts, witnesses hide and shops close. Items and signs stay where they are.
+- A real Посланник does not appear in the slice. The group only waits for one, so the ritual gains no extra timer.
+- Found items stay in the bag, and found facts go into **Character Notes**: short records with no hint of what they are for.
+
+| Weak Point | In the city, first source | In the city, second source | During the invasion |
+|---|---|---|---|
+| Сомневающийся | A notice about a missing person, with the conductor's name and looks | Kin or a creditor at the tavern: whom the conductor fears for, and a letter | Eavesdropping at the circle, searching a dead follower, or Чужой сон |
+| Посланник | A sign where those who left used to meet | A token among a missing person's belongings, for example in pawn | Eavesdropping on the word at the circle, or a token from a dead follower |
+| Грязная тайна | A receipt or record of the senior's old affair | The same paper, sold by Veinmarket | Чужой сон on a sleeper, or searching a dead follower |
+| Основа ритуала | Harrow remembers an odd buyer and what the buyer took | A note with the mixture on the Soot Stair | Seeing the base from Stealth Mode, then brewing a substitute in time: brewing takes 6 of the 60 ticks |
+
+Основа ритуала has no roll, so its further sources only give another way to learn what to make. Its check is the stealth at the circle.
+
+A prepared Limit 8 character at value 1 against a Limit 9 conductor at value 0, on a Large Final Check ([10.4](10.4%20Dialogue%20and%20Social%20Checks.md) §7):
+
+| Arguments | Chance |
+|---:|---:|
+| 1 | 17 % |
+| 2 | 28 % |
+| 3 | 42 % |
+| 3, and Reputation or Danger +1 | 58 % |
+| 3, Reputation, and Внушение | 72 % |
+
+A planned kill of the senior gives 42 % with the best gear ([10.2](10.2%20Combat%20System%20Draft.md) §5b), so full preparation for dialogue ends up at least as good. A new character has 8 %, with value 0 and one Argument, and still sees that the option exists. That discovery is what the slice wants from a first run.
 
 # Slice Fantasy
 
@@ -130,7 +165,7 @@ Each of these is implemented in a limited form:
   - notice board node;
   - one side street for the night abduction POI;
   - one small aftermath / Trace space.
-- 1 World Seed for the slice (fixed seed for prototype reliability).
+- 1 World Seed for the slice (fixed seed for prototype reliability). The two Ritual Weak Points are chosen by their own key.
 - Lightweight Symptoms only (patrol mood, shop open/closed, rumour tone).
 - Pre-pivot continuous OrganicTown grid district is **not** the slice delivery target.
 
@@ -153,7 +188,7 @@ Each of these is implemented in a limited form:
 
 The slice has no backstory: the character has come of age and decides to become an adventurer. Someone offers it a job, or it overhears talk of an investigation into a disappearance. This is the trial.
 
-The character starts with almost nothing, so fighting is hard at first. It can find a weapon and try force, or use attention and dialogue. It learns about supernatural forces during the trial or later.
+The character starts with almost nothing, so fighting is hard at first. It can find a weapon and try force, or use attention and dialogue. It learns about supernatural forces during the trial or later. The trial always leads past one trace of a Ritual Weak Point, with no sign of what it is for.
 - One Bargain offer remains as a priced tease.
 
 ## Information Sources

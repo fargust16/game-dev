@@ -1,10 +1,10 @@
 # 91 Agent Decision Record
 
-Version: 1.1
+Version: 1.2
 
 Status: Draft
 
-Last Updated: 2026-11-02 (a conductor who fights loses 3 AP, owner-approved.)
+Last Updated: 2026-11-02 (traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [AGENTS.md](AGENTS.md)
@@ -68,7 +68,7 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 
 ## Ritual Weak Points
 
-- A ritual in the slice has two Ritual Weak Points, chosen by the seed from Сомневающийся, Посланник, Грязная тайна, and Основа ритуала ([21](21%20Cult%20Campaign%20and%20City%20Control.md) §4). Any one stops it. No list or map mark shows them. A failed Final Check leaves only the hidden route, and the followers report it through the Cult Thought Link, which carries orders and reports in exceptional cases and is not a shared mind. Any dialogue pauses the world, with no exceptions, and costs one tick when it ends.
+- A ritual in the slice has two Ritual Weak Points, chosen by the seed from Сомневающийся, Посланник, Грязная тайна, and Основа ритуала ([21](21%20Cult%20Campaign%20and%20City%20Control.md) §4). Any one stops it. No list or map mark shows them. A failed Final Check leaves only the hidden route, and the followers report it through the Cult Thought Link, which carries orders and reports in exceptional cases and is not a shared mind. Any dialogue pauses the world, with no exceptions, and costs one tick when it ends. Traces of a Weak Point were left by people who joined the General earlier, not by a hidden agent: each has two sources in the city and one during the invasion, any one opens it, and each further one adds +1 ([11 Vertical Slice](11%20Vertical%20Slice.md)). Only the run's two Weak Points leave traces, the first-day trial always leads past one, and witnesses hide when the invasion starts. Found facts go into Character Notes, with no hint of what they are for.
 
 ## Vertical Slice target
 
