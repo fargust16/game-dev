@@ -53,7 +53,7 @@
   },
   {
     "id": "q-wl-difficulty",
-    "text": "What exact force values and odds produce the agreed final-fight direction: allies win at the lowest Combat Difficulty, Normal is near-even with a slight enemy advantage, and higher settings increasingly favour the enemy? Do the other seven sliders affect support or outcome?",
+    "text": "What exact force values and odds produce the agreed final-fight direction: allies win at the lowest Combat Difficulty, the middle setting is near-even with a slight enemy advantage, and higher settings increasingly favour the enemy? Do the other seven sliders affect support or outcome?",
     "systemIds": [
       "world-laws"
     ],
@@ -317,13 +317,13 @@
   },
   {
     "id": "q-cf-initiative",
-    "text": "Exact initiative formula and Move Speed units / cells per Move on the Combat Grid?",
+    "text": "Exact initiative formula and Move Speed units on the Combat Grid. Working values are in 10.2 §5b.",
     "systemIds": [
       "confront"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority",
-    "status": "open",
+    "status": "resolved",
     "priority": "high",
     "sourceKind": "gameplay-design",
     "origin": "imported"
@@ -356,13 +356,13 @@
   },
   {
     "id": "q-cf-dash",
-    "text": "Is Bonus-to-Dash enabled in V1 or deferred?",
+    "text": "Bonus-to-Dash: withdrawn with the Move + Action + Bonus structure (10.2).",
     "systemIds": [
       "confront"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority",
-    "status": "open",
+    "status": "resolved",
     "priority": "high",
     "sourceKind": "gameplay-design",
     "origin": "imported"
@@ -396,7 +396,7 @@
   },
   {
     "id": "q-cl-gap",
-    "text": "What exact V1 length is the Death Gap in days?",
+    "text": "What exact length is the Death Gap in days? It is out of the slice.",
     "systemIds": [
       "character-life"
     ],
@@ -422,7 +422,7 @@
   },
   {
     "id": "q-cl-entry",
-    "text": "What is the minimal Faction Entry pattern reusable by all V1 factions?",
+    "text": "The slice's Faction Entry is the first-day trial. What minimal pattern is reusable by every joinable faction in the full game?",
     "systemIds": [
       "character-life",
       "world-laws"

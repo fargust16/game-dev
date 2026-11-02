@@ -1,10 +1,10 @@
 # 16 Architecture Pivot
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft
 
-Last Updated: 2026-11-02 (the Combat Grid is built during a fight; the slice uses 20 cells, with 50 planned. Earlier: transparent walls detailed from the lab. Earlier: the Combat Grid follows the player. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: the Combat Grid forms around the player; interiors stay separate scenes; door and camera rules recorded. Earlier: what failed in 2026-08 stated exactly; the world lives between rounds; the door question added to the technical test. Earlier: owner replaced the Combat Arena with combat in place on a Combat Grid.)
+Last Updated: 2026-11-02 (the Combat Grid test is passed (CC-33). Earlier: the Combat Grid is built during a fight; the slice uses 20 cells, with 50 planned. Earlier: transparent walls detailed from the lab. Earlier: the Combat Grid follows the player. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: the Combat Grid forms around the player; interiors stay separate scenes; door and camera rules recorded. Earlier: what failed in 2026-08 stated exactly; the world lives between rounds; the door question added to the technical test. Earlier: owner replaced the Combat Arena with combat in place on a Combat Grid.)
 
 Depends On:
 [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
@@ -90,7 +90,7 @@ Interiors stay separate scenes. A fight carries through a door the way a change 
 
 Around a fight in the street, the camera can rotate. Walls that block the view become transparent, with only their outlines shown and without revealing the interior behind them. In the lab a whole building turns into its foundation and wall outlines, because cutting a hole in one shows the empty shell inside.
 
-A [technical test](unity/Assets/Plans/COMBAT_GRID_TECH_TEST.md) comes before further design (CC-33).
+The [technical test](unity/Assets/Plans/COMBAT_GRID_TECH_TEST.md) holds, and the owner accepted it (CC-33).
 
 # Scene Graph
 
@@ -248,7 +248,7 @@ Each ticket should get its own micro-plan before code.
 
 - **Vision / Pillars:** Compatible — Curiosity, priced power, living world remain; only presentation splits.
 - **Confront constraints:** Compatible — combat in place is presentation; residue / no XP / alternatives remain.
-- **Solo / AI shipability:** Overworld and interiors stay isolated. Combat in place raises the technical risk (CC-33).
+- **Solo / AI shipability:** Overworld and interiors stay isolated. Combat in place raised the technical risk, and its test holds (CC-33).
 - **Code:** Untouched; `unity/` OrganicTown remains pre-pivot prototype archive, deprecated, not a reuse source for new world/settlement/building systems ([13](13%20City%20Generation.md), [15](15%20Procedural%20Building%20Generation.md)).
 
 ---

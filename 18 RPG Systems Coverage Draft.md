@@ -1,8 +1,8 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.13
+Version: 0.14
 Status: Draft
-Last Updated: 2026-11-02 (Persuasion, Intimidation, and Deception confirmed in 10.4. Earlier: terms renamed to Arcana and Limit. Earlier: Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
+Last Updated: 2026-11-02 (Evasion and Blocking follow 10.2; question range corrected. Earlier: Persuasion, Intimidation, and Deception confirmed in 10.4. Earlier: terms renamed to Arcana and Limit. Earlier: Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [99 Open Questions](99%20Open%20Questions.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -235,7 +235,7 @@ The following are review states, not claims about the current map.
 | Combat | Existing constraints and turn economy; full rules open | Audit [08](08%20Confront%20Constraints.md), [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2](10.2%20Combat%20System%20Draft.md), [16](16%20Architecture%20Pivot.md) |
 | NPCs and creatures | Partial architecture references | Audit actor/spawn/AI cards |
 | Quests, POIs, information | Existing foundations; integration open | Audit [03](03%20Decision%20Engine.md), [04](04%20Points%20of%20Interest.md), [09](09%20Information%20Sources.md) |
-| Factions and relationships | Three allied Major Factions, the primary opposing Limit 0-led Major Faction, and two candidate beneficial Minor Factions captured in [02 World Laws](02%20World%20Laws.md); the war for cities is in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) | Work through CC-1 … CC-32 in [99 Open Questions](99%20Open%20Questions.md), then resolve the finite-world relationship, hostile branches, minor-faction generation and system boundaries, and map factions to the Lower Veil slice |
+| Factions and relationships | Three allied Major Factions, the primary opposing Limit 0-led Major Faction, and two candidate beneficial Minor Factions captured in [02 World Laws](02%20World%20Laws.md); the war for cities is in [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) | Work through CC-1 … CC-44, where still open, in [99 Open Questions](99%20Open%20Questions.md), then resolve the finite-world relationship, hostile branches, minor-faction generation and system boundaries, and map factions to the Lower Veil slice |
 | Economy and item crafting | Item Creation and Enchanting foundations documented | Resolve economy, resource availability, and V1 scope after core item rules |
 | World simulation and generation | Significant existing documentation | Preserve current authority and audit only missing gameplay interfaces |
 | Shared rules, save, UI, balance | Partial architectural coverage | Audit system cards and cross-system contracts |
@@ -324,8 +324,8 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 |---|---|---|---|
 | Fight with melee weapons | Melee Weapon Proficiency (working name) | Strength, Dexterity | Whether weapon types have separate skills is undecided. |
 | Fight with ranged weapons | Ranged Weapon Proficiency (working name) | Dexterity, Perception | Whether bows, thrown weapons, and other ranged weapons are separate is undecided. |
-| Evade an attack | Evasion | Dexterity, Perception | Candidate skill; may instead be resolved from attributes and combat rules. |
-| Block an attack | Blocking | Strength, Dexterity | Candidate skill; may instead be a combat action governed by equipment and attributes. |
+| Evade an attack | Evasion | Dexterity, Perception | Not a skill: the owner rejected a standalone Evasion skill ([10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md)). |
+| Block an attack | Blocking | Strength, Dexterity | A combat reaction: its chance comes from equipment, abilities, and effects ([10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md)). |
 | Use magical or Arcana abilities | Ability-specific system, not a generic “combat abilities” skill | Depends on the ability | A separate design pass must cover supernatural powers, costs, requirements, combat use, and non-combat use. Do not collapse all magic into one skill by default. |
 | Maintain composure under combat pressure | No separate skill decided | Will | May be handled directly through Will and condition rules. |
 
@@ -382,7 +382,7 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 - Final names and boundaries for load carrying, creature harvesting, hidden-cache search, identification/appraisal, theft/sleight of hand, and social skills.
 - Whether Climbing is included in V1 and how it will be implemented.
 - Which attributes are trained by each action versus merely used to resolve it.
-- Whether combat weapon proficiency, Evasion, and Blocking are skills or are resolved through attributes, equipment, and combat actions.
+- Which weapon skills exist (CC-41).
 - Alchemy's learning path, skill progression, ability unlocks, potion categories, recipe/ingredient discovery, and whether a learned character must personally brew each advancement potion; see [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
 - How Identification reveals rarity, quality, description, and artefact/mineral properties.
 - How a Hidden Cache Search skill affects audio/visual cues and whether that cue fits the intended exploration experience.

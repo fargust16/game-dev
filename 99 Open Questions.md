@@ -1,10 +1,10 @@
 # 99 Open Questions
 
-Version: 1.12
+Version: 1.13
 
 Status: Draft
 
-Last Updated: 2026-11-02 (CC-17: the owner approved the capital's exception to going for the ritual first. Earlier: CC-13, CC-16, CC-17, CC-27 and CC-43 updated for the owner's odds; CC-44 added. Earlier: CC-12 to CC-15 and CC-36 carry working answers; CC-43 added. Earlier: CC-42 added for the slice's traces. Earlier: CC-41: the conductors' AP settled by the owner. Earlier: CC-41 added for combat numbers; the AP cost of Stealth Mode leaves CC-39. Earlier: CC-8 narrowed to the campaign. Earlier: CC-40: Arguments come only from the current life. Earlier: CC-40 narrowed after the Disco Elysium model. Earlier: CC-40 added. Earlier: CC-39 narrowed to numbers. Earlier: CC-39 added; CC-6 narrowed; Vigilance recorded. Earlier: CC-37 and CC-38 resolved. Earlier: CC-29 resolved in principle; CC-37 and CC-38 added; the Starting Faction retired; sleep restores a little Sanity. Earlier: CC-33 resolved. Earlier: Combat Grid Phase B built; a building in the way becomes an outline. Earlier: the Combat Grid's edge rule recorded. Earlier: Combat Grid Phase A recorded; CC-33 narrowed. Earlier: Force Estimate recorded; CC-36 narrowed. Earlier: the lapse of a liberated ritual and the force estimate recorded; CC-36 narrowed. Earlier: CC-33 and CC-36 narrowed; the one-day rule withdrawn. Earlier: CC-34 resolved; CC-33 narrowed; CC-36 added. Earlier: secondary attribute and Limit names settled; ritual is one hour; CC-31 and CC-32 narrowed; CC-34 and CC-35 added. Earlier: owner's table fixes and combat in place recorded: CC-22 and CC-30 resolved; CC-29, CC-31, and CC-32 narrowed; CC-33 added. Earlier: Arcana and Limits recorded in 05.1; CC-22 and CC-29 narrowed; CC-30 … CC-32 added. Earlier: 22 Pathways recorded; CC-27 and CC-28 resolved; CC-22 narrowed; CC-29 added. Earlier: Vertical Slice settled: CC-24, CC-25, and CC-26 resolved; CC-27 and CC-28 added. Earlier: owner's fourth answers recorded: CC-11, CC-14, and CC-16 resolved; CC-7, CC-10, CC-12, CC-15, and CC-17 narrowed; CC-24 … CC-26 added for the redefined Vertical Slice. Earlier: owner's third answers recorded: CC-1, CC-8, CC-18, and CC-21 resolved; CC-7, CC-10, CC-12, CC-14, CC-15, and CC-20 narrowed. Earlier: owner's second answers recorded: CC-4, CC-9, CC-21, and CC-23 resolved; CC-3, CC-6, CC-7, CC-8, CC-10, CC-13, CC-17, CC-20, and CC-22 narrowed; Divine Plane restored. Earlier: owner answers recorded: campaign length, 3×3 target world, 5–7 cities, the rituals' purpose, the Stage Occupancy Rule; CC-1 … CC-3, CC-5, CC-9, CC-10, and CC-17 narrowed; CC-20 … CC-23 added; GEO-1 reopened by the campaign's gameplay requirement. Earlier: the war for cities recorded: required-ritual count resolved by the Capital Gate; Cult Campaign block CC-1 … CC-19 added. Earlier: daily player summary/news-map channels, six-hour ritual windows, allied response, potential parallel operations, and fixed capital awakening/occupation loop recorded; ritual count/concurrency, off-screen resolution, command threshold, capture, destruction trigger, and post-campaign play remain open. Earlier: sealed Stage 0 antagonist, major/minor distinction, and two candidate minor factions recorded; finale and generation remain open. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
+Last Updated: 2026-11-02 (stale entries closed or narrowed against the documents; no new decision. Earlier: CC-17: the owner approved the capital's exception to going for the ritual first. Earlier: CC-13, CC-16, CC-17, CC-27 and CC-43 updated for the owner's odds; CC-44 added. Earlier: CC-12 to CC-15 and CC-36 carry working answers; CC-43 added. Earlier: CC-42 added for the slice's traces. Earlier: CC-41: the conductors' AP settled by the owner. Earlier: CC-41 added for combat numbers; the AP cost of Stealth Mode leaves CC-39. Earlier: CC-8 narrowed to the campaign. Earlier: CC-40: Arguments come only from the current life. Earlier: CC-40 narrowed after the Disco Elysium model. Earlier: CC-40 added. Earlier: CC-39 narrowed to numbers. Earlier: CC-39 added; CC-6 narrowed; Vigilance recorded. Earlier: CC-37 and CC-38 resolved. Earlier: CC-29 resolved in principle; CC-37 and CC-38 added; the Starting Faction retired; sleep restores a little Sanity. Earlier: CC-33 resolved. Earlier: Combat Grid Phase B built; a building in the way becomes an outline. Earlier: the Combat Grid's edge rule recorded. Earlier: Combat Grid Phase A recorded; CC-33 narrowed. Earlier: Force Estimate recorded; CC-36 narrowed. Earlier: the lapse of a liberated ritual and the force estimate recorded; CC-36 narrowed. Earlier: CC-33 and CC-36 narrowed; the one-day rule withdrawn. Earlier: CC-34 resolved; CC-33 narrowed; CC-36 added. Earlier: secondary attribute and Limit names settled; ritual is one hour; CC-31 and CC-32 narrowed; CC-34 and CC-35 added. Earlier: owner's table fixes and combat in place recorded: CC-22 and CC-30 resolved; CC-29, CC-31, and CC-32 narrowed; CC-33 added. Earlier: Arcana and Limits recorded in 05.1; CC-22 and CC-29 narrowed; CC-30 … CC-32 added. Earlier: 22 Pathways recorded; CC-27 and CC-28 resolved; CC-22 narrowed; CC-29 added. Earlier: Vertical Slice settled: CC-24, CC-25, and CC-26 resolved; CC-27 and CC-28 added. Earlier: owner's fourth answers recorded: CC-11, CC-14, and CC-16 resolved; CC-7, CC-10, CC-12, CC-15, and CC-17 narrowed; CC-24 … CC-26 added for the redefined Vertical Slice. Earlier: owner's third answers recorded: CC-1, CC-8, CC-18, and CC-21 resolved; CC-7, CC-10, CC-12, CC-14, CC-15, and CC-20 narrowed. Earlier: owner's second answers recorded: CC-4, CC-9, CC-21, and CC-23 resolved; CC-3, CC-6, CC-7, CC-8, CC-10, CC-13, CC-17, CC-20, and CC-22 narrowed; Divine Plane restored. Earlier: owner answers recorded: campaign length, 3×3 target world, 5–7 cities, the rituals' purpose, the Stage Occupancy Rule; CC-1 … CC-3, CC-5, CC-9, CC-10, and CC-17 narrowed; CC-20 … CC-23 added; GEO-1 reopened by the campaign's gameplay requirement. Earlier: the war for cities recorded: required-ritual count resolved by the Capital Gate; Cult Campaign block CC-1 … CC-19 added. Earlier: daily player summary/news-map channels, six-hour ritual windows, allied response, potential parallel operations, and fixed capital awakening/occupation loop recorded; ritual count/concurrency, off-screen resolution, command threshold, capture, destruction trigger, and post-campaign play remain open. Earlier: sealed Stage 0 antagonist, major/minor distinction, and two candidate minor factions recorded; finale and generation remain open. Earlier: Item Creation formulas/stage gates, weight-only inventory, quality colours, durability/repair boundaries, Enchanting scope, NPC recovery, and successor-item rules updated. Earlier: Item Creation skill primarily shapes the random modifier-count distribution from 0–6 toward higher counts, without hard quality unlocks or caps. Earlier: Ordinary item quality mapping finalized: Normal 0, Magic 1–2, Rare 3, Epic 4, Legendary 5–6 modifiers. Earlier: Crafting skill influences modifier-count probabilities; NPC equipment is assigned as part of NPC builds and only partly recoverable. Earlier: Base-item level affects modifier-tier probabilities without imposing a hard tier cap; base families use weighted rather than exclusive modifier pools. Earlier: Profession mastery affects reforging tier probabilities but imposes no hard modifier-tier cap. Earlier: Full regeneration of modifier type, tier, and value on reforging clarified. Earlier: Profession-mastery unlocks and base-dependent modifier weighting clarified; per-modifier learning requirement rejected. Earlier: Permanent modifier locking, escalating lock costs, and all-unlocked-modifier reforging rules clarified. Earlier: Major/minor modifier categories, tiers, weighting, and profession-based reforging direction clarified. Earlier: Base-item and modifier-driven itemisation direction captured. Earlier: Pathway attribute requirements, deterministic advancement, and sanity-loss creature outcomes documented. Earlier: Universal resource Stage Multiplier and maximum HP/Stamina formulas agreed; ordinary HP recovery confirmed; shared attribute/skill XP principles clarified; derived character statistics, Will Power, and Sanity model documented; GEO-10: G3f's calibration and held-out evaluation ran under the owner's research mission. Earlier: GEO-10: G3f's specification written under the owner's research mission. Earlier: G3f decisions D-3 … D-12 on content: pointers in GEO-3, GEO-10 and GEO-11. Earlier: the G3f phase plan approved — D-1, D-2: a GEO-3 line; GEO-10 and GEO-11 added. 2026-10-24: GEO-3: G3e-PM ran — registered D1 INCONCLUSIVE, H FAIL by §7, DEV-1; the S-LM1 line stopped. Earlier: the post-mortem checks G3e-PM pre-registered, plan approved, not run. Earlier: G3e Step 1 ended not ready; the report accepted, Step 1 closed. Earlier: S-LM3 closed with a negative result. Earlier: G3e diagnostic run 6. Earlier: G3e Step 1 state after five calibration runs — no synthesis accepted. Earlier: LMC = G3e; C8, C9 decided; LMC specification v0.4: A1, A3 and the whale-back option (b) approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC design note approved as the research plan; Step 1 readiness check; LMC technical specification approved, §12 items 1–4; Step 1 not authorised. Earlier: drafted and checked on G3c data. 2026-10-21: LMC R5 extended to designated outlets, GEO-7 discrepancy closed; LMC note v0.2, the owner's revision; LMC pair approved, step 0 written; post-G3c review: GEO-1, GEO-2 resolved; GEO-3 … GEO-8 classified; GEO-9 added. Earlier: G3c evidence; G2: D6 approved)
 
 Depends On:
 All Canonical Documents
@@ -110,7 +110,7 @@ As timed Points of Interest with lazy activation, readable Active Windows, and I
 ## Progression
 
 **How many Arcana in V1?**  
-One or two player Arcana with different styles of play, out of 22 in the game, one for each Tarot Major Arcana archetype. The other 16 follow after the slice. Documented in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
+Two player Arcana with different styles of play, out of 22 in the game, one for each Tarot Major Arcana archetype. The other 16 follow after the slice. Documented in [05.1 Arcana and Limits](05.1%20Arcana%20and%20Limits.md).
 
 **Which Limits in V1?**  
 The player reaches 9 → 8, and Limit 7 is for NPCs only. Deeper Limits later.
@@ -230,7 +230,7 @@ Free third-person overworld and interior scenes; square grid + Environment Actio
 Unity locked. URP, C#, project folder `unity/`, free 3P + custom Combat Grid TB. Documented in [12 Engine Choice](12%20Engine%20Choice.md).
 
 **What is the first playable proof?**  
-A Vertical Slice of one city and a small territory at player Limits 9–8, in which the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player either stops the ritual and wins or loses. It has one joinable faction with three Arcana, the three earlier POIs as side events, required mechanics in a limited form, and a Lord of the Mysteries-like industrial-era mood — delivered on overworld → interior → combat in place. Death Gap is out of slice scope. Placeholder names may change. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md) and [16](16%20Architecture%20Pivot.md).
+A Vertical Slice of one city and a small territory at player Limits 9–8, in which the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player either stops the ritual and wins or loses. It has one joinable faction and two player Arcana, the three earlier POIs as side events, required mechanics in a limited form, and a Lord of the Mysteries-like industrial-era mood — delivered on overworld → interior → combat in place. Death Gap is out of slice scope. Placeholder names may change. Documented in [11 Vertical Slice](11%20Vertical%20Slice.md) and [16](16%20Architecture%20Pivot.md).
 
 **Where do systems / interfaces / micro-iterations live?**  
 [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md) — System Cards + Track backlog. Spatial locks remain in [16](16%20Architecture%20Pivot.md).
@@ -291,9 +291,9 @@ How does ending the campaign before manifestation relate to the world's later fi
 
 After manifestation, which state changes decide whether the cult holds the capital, and how do allied groups repeatedly attempt to retake it? What event begins the being's separate planet-destruction rite if it remains undefeated?
 
-Which allied leaders and follower groups take part in the capital confrontation, and what determines their composition, casualties, and surviving forces? The qualitative difficulty direction is set: allied forces are expected to win at the lowest Combat Difficulty; Normal is near-even with a slight enemy advantage; higher settings increasingly favour the enemy.
+Which allied leaders and follower groups take part in the capital confrontation, and what determines their composition, casualties, and surviving forces? The qualitative difficulty direction is set: allied forces are expected to win at the lowest Combat Difficulty; the middle setting is near-even with a slight enemy advantage; higher settings increasingly favour the enemy.
 
-What exact force values, odds, and tuning produce the agreed Combat Difficulty direction in the final confrontation, and do any of the other seven sliders affect allied support or its outcome? Numerical balance is deferred until the concept is settled.
+What exact force values, odds, and tuning produce the agreed Combat Difficulty direction in the final confrontation, and do any of the other eight sliders affect allied support or its outcome? Numerical balance is deferred until the concept is settled.
 
 Which public events enter the daily bulletin and faction/map presentation, how quickly do reports spread, and when does a source reveal an exact ritual site versus only a region? The private player summary includes the character's own actions regardless of publicity; its presentation and retention remain open.
 
@@ -473,7 +473,7 @@ Which of the 22 Arcana is the seer Arcana mentioned in [21 Cult Campaign and Cit
 
 How are attribute and skill values normalised to a common task-equivalent scale if their progression tracks use different numeric scales?
 
-How are the shared check rules reconciled with combat's attack-specific multi-attribute formulas?
+How are the shared check rules reconciled with combat's attack-specific multi-attribute formulas? Working Accuracy and Evasion formulas are in [10.2](10.2%20Combat%20System%20Draft.md) §5b.
 
 What are the exact numeric values for the shared attribute/skill progression system: base XP by task-difficulty stage, the ten-stage Δ_XP modifier table, the nonlinear XP required for each next track level, the residual floor, and the outcome modifiers for failure, normal success, and critical success? The agreed structure is universal across activity types and independent of Limit; see [07.1](07.1%20Character%20Attributes,%20Skills,%20and%20Action%20Checks.md).
 
@@ -481,19 +481,15 @@ What are the exceptional requirements and unique benefit for attribute 100?
 
 ## Derived Character Statistics
 
-What are the exact formulas and scales for Maximum HP, Maximum Stamina, and Maximum Will Power? Maximum Stamina is primarily derived from Endurance; its formula remains open.
-
 What are the exact ability costs and how do they vary among Arcana and ability types? The initial balance bands are approximately 10–20% of maximum Will Power for ordinary abilities, 25–40% for powerful abilities, and 50–80% for exceptional abilities; individual abilities define actual costs.
 
 How do effects damage or suppress Will: temporary effective-attribute reduction, maximum-pool reduction, current-resource loss, or a combination? What are duration, treatment, and recovery rules? What are the exact Will XP reward and meaningful-expenditure eligibility for full exhaustion?
 
-What are the exact Movement Speed formula and separate world and Combat Grid units?
+What is the exact Movement Speed formula in free movement? On the Combat Grid a cell costs 1 AP ([10.2](10.2%20Combat%20System%20Draft.md) §5b).
 
 Which additional movement, check, or combat penalties (if any) should apply in High / Overloaded / Critical Overload states? The starting capacity formula, 100/125/150/200% thresholds, and pickup hard limit are specified in [07.2](07.2%20Derived%20Character%20Statistics.md); exertion-cost multipliers remain open.
 
-What are the Accuracy and Evasion formulas and their reconciliation with the shared action-check model?
-
-What are the Physical/Magical Defence conversion curves, caps, stacking, and penetration rules?
+What are the Physical/Magical Defence stacking and penetration rules? The working conversion and its cap are in [10.2](10.2%20Combat%20System%20Draft.md) §5b.
 
 What are the exact recovery rules for Will Power and individual negative conditions? Ordinary HP recovery is fixed at 1% of maximum HP per 10 world ticks unless blocked; see [07.2](07.2%20Derived%20Character%20Statistics.md). What exact items, abilities, treatments, safe activities, or rare events restore Sanity, and at what rates? Stamina recovery is fixed at 5% of maximum per world tick while not performing Stamina-consuming exertion; exact modifiers/blockers remain open.
 
@@ -513,13 +509,9 @@ How diegetic / readable is the transition into Turn-Based Mode (cut, warning) wi
 
 How often may important nodes offer Confront as one option versus scenes that begin already in Confront?
 
-Exact initiative formula and Move Speed units / cells per Move on the Combat Grid?
-
 Diagonal move cost on the Combat Grid: 1 or 1.5?
 
 Exact fail chance bands for vault/climb in V1?
-
-Is Bonus-to-Dash enabled in V1 or deferred?
 
 ## Vertical Slice
 
@@ -528,8 +520,6 @@ What exact prop/language checklist best communicates early radio/steam novelty w
 How visible should crown/nobility pressure be inside Lower Veil without adding a third faction?
 
 Wardens and Veinmarket are local groups in the slice. Are they also parts of a Major Faction in the full game?
-
-The primary opposing Major Faction appears in V1 through the Spirit General's invasion. The remaining slice questions are CC-29, CC-32, and CC-33.
 
 ## Items, Inventory, Equipment, Item Creation, Enchanting, and Alchemy
 
@@ -546,7 +536,7 @@ Item and equipment questions are consolidated in [19 Items, Crafting, Inventory,
 - Exact colour values, icons, and accessible UI presentation for the agreed quality colours.
 - Unique artifacts with both positive and negative traits, including how factions control them; later design ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §7).
 
-Alchemy questions include the mini-game and its outcomes, its timing against the six world ticks, skill/ability progression, lawful and unlawful learning routes, formula and ingredient discovery, whether the player must personally brew each potion, other potion categories, and V1 inclusion. Detailed questions are in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
+Alchemy questions include the mini-game and its outcomes, its timing against the six world ticks, skill/ability progression, lawful and unlawful learning routes, formula and ingredient discovery, whether the player must personally brew each potion, other potion categories, and what the slice's limited form needs. Detailed questions are in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
 
 The item-count formula, Item Creation stage gates, starting carrying capacity/weight model, NPC recovery formula, count-to-quality bands, insertion rule, value-change scope, durability categories, and repair ingredient class are defined in [19]. The Vertical Slice includes Item Creation and Alchemy in a limited form and excludes Enchanting.
 
@@ -554,11 +544,11 @@ The item-count formula, Item Creation stage gates, starting carrying capacity/we
 
 After either campaign completion route and its rating, can the surviving character continue in an epilogue or free-play state? If so, how does that state interact with the world's finite life-cycle? The campaign itself ends when the rating is presented.
 
-What exact V1 length is the Death Gap in days?
+What exact length is the Death Gap in days? It is out of the slice.
 
 How large may a Legacy Cache be before it undermines death, and which items (including extracted modifier instances) may be stored and reliably inherited?
 
-What is the minimal Faction Entry pattern reusable by all V1 factions?
+The slice's Faction Entry is the first-day trial ([11 Vertical Slice](11%20Vertical%20Slice.md)). What minimal pattern is reusable by every joinable faction in the full game?
 
 How many Soft Memory dialogue hooks are required in V1 versus optional flavour?
 
@@ -596,7 +586,7 @@ How are secrets generated?
 
 Can secrets vanish forever?
 
-The target world size is decided: 3 × 3 tiles, 4200 × 4200 m ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §2). Whether V1 uses it is CC-11; the V0 world stays 2800 × 2800 m in [17](17%20Game%20Systems%20Architecture.md).
+The target world size is decided: 3 × 3 tiles, 4200 × 4200 m ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §2). V1, the one-city slice, does not need it (CC-11); the V0 world stays 2800 × 2800 m in [17](17%20Game%20Systems%20Architecture.md).
 
 ## Procedural Buildings / Scenes
 

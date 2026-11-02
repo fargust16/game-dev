@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.15
+Version: 0.16
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-02 (any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-02 (ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -134,7 +134,7 @@ All time-dependent conditions and natural recovery use the shared world clock. T
 ## Natural health recovery
 
 - Natural HP recovery during ordinary activity is deliberately very slow.
-- A starting balance candidate is approximately **1% of maximum HP per 10 world ticks** (10 in-game minutes). This is a proposal for playtesting, not a final approved rate.
+- Ordinary recovery is **1% of maximum HP per 10 world ticks** (10 in-game minutes), owner-approved on 2026-10-31 ([07.2](07.2%20Derived%20Character%20Statistics.md)).
 - Natural recovery must not make repeated combat sustainable through a short wait. Health is a limited resource and players are expected to use exploration, preparation, First Aid, rest, and medical services rather than treating combat as the only activity.
 - Sleep is a distinct recovery mode: it can fully restore ordinary HP when recovery is not blocked, rather than using the slow ordinary recovery rate.
 
@@ -311,13 +311,13 @@ Information transmission is not automatic universal knowledge. Each channel need
 6. What are the final sleep duration rules within the 6–8 hour range, and what can the player choose?
 7. What is the comfort score, how is it calculated, and what temporary rest bonuses can it grant?
 8. How are sleep safety, detection, waking, alarm response, and ambush opening attacks resolved?
-9. What is the ordinary natural HP recovery rate and how does it interact with rest outside sleep?
+9. How does ordinary natural HP recovery interact with rest outside sleep?
 10. What are the Poison and Bleeding natural-removal probabilities, Endurance curves, item modifiers, and treatment rules?
 11. What injury categories exist, what penalties do they impose, and what are their natural-healing probabilities and time curves?
 12. What exactly can First Aid treat or stabilise, and which injuries require a doctor or specialist?
 13. What are the exact HP/stamina recovery rules during sleep, including the timing of recovery when a blocking condition is removed partway through sleep?
 14. How are timed condition durations and early-removal probabilities finalised?
-15. What is the final encounter escape distance and how is it measured on the grid?
+15. The escape distance is about 10 cells. How exactly is it measured on the grid?
 16. How are actors inserted into Initiative when they arrive during an active round?
 17. A fighter who leaves the Combat Grid drops into simulation, and one who comes inside appears on it from the next round. How do pursuit and re-engagement work across a whole city?
 18. What information can each communication channel transmit, to whom, how quickly, and with what limits?
