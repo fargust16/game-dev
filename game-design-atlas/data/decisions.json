@@ -1239,9 +1239,9 @@
   },
   {
     "id": "d-social-checks",
-    "statement": "Dialogue uses three Social Checks with a chance of success. Persuasion and Deception use Intelligence and Will, Intimidation uses Strength and Will, and the listener resists with the same attributes. Intelligence shows the percentage. Attitude, Reputation, and rumours change the chance, depending on the skill and on who is listening.",
-    "rationale": "Gives Convince and Threaten rules, lets what a character did return through what people heard, and stops one good name opening every door.",
-    "alternatives": "Fixed requirements with no chance, or Reputation that passes a check outright.",
+    "statement": "Dialogue follows Disco Elysium: 2d6 + Character Value + Modifiers against Request + Listener Value, +2 for an enemy. A Social Check exists only with an Argument the character holds. Persuasion and Deception use Intelligence and Will, Intimidation uses Strength and Will, and the listener resists with the same attributes. Persuasion brings an ordinary gain, and Deception brings more and costs more. A failed check is not repeated on the spot: friendly listeners may give a clue or a Proof Task, and against enemies it is a Final Check that ends in a fight. Reputation and Danger are read from a Deeds Record.",
+    "rationale": "Knowledge opens a conversation instead of stats, a flatter two-dice curve keeps a small lead from winning every talk, and a failure changes the situation instead of wasting time.",
+    "alternatives": "The shared curve of 07.1, which reaches 99 % at a lead of 4 and falls to 1 % at a difference of 8.",
     "systemIds": [
       "approaches"
     ],
