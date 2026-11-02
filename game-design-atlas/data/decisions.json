@@ -1296,5 +1296,22 @@
       "src-10"
     ],
     "dateNote": "Authoring defaults calculated on the owner's instruction, 2026-11-02."
+  },
+  {
+    "id": "d-conductor-ap",
+    "statement": "A conductor who fights goes on conducting and has 3 AP less each turn. The ritual does not stop because someone was attacked.",
+    "rationale": "The fight at the circle stays worth starting, and the ritual keeps running while it lasts.",
+    "alternatives": "Conductors at full AP, which makes the fight harder still, or half AP, which leaves a two-handed senior unable to attack.",
+    "systemIds": [
+      "cult-campaign",
+      "confront"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21",
+      "src-10"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-02."
   }
 ]
