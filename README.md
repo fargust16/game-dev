@@ -84,6 +84,7 @@ This repository is currently a design bible. Implementation begins only after th
 | Doc | Status | Role |
 |-----|--------|------|
 | [90 Glossary](90%20Glossary.md) | Draft | Terminology |
+| [91 Agent Decision Record](91%20Agent%20Decision%20Record.md) | Draft | Full text of agent decisions and the history of AGENTS.md |
 | [99 Open Questions](99%20Open%20Questions.md) | Draft | Unresolved design questions |
 
 ---
