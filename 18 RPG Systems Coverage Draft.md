@@ -1,8 +1,8 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.12
+Version: 0.13
 Status: Draft
-Last Updated: 2026-11-01 (terms renamed to Arcana and Limit. Earlier: Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
+Last Updated: 2026-11-02 (Persuasion, Intimidation, and Deception confirmed in 10.4. Earlier: terms renamed to Arcana and Limit. Earlier: Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [99 Open Questions](99%20Open%20Questions.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -309,9 +309,9 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 
 | Action | Candidate skill | Candidate attribute influences | Notes |
 |---|---|---|---|
-| Persuade through arguments or reasons | Persuasion | Intelligence, Will | Distinct from negotiation if the game supports both as separate outcomes. |
-| Intimidate | Intimidation | Strength, Will | Can rely on credible threat, reputation, context, or force; does not always require a physical check. |
-| Lie | Deception | Intelligence, Will | Used when a lie is materially contested. |
+| Persuade through arguments or reasons | Persuasion, confirmed in [10.4](10.4%20Dialogue%20and%20Social%20Checks.md) | Intelligence, Will | Distinct from negotiation if the game supports both as separate outcomes. |
+| Intimidate | Intimidation, confirmed in [10.4](10.4%20Dialogue%20and%20Social%20Checks.md) | Strength, Will | Can rely on credible threat, reputation, context, or force; does not always require a physical check. |
+| Lie | Deception, confirmed in [10.4](10.4%20Dialogue%20and%20Social%20Checks.md) | Intelligence, Will | Used when a lie is materially contested. |
 | Find a compromise or agreement | Diplomacy | Intelligence, Will | Remains a candidate distinct from Persuasion. |
 | Negotiate prices | Trading / Haggling | Intelligence, Will | Could connect to merchant access and economy rules. |
 | Notice deception or read a person | Insight (working name) | Perception, Intelligence | Exact boundaries versus world knowledge and dialogue context remain open. |

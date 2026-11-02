@@ -1,10 +1,10 @@
 # 06 Approaches
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft
 
-Last Updated: 2026-11-02 (Veil's rules live in 10.3. Earlier: Confront runs in place.)
+Last Updated: 2026-11-02 (Convince and Threaten use the Social Checks of 10.4. Earlier: Veil's rules live in 10.3. Earlier: Confront runs in place.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md)
@@ -75,6 +75,7 @@ Social resolution through consent, trust, or shared logic.
 - Strong when the player has clues, reputation, or a readable shared interest.
 - Can fail without combat and still reveal motives.
 - Distinct from Threaten: fear is not the main lever.
+- Uses the Persuasion and Deception checks of [10.4 Dialogue and Social Checks](10.4%20Dialogue%20and%20Social%20Checks.md).
 
 ## Threaten
 
@@ -83,6 +84,7 @@ Social or physical pressure through fear.
 - Strong for Open Style conduct and desperate urgency.
 - Risks lasting enmity, false compliance, or escalation into Confront.
 - Yield Threshold moments often begin here or in Confront.
+- Uses the Intimidation check of [10.4 Dialogue and Social Checks](10.4%20Dialogue%20and%20Social%20Checks.md).
 
 ## Exchange
 
@@ -166,7 +168,7 @@ When filling a Decision Node card, name both the axes and the Approaches used by
 Deferred to later system docs:
 
 - hit chances, stances, cooldowns, combat AI;
-- full dialogue trees and persuasion minigames;
+- full dialogue trees and persuasion minigames (the checks themselves are in [10.4 Dialogue and Social Checks](10.4%20Dialogue%20and%20Social%20Checks.md));
 - stealth detection meters, now in [10.3 Stealth and Detection](10.3%20Stealth%20and%20Detection.md);
 - economy price formulas for Exchange;
 - rite choreography and spell animation.

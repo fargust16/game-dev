@@ -1236,5 +1236,20 @@
       "src-10"
     ],
     "dateNote": "Owner-approved answers, 2026-11-02."
+  },
+  {
+    "id": "d-social-checks",
+    "statement": "Dialogue uses three Social Checks with a chance of success. Persuasion and Deception use Intelligence and Will, Intimidation uses Strength and Will, and the listener resists with the same attributes. Intelligence shows the percentage. Attitude, Reputation, and rumours change the chance, depending on the skill and on who is listening.",
+    "rationale": "Gives Convince and Threaten rules, lets what a character did return through what people heard, and stops one good name opening every door.",
+    "alternatives": "Fixed requirements with no chance, or Reputation that passes a check outright.",
+    "systemIds": [
+      "approaches"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-10-4"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-02."
   }
 ]
