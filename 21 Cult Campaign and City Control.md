@@ -1,10 +1,10 @@
 # 21 Cult Campaign and City Control
 
-Version: 0.17
+Version: 0.18
 
 Status: Draft — owner-approved direction, incomplete specification
 
-Last Updated: 2026-11-02 (ritual dialogue checks are Final Checks. Earlier: dialogue checks follow 10.4. Earlier: stealth in a captured city follows 10.3. Earlier: the Force Estimate governs every side; a senior's death has no effect of its own. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate; ritual group numbers set. Earlier: allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
+Last Updated: 2026-11-02 (Ritual Weak Points added. Earlier: ritual dialogue checks are Final Checks. Earlier: dialogue checks follow 10.4. Earlier: stealth in a captured city follows 10.3. Earlier: the Force Estimate governs every side; a senior's death has no effect of its own. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate; ritual group numbers set. Earlier: allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07 Character Life](07%20Character%20Life.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -175,15 +175,43 @@ A ritual is stopped in one of four ways:
 - Kill everyone conducting it.
 - Kill the senior who started it. The ritual then counts as disrupted.
 - A Cult Retreat. Those conducting the ritual stop and leave without fighting.
-- Meet the conditions set for that ritual: persuade cultists, pose as one of them or as a local, pretend to help and derail it. These are Final Checks, so a failure against a follower who can fight starts a fight ([10.4 Dialogue and Social Checks](10.4%20Dialogue%20and%20Social%20Checks.md)).
+- Exploit one of its Ritual Weak Points: persuade a cultist, pose as one of them or as a local, pretend to help and derail it, or spoil what it rests on.
 
-The conditions differ from ritual to ritual, so the player cannot learn one answer and repeat it. They take planning, and they give less warlike Arcana a way to act.
+The Weak Points differ from ritual to ritual, so the player cannot learn one answer and repeat it. They take planning, and they give less warlike Arcana a way to act.
 
 The non-combat routes exist only while the cult has not fully taken the city. Once the city is cleared, a running ritual can be stopped only by fighting.
 
 Once a ritual is disrupted, the attributes of the enemy's followers and General fall. They then redo the Force Estimate with that penalty, and it decides whether they fight on or leave. Against a single intruder they may try to drive that person off or fight.
 
 A new ritual can be held in a city two game days after the previous one there, so that rituals do not run constantly. The city itself can be retaken at once, but the ritual must wait. While it waits, the city does not count as captured and does not open the capital.
+
+## Ritual Weak Points (owner-approved)
+
+Every ritual has **Ritual Weak Points**. In the slice it has two, chosen by the seed from the four below. The seed also sets the people, items, and places involved. Exploiting any one of them stops the ritual, which then counts as disrupted.
+
+| Weak Point | What it is | How it is exploited | What it needs |
+|---|---|---|---|
+| Сомневающийся | A conductor with a personal reason to waver: family in the city, a debt, fear | Persuasion, a Large request | An Argument about that person |
+| Самозванец | The group lets someone who seems a new convert or a local help at the circle | Deception, a Large request, then derailing the ritual from inside | A sign or word of the cult |
+| Грязная тайна | The senior or a conductor hides something from the others | Intimidation, a Large request | Evidence of it |
+| Основа ритуала | The ritual rests on an item or a mixture | Reaching it in Stealth Mode and swapping or spoiling it, with no roll | An item or potion made in advance |
+
+The dialogue routes are Final Checks ([10.4 Dialogue and Social Checks](10.4%20Dialogue%20and%20Social%20Checks.md)). Working reading: Самозванец poses as a convert not yet on the Cult Thought Link, because a follower would be checked through the Link at once.
+
+**Finding them.** No list and no map mark shows a Weak Point. The player recognises one on finding its Argument and seeing the option appear in dialogue.
+
+Arguments come from two places:
+
+- **Before the invasion:** odd traces in the ordinary life of the city, whose meaning the player does not know yet. On a later run the player knows such traces are worth looking for.
+- **During the invasion:** eavesdropping at the site, searching a dead follower, or reading a sleeping one with Дрёма and Чужой сон.
+
+**At the site.** Guards challenge a stranger and let it speak. They recognise a member of an allied faction at once, so Deception is harder for it.
+
+**Time.** The ritual does not wait: each line of a dialogue at the ritual site costs one tick ([18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)).
+
+**After a failure.** A failed Final Check starts a fight, and every follower in the city knows of it through the Cult Thought Link. No dialogue route remains. Only the hidden route stays, if it is one of this ritual's Weak Points.
+
+How many Weak Points a campaign ritual has, and which further kinds exist, is open (CC-8).
 
 ## Force Estimate (owner-approved)
 

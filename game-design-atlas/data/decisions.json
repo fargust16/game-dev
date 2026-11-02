@@ -1251,5 +1251,20 @@
       "src-10-4"
     ],
     "dateNote": "Owner-approved answers, 2026-11-02."
+  },
+  {
+    "id": "d-ritual-weak-points",
+    "statement": "A ritual in the slice has two Ritual Weak Points, chosen by the seed from Сомневающийся, Самозванец, Грязная тайна, and Основа ритуала. Any one stops it. No list or map mark shows them: the player recognises one on finding its Argument. A line of dialogue at the site costs one tick. A failed Final Check leaves only the hidden route.",
+    "rationale": "Gives a non-violent way to win that rests on what the character found out, differs each run, and uses stealth, Alchemy, and the three Social Checks.",
+    "alternatives": "One fixed answer per ritual, which a player learns once; or map marks, which remove the search.",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-02."
   }
 ]
