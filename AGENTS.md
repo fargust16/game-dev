@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 1.26
+Version: 1.27
 
 Status: Draft
 
-Last Updated: 2026-11-02 (the allies' edge in items stays with their Limit 8 fighters)
+Last Updated: 2026-11-02 (items are made as 19 §3 makes them; Outfit V0 reads as the skill of a side's armourers)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)

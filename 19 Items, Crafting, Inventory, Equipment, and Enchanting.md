@@ -1,8 +1,8 @@
 # 19 Items, Crafting, Inventory, Equipment, and Enchanting
 
-Version: 0.6
+Version: 0.7
 Status: Draft — owner-confirmed rules with delegated starting-balance formulas; content tables, operation costs, and selected edge cases remain open
-Last Updated: 2026-11-02 (working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
+Last Updated: 2026-11-02 (catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -70,19 +70,20 @@ This draft consolidates owner-approved direction for item bases, Item Creation, 
 
 Owner's direction, 2026-11-02: items strengthen a character significantly, and whole sets, not single items or consumables, decide fights ([10.2](10.2%20Combat%20System%20Draft.md) §5b). The values below are authoring defaults checked by `tools/balance/item_sim.py`, not owner-approved rules. They answer the open items of §2.2 only as far as a simulation needs.
 
-| Type | Tier 9 gives |
+| Type | A major modifier of tier 9 gives |
 |---|---:|
-| Damage | +8 % |
-| Accuracy | +4 |
-| Critical chance | +7 percentage points |
-| Critical damage | +20 percentage points |
-| Maximum HP | +7 % |
-| Physical defence | +3 |
-| Evasion | +2.8 |
-| AP | +0.6 |
-| Initiative | +2 |
-| Will against control | +3 |
+| Damage | +11 % |
+| Accuracy | +5 |
+| Critical chance | +9 percentage points |
+| Critical damage | +25 percentage points |
+| Maximum HP | +9 % |
+| Physical defence | +4 |
+| Evasion | +4 |
+| AP | +0.8 |
+| Initiative | +3 |
+| Will against control | +4 |
 
+- A minor modifier gives half of a major one. Each modifier is major or minor at even odds while its group has room, which is a working reading of the split left open in §2.2.
 - Each tier above 9 adds half of the tier 9 value, so tier 7 gives double. A value rolls within ±20 %.
 - At stage 9 a modifier is tier 9 in 70 % of rolls, tier 8 in 25 %, and tier 7 in 5 %.
 - A modifier takes one of its base's favoured types in 75 % of rolls, and any type in the rest.
@@ -100,7 +101,7 @@ Owner's direction, 2026-11-02: items strengthen a character significantly, and w
 | Ring | Damage, Critical chance, Critical damage, Will |
 | Necklace | Will, HP, Initiative, Accuracy |
 
-A soldier's whole set is 11 pieces, so a Magic set carries about 16 modifiers and a Rare set 33. By the formula of §3 an average of 1.5 modifiers an item needs Item Creation of about 26, and an average of 3 needs about 67, so Outfit V0 of [10.2](10.2%20Combat%20System%20Draft.md) §5b assumes that a faction's armourers make its soldiers' sets. A character with skill 1–10 averages under one modifier an item. Critical chance and Critical damage here are item modifiers, not the separately levelled attributes that [07.2](07.2%20Derived%20Character%20Statistics.md) excludes.
+A whole set is 11 pieces. At the average of 1.5 modifiers an item it carries about 16, and at 3 about 33. By the formula of §3 the first needs Item Creation of about 26 and the second about 67, so Outfit V0 of [10.2](10.2%20Combat%20System%20Draft.md) §5b is read as a soldier's set and an officer's set, by the skill of the armourers who make them. A character with skill 1–10 averages under one modifier an item, and stage 8 at skill 11 adds more than the modifiers do. Critical chance and Critical damage here are item modifiers, not the separately levelled attributes that [07.2](07.2%20Derived%20Character%20Statistics.md) excludes.
 
 # 3. Item Creation
 
@@ -219,7 +220,7 @@ There is no separate delete or replace operation. Full reforge is the only curre
 
 # 7. Open design questions
 
-1. Confirm whether base-favored modifier types are independent of the major/minor group (this draft treats them independently). What is the final base catalogue and its fixed favored-type weights? What are the exact item-stage/tier weights, numeric ranges, and duplicate constraints? §2.4 holds working values only; how much a minor modifier gives against a major one is open (CC-47).
+1. Confirm whether base-favored modifier types are independent of the major/minor group (this draft treats them independently). What is the final base catalogue and its fixed favored-type weights? What are the exact item-stage/tier weights, numeric ranges, and duplicate constraints? §2.4 holds working values only.
 2. What probability distribution assigns major/minor groups among valid 3+3 splits? How does random Enchanting addition choose among groups that have free slots?
 3. Which Enchanting skill levels unlock Steps 2–6 after learning unlocks Step 1?
 4. What costs, ingredient lists, stations/requirements, and world-time durations apply to each Enchanting operation?

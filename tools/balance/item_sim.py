@@ -1,9 +1,10 @@
-"""What item sets do to a fight, on the Combat Grid of tactical_sim.py.
+"""What items do to a fight, on the Combat Grid of tactical_sim.py.
 
 19 gives items a stage, slots, 0-6 modifiers, and a quality named by their count,
-but no modifier types or values. This file tries a working catalogue of them.
-Every value here is an experiment, not a rule. Soldiers differ a little by a random
-spread of attributes, and the rest of a fighter's strength comes from its items.
+but no modifier types or values. This file tries a working catalogue of them, made
+as 19 §3 makes them. Every value here is an authoring default, not a rule. Soldiers
+differ a little by a random spread of attributes, and the rest of a fighter's
+strength comes from its items.
 
 Run: python tools/balance/item_sim.py [fights per line] [section]
 """
@@ -17,7 +18,7 @@ from multiprocessing import Pool
 import combat_sim as c
 import tactical_sim as t
 
-RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 1500
+RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 3000
 SECTION = sys.argv[2] if len(sys.argv) > 2 else "all"
 SPREAD = 2
 FAVOURED = 0.75
@@ -35,24 +36,24 @@ SLOTS = {
     "ring 2": ("damage", "crit", "crit_damage", "will"),
     "necklace": ("will", "hp", "initiative", "accuracy"),
 }
-# What one modifier of tier 9 gives. Percentages are fractions, the rest are points.
+# What one major modifier of tier 9 gives. Percentages are fractions, the rest are points.
 VALUE = {
-    "damage": 0.04, "accuracy": 2.0, "crit": 0.035, "crit_damage": 0.10,
-    "hp": 0.035, "defence": 1.5, "evasion": 1.4,
-    "ap": 0.3, "initiative": 1.0, "will": 1.5,
+    "damage": 0.11, "accuracy": 5.0, "crit": 0.09, "crit_damage": 0.25,
+    "hp": 0.09, "defence": 4.0, "evasion": 4.0,
+    "ap": 0.8, "initiative": 3.0, "will": 4.0,
 }
 ALL_TYPES = tuple(VALUE)
 TIER_STEP = 0.5
 TIER_WEIGHTS = {9: ((9, 8, 7), (70, 25, 5)), 8: ((9, 8, 7, 6), (35, 40, 20, 5))}
 QUALITY = {"Normal": (0, 0), "Magic": (1, 2), "Rare": (3, 3), "Epic": (4, 4), "Legendary": (5, 6)}
-SHORT = dict(zip("NMREL", QUALITY))
+SOLDIER, OFFICER, MASTER = 26, 67, 95
 
 
 @dataclass(frozen=True)
 class Items:
     scale: float = 1.0
-    stage_step: float = 0.35
     spread: int = SPREAD
+    minor: float = 0.5
 
 
 def roll_modifier(slot, stage, items):
@@ -67,21 +68,43 @@ def add(u, kind, value):
     setattr(u.gear, kind, getattr(u.gear, kind) + value)
 
 
-def item(u, slot, quality, items, stage=9):
+def filled(u, slot, count, items, stage=9):
+    """One item with this many modifiers, 3 major and 3 minor at most."""
     if slot == "weapon":
         u.weapon = c.staged(u.weapon, stage)
     elif slot == "body":
         u.armour_stage = stage
-    low, high = QUALITY[quality]
-    for _ in range(random.randint(low, high)):
-        add(u, *roll_modifier(slot, stage, items))
+    major = minor = 0
+    for _ in range(count):
+        is_major = minor == 3 or (major < 3 and random.random() < 0.5)
+        major += is_major
+        minor += not is_major
+        kind, value = roll_modifier(slot, stage, items)
+        add(u, kind, value * (1 if is_major else items.minor))
     return u
 
 
-def equip(u, quality, items, stage=9):
+def item(u, slot, quality, items):
+    return filled(u, slot, random.randint(*QUALITY[quality]), items)
+
+
+def equip(u, quality, items):
     """A whole set of one quality. The luck of the rolls stays in."""
     for slot in SLOTS:
-        item(u, slot, quality, items, stage)
+        item(u, slot, quality, items)
+    return u
+
+
+def modifier_count(skill):
+    """19 §3, with the maker's Perception and Luck left out."""
+    p = 0.10 + 0.60 * (skill - 1) / 99
+    return sum(random.random() < p for _ in range(6))
+
+
+def supplied(u, skill, items, slots=tuple(SLOTS), tries=1, stage=9):
+    """Items as a maker of this skill makes them, each the best of `tries` attempts."""
+    for slot in slots:
+        filled(u, slot, max(modifier_count(skill) for _ in range(tries)), items, stage)
     return u
 
 
@@ -96,8 +119,8 @@ def soldier(items=Items()):
     return spread(c.Unit("s", 9, 6, 6, 4, 4, 5, will=4, weapon=c.ONE_HAND, armour="cloth"), items.spread)
 
 
-def band(n, quality, items, stage=9):
-    return [equip(soldier(items), quality, items, stage) for _ in range(n)]
+def band(n, quality, items):
+    return [equip(soldier(items), quality, items) for _ in range(n)]
 
 
 def pure(n, kinds, count, items):
@@ -124,11 +147,15 @@ def line(name, row):
     return f"{name:<24} " + " ".join(f"{k} {v:3.0f}" for k, v in row.items())
 
 
+def row(name, percent):
+    return f"{name:<44} {percent:5.1f}"
+
+
 # One stat alone: which types are worth the same? 5 with it against 5 without.
 def stat_job(kind):
     seeded(kind)
     items = Items()
-    return line(kind, {f"+{n}": d(lambda: pure(5, (kind,), n, items), lambda: pure(5, (), 0, items)) for n in (6, 12, 24)})
+    return line(kind, {f"+{n}": d(lambda: pure(5, (kind,), n, items), lambda: pure(5, (), 0, items)) for n in (3, 6, 12)})
 
 
 THEMES = {
@@ -143,10 +170,20 @@ THEMES = {
 # Whole sets of equal size against each other: is there one best set?
 def theme_job(name):
     seeded(name)
-    items = Items(scale=2.0)
-    row = {other: d(lambda: pure(5, THEMES[name], 12, items), lambda: pure(5, THEMES[other], 12, items)) for other in THEMES}
-    row["plain"] = d(lambda: pure(5, THEMES[name], 12, items), lambda: pure(5, (), 0, items))
-    return line(name, row)
+    items = Items(scale=0.75)
+    out = {other: d(lambda: pure(5, THEMES[name], 12, items), lambda: pure(5, THEMES[other], 12, items)) for other in THEMES}
+    out["plain"] = d(lambda: pure(5, THEMES[name], 12, items), lambda: pure(5, (), 0, items))
+    return line(name, out)
+
+
+# Does going first cost anything once the sides already stand in reach?
+def first_job(gap):
+    seeded(f"first {gap}")
+    items = Items()
+    rules = replace(t.PLAIN, gap=gap)
+    a = lambda: pure(5, ("initiative",), 6, items)
+    b = lambda: pure(5, (), 0, items)
+    return line(f"gap {gap}", {"plain": t.duel(rules, b, b, RUNS), "initiative": t.duel(rules, a, b, RUNS)})
 
 
 def one_of(n, fn, items):
@@ -156,19 +193,27 @@ def one_of(n, fn, items):
 
 
 # How far one item reaches, on a base of 5 against 5 Normal.
-def reach_job(scale):
-    seeded(f"reach {scale}")
-    items = Items(scale=scale)
+def reach_job(_):
+    seeded("reach")
+    items = Items()
     base = lambda: one_of(5, lambda u: None, items)
-    row = {
+    return line("reach", {
+        "plain": d(base, base),
         "a R weapon": d(lambda: one_of(5, lambda u: item(u[0], "weapon", "Rare", items), items), base),
         "a L weapon": d(lambda: one_of(5, lambda u: item(u[0], "weapon", "Legendary", items), items), base),
         "a R set": d(lambda: one_of(5, lambda u: equip(u[0], "Rare", items), items), base),
         "a L set": d(lambda: one_of(5, lambda u: equip(u[0], "Legendary", items), items), base),
         "5 R body": d(lambda: one_of(5, lambda us: [item(u, "body", "Rare", items) for u in us], items), base),
         "5 R weapon": d(lambda: one_of(5, lambda us: [item(u, "weapon", "Rare", items) for u in us], items), base),
-    }
-    return line(f"scale {scale}", row)
+    })
+
+
+# One fighter alone against several with no items.
+def solo_job(quality):
+    seeded(f"solo {quality}")
+    items = Items()
+    alone = lambda: [equip(soldier(items), quality, items)]
+    return line(f"one in {quality}", {f"v {n}": d(alone, lambda: band(n, "Normal", items)) for n in (1, 2, 3, 5)})
 
 
 # The random spread of a soldier.
@@ -184,15 +229,12 @@ def spread_job(n):
     })
 
 
-# Ladders of quality, by the size of a modifier.
-GRID = {f"scale {k}": Items(scale=k) for k in (1.0, 1.5, 2.0, 3.0)}
-
-
-def grid_job(name):
-    seeded(name)
-    items = GRID[name]
+# The ladder of quality.
+def grid_job(_):
+    seeded("ladder")
+    items = Items()
     b = lambda q, k: band(k, q, items)
-    return line(name, {
+    return line("ladder", {
         "M v N": d(lambda: b("Magic", 5), lambda: b("Normal", 5)),
         "R v M": d(lambda: b("Rare", 5), lambda: b("Magic", 5)),
         "E v R": d(lambda: b("Epic", 5), lambda: b("Rare", 5)),
@@ -202,39 +244,32 @@ def grid_job(name):
         "R v 8N": d(lambda: b("Rare", 5), lambda: b("Normal", 8)),
         "M+N v M": d(lambda: b("Magic", 5) + b("Normal", 1), lambda: b("Magic", 5)),
         "R+N v R": d(lambda: b("Rare", 5) + b("Normal", 1), lambda: b("Rare", 5)),
-        "R+M v R": d(lambda: b("Rare", 5) + b("Magic", 1), lambda: b("Rare", 5)),
     })
 
 
-# Does going first cost anything once the sides already stand in reach?
-def first_job(gap):
-    seeded(f"first {gap}")
-    items = Items()
-    rules = replace(t.PLAIN, gap=gap)
-    a = lambda: pure(5, ("initiative",), 12, items)
-    b = lambda: pure(5, (), 0, items)
-    return line(f"gap {gap}", {"plain": t.duel(rules, b, b, RUNS), "+12 initiative": t.duel(rules, a, b, RUNS)})
-
-
-def ranked(profile):
-    return {9: SHORT[profile[0]], 8: SHORT[profile[1]], 7: SHORT[profile[-1]]}
-
-
 @dataclass(frozen=True)
-class Outfit:
-    """Who wears what by rank. Letters are qualities at Limit 9, 8 and 7."""
-    allies: str = "MR"
-    cult: str = "MMR"
+class Supply:
+    """The skill of the armourers who dress a rank: Limit 9, 8, and 7. None means no items."""
+    allies: tuple = (SOLDIER, OFFICER)
+    cult: tuple = (SOLDIER, SOLDIER, OFFICER)
     bonus: int = 1
-    scale: float = 2.0
+    scale: float = 1.0
     spread: int = SPREAD
+    minor: float = 0.5
 
     def items(self):
-        return Items(scale=self.scale, spread=self.spread)
+        return Items(scale=self.scale, spread=self.spread, minor=self.minor)
 
-    def wears(self, profile):
+    def wears(self, skills):
+        """A rank's skill may be a pair: then each member gets one of the two at random."""
         items = self.items()
-        return lambda u: equip(spread(u, items.spread), ranked(profile)[u.limit], items)
+
+        def dress(u):
+            spread(u, items.spread)
+            skill = skills[9 - u.limit]
+            skill = random.choice(skill) if isinstance(skill, tuple) else skill
+            return u if skill is None else supplied(u, skill, items)
+        return dress
 
     def rules(self):
         return replace(t.V0, outfit=self.wears(self.cult), enemy_bonus=self.bonus)
@@ -243,64 +278,101 @@ class Outfit:
         return [self.wears(self.allies)(u) for u in t.archers()]
 
 
-# The slice: what each outfit gives, and what one more does.
-SLICES = {f"{a} v {b}+{n} ×{k}": Outfit(a, b, n, k) for k in (2.0,) for a, b, n in (
-    ("NN", "NNN", 1), ("MR", "NME", 2), ("MR", "MMR", 1), ("MR", "MMR", 2), ("MR", "MRR", 1),
-    ("MM", "MMR", 1), ("RE", "RRR", 1), ("RR", "RRR", 1),
-)}
-
-
-def slice_job(name):
-    seeded(name)
-    o = SLICES[name]
-    items, rules = o.items(), o.rules()
-    chain = lambda fn: t.chain(rules, fn, runs=RUNS)
-    base = chain(o.side)
-    extra = lambda fn: chain(lambda: o.side() + [fn()]) - base
-    row = {
-        "base": base,
-        "club": extra(c.new_character),
-        "club M": extra(lambda: equip(c.new_character(), "Magic", items)),
-        "club R": extra(lambda: equip(c.new_character(), "Rare", items)),
-        "L9": extra(lambda: o.wears(o.allies)(c.ally9())),
-        "L8": extra(lambda: o.wears(o.allies)(c.ally8())),
-    }
-    return f"{name:<24} " + " ".join(f"{k} {v:+3.0f}" if k != "base" else f"{k} {v:3.0f}" for k, v in row.items())
-
-
-# Outfit V0: what moves it, in points of the whole chain.
-V0 = Outfit()
-ALLIED_ROWS = {
-    "allies alone": lambda o, i: o.side(),
-    "+ club": lambda o, i: o.side() + [c.new_character()],
-    "+ club, a Rare weapon": lambda o, i: o.side() + [item(c.new_character(), "weapon", "Rare", i)],
-    "+ club, Magic set": lambda o, i: o.side() + [equip(c.new_character(), "Magic", i)],
-    "+ club, Rare set": lambda o, i: o.side() + [equip(c.new_character(), "Rare", i)],
-    "+ Limit 9, no items": lambda o, i: o.side() + [c.ally9()],
-    "+ Limit 9, same": lambda o, i: o.side() + [o.wears(o.allies)(c.ally9())],
-    "+ Limit 8, same": lambda o, i: o.side() + [o.wears(o.allies)(c.ally8())],
-    "+ hero of Limit 9, no items": lambda o, i: o.side() + [c.hero9()],
-    "+ hero of Limit 9, Magic set": lambda o, i: o.side() + [equip(c.hero9(), "Magic", i)],
-    "+ hero of Limit 9, Rare set": lambda o, i: o.side() + [equip(c.hero9(), "Rare", i)],
-    "+ hero of Limit 8, Rare set": lambda o, i: o.side() + [equip(c.hero(), "Rare", i)],
+V0 = Supply()
+MINORS = {
+    "minor ×1, same total": Supply(minor=1.0, scale=0.75),
+    "minor ×0.75, same total": Supply(minor=0.75, scale=0.857),
+    "minor ×0.5": V0,
+    "minor ×0.25, same total": Supply(minor=0.25, scale=1.2),
 }
-OUTFITS = {
-    "no items at all": Outfit("NN", "NNN"),
-    "allies a quality up": Outfit(allies="RE"),
-    "allies a quality down": Outfit(allies="NM"),
-    "allied Limit 9 in Rare": Outfit(allies="RR"),
-    "allied Limit 8 in Epic": Outfit(allies="ME"),
-    "cult a quality up": Outfit(cult="RRE"),
-    "cult a quality down": Outfit(cult="NNM"),
-    "no spread": Outfit(spread=0),
-    "spread ±4": Outfit(spread=4),
-    "modifiers ×1.5": Outfit(scale=1.5),
-    "modifiers ×3": Outfit(scale=3.0),
+SUPPLIES = {
+    "as they are": V0,
+    "no items at all": Supply(allies=(None, None), cult=(None, None, None)),
+    "allied armourers -20": Supply(allies=(6, 47)),
+    "allied armourers -10": Supply(allies=(16, 57)),
+    "allied armourers -5": Supply(allies=(21, 62)),
+    "allied armourers +5": Supply(allies=(31, 72)),
+    "allied armourers +10": Supply(allies=(36, 77)),
+    "allied armourers +20": Supply(allies=(46, 87)),
+    "cult armourers -20": Supply(cult=(6, 6, 47)),
+    "cult armourers -10": Supply(cult=(16, 16, 57)),
+    "cult armourers -5": Supply(cult=(21, 21, 62)),
+    "cult armourers +5": Supply(cult=(31, 31, 72)),
+    "cult armourers +10": Supply(cult=(36, 36, 77)),
+    "cult armourers +20": Supply(cult=(46, 46, 87)),
+    "allies a quality up": Supply(allies=(OFFICER, MASTER)),
+    "allies a quality down": Supply(allies=(1, SOLDIER)),
+    "cult a quality up": Supply(cult=(OFFICER, OFFICER, MASTER)),
+    "cult a quality down": Supply(cult=(1, 1, SOLDIER)),
+    "every rank dressed alike": Supply(cult=(SOLDIER, OFFICER, OFFICER)),
+    "half the cult Limit 9 better": Supply(cult=((SOLDIER, OFFICER), SOLDIER, OFFICER)),
+    "half the cult Limit 8 better": Supply(cult=(SOLDIER, (SOLDIER, OFFICER), OFFICER)),
+    "half the cult Limit 9 with no items": Supply(cult=((SOLDIER, None), SOLDIER, OFFICER)),
+    "half the cult Limit 8 with no items": Supply(cult=(SOLDIER, (SOLDIER, None), OFFICER)),
+    "cult Limit 7 with no items": Supply(cult=(SOLDIER, SOLDIER, None)),
+    "no spread": Supply(spread=0),
+    "spread ±4": Supply(spread=4),
+    "modifiers ×0.75": Supply(scale=0.75),
+    "modifiers ×1.5": Supply(scale=1.5),
 }
 
 
-def each(o, fn):
-    units = o.side()
+def changed_one(limit, skill):
+    """The allies with one fighter of this rank in another set."""
+    units = V0.side()
+    fresh = c.ally9() if limit == 9 else c.ally8()
+    if skill is not None:
+        supplied(fresh, skill, V0.items())
+    units[[u.limit for u in units].index(limit)].gear = fresh.gear
+    return units
+
+
+ONE_FIGHTER = {
+    "one allied Limit 9 in an officer's set": lambda: changed_one(9, OFFICER),
+    "one allied Limit 8 in a master's set": lambda: changed_one(8, MASTER),
+    "one allied Limit 8 in a soldier's set": lambda: changed_one(8, SOLDIER),
+    "one allied Limit 8 with no items": lambda: changed_one(8, None),
+}
+
+
+def looted(n, items):
+    return supplied(c.hero9(), SOLDIER, items, random.sample(list(SLOTS), n))
+
+
+def stage_8_two(items):
+    """Skill 15: stage 8 on weapon and body, stage 9 on the rest."""
+    u = supplied(c.hero9(), 15, items, ("weapon", "body"), stage=8)
+    return supplied(u, 15, items, tuple(s for s in SLOTS if s not in ("weapon", "body")))
+
+
+PLAYER = {
+    "club, no items": lambda i: c.new_character(),
+    "club, own work, skill 5": lambda i: supplied(c.new_character(), 5, i),
+    "club, own work, skill 15": lambda i: supplied(c.new_character(), 15, i),
+    "club, a Rare weapon": lambda i: item(c.new_character(), "weapon", "Rare", i),
+    "club, soldier's set": lambda i: supplied(c.new_character(), SOLDIER, i),
+    "club, officer's set": lambda i: supplied(c.new_character(), OFFICER, i),
+    "Limit 9, no items": lambda i: c.ally9(),
+    "Limit 9, same as the allies": lambda i: V0.wears(V0.allies)(c.ally9()),
+    "Limit 8, same as the allies": lambda i: V0.wears(V0.allies)(c.ally8()),
+    "hero L9, no items": lambda i: c.hero9(),
+    "hero L9, own work, skill 5": lambda i: supplied(c.hero9(), 5, i),
+    "hero L9, own work, skill 15": lambda i: supplied(c.hero9(), 15, i),
+    "hero L9, best of 3, skill 15": lambda i: supplied(c.hero9(), 15, i, tries=3),
+    "hero L9, stage 8 weapon and body, skill 15": stage_8_two,
+    "hero L9, whole set stage 8, skill 15": lambda i: supplied(c.hero9(), 15, i, stage=8),
+    "hero L9, whole set stage 8, best of 3": lambda i: supplied(c.hero9(), 15, i, tries=3, stage=8),
+    "hero L9, 4 looted items": lambda i: looted(4, i),
+    "hero L9, 8 looted items": lambda i: looted(8, i),
+    "hero L9, soldier's set": lambda i: supplied(c.hero9(), SOLDIER, i),
+    "hero L9, officer's set": lambda i: supplied(c.hero9(), OFFICER, i),
+    "hero L8, soldier's set": lambda i: supplied(c.hero(), SOLDIER, i),
+    "hero L8, officer's set": lambda i: supplied(c.hero(), OFFICER, i),
+}
+
+
+def each(fn):
+    units = V0.side()
     for u in units:
         fn(u)
     return units
@@ -317,18 +389,18 @@ def armed(u, weapon, limit):
 
 
 LEVERS = {
-    "allies in chain": lambda o: each(o, lambda u: setattr(u, "armour", "chain")),
-    "allies in leather": lambda o: each(o, lambda u: setattr(u, "armour", "leather")),
-    "Limit 8 with shields": lambda o: each(o, lambda u: armed(u, c.SHIELDED, 8)),
-    "Limit 8 with two-handed": lambda o: each(o, lambda u: armed(u, c.TWO_HAND, 8)),
-    "Limit 9 with crossbows": lambda o: each(o, lambda u: armed(u, c.CROSSBOW, 9)),
-    "Limit 9 in melee, no bows": lambda o: [o.wears(o.allies)(u) for u in t.allies()],
-    "+3 Strength on all": lambda o: each(o, lambda u: raised(u, "str")),
-    "+3 Endurance on all": lambda o: each(o, lambda u: raised(u, "end")),
-    "+3 Dexterity on all": lambda o: each(o, lambda u: raised(u, "dex")),
-    "+3 Perception on all": lambda o: each(o, lambda u: raised(u, "per")),
-    "+3 weapon skill on all": lambda o: each(o, lambda u: raised(u, "skill")),
-    "+3 on all five": lambda o: each(o, lambda u: raised(u, "str", "end", "dex", "per", "skill")),
+    "allies in chain": lambda: each(lambda u: setattr(u, "armour", "chain")),
+    "allies in leather": lambda: each(lambda u: setattr(u, "armour", "leather")),
+    "Limit 8 with shields": lambda: each(lambda u: armed(u, c.SHIELDED, 8)),
+    "Limit 8 with two-handed": lambda: each(lambda u: armed(u, c.TWO_HAND, 8)),
+    "Limit 9 with crossbows": lambda: each(lambda u: armed(u, c.CROSSBOW, 9)),
+    "Limit 9 in melee, no bows": lambda: [V0.wears(V0.allies)(u) for u in t.allies()],
+    "+3 Strength on all": lambda: each(lambda u: raised(u, "str")),
+    "+3 Endurance on all": lambda: each(lambda u: raised(u, "end")),
+    "+3 Dexterity on all": lambda: each(lambda u: raised(u, "dex")),
+    "+3 Perception on all": lambda: each(lambda u: raised(u, "per")),
+    "+3 weapon skill on all": lambda: each(lambda u: raised(u, "skill")),
+    "+3 on all five": lambda: each(lambda u: raised(u, "str", "end", "dex", "per", "skill")),
 }
 RULES = {
     "allies take the nearest": dict(a_targeting="nearest"),
@@ -340,32 +412,50 @@ RULES = {
 }
 
 
+def minor_job(name):
+    seeded(name)
+    o = MINORS[name]
+    rules = o.rules()
+    chain = lambda fn: t.chain(rules, fn, runs=RUNS)
+    base = chain(o.side)
+    more = {
+        "club": chain(lambda: o.side() + [c.new_character()]) - base,
+        "L9": chain(lambda: o.side() + [o.wears(o.allies)(c.ally9())]) - base,
+        "L8": chain(lambda: o.side() + [o.wears(o.allies)(c.ally8())]) - base,
+    }
+    return f"{name:<34} base {base:3.0f} " + " ".join(f"{k} {v:+3.0f}" for k, v in more.items())
+
+
+def supply_job(name):
+    seeded(name)
+    o = SUPPLIES[name]
+    return row(name, t.chain(o.rules(), o.side, runs=RUNS))
+
+
+def fighter_job(name):
+    seeded(name)
+    return row(name, t.chain(V0.rules(), ONE_FIGHTER[name], runs=RUNS))
+
+
+def player_job(name):
+    seeded(name)
+    fn, items = PLAYER[name], V0.items()
+    return row("+ " + name, t.chain(V0.rules(), lambda: V0.side() + [fn(items)], runs=RUNS))
+
+
 def lever_job(name):
     seeded(name)
-    return f"{name:<30} {t.chain(V0.rules(), lambda: LEVERS[name](V0), runs=RUNS):5.1f}"
+    return row(name, t.chain(V0.rules(), LEVERS[name], runs=RUNS))
 
 
 def rule_job(name):
     seeded(name)
-    return f"{name:<30} {t.chain(replace(V0.rules(), **RULES[name]), V0.side, runs=RUNS):5.1f}"
-
-
-def allied_job(name):
-    seeded(name)
-    fn = ALLIED_ROWS[name]
-    items = V0.items()
-    return f"{name:<30} {t.chain(V0.rules(), lambda: fn(V0, items), runs=RUNS):5.1f}"
-
-
-def outfit_job(name):
-    seeded(name)
-    o = OUTFITS[name]
-    return f"{name:<30} {t.chain(o.rules(), o.side, runs=RUNS):5.1f}"
+    return row(name, t.chain(replace(V0.rules(), **RULES[name]), V0.side, runs=RUNS))
 
 
 def forced_job(size):
     seeded(f"force {size}")
-    return f"main force of {size:<16} {t.chain(V0.rules(), V0.side, size, RUNS):5.1f}"
+    return row(f"main force of {size}", t.chain(V0.rules(), V0.side, size, RUNS))
 
 
 # Does the outfit keep fights to a length the ritual allows?
@@ -386,13 +476,15 @@ def length_job(_):
 SECTIONS = {
     "stats": (stat_job, list(VALUE)),
     "themes": (theme_job, list(THEMES)),
-    "reach": (reach_job, [1.0, 2.0, 3.0]),
     "first": (first_job, [12, 6, 3]),
-    "spread": (spread_job, [0, 1, 2, 3, 4]),
-    "grid": (grid_job, list(GRID)),
-    "slice": (slice_job, list(SLICES)),
-    "allied": (allied_job, list(ALLIED_ROWS)),
-    "outfits": (outfit_job, list(OUTFITS)),
+    "reach": (reach_job, [0]),
+    "solo": (solo_job, ["Magic", "Rare", "Epic", "Legendary"]),
+    "spread": (spread_job, [0, 2, 4]),
+    "grid": (grid_job, [0]),
+    "minors": (minor_job, list(MINORS)),
+    "supply": (supply_job, list(SUPPLIES)),
+    "fighter": (fighter_job, list(ONE_FIGHTER)),
+    "player": (player_job, list(PLAYER)),
     "levers": (lever_job, list(LEVERS)),
     "rules": (rule_job, list(RULES)),
     "force": (forced_job, [5, 6, 7]),
@@ -405,8 +497,8 @@ def main():
         for name, (job, args) in SECTIONS.items():
             if SECTION in ("all", name):
                 print(f"\n== {name}", flush=True)
-                for row in pool.imap(job, args):
-                    print(row, flush=True)
+                for text in pool.imap(job, args):
+                    print(text, flush=True)
 
 
 if __name__ == "__main__":

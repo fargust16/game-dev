@@ -1,10 +1,10 @@
 # 91 Agent Decision Record
 
-Version: 1.9
+Version: 1.10
 
 Status: Draft
 
-Last Updated: 2026-11-02 (the allies' edge in items recorded. Earlier: the Alchemical Flask rejected by the owner, and items recorded as what decides fights. Earlier: group fights on the Combat Grid recorded, and the Alchemical Flask proposed. Earlier: the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
+Last Updated: 2026-11-02 (the slice's numbers in Items in fights updated. Earlier: the allies' edge in items recorded. Earlier: the Alchemical Flask rejected by the owner, and items recorded as what decides fights. Earlier: group fights on the Combat Grid recorded, and the Alchemical Flask proposed. Earlier: the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [AGENTS.md](AGENTS.md)
@@ -64,7 +64,7 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 
 ## Items in fights
 
-- Owner's direction, 2026-11-02: attributes differ only slightly, with nothing like ×2 between peers, and soldiers differ by a random spread. Preparation through whole sets of items decides fights, and items strengthen a character significantly. No single item or consumable may change a battle's result that much, so the Alchemical Flask, proposed the same day as a thrown potion with area damage, is rejected. The Modifier Catalogue in [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §2.4 and Outfit V0 in [10.2](10.2%20Combat%20System%20Draft.md) §5b are authoring defaults checked by `tools/balance/item_sim.py`: the allies alone stop the slice's ritual in 40 % of runs, one more club adds 15 points against 27 with no items, and one Rare weapon on that fighter adds nothing. The owner decided on 2026-11-02 that the allies' edge stays with their Limit 8 fighters, who wear Rare against the cult's Magic; a cult Limit 9 stays a little stronger than an allied one. The other open points are CC-47.
+- Owner's direction, 2026-11-02: attributes differ only slightly, with nothing like ×2 between peers, and soldiers differ by a random spread. Preparation through whole sets of items decides fights, and items strengthen a character significantly. No single item or consumable may change a battle's result that much, so the Alchemical Flask, proposed the same day as a thrown potion with area damage, is rejected. The Modifier Catalogue in [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §2.4 and Outfit V0 in [10.2](10.2%20Combat%20System%20Draft.md) §5b are authoring defaults checked by `tools/balance/item_sim.py`: the allies alone stop the slice's ritual in about 40 % of runs, one more club adds 12 points against 27 with no items, and one Rare weapon on that fighter adds about 2. The owner decided on 2026-11-02 that the allies' edge stays with their Limit 8 fighters, who wear officer's sets against the cult's soldier's sets; a cult Limit 9 stays a little stronger than an allied one. The other open points are CC-47.
 
 ## Campaign odds
 
@@ -143,6 +143,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 # AGENTS.md Update History
 
 The notes of `AGENTS.md`, newest first.
+
+2026-11-02 (the allies' edge in items stays with their Limit 8 fighters)
 
 2026-11-02 (the Alchemical Flask rejected; items decide fights)
 
