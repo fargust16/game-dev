@@ -1,10 +1,10 @@
 # 07 Character Life
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft
 
-Last Updated: 2026-11-02 (every character starts Uninitiated and Factionless; attribute start and Character Archetypes recorded; the Starting Faction retired. Earlier: terms renamed to Arcana and Limit. Earlier: Last Free City Rule recorded. Earlier: manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
+Last Updated: 2026-11-02 (9 free points and three archetypes set. Earlier: every character starts Uninitiated and Factionless; attribute start and Character Archetypes recorded; the Starting Faction retired. Earlier: terms renamed to Arcana and Limit. Earlier: Last Free City Rule recorded. Earlier: manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md)
@@ -41,10 +41,18 @@ Every character, in the slice and in the full game, starts **Uninitiated** and *
 
 All seven attributes start at 1. The player then does one of two things, once in a life:
 
-- spends a small pool of points by hand, about 7, one for each attribute;
-- or chooses a **Character Archetype**, a preset spread in a fixed order that gives slightly more than the pool, about 9.
+- spends 9 free points by hand on any attributes;
+- or chooses a **Character Archetype**, a preset spread in a fixed order that gives slightly more, 11 points.
 
-The owner has no fixed preference between them. Playtests decide which stays. The point counts are authoring defaults, and the slice's archetypes are open (CC-38).
+Three archetypes are offered at creation:
+
+| Archetype | Added to the starting 1 | Who it is |
+|---|---|---|
+| Боец | Сила +5, Выносливость +4, Ловкость +2 | Lives by the body |
+| Сыщик | Восприятие +5, Интеллект +4, Ловкость +2 | Lives by noticing |
+| Оборванец | Воля +5, Удача +4, Ловкость +2 | Survived the street on stubbornness and luck |
+
+The 9 points and the three names are the owner's. The 11 points and the spreads are authoring defaults.
 
 ## Character Archetypes in the full game
 

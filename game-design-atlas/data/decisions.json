@@ -1147,7 +1147,7 @@
   },
   {
     "id": "d-character-start",
-    "statement": "Every character starts Uninitiated and Factionless, in the slice and the full game. All seven attributes start at 1, and the player spends a small pool once or picks a slightly stronger Character Archetype. In the full game archetypes are assembled from templates by seed.",
+    "statement": "Every character starts Uninitiated and Factionless, in the slice and the full game. All seven attributes start at 1, and the player spends 9 free points or picks an 11-point Character Archetype: Боец, Сыщик, or Оборванец. In the full game archetypes are assembled from templates by seed.",
     "rationale": "Keeps Allegiance earned in every life and leaves room for seeded starts later.",
     "alternatives": "",
     "systemIds": [
@@ -1189,6 +1189,21 @@
     "origin": "imported",
     "sourceIds": [
       "src-07-2"
+    ],
+    "dateNote": "Owner-approved answers, 2026-11-02."
+  },
+  {
+    "id": "d-limit-growth",
+    "statement": "A Limit raises each primary attribute by +3, +4, +5, +6, +7, +8, +8, +9, +9, +10 from Limit 9 to Limit 0, and the secondary by +1, +2, +2, +2, +2, +3, +3, +3, +3, +3.",
+    "rationale": "Deep Limits feel stronger while training stays needed at every step and the total fits the 1–100 scale.",
+    "alternatives": "About 30 % of the target Limit's band, which totals 165 and removes training from Limit 5.",
+    "systemIds": [
+      "progression"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-05-1"
     ],
     "dateNote": "Owner-approved answers, 2026-11-02."
   }
