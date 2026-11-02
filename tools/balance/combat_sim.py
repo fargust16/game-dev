@@ -10,7 +10,7 @@ import io
 import math
 import random
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 LIMIT_S = {None: 1.00, 9: 1.00, 8: 1.15, 7: 1.32, 6: 1.52, 5: 1.75, 4: 2.01, 3: 2.31, 2: 2.66, 1: 3.06, 0: 3.52}
 RUNS = 4000
@@ -26,6 +26,15 @@ SLEEP_ROUNDS = 3
 CONDUCTING_AP = 3
 STAGE_STEP = 0.35
 CRIT = 2.0
+ARMOUR_RANGED = 2.0
+ADJACENT = 0.10
+CRIT_PIERCE = 0.5
+INFUSION_COST = 5.0
+INFUSION_DIVISOR = 24.0
+INFUSION_ARMOUR = {"chain": 0.5, "plate": 0.0}
+ARMOUR_WEIGHT = {"none": 0.0, "cloth": 5.7, "leather": 11.3, "chain": 21.2, "plate": 31.8}
+CARRIED = 3.0
+LOAD = ((1.00, 0, 0), (1.25, 8, 0), (1.50, 16, 1), (2.00, 24, 2))
 
 
 def stage_factor(stage):
@@ -43,20 +52,24 @@ class Weapon:
     guard_chance: float = 0.0
     guard_absorb: float = 0.0
     stealth_mult: float = 0.0
+    reload: int = 0
+    range: int = 12
+    weight: float = 2.0
 
 
-DAGGER = Weapon("dagger", 3, 3, guard="parry", guard_chance=0.30, guard_absorb=1.0, stealth_mult=1.0)
+DAGGER = Weapon("dagger", 3, 3, guard="parry", guard_chance=0.30, guard_absorb=1.0, stealth_mult=1.0, weight=1.0)
 ONE_HAND = Weapon("one-hand", 5, 5, guard="parry", guard_chance=0.40, guard_absorb=1.0)
-SHIELDED = Weapon("one-hand and shield", 5, 5, guard="block", guard_chance=0.60, guard_absorb=0.8)
-TWO_HAND = Weapon("two-hand", 9, 7, guard="block", guard_chance=0.40, guard_absorb=0.6)
-BOW = Weapon("bow", 5, 5, True)
-CROSSBOW = Weapon("crossbow", 9, 7, True)
+SHIELDED = Weapon("one-hand and shield", 5, 5, guard="block", guard_chance=0.60, guard_absorb=0.8, weight=6.0)
+TWO_HAND = Weapon("two-hand", 9, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=5.0)
+BOW = Weapon("bow", 4, 5, True, weight=1.5)
+RIFLE = Weapon("rifle", 9, 10, True, reload=7, range=16, weight=4.0)
+PISTOL = Weapon("pistol", 7, 8, True, reload=5, range=6, weight=1.2)
 
-ARMOUR = {"none": (0, 0), "cloth": (3, 6), "leather": (8, 5), "chain": (16, 3), "plate": (28, 2)}
+ARMOUR = {"none": (0, 0), "cloth": (3, 10), "leather": (8, 5), "chain": (16, 3), "plate": (24, 2)}
 
 
 def staged(weapon, stage):
-    return Weapon(weapon.name, weapon.base, weapon.ap, weapon.ranged, stage, weapon.guard, weapon.guard_chance, weapon.guard_absorb, weapon.stealth_mult)
+    return replace(weapon, stage=stage)
 
 
 @dataclass
@@ -72,6 +85,9 @@ class Gear:
     ap: float = 0.0
     initiative: float = 0.0
     will: float = 0.0
+    magic: float = 0.0
+    wp: float = 0.0
+    ward: float = 0.0
 
 
 @dataclass(eq=False)
@@ -102,14 +118,19 @@ class Unit:
     exposed: bool = False
     stance: bool = False
     struck: bool = False
+    infuse: bool = False
+    loaded: bool = True
+    reloaded: int = 0
     held: int = -1
     frac: float = 0.0
+    burden: tuple = (0, 0)
     extra: dict = field(default_factory=dict)
     gear: Gear = field(default_factory=Gear)
 
     def reset(self):
+        self.burden = self.load()
         self.hp = self.max_hp()
-        self.wp = (20 + 0.8 * self.will) * LIMIT_S[self.limit]
+        self.wp = self.max_wp()
         self.reserve = 0
         self.skip = 0
         self.asleep = 0
@@ -117,14 +138,19 @@ class Unit:
         self.exposed = False
         self.frac = random.random()
 
+    def load(self):
+        """What the worn armour and held weapon cost in Evasion and AP, as a share of Carrying Capacity."""
+        share = (ARMOUR_WEIGHT[self.armour] + self.weapon.weight + CARRIED) / (20 + self.str)
+        return next((band[1:] for band in LOAD if share <= band[0]), LOAD[-1][1:])
+
     def max_hp(self):
         return (20 + 0.8 * self.end) * LIMIT_S[self.limit] * (1 + self.gear.hp)
 
     def max_wp(self):
-        return (20 + 0.8 * self.will) * LIMIT_S[self.limit]
+        return (20 + 0.8 * self.will) * LIMIT_S[self.limit] * (1 + self.gear.wp)
 
     def ap(self):
-        whole = 10 + self.dex / 20 + self.gear.ap + self.frac
+        whole = 10 + self.dex / 20 + self.gear.ap - self.burden[1] + self.frac
         self.frac = whole - math.floor(whole)
         return math.floor(whole) - (CONDUCTING_AP if self.conducting else 0)
 
@@ -137,7 +163,7 @@ class Unit:
         return ((self.str + self.dex + self.per) / 3 + self.skill) / 2 + self.gear.accuracy
 
     def evasion(self):
-        return 0 if self.asleep else (self.dex + self.per) / 2 + self.gear.evasion
+        return 0 if self.asleep else (self.dex + self.per) / 2 + self.gear.evasion - self.burden[0]
 
     def damage_roll(self):
         w = self.weapon
@@ -182,7 +208,8 @@ def strike(a, t, foes_of_t=(), side_of_t=(), bonus_crit=0.0, crit_extra=0.0, mul
     crit = 1.0
     if random.random() < min(0.95, raw):
         crit = CRIT + max(0, raw - 0.95) + crit_extra + a.gear.crit_damage
-    damage = a.damage_roll() * crit * mult * (1 - mitigation(t.defence(side_of_t)))
+    defence = t.defence(side_of_t) * (ARMOUR_RANGED if a.weapon.ranged else 1)
+    damage = a.damage_roll() * crit * mult * (1 - mitigation(defence))
     if t.brace:
         damage *= 1 - BRACE_REDUCTION
     if not unguarded and not a.weapon.ranged and t.weapon.guard and t.reserve >= REACTION_AP and not t.asleep and not t.skip:
@@ -313,15 +340,15 @@ def senior7():
 
 
 def ally9():
-    return Unit("A9", 9, 6, 6, 4, 4, 5, will=4, intl=6, weapon=ONE_HAND, armour="cloth")
+    return Unit("A9", 9, 6, 6, 4, 4, 5, will=4, intl=6, weapon=ONE_HAND, armour="cloth", infuse=True)
 
 
 def ally8():
-    return Unit("A8", 8, 12, 10, 8, 6, 12, will=6, intl=12, weapon=ONE_HAND, armour="leather", abilities=("sleep",))
+    return Unit("A8", 8, 12, 10, 8, 6, 12, will=6, intl=12, weapon=ONE_HAND, armour="leather", abilities=("sleep",), infuse=True)
 
 
 def ally7():
-    return Unit("A7", 7, 20, 16, 12, 10, 20, will=12, intl=20, weapon=TWO_HAND, armour="leather", abilities=("sleep",))
+    return Unit("A7", 7, 20, 16, 12, 10, 20, will=12, intl=20, weapon=TWO_HAND, armour="leather", abilities=("sleep",), infuse=True)
 
 
 KIT = ("stand", "brace", "support")
@@ -378,7 +405,7 @@ def main():
     report("Hero, dagger, two blows and two parries", [hero(DAGGER, abilities=(), guarded=True)], [plain()])
     report("Hero, chain", [hero(ONE_HAND, "chain", abilities=())], [plain()])
     report("Priestess, bow", [priestess(())], [plain()])
-    report("Priestess, crossbow", [priestess((), CROSSBOW)], [plain()])
+    report("Priestess, rifle", [priestess((), RIFLE)], [plain()])
 
     print("\nThe player, with abilities")
     report("New character v L9", [new_character()], [follower9()])

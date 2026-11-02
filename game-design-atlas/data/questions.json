@@ -1417,7 +1417,7 @@
   },
   {
     "id": "q-cc-41",
-    "text": "CC-41. Do Combat Numbers V0 hold with cover, facing, and magical attacks, how much range does each weapon have, which weapon skills exist, do conditions balance, is a shooter worth too much, why do allies who take the nearest target do better than Target Rules V0, and should the campaign's kill table take in the cult's edge, Outfit V0, Wait, and critical hits at ×2?",
+    "text": "CC-41. Do Combat Numbers V0 hold with cover in the slice's fights, facing, and abilities that deal magical damage, which weapon skills exist, do conditions balance, and should the campaign's kill table take in the cult's edge, Outfit V0, Wait, critical hits at ×2, firearms, and Infusion?",
     "systemIds": [
       "confront"
     ],
@@ -1510,7 +1510,21 @@
   },
   {
     "id": "q-cc-48",
-    "text": "CC-48. What do items, ingredients, and lessons cost, how much does a task pay, what sets the ceiling on crafting when time does not, how fast do Shop Skill and stages rise with World Age, does stock run out, what happens to the shops of a captured city, how does Faction Influence act on a shelf, how are territories balanced by stage and difficulty, and which details of the Faction Gift and the slice's Masters stand?",
+    "text": "CC-48. What do items, ingredients, and lessons cost, how much does a task pay, how fast do Shop Skill and stages rise with World Age, does stock run out, what happens to the shops of a captured city, how does Faction Influence act on a shelf, how are territories balanced by stage and difficulty, and which details of the Faction Gift and the slice's Masters stand?",
+    "systemIds": [
+      "confront",
+      "itemisation"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-49",
+    "text": "CC-49. Who can infuse, does Infusion need training, does exhaustion through it pay the reward, do firearms use ammunition, is the mini-crossbow worth having, what is the bow for, can a pistol be held with a sword or a shield, is 27-34 % alone the right price for shooters and mages, and do magical abilities keep the triangle?",
     "systemIds": [
       "confront",
       "itemisation"

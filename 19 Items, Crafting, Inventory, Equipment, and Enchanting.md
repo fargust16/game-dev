@@ -1,8 +1,8 @@
 # 19 Items, Crafting, Inventory, Equipment, and Enchanting
 
-Version: 0.8
+Version: 0.9
 Status: Draft — owner-confirmed rules with delegated starting-balance formulas; content tables, operation costs, and selected edge cases remain open
-Last Updated: 2026-11-02 (shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
+Last Updated: 2026-11-02 (catalogue gains Magical Damage, Will Power, and magical defence, and critical and defence values rise; crossbows out, rifle and pistol in; crafting has no ceiling, by the owner's decision. Earlier: shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -74,10 +74,13 @@ Owner's direction, 2026-11-02: items strengthen a character significantly, and w
 |---|---:|
 | Damage | +11 % |
 | Accuracy | +5 |
-| Critical chance | +9 percentage points |
-| Critical damage | +25 percentage points |
+| Critical chance | +11 percentage points |
+| Critical damage | +30 percentage points |
 | Maximum HP | +9 % |
-| Physical defence | +4 |
+| Physical defence | +5 |
+| Magical defence | +4 |
+| Magical Damage | Magical damage of 11 % of the weapon's base on every blow |
+| Maximum Will Power | +9 % |
 | Evasion | +4 |
 | AP | +0.8 |
 | Initiative | +3 |
@@ -90,18 +93,18 @@ Owner's direction, 2026-11-02: items strengthen a character significantly, and w
 
 | Base | Favoured types |
 |---|---|
-| Weapon | Damage, Accuracy, Critical chance, Critical damage |
+| Weapon | Damage, Accuracy, Critical chance, Critical damage, Magical Damage |
 | Head | Accuracy, Critical chance, Will, HP |
 | Body | Defence, HP |
-| Shoulders | Defence, Will, HP |
+| Shoulders | Defence, Magical defence, Will, HP |
 | Gloves | Damage, Accuracy, Critical chance |
 | Trousers | HP, Defence, Evasion |
 | Boots | Evasion, Initiative, AP |
 | Belt | HP, AP, Defence |
-| Ring | Damage, Critical chance, Critical damage, Will |
-| Necklace | Will, HP, Initiative, Accuracy |
+| Ring | Damage, Critical chance, Critical damage, Magical Damage, Maximum Will Power |
+| Necklace | Will, HP, Initiative, Accuracy, Maximum Will Power, Magical defence |
 
-A whole set is 11 pieces. A set from a city shop, at Shop Skill 26 (§6.1), carries about 16 modifiers, and one from a capital Master, at 50, about 26. A character with skill 1–10 averages under one modifier an item. Critical chance and Critical damage here are item modifiers, not the separately levelled attributes that [07.2](07.2%20Derived%20Character%20Statistics.md) excludes.
+A whole set is 11 pieces. A set from a city shop, at Shop Skill 26 (§6.1), carries about 16 modifiers, and one from a capital Master, at 50, about 26. A character with skill 1–10 averages under one modifier an item. A weapon with Magical Damage is what a magic pistol or a magic bow is, and it needs no Will Power, unlike Infusion (10.2 §5b). Critical chance and Critical damage here are item modifiers, not the separately levelled attributes that [07.2](07.2%20Derived%20Character%20Statistics.md) excludes.
 
 # 3. Item Creation
 
@@ -140,14 +143,14 @@ For every generated modifier, the selected base supplies the fixed type weights;
 - Personal inventory is an unlimited bag: there is no item-count cap, grid capacity, or variable footprint. Every item has the same-size inventory entry/icon; weight is the only carrying limit.
 - Every carried item has an assigned weight. Total carried weight includes equipped items and equals the sum of item weights; stack weight is the per-unit weight multiplied by quantity. Currency/gold weighs 0 and never changes the load.
 - Starting weight balance (kg): ring 0.05; necklace/amulet 0.10; belt 0.25. Cloth armour: head 0.5, body 2, shoulders 0.8, gloves 0.4, trousers 1.2, boots 0.8. Leather armour: 1, 4, 1.5, 0.8, 2.5, 1.5 respectively. Chain armour: 1.8, 7.5, 3, 1.4, 4.5, 3 respectively. Plate/heavy-metal armour: 2.8, 11, 4.5, 2, 7, 4.5 respectively.
-- Starting hand-item weights (kg): one-handed wooden weapon 1; one-handed metal/iron weapon 2; two-handed wooden weapon 2.5; two-handed metal/iron weapon 5; wooden shield 2.5; metal shield 4; bow 1.5; crossbow 3.
+- Starting hand-item weights (kg): one-handed wooden weapon 1; one-handed metal/iron weapon 2; two-handed wooden weapon 2.5; two-handed metal/iron weapon 5; wooden shield 2.5; metal shield 4; bow 1.5; rifle 4; pistol 1.2.
 - These weights are initial balance values. Specific bases, tools, materials, consumables, and additional item families must receive explicit weights in their content definitions. Cloth should remain lighter than leather, leather lighter than chain, and plate/heavy metal heaviest; jewellery is nearly weightless.
 - Working base damage, attack AP, armour values, and block and parry chances are in [10.2](10.2%20Combat%20System%20Draft.md) §5b.
 - Stacking, equipment slots, and containers remain distinct from item footprints. A separate home stash is intended, but its capacity and whether it is weight-limited remain open.
 
 ## 4.2 Equipment
 
-- The character has two universal hand slots. Compatible one-handed weapons, shields, talismans, books, and similar items may occupy either hand; a two-handed item uses both. A bow/crossbow occupies one hand while its arrows/bolts use the other as ammunition.
+- The character has two universal hand slots. Compatible one-handed weapons, shields, talismans, books, and similar items may occupy either hand; a two-handed item uses both. A bow occupies one hand while its arrows use the other as ammunition. A rifle uses both hands, and a pistol one. Staffs and wands do not exist, by the owner's direction of 2026-11-02.
 - Current body/accessory slot direction: head, body, shoulders, gloves, belt, trousers, boots, two rings, and one necklace/amulet slot. Necklace and amulet share one slot.
 - Exact compatibility, requirements, final slot catalogue, and recalculation of derived values remain open. See [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) and [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
 
@@ -238,6 +241,7 @@ Owner's direction, 2026-11-02. Numbers are authoring defaults checked by `tools/
 
 - **World Age.** The longer a world lives, the better its shelves. Working reading: Shop Skill rises by 1 a game day. Higher stages also reach the shelves as the world ages; the pace is open (CC-48). Because both sides buy from the same shelves, this barely tilts a fight: every shop +20 moves the slice by 2 points ([10.2](10.2%20Combat%20System%20Draft.md) §5b).
 - Ingredients for sale depend on which monsters prevail around the city, and crafting resources on the trees, metal veins, and other sources around it, so cities differ. The capital is a first-level city, so beginner resources prevail around it, and farther cities differ by the difficulty of their zones. Territories must be balanced by stage and difficulty, which the slice does not need (CC-48).
+- **Crafting has no ceiling,** by the owner's decision of 2026-11-02. A player who wants to craft may craft without limit. The price is the time and effort it takes: find resources, find Masters, guess that gathering exists, earn the first pickaxe or axe, walk there and back, and fight the monsters that live there.
 - The Equipment Quality slider of [02](02%20World%20Laws.md) sets the base Shop Skill, and the Economy slider and Faction Influence set prices, stock, and access, as 02 requires (working reading).
 
 ## 6.2 Faction Gift

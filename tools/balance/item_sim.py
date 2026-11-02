@@ -25,23 +25,24 @@ SPREAD = 2
 FAVOURED = 0.75
 # The types each base favours, and through them what a whole set leans to.
 SLOTS = {
-    "weapon": ("damage", "accuracy", "crit", "crit_damage"),
+    "weapon": ("damage", "accuracy", "crit", "crit_damage", "magic"),
     "head": ("accuracy", "crit", "will", "hp"),
     "body": ("defence", "hp"),
-    "shoulders": ("defence", "will", "hp"),
+    "shoulders": ("defence", "ward", "will", "hp"),
     "gloves": ("damage", "accuracy", "crit"),
     "trousers": ("hp", "defence", "evasion"),
     "boots": ("evasion", "initiative", "ap"),
     "belt": ("hp", "ap", "defence"),
-    "ring 1": ("damage", "crit", "crit_damage", "will"),
-    "ring 2": ("damage", "crit", "crit_damage", "will"),
-    "necklace": ("will", "hp", "initiative", "accuracy"),
+    "ring 1": ("damage", "crit", "crit_damage", "magic", "wp"),
+    "ring 2": ("damage", "crit", "crit_damage", "magic", "wp"),
+    "necklace": ("will", "hp", "initiative", "accuracy", "wp", "ward"),
 }
 # What one major modifier of tier 9 gives. Percentages are fractions, the rest are points.
 VALUE = {
-    "damage": 0.11, "accuracy": 5.0, "crit": 0.09, "crit_damage": 0.25,
-    "hp": 0.09, "defence": 4.0, "evasion": 4.0,
+    "damage": 0.11, "accuracy": 5.0, "crit": 0.11, "crit_damage": 0.30,
+    "hp": 0.09, "defence": 5.0, "evasion": 4.0,
     "ap": 0.8, "initiative": 3.0, "will": 4.0,
+    "magic": 0.11, "wp": 0.09, "ward": 4.0,
 }
 ALL_TYPES = tuple(VALUE)
 TIER_STEP = 0.5
@@ -403,8 +404,9 @@ LEVERS = {
     "allies in leather": lambda: each(lambda u: setattr(u, "armour", "leather")),
     "Limit 8 with shields": lambda: each(lambda u: armed(u, c.SHIELDED, 8)),
     "Limit 8 with two-handed": lambda: each(lambda u: armed(u, c.TWO_HAND, 8)),
-    "Limit 9 with crossbows": lambda: each(lambda u: armed(u, c.CROSSBOW, 9)),
-    "Limit 9 in melee, no bows": lambda: [V0.wears(V0.allies)(u) for u in t.allies()],
+    "Limit 9 in melee, no shooters": lambda: [V0.wears(V0.allies)(u) for u in t.allies()],
+    "allies do not infuse": lambda: each(lambda u: setattr(u, "infuse", False)),
+    "Limit 9 with bows": lambda: each(lambda u: armed(u, c.BOW, 9)),
     "+3 Strength on all": lambda: each(lambda u: raised(u, "str")),
     "+3 Endurance on all": lambda: each(lambda u: raised(u, "end")),
     "+3 Dexterity on all": lambda: each(lambda u: raised(u, "dex")),

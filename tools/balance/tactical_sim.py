@@ -6,7 +6,8 @@ fighters on cells. Melee fighters must walk, they are held by whoever stands nex
 to them, and every fighter picks targets by impact: how much harm the target does
 to its side, against how fast this fighter can bring it down. Fighters can wait to
 the end of the round, hold back from an enemy's reach, and stand in a Defensive
-Stance that answers an attacker with a Counterattack.
+Stance that answers an attacker with a Counterattack. Firearms reload, armour counts
+double against ranged physical damage, and a blow can be filled with Will Power.
 
 V0 is the configuration 10.2 reports, before items. The other switches of Rules
 are the levers tried against headcount, kept so that the table of levers can be
@@ -25,7 +26,6 @@ from multiprocessing import Pool
 import combat_sim as c
 
 RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 3000
-BOW_RANGE = 12
 SPELL_RANGE = 6
 ORDER_RANGE = 4
 SUPPORT_RANGE = 2
@@ -35,7 +35,7 @@ KILL_BONUS = 2.5
 ASLEEP_FACTOR = 0.2
 CROWD_FACTOR = 0.5
 BREAK_OFF_FACTOR = 1.5
-ADJACENT_SHOT = 0.20
+PISTOL_RANGE = 6
 OBJECTIVE_BONUS = 3.0
 STUN_AP = 2
 STUN_SKILL = 5
@@ -78,6 +78,11 @@ class Rules:
     stance_evasion: float = DEFENCE_EVASION
     stance_guard: float = DEFENCE_GUARD
     counter_ap: int = COUNTER_AP
+    ranged_armour: float = c.ARMOUR_RANGED
+    infusion_cost: float = c.INFUSION_COST
+    infusion_divisor: float = c.INFUSION_DIVISOR
+    cover: float = 0.0
+    crit_pierce: float = c.CRIT_PIERCE
 
 
 def cheb(a, b):
@@ -105,6 +110,7 @@ class Fight:
             u.skip = u.asleep = 0
             u.stance = False
             u.held = -1
+            u.loaded = True
             u.threat = self.threat(u)
         self.leaders = [self.leader(a), self.leader(b)]
 
@@ -129,12 +135,14 @@ class Fight:
         return self.a if u in self.a else self.b
 
     def blows(self, u):
-        return max(1, int((10 + u.dex / 20) / u.weapon.ap))
+        return max(1, int((10 + u.dex / 20 - u.burden[1]) / u.weapon.ap))
 
     def expected_blow(self, a, t):
         w = a.weapon
-        raw = w.base * c.stage_factor(w.stage) * (1 if w.ranged else 1 + a.str / 50) * (1 + a.gear.damage) * self.r.damage_scale
-        return self.chance(a, t, 0.0) * self.reduce(raw, t)
+        base = w.base * c.stage_factor(w.stage) * self.r.damage_scale
+        raw = base * (1 if w.ranged else 1 + a.str / 50) * (1 + a.gear.damage)
+        share = a.gear.magic + (self.infusion(a) if a.infuse else 0)
+        return self.chance(a, t, 0.0) * (self.reduce(raw, t, w.ranged) + self.warded(share * base, t))
 
     def threat(self, u):
         foes = self.foes(u)
@@ -151,8 +159,23 @@ class Fight:
             d += c.SUPPORT_DEFENCE
         return d
 
-    def reduce(self, raw, t):
-        d = self.defence(t)
+    def warded(self, magic, t):
+        return magic * (1 - c.mitigation(c.ARMOUR[t.armour][1] * c.stage_factor(t.armour_stage) + t.gear.ward))
+
+    def infusion(self, a):
+        return a.intl / self.r.infusion_divisor * c.INFUSION_ARMOUR.get(a.armour, 1.0)
+
+    def infused(self, a):
+        """The share of a weapon's base a blow adds as magical damage. Pouring Will Power in stops short of exhaustion."""
+        share = a.gear.magic
+        cost = self.r.infusion_cost * c.LIMIT_S[a.limit]
+        if a.infuse and a.wp >= 2 * cost:
+            a.wp -= cost
+            share += self.infusion(a)
+        return share
+
+    def reduce(self, raw, t, ranged=False, pierce=0.0):
+        d = self.defence(t) * (self.r.ranged_armour if ranged else 1) * (1 - pierce)
         if self.r.armour == "flat":
             return max(raw * self.r.flat_floor, raw - d / self.r.flat_divisor)
         return raw * (1 - c.mitigation(d))
@@ -172,21 +195,27 @@ class Fight:
         return hit
 
     def landed(self, a, t, bonus_crit, crit_extra, mult, unguarded):
+        share = self.infused(a)
         flank = self.flanked(a, t)
         bonus_hit = c.FLANK_HIT if flank else 0.0
         bonus_crit += c.FLANK_CRIT if flank else 0.0
         if t.exposed:
             bonus_hit += 0.10
             t.exposed = False
-        if a.weapon.ranged and any(cheb(a, f) == 1 for f in alive(self.foes(a))):
-            bonus_hit -= ADJACENT_SHOT
+        if a.weapon.ranged and a.weapon.range > PISTOL_RANGE and any(cheb(a, f) == 1 for f in alive(self.foes(a))):
+            bonus_hit -= c.ADJACENT
+        if a.weapon.ranged and cheb(a, t) > 1:
+            bonus_hit -= self.r.cover
         if t.stance:
             bonus_hit -= self.r.stance_evasion * t.reserve
         if random.random() >= self.chance(a, t, bonus_hit):
             return False
         raw = a.crit_raw() + bonus_crit + self.r.crit_bonus
         crit = self.r.crit + max(0, raw - 0.95) + crit_extra + a.gear.crit_damage if random.random() < min(0.95, raw) else 1.0
-        damage = self.reduce(a.damage_roll() * crit * mult * self.r.damage_scale, t)
+        w = a.weapon
+        magic = share * w.base * c.stage_factor(w.stage) * crit * mult * self.r.damage_scale
+        pierce = self.r.crit_pierce if crit > 1 and not w.ranged else 0.0
+        damage = self.reduce(a.damage_roll() * crit * mult * self.r.damage_scale, t, w.ranged, pierce) + self.warded(magic, t)
         if t.brace:
             damage *= 1 - c.BRACE_REDUCTION
         if not unguarded and not a.weapon.ranged and t.weapon.guard and t.reserve >= c.REACTION_AP and not t.asleep and not t.skip:
@@ -204,7 +233,7 @@ class Fight:
         targeting = self.r.a_targeting if u in self.a and self.r.a_targeting else self.r.targeting
         if targeting == "random":
             return random.random()
-        reach = cheb(u, e) - 1 if not u.weapon.ranged else max(0, cheb(u, e) - BOW_RANGE)
+        reach = cheb(u, e) - 1 if not u.weapon.ranged else max(0, cheb(u, e) - u.weapon.range)
         if targeting == "nearest":
             return -reach - e.hp / 1000
         turns = max(0, math.ceil((reach - ap) / 10))
@@ -300,7 +329,7 @@ class Fight:
         return u.weapon.ap
 
     def full_ap(self, u):
-        return math.floor(10 + u.dex / 20 + u.gear.ap) - (c.CONDUCTING_AP if u.conducting else 0)
+        return math.floor(10 + u.dex / 20 + u.gear.ap - u.burden[1]) - (c.CONDUCTING_AP if u.conducting else 0)
 
     def waits(self, u, later):
         """Wait if nothing is in reach now, and an enemy still to act will walk into reach."""
@@ -352,11 +381,22 @@ class Fight:
             t = u.intent
             adjacent = [f for f in foes if cheb(u, f) == 1]
             if u.weapon.ranged:
-                if cheb(u, t) <= BOW_RANGE:
-                    if ap < cost:
+                reload = u.weapon.reload
+                if cheb(u, t) <= u.weapon.range:
+                    if not u.loaded:
+                        paid = min(ap, reload - u.reloaded)
+                        ap -= paid
+                        u.reloaded += paid
+                        u.loaded = u.reloaded >= reload
+                        if not u.loaded:
+                            break
+                        u.reloaded = 0
+                        continue
+                    if ap < cost - reload:
                         break
                     self.strike(u, t)
-                    ap -= cost
+                    ap -= cost - reload
+                    u.loaded = not reload
                 else:
                     left = self.step(u, (t.x, t.y), ap)
                     if left is None:
@@ -468,7 +508,7 @@ def main_force(rules, size=None):
     elif rules.shift < 0:
         units[n] = c.follower9()
     if rules.ranged:
-        units[0].weapon = c.CROSSBOW
+        units[0].weapon = c.RIFLE
     return outfitted(rules, stronger(units, rules.enemy_bonus))
 
 
@@ -482,7 +522,7 @@ def allies():
 
 def archers():
     units = allies()
-    units[0].weapon = units[1].weapon = c.BOW
+    units[0].weapon = units[1].weapon = c.RIFLE
     return units
 
 
@@ -584,8 +624,8 @@ SIDES = {
     "allies in leather": lambda: equipped(armour="leather"),
     "Limit 8 with two-handed": lambda: equipped(c.TWO_HAND, only="A8"),
     "Limit 8 with shield": lambda: equipped(c.SHIELDED, only="A8"),
-    "Limit 9 with crossbows": lambda: equipped(c.CROSSBOW, only="A9"),
-    "Limit 9 in melee, no bows": allies,
+    "Limit 9 with rifles": lambda: equipped(c.RIFLE, only="A9"),
+    "Limit 9 in melee, no shooters": allies,
     "+3 Strength": lambda: changed("str"),
     "+3 Endurance": lambda: changed("end"),
     "+3 Dexterity": lambda: changed("dex"),
