@@ -1391,7 +1391,7 @@
   },
   {
     "id": "q-cc-39",
-    "text": "CC-39. How fast does the Notice Meter fill and fade, how strong are the darkness and Alert modifiers, what does Stealth Mode cost in AP in a fight, how fast does a crouching character move, and does Vigilance stay its own slider?",
+    "text": "CC-39. How fast does the Notice Meter fill and fade, how strong are the darkness and Alert modifiers, how fast does a crouching character move, and does Vigilance stay its own slider?",
     "systemIds": [
       "confront"
     ],
@@ -1407,6 +1407,19 @@
     "text": "CC-40. Can a successful lie be exposed later, does Intimidation cost Attitude on success, which full-game checks are kept, and when do allied guards attack a character who ignores them?",
     "systemIds": [
       "approaches"
+    ],
+    "sourceId": "src-99",
+    "sectionTitle": "High Priority — Cult Campaign and City Control",
+    "status": "open",
+    "priority": "high",
+    "sourceKind": "gameplay-design",
+    "origin": "imported"
+  },
+  {
+    "id": "q-cc-41",
+    "text": "CC-41. Do Combat Numbers V0 hold on the Combat Grid with cover, facing, flanking, and target rules, how much range does each weapon have, which weapon skills exist, do magical attacks and conditions balance, and does a conductor who fights lose 3 AP?",
+    "systemIds": [
+      "confront"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority — Cult Campaign and City Control",

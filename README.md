@@ -56,7 +56,7 @@ This repository is currently a design bible. Implementation begins only after th
 | [08 Confront Constraints](08%20Confront%20Constraints.md) | Draft | Hard fence around combat so it cannot become the whole game |
 | [09 Information Sources](09%20Information%20Sources.md) | Draft | Boards, papers, bartenders, rumours, traces — partial discovery |
 | [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Draft | Combat Grid + vault/climb/window verbs |
-| [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) | Draft | Combat rules, equipment, and durability boundary |
+| [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) | Draft | Combat rules, Combat Numbers V0, equipment, and durability boundary |
 | [10.3 Stealth and Detection](10.3%20Stealth%20and%20Detection.md) | Draft | Stealth Mode, Vision Cones, Notice Meters, crimes |
 | [10.4 Dialogue and Social Checks](10.4%20Dialogue%20and%20Social%20Checks.md) | Draft | Social Checks, Attitude, Reputation |
 | [11 Vertical Slice](11%20Vertical%20Slice.md) | Draft | First playable proof: 1 city, player Limits 9–8, one General's invasion and ritual |

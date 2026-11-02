@@ -1,8 +1,8 @@
 # 19 Items, Crafting, Inventory, Equipment, and Enchanting
 
-Version: 0.4
+Version: 0.5
 Status: Draft — owner-confirmed rules with delegated starting-balance formulas; content tables, operation costs, and selected edge cases remain open
-Last Updated: 2026-11-01 (terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
+Last Updated: 2026-11-02 (working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -105,6 +105,7 @@ For every generated modifier, the selected base supplies the fixed type weights;
 - Starting weight balance (kg): ring 0.05; necklace/amulet 0.10; belt 0.25. Cloth armour: head 0.5, body 2, shoulders 0.8, gloves 0.4, trousers 1.2, boots 0.8. Leather armour: 1, 4, 1.5, 0.8, 2.5, 1.5 respectively. Chain armour: 1.8, 7.5, 3, 1.4, 4.5, 3 respectively. Plate/heavy-metal armour: 2.8, 11, 4.5, 2, 7, 4.5 respectively.
 - Starting hand-item weights (kg): one-handed wooden weapon 1; one-handed metal/iron weapon 2; two-handed wooden weapon 2.5; two-handed metal/iron weapon 5; wooden shield 2.5; metal shield 4; bow 1.5; crossbow 3.
 - These weights are initial balance values. Specific bases, tools, materials, consumables, and additional item families must receive explicit weights in their content definitions. Cloth should remain lighter than leather, leather lighter than chain, and plate/heavy metal heaviest; jewellery is nearly weightless.
+- Working base damage, attack AP, armour values, and block and parry chances are in [10.2](10.2%20Combat%20System%20Draft.md) §5b.
 - Stacking, equipment slots, and containers remain distinct from item footprints. A separate home stash is intended, but its capacity and whether it is weight-limited remain open.
 
 ## 4.2 Equipment
