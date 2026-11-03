@@ -199,8 +199,9 @@ def hit_chance(a, t, bonus=0.0):
 CONTEST_SCALE = 100
 
 
-def resist_check(a, t):
-    p = 0.50 + (max(a.intl, a.will) - t.will - t.gear.will) / CONTEST_SCALE
+def resist_check(a, t, will_only=False):
+    power = a.will if will_only else max(a.intl, a.will)
+    p = 0.50 + (power - t.will - t.gear.will) / CONTEST_SCALE
     return random.random() < min(0.95, max(0.05, p * (1 + a.luck / 100)))
 
 

@@ -46,7 +46,10 @@ STING_BASE = 5
 STING_RANGE = 12
 DISORIENT_HIT = 0.10
 PILLAR_AP = 4
-WAKE_AP = 0
+WAKE_AP = 3
+ORDER_BY_WILL = False
+SLEEP_COST = c.POWERFUL
+ORDER_COST = c.ORDINARY
 STUN_AP = 2
 STUN_SKILL = 5
 SWEEP_AP = 2
@@ -295,23 +298,23 @@ class Fight:
     def control(self, u, ap):
         foes = alive(self.foes(u))
         awake = [f for f in foes if not f.asleep and not f.skip]
-        if "sleep" in u.abilities and len(awake) >= 2 and ap >= 5 and u.can_spend(c.POWERFUL):
+        if "sleep" in u.abilities and len(awake) >= 2 and ap >= 5 and u.can_spend(SLEEP_COST):
             near = [f for f in awake if cheb(u, f) <= SPELL_RANGE]
             if near:
                 target = max(near, key=lambda f: f.threat)
-                u.wp -= u.max_wp() * c.POWERFUL
+                u.wp -= u.max_wp() * SLEEP_COST
                 ap -= 5
                 if c.resist_check(u, target):
                     target.asleep = c.SLEEP_ROUNDS
                 else:
                     u.exposed = True
-        if "stand" in u.abilities and ap >= 4 + u.weapon.ap and u.can_spend(c.ORDINARY):
+        if "stand" in u.abilities and ap >= 4 + u.weapon.ap and u.can_spend(ORDER_COST):
             near = [f for f in awake if not f.asleep and not f.skip and cheb(u, f) <= ORDER_RANGE]
             if near:
                 target = max(near, key=lambda f: f.threat)
-                u.wp -= u.max_wp() * c.ORDINARY
+                u.wp -= u.max_wp() * ORDER_COST
                 ap -= 4
-                if c.resist_check(u, target):
+                if c.resist_check(u, target, ORDER_BY_WILL):
                     target.skip = 1
                 else:
                     u.exposed = True
@@ -331,7 +334,7 @@ class Fight:
                 u.wp -= u.max_wp() * c.POWERFUL
                 ap -= PILLAR_AP
                 for f in around:
-                    if c.resist_check(u, f):
+                    if c.resist_check(u, f, ORDER_BY_WILL):
                         f.taunter = u
         return ap
 

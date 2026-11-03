@@ -1,10 +1,10 @@
 # 91 Agent Decision Record
 
-Version: 1.20
+Version: 1.21
 
 Status: Draft
 
-Last Updated: 2026-11-03 (armour splits its defence by the owner's direction, and the earlier AGENTS note moved here. Earlier: a pistol can share the hands, by the owner's decision, and the earlier AGENTS note moved here. Earlier: the bow and the mini-crossbow removed by the owner, and the earlier AGENTS note moved here. Earlier: V1 counts no ammunition, by the owner's decision, and the earlier AGENTS note moved here. Earlier: exhaustion through Infusion pays the usual reward, by the owner's decision, and the earlier AGENTS note moved here. Earlier: Infusion is paid for each blow, by the owner's decision, and the earlier AGENTS note moved here. Earlier: any initiated character infuses, with no training, by the owner's decision, and the earlier AGENTS note moved here. Earlier: shooters and mages stay weak alone, by the owner's decision, and the earlier AGENTS note moved here. Earlier: Kinds of fighter recorded, and the earlier AGENTS note moved here. Earlier: Shops and Masters, and Wait and Defensive Stance, recorded. Earlier: the slice's numbers in Items in fights updated. Earlier: the allies' edge in items recorded. Earlier: the Alchemical Flask rejected by the owner, and items recorded as what decides fights. Earlier: group fights on the Combat Grid recorded, and the Alchemical Flask proposed. Earlier: the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
+Last Updated: 2026-11-03 (an ally can wake a sleeper, by the owner's decision, and the earlier AGENTS note moved here. Earlier: armour splits its defence by the owner's direction, and the earlier AGENTS note moved here. Earlier: a pistol can share the hands, by the owner's decision, and the earlier AGENTS note moved here. Earlier: the bow and the mini-crossbow removed by the owner, and the earlier AGENTS note moved here. Earlier: V1 counts no ammunition, by the owner's decision, and the earlier AGENTS note moved here. Earlier: exhaustion through Infusion pays the usual reward, by the owner's decision, and the earlier AGENTS note moved here. Earlier: Infusion is paid for each blow, by the owner's decision, and the earlier AGENTS note moved here. Earlier: any initiated character infuses, with no training, by the owner's decision, and the earlier AGENTS note moved here. Earlier: shooters and mages stay weak alone, by the owner's decision, and the earlier AGENTS note moved here. Earlier: Kinds of fighter recorded, and the earlier AGENTS note moved here. Earlier: Shops and Masters, and Wait and Defensive Stance, recorded. Earlier: the slice's numbers in Items in fights updated. Earlier: the allies' edge in items recorded. Earlier: the Alchemical Flask rejected by the owner, and items recorded as what decides fights. Earlier: group fights on the Combat Grid recorded, and the Alchemical Flask proposed. Earlier: the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [AGENTS.md](AGENTS.md)
@@ -87,7 +87,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 - Owner-approved, 2026-11-03: V1 counts neither cartridges nor arrows, and Reload is the price of shooting. Ammunition as an item may come in V2, once shop prices exist.
 - Owner-approved, 2026-11-03: the bow and the mini-crossbow are removed with every weapon like them. Every weapon is iron: a melee weapon or a firearm, in one hand or two.
 - Owner-approved, 2026-11-03: a pistol can be held with a one-handed weapon, a shield, or a second pistol, and Reload needs a free hand. Authoring defaults in 10.2 §5b: putting an item away or drawing it costs 2 AP; a shot from the off hand is at −20 to hit and does half damage, and a pistol in the off hand takes away parrying. Without that price the opening shot raised a critical build from 46 % to 74 %; with it, the choice is a trade at 47 %.
-- Owner's direction, 2026-11-03: the armour family splits its defence. Cloth gives very high magical and very low physical defence, leather half and half, and plate physical defence only, so full cloth guards well against magic and full plate badly. Authoring defaults in 10.2 §5b: cloth 2 and 20, leather 8 and 8, chain 16 and 3, plate 24 and 0; the triangle stands at 72, 88, and 71, and the slice at 40 %. Other open points are CC-49.
+- Owner's direction, 2026-11-03: the armour family splits its defence. Cloth gives very high magical and very low physical defence, leather half and half, and plate physical defence only, so full cloth guards well against magic and full plate badly. Authoring defaults in 10.2 §5b: cloth 2 and 20, leather 8 and 8, chain 16 and 3, plate 24 and 0; the triangle stands at 72, 88, and 71, and the slice at 40 %.
+- Owner-approved, 2026-11-03: an ally next to a sleeper can wake it for AP, 3 AP as an authoring default. In `build_sim.py` the abilities of 05.1 then let the kit of Император win, and the slice falls to 24 %; choosing the builds again, sizing the kits, and tuning the slice back are open in CC-49. Other open points are CC-49.
 
 ## Campaign odds
 
@@ -166,6 +167,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 # AGENTS.md Update History
 
 The notes of `AGENTS.md`, newest first.
+
+2026-11-03 (armour splits its defence: cloth against magic, leather half and half, plate against physical harm)
 
 2026-11-03 (a pistol can share the hands, and Reload needs a free hand)
 
