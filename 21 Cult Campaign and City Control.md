@@ -1,10 +1,10 @@
 # 21 Cult Campaign and City Control
 
-Version: 0.29
+Version: 0.30
 
 Status: Draft — owner-approved direction, incomplete specification
 
-Last Updated: 2026-11-03 (the owner's answers to CC-3, CC-6, CC-7, and CC-8: open resistance counts, life under Cult Control, an Unclaimed city falls to the ritual alone, a General loses only followers, and Weak Points in the campaign. Earlier: open items run to CC-46. Earlier: Faction Influence is read from the war, and a Side Event changes the war directly (owner-approved). Earlier: references to resolved questions corrected. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded; Campaign Numbers V0 rebuilt on a whole war to manifestation or the death of the Generals. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: the source of traces recorded; the slice's scheme lives in 11. Earlier: a conductor who fights loses 3 AP, owner-approved. Earlier: working reading: a conductor who fights loses 3 AP. Earlier: the Cult Thought Link carries orders and reports only; Посланник restored. Earlier: Ritual Weak Points added. Earlier: ritual dialogue checks are Final Checks. Earlier: dialogue checks follow 10.4. Earlier: stealth in a captured city follows 10.3. Earlier: the Force Estimate governs every side; a senior's death has no effect of its own. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate; ritual group numbers set. Earlier: allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
+Last Updated: 2026-11-03 (the owner's answers to CC-9, CC-10, CC-12, and CC-13: a fallen General's followers join a living one, Generals move with no camp, seers in every city, the player's pace to Limit 2–3, every number held with no player, Major Factions cannot die, and faction heads stay in the capital. Earlier: the owner's answers to CC-3, CC-6, CC-7, and CC-8: open resistance counts, life under Cult Control, an Unclaimed city falls to the ritual alone, a General loses only followers, and Weak Points in the campaign. Earlier: open items run to CC-46. Earlier: Faction Influence is read from the war, and a Side Event changes the war directly (owner-approved). Earlier: references to resolved questions corrected. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded; Campaign Numbers V0 rebuilt on a whole war to manifestation or the death of the Generals. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: the source of traces recorded; the slice's scheme lives in 11. Earlier: a conductor who fights loses 3 AP, owner-approved. Earlier: working reading: a conductor who fights loses 3 AP. Earlier: the Cult Thought Link carries orders and reports only; Посланник restored. Earlier: Ritual Weak Points added. Earlier: ritual dialogue checks are Final Checks. Earlier: dialogue checks follow 10.4. Earlier: stealth in a captured city follows 10.3. Earlier: the Force Estimate governs every side; a senior's death has no effect of its own. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate; ritual group numbers set. Earlier: allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07 Character Life](07%20Character%20Life.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -93,7 +93,7 @@ This is a game-design target. It authorises no production terrain work. The V0 e
 - At world creation the whole playable state belongs to the three allied Major Factions. The cult holds no city.
 - The cult's objective before manifestation is to capture cities by conducting rituals in them.
 - The capital is the last target. The cult works on every other city first.
-- Neutral territory exists outside the cities. The Raiding General's base stands there.
+- Neutral territory exists outside the cities. Generals who walk in the open move through it with no fixed camp (§7, owner-approved 2026-11-03).
 
 ## City Control
 
@@ -340,9 +340,19 @@ The labels below describe roles only. They are not final names.
 |---|---|---|---|
 | **Spirit General** | Lives in the Spirit World. After a capture it leaves all its followers in the city and returns there. It gathers new followers there, the weakest and the fastest to arrive, and comes out in a city together with them. It comes out only in cities. | Only during a capture, while the ritual runs. | Be at the ritual in time and win while it is out. |
 | **Holding General** | The warlike one. Stays with its followers in the city it captured until it has gathered enough for the next sortie, then moves on, leaving only a small part behind. Fights to the end. Hardest of the three in battle. | In the city it holds. | Prepare for one decisive fight, or strike the weak garrisons it leaves behind. |
-| **Raiding General** | Walks in the open. After a capture it leaves almost all its force in the city and goes off on foot with a few followers, then gathers a new force in neutral territory, where it has a base. | In neutral territory or on the approach. | Find it between sorties and stop it before it reaches a city. |
+| **Raiding General** | Walks in the open. After a capture it leaves almost all its force in the city and goes off on foot with a few followers, then gathers a new force while it moves through neutral territory, with no fixed camp. | In neutral territory, for instance on a road, or on the approach. | Find it between sorties and stop it before it reaches a city. |
 
 The owner's reference for the Spirit General is a *Space Rangers* enemy that travels through black holes. This is a comparison of feel only.
+
+## Where the Generals are (owner-approved, 2026-11-03)
+
+- Each General has a starting position set by the seed. The Spirit General's is the Spirit World, where nobody can find it. The Holding and Raiding Generals start in neutral territory.
+- No General has a fixed camp, because a camp could be attacked again and again.
+- The Holding General is always in a city it holds. Before its first capture, and on its way to the next target, it moves as the Raiding General does.
+- A General in neutral territory keeps moving. It stays away from the capital and near its nearest captured city, so the Generals are spread over the whole map. It can be met by chance, for instance on a neutral road.
+- On the way to a target a General tries to stay unseen and goes around cities the cult does not hold.
+
+Working reading: the simulation's chance of finding the Raiding General on 8 % of days stands for these meetings (§8).
 
 ## Spirit World and Divine Plane
 
@@ -363,11 +373,12 @@ The three Generals are therefore the top of the cult's living hierarchy. Above t
 
 ## Working readings
 
-- A killed General is not replaced, because killing all three must remain able to end the campaign. Whether the cult's reinforcement slows as Generals fall is open (CC-9).
+- A killed General is not replaced, because killing all three must remain able to end the campaign.
+- Owner-approved, 2026-11-03: the free followers of a fallen General join the nearest living General, no new followers of its kind appear, and its garrisons and the followers already in the world remain. The cult's reinforcement therefore slows with every General who falls.
 - A General is a persistent named actor, not a generated follower.
 - During a sortie the Spirit General stands at the ritual, while the Holding and Raiding Generals go with the main force (CC-43).
 - The Holding General does not Break Away or offer a Yield. This is an exception for one actor, not a change to [08 Confront Constraints](08%20Confront%20Constraints.md).
-- The three behaviours are fixed archetypes across worlds. The World Seed varies who the Generals are, their bases, and their target order, so that a past world teaches how to read a General without solving the next one. Whether they vary by Arcana depends on CC-22.
+- The three behaviours are fixed archetypes across worlds. The World Seed varies who the Generals are, their starting positions, and their target order, so that a past world teaches how to read a General without solving the next one. Whether they vary by Arcana depends on CC-22.
 
 ## Defeating a General (owner-approved)
 
@@ -379,11 +390,15 @@ A character far below Limit 2 cannot win a stat race. A General falls in one of 
 
 Artifacts may help. They are tightly controlled, go only to trusted members with high standing, and some are dangerous to Sanity. They are unique items for later design.
 
+Owner-approved, 2026-11-03: in the full game a player who works only at advancement, going to places of their own Limit, attacking the cult's raiding parties, and taking assignments, can reach Limit 2 or 3 within the 15–20 days of the campaign, depending on the style of play. A player who advances more slowly can buy time by slowing the war instead. The pace belongs to [05 Progression](05%20Progression.md), and its numbers are open (CC-10).
+
 Allied forces can kill a General without the player, and on the middle setting they kill all three in about two wars of five (§8). The owner's odds of 2026-11-02 replace the earlier reading that this is rare at the middle setting. At the lowest setting the game should win by itself: the allied side can kill all three Generals, so that a player who only wants to enjoy the world can do so.
 
 ## Seers and the Spirit General
 
 Allied factions have otherworldly seers, and the player character may be one through a seer Arcana. Seers can predict where the Spirit General will come out, so forces can gather there first.
+
+Owner-approved, 2026-11-03: a seer can be found in any city. A player outside a faction buys a prediction through Exchange, or persuades the seer to share it free through Convince, a Social Check with an Argument ([10.4](10.4%20Dialogue%20and%20Social%20Checks.md)). What a prediction costs belongs to CC-48.
 
 ## The final attack
 
@@ -397,7 +412,7 @@ Before the capital, all three Generals attack together. They may fight in differ
 
 **Cult Forces** generate much faster and are not tied to the general rules of the world's population. The system gives each General new followers automatically and periodically, near that General. The game does not need to explain where they were found.
 
-Killing rank-and-file cult followers never exhausts the cult. New followers keep appearing until its leadership is destroyed.
+Killing rank-and-file cult followers never exhausts the cult. New followers keep appearing until its leadership is destroyed. Each General who falls ends its own kind: its free followers join the nearest living General, and no new ones of its kind appear (§7).
 
 Campaign pace depends on difficulty: harder settings make the cult advance faster. The eighth Difficulty Setting, **Cult Pace**, owns this ([02 World Laws](02%20World%20Laws.md)).
 
@@ -414,6 +429,8 @@ The world lives without the player, and both sides pursue their goals with the s
 - They post assignments for other factions, Factionless characters, and otherworldly people: freeing a city, for a stated reward. This is a **Liberation Contract**.
 - They want the Cult Generals dead as much as anyone, and they have Limit 2 generals of their own, the **Allied Generals**.
 - Their goddess on the Divine Plane can intervene now and then, with abilities up to Limit 0: a **Divine Blessing** or strengthening of one or several of her direct followers, perhaps a global strengthening. It is never constant attention.
+- Owner-approved, 2026-11-03: a Major Faction cannot die. A god oversees it, and the death of one of its Allied Generals weakens it but does not end it.
+- Owner-approved, 2026-11-03: the heads of the factions stay in the capital. One goes out to free a city only rarely: by chance, when the player persuades it, or when the player pays for a **Sponsored Operation**, an allied operation to free a city, as one could sponsor an operation in *Space Rangers*. Whether the heads are the Allied Generals is open (CC-44).
 
 These events are how the war reaches the player. They give the character defences and liberations to join, so that the player takes part in the war and does not only explore.
 
@@ -468,6 +485,8 @@ Each row is 3000 wars. A figure from 500 wars moves by about two points.
 | High | ×1.25 | Half a Limit deeper | 75 | 19 % | 78 % | 3 % | 16 |
 | Highest | ×1.5 | One and a quarter Limits deeper | 75 | 8 % | 90 % | 2 % | 12 |
 
+After CC-9, with a fallen General's free followers joining a living one, the same 3000 wars per row move no figure by more than a point: allies against cult 98/0, 69/30, 42/56, 19/78, and 7/90.
+
 Half a Limit deeper means that half of the followers stand one Limit deeper, down to Limit 5.
 
 Working reading: these five settings move Cult Pace, Combat Difficulty, and at the low end the Generals' attributes together, so they are a ladder of presets, not the effect of one slider (CC-43).
@@ -505,7 +524,7 @@ The simulation runs one allied command for all three factions, a simplification 
 - **Defence.** When a city is attacked, the command draws free followers until its Force Estimate against the main force reaches about 0.9 to 1.1. If it cannot reach 0.9 it sends nobody, and the city fights alone.
 - **Liberation.** Once a day the command considers every captured city, a city with a General in it first, then the weakest garrison. It goes at an estimate of 1.75, or at 1.25 when at most one ordinary city is still free or the final attack is coming.
 - **Liberation Contract.** When the free pool falls short, the command hires 4 outsiders for that attempt. If it still falls short the contract is cancelled. Survivors return to the pool of outsiders.
-- **Allied Generals.** Two stay at home, so at most one is away, and it answers a call 30 % of the time. It joins a defence only against a General in the main force, and it goes first to a hunt or to a city a General holds. It rests half a day after a task. A General seeks out the rival General in a fight.
+- **Allied Generals.** Two stay at home, so at most one is away, and it answers a call 30 % of the time. It joins a defence only against a General in the main force, and it goes first to a hunt or to a city a General holds. It rests half a day after a task. A General seeks out the rival General in a fight. If the Allied Generals are the faction heads above, this is too often: answering 15 %, 10 %, or none of the calls, the allies win 29 %, 23 %, or 14 % at the middle setting, against 42 % at 30 % (1000 wars each), so the owner's 40/60 would need another allied strength (CC-44).
 - **Last General.** When one Cult General is left, every Allied General may leave, and seers and hunts work four times as often.
 - **Seers.** A warning comes on 15 % of the Spirit General's sorties, and an Allied General may then wait at the place. The Raiding General is found on 8 % of days and is hunted at an estimate of 1.2.
 - **Divine Blessing.** It multiplies a side's blows by 1.3 for one fight that has an Allied General, at most once in 2 days. A global strengthening is not simulated.
@@ -583,7 +602,7 @@ The lowest setting needs more than a slow cult, because allied followers of Limi
 
 ## Open
 
-Exact rates, Limit mix, and cap are CC-12. Allied starting strength and replacement are CC-13. Allied Generals, Liberation Contracts, and the Divine Blessing are CC-44.
+Owner-approved, 2026-11-03 (CC-12, CC-13): every number here is set and checked with no player, because each player plays differently and is what moves them. Playtest may still change them. Allied Generals, Liberation Contracts, the Divine Blessing, and the Sponsored Operation are CC-44.
 
 # 9. The player in the campaign
 
@@ -603,7 +622,7 @@ As allied forces wear down, the player's share of the defence grows. This is a p
 
 City Capture, City Liberation, and control changes are significant public events. They reach the player through daily public news, rumours, ambient NPC speech, briefings, and the map's qualitative control layer, under the rules of [09 Information Sources](09%20Information%20Sources.md).
 
-Knowing a city's control is not the same as knowing a General's position. How a General's location becomes known is open (CC-10).
+Knowing a city's control is not the same as knowing a General's position. The Spirit General's next place comes only from a seer, the Holding General is in a city it holds, and the Raiding General is met in neutral territory (§7). What else shows where a moving General walks is open (CC-10).
 
 The Cult Thought Link is a defined channel under [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), not global NPC knowledge. It reaches cult followers only.
 
@@ -649,7 +668,7 @@ Known risks:
 - **Content cost of ritual conditions.** Conditions that differ every time need a set of authored parts that the World Seed combines, which is a real load for a solo developer (§4).
 - **Slice scope.** The slice's required mechanics pull many undesigned systems into the first build (CC-39 to CC-42).
 - **Emptied cities after manifestation.** If captured cities lose their residents, the world after manifestation has few people, services, or quests left (CC-20).
-- **Time to reach a General.** Direct defeat takes Limit 2, or Limit 3 with good statistics and strategy, inside a 15–20 day campaign. A Limit 7 character has a 1.32 Limit multiplier against a General's 2.66 ([07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md)). If the player cannot get deep enough in time, allied numbers and disrupted rituals carry that whole path (CC-10).
+- **Time to reach a General.** Direct defeat takes Limit 2, or Limit 3 with good statistics and strategy, inside a 15–20 day campaign. A Limit 7 character has a 1.32 Limit multiplier against a General's 2.66 ([07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md)). The owner's target is that focused advancement gets there in time (§7). If progression numbers miss it, allied numbers and disrupted rituals carry that whole path (CC-10).
 - **Terrain evidence.** The target world and city count sit outside the conditions of the terrain research so far (CC-2).
 - **A war won without the player.** At the middle setting a player who does nothing still wins about two wars of five. That is the owner's chosen odds, and it means a passive run can end in a rating. The rating must show the difference (CC-43).
 - **The player as saviour.** "Only the player can turn the odds" must stay a matter of one more strong actor in a real war, not a chosen-one role. Allied Generals who kill Generals on their own are what keeps this true.

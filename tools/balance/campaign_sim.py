@@ -314,8 +314,11 @@ class World:
         return 1.0
 
     def refuge(self, survivors, force):
-        """Survivors spread over the held cities. Those with no room scatter."""
+        """Survivors spread over the held cities. Those with no room join their General, or a living one if theirs
+        has fallen (21 §7), and those with no room there either scatter."""
         held = self.held()
+        if not force.alive:
+            force = next((f for f in self.forces if f.alive), force)
         for key in survivors.elements():
             room = [c for c in held if size(c.cult) < CITY_CAP]
             if room:
@@ -508,7 +511,11 @@ def hunt_raiding(world):
         raiding.alive = False
         world.log["generals"] += 1
     foe[CULT_GENERAL] = 0
-    raiding.pool = +foe
+    if raiding.alive:
+        raiding.pool = +foe
+    else:
+        raiding.pool = Counter()
+        world.refuge(+foe, raiding)
     release(world, party)
     world.check_generals()
 
@@ -545,8 +552,10 @@ def liberate(world, city):
         world.refuge(foe, holder or world.forces[0])
     else:
         city.cult = take(foe, CITY_CAP)
-        if holder:
+        if holder and holder.alive:
             holder.pool = take(foe, FORCE_CAP)
+        elif holder:
+            world.refuge(+foe, holder)
         release(world, party)
     world.check_generals()
 

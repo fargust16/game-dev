@@ -818,6 +818,21 @@
     "dateNote": "Owner-approved answers to CC-3, CC-6, CC-7, and CC-8, 2026-11-03."
   },
   {
+    "id": "d-generals-and-allied-factions",
+    "statement": "A fallen General's free followers join the nearest living General and no new followers of its kind appear. Generals have starting positions and no fixed camp: the Spirit General cannot be found, the Holding General stays in a city it holds, and the others move through neutral territory near their captured cities. Seers in every city sell or share predictions. Every campaign number is held with no player. A Major Faction cannot die, and faction heads stay in the capital, going out rarely by chance, persuasion, or a Sponsored Operation. Focused advancement reaches Limit 2–3 within the campaign.",
+    "rationale": "Each General killed visibly weakens the cult without ending it, a General can be met but not besieged, and the player's numbers stay out of the world's balance.",
+    "alternatives": "Fixed General camps, a fallen General's followers scattering at once, or a faction that dies with its cities.",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers to CC-9, CC-10, CC-12, and CC-13, 2026-11-03."
+  },
+  {
     "id": "d-general-ending",
     "statement": "Killing all three Cult Generals is the only way to end the campaign before manifestation.",
     "rationale": "Replaces the undefined command threshold.",

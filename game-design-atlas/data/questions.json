@@ -994,27 +994,27 @@
   },
   {
     "id": "q-cc-9",
-    "text": "CC-9. Resolved in principle: killing all three Generals is the only pre-manifestation ending. What happens to a Force and to reinforcement when one or two have fallen?",
+    "text": "CC-9. Resolved by the owner, 2026-11-03: a fallen General's free followers join the nearest living General, no new followers of its kind appear, and its garrisons remain.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-cc-10",
-    "text": "CC-10. The ways to defeat a General are decided. How does a seer's prediction reach a player outside a faction, how is the Raiding General found, and can a player reach Limit 2–3 within 15–20 game days?",
+    "text": "CC-10. Resolved in part by the owner, 2026-11-03: seers in every city sell or share predictions; Generals move through neutral territory with no camp; focused advancement reaches Limit 2–3 within the campaign. Open: what else shows where a moving General walks, and the progression numbers for this pace.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority — Cult Campaign and City Control",
     "status": "open",
-    "priority": "high",
+    "priority": "medium",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
@@ -1033,27 +1033,27 @@
   },
   {
     "id": "q-cc-12",
-    "text": "CC-12. Working answer: Campaign Numbers V0 in 21 §8 give rates, Limit mixes, and a cap of 30. Do they hold in play with a player in the world?",
+    "text": "CC-12. Resolved by the owner, 2026-11-03: every campaign number is set and checked with no player; Campaign Numbers V0 stand as authoring defaults until playtest.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-cc-13",
-    "text": "CC-13. Working answer: Campaign Numbers V0 in 21 §8 give starting forces and replacement, three Allied Generals, and a pool of outsiders. Can a whole Major Faction die, and what happens to Faction Entry if it does?",
+    "text": "CC-13. Resolved by the owner, 2026-11-03: a Major Faction cannot die, because a god oversees it; faction heads stay in the capital and go out rarely, by chance, persuasion, or a Sponsored Operation.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
@@ -1456,7 +1456,7 @@
   },
   {
     "id": "q-cc-44",
-    "text": "CC-44. How many Allied Generals are there and on which Arcana, which allied god is the goddess, what does a Divine Blessing do in rules and who can receive one, and who posts a Liberation Contract, what does it pay, and where do the outsiders come from?",
+    "text": "CC-44. How many Allied Generals are there and on which Arcana, which allied god is the goddess, what does a Divine Blessing do in rules and who can receive one, and who posts a Liberation Contract, what does it pay, and where do the outsiders come from? Are the faction heads, who stay in the capital, the Allied Generals? What does a Sponsored Operation cost and bring?",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1510,7 +1510,7 @@
   },
   {
     "id": "q-cc-48",
-    "text": "CC-48. What do items, ingredients, and lessons cost, how much does a task pay, how fast do Shop Skill and stages rise with World Age, does stock run out, what happens to the shops of a captured city, how does Faction Influence act on a shelf, how are territories balanced by stage and difficulty, and which details of the Faction Gift and the slice's Masters stand?",
+    "text": "CC-48. What do items, ingredients, and lessons cost, how much does a task pay, how fast do Shop Skill and stages rise with World Age, does stock run out, what happens to the shops of a captured city, how does Faction Influence act on a shelf, how are territories balanced by stage and difficulty, and which details of the Faction Gift and the slice's Masters stand? What does a seer's prediction cost?",
     "systemIds": [
       "confront",
       "itemisation"

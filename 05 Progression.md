@@ -1,10 +1,10 @@
 # 05 Progression
 
-Version: 0.17
+Version: 0.18
 
 Status: Draft
 
-Last Updated: 2026-11-02 (the slice's abilities are in 05.1. Earlier: Limit growth direction recorded; the Starting Faction retired. Earlier: the secondary attribute is fixed per Arcana. Earlier: terms renamed to Arcana and Limit. Earlier: Pathways become Arcana and Stages become Limits, with content moved to 05.1; two abilities per Limit; Stage 1 demotion and occupancy corrected for faction Arcana. Earlier: 22 Tarot-archetype Pathways recorded, with six named; the V1 player reaches Stages 9–8 and Stage 7 is for NPCs only. Earlier: the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
+Last Updated: 2026-11-03 (the owner's pace target for the full game: focused advancement reaches Limit 2–3 within the campaign. Earlier: the slice's abilities are in 05.1. Earlier: Limit growth direction recorded; the Starting Faction retired. Earlier: the secondary attribute is fixed per Arcana. Earlier: terms renamed to Arcana and Limit. Earlier: Pathways become Arcana and Stages become Limits, with content moved to 05.1; two abilities per Limit; Stage 1 demotion and occupancy corrected for faction Arcana. Earlier: 22 Tarot-archetype Pathways recorded, with six named; the V1 player reaches Stages 9–8 and Stage 7 is for NPCs only. Earlier: the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
@@ -227,6 +227,10 @@ Rules:
 4. Acting against Arcana conduct is possible, but slows or endangers clean advancement and may create dissonant side effects.
 
 This keeps Player Knowledge valuable as judgment, not as a wiki route.
+
+# Pace of advancement (owner-approved, 2026-11-03)
+
+In the full game a player who works only at advancement, going to places of their own Limit, attacking the cult's raiding parties, and taking assignments, can reach Limit 2 or 3 within the 15–20 days of the campaign, depending on the style of play. From Limit 9 that is six or seven advancements, about one every two to three days. A player who advances more slowly can buy time by slowing the war ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §7). The numbers that give this pace are open (CC-10). V1's player reaches Limits 9–8.
 
 # Formulas and Ingredients
 
