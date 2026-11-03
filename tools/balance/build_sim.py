@@ -59,7 +59,7 @@ ARCANA = {
 # Strength, Endurance, Dexterity, Perception, Intelligence, Will: 51 points each.
 STATS = {
     "plate": (15, 11, 6, 6, 3, 10),
-    "attack": (17, 10, 9, 6, 3, 6),
+    "attack": (17, 13, 9, 6, 3, 3),
     "crit": (9, 9, 11, 16, 3, 3),
     "rifle": (5, 9, 15, 15, 3, 4),
     "mage": (4, 9, 6, 8, 14, 10),
@@ -72,40 +72,43 @@ def variant(base, **changes):
 
 
 def make_builds():
-    """Read from the weapons of combat_sim.py as they stand, so a tuning run can change them."""
+    """Read from the weapons of combat_sim.py as they stand, so a tuning run can change them.
+
+    Every main build carries two Weapon Sets, because at 2 AP a second set is worth more than
+    anything it costs: a melee build opens with a pistol, and a shooter keeps a sword."""
     shield = c.shielded(c.SWORD)
-    plate = Build(*STATS["plate"], shield, "plate", ("hp", "defence", "damage"), arcana="Император")
-    attack = Build(*STATS["attack"], c.GREATSWORD, "chain", ("damage", "accuracy", "hp"), arcana="Император")
-    crit = Build(*STATS["crit"], c.SWORD, "leather", ("crit", "crit_damage", "accuracy"))
-    shooter = Build(*STATS["rifle"], c.RIFLE, "leather", ("damage", "accuracy", "evasion"))
-    mage = Build(*STATS["mage"], c.RIFLE, "leather", ("magic", "wp", "hp", "accuracy"), True)
+    plate = Build(*STATS["plate"], c.PISTOL, "plate", ("hp", "defence", "damage"), second=shield, opener=True, arcana="Император")
+    attack = Build(*STATS["attack"], c.PISTOL, "chain", ("damage", "accuracy", "hp"), second=c.GREATSWORD, opener=True, arcana="Император")
+    crit = Build(*STATS["crit"], c.PISTOL, "leather", ("crit", "crit_damage", "accuracy"), second=c.SWORD, opener=True)
+    shooter = Build(*STATS["rifle"], c.RIFLE, "leather", ("damage", "accuracy", "evasion"), second=c.SWORD)
+    mage = Build(*STATS["mage"], c.RIFLE, "leather", ("magic", "wp", "hp", "accuracy"), True, second=c.SWORD)
     builds = {"plate": plate, "attack": attack, "crit": crit, "rifle": shooter, "mage": mage}
     builds.update({
-        "attack, greataxe": variant(attack, weapon=c.GREATAXE),
-        "attack, maul": variant(attack, weapon=c.MAUL),
-        "attack, pistol set": variant(attack, weapon=c.PISTOL, second=c.GREATSWORD, opener=True),
+        "attack, greataxe": variant(attack, second=c.GREATAXE),
+        "attack, maul": variant(attack, second=c.MAUL),
+        "attack, one set": variant(attack, weapon=c.GREATSWORD, second=None, opener=False),
         "attack in plate": variant(attack, armour="plate"),
-        "crit, dagger": variant(crit, weapon=c.DAGGER),
-        "crit, axe": variant(crit, weapon=c.AXE),
-        "crit, mace": variant(crit, weapon=c.MACE),
-        "crit, pistol set": variant(crit, weapon=c.PISTOL, second=c.SWORD, opener=True),
+        "crit, dagger": variant(crit, second=c.DAGGER),
+        "crit, axe": variant(crit, second=c.AXE),
+        "crit, mace": variant(crit, second=c.MACE),
+        "crit, one set": variant(crit, weapon=c.SWORD, second=None, opener=False),
         "crit, Initiative": variant(crit, mods=TEMPO),
-        "plate, mace": variant(plate, weapon=c.shielded(c.MACE)),
-        "plate, axe": variant(plate, weapon=c.shielded(c.AXE)),
-        "plate, no shield": variant(plate, weapon=c.SWORD),
-        "plate, pistol set": variant(plate, weapon=c.PISTOL, second=shield, opener=True),
+        "plate, mace": variant(plate, second=c.shielded(c.MACE)),
+        "plate, axe": variant(plate, second=c.shielded(c.AXE)),
+        "plate, no shield": variant(plate, second=c.SWORD),
+        "plate, one set": variant(plate, weapon=shield, second=None, opener=False),
         "pistol": variant(shooter, weapon=c.PISTOL),
-        "rifle, sword set": variant(shooter, second=c.SWORD),
+        "rifle, one set": variant(shooter, second=None),
         "rifle, Initiative": variant(shooter, mods=("damage", "accuracy", "initiative")),
         "rifle in plate": variant(shooter, armour="plate"),
         "mage in cloth": variant(mage, armour="cloth"),
         "mage in chain": variant(mage, armour="chain"),
         "mage in plate": variant(mage, armour="plate"),
+        "mage, one set": variant(mage, second=None),
         "mage, pistol": variant(mage, weapon=c.PISTOL),
-        "mage, sword": variant(mage, weapon=c.SWORD),
-        "mage, sword set": variant(mage, second=c.SWORD),
-        "mage, greatsword": variant(mage, weapon=c.GREATSWORD),
-        "mage, maul": variant(mage, weapon=c.MAUL),
+        "mage, sword": variant(mage, weapon=c.SWORD, second=None),
+        "mage, greatsword": variant(mage, weapon=c.GREATSWORD, second=None),
+        "mage, maul": variant(mage, weapon=c.MAUL, second=None),
     })
     if MODE != "none":
         builds.update({
