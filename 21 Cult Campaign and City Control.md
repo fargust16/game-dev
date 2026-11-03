@@ -1,10 +1,10 @@
 # 21 Cult Campaign and City Control
 
-Version: 0.28
+Version: 0.29
 
 Status: Draft — owner-approved direction, incomplete specification
 
-Last Updated: 2026-11-02 (open items run to CC-46. Earlier: Faction Influence is read from the war, and a Side Event changes the war directly (owner-approved). Earlier: references to resolved questions corrected. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded; Campaign Numbers V0 rebuilt on a whole war to manifestation or the death of the Generals. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: the source of traces recorded; the slice's scheme lives in 11. Earlier: a conductor who fights loses 3 AP, owner-approved. Earlier: working reading: a conductor who fights loses 3 AP. Earlier: the Cult Thought Link carries orders and reports only; Посланник restored. Earlier: Ritual Weak Points added. Earlier: ritual dialogue checks are Final Checks. Earlier: dialogue checks follow 10.4. Earlier: stealth in a captured city follows 10.3. Earlier: the Force Estimate governs every side; a senior's death has no effect of its own. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate; ritual group numbers set. Earlier: allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
+Last Updated: 2026-11-03 (the owner's answers to CC-3, CC-6, CC-7, and CC-8: open resistance counts, life under Cult Control, an Unclaimed city falls to the ritual alone, a General loses only followers, and Weak Points in the campaign. Earlier: open items run to CC-46. Earlier: Faction Influence is read from the war, and a Side Event changes the war directly (owner-approved). Earlier: references to resolved questions corrected. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded; Campaign Numbers V0 rebuilt on a whole war to manifestation or the death of the Generals. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: the source of traces recorded; the slice's scheme lives in 11. Earlier: a conductor who fights loses 3 AP, owner-approved. Earlier: working reading: a conductor who fights loses 3 AP. Earlier: the Cult Thought Link carries orders and reports only; Посланник restored. Earlier: Ritual Weak Points added. Earlier: ritual dialogue checks are Final Checks. Earlier: dialogue checks follow 10.4. Earlier: stealth in a captured city follows 10.3. Earlier: the Force Estimate governs every side; a senior's death has no effect of its own. Earlier: a ritual lapses a game day after liberation; retreat follows a force estimate; ritual group numbers set. Earlier: allied directive, retreat ending a ritual, undoing from Limit 5, ritual group sizes, and the 20-cell grid recorded; the one-day rule withdrawn. Earlier: ritual order in a city, allied ignorance of rituals, undoing a ritual, and the grid around the player recorded. Earlier: a ritual lasts one in-game hour; the relation of ritual and capture is open; NPC behaviour in a fight recorded. Earlier: the city as a battlefield and all three cult Arcana occupied recorded. Earlier: Arcana and the corrected Limit 1 rule recorded. Earlier: the cult's three Pathways recorded; the V1 player reaches Stages 9–8. Earlier: V1 settled: the Spirit General comes out on day 1–2. Earlier: owner's fourth answers: the ritual site, the one-day force of a liberated Place of Power, seers, how a General can be defeated, allied kills of Generals, allied cooperation, force numbers and each General's rate, the Cult Pace slider, and the V1 slice. Earlier: owner's third answers: generation-driven Cult Sorties and their odds, each General's cycle, the Spirit General replacing the teleporting reading, how rituals are stopped, the two-day ritual wait, the Last Free City Rule, and the capital's residents among the dead. Earlier: owner's second answers: capture order, Unclaimed cities and faction ownership, life under Cult Control, ritual sabotage, retreat triggers, the rituals' secret revealed only at manifestation, killing all three Generals as the only pre-manifestation ending, the Holding General's moves, and the Divine Plane restored apart from the Spirit World. Earlier: campaign length, 3×3 target world, 5–7 cities, the secret purpose of rituals, the manifestation condition, Cult Retreat, Cult Thought Link, Generals' behaviour outside cities, the Spirit World, and the Stage Occupancy Rule recorded. Earlier: first version: the pre-manifestation campaign is a war for cities led by three Stage 2 Cult Generals, with asymmetric force generation and a Capital Gate.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [07 Character Life](07%20Character%20Life.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -110,11 +110,12 @@ Control changes only when City Capture or City Liberation completes, or when a f
 - The allied faction with the most followers in the city takes it.
 - A city liberated by the player alone is Unclaimed. The first allied faction whose follower arrives claims it, and that faction's followers then appear there as defenders.
 - Replacement of allied followers becomes possible in the city again.
+- Owner-approved, 2026-11-03: a Cult Sortie against an Unclaimed city where nobody resists openly needs no fight. The ritual alone takes it.
 
 ## Working readings
 
 - "The whole world belongs to the allied factions" is read as "every city". Land between cities carries no City Control and stays neutral.
-- An Unclaimed city is not under Cult Control, so it keeps the Capital Gate closed. How the cult takes an Unclaimed city is open (CC-7).
+- An Unclaimed city is not under Cult Control, so it keeps the Capital Gate closed.
 
 # 4. City Capture and City Liberation
 
@@ -128,6 +129,7 @@ Control changes only when City Capture or City Liberation completes, or when a f
 - Killing every follower is not required. Cult followers may decide to retreat.
 - A General does not have to be in a captured city. A General may also run from a fight, except the Holding General.
 - Rituals can run in parallel in two cities when the cult has gathered enough followers.
+- Owner-approved, 2026-11-03: a General loses only the followers who die. The death of its garrison does not weaken the General itself.
 
 ## The city as a battlefield (owner-approved)
 
@@ -212,7 +214,7 @@ Arguments come from two places:
 
 **After a failure.** A failed Final Check starts a fight. The followers report it through the Cult Thought Link, and part of the main force may come to the ritual. No dialogue route remains. Only the hidden route stays, if it is one of this ritual's Weak Points.
 
-How many Weak Points a campaign ritual has, and which further kinds exist, is open (CC-8).
+**In the campaign** (owner-approved, 2026-11-03): a ritual has two Weak Points at the middle setting and one at the higher settings. Later versions add further kinds, for instance an anchor in a living carrier. Traces follow the slice's scheme in every generated city: each Weak Point has two sources in the city and one during the invasion. Which slider sets the count, and how many the lower settings give, is open (CC-36).
 
 ## Force Estimate (owner-approved)
 
@@ -243,6 +245,12 @@ A captured city is a closed combat zone, but residents and shops keep working, a
 - A stranger with no faction can walk through at some risk, because nobody knows them.
 - Followers sense a member of a known faction, approach, and demand a check through dialogue. Refusing starts a fight. A character who agrees and belongs to no faction may only be threatened.
 
+Owner-approved, 2026-11-03:
+
+- **The check** is an ordinary Social Check of [10.4](10.4%20Dialogue%20and%20Social%20Checks.md): the character answers the patrol with an Argument, such as a cover story or a sign of the cult, against the patrol's Listener Value. As with every check against enemies, a failure is a Final Check and ends in a fight.
+- **Shops** keep working, because the cult keeps residents alive and calm, but prices are higher and stock is poorer. How much belongs to CC-48.
+- **Symptoms** ([02 World Laws](02%20World%20Laws.md)) of a captured city: patrols in the streets, cult signs on the walls, closed temples, empty streets at night, and the allied factions' banners gone.
+
 The dialogues themselves are later content.
 
 ## Cult Thought Link
@@ -256,13 +264,13 @@ The **Cult Thought Link** is a chain of command, not a shared mind. It carries o
 
 Followers do not use the Link to ask each other things during a ritual or a battle, or to check what a stranger tells them. A lie told to one of them therefore stays unchecked until it fails.
 
-No hidden cult follower can therefore keep a city from being liberated. The same question for allied followers during a capture is open (CC-3).
+No hidden cult follower can therefore keep a city from being liberated. The same holds the other way: during a capture only open resistance counts (*Followers and ordinary residents*).
 
 ## Followers and ordinary residents
 
 A **Follower** is a character who belongs to a Major Faction's forces. Ordinary residents are not followers, even when they live under a faction's rule.
 
-Who else counts for capture and liberation is open (CC-3), including Minor Faction members, unaffiliated practitioners, and the player character.
+Owner-approved, 2026-11-03: beside followers, any initiated character who openly resists counts for City Capture and City Liberation, a Minor Faction member, an unaffiliated practitioner, or the player character, and a hidden one does not, as a hidden cult follower does not keep a city from being liberated. A lone player can therefore delay a capture by fighting, but cannot hold a city just by being there.
 
 ## Working readings
 
@@ -601,7 +609,7 @@ The Cult Thought Link is a defined channel under [18 World Time and Living Simul
 
 No source in the world reports the purpose of the rituals.
 
-Captured and liberated cities must look different in the world. Their Symptoms are part of CC-6.
+Captured and liberated cities must look different in the world. The Symptoms of a captured city are in §4 (*Life under Cult Control*).
 
 # 11. World Engine and simulation budget
 
@@ -631,14 +639,14 @@ Filter of [AGENTS.md](AGENTS.md):
 | Teaches about the world? | Yes: General behaviour, tells, and control patterns are prime Player Knowledge targets. |
 | Power has a price? | Partly. Fighting for a city costs time elsewhere; costs of allied help are open. |
 | Multiple options viable? | **Yes, before a city falls.** Persuasion, disguise, and stealth are real routes during a capture. A fallen city is combat only by the owner's decision; [08 Confront Constraints](08%20Confront%20Constraints.md) accepts alternatives that come beforehand. |
-| Failure valuable? | **At risk.** Liberating a city that falls again the next day may only waste time. Liberation needs a lasting payoff (CC-7). |
+| Failure valuable? | **At risk.** Liberating a city that falls again the next day may only waste time. Liberation needs a lasting payoff. An Unclaimed city falls to a ritual alone, with no fight (§3), so a solo liberation lasts only until an allied follower claims the city or the cult returns. |
 | World changes afterward? | Yes: control, residents, services, the Capital Gate, and the deaths at manifestation. |
 
 Known risks:
 
 - **Constant urgency against curiosity.** A war with a visible front can crowd out exploration, the game's first pillar. The 15–20 day length, the quiet first days, and the 3×3 world are the response.
-- **Solo fight against a whole garrison.** The Cult Thought Link draws a city's followers to one fight. A lone character can meet all of them, so the size of a garrison and how they arrive decide whether solo liberation is possible (CC-8).
-- **Content cost of ritual conditions.** Conditions that differ every time need a set of authored parts that the World Seed combines, which is a real load for a solo developer (CC-8).
+- **Solo fight against a whole garrison.** The Cult Thought Link draws a city's followers to one fight. A lone character can meet all of them, so the size of a garrison and how they arrive decide whether solo liberation is possible (CC-43).
+- **Content cost of ritual conditions.** Conditions that differ every time need a set of authored parts that the World Seed combines, which is a real load for a solo developer (§4).
 - **Slice scope.** The slice's required mechanics pull many undesigned systems into the first build (CC-39 to CC-42).
 - **Emptied cities after manifestation.** If captured cities lose their residents, the world after manifestation has few people, services, or quests left (CC-20).
 - **Time to reach a General.** Direct defeat takes Limit 2, or Limit 3 with good statistics and strategy, inside a 15–20 day campaign. A Limit 7 character has a 1.32 Limit multiplier against a General's 2.66 ([07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md)). If the player cannot get deep enough in time, allied numbers and disrupted rituals carry that whole path (CC-10).

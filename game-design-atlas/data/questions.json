@@ -916,14 +916,14 @@
   },
   {
     "id": "q-cc-3",
-    "text": "CC-3. Which actors must leave a city for the cult's clearing to complete: hidden allied followers, Minor Faction members, unaffiliated practitioners, the player character? Can a lone player keep a city from falling just by being there?",
+    "text": "CC-3. Resolved by the owner, 2026-11-03: any initiated character who openly resists counts for capture and liberation, a hidden one never; a lone player can delay a capture by fighting but cannot hold a city by presence.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
@@ -955,40 +955,40 @@
   },
   {
     "id": "q-cc-6",
-    "text": "CC-6. The closed-zone rule, stealth, and the dialogue check are decided. How does being noticed work, what does the check consist of, do prices or stock change, and which Symptoms show a captured city?",
+    "text": "CC-6. Resolved by the owner, 2026-11-03: the patrol's check is an ordinary Social Check with an Argument; shops work with higher prices and poorer stock; a captured city shows patrols, cult signs, closed temples, empty night streets, and no allied banners.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-cc-7",
-    "text": "CC-7. Ownership, the two-day wait per city, and the one-day force of a Place of Power are decided. Does a sortie against an Unclaimed city need a fight, and does a garrison's death set its General back?",
+    "text": "CC-7. Resolved by the owner, 2026-11-03: a sortie against an Unclaimed city with no open resistance needs no fight; a General loses only followers.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-cc-8",
-    "text": "CC-8. The slice has two Ritual Weak Points from four kinds. How many does a campaign ritual have, which further kinds exist, and what do their traces look like in a generated city?",
+    "text": "CC-8. Resolved by the owner, 2026-11-03: a campaign ritual has two Weak Points at the middle setting and one at higher settings; further kinds come later; traces follow the slice's scheme.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
@@ -1350,7 +1350,7 @@
   },
   {
     "id": "q-cc-36",
-    "text": "CC-36. Can the undoing be interrupted? Where is the ritual site? The Force Estimate has a working calculation in 21 §8. Does difficulty change how boldly each side acts, and how many followers does each ritual need?",
+    "text": "CC-36. Can the undoing be interrupted? Where is the ritual site? The Force Estimate has a working calculation in 21 §8. Does difficulty change how boldly each side acts, and how many followers does each ritual need? Which slider sets the number of Weak Points of a campaign ritual, and how many do the lower settings give?",
     "systemIds": [
       "cult-campaign"
     ],

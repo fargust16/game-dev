@@ -803,6 +803,21 @@
     "dateNote": "Owner-approved answers, 2026-11-01."
   },
   {
+    "id": "d-capture-liberation-details",
+    "statement": "Any initiated character who openly resists counts for City Capture and City Liberation, a hidden one never. Under Cult Control a patrol's check is an ordinary Social Check, shops work at higher prices with poorer stock, and Symptoms show the capture. A sortie against an Unclaimed city with no open resistance needs no fight, and a General loses only the followers who die.",
+    "rationale": "Mirrors the rule that hidden cultists cannot freeze a liberation, keeps the player one strong actor rather than a city's anchor, and lets the world show a capture without numbers.",
+    "alternatives": "Only faction followers count, or anyone present counts, so a hidden player could hold a city.",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-21"
+    ],
+    "dateNote": "Owner-approved answers to CC-3, CC-6, CC-7, and CC-8, 2026-11-03."
+  },
+  {
     "id": "d-general-ending",
     "statement": "Killing all three Cult Generals is the only way to end the campaign before manifestation.",
     "rationale": "Replaces the undefined command threshold.",
@@ -1255,7 +1270,7 @@
   },
   {
     "id": "d-ritual-weak-points",
-    "statement": "A ritual in the slice has two Ritual Weak Points, chosen by the seed from Сомневающийся, Посланник, Грязная тайна, and Основа ритуала. Any one stops it. No list or map mark shows them: the player recognises one on finding its Argument. A failed Final Check leaves only the hidden route, and the followers report it through the Cult Thought Link, which carries orders and reports in exceptional cases.",
+    "statement": "A ritual in the slice has two Ritual Weak Points, chosen by the seed from Сомневающийся, Посланник, Грязная тайна, and Основа ритуала. Any one stops it. No list or map mark shows them: the player recognises one on finding its Argument. A failed Final Check leaves only the hidden route, and the followers report it through the Cult Thought Link, which carries orders and reports in exceptional cases. A campaign ritual has two at the middle setting and one at the higher settings (2026-11-03).",
     "rationale": "Gives a non-violent way to win that rests on what the character found out, differs each run, and uses stealth, Alchemy, and the three Social Checks.",
     "alternatives": "One fixed answer per ritual, which a player learns once; or map marks, which remove the search.",
     "systemIds": [
