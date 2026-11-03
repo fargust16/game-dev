@@ -16,13 +16,13 @@ LIMIT_S = {None: 1.00, 9: 1.00, 8: 1.15, 7: 1.32, 6: 1.52, 5: 1.75, 4: 2.01, 3: 
 RUNS = 4000
 CLOSE_IN_CELLS = 6
 REACTION_AP = 2
-FLANK_HIT = 0.10
-FLANK_CRIT = 0.10
+SURROUND_HIT = {2: 0.10, 3: 0.20, 4: 0.20}
 ORDINARY = 0.15
 POWERFUL = 0.33
 BRACE_REDUCTION = 0.25
 SUPPORT_DEFENCE = 5
 SLEEP_ROUNDS = 3
+SLEEP_AP = 2
 CONDUCTING_AP = 3
 STAGE_STEP = 0.35
 CRIT = 2.0
@@ -55,14 +55,34 @@ class Weapon:
     reload: int = 0
     range: int = 12
     weight: float = 2.0
+    accuracy: float = 0.0
+    crit: float = 0.0
+    stun: float = 0.0
+    cleave: float = 0.0
 
 
-DAGGER = Weapon("dagger", 3, 3, guard="parry", guard_chance=0.30, guard_absorb=1.0, stealth_mult=1.0, weight=1.0)
-ONE_HAND = Weapon("one-hand", 5, 5, guard="parry", guard_chance=0.40, guard_absorb=1.0)
-SHIELDED = Weapon("one-hand and shield", 5, 5, guard="block", guard_chance=0.60, guard_absorb=0.8, weight=6.0)
-TWO_HAND = Weapon("two-hand", 9, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=5.0)
+SHIELD_BLOCK = 0.50
+
+
+def shielded(w):
+    return replace(w, name=w.name + " and shield", guard="block", guard_chance=SHIELD_BLOCK, guard_absorb=0.8, weight=w.weight + 4.0)
+
+
+# Kinds of weapon (10.2 §5b): a dagger is the truest and the likeliest to find a critical hit, a sword the
+# quickest and truer than an axe or a mace, an axe hits as hard as a sword and finds more critical hits,
+# and a mace hits hardest, finds the fewest, and may stun. A greatsword also catches a second enemy.
+DAGGER = Weapon("dagger", 3, 3, guard="parry", guard_chance=0.30, guard_absorb=1.0, stealth_mult=1.0, weight=1.0, accuracy=10, crit=0.25)
+SWORD = Weapon("sword", 5, 4, guard="parry", guard_chance=0.40, guard_absorb=1.0, accuracy=5)
+AXE = Weapon("axe", 5, 5, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=2.2, crit=0.20)
+MACE = Weapon("mace", 6.5, 5, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=2.5, crit=-0.03, stun=0.05)
+GREATSWORD = Weapon("greatsword", 8.5, 6, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=4.5, accuracy=5, cleave=0.5)
+GREATAXE = Weapon("greataxe", 8.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=5.0, crit=0.22)
+MAUL = Weapon("maul", 10.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=6.0, crit=-0.03, stun=0.08)
+ONE_HAND = SWORD
+TWO_HAND = GREATSWORD
+SHIELDED = shielded(SWORD)
 RIFLE = Weapon("rifle", 9, 10, True, reload=7, range=16, weight=4.0)
-PISTOL = Weapon("pistol", 7, 8, True, reload=5, range=6, weight=1.2)
+PISTOL = Weapon("pistol", 7, 8, True, reload=5, range=6, weight=1.2, accuracy=-10)
 
 ARMOUR = {"none": (0, 0), "cloth": (2, 20), "leather": (8, 8), "chain": (16, 3), "plate": (24, 0)}
 
@@ -120,10 +140,10 @@ class Unit:
     infuse: bool = False
     loaded: bool = True
     reloaded: int = 0
-    sidearm: int = 0
-    shots: int = 0
-    stowed: bool = False
-    offhand: bool = False
+    second: object = None
+    opener: bool = False
+    second_loaded: bool = True
+    reacted: bool = False
     disoriented: int = 0
     dazed: bool = False
     taunter: object = None
@@ -146,7 +166,7 @@ class Unit:
 
     def load(self):
         """What the worn armour and held weapon cost in Evasion and AP, as a share of Carrying Capacity."""
-        share = (ARMOUR_WEIGHT[self.armour] + self.weapon.weight + self.sidearm * PISTOL.weight + CARRIED) / (20 + self.str)
+        share = (ARMOUR_WEIGHT[self.armour] + self.weapon.weight + (self.second.weight if self.second else 0.0) + CARRIED) / (20 + self.str)
         return next((band[1:] for band in LOAD if share <= band[0]), LOAD[-1][1:])
 
     def max_hp(self):
@@ -165,8 +185,8 @@ class Unit:
 
     def accuracy(self):
         if self.weapon.ranged:
-            return ((self.dex + self.per) / 2 + self.skill) / 2 + self.gear.accuracy
-        return ((self.str + self.dex + self.per) / 3 + self.skill) / 2 + self.gear.accuracy
+            return ((self.dex + self.per) / 2 + self.skill) / 2 + self.gear.accuracy + self.weapon.accuracy
+        return ((self.str + self.dex + self.per) / 3 + self.skill) / 2 + self.gear.accuracy + self.weapon.accuracy
 
     def evasion(self):
         return 0 if self.asleep else (self.dex + self.per) / 2 + self.gear.evasion - self.burden[0]
@@ -177,7 +197,7 @@ class Unit:
         return w.base * stage_factor(w.stage) * power * (1 + self.gear.damage) * random.uniform(0.85, 1.15)
 
     def crit_raw(self):
-        return (0.05 + 0.90 * (self.per - 1) / 99 + self.gear.crit) * (1 + self.luck / 100)
+        return (0.05 + 0.90 * (self.per - 1) / 99 + self.gear.crit + self.weapon.crit) * (1 + self.luck / 100)
 
     def defence(self, side=()):
         support = SUPPORT_DEFENCE if any("support" in u.abilities and u.hp > 0 and u is not self for u in side) else 0
@@ -205,10 +225,8 @@ def resist_check(a, t, will_only=False):
     return random.random() < min(0.95, max(0.05, p * (1 + a.luck / 100)))
 
 
-def strike(a, t, foes_of_t=(), side_of_t=(), bonus_crit=0.0, crit_extra=0.0, mult=1.0, unguarded=False, flanked=False):
-    bonus_hit = FLANK_HIT if flanked else 0.0
-    if flanked:
-        bonus_crit += FLANK_CRIT
+def strike(a, t, foes_of_t=(), side_of_t=(), bonus_crit=0.0, crit_extra=0.0, mult=1.0, unguarded=False, surround=0):
+    bonus_hit = SURROUND_HIT.get(surround, 0.0)
     if t.exposed:
         bonus_hit += 0.10
         t.exposed = False
@@ -257,10 +275,10 @@ def take_turn(u, own, enemy, rnd):
     if not foes:
         return
     awake = [f for f in foes if not f.asleep and not f.skip]
-    if "sleep" in u.abilities and len(awake) >= 2 and ap >= 5 and u.can_spend(POWERFUL):
+    if "sleep" in u.abilities and len(awake) >= 2 and ap >= SLEEP_AP and u.can_spend(POWERFUL):
         target = deepest(awake)
         u.wp -= u.max_wp() * POWERFUL
-        ap -= 5
+        ap -= SLEEP_AP
         if resist_check(u, target):
             target.asleep = SLEEP_ROUNDS
         else:
@@ -285,15 +303,16 @@ def take_turn(u, own, enemy, rnd):
             break
         awake = [f for f in foes if not f.asleep] or foes
         target = min(awake, key=lambda f: f.hp) if u.focus else random.choice(awake)
+        # No grid: with three or more on the side the target counts as surrounded by two, with two at even odds.
         attackers = len(alive(own))
-        flanked = not u.weapon.ranged and (attackers >= 3 or (attackers == 2 and random.random() < 0.5))
+        surround = 2 if not u.weapon.ranged and (attackers >= 3 or (attackers == 2 and random.random() < 0.5)) else 0
         if "crush" in u.abilities and not u.weapon.ranged and ap >= u.weapon.ap + 1 and u.can_spend(POWERFUL):
             u.wp -= u.max_wp() * POWERFUL
             ap -= u.weapon.ap + 1
-            if not strike(u, target, own, enemy, mult=1.5, unguarded=True, flanked=flanked):
+            if not strike(u, target, own, enemy, mult=1.5, unguarded=True, surround=surround):
                 u.exposed = True
             continue
-        strike(u, target, own, enemy, flanked=flanked)
+        strike(u, target, own, enemy, surround=surround)
         ap -= u.weapon.ap
     u.reserve = ap
 

@@ -46,7 +46,8 @@ class Build:
     armour: str
     mods: tuple
     infuse: bool = False
-    sidearm: int = 0
+    second: c.Weapon = None
+    opener: bool = False
     arcana: str = "Жрица"
 
 
@@ -55,48 +56,69 @@ ARCANA = {
     "Жрица": {9: (), 8: ("sleep",), 7: ("sting",)},
 }
 
-PLATE = Build(15, 14, 6, 6, 3, 7, c.SHIELDED, "plate", ("hp", "defence", "damage"), arcana="Император")
-ATTACK = Build(18, 10, 9, 6, 3, 5, c.TWO_HAND, "chain", ("damage", "accuracy", "hp"), arcana="Император")
-CRIT = Build(9, 9, 11, 16, 3, 3, c.ONE_HAND, "leather", ("crit", "crit_damage", "accuracy"))
-SHOOTER = Build(5, 9, 15, 15, 3, 4, c.RIFLE, "leather", ("damage", "accuracy", "evasion"))
-MAGE = Build(4, 9, 6, 8, 14, 10, c.RIFLE, "leather", ("magic", "wp", "hp", "accuracy"), True)
+# Strength, Endurance, Dexterity, Perception, Intelligence, Will: 51 points each.
+STATS = {
+    "plate": (15, 11, 6, 6, 3, 10),
+    "attack": (17, 10, 9, 6, 3, 6),
+    "crit": (9, 9, 11, 16, 3, 3),
+    "rifle": (5, 9, 15, 15, 3, 4),
+    "mage": (4, 9, 6, 8, 14, 10),
+}
+MAIN = tuple(STATS)
 
 
 def variant(base, **changes):
     return Build(**{**base.__dict__, **changes})
 
 
-BUILDS = {"plate": PLATE, "attack": ATTACK, "crit": CRIT, "rifle": SHOOTER, "mage": MAGE}
-MAIN = tuple(BUILDS)
-BUILDS.update({
-    "attack in plate": variant(ATTACK, armour="plate"),
-    "crit, dagger": variant(CRIT, weapon=c.DAGGER),
-    "crit, sword, pistol": variant(CRIT, sidearm=1),
-    "crit, dagger, pistol": variant(CRIT, weapon=c.DAGGER, sidearm=1),
-    "plate, sword, pistol": variant(PLATE, weapon=c.ONE_HAND, sidearm=1),
-    "plate, sword": variant(PLATE, weapon=c.ONE_HAND),
-    "crit, Initiative": variant(CRIT, mods=TEMPO),
-    "pistol": variant(SHOOTER, weapon=c.PISTOL),
-    "two pistols": variant(SHOOTER, weapon=c.PISTOL, sidearm=1),
-    "rifle, Initiative": variant(SHOOTER, mods=("damage", "accuracy", "initiative")),
-    "rifle in plate": variant(SHOOTER, armour="plate"),
-    "mage in cloth": variant(MAGE, armour="cloth"),
-    "mage in chain": variant(MAGE, armour="chain"),
-    "mage in plate": variant(MAGE, armour="plate"),
-    "mage, pistol": variant(MAGE, weapon=c.PISTOL),
-    "mage, sword": variant(MAGE, weapon=c.ONE_HAND),
-    "mage, sword, pistol": variant(MAGE, weapon=c.ONE_HAND, sidearm=1),
-    "mage, two pistols": variant(MAGE, weapon=c.PISTOL, sidearm=1),
-    "mage, two-hand": variant(MAGE, weapon=c.TWO_HAND),
-})
-if MODE != "none":
-    BUILDS.update({
-        "plate, Жрица": variant(PLATE, arcana="Жрица"),
-        "attack, Жрица": variant(ATTACK, arcana="Жрица"),
-        "crit, Император": variant(CRIT, arcana="Император"),
-        "rifle, Император": variant(SHOOTER, arcana="Император"),
-        "mage, Император": variant(MAGE, arcana="Император"),
+def make_builds():
+    """Read from the weapons of combat_sim.py as they stand, so a tuning run can change them."""
+    shield = c.shielded(c.SWORD)
+    plate = Build(*STATS["plate"], shield, "plate", ("hp", "defence", "damage"), arcana="Император")
+    attack = Build(*STATS["attack"], c.GREATSWORD, "chain", ("damage", "accuracy", "hp"), arcana="Император")
+    crit = Build(*STATS["crit"], c.SWORD, "leather", ("crit", "crit_damage", "accuracy"))
+    shooter = Build(*STATS["rifle"], c.RIFLE, "leather", ("damage", "accuracy", "evasion"))
+    mage = Build(*STATS["mage"], c.RIFLE, "leather", ("magic", "wp", "hp", "accuracy"), True)
+    builds = {"plate": plate, "attack": attack, "crit": crit, "rifle": shooter, "mage": mage}
+    builds.update({
+        "attack, greataxe": variant(attack, weapon=c.GREATAXE),
+        "attack, maul": variant(attack, weapon=c.MAUL),
+        "attack, pistol set": variant(attack, weapon=c.PISTOL, second=c.GREATSWORD, opener=True),
+        "attack in plate": variant(attack, armour="plate"),
+        "crit, dagger": variant(crit, weapon=c.DAGGER),
+        "crit, axe": variant(crit, weapon=c.AXE),
+        "crit, mace": variant(crit, weapon=c.MACE),
+        "crit, pistol set": variant(crit, weapon=c.PISTOL, second=c.SWORD, opener=True),
+        "crit, Initiative": variant(crit, mods=TEMPO),
+        "plate, mace": variant(plate, weapon=c.shielded(c.MACE)),
+        "plate, axe": variant(plate, weapon=c.shielded(c.AXE)),
+        "plate, no shield": variant(plate, weapon=c.SWORD),
+        "plate, pistol set": variant(plate, weapon=c.PISTOL, second=shield, opener=True),
+        "pistol": variant(shooter, weapon=c.PISTOL),
+        "rifle, sword set": variant(shooter, second=c.SWORD),
+        "rifle, Initiative": variant(shooter, mods=("damage", "accuracy", "initiative")),
+        "rifle in plate": variant(shooter, armour="plate"),
+        "mage in cloth": variant(mage, armour="cloth"),
+        "mage in chain": variant(mage, armour="chain"),
+        "mage in plate": variant(mage, armour="plate"),
+        "mage, pistol": variant(mage, weapon=c.PISTOL),
+        "mage, sword": variant(mage, weapon=c.SWORD),
+        "mage, sword set": variant(mage, second=c.SWORD),
+        "mage, greatsword": variant(mage, weapon=c.GREATSWORD),
+        "mage, maul": variant(mage, weapon=c.MAUL),
     })
+    if MODE != "none":
+        builds.update({
+            "plate, Жрица": variant(plate, arcana="Жрица"),
+            "attack, Жрица": variant(attack, arcana="Жрица"),
+            "crit, Император": variant(crit, arcana="Император"),
+            "rifle, Император": variant(shooter, arcana="Император"),
+            "mage, Император": variant(mage, arcana="Император"),
+        })
+    return builds
+
+
+BUILDS = make_builds()
 
 
 def abilities(b):
@@ -107,7 +129,7 @@ def abilities(b):
 
 def fighter(build):
     b = BUILDS[build]
-    u = c.Unit(build, 8 if MODE == "none" else int(MODE), b.str, b.end, b.dex, b.per, SKILL, b.will, b.intl, b.weapon, b.armour, infuse=b.infuse, sidearm=b.sidearm, abilities=abilities(b))
+    u = c.Unit(build, 8 if MODE == "none" else int(MODE), b.str, b.end, b.dex, b.per, SKILL, b.will, b.intl, b.weapon, b.armour, infuse=b.infuse, second=b.second, opener=b.opener, abilities=abilities(b))
     for i in range(MODIFIERS):
         kind = b.mods[i % len(b.mods)]
         s.add(u, kind, s.VALUE[kind] * SCALE)

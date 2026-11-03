@@ -2,13 +2,15 @@
 
 combat_sim.py has no space: anyone can hit anyone, so a fight is a race of total
 damage against total HP, and one more body decides it. This model puts the same
-fighters on cells. Melee fighters must walk, they are held by whoever stands next
-to them, and every fighter picks targets by impact: how much harm the target does
-to its side, against how fast this fighter can bring it down. Fighters can wait to
-the end of the round, hold back from an enemy's reach, and stand in a Defensive
-Stance that answers an attacker with a Counterattack. Firearms reload, armour counts
-double against ranged physical damage, and a blow can be filled with Will Power. A
-pistol in the off hand fires once at a price, and Reload needs a free hand.
+fighters on cells. Melee fighters must walk and strike only across a side of a cell,
+never across a corner. Whoever leaves a cell beside an enemy with a melee weapon takes
+its Reaction Attack, a fighter with two or more enemies beside it is Surrounded, and
+every fighter picks targets by impact: how much harm the target does to its side,
+against how fast this fighter can bring it down. Fighters can wait to the end of the
+round, hold back from an enemy's reach, and stand in a Defensive Stance that answers
+an attacker with a Counterattack. Firearms reload, armour counts double against
+ranged physical damage, and a blow can be filled with Will Power. A fighter may carry
+a second Weapon Set and change to it.
 
 V0 is the configuration 10.2 reports, before items. The other switches of Rules
 are the levers tried against headcount, kept so that the table of levers can be
@@ -30,23 +32,25 @@ RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 3000
 SPELL_RANGE = 6
 ORDER_RANGE = 4
 SUPPORT_RANGE = 2
-ESCAPE_AP = 2
+ESCAPE_AP = 0
 REACH_DISCOUNT = 0.7
 KILL_BONUS = 2.5
 ASLEEP_FACTOR = 0.2
 CROWD_FACTOR = 0.5
 BREAK_OFF_FACTOR = 1.5
 PISTOL_RANGE = 6
-STOW_AP = 2
-OFFHAND_HIT = 0.20
-OFFHAND_DAMAGE = 0.5
+SWAP_AP = 2
+SURROUND_HIT = c.SURROUND_HIT
 OBJECTIVE_BONUS = 3.0
 STING_AP = 5
 STING_BASE = 5
 STING_RANGE = 12
 DISORIENT_HIT = 0.10
 PILLAR_AP = 4
-WAKE_AP = 3
+WAKE_AP = 6
+SLEEP_AP = c.SLEEP_AP
+ORDER_AP = 4
+BRACE_AP = 3
 ORDER_BY_WILL = False
 SLEEP_COST = c.POWERFUL
 ORDER_COST = c.ORDINARY
@@ -71,7 +75,6 @@ class Rules:
     flat_divisor: float = 4.0
     flat_floor: float = 0.25
     skill_weight: float = 1.0
-    cleave: bool = False
     morale: float = 0.0
     leader_weight: float = 1.0
     enemy_bonus: int = 0
@@ -96,13 +99,22 @@ class Rules:
     infusion_divisor: float = c.INFUSION_DIVISOR
     cover: float = 0.0
     crit_pierce: float = c.CRIT_PIERCE
-    offhand_hit: float = OFFHAND_HIT
-    offhand_mult: float = OFFHAND_DAMAGE
-    offhand_parry: bool = False
+    reaction: bool = True
 
 
 def cheb(a, b):
     return max(abs(a.x - b.x), abs(a.y - b.y))
+
+
+def touch(a, b):
+    """Side by side: a melee blow crosses a side of a cell, never a corner."""
+    return abs(a.x - b.x) + abs(a.y - b.y) == 1
+
+
+def steps_to(a, b):
+    """Steps, diagonal ones included, until a stands side by side with b."""
+    dx, dy = abs(a.x - b.x), abs(a.y - b.y)
+    return max(max(dx, dy) - 1, min(dx, dy))
 
 
 def alive(side):
@@ -126,8 +138,9 @@ class Fight:
             u.skip = u.asleep = 0
             u.stance = False
             u.held = -1
-            u.loaded = True
-            u.shots, u.stowed = u.sidearm, False
+            u.loaded = u.second_loaded = True
+            u.reloaded = 0
+            u.reacted = False
             u.disoriented, u.dazed, u.taunter = 0, False, None
             u.threat = self.threat(u)
         self.leaders = [self.leader(a), self.leader(b)]
@@ -137,7 +150,7 @@ class Fight:
         return ranks[0] if len(ranks) < 2 or ranks[0].limit != ranks[1].limit else None
 
     def place(self, side, left):
-        front = [u for u in side if not u.weapon.ranged and "sleep" not in u.abilities]
+        front = [u for u in side if (u.opener or not u.weapon.ranged) and "sleep" not in u.abilities]
         back = [u for u in side if u not in front]
         s = self.r.spacing
         for i, u in enumerate(front + back):
@@ -198,11 +211,9 @@ class Fight:
             return max(raw * self.r.flat_floor, raw - d / self.r.flat_divisor)
         return raw * (1 - c.mitigation(d))
 
-    def flanked(self, a, t):
-        if a.weapon.ranged:
-            return False
-        ax, ay = a.x - t.x, a.y - t.y
-        return any(b is not a and cheb(b, t) == 1 and (b.x - t.x) * ax + (b.y - t.y) * ay < 0 for b in alive(self.own(a)))
+    def surrounded(self, t):
+        """How many awake enemies stand side by side with t."""
+        return sum(1 for b in alive(self.foes(t)) if touch(b, t) and not b.asleep and not b.skip)
 
     def strike(self, a, t, bonus_crit=0.0, crit_extra=0.0, mult=1.0, unguarded=False, counter=False):
         hit = self.landed(a, t, bonus_crit, crit_extra, mult, unguarded)
@@ -212,20 +223,16 @@ class Fight:
             self.strike(t, a, counter=True)
         return hit
 
-    def landed(self, a, t, bonus_crit, crit_extra, mult, unguarded):
-        share = self.infused(a)
-        flank = self.flanked(a, t)
-        bonus_hit = c.FLANK_HIT if flank else 0.0
-        bonus_crit += c.FLANK_CRIT if flank else 0.0
+    def landed(self, a, t, bonus_crit, crit_extra, mult, unguarded, reaction=False):
+        share = a.gear.magic if reaction else self.infused(a)
+        bonus_hit = SURROUND_HIT.get(self.surrounded(t), 0.0)
         if t.exposed:
             bonus_hit += 0.10
             t.exposed = False
-        if a.weapon.ranged and a.weapon.range > PISTOL_RANGE and any(cheb(a, f) == 1 for f in alive(self.foes(a))):
+        if a.weapon.ranged and a.weapon.range > PISTOL_RANGE and any(touch(a, f) for f in alive(self.foes(a))):
             bonus_hit -= c.ADJACENT
         if a.weapon.ranged and cheb(a, t) > 1:
             bonus_hit -= self.r.cover
-        if a.offhand:
-            bonus_hit -= self.r.offhand_hit
         if t.stance:
             bonus_hit -= self.r.stance_evasion * t.reserve
         if random.random() >= self.chance(a, t, bonus_hit):
@@ -238,7 +245,7 @@ class Fight:
         damage = self.reduce(a.damage_roll() * crit * mult * self.r.damage_scale, t, w.ranged, pierce) + self.warded(magic, t)
         if t.brace:
             damage *= 1 - c.BRACE_REDUCTION
-        if not unguarded and not a.weapon.ranged and t.weapon.guard and (self.r.offhand_parry or not t.sidearm) and t.reserve >= c.REACTION_AP and not t.asleep and not t.skip:
+        if not unguarded and not a.weapon.ranged and t.weapon.guard and t.reserve >= c.REACTION_AP and not t.asleep and not t.skip:
             guard = t.weapon.guard_chance * (1 + self.r.stance_guard * t.reserve if t.stance else 1)
             t.reserve -= c.REACTION_AP
             if random.random() < guard:
@@ -247,13 +254,15 @@ class Fight:
         t.asleep = 0
         if t.hp <= 0:
             self.cells.pop((t.x, t.y), None)
+        elif w.stun and random.random() < w.stun:
+            t.skip = max(t.skip, 1)
         return True
 
     def score(self, u, e, ap):
         targeting = self.r.a_targeting if u in self.a and self.r.a_targeting else self.r.targeting
         if targeting == "random":
             return random.random()
-        reach = cheb(u, e) - 1 if not u.weapon.ranged else max(0, cheb(u, e) - u.weapon.range)
+        reach = steps_to(u, e) if not u.weapon.ranged else max(0, cheb(u, e) - u.weapon.range)
         if targeting == "nearest":
             return -reach - e.hp / 1000
         turns = max(0, math.ceil((reach - ap) / 10))
@@ -263,7 +272,7 @@ class Fight:
             value *= KILL_BONUS
         if e.asleep or e.skip:
             value *= ASLEEP_FACTOR
-        if sum(1 for b in alive(self.own(u)) if b is not u and cheb(b, e) == 1) >= 3:
+        if sum(1 for b in alive(self.own(u)) if b is not u and touch(b, e)) >= 3:
             value *= CROWD_FACTOR
         if e is self.objective:
             value *= OBJECTIVE_BONUS
@@ -290,37 +299,51 @@ class Fight:
         price = 1 + (self.r.escape_ap if held and not any(max(abs(x - f.x), abs(y - f.y)) == 1 for f in held) else 0)
         if ap < price:
             return None
+        left = [f for f in alive(self.foes(u)) if touch(u, f)]
         del self.cells[(u.x, u.y)]
         u.x, u.y = x, y
         self.cells[(x, y)] = u
-        return ap - price
+        return self.reactions(u, left, ap - price)
+
+    def reactions(self, u, left, ap):
+        """Each enemy with a melee weapon whose side u has just left strikes once, free, once a round.
+        The blow takes no Will Power, ability or second target; u may parry it with the AP it holds."""
+        if not self.r.reaction:
+            return ap
+        for f in left:
+            if f.hp > 0 and u.hp > 0 and not f.weapon.ranged and not f.reacted and not f.asleep and not f.skip:
+                f.reacted = True
+                u.reserve = ap
+                self.landed(f, u, 0.0, 0.0, 1.0, False, reaction=True)
+                ap = u.reserve
+        return ap
 
     def control(self, u, ap):
         foes = alive(self.foes(u))
         awake = [f for f in foes if not f.asleep and not f.skip]
-        if "sleep" in u.abilities and len(awake) >= 2 and ap >= 5 and u.can_spend(SLEEP_COST):
+        if "sleep" in u.abilities and len(awake) >= 2 and ap >= SLEEP_AP and u.can_spend(SLEEP_COST):
             near = [f for f in awake if cheb(u, f) <= SPELL_RANGE]
             if near:
                 target = max(near, key=lambda f: f.threat)
                 u.wp -= u.max_wp() * SLEEP_COST
-                ap -= 5
+                ap -= SLEEP_AP
                 if c.resist_check(u, target):
                     target.asleep = c.SLEEP_ROUNDS
                 else:
                     u.exposed = True
-        if "stand" in u.abilities and ap >= 4 + u.weapon.ap and u.can_spend(ORDER_COST):
+        if "stand" in u.abilities and ap >= ORDER_AP + u.weapon.ap and u.can_spend(ORDER_COST):
             near = [f for f in awake if not f.asleep and not f.skip and cheb(u, f) <= ORDER_RANGE]
             if near:
                 target = max(near, key=lambda f: f.threat)
                 u.wp -= u.max_wp() * ORDER_COST
-                ap -= 4
+                ap -= ORDER_AP
                 if c.resist_check(u, target, ORDER_BY_WILL):
                     target.skip = 1
                 else:
                     u.exposed = True
-        if "brace" in u.abilities and ap >= 3 + u.weapon.ap and u.can_spend(c.ORDINARY) and sum(1 for f in foes if cheb(u, f) <= 3) >= 2:
+        if "brace" in u.abilities and ap >= BRACE_AP + u.weapon.ap and u.can_spend(c.ORDINARY) and sum(1 for f in foes if cheb(u, f) <= 3) >= 2:
             u.wp -= u.max_wp() * c.ORDINARY
-            ap -= 3
+            ap -= BRACE_AP
             u.brace = True
         if "sting" in u.abilities and ap >= STING_AP and u.can_spend(c.ORDINARY):
             near = [f for f in foes if cheb(u, f) <= STING_RANGE]
@@ -329,7 +352,7 @@ class Fight:
                 ap -= STING_AP
                 self.sting(u, self.best(u, near, ap))
         if "pillar" in u.abilities and ap >= PILLAR_AP + u.weapon.ap and u.can_spend(c.POWERFUL):
-            around = [f for f in awake if cheb(u, f) == 1]
+            around = [f for f in awake if touch(u, f)]
             if len(around) >= 2:
                 u.wp -= u.max_wp() * c.POWERFUL
                 ap -= PILLAR_AP
@@ -356,7 +379,7 @@ class Fight:
     def attack(self, u, t, ap):
         u.struck = True
         foes = alive(self.foes(u))
-        around = [f for f in foes if cheb(u, f) == 1]
+        around = [f for f in foes if touch(u, f)]
         if self.r.sweep_skill and u.skill >= self.r.sweep_skill and len(around) >= 2 and ap >= u.weapon.ap + SWEEP_AP:
             for f in around:
                 self.strike(u, f, mult=self.r.sweep_mult)
@@ -371,10 +394,11 @@ class Fight:
                 u.exposed = True
             return u.weapon.ap + 1
         self.strike(u, t)
-        if self.r.cleave and u.weapon.name == "two-hand":
-            rest = [f for f in foes if f is not t and f.hp > 0 and cheb(u, f) == 1]
+        if u.weapon.cleave:
+            # The sweep reaches a cell beside the target, across the attacker's corner.
+            rest = [f for f in foes if f is not t and f.hp > 0 and touch(f, t) and cheb(u, f) == 1 and not touch(u, f)]
             if rest:
-                self.strike(u, random.choice(rest), mult=0.5)
+                self.strike(u, random.choice(rest), mult=u.weapon.cleave)
         return u.weapon.ap
 
     def full_ap(self, u):
@@ -385,16 +409,26 @@ class Fight:
         if not self.r.wait or u.weapon.ranged or u.conducting or u.skip or u.asleep:
             return False
         reach = self.full_ap(u) - u.weapon.ap
-        if any(cheb(u, f) - 1 <= reach for f in alive(self.foes(u))):
+        if any(steps_to(u, f) <= reach for f in alive(self.foes(u))):
             return False
-        return any(not f.weapon.ranged and cheb(u, f) - 1 - self.full_ap(f) <= reach for f in later if f.hp > 0 and f in self.foes(u))
+        return any(not f.weapon.ranged and steps_to(u, f) - self.full_ap(f) <= reach for f in later if f.hp > 0 and f in self.foes(u))
 
     def holds(self, u, ap):
         """Nothing to strike this turn: do not walk into the reach of whoever still has to act."""
         foes = alive(self.foes(u))
-        if not self.r.hold or u.conducting or u.struck or min(cheb(u, f) for f in foes) - 1 + u.weapon.ap <= ap:
+        if not self.r.hold or u.conducting or u.struck or min(steps_to(u, f) for f in foes) + u.weapon.ap <= ap:
             return False
-        return any(f in self.pending and not f.weapon.ranged and cheb(u, f) - 2 <= self.full_ap(f) - f.weapon.ap for f in foes)
+        return any(f in self.pending and not f.weapon.ranged and steps_to(u, f) - 1 <= self.full_ap(f) - f.weapon.ap for f in foes)
+
+    def changes_set(self, u, foes):
+        """A firearm emptied gives way to the melee set: at once for one carried to open a fight,
+        and for a shooter once an enemy stands beside it. A shooter takes the firearm back when free."""
+        if u.second is None:
+            return False
+        touched = any(touch(u, f) and not f.asleep and not f.skip for f in foes)
+        if u.weapon.ranged and not u.second.ranged:
+            return not u.loaded and (u.opener or touched)
+        return not u.weapon.ranged and u.second.ranged and not u.opener and not touched
 
     def stand(self, u, ap):
         """Defence: no attack this turn, and the AP left pay for it until the next one."""
@@ -405,7 +439,7 @@ class Fight:
         self.pending.discard(u)
         u.dazed, u.disoriented = u.disoriented > 0, max(0, u.disoriented - 1)
         taunter, u.taunter = u.taunter, None
-        u.brace = False
+        u.brace = u.reacted = False
         u.stance = u.struck = False
         if u.skip or u.asleep:
             u.skip = max(0, u.skip - 1)
@@ -418,15 +452,23 @@ class Fight:
         ap = self.control(u, pool)
         if u.hp <= 0:
             return
-        if self.r.turtle and u in self.a and any(cheb(u, f) == 1 for f in alive(self.foes(u))):
+        if self.r.turtle and u in self.a and any(touch(u, f) for f in alive(self.foes(u))):
             self.stand(u, ap)
             return
-        cost = u.weapon.ap
         first = True
         while True:
             foes = alive(self.foes(u))
             if not foes or ap < 1 or u.hp <= 0:
                 break
+            if self.changes_set(u, foes):
+                if ap < SWAP_AP:
+                    break
+                ap -= SWAP_AP
+                u.weapon, u.second = u.second, u.weapon
+                u.loaded, u.second_loaded = u.second_loaded, u.loaded
+                u.reloaded = 0
+                continue
+            cost = u.weapon.ap
             if u.intent not in foes or first:
                 u.intent = self.best(u, foes, ap)
             if taunter in foes:
@@ -437,24 +479,10 @@ class Fight:
                 ap -= WAKE_AP
                 continue
             t = u.intent
-            adjacent = [f for f in foes if cheb(u, f) == 1]
-            near = [f for f in foes if cheb(u, f) <= PISTOL_RANGE]
-            if u.shots and near and ap >= c.PISTOL.ap - c.PISTOL.reload:
-                main, u.weapon = u.weapon, c.PISTOL
-                u.offhand = True
-                self.strike(u, self.best(u, near, ap), mult=self.r.offhand_mult)
-                u.weapon, u.offhand = main, False
-                u.shots -= 1
-                ap -= c.PISTOL.ap - c.PISTOL.reload
-                continue
+            adjacent = [f for f in foes if touch(u, f)]
             if u.weapon.ranged:
                 reload = u.weapon.reload
                 if cheb(u, t) <= u.weapon.range:
-                    if not u.loaded and u.sidearm and not u.stowed:
-                        if ap < STOW_AP:
-                            break
-                        ap -= STOW_AP
-                        u.stowed = True
                     if not u.loaded:
                         paid = min(ap, reload - u.reloaded)
                         ap -= paid
@@ -491,7 +519,7 @@ class Fight:
             if not adjacent and self.holds(u, ap):
                 self.stand(u, ap)
                 return
-            need = cheb(u, t) - 1
+            need = steps_to(u, t)
             if adjacent:
                 near = self.best(u, adjacent, ap)
                 reach_it = ap - need - self.r.escape_ap >= cost
@@ -632,7 +660,8 @@ LEVERS = {
     "lane, 3 cells": replace(V0, width=3),
     "nearest target, both sides": replace(V0, targeting="nearest"),
     "random target, both sides": replace(V0, targeting="random"),
-    "free to leave a fight": replace(V0, escape_ap=0),
+    "no Reaction Attack": replace(V0, reaction=False),
+    "2 AP to leave instead of a Reaction Attack": replace(V0, reaction=False, escape_ap=2),
     "flat armour": replace(V0, armour="flat"),
     "skill difference ×3": replace(V0, skill_weight=3.0),
     "damage ×1.5": replace(V0, damage_scale=1.5),
@@ -641,7 +670,6 @@ LEVERS = {
     "morale and leader": replace(V0, morale=0.5, leader_weight=0.7),
     "stun on 30 %": replace(V0, stun=0.3),
     "sweep at skill 10": replace(V0, sweep_skill=10),
-    "cleave, two-handed": replace(V0, cleave=True),
 }
 
 
