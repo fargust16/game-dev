@@ -30,7 +30,7 @@ ARMOUR_RANGED = 2.0
 ADJACENT = 0.10
 CRIT_PIERCE = 0.5
 INFUSION_COST = 5.0
-INFUSION_DIVISOR = 30.0
+INFUSION_DIVISOR = 24.0
 INFUSION_ARMOUR = {"chain": 0.5, "plate": 0.0}
 ARMOUR_WEIGHT = {"none": 0.0, "cloth": 5.7, "leather": 11.3, "chain": 21.2, "plate": 31.8}
 CARRIED = 3.0
@@ -52,7 +52,6 @@ class Weapon:
     guard_chance: float = 0.0
     guard_absorb: float = 0.0
     stealth_mult: float = 0.0
-    reload: int = 0
     range: int = 12
     weight: float = 2.0
     accuracy: float = 0.0
@@ -81,8 +80,8 @@ MAUL = Weapon("maul", 10.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.
 ONE_HAND = SWORD
 TWO_HAND = GREATSWORD
 SHIELDED = shielded(SWORD)
-RIFLE = Weapon("rifle", 8, 10, True, reload=7, range=16, weight=4.0)
-PISTOL = Weapon("pistol", 7, 8, True, reload=5, range=6, weight=1.2, accuracy=-10)
+RIFLE = Weapon("rifle", 6.75, 6, True, range=16, weight=4.0)
+PISTOL = Weapon("pistol", 5, 4, True, range=6, weight=1.2, accuracy=-10)
 
 ARMOUR = {"none": (0, 0), "cloth": (2, 20), "leather": (8, 8), "chain": (16, 3), "plate": (24, 0)}
 
@@ -138,11 +137,9 @@ class Unit:
     stance: bool = False
     struck: bool = False
     infuse: bool = False
-    loaded: bool = True
-    reloaded: int = 0
+    fired: bool = False
     second: object = None
     opener: bool = False
-    second_loaded: bool = True
     reacted: bool = False
     disoriented: int = 0
     dazed: bool = False

@@ -8,7 +8,8 @@ its Reaction Attack, a fighter with two or more enemies beside it is Surrounded,
 every fighter picks targets by impact: how much harm the target does to its side,
 against how fast this fighter can bring it down. Fighters can wait to the end of the
 round, hold back from an enemy's reach, and stand in a Defensive Stance that answers
-an attacker with a Counterattack. Firearms reload, armour counts double against a
+an attacker with a Counterattack. A shot has no separate Reload and costs more than a
+blow, a shooter steps back with the AP its shot leaves, armour counts more against a
 shot from beyond the next cell, a shooter with an enemy beside it aims worse, and a blow
 can be filled with Will Power. A fighter may carry a second Weapon Set and change to it.
 
@@ -41,7 +42,7 @@ BREAK_OFF_FACTOR = 1.5
 SWAP_AP = 2
 SURROUND_HIT = c.SURROUND_HIT
 OBJECTIVE_BONUS = 3.0
-STING_AP = 5
+STING_AP = 4
 STING_BASE = 7
 STING_RANGE = 12
 DISORIENT_HIT = 0.10
@@ -101,6 +102,7 @@ class Rules:
     cover: float = 0.0
     crit_pierce: float = c.CRIT_PIERCE
     reaction: bool = True
+    room: int = 10
 
 
 def cheb(a, b):
@@ -126,7 +128,7 @@ class Fight:
     def __init__(self, a, b, rules, objective=None, wounded_a=False):
         self.a, self.b, self.r, self.objective = a, b, rules, objective
         self.per_column = (rules.width + rules.spacing - 1) // rules.spacing
-        depth = (len(a + b) // self.per_column + 1) * rules.spacing
+        depth = (len(a + b) // self.per_column + 1) * rules.spacing + rules.room
         self.front = depth
         self.length = 2 * depth + rules.gap + 1
         self.cells = {}
@@ -139,8 +141,7 @@ class Fight:
             u.skip = u.asleep = 0
             u.stance = False
             u.held = -1
-            u.loaded = u.second_loaded = True
-            u.reloaded = 0
+            u.fired = False
             u.reacted = False
             u.disoriented, u.dazed, u.taunter = 0, False, None
             u.threat = self.threat(u)
@@ -418,13 +419,13 @@ class Fight:
         return any(f in self.pending and not f.weapon.ranged and steps_to(u, f) - 1 <= self.full_ap(f) - f.weapon.ap for f in foes)
 
     def changes_set(self, u, foes):
-        """A firearm emptied gives way to the melee set: at once for one carried to open a fight,
+        """A firearm gives way to the melee set: after its first shot for one carried to open a fight,
         and for a shooter once an enemy stands beside it. A shooter takes the firearm back when free."""
         if u.second is None:
             return False
         touched = any(touch(u, f) and not f.asleep and not f.skip for f in foes)
         if u.weapon.ranged and not u.second.ranged:
-            return not u.loaded and (u.opener or touched)
+            return u.fired if u.opener else touched
         return not u.weapon.ranged and u.second.ranged and not u.opener and not touched
 
     def stand(self, u, ap):
@@ -462,8 +463,6 @@ class Fight:
                     break
                 ap -= SWAP_AP
                 u.weapon, u.second = u.second, u.weapon
-                u.loaded, u.second_loaded = u.second_loaded, u.loaded
-                u.reloaded = 0
                 continue
             cost = u.weapon.ap
             if u.intent not in foes or first:
@@ -478,22 +477,12 @@ class Fight:
             t = u.intent
             adjacent = [f for f in foes if touch(u, f)]
             if u.weapon.ranged:
-                reload = u.weapon.reload
                 if cheb(u, t) <= u.weapon.range:
-                    if not u.loaded:
-                        paid = min(ap, reload - u.reloaded)
-                        ap -= paid
-                        u.reloaded += paid
-                        u.loaded = u.reloaded >= reload
-                        if not u.loaded:
-                            break
-                        u.reloaded = 0
-                        continue
-                    if ap < cost - reload:
+                    if ap < cost:
                         break
                     self.strike(u, t)
-                    ap -= cost - reload
-                    u.loaded = not reload
+                    ap -= cost
+                    u.fired = True
                 else:
                     left = self.step(u, (t.x, t.y), ap)
                     if left is None:
@@ -536,7 +525,25 @@ class Fight:
                 break
             ap = left
             first = False
+        ap = self.retreat(u, ap)
         u.reserve = self.brace(u, max(0, ap))
+
+    def retreat(self, u, ap):
+        """A shooter spends the AP left after its shot stepping away from the nearest melee enemy,
+        never out of a side it touches, which would draw a Reaction Attack."""
+        if not u.weapon.ranged or u.opener or u.hp <= 0:
+            return ap
+        melee = [f for f in alive(self.foes(u)) if not f.weapon.ranged and not f.asleep and not f.skip]
+        if not melee or any(touch(u, f) for f in alive(self.foes(u))):
+            return ap
+        f = min(melee, key=lambda m: cheb(u, m))
+        goal = (u.x + 40 * ((u.x > f.x) - (u.x < f.x)), u.y + 40 * ((u.y > f.y) - (u.y < f.y)))
+        while ap >= 1 and u.hp > 0:
+            left = self.step(u, goal, ap)
+            if left is None:
+                break
+            ap = left
+        return ap
 
     def brace(self, u, ap):
         """Не сдвинуть is paid from the AP left at the end of a turn, as a Defensive Stance is, never from a blow."""

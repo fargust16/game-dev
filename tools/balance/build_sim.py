@@ -76,11 +76,12 @@ def make_builds():
     """Read from the weapons of combat_sim.py as they stand, so a tuning run can change them.
 
     Every main build carries two Weapon Sets, because at 2 AP a second set is worth more than
-    anything it costs: a melee build opens with a pistol, and a shooter keeps a sword."""
+    anything it costs: a melee build opens with a pistol, and a shooter keeps a sword. The critical
+    build fights with a dagger, the weapon of critical hits."""
     shield = c.shielded(c.SWORD)
     plate = Build(*STATS["plate"], c.PISTOL, "plate", ("hp", "defence", "damage"), second=shield, opener=True, arcana="Император")
     attack = Build(*STATS["attack"], c.PISTOL, "chain", ("damage", "accuracy", "hp"), second=c.GREATSWORD, opener=True, arcana="Император")
-    crit = Build(*STATS["crit"], c.PISTOL, "leather", ("crit", "crit_damage", "accuracy"), second=c.SWORD, opener=True)
+    crit = Build(*STATS["crit"], c.PISTOL, "leather", ("crit", "crit_damage", "accuracy"), second=c.DAGGER, opener=True)
     shooter = Build(*STATS["rifle"], c.RIFLE, "leather", ("damage", "accuracy", "evasion"), second=c.SWORD)
     mage = Build(*STATS["mage"], c.RIFLE, "leather", ("magic", "wp", "hp", "accuracy"), True, second=c.SWORD)
     builds = {"plate": plate, "attack": attack, "crit": crit, "rifle": shooter, "mage": mage}
@@ -89,10 +90,10 @@ def make_builds():
         "attack, maul": variant(attack, second=c.MAUL),
         "attack, one set": variant(attack, weapon=c.GREATSWORD, second=None, opener=False),
         "attack in plate": variant(attack, armour="plate"),
-        "crit, dagger": variant(crit, second=c.DAGGER),
+        "crit, sword": variant(crit, second=c.SWORD),
         "crit, axe": variant(crit, second=c.AXE),
         "crit, mace": variant(crit, second=c.MACE),
-        "crit, one set": variant(crit, weapon=c.SWORD, second=None, opener=False),
+        "crit, one set": variant(crit, weapon=c.DAGGER, second=None, opener=False),
         "crit, Initiative": variant(crit, mods=TEMPO),
         "plate, mace": variant(plate, second=c.shielded(c.MACE)),
         "plate, axe": variant(plate, second=c.shielded(c.AXE)),
