@@ -1,10 +1,10 @@
 # 05 Progression
 
-Version: 0.18
+Version: 0.19
 
 Status: Draft
 
-Last Updated: 2026-11-03 (the owner's pace target for the full game: focused advancement reaches Limit 2–3 within the campaign. Earlier: the slice's abilities are in 05.1. Earlier: Limit growth direction recorded; the Starting Faction retired. Earlier: the secondary attribute is fixed per Arcana. Earlier: terms renamed to Arcana and Limit. Earlier: Pathways become Arcana and Stages become Limits, with content moved to 05.1; two abilities per Limit; Stage 1 demotion and occupancy corrected for faction Arcana. Earlier: 22 Tarot-archetype Pathways recorded, with six named; the V1 player reaches Stages 9–8 and Stage 7 is for NPCs only. Earlier: the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
+Last Updated: 2026-11-03 (the Cult Generals' Arcana and the heads of the Major Factions, by the owner. Earlier: the owner's pace target for the full game: focused advancement reaches Limit 2–3 within the campaign. Earlier: the slice's abilities are in 05.1. Earlier: Limit growth direction recorded; the Starting Faction retired. Earlier: the secondary attribute is fixed per Arcana. Earlier: terms renamed to Arcana and Limit. Earlier: Pathways become Arcana and Stages become Limits, with content moved to 05.1; two abilities per Limit; Stage 1 demotion and occupancy corrected for faction Arcana. Earlier: 22 Tarot-archetype Pathways recorded, with six named; the V1 player reaches Stages 9–8 and Stage 7 is for NPCs only. Earlier: the V1 faction opens two or three Pathways. Earlier: deeper-stage actors allowed in V1. Earlier: Stage Occupancy Rule extended to every Pathway, including the player's, with its demotion and hidden-Pathway consequences; Pathway change from Stage 5 recorded. Earlier: Stage Occupancy Rule recorded. Earlier: world actors above V1's player stages, such as the Stage 2 Cult Generals, recorded as a full-game premise. Earlier: Pathway advancement now requires the Alchemy profession and the correct brewed potion.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md), [04 Points of Interest](04%20Points%20of%20Interest.md)
@@ -143,7 +143,9 @@ This is a law of the world, not a difficulty or balance setting. It is why follo
 
 This is a price of following a god: a faction's Arcana probably has its Limit 0 occupied. The character does not know at first which Arcana belongs to which deity and must find out through dialogue and investigation, or take the risk and stop at Limit 2.
 
-Which Arcana have an occupied Limit 0 is open ([99 Open Questions](99%20Open%20Questions.md) CC-22).
+Owner-approved, 2026-11-03: the head of each of the three Major Factions is the Limit 0 being of its Arcana, the god who oversees it. Its Limit 0 is therefore occupied, and its strongest followers on that Arcana are Limit 2. These are the Allied Generals: "General" is a figure of speech, and a faction may have several ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md) §8). In the full game other factions may have a head at Limit 1 or Limit 2. The three Cult Generals should ideally belong to three different Arcana, matching their different behaviour; for simplicity all three belong to the Emperor Arcana for now.
+
+Whether the World Seed varies which Limit 0 are occupied is open ([99 Open Questions](99%20Open%20Questions.md) CC-22).
 
 ## Changing Arcana
 
