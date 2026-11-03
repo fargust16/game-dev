@@ -1176,14 +1176,14 @@
   },
   {
     "id": "q-cc-23",
-    "text": "CC-23. Resolved in principle: a senior's death or heavy losses trigger retreat. What share of losses counts, and do allied followers follow the same rule?",
+    "text": "CC-23. Resolved as an authoring default, 2026-11-03: in a tactical fight the cult checks the Force Estimate each round and retreats below 0.15; losses come from the chase, with no fixed share.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
@@ -1404,14 +1404,14 @@
   },
   {
     "id": "q-cc-40",
-    "text": "CC-40. Can a successful lie be exposed later, does Intimidation cost Attitude on success, which full-game checks are kept, and when do allied guards attack a character who ignores them?",
+    "text": "CC-40. Slice details set 2026-11-03: exposed lies, Intimidation's cost, guards' two warnings, rumours between cities (10.4). Open: which full-game checks of 10.4 §8 are kept?",
     "systemIds": [
       "approaches"
     ],
     "sourceId": "src-99",
     "sectionTitle": "High Priority — Cult Campaign and City Control",
     "status": "open",
-    "priority": "high",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
