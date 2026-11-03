@@ -124,6 +124,9 @@ class Unit:
     shots: int = 0
     stowed: bool = False
     offhand: bool = False
+    disoriented: int = 0
+    dazed: bool = False
+    taunter: object = None
     held: int = -1
     frac: float = 0.0
     burden: tuple = (0, 0)
@@ -193,8 +196,11 @@ def hit_chance(a, t, bonus=0.0):
     return min(0.95, max(0.05, p * (1 + a.luck / 100)))
 
 
+CONTEST_SCALE = 100
+
+
 def resist_check(a, t):
-    p = 0.50 + (max(a.intl, a.will) - t.will - t.gear.will) / 100
+    p = 0.50 + (max(a.intl, a.will) - t.will - t.gear.will) / CONTEST_SCALE
     return random.random() < min(0.95, max(0.05, p * (1 + a.luck / 100)))
 
 

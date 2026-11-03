@@ -7,7 +7,11 @@ and critical hits sit between them, and no build is best overall. The lines belo
 the five main builds are the choices a player could make instead: they check that
 no such choice beats the main builds. Every value is an authoring default.
 
-Run: python tools/balance/build_sim.py [fights per cell]
+Run: python tools/balance/build_sim.py [fights per cell] [none | 8 | 7]
+
+With 8 or 7 every fighter is of that Limit and has the combat abilities of its Arcana
+(05.1) for that Limit and those below it: plate and attack are on Император, the rest
+on Жрица, and the lines that end in an Arcana swap it. Завеса is not modelled.
 """
 import io
 import random
@@ -21,6 +25,7 @@ import item_sim as s
 import tactical_sim as t
 
 RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 300
+MODE = sys.argv[2] if len(sys.argv) > 2 else "none"
 SKILL = 12
 MODIFIERS = 12
 SCALE = 0.75
@@ -42,10 +47,16 @@ class Build:
     mods: tuple
     infuse: bool = False
     sidearm: int = 0
+    arcana: str = "Жрица"
 
 
-PLATE = Build(15, 14, 6, 6, 3, 7, c.SHIELDED, "plate", ("hp", "defence", "damage"))
-ATTACK = Build(18, 10, 9, 6, 3, 5, c.TWO_HAND, "chain", ("damage", "accuracy", "hp"))
+ARCANA = {
+    "Император": {9: ("brace",), 8: ("support", "stand"), 7: ("pillar", "crush")},
+    "Жрица": {9: (), 8: ("sleep",), 7: ("sting",)},
+}
+
+PLATE = Build(15, 14, 6, 6, 3, 7, c.SHIELDED, "plate", ("hp", "defence", "damage"), arcana="Император")
+ATTACK = Build(18, 10, 9, 6, 3, 5, c.TWO_HAND, "chain", ("damage", "accuracy", "hp"), arcana="Император")
 CRIT = Build(9, 9, 11, 16, 3, 3, c.ONE_HAND, "leather", ("crit", "crit_damage", "accuracy"))
 SHOOTER = Build(5, 9, 15, 15, 3, 4, c.RIFLE, "leather", ("damage", "accuracy", "evasion"))
 MAGE = Build(4, 9, 6, 8, 14, 10, c.RIFLE, "leather", ("magic", "wp", "hp", "accuracy"), True)
@@ -78,11 +89,25 @@ BUILDS.update({
     "mage, two pistols": variant(MAGE, weapon=c.PISTOL, sidearm=1),
     "mage, two-hand": variant(MAGE, weapon=c.TWO_HAND),
 })
+if MODE != "none":
+    BUILDS.update({
+        "plate, Жрица": variant(PLATE, arcana="Жрица"),
+        "attack, Жрица": variant(ATTACK, arcana="Жрица"),
+        "crit, Император": variant(CRIT, arcana="Император"),
+        "rifle, Император": variant(SHOOTER, arcana="Император"),
+        "mage, Император": variant(MAGE, arcana="Император"),
+    })
+
+
+def abilities(b):
+    if MODE == "none":
+        return ()
+    return sum((kit for limit, kit in ARCANA[b.arcana].items() if limit >= int(MODE)), ())
 
 
 def fighter(build):
     b = BUILDS[build]
-    u = c.Unit(build, 8, b.str, b.end, b.dex, b.per, SKILL, b.will, b.intl, b.weapon, b.armour, infuse=b.infuse, sidearm=b.sidearm)
+    u = c.Unit(build, 8 if MODE == "none" else int(MODE), b.str, b.end, b.dex, b.per, SKILL, b.will, b.intl, b.weapon, b.armour, infuse=b.infuse, sidearm=b.sidearm, abilities=abilities(b))
     for i in range(MODIFIERS):
         kind = b.mods[i % len(b.mods)]
         s.add(u, kind, s.VALUE[kind] * SCALE)

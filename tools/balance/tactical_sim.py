@@ -41,13 +41,19 @@ STOW_AP = 2
 OFFHAND_HIT = 0.20
 OFFHAND_DAMAGE = 0.5
 OBJECTIVE_BONUS = 3.0
+STING_AP = 5
+STING_BASE = 5
+STING_RANGE = 12
+DISORIENT_HIT = 0.10
+PILLAR_AP = 4
+WAKE_AP = 0
 STUN_AP = 2
 STUN_SKILL = 5
 SWEEP_AP = 2
 DEFENCE_EVASION = 0.015
 DEFENCE_GUARD = 0.03
 COUNTER_AP = 2
-CONTROL_VALUE = {"sleep": 6.0, "stand": 3.0, "crush": 3.0, "support": 2.0}
+CONTROL_VALUE = {"sleep": 6.0, "stand": 3.0, "crush": 3.0, "support": 2.0, "sting": 3.0, "pillar": 3.0}
 
 
 @dataclass(frozen=True)
@@ -119,6 +125,7 @@ class Fight:
             u.held = -1
             u.loaded = True
             u.shots, u.stowed = u.sidearm, False
+            u.disoriented, u.dazed, u.taunter = 0, False, None
             u.threat = self.threat(u)
         self.leaders = [self.leader(a), self.leader(b)]
 
@@ -158,7 +165,7 @@ class Fight:
         return harm + sum(CONTROL_VALUE.get(x, 0.0) for x in u.abilities)
 
     def chance(self, a, t, bonus):
-        p = 0.70 + self.r.skill_weight * (a.accuracy() - t.evasion()) / 100 + bonus
+        p = 0.70 + self.r.skill_weight * (a.accuracy() - t.evasion()) / 100 + bonus - (DISORIENT_HIT if a.dazed else 0.0)
         return min(0.95, max(0.05, p * (1 + a.luck / 100)))
 
     def defence(self, t):
@@ -312,7 +319,36 @@ class Fight:
             u.wp -= u.max_wp() * c.ORDINARY
             ap -= 3
             u.brace = True
+        if "sting" in u.abilities and ap >= STING_AP and u.can_spend(c.ORDINARY):
+            near = [f for f in foes if cheb(u, f) <= STING_RANGE]
+            if near:
+                u.wp -= u.max_wp() * c.ORDINARY
+                ap -= STING_AP
+                self.sting(u, self.best(u, near, ap))
+        if "pillar" in u.abilities and ap >= PILLAR_AP + u.weapon.ap and u.can_spend(c.POWERFUL):
+            around = [f for f in awake if cheb(u, f) == 1]
+            if len(around) >= 2:
+                u.wp -= u.max_wp() * c.POWERFUL
+                ap -= PILLAR_AP
+                for f in around:
+                    if c.resist_check(u, f):
+                        f.taunter = u
         return ap
+
+    def sting(self, u, t):
+        """Укол разума: a ranged magical attack. A hit disorients the target for its next turn, a miss the caster."""
+        main, u.weapon = u.weapon, c.PISTOL
+        hit = random.random() < self.chance(u, t, -self.r.cover if cheb(u, t) > 1 else 0.0)
+        u.weapon = main
+        if not hit:
+            u.disoriented = 1
+            return
+        raw = STING_BASE * c.stage_factor(u.weapon.stage) * (1 + u.intl / 50) * self.r.damage_scale * random.uniform(0.85, 1.15)
+        t.hp -= self.warded(raw, t)
+        t.asleep = 0
+        t.disoriented = 1
+        if t.hp <= 0:
+            self.cells.pop((t.x, t.y), None)
 
     def attack(self, u, t, ap):
         u.struck = True
@@ -364,6 +400,8 @@ class Fight:
 
     def turn(self, u, rnd):
         self.pending.discard(u)
+        u.dazed, u.disoriented = u.disoriented > 0, max(0, u.disoriented - 1)
+        taunter, u.taunter = u.taunter, None
         u.brace = False
         u.stance = u.struck = False
         if u.skip or u.asleep:
@@ -388,6 +426,13 @@ class Fight:
                 break
             if u.intent not in foes or first:
                 u.intent = self.best(u, foes, ap)
+            if taunter in foes:
+                u.intent = taunter
+            sleeper = next((b for b in alive(self.own(u)) if b.asleep and cheb(u, b) == 1), None) if WAKE_AP else None
+            if sleeper and ap >= WAKE_AP:
+                sleeper.asleep = 0
+                ap -= WAKE_AP
+                continue
             t = u.intent
             adjacent = [f for f in foes if cheb(u, f) == 1]
             near = [f for f in foes if cheb(u, f) <= PISTOL_RANGE]
