@@ -42,16 +42,17 @@ SWAP_AP = 2
 SURROUND_HIT = c.SURROUND_HIT
 OBJECTIVE_BONUS = 3.0
 STING_AP = 5
-STING_BASE = 5
+STING_BASE = 7
 STING_RANGE = 12
 DISORIENT_HIT = 0.10
 PILLAR_AP = 4
 WAKE_AP = 6
 SLEEP_AP = c.SLEEP_AP
 ORDER_AP = 4
-BRACE_AP = 3
+BRACE_AP = 2
 ORDER_BY_WILL = False
 SLEEP_COST = c.POWERFUL
+SLEEP_CONTEST = 0.40
 ORDER_COST = c.ORDINARY
 STUN_AP = 2
 STUN_SKILL = 5
@@ -327,7 +328,7 @@ class Fight:
                 target = max(near, key=lambda f: f.threat)
                 u.wp -= u.max_wp() * SLEEP_COST
                 ap -= SLEEP_AP
-                if c.resist_check(u, target):
+                if c.resist_check(u, target, base=SLEEP_CONTEST):
                     target.asleep = c.SLEEP_ROUNDS
                 else:
                     u.exposed = True
@@ -341,10 +342,6 @@ class Fight:
                     target.skip = 1
                 else:
                     u.exposed = True
-        if "brace" in u.abilities and ap >= BRACE_AP + u.weapon.ap and u.can_spend(c.ORDINARY) and sum(1 for f in foes if cheb(u, f) <= 3) >= 2:
-            u.wp -= u.max_wp() * c.ORDINARY
-            ap -= BRACE_AP
-            u.brace = True
         if "sting" in u.abilities and ap >= STING_AP and u.can_spend(c.ORDINARY):
             near = [f for f in foes if cheb(u, f) <= STING_RANGE]
             if near:
@@ -539,7 +536,15 @@ class Fight:
                 break
             ap = left
             first = False
-        u.reserve = max(0, ap)
+        u.reserve = self.brace(u, max(0, ap))
+
+    def brace(self, u, ap):
+        """Не сдвинуть is paid from the AP left at the end of a turn, as a Defensive Stance is, never from a blow."""
+        if "brace" in u.abilities and ap >= BRACE_AP and u.can_spend(c.ORDINARY) and sum(1 for f in alive(self.foes(u)) if cheb(u, f) <= 3) >= 2:
+            u.wp -= u.max_wp() * c.ORDINARY
+            u.brace = True
+            return ap - BRACE_AP
+        return ap
 
     def strength(self, side, leader):
         total = sum(max(0, u.hp) / u.max_hp() * c.LIMIT_S[u.limit] ** 2 for u in side)

@@ -21,7 +21,7 @@ ORDINARY = 0.15
 POWERFUL = 0.33
 BRACE_REDUCTION = 0.25
 SUPPORT_DEFENCE = 5
-SLEEP_ROUNDS = 3
+SLEEP_ROUNDS = 1
 SLEEP_AP = 2
 CONDUCTING_AP = 3
 STAGE_STEP = 0.35
@@ -225,9 +225,9 @@ def hit_chance(a, t, bonus=0.0):
 CONTEST_SCALE = 100
 
 
-def resist_check(a, t, will_only=False):
+def resist_check(a, t, will_only=False, base=0.50):
     power = a.will if will_only else max(a.intl, a.will)
-    p = 0.50 + (power - t.will - t.gear.will) / CONTEST_SCALE
+    p = base + (power - t.will - t.gear.will) / CONTEST_SCALE
     return random.random() < min(0.95, max(0.05, p * (1 + a.luck / 100)))
 
 
