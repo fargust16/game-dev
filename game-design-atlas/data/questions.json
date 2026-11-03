@@ -330,27 +330,27 @@
   },
   {
     "id": "q-cf-diagonal",
-    "text": "Diagonal move cost on the Combat Grid: 1 or 1.5?",
+    "text": "Resolved as an authoring default, 2026-11-03: A diagonal step costs 1 AP, the same as an orthogonal one, as the balance simulations count it.",
     "systemIds": [
       "confront"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-cf-vault",
-    "text": "Exact fail chance bands for vault/climb in V1?",
+    "text": "Resolved as an authoring default, 2026-11-03: Three bands, D 1, 3 and 5, checked against the attribute on the 07.1 curve; AP 2–3; a failure spends the AP and costs position, a fall 10 % of maximum HP per 2 m.",
     "systemIds": [
       "confront"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
