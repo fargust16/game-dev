@@ -1072,33 +1072,33 @@
   },
   {
     "id": "q-cc-15",
-    "text": "CC-15. Working answer: a per-city ledger of followers per Limit and a kill table from Combat Numbers V0. The ledger is harsher on defenders than the tactical simulation in small even fights. Does that matter once the player sees both sides of one battle? Owner, 2026-11-03: a fight ends the same whether the player watches it or not; open: the same tactical simulation unseen, or a calibrated ledger?",
+    "text": "CC-15. Resolved by the owner, 2026-11-03: an unseen fight is the same tactical fight without drawing, with the same seed; the agent rebuilds the campaign odds on it.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-cc-16",
-    "text": "CC-16. Factions usually act alone and unite when weak, and they act on goals with a free pool of forces. Working answer for the simulation: one allied command for all three. How does each of the three differ, and how does each choose its next city?",
+    "text": "CC-16. Resolved by the owner, 2026-11-03: the allied factions follow one rule and differ only in starting cities and slightly in fighters by Arcana; they sometimes join attacks.",
     "systemIds": [
       "cult-campaign"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority — Cult Campaign and City Control",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-cc-17",
-    "text": "CC-17. A liberated city whose ritual has neither been undone nor lapsed still counts. How does the final battle with three Generals run, can the smaller rituals be disrupted, how long is the capital ritual, and what follows a broken one? Working model for the simulation in 21 §8: the attack comes a day after the Gate opens, a quarter of the defenders start at the ritual, and a broken ritual is tried again after two days. The owner approved that start at the ritual as the one exception to 21 §4. Owner, 2026-11-03: entrances, gates with hit points, the Spirit General inside first, the ritual on a square made for a fight; open: where the site lies, entrances, gate numbers.",
+    "text": "CC-17. A liberated city whose ritual has neither been undone nor lapsed still counts. How does the final battle with three Generals run, can the smaller rituals be disrupted, how long is the capital ritual, and what follows a broken one? Working model for the simulation in 21 §8: the attack comes a day after the Gate opens, a quarter of the defenders start at the ritual, and a broken ritual is tried again after two days. The owner approved that start at the ritual as the one exception to 21 §4. Owner, 2026-11-03: entrances, gates with hit points, the Spirit General inside first, the main fight on the central square and the ritual at a seed-chosen place away from it, with no physical Weak Point; open: entrances and gate numbers.",
     "systemIds": [
       "cult-campaign"
     ],
@@ -1456,7 +1456,7 @@
   },
   {
     "id": "q-cc-44",
-    "text": "CC-44. How many Allied Generals are there and on which Arcana, which allied god is the goddess, what does a Divine Blessing do in rules and who can receive one, and who posts a Liberation Contract, what does it pay, and where do the outsiders come from? Are the faction heads, who stay in the capital, the Allied Generals? What does a Sponsored Operation cost and bring? Owner, 2026-11-03: faction heads are Limit 0 gods, not the Allied Generals; whom the rare help concerns is open.",
+    "text": "CC-44. How many Allied Generals are there and on which Arcana, which allied god is the goddess, what does a Divine Blessing do in rules and who can receive one, and who posts a Liberation Contract, what does it pay, and where do the outsiders come from? Are the faction heads, who stay in the capital, the Allied Generals? What does a Sponsored Operation cost and bring? Owner, 2026-11-03: faction heads are Limit 0 gods who never come out; rare help comes from the physical leaders, asked for or bought as a Sponsored Operation.",
     "systemIds": [
       "cult-campaign"
     ],
