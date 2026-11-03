@@ -92,93 +92,93 @@
   },
   {
     "id": "q-poi-duration",
-    "text": "What exact in-world durations belong to Brief / Short / Standard / Long / Persistent in V1?",
+    "text": "Resolved as an authoring default, 2026-11-03: Brief 2–4 hours, Short 6–24 hours, Standard 2–3 days, Long 5–8 days, Persistent until a named world event; a window runs from the POI's appearance.",
     "systemIds": [
       "points-of-interest"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-poi-urgency",
-    "text": "How exactly does the UI/map express urgency without becoming a stressful quest-timer game?",
+    "text": "Resolved as an authoring default, 2026-11-03: A Marked POI shows its source's words, never a number or countdown; the marker becomes an aftermath mark when the window ends.",
     "systemIds": [
       "points-of-interest"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-poi-count",
-    "text": "How many active Marked POIs should a V1 district show at once?",
+    "text": "Resolved as an authoring default, 2026-11-03: At most three active event POIs a district, at most two Brief or Short; taken tasks and the war's operations do not count.",
     "systemIds": [
       "points-of-interest"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-info-tips",
-    "text": "How many tips should a V1 district generate per day from boards / bartenders / rumours?",
+    "text": "Resolved as an authoring default, 2026-11-03: About five tips a district a day: two or three morning notices, one evening bartender tip, two or three rumour lines; every POI has two sources.",
     "systemIds": [
       "information-sources"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-info-upgrade",
-    "text": "When does a tip upgrade from Hinted to Marked by rule?",
+    "text": "Resolved as an authoring default, 2026-11-03: A tip Marks when it names a walkable place; two Hinted sources, a found Physical Trace, or entering the area also Mark.",
     "systemIds": [
       "information-sources"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-info-false",
-    "text": "How much false or slanted information is healthy in V1 before trust collapses?",
+    "text": "Resolved as an authoring default, 2026-11-03: All sources slant; about one tip in five may be wrong and is contradicted in time; Physical Traces never lie; the slice has at most one false rumour a day.",
     "systemIds": [
       "information-sources"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },
   {
     "id": "q-info-persistent",
-    "text": "Can a Persistent POI still be finite without feeling like a fake timer?",
+    "text": "Resolved as an authoring default, 2026-11-03: A Persistent POI has no clock and ends on a named world event of the war, stated by its sources.",
     "systemIds": [
       "information-sources",
       "points-of-interest"
     ],
     "sourceId": "src-99",
-    "sectionTitle": "High Priority",
-    "status": "open",
-    "priority": "high",
+    "sectionTitle": "Resolved Decisions",
+    "status": "resolved",
+    "priority": "low",
     "sourceKind": "gameplay-design",
     "origin": "imported"
   },

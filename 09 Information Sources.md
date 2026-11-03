@@ -1,10 +1,10 @@
 # 09 Information Sources
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft
 
-Last Updated: 2026-11-02 (Character Notes added. Earlier: rumours carry Reputation. Earlier: Confront runs in place. Earlier: the rituals' purpose excluded from every source until manifestation. Earlier: the secret purpose of rituals excluded from public sources. Earlier: reported City Control recorded as the public reading of campaign progress. Earlier: private daily action summary separated from public news; public event/map reporting and source-limited NPC awareness clarified.)
+Last Updated: 2026-11-03 (tips a day, Hinted to Marked, and false tips, authoring defaults. Earlier: Character Notes added. Earlier: rumours carry Reputation. Earlier: Confront runs in place. Earlier: the rituals' purpose excluded from every source until manifestation. Earlier: the secret purpose of rituals excluded from public sources. Earlier: reported City Control recorded as the public reading of campaign progress. Earlier: private daily action summary separated from public news; public event/map reporting and source-limited NPC awareness clarified.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md)
@@ -145,11 +145,27 @@ Rules:
 - A source may warn that time is short without giving the exact pin.
 - Player Knowledge helps recognise which sources are usually biased or fertile.
 
+## Tips and marking in V1
+
+Authoring defaults set by the agent on 2026-11-03.
+
+**Tips a day.** A district gives about five new tips a day:
+
+- the Notice Board is renewed each morning with two or three notices, one lead to a POI and one or two tasks for gold, and an urgent notice can be pinned during the day;
+- the bartender has one new tip each evening, and more for Convince, Threaten, or Exchange;
+- Street Rumour carries two or three lines a day, one of them a lead.
+
+Every POI has at least two sources, so missing one source never hides it. Faction Contacts, Witnesses, and Physical Traces come on top, tied to their scenes.
+
+**Hinted to Marked.** A tip Marks a POI when it names a place a person can walk to: a shop, a lane, a stair. A tip that names only a district, a kind of event, or a time Hints it. Two Hinted tips about the same POI from different sources Mark it, and so do finding a Physical Trace of it and walking into its area. Bartenders, Witnesses, and Faction Contacts usually name a place; Rumour and the Newspaper usually do not.
+
+**False tips.** Every source is slanted by its bias. About one tip in five may be wrong on a fact, by mistake or by intent, and every wrong tip is contradicted by another source the player can reach before the window ends. A Physical Trace never lies, though it can be misread. The Notice Board and Faction Contacts slant and may be out of date, but they do not invent. In the slice false tips come only from Street Rumour, at most one a day, and never about a Ritual Weak Point ([11 Vertical Slice](11%20Vertical%20Slice.md)).
+
 ## Public news and map information
 
 At the in-game day boundary, the player receives a daily summary with their own actions and a broad public-news digest. The personal action summary includes what the character did even when it was not publicly observed. The public digest reports significant events available to its publisher, rather than exposing the World Engine's private state. Major confirmed events such as a completed or disrupted ritual are intended to enter broad public circulation; NPCs may mention them in ambient dialogue after the report reaches their eligible audience. Each NPC still needs a source of information under [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), and private operation details remain limited to valid recipients.
 
-The interactive map records publicly reported or personally discovered event locations. A qualitative faction layer shows reported City Control ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)) and where a faction retains or loses local presence. Reported City Control is the public reading of campaign progress: the fall of the last other city tells the player that the capital is next. The map does not display numeric Faction Influence, a count of completed rituals, or unreported secret operations. Whether a report marks an exact site or only a region depends on its source and remains to be authored.
+The interactive map records publicly reported or personally discovered event locations. A qualitative faction layer shows reported City Control ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)) and where a faction retains or loses local presence. Reported City Control is the public reading of campaign progress: the fall of the last other city tells the player that the capital is next. The map does not display numeric Faction Influence, a count of completed rituals, or unreported secret operations. Whether a report marks an exact site or only a region follows the rule of § Tips and marking in V1: a report that names a place a person can walk to marks it.
 
 No source in the world reports the purpose of cult rituals. Nobody knows that captured cities are being prepared for sacrifice. Sources report rituals with no civilian victims, and the player can only guess until manifestation reveals the purpose. No dialogue lets a later character convince NPCs of it ([21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)).
 
@@ -199,7 +215,7 @@ V1 methods:
 - bartender tone that marks Brief vs Long;
 - map urgency after Marked upgrade.
 
-Exact UI chrome remains open. The design rule is: the player should be able to understand that waiting has a cost.
+A Marked POI shows its source's words, never a countdown ([04 Points of Interest](04%20Points%20of%20Interest.md) § Active Window); the rest of the UI chrome remains open. The design rule is: the player should be able to understand that waiting has a cost.
 
 # Relation to Other Systems
 
@@ -262,7 +278,7 @@ A new tip is good if:
 - **Character Life / Progression:** Compatible. Factionless hardship and Formula leads both fit.
 - **World Time:** The private player summary and public bulletin arrive at the in-game day boundary; NPC awareness still requires a valid information channel.
 - **World Laws / POIs:** Public reports and qualitative map changes expose consequences without disclosing hidden counters.
-- **Glossary / Open Questions:** Updated; public bulletin content, map precision, spread time, private-summary UI, and spawn density remain open.
+- **Glossary / Open Questions:** Updated; public bulletin content, map precision, spread time, private-summary UI, remain open; spawn density and marking are authoring defaults in § Tips and marking in V1.
 
 # Related Documents
 

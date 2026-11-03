@@ -1,10 +1,10 @@
 # 04 Points of Interest
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft
 
-Last Updated: 2026-11-02 (unattended outcomes are weighted by the forces present and change the war directly. Earlier: a ritual lasts one in-game hour. Earlier: cult rituals belong to City Capture; a city under Cult Control is persistent world state, not a POI. Earlier: ritual operations use six-hour world-time windows without player-facing countdowns; public event sites and faction control are represented on the map.)
+Last Updated: 2026-11-03 (V1 window classes, urgency on the map, and three active POIs a district, authoring defaults. Earlier: unattended outcomes are weighted by the forces present and change the war directly. Earlier: a ritual lasts one in-game hour. Earlier: cult rituals belong to City Capture; a city under Cult Control is persistent world state, not a POI. Earlier: ritual operations use six-hour world-time windows without player-facing countdowns; public event sites and faction control are represented on the map.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [03.1 Decision Node Template](03.1%20Decision%20Node%20Template.md)
@@ -119,6 +119,8 @@ POIs may be found by stumbling into the interaction area or through [Information
 - **Unknown** — exists in data; no map marker yet
 - **Hinted** — player heard enough to know a region/type, not exact point
 - **Marked** — visible on the world map
+
+Which tip Hints and which Marks is set in [09 Information Sources](09%20Information%20Sources.md) § Tips and marking in V1.
 - **Expired / Resolved** — no longer interactable; residue may remain as Symptom or Legacy trace
 
 A discovery clue may open another POI without forcing the player to travel immediately. That is a valid Attention / Commitment hook.
@@ -127,13 +129,20 @@ A discovery clue may open another POI without forcing the player to travel immed
 
 Every POI has a lifetime in **player world-time** only.
 
-Examples of duration classes:
+Duration classes, V1 authoring defaults set by the agent on 2026-11-03. One World Tick is one in-game minute ([18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)) and ten real seconds of free exploration, so an in-game hour is ten real minutes.
 
-- **Brief** — hours in-world; urgent street events
-- **Short** — about a day
-- **Standard** — several days
-- **Long** — a week or more
-- **Persistent** — rare; still finite, but long enough to feel stable
+| Class | In-world length | Typical use |
+|---|---|---|
+| **Brief** | 2–4 hours, 20–40 real minutes | tonight's street event |
+| **Short** | 6–24 hours, ending on the day or night it began | an arrest before the whistle |
+| **Standard** | 2–3 days | a trace before the rain washes it |
+| **Long** | 5–8 days | a faction's preparations |
+| **Persistent** | until a named world event, such as a city's capture or liberation | a place that stands until the war changes it |
+
+- The seed picks the exact length inside the class.
+- A window runs from the POI's appearance, never from its discovery. A player who hears of it late has less of it.
+- A Persistent POI has no clock. It is finite because the event that ends it is part of the war, and its sources say what it waits for, so it never feels like a hidden timer.
+- In the slice a window that outlasts the invasion ends with it.
 
 Rules:
 
@@ -141,6 +150,7 @@ Rules:
 2. Exact second-timers are not required, but the urgency class must be readable.
 3. Sources of readability may include rumour wording, notice-board deadlines, NPC phrases, map marker urgency, or diary notes.
 4. If an event disappears because the player was late, the world should show what happened, not silently delete the opportunity.
+5. A Marked POI shows its urgency in the words its source used, such as "tonight" or "before the whistle", and never as a number or a countdown. The marker does not change as the window runs down: the world shows that through the scene, its sources and its Symptoms. When the window ends, the marker becomes a mark of the aftermath (authoring default, 2026-11-03).
 
 Active Windows create Commitment pressure: world-time is a scarce stock.
 
@@ -222,7 +232,7 @@ Follow-up POI chance:
 ## V1
 
 - Handful of POI types.
-- Seed places a limited number of active POIs.
+- Seed places a limited number of active POIs: a district has at most three active event POIs at once, Hinted or Marked, and at most two of them Brief or Short, so there is always a choice and never a list (authoring default, 2026-11-03). Tasks the player has taken and the war's own operations do not count.
 - Map markers for Marked state.
 - Active Window classes with readable urgency.
 - Unattended resolution tables with Influence weighting.
