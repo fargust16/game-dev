@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.18
+Version: 0.19
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-02 (a Master teaches First Aid and sells its supplies. Earlier: the question on reports names forces, not numeric Influence. Earlier: ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-03 (Bleeding and Poison rates and First Aid treatment in 10.2, authoring defaults. Earlier: a Master teaches First Aid and sells its supplies. Earlier: the question on reports names forces, not numeric Influence. Earlier: ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -147,7 +147,7 @@ All time-dependent conditions and natural recovery use the shared world clock. T
 - **Poison** blocks HP and stamina recovery while active. If it remains active throughout sleep, the character does not wake with fully restored HP.
 - **Bleeding** continues to cause health loss while active and may reduce HP to zero, including during sleep.
 - First Aid items and treatment can stop or neutralise these conditions according to their specific rules.
-- Exact per-tick probabilities, Endurance curves, item modifiers, and treatment rules remain open.
+- Authoring defaults, 2026-11-03: Bleeding takes 1 % of maximum HP a tick and ends by itself at `Endurance / 2` % a tick; Poison ends at `Endurance / 4` % a tick. Treatment is in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md) § First Aid and conditions in the slice.
 
 ## Other timed conditions
 
@@ -312,7 +312,7 @@ Information transmission is not automatic universal knowledge. Each channel need
 7. What is the comfort score, how is it calculated, and what temporary rest bonuses can it grant?
 8. How are sleep safety, detection, waking, alarm response, and ambush opening attacks resolved?
 9. How does ordinary natural HP recovery interact with rest outside sleep?
-10. What are the Poison and Bleeding natural-removal probabilities, Endurance curves, item modifiers, and treatment rules?
+10. Resolved, 2026-11-03 (authoring default): the Poison and Bleeding rates and treatment are in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
 11. What injury categories exist, what penalties do they impose, and what are their natural-healing probabilities and time curves?
 12. What exactly can First Aid treat or stabilise, and which injuries require a doctor or specialist?
 13. What are the exact HP/stamina recovery rules during sleep, including the timing of recovery when a blocking condition is removed partway through sleep?
