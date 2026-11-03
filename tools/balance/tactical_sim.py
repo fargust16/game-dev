@@ -7,7 +7,8 @@ to them, and every fighter picks targets by impact: how much harm the target doe
 to its side, against how fast this fighter can bring it down. Fighters can wait to
 the end of the round, hold back from an enemy's reach, and stand in a Defensive
 Stance that answers an attacker with a Counterattack. Firearms reload, armour counts
-double against ranged physical damage, and a blow can be filled with Will Power.
+double against ranged physical damage, and a blow can be filled with Will Power. A
+pistol in the off hand fires once at a price, and Reload needs a free hand.
 
 V0 is the configuration 10.2 reports, before items. The other switches of Rules
 are the levers tried against headcount, kept so that the table of levers can be
@@ -36,6 +37,9 @@ ASLEEP_FACTOR = 0.2
 CROWD_FACTOR = 0.5
 BREAK_OFF_FACTOR = 1.5
 PISTOL_RANGE = 6
+STOW_AP = 2
+OFFHAND_HIT = 0.20
+OFFHAND_DAMAGE = 0.5
 OBJECTIVE_BONUS = 3.0
 STUN_AP = 2
 STUN_SKILL = 5
@@ -83,6 +87,9 @@ class Rules:
     infusion_divisor: float = c.INFUSION_DIVISOR
     cover: float = 0.0
     crit_pierce: float = c.CRIT_PIERCE
+    offhand_hit: float = OFFHAND_HIT
+    offhand_mult: float = OFFHAND_DAMAGE
+    offhand_parry: bool = False
 
 
 def cheb(a, b):
@@ -111,6 +118,7 @@ class Fight:
             u.stance = False
             u.held = -1
             u.loaded = True
+            u.shots, u.stowed = u.sidearm, False
             u.threat = self.threat(u)
         self.leaders = [self.leader(a), self.leader(b)]
 
@@ -206,6 +214,8 @@ class Fight:
             bonus_hit -= c.ADJACENT
         if a.weapon.ranged and cheb(a, t) > 1:
             bonus_hit -= self.r.cover
+        if a.offhand:
+            bonus_hit -= self.r.offhand_hit
         if t.stance:
             bonus_hit -= self.r.stance_evasion * t.reserve
         if random.random() >= self.chance(a, t, bonus_hit):
@@ -218,7 +228,7 @@ class Fight:
         damage = self.reduce(a.damage_roll() * crit * mult * self.r.damage_scale, t, w.ranged, pierce) + self.warded(magic, t)
         if t.brace:
             damage *= 1 - c.BRACE_REDUCTION
-        if not unguarded and not a.weapon.ranged and t.weapon.guard and t.reserve >= c.REACTION_AP and not t.asleep and not t.skip:
+        if not unguarded and not a.weapon.ranged and t.weapon.guard and (self.r.offhand_parry or not t.sidearm) and t.reserve >= c.REACTION_AP and not t.asleep and not t.skip:
             guard = t.weapon.guard_chance * (1 + self.r.stance_guard * t.reserve if t.stance else 1)
             t.reserve -= c.REACTION_AP
             if random.random() < guard:
@@ -380,9 +390,23 @@ class Fight:
                 u.intent = self.best(u, foes, ap)
             t = u.intent
             adjacent = [f for f in foes if cheb(u, f) == 1]
+            near = [f for f in foes if cheb(u, f) <= PISTOL_RANGE]
+            if u.shots and near and ap >= c.PISTOL.ap - c.PISTOL.reload:
+                main, u.weapon = u.weapon, c.PISTOL
+                u.offhand = True
+                self.strike(u, self.best(u, near, ap), mult=self.r.offhand_mult)
+                u.weapon, u.offhand = main, False
+                u.shots -= 1
+                ap -= c.PISTOL.ap - c.PISTOL.reload
+                continue
             if u.weapon.ranged:
                 reload = u.weapon.reload
                 if cheb(u, t) <= u.weapon.range:
+                    if not u.loaded and u.sidearm and not u.stowed:
+                        if ap < STOW_AP:
+                            break
+                        ap -= STOW_AP
+                        u.stowed = True
                     if not u.loaded:
                         paid = min(ap, reload - u.reloaded)
                         ap -= paid

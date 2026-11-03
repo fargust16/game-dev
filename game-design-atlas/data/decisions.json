@@ -1491,7 +1491,7 @@
   },
   {
     "id": "d-kinds-of-fighter",
-    "statement": "Critical, attack, magic, and shooter builds are about equal overall and play against each other: mages beat plate, plate beats shooters, shooters beat mages. Initiative is no automatic win. The weapons are Victorian and iron: swords, daggers, hand weapons, and rifles and pistols with a shot and a Reload; staffs, wands, bows, and crossbows are out. V1 counts no ammunition, by the owner's choice on 2026-11-03. Shooters and mages stay weak alone, by the owner's choice on 2026-11-03.",
+    "statement": "Critical, attack, magic, and shooter builds are about equal overall and play against each other: mages beat plate, plate beats shooters, shooters beat mages. Initiative is no automatic win. The weapons are Victorian and iron: swords, daggers, hand weapons, and rifles and pistols with a shot and a Reload; staffs, wands, bows, and crossbows are out. A pistol can go with a one-handed weapon, a shield, or a second pistol, and Reload needs a free hand. V1 counts no ammunition, by the owner's choice on 2026-11-03. Shooters and mages stay weak alone, by the owner's choice on 2026-11-03.",
     "rationale": "Five builds of one budget reach 46-54 % five against five, with the triangle at 71, 88, and 72. Physical defence counts double against ranged physical damage, so arrows do not pierce armour, and load bands make Strength pay for heavy armour. Investing in Initiative costs a build 9-13 points.",
     "alternatives": "A fixed Evasion or AP penalty on plate: AP was too sharp, because one AP took a second blow away from a one-handed fighter, and neither stopped a mage or a shooter from wearing it.",
     "systemIds": [
@@ -1504,7 +1504,7 @@
       "src-10",
       "src-19"
     ],
-    "dateNote": "Direction owner-approved, 2026-11-02; weakness alone, no ammunition in V1, and no bows owner-approved, 2026-11-03; values are authoring defaults, CC-49."
+    "dateNote": "Direction owner-approved, 2026-11-02; weakness alone, no ammunition in V1, no bows, and pistols in either hand owner-approved, 2026-11-03; values are authoring defaults, CC-49."
   },
   {
     "id": "d-infusion",

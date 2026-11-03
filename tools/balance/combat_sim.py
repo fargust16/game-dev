@@ -120,6 +120,10 @@ class Unit:
     infuse: bool = False
     loaded: bool = True
     reloaded: int = 0
+    sidearm: int = 0
+    shots: int = 0
+    stowed: bool = False
+    offhand: bool = False
     held: int = -1
     frac: float = 0.0
     burden: tuple = (0, 0)
@@ -139,7 +143,7 @@ class Unit:
 
     def load(self):
         """What the worn armour and held weapon cost in Evasion and AP, as a share of Carrying Capacity."""
-        share = (ARMOUR_WEIGHT[self.armour] + self.weapon.weight + CARRIED) / (20 + self.str)
+        share = (ARMOUR_WEIGHT[self.armour] + self.weapon.weight + self.sidearm * PISTOL.weight + CARRIED) / (20 + self.str)
         return next((band[1:] for band in LOAD if share <= band[0]), LOAD[-1][1:])
 
     def max_hp(self):

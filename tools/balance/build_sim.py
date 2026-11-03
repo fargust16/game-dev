@@ -41,6 +41,7 @@ class Build:
     armour: str
     mods: tuple
     infuse: bool = False
+    sidearm: int = 0
 
 
 PLATE = Build(15, 14, 6, 6, 3, 7, c.SHIELDED, "plate", ("hp", "defence", "damage"))
@@ -59,8 +60,13 @@ MAIN = tuple(BUILDS)
 BUILDS.update({
     "attack in plate": variant(ATTACK, armour="plate"),
     "crit, dagger": variant(CRIT, weapon=c.DAGGER),
+    "crit, sword, pistol": variant(CRIT, sidearm=1),
+    "crit, dagger, pistol": variant(CRIT, weapon=c.DAGGER, sidearm=1),
+    "plate, sword, pistol": variant(PLATE, weapon=c.ONE_HAND, sidearm=1),
+    "plate, sword": variant(PLATE, weapon=c.ONE_HAND),
     "crit, Initiative": variant(CRIT, mods=TEMPO),
     "pistol": variant(SHOOTER, weapon=c.PISTOL),
+    "two pistols": variant(SHOOTER, weapon=c.PISTOL, sidearm=1),
     "rifle, Initiative": variant(SHOOTER, mods=("damage", "accuracy", "initiative")),
     "rifle in plate": variant(SHOOTER, armour="plate"),
     "mage in cloth": variant(MAGE, armour="cloth"),
@@ -68,13 +74,15 @@ BUILDS.update({
     "mage in plate": variant(MAGE, armour="plate"),
     "mage, pistol": variant(MAGE, weapon=c.PISTOL),
     "mage, sword": variant(MAGE, weapon=c.ONE_HAND),
+    "mage, sword, pistol": variant(MAGE, weapon=c.ONE_HAND, sidearm=1),
+    "mage, two pistols": variant(MAGE, weapon=c.PISTOL, sidearm=1),
     "mage, two-hand": variant(MAGE, weapon=c.TWO_HAND),
 })
 
 
 def fighter(build):
     b = BUILDS[build]
-    u = c.Unit(build, 8, b.str, b.end, b.dex, b.per, SKILL, b.will, b.intl, b.weapon, b.armour, infuse=b.infuse)
+    u = c.Unit(build, 8, b.str, b.end, b.dex, b.per, SKILL, b.will, b.intl, b.weapon, b.armour, infuse=b.infuse, sidearm=b.sidearm)
     for i in range(MODIFIERS):
         kind = b.mods[i % len(b.mods)]
         s.add(u, kind, s.VALUE[kind] * SCALE)
