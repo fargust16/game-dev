@@ -1508,7 +1508,7 @@
   },
   {
     "id": "d-infusion",
-    "statement": "A character fills a weapon with magic through Will Power: at a flat cost a blow, it adds magical damage set by Intelligence. It works with any weapon and needs no spell. Any initiated character can infuse, with no training. Magical weapons give the same damage with no Will Power. Crafting has no ceiling, and its price is time and effort.",
+    "statement": "A character fills a weapon with magic through Will Power: at a flat cost paid for each blow, never once a turn, it adds magical damage set by Intelligence. It works with any weapon and needs no spell. Any initiated character can infuse, with no training. Magical weapons give the same damage with no Will Power. Crafting has no ceiling, and its price is time and effort.",
     "rationale": "Characters of high Intelligence use the same items as everyone else and repay weak Strength and Dexterity this way. The cost is flat so that more Will means more blows, and plate's low magical defence makes the blow armour-piercing. Allies who do not infuse fall from 41 % to 34 % in the slice.",
     "alternatives": "A cost as a share of maximum Will Power, which would give more Will no more blows. Staffs and wands, cancelled by the owner.",
     "systemIds": [
@@ -1521,6 +1521,6 @@
       "src-10",
       "src-19"
     ],
-    "dateNote": "Direction owner-approved, 2026-11-02; any initiated character, with no training, owner-approved, 2026-11-03; values are working readings, CC-49."
+    "dateNote": "Direction owner-approved, 2026-11-02; any initiated character, with no training, and a price for each blow, owner-approved, 2026-11-03; values are working readings, CC-49."
   }
 ]
