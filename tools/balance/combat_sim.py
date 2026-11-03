@@ -64,7 +64,7 @@ TWO_HAND = Weapon("two-hand", 9, 7, guard="block", guard_chance=0.40, guard_abso
 RIFLE = Weapon("rifle", 9, 10, True, reload=7, range=16, weight=4.0)
 PISTOL = Weapon("pistol", 7, 8, True, reload=5, range=6, weight=1.2)
 
-ARMOUR = {"none": (0, 0), "cloth": (3, 10), "leather": (8, 5), "chain": (16, 3), "plate": (24, 2)}
+ARMOUR = {"none": (0, 0), "cloth": (2, 20), "leather": (8, 8), "chain": (16, 3), "plate": (24, 0)}
 
 
 def staged(weapon, stage):
