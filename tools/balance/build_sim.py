@@ -27,6 +27,7 @@ import tactical_sim as t
 RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 300
 MODE = sys.argv[2] if len(sys.argv) > 2 else "none"
 SKILL = 12
+OFF_SKILL = 3
 MODIFIERS = 12
 SCALE = 0.75
 GAPS = (6, 9, 12)
@@ -131,8 +132,12 @@ def abilities(b):
 
 
 def fighter(build):
+    """A build trains the skill of the weapon it relies on, the firearm of a shooter or the melee
+    weapon after a pistol's opening shot, and has OFF_SKILL in the other."""
     b = BUILDS[build]
-    u = c.Unit(build, 8 if MODE == "none" else int(MODE), b.str, b.end, b.dex, b.per, SKILL, b.will, b.intl, b.weapon, b.armour, infuse=b.infuse, second=b.second, opener=b.opener, abilities=abilities(b))
+    shooter = b.weapon.ranged and not b.opener
+    melee, ranged = (OFF_SKILL, SKILL) if shooter else (SKILL, OFF_SKILL)
+    u = c.Unit(build, 8 if MODE == "none" else int(MODE), b.str, b.end, b.dex, b.per, melee, b.will, b.intl, b.weapon, b.armour, infuse=b.infuse, second=b.second, opener=b.opener, abilities=abilities(b), ranged_skill=ranged)
     for i in range(MODIFIERS):
         kind = b.mods[i % len(b.mods)]
         s.add(u, kind, s.VALUE[kind] * SCALE)

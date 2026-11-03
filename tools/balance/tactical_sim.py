@@ -8,9 +8,9 @@ its Reaction Attack, a fighter with two or more enemies beside it is Surrounded,
 every fighter picks targets by impact: how much harm the target does to its side,
 against how fast this fighter can bring it down. Fighters can wait to the end of the
 round, hold back from an enemy's reach, and stand in a Defensive Stance that answers
-an attacker with a Counterattack. Firearms reload, armour counts double against
-ranged physical damage, and a blow can be filled with Will Power. A fighter may carry
-a second Weapon Set and change to it.
+an attacker with a Counterattack. Firearms reload, armour counts double against a
+shot from beyond the next cell, a shooter with an enemy beside it aims worse, and a blow
+can be filled with Will Power. A fighter may carry a second Weapon Set and change to it.
 
 V0 is the configuration 10.2 reports, before items. The other switches of Rules
 are the levers tried against headcount, kept so that the table of levers can be
@@ -38,7 +38,6 @@ KILL_BONUS = 2.5
 ASLEEP_FACTOR = 0.2
 CROWD_FACTOR = 0.5
 BREAK_OFF_FACTOR = 1.5
-PISTOL_RANGE = 6
 SWAP_AP = 2
 SURROUND_HIT = c.SURROUND_HIT
 OBJECTIVE_BONUS = 3.0
@@ -95,6 +94,7 @@ class Rules:
     stance_guard: float = DEFENCE_GUARD
     counter_ap: int = COUNTER_AP
     ranged_armour: float = c.ARMOUR_RANGED
+    point_blank: float = c.ADJACENT
     infusion_cost: float = c.INFUSION_COST
     infusion_divisor: float = c.INFUSION_DIVISOR
     cover: float = 0.0
@@ -173,7 +173,7 @@ class Fight:
         base = w.base * c.stage_factor(w.stage) * self.r.damage_scale
         raw = base * (1 if w.ranged else 1 + a.str / 50) * (1 + a.gear.damage)
         share = a.gear.magic + (self.infusion(a) if a.infuse else 0)
-        return self.chance(a, t, 0.0) * (self.reduce(raw, t, w.ranged) + self.warded(share * base, t))
+        return self.chance(a, t, 0.0) * (self.reduce(raw, t, w.ranged and cheb(a, t) > 1) + self.warded(share * base, t))
 
     def threat(self, u):
         foes = self.foes(u)
@@ -229,8 +229,8 @@ class Fight:
         if t.exposed:
             bonus_hit += 0.10
             t.exposed = False
-        if a.weapon.ranged and a.weapon.range > PISTOL_RANGE and any(touch(a, f) for f in alive(self.foes(a))):
-            bonus_hit -= c.ADJACENT
+        if a.weapon.ranged and any(touch(a, f) for f in alive(self.foes(a))):
+            bonus_hit -= self.r.point_blank
         if a.weapon.ranged and cheb(a, t) > 1:
             bonus_hit -= self.r.cover
         if t.stance:
@@ -242,7 +242,7 @@ class Fight:
         w = a.weapon
         magic = share * w.base * c.stage_factor(w.stage) * crit * mult * self.r.damage_scale
         pierce = self.r.crit_pierce if crit > 1 and not w.ranged else 0.0
-        damage = self.reduce(a.damage_roll() * crit * mult * self.r.damage_scale, t, w.ranged, pierce) + self.warded(magic, t)
+        damage = self.reduce(a.damage_roll() * crit * mult * self.r.damage_scale, t, w.ranged and cheb(a, t) > 1, pierce) + self.warded(magic, t)
         if t.brace:
             damage *= 1 - c.BRACE_REDUCTION
         if not unguarded and not a.weapon.ranged and t.weapon.guard and t.reserve >= c.REACTION_AP and not t.asleep and not t.skip:
@@ -597,6 +597,7 @@ def stronger(units, bonus):
         u.dex += bonus
         u.per += bonus
         u.skill += bonus
+        u.ranged_skill += bonus
     return units
 
 

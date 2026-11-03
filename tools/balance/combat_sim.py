@@ -81,7 +81,7 @@ MAUL = Weapon("maul", 10.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.
 ONE_HAND = SWORD
 TWO_HAND = GREATSWORD
 SHIELDED = shielded(SWORD)
-RIFLE = Weapon("rifle", 9, 10, True, reload=7, range=16, weight=4.0)
+RIFLE = Weapon("rifle", 8, 10, True, reload=7, range=16, weight=4.0)
 PISTOL = Weapon("pistol", 7, 8, True, reload=5, range=6, weight=1.2, accuracy=-10)
 
 ARMOUR = {"none": (0, 0), "cloth": (2, 20), "leather": (8, 8), "chain": (16, 3), "plate": (24, 0)}
@@ -152,6 +152,12 @@ class Unit:
     burden: tuple = (0, 0)
     extra: dict = field(default_factory=dict)
     gear: Gear = field(default_factory=Gear)
+    ranged_skill: int | None = None
+
+    def __post_init__(self):
+        """skill is the Melee Skill; a fighter given no Ranged Skill shoots with the same value."""
+        if self.ranged_skill is None:
+            self.ranged_skill = self.skill
 
     def reset(self):
         self.burden = self.load()
@@ -185,7 +191,7 @@ class Unit:
 
     def accuracy(self):
         if self.weapon.ranged:
-            return ((self.dex + self.per) / 2 + self.skill) / 2 + self.gear.accuracy + self.weapon.accuracy
+            return ((self.dex + self.per) / 2 + self.ranged_skill) / 2 + self.gear.accuracy + self.weapon.accuracy
         return ((self.str + self.dex + self.per) / 3 + self.skill) / 2 + self.gear.accuracy + self.weapon.accuracy
 
     def evasion(self):
