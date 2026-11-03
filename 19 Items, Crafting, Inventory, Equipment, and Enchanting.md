@@ -1,8 +1,8 @@
 # 19 Items, Crafting, Inventory, Equipment, and Enchanting
 
-Version: 0.9
+Version: 0.10
 Status: Draft — owner-confirmed rules with delegated starting-balance formulas; content tables, operation costs, and selected edge cases remain open
-Last Updated: 2026-11-02 (catalogue gains Magical Damage, Will Power, and magical defence, and critical and defence values rise; crossbows out, rifle and pistol in; crafting has no ceiling, by the owner's decision. Earlier: shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
+Last Updated: 2026-11-03 (V1 counts no ammunition, by the owner's decision. Earlier: catalogue gains Magical Damage, Will Power, and magical defence, and critical and defence values rise; crossbows out, rifle and pistol in; crafting has no ceiling, by the owner's decision. Earlier: shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -150,7 +150,7 @@ For every generated modifier, the selected base supplies the fixed type weights;
 
 ## 4.2 Equipment
 
-- The character has two universal hand slots. Compatible one-handed weapons, shields, talismans, books, and similar items may occupy either hand; a two-handed item uses both. A bow occupies one hand while its arrows use the other as ammunition. A rifle uses both hands, and a pistol one. Staffs and wands do not exist, by the owner's direction of 2026-11-02.
+- The character has two universal hand slots. Compatible one-handed weapons, shields, talismans, books, and similar items may occupy either hand; a two-handed item uses both. A bow occupies one hand while drawing its arrows takes the other. V1 counts neither arrows nor cartridges as items, by the owner's decision of 2026-11-03. A rifle uses both hands, and a pistol one. Staffs and wands do not exist, by the owner's direction of 2026-11-02.
 - Current body/accessory slot direction: head, body, shoulders, gloves, belt, trousers, boots, two rings, and one necklace/amulet slot. Necklace and amulet share one slot.
 - Exact compatibility, requirements, final slot catalogue, and recalculation of derived values remain open. See [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) and [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
 

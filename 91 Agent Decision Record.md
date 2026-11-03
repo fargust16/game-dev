@@ -1,10 +1,10 @@
 # 91 Agent Decision Record
 
-Version: 1.16
+Version: 1.17
 
 Status: Draft
 
-Last Updated: 2026-11-03 (exhaustion through Infusion pays the usual reward, by the owner's decision, and the earlier AGENTS note moved here. Earlier: Infusion is paid for each blow, by the owner's decision, and the earlier AGENTS note moved here. Earlier: any initiated character infuses, with no training, by the owner's decision, and the earlier AGENTS note moved here. Earlier: shooters and mages stay weak alone, by the owner's decision, and the earlier AGENTS note moved here. Earlier: Kinds of fighter recorded, and the earlier AGENTS note moved here. Earlier: Shops and Masters, and Wait and Defensive Stance, recorded. Earlier: the slice's numbers in Items in fights updated. Earlier: the allies' edge in items recorded. Earlier: the Alchemical Flask rejected by the owner, and items recorded as what decides fights. Earlier: group fights on the Combat Grid recorded, and the Alchemical Flask proposed. Earlier: the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
+Last Updated: 2026-11-03 (V1 counts no ammunition, by the owner's decision, and the earlier AGENTS note moved here. Earlier: exhaustion through Infusion pays the usual reward, by the owner's decision, and the earlier AGENTS note moved here. Earlier: Infusion is paid for each blow, by the owner's decision, and the earlier AGENTS note moved here. Earlier: any initiated character infuses, with no training, by the owner's decision, and the earlier AGENTS note moved here. Earlier: shooters and mages stay weak alone, by the owner's decision, and the earlier AGENTS note moved here. Earlier: Kinds of fighter recorded, and the earlier AGENTS note moved here. Earlier: Shops and Masters, and Wait and Defensive Stance, recorded. Earlier: the slice's numbers in Items in fights updated. Earlier: the allies' edge in items recorded. Earlier: the Alchemical Flask rejected by the owner, and items recorded as what decides fights. Earlier: group fights on the Combat Grid recorded, and the Alchemical Flask proposed. Earlier: the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [AGENTS.md](AGENTS.md)
@@ -83,7 +83,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 - Owner-approved, 2026-11-03: shooters and mages stay weak alone, against 60–65 % for melee builds, as the price of their strength in a group.
 - Owner-approved, 2026-11-03: any character who has entered an Arcana can infuse, with no training; the power comes with initiation, and an Uninitiated character has none.
 - Owner-approved, 2026-11-03: Infusion is paid for each blow, never once for a whole turn, so that a weapon with many blows a turn gains no cheaper Infusion.
-- Owner-approved, 2026-11-03: zero Will Power through Infusion is full exhaustion as in 07.2, with the usual reward once a continuous episode and the usual Sanity damage. Other open points are CC-49.
+- Owner-approved, 2026-11-03: zero Will Power through Infusion is full exhaustion as in 07.2, with the usual reward once a continuous episode and the usual Sanity damage.
+- Owner-approved, 2026-11-03: V1 counts neither cartridges nor arrows, and Reload is the price of shooting. Ammunition as an item may come in V2, once shop prices exist. Other open points are CC-49.
 
 ## Campaign odds
 
@@ -162,6 +163,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 # AGENTS.md Update History
 
 The notes of `AGENTS.md`, newest first.
+
+2026-11-03 (exhaustion through Infusion pays the usual reward)
 
 2026-11-03 (Infusion is paid for each blow)
 
