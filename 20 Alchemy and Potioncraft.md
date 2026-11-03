@@ -1,10 +1,10 @@
 # 20 Alchemy and Potioncraft
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft — owner-approved foundation; skill progression, mini-game, recipes, and balance remain open
 
-Last Updated: 2026-11-02 (the potion shop's Master teaches Alchemy as a working reading. Earlier: the Alchemical Flask rejected by the owner. Earlier: the Alchemical Flask proposal noted. Earlier: the V1 question follows the slice's Limits. Earlier: terms renamed to Arcana and Limit. Earlier: potion-making included in the Vertical Slice.)
+Last Updated: 2026-11-03 (the brewing mini-game is a Reaction Check once a tick, and its results change the potion's Sanity cost and attribute rise, by the owner. Earlier: the potion shop's Master teaches Alchemy as a working reading. Earlier: the Alchemical Flask rejected by the owner. Earlier: the Alchemical Flask proposal noted. Earlier: the V1 question follows the slice's Limits. Earlier: terms renamed to Arcana and Limit. Earlier: potion-making included in the Vertical Slice.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -43,7 +43,19 @@ Alchemy discovery should teach the player to read the world and its materials. T
 
 Brewing a potion takes **six world-time ticks** and includes a mini-game. Each world-time tick is one in-game minute under [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md).
 
-The six-tick duration and the presence of a mini-game are approved. Whether the mini-game runs within those six ticks or adds time, whether player input pauses the shared clock, and what interruption or failure does to the ingredients and resulting potion are not yet defined.
+The six-tick duration and the presence of a mini-game are approved.
+
+Owner-approved, 2026-11-03: the mini-game is a series of Reaction Checks. A **Reaction Check** is a timing check: a marker runs once along a bar, the bar has a large good zone and a smaller perfect zone inside it, and the player presses Space. Stopping in the perfect zone is a perfect result, in the good zone a good one, anywhere else or not at all a bad one.
+
+- A brewing plays its animation, and once a tick, every ten real seconds, a Reaction Check appears, so a six-tick brewing has six. The world does not pause.
+- Six good results give the standard potion: the Limit's standard Sanity cost and its standard attribute rise.
+- Perfect results lower the Sanity cost, and they add one or two points to the Arcana's primary attributes above the standard rise.
+- A bad result still gives a potion, but each one raises the Sanity cost. Six bad results take a great deal of Sanity and give almost none of the attribute rise.
+- The correct potion still grants its Limit: brewing changes only its price and its rise ([05 Progression](05%20Progression.md)).
+
+Authoring defaults: each perfect result lowers the Limit's mandatory Sanity cost by 10 % and each bad one raises it by 25 %, so six perfect results take 40 % of it and six bad ones 250 %. Three perfect results add 1 to both primary attributes and six add 2. Each bad result takes 15 % of the attribute rise away, so six leave a tenth of it. The good zone is a quarter of the bar and the perfect zone 6 %, and the marker crosses the bar in 1.5 seconds; Alchemy skill widens both zones, to 40 % and 10 % at skill 100 (working reading).
+
+What interruption does to the ingredients is not yet defined.
 
 # 4. Boundaries
 
@@ -59,10 +71,10 @@ The six-tick duration and the presence of a mini-game are approved. Whether the 
 2. Must a character personally brew each advancement potion, or may they commission or obtain one after learning Alchemy?
 3. How does Alchemy skill progress, and which attributes, skills, tools, stations, and conditions affect each capability?
 4. How are formulas discovered and decoded, ingredients identified, and ingredient locations found?
-5. What is the brewing mini-game, and how do its outcomes affect ingredient loss, potion validity, and any potion quality?
-6. Does the mini-game occur within the six world ticks or extend the elapsed time? Does it pause, advance, or otherwise interact with the shared clock?
+5. Resolved, 2026-11-03: Reaction Checks once a tick, which change the Sanity cost and attribute rise (§3). What does an interrupted brewing do to its ingredients?
+6. Resolved, 2026-11-03: the checks run within the six ticks, and the clock does not pause.
 7. Which potion categories beyond Arcana advancement exist, if any, and how do they respect the current prohibition on HP-restoring potions? The owner rejected a thrown Alchemical Flask on 2026-11-02: no consumable may change a battle's result that much (CC-46).
-8. Which parts of Alchemy does the slice's limited form need, including the first potion and the 9→8 transition? Limit 7 is for NPCs only.
+8. Resolved, 2026-11-03: the slice brews only Limit potions and the substitute base for Основа ритуала, and the formulas of Limits 9 and 8 come as [11 Vertical Slice](11%20Vertical%20Slice.md) describes. Limit 7 is for NPCs only.
 9. What recipe costs, station requirements, ingredient quantities, and numeric balance values should the later balance pass propose?
 
 ---

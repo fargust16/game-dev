@@ -833,6 +833,21 @@
     "dateNote": "Owner-approved answers to CC-9, CC-10, CC-12, and CC-13, 2026-11-03."
   },
   {
+    "id": "d-slice-limited-forms",
+    "statement": "The slice's limited forms: Жрица's Limit formulas come from the faction and Император's from a deserter's cache; brewing is a Reaction Check once a tick that moves the Sanity cost and attribute rise; wolves and boars live outside the city, some glowing with magical ingredients; sleep in a paid room or the street; theft is one Reaction Check; tasks come from the board, Masters, and the faction; durability is off.",
+    "rationale": "Each required mechanic gets the smallest form that still teaches the world, and the agent sets the numbers.",
+    "alternatives": "Brewing and theft as plain rolls; durability and repair in the slice.",
+    "systemIds": [
+      "cult-campaign"
+    ],
+    "status": "accepted",
+    "origin": "imported",
+    "sourceIds": [
+      "src-11"
+    ],
+    "dateNote": "Owner-approved, 2026-11-03."
+  },
+  {
     "id": "d-general-ending",
     "statement": "Killing all three Cult Generals is the only way to end the campaign before manifestation.",
     "rationale": "Replaces the undefined command threshold.",
