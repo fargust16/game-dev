@@ -1,8 +1,8 @@
 # 19 Items, Crafting, Inventory, Equipment, and Enchanting
 
-Version: 0.19
+Version: 0.20
 Status: Draft — owner-confirmed rules with delegated starting-balance formulas; content tables, operation costs, and selected edge cases remain open
-Last Updated: 2026-11-03 (durability is off in the slice, by the owner. Earlier: the Attribute Requirement penalty grows with the shortfall. Earlier: Attribute Requirements V0: values and stage scaling in 10.2 §5b. Earlier: Attribute Requirements for weapons and armour, and silver cartridges deal more damage to monsters, by the owner's direction. Earlier: the hand on the Cartridge Pouch loads each shot, with no separate Reload. Earlier: kinds of weapon, the Cartridge Pouch, and two Weapon Sets, by the owner's decision. Earlier: armour splits its defence by the owner's direction: cloth against magic, leather half and half, plate against physical harm. Earlier: a pistol can share the hands with a one-handed weapon, a shield, or a second pistol, and Reload needs a free hand, by the owner's decision. Earlier: bows and the mini-crossbow removed by the owner: weapons are iron, for melee and firearms. Earlier: V1 counts no ammunition, by the owner's decision. Earlier: catalogue gains Magical Damage, Will Power, and magical defence, and critical and defence values rise; crossbows out, rifle and pistol in; crafting has no ceiling, by the owner's decision. Earlier: shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
+Last Updated: 2026-11-03 (prices, wages, selling and stock (§6.3), authoring defaults; Shop Skill +1 a day kept as an authoring default. Earlier: durability is off in the slice, by the owner. Earlier: the Attribute Requirement penalty grows with the shortfall. Earlier: Attribute Requirements V0: values and stage scaling in 10.2 §5b. Earlier: Attribute Requirements for weapons and armour, and silver cartridges deal more damage to monsters, by the owner's direction. Earlier: the hand on the Cartridge Pouch loads each shot, with no separate Reload. Earlier: kinds of weapon, the Cartridge Pouch, and two Weapon Sets, by the owner's decision. Earlier: armour splits its defence by the owner's direction: cloth against magic, leather half and half, plate against physical harm. Earlier: a pistol can share the hands with a one-handed weapon, a shield, or a second pistol, and Reload needs a free hand, by the owner's decision. Earlier: bows and the mini-crossbow removed by the owner: weapons are iron, for melee and firearms. Earlier: V1 counts no ammunition, by the owner's decision. Earlier: catalogue gains Magical Damage, Will Power, and magical defence, and critical and defence values rise; crossbows out, rifle and pistol in; crafting has no ceiling, by the owner's decision. Earlier: shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -244,7 +244,7 @@ Owner's direction, 2026-11-02. Numbers are authoring defaults checked by `tools/
 | 75 | Faction's Master, first day | 0.9 % | 24.9 % | 30.4 % | 27.7 % | 16.2 % |
 | 95 | Faction's Master, day 20 | 0.1 % | 9.6 % | 21.7 % | 32.9 % | 35.7 % |
 
-- **World Age.** The longer a world lives, the better its shelves. Working reading: Shop Skill rises by 1 a game day. Higher stages also reach the shelves as the world ages; the pace is open (CC-48). Because both sides buy from the same shelves, this barely tilts a fight: every shop +20 moves the slice by 2 points ([10.2](10.2%20Combat%20System%20Draft.md) §5b).
+- **World Age.** The longer a world lives, the better its shelves. Shop Skill rises by 1 a game day (authoring default, 2026-11-03). Higher stages also reach the shelves as the world ages; the pace is open (CC-48). Because both sides buy from the same shelves, this barely tilts a fight: every shop +20 moves the slice by 2 points ([10.2](10.2%20Combat%20System%20Draft.md) §5b).
 - Ingredients for sale depend on which monsters prevail around the city, and crafting resources on the trees, metal veins, and other sources around it, so cities differ. The capital is a first-level city, so beginner resources prevail around it, and farther cities differ by the difficulty of their zones. Territories must be balanced by stage and difficulty, which the slice does not need (CC-48).
 - **Crafting has no ceiling,** by the owner's decision of 2026-11-02. A player who wants to craft may craft without limit. The price is the time and effort it takes: find resources, find Masters, guess that gathering exists, earn the first pickaxe or axe, walk there and back, and fight the monsters that live there.
 - The Equipment Quality slider of [02](02%20World%20Laws.md) sets the base Shop Skill, and the Economy slider and Faction Influence set prices, stock, and access, as 02 requires (working reading).
@@ -253,7 +253,50 @@ Owner's direction, 2026-11-02. Numbers are authoring defaults checked by `tools/
 
 Owner's direction, 2026-11-02: a character who joins a faction may receive a **Faction Gift**, an item or several to choose from, weapons or armour, random and set by the World Seed. It is Magic or Rare, and Epic in very rare cases.
 
-Working readings: the offer is three items and the character takes one, at Magic 70 %, Rare 28 %, Epic 2 %. In the slice one Gift adds about 1 point to a Limit 9 hero, so it is a welcome, not a set.
+Authoring defaults, 2026-11-03: the offer comes every time a character joins, and it is three items of which the character takes one, at Magic 70 %, Rare 28 %, Epic 2 %. In the slice one Gift adds about 1 point to a Limit 9 hero, so it is a welcome, not a set.
+
+## 6.3 Prices and wages
+
+Authoring defaults set by the agent on 2026-11-03 (CC-48), at the middle Economy setting, which may later scale them. The unit is gold, and the anchor is a day's plain work in a city: about 10 gold.
+
+**Equipment**, any base, by quality:
+
+| Normal | Magic | Rare | Epic | Legendary |
+|---:|---:|---:|---:|---:|
+| 5 | 15 | 40 | 100 | 250 |
+
+A city set of 11 pieces at Shop Skill 26 costs about 230 gold.
+
+**Everything else:**
+
+| Goods or service | Gold |
+|---|---:|
+| Herb, ordinary ingredient from a beast, wood | 1 |
+| Ore, leather | 2–3 |
+| Pickaxe or axe | 6–8 |
+| Bandage / splint / antidote | 2 / 4 / 6 |
+| Magical ingredient for the Limit 9 potion, from the Master of Enchanting | 20 |
+| Magical ingredient for the Limit 8 potion, the same Master's price | 150 |
+| A lesson that teaches a profession from its Master | 10 |
+| A tavern room for a night | 3 |
+| A seer's prediction | 30 |
+
+**What gold comes from:**
+
+| Source | Gold |
+|---|---:|
+| Starting purse | 5 |
+| Notice Board task, an hour or two of work | 5–15 |
+| A Master's order, often for something gathered or made | 10–25 |
+| Faction task, for members | 20–40 |
+| A townsman's / a guard's / a merchant's purse, by theft | 1–6 / 3–8 / 10–30 |
+| A glowing beast's magical ingredient, sold to the Master of Enchanting | 40 |
+
+**Selling.** A shop pays a quarter of its own price. Selling is possible, but buying and selling back never pays, and crafting for sale is slow money.
+
+**The budget of a run.** A player who works through two days earns about 100 gold. That buys the Limit 9 ingredient, lessons, First Aid supplies, and two or three Magic pieces, or one Rare weapon, but not a whole set. So a set comes from mixing the routes of 11: buying, crafting, tasks, and theft. The Limit 8 ingredient at 150 gold is within reach only for a player who saves and steals; the glowing beast costs a trip instead.
+
+**Stock.** A shop holds one to three of each thing it sells. Each morning it fills again to that count, so the Shop Skill of that day makes the new pieces. Working reading for the full game: buyers share one shelf, so what the player buys is missing for others until morning. The slice's fighters bring their own gear and do not shop during the run.
 
 # 7. Open design questions
 
