@@ -58,6 +58,7 @@ class Weapon:
     crit: float = 0.0
     stun: float = 0.0
     cleave: float = 0.0
+    req: tuple = ()
 
 
 SHIELD_BLOCK = 0.50
@@ -70,20 +71,24 @@ def shielded(w):
 # Kinds of weapon (10.2 §5b): a dagger is the truest and the likeliest to find a critical hit, a sword the
 # quickest and truer than an axe or a mace, an axe hits as hard as a sword and finds more critical hits,
 # and a mace hits hardest, finds the fewest, and may stun. A greatsword also catches a second enemy.
-DAGGER = Weapon("dagger", 3, 3, guard="parry", guard_chance=0.30, guard_absorb=1.0, stealth_mult=1.0, weight=1.0, accuracy=10, crit=0.25)
-SWORD = Weapon("sword", 5, 4, guard="parry", guard_chance=0.40, guard_absorb=1.0, accuracy=5)
-AXE = Weapon("axe", 5, 5, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=2.2, crit=0.20)
-MACE = Weapon("mace", 6.5, 5, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=2.5, crit=-0.03, stun=0.05)
-GREATSWORD = Weapon("greatsword", 8.5, 6, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=4.5, accuracy=5, cleave=0.5)
-GREATAXE = Weapon("greataxe", 8.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=5.0, crit=0.22)
-MAUL = Weapon("maul", 10.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=6.0, crit=-0.03, stun=0.08)
+# Attribute Requirements (10.2 §5b), at stage 9; an item asks (10 − stage) times as much, so stage 8 asks double.
+# Below them a weapon hits half as often and armour gives half its defence.
+DAGGER = Weapon("dagger", 3, 3, guard="parry", guard_chance=0.30, guard_absorb=1.0, stealth_mult=1.0, weight=1.0, accuracy=10, crit=0.25, req=(("dex", 4),))
+SWORD = Weapon("sword", 5, 4, guard="parry", guard_chance=0.40, guard_absorb=1.0, accuracy=5, req=(("str", 2), ("dex", 2)))
+AXE = Weapon("axe", 5, 5, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=2.2, crit=0.20, req=(("str", 4), ("dex", 3)))
+MACE = Weapon("mace", 6.5, 5, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=2.5, crit=-0.03, stun=0.05, req=(("str", 5),))
+GREATSWORD = Weapon("greatsword", 8.5, 6, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=4.5, accuracy=5, cleave=0.5, req=(("str", 6), ("dex", 3)))
+GREATAXE = Weapon("greataxe", 8.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=5.0, crit=0.22, req=(("str", 7),))
+MAUL = Weapon("maul", 10.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=6.0, crit=-0.03, stun=0.08, req=(("str", 8),))
 ONE_HAND = SWORD
 TWO_HAND = GREATSWORD
 SHIELDED = shielded(SWORD)
-RIFLE = Weapon("rifle", 6.75, 6, True, range=16, weight=4.0)
-PISTOL = Weapon("pistol", 5, 4, True, range=6, weight=1.2, accuracy=-10)
+RIFLE = Weapon("rifle", 6.75, 6, True, range=16, weight=4.0, req=(("per", 3),))
+PISTOL = Weapon("pistol", 5, 4, True, range=6, weight=1.2, accuracy=-10, req=(("dex", 3),))
 
 ARMOUR = {"none": (0, 0), "cloth": (2, 20), "leather": (8, 8), "chain": (16, 3), "plate": (24, 0)}
+ARMOUR_REQ = {"leather": (("dex", 3),), "chain": (("str", 5),), "plate": (("str", 7),)}
+REQ_SHARE = 0.5
 
 
 def staged(weapon, stage):
@@ -150,6 +155,7 @@ class Unit:
     extra: dict = field(default_factory=dict)
     gear: Gear = field(default_factory=Gear)
     ranged_skill: int | None = None
+    gear_stage: int | None = None
 
     def __post_init__(self):
         """skill is the Melee Skill; a fighter given no Ranged Skill shoots with the same value."""
@@ -168,7 +174,8 @@ class Unit:
         self.frac = random.random()
 
     def load(self):
-        """What the worn armour and held weapon cost in Evasion and AP, as a share of Carrying Capacity."""
+        """What the worn armour, the held weapons and the rest of the load cost in Evasion and AP, as a share of
+        Carrying Capacity. It stands beside the Attribute Requirement of heavy armour: without it plate beats shooters 85 %."""
         share = (ARMOUR_WEIGHT[self.armour] + self.weapon.weight + (self.second.weight if self.second else 0.0) + CARRIED) / (20 + self.str)
         return next((band[1:] for band in LOAD if share <= band[0]), LOAD[-1][1:])
 
@@ -204,7 +211,21 @@ class Unit:
 
     def defence(self, side=()):
         support = SUPPORT_DEFENCE if any("support" in u.abilities and u.hp > 0 and u is not self for u in side) else 0
-        return ARMOUR[self.armour][0] * stage_factor(self.armour_stage) + support + self.gear.defence
+        return ARMOUR[self.armour][0] * stage_factor(self.armour_stage) * self.armour_share() + support + self.gear.defence
+
+    def meets(self, req, stage):
+        """gear_stage, when set, stands for the stage of the fighter's gear: build_sim.py keeps its items at
+        Stage Factor 1 for comparison but asks the requirements of the Limit its builds stand for."""
+        scale = 10 - (self.gear_stage or stage)
+        return all(getattr(self, a) >= v * scale for a, v in req)
+
+    def aim(self):
+        """Below its weapon's Attribute Requirements a fighter hits half as often."""
+        return 1.0 if self.meets(self.weapon.req, self.weapon.stage) else REQ_SHARE
+
+    def armour_share(self):
+        """Below its armour's Attribute Requirements a fighter gets half the armour's defence."""
+        return 1.0 if self.meets(ARMOUR_REQ.get(self.armour, ()), self.armour_stage) else REQ_SHARE
 
     def can_spend(self, share):
         return self.wp > self.max_wp() * share

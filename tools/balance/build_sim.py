@@ -134,11 +134,12 @@ def abilities(b):
 
 def fighter(build):
     """A build trains the skill of the weapon it relies on, the firearm of a shooter or the melee
-    weapon after a pistol's opening shot, and has OFF_SKILL in the other."""
+    weapon after a pistol's opening shot, and has OFF_SKILL in the other. Its 51 points are those of
+    Limit 8, so it meets or misses the Attribute Requirements of stage 8 gear."""
     b = BUILDS[build]
     shooter = b.weapon.ranged and not b.opener
     melee, ranged = (OFF_SKILL, SKILL) if shooter else (SKILL, OFF_SKILL)
-    u = c.Unit(build, 8 if MODE == "none" else int(MODE), b.str, b.end, b.dex, b.per, melee, b.will, b.intl, b.weapon, b.armour, infuse=b.infuse, second=b.second, opener=b.opener, abilities=abilities(b), ranged_skill=ranged)
+    u = c.Unit(build, 8 if MODE == "none" else int(MODE), b.str, b.end, b.dex, b.per, melee, b.will, b.intl, b.weapon, b.armour, infuse=b.infuse, second=b.second, opener=b.opener, abilities=abilities(b), ranged_skill=ranged, gear_stage=8)
     for i in range(MODIFIERS):
         kind = b.mods[i % len(b.mods)]
         s.add(u, kind, s.VALUE[kind] * SCALE)

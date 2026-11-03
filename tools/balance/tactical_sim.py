@@ -175,7 +175,7 @@ class Fight:
         base = w.base * c.stage_factor(w.stage) * self.r.damage_scale
         raw = base * (1 if w.ranged else 1 + a.str / 50) * (1 + a.gear.damage)
         share = a.gear.magic + (self.infusion(a) if a.infuse else 0)
-        return self.chance(a, t, 0.0) * (self.reduce(raw, t, w.ranged and cheb(a, t) > 1) + self.warded(share * base, t))
+        return self.chance(a, t, 0.0) * a.aim() * (self.reduce(raw, t, w.ranged and cheb(a, t) > 1) + self.warded(share * base, t))
 
     def threat(self, u):
         foes = self.foes(u)
@@ -187,13 +187,13 @@ class Fight:
         return min(0.95, max(0.05, p * (1 + a.luck / 100)))
 
     def defence(self, t):
-        d = c.ARMOUR[t.armour][0] * c.stage_factor(t.armour_stage) + t.gear.defence
+        d = c.ARMOUR[t.armour][0] * c.stage_factor(t.armour_stage) * t.armour_share() + t.gear.defence
         if any("support" in u.abilities and u is not t and cheb(u, t) <= SUPPORT_RANGE for u in alive(self.own(t))):
             d += c.SUPPORT_DEFENCE
         return d
 
     def warded(self, magic, t):
-        return magic * (1 - c.mitigation(c.ARMOUR[t.armour][1] * c.stage_factor(t.armour_stage) + t.gear.ward))
+        return magic * (1 - c.mitigation(c.ARMOUR[t.armour][1] * c.stage_factor(t.armour_stage) * t.armour_share() + t.gear.ward))
 
     def infusion(self, a):
         return a.intl / self.r.infusion_divisor * c.INFUSION_ARMOUR.get(a.armour, 1.0)
@@ -237,7 +237,7 @@ class Fight:
             bonus_hit -= self.r.cover
         if t.stance:
             bonus_hit -= self.r.stance_evasion * t.reserve
-        if random.random() >= self.chance(a, t, bonus_hit):
+        if random.random() >= self.chance(a, t, bonus_hit) * a.aim():
             return False
         raw = a.crit_raw() + bonus_crit + self.r.crit_bonus
         crit = self.r.crit + max(0, raw - 0.95) + crit_extra + a.gear.crit_damage if random.random() < min(0.95, raw) else 1.0
