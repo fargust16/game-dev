@@ -1,10 +1,10 @@
 # 91 Agent Decision Record
 
-Version: 1.13
+Version: 1.14
 
 Status: Draft
 
-Last Updated: 2026-11-03 (shooters and mages stay weak alone, by the owner's decision, and the earlier AGENTS note moved here. Earlier: Kinds of fighter recorded, and the earlier AGENTS note moved here. Earlier: Shops and Masters, and Wait and Defensive Stance, recorded. Earlier: the slice's numbers in Items in fights updated. Earlier: the allies' edge in items recorded. Earlier: the Alchemical Flask rejected by the owner, and items recorded as what decides fights. Earlier: group fights on the Combat Grid recorded, and the Alchemical Flask proposed. Earlier: the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
+Last Updated: 2026-11-03 (any initiated character infuses, with no training, by the owner's decision, and the earlier AGENTS note moved here. Earlier: shooters and mages stay weak alone, by the owner's decision, and the earlier AGENTS note moved here. Earlier: Kinds of fighter recorded, and the earlier AGENTS note moved here. Earlier: Shops and Masters, and Wait and Defensive Stance, recorded. Earlier: the slice's numbers in Items in fights updated. Earlier: the allies' edge in items recorded. Earlier: the Alchemical Flask rejected by the owner, and items recorded as what decides fights. Earlier: group fights on the Combat Grid recorded, and the Alchemical Flask proposed. Earlier: the earlier AGENTS note moved here. Earlier: the capital's final battle is an owner-approved exception to the rule on going for the ritual first. Earlier: the owner's odds with no player and allied conduct recorded. Earlier: Campaign Numbers V0 recorded, checked by a campaign simulation. Earlier: traces of the Ritual Weak Points recorded. Earlier: a conductor who fights loses 3 AP, owner-approved.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [AGENTS.md](AGENTS.md)
@@ -79,8 +79,9 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 ## Kinds of fighter
 
 - Owner's direction, 2026-11-02: fighters who go through critical hits, plain attack, magic, and ranged attacks are about equal overall and play against each other: mages are good against plate, shooters against mages, and plate against shooters, because arrows do not pierce physical armour. Critical hits stand level with the others, and Initiative is no automatic win. The style is Victorian: staffs and wands are cancelled, with no standard fireball; the crossbow is removed; gunpowder rifles and pistols, with a shot and a Reload, join swords, daggers, and hand weapons; and the bow stays for now. Characters of high Intelligence attack with the same items and fill their weapon with magic through Will Power: it adds magical damage, works with no spell, comes more often with more Will, and goes through heavy armour better. Magical weapons exist. Crafting has no ceiling: its price is time and effort.
-- Authoring defaults and working readings in [10.2](10.2%20Combat%20System%20Draft.md) §5b, checked by `tools/balance/build_sim.py`: physical defence counts double against ranged physical damage; Infusion costs a flat 5 × S a blow and adds `weapon base × Stage Factor × Intelligence / 24`; chain halves it and plate stops it; any initiated character can infuse; a melee critical hit halves physical defence; the load bands take Evasion and AP in a fight, so that Strength pays for heavy armour. Five builds of one budget reach 46–54 % five against five, with the triangle at 71, 88, and 72. Alone a shooter wins 27 % and a mage 34 %.
-- Owner-approved, 2026-11-03: shooters and mages stay weak alone, against 60–65 % for melee builds, as the price of their strength in a group. Other open points are CC-49.
+- Authoring defaults and working readings in [10.2](10.2%20Combat%20System%20Draft.md) §5b, checked by `tools/balance/build_sim.py`: physical defence counts double against ranged physical damage; Infusion costs a flat 5 × S a blow and adds `weapon base × Stage Factor × Intelligence / 24`; chain halves it and plate stops it; a melee critical hit halves physical defence; the load bands take Evasion and AP in a fight, so that Strength pays for heavy armour. Five builds of one budget reach 46–54 % five against five, with the triangle at 71, 88, and 72. Alone a shooter wins 27 % and a mage 34 %.
+- Owner-approved, 2026-11-03: shooters and mages stay weak alone, against 60–65 % for melee builds, as the price of their strength in a group.
+- Owner-approved, 2026-11-03: any character who has entered an Arcana can infuse, with no training; the power comes with initiation, and an Uninitiated character has none. Other open points are CC-49.
 
 ## Campaign odds
 
@@ -159,6 +160,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 # AGENTS.md Update History
 
 The notes of `AGENTS.md`, newest first.
+
+2026-11-03 (shooters and mages stay weak alone)
 
 2026-11-02 (the kinds of fighter balanced; rifles, pistols, and Infusion added; staffs, wands, and crossbows out)
 
