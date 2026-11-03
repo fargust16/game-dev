@@ -12,7 +12,8 @@ namespace GameDev.World
     {
         public static WorldClock Instance { get; private set; }
 
-        [SerializeField] private float worldHours = 9f;
+        [Tooltip("A slice run starts at 08:00 on day 1 (11 Vertical Slice).")]
+        [SerializeField] private float worldHours = 8f;
         [Tooltip("Realtime seconds that equal one in-world hour.")]
         [SerializeField] private float realtimeSecondsPerWorldHour = 45f;
         [SerializeField] private bool isPaused;

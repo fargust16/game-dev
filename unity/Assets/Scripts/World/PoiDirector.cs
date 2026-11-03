@@ -49,12 +49,15 @@ namespace GameDev.World
                     continue;
                 }
 
-                if (!poi.windowOpen)
+                // 04: a window runs from the POI's appearance, never from its discovery.
+                if (!poi.windowOpen && now >= poi.appearsAtHours)
                 {
-                    continue;
+                    poi.windowOpen = true;
+                    poi.windowStartHours = poi.appearsAtHours;
+                    poi.windowEndHours = poi.appearsAtHours + poi.windowHours;
                 }
 
-                if (now < poi.windowEndHours)
+                if (!poi.windowOpen || now < poi.windowEndHours)
                 {
                     continue;
                 }
@@ -86,7 +89,6 @@ namespace GameDev.World
                 foreach (var id in marks)
                 {
                     changed |= RaiseDiscovery(id, PoiDiscoveryState.Marked);
-                    EnsureWindowStarted(id);
                 }
             }
 
@@ -108,6 +110,12 @@ namespace GameDev.World
                 return;
             }
 
+            if (poi.discovery != PoiDiscoveryState.Resolved && !poi.windowOpen)
+            {
+                InteractionFeedback.Show(Label(id), "Nothing here draws your attention yet.");
+                return;
+            }
+
             if (poi.discovery == PoiDiscoveryState.Unknown)
             {
                 InteractionFeedback.Show(
@@ -124,19 +132,6 @@ namespace GameDev.World
                         ? "This moment has already passed. Residue remains in the district."
                         : poi.aftermathText);
                 return;
-            }
-
-            if (poi.id == PoiShellId.PoiC_SootStairTrace && !CanOpenTrace())
-            {
-                InteractionFeedback.Show(
-                    Label(id),
-                    "Ash and boot-scuffs, but nothing that resolves into a story yet. Aftermath from the arrest or collectors will wake this Trace.");
-                return;
-            }
-
-            if (!poi.windowOpen)
-            {
-                EnsureWindowStarted(id);
             }
 
             if (WorldClock.Instance != null && WorldClock.Instance.WorldHours >= poi.windowEndHours)
@@ -198,29 +193,43 @@ namespace GameDev.World
                 return $"{baseName} [Resolved]";
             }
 
-            var urgency = WindowUrgency(poi);
-            var state = poi.discovery == PoiDiscoveryState.Marked ? "Marked" : "Hinted";
-            return string.IsNullOrEmpty(urgency) ? $"{baseName} [{state}]" : $"{baseName} [{state}/{urgency}]";
+            // 04 rule 5: a Marked POI shows its urgency in its source's words, never as a countdown.
+            return poi.discovery == PoiDiscoveryState.Marked
+                ? $"{baseName} [Marked: {poi.urgencyWords}]"
+                : $"{baseName} [Hinted]";
         }
 
+        /// <summary>
+        /// Slice times, 11 Vertical Slice (authoring defaults, 2026-11-03): A 14:00–20:00 on day 1,
+        /// B 23:00–02:00 the same night, C from its appearance; the slice has no invasion yet, so C keeps a Standard window.
+        /// </summary>
         private void BootstrapDefaults()
         {
             _pois[PoiShellId.PoiA_HarrowArrest] = new RuntimePoi
             {
                 id = PoiShellId.PoiA_HarrowArrest,
                 windowClass = ActiveWindowClass.Short,
+                appearsAtHours = 14f,
+                windowHours = 6f,
+                urgencyWords = "before the whistle",
                 discovery = PoiDiscoveryState.Unknown
             };
             _pois[PoiShellId.PoiB_EleventhBellCollectors] = new RuntimePoi
             {
                 id = PoiShellId.PoiB_EleventhBellCollectors,
                 windowClass = ActiveWindowClass.Brief,
+                appearsAtHours = 23f,
+                windowHours = 3f,
+                urgencyWords = "tonight",
                 discovery = PoiDiscoveryState.Unknown
             };
             _pois[PoiShellId.PoiC_SootStairTrace] = new RuntimePoi
             {
                 id = PoiShellId.PoiC_SootStairTrace,
                 windowClass = ActiveWindowClass.Standard,
+                appearsAtHours = float.PositiveInfinity, // appears when an A or B aftermath wakes it
+                windowHours = 72f,
+                urgencyWords = "before the rain",
                 discovery = PoiDiscoveryState.Unknown
             };
         }
@@ -232,12 +241,8 @@ namespace GameDev.World
                 return false;
             }
 
-            if (poi.discovery == PoiDiscoveryState.Resolved)
-            {
-                return false;
-            }
-
-            if (id == PoiShellId.PoiC_SootStairTrace && !CanOpenTrace())
+            // A tip cannot name what has not appeared yet.
+            if (poi.discovery == PoiDiscoveryState.Resolved || !poi.windowOpen)
             {
                 return false;
             }
@@ -248,41 +253,12 @@ namespace GameDev.World
             }
 
             poi.discovery = target;
-            EnsureWindowStarted(id);
 
             InteractionFeedback.Show(
                 "Discovery",
                 $"{Label(id)} is now {target}.",
                 3.5f);
             return true;
-        }
-
-        private void EnsureWindowStarted(PoiShellId id)
-        {
-            if (!_pois.TryGetValue(id, out var poi))
-            {
-                return;
-            }
-
-            if (poi.discovery == PoiDiscoveryState.Resolved || poi.windowOpen)
-            {
-                return;
-            }
-
-            if (poi.discovery == PoiDiscoveryState.Unknown)
-            {
-                return;
-            }
-
-            if (id == PoiShellId.PoiC_SootStairTrace && !CanOpenTrace())
-            {
-                return;
-            }
-
-            var now = WorldClock.Instance != null ? WorldClock.Instance.WorldHours : 0f;
-            poi.windowOpen = true;
-            poi.windowStartHours = now;
-            poi.windowEndHours = now + HoursForClass(poi.windowClass);
         }
 
         private void ResolveUnattended(RuntimePoi poi)
@@ -292,16 +268,23 @@ namespace GameDev.World
                 return;
             }
 
+            var known = poi.discovery != PoiDiscoveryState.Unknown;
             poi.discovery = PoiDiscoveryState.Resolved;
             poi.windowOpen = false;
             poi.resolution = PoiResolutionKind.Unattended;
             poi.aftermathText = UnattendedText(poi.id);
             ApplyAftermathFlags(poi.id, unattended: true);
             MaybeUnlockTrace();
-            InteractionFeedback.Show(
-                Label(poi.id) + " — window closed",
-                poi.aftermathText,
-                8f);
+
+            // A POI the player never heard of leaves only residue, no announcement.
+            if (known)
+            {
+                InteractionFeedback.Show(
+                    Label(poi.id) + " — window closed",
+                    poi.aftermathText,
+                    8f);
+            }
+
             RefreshAllShellLabels();
         }
 
@@ -362,42 +345,21 @@ namespace GameDev.World
                 return;
             }
 
-            if (trace.discovery != PoiDiscoveryState.Unknown)
+            if (trace.discovery != PoiDiscoveryState.Unknown || trace.windowOpen)
             {
                 return;
             }
 
+            var now = WorldClock.Instance != null ? WorldClock.Instance.WorldHours : 0f;
+            trace.appearsAtHours = now;
+            trace.windowOpen = true;
+            trace.windowStartHours = now;
+            trace.windowEndHours = now + trace.windowHours;
             trace.discovery = PoiDiscoveryState.Hinted;
             InteractionFeedback.Show(
                 "Trace wakes",
                 "Soot Stair Trace is now Hinted — something left a readable residue under the factory wall.",
                 5f);
-        }
-
-        private string WindowUrgency(RuntimePoi poi)
-        {
-            if (!poi.windowOpen || WorldClock.Instance == null)
-            {
-                return poi.windowClass.ToString();
-            }
-
-            var left = poi.windowEndHours - WorldClock.Instance.WorldHours;
-            if (left <= 0f)
-            {
-                return "closing";
-            }
-
-            if (left < 2f)
-            {
-                return "urgent";
-            }
-
-            if (left < 6f)
-            {
-                return "soon";
-            }
-
-            return poi.windowClass.ToString();
         }
 
         private void RefreshAllShellLabels()
@@ -406,18 +368,6 @@ namespace GameDev.World
             foreach (var shell in shells)
             {
                 shell.RefreshPresentation();
-            }
-        }
-
-        private static float HoursForClass(ActiveWindowClass windowClass)
-        {
-            switch (windowClass)
-            {
-                case ActiveWindowClass.Brief: return 4f;
-                case ActiveWindowClass.Short: return 24f;
-                case ActiveWindowClass.Standard: return 72f;
-                case ActiveWindowClass.Long: return 168f;
-                default: return 240f;
             }
         }
 
@@ -469,6 +419,9 @@ namespace GameDev.World
             public PoiShellId id;
             public PoiDiscoveryState discovery;
             public ActiveWindowClass windowClass;
+            public float appearsAtHours;
+            public float windowHours;
+            public string urgencyWords;
             public bool windowOpen;
             public float windowStartHours;
             public float windowEndHours;
