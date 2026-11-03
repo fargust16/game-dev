@@ -72,7 +72,7 @@ def shielded(w):
 # quickest and truer than an axe or a mace, an axe hits as hard as a sword and finds more critical hits,
 # and a mace hits hardest, finds the fewest, and may stun. A greatsword also catches a second enemy.
 # Attribute Requirements (10.2 §5b), at stage 9; an item asks (10 − stage) times as much, so stage 8 asks double.
-# Below them a weapon hits half as often and armour gives half its defence.
+# Below them a weapon hits and armour defends in proportion: at half the requirement, half as well.
 DAGGER = Weapon("dagger", 3, 3, guard="parry", guard_chance=0.30, guard_absorb=1.0, stealth_mult=1.0, weight=1.0, accuracy=10, crit=0.25, req=(("dex", 4),))
 SWORD = Weapon("sword", 5, 4, guard="parry", guard_chance=0.40, guard_absorb=1.0, accuracy=5, req=(("str", 2), ("dex", 2)))
 AXE = Weapon("axe", 5, 5, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=2.2, crit=0.20, req=(("str", 4), ("dex", 3)))
@@ -88,7 +88,6 @@ PISTOL = Weapon("pistol", 5, 4, True, range=6, weight=1.2, accuracy=-10, req=(("
 
 ARMOUR = {"none": (0, 0), "cloth": (2, 20), "leather": (8, 8), "chain": (16, 3), "plate": (24, 0)}
 ARMOUR_REQ = {"leather": (("dex", 3),), "chain": (("str", 5),), "plate": (("str", 7),)}
-REQ_SHARE = 0.5
 
 
 def staged(weapon, stage):
@@ -213,19 +212,24 @@ class Unit:
         support = SUPPORT_DEFENCE if any("support" in u.abilities and u.hp > 0 and u is not self for u in side) else 0
         return ARMOUR[self.armour][0] * stage_factor(self.armour_stage) * self.armour_share() + support + self.gear.defence
 
-    def meets(self, req, stage):
-        """gear_stage, when set, stands for the stage of the fighter's gear: build_sim.py keeps its items at
-        Stage Factor 1 for comparison but asks the requirements of the Limit its builds stand for."""
+    def fit(self, req, stage):
+        """The share of an item that works: the attribute furthest below its requirement over that requirement,
+        so half the requirement gives half the item. gear_stage, when set, stands for the stage of the fighter's
+        gear: build_sim.py keeps its items at Stage Factor 1 for comparison but asks the requirements of the Limit
+        its builds stand for."""
         scale = 10 - (self.gear_stage or stage)
-        return all(getattr(self, a) >= v * scale for a, v in req)
+        return min((min(1.0, getattr(self, a) / (v * scale)) for a, v in req), default=1.0)
+
+    def meets(self, req, stage):
+        return self.fit(req, stage) == 1.0
 
     def aim(self):
-        """Below its weapon's Attribute Requirements a fighter hits half as often."""
-        return 1.0 if self.meets(self.weapon.req, self.weapon.stage) else REQ_SHARE
+        """Below its weapon's Attribute Requirements a fighter hits less often, in proportion to the shortfall."""
+        return self.fit(self.weapon.req, self.weapon.stage)
 
     def armour_share(self):
-        """Below its armour's Attribute Requirements a fighter gets half the armour's defence."""
-        return 1.0 if self.meets(ARMOUR_REQ.get(self.armour, ()), self.armour_stage) else REQ_SHARE
+        """Below its armour's Attribute Requirements a fighter gets that share of the armour's defence."""
+        return self.fit(ARMOUR_REQ.get(self.armour, ()), self.armour_stage)
 
     def can_spend(self, share):
         return self.wp > self.max_wp() * share
