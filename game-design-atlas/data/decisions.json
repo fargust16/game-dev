@@ -1255,7 +1255,7 @@
   },
   {
     "id": "d-stealth",
-    "statement": "Stealth is a special action. NPCs have 10-cell Vision Cones whose angle Vigilance sets, and a Notice Meter fills by Stealth skill and Dexterity against Perception. Darkness adds to Stealth skill, and noise is not simulated. Perception shows the meter and Intelligence the cones. An NPC that loses sight of the character checks the last place and stays Alert. Outside a fight allies break stealth too. A stealth attack rolls to hit as usual, adds 50 percentage points of critical chance, and never stuns.",
+    "statement": "Stealth is a special action. NPCs have 10-cell Vision Cones whose angle the World Inhabitants slider sets, Vigilance being folded into it, and a Notice Meter fills by Stealth skill and Dexterity against Perception. Darkness adds to Stealth skill, and noise is not simulated. Perception shows the meter and Intelligence the cones. An NPC that loses sight of the character checks the last place and stays Alert, with its own Perception 25 % higher. Outside a fight allies break stealth too. A stealth attack rolls to hit as usual, adds 50 percentage points of critical chance, and never stuns.",
     "rationale": "Gives Veil real rules, ties what the player can read to attributes, and keeps striking from hiding from answering every fight.",
     "alternatives": "Single checks of Dexterity against Perception, which are simpler but opaque.",
     "systemIds": [

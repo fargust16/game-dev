@@ -1,10 +1,10 @@
 # 03 Decision Engine
 
-Version: 0.2.5
+Version: 0.3.5
 
 Status: Draft
 
-Last Updated: 2026-11-02 (Side Events change the war directly, and Faction Influence is read from it. Earlier: nine Difficulty Settings. Earlier: the Starting Faction retired. Earlier: retired World Difficulty wording replaced with the independent Difficulty Settings; 21 added as a dependent document.)
+Last Updated: 2026-11-03 (eight Difficulty Settings. Earlier: Side Events change the war directly, and Faction Influence is read from it. Earlier: nine Difficulty Settings. Earlier: the Starting Faction retired. Earlier: retired World Difficulty wording replaced with the independent Difficulty Settings; 21 added as a dependent document.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md)
@@ -139,7 +139,7 @@ Side Events from [02 World Laws](02%20World%20Laws.md) are standard Allegiance n
 
 Every character begins Factionless until Faction Entry. Membership, betrayal, neutrality, and aid to rivals remain Allegiance decisions because access, Symptoms, and open paths change with them. Full rules live in [07 Character Life](07%20Character%20Life.md).
 
-Difficulty Settings are nine independent sliders ([02 World Laws](02%20World%20Laws.md)). They raise challenge; they do not invent a single correct strategy.
+Difficulty Settings are eight independent sliders ([02 World Laws](02%20World%20Laws.md)). They raise challenge; they do not invent a single correct strategy.
 
 # Information Before Choice
 
