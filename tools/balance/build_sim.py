@@ -60,7 +60,6 @@ BUILDS.update({
     "attack in plate": variant(ATTACK, armour="plate"),
     "crit, dagger": variant(CRIT, weapon=c.DAGGER),
     "crit, Initiative": variant(CRIT, mods=TEMPO),
-    "bow": variant(SHOOTER, weapon=c.BOW),
     "pistol": variant(SHOOTER, weapon=c.PISTOL),
     "rifle, Initiative": variant(SHOOTER, mods=("damage", "accuracy", "initiative")),
     "rifle in plate": variant(SHOOTER, armour="plate"),

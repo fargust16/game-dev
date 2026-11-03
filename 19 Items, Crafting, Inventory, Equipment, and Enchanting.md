@@ -1,8 +1,8 @@
 # 19 Items, Crafting, Inventory, Equipment, and Enchanting
 
-Version: 0.10
+Version: 0.11
 Status: Draft — owner-confirmed rules with delegated starting-balance formulas; content tables, operation costs, and selected edge cases remain open
-Last Updated: 2026-11-03 (V1 counts no ammunition, by the owner's decision. Earlier: catalogue gains Magical Damage, Will Power, and magical defence, and critical and defence values rise; crossbows out, rifle and pistol in; crafting has no ceiling, by the owner's decision. Earlier: shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
+Last Updated: 2026-11-03 (bows and the mini-crossbow removed by the owner: weapons are iron, for melee and firearms. Earlier: V1 counts no ammunition, by the owner's decision. Earlier: catalogue gains Magical Damage, Will Power, and magical defence, and critical and defence values rise; crossbows out, rifle and pistol in; crafting has no ceiling, by the owner's decision. Earlier: shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -104,7 +104,7 @@ Owner's direction, 2026-11-02: items strengthen a character significantly, and w
 | Ring | Damage, Critical chance, Critical damage, Magical Damage, Maximum Will Power |
 | Necklace | Will, HP, Initiative, Accuracy, Maximum Will Power, Magical defence |
 
-A whole set is 11 pieces. A set from a city shop, at Shop Skill 26 (§6.1), carries about 16 modifiers, and one from a capital Master, at 50, about 26. A character with skill 1–10 averages under one modifier an item. A weapon with Magical Damage is what a magic pistol or a magic bow is, and it needs no Will Power, unlike Infusion (10.2 §5b). Critical chance and Critical damage here are item modifiers, not the separately levelled attributes that [07.2](07.2%20Derived%20Character%20Statistics.md) excludes.
+A whole set is 11 pieces. A set from a city shop, at Shop Skill 26 (§6.1), carries about 16 modifiers, and one from a capital Master, at 50, about 26. A character with skill 1–10 averages under one modifier an item. A weapon with Magical Damage is what a magic pistol or a magic rifle is, and it needs no Will Power, unlike Infusion (10.2 §5b). Critical chance and Critical damage here are item modifiers, not the separately levelled attributes that [07.2](07.2%20Derived%20Character%20Statistics.md) excludes.
 
 # 3. Item Creation
 
@@ -143,14 +143,14 @@ For every generated modifier, the selected base supplies the fixed type weights;
 - Personal inventory is an unlimited bag: there is no item-count cap, grid capacity, or variable footprint. Every item has the same-size inventory entry/icon; weight is the only carrying limit.
 - Every carried item has an assigned weight. Total carried weight includes equipped items and equals the sum of item weights; stack weight is the per-unit weight multiplied by quantity. Currency/gold weighs 0 and never changes the load.
 - Starting weight balance (kg): ring 0.05; necklace/amulet 0.10; belt 0.25. Cloth armour: head 0.5, body 2, shoulders 0.8, gloves 0.4, trousers 1.2, boots 0.8. Leather armour: 1, 4, 1.5, 0.8, 2.5, 1.5 respectively. Chain armour: 1.8, 7.5, 3, 1.4, 4.5, 3 respectively. Plate/heavy-metal armour: 2.8, 11, 4.5, 2, 7, 4.5 respectively.
-- Starting hand-item weights (kg): one-handed wooden weapon 1; one-handed metal/iron weapon 2; two-handed wooden weapon 2.5; two-handed metal/iron weapon 5; wooden shield 2.5; metal shield 4; bow 1.5; rifle 4; pistol 1.2.
+- Starting hand-item weights (kg): one-handed iron weapon 2; two-handed iron weapon 5; wooden shield 2.5; metal shield 4; rifle 4; pistol 1.2.
 - These weights are initial balance values. Specific bases, tools, materials, consumables, and additional item families must receive explicit weights in their content definitions. Cloth should remain lighter than leather, leather lighter than chain, and plate/heavy metal heaviest; jewellery is nearly weightless.
 - Working base damage, attack AP, armour values, and block and parry chances are in [10.2](10.2%20Combat%20System%20Draft.md) §5b.
 - Stacking, equipment slots, and containers remain distinct from item footprints. A separate home stash is intended, but its capacity and whether it is weight-limited remain open.
 
 ## 4.2 Equipment
 
-- The character has two universal hand slots. Compatible one-handed weapons, shields, talismans, books, and similar items may occupy either hand; a two-handed item uses both. A bow occupies one hand while drawing its arrows takes the other. V1 counts neither arrows nor cartridges as items, by the owner's decision of 2026-11-03. A rifle uses both hands, and a pistol one. Staffs and wands do not exist, by the owner's direction of 2026-11-02.
+- The character has two universal hand slots. Compatible one-handed weapons, shields, talismans, books, and similar items may occupy either hand; a two-handed item uses both. A rifle uses both hands, and a pistol one. V1 counts no cartridges as items, by the owner's decision of 2026-11-03. Every weapon is iron, a melee weapon or a firearm: staffs and wands do not exist, by the owner's direction of 2026-11-02, and bows and crossbows of any size do not exist, by the owner's decision of 2026-11-03.
 - Current body/accessory slot direction: head, body, shoulders, gloves, belt, trousers, boots, two rings, and one necklace/amulet slot. Necklace and amulet share one slot.
 - Exact compatibility, requirements, final slot catalogue, and recalculation of derived values remain open. See [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md) and [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
 

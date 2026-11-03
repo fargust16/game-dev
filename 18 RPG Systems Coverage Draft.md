@@ -1,8 +1,8 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.16
+Version: 0.17
 Status: Draft
-Last Updated: 2026-11-02 (open items run to CC-48; Masters of gathering exist in the slice. Earlier: open items run to CC-46. Earlier: Evasion and Blocking follow 10.2; question range corrected. Earlier: Persuasion, Intimidation, and Deception confirmed in 10.4. Earlier: terms renamed to Arcana and Limit. Earlier: Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
+Last Updated: 2026-11-03 (bows and the mini-crossbow removed by the owner: weapons are iron, for melee and firearms. Earlier: open items run to CC-48; Masters of gathering exist in the slice. Earlier: open items run to CC-46. Earlier: Evasion and Blocking follow 10.2; question range corrected. Earlier: Persuasion, Intimidation, and Deception confirmed in 10.4. Earlier: terms renamed to Arcana and Limit. Earlier: Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [99 Open Questions](99%20Open%20Questions.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -325,7 +325,7 @@ The existing [06 Approaches](06%20Approaches.md) remain the larger decision fram
 | Action | Candidate skill | Candidate attribute influences | Notes |
 |---|---|---|---|
 | Fight with melee weapons | Melee Weapon Proficiency (working name) | Strength, Dexterity | Whether weapon types have separate skills is undecided. |
-| Fight with ranged weapons | Ranged Weapon Proficiency (working name) | Dexterity, Perception | Whether bows, thrown weapons, and other ranged weapons are separate is undecided. |
+| Fight with ranged weapons | Ranged Weapon Proficiency (working name) | Dexterity, Perception | Ranged weapons are firearms only: bows and crossbows are removed by the owner (2026-11-03). Whether rifle and pistol have separate skills is undecided. |
 | Evade an attack | Evasion | Dexterity, Perception | Not a skill: the owner rejected a standalone Evasion skill ([10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md)). |
 | Block an attack | Blocking | Strength, Dexterity | A combat reaction: its chance comes from equipment, abilities, and effects ([10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md)). |
 | Use magical or Arcana abilities | Ability-specific system, not a generic “combat abilities” skill | Depends on the ability | A separate design pass must cover supernatural powers, costs, requirements, combat use, and non-combat use. Do not collapse all magic into one skill by default. |

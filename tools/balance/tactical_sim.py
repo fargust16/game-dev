@@ -582,11 +582,6 @@ def without_abilities(u):
     return u
 
 
-def bowman(u):
-    u.weapon = c.BOW
-    return u
-
-
 def changed(attribute, n=3):
     units = side()
     for u in units:
@@ -616,7 +611,6 @@ SIDES = {
     "+ Limit 8, whole": lambda: side() + [c.ally8()],
     "+ Limit 8, no Дрёма": lambda: side() + [without_abilities(c.ally8())],
     "+ Limit 9": lambda: side() + [c.ally9()],
-    "+ Limit 9 with a bow": lambda: side() + [bowman(c.ally9())],
     "+ club": lambda: side() + [c.new_character()],
     "+ hero of Limit 9": lambda: side() + [c.hero9()],
     "+ hero of Limit 8": lambda: side() + [c.hero()],

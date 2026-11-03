@@ -61,7 +61,6 @@ DAGGER = Weapon("dagger", 3, 3, guard="parry", guard_chance=0.30, guard_absorb=1
 ONE_HAND = Weapon("one-hand", 5, 5, guard="parry", guard_chance=0.40, guard_absorb=1.0)
 SHIELDED = Weapon("one-hand and shield", 5, 5, guard="block", guard_chance=0.60, guard_absorb=0.8, weight=6.0)
 TWO_HAND = Weapon("two-hand", 9, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=5.0)
-BOW = Weapon("bow", 4, 5, True, weight=1.5)
 RIFLE = Weapon("rifle", 9, 10, True, reload=7, range=16, weight=4.0)
 PISTOL = Weapon("pistol", 7, 8, True, reload=5, range=6, weight=1.2)
 
@@ -366,7 +365,7 @@ def new_character():
     return Unit("new", None, 6, 5, 3, 1, 1, will=1, weapon=Weapon("club", 4, 5), armour="none", focus=True)
 
 
-def priestess(abilities=("sleep",), weapon=BOW):
+def priestess(abilities=("sleep",), weapon=RIFLE):
     return Unit("priestess", 8, 4, 5, 6, 14, 10, will=4, intl=12, weapon=weapon, armour="cloth", focus=True, abilities=abilities)
 
 
@@ -404,8 +403,7 @@ def main():
     report("Hero, dagger", [hero(DAGGER, abilities=())], [plain()])
     report("Hero, dagger, two blows and two parries", [hero(DAGGER, abilities=(), guarded=True)], [plain()])
     report("Hero, chain", [hero(ONE_HAND, "chain", abilities=())], [plain()])
-    report("Priestess, bow", [priestess(())], [plain()])
-    report("Priestess, rifle", [priestess((), RIFLE)], [plain()])
+    report("Priestess, rifle", [priestess(())], [plain()])
 
     print("\nThe player, with abilities")
     report("New character v L9", [new_character()], [follower9()])

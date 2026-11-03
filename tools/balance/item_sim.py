@@ -406,7 +406,6 @@ LEVERS = {
     "Limit 8 with two-handed": lambda: each(lambda u: armed(u, c.TWO_HAND, 8)),
     "Limit 9 in melee, no shooters": lambda: [V0.wears(V0.allies)(u) for u in t.allies()],
     "allies do not infuse": lambda: each(lambda u: setattr(u, "infuse", False)),
-    "Limit 9 with bows": lambda: each(lambda u: armed(u, c.BOW, 9)),
     "+3 Strength on all": lambda: each(lambda u: raised(u, "str")),
     "+3 Endurance on all": lambda: each(lambda u: raised(u, "end")),
     "+3 Dexterity on all": lambda: each(lambda u: raised(u, "dex")),
