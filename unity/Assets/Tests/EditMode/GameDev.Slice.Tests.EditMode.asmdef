@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "GameDev.World.Seed",
         "GameDev.World.Time",
-        "GameDev.Slice"
+        "GameDev.Slice",
+        "GameDev.Slice.Editor"
     ],
     "includePlatforms": [
         "Editor"

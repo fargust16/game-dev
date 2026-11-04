@@ -89,6 +89,8 @@ Accepted when: the player walks the city and the forest in third person; enters 
 
 S0.1–S0.5 need nothing from the owner. S0.6 needs the C0 map and the first kit blocks; stand-ins fill the gaps.
 
+Progress: S0.1 done, 12 tests (commit `0bb96fd`). S0.2 done: the layers `Ground`, `Structure`, `Prop`, `Vegetation`, `Character`, `Interactable`, `NoGrid` at 8–14; `KitBlock` and `KitEnvironmentAction`; the layout check and eight stand-ins (kit standard §9–§9a); 6 tests, 18 in all. S0.2 also fixed the kit standard: pivots sit on grid nodes, and a post fills a node where walls meet.
+
 ### S1 — Information and POIs
 
 | Part | Systems | Notes |

@@ -2,7 +2,7 @@
 
 Status: Draft — authoring defaults set by the agent; the owner's decision that sets the frame is marked
 Created: 2026-11-04
-Last Updated: 2026-11-04
+Last Updated: 2026-11-04 (S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [10.1 Grid World and Environment Actions](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [COMBAT_GRID_TECH_TEST.md](COMBAT_GRID_TECH_TEST.md)
 Used by: [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -20,7 +20,7 @@ This standard says what a block must be so that it snaps together, so that the C
 
 - 1 Unity unit = 1 m. Y is up. A block is modelled at its real size and imported at scale 1.
 - The front of a block faces +Z.
-- **Pivot** at the block's bottom-left-back corner, so a block placed on whole metres lands on the grid.
+- **Pivot on a grid node**, so a block placed on whole metres lands on the grid: at the bottom-left-back corner of a block that fills cells (crate, street tile, tree), and at the bottom-left end of the centre line of a linear block (wall, fence), because that line lies on the grid line (§2). Corrected 2026-11-04 in S0.2: a corner pivot would put a wall's centre line half a thickness off the grid.
 - Rotations are multiples of 90° about Y only.
 
 ## 2. The grid that everything follows
@@ -29,6 +29,7 @@ The Combat Grid has **1 m cells aligned to the world** (measured: at 1.5 m narro
 
 - Footprints are whole metres. Preferred wall widths are 1, 2, and 4 m.
 - **A wall stands on a grid line, centred on it,** at most 0.3 m thick. A capsule of radius 0.3 m (measured) then still stands in the middle of the cells on both sides, so a wall closes the edge between two cells and costs neither cell.
+- **Where linear blocks meet** (authoring default, 2026-11-04): a wall or fence stops half its thickness short of each grid node, and a **post** of the wall's thickness fills a node where walls meet at a corner or a run ends. A wall of nominal width 4 m is therefore 3.7 m long. A T-junction needs no post: the through wall's face meets the end of the other. Without this, walls meeting at a corner share a square of their thickness and break the non-overlap law (§6).
 - A floor or street surface top sits at a whole 0.1 m height.
 
 ## 3. Sizes that gameplay depends on
@@ -94,6 +95,12 @@ A block that can be vaulted, climbed, or breached in a fight carries a tag compo
 ## 9. Stand-ins
 
 Code may need a block before the owner's side has made it. A stand-in is a plain box at the block's exact size, collider, layer, and name, under `Assets/Prefabs/SliceKit/_StandIn/`. When the real block arrives it replaces the stand-in in place, and the grid must read the same cells.
+
+The menu *GameDev → Slice → Create Kit Stand-ins* (S0.2) writes the first set: a wall 4×3 and 2×3, a post, a 3×3 wall with a 1.2 × 2.2 m doorway over its middle cell edge, a fence 2×1 at 0.1 m thick, a crate 1×1, a street tile 4×4, and a tree trunk of radius 0.3 m and 4 m high.
+
+## 9a. The layout check
+
+The menu *GameDev → Slice → Check Kit Layout* (S0.2) reads every `KitBlock` in the open scenes and reports, without moving anything: a block off the 1 m grid, off the 0.1 m height step, turned other than by 90° about Y, or scaled; a block on a layer that is not a kit block layer; a solid block (`Ground`, `Structure`, `Prop`, `Vegetation`) without a solid collider, and a `NoGrid` block with one; and two blocks whose solid colliders overlap by more than 0.01 m. Touching is allowed. A block whose Environment Action matters carries `KitEnvironmentAction` with its action and band (§5).
 
 ## 10. Acceptance of a block
 
