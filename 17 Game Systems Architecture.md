@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 1.18
+Version: 1.19
 
 Status: Draft
 
-Last Updated: 2026-11-04 (L.1–L.3: the code lives in its owning folders, from S0.3. Earlier: X.1: the first `IWorldClock` contract, from S0.1. Earlier: next code default: the Vertical Slice implementation plan, in one hand-built scene, by the owner's decision. Earlier: the slice's Suspend Save, townsfolk schedules, and the Item Creation workshop, by the owner's answers. Earlier: unseen fights run the tactical rules without drawing, by the owner. Earlier: faction state holds forces and City Control; Influence is read from them. Earlier: Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
+Last Updated: 2026-11-04 (I.1–I.3: the first doors, from S0.4. Earlier: L.1–L.3: the code lives in its owning folders, from S0.3. Earlier: X.1: the first `IWorldClock` contract, from S0.1. Earlier: next code default: the Vertical Slice implementation plan, in one hand-built scene, by the owner's decision. Earlier: the slice's Suspend Save, townsfolk schedules, and the Item Creation workshop, by the owner's answers. Earlier: unseen fights run the tactical rules without drawing, by the owner. Earlier: faction state holds forces and City Control; Influence is read from them. Earlier: Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
 
 Depends On:
 [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -414,6 +414,8 @@ Code state after slice iteration S0.3: L.1–L.3 each have their own assembly in
 | **Extensibility** | Hooks for NPC/Dialogue systems. |
 | **V1 scope / Deferred** | Interior V0 greybox room. |
 | **Owning folder** | `unity/Assets/Scripts/World/Interiors/` |
+
+Code state after slice iteration S0.4: I.1–I.3 each have their own assembly in the owning folder: `GameDev.World.Portals` (`Portal`), `GameDev.Core.Scenes` (`TravelRequest`, `SceneTransition`), `GameDev.World.Interiors` (`InteriorRuntime`). One change from the cards above: a `TravelRequest` names the arrival door, not a return pose, and that door holds the pose, so the street door is the interior's way back and a door's place is saved with its scene, not in the request. Theme tags and the interfaces wait for a second implementation. A door costs no game time of its own (authoring default); the clock, which outlives the scene, runs through the load.
 
 ---
 

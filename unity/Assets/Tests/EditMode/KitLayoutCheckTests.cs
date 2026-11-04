@@ -52,14 +52,15 @@ namespace GameDev.Slice.Tests
             CollectionAssert.IsEmpty(CheckAll().Select(f => f.ToString()));
         }
 
-        [Test]
-        public void TheMovementTestSceneIsClean()
+        [TestCase(SliceTestScenes.MovementScenePath, 100)]
+        [TestCase(SliceTestScenes.TavernScenePath, 20)]
+        public void ATestSceneIsClean(string path, int minimumBlocks)
         {
-            var scene = EditorSceneManager.OpenScene(SliceTestScenes.MovementScenePath, OpenSceneMode.Additive);
+            var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
             try
             {
                 var blocks = scene.GetRootGameObjects().SelectMany(go => go.GetComponentsInChildren<KitBlock>()).ToList();
-                Assert.Greater(blocks.Count, 100);
+                Assert.Greater(blocks.Count, minimumBlocks);
                 CollectionAssert.IsEmpty(KitLayoutCheck.Check(blocks).Select(f => f.ToString()));
             }
             finally

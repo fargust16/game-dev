@@ -37,6 +37,17 @@ namespace GameDev.Locomotion
 
         public bool IsGrounded => _controller != null && _controller.isGrounded;
 
+        /// <summary>Puts the player at a pose at once, as a door does; a CharacterController ignores a moved transform
+        /// while it is enabled.</summary>
+        public void Teleport(Vector3 position, Quaternion rotation)
+        {
+            var controller = _controller != null ? _controller : GetComponent<CharacterController>();
+            controller.enabled = false;
+            transform.SetPositionAndRotation(position, rotation);
+            controller.enabled = true;
+            _verticalVelocity = 0f;
+        }
+
         private void Awake()
         {
             _controller = GetComponent<CharacterController>();

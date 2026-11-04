@@ -7,7 +7,9 @@
         "GameDev.World.Seed",
         "GameDev.World.Time",
         "GameDev.Slice",
-        "GameDev.Slice.Editor"
+        "GameDev.Slice.Editor",
+        "GameDev.Core.Scenes",
+        "GameDev.World.Portals"
     ],
     "includePlatforms": [
         "Editor"

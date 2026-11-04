@@ -8,7 +8,10 @@
         "GameDev.Input",
         "GameDev.Locomotion",
         "GameDev.Cameras",
-        "GameDev.World.Time"
+        "GameDev.World.Time",
+        "GameDev.Core.Scenes",
+        "GameDev.World.Portals",
+        "GameDev.World.Interiors"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,4 +1,5 @@
 using GameDev.Slice.Kit;
+using GameDev.World.Portals;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,8 +26,10 @@ namespace GameDev.Slice.EditorTools
             EnsureFolder(Folder);
             Save(Linear("Kit_Wall_StandIn_4x3", KitLayers.Structure, 4f, 3f, WallThickness));
             Save(Linear("Kit_Wall_StandIn_2x3", KitLayers.Structure, 2f, 3f, WallThickness));
+            Save(Linear("Kit_Wall_StandIn_1x3", KitLayers.Structure, 1f, 3f, WallThickness));
             Save(Post("Kit_Post_StandIn_0x3", 3f));
             Save(Doorway("Kit_Door_StandIn_3x3"));
+            Save(PortalDoor("Kit_PortalDoor_StandIn_3x3"));
             Save(Linear("Kit_Fence_StandIn_2x1", KitLayers.Prop, 2f, 1f, FenceThickness));
             Save(Crate("Kit_Crate_StandIn_1x1"));
             Save(Street("Kit_Street_StandIn_4x4", 4f));
@@ -65,6 +68,22 @@ namespace GameDev.Slice.EditorTools
             Box(root, new Vector3(half, 0f, -half), new Vector3(openingLeft, height, half));
             Box(root, new Vector3(openingRight, 0f, -half), new Vector3(3f - half, height, half));
             Box(root, new Vector3(openingLeft, openingTop, -half), new Vector3(openingRight, height, half));
+            return root;
+        }
+
+        /// <summary>
+        /// A doorway closed by its leaf, marked as a portal (kit standard §6): the leaf is an Interactable child with
+        /// its own collider, inside the opening. Each placed door gets its ids in the scene.
+        /// </summary>
+        public static GameObject PortalDoor(string name)
+        {
+            var root = Doorway(name);
+            const float leafThickness = 0.05f;
+            Box(root, new Vector3(0.9f, 0f, -leafThickness * 0.5f), new Vector3(2.1f, 2.2f, leafThickness * 0.5f));
+            var leaf = root.transform.GetChild(root.transform.childCount - 1).gameObject;
+            leaf.name = "Leaf";
+            leaf.layer = LayerMask.NameToLayer(KitLayers.Interactable);
+            root.AddComponent<Portal>();
             return root;
         }
 

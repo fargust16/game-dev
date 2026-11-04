@@ -56,6 +56,21 @@ namespace GameDev.Cameras
             SetCursorLocked(true);
         }
 
+        /// <summary>A new scene starts behind its player, who may have just been placed there by a door.</summary>
+        private void Start()
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            _yaw = target.eulerAngles.y;
+            var pivot = target.position + targetOffset;
+            var offset = Quaternion.Euler(pitch, _yaw, 0f) * (Vector3.back * distance);
+            transform.position = pivot + offset.normalized * ResolveCollisionDistance(pivot, offset, distance);
+            _velocity = Vector3.zero;
+        }
+
         private void OnDisable()
         {
             SetCursorLocked(false);

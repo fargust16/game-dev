@@ -2,6 +2,8 @@ using System.Linq;
 using GameDev.Cameras;
 using GameDev.Locomotion;
 using GameDev.Slice.Kit;
+using GameDev.World.Interiors;
+using GameDev.World.Portals;
 using GameDev.World.Timekeeping;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -12,12 +14,18 @@ namespace GameDev.Slice.EditorTools
     /// <summary>
     /// Builds the slice player prefab and the S0.3 movement test scene from stand-ins (VERTICAL_SLICE_IMPLEMENTATION_PLAN
     /// S0.3). The test scene is a lab, not Veilmouth: a paved square with a corner of a house, a doorway, a fence,
-    /// crates, and trees, so movement, the camera's spring arm, and later the grid have something to meet.
+    /// crates, and trees, so movement, the camera's spring arm, and later the grid have something to meet. Its door
+    /// leads to the S0.4 tavern test interior, a stand-in room whose door leads back.
     /// </summary>
     public static class SliceTestScenes
     {
         public const string PlayerPrefabPath = "Assets/Prefabs/Slice/SlicePlayer.prefab";
         public const string MovementScenePath = "Assets/Scenes/Slice/S0_Movement_Test.unity";
+        public const string TavernScenePath = "Assets/Scenes/Slice/S0_Tavern_Test.unity";
+
+        public const string TavernBuildingId = "tavern";
+        public const string TavernStreetPortalId = "tavern.street";
+        public const string TavernInsidePortalId = "tavern.inside";
 
         /// <summary>Where the movement test puts the player: a clear run of 18 m to the north.</summary>
         public static readonly Vector3 MovementSpawn = new Vector3(-2f, 0.1f, -12f);
@@ -31,6 +39,16 @@ namespace GameDev.Slice.EditorTools
         private const float PlayerRadius = 0.3f;
         private const float PlayerStep = 0.4f;
         private const float PlayerSlopeLimit = 45f;
+
+        /// <summary>Stand-ins, then both test scenes; batch runs use it through -executeMethod.</summary>
+        [MenuItem("GameDev/Slice/Build All Test Scenes")]
+        public static void BuildAll()
+        {
+            KitStandIns.CreateAll();
+            BuildPlayerPrefab();
+            BuildMovementScene();
+            BuildTavernScene();
+        }
 
         [MenuItem("GameDev/Slice/Build Player Prefab")]
         public static void BuildPlayerPrefab()
@@ -103,7 +121,7 @@ namespace GameDev.Slice.EditorTools
             Place("Kit_Post_StandIn_0x3", 0, 8);
             Place("Kit_Wall_StandIn_4x3", 0, 8);
             Place("Kit_Post_StandIn_0x3", 4, 8);
-            Place("Kit_Door_StandIn_3x3", 4, 8);
+            PlaceDoor(4, 8, TavernStreetPortalId, TavernScenePath, TavernInsidePortalId, false);
             Place("Kit_Post_StandIn_0x3", 7, 8);
             Place("Kit_Wall_StandIn_2x3", 7, 8);
             Place("Kit_Post_StandIn_0x3", 9, 8);
@@ -118,8 +136,72 @@ namespace GameDev.Slice.EditorTools
             Place("Kit_Tree_StandIn_1x4", -12, 10);
             Place("Kit_Tree_StandIn_1x4", -8, 12);
 
+            AddPlayerRig(MovementSpawn);
+            Save(scene, MovementScenePath);
+        }
+
+        /// <summary>
+        /// The tavern test interior: an 8 × 8 m stand-in room whose door, in the south wall, leads back to the street.
+        /// The real tavern is built from the owner's kit in S0.6.
+        /// </summary>
+        [MenuItem("GameDev/Slice/Build Tavern Test Interior")]
+        public static void BuildTavernScene()
+        {
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath) == null)
+            {
+                BuildPlayerPrefab();
+            }
+
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+            for (var x = 0; x < 8; x += 4)
+            {
+                for (var z = 0; z < 8; z += 4)
+                {
+                    Place("Kit_Street_StandIn_4x4", x, z);
+                }
+            }
+
+            // South wall, 2 + 3 + 2 + 1 m, with the door; posts at every node where blocks meet.
+            Place("Kit_Post_StandIn_0x3", 0, 0);
+            Place("Kit_Wall_StandIn_2x3", 0, 0);
+            Place("Kit_Post_StandIn_0x3", 2, 0);
+            PlaceDoor(2, 0, TavernInsidePortalId, MovementScenePath, TavernStreetPortalId, true);
+            Place("Kit_Post_StandIn_0x3", 5, 0);
+            Place("Kit_Wall_StandIn_2x3", 5, 0);
+            Place("Kit_Post_StandIn_0x3", 7, 0);
+            Place("Kit_Wall_StandIn_1x3", 7, 0);
+            Place("Kit_Post_StandIn_0x3", 8, 0);
+
+            // North wall and the two side walls, 4 + 4 m each.
+            Place("Kit_Post_StandIn_0x3", 0, 8);
+            Place("Kit_Wall_StandIn_4x3", 0, 8);
+            Place("Kit_Post_StandIn_0x3", 4, 8);
+            Place("Kit_Wall_StandIn_4x3", 4, 8);
+            Place("Kit_Post_StandIn_0x3", 8, 8);
+            Place("Kit_Wall_StandIn_4x3", 0, 0, -90f);
+            Place("Kit_Post_StandIn_0x3", 0, 4);
+            Place("Kit_Wall_StandIn_4x3", 0, 4, -90f);
+            Place("Kit_Wall_StandIn_4x3", 8, 0, -90f);
+            Place("Kit_Post_StandIn_0x3", 8, 4);
+            Place("Kit_Wall_StandIn_4x3", 8, 4, -90f);
+
+            // Two tables.
+            Place("Kit_Crate_StandIn_1x1", 2, 5);
+            Place("Kit_Crate_StandIn_1x1", 5, 5);
+
+            new GameObject("Interior").AddComponent<InteriorRuntime>().Configure(TavernBuildingId);
+            AddPlayerRig(new Vector3(4f, 0.1f, 3f));
+            Save(scene, TavernScenePath);
+        }
+
+        /// <summary>The scene's name as SceneManager knows it.</summary>
+        public static string SceneName(string scenePath) => System.IO.Path.GetFileNameWithoutExtension(scenePath);
+
+        /// <summary>The player, the camera behind them, and a clock, so a scene also plays when opened alone.</summary>
+        private static void AddPlayerRig(Vector3 spawn)
+        {
             var player = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath));
-            player.transform.position = MovementSpawn;
+            player.transform.position = spawn;
 
             var cameraRig = Camera.main.gameObject.AddComponent<ThirdPersonCamera>();
             cameraRig.SetTarget(player.transform);
@@ -130,19 +212,45 @@ namespace GameDev.Slice.EditorTools
             serializedClock.FindProperty("settings").objectReferenceValue =
                 AssetDatabase.LoadAssetAtPath<GameClockSettings>(ClockSettingsPath);
             serializedClock.ApplyModifiedPropertiesWithoutUndo();
-
-            KitStandIns.EnsureFolder("Assets/Scenes/Slice");
-            EditorSceneManager.SaveScene(scene, MovementScenePath);
-
-            var faults = KitLayoutCheck.Check(Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude));
-            Debug.Log($"Movement test scene written to {MovementScenePath}; kit layout faults: {faults.Count}.");
         }
 
-        private static void Place(string standIn, int x, int z, float yaw = 0f)
+        private static void Save(UnityEngine.SceneManagement.Scene scene, string path)
+        {
+            KitStandIns.EnsureFolder("Assets/Scenes/Slice");
+            EditorSceneManager.SaveScene(scene, path);
+            AddToBuildSettings(path);
+
+            var faults = KitLayoutCheck.Check(Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude));
+            Debug.Log($"Test scene written to {path}; kit layout faults: {faults.Count}.");
+        }
+
+        /// <summary>A door loads its target by name, which needs the scene in Build Settings.</summary>
+        private static void AddToBuildSettings(string path)
+        {
+            var scenes = EditorBuildSettings.scenes;
+            if (scenes.Any(s => s.path == path))
+            {
+                return;
+            }
+
+            EditorBuildSettings.scenes = scenes.Append(new EditorBuildSettingsScene(path, true)).ToArray();
+        }
+
+        private static void PlaceDoor(int x, int z, string id, string targetScenePath, string targetPortalId, bool arriveOnPositiveZ)
+        {
+            var portal = Place("Kit_PortalDoor_StandIn_3x3", x, z).GetComponent<Portal>();
+            portal.Configure(id, SceneName(targetScenePath), targetPortalId, arriveOnPositiveZ);
+
+            // A field set from code on a prefab instance is saved only once recorded as an override.
+            PrefabUtility.RecordPrefabInstancePropertyModifications(portal);
+        }
+
+        private static GameObject Place(string standIn, int x, int z, float yaw = 0f)
         {
             var asset = AssetDatabase.LoadAssetAtPath<GameObject>($"{KitStandIns.Folder}/{standIn}.prefab");
             var block = (GameObject)PrefabUtility.InstantiatePrefab(asset);
             block.transform.SetPositionAndRotation(new Vector3(x, 0f, z), Quaternion.Euler(0f, yaw, 0f));
+            return block;
         }
 
         private static void FitHeight(GameObject model, float height)

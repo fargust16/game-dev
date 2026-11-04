@@ -2,7 +2,7 @@
 
 Status: Draft — authoring defaults set by the agent; the owner's decision that sets the frame is marked
 Created: 2026-11-04
-Last Updated: 2026-11-04 (S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
+Last Updated: 2026-11-04 (S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [10.1 Grid World and Environment Actions](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [COMBAT_GRID_TECH_TEST.md](COMBAT_GRID_TECH_TEST.md)
 Used by: [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -76,7 +76,7 @@ A block that can be vaulted, climbed, or breached in a fight carries a tag compo
 
 - A house is a group of blocks under one root object, named by its building id. The camera's transparent walls (grid test, Phase B) hide a whole building at once and show its foundation and ground-floor outline, so ground-floor walls are named `F0_…` and higher storeys `F1_…`, `F2_…`.
 - **No two blocks occupy the same space.** This is the law of the [Shell Non-Overlap Rule](SHELL_NON_OVERLAP_RULE.md), applied to hand-assembled buildings: bounds may touch, never overlap. An editor check reports overlaps; it never moves blocks itself.
-- **Interiors are separate scenes** ([16](../../../16%20Architecture%20Pivot.md), locked). A building that can be entered has a door block marked as a portal, with the id of its interior scene. Interiors are built from the same kit.
+- **Interiors are separate scenes** ([16](../../../16%20Architecture%20Pivot.md), locked). A building that can be entered has a door block marked as a portal, with the id of its interior scene. Interiors are built from the same kit. In code (S0.4) the door block carries `Portal`: its own id, the target scene, the id of the paired door there, and the side of the wall where an arriving player stands; the leaf is an `Interactable` child inside the opening. The interior's door leads back to the street door, so the player comes out where they went in.
 - A building that cannot be entered still has a closed door, so the street reads as lived in.
 
 ## 7. Ground and forest
@@ -96,7 +96,7 @@ A block that can be vaulted, climbed, or breached in a fight carries a tag compo
 
 Code may need a block before the owner's side has made it. A stand-in is a plain box at the block's exact size, collider, layer, and name, under `Assets/Prefabs/SliceKit/_StandIn/`. When the real block arrives it replaces the stand-in in place, and the grid must read the same cells.
 
-The menu *GameDev → Slice → Create Kit Stand-ins* (S0.2) writes the first set: a wall 4×3 and 2×3, a post, a 3×3 wall with a 1.2 × 2.2 m doorway over its middle cell edge, a fence 2×1 at 0.1 m thick, a crate 1×1, a street tile 4×4, and a tree trunk of radius 0.3 m and 4 m high.
+The menu *GameDev → Slice → Create Kit Stand-ins* (S0.2) writes the first set: a wall 4×3 and 2×3, a post, a 3×3 wall with a 1.2 × 2.2 m doorway over its middle cell edge, a fence 2×1 at 0.1 m thick, a crate 1×1, a street tile 4×4, and a tree trunk of radius 0.3 m and 4 m high. S0.4 added a wall 1×3, because a side that holds the 3 m doorway has an odd length, and a portal door: the 3×3 doorway closed by a 0.05 m leaf, with `Portal` on it.
 
 ## 9a. The layout check
 

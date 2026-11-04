@@ -5,7 +5,9 @@
         "GameDev.Slice",
         "GameDev.Locomotion",
         "GameDev.Cameras",
-        "GameDev.World.Time"
+        "GameDev.World.Time",
+        "GameDev.World.Portals",
+        "GameDev.World.Interiors"
     ],
     "includePlatforms": [
         "Editor"

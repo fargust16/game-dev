@@ -1,0 +1,18 @@
+{
+    "name": "GameDev.World.Portals",
+    "rootNamespace": "GameDev.World.Portals",
+    "references": [
+        "GameDev.Core.Scenes",
+        "GameDev.Input",
+        "GameDev.Locomotion"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
