@@ -9,10 +9,13 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S0.4: every door in the test scenes leads to a door that leads back, and stands where it should.</summary>
+    /// <summary>S0.4, S0.6: every door leads to a door that leads back, and stands where it should.</summary>
     public sealed class PortalPairingTests
     {
         private static readonly string[] ScenePaths = { SliceTestScenes.MovementScenePath, SliceTestScenes.TavernScenePath };
+        private static readonly string[] VeilmouthPaths = { VeilmouthScene.ScenePath, VeilmouthScene.SootAndBellScenePath };
+
+        private static readonly object[] SceneSets = { new object[] { ScenePaths }, new object[] { VeilmouthPaths } };
 
         private readonly List<UnityEngine.SceneManagement.Scene> _opened = new List<UnityEngine.SceneManagement.Scene>();
 
@@ -27,10 +30,10 @@ namespace GameDev.Slice.Tests
             _opened.Clear();
         }
 
-        private Dictionary<string, Portal[]> OpenAll()
+        private Dictionary<string, Portal[]> OpenAll(string[] scenePaths)
         {
             var portals = new Dictionary<string, Portal[]>();
-            foreach (var path in ScenePaths)
+            foreach (var path in scenePaths)
             {
                 var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
                 _opened.Add(scene);
@@ -40,12 +43,12 @@ namespace GameDev.Slice.Tests
             return portals;
         }
 
-        [Test]
-        public void EveryDoorLeadsToADoorThatLeadsBack()
+        [TestCaseSource(nameof(SceneSets))]
+        public void EveryDoorLeadsToADoorThatLeadsBack(string[] scenePaths)
         {
-            var portals = OpenAll();
+            var portals = OpenAll(scenePaths);
             var inBuild = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToList();
-            CollectionAssert.IsSubsetOf(ScenePaths, inBuild, "a door loads its target by name from Build Settings");
+            CollectionAssert.IsSubsetOf(scenePaths, inBuild, "a door loads its target by name from Build Settings");
 
             var count = 0;
             foreach (var pair in portals)
@@ -68,7 +71,7 @@ namespace GameDev.Slice.Tests
         [Test]
         public void TheStreetDoorPutsThePlayerOutsideFacingAway()
         {
-            var street = OpenAll()[SliceTestScenes.SceneName(SliceTestScenes.MovementScenePath)]
+            var street = OpenAll(ScenePaths)[SliceTestScenes.SceneName(SliceTestScenes.MovementScenePath)]
                 .Single(p => p.Id == SliceTestScenes.TavernStreetPortalId);
 
             // The door block at (4, 0, 8) along +X; the house is north of it.

@@ -19,7 +19,6 @@ namespace GameDev.Slice.Tests
     {
         private const string StreetScenePath = "Assets/Scenes/Slice/S0_Movement_Test.unity";
         private const string StreetScene = "S0_Movement_Test";
-        private const string TavernScene = "S0_Tavern_Test";
 
         private static Portal FindPortal(string id) =>
             Object.FindObjectsByType<Portal>(FindObjectsInactive.Exclude).Single(p => p.Id == id);
@@ -41,29 +40,40 @@ namespace GameDev.Slice.Tests
         }
 
         [UnityTest]
-        public IEnumerator ThePlayerGoesInAndComesBackWhereTheyEntered()
+        public IEnumerator ThePlayerGoesInAndComesBackWhereTheyEntered() =>
+            GoInAndBack(StreetScenePath, "tavern.street", "tavern.inside", "tavern");
+
+        /// <summary>S0.6: the same in Veilmouth, through the Soot &amp; Bell.</summary>
+        [UnityTest]
+        public IEnumerator InVeilmouthThePlayerGoesIntoTheSootAndBellAndBack() =>
+            GoInAndBack("Assets/Scenes/Slice/Veilmouth.unity", "soot-and-bell.street", "soot-and-bell.inside", "soot-and-bell");
+
+        private IEnumerator GoInAndBack(string streetScenePath, string streetId, string insideId, string buildingId)
         {
-            yield return LoadScene(StreetScenePath);
+            var streetScene = System.IO.Path.GetFileNameWithoutExtension(streetScenePath);
+            yield return LoadScene(streetScenePath);
             var clock = GameClockDriver.Running;
             Assert.IsNotNull(clock);
 
-            var entrance = FindPortal("tavern.street").ArrivalPose;
+            var street = FindPortal(streetId);
+            var interiorScene = street.Target.SceneName;
+            var entrance = street.ArrivalPose;
             Object.FindAnyObjectByType<PlayerLocomotion>().Teleport(entrance.position, entrance.rotation);
             yield return new WaitForSeconds(0.2f);
             var before = Now(clock);
 
-            yield return UseDoorAndWaitFor(TavernScene);
+            yield return UseDoorAndWaitFor(interiorScene);
             Assert.IsNotNull(InteriorRuntime.Current);
-            Assert.AreEqual("tavern", InteriorRuntime.Current.BuildingId);
+            Assert.AreEqual(buildingId, InteriorRuntime.Current.BuildingId);
             var inside = Object.FindAnyObjectByType<PlayerLocomotion>();
-            var insidePose = FindPortal("tavern.inside").ArrivalPose;
+            var insidePose = FindPortal(insideId).ArrivalPose;
             Assert.Less(Vector3.Distance(inside.transform.position, insidePose.position), 0.3f, Describe(inside));
             Assert.IsTrue(inside.IsGrounded, Describe(inside));
             Assert.AreSame(clock, GameClockDriver.Running, "one clock runs through the door");
             var middle = Now(clock);
             Assert.Greater(middle, before);
 
-            yield return UseDoorAndWaitFor(StreetScene);
+            yield return UseDoorAndWaitFor(streetScene);
             Assert.IsNull(InteriorRuntime.Current);
             var outside = Object.FindAnyObjectByType<PlayerLocomotion>();
             Assert.Less(Vector3.Distance(outside.transform.position, entrance.position), 0.3f, Describe(outside));

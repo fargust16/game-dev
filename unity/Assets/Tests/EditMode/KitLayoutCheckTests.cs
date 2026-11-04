@@ -54,6 +54,8 @@ namespace GameDev.Slice.Tests
 
         [TestCase(SliceTestScenes.MovementScenePath, 100)]
         [TestCase(SliceTestScenes.TavernScenePath, 20)]
+        [TestCase(VeilmouthScene.ScenePath, 60)]
+        [TestCase(VeilmouthScene.SootAndBellScenePath, 20)]
         public void ATestSceneIsClean(string path, int minimumBlocks)
         {
             var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
