@@ -1,0 +1,34 @@
+.hud {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.hud__time {
+    position: absolute;
+    top: 16px;
+    right: 24px;
+    font-size: 22px;
+    color: rgb(236, 228, 210);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+}
+
+.hud__prompt {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 22%;
+    font-size: 20px;
+    -unity-text-align: middle-center;
+    color: rgb(236, 228, 210);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+    display: none;
+}
+
+.hud__prompt--visible {
+    display: flex;
+}

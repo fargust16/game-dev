@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 1.19
+Version: 1.20
 
 Status: Draft
 
-Last Updated: 2026-11-04 (I.1–I.3: the first doors, from S0.4. Earlier: L.1–L.3: the code lives in its owning folders, from S0.3. Earlier: X.1: the first `IWorldClock` contract, from S0.1. Earlier: next code default: the Vertical Slice implementation plan, in one hand-built scene, by the owner's decision. Earlier: the slice's Suspend Save, townsfolk schedules, and the Item Creation workshop, by the owner's answers. Earlier: unseen fights run the tactical rules without drawing, by the owner. Earlier: faction state holds forces and City Control; Influence is read from them. Earlier: Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
+Last Updated: 2026-11-04 (X.3 and X.6: the save contract and the first HUD, from S0.5. Earlier: I.1–I.3: the first doors, from S0.4. Earlier: L.1–L.3: the code lives in its owning folders, from S0.3. Earlier: X.1: the first `IWorldClock` contract, from S0.1. Earlier: next code default: the Vertical Slice implementation plan, in one hand-built scene, by the owner's decision. Earlier: the slice's Suspend Save, townsfolk schedules, and the Item Creation workshop, by the owner's answers. Earlier: unseen fights run the tactical rules without drawing, by the owner. Earlier: faction state holds forces and City Control; Influence is read from them. Earlier: Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
 
 Depends On:
 [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -743,6 +743,8 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 | **V1 scope / Deferred** | Contracts early; full service when rails exist. Owner's decision, 2026-11-04: the slice has one **Suspend Save**, written when the player saves and quits outside a fight or dialogue, and deleted when it is loaded. Authoring default: the game also autosaves into the same slot after each full sleep and when the invasion starts; a development build keeps free saves for testing. The full game saves at any time outside a fight or dialogue. |
 | **Owning folder** | `unity/Assets/Scripts/Core/Save/` |
 
+Code state after slice iteration S0.5: `GameDev.Core.Save` holds the contract with no engine code: `SaveSchema` (schema version 1 and the slice's ten sections), `SaveFile`, `ISaveContributor`, and `SaveAssembler`, which refuses a newer save whole and reports missing sections. The clock is the first contributor. The section list and the rules are in `VERTICAL_SLICE_IMPLEMENTATION_PLAN.md` S0. `ISaveService`, the slot, and disk come with the Suspend Save in slice milestone S5c.
+
 ## X.4 Networking
 
 | Field | Content |
@@ -772,6 +774,8 @@ Mechanics must not outrun Decision Engine / Vertical Slice needs. Cards define o
 | **Extensibility** | Themeable UI. |
 | **V1 scope / Deferred** | Minimal HUD with locomotion and combat. |
 | **Owning folder** | `unity/Assets/Scripts/UI/`, `unity/Assets/Scripts/Audio/` |
+
+Code state after slice iteration S0.5: `GameDev.UI` holds the slice HUD on UI Toolkit (authoring default): `HudView` reads the running clock and the doors in reach and changes nothing; its layout is `Assets/UI/Hud/Hud.uxml` with its style sheet, under one panel on Unity's default runtime theme.
 
 ---
 

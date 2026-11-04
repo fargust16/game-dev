@@ -9,7 +9,9 @@
         "GameDev.Slice",
         "GameDev.Slice.Editor",
         "GameDev.Core.Scenes",
-        "GameDev.World.Portals"
+        "GameDev.World.Portals",
+        "GameDev.Core.Save",
+        "GameDev.UI"
     ],
     "includePlatforms": [
         "Editor"

@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Hud.uss" />
+    <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
+        <ui:Label name="time" class="hud__time" text="Day 1 · 08:00" picking-mode="Ignore" />
+        <ui:Label name="prompt" class="hud__prompt" text="E  Enter" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

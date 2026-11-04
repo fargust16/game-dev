@@ -1,0 +1,19 @@
+{
+    "name": "GameDev.UI",
+    "rootNamespace": "GameDev.UI",
+    "references": [
+        "GameDev.Core.Scenes",
+        "GameDev.World.Time",
+        "GameDev.World.Portals",
+        "GameDev.Locomotion"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

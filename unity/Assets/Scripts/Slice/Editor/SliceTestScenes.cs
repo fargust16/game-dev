@@ -2,12 +2,14 @@ using System.Linq;
 using GameDev.Cameras;
 using GameDev.Locomotion;
 using GameDev.Slice.Kit;
+using GameDev.UI;
 using GameDev.World.Interiors;
 using GameDev.World.Portals;
 using GameDev.World.Timekeeping;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace GameDev.Slice.EditorTools
 {
@@ -33,6 +35,9 @@ namespace GameDev.Slice.EditorTools
         private const string CharacterPrefabPath = "Assets/Kevin Iglesias/Human Character Dummy/Prefabs/HumanDummy_M White.prefab";
         private const string AnimatorPath = "Assets/Settings/OverworldPlayerAnimator.controller";
         private const string ClockSettingsPath = "Assets/Data/Slice/GameClockSettings.asset";
+        private const string PanelSettingsPath = "Assets/UI/SlicePanelSettings.asset";
+        private const string ThemePath = "Assets/UI/SliceRuntimeTheme.tss";
+        private const string HudPath = "Assets/UI/Hud/Hud.uxml";
 
         // Kit standard §3, measured: the walker of the grid test.
         private const float PlayerHeight = 1.8f;
@@ -197,7 +202,7 @@ namespace GameDev.Slice.EditorTools
         /// <summary>The scene's name as SceneManager knows it.</summary>
         public static string SceneName(string scenePath) => System.IO.Path.GetFileNameWithoutExtension(scenePath);
 
-        /// <summary>The player, the camera behind them, and a clock, so a scene also plays when opened alone.</summary>
+        /// <summary>The player, the camera behind them, a clock, and the HUD, so a scene also plays when opened alone.</summary>
         private static void AddPlayerRig(Vector3 spawn)
         {
             var player = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath));
@@ -212,6 +217,29 @@ namespace GameDev.Slice.EditorTools
             serializedClock.FindProperty("settings").objectReferenceValue =
                 AssetDatabase.LoadAssetAtPath<GameClockSettings>(ClockSettingsPath);
             serializedClock.ApplyModifiedPropertiesWithoutUndo();
+
+            var hud = new GameObject("HUD");
+            var document = hud.AddComponent<UIDocument>();
+            document.panelSettings = PanelSettingsAsset();
+            document.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(HudPath);
+            hud.AddComponent<HudView>();
+        }
+
+        /// <summary>The slice's one panel: Unity's default runtime theme, scaled from 1920 × 1080 (authoring default).</summary>
+        private static PanelSettings PanelSettingsAsset()
+        {
+            var panel = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
+            if (panel != null)
+            {
+                return panel;
+            }
+
+            panel = ScriptableObject.CreateInstance<PanelSettings>();
+            panel.themeStyleSheet = AssetDatabase.LoadAssetAtPath<ThemeStyleSheet>(ThemePath);
+            panel.scaleMode = PanelScaleMode.ScaleWithScreenSize;
+            panel.referenceResolution = new Vector2Int(1920, 1080);
+            AssetDatabase.CreateAsset(panel, PanelSettingsPath);
+            return panel;
         }
 
         private static void Save(UnityEngine.SceneManagement.Scene scene, string path)
