@@ -1,0 +1,17 @@
+{
+    "name": "GameDev.Slice",
+    "rootNamespace": "GameDev.Slice",
+    "references": [
+        "GameDev.World.Seed",
+        "GameDev.World.Time"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

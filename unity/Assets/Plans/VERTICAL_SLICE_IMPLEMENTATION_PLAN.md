@@ -76,6 +76,19 @@ The milestones keep the names of [11](../../../11%20Vertical%20Slice.md). S5 is 
 
 Accepted when: the player walks the city and the forest in third person; enters the tavern and comes back to the same place; the clock gives one tick every 10 seconds and keeps counting through the door; the grid lab, run in this scene, reads a street correctly (walls close edges, a fence is low cover, a doorway passes one cell); the overlap check is clean; and the tests pass.
 
+**S0 iterations** (owner authorised S0 on 2026-11-04). Each is one micro-plan of at most about 500 lines.
+
+| Iteration | Contents | Done when |
+|---|---|---|
+| S0.1 Assemblies, seed, clock | Assembly definitions for the seed, the clock, and the slice, plus an EditMode test assembly; `IWorldClock` as a plain model with whole ticks, partial-tick progress, pause holders, and tick-boundary and time-advanced events; a driver that survives scene changes; clock and slice settings as data assets; the slice's named seed streams | It compiles, and the clock and seed tests pass |
+| S0.2 Kit in the project | The kit standard's layers, tags, and folders; the stand-ins folder; an editor check for overlapping blocks and blocks off the 1 m grid | The check runs on a test scene and reports both faults |
+| S0.3 Movement and camera | The controller and camera moved to `Locomotion/` and `Camera/` with the input service in its own assembly, freed from the Overworld and decision code | The player walks a test scene in third person |
+| S0.4 Doors and interiors | Portal, scene transition, interior runtime; the tavern as the first interior; the return to the entry point | In and out of the tavern, and the clock keeps counting |
+| S0.5 Save contract, HUD | Schema version and the list of what persists; a UI Toolkit HUD with the day and time | The HUD shows the time; the contract is in code and in this plan |
+| S0.6 The scene | `Veilmouth.unity`: the playable ground, the sea, the player rig, the clock, and the HUD; then the streets, buildings, and forest by hand from the owner's kit, by C0 | The acceptance above |
+
+S0.1–S0.5 need nothing from the owner. S0.6 needs the C0 map and the first kit blocks; stand-ins fill the gaps.
+
 ### S1 — Information and POIs
 
 | Part | Systems | Notes |
@@ -194,7 +207,7 @@ Owner's decision 3. The check read each file's structure against the System Card
 | `World/CityGenerator`, `CityDistrict`, `LowerVeilGreyboxBuilder`, `Landmark*`, `S0_LightingController`, `BillboardLabel`, Editor `S0GreyboxMenu`, `TownGenerateMenu`, `CityGenerateMenu` | **Not used** | Pre-pivot archive ([16](../../../16%20Architecture%20Pivot.md) §5) |
 | Terrain, Overworld, and research Editor tools | **Untouched** | Not part of the slice |
 
-The project has no assembly definitions and no tests yet; S0 adds them.
+The project has no assembly definitions of its own, and its existing tests (terrain, roads, seed) live in the Editor assembly. S0 adds assemblies for the slice's code and an EditMode test assembly beside them; the seed's folder becomes its own assembly, which the rest of the project still sees.
 
 ---
 

@@ -1,0 +1,20 @@
+using GameDev.World.Seed;
+using UnityEngine;
+
+namespace GameDev.Slice
+{
+    /// <summary>Immutable settings of the Vertical Slice run (VERTICAL_SLICE_IMPLEMENTATION_PLAN §1).</summary>
+    [CreateAssetMenu(menuName = "GameDev/Slice/Slice Settings", fileName = "SliceSettings")]
+    public sealed class SliceSettings : ScriptableObject
+    {
+        [Tooltip("The slice's one fixed world seed; every random choice is a named fork of it (SliceSeedStreams). Authoring default.")]
+        [SerializeField] private int seed = 110201;
+
+        public int Seed => seed;
+
+        public IWorldSeed CreateSeed()
+        {
+            return new WorldSeed(seed);
+        }
+    }
+}
