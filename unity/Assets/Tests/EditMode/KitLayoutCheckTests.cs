@@ -3,6 +3,7 @@ using System.Linq;
 using GameDev.Slice.EditorTools;
 using GameDev.Slice.Kit;
 using NUnit.Framework;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace GameDev.Slice.Tests
@@ -49,6 +50,22 @@ namespace GameDev.Slice.Tests
             Place(KitStandIns.Trunk("Tree", 4f), 1f, 0f, 2f);
 
             CollectionAssert.IsEmpty(CheckAll().Select(f => f.ToString()));
+        }
+
+        [Test]
+        public void TheMovementTestSceneIsClean()
+        {
+            var scene = EditorSceneManager.OpenScene(SliceTestScenes.MovementScenePath, OpenSceneMode.Additive);
+            try
+            {
+                var blocks = scene.GetRootGameObjects().SelectMany(go => go.GetComponentsInChildren<KitBlock>()).ToList();
+                Assert.Greater(blocks.Count, 100);
+                CollectionAssert.IsEmpty(KitLayoutCheck.Check(blocks).Select(f => f.ToString()));
+            }
+            finally
+            {
+                EditorSceneManager.CloseScene(scene, true);
+            }
         }
 
         [Test]

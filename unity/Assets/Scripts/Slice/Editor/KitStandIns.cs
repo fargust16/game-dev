@@ -126,7 +126,7 @@ namespace GameDev.Slice.EditorTools
             Object.DestroyImmediate(root);
         }
 
-        private static void EnsureFolder(string path)
+        internal static void EnsureFolder(string path)
         {
             var parent = "Assets";
             foreach (var part in path.Substring("Assets/".Length).Split('/'))

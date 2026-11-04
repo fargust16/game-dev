@@ -57,7 +57,7 @@ namespace GameDev.Slice.EditorTools
         [MenuItem("GameDev/Slice/Check Kit Layout")]
         private static void CheckOpenScenes()
         {
-            var blocks = Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var blocks = Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude);
             var faults = Check(blocks);
             foreach (var fault in faults)
             {

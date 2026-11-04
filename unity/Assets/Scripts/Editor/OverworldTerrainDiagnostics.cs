@@ -311,7 +311,7 @@ namespace GameDev.EditorTools
         /// </summary>
         /// <remarks>
         /// Unity's <c>CharacterController.slopeLimit</c> default, which
-        /// <see cref="GameDev.Player.OverworldPlayerController"/> leaves alone, and the same figure
+        /// <see cref="GameDev.Locomotion.PlayerLocomotion"/> leaves alone, and the same figure
         /// a default NavMesh agent bakes with. Not the same threshold as
         /// <c>RoadCost.MaxWalkableGrade</c> (0.45, i.e. 24 deg), which is about comfortable roads,
         /// not about whether a person can get up there at all.

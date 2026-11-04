@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using GameDev.Cameras;
 using GameDev.Player;
 using GameDev.World.Buildings.Shell;
 using UnityEngine;
@@ -59,7 +60,7 @@ namespace GameDev.Grid
         private CombatGridReader _reader;
         private CombatGridWindow _window;
         private Camera _camera;
-        private OverworldThirdPersonCamera _freeCamera;
+        private ThirdPersonCamera _freeCamera;
         private Mesh _overlay;
         private Mesh _outline;
         private GameObject _overlayObject;
@@ -91,7 +92,7 @@ namespace GameDev.Grid
 
             _reader = new CombatGridReader(CellMeters);
             _camera = Camera.main;
-            _freeCamera = _camera != null ? _camera.GetComponent<OverworldThirdPersonCamera>() : null;
+            _freeCamera = _camera != null ? _camera.GetComponent<ThirdPersonCamera>() : null;
 
             var material = new Material(Shader.Find("Sprites/Default"));
             _overlay = CreateMeshObject("CombatGridOverlay", material, out _overlayObject);

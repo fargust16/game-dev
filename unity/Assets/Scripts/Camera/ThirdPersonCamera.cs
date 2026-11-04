@@ -1,18 +1,15 @@
-using GameDev.Decisions;
 using GameDev.Input;
-using GameDev.World;
 using UnityEngine;
 
-namespace GameDev.Player
+// The namespace is Cameras, not Camera: a GameDev.Camera namespace would hide UnityEngine.Camera in GameDev code.
+namespace GameDev.Cameras
 {
     /// <summary>
-    /// Genshin Impact-style third-person orbit camera for the free-roam Overworld player: mouse
-    /// (cursor locked) orbits behind/around the character at a close, mostly-level distance instead
-    /// of GameDev.Player.SimpleFollowCamera's BG3-tactical top-down angle - that camera stays the
-    /// default for the Town/Grid lab (GridPlayerController), this one is Overworld-only, wired up by
-    /// GameDev.EditorTools.OverworldPlayerMenu.
+    /// Third-person orbit camera (17 L.3): the locked mouse orbits behind the character at a close, mostly level
+    /// distance, and a spring arm pulls it in front of walls. Moved from GameDev.Player.OverworldThirdPersonCamera in
+    /// S0.3 and freed from the old WorldClock and DecisionNodeSession; whoever opens a menu sets <see cref="LookEnabled"/>.
     /// </summary>
-    public sealed class OverworldThirdPersonCamera : MonoBehaviour
+    public sealed class ThirdPersonCamera : MonoBehaviour
     {
         [SerializeField] private Transform target;
         [SerializeField] private Vector3 targetOffset = new Vector3(0f, 1.5f, 0f);
@@ -35,6 +32,11 @@ namespace GameDev.Player
         private float _yaw;
         private Vector3 _velocity;
 
+        /// <summary>False while a menu or dialogue owns the mouse: the camera keeps following but stops orbiting.</summary>
+        public bool LookEnabled { get; set; } = true;
+
+        public Transform Target => target;
+
         public void SetTarget(Transform newTarget)
         {
             target = newTarget;
@@ -42,6 +44,11 @@ namespace GameDev.Player
             {
                 _yaw = target.eulerAngles.y;
             }
+        }
+
+        public void SetCollisionMask(LayerMask mask)
+        {
+            collisionMask = mask;
         }
 
         private void OnEnable()
@@ -61,23 +68,16 @@ namespace GameDev.Player
                 return;
             }
 
-            var paused = (WorldClock.Instance != null && WorldClock.Instance.IsPaused) || DecisionNodeSession.IsOpen;
             var input = GameInputService.Instance;
-
-            if (input != null && !paused)
+            if (input != null && LookEnabled)
             {
                 if (input.CancelPressed)
                 {
                     SetCursorLocked(false);
                 }
 
-                // The Editor Game View (like most OS/browser windows) only honours
-                // Cursor.lockState once the window actually has input focus, which a script can't
-                // force before the player interacts - the OnEnable lock request above is silently
-                // dropped until then, so without this the camera never gets a single mouse delta
-                // and looks completely static. Re-request the lock on the first click instead of
-                // assuming it already took; ClickMovePressed (left mouse) only drives GridMap
-                // path-clicking elsewhere, so it's free to reuse here.
+                // The Game View honours Cursor.lockState only once it has focus, so the lock asked for in
+                // OnEnable is dropped until the player clicks; ask again on the first left click.
                 if (Cursor.lockState != CursorLockMode.Locked && input.ClickMovePressed)
                 {
                     SetCursorLocked(true);
@@ -108,11 +108,9 @@ namespace GameDev.Player
             transform.rotation = rotation;
         }
 
-        /// <summary>Spring-arm style: pulls the camera in along the same ray if something (terrain,
-        /// a building) sits between the pivot and the desired position, so it never clips through
-        /// geometry. Hits on the target's own collider (CharacterController) are skipped - casting
-        /// from a chest-height pivot that sits inside the player's own capsule would otherwise
-        /// register a same-point hit and permanently collapse the camera to minDistance.</summary>
+        /// <summary>Spring arm: pulls the camera in along the same ray when something sits between the pivot and the
+        /// desired position. Hits on the target's own colliders are skipped, because the chest-height pivot sits inside
+        /// the player's capsule and would otherwise collapse the camera to its minimum distance.</summary>
         private float ResolveCollisionDistance(Vector3 pivot, Vector3 desiredOffset, float desiredDistance)
         {
             if (desiredDistance <= 0.0001f)

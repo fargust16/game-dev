@@ -1,6 +1,8 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Linq;
+using GameDev.Cameras;
+using GameDev.Locomotion;
 using GameDev.Player;
 using GameDev.World;
 using GameDev.World.Poi;
@@ -22,7 +24,7 @@ namespace GameDev.EditorTools
     /// walk/run/sprint/jump around the Overworld terrain: ensure the Dummy FBX is a Humanoid rig,
     /// build a locomotion Animator Controller (Idle/Walk/Run/Sprint 1D blend tree + a
     /// Jump-Begin/Fall/Land sub-sequence) from the Male clip set, then spawn the prefab with a
-    /// CharacterController + OverworldPlayerController on top of the generated terrain and point
+    /// CharacterController + PlayerLocomotion on top of the generated terrain and point
     /// the existing follow camera at it.
     /// <para>
     /// Prefer the HumanDummy_M White prefab (already Humanoid) for spawn. Step 1 configures the
@@ -162,7 +164,7 @@ namespace GameDev.EditorTools
             jumpLandState.motion = jumpLand;
 
             // Jump pressed while moving/idle -> leave the ground, regardless of Grounded (button
-            // press already implies grounded - OverworldPlayerController only fires it then).
+            // press already implies grounded - PlayerLocomotion only fires it then).
             var toJumpBegin = locomotionState.AddTransition(jumpBeginState);
             toJumpBegin.hasExitTime = false;
             toJumpBegin.duration = 0.05f;
@@ -206,7 +208,7 @@ namespace GameDev.EditorTools
         /// holding a destroyed object. That is both symptoms at once: the legacy graph behind the
         /// controller throws <c>NullReferenceException</c> from <c>UnityEditor.Graphs.Edge.WakeUp</c>
         /// on the next domain reload, and at runtime the controller reads as absent, so every
-        /// <c>SetFloat</c>/<c>SetBool</c> in <c>OverworldPlayerController.Update</c> warns once per
+        /// <c>SetFloat</c>/<c>SetBool</c> in <c>PlayerLocomotion.Update</c> warns once per
         /// frame — thousands of lines. Reassigning here closes the window; running the rebuild
         /// <em>after</em> spawning the player was what opened it.
         /// </remarks>
@@ -275,9 +277,9 @@ namespace GameDev.EditorTools
             characterController.skinWidth = 0.03f;
             characterController.stepOffset = 0.4f;
 
-            if (player.GetComponent<OverworldPlayerController>() == null)
+            if (player.GetComponent<PlayerLocomotion>() == null)
             {
-                player.AddComponent<OverworldPlayerController>();
+                player.AddComponent<PlayerLocomotion>();
             }
 
             // Prefer TownApproach / settlement when SpawnPlayerAtTown was used; otherwise keep
@@ -413,7 +415,7 @@ namespace GameDev.EditorTools
             return OverworldTerrainAccess.TrySampleHeightWorld(xz.x, xz.z, out groundY);
         }
 
-        /// <summary>Genshin-style close third-person orbit (GameDev.Player.OverworldThirdPersonCamera)
+        /// <summary>Genshin-style close third-person orbit (GameDev.Cameras.ThirdPersonCamera)
         /// - distinct from GameDev.Player.SimpleFollowCamera, which stays the BG3-tactical top-down
         /// rig for the Town/Grid lab. Reuses whatever Camera already exists in the scene (e.g.
         /// OverworldTerrainMenu's straight-down review camera) rather than adding a second one, and
@@ -447,10 +449,10 @@ namespace GameDev.EditorTools
                 Object.DestroyImmediate(staleFollowCamera);
             }
 
-            var thirdPersonCamera = cameraObject.GetComponent<OverworldThirdPersonCamera>();
+            var thirdPersonCamera = cameraObject.GetComponent<ThirdPersonCamera>();
             if (thirdPersonCamera == null)
             {
-                thirdPersonCamera = cameraObject.AddComponent<OverworldThirdPersonCamera>();
+                thirdPersonCamera = cameraObject.AddComponent<ThirdPersonCamera>();
             }
 
             thirdPersonCamera.SetTarget(target);

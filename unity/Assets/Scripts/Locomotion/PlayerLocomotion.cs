@@ -1,17 +1,16 @@
 using GameDev.Input;
 using UnityEngine;
 
-namespace GameDev.Player
+namespace GameDev.Locomotion
 {
     /// <summary>
-    /// Free-roam CharacterController locomotion for the Overworld (WASD move, camera-relative,
-    /// Shift to sprint, Space to jump). Drives an Animator (Speed float 0-3 = Idle/Walk/Run/Sprint,
-    /// Grounded bool, Jump trigger) built by GameDev.EditorTools.OverworldPlayerMenu - see that
-    /// file for the blend tree/jump state machine this expects.
+    /// Free third-person movement on a CharacterController (17 L.2): WASD relative to the camera, Shift to sprint,
+    /// Space to jump. Drives an Animator on this object or a child (Speed float 0–3 = Idle/Walk/Run/Sprint,
+    /// Grounded bool, Jump trigger), as built by GameDev.EditorTools.OverworldPlayerMenu. Moved from
+    /// GameDev.Player.OverworldPlayerController in S0.3; the Overworld player and the slice player share it.
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
-    [RequireComponent(typeof(Animator))]
-    public sealed class OverworldPlayerController : MonoBehaviour
+    public sealed class PlayerLocomotion : MonoBehaviour
     {
         [Header("Speeds (m/s) - match Animator Speed blend positions 0/1/2/3")]
         [SerializeField] private float walkSpeed = 2f;
@@ -36,11 +35,20 @@ namespace GameDev.Player
         private float _animSpeed;
         private float _verticalVelocity;
 
+        public bool IsGrounded => _controller != null && _controller.isGrounded;
+
         private void Awake()
         {
             _controller = GetComponent<CharacterController>();
-            _animator = GetComponent<Animator>();
-            _animator.applyRootMotion = false;
+
+            // Unity's default of 0.001 m drops shorter steps, which at a high frame rate is every step.
+            _controller.minMoveDistance = 0f;
+            _animator = GetComponentInChildren<Animator>();
+            if (_animator != null)
+            {
+                _animator.applyRootMotion = false;
+            }
+
             GameInputService.EnsureExists();
         }
 
@@ -61,7 +69,10 @@ namespace GameDev.Player
             if (grounded && input.JumpPressed)
             {
                 _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                _animator.SetTrigger(JumpParam);
+                if (_animator != null)
+                {
+                    _animator.SetTrigger(JumpParam);
+                }
             }
 
             _verticalVelocity += gravity * Time.deltaTime;
@@ -84,8 +95,11 @@ namespace GameDev.Player
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotateSpeed * Time.deltaTime);
             }
 
-            _animator.SetFloat(SpeedParam, _animSpeed);
-            _animator.SetBool(GroundedParam, grounded);
+            if (_animator != null)
+            {
+                _animator.SetFloat(SpeedParam, _animSpeed);
+                _animator.SetBool(GroundedParam, grounded);
+            }
         }
 
         /// <summary>Maps the 0..3 Idle/Walk/Run/Sprint blend value to an actual world-space speed.</summary>

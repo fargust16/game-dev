@@ -2,7 +2,10 @@
     "name": "GameDev.Slice.Editor",
     "rootNamespace": "GameDev.Slice.EditorTools",
     "references": [
-        "GameDev.Slice"
+        "GameDev.Slice",
+        "GameDev.Locomotion",
+        "GameDev.Cameras",
+        "GameDev.World.Time"
     ],
     "includePlatforms": [
         "Editor"

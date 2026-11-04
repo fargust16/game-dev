@@ -89,7 +89,7 @@ Accepted when: the player walks the city and the forest in third person; enters 
 
 S0.1–S0.5 need nothing from the owner. S0.6 needs the C0 map and the first kit blocks; stand-ins fill the gaps.
 
-Progress: S0.1 done, 12 tests (commit `0bb96fd`). S0.2 done: the layers `Ground`, `Structure`, `Prop`, `Vegetation`, `Character`, `Interactable`, `NoGrid` at 8–14; `KitBlock` and `KitEnvironmentAction`; the layout check and eight stand-ins (kit standard §9–§9a); 6 tests, 18 in all. S0.2 also fixed the kit standard: pivots sit on grid nodes, and a post fills a node where walls meet.
+Progress: S0.1 done, 12 tests (commit `0bb96fd`). S0.2 done: the layers `Ground`, `Structure`, `Prop`, `Vegetation`, `Character`, `Interactable`, `NoGrid` at 8–14; `KitBlock` and `KitEnvironmentAction`; the layout check and eight stand-ins (kit standard §9–§9a); 6 tests, 18 in all. S0.2 also fixed the kit standard: pivots sit on grid nodes, and a post fills a node where walls meet. S0.3 done: `GameDev.Input` (the input service, unchanged), `GameDev.Locomotion` (`PlayerLocomotion`, the old Overworld controller; the Animator is optional and sits on a child), and `GameDev.Cameras` (`ThirdPersonCamera`, the old Overworld camera without the old clock and decision node: whoever opens a menu sets `LookEnabled`); the Overworld player menu and the grid lab use the new types. Editor menus build the slice player prefab and `Scenes/Slice/S0_Movement_Test.unity` from stand-ins (0 kit faults); 2 PlayMode tests walk the player there in a batch run, and an EditMode test keeps the scene's kit clean, 19 EditMode tests in all.
 
 ### S1 — Information and POIs
 
@@ -196,7 +196,7 @@ Owner's decision 3. The check read each file's structure against the System Card
 |---|---|---|
 | `World/WorldSeed` | **Keep** | Already `Fork(name)` with `System.Random`, as W.1 asks; move to `World/Seed/` |
 | `Input/GameInputService`, `Input/GameInput.inputactions` | **Keep**, extend | Input System actions; add the slice's actions |
-| `Player/OverworldPlayerController`, `Player/OverworldThirdPersonCamera` | **Keep**, move | Free third-person movement and an orbit camera with collision; move to `Locomotion/` and `Camera/`, and free them from the Overworld scene's setup |
+| `Player/OverworldPlayerController`, `Player/OverworldThirdPersonCamera` | **Keep**, move | Free third-person movement and an orbit camera with collision; move to `Locomotion/` and `Camera/`, and free them from the Overworld scene's setup. Done in S0.3 as `PlayerLocomotion` and `ThirdPersonCamera` |
 | `Grid/CombatGridReader` | **Keep** as the base of C.2 | It passed the grid test; production work: stop allocating on every step (gate G2), keep characters out of the reading, read the kit's tags |
 | `Grid/CombatGridLab` | **Lab only** | Its following, transparent walls, and outlines move into production code; the lab stays as a tool |
 | `World/WorldClock` | **Rewrite** | Float hours at 45 real seconds an hour, no tick events, no round tick; 17 X.1 asks for `IWorldClock` with one-minute ticks at 10 seconds each |
