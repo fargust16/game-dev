@@ -1,8 +1,8 @@
 # 18 RPG Systems Coverage Draft
 
-Version: 0.17
+Version: 0.18
 Status: Draft
-Last Updated: 2026-11-03 (bows and the mini-crossbow removed by the owner: weapons are iron, for melee and firearms. Earlier: open items run to CC-48; Masters of gathering exist in the slice. Earlier: open items run to CC-46. Earlier: Evasion and Blocking follow 10.2; question range corrected. Earlier: Persuasion, Intimidation, and Deception confirmed in 10.4. Earlier: terms renamed to Arcana and Limit. Earlier: Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
+Last Updated: 2026-11-04 (gathering and Skinning are specified for the slice in 19 §6.4. Earlier: bows and the mini-crossbow removed by the owner: weapons are iron, for melee and firearms. Earlier: open items run to CC-48; Masters of gathering exist in the slice. Earlier: open items run to CC-46. Earlier: Evasion and Blocking follow 10.2; question range corrected. Earlier: Persuasion, Intimidation, and Deception confirmed in 10.4. Earlier: terms renamed to Arcana and Limit. Earlier: Factions row updated for the war for cities in 21. Earlier: manifestation defeat rule, playable-state scope, and Alchemy profession recorded; detailed endings and system gaps remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [99 Open Questions](99%20Open%20Questions.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -124,7 +124,7 @@ Combat is a distinct turn-based mode in place under the current architecture; it
 - **Movement and traversal:** define locomotion, collision, jumping/falling, traversable surfaces, and interaction constraints in overworld/interiors.
 - **Points of Interest:** audit existing POI rules and define discovery, activation, state, content, revisit, expiry, and consequences.
 - **Interiors and dungeons:** define entry/exit, exploration, locks, traps, secrets, encounter transitions, and generated structure.
-- **Gathering and resource collection:** define discovery, eligibility, tools/skill checks, time/cost, yield, depletion, regrowth, and world-state changes.
+- **Gathering and resource collection:** define discovery, eligibility, tools/skill checks, time/cost, yield, depletion, regrowth, and world-state changes. The slice's version is in [19](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.4 (2026-11-04): anyone gathers in repeating cycles until cancelled or the node runs out, and Skinning a beast needs a lesson.
 - **World interaction:** define examining, opening, talking, manipulating objects, hidden objects, and context-sensitive actions.
 - **Time, weather, and environmental conditions:** define which conditions affect visibility, actors, resources, POIs, and events.
 

@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 1.55
+Version: 1.56
 
 Status: Draft
 
-Last Updated: 2026-11-03 (slice audit: the campaign odds entry records the owner's acceptance of 23 % for the slice)
+Last Updated: 2026-11-04 (slice design gaps: the Vertical Slice target entry points to the owner's answers on beasts, gathering, Yield, saving, schedules and ritual sites)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -409,7 +409,7 @@ An entry marked † is the short binding form. Its full text is in [91 Agent Dec
 - † **Dialogue** ([10.4 Dialogue and Social Checks](10.4%20Dialogue%20and%20Social%20Checks.md)): modelled on Disco Elysium: `2d6 + Character Value + Modifiers` against `Request + Listener Value`, +2 for an enemy, a deliberate exception to the curve of 07.1. A Social Check exists only with an Argument the character gained in this life; a fact the player remembers from an earlier life does not count. A failed check cannot be repeated on the spot, and against enemies it is a Final Check that ends in a fight.
 - † **Ritual Weak Points** ([21](21%20Cult%20Campaign%20and%20City%20Control.md) §4): a slice ritual has two, chosen by the seed, and any one stops it; a campaign ritual has two at the middle setting and one at the higher settings. No list or map mark shows them. A failed Final Check leaves only the hidden route. The Cult Thought Link carries orders and reports in exceptional cases and is not a shared mind. Any dialogue pauses the world, with no exceptions, and costs one tick when it ends. Traces of a Weak Point were left by people who joined the General earlier, not by a hidden agent: each has two sources in the city and one during the invasion, any one opens it, and each further one adds +1 ([11 Vertical Slice](11%20Vertical%20Slice.md)).
 - Information comes from biased partial Information Sources; no omniscient quest spoiler log that replaces world reading.
-- † **Vertical Slice target** ([11 Vertical Slice](11%20Vertical%20Slice.md)): the first implementation target. One city and a small territory at player Limits 9–8; a Factionless character may join the faction through a first-day trial; the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player stops the ritual and wins or loses. Required in a limited form, as 11 sets out: free exploration, gathering, Item Creation, Alchemy, First Aid, shops and gold, theft, combat, dialogue with checks, stealth, time, sleep. Brewing and theft are Reaction Checks, and durability is off. Out: Enchanting, Death Gap, Legacy Cache, Arcana change.
+- † **Vertical Slice target** ([11 Vertical Slice](11%20Vertical%20Slice.md)): the first implementation target. One city and a small territory at player Limits 9–8; a Factionless character may join the faction through a first-day trial; the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player stops the ritual and wins or loses. Required in a limited form, as 11 sets out: free exploration, gathering, Item Creation, Alchemy, First Aid, shops and gold, theft, combat, dialogue with checks, stealth, time, sleep. Brewing and theft are Reaction Checks, and durability is off. Out: Enchanting, Death Gap, Legacy Cache, Arcana change. The owner's answers of 2026-11-04 (beast territories, gathering and lessons, Yield, one Suspend Save, schedules, Ritual Site Candidates) are in the record.
 - Vertical Slice mood: Lord of the Mysteries-like 18–19th century industrial-occult transition; the slice's city is Veilmouth, and Lower Veil is one of its districts; only the internal-order faction is joinable; Wardens and Veinmarket are local groups; placeholder names mutable.
 
 ## Engine and terrain

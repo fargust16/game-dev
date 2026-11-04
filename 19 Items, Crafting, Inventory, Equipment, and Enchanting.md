@@ -1,8 +1,8 @@
 # 19 Items, Crafting, Inventory, Equipment, and Enchanting
 
-Version: 0.20
+Version: 0.21
 Status: Draft — owner-confirmed rules with delegated starting-balance formulas; content tables, operation costs, and selected edge cases remain open
-Last Updated: 2026-11-03 (prices, wages, selling and stock (§6.3), authoring defaults; Shop Skill +1 a day kept as an authoring default. Earlier: durability is off in the slice, by the owner. Earlier: the Attribute Requirement penalty grows with the shortfall. Earlier: Attribute Requirements V0: values and stage scaling in 10.2 §5b. Earlier: Attribute Requirements for weapons and armour, and silver cartridges deal more damage to monsters, by the owner's direction. Earlier: the hand on the Cartridge Pouch loads each shot, with no separate Reload. Earlier: kinds of weapon, the Cartridge Pouch, and two Weapon Sets, by the owner's decision. Earlier: armour splits its defence by the owner's direction: cloth against magic, leather half and half, plate against physical harm. Earlier: a pistol can share the hands with a one-handed weapon, a shield, or a second pistol, and Reload needs a free hand, by the owner's decision. Earlier: bows and the mini-crossbow removed by the owner: weapons are iron, for melee and firearms. Earlier: V1 counts no ammunition, by the owner's decision. Earlier: catalogue gains Magical Damage, Will Power, and magical defence, and critical and defence values rise; crossbows out, rifle and pistol in; crafting has no ceiling, by the owner's decision. Earlier: shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
+Last Updated: 2026-11-04 (gathering, Skinning, learning Item Creation from its Master, the workshop, stage 9 recipes, and the weights of resources, tools and First Aid supplies: the owner's rules, the agent's numbers. Earlier: prices, wages, selling and stock (§6.3), authoring defaults; Shop Skill +1 a day kept as an authoring default. Earlier: durability is off in the slice, by the owner. Earlier: the Attribute Requirement penalty grows with the shortfall. Earlier: Attribute Requirements V0: values and stage scaling in 10.2 §5b. Earlier: Attribute Requirements for weapons and armour, and silver cartridges deal more damage to monsters, by the owner's direction. Earlier: the hand on the Cartridge Pouch loads each shot, with no separate Reload. Earlier: kinds of weapon, the Cartridge Pouch, and two Weapon Sets, by the owner's decision. Earlier: armour splits its defence by the owner's direction: cloth against magic, leather half and half, plate against physical harm. Earlier: a pistol can share the hands with a one-handed weapon, a shield, or a second pistol, and Reload needs a free hand, by the owner's decision. Earlier: bows and the mini-crossbow removed by the owner: weapons are iron, for melee and firearms. Earlier: V1 counts no ammunition, by the owner's decision. Earlier: catalogue gains Magical Damage, Will Power, and magical defence, and critical and defence values rise; crossbows out, rifle and pistol in; crafting has no ceiling, by the owner's decision. Earlier: shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -20,7 +20,7 @@ This draft consolidates owner-approved direction for item bases, Item Creation, 
 
 - There is no global character level. Attributes and skills have separate progression tracks; ordinary skill progression is distinct from Limits.
 - The item/equipment-crafting professions are **Item Creation** and **Enchanting**. **Alchemy** is a separate, potion-only profession defined in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md); it does not create equipment or modify items. Luck and Perception are attributes, not professions. No separate crafting profession exists for each material or equipment family.
-- **Item Creation** creates equipment from bases and required resources. Its skill is the primary influence on modifier count; the starting probability formula is in §3.
+- **Item Creation** creates equipment from bases and required resources. Its skill is the primary influence on modifier count; the starting probability formula is in §3. By the owner's decision of 2026-11-04 it is learned from its Master, as Alchemy is; gathering needs no lesson (§6.4).
 - **Luck** and **Perception** affect modifier count as specified in §3. Neither changes a base's fixed modifier-type weights. Luck also follows the shared probability rule in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md); fixed weighted item tables are not rewritten by Luck.
 - **Enchanting** performs the operations in §5. Learning the profession grants the first operation; later skill thresholds unlock the next operations in order. Enchanting skill shifts tier outcomes in its own random operations but does not change modifier-type weights. The exact unlock levels remain open.
 - Attribute, skill, and shared probability rules are in [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md).
@@ -137,6 +137,43 @@ The starting model yields about 10.1% per potential modifier at Item Creation 1 
 
 For every generated modifier, the selected base supplies the fixed type weights; the base stage supplies tier weights; the tier supplies the numeric range. Item Creation, Luck, and Perception affect modifier count only. Enchanting skill may influence tier outcomes during Enchanting operations, not base type weights.
 
+**Learning and the workshop.** Owner's decision, 2026-11-04: anyone may gather, but only a character who has learned Item Creation from its Master may craft, as with Alchemy. Authoring defaults the same day:
+
+- The lesson costs 10 gold (§6.3).
+- Crafting happens at the Master's workshop, which costs 1 gold a piece and is open while the Master works ([18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)).
+- A stage 9 piece takes 10 ticks and a stage 8 piece 20. The world advances during the work, and being attacked interrupts it with the resources kept.
+- Item Creation always makes its item; only the modifier count is random. For XP of [07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §3 it counts as a normal success.
+- A crafter reaches about skill 11 to 14 in a run, and 15 is the ceiling, because stage 8 pieces need a rare ingredient ([07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §3, `tools/balance/progress_sim.py`).
+
+**Recipes of stage 9.** Authoring defaults, 2026-11-04.
+
+| Item | Resources |
+|---|---|
+| Dagger | 2 ore, 1 wood |
+| Sword | 3 ore, 1 wood |
+| Axe | 3 ore, 2 wood |
+| Mace | 4 ore, 1 wood |
+| Greatsword | 5 ore, 1 wood |
+| Greataxe | 5 ore, 2 wood |
+| Maul | 6 ore, 2 wood |
+| Pistol | 3 ore, 2 wood |
+| Rifle | 4 ore, 3 wood |
+| Cartridge Pouch | 2 leather |
+| Wooden shield | 4 wood |
+| Metal shield | 5 ore, 1 wood |
+| Ring | 1 ore |
+| Necklace or amulet | 2 ore |
+| Belt | 1 leather |
+
+| Armour (head / body / shoulders / gloves / trousers / boots) | Resource |
+|---|---|
+| Cloth | 2 / 4 / 2 / 1 / 3 / 2 flax |
+| Leather | 1 / 3 / 2 / 1 / 2 / 1 leather |
+| Chain | 2 / 6 / 3 / 2 / 4 / 2 ore |
+| Plate | 3 / 9 / 4 / 2 / 6 / 3 ore |
+
+A stage 8 piece takes half as many resources again, rounded up, plus one rare ingredient of stage 8 (§2.1). In the slice that is a glowing beast's magical ingredient, or the same bought from the Master of Enchanting for 150 gold (§6.3). It competes with the Limit 8 potion for the same ingredient ([05.1](05.1%20Arcana%20and%20Limits.md)).
+
 # 4. Inventory, equipment, and durability
 
 ## 4.1 Inventory and weight
@@ -145,6 +182,7 @@ For every generated modifier, the selected base supplies the fixed type weights;
 - Every carried item has an assigned weight. Total carried weight includes equipped items and equals the sum of item weights; stack weight is the per-unit weight multiplied by quantity. Currency/gold weighs 0 and never changes the load.
 - Starting weight balance (kg): ring 0.05; necklace/amulet 0.10; belt 0.25. Cloth armour: head 0.5, body 2, shoulders 0.8, gloves 0.4, trousers 1.2, boots 0.8. Leather armour: 1, 4, 1.5, 0.8, 2.5, 1.5 respectively. Chain armour: 1.8, 7.5, 3, 1.4, 4.5, 3 respectively. Plate/heavy-metal armour: 2.8, 11, 4.5, 2, 7, 4.5 respectively.
 - Starting hand-item weights (kg): dagger 1; sword 2; axe 2.2; mace 2.5; greatsword 4.5; greataxe 5; maul 6; wooden shield 2.5; metal shield 4; rifle 4; pistol 1.2; Cartridge Pouch 0.5.
+- Resources, tools, and supplies (kg, authoring defaults, 2026-11-04): ore 1; wood 1.5; leather 0.5; flax 0.2; herb 0.1; ordinary beast ingredient 0.2; magical ingredient 0.1; woodcutting axe 2; pickaxe 2.5; bandage 0.1; splint 0.5; antidote 0.2; potion 0.3.
 - These weights are initial balance values. Specific bases, tools, materials, consumables, and additional item families must receive explicit weights in their content definitions. Cloth should remain lighter than leather, leather lighter than chain, and plate/heavy metal heaviest; jewellery is nearly weightless.
 - Working base damage, attack AP, armour values, and block and parry chances are in [10.2](10.2%20Combat%20System%20Draft.md) §5b.
 - Stacking, equipment slots, and containers remain distinct from item footprints. A separate home stash is intended, but its capacity and whether it is weight-limited remain open.
@@ -298,6 +336,29 @@ A city set of 11 pieces at Shop Skill 26 costs about 230 gold.
 
 **Stock.** A shop holds one to three of each thing it sells. Each morning it fills again to that count, so the Shop Skill of that day makes the new pieces. Working reading for the full game: buyers share one shelf, so what the player buys is missing for others until morning. The slice's fighters bring their own gear and do not shop during the run.
 
+## 6.4 Gathering and Skinning
+
+Owner's rules, 2026-11-04:
+
+- Anyone may gather herbs, wood, and ore; no lesson is needed.
+- Gathering repeats cycle after cycle, with its animation, until the player cancels it or the node runs out.
+- Skinning a beast needs a lesson from a Master.
+
+Authoring defaults the same day:
+
+| Node | Units | Tool | Skill / attribute | D | Comes back |
+|---|---:|---|---|---:|---|
+| Herb patch | 3 | hands | Herbalism / Perception | 1 | 24 hours after it was emptied |
+| Flax patch | 3 | hands | Herbalism / Dexterity | 1 | 24 hours after it was emptied |
+| Tree | 6 | axe | Woodcutting / Strength | 2 | not within a run |
+| Ore vein | 8 | pickaxe | Mining / Strength | 3 | not within a run |
+
+- A cycle takes 1 tick and is an action check of [07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §4 against the node's D: a success gives 1 unit, a critical success 2, and a failure none.
+- Each cycle costs 3 % of the character's maximum Stamina. Gathering stops at 0 Stamina.
+- Moving, opening the bag, being noticed by a beast, or being attacked cancels it.
+- **Skinning** takes 3 ticks and is a check on (Dexterity + Skinning) / 2 against D 2. A wolf gives 1 leather and a boar 2; a failure gives half, rounded down. The lesson costs 10 gold.
+- Working readings, not owner decisions: the Master of Item Creation teaches Skinning, and a beast's other parts, its ingredients, need no lesson. Whether the slice's gathering skills have Masters at all is open (§7).
+
 # 7. Open design questions
 
 1. Confirm whether base-favored modifier types are independent of the major/minor group (this draft treats them independently). What is the final base catalogue and its fixed favored-type weights? What are the exact item-stage/tier weights, numeric ranges, and duplicate constraints? §2.4 holds working values only.
@@ -311,6 +372,9 @@ A city set of 11 pieces at Shop Skill 26 costs about 230 gold.
 9. Which item types may be placed in or inherited from a Legacy Cache? Can an extracted modifier instance be stored there and survive into another Character Life?
 10. Will transformed NPCs become monsters, and what equipment/items may they drop? What are the rules for non-equipment carried goods and other non-combat item acquisition?
 11. What exact colour values, icons, and accessible presentation accompany the agreed quality colour categories?
+12. Which Master teaches Skinning? (Working reading: the Master of Item Creation.)
+13. Does taking a beast's other parts, its ingredients, need the Skinning lesson? (Working reading: no.)
+14. Do Herbalism, Woodcutting, and Mining have Masters who teach anything, and what would a lesson give when gathering needs none?
 
 Starting modifier-count probabilities, Item Creation stage gates, initial weight values/carry thresholds, NPC equipment-recovery formula, quality bands/colour directions, insertion capacity and compatibility, numeric-value operation scope, and durability categories/repair ingredient type are defined in this draft. Their initial balance values may be tuned through later playtesting.
 

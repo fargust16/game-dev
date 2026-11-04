@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.19
+Version: 0.20
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-03 (Bleeding and Poison rates and First Aid treatment in 10.2, authoring defaults. Earlier: a Master teaches First Aid and sells its supplies. Earlier: the question on reports names forces, not numeric Influence. Earlier: ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-04 (sleep restores 3 Sanity; the slice's townsfolk schedules, by the owner's answer, with authoring-default hours. Earlier: Bleeding and Poison rates and First Aid treatment in 10.2, authoring defaults. Earlier: a Master teaches First Aid and sells its supplies. Earlier: the question on reports names forces, not numeric Influence. Earlier: ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -91,7 +91,7 @@ During ordinary free exploration, the shared game clock advances continuously at
 
 - A completed, uninterrupted sleep session fully restores the character's ordinary HP **only if no active condition or other effect prevents health recovery**.
 - Sleep also restores stamina. The rate and additional benefits depend on sleep comfort; exact values remain open.
-- A completed sleep restores a little Sanity ([07.2](07.2%20Derived%20Character%20Statistics.md)). The amount is open.
+- A completed sleep of 6 hours or more restores 3 Sanity ([07.2](07.2%20Derived%20Character%20Statistics.md); authoring default, 2026-11-04).
 - If Poison remains active, health and stamina recovery remain blocked for as long as the poison condition persists.
 - If Bleeding remains active, it continues to remove health during sleep and can kill the character before waking.
 - If a recovery-blocking condition is removed partway through sleep, the corresponding recovery may begin from that point onward. A condition is never treated as removed merely because the character slept.
@@ -219,6 +219,14 @@ Examples of ordinary activities include:
 - an NPC reacting to a threat by fleeing, hiding, warning others, or fighting.
 
 Schedules can guide ordinary routines, but NPC behaviour must not be limited to a rigid sequence of scripted time slots. Current circumstances and newly received information can change what an NPC decides to do.
+
+**Townsfolk in the slice.** Owner's decision, 2026-11-04, with authoring-default hours:
+
+- Named NPCs follow schedules of home, work, tavern, and sleep, and events interrupt them. Masters and their shops keep 08:00–20:00.
+- A shop and its workshop are closed while their Master is away, asleep, or hiding.
+- When the invasion begins, ordinary NPCs hide and defenders go to the fight ([21](21%20Cult%20Campaign%20and%20City%20Control.md)).
+- Crowds walk with no schedule, and fewer walk at night.
+- Goal-driven behaviour, where an NPC chooses its own aims, is V2.
 
 ## Settlement displacement and return
 

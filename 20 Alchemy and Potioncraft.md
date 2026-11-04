@@ -1,10 +1,10 @@
 # 20 Alchemy and Potioncraft
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft — owner-approved foundation; skill progression, mini-game, recipes, and balance remain open
 
-Last Updated: 2026-11-03 (the brewing mini-game is a Reaction Check once a tick, and its results change the potion's Sanity cost and attribute rise, by the owner. Earlier: the potion shop's Master teaches Alchemy as a working reading. Earlier: the Alchemical Flask rejected by the owner. Earlier: the Alchemical Flask proposal noted. Earlier: the V1 question follows the slice's Limits. Earlier: terms renamed to Arcana and Limit. Earlier: potion-making included in the Vertical Slice.)
+Last Updated: 2026-11-04 (an interrupted brewing loses its ordinary ingredients and keeps the magical one, authoring default. Earlier: the brewing mini-game is a Reaction Check once a tick, and its results change the potion's Sanity cost and attribute rise, by the owner. Earlier: the potion shop's Master teaches Alchemy as a working reading. Earlier: the Alchemical Flask rejected by the owner. Earlier: the Alchemical Flask proposal noted. Earlier: the V1 question follows the slice's Limits. Earlier: terms renamed to Arcana and Limit. Earlier: potion-making included in the Vertical Slice.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -55,7 +55,7 @@ Owner-approved, 2026-11-03: the mini-game is a series of Reaction Checks. A **Re
 
 Authoring defaults: each perfect result lowers the Limit's mandatory Sanity cost by 10 % and each bad one raises it by 25 %, so six perfect results take 40 % of it and six bad ones 250 %. Three perfect results add 1 to both primary attributes and six add 2. Each bad result takes 15 % of the attribute rise away, so six leave a tenth of it. The good zone is a quarter of the bar and the perfect zone 6 %, and the marker crosses the bar in 1.5 seconds; Alchemy skill widens both zones, to 40 % and 10 % at skill 100 (working reading).
 
-What interruption does to the ingredients is not yet defined.
+**Interruption.** Authoring default, 2026-11-04: moving away, being attacked, or a fight starting interrupts a brewing. The ordinary ingredients are lost and the magical one is kept, so an interruption costs time and herbs but never the trip for a glowing beast or 150 gold.
 
 # 4. Boundaries
 
@@ -71,7 +71,7 @@ What interruption does to the ingredients is not yet defined.
 2. Must a character personally brew each advancement potion, or may they commission or obtain one after learning Alchemy?
 3. How does Alchemy skill progress, and which attributes, skills, tools, stations, and conditions affect each capability?
 4. How are formulas discovered and decoded, ingredients identified, and ingredient locations found?
-5. Resolved, 2026-11-03: Reaction Checks once a tick, which change the Sanity cost and attribute rise (§3). What does an interrupted brewing do to its ingredients?
+5. Resolved, 2026-11-03: Reaction Checks once a tick, which change the Sanity cost and attribute rise (§3). Resolved, 2026-11-04 (authoring default): an interrupted brewing loses its ordinary ingredients and keeps the magical one (§3).
 6. Resolved, 2026-11-03: the checks run within the six ticks, and the clock does not pause.
 7. Which potion categories beyond Arcana advancement exist, if any, and how do they respect the current prohibition on HP-restoring potions? The owner rejected a thrown Alchemical Flask on 2026-11-02: no consumable may change a battle's result that much (CC-46).
 8. Resolved, 2026-11-03: the slice brews only Limit potions and the substitute base for Основа ритуала, and the formulas of Limits 9 and 8 come as [11 Vertical Slice](11%20Vertical%20Slice.md) describes. Limit 7 is for NPCs only.
