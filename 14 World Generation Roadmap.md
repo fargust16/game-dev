@@ -1,10 +1,10 @@
 # 14 World Generation Roadmap
 
-Version: 0.38
+Version: 0.39
 
 Status: Draft
 
-Last Updated: 2026-11-01 (Combat Grid replaces arenas in the roadmap. Earlier: the campaign's 3×3 target world and 5–7 cities recorded; no change to the order or to production. Earlier: G3f: calibration (two runs, fixes F1, F2), GF-RF frozen, held-out part (1) 8 of 10; the owner's blind review pending. Earlier: G3f: the owner's research mission (2026-10-25); WP0 done; the technical specification and the research package written. Earlier: G3f: the owner's decisions D-3 … D-12 on content recorded in the phase plan v0.3; none authorises execution. Earlier: G3f, regional geography architecture: the phase plan approved — D-1, D-2 — and recorded; only step A authorised. 2026-10-24: G3e-PM ran: H FAIL; the S-LM1 line stopped. G3e-PM post-mortem checks pre-registered, plan approved, not run. G3e Step 1 ended not ready; report accepted, Step 1 closed. 2026-10-23: LMC named G3e; C8, C9 decided. LMC specification v0.4 approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC Step 1 readiness check; design note approved as the research plan. Earlier: LMC technical specification approved; Step 1 not authorised. Earlier: checked on G3c data. 2026-10-21: LMC design note v0.2, the owner's revision; post-G3c review: GEO decisions, model research plan; G3c results; G2 review)
+Last Updated: 2026-11-04 (the Vertical Slice is one hand-built scene outside this pipeline, by the owner's decision; Overworld V0 marked shipped in the agent instructions. Earlier: Combat Grid replaces arenas in the roadmap. Earlier: the campaign's 3×3 target world and 5–7 cities recorded; no change to the order or to production. Earlier: G3f: calibration (two runs, fixes F1, F2), GF-RF frozen, held-out part (1) 8 of 10; the owner's blind review pending. Earlier: G3f: the owner's research mission (2026-10-25); WP0 done; the technical specification and the research package written. Earlier: G3f: the owner's decisions D-3 … D-12 on content recorded in the phase plan v0.3; none authorises execution. Earlier: G3f, regional geography architecture: the phase plan approved — D-1, D-2 — and recorded; only step A authorised. 2026-10-24: G3e-PM ran: H FAIL; the S-LM1 line stopped. G3e-PM post-mortem checks pre-registered, plan approved, not run. G3e Step 1 ended not ready; report accepted, Step 1 closed. 2026-10-23: LMC named G3e; C8, C9 decided. LMC specification v0.4 approved; earlier the same day C2–C5 prepared. 2026-10-22: LMC Step 1 readiness check; design note approved as the research plan. Earlier: LMC technical specification approved; Step 1 not authorised. Earlier: checked on G3c data. 2026-10-21: LMC design note v0.2, the owner's revision; post-G3c review: GEO decisions, model research plan; G3c results; G2 review)
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md)
@@ -366,7 +366,7 @@ Do **not** resume this order unless the user explicitly overrides [16](16%20Arch
 # Agent Instructions (quick)
 
 1. Read [16 Architecture Pivot](16%20Architecture%20Pivot.md), then [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md), then this file.
-2. **Next implementation default:** `unity/Assets/Plans/OVERWORLD_V0_PLAN.md` (W0.1→W0.9). Do not extend OrganicTown C1 continuous path.
+2. **World-gen path:** `unity/Assets/Plans/OVERWORLD_V0_PLAN.md` (W0.1→W0.9), shipped. Do not extend OrganicTown C1 continuous path. The project's next code is the Vertical Slice, in one hand-built scene that does not use this pipeline (`unity/Assets/Plans/VERTICAL_SLICE_IMPLEMENTATION_PLAN.md`, owner, 2026-11-04).
 3. Keep style: no inheritance tricks; deterministic `WorldSeed` forks; human-scale metres; chunk **64 m**; playable overworld **2800 × 2800 m**.
 4. Confirm design forks with the user before changing locked architecture above.
 5. After a documentation or milestone step: commit when the user asks (human steers git).

@@ -1,10 +1,10 @@
 # 16 Architecture Pivot
 
-Version: 0.11
+Version: 0.12
 
 Status: Draft
 
-Last Updated: 2026-11-02 (the Combat Grid test is passed (CC-33). Earlier: the Combat Grid is built during a fight; the slice uses 20 cells, with 50 planned. Earlier: transparent walls detailed from the lab. Earlier: the Combat Grid follows the player. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: the Combat Grid forms around the player; interiors stay separate scenes; door and camera rules recorded. Earlier: what failed in 2026-08 stated exactly; the world lives between rounds; the door question added to the technical test. Earlier: owner replaced the Combat Arena with combat in place on a Combat Grid.)
+Last Updated: 2026-11-04 (the Vertical Slice is an owner-approved exception to the seeded Overworld: one hand-built scene. Earlier: the Combat Grid test is passed (CC-33). Earlier: the Combat Grid is built during a fight; the slice uses 20 cells, with 50 planned. Earlier: transparent walls detailed from the lab. Earlier: the Combat Grid follows the player. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: the Combat Grid forms around the player; interiors stay separate scenes; door and camera rules recorded. Earlier: what failed in 2026-08 stated exactly; the world lives between rounds; the door question added to the technical test. Earlier: owner replaced the Combat Arena with combat in place on a Combat Grid.)
 
 Depends On:
 [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
@@ -52,7 +52,7 @@ Philosophy (`00`–`07`, Decision Engine, Approaches as choices, Confront *const
 
 | Layer | Lock |
 |-------|------|
-| **Overworld** | Seeded Valheim-like zones/biomes/POIs/creatures; smaller than Valheim OK; **no** tree/rock harvest as core loop |
+| **Overworld** | Seeded Valheim-like zones/biomes/POIs/creatures; smaller than Valheim OK; **no** tree/rock harvest as core loop. Exception, owner's decision of 2026-11-04: the Vertical Slice is one hand-built scene, a small city and its forest, assembled from a modular kit ([11](11%20Vertical%20Slice.md)) |
 | **Movement / camera** | Free third-person, Genshin-like locomotion feel (not feature parity); no top-down tactical overworld |
 | **Interiors** | Separate scenes, like a change of level in Fallout; free third-person outside Confront; their own Combat Grid during it |
 | **Confront** | Runs **in place**, in the scene where it starts; Fallout 1/2 / BG3 turn feel; free movement returns with residue |
@@ -219,7 +219,7 @@ OrganicTown is not viable (not modular, not optimized, did not read as a real ci
 | [10.2](10.2%20Combat%20System%20Draft.md) | Initiative + AP combat economy on the Combat Grid |
 | [10.1](10.1%20Grid%20World%20and%20Environment%20Actions.md) | Combat Grid + Environment Actions |
 | [18](18%20World%20Time%20and%20Living%20Simulation.md) | Shared world clock and living-world simulation |
-| [11](11%20Vertical%20Slice.md) | Prove overworld stub → interior → combat in place |
+| [11](11%20Vertical%20Slice.md) | Prove a hand-built slice scene → interior → combat in place |
 | [12](12%20Engine%20Choice.md) | Free 3P + Combat Grid architecture |
 | [13](13%20City%20Generation.md) | Legacy / mood reference |
 | [14](14%20World%20Generation%20Roadmap.md) | Post-pivot overworld roadmap |

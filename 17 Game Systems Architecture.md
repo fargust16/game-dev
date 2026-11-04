@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 1.15
+Version: 1.16
 
 Status: Draft
 
-Last Updated: 2026-11-04 (the slice's Suspend Save, townsfolk schedules, and the Item Creation workshop, by the owner's answers. Earlier: unseen fights run the tactical rules without drawing, by the owner. Earlier: faction state holds forces and City Control; Influence is read from them. Earlier: Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
+Last Updated: 2026-11-04 (next code default: the Vertical Slice implementation plan, in one hand-built scene, by the owner's decision. Earlier: the slice's Suspend Save, townsfolk schedules, and the Item Creation workshop, by the owner's answers. Earlier: unseen fights run the tactical rules without drawing, by the owner. Earlier: faction state holds forces and City Control; Influence is read from them. Earlier: Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
 
 Depends On:
 [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -830,7 +830,7 @@ Detail acceptance: [OVERWORLD_V0_PLAN.md](unity/Assets/Plans/OVERWORLD_V0_PLAN.m
 
 ## Later waves (named only)
 
-- Vertical Slice content on new rails ([11](11%20Vertical%20Slice.md))
+- Vertical Slice on new rails ([11](11%20Vertical%20Slice.md)): milestones S0–S7 in [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](unity/Assets/Plans/VERTICAL_SLICE_IMPLEMENTATION_PLAN.md), blocks by [SLICE_MODULAR_KIT_STANDARD.md](unity/Assets/Plans/SLICE_MODULAR_KIT_STANDARD.md)
 - Building DNA / Interior compiler phases ([15](15%20Procedural%20Building%20Generation.md))
 - NPC / Dialogue / Quest / Economy / Arcana code after respective design gates
 - Additive scene loading; richer biomes; networking transport
@@ -852,7 +852,7 @@ Detail acceptance: [OVERWORLD_V0_PLAN.md](unity/Assets/Plans/OVERWORLD_V0_PLAN.m
 # Agent Instructions
 
 1. Read [16](16%20Architecture%20Pivot.md) for scene locks, then this file for system ownership.
-2. Next **code** default: [OVERWORLD_V0_PLAN.md](unity/Assets/Plans/OVERWORLD_V0_PLAN.md) iterations W0.1 → W0.9.
+2. Next **code** default: [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](unity/Assets/Plans/VERTICAL_SLICE_IMPLEMENTATION_PLAN.md), milestone S0, once the owner authorises it. Overworld V0 ([OVERWORLD_V0_PLAN.md](unity/Assets/Plans/OVERWORLD_V0_PLAN.md)) is shipped and stays the full game's world path; the slice is one hand-built scene (owner, 2026-11-04).
 3. Before coding a system, open its System Card; if the card is Deferred/gated, do not invent a full implementation.
 4. If architecture must change, update this document (and contradict-check `16`) **before** code.
 5. OrganicTown is deprecated and not a reuse source ([13](13%20City%20Generation.md)). Only generic, non-city-specific patterns already specified independently in this document carry forward: deterministic `WorldSeed` fork-by-name (W.1) and the modular art dressing library (`PROCEDURAL_TOWN_ASSET_LIBRARY.md`). Do not port OrganicTown's polygon/continuous-mesh generation code or algorithms.
