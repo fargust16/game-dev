@@ -2,7 +2,7 @@
 
 Status: Draft — the owner's decisions are marked; everything else is the agent's plan and authoring defaults
 Created: 2026-11-04
-Last Updated: 2026-11-04
+Last Updated: 2026-11-04 (C0, the Veilmouth map, accepted by the owner: §2)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md) (what the slice is), [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md) (systems and folders), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md) (scene locks)
 Companion: [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -37,20 +37,36 @@ This plan orders the work, names the systems of [17](../../../17%20Game%20System
 
 ---
 
-## 2. The slice scene
+## 2. The slice scene: the Veilmouth map (C0)
 
-Authoring defaults, 2026-11-04. They size the work; the content pack (§5) fixes the details with the owner.
+C0, accepted by the owner as the agent drafted it, 2026-11-04. It is a layout: S0.6 places it on the ground, and the sizes and counts stay authoring defaults until the scene is built. North is +Z.
 
 | Item | Value |
 |---|---|
 | Scene | `Assets/Scenes/Slice/Veilmouth.unity`, with interiors as separate scenes beside it |
-| Playable area | about 700 × 700 m, ending at the sea on one side and at steep ground (over 45°) elsewhere, with no invisible walls |
-| City | about 200 × 200 m on the shore, with Lower Veil as its district of authored POIs |
-| Forest and land | the rest: 6 wolf packs and 4 boars in territories about 30 m across, at least 60 m apart ([11](../../../11%20Vertical%20Slice.md)) |
-| Resource nodes | about 40 trees to fell, 12 ore veins, 30 herb patches, 10 flax patches ([11](../../../11%20Vertical%20Slice.md)) |
-| Ritual Site Candidates | three: a factory yard, a cellar under the Soot Stair, an old chapel (working examples, [21](../../../21%20Cult%20Campaign%20and%20City%20Control.md) §4) |
+| Playable area | about 700 × 700 m: the sea along the south edge and steep ground (over 45°) on the other three, with no invisible walls |
+| Sea and river | the harbour in the mouth of the river Veil; the Veil runs from the north edge along the city's east side into the sea, and one bridge crosses it from the city |
+| City | about 200 × 200 m on the shore, west of the river, in the districts below |
+| Fields | west of the city: the flax and the boars' ground |
+| Forest | north and west, around the fields and the city: trees and herbs; wolves deeper in, boars at its edge |
+| Hill | north-east, across the river: the ore, so a trip for ore crosses the bridge |
+| Road | from the Ridge north through the forest to the edge of the area |
+| Beasts | 6 wolf packs deeper in the forest and 4 boars at the forest edge and in the fields, in territories about 30 m across, at least 60 m apart ([11](../../../11%20Vertical%20Slice.md)) |
+| Resource nodes | about 40 trees in the forest, 12 ore veins on the hill, 30 herb patches in forest glades, 10 flax patches in the fields ([11](../../../11%20Vertical%20Slice.md)) |
 
-**Buildings that open into an interior scene** (authoring default): the tavern, Harrow's apothecary, the faction's house, the missing person's room, the cellar under the Soot Stair, and the old chapel. Shops of the trader and of the Masters of Item Creation, Enchanting, and First Aid serve over a counter that faces the street, and the Item Creation workshop is a yard, so they need no interior. Every other building has a closed door.
+**Districts.**
+
+| Place | Where | Holds |
+|---|---|---|
+| Ridge | the upper town, the city's north side; the rich | the faction's house; the Wardens' station with its lock-up |
+| Market | the centre and west | the trader; the counters of the Masters of Item Creation, Enchanting, and First Aid; the Item Creation yard; the seer's counter (authoring default) |
+| Lower Veil | the south-east, by the river and the docks; the poor and the factories | the Soot & Bell (the tavern) with the Notice Board; Harrow & Tincture; the factory with its yard and fence; Loom Lane; the pawn shop; the missing person's tenement room |
+| Soot Stair | from the Ridge down into Lower Veil, near Loom Lane | the narrow way between the upper and the lower town, with its cellar |
+| Old chapel | the city's north-west edge, toward the forest | — |
+
+**Ritual Site Candidates** ([11](../../../11%20Vertical%20Slice.md); [21](../../../21%20Cult%20Campaign%20and%20City%20Control.md) §4): (1) the factory yard, open ground in Lower Veil; (2) the cellar under the Soot Stair, closed and inside the city; (3) the old chapel at the city's edge. The seed picks one by its own key.
+
+**Buildings that open into an interior scene** (C0): seven — the Soot & Bell, Harrow's apothecary, the faction's house, the Wardens' lock-up, the missing person's room, the cellar under the Soot Stair, and the old chapel. The lock-up opens because Harrow can be heard there when the Wardens hold him ([11](../../../11%20Vertical%20Slice.md)). The trader, the three Masters, the pawn shop, and the seer serve over a counter that faces the street, and the Item Creation workshop is a yard, so they need no interior. Every other building has a closed door.
 
 At the pace of [18](../../../18%20World%20Time%20and%20Living%20Simulation.md), one tick of 10 real seconds per game minute, a run walks across 700 m in about two real minutes, or 12 ticks. Distance therefore costs little time, and the two game days hold enough real time to explore everything.
 
@@ -87,7 +103,7 @@ Accepted when: the player walks the city and the forest in third person; enters 
 | S0.5 Save contract, HUD | Schema version and the list of what persists; a UI Toolkit HUD with the day and time | The HUD shows the time; the contract is in code and in this plan |
 | S0.6 The scene | `Veilmouth.unity`: the playable ground, the sea, the player rig, the clock, and the HUD; then the streets, buildings, and forest by hand from the owner's kit, by C0 | The acceptance above |
 
-S0.1–S0.5 need nothing from the owner. S0.6 needs the C0 map and the first kit blocks; stand-ins fill the gaps.
+S0.1–S0.5 need nothing from the owner. S0.6 needs the C0 map (§2, done) and the first kit blocks; stand-ins fill the gaps.
 
 Progress: S0.1 done, 12 tests (commit `0bb96fd`). S0.2 done: the layers `Ground`, `Structure`, `Prop`, `Vegetation`, `Character`, `Interactable`, `NoGrid` at 8–14; `KitBlock` and `KitEnvironmentAction`; the layout check and eight stand-ins (kit standard §9–§9a); 6 tests, 18 in all. S0.2 also fixed the kit standard: pivots sit on grid nodes, and a post fills a node where walls meet. S0.3 done: `GameDev.Input` (the input service, unchanged), `GameDev.Locomotion` (`PlayerLocomotion`, the old Overworld controller; the Animator is optional and sits on a child), and `GameDev.Cameras` (`ThirdPersonCamera`, the old Overworld camera without the old clock and decision node: whoever opens a menu sets `LookEnabled`); the Overworld player menu and the grid lab use the new types. Editor menus build the slice player prefab and `Scenes/Slice/S0_Movement_Test.unity` from stand-ins (0 kit faults); 2 PlayMode tests walk the player there in a batch run, and an EditMode test keeps the scene's kit clean, 19 EditMode tests in all. S0.4 done: `GameDev.Core.Scenes` (`TravelRequest` with the scene and the arrival door; `SceneTransition`, a single-scene swap behind a gate), `GameDev.World.Portals` (`Portal`: Interact within 1.5 m of the opening; the paired door places the player 1 m in front of itself, facing away), and `GameDev.World.Interiors` (`InteriorRuntime`, which marks an interior scene with its building id). The movement test scene's door leads to `Scenes/Slice/S0_Tavern_Test.unity`, an 8 × 8 m stand-in room, and back; both are in Build Settings. Authoring default: a door costs no game time of its own; the clock runs through the load, so a door takes only the real seconds the load takes. 2 EditMode tests check that the doors pair up and where the street door puts the player, and 2 PlayMode tests go in and out and check the clock; 22 EditMode and 4 PlayMode tests in all. The real tavern comes from the owner's kit in S0.6. S0.5 done: the save contract below, in `GameDev.Core.Save` (`SaveSchema`, `SaveFile`, `ISaveContributor`, `SaveAssembler`), with the clock as its first contributor; and a UI Toolkit HUD in `GameDev.UI` (`HudView` on `UI/Hud/Hud.uxml`, one panel from Unity's default runtime theme scaled from 1920 × 1080) that shows the day and time and an "E Enter" prompt within a door's reach. Both test scenes carry it. 8 EditMode and 2 PlayMode tests; 30 EditMode and 6 PlayMode in all.
 
@@ -236,7 +252,7 @@ Content is written with the owner, by the usual method, just before the mileston
 
 | Piece | Needed by | Contents |
 |---|---|---|
-| C0 Veilmouth map | S0 | Street plan, the buildings and which open, shops, forest zones, territories, resource nodes, the three Ritual Site Candidates |
+| C0 Veilmouth map | S0 | **Done, 2026-11-04** (§2): districts, the buildings and which open, shops, forest zones, territories, resource nodes, the three Ritual Site Candidates; the street plan itself is drawn in S0.6 |
 | C1 People | S1 | 6–10 named NPCs and the Masters: role, place, schedule, what they know, what tips they give |
 | C2 POI A and B | S2 | Full Decision Node cards, dialogue, the Arguments each needs |
 | C3 Beasts and enemies | S3 | Where each territory lies, which beasts glow, what they leave |
@@ -256,6 +272,5 @@ Content is written with the owner, by the usual method, just before the mileston
 
 ## 7. Open
 
-- The interiors list in §2 and the scene's size are authoring defaults to confirm with C0.
 - The triangle and texture budget of the kit (kit standard, *Open*).
 - Whether the full game later reuses the slice's city as a hand-built landmark on the seeded Overworld, or rebuilds it.
