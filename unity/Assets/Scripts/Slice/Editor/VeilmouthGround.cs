@@ -196,16 +196,16 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>Weights for the five canonical layers (grass, sand, soil, cliff, rock), by priority cover.</summary>
-        public static float[,,] Paint(float[,] heights)
+        public static float[,,] Paint(float[,] heights, int resolution = AlphamapResolution)
         {
-            var maps = new float[AlphamapResolution, AlphamapResolution, 5];
+            var maps = new float[resolution, resolution, 5];
             var cell = Size / (HeightmapResolution - 1);
-            for (var z = 0; z < AlphamapResolution; z++)
+            for (var z = 0; z < resolution; z++)
             {
-                for (var x = 0; x < AlphamapResolution; x++)
+                for (var x = 0; x < resolution; x++)
                 {
-                    var hx = Mathf.RoundToInt(x * (HeightmapResolution - 1f) / (AlphamapResolution - 1f));
-                    var hz = Mathf.RoundToInt(z * (HeightmapResolution - 1f) / (AlphamapResolution - 1f));
+                    var hx = Mathf.RoundToInt(x * (HeightmapResolution - 1f) / (resolution - 1f));
+                    var hz = Mathf.RoundToInt(z * (HeightmapResolution - 1f) / (resolution - 1f));
                     var h = heights[hz, hx];
                     var gx = (heights[hz, Mathf.Min(hx + 1, HeightmapResolution - 1)] - heights[hz, Mathf.Max(hx - 1, 0)]) / (2f * cell);
                     var gz = (heights[Mathf.Min(hz + 1, HeightmapResolution - 1), hx] - heights[Mathf.Max(hz - 1, 0), hx]) / (2f * cell);

@@ -32,7 +32,7 @@ namespace GameDev.Slice.EditorTools
             Top("view_government", new Vector3(0f, 0f, -70f), 80f);
             Top("view_market", new Vector3(-80f, 0f, -255f), 80f);
             Top("view_hill", new Vector3(420f, 0f, 140f), 180f);
-            Eye("eye_bellstreet", 205f, -236f, 205f, -222f, 2.5f);
+            Eye("eye_bellstreet", 215f, -235f, 100f, -235f, 2.5f);
             Eye("eye_highstreet", -150f, -171f, 100f, -171f, 3f);
             Eye("eye_avenue", 0f, -150f, 0f, -20f, 6f);
             Eye("eye_ridgestreet", -80f, -86f, 100f, -86f, 3f);

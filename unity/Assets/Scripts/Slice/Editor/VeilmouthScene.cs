@@ -89,8 +89,8 @@ namespace GameDev.Slice.EditorTools
             ("Forest", -110f, 265f, 780f, 470f, Land),
             ("Ore Hill", 420f, 140f, 150f, 340f, Land),
             ("Ritual Site Candidate 1 - Ritual Square", 154.5f, -260f, 25f, 24f, Ritual),
-            ("Ritual Site Candidate 2 - Soot Stair Cellar", 204f, -154f, 8f, 8f, Ritual),
-            ("Ritual Site Candidate 3 - Old Chapel", -190f, -22.5f, 12f, 12f, Ritual),
+            ("Ritual Site Candidate 2 - Soot Stair Cellar", 213f, -136f, 8f, 8f, Ritual),
+            ("Ritual Site Candidate 3 - Old Chapel", -189f, -48f, 12f, 12f, Ritual),
         };
 
         public static string[] ZoneNames => Zones.Select(z => z.Name).ToArray();

@@ -60,10 +60,10 @@ namespace GameDev.Slice.EditorTools
 
         private const float T = VeilmouthScene.TerrainLevel;
         private const float S = VeilmouthScene.StreetLevel;
-        private const string Dummies = "Assets/Kevin Iglesias/Human Character Dummy/Prefabs";
+        internal const string Dummies = "Assets/Kevin Iglesias/Human Character Dummy/Prefabs";
         private const string AnimatorPath = "Assets/Settings/OverworldPlayerAnimator.controller";
-        private const string WolfPath = "Assets/FourEvilDragonsHP/Prefab/DragonSoulEater/Grey.prefab";
-        private const string BoarPath = "Assets/FourEvilDragonsHP/Prefab/DragonNightmare/Albino.prefab";
+        internal const string WolfPath = "Assets/FourEvilDragonsHP/Prefab/DragonSoulEater/Grey.prefab";
+        internal const string BoarPath = "Assets/FourEvilDragonsHP/Prefab/DragonNightmare/Albino.prefab";
 
         private static Dictionary<string, SliceKitCatalogue.Entry> _kit;
         private static Transform _parent;
@@ -225,7 +225,7 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>Scales a character to <paramref name="height"/> (0 keeps it), sets its feet on its y, and gives it a capsule.</summary>
-        private static void Stand(GameObject go, float height)
+        internal static void Stand(GameObject go, float height)
         {
             foreach (var c in go.GetComponentsInChildren<Collider>(true))
             {
@@ -248,7 +248,7 @@ namespace GameDev.Slice.EditorTools
             SliceKitCatalogue.SetLayer(go, KitLayers.Character);
         }
 
-        private static Bounds Seen(GameObject go)
+        internal static Bounds Seen(GameObject go)
         {
             var renderers = go.GetComponentsInChildren<Renderer>().Where(r => !(r is ParticleSystemRenderer)).ToArray();
             var b = renderers[0].bounds;
@@ -337,7 +337,7 @@ namespace GameDev.Slice.EditorTools
         /// frame; with none in the scene the wind is zero, its direction undefined, and every tree and bush vanishes
         /// (found 2026-11-05). One wind zone for the scene, at the pack's defaults.
         /// </summary>
-        private static void Wind(Transform root)
+        internal static void Wind(Transform root)
         {
             var wind = new GameObject("Wind");
             wind.transform.SetParent(root, false);

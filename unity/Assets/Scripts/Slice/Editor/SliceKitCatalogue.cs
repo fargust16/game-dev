@@ -71,6 +71,7 @@ namespace GameDev.Slice.EditorTools
         private const string Trees = "Assets/Stylized Trees Pack/Assets/Prefabs";
         private const string Colonial = "Assets/3DShapes";
         private const string VictorianStreet = "Assets/Modular Victorian City/Prefabs/Basic elements/Street";
+        private const string Polytope = "Assets/Polytope Studio/Lowpoly_Environments/Prefabs";
 
         private static Spec S(string key, string family, string part, string folder, string file, string layer,
             Body body = Body.Box, Anchor anchor = Anchor.Centre) =>
@@ -207,6 +208,29 @@ namespace GameDev.Slice.EditorTools
                 bush.SizeY = 1.6f;
                 yield return bush;
             }
+
+            // C1 (city plan §4, §6): the Victorian railing and column, and the plain green cover of Polytope Studio, which
+            // is the common tree and shrub; the Stylized Trees Pack's coloured crowns stay for the rare resource trees.
+            var railing = S("Railing", "Street", "Railing", "Assets/Modular Victorian City/Prefabs/Modules", "Fence", pr, anchor: Anchor.Linear);
+            railing.SizeX = 2f;
+            yield return railing;
+            var column = S("Column", "Street", "Column", VictorianStreet, "Column", st);
+            column.SizeY = 8f;
+            yield return column;
+            foreach (var (key, file) in new[] { ("Tree_Fruit", "PT_Fruit_Tree_01_green"), ("Tree_Pine", "PT_Pine_Tree_03_green") })
+            {
+                yield return S(key, "Tree", key.Substring(5), Polytope + "/Trees", file, ve, Body.Trunk, Anchor.Pivot);
+            }
+
+            var shrub = S("Shrub", "Bush", "Shrub", Polytope + "/Shrubs", "PT_Generic_Shrub_01_green", KitLayers.NoGrid, Body.None, Anchor.Pivot);
+            shrub.SizeY = 1.2f;
+            yield return shrub;
+            var grass = S("Grass", "Bush", "Grass", Polytope + "/Plants", "PT_Grass_02", KitLayers.NoGrid, Body.None, Anchor.Pivot);
+            grass.SizeY = 0.5f;
+            yield return grass;
+            var poppy = S("Poppy", "Bush", "Poppy", Polytope + "/Flowers", "PT_Poppy_02", KitLayers.NoGrid, Body.None, Anchor.Pivot);
+            poppy.SizeY = 0.5f;
+            yield return poppy;
 
             var bridge = S("Bridge", "Bridge", "Veil", "Assets/Julien Tonsuso", "bridge_01", st, Body.Keep);
             bridge.Material = "Assets/YughuesFreePavementsMaterials/Materials/M_YFPM_Blocs.mat"; // its own is a Substance (.sbsar), magenta without the plugin

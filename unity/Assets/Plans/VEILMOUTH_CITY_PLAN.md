@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1)
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft — accepted by the owner, 2026-11-05; sizes remain authoring defaults
 
-Last Updated: 2026-11-05 (§9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-05 (§13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
@@ -215,7 +215,7 @@ The agent shapes the slice's ground once from C1 with an authoring tool, at the 
 - outside the walls, a coastal plain at the low level that rises 8 m north of the Ridge's line into the forest, rolling there by up to 4 m; the ore hill to 70 m;
 - the north, west, and east edges rise 45 m within 45 m of the boundary, steeper than 45°, with a pass where each road leaves.
 
-Checked by `VeilmouthSceneTests` (the heights above, the edge's slope, the roads' passes) and by `VeilmouthRenders`. Until the city is rebuilt (§11, step 3), C0's dressing still stands where it was, on this ground.
+Checked by `VeilmouthSceneTests` (the heights above, the edge's slope, the roads' passes) and by `VeilmouthRenders`. The same day the C1 city replaced C0's dressing on this ground (§13).
 
 ---
 
@@ -249,7 +249,47 @@ Checked by `VeilmouthSceneTests` (the heights above, the edge's slope, the roads
 
 1. Measure the Victorian modules and BK_AlchemistHouse; URP copies of BK's materials.
 2. The ground (§9).
-3. The plot builder and the city (§3–§7); the C0 Map zones become C1's; tests follow.
+3. ~~The plot builder and the city (§3–§7); the C0 Map zones become C1's; tests follow.~~ Done 2026-11-05 (§13).
 4. The seven interiors (§8).
-5. Trees and green (§6.2).
+5. ~~Trees and green (§6.2).~~ Done with the city (§13); the courts' and gardens' details remain.
 6. Walk it, render it, and hand it to the owner.
+
+---
+
+# 13. The city as built, 2026-11-05
+
+`VeilmouthCity` (*GameDev → Slice → Build Veilmouth City from C1 (once)*) builds the city once from this plan on the shaped ground, under one root, `Veilmouth C1`, and refuses to run again: from then on the scene is the owner's. It removes C0's `Dressing` root and lays the `C1 Map` zones again with two candidates moved to where their places now are: Candidate 2 to the cellar door's yard (213, −136), Candidate 3 to the chapel's forecourt (−189, −48). `BuildReplacing` is for the agent's own batch iterations only. Layout randomness is a fixed `System.Random`, never the world seed. Everything below is an authoring default.
+
+**Streets** are painted into the ground: three layers appended after the canonical five, which keep their order, because URP's terrain draws eight layers at most (Yughues' textures as terrain layers under `Settings/TerrainLayers/Slice/`, created once and tuned in the Inspector after that): *Setts* (`Rough01`) on every carriageway, *Flags* (`SmoothSquare`) on the pavements, and *Cobbles* (`Mediterranean01`) on squares, lanes, and yards. §2's asphalt has no texture in the agreed packs, so the High Street and the avenue are setts for now. The weights are painted again at 1024 (0.98 m a texel) over the canonical paint of §9, and the low town's yards and courts are cobbled. Kerbs are stone strips 0.3 m wide and 0.15 m high on the pavement's side of each carriageway, broken at every street, square, yard, or gate that meets them; they are NoGrid and carry no collider. As built, in plan coordinates (§3's world coordinates are X = px − 500, Z = 500 − py):
+
+| Street | Where | Section |
+|---|---|---|
+| High Street | 280–780 × 662–680, broken by Crown Circus | 4 + 10 + 4 m |
+| Crown Avenue | 482–518 × 560–646 | 4 + 7 + 14 mall + 7 + 4 m |
+| Ridge Street | 280–708 × 580–592 | 3 + 6 + 3 m |
+| Terrace streets West and East | 304–316 and 414–426 × 606–662 | 3 + 6 + 3 m |
+| Mercers Row and Bell Street | 280–370 and 430–724 × 730–740, on one line broken by the Market Square | 2 + 6 + 2 m |
+| Cheap Street, Dock Road | 454–466 and 724–736 × 680–812 | 2 + 8 + 2 m |
+| Loom Lane, Ridge Lane, Back Lane | 560–724 × 778–784; 545–698 × 620–626; 280–414 × 600–606 | cobbles |
+| Tanners Slant | from the High Street (325, 680) to the Market Square (370, 725), at 45° | 8 m setts |
+| Alleys | Court Alley, Loom Alley, Ridge Alley, Chapel Lane, the Garden Passage | 3–14 m, cobbles |
+| North Road | 618–628 × 490–580 | setts |
+| Quays | the Sea Quay 280–740 × 812–830; the Basin Quay 736–780 × 780–790 | setts |
+
+Squares: Crown Circus (475–525 × 646–696), the palace forecourt (460–540 × 530–560), the Market Square (370–430 × 720–765), the Ritual Square (642–667 × 740–778), the chapel's forecourt, Wardley Garden (340–390 × 606–644, lawn), the Soot & Bell's yard and gate, the cellar yard, and the pawnbroker's corner.
+
+**Stone works** are one mesh for each material with a box collider for each solid box (Structure): the town wall, 2 m thick and 6 m over the ground, along the west and north, with the West Gate (a 14 m gap, a tower either side, a lintel from 7 to 9 m), the North Gate, and the chapel's postern; the Ridge's retaining wall with a 1 m parapet wherever the two levels differ by 0.3 m or more; the Soot Stair's blind walls, at least 3.2 m over the low ground, and its cellar door; the river's embankment with a 1 m parapet; the basin's walls and the sea quay's edge; and the Veil Bridge, a stone deck 16 m wide at street level on four piers, from the embankment to the east bank at px 852. Julien Tonsuso's bridge is no longer used.
+
+**Houses** are the 27 variants baked from the Victorian modules (§5.1–§5.2) in rows along every street. A house takes its plot only if it is free; where a row meets a street, a square, or an earlier building, it moves on a metre and tries again. It stands on the highest ground under it, rounded up to 0.1 m, on a stone plinth where the ground falls more than 0.25 m, and every door above the ground outside gets steps (rises of at most 0.18 m, treads of 0.32 m, 2.4 m wide). Each baked house carries a `Door` marker in each doorway. Terrace houses are raised 0.9 m behind front areas of 2 m with railings and a gate at each door; the Ridge's villas stand 10 m apart in gardens behind railings. Tanners Slant is the one street at 45°: a `KitFrame` on the world node (−175, −180), its tenements and shops in the frame's grid, a dark lane with no lamps. The palace is the marble Civic16 with a Wing12 either side; the Town Hall (Civic16) faces the avenue from its podium on the slope; the Assize (Civic12) faces it from the east; the Customs House (Civic12) stands at the basin's head. Arch houses lead from Terrace Street West into Wardley Garden and from Bell Street into the tenement court.
+
+**The seven that open** (§5.3), each with a portal leaf in its door: the Soot & Bell (Tavern6, Bell Street's north side, with its yard and gate east of it), Harrow & Tincture (Shop4, west of the tavern), the faction's house (Villa6 on Ridge Street), the Assize and the Wardens' station (the avenue's east flank), the missing person's tenement (Tenement4 on Loom Lane), the cellar door in the Soot Stair's east wall, and the old chapel (north-west corner). The Notice Board stands at the tavern's gate.
+
+**Lamps** follow §4: in the pavement's cell by the kerb, at a party wall where one is within 5 m, never within 2 m of a door along its front, 25–30 m apart, staggered across streets wider than 12 m, and at the corners of the forecourt and the Circus. `VeilmouthCityTests` checks every lamp against every door marker and portal.
+
+**Squares and green:** the avenue's mall has trees in pairs every 20 m with benches between; the Crown Column stands in the Circus; Wardley Garden has railings with gates, five trees, benches, shrubs and flowers; the forecourt has four trees. Plain green trees and grass are Polytope Studio's (§6.2): about 560 pines and fruit trees and 200 shrubs in the forest, grass and flowers in the glades and fields; the Stylized Trees Pack's coloured crowns are only the 40 fellable trees round the glades.
+
+**Outside the walls:** four farms on the West road and the fenced flax field; the forest north of the wall, with eight glades, 30 herb patches, six wolf and four boar territories with their stand-ins; the ore hill with 12 iron veins, pines, and shrubs. People: the Wardens, the faction, Veinmarket, the Masters, the sellers, the pawnbroker, and townsfolk at their posts in the asset map's colours.
+
+**Counted** on the full build: 1953 kit blocks with no kit fault, 315 houses, 323 doorways, 147 lamps, 233 railing segments, 7 portals. Tests: `VeilmouthCityTests` (no lamp before a door, the seven doors, the slant's frame, C1 replaces C0's dressing), with `KitLayoutCheckTests`, `PortalPairingTests`, and `VeilmouthSceneTests`.
+
+**Still missing or simplified** in this pass: the Item Creation yard stands in the Market Square, not through an arch off Cheap Street; the mews court is Wardley Garden and its passage; courts have no pumps, washing lines, carts, or cranes (no models yet); the stalls are few; roofs keep the pack's blue slate; the Combat Grid has not yet been run on the new streets; the interiors are still C0's (§11, step 4).
