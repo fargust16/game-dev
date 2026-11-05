@@ -54,8 +54,14 @@ namespace GameDev.Slice.Tests
 
         [TestCase(SliceTestScenes.MovementScenePath, 100)]
         [TestCase(SliceTestScenes.TavernScenePath, 20)]
-        [TestCase(VeilmouthScene.ScenePath, 60)]
+        [TestCase(VeilmouthScene.ScenePath, 1000)]
         [TestCase(VeilmouthScene.SootAndBellScenePath, 20)]
+        [TestCase(VeilmouthDressing.HarrowScenePath, 15)]
+        [TestCase(VeilmouthDressing.FactionHouseScenePath, 15)]
+        [TestCase(VeilmouthDressing.LockupScenePath, 15)]
+        [TestCase(VeilmouthDressing.MissingRoomScenePath, 15)]
+        [TestCase(VeilmouthDressing.CellarScenePath, 15)]
+        [TestCase(VeilmouthDressing.ChapelScenePath, 15)]
         public void ATestSceneIsClean(string path, int minimumBlocks)
         {
             var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);

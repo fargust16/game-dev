@@ -53,7 +53,7 @@ namespace GameDev.Slice.Tests
         [Test]
         public void TheC0MapIsLaidOut()
         {
-            var zones = All<LayoutZone>();
+            var zones = All<LayoutZone>().Where(z => z.transform.parent != null && z.transform.parent.name == "C0 Map").ToArray();
             CollectionAssert.AreEquivalent(VeilmouthScene.ZoneNames, zones.Select(z => z.name));
 
             var zone = zones.ToDictionary(z => z.name);

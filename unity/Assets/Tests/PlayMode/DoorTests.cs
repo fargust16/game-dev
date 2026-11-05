@@ -48,6 +48,13 @@ namespace GameDev.Slice.Tests
         public IEnumerator InVeilmouthThePlayerGoesIntoTheSootAndBellAndBack() =>
             GoInAndBack("Assets/Scenes/Slice/Veilmouth.unity", "soot-and-bell.street", "soot-and-bell.inside", "soot-and-bell");
 
+        /// <summary>The dressing pass: every other building that opens, through its door leaf on the model's face.</summary>
+        [UnityTest]
+        public IEnumerator InVeilmouthThePlayerGoesIntoEveryOtherBuildingAndBack(
+            [Values("harrow-apothecary", "faction-house", "wardens-lockup", "missing-room", "soot-stair-cellar", "old-chapel")]
+            string building) =>
+            GoInAndBack("Assets/Scenes/Slice/Veilmouth.unity", building + ".street", building + ".inside", building);
+
         private IEnumerator GoInAndBack(string streetScenePath, string streetId, string insideId, string buildingId)
         {
             var streetScene = System.IO.Path.GetFileNameWithoutExtension(streetScenePath);

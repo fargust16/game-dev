@@ -13,9 +13,11 @@ namespace GameDev.Slice.Tests
     public sealed class PortalPairingTests
     {
         private static readonly string[] ScenePaths = { SliceTestScenes.MovementScenePath, SliceTestScenes.TavernScenePath };
-        private static readonly string[] VeilmouthPaths = { VeilmouthScene.ScenePath, VeilmouthScene.SootAndBellScenePath };
+        private static readonly string[] VeilmouthPaths =
+            new[] { VeilmouthScene.ScenePath, VeilmouthScene.SootAndBellScenePath }.Concat(VeilmouthDressing.InteriorScenePaths).ToArray();
 
-        private static readonly object[] SceneSets = { new object[] { ScenePaths }, new object[] { VeilmouthPaths } };
+        // The test scenes have one pair of doors; Veilmouth has seven, one for each building that opens (C0).
+        private static readonly object[] SceneSets = { new object[] { ScenePaths, 2 }, new object[] { VeilmouthPaths, 14 } };
 
         private readonly List<UnityEngine.SceneManagement.Scene> _opened = new List<UnityEngine.SceneManagement.Scene>();
 
@@ -44,7 +46,7 @@ namespace GameDev.Slice.Tests
         }
 
         [TestCaseSource(nameof(SceneSets))]
-        public void EveryDoorLeadsToADoorThatLeadsBack(string[] scenePaths)
+        public void EveryDoorLeadsToADoorThatLeadsBack(string[] scenePaths, int doors)
         {
             var portals = OpenAll(scenePaths);
             var inBuild = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToList();
@@ -65,7 +67,7 @@ namespace GameDev.Slice.Tests
                 }
             }
 
-            Assert.AreEqual(2, count);
+            Assert.AreEqual(doors, count);
         }
 
         [Test]

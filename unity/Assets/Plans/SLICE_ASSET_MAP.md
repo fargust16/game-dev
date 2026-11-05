@@ -2,7 +2,7 @@
 
 Status: Draft — the owner's list of packs and answers, 2026-11-05; checked against the project on disk and the design documents by the agent
 Created: 2026-11-05
-Last Updated: 2026-11-05 (the magic circle's rules are in 21 §4. Earlier: the owner's models through the Tripo Bridge: pistol, rifle, iron ore, Notice Board, bed; Stylized Trees Pack for trees and bushes, its editor script fixed; Modular Fantasy Bridges; the factory yard dropped; render state recounted after the owner's conversion. Earlier: render state recounted after the owner's URP imports; the pouch came through the Tripo Bridge and the pistols failed as ZIP; §9 lists the models the slice still needs. Earlier: Basic Treasure Coins found in REAL_DEDICATED; the dragons are FourEvilDragonsHP; the firearms come through the Tripo Bridge. Earlier: the owner's second list: Multistory Dungeons 2 for alchemy, Victorian Objects weapons, Stylized 3D Tools, RPG_Animations_Pack_FREE, Roadside Tales Free, Modern RPG icons, Yughues pavements, WaterWorks; the owner's answers on shields, hidden followers, colours, coins, and buildings)
+Last Updated: 2026-11-05 (the agent's dressing pass: the owner's bar counter, cabinet, cell bars, and cell door in; the magic circle made; three pack problems handled; §9 updated. Earlier: the magic circle's rules are in 21 §4. Earlier: the owner's models through the Tripo Bridge: pistol, rifle, iron ore, Notice Board, bed; Stylized Trees Pack for trees and bushes, its editor script fixed; Modular Fantasy Bridges; the factory yard dropped; render state recounted after the owner's conversion. Earlier: render state recounted after the owner's URP imports; the pouch came through the Tripo Bridge and the pistols failed as ZIP; §9 lists the models the slice still needs. Earlier: Basic Treasure Coins found in REAL_DEDICATED; the dragons are FourEvilDragonsHP; the firearms come through the Tripo Bridge. Earlier: the owner's second list: Multistory Dungeons 2 for alchemy, Victorian Objects weapons, Stylized 3D Tools, RPG_Animations_Pack_FREE, Roadside Tales Free, Modern RPG icons, Yughues pavements, WaterWorks; the owner's answers on shields, hidden followers, colours, coins, and buildings)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 Related: [ASSET_LIBRARY_REFERENCE.md](ASSET_LIBRARY_REFERENCE.md) (the Overworld's registry)
 
@@ -146,6 +146,12 @@ Counted from every `.mat` file's shader after the owner ran the Render Pipeline 
 
 **Stylized Trees Pack fix** (agent, 2026-11-05): `Shared/Shaders/Editor/GradientGUIDrawer.cs` called `Object.GetInstanceID()`, which Unity 6.3 made an error (CS0619). It now calls `GetEntityId()` on Unity 6.3 and later; the value is only a dictionary key. The pack is a vendor folder outside git, so a reimport of the pack undoes the fix.
 
+**Found by the dressing pass** (agent, 2026-11-05), each handled without changing the vendor files:
+
+- **Tripo base maps.** The Tripo Bridge left `_BaseMap` empty on nine of the owner's ten models (all but the iron ore), though each image lies in the model's `.fbm` folder: the models showed white. `SliceKitCatalogue` gives each wrapper a project copy of the material with that image (`Assets/Materials/Slice/Tripo/`). A model used outside the kit needs the same, or the bridge fixed.
+- **Stylized Trees Pack wind.** The pack's Amplify shaders bend every vertex by the global wind its `Growth.WindController` (with a `WindZone`) sets each frame; with none in a scene the trees and bushes vanish. Veilmouth has one `Wind` under `Dressing`; any other scene with the pack needs one.
+- **The bridge's Substance.** Modular Fantasy Bridges' material is a Substance (`Stylized_Bridge.sbsar`) and shows magenta without the Substance plugin; the bridge wears Yughues `M_YFPM_Blocs`.
+
 `Assets/AlchemyLabProps/` is no longer needed: Multistory Dungeons 2 is its URP import.
 
 ## 8. Open
@@ -164,16 +170,20 @@ What no pack in this map gives, checked against [11](../../../11%20Vertical%20Sl
 | 3 | Herb patch and flax plant | Gathering, 30 herbs and 10 flax | blocks | **done**: Stylized Trees Pack bushes (§4) |
 | 4 | Fellable tree | Felling, about 40 trees | blocks | **done**: Stylized Trees Pack (§4); no stump |
 | 5 | Notice Board | Information Source, tasks | blocks | **done**: Tripo (§4) |
-| 6 | Magic circle on the ground | The ritual, 21 §4 | blocks | a decal or flat mesh of our own; the conductors stand round it. No Weak Point objects: the owner's physical vulnerability is the conductors themselves |
+| 6 | Magic circle on the ground | The ritual, 21 §4 | blocks | **done**: our own flat mesh, `Kit_Ritual_Circle_8x0`, two rings of 4 and 3 m and three conductors' places (agent, 2026-11-05). No Weak Point objects: the owner's physical vulnerability is the conductors themselves. A drawn decal can replace it in S7 |
 | 7 | Bed | Sleep in a tavern room | blocks | **done**: Tripo (§4) |
 | 8 | Wolf and boar, rigged, with idle, walk, run, attack, hit, and death | Beasts of the slice | place | the dragons stand in (§6) |
 | 9 | Bridge over the River Veil, about 14 × 6 m | C0: the one bridge | place | **done**: Modular Fantasy Bridges (§4) |
 | 10 | ~~Factory yard~~ | — | — | **dropped**: the slice has no factory locations, and Ritual Site Candidate 1 is a square in Lower Veil (owner, 2026-11-05) |
-| 11 | Cell bars and a cell door | The Wardens' lock-up interior, Yield | place | later (owner, 2026-11-05) |
-| 12 | Bar counter and tavern shelves | The Soot & Bell interior | place | later (owner, 2026-11-05); Multistory Dungeons 2 tables and cupboards meanwhile |
+| 11 | Cell bars and a cell door | The Wardens' lock-up interior, Yield | place | **done**: Tripo, the owner's models (`rusty_iron_gate`, `rusty_iron_jail_door`); the door stands in the bars' own doorway |
+| 12 | Bar counter and tavern shelves | The Soot & Bell interior | place | **done**: Tripo, the owner's models (`ornate_wooden_bar_counter`, `ornate_cabinet`), with a Multistory Dungeons 2 shelf |
 | 13 | Quay or pier on the sea front | C0: the sea to the south | polish | none |
 | 14 | Worn armour: cloth, leather, chain, and plate on a Dummy | Reading a fighter's gear in a fight | polish | Market `armor_*` for shop display only; Dummies' colours read the role |
 | 15 | A Spirit General apart from the pink Dummy | The General's appearance | polish | the pink Dummy (§1) |
+| 16 | Interior walls and floors for houses: wood, plaster, paper | The seven interiors | polish | Low Poly Dungeons Lite stone in all six new rooms; the Soot & Bell keeps its stand-in walls (agent's pass, 2026-11-05) |
+| 17 | Doors that open, matching the houses' own | Entering the seven buildings | polish | a dark stand-in leaf over the model's door |
+| 18 | A cellar entrance: a hatch or steps down in a wall | The cellar under the Soot Stair | place | a Low Poly Dungeons wall with a door leaf at the stair's foot |
+| 19 | Grey, pink, teal, and brown Dummies as proper materials | §1 colours | polish | teal and brown are plain URP Lit (`Materials/Slice/Dummy_*`); the Dummies' own colours are still built-in Unlit (§7) |
 
 Already covered, so not needed: anvil and workshop (Market `anvil_with_hammer`, `leather_dressing_frame`, tables), alchemy table and glass, the cache and the formula (`Treasure_Chest_*`, `Book_*`, `Scroll_01`), shop counters (Market stalls and sections), loot (`bag`, `bag_of_gold`), coins, street lamps (Victorian City `Lamp post`, Colonial `StreetLamp1`), the church and graveyard, stairs for the Soot Stair (Victorian City `Steps`), fences and the pouch. Bandages, splints, and antidotes need no world model: they live in the inventory as icons.
 
