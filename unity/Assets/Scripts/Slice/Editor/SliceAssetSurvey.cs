@@ -44,6 +44,14 @@ namespace GameDev.Slice.EditorTools
             ("beasts", "Assets/FourEvilDragonsHP/Prefab", new[] { "Grey", "Albino" }),
             ("bridges", "Assets/Julien Tonsuso", new[] { "bridge_01", "bridge_02", "bridge_03", "bridge_04" }),
             ("people", "Assets/Kevin Iglesias/Human Character Dummy/Prefabs", new[] { "HumanDummy_M White" }),
+
+            // C1 (2026-11-05): the modules a house is built from, and the interior kit.
+            ("vmodules", "Assets/Modular Victorian City/Prefabs/Modules",
+                new[] { "GroundWall1", "GroundDoor1", "GroundDoorC1", "GroundWindow1", "GroundWindowC1", "GroundCornelWall1", "GroundSideWall1", "UpWall", "UpWindow1", "UpWindowC1", "UpCornelWall1", "UpSideWall1", "Roof", "RoofCorner", "RoofUp", "RoofWall", "Roof Window", "Roof WindowC1", "Arch", "Fence", "Sidewalk Straight", "Sidewalk corner", "WoddenDoorBlue", "WoodenWallBlue" }),
+            ("vbasic", "Assets/Modular Victorian City/Prefabs/Basic elements",
+                new[] { "Door 1", "Door 2", "Double door", "Door frame", "Steps", "Half steps", "Arch", "Arch wall", "Arch entrance", "Wall1", "Wall2", "Wall3", "Wall4", "Fence column", "Top of the fence", "Bottom of the fence", "Straight border", "Сorner border", "Awning blue", "Glass wall  blue", "Door portal  blue", "Window 1", "Pipe" }),
+            ("bk", "Assets/BK_AlchemistHouse/Prefabs",
+                new[] { "IntWall01a", "IntWall01b", "IntWall01door", "IntWall02a", "IntWall02b", "IntWall02door", "IntWall02window01", "IntWoodFloor01", "StoneFloor01", "Floor", "IntCeiling01", "IntCeilingPillarBend", "VerticalPillar", "VerticalPillarBig", "HorizontalPillar", "WoodStairs", "Door", "WoodDoor01", "IntWoodFence01", "Stove", "TableSink", "WoodCupboard01", "WoodCupboard02", "WoodCupboard03", "WoodShelf01", "Drawer01", "WoodDrawer01", "WoodTableSquare01", "Table01", "Table04", "Chair01", "WoodStool", "Workbench", "Trunk01", "Carpet01", "Caldron01", "CaldronTripod01", "LabSetup01", "Oillamp01", "Candle01", "Books1", "Painting01" }),
         };
 
         [MenuItem("GameDev/Slice/Survey Slice Assets")]

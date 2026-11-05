@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1)
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft — accepted by the owner, 2026-11-05; sizes remain authoring defaults
 
-Last Updated: 2026-11-05 (§12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-05 (§2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
@@ -55,7 +55,7 @@ Answers to the three questions of the first pass: an arch house lets people thro
 - **Depth:** a house is built from the pack's modules (§5.1) on a plot 10–14 m deep, with a back wall and a roof, not as a shell.
 - **Density:** street fronts are continuous; there is no grass between houses on a street.
 - **Detail:** kerbs, steps, railings, shop fronts, awnings, chimneys, and lamps by the rules of §4.
-- **Size:** the door and storey of the modules are measured when the builder is written; if a ground-floor storey comes out under 3.5 m or a front door under 2.5 m, the modules are scaled up together until they reach it (a **measured** factor, not a guess).
+- **Size:** a ground-floor storey under 3.5 m or a front doorway under 2.5 m is scaled up with every module together. **Measured** (survey of 2026-11-05, `Logs/SliceSurvey/survey.tsv`): a module is 2 m wide and a storey 3 m high; `Door 1` is 1.01 × 1.91 m in a `Door frame` of 1.2 × 2.34 m; `Steps` are 2 m wide and 3 m high over 4 m; `Arch` is 4 m wide and 6 m high; `Fence` 1.5 m high. The houses are therefore built at **×1.25**: a module 2.5 m, a storey 3.75 m, a doorway 2.93 m with a door of 2.39 m, an arch 5 × 7.5 m, railings 1.9 m. It is the smallest factor that clears 3.5 m and keeps an even count of modules on whole metres (frontages of 5, 10, 15 m); ×1.17 would clear it but leave modules of 2.33 m off the grid. The scale stands on the model inside the kit wrapper, so the block itself keeps scale 1 (kit standard §1).
 
 **Street sections** (authoring defaults; a carriage is about 2.2 m wide, two pass in 6 m; two people walk abreast in 1.5 m):
 
@@ -186,7 +186,9 @@ The drawing's inset shows the mews court.
 
 # 8. Interiors
 
-Built from BK_AlchemistHouse (owner, 2026-11-05): `IntWall01a/b`, `IntWall01door`, `IntWall02*` with windows, `IntWoodFloor01`, `StoneFloor01`, `IntCeiling01` with beams and pillars, `WoodStairs`, `Door`, the `Stove`, `TableSink`, cupboards, shelves, drawers, tables, chairs, stools, carpets, paintings, books, bottles, flasks, jars, candles and oil lamps, the cauldrons and lab sets. Its materials are built-in Standard and get URP copies as the Tripo ones did. Ceilings 3.3–3.6 m; rooms that read as rooms, not boxes:
+Built from BK_AlchemistHouse (owner, 2026-11-05): `IntWall01a/b`, `IntWall01door`, `IntWall02*` with windows, `IntWoodFloor01`, `StoneFloor01`, `IntCeiling01` with beams and pillars, `WoodStairs`, `Door`, the `Stove`, `TableSink`, cupboards, shelves, drawers, tables, chairs, stools, carpets, paintings, books, bottles, flasks, jars, candles and oil lamps, the cauldrons and lab sets. Its materials are built-in Standard and get URP copies under `Materials/Slice/BK/` (`SliceUrpMaterials`, 2026-11-05: 142 Standard by their own maps and render modes, the three of BK's refraction glass as clear URP glass, flame and smoke as URP particles).
+
+**Measured** (2026-11-05): BK's walls, floors and ceilings are 2.5 m modules, its walls 2.5 m high, its door 1.1 × 1.98 m, its stairs 2.53 m high; its furniture is at true size (stove 1.51 m high, cupboard 1.9 m, table 0.78 m, chair seat about 0.45 m). The architecture is built at **×1.2**, a 3 m module with a door of 2.38 m, and the furniture at ×1.0. Ceilings are therefore **3 m**, not the 3.3–3.6 m first written here: ×1.32–1.44 would reach those, but makes doors 2.6–2.85 m and leaves the module off whole metres. The taproom and the chapel's nave may take a second row of wall later for height. Rooms that read as rooms, not boxes:
 
 | Interior | Rooms (authoring default) |
 |---|---|
