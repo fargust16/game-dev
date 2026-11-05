@@ -2,7 +2,7 @@
 
 Status: Draft — the owner's decisions are marked; everything else is the agent's plan and authoring defaults
 Created: 2026-11-04
-Last Updated: 2026-11-05 (the inventory's money is in bronze, by 19 §6.3; the asset map takes the owner's second list. Earlier: the slice's asset map, SLICE_ASSET_MAP.md, by the owner's list of packs. Earlier: S0.6a: the Veilmouth scene's starting point. Earlier: C0, the Veilmouth map, accepted by the owner: §2)
+Last Updated: 2026-11-05 (no factory locations in the slice: Ritual Site Candidate 1 is a square in Lower Veil, by the owner. Earlier: the inventory's money is in bronze, by 19 §6.3; the asset map takes the owner's second list. Earlier: the slice's asset map, SLICE_ASSET_MAP.md, by the owner's list of packs. Earlier: S0.6a: the Veilmouth scene's starting point. Earlier: C0, the Veilmouth map, accepted by the owner: §2)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md) (what the slice is), [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md) (systems and folders), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md) (scene locks)
 Companion: [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) (which pack serves each mechanic, character, and place)
 
@@ -60,11 +60,11 @@ C0, accepted by the owner as the agent drafted it, 2026-11-04. It is a layout: S
 |---|---|---|
 | Ridge | the upper town, the city's north side; the rich | the faction's house; the Wardens' station with its lock-up |
 | Market | the centre and west | the trader; the counters of the Masters of Item Creation, Enchanting, and First Aid; the Item Creation yard; the seer's counter (authoring default) |
-| Lower Veil | the south-east, by the river and the docks; the poor and the factories | the Soot & Bell (the tavern) with the Notice Board; Harrow & Tincture; the factory with its yard and fence; Loom Lane; the pawn shop; the missing person's tenement room |
+| Lower Veil | the south-east, by the river and the docks; the poor and the factories | the Soot & Bell (the tavern) with the Notice Board; Harrow & Tincture; the square of Ritual Site Candidate 1; Loom Lane; the pawn shop; the missing person's tenement room |
 | Soot Stair | from the Ridge down into Lower Veil, near Loom Lane | the narrow way between the upper and the lower town, with its cellar |
 | Old chapel | the city's north-west edge, toward the forest | — |
 
-**Ritual Site Candidates** ([11](../../../11%20Vertical%20Slice.md); [21](../../../21%20Cult%20Campaign%20and%20City%20Control.md) §4): (1) the factory yard, open ground in Lower Veil; (2) the cellar under the Soot Stair, closed and inside the city; (3) the old chapel at the city's edge. The seed picks one by its own key.
+**Ritual Site Candidates** ([11](../../../11%20Vertical%20Slice.md); [21](../../../21%20Cult%20Campaign%20and%20City%20Control.md) §4): (1) a square in Lower Veil, open ground in the city at the same place (the slice has no factory locations, owner 2026-11-05; the scene's guide `Ritual Site Candidate 1 - Factory Yard` keeps its old name until the owner's S0.6b pass, and `VeilmouthScene` follows then); (2) the cellar under the Soot Stair, closed and inside the city; (3) the old chapel at the city's edge. The seed picks one by its own key.
 
 **Buildings that open into an interior scene** (C0): seven — the Soot & Bell, Harrow's apothecary, the faction's house, the Wardens' lock-up, the missing person's room, the cellar under the Soot Stair, and the old chapel. The lock-up opens because Harrow can be heard there when the Wardens hold him ([11](../../../11%20Vertical%20Slice.md)). The trader, the three Masters, the pawn shop, and the seer serve over a counter that faces the street, and the Item Creation workshop is a yard, so they need no interior. Every other building has a closed door.
 
