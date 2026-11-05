@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1)
 
-Version: 0.1
+Version: 0.3
 
-Status: Draft — proposed by the agent on the owner's play test; not accepted
+Status: Draft — accepted by the owner, 2026-11-05; sizes remain authoring defaults
 
-Last Updated: 2026-11-05 (first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-05 (§12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
@@ -18,7 +18,7 @@ Referenced By:
 
 The first dressing of C0 put real models on the accepted map, and the owner's play test showed the map itself was the problem: a few streets in a field, houses as boxes on grass, props scattered without a reason. This document designs Veilmouth as a city before anything is built again: its zones, its streets in section, its plots and what stands on them, its courtyards, its edge and gates, its ground, and its interiors. It keeps everything C0 holds (the seven buildings that open, the Masters, the Ritual Site Candidates, the resources and beasts outside) and moves it into a believable city.
 
-Nothing here is built until the owner accepts C1. Names are placeholders. Every size is an authoring default, labelled **measured** where it comes from a model.
+The owner accepted C1 on 2026-11-05 and it replaces C0's layout; C0's contents stay. Names are placeholders. Every size is an authoring default, labelled **measured** where it comes from a model.
 
 The plan's drawing is [VEILMOUTH_CITY_PLAN_C1.svg](VEILMOUTH_CITY_PLAN_C1.svg), at 1 px = 1 m, north up.
 
@@ -206,15 +206,33 @@ The agent shapes the slice's ground once from C1 with an authoring tool, at the 
 
 ---
 
-# 10. Open for the owner
+# 10. The owner's answers, 2026-11-05
 
-1. **Whose palace?** Veilmouth is not the full game's capital (21's Capital Gate). The agent recommends the **Governor's Palace**, the Crown's residence in the city, so the full game keeps its capital elsewhere. Alternative: a royal summer palace.
-2. **Only right angles?** The kit and the Combat Grid assume 90° turns. The agent recommends keeping them, and getting an older, crooked feel from uneven blocks, jogs, dead ends, and the curve of the embankment drawn in steps. Alternative: some streets at 45°, which needs the kit check and the grid tested at that angle first.
-3. **C1's size.** The city grows from 200 × 200 m to about 480 × 340 m, and the area from 700 to 1000 m. A run across takes about three real minutes. Smaller is possible by cutting the terraces or the market quarter.
+1. **The palace** is the **Governor's Palace**, the Crown's residence in the city; the full game's capital stays elsewhere (21's Capital Gate).
+2. **Angles:** streets are at right angles, and some run at 45°. A 45° street is built only after the Combat Grid and the kit check are tested at that angle (§12).
+3. **Size:** the city is about 480 × 340 m in an area of 1000 × 1000 m.
 
 ---
 
-# 11. Order of work after acceptance
+# 12. Streets at 45°: the grid check
+
+`CombatGridAngleCheck` (agent, 2026-11-05; `Logs/GridAngle/report.txt`) builds a straight walled street 28 m long, 2, 3, 4, 6, and 12 m wide, at 0°, 45°, and 30°, once on the kit's grid and once off it, and reads it with the Combat Grid. **Measured:**
+
+| Reading | 0° | 45° |
+|---|---|---|
+| Street cells a person can stand on | 100 % | 100 % |
+| One end reaches the other | always | from 3 m wide; a 2 m street on the grid falls apart into a staircase the grid cannot cross without cutting corners |
+| Grid moves per metre of street | 0.95 | 0.68: a diagonal step costs 1 AP like a straight one (10.1), so a fight along a 45° street covers about 40 % more ground per AP, as it already does across any open square |
+| Cells beside the wall with cover, before | 100 % on the grid, 0–100 % off it | 0–52 %, by chance of how the wall met the cells |
+| Cells beside the wall with cover, after the change below | 100 % on the grid | 100 % from 3 m wide |
+
+**Changed** the same day: cover was one ray 0.75 m from a cell's middle along each side, which misses a wall at 45°; it is now a thin strip beside each side, from 0.3 to 0.9 m out and as wide as the cell, at each cover height (`CombatGridReader`; authoring defaults). A wall on a grid line gives the same cover as before. At 30°, not asked for, 81–92 % of those cells get cover.
+
+**Rules for C1** (the kit standard §1): a street at 45° is a `KitFrame` on a node of the world grid; its blocks keep the 1 m grid and 90° turns in the frame's axes, and the kit check measures a turned block's overlap on its colliders, not on its world bounds (tests: `KitLayoutCheckTests`). A street at 45° is at least 3 m wide; alleys and courts of 2–3 m stay at right angles. The Combat Grid itself stays world-aligned.
+
+---
+
+# 11. Order of work
 
 1. Measure the Victorian modules and BK_AlchemistHouse; URP copies of BK's materials.
 2. The ground (§9).

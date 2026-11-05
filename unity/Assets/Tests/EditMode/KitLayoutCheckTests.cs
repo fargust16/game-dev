@@ -118,6 +118,62 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(faults.All(f => f.Kind == KitFaultKind.OffGrid));
         }
 
+        /// <summary>C1 §12: a street at 45° is a frame on a world grid node; its blocks keep the grid in its axes.</summary>
+        private GameObject Frame(float x, float z, float yaw)
+        {
+            var frame = new GameObject("Frame", typeof(KitFrame));
+            frame.transform.SetPositionAndRotation(new Vector3(x, 0f, z), Quaternion.Euler(0f, yaw, 0f));
+            _made.Add(frame);
+            return frame;
+        }
+
+        private GameObject InFrame(GameObject frame, GameObject block, float x, float z, float yaw = 0f)
+        {
+            block.transform.SetParent(frame.transform, false);
+            block.transform.localPosition = new Vector3(x, 0f, z);
+            block.transform.localRotation = Quaternion.Euler(0f, yaw, 0f);
+            _made.Add(block);
+            return block;
+        }
+
+        private List<KitFault> CheckFramed()
+        {
+            return KitLayoutCheck.Check(_made.Select(go => go.GetComponent<KitBlock>()).Where(b => b != null).ToList());
+        }
+
+        [Test]
+        public void TouchingBlocksOnAStreetAt45AreClean()
+        {
+            var frame = Frame(10f, 3f, 45f);
+            InFrame(frame, KitStandIns.Crate("Crate"), 0f, 0f);
+            InFrame(frame, KitStandIns.Crate("Crate"), 1f, 0f);
+            InFrame(frame, KitStandIns.Crate("Crate"), 0f, 1f);
+            InFrame(frame, KitStandIns.Linear("Wall", KitLayers.Structure, 4f, 3f, KitStandIns.WallThickness), 2f, 0f);
+            InFrame(frame, KitStandIns.Linear("Wall", KitLayers.Structure, 4f, 3f, KitStandIns.WallThickness), 6f, 0f);
+            CollectionAssert.IsEmpty(CheckFramed().Select(f => f.ToString()));
+        }
+
+        [Test]
+        public void OverlapOnAStreetAt45IsReported()
+        {
+            var frame = Frame(10f, 3f, 45f);
+            InFrame(frame, KitStandIns.Crate("Crate"), 0f, 0f);
+            InFrame(frame, KitStandIns.Crate("Crate"), 0.5f, 0f);
+            var faults = CheckFramed();
+            Assert.IsTrue(faults.Any(f => f.Kind == KitFaultKind.Overlap));
+        }
+
+        [Test]
+        public void AFrameOffAGridNodeOrAngleAndABlockOffItsGridAreReported()
+        {
+            InFrame(Frame(10.5f, 3f, 45f), KitStandIns.Crate("Crate"), 0f, 0f);
+            InFrame(Frame(30f, 3f, 30f), KitStandIns.Crate("Crate"), 0f, 0f);
+            InFrame(Frame(50f, 3f, 45f), KitStandIns.Crate("Crate"), 0.5f, 0f);
+            var faults = CheckFramed();
+            Assert.AreEqual(3, faults.Count, string.Join("\n", faults));
+            Assert.IsTrue(faults.All(f => f.Kind == KitFaultKind.OffGrid));
+        }
+
         [Test]
         public void LayersAndCollidersAreChecked()
         {

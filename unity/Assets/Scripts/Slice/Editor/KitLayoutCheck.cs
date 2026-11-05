@@ -38,7 +38,10 @@ namespace GameDev.Slice.EditorTools
 
     /// <summary>
     /// Checks hand-placed kit blocks against SLICE_MODULAR_KIT_STANDARD: the 1 m grid and 90° turns (§1–§2), the kit's
-    /// layers (§5), colliders (§4), and the non-overlap law (§6): solid bounds may touch, never overlap.
+    /// layers (§5), colliders (§4), and the non-overlap law (§6): solid bounds may touch, never overlap. A block under a
+    /// <see cref="KitFrame"/> keeps the grid and the turns in the frame's axes, and the frame stands on a world grid
+    /// node at a multiple of 45° (C1 §12, 2026-11-05); a turned block's overlap is measured on its colliders, not on
+    /// its world bounds.
     /// It reports and never moves a block.
     /// </summary>
     public static class KitLayoutCheck
@@ -111,14 +114,30 @@ namespace GameDev.Slice.EditorTools
         private static void CheckPlacement(KitBlock block, List<KitFault> faults)
         {
             var t = block.transform;
-            var p = t.position;
+            var frame = block.GetComponentInParent<KitFrame>();
+            if (frame != null)
+            {
+                var f = frame.transform;
+                var fyaw = Mathf.Atan2(f.forward.x, f.forward.z) * Mathf.Rad2Deg;
+                if (!IsMultiple(f.position.x, 1f) || !IsMultiple(f.position.z, 1f) ||
+                    Mathf.Abs(fyaw / 45f - Mathf.Round(fyaw / 45f)) * 45f > AngleToleranceDegrees ||
+                    Vector3.Angle(f.up, Vector3.up) > AngleToleranceDegrees)
+                {
+                    faults.Add(new KitFault(KitFaultKind.OffGrid, block, $"its frame '{frame.name}' is off a grid node or not at a multiple of 45°"));
+                }
+            }
+
+            var frameRotation = frame != null ? frame.transform.rotation : Quaternion.identity;
+            var frameOrigin = frame != null ? frame.transform.position : Vector3.zero;
+            var p = Quaternion.Inverse(frameRotation) * (t.position - frameOrigin);
+            p.y = t.position.y;
             if (!IsMultiple(p.x, 1f) || !IsMultiple(p.z, 1f) || !IsMultiple(p.y, HeightStep))
             {
                 faults.Add(new KitFault(KitFaultKind.OffGrid, block,
                     $"position {p.x:0.###}, {p.y:0.###}, {p.z:0.###} is off the 1 m grid or the 0.1 m height step"));
             }
 
-            var forward = t.forward;
+            var forward = Quaternion.Inverse(frameRotation) * t.forward;
             var yaw = Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg;
             var yawOff = Mathf.Abs(yaw / 90f - Mathf.Round(yaw / 90f)) * 90f;
             if (Vector3.Angle(t.up, Vector3.up) > AngleToleranceDegrees || yawOff > AngleToleranceDegrees)
@@ -180,10 +199,58 @@ namespace GameDev.Slice.EditorTools
                     }
 
                     var depth = Penetration(a.bounds, b.bounds);
+                    if (depth > OverlapTolerance && (Turned(a.block) || Turned(b.block)))
+                    {
+                        depth = ColliderPenetration(a.block, b.block, depth);
+                    }
+
                     if (depth > OverlapTolerance)
                     {
                         faults.Add(new KitFault(KitFaultKind.Overlap, a.block, $"solid bounds overlap by {depth:0.###} m", b.block));
                     }
+                }
+            }
+        }
+
+        private static bool Turned(KitBlock block)
+        {
+            var forward = block.transform.forward;
+            var yaw = Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg;
+            return Mathf.Abs(yaw / 90f - Mathf.Round(yaw / 90f)) * 90f > AngleToleranceDegrees;
+        }
+
+        /// <summary>The deepest penetration between the two blocks' own solid colliders; world bounds overstate it
+        /// for a turned block. A pair Unity cannot measure keeps the bounds' reading.</summary>
+        private static float ColliderPenetration(KitBlock a, KitBlock b, float boundsDepth)
+        {
+            var deepest = 0f;
+            foreach (var ca in Solids(a))
+            {
+                foreach (var cb in Solids(b))
+                {
+                    if (ca is MeshCollider ma && !ma.convex || cb is MeshCollider mb && !mb.convex)
+                    {
+                        return boundsDepth;
+                    }
+
+                    if (Physics.ComputePenetration(ca, ca.transform.position, ca.transform.rotation,
+                            cb, cb.transform.position, cb.transform.rotation, out _, out var distance))
+                    {
+                        deepest = Mathf.Max(deepest, distance);
+                    }
+                }
+            }
+
+            return deepest;
+        }
+
+        private static IEnumerable<Collider> Solids(KitBlock block)
+        {
+            foreach (var collider in block.GetComponentsInChildren<Collider>())
+            {
+                if (collider.enabled && !collider.isTrigger && collider.GetComponentInParent<KitBlock>() == block)
+                {
+                    yield return collider;
                 }
             }
         }

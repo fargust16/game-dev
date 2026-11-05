@@ -2,7 +2,7 @@
 
 Status: Draft — authoring defaults set by the agent; the owner's decision that sets the frame is marked
 Created: 2026-11-04
-Last Updated: 2026-11-05 (§7: the agent shapes the ground once from the city plan, by the owner after the play test. Earlier: §8 points to the slice's asset map. Earlier: S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
+Last Updated: 2026-11-05 (§1: streets at 45° under a `KitFrame`, after the grid check of C1 §12. Earlier: §7: the agent shapes the ground once from the city plan, by the owner after the play test. Earlier: §8 points to the slice's asset map. Earlier: S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [10.1 Grid World and Environment Actions](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [COMBAT_GRID_TECH_TEST.md](COMBAT_GRID_TECH_TEST.md)
 Used by: [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -21,7 +21,7 @@ This standard says what a block must be so that it snaps together, so that the C
 - 1 Unity unit = 1 m. Y is up. A block is modelled at its real size and imported at scale 1.
 - The front of a block faces +Z.
 - **Pivot on a grid node**, so a block placed on whole metres lands on the grid: at the bottom-left-back corner of a block that fills cells (crate, street tile, tree), and at the bottom-left end of the centre line of a linear block (wall, fence), because that line lies on the grid line (§2). Corrected 2026-11-04 in S0.2: a corner pivot would put a wall's centre line half a thickness off the grid.
-- Rotations are multiples of 90° about Y only.
+- Rotations are multiples of 90° about Y only. **Exception, streets at 45°** (owner, 2026-11-05; C1 §12): blocks under a `KitFrame` keep the grid and 90° turns in the frame's axes; the frame stands on a node of the world's 1 m grid at a multiple of 45°. Such a street is at least 3 m wide, and the layout check measures a turned block's overlap on its colliders.
 
 ## 2. The grid that everything follows
 

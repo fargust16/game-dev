@@ -63,6 +63,14 @@ namespace GameDev.Grid
         private const float LowCoverHeight = 0.7f;
         private const float HighCoverHeight = 1.5f;
         private const int MaxHits = 32;
+
+        // Cover reads a strip beside each side of the cell, not one ray from its middle, so a wall at any angle gives
+        // the same cover as one on the grid lines (Veilmouth C1 §12, 2026-11-05). The strip runs from 0.3 m (the
+        // person's radius) to 0.9 m out from the cell's middle, across the cell's whole width, a thin slice at each
+        // cover height. Authoring defaults: a wall on a grid line, 0.5 m out, still gives cover as before.
+        private const float CoverNear = 0.3f;
+        private const float CoverFar = 0.9f;
+        private const float CoverSlice = 0.05f;
         private const int CoordOffset = 32768;
 
         private static readonly int[] DirX = { 1, -1, 0, 0 };
@@ -73,6 +81,7 @@ namespace GameDev.Grid
         private readonly Dictionary<long, bool> _edges = new Dictionary<long, bool>();
         private readonly Dictionary<long, CombatGridCover> _cover = new Dictionary<long, CombatGridCover>();
         private readonly RaycastHit[] _hits = new RaycastHit[MaxHits];
+        private readonly Collider[] _near = new Collider[MaxHits];
 
         public int OverflowColumns;
         public int TerrainCoverRays;
@@ -265,18 +274,24 @@ namespace GameDev.Grid
 
         private bool CoverRay(Vector3 origin, Vector3 direction)
         {
-            if (!Physics.Raycast(origin, direction, out var hit, _cell * 0.75f, Mask, QueryTriggerInteraction.Ignore))
+            var depth = (CoverFar - CoverNear) * _cell;
+            var centre = origin + direction * ((CoverNear * _cell) + depth * 0.5f);
+            var across = Vector3.Cross(Vector3.up, direction);
+            var half = (direction * (depth * 0.5f)) + (across * (_cell * 0.5f));
+            var extents = new Vector3(Mathf.Abs(half.x), CoverSlice, Mathf.Abs(half.z));
+            var count = Physics.OverlapBoxNonAlloc(centre, extents, _near, Quaternion.identity, Mask, QueryTriggerInteraction.Ignore);
+            for (var i = 0; i < count; i++)
             {
-                return false;
+                if (_near[i] is TerrainCollider)
+                {
+                    TerrainCoverRays++;
+                    continue;
+                }
+
+                return true;
             }
 
-            if (hit.collider is TerrainCollider)
-            {
-                TerrainCoverRays++;
-                return false;
-            }
-
-            return true;
+            return false;
         }
 
         private CombatGridSurface[] ReadColumn(int ix, int iz)
