@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S0.6: Veilmouth.unity holds the C0 map, ground over the whole area, and the sea under it.</summary>
+    /// <summary>S0.6: Veilmouth.unity holds the C1 map, ground over the whole area shaped from C1, and the sea under it.</summary>
     public sealed class VeilmouthSceneTests
     {
         private UnityEngine.SceneManagement.Scene _scene;
@@ -41,6 +41,31 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(VeilmouthScene.TerrainLevel, ground, 0.01f);
         }
 
+        /// <summary>C1 §9: the Ridge 8 m up, the avenue's climb, the river and the sea dug below Sea Level, the hill.</summary>
+        [TestCase(-100f, -86f, VeilmouthGround.Ridge, 0.05f)] // Ridge Street
+        [TestCase(-100f, -171f, VeilmouthGround.Low, 0.05f)] // High Street
+        [TestCase(0f, -103f, 29.9f, 0.1f)] // halfway up Crown Avenue
+        [TestCase(204f, -121f, 29.9f, 0.3f)] // halfway down the Soot Stair
+        [TestCase(300f, -100f, VeilmouthGround.RiverBed, 0.05f)]
+        [TestCase(0f, -400f, VeilmouthGround.SeaBed, 0.5f)]
+        [TestCase(420f, 140f, VeilmouthGround.HillTop, 4f)] // the ore hill's top
+        public void TheGroundFollowsC1(float x, float z, float height, float tolerance)
+        {
+            var terrain = All<Terrain>().Single();
+            var ground = terrain.SampleHeight(new Vector3(x, 0f, z)) + terrain.transform.position.y;
+            Assert.AreEqual(height, ground, tolerance);
+        }
+
+        [Test]
+        public void TheAreaEdgeIsTooSteepToWalkAndTheRoadsLeaveThroughPasses()
+        {
+            var terrain = All<Terrain>().Single();
+            float At(float x, float z) => terrain.SampleHeight(new Vector3(x, 0f, z));
+            Assert.Greater(At(-498f, 100f) - At(-460f, 100f), 30f, "the west edge rises");
+            Assert.Greater(Mathf.Atan((At(-480f, 100f) - At(-470f, 100f)) / 10f) * Mathf.Rad2Deg, 45f, "steeper than 45 degrees");
+            Assert.Less(At(-498f, -172f) - At(-460f, -172f), 8f, "the West road leaves through a pass");
+        }
+
         [Test]
         public void TheWaterLiesAtSeaLevelUnderTheGround()
         {
@@ -51,9 +76,9 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
-        public void TheC0MapIsLaidOut()
+        public void TheC1MapIsLaidOut()
         {
-            var zones = All<LayoutZone>().Where(z => z.transform.parent != null && z.transform.parent.name == "C0 Map").ToArray();
+            var zones = All<LayoutZone>().Where(z => z.transform.parent != null && z.transform.parent.name == VeilmouthScene.MapName).ToArray();
             CollectionAssert.AreEquivalent(VeilmouthScene.ZoneNames, zones.Select(z => z.name));
 
             var zone = zones.ToDictionary(z => z.name);

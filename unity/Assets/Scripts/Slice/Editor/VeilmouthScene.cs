@@ -11,9 +11,9 @@ namespace GameDev.Slice.EditorTools
     /// Creates the starting point of Veilmouth.unity (VERTICAL_SLICE_IMPLEMENTATION_PLAN S0.6) and of its first
     /// interior. From then on both scenes are hand-built, so this never overwrites one that exists.
     /// <para>
-    /// It writes: a flat terrain over the whole 700 × 700 m area at one level, for the owner to shape by hand (kit
-    /// standard §7); the water at Sea Level beneath it, which shows wherever the ground is dug below the sea; the C0
-    /// map as <see cref="LayoutZone"/> guides; and a stand-in street in Lower Veil with the Soot &amp; Bell, whose door
+    /// It writes: a flat terrain over the whole area at one level, which <see cref="VeilmouthGround"/> shapes once
+    /// from the city plan C1 (kit standard §7); the water at Sea Level beneath it, which shows wherever the ground is
+    /// dug below the sea; the C1 map as <see cref="LayoutZone"/> guides; and a stand-in street in Lower Veil with the Soot &amp; Bell, whose door
     /// leads to its interior and back.
     /// </para>
     /// </summary>
@@ -27,8 +27,10 @@ namespace GameDev.Slice.EditorTools
         public const string SootAndBellStreetPortalId = "soot-and-bell.street";
         public const string SootAndBellInsidePortalId = "soot-and-bell.inside";
 
-        /// <summary>The playable area's side, plan §2. The scene's origin is the area's centre; north is +Z.</summary>
-        public const float Extent = 700f;
+        /// <summary>The playable area's side, city plan C1 §3. The scene's origin is the area's centre; north is +Z.</summary>
+        public const float Extent = 1000f;
+
+        public const string MapName = "C1 Map";
 
         /// <summary>WorldScale.SeaLevelMeters: the Combat Grid reads every surface below it as water.</summary>
         public const float SeaLevel = 24f;
@@ -39,16 +41,16 @@ namespace GameDev.Slice.EditorTools
         /// <summary>A street tile lies on the ground, so its top is 0.1 m higher (kit standard §2).</summary>
         public const float StreetLevel = 26f;
 
-        /// <summary>Where the scene starts the player: on the street in front of the Soot &amp; Bell, facing it.</summary>
-        public static readonly Vector3 Spawn = new Vector3(104f, StreetLevel + 0.1f, -190f);
+        /// <summary>Where the scene starts the player: on Bell Street in front of the Soot &amp; Bell (C1).</summary>
+        public static readonly Vector3 Spawn = new Vector3(205f, StreetLevel + 0.1f, -236f);
 
         /// <summary>The Soot &amp; Bell's south-west corner node; its door is 2 m along the south wall.</summary>
         private static readonly Vector3 SootAndBellCorner = new Vector3(100f, StreetLevel, -180f);
 
         /// <summary>Authoring default: room for hills of up to 70 m above the ground.</summary>
-        private const float HeightBudget = 100f;
+        public const float HeightBudget = 100f;
 
-        private const int HeightmapResolution = 513;
+        private const int HeightmapResolution = VeilmouthGround.HeightmapResolution;
         private const string TerrainMaterialPath = "Assets/Settings/OverworldTerrain.mat";
         private const string WaterMaterialPath = "Assets/Settings/Water/OverworldWater.mat";
 
@@ -67,24 +69,28 @@ namespace GameDev.Slice.EditorTools
         private static readonly Color City = new Color(1f, 0.8f, 0.2f, 0.9f);
         private static readonly Color Ritual = new Color(1f, 0.3f, 0.3f, 0.9f);
 
-        /// <summary>The C0 map, plan §2: name, centre (x, z), size (x, z), colour.</summary>
+        /// <summary>The C1 map (VEILMOUTH_CITY_PLAN.md §3 and its svg): name, centre (x, z), size (x, z), colour.</summary>
         private static readonly (string Name, float X, float Z, float SizeX, float SizeZ, Color Color)[] Zones =
         {
-            ("Sea", 0f, -315f, 700f, 70f, Water),
-            ("River Veil", 170f, 35f, 10f, 630f, Water),
-            ("Bridge", 170f, -200f, 14f, 6f, City),
-            ("City", 40f, -170f, 200f, 200f, City),
-            ("Ridge", 40f, -95f, 200f, 50f, City),
-            ("Market", -15f, -200f, 90f, 140f, City),
-            ("Lower Veil", 90f, -200f, 100f, 140f, City),
-            ("Soot Stair", 90f, -125f, 6f, 20f, City),
-            ("Old Chapel", -75f, -60f, 20f, 20f, City),
-            ("Fields", -190f, -165f, 240f, 170f, Land),
-            ("Forest", -90f, 140f, 480f, 380f, Land),
-            ("Hill", 265f, 175f, 130f, 270f, Land),
-            ("Ritual Site Candidate 1 - Factory Yard", 120f, -235f, 20f, 20f, Ritual),
-            ("Ritual Site Candidate 2 - Soot Stair Cellar", 90f, -140f, 8f, 8f, Ritual),
-            ("Ritual Site Candidate 3 - Old Chapel", -75f, -60f, 12f, 12f, Ritual),
+            ("Sea", 0f, -415f, 1000f, 170f, Water),
+            ("River Veil", 300f, 85f, 40f, 830f, Water),
+            ("Veil Bridge", 300f, -172f, 40f, 16f, City),
+            ("City", 30f, -160f, 500f, 340f, City),
+            ("Ridge", 30f, -45f, 500f, 110f, City),
+            ("Government Quarter", 0f, -70.5f, 160f, 151f, City),
+            ("High Street", 30f, -171f, 500f, 18f, City),
+            ("Terraces", -120f, -131f, 200f, 62f, City),
+            ("Under the Ridge", 160f, -131f, 240f, 62f, City),
+            ("Market Quarter", -80f, -255f, 280f, 150f, City),
+            ("Lower Veil", 170f, -255f, 220f, 150f, City),
+            ("Soot Stair", 204f, -121f, 8f, 58f, City),
+            ("Old Chapel", -190f, -22.5f, 30f, 35f, City),
+            ("Fields", -370f, -155f, 260f, 350f, Land),
+            ("Forest", -110f, 265f, 780f, 470f, Land),
+            ("Ore Hill", 420f, 140f, 150f, 340f, Land),
+            ("Ritual Site Candidate 1 - Ritual Square", 154.5f, -260f, 25f, 24f, Ritual),
+            ("Ritual Site Candidate 2 - Soot Stair Cellar", 204f, -154f, 8f, 8f, Ritual),
+            ("Ritual Site Candidate 3 - Old Chapel", -190f, -22.5f, 12f, 12f, Ritual),
         };
 
         public static string[] ZoneNames => Zones.Select(z => z.Name).ToArray();
@@ -201,9 +207,9 @@ namespace GameDev.Slice.EditorTools
             }
         }
 
-        private static void CreateZones()
+        internal static void CreateZones()
         {
-            var root = new GameObject("C0 Map");
+            var root = new GameObject(MapName);
             foreach (var zone in Zones)
             {
                 var go = new GameObject(zone.Name);

@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1)
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft — accepted by the owner, 2026-11-05; sizes remain authoring defaults
 
-Last Updated: 2026-11-05 (§2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-05 (§9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
@@ -205,6 +205,17 @@ Built from BK_AlchemistHouse (owner, 2026-11-05): `IntWall01a/b`, `IntWall01door
 # 9. The ground
 
 The agent shapes the slice's ground once from C1 with an authoring tool, at the owner's request of 2026-11-05; the owner then changes it by hand. It is not the production terrain pipeline and touches nothing of TerrainGen. Heights (authoring defaults): sea bed 18–20 m; the river bed 21 m in a channel of 40 m with stone embankments to 26 m; quays 26 m; the city's low streets 26 m; the Ridge plateau 34 m behind a retaining wall; the avenue climbs 8 m over 100 m (8 %); the Soot Stair drops 8 m over 50 m in flights; the ore hill 40–70 m across the river; the area's edge steep beyond 45°. Paint: grass in fields and gardens, forest floor in the forest, rock on the hill and the edge, sand and mud on the shore; streets carry their own paving.
+
+**Shaped** 2026-11-05 by `VeilmouthGround` (`GameDev/Slice/Shape Veilmouth Ground from C1 (once)`), which refuses to run once the scene holds the C1 map; the ground is the owner's from then on. The terrain is 1000 × 1000 m with a heightmap of 1025 (a sample every 0.98 m) and weights of 512 on the five canonical layers. As built (authoring defaults):
+
+- the low city at 25.9 m and the Ridge at 33.9 m behind a retaining wall on its edge, one sample wide, for the kit's wall to face;
+- Crown Avenue climbs from the Circus at 25.9 m to the forecourt at 33.9 m, and the ground 60 m either side of it climbs with it, easing into the low town and into the Ridge over 25 m more: the Town Hall and the Assize stand on that slope and get level platforms when they are built, and Ridge Street dips to meet the avenue rather than meeting it at a step;
+- the Soot Stair is a causeway that falls 8 m over 58 m between the ground on either side, for its flights and blind walls;
+- the river bed at 21 m in its 40 m channel, with vertical embankments along the city and banks of 25 m outside it; the sea bed from 19.5 m to 18 m, vertical quays along the city and the basin, a beach elsewhere;
+- outside the walls, a coastal plain at the low level that rises 8 m north of the Ridge's line into the forest, rolling there by up to 4 m; the ore hill to 70 m;
+- the north, west, and east edges rise 45 m within 45 m of the boundary, steeper than 45°, with a pass where each road leaves.
+
+Checked by `VeilmouthSceneTests` (the heights above, the edge's slope, the roads' passes) and by `VeilmouthRenders`. Until the city is rebuilt (§11, step 3), C0's dressing still stands where it was, on this ground.
 
 ---
 

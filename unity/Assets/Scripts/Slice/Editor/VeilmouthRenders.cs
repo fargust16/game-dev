@@ -25,24 +25,23 @@ namespace GameDev.Slice.EditorTools
             // The wind controller runs only in an editor frame; a batch render sets its globals itself.
             Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
-            const float s = VeilmouthScene.StreetLevel;
-            Top("view_world", new Vector3(0f, 0f, 0f), 350f);
-            Top("view_city", new Vector3(40f, 0f, -170f), 110f);
-            Top("view_lowerveil", new Vector3(90f, 0f, -200f), 55f);
-            Top("view_market", new Vector3(-16f, 0f, -202f), 26f);
-            Top("view_chapel", new Vector3(-70f, 0f, -58f), 18f);
-            Top("view_hill", new Vector3(265f, 0f, 175f), 140f);
-            Eye("eye_bellstreet", new Vector3(104f, s + 1.7f, -191f), new Vector3(102f, s + 4f, -176f));
-            Eye("eye_harrow", new Vector3(116f, s + 1.7f, -191f), new Vector3(115f, s + 3f, -176f));
-            Eye("eye_faction_wardens", new Vector3(36f, s + 1.7f, -98f), new Vector3(36f, s + 4f, -84f));
-            Eye("eye_hill", new Vector3(200f, s + 3f, 60f), new Vector3(260f, s, 150f));
-            Eye("eye_bellstreet_east", new Vector3(60f, s + 1.7f, -188f), new Vector3(110f, s + 3f, -188f));
-            Eye("eye_market", new Vector3(-15f, s + 1.7f, -214f), new Vector3(-18f, s + 1f, -186f));
-            Eye("eye_ridge", new Vector3(30f, s + 1.7f, -96f), new Vector3(50f, s + 3f, -90f));
-            Eye("eye_chapel", new Vector3(-76f, s + 1.7f, -72f), new Vector3(-75f, s + 4f, -55f));
-            Eye("eye_bridge", new Vector3(146f, s + 1.7f, -200f), new Vector3(175f, s + 1f, -200f));
-            Eye("eye_ritual_square", new Vector3(120f, s + 6f, -250f), new Vector3(120f, s, -236f));
-            Eye("eye_forest", new Vector3(-200f, s + 1.7f, 62f), new Vector3(-200f, s + 2f, 80f));
+            // C1 views; an eye stands 1.7 m above the ground under it.
+            Top("view_world", new Vector3(0f, 0f, 0f), 500f);
+            Top("view_city", new Vector3(30f, 0f, -160f), 260f);
+            Top("view_lowerveil", new Vector3(170f, 0f, -255f), 80f);
+            Top("view_government", new Vector3(0f, 0f, -70f), 80f);
+            Top("view_market", new Vector3(-80f, 0f, -255f), 80f);
+            Top("view_hill", new Vector3(420f, 0f, 140f), 180f);
+            Eye("eye_bellstreet", 205f, -236f, 205f, -222f, 2.5f);
+            Eye("eye_highstreet", -150f, -171f, 100f, -171f, 3f);
+            Eye("eye_avenue", 0f, -150f, 0f, -20f, 6f);
+            Eye("eye_ridgestreet", -80f, -86f, 100f, -86f, 3f);
+            Eye("eye_sootstair", 204f, -95f, 204f, -150f, 0f);
+            Eye("eye_bridge", 300f, -172f, 150f, -172f, 4f);
+            Eye("eye_quay", 100f, -318f, 300f, -330f, 0f);
+            Eye("eye_westgate", -300f, -172f, -200f, -150f, 4f);
+            Eye("eye_forest", 123f, 120f, 123f, 300f, 2f);
+            Eye("eye_hill", 340f, 0f, 420f, 140f, 20f);
 
             foreach (var path in new[] { VeilmouthScene.SootAndBellScenePath }.Concat(VeilmouthDressing.InteriorScenePaths))
             {
@@ -83,9 +82,17 @@ namespace GameDev.Slice.EditorTools
             var camera = Make();
             camera.orthographic = true;
             camera.orthographicSize = half;
-            camera.transform.SetPositionAndRotation(new Vector3(centre.x, 200f, centre.z), Quaternion.LookRotation(Vector3.down, Vector3.forward));
+            camera.transform.SetPositionAndRotation(new Vector3(centre.x, 300f, centre.z), Quaternion.LookRotation(Vector3.down, Vector3.forward));
             camera.farClipPlane = 400f;
             Shoot(camera, name, 1400, 1400);
+        }
+
+        /// <summary>An eye 1.7 m above the ground at (x, z), looking at (toX, toZ) at <paramref name="up"/> above its ground.</summary>
+        private static void Eye(string name, float x, float z, float toX, float toZ, float up)
+        {
+            var terrain = Terrain.activeTerrain;
+            float Ground(float gx, float gz) => terrain.SampleHeight(new Vector3(gx, 0f, gz)) + terrain.transform.position.y;
+            Eye(name, new Vector3(x, Ground(x, z) + 1.7f, z), new Vector3(toX, Ground(toX, toZ) + up, toZ));
         }
 
         private static void Eye(string name, Vector3 from, Vector3 to)
@@ -93,7 +100,7 @@ namespace GameDev.Slice.EditorTools
             var camera = Make();
             camera.fieldOfView = 65f;
             camera.transform.SetPositionAndRotation(from, Quaternion.LookRotation(to - from));
-            camera.farClipPlane = 800f;
+            camera.farClipPlane = 1500f;
             Shoot(camera, name, 1600, 900);
         }
 
