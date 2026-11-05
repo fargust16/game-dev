@@ -2,7 +2,7 @@
 
 Status: Draft — the owner's decisions are marked; everything else is the agent's plan and authoring defaults
 Created: 2026-11-04
-Last Updated: 2026-11-05 (the slice's asset map, SLICE_ASSET_MAP.md, by the owner's list of packs. Earlier: S0.6a: the Veilmouth scene's starting point. Earlier: C0, the Veilmouth map, accepted by the owner: §2)
+Last Updated: 2026-11-05 (the inventory's money is in bronze, by 19 §6.3; the asset map takes the owner's second list. Earlier: the slice's asset map, SLICE_ASSET_MAP.md, by the owner's list of packs. Earlier: S0.6a: the Veilmouth scene's starting point. Earlier: C0, the Veilmouth map, accepted by the owner: §2)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md) (what the slice is), [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md) (systems and folders), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md) (scene locks)
 Companion: [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) (which pack serves each mechanic, character, and place)
 
@@ -117,7 +117,7 @@ S0.6 runs in two parts. **S0.6a done** (agent): the menu *GameDev → Slice → 
 | `world.clock` | The tick and the progress toward the next one (written in S0.5) | X.1 |
 | `player.place` | The scene the player is in and their pose | L.2, I.2 |
 | `player.character` | Attributes, skills, Arcana and Limit, Conduct Progress, HP, Will Power, Sanity, Fatigue, conditions | P |
-| `player.inventory` | The bag, equipped items and Weapon Sets, gold | 19 |
+| `player.inventory` | The bag, equipped items and Weapon Sets, money in bronze | 19 |
 | `player.knowledge` | Arguments gained in this life, lessons, recipes | 10.4, 19, 20 |
 | `world.state` | POI states, decision outcomes, residue, interiors' changes by building id, spent resource nodes, shop shelves | C.6, Q.3, W.7 |
 | `world.people` | Named NPCs and beasts: alive or dead, where, their task, their opinion of the player | A.2 |

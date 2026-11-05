@@ -1,8 +1,8 @@
 # 19 Items, Crafting, Inventory, Equipment, and Enchanting
 
-Version: 0.22
+Version: 0.23
 Status: Draft — owner-confirmed rules with delegated starting-balance formulas; content tables, operation costs, and selected edge cases remain open
-Last Updated: 2026-11-04 (the owner's answers: the Master of Item Creation teaches Skinning, a beast's ingredients need no lesson, and gathering has no Masters of its own; who sells which tools and ingredients approved. Earlier: gathering, Skinning, learning Item Creation from its Master, the workshop, stage 9 recipes, and the weights of resources, tools and First Aid supplies: the owner's rules, the agent's numbers. Earlier: prices, wages, selling and stock (§6.3), authoring defaults; Shop Skill +1 a day kept as an authoring default. Earlier: durability is off in the slice, by the owner. Earlier: the Attribute Requirement penalty grows with the shortfall. Earlier: Attribute Requirements V0: values and stage scaling in 10.2 §5b. Earlier: Attribute Requirements for weapons and armour, and silver cartridges deal more damage to monsters, by the owner's direction. Earlier: the hand on the Cartridge Pouch loads each shot, with no separate Reload. Earlier: kinds of weapon, the Cartridge Pouch, and two Weapon Sets, by the owner's decision. Earlier: armour splits its defence by the owner's direction: cloth against magic, leather half and half, plate against physical harm. Earlier: a pistol can share the hands with a one-handed weapon, a shield, or a second pistol, and Reload needs a free hand, by the owner's decision. Earlier: bows and the mini-crossbow removed by the owner: weapons are iron, for melee and firearms. Earlier: V1 counts no ammunition, by the owner's decision. Earlier: catalogue gains Magical Damage, Will Power, and magical defence, and critical and defence values rise; crossbows out, rifle and pistol in; crafting has no ceiling, by the owner's decision. Earlier: shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
+Last Updated: 2026-11-05 (money in bronze, silver, and gold, 100 to 1, by the owner; every price recalculated in bronze; a shield goes only with a sword, an axe, or a mace, and spears do not exist, by the owner. Earlier: the owner's answers: the Master of Item Creation teaches Skinning, a beast's ingredients need no lesson, and gathering has no Masters of its own; who sells which tools and ingredients approved. Earlier: gathering, Skinning, learning Item Creation from its Master, the workshop, stage 9 recipes, and the weights of resources, tools and First Aid supplies: the owner's rules, the agent's numbers. Earlier: prices, wages, selling and stock (§6.3), authoring defaults; Shop Skill +1 a day kept as an authoring default. Earlier: durability is off in the slice, by the owner. Earlier: the Attribute Requirement penalty grows with the shortfall. Earlier: Attribute Requirements V0: values and stage scaling in 10.2 §5b. Earlier: Attribute Requirements for weapons and armour, and silver cartridges deal more damage to monsters, by the owner's direction. Earlier: the hand on the Cartridge Pouch loads each shot, with no separate Reload. Earlier: kinds of weapon, the Cartridge Pouch, and two Weapon Sets, by the owner's decision. Earlier: armour splits its defence by the owner's direction: cloth against magic, leather half and half, plate against physical harm. Earlier: a pistol can share the hands with a one-handed weapon, a shield, or a second pistol, and Reload needs a free hand, by the owner's decision. Earlier: bows and the mini-crossbow removed by the owner: weapons are iron, for melee and firearms. Earlier: V1 counts no ammunition, by the owner's decision. Earlier: catalogue gains Magical Damage, Will Power, and magical defence, and critical and defence values rise; crossbows out, rifle and pistol in; crafting has no ceiling, by the owner's decision. Earlier: shops, Masters, Shop Skill, and the Faction Gift added. Earlier: catalogue values reworked, with minor modifiers at half of major ones. Earlier: working Modifier Catalogue added as authoring defaults, and the owner's direction that items decide fights. Earlier: working weapon and armour values referenced. Earlier: terms renamed to Arcana and Limit. Earlier: profession scope now distinguishes equipment crafting from the new potion-only Alchemy profession.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2 Derived Character Statistics](07.2%20Derived%20Character%20Statistics.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -139,8 +139,8 @@ For every generated modifier, the selected base supplies the fixed type weights;
 
 **Learning and the workshop.** Owner's decision, 2026-11-04: anyone may gather, but only a character who has learned Item Creation from its Master may craft, as with Alchemy. Authoring defaults the same day:
 
-- The lesson costs 10 gold (§6.3).
-- Crafting happens at the Master's workshop, which costs 1 gold a piece and is open while the Master works ([18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)).
+- The lesson costs 1 000 bronze (§6.3).
+- Crafting happens at the Master's workshop, which costs 100 bronze a piece and is open while the Master works ([18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)).
 - A stage 9 piece takes 10 ticks and a stage 8 piece 20. The world advances during the work, and being attacked interrupts it with the resources kept.
 - Item Creation always makes its item; only the modifier count is random. For XP of [07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §3 it counts as a normal success.
 - A crafter reaches about skill 11 to 14 in a run, and 15 is the ceiling, because stage 8 pieces need a rare ingredient ([07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §3, `tools/balance/progress_sim.py`).
@@ -172,14 +172,14 @@ For every generated modifier, the selected base supplies the fixed type weights;
 | Chain | 2 / 6 / 3 / 2 / 4 / 2 ore |
 | Plate | 3 / 9 / 4 / 2 / 6 / 3 ore |
 
-A stage 8 piece takes half as many resources again, rounded up, plus one rare ingredient of stage 8 (§2.1). In the slice that is a glowing beast's magical ingredient, or the same bought from the Master of Enchanting for 150 gold (§6.3). It competes with the Limit 8 potion for the same ingredient ([05.1](05.1%20Arcana%20and%20Limits.md)).
+A stage 8 piece takes half as many resources again, rounded up, plus one rare ingredient of stage 8 (§2.1). In the slice that is a glowing beast's magical ingredient, or the same bought from the Master of Enchanting for 15 000 bronze (§6.3). It competes with the Limit 8 potion for the same ingredient ([05.1](05.1%20Arcana%20and%20Limits.md)).
 
 # 4. Inventory, equipment, and durability
 
 ## 4.1 Inventory and weight
 
 - Personal inventory is an unlimited bag: there is no item-count cap, grid capacity, or variable footprint. Every item has the same-size inventory entry/icon; weight is the only carrying limit.
-- Every carried item has an assigned weight. Total carried weight includes equipped items and equals the sum of item weights; stack weight is the per-unit weight multiplied by quantity. Currency/gold weighs 0 and never changes the load.
+- Every carried item has an assigned weight. Total carried weight includes equipped items and equals the sum of item weights; stack weight is the per-unit weight multiplied by quantity. Coins weigh 0 and never change the load.
 - Starting weight balance (kg): ring 0.05; necklace/amulet 0.10; belt 0.25. Cloth armour: head 0.5, body 2, shoulders 0.8, gloves 0.4, trousers 1.2, boots 0.8. Leather armour: 1, 4, 1.5, 0.8, 2.5, 1.5 respectively. Chain armour: 1.8, 7.5, 3, 1.4, 4.5, 3 respectively. Plate/heavy-metal armour: 2.8, 11, 4.5, 2, 7, 4.5 respectively.
 - Starting hand-item weights (kg): dagger 1; sword 2; axe 2.2; mace 2.5; greatsword 4.5; greataxe 5; maul 6; wooden shield 2.5; metal shield 4; rifle 4; pistol 1.2; Cartridge Pouch 0.5.
 - Resources, tools, and supplies (kg, authoring defaults, 2026-11-04): ore 1; wood 1.5; leather 0.5; flax 0.2; herb 0.1; ordinary beast ingredient 0.2; magical ingredient 0.1; woodcutting axe 2; pickaxe 2.5; bandage 0.1; splint 0.5; antidote 0.2; potion 0.3.
@@ -189,7 +189,7 @@ A stage 8 piece takes half as many resources again, rounded up, plus one rare in
 
 ## 4.2 Equipment
 
-- The character has two universal hand slots. Compatible one-handed weapons, shields, talismans, books, and similar items may occupy either hand; a two-handed item uses both. A pistol uses one hand and a Cartridge Pouch the other. A rifle uses both hands, and its Cartridge Pouch fills the off-hand slot, as a quiver does in Path of Exile. Nothing else may share the hands with a firearm, by the owner's decision of 2026-11-03, which withdraws the earlier decision of that day that let a pistol go with a one-handed weapon, a shield, or a second pistol ([10.2](10.2%20Combat%20System%20Draft.md) §5b). V1 counts no cartridges as items, by the owner's decision of 2026-11-03. Every weapon is iron, a melee weapon or a firearm: staffs and wands do not exist, by the owner's direction of 2026-11-02, and bows and crossbows of any size do not exist, by the owner's decision of 2026-11-03.
+- The character has two universal hand slots. Compatible one-handed weapons, shields, talismans, books, and similar items may occupy either hand; a two-handed item uses both. A shield goes only with a sword, an axe, or a mace in the other hand, never with a dagger, by the owner's decision of 2026-11-05. A pistol uses one hand and a Cartridge Pouch the other. A rifle uses both hands, and its Cartridge Pouch fills the off-hand slot, as a quiver does in Path of Exile. Nothing else may share the hands with a firearm, by the owner's decision of 2026-11-03, which withdraws the earlier decision of that day that let a pistol go with a one-handed weapon, a shield, or a second pistol ([10.2](10.2%20Combat%20System%20Draft.md) §5b). V1 counts no cartridges as items, by the owner's decision of 2026-11-03. Every weapon is iron, a melee weapon or a firearm: staffs and wands do not exist, by the owner's direction of 2026-11-02, and bows and crossbows of any size do not exist, by the owner's decision of 2026-11-03. Spears do not exist either (owner, 2026-11-05).
 - **Cartridge Pouch.** Owner-approved, 2026-11-03: an item of its own, needed for every firearm, whose cartridges never run out. It has its own modifiers, it can be enchanted, and it comes in every quality up to Legendary, and as a Unique. Its cartridges are ordinary, against people, or silver, which deal more damage to monsters, by the owner's direction of 2026-11-03. How much more waits for monsters, and the slice uses ordinary cartridges only. The hand on the pouch loads each shot, since 2026-11-03 with no separate Reload ([10.2](10.2%20Combat%20System%20Draft.md) §5b), and changing the pouch in a fight costs 2 AP.
 - **Weapon Sets.** Owner-approved, 2026-11-03: a character carries two Weapon Sets, each filling the hands, and changes between them in a fight for 2 AP, an authoring default within the owner's 1–2 AP.
 - **Kinds of weapon.** Owner-approved, 2026-11-03: dagger, sword, axe, and mace in one hand; greatsword, greataxe, and maul in two; pistol and rifle with a Cartridge Pouch. Each has its own trait, and their numbers are in [10.2](10.2%20Combat%20System%20Draft.md) §5b. Owner's direction, 2026-11-03: weapons and armour have Attribute Requirements. Below them a weapon aims worse and armour gives less of its bonuses, about half of what the item would. The penalty grows with the shortfall, by the owner's direction: at half a requirement an item gives half. An item of stage S asks (10 − S) times its values of stage 9; the values are authoring defaults in [10.2](10.2%20Combat%20System%20Draft.md) §5b, *Attribute Requirements*. Cloth, a shield, and the Cartridge Pouch ask nothing.
@@ -293,46 +293,52 @@ Owner's direction, 2026-11-02: a character who joins a faction may receive a **F
 
 Authoring defaults, 2026-11-03: the offer comes every time a character joins, and it is three items of which the character takes one, at Magic 70 %, Rare 28 %, Epic 2 %. In the slice one Gift adds about 1 point to a Limit 9 hero, so it is a welcome, not a set.
 
-## 6.3 Prices and wages
+## 6.3 Money, prices, and wages
 
-Authoring defaults set by the agent on 2026-11-03 (CC-48), at the middle Economy setting, which may later scale them. The unit is gold, and the anchor is a day's plain work in a city: about 10 gold.
+**Money** (owner's decision, 2026-11-05). There are three coins: bronze, silver, and gold. 100 bronze make 1 silver, and 100 silver make 1 gold. Every price, wage, purse, and fine is one whole number of bronze, and the interface shows it in coins: the bronze below 100, the silver below 100, and the gold above. So 375 bronze shows as 3 silver 75 bronze, and 25 000 bronze as 2 gold 50 silver. Authoring default: a coin whose count is zero is not shown. Coins weigh nothing (§3).
 
-**Equipment**, any base, by quality:
+**Recalculation** (agent, 2026-11-05, authoring default). Every earlier price in gold became the same number of silver, that is ×100 in bronze, so no balance changes. Silver is therefore the everyday coin. Bronze comes from purses, from what a shop pays (a quarter of its price), and from small goods, and gold only from the most valuable things.
+
+Authoring defaults set by the agent on 2026-11-03 (CC-48), at the middle Economy setting, which may later scale them. The unit is bronze, and the anchor is a day's plain work in a city: about 1 000 bronze (10 silver).
+
+**Equipment**, any base, by quality, in bronze:
 
 | Normal | Magic | Rare | Epic | Legendary |
 |---:|---:|---:|---:|---:|
-| 5 | 15 | 40 | 100 | 250 |
+| 500 | 1 500 | 4 000 | 10 000 | 25 000 |
 
-A city set of 11 pieces at Shop Skill 26 costs about 230 gold.
+A city set of 11 pieces at Shop Skill 26 costs about 23 000 bronze (2 gold 30 silver).
 
 **Everything else:**
 
-| Goods or service | Gold |
+| Goods or service | Bronze |
 |---|---:|
-| Herb, ordinary ingredient from a beast, wood | 1 |
-| Ore, leather | 2–3 |
-| Pickaxe or axe | 6–8 |
-| Bandage / splint / antidote | 2 / 4 / 6 |
-| Magical ingredient for the Limit 9 potion, from the Master of Enchanting | 20 |
-| Magical ingredient for the Limit 8 potion, the same Master's price | 150 |
-| A lesson that teaches a profession from its Master | 10 |
-| A tavern room for a night | 3 |
-| A seer's prediction | 30 |
+| Herb, ordinary ingredient from a beast, wood | 100 |
+| Ore, leather | 200–300 |
+| Pickaxe or axe | 600–800 |
+| Bandage / splint / antidote | 200 / 400 / 600 |
+| Magical ingredient for the Limit 9 potion, from the Master of Enchanting | 2 000 |
+| Magical ingredient for the Limit 8 potion, the same Master's price | 15 000 |
+| A lesson that teaches a profession from its Master | 1 000 |
+| A tavern room for a night | 300 |
+| A seer's prediction | 3 000 |
 
-**What gold comes from:**
+**What money comes from:**
 
-| Source | Gold |
+| Source | Bronze |
 |---|---:|
-| Starting purse | 5 |
-| Notice Board task, an hour or two of work | 5–15 |
-| A Master's order, often for something gathered or made | 10–25 |
-| Faction task, for members | 20–40 |
-| A townsman's / a guard's / a merchant's purse, by theft | 1–6 / 3–8 / 10–30 |
-| A glowing beast's magical ingredient, sold to the Master of Enchanting | 40 |
+| Starting purse | 500 |
+| Notice Board task, an hour or two of work | 500–1 500 |
+| A Master's order, often for something gathered or made | 1 000–2 500 |
+| Faction task, for members | 2 000–4 000 |
+| A townsman's / a guard's / a merchant's purse, by theft | 100–600 / 300–800 / 1 000–3 000 |
+| A glowing beast's magical ingredient, sold to the Master of Enchanting | 4 000 |
+
+A purse holds any whole number of bronze in its range.
 
 **Selling.** A shop pays a quarter of its own price. Selling is possible, but buying and selling back never pays, and crafting for sale is slow money.
 
-**The budget of a run.** A player who works through two days earns about 100 gold. That buys the Limit 9 ingredient, lessons, First Aid supplies, and two or three Magic pieces, or one Rare weapon, but not a whole set. So a set comes from mixing the routes of 11: buying, crafting, tasks, and theft. The Limit 8 ingredient at 150 gold is within reach only for a player who saves and steals; the glowing beast costs a trip instead.
+**The budget of a run.** A player who works through two days earns about 10 000 bronze (1 gold). That buys the Limit 9 ingredient, lessons, First Aid supplies, and two or three Magic pieces, or one Rare weapon, but not a whole set. So a set comes from mixing the routes of 11: buying, crafting, tasks, and theft. The Limit 8 ingredient at 15 000 bronze is within reach only for a player who saves and steals; the glowing beast costs a trip instead.
 
 **Stock.** A shop holds one to three of each thing it sells. Each morning it fills again to that count, so the Shop Skill of that day makes the new pieces. Working reading for the full game: buyers share one shelf, so what the player buys is missing for others until morning. The slice's fighters bring their own gear and do not shop during the run.
 
@@ -356,7 +362,7 @@ Authoring defaults the same day:
 - A cycle takes 1 tick and is an action check of [07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §4 against the node's D: a success gives 1 unit, a critical success 2, and a failure none.
 - Each cycle costs 3 % of the character's maximum Stamina. Gathering stops at 0 Stamina.
 - Moving, opening the bag, being noticed by a beast, or being attacked cancels it.
-- **Skinning** takes 3 ticks and is a check on (Dexterity + Skinning) / 2 against D 2. A wolf gives 1 leather and a boar 2; a failure gives half, rounded down. The lesson costs 10 gold.
+- **Skinning** takes 3 ticks and is a check on (Dexterity + Skinning) / 2 against D 2. A wolf gives 1 leather and a boar 2; a failure gives half, rounded down. The lesson costs 1 000 bronze.
 - Owner's decisions, 2026-11-04: the Master of Item Creation teaches Skinning, and taking a beast's other parts, its ingredients, needs no lesson.
 - **No gathering Masters.** Owner's decision, 2026-11-04: Herbalism, Woodcutting, and Mining have no Masters, because gathering needs no lesson. Tools and common ingredients are sold by the Masters of the crafting professions, Item Creation and Enchanting, and by the Master of First Aid. Who sells what, owner-approved the same day: the Master of Item Creation sells axes, pickaxes, ore, wood, leather, and flax; the Master of Enchanting sells magical ingredients (§6.3); the Master of First Aid sells herbs and ordinary beast ingredients beside its supplies.
 

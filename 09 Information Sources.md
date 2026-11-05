@@ -1,10 +1,10 @@
 # 09 Information Sources
 
-Version: 0.11
+Version: 0.12
 
 Status: Draft
 
-Last Updated: 2026-11-03 (tips a day, Hinted to Marked, and false tips, authoring defaults. Earlier: Character Notes added. Earlier: rumours carry Reputation. Earlier: Confront runs in place. Earlier: the rituals' purpose excluded from every source until manifestation. Earlier: the secret purpose of rituals excluded from public sources. Earlier: reported City Control recorded as the public reading of campaign progress. Earlier: private daily action summary separated from public news; public event/map reporting and source-limited NPC awareness clarified.)
+Last Updated: 2026-11-05 (tasks pay money, not gold, by 19 §6.3. Earlier: tips a day, Hinted to Marked, and false tips, authoring defaults. Earlier: Character Notes added. Earlier: rumours carry Reputation. Earlier: Confront runs in place. Earlier: the rituals' purpose excluded from every source until manifestation. Earlier: the secret purpose of rituals excluded from public sources. Earlier: reported City Control recorded as the public reading of campaign progress. Earlier: private daily action summary separated from public news; public event/map reporting and source-limited NPC awareness clarified.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md)
@@ -151,7 +151,7 @@ Authoring defaults set by the agent on 2026-11-03.
 
 **Tips a day.** A district gives about five new tips a day:
 
-- the Notice Board is renewed each morning with two or three notices, one lead to a POI and one or two tasks for gold, and an urgent notice can be pinned during the day;
+- the Notice Board is renewed each morning with two or three notices, one lead to a POI and one or two tasks for money, and an urgent notice can be pinned during the day;
 - the bartender has one new tip each evening, and more for Convince, Threaten, or Exchange;
 - Street Rumour carries two or three lines a day, one of them a lead.
 
