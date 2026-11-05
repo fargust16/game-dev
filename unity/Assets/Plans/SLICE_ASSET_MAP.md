@@ -2,7 +2,7 @@
 
 Status: Draft — the owner's list of packs and answers, 2026-11-05; checked against the project on disk and the design documents by the agent
 Created: 2026-11-05
-Last Updated: 2026-11-05 (the owner's second list: Multistory Dungeons 2 for alchemy, Victorian Objects weapons, Stylized 3D Tools, RPG_Animations_Pack_FREE, Roadside Tales Free, Modern RPG icons, Yughues pavements, WaterWorks; the owner's answers on shields, hidden followers, colours, coins, and buildings)
+Last Updated: 2026-11-05 (Basic Treasure Coins found in REAL_DEDICATED; the dragons are FourEvilDragonsHP; the firearms come through the Tripo Bridge. Earlier: the owner's second list: Multistory Dungeons 2 for alchemy, Victorian Objects weapons, Stylized 3D Tools, RPG_Animations_Pack_FREE, Roadside Tales Free, Modern RPG icons, Yughues pavements, WaterWorks; the owner's answers on shields, hidden followers, colours, coins, and buildings)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 Related: [ASSET_LIBRARY_REFERENCE.md](ASSET_LIBRARY_REFERENCE.md) (the Overworld's registry)
 
@@ -81,12 +81,12 @@ The main clips are in `Assets/Kevin Iglesias/Human Animations/Animations/Male/` 
 | Pistol, rifle, Cartridge Pouch | Victorian Objects | `Assets/Victorian Objects/Weapons/pistol.glb`, `rifle.glb`, `satchel.glb`. The satchel is the Cartridge Pouch of every firearm (owner, 2026-11-05). **Not imported as models yet** (§7) |
 | Woodcutting axe, pickaxe, crafting hammer | Stylized 3D Tools | `Assets/Stylized 3D Tools/Prefabs/axe01`, `pickaxe01`, `hammer01` |
 | Potions and brewing glass | Multistory Dungeons 2; Low-Poly Weapons | `Assets/Multistory Dungeons 2/Prefabs/Props/Books And Alchemy/`: `Potion_01–04`, `Potion_Blue_01`, `Potion_Red_01`, `Flask_01–05`, `Retort_Preset_01`; also `Low-Poly Weapons/Prefabs/Potion_*`. Models only; [20](../../../20%20Alchemy%20and%20Potioncraft.md) decides which potions exist |
-| Coins | Basic Treasure Coins: **not on disk** | in the project instead: `LowPolyMedievalPropsLite/Prefabs/Coin_01–03`, `Low-Poly Medieval Market/Prefabs/coin`, `coins` |
+| Coins: bronze, silver, gold | Basic Treasure Coins | `Assets/REAL_DEDICATED/BasicTreasureCoins/Prefabs/CoinPile_Copper` (bronze), `CoinPile_Silver`, `CoinPile_Gold` |
 
 - Every weapon is iron (10.2), so swords and blades use the plain metal variants (for example `Sword15_Iron`, `Sword1_Silver`). The lava, frost, blood, and coloured variants read as magic weapons the slice does not have.
 - A shield goes only with a sword, an axe, or a mace (owner, 2026-11-05; 10.2 §5b).
 - Not used, because the design has no such weapons (10.2 §5b): staffs, wands, bows, and spears from RPG Weapons; bows, crossbows, arrows, bombs, and grenades from Low-Poly Weapons.
-- Money is bronze, silver, and gold, 100 to 1 ([19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.3). One coin model in three tints serves all three until Basic Treasure Coins is imported.
+- Money is bronze, silver, and gold, 100 to 1 ([19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.3). Basic Treasure Coins has one pile for each metal; its copper pile is the bronze.
 
 ## 4. Places and props
 
@@ -119,7 +119,8 @@ The main clips are in `Assets/Kevin Iglesias/Human Animations/Animations/Male/` 
 | Beast | Source | Location | Note |
 |---|---|---|---|
 | Wolves and boars, until real models exist | Dragon for Boss Monster : HP | `Assets/FourEvilDragonsHP/Prefab/` — four dragons in six colours | Imported. Built-in materials: convert. Scaled down to a wolf's or a boar's size, so the Combat Grid holds them like any fighter. A beast that glows ([11](../../../11%20Vertical%20Slice.md)) uses the material's emission |
-| — | Dragon for Boss Monster : PBR | **not on disk**, though the owner imported it on 2026-11-05 | — |
+
+The owner's "dragons" are this pack (2026-11-05); the PBR version is not used.
 
 ## 7. Render state on disk, 2026-11-05
 
@@ -130,7 +131,8 @@ The main clips are in `Assets/Kevin Iglesias/Human Animations/Animations/Male/` 
 | Stylized 3D Tools | Built-in Standard (Specular setup) | Render Pipeline Converter |
 | Magic Effects FREE (Hovl) | Built-in particles | Render Pipeline Converter |
 | LowPolyDungeonsLite, LowPolyMedievalPropsLite, FantasyMedievalTown_LITE, Yughues Free Pavement Materials | Built-in Standard | import the pack's own URP `.unitypackage` |
-| Victorian Objects | `.glb` files with no importer: Unity sees them as plain files | needs a glTF importer package, such as glTFast (`com.unity.cloud.gltfast`); packages are the owner's call |
+| Basic Treasure Coins | a shader that is not in the project, so the coins render magenta | import `REAL_DEDICATED/BasicTreasureCoins/BasicTreasureCoins_URP.unitypackage` |
+| Victorian Objects | `.glb` files with no importer: Unity sees them as plain files | the owner brings the pistol, rifle, and pouch over through the Tripo Bridge (`com.tripo3d.unitybridge`, *GameDev → Tools → Tripo Bridge - Check Port and Open*), which imports FBX, OBJ, or ZIP |
 | Human Character Dummy, Low-Poly Weapons | built-in shader ids, not Standard | check in the editor |
 | Modern RPG - Free icons pack, RPG_Animations_Pack_FREE | images; animation clips | ready |
 
@@ -138,8 +140,7 @@ The main clips are in `Assets/Kevin Iglesias/Human Animations/Animations/Male/` 
 
 ## 8. Open
 
-1. **Not on disk:** Basic Treasure Coins and Dragon for Boss Monster : PBR. The owner reports both imported on 2026-11-05, but no folder holds them; the import may not have finished.
-2. **The `.glb` weapons and props** need a glTF importer package before they can be placed (§7).
-3. **Missing clips:** sneaking, sleeping, brewing, First Aid, felling, the Defensive Stance, and Yield.
+1. **The `.glb` weapons and props** are not models yet: the owner brings them over through the Tripo Bridge (§7).
+2. **Missing clips:** sneaking, sleeping, brewing, First Aid, felling, the Defensive Stance, and Yield.
 
 Resolved by the owner on 2026-11-05: spears do not exist and a shield goes with a sword, an axe, or a mace; red marks only Cult Forces that act openly; the faction's members, allied fighters, and Veinmarket get colours of their own; money is bronze, silver, and gold, 100 to 1; FantasyMedievalTown_LITE serves villages and outer buildings, and Modular Victorian City with Modular European House serves the city.

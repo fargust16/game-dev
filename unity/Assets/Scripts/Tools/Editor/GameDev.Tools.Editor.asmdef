@@ -1,0 +1,24 @@
+{
+    "name": "GameDev.Tools.Editor",
+    "rootNamespace": "GameDev.Tools.Editor",
+    "references": [
+        "Tripo3D.UnityBridge.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.tripo3d.unitybridge",
+            "expression": "",
+            "define": "TRIPO_BRIDGE"
+        }
+    ],
+    "noEngineReferences": false
+}
