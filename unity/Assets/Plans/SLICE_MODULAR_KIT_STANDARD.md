@@ -2,7 +2,7 @@
 
 Status: Draft — authoring defaults set by the agent; the owner's decision that sets the frame is marked
 Created: 2026-11-04
-Last Updated: 2026-11-04 (S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
+Last Updated: 2026-11-05 (§8 points to the slice's asset map. Earlier: S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [10.1 Grid World and Environment Actions](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [COMBAT_GRID_TECH_TEST.md](COMBAT_GRID_TECH_TEST.md)
 Used by: [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -90,6 +90,7 @@ A block that can be vaulted, climbed, or breached in a fight carries a tag compo
 
 - URP Lit or URP Simple Lit materials. A pack made for the Built-in pipeline is converted before use (see [ASSET_LIBRARY_REFERENCE.md](ASSET_LIBRARY_REFERENCE.md), Low Poly Environment).
 - Names: `Kit_<Family>_<Part>_<Width>x<Height>`, for example `Kit_Wall_Brick_4x3`, `Kit_Door_Wood_1x2`, `Kit_Prop_Crate_1x1`.
+- Which vendor pack serves which block, prop, and place is in [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md).
 - Blocks are prefabs under `Assets/Prefabs/SliceKit/<Family>/`. A third-party pack stays in its vendor folder and is wrapped by a project prefab that adds the colliders, layer, and tags of this standard.
 - Static blocks are marked static for batching. Large blocks carry LODs when their triangle count is high; the exact budget is set once the first blocks arrive.
 

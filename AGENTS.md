@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 1.57
+Version: 1.58
 
 Status: Draft
 
-Last Updated: 2026-11-04 (the slice is one hand-built scene from a modular kit, and its implementation plan is the next code default)
+Last Updated: 2026-11-05 (the slice's asset map names the pack for each mechanic, character, and place)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -410,6 +410,7 @@ An entry marked † is the short binding form. Its full text is in [91 Agent Dec
 - † **Ritual Weak Points** ([21](21%20Cult%20Campaign%20and%20City%20Control.md) §4): a slice ritual has two, chosen by the seed, and any one stops it; a campaign ritual has two at the middle setting and one at the higher settings. No list or map mark shows them. A failed Final Check leaves only the hidden route. The Cult Thought Link carries orders and reports in exceptional cases and is not a shared mind. Any dialogue pauses the world, with no exceptions, and costs one tick when it ends. Traces of a Weak Point were left by people who joined the General earlier, not by a hidden agent: each has two sources in the city and one during the invasion, any one opens it, and each further one adds +1 ([11 Vertical Slice](11%20Vertical%20Slice.md)).
 - Information comes from biased partial Information Sources; no omniscient quest spoiler log that replaces world reading.
 - † **Vertical Slice target** ([11 Vertical Slice](11%20Vertical%20Slice.md)): the first implementation target. One city and a small territory at player Limits 9–8; a Factionless character may join the faction through a first-day trial; the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player stops the ritual and wins or loses. Required in a limited form, as 11 sets out: free exploration, gathering, Item Creation, Alchemy, First Aid, shops and gold, theft, combat, dialogue with checks, stealth, time, sleep. Brewing and theft are Reaction Checks, and durability is off. Out: Enchanting, Death Gap, Legacy Cache, Arcana change. The owner's answers of 2026-11-04 (beast territories, gathering and lessons, Yield, one Suspend Save, schedules, Ritual Site Candidates) are in the record. The slice is one hand-built scene assembled from a modular kit, with real assets from the start, and its ground is shaped by hand with Unity's tools: authored content, not a terrain generator or bake path (owner, 2026-11-04).
+- **Slice assets** (owner, 2026-11-05): [SLICE_ASSET_MAP.md](unity/Assets/Plans/SLICE_ASSET_MAP.md) names the pack for each mechanic, character, and place of the slice; a pack outside it needs the owner. The medieval packs are temporary stand-ins for the era, and characters are colour-coded Human Character Dummies.
 - Vertical Slice mood: Lord of the Mysteries-like 18–19th century industrial-occult transition; the slice's city is Veilmouth, and Lower Veil is one of its districts; only the internal-order faction is joinable; Wardens and Veinmarket are local groups; placeholder names mutable.
 
 ## Engine and terrain

@@ -3,6 +3,7 @@
 **Status:** Draft
 **Date:** 2026-08-15
 **Applies to:** Overworld V0 and later world-gen / locomotion waves ([17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md))
+**Vertical Slice:** the slice's packs, per mechanic, are in [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) (2026-11-05).
 **Related:** [OVERWORLD_V0_PLAN.md](OVERWORLD_V0_PLAN.md), [PROCEDURAL_TOWN_ASSET_LIBRARY.md](PROCEDURAL_TOWN_ASSET_LIBRARY.md) (pre-pivot dressing policy, still useful for shell/interior materials)
 
 ---

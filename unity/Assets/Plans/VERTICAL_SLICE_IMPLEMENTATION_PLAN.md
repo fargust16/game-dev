@@ -2,9 +2,9 @@
 
 Status: Draft — the owner's decisions are marked; everything else is the agent's plan and authoring defaults
 Created: 2026-11-04
-Last Updated: 2026-11-04 (S0.6a: the Veilmouth scene's starting point. Earlier: C0, the Veilmouth map, accepted by the owner: §2)
+Last Updated: 2026-11-05 (the slice's asset map, SLICE_ASSET_MAP.md, by the owner's list of packs. Earlier: S0.6a: the Veilmouth scene's starting point. Earlier: C0, the Veilmouth map, accepted by the owner: §2)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md) (what the slice is), [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md) (systems and folders), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md) (scene locks)
-Companion: [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
+Companion: [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) (which pack serves each mechanic, character, and place)
 
 ---
 

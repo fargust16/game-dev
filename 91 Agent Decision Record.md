@@ -192,6 +192,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 
 The notes of `AGENTS.md`, newest first.
 
+2026-11-04 (the slice is one hand-built scene from a modular kit, and its implementation plan is the next code default)
+
 2026-11-04 (slice design gaps: the Vertical Slice target entry points to the owner's answers on beasts, gathering, Yield, saving, schedules and ritual sites)
 
 2026-11-03 (slice audit: the campaign odds entry records the owner's acceptance of 23 % for the slice)
