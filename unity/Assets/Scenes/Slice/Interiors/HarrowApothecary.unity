@@ -776,7 +776,11 @@ PrefabInstance:
     - target: {fileID: 2866172453861419833, guid: cf00dd020e6c2da47b5072176f1d9758, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 1b93dcb9e867f3349acb0c9c9a35fd51, type: 2}
+      objectReference: {fileID: 9100000, guid: 91a80b0e753591a41a1c7176a42cdbc9, type: 2}
+    - target: {fileID: 2866172453861419833, guid: cf00dd020e6c2da47b5072176f1d9758, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2954095353965912170, guid: cf00dd020e6c2da47b5072176f1d9758, type: 3}
       propertyPath: m_Layer
       value: 12
@@ -785,6 +789,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 3235266841473906255, guid: cf00dd020e6c2da47b5072176f1d9758, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 48af5faf69e1e4246ad5cb45b3bf01e8, type: 2}
     - target: {fileID: 3283491970233160473, guid: cf00dd020e6c2da47b5072176f1d9758, type: 3}
       propertyPath: m_Layer
       value: 12
@@ -1662,10 +1670,13 @@ MonoBehaviour:
   mouseSensitivity: 2.5
   zoomSpeed: 4
   positionSmoothTime: 0.06
+  pullInTime: 0.05
+  returnTime: 0.45
+  returnDelay: 0.15
   collisionRadius: 0.25
   collisionMask:
     serializedVersion: 2
-    m_Bits: 4294946811
+    m_Bits: 768
 --- !u!81 &1486694779
 AudioListener:
   m_ObjectHideFlags: 0

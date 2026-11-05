@@ -96,6 +96,7 @@ namespace GameDev.Slice.EditorTools
             animator.runtimeAnimatorController = animatorController;
             animator.applyRootMotion = false;
             FitHeight(model, PlayerHeight);
+            SliceCharacterLook.Look(model);
 
             SetLayer(root, KitLayers.Character);
             KitStandIns.EnsureFolder("Assets/Prefabs/Slice");
@@ -232,7 +233,7 @@ namespace GameDev.Slice.EditorTools
 
             var cameraRig = Camera.main.gameObject.AddComponent<ThirdPersonCamera>();
             cameraRig.SetTarget(player.transform);
-            cameraRig.SetCollisionMask(~LayerMask.GetMask(KitLayers.Character, KitLayers.NoGrid, "Ignore Raycast"));
+            cameraRig.SetCollisionMask(SliceCharacterLook.CameraCollision);
 
             var clock = new GameObject("GameClock").AddComponent<GameClockDriver>();
             var serializedClock = new SerializedObject(clock);

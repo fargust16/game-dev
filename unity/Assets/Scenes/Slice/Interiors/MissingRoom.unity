@@ -949,10 +949,13 @@ MonoBehaviour:
   mouseSensitivity: 2.5
   zoomSpeed: 4
   positionSmoothTime: 0.06
+  pullInTime: 0.05
+  returnTime: 0.45
+  returnDelay: 0.15
   collisionRadius: 0.25
   collisionMask:
     serializedVersion: 2
-    m_Bits: 4294946811
+    m_Bits: 768
 --- !u!81 &1112393342
 AudioListener:
   m_ObjectHideFlags: 0

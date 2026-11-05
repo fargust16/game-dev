@@ -198,11 +198,7 @@ namespace GameDev.Slice.EditorTools
             go.name = name;
             go.transform.SetPositionAndRotation(new Vector3(x, y, z), Quaternion.Euler(0f, yaw, 0f));
             Stand(go, 1.8f);
-            var animator = go.GetComponent<Animator>();
-            if (animator != null)
-            {
-                animator.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(AnimatorPath);
-            }
+            SliceCharacterLook.Fix(go);
 
             if (custom)
             {
@@ -225,6 +221,7 @@ namespace GameDev.Slice.EditorTools
             var size = Seen(go).size;
             go.transform.localScale = Vector3.one * (length / Mathf.Max(size.x, size.z));
             Stand(go, 0f);
+            SliceCharacterLook.Fix(go);
         }
 
         /// <summary>Scales a character to <paramref name="height"/> (0 keeps it), sets its feet on its y, and gives it a capsule.</summary>

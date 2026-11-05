@@ -394,7 +394,11 @@ PrefabInstance:
     - target: {fileID: 7869543608362826461, guid: 9bd72731ebe2248478ba4849c274a43b, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 1b93dcb9e867f3349acb0c9c9a35fd51, type: 2}
+      objectReference: {fileID: 9100000, guid: 91a80b0e753591a41a1c7176a42cdbc9, type: 2}
+    - target: {fileID: 7869543608362826461, guid: 9bd72731ebe2248478ba4849c274a43b, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8063818996778211973, guid: 9bd72731ebe2248478ba4849c274a43b, type: 3}
       propertyPath: m_Layer
       value: 12
@@ -1595,7 +1599,11 @@ PrefabInstance:
     - target: {fileID: 5794894658370936964, guid: 8e1471e805192fd4e902f7cc7eec8378, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 1b93dcb9e867f3349acb0c9c9a35fd51, type: 2}
+      objectReference: {fileID: 9100000, guid: 91a80b0e753591a41a1c7176a42cdbc9, type: 2}
+    - target: {fileID: 5794894658370936964, guid: 8e1471e805192fd4e902f7cc7eec8378, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5850494997385571534, guid: 8e1471e805192fd4e902f7cc7eec8378, type: 3}
       propertyPath: m_Layer
       value: 12
@@ -2499,10 +2507,13 @@ MonoBehaviour:
   mouseSensitivity: 2.5
   zoomSpeed: 4
   positionSmoothTime: 0.06
+  pullInTime: 0.05
+  returnTime: 0.45
+  returnDelay: 0.15
   collisionRadius: 0.25
   collisionMask:
     serializedVersion: 2
-    m_Bits: 4294946811
+    m_Bits: 768
 --- !u!81 &1682959091
 AudioListener:
   m_ObjectHideFlags: 0

@@ -751,7 +751,11 @@ PrefabInstance:
     - target: {fileID: 7869543608362826461, guid: 9bd72731ebe2248478ba4849c274a43b, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 1b93dcb9e867f3349acb0c9c9a35fd51, type: 2}
+      objectReference: {fileID: 9100000, guid: 91a80b0e753591a41a1c7176a42cdbc9, type: 2}
+    - target: {fileID: 7869543608362826461, guid: 9bd72731ebe2248478ba4849c274a43b, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8063818996778211973, guid: 9bd72731ebe2248478ba4849c274a43b, type: 3}
       propertyPath: m_Layer
       value: 12
@@ -1804,10 +1808,13 @@ MonoBehaviour:
   mouseSensitivity: 2.5
   zoomSpeed: 4
   positionSmoothTime: 0.06
+  pullInTime: 0.05
+  returnTime: 0.45
+  returnDelay: 0.15
   collisionRadius: 0.25
   collisionMask:
     serializedVersion: 2
-    m_Bits: 4294946811
+    m_Bits: 768
 --- !u!81 &906647662
 AudioListener:
   m_ObjectHideFlags: 0
@@ -2581,7 +2588,11 @@ PrefabInstance:
     - target: {fileID: 3511398462359438279, guid: 75f582752a9a5774dbabd596a75f7bd0, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 1b93dcb9e867f3349acb0c9c9a35fd51, type: 2}
+      objectReference: {fileID: 9100000, guid: 91a80b0e753591a41a1c7176a42cdbc9, type: 2}
+    - target: {fileID: 3511398462359438279, guid: 75f582752a9a5774dbabd596a75f7bd0, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3545931680157670943, guid: 75f582752a9a5774dbabd596a75f7bd0, type: 3}
       propertyPath: m_Layer
       value: 12
@@ -2602,6 +2613,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 4294662629458452145, guid: 75f582752a9a5774dbabd596a75f7bd0, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ae863a0ae71616a4d97b3b42d829adeb, type: 2}
     - target: {fileID: 4519688222370970180, guid: 75f582752a9a5774dbabd596a75f7bd0, type: 3}
       propertyPath: m_Layer
       value: 12

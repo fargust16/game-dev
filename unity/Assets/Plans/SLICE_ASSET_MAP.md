@@ -2,7 +2,7 @@
 
 Status: Draft — the owner's list of packs and answers, 2026-11-05; checked against the project on disk and the design documents by the agent
 Created: 2026-11-05
-Last Updated: 2026-11-05 (the agent's dressing pass: the owner's bar counter, cabinet, cell bars, and cell door in; the magic circle made; three pack problems handled; §9 updated. Earlier: the magic circle's rules are in 21 §4. Earlier: the owner's models through the Tripo Bridge: pistol, rifle, iron ore, Notice Board, bed; Stylized Trees Pack for trees and bushes, its editor script fixed; Modular Fantasy Bridges; the factory yard dropped; render state recounted after the owner's conversion. Earlier: render state recounted after the owner's URP imports; the pouch came through the Tripo Bridge and the pistols failed as ZIP; §9 lists the models the slice still needs. Earlier: Basic Treasure Coins found in REAL_DEDICATED; the dragons are FourEvilDragonsHP; the firearms come through the Tripo Bridge. Earlier: the owner's second list: Multistory Dungeons 2 for alchemy, Victorian Objects weapons, Stylized 3D Tools, RPG_Animations_Pack_FREE, Roadside Tales Free, Modern RPG icons, Yughues pavements, WaterWorks; the owner's answers on shields, hidden followers, colours, coins, and buildings)
+Last Updated: 2026-11-05 (the owner's play test: BK_AlchemistHouse for every interior, Polytope Studio's green trees and grass as common cover, the Dummies' and dragons' render and animator problems found and handled; §9 rows 16–17 resolved. Earlier: the agent's dressing pass: the owner's bar counter, cabinet, cell bars, and cell door in; the magic circle made; three pack problems handled; §9 updated. Earlier: the magic circle's rules are in 21 §4. Earlier: the owner's models through the Tripo Bridge: pistol, rifle, iron ore, Notice Board, bed; Stylized Trees Pack for trees and bushes, its editor script fixed; Modular Fantasy Bridges; the factory yard dropped; render state recounted after the owner's conversion. Earlier: render state recounted after the owner's URP imports; the pouch came through the Tripo Bridge and the pistols failed as ZIP; §9 lists the models the slice still needs. Earlier: Basic Treasure Coins found in REAL_DEDICATED; the dragons are FourEvilDragonsHP; the firearms come through the Tripo Bridge. Earlier: the owner's second list: Multistory Dungeons 2 for alchemy, Victorian Objects weapons, Stylized 3D Tools, RPG_Animations_Pack_FREE, Roadside Tales Free, Modern RPG icons, Yughues pavements, WaterWorks; the owner's answers on shields, hidden followers, colours, coins, and buildings)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 Related: [ASSET_LIBRARY_REFERENCE.md](ASSET_LIBRARY_REFERENCE.md) (the Overworld's registry)
 
@@ -152,6 +152,13 @@ Counted from every `.mat` file's shader after the owner ran the Render Pipeline 
 - **Stylized Trees Pack wind.** The pack's Amplify shaders bend every vertex by the global wind its `Growth.WindController` (with a `WindZone`) sets each frame; with none in a scene the trees and bushes vanish. Veilmouth has one `Wind` under `Dressing`; any other scene with the pack needs one.
 - **The bridge's Substance.** Modular Fantasy Bridges' material is a Substance (`Stylized_Bridge.sbsar`) and shows magenta without the Substance plugin; the bridge wears Yughues `M_YFPM_Blocs`.
 
+**Found by the owner's play test** (2026-11-05):
+
+- **Human Character Dummy.** Its materials are built-in `Unlit/Texture`, which this URP project does not draw: the player and every Dummy but the project-coloured ones were invisible. `SliceCharacterLook` gives each a URP Lit copy with the same palette texture and offset (`Assets/Materials/Slice/Dummy/`).
+- **FourEvilDragonsHP controllers.** `SouleaterCTRL` and `NightmareCTRL` are the pack's demo, chaining every clip with exit times (flight, death, and the rest). The stand-ins wear project controllers with the pack's `Idle` alone (`Assets/Settings/Slice/`).
+- **BK_AlchemistHouse** (owner, 2026-11-05: the base for every interior). 157 prefabs: interior walls with doors and windows, wooden and stone floors, ceilings and beams, stairs, doors, the stove, a table with a sink, cupboards, shelves, drawers, tables, chairs, carpets, paintings, books, bottles, flasks, jars, candles and oil lamps, cauldrons and lab sets. Its 143 materials are built-in Standard and need URP copies; its volumetric-light scripts and shaders are built-in only and stay out. Its jars of babies and brains are not used.
+- **Polytope Studio Lowpoly Environments** (owner, 2026-11-05: plain green trees and grass as common cover). `PT_Fruit_Tree_01_green` and `PT_Pine_Tree_03_green` with their `cut`, `stump`, and `logs` variants, `PT_Grass_02`, shrubs, flowers, rocks. The Stylized Trees Pack's coloured trees become rare, for resources.
+
 `Assets/AlchemyLabProps/` is no longer needed: Multistory Dungeons 2 is its URP import.
 
 ## 8. Open
@@ -180,8 +187,11 @@ What no pack in this map gives, checked against [11](../../../11%20Vertical%20Sl
 | 13 | Quay or pier on the sea front | C0: the sea to the south | polish | none |
 | 14 | Worn armour: cloth, leather, chain, and plate on a Dummy | Reading a fighter's gear in a fight | polish | Market `armor_*` for shop display only; Dummies' colours read the role |
 | 15 | A Spirit General apart from the pink Dummy | The General's appearance | polish | the pink Dummy (§1) |
-| 16 | Interior walls and floors for houses: wood, plaster, paper | The seven interiors | polish | Low Poly Dungeons Lite stone in all six new rooms; the Soot & Bell keeps its stand-in walls (agent's pass, 2026-11-05) |
-| 17 | Doors that open, matching the houses' own | Entering the seven buildings | polish | a dark stand-in leaf over the model's door |
+| 16 | Interior walls and floors for houses: wood, plaster, paper | The seven interiors | place | **chosen**: BK_AlchemistHouse (owner, 2026-11-05); the rooms are rebuilt from it after C1 is accepted |
+| 17 | Doors that open, matching the houses' own | Entering the seven buildings | polish | the leaf is hidden and only its trigger stays (owner, 2026-11-05); the house's own door is the one seen |
+| 20 | A town wall with gates, and toll houses | The city's edge, C1 §3.8 | place | none yet; to find in the agreed packs or ask the owner |
+| 21 | A palace, a town hall, an assize court, a customs house | Crown Avenue and the Government Quarter, C1 §3.1 | place | to assemble from the Victorian modules, larger; a dome or tower for the palace is missing |
+| 22 | Carriages and horses, a crane, a fountain or statue, a water pump, washing lines | Streets, docks, squares, and courts, C1 §6–§7 | polish | none yet |
 | 18 | A cellar entrance: a hatch or steps down in a wall | The cellar under the Soot Stair | place | a Low Poly Dungeons wall with a door leaf at the stair's foot |
 | 19 | Grey, pink, teal, and brown Dummies as proper materials | §1 colours | polish | teal and brown are plain URP Lit (`Materials/Slice/Dummy_*`); the Dummies' own colours are still built-in Unlit (§7) |
 

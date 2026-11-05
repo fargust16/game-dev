@@ -6,6 +6,8 @@ namespace GameDev.Core.Scenes
 {
     /// <summary>
     /// V0 scene transition (17 I.2): a single-scene swap behind a gate that refuses a second journey while one loads.
+    /// Since 2026-11-05 the swap happens behind <see cref="ScreenFade"/>: the screen darkens, the scene loads in the
+    /// dark, and the veil lifts once the player and the camera stand in the new scene.
     /// Objects that stay alive through the swap (the clock) keep running, so travelling costs only the real time the
     /// load takes. <see cref="Arriving"/> is raised once the new scene's objects are awake and enabled, before any of
     /// them starts, so a portal can place the player before the camera first looks at it.
@@ -29,6 +31,7 @@ namespace GameDev.Core.Scenes
             SceneManager.sceneLoaded -= OnSceneLoaded;
             IsTraveling = false;
             _current = default;
+            ScreenFade.Reset();
             Arriving = null;
             TravelCompleted = null;
         }
@@ -55,8 +58,11 @@ namespace GameDev.Core.Scenes
 
             IsTraveling = true;
             _current = request;
-            SceneManager.sceneLoaded += OnSceneLoaded;
-            SceneManager.LoadSceneAsync(request.SceneName, LoadSceneMode.Single);
+            ScreenFade.Out(() =>
+            {
+                SceneManager.sceneLoaded += OnSceneLoaded;
+                SceneManager.LoadSceneAsync(request.SceneName, LoadSceneMode.Single);
+            });
             return true;
         }
 
@@ -73,6 +79,7 @@ namespace GameDev.Core.Scenes
             IsTraveling = false;
             Arriving?.Invoke(request);
             TravelCompleted?.Invoke(request);
+            ScreenFade.In();
         }
     }
 }

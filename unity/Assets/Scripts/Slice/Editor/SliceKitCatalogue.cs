@@ -490,7 +490,10 @@ namespace GameDev.Slice.EditorTools
             leaf.transform.localPosition = new Vector3(1.5f, 1.1f, 0.125f);
             leaf.transform.localScale = new Vector3(1.2f, 2.2f, 0.05f);
             leaf.GetComponent<BoxCollider>().isTrigger = true;
-            leaf.GetComponent<MeshRenderer>().sharedMaterial = Colour("Kit_DoorLeaf", new Color(0.24f, 0.15f, 0.09f), false);
+
+            // Only the trigger: a drawn leaf over the model's own door looked wrong (owner, 2026-11-05).
+            Object.DestroyImmediate(leaf.GetComponent<MeshRenderer>());
+            Object.DestroyImmediate(leaf.GetComponent<MeshFilter>());
             root.AddComponent<Portal>();
             SetLayer(root, KitLayers.Interactable);
             return Save(root, "PortalLeaf", "Portal", 3, 0, 2.2f);

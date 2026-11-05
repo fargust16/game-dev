@@ -2,7 +2,7 @@
 
 Status: Draft — authoring defaults set by the agent; the owner's decision that sets the frame is marked
 Created: 2026-11-04
-Last Updated: 2026-11-05 (§8 points to the slice's asset map. Earlier: S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
+Last Updated: 2026-11-05 (§7: the agent shapes the ground once from the city plan, by the owner after the play test. Earlier: §8 points to the slice's asset map. Earlier: S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [10.1 Grid World and Environment Actions](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [COMBAT_GRID_TECH_TEST.md](COMBAT_GRID_TECH_TEST.md)
 Used by: [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -81,7 +81,7 @@ A block that can be vaulted, climbed, or breached in a fight carries a tag compo
 
 ## 7. Ground and forest
 
-- The slice's ground is a Unity terrain shaped by hand with Unity's own tools, using the five canonical `TerrainLayer` assets. It is authored content: no code shapes it, and it is not a generator, a bake path, or an input to the Overworld pipeline. Code (S0.6) creates it once as one flat level at 25.9 m, 1.9 m above the 24 m Sea Level below which the Combat Grid reads water, and never writes it again.
+- The slice's ground is a Unity terrain using the five canonical `TerrainLayer` assets. It is authored content, not a generator, a bake path, or an input to the Overworld pipeline. Code (S0.6) created it once as one flat level at 25.9 m, 1.9 m above the 24 m Sea Level below which the Combat Grid reads water. After the owner's play test of 2026-11-05 the agent shapes it once from the city plan (`VEILMOUTH_CITY_PLAN.md` §9) with an authoring tool that refuses to run twice, and from then on the owner changes it by hand with Unity's tools (owner).
 - The sea and the river are one water sheet at Sea Level under the ground; they appear where the ground is dug below 24 m.
 - Forest trees are placed as prefabs or terrain trees **with trunk colliders**, because trees are obstacles and Full Cover in a fight ([10.1](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md)). The grid test found trees without colliders, and they must not stay that way here.
 - A tree that can be felled, an ore vein, and a herb or flax patch are resource nodes ([19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.4): separate prefabs on the `Interactable` layer, not terrain trees.

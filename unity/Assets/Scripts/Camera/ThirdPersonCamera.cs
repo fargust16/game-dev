@@ -25,12 +25,23 @@ namespace GameDev.Cameras
         [SerializeField] private float zoomSpeed = 4f;
         [SerializeField] private float positionSmoothTime = 0.06f;
 
+        // Common third-person practice (fast in, slow out): the arm shortens almost at once so a wall never stands
+        // between the camera and the character, and lengthens slowly so passing a corner or a door frame does not jerk
+        // the view. Authoring defaults, 2026-11-05.
+        [SerializeField] private float pullInTime = 0.05f;
+        [SerializeField] private float returnTime = 0.45f;
+        [SerializeField] private float returnDelay = 0.15f;
+
         [Header("Collision")]
         [SerializeField] private float collisionRadius = 0.25f;
         [SerializeField] private LayerMask collisionMask = ~0;
 
         private float _yaw;
         private Vector3 _velocity;
+        private float _armLength;
+        private float _armVelocity;
+        private float _clearSince;
+        private Vector3 _smoothedPivot;
 
         /// <summary>False while a menu or dialogue owns the mouse: the camera keeps following but stops orbiting.</summary>
         public bool LookEnabled { get; set; } = true;
@@ -66,9 +77,12 @@ namespace GameDev.Cameras
 
             _yaw = target.eulerAngles.y;
             var pivot = target.position + targetOffset;
+            _smoothedPivot = pivot;
             var offset = Quaternion.Euler(pitch, _yaw, 0f) * (Vector3.back * distance);
-            transform.position = pivot + offset.normalized * ResolveCollisionDistance(pivot, offset, distance);
+            _armLength = ResolveCollisionDistance(pivot, offset, distance);
+            transform.position = pivot + offset.normalized * _armLength;
             _velocity = Vector3.zero;
+            _armVelocity = 0f;
         }
 
         private void OnDisable()
@@ -116,10 +130,22 @@ namespace GameDev.Cameras
             var rotation = Quaternion.Euler(pitch, _yaw, 0f);
             var desiredOffset = rotation * (Vector3.back * distance);
 
-            var clampedDistance = ResolveCollisionDistance(pivot, desiredOffset, distance);
-            var finalPosition = pivot + desiredOffset.normalized * clampedDistance;
+            var allowed = ResolveCollisionDistance(pivot, desiredOffset, distance);
+            if (allowed < _armLength - 0.01f)
+            {
+                _armLength = Mathf.SmoothDamp(_armLength, allowed, ref _armVelocity, pullInTime);
+                _armLength = Mathf.Min(_armLength, allowed + 0.1f);
+                _clearSince = Time.time;
+            }
+            else if (Time.time - _clearSince >= returnDelay)
+            {
+                _armLength = Mathf.SmoothDamp(_armLength, allowed, ref _armVelocity, returnTime);
+            }
 
-            transform.position = Vector3.SmoothDamp(transform.position, finalPosition, ref _velocity, positionSmoothTime);
+            // The pivot follows the character smoothly; the arm's length is smoothed apart from it, so a wall never
+            // drags the whole view sideways.
+            _smoothedPivot = Vector3.SmoothDamp(_smoothedPivot, pivot, ref _velocity, positionSmoothTime);
+            transform.position = _smoothedPivot + desiredOffset.normalized * _armLength;
             transform.rotation = rotation;
         }
 
