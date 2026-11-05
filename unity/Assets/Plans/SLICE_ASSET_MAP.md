@@ -2,7 +2,7 @@
 
 Status: Draft — the owner's list of packs and answers, 2026-11-05; checked against the project on disk and the design documents by the agent
 Created: 2026-11-05
-Last Updated: 2026-11-05 (Basic Treasure Coins found in REAL_DEDICATED; the dragons are FourEvilDragonsHP; the firearms come through the Tripo Bridge. Earlier: the owner's second list: Multistory Dungeons 2 for alchemy, Victorian Objects weapons, Stylized 3D Tools, RPG_Animations_Pack_FREE, Roadside Tales Free, Modern RPG icons, Yughues pavements, WaterWorks; the owner's answers on shields, hidden followers, colours, coins, and buildings)
+Last Updated: 2026-11-05 (render state recounted after the owner's URP imports; the pouch came through the Tripo Bridge and the pistols failed as ZIP; §9 lists the models the slice still needs. Earlier: Basic Treasure Coins found in REAL_DEDICATED; the dragons are FourEvilDragonsHP; the firearms come through the Tripo Bridge. Earlier: the owner's second list: Multistory Dungeons 2 for alchemy, Victorian Objects weapons, Stylized 3D Tools, RPG_Animations_Pack_FREE, Roadside Tales Free, Modern RPG icons, Yughues pavements, WaterWorks; the owner's answers on shields, hidden followers, colours, coins, and buildings)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 Related: [ASSET_LIBRARY_REFERENCE.md](ASSET_LIBRARY_REFERENCE.md) (the Overworld's registry)
 
@@ -78,7 +78,8 @@ The main clips are in `Assets/Kevin Iglesias/Human Animations/Animations/Male/` 
 | Sword, greatsword | FREE - Low Poly Swords | `Assets/Blink/Art/Weapons/LowPoly/FreeSwords`: `Sword1`–`Sword15` variants |
 | Dagger | Low-Poly Weapons (proposed; not in the owner's list) | `Assets/Low-Poly Weapons/Prefabs/Dagger.prefab` |
 | Wooden and metal shield | FREE - RPG Weapons | `FreeRPGWeapons/_PREFABS/Shield_Basic` (wooden), `Shield_Medium` (metal). `Shield_Epic` reads as magic and is not used |
-| Pistol, rifle, Cartridge Pouch | Victorian Objects | `Assets/Victorian Objects/Weapons/pistol.glb`, `rifle.glb`, `satchel.glb`. The satchel is the Cartridge Pouch of every firearm (owner, 2026-11-05). **Not imported as models yet** (§7) |
+| Cartridge Pouch | Tripo (the owner's model) | `Assets/TripoModels/leather_satchel_3d_model/leather_satchel_3d_model.fbx`, URP Lit. The pouch of every firearm (owner, 2026-11-05) |
+| Pistol, rifle | Tripo (the owner's models) | **not imported yet** (§9). Both pistols arrived as ZIP and failed to unpack, and the rifle was not sent. `Assets/Victorian Objects/Weapons/*.glb` are the same models as plain files Unity cannot read |
 | Woodcutting axe, pickaxe, crafting hammer | Stylized 3D Tools | `Assets/Stylized 3D Tools/Prefabs/axe01`, `pickaxe01`, `hammer01` |
 | Potions and brewing glass | Multistory Dungeons 2; Low-Poly Weapons | `Assets/Multistory Dungeons 2/Prefabs/Props/Books And Alchemy/`: `Potion_01–04`, `Potion_Blue_01`, `Potion_Red_01`, `Flask_01–05`, `Retort_Preset_01`; also `Low-Poly Weapons/Prefabs/Potion_*`. Models only; [20](../../../20%20Alchemy%20and%20Potioncraft.md) decides which potions exist |
 | Coins: bronze, silver, gold | Basic Treasure Coins | `Assets/REAL_DEDICATED/BasicTreasureCoins/Prefabs/CoinPile_Copper` (bronze), `CoinPile_Silver`, `CoinPile_Gold` |
@@ -93,13 +94,13 @@ The main clips are in `Assets/Kevin Iglesias/Human Animations/Animations/Male/` 
 | Place or use | Source | Location | State |
 |---|---|---|---|
 | The city's houses (trial) | Modular Victorian City; Modular European House | `Assets/Modular Victorian City/`; `Assets/Modular European House/` | Used as they are (owner, 2026-11-05); their textures may later be tuned toward brick or stone |
-| Villages and buildings outside the city | FantasyMedievalTown_LITE | `Assets/FantasyMedievalTown_LITE/` (walls, floor, corner, roof, stairs) | import its URP package first |
+| Villages and buildings outside the city | FantasyMedievalTown_LITE | `Assets/FantasyMedievalTown_LITE/` (walls, floor, corner, roof, stairs) | URP |
 | The market; the Master of Item Creation | Low-Poly Medieval Market | `Assets/Low-Poly Medieval Market/` | imported |
 | The places of Alchemy and of the Master of Enchanting; candles, lamps, barrels, furniture, chests | Multistory Dungeons 2 (the URP import of Alchemy Lab Props) | `Assets/Multistory Dungeons 2/Prefabs/Props/` (`Books And Alchemy`, `Furniture`, `Lantern_*`, `Torch_*`, `Treasure_Chest_*`), `Prefabs/VFX/` (candle and torch fire) | URP |
 | The old chapel, the faction's church, the graveyard | Colonial City LittlePack – Church Graveyard Environment | `Assets/3DShapes/Colonial City LittlePack – Church Graveyard Environment/` | imported |
-| Street and house props | Low Poly Simple Medieval Props; Victorian Objects | `Assets/LowPolyMedievalPropsLite/`; `Assets/Victorian Objects/Props/City_Bench.glb`, `City_Lantern.glb` | the `.glb` files are not imported as models yet (§7) |
+| Street and house props | Low Poly Simple Medieval Props; Victorian Objects | `Assets/LowPolyMedievalPropsLite/`; `Assets/Victorian Objects/Props/City_Bench.glb`, `City_Lantern.glb` | the `.glb` files are not models: send them through the Tripo Bridge as FBX if they are wanted |
 | Roadside fences and props | Roadside Tales Free (EmaceArt) | `Assets/EmaceArt/Fences 2026/` (`Meshes/EA03_Fence_*`, `Prefabs/`) | URP |
-| Street and square paving | Yughues Free Pavement Materials | `Assets/YughuesFreePavementsMaterials/Materials/M_YFPM_*` | import `YughuesFreePavementMaterials_URP.unitypackage` first |
+| Street and square paving | Yughues Free Pavement Materials | `Assets/YughuesFreePavementsMaterials/Materials/M_YFPM_*` | URP |
 | The sea and the River Veil | WaterWorks | `Assets/WaterWorks/`; the scene's `Water` sheet already uses `Assets/Settings/Water/OverworldWater.mat` on WaterWorks' `SSR_Water` Shader Graph | in use. A water of our own is made only if this one fails in the slice |
 | The cellar under the Soot Stair, other cellars | Low Poly Dungeons Lite | `Assets/LowPolyDungeonsLite/` | imported |
 
@@ -122,25 +123,55 @@ The main clips are in `Assets/Kevin Iglesias/Human Animations/Animations/Male/` 
 
 The owner's "dragons" are this pack (2026-11-05); the PBR version is not used.
 
-## 7. Render state on disk, 2026-11-05
+## 7. Render state on disk, 2026-11-05, after the owner's URP imports
+
+Counted from every `.mat` file's shader. A skybox material on a built-in skybox shader renders in URP and is not counted as a problem.
 
 | Pack | Materials | Before use |
 |---|---|---|
-| Modular Victorian City, Low-Poly Medieval Market (8 of 9), Free Fire VFX URP, Multistory Dungeons 2, Roadside Tales Free, WaterWorks | URP | ready |
-| FREE - RPG Weapons and Low Poly Swords (Blink), Colonial City LittlePack, FourEvilDragonsHP, Modular European House (19 of 21) | Built-in Standard | Render Pipeline Converter |
-| Stylized 3D Tools | Built-in Standard (Specular setup) | Render Pipeline Converter |
-| Magic Effects FREE (Hovl) | Built-in particles | Render Pipeline Converter |
-| LowPolyDungeonsLite, LowPolyMedievalPropsLite, FantasyMedievalTown_LITE, Yughues Free Pavement Materials | Built-in Standard | import the pack's own URP `.unitypackage` |
-| Basic Treasure Coins | a shader that is not in the project, so the coins render magenta | import `REAL_DEDICATED/BasicTreasureCoins/BasicTreasureCoins_URP.unitypackage` |
-| Victorian Objects | `.glb` files with no importer: Unity sees them as plain files | the owner brings the pistol, rifle, and pouch over through the Tripo Bridge (`com.tripo3d.unitybridge`, *GameDev → Tools → Tripo Bridge - Check Port and Open*), which imports FBX, OBJ, or ZIP |
-| Human Character Dummy, Low-Poly Weapons | built-in shader ids, not Standard | check in the editor |
+| Modular Victorian City, Multistory Dungeons 2, Roadside Tales Free, Yughues Free Pavement Materials, Basic Treasure Coins, Free Fire VFX URP, WaterWorks, the Tripo pouch | URP | ready |
+| Low-Poly Medieval Market | URP; its skybox built-in | ready |
+| FantasyMedievalTown_LITE | URP except `MedievalTownLite_Nature.mat` (Standard) | convert that one material |
+| FREE - RPG Weapons and Low Poly Swords (Blink), 85 | Built-in Standard | Render Pipeline Converter |
+| Colonial City LittlePack (7), LowPolyMedievalPropsLite (3), LowPolyDungeonsLite (3) | Built-in Standard | Render Pipeline Converter, or the pack's URP `.unitypackage` where it ships one |
+| Modular European House | 19 Built-in Standard; `M_Cypress.mat` on a built-in tree shader | Render Pipeline Converter; the cypress by hand to URP Lit |
+| Stylized 3D Tools (3) | Built-in Standard (Specular setup) | Render Pipeline Converter |
+| FourEvilDragonsHP (33) | Built-in Standard and Standard (Specular setup) | Render Pipeline Converter |
+| Magic Effects FREE (Hovl), 33 | Built-in particles | Render Pipeline Converter |
+| Human Character Dummy, Human Animations demo dummies | built-in shaders that are not Standard (`HumanDummy.mat` among them) | check in the editor; the slice's colour variants (§1) are made on URP Lit anyway |
+| Low-Poly Weapons (2) | a built-in mobile shader | check in the editor; else URP Lit by hand |
+| Victorian Objects | `.glb` files with no importer | not used: the same models come through the Tripo Bridge as FBX (§9) |
 | Modern RPG - Free icons pack, RPG_Animations_Pack_FREE | images; animation clips | ready |
 
 `Assets/AlchemyLabProps/` is no longer needed: Multistory Dungeons 2 is its URP import.
 
 ## 8. Open
 
-1. **The `.glb` weapons and props** are not models yet: the owner brings them over through the Tripo Bridge (§7).
-2. **Missing clips:** sneaking, sleeping, brewing, First Aid, felling, the Defensive Stance, and Yield.
+1. **Missing clips:** sneaking, sleeping, brewing, First Aid, felling, the Defensive Stance, and Yield.
+2. **The Tripo Bridge and ZIP.** The bridge (`com.tripo3d.unitybridge`, *GameDev → Tools → Tripo Bridge - Check Port and Open*) imported the pouch, sent as FBX, but both pistols, sent as ZIP, failed with *End of Central Directory record could not be found*: the archive arrived broken or cut short. Send each model as **FBX**, one at a time.
+
+## 9. Models the slice still needs
+
+What no pack in this map gives, checked against [11](../../../11%20Vertical%20Slice.md) and the C0 map (plan §2) on 2026-11-05. **Blocks** means a mechanic cannot be read or played without it; **place** means a C0 place has no fitting model; **polish** can wait. Until a model exists, a kit stand-in holds its place (kit standard §9).
+
+| # | Model | For | Priority | What exists now |
+|---|---|---|---|---|
+| 1 | Pistol and rifle, iron, Victorian | Ranged fighters, 10.2 §5b | blocks | the owner's Tripo models; resend as FBX (§8) |
+| 2 | Ore vein: a rock with visible ore, and the same rock spent | Gathering ore, 12 veins on the hill | blocks | plain rocks (`Rock_01_LITE`, `LowPolyDungeonsLite/Rock_01`, `Stone_01`), which do not say "ore" |
+| 3 | Herb patch and flax plant, each also gathered | Gathering, 30 herbs and 10 flax | blocks | Market grass and bushes, which read as scenery |
+| 4 | Fellable tree and its stump | Felling, about 40 trees | blocks | Market `tree_01–03`, no stump |
+| 5 | Notice Board | Information Source, tasks | blocks | none |
+| 6 | Ritual: a ritual circle or altar, and two Ritual Weak Point objects that look like part of the place, never marked | The invasion and its ritual, 21 §4 | blocks | candles and books of Multistory Dungeons 2; the circle can be a decal |
+| 7 | Bed | Sleep in a tavern room | blocks | none |
+| 8 | Wolf and boar, rigged, with idle, walk, run, attack, hit, and death | Beasts of the slice | place | the dragons stand in (§6) |
+| 9 | Bridge over the River Veil, about 14 × 6 m | C0: the one bridge | place | none |
+| 10 | Factory yard: a brick works with a chimney, a warehouse, a yard gate | C0: Ritual Site Candidate 1, the industrial city of 11 | place | none; Victorian City walls can stand in |
+| 11 | Cell bars and a cell door | The Wardens' lock-up interior, Yield | place | none |
+| 12 | Bar counter and tavern shelves | The Soot & Bell interior | place | Multistory Dungeons 2 tables and cupboards |
+| 13 | Quay or pier on the sea front | C0: the sea to the south | polish | none |
+| 14 | Worn armour: cloth, leather, chain, and plate on a Dummy | Reading a fighter's gear in a fight | polish | Market `armor_*` for shop display only; Dummies' colours read the role |
+| 15 | A Spirit General apart from the pink Dummy | The General's appearance | polish | the pink Dummy (§1) |
+
+Already covered, so not needed: anvil and workshop (Market `anvil_with_hammer`, `leather_dressing_frame`, tables), alchemy table and glass, the cache and the formula (`Treasure_Chest_*`, `Book_*`, `Scroll_01`), shop counters (Market stalls and sections), loot (`bag`, `bag_of_gold`), coins, street lamps (Victorian City `Lamp post`, Colonial `StreetLamp1`), the church and graveyard, stairs for the Soot Stair (Victorian City `Steps`), fences and the pouch. Bandages, splints, and antidotes need no world model: they live in the inventory as icons.
 
 Resolved by the owner on 2026-11-05: spears do not exist and a shield goes with a sword, an axe, or a mace; red marks only Cult Forces that act openly; the faction's members, allied fighters, and Veinmarket get colours of their own; money is bronze, silver, and gold, 100 to 1; FantasyMedievalTown_LITE serves villages and outer buildings, and Modular Victorian City with Modular European House serves the city.
