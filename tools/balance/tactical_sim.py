@@ -13,6 +13,10 @@ blow, a shooter steps back with the AP its shot leaves, armour counts more again
 shot from beyond the next cell, a shooter with an enemy beside it aims worse, and a blow
 can be filled with Will Power. A fighter may carry a second Weapon Set and change to it.
 
+The ritual of 21 §4 is a circle: its Limit 9 conductors never answer, a Limit 8 senior leads the
+guards and fights, a guard with no enemy beside it takes an empty place, and a circle short of
+hands for 10 rounds has failed. circle_first makes the attackers go for the conductors.
+
 V0 is the configuration 10.2 reports, before items. The other switches of Rules
 are the levers tried against headcount, kept so that the table of levers can be
 repeated. item_sim.py dresses these fighters through Rules.outfit.
@@ -61,6 +65,10 @@ SWEEP_AP = 2
 DEFENCE_EVASION = 0.015
 DEFENCE_GUARD = 0.03
 COUNTER_AP = 2
+# The ritual of 21 §4: conductors stand round the circle and never answer; a guard with no enemy
+# beside it takes an empty place, and a circle short of hands for SHORT_TICKS rounds has failed.
+RITUAL_TICKS = 60
+SHORT_TICKS = 10
 CONTROL_VALUE = {"sleep": 6.0, "stand": 3.0, "crush": 3.0, "support": 2.0, "sting": 3.0, "pillar": 3.0}
 
 
@@ -82,7 +90,12 @@ class Rules:
     damage_scale: float = 1.0
     crit_bonus: float = 0.0
     stun: float = 0.0
-    forces: tuple = (5, 5, 6, 6, 7)
+    # The main force: 4, 5, or 6 in 20, 40, and 40 % of runs; the ritual group stands apart (21 §4).
+    forces: tuple = (4, 5, 5, 6, 6)
+    places: int = 3
+    guards: tuple = (2,)
+    guard_limit: int = 9
+    circle_first: bool = False
     ranged: bool = False
     shift: int = 0
     sweep_skill: int = 0
@@ -125,8 +138,10 @@ def alive(side):
 
 
 class Fight:
-    def __init__(self, a, b, rules, objective=None, wounded_a=False):
+    def __init__(self, a, b, rules, objective=None, wounded_a=False, ritual=0):
+        """ritual: the ticks the circle still needs, held by side b's conductors. 0 is an ordinary fight."""
         self.a, self.b, self.r, self.objective = a, b, rules, objective
+        self.progress, self.short = ritual, 0
         self.per_column = (rules.width + rules.spacing - 1) // rules.spacing
         depth = (len(a + b) // self.per_column + 1) * rules.spacing + rules.room
         self.front = depth
@@ -146,13 +161,14 @@ class Fight:
             u.disoriented, u.dazed, u.taunter = 0, False, None
             u.threat = self.threat(u)
         self.leaders = [self.leader(a), self.leader(b)]
+        self.circle = [(u.x, u.y) for u in b if u.conducting] if ritual else []
 
     def leader(self, side):
         ranks = sorted(side, key=lambda u: 9 if u.limit is None else u.limit)
         return ranks[0] if len(ranks) < 2 or ranks[0].limit != ranks[1].limit else None
 
     def place(self, side, left):
-        front = [u for u in side if (u.opener or not u.weapon.ranged) and "sleep" not in u.abilities]
+        front = [u for u in side if (u.opener or not u.weapon.ranged) and "sleep" not in u.abilities and not u.conducting]
         back = [u for u in side if u not in front]
         s = self.r.spacing
         for i, u in enumerate(front + back):
@@ -215,7 +231,7 @@ class Fight:
 
     def surrounded(self, t):
         """How many awake enemies stand side by side with t."""
-        return sum(1 for b in alive(self.foes(t)) if touch(b, t) and not b.asleep and not b.skip)
+        return sum(1 for b in alive(self.foes(t)) if touch(b, t) and not b.asleep and not b.skip and not b.conducting)
 
     def strike(self, a, t, bonus_crit=0.0, crit_extra=0.0, mult=1.0, unguarded=False, counter=False):
         hit = self.landed(a, t, bonus_crit, crit_extra, mult, unguarded)
@@ -247,7 +263,7 @@ class Fight:
         damage = self.reduce(a.damage_roll() * crit * mult * self.r.damage_scale, t, w.ranged and cheb(a, t) > 1, pierce) + self.warded(magic, t)
         if t.brace:
             damage *= 1 - c.BRACE_REDUCTION
-        if not unguarded and not a.weapon.ranged and t.weapon.guard and t.reserve >= c.REACTION_AP and not t.asleep and not t.skip:
+        if not unguarded and not a.weapon.ranged and t.weapon.guard and t.reserve >= c.REACTION_AP and not t.asleep and not t.skip and not t.conducting:
             guard = t.weapon.guard_chance * (1 + self.r.stance_guard * t.reserve if t.stance else 1)
             t.reserve -= c.REACTION_AP
             if random.random() < guard:
@@ -276,7 +292,7 @@ class Fight:
             value *= ASLEEP_FACTOR
         if sum(1 for b in alive(self.own(u)) if b is not u and touch(b, e)) >= 3:
             value *= CROWD_FACTOR
-        if e is self.objective:
+        if e is self.objective or (self.r.circle_first and u in self.a and e.conducting):
             value *= OBJECTIVE_BONUS
         return value
 
@@ -313,7 +329,7 @@ class Fight:
         if not self.r.reaction:
             return ap
         for f in left:
-            if f.hp > 0 and u.hp > 0 and not f.weapon.ranged and not f.reacted and not f.asleep and not f.skip:
+            if f.hp > 0 and u.hp > 0 and not f.weapon.ranged and not f.reacted and not f.asleep and not f.skip and not f.conducting:
                 f.reacted = True
                 u.reserve = ap
                 self.landed(f, u, 0.0, 0.0, 1.0, False, reaction=True)
@@ -400,7 +416,7 @@ class Fight:
         return u.weapon.ap
 
     def full_ap(self, u):
-        return math.floor(10 + u.dex / 20 + u.gear.ap - u.burden[1]) - (c.CONDUCTING_AP if u.conducting else 0)
+        return math.floor(10 + u.dex / 20 + u.gear.ap - u.burden[1])
 
     def waits(self, u, later):
         """Wait if nothing is in reach now, and an enemy still to act will walk into reach."""
@@ -439,6 +455,11 @@ class Fight:
         taunter, u.taunter = u.taunter, None
         u.brace = u.reacted = False
         u.stance = u.struck = False
+        if u.conducting:
+            u.reserve = 0
+            return
+        if self.joins_circle(u):
+            return
         if u.skip or u.asleep:
             u.skip = max(0, u.skip - 1)
             u.asleep = max(0, u.asleep - 1)
@@ -528,6 +549,34 @@ class Fight:
         ap = self.retreat(u, ap)
         u.reserve = self.brace(u, max(0, ap))
 
+    def joins_circle(self, u):
+        """A guard with no enemy beside it walks to an empty place of the circle and, once there, conducts."""
+        if not self.circle or u not in self.b or u is self.objective or u.skip or u.asleep:
+            return False
+        empty = [p for p in self.circle if p not in self.cells]
+        if not empty or any(touch(u, f) and not f.asleep and not f.skip for f in alive(self.a)):
+            return False
+        goal = min(empty, key=lambda p: cheb_xy(u.x, u.y, p))
+        ap = u.ap()
+        # Walking past an enemy draws its Reaction Attack, which can kill the guard on the way.
+        while ap >= 1 and u.hp > 0 and (u.x, u.y) != goal:
+            left = self.step(u, goal, ap)
+            if left is None:
+                break
+            ap = left
+        u.conducting = u.hp > 0 and (u.x, u.y) == goal
+        u.reserve = 0
+        return True
+
+    def ritual_round(self):
+        """At the end of a round: a full circle moves the ritual on, a short one waits and may fail."""
+        if sum(1 for u in alive(self.b) if u.conducting and not u.asleep) < len(self.circle):
+            self.short += 1
+            return self.a if self.short >= SHORT_TICKS else None
+        self.short = 0
+        self.progress -= 1
+        return self.b if self.progress <= 0 else None
+
     def retreat(self, u, ap):
         """A shooter spends the AP left after its shot stepping away from the nearest melee enemy,
         never out of a side it touches, which would draw a Reaction Attack."""
@@ -585,6 +634,8 @@ class Fight:
                 return rnd, self.b
             if not alive(self.b):
                 return rnd, self.a
+            if self.circle and (winner := self.ritual_round()) is not None:
+                return rnd, winner
             if self.r.morale:
                 sa, sb = self.strength(self.a, self.leaders[0]), self.strength(self.b, self.leaders[1])
                 if self.objective is None and sb < self.r.morale * sa:
@@ -648,12 +699,23 @@ def chain(rules, side, size=None, runs=None):
             continue
         start = max(rounds + 5, random.randint(15, 20))
         survivors = alive(a)
-        senior, one, two = outfitted(rules, stronger([c.follower8(), c.follower9(), c.follower9()], rules.enemy_bonus))
-        for u in (senior, one, two):
-            u.conducting = True
-        winner = Fight(survivors, [senior, one, two], rules, objective=senior, wounded_a=True).run(60 - start)[1]
+        senior, group = ritual_group(rules)
+        # The circle can wait at most SHORT_TICKS at a time, so a run past this bound cannot happen.
+        bound = 4 * RITUAL_TICKS
+        winner = Fight(survivors, group, rules, objective=senior, wounded_a=True, ritual=RITUAL_TICKS - start).run(bound)[1]
         wins += winner is survivors
     return wins / (runs or RUNS) * 100
+
+
+def ritual_group(rules):
+    """21 §4: a Limit 8 senior who leads the guards and fights, Limit 9 conductors round the circle, Limit 9 guards."""
+    places = rules.places
+    guard = c.follower9 if rules.guard_limit == 9 else c.follower8
+    units = [c.follower8()] + [c.follower9() for _ in range(places)] + [guard() for _ in range(random.choice(rules.guards))]
+    units = outfitted(rules, stronger(units, rules.enemy_bonus))
+    for u in units[1:1 + places]:
+        u.conducting = True
+    return units[0], units
 
 
 def duel(rules, a_fn, b_fn, runs=None):
@@ -801,7 +863,7 @@ def main():
         print("\n".join(pool.map(lever, LEVERS)))
         print("\nV0: what stops the ritual")
         print("\n".join(pool.map(fielded, SIDES)))
-        print("\n".join(pool.map(forced, (5, 6, 7))))
+        print("\n".join(pool.map(forced, (4, 5, 6))))
         print("\n".join(pool.map(shifted, (-1, 1))))
         print("\nV0: allies who play badly, enemies who play well")
         print("\n".join(pool.map(careless, ("careless nearest", "careless random"))))

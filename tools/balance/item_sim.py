@@ -473,6 +473,40 @@ def forced_job(size):
     return row(f"main force of {size}", t.chain(V0.rules(), V0.side, size, RUNS))
 
 
+# How the ritual of 21 §4 ends: the allies, with or without a hero, and a hero alone at the circle.
+RITUAL = {
+    "allies, senior first": (lambda: V0.side(), False, True),
+    "allies, circle first": (lambda: V0.side(), True, True),
+    "+ hero L9 city set, senior first": (lambda: V0.side() + [PLAYER["hero L9, city set"](V0.items())], False, True),
+    "+ hero L9 city set, circle first": (lambda: V0.side() + [PLAYER["hero L9, city set"](V0.items())], True, True),
+    "hero L9 city set alone": (lambda: [PLAYER["hero L9, city set"](V0.items())], False, False),
+    "hero L8 capital set alone": (lambda: [PLAYER["hero L8, capital set"](V0.items())], False, False),
+    "hero L8 capital set alone, circle first": (lambda: [PLAYER["hero L8, capital set"](V0.items())], True, False),
+}
+
+
+def ritual_job(name):
+    """With no main battle first, the side reaches the circle at tick 15, unwounded."""
+    seeded(f"ritual {name}")
+    side, circle_first, battle = RITUAL[name]
+    rules = replace(V0.rules(), circle_first=circle_first)
+    ends = {"senior": 0, "circle": 0, "done": 0}
+    for _ in range(RUNS):
+        a, start = side(), 15
+        if battle:
+            rounds, winner = t.Fight(a, t.main_force(rules), rules).run(55)
+            if winner is not a:
+                continue
+            start = max(rounds + 5, random.randint(15, 20))
+        senior, group = t.ritual_group(rules)
+        fight = t.Fight(t.alive(a) if battle else a, group, rules, objective=senior, wounded_a=battle, ritual=t.RITUAL_TICKS - start)
+        winner = fight.run(4 * t.RITUAL_TICKS)[1]
+        key = "done" if winner is not fight.a else "senior" if senior.hp <= 0 else "circle"
+        ends[key] += 1
+    share = lambda k: ends[k] / RUNS * 100
+    return f"{name:<40} stopped {share('senior') + share('circle'):5.1f}  by the senior {share('senior'):5.1f}  by the circle {share('circle'):5.1f}"
+
+
 # How much a fighter who only stands in Defence wins against one who attacks.
 def defence_job(name):
     seeded(f"defence {name}")
@@ -527,7 +561,8 @@ SECTIONS = {
     "player": (player_job, list(PLAYER)),
     "levers": (lever_job, list(LEVERS)),
     "rules": (rule_job, list(RULES)),
-    "force": (forced_job, [5, 6, 7]),
+    "force": (forced_job, [4, 5, 6]),
+    "ritual": (ritual_job, list(RITUAL)),
     "defence": (defence_job, ["one-handed", "shield", "two-handed", "dagger"]),
     "stock": (stock_job, [5, 15, 26, 36, 46, 50, 60, 70, 75, 95]),
     "length": (length_job, [0]),

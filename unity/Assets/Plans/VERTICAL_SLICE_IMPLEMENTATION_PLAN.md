@@ -2,7 +2,7 @@
 
 Status: Draft — the owner's decisions are marked; everything else is the agent's plan and authoring defaults
 Created: 2026-11-04
-Last Updated: 2026-11-05 (no factory locations in the slice: Ritual Site Candidate 1 is a square in Lower Veil, by the owner. Earlier: the inventory's money is in bronze, by 19 §6.3; the asset map takes the owner's second list. Earlier: the slice's asset map, SLICE_ASSET_MAP.md, by the owner's list of packs. Earlier: S0.6a: the Veilmouth scene's starting point. Earlier: C0, the Veilmouth map, accepted by the owner: §2)
+Last Updated: 2026-11-05 (the ritual is a magic circle with three conductors and two guards, and the main force is 4–6, by 21 §4 and 11. Earlier: no factory locations in the slice: Ritual Site Candidate 1 is a square in Lower Veil, by the owner. Earlier: the inventory's money is in bronze, by 19 §6.3; the asset map takes the owner's second list. Earlier: the slice's asset map, SLICE_ASSET_MAP.md, by the owner's list of packs. Earlier: S0.6a: the Veilmouth scene's starting point. Earlier: C0, the Veilmouth map, accepted by the owner: §2)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md) (what the slice is), [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md) (systems and folders), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md) (scene locks)
 Companion: [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) (which pack serves each mechanic, character, and place)
 
@@ -210,7 +210,7 @@ Accepted when (S5 as a whole): a new character can gather, learn and craft, buy,
 | Part | Systems | Notes |
 |---|---|---|
 | The General and the ritual | E.1b | The Spirit General comes out on day 2 between 12:00 and 24:00, the ritual starts at once and lasts 60 ticks, the General leaves after 15–20 ticks ([11](../../../11%20Vertical%20Slice.md), [21](../../../21%20Cult%20Campaign%20and%20City%20Control.md) §4) |
-| Forces | E.1b, A.2 | The ritual group, the main force, the allies; the allies' directive; Force Estimate and Cult Retreat ([21](../../../21%20Cult%20Campaign%20and%20City%20Control.md)) |
+| Forces | E.1b, A.2 | The ritual group at its magic circle: conductors who never answer, guards who take an empty place, a circle that waits while short and fails after 10 ticks short; the main force, the allies; the allies' directive; Force Estimate and Cult Retreat ([21](../../../21%20Cult%20Campaign%20and%20City%20Control.md)) |
 | Fights away from the player | C.5 | The same tactical rules without drawing, on the shared tick ([18](../../../18%20World%20Time%20and%20Living%20Simulation.md)) |
 | Weak Points and traces | Q.2, Q.3 | Two Weak Points and one Ritual Site Candidate by the seed; their traces in the city ([11](../../../11%20Vertical%20Slice.md), [21](../../../21%20Cult%20Campaign%20and%20City%20Control.md) §4) |
 | Endings | — | Win, loss, death, Sanity 0 |

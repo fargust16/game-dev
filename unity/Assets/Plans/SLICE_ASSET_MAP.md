@@ -2,7 +2,7 @@
 
 Status: Draft — the owner's list of packs and answers, 2026-11-05; checked against the project on disk and the design documents by the agent
 Created: 2026-11-05
-Last Updated: 2026-11-05 (the owner's models through the Tripo Bridge: pistol, rifle, iron ore, Notice Board, bed; Stylized Trees Pack for trees and bushes, its editor script fixed; Modular Fantasy Bridges; the factory yard dropped; render state recounted after the owner's conversion. Earlier: render state recounted after the owner's URP imports; the pouch came through the Tripo Bridge and the pistols failed as ZIP; §9 lists the models the slice still needs. Earlier: Basic Treasure Coins found in REAL_DEDICATED; the dragons are FourEvilDragonsHP; the firearms come through the Tripo Bridge. Earlier: the owner's second list: Multistory Dungeons 2 for alchemy, Victorian Objects weapons, Stylized 3D Tools, RPG_Animations_Pack_FREE, Roadside Tales Free, Modern RPG icons, Yughues pavements, WaterWorks; the owner's answers on shields, hidden followers, colours, coins, and buildings)
+Last Updated: 2026-11-05 (the magic circle's rules are in 21 §4. Earlier: the owner's models through the Tripo Bridge: pistol, rifle, iron ore, Notice Board, bed; Stylized Trees Pack for trees and bushes, its editor script fixed; Modular Fantasy Bridges; the factory yard dropped; render state recounted after the owner's conversion. Earlier: render state recounted after the owner's URP imports; the pouch came through the Tripo Bridge and the pistols failed as ZIP; §9 lists the models the slice still needs. Earlier: Basic Treasure Coins found in REAL_DEDICATED; the dragons are FourEvilDragonsHP; the firearms come through the Tripo Bridge. Earlier: the owner's second list: Multistory Dungeons 2 for alchemy, Victorian Objects weapons, Stylized 3D Tools, RPG_Animations_Pack_FREE, Roadside Tales Free, Modern RPG icons, Yughues pavements, WaterWorks; the owner's answers on shields, hidden followers, colours, coins, and buildings)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 Related: [ASSET_LIBRARY_REFERENCE.md](ASSET_LIBRARY_REFERENCE.md) (the Overworld's registry)
 
@@ -109,7 +109,7 @@ The main clips are in `Assets/Kevin Iglesias/Human Animations/Animations/Male/` 
 | The Notice Board | Tripo (the owner's model) | `Assets/TripoModels/ornate_notice_board_3d_model/` | URP Lit |
 | Beds: the tavern room, homes | Tripo (the owner's model) | `Assets/TripoModels/ornate_wooden_bed_3d_model/` | URP Lit |
 | The bridge over the River Veil | Modular Fantasy Bridges | `Assets/Julien Tonsuso/Modular Fantasy Bridges/Models/bridge_01`, `bridge_02` and their `_piece_*` parts | materials inside the FBX files; check in the editor |
-| The ritual: a magic circle on the ground, with the conductors standing round it | a decal or a flat mesh of our own | none yet | the owner's form, 2026-11-05; its rules await the owner's confirmation |
+| The ritual: a magic circle on the ground, with the conductors standing round it | a decal or a flat mesh of our own | none yet | the owner's form, 2026-11-05; its rules are in 21 §4: three conductors stand round it, and two guards and the senior beside them |
 
 ## 5. Effects, sound, cursors, icons
 
