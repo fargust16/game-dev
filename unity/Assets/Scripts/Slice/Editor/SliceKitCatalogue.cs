@@ -608,7 +608,7 @@ namespace GameDev.Slice.EditorTools
         /// lies in the model's .fbm folder. The wrapper wears a project copy of the material with the image as its base
         /// map; the owner's files are not changed.
         /// </summary>
-        private static void LinkTripoTextures(GameObject model, string source)
+        internal static void LinkTripoTextures(GameObject model, string source)
         {
             var folder = Path.ChangeExtension(source, ".fbm").Replace('\\', '/');
             if (!AssetDatabase.IsValidFolder(folder))

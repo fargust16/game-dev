@@ -189,6 +189,46 @@ namespace GameDev.Slice.EditorTools
             Shoot(camera, name, 1600, 900);
         }
 
+        /// <summary>
+        /// A walking townsperson close by, from the front and the side, and the townsfolk's routes from above.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderTownsfolk
+        /// </summary>
+        [MenuItem("GameDev/Slice/Render Veilmouth Townsfolk")]
+        public static void RenderTownsfolk()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var walk = AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/Settings/Slice/Townsfolk/Walk.anim");
+            var walkers = Object.FindObjectsByType<GameDev.Slice.People.TownsfolkWalker>(FindObjectsSortMode.None).OrderBy(w => w.transform.position.x).ToList();
+            var line = new Material(Shader.Find("Universal Render Pipeline/Unlit")) { color = new Color(1f, 0.15f, 0.6f) };
+            foreach (var w in walkers)
+            {
+                walk.SampleAnimation(w.GetComponentInChildren<Animator>().gameObject, 0.6f);
+                var lr = new GameObject("Route").AddComponent<LineRenderer>();
+                lr.sharedMaterial = line;
+                lr.loop = true;
+                lr.widthMultiplier = 0.5f;
+                lr.positionCount = w.Route.Length;
+                lr.SetPositions(w.Route.Select(p => p + (Vector3.up * 0.3f)).ToArray());
+            }
+
+            var one = walkers[walkers.Count / 2].transform;
+            var at = one.position + (Vector3.up * 1.1f);
+            Shot("townsperson_front", at + (one.forward * 3.2f) + (Vector3.up * 0.2f), at);
+            Shot("townsperson_side", at + (one.right * 3.2f) + (Vector3.up * 0.2f), at);
+            Top("townsfolk_routes_city", new Vector3(30f, 0f, -200f), 200f);
+            Top("townsfolk_routes_market", new Vector3(-90f, 0f, -230f), 50f);
+            Debug.Log($"Townsfolk views written to {OutputFolder}.");
+        }
+
+        private static void Shot(string name, Vector3 from, Vector3 to)
+        {
+            var camera = Make();
+            camera.fieldOfView = 45f;
+            camera.transform.SetPositionAndRotation(from, Quaternion.LookRotation(to - from));
+            Shoot(camera, name, 900, 900);
+        }
+
         private static Camera Make()
         {
             var camera = new GameObject("RenderCamera").AddComponent<Camera>();

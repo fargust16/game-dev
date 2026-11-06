@@ -1719,6 +1719,20 @@ namespace GameDev.Slice.EditorTools
 
         private static void Person(string colour, bool female, float px, float py, float yaw, string name)
         {
+            if (colour == "Yellow")
+            {
+                // Ordinary townsfolk are the owner's gentleman, walking a closed route round their place (2026-11-06).
+                Physics.SyncTransforms();
+                var at = World(px, py, Ground(px, py));
+                var route = SliceTownsfolk.PlanRoute(at);
+                var walker = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(SliceTownsfolk.PrefabPath), _people);
+                walker.name = name;
+                walker.transform.SetPositionAndRotation(route.Length > 0 ? route[0] : at, Quaternion.Euler(0f, yaw, 0f));
+                var walk = walker.GetComponent<GameDev.Slice.People.TownsfolkWalker>();
+                walk.Configure(route, walk.Speed, SliceTownsfolk.GroundMask);
+                return;
+            }
+
             var custom = colour == "Teal" || colour == "Brown";
             var path = $"{VeilmouthDressing.Dummies}/HumanDummy_{(female ? "F" : "M")} {(custom ? "White" : colour)}.prefab";
             var go = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path), _people);
