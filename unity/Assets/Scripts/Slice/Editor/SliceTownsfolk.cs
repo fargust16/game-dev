@@ -11,11 +11,13 @@ using UnityEngine;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// The ordinary townsfolk (owner, 2026-11-06): the owner's Victorian gentleman from Tripo, with its own walk and idle,
-    /// replaces the yellow Dummies, and each walks a closed route round its place until S5c gives it a schedule.
+    /// The ordinary townsfolk (owner, 2026-11-06): the owner's man and woman from Tripo replace the yellow Dummies, and
+    /// each walks a closed route round its place until S5c gives it a schedule. The man is the owner's stylized male
+    /// character, which replaced the Victorian gentleman the same day and has no clips of its own: it walks and stands
+    /// in the gentleman's clips, retargeted once to its rig (<see cref="FitGentlemanClipsToMan"/>).
     /// <list type="bullet">
-    /// <item>The model is scaled to 1.75 m and turned to face +Z; its clips are copied to looping project clips; the
-    /// owner's files are not changed.</item>
+    /// <item>The model is scaled to 1.75 m and turned to face +Z; its clips, or the borrowed ones, are copied to
+    /// looping project clips; the owner's files are not changed.</item>
     /// <item>The walking speed is measured from the walk clip's stride, so the feet do not slide.</item>
     /// <item>A route is planned on 1 m cells round the person's place, over ground a person's capsule fits on, then
     /// straightened where a person fits along the straight line.</item>
@@ -24,13 +26,23 @@ namespace GameDev.Slice.EditorTools
     /// </summary>
     public static class SliceTownsfolk
     {
-        public const string ModelPath = "Assets/TripoModels/victorian_gentleman_3d_model_1/victorian_gentleman_3d_model_1.fbx";
+        public const string ModelPath = "Assets/TripoModels/stylized_male_character_3d_model/stylized_male_character_3d_model.fbx";
         public const string PrefabPath = "Assets/Prefabs/Slice/Townsperson.prefab";
         private const string AnimationFolder = "Assets/Settings/Slice/Townsfolk";
         private const string ControllerPath = AnimationFolder + "/SliceTownsfolk.controller";
         public const string WomanModelPath = "Assets/TripoModels/historical_woman_3d_model/historical_woman_3d_model.fbx";
         public const string WomanPrefabPath = "Assets/Prefabs/Slice/Townswoman.prefab";
         private const string WomanFolder = AnimationFolder + "/Woman";
+
+        /// <summary>
+        /// The gentleman's walk and idle, kept in the project when the owner removed the gentleman (2026-11-06), and the
+        /// same retargeted to the man's rig, which the man walks and stands in.
+        /// </summary>
+        public const string GentlemanWalk = AnimationFolder + "/Borrowed/GentlemanWalk.anim";
+        public const string GentlemanIdle = AnimationFolder + "/Borrowed/GentlemanIdle.anim";
+        public const string ManWalk = AnimationFolder + "/Borrowed/ManWalk.anim";
+        public const string ManIdle = AnimationFolder + "/Borrowed/ManIdle.anim";
+        private const string GentlemanModelPath = "Assets/TripoModels/victorian_gentleman_3d_model_1/victorian_gentleman_3d_model_1.fbx";
 
         /// <summary>One townsfolk model: the owner's file, the prefab wrapping it, and its looping clips.</summary>
         private sealed class Kind
@@ -92,8 +104,8 @@ namespace GameDev.Slice.EditorTools
         {
             var source = AssetDatabase.LoadAssetAtPath<GameObject>(kind.Model);
             var clips = AssetDatabase.LoadAllAssetsAtPath(kind.Model).OfType<AnimationClip>().Where(c => !c.name.StartsWith("__preview")).ToList();
-            var walkSource = clips.First(c => c.name.StartsWith("walk"));
-            var idleSource = clips.First(c => c.name.StartsWith("idle"));
+            var walkSource = clips.FirstOrDefault(c => c.name.StartsWith("walk")) ?? AssetDatabase.LoadAssetAtPath<AnimationClip>(ManWalk);
+            var idleSource = clips.FirstOrDefault(c => c.name.StartsWith("idle")) ?? AssetDatabase.LoadAssetAtPath<AnimationClip>(ManIdle);
 
             var root = new GameObject(kind.Name);
             var model = (GameObject)PrefabUtility.InstantiatePrefab(source);
@@ -215,6 +227,134 @@ namespace GameDev.Slice.EditorTools
             machine.defaultState = walkState;
             AssetDatabase.SaveAssets();
             return controller;
+        }
+
+        /// <summary>
+        /// Once, while the gentleman's model was still in the project (2026-11-06): his walk and idle retargeted to the
+        /// man's rig. Both are Tripo rigs with the same bones, but their rest poses differ (the man stands in a T-pose),
+        /// so a bone's rotation cannot be copied as it is. Each bone of the man is first swung so that it points as the
+        /// gentleman's does at rest, then turned as the gentleman's turns from his rest; the hips move as his do. The man
+        /// keeps his own bone lengths. Batch: -executeMethod GameDev.Slice.EditorTools.SliceTownsfolk.FitGentlemanClipsToMan
+        /// </summary>
+        public static void FitGentlemanClipsToMan()
+        {
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(GentlemanModelPath) == null)
+            {
+                Debug.LogError("[SliceTownsfolk] The gentleman's model is gone; the man's clips stay as they were fitted.");
+                return;
+            }
+
+            Retarget(GentlemanModelPath, GentlemanWalk, ModelPath, ManWalk);
+            Retarget(GentlemanModelPath, GentlemanIdle, ModelPath, ManIdle);
+            AssetDatabase.SaveAssets();
+        }
+
+        private static void Retarget(string donorModel, string donorClip, string targetModel, string path)
+        {
+            var donor = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(donorModel));
+            var target = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(targetModel));
+            var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(donorClip);
+            var d = Bones(donor);
+            var t = Bones(target);
+            var common = t.Keys.Where(k => k.StartsWith("Armature/") && d.ContainsKey(k)).OrderBy(k => k.Count(c => c == '/')).ToList();
+
+            // At rest, before any clip is sampled.
+            var swing = common.ToDictionary(k => k, k =>
+            {
+                var dc = Lead(d[k]);
+                var tc = Lead(t[k]);
+                return dc != null && tc != null
+                    ? Quaternion.FromToRotation(tc.position - t[k].position, dc.position - d[k].position)
+                    : Quaternion.identity;
+            });
+            var donorRest = common.ToDictionary(k => k, k => d[k].rotation);
+            var targetRest = common.ToDictionary(k => k, k => t[k].rotation);
+            const string hips = "Armature/Hips";
+            var donorHips = d[hips].localPosition;
+            var targetHips = t[hips].localPosition;
+
+            const float rate = 30f;
+            var frames = Mathf.Max(2, Mathf.RoundToInt(clip.length * rate));
+            var rotation = common.ToDictionary(k => k, _ => new[] { new AnimationCurve(), new AnimationCurve(), new AnimationCurve(), new AnimationCurve() });
+            var position = new[] { new AnimationCurve(), new AnimationCurve(), new AnimationCurve() };
+            var previous = new Dictionary<string, Quaternion>();
+            for (var i = 0; i <= frames; i++)
+            {
+                var time = clip.length * i / frames;
+                clip.SampleAnimation(donor, time);
+                foreach (var k in common)
+                {
+                    t[k].rotation = d[k].rotation * Quaternion.Inverse(donorRest[k]) * swing[k] * targetRest[k];
+                }
+
+                foreach (var k in common)
+                {
+                    var q = t[k].localRotation;
+                    if (previous.TryGetValue(k, out var p) && Quaternion.Dot(p, q) < 0f)
+                    {
+                        q = new Quaternion(-q.x, -q.y, -q.z, -q.w);
+                    }
+
+                    previous[k] = q;
+                    rotation[k][0].AddKey(time, q.x);
+                    rotation[k][1].AddKey(time, q.y);
+                    rotation[k][2].AddKey(time, q.z);
+                    rotation[k][3].AddKey(time, q.w);
+                }
+
+                var at = targetHips + (d[hips].localPosition - donorHips);
+                position[0].AddKey(time, at.x);
+                position[1].AddKey(time, at.y);
+                position[2].AddKey(time, at.z);
+            }
+
+            var result = new AnimationClip { name = Path.GetFileNameWithoutExtension(path), frameRate = rate };
+            foreach (var k in common)
+            {
+                result.SetCurve(k, typeof(Transform), "localRotation.x", rotation[k][0]);
+                result.SetCurve(k, typeof(Transform), "localRotation.y", rotation[k][1]);
+                result.SetCurve(k, typeof(Transform), "localRotation.z", rotation[k][2]);
+                result.SetCurve(k, typeof(Transform), "localRotation.w", rotation[k][3]);
+            }
+
+            result.SetCurve(hips, typeof(Transform), "localPosition.x", position[0]);
+            result.SetCurve(hips, typeof(Transform), "localPosition.y", position[1]);
+            result.SetCurve(hips, typeof(Transform), "localPosition.z", position[2]);
+            result.EnsureQuaternionContinuity();
+            var settings = AnimationUtility.GetAnimationClipSettings(result);
+            settings.loopTime = true;
+            AnimationUtility.SetAnimationClipSettings(result, settings);
+            AssetDatabase.DeleteAsset(path);
+            AssetDatabase.CreateAsset(result, path);
+            Object.DestroyImmediate(donor);
+            Object.DestroyImmediate(target);
+            Debug.Log($"[SliceTownsfolk] {donorClip} retargeted to {targetModel}: {common.Count} bones, {frames + 1} frames, {path}.");
+        }
+
+        private static Dictionary<string, Transform> Bones(GameObject model) =>
+            model.GetComponentsInChildren<Transform>().Where(b => b != model.transform)
+                .ToDictionary(b => AnimationUtility.CalculateTransformPath(b, model.transform));
+
+        /// <summary>The child a bone points to: the spine from the hips, the neck from the chest, the head from the neck, the middle finger from the hand, or its only child.</summary>
+        private static Transform Lead(Transform bone)
+        {
+            var children = bone.Cast<Transform>().ToList();
+            foreach (var name in new[] { "Spine", "Neck", "Head" })
+            {
+                var named = children.FirstOrDefault(c => c.name == name);
+                if (named != null)
+                {
+                    return named;
+                }
+            }
+
+            var middle = children.FirstOrDefault(c => c.name.EndsWith("MiddleProximal"));
+            if (middle != null)
+            {
+                return middle;
+            }
+
+            return children.Count == 1 ? children[0] : null;
         }
 
         private static AnimationClip LoopingCopy(AnimationClip source, string path)
@@ -339,6 +479,30 @@ namespace GameDev.Slice.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log($"[SliceTownsfolk] {Women.Count(w => w)} of {Women.Length} walkers are townswomen now, walking {speed:0.00} m/s, in {VeilmouthScene.ScenePath}.");
+        }
+
+        /// <summary>
+        /// At the owner's request (2026-11-06): the townsperson is rebuilt from <see cref="ModelPath"/>, and every man
+        /// walking in Veilmouth takes the new model's measured pace, keeping his place, facing, and route.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.SliceTownsfolk.RebuildMan
+        /// </summary>
+        [MenuItem("GameDev/Slice/Townsfolk/Rebuild the Townsperson from Its Model")]
+        public static void RebuildMan()
+        {
+            var prefab = BuildPrefab();
+            var speed = prefab.GetComponent<TownsfolkWalker>().Speed;
+            var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var men = Object.FindObjectsByType<TownsfolkWalker>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                .Where(w => PrefabUtility.GetCorrespondingObjectFromSource(w.gameObject) == prefab).ToList();
+            foreach (var walker in men)
+            {
+                walker.Configure(walker.Route, speed, GroundMask);
+                EditorUtility.SetDirty(walker);
+            }
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log($"[SliceTownsfolk] {men.Count} townsmen in {VeilmouthScene.ScenePath} now walk {speed:0.00} m/s in the new model.");
         }
 
         // ------------------------------------------------------------------------------------------- routes
