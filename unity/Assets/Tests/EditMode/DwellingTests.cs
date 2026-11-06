@@ -76,9 +76,14 @@ namespace GameDev.Slice.Tests
                     Assert.AreEqual(key.StreetPortalId, door.Target.ArrivalPortalId);
                     var rooms = root.GetComponentsInChildren<Transform>().Count(t => t.name.StartsWith(DwellingAssembler.RoomMarker));
                     Assert.GreaterOrEqual(rooms, archetype == DwellingArchetype.Tenement ? 1 : 2, $"{archetype}");
-                    Assert.LessOrEqual(rooms, archetype == DwellingArchetype.Villa ? 5 : 4, $"{archetype}");
-                    var furniture = root.Find("Furniture").childCount;
-                    Assert.GreaterOrEqual(furniture, rooms * 2, $"{archetype} {wealth} #{n} is furnished");
+                    Assert.LessOrEqual(rooms, archetype == DwellingArchetype.Villa ? 6 : 4, $"{archetype}");
+                    var furniture = root.Find("Furniture");
+                    Assert.GreaterOrEqual(furniture.childCount, rooms * 2, $"{archetype} {wealth} #{n} is furnished");
+                    // Every home has a bed (owner, 2026-11-06); a warehouse is no home.
+                    if (archetype != DwellingArchetype.Warehouse)
+                    {
+                        Assert.IsTrue(furniture.Cast<Transform>().Any(t => t.name.Contains("WallBed")), $"{archetype} {wealth} #{n} has a bed");
+                    }
                 }
             }
 

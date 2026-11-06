@@ -77,6 +77,7 @@ namespace GameDev.Slice.EditorTools
             public float Stretch = 1f; // a vertical scale on top of Factor (BK's rooms: walls 3.6 m, owner 2026-11-06)
             public bool Infill;        // a BK wall set with its infill plane (InfillPlane) at WallInfill instead of centred
             public float Shift;        // m added to a centred linear block's depth: BK's door leaf in its aligned frame
+            public float Out;          // m a flat hung piece stands off the wall's infill (owner's play test, 2026-11-06)
             public bool LineBody;      // a linear block whose body is the full 0.3 m on its line, whatever is seen
             public string Pack;       // a pack whose built-in materials get URP copies (SliceUrpMaterials)
             public bool NoLights;     // removes the vendor's lights (BK's window carries one)
@@ -119,6 +120,7 @@ namespace GameDev.Slice.EditorTools
         /// Authoring default; BK's furniture so keeps the proportion its own architecture had at ×1.2.
         /// </summary>
         public const float FurnitureScale = 1.2f;
+        public const float HungOut = 0.04f; // m
 
         private static Spec Game(Spec spec)
         {
@@ -398,11 +400,15 @@ namespace GameDev.Slice.EditorTools
             yield return F("BkCarpetLong", "Carpet01", ng, Body.None);
             yield return F("BkCarpetWide", "Carpet03", ng, Body.None);
             // What hangs is a two-cell block with the piece in its middle, so it centres on a 4 m wall segment.
+            // A flat piece stands 0.04 m off the plaster, whose relief showed through a painting hung flush (owner's
+            // play test, 2026-11-06; authoring default).
             var board = F("BkBoard", "Board", ng, Body.None, Anchor.Face);
             board.Width = 2;
+            board.Out = HungOut;
             yield return board;
             var painting = F("BkPainting", "Painting01", ng, Body.None, Anchor.Face, It("Misc"));
             painting.Width = 2;
+            painting.Out = HungOut;
             yield return painting;
             yield return F("BkTrunk", "Trunk01", ia, folder: It("Misc"));
             yield return F("BkCauldron", "CaldronTripod01_Bubbles", pr, folder: It("Lab"));
@@ -618,7 +624,7 @@ namespace GameDev.Slice.EditorTools
                     offset = new Vector3(-b.center.x, -b.min.y, -b.center.z);
                     break;
                 case Anchor.Face:
-                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, WallInfill - b.min.z);
+                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, WallInfill + spec.Out - b.min.z);
                     break;
                 default:
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, depth * 0.5f - b.center.z);
@@ -858,7 +864,10 @@ namespace GameDev.Slice.EditorTools
 
         /// <summary>
         /// A set (city plan §8): the base model and BK's things standing on its top, each centred at a fraction of the
-        /// top's extent, under one "Model". Things keep their true size; the base's top is read from what is seen.
+        /// top's extent, under one "Model". Things keep their true size. Each stands on the base's surface found under
+        /// its place by a ray on the base's meshes, not on its bounds' top, which a shelf's back rail raised above its
+        /// board (owner's play test, 2026-11-06: bottles floated over the shelf). BK's volumetric light script, which
+        /// needs the built-in pipeline, is removed from its lamps and candles.
         /// </summary>
         private static GameObject StandOn(GameObject root, GameObject baseModel, Spec spec)
         {
@@ -884,13 +893,45 @@ namespace GameDev.Slice.EditorTools
                     GameObjectUtility.RemoveMonoBehavioursWithMissingScript(t.gameObject);
                 }
 
+                foreach (var light in thing.GetComponentsInChildren<MonoBehaviour>(true).Where(m => m.GetType().Name == "VolumetricLight").ToList())
+                {
+                    Object.DestroyImmediate(light);
+                }
+
                 SliceUrpMaterials.Apply(thing, spec.Pack ?? "BK");
                 var seen = Seen(thing);
-                var at = new Vector3(top.min.x + fx * top.size.x, top.max.y, top.min.z + fz * top.size.z);
+                var x = top.min.x + fx * top.size.x;
+                var z = top.min.z + fz * top.size.z;
+                var at = new Vector3(x, Surface(baseModel, x, z, top.max.y), z);
                 thing.transform.position += at - new Vector3(seen.center.x, seen.min.y, seen.center.z);
             }
 
             return holder;
+        }
+
+        /// <summary>The highest point of a model's meshes under (x, z), or <paramref name="fallback"/> where none is.</summary>
+        private static float Surface(GameObject model, float x, float z, float fallback)
+        {
+            var best = float.NegativeInfinity;
+            var ray = new Ray(new Vector3(x, fallback + 1f, z), Vector3.down);
+            foreach (var filter in model.GetComponentsInChildren<MeshFilter>())
+            {
+                if (filter.sharedMesh == null)
+                {
+                    continue;
+                }
+
+                var probe = filter.gameObject.AddComponent<MeshCollider>();
+                probe.sharedMesh = filter.sharedMesh;
+                if (probe.Raycast(ray, out var hit, fallback + 100f))
+                {
+                    best = Mathf.Max(best, hit.point.y);
+                }
+
+                Object.DestroyImmediate(probe);
+            }
+
+            return float.IsNegativeInfinity(best) ? fallback : best;
         }
 
 

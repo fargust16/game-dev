@@ -120,7 +120,8 @@ namespace GameDev.Slice.Dwellings
             },
             [RoomKind.BackRoom] = new[]
             {
-                new Item("Crate", Spot.Free, count: 2), new Item("Barrel", Spot.Free), new Item("BkSideTable", Spot.Wall),
+                // The shopkeeper sleeps behind the shop (owner, 2026-11-06: a bed in every home).
+                new Item("WallBed", Spot.Wall), new Item("Crate", Spot.Free, count: 2), new Item("Barrel", Spot.Free), new Item("BkSideTable", Spot.Wall),
                 new Item("BkDrawer", Spot.Wall, Middling), new Item("BkBasketB", Spot.Free, Middling),
             },
             [RoomKind.DiningRoom] = new[]
@@ -200,15 +201,16 @@ namespace GameDev.Slice.Dwellings
                         .Open(Opening.Street, 4, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 8, 0)
                         .Open(Opening.Door, 4, 8).Open(Opening.Door, 8, 12, true).Open(Opening.Window, 0, 12, true).Open(Opening.Window, 8, 16);
                 case DwellingArchetype.Villa:
-                    // A hall up the middle between the parlour and the dining room, the study and the kitchen behind.
+                    // A hall up the middle between the parlour and the dining room, the study and the kitchen behind,
+                    // and the bedroom behind the study (owner, 2026-11-06: a bed in every home).
                     return new DwellingPlan()
                         .Room("Parlour", RoomKind.Parlour, 0, 0, 8, 8).Room("Hall", RoomKind.Hall, 8, 0, 4, 12)
                         .Room("Dining room", RoomKind.DiningRoom, 12, 0, 8, 8).Room("Study", RoomKind.Study, 0, 8, 8, 8)
-                        .Room("Kitchen", RoomKind.Kitchen, 12, 8, 8, 8, true)
+                        .Room("Kitchen", RoomKind.Kitchen, 12, 8, 8, 8, true).Room("Bedroom", RoomKind.Bedroom, 0, 16, 8, 8)
                         .Open(Opening.Street, 8, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 4, 0)
                         .Open(Opening.Window, 12, 0).Open(Opening.Window, 16, 0).Open(Opening.Window, 0, 4, true)
-                        .Open(Opening.Window, 20, 4, true).Open(Opening.Window, 8, 12).Open(Opening.Window, 4, 16)
-                        .Open(Opening.Window, 16, 16)
+                        .Open(Opening.Window, 20, 4, true).Open(Opening.Window, 8, 12).Open(Opening.Door, 4, 16)
+                        .Open(Opening.Window, 0, 20, true).Open(Opening.Window, 4, 24).Open(Opening.Window, 16, 16)
                         .Open(Opening.Door, 8, 4, true).Open(Opening.Door, 8, 8, true).Open(Opening.Door, 12, 4, true)
                         .Open(Opening.Door, 12, 8, true);
                 case DwellingArchetype.Warehouse:

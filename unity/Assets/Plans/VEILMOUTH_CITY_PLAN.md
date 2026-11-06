@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1)
 
-Version: 0.11
+Version: 0.12
 
 Status: Draft — accepted by the owner, 2026-11-05; sizes remain authoring defaults
 
-Last Updated: 2026-11-06 (§17: the owner's second play test fixed and rerun at the owner's request: still dressing, game scale ×1.2, BK's 4 m module, walls set by their infill, one-style steps, props on slopes, railings without holes, blue shop floors; §14 and §16 resized. Earlier: §16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-06 (§18: the owner's third play test: shelves, paintings, and beds fixed; detached houses, loose props, a room constructor, transport, cabs, and animals recorded. Earlier: §17: the owner's second play test fixed and rerun at the owner's request: still dressing, game scale ×1.2, BK's 4 m module, walls set by their infill, one-style steps, props on slopes, railings without holes, blue shop floors; §14 and §16 resized. Earlier: §16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
@@ -384,7 +384,7 @@ Step 4a's first half: the shared Dwelling scene, the generator it runs, and a st
 | Tenement | one room 8 × 8 m, or that room and a stone kitchen 4 × 8 m |
 | Terrace | hall 4 × 12 m, parlour 8 × 8 m, stone kitchen 8 × 4 m, bedroom 12 × 4 m |
 | Shop | shop room 12 × 8 m with the street door, back room 8 × 8 m, stone kitchen 4 × 8 m |
-| Villa | parlour 8 × 8 m, hall 4 × 12 m with the street door, dining room 8 × 8 m, study 8 × 8 m, stone kitchen 8 × 8 m |
+| Villa | parlour 8 × 8 m, hall 4 × 12 m with the street door, dining room 8 × 8 m, study 8 × 8 m, stone kitchen 8 × 8 m, bedroom 8 × 8 m behind the study (§18) |
 | Warehouse | stone store 12 × 12 m, office 8 × 8 m |
 
 **Wealth** ([19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.3) comes from where the house stands, in plan coordinates: the Ridge (py < 600) is rich; tenements and warehouses elsewhere are poor; a house in Lower Veil (px ≥ 470 and py ≥ 690, or px ≥ 545 and 600 < py < 662) is poor; the rest are middling. It chooses the furniture each room may take, the Lock (2, 4, or 6, [10.3](../../../10.3%20Stealth%20and%20Detection.md) §6.1), and the Stash chance.
@@ -438,3 +438,21 @@ The owner played the city and interiors again and gave ten remarks with screensh
 - Railings end at a neighbouring house rather than leaving a gap before it.
 
 **Counted** on this build: 3284 kit blocks in the city, 277 doorways, and 749 in the seven interiors, all with no kit fault; 56 sample Dwellings with no kit fault; the grid check passes (railings 1498 of 1499 low enough, 750 of 750 crossings closed, house fronts closed). The stale 3 m BK prefabs and the old-size furniture, which nothing used, were removed from the kit.
+
+---
+
+# 18. The owner's third play test, 2026-11-06
+
+The owner played again and sent four screenshots with remarks and wishes. What could be fixed in the kit was fixed the same day; the rest is recorded here and in [99 Open Questions](../../../99%20Open%20Questions.md) (VS-PHYS, VS-PLOT, VS-ROOMS, VS-BEASTS, FG-TRANSIT, FG-CAB), and waits for the owner's word on its design.
+
+| # | Remark | Where it stands |
+|---|---|---|
+| 1 | Bottles float over the shelf | Fixed: a set's things stand on the surface a ray finds under them; the shelf's brackets had raised its bounds above the board. Every thing of every set now sits on its base (measured, gap 0.000 m). |
+| 2 | Paintings sink into the wall | Fixed: paintings and boards stand 0.04 m off the plaster, in every interior and Dwelling, since they are kit prefabs. |
+| 3 | Railings stand too close to houses, have holes, and steps run past them onto the pavement | Waits for 4, which places railings round each house with one gate opposite its door. |
+| 4 | Each railed house should stand alone on its own green ground; only shopping streets and the slums build in rows; rich residential quarters have gardens with a bench, trees, shrubs, and flowers | A change to §3.3, §3.4, and §5.2, the owner's. Planned as the next pass of the city (VS-PLOT). |
+| 5 | Every home needs beds, and living rooms must be furnished | Fixed in the Dwelling generator: a villa has a bedroom behind its study, and a shop's back room has the shopkeeper's bed; tenements and terraces had beds. Rooms keep their furniture lists (§16). |
+| 6 | All interiors look the same; assemble rooms at random like a construction set | Recorded (VS-ROOMS); later. |
+| 7 | Tables, chairs, crates, barrels, and small things should have mass and gravity, fall, roll, and later break | Recorded with a working design (VS-PHYS); the agent proposes it as the next pass, before 4. |
+| 8 | City transport, carriages as cabs, street animals | Recorded for later (FG-TRANSIT, FG-CAB, VS-BEASTS). |
+| 9 | A warning from `VolumetricLight` | Fixed: BK's script, which needs the built-in pipeline, is removed from the kit's lamps and candles. The Tripo Bridge's socket error is the bridge's own: its server was already running, as when its window is opened twice. |

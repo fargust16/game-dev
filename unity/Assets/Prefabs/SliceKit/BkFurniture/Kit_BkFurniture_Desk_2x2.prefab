@@ -460,7 +460,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8200874298285081654}
   - component: {fileID: 3776639840304576074}
-  - component: {fileID: 6226416556411853393}
   m_Layer: 10
   m_Name: Point light
   m_TagString: Untagged
@@ -548,32 +547,6 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
---- !u!114 &6226416556411853393
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1231797232243623995}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dafc90245bfe9e2408e358f71deace2a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SampleCount: 4
-  ScatteringCoef: 0.01
-  ExtinctionCoef: 0.1
-  SkyboxExtinctionCoef: 1
-  MieG: 0.9
-  HeightFog: 0
-  HeightScale: 0.1
-  GroundLevel: 0
-  Noise: 0
-  NoiseScale: 0.015
-  NoiseIntensity: 1
-  NoiseIntensityOffset: 0.3
-  NoiseVelocity: {x: 3, y: 3}
-  MaxRayLength: 400
 --- !u!1 &1455594361013418388
 GameObject:
   m_ObjectHideFlags: 0
@@ -1356,7 +1329,7 @@ Transform:
   m_GameObject: {fileID: 4505051391586828335}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.17826319, y: 0.9593162, z: -0.07973113}
+  m_LocalPosition: {x: 0.17826319, y: 0.95931643, z: -0.07973113}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1534,7 +1507,7 @@ Transform:
   m_GameObject: {fileID: 5713701296006285813}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.9468534, y: 1.2500541, z: -1.366667}
+  m_LocalPosition: {x: 1.9468534, y: 1.2500544, z: -1.366667}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2130,7 +2103,7 @@ Transform:
   m_GameObject: {fileID: 6856583619641699939}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0.56450003, y: 1.0751288, z: 0.07973068}
+  m_LocalPosition: {x: 0.56450003, y: 1.075129, z: 0.07973068}
   m_LocalScale: {x: 0.25, y: 0.25000012, z: 0.23000012}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2349,8 +2322,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2, y: 1.6031299, z: 0.95677066}
-  m_Center: {x: 1, y: 0.80156493, z: 0.7311853}
+  m_Size: {x: 2, y: 1.6031301, z: 0.95677066}
+  m_Center: {x: 1, y: 0.80156505, z: 0.7311853}
 --- !u!1 &7780221242320930950
 GameObject:
   m_ObjectHideFlags: 0

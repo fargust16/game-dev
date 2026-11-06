@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &132060927
+--- !u!1 &243612858
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,54 +127,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 132060929}
-  - component: {fileID: 132060928}
-  m_Layer: 0
-  m_Name: Interior
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &132060928
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 132060927}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d719e4b585ae1c4a8571b566ae1a4dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: GameDev.World.Interiors::GameDev.World.Interiors.InteriorRuntime
-  buildingId: dwelling.0.0
---- !u!4 &132060929
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 132060927}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &514669941
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 514669944}
-  - component: {fileID: 514669943}
-  - component: {fileID: 514669942}
+  - component: {fileID: 243612861}
+  - component: {fileID: 243612860}
+  - component: {fileID: 243612859}
   m_Layer: 0
   m_Name: HUD
   m_TagString: Untagged
@@ -182,25 +137,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &514669942
+--- !u!114 &243612859
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 514669941}
+  m_GameObject: {fileID: 243612858}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2aa4737597742c245bd87de2ce4a4e95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameDev.UI::GameDev.UI.HudView
---- !u!114 &514669943
+--- !u!114 &243612860
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 514669941}
+  m_GameObject: {fileID: 243612858}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
@@ -217,13 +172,13 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
---- !u!4 &514669944
+--- !u!4 &243612861
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 514669941}
+  m_GameObject: {fileID: 243612858}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -232,7 +187,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &718272233
+--- !u!1 &371255332
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -240,58 +195,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 718272235}
-  - component: {fileID: 718272234}
-  m_Layer: 0
-  m_Name: Dwelling
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &718272234
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 718272233}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc6b0141bcec1044689f694a00f8f91a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: GameDev.Slice.Dwellings::GameDev.Slice.Dwellings.DwellingRuntime
-  kit: {fileID: 11400000, guid: 20bf71db2c44934468e00331e607b78c, type: 2}
-  settings: {fileID: 11400000, guid: 8d3d203705f912548a7b9b7d430f09d7, type: 2}
-  interior: {fileID: 132060928}
-  previewContext: dwelling.0.0|Veilmouth|0|0|Terrace|Middling
---- !u!4 &718272235
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 718272233}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &785434647
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 785434651}
-  - component: {fileID: 785434650}
-  - component: {fileID: 785434649}
-  - component: {fileID: 785434648}
+  - component: {fileID: 371255336}
+  - component: {fileID: 371255335}
+  - component: {fileID: 371255334}
+  - component: {fileID: 371255333}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -299,19 +206,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &785434648
+--- !u!114 &371255333
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 785434647}
+  m_GameObject: {fileID: 371255332}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb826d250c7b70d4e8046d22c0d0c755, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameDev.Cameras::GameDev.Cameras.ThirdPersonCamera
-  target: {fileID: 1715036312}
+  target: {fileID: 1467251744}
   targetOffset: {x: 0, y: 1.5, z: 0}
   distance: 4.5
   minDistance: 1.2
@@ -329,21 +236,21 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 772
---- !u!81 &785434649
+--- !u!81 &371255334
 AudioListener:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 785434647}
+  m_GameObject: {fileID: 371255332}
   m_Enabled: 1
---- !u!20 &785434650
+--- !u!20 &371255335
 Camera:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 785434647}
+  m_GameObject: {fileID: 371255332}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
@@ -388,13 +295,13 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!4 &785434651
+--- !u!4 &371255336
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 785434647}
+  m_GameObject: {fileID: 371255332}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: -10}
@@ -403,7 +310,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1044122509
+--- !u!1 &1011313635
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -411,35 +318,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1044122511}
-  - component: {fileID: 1044122510}
+  - component: {fileID: 1011313637}
+  - component: {fileID: 1011313636}
   m_Layer: 0
-  m_Name: GameClock
+  m_Name: Dwelling
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1044122510
+--- !u!114 &1011313636
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1044122509}
+  m_GameObject: {fileID: 1011313635}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01d7df669238c274a9f29ffc951d6725, type: 3}
+  m_Script: {fileID: 11500000, guid: fc6b0141bcec1044689f694a00f8f91a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GameDev.World.Time::GameDev.World.Timekeeping.GameClockDriver
-  settings: {fileID: 11400000, guid: 26cccc1df8482cd4182892ff888b6efd, type: 2}
---- !u!4 &1044122511
+  m_EditorClassIdentifier: GameDev.Slice.Dwellings::GameDev.Slice.Dwellings.DwellingRuntime
+  kit: {fileID: 11400000, guid: 20bf71db2c44934468e00331e607b78c, type: 2}
+  settings: {fileID: 11400000, guid: 8d3d203705f912548a7b9b7d430f09d7, type: 2}
+  interior: {fileID: 1218936049}
+  previewContext: dwelling.0.0|Veilmouth|0|0|Terrace|Middling
+--- !u!4 &1011313637
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1044122509}
+  m_GameObject: {fileID: 1011313635}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -448,7 +358,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1715036311
+--- !u!1 &1218936048
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1218936050}
+  - component: {fileID: 1218936049}
+  m_Layer: 0
+  m_Name: Interior
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1218936049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218936048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d719e4b585ae1c4a8571b566ae1a4dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.World.Interiors::GameDev.World.Interiors.InteriorRuntime
+  buildingId: dwelling.0.0
+--- !u!4 &1218936050
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218936048}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1467251743
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -505,12 +460,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 25d65436298b13847b922e6bfb0f5fc0, type: 3}
---- !u!4 &1715036312 stripped
+--- !u!4 &1467251744 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 555055532081621831, guid: 25d65436298b13847b922e6bfb0f5fc0, type: 3}
-  m_PrefabInstance: {fileID: 1715036311}
+  m_PrefabInstance: {fileID: 1467251743}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1894696420
+--- !u!1 &1666403663
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -518,8 +473,53 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1894696422}
-  - component: {fileID: 1894696421}
+  - component: {fileID: 1666403665}
+  - component: {fileID: 1666403664}
+  m_Layer: 0
+  m_Name: GameClock
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1666403664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666403663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01d7df669238c274a9f29ffc951d6725, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.World.Time::GameDev.World.Timekeeping.GameClockDriver
+  settings: {fileID: 11400000, guid: 26cccc1df8482cd4182892ff888b6efd, type: 2}
+--- !u!4 &1666403665
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666403663}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1868626354
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1868626356}
+  - component: {fileID: 1868626355}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -527,13 +527,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!108 &1894696421
+--- !u!108 &1868626355
 Light:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1894696420}
+  m_GameObject: {fileID: 1868626354}
   m_Enabled: 1
   serializedVersion: 13
   m_Type: 1
@@ -592,13 +592,13 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
---- !u!4 &1894696422
+--- !u!4 &1868626356
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1894696420}
+  m_GameObject: {fileID: 1868626354}
   serializedVersion: 2
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
   m_LocalPosition: {x: 0, y: 3, z: 0}
@@ -611,10 +611,10 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 785434651}
-  - {fileID: 1894696422}
-  - {fileID: 132060929}
-  - {fileID: 718272235}
-  - {fileID: 1715036311}
-  - {fileID: 1044122511}
-  - {fileID: 514669944}
+  - {fileID: 371255336}
+  - {fileID: 1868626356}
+  - {fileID: 1218936050}
+  - {fileID: 1011313637}
+  - {fileID: 1467251743}
+  - {fileID: 1666403665}
+  - {fileID: 243612861}
