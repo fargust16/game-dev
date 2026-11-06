@@ -255,6 +255,7 @@ namespace GameDev.Slice.EditorTools
             // is the common tree and shrub; the Stylized Trees Pack's coloured crowns stay for the rare resource trees.
             var railing = S("Railing", "Street", "Railing", "Assets/Modular Victorian City/Prefabs/Modules", "Fence", pr, anchor: Anchor.Linear);
             railing.SizeX = 2f;
+            railing.SizeY = 1.04f; // its collider then stands 1.2 m: low cover is 0.8–1.2 m (kit standard §3); at 1.36 m it read as high cover (grid check, 2026-11-06)
             yield return railing;
             var column = S("Column", "Street", "Column", VictorianStreet, "Column", st);
             column.SizeY = 8f;

@@ -263,7 +263,7 @@ Checked by `VeilmouthSceneTests` (the heights above, the edge's slope, the roads
 4. ~~The seven interiors (§8).~~ Done 2026-11-06 (§14).
 4a. ~~The Dwelling scene and its generator (§8), then a door on every dwelling~~ (done 2026-11-06, §16), and breaking in with witnesses, the Wardens and the Arrest ([10.3](../../../10.3%20Stealth%20and%20Detection.md) §6.1–6.2, [10.4](../../../10.4%20Dialogue%20and%20Social%20Checks.md) §6).
 5. ~~Trees and green (§6.2).~~ Done with the city (§13); the courts' and gardens' details remain.
-6. Walk it, render it, and hand it to the owner.
+6. Walk it, render it, and hand it to the owner. The Combat Grid's reading of the city, its interiors and dwellings passed on 2026-11-06 ([VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md), *S0's acceptance in the slice's own scenes*); the railings were lowered to 1.04 m for it. The owner's walk remains.
 
 ---
 

@@ -2,7 +2,7 @@
 
 Status: Draft — authoring defaults set by the agent; the owner's decision that sets the frame is marked
 Created: 2026-11-04
-Last Updated: 2026-11-06 (§6: an interior assembled at run time keeps the kit's rules, and a solid piece keeps 0.16 m from a wall's line. Earlier: §2, §4, §6: after the owner's play test of C1, a wall piece's back on the wall's face, solid door leaves, a proud strip and stoops as nested blocks, a ceiling collider for the camera, and a fall guard. Earlier: §6: an arriving player stands on the ground under the arrival point, after C1's Wardens' station dropped the player 0.44 m. Earlier: §2: a wall seen thicker than 0.3 m keeps a body of 0.3 m on its line, and a single-sided wall between two rooms gets a seen face for the second, after the BK interiors. Earlier: §1: streets at 45° under a `KitFrame`, after the grid check of C1 §12. Earlier: §7: the agent shapes the ground once from the city plan, by the owner after the play test. Earlier: §8 points to the slice's asset map. Earlier: S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
+Last Updated: 2026-11-06 (§3 and §5: the street railing lowered to 1.04 m, its collider 1.2 m, so it reads low cover; the Combat Grid leaves out the Character and NoGrid layers, and only terrain below Sea Level is water. Earlier: §6: an interior assembled at run time keeps the kit's rules, and a solid piece keeps 0.16 m from a wall's line. Earlier: §2, §4, §6: after the owner's play test of C1, a wall piece's back on the wall's face, solid door leaves, a proud strip and stoops as nested blocks, a ceiling collider for the camera, and a fall guard. Earlier: §6: an arriving player stands on the ground under the arrival point, after C1's Wardens' station dropped the player 0.44 m. Earlier: §2: a wall seen thicker than 0.3 m keeps a body of 0.3 m on its line, and a single-sided wall between two rooms gets a seen face for the second, after the BK interiors. Earlier: §1: streets at 45° under a `KitFrame`, after the grid check of C1 §12. Earlier: §7: the agent shapes the ground once from the city plan, by the owner after the play test. Earlier: §8 points to the slice's asset map. Earlier: S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [10.1 Grid World and Environment Actions](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [COMBAT_GRID_TECH_TEST.md](COMBAT_GRID_TECH_TEST.md)
 Used by: [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -44,7 +44,7 @@ The Combat Grid has **1 m cells aligned to the world** (measured: at 1.5 m narro
 | Stair riser | at most 0.25 m, run at least 0.28 m | under the 0.4 m step, under 45° |
 | Ramp | at most 30° | under the 45° limit with margin |
 | Street, alley | at least 3 m and 2 m clear | three cells and two cells: a fight needs room |
-| Low cover (fence, crate line, low wall) | 0.8–1.2 m high | the cover rays sit at 0.7 m and 1.5 m (measured): low cover stops the first and not the second, so it reads as Half Cover |
+| Low cover (fence, crate line, low wall) | 0.8–1.2 m high, its collider included | the cover rays sit at 0.7 m and 1.5 m (measured): low cover stops the first and not the second, so it reads as Half Cover. A railing whose collider stood 1.36 m read as high cover wherever it stood 0.1 m above the cells beside it (grid check, 2026-11-06) |
 | High cover (wall, pillar, coach, tree trunk) | at least 1.6 m high | stops both rays: Full Cover |
 | Gap a fighter may jump | 1, 2, or 3 cells | Easy, Hard, Very hard of 10.1 |
 | Ledge a fighter may climb | at most 2 m | Climb Up of 10.1 |
@@ -70,6 +70,8 @@ The grid test found that pieces without colliders are invisible to the grid: abo
 | `Character` | player, NPCs, beasts | no |
 | `Interactable` | doors, shop counters, beds, resource nodes, containers | yes if it has a solid collider |
 | `NoGrid` | decoration without collision | no |
+
+`CombatGridReader`'s mask follows this table: it leaves out `Character`, `NoGrid`, Water, and Ignore Raycast. Until 2026-11-06 it read `Character`, so a standing person closed cells. Only the terrain below Sea Level reads as water, so an interior's floor near 0 m is a floor.
 
 A block that can be vaulted, climbed, or breached in a fight carries a tag component with its 10.1 action and band. The slice needs at least one vault or mantle tag ([10.1](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), *Vertical Slice Implications*).
 

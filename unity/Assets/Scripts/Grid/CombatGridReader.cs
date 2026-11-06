@@ -53,7 +53,9 @@ namespace GameDev.Grid
     {
         public const int MaxLevels = 16;
         public const int Reach = 20;
-        public const int Mask = Physics.DefaultRaycastLayers & ~(1 << 4);
+        // The grid reads the place, never the characters in it (AGENTS, Vertical Slice target), so it leaves out Water
+        // (4), the slice's Character layer (12), and NoGrid (14); Ignore Raycast (2) is already outside the defaults.
+        public const int Mask = Physics.DefaultRaycastLayers & ~(1 << 4) & ~(1 << 12) & ~(1 << 14);
         public const float SlopeLimitDegrees = 45f;
         public const float StepOffset = 0.4f;
         public const float TopY = WorldScale.TerrainHeightBudgetMeters + 20f;
@@ -324,7 +326,9 @@ namespace GameDev.Grid
         private static CombatGridSurface ReadSurface(RaycastHit hit)
         {
             var surface = new CombatGridSurface { Y = hit.point.y, Reason = CombatGridBlock.None, Standable = true };
-            if (hit.point.y < WorldScale.SeaLevelMeters)
+            // Water is the ground under the sea, so only the terrain below Sea Level reads as water: an interior's
+            // floor stands near 0 m and a quay's steps may dip below 24 m, and both are floors (2026-11-06).
+            if (hit.collider is TerrainCollider && hit.point.y < WorldScale.SeaLevelMeters)
             {
                 surface.Reason = CombatGridBlock.Water;
             }
