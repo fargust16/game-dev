@@ -19,6 +19,7 @@ namespace GameDev.World.Terrain.Tests
     /// they are fast and independent of the seed. The TerrainGen tests use the canonical seed and pin the
     /// field the terrain pipeline was built on. One test runs the full production bake.
     /// </remarks>
+    [Category("Slow")] // measured 2026-11-06 over 5 s a class; see unity/Assets/Plans/TEST_RUNS.md
     public sealed class OverworldTerrainBakeTests
     {
         private const int CanonicalSeed = 110201;

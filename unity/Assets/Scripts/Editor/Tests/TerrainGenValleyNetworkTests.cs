@@ -19,6 +19,7 @@ namespace GameDev.World.TerrainGen.Tests
     /// reclassified termination, no trajectory, no height.
     /// </para>
     /// </remarks>
+    [Category("Slow")] // measured 2026-11-06 over 5 s a class; see unity/Assets/Plans/TEST_RUNS.md
     public sealed class TerrainGenValleyNetworkTests
     {
         private static readonly int[] Seeds =

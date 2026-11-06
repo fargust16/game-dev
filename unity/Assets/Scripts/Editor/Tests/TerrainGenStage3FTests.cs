@@ -22,6 +22,7 @@ namespace GameDev.World.TerrainGen.Tests
     /// worlds are built once in <c>OneTimeSetUp</c> and shared, as the Stage 4A suite does.
     /// </para>
     /// </remarks>
+    [Category("Slow")] // measured 2026-11-06 over 5 s a class; see unity/Assets/Plans/TEST_RUNS.md
     public sealed class TerrainGenStage3FTests
     {
         private static readonly int[] Seeds = TerrainGenStage3FDump.CanonicalSeeds;

@@ -25,6 +25,10 @@ using Random = System.Random;
 
 `UnityEngine.Random` is allowed only for non-deterministic presentation (VFX jitter, one-off editor toys) — never for regenerable world content.
 
+## Test runs (must)
+
+Run the narrowest test set that covers a change, by `unity/Assets/Plans/TEST_RUNS.md`: `slice`, `slice-play`, or `world` (`-testCategory "!Slow"`). The Slow terrain fixtures take about 31 minutes and run only when TerrainGen or the bake changes, before a milestone, or on request. A new fixture that builds a world or bakes terrain gets `[Category("Slow")]` on its class.
+
 ## Related locks
 
 - ScriptableObjects = immutable defs only; no runtime state.

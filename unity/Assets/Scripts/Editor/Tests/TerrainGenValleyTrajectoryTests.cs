@@ -20,6 +20,7 @@ namespace GameDev.World.TerrainGen.Tests
     /// the corridors themselves and Stage 1's height field.
     /// </para>
     /// </remarks>
+    [Category("Slow")] // measured 2026-11-06 over 5 s a class; see unity/Assets/Plans/TEST_RUNS.md
     public sealed class TerrainGenValleyTrajectoryTests
     {
         private static readonly int[] Seeds =

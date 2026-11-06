@@ -23,6 +23,7 @@ namespace GameDev.World.TerrainGen.Tests
     /// the model is what a field would be sampled from.
     /// </para>
     /// </remarks>
+    [Category("Slow")] // measured 2026-11-06 over 5 s a class; see unity/Assets/Plans/TEST_RUNS.md
     public sealed class TerrainGenStage2BRobustnessTests
     {
         private static readonly int[] Seeds =

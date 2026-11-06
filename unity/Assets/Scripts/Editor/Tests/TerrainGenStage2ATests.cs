@@ -19,6 +19,7 @@ namespace GameDev.World.TerrainGen.Tests
     /// nothing here evaluates the 1025 x 1025 lattice.
     /// </para>
     /// </remarks>
+    [Category("Slow")] // measured 2026-11-06 over 5 s a class; see unity/Assets/Plans/TEST_RUNS.md
     public sealed class TerrainGenStage2ATests
     {
         private static readonly int[] Seeds = { 110201, 424242, 20260905, 7, 1337 };

@@ -20,6 +20,7 @@ namespace GameDev.World.TerrainGen.Tests
     /// fixture that regenerates per test would spend a minute proving the same thing twenty times.
     /// </para>
     /// </remarks>
+    [Category("Slow")] // measured 2026-11-06 over 5 s a class; see unity/Assets/Plans/TEST_RUNS.md
     public sealed class TerrainGenStage1Tests
     {
         private const int SeedA = 110201;

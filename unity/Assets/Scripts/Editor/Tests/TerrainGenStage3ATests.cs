@@ -27,6 +27,7 @@ namespace GameDev.World.TerrainGen.Tests
     /// taking the parts rather than a <see cref="Stage2BResult"/>.
     /// </para>
     /// </remarks>
+    [Category("Slow")] // measured 2026-11-06 over 5 s a class; see unity/Assets/Plans/TEST_RUNS.md
     public sealed class TerrainGenStage3ATests
     {
         /// <summary>The canonical five, the two the selection pass restored, and the refusals.</summary>

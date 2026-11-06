@@ -19,6 +19,7 @@ namespace GameDev.World.TerrainGen.Tests
     /// tie or an exactly-parallel pair on demand.
     /// </para>
     /// </remarks>
+    [Category("Slow")] // measured 2026-11-06 over 5 s a class; see unity/Assets/Plans/TEST_RUNS.md
     public sealed class TerrainGenValleyTopologyTests
     {
         private static readonly int[] Seeds =

@@ -21,6 +21,7 @@ namespace GameDev.World.TerrainGen.Tests
     /// actually score is measured by <see cref="TerrainGenStage3FVerifyDump"/> and read by a human.
     /// </para>
     /// </remarks>
+    [Category("Slow")] // measured 2026-11-06 over 5 s a class; see unity/Assets/Plans/TEST_RUNS.md
     public sealed class TerrainGenStage3FVerificationTests
     {
         private const int Seed = 110201;

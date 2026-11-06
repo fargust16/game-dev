@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 1.67
+Version: 1.68
 
 Status: Draft
 
-Last Updated: 2026-11-06 (the agent's passes rerun only at the owner's request, as for the play-test remarks)
+Last Updated: 2026-11-06 (test runs: the narrowest set that covers a change, and the Slow terrain fixtures only when needed, by the owner)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -425,6 +425,7 @@ An entry marked † is the short binding form. Its full text is in [91 Agent Dec
 - † **Road passability contract** (owner, 2026-08-31; approved but not Canonical, binding until a Canonical host exists): mountain terrain is traversable, so pathfinding expresses it as price, not refusal; `MountainPenalty` and `MountainCost` stay soft and never become `+Infinity`. Hard blocking is limited to water / `+Infinity`, earthwork beyond `MaxCutDepth` / `MaxFillHeight`, and grade >= `MaxWalkableGrade`. `ExistingCorridorDiscount` affects construction cost only and never passability: read passability from `LandscapeCostField.TerrainCost` / `TerrainCostAtTerrain`.
 - † **Target geography D6** (owner, 2026-10-20; [GEOGRAPHY_TARGET_BRIEF_G2.md](unity/Assets/Plans/GEOGRAPHY_TARGET_BRIEF_G2.md) §9): a regional geography with a landform grammar: a dominant branching mountain system, several large plateaus, barriers and routes designed together, deliberate valleys and lowlands, rivers to designated coastal outlets, coasts caused by their hinterland. The concept image is a composition: never infer counts, sizes, heights or positions from it. D6 sets a target, not a technique: production terrain stays `H4A`, and nothing in D6 authorises implementation.
 - † **Geography decisions after G3c** (2026-10-21): only *Resolved* parts bind. The world is not enlarged on G3c's evidence; one connected branching mountain system counts as one T1; a lake exists only in a Declared Basin with one outlet to the ocean, with no endorheic basin, and V0 water stays ocean only; hard gates are requirements with direct gameplay or topological meaning, morphology metrics are diagnostics, and pre-registered thresholds are never changed retroactively; flat land is never rewarded for its own sake; tier labels never decide traversal; geography provides regions, candidate areas and routes, and placement never reshapes terrain at region scale. None of these authorises production terrain work, a Stage 1 change, a new experiment or G3d.
+- **Test runs** (owner, 2026-11-06; `unity/Assets/Plans/TEST_RUNS.md`): Unity runs tests on one core, so run the narrowest set that covers a change: `slice`, `slice-play`, or `world`, which leaves out `[Category("Slow")]`. The 17 Slow terrain fixtures, nearly all of a full run's 31 minutes, run only when TerrainGen or the bake changes, before a milestone, or on request, in the background. A fixture over 5 s gets Slow on its class.
 - **Unity C# RNG:** seeded generation uses `System.Random` (via `IWorldSeed.Fork`), never `UnityEngine.Random`. In files with `using UnityEngine;`, alias with `using Random = System.Random;` to avoid CS0104. Detail: `.cursor/rules/unity-csharp.mdc`.
 
 When the user shares vision instead of a direct Open Question answer, synthesise a clear Draft answer, challenge contradictions, then write it into documents only after confirmation.
