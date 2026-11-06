@@ -863,7 +863,7 @@ Transform:
   m_Children:
   - {fileID: 6719588152201517400}
   - {fileID: 8932667948712734431}
-  - {fileID: 5915107278744439140}
+  - {fileID: 5898518269962077769}
   - {fileID: 566782657119016344}
   - {fileID: 4721464939118312770}
   - {fileID: 3132044293100031135}
@@ -1024,7 +1024,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.Kit.LooseProp
   thing: 1
---- !u!1 &7350670407444408997
+--- !u!1 &4897395077844307980
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1032,12 +1032,12 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5915107278744439140}
-  - component: {fileID: 977221272338443399}
-  - component: {fileID: 3725650986929191982}
-  - component: {fileID: 2544521563685662747}
-  - component: {fileID: 7221055349183433008}
-  - component: {fileID: 1384651128909525064}
+  - component: {fileID: 5898518269962077769}
+  - component: {fileID: 2154515456214252452}
+  - component: {fileID: 7066783579666505660}
+  - component: {fileID: 4926506755140683006}
+  - component: {fileID: 3731959319573746880}
+  - component: {fileID: 4625511010468655053}
   m_Layer: 14
   m_Name: ClutterPlate01
   m_TagString: Untagged
@@ -1045,13 +1045,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5915107278744439140
+--- !u!4 &5898518269962077769
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7350670407444408997}
+  m_GameObject: {fileID: 4897395077844307980}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0.28443226, y: 0.77958167, z: 0.28443223}
@@ -1060,21 +1060,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6176427382664112500}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!33 &977221272338443399
+--- !u!33 &2154515456214252452
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7350670407444408997}
+  m_GameObject: {fileID: 4897395077844307980}
   m_Mesh: {fileID: 4300000, guid: 5f0a1b349c791764ca4b1e4befa2dc3a, type: 3}
---- !u!23 &3725650986929191982
+--- !u!23 &7066783579666505660
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7350670407444408997}
+  m_GameObject: {fileID: 4897395077844307980}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -1117,13 +1117,13 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &2544521563685662747
+--- !u!64 &4926506755140683006
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7350670407444408997}
+  m_GameObject: {fileID: 4897395077844307980}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -1139,13 +1139,13 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 5f0a1b349c791764ca4b1e4befa2dc3a, type: 3}
---- !u!54 &7221055349183433008
+--- !u!54 &3731959319573746880
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7350670407444408997}
+  m_GameObject: {fileID: 4897395077844307980}
   serializedVersion: 5
   m_Mass: 0.5
   m_LinearDamping: 0
@@ -1166,13 +1166,13 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 3
---- !u!114 &1384651128909525064
+--- !u!114 &4625511010468655053
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7350670407444408997}
+  m_GameObject: {fileID: 4897395077844307980}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b350d7b9522c0147b051436ae4a3425, type: 3}

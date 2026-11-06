@@ -198,6 +198,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 
 The notes of `AGENTS.md`, newest first.
 
+2026-11-06 (test runs: the narrowest set that covers a change, and the Slow terrain fixtures only when needed, by the owner)
+
 2026-11-06 (the agent's passes rerun only at the owner's request, as for the play-test remarks)
 
 2026-11-06 (the seven interiors built once by `VeilmouthInteriors`; each is then the owner's)

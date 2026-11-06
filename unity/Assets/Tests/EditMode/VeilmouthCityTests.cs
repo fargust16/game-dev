@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S0.6, C1 §4–§5, §12: the city built from the plan C1 by <see cref="VeilmouthCity"/>.</summary>
+    /// <summary>S0.6, §4–§5, §12, §21: the city built from the plan C2 by <see cref="VeilmouthCity"/>.</summary>
     public sealed class VeilmouthCityTests
     {
         private UnityEngine.SceneManagement.Scene _scene;
@@ -51,7 +51,7 @@ namespace GameDev.Slice.Tests
                 doors.Add((t.position + (t.right * 1.5f), t.forward, t.right));
             }
 
-            Assert.Greater(doors.Count, 200);
+            Assert.Greater(doors.Count, 120); // C2 (city plan §21): 173 doors
             var faults = new List<string>();
             foreach (var lamp in lamps)
             {
@@ -112,13 +112,14 @@ namespace GameDev.Slice.Tests
             StringAssert.StartsWith("Overworld_", layers[4].name);
         }
 
-        /// <summary>The C0 dressing is gone; the C1 city stands under its own root.</summary>
+        /// <summary>The C0 dressing and the C1 city are gone; the C2 city stands under its own root.</summary>
         [Test]
-        public void TheC1CityReplacesTheC0Dressing()
+        public void TheC2CityReplacesTheEarlierLayouts()
         {
             var roots = _scene.GetRootGameObjects().Select(g => g.name).ToArray();
             CollectionAssert.Contains(roots, VeilmouthCity.RootName);
             CollectionAssert.DoesNotContain(roots, VeilmouthDressing.RootName);
+            CollectionAssert.DoesNotContain(roots, "Veilmouth C1");
         }
     }
 }

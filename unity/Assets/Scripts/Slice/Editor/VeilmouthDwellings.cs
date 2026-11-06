@@ -228,12 +228,12 @@ namespace GameDev.Slice.EditorTools
             return true;
         }
 
-        /// <summary>City plan C1 §3, in plan coordinates (px = X + 500, py = 500 − Z).</summary>
+        /// <summary>City plan C2 (§3, §21), in plan coordinates (px = X + 500, py = 500 − Z).</summary>
         public static DwellingWealth WealthAt(Vector3 world, DwellingArchetype archetype)
         {
             var px = world.x + 500f;
             var py = 500f - world.z;
-            if (py < 600f)
+            if (py < 680f)
             {
                 return DwellingWealth.Rich; // the Ridge
             }
@@ -243,7 +243,7 @@ namespace GameDev.Slice.EditorTools
                 return DwellingWealth.Poor;
             }
 
-            var lowerVeil = (px >= 470f && py >= 690f) || (px >= 545f && py > 600f && py < 662f);
+            var lowerVeil = (px >= 620f && py >= 744f) || (px >= 648f && py > 680f && py < 726f);
             return lowerVeil ? DwellingWealth.Poor : DwellingWealth.Middling;
         }
 

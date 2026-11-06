@@ -112,7 +112,7 @@ namespace GameDev.Slice.Tests
             var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             var doors = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Portal>())
                 .Where(p => p.Target.SceneName == SliceTestScenes.SceneName(VeilmouthDwellings.ScenePath)).ToList();
-            Assert.Greater(doors.Count, 200);
+            Assert.Greater(doors.Count, 60); // C2, the smaller city (city plan §21): 77 dwellings; C1 had 269
             Assert.AreEqual(doors.Count, doors.Select(d => d.Id).Distinct().Count(), "one id per door");
 
             var kinds = new HashSet<DwellingArchetype>();

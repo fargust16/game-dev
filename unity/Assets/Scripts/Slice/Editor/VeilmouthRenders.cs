@@ -25,35 +25,35 @@ namespace GameDev.Slice.EditorTools
             // The wind controller runs only in an editor frame; a batch render sets its globals itself.
             Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
-            // C1 views; an eye stands 1.7 m above the ground under it.
+            // C2 views; an eye stands 1.7 m above the ground under it.
             Top("view_world", new Vector3(0f, 0f, 0f), 500f);
-            Top("view_city", new Vector3(30f, 0f, -160f), 260f);
-            Top("view_lowerveil", new Vector3(170f, 0f, -255f), 80f);
-            Top("view_government", new Vector3(0f, 0f, -70f), 80f);
-            Top("view_market", new Vector3(-80f, 0f, -255f), 80f);
+            Top("view_city", new Vector3(130f, 0f, -228f), 160f);
+            Top("view_lowerveil", new Vector3(200f, 0f, -287f), 60f);
+            Top("view_government", new Vector3(110f, 0f, -170f), 60f);
+            Top("view_market", new Vector3(50f, 0f, -287f), 60f);
             Top("view_hill", new Vector3(420f, 0f, 140f), 180f);
-            Eye("eye_bellstreet", 215f, -235f, 100f, -235f, 2.5f);
-            Eye("eye_highstreet", -150f, -171f, 100f, -171f, 3f);
-            Eye("eye_avenue", 0f, -150f, 0f, -20f, 6f);
-            Eye("eye_ridgestreet", -80f, -86f, 100f, -86f, 3f);
-            Eye("eye_sootstair", 204f, -95f, 204f, -150f, 0f);
-            Eye("eye_bridge", 300f, -172f, 150f, -172f, 4f);
-            Eye("eye_quay", 100f, -318f, 300f, -330f, 0f);
-            Eye("eye_westgate", -300f, -172f, -200f, -150f, 4f);
+            Eye("eye_bellstreet", 195f, -275f, 100f, -275f, 2.5f);
+            Eye("eye_highstreet", -10f, -235f, 100f, -235f, 3f);
+            Eye("eye_avenue", 110f, -218f, 110f, -160f, 4f);
+            Eye("eye_ridgestreet", 0f, -168f, 120f, -168f, 3f);
+            Eye("eye_sootstair", 204f, -178f, 204f, -215f, 0f);
+            Eye("eye_bridge", 300f, -235f, 200f, -235f, 4f);
+            Eye("eye_quay", 100f, -318f, 230f, -330f, 0f);
+            Eye("eye_westgate", -80f, -235f, 20f, -220f, 4f);
             Eye("eye_forest", 123f, 120f, 123f, 300f, 2f);
             Eye("eye_hill", 340f, 0f, 420f, 140f, 20f);
             // The owner's remarks of 2026-11-06: the terraces' gardens, a corner house, a villa's garden, the North Gate.
-            Eye("eye_terraces", -190f, -103f, -190f, -150f, 2f);
-            Eye("eye_corner", -168f, -174f, -196f, -150f, 3f);
-            Eye("eye_villa", -100f, -87f, -122f, -66f, 3f);
-            Eye("eye_northgate", 123f, -8f, 123f, 14f, 4f);
-            Eye("eye_shopfront", -40f, -172f, -40f, -160f, 1.5f);
+            Eye("eye_terraces", 22f, -184f, 22f, -215f, 2f);
+            Eye("eye_corner", 30f, -237f, 2f, -213f, 3f);
+            Eye("eye_villa", 40f, -168f, 18f, -147f, 3f);
+            Eye("eye_northgate", 247f, -140f, 247f, -118f, 4f);
+            Eye("eye_shopfront", 60f, -235f, 60f, -223f, 1.5f);
             // Detached houses on their plots (city plan §19): the Terraces and the Ridge from above, a gate, a villa's side.
-            Top("view_terraces", new Vector3(-140f, 0f, -129f), 70f);
-            Top("view_ridge_west", new Vector3(-112f, 0f, -67f), 70f);
-            Top("view_ridge_east", new Vector3(126f, 0f, -67f), 75f);
-            Eye("eye_plot_gate", -194f, -117f, -205f, -117f, 1.7f);
-            Eye("eye_villa_side", -100f, -92f, -119f, -66f, 1.7f);
+            Top("view_terraces", new Vector3(26f, 0f, -203f), 50f);
+            Top("view_ridge_west", new Vector3(55f, 0f, -150f), 50f);
+            Top("view_ridge_east", new Vector3(220f, 0f, -150f), 50f);
+            Eye("eye_plot_gate", 18f, -199f, 7f, -199f, 1.7f);
+            Eye("eye_villa_side", 40f, -172f, 21f, -146f, 1.7f);
 
             RenderInteriors();
             Debug.Log($"Veilmouth views written to {OutputFolder}.");
@@ -228,8 +228,8 @@ namespace GameDev.Slice.EditorTools
                 Shot($"{prefix}_side", at + (one.right * 3.2f) + (Vector3.up * 0.2f), at);
             }
 
-            Top("townsfolk_routes_city", new Vector3(30f, 0f, -200f), 200f);
-            Top("townsfolk_routes_market", new Vector3(-90f, 0f, -230f), 50f);
+            Top("townsfolk_routes_city", new Vector3(130f, 0f, -250f), 150f);
+            Top("townsfolk_routes_market", new Vector3(50f, 0f, -270f), 40f);
             Debug.Log($"Townsfolk views written to {OutputFolder}.");
         }
 

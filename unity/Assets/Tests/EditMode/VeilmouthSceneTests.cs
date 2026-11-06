@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S0.6: Veilmouth.unity holds the C1 map, ground over the whole area shaped from C1, and the sea under it.</summary>
+    /// <summary>S0.6: Veilmouth.unity holds the C2 map, ground over the whole area shaped from C2, and the sea under it.</summary>
     public sealed class VeilmouthSceneTests
     {
         private UnityEngine.SceneManagement.Scene _scene;
@@ -41,15 +41,15 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(VeilmouthScene.TerrainLevel, ground, 0.01f);
         }
 
-        /// <summary>C1 §9: the Ridge 8 m up, the avenue's climb, the river and the sea dug below Sea Level, the hill.</summary>
-        [TestCase(-100f, -86f, VeilmouthGround.Ridge, 0.05f)] // Ridge Street
-        [TestCase(-100f, -171f, VeilmouthGround.Low, 0.05f)] // High Street
-        [TestCase(0f, -103f, 29.9f, 0.1f)] // halfway up Crown Avenue
-        [TestCase(204f, -121f, 29.9f, 0.3f)] // halfway down the Soot Stair
+        /// <summary>C2 §9, §21: the Ridge 4 m up, the avenue's climb, the river and the sea dug below Sea Level, the hill.</summary>
+        [TestCase(40f, -168f, VeilmouthGround.Ridge, 0.05f)] // Ridge Street
+        [TestCase(50f, -235f, VeilmouthGround.Low, 0.05f)] // High Street
+        [TestCase(110f, -194.5f, 27.9f, 0.1f)] // halfway up Crown Avenue
+        [TestCase(204f, -197f, 27.9f, 0.3f)] // halfway down the Soot Stair
         [TestCase(300f, -100f, VeilmouthGround.RiverBed, 0.05f)]
         [TestCase(0f, -400f, VeilmouthGround.SeaBed, 0.5f)]
         [TestCase(420f, 140f, VeilmouthGround.HillTop, 4f)] // the ore hill's top
-        public void TheGroundFollowsC1(float x, float z, float height, float tolerance)
+        public void TheGroundFollowsC2(float x, float z, float height, float tolerance)
         {
             var terrain = All<Terrain>().Single();
             var ground = terrain.SampleHeight(new Vector3(x, 0f, z)) + terrain.transform.position.y;
@@ -63,7 +63,7 @@ namespace GameDev.Slice.Tests
             float At(float x, float z) => terrain.SampleHeight(new Vector3(x, 0f, z));
             Assert.Greater(At(-498f, 100f) - At(-460f, 100f), 30f, "the west edge rises");
             Assert.Greater(Mathf.Atan((At(-480f, 100f) - At(-470f, 100f)) / 10f) * Mathf.Rad2Deg, 45f, "steeper than 45 degrees");
-            Assert.Less(At(-498f, -172f) - At(-460f, -172f), 8f, "the West road leaves through a pass");
+            Assert.Less(At(-498f, -235f) - At(-460f, -235f), 8f, "the West road leaves through a pass");
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
-        public void TheC1MapIsLaidOut()
+        public void TheC2MapIsLaidOut()
         {
             var zones = All<LayoutZone>().Where(z => z.transform.parent != null && z.transform.parent.name == VeilmouthScene.MapName).ToArray();
             CollectionAssert.AreEquivalent(VeilmouthScene.ZoneNames, zones.Select(z => z.name));

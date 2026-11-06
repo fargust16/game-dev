@@ -13,9 +13,9 @@ using Random = System.Random;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// Builds Veilmouth once from the city plan C1 (VEILMOUTH_CITY_PLAN.md §2–§7, §11 step 3), accepted by the owner on
-    /// 2026-11-05, on the ground <see cref="VeilmouthGround"/> shaped from it. Everything goes under one root,
-    /// <c>Veilmouth C1</c>, and from then on the owner moves, removes and adds by hand: it refuses to run twice.
+    /// Builds Veilmouth once from the city plan C2 (VEILMOUTH_CITY_PLAN.md §21, by the rules of §2–§7 and §19), accepted
+    /// by the owner on 2026-11-06, on the ground <see cref="VeilmouthGround"/> shaped from it. Everything goes under one
+    /// root, <c>Veilmouth C2</c>, and from then on the owner moves, removes and adds by hand: it refuses to run twice.
     /// <para>
     /// It paints the streets into the ground (five appended layers after the canonical five, which keep their order),
     /// lays kerbs; raises the town wall with its gates and towers, the Ridge's retaining wall, the Soot Stair's blind
@@ -34,7 +34,8 @@ namespace GameDev.Slice.EditorTools
     /// </summary>
     public static class VeilmouthCity
     {
-        public const string RootName = "Veilmouth C1";
+        public const string RootName = "Veilmouth C2";
+        private const string OldRootName = "Veilmouth C1"; // C2 replaces C1's layout (city plan §21)
         public const int AlphamapResolution = 1024;
         public const string LayerFolder = "Assets/Settings/TerrainLayers/Slice";
 
@@ -85,23 +86,19 @@ namespace GameDev.Slice.EditorTools
         /// </summary>
         private static readonly (Facing F, float Front, (int S0, int S1)[] Spans)[] TerracePlots =
         {
-            (Facing.E, 300f, new[] { (607, 629), (629, 651) }), (Facing.W, 320f, new[] { (607, 629) }),
-            (Facing.E, 410f, new[] { (607, 629), (629, 651) }), (Facing.W, 430f, new[] { (607, 629), (629, 651) }),
+            (Facing.E, 512f, new[] { (685, 713) }), (Facing.W, 532f, new[] { (685, 713) }),
         };
 
         private const int TerraceGarden = 4, TerraceBehind = 2;
 
         /// <summary>The Ridge's villa plots on Ridge Street's north side (§3.4, §19); the faction's house has its own.</summary>
-        private static readonly (int S0, int S1)[] VillaPlots = { (330, 359), (359, 388), (388, 417), (417, 446), (556, 581), (629, 663), (663, 697) };
+        private static readonly (int S0, int S1)[] VillaPlots = { (524, 555), (555, 586), (670, 704), (704, 737) };
 
-        private const float VillaFront = 574f;
+        private const float VillaFront = 656f;
         private const int VillaGarden = 5, VillaBehind = 3;
-        private const int FactionPlot0 = 581, FactionPlot1 = 617, FactionAt = 588;
+        private const int FactionPlot0 = 634, FactionPlot1 = 670, FactionAt = 641;
 
-        /// <summary>The small green beside the arch house to Wardley Garden (§19), plan metres.</summary>
-        private static readonly (float X0, float Y0, float X1, float Y1) ArchGreen = (316f, 641f, 332f, 651f);
-
-        [MenuItem("GameDev/Slice/Build Veilmouth City from C1 (once)")]
+        [MenuItem("GameDev/Slice/Build Veilmouth City from C2 (once)")]
         public static void Build() => Run(false);
 
         /// <summary>Batch only, for the agent's iterations: replaces this builder's own root.</summary>
@@ -121,7 +118,7 @@ namespace GameDev.Slice.EditorTools
             {
                 if (!replace)
                 {
-                    Debug.LogWarning($"{VeilmouthScene.ScenePath} already holds the C1 city; the builder does not run twice.");
+                    Debug.LogWarning($"{VeilmouthScene.ScenePath} already holds the C2 city; the builder does not run twice.");
                     return;
                 }
             }
@@ -134,9 +131,9 @@ namespace GameDev.Slice.EditorTools
 
             // Opened again: baking builds and drops its assemblies in the open scene.
             scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
-            foreach (var old in scene.GetRootGameObjects().Where(g => g.name == RootName || g.name == VeilmouthDressing.RootName))
+            foreach (var old in scene.GetRootGameObjects().Where(g => g.name == RootName || g.name == OldRootName || g.name == VeilmouthDressing.RootName))
             {
-                Object.DestroyImmediate(old); // C0's dressing pass: C1 replaces its layout (city plan, status)
+                Object.DestroyImmediate(old); // C0's dressing and C1's city: C2 replaces their layout (city plan §21)
             }
 
             // The layout zones again, now that the cellar's door and the chapel's forecourt have their places.
@@ -155,6 +152,7 @@ namespace GameDev.Slice.EditorTools
             _houses = new List<Vector2[]>();
             _fenced = new HashSet<(bool, float, int, int)>();
             _stepsClear = float.MaxValue;
+            _lampsAt.Clear();
 
             _root = new GameObject(RootName).transform;
             _people = Group("People");
@@ -176,8 +174,6 @@ namespace GameDev.Slice.EditorTools
             Slant();
             _parent = Group("Houses");
             Houses();
-            _parent = _gardens;
-            Gardens();
             _parent = Group("Squares and Yards");
             Market();
             Squares();
@@ -1024,14 +1020,14 @@ namespace GameDev.Slice.EditorTools
             Lanes(name, surface, walk > 0, Rect(px0 + walk, py0, px1 - walk, py1), Use.Road);
         }
 
-        private static readonly Vector2 SlantStart = new Vector2(325f, 680f);
-        private static readonly Vector2 SlantEnd = new Vector2(370f, 725f);
+        private static readonly Vector2 SlantStart = new Vector2(486f, 744f);
+        private static readonly Vector2 SlantEnd = new Vector2(516f, 774f);
 
         private static void Streets()
         {
             // The low town's yards and courts are paved with cobbles; the streets are painted over them.
-            _lanes.Add(new Lane { Street = "Yards", Quad = Rect(280, 600, 780, 830), Layer = Cobbles, PaintOnly = true });
-            _lanes.Add(new Lane { Street = "Soot Stair", Quad = Rect(700, 592, 708, 650), Layer = Cobbles, PaintOnly = true });
+            _lanes.Add(new Lane { Street = "Yards", Quad = Rect(480, 680, 780, 830), Layer = Cobbles, PaintOnly = true });
+            _lanes.Add(new Lane { Street = "Soot Stair", Quad = Rect(700, 674, 708, 714), Layer = Cobbles, PaintOnly = true });
             // The plots' gardens (§19) are green all over.
             var terraceDepth = _kit[TerraceKeys[0]].Depth;
             foreach (var (f, front, spans) in TerracePlots)
@@ -1048,59 +1044,54 @@ namespace GameDev.Slice.EditorTools
                 _lanes.Add(new Lane { Street = "Gardens", Quad = PlotQuad(Facing.S, VillaFront, s0, s1, villaDepth, VillaGarden, VillaBehind), Layer = Grass, PaintOnly = true });
             }
 
-            _lanes.Add(new Lane { Street = "Gardens", Quad = Rect(ArchGreen.X0, ArchGreen.Y0, ArchGreen.X1, ArchGreen.Y1), Layer = Grass, PaintOnly = true });
+            // §2 sections, C2's layout (§21). Order matters for paint: a later lane covers an earlier one where they cross.
+            StreetX("Ridge Street", 480, 752, 662, 674, 4, Setts);
+            StreetY("North Road", 742, 752, 626, 662, 0, Setts);
+            StreetX("High Street", 480, 590, 726, 744, 5, Asphalt);
+            StreetX("High Street East", 630, 780, 726, 744, 5, Asphalt); // the Circus between them, round its column
+            StreetY("Terrace Street", 516, 528, 680, 726, 4, Setts);
+            StreetX("Mercers Row", 480, 610, 770, 780, 3, Setts);
+            StreetX("Bell Street", 610, 700, 770, 780, 3, Setts);
+            StreetY("Cheap Street", 516, 528, 744, 812, 3, Setts);
+            StreetY("Market Street", 604, 616, 755, 812, 3, Setts);
+            StreetY("Dock Road", 700, 712, 744, 812, 3, Setts);
+            StreetX("Loom Lane", 616, 700, 792, 798, 0, Cobbles);
+            StreetX("Ridge Lane", 648, 700, 696, 702, 0, Cobbles);
+            StreetX("Stair Lane", 721, 778, 696, 702, 0, Cobbles);
+            StreetY("Ridge Alley", 670, 673, 702, 726, 0, Cobbles);
+            StreetX("Garden Walk", 528, 572, 680, 684, 0, Cobbles);
+            Lanes("Sea Quay", Setts, false, Rect(480, 812, 740, 830), Use.Walk);
+            Lanes("Basin Quay", Setts, false, Rect(712, 784, 780, 790), Use.Walk);
 
-            // §2 sections. Order matters for paint: a later lane covers an earlier one where they cross.
-            StreetX("Ridge Street", 280, 708, 580, 592, 4, Setts);
-            StreetY("North Road", 618, 628, 490, 580, 0, Setts);
-            StreetX("High Street", 280, 475, 662, 680, 5, Asphalt);
-            StreetX("High Street East", 525, 780, 662, 680, 5, Asphalt); // the Circus between them, round its column
-            StreetY("Terrace Street West", 304, 316, 606, 662, 4, Setts);
-            StreetY("Terrace Street East", 414, 426, 606, 662, 4, Setts);
-            StreetX("Back Lane", 280, 414, 600, 606, 0, Cobbles);
-            StreetX("Mercers Row", 280, 370, 730, 740, 3, Setts);
-            StreetX("Bell Street", 430, 724, 730, 740, 3, Setts);
-            StreetY("Cheap Street", 454, 466, 680, 812, 3, Setts);
-            StreetY("Dock Road", 724, 736, 680, 812, 3, Setts);
-            StreetX("Loom Lane", 560, 724, 778, 784, 0, Cobbles);
-            StreetX("Ridge Lane", 545, 698, 620, 626, 0, Cobbles);
-            Lanes("Sea Quay", Setts, false, Rect(280, 812, 740, 830), Use.Walk);
-            Lanes("Basin Quay", Setts, false, Rect(736, 780, 780, 790), Use.Walk);
-            StreetY("Court Alley", 620, 623, 680, 730, 0, Cobbles);
-            StreetY("Loom Alley", 670, 673, 740, 778, 0, Cobbles);
-            StreetY("Ridge Alley", 600, 603, 626, 662, 0, Cobbles);
-            StreetY("Chapel Lane", 306, 314, 548, 580, 0, Cobbles);
-            StreetX("Garden Passage", 328, 340, 630, 640, 0, Cobbles);
-
-            // Crown Avenue (§3.1): pavements, two carriageways and the mall between them, from the Circus to the forecourt.
-            Lanes("Crown Avenue", Flags, false, Rect(482, 560, 486, 646), Use.Walk);
-            Lanes("Crown Avenue", Flags, false, Rect(514, 560, 518, 646), Use.Walk);
-            Lanes("Crown Avenue", Asphalt, true, Rect(486, 560, 493, 646), Use.Road);
-            Lanes("Crown Avenue", Asphalt, true, Rect(507, 560, 514, 646), Use.Road);
-            Lanes("Crown Avenue", Square, false, Rect(493, 560, 507, 646), Use.Walk);
+            // Crown Avenue (§3.1): pavements, two carriageways and the mall between them, from the forecourt to the Circus.
+            Lanes("Crown Avenue", Flags, false, Rect(592, 662, 596, 715), Use.Walk);
+            Lanes("Crown Avenue", Flags, false, Rect(624, 662, 628, 715), Use.Walk);
+            Lanes("Crown Avenue", Asphalt, true, Rect(596, 662, 603, 715), Use.Road);
+            Lanes("Crown Avenue", Asphalt, true, Rect(617, 662, 624, 715), Use.Road);
+            Lanes("Crown Avenue", Square, false, Rect(603, 662, 617, 715), Use.Walk);
 
             // Squares and yards: no building stands on them; props may.
-            Lanes("Crown Circus", Square, false, Rect(475, 646, 525, 696), Use.Walk);
-            Lanes("Palace Forecourt", Square, false, Rect(460, 530, 540, 560), Use.Walk);
-            Lanes("Market Square", Square, false, Rect(370, 720, 430, 765), Use.Walk);
-            Lanes("Ritual Square", Square, false, Rect(642, 740, 667, 778), Use.Walk);
-            Lanes("Chapel Forecourt", Square, false, Rect(300, 540, 322, 556), Use.Walk);
-            Lanes("Wardley Garden", Grass, false, Rect(340, 606, 390, 644), Use.Walk);
-            Lanes("Cellar Yard", Cobbles, false, Rect(709, 626, 721, 662), Use.Walk);
-            Lanes("Soot & Bell Yard", Cobbles, false, Rect(696, 703, 716, 715), Use.Walk);
-            Lanes("Soot & Bell Gate", Cobbles, false, Rect(711, 715, 716, 730), Use.Walk);
-            Lanes("Pawn Corner", Cobbles, false, Rect(700, 768, 706, 778), Use.Walk);
+            Lanes("Crown Circus", Square, false, Rect(590, 715, 630, 755), Use.Walk);
+            Lanes("Palace Forecourt", Square, false, Rect(588, 648, 632, 662), Use.Walk);
+            Lanes("Market Square", Square, false, Rect(538, 744, 588, 770), Use.Walk);
+            Lanes("Ritual Square", Square, false, Rect(630, 780, 655, 806), Use.Walk);
+            Lanes("Chapel Forecourt", Square, false, Rect(480, 650, 502, 662), Use.Walk);
+            Lanes("Wardley Garden", Grass, false, Rect(546, 684, 570, 712), Use.Walk);
+            Lanes("Cellar Yard", Cobbles, false, Rect(709, 690, 721, 726), Use.Walk);
+            Lanes("Soot & Bell Yard", Cobbles, false, Rect(695, 755, 700, 770), Use.Walk);
+            Lanes("Tenement Court", Cobbles, false, Rect(650, 754, 660, 762.5f), Use.Walk);
+            Lanes("Pawn Corner", Cobbles, false, Rect(690, 798, 696, 808), Use.Walk);
 
-            // Tanners Slant, at 45° from the High Street to the Market Square (§12): setts, 8 m, no pavements, dark.
+            // Tanners Slant, at 45° from the High Street to Cheap Street (§12): setts, 8 m, no pavements, dark.
             Lanes("Tanners Slant", Setts, false, Along(SlantStart, SlantEnd, 4f, 6f), Use.Road);
 
             // What is not ground to build on: the river, the basin, the Soot Stair, the town wall's line, the bridge.
-            Take(Rect(778, 490, 830, 830), Use.Solid);
+            Take(Rect(778, 616, 830, 830), Use.Solid);
             Take(Rect(740, 790, 860, 830), Use.Solid);
-            Take(Rect(698, 592, 710, 662), Use.Solid);
-            Take(Rect(270, 480, 280, 840), Use.Solid);
-            Take(Rect(270, 480, 790, 490), Use.Solid);
-            Take(Rect(280, 599, 780, 601), Use.Solid); // the retaining wall
+            Take(Rect(698, 674, 710, 726), Use.Solid);
+            Take(Rect(470, 616, 480, 840), Use.Solid);
+            Take(Rect(470, 616, 790, 626), Use.Solid);
+            Take(Rect(480, 679, 780, 681), Use.Solid); // the retaining wall
         }
 
         private static void PaintStreets()
@@ -1257,39 +1248,39 @@ namespace GameDev.Slice.EditorTools
             // the North Gate and the chapel's postern; a tower either side of each gate.
             // A run stops at its tower's face and the lintel spans between the towers at the wall's own thickness and
             // top: no two faces lie in one plane (the owner saw the gate flicker, 2026-11-06).
-            WallRun(true, 278f, 280f, 490, 660, 6f);
-            WallRun(true, 278f, 280f, 684, 830, 6f);
-            WallRun(false, 488f, 490f, 278, 611, 6f, (330, 333));
-            WallRun(false, 488f, 490f, 635, 780, 6f);
-            Lintel(true, 278f, 280f, 665f, 679f, 6f);
-            Lintel(false, 488f, 490f, 616f, 630f, 6f);
-            House(VictorianHouses.Key("Tower2", "stone"), Facing.W, 275f, 660, name: "West Gate - north tower", force: true);
-            House(VictorianHouses.Key("Tower2", "stone"), Facing.W, 275f, 679, name: "West Gate - south tower", force: true);
-            House(VictorianHouses.Key("Tower2", "stone"), Facing.N, 485f, 611, name: "North Gate - west tower", force: true);
-            House(VictorianHouses.Key("Tower2", "stone"), Facing.N, 485f, 630, name: "North Gate - east tower", force: true);
+            WallRun(true, 478f, 480f, 626, 723, 6f);
+            WallRun(true, 478f, 480f, 747, 830, 6f);
+            WallRun(false, 624f, 626f, 478, 735, 6f);
+            WallRun(false, 624f, 626f, 759, 780, 6f);
+            Lintel(true, 478f, 480f, 728f, 742f, 6f);
+            Lintel(false, 624f, 626f, 740f, 754f, 6f);
+            House(VictorianHouses.Key("Tower2", "stone"), Facing.W, 475f, 723, name: "West Gate - north tower", force: true);
+            House(VictorianHouses.Key("Tower2", "stone"), Facing.W, 475f, 742, name: "West Gate - south tower", force: true);
+            House(VictorianHouses.Key("Tower2", "stone"), Facing.N, 621f, 735, name: "North Gate - west tower", force: true);
+            House(VictorianHouses.Key("Tower2", "stone"), Facing.N, 621f, 754, name: "North Gate - east tower", force: true);
 
             // The Ridge's retaining wall, with a parapet of 1 m, wherever the two levels differ.
             // It stops where a street crosses its line (the owner found Crown Avenue walled off, 2026-11-06).
-            for (var px = 280; px < 780; px += 2)
+            for (var px = 480; px < 780; px += 2)
             {
-                var cell = Rect(px, 599.3f, px + 2, 600.7f);
-                if ((px >= 698 && px < 710) || _lanes.Any(l => !l.PaintOnly && l.Quad.Min(q => q.y) < 599f && l.Quad.Max(q => q.y) > 601f && Overlap(l.Quad, cell)))
+                var cell = Rect(px, 679.3f, px + 2, 680.7f);
+                if ((px >= 698 && px < 710) || _lanes.Any(l => !l.PaintOnly && l.Quad.Min(q => q.y) < 679f && l.Quad.Max(q => q.y) > 681f && Overlap(l.Quad, cell)))
                 {
                     continue;
                 }
 
-                var top = Mathf.Max(Ground(px + 1f, 598.5f), Ground(px + 1f, 597f));
-                var bottom = Mathf.Min(Ground(px + 1f, 601.5f), Ground(px + 1f, 603f));
+                var top = Mathf.Max(Ground(px + 1f, 678.5f), Ground(px + 1f, 677f));
+                var bottom = Mathf.Min(Ground(px + 1f, 681.5f), Ground(px + 1f, 683f));
                 if (top - bottom < 0.3f)
                 {
                     continue;
                 }
 
-                Slab(px, px + 2, 599.3f, 600.7f, bottom - 0.5f, top + 1f);
+                Slab(px, px + 2, 679.3f, 680.7f, bottom - 0.5f, top + 1f);
             }
 
             // The Soot Stair's blind walls, either side of its causeway, at least 3.2 m over the low ground.
-            for (var py = 600; py < 650; py += 2)
+            for (var py = 680; py < 714; py += 2)
             {
                 var causeway = Mathf.Max(Ground(704f, py), Ground(704f, py + 2f));
                 var top = Mathf.Max(causeway + 1f, Low + 3.2f);
@@ -1297,18 +1288,18 @@ namespace GameDev.Slice.EditorTools
                 Slab(708f, 709f, py, py + 2, Low - 0.5f, top);
             }
 
-            Slab(698.6f, 709f, 650f, 650.6f, Low - 0.5f, Low + 0.3f); // the stair's last step
+            Slab(698.6f, 709f, 714f, 714.6f, Low - 0.5f, Low + 0.3f); // the stair's last step
 
             // The cellar door in the stair's east wall, opening on its yard (§5.3).
-            _works.Box(World(709.05f, 634.5f, Low + 1.2f), new Vector3(0.1f, 2.4f, 1.6f), 0f, false, "Dark grey");
+            _works.Box(World(709.05f, 700.5f, Low + 1.2f), new Vector3(0.1f, 2.4f, 1.6f), 0f, false, "Dark grey");
             var leaf = (GameObject)PrefabUtility.InstantiatePrefab(_kit["PortalLeaf"].Prefab, _parent);
-            leaf.transform.SetPositionAndRotation(World(709f, 633f, Up(Low)), Quaternion.Euler(0f, 90f, 0f));
+            leaf.transform.SetPositionAndRotation(World(709f, 699f, Up(Low)), Quaternion.Euler(0f, 90f, 0f));
             Configure(leaf, "soot-stair-cellar.street", VeilmouthDressing.CellarScenePath, "soot-stair-cellar.inside");
-            _doors.Add((new Vector2(709f, 634.5f), new Vector2(1f, 0f)));
+            _doors.Add((new Vector2(709f, 700.5f), new Vector2(1f, 0f)));
 
             // The river's embankment along the city, with a parapet; the basin's walls; the sea quay's edge.
             // It runs on to the bridge's parapets, so no corner is left open (owner's fourth play test, 2026-11-06).
-            for (var py = 490; py < 790; py += 4)
+            for (var py = 626; py < 790; py += 4)
             {
                 var top = Ground(778f, py + 2f) + 1f;
                 if (py + 4 > BridgeNorth && py < BridgeSouth)
@@ -1339,7 +1330,7 @@ namespace GameDev.Slice.EditorTools
                 Slab(px, px + 4, 789f, 790.5f, VeilmouthGround.SeaBed - 1f, Ground(px + 2f, 787f) + 0.3f);
             }
 
-            for (var px = 280; px < 740; px += 4)
+            for (var px = 480; px < 740; px += 4)
             {
                 Slab(px, px + 4, 829.5f, 831f, VeilmouthGround.SeaBed - 3f, Ground(px + 2f, 828f) + 0.3f);
             }
@@ -1414,7 +1405,7 @@ namespace GameDev.Slice.EditorTools
             _works.Box(World((px0 + px1) / 2f, (py0 + py1) / 2f, (y0 + y1) / 2f), new Vector3(px1 - px0, y1 - y0, py1 - py0), 0f,
                 true, material);
 
-        private const float BridgeNorth = 663.4f, BridgeSouth = 680.6f; // the parapets' outer faces
+        private const float BridgeNorth = 726.4f, BridgeSouth = 743.6f; // the parapets' outer faces
 
         /// <summary>
         /// The Veil Bridge (§3.8): a stone deck at street level over the river on piers, with parapets, to the east bank.
@@ -1424,36 +1415,34 @@ namespace GameDev.Slice.EditorTools
         private static void Bridge()
         {
             const float deck = Low + 0.1f;
-            Slab(778f, 854f, 664f, 680f, deck - 1.2f, deck, "Paving stones");
-            Slab(780f, 852f, BridgeNorth, 664f, deck - 1.2f, deck + 1.1f);
-            Slab(780f, 852f, 680f, BridgeSouth, deck - 1.2f, deck + 1.1f);
+            Slab(778f, 854f, 727f, 743f, deck - 1.2f, deck, "Paving stones");
+            Slab(780f, 852f, BridgeNorth, 727f, deck - 1.2f, deck + 1.1f);
+            Slab(780f, 852f, 743f, BridgeSouth, deck - 1.2f, deck + 1.1f);
             Slab(778f, 780.5f, BridgeNorth, BridgeSouth, VeilmouthGround.RiverBed - 0.5f, deck - 1.2f);
             Slab(840f, 854f, BridgeNorth, BridgeSouth, VeilmouthGround.RiverBed - 0.5f, deck - 1.2f);
             foreach (var px in new[] { 792f, 806f, 820f, 834f })
             {
-                Slab(px - 1.5f, px + 1.5f, 662f, 682f, VeilmouthGround.RiverBed - 1f, deck - 1.2f);
+                Slab(px - 1.5f, px + 1.5f, 725f, 745f, VeilmouthGround.RiverBed - 1f, deck - 1.2f);
             }
 
-            Take(Rect(778, 662, 852, 682), Use.Solid);
+            Take(Rect(778, 725, 852, 745), Use.Solid);
         }
 
         // ------------------------------------------------------------------------------------------- buildings
 
         private static void Government()
         {
-            // The Governor's Palace closes the avenue (§3.1): the marble centre with a wing either side, on the forecourt.
-            House(VictorianHouses.Key("Civic16", "marble"), Facing.S, 530f, 480, name: "The Governor's Palace", force: true);
-            House(VictorianHouses.Key("Wing12", "marble"), Facing.S, 530f, 450, name: "The Governor's Palace - west wing", force: true);
-            House(VictorianHouses.Key("Wing12", "marble"), Facing.S, 530f, 520, name: "The Governor's Palace - east wing", force: true);
+            // The Governor's Palace closes the avenue (§3.1): the marble centre on its forecourt; C2 has no wings (§21).
+            House(VictorianHouses.Key("Civic16", "marble"), Facing.S, 648f, 590, name: "The Governor's Palace", force: true);
 
             // The Town Hall on the avenue's west flank, facing it, on its podium over the slope.
-            House(VictorianHouses.Key("Civic16", "stone"), Facing.E, 478f, 606, name: "The Town Hall");
+            House(VictorianHouses.Key("Civic12", "stone"), Facing.E, 592f, 684, name: "The Town Hall");
         }
 
         private static void Openable()
         {
             // The Wardens' station and lock-up in the Assize, on the avenue's east flank (§3.1, §5.3).
-            var assize = House(VictorianHouses.Key("Civic12", "stone"), Facing.W, 522f, 610, name: "The Assize and the Wardens' station", force: true);
+            var assize = House(VictorianHouses.Key("Civic12", "stone"), Facing.W, 628f, 684, name: "The Assize and the Wardens' station", force: true);
             Entrance(assize, "wardens-lockup.street", VeilmouthDressing.LockupScenePath, "wardens-lockup.inside");
 
             // The faction's house, a villa on Ridge Street in the largest plot (§19).
@@ -1461,20 +1450,20 @@ namespace GameDev.Slice.EditorTools
                 new Random(FactionPlot0), "The faction's house", FactionAt, true);
             Entrance(faction, "faction-house.street", VeilmouthDressing.FactionHouseScenePath, "faction-house.inside");
 
-            // The Soot & Bell, the corner house on Bell Street with its yard behind, and Harrow & Tincture by it.
-            var bell = House(VictorianHouses.Key("Tavern6", "brick"), Facing.S, 730f, 696, name: "The Soot & Bell", force: true);
+            // The Soot & Bell on Bell Street with its yard beside it on Dock Road, and Harrow & Tincture by it.
+            var bell = House(VictorianHouses.Key("Tavern6", "brick"), Facing.S, 770f, 680, name: "The Soot & Bell", force: true);
             Entrance(bell, VeilmouthScene.SootAndBellStreetPortalId, VeilmouthScene.SootAndBellScenePath, VeilmouthScene.SootAndBellInsidePortalId);
-            var harrow = House(VictorianHouses.Key("Shop4", "brick"), Facing.S, 730f, 686, name: "Harrow & Tincture", force: true);
+            var harrow = House(VictorianHouses.Key("Shop4", "brick"), Facing.S, 770f, 670, name: "Harrow & Tincture", force: true);
             Entrance(harrow, "harrow-apothecary.street", VeilmouthDressing.HarrowScenePath, "harrow-apothecary.inside");
-            Prop("NoticeBoard", Facing.S, 711f, 728f, "Notice Board");
+            Prop("NoticeBoard", Facing.S, 696f, 768f, "Notice Board");
 
             // The missing person's tenement on Loom Lane.
-            var missing = House(VictorianHouses.Key("Tenement4", "brick2"), Facing.S, 778f, 625, name: "The missing person's tenement", force: true);
+            var missing = House(VictorianHouses.Key("Tenement4", "brick2"), Facing.N, 798f, 665, name: "The missing person's tenement", force: true);
             Entrance(missing, "missing-room.street", VeilmouthDressing.MissingRoomScenePath, "missing-room.inside");
 
-            // The old chapel in the north-west corner, its forecourt toward Chapel Lane (§3.7).
+            // The old chapel in the north-west corner, its forecourt on Ridge Street (§3.7).
             var chapelKey = "Chapel";
-            var chapel = House(chapelKey, Facing.S, 540f, 304, name: "The old chapel", force: true);
+            var chapel = House(chapelKey, Facing.S, 650f, 484, name: "The old chapel", force: true);
             var right = chapel.transform.right;
             var door = chapel.transform.position + (chapel.transform.rotation * new Vector3(_kit[chapelKey].DoorX, 0f, _kit[chapelKey].Depth));
             var leaf = (GameObject)PrefabUtility.InstantiatePrefab(_kit["PortalLeaf"].Prefab, _parent);
@@ -1495,14 +1484,14 @@ namespace GameDev.Slice.EditorTools
             var rng = new Random(45);
             foreach (var side in new[] { 1, -1 })
             {
-                for (var x = 10; x < 56;)
+                for (var x = 6; x < 36;)
                 {
                     var key = palette[rng.Next(palette.Length)];
                     var e = _kit[key];
                     var z0 = side > 0 ? 4f : -4f - e.Depth;
                     var local = new[] { new Vector2(x, z0), new Vector2(x + e.Width, z0), new Vector2(x + e.Width, z0 + e.Depth), new Vector2(x, z0 + e.Depth) };
                     var quad = local.Select(l => Plan(frame.transform.TransformPoint(new Vector3(l.x, 0f, l.y)))).ToArray();
-                    if (x + e.Width > 56 || !Free(quad, true))
+                    if (x + e.Width > 36 || !Free(quad, true))
                     {
                         x += 1;
                         continue;
@@ -1539,14 +1528,12 @@ namespace GameDev.Slice.EditorTools
             var market = Keys("Shop4", "brick", "brick2", "grey", "stucco").Concat(Keys("Tenement4", "brick", "grey")).Concat(Keys("Tenement2", "brick2", "grey")).ToArray();
             var warehouses = Keys("Warehouse6", "warehouse");
 
-            // The arch house of the terraces: through it from Terrace Street West into Wardley Garden (§7).
-            House(VictorianHouses.Key("Arch4", "stucco"), Facing.W, 320f, 630, name: "Arch house - to Wardley Garden");
-            // The arch house of Lower Veil: from Mercers Row into the tenement court behind it.
-            House(VictorianHouses.Key("Arch4", "brick"), Facing.S, 730f, 600, name: "Arch house - to the tenement court");
+            // The arch house of Lower Veil: from Bell Street into the tenement court behind it. C2 drops the Terraces' (§21).
+            House(VictorianHouses.Key("Arch4", "brick"), Facing.S, 770f, 650, name: "Arch house - to the tenement court");
 
             // High Street (§3.2): four storeys of one cornice height, shops below, wall to wall.
-            Row(Facing.S, 662f, 280, 778, shops, 1);
-            Row(Facing.N, 680f, 280, 778, shops, 2);
+            Row(Facing.S, 726f, 480, 778, shops, 1);
+            Row(Facing.N, 744f, 480, 778, shops, 2);
 
             // The Terraces (§3.3) and the Ridge (§3.4): detached houses, each on its own railed plot with its garden (§19).
             var rng = new Random(3);
@@ -1563,27 +1550,27 @@ namespace GameDev.Slice.EditorTools
                 Plot(Facing.S, VillaFront, s0, s1, VillaKeys[rng.Next(VillaKeys.Length)], VillaGarden, VillaBehind, new Random(s0));
             }
 
-            // Under the Ridge and Ridge Lane: tenements.
-            Row(Facing.S, 620f, 545, 698, tenements, 9);
-            Row(Facing.N, 626f, 545, 698, tenements, 10);
+            // Under the Ridge, on Ridge Lane and Stair Lane: tenements.
+            Row(Facing.S, 696f, 648, 700, tenements, 9);
+            Row(Facing.N, 702f, 648, 700, tenements, 10);
+            Row(Facing.S, 696f, 721, 778, tenements, 24);
+            Row(Facing.N, 702f, 721, 778, tenements, 25);
 
             // Market Quarter (§3.5) and Lower Veil (§3.6).
-            Row(Facing.S, 730f, 280, 724, market, 11);
-            Row(Facing.N, 740f, 280, 724, market, 12);
-            Row(Facing.S, 720f, 370, 430, market, 13);
-            Row(Facing.N, 765f, 370, 430, market, 14);
-            Row(Facing.E, 370f, 720, 765, market, 15);
-            Row(Facing.W, 430f, 720, 765, market, 16);
-            Row(Facing.E, 454f, 690, 812, market, 17);
-            Row(Facing.W, 466f, 690, 812, market, 18);
-            Row(Facing.S, 778f, 560, 724, tenements, 19);
-            Row(Facing.N, 784f, 560, 724, tenements, 20);
-            Row(Facing.E, 724f, 690, 812, tenements, 21);
-            Row(Facing.W, 736f, 690, 780, warehouses, 22);
-            Row(Facing.S, 812f, 280, 724, warehouses, 23);
+            Row(Facing.S, 770f, 480, 700, market, 11);
+            Row(Facing.N, 780f, 480, 700, market, 12);
+            Row(Facing.W, 588f, 744, 770, market, 16);
+            Row(Facing.E, 516f, 744, 812, market, 17);
+            Row(Facing.W, 528f, 744, 812, market, 18);
+            Row(Facing.E, 604f, 755, 812, market, 14);
+            Row(Facing.W, 616f, 755, 812, market, 13);
+            Row(Facing.N, 798f, 616, 700, tenements, 20);
+            Row(Facing.E, 700f, 744, 812, tenements, 21);
+            Row(Facing.W, 712f, 754, 784, warehouses, 22);
+            Row(Facing.S, 812f, 480, 616, warehouses, 23);
 
             // The Customs House at the basin's head.
-            House(VictorianHouses.Key("Civic12", "stone"), Facing.S, 780f, 744, name: "The Customs House");
+            House(VictorianHouses.Key("Civic12", "stone"), Facing.S, 784f, 742, name: "The Customs House");
         }
 
         // ------------------------------------------------------------------------------------------- squares
@@ -1591,134 +1578,119 @@ namespace GameDev.Slice.EditorTools
         private static void Market()
         {
             // Market Square (§3.5, §6.1): stalls in rows with an aisle, the Masters' counters, the seer's booth.
-            Prop("Stall_Goods", Facing.S, 378f, 721f, "The trader's stall");
-            Prop("Stall_Empty", Facing.S, 388f, 721f, "Master of Enchanting");
-            Prop("Stall_Empty", Facing.S, 398f, 721f, "Master of First Aid");
-            Prop("BottleTable", Facing.S, 408f, 722f);
-            Prop("Counter", Facing.S, 414f, 722f, "The seer's counter");
-            Prop("Candles", Facing.S, 418f, 722f);
-            Prop("Stall_Food", Facing.N, 388f, 758f);
-            Prop("Stall_Fish", Facing.N, 398f, 758f);
-            Prop("Stall_Meat", Facing.N, 408f, 758f);
-            Prop("Stall_Weapons", Facing.E, 372f, 746f, "Master of Item Creation");
-            for (var py = 744; py < 764; py += 2)
+            Prop("Stall_Goods", Facing.S, 541f, 745f, "The trader's stall");
+            Prop("Stall_Empty", Facing.S, 550f, 745f, "Master of Enchanting");
+            Prop("Stall_Empty", Facing.S, 559f, 745f, "Master of First Aid");
+            Prop("BottleTable", Facing.S, 568f, 746f);
+            Prop("Counter", Facing.S, 574f, 746f, "The seer's counter");
+            Prop("Candles", Facing.S, 578f, 746f);
+            Prop("Stall_Food", Facing.N, 556f, 763f);
+            Prop("Stall_Fish", Facing.N, 565f, 763f);
+            Prop("Stall_Meat", Facing.N, 574f, 763f);
+            Prop("Stall_Weapons", Facing.E, 539f, 754f, "Master of Item Creation");
+            for (var py = 752; py < 768; py += 2)
             {
-                Prop("Fence", Facing.E, 384f, py);
+                Prop("Fence", Facing.E, 552f, py);
             }
 
-            Prop("Anvil", Facing.N, 377f, 752f);
-            Prop("LeatherFrame", Facing.N, 379f, 757f);
-            Prop("ArmourStand", Facing.N, 375f, 760f);
-            Prop("Firewood", Facing.N, 381f, 760f);
-            Prop("Barrel", Facing.N, 382f, 748f);
-            foreach (var (px, py) in new[] { (396, 742), (406, 742), (416, 742) })
+            Prop("Anvil", Facing.N, 546f, 758f);
+            Prop("LeatherFrame", Facing.N, 547f, 762f);
+            Prop("ArmourStand", Facing.N, 542f, 766f);
+            Prop("Firewood", Facing.N, 548f, 766f);
+            Prop("Barrel", Facing.N, 549f, 753f);
+            foreach (var (px, py) in new[] { (558, 756), (566, 756), (574, 756) })
             {
                 Prop("Bench", Facing.N, px, py);
             }
         }
 
-        /// <summary>The small green beside the arch house to Wardley Garden (§19): unrailed, a tree, shrubs, a bench.</summary>
-        private static void Gardens()
-        {
-            Prop("Tree_Fruit", Facing.N, 325f, 646f);
-            foreach (var (px, py, key) in new[] { (329f, 642f, "Shrub"), (329f, 649f, "Poppy"), (322f, 649.5f, "Shrub"), (317.5f, 649.5f, "Poppy") })
-            {
-                Prop(key, Facing.N, px, py);
-            }
-
-            Prop("Bench", Facing.W, 318f, 642f);
-        }
-
         private static void Squares()
         {
             // Crown Avenue's mall: trees in pairs every 20 m, benches between them (§3.1).
-            for (var py = 566; py < 640; py += 20)
+            for (var py = 668; py < 710; py += 20)
             {
-                Prop("Tree_Fruit", Facing.N, 495f, py);
-                Prop("Tree_Fruit", Facing.N, 504f, py);
-                Prop("Bench", Facing.E, 494f, py + 9f);
-                Prop("Bench", Facing.W, 504f, py + 9f);
+                Prop("Tree_Fruit", Facing.N, 605f, py);
+                Prop("Tree_Fruit", Facing.N, 614f, py);
+                Prop("Bench", Facing.E, 604f, py + 9f);
+                Prop("Bench", Facing.W, 614f, py + 9f);
             }
 
-            Prop("Column", Facing.N, 499f, 670f, "The Crown Column");
-            foreach (var (px, py) in new[] { (470, 538), (528, 538), (470, 552), (528, 552) })
-            {
-                Prop("Tree_Fruit", Facing.N, px, py);
-            }
-
-            // Wardley Garden (§3.3): railings round a lawn, trees at its corners, benches, a gate on each side.
-            Railings(true, 607f, 341, 355);
-            Railings(true, 607f, 361, 389);
-            Railings(true, 643f, 341, 389);
-            Railings(false, 341f, 607, 629);
-            Railings(false, 341f, 641, 643);
-            Railings(false, 389f, 607, 643);
-            foreach (var (px, py) in new[] { (346, 612), (382, 612), (346, 636), (382, 636), (364, 624) })
+            Prop("Column", Facing.N, 609f, 734f, "The Crown Column");
+            foreach (var (px, py) in new[] { (590, 653), (629, 653) })
             {
                 Prop("Tree_Fruit", Facing.N, px, py);
             }
 
-            foreach (var (px, py, f) in new[] { (356, 620, Facing.S), (370, 620, Facing.S), (356, 630, Facing.N), (370, 630, Facing.N) })
+            // Wardley Garden (§3.3): railings round a lawn, trees at its corners, benches, a gate from the Garden Walk.
+            Railings(true, 685f, 547, 555);
+            Railings(true, 685f, 561, 569);
+            Railings(true, 711f, 547, 569);
+            Railings(false, 547f, 685, 711);
+            Railings(false, 569f, 685, 711);
+            foreach (var (px, py) in new[] { (551, 689), (564, 689), (551, 706), (564, 706), (557, 697) })
+            {
+                Prop("Tree_Fruit", Facing.N, px, py);
+            }
+
+            foreach (var (px, py, f) in new[] { (550, 693, Facing.S), (561, 693, Facing.S), (550, 701, Facing.N), (561, 701, Facing.N) })
             {
                 Prop("Bench", f, px, py);
             }
 
             var rng = new Random(606);
-            for (var i = 0; i < 40; i++)
+            for (var i = 0; i < 20; i++)
             {
-                Prop(i % 4 == 0 ? "Poppy" : "Shrub", Facing.N, 341 + rng.Next(48), 607 + rng.Next(36));
+                Prop(i % 4 == 0 ? "Poppy" : "Shrub", Facing.N, 548 + rng.Next(20), 686 + rng.Next(24));
             }
 
             // The chapel's graveyard and forecourt; Ritual Site Candidate 3 is the forecourt (§3.7).
-            for (var px = 328; px <= 340; px += 3)
+            for (var px = 505; px <= 517; px += 3)
             {
-                for (var py = 512; py <= 532; py += 4)
+                for (var py = 631; py <= 643; py += 4)
                 {
                     Prop("Grave", Facing.S, px, py);
                 }
             }
 
-            for (var px = 326; px < 344; px += 4)
+            for (var px = 503; px < 519; px += 4)
             {
-                Prop("GraveWall", Facing.N, px, 509.9f);
-                Prop("GraveWall", Facing.N, px, 537.9f);
+                Prop("GraveWall", Facing.N, px, 627.9f);
+                Prop("GraveWall", Facing.N, px, 647.9f);
             }
 
-            Circle(World(311f, 548f, Up(Ground(311f, 548f))), "Candidate 3, before the old chapel");
+            Circle(World(491f, 656f, Up(Ground(491f, 656f))), "Candidate 3, before the old chapel");
 
             // Ritual Site Candidate 1, the small square in Lower Veil, between Bell Street and Loom Lane.
-            Prop("Bench", Facing.N, 645f, 746f);
-            Prop("Bench", Facing.N, 660f, 746f);
-            Prop("TrashCan", Facing.N, 643f, 774f);
-            Circle(World(654.5f, 760f, Up(Ground(654.5f, 760f))), "Candidate 1, the Lower Veil square");
+            Prop("Bench", Facing.N, 633f, 786f);
+            Prop("Bench", Facing.N, 648f, 786f);
+            Prop("TrashCan", Facing.N, 631f, 803f);
+            Circle(World(642.5f, 793f, Up(Ground(642.5f, 793f))), "Candidate 1, the Lower Veil square");
 
             // The Soot & Bell's yard (§6.1) and the tenement court.
-            Prop("Barrels", Facing.N, 698f, 705f);
-            Prop("Barrel", Facing.N, 703f, 705f);
-            Prop("Firewood", Facing.N, 706f, 705f);
-            Prop("Crate", Facing.N, 712f, 706f);
-            Prop("Box", Facing.N, 713f, 709f);
-            Prop("Barrel", Facing.N, 712f, 703f);
-            Prop("Barrel", Facing.N, 610f, 712f);
-            Prop("Crate", Facing.N, 612f, 716f);
-            Prop("Box", Facing.N, 608f, 714f);
+            Prop("Barrels", Facing.N, 696f, 757f);
+            Prop("Barrel", Facing.N, 698f, 760f);
+            Prop("Firewood", Facing.N, 696f, 763f);
+            Prop("Crate", Facing.N, 697f, 766f);
+            Prop("Barrel", Facing.N, 652f, 756f);
+            Prop("Crate", Facing.N, 655f, 758f);
+            Prop("Box", Facing.N, 657f, 755f);
 
             // The pawnbroker's counter in a gap on Loom Lane, and the cellar yard.
-            Prop("Counter", Facing.S, 701f, 775f, "Pawn shop counter");
-            Prop("Chest", Facing.S, 701f, 769f, "Pawn shop chest");
-            Prop("Barrel", Facing.N, 715f, 630f);
-            Prop("Box", Facing.N, 718f, 628f);
+            Prop("Counter", Facing.N, 691f, 799f, "Pawn shop counter");
+            Prop("Chest", Facing.N, 691f, 805f, "Pawn shop chest");
+            Prop("Barrel", Facing.N, 715f, 693f);
+            Prop("Box", Facing.N, 718f, 691f);
 
             // The docks (§6.1): cargo on the quays.
             var cargo = new Random(812);
-            for (var px = 290; px < 730; px += 22)
+            for (var px = 490; px < 730; px += 22)
             {
                 Prop(cargo.Next(2) == 0 ? "Barrels" : "Crate", Facing.N, px + cargo.Next(6), 820f + cargo.Next(4));
                 Prop("Box", Facing.N, px + 8 + cargo.Next(4), 821f + cargo.Next(4));
             }
 
-            Prop("Barrels", Facing.N, 750f, 783f);
-            Prop("Crate", Facing.N, 760f, 784f);
+            Prop("Barrels", Facing.N, 750f, 785f);
+            Prop("Crate", Facing.N, 760f, 785f);
         }
 
         // ------------------------------------------------------------------------------------------- lamps
@@ -1729,28 +1701,64 @@ namespace GameDev.Slice.EditorTools
         /// </summary>
         private static void AllLamps()
         {
-            Lamps(true, 666f, 280, 780, 28f, 4f);
-            Lamps(true, 675f, 280, 780, 28f, 18f);
-            Lamps(true, 583f, 280, 708, 27f, 6f);
-            Lamps(true, 588f, 280, 708, 27f, 6f);
-            Lamps(false, 485f, 560, 646, 25f, 5f);
-            Lamps(false, 514f, 560, 646, 25f, 5f);
-            Lamps(false, 307f, 606, 662, 26f, 8f);
-            Lamps(false, 312f, 606, 662, 26f, 21f);
-            Lamps(false, 417f, 606, 662, 26f, 8f);
-            Lamps(false, 422f, 606, 662, 26f, 21f);
-            Lamps(true, 732f, 280, 724, 27f, 5f);
-            Lamps(true, 737f, 280, 724, 27f, 18f);
-            Lamps(false, 456f, 680, 812, 27f, 12f);
-            Lamps(false, 463f, 680, 812, 27f, 25f);
-            Lamps(false, 726f, 680, 812, 27f, 12f);
-            Lamps(false, 733f, 680, 812, 27f, 25f);
-            Lamps(true, 813f, 280, 740, 30f, 10f);
-            foreach (var (px, py) in new[] { (461, 531), (538, 531), (461, 558), (538, 558), (476, 647), (523, 647), (476, 694), (523, 694) })
+            Lamps(true, 730f, 480, 780, 28f, 4f);
+            Lamps(true, 739f, 480, 780, 28f, 18f);
+            Lamps(true, 665f, 480, 752, 27f, 6f);
+            Lamps(true, 670f, 480, 752, 27f, 6f);
+            Lamps(false, 595f, 662, 715, 25f, 5f);
+            Lamps(false, 624f, 662, 715, 25f, 5f);
+            Lamps(false, 519f, 680, 726, 26f, 8f);
+            Lamps(false, 524f, 680, 726, 26f, 21f);
+            Lamps(true, 772f, 480, 700, 27f, 5f);
+            Lamps(true, 777f, 480, 700, 27f, 18f);
+            Lamps(false, 518f, 744, 812, 27f, 12f);
+            Lamps(false, 525f, 744, 812, 27f, 25f);
+            Lamps(false, 606f, 755, 812, 27f, 12f);
+            Lamps(false, 613f, 755, 812, 27f, 25f);
+            Lamps(false, 702f, 744, 812, 27f, 12f);
+            Lamps(false, 709f, 744, 812, 27f, 25f);
+            Lamps(true, 813f, 480, 740, 30f, 10f);
+
+            // A lamp at every corner of the crossroads (§21), on the pavement by both kerbs, where no door forbids it.
+            foreach (var (x0, x1, wx, y0, y1, wy) in new[]
+                     {
+                         (516, 528, 4, 726, 744, 5), (700, 712, 3, 726, 744, 5), (516, 528, 3, 770, 780, 3),
+                         (604, 616, 3, 770, 780, 3), (700, 712, 3, 770, 780, 3), (592, 628, 4, 662, 674, 4),
+                     })
+            {
+                foreach (var (cx, cy) in new[] { (x0 + wx - 1, y0 + wy - 1), (x1 - wx, y0 + wy - 1), (x0 + wx - 1, y1 - wy), (x1 - wx, y1 - wy) })
+                {
+                    CornerLamp(cx, cy);
+                }
+            }
+
+            foreach (var (px, py) in new[] { (588, 660), (631, 660), (591, 716), (628, 716), (591, 753), (628, 753) })
             {
                 Prop("LampPost", Facing.N, px, py);
             }
         }
+
+        /// <summary>A lamp on a crossroads' corner cell unless one already stands within 4 m or a door is before it.</summary>
+        private static void CornerLamp(float px, float py)
+        {
+            var centre = new Vector2(px + 0.5f, py + 0.5f);
+            if (_lampsAt.Any(l => (l - centre).sqrMagnitude < 16f) || _doors.Any(d =>
+                {
+                    var off = centre - d.At;
+                    var outside = Vector2.Dot(off, d.Out);
+                    return outside > 0f && outside < 8.5f && Mathf.Abs(Vector2.Dot(off, new Vector2(-d.Out.y, d.Out.x))) < 2.2f;
+                }))
+            {
+                return;
+            }
+
+            if (Prop("LampPost", Facing.N, px, py) != null)
+            {
+                _lampsAt.Add(centre);
+            }
+        }
+
+        private static readonly List<Vector2> _lampsAt = new List<Vector2>();
 
         private static void Lamps(bool alongX, float cell, int a0, int a1, float spacing, float phase)
         {
@@ -1771,6 +1779,7 @@ namespace GameDev.Slice.EditorTools
                     var placed = alongX ? Prop("LampPost", Facing.N, at - 1f, cell) : Prop("LampPost", Facing.N, cell, at - 1f);
                     if (placed != null)
                     {
+                        _lampsAt.Add(alongX ? new Vector2(centre, cell + 0.5f) : new Vector2(cell + 0.5f, centre));
                         break;
                     }
                 }
@@ -1813,11 +1822,11 @@ namespace GameDev.Slice.EditorTools
             }
 
             var rng = new Random(250);
-            for (var i = 0; i < 160; i++)
+            for (var i = 0; i < 260; i++)
             {
-                var px = 60 + rng.Next(210);
+                var px = 60 + rng.Next(410);
                 var py = 520 + rng.Next(280);
-                if (Mathf.Abs(py - 672) < 8)
+                if (Mathf.Abs(py - 735) < 8)
                 {
                     continue;
                 }
@@ -1841,7 +1850,7 @@ namespace GameDev.Slice.EditorTools
                 new Vector2(130, 250), new Vector2(250, 330), new Vector2(360, 180), new Vector2(470, 380), new Vector2(560, 240),
                 new Vector2(700, 300), new Vector2(250, 120), new Vector2(420, 420),
             };
-            bool InForest(float px, float py) => px > 60 && px < 740 && py > 60 && py < 455 && (px < 606 || px > 640);
+            bool InForest(float px, float py) => px > 60 && px < 735 && py > 60 && py < 455; // the North Road runs at px 742–752
 
             // Glades: about 40 fellable trees (the rare coloured crowns) round them and 30 herb patches in them.
             var herbs = 0;
@@ -1955,32 +1964,32 @@ namespace GameDev.Slice.EditorTools
         private static void Townsfolk()
         {
             // Wardens, blue: at the Assize's door, on the High Street and Bell Street.
-            Person("Blue", false, 519.5f, 621f, 270f, "Warden at the station");
-            Person("Blue", false, 519.5f, 629f, 270f, "Warden at the station");
-            Person("Blue", false, 600f, 671f, 90f, "Warden on the High Street");
-            Person("Blue", true, 650f, 735f, 270f, "Warden on Bell Street");
+            Person("Blue", false, 625.5f, 695f, 270f, "Warden at the station");
+            Person("Blue", false, 625.5f, 703f, 270f, "Warden at the station");
+            Person("Blue", false, 650f, 735f, 90f, "Warden on the High Street");
+            Person("Blue", true, 640f, 775f, 270f, "Warden on Bell Street");
 
             // The faction, teal, at its house; Veinmarket, brown, on Loom Lane.
-            Person("Teal", false, 593f, 578.6f, 180f, "Faction member");
-            Person("Teal", true, 600f, 578.6f, 180f, "Faction member");
-            Person("Brown", false, 690f, 781f, 0f, "Veinmarket");
-            Person("Brown", false, 692f, 780f, 270f, "Veinmarket");
+            Person("Teal", false, 646f, 660.6f, 180f, "Faction member");
+            Person("Teal", true, 653f, 660.6f, 180f, "Faction member");
+            Person("Brown", false, 680f, 795f, 0f, "Veinmarket");
+            Person("Brown", false, 682f, 794f, 270f, "Veinmarket");
 
             // Masters, green, and sellers, orange, in Market Square; the pawnbroker on Loom Lane.
-            Person("Green", false, 376f, 750f, 90f, "Master of Item Creation");
-            Person("Green", true, 391f, 727f, 180f, "Master of Enchanting");
-            Person("Green", false, 401f, 727f, 180f, "Master of First Aid");
-            Person("Orange", false, 381f, 727f, 180f, "The trader");
-            Person("Orange", true, 416f, 726f, 180f, "The seer");
-            Person("Orange", false, 703f, 776f, 0f, "The pawnbroker");
+            Person("Green", false, 543f, 758f, 90f, "Master of Item Creation");
+            Person("Green", true, 553f, 751f, 180f, "Master of Enchanting");
+            Person("Green", false, 562f, 751f, 180f, "Master of First Aid");
+            Person("Orange", false, 544f, 751f, 180f, "The trader");
+            Person("Orange", true, 576f, 750f, 180f, "The seer");
+            Person("Orange", false, 693f, 803f, 0f, "The pawnbroker");
 
             // Townsfolk, yellow.
             foreach (var (px, py, yaw, female) in new[]
                      {
-                         (400f, 735f, 0f, false), (404f, 736f, 200f, true), (680f, 734f, 90f, true), (695f, 732f, 270f, false),
-                         (560f, 586f, 90f, true), (600f, 585f, 270f, false), (600f, 781f, 90f, true), (480f, 822f, 180f, false),
-                         (500f, 820f, 0f, true), (654f, 756f, 30f, false), (430f, 664f, 90f, false), (520f, 678f, 270f, true),
-                         (497f, 600f, 0f, false), (365f, 625f, 180f, true),
+                         (560f, 775f, 0f, false), (564f, 776f, 200f, true), (660f, 775f, 90f, true), (675f, 773f, 270f, false),
+                         (540f, 668f, 90f, true), (660f, 669f, 270f, false), (620f, 795f, 90f, true), (540f, 822f, 180f, false),
+                         (560f, 820f, 0f, true), (642f, 790f, 30f, false), (500f, 729f, 90f, false), (580f, 741f, 270f, true),
+                         (610f, 692f, 0f, false), (557f, 693f, 180f, true),
                      })
             {
                 Person("Yellow", female, px, py, yaw, "Townsperson");
@@ -2176,24 +2185,34 @@ namespace GameDev.Slice.EditorTools
                 {
                     var name = pair.Key == "" ? defaultMaterial : pair.Key;
                     var (v, n, uv, i) = pair.Value;
-                    var mesh = new Mesh { name = $"{_owner.name} - {name}", indexFormat = IndexFormat.UInt32 };
+                    var meshName = $"{_owner.name} - {name}";
+                    var path = $"{SliceKitCatalogue.Folder}/Works/{meshName.Replace("&", "and")}.asset";
+                    KitStandIns.EnsureFolder(SliceKitCatalogue.Folder + "/Works");
+                    // The asset's own mesh is written in place: a copy into it leaves the old geometry on the GPU for the
+                    // rest of the session, so renders made after a rebuild showed C1's walls (2026-11-06).
+                    var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+                    var created = mesh == null;
+                    if (created)
+                    {
+                        mesh = new Mesh();
+                    }
+
+                    mesh.Clear();
+                    mesh.name = meshName;
+                    mesh.indexFormat = IndexFormat.UInt32;
                     mesh.SetVertices(v);
                     mesh.SetNormals(n);
                     mesh.SetUVs(0, uv);
                     mesh.SetTriangles(i, 0);
                     mesh.RecalculateBounds();
                     mesh.RecalculateTangents();
-                    var path = $"{SliceKitCatalogue.Folder}/Works/{mesh.name.Replace("&", "and")}.asset";
-                    KitStandIns.EnsureFolder(SliceKitCatalogue.Folder + "/Works");
-                    var existing = AssetDatabase.LoadAssetAtPath<Mesh>(path);
-                    if (existing != null)
+                    if (created)
                     {
-                        EditorUtility.CopySerialized(mesh, existing);
-                        mesh = existing;
+                        AssetDatabase.CreateAsset(mesh, path);
                     }
                     else
                     {
-                        AssetDatabase.CreateAsset(mesh, path);
+                        EditorUtility.SetDirty(mesh);
                     }
 
                     var go = new GameObject(name);
