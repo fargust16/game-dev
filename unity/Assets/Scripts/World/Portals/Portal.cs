@@ -38,7 +38,10 @@ namespace GameDev.World.Portals
 
         public TravelRequest Target => new TravelRequest(targetScene, targetPortalId);
 
-        /// <summary>Where an arriving player stands, facing away from the door.</summary>
+        /// <summary>
+        /// Where an arriving player stands, facing away from the door: on the ground under that point, so a door at
+        /// the top of steps does not drop the player from its sill (C1's Wardens' station, 0.44 m).
+        /// </summary>
         public Pose ArrivalPose
         {
             get
@@ -46,9 +49,19 @@ namespace GameDev.World.Portals
                 var side = arriveOnPositiveZ ? 1f : -1f;
                 var position = transform.TransformPoint(OpeningCentre + new Vector3(0f, 0f, side * arrivalDistance));
                 var facing = transform.TransformDirection(new Vector3(0f, 0f, side));
+                var notCharacters = ~LayerMask.GetMask("Character");
+                if (Physics.Raycast(position + Vector3.up * GroundSearch, Vector3.down, out var hit, GroundSearch * 2f,
+                        notCharacters, QueryTriggerInteraction.Ignore))
+                {
+                    position.y = hit.point.y;
+                }
+
                 return new Pose(position, Quaternion.LookRotation(facing, Vector3.up));
             }
         }
+
+        /// <summary>Authoring default, m: how far above and below the sill the arrival looks for the ground.</summary>
+        private const float GroundSearch = 0.75f;
 
         /// <summary>Editor setup for scenes built by code; a placed door is set in the Inspector.</summary>
         public void Configure(string id, string sceneName, string pairedPortalId, bool arrivalOnPositiveZ)
