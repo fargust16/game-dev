@@ -9,3 +9,6 @@
 *.png binary
 *.fbx binary
 *.tgz binary
+
+# Shell scripts break on CRLF, so they stay LF on every checkout.
+*.sh text eol=lf
