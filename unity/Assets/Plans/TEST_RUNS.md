@@ -1,16 +1,16 @@
 # Test Runs and Heavy Operations
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
-Last Updated: 2026-11-06 (first version: test sets, the Slow category, and how heavy runs are done, by the owner's request for faster runs)
+Last Updated: 2026-11-06 (`run_tests.ps1` for PowerShell, since PowerShell cannot run the `.sh` and its `bash` is WSL's. Earlier: first version: test sets, the Slow category, and how heavy runs are done, by the owner's request for faster runs)
 
 Depends On:
 [AGENTS.md](../../../AGENTS.md)
 
 Referenced By:
-[AGENTS.md](../../../AGENTS.md), `.cursor/rules/unity-csharp.mdc`, `tools/unity/run_tests.sh`
+[AGENTS.md](../../../AGENTS.md), `.cursor/rules/unity-csharp.mdc`, `tools/unity/run_tests.ps1`, `tools/unity/run_tests.sh`
 
 ---
 
@@ -25,7 +25,7 @@ So runs get faster by running less: the narrowest set that covers a change.
 
 # 2. The sets
 
-`tools/unity/run_tests.sh <set>` runs one set in batch mode and prints a summary and any failed test. Extra arguments go to Unity, so `-testFilter <namespace, class, or test>` narrows any set further.
+`tools/unity/run_tests.ps1 <set>` in PowerShell, or `tools/unity/run_tests.sh <set>` in Git Bash, runs one set in batch mode and prints a summary and any failed test. Both scripts live in the repository's root, so from `unity\` the PowerShell call is `..\tools\unity\run_tests.ps1 world`. PowerShell cannot run the `.sh`, and the `bash` it finds is WSL's, not Git Bash. Extra arguments go to Unity, so `-testFilter <namespace, class, or test>` narrows any set further.
 
 | Set | Unity arguments | What it holds | Measured, 2026-11-06 |
 |---|---|---|---|
@@ -61,4 +61,4 @@ Every set also takes `-batchmode -nographics -projectPath . -runTests -testResul
 
 # 6. The agent's shell
 
-lean-ctx's allowlist does not let an agent run `tools/unity/run_tests.sh` itself. The agent runs the same Unity command line from §2, and the owner may use the script. `lean-ctx allow run_tests.sh` would let agents use the script too; that is the owner's choice.
+lean-ctx's allowlist does not let an agent run either script in its own shell. The agent runs the same Unity command line from §2, or runs `run_tests.ps1` in a tab of the owner's Terminal panel, where the owner sees it. `lean-ctx allow` for the scripts would let agents run them in their own shell too; that is the owner's choice.

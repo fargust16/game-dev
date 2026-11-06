@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs one set of Unity tests in batch mode and prints a short summary.
-# The sets and when to run each: unity/Assets/Plans/TEST_RUNS.md.
+# The sets and when to run each: unity/Assets/Plans/TEST_RUNS.md. In PowerShell use run_tests.ps1.
 #
 #   tools/unity/run_tests.sh slice        # the slice's EditMode tests (the default)
 #   tools/unity/run_tests.sh slice-play   # the slice's PlayMode tests
