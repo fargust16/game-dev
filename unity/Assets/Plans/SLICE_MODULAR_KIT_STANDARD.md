@@ -2,7 +2,7 @@
 
 Status: Draft — authoring defaults set by the agent; the owner's decision that sets the frame is marked
 Created: 2026-11-04
-Last Updated: 2026-11-05 (§1: streets at 45° under a `KitFrame`, after the grid check of C1 §12. Earlier: §7: the agent shapes the ground once from the city plan, by the owner after the play test. Earlier: §8 points to the slice's asset map. Earlier: S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
+Last Updated: 2026-11-06 (§2: a wall seen thicker than 0.3 m keeps a body of 0.3 m on its line, and a single-sided wall between two rooms gets a seen face for the second, after the BK interiors. Earlier: §1: streets at 45° under a `KitFrame`, after the grid check of C1 §12. Earlier: §7: the agent shapes the ground once from the city plan, by the owner after the play test. Earlier: §8 points to the slice's asset map. Earlier: S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [10.1 Grid World and Environment Actions](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [COMBAT_GRID_TECH_TEST.md](COMBAT_GRID_TECH_TEST.md)
 Used by: [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -28,7 +28,7 @@ This standard says what a block must be so that it snaps together, so that the C
 The Combat Grid has **1 m cells aligned to the world** (measured: at 1.5 m narrow gaps did not survive). Blocks therefore follow a 1 m placement grid:
 
 - Footprints are whole metres. Preferred wall widths are 1, 2, and 4 m.
-- **A wall stands on a grid line, centred on it,** at most 0.3 m thick. A capsule of radius 0.3 m (measured) then still stands in the middle of the cells on both sides, so a wall closes the edge between two cells and costs neither cell.
+- **A wall stands on a grid line, centred on it,** at most 0.3 m thick. A capsule of radius 0.3 m (measured) then still stands in the middle of the cells on both sides, so a wall closes the edge between two cells and costs neither cell. A wall seen thicker keeps a body of 0.3 m centred on its line (BK's plaster wall, 0.377 m measured, 2026-11-06). A wall model drawn on one side only, as BK's are, gets a second block between two rooms: a face turned to the other room, NoGrid and without a collider.
 - **Where linear blocks meet** (authoring default, 2026-11-04): a wall or fence stops half its thickness short of each grid node, and a **post** of the wall's thickness fills a node where walls meet at a corner or a run ends. A wall of nominal width 4 m is therefore 3.7 m long. A T-junction needs no post: the through wall's face meets the end of the other. Without this, walls meeting at a corner share a square of their thickness and break the non-overlap law (§6).
 - A floor or street surface top sits at a whole 0.1 m height.
 

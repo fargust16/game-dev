@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1)
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft — accepted by the owner, 2026-11-05; sizes remain authoring defaults
 
-Last Updated: 2026-11-06 (§8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-06 (§14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
@@ -260,7 +260,7 @@ Checked by `VeilmouthSceneTests` (the heights above, the edge's slope, the roads
 1. Measure the Victorian modules and BK_AlchemistHouse; URP copies of BK's materials.
 2. The ground (§9).
 3. ~~The plot builder and the city (§3–§7); the C0 Map zones become C1's; tests follow.~~ Done 2026-11-05 (§13).
-4. The seven interiors (§8).
+4. ~~The seven interiors (§8).~~ Done 2026-11-06 (§14).
 4a. The Dwelling scene and its generator (§8), then a door on every dwelling, and breaking in with witnesses, the Wardens and the Arrest ([10.3](../../../10.3%20Stealth%20and%20Detection.md) §6.1–6.2, [10.4](../../../10.4%20Dialogue%20and%20Social%20Checks.md) §6).
 5. ~~Trees and green (§6.2).~~ Done with the city (§13); the courts' and gardens' details remain.
 6. Walk it, render it, and hand it to the owner.
@@ -304,3 +304,36 @@ Squares: Crown Circus (475–525 × 646–696), the palace forecourt (460–540 
 **Counted** on the full build: 1953 kit blocks with no kit fault, 315 houses, 323 doorways, 147 lamps, 233 railing segments, 7 portals. Tests: `VeilmouthCityTests` (no lamp before a door, the seven doors, the slant's frame, C1 replaces C0's dressing), with `KitLayoutCheckTests`, `PortalPairingTests`, and `VeilmouthSceneTests`.
 
 **Still missing or simplified** in this pass: the Item Creation yard stands in the Market Square, not through an arch off Cheap Street; the mews court is Wardley Garden and its passage; courts have no pumps, washing lines, carts, or cranes (no models yet); the stalls are few; roofs keep the pack's blue slate; the Combat Grid has not yet been run on the new streets; the interiors are still C0's (§11, step 4).
+
+---
+
+# 14. The interiors as built, 2026-11-06
+
+`VeilmouthInteriors` (*GameDev → Slice → Build Veilmouth Interiors from C1 (once)*) builds the seven interiors of §8 from BK_AlchemistHouse, each under one root, `Interior C1`, and refuses to rebuild a scene that has it: from then on each interior is the owner's. `BuildReplacing` is for the agent's own batch iterations only. Everything below is an authoring default unless it is marked measured.
+
+**The room kit** is two kit families. `BkRoom` holds the architecture at ×1.2: walls, doorways, the window, the door, posts, wooden and stone floors, and the ceiling. `BkFurniture` holds the furniture at true size, plus sets: a table, bench, or shelf with BK's things standing on its top, such as plates and a candle, bottles, books, jars, or lab sets. A shelf, a board, or a painting hangs on a wall's face. **Measured** (render probe, 2026-11-06):
+
+- BK draws a wall only on its local +Z side. A wall between two rooms therefore gets a second face turned to the other room, which is seen and never solid.
+- `IntWall02a/b` are brick between timbers, and they line the stone rooms: the kitchen, the laboratory and store room, the lock-up's corridor and cells, the cellar's vaults, and the chapel. `IntWall01a`, both doorways, and the window are plaster, and they line every other room.
+- The plaster wall is 0.377 m thick, the brick 0.167 m, the window 0.27 m. A wall's body is capped at 0.3 m (kit standard §2).
+- The walls stand 3 m, but their frame tops out just below that. The ceiling is therefore at **2.9 m**, which closes a slit of sky seen above the outer walls.
+
+BK's jars of babies and brains are not used.
+
+**Rooms** are rounded to the 3 m module, on the ground floor only. There are no stairs and no upper floors yet, so the Soot & Bell's let room lies behind a passage, not up a stair.
+
+| Interior | Rooms as built |
+|---|---|
+| Soot & Bell | taproom 15 × 9 m with the bar, the cabinet, the fireplace, and tables; kitchen 6 × 6 m (stone) with the stove and sink; passage 3 × 6 m with the closed back door to the yard; let room 6 × 6 m with the bed |
+| Harrow & Tincture | shop 9 × 6 m with counters and bottle shelves; laboratory 9 × 6 m (stone) with the cauldron, alembic, lab bench, and books; store room 3 × 6 m (stone) |
+| Faction's house | hall 12 × 9 m with the rostrum and pews; office 6 × 6 m; archive 6 × 6 m with shelves |
+| Wardens' station | front desk room 9 × 6 m; office 6 × 6 m; guard room 6 × 6 m with the stove; corridor 9 × 3 m and three cells 3 × 3 m (stone) behind the owner's bars, widened to 3 m with their door |
+| Missing person's room | landing 6 × 3 m with a closed neighbour's door; the room 6 × 6 m with the bed, wash stand, stove, table, chair, and the cache |
+| Cellar | three stone vaults, 6 × 6, 9 × 9, and 6 × 6 m, joined by doorways; barrels, crates, and candles; the circle's place in the middle vault, hidden until a ritual starts there |
+| Old chapel | nave 9 × 15 m (stone) with pews, candles, and the rostrum; vestry 3 × 6 m (stone) |
+
+Each room has one warm point light under its ceiling, with no shadows. The street door holds the portal leaf, and the player arrives just inside it. The people are the asset map's coloured Dummies at their posts.
+
+**Counted:** 710 kit blocks in the seven, with no kit fault.
+
+**Still missing:** stairs and upper floors; arches between the vaults; the cache's contents (the Stash rules of [19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.3 come with step 4a).

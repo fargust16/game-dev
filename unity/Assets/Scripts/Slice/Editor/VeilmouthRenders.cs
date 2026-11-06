@@ -43,17 +43,47 @@ namespace GameDev.Slice.EditorTools
             Eye("eye_forest", 123f, 120f, 123f, 300f, 2f);
             Eye("eye_hill", 340f, 0f, 420f, 140f, 20f);
 
-            foreach (var path in new[] { VeilmouthScene.SootAndBellScenePath }.Concat(VeilmouthDressing.InteriorScenePaths))
+            RenderInteriors();
+            Debug.Log($"Veilmouth views written to {OutputFolder}.");
+        }
+
+        /// <summary>
+        /// Each C1 interior from above with its ceilings hidden, and each room from a walker's eye in its south-west
+        /// corner toward the far corner. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderInteriors
+        /// </summary>
+        [MenuItem("GameDev/Slice/Render Veilmouth Interiors")]
+        public static void RenderInteriors()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            foreach (var (_, path) in VeilmouthInteriors.All)
             {
                 EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
                 ShowCircles();
                 var name = Path.GetFileNameWithoutExtension(path);
+                var ceilings = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None)
+                    .Where(t => t.name.StartsWith("Kit_BkRoom_Ceiling")).Select(t => t.gameObject).ToArray();
+                foreach (var c in ceilings)
+                {
+                    c.SetActive(false);
+                }
+
                 var room = Bounds();
                 Top("room_" + name, room.center, Mathf.Max(room.extents.x, room.extents.z) + 0.5f);
-                Eye("roomeye_" + name, new Vector3(room.center.x, 2.2f, room.min.z + 0.5f), new Vector3(room.center.x, 0.8f, room.max.z));
-            }
+                foreach (var c in ceilings)
+                {
+                    c.SetActive(true);
+                }
 
-            Debug.Log($"Veilmouth views written to {OutputFolder}.");
+                foreach (var marker in Object.FindObjectsByType<Transform>(FindObjectsSortMode.None)
+                             .Where(t => t.name.StartsWith(VeilmouthInteriors.RoomMarker)))
+                {
+                    var p = marker.position;
+                    var half = marker.localScale * 0.5f;
+                    var label = marker.name.Substring(VeilmouthInteriors.RoomMarker.Length).Replace(' ', '_').ToLowerInvariant();
+                    Eye($"roomeye_{name}_{label}", new Vector3(p.x - half.x + 0.5f, 1.7f, p.z - half.z + 0.5f),
+                        new Vector3(p.x + half.x - 0.5f, 1.0f, p.z + half.z - 0.5f));
+                }
+            }
         }
 
         private static void ShowCircles()

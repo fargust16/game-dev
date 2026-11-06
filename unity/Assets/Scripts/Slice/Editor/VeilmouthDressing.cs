@@ -69,6 +69,14 @@ namespace GameDev.Slice.EditorTools
         private static Transform _parent;
         private static Transform _people;
 
+        /// <summary>For another pass that stands people and circles with this one's helpers (VeilmouthInteriors).</summary>
+        internal static void Use(Dictionary<string, SliceKitCatalogue.Entry> kit, Transform parent)
+        {
+            _kit = kit;
+            _parent = parent;
+            _people = parent;
+        }
+
         [MenuItem("GameDev/Slice/Dress Veilmouth (one pass)")]
         public static void Dress() => Run(false);
 
@@ -190,7 +198,7 @@ namespace GameDev.Slice.EditorTools
         /// A person in the asset map's colour for their role (§1), standing idle. Not a kit block: the Character layer.
         /// Teal and brown have no Dummy prefab, so a white Dummy wears a project material.
         /// </summary>
-        private static void Person(string colour, bool female, float x, float z, float yaw, string name, float y = S)
+        internal static void Person(string colour, bool female, float x, float z, float yaw, string name, float y = S)
         {
             var custom = colour == "Teal" || colour == "Brown";
             var path = $"{Dummies}/HumanDummy_{(female ? "F" : "M")} {(custom ? "White" : colour)}.prefab";
@@ -270,7 +278,7 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>The ritual's magic circle at a candidate, hidden: the ritual system shows the one the seed picks.</summary>
-        private static void Circle(Vector3 centre, string candidate)
+        internal static void Circle(Vector3 centre, string candidate)
         {
             var circle = At("RitualCircle", centre, Quaternion.identity);
             circle.name = $"Ritual Circle - {candidate}";
