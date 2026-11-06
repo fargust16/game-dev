@@ -48,6 +48,12 @@ namespace GameDev.Slice.EditorTools
             Eye("eye_villa", -100f, -87f, -122f, -66f, 3f);
             Eye("eye_northgate", 123f, -8f, 123f, 14f, 4f);
             Eye("eye_shopfront", -40f, -172f, -40f, -160f, 1.5f);
+            // Detached houses on their plots (city plan §19): the Terraces and the Ridge from above, a gate, a villa's side.
+            Top("view_terraces", new Vector3(-140f, 0f, -129f), 70f);
+            Top("view_ridge_west", new Vector3(-112f, 0f, -67f), 70f);
+            Top("view_ridge_east", new Vector3(126f, 0f, -67f), 75f);
+            Eye("eye_plot_gate", -194f, -117f, -205f, -117f, 1.7f);
+            Eye("eye_villa_side", -100f, -92f, -119f, -66f, 1.7f);
 
             RenderInteriors();
             Debug.Log($"Veilmouth views written to {OutputFolder}.");

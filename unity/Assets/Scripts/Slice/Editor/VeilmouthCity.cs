@@ -75,20 +75,31 @@ namespace GameDev.Slice.EditorTools
         private static Works _works;
         private static Works _kerbs;
         private static List<Vector2[]> _houses;  // every house's plan footprint, in the order built
-        private static List<Vector2[]> _villas;
+        private static HashSet<(bool AlongX, float Line, int A0, int A1)> _fenced; // railing lines already set
+        private static Transform _gardens;
+        private static float _stepsClear; // the least room left between a plot's front steps and its railings, m
 
         /// <summary>
-        /// The terrace rows (§3.3): each front line, whether it faces east, and where its houses run (the arch house's
-        /// row runs longer); a front garden 4 m deep before it and side gardens at its ends, inside the railings.
+        /// The Terraces' plots (§3.3, §19): each row's house front line, the side its doors face, and its plots along the
+        /// street, each holding one detached house in its middle with a front garden of 4 m and 2 m behind it.
         /// </summary>
-        private static readonly (float Front, bool East, int A0, int A1)[] TerraceGardens =
+        private static readonly (Facing F, float Front, (int S0, int S1)[] Spans)[] TerracePlots =
         {
-            (300f, true, 614, 644), (320f, false, 610, 650), (410f, true, 614, 644), (430f, false, 614, 644),
+            (Facing.E, 300f, new[] { (607, 629), (629, 651) }), (Facing.W, 320f, new[] { (607, 629) }),
+            (Facing.E, 410f, new[] { (607, 629), (629, 651) }), (Facing.W, 430f, new[] { (607, 629), (629, 651) }),
         };
 
-        /// <summary>A terrace row's railed enclosure across the street axis: from a metre behind its houses to its pavement.</summary>
-        private static (float Lo, float Hi) Enclosure(float front, bool east) =>
-            east ? (front - 11f, front + 4f) : (front - 4f, front + 11f);
+        private const int TerraceGarden = 4, TerraceBehind = 2;
+
+        /// <summary>The Ridge's villa plots on Ridge Street's north side (§3.4, §19); the faction's house has its own.</summary>
+        private static readonly (int S0, int S1)[] VillaPlots = { (330, 359), (359, 388), (388, 417), (417, 446), (556, 581), (629, 663), (663, 697) };
+
+        private const float VillaFront = 574f;
+        private const int VillaGarden = 5, VillaBehind = 3;
+        private const int FactionPlot0 = 581, FactionPlot1 = 617, FactionAt = 588;
+
+        /// <summary>The small green beside the arch house to Wardley Garden (§19), plan metres.</summary>
+        private static readonly (float X0, float Y0, float X1, float Y1) ArchGreen = (316f, 641f, 332f, 651f);
 
         [MenuItem("GameDev/Slice/Build Veilmouth City from C1 (once)")]
         public static void Build() => Run(false);
@@ -142,10 +153,12 @@ namespace GameDev.Slice.EditorTools
             _doors = new List<(Vector2, Vector2)>();
             _partyWalls = new List<(bool, float, float)>();
             _houses = new List<Vector2[]>();
-            _villas = new List<Vector2[]>();
+            _fenced = new HashSet<(bool, float, int, int)>();
+            _stepsClear = float.MaxValue;
 
             _root = new GameObject(RootName).transform;
             _people = Group("People");
+            _gardens = Group("Gardens");
             VeilmouthDressing.Wind(_root);
             _works = new Works(Group("Stone Works"), true);
             _kerbs = new Works(Group("Kerbs"), false);
@@ -163,7 +176,7 @@ namespace GameDev.Slice.EditorTools
             Slant();
             _parent = Group("Houses");
             Houses();
-            _parent = Group("Gardens");
+            _parent = _gardens;
             Gardens();
             _parent = Group("Squares and Yards");
             Market();
@@ -438,7 +451,8 @@ namespace GameDev.Slice.EditorTools
         /// A house on a plan footprint if it is free: on the highest ground under it, rounded up to 0.1 m, plus
         /// <paramref name="raise"/>; a stone plinth where the ground falls away under it, and steps down from each door.
         /// </summary>
-        private static GameObject House(string key, Facing f, float front, float a, float raise = 0f, string name = null, bool force = false)
+        private static GameObject House(string key, Facing f, float front, float a, float raise = 0f, string name = null, bool force = false,
+            float ceiling = float.MaxValue)
         {
             var e = _kit[key];
             var quad = Footprint(f, front, a, e.Width, e.Depth);
@@ -450,7 +464,7 @@ namespace GameDev.Slice.EditorTools
             Take(quad, Use.Solid);
             _houses.Add(quad);
             var (min, max) = GroundUnder(quad);
-            var floor = Up(max) + raise;
+            var floor = Mathf.Min(Up(max) + raise, ceiling);
             var lo = new Vector2(quad.Min(p => p.x), quad.Min(p => p.y));
             var hi = new Vector2(quad.Max(p => p.x), quad.Max(p => p.y));
             var house = PutPlan(key, f, lo.x, lo.y, floor);
@@ -746,6 +760,187 @@ namespace GameDev.Slice.EditorTools
             Take(Rect(lo.x, lo.y, lo.x + size.x, lo.y + size.z), Use.Solid);
         }
 
+        private static readonly string[] TerraceKeys = Keys("Terrace4", "brick", "stucco", "brick2", "grey")
+            .Select(k => VictorianHouses.CornerKey(k, VictorianHouses.Side.Both)).ToArray();
+
+        private static readonly string[] VillaKeys = Keys("Villa6", "stucco", "grey");
+
+        /// <summary>A plot's plan rectangle: from <paramref name="garden"/> m before the front to <paramref name="behind"/> m behind the house.</summary>
+        private static Vector2[] PlotQuad(Facing f, float front, int s0, int s1, int depth, int garden, int behind)
+        {
+            var o = Outward(f);
+            var s = o.x + o.y;
+            var c0 = front + (s * garden);
+            var c1 = front - (s * (depth + behind));
+            var (lo, hi) = (Mathf.Min(c0, c1), Mathf.Max(c0, c1));
+            return f == Facing.N || f == Facing.S ? Rect(s0, lo, s1, hi) : Rect(lo, s0, hi, s1);
+        }
+
+        /// <summary>
+        /// A detached house on its own plot (§19): the house in the plot's middle, or at <paramref name="at"/>; railings
+        /// all round with one gate of 3 m opposite its door; and its garden. Returns the house, or null.
+        /// </summary>
+        private static GameObject Plot(Facing f, float front, int s0, int s1, string key, int garden, int behind, Random rng,
+            string name = null, float? at = null, bool force = false)
+        {
+            var e = _kit[key];
+            var a = at ?? s0 + Mathf.Floor((s1 - s0 - e.Width) / 2f);
+            // On a slope rising away from the street the floor is held down so the door's steps end 1.5 m inside the
+            // railings (§19); the house's back then stands into the slope. A house's local −X is the row's start for
+            // fronts facing N or E, its end for S and W.
+            var o = Outward(f);
+            var alongX = f == Facing.N || f == Facing.S;
+            var doorAlong = f == Facing.N || f == Facing.E ? a + e.DoorX : a + e.Width - e.DoorX;
+            var foot = (alongX ? new Vector2(doorAlong, front) : new Vector2(front, doorAlong)) + (o * (VictorianHouses.Stoop + 1.2f));
+            var tread = Mathf.Max(VictorianHouses.StoopTread, 0.28f);
+            var treads = Mathf.Max(0, Mathf.FloorToInt((garden - 1.5f - VictorianHouses.Stoop) / tread));
+            var ceiling = Ground(foot.x, foot.y) + (treads * VictorianHouses.StoopRise) - 0.05f; // a house's height is set to 0.1 m
+            var house = House(key, f, front, a, 0f, name, force, ceiling);
+            if (house == null)
+            {
+                Debug.LogWarning($"[VeilmouthCity] no house fits the plot {s0}–{s1} on {f} {front}.");
+                return null;
+            }
+
+            var s = o.x + o.y;
+            var depth = garden + e.Depth + behind;
+            var line = front + (s * garden);
+            var back = line - (s * depth);
+            var door = house.transform.Cast<Transform>().FirstOrDefault(t => t.name == VictorianHouses.DoorMarker);
+            var doorAt = door != null ? Plan(door.position) : Vector2.zero;
+            var gate = door != null ? (alongX ? doorAt.x : doorAt.y) : a + (e.Width / 2f);
+
+            var parent = _parent;
+            _parent = _gardens;
+            var (lo, hi) = ((int)Mathf.Min(line, back), (int)Mathf.Max(line, back));
+            Fence(alongX, line, s0, s1, gate);
+            Fence(alongX, back, s0, s1, null);
+            Fence(!alongX, s0, lo, hi, null);
+            Fence(!alongX, s1, lo, hi, null);
+            Garden(f, line, s0, s1, a, e.Width, e.Depth, garden, behind, gate, rng);
+            _parent = parent;
+
+            // The room left between the foot of the door's steps and the railings (§19 asks for 1.5 m at least).
+            if (door != null)
+            {
+                var floor = house.transform.position.y;
+                var outside = doorAt + (o * (VictorianHouses.Stoop + 1.2f));
+                var rise = floor - Ground(outside.x, outside.y);
+                var steps = rise <= VictorianHouses.StoopRise * 0.5f ? 0 : Mathf.CeilToInt(rise / VictorianHouses.StoopRise);
+                var reach = VictorianHouses.Stoop + (steps * Mathf.Max(VictorianHouses.StoopTread, 0.28f));
+                _stepsClear = Mathf.Min(_stepsClear, garden - reach);
+                if (garden - reach < 1.5f)
+                {
+                    Debug.LogWarning($"[VeilmouthCity] plot {s0}–{s1} on {f} {front}: steps reach {reach:0.00} m of a {garden} m garden (rise {rise:0.00} m).");
+                }
+            }
+
+            return house;
+        }
+
+        /// <summary>
+        /// A plot's railing line from a0 to a1, in segments of 2 m and one of 1 m for an odd metre, with no hole but the
+        /// gate, 3 m wide, centred on <paramref name="gate"/> when one is given (§19). A line two plots share is set once.
+        /// </summary>
+        private static void Fence(bool alongX, float line, int a0, int a1, float? gate)
+        {
+            if (!_fenced.Add((alongX, line, a0, a1)))
+            {
+                return;
+            }
+
+            void Run(int from, int to)
+            {
+                for (var a = from; a < to;)
+                {
+                    var length = to - a >= 2 ? 2 : 1;
+                    var key = length == 2 ? "Railing" : "RailingShort";
+                    if (alongX)
+                    {
+                        Prop(key, Facing.N, a, line - 0.1f, force: true);
+                    }
+                    else
+                    {
+                        Prop(key, Facing.E, line - 0.1f, a, force: true);
+                    }
+
+                    a += length;
+                }
+            }
+
+            if (gate is float g)
+            {
+                var g0 = Mathf.Clamp(Mathf.RoundToInt(g - 1.5f), a0, a1);
+                Run(a0, g0);
+                Run(Mathf.Min(a1, g0 + 3), a1);
+            }
+            else
+            {
+                Run(a0, a1);
+            }
+        }
+
+        /// <summary>
+        /// A plot's garden (§19): a small tree in each back corner with room for it, shrubs and flowers along the side
+        /// railings, flowers along the front railings off the gate's path, and a bench in the wider side garden facing
+        /// the house. u runs along the street, v in from the front railings.
+        /// </summary>
+        private static void Garden(Facing f, float line, int s0, int s1, float a, int width, int houseDepth, int garden, int behind, float gate, Random rng)
+        {
+            var o = Outward(f);
+            var s = o.x + o.y;
+            var alongX = f == Facing.N || f == Facing.S;
+            var depth = garden + houseDepth + behind;
+            Vector2 Corner(float u0, float u1, float v0, float v1)
+            {
+                var c = Mathf.Min(line - (v0 * s), line - (v1 * s));
+                var u = Mathf.Min(u0, u1);
+                return alongX ? new Vector2(u, c) : new Vector2(c, u);
+            }
+
+            void Plant(string key, float u, float v)
+            {
+                var p = Corner(u, u + 1f, v, v + 1f);
+                Prop(key, Facing.N, p.x, p.y);
+            }
+
+            var left = a - s0;
+            var right = s1 - (a + width);
+            if (left >= 3f)
+            {
+                Plant("Tree_Fruit", s0 + 1f, depth - 2f);
+            }
+
+            if (right >= 3f)
+            {
+                Plant("Tree_Fruit", s1 - 2f, depth - 2f);
+            }
+
+            for (var v = 1f; v < depth - 3f; v += 2f)
+            {
+                Plant(rng.Next(4) == 0 ? "Poppy" : "Shrub", s0 + 0.2f, v);
+                Plant(rng.Next(4) == 0 ? "Poppy" : "Shrub", s1 - 1.2f, v);
+            }
+
+            for (var u = s0 + 1.5f; u < s1 - 1.5f; u += 2f)
+            {
+                if (Mathf.Abs(u + 0.5f - gate) >= 2.5f)
+                {
+                    Plant(rng.Next(2) == 0 ? "Poppy" : "Shrub", u, 0.2f);
+                }
+            }
+
+            if (Mathf.Max(left, right) >= 3f)
+            {
+                var toward = left >= right;
+                var u = toward ? s0 + (left / 2f) - 0.5f : s1 - (right / 2f) - 0.5f;
+                var v = garden + (houseDepth / 2f) - 1.5f;
+                var p = Corner(u, u + 1f, v, v + 3f);
+                var facing = alongX ? (toward ? Facing.E : Facing.W) : (toward ? Facing.S : Facing.N);
+                Prop("Bench", facing, p.x, p.y);
+            }
+        }
+
         /// <summary>
         /// Railings on a line along a front area, in segments of 2 m and a 1 m one for an odd metre at the end. A gate
         /// is left only before a door that opens toward the line, and a segment is set whatever prop was put there
@@ -832,10 +1027,23 @@ namespace GameDev.Slice.EditorTools
             // The low town's yards and courts are paved with cobbles; the streets are painted over them.
             _lanes.Add(new Lane { Street = "Yards", Quad = Rect(280, 600, 780, 830), Layer = Cobbles, PaintOnly = true });
             _lanes.Add(new Lane { Street = "Soot Stair", Quad = Rect(700, 592, 708, 650), Layer = Cobbles, PaintOnly = true });
-            foreach (var (lo, hi) in TerraceGardens.Select(t => Enclosure(t.Front, t.East)))
+            // The plots' gardens (§19) are green all over.
+            var terraceDepth = _kit[TerraceKeys[0]].Depth;
+            foreach (var (f, front, spans) in TerracePlots)
             {
-                _lanes.Add(new Lane { Street = "Terrace gardens", Quad = Rect(lo, 607, hi, 651), Layer = Grass, PaintOnly = true });
+                foreach (var (s0, s1) in spans)
+                {
+                    _lanes.Add(new Lane { Street = "Gardens", Quad = PlotQuad(f, front, s0, s1, terraceDepth, TerraceGarden, TerraceBehind), Layer = Grass, PaintOnly = true });
+                }
             }
+
+            var villaDepth = _kit[VillaKeys[0]].Depth;
+            foreach (var (s0, s1) in VillaPlots.Append((FactionPlot0, FactionPlot1)))
+            {
+                _lanes.Add(new Lane { Street = "Gardens", Quad = PlotQuad(Facing.S, VillaFront, s0, s1, villaDepth, VillaGarden, VillaBehind), Layer = Grass, PaintOnly = true });
+            }
+
+            _lanes.Add(new Lane { Street = "Gardens", Quad = Rect(ArchGreen.X0, ArchGreen.Y0, ArchGreen.X1, ArchGreen.Y1), Layer = Grass, PaintOnly = true });
 
             // §2 sections. Order matters for paint: a later lane covers an earlier one where they cross.
             StreetX("Ridge Street", 280, 708, 580, 592, 4, Setts);
@@ -1223,8 +1431,9 @@ namespace GameDev.Slice.EditorTools
             var assize = House(VictorianHouses.Key("Civic12", "stone"), Facing.W, 522f, 610, name: "The Assize and the Wardens' station", force: true);
             Entrance(assize, "wardens-lockup.street", VeilmouthDressing.LockupScenePath, "wardens-lockup.inside");
 
-            // The faction's house, a villa on Ridge Street.
-            var faction = House(VictorianHouses.Key("Villa6", "stucco"), Facing.S, 577f, 588, name: "The faction's house", force: true);
+            // The faction's house, a villa on Ridge Street in the largest plot (§19).
+            var faction = Plot(Facing.S, VillaFront, FactionPlot0, FactionPlot1, VictorianHouses.Key("Villa6", "stucco"), VillaGarden, VillaBehind,
+                new Random(FactionPlot0), "The faction's house", FactionAt, true);
             Entrance(faction, "faction-house.street", VeilmouthDressing.FactionHouseScenePath, "faction-house.inside");
 
             // The Soot & Bell, the corner house on Bell Street with its yard behind, and Harrow & Tincture by it.
@@ -1301,10 +1510,8 @@ namespace GameDev.Slice.EditorTools
         private static void Houses()
         {
             var shops = Keys("Shop4", "brick", "brick2", "stucco", "grey", "brick", "brick2", "blue").Concat(Keys("Shop6", "stucco", "brick")).ToArray();
-            var terraces = Keys("Terrace4", "brick", "stucco", "brick2", "grey");
             var tenements = Keys("Tenement4", "brick", "brick2", "grey", "brick2").Concat(Keys("Tenement2", "brick2", "grey")).ToArray();
             var market = Keys("Shop4", "brick", "brick2", "grey", "stucco").Concat(Keys("Tenement4", "brick", "grey")).Concat(Keys("Tenement2", "brick2", "grey")).ToArray();
-            var villas = Keys("Villa6", "stucco", "grey");
             var warehouses = Keys("Warehouse6", "warehouse");
 
             // The arch house of the terraces: through it from Terrace Street West into Wardley Garden (§7).
@@ -1316,21 +1523,20 @@ namespace GameDev.Slice.EditorTools
             Row(Facing.S, 662f, 280, 778, shops, 1);
             Row(Facing.N, 680f, 280, 778, shops, 2);
 
-            // Terraces (§3.3): raised ground floors behind front gardens, each row railed round with its gardens.
-            var seed = 3;
-            foreach (var (front, east, a0, a1) in TerraceGardens)
+            // The Terraces (§3.3) and the Ridge (§3.4): detached houses, each on its own railed plot with its garden (§19).
+            var rng = new Random(3);
+            foreach (var (f, front, spans) in TerracePlots)
             {
-                Row(east ? Facing.E : Facing.W, front, a0, a1, terraces, seed++, 0.9f);
+                foreach (var (s0, s1) in spans)
+                {
+                    Plot(f, front, s0, s1, TerraceKeys[rng.Next(TerraceKeys.Length)], TerraceGarden, TerraceBehind, new Random(s0 * 7 + (int)front));
+                }
             }
 
-            // The Ridge (§3.4): villas in gardens on Ridge Street's north side, each railed round.
-            var before = _houses.Count;
-            Row(Facing.S, 577f, 330, 445, villas, 7, 0f, 10);
-            Row(Facing.S, 577f, 560, 698, villas, 8, 0f, 10);
-            Railings(true, 579f, 326, 446);
-            Railings(true, 579f, 556, 616);
-            Railings(true, 579f, 630, 700);
-            _villas = _houses.Skip(before).ToList();
+            foreach (var (s0, s1) in VillaPlots)
+            {
+                Plot(Facing.S, VillaFront, s0, s1, VillaKeys[rng.Next(VillaKeys.Length)], VillaGarden, VillaBehind, new Random(s0));
+            }
 
             // Under the Ridge and Ridge Lane: tenements.
             Row(Facing.S, 620f, 545, 698, tenements, 9);
@@ -1386,68 +1592,16 @@ namespace GameDev.Slice.EditorTools
             }
         }
 
-        /// <summary>
-        /// The owner's play test of 2026-11-06: a house's railings go all the way round it, standing off from it, and
-        /// the ground inside is green, with bushes, small trees and a bench. Terrace rows are railed round as a block
-        /// with their front gardens; each villa on its own.
-        /// </summary>
+        /// <summary>The small green beside the arch house to Wardley Garden (§19): unrailed, a tree, shrubs, a bench.</summary>
         private static void Gardens()
         {
-            var rng = new Random(611);
-            foreach (var (front, east, a0, a1) in TerraceGardens)
+            Prop("Tree_Fruit", Facing.N, 325f, 646f);
+            foreach (var (px, py, key) in new[] { (329f, 642f, "Shrub"), (329f, 649f, "Poppy"), (322f, 649.5f, "Shrub"), (317.5f, 649.5f, "Poppy") })
             {
-                var (lo, hi) = Enclosure(front, east);
-                var street = east ? hi : lo;
-                var back = east ? lo : hi;
-                Railings(false, street, 607, 651);
-                Railings(false, back, 607, 651);
-                Railings(true, 607f, (int)lo, (int)hi);
-                Railings(true, 651f, (int)lo, (int)hi);
-                // The front garden: shrubs along the railings, between the gates.
-                for (var py = 608; py < 650; py += 2)
-                {
-                    Prop(rng.Next(5) == 0 ? "Poppy" : "Shrub", Facing.N, east ? street - 1.2f : street + 0.2f, py);
-                }
-
-                // The side gardens at each end: a small tree, shrubs, a bench.
-                foreach (var (s0, s1) in new[] { (607, a0), (a1, 651) })
-                {
-                    if (s1 - s0 < 3)
-                    {
-                        continue;
-                    }
-
-                    var mid = (s0 + s1) / 2f;
-                    Prop("Tree_Fruit", Facing.N, (lo + hi) / 2f - 0.5f, mid - 0.5f);
-                    Prop("Bench", Facing.N, east ? lo + 2f : hi - 4f, s0 == 607 ? s0 + 1f : s1 - 2f);
-                    for (var px = (int)lo + 1; px < (int)hi - 1; px += 2)
-                    {
-                        Prop(rng.Next(3) == 0 ? "Poppy" : "Shrub", Facing.N, px, s0 == 607 ? s1 - 1.2f : s0 + 0.2f);
-                    }
-                }
+                Prop(key, Facing.N, px, py);
             }
 
-            foreach (var villa in _villas)
-            {
-                var x0 = villa.Min(p => p.x) - 3f;
-                var x1 = villa.Max(p => p.x) + 3f;
-                var y0 = villa.Min(p => p.y) - 3f;
-                Railings(false, x0, (int)y0, 579);
-                Railings(false, x1, (int)y0, 579);
-                Railings(true, y0, (int)x0, (int)x1);
-                foreach (var (px, py) in new[] { (x0 + 1f, y0 + 1f), (x1 - 2f, y0 + 1f), (x0 + 1f, 576f), (x1 - 2f, 576f) })
-                {
-                    Prop("Tree_Fruit", Facing.N, px, py);
-                }
-
-                for (var py = (int)y0 + 3; py < 575; py += 2)
-                {
-                    Prop("Shrub", Facing.N, x0 + 1f, py);
-                    Prop(rng.Next(4) == 0 ? "Poppy" : "Shrub", Facing.N, x1 - 2f, py);
-                }
-
-                Prop("Bench", Facing.E, x0 + 1f, Mathf.Round((y0 + 577f) / 2f));
-            }
+            Prop("Bench", Facing.W, 318f, 642f);
         }
 
         private static void Squares()
@@ -1879,6 +2033,7 @@ namespace GameDev.Slice.EditorTools
         {
             var blocks = Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude);
             var faults = KitLayoutCheck.Check(blocks);
+            Debug.Log($"[VeilmouthCity] plots: the least room between a door's steps and its railings is {_stepsClear:0.00} m (§19 asks 1.5 m).");
             Debug.Log($"[VeilmouthCity] {blocks.Length} blocks, {_doors.Count} doors, {_lanes.Count} lanes, {faults.Count} kit faults" +
                       (faults.Count > 0 ? ":\n  " + string.Join("\n  ", faults.Take(60).Select(f => f.ToString())) : "."));
         }

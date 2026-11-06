@@ -46,11 +46,11 @@ namespace GameDev.Slice.EditorTools
             public string Facade = "Wall1"; // the walls' material: Wall1–Wall4, Brick01, Brick02, Stone wall
             public bool Dormers = true;
             public int Arch = -1;         // the first of the two front modules an arch passes under, or none
-            public Side Faced;            // a corner house: the side with a second facade on a side street
+            public Side Faced;            // a corner house: the side with a second facade on a side street; Both: a house seen all round
         }
 
-        /// <summary>A house's sides by its own axes, its front on +Z: −X is Left.</summary>
-        public enum Side { None, Left, Right }
+        /// <summary>A house's sides by its own axes, its front on +Z: −X is Left. Both: a detached house (city plan §19).</summary>
+        public enum Side { None, Left, Right, Both }
 
         /// <summary>Survey of 2026-11-06, at ×1: the house door's stoop, 0.66 m out from the front and 0.4 m high.</summary>
         private const float StoopOut = 0.66f, StoopHigh = 0.4f, StoopHalfWidth = 0.87f;
@@ -68,10 +68,13 @@ namespace GameDev.Slice.EditorTools
         public const string StoopMaterial = "Porch";
 
         /// <summary>The key of a type's corner variant, its second facade on <paramref name="side"/>.</summary>
-        public static string CornerKey(string key, Side side) => key + (side == Side.Left ? "_cornerL" : "_cornerR");
+        public static string CornerKey(string key, Side side) => key + (side == Side.Left ? "_cornerL" : side == Side.Right ? "_cornerR" : "_detached");
 
         /// <summary>The types baked with a corner variant on each side: the terrace types a row ends with.</summary>
         public static readonly string[] CornerTypes = { "Shop4", "Terrace4", "Tenement4" };
+
+        /// <summary>The types also baked detached, with both side facades (city plan §19): the Terraces' houses.</summary>
+        public static readonly string[] DetachedTypes = { "Terrace4" };
 
         private static GameObject Load(string path) => AssetDatabase.LoadAssetAtPath<GameObject>(path + ".prefab");
 
@@ -106,7 +109,8 @@ namespace GameDev.Slice.EditorTools
                             continue; // the arch's own model walls its passage (below)
                         }
 
-                        var faced = (left && spec.Faced == Side.Left) || (right && spec.Faced == Side.Right);
+                        var faced = (left && (spec.Faced == Side.Left || spec.Faced == Side.Both)) ||
+                                    (right && (spec.Faced == Side.Right || spec.Faced == Side.Both));
                         var sideYaw = left ? 270f : 90f;
                         var shopFloor = spec.Shop && !up;
                         if ((front || back) && (left || right) && shopFloor)
@@ -489,7 +493,7 @@ namespace GameDev.Slice.EditorTools
             new Spec { Name = "Terrace4", Front = 4, Depth = 4, Storeys = 3, Doors = new[] { 1 } },
             new Spec { Name = "Tenement4", Front = 4, Depth = 4, Storeys = 4, Doors = new[] { 2 } },
             new Spec { Name = "Tenement2", Front = 2, Depth = 4, Storeys = 4 },
-            new Spec { Name = "Villa6", Front = 6, Depth = 6, Storeys = 3, Doors = new[] { 2 } },
+            new Spec { Name = "Villa6", Front = 6, Depth = 6, Storeys = 3, Doors = new[] { 2 }, Faced = Side.Both }, // stands alone (§19)
             new Spec { Name = "Warehouse6", Front = 6, Depth = 6, Storeys = 3, Doors = new[] { 2, 3 }, Dormers = false },
             new Spec { Name = "Civic12", Front = 12, Depth = 8, Storeys = 3, Doors = new[] { 5, 6 } },
             new Spec { Name = "Civic16", Front = 16, Depth = 8, Storeys = 3, Doors = new[] { 7, 8 } },
@@ -522,6 +526,11 @@ namespace GameDev.Slice.EditorTools
             {
                 var source = Types.Single(t => t.Name == type);
                 var sides = CornerTypes.Contains(type) ? new[] { Side.None, Side.Left, Side.Right } : new[] { Side.None };
+                if (DetachedTypes.Contains(type))
+                {
+                    sides = sides.Append(Side.Both).ToArray();
+                }
+
                 foreach (var side in sides)
                 {
                     var key = Key(type, facade);
@@ -529,7 +538,7 @@ namespace GameDev.Slice.EditorTools
                     {
                         Name = side == Side.None ? $"{type}_{facade}" : CornerKey($"{type}_{facade}", side), Front = source.Front,
                         Depth = source.Depth, Storeys = source.Storeys, Doors = source.Doors, Shop = source.Shop,
-                        Dormers = source.Dormers, Arch = source.Arch, Faced = side,
+                        Dormers = source.Dormers, Arch = source.Arch, Faced = side == Side.None ? source.Faced : side,
                     };
                     var entry = Bake(spec, Facade(facade, shop, source.Shop));
                     entry.Key = side == Side.None ? key : CornerKey(key, side);

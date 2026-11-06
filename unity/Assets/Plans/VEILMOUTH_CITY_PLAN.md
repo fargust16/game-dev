@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1)
 
-Version: 0.13
+Version: 0.14
 
 Status: Draft — accepted by the owner, 2026-11-05; sizes remain authoring defaults
 
-Last Updated: 2026-11-06 (§18, remark 7: loose props built, by kit standard §4. Earlier: §18: the owner's third play test: shelves, paintings, and beds fixed; detached houses, loose props, a room constructor, transport, cabs, and animals recorded. Earlier: §17: the owner's second play test fixed and rerun at the owner's request: still dressing, game scale ×1.2, BK's 4 m module, walls set by their infill, one-style steps, props on slopes, railings without holes, blue shop floors; §14 and §16 resized. Earlier: §16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-06 (§19: detached houses, by the owner after the third play test: every railed house stands alone on its own green plot, railed all round with one gate opposite its door; §3.3, §3.4 and §5.2 changed to match. Earlier: §18, remark 7: loose props built, by kit standard §4. Earlier: §18: the owner's third play test: shelves, paintings, and beds fixed; detached houses, loose props, a room constructor, transport, cabs, and animals recorded. Earlier: §17: the owner's second play test fixed and rerun at the owner's request: still dressing, game scale ×1.2, BK's 4 m module, walls set by their infill, one-style steps, props on slopes, railings without holes, blue shop floors; §14 and §16 resized. Earlier: §16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
@@ -87,11 +87,11 @@ East–west from the West Gate to the Veil Bridge. Four-storey houses of one cor
 
 ## 3.3 Terraces (residential, west)
 
-Middle-class terraces between the High Street and the Ridge: houses of three storeys on a raised ground floor, each behind a front area with railings, a gate, steps up, and a small tree or shrubs. A garden square (Wardley Square) with railings, lawn, trees, and benches. Mews behind the terraces through arches (§7).
+Middle-class houses between the High Street and the Ridge. The district keeps its name, but its houses stand alone (§19, owner 2026-11-06): three storeys, each on its own green plot, railed all round with one gate opposite its door, with a garden of trees, shrubs, flowers, and a bench. A garden square (Wardley Square) with railings, lawn, trees, and benches. Mews behind the terraces through arches (§7).
 
 ## 3.4 The Ridge (upper town)
 
-The rich, 8 m above the High Street behind a retaining wall. Villas and wide townhouses in gardens, the faction's house, Ridge Street, and the palace. Lamps regular and bright: stealth is hard here.
+The rich, 8 m above the High Street behind a retaining wall. Villas standing alone in gardens (§19), the faction's house in the largest, Ridge Street, and the palace. Lamps regular and bright: stealth is hard here.
 
 ## 3.5 Market Quarter (commercial)
 
@@ -135,8 +135,8 @@ A plot is a rectangle on the 1 m grid with a frontage, a depth, a storey count, 
 |---|---|---|---|---|
 | High Street shop house | 6–9 × 12 m | 4 | shop front, awning, sign | yard behind |
 | Corner building | 9–14 × 14 m | 4 | shop or tavern, door on the corner | — |
-| Terrace house | 6–7 × 12 m | 3 + raised ground | door up 4–6 steps | front area 3 m, railings, gate, a tree or shrubs; garden behind |
-| Villa (Ridge) | 14–20 × 14 m | 2–3 | porch | garden 10–20 m round it, wall or railings |
+| Detached house (Terraces) | 10 × 10 m on a plot 22 × 16 m | 3 | door on the ground, its stoop | a plot railed all round (§19): front garden 4 m, 6 m each side, 2 m behind |
+| Villa (Ridge) | 15 × 15 m on a plot 25–37 × 23 m | 3 | door on the ground, its stoop | a plot railed all round (§19): front garden 5 m, 5 m or more each side, 3 m behind |
 | Tenement | 5–6 × 10 m | 3–4 | door straight on the street | court behind |
 | Warehouse | 12–20 × 16 m | 2–3 | loading door, hoist | dock or yard |
 | Civic (Town Hall, Assize, Customs) | 30–60 × 30 m | 2–3 high storeys | portico, steps | forecourt |
@@ -449,10 +449,29 @@ The owner played again and sent four screenshots with remarks and wishes. What c
 |---|---|---|
 | 1 | Bottles float over the shelf | Fixed: a set's things stand on the surface a ray finds under them; the shelf's brackets had raised its bounds above the board. Every thing of every set now sits on its base (measured, gap 0.000 m). |
 | 2 | Paintings sink into the wall | Fixed: paintings and boards stand 0.04 m off the plaster, in every interior and Dwelling, since they are kit prefabs. |
-| 3 | Railings stand too close to houses, have holes, and steps run past them onto the pavement | Waits for 4, which places railings round each house with one gate opposite its door. |
-| 4 | Each railed house should stand alone on its own green ground; only shopping streets and the slums build in rows; rich residential quarters have gardens with a bench, trees, shrubs, and flowers | A change to §3.3, §3.4, and §5.2, the owner's. Planned as the next pass of the city (VS-PLOT). |
+| 3 | Railings stand too close to houses, have holes, and steps run past them onto the pavement | Built with 4 (§19): railings stand 2 m or more from the house, without a hole, the only opening a 3 m gate opposite the door; every door's steps end 1.5 m or more inside them (least measured: 1.78 m). |
+| 4 | Each railed house should stand alone on its own green ground; only shopping streets and the slums build in rows; rich residential quarters have gardens with a bench, trees, shrubs, and flowers | Built (§19, VS-PLOT): the Terraces and the Ridge stand as detached houses on railed green plots with trees, shrubs, poppies, and a bench; §3.3, §3.4, and §5.2 changed to match. |
 | 5 | Every home needs beds, and living rooms must be furnished | Fixed in the Dwelling generator: a villa has a bedroom behind its study, and a shop's back room has the shopkeeper's bed; tenements and terraces had beds. Rooms keep their furniture lists (§16). |
 | 6 | All interiors look the same; assemble rooms at random like a construction set | Recorded (VS-ROOMS); later. |
 | 7 | Tables, chairs, crates, barrels, and small things should have mass and gravity, fall, roll, and later break | Built the same day, at the owner's choice, by the kit standard's §4 (*Loose props*): they sleep where they stand until touched, a set's things come off it, the player pushes them, and townsfolk shoulder them aside. Breaking is V2 (VS-PHYS). |
 | 8 | City transport, carriages as cabs, street animals | Recorded for later (FG-TRANSIT, FG-CAB, VS-BEASTS). |
 | 9 | A warning from `VolumetricLight` | Fixed: BK's script, which needs the built-in pipeline, is removed from the kit's lamps and candles. The Tripo Bridge's socket error is the bridge's own: its server was already running, as when its window is opened twice. |
+
+---
+
+# 19. Detached houses (VS-PLOT), 2026-11-06
+
+The owner, after the third play test: every house with railings is a building of its own on its own ground; only shopping streets and the slums build in rows; the rich residential quarters give each house railings all round, one gate opposite its door, and a green garden with a bench, trees, shrubs, and flowers; the railings never have holes and keep a clear distance from the house. The agent reads the rich residential quarters as the Terraces (§3.3) and the Ridge (§3.4). Every number below is an authoring default.
+
+**A plot** is a rectangle on the 1 m grid holding one house:
+
+- **Railings all round, without a hole.** The only opening is the gate, 3 m wide, opposite the house door; nothing else in the line is left out. Two plots side by side share the railing between them.
+- **Clear of the house:** the railings stand at least 2 m from the house's back and sides, and the front garden is at least 4 m deep. The house stands on the ground with no raised floor, so its steps end at least 1.5 m inside the railings and never cross them.
+- **A garden:** grass over the whole plot; a small tree in each back corner where the side garden is 3 m or more; shrubs along the side railings, one in four a flower (`Poppy`, Polytope Studio, already in the kit); flowers along the front railings either side of the gate path; a bench in the wider side garden. Nothing stands on the 3 m path from the gate to the door.
+- **The house** has windows on both sides and its back, since it is seen all round: the Terraces' house type and the villa are baked with both side facades.
+
+**The Terraces** keep their four rows on Terrace Street West and East (§2): two plots of 22 m on each row, 607–651 along the street, a house of 10 × 10 m in the middle of each, front gardens of 4 m to the pavement. The arch house to Wardley Garden (§7) stands on its own on the west row of Terrace Street West, unrailed, since it is a passage and not a home, with a small green beside it.
+
+**The Ridge** has seven villa plots on Ridge Street's north side, the houses set back to give front gardens of 5 m: four of 29 m between 330 and 446, one of 25 m and the faction's house in the largest, 36 m, between 556 and 617, and two of 34 m between 629 and 697.
+
+This replaces the terrace rows railed round as a block and the villas railed on three sides of §17. Shopping streets, the High Street, Lower Veil, and the docks keep building wall to wall.
