@@ -33,8 +33,9 @@ namespace GameDev.Slice.EditorTools
         public const string PersonIdlePath = AnimatorFolder + "/SlicePersonIdle.controller";
         private const string PortalLeafPath = SliceKitCatalogue.Folder + "/Portal/Kit_Portal_Leaf_3x2.prefab";
 
-        /// <summary>What the camera's spring arm meets: the ground and the buildings, nothing smaller.</summary>
-        public static LayerMask CameraCollision => LayerMask.GetMask(KitLayers.Ground, KitLayers.Structure);
+        /// <summary>What the camera's spring arm meets: the ground, the buildings and the interiors' ceilings, nothing smaller.</summary>
+        public static LayerMask CameraCollision =>
+            LayerMask.GetMask(KitLayers.Ground, KitLayers.Structure, VeilmouthInteriors.CeilingLayer);
 
         [MenuItem("GameDev/Slice/Fix Characters, Doors and Camera in Slice Scenes")]
         public static void FixAll()

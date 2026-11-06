@@ -26,9 +26,15 @@ namespace GameDev.Slice.EditorTools
         public const string RootName = "Interior C1";
         public const string RoomMarker = "Room - ";
         public const int Module = 3;
-        // The walls stand 3 m, but their single-sided frame tops out a little lower: a ceiling at 2.9 m closes the slit
-        // of sky seen above an outer wall (render of 2026-11-06).
-        public const float CeilingHeight = 2.9f;
+        // The walls stand 3.6 m (SliceKitCatalogue.BkStretch), but their single-sided frame tops out a little lower: a
+        // ceiling 0.97 of the way up closes the slit of sky seen above an outer wall (render of 2026-11-06).
+        public const float CeilingHeight = 2.9f * SliceKitCatalogue.BkStretch;
+
+        /// <summary>
+        /// The layer of a ceiling's collider: the camera's spring arm meets it (SliceCharacterLook.CameraCollision), the
+        /// Combat Grid does not read it as a floor (CombatGridReader.Mask leaves Ignore Raycast out).
+        /// </summary>
+        public const string CeilingLayer = "Ignore Raycast";
 
         public static readonly (string Id, string Path)[] All =
         {
@@ -215,6 +221,14 @@ namespace GameDev.Slice.EditorTools
                 marker.position = new Vector3(x + w * 0.5f, 0f, z + d * 0.5f);
                 marker.localScale = new Vector3(w, CeilingHeight, d);
 
+                // The camera stays under the ceiling (owner's play test, 2026-11-06). Not a kit block: a box the arm meets.
+                var ceiling = new GameObject("Ceiling collider - " + name);
+                ceiling.transform.SetParent(_parent, false);
+                ceiling.layer = LayerMask.NameToLayer(CeilingLayer);
+                var box = ceiling.AddComponent<BoxCollider>();
+                box.center = new Vector3(x + w * 0.5f, CeilingHeight + 0.15f, z + d * 0.5f);
+                box.size = new Vector3(w, 0.3f, d);
+
                 var light = new GameObject("Light - " + name).AddComponent<Light>();
                 light.transform.SetParent(_parent, false);
                 light.transform.position = new Vector3(x + w * 0.5f, CeilingHeight - 0.4f, z + d * 0.5f);
@@ -238,13 +252,16 @@ namespace GameDev.Slice.EditorTools
                 // wall between two rooms gets a face turned to the second, and each side takes its room's family,
                 // brick for a stone room and plaster for the rest.
                 var sides = Sides(plan, x, z, alongZ);
-                void Wall(Func<bool, string> family)
+                GameObject Wall(Func<bool, string> family)
                 {
-                    Segment(family(sides[0].Stone), x, z, alongZ, sides[0].Facing);
+                    var solid = Segment(family(sides[0].Stone), x, z, alongZ, sides[0].Facing);
                     if (sides.Count > 1) Segment(family(sides[1].Stone) + "Face", x, z, alongZ, sides[1].Facing);
+                    return solid;
                 }
 
-                void Leaf(string key) => Segment(key, x, z, alongZ, sides[0].Facing);
+                GameObject Leaf(string key) => Segment(key, x, z, alongZ, sides[0].Facing);
+                // The shut leaf stands in its doorway's opening as a nested block, as the cell door in its bars.
+                void Shut(GameObject doorway) => Leaf("BkDoor").transform.SetParent(doorway.transform, true);
                 switch (kind)
                 {
                     case Opening.Wall:
@@ -257,15 +274,13 @@ namespace GameDev.Slice.EditorTools
                         Wall(Doorway);
                         break;
                     case Opening.Closed:
-                        Wall(Doorway);
-                        Leaf("BkDoor");
+                        Shut(Wall(Doorway));
                         break;
                     case Opening.Cell:
                         Put("CellBars3", x, z, alongZ ? 3 : 0);
                         break;
                     case Opening.Street:
-                        Leaf(Doorway(sides[0].Stone));
-                        Leaf("BkDoor");
+                        Shut(Leaf(Doorway(sides[0].Stone)));
                         var portal = Put("PortalLeaf", x, z, alongZ ? 3 : 0).GetComponent<Portal>();
                         portal.Configure(id + ".inside", SliceTestScenes.SceneName(VeilmouthScene.ScenePath), id + ".street", true);
                         PrefabUtility.RecordPrefabInstancePropertyModifications(portal);
@@ -357,6 +372,15 @@ namespace GameDev.Slice.EditorTools
                     Against("BkDrawer", S, 15, 10);
                     Put("BkChair", 13, 10);
                     Put("BkCarpet", 11, 10);
+                    Hang("BkPainting", N, 0, 4, 1.9f);
+                    Hang("BkPainting", W, 15, 7, 1.9f);
+                    Against("BkSideTable", N, 0, 3);
+                    Put("BkLogs", 1, 3);
+                    Hang("BkDishShelf", S, 15, 1, 1.7f);
+                    Against("BkDresser", E, 9, 10);
+                    Hang("BkPainting", E, 6, 10, 1.9f);
+                    Hang("BkPainting", W, 15, 10, 1.9f);
+                    Put("BkTrunk", 10, 9);
                     VeilmouthDressing.Person("Yellow", false, 11.5f, 6.8f, 180f, "Tavern keeper", 0f);
                     VeilmouthDressing.Person("Brown", false, 1.5f, 6.5f, 90f, "Veinmarket at a table", 0f);
                     break;
@@ -376,10 +400,17 @@ namespace GameDev.Slice.EditorTools
                     Hang("BkBookShelf", S, 12, 6, 1.6f);
                     Hang("BkJarShelf", W, 9, 6, 1.5f);
                     Put("Barrel", 10, 10);
-                    Put("Barrel", 11, 10);
-                    Put("Barrel", 10, 11);
+                    Put("Barrel", 10, 9);
                     Put("BkBasket", 11, 7);
                     Put("Crate", 10, 7);
+                    Hang("BkBottleShelf", S, 6, 1, 2.1f);
+                    Hang("BkBottleShelf", S, 6, 3, 2.1f);
+                    Put("BkBasketB", 1, 4);
+                    Put("Crate", 7, 4);
+                    Put("BkWorkTable", 6, 8);
+                    Hang("BkBookShelfB", S, 12, 6, 2.2f);
+                    Put("BkGlobe", 1, 10);
+                    Hang("BkJarShelf", E, 9, 7, 1.5f);
                     VeilmouthDressing.Person("Green", false, 3.5f, 4.8f, 180f, "Harrow", 0f);
                     break;
 
@@ -405,6 +436,15 @@ namespace GameDev.Slice.EditorTools
 
                     Hang("BkBookShelf", E, 6, 10, 1.6f);
                     Against("BkDesk", W, 12, 10);
+                    Hang("BkPainting", W, 12, 7, 1.9f);
+                    Put("BkCarpetLong", 4, 1);
+                    Put("BkCarpetLong", 4, 4);
+                    Hang("BkPainting", N, 9, 4, 1.9f);
+                    Against("BkSideTable", W, 6, 12);
+                    Hang("BkBookShelfB", E, 6, 10, 2.2f);
+                    Hang("BkBookShelfC", E, 6, 12, 1.6f);
+                    Hang("BkBookShelf", E, 6, 12, 2.2f);
+                    Put("BkTrunk", 9, 12);
                     VeilmouthDressing.Person("Teal", false, 6f, 7.4f, 180f, "Faction member", 0f);
                     VeilmouthDressing.Person("Teal", true, 2.5f, 12.4f, 0f, "Faction member", 0f);
                     break;
@@ -424,6 +464,11 @@ namespace GameDev.Slice.EditorTools
                     Put("BkDiningTable", 10, 8);
                     Put("BkStool", 12, 8);
                     Against("BkCupboardTall", S, 12, 9);
+                    Hang("BkPainting", N, 0, 1, 1.9f);
+                    Against("BkCupboard", E, 0, 4);
+                    Against("BkCupboardGlass", N, 0, 9);
+                    Hang("BkPainting", S, 6, 12, 1.9f);
+                    Against("BkArmsTable", S, 12, 12);
                     VeilmouthDressing.Person("Blue", false, 4f, 4.6f, 180f, "Warden", 0f);
                     VeilmouthDressing.Person("Blue", true, 11f, 10.5f, 180f, "Warden", 0f);
                     break;
@@ -436,6 +481,8 @@ namespace GameDev.Slice.EditorTools
                     Put("BkChair", 5, 3);
                     Put("BkTrunk", 3, 6).name = "The cache";
                     Hang("BkBookShelf", E, 0, 4, 1.6f);
+                    Hang("BkPainting", S, 9, 1, 1.9f);
+                    Against("BkDresser", S, 3, 3);
                     break;
 
                 case "soot-stair-cellar":
@@ -447,6 +494,8 @@ namespace GameDev.Slice.EditorTools
                     Put("Barrels", 16, 3);
                     Put("Box", 19, 1);
                     Put("BkLogs", 19, 4);
+                    Put("BkBasketB", 1, 5);
+                    Put("Crate", 16, 1);
                     Put("Candles", 7, 8);
                     Put("Candles", 14, 8);
                     VeilmouthDressing.Circle(new Vector3(10f, 0f, 4f), "Candidate 2, the cellar under the Soot Stair");
@@ -464,6 +513,11 @@ namespace GameDev.Slice.EditorTools
                     Put("Candles", 6, 13);
                     Against("BkCupboardTall", S, 15, 9);
                     Against("BkDesk", W, 12, 10);
+                    Put("BkCarpetLong", 3, 3);
+                    Put("BkCarpetLong", 3, 6);
+                    Put("BkCarpetLong", 3, 9);
+                    Hang("BkPainting", W, 9, 7, 2.0f);
+                    Put("BkTrunk", 10, 12);
                     break;
             }
         }

@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1)
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft — accepted by the owner, 2026-11-05; sizes remain authoring defaults
 
-Last Updated: 2026-11-06 (§14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-06 (§15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
@@ -62,9 +62,9 @@ Answers to the three questions of the first pass: an arch house lets people thro
 | Street | Total | Pavement each side | Carriageway | Notes |
 |---|---|---|---|---|
 | Crown Avenue (grand) | 36 m | 4 m | 2 × 7 m | a 14 m mall of trees and benches between the carriageways |
-| High Street (central) | 18 m | 4 m | 10 m | two carriages pass with a third standing |
-| Ridge Street, terrace streets | 12–14 m | 3 m | 6–8 m | plus front areas of 2–4 m behind railings |
-| Bell Street, Mercers Row, Cheap Street | 10–12 m | 2–3 m | 6 m | shop fronts, stalls at the kerb |
+| High Street (central) | 18 m | 5 m | 8 m | two carriages pass with a third standing |
+| Ridge Street, terrace streets | 12–14 m | 4 m | 4–6 m | plus front areas of 2–4 m behind railings |
+| Bell Street, Mercers Row, Cheap Street | 10–12 m | 3 m | 4–6 m | shop fronts, stalls at the kerb |
 | Loom Lane, mews | 6–8 m | none or 1 m | shared | cobbles |
 | Court alley (Lower Veil) | 2–3 m | — | — | under arches, between tenements |
 | Stair lane (Soot Stair) | 8 m | — | — | flights of 1.5–2 m with landings |
@@ -275,12 +275,12 @@ Checked by `VeilmouthSceneTests` (the heights above, the edge's slope, the roads
 
 | Street | Where | Section |
 |---|---|---|
-| High Street | 280–780 × 662–680, broken by Crown Circus | 4 + 10 + 4 m |
+| High Street | 280–780 × 662–680, broken by Crown Circus | 5 + 8 + 5 m |
 | Crown Avenue | 482–518 × 560–646 | 4 + 7 + 14 mall + 7 + 4 m |
-| Ridge Street | 280–708 × 580–592 | 3 + 6 + 3 m |
-| Terrace streets West and East | 304–316 and 414–426 × 606–662 | 3 + 6 + 3 m |
-| Mercers Row and Bell Street | 280–370 and 430–724 × 730–740, on one line broken by the Market Square | 2 + 6 + 2 m |
-| Cheap Street, Dock Road | 454–466 and 724–736 × 680–812 | 2 + 8 + 2 m |
+| Ridge Street | 280–708 × 580–592 | 4 + 4 + 4 m |
+| Terrace streets West and East | 304–316 and 414–426 × 606–662 | 4 + 4 + 4 m |
+| Mercers Row and Bell Street | 280–370 and 430–724 × 730–740, on one line broken by the Market Square | 3 + 4 + 3 m |
+| Cheap Street, Dock Road | 454–466 and 724–736 × 680–812 | 3 + 6 + 3 m |
 | Loom Lane, Ridge Lane, Back Lane | 560–724 × 778–784; 545–698 × 620–626; 280–414 × 600–606 | cobbles |
 | Tanners Slant | from the High Street (325, 680) to the Market Square (370, 725), at 45° | 8 m setts |
 | Alleys | Court Alley, Loom Alley, Ridge Alley, Chapel Lane, the Garden Passage | 3–14 m, cobbles |
@@ -316,7 +316,7 @@ Squares: Crown Circus (475–525 × 646–696), the palace forecourt (460–540 
 - BK draws a wall only on its local +Z side. A wall between two rooms therefore gets a second face turned to the other room, which is seen and never solid.
 - `IntWall02a/b` are brick between timbers, and they line the stone rooms: the kitchen, the laboratory and store room, the lock-up's corridor and cells, the cellar's vaults, and the chapel. `IntWall01a`, both doorways, and the window are plaster, and they line every other room.
 - The plaster wall is 0.377 m thick, the brick 0.167 m, the window 0.27 m. A wall's body is capped at 0.3 m (kit standard §2).
-- The walls stand 3 m, but their frame tops out just below that. The ceiling is therefore at **2.9 m**, which closes a slit of sky seen above the outer walls.
+- The walls stand 3 m, but their frame tops out just below that. The ceiling was therefore at 2.9 m, which closes a slit of sky seen above the outer walls. After the owner's play test (§15) BK's architecture is stretched upright by 1.2 more: walls 3.6 m, the ceiling at **3.48 m**.
 
 BK's jars of babies and brains are not used.
 
@@ -334,6 +334,35 @@ BK's jars of babies and brains are not used.
 
 Each room has one warm point light under its ceiling, with no shadows. The street door holds the portal leaf, and the player arrives just inside it. The people are the asset map's coloured Dummies at their posts.
 
-**Counted:** 710 kit blocks in the seven, with no kit fault.
+**Counted:** 710 kit blocks in the seven, with no kit fault; 749 after §15.
 
 **Still missing:** stairs and upper floors; arches between the vaults; the cache's contents (the Stash rules of [19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.3 come with step 4a).
+
+---
+
+# 15. The owner's remarks, 2026-11-06, as fixed
+
+The owner played the built city and interiors and asked for their remarks to be fixed by hand before step 4a, with rules for generating houses and props to follow later. Both passes were rerun by batch at the owner's request (`BuildReplacing`), so the scenes are again the owner's from this build. Every number is an authoring default unless it is marked measured.
+
+| # | Remark | Fix |
+|---|---|---|
+| 1 | The shop's double door floats | The pack draws its shop door 0.96 m up, on a wooden base end that the bake leaves out. The bake moves the `Double door` down by 0.96 × 1.25 m and the `Door portal` by 0.6 × 1.25 m (measured on the modules at ×1). |
+| 2 | Gaps where panels meet | A shop's ground floor is now its shop front to both corners, with no stone corner between fronts. No other gap was found in the renders. The owner is asked to point to any that remain. |
+| 3 | The house steps are walked through | Each house door's stoop is three collider steps, 0.17 m high each, following the pack's own fronts (measured: 0.66 × 0.4 m at ×1). |
+| 4 | The way to the palace forecourt is walled off, and a person stands in the wall | The Ridge's retaining wall sampled the avenue's ramp. It now stops wherever a street crosses the Ridge's edge. |
+| 5 | Running into a wall drops the model head first through it | A house's body now reaches over its pilasters and door frames: a strip 0.16 m proud of the front. It stops 0.16 m short of each end, so fronts meeting in a square's inner corner do not cross. The stoops are solid too. |
+| 6 | Trees float | Trees, bushes, and grass stand 0.2 m into the ground. |
+| 7 | The city gate flickers, and its lintel sticks out | The lintel is the wall's own thickness, flush with both faces, from 4.5 m over the road up to the wall's top. The tower and wall faces no longer lie in one plane. |
+| 8 | Interior ceilings are low, and the camera sticks | See §14: the ceiling is at 3.48 m. Each room has a box collider under its ceiling on Unity's `Ignore Raycast` layer, so the camera stops at it and the Combat Grid does not read it. |
+| 9 | Stoves stand out from walls and paintings do not touch them; running at a door drops the player into the void | A piece that stands against a wall (stove, sink, cupboards, chest of drawers, kitchen table, desk, lab bench, alembic) puts its back on the wall's face, 0.19 m from the line, and a painting hangs on that face. Doors are solid leaves in their doorways. A fall guard on the player returns them to the last ground they stood on once they fall 5 m below the scene's lowest collider. |
+| 10 | Pavements too narrow | They are wider: 5 m on the High Street, 4 m on Ridge Street and the terrace streets, and 3 m on the others (§2). |
+| 11 | Terrace fences should run round the house, further out, with green, trees, bushes, and benches | Each terrace row stands in a railed garden on all four sides, with lawn, shrubs along the front, and a tree and a bench in each side garden of 3 m or more. A villa's railings run round its sides and back, 3 m from the house, with corner trees, shrubs, and a bench. |
+| 12 | Corner houses, and no empty corners of odd widths | Shop4, Terrace4, and Tenement4 are baked with a second facade on either side for the ends of a row. A row now fills each free span exactly: it searches the widths for the best fit, and a leftover under one house becomes a yard wall 4 m high. |
+| 13 | Storeys' colours should match | A shop house's upper storeys take the wall material of its ground floor's colour set. |
+| 14 | The cornice should run along the roof's sides | Each gable end carries the pack's roof cornice without its slope. |
+| 15 | Interiors are sparse | More of BK's pieces and sets: carpets, paintings, a dresser, side and round tables, a work table with a cauldron and lab glass, an arms table, shelves of books, a globe, dishes, and baskets. What no pack has is listed for the owner in [SLICE_MODELS_WANTED.md](SLICE_MODELS_WANTED.md). |
+| 16 | Generation rules for houses and props | Later, by the owner. |
+
+Other changes in this pass: the arch house into Wardley Garden stands at px 320, with its passage 328–340, and a lamp keeps 8 m from a door measured to its centre.
+
+**Counted** on this build: 3197 kit blocks in the city and 749 in the seven interiors, all with no kit fault, and 277 doorways. Tests pass: `KitLayoutCheckTests`, `PortalPairingTests`, `VeilmouthCityTests`, and `VeilmouthSceneTests` (51 in EditMode), and the door and movement tests in PlayMode (20).

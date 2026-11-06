@@ -31,6 +31,7 @@ namespace GameDev.Slice.EditorTools
             Ground,   // a 0.1 m slab under the footprint whose top is the pivot's height
             None,     // NoGrid: seen, never solid
             Doorway,  // a linear wall with an opening in its middle: two side boxes and a lintel
+            Leaf,     // a door leaf: one box filling its doorway's opening, 0.1 m thick on the line
         }
 
         public enum Anchor
@@ -40,8 +41,16 @@ namespace GameDev.Slice.EditorTools
             Linear,   // centred on the grid line through the pivot, along +X
             Pivot,    // the vendor pivot in the middle of the cell beyond the pivot's node (trees, bushes)
             Node,     // what is seen is centred on the pivot's node, with no footprint (a corner post)
-            Face,     // along +X like Linear, its back 0.08 m out on +Z: hung on a wall's face (shelf, painting)
+            Face,     // along +X like Linear, its back on the wall's face (WallFace out on +Z): a shelf, a painting
+            Back,     // centred in X, its back on the wall's face (WallFace out on +Z): furniture against a wall
         }
+
+        /// <summary>
+        /// Where a BK room's plain wall shows its face, m from the wall's line (survey of 2026-11-06): the plaster is
+        /// 0.37 m thick at ×1.2, so its face is 0.19 m out, and the thinner brick is set with its face there too, so
+        /// furniture, shelves and paintings stand against either.
+        /// </summary>
+        public const float WallFace = 0.19f;
 
         public sealed class Spec
         {
@@ -55,6 +64,9 @@ namespace GameDev.Slice.EditorTools
             public float? DoorX;  // where a building's own door is, from the footprint's local west edge
             public string Material; // a project-side material for a model whose own does not render in URP
             public float Factor = 1f; // a uniform scale before sizing (BK's architecture at x1.2, city plan §8)
+            public float Stretch = 1f; // a vertical scale on top of Factor (BK's rooms: walls 3.6 m, owner 2026-11-06)
+            public bool OnFace;        // a linear block set with its seen face at WallFace instead of centred
+            public bool LineBody;      // a linear block whose body is the full 0.3 m on its line, whatever is seen
             public string Pack;       // a pack whose built-in materials get URP copies (SliceUrpMaterials)
             public bool NoLights;     // removes the vendor's lights (BK's window carries one)
             public float OpenWidth, OpenHeight; // a doorway's opening, m, after Factor
@@ -67,6 +79,7 @@ namespace GameDev.Slice.EditorTools
             public int Width, Depth; // footprint in cells along local X and Z; a linear block's depth is 0
             public float Height;
             public float DoorX;
+            public float Stoop; // a house door's own steps, m out from its front; the city's steps start beyond them
             public GameObject Prefab => AssetDatabase.LoadAssetAtPath<GameObject>(Path);
         }
 
@@ -82,6 +95,9 @@ namespace GameDev.Slice.EditorTools
         private const string Polytope = "Assets/Polytope Studio/Lowpoly_Environments/Prefabs";
         private const string Bk = "Assets/BK_AlchemistHouse/Prefabs";
         private const float BkArchitecture = 1.2f; // city plan §8: a 3 m module, walls and ceilings 3 m, a door 2.38 m
+        // The owner's play test of 2026-11-06: 3 m rooms trap the camera under the ceiling. The architecture is stretched
+        // upward once more, so walls stand 3.6 m and a door 2.85 m (authoring default).
+        public const float BkStretch = 1.2f;
 
         private static Spec S(string key, string family, string part, string folder, string file, string layer,
             Body body = Body.Box, Anchor anchor = Anchor.Centre) =>
@@ -278,22 +294,32 @@ namespace GameDev.Slice.EditorTools
             {
                 var spec = S(key, "BkRoom", key.Substring(2), arch, file, layer, body, anchor);
                 spec.Factor = BkArchitecture;
+                spec.Stretch = BkStretch;
+                spec.LineBody = true; // brick, plaster and window walls meet at a node whatever their own thickness
                 spec.Pack = "BK";
                 spec.NoLights = true;
                 spec.Width = width;
                 return spec;
             }
 
+            Spec Plain(string key, string file, string layer, Body body)
+            {
+                var spec = A(key, file, layer, body, Anchor.Linear, 3);
+                spec.OnFace = true;
+                return spec;
+            }
+
             // Walls (probe render of 2026-11-06): IntWall02a/b are brick between timbers, for stone rooms; IntWall01a,
-            // both doorways and the window are plaster. Each is drawn on its local +Z side only.
-            yield return A("BkBrick", "IntWall02a", st, Body.Box, Anchor.Linear, 3);
-            yield return A("BkBrickB", "IntWall02b", st, Body.Box, Anchor.Linear, 3);
+            // both doorways and the window are plaster. Each is drawn on its local +Z side only. A plain wall shows its
+            // face WallFace out from its line, whatever its thickness.
+            yield return Plain("BkBrick", "IntWall02a", st, Body.Box);
+            yield return Plain("BkBrickB", "IntWall02b", st, Body.Box);
             yield return A("BkWindow", "IntWall02window01", st, Body.Box, Anchor.Linear, 3);
             var doorway = A("BkDoorway", "IntWall02door", st, Body.Doorway, Anchor.Linear, 3);
             doorway.OpenWidth = 1.1f * BkArchitecture;
-            doorway.OpenHeight = 1.98f * BkArchitecture;
+            doorway.OpenHeight = 1.98f * BkArchitecture * BkStretch;
             yield return doorway;
-            yield return A("BkPlaster", "IntWall01a", st, Body.Box, Anchor.Linear, 3);
+            yield return Plain("BkPlaster", "IntWall01a", st, Body.Box);
             var plasterDoorway = A("BkPlasterDoorway", "IntWall01door", st, Body.Doorway, Anchor.Linear, 3);
             plasterDoorway.OpenWidth = doorway.OpenWidth;
             plasterDoorway.OpenHeight = doorway.OpenHeight;
@@ -305,14 +331,27 @@ namespace GameDev.Slice.EditorTools
                          ("BkPlasterFace", "IntWall01a"), ("BkPlasterDoorwayFace", "IntWall01door"),
                      })
             {
-                yield return A(key, file, ng, Body.None, Anchor.Linear, 3);
+                var face = A(key, file, ng, Body.None, Anchor.Linear, 3);
+                face.OnFace = !key.Contains("Doorway");
+                yield return face;
             }
 
-            yield return A("BkDoor", "Door", ng, Body.None, Anchor.Linear, 3);
+            // A shut door is solid: the owner fell out of an interior through the street door (play test, 2026-11-06).
+            var door = A("BkDoor", "Door", st, Body.Leaf, Anchor.Linear, 3);
+            door.OpenWidth = doorway.OpenWidth;
+            door.OpenHeight = doorway.OpenHeight;
+            yield return door;
             yield return A("BkPost", "VerticalPillar", ng, Body.None, Anchor.Node);
-            yield return A("BkFloor", "IntWoodFloor01", KitLayers.Ground, Body.Ground, Anchor.Centre);
-            yield return A("BkStoneFloor", "StoneFloor01", KitLayers.Ground, Body.Ground, Anchor.Centre);
-            yield return A("BkCeiling", "IntCeiling01", ng, Body.None, Anchor.Centre);
+            foreach (var flat in new[]
+                     {
+                         A("BkFloor", "IntWoodFloor01", KitLayers.Ground, Body.Ground, Anchor.Centre),
+                         A("BkStoneFloor", "StoneFloor01", KitLayers.Ground, Body.Ground, Anchor.Centre),
+                         A("BkCeiling", "IntCeiling01", ng, Body.None, Anchor.Centre),
+                     })
+            {
+                flat.Stretch = 1f;
+                yield return flat;
+            }
 
             Spec F(string key, string file, string layer, Body body = Body.Box, Anchor anchor = Anchor.Centre, string folder = furn)
             {
@@ -322,24 +361,29 @@ namespace GameDev.Slice.EditorTools
             }
 
             string It(string group) => items + "/" + group;
-            yield return F("BkStove", "StoveLit", pr, anchor: Anchor.Front);
-            var sink = F("BkSink", "TableSink", pr, anchor: Anchor.Front);
+            // Furniture against a wall stands with its back on the wall's face (owner, 2026-11-06: no gap behind a stove).
+            yield return F("BkStove", "StoveLit", pr, anchor: Anchor.Back);
+            var sink = F("BkSink", "TableSink", pr, anchor: Anchor.Back);
             sink.ModelYaw = 90f; // survey: its length runs along Z
             yield return sink;
-            yield return F("BkCupboard", "WoodCupboard01", pr, anchor: Anchor.Front);
-            yield return F("BkCupboardGlass", "WoodCupboard02", pr, anchor: Anchor.Front);
-            yield return F("BkCupboardTall", "WoodCupboard03", pr, anchor: Anchor.Front);
-            yield return F("BkDrawer", "WoodDrawer01", pr, anchor: Anchor.Front);
+            yield return F("BkCupboard", "WoodCupboard01", pr, anchor: Anchor.Back);
+            yield return F("BkCupboardGlass", "WoodCupboard02", pr, anchor: Anchor.Back);
+            yield return F("BkCupboardTall", "WoodCupboard03", pr, anchor: Anchor.Back);
+            yield return F("BkDrawer", "WoodDrawer01", pr, anchor: Anchor.Back);
             yield return F("BkChair", "Chair01", pr);
             yield return F("BkStool", "WoodStool", pr);
-            yield return F("BkAlembic", "Alembic02", pr, anchor: Anchor.Front);
+            yield return F("BkAlembic", "Alembic02", pr, anchor: Anchor.Back);
             yield return F("BkCarpet", "Carpet02", ng, Body.None);
+            yield return F("BkCarpetLong", "Carpet01", ng, Body.None);
+            yield return F("BkCarpetWide", "Carpet03", ng, Body.None);
             yield return F("BkBoard", "Board", ng, Body.None, Anchor.Face);
             yield return F("BkPainting", "Painting01", ng, Body.None, Anchor.Face, It("Misc"));
             yield return F("BkTrunk", "Trunk01", ia, folder: It("Misc"));
             yield return F("BkCauldron", "CaldronTripod01_Bubbles", pr, folder: It("Lab"));
             yield return F("BkBasket", "Basket02", pr, folder: It("Misc"));
+            yield return F("BkBasketB", "Basket03", pr, folder: It("Misc"));
             yield return F("BkLogs", "Log01", pr, folder: It("Misc"));
+            yield return F("BkGlobe", "Globe", pr, folder: It("Misc"));
 
             Spec Set(string key, string file, string layer, Body body, Anchor anchor, params (string Folder, string File, float Fx, float Fz)[] on)
             {
@@ -352,17 +396,35 @@ namespace GameDev.Slice.EditorTools
                 (It("Dishes"), "ClutterPlate01", 0.3f, 0.3f), (It("Dishes"), "ClutterPlate01", 0.7f, 0.7f),
                 (It("Dishes"), "ClutterPichet01", 0.5f, 0.5f), (It("Dishes"), "ClutterGlass01", 0.7f, 0.3f),
                 (It("Lights"), "Candle01b_on", 0.3f, 0.7f));
-            yield return Set("BkKitchenTable", "WoodTableSquare01b", pr, Body.Box, Anchor.Front,
+            yield return Set("BkKitchenTable", "WoodTableSquare01b", pr, Body.Box, Anchor.Back,
                 (It("Ingredients"), "ClutterBowl03Ing01", 0.25f, 0.5f), (It("Dishes"), "ClutterBowl02", 0.55f, 0.4f),
                 (It("Organic"), "Apple", 0.75f, 0.6f), (It("Dishes"), "ClutterPichet03", 0.88f, 0.4f));
-            yield return Set("BkDesk", "WoodTableSquare01b", pr, Body.Box, Anchor.Front,
+            yield return Set("BkDesk", "WoodTableSquare01b", pr, Body.Box, Anchor.Back,
                 (It("Books"), "Books1", 0.3f, 0.6f), (It("Books"), "Book01", 0.62f, 0.4f),
                 (It("Lights"), "Oillamp01_on", 0.88f, 0.6f));
             yield return Set("BkCounter", "WoodTableSquare01b", pr, Body.Box, Anchor.Front,
                 (It("Bottles"), "Bottle01", 0.12f, 0.5f), (It("Bottles"), "Bottle02", 0.22f, 0.6f),
                 (It("Bottles"), "Bottle03", 0.32f, 0.45f), (It("Bottles"), "Flask02", 0.55f, 0.5f),
                 (It("Bottles"), "Flask05", 0.68f, 0.6f), (It("Lights"), "Oillamp01_on", 0.88f, 0.5f));
-            yield return Set("BkLabBench", "Workbench", pr, Body.Box, Anchor.Front,
+            // More of BK's things for rooms that read as lived in (owner, 2026-11-06).
+            yield return Set("BkDresser", "Drawer03", pr, Body.Box, Anchor.Back,
+                (It("Lights"), "Candle01b_on", 0.15f, 0.5f), (It("Books"), "Book06", 0.45f, 0.5f),
+                (It("Dishes"), "ClutterBowl01", 0.8f, 0.5f));
+            var sideTable = Set("BkSideTable", "Table01", pr, Body.Box, Anchor.Back,
+                (It("Lights"), "Oillamp01_on", 0.25f, 0.5f), (It("Books"), "Book09", 0.7f, 0.5f));
+            sideTable.ModelYaw = 90f; // survey: its length runs along Z
+            yield return sideTable;
+            yield return Set("BkRoundTable", "Table04", pr, Body.Box, Anchor.Centre,
+                (It("Dishes"), "ClutterPlate01", 0.3f, 0.35f), (It("Dishes"), "ClutterPlate01", 0.7f, 0.65f),
+                (It("Dishes"), "ClutterPichet02", 0.5f, 0.5f), (It("Dishes"), "ClutterGlass02", 0.35f, 0.7f),
+                (It("Books"), "Book10", 0.68f, 0.3f));
+            yield return Set("BkWorkTable", "WoodTableSquare01", pr, Body.Box, Anchor.Centre,
+                (It("Lab"), "Caldron01", 0.3f, 0.3f), (It("Lab"), "LabSetup02", 0.7f, 0.6f),
+                (It("Ingredients"), "ClutterBowl03Ing02", 0.3f, 0.7f), (It("Ingredients"), "ClutterBowl03Ing05", 0.6f, 0.25f));
+            yield return Set("BkArmsTable", "Workbench", pr, Body.Box, Anchor.Back,
+                (It("Weapons"), "Sword01", 0.2f, 0.5f), (It("Weapons"), "Axe01", 0.45f, 0.5f),
+                (It("Weapons"), "Dagger01", 0.65f, 0.5f), (It("Lights"), "Oillamp01_on", 0.88f, 0.5f));
+            yield return Set("BkLabBench", "Workbench", pr, Body.Box, Anchor.Back,
                 (It("Lab"), "LabSetup01", 0.2f, 0.5f), (It("Lab"), "LabSetup03", 0.55f, 0.5f),
                 (It("Bottles"), "Flask07", 0.8f, 0.4f), (It("Bottles"), "Flask03", 0.9f, 0.65f));
             yield return Set("BkTavernTable", "table03", pr, Body.Box, Anchor.Centre,
@@ -377,6 +439,14 @@ namespace GameDev.Slice.EditorTools
             yield return Set("BkJarShelf", "WoodShelf01", ng, Body.None, Anchor.Face,
                 (It("Organic"), "Jar01", 0.2f, 0.5f), (It("Organic"), "Jar01", 0.5f, 0.5f),
                 (It("Misc"), "Basket01", 0.8f, 0.5f));
+            yield return Set("BkBookShelfB", "WoodShelf01", ng, Body.None, Anchor.Face,
+                (It("Books"), "Books3", 0.35f, 0.5f), (It("Lights"), "Candle01", 0.85f, 0.5f));
+            yield return Set("BkBookShelfC", "WoodShelf01", ng, Body.None, Anchor.Face,
+                (It("Misc"), "Globe", 0.12f, 0.5f), (It("Books"), "Books4", 0.65f, 0.5f));
+            yield return Set("BkDishShelf", "WoodShelf01", ng, Body.None, Anchor.Face,
+                (It("Dishes"), "ClutterPlate01", 0.15f, 0.5f), (It("Dishes"), "ClutterBowl01", 0.35f, 0.5f),
+                (It("Dishes"), "ClutterPichet01", 0.55f, 0.5f), (It("Dishes"), "ClutterGlass01", 0.72f, 0.5f),
+                (It("Dishes"), "ClutterGlass02", 0.88f, 0.5f));
         }
 
         /// <summary>Builds every wrapper and the project's own blocks; returns them by key.</summary>
@@ -451,6 +521,17 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
+            if (!Mathf.Approximately(spec.Stretch, 1f))
+            {
+                // A vendor root is often turned (BK's are -90° about X), so the stretch goes on an upright holder.
+                var holder = new GameObject("Model");
+                holder.transform.SetParent(root.transform, false);
+                model.name = "Base";
+                model.transform.SetParent(holder.transform, true);
+                holder.transform.localScale = new Vector3(1f, spec.Stretch, 1f);
+                model = holder;
+            }
+
             model.transform.localScale *= spec.Factor;
             if (spec.Body != Body.Keep)
             {
@@ -465,7 +546,8 @@ namespace GameDev.Slice.EditorTools
             var linear = spec.Anchor == Anchor.Linear || spec.Anchor == Anchor.Face;
             var node = spec.Anchor == Anchor.Node;
             var width = node ? 0 : spec.Anchor == Anchor.Pivot ? 1 : Mathf.Max(1, Mathf.CeilToInt(b.size.x - 0.05f));
-            var depth = linear || node ? 0 : spec.Anchor == Anchor.Pivot ? 1 : Mathf.Max(1, Mathf.CeilToInt(b.size.z - 0.05f));
+            var back = spec.Anchor == Anchor.Back ? WallFace : 0f;
+            var depth = linear || node ? 0 : spec.Anchor == Anchor.Pivot ? 1 : Mathf.Max(1, Mathf.CeilToInt(b.size.z + back - 0.05f));
             if (linear)
             {
                 width = spec.Width ?? Mathf.Max(1, Mathf.RoundToInt(b.size.x));
@@ -478,7 +560,10 @@ namespace GameDev.Slice.EditorTools
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, depth - b.max.z);
                     break;
                 case Anchor.Linear:
-                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, -b.center.z);
+                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, spec.OnFace ? WallFace - b.max.z : -b.center.z);
+                    break;
+                case Anchor.Back:
+                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, WallFace - b.min.z);
                     break;
                 case Anchor.Pivot:
                     offset = new Vector3(0.5f, -Mathf.Min(0f, b.min.y), 0.5f);
@@ -487,7 +572,7 @@ namespace GameDev.Slice.EditorTools
                     offset = new Vector3(-b.center.x, -b.min.y, -b.center.z);
                     break;
                 case Anchor.Face:
-                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, 0.08f - b.min.z);
+                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, WallFace - b.min.z);
                     break;
                 default:
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, depth * 0.5f - b.center.z);
@@ -501,7 +586,7 @@ namespace GameDev.Slice.EditorTools
             var name = $"Kit_{spec.Family}_{spec.Part}_{width}x{height}";
             root.name = name;
             root.AddComponent<KitBlock>();
-            AddBody(root, spec.Body, b, width, depth, linear, spec.OpenWidth, spec.OpenHeight);
+            AddBody(root, spec.Body, b, width, depth, linear, spec.OpenWidth, spec.OpenHeight, spec.LineBody);
             SetLayer(root, spec.Layer);
             if (spec.Layer != KitLayers.Interactable)
             {
@@ -608,7 +693,7 @@ namespace GameDev.Slice.EditorTools
         }
 
         private static void AddBody(GameObject root, Body body, Bounds seen, int width, int depth, bool linear,
-            float openWidth = 0f, float openHeight = 0f)
+            float openWidth = 0f, float openHeight = 0f, bool lineBody = false)
         {
             switch (body)
             {
@@ -633,6 +718,10 @@ namespace GameDev.Slice.EditorTools
                 case Body.Keep:
                 case Body.None:
                     return;
+                case Body.Leaf:
+                    Box(root, new Vector3(width * 0.5f - openWidth * 0.5f, 0f, -0.05f),
+                        new Vector3(width * 0.5f + openWidth * 0.5f, openHeight, 0.05f));
+                    return;
             }
 
             var min = seen.min;
@@ -642,8 +731,8 @@ namespace GameDev.Slice.EditorTools
                 // Kit standard §2: a wall's body is at most 0.3 m thick, centred on its line, however thick it is seen
                 // (BK's plaster wall is 0.377 m at ×1.2, measured), and it stops half that thickness short of each
                 // node, so two walls meeting at a corner only touch.
-                var middle = (min.z + max.z) * 0.5f;
-                var half = Mathf.Min(0.3f, max.z - min.z) * 0.5f;
+                var middle = lineBody ? 0f : (min.z + max.z) * 0.5f;
+                var half = lineBody ? 0.15f : Mathf.Min(0.3f, max.z - min.z) * 0.5f;
                 min.z = middle - half;
                 max.z = middle + half;
                 min.x = Mathf.Max(min.x, half);

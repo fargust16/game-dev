@@ -2,7 +2,7 @@
 
 Status: Draft — authoring defaults set by the agent; the owner's decision that sets the frame is marked
 Created: 2026-11-04
-Last Updated: 2026-11-06 (§6: an arriving player stands on the ground under the arrival point, after C1's Wardens' station dropped the player 0.44 m. Earlier: §2: a wall seen thicker than 0.3 m keeps a body of 0.3 m on its line, and a single-sided wall between two rooms gets a seen face for the second, after the BK interiors. Earlier: §1: streets at 45° under a `KitFrame`, after the grid check of C1 §12. Earlier: §7: the agent shapes the ground once from the city plan, by the owner after the play test. Earlier: §8 points to the slice's asset map. Earlier: S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
+Last Updated: 2026-11-06 (§2, §4, §6: after the owner's play test of C1, a wall piece's back on the wall's face, solid door leaves, a proud strip and stoops as nested blocks, a ceiling collider for the camera, and a fall guard. Earlier: §6: an arriving player stands on the ground under the arrival point, after C1's Wardens' station dropped the player 0.44 m. Earlier: §2: a wall seen thicker than 0.3 m keeps a body of 0.3 m on its line, and a single-sided wall between two rooms gets a seen face for the second, after the BK interiors. Earlier: §1: streets at 45° under a `KitFrame`, after the grid check of C1 §12. Earlier: §7: the agent shapes the ground once from the city plan, by the owner after the play test. Earlier: §8 points to the slice's asset map. Earlier: S0.6: the ground starts as one flat level, and the water lies at Sea Level under it. Earlier: S0.4: the portal door and a 1 m wall. Earlier: S0.2: pivots on grid nodes, posts where walls meet, the stand-ins, and the layout check)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [10.1 Grid World and Environment Actions](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [COMBAT_GRID_TECH_TEST.md](COMBAT_GRID_TECH_TEST.md)
 Used by: [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -31,6 +31,7 @@ The Combat Grid has **1 m cells aligned to the world** (measured: at 1.5 m narro
 - **A wall stands on a grid line, centred on it,** at most 0.3 m thick. A capsule of radius 0.3 m (measured) then still stands in the middle of the cells on both sides, so a wall closes the edge between two cells and costs neither cell. A wall seen thicker keeps a body of 0.3 m centred on its line (BK's plaster wall, 0.377 m measured, 2026-11-06). A wall model drawn on one side only, as BK's are, gets a second block between two rooms: a face turned to the other room, NoGrid and without a collider.
 - **Where linear blocks meet** (authoring default, 2026-11-04): a wall or fence stops half its thickness short of each grid node, and a **post** of the wall's thickness fills a node where walls meet at a corner or a run ends. A wall of nominal width 4 m is therefore 3.7 m long. A T-junction needs no post: the through wall's face meets the end of the other. Without this, walls meeting at a corner share a square of their thickness and break the non-overlap law (§6).
 - A floor or street surface top sits at a whole 0.1 m height.
+- **A piece against a wall** (2026-11-06) puts its back on the wall's face, 0.19 m from the line (`SliceKitCatalogue.WallFace`): `Anchor.Back` for a stove, a cupboard, or a desk, and `Anchor.Face` for a painting or a shelf. Its footprint counts from the wall's line, so it stays on whole metres.
 
 ## 3. Sizes that gameplay depends on
 
@@ -55,7 +56,7 @@ The grid test found that pieces without colliders are invisible to the grid: abo
 - **Every block that a person cannot walk through has a collider.** That includes fences, lamps, crates, barrels, trims that stick out, and tree trunks.
 - Colliders follow what is visible: simple boxes or capsules, or a simplified convex mesh. **No collider without visible geometry** (the grid test's gate G5, *air walls*).
 - Small decoration a person steps over or through, such as grass, litter, and flat signs, has no collider.
-- A door leaf has its own collider and its own object, so it can open.
+- A door leaf has its own collider and its own object, so it can open. A closed door is a solid leaf filling its opening, 0.05 m either side of the line, nested in its doorway's block (2026-11-06: an open doorway in an interior's outer wall dropped the player out of the scene).
 - Characters are never part of the reading: the grid reads the place, and who stands where is a separate layer (measured: the first lab run read the player's own capsule as a wall).
 
 ## 5. Layers and tags
@@ -78,6 +79,9 @@ A block that can be vaulted, climbed, or breached in a fight carries a tag compo
 - **No two blocks occupy the same space.** This is the law of the [Shell Non-Overlap Rule](SHELL_NON_OVERLAP_RULE.md), applied to hand-assembled buildings: bounds may touch, never overlap. An editor check reports overlaps; it never moves blocks itself.
 - **Interiors are separate scenes** ([16](../../../16%20Architecture%20Pivot.md), locked). A building that can be entered has a door block marked as a portal, with the id of its interior scene. Interiors are built from the same kit. In code (S0.4) the door block carries `Portal`: its own id, the target scene, the id of the paired door there, and the side of the wall where an arriving player stands; the leaf is an `Interactable` child inside the opening. The interior's door leads back to the street door, so the player comes out where they went in. The player arrives 1 m out from the opening, on the ground under that point within 0.75 m of the sill, so a door at the top of steps does not drop them (2026-11-06).
 - A building that cannot be entered still has a closed door, so the street reads as lived in.
+- **What stands proud of a footprint** (2026-11-06) is a block nested in its owner's block, so the layout check measures it for itself. A baked house's pilasters and door frames are covered by a strip 0.16 m proud of the front, stopping 0.16 m short of each end, and each house door's stoop is three collider steps.
+- **Interior ceilings** are 3.48 m high. Each room has a box collider under its ceiling on Unity's `Ignore Raycast` layer, which the camera collides with and the Combat Grid does not read, because its mask leaves that layer out.
+- **Fall guard:** the player carries `FallGuard`. Once they fall 5 m below the lowest collider in the scene, it returns them to the last ground they stood on. It is a safety net under any gap in a scene, not a way to design one.
 
 ## 7. Ground and forest
 

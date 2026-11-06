@@ -46,11 +46,35 @@ namespace GameDev.Slice.EditorTools
             public string Facade = "Wall1"; // the walls' material: Wall1–Wall4, Brick01, Brick02, Stone wall
             public bool Dormers = true;
             public int Arch = -1;         // the first of the two front modules an arch passes under, or none
+            public Side Faced;            // a corner house: the side with a second facade on a side street
         }
+
+        /// <summary>A house's sides by its own axes, its front on +Z: −X is Left.</summary>
+        public enum Side { None, Left, Right }
+
+        /// <summary>Survey of 2026-11-06, at ×1: the house door's stoop, 0.66 m out from the front and 0.4 m high.</summary>
+        private const float StoopOut = 0.66f, StoopHigh = 0.4f, StoopHalfWidth = 0.87f;
+
+        /// <summary>Survey: the pilasters and the door frames stand up to 0.13 m proud of the front at ×1.</summary>
+        private const float Proud = 0.13f;
+
+        /// <summary>How far a house door's stoop reaches out from the front, m at ×1.25; the city's steps start there.</summary>
+        public const float Stoop = StoopOut * Scale;
+
+        /// <summary>The key of a type's corner variant, its second facade on <paramref name="side"/>.</summary>
+        public static string CornerKey(string key, Side side) => key + (side == Side.Left ? "_cornerL" : "_cornerR");
+
+        /// <summary>The types baked with a corner variant on each side: the terrace types a row ends with.</summary>
+        public static readonly string[] CornerTypes = { "Shop4", "Terrace4", "Tenement4" };
 
         private static GameObject Load(string path) => AssetDatabase.LoadAssetAtPath<GameObject>(path + ".prefab");
 
-        /// <summary>Places the modules of a house under <paramref name="parent"/>, in module metres (×1).</summary>
+        /// <summary>
+        /// Places the modules of a house under <paramref name="parent"/>, in module metres (×1). The owner's play test
+        /// of 2026-11-06 set three rules: a shop's ground floor is its shop front to the corners, with no stone corner
+        /// between (one colour set per floor); the cornice runs round the roof's sides too; and a corner house shows a
+        /// second facade on its side street.
+        /// </summary>
         public static void Assemble(Transform parent, Spec spec)
         {
             for (var s = 0; s < spec.Storeys; s++)
@@ -76,6 +100,18 @@ namespace GameDev.Slice.EditorTools
                             continue; // the arch's own model walls its passage (below)
                         }
 
+                        var faced = (left && spec.Faced == Side.Left) || (right && spec.Faced == Side.Right);
+                        var sideYaw = left ? 270f : 90f;
+                        if (front && (left || right) && spec.Shop && !up)
+                        {
+                            // The shop front runs to the corner: its end post (−X on the module) covers the corner, so the
+                            // right-hand one is mirrored. The side is a shop front too on a side street, else a plain wall.
+                            Put(parent, Modules + "WoodenWallBlue", centre, 0f, 0.95f, mirror: right);
+                            Put(parent, Modules + (faced ? "WoodenWallBlue" : "GroundSideWall1"), centre, sideYaw,
+                                faced ? 0.95f : 0f, mirror: faced && left);
+                            continue;
+                        }
+
                         if ((front || back) && (left || right))
                         {
                             var yaw = front ? (left ? 0f : 90f) : (right ? 180f : 270f);
@@ -92,9 +128,14 @@ namespace GameDev.Slice.EditorTools
                         {
                             Put(parent, Modules + (up ? "UpWindow1" : "GroundWall1"), centre, 180f);
                         }
+                        else if (faced)
+                        {
+                            var module = up ? "UpWindow1" : spec.Shop ? "WoodenWallBlue" : "GroundWindow1";
+                            Put(parent, Modules + module, centre, sideYaw, module.StartsWith("Wo") ? 0.95f : 0f);
+                        }
                         else
                         {
-                            Put(parent, Modules + (up ? "UpSideWall1" : "GroundSideWall1"), centre, left ? 270f : 90f);
+                            Put(parent, Modules + (up ? "UpSideWall1" : "GroundSideWall1"), centre, sideYaw);
                         }
                     }
                 }
@@ -134,7 +175,19 @@ namespace GameDev.Slice.EditorTools
                         Put(parent, Modules + "RoofUp", centre, 0f);
                         if (left || right)
                         {
-                            Put(parent, Modules + "UpSideWall1", centre, left ? 270f : 90f);
+                            var yaw = left ? 270f : 90f;
+                            Put(parent, Modules + "UpSideWall1", centre, yaw);
+                            // The corner's cornice ("Frame top (1)") goes on along the gable end: a Roof module's
+                            // own cornice, turned to the side, without its slope.
+                            var cornice = Put(parent, Modules + "Roof", centre, yaw);
+                            if (cornice != null)
+                            {
+                                PrefabUtility.UnpackPrefabInstance(cornice, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+                                foreach (var slope in cornice.GetComponentsInChildren<Transform>(true).Where(t => t.name == "The roof is sloping").ToArray())
+                                {
+                                    Object.DestroyImmediate(slope.gameObject);
+                                }
+                            }
                         }
                     }
                 }
@@ -156,13 +209,13 @@ namespace GameDev.Slice.EditorTools
             return spec.Shop ? "WoodenWallBlue" : "GroundWindow1";
         }
 
-        private static void Put(Transform parent, string path, Vector3 position, float yaw, float forward = 0f, bool mirror = false)
+        private static GameObject Put(Transform parent, string path, Vector3 position, float yaw, float forward = 0f, bool mirror = false)
         {
             var prefab = Load(path);
             if (prefab == null)
             {
                 Debug.LogError($"[VictorianHouses] missing {path}");
-                return;
+                return null;
             }
 
             var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
@@ -172,6 +225,8 @@ namespace GameDev.Slice.EditorTools
             {
                 go.transform.localScale = new Vector3(-1f, 1f, 1f);
             }
+
+            return go;
         }
 
         /// <summary>
@@ -196,8 +251,16 @@ namespace GameDev.Slice.EditorTools
                     continue;
                 }
 
+                // The shop door stands on the pavement (owner's play test, 2026-11-06): the pack lifts its double door
+                // 0.96 m and its portal 0.6 m onto a sill strip, which goes.
+                var drop = r.name == "Double door" ? 0.96f : r.name == "Door portal" ? 0.6f : 0f;
+                if (r.name == "Wooden base end")
+                {
+                    continue;
+                }
+
                 var mesh = filter.sharedMesh;
-                var m = r.transform.localToWorldMatrix; // the assembly stands at the origin with the scale on its root
+                var m = Matrix4x4.Translate(Vector3.down * (drop * Scale)) * r.transform.localToWorldMatrix; // the assembly stands at the origin with the scale on its root
                 var normalMatrix = m.inverse.transpose;
                 var flip = m.determinant < 0f;
                 var verts = mesh.vertices;
@@ -297,6 +360,14 @@ namespace GameDev.Slice.EditorTools
             model.AddComponent<MeshFilter>().sharedMesh = baked;
             model.AddComponent<MeshRenderer>().sharedMaterials = order.ToArray();
 
+            // The body reaches out over the pilasters and door frames, so a walker meets what is seen and its head does
+            // not pass into the front (owner's play test, 2026-11-06). What stands proud of the footprint, this strip
+            // and each stoop, is a nested block of its own, so the kit check measures it for itself.
+            var proud = depth + (Proud * Scale);
+            var front = Nested(root, "Front");
+            // The strip stops short of each end by its own depth: where two rows meet in a square's inner corner, the
+            // fronts would otherwise cross in a 0.16 m square (kit check, 2026-11-06). A walker cannot reach the notch.
+            var inset = Proud * Scale;
             if (spec.Arch >= 0)
             {
                 // The passage through the house (city plan §5.2, §7): open between its piers for two storeys.
@@ -305,10 +376,31 @@ namespace GameDev.Slice.EditorTools
                 Box(root, 0f, x0, 0f, eaves, 0f, depth);
                 Box(root, x1, width, 0f, eaves, 0f, depth);
                 Box(root, x0, x1, 2f * Storey, eaves, 0f, depth);
+                Box(front, inset, x0, 0f, eaves, depth, proud);
+                Box(front, x1, width - inset, 0f, eaves, depth, proud);
+                Box(front, x0, x1, 2f * Storey, eaves, depth, proud);
             }
             else
             {
                 Box(root, 0f, width, 0f, eaves, 0f, depth);
+                Box(front, inset, width - inset, 0f, eaves, depth, proud);
+            }
+
+            if (!spec.Shop)
+            {
+                // The stoop before each house door is climbed (owner's play test, 2026-11-06): three steps whose fronts
+                // follow the pack's own, measured at ×1.
+                foreach (var i in spec.Doors)
+                {
+                    var stoop = Nested(root, "Stoop");
+                    var mid = (i + 0.5f) * Module;
+                    var half = StoopHalfWidth * Scale;
+                    for (var k = 1; k <= 3; k++)
+                    {
+                        var reach = StoopOut * Scale * (4 - k) / 3f;
+                        Box(stoop, mid - half, mid + half, 0f, StoopHigh * Scale * k / 3f, proud, depth + reach);
+                    }
+                }
             }
 
             // A marker in each doorway, on the front at floor level, facing out: the street furniture rules (city plan §4)
@@ -332,7 +424,7 @@ namespace GameDev.Slice.EditorTools
             return new SliceKitCatalogue.Entry
             {
                 Key = "House_" + spec.Name, Path = path, Width = Mathf.RoundToInt(width), Depth = Mathf.RoundToInt(depth),
-                Height = height, DoorX = DoorX(spec),
+                Height = height, DoorX = DoorX(spec), Stoop = spec.Shop ? 0f : Stoop,
             };
         }
 
@@ -349,7 +441,7 @@ namespace GameDev.Slice.EditorTools
         /// Facade colours (city plan §2: brick and stucco, few painted fronts, against the toy look): the pack's upper
         /// wall (Wall1) and ground wall (Wall2) and its blue shop front swapped for other pack materials.
         /// </summary>
-        public static Dictionary<string, string> Facade(string variant, string shop = "blue")
+        public static Dictionary<string, string> Facade(string variant, string shop = "blue", bool shopHouse = false)
         {
             var map = new Dictionary<string, string>();
             switch (variant)
@@ -362,6 +454,13 @@ namespace GameDev.Slice.EditorTools
                 case "marble": map["Wall1"] = "Marble"; map["Wall2"] = "Stone wall"; break;
                 case "warehouse": map["Wall1"] = "Brick02"; map["Wall2"] = "Brick02"; break;
                 default: map["Wall2"] = "Stone wall"; break; // the pack's blue, rare
+            }
+
+            if (shopHouse)
+            {
+                // A shop's ground floor is its shop front; what little ground wall it shows (the sides, the back) is the
+                // upper floors' own, so the house reads as one (owner's play test, 2026-11-06: "not like lego").
+                map["Wall2"] = map.TryGetValue("Wall1", out var upper) ? upper : "Wall1";
             }
 
             if (shop != "blue")
@@ -415,14 +514,20 @@ namespace GameDev.Slice.EditorTools
             foreach (var (type, facade, shop) in Variants)
             {
                 var source = Types.Single(t => t.Name == type);
-                var spec = new Spec
+                var sides = CornerTypes.Contains(type) ? new[] { Side.None, Side.Left, Side.Right } : new[] { Side.None };
+                foreach (var side in sides)
                 {
-                    Name = $"{type}_{facade}", Front = source.Front, Depth = source.Depth, Storeys = source.Storeys, Doors = source.Doors,
-                    Shop = source.Shop, Dormers = source.Dormers, Arch = source.Arch,
-                };
-                var entry = Bake(spec, Facade(facade, shop));
-                entry.Key = Key(type, facade);
-                entries[entry.Key] = entry;
+                    var key = Key(type, facade);
+                    var spec = new Spec
+                    {
+                        Name = side == Side.None ? $"{type}_{facade}" : CornerKey($"{type}_{facade}", side), Front = source.Front,
+                        Depth = source.Depth, Storeys = source.Storeys, Doors = source.Doors, Shop = source.Shop,
+                        Dormers = source.Dormers, Arch = source.Arch, Faced = side,
+                    };
+                    var entry = Bake(spec, Facade(facade, shop, source.Shop));
+                    entry.Key = side == Side.None ? key : CornerKey(key, side);
+                    entries[entry.Key] = entry;
+                }
             }
 
             AssetDatabase.SaveAssets();
@@ -431,6 +536,14 @@ namespace GameDev.Slice.EditorTools
 
         /// <summary>The house door's middle from the footprint's west edge, or the middle of the front.</summary>
         public static float DoorX(Spec spec) => spec.Doors.Length > 0 ? (spec.Doors[0] + 0.5f) * Module : spec.Front * Module * 0.5f;
+
+        private static GameObject Nested(GameObject root, string name)
+        {
+            var child = new GameObject(name);
+            child.transform.SetParent(root.transform, false);
+            child.AddComponent<KitBlock>();
+            return child;
+        }
 
         private static void Box(GameObject root, float x0, float x1, float y0, float y1, float z0, float z1)
         {

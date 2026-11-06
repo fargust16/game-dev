@@ -79,6 +79,7 @@ namespace GameDev.Slice.EditorTools
             // stands still and loses contact with the ground; Unity's own guidance is to leave it at 0.
             controller.minMoveDistance = 0f;
             root.AddComponent<PlayerLocomotion>();
+            root.AddComponent<FallGuard>();
 
             var model = (GameObject)PrefabUtility.InstantiatePrefab(character, root.transform);
             model.name = "Model";

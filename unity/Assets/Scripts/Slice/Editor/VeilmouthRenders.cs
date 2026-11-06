@@ -42,6 +42,12 @@ namespace GameDev.Slice.EditorTools
             Eye("eye_westgate", -300f, -172f, -200f, -150f, 4f);
             Eye("eye_forest", 123f, 120f, 123f, 300f, 2f);
             Eye("eye_hill", 340f, 0f, 420f, 140f, 20f);
+            // The owner's remarks of 2026-11-06: the terraces' gardens, a corner house, a villa's garden, the North Gate.
+            Eye("eye_terraces", -190f, -103f, -190f, -150f, 2f);
+            Eye("eye_corner", -168f, -174f, -196f, -150f, 3f);
+            Eye("eye_villa", -100f, -87f, -122f, -66f, 3f);
+            Eye("eye_northgate", 123f, -8f, 123f, 14f, 4f);
+            Eye("eye_shopfront", -40f, -172f, -40f, -160f, 1.5f);
 
             RenderInteriors();
             Debug.Log($"Veilmouth views written to {OutputFolder}.");

@@ -31,8 +31,17 @@ namespace GameDev.Slice.EditorTools
 
         public override string ToString()
         {
-            var other = Other != null ? $" and '{Other.name}'" : string.Empty;
-            return $"{Kind}: '{Block.name}'{other}: {Detail}";
+            var other = Other != null ? $" and {Label(Other)}" : string.Empty;
+            return $"{Kind}: {Label(Block)}{other}: {Detail}";
+        }
+
+        /// <summary>A nested block is named with its owner, and every block with where it stands, so a fault can be found.</summary>
+        private static string Label(KitBlock block)
+        {
+            var owner = block.transform.parent != null ? block.transform.parent.GetComponentInParent<KitBlock>() : null;
+            var name = owner != null ? $"{owner.name}/{block.name}" : block.name;
+            var p = block.transform.position;
+            return $"'{name}' at ({p.x:0.##}, {p.y:0.##}, {p.z:0.##})";
         }
     }
 
