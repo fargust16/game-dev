@@ -27,7 +27,7 @@ namespace GameDev.Slice.EditorTools
         /// <summary>The architecture of a room and the portal leaf; the furniture comes from the planner's own lists.</summary>
         private static readonly string[] Architecture =
         {
-            "BkFloor", "BkStoneFloor", "BkCeiling", "BkPost", "BkWindow", "BkDoor", "PortalLeaf",
+            "BkFloor", "BkStoneFloor", "BkCeiling", "BkPost", "BkWindow", "BkDoor", "PortalLeafRoom",
             "BkPlaster", "BkPlasterFace", "BkBrick", "BkBrickFace", "BkBrickB", "BkBrickBFace",
             "BkDoorway", "BkDoorwayFace", "BkPlasterDoorway", "BkPlasterDoorwayFace",
         };

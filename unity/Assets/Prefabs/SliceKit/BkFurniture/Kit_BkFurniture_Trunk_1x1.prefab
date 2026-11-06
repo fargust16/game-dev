@@ -65,8 +65,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.72527814, y: 0.32350364, z: 0.42208552}
-  m_Center: {x: 0.5, y: 0.16175182, z: 0.5}
+  m_Size: {x: 0.8703338, y: 0.38820437, z: 0.5065026}
+  m_Center: {x: 0.49999994, y: 0.19410218, z: 0.5}
 --- !u!1001 &3115296475354749525
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -84,16 +84,28 @@ PrefabInstance:
       value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 4215274236685596, guid: a48529e3c8cffeb49b103f39d34d1f37, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4215274236685596, guid: a48529e3c8cffeb49b103f39d34d1f37, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4215274236685596, guid: a48529e3c8cffeb49b103f39d34d1f37, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4215274236685596, guid: a48529e3c8cffeb49b103f39d34d1f37, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.5000021
+      value: 0.5000025
       objectReference: {fileID: 0}
     - target: {fileID: 4215274236685596, guid: a48529e3c8cffeb49b103f39d34d1f37, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.16176797
+      value: 0.19412157
       objectReference: {fileID: 0}
     - target: {fileID: 4215274236685596, guid: a48529e3c8cffeb49b103f39d34d1f37, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.49999
+      value: 0.49998796
       objectReference: {fileID: 0}
     - target: {fileID: 4215274236685596, guid: a48529e3c8cffeb49b103f39d34d1f37, type: 3}
       propertyPath: m_LocalRotation.w
@@ -129,6 +141,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 5ec8f5baad1a5f44c80d903ee25d00f6, type: 2}
     m_RemovedComponents:
     - {fileID: 65605555768453536, guid: a48529e3c8cffeb49b103f39d34d1f37, type: 3}
+    - {fileID: 54788239841783778, guid: a48529e3c8cffeb49b103f39d34d1f37, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

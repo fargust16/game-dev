@@ -14,9 +14,10 @@ namespace GameDev.Slice.EditorTools
 {
     /// <summary>
     /// The seven interiors of the city plan C1 §8, built once from BK_AlchemistHouse (owner, 2026-11-05): rooms that read
-    /// as rooms on BK's 3 m module, with walls, doorways, windows, corner posts, floors, ceilings 3 m up, the street door
-    /// with its portal, furniture at true size, a light in each room, and the people at their posts. Room sizes are §8's
-    /// rounded to the module (authoring defaults). It replaces C0's stone boxes, and from then on each scene is the
+    /// as rooms on BK's 4 m module, with walls, doorways, windows, corner posts, floors, ceilings 3.5 m up, the street door
+    /// with its portal, furniture at game scale, a light in each room, and the people at their posts. Room sizes are §8's
+    /// rounded to the 3 m module, then widened by a third with it (owner's play test, 2026-11-06: rooms felt cramped
+    /// beside the character; authoring defaults). It replaces C0's stone boxes, and from then on each scene is the
     /// owner's: it refuses an interior that already holds its root, and <see cref="BuildReplacing"/> is for the agent's
     /// own batch iterations only. Plan coordinates: x east, z north, metres from the south-west corner; the street door
     /// is on the south wall, so an arriving player faces north into the room.
@@ -25,10 +26,10 @@ namespace GameDev.Slice.EditorTools
     {
         public const string RootName = "Interior C1";
         public const string RoomMarker = "Room - ";
-        public const int Module = 3;
-        // The walls stand 3.6 m (SliceKitCatalogue.BkStretch), but their single-sided frame tops out a little lower: a
+        public const int Module = SliceKitCatalogue.BkModule;
+        // The walls stand 3.6 m (SliceKitCatalogue.BkVertical), but their single-sided frame tops out a little lower: a
         // ceiling 0.97 of the way up closes the slit of sky seen above an outer wall (render of 2026-11-06).
-        public const float CeilingHeight = 2.9f * SliceKitCatalogue.BkStretch;
+        public const float CeilingHeight = 2.42f * SliceKitCatalogue.BkVertical;
 
         /// <summary>
         /// The layer of a ceiling's collider: the camera's spring arm meets it (SliceCharacterLook.CameraCollision), the
@@ -106,7 +107,7 @@ namespace GameDev.Slice.EditorTools
                 return this;
             }
 
-            /// <summary>The 3 m wall segment from node (x, z) along +X, or along +Z.</summary>
+            /// <summary>The wall segment of one module from node (x, z) along +X, or along +Z.</summary>
             public Plan Open(Opening kind, int x, int z, bool alongZ = false)
             {
                 Openings[(x, z, alongZ)] = kind;
@@ -132,7 +133,7 @@ namespace GameDev.Slice.EditorTools
             Furnish(id);
 
             new GameObject("Interior").AddComponent<InteriorRuntime>().Configure(id);
-            SliceTestScenes.AddPlayerRig(new Vector3(plan.Street.X + 1.5f, 0.1f, plan.Street.Z + 1.6f));
+            SliceTestScenes.AddPlayerRig(new Vector3(plan.Street.X + Module * 0.5f, 0.1f, plan.Street.Z + 1.6f));
             SliceTestScenes.Save(scene, path);
             Report(path);
         }
@@ -143,46 +144,46 @@ namespace GameDev.Slice.EditorTools
             {
                 case VeilmouthScene.SootAndBellId:
                     return new Plan()
-                        .Room("Taproom", 0, 0, 15, 9).Room("Kitchen", 0, 9, 6, 6, true).Room("Passage", 6, 9, 3, 6)
-                        .Room("Let room", 9, 9, 6, 6)
-                        .Open(Opening.Street, 6, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 12, 0)
-                        .Open(Opening.Window, 15, 3, true).Open(Opening.Door, 3, 9).Open(Opening.Door, 6, 9)
-                        .Open(Opening.Door, 6, 12, true).Open(Opening.Door, 9, 12, true).Open(Opening.Closed, 6, 15)
-                        .Open(Opening.Window, 12, 15);
+                        .Room("Taproom", 0, 0, 20, 12).Room("Kitchen", 0, 12, 8, 8, true).Room("Passage", 8, 12, 4, 8)
+                        .Room("Let room", 12, 12, 8, 8)
+                        .Open(Opening.Street, 8, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 16, 0)
+                        .Open(Opening.Window, 20, 4, true).Open(Opening.Door, 4, 12).Open(Opening.Door, 8, 12)
+                        .Open(Opening.Door, 8, 16, true).Open(Opening.Door, 12, 16, true).Open(Opening.Closed, 8, 20)
+                        .Open(Opening.Window, 16, 20);
                 case "harrow-apothecary":
                     return new Plan()
-                        .Room("Shop", 0, 0, 9, 6).Room("Laboratory", 0, 6, 9, 6, true).Room("Store room", 9, 6, 3, 6, true)
-                        .Open(Opening.Street, 3, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 6, 0)
-                        .Open(Opening.Door, 6, 6).Open(Opening.Door, 9, 9, true).Open(Opening.Window, 0, 9, true);
+                        .Room("Shop", 0, 0, 12, 8).Room("Laboratory", 0, 8, 12, 8, true).Room("Store room", 12, 8, 4, 8, true)
+                        .Open(Opening.Street, 4, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 8, 0)
+                        .Open(Opening.Door, 8, 8).Open(Opening.Door, 12, 12, true).Open(Opening.Window, 0, 12, true);
                 case "faction-house":
                     return new Plan()
-                        .Room("Hall", 0, 0, 12, 9).Room("Office", 0, 9, 6, 6).Room("Archive", 6, 9, 6, 6)
-                        .Open(Opening.Street, 6, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 9, 0)
-                        .Open(Opening.Window, 0, 3, true).Open(Opening.Window, 12, 3, true)
-                        .Open(Opening.Door, 0, 9).Open(Opening.Door, 9, 9).Open(Opening.Window, 0, 12, true);
+                        .Room("Hall", 0, 0, 16, 12).Room("Office", 0, 12, 8, 8).Room("Archive", 8, 12, 8, 8)
+                        .Open(Opening.Street, 8, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 12, 0)
+                        .Open(Opening.Window, 0, 4, true).Open(Opening.Window, 16, 4, true)
+                        .Open(Opening.Door, 0, 12).Open(Opening.Door, 12, 12).Open(Opening.Window, 0, 16, true);
                 case "wardens-lockup":
                     return new Plan()
-                        .Room("Front desk", 0, 0, 9, 6).Room("Office", 9, 0, 6, 6).Room("Corridor", 0, 6, 9, 3, true)
-                        .Room("Guard room", 9, 6, 6, 6).Room("Cell 1", 0, 9, 3, 3, true).Room("Cell 2", 3, 9, 3, 3, true)
-                        .Room("Cell 3", 6, 9, 3, 3, true)
-                        .Open(Opening.Street, 3, 0).Open(Opening.Window, 6, 0).Open(Opening.Window, 12, 0)
-                        .Open(Opening.Door, 9, 3, true).Open(Opening.Door, 6, 6).Open(Opening.Door, 9, 6, true)
-                        .Open(Opening.Cell, 0, 9).Open(Opening.Cell, 3, 9).Open(Opening.Cell, 6, 9);
+                        .Room("Front desk", 0, 0, 12, 8).Room("Office", 12, 0, 8, 8).Room("Corridor", 0, 8, 12, 4, true)
+                        .Room("Guard room", 12, 8, 8, 8).Room("Cell 1", 0, 12, 4, 4, true).Room("Cell 2", 4, 12, 4, 4, true)
+                        .Room("Cell 3", 8, 12, 4, 4, true)
+                        .Open(Opening.Street, 4, 0).Open(Opening.Window, 8, 0).Open(Opening.Window, 16, 0)
+                        .Open(Opening.Door, 12, 4, true).Open(Opening.Door, 8, 8).Open(Opening.Door, 12, 8, true)
+                        .Open(Opening.Cell, 0, 12).Open(Opening.Cell, 4, 12).Open(Opening.Cell, 8, 12);
                 case "missing-room":
                     return new Plan()
-                        .Room("Landing", 0, 0, 6, 3).Room("Room", 0, 3, 6, 6)
-                        .Open(Opening.Street, 3, 0).Open(Opening.Closed, 0, 0).Open(Opening.Door, 0, 3)
-                        .Open(Opening.Window, 3, 9);
+                        .Room("Landing", 0, 0, 8, 4).Room("Room", 0, 4, 8, 8)
+                        .Open(Opening.Street, 4, 0).Open(Opening.Closed, 0, 0).Open(Opening.Door, 0, 4)
+                        .Open(Opening.Window, 4, 12);
                 case "soot-stair-cellar":
                     return new Plan()
-                        .Room("West vault", 0, 0, 6, 6, true).Room("Circle vault", 6, 0, 9, 9, true)
-                        .Room("East vault", 15, 0, 6, 6, true)
-                        .Open(Opening.Street, 0, 0).Open(Opening.Door, 6, 3, true).Open(Opening.Door, 15, 3, true);
+                        .Room("West vault", 0, 0, 8, 8, true).Room("Circle vault", 8, 0, 12, 12, true)
+                        .Room("East vault", 20, 0, 8, 8, true)
+                        .Open(Opening.Street, 0, 0).Open(Opening.Door, 8, 4, true).Open(Opening.Door, 20, 4, true);
                 case "old-chapel":
                     return new Plan()
-                        .Room("Nave", 0, 0, 9, 15, true).Room("Vestry", 9, 9, 3, 6, true)
-                        .Open(Opening.Street, 3, 0).Open(Opening.Window, 0, 3, true).Open(Opening.Window, 0, 9, true)
-                        .Open(Opening.Window, 9, 3, true).Open(Opening.Door, 9, 12, true).Open(Opening.Window, 3, 15);
+                        .Room("Nave", 0, 0, 12, 20, true).Room("Vestry", 12, 12, 4, 8, true)
+                        .Open(Opening.Street, 4, 0).Open(Opening.Window, 0, 4, true).Open(Opening.Window, 0, 12, true)
+                        .Open(Opening.Window, 12, 4, true).Open(Opening.Door, 12, 16, true).Open(Opening.Window, 4, 20);
                 default:
                     throw new ArgumentException(id);
             }
@@ -190,7 +191,7 @@ namespace GameDev.Slice.EditorTools
 
         // ------------------------------------------------------------------------------------------------ rooms
 
-        /// <summary>Floors, ceilings, a marker and a light per room; one wall per 3 m segment; a post at every node.</summary>
+        /// <summary>Floors, ceilings, a marker and a light per room; one wall per module; a post at every node.</summary>
         private static void Rooms(Plan plan, string id)
         {
             var segments = new Dictionary<(int X, int Z, bool AlongZ), int>();
@@ -277,11 +278,11 @@ namespace GameDev.Slice.EditorTools
                         Shut(Wall(Doorway));
                         break;
                     case Opening.Cell:
-                        Put("CellBars3", x, z, alongZ ? 3 : 0);
+                        Put("CellBars", x, z, alongZ ? 3 : 0);
                         break;
                     case Opening.Street:
                         Shut(Leaf(Doorway(sides[0].Stone)));
-                        var portal = Put("PortalLeaf", x, z, alongZ ? 3 : 0).GetComponent<Portal>();
+                        var portal = Put("PortalLeafRoom", x, z, alongZ ? 3 : 0).GetComponent<Portal>();
                         portal.Configure(id + ".inside", SliceTestScenes.SceneName(VeilmouthScene.ScenePath), id + ".street", true);
                         PrefabUtility.RecordPrefabInstancePropertyModifications(portal);
                         portal.gameObject.name = $"Portal - {id}.inside";
@@ -328,7 +329,7 @@ namespace GameDev.Slice.EditorTools
             return sides;
         }
 
-        /// <summary>A linear block on the 3 m segment from (x, z), its local +Z turned to <paramref name="facing"/>.</summary>
+        /// <summary>A linear block on the segment of one module from (x, z), its local +Z turned to <paramref name="facing"/>.</summary>
         private static GameObject Segment(string key, int x, int z, bool alongZ, Vector2Int facing)
         {
             var turns = Turns(facing);
@@ -349,175 +350,175 @@ namespace GameDev.Slice.EditorTools
             switch (id)
             {
                 case VeilmouthScene.SootAndBellId:
-                    Put("BarCounter", 9, 4, 2).name = "Bar";
-                    Against("BarCabinet", S, 9, 9);
-                    Put("Barrel", 12, 7);
-                    Put("Barrel", 13, 7);
-                    Against("BkStove", E, 0, 4).name = "Fireplace";
-                    Hang("BkPainting", E, 0, 6, 1.6f);
-                    foreach (var (tx, tz) in new[] { (2, 1), (2, 5), (11, 1) })
+                    Put("BarCounter", 12, 5, 2).name = "Bar";
+                    Against("BarCabinet", S, 12, 12);
+                    Put("Barrel", 16, 9);
+                    Put("Barrel", 17, 9);
+                    Against("BkStove", E, 0, 5).name = "Fireplace";
+                    Hang("BkPainting", E, 0, 8, 1.6f);
+                    foreach (var (tx, tz) in new[] { (3, 1), (3, 7), (15, 1) })
                     {
                         Put("BkTavernTable", tx, tz);
                         Put("BkStool", tx - 1, tz);
                         Put("BkStool", tx + 2, tz + 1);
                     }
 
-                    Hang("BkBottleShelf", S, 9, 12, 1.5f);
-                    Against("BkStove", E, 0, 13);
-                    Against("BkSink", S, 15, 3);
-                    Against("BkCupboard", W, 6, 10);
-                    Put("BkKitchenTable", 2, 11, 1);
-                    Put("BkBasket", 1, 9);
-                    Put("Bed", 12, 12).name = "Bed (a room for the night)";
-                    Against("BkDrawer", S, 15, 10);
-                    Put("BkChair", 13, 10);
-                    Put("BkCarpet", 11, 10);
-                    Hang("BkPainting", N, 0, 4, 1.9f);
-                    Hang("BkPainting", W, 15, 7, 1.9f);
-                    Against("BkSideTable", N, 0, 3);
-                    Put("BkLogs", 1, 3);
-                    Hang("BkDishShelf", S, 15, 1, 1.7f);
-                    Against("BkDresser", E, 9, 10);
-                    Hang("BkPainting", E, 6, 10, 1.9f);
-                    Hang("BkPainting", W, 15, 10, 1.9f);
-                    Put("BkTrunk", 10, 9);
-                    VeilmouthDressing.Person("Yellow", false, 11.5f, 6.8f, 180f, "Tavern keeper", 0f);
-                    VeilmouthDressing.Person("Brown", false, 1.5f, 6.5f, 90f, "Veinmarket at a table", 0f);
+                    Hang("BkBottleShelf", S, 12, 16, 1.5f);
+                    Against("BkStove", E, 0, 17);
+                    Against("BkSink", S, 20, 4);
+                    Against("BkCupboard", W, 8, 13);
+                    Put("BkKitchenTable", 3, 15, 1);
+                    Put("BkBasket", 1, 12);
+                    Put("Bed", 16, 16).name = "Bed (a room for the night)";
+                    Against("BkDrawer", S, 20, 13);
+                    Put("BkChair", 17, 13);
+                    Put("BkCarpet", 15, 13);
+                    Hang("BkPainting", N, 0, 5, 1.9f);
+                    Hang("BkPainting", W, 20, 9, 1.9f);
+                    Against("BkSideTable", N, 0, 4);
+                    Put("BkLogs", 1, 4);
+                    Hang("BkDishShelf", S, 20, 1, 1.7f);
+                    Against("BkDresser", E, 12, 13);
+                    Hang("BkPainting", E, 8, 13, 1.9f);
+                    Hang("BkPainting", W, 20, 13, 1.9f);
+                    Put("BkTrunk", 13, 12);
+                    VeilmouthDressing.Person("Yellow", false, 15.3f, 9.1f, 180f, "Tavern keeper", 0f);
+                    VeilmouthDressing.Person("Brown", false, 2.0f, 8.7f, 90f, "Veinmarket at a table", 0f);
                     break;
 
                 case "harrow-apothecary":
-                    Put("BkCounter", 2, 3, 2).name = "Counter";
-                    Put("BkCounter", 4, 3, 2).name = "Counter";
-                    Hang("BkBottleShelf", S, 6, 1, 1.4f);
-                    Hang("BkBottleShelf", S, 6, 3, 1.4f);
+                    Put("BkCounter", 3, 4, 2).name = "Counter";
+                    Put("BkCounter", 5, 4, 2).name = "Counter";
+                    Hang("BkBottleShelf", S, 8, 1, 1.4f);
+                    Hang("BkBottleShelf", S, 8, 4, 1.4f);
                     Against("BkCupboardGlass", E, 0, 1);
-                    Against("BkDrawer", W, 9, 1);
-                    Against("BkLabBench", S, 12, 0);
-                    Against("BkAlembic", S, 12, 3);
-                    Put("BkCauldron", 5, 8);
-                    Against("BkDesk", E, 0, 7);
-                    Put("BkStool", 2, 8);
-                    Hang("BkBookShelf", S, 12, 6, 1.6f);
-                    Hang("BkJarShelf", W, 9, 6, 1.5f);
-                    Put("Barrel", 10, 10);
-                    Put("Barrel", 10, 9);
-                    Put("BkBasket", 11, 7);
-                    Put("Crate", 10, 7);
-                    Hang("BkBottleShelf", S, 6, 1, 2.1f);
-                    Hang("BkBottleShelf", S, 6, 3, 2.1f);
-                    Put("BkBasketB", 1, 4);
-                    Put("Crate", 7, 4);
-                    Put("BkWorkTable", 6, 8);
-                    Hang("BkBookShelfB", S, 12, 6, 2.2f);
-                    Put("BkGlobe", 1, 10);
-                    Hang("BkJarShelf", E, 9, 7, 1.5f);
-                    VeilmouthDressing.Person("Green", false, 3.5f, 4.8f, 180f, "Harrow", 0f);
+                    Against("BkDrawer", W, 12, 1);
+                    Against("BkLabBench", S, 16, 1);
+                    Against("BkAlembic", S, 16, 4);
+                    Put("BkCauldron", 7, 11);
+                    Against("BkDesk", E, 0, 9);
+                    Put("BkStool", 3, 11);
+                    Hang("BkBookShelf", S, 16, 8, 1.6f);
+                    Hang("BkJarShelf", W, 12, 8, 1.5f);
+                    Put("Barrel", 13, 13);
+                    Put("Barrel", 13, 12);
+                    Put("BkBasket", 15, 9);
+                    Put("Crate", 13, 9);
+                    Hang("BkBottleShelf", S, 8, 1, 2.1f);
+                    Hang("BkBottleShelf", S, 8, 4, 2.1f);
+                    Put("BkBasketB", 1, 5);
+                    Put("Crate", 9, 5);
+                    Put("BkWorkTable", 8, 11);
+                    Hang("BkBookShelfB", S, 16, 8, 2.2f);
+                    Put("BkGlobe", 1, 13);
+                    Hang("BkJarShelf", E, 12, 9, 1.5f);
+                    VeilmouthDressing.Person("Green", false, 4.7f, 6.4f, 180f, "Harrow", 0f);
                     break;
 
                 case "faction-house":
-                    Against("Rostrum", S, 9, 5);
-                    foreach (var z in new[] { 2, 4, 6 })
+                    Against("Rostrum", S, 12, 7);
+                    foreach (var z in new[] { 2, 5, 8 })
                     {
                         Put("Pew", 1, z);
                         Put("Pew", 8, z);
                     }
 
-                    Put("Candles", 3, 7);
-                    Put("Candles", 8, 7);
-                    Hang("BkPainting", E, 0, 6, 1.6f);
-                    Against("BkDesk", S, 15, 2);
-                    Put("BkChair", 3, 13);
-                    Against("BkCupboard", E, 0, 10);
-                    Put("BkCarpet", 2, 10);
-                    foreach (var a in new[] { 6, 8 })
+                    Put("Candles", 4, 9);
+                    Put("Candles", 11, 9);
+                    Hang("BkPainting", E, 0, 8, 1.6f);
+                    Against("BkDesk", S, 20, 3);
+                    Put("BkChair", 4, 17);
+                    Against("BkCupboard", E, 0, 13);
+                    Put("BkCarpet", 3, 13);
+                    foreach (var a in new[] { 8, 11 })
                     {
                         Against("BkCupboardTall", S, 15, a);
                     }
 
-                    Hang("BkBookShelf", E, 6, 10, 1.6f);
-                    Against("BkDesk", W, 12, 10);
-                    Hang("BkPainting", W, 12, 7, 1.9f);
-                    Put("BkCarpetLong", 4, 1);
-                    Put("BkCarpetLong", 4, 4);
-                    Hang("BkPainting", N, 9, 4, 1.9f);
-                    Against("BkSideTable", W, 6, 12);
-                    Hang("BkBookShelfB", E, 6, 10, 2.2f);
-                    Hang("BkBookShelfC", E, 6, 12, 1.6f);
-                    Hang("BkBookShelf", E, 6, 12, 2.2f);
-                    Put("BkTrunk", 9, 12);
-                    VeilmouthDressing.Person("Teal", false, 6f, 7.4f, 180f, "Faction member", 0f);
-                    VeilmouthDressing.Person("Teal", true, 2.5f, 12.4f, 0f, "Faction member", 0f);
+                    Hang("BkBookShelf", E, 8, 13, 1.6f);
+                    Against("BkDesk", W, 16, 13);
+                    Hang("BkPainting", W, 16, 9, 1.9f);
+                    Put("BkCarpetLong", 5, 1);
+                    Put("BkCarpetLong", 5, 5);
+                    Hang("BkPainting", N, 12, 5, 1.9f);
+                    Against("BkSideTable", W, 8, 16);
+                    Hang("BkBookShelfB", E, 8, 13, 2.2f);
+                    Hang("BkBookShelfC", E, 8, 16, 1.6f);
+                    Hang("BkBookShelf", E, 8, 16, 2.2f);
+                    Put("BkTrunk", 12, 16);
+                    VeilmouthDressing.Person("Teal", false, 8.0f, 9.9f, 180f, "Faction member", 0f);
+                    VeilmouthDressing.Person("Teal", true, 3.3f, 16.5f, 0f, "Faction member", 0f);
                     break;
 
                 case "wardens-lockup":
-                    Put("BkDesk", 3, 3, 2).name = "Front desk";
+                    Put("BkDesk", 4, 4, 2).name = "Front desk";
                     Against("Pew", E, 1, 1);
-                    Hang("BkBoard", W, 9, 1, 1.0f).name = "Notices";
-                    Against("BkDesk", W, 15, 2);
-                    Put("BkChair", 12, 3);
-                    Against("BkCupboard", S, 6, 11);
-                    Hang("BkPainting", N, 0, 10, 1.6f);
-                    Put("BkStool", 1, 10);
-                    Put("BkBasket", 4, 10);
-                    Put("BkLogs", 7, 10);
-                    Against("BkStove", W, 15, 9);
-                    Put("BkDiningTable", 10, 8);
-                    Put("BkStool", 12, 8);
-                    Against("BkCupboardTall", S, 12, 9);
+                    Hang("BkBoard", W, 12, 1, 1.0f).name = "Notices";
+                    Against("BkDesk", W, 20, 3);
+                    Put("BkChair", 16, 4);
+                    Against("BkCupboard", S, 8, 15);
+                    Hang("BkPainting", N, 0, 13, 1.6f);
+                    Put("BkStool", 1, 13);
+                    Put("BkBasket", 5, 13);
+                    Put("BkLogs", 9, 13);
+                    Against("BkStove", W, 20, 12);
+                    Put("BkDiningTable", 13, 11);
+                    Put("BkStool", 16, 11);
+                    Against("BkCupboardTall", S, 16, 12);
                     Hang("BkPainting", N, 0, 1, 1.9f);
-                    Against("BkCupboard", E, 0, 4);
-                    Against("BkCupboardGlass", N, 0, 9);
-                    Hang("BkPainting", S, 6, 12, 1.9f);
-                    Against("BkArmsTable", S, 12, 12);
-                    VeilmouthDressing.Person("Blue", false, 4f, 4.6f, 180f, "Warden", 0f);
-                    VeilmouthDressing.Person("Blue", true, 11f, 10.5f, 180f, "Warden", 0f);
+                    Against("BkCupboard", E, 0, 5);
+                    Against("BkCupboardGlass", N, 0, 12);
+                    Hang("BkPainting", S, 8, 16, 1.9f);
+                    Against("BkArmsTable", S, 16, 16);
+                    VeilmouthDressing.Person("Blue", false, 5.3f, 6.1f, 180f, "Warden", 0f);
+                    VeilmouthDressing.Person("Blue", true, 14.7f, 14.0f, 180f, "Warden", 0f);
                     break;
 
                 case "missing-room":
-                    Put("Bed", 1, 6);
-                    Against("BkStove", S, 9, 4);
-                    Against("BkDrawer", W, 6, 4).name = "Wash stand";
-                    Put("BkDiningTable", 3, 4);
-                    Put("BkChair", 5, 3);
-                    Put("BkTrunk", 3, 6).name = "The cache";
-                    Hang("BkBookShelf", E, 0, 4, 1.6f);
-                    Hang("BkPainting", S, 9, 1, 1.9f);
-                    Against("BkDresser", S, 3, 3);
+                    Put("Bed", 1, 8);
+                    Against("BkStove", S, 12, 5);
+                    Against("BkDrawer", W, 8, 5).name = "Wash stand";
+                    Put("BkDiningTable", 4, 5);
+                    Put("BkChair", 7, 4);
+                    Put("BkTrunk", 4, 8).name = "The cache";
+                    Hang("BkBookShelf", E, 0, 5, 1.6f);
+                    Hang("BkPainting", S, 12, 1, 1.9f);
+                    Against("BkDresser", S, 4, 4);
                     break;
 
                 case "soot-stair-cellar":
-                    Put("Barrels", 1, 3);
-                    Put("Barrel", 4, 4);
-                    Put("Barrel", 4, 3);
-                    Put("Box", 4, 1);
-                    Put("Firewood", 3, 1);
-                    Put("Barrels", 16, 3);
-                    Put("Box", 19, 1);
-                    Put("BkLogs", 19, 4);
-                    Put("BkBasketB", 1, 5);
-                    Put("Crate", 16, 1);
-                    Put("Candles", 7, 8);
-                    Put("Candles", 14, 8);
-                    VeilmouthDressing.Circle(new Vector3(10f, 0f, 4f), "Candidate 2, the cellar under the Soot Stair");
+                    Put("Barrels", 1, 4);
+                    Put("Barrel", 5, 5);
+                    Put("Barrel", 5, 4);
+                    Put("Box", 5, 1);
+                    Put("Firewood", 4, 1);
+                    Put("Barrels", 21, 4);
+                    Put("Box", 25, 1);
+                    Put("BkLogs", 25, 5);
+                    Put("BkBasketB", 1, 7);
+                    Put("Crate", 21, 1);
+                    Put("Candles", 9, 11);
+                    Put("Candles", 19, 11);
+                    VeilmouthDressing.Circle(new Vector3(14f, 0f, 6f), "Candidate 2, the cellar under the Soot Stair");
                     break;
 
                 case "old-chapel":
-                    Against("Rostrum", S, 15, 4);
-                    foreach (var z in new[] { 3, 5, 7, 9, 11 })
+                    Against("Rostrum", S, 20, 5);
+                    foreach (var z in new[] { 4, 7, 10, 13, 16 })
                     {
                         Put("Pew", 0, z);
                         Put("Pew", 6, z);
                     }
 
-                    Put("Candles", 2, 13);
-                    Put("Candles", 6, 13);
-                    Against("BkCupboardTall", S, 15, 9);
-                    Against("BkDesk", W, 12, 10);
-                    Put("BkCarpetLong", 3, 3);
-                    Put("BkCarpetLong", 3, 6);
-                    Put("BkCarpetLong", 3, 9);
-                    Hang("BkPainting", W, 9, 7, 2.0f);
-                    Put("BkTrunk", 10, 12);
+                    Put("Candles", 3, 17);
+                    Put("Candles", 8, 17);
+                    Against("BkCupboardTall", S, 20, 12);
+                    Against("BkDesk", W, 16, 13);
+                    Put("BkCarpetLong", 4, 4);
+                    Put("BkCarpetLong", 4, 8);
+                    Put("BkCarpetLong", 4, 12);
+                    Hang("BkPainting", W, 12, 9, 2.0f);
+                    Put("BkTrunk", 13, 16);
                     break;
             }
         }
@@ -543,11 +544,15 @@ namespace GameDev.Slice.EditorTools
             return Put(key, line - e.Depth, a, turns);
         }
 
-        /// <summary>A Face block hung on the wall line, facing into the room, spanning [a, a + width] along it.</summary>
+        /// <summary>
+        /// A Face block hung on the wall line, facing into the room, centred on the wall segment that holds
+        /// <paramref name="a"/> (owner's play test, 2026-11-06: a board across a post read lopsided).
+        /// </summary>
         private static GameObject Hang(string key, Vector2Int facing, int line, int a, float y)
         {
             var e = _kit[key];
             var turns = Turns(facing);
+            a = a / Module * Module + (Module - e.Width) / 2;
             // Local +X runs +X (N), -X (S), -Z (E), +Z (W), so the pivot is the span's start or end.
             Vector3 pivot;
             if (facing == N) pivot = new Vector3(a, y, line);

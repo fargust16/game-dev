@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1)
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft — accepted by the owner, 2026-11-05; sizes remain authoring defaults
 
-Last Updated: 2026-11-06 (§16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-06 (§17: the owner's second play test fixed and rerun at the owner's request: still dressing, game scale ×1.2, BK's 4 m module, walls set by their infill, one-style steps, props on slopes, railings without holes, blue shop floors; §14 and §16 resized. Earlier: §16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
@@ -311,7 +311,7 @@ Squares: Crown Circus (475–525 × 646–696), the palace forecourt (460–540 
 
 `VeilmouthInteriors` (*GameDev → Slice → Build Veilmouth Interiors from C1 (once)*) builds the seven interiors of §8 from BK_AlchemistHouse, each under one root, `Interior C1`, and refuses to rebuild a scene that has it: from then on each interior is the owner's. `BuildReplacing` is for the agent's own batch iterations only. Everything below is an authoring default unless it is marked measured.
 
-**The room kit** is two kit families. `BkRoom` holds the architecture at ×1.2: walls, doorways, the window, the door, posts, wooden and stone floors, and the ceiling. `BkFurniture` holds the furniture at true size, plus sets: a table, bench, or shelf with BK's things standing on its top, such as plates and a candle, bottles, books, jars, or lab sets. A shelf, a board, or a painting hangs on a wall's face. **Measured** (render probe, 2026-11-06):
+**The room kit** is two kit families. `BkRoom` holds the architecture, at ×1.6 along and ×1.44 up since §17 (×1.2 before): walls, doorways, the window, the door, posts, wooden and stone floors, and the ceiling. `BkFurniture` holds the furniture, at game scale ×1.2 since §17 (true size before), plus sets: a table, bench, or shelf with BK's things standing on its top, such as plates and a candle, bottles, books, jars, or lab sets. A shelf, a board, or a painting hangs on a wall's face. **Measured** (render probe, 2026-11-06):
 
 - BK draws a wall only on its local +Z side. A wall between two rooms therefore gets a second face turned to the other room, which is seen and never solid.
 - `IntWall02a/b` are brick between timbers, and they line the stone rooms: the kitchen, the laboratory and store room, the lock-up's corridor and cells, the cellar's vaults, and the chapel. `IntWall01a`, both doorways, and the window are plaster, and they line every other room.
@@ -320,21 +320,21 @@ Squares: Crown Circus (475–525 × 646–696), the palace forecourt (460–540 
 
 BK's jars of babies and brains are not used.
 
-**Rooms** are rounded to the 3 m module, on the ground floor only. There are no stairs and no upper floors yet, so the Soot & Bell's let room lies behind a passage, not up a stair.
+**Rooms** are rounded to the 4 m module (3 m before §17), on the ground floor only. There are no stairs and no upper floors yet, so the Soot & Bell's let room lies behind a passage, not up a stair.
 
 | Interior | Rooms as built |
 |---|---|
-| Soot & Bell | taproom 15 × 9 m with the bar, the cabinet, the fireplace, and tables; kitchen 6 × 6 m (stone) with the stove and sink; passage 3 × 6 m with the closed back door to the yard; let room 6 × 6 m with the bed |
-| Harrow & Tincture | shop 9 × 6 m with counters and bottle shelves; laboratory 9 × 6 m (stone) with the cauldron, alembic, lab bench, and books; store room 3 × 6 m (stone) |
-| Faction's house | hall 12 × 9 m with the rostrum and pews; office 6 × 6 m; archive 6 × 6 m with shelves |
-| Wardens' station | front desk room 9 × 6 m; office 6 × 6 m; guard room 6 × 6 m with the stove; corridor 9 × 3 m and three cells 3 × 3 m (stone) behind the owner's bars, widened to 3 m with their door |
-| Missing person's room | landing 6 × 3 m with a closed neighbour's door; the room 6 × 6 m with the bed, wash stand, stove, table, chair, and the cache |
-| Cellar | three stone vaults, 6 × 6, 9 × 9, and 6 × 6 m, joined by doorways; barrels, crates, and candles; the circle's place in the middle vault, hidden until a ritual starts there |
-| Old chapel | nave 9 × 15 m (stone) with pews, candles, and the rostrum; vestry 3 × 6 m (stone) |
+| Soot & Bell | taproom 20 × 12 m with the bar, the cabinet, the fireplace, and tables; kitchen 8 × 8 m (stone) with the stove and sink; passage 4 × 8 m with the closed back door to the yard; let room 8 × 8 m with the bed |
+| Harrow & Tincture | shop 12 × 8 m with counters and bottle shelves; laboratory 12 × 8 m (stone) with the cauldron, alembic, lab bench, and books; store room 4 × 8 m (stone) |
+| Faction's house | hall 16 × 12 m with the rostrum and pews; office 8 × 8 m; archive 8 × 8 m with shelves |
+| Wardens' station | front desk room 12 × 8 m; office 8 × 8 m; guard room 8 × 8 m with the stove; corridor 12 × 4 m and three cells 4 × 4 m (stone) behind the owner's bars, widened to 4 m with their door |
+| Missing person's room | landing 8 × 4 m with a closed neighbour's door; the room 8 × 8 m with the bed, wash stand, stove, table, chair, and the cache |
+| Cellar | three stone vaults, 8 × 8, 12 × 12, and 8 × 8 m, joined by doorways; barrels, crates, and candles; the circle's place in the middle vault, hidden until a ritual starts there |
+| Old chapel | nave 12 × 20 m (stone) with pews, candles, and the rostrum; vestry 4 × 8 m (stone) |
 
 Each room has one warm point light under its ceiling, with no shadows. The street door holds the portal leaf, and the player arrives just inside it. The people are the asset map's coloured Dummies at their posts.
 
-**Counted:** 710 kit blocks in the seven, with no kit fault; 749 after §15.
+**Counted:** 710 kit blocks in the seven, with no kit fault; 749 after §15 and again after §17.
 
 **Still missing:** stairs and upper floors; arches between the vaults; the cache's contents (the Stash rules of [19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.3 come with step 4a).
 
@@ -377,23 +377,23 @@ Step 4a's first half: the shared Dwelling scene, the generator it runs, and a st
 
 **The same house, the same rooms.** The plan comes from the slice seed forked by the stream `slice.dwellings` and the door's place, so a house always gives the same rooms and furniture, and houses of one kind differ (12 terraces gave more than 6 different plans). Nothing in the house is kept yet: a picked door and a taken Stash are kept for the run once breaking in exists.
 
-**Rooms** on the 3 m module, ground floor only, the street door along the front; each plan is mirrored left to right half the time:
+**Rooms** on the 4 m module (3 m before §17), ground floor only, the street door along the front; each plan is mirrored left to right half the time:
 
 | House | Rooms as built |
 |---|---|
-| Tenement | one room 6 × 6 m, or that room and a stone kitchen 3 × 6 m |
-| Terrace | hall 3 × 9 m, parlour 6 × 6 m, stone kitchen 6 × 3 m, bedroom 9 × 3 m |
-| Shop | shop room 9 × 6 m with the street door, back room 6 × 6 m, stone kitchen 3 × 6 m |
-| Villa | parlour 6 × 6 m, hall 3 × 9 m with the street door, dining room 6 × 6 m, study 6 × 6 m, stone kitchen 6 × 6 m |
-| Warehouse | stone store 9 × 9 m, office 6 × 6 m |
+| Tenement | one room 8 × 8 m, or that room and a stone kitchen 4 × 8 m |
+| Terrace | hall 4 × 12 m, parlour 8 × 8 m, stone kitchen 8 × 4 m, bedroom 12 × 4 m |
+| Shop | shop room 12 × 8 m with the street door, back room 8 × 8 m, stone kitchen 4 × 8 m |
+| Villa | parlour 8 × 8 m, hall 4 × 12 m with the street door, dining room 8 × 8 m, study 8 × 8 m, stone kitchen 8 × 8 m |
+| Warehouse | stone store 12 × 12 m, office 8 × 8 m |
 
 **Wealth** ([19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.3) comes from where the house stands, in plan coordinates: the Ridge (py < 600) is rich; tenements and warehouses elsewhere are poor; a house in Lower Veil (px ≥ 470 and py ≥ 690, or px ≥ 545 and 600 < py < 662) is poor; the rest are middling. It chooses the furniture each room may take, the Lock (2, 4, or 6, [10.3](../../../10.3%20Stealth%20and%20Detection.md) §6.1), and the Stash chance.
 
 **Furniture** by each room's kind and wealth, from the same `BkFurniture` kit as §14:
 
-- Pieces go against walls first, then in the middle, then free, then hung. A doorway keeps the three cells in front of it and the middle one behind it clear. A window or door segment takes no wall piece, and each wall segment takes one.
+- Pieces go against walls first, then in the middle, then free, then hung. A doorway keeps the cells along its segment clear, and behind them the two its 1.76 m opening gives onto (§17). A window or door segment takes no wall piece, and each wall segment takes one.
 - A solid piece keeps 0.16 m from a wall's line, the clearance a wall's 0.3 m body leaves. Carpets take no cells.
-- The bed is `Kit_Furniture_WallBed`, the Tripo bed with its back on the wall's face (`Anchor.Back`, 1.8 m deep): the centred bed can never clear a wall.
+- The bed is `Kit_Furniture_WallBed`, the Tripo bed with its back on the wall's beams (`Anchor.Back`, at game scale since §17): the centred bed can never clear a wall.
 - What a room asks for and cannot place is listed for review, never shown; on the samples only a villa parlour's second painting.
 
 **The Stash** is BK's trunk, in the first of the bedroom, study, room, back room, office, store, and kitchen that the house has: in half the poor homes, 60 % of the middling, 70 % of the rich (400 houses each, within 8 points). It is a marker only; what it holds comes with S5a.
@@ -410,3 +410,31 @@ Step 4a's first half: the shared Dwelling scene, the generator it runs, and a st
 - The Stash's contents, and a picked door and taken Stash kept for the run: S5a and the save of S5c.
 - Residents at home by their schedules: S5c.
 - Stairs and upper floors, as in §14; a plain bed for poor homes ([SLICE_MODELS_WANTED.md](SLICE_MODELS_WANTED.md)).
+
+---
+
+# 17. The owner's second play test, 2026-11-06, as fixed
+
+The owner played the city and interiors again and gave ten remarks with screenshots. Both passes, the interiors, and the kit were rebuilt by batch at the owner's request, so the scenes are again the owner's from this build. Every number is an authoring default unless it is marked measured.
+
+| # | Remark | Fix |
+|---|---|---|
+| 1 | The potions fall through the alchemist's shelves; check that every prop has a collider | BK's potions carry their own dynamic rigid bodies. The kit now removes a vendor model's rigid bodies and joints with its colliders, and the wrapper's box is what is solid (kit standard §4). Every kit block has a collider, and no dynamic body is left in the seven interiors. |
+| 2 | The bed, benches, cupboards and tables are small beside the character, and the interiors are cramped | Furniture and loose props stand at game scale ×1.2 (kit standard §1): the bed is 2.3 m long, the bench and notice board larger. BK's architecture is ×1.6 along and ×1.44 up, so its wall is a **4 m module**, 3.6 m high, with a doorway 1.76 m wide; every room of §14 and §16 grew by a third, and the ceiling stays at 3.48 m. |
+| 3 | The painting still floats; perhaps it is levelled by the timber beams, not the wall's surface | It was. **Measured** from each wall's mesh: the plaster between the beams is 0.127 m behind them at ×1, and BK's plaster walls stood 0.28 m further back than its brick ones at ×1.6, so a painting on the beams' line was 0.43 m off the plaster. Every BK wall, doorway and window is now set by its infill plane, 0.05 m from the line, and what hangs on a wall hangs on that plane; a piece against a wall puts its back on the beams, 0.25 m from the line (kit standard §2). Every hung piece in the seven was measured with its back on the plaster. |
+| 4 | The steps to some houses have gaps and mixed styles | A house's steps are one style, the stoop's own `Porch` material, in treads of the stoop's width and the kit's least run, 0.28 m, each rising by an equal step down to the ground with no gap; where the ground is lower than the stoop's foot, a filled plinth of the same material closes it. |
+| 5 | On slopes the fence stands upright, not along the slope; props do not follow the ground | A prop's seen model tilts to the ground's plane under its footprint, at most 25°, and a fence or railing pitches along its length only. Its block, pivot and body stay level on the grid, so the layout check and the Combat Grid read it as before. Lamp posts, columns, the notice board, graves and stands stay plumb; plants are sunk as before. |
+| 6 | Holes in fences where no way in or out is planned | Railings are 2 m segments with a 1 m segment (`RailingShort`) for an odd metre, and a gate is left only before a door within 5 m that faces the railing. A railing is set over any prop already there, but never through a house, so it now stops at a neighbouring house. |
+| 7 | The Wardens' board floats and is off-centre on its wall | Hung pieces are two-cell blocks centred on their 4 m wall segment and on the infill plane (remark 3). The rostrum and the bar cabinet stand with their backs on the wall. |
+| 8 | Interiors feel stuffy | See remark 2. |
+| 9 | Gaps where two different assets meet; the ground floor mixes two assets, and the whole of it should be the blue one | A shop's ground floor is now `WoodenWallBlue` all round: its fronts and back, its side walls, and both corners of each front and back, mirrored at each end, so no stone or plaster panel meets the shop front on that floor. |
+| 10 | The notice board is very small beside the character | It stands at game scale, 3 m wide. |
+
+**What this costs**, for the owner's review:
+
+- An interior doorway is now 1.76 m wide and lets **two** Combat Grid cells through where it stands over a node, so chokepoints are wider; the grid check expects two there and one over a cell's middle.
+- Aligning by the infill brings the plaster walls' end posts up to 0.46 m into the room at the nodes.
+- A prop tilts only in its model: on a steep slope its level body may stand slightly proud of the ground at one end.
+- Railings end at a neighbouring house rather than leaving a gap before it.
+
+**Counted** on this build: 3284 kit blocks in the city, 277 doorways, and 749 in the seven interiors, all with no kit fault; 56 sample Dwellings with no kit fault; the grid check passes (railings 1498 of 1499 low enough, 750 of 750 crossings closed, house fronts closed). The stale 3 m BK prefabs and the old-size furniture, which nothing used, were removed from the kit.

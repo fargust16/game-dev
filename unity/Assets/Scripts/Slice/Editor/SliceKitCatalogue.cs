@@ -46,11 +46,21 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// Where a BK room's plain wall shows its face, m from the wall's line (survey of 2026-11-06): the plaster is
-        /// 0.37 m thick at ×1.2, so its face is 0.19 m out, and the thinner brick is set with its face there too, so
-        /// furniture, shelves and paintings stand against either.
+        /// Where a BK room's plain wall shows its timbers, m from the wall's line (survey of 2026-11-06: 0.19 m at ×1.2,
+        /// so 0.158 m a unit of BK's horizontal scale); the thinner brick is set with its face there too. Furniture
+        /// against a wall stands on it.
         /// </summary>
-        public const float WallFace = 0.19f;
+        public const float WallFace = 0.158f * BkArchitecture;
+
+        /// <summary>
+        /// Where the plaster or the brick between the timbers shows, m from the wall's line. Measured 2026-11-06 from
+        /// each wall's mesh (the largest face turned to the room): in every BK wall it lies 0.127 m behind the beams at
+        /// ×1, but the plaster walls' own models put it 0.28 m further back than the brick ones at ×1.6, so a painting
+        /// hung on the beams' line stood 0.43 m off the plaster (the owner's play test). Every BK wall is therefore set
+        /// by this plane (<see cref="Spec.Infill"/>), which brings all their beams to WallFace, and shelves, boards and
+        /// paintings hang on it.
+        /// </summary>
+        public const float WallInfill = WallFace - 0.127f * BkArchitecture;
 
         public sealed class Spec
         {
@@ -65,7 +75,8 @@ namespace GameDev.Slice.EditorTools
             public string Material; // a project-side material for a model whose own does not render in URP
             public float Factor = 1f; // a uniform scale before sizing (BK's architecture at x1.2, city plan §8)
             public float Stretch = 1f; // a vertical scale on top of Factor (BK's rooms: walls 3.6 m, owner 2026-11-06)
-            public bool OnFace;        // a linear block set with its seen face at WallFace instead of centred
+            public bool Infill;        // a BK wall set with its infill plane (InfillPlane) at WallInfill instead of centred
+            public float Shift;        // m added to a centred linear block's depth: BK's door leaf in its aligned frame
             public bool LineBody;      // a linear block whose body is the full 0.3 m on its line, whatever is seen
             public string Pack;       // a pack whose built-in materials get URP copies (SliceUrpMaterials)
             public bool NoLights;     // removes the vendor's lights (BK's window carries one)
@@ -94,10 +105,26 @@ namespace GameDev.Slice.EditorTools
         private const string VictorianStreet = "Assets/Modular Victorian City/Prefabs/Basic elements/Street";
         private const string Polytope = "Assets/Polytope Studio/Lowpoly_Environments/Prefabs";
         private const string Bk = "Assets/BK_AlchemistHouse/Prefabs";
-        private const float BkArchitecture = 1.2f; // city plan §8: a 3 m module, walls and ceilings 3 m, a door 2.38 m
-        // The owner's play test of 2026-11-06: 3 m rooms trap the camera under the ceiling. The architecture is stretched
-        // upward once more, so walls stand 3.6 m and a door 2.85 m (authoring default).
-        public const float BkStretch = 1.2f;
+        // BK's architecture: a 2.5 m wall. The owner's play tests of 2026-11-06: 3 m rooms trap the camera under the
+        // ceiling, and rooms on a 3 m module feel cramped beside the character. So the walls are ×1.6 along (a 4 m
+        // module, a door 1.76 m wide) and ×1.44 up (walls 3.6 m, a door 2.85 m high). Authoring defaults.
+        public const float BkArchitecture = 1.6f;
+        public const float BkStretch = 0.9f;
+        public const float BkVertical = BkArchitecture * BkStretch;
+        public const int BkModule = 4;
+
+        /// <summary>
+        /// Furniture and loose props at game scale: ×1.2 their true size (owner's play test, 2026-11-06: beds, benches,
+        /// cupboards and tables at true size read small beside the 1.8 m character from a third-person camera).
+        /// Authoring default; BK's furniture so keeps the proportion its own architecture had at ×1.2.
+        /// </summary>
+        public const float FurnitureScale = 1.2f;
+
+        private static Spec Game(Spec spec)
+        {
+            spec.Factor = FurnitureScale;
+            return spec;
+        }
 
         private static Spec S(string key, string family, string part, string folder, string file, string layer,
             Body body = Body.Box, Anchor anchor = Anchor.Centre) =>
@@ -150,38 +177,38 @@ namespace GameDev.Slice.EditorTools
             yield return S("BottleTable", "Market", "BottleTable", Market, "table_with_bottels", pr, anchor: Anchor.Front);
             yield return S("WeaponTable", "Market", "WeaponTable", Market, "Table_with_weapon", pr, anchor: Anchor.Front);
             yield return S("Counter", "Market", "Counter", Market, "stand_01", pr, anchor: Anchor.Front);
-            yield return S("Crate", "Market", "Crate", Market, "wooden_box", pr);
+            yield return Game(S("Crate", "Market", "Crate", Market, "wooden_box", pr));
 
             // Street props.
             yield return S("LampPost", "Street", "Lamp", VictorianStreet, "Lamp post", pr);
-            yield return S("Bench", "Street", "Bench", VictorianStreet, "Wooden bench", pr, anchor: Anchor.Front);
-            yield return S("TrashCan", "Street", "TrashCan", VictorianStreet, "Trash can", pr);
-            yield return S("Barrel", "Props", "Barrel", PropsLite, "Barrel_01", pr);
-            yield return S("Box", "Props", "Box", PropsLite, "Box_01", pr);
-            yield return S("Firewood", "Props", "Firewood", PropsLite, "Firewood_01", pr);
+            yield return Game(S("Bench", "Street", "Bench", VictorianStreet, "Wooden bench", pr, anchor: Anchor.Front));
+            yield return Game(S("TrashCan", "Street", "TrashCan", VictorianStreet, "Trash can", pr));
+            yield return Game(S("Barrel", "Props", "Barrel", PropsLite, "Barrel_01", pr));
+            yield return Game(S("Box", "Props", "Box", PropsLite, "Box_01", pr));
+            yield return Game(S("Firewood", "Props", "Firewood", PropsLite, "Firewood_01", pr));
             var fence = S("Fence", "Fence", "Field", PropsLite, "Fence_01", pr, anchor: Anchor.Linear);
             fence.SizeX = 2f;
             yield return fence;
 
             // Interiors: Multistory Dungeons 2 furniture and alchemy, Low Poly Dungeons Lite walls and floors.
-            yield return S("Barrels", "Props", "Barrels", Dungeon2, "Barrels_Preset_01", pr);
+            yield return Game(S("Barrels", "Props", "Barrels", Dungeon2, "Barrels_Preset_01", pr));
             foreach (var (key, file) in new[] { ("CupboardBig", "Cupboard_Big_Preset_01"), ("Cupboard", "Cupboard_Preset_01"), ("Shelf", "Shelf_Preset_01") })
             {
-                var cupboard = S(key, "Furniture", key, Dungeon2, file, pr, anchor: Anchor.Front);
+                var cupboard = Game(S(key, "Furniture", key, Dungeon2, file, pr, anchor: Anchor.Front));
                 cupboard.ModelYaw = 90f; // survey: their open side faces -X
                 yield return cupboard;
             }
 
-            yield return S("Table", "Furniture", "Table", Dungeon2, "Table_Preset_01", pr);
-            yield return S("TablePlain", "Furniture", "TablePlain", Dungeon2, "Table_01", pr);
-            yield return S("Chair", "Furniture", "Chair", Dungeon2, "Chair_Wooden_01", pr);
-            yield return S("Pew", "Furniture", "Pew", Dungeon2, "Bench_Wooden_01", pr);
-            yield return S("Rostrum", "Furniture", "Rostrum", Dungeon2, "Rostrum_Preset_01", pr, anchor: Anchor.Front);
-            yield return S("Candles", "Furniture", "Candles", Dungeon2, "Candlestick_Floor_01_Lit", pr);
-            yield return S("Drawer", "Furniture", "Drawer", Dungeon2, "Drawer_Preset_01", pr, anchor: Anchor.Front);
-            yield return S("Chest", "Furniture", "Chest", Dungeon2, "Treasure_Chest_01", ia);
-            yield return S("Books", "Furniture", "Books", Dungeon2, "Books_Preset_01", pr);
-            yield return S("Retort", "Furniture", "Retort", Dungeon2, "Retort_Preset_01", pr);
+            yield return Game(S("Table", "Furniture", "Table", Dungeon2, "Table_Preset_01", pr));
+            yield return Game(S("TablePlain", "Furniture", "TablePlain", Dungeon2, "Table_01", pr));
+            yield return Game(S("Chair", "Furniture", "Chair", Dungeon2, "Chair_Wooden_01", pr));
+            yield return Game(S("Pew", "Furniture", "Pew", Dungeon2, "Bench_Wooden_01", pr));
+            yield return Game(S("Rostrum", "Furniture", "Rostrum", Dungeon2, "Rostrum_Preset_01", pr, anchor: Anchor.Back));
+            yield return Game(S("Candles", "Furniture", "Candles", Dungeon2, "Candlestick_Floor_01_Lit", pr));
+            yield return Game(S("Drawer", "Furniture", "Drawer", Dungeon2, "Drawer_Preset_01", pr, anchor: Anchor.Front));
+            yield return Game(S("Chest", "Furniture", "Chest", Dungeon2, "Treasure_Chest_01", ia));
+            yield return Game(S("Books", "Furniture", "Books", Dungeon2, "Books_Preset_01", pr));
+            yield return Game(S("Retort", "Furniture", "Retort", Dungeon2, "Retort_Preset_01", pr));
             var wall = S("RoomWall", "Room", "Wall", DungeonLite, "Wall_27", st, anchor: Anchor.Linear);
             wall.SizeX = 4f;
             yield return wall;
@@ -189,17 +216,17 @@ namespace GameDev.Slice.EditorTools
 
             // The owner's Tripo models (survey: each normalised to 1 m on its longest side).
             var bar = S("BarCounter", "Tavern", "BarCounter", Tripo, "ornate_wooden_bar_counter_3d_model", pr, anchor: Anchor.Front);
-            bar.SizeX = 4f; // 4 × 1.04 × 1.32 m
+            bar.SizeX = 4.8f; // game scale: 4.8 × 1.24 × 1.58 m (true size 4 × 1.04 × 1.32)
             yield return bar;
-            var cabinet = S("BarCabinet", "Tavern", "BarCabinet", Tripo, "ornate_cabinet_3d_model", pr, anchor: Anchor.Front);
-            cabinet.SizeY = 2.4f; // 2.7 × 2.4 × 0.73 m
+            var cabinet = S("BarCabinet", "Tavern", "BarCabinet", Tripo, "ornate_cabinet_3d_model", pr, anchor: Anchor.Back);
+            cabinet.SizeY = 2.9f; // game scale: 3.2 × 2.9 × 0.86 m
             yield return cabinet;
             var bed = S("Bed", "Furniture", "Bed", Tripo, "ornate_wooden_bed_3d_model", ia);
-            bed.SizeZ = 1.9f; // 1.69 × 1.48 × 1.9 m, so it stands in a 2 × 2 m corner clear of the walls
+            bed.SizeZ = 2.3f; // game scale (owner's play test, 2026-11-06: 1.9 m read short): 2.06 × 1.79 × 2.3 m
             yield return bed;
-            // The Dwelling's bed (step 4a): the same model with its head on a wall's face, 1.8 m long so it keeps 2 × 2 m.
+            // The Dwelling's bed (step 4a): the same model with its head on a wall's face, at game scale.
             var wallBed = S("WallBed", "Furniture", "WallBed", Tripo, "ornate_wooden_bed_3d_model", ia, anchor: Anchor.Back);
-            wallBed.SizeZ = 1.8f;
+            wallBed.SizeZ = 2.2f;
             yield return wallBed;
             // The cell's front: the bars, 4 × 2.76 m, have their own doorway, and the cell door stands in it (CellFront).
             var door = S("CellDoor", "Lockup", "Door", Tripo, "rusty_iron_jail_door_3d_model", ia, anchor: Anchor.Linear);
@@ -211,20 +238,8 @@ namespace GameDev.Slice.EditorTools
             var bars = S("CellBars", "Lockup", "Bars", Tripo, "rusty_iron_gate_3d_model", st, Body.None, Anchor.Linear);
             bars.SizeX = 4f;
             yield return bars;
-            // C1 §8: the lockup's cells stand on BK's 3 m module, so their fronts are the same bars and door at 3 m.
-            var door3 = S("CellDoor3", "Lockup", "Door", Tripo, "rusty_iron_jail_door_3d_model", ia, anchor: Anchor.Linear);
-            door3.SizeX = 0.9f;
-            door3.SizeY = 2.13f;
-            door3.Uniform = false;
-            door3.Width = 3;
-            yield return door3;
-            var bars3 = S("CellBars3", "Lockup", "Bars", Tripo, "rusty_iron_gate_3d_model", st, Body.None, Anchor.Linear);
-            bars3.SizeX = 3f;
-            bars3.SizeY = 2.76f;
-            bars3.Uniform = false;
-            yield return bars3;
             var board = S("NoticeBoard", "Street", "NoticeBoard", Tripo, "ornate_notice_board_3d_model", ia, anchor: Anchor.Front);
-            board.SizeY = 2.2f;
+            board.SizeY = 3f; // game scale (owner's play test, 2026-11-06: 2.2 m read very small)
             yield return board;
             var ore = S("IronOre", "Resource", "IronOre", Tripo, "rugged_rock_formation_3d_model", ia);
             ore.SizeX = 2f; // 2 × 1.5 × 1.26 m
@@ -257,6 +272,12 @@ namespace GameDev.Slice.EditorTools
             railing.SizeX = 2f;
             railing.SizeY = 1.04f; // its collider then stands 1.2 m: low cover is 0.8–1.2 m (kit standard §3); at 1.36 m it read as high cover (grid check, 2026-11-06)
             yield return railing;
+            // The same railing 1 m long, for the odd metre of a line (owner's play test, 2026-11-06: gaps in railings).
+            var railingShort = S("RailingShort", "Street", "Railing", "Assets/Modular Victorian City/Prefabs/Modules", "Fence", pr, anchor: Anchor.Linear);
+            railingShort.SizeX = 1f;
+            railingShort.SizeY = railing.SizeY;
+            railingShort.Uniform = false;
+            yield return railingShort;
             var column = S("Column", "Street", "Column", VictorianStreet, "Column", st);
             column.SizeY = 8f;
             yield return column;
@@ -286,8 +307,8 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// BK_AlchemistHouse for the interiors (city plan §8, survey of 2026-11-06): its architecture at ×1.2 on a 3 m
-        /// module, its furniture at true size, and sets, a table or a bench with BK's things standing on its top. A shelf,
+        /// BK_AlchemistHouse for the interiors (city plan §8, survey and play tests of 2026-11-06): its architecture at ×1.6
+        /// along and ×1.44 up on a 4 m module, its furniture at game scale (FurnitureScale), and sets, a table or a bench with BK's things standing on its top. A shelf,
         /// a board or a painting hangs on a wall's face (Anchor.Face) at the height its block is placed.
         /// </summary>
         private static IEnumerable<Spec> BkSpecs()
@@ -304,28 +325,24 @@ namespace GameDev.Slice.EditorTools
                 spec.Pack = "BK";
                 spec.NoLights = true;
                 spec.Width = width;
+                spec.Infill = anchor == Anchor.Linear && body != Body.Leaf;
                 return spec;
             }
 
-            Spec Plain(string key, string file, string layer, Body body)
-            {
-                var spec = A(key, file, layer, body, Anchor.Linear, 3);
-                spec.OnFace = true;
-                return spec;
-            }
+            Spec Plain(string key, string file, string layer, Body body) => A(key, file, layer, body, Anchor.Linear, BkModule);
 
             // Walls (probe render of 2026-11-06): IntWall02a/b are brick between timbers, for stone rooms; IntWall01a,
-            // both doorways and the window are plaster. Each is drawn on its local +Z side only. A plain wall shows its
-            // face WallFace out from its line, whatever its thickness.
+            // both doorways and the window are plaster. Each is drawn on its local +Z side only. Every one shows its infill
+            // WallInfill out from its line and its beams at WallFace, whatever its thickness.
             yield return Plain("BkBrick", "IntWall02a", st, Body.Box);
             yield return Plain("BkBrickB", "IntWall02b", st, Body.Box);
-            yield return A("BkWindow", "IntWall02window01", st, Body.Box, Anchor.Linear, 3);
-            var doorway = A("BkDoorway", "IntWall02door", st, Body.Doorway, Anchor.Linear, 3);
+            yield return A("BkWindow", "IntWall02window01", st, Body.Box, Anchor.Linear, BkModule);
+            var doorway = A("BkDoorway", "IntWall02door", st, Body.Doorway, Anchor.Linear, BkModule);
             doorway.OpenWidth = 1.1f * BkArchitecture;
             doorway.OpenHeight = 1.98f * BkArchitecture * BkStretch;
             yield return doorway;
             yield return Plain("BkPlaster", "IntWall01a", st, Body.Box);
-            var plasterDoorway = A("BkPlasterDoorway", "IntWall01door", st, Body.Doorway, Anchor.Linear, 3);
+            var plasterDoorway = A("BkPlasterDoorway", "IntWall01door", st, Body.Doorway, Anchor.Linear, BkModule);
             plasterDoorway.OpenWidth = doorway.OpenWidth;
             plasterDoorway.OpenHeight = doorway.OpenHeight;
             yield return plasterDoorway;
@@ -336,15 +353,14 @@ namespace GameDev.Slice.EditorTools
                          ("BkPlasterFace", "IntWall01a"), ("BkPlasterDoorwayFace", "IntWall01door"),
                      })
             {
-                var face = A(key, file, ng, Body.None, Anchor.Linear, 3);
-                face.OnFace = !key.Contains("Doorway");
-                yield return face;
+                yield return A(key, file, ng, Body.None, Anchor.Linear, BkModule);
             }
 
             // A shut door is solid: the owner fell out of an interior through the street door (play test, 2026-11-06).
-            var door = A("BkDoor", "Door", st, Body.Leaf, Anchor.Linear, 3);
+            var door = A("BkDoor", "Door", st, Body.Leaf, Anchor.Linear, BkModule);
             door.OpenWidth = doorway.OpenWidth;
             door.OpenHeight = doorway.OpenHeight;
+            door.Shift = 0.14f; // measured: the brick doorway's frame centre once aligned; the deeper plaster frame holds it too
             yield return door;
             yield return A("BkPost", "VerticalPillar", ng, Body.None, Anchor.Node);
             foreach (var flat in new[]
@@ -360,7 +376,7 @@ namespace GameDev.Slice.EditorTools
 
             Spec F(string key, string file, string layer, Body body = Body.Box, Anchor anchor = Anchor.Centre, string folder = furn)
             {
-                var spec = S(key, "BkFurniture", key.Substring(2), folder, file, layer, body, anchor);
+                var spec = Game(S(key, "BkFurniture", key.Substring(2), folder, file, layer, body, anchor));
                 spec.Pack = "BK";
                 return spec;
             }
@@ -381,8 +397,13 @@ namespace GameDev.Slice.EditorTools
             yield return F("BkCarpet", "Carpet02", ng, Body.None);
             yield return F("BkCarpetLong", "Carpet01", ng, Body.None);
             yield return F("BkCarpetWide", "Carpet03", ng, Body.None);
-            yield return F("BkBoard", "Board", ng, Body.None, Anchor.Face);
-            yield return F("BkPainting", "Painting01", ng, Body.None, Anchor.Face, It("Misc"));
+            // What hangs is a two-cell block with the piece in its middle, so it centres on a 4 m wall segment.
+            var board = F("BkBoard", "Board", ng, Body.None, Anchor.Face);
+            board.Width = 2;
+            yield return board;
+            var painting = F("BkPainting", "Painting01", ng, Body.None, Anchor.Face, It("Misc"));
+            painting.Width = 2;
+            yield return painting;
             yield return F("BkTrunk", "Trunk01", ia, folder: It("Misc"));
             yield return F("BkCauldron", "CaldronTripod01_Bubbles", pr, folder: It("Lab"));
             yield return F("BkBasket", "Basket02", pr, folder: It("Misc"));
@@ -394,6 +415,11 @@ namespace GameDev.Slice.EditorTools
             {
                 var spec = F(key, file, layer, body, anchor);
                 spec.On = on;
+                if (anchor == Anchor.Face)
+                {
+                    spec.Width = 2;
+                }
+
                 return spec;
             }
 
@@ -468,8 +494,11 @@ namespace GameDev.Slice.EditorTools
             }
 
             CellFront(entries["CellBars"], entries["CellDoor"]);
-            CellFront(entries["CellBars3"], entries["CellDoor3"]);
-            foreach (var entry in new[] { Paving("Street", "M_YFPM_Pavement01"), Paving("Square", "M_YFPM_Mediterranean01"), PortalLeaf(), RitualCircle() })
+            foreach (var entry in new[]
+                     {
+                         Paving("Street", "M_YFPM_Pavement01"), Paving("Square", "M_YFPM_Mediterranean01"), PortalLeaf("PortalLeaf", "Leaf", 3),
+                         PortalLeaf("PortalLeafRoom", "LeafRoom", BkModule), RitualCircle(),
+                     })
             {
                 entries[entry.Key] = entry;
             }
@@ -546,6 +575,18 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
+            // BK's loose things carry their own dynamic bodies; without their colliders they fell through the shelves
+            // (owner's play test, 2026-11-06). The slice's dressing is still: the wrapper's own body is what is solid.
+            foreach (var joint in model.GetComponentsInChildren<Joint>(true))
+            {
+                Object.DestroyImmediate(joint);
+            }
+
+            foreach (var body in model.GetComponentsInChildren<Rigidbody>(true))
+            {
+                Object.DestroyImmediate(body);
+            }
+
             Scale(model, spec);
             var b = Seen(model);
             var linear = spec.Anchor == Anchor.Linear || spec.Anchor == Anchor.Face;
@@ -565,7 +606,7 @@ namespace GameDev.Slice.EditorTools
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, depth - b.max.z);
                     break;
                 case Anchor.Linear:
-                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, spec.OnFace ? WallFace - b.max.z : -b.center.z);
+                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, spec.Infill ? WallInfill - InfillPlane(model) : spec.Shift - b.center.z);
                     break;
                 case Anchor.Back:
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, WallFace - b.min.z);
@@ -577,7 +618,7 @@ namespace GameDev.Slice.EditorTools
                     offset = new Vector3(-b.center.x, -b.min.y, -b.center.z);
                     break;
                 case Anchor.Face:
-                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, WallFace - b.min.z);
+                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, WallInfill - b.min.z);
                     break;
                 default:
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, depth * 0.5f - b.center.z);
@@ -695,6 +736,48 @@ namespace GameDev.Slice.EditorTools
             var mean = ratios.Average();
             var factor = spec.Uniform ? Vector3.one * mean : new Vector3(rx ?? mean, ry ?? mean, rz ?? mean);
             model.transform.localScale = Vector3.Scale(model.transform.localScale, factor);
+        }
+
+        /// <summary>
+        /// A wall model's infill: the depth of the largest area of faces turned to +Z, in 0.01 m bins (the plaster or the
+        /// brick between its timbers, as against its beams and posts).
+        /// </summary>
+        private static float InfillPlane(GameObject model)
+        {
+            var bins = new Dictionary<int, float>();
+            foreach (var filter in model.GetComponentsInChildren<MeshFilter>(true))
+            {
+                var mesh = filter.sharedMesh;
+                if (mesh == null)
+                {
+                    continue;
+                }
+
+                var v = mesh.vertices;
+                var n = mesh.normals;
+                var t = mesh.triangles;
+                var m = filter.transform.localToWorldMatrix;
+                for (var i = 0; i < t.Length; i += 3)
+                {
+                    if (n.Length == 0 || m.MultiplyVector(n[t[i]]).normalized.z < 0.9f)
+                    {
+                        continue;
+                    }
+
+                    var a = m.MultiplyPoint3x4(v[t[i]]);
+                    var b = m.MultiplyPoint3x4(v[t[i + 1]]);
+                    var c = m.MultiplyPoint3x4(v[t[i + 2]]);
+                    var bin = Mathf.RoundToInt((a.z + b.z + c.z) / 3f * 100f);
+                    bins[bin] = (bins.TryGetValue(bin, out var area) ? area : 0f) + Vector3.Cross(b - a, c - a).magnitude * 0.5f;
+                }
+            }
+
+            if (bins.Count == 0)
+            {
+                throw new System.InvalidOperationException($"{model.name}: no face turned to +Z to set the wall by");
+            }
+
+            return bins.OrderByDescending(kv => kv.Value).First().Key / 100f;
         }
 
         private static void AddBody(GameObject root, Body body, Bounds seen, int width, int depth, bool linear,
@@ -830,14 +913,14 @@ namespace GameDev.Slice.EditorTools
         /// cell edge, 0.1 m beyond the grid line on local +Z, a trigger on the Interactable layer. An arriving player
         /// stands 1 m out on +Z. It replaces the stand-in doorway where the wall is the building's own model.
         /// </summary>
-        private static Entry PortalLeaf()
+        private static Entry PortalLeaf(string key, string part, int width)
         {
-            var root = new GameObject("Kit_Portal_Leaf_3x2");
+            var root = new GameObject($"Kit_Portal_{part}_{width}x2");
             root.AddComponent<KitBlock>();
             var leaf = GameObject.CreatePrimitive(PrimitiveType.Cube);
             leaf.name = "Leaf";
             leaf.transform.SetParent(root.transform, false);
-            leaf.transform.localPosition = new Vector3(1.5f, 1.1f, 0.125f);
+            leaf.transform.localPosition = new Vector3(width * 0.5f, 1.1f, 0.125f);
             leaf.transform.localScale = new Vector3(1.2f, 2.2f, 0.05f);
             leaf.GetComponent<BoxCollider>().isTrigger = true;
 
@@ -846,7 +929,7 @@ namespace GameDev.Slice.EditorTools
             Object.DestroyImmediate(leaf.GetComponent<MeshFilter>());
             root.AddComponent<Portal>();
             SetLayer(root, KitLayers.Interactable);
-            return Save(root, "PortalLeaf", "Portal", 3, 0, 2.2f);
+            return Save(root, key, "Portal", width, 0, 2.2f);
         }
 
         /// <summary>

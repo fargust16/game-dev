@@ -359,15 +359,19 @@ namespace GameDev.Slice.EditorTools
             return Put(key, _parent, px0 - 500f, 500f - py0 - extentY, Turns(f), y);
         }
 
-        /// <summary>A prop if its cells are free; it takes them. (px0, py0) is the footprint's north-west corner.</summary>
-        private static GameObject Prop(string key, Facing f, float px0, float py0, string name = null)
+        /// <summary>
+        /// A prop if its cells are free, or, when <paramref name="force"/>, wherever no house stands; it takes them.
+        /// (px0, py0) is the footprint's north-west corner.
+        /// </summary>
+        private static GameObject Prop(string key, Facing f, float px0, float py0, string name = null, bool force = false)
         {
             var e = _kit[key];
             var turned = f == Facing.E || f == Facing.W;
             var w = e.Depth > 0 ? (turned ? e.Depth : e.Width) : (turned ? 0.2f : e.Width);
             var d = e.Depth > 0 ? (turned ? e.Width : e.Depth) : (turned ? e.Width : 0.2f);
             var quad = Rect(px0, py0, px0 + w, py0 + d);
-            if (!Free(quad, false))
+            // Forced, it still keeps 0.2 m off a house, whose pilasters and door frames stand 0.16 m proud of its plot.
+            if (force ? _houses.Any(h => Overlap(h, Rect(px0 - 0.2f, py0 - 0.2f, px0 + w + 0.2f, py0 + d + 0.2f))) : !Free(quad, false))
             {
                 return null;
             }
@@ -382,7 +386,52 @@ namespace GameDev.Slice.EditorTools
                 go.name = name;
             }
 
+            if (!plant && !Upright.Contains(key))
+            {
+                Settle(go, quad, e.Depth == 0, turned);
+            }
+
             return go;
+        }
+
+        /// <summary>What stands plumb whatever the ground: posts, a column, a board on its legs, a grave, a stand.</summary>
+        private static readonly HashSet<string> Upright = new HashSet<string>
+        {
+            "LampPost", "Column", "NoticeBoard", "Grave", "GraveWall", "ArmourStand", "Candles",
+        };
+
+        /// <summary>
+        /// Tilts a prop's seen model to the ground's plane under its footprint, about the footprint's centre on the
+        /// ground (owner's play test, 2026-11-06: fences stood square on slopes, props stood over a hollow). A fence or
+        /// a railing only pitches along its length. Only the model turns: the block and its body stay level on the
+        /// grid, as the kit standard requires. At most 25° (authoring default).
+        /// </summary>
+        private static void Settle(GameObject go, Vector2[] quad, bool linear, bool turned)
+        {
+            var model = go.transform.Find("Model");
+            if (model == null)
+            {
+                return;
+            }
+
+            var lo = new Vector2(quad.Min(p => p.x), quad.Min(p => p.y));
+            var hi = new Vector2(quad.Max(p => p.x), quad.Max(p => p.y));
+            var c = (lo + hi) / 2f;
+            // Gradients per plan metre; plan y runs to world -Z. A linear block runs along plan x unless turned.
+            var gx = hi.x - lo.x > 0.5f && !(linear && turned) ? (Ground(hi.x, c.y) - Ground(lo.x, c.y)) / (hi.x - lo.x) : 0f;
+            var gy = hi.y - lo.y > 0.5f && !(linear && !turned) ? (Ground(c.x, hi.y) - Ground(c.x, lo.y)) / (hi.y - lo.y) : 0f;
+            var normal = new Vector3(-gx, 1f, gy).normalized;
+            var angle = Vector3.Angle(Vector3.up, normal);
+            if (angle < 0.5f)
+            {
+                return;
+            }
+
+            var tilt = Quaternion.AngleAxis(Mathf.Min(angle, 25f), Vector3.Cross(Vector3.up, normal).normalized);
+            var ground = World(c.x, c.y, Ground(c.x, c.y));
+            var level = new Vector3(ground.x, go.transform.position.y, ground.z);
+            model.SetPositionAndRotation(ground + (tilt * (model.position - level)), tilt * model.rotation);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(model);
         }
 
         /// <summary>
@@ -431,37 +480,58 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// Records a door, and builds steps from it down to the ground outside when it stands above it. A house door's
-        /// own stoop comes first: the steps start at its foot, <paramref name="stoop"/> out (owner's play test,
-        /// 2026-11-06: the house's brick steps no longer stand on the city's stone ones).
+        /// Records a door, and builds steps from it down to the ground outside when it stands above it. The steps
+        /// continue a house door's own stoop from its foot, <paramref name="stoop"/> out, in the pack's Porch stone and at
+        /// the stoop's width, tread and rise, so the two read as one stair; under the stoop the same stone goes down to
+        /// the ground, so it never stands over a hollow on a slope (owner's play tests of 2026-11-06: steps in two styles
+        /// with a gap between).
         /// </summary>
         private static void Doorway(Vector3 world, Vector2 outward, float floor, float stoop = 0f)
         {
             var at = Plan(world);
             _doors.Add((at, outward));
+            var side = new Vector2(-outward.y, outward.x);
+            var width = VictorianHouses.StoopWidth;
+            Vector3 Size(float deep, float high) => new Vector3(Mathf.Abs(side.x) * width + Mathf.Abs(outward.x) * deep, high,
+                Mathf.Abs(side.y) * width + Mathf.Abs(outward.y) * deep);
+
             var p = at + (outward * stoop);
+            if (stoop > 0f)
+            {
+                var under = at + (outward * (stoop / 2f));
+                var low = Mathf.Min(Ground(at.x, at.y), Ground(p.x, p.y)) - 0.3f;
+                if (floor - low > 0.32f)
+                {
+                    _works.Box(World(under.x, under.y, (floor + low) / 2f), Size(stoop, floor - low), 0f, false, VictorianHouses.StoopMaterial);
+                }
+            }
+
             var outside = p + (outward * 1.2f);
             var rise = floor - Ground(outside.x, outside.y);
-            if (rise <= 0.2f)
+            if (rise <= VictorianHouses.StoopRise * 0.5f)
             {
                 return;
             }
 
-            var n = Mathf.CeilToInt(rise / 0.18f);
-            var step = rise / (n + 1);
-            var side = new Vector2(-outward.y, outward.x);
-            var width = 2.4f;
-            for (var k = 0; k < n; k++)
+            var n = Mathf.CeilToInt(rise / VictorianHouses.StoopRise);
+            var step = rise / n;
+            var tread = Mathf.Max(VictorianHouses.StoopTread, 0.28f); // the kit standard's least run (§3), 5 mm over the stoop's
+            // Below a stoop the first tread is at its foot, the floor's level; below a shop's door, one riser down.
+            var first = stoop > 0f ? 0 : 1;
+            for (var k = first; k < n; k++)
             {
-                var top = floor - ((k + 1) * step);
-                var c = p + (outward * ((k + 0.5f) * 0.32f));
-                var bottom = Ground(c.x, c.y) - 0.3f;
-                var size = new Vector3(Mathf.Abs(side.x) * width + Mathf.Abs(outward.x) * 0.32f, top - bottom,
-                    Mathf.Abs(side.y) * width + Mathf.Abs(outward.y) * 0.32f);
-                _works.Box(World(c.x, c.y, (top + bottom) / 2f), size, 0f);
+                var top = floor - (k * step);
+                var c = p + (outward * ((k - first + 0.5f) * tread));
+                var bottom = Mathf.Min(Ground(c.x, c.y), top) - 0.3f;
+                _works.Box(World(c.x, c.y, (top + bottom) / 2f), Size(tread, top - bottom), 0f, true, VictorianHouses.StoopMaterial);
             }
 
-            var reach = n * 0.32f;
+            var reach = (n - first) * tread;
+            if (reach <= 0f)
+            {
+                return;
+            }
+
             var a = p - (side * (width / 2f));
             var b = p + (side * (width / 2f)) + (outward * reach);
             Take(Rect(Mathf.Min(a.x, b.x), Mathf.Min(a.y, b.y), Mathf.Max(a.x, b.x), Mathf.Max(a.y, b.y)), Use.Solid);
@@ -676,24 +746,47 @@ namespace GameDev.Slice.EditorTools
             Take(Rect(lo.x, lo.y, lo.x + size.x, lo.y + size.z), Use.Solid);
         }
 
-        /// <summary>Railings on a line along a front area, with a gate gap at each door; segments of 2 m.</summary>
+        /// <summary>
+        /// Railings on a line along a front area, in segments of 2 m and a 1 m one for an odd metre at the end. A gate
+        /// is left only before a door that opens toward the line, and a segment is set whatever prop was put there
+        /// before, though never through a house (owner's play test, 2026-11-06: gaps stood where no way in or out was
+        /// meant).
+        /// </summary>
         private static void Railings(bool alongX, float line, int a0, int a1)
         {
+            var segments = new List<(int A, int Length)>();
             for (var a = a0; a + 2 <= a1; a += 2)
             {
-                var mid = a + 1f;
-                if (_doors.Any(d => Mathf.Abs((alongX ? d.At.y : d.At.x) - line) < 5f && Mathf.Abs((alongX ? d.At.x : d.At.y) - mid) < 1.6f))
+                segments.Add((a, 2));
+            }
+
+            if ((a1 - a0) % 2 == 1)
+            {
+                segments.Add((a1 - 1, 1));
+            }
+
+            foreach (var (a, length) in segments)
+            {
+                var key = length == 2 ? "Railing" : "RailingShort";
+                var mid = a + (length / 2f);
+                if (_doors.Any(d =>
+                    {
+                        var across = (alongX ? d.At.y : d.At.x) - line;
+                        var facing = alongX ? d.Out.y : d.Out.x;
+                        return Mathf.Abs(across) < 5f && across * facing < 0f && Mathf.Abs(facing) > 0.5f &&
+                               Mathf.Abs((alongX ? d.At.x : d.At.y) - mid) < 1.6f;
+                    }))
                 {
                     continue;
                 }
 
                 if (alongX)
                 {
-                    Prop("Railing", Facing.N, a, line - 0.1f);
+                    Prop(key, Facing.N, a, line - 0.1f, force: true);
                 }
                 else
                 {
-                    Prop("Railing", Facing.E, line - 0.1f, a);
+                    Prop(key, Facing.E, line - 0.1f, a, force: true);
                 }
             }
         }

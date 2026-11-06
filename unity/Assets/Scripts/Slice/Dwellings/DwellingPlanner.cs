@@ -33,7 +33,7 @@ namespace GameDev.Slice.Dwellings
 
     /// <summary>
     /// Plans a dwelling from its key and its own seed stream (15, *The slice's Dwellings*; city plan C1 §8): the rooms
-    /// of its archetype on the 3 m module, turned left or right by the seed, then the furniture its rooms and wealth
+    /// of its archetype on the 4 m module, turned left or right by the seed, then the furniture its rooms and wealth
     /// call for, and the Stash by 19 §6.3's chances. The same key and seed always give the same plan. Every layout and
     /// list here is an authoring default.
     /// </summary>
@@ -171,7 +171,7 @@ namespace GameDev.Slice.Dwellings
 
         // ------------------------------------------------------------------------------------------- layouts
 
-        /// <summary>The rooms of city plan C1 §8 on the 3 m module; the street door is on the front, z = 0.</summary>
+        /// <summary>The rooms of city plan C1 §8, widened by a third to the 4 m module; the street door is on the front, z = 0.</summary>
         private static DwellingPlan Layout(DwellingArchetype archetype, Random rng)
         {
             switch (archetype)
@@ -180,41 +180,41 @@ namespace GameDev.Slice.Dwellings
                     // One flat: a room and a kitchen, or one room.
                     return rng.Next(2) == 0
                         ? new DwellingPlan()
-                            .Room("Room", RoomKind.Room, 0, 0, 6, 6)
-                            .Open(Opening.Street, 0, 0).Open(Opening.Window, 3, 6)
+                            .Room("Room", RoomKind.Room, 0, 0, 8, 8)
+                            .Open(Opening.Street, 0, 0).Open(Opening.Window, 4, 8)
                         : new DwellingPlan()
-                            .Room("Room", RoomKind.Room, 0, 0, 6, 6).Room("Kitchen", RoomKind.Kitchen, 6, 0, 3, 6, true)
-                            .Open(Opening.Street, 0, 0).Open(Opening.Door, 6, 3, true).Open(Opening.Window, 3, 6).Open(Opening.Window, 6, 6);
+                            .Room("Room", RoomKind.Room, 0, 0, 8, 8).Room("Kitchen", RoomKind.Kitchen, 8, 0, 4, 8, true)
+                            .Open(Opening.Street, 0, 0).Open(Opening.Door, 8, 4, true).Open(Opening.Window, 4, 8).Open(Opening.Window, 8, 8);
                 case DwellingArchetype.Terrace:
                     // A hall along the side, the parlour at the front, the kitchen behind it, the bedroom across the back.
                     return new DwellingPlan()
-                        .Room("Hall", RoomKind.Hall, 0, 0, 3, 9).Room("Parlour", RoomKind.Parlour, 3, 0, 6, 6)
-                        .Room("Kitchen", RoomKind.Kitchen, 3, 6, 6, 3, true).Room("Bedroom", RoomKind.Bedroom, 0, 9, 9, 3)
-                        .Open(Opening.Street, 0, 0).Open(Opening.Window, 3, 0).Open(Opening.Window, 6, 0)
-                        .Open(Opening.Door, 3, 3, true).Open(Opening.Door, 3, 6, true).Open(Opening.Door, 0, 9)
-                        .Open(Opening.Window, 9, 6, true).Open(Opening.Window, 6, 12);
+                        .Room("Hall", RoomKind.Hall, 0, 0, 4, 12).Room("Parlour", RoomKind.Parlour, 4, 0, 8, 8)
+                        .Room("Kitchen", RoomKind.Kitchen, 4, 8, 8, 4, true).Room("Bedroom", RoomKind.Bedroom, 0, 12, 12, 4)
+                        .Open(Opening.Street, 0, 0).Open(Opening.Window, 4, 0).Open(Opening.Window, 8, 0)
+                        .Open(Opening.Door, 4, 4, true).Open(Opening.Door, 4, 8, true).Open(Opening.Door, 0, 12)
+                        .Open(Opening.Window, 12, 8, true).Open(Opening.Window, 8, 16);
                 case DwellingArchetype.Shop:
                     return new DwellingPlan()
-                        .Room("Shop", RoomKind.ShopRoom, 0, 0, 9, 6).Room("Back room", RoomKind.BackRoom, 0, 6, 6, 6)
-                        .Room("Kitchen", RoomKind.Kitchen, 6, 6, 3, 6, true)
-                        .Open(Opening.Street, 3, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 6, 0)
-                        .Open(Opening.Door, 3, 6).Open(Opening.Door, 6, 9, true).Open(Opening.Window, 0, 9, true).Open(Opening.Window, 6, 12);
+                        .Room("Shop", RoomKind.ShopRoom, 0, 0, 12, 8).Room("Back room", RoomKind.BackRoom, 0, 8, 8, 8)
+                        .Room("Kitchen", RoomKind.Kitchen, 8, 8, 4, 8, true)
+                        .Open(Opening.Street, 4, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 8, 0)
+                        .Open(Opening.Door, 4, 8).Open(Opening.Door, 8, 12, true).Open(Opening.Window, 0, 12, true).Open(Opening.Window, 8, 16);
                 case DwellingArchetype.Villa:
                     // A hall up the middle between the parlour and the dining room, the study and the kitchen behind.
                     return new DwellingPlan()
-                        .Room("Parlour", RoomKind.Parlour, 0, 0, 6, 6).Room("Hall", RoomKind.Hall, 6, 0, 3, 9)
-                        .Room("Dining room", RoomKind.DiningRoom, 9, 0, 6, 6).Room("Study", RoomKind.Study, 0, 6, 6, 6)
-                        .Room("Kitchen", RoomKind.Kitchen, 9, 6, 6, 6, true)
-                        .Open(Opening.Street, 6, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 3, 0)
-                        .Open(Opening.Window, 9, 0).Open(Opening.Window, 12, 0).Open(Opening.Window, 0, 3, true)
-                        .Open(Opening.Window, 15, 3, true).Open(Opening.Window, 6, 9).Open(Opening.Window, 3, 12)
-                        .Open(Opening.Window, 12, 12)
-                        .Open(Opening.Door, 6, 3, true).Open(Opening.Door, 6, 6, true).Open(Opening.Door, 9, 3, true)
-                        .Open(Opening.Door, 9, 6, true);
+                        .Room("Parlour", RoomKind.Parlour, 0, 0, 8, 8).Room("Hall", RoomKind.Hall, 8, 0, 4, 12)
+                        .Room("Dining room", RoomKind.DiningRoom, 12, 0, 8, 8).Room("Study", RoomKind.Study, 0, 8, 8, 8)
+                        .Room("Kitchen", RoomKind.Kitchen, 12, 8, 8, 8, true)
+                        .Open(Opening.Street, 8, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 4, 0)
+                        .Open(Opening.Window, 12, 0).Open(Opening.Window, 16, 0).Open(Opening.Window, 0, 4, true)
+                        .Open(Opening.Window, 20, 4, true).Open(Opening.Window, 8, 12).Open(Opening.Window, 4, 16)
+                        .Open(Opening.Window, 16, 16)
+                        .Open(Opening.Door, 8, 4, true).Open(Opening.Door, 8, 8, true).Open(Opening.Door, 12, 4, true)
+                        .Open(Opening.Door, 12, 8, true);
                 case DwellingArchetype.Warehouse:
                     return new DwellingPlan()
-                        .Room("Store", RoomKind.Store, 0, 0, 9, 9, true).Room("Office", RoomKind.Office, 9, 0, 6, 6)
-                        .Open(Opening.Street, 3, 0).Open(Opening.Door, 9, 3, true).Open(Opening.Window, 12, 0);
+                        .Room("Store", RoomKind.Store, 0, 0, 12, 12, true).Room("Office", RoomKind.Office, 12, 0, 8, 8)
+                        .Open(Opening.Street, 4, 0).Open(Opening.Door, 12, 4, true).Open(Opening.Window, 16, 0);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(archetype), archetype, null);
             }
@@ -301,13 +301,15 @@ namespace GameDev.Slice.Dwellings
                     continue;
                 }
 
-                // A doorway keeps the three cells inside it and the middle one behind those clear.
+                // A doorway keeps the cells along its segment clear, and behind them the two it opens on: BK's doorway
+                // is 1.76 m wide over the segment's middle node (4 m module, 2026-11-06).
                 for (var i = 0; i < m; i++)
                 {
                     room.Taken.Add(Cell(wall, i, 0));
                 }
 
-                room.Taken.Add(Cell(wall, 1, 1));
+                room.Taken.Add(Cell(wall, (m / 2) - 1, 1));
+                room.Taken.Add(Cell(wall, m / 2, 1));
             }
 
             return room;

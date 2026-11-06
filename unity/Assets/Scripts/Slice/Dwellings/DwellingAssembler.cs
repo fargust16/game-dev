@@ -7,7 +7,7 @@ namespace GameDev.Slice.Dwellings
 {
     /// <summary>
     /// Builds a <see cref="DwellingPlan"/> from the kit, by the rules the seven hand-built interiors follow (city plan
-    /// C1 §14–§15): a floor and a ceiling per 3 m cell, one wall block per segment with a seen face for a second room,
+    /// C1 §14–§15): a floor and a ceiling per module cell, one wall block per segment with a seen face for a second room,
     /// a post at every node, a door leaf in the street doorway with the portal back, a ceiling collider for the camera,
     /// and one warm light per room.
     /// </summary>
@@ -133,7 +133,7 @@ namespace GameDev.Slice.Dwellings
                             leaf.transform.SetParent(doorway.transform, true); // the shut leaf, nested in its doorway
                         }
 
-                        var door = Put(kit, parent, "PortalLeaf", x, z, alongZ ? 3 : 0);
+                        var door = Put(kit, parent, "PortalLeafRoom", x, z, alongZ ? 3 : 0);
                         portal = door != null ? door.GetComponent<Portal>() : null;
                         if (portal != null)
                         {
@@ -183,7 +183,7 @@ namespace GameDev.Slice.Dwellings
             return sides;
         }
 
-        /// <summary>A linear block on the 3 m segment from (x, z), its local +Z turned to <paramref name="facing"/>.</summary>
+        /// <summary>A linear block on the segment of one module from (x, z), its local +Z turned to <paramref name="facing"/>.</summary>
         private static GameObject Segment(DwellingKit kit, Transform parent, string key, int x, int z, bool alongZ, Vector2Int facing)
         {
             const int m = DwellingPlan.Module;

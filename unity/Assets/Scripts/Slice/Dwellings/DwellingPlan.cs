@@ -19,7 +19,7 @@ namespace GameDev.Slice.Dwellings
         Office,
     }
 
-    /// <summary>What closes a 3 m wall segment.</summary>
+    /// <summary>What closes a wall segment of one module.</summary>
     public enum Opening
     {
         Wall,
@@ -99,16 +99,16 @@ namespace GameDev.Slice.Dwellings
     }
 
     /// <summary>
-    /// A dwelling's rooms on the 3 m module, the openings of its wall segments, and its furniture. Plain data: the
+    /// A dwelling's rooms on BK's 4 m module (owner's play test, 2026-11-06), the openings of its wall segments, and its furniture. Plain data: the
     /// planner writes it from a key and a seed stream, and the assembler builds it from the kit.
     /// </summary>
     public sealed class DwellingPlan
     {
-        public const int Module = 3;
+        public const int Module = 4;
 
         public readonly List<DwellingRoom> Rooms = new List<DwellingRoom>();
 
-        /// <summary>The 3 m segment from node (X, Z) along +X, or along +Z.</summary>
+        /// <summary>The segment of one module from node (X, Z) along +X, or along +Z.</summary>
         public readonly Dictionary<(int X, int Z, bool AlongZ), Opening> Openings = new Dictionary<(int, int, bool), Opening>();
 
         public readonly List<Placement> Furniture = new List<Placement>();

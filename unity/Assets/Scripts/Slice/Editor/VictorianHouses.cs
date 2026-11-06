@@ -61,6 +61,12 @@ namespace GameDev.Slice.EditorTools
         /// <summary>How far a house door's stoop reaches out from the front, m at ×1.25; the city's steps start there.</summary>
         public const float Stoop = StoopOut * Scale;
 
+        /// <summary>The stoop's width, its treads' depth and its risers' height at ×1.25: the city's steps continue it.</summary>
+        public const float StoopWidth = 2f * StoopHalfWidth * Scale, StoopTread = Stoop / 3f, StoopRise = StoopHigh * Scale / 3f;
+
+        /// <summary>The pack's material of the stoop ("Ladder" in GroundDoor1, survey of 2026-11-06).</summary>
+        public const string StoopMaterial = "Porch";
+
         /// <summary>The key of a type's corner variant, its second facade on <paramref name="side"/>.</summary>
         public static string CornerKey(string key, Side side) => key + (side == Side.Left ? "_cornerL" : "_cornerR");
 
@@ -71,9 +77,9 @@ namespace GameDev.Slice.EditorTools
 
         /// <summary>
         /// Places the modules of a house under <paramref name="parent"/>, in module metres (×1). The owner's play test
-        /// of 2026-11-06 set three rules: a shop's ground floor is its shop front to the corners, with no stone corner
-        /// between (one colour set per floor); the cornice runs round the roof's sides too; and a corner house shows a
-        /// second facade on its side street.
+        /// of 2026-11-06 set three rules: a shop's ground floor is its shop front all round, its sides and back too,
+        /// with no stone wall or corner on it (one colour set per floor, and no seam where two packs' walls met); the
+        /// cornice runs round the roof's sides too; and a corner house shows a second facade on its side street.
         /// </summary>
         public static void Assemble(Transform parent, Spec spec)
         {
@@ -102,13 +108,13 @@ namespace GameDev.Slice.EditorTools
 
                         var faced = (left && spec.Faced == Side.Left) || (right && spec.Faced == Side.Right);
                         var sideYaw = left ? 270f : 90f;
-                        if (front && (left || right) && spec.Shop && !up)
+                        var shopFloor = spec.Shop && !up;
+                        if ((front || back) && (left || right) && shopFloor)
                         {
-                            // The shop front runs to the corner: its end post (−X on the module) covers the corner, so the
-                            // right-hand one is mirrored. The side is a shop front too on a side street, else a plain wall.
-                            Put(parent, Modules + "WoodenWallBlue", centre, 0f, 0.95f, mirror: right);
-                            Put(parent, Modules + (faced ? "WoodenWallBlue" : "GroundSideWall1"), centre, sideYaw,
-                                faced ? 0.95f : 0f, mirror: faced && left);
+                            // The shop front runs round the corner: a module's end post (−X on it) covers the corner, so a
+                            // module whose corner lies on its +X side is mirrored.
+                            Put(parent, Modules + "WoodenWallBlue", centre, front ? 0f : 180f, 0.95f, mirror: front ? right : left);
+                            Put(parent, Modules + "WoodenWallBlue", centre, sideYaw, 0.95f, mirror: front ? left : right);
                             continue;
                         }
 
@@ -126,9 +132,10 @@ namespace GameDev.Slice.EditorTools
                         }
                         else if (back)
                         {
-                            Put(parent, Modules + (up ? "UpWindow1" : "GroundWall1"), centre, 180f);
+                            Put(parent, Modules + (up ? "UpWindow1" : shopFloor ? "WoodenWallBlue" : "GroundWall1"), centre, 180f,
+                                shopFloor ? 0.95f : 0f);
                         }
-                        else if (faced)
+                        else if (faced || shopFloor)
                         {
                             var module = up ? "UpWindow1" : spec.Shop ? "WoodenWallBlue" : "GroundWindow1";
                             Put(parent, Modules + module, centre, sideYaw, module.StartsWith("Wo") ? 0.95f : 0f);

@@ -72,7 +72,7 @@ namespace GameDev.EditorTools
             ok &= Railings(reader, report);
 
             report.AppendLine();
-            report.AppendLine("Doorways (each between two rooms lets exactly one cell through; one with a door leaf none):");
+            report.AppendLine("Doorways (each between two rooms lets its cells through, two over a node and one over a cell; one with a door leaf none):");
             foreach (var path in InteriorScenes())
             {
                 EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
@@ -267,9 +267,11 @@ namespace GameDev.EditorTools
                 var hasLeaf = leaves.Any(l => l.Intersects(body));
                 var passes = 0;
                 var measured = 0;
-                for (var k = -1; k <= 1; k++)
+                // The four cells round the doorway's middle, sampled at their own middles, never on a grid line.
+                var at = Vector3.Dot(body.center, along);
+                for (var k = -2; k <= 1; k++)
                 {
-                    var c = body.center + (along * k);
+                    var c = body.center + (along * (Mathf.Round(at) + k + 0.5f - at));
                     var p = Passes(reader, c - (across * 0.6f), c + (across * 0.6f), body.min.y);
                     if (p >= 0)
                     {
@@ -278,7 +280,9 @@ namespace GameDev.EditorTools
                     }
                 }
 
-                var expected = hasLeaf ? 0 : 1;
+                // A doorway over a node passes the two cells either side of it (BK's 4 m wall, its 1.76 m opening over
+                // the middle node, 2026-11-06); one over a cell's middle passes that cell.
+                var expected = hasLeaf ? 0 : Mathf.Abs(at - Mathf.Round(at)) < 0.25f ? 2 : 1;
                 if (passes == expected && (hasLeaf || measured > 0))
                 {
                     if (hasLeaf) leafed++;
@@ -291,7 +295,7 @@ namespace GameDev.EditorTools
                 }
             }
 
-            report.AppendLine($"  {(faults == 0 ? "ok  " : "FAIL")} {sceneName}: {open} open doorways pass one cell, {leafed} with a leaf pass none, {faults} faults");
+            report.AppendLine($"  {(faults == 0 ? "ok  " : "FAIL")} {sceneName}: {open} open doorways pass their cells, {leafed} with a leaf pass none, {faults} faults");
             foreach (var note in notes.Take(10))
             {
                 report.AppendLine($"       {note}");

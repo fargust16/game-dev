@@ -65,8 +65,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4482126, y: 1.0729177, z: 1.4482125}
-  m_Center: {x: 1, y: 0.53645885, z: 0.99999994}
+  m_Size: {x: 1.7378552, y: 1.2875016, z: 1.7378551}
+  m_Center: {x: 1, y: 0.6437508, z: 0.99999994}
 --- !u!1 &1575722911958721622
 GameObject:
   m_ObjectHideFlags: 0
@@ -78,7 +78,6 @@ GameObject:
   - component: {fileID: 45274175127071947}
   - component: {fileID: 3527667441701520453}
   - component: {fileID: 735988279297613833}
-  - component: {fileID: 6653533669984618749}
   m_Layer: 10
   m_Name: ClutterTanker01
   m_TagString: Untagged
@@ -158,33 +157,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!54 &6653533669984618749
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1575722911958721622}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &5701687398223658596
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,7 +472,6 @@ GameObject:
   - component: {fileID: 5707626356445229438}
   - component: {fileID: 5718842577183520452}
   - component: {fileID: 5724454019181259950}
-  - component: {fileID: 5757280943172824184}
   m_Layer: 10
   m_Name: Candle01b_on
   m_TagString: Untagged
@@ -583,33 +554,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!54 &5757280943172824184
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5702069933637489076}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &5879776369469829504
 GameObject:
   m_ObjectHideFlags: 0
@@ -636,16 +580,16 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1, y: 0.000000059604645, z: 1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 330581326440280815}
   - {fileID: 45274175127071947}
-  - {fileID: 2025778580638258595}
+  - {fileID: 6064856836927923068}
   - {fileID: 5707626356445229438}
   m_Father: {fileID: 2024172432501256799}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8177061828661355440
+--- !u!1 &8580892783036444469
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -653,10 +597,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2025778580638258595}
-  - component: {fileID: 8342677345160413363}
-  - component: {fileID: 7278479438549659570}
-  - component: {fileID: 3861737145787847328}
+  - component: {fileID: 6064856836927923068}
+  - component: {fileID: 6799818557077856778}
+  - component: {fileID: 6777461347440788049}
   m_Layer: 10
   m_Name: ClutterTanker01
   m_TagString: Untagged
@@ -664,13 +607,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2025778580638258595
+--- !u!4 &6064856836927923068
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8177061828661355440}
+  m_GameObject: {fileID: 8580892783036444469}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0.2090427, y: 0.83296, z: 0.14482123}
@@ -679,21 +622,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8682231265789551817}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!33 &8342677345160413363
+--- !u!33 &6799818557077856778
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8177061828661355440}
+  m_GameObject: {fileID: 8580892783036444469}
   m_Mesh: {fileID: 4300000, guid: 1c6dc76b65f2ec64aa5c41256f4e15ff, type: 3}
---- !u!23 &7278479438549659570
+--- !u!23 &6777461347440788049
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8177061828661355440}
+  m_GameObject: {fileID: 8580892783036444469}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -736,33 +679,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!54 &3861737145787847328
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8177061828661355440}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1001 &325963584304450105
 PrefabInstance:
   m_ObjectHideFlags: 0
