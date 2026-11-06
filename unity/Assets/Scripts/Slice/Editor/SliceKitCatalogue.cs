@@ -197,6 +197,10 @@ namespace GameDev.Slice.EditorTools
             var bed = S("Bed", "Furniture", "Bed", Tripo, "ornate_wooden_bed_3d_model", ia);
             bed.SizeZ = 1.9f; // 1.69 × 1.48 × 1.9 m, so it stands in a 2 × 2 m corner clear of the walls
             yield return bed;
+            // The Dwelling's bed (step 4a): the same model with its head on a wall's face, 1.8 m long so it keeps 2 × 2 m.
+            var wallBed = S("WallBed", "Furniture", "WallBed", Tripo, "ornate_wooden_bed_3d_model", ia, anchor: Anchor.Back);
+            wallBed.SizeZ = 1.8f;
+            yield return wallBed;
             // The cell's front: the bars, 4 × 2.76 m, have their own doorway, and the cell door stands in it (CellFront).
             var door = S("CellDoor", "Lockup", "Door", Tripo, "rusty_iron_jail_door_3d_model", ia, anchor: Anchor.Linear);
             door.SizeX = 1.2f;

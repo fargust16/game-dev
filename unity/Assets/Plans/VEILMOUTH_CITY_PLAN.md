@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1)
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft — accepted by the owner, 2026-11-05; sizes remain authoring defaults
 
-Last Updated: 2026-11-06 (§15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-06 (§16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
@@ -261,7 +261,7 @@ Checked by `VeilmouthSceneTests` (the heights above, the edge's slope, the roads
 2. The ground (§9).
 3. ~~The plot builder and the city (§3–§7); the C0 Map zones become C1's; tests follow.~~ Done 2026-11-05 (§13).
 4. ~~The seven interiors (§8).~~ Done 2026-11-06 (§14).
-4a. The Dwelling scene and its generator (§8), then a door on every dwelling, and breaking in with witnesses, the Wardens and the Arrest ([10.3](../../../10.3%20Stealth%20and%20Detection.md) §6.1–6.2, [10.4](../../../10.4%20Dialogue%20and%20Social%20Checks.md) §6).
+4a. ~~The Dwelling scene and its generator (§8), then a door on every dwelling~~ (done 2026-11-06, §16), and breaking in with witnesses, the Wardens and the Arrest ([10.3](../../../10.3%20Stealth%20and%20Detection.md) §6.1–6.2, [10.4](../../../10.4%20Dialogue%20and%20Social%20Checks.md) §6).
 5. ~~Trees and green (§6.2).~~ Done with the city (§13); the courts' and gardens' details remain.
 6. Walk it, render it, and hand it to the owner.
 
@@ -366,3 +366,47 @@ The owner played the built city and interiors and asked for their remarks to be 
 Other changes in this pass: the arch house into Wardley Garden stands at px 320, with its passage 328–340, and a lamp keeps 8 m from a door measured to its centre.
 
 **Counted** on this build: 3197 kit blocks in the city and 749 in the seven interiors, all with no kit fault, and 277 doorways. Tests pass: `KitLayoutCheckTests`, `PortalPairingTests`, `VeilmouthCityTests`, and `VeilmouthSceneTests` (51 in EditMode), and the door and movement tests in PlayMode (20).
+
+---
+
+# 16. The Dwellings as built, 2026-11-06
+
+Step 4a's first half: the shared Dwelling scene, the generator it runs, and a street door on every dwelling. Every number is an authoring default unless it is marked measured. Breaking in is not built yet (end of this section).
+
+**The journey.** A dwelling's street door is a `Portal` whose journey carries the house as its context, a `DwellingKey`: the street door's id, the street scene, the door's place in decimetres, the house's kind, and its wealth. Every such door arrives at `dwelling.inside` in `Scenes/Slice/Interiors/Dwelling.unity`, which is in Build Settings. There `DwellingRuntime` reads the key, plans the home, builds it from the kit, sets its door to lead back to the street door, and stands the player just inside. Opened alone in the editor, the scene builds a preview terrace.
+
+**The same house, the same rooms.** The plan comes from the slice seed forked by the stream `slice.dwellings` and the door's place, so a house always gives the same rooms and furniture, and houses of one kind differ (12 terraces gave more than 6 different plans). Nothing in the house is kept yet: a picked door and a taken Stash are kept for the run once breaking in exists.
+
+**Rooms** on the 3 m module, ground floor only, the street door along the front; each plan is mirrored left to right half the time:
+
+| House | Rooms as built |
+|---|---|
+| Tenement | one room 6 × 6 m, or that room and a stone kitchen 3 × 6 m |
+| Terrace | hall 3 × 9 m, parlour 6 × 6 m, stone kitchen 6 × 3 m, bedroom 9 × 3 m |
+| Shop | shop room 9 × 6 m with the street door, back room 6 × 6 m, stone kitchen 3 × 6 m |
+| Villa | parlour 6 × 6 m, hall 3 × 9 m with the street door, dining room 6 × 6 m, study 6 × 6 m, stone kitchen 6 × 6 m |
+| Warehouse | stone store 9 × 9 m, office 6 × 6 m |
+
+**Wealth** ([19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.3) comes from where the house stands, in plan coordinates: the Ridge (py < 600) is rich; tenements and warehouses elsewhere are poor; a house in Lower Veil (px ≥ 470 and py ≥ 690, or px ≥ 545 and 600 < py < 662) is poor; the rest are middling. It chooses the furniture each room may take, the Lock (2, 4, or 6, [10.3](../../../10.3%20Stealth%20and%20Detection.md) §6.1), and the Stash chance.
+
+**Furniture** by each room's kind and wealth, from the same `BkFurniture` kit as §14:
+
+- Pieces go against walls first, then in the middle, then free, then hung. A doorway keeps the three cells in front of it and the middle one behind it clear. A window or door segment takes no wall piece, and each wall segment takes one.
+- A solid piece keeps 0.16 m from a wall's line, the clearance a wall's 0.3 m body leaves. Carpets take no cells.
+- The bed is `Kit_Furniture_WallBed`, the Tripo bed with its back on the wall's face (`Anchor.Back`, 1.8 m deep): the centred bed can never clear a wall.
+- What a room asks for and cannot place is listed for review, never shown; on the samples only a villa parlour's second painting.
+
+**The Stash** is BK's trunk, in the first of the bedroom, study, room, back room, office, store, and kitchen that the house has: in half the poor homes, 60 % of the middling, 70 % of the rich (400 houses each, within 8 points). It is a marker only; what it holds comes with S5a.
+
+**The doors.** `VeilmouthDwellings.AddDoors` puts a street door at each baked house's door marker, under `Dwelling doors` in `Veilmouth City`, unless one of the seven already opens there. It reads the house's kind from its baked prefab: Shop, Terrace, Tenement, Villa, Warehouse, and an arch house as a terrace in stucco and a tenement otherwise; civic buildings, the tavern, and the chapel are not dwellings. The city's build adds them, and the menu *GameDev → Slice → Dwellings → Add Dwelling Doors to Veilmouth (once)* added them to the owner's scene and refuses to run again. **Counted:** 265 doors, each with its own id: 101 middling and 19 poor shops, 61 tenements, 12 terraces, 10 villas, 62 warehouses.
+
+**Checked:** 56 sample homes, seven kinds at their wealth, eight each, with no kit fault, each with its rooms, at least two pieces a room, and a door that leads back. Renders of 14 are in `Logs/SliceSurvey/dwelling_*.png` (*GameDev → Slice → Render Dwellings*). Tests pass: `DwellingTests` with the city's, kit's, and portals' tests (63 in EditMode); a PlayMode test walks into a terrace, a tenement, a shop, a villa, and a warehouse of Veilmouth and back out (26 in PlayMode).
+
+**Not built yet**, each waiting on its milestone:
+
+- The lock: a dwelling's door opens freely. Picking it is a Reaction Check of Theft and Dexterity with Lockpicks (10.3 §6.1), which needs the Reaction Check and inventory of S5a.
+- Witnesses who see a break-in from outside, and residents inside: Vision Cones and the Notice Meter of S3.
+- A witness fetching a Warden, and the Arrest: walking townsfolk of S5c and dialogue of S2 ([10.4](../../../10.4%20Dialogue%20and%20Social%20Checks.md) §6).
+- The Stash's contents, and a picked door and taken Stash kept for the run: S5a and the save of S5c.
+- Residents at home by their schedules: S5c.
+- Stairs and upper floors, as in §14; a plain bed for poor homes ([SLICE_MODELS_WANTED.md](SLICE_MODELS_WANTED.md)).

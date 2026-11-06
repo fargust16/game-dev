@@ -75,7 +75,9 @@ namespace GameDev.Slice.Tests
         [Test]
         public void TheSevenBuildingsOpenFromTheStreet()
         {
-            var ids = All<Portal>().Select(p => p.name).ToArray();
+            // Every other door leads to the shared Dwelling scene (DwellingTests).
+            var ids = All<Portal>().Where(p => p.Target.SceneName != SliceTestScenes.SceneName(VeilmouthDwellings.ScenePath))
+                .Select(p => p.name).ToArray();
             foreach (var id in new[]
                      {
                          VeilmouthScene.SootAndBellStreetPortalId, "harrow-apothecary.street", "faction-house.street", "wardens-lockup.street",

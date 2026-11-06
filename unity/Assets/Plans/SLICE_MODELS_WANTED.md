@@ -34,7 +34,7 @@ Priority A means the room reads as empty or wrong without the model. B means it 
 | Fireplace with a mantelpiece | Soot & Bell taproom, faction hall, office | 2 × 0.6 × 1.4 | A | Only BK's iron stoves stand in for one now. |
 | Armchair and settee, upholstered | Faction office and hall, the let room | 1 × 1 × 1; 2 × 1 × 1 | A | BK has no soft seats. |
 | Wardrobe | The let room, the missing person's room | 1.2 × 0.6 × 2.1 | A | |
-| Iron bedstead and a cell cot | Missing room, the lock-up's cells | 1 × 2 × 1 | A | The Tripo bed is ornate and too grand for a tenement. The cells have no bed. |
+| Iron bedstead and a cell cot | Missing room, the lock-up's cells, poor dwellings (city plan §16) | 1 × 2 × 1 | A | The Tripo bed is ornate and too grand for a tenement. The cells have no bed. |
 | Apothecary chest of many small drawers | Harrow's shop | 2 × 0.5 × 2 | A | The shop's signature piece. |
 | Writing desk with drawers, or a bureau | Faction office, Wardens' office | 1.4 × 0.7 × 0.8 | B | BK's desk is a plain table. |
 | Archive cabinet, or shelves of files and boxes | Faction archive, Wardens' office | 1 × 0.5 × 2 | B | |

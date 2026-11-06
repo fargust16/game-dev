@@ -92,6 +92,55 @@ namespace GameDev.Slice.EditorTools
             }
         }
 
+        /// <summary>
+        /// Sample dwellings, one of each kind at each wealth it comes in, from above with their ceilings hidden, and
+        /// their kit faults in the log. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderDwellings
+        /// </summary>
+        [MenuItem("GameDev/Slice/Dwellings/Render Sample Dwellings")]
+        public static void RenderDwellings()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            var kit = VeilmouthDwellings.Kit;
+            var settings = VeilmouthDwellings.Settings;
+            var samples = new[]
+            {
+                (Dwellings.DwellingArchetype.Tenement, Dwellings.DwellingWealth.Poor), (Dwellings.DwellingArchetype.Terrace, Dwellings.DwellingWealth.Middling),
+                (Dwellings.DwellingArchetype.Terrace, Dwellings.DwellingWealth.Rich), (Dwellings.DwellingArchetype.Shop, Dwellings.DwellingWealth.Poor),
+                (Dwellings.DwellingArchetype.Shop, Dwellings.DwellingWealth.Middling), (Dwellings.DwellingArchetype.Villa, Dwellings.DwellingWealth.Rich),
+                (Dwellings.DwellingArchetype.Warehouse, Dwellings.DwellingWealth.Poor),
+            };
+            var faults = 0;
+            foreach (var (archetype, wealth) in samples)
+            {
+                for (var n = 0; n < 2; n++)
+                {
+                    EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+                    var key = VeilmouthDwellings.PreviewKey(archetype, wealth, 1000 + n * 37, -2000 - n * 53);
+                    var found = VeilmouthDwellings.BuildAndCheck(key, kit, settings, out var root);
+                    faults += found.Count;
+                    var plan = Dwellings.DwellingRuntime.PlanFor(key, settings, kit);
+                    if (plan.Unplaced.Count > 0)
+                    {
+                        Debug.Log($"[Dwelling] {archetype} {wealth} #{n} found no room for: {string.Join(", ", plan.Unplaced)}");
+                    }
+                    foreach (var f in found)
+                    {
+                        Debug.LogWarning($"[Dwelling] {archetype} {wealth} #{n}: {f}");
+                    }
+
+                    foreach (var c in root.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("Kit_BkRoom_Ceiling")))
+                    {
+                        c.gameObject.SetActive(false);
+                    }
+
+                    var b = Bounds();
+                    Top($"dwelling_{archetype}_{wealth}_{n}".ToLowerInvariant(), b.center, Mathf.Max(b.extents.x, b.extents.z) + 0.5f);
+                }
+            }
+
+            Debug.Log($"[Dwelling] {samples.Length * 2} sample dwellings rendered, {faults} kit faults.");
+        }
+
         private static void ShowCircles()
         {
             foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)

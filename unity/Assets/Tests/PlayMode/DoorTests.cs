@@ -55,14 +55,31 @@ namespace GameDev.Slice.Tests
             string building) =>
             GoInAndBack("Assets/Scenes/Slice/Veilmouth.unity", building + ".street", building + ".inside", building);
 
-        private IEnumerator GoInAndBack(string streetScenePath, string streetId, string insideId, string buildingId)
+        /// <summary>
+        /// Step 4a: a dwelling of each kind, through its street door into the shared Dwelling scene, which builds its
+        /// rooms and its door back; the dwelling's id is its street door's.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator InVeilmouthThePlayerGoesIntoADwellingAndBack(
+            [Values("Terrace", "Tenement", "Shop", "Villa", "Warehouse")] string archetype) =>
+            GoInAndBack("Assets/Scenes/Slice/Veilmouth.unity", () => Object.FindObjectsByType<Portal>(FindObjectsInactive.Exclude)
+                .Where(p => p.Target.SceneName == "Dwelling" && p.Target.Context.Contains("|" + archetype + "|"))
+                .OrderBy(p => p.Id, System.StringComparer.Ordinal).First(), null, null);
+
+        private IEnumerator GoInAndBack(string streetScenePath, string streetId, string insideId, string buildingId) =>
+            GoInAndBack(streetScenePath, () => FindPortal(streetId), insideId, buildingId);
+
+        /// <summary>A null <paramref name="insideId"/> or <paramref name="buildingId"/> is the street door's own id's.</summary>
+        private IEnumerator GoInAndBack(string streetScenePath, System.Func<Portal> pickStreet, string insideId, string buildingId)
         {
             var streetScene = System.IO.Path.GetFileNameWithoutExtension(streetScenePath);
             yield return LoadScene(streetScenePath);
             var clock = GameClockDriver.Running;
             Assert.IsNotNull(clock);
 
-            var street = FindPortal(streetId);
+            var street = pickStreet();
+            insideId ??= street.Id + ".inside";
+            buildingId ??= street.Id;
             var interiorScene = street.Target.SceneName;
             var entrance = street.ArrivalPose;
             Object.FindAnyObjectByType<PlayerLocomotion>().Teleport(entrance.position, entrance.rotation);

@@ -1,0 +1,21 @@
+{
+    "name": "GameDev.Slice.Dwellings",
+    "rootNamespace": "GameDev.Slice.Dwellings",
+    "references": [
+        "GameDev.Slice",
+        "GameDev.World.Seed",
+        "GameDev.World.Portals",
+        "GameDev.World.Interiors",
+        "GameDev.Core.Scenes",
+        "GameDev.Locomotion"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

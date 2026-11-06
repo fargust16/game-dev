@@ -23,6 +23,9 @@ namespace GameDev.World.Portals
         [SerializeField] private string targetScene;
         [SerializeField] private string targetPortalId;
 
+        [Tooltip("Passed to the target scene with the journey: a shared scene (the Dwelling) reads which place it is from it.")]
+        [SerializeField] private string travelContext;
+
         [Tooltip("The side of the wall, local +Z or -Z, where an arriving player stands.")]
         [SerializeField] private bool arriveOnPositiveZ;
 
@@ -36,7 +39,7 @@ namespace GameDev.World.Portals
 
         public string Id => portalId;
 
-        public TravelRequest Target => new TravelRequest(targetScene, targetPortalId);
+        public TravelRequest Target => new TravelRequest(targetScene, targetPortalId, travelContext);
 
         /// <summary>
         /// Where an arriving player stands, facing away from the door: on the ground under that point, so a door at
@@ -63,13 +66,17 @@ namespace GameDev.World.Portals
         /// <summary>Authoring default, m: how far above and below the sill the arrival looks for the ground.</summary>
         private const float GroundSearch = 0.75f;
 
-        /// <summary>Editor setup for scenes built by code; a placed door is set in the Inspector.</summary>
-        public void Configure(string id, string sceneName, string pairedPortalId, bool arrivalOnPositiveZ)
+        /// <summary>
+        /// Setup for scenes built by code, and for a shared scene that sets its door when it learns where it is; a
+        /// placed door is set in the Inspector.
+        /// </summary>
+        public void Configure(string id, string sceneName, string pairedPortalId, bool arrivalOnPositiveZ, string context = null)
         {
             portalId = id;
             targetScene = sceneName;
             targetPortalId = pairedPortalId;
             arriveOnPositiveZ = arrivalOnPositiveZ;
+            travelContext = context ?? string.Empty;
         }
 
         /// <summary>True when the player stands within reach of the opening.</summary>

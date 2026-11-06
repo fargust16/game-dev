@@ -3,6 +3,7 @@
     "rootNamespace": "GameDev.Slice.EditorTools",
     "references": [
         "GameDev.Slice",
+        "GameDev.Slice.Dwellings",
         "GameDev.Locomotion",
         "GameDev.Cameras",
         "GameDev.World.Time",

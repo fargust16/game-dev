@@ -175,6 +175,8 @@ namespace GameDev.Slice.EditorTools
             Forest();
             Hill();
             Townsfolk();
+            // A street door on every dwelling (15, *The slice's Dwellings*), after every building stands.
+            VeilmouthDwellings.AddDoors(_root);
 
             _works.Finish("Stone wall");
             _kerbs.Finish("Grey");

@@ -1,0 +1,576 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57312282b39d967429355a99bf55e4d2, type: 3}
+  m_Name: DwellingKit
+  m_EditorClassIdentifier: GameDev.Slice.Dwellings::GameDev.Slice.Dwellings.DwellingKit
+  blocks:
+  - key: BkFloor
+    prefab: {fileID: 612693209300473715, guid: 45960af945f21f24881ab7c5adad178b, type: 3}
+    width: 3
+    depth: 3
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 3
+      height: 3
+  - key: BkStoneFloor
+    prefab: {fileID: 34616369314844790, guid: 6bdc49ca9282d1c4cabb7bf4f4edb8ff, type: 3}
+    width: 3
+    depth: 3
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 3
+      height: 3
+  - key: BkCeiling
+    prefab: {fileID: 7144309866216807147, guid: c26ef7e218991d941a0a2914a9928723, type: 3}
+    width: 3
+    depth: 3
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkPost
+    prefab: {fileID: 4665416173132814848, guid: 50deec3fd5588274c99a5ac8553e2681, type: 3}
+    width: 0
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkWindow
+    prefab: {fileID: 6418723391245559719, guid: c79c4156f8b09e64aa31f5b3a82a95ec, type: 3}
+    width: 3
+    depth: 0
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.1500001
+      y: -0.15
+      width: 2.6999998
+      height: 0.3
+  - key: BkDoor
+    prefab: {fileID: 3447268006812859790, guid: e7150fba805a5d44ea5ae335f98efaa3, type: 3}
+    width: 3
+    depth: 0
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.8399999
+      y: -0.05
+      width: 1.3200002
+      height: 0.1
+  - key: PortalLeaf
+    prefab: {fileID: 8665231005878041080, guid: 2ee0cc5cc03619e4d9459e2cda43632b, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkPlaster
+    prefab: {fileID: 4578833092543275784, guid: 9e7caeada8099714f8399640c0f6eb89, type: 3}
+    width: 3
+    depth: 0
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.1500001
+      y: -0.15
+      width: 2.6999998
+      height: 0.3
+  - key: BkPlasterFace
+    prefab: {fileID: 6299941707776691332, guid: 44be889aaa5c4f446bd0a8043fb7aa74, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkBrick
+    prefab: {fileID: 8604145220812462452, guid: 8fa91e87b7a84734db062ae192b65ffb, type: 3}
+    width: 3
+    depth: 0
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.1500001
+      y: -0.15
+      width: 2.6999998
+      height: 0.3
+  - key: BkBrickFace
+    prefab: {fileID: 568267618850704640, guid: 5839a94bf9f0ccb418af7592d0258644, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkBrickB
+    prefab: {fileID: 4580252991054987139, guid: 1241c1e1b23e9f24eac8a9c9ee5a6b9a, type: 3}
+    width: 3
+    depth: 0
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.1500001
+      y: -0.15
+      width: 2.6999998
+      height: 0.3
+  - key: BkBrickBFace
+    prefab: {fileID: 3343782727059147185, guid: a4063975f4cb50a4182d94ebb473e88d, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkDoorway
+    prefab: {fileID: 3389360332771180176, guid: cde5c045ec301444099e58be380d29b8, type: 3}
+    width: 3
+    depth: 0
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.1500001
+      y: -0.15
+      width: 2.6999998
+      height: 0.3
+  - key: BkDoorwayFace
+    prefab: {fileID: 8735495862028305482, guid: 599baa62253f1d74eb70f25f49b0380e, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkPlasterDoorway
+    prefab: {fileID: 7238026935147132778, guid: a53af3f25bddd4246978200d3376655e, type: 3}
+    width: 3
+    depth: 0
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.1500001
+      y: -0.15
+      width: 2.6999998
+      height: 0.3
+  - key: BkPlasterDoorwayFace
+    prefab: {fileID: 4928218301237430431, guid: a3751602e64d8664882a8e9d483bde92, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkDrawer
+    prefab: {fileID: 2909751335020919556, guid: 81b7d8e0b87e77f488f58f2dc2672d20, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0.19
+      width: 1
+      height: 0.47395623
+  - key: BkPainting
+    prefab: {fileID: 5865797620483629252, guid: ec0567dfb1da18646af750f54ef73ceb, type: 3}
+    width: 1
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkCarpetLong
+    prefab: {fileID: 36441460830740994, guid: 86651af66cf046544a532ccfb66b246b, type: 3}
+    width: 2
+    depth: 3
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkSideTable
+    prefab: {fileID: 6255876256925527870, guid: 837ad977d698fc445926b6db84046f5d, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.35726357
+      y: 0.19
+      width: 1.2854729
+      height: 0.57383126
+  - key: BkChair
+    prefab: {fileID: 5637146740861514913, guid: 64bc256dee809af4592fea279afd9416, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.23811066
+      y: 0.22789556
+      width: 0.5237787
+      height: 0.5442089
+  - key: BkRoundTable
+    prefab: {fileID: 2658100745899802428, guid: c80ed6bd5655ad14296ba88816f9a38f, type: 3}
+    width: 3
+    depth: 3
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.46882033
+      y: 0.46882033
+      width: 2.0623593
+      height: 2.0623593
+  - key: BkBookShelf
+    prefab: {fileID: 6169597541290119679, guid: e693cbe83be21624ea599ac3927be3c2, type: 3}
+    width: 2
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkCupboardGlass
+    prefab: {fileID: 6443874754643788885, guid: 465050491291c604db332627c368e941, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.43749046
+      y: 0.19
+      width: 1.1250191
+      height: 0.59812796
+  - key: BkStove
+    prefab: {fileID: 5587945030619686455, guid: 67c60e4ddfc957f4bae07f211b252e48, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.1638298
+      y: 0.19000006
+      width: 0.6723404
+      height: 0.6313968
+  - key: BkKitchenTable
+    prefab: {fileID: 7797233770445511884, guid: fe6e40ba858623844a42da049a13030c, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.25723672
+      y: 0.19000006
+      width: 1.4855266
+      height: 0.7973089
+  - key: BkStool
+    prefab: {fileID: 607607106717950430, guid: a64a60bfc52c4c94793fdf253b4cf764, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.3545255
+      y: 0.35452783
+      width: 0.29094893
+      height: 0.29094422
+  - key: BkLogs
+    prefab: {fileID: 526199657873181764, guid: aada077db35e11940b10ca70c392e2e4, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.39085388
+      y: 0.38091177
+      width: 0.21829224
+      height: 0.23817647
+  - key: BkSink
+    prefab: {fileID: 1388208465252244500, guid: d3221735861ba7a4d886621386912526, type: 3}
+    width: 3
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.39635992
+      y: 0.19000006
+      width: 2.2072802
+      height: 0.7164787
+  - key: BkCupboard
+    prefab: {fileID: 2929276956415734454, guid: eb3c9c5975fe0c342895234cc97a6adc, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.43749046
+      y: 0.19
+      width: 1.1250191
+      height: 0.59812796
+  - key: BkDishShelf
+    prefab: {fileID: 4431738653556128693, guid: 6be60deb6eca9da408065c4dc7d58300, type: 3}
+    width: 2
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkBasket
+    prefab: {fileID: 2046260983633417291, guid: aec8f646b7630d7419342aab37309432, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.30518115
+      y: 0.30518115
+      width: 0.3896377
+      height: 0.3896377
+  - key: WallBed
+    prefab: {fileID: 1290494339033612555, guid: 2e308f8461d01cd42bcf1d5a7cd9f2e8, type: 3}
+    width: 2
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.19496846
+      y: 0.18999994
+      width: 1.6100631
+      height: 1.8
+  - key: BkDresser
+    prefab: {fileID: 1493458030598515075, guid: e3e7c978a72d1ab47a0b3ca8742c6f31, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.37167716
+      y: 0.19
+      width: 1.2566457
+      height: 0.53856254
+  - key: BkCarpet
+    prefab: {fileID: 8404570416611362329, guid: 00613bfe61c7e6f41839109e5a7bae9e, type: 3}
+    width: 3
+    depth: 2
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkCounter
+    prefab: {fileID: 5482443821417250596, guid: ec35a16b165e521428a8e1d507498099, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.25723672
+      y: 0.20269108
+      width: 1.4855266
+      height: 0.7973089
+  - key: BkBottleShelf
+    prefab: {fileID: 7294915217008024452, guid: f97c7fe32295ace40a0ced1d9aac17b9, type: 3}
+    width: 2
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: Crate
+    prefab: {fileID: 8139367422513150409, guid: 8252dd84c1b66ec48833d9c2c77ce791, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.07100195
+      y: 0.17169946
+      width: 0.8579961
+      height: 0.6566011
+  - key: BkJarShelf
+    prefab: {fileID: 480774415066687172, guid: 06808fc791f09ad4598117467bcf5dbe, type: 3}
+    width: 2
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: Barrel
+    prefab: {fileID: 3178616073441222896, guid: af08d6e3d3f8d0243954eb24a0895cd5, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.09476197
+      y: 0.09476197
+      width: 0.81047606
+      height: 0.81047606
+  - key: BkBasketB
+    prefab: {fileID: 1307891116020750097, guid: 12e91c751fc878842b3c786bbe3e2141, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.29641664
+      y: 0.29641664
+      width: 0.40716672
+      height: 0.40716672
+  - key: BkDiningTable
+    prefab: {fileID: 259379738142109846, guid: 81cb6409663abec45803c49a88527504, type: 3}
+    width: 2
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.2889192
+      y: 0.2889192
+      width: 1.4221616
+      height: 1.4221616
+  - key: BkCarpetWide
+    prefab: {fileID: 565220807802587961, guid: b6282adffd29564479b0dc1d6a81dda0, type: 3}
+    width: 3
+    depth: 4
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkDesk
+    prefab: {fileID: 1466250670471424199, guid: fe21f48ea45304a4a8252778d08f3095, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.16270995
+      y: 0.19000006
+      width: 1.67458
+      height: 0.7973089
+  - key: BkBookShelfB
+    prefab: {fileID: 3162023375119891187, guid: a4982fdb47203684696694dd1147809b, type: 3}
+    width: 2
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkBookShelfC
+    prefab: {fileID: 3011269286831839394, guid: 7ba29e27dd0369d44bca759e8d99b7b0, type: 3}
+    width: 2
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkGlobe
+    prefab: {fileID: 3971712385953270438, guid: 9e603d0762fc777429480bc1964e7a8b, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.32478625
+      y: 0.3247862
+      width: 0.3504275
+      height: 0.35042763
+  - key: BkCupboardTall
+    prefab: {fileID: 6615047667512393052, guid: e323e8257a4b6e84792b9f280cc6fffa, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.38873374
+      y: 0.19
+      width: 1.2225325
+      height: 0.56383115
+  - key: BkBoard
+    prefab: {fileID: 8416617603082835474, guid: fe22ad5f447a87a4891f16dfb7715712, type: 3}
+    width: 2
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+  - key: BkTrunk
+    prefab: {fileID: 1453890088661769057, guid: 3659b6db3be821d478e3b04f4ab140fa, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.13736093
+      y: 0.28895724
+      width: 0.72527814
+      height: 0.42208552

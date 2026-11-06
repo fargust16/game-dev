@@ -52,10 +52,13 @@ namespace GameDev.Slice.Tests
             var inBuild = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToList();
             CollectionAssert.IsSubsetOf(scenePaths, inBuild, "a door loads its target by name from Build Settings");
 
+            // A dwelling's street door leads to the shared Dwelling scene, which builds its door back on arrival
+            // (DwellingTests); every other door has its pair in a scene on disk.
+            var dwelling = SliceTestScenes.SceneName(VeilmouthDwellings.ScenePath);
             var count = 0;
             foreach (var pair in portals)
             {
-                foreach (var portal in pair.Value)
+                foreach (var portal in pair.Value.Where(p => p.Target.SceneName != dwelling))
                 {
                     count++;
                     Assert.IsTrue(portal.Target.IsValid, $"{pair.Key}#{portal.Id} has no target");
