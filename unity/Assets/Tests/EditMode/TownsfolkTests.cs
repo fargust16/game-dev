@@ -9,13 +9,14 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>The ordinary townsfolk: the owner's gentleman replaces every yellow Dummy, each on a clear closed route.</summary>
+    /// <summary>The ordinary townsfolk: the owner's gentleman and woman, 8 and 7, replace every yellow Dummy, each on a clear closed route.</summary>
     public sealed class TownsfolkTests
     {
-        [Test]
-        public void TheTownspersonWalksAndIdlesInLoops()
+        [TestCase(SliceTownsfolk.PrefabPath)]
+        [TestCase(SliceTownsfolk.WomanPrefabPath)]
+        public void TheTownsfolkWalkAndIdleInLoops(string path)
         {
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(SliceTownsfolk.PrefabPath);
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             Assert.IsNotNull(prefab);
             var walker = prefab.GetComponent<TownsfolkWalker>();
             Assert.That(walker.Speed, Is.InRange(0.6f, 2f));
@@ -36,6 +37,10 @@ namespace GameDev.Slice.Tests
             Assert.IsFalse(people.Cast<Transform>().Any(t => PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject) is GameObject s && s.name.Contains("Yellow")), "no yellow Dummy is left");
             var walkers = people.GetComponentsInChildren<TownsfolkWalker>();
             Assert.AreEqual(15, walkers.Length);
+            var women = walkers.Count(w => PrefabUtility.GetCorrespondingObjectFromSource(w.gameObject) is GameObject s && s.name == "Townswoman");
+            var men = walkers.Count(w => PrefabUtility.GetCorrespondingObjectFromSource(w.gameObject) is GameObject s && s.name == "Townsperson");
+            Assert.AreEqual(7, women, "townswomen");
+            Assert.AreEqual(8, men, "townsmen");
             Physics.SyncTransforms();
 
             // A person's capsule fits all along each route; the walkers themselves are left out.

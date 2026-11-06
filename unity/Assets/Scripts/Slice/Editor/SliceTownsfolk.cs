@@ -28,6 +28,32 @@ namespace GameDev.Slice.EditorTools
         public const string PrefabPath = "Assets/Prefabs/Slice/Townsperson.prefab";
         private const string AnimationFolder = "Assets/Settings/Slice/Townsfolk";
         private const string ControllerPath = AnimationFolder + "/SliceTownsfolk.controller";
+        public const string WomanModelPath = "Assets/TripoModels/historical_woman_3d_model/historical_woman_3d_model.fbx";
+        public const string WomanPrefabPath = "Assets/Prefabs/Slice/Townswoman.prefab";
+        private const string WomanFolder = AnimationFolder + "/Woman";
+
+        /// <summary>One townsfolk model: the owner's file, the prefab wrapping it, and its looping clips.</summary>
+        private sealed class Kind
+        {
+            public string Name;
+            public string Model;
+            public string Prefab;
+            public string Folder;
+            public string Controller;
+        }
+
+        private static readonly Kind Man = new Kind { Name = "Townsperson", Model = ModelPath, Prefab = PrefabPath, Folder = AnimationFolder, Controller = ControllerPath };
+
+        private static readonly Kind Woman = new Kind
+        {
+            Name = "Townswoman", Model = WomanModelPath, Prefab = WomanPrefabPath, Folder = WomanFolder, Controller = WomanFolder + "/SliceTownswoman.controller",
+        };
+
+        /// <summary>
+        /// Which walkers are women, in their order under People: the female flags of <c>VeilmouthCity.Townsfolk</c>'s
+        /// yellow list, then the farmer. 7 women and 8 men (owner, 2026-11-06: "let there be as many of each").
+        /// </summary>
+        public static readonly bool[] Women = { false, true, true, false, true, false, true, false, true, false, false, true, false, true, false };
 
         // Authoring defaults, 2026-11-06.
         public const float Height = 1.75f;       // m
@@ -49,20 +75,31 @@ namespace GameDev.Slice.EditorTools
             ReplaceInVeilmouth();
         }
 
+        [MenuItem("GameDev/Slice/Townsfolk/Build the Townswoman and Make Half the Townsfolk Women in Veilmouth (once)")]
+        public static void BuildWomanAndMakeHalfWomen()
+        {
+            BuildWoman();
+            MakeHalfWomen();
+        }
+
         // ------------------------------------------------------------------------------------------- the prefab
 
-        public static GameObject BuildPrefab()
+        public static GameObject BuildPrefab() => Build(Man);
+
+        public static GameObject BuildWoman() => Build(Woman);
+
+        private static GameObject Build(Kind kind)
         {
-            var source = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath);
-            var clips = AssetDatabase.LoadAllAssetsAtPath(ModelPath).OfType<AnimationClip>().Where(c => !c.name.StartsWith("__preview")).ToList();
+            var source = AssetDatabase.LoadAssetAtPath<GameObject>(kind.Model);
+            var clips = AssetDatabase.LoadAllAssetsAtPath(kind.Model).OfType<AnimationClip>().Where(c => !c.name.StartsWith("__preview")).ToList();
             var walkSource = clips.First(c => c.name.StartsWith("walk"));
             var idleSource = clips.First(c => c.name.StartsWith("idle"));
 
-            var root = new GameObject("Townsperson");
+            var root = new GameObject(kind.Name);
             var model = (GameObject)PrefabUtility.InstantiatePrefab(source);
             model.name = "Model";
             model.transform.SetParent(root.transform, false);
-            SliceKitCatalogue.LinkTripoTextures(model, ModelPath);
+            SliceKitCatalogue.LinkTripoTextures(model, kind.Model);
 
             // Size, feet and facing in the walk's first pose.
             walkSource.SampleAnimation(model, 0f);
@@ -82,7 +119,7 @@ namespace GameDev.Slice.EditorTools
                 animator = model.AddComponent<Animator>();
             }
 
-            animator.runtimeAnimatorController = Controller(walkSource, idleSource);
+            animator.runtimeAnimatorController = Controller(kind, walkSource, idleSource);
             animator.applyRootMotion = false;
             animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
 
@@ -93,10 +130,10 @@ namespace GameDev.Slice.EditorTools
             root.AddComponent<TownsfolkWalker>().Configure(new Vector3[0], speed, GroundMask);
             SliceKitCatalogue.SetLayer(root, KitLayers.Character);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(PrefabPath) ?? "Assets");
-            var prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(kind.Prefab) ?? "Assets");
+            var prefab = PrefabUtility.SaveAsPrefabAsset(root, kind.Prefab);
             Object.DestroyImmediate(root);
-            Debug.Log($"[SliceTownsfolk] {PrefabPath}: {Height} m, facing turned from {forward}, walking {speed:0.00} m/s (measured from the walk's stride).");
+            Debug.Log($"[SliceTownsfolk] {kind.Prefab}: {Height} m, facing turned from {forward}, walking {speed:0.00} m/s (measured from the walk's stride).");
             return prefab;
         }
 
@@ -163,13 +200,14 @@ namespace GameDev.Slice.EditorTools
             return (min, max);
         }
 
-        private static RuntimeAnimatorController Controller(AnimationClip walkSource, AnimationClip idleSource)
+        private static RuntimeAnimatorController Controller(Kind kind, AnimationClip walkSource, AnimationClip idleSource)
         {
-            Directory.CreateDirectory(AnimationFolder);
-            var walk = LoopingCopy(walkSource, AnimationFolder + "/Walk.anim");
-            var idle = LoopingCopy(idleSource, AnimationFolder + "/Idle.anim");
-            AssetDatabase.DeleteAsset(ControllerPath);
-            var controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
+            Directory.CreateDirectory(kind.Folder);
+            AssetDatabase.Refresh();
+            var walk = LoopingCopy(walkSource, kind.Folder + "/Walk.anim");
+            var idle = LoopingCopy(idleSource, kind.Folder + "/Idle.anim");
+            AssetDatabase.DeleteAsset(kind.Controller);
+            var controller = AnimatorController.CreateAnimatorControllerAtPath(kind.Controller);
             var machine = controller.layers[0].stateMachine;
             var walkState = machine.AddState("Walk");
             walkState.motion = walk;
@@ -247,6 +285,60 @@ namespace GameDev.Slice.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log($"[SliceTownsfolk] {placed.Count} yellow Dummies replaced by walking townsfolk in {VeilmouthScene.ScenePath}.");
+        }
+
+        /// <summary>
+        /// Once, in the owner's Veilmouth: the walkers flagged in <see cref="Women"/> become townswomen, keeping their
+        /// place, facing and route and walking at the woman's own measured pace. It refuses to run where a townswoman
+        /// already walks, since the scene is the owner's.
+        /// </summary>
+        public static void MakeHalfWomen()
+        {
+            var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var root = scene.GetRootGameObjects().FirstOrDefault(g => g.name == VeilmouthCity.RootName);
+            var people = root != null ? root.transform.Find("People") : null;
+            var woman = AssetDatabase.LoadAssetAtPath<GameObject>(WomanPrefabPath);
+            if (people == null || woman == null)
+            {
+                Debug.LogError("[SliceTownsfolk] Veilmouth has no People group, or the townswoman is not built.");
+                return;
+            }
+
+            var walkers = people.GetComponentsInChildren<TownsfolkWalker>(true);
+            if (walkers.Any(w => PrefabUtility.GetCorrespondingObjectFromSource(w.gameObject) == woman))
+            {
+                Debug.LogWarning("[SliceTownsfolk] Townswomen already walk in Veilmouth; the townsfolk are the owner's now and are not changed again.");
+                return;
+            }
+
+            if (walkers.Length != Women.Length)
+            {
+                Debug.LogError($"[SliceTownsfolk] Veilmouth has {walkers.Length} walkers, not the {Women.Length} of the yellow list; nothing is changed.");
+                return;
+            }
+
+            var speed = woman.GetComponent<TownsfolkWalker>().Speed;
+            for (var i = 0; i < walkers.Length; i++)
+            {
+                if (!Women[i])
+                {
+                    continue;
+                }
+
+                var man = walkers[i];
+                var go = (GameObject)PrefabUtility.InstantiatePrefab(woman, people);
+                go.name = man.name == "Townsperson" ? "Townswoman" : man.name;
+                go.transform.SetPositionAndRotation(man.transform.position, man.transform.rotation);
+                go.transform.SetSiblingIndex(man.transform.GetSiblingIndex());
+                var walker = go.GetComponent<TownsfolkWalker>();
+                walker.Configure(man.Route, speed, GroundMask);
+                EditorUtility.SetDirty(walker);
+                Object.DestroyImmediate(man.gameObject);
+            }
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log($"[SliceTownsfolk] {Women.Count(w => w)} of {Women.Length} walkers are townswomen now, walking {speed:0.00} m/s, in {VeilmouthScene.ScenePath}.");
         }
 
         // ------------------------------------------------------------------------------------------- routes

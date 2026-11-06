@@ -198,12 +198,12 @@ namespace GameDev.Slice.EditorTools
         {
             Directory.CreateDirectory(OutputFolder);
             EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
-            var walk = AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/Settings/Slice/Townsfolk/Walk.anim");
             var walkers = Object.FindObjectsByType<GameDev.Slice.People.TownsfolkWalker>(FindObjectsSortMode.None).OrderBy(w => w.transform.position.x).ToList();
             var line = new Material(Shader.Find("Universal Render Pipeline/Unlit")) { color = new Color(1f, 0.15f, 0.6f) };
             foreach (var w in walkers)
             {
-                walk.SampleAnimation(w.GetComponentInChildren<Animator>().gameObject, 0.6f);
+                var animator = w.GetComponentInChildren<Animator>();
+                animator.runtimeAnimatorController.animationClips.First(c => c.name == "Walk").SampleAnimation(animator.gameObject, 0.6f);
                 var lr = new GameObject("Route").AddComponent<LineRenderer>();
                 lr.sharedMaterial = line;
                 lr.loop = true;
@@ -212,10 +212,16 @@ namespace GameDev.Slice.EditorTools
                 lr.SetPositions(w.Route.Select(p => p + (Vector3.up * 0.3f)).ToArray());
             }
 
-            var one = walkers[walkers.Count / 2].transform;
-            var at = one.position + (Vector3.up * 1.1f);
-            Shot("townsperson_front", at + (one.forward * 3.2f) + (Vector3.up * 0.2f), at);
-            Shot("townsperson_side", at + (one.right * 3.2f) + (Vector3.up * 0.2f), at);
+            foreach (var (prefix, prefab) in new[] { ("townsperson", SliceTownsfolk.PrefabPath), ("townswoman", SliceTownsfolk.WomanPrefabPath) })
+            {
+                var source = AssetDatabase.LoadAssetAtPath<GameObject>(prefab);
+                var kind = walkers.Where(w => PrefabUtility.GetCorrespondingObjectFromSource(w.gameObject) == source).ToList();
+                var one = kind[kind.Count / 2].transform;
+                var at = one.position + (Vector3.up * 1.1f);
+                Shot($"{prefix}_front", at + (one.forward * 3.2f) + (Vector3.up * 0.2f), at);
+                Shot($"{prefix}_side", at + (one.right * 3.2f) + (Vector3.up * 0.2f), at);
+            }
+
             Top("townsfolk_routes_city", new Vector3(30f, 0f, -200f), 200f);
             Top("townsfolk_routes_market", new Vector3(-90f, 0f, -230f), 50f);
             Debug.Log($"Townsfolk views written to {OutputFolder}.");
