@@ -3,7 +3,8 @@
     "rootNamespace": "GameDev.Slice",
     "references": [
         "GameDev.World.Seed",
-        "GameDev.World.Time"
+        "GameDev.World.Time",
+        "GameDev.Locomotion"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
