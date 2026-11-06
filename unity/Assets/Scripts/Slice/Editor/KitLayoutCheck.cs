@@ -171,13 +171,8 @@ namespace GameDev.Slice.EditorTools
         {
             bounds = default;
             var found = false;
-            foreach (var collider in block.GetComponentsInChildren<Collider>())
+            foreach (var collider in Solids(block))
             {
-                if (!collider.enabled || collider.isTrigger || collider.GetComponentInParent<KitBlock>() != block)
-                {
-                    continue;
-                }
-
                 if (found)
                 {
                     bounds.Encapsulate(collider.bounds);
@@ -253,11 +248,17 @@ namespace GameDev.Slice.EditorTools
             return deepest;
         }
 
+        /// <summary>
+        /// The block's own enabled, non-trigger colliders. A set's loose things leave it when the scene starts, and a
+        /// still set's ThingSurface only holds them (kit standard §4), so neither counts.
+        /// </summary>
         private static IEnumerable<Collider> Solids(KitBlock block)
         {
             foreach (var collider in block.GetComponentsInChildren<Collider>())
             {
-                if (collider.enabled && !collider.isTrigger && collider.GetComponentInParent<KitBlock>() == block)
+                var loose = collider.GetComponentInParent<LooseProp>();
+                if (collider.enabled && !collider.isTrigger && collider.GetComponentInParent<KitBlock>() == block &&
+                    (loose == null || !loose.IsThing) && collider.GetComponentInParent<ThingSurface>() == null)
                 {
                     yield return collider;
                 }

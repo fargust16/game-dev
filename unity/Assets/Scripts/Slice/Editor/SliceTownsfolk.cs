@@ -100,6 +100,24 @@ namespace GameDev.Slice.EditorTools
 
         public static GameObject BuildWoman() => Build(Woman);
 
+        /// <summary>The saved townsfolk prefabs (the loose-props pass patches them in place).</summary>
+        internal static readonly string[] Prefabs = { PrefabPath, WomanPrefabPath };
+
+        /// <summary>
+        /// A walker shoulders loose props aside (kit standard §4): a kinematic body, which the walker still moves by its
+        /// transform, so a prop it walks into wakes and is pushed out of its way.
+        /// </summary>
+        internal static void ShoulderLooseProps(GameObject root)
+        {
+            if (!root.TryGetComponent<Rigidbody>(out var body))
+            {
+                body = root.AddComponent<Rigidbody>();
+            }
+
+            body.isKinematic = true;
+            body.useGravity = false;
+        }
+
         private static GameObject Build(Kind kind)
         {
             var source = AssetDatabase.LoadAssetAtPath<GameObject>(kind.Model);
@@ -139,6 +157,7 @@ namespace GameDev.Slice.EditorTools
             capsule.height = Height;
             capsule.radius = 0.25f;
             capsule.center = new Vector3(0f, Height * 0.5f, 0f);
+            ShoulderLooseProps(root);
             root.AddComponent<TownsfolkWalker>().Configure(new Vector3[0], speed, GroundMask);
             SliceKitCatalogue.SetLayer(root, KitLayers.Character);
 

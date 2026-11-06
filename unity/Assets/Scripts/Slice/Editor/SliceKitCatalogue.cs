@@ -122,6 +122,28 @@ namespace GameDev.Slice.EditorTools
         public const float FurnitureScale = 1.2f;
         public const float HungOut = 0.04f; // m
 
+        /// <summary>
+        /// Loose props (kit standard §4, owner 2026-11-06): the kinds that have mass and gravity, and their mass, kg.
+        /// Authoring defaults. Every other block is still.
+        /// </summary>
+        public static readonly IReadOnlyDictionary<string, float> LooseMass = new Dictionary<string, float>
+        {
+            ["Crate"] = 15f, ["Barrel"] = 60f, ["Barrels"] = 150f, ["Box"] = 10f, ["Firewood"] = 12f, ["TrashCan"] = 8f,
+            ["Bench"] = 30f, ["BottleTable"] = 25f, ["WeaponTable"] = 30f, ["Table"] = 25f, ["TablePlain"] = 20f,
+            ["Chair"] = 6f, ["Pew"] = 40f, ["Candles"] = 4f, ["Books"] = 2f, ["Retort"] = 3f,
+            ["BkChair"] = 6f, ["BkStool"] = 4f, ["BkBasket"] = 2f, ["BkBasketB"] = 2f, ["BkLogs"] = 12f, ["BkGlobe"] = 5f,
+            ["BkCauldron"] = 15f, ["BkDiningTable"] = 30f, ["BkKitchenTable"] = 25f, ["BkDesk"] = 35f, ["BkSideTable"] = 12f,
+            ["BkRoundTable"] = 25f, ["BkWorkTable"] = 35f, ["BkArmsTable"] = 40f, ["BkLabBench"] = 40f, ["BkTavernTable"] = 25f,
+        };
+
+        /// <summary>A set's thing, kg, by its file (authoring defaults, 2026-11-06).</summary>
+        internal static float ThingMass(string file) =>
+            file.StartsWith("Books") || file.StartsWith("LabSetup") || file.StartsWith("Caldron") || file.StartsWith("Globe") ? 3f
+            : file.StartsWith("Sword") || file.StartsWith("Axe") ? 1.5f
+            : file.StartsWith("Book") || file.StartsWith("Oillamp") || file.StartsWith("Candle") || file.StartsWith("Jar") || file.StartsWith("Basket") ? 1f
+            : file.StartsWith("Apple") ? 0.2f
+            : 0.5f;
+
         private static Spec Game(Spec spec)
         {
             spec.Factor = FurnitureScale;
@@ -548,9 +570,10 @@ namespace GameDev.Slice.EditorTools
             }
 
             model.transform.localRotation = Quaternion.Euler(0f, spec.ModelYaw, 0f) * model.transform.localRotation;
+            var things = new List<(GameObject Thing, string File)>();
             if (spec.On != null)
             {
-                model = StandOn(root, model, spec);
+                model = StandOn(root, model, spec, things);
             }
 
             if (spec.NoLights)
@@ -582,7 +605,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             // BK's loose things carry their own dynamic bodies; without their colliders they fell through the shelves
-            // (owner's play test, 2026-11-06). The slice's dressing is still: the wrapper's own body is what is solid.
+            // (owner's play test, 2026-11-06). The wrapper gives loose props bodies of its own (kit standard §4).
             foreach (var joint in model.GetComponentsInChildren<Joint>(true))
             {
                 Object.DestroyImmediate(joint);
@@ -638,9 +661,50 @@ namespace GameDev.Slice.EditorTools
             var name = $"Kit_{spec.Family}_{spec.Part}_{width}x{height}";
             root.name = name;
             root.AddComponent<KitBlock>();
-            AddBody(root, spec.Body, b, width, depth, linear, spec.OpenWidth, spec.OpenHeight, spec.LineBody);
+            // A set's body covers its base only: its things are bodies of their own (kit standard §4).
+            var baseModel = spec.On != null ? model.transform.Find("Base").gameObject : model;
+            var loose = LooseMass.TryGetValue(spec.Key, out var mass);
+            if (!loose || !Loose(root, baseModel, mass, false))
+            {
+                loose = false;
+                AddBody(root, spec.Body, spec.On != null ? Seen(baseModel) : b, width, depth, linear, spec.OpenWidth, spec.OpenHeight, spec.LineBody);
+            }
+
+            if (things.Count > 0 && spec.Body == Body.None)
+            {
+                // A still set seen and never solid (a shelf) still holds its things up.
+                baseModel.AddComponent<ThingSurface>();
+                foreach (var filter in baseModel.GetComponentsInChildren<MeshFilter>())
+                {
+                    if (filter.sharedMesh != null)
+                    {
+                        filter.gameObject.AddComponent<MeshCollider>().sharedMesh = filter.sharedMesh;
+                    }
+                }
+            }
+
             SetLayer(root, spec.Layer);
-            if (spec.Layer != KitLayers.Interactable)
+            foreach (var (thing, file) in things)
+            {
+                if (Loose(thing, thing, ThingMass(file), true))
+                {
+                    SetLayer(thing, KitLayers.NoGrid); // a bottle on the floor never closes a cell
+                }
+            }
+
+            if (loose || things.Count > 0)
+            {
+                // A vendor's own static flags would batch what now moves.
+                foreach (var t in root.GetComponentsInChildren<Transform>(true))
+                {
+                    if (loose || t.GetComponentInParent<LooseProp>() != null)
+                    {
+                        GameObjectUtility.SetStaticEditorFlags(t.gameObject, 0);
+                    }
+                }
+            }
+
+            if (!loose && spec.Layer != KitLayers.Interactable)
             {
                 GameObjectUtility.SetStaticEditorFlags(root, StaticEditorFlags.BatchingStatic);
             }
@@ -648,6 +712,40 @@ namespace GameDev.Slice.EditorTools
             var entry = Save(root, spec.Key, spec.Family, width, depth, b.size.y);
             entry.DoorX = spec.DoorX ?? width * 0.5f;
             return entry;
+        }
+
+        /// <summary>
+        /// Makes <paramref name="body"/> a loose prop (kit standard §4): a convex collider on each of
+        /// <paramref name="shape"/>'s meshes, so a prop tilted to a slope rests on it, a sleeping rigid body of
+        /// <paramref name="mass"/> kg, and a LooseProp. False, with nothing added, where no mesh can carry a collider.
+        /// </summary>
+        private static bool Loose(GameObject body, GameObject shape, float mass, bool thing)
+        {
+            var filters = shape.GetComponentsInChildren<MeshFilter>().Where(f =>
+            {
+                var size = f.sharedMesh != null ? f.sharedMesh.bounds.size : Vector3.zero;
+                var renderer = f.GetComponent<MeshRenderer>();
+                return renderer != null && renderer.enabled && Mathf.Min(size.x, Mathf.Min(size.y, size.z)) >= 0.001f; // a flat flame makes no hull
+            }).ToList();
+            if (filters.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (var filter in filters)
+            {
+                var hull = filter.gameObject.AddComponent<MeshCollider>();
+                hull.sharedMesh = filter.sharedMesh;
+                hull.convex = true;
+            }
+
+            var rigidbody = body.AddComponent<Rigidbody>();
+            rigidbody.mass = mass;
+            rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+            rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            rigidbody.maxDepenetrationVelocity = 1f; // a prop set slightly into its neighbour eases out, never jumps
+            body.AddComponent<LooseProp>().Configure(thing);
+            return true;
         }
 
         /// <summary>
@@ -869,7 +967,7 @@ namespace GameDev.Slice.EditorTools
         /// board (owner's play test, 2026-11-06: bottles floated over the shelf). BK's volumetric light script, which
         /// needs the built-in pipeline, is removed from its lamps and candles.
         /// </summary>
-        private static GameObject StandOn(GameObject root, GameObject baseModel, Spec spec)
+        private static GameObject StandOn(GameObject root, GameObject baseModel, Spec spec, List<(GameObject, string)> things)
         {
             var holder = new GameObject("Model");
             holder.transform.SetParent(root.transform, false);
@@ -904,6 +1002,7 @@ namespace GameDev.Slice.EditorTools
                 var z = top.min.z + fz * top.size.z;
                 var at = new Vector3(x, Surface(baseModel, x, z, top.max.y), z);
                 thing.transform.position += at - new Vector3(seen.center.x, seen.min.y, seen.center.z);
+                things.Add((thing, file));
             }
 
             return holder;

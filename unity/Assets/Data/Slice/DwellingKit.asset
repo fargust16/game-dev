@@ -240,10 +240,10 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.22871614
+      x: 0.2287159
       y: 0.2528
-      width: 1.5425676
-      height: 0.68859756
+      width: 1.5425678
+      height: 0.68859744
   - key: BkChair
     prefab: {fileID: 5637146740861514913, guid: 64bc256dee809af4592fea279afd9416, type: 3}
     width: 1
@@ -251,10 +251,10 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.18573284
-      y: 0.17347467
-      width: 0.6285343
-      height: 0.65305066
+      x: 0.20026016
+      y: 0.17394835
+      width: 0.613539
+      height: 0.6501545
   - key: BkRoundTable
     prefab: {fileID: 2658100745899802428, guid: c80ed6bd5655ad14296ba88816f9a38f, type: 3}
     width: 3
@@ -262,10 +262,10 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.26258445
-      y: 0.26258445
-      width: 2.474831
-      height: 2.474831
+      x: 0.2625847
+      y: 0.2625842
+      width: 2.4748316
+      height: 2.474832
   - key: BkBookShelf
     prefab: {fileID: 6169597541290119679, guid: e693cbe83be21624ea599ac3927be3c2, type: 3}
     width: 2
@@ -306,10 +306,10 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.10868406
+      x: 0.1086843
       y: 0.2528
-      width: 1.7826319
-      height: 0.95677066
+      width: 1.7826314
+      height: 0.9567708
   - key: BkStool
     prefab: {fileID: 607607106717950430, guid: a64a60bfc52c4c94793fdf253b4cf764, type: 3}
     width: 1
@@ -317,10 +317,10 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.32543057
-      y: 0.32543343
-      width: 0.3491388
-      height: 0.34913307
+      x: 0.3254422
+      y: 0.3254335
+      width: 0.34912717
+      height: 0.349133
   - key: BkLogs
     prefab: {fileID: 526199657873181764, guid: aada077db35e11940b10ca70c392e2e4, type: 3}
     width: 1
@@ -329,9 +329,9 @@ MonoBehaviour:
     body:
       serializedVersion: 2
       x: 0.36902463
-      y: 0.35709417
-      width: 0.26195073
-      height: 0.28581166
+      y: 0.35709423
+      width: 0.2619506
+      height: 0.28581154
   - key: BkSink
     prefab: {fileID: 1388208465252244500, guid: d3221735861ba7a4d886621386912526, type: 3}
     width: 3
@@ -372,10 +372,10 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.26621735
-      y: 0.2662174
-      width: 0.4675653
-      height: 0.46756518
+      x: 0.26621747
+      y: 0.26621747
+      width: 0.46756518
+      height: 0.46756506
   - key: WallBed
     prefab: {fileID: 8735111608015736961, guid: 0c6d9be0f57ebba46804c597e79b0a23, type: 3}
     width: 2
@@ -438,9 +438,9 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0
+      x: -0.0147976875
       y: 0.106039345
-      width: 1
+      width: 1.0295954
       height: 0.7879213
   - key: BkJarShelf
     prefab: {fileID: 480774415066687172, guid: 06808fc791f09ad4598117467bcf5dbe, type: 3}
@@ -460,10 +460,10 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.0137143135
-      y: 0.0137143135
-      width: 0.9725714
-      height: 0.9725714
+      x: 0.013714194
+      y: 0.013714194
+      width: 0.97257185
+      height: 0.97257185
   - key: BkBasketB
     prefab: {fileID: 1307891116020750097, guid: 12e91c751fc878842b3c786bbe3e2141, type: 3}
     width: 1
@@ -471,9 +471,9 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.25569993
+      x: 0.2557
       y: 0.2557
-      width: 0.48860013
+      width: 0.48860002
       height: 0.48860002
   - key: BkDiningTable
     prefab: {fileID: 259379738142109846, guid: 81cb6409663abec45803c49a88527504, type: 3}
@@ -483,9 +483,9 @@ MonoBehaviour:
     body:
       serializedVersion: 2
       x: 0.146703
-      y: 0.146703
-      width: 1.706594
-      height: 1.706594
+      y: 0.14670277
+      width: 1.7065935
+      height: 1.7065939
   - key: BkCarpetWide
     prefab: {fileID: 565220807802587961, guid: b6282adffd29564479b0dc1d6a81dda0, type: 3}
     width: 3
@@ -504,10 +504,10 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0
-      y: 0.2528
-      width: 2
-      height: 0.95677066
+      x: 0.22211552
+      y: 0.25280046
+      width: 1.7826335
+      height: 0.9567714
   - key: BkBookShelfB
     prefab: {fileID: 3162023375119891187, guid: a4982fdb47203684696694dd1147809b, type: 3}
     width: 2
@@ -540,7 +540,7 @@ MonoBehaviour:
       x: 0.28974348
       y: 0.28974342
       width: 0.42051303
-      height: 0.42051315
+      height: 0.4205131
   - key: BkCupboardTall
     prefab: {fileID: 3121580462832490043, guid: 7d822a3833a875d4496ade1870bd1648, type: 3}
     width: 2

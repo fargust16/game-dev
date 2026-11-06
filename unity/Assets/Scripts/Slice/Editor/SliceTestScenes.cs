@@ -80,6 +80,7 @@ namespace GameDev.Slice.EditorTools
             controller.minMoveDistance = 0f;
             root.AddComponent<PlayerLocomotion>();
             root.AddComponent<FallGuard>();
+            root.AddComponent<PushLooseProps>(); // kit standard §4: the player pushes loose props
 
             var model = (GameObject)PrefabUtility.InstantiatePrefab(character, root.transform);
             model.name = "Model";

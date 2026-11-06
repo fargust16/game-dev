@@ -92,7 +92,11 @@ namespace GameDev.Slice.EditorTools
             var go = (GameObject)Object.Instantiate(prefab);
             go.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             Physics.SyncTransforms();
-            var colliders = go.GetComponentsInChildren<Collider>().Where(c => c.enabled && !c.isTrigger).ToArray();
+            // A set's loose things and a shelf's ThingSurface are no part of its body (kit standard §4).
+            var colliders = go.GetComponentsInChildren<Collider>()
+                .Where(c => c.enabled && !c.isTrigger && c.GetComponentInParent<ThingSurface>() == null &&
+                            (c.GetComponentInParent<LooseProp>() is not { IsThing: true }))
+                .ToArray();
             var solid = go.layer != LayerMask.NameToLayer(KitLayers.NoGrid) && colliders.Length > 0;
             var body = new Rect();
             if (solid)
