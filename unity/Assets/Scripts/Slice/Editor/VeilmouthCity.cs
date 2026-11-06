@@ -393,7 +393,12 @@ namespace GameDev.Slice.EditorTools
             var (min, max) = GroundUnder(quad);
             // A plant is sunk below the lowest ground under it rather than left floating on a slope (owner, 2026-11-06).
             var plant = key.StartsWith("Tree_") || key.StartsWith("Bush_") || key == "Shrub" || key == "Grass" || key == "Poppy";
-            var go = PutPlan(key, f, px0, py0, plant ? min - 0.2f : Up(Mathf.Max(min, max - 0.15f)));
+            // A loose prop stands on the ground at its centre, not on the rounded height, or it would drop when woken
+            // (owner's fourth play test, 2026-11-06); Settle then tilts it to the slope.
+            var loose = SliceKitCatalogue.LooseMass.ContainsKey(key);
+            var centre = new Vector2(quad.Average(p => p.x), quad.Average(p => p.y));
+            var y = plant ? min - 0.2f : loose ? Ground(centre.x, centre.y) : Up(Mathf.Max(min, max - 0.15f));
+            var go = PutPlan(key, f, px0, py0, y);
             if (name != null)
             {
                 go.name = name;
@@ -1302,14 +1307,26 @@ namespace GameDev.Slice.EditorTools
             _doors.Add((new Vector2(709f, 634.5f), new Vector2(1f, 0f)));
 
             // The river's embankment along the city, with a parapet; the basin's walls; the sea quay's edge.
+            // It runs on to the bridge's parapets, so no corner is left open (owner's fourth play test, 2026-11-06).
             for (var py = 490; py < 790; py += 4)
             {
-                if (py + 4 > 664 && py < 680)
+                var top = Ground(778f, py + 2f) + 1f;
+                if (py + 4 > BridgeNorth && py < BridgeSouth)
                 {
+                    if (py < BridgeNorth)
+                    {
+                        Slab(779f, 780.5f, py, BridgeNorth, VeilmouthGround.RiverBed - 0.5f, top);
+                    }
+
+                    if (py + 4 > BridgeSouth)
+                    {
+                        Slab(779f, 780.5f, BridgeSouth, py + 4, VeilmouthGround.RiverBed - 0.5f, top);
+                    }
+
                     continue;
                 }
 
-                Slab(779f, 780.5f, py, py + 4, VeilmouthGround.RiverBed - 0.5f, Ground(778f, py + 2f) + 1f);
+                Slab(779f, 780.5f, py, py + 4, VeilmouthGround.RiverBed - 0.5f, top);
             }
 
             for (var py = 790; py < 830; py += 4)
@@ -1397,13 +1414,21 @@ namespace GameDev.Slice.EditorTools
             _works.Box(World((px0 + px1) / 2f, (py0 + py1) / 2f, (y0 + y1) / 2f), new Vector3(px1 - px0, y1 - y0, py1 - py0), 0f,
                 true, material);
 
-        /// <summary>The Veil Bridge (§3.8): a stone deck at street level over the river on piers, with parapets, to the east bank.</summary>
+        private const float BridgeNorth = 663.4f, BridgeSouth = 680.6f; // the parapets' outer faces
+
+        /// <summary>
+        /// The Veil Bridge (§3.8): a stone deck at street level over the river on piers, with parapets, to the east bank.
+        /// Each end runs 2 m on to the land and an abutment fills the bank under it down to the river bed, so no gap is
+        /// left between the deck and the ground (owner's fourth play test, 2026-11-06).
+        /// </summary>
         private static void Bridge()
         {
             const float deck = Low + 0.1f;
-            Slab(780f, 852f, 664f, 680f, deck - 1.2f, deck, "Paving stones");
-            Slab(780f, 852f, 663.4f, 664f, deck - 1.2f, deck + 1.1f);
-            Slab(780f, 852f, 680f, 680.6f, deck - 1.2f, deck + 1.1f);
+            Slab(778f, 854f, 664f, 680f, deck - 1.2f, deck, "Paving stones");
+            Slab(780f, 852f, BridgeNorth, 664f, deck - 1.2f, deck + 1.1f);
+            Slab(780f, 852f, 680f, BridgeSouth, deck - 1.2f, deck + 1.1f);
+            Slab(778f, 780.5f, BridgeNorth, BridgeSouth, VeilmouthGround.RiverBed - 0.5f, deck - 1.2f);
+            Slab(840f, 854f, BridgeNorth, BridgeSouth, VeilmouthGround.RiverBed - 0.5f, deck - 1.2f);
             foreach (var px in new[] { 792f, 806f, 820f, 834f })
             {
                 Slab(px - 1.5f, px + 1.5f, 662f, 682f, VeilmouthGround.RiverBed - 1f, deck - 1.2f);

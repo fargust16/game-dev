@@ -123,24 +123,29 @@ namespace GameDev.Slice.EditorTools
         public const float HungOut = 0.04f; // m
 
         /// <summary>
-        /// Loose props (kit standard §4, owner 2026-11-06): the kinds that have mass and gravity, and their mass, kg.
-        /// Authoring defaults. Every other block is still.
+        /// Loose props (kit standard §4, owner 2026-11-06): the kinds that have mass and gravity, and their mass, kg, as
+        /// the real thing of its size weighs: oak furniture, a full barrel, a cast-iron bench (owner's fourth play test,
+        /// 2026-11-06: tables and benches flew from a touch). Authoring defaults. Every other block is still. With a
+        /// walker's push of 200 N and friction 0.6, what weighs over 34 kg does not slide.
         /// </summary>
         public static readonly IReadOnlyDictionary<string, float> LooseMass = new Dictionary<string, float>
         {
-            ["Crate"] = 15f, ["Barrel"] = 60f, ["Barrels"] = 150f, ["Box"] = 10f, ["Firewood"] = 12f, ["TrashCan"] = 8f,
-            ["Bench"] = 30f, ["BottleTable"] = 25f, ["WeaponTable"] = 30f, ["Table"] = 25f, ["TablePlain"] = 20f,
-            ["Chair"] = 6f, ["Pew"] = 40f, ["Candles"] = 4f, ["Books"] = 2f, ["Retort"] = 3f,
-            ["BkChair"] = 6f, ["BkStool"] = 4f, ["BkBasket"] = 2f, ["BkBasketB"] = 2f, ["BkLogs"] = 12f, ["BkGlobe"] = 5f,
-            ["BkCauldron"] = 15f, ["BkDiningTable"] = 30f, ["BkKitchenTable"] = 25f, ["BkDesk"] = 35f, ["BkSideTable"] = 12f,
-            ["BkRoundTable"] = 25f, ["BkWorkTable"] = 35f, ["BkArmsTable"] = 40f, ["BkLabBench"] = 40f, ["BkTavernTable"] = 25f,
+            ["Crate"] = 30f, ["Barrel"] = 140f, ["Barrels"] = 400f, ["Box"] = 15f, ["Firewood"] = 20f, ["TrashCan"] = 15f,
+            ["Bench"] = 60f, ["BottleTable"] = 45f, ["WeaponTable"] = 60f, ["Table"] = 45f, ["TablePlain"] = 35f,
+            ["Chair"] = 7f, ["Pew"] = 90f, ["Candles"] = 5f, ["Books"] = 4f, ["Retort"] = 3f,
+            ["BkChair"] = 7f, ["BkStool"] = 4f, ["BkBasket"] = 2f, ["BkBasketB"] = 2f, ["BkLogs"] = 20f, ["BkGlobe"] = 8f,
+            ["BkCauldron"] = 30f, ["BkDiningTable"] = 60f, ["BkKitchenTable"] = 45f, ["BkDesk"] = 70f, ["BkSideTable"] = 15f,
+            ["BkRoundTable"] = 40f, ["BkWorkTable"] = 70f, ["BkArmsTable"] = 80f, ["BkLabBench"] = 120f, ["BkTavernTable"] = 50f,
         };
 
         /// <summary>A set's thing, kg, by its file (authoring defaults, 2026-11-06).</summary>
         internal static float ThingMass(string file) =>
             file.StartsWith("Books") || file.StartsWith("LabSetup") || file.StartsWith("Caldron") || file.StartsWith("Globe") ? 3f
-            : file.StartsWith("Sword") || file.StartsWith("Axe") ? 1.5f
-            : file.StartsWith("Book") || file.StartsWith("Oillamp") || file.StartsWith("Candle") || file.StartsWith("Jar") || file.StartsWith("Basket") ? 1f
+            : file.StartsWith("Axe") ? 2.5f
+            : file.StartsWith("Sword") || file.StartsWith("Jar") || file.StartsWith("Oillamp") ? 1.5f
+            : file.StartsWith("Book") || file.StartsWith("Basket") ? 1f
+            : file.StartsWith("Bottle") ? 0.8f
+            : file.StartsWith("Candle") ? 0.3f
             : file.StartsWith("Apple") ? 0.2f
             : 0.5f;
 
@@ -295,6 +300,7 @@ namespace GameDev.Slice.EditorTools
             var railing = S("Railing", "Street", "Railing", "Assets/Modular Victorian City/Prefabs/Modules", "Fence", pr, anchor: Anchor.Linear);
             railing.SizeX = 2f;
             railing.SizeY = 1.04f; // its collider then stands 1.2 m: low cover is 0.8–1.2 m (kit standard §3); at 1.36 m it read as high cover (grid check, 2026-11-06)
+            railing.Uniform = false; // 2 m long whatever its height: a uniform scale left it short of its 2 m and the line full of holes (owner's fourth play test, 2026-11-06)
             yield return railing;
             // The same railing 1 m long, for the odd metre of a line (owner's play test, 2026-11-06: gaps in railings).
             var railingShort = S("RailingShort", "Street", "Railing", "Assets/Modular Victorian City/Prefabs/Modules", "Fence", pr, anchor: Anchor.Linear);
@@ -459,7 +465,8 @@ namespace GameDev.Slice.EditorTools
                 (It("Ingredients"), "ClutterBowl03Ing01", 0.25f, 0.5f), (It("Dishes"), "ClutterBowl02", 0.55f, 0.4f),
                 (It("Organic"), "Apple", 0.75f, 0.6f), (It("Dishes"), "ClutterPichet03", 0.88f, 0.4f));
             yield return Set("BkDesk", "WoodTableSquare01b", pr, Body.Box, Anchor.Back,
-                (It("Books"), "Books1", 0.3f, 0.6f), (It("Books"), "Book01", 0.62f, 0.4f),
+                // Books that lie: BK's row Books1 overhung the top and its single books stood on their edges and toppled (2026-11-06).
+                (It("Books"), "Book09", 0.25f, 0.5f), (It("Books"), "Book10", 0.55f, 0.45f),
                 (It("Lights"), "Oillamp01_on", 0.88f, 0.6f));
             yield return Set("BkCounter", "WoodTableSquare01b", pr, Body.Box, Anchor.Front,
                 (It("Bottles"), "Bottle01", 0.12f, 0.5f), (It("Bottles"), "Bottle02", 0.22f, 0.6f),
@@ -670,23 +677,14 @@ namespace GameDev.Slice.EditorTools
                 AddBody(root, spec.Body, spec.On != null ? Seen(baseModel) : b, width, depth, linear, spec.OpenWidth, spec.OpenHeight, spec.LineBody);
             }
 
-            if (things.Count > 0 && spec.Body == Body.None)
-            {
-                // A still set seen and never solid (a shelf) still holds its things up.
-                baseModel.AddComponent<ThingSurface>();
-                foreach (var filter in baseModel.GetComponentsInChildren<MeshFilter>())
-                {
-                    if (filter.sharedMesh != null)
-                    {
-                        filter.gameObject.AddComponent<MeshCollider>().sharedMesh = filter.sharedMesh;
-                    }
-                }
-            }
-
+            // A shelf hung on a wall keeps its things still, as part of it: packed against the wall and the board, they
+            // were flung out when woken (owner's fourth play test, 2026-11-06). Things on a table, a desk, a counter, or a
+            // dresser are loose.
+            var looseThings = spec.Body != Body.None;
             SetLayer(root, spec.Layer);
             foreach (var (thing, file) in things)
             {
-                if (Loose(thing, thing, ThingMass(file), true))
+                if (looseThings && Loose(thing, thing, ThingMass(file), true))
                 {
                     SetLayer(thing, KitLayers.NoGrid); // a bottle on the floor never closes a cell
                 }
@@ -1015,7 +1013,8 @@ namespace GameDev.Slice.EditorTools
             var ray = new Ray(new Vector3(x, fallback + 1f, z), Vector3.down);
             foreach (var filter in model.GetComponentsInChildren<MeshFilter>())
             {
-                if (filter.sharedMesh == null)
+                // Only what is seen, as the loose prop's hulls are: a hidden mesh held a book 0.15 m over a desk (2026-11-06).
+                if (filter.sharedMesh == null || !filter.TryGetComponent<MeshRenderer>(out var seen) || !seen.enabled)
                 {
                     continue;
                 }

@@ -350,10 +350,12 @@ namespace GameDev.Slice.EditorTools
             switch (id)
             {
                 case VeilmouthScene.SootAndBellId:
-                    Put("BarCounter", 12, 5, 2).name = "Bar";
+                    // The bar stands 1.5 m before its back cabinet, the keeper between, so the taproom keeps its floor
+                    // (owner's fourth play test, 2026-11-06: the bar stood out in the room, far from its keeper).
+                    Put("BarCounter", 12, 8, 2).name = "Bar";
                     Against("BarCabinet", S, 12, 12);
-                    Put("Barrel", 16, 9);
-                    Put("Barrel", 17, 9);
+                    Put("Barrel", 17, 10);
+                    Put("Barrel", 18, 10);
                     Against("BkStove", E, 0, 5).name = "Fireplace";
                     Hang("BkPainting", E, 0, 8, 1.6f);
                     foreach (var (tx, tz) in new[] { (3, 1), (3, 7), (15, 1) })
@@ -382,7 +384,7 @@ namespace GameDev.Slice.EditorTools
                     Hang("BkPainting", E, 8, 13, 1.9f);
                     Hang("BkPainting", W, 20, 13, 1.9f);
                     Put("BkTrunk", 13, 12);
-                    VeilmouthDressing.Person("Yellow", false, 15.3f, 9.1f, 180f, "Tavern keeper", 0f);
+                    VeilmouthDressing.Person("Yellow", false, 15.3f, 10.4f, 180f, "Tavern keeper", 0f);
                     VeilmouthDressing.Person("Brown", false, 2.0f, 8.7f, 90f, "Veinmarket at a table", 0f);
                     break;
 

@@ -22,13 +22,35 @@ namespace GameDev.Slice.Tests
         [UnityTest]
         public IEnumerator InVeilmouthWokenPropsRestWhereTheyStand() => Settles("Assets/Scenes/Slice/Veilmouth.unity");
 
+        // Every other interior too (owner's fourth play test, 2026-11-06: things hung in the air in a room).
+        [UnityTest]
+        public IEnumerator InEveryOtherInteriorWokenPropsRestWhereTheyStand(
+            [Values("FactionHouse", "OldChapel", "MissingRoom", "WardensLockup", "SootStairCellar", "Dwelling")] string scene) =>
+            Settles($"Assets/Scenes/Slice/Interiors/{scene}.unity");
+
         [UnityTest]
         public IEnumerator ThePlayerPushesAChair()
         {
             yield return LoadScene("Assets/Scenes/Slice/Interiors/SootAndBell.unity");
             var chair = Object.FindObjectsByType<LooseProp>(FindObjectsInactive.Exclude)
-                .Where(p => !p.IsThing && Mathf.Approximately(p.GetComponent<Rigidbody>().mass, 6f)).OrderBy(p => p.name).FirstOrDefault();
+                .Where(p => !p.IsThing && p.name.Contains("Chair")).OrderBy(p => p.name).FirstOrDefault();
             Assert.IsNotNull(chair, "the tavern has a chair");
+            yield return Push(chair, 0.1f, true);
+        }
+
+        /// <summary>A table weighs too much to slide from a walker's push (owner's fourth play test, 2026-11-06).</summary>
+        [UnityTest]
+        public IEnumerator ThePlayerDoesNotShoveATable()
+        {
+            yield return LoadScene("Assets/Scenes/Slice/Interiors/SootAndBell.unity");
+            var table = Object.FindObjectsByType<LooseProp>(FindObjectsInactive.Exclude)
+                .Where(p => !p.IsThing && p.name.Contains("TavernTable")).OrderBy(p => p.name).FirstOrDefault();
+            Assert.IsNotNull(table, "the tavern has a table");
+            yield return Push(table, 0.05f, false);
+        }
+
+        private IEnumerator Push(LooseProp chair, float limit, bool moves)
+        {
             var player = Object.FindAnyObjectByType<PushLooseProps>();
             Assert.IsNotNull(player, "the player pushes props");
             var controller = player.GetComponent<CharacterController>();
@@ -55,7 +77,14 @@ namespace GameDev.Slice.Tests
             }
 
             var moved = Vector3.ProjectOnPlane(chair.transform.position - start, Vector3.up).magnitude;
-            Assert.Greater(moved, 0.1f, $"{chair.name} is pushed");
+            if (moves)
+            {
+                Assert.Greater(moved, limit, $"{chair.name} is pushed");
+            }
+            else
+            {
+                Assert.Less(moved, limit, $"{chair.name} stands");
+            }
         }
 
         private IEnumerator Settles(string scene)
