@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 1.64
+Version: 1.65
 
 Status: Draft
 
-Last Updated: 2026-11-05 (the C1 city built once by `VeilmouthCity`; the scene is then the owner's)
+Last Updated: 2026-11-06 (breaking into dwellings, by the owner)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -412,6 +412,7 @@ An entry marked † is the short binding form. Its full text is in [91 Agent Dec
 - Information comes from biased partial Information Sources; no omniscient quest spoiler log that replaces world reading.
 - † **Vertical Slice target** ([11 Vertical Slice](11%20Vertical%20Slice.md)): the first implementation target. One city and a small territory at player Limits 9–8; a Factionless character may join the faction through a first-day trial; the Spirit General comes out on day 1–2, the ritual starts at once, the General leaves after 15–20 ticks, and the player stops the ritual and wins or loses. Required in a limited form, as 11 sets out: free exploration, gathering, Item Creation, Alchemy, First Aid, shops and money, theft, combat, dialogue with checks, stealth, time, sleep. Brewing and theft are Reaction Checks, and durability is off. Out: Enchanting, Death Gap, Legacy Cache, Arcana change. The owner's answers of 2026-11-04 (beast territories, gathering and lessons, Yield, one Suspend Save, schedules, Ritual Site Candidates) are in the record. The slice is one hand-built scene assembled from a modular kit, with real assets from the start, and its ground is authored content, not a terrain generator or bake path: the agent shapes it once from the city plan, and the owner then changes it by hand (owner, 2026-11-05).
 - **Slice assets** (owner, 2026-11-05): [SLICE_ASSET_MAP.md](unity/Assets/Plans/SLICE_ASSET_MAP.md) names the pack for each mechanic, character, and place of the slice; a pack outside it needs the owner. The medieval packs are temporary stand-ins for the era, and characters are colour-coded Human Character Dummies. Vendor models enter scenes only as kit wrappers from `SliceKitCatalogue`; the agent's passes (`VeilmouthDressing` for C0, `VeilmouthCity` for C1, 2026-11-05) never run twice, and the scene is then the owner's. After the owner's play test, interiors come from BK_AlchemistHouse and common trees and grass from Polytope Studio's green ones; the city plan C1 (`VEILMOUTH_CITY_PLAN.md`), accepted by the owner, replaces C0's layout; a street at 45° stands under a `KitFrame`, at least 3 m wide (grid check, C1 §12).
+- **Break-ins** (owner, 2026-11-06; [10.3](10.3%20Stealth%20and%20Detection.md) §6.1–6.2, [10.4](10.4%20Dialogue%20and%20Social%20Checks.md) §6): every dwelling opens into one generated Dwelling scene; a lock is a Reaction Check of Theft and Dexterity with Lockpicks; anyone outside who sees it notices, residents inside; a witness fetches a Warden, and an Arrest keeps the Arguments rule; a Stash reads from who lives there.
 - Vertical Slice mood: Lord of the Mysteries-like 18–19th century industrial-occult transition; the slice's city is Veilmouth, and Lower Veil is one of its districts; only the internal-order faction is joinable; Wardens and Veinmarket are local groups; placeholder names mutable.
 
 ## Engine and terrain

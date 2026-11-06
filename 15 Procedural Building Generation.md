@@ -1,10 +1,10 @@
 # 15 Procedural Building Generation
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft
 
-Last Updated: 2026-11-02 (fences, boundaries, lamps, and props need colliders. Earlier: Confront runs in place, so generated buildings feed the Combat Grid.)
+Last Updated: 2026-11-06 (the slice's Dwellings, by the owner: every dwelling is a Portal building whose rooms one shared scene assembles from its type and seed. Earlier: fences, boundaries, lamps, and props need colliders. Earlier: Confront runs in place, so generated buildings feed the Combat Grid.)
 
 Depends On:
 [11 Vertical Slice](11%20Vertical%20Slice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [90 Glossary](90%20Glossary.md)
@@ -102,6 +102,8 @@ Vertical / openings / dress / secrets / gameplay bindings
 ```
 
 Confront runs in place on a Combat Grid built from the scene ([16](16%20Architecture%20Pivot.md)), so generated pieces must carry what the grid needs. Fences, boundaries, lamps, and props get colliders, which they lack today.
+
+**The slice's Dwellings** (owner, 2026-11-06). In the Vertical Slice every dwelling is a Portal building, because breaking in is gameplay ([10.3 Stealth and Detection](10.3%20Stealth%20and%20Detection.md) §6.1). One shared **Dwelling** scene runs this assembly on entry from the house's archetype and seed: one home of two to four rooms on the floor of its door, a single flat in a tenement, built from BK_AlchemistHouse's pieces at ×1.2 with its furniture at ×1.0. The same house always gives the same rooms, and its state is kept for the run. The seven buildings that open into their own interiors stay hand-assembled from the same kit. Rooms by archetype, authoring defaults ([VEILMOUTH_CITY_PLAN.md](unity/Assets/Plans/VEILMOUTH_CITY_PLAN.md) §8): a terrace has a hall, parlour, kitchen and bedroom; a tenement flat a room and a kitchen, or one room; a shop a shop room, back room and kitchen; a villa a hall, parlour, dining room, kitchen and study; a warehouse a store and an office.
 
 ## Hard rules
 

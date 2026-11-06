@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1)
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft — accepted by the owner, 2026-11-05; sizes remain authoring defaults
 
-Last Updated: 2026-11-05 (§13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-06 (§8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
@@ -200,6 +200,16 @@ Built from BK_AlchemistHouse (owner, 2026-11-05): `IntWall01a/b`, `IntWall01door
 | Cellar | three vaults of 6 × 6 m joined by arches, barrels, the circle's place |
 | Old chapel | nave 8 × 16 m with pews; vestry 4 × 5 m |
 
+**Dwellings** (owner, 2026-11-06; [15](../../../15%20Procedural%20Building%20Generation.md), [10.3](../../../10.3%20Stealth%20and%20Detection.md) §6.1). Every other house opens into one shared Dwelling scene, which assembles its rooms on entry from the house's type and id with the same kit: one home of two to four rooms on the floor of its door, a single flat in a tenement, the same each time, its picked door and taken Stash kept for the run. Rooms (authoring defaults):
+
+| House | Rooms | Wealth |
+|---|---|---|
+| Terrace | hall, parlour 5 × 4 m, kitchen, bedroom | middling; rich on the Ridge |
+| Tenement | one flat: a room 5 × 4 m and a kitchen, or one room | poor |
+| Shop | shop room, back room, kitchen | middling; poor in Lower Veil |
+| Villa | hall, parlour, dining room, kitchen, study | rich |
+| Warehouse | store, office | poor |
+
 ---
 
 # 9. The ground
@@ -251,6 +261,7 @@ Checked by `VeilmouthSceneTests` (the heights above, the edge's slope, the roads
 2. The ground (§9).
 3. ~~The plot builder and the city (§3–§7); the C0 Map zones become C1's; tests follow.~~ Done 2026-11-05 (§13).
 4. The seven interiors (§8).
+4a. The Dwelling scene and its generator (§8), then a door on every dwelling, and breaking in with witnesses, the Wardens and the Arrest ([10.3](../../../10.3%20Stealth%20and%20Detection.md) §6.1–6.2, [10.4](../../../10.4%20Dialogue%20and%20Social%20Checks.md) §6).
 5. ~~Trees and green (§6.2).~~ Done with the city (§13); the courts' and gardens' details remain.
 6. Walk it, render it, and hand it to the owner.
 
