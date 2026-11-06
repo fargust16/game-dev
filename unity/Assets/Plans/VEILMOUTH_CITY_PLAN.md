@@ -402,7 +402,7 @@ Step 4a's first half: the shared Dwelling scene, the generator it runs, and a st
 
 **Checked:** 56 sample homes, seven kinds at their wealth, eight each, with no kit fault, each with its rooms, at least two pieces a room, and a door that leads back. Renders of 14 are in `Logs/SliceSurvey/dwelling_*.png` (*GameDev → Slice → Render Dwellings*). Tests pass: `DwellingTests` with the city's, kit's, and portals' tests (63 in EditMode); a PlayMode test walks into a terrace, a tenement, a shop, a villa, and a warehouse of Veilmouth and back out (26 in PlayMode).
 
-**Not built yet**, each waiting on its milestone:
+**Not built yet**, each waiting on its milestone; the owner chose to wait for them rather than build stand-ins ahead (2026-11-06):
 
 - The lock: a dwelling's door opens freely. Picking it is a Reaction Check of Theft and Dexterity with Lockpicks (10.3 §6.1), which needs the Reaction Check and inventory of S5a.
 - Witnesses who see a break-in from outside, and residents inside: Vision Cones and the Notice Meter of S3.
