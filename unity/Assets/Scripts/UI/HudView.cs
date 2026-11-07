@@ -31,6 +31,9 @@ namespace GameDev.UI
         private Label _readingText;
         private VisualElement _notes;
         private ScrollView _notesList;
+        private VisualElement _map;
+        private CityMapElement _mapView;
+        private const string MapVisible = "hud__map--visible";
         private long _shownTick = -1;
         private PlayerLocomotion _player;
         private Portal[] _portals;
@@ -99,12 +102,48 @@ namespace GameDev.UI
                 _notesList.Add(label);
             }
 
+            CloseMap();
             _notes.AddToClassList(NotesVisible);
         }
 
         public void CloseNotes()
         {
             _notes?.RemoveFromClassList(NotesVisible);
+        }
+
+        public bool IsMapOpen => _map != null && _map.ClassListContains(MapVisible);
+
+        /// <summary>The marks the map shows now.</summary>
+        public IReadOnlyList<MapMark> MapMarks => _mapView != null ? _mapView.Marks : new MapMark[0];
+
+        /// <summary>Opens the map (S1.6) on the city plan with these marks and the player, or refreshes it while open.</summary>
+        public void ShowMap(string planSvg, IReadOnlyList<MapMark> marks, Vector3? player)
+        {
+            if (!Bind() || _map == null)
+            {
+                return;
+            }
+
+            if (_mapView == null)
+            {
+                _mapView = new CityMapElement { pickingMode = PickingMode.Ignore };
+                _mapView.style.flexGrow = 1;
+                _map.Q<VisualElement>("map-area").Add(_mapView);
+            }
+
+            if (!_mapView.HasPlan && !string.IsNullOrEmpty(planSvg))
+            {
+                _mapView.SetPlan(planSvg);
+            }
+
+            _mapView.SetMarks(marks, player);
+            CloseNotes();
+            _map.AddToClassList(MapVisible);
+        }
+
+        public void CloseMap()
+        {
+            _map?.RemoveFromClassList(MapVisible);
         }
 
         private void Start()
@@ -139,6 +178,7 @@ namespace GameDev.UI
             _readingText = root.Q<Label>("reading-text");
             _notes = root.Q<VisualElement>("notes");
             _notesList = root.Q<ScrollView>("notes-list");
+            _map = root.Q<VisualElement>("map");
             if (_time == null || _prompt == null || _reading == null || _readingTitle == null || _readingText == null || _notes == null || _notesList == null)
             {
                 _time = null;

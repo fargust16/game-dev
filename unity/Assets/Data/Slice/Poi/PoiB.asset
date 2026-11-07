@@ -30,5 +30,5 @@ MonoBehaviour:
     raises:
     - aftermath.loom_lane.snatch_spoiled
     - aftermath.loom_lane.trail_colder
-  place: {x: 0, y: 0, z: 0}
-  hintRadius: 30
+  place: {x: 160, y: 26, z: -295}
+  hintRadius: 35

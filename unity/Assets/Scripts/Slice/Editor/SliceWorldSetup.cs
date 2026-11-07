@@ -25,21 +25,36 @@ namespace GameDev.Slice.EditorTools
         internal static SliceWorldDriver AddWorld()
         {
             var driver = new GameObject("SliceWorld").AddComponent<SliceWorldDriver>();
-            driver.Configure(
-                AssetDatabase.LoadAssetAtPath<SliceSettings>(SettingsPath),
-                new[] { "PoiA", "PoiB", "PoiC" }.Select(n => AssetDatabase.LoadAssetAtPath<PoiDefinition>(PoiFolder + n + ".asset")).ToArray(),
-                AssetDatabase.LoadAssetAtPath<TipCatalogue>(PoiFolder + "Tips.asset"));
-            EditorUtility.SetDirty(driver);
+            Set(driver);
             return driver;
         }
 
+        /// <summary>The driver's assets: the settings, the POIs, the tips, and the city plan C2 for the map (S1.6).</summary>
+        private static void Set(SliceWorldDriver driver)
+        {
+            driver.Configure(
+                AssetDatabase.LoadAssetAtPath<SliceSettings>(SettingsPath),
+                new[] { "PoiA", "PoiB", "PoiC" }.Select(n => AssetDatabase.LoadAssetAtPath<PoiDefinition>(PoiFolder + n + ".asset")).ToArray(),
+                AssetDatabase.LoadAssetAtPath<TipCatalogue>(PoiFolder + "Tips.asset"),
+                AssetDatabase.LoadAssetAtPath<TextAsset>(PlanPath));
+            EditorUtility.SetDirty(driver);
+        }
+
+        private const string PlanPath = "Assets/Data/Slice/Map/VeilmouthC2Plan.xml";
+
+        /// <summary>Adds what Veilmouth lacks of the world, and sets the existing driver's assets again (S1.6 added the plan).</summary>
         [MenuItem("GameDev/Slice/World/Add the Slice World and the Notice Board to Veilmouth (once)")]
         public static void AddToVeilmouth()
         {
             var scene = EditorSceneManager.OpenScene(VeilmouthPath, OpenSceneMode.Single);
-            if (Object.FindAnyObjectByType<SliceWorldDriver>() == null)
+            var existing = Object.FindAnyObjectByType<SliceWorldDriver>();
+            if (existing == null)
             {
                 AddWorld();
+            }
+            else
+            {
+                Set(existing);
             }
 
             var board = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Transform>(true))

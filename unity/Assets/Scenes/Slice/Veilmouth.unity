@@ -171353,6 +171353,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
   - {fileID: 11400000, guid: 1afbb87f59ce4488b916e8e08b724d91, type: 2}
   tips: {fileID: 11400000, guid: 2d6a9e5f2e884da4abd1b13c1146f7c7, type: 2}
+  cityPlan: {fileID: 4900000, guid: 0c36fdce9a0ff384a90958a1e6b90bac, type: 3}
+  cityScene: Veilmouth
 --- !u!4 &2121016870
 Transform:
   m_ObjectHideFlags: 0
