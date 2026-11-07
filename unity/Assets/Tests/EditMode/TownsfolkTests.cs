@@ -34,7 +34,9 @@ namespace GameDev.Slice.Tests
         {
             var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             var people = scene.GetRootGameObjects().First(g => g.name == VeilmouthCity.RootName).transform.Find("People");
-            Assert.IsFalse(people.Cast<Transform>().Any(t => PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject) is GameObject s && s.name.Contains("Yellow")), "no yellow Dummy is left");
+            // A named person (S1.5) may be a yellow Dummy, as Kit Mallow is; only the unnamed townsfolk walk.
+            Assert.IsFalse(people.Cast<Transform>().Any(t => t.GetComponent<GameDev.Slice.People.NamedPerson>() == null
+                && PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject) is GameObject s && s.name.Contains("Yellow")), "no unnamed yellow Dummy is left");
             var walkers = people.GetComponentsInChildren<TownsfolkWalker>();
             Assert.AreEqual(15, walkers.Length);
             var women = walkers.Count(w => PrefabUtility.GetCorrespondingObjectFromSource(w.gameObject) is GameObject s && s.name == "Townswoman");
