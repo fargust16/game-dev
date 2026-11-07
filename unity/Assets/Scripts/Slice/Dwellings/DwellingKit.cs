@@ -24,7 +24,39 @@ namespace GameDev.Slice.Dwellings
             public Rect body;
         }
 
+        /// <summary>
+        /// A window wall's glass, measured in the editor (VICTORIAN_INTERIORS_PLAN §5): its rectangle in metres from the
+        /// segment's middle along the wall and up from the floor, and how far into the room from the wall's line it stands.
+        /// </summary>
+        [Serializable]
+        public sealed class Glass
+        {
+            public string key;
+            public float u0, u1, y0, y1, depth;
+        }
+
         [SerializeField] private List<Block> blocks = new List<Block>();
+
+        [Tooltip("The pack's fire, lit in each fireplace.")]
+        [SerializeField] private GameObject fire;
+
+        [Tooltip("Our own unlit material of a window's lit pane; its colour follows the sky.")]
+        [SerializeField] private Material pane;
+
+        [SerializeField] private List<Glass> glass = new List<Glass>();
+
+        public GameObject Fire => fire;
+
+        public Material Pane => pane;
+
+        public Glass GlassOf(string key) => glass.Find(g => g.key == key);
+
+        public void SetLight(GameObject fireSource, Material paneMaterial, IEnumerable<Glass> windows)
+        {
+            fire = fireSource;
+            pane = paneMaterial;
+            glass = new List<Glass>(windows);
+        }
 
         private Dictionary<string, Block> _byKey;
 

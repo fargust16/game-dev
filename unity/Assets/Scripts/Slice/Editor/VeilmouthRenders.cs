@@ -171,13 +171,20 @@ namespace GameDev.Slice.EditorTools
                         Debug.LogWarning($"[Dwelling] {archetype} {wealth} #{n}: {f}");
                     }
 
-                    foreach (var c in root.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("Kit_BkRoom_Ceiling")))
-                    {
-                        c.gameObject.SetActive(false);
-                    }
-
+                    // Storey by storey, with everything above it hidden, as the seven are rendered (VI-3, VI-4).
                     var b = Bounds();
-                    Top($"dwelling_{archetype}_{wealth}_{n}".ToLowerInvariant(), b.center, Mathf.Max(b.extents.x, b.extents.z) + 0.5f);
+                    var renderers = root.GetComponentsInChildren<Renderer>(true);
+                    for (var storey = 0; storey < plan.Floors; storey++)
+                    {
+                        var top = ((storey + 1) * Dwellings.DwellingPlan.Storey) - 0.25f;
+                        foreach (var r in renderers)
+                        {
+                            r.enabled = r.bounds.min.y < top;
+                        }
+
+                        var suffix = storey == 0 ? string.Empty : $"_floor{storey + 1}";
+                        Top($"dwelling_{archetype}_{wealth}_{n}{suffix}".ToLowerInvariant(), b.center, Mathf.Max(b.extents.x, b.extents.z) + 0.5f);
+                    }
                 }
             }
 

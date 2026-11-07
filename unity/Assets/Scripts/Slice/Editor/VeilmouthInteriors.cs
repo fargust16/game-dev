@@ -43,10 +43,10 @@ namespace GameDev.Slice.EditorTools
 
         private const float LampIntensity = 2.5f;
 
-        private const string FirePath = "Assets/Victorian Interiors/Victorian Interiors/Prefabs/Particle System.prefab";
+        internal const string FirePath = "Assets/Victorian Interiors/Victorian Interiors/Prefabs/Particle System.prefab";
 
         // Measured (probe front views of 2026-11-07, m from the window's middle): the glass painted on each window wall.
-        private static readonly Dictionary<string, (float U0, float U1, float Y0, float Y1, float ProbeU, float ProbeY)> Glass = new()
+        internal static readonly Dictionary<string, (float U0, float U1, float Y0, float Y1, float ProbeU, float ProbeY)> Glass = new()
         {
             ["ViPaperWindow"] = (-0.68f, 0.68f, 0.71f, 2.85f, 0.45f, 2.4f),
             ["ViDarkWindow"] = (-0.46f, 0.46f, 1.17f, 2.94f, 0.35f, 2.75f),

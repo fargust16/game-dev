@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.4
+Version: 0.5
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-3 done, VI-4 and VI-5 wait for the owner
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-4 done, VI-5 waits for the owner
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-07 (VI-3: storeys, the stair and its well, the Soot & Bell's let rooms upstairs, the Combat Grid on the storey of the fight; what changed is in §8. The earlier note is in §10)
+Last Updated: 2026-11-07 (VI-4: the Dwellings rebuilt from Victorian Interiors, with §4's rooms, washing by wealth, and rich houses on three floors joined by a switchback stair; what changed is in §8. The earlier note is in §10)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -224,7 +224,7 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 | **VI-1 Kit** | Wrap the pack as `ViRoom` and `ViFurniture`: colliders, layers, 1 m placement, back-anchored footprints, pivots corrected. Measure what §3 lists. One sample room of each finish, rendered. | the kit check passes on every wrapper; §3's measurements are recorded here. **Done 2026-11-07:** 74 wrappers, three sample rooms and a gallery of 298 blocks with no kit fault (`VictorianInteriorsSamples`, `VictorianKitTests`) |
 | **VI-2 The seven, ground floors and light** | `VeilmouthInteriors` on the 3 m module with `ViRoom`; §7's rooms dressed from `ViFurniture` and §6; fireplaces, curtains, lamps and candles; daylight through each window's lit pane and spot, from the clock (§5). | the seven build with no kit fault; the portal, people and S1 tests pass; renders at noon and at night. **Done 2026-11-07:** the seven with 55–207 blocks each and no kit fault; 24 EditMode and 29 PlayMode tests pass; renders `room_*_noon`, `room_*_night` and `roomeye_*` |
 | **VI-3 Stairs and floors** | The assembler learns storeys: a floor at each 3.5 m plus the ceiling, a stair well, the stair and banister, ceilings that are the next floor, the camera kept under each storey. The Combat Grid reads the storey the fight is on. The Soot & Bell's let rooms go upstairs (owner, §9). | a character walks up and down every stair; the Combat Grid builds on an upper floor; tests. **Done 2026-11-07:** the Soot & Bell on two storeys with no kit fault; the player walks the stair up and down (`StairTests`); a fight on the landing reads the landing and reaches the hall down the stair (`CombatGridStoreyTests`); 25 EditMode and 30 PlayMode tests pass |
-| **VI-4 Dwellings** | `DwellingPlanner` gains §4's room types and the washing by wealth; rich houses get their storeys from the baked house; furnishing lists move to `ViFurniture`; the Stash keeps its rooms and chances. | the sample homes plan and build with no kit fault, each wealth and kind; the PlayMode walk into each kind and back; renders |
+| **VI-4 Dwellings** | `DwellingPlanner` gains §4's room types and the washing by wealth; rich houses get their storeys from the baked house; furnishing lists move to `ViFurniture`; the Stash keeps its rooms and chances. | the sample homes plan and build with no kit fault, each wealth and kind; the PlayMode walk into each kind and back; renders. **Done 2026-11-07:** 14 sample homes, every kind and wealth, with no kit fault; the player walks into each kind and back (`DoorTests`) and up and down both stairs of a rich terrace, villa and shop house (`StairTests`); renders `dwelling_<kind>_<wealth>_<n>` storey by storey |
 | **VI-5 Play test** | The owner walks the seven and a home of each kind. | the owner's remarks, recorded as in city plan §15 |
 
 **What VI-2 changed from §5 and §7** (authoring defaults unless the owner's):
@@ -249,6 +249,20 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 - **Renders.** A storey is rendered with everything above it hidden: `room_<name>` and `room_<name>_floor2`.
 - **Tables.** A walker's push slid the 2 m oak table 5.1 cm at 40 kg; the pack's tables weigh 50 and 40 kg.
 
+**What VI-4 changed and settled** (authoring defaults unless the owner's):
+
+- **Floors.** Every rich terrace, villa and shop house has three floors. §4.1 gives them three or four storeys outside, and an interior keeps at most three. Middling and poor homes, tenement flats and warehouses keep one (owner, §9).
+- **The stair hall.** A rich house's hall is 12 × 12 with a switchback: the first flight climbs east in its middle row to the first floor, the second climbs west in the row behind to the second. Each storey's landing is a Landing room over the hall. A plan mirrored left to right turns both flights.
+- **Rich house, 24 × 21 m.** Ground floor: drawing room 6 × 12, dining room 6 × 12, study 9 × 9 in panelling, kitchen 9 × 9, scullery 6 × 9. First floor: bedroom and second bedroom 6 × 12, dressing room 6 × 9, bathroom 6 × 9, guest room 12 × 9. Second floor: nursery, servant's room, box room. A rich shop house keeps its shop, back room and kitchen downstairs; drawing room, dining room, bathroom and study go to the first floor, bedrooms, servant's room and box room to the second.
+- **Middling and poor homes.** A terrace or villa has a hall, parlour 9 × 9, kitchen 9 × 6 with its hearth, a closet of 3 × 3, a pantry and a bedroom 12 × 6. The closet is the WC in a middling house and a coal store in a poor one (washing by wealth, §9). A middling shop has a shop room 12 × 9, kitchen, WC, store and back room; a poor shop a shop room and a back room. A tenement flat is one room, or a room and a kitchen.
+- **A 6 × 6 kitchen cannot hold a fireplace.** A fireplace stands against an inner wall with a room behind it, and three modules leave no such wall free of the doorways. Kitchens are 9 × 6.
+- **Warehouse.** The store and office take the dark finish, not stone: §9 keeps stone for the cellar vaults, the cells and the chapel's nave only.
+- **Furnishing.** Every room kind has its own list from `ViFurniture`, each item with the wealth it starts from and, where it stops, the wealth it ends at: candles in poor homes, wall lamps in middling and rich, a chandelier and a fireplace in every rich main room, a picture drawn from the pack's eight by the seed. Chairs stand at a table's sides facing it. A desk wider than a module takes two wall segments. A closet of one module keeps only the first row inside its door clear. Crates and barrels stay in stores and box rooms (§6). Two pieces put free never touch: a crate's body juts 1 cm past its cell, and two side by side broke the kit check.
+- **Clearance.** A piece's back stands 0.16 m from the wall line, where the wall's face is. The planner's clearance is 0.155 m, because the kit check allows 0.01 m.
+- **The Stash** is still BK's trunk, a themed prop the pack lacks (§6), in the first of the bedroom, study, room, back room, dressing room, office, box room, store and kitchen that the home has, at 50 / 60 / 70 % by wealth, as before.
+- **Light.** Every window has a curtain, a lit pane and its spot; every hearth burns; the scene's lights follow the clock as in the seven (§5). The Dwelling scene has no sun of its own.
+- **Renders.** A home is rendered storey by storey with everything above hidden: `dwelling_<kind>_<wealth>_<n>`, `_floor2`, `_floor3`.
+
 **Risks:**
 
 - **A fight on a stair.** The stair is one grid cell wide. Whether a fight there needs a rule of its own (a narrow place, Surrounded impossible) is left to VI-5 and to the Combat Grid's own documents.
@@ -267,4 +281,5 @@ The owner accepted all five recommendations and authorised VI-1. These are now d
 
 ## 10. Update history
 
+- 2026-11-07 (v0.4): VI-3, storeys, the stair and its well, the Soot & Bell's let rooms upstairs, the Combat Grid on the storey of the fight.
 - 2026-11-07 (v0.3): VI-2, the seven rebuilt on the 3 m module, with light from the clock. Earlier: VI-1, the kit families built and measured; the windows are opaque, so daylight comes through lit panes; the owner's answers in §9.

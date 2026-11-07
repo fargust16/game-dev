@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections;
 using System.Linq;
+using GameDev.Slice.Dwellings;
 using GameDev.Slice.Kit;
 using NUnit.Framework;
 using UnityEngine;
@@ -21,8 +22,33 @@ namespace GameDev.Slice.Tests
         public IEnumerator ThePlayerWalksUpAndDownEveryStair([Values("SootAndBell")] string scene)
         {
             yield return LoadScene($"Assets/Scenes/Slice/Interiors/{scene}.unity");
+            yield return WalkEveryStair(scene);
+        }
+
+        /// <summary>A rich house of each kind, built in the Dwelling scene, walked up to its top floor and down (VI-4).</summary>
+        [UnityTest]
+        public IEnumerator ThePlayerWalksEveryStairOfARichHouse([Values("Terrace", "Villa", "Shop")] string archetype)
+        {
+            yield return LoadScene("Assets/Scenes/Slice/Interiors/Dwelling.unity");
+            var runtime = DwellingRuntime.Current;
+            Assert.IsNotNull(runtime, "the Dwelling scene");
+            var kind = (DwellingArchetype)System.Enum.Parse(typeof(DwellingArchetype), archetype);
+            foreach (var x in new[] { 1000, 1037 })
+            {
+                runtime.Build(new DwellingKey(DwellingKey.IdAt(x, 0), "Veilmouth", x, 0, kind, DwellingWealth.Rich));
+                yield return new WaitForFixedUpdate();
+                yield return WalkEveryStair($"a rich {archetype} at {x}", 2);
+            }
+        }
+
+        private IEnumerator WalkEveryStair(string scene, int count = 0)
+        {
             var stairs = Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude).Where(b => b.name == "Stair").ToArray();
             Assert.IsNotEmpty(stairs, $"{scene} has a stair");
+            if (count > 0)
+            {
+                Assert.AreEqual(count, stairs.Length, $"{scene}: a stair to each floor");
+            }
             var controller = Object.FindObjectsByType<CharacterController>(FindObjectsInactive.Exclude)
                 .FirstOrDefault(c => c.GetComponent<PushLooseProps>() != null);
             Assert.IsNotNull(controller, "the player");

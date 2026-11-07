@@ -24,13 +24,6 @@ namespace GameDev.Slice.EditorTools
         public const string DoorsGroup = "Dwelling doors";
         private const string SettingsPath = "Assets/Data/Slice/SliceSettings.asset";
 
-        /// <summary>The architecture of a room and the portal leaf; the furniture comes from the planner's own lists.</summary>
-        private static readonly string[] Architecture =
-        {
-            "BkFloor", "BkStoneFloor", "BkCeiling", "BkPost", "BkWindow", "BkDoor", "PortalLeafRoom",
-            "BkPlaster", "BkPlasterFace", "BkBrick", "BkBrickFace", "BkBrickB", "BkBrickBFace",
-            "BkDoorway", "BkDoorwayFace", "BkPlasterDoorway", "BkPlasterDoorwayFace",
-        };
 
         /// <summary>The dwelling the Dwelling scene builds when opened alone.</summary>
         public static DwellingKey PreviewKey(DwellingArchetype archetype = DwellingArchetype.Terrace, DwellingWealth wealth = DwellingWealth.Middling, int x = 0, int z = 0) =>
@@ -39,8 +32,22 @@ namespace GameDev.Slice.EditorTools
         [MenuItem("GameDev/Slice/Dwellings/Build Kit and Scene")]
         public static void BuildAll()
         {
-            BuildKit(SliceKitCatalogue.BuildAll());
+            // Every other wrapper as it is on disk (the owner's edits stay); the Victorian ones built afresh (VI-4).
+            var catalogue = SliceKitCatalogue.Load();
+            foreach (var kv in SliceKitCatalogue.BuildVictorian())
+            {
+                catalogue[kv.Key] = kv.Value;
+            }
+
+            BuildKit(catalogue);
             BuildScene();
+        }
+
+        /// <summary>The kit, the scene and pictures of sample dwellings, storey by storey (VI-4).</summary>
+        public static void BuildAllAndRender()
+        {
+            BuildAll();
+            VeilmouthRenders.RenderDwellings();
         }
 
         /// <summary>The kit, the scene, the doors on Veilmouth (once), and pictures of sample dwellings.</summary>
@@ -55,7 +62,7 @@ namespace GameDev.Slice.EditorTools
 
         public static DwellingKit BuildKit(Dictionary<string, SliceKitCatalogue.Entry> catalogue)
         {
-            var keys = Architecture.Concat(DwellingPlanner.Keys).Distinct().ToList();
+            var keys = DwellingAssembler.Keys.Concat(DwellingPlanner.Keys).Distinct().ToList();
             var blocks = new List<DwellingKit.Block>();
             foreach (var key in keys)
             {
@@ -80,10 +87,61 @@ namespace GameDev.Slice.EditorTools
             }
 
             kit.SetBlocks(blocks);
+            var glass = new List<DwellingKit.Glass>();
+            foreach (var key in VeilmouthInteriors.Glass.Keys)
+            {
+                if (catalogue.TryGetValue(key, out var entry) && entry.Prefab != null)
+                {
+                    glass.Add(MeasureGlass(key, entry.Prefab));
+                }
+            }
+
+            kit.SetLight(AssetDatabase.LoadAssetAtPath<GameObject>(VeilmouthInteriors.FirePath),
+                SliceKitCatalogue.Colour("ViWindowPane", new Color(0.78f, 0.86f, 0.95f), true), glass);
             EditorUtility.SetDirty(kit);
             AssetDatabase.SaveAssets();
             Debug.Log($"[VeilmouthDwellings] kit written: {blocks.Count} blocks.");
             return kit;
+        }
+
+        /// <summary>
+        /// A window wall's glass (VICTORIAN_INTERIORS_PLAN §5): its rectangle as measured for the seven, and its depth into
+        /// the room found by a ray onto the wall's own meshes, as `VeilmouthInteriors.Daylight` finds it.
+        /// </summary>
+        private static DwellingKit.Glass MeasureGlass(string key, GameObject prefab)
+        {
+            var g = VeilmouthInteriors.Glass[key];
+            var go = (GameObject)Object.Instantiate(prefab);
+            go.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            var probes = new List<MeshCollider>();
+            foreach (var filter in go.GetComponentsInChildren<MeshFilter>())
+            {
+                if (filter.sharedMesh != null && filter.TryGetComponent<MeshRenderer>(out var r) && r.enabled)
+                {
+                    var c = filter.gameObject.AddComponent<MeshCollider>();
+                    c.sharedMesh = filter.sharedMesh;
+                    probes.Add(c);
+                }
+            }
+
+            var backfaces = Physics.queriesHitBackfaces;
+            Physics.queriesHitBackfaces = true;
+            Physics.SyncTransforms();
+            float? best = null;
+            var at = new Vector3((SliceKitCatalogue.ViModule * 0.5f) + g.ProbeU, g.ProbeY, 0f);
+            foreach (var c in probes)
+            {
+                if (c.Raycast(new Ray(at + Vector3.forward, Vector3.back), out var hit, 2f) && (best == null || hit.distance < best))
+                {
+                    best = hit.distance;
+                }
+            }
+
+            Physics.queriesHitBackfaces = backfaces;
+            Object.DestroyImmediate(go);
+            var depth = best.HasValue ? 1f - best.Value : SliceKitCatalogue.ViFace;
+            Debug.Log($"[VeilmouthDwellings] {key}: glass u {g.U0:0.00}..{g.U1:0.00}, y {g.Y0:0.00}..{g.Y1:0.00}, at {depth:0.00} m.");
+            return new DwellingKit.Glass { key = key, u0 = g.U0, u1 = g.U1, y0 = g.Y0, y1 = g.Y1, depth = depth };
         }
 
         /// <summary>A block's solid body in its own metres: the union of its solid colliders, as the layout check takes it.</summary>
@@ -120,6 +178,12 @@ namespace GameDev.Slice.EditorTools
         {
             var kit = AssetDatabase.LoadAssetAtPath<DwellingKit>(KitPath);
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+            // No sun indoors: the pack's windows are opaque, and daylight comes through their lit panes (plan §5).
+            foreach (var sun in Object.FindObjectsByType<Light>(FindObjectsInactive.Include))
+            {
+                Object.DestroyImmediate(sun.gameObject);
+            }
+
             var interior = new GameObject("Interior").AddComponent<InteriorRuntime>();
             interior.Configure(PreviewKey().StreetPortalId);
             var runtime = new GameObject("Dwelling").AddComponent<DwellingRuntime>();
