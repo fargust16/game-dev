@@ -4,7 +4,7 @@ Version: 0.1
 
 Status: Draft
 
-Last Updated: 2026-11-06 (The city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
+Last Updated: 2026-11-07 (Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
 
 Depends On: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §8 and §14, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -27,6 +27,8 @@ A pack outside the asset map needs the owner's approval. Nothing here is a decis
 ## Interiors
 
 Priority A means the room reads as empty or wrong without the model. B means it adds life. C is a detail.
+
+**2026-11-07:** the owner chose Victorian Interiors for every interior ([VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md)). It covers the bookcase, fireplace, armchair and settee, wardrobe (a tall cupboard), wall clock and mirror, wall lamp, curtains, writing desk, and the bucket and washstand pieces below. Still wanted from this list: an iron bedstead and a cell cot, the apothecary chest, an archive cabinet, a counter with scale and till, the chapel's altar and lectern, sacks, bar stools and cask rack, a pot rail, and a wine rack.
 
 | Model | Where (C1 §8) | Size, m (W × D × H) | Priority | Notes |
 |---|---|---|---|---|

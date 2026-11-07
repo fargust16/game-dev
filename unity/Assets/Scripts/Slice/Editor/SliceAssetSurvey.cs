@@ -54,8 +54,30 @@ namespace GameDev.Slice.EditorTools
                 new[] { "IntWall01a", "IntWall01b", "IntWall01door", "IntWall02a", "IntWall02b", "IntWall02door", "IntWall02window01", "IntWoodFloor01", "StoneFloor01", "Floor", "IntCeiling01", "IntCeilingPillarBend", "VerticalPillar", "VerticalPillarBig", "HorizontalPillar", "WoodStairs", "Door", "WoodDoor01", "IntWoodFence01", "Stove", "TableSink", "WoodCupboard01", "WoodCupboard02", "WoodCupboard03", "WoodShelf01", "Drawer01", "WoodDrawer01", "WoodTableSquare01", "Table01", "Table04", "Chair01", "WoodStool", "Workbench", "Trunk01", "Carpet01", "Caldron01", "CaldronTripod01", "LabSetup01", "Oillamp01", "Candle01", "Books1", "Painting01" }),
         };
 
+        // The owner's interior pack (2026-11-07): every prefab, so the interiors are planned from measurements.
+        private const string VictorianInteriors = "Assets/Victorian Interiors/Victorian Interiors/Prefabs";
+
+        private static readonly (string Group, string Folder, string[] Names)[] InteriorGroups =
+        {
+            ("vinterior", VictorianInteriors,
+                Directory.Exists(VictorianInteriors)
+                    ? Directory.GetFiles(VictorianInteriors, "*.prefab", SearchOption.AllDirectories).Select(Path.GetFileNameWithoutExtension).OrderBy(n => n).ToArray()
+                    : new string[0]),
+        };
+
         [MenuItem("GameDev/Slice/Survey Slice Assets")]
         public static void Run()
+        {
+            Survey(Groups);
+        }
+
+        /// <summary>Only the Victorian Interiors pack. Batch: -executeMethod GameDev.Slice.EditorTools.SliceAssetSurvey.RunVictorianInteriors</summary>
+        public static void RunVictorianInteriors()
+        {
+            Survey(InteriorGroups, "vinterior");
+        }
+
+        private static void Survey((string Group, string Folder, string[] Names)[] groups, string reportName = "survey")
         {
             Directory.CreateDirectory(OutputFolder);
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -65,7 +87,7 @@ namespace GameDev.Slice.EditorTools
             RenderSettings.ambientLight = Color.gray;
 
             var report = new StringBuilder("group\tname\tpath\tsize_x\tsize_y\tsize_z\tmin_x\tmin_y\tmin_z\tcolliders\trenderers\tshaders\n");
-            foreach (var group in Groups.GroupBy(g => g.Group))
+            foreach (var group in groups.GroupBy(g => g.Group))
             {
                 var tiles = new List<Texture2D>();
                 foreach (var (_, folder, names) in group)
@@ -92,10 +114,15 @@ namespace GameDev.Slice.EditorTools
                     }
                 }
 
-                File.WriteAllBytes($"{OutputFolder}/{group.Key}.png", Sheet(tiles).EncodeToPNG());
+                // At most 36 tiles a sheet, so a large pack stays readable.
+                for (var start = 0; start < tiles.Count; start += 36)
+                {
+                    var name = tiles.Count > 36 ? $"{group.Key}_{(start / 36) + 1}" : group.Key;
+                    File.WriteAllBytes($"{OutputFolder}/{name}.png", Sheet(tiles.Skip(start).Take(36).ToList()).EncodeToPNG());
+                }
             }
 
-            File.WriteAllText($"{OutputFolder}/survey.tsv", report.ToString());
+            File.WriteAllText($"{OutputFolder}/{reportName}.tsv", report.ToString());
             Debug.Log($"Slice asset survey written to {OutputFolder}.");
         }
 
