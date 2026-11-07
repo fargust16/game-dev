@@ -17,7 +17,7 @@ namespace GameDev.Slice.EditorTools
     /// lies along +X on the grid line through the pivot. Sizes are authoring defaults, read from the survey of 2026-11-05.
     /// Rebuilding replaces the wrappers; the vendor files are never changed.
     /// </summary>
-    public static class SliceKitCatalogue
+    public static partial class SliceKitCatalogue
     {
         public const string Folder = "Assets/Prefabs/SliceKit";
         public const string MaterialFolder = "Assets/Materials/Slice";
@@ -83,6 +83,10 @@ namespace GameDev.Slice.EditorTools
             public bool NoLights;     // removes the vendor's lights (BK's window carries one)
             public float OpenWidth, OpenHeight; // a doorway's opening, m, after Factor
             public (string Folder, string File, float Fx, float Fz)[] On; // a set: things standing on the base's top
+            public float? InfillAt;   // where an Infill wall's infill plane is set, m from its line (WallInfill when unset)
+            public float? Face;       // where a Back or Face piece's back stands, m from the wall's line (BK's when unset)
+            public bool Top;          // what is seen hangs below the pivot: a ceiling, a chandelier
+            public bool Books;        // a bookcase: rows of the pack's books stand on each of its shelves
         }
 
         public sealed class Entry
@@ -136,6 +140,8 @@ namespace GameDev.Slice.EditorTools
             ["BkChair"] = 7f, ["BkStool"] = 4f, ["BkBasket"] = 2f, ["BkBasketB"] = 2f, ["BkLogs"] = 20f, ["BkGlobe"] = 8f,
             ["BkCauldron"] = 30f, ["BkDiningTable"] = 60f, ["BkKitchenTable"] = 45f, ["BkDesk"] = 70f, ["BkSideTable"] = 15f,
             ["BkRoundTable"] = 40f, ["BkWorkTable"] = 70f, ["BkArmsTable"] = 80f, ["BkLabBench"] = 120f, ["BkTavernTable"] = 50f,
+            ["ViChair"] = 7f, ["ViArmchair"] = 14f, ["ViFootstool"] = 5f, ["ViTable"] = 15f, ["ViTableB"] = 12f, ["ViTableRound"] = 15f,
+            ["ViDiningTable"] = 90f, ["ViKitchenTable"] = 45f, ["ViBucket"] = 3f, ["ViBox"] = 5f,
         };
 
         /// <summary>A set's thing, kg, by its file (authoring defaults, 2026-11-06).</summary>
@@ -326,7 +332,7 @@ namespace GameDev.Slice.EditorTools
             poppy.SizeY = 0.5f;
             yield return poppy;
 
-            foreach (var spec in BkSpecs())
+            foreach (var spec in BkSpecs().Concat(ViSpecs()))
             {
                 yield return spec;
             }
@@ -628,7 +634,7 @@ namespace GameDev.Slice.EditorTools
             var linear = spec.Anchor == Anchor.Linear || spec.Anchor == Anchor.Face;
             var node = spec.Anchor == Anchor.Node;
             var width = node ? 0 : spec.Anchor == Anchor.Pivot ? 1 : Mathf.Max(1, Mathf.CeilToInt(b.size.x - 0.05f));
-            var back = spec.Anchor == Anchor.Back ? WallFace : 0f;
+            var back = spec.Anchor == Anchor.Back ? spec.Face ?? WallFace : 0f;
             var depth = linear || node ? 0 : spec.Anchor == Anchor.Pivot ? 1 : Mathf.Max(1, Mathf.CeilToInt(b.size.z + back - 0.05f));
             if (linear)
             {
@@ -642,10 +648,10 @@ namespace GameDev.Slice.EditorTools
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, depth - b.max.z);
                     break;
                 case Anchor.Linear:
-                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, spec.Infill ? WallInfill - InfillPlane(model) : spec.Shift - b.center.z);
+                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, spec.Infill ? (spec.InfillAt ?? WallInfill) - InfillPlane(model) : spec.Shift - b.center.z);
                     break;
                 case Anchor.Back:
-                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, WallFace - b.min.z);
+                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, back - b.min.z);
                     break;
                 case Anchor.Pivot:
                     offset = new Vector3(0.5f, -Mathf.Min(0f, b.min.y), 0.5f);
@@ -654,14 +660,24 @@ namespace GameDev.Slice.EditorTools
                     offset = new Vector3(-b.center.x, -b.min.y, -b.center.z);
                     break;
                 case Anchor.Face:
-                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, WallInfill + spec.Out - b.min.z);
+                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, (spec.Face ?? WallInfill) + spec.Out - b.min.z);
                     break;
                 default:
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, depth * 0.5f - b.center.z);
                     break;
             }
 
+            if (spec.Top)
+            {
+                offset.y = -b.max.y;
+            }
+
             model.transform.localPosition += offset;
+            if (spec.Books)
+            {
+                FillShelves(model, spec.Key);
+            }
+
             b = Seen(model);
 
             var height = Mathf.Max(1, Mathf.RoundToInt(b.size.y));
@@ -925,8 +941,11 @@ namespace GameDev.Slice.EditorTools
                 var half = lineBody ? 0.15f : Mathf.Min(0.3f, max.z - min.z) * 0.5f;
                 min.z = middle - half;
                 max.z = middle + half;
-                min.x = Mathf.Max(min.x, half);
-                max.x = Mathf.Min(max.x, width - half);
+                // A wall set off its line (Victorian Interiors, by its face) stops as far short of each node as it
+                // reaches from the line, so a wall meeting it at a corner still only touches.
+                var reach = lineBody ? 0.15f : Mathf.Max(Mathf.Abs(min.z), Mathf.Abs(max.z));
+                min.x = Mathf.Max(min.x, reach);
+                max.x = Mathf.Min(max.x, width - reach);
             }
             else
             {

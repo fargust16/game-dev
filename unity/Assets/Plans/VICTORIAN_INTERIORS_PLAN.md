@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.1
+Version: 0.2
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the iterations and the open questions in §9 wait for the owner
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 done, VI-2 … VI-5 wait for the owner
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-07 (first draft: the pack chosen for every interior, measured, and the rebuild planned in five iterations)
+Last Updated: 2026-11-07 (VI-1: the kit families built and measured; the windows are opaque, so daylight comes through lit panes; the owner's answers in §9)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -39,7 +39,7 @@ From the survey of 2026-11-07 (`SliceAssetSurvey.RunVictorianInteriors`; `Logs/S
 | Family | Pieces | Measured |
 |---|---|---|
 | Walls | `Wall_1` … `Wall_6`, `Wall_8`, each with `Corner_Inner` and `Corner_Outer`; `Wall_7`, a half wall | 3 × 3.5, 0.22–0.34 thick; `Wall_7` 1.5 high |
-| Wall finishes | `Wall_1`, `Wall_3`: patterned paper over a panelled dado; `Wall_2`: a window over dark wood with patterned paper; `Wall_4`: wood panelling; `Wall_5`: plain dark; `Wall_6`: a window; `Wall_8`: a doorway | from the sheets |
+| Wall finishes | paper over a panelled dado: `Wall_1` plain, `Wall_2` its doorway, `Wall_3` its window; plain dark: `Wall_5`, `Wall_8` its doorway, `Wall_6` its window; `Wall_4`: wood panelling, plain only | measured by the probe, VI-1 |
 | Floor, ceiling | `Floor` (one wooden floor), `Ceiling` | 3 × 3; the ceiling 0.23 thick |
 | Doors | `Door_1`, `Door_2` | 1.37 × 2.12 |
 | Stairs | `Stair`, `Banister`, `Banister_End` | 2.75 wide, 4.69 high, 6.35 long; banister 2.94 long |
@@ -58,7 +58,7 @@ From the survey of 2026-11-07 (`SliceAssetSurvey.RunVictorianInteriors`; `Logs/S
 
 - **Off-centre pivots.** These prefabs have their pivot away from their body: `Books_Group_*`, `BookShelf_3`, `Box_2_2`, `Clock_Small Variant`, `Counter`, `Cupboard_4`, `Hanger_*`, `Lamp_2`, `Plate_2`, `Plate_3`, `Shelf_4`, `Table_Prefab`. Their kit wrappers must correct this (kit standard §1).
 - **Windows.** The pack has no separate window. A window is a window wall, `Wall_2` or `Wall_6`.
-- **Glass.** The window walls carry no glass material. Whether their openings are empty is checked in VI-1.
+- **Glass.** The window walls carry no glass material, and their openings are not empty: the panes are part of the wall's opaque mesh and texture, whose albedo has no alpha (measured, VI-1). No light passes through them (§5).
 - **Floors.** There is one floor material, wood, and no stone floor or stone wall.
 - **The telephone.** `Phone` is not used: the city has no telephone line (authoring default).
 
@@ -88,13 +88,17 @@ These sizes are authoring defaults.
 - `ViRoom` holds the architecture: walls by finish, corners, doorways, window walls, doors, floor, ceiling, stairs, banister.
 - `ViFurniture` holds everything else.
 
-**Measured in VI-1, before any room is built:**
+**Measured in VI-1** (`VictorianInteriorsProbe`, `Logs/SliceSurvey/vinterior_probe.txt`):
 
-- whether a wall is drawn on one side, as BK's were, or on both;
-- the doorway's clear opening against the character's height;
-- whether the windows hold glass;
-- the stair's rise per storey and its slope against the character controller's slope limit;
-- the long-case clock's and bed's true proportions on the sheets: the bed's 3.14 m length suggests a canopy or a footboard bench.
+- **Both sides drawn.** Every wall has equal faces on both sides, so one wall serves two rooms.
+- **Face planes.** A paper wall's dado stands 0.08 m proud of its paper; the dark and panelled walls 0.03 m. The kit stands every wall with its main face 0.08 m from the room's edge line (`ViFace`), where pictures, mirrors and curtains hang. Furniture backs stand 0.16 m from that line (`ViBack`), clear of the deepest dado.
+- **Doorway.** The clear opening is 1.35 × 2.18 m.
+- **Windows.** Opaque, as §2 says.
+- **Stair.** One flight rises about 3.54 m, a storey, in about 19 steps of 0.19 × 0.35 m, a slope of 28°. It is checked against the slice's character controller in VI-3.
+- **Lights in the prefabs.** `Candle_1…4` carry a point light each, `Lamp_2` one, `Table_Prefab` two; `Lamp_1`, the chandelier, is emissive only; the fire is a separate particle prefab.
+- **Clock.** `Clock_Small` is a mantel clock that stands, not a wall clock.
+- **Bed.** Its head is at its back, against the wall.
+- **Corners.** A piece three cells wide fills its module almost wholly, so it cannot stand in a corner: the side wall's dado meets it. Such pieces stand on a wall's middle module or in the room.
 
 ## 4. Rooms by period and wealth
 
@@ -103,7 +107,7 @@ The houses follow the layout of a British-style town house of the late 18th to t
 ### 4.1 Floors
 
 - **Rich house:** as many interior floors as the building has storeys outside, two or three (owner). The storeys come from the baked house's type (city plan §5.2): a villa 3, a detached house 3, a shop house 4, a tenement 3–4, a warehouse 2–3. A warehouse is a store, not a home, and keeps one floor.
-- **Middling and poor houses:** one floor, as today. Question 2 in §9 asks whether middling houses should also gain their upper floor.
+- **Middling and poor houses:** one floor, as today; a middling house gains no upper floor (owner, §9).
 - **A tenement flat:** one flat on one floor of its building, whatever the storeys outside. That is how tenements were let.
 
 ### 4.2 Room types
@@ -120,14 +124,14 @@ The houses follow the layout of a British-style town house of the late 18th to t
 | Bedroom | sleep; the best on the first floor | all | bed, washstand or chest of drawers, wardrobe or tall cupboard, chair, mirror, fireplace (rich), carpet, candle |
 | Dressing room | beside the main bedroom | rich, optional | tall cupboard, mirror, chair, coat stands |
 | Bathroom with WC | bath, toilet and basin, behind one door | rich | bath, toilet, basin, towel rail, mirror, soap and sponge |
-| WC | a toilet and a basin in a closet | middling (question 3) | toilet, basin |
+| WC | a toilet and a basin in a closet | middling | toilet, basin |
 | Nursery | the children's room, on the top floor | rich, three floors | small beds, small chair, table, toys from the small things |
 | Servant's room | the maid's room in the attic storey | rich, three floors | narrow bed, chair, small table, candle |
 | Room | the poor family's one room: they live, sleep and cook here | poor | fireplace as hearth and stove, bed, table, chairs, a washstand with a basin, bucket |
 | Shop room, back room | trade at the front, the shopkeeper's room behind | shop | counter, shelves; the back room as a poor or middling Room |
 | Office, store | the warehouse's clerk and its goods | warehouse | desk, chair, cupboard; crates and barrels (§6) |
 
-**Washing by wealth.** A poor household has no bathroom: the privy stands in the court, outside the interior, and indoors there is only a basin and a bucket. A middling house has a WC. A rich house has a full bathroom. All of this is an authoring default, and question 3 in §9 asks the owner to confirm it.
+**Washing by wealth.** A poor household has no bathroom: the privy stands in the court, outside the interior, and indoors there is only a basin and a bucket. A middling house has a WC. A rich house has a full bathroom. The owner confirmed this (§9).
 
 **Layout by floor, rich house:**
 
@@ -149,15 +153,15 @@ A rich shop house keeps its shop and back room downstairs. Its living rooms move
 
 - Every window is a window wall, with the pack's `Curtain` hung inside it.
 - The curtains are drawn open by day and closed by night, from the clock. They do not move while the player watches; they change at the tick of dusk or dawn. Authoring defaults.
-- If VI-1 finds the window openings empty, a pane of a project URP glass material fills them. That pane is our own material, never a change to a vendor file.
+- The pack's window panes are opaque (§2), so no sun can shine through them. Each window instead carries a **lit pane**: a quad of our own unlit material just inside the glass, whose colour follows the sky at the hour. It is our own material, never a change to a vendor file.
 
-**The sun.**
+**Daylight** (changed in VI-1 from a directional sun, which the opaque windows would block):
 
-- Each interior has one directional light, set from the game clock: its angle, colour and strength follow the hour, as outside.
-- It casts shadows, so daylight falls through the windows in patches on the floor and fades at dusk.
+- Each window carries one spot light of its own, inside the pane, aimed down into the room. Its colour and strength follow the hour from the game clock, so daylight falls in a patch on the floor under each window and fades at dusk.
+- The spot casts no shadow; at most the room's main window may, inside the light budget below.
 - Ambient light comes from the sky at the hour.
-- Through a window the player sees the sky and the light, not the street. Question 5 in §9 covers this.
-- The sun in Veilmouth is reused if it can be driven from the clock (`S0_LightingController` follows `WorldClock`). It is not duplicated.
+- Through a window the player sees the sky and the light, not the street (owner, §9).
+- The hour comes from `WorldClock`, as for `S0_LightingController` outside. No second clock is made.
 
 **Lamps and candles:**
 
@@ -189,24 +193,24 @@ These pieces stay only because a room's purpose needs them and Victorian Interio
 | Wardens' lock-up | the cell bars and cell door; a weapons table | the owner's Tripo models; BK |
 | Faction's hall, old chapel | pews, rostrum, candle stands | the present kit |
 | Cellar, store rooms, warehouses | barrels, crates, sacks, firewood, baskets | Multistory Dungeons 2, Low Poly Medieval Props |
-| Cellar vaults, the cells, the chapel's nave | stone walls and stone floors (question 1) | BK's stone, or Low Poly Dungeons Lite |
+| Cellar vaults, the cells, the chapel's nave | stone walls and stone floors (owner, §9) | BK's stone, or Low Poly Dungeons Lite |
 | The cellar | the magic circle | our own (21 §4) |
 
 Every other piece that stands in the seven interiors or the Dwelling kit today goes.
 
 ## 7. The seven interiors
 
-The room programmes stay those of city plan §8, rebuilt on the 3 m module and dressed with the pack. Their people keep their posts, and their portals and door ids do not change, so the city, the named people and every test keep working. Upper floors are added only where §4 or question 4 says so.
+The room programmes stay those of city plan §8, rebuilt on the 3 m module and dressed with the pack. Their people keep their posts, and their portals and door ids do not change, so the city, the named people and every test keep working. Upper floors are added only where §4 or §9 says so.
 
 | Interior | Rebuilt as |
 |---|---|
-| Soot & Bell | taproom 21 × 12 with the bar, a fireplace, tables with chairs, pictures; kitchen 9 × 9 with the hearth; scullery; a stair to the let rooms on the first floor (question 4) |
+| Soot & Bell | taproom 21 × 12 with the bar, a fireplace, tables with chairs, pictures; kitchen 9 × 9 with the hearth; scullery; a stair to the let rooms on the first floor (owner, §9) |
 | Harrow & Tincture | shop 12 × 9 with counters, glazed cupboards and bottle shelves; laboratory 12 × 9 (themed); store room 3 × 9 |
 | Faction's house | hall 15 × 12 with the rostrum, pews and a fireplace; office 9 × 9 with a desk, bookcase and armchairs; archive 9 × 9 with bookcases full of books |
 | Wardens' station | front desk room 12 × 9; office 9 × 9 with a desk and a clock; guard room 9 × 9 with a hearth, table and chairs; corridor and three cells (themed) |
 | Missing person's room | the landing and one poor Room 9 × 9: bed, hearth, table, chair, washstand, the cache |
-| Cellar | three vaults (themed, question 1) |
-| Old chapel | nave 12 × 21 and vestry (themed walls, question 1), with the pack's candles, books and carpets |
+| Cellar | three vaults (themed, §9) |
+| Old chapel | nave 12 × 21 and vestry (themed walls, §9), with the pack's candles, books and carpets |
 
 Rebuilding these scenes needs the owner's request each time, and the owner has given it now: the scenes are the owner's (AGENTS, *Slice assets*). `VeilmouthInteriors` is rebuilt for the pack, and its run replaces only its own root.
 
@@ -216,9 +220,9 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 
 | Step | Work | Done when |
 |---|---|---|
-| **VI-1 Kit** | Wrap the pack as `ViRoom` and `ViFurniture`: colliders, layers, 1 m placement, back-anchored footprints, pivots corrected. Measure what §3 lists. One sample room of each finish, rendered. | the kit check passes on every wrapper; §3's measurements are recorded here |
-| **VI-2 The seven, ground floors and light** | `VeilmouthInteriors` on the 3 m module with `ViRoom`; §7's rooms dressed from `ViFurniture` and §6; fireplaces, curtains, lamps and candles; the sun from the clock in each interior. | the seven build with no kit fault; the portal, people and S1 tests pass; renders at noon and at night |
-| **VI-3 Stairs and floors** | The assembler learns storeys: a floor at each 3.5 m plus the ceiling, a stair well, the stair and banister, ceilings that are the next floor, the camera kept under each storey. The Combat Grid reads the storey the fight is on. The Soot & Bell's let rooms go upstairs if question 4 says so. | a character walks up and down every stair; the Combat Grid builds on an upper floor; tests |
+| **VI-1 Kit** | Wrap the pack as `ViRoom` and `ViFurniture`: colliders, layers, 1 m placement, back-anchored footprints, pivots corrected. Measure what §3 lists. One sample room of each finish, rendered. | the kit check passes on every wrapper; §3's measurements are recorded here. **Done 2026-11-07:** 74 wrappers, three sample rooms and a gallery of 298 blocks with no kit fault (`VictorianInteriorsSamples`, `VictorianKitTests`) |
+| **VI-2 The seven, ground floors and light** | `VeilmouthInteriors` on the 3 m module with `ViRoom`; §7's rooms dressed from `ViFurniture` and §6; fireplaces, curtains, lamps and candles; daylight through each window's lit pane and spot, from the clock (§5). | the seven build with no kit fault; the portal, people and S1 tests pass; renders at noon and at night |
+| **VI-3 Stairs and floors** | The assembler learns storeys: a floor at each 3.5 m plus the ceiling, a stair well, the stair and banister, ceilings that are the next floor, the camera kept under each storey. The Combat Grid reads the storey the fight is on. The Soot & Bell's let rooms go upstairs (owner, §9). | a character walks up and down every stair; the Combat Grid builds on an upper floor; tests |
 | **VI-4 Dwellings** | `DwellingPlanner` gains §4's room types and the washing by wealth; rich houses get their storeys from the baked house; furnishing lists move to `ViFurniture`; the Stash keeps its rooms and chances. | the sample homes plan and build with no kit fault, each wealth and kind; the PlayMode walk into each kind and back; renders |
 | **VI-5 Play test** | The owner walks the seven and a home of each kind. | the owner's remarks, recorded as in city plan §15 |
 
@@ -228,12 +232,12 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 - **Lights and frame time.** These are measured in VI-2 against §5's budget.
 - **Room size.** The 3 m module must not bring back the cramped feeling the owner reported on 2026-11-06. §3's table keeps the floor area, and VI-5 checks it.
 
-## 9. Open questions for the owner
+## 9. The owner's answers (2026-11-07)
 
-Each question carries the agent's recommendation. Until answered, the recommendation is the working default.
+The owner accepted all five recommendations and authorised VI-1. These are now decisions:
 
-1. **Stone rooms.** The pack has no stone wall or floor. Should the cellar's vaults, the cells and the chapel's nave keep stone as themed exceptions? *Recommendation:* yes; the old kitchens and laboratory take the pack's walls.
-2. **Middling houses.** Should a middling detached house or shop house also get its upper floor, with the bedrooms upstairs? It would be truer to the period, but there would be more to build and walk. *Recommendation:* not in the slice; rich houses only, as the owner said.
-3. **Washing by wealth.** Should washing follow §4: a rich bathroom, a middling WC, and a basin and bucket for the poor? *Recommendation:* yes; it reads a household at a glance.
-4. **Upper floors of the seven.** *Recommendation:* the Soot & Bell's let rooms go up a stair; the faction's house stays one floor; Harrow sleeps in the back of the shop as now.
-5. **The view through windows.** Should a window show only the sky and the light, or a painted street behind it? *Recommendation:* the sky and the light only in the slice.
+1. **Stone rooms.** The cellar's vaults, the cells and the chapel's nave keep stone as themed exceptions. The old stone kitchens and the laboratory take the pack's walls.
+2. **Middling houses.** No upper floor in the slice. Only rich houses get their storeys.
+3. **Washing by wealth.** A rich house has a bathroom, a middling house a WC, and a poor household a basin and a bucket, with the privy in the court.
+4. **Upper floors of the seven.** The Soot & Bell's let rooms go up a stair. The faction's house stays on one floor, and Harrow sleeps in the back of the shop as now.
+5. **The view through windows.** A window shows only the sky and the light in the slice.
