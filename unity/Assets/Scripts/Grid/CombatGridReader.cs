@@ -122,7 +122,11 @@ namespace GameDev.Grid
             return column;
         }
 
-        /// <summary>The nearest cell whose lowest standable surface can hold the player.</summary>
+        /// <summary>
+        /// The nearest cell with a standable surface, and in it the surface nearest the position's height, so a fight on
+        /// an upper storey reads that storey and not the floor under it (VICTORIAN_INTERIORS_PLAN VI-3). With one
+        /// surface in a column, as outdoors, it is the same cell as before.
+        /// </summary>
         public bool TryFindStart(Vector3 position, out int ix, out int iz, out int level)
         {
             var cx = Mathf.FloorToInt(position.x / _cell);
@@ -139,15 +143,22 @@ namespace GameDev.Grid
                         }
 
                         var column = Column(cx + dx, cz + dz);
+                        var best = -1;
                         for (var l = column.Length - 1; l >= 0; l--)
                         {
-                            if (column[l].Standable)
+                            if (column[l].Standable &&
+                                (best < 0 || Mathf.Abs(column[l].Y - position.y) < Mathf.Abs(column[best].Y - position.y)))
                             {
-                                ix = cx + dx;
-                                iz = cz + dz;
-                                level = l;
-                                return true;
+                                best = l;
                             }
+                        }
+
+                        if (best >= 0)
+                        {
+                            ix = cx + dx;
+                            iz = cz + dz;
+                            level = best;
+                            return true;
                         }
                     }
                 }

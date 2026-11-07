@@ -99,20 +99,38 @@ namespace GameDev.Slice.EditorTools
                 }
 
                 var room = Bounds();
-                Top("room_" + name, room.center, Mathf.Max(room.extents.x, room.extents.z) + 0.5f);
+                var markers = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None)
+                    .Where(t => t.name.StartsWith(VeilmouthInteriors.RoomMarker)).ToArray();
+                var storeys = markers.Length == 0 ? 1 : Mathf.RoundToInt(markers.Max(m => m.position.y) / VeilmouthInteriors.Storey) + 1;
+                for (var storey = 0; storey < storeys; storey++)
+                {
+                    // Each storey from above, with everything from the next floor up hidden (VI-3).
+                    var above = Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None)
+                        .Where(r => r.enabled && r.bounds.min.y >= (storey + 1) * VeilmouthInteriors.Storey - 0.25f).ToArray();
+                    foreach (var r in above)
+                    {
+                        r.enabled = false;
+                    }
+
+                    Top("room_" + name + (storey > 0 ? $"_floor{storey + 1}" : string.Empty), room.center, Mathf.Max(room.extents.x, room.extents.z) + 0.5f);
+                    foreach (var r in above)
+                    {
+                        r.enabled = true;
+                    }
+                }
+
                 foreach (var c in ceilings)
                 {
                     c.SetActive(true);
                 }
 
-                foreach (var marker in Object.FindObjectsByType<Transform>(FindObjectsSortMode.None)
-                             .Where(t => t.name.StartsWith(VeilmouthInteriors.RoomMarker)))
+                foreach (var marker in markers)
                 {
                     var p = marker.position;
                     var half = marker.localScale * 0.5f;
                     var label = marker.name.Substring(VeilmouthInteriors.RoomMarker.Length).Replace(' ', '_').ToLowerInvariant();
-                    Eye($"roomeye_{name}_{label}", new Vector3(p.x - half.x + 0.5f, 1.7f, p.z - half.z + 0.5f),
-                        new Vector3(p.x + half.x - 0.5f, 1.0f, p.z + half.z - 0.5f));
+                    Eye($"roomeye_{name}_{label}", new Vector3(p.x - half.x + 0.5f, p.y + 1.7f, p.z - half.z + 0.5f),
+                        new Vector3(p.x + half.x - 0.5f, p.y + 1.0f, p.z + half.z - 0.5f));
                 }
             }
         }

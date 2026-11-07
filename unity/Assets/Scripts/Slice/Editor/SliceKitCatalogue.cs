@@ -74,6 +74,8 @@ namespace GameDev.Slice.EditorTools
             public float? DoorX;  // where a building's own door is, from the footprint's local west edge
             public string Material; // a project-side material for a model whose own does not render in URP
             public float Factor = 1f; // a uniform scale before sizing (BK's architecture at x1.2, city plan §8)
+            public bool Ramp;          // a stair: a smooth slope over its steps' noses, which the grid and the walker read (VI-3)
+            public float BodyTop;      // when above 0, the body's colliders stop at this height (Victorian Interiors: 3.4 m, VI-3)
             public float Stretch = 1f; // a vertical scale on top of Factor (BK's rooms: walls 3.6 m, owner 2026-11-06)
             public bool Infill;        // a BK wall set with its infill plane (InfillPlane) at WallInfill instead of centred
             public float Shift;        // m added to a centred linear block's depth: BK's door leaf in its aligned frame
@@ -140,7 +142,7 @@ namespace GameDev.Slice.EditorTools
             ["BkChair"] = 7f, ["BkStool"] = 4f, ["BkBasket"] = 2f, ["BkBasketB"] = 2f, ["BkLogs"] = 20f, ["BkGlobe"] = 8f,
             ["BkCauldron"] = 30f, ["BkDiningTable"] = 60f, ["BkKitchenTable"] = 45f, ["BkDesk"] = 70f, ["BkSideTable"] = 15f,
             ["BkRoundTable"] = 40f, ["BkWorkTable"] = 70f, ["BkArmsTable"] = 80f, ["BkLabBench"] = 120f, ["BkTavernTable"] = 50f,
-            ["ViChair"] = 7f, ["ViArmchair"] = 14f, ["ViFootstool"] = 5f, ["ViTable"] = 40f, ["ViTableB"] = 35f, ["ViTableRound"] = 20f, // oak, 2 m long: a walker does not shove it
+            ["ViChair"] = 7f, ["ViArmchair"] = 14f, ["ViFootstool"] = 5f, ["ViTable"] = 50f, ["ViTableB"] = 40f, ["ViTableRound"] = 20f, // oak, 2 m long: a walker does not shove it
             ["ViDiningTable"] = 90f, ["ViKitchenTable"] = 45f, ["ViBucket"] = 3f, ["ViBox"] = 5f,
         };
 
@@ -718,6 +720,16 @@ namespace GameDev.Slice.EditorTools
                 {
                     AddBody(root, spec.Body, spec.On != null ? Seen(baseModel) : b, width, depth, linear, spec.OpenWidth, spec.OpenHeight, spec.LineBody);
                 }
+
+                if (spec.BodyTop > 0f)
+                {
+                    CapBody(root, spec.BodyTop);
+                }
+
+                if (spec.Ramp)
+                {
+                    AddRamp(root);
+                }
             }
 
             // A shelf hung on a wall keeps its things still, as part of it: packed against the wall and the board, they
@@ -1028,6 +1040,72 @@ namespace GameDev.Slice.EditorTools
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// A ray down onto a stair often strikes a step's nose and reads a wall (normals of 64°-67°, measured), so the Combat
+        /// Grid cut the stair in two. A 0.1 m slab lies on the noses, from the floor to the top tread's front edge, about
+        /// 28.5° (measured) and walkable; the feet stand at most one riser (0.19 m) over a tread. It replaces the steps' own collider; the
+        /// rails keep theirs.
+        /// </summary>
+        private static void AddRamp(GameObject root)
+        {
+            var steps = root.GetComponentsInChildren<MeshCollider>(true)
+                .Where(m => m.sharedMesh != null && !m.name.Contains("Banister"))
+                .OrderByDescending(m => m.sharedMesh.bounds.size.sqrMagnitude)
+                .FirstOrDefault();
+            if (steps == null)
+            {
+                Debug.LogWarning($"{root.name}: a ramp asked for, but no steps' collider");
+                return;
+            }
+
+            // The steps' vertices in the block's frame. The slope is the line under which every vertex lies, through the
+            // front edge of the top tread: it touches every nose, which stand in one line.
+            var points = steps.sharedMesh.vertices.Select(p => root.transform.InverseTransformPoint(steps.transform.TransformPoint(p))).ToArray();
+            var minX = points.Min(p => p.x);
+            var maxX = points.Max(p => p.x);
+            var top = points.Max(p => p.y);
+            var floor = points.Min(p => p.y);
+            var edge = points.Where(p => p.y >= top - 0.01f).Min(p => p.z);
+            var slope = points.Where(p => p.z < edge - 0.05f).Min(p => (top - p.y) / (edge - p.z));
+            var head = new Vector3((minX + maxX) * 0.5f, top, edge);
+            var foot = new Vector3(head.x, floor, edge - ((top - floor) / slope));
+            var along = head - foot;
+            Debug.Log($"{root.name}: ramp from {foot} to {head}, {Mathf.Atan(slope) * Mathf.Rad2Deg:F1}°");
+            var rotation = Quaternion.LookRotation(along.normalized, Vector3.up);
+            var ramp = new GameObject("Ramp");
+            ramp.transform.SetParent(root.transform, false);
+            ramp.layer = root.layer;
+            ramp.transform.localRotation = rotation;
+            ramp.transform.localPosition = ((foot + head) * 0.5f) - (rotation * Vector3.up * 0.05f);
+            var box = ramp.AddComponent<BoxCollider>();
+            box.size = new Vector3(maxX - minX, 0.1f, along.magnitude);
+            Object.DestroyImmediate(steps); // under the slope it would read as a second floor 0.1 m lower
+        }
+
+        /// <summary>Cuts the block's own boxes at <paramref name="top"/>; a box wholly above it would be none, and goes.</summary>
+        private static void CapBody(GameObject root, float top)
+        {
+            foreach (var box in root.GetComponents<BoxCollider>())
+            {
+                var min = box.center - box.size * 0.5f;
+                var max = box.center + box.size * 0.5f;
+                if (max.y <= top)
+                {
+                    continue;
+                }
+
+                if (min.y >= top - 0.05f)
+                {
+                    Object.DestroyImmediate(box);
+                    continue;
+                }
+
+                max.y = top;
+                box.center = (min + max) * 0.5f;
+                box.size = max - min;
+            }
         }
 
         private static void Box(GameObject root, Vector3 min, Vector3 max)

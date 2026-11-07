@@ -65,6 +65,9 @@ namespace GameDev.Slice.EditorTools
 
         private static Dictionary<string, SliceKitCatalogue.Entry> _kit;
         private static Transform _parent;
+
+        /// <summary>The floor of the storey being built or furnished: every placement stands this much higher (VI-3).</summary>
+        private static float _floorY;
         private static readonly List<Light> WindowLights = new();
         private static readonly List<Renderer> Panes = new();
         private static readonly List<InteriorLighting.Hearth> Hearths = new();
@@ -122,23 +125,24 @@ namespace GameDev.Slice.EditorTools
 
         private sealed class Plan
         {
-            public readonly List<(string Name, int X, int Z, int W, int D, string Finish)> Rooms = new();
-            public readonly Dictionary<(int X, int Z, bool AlongZ), Opening> Openings = new();
+            public readonly List<(string Name, int X, int Z, int W, int D, string Finish, int Level)> Rooms = new();
+            public readonly Dictionary<(int X, int Z, bool AlongZ, int Level), Opening> Openings = new();
+            public readonly List<(int X, int Z, int W, int D, int Level)> Wells = new();
             public (int X, int Z) Street;
 
             public bool Windowless => !Openings.Values.Contains(Opening.Window);
 
-            /// <summary>A room of one finish: Paper, Dark, Panel (ViFinishes) or Stone.</summary>
-            public Plan Room(string name, int x, int z, int w, int d, string finish)
+            /// <summary>A room of one finish: Paper, Dark, Panel (ViFinishes) or Stone, on storey <paramref name="level"/> (0 the ground).</summary>
+            public Plan Room(string name, int x, int z, int w, int d, string finish, int level = 0)
             {
-                Rooms.Add((name, x, z, w, d, finish));
+                Rooms.Add((name, x, z, w, d, finish, level));
                 return this;
             }
 
-            /// <summary>The wall segment of one module from node (x, z) along +X, or along +Z.</summary>
-            public Plan Open(Opening kind, int x, int z, bool alongZ = false)
+            /// <summary>The wall segment of one module from node (x, z) along +X, or along +Z, on storey <paramref name="level"/>.</summary>
+            public Plan Open(Opening kind, int x, int z, bool alongZ = false, int level = 0)
             {
-                Openings[(x, z, alongZ)] = kind;
+                Openings[(x, z, alongZ, level)] = kind;
                 if (kind == Opening.Street)
                 {
                     Street = (x, z);
@@ -146,6 +150,19 @@ namespace GameDev.Slice.EditorTools
 
                 return this;
             }
+
+            /// <summary>
+            /// A stair well: storey <paramref name="level"/> has no floor over these modules, and the storey under it no
+            /// ceiling (VI-3). Its edges are the module lines.
+            /// </summary>
+            public Plan Well(int x, int z, int w, int d, int level)
+            {
+                Wells.Add((x, z, w, d, level));
+                return this;
+            }
+
+            public bool InWell(int cx, int cz, int level) =>
+                Wells.Any(w => w.Level == level && cx >= w.X && cx < w.X + w.W && cz >= w.Z && cz < w.Z + w.D);
         }
 
         private static void BuildOne(string id, string path)
@@ -168,6 +185,7 @@ namespace GameDev.Slice.EditorTools
             _parent = Group(root, "Furniture");
             VeilmouthDressing.Use(_kit, Group(root, "People"));
             Furnish(id);
+            NestOnStairs(root);
 
             var hearthLights = new HashSet<Light>(Hearths.Select(h => h.Light));
             var lamps = _parent.GetComponentsInChildren<Light>(true).Where(l => !hearthLights.Contains(l)).ToArray();
@@ -198,15 +216,21 @@ namespace GameDev.Slice.EditorTools
             switch (id)
             {
                 case VeilmouthScene.SootAndBellId:
-                    // The let room stays downstairs until VI-3 takes it up the stair (owner, plan §9).
+                    // The let rooms go up the stair (owner, plan §9): the stair climbs east through the hall, from x 11 to
+                    // the well's end at x 18; upstairs a landing round the well and two let rooms.
                     return new Plan()
-                        .Room("Taproom", 0, 0, 21, 12, panel).Room("Kitchen", 0, 12, 9, 9, dark).Room("Passage", 9, 12, 3, 9, dark)
-                        .Room("Let room", 12, 12, 9, 9, paper)
+                        .Room("Taproom", 0, 0, 21, 12, panel).Room("Kitchen", 0, 12, 6, 9, dark).Room("Scullery", 6, 12, 3, 9, dark)
+                        .Room("Stair hall", 9, 12, 12, 9, dark)
+                        .Room("Landing", 9, 12, 12, 9, dark, 1).Room("Let room", 0, 12, 9, 9, paper, 1).Room("Let room 2", 12, 6, 9, 6, paper, 1)
+                        .Well(12, 15, 6, 3, 1)
                         .Open(Opening.Street, 9, 0).Open(Opening.Window, 3, 0).Open(Opening.Window, 15, 0)
                         .Open(Opening.Window, 0, 3, true).Open(Opening.Window, 21, 6, true)
-                        .Open(Opening.Door, 3, 12).Open(Opening.Door, 9, 12).Open(Opening.Door, 12, 15, true)
-                        .Open(Opening.Closed, 9, 21).Open(Opening.Window, 3, 21).Open(Opening.Window, 15, 21)
-                        .Open(Opening.Window, 21, 15, true);
+                        .Open(Opening.Door, 3, 12).Open(Opening.Door, 9, 12).Open(Opening.Door, 6, 15, true).Open(Opening.Door, 9, 18, true)
+                        .Open(Opening.Closed, 12, 21).Open(Opening.Window, 0, 15, true).Open(Opening.Window, 3, 21).Open(Opening.Window, 6, 21)
+                        .Open(Opening.Window, 18, 21).Open(Opening.Window, 21, 15, true)
+                        .Open(Opening.Door, 9, 15, true, 1).Open(Opening.Door, 15, 12, false, 1)
+                        .Open(Opening.Window, 0, 15, true, 1).Open(Opening.Window, 3, 21, false, 1).Open(Opening.Window, 18, 21, false, 1)
+                        .Open(Opening.Window, 21, 15, true, 1).Open(Opening.Window, 21, 6, true, 1).Open(Opening.Window, 15, 6, false, 1);
                 case "harrow-apothecary":
                     return new Plan()
                         .Room("Shop", 0, 0, 12, 9, paper).Room("Laboratory", 0, 9, 12, 9, dark).Room("Store room", 12, 9, 3, 9, dark)
@@ -251,50 +275,66 @@ namespace GameDev.Slice.EditorTools
 
         // ------------------------------------------------------------------------------------------------ rooms
 
-        /// <summary>Floors, ceilings, a marker and a ceiling collider per room; one wall per module; posts at stone nodes.</summary>
+        /// <summary>
+        /// Floors, ceilings, a marker and ceiling colliders per room, storey by storey; one wall per module; posts at
+        /// stone nodes. A stair well leaves out the floor over it and the ceiling and its collider under it.
+        /// </summary>
         private static void Rooms(Plan plan, string id)
         {
-            var segments = new HashSet<(int X, int Z, bool AlongZ)>();
-            foreach (var (name, x, z, w, d, finish) in plan.Rooms)
+            var segments = new HashSet<(int X, int Z, bool AlongZ, int Level)>();
+            foreach (var (name, x, z, w, d, finish, level) in plan.Rooms)
             {
+                _floorY = level * Storey;
+                var ceiling = new GameObject("Ceiling collider - " + name);
+                ceiling.transform.SetParent(_parent, false);
+                ceiling.layer = LayerMask.NameToLayer(CeilingLayer);
                 for (var cx = x; cx < x + w; cx += Module)
                 {
                     for (var cz = z; cz < z + d; cz += Module)
                     {
-                        At(finish == Stone ? "ViStoneFloor" : "ViFloor", new Vector3(cx, 0f, cz), Quaternion.identity);
+                        if (!plan.InWell(cx, cz, level))
+                        {
+                            At(finish == Stone ? "ViStoneFloor" : "ViFloor", new Vector3(cx, 0f, cz), Quaternion.identity);
+                        }
+
+                        if (plan.InWell(cx, cz, level + 1))
+                        {
+                            continue;
+                        }
+
                         At("ViCeiling", new Vector3(cx, Storey, cz), Quaternion.identity);
+                        // The camera stays under the ceiling (owner's play test, 2026-11-06). Not a kit block: a box the
+                        // arm meets, one per module so a stair well stays open to the camera.
+                        var box = ceiling.AddComponent<BoxCollider>();
+                        // Under the next floor's slab (3.4 m), never through it, so a person or a prop upstairs stands
+                        // on the floor and not on this box (VI-3): 3.14–3.40 m, about the ceiling's underside.
+                        box.center = new Vector3(cx + Module * 0.5f, _floorY + CeilingHeight, cz + Module * 0.5f);
+                        box.size = new Vector3(Module, 0.26f, Module);
                     }
 
-                    segments.Add((cx, z, false));
-                    segments.Add((cx, z + d, false));
+                    segments.Add((cx, z, false, level));
+                    segments.Add((cx, z + d, false, level));
                 }
 
                 for (var cz = z; cz < z + d; cz += Module)
                 {
-                    segments.Add((x, cz, true));
-                    segments.Add((x + w, cz, true));
+                    segments.Add((x, cz, true, level));
+                    segments.Add((x + w, cz, true, level));
                 }
 
                 var marker = new GameObject(RoomMarker + name).transform;
                 marker.SetParent(_parent, false);
-                marker.position = new Vector3(x + w * 0.5f, 0f, z + d * 0.5f);
+                marker.position = new Vector3(x + w * 0.5f, _floorY, z + d * 0.5f);
                 marker.localScale = new Vector3(w, Storey, d);
-
-                // The camera stays under the ceiling (owner's play test, 2026-11-06). Not a kit block: a box the arm meets.
-                var ceiling = new GameObject("Ceiling collider - " + name);
-                ceiling.transform.SetParent(_parent, false);
-                ceiling.layer = LayerMask.NameToLayer(CeilingLayer);
-                var box = ceiling.AddComponent<BoxCollider>();
-                box.center = new Vector3(x + w * 0.5f, CeilingHeight + 0.15f, z + d * 0.5f);
-                box.size = new Vector3(w, 0.3f, d);
             }
 
-            var stoneNodes = new HashSet<(int, int)>();
+            var stoneNodes = new HashSet<(int, int, int)>();
             var face = 0;
-            foreach (var (x, z, alongZ) in segments.OrderBy(s => s.X).ThenBy(s => s.Z).ThenBy(s => s.AlongZ))
+            foreach (var (x, z, alongZ, level) in segments.OrderBy(s => s.Level).ThenBy(s => s.X).ThenBy(s => s.Z).ThenBy(s => s.AlongZ))
             {
-                plan.Openings.TryGetValue((x, z, alongZ), out var kind);
-                var sides = Sides(plan, x, z, alongZ);
+                _floorY = level * Storey;
+                plan.Openings.TryGetValue((x, z, alongZ, level), out var kind);
+                var sides = Sides(plan, x, z, alongZ, level);
                 if (kind == Opening.Cell)
                 {
                     Put("ViCellBars", x, z, alongZ ? 3 : 0).name = "Cell front";
@@ -318,8 +358,8 @@ namespace GameDev.Slice.EditorTools
                 if (stone)
                 {
                     StoneWall(kind, x, z, alongZ, main.Facing, sides.Count > 1 ? other.Facing : (Vector2Int?)null, face++ % 3 == 2, id);
-                    stoneNodes.Add((x, z));
-                    stoneNodes.Add(alongZ ? (x, z + Module) : (x + Module, z));
+                    stoneNodes.Add((x, z, level));
+                    stoneNodes.Add(alongZ ? (x, z + Module, level) : (x + Module, z, level));
                 }
                 else
                 {
@@ -327,10 +367,13 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            foreach (var (x, z) in stoneNodes)
+            foreach (var (x, z, level) in stoneNodes)
             {
+                _floorY = level * Storey;
                 At("ViStonePost", new Vector3(x, 0f, z), Quaternion.identity);
             }
+
+            _floorY = 0f;
         }
 
         private static void FinishedWall(Opening kind, string finish, int x, int z, bool alongZ, Vector2Int facing, string id)
@@ -418,7 +461,7 @@ namespace GameDev.Slice.EditorTools
         {
             var f = new Vector3(facing.x, 0f, facing.y);
             var u = alongZ ? Vector3.forward : Vector3.right;
-            var centre = new Vector3(x, 0f, z) + u * (Module * 0.5f);
+            var centre = new Vector3(x, _floorY, z) + u * (Module * 0.5f);
             var probes = new List<MeshCollider>();
             foreach (var filter in wall.GetComponentsInChildren<MeshFilter>())
             {
@@ -522,7 +565,7 @@ namespace GameDev.Slice.EditorTools
         /// The rooms beside a wall segment, north/south or east/west: the direction from the wall into each, its finish,
         /// and its place in the plan.
         /// </summary>
-        private static List<(Vector2Int Facing, string Finish, int Index)> Sides(Plan plan, int x, int z, bool alongZ)
+        private static List<(Vector2Int Facing, string Finish, int Index)> Sides(Plan plan, int x, int z, bool alongZ, int level)
         {
             var sides = new List<(Vector2Int, string, int)>();
             void Look(Vector2Int facing, float px, float pz)
@@ -530,7 +573,7 @@ namespace GameDev.Slice.EditorTools
                 for (var i = 0; i < plan.Rooms.Count; i++)
                 {
                     var r = plan.Rooms[i];
-                    if (px > r.X && px < r.X + r.W && pz > r.Z && pz < r.Z + r.D)
+                    if (r.Level == level && px > r.X && px < r.X + r.W && pz > r.Z && pz < r.Z + r.D)
                     {
                         sides.Add((facing, r.Finish, i));
                     }
@@ -626,27 +669,64 @@ namespace GameDev.Slice.EditorTools
 
             // Kitchen: the hearth burns all day.
             Fireplace(E, 0, 15, true);
-            Put("ViKitchenTable", 3, 15);
-            Put("ViChair", 3, 14);
-            Put("ViChair", 5, 14);
-            Put("ViChair", 4, 17, 2);
-            Against("ViCupboardGlass", S, 21, 6);
-            Against("ViShelves", W, 9, 13);
-            Against("ViBasin", E, 0, 19);
+            Put("ViKitchenTable", 3, 15, 1);
+            Put("ViChair", 3, 18, 2);
+            Put("ViChair", 4, 18, 2);
+            Against("ViCupboardGlass", S, 21, 1);
+            Against("ViBasin", S, 21, 4);
             Put("ViBucket", 1, 13);
             Hang("ViWallLamp", N, 12, 0, 2.2f);
 
-            // Passage and the let room.
-            Hang("ViPicture2", E, 9, 15, 1.6f);
-            Hang("ViWallLamp", W, 12, 18, 2.2f);
-            Against("ViBed", S, 21, 18).name = "Bed (a room for the night)";
-            Against("ViCabinet", N, 12, 19);
-            Put("ViOilLamp", 19, 12, 0, 1.2f);
-            Against("ViBasin", W, 21, 13);
-            Put("ViTableRound", 14, 18);
-            Put("ViChair", 14, 17);
-            Put("ViRug", 15, 15);
-            Hang("ViPicture8", E, 12, 18, 1.6f);
+            // Scullery: the sink, a bucket and a basket in the one cell clear of both walls.
+            Against("ViBasin", E, 6, 13).name = "Scullery sink";
+            Put("BkBasket", 7, 16);
+            Put("ViBucket", 7, 19);
+
+            // Stair hall: the stair climbs east to the landing (VI-3).
+            Put("ViStair", 11, 15, 1).name = "Stair";
+            Put("ViCoatStand", 19, 13);
+            Against("ViClock", W, 21, 18);
+            Put("ViPlantB", 15, 19);
+            Hang("ViWallLamp", E, 9, 15, 2.2f);
+            Hang("ViWallLamp", S, 21, 15, 2.2f);
+            Hang("ViPicture2", N, 12, 15, 1.6f);
+
+            // Upstairs.
+            _floorY = Storey;
+
+            // Landing: a balustrade round the well where the stair's own rails are low.
+            foreach (var (bx, bz, bt) in new[] { (12, 14, 1), (15, 14, 1), (12, 18, 1), (15, 18, 1), (11, 15, 0) })
+            {
+                Put("ViBanister", bx, bz, bt).name = "Balustrade";
+            }
+
+            Put("ViPlant", 10, 18);
+            Put("ViArmchair", 19, 19, 2);
+            Hang("ViWallLamp", S, 21, 12, 2.2f);
+            Hang("ViWallLamp", W, 21, 18, 2.2f);
+            Hang("ViPicture5", N, 12, 9, 1.6f);
+
+            // The let room for the night, over the kitchen.
+            Against("ViBed", S, 21, 6).name = "Bed (a room for the night)";
+            Against("ViCabinet", W, 9, 19);
+            Put("ViOilLamp", 8, 19, 0, 1.2f);
+            Against("ViBasin", N, 12, 1);
+            Put("ViTableRound", 3, 15);
+            Put("ViChair", 3, 14);
+            Put("ViRug", 2, 16);
+            Hang("ViPicture8", N, 12, 6, 1.6f);
+            Hang("ViWallLamp", E, 0, 12, 2.2f);
+
+            // Let room 2, over the taproom's east end.
+            Against("ViBed", W, 21, 9);
+            Against("ViBasin", E, 12, 7);
+            Put("ViTableB", 13, 10);
+            Put("ViChair", 13, 9);
+            Put("ViCandle", 14, 10, 0, 0.9f);
+            Put("ViRug", 14, 7);
+            Hang("ViPicture1", E, 12, 9, 1.6f);
+            Hang("ViWallLamp", N, 6, 12, 2.2f);
+            _floorY = 0f;
         }
 
         private static void Harrow()
@@ -830,6 +910,48 @@ namespace GameDev.Slice.EditorTools
             Put("ViChair", 16, 16);
         }
 
+        /// <summary>
+        /// A stair's solid bounds are its whole slope, 7 × 3 m and 4.7 m high, so the floor over its foot and the
+        /// balustrade at its well's end stand inside them though they touch nothing of it. They are nested under the stair
+        /// as its own pieces (kit standard §6), which the kit check reads with it, not against it (VI-3).
+        /// </summary>
+        private static void NestOnStairs(Transform root)
+        {
+            Physics.SyncTransforms();
+            Bounds? Solid(Component block)
+            {
+                Bounds? b = null;
+                foreach (var c in block.GetComponentsInChildren<Collider>().Where(c => c.enabled && !c.isTrigger && c.GetComponentInParent<KitBlock>() == block))
+                {
+                    if (b.HasValue) { var u = b.Value; u.Encapsulate(c.bounds); b = u; }
+                    else b = c.bounds;
+                }
+
+                return b;
+            }
+
+            var blocks = root.GetComponentsInChildren<KitBlock>();
+            foreach (var stair in blocks.Where(k => k.name == "Stair"))
+            {
+                var bounds = Solid(stair);
+                if (!bounds.HasValue)
+                {
+                    continue;
+                }
+
+                var inside = bounds.Value;
+                inside.Expand(-0.02f);
+                foreach (var piece in blocks.Where(k => k.name.StartsWith("Kit_ViRoom_Floor") || k.name == "Balustrade"))
+                {
+                    var other = Solid(piece);
+                    if (other.HasValue && inside.Intersects(other.Value))
+                    {
+                        piece.transform.SetParent(stair.transform, true);
+                    }
+                }
+            }
+        }
+
         /// <summary>A two-cell table with two chairs on either long side, facing it.</summary>
         private static void Table(int x, int z)
         {
@@ -937,7 +1059,7 @@ namespace GameDev.Slice.EditorTools
         {
             var go = (GameObject)PrefabUtility.InstantiatePrefab(_kit[key].Prefab, _parent);
             go.transform.SetPositionAndRotation(
-                new Vector3(Mathf.Round(pivot.x), Mathf.Round(pivot.y * 10f) / 10f, Mathf.Round(pivot.z)), rotation);
+                new Vector3(Mathf.Round(pivot.x), Mathf.Round((pivot.y + _floorY) * 10f) / 10f, Mathf.Round(pivot.z)), rotation);
             return go;
         }
 

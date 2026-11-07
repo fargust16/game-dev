@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.3
+Version: 0.4
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 and VI-2 done, VI-3 … VI-5 wait for the owner
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-3 done, VI-4 and VI-5 wait for the owner
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-07 (VI-2: the seven rebuilt on the 3 m module, with light from the clock; what changed from §5 and §7 is in §8. Earlier: VI-1, the kit families built and measured; the windows are opaque, so daylight comes through lit panes; the owner's answers in §9)
+Last Updated: 2026-11-07 (VI-3: storeys, the stair and its well, the Soot & Bell's let rooms upstairs, the Combat Grid on the storey of the fight; what changed is in §8. The earlier note is in §10)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -94,7 +94,7 @@ These sizes are authoring defaults.
 - **Face planes.** A paper wall's dado stands 0.08 m proud of its paper; the dark and panelled walls 0.03 m. The kit stands every wall with its main face 0.08 m from the room's edge line (`ViFace`), where pictures, mirrors and curtains hang. Furniture backs stand 0.16 m from that line (`ViBack`), clear of the deepest dado.
 - **Doorway.** The clear opening is 1.35 × 2.18 m.
 - **Windows.** Opaque, as §2 says.
-- **Stair.** One flight rises about 3.54 m, a storey, in about 19 steps of 0.19 × 0.35 m, a slope of 28°. It is checked against the slice's character controller in VI-3.
+- **Stair.** One flight rises about 3.54 m, a storey, in about 19 steps of 0.19 × 0.32 m, a slope of 28.5° along its noses (measured in VI-3). Its footprint is 3 × 7 m; its top end lies on a module line.
 - **Lights in the prefabs.** `Candle_1…4` carry a point light each, `Lamp_2` one, `Table_Prefab` two; `Lamp_1`, the chandelier, is emissive only; the fire is a separate particle prefab.
 - **Clock.** `Clock_Small` is a mantel clock that stands, not a wall clock.
 - **Bed.** Its head is at its back, against the wall.
@@ -205,7 +205,7 @@ The room programmes stay those of city plan §8, rebuilt on the 3 m module and d
 
 | Interior | Rebuilt as |
 |---|---|
-| Soot & Bell | taproom 21 × 12 with the bar, a fireplace, tables with chairs, pictures; kitchen 9 × 9 with the hearth; scullery; a stair to the let rooms on the first floor (owner, §9) |
+| Soot & Bell | taproom 21 × 12 with the bar, a fireplace, tables with chairs, pictures; kitchen 6 × 9 with the hearth; scullery 3 × 9; a stair hall and the stair to the landing and two let rooms on the first floor (owner, §9; VI-3) |
 | Harrow & Tincture | shop 12 × 9 with counters, glazed cupboards and bottle shelves; laboratory 12 × 9 (themed); store room 3 × 9 |
 | Faction's house | hall 18 × 12 with the rostrum, pews and a fireplace; office 9 × 9 with a desk, bookcase and armchairs; archive 9 × 9 with bookcases full of books |
 | Wardens' station | front desk room 12 × 9; office 9 × 9 with a desk and a clock; guard room 9 × 9 with a hearth, table and chairs; corridor and three cells (themed) |
@@ -223,7 +223,7 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 |---|---|---|
 | **VI-1 Kit** | Wrap the pack as `ViRoom` and `ViFurniture`: colliders, layers, 1 m placement, back-anchored footprints, pivots corrected. Measure what §3 lists. One sample room of each finish, rendered. | the kit check passes on every wrapper; §3's measurements are recorded here. **Done 2026-11-07:** 74 wrappers, three sample rooms and a gallery of 298 blocks with no kit fault (`VictorianInteriorsSamples`, `VictorianKitTests`) |
 | **VI-2 The seven, ground floors and light** | `VeilmouthInteriors` on the 3 m module with `ViRoom`; §7's rooms dressed from `ViFurniture` and §6; fireplaces, curtains, lamps and candles; daylight through each window's lit pane and spot, from the clock (§5). | the seven build with no kit fault; the portal, people and S1 tests pass; renders at noon and at night. **Done 2026-11-07:** the seven with 55–207 blocks each and no kit fault; 24 EditMode and 29 PlayMode tests pass; renders `room_*_noon`, `room_*_night` and `roomeye_*` |
-| **VI-3 Stairs and floors** | The assembler learns storeys: a floor at each 3.5 m plus the ceiling, a stair well, the stair and banister, ceilings that are the next floor, the camera kept under each storey. The Combat Grid reads the storey the fight is on. The Soot & Bell's let rooms go upstairs (owner, §9). | a character walks up and down every stair; the Combat Grid builds on an upper floor; tests |
+| **VI-3 Stairs and floors** | The assembler learns storeys: a floor at each 3.5 m plus the ceiling, a stair well, the stair and banister, ceilings that are the next floor, the camera kept under each storey. The Combat Grid reads the storey the fight is on. The Soot & Bell's let rooms go upstairs (owner, §9). | a character walks up and down every stair; the Combat Grid builds on an upper floor; tests. **Done 2026-11-07:** the Soot & Bell on two storeys with no kit fault; the player walks the stair up and down (`StairTests`); a fight on the landing reads the landing and reaches the hall down the stair (`CombatGridStoreyTests`); 25 EditMode and 30 PlayMode tests pass |
 | **VI-4 Dwellings** | `DwellingPlanner` gains §4's room types and the washing by wealth; rich houses get their storeys from the baked house; furnishing lists move to `ViFurniture`; the Stash keeps its rooms and chances. | the sample homes plan and build with no kit fault, each wealth and kind; the PlayMode walk into each kind and back; renders |
 | **VI-5 Play test** | The owner walks the seven and a home of each kind. | the owner's remarks, recorded as in city plan §15 |
 
@@ -238,9 +238,20 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 - A desk whose back rises above its top got a body of two boxes, one under its things and one for the back. One box over all held the things inside it, and they were flung out when woken (`SliceKitCatalogue.RaisedBack`).
 - The pack's open shelves (`ViShelves`) stand empty: only bookcases are filled. Seen from far above, a floor shows its lower-detail mesh in patches; at a walker's height it does not.
 
+**What VI-3 changed and settled** (authoring defaults unless the owner's):
+
+- **Storeys.** A storey is 3.5 m. A room has a storey number; its floor tiles, ceiling, walls, openings and lights stand at that storey's height. A ceiling is placed under the next storey's floor, and a box of 0.26 m (3.14–3.40 m) over each module stops the camera, below the slab of the floor above.
+- **Bodies under a floor.** The floor slab is 0.1 m thick, so the bodies of walls and of what reaches the ceiling stop at 3.4 m (`SliceKitVictorian.ViBodyTop`, measured) and the slab rests on them.
+- **Stair and well.** The stair climbs its footprint's +Z toward a module line, where the upper floor begins. Its well is 6 × 3 m, two floor tiles left out; the stair's lowest metre runs under the floor before the well, with room to stand over it. Balustrades (`ViBanister`, solid) guard the well's sides and its low end. A floor tile or balustrade inside the stair's bounds is nested under the stair as its piece (kit standard §6).
+- **The stair's slope.** A ray down onto the pack's steps often struck a nose and read a wall (64°–67°), so the grid cut the stair in two. The steps' collider is replaced by a 0.1 m slab on the noses, 28.5°, worked out from the steps' vertices (`SliceKitCatalogue.AddRamp`); the rails keep theirs. A foot stands at most a riser (0.19 m) over a tread. On the grid the stair is one cell wide: beside the rails the capsule has no room.
+- **Soot & Bell.** Ground floor: taproom 21 × 12, kitchen 6 × 9 with its hearth, scullery 3 × 9, stair hall 12 × 9. First floor: the landing over the stair hall, let room 9 × 9 over the kitchen and scullery, let room 2 9 × 6 over the taproom's back.
+- **Combat Grid.** It already read many levels per column. `CombatGridReader.TryFindStart` now picks the level nearest the fighter's height, so a fight on the landing starts on the landing, not in the hall under it.
+- **Renders.** A storey is rendered with everything above it hidden: `room_<name>` and `room_<name>_floor2`.
+- **Tables.** A walker's push slid the 2 m oak table 5.1 cm at 40 kg; the pack's tables weigh 50 and 40 kg.
+
 **Risks:**
 
-- **Stairs and the Combat Grid.** The stair is steep: 4.69 m over 6.35 m, if all of its height is the rise. The grid has so far read only one level. VI-3 carries this risk, and a fight on a stair may need its own rule.
+- **A fight on a stair.** The stair is one grid cell wide. Whether a fight there needs a rule of its own (a narrow place, Surrounded impossible) is left to VI-5 and to the Combat Grid's own documents.
 - **Lights and frame time.** The count stays within §5's budget (§5); the frame time is checked in VI-5.
 - **Room size.** The 3 m module must not bring back the cramped feeling the owner reported on 2026-11-06. §3's table keeps the floor area, and VI-5 checks it.
 
@@ -253,3 +264,7 @@ The owner accepted all five recommendations and authorised VI-1. These are now d
 3. **Washing by wealth.** A rich house has a bathroom, a middling house a WC, and a poor household a basin and a bucket, with the privy in the court.
 4. **Upper floors of the seven.** The Soot & Bell's let rooms go up a stair. The faction's house stays on one floor, and Harrow sleeps in the back of the shop as now.
 5. **The view through windows.** A window shows only the sky and the light in the slice.
+
+## 10. Update history
+
+- 2026-11-07 (v0.3): VI-2, the seven rebuilt on the 3 m module, with light from the clock. Earlier: VI-1, the kit families built and measured; the windows are opaque, so daylight comes through lit panes; the owner's answers in §9.
