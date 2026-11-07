@@ -191,6 +191,52 @@ namespace GameDev.Slice.EditorTools
             Debug.Log($"[Dwelling] {samples.Length * 2} sample dwellings rendered, {faults} kit faults.");
         }
 
+        /// <summary>
+        /// Close views of a rich villa at a walker's eye: each stair from its head and its foot, the top step from the
+        /// side, the well from beside it, and the street door from inside (owner's play test VI-5).
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderDwellingDetails
+        /// </summary>
+        public static void RenderDwellingDetails()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+            foreach (var sun in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+            {
+                Object.DestroyImmediate(sun.gameObject);
+            }
+
+            var key = VeilmouthDwellings.PreviewKey(Dwellings.DwellingArchetype.Villa, Dwellings.DwellingWealth.Rich, 1000, -2000);
+            VeilmouthDwellings.BuildAndCheck(key, VeilmouthDwellings.Kit, VeilmouthDwellings.Settings, out var root);
+            var n = 0;
+            var plan = Dwellings.DwellingRuntime.PlanFor(key, VeilmouthDwellings.Settings, VeilmouthDwellings.Kit);
+            foreach (var w in plan.Wells)
+            {
+                // From the plan: the well's far end is the stair's head, on the module line; its foot a metre short of
+                // the well's near end, a storey down. The dwelling stands at the origin.
+                var climb = w.ClimbsEast ? Vector3.right : Vector3.left;
+                var side = Vector3.back;
+                var floor = w.Level * Dwellings.DwellingPlan.Storey;
+                var z = w.Z + (Dwellings.DwellingWell.Depth * 0.5f);
+                var top = new Vector3(w.ClimbsEast ? w.X + Dwellings.DwellingWell.Width : w.X, floor, z);
+                var foot = new Vector3(w.ClimbsEast ? w.X - 1 : w.X + Dwellings.DwellingWell.Width + 1, floor - Dwellings.DwellingPlan.Storey, z);
+                var centre = new Vector3(w.X + (Dwellings.DwellingWell.Width * 0.5f), floor, z);
+                Eye($"detail_stair{n}_head", top + (climb * 2.5f) + (Vector3.up * 1.7f), centre - (climb * 1.5f) - (Vector3.up * 1.5f));
+                Eye($"detail_stair{n}_foot", foot - (climb * 1.5f) + (Vector3.up * 1.7f), top + (Vector3.up * 0.3f));
+                Eye($"detail_stair{n}_topside", top + (climb * 1.2f) + (Vector3.up * 0.8f) + (Vector3.forward * 0.4f), top - (climb * 1f) - (Vector3.up * 0.3f));
+                Eye($"detail_stair{n}_well", centre + (side * 3.5f) + (Vector3.up * 1.7f), centre - (Vector3.up * 1f));
+                n++;
+            }
+
+            var door = root.GetComponentsInChildren<Transform>().FirstOrDefault(t => t.name.StartsWith("Kit_ViFurniture_Door") || t.name.StartsWith("Kit_ViRoom_Door"));
+            if (door != null)
+            {
+                var at = door.position + (Vector3.up * 1.2f);
+                Eye("detail_street_door", at + (Vector3.forward * 3f) + (Vector3.up * 0.4f), at);
+            }
+
+            Debug.Log($"[Dwelling] details of {n} stairs rendered.");
+        }
+
         private static void ShowCircles()
         {
             foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)

@@ -520,19 +520,23 @@ namespace GameDev.Slice.Dwellings
                 plan.Furniture.Add(new Placement(StairKey, PlacementMode.Put, x, w.Z, w.ClimbsEast ? 1 : 3, N, 0, 0, 0f, false, below, "Stair"));
                 Keep(rooms, cells, below);
                 Keep(rooms, new RectInt(w.ClimbsEast ? x - 1 : x + 7, w.Z, 1, DwellingWell.Depth), below); // its foot
+                // Under its head: the newel stands 0.12 m past the footprint (VI-5), and its rails' bounds reach the floor.
+                Keep(rooms, new RectInt(w.ClimbsEast ? x + 7 : x - 1, w.Z, 1, DwellingWell.Depth), below);
                 Keep(rooms, new RectInt(w.X, w.Z, DwellingWell.Width, DwellingWell.Depth), w.Level);
                 Keep(rooms, new RectInt(w.ClimbsEast ? w.X + DwellingWell.Width : w.X - 1, w.Z, 1, DwellingWell.Depth), w.Level); // its head
             }
 
+            // A balustrade's side stands flush with its footprint's front, which faces the well, so it stands on the well's
+            // edge (VI-5): turns 0 faces +Z, 1 +X, 2 −Z, 3 −X.
             foreach (var w in plan.Wells)
             {
                 var low = new RectInt(w.ClimbsEast ? w.X - 1 : w.X + DwellingWell.Width, w.Z, 1, DwellingWell.Depth);
-                Balustrade(plan, rooms, stairs, low, 0, w.Level);
-                foreach (var z in new[] { w.Z - 1, w.Z + DwellingWell.Depth })
+                Balustrade(plan, rooms, stairs, low, w.ClimbsEast ? 1 : 3, w.Level);
+                foreach (var (z, turns) in new[] { (w.Z - 1, 0), (w.Z + DwellingWell.Depth, 2) })
                 {
                     for (var x = w.X; x < w.X + DwellingWell.Width; x += M)
                     {
-                        Balustrade(plan, rooms, stairs, new RectInt(x, z, M, 1), 1, w.Level);
+                        Balustrade(plan, rooms, stairs, new RectInt(x, z, M, 1), turns, w.Level);
                     }
                 }
             }
@@ -813,7 +817,7 @@ namespace GameDev.Slice.Dwellings
         private static bool Covers(Placement f, (int X, int Z) c)
         {
             var (w, d) = f.Key == StairKey ? (7, 3) : (M, 1);
-            if (f.Key == BalustradeKey && f.Turns % 2 == 0)
+            if (f.Key == BalustradeKey && f.Turns % 2 == 1)
             {
                 (w, d) = (1, M);
             }

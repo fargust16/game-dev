@@ -51,6 +51,9 @@ namespace GameDev.Slice.EditorTools
         /// </summary>
         public const float ViBodyTop = ViStorey - 0.1f;
 
+        /// <summary>Measured (VI-3): how far the stair's top newel stands past its top step, m.</summary>
+        public const float ViStairNewel = 0.12f;
+
         /// <summary>The keys of the room family's walls, by finish: plain, doorway, window (null where the pack has none).</summary>
         public static readonly IReadOnlyDictionary<string, (string Plain, string Doorway, string Window)> ViFinishes =
             new Dictionary<string, (string, string, string)>
@@ -110,15 +113,20 @@ namespace GameDev.Slice.EditorTools
             ceiling.Top = true; // placed at the storey's height, it hangs 0.23 m below
             yield return ceiling;
             // The stair (VI-3): it rises 3.54 m in 19 steps of about 0.19 × 0.35 m (28°) over 6.1 m, measured; turned so
-            // it climbs toward its front, and its top end flush with the footprint's front edge, so the top step meets
-            // the upper floor at a module line (0.12 m short, measured). Its own rails carry the pack's colliders.
+            // it climbs toward its front. Its rails' newel stands 0.12 m past the top step (measured), so the stair is
+            // set 0.12 m further on than its bounds' front: the top step meets the upper floor at the module line, and the
+            // newel stands on the landing (owner's play test VI-5, remark 1). Its own rails carry the pack's colliders.
             var stair = R("ViStair", "Stair", st, Body.Keep, Anchor.Front);
             stair.ModelYaw = 180f;
             stair.Ramp = true;
+            stair.Shift = ViStairNewel;
             yield return stair;
-            // The balustrade round a stair well on the upper floor: solid, so nobody walks into the well (VI-3).
-            var banister = R("ViBanister", "Banister", st, Body.Box, Anchor.Centre);
-            banister.ModelYaw = 180f;
+            // The balustrade round a stair well on the upper floor: solid, so nobody walks into the well (VI-3). It lies
+            // along X, 3 m, with its side flush with its footprint's front, so placed in the row beside the well it stands
+            // on the well's edge, not in the middle of the row half a metre off (owner's play test VI-5, remark 1).
+            var banister = R("ViBanister", "Banister", st, Body.Box, Anchor.Front);
+            banister.ModelYaw = 90f;
+            banister.Lengthen = 3f / 2.94f; // measured 2.94 m: two in a row left a 6 cm gap (VI-5)
             yield return banister;
 
             // Stone (owner, 2026-11-07: the cellar's vaults, the cells and the chapel's nave): the pack has none, so BK's

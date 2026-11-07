@@ -76,9 +76,9 @@ MonoBehaviour:
     body:
       serializedVersion: 2
       x: 0.10922909
-      y: -0.10922906
+      y: -0.10922903
       width: 2.7815418
-      height: 0.21845812
+      height: 0.21845809
   - key: ViDarkDoorway
     prefab: {fileID: 4310150033674446116, guid: 2a9be46e7080bd44caf391399c30116e, type: 3}
     width: 3
@@ -108,9 +108,9 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.11000013
-      y: -0.10845855
-      width: 2.7799997
+      x: 0.11845851
+      y: -0.118458554
+      width: 2.763083
       height: 0.2184586
   - key: ViDoor
     prefab: {fileID: 7312406339525530521, guid: c3ea68a4a22a7024d86b92afde6811a0, type: 3}
@@ -317,9 +317,9 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.29175657
+      x: 0.29177177
       y: 0.29177177
-      width: 0.41648686
+      width: 0.41645646
       height: 0.41645646
   - key: ViSofa
     prefab: {fileID: 6705102054000465093, guid: 23c5f5bf982cfd64d9c95c08e173081a, type: 3}
@@ -450,7 +450,7 @@ MonoBehaviour:
     body:
       serializedVersion: 2
       x: 0.10653067
-      y: 0.16000003
+      y: 0.15999997
       width: 0.78693867
       height: 0.772735
   - key: ViShelvesB
@@ -493,9 +493,9 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.10938549
+      x: 0.10951626
       y: 0.16000009
-      width: 1.7812289
+      width: 1.7809675
       height: 3.1373105
   - key: ViCabinet
     prefab: {fileID: 5424685864822318406, guid: 66d94007eff9b454c816454906c02331, type: 3}
@@ -769,20 +769,20 @@ MonoBehaviour:
     body:
       serializedVersion: 2
       x: 0.15555143
-      y: 0.04773712
+      y: 0.167737
       width: 2.6697001
       height: 6.952263
   - key: ViBanister
-    prefab: {fileID: 6488408044541569660, guid: 1138d7d64e40add41a7d937e8abcbd2b, type: 3}
-    width: 1
-    depth: 3
+    prefab: {fileID: 753626291178626472, guid: 2c7cd308def53c346a9c2e47bfbf6c8e, type: 3}
+    width: 3
+    depth: 1
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.3279528
-      y: 0.03074503
-      width: 0.3440944
-      height: 2.93851
+      x: 0.00076031685
+      y: 0.6559055
+      width: 2.9984796
+      height: 0.3440945
   fire: {fileID: 8815679994851198048, guid: c21c5c6cc00bae1478ae61b12e50cb6a, type: 3}
   pane: {fileID: 2100000, guid: b8ff7779b128c0c4ebf9c6eb012da000, type: 2}
   glass:

@@ -79,9 +79,19 @@ namespace GameDev.World.Portals
             travelContext = context ?? string.Empty;
         }
 
-        /// <summary>True when the player stands within reach of the opening.</summary>
+        /// <summary>
+        /// True when the player stands within reach of the opening, on its level: a landing over a street door is not
+        /// within reach of it (owner's play test VI-5, remark 2). The player's feet stand from the sill up to a little
+        /// above it, as on a step before the door.
+        /// </summary>
         public bool InReach(Vector3 position)
         {
+            var sill = transform.position.y;
+            if (position.y < sill - 1f || position.y > sill + 1.5f)
+            {
+                return false;
+            }
+
             var offset = position - transform.TransformPoint(OpeningCentre);
             offset.y = 0f;
             return offset.sqrMagnitude <= interactRadius * interactRadius;

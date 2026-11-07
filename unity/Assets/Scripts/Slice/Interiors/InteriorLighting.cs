@@ -96,6 +96,7 @@ namespace GameDev.Slice.Interiors
 
         private void Update()
         {
+            HideTheSky();
             var clock = GameClockDriver.Running;
             var minute = clock != null ? clock.MinuteOfDay : previewMinute;
             if (minute != _shown)
@@ -167,6 +168,27 @@ namespace GameDev.Slice.Interiors
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.ambientLight = Color.Lerp(NightAmbient, DayAmbient, day);
         }
+
+        /// <summary>
+        /// Nothing outside an interior is ever meant to be seen: its windows show the sky as lit panes (§5). The sky
+        /// showed bright through the gap round a shut door and the seams between wall pieces (owner's play test VI-5,
+        /// remark 6), so behind the walls the camera draws black.
+        /// </summary>
+        private void HideTheSky()
+        {
+            var camera = Camera.main;
+            if (camera == null || camera == _darkened)
+            {
+                return;
+            }
+
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = Color.black;
+            RenderSettings.skybox = null;
+            _darkened = camera;
+        }
+
+        private Camera _darkened;
 
         private void Flicker()
         {

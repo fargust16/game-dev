@@ -44,12 +44,38 @@ namespace GameDev.Slice
             interactRadius = radius;
         }
 
+        /// <summary>
+        /// True when the player stands within reach on the same level and sees the source: the publican could be asked
+        /// from the landing above the taproom (owner's play test VI-5, remark 2). Walls, floors and ceilings block the
+        /// sight line, taken at chest height; a counter, which is lower, does not.
+        /// </summary>
         public bool InReach(Vector3 position)
         {
             var offset = position - transform.position;
+            if (offset.y < -SameLevel || offset.y > SameLevel)
+            {
+                return false;
+            }
+
             offset.y = 0f;
-            return offset.sqrMagnitude <= interactRadius * interactRadius;
+            if (offset.sqrMagnitude > interactRadius * interactRadius)
+            {
+                return false;
+            }
+
+            // The source's own body (a notice board) is the last thing on the line, so hitting it first means nothing
+            // stands between.
+            var mask = LayerMask.GetMask("Ground", "Structure");
+            return mask == 0
+                   || !Physics.Linecast(position + (Vector3.up * Chest), transform.position + (Vector3.up * Chest), out var hit, mask, QueryTriggerInteraction.Ignore)
+                   || hit.collider.transform.IsChildOf(transform);
         }
+
+        /// <summary>Authoring default, m: a source more than this above or below the player stands on another level.</summary>
+        private const float SameLevel = 1.5f;
+
+        /// <summary>Authoring default, m: the sight line's height over the feet, above a counter's 1.05 m.</summary>
+        private const float Chest = 1.4f;
 
         public string PromptFor(Vector3 player) =>
             !IsOpen && InReach(player) ? (source == TipSource.NoticeBoard ? "E  Read" : "E  Ask") : null;

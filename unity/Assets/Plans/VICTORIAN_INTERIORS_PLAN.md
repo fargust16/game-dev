@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.5
+Version: 0.6
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-4 done, VI-5 waits for the owner
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-5 done; the next steps wait for the owner's word on [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) §9
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-07 (VI-4: the Dwellings rebuilt from Victorian Interiors, with §4's rooms, washing by wealth, and rich houses on three floors joined by a switchback stair; what changed is in §8. The earlier note is in §10)
+Last Updated: 2026-11-07 (VI-5: the owner's eight remarks in §8; the balustrades, talking through floors, the walls' LOD and the sky round doors fixed; furnishing by rules drafted in `INTERIOR_FURNISHING_RULES.md`. The earlier note is in §10)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -225,7 +225,7 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 | **VI-2 The seven, ground floors and light** | `VeilmouthInteriors` on the 3 m module with `ViRoom`; §7's rooms dressed from `ViFurniture` and §6; fireplaces, curtains, lamps and candles; daylight through each window's lit pane and spot, from the clock (§5). | the seven build with no kit fault; the portal, people and S1 tests pass; renders at noon and at night. **Done 2026-11-07:** the seven with 55–207 blocks each and no kit fault; 24 EditMode and 29 PlayMode tests pass; renders `room_*_noon`, `room_*_night` and `roomeye_*` |
 | **VI-3 Stairs and floors** | The assembler learns storeys: a floor at each 3.5 m plus the ceiling, a stair well, the stair and banister, ceilings that are the next floor, the camera kept under each storey. The Combat Grid reads the storey the fight is on. The Soot & Bell's let rooms go upstairs (owner, §9). | a character walks up and down every stair; the Combat Grid builds on an upper floor; tests. **Done 2026-11-07:** the Soot & Bell on two storeys with no kit fault; the player walks the stair up and down (`StairTests`); a fight on the landing reads the landing and reaches the hall down the stair (`CombatGridStoreyTests`); 25 EditMode and 30 PlayMode tests pass |
 | **VI-4 Dwellings** | `DwellingPlanner` gains §4's room types and the washing by wealth; rich houses get their storeys from the baked house; furnishing lists move to `ViFurniture`; the Stash keeps its rooms and chances. | the sample homes plan and build with no kit fault, each wealth and kind; the PlayMode walk into each kind and back; renders. **Done 2026-11-07:** 14 sample homes, every kind and wealth, with no kit fault; the player walks into each kind and back (`DoorTests`) and up and down both stairs of a rich terrace, villa and shop house (`StairTests`); renders `dwelling_<kind>_<wealth>_<n>` storey by storey |
-| **VI-5 Play test** | The owner walks the seven and a home of each kind. | the owner's remarks, recorded as in city plan §15 |
+| **VI-5 Play test** | The owner walks the seven and a home of each kind. | the owner's remarks, recorded as in city plan §15. **Held 2026-11-07:** eight remarks, below; four fixed at once, four lead to [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) |
 
 **What VI-2 changed from §5 and §7** (authoring defaults unless the owner's):
 
@@ -271,6 +271,19 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 
 What to look for, besides the owner's own eye: whether rooms feel cramped on the 3 m module, the stair and a fight on it, the light by day and night and the frame time in the rich houses, and whether a home reads its household's wealth.
 
+**VI-5, the owner's remarks** (2026-11-07):
+
+| # | Remark | Done |
+|---|---|---|
+| 1 | The balustrades do not meet the stair's well, and the stair meets the floor badly | The balustrade stood in the middle of the metre beside the well, half a metre off its edge. It now lies along its 3 m with its side flush with its footprint's front, on the well's edge, lengthened to 3 m (it measured 2.94) so two in a row close. The stair stands 0.12 m further on, so its top step meets the upper floor at the module line and its newel stands on the landing (`SliceKitVictorian`). |
+| 2 | The publican could be asked from the floor above | A person answers only on the player's level (1.5 m up or down) and in sight at chest height, through no wall, floor or ceiling; a counter does not block (`TipSourcePoint`). A door is within reach only on its own level (`Portal`). |
+| 3 | The walls' look changes with the camera's angle, in almost every interior | The pack's walls and furniture carry LOD groups whose coarser meshes differ in their panels. A wrapper keeps the finest level only (`SliceKitCatalogue.KeepFinestLevel`). |
+| 4 | A basin in a bedroom and no toilet anywhere; a bathroom with bath, basin, toilet, wall cabinets | A wash place in every home: [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) §3–§5, the poor's washroom a decision of §9. |
+| 5 | A plant on the floor; furnishing must follow rules per room, walls and corners first, passages clear, symmetry; the bar centred opposite the door, a stage, a higher ceiling with chandeliers, from a real pub plan | The rules §2–§4; the pub's plan §6; the taproom's height a decision of §9. |
+| 6 | Light shows round the door inside | The sky showed through the gap round a shut door and the seams between wall pieces. Inside an interior the camera now draws black behind the walls (`InteriorLighting`). |
+| 7 | A hall of barrels and crates, a chair in the middle of a room; every home must have a bedroom, a kitchen and a bath | The rules §5: a home always has somewhere to sleep, to cook and to wash. |
+| 8 | The same faults everywhere: build from purpose to places to rooms to buildings; small props on surfaces; shops with a counter across the width; servants in rich houses who run for the Wardens | The rules §1–§7; servants §5, their numbers a decision of §9. |
+
 **Risks:**
 
 - **A fight on a stair.** The stair is one grid cell wide. Whether a fight there needs a rule of its own (a narrow place, Surrounded impossible) is left to VI-5 and to the Combat Grid's own documents.
@@ -289,5 +302,6 @@ The owner accepted all five recommendations and authorised VI-1. These are now d
 
 ## 10. Update history
 
+- 2026-11-07 (v0.5): VI-4, the Dwellings rebuilt from Victorian Interiors, with §4's rooms, washing by wealth, and rich houses on three floors joined by a switchback stair.
 - 2026-11-07 (v0.4): VI-3, storeys, the stair and its well, the Soot & Bell's let rooms upstairs, the Combat Grid on the storey of the fight.
 - 2026-11-07 (v0.3): VI-2, the seven rebuilt on the 3 m module, with light from the clock. Earlier: VI-1, the kit families built and measured; the windows are opaque, so daylight comes through lit panes; the owner's answers in §9.

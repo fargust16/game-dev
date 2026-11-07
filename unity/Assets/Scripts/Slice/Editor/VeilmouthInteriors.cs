@@ -695,7 +695,8 @@ namespace GameDev.Slice.EditorTools
             _floorY = Storey;
 
             // Landing: a balustrade round the well where the stair's own rails are low.
-            foreach (var (bx, bz, bt) in new[] { (12, 14, 1), (15, 14, 1), (12, 18, 1), (15, 18, 1), (11, 15, 0) })
+            // Each stands on the well's edge, its front toward the well (VI-5).
+            foreach (var (bx, bz, bt) in new[] { (12, 14, 0), (15, 14, 0), (12, 18, 2), (15, 18, 2), (11, 15, 1) })
             {
                 Put("ViBanister", bx, bz, bt).name = "Balustrade";
             }

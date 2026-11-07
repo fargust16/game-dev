@@ -77,8 +77,9 @@ namespace GameDev.Slice.EditorTools
             public bool Ramp;          // a stair: a smooth slope over its steps' noses, which the grid and the walker read (VI-3)
             public float BodyTop;      // when above 0, the body's colliders stop at this height (Victorian Interiors: 3.4 m, VI-3)
             public float Stretch = 1f; // a vertical scale on top of Factor (BK's rooms: walls 3.6 m, owner 2026-11-06)
+            public float Lengthen = 1f; // a scale along X, after ModelYaw, on top of Factor (the balustrade: 2.94 m to 3 m, VI-5)
             public bool Infill;        // a BK wall set with its infill plane (InfillPlane) at WallInfill instead of centred
-            public float Shift;        // m added to a centred linear block's depth: BK's door leaf in its aligned frame
+            public float Shift;        // m added to a centred linear block's depth (BK's door leaf in its aligned frame), or past a front-anchored block's front (the stair)
             public float Out;          // m a flat hung piece stands off the wall's infill (owner's play test, 2026-11-06)
             public bool LineBody;      // a linear block whose body is the full 0.3 m on its line, whatever is seen
             public string Pack;       // a pack whose built-in materials get URP copies (SliceUrpMaterials)
@@ -623,14 +624,14 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            if (!Mathf.Approximately(spec.Stretch, 1f))
+            if (!Mathf.Approximately(spec.Stretch, 1f) || !Mathf.Approximately(spec.Lengthen, 1f))
             {
                 // A vendor root is often turned (BK's are -90° about X), so the stretch goes on an upright holder.
                 var holder = new GameObject("Model");
                 holder.transform.SetParent(root.transform, false);
                 model.name = "Base";
                 model.transform.SetParent(holder.transform, true);
-                holder.transform.localScale = new Vector3(1f, spec.Stretch, 1f);
+                holder.transform.localScale = new Vector3(spec.Lengthen, spec.Stretch, 1f);
                 model = holder;
             }
 
@@ -655,6 +656,7 @@ namespace GameDev.Slice.EditorTools
                 Object.DestroyImmediate(body);
             }
 
+            KeepFinestLevel(model);
             Scale(model, spec);
             var b = Seen(model);
             var linear = spec.Anchor == Anchor.Linear || spec.Anchor == Anchor.Face;
@@ -671,7 +673,7 @@ namespace GameDev.Slice.EditorTools
             switch (spec.Anchor)
             {
                 case Anchor.Front:
-                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, depth - b.max.z);
+                    offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, depth - b.max.z + spec.Shift);
                     break;
                 case Anchor.Linear:
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, spec.Infill ? (spec.InfillAt ?? WallInfill) - InfillPlane(model) : spec.Shift - b.center.z);
@@ -1343,6 +1345,31 @@ namespace GameDev.Slice.EditorTools
                 .Where(p => Path.GetFileNameWithoutExtension(p) == name && (p.EndsWith(".prefab") || p.EndsWith(".fbx")))
                 .OrderBy(p => p.EndsWith(".prefab") ? 0 : 1)
                 .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Victorian Interiors' walls and furniture carry LOD groups whose coarser meshes differ in their panels and
+        /// mouldings, so a wall changed its look as the camera moved (owner's play test VI-5, remark 3). Rooms are seen
+        /// from close by, so a wrapper keeps the finest level only and drops the group.
+        /// </summary>
+        private static void KeepFinestLevel(GameObject model)
+        {
+            foreach (var group in model.GetComponentsInChildren<LODGroup>(true))
+            {
+                var lods = group.GetLODs();
+                var finest = lods.Length > 0 ? new HashSet<Renderer>(lods[0].renderers.Where(r => r != null)) : new HashSet<Renderer>();
+                foreach (var r in lods.Skip(1).SelectMany(l => l.renderers).Where(r => r != null && !finest.Contains(r)).Distinct().ToList())
+                {
+                    var filter = r.GetComponent<MeshFilter>();
+                    Object.DestroyImmediate(r);
+                    if (filter != null)
+                    {
+                        Object.DestroyImmediate(filter);
+                    }
+                }
+
+                Object.DestroyImmediate(group);
+            }
         }
 
         /// <summary>The union of what is seen, in the wrapper root's space (the root stands at the origin).</summary>

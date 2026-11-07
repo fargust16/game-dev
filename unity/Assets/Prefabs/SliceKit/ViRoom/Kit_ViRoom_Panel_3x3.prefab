@@ -65,8 +65,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.7799997, y: 3.4, z: 0.2184586}
-  m_Center: {x: 1.5, y: 1.7, z: 0.00077074766}
+  m_Size: {x: 2.763083, y: 3.4, z: 0.2184586}
+  m_Center: {x: 1.5, y: 1.7, z: -0.009229258}
 --- !u!1001 &5629867630939811006
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -85,7 +85,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4283874249558586, guid: 447b2b46b16d9e34cae9521f49502560, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.5009135
+      value: 1.5009125
       objectReference: {fileID: 0}
     - target: {fileID: 4283874249558586, guid: 447b2b46b16d9e34cae9521f49502560, type: 3}
       propertyPath: m_LocalPosition.y
@@ -93,7 +93,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4283874249558586, guid: 447b2b46b16d9e34cae9521f49502560, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.11
+      value: 0.099999994
       objectReference: {fileID: 0}
     - target: {fileID: 4283874249558586, guid: 447b2b46b16d9e34cae9521f49502560, type: 3}
       propertyPath: m_LocalRotation.w
@@ -129,6 +129,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2561521402620511396, guid: 447b2b46b16d9e34cae9521f49502560, type: 3}
+    - {fileID: 8696679083655881186, guid: 447b2b46b16d9e34cae9521f49502560, type: 3}
+    - {fileID: 8696679083656979234, guid: 447b2b46b16d9e34cae9521f49502560, type: 3}
+    - {fileID: 4323522389028771994, guid: 447b2b46b16d9e34cae9521f49502560, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
