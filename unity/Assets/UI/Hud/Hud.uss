@@ -105,3 +105,18 @@
     color: rgb(236, 228, 210);
     margin-bottom: 10px;
 }
+
+/* S1.5: the name of the nearest named person, over their head. */
+.hud__nametag {
+    position: absolute;
+    font-size: 18px;
+    color: rgb(236, 228, 210);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+    translate: -50% -100%;
+    display: none;
+}
+
+.hud__nametag--visible {
+    display: flex;
+}

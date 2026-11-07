@@ -56,6 +56,34 @@ namespace GameDev.Slice.Tests
 
             Assert.IsFalse(hud.IsNotesOpen, "J again closes them");
         }
+
+        [UnityTest]
+        public IEnumerator TheNewsboyIsNamedNearbyAndAskingHimPausesTheWorld()
+        {
+            yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
+            var world = SliceWorldDriver.Running;
+            var kit = Object.FindObjectsByType<People.NamedPerson>(FindObjectsSortMode.None).Single(p => p.Id == "kit");
+            var player = Object.FindAnyObjectByType<PlayerLocomotion>();
+            player.Teleport(kit.transform.position + (kit.transform.forward * 1.5f) + (Vector3.up * 0.1f), Quaternion.LookRotation(-kit.transform.forward));
+            yield return new WaitForSeconds(0.5f);
+
+            var hud = Object.FindAnyObjectByType<HudView>();
+            Assert.AreEqual("Kit Mallow", hud.NameTagText, "the player sees the newsboy's name nearby");
+            Assert.AreEqual("E  Ask", hud.PromptText);
+
+            yield return Tap(Key.E);
+
+            Assert.IsTrue(hud.IsReadingOpen);
+            Assert.AreEqual("Kit Mallow", hud.ReadingTitle);
+            Assert.IsTrue(world.Clock.IsPaused, "talk pauses the world (10.4)");
+            var tick = world.Clock.Tick;
+
+            yield return Tap(Key.E);
+
+            Assert.IsFalse(hud.IsReadingOpen);
+            Assert.IsFalse(world.Clock.IsPaused);
+            Assert.GreaterOrEqual(world.Clock.Tick, tick + 1, "the talk costs one tick when it ends");
+        }
     }
 }
 #endif

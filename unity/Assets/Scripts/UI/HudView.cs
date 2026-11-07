@@ -35,8 +35,18 @@ namespace GameDev.UI
         private PlayerLocomotion _player;
         private Portal[] _portals;
         private List<IPromptSource> _sources;
+        private List<INameTag> _tags;
+        private Label _nameTag;
+
+        private const string NameTagVisible = "hud__nametag--visible";
+
+        /// <summary>Authoring default, m: the HUD names a person within this reach.</summary>
+        private const float NameReach = 6f;
 
         public string TimeText => _time?.text;
+
+        /// <summary>The name shown over a person, or null.</summary>
+        public string NameTagText => _nameTag != null && _nameTag.ClassListContains(NameTagVisible) ? _nameTag.text : null;
 
         public bool IsPromptVisible => _prompt != null && _prompt.ClassListContains(PromptVisible);
 
@@ -108,7 +118,10 @@ namespace GameDev.UI
 
             _player = FindAnyObjectByType<PlayerLocomotion>();
             _portals = FindObjectsByType<Portal>(FindObjectsInactive.Exclude);
-            _sources = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude).OfType<IPromptSource>().ToList();
+            var behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude);
+            _sources = behaviours.OfType<IPromptSource>().ToList();
+            _tags = behaviours.OfType<INameTag>().ToList();
+            _nameTag = GetComponent<UIDocument>().rootVisualElement.Q<Label>("nametag");
         }
 
         private bool Bind()
@@ -151,6 +164,50 @@ namespace GameDev.UI
             }
 
             _prompt.EnableInClassList(PromptVisible, prompt != null);
+            ShowNameTag();
+        }
+
+        // The nearest named person within reach and in front of the camera, named over their head.
+        private void ShowNameTag()
+        {
+            if (_nameTag == null)
+            {
+                return;
+            }
+
+            var camera = Camera.main;
+            INameTag nearest = null;
+            var best = NameReach * NameReach;
+            if (_player != null && camera != null && !SceneTransition.IsTraveling)
+            {
+                var position = _player.transform.position;
+                foreach (var person in _tags)
+                {
+                    if (person as Object == null)
+                    {
+                        continue;
+                    }
+
+                    var distance = (person.TagPosition - position).sqrMagnitude;
+                    if (distance <= best && camera.WorldToViewportPoint(person.TagPosition).z > 0f)
+                    {
+                        best = distance;
+                        nearest = person;
+                    }
+                }
+            }
+
+            if (nearest == null || _nameTag.panel == null)
+            {
+                _nameTag.RemoveFromClassList(NameTagVisible);
+                return;
+            }
+
+            var at = RuntimePanelUtils.CameraTransformWorldToPanel(_nameTag.panel, nearest.TagPosition, camera);
+            _nameTag.text = nearest.DisplayName;
+            _nameTag.style.left = at.x;
+            _nameTag.style.top = at.y;
+            _nameTag.AddToClassList(NameTagVisible);
         }
 
         private string Prompt()
