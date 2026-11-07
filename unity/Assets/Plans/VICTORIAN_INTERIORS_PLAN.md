@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.8
+Version: 0.9
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-6 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings; VI-7 (the seven) and VI-8 (play test) follow, each on the owner's word
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-7 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings and VI-7 the seven by the same rules; VI-8 (play test) follows on the owner's word
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-07 (VI-6 done: the Dwellings furnished by rules; a middling terrace or shop washes in a bathroom of 3 × 6, a poor home in its washroom. The earlier note is in §10)
+Last Updated: 2026-11-08 (VI-7 done: the seven furnished by the rules; the Soot & Bell's taproom 7 m high to the pub plan, its back range 12 m deep; the faction's hall 21 m wide. The earlier note is in §10)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -205,9 +205,9 @@ The room programmes stay those of city plan §8, rebuilt on the 3 m module and d
 
 | Interior | Rebuilt as |
 |---|---|
-| Soot & Bell | taproom 21 × 12 with the bar, a fireplace, tables with chairs, pictures; kitchen 6 × 9 with the hearth; scullery 3 × 9; a stair hall and the stair to the landing and two let rooms on the first floor (owner, §9; VI-3) |
-| Harrow & Tincture | shop 12 × 9 with counters, glazed cupboards and bottle shelves; laboratory 12 × 9 (themed); store room 3 × 9 |
-| Faction's house | hall 18 × 12 with the rostrum, pews and a fireplace; office 9 × 9 with a desk, bookcase and armchairs; archive 9 × 9 with bookcases full of books |
+| Soot & Bell | taproom 21 × 12, 7 m high, to the pub plan of the furnishing rules §6; kitchen 6 × 12 with the hearth; scullery 3 × 12; a stair hall 12 × 12 and the stair to the landing, a back landing and two let rooms on the first floor (owner, §9; VI-3, VI-7) |
+| Harrow & Tincture | shop 12 × 9 with the counter across it, shop shelves behind, glazed cupboards and bottle shelves; laboratory 12 × 9 (themed); store room 3 × 9 |
+| Faction's house | hall 21 × 12, symmetric about the street door, with the rostrum, pews and two fireplaces; office 9 × 9 with a desk, bookcase and armchairs; archive 12 × 9 with bookcases full of books |
 | Wardens' station | front desk room 12 × 9; office 9 × 9 with a desk and a clock; guard room 9 × 9 with a hearth, table and chairs; corridor and three cells (themed) |
 | Missing person's room | the landing and one poor Room 9 × 9: bed, hearth, table, chair, washstand, the cache |
 | Cellar | three vaults (themed, §9) |
@@ -227,7 +227,7 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 | **VI-4 Dwellings** | `DwellingPlanner` gains §4's room types and the washing by wealth; rich houses get their storeys from the baked house; furnishing lists move to `ViFurniture`; the Stash keeps its rooms and chances. | the sample homes plan and build with no kit fault, each wealth and kind; the PlayMode walk into each kind and back; renders. **Done 2026-11-07:** 14 sample homes, every kind and wealth, with no kit fault; the player walks into each kind and back (`DoorTests`) and up and down both stairs of a rich terrace, villa and shop house (`StairTests`); renders `dwelling_<kind>_<wealth>_<n>` storey by storey |
 | **VI-5 Play test** | The owner walks the seven and a home of each kind. | the owner's remarks, recorded as in city plan §15. **Held 2026-11-07:** eight remarks, below; four fixed at once, four lead to [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) |
 | **VI-6 Furnishing rules** | The places, rooms and buildings of [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) §7 as data, a planner that fills a room from its places, and a check; the Dwellings refurnished: a washroom in every home, servants in rich houses, burglary numbers checked again. | every sample home has somewhere to sleep, cook and wash, walk-ways clear, no small thing on the floor; kit faults 0; renders. |
-| **VI-7 The seven by the rules** | The seven interiors rebuilt by the same rules; the Soot & Bell to the rules' §6 plan, its taproom two storeys high, 7 m. | the counter faces the street door, the way to it clear; kit faults 0; the named people in place; renders. |
+| **VI-7 The seven by the rules** | The seven interiors rebuilt by the same rules; the Soot & Bell to the rules' §6 plan, its taproom two storeys high, 7 m. | the counter faces the street door, the way to it clear; kit faults 0; the named people in place; renders. **Done 2026-11-08:** the seven with 55–394 blocks each and no kit fault; the named people in place; 35 EditMode and 34 PlayMode tests pass, the stair, the doors, loose props and a fight on the landing among them; renders `room_*` and `roomeye_*` at noon and at night |
 | **VI-8 Play test** | The owner walks the seven and a home of each kind. | the owner's remarks, recorded as in city plan §15. |
 
 **What VI-2 changed from §5 and §7** (authoring defaults unless the owner's):
@@ -265,6 +265,16 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 - **The Stash** is still BK's trunk, a themed prop the pack lacks (§6), in the first of the bedroom, study, room, back room, dressing room, office, box room, store and kitchen that the home has, at 50 / 60 / 70 % by wealth, as before.
 - **Light.** Every window has a curtain, a lit pane and its spot; every hearth burns; the scene's lights follow the clock as in the seven (§5). The Dwelling scene has no sun of its own.
 - **Renders.** A home is rendered storey by storey with everything above hidden: `dwelling_<kind>_<wealth>_<n>`, `_floor2`, `_floor3`.
+
+**What VI-7 changed and settled** (authoring defaults unless the owner's):
+
+- **The Soot & Bell's taproom** follows the pub plan of the furnishing rules §6. The street door is in the middle of the front, and the bar (5 m) stands opposite it on the same axis, x 10.5, with the back-bar cabinet behind it, half a metre off the axis because a 4 m piece cannot centre on the 1 m grid, and Nell between them. The way from the door to the bar is 5 m wide and empty, edged by two low partitions of the pack's banister. West of it is the saloon: a carpet, a sofa and two armchairs round a low table before the hearth, and two snug tables with armchairs under the window. East of it is the public bar: two tables with stools on the bare floor, four chairs facing the stage, and the stage itself, 3 × 6 m and 0.4 m high, four layers of the pack's floor tile, at the east wall on the room's axis. It stands 1 m off the wall, whose body its tiles would meet, and no table stands within 2 m of its front. The pack has no fixed bench and no piano (rules §8). The kitchen and stair-hall doors stand at the back wall's two ends.
+- **Its height.** The taproom's upper storey is one well, so no floor or ceiling lies between, and its ceiling is at 7 m (owner, rules §9). A row of five high windows lights it, and three chandeliers hang at 6.8 m, their lights reaching 12.5 m. A storey that is all well gets no room marker of its own.
+- **Its back range is 12 m deep**, not 9, so the second let room (9 × 6) stands over the stair hall. Upstairs the landing keeps the well's south and west sides. The well's west balustrade runs to the module line, where a wall's body would meet it, so the landing's west strip opens without a wall into a back landing of 3 × 6 with a chair and a small table (`Opening.None`). The let rooms have a bed with a nightstand, a wash stand, a dresser or glazed cupboard and a small table with a chair.
+- **Harrow & Tincture** greets with two counter sets across the shop before the street door, the shop shelves centred behind them, Harrow between, and the laboratory door at the back wall's end beside the counter.
+- **The faction's hall is 21 m wide**, not 18, so that it is symmetric about the street door's axis: the 3 m aisle, three rows of pews either side, the rostrum, candle stands, two hearths, two chandeliers and the two doors at the back. The archive behind is 12 × 9, its bookcases never in a corner.
+- **The Wardens' front desk** stands across the street door's axis with Coyle behind it; the waiting chairs face it.
+- The missing person's wash stand is the basin set. The cellar and the chapel stay as built in VI-2: the chapel's aisle and pews were already symmetric.
 
 **VI-5, the route** (2026-11-07). The owner plays `Veilmouth`, starting on Bell Street before the Soot & Bell, and walks:
 
@@ -305,6 +315,7 @@ The owner accepted all five recommendations and authorised VI-1. These are now d
 
 ## 10. Update history
 
+- 2026-11-08 (v0.9): VI-7, the seven furnished by the rules; the Soot & Bell to the pub plan with its 7 m taproom, its back range 12 m deep and a back landing; the faction's hall 21 m wide.
 - 2026-11-07 (v0.8): VI-6, the Dwellings furnished by `INTERIOR_FURNISHING_RULES.md` §7: places, rooms, the planner and its check; a washroom or bathroom in every home, servants in rich houses, the burglary numbers checked again (10.3 §6).
 - 2026-11-07 (v0.7): the owner's four decisions on the furnishing rules: VI-6 … VI-8 added to §8, the poor washroom replaces §9.3.
 - 2026-11-07 (v0.6): VI-5, the owner's eight remarks; the balustrades, talking through floors, the walls' LOD and the sky round doors fixed; furnishing by rules drafted in `INTERIOR_FURNISHING_RULES.md`.

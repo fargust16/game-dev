@@ -42,6 +42,7 @@ namespace GameDev.Slice.EditorTools
         public const string CeilingLayer = "Ignore Raycast";
 
         private const float LampIntensity = 2.5f;
+        private const string ChandelierLight = "Chandelier light";
 
         internal const string FirePath = "Assets/Victorian Interiors/Victorian Interiors/Prefabs/Particle System.prefab";
 
@@ -119,6 +120,7 @@ namespace GameDev.Slice.EditorTools
             Closed,  // a doorway with its leaf shut (a back door, a door to nowhere the player goes)
             Window,
             Cell,    // a cell's front: the bars with their door
+            None,    // no wall: one room open into the next (the Soot & Bell's back landing, VI-7)
         }
 
         private const string Stone = "Stone";
@@ -194,7 +196,7 @@ namespace GameDev.Slice.EditorTools
                 // The pack's lamps were lit for baked light (0.9); realtime, a lamp lights its corner of the room.
                 // Authoring defaults: strength 2.5 at least, reach 6–9 m.
                 lamp.intensity = Mathf.Max(lamp.intensity, LampIntensity);
-                lamp.range = Mathf.Clamp(lamp.range, 6f, 9f);
+                lamp.range = lamp.name == ChandelierLight ? lamp.range : Mathf.Clamp(lamp.range, 6f, 9f);
                 lamp.shadows = LightShadows.None;
                 PrefabUtility.RecordPrefabInstancePropertyModifications(lamp);
             }
@@ -216,34 +218,47 @@ namespace GameDev.Slice.EditorTools
             switch (id)
             {
                 case VeilmouthScene.SootAndBellId:
-                    // The let rooms go up the stair (owner, plan §9): the stair climbs east through the hall, from x 11 to
-                    // the well's end at x 18; upstairs a landing round the well and two let rooms.
+                    // The pub plan of the furnishing rules §6 (VI-7). The taproom rises through two storeys, 7 m, with no
+                    // floor over it (owner, rules §9): its upper storey is all well, lit by a row of high windows. The
+                    // street door is in the middle of the front, the kitchen and stair-hall doors at the ends of the back
+                    // wall. The back range is 12 m deep (an authoring default, deeper than VI-2's 9 m) so that the second
+                    // let room stands over the stair hall: the stair climbs east from x 11 to the well's end at x 18, and
+                    // upstairs the landing keeps the well's south and west sides, the second let room its north. No wall
+                    // closes the landing's west strip to the north: the well's west balustrade runs to the module line,
+                    // where a wall's body would meet it, so the strip opens into a back landing.
                     return new Plan()
-                        .Room("Taproom", 0, 0, 21, 12, panel).Room("Kitchen", 0, 12, 6, 9, dark).Room("Scullery", 6, 12, 3, 9, dark)
-                        .Room("Stair hall", 9, 12, 12, 9, dark)
-                        .Room("Landing", 9, 12, 12, 9, dark, 1).Room("Let room", 0, 12, 9, 9, paper, 1).Room("Let room 2", 12, 6, 9, 6, paper, 1)
-                        .Well(12, 15, 6, 3, 1)
+                        .Room("Taproom", 0, 0, 21, 12, panel).Room("Kitchen", 0, 12, 6, 12, dark).Room("Scullery", 6, 12, 3, 12, dark)
+                        .Room("Stair hall", 9, 12, 12, 12, dark)
+                        .Room("Taproom", 0, 0, 21, 12, paper, 1)
+                        .Room("Landing", 9, 12, 12, 6, dark, 1).Room("Let room", 0, 12, 9, 12, paper, 1)
+                        .Room("Back landing", 9, 18, 3, 6, dark, 1).Room("Let room 2", 12, 18, 9, 6, paper, 1)
+                        .Well(0, 0, 21, 12, 1).Well(12, 15, 6, 3, 1)
                         .Open(Opening.Street, 9, 0).Open(Opening.Window, 3, 0).Open(Opening.Window, 15, 0)
                         .Open(Opening.Window, 0, 3, true).Open(Opening.Window, 21, 6, true)
-                        .Open(Opening.Door, 3, 12).Open(Opening.Door, 9, 12).Open(Opening.Door, 6, 15, true).Open(Opening.Door, 9, 18, true)
-                        .Open(Opening.Closed, 12, 21).Open(Opening.Window, 0, 15, true).Open(Opening.Window, 3, 21).Open(Opening.Window, 6, 21)
-                        .Open(Opening.Window, 18, 21).Open(Opening.Window, 21, 15, true)
-                        .Open(Opening.Door, 9, 15, true, 1).Open(Opening.Door, 15, 12, false, 1)
-                        .Open(Opening.Window, 0, 15, true, 1).Open(Opening.Window, 3, 21, false, 1).Open(Opening.Window, 18, 21, false, 1)
-                        .Open(Opening.Window, 21, 15, true, 1).Open(Opening.Window, 21, 6, true, 1).Open(Opening.Window, 15, 6, false, 1);
+                        .Open(Opening.Door, 0, 12).Open(Opening.Door, 18, 12).Open(Opening.Door, 6, 15, true).Open(Opening.Door, 9, 18, true)
+                        .Open(Opening.Closed, 18, 24).Open(Opening.Window, 0, 18, true).Open(Opening.Window, 0, 21, true).Open(Opening.Window, 3, 24)
+                        .Open(Opening.Window, 6, 24).Open(Opening.Window, 15, 24).Open(Opening.Window, 21, 15, true).Open(Opening.Window, 21, 18, true)
+                        .Open(Opening.Window, 3, 0, false, 1).Open(Opening.Window, 9, 0, false, 1).Open(Opening.Window, 15, 0, false, 1)
+                        .Open(Opening.Window, 0, 6, true, 1).Open(Opening.Window, 21, 6, true, 1)
+                        .Open(Opening.Door, 9, 15, true, 1).Open(Opening.Door, 18, 18, false, 1).Open(Opening.None, 9, 18, false, 1)
+                        .Open(Opening.Window, 0, 15, true, 1).Open(Opening.Window, 0, 18, true, 1).Open(Opening.Window, 0, 24, false, 1)
+                        .Open(Opening.Window, 21, 15, true, 1).Open(Opening.Window, 21, 18, true, 1).Open(Opening.Window, 15, 24, false, 1)
+                        .Open(Opening.Window, 18, 24, false, 1);
                 case "harrow-apothecary":
                     return new Plan()
                         .Room("Shop", 0, 0, 12, 9, paper).Room("Laboratory", 0, 9, 12, 9, dark).Room("Store room", 12, 9, 3, 9, dark)
                         .Open(Opening.Street, 3, 0).Open(Opening.Window, 9, 0).Open(Opening.Window, 0, 3, true)
-                        .Open(Opening.Door, 6, 9).Open(Opening.Door, 12, 12, true).Open(Opening.Window, 0, 9, true)
+                        .Open(Opening.Door, 9, 9).Open(Opening.Door, 12, 12, true).Open(Opening.Window, 0, 9, true)
                         .Open(Opening.Window, 6, 18);
                 case "faction-house":
+                    // The hall is 21 m wide (VI-7; 18 m before) so that it is symmetric about the street door's axis,
+                    // x 10.5: the aisle, the pews, the rostrum, the two hearths and the doors at the back (rules §6).
                     return new Plan()
-                        .Room("Hall", 0, 0, 18, 12, panel).Room("Office", 0, 12, 9, 9, paper).Room("Archive", 9, 12, 9, 9, dark)
+                        .Room("Hall", 0, 0, 21, 12, panel).Room("Office", 0, 12, 9, 9, paper).Room("Archive", 9, 12, 12, 9, dark)
                         .Open(Opening.Street, 9, 0).Open(Opening.Window, 3, 0).Open(Opening.Window, 15, 0)
-                        .Open(Opening.Window, 0, 6, true).Open(Opening.Window, 18, 6, true)
-                        .Open(Opening.Door, 3, 12).Open(Opening.Door, 12, 12).Open(Opening.Window, 6, 21)
-                        .Open(Opening.Window, 18, 12, true);
+                        .Open(Opening.Window, 0, 6, true).Open(Opening.Window, 21, 6, true)
+                        .Open(Opening.Door, 3, 12).Open(Opening.Door, 15, 12).Open(Opening.Window, 6, 21)
+                        .Open(Opening.Window, 18, 21).Open(Opening.Window, 21, 12, true);
                 case "wardens-lockup":
                     return new Plan()
                         .Room("Front desk", 0, 0, 12, 9, dark).Room("Office", 12, 0, 9, 9, paper).Room("Corridor", 0, 9, 12, 3, dark)
@@ -322,6 +337,12 @@ namespace GameDev.Slice.EditorTools
                     segments.Add((x + w, cz, true, level));
                 }
 
+                // A storey that is all well is the upper half of a tall room below (the taproom, VI-7): no room of its own.
+                if (plan.InWell(x, z, level) && plan.InWell(x + w - 1, z + d - 1, level))
+                {
+                    continue;
+                }
+
                 var marker = new GameObject(RoomMarker + name).transform;
                 marker.SetParent(_parent, false);
                 marker.position = new Vector3(x + w * 0.5f, _floorY, z + d * 0.5f);
@@ -334,6 +355,11 @@ namespace GameDev.Slice.EditorTools
             {
                 _floorY = level * Storey;
                 plan.Openings.TryGetValue((x, z, alongZ, level), out var kind);
+                if (kind == Opening.None)
+                {
+                    continue;
+                }
+
                 var sides = Sides(plan, x, z, alongZ, level);
                 if (kind == Opening.Cell)
                 {
@@ -641,105 +667,146 @@ namespace GameDev.Slice.EditorTools
 
         private static void SootAndBell()
         {
-            // Taproom: the hearth on the west wall, the bar before its cabinet with the keeper between, four tables.
+            // Taproom, by the pub plan of rules §6: the bar faces the street door across the room, on its axis, the
+            // back-bar cabinet behind it and the keeper between; nothing stands on the 5 m way from the door to the bar,
+            // which two low partitions edge. West of them the saloon: carpet, upholstered chairs, the hearth and two
+            // snug tables; east the public bar: tables with stools on the bare floor, and a small stage at the end wall
+            // on the room's axis, chairs facing it and no table within 2 m of its front. Its piano is missing from the
+            // pack (SLICE_MODELS_WANTED). Three chandeliers hang in the 7 m height.
             Fireplace(E, 0, 6);
-            Against("BarCabinet", S, 12, 13);
-            Put("BarCounter", 12, 8, 2).name = "Bar";
-            Put("Barrel", 18, 10);
-            Put("Barrel", 19, 10);
-            Table(4, 2);
-            Table(4, 6);
-            Table(15, 3);
-            Table(18, 6);
-            Put("ViCoatStand", 7, 1);
-            Chandelier(5, 4);
-            Chandelier(15, 4);
-            Against("ViClock", E, 0, 10);
-            Put("ViPlantC", 18, 0);
-            Hang("ViPicture3", S, 12, 0, 1.6f);
-            Hang("ViPicture6", S, 12, 6, 1.6f);
-            Hang("ViPicture7", W, 21, 0, 1.6f);
-            Hang("ViPicture2", W, 21, 9, 1.6f);
-            Hang("ViWallLamp", E, 0, 0, 2.2f);
-            Hang("ViWallLamp", W, 21, 3, 2.2f);
+            Put("BarCounter", 8, 8, 2).name = "Bar";
+            Against("BarCabinet", S, 12, 9);
+            Put("Barrel", 6, 10);
+            Put("Barrel", 7, 10);
+            Hang("BkBottleShelf", S, 12, 6, 1.6f);
+            Hang("BkBottleShelf", S, 12, 6, 2.3f);
+            Put("ViBanister", 7, 4, 1).name = "Partition";
+            Put("ViBanister", 13, 4, 3).name = "Partition";
+
+            // The saloon.
+            Put("ViCarpet", 2, 4);
+            Put("ViSofa", 4, 6, 3);
+            Put("ViTableRound", 3, 7);
+            Put("ViArmchair", 3, 6);
+            Put("ViArmchair", 3, 8, 2);
+            Table(1, 2, "ViArmchair");
+            Table(4, 2, "ViArmchair");
+            Put("ViCoatStand", 7, 0);
+
+            // The public bar and its stage.
+            Table(13, 1, "BkStool");
+            Table(13, 9, "BkStool");
+            foreach (var z in new[] { 4, 5, 6, 7 })
+            {
+                Put("BkChair", 15, z, 1);
+            }
+
+            // The stage stands a metre off the end wall, whose body its tiles would meet; the strip behind is the
+            // performers' way on.
+            Stage(17, 3, 1, 2);
+            Put("ViPlantC", 19, 0);
+            Against("ViClock", W, 21, 10);
+
+            Chandelier(3, 5, Storey);
+            Chandelier(9, 3, Storey);
+            Chandelier(15, 5, Storey);
             Hang("ViWallLamp", N, 0, 6, 2.2f);
             Hang("ViWallLamp", N, 0, 12, 2.2f);
-            VeilmouthDressing.Person("Yellow", false, 15.3f, 10.45f, 180f, "Tavern keeper", 0f);
-            VeilmouthDressing.Person("Brown", false, 6.6f, 6.5f, 270f, "Veinmarket at a table", 0f);
+            Hang("ViWallLamp", E, 0, 9, 2.2f);
+            Hang("ViWallLamp", W, 21, 3, 2.2f);
+            Hang("ViWallLamp", W, 21, 9, 2.2f);
+            Hang("ViPicture3", E, 0, 0, 1.6f);
+            Hang("ViPicture6", N, 0, 0, 1.6f);
+            Hang("ViPicture1", N, 0, 18, 1.6f);
+            Hang("ViPicture7", W, 21, 0, 1.6f);
+            Hang("ViPicture2", S, 12, 3, 1.6f);
+            Hang("ViPicture4", S, 12, 15, 1.6f);
+            VeilmouthDressing.Person("Yellow", false, 10.5f, 10.3f, 180f, "Tavern keeper", 0f);
+            VeilmouthDressing.Person("Brown", false, 3.5f, 2.5f, 270f, "Veinmarket at a table", 0f);
 
             // Kitchen: the hearth burns all day.
             Fireplace(E, 0, 15, true);
-            Put("ViKitchenTable", 3, 15, 1);
-            Put("ViChair", 3, 18, 2);
-            Put("ViChair", 4, 18, 2);
-            Against("ViCupboardGlass", S, 21, 1);
-            Against("ViBasin", S, 21, 4);
-            Put("ViBucket", 1, 13);
-            Hang("ViWallLamp", N, 12, 0, 2.2f);
+            Put("ViKitchenTable", 2, 19);
+            Put("ViChair", 2, 18);
+            Put("ViChair", 3, 18);
+            Put("ViChair", 2, 21, 2);
+            Put("ViChair", 3, 21, 2);
+            Against("ViCupboardGlass", S, 24, 1);
+            Against("ViBasin", W, 6, 22);
+            Put("ViBucket", 5, 13);
+            Hang("ViWallLamp", N, 12, 3, 2.2f);
 
-            // Scullery: the sink, a bucket and a basket in the one cell clear of both walls.
+            // Scullery: the sink, a bucket and a basket in the one column clear of both walls.
             Against("ViBasin", E, 6, 13).name = "Scullery sink";
-            Put("BkBasket", 7, 16);
-            Put("ViBucket", 7, 19);
+            Put("BkBasket", 7, 22);
+            Put("ViBucket", 7, 23);
 
-            // Stair hall: the stair climbs east to the landing (VI-3).
+            // Stair hall: the stair climbs east to the landing (VI-3); the tap's stock at the back.
             Put("ViStair", 11, 15, 1).name = "Stair";
-            Put("ViCoatStand", 19, 13);
-            Against("ViClock", W, 21, 18);
-            Put("ViPlantB", 15, 19);
-            Hang("ViWallLamp", E, 9, 15, 2.2f);
-            Hang("ViWallLamp", S, 21, 15, 2.2f);
-            Hang("ViPicture2", N, 12, 15, 1.6f);
+            Put("ViCoatStand", 10, 12);
+            Against("ViClock", W, 21, 21);
+            Put("Barrels", 10, 21);
+            Put("Crate", 14, 22);
+            Put("Box", 16, 22);
+            Hang("ViWallLamp", E, 9, 12, 2.2f);
+            Hang("ViWallLamp", W, 21, 12, 2.2f);
+            Hang("ViWallLamp", S, 24, 12, 2.2f);
+            Hang("ViPicture2", N, 12, 12, 1.6f);
 
             // Upstairs.
             _floorY = Storey;
 
-            // Landing: a balustrade round the well where the stair's own rails are low.
-            // Each stands on the well's edge, its front toward the well (VI-5).
-            foreach (var (bx, bz, bt) in new[] { (12, 14, 0), (15, 14, 0), (12, 18, 2), (15, 18, 2), (11, 15, 1) })
+            // Landing: a balustrade on the well's south and west edges where the stair's own rails are low; the second
+            // let room's wall is its north edge. Each stands on the well's edge, its front toward the well (VI-5).
+            foreach (var (bx, bz, bt) in new[] { (12, 14, 0), (15, 14, 0), (11, 15, 1) })
             {
                 Put("ViBanister", bx, bz, bt).name = "Balustrade";
             }
 
-            Put("ViPlant", 10, 18);
-            Put("ViArmchair", 19, 19, 2);
-            Hang("ViWallLamp", S, 21, 12, 2.2f);
-            Hang("ViWallLamp", W, 21, 18, 2.2f);
-            Hang("ViPicture5", N, 12, 9, 1.6f);
+            Put("ViPlant", 19, 12);
+            Hang("ViWallLamp", N, 12, 12, 2.2f);
+            Hang("ViWallLamp", E, 9, 12, 2.2f);
+            Hang("ViPicture5", N, 12, 15, 1.6f);
 
-            // The let room for the night, over the kitchen.
-            Against("ViBed", S, 21, 6).name = "Bed (a room for the night)";
-            Against("ViCabinet", W, 9, 19);
-            Put("ViOilLamp", 8, 19, 0, 1.2f);
-            Against("ViBasin", N, 12, 1);
-            Put("ViTableRound", 3, 15);
-            Put("ViChair", 3, 14);
-            Put("ViRug", 2, 16);
-            Hang("ViPicture8", N, 12, 6, 1.6f);
-            Hang("ViWallLamp", E, 0, 12, 2.2f);
+            // The let room over the kitchen: a bed with its nightstand, a wash stand, a dresser, a small table.
+            Against("ViBed", S, 24, 3).name = "Bed (a room for the night)";
+            Against("ViNightstand", S, 24, 5);
+            Against("ViBasinSet", E, 0, 21).name = "Wash stand";
+            Against("ViDresser", N, 12, 1);
+            Put("ViTableRoundSet", 5, 15);
+            Put("ViChair", 6, 15, 3);
+            Put("ViRug", 3, 17);
+            Hang("ViWallLamp", N, 12, 6, 2.2f);
+            Hang("ViPicture8", S, 24, 6, 1.6f);
 
-            // Let room 2, over the taproom's east end.
-            Against("ViBed", W, 21, 9);
-            Against("ViBasin", E, 12, 7);
-            Put("ViTableB", 13, 10);
-            Put("ViChair", 13, 9);
-            Put("ViCandle", 14, 10, 0, 0.9f);
-            Put("ViRug", 14, 7);
-            Hang("ViPicture1", E, 12, 9, 1.6f);
-            Hang("ViWallLamp", N, 6, 12, 2.2f);
+            // The back landing: a chair by a small table.
+            Put("ViTableRoundSet", 10, 21);
+            Put("ViArmchair", 10, 22, 2);
+            Hang("ViWallLamp", W, 12, 21, 2.2f);
+
+            // Let room 2, over the stair hall.
+            Against("ViBed", E, 12, 19);
+            Against("ViNightstand", E, 12, 21);
+            Against("ViBasinSet", S, 24, 13).name = "Wash stand";
+            Against("ViCupboardGlass", W, 21, 22);
+            Put("ViTableRoundSet", 16, 21);
+            Put("ViChair", 17, 21, 3);
+            Hang("ViWallLamp", N, 18, 12, 2.2f);
+            Hang("ViPicture1", N, 18, 15, 1.6f);
             _floorY = 0f;
         }
 
         private static void Harrow()
         {
-            // Shop: two counters with Harrow behind them, BK's bottle shelves on the wall behind (themed, plan §6).
-            Put("ViCounter", 3, 4, 2).name = "Counter";
-            Put("ViCounter", 6, 4, 2).name = "Counter";
-            foreach (var a in new[] { 0, 3 })
-            {
-                Hang("BkBottleShelf", S, 9, a, 1.4f);
-                Hang("BkBottleShelf", S, 9, a, 2.1f);
-            }
+            // Shop, by the rules' shop (§6): the counter across the room before the street door, the shop shelves
+            // centred behind it with Harrow between, the laboratory door at the back wall's end beside the counter,
+            // glazed cupboards on the side wall, BK's bottle shelves (themed, plan §6) on the back wall's free segment.
+            Put("ViCounterSet", 3, 4, 2).name = "Counter";
+            Put("ViCounterSet", 6, 4, 2).name = "Counter";
+            Against("ViShopShelves", S, 9, 4);
+            Against("ViShopShelves", S, 9, 6);
+            Hang("BkBottleShelf", S, 9, 0, 1.4f);
+            Hang("BkBottleShelf", S, 9, 0, 2.1f);
 
             Against("ViCupboardGlass", E, 0, 6);
             Against("ViShelves", W, 12, 1);
@@ -749,7 +816,7 @@ namespace GameDev.Slice.EditorTools
             Chandelier(5, 1);
             Hang("ViPicture4", N, 0, 0, 1.7f);
             Hang("ViPicture1", N, 0, 6, 1.7f);
-            VeilmouthDressing.Person("Green", false, 4.7f, 6.6f, 180f, "Harrow", 0f);
+            VeilmouthDressing.Person("Green", false, 6f, 6.7f, 180f, "Harrow", 0f);
 
             // Laboratory (themed): bench, alembic, cauldron and work table; a desk and books.
             Against("BkLabBench", S, 18, 1);
@@ -760,7 +827,7 @@ namespace GameDev.Slice.EditorTools
             Put("ViChair", 2, 14, 3);
             Hang("BkJarShelf", W, 12, 15, 1.5f);
             Against("ViBookcaseLow", N, 9, 3);
-            Put("BkGlobe", 10, 10);
+            Put("BkGlobe", 11, 13);
             Hang("ViWallLamp", W, 12, 9, 2.2f);
 
             // Store room.
@@ -773,7 +840,8 @@ namespace GameDev.Slice.EditorTools
 
         private static void FactionHouse()
         {
-            // Hall: the rostrum on the north wall, pews either side of the aisle under the door, the hearth on the west.
+            // Hall, symmetric about the street door's axis (rules §6): the rostrum on the north wall over the clear
+            // 3 m aisle, three rows of pews either side, candle stands, a hearth on each side wall, two chandeliers.
             var rostrum = _kit["Rostrum"].Width;
             Against("Rostrum", S, 12, (21 - rostrum) / 2);
             foreach (var z in new[] { 3, 5, 7 })
@@ -785,12 +853,13 @@ namespace GameDev.Slice.EditorTools
             Put("Candles", 6, 9);
             Put("Candles", 14, 9);
             Fireplace(E, 0, 3);
-            Chandelier(9, 4);
-            Put("ViCarpetB", 8, 2);
+            Fireplace(W, 21, 3);
+            Chandelier(5, 5);
+            Chandelier(14, 5);
             Hang("ViWallLamp", E, 0, 9, 2.2f);
-            Hang("ViWallLamp", W, 18, 9, 2.2f);
+            Hang("ViWallLamp", W, 21, 9, 2.2f);
             Hang("ViPicture1", E, 0, 0, 1.7f);
-            Hang("ViPicture5", W, 18, 0, 1.7f);
+            Hang("ViPicture5", W, 21, 0, 1.7f);
             VeilmouthDressing.Person("Teal", false, 10.5f, 9.2f, 180f, "Faction member", 0f);
 
             // Office: the desk under the window, a bookcase, armchairs by a round table.
@@ -806,28 +875,32 @@ namespace GameDev.Slice.EditorTools
             Hang("ViWallLamp", E, 0, 18, 2.2f);
             VeilmouthDressing.Person("Teal", true, 3.5f, 16.5f, 0f, "Faction member", 0f);
 
-            // Archive: bookcases full of books on three walls, a reading table.
+            // Archive: bookcases full of books on three walls, never in a corner, and a reading table.
             Against("ViBookcase", S, 21, 12);
-            Against("ViBookcase", W, 18, 15);
+            Against("ViBookcase", S, 21, 15);
+            Against("ViBookcase", W, 21, 15);
             Against("ViBookcase", E, 9, 15);
-            Against("ViShelves", N, 12, 15);
-            Put("ViTable", 12, 16);
-            Put("ViChair", 12, 15);
-            Put("ViOilLamp", 13, 16, 0, 1.0f);
+            Against("ViShelves", N, 12, 18);
+            Put("ViTable", 13, 16);
+            Put("ViChair", 13, 15);
+            Put("ViChair", 14, 17, 2);
+            Put("ViOilLamp", 14, 16, 0, 1.0f);
             Hang("ViWallLamp", N, 12, 9, 2.2f);
         }
 
         private static void Lockup()
         {
             // Front desk room.
-            Put("ViCounter", 4, 4, 2).name = "Front desk";
-            Put("ViChair", 1, 6, 1);
-            Put("ViChair", 1, 7, 1);
+            // The front desk faces the street door across the room (rules §6), the Warden behind it, the waiting chairs
+            // by the window facing it.
+            Put("ViCounter", 3, 4, 2).name = "Front desk";
+            Put("ViChair", 9, 1);
+            Put("ViChair", 10, 1);
             Hang("BkBoard", W, 12, 6, 1.0f).name = "Notices";
             Against("ViCabinet", S, 9, 1);
             Hang("ViPicture7", N, 0, 0, 1.7f);
             Hang("ViWallLamp", E, 0, 0, 2.2f);
-            VeilmouthDressing.Person("Blue", false, 5.5f, 6.7f, 180f, "Warden", 0f);
+            VeilmouthDressing.Person("Blue", false, 4.5f, 6.7f, 180f, "Warden", 0f);
 
             // Office: a desk and a clock.
             Against("ViDesk", S, 9, 14);
@@ -865,7 +938,7 @@ namespace GameDev.Slice.EditorTools
             Put("ViChair", 3, 5);
             Put("ViChair", 4, 7, 2);
             Put("ViCandle", 4, 6, 0, 0.9f);
-            Against("ViBasin", W, 9, 4).name = "Wash stand";
+            Against("ViBasinSet", W, 9, 4).name = "Wash stand";
             Put("ViBucket", 7, 4);
             Put("ViBox", 5, 11).name = "The cache";
             Hang("ViPicture8", N, 3, 3, 1.7f);
@@ -953,14 +1026,41 @@ namespace GameDev.Slice.EditorTools
             }
         }
 
-        /// <summary>A two-cell table with two chairs on either long side, facing it.</summary>
-        private static void Table(int x, int z)
+        /// <summary>A two-cell table with two seats on either long side, facing it: chairs, armchairs or stools.</summary>
+        private static void Table(int x, int z, string seat = "ViChair")
         {
             Put("ViTable", x, z);
-            Put("ViChair", x, z - 1);
-            Put("ViChair", x + 1, z - 1);
-            Put("ViChair", x, z + 1, 2);
-            Put("ViChair", x + 1, z + 1, 2);
+            Put(seat, x, z - 1);
+            Put(seat, x + 1, z - 1);
+            Put(seat, x, z + 1, 2);
+            Put(seat, x + 1, z + 1, 2);
+        }
+
+        /// <summary>
+        /// A small stage of the pack's floor tiles (rules §6; the pack has no stage): <paramref name="w"/> × <paramref name="d"/>
+        /// modules from (x, z), stacked until it stands 0.4 m high (rules §3); each tile's slab is measured, so the stack
+        /// is solid with no gap and no overlap.
+        /// </summary>
+        private static void Stage(int x, int z, int w, int d)
+        {
+            var probe = (GameObject)Object.Instantiate(_kit["ViFloor"].Prefab);
+            Physics.SyncTransforms();
+            var colliders = probe.GetComponentsInChildren<Collider>().Where(c => c.enabled && !c.isTrigger).ToArray();
+            var slab = colliders.Length > 0 ? colliders.Max(c => c.bounds.max.y) - colliders.Min(c => c.bounds.min.y) : 0.1f;
+            Object.DestroyImmediate(probe);
+            var step = Mathf.Max(0.1f, Mathf.Round(slab * 10f) / 10f);
+            var layers = Mathf.Clamp(Mathf.CeilToInt(0.4f / step - 0.01f), 1, 4);
+            Debug.Log($"[VeilmouthInteriors] stage: floor slab {slab:0.000} m, {layers} layers of {step:0.0} m.");
+            for (var i = 1; i <= layers; i++)
+            {
+                for (var cx = x; cx < x + w * Module; cx += Module)
+                {
+                    for (var cz = z; cz < z + d * Module; cz += Module)
+                    {
+                        At("ViFloor", new Vector3(cx, step * i, cz), Quaternion.identity).name = "Stage";
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -986,16 +1086,18 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>The pack's chandelier under the ceiling; it is only emissive, so it carries a warm light of our own.</summary>
-        private static void Chandelier(int x, int z)
+        private static void Chandelier(int x, int z, float raised = 0f)
         {
-            var block = Put("ViChandelier", x, z, 0, 3.3f);
-            var light = new GameObject("Chandelier light").AddComponent<Light>();
+            // Under the ceiling; a tall room's ceiling is <paramref name="raised"/> higher (the taproom, 7 m, VI-7).
+            var block = Put("ViChandelier", x, z, 0, 3.3f + raised);
+            var light = new GameObject(ChandelierLight).AddComponent<Light>();
             light.transform.SetParent(block.transform, false);
             light.transform.localPosition = new Vector3(1f, -0.9f, 1f);
             light.type = LightType.Point;
             light.color = new Color(1f, 0.8f, 0.55f);
-            light.range = 9f;
-            light.intensity = 3f;
+            // Authoring default: a high chandelier reaches further to light the same floor.
+            light.range = 9f + raised;
+            light.intensity = 3f + raised * 0.6f;
             light.shadows = LightShadows.None;
         }
 

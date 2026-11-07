@@ -1,10 +1,10 @@
 # Slice Models Wanted
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft
 
-Last Updated: 2026-11-07 (Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
+Last Updated: 2026-11-08 (Interiors: a fixed wall bench or settle, an upright piano and a stage platform, which the furnishing rules §8 and the Soot & Bell's pub plan need (VI-7). Earlier: Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
 
 Depends On: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §8 and §14, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -28,7 +28,7 @@ A pack outside the asset map needs the owner's approval. Nothing here is a decis
 
 Priority A means the room reads as empty or wrong without the model. B means it adds life. C is a detail.
 
-**2026-11-07:** the owner chose Victorian Interiors for every interior ([VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md)). It covers the bookcase, fireplace, armchair and settee, wardrobe (a tall cupboard), wall clock and mirror, wall lamp, curtains, writing desk, and the bucket and washstand pieces below. Still wanted from this list: an iron bedstead and a cell cot, the apothecary chest, an archive cabinet, a counter with scale and till, the chapel's altar and lectern, sacks, bar stools and cask rack, a pot rail, a wine rack, and a drawn curtain for the pack's windows: the pack has only one, tied back, so the curtains cannot close at night (VICTORIAN_INTERIORS_PLAN §5).
+**2026-11-07:** the owner chose Victorian Interiors for every interior ([VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md)). It covers the bookcase, fireplace, armchair and settee, wardrobe (a tall cupboard), wall clock and mirror, wall lamp, curtains, writing desk, and the bucket and washstand pieces below. Still wanted from this list: an iron bedstead and a cell cot, the apothecary chest, an archive cabinet, a counter with scale and till, the chapel's altar and lectern, sacks, bar stools and cask rack, a pot rail, a wine rack, a drawn curtain for the pack's windows, and a fixed wall bench, an upright piano and a stage platform (INTERIOR_FURNISHING_RULES §8): the pack has only one, tied back, so the curtains cannot close at night (VICTORIAN_INTERIORS_PLAN §5).
 
 | Model | Where (C1 §8) | Size, m (W × D × H) | Priority | Notes |
 |---|---|---|---|---|
@@ -46,6 +46,9 @@ Priority A means the room reads as empty or wrong without the model. B means it 
 | Curtains for BK's window | Plaster rooms | 1.3 × 0.1 × 2.6 | B | Fitted to BK's window at ×1.2 × 1.2. |
 | Chapel altar, lectern and candelabra | Old chapel | 2 × 1 × 1.1 | B | The rostrum stands in for the altar now. |
 | Sacks of grain and of coal | Kitchen, store room, cellar | 0.6 × 0.4 × 0.8 | C | |
+| Fixed wall bench or settle, high-backed | Soot & Bell public bar and snugs; kitchens; the chapel | 2–3 × 0.6 × 1.2 | B | The pub plan's benches along the walls (rules §6). The public bar seats on stools and chairs until then |
+| Upright piano | Soot & Bell stage; a rich drawing room | 1.5 × 0.6 × 1.3 | B | The stage stands without one (VI-7) |
+| Stage platform with a front edge and steps | Soot & Bell taproom | 3 × 3 × 0.4 | C | Built now from four layers of the pack's floor tile (VI-7); a model would give it a finished edge and steps |
 | Bar stools; casks on a rack | Soot & Bell taproom and cellar | 0.4 × 0.4 × 0.8; 2 × 0.8 × 1.5 | C | |
 | Pots and pans on a hanging rail | Kitchens | 1.5 × 0.2 × 0.6 | C | |
 | Bucket, chamber pot, washstand with a jug | Cells, the missing room | 0.4 × 0.4 × 0.4 | C | |

@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1), the seven wait for VI-7
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-07 (§7.1: VI-6 built the places, rooms, planner and check for the Dwellings; what the kit's measurements changed)
+Last Updated: 2026-11-08 (§7.2: VI-7 furnished the seven by the rules, the Soot & Bell to §6's plan. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -144,6 +144,14 @@ The rules become data and one planner, used by the Dwelling scene and by the sev
 - **The check** (`DwellingPlanner.Audit`, `DwellingTests.SampleHomesKeepTheFurnishingRules`, 84 sample homes): sleep, cook and wash in every home; ways in that reach one another; nothing in a doorway or on a stair's foot; no small thing on a forbidden floor; every seat facing a table, a desk or a hearth within two cells. Symmetry is sought by the placement score, not yet checked.
 - **Servants.** A rich house's plan carries its servants, one and in half the houses two (`SecondServantChance`), and its servant's room a bed for each. Their schedule, cones and running for a Warden belong to the break-in work of 10.3 §6 and are not built yet.
 
+### 7.2 As built for the seven (VI-7)
+
+The seven stay hand-placed in `VeilmouthInteriors`, by §6 and the places of §3; the planner's check is not run on them. Their plans are in the interiors plan, §8 (*What VI-7 changed*).
+
+- **The pub.** Every line of §6 holds in the Soot & Bell except the fixed benches and the piano, which the pack lacks (§8): the public bar seats on stools and chairs. The back-bar cabinet stands half a metre off the bar's axis, since a 4 m piece cannot centre on the 1 m grid.
+- **The stage** is four layers of the pack's 0.1 m floor tile, 0.4 m high, 1 m off the end wall: a tile touching the wall's line would meet the wall's body.
+- **Symmetry.** The faction's hall was widened to 21 m so that its rows, hearths, chandeliers and doors mirror about the street door; the chapel already did.
+
 ## 8. Pieces the pack lacks
 
 Victorian Interiors has no nightstand, coal scuttle, bench or settle, piano, stage, wall cabinet, towel rail or kitchen range. By the interiors plan's §6, a themed prop from another pack may stand in for a piece a room's purpose needs. Until the owner chooses:
@@ -170,6 +178,7 @@ The owner accepted all four recommendations. These are now decisions:
 
 ## Update history
 
+- 2026-11-08 (v0.4): §7.2, as built in VI-7 for the seven.
 - 2026-11-07 (v0.3): §7.1, as built in VI-6 for the Dwellings; §8's nightstand and towel rail as measured.
 - 2026-11-07 (v0.2): the owner's four decisions in §9.
 - 2026-11-07 (v0.1): first draft: the furnishing grammar from building purpose to small props, from the owner's remarks 4, 5, 7 and 8 of VI-5.
