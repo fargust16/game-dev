@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.6
+Version: 0.7
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-5 done; the next steps wait for the owner's word on [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) §9
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-5 done; VI-6 … VI-8 build [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md), each on the owner's word
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-07 (VI-5: the owner's eight remarks in §8; the balustrades, talking through floors, the walls' LOD and the sky round doors fixed; furnishing by rules drafted in `INTERIOR_FURNISHING_RULES.md`. The earlier note is in §10)
+Last Updated: 2026-11-07 (the owner's four decisions on the furnishing rules: VI-6 … VI-8 added to §8, the poor washroom replaces §9.3. The earlier note is in §10)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -131,7 +131,7 @@ The houses follow the layout of a British-style town house of the late 18th to t
 | Shop room, back room | trade at the front, the shopkeeper's room behind | shop | counter, shelves; the back room as a poor or middling Room |
 | Office, store | the warehouse's clerk and its goods | warehouse | desk, chair, cupboard; crates and barrels (§6) |
 
-**Washing by wealth.** A poor household has no bathroom: the privy stands in the court, outside the interior, and indoors there is only a basin and a bucket. A middling house has a WC. A rich house has a full bathroom. The owner confirmed this (§9).
+**Washing by wealth.** A poor household has a washroom of 3 × 3 m with a basin, a bucket and a toilet. A middling house has a WC and a wash place. A rich house has a full bathroom. The owner set the poor washroom on 2026-11-07 after VI-5, replacing §9.3 (furnishing rules §9).
 
 **Layout by floor, rich house:**
 
@@ -226,6 +226,9 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 | **VI-3 Stairs and floors** | The assembler learns storeys: a floor at each 3.5 m plus the ceiling, a stair well, the stair and banister, ceilings that are the next floor, the camera kept under each storey. The Combat Grid reads the storey the fight is on. The Soot & Bell's let rooms go upstairs (owner, §9). | a character walks up and down every stair; the Combat Grid builds on an upper floor; tests. **Done 2026-11-07:** the Soot & Bell on two storeys with no kit fault; the player walks the stair up and down (`StairTests`); a fight on the landing reads the landing and reaches the hall down the stair (`CombatGridStoreyTests`); 25 EditMode and 30 PlayMode tests pass |
 | **VI-4 Dwellings** | `DwellingPlanner` gains §4's room types and the washing by wealth; rich houses get their storeys from the baked house; furnishing lists move to `ViFurniture`; the Stash keeps its rooms and chances. | the sample homes plan and build with no kit fault, each wealth and kind; the PlayMode walk into each kind and back; renders. **Done 2026-11-07:** 14 sample homes, every kind and wealth, with no kit fault; the player walks into each kind and back (`DoorTests`) and up and down both stairs of a rich terrace, villa and shop house (`StairTests`); renders `dwelling_<kind>_<wealth>_<n>` storey by storey |
 | **VI-5 Play test** | The owner walks the seven and a home of each kind. | the owner's remarks, recorded as in city plan §15. **Held 2026-11-07:** eight remarks, below; four fixed at once, four lead to [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) |
+| **VI-6 Furnishing rules** | The places, rooms and buildings of [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) §7 as data, a planner that fills a room from its places, and a check; the Dwellings refurnished: a washroom in every home, servants in rich houses, burglary numbers checked again. | every sample home has somewhere to sleep, cook and wash, walk-ways clear, no small thing on the floor; kit faults 0; renders. |
+| **VI-7 The seven by the rules** | The seven interiors rebuilt by the same rules; the Soot & Bell to the rules' §6 plan, its taproom two storeys high, 7 m. | the counter faces the street door, the way to it clear; kit faults 0; the named people in place; renders. |
+| **VI-8 Play test** | The owner walks the seven and a home of each kind. | the owner's remarks, recorded as in city plan §15. |
 
 **What VI-2 changed from §5 and §7** (authoring defaults unless the owner's):
 
@@ -296,12 +299,13 @@ The owner accepted all five recommendations and authorised VI-1. These are now d
 
 1. **Stone rooms.** The cellar's vaults, the cells and the chapel's nave keep stone as themed exceptions. The old stone kitchens and the laboratory take the pack's walls.
 2. **Middling houses.** No upper floor in the slice. Only rich houses get their storeys.
-3. **Washing by wealth.** A rich house has a bathroom, a middling house a WC, and a poor household a basin and a bucket, with the privy in the court.
+3. **Washing by wealth.** A rich house has a bathroom, a middling house a WC, and a poor household a basin and a bucket, with the privy in the court. *Replaced after VI-5 (owner, 2026-11-07): a poor home has a washroom with a basin, a bucket and a toilet (furnishing rules §9).*
 4. **Upper floors of the seven.** The Soot & Bell's let rooms go up a stair. The faction's house stays on one floor, and Harrow sleeps in the back of the shop as now.
 5. **The view through windows.** A window shows only the sky and the light in the slice.
 
 ## 10. Update history
 
+- 2026-11-07 (v0.6): VI-5, the owner's eight remarks; the balustrades, talking through floors, the walls' LOD and the sky round doors fixed; furnishing by rules drafted in `INTERIOR_FURNISHING_RULES.md`.
 - 2026-11-07 (v0.5): VI-4, the Dwellings rebuilt from Victorian Interiors, with §4's rooms, washing by wealth, and rich houses on three floors joined by a switchback stair.
 - 2026-11-07 (v0.4): VI-3, storeys, the stair and its well, the Soot & Bell's let rooms upstairs, the Combat Grid on the storey of the fight.
 - 2026-11-07 (v0.3): VI-2, the seven rebuilt on the 3 m module, with light from the clock. Earlier: VI-1, the kit families built and measured; the windows are opaque, so daylight comes through lit panes; the owner's answers in §9.

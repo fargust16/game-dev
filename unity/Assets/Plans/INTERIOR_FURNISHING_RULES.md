@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.1
+Version: 0.2
 
-Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the decisions in §9 wait for the owner, and nothing here is built yet
+Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; nothing here is built yet, VI-6 builds it
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-07 (first draft: the furnishing grammar from building purpose to small props, from the owner's remarks 4, 5, 7 and 8 of VI-5)
+Last Updated: 2026-11-07 (§9: the owner accepted the four recommendations: a poor washroom, the taproom 7 m, servants' numbers, VI-6 … VI-8)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -105,7 +105,7 @@ A room is a set of places. *Required* places always come; *optional* ones come b
 | **Middling** | a hall, a parlour, a kitchen with its table, one or two bedrooms, a bathroom (bath, toilet, basin) |
 | **Rich** | a hall with the stair; a drawing room, a dining room, a study or library, a kitchen, a scullery and a pantry; three bedrooms at least, the master's with a dressing room; a bathroom on each bedroom floor or two WCs; a nursery, servants' rooms |
 
-**Servants** (owner, VI-5). A rich house may have servants at home. A servant is a resident of 10.3 §6.1: it keeps its schedule, notices with its own cone and meter, and as a witness of a break-in it runs out of the house to the nearest Warden, as 10.3 §6.2 says of every witness. Its chance and schedule are open (§9).
+**Servants** (owner, VI-5). A rich house may have servants at home. A servant is a resident of 10.3 §6.1: it keeps its schedule, notices with its own cone and meter, and as a witness of a break-in it runs out of the house to the nearest Warden, as 10.3 §6.2 says of every witness. One is at home 06:00–22:00 in every rich house, a second in half of them (§9).
 
 ## 6. Trade, public and work buildings
 
@@ -141,12 +141,14 @@ Victorian Interiors has no nightstand, coal scuttle, bench or settle, piano, sta
 - the range stays the fireplace (owner);
 - a bench, a piano and a stage platform are listed in [SLICE_MODELS_WANTED.md](SLICE_MODELS_WANTED.md); the stage can be built from floor pieces at once.
 
-## 9. Decisions for the owner
+## 9. The owner's decisions (2026-11-07)
 
-1. **Washing for the poor.** The owner decided on 2026-11-07 (interiors plan §9.3) that a poor home has only a basin and a bucket, with the privy in the court. Remark 4 of VI-5 asks for a wash place in every home, and remark 7 allows the poor a shared kitchen-living room and a washroom. *Recommendation:* a poor home gets a small washroom of 3 × 3 m with a basin, a bucket and a toilet, and the earlier answer is replaced.
-2. **The taproom's height.** *Recommendation:* the taproom rises through two storeys, 7 m, with no floor over it. The second let room moves over the stair hall. *Alternative:* 5 m, a storey and a half, which needs walls of another height that the pack does not have.
-3. **Servants.** *Recommendation:* every rich house has one servant at home in its working hours, 06:00–22:00, and a second in half of them, asleep in the servant's room at night. 10.3's burglary numbers are checked again with `tools/balance/burglary_sim.py` once the chance is set. Authoring defaults.
-4. **The order of the work.** *Recommendation:* VI-6 builds the places, rooms and planner of §7 and refurnishes the Dwellings; VI-7 rebuilds the seven by the same rules, the Soot & Bell to §6's plan; VI-8 is the owner's play test.
+The owner accepted all four recommendations. These are now decisions:
+
+1. **Washing for the poor.** A poor home has a small washroom of 3 × 3 m with a basin, a bucket and a toilet. It replaces the earlier basin-and-bucket answer (interiors plan §9.3).
+2. **The taproom's height.** The Soot & Bell's taproom rises through two storeys, 7 m, with no floor over it, and two or three chandeliers hang in the space. The second let room moves over the stair hall.
+3. **Servants.** Every rich house has one servant at home in its working hours, 06:00–22:00, and half of them a second; at night they sleep in the servant's room. Authoring defaults. 10.3's burglary numbers are checked again with `tools/balance/burglary_sim.py` in VI-6.
+4. **The order of the work.** VI-6 builds the places, rooms and planner of §7 and refurnishes the Dwellings; VI-7 rebuilds the seven by the same rules, the Soot & Bell to §6's plan; VI-8 is the owner's play test. Each step waits for the owner's word.
 
 ## Sources
 
@@ -156,4 +158,5 @@ Victorian Interiors has no nightstand, coal scuttle, bench or settle, piano, sta
 
 ## Update history
 
-- 2026-11-07 (v0.1): first draft.
+- 2026-11-07 (v0.2): the owner's four decisions in §9.
+- 2026-11-07 (v0.1): first draft: the furnishing grammar from building purpose to small props, from the owner's remarks 4, 5, 7 and 8 of VI-5.
