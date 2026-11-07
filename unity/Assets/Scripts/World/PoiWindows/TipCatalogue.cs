@@ -48,6 +48,9 @@ namespace GameDev.World.Poi
         public bool needsApproach;
 
         [TextArea(2, 4)] public string line;
+
+        [Tooltip("The fact in the character's own words for the Character Notes (11): what was found, never what to do with it.")]
+        [TextArea(2, 4)] public string note;
     }
 
     /// <summary>The tips of the slice's sources as data (17 Q.2; 09 *Tips a day*). Immutable at run time.</summary>

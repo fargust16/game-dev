@@ -45,6 +45,16 @@ namespace GameDev.Slice.Tests
             yield return Tap(Key.E);
 
             Assert.IsFalse(hud.IsReadingOpen, "Interact again closes it");
+
+            // S1.4: the notice's fact is in the Character Notes, in the character's words.
+            yield return Tap(Key.J);
+
+            Assert.IsTrue(hud.IsNotesOpen, "J opens the Notes");
+            Assert.IsTrue(hud.NoteLines.Any(l => l.Contains("seizure notice for Harrow & Tincture")), string.Join(" | ", hud.NoteLines));
+
+            yield return Tap(Key.J);
+
+            Assert.IsFalse(hud.IsNotesOpen, "J again closes them");
         }
     }
 }

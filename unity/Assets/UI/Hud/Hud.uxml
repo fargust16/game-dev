@@ -8,5 +8,10 @@
             <ui:Label name="reading-text" class="hud__reading-text" text="" picking-mode="Ignore" />
             <ui:Label class="hud__reading-close" text="E  Close" picking-mode="Ignore" />
         </ui:VisualElement>
+        <ui:VisualElement name="notes" class="hud__notes">
+            <ui:Label class="hud__notes-title" text="Notes" picking-mode="Ignore" />
+            <ui:ScrollView name="notes-list" class="hud__notes-list" />
+            <ui:Label class="hud__reading-close" text="J  Close" picking-mode="Ignore" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

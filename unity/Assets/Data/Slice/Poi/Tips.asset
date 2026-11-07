@@ -23,6 +23,7 @@ MonoBehaviour:
     requiresAtLeast: 1
     needsApproach: 0
     line: "MISSING. Mill girls, gone near Loom Lane. The paper's edges are greased by sooty thumbs."
+    note: "A notice on the board: mill girls have gone missing near Loom Lane."
   - id: board.wren
     source: 0
     day: 0
@@ -33,6 +34,7 @@ MonoBehaviour:
     requiresAtLeast: 1
     needsApproach: 0
     line: "MISSING. Thomas Wren, clerk at the mill. Any word to his sister, Lottie Wren, at the Soot & Bell."
+    note: "Thomas Wren, a clerk at the mill, is missing. His sister Lottie posted the notice."
   - id: board.seizure
     source: 0
     day: 1
@@ -43,6 +45,7 @@ MonoBehaviour:
     requiresAtLeast: 1
     needsApproach: 0
     line: "WARDEN SEIZURE NOTICE. Harrow & Tincture, Bell Street, before the second-shift bell. By order, brass number 14."
+    note: "The Wardens posted a seizure notice for Harrow & Tincture on Bell Street, to be done before the second-shift bell."
   - id: nell.harrow
     source: 1
     day: 1
@@ -53,6 +56,7 @@ MonoBehaviour:
     requiresAtLeast: 1
     needsApproach: 0
     line: "Brass-numbers are taking old Harrow tonight. Say he sold black tincture to mill hands. If you care, go before the whistle. After that it's paperwork and padlocks."
+    note: "Nell says the Wardens mean to take old Harrow tonight, for selling black tincture to mill hands."
   - id: nell.collectors
     source: 1
     day: 1
@@ -63,6 +67,7 @@ MonoBehaviour:
     requiresAtLeast: 1
     needsApproach: 1
     line: "After the eleventh bell they take mill girls off Loom Lane. Tonight again."
+    note: "Nell says mill girls are taken off Loom Lane after the eleventh bell."
   - id: nell.chalk
     source: 1
     day: 2
@@ -73,6 +78,7 @@ MonoBehaviour:
     requiresAtLeast: 1
     needsApproach: 0
     line: "Lane's wrong. Coal stairs got fresh chalk. Rain'll wash it by midweek."
+    note: "Nell says there is fresh chalk on the coal stairs."
   - id: kit.drawers
     source: 2
     day: 1
@@ -83,6 +89,7 @@ MonoBehaviour:
     requiresAtLeast: 1
     needsApproach: 0
     line: "They want the drawers more than the man."
+    note: "The newsboy says they want the drawers more than the man."
   - id: kit.coachcoats
     source: 2
     day: 1
@@ -93,6 +100,7 @@ MonoBehaviour:
     requiresAtLeast: 1
     needsApproach: 0
     line: "Collectors in coach-coats. Not proper cabmen."
+    note: "The newsboy talks of collectors in coach-coats, not proper cabmen."
   - id: kit.seal
     source: 2
     day: 2
@@ -103,6 +111,7 @@ MonoBehaviour:
     requiresAtLeast: 1
     needsApproach: 0
     line: "Wax seal melted funny on Harrow's door."
+    note: "The newsboy says the wax seal on Harrow's door melted oddly."
   - id: kit.glove
     source: 2
     day: 2
@@ -113,3 +122,4 @@ MonoBehaviour:
     requiresAtLeast: 2
     needsApproach: 0
     line: "Glove by the coach ruts, down Loom Lane."
+    note: "The newsboy says there was a glove by the coach ruts on Loom Lane."

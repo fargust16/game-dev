@@ -69,3 +69,39 @@
     -unity-text-align: middle-right;
     color: rgb(190, 178, 156);
 }
+
+/* The Character Notes of S1.4: one line for each fact found, in order, and nothing that says what to do. */
+.hud__notes {
+    position: absolute;
+    left: 25%;
+    right: 25%;
+    top: 12%;
+    bottom: 12%;
+    padding: 20px 26px;
+    background-color: rgba(30, 26, 20, 0.94);
+    border-width: 1px;
+    border-color: rgb(120, 104, 80);
+    display: none;
+}
+
+.hud__notes--visible {
+    display: flex;
+}
+
+.hud__notes-title {
+    font-size: 24px;
+    -unity-font-style: bold;
+    color: rgb(236, 228, 210);
+    margin-bottom: 12px;
+}
+
+.hud__notes-list {
+    flex-grow: 1;
+}
+
+.hud__note {
+    font-size: 18px;
+    white-space: normal;
+    color: rgb(236, 228, 210);
+    margin-bottom: 10px;
+}

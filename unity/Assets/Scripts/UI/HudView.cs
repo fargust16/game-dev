@@ -20,12 +20,17 @@ namespace GameDev.UI
         private const string PromptVisible = "hud__prompt--visible";
         private const string ReadingVisible = "hud__reading--visible";
         private const string DoorPrompt = "E  Enter";
+        private const string NotesVisible = "hud__notes--visible";
+        private const string NoteClass = "hud__note";
+        private const string NothingNoted = "Nothing noted yet.";
 
         private Label _time;
         private Label _prompt;
         private VisualElement _reading;
         private Label _readingTitle;
         private Label _readingText;
+        private VisualElement _notes;
+        private ScrollView _notesList;
         private long _shownTick = -1;
         private PlayerLocomotion _player;
         private Portal[] _portals;
@@ -61,11 +66,42 @@ namespace GameDev.UI
             _reading?.RemoveFromClassList(ReadingVisible);
         }
 
+        public bool IsNotesOpen => _notes != null && _notes.ClassListContains(NotesVisible);
+
+        /// <summary>The lines the Notes page shows, top first.</summary>
+        public IReadOnlyList<string> NoteLines => _notesList == null
+            ? new string[0]
+            : _notesList.Query<Label>(className: NoteClass).ToList().Select(l => l.text).ToList();
+
+        /// <summary>Opens the Character Notes page with these lines, or refreshes it while open.</summary>
+        public void ShowNotes(IReadOnlyList<string> lines)
+        {
+            if (!Bind())
+            {
+                return;
+            }
+
+            _notesList.Clear();
+            foreach (var line in lines.Count > 0 ? lines : new[] { NothingNoted })
+            {
+                var label = new Label(line);
+                label.AddToClassList(NoteClass);
+                _notesList.Add(label);
+            }
+
+            _notes.AddToClassList(NotesVisible);
+        }
+
+        public void CloseNotes()
+        {
+            _notes?.RemoveFromClassList(NotesVisible);
+        }
+
         private void Start()
         {
             if (!Bind())
             {
-                Debug.LogError("The HUD's UXML needs the labels 'time', 'prompt', 'reading-title' and 'reading-text' and the element 'reading'.", this);
+                Debug.LogError("The HUD's UXML needs the labels 'time', 'prompt', 'reading-title' and 'reading-text', the elements 'reading' and 'notes', and the scroll view 'notes-list'.", this);
                 enabled = false;
                 return;
             }
@@ -88,7 +124,9 @@ namespace GameDev.UI
             _reading = root.Q<VisualElement>("reading");
             _readingTitle = root.Q<Label>("reading-title");
             _readingText = root.Q<Label>("reading-text");
-            if (_time == null || _prompt == null || _reading == null || _readingTitle == null || _readingText == null)
+            _notes = root.Q<VisualElement>("notes");
+            _notesList = root.Q<ScrollView>("notes-list");
+            if (_time == null || _prompt == null || _reading == null || _readingTitle == null || _readingText == null || _notes == null || _notesList == null)
             {
                 _time = null;
                 return false;

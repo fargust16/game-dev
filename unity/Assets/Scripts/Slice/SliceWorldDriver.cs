@@ -1,3 +1,5 @@
+using GameDev.Input;
+using GameDev.UI;
 using GameDev.World.Poi;
 using GameDev.World.State;
 using GameDev.World.Timekeeping;
@@ -6,8 +8,8 @@ using UnityEngine;
 namespace GameDev.Slice
 {
     /// <summary>
-    /// Owns the slice's run-time world: the world state store, the POI Director on the running clock, and the tips
-    /// the sources say. It lives through scene changes like the clock; a driver that arrives with a later scene while
+    /// Owns the slice's run-time world: the world state store, the POI Director on the running clock, the tips the
+    /// sources say, and the Character Notes, which J opens on the HUD. It lives through scene changes like the clock; a driver that arrives with a later scene while
     /// one already runs removes itself, so a scene may carry one for testing.
     /// </summary>
     public sealed class SliceWorldDriver : MonoBehaviour
@@ -28,6 +30,10 @@ namespace GameDev.Slice
         public TipBook Tips { get; private set; }
 
         public IWorldClock Clock { get; private set; }
+
+        public CharacterNotes Notes { get; private set; }
+
+        private HudView _hud;
 
         /// <summary>Setup for scenes built by code; a placed driver is set in the Inspector.</summary>
         public void Configure(SliceSettings sliceSettings, PoiDefinition[] definitions, TipCatalogue catalogue)
@@ -76,6 +82,52 @@ namespace GameDev.Slice
             Director = new PoiDirector(pois, State, settings.CreateSeed(), SliceSeedStreams.PoiUnattended, Clock);
             Director.Evaluate(Clock.Tick);
             Tips = new TipBook(tips, State, Director);
+            Notes = new CharacterNotes(Tips);
+            Notes.Added += _ => RefreshNotes();
+        }
+
+        // The Notes page belongs to whichever scene's HUD is up; the key works in every scene the world lives through.
+        private void Update()
+        {
+            var input = GameInputService.Instance;
+            if (Notes == null || input == null || !input.NotesPressed)
+            {
+                return;
+            }
+
+            var hud = Hud();
+            if (hud == null)
+            {
+                return;
+            }
+
+            if (hud.IsNotesOpen)
+            {
+                hud.CloseNotes();
+            }
+            else
+            {
+                hud.ShowNotes(Notes.Lines);
+            }
+        }
+
+        private void RefreshNotes()
+        {
+            var hud = Hud();
+            if (hud != null && hud.IsNotesOpen)
+            {
+                hud.ShowNotes(Notes.Lines);
+            }
+        }
+
+        private HudView Hud()
+        {
+            if (_hud == null)
+            {
+                _hud = FindAnyObjectByType<HudView>();
+            }
+
+            return _hud;
         }
 
         private void OnDestroy()
