@@ -263,6 +263,14 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 - **Light.** Every window has a curtain, a lit pane and its spot; every hearth burns; the scene's lights follow the clock as in the seven (§5). The Dwelling scene has no sun of its own.
 - **Renders.** A home is rendered storey by storey with everything above hidden: `dwelling_<kind>_<wealth>_<n>`, `_floor2`, `_floor3`.
 
+**VI-5, the route** (2026-11-07). The owner plays `Veilmouth`, starting on Bell Street before the Soot & Bell, and walks:
+
+- **The seven** through their street doors: the Soot & Bell (both storeys and the stair), Harrow & Tincture, the faction's house, the Wardens' lock-up with its cells, the missing person's room, the cellar under the Soot Stair, the old chapel. Once by day and once by night, for the light from the clock (§5).
+- **A home of each kind found in C2.** Veilmouth has 77 dwelling doors, in six kinds; one door of each, as world X, Z in metres, from its key: a rich villa on the Ridge (40.8, −156; three floors), a middling terrace (12, −197.8), a middling shop (36.8, −280), a poor shop (143.8, −244), a poor tenement flat (64.2, −280), a poor warehouse (44.2, −312).
+- **The kinds C2 does not have.** No rich terrace, rich shop house, poor terrace or middling villa stands in the city. Each is seen in the `Dwelling` scene played alone, with the `Dwelling` object's *Preview Context* set to, for example, `dwelling.0.0|Veilmouth|0|0|Shop|Rich`; the kind is one of Terrace, Tenement, Shop, Villa, Warehouse, and the wealth one of Poor, Middling, Rich. Its street door then leads nowhere, since no such door stands in the city.
+
+What to look for, besides the owner's own eye: whether rooms feel cramped on the 3 m module, the stair and a fight on it, the light by day and night and the frame time in the rich houses, and whether a home reads its household's wealth.
+
 **Risks:**
 
 - **A fight on a stair.** The stair is one grid cell wide. Whether a fight there needs a rule of its own (a narrow place, Surrounded impossible) is left to VI-5 and to the Combat Grid's own documents.
