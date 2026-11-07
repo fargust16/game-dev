@@ -2,40 +2,55 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using GameDev.Slice.Interiors;
 using GameDev.Slice.Kit;
 using GameDev.World.Interiors;
 using GameDev.World.Portals;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// The seven interiors of the city plan C1 §8, built once from BK_AlchemistHouse (owner, 2026-11-05): rooms that read
-    /// as rooms on BK's 4 m module, with walls, doorways, windows, corner posts, floors, ceilings 3.5 m up, the street door
-    /// with its portal, furniture at game scale, a light in each room, and the people at their posts. Room sizes are §8's
-    /// rounded to the 3 m module, then widened by a third with it (owner's play test, 2026-11-06: rooms felt cramped
-    /// beside the character; authoring defaults). It replaces C0's stone boxes, and from then on each scene is the
-    /// owner's: it refuses an interior that already holds its root, and <see cref="BuildReplacing"/> is for the agent's
-    /// own batch iterations only. Plan coordinates: x east, z north, metres from the south-west corner; the street door
-    /// is on the south wall, so an arriving player faces north into the room.
+    /// The seven interiors of the city plan rebuilt wholly from Victorian Interiors (owner, 2026-11-07;
+    /// VICTORIAN_INTERIORS_PLAN §7, VI-2): ground floors on the pack's 3 m module, walls of three finishes, stone only in
+    /// the cellar's vaults, the cells and the chapel, floors, ceilings at the 3.5 m storey, the street door with its
+    /// portal, the pack's furniture and §6's themed props, fireplaces where stoves stood, curtains on every window, and
+    /// light from the clock (<see cref="InteriorLighting"/>): a lit pane and a spot at each window, lamps and candles,
+    /// fire in the hearths. The people stand at their posts. Each scene is the owner's once built: it refuses an interior
+    /// that already holds its root, and <see cref="BuildReplacing"/> is for the owner's request and the agent's batch
+    /// iterations only. Plan coordinates: x east, z north, metres from the south-west corner; the street door is on the
+    /// south wall, so an arriving player faces north into the room. Room sizes are authoring defaults.
     /// </summary>
     public static class VeilmouthInteriors
     {
-        public const string RootName = "Interior C1";
+        public const string RootName = "Interior VI";
         public const string RoomMarker = "Room - ";
-        public const int Module = SliceKitCatalogue.BkModule;
-        // The walls stand 3.6 m (SliceKitCatalogue.BkVertical), but their single-sided frame tops out a little lower: a
-        // ceiling 0.97 of the way up closes the slit of sky seen above an outer wall (render of 2026-11-06).
-        public const float CeilingHeight = 2.42f * SliceKitCatalogue.BkVertical;
+        public const int Module = SliceKitCatalogue.ViModule;
+        public const float Storey = SliceKitCatalogue.ViStorey;
+
+        /// <summary>The ceiling's underside: the pack's ceiling is 0.23 m thick under the storey's height.</summary>
+        public const float CeilingHeight = Storey - 0.23f;
 
         /// <summary>
         /// The layer of a ceiling's collider: the camera's spring arm meets it (SliceCharacterLook.CameraCollision), the
         /// Combat Grid does not read it as a floor (CombatGridReader.Mask leaves Ignore Raycast out).
         /// </summary>
         public const string CeilingLayer = "Ignore Raycast";
+
+        private const float LampIntensity = 2.5f;
+
+        private const string FirePath = "Assets/Victorian Interiors/Victorian Interiors/Prefabs/Particle System.prefab";
+
+        // Measured (probe front views of 2026-11-07, m from the window's middle): the glass painted on each window wall.
+        private static readonly Dictionary<string, (float U0, float U1, float Y0, float Y1, float ProbeU, float ProbeY)> Glass = new()
+        {
+            ["ViPaperWindow"] = (-0.68f, 0.68f, 0.71f, 2.85f, 0.45f, 2.4f),
+            ["ViDarkWindow"] = (-0.46f, 0.46f, 1.17f, 2.94f, 0.35f, 2.75f),
+        };
 
         public static readonly (string Id, string Path)[] All =
         {
@@ -50,22 +65,31 @@ namespace GameDev.Slice.EditorTools
 
         private static Dictionary<string, SliceKitCatalogue.Entry> _kit;
         private static Transform _parent;
+        private static readonly List<Light> WindowLights = new();
+        private static readonly List<Renderer> Panes = new();
+        private static readonly List<InteriorLighting.Hearth> Hearths = new();
 
-        [MenuItem("GameDev/Slice/Build Veilmouth Interiors from C1 (once)")]
+        [MenuItem("GameDev/Slice/Build Veilmouth Interiors from Victorian Interiors (once)")]
         public static void Build() => Run(false);
 
-        /// <summary>Batch only, for the agent's iterations: replaces this pass's own interiors.</summary>
+        /// <summary>Batch only, at the owner's request or for the agent's iterations: replaces the seven interiors.</summary>
         public static void BuildReplacing() => Run(true);
 
         public static void BuildReplacingAndRender()
         {
             Run(true);
-            VeilmouthRenders.RenderInteriors();
+            VeilmouthRenders.RenderInteriorsNoonAndNight();
         }
 
         private static void Run(bool replace)
         {
-            _kit = SliceKitCatalogue.BuildAll();
+            // Every other wrapper as it is on disk (the owner's edits stay); the Victorian ones built afresh.
+            _kit = SliceKitCatalogue.Load();
+            foreach (var kv in SliceKitCatalogue.BuildVictorian())
+            {
+                _kit[kv.Key] = kv.Value;
+            }
+
             foreach (var (id, path) in All)
             {
                 if (File.Exists(path) && !replace)
@@ -88,22 +112,26 @@ namespace GameDev.Slice.EditorTools
         {
             Wall,
             Door,    // an open doorway between rooms
-            Street,  // the doorway to the street: BK's door leaf and the portal
-            Closed,  // a doorway with BK's door leaf shut (a back door, a door to nowhere the player goes)
+            Street,  // the doorway to the street: a shut leaf and the portal
+            Closed,  // a doorway with its leaf shut (a back door, a door to nowhere the player goes)
             Window,
             Cell,    // a cell's front: the bars with their door
         }
 
+        private const string Stone = "Stone";
+
         private sealed class Plan
         {
-            public readonly List<(string Name, int X, int Z, int W, int D, bool Stone)> Rooms = new();
+            public readonly List<(string Name, int X, int Z, int W, int D, string Finish)> Rooms = new();
             public readonly Dictionary<(int X, int Z, bool AlongZ), Opening> Openings = new();
             public (int X, int Z) Street;
 
-            /// <summary>A room; a stone room has a stone floor and brick walls.</summary>
-            public Plan Room(string name, int x, int z, int w, int d, bool stone = false)
+            public bool Windowless => !Openings.Values.Contains(Opening.Window);
+
+            /// <summary>A room of one finish: Paper, Dark, Panel (ViFinishes) or Stone.</summary>
+            public Plan Room(string name, int x, int z, int w, int d, string finish)
             {
-                Rooms.Add((name, x, z, w, d, stone));
+                Rooms.Add((name, x, z, w, d, finish));
                 return this;
             }
 
@@ -123,8 +151,17 @@ namespace GameDev.Slice.EditorTools
         private static void BuildOne(string id, string path)
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+            // No sun indoors: the pack's windows are opaque, and daylight comes through their lit panes (plan §5).
+            foreach (var sun in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+            {
+                Object.DestroyImmediate(sun.gameObject);
+            }
+
             var root = new GameObject(RootName).transform;
             var plan = PlanFor(id);
+            WindowLights.Clear();
+            Panes.Clear();
+            Hearths.Clear();
 
             _parent = Group(root, "Rooms");
             Rooms(plan, id);
@@ -132,58 +169,81 @@ namespace GameDev.Slice.EditorTools
             VeilmouthDressing.Use(_kit, Group(root, "People"));
             Furnish(id);
 
+            var hearthLights = new HashSet<Light>(Hearths.Select(h => h.Light));
+            var lamps = _parent.GetComponentsInChildren<Light>(true).Where(l => !hearthLights.Contains(l)).ToArray();
+            foreach (var lamp in lamps)
+            {
+                // The pack's lamps were lit for baked light (0.9); realtime, a lamp lights its corner of the room.
+                // Authoring defaults: strength 2.5 at least, reach 6–9 m.
+                lamp.intensity = Mathf.Max(lamp.intensity, LampIntensity);
+                lamp.range = Mathf.Clamp(lamp.range, 6f, 9f);
+                lamp.shadows = LightShadows.None;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(lamp);
+            }
+
+            var lighting = new GameObject("Lighting").AddComponent<InteriorLighting>();
+            lighting.transform.SetParent(root, false);
+            lighting.Configure(WindowLights.ToArray(), Panes.ToArray(), lamps, Hearths.ToArray(), plan.Windowless);
+            lighting.Apply(lighting.PreviewMinute);
+
             new GameObject("Interior").AddComponent<InteriorRuntime>().Configure(id);
             SliceTestScenes.AddPlayerRig(new Vector3(plan.Street.X + Module * 0.5f, 0.1f, plan.Street.Z + 1.6f));
             SliceTestScenes.Save(scene, path);
-            Report(path);
+            Report(path, WindowLights.Count, lamps.Length, Hearths.Count);
         }
 
         private static Plan PlanFor(string id)
         {
+            const string paper = "Paper", dark = "Dark", panel = "Panel";
             switch (id)
             {
                 case VeilmouthScene.SootAndBellId:
+                    // The let room stays downstairs until VI-3 takes it up the stair (owner, plan §9).
                     return new Plan()
-                        .Room("Taproom", 0, 0, 20, 12).Room("Kitchen", 0, 12, 8, 8, true).Room("Passage", 8, 12, 4, 8)
-                        .Room("Let room", 12, 12, 8, 8)
-                        .Open(Opening.Street, 8, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 16, 0)
-                        .Open(Opening.Window, 20, 4, true).Open(Opening.Door, 4, 12).Open(Opening.Door, 8, 12)
-                        .Open(Opening.Door, 8, 16, true).Open(Opening.Door, 12, 16, true).Open(Opening.Closed, 8, 20)
-                        .Open(Opening.Window, 16, 20);
+                        .Room("Taproom", 0, 0, 21, 12, panel).Room("Kitchen", 0, 12, 9, 9, dark).Room("Passage", 9, 12, 3, 9, dark)
+                        .Room("Let room", 12, 12, 9, 9, paper)
+                        .Open(Opening.Street, 9, 0).Open(Opening.Window, 3, 0).Open(Opening.Window, 15, 0)
+                        .Open(Opening.Window, 0, 3, true).Open(Opening.Window, 21, 6, true)
+                        .Open(Opening.Door, 3, 12).Open(Opening.Door, 9, 12).Open(Opening.Door, 12, 15, true)
+                        .Open(Opening.Closed, 9, 21).Open(Opening.Window, 3, 21).Open(Opening.Window, 15, 21)
+                        .Open(Opening.Window, 21, 15, true);
                 case "harrow-apothecary":
                     return new Plan()
-                        .Room("Shop", 0, 0, 12, 8).Room("Laboratory", 0, 8, 12, 8, true).Room("Store room", 12, 8, 4, 8, true)
-                        .Open(Opening.Street, 4, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 8, 0)
-                        .Open(Opening.Door, 8, 8).Open(Opening.Door, 12, 12, true).Open(Opening.Window, 0, 12, true);
+                        .Room("Shop", 0, 0, 12, 9, paper).Room("Laboratory", 0, 9, 12, 9, dark).Room("Store room", 12, 9, 3, 9, dark)
+                        .Open(Opening.Street, 3, 0).Open(Opening.Window, 9, 0).Open(Opening.Window, 0, 3, true)
+                        .Open(Opening.Door, 6, 9).Open(Opening.Door, 12, 12, true).Open(Opening.Window, 0, 9, true)
+                        .Open(Opening.Window, 6, 18);
                 case "faction-house":
                     return new Plan()
-                        .Room("Hall", 0, 0, 16, 12).Room("Office", 0, 12, 8, 8).Room("Archive", 8, 12, 8, 8)
-                        .Open(Opening.Street, 8, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 12, 0)
-                        .Open(Opening.Window, 0, 4, true).Open(Opening.Window, 16, 4, true)
-                        .Open(Opening.Door, 0, 12).Open(Opening.Door, 12, 12).Open(Opening.Window, 0, 16, true);
+                        .Room("Hall", 0, 0, 18, 12, panel).Room("Office", 0, 12, 9, 9, paper).Room("Archive", 9, 12, 9, 9, dark)
+                        .Open(Opening.Street, 9, 0).Open(Opening.Window, 3, 0).Open(Opening.Window, 15, 0)
+                        .Open(Opening.Window, 0, 6, true).Open(Opening.Window, 18, 6, true)
+                        .Open(Opening.Door, 3, 12).Open(Opening.Door, 12, 12).Open(Opening.Window, 6, 21)
+                        .Open(Opening.Window, 18, 12, true);
                 case "wardens-lockup":
                     return new Plan()
-                        .Room("Front desk", 0, 0, 12, 8).Room("Office", 12, 0, 8, 8).Room("Corridor", 0, 8, 12, 4, true)
-                        .Room("Guard room", 12, 8, 8, 8).Room("Cell 1", 0, 12, 4, 4, true).Room("Cell 2", 4, 12, 4, 4, true)
-                        .Room("Cell 3", 8, 12, 4, 4, true)
-                        .Open(Opening.Street, 4, 0).Open(Opening.Window, 8, 0).Open(Opening.Window, 16, 0)
-                        .Open(Opening.Door, 12, 4, true).Open(Opening.Door, 8, 8).Open(Opening.Door, 12, 8, true)
-                        .Open(Opening.Cell, 0, 12).Open(Opening.Cell, 4, 12).Open(Opening.Cell, 8, 12);
+                        .Room("Front desk", 0, 0, 12, 9, dark).Room("Office", 12, 0, 9, 9, paper).Room("Corridor", 0, 9, 12, 3, dark)
+                        .Room("Guard room", 12, 9, 9, 9, dark).Room("Cell 1", 0, 12, 3, 6, Stone).Room("Cell 2", 3, 12, 3, 6, Stone)
+                        .Room("Cell 3", 6, 12, 3, 6, Stone)
+                        .Open(Opening.Street, 3, 0).Open(Opening.Window, 9, 0).Open(Opening.Window, 0, 3, true)
+                        .Open(Opening.Door, 6, 9).Open(Opening.Door, 12, 3, true).Open(Opening.Door, 12, 9, true)
+                        .Open(Opening.Window, 15, 0).Open(Opening.Window, 21, 3, true).Open(Opening.Window, 21, 12, true)
+                        .Open(Opening.Cell, 0, 12).Open(Opening.Cell, 3, 12).Open(Opening.Cell, 6, 12);
                 case "missing-room":
                     return new Plan()
-                        .Room("Landing", 0, 0, 8, 4).Room("Room", 0, 4, 8, 8)
-                        .Open(Opening.Street, 4, 0).Open(Opening.Closed, 0, 0).Open(Opening.Door, 0, 4)
-                        .Open(Opening.Window, 4, 12);
+                        .Room("Landing", 0, 0, 9, 3, dark).Room("Room", 0, 3, 9, 9, dark)
+                        .Open(Opening.Street, 3, 0).Open(Opening.Closed, 0, 0, true).Open(Opening.Door, 0, 3)
+                        .Open(Opening.Window, 3, 12);
                 case "soot-stair-cellar":
                     return new Plan()
-                        .Room("West vault", 0, 0, 8, 8, true).Room("Circle vault", 8, 0, 12, 12, true)
-                        .Room("East vault", 20, 0, 8, 8, true)
-                        .Open(Opening.Street, 0, 0).Open(Opening.Door, 8, 4, true).Open(Opening.Door, 20, 4, true);
+                        .Room("West vault", 0, 0, 9, 9, Stone).Room("Circle vault", 9, 0, 12, 12, Stone).Room("East vault", 21, 0, 9, 9, Stone)
+                        .Open(Opening.Street, 0, 0).Open(Opening.Door, 9, 3, true).Open(Opening.Door, 21, 3, true);
                 case "old-chapel":
+                    // The nave is 15 m wide: two rows of 4 m pews and a 3 m aisle under the door.
                     return new Plan()
-                        .Room("Nave", 0, 0, 12, 20, true).Room("Vestry", 12, 12, 4, 8, true)
-                        .Open(Opening.Street, 4, 0).Open(Opening.Window, 0, 4, true).Open(Opening.Window, 0, 12, true)
-                        .Open(Opening.Window, 12, 4, true).Open(Opening.Door, 12, 16, true).Open(Opening.Window, 4, 20);
+                        .Room("Nave", 0, 0, 15, 21, Stone).Room("Vestry", 15, 12, 3, 9, Stone)
+                        .Open(Opening.Street, 6, 0).Open(Opening.Window, 0, 6, true).Open(Opening.Window, 0, 12, true)
+                        .Open(Opening.Window, 15, 6, true).Open(Opening.Door, 15, 15, true);
                 default:
                     throw new ArgumentException(id);
             }
@@ -191,36 +251,34 @@ namespace GameDev.Slice.EditorTools
 
         // ------------------------------------------------------------------------------------------------ rooms
 
-        /// <summary>Floors, ceilings, a marker and a light per room; one wall per module; a post at every node.</summary>
+        /// <summary>Floors, ceilings, a marker and a ceiling collider per room; one wall per module; posts at stone nodes.</summary>
         private static void Rooms(Plan plan, string id)
         {
-            var segments = new Dictionary<(int X, int Z, bool AlongZ), int>();
-            void Count((int, int, bool) s) => segments[s] = segments.TryGetValue(s, out var n) ? n + 1 : 1;
-
-            foreach (var (name, x, z, w, d, stone) in plan.Rooms)
+            var segments = new HashSet<(int X, int Z, bool AlongZ)>();
+            foreach (var (name, x, z, w, d, finish) in plan.Rooms)
             {
                 for (var cx = x; cx < x + w; cx += Module)
                 {
                     for (var cz = z; cz < z + d; cz += Module)
                     {
-                        Put(stone ? "BkStoneFloor" : "BkFloor", cx, cz);
-                        Put("BkCeiling", cx, cz, 0, CeilingHeight);
+                        At(finish == Stone ? "ViStoneFloor" : "ViFloor", new Vector3(cx, 0f, cz), Quaternion.identity);
+                        At("ViCeiling", new Vector3(cx, Storey, cz), Quaternion.identity);
                     }
 
-                    Count((cx, z, false));
-                    Count((cx, z + d, false));
+                    segments.Add((cx, z, false));
+                    segments.Add((cx, z + d, false));
                 }
 
                 for (var cz = z; cz < z + d; cz += Module)
                 {
-                    Count((x, cz, true));
-                    Count((x + w, cz, true));
+                    segments.Add((x, cz, true));
+                    segments.Add((x + w, cz, true));
                 }
 
                 var marker = new GameObject(RoomMarker + name).transform;
                 marker.SetParent(_parent, false);
                 marker.position = new Vector3(x + w * 0.5f, 0f, z + d * 0.5f);
-                marker.localScale = new Vector3(w, CeilingHeight, d);
+                marker.localScale = new Vector3(w, Storey, d);
 
                 // The camera stays under the ceiling (owner's play test, 2026-11-06). Not a kit block: a box the arm meets.
                 var ceiling = new GameObject("Ceiling collider - " + name);
@@ -229,88 +287,253 @@ namespace GameDev.Slice.EditorTools
                 var box = ceiling.AddComponent<BoxCollider>();
                 box.center = new Vector3(x + w * 0.5f, CeilingHeight + 0.15f, z + d * 0.5f);
                 box.size = new Vector3(w, 0.3f, d);
-
-                var light = new GameObject("Light - " + name).AddComponent<Light>();
-                light.transform.SetParent(_parent, false);
-                light.transform.position = new Vector3(x + w * 0.5f, CeilingHeight - 0.4f, z + d * 0.5f);
-                light.type = LightType.Point;
-                light.color = new Color(1f, 0.82f, 0.6f);
-                light.range = Mathf.Max(w, d) * 1.1f;
-                light.intensity = 2.5f;
-                light.shadows = LightShadows.None;
             }
 
-            var nodes = new HashSet<(int, int)>();
+            var stoneNodes = new HashSet<(int, int)>();
             var face = 0;
-            foreach (var ((x, z, alongZ), _) in segments.OrderBy(s => s.Key.X).ThenBy(s => s.Key.Z))
+            foreach (var (x, z, alongZ) in segments.OrderBy(s => s.X).ThenBy(s => s.Z).ThenBy(s => s.AlongZ))
             {
                 plan.Openings.TryGetValue((x, z, alongZ), out var kind);
-                var brickB = face++ % 3 == 2;
-                string Plain(bool stone) => stone ? brickB ? "BkBrickB" : "BkBrick" : "BkPlaster";
-                string Doorway(bool stone) => stone ? "BkDoorway" : "BkPlasterDoorway";
-
-                // BK draws a wall on its local +Z side only: the solid wall faces the first room on the segment, a
-                // wall between two rooms gets a face turned to the second, and each side takes its room's family,
-                // brick for a stone room and plaster for the rest.
                 var sides = Sides(plan, x, z, alongZ);
-                GameObject Wall(Func<bool, string> family)
+                if (kind == Opening.Cell)
                 {
-                    var solid = Segment(family(sides[0].Stone), x, z, alongZ, sides[0].Facing);
-                    if (sides.Count > 1) Segment(family(sides[1].Stone) + "Face", x, z, alongZ, sides[1].Facing);
-                    return solid;
+                    Put("ViCellBars", x, z, alongZ ? 3 : 0).name = "Cell front";
+                    continue;
                 }
 
-                GameObject Leaf(string key) => Segment(key, x, z, alongZ, sides[0].Facing);
-                // The shut leaf stands in its doorway's opening as a nested block, as the cell door in its bars.
-                void Shut(GameObject doorway) => Leaf("BkDoor").transform.SetParent(doorway.transform, true);
-                switch (kind)
+                // The main room is the one listed first: its finish takes the wall, which is drawn on both sides.
+                var main = sides.OrderBy(s => s.Index).First();
+                var other = sides.Count > 1 ? sides.OrderBy(s => s.Index).Last() : default;
+                var stone = main.Finish == Stone;
+                if (sides.Count > 1 && (other.Finish == Stone) != stone)
                 {
-                    case Opening.Wall:
-                        Wall(Plain);
-                        break;
-                    case Opening.Window:
-                        Leaf("BkWindow");
-                        break;
-                    case Opening.Door:
-                        Wall(Doorway);
-                        break;
-                    case Opening.Closed:
-                        Shut(Wall(Doorway));
-                        break;
-                    case Opening.Cell:
-                        Put("CellBars", x, z, alongZ ? 3 : 0);
-                        break;
-                    case Opening.Street:
-                        Shut(Leaf(Doorway(sides[0].Stone)));
-                        var portal = Put("PortalLeafRoom", x, z, alongZ ? 3 : 0).GetComponent<Portal>();
-                        portal.Configure(id + ".inside", SliceTestScenes.SceneName(VeilmouthScene.ScenePath), id + ".street", true);
-                        PrefabUtility.RecordPrefabInstancePropertyModifications(portal);
-                        portal.gameObject.name = $"Portal - {id}.inside";
-                        break;
+                    throw new InvalidOperationException($"{id}: the wall at ({x}, {z}) stands between stone and a finished room; plan them apart.");
                 }
 
-                nodes.Add((x, z));
-                nodes.Add(alongZ ? (x, z + Module) : (x + Module, z));
+                if (kind == Opening.Window && sides.Count > 1)
+                {
+                    throw new InvalidOperationException($"{id}: a window at ({x}, {z}) between two rooms.");
+                }
+
+                if (stone)
+                {
+                    StoneWall(kind, x, z, alongZ, main.Facing, sides.Count > 1 ? other.Facing : (Vector2Int?)null, face++ % 3 == 2, id);
+                    stoneNodes.Add((x, z));
+                    stoneNodes.Add(alongZ ? (x, z + Module) : (x + Module, z));
+                }
+                else
+                {
+                    FinishedWall(kind, main.Finish, x, z, alongZ, main.Facing, id);
+                }
             }
 
-            foreach (var (x, z) in nodes)
+            foreach (var (x, z) in stoneNodes)
             {
-                Put("BkPost", x, z);
+                At("ViStonePost", new Vector3(x, 0f, z), Quaternion.identity);
+            }
+        }
+
+        private static void FinishedWall(Opening kind, string finish, int x, int z, bool alongZ, Vector2Int facing, string id)
+        {
+            var (plain, doorway, window) = SliceKitCatalogue.ViFinishes[finish];
+            doorway ??= SliceKitCatalogue.ViFinishes["Dark"].Doorway;
+            window ??= SliceKitCatalogue.ViFinishes["Dark"].Window;
+            switch (kind)
+            {
+                case Opening.Wall:
+                    Segment(plain, x, z, alongZ, facing);
+                    break;
+                case Opening.Door:
+                    Segment(doorway, x, z, alongZ, facing);
+                    break;
+                case Opening.Closed:
+                    Shut(Segment(doorway, x, z, alongZ, facing), "ViDoor", x, z, alongZ, facing);
+                    break;
+                case Opening.Street:
+                    Shut(Segment(doorway, x, z, alongZ, facing), "ViDoor", x, z, alongZ, facing).name = "Street door";
+                    StreetPortal(id, x, z, alongZ);
+                    break;
+                case Opening.Window:
+                    var wall = Segment(window, x, z, alongZ, facing);
+                    Daylight(wall, window, x, z, alongZ, facing);
+                    var curtain = Hang("ViCurtain", facing, alongZ ? x : z, alongZ ? z : x, 0.2f);
+                    curtain.transform.SetParent(_parent, true);
+                    break;
             }
         }
 
         /// <summary>
-        /// The rooms beside a wall segment, north/south or east/west: the direction from the wall into each, and
-        /// whether it is a stone room.
+        /// BK's stone is drawn on its local +Z side only: the solid wall faces the main room, and a wall between two
+        /// stone rooms gets a seen face turned to the other.
         /// </summary>
-        private static List<(Vector2Int Facing, bool Stone)> Sides(Plan plan, int x, int z, bool alongZ)
+        private static void StoneWall(Opening kind, int x, int z, bool alongZ, Vector2Int facing, Vector2Int? back, bool brickB, string id)
         {
-            var sides = new List<(Vector2Int, bool)>();
+            var plain = brickB ? "ViStoneWallB" : "ViStoneWall";
+            switch (kind)
+            {
+                case Opening.Wall:
+                    Segment(plain, x, z, alongZ, facing);
+                    if (back.HasValue) Segment(plain + "Face", x, z, alongZ, back.Value);
+                    break;
+                case Opening.Door:
+                    Segment("ViStoneDoorway", x, z, alongZ, facing);
+                    if (back.HasValue) Segment("ViStoneDoorwayFace", x, z, alongZ, back.Value);
+                    break;
+                case Opening.Closed:
+                    Shut(Segment("ViStoneDoorway", x, z, alongZ, facing), "ViStoneDoor", x, z, alongZ, facing);
+                    break;
+                case Opening.Street:
+                    Shut(Segment("ViStoneDoorway", x, z, alongZ, facing), "ViStoneDoor", x, z, alongZ, facing).name = "Street door";
+                    StreetPortal(id, x, z, alongZ);
+                    break;
+                case Opening.Window:
+                    var wall = Segment("ViStoneWindow", x, z, alongZ, facing);
+                    Daylight(wall, "ViStoneWindow", x, z, alongZ, facing);
+                    break;
+            }
+        }
+
+        /// <summary>The shut leaf stands in its doorway's opening as a nested block (kit standard §6).</summary>
+        private static GameObject Shut(GameObject doorway, string leaf, int x, int z, bool alongZ, Vector2Int facing)
+        {
+            var door = Segment(leaf, x, z, alongZ, facing);
+            door.transform.SetParent(doorway.transform, true);
+            return door;
+        }
+
+        private static void StreetPortal(string id, int x, int z, bool alongZ)
+        {
+            var portal = Put("PortalLeaf", x, z, alongZ ? 3 : 0).GetComponent<Portal>();
+            portal.Configure(id + ".inside", SliceTestScenes.SceneName(VeilmouthScene.ScenePath), id + ".street", true);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(portal);
+            portal.gameObject.name = $"Portal - {id}.inside";
+        }
+
+        /// <summary>
+        /// A window's daylight (plan §5): a lit pane of our own unlit material on its glass, and a spot just inside
+        /// aimed down into the room; <see cref="InteriorLighting"/> sets both from the hour. The pack's glass is painted on
+        /// the wall, so its rectangle is measured; BK's stone window is found by rays through its opening.
+        /// </summary>
+        private static void Daylight(GameObject wall, string key, int x, int z, bool alongZ, Vector2Int facing)
+        {
+            var f = new Vector3(facing.x, 0f, facing.y);
+            var u = alongZ ? Vector3.forward : Vector3.right;
+            var centre = new Vector3(x, 0f, z) + u * (Module * 0.5f);
+            var probes = new List<MeshCollider>();
+            foreach (var filter in wall.GetComponentsInChildren<MeshFilter>())
+            {
+                if (filter.sharedMesh != null && filter.TryGetComponent<MeshRenderer>(out var r) && r.enabled)
+                {
+                    var c = filter.gameObject.AddComponent<MeshCollider>();
+                    c.sharedMesh = filter.sharedMesh;
+                    probes.Add(c);
+                }
+            }
+
+            var backfaces = Physics.queriesHitBackfaces;
+            Physics.queriesHitBackfaces = true;
+            Physics.SyncTransforms();
+            try
+            {
+                float? Hit(Vector3 at)
+                {
+                    float? best = null;
+                    foreach (var c in probes)
+                    {
+                        if (c.Raycast(new Ray(at + f, -f), out var hit, 2f) && (best == null || hit.distance < best))
+                        {
+                            best = hit.distance;
+                        }
+                    }
+
+                    return best.HasValue ? 1f - best.Value : (float?)null; // m from the wall's line into the room
+                }
+
+                float u0, u1, y0, y1, depth;
+                if (Glass.TryGetValue(key, out var g))
+                {
+                    (u0, u1, y0, y1) = (g.U0, g.U1, g.Y0, g.Y1);
+                    depth = Hit(centre + u * g.ProbeU + Vector3.up * g.ProbeY) ?? SliceKitCatalogue.ViFace;
+                }
+                else
+                {
+                    // The opening is where the rays go deeper than the wall's face, the most common depth: to its glass
+                    // and frame, or through.
+                    var samples = new List<(float U, float Y, float? D)>();
+                    for (var su = -1.4f; su <= 1.4f; su += 0.05f)
+                    {
+                        for (var sy = 0.2f; sy <= Storey - 0.2f; sy += 0.05f)
+                        {
+                            samples.Add((su, sy, Hit(centre + u * su + Vector3.up * sy)));
+                        }
+                    }
+
+                    var face = samples.Where(o => o.D.HasValue).GroupBy(o => Mathf.Round(o.D.Value * 50f))
+                        .OrderByDescending(g => g.Count()).Select(g => g.Key / 50f).DefaultIfEmpty(0f).First();
+                    var open = samples.Where(o => o.D == null || o.D < face - 0.04f).ToList();
+                    (u0, u1, y0, y1) = open.Count > 20
+                        ? (open.Min(o => o.U), open.Max(o => o.U), open.Min(o => o.Y), open.Max(o => o.Y))
+                        : (-0.6f, 0.6f, 1.0f, 2.6f);
+                    var glass = open.Where(o => o.D.HasValue).Select(o => o.D.Value).OrderBy(d => d).ToList();
+                    depth = glass.Count > 0 ? glass[glass.Count / 2] : 0f;
+                    Debug.Log($"[VeilmouthInteriors] {key} at ({x}, {z}): face {face:0.00} m, opening u {u0:0.00}..{u1:0.00}, y {y0:0.00}..{y1:0.00}, pane at {depth:0.00} m.");
+                    if (open.Count <= 20)
+                    {
+                        Debug.LogWarning($"[VeilmouthInteriors] {key} at ({x}, {z}): no opening found; the pane takes an authoring default.");
+                    }
+                }
+
+                var pane = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                Object.DestroyImmediate(pane.GetComponent<Collider>());
+                pane.name = "Window pane";
+                pane.layer = LayerMask.NameToLayer(KitLayers.NoGrid);
+                pane.transform.SetParent(_parent, false);
+                pane.transform.position = centre + u * ((u0 + u1) * 0.5f) + Vector3.up * ((y0 + y1) * 0.5f) + f * (depth + 0.005f);
+                pane.transform.rotation = Quaternion.LookRotation(-f); // a quad shows its face to its local -Z: into the room
+                pane.transform.localScale = new Vector3(u1 - u0, y1 - y0, 1f);
+                var renderer = pane.GetComponent<MeshRenderer>();
+                renderer.sharedMaterial = SliceKitCatalogue.Colour("ViWindowPane", new Color(0.78f, 0.86f, 0.95f), true);
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+                Panes.Add(renderer);
+
+                var spot = new GameObject("Window light").AddComponent<Light>();
+                spot.transform.SetParent(_parent, false);
+                spot.transform.position = centre + Vector3.up * (y1 - 0.1f) + f * 0.5f;
+                spot.transform.rotation = Quaternion.LookRotation((f * 0.75f) + (Vector3.down * 0.66f)); // about 41° down
+                spot.type = LightType.Spot;
+                spot.range = 10f;
+                spot.spotAngle = 95f;
+                spot.innerSpotAngle = 55f;
+                spot.shadows = LightShadows.None;
+                WindowLights.Add(spot);
+            }
+            finally
+            {
+                Physics.queriesHitBackfaces = backfaces;
+                foreach (var c in probes)
+                {
+                    Object.DestroyImmediate(c);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The rooms beside a wall segment, north/south or east/west: the direction from the wall into each, its finish,
+        /// and its place in the plan.
+        /// </summary>
+        private static List<(Vector2Int Facing, string Finish, int Index)> Sides(Plan plan, int x, int z, bool alongZ)
+        {
+            var sides = new List<(Vector2Int, string, int)>();
             void Look(Vector2Int facing, float px, float pz)
             {
-                foreach (var r in plan.Rooms.Where(r => px > r.X && px < r.X + r.W && pz > r.Z && pz < r.Z + r.D))
+                for (var i = 0; i < plan.Rooms.Count; i++)
                 {
-                    sides.Add((facing, r.Stone));
+                    var r = plan.Rooms[i];
+                    if (px > r.X && px < r.X + r.W && pz > r.Z && pz < r.Z + r.D)
+                    {
+                        sides.Add((facing, r.Finish, i));
+                    }
                 }
             }
 
@@ -332,197 +555,325 @@ namespace GameDev.Slice.EditorTools
         /// <summary>A linear block on the segment of one module from (x, z), its local +Z turned to <paramref name="facing"/>.</summary>
         private static GameObject Segment(string key, int x, int z, bool alongZ, Vector2Int facing)
         {
-            var turns = Turns(facing);
             // Local +X runs +X (N), -X (S), -Z (E), +Z (W): the pivot is the segment's start or its end.
             var pivot = facing == S ? new Vector3(x + Module, 0f, z) : facing == E ? new Vector3(x, 0f, z + Module) : new Vector3(x, 0f, z);
-            return At(key, pivot, Quaternion.Euler(0f, 90f * turns, 0f));
+            return At(key, pivot, Quaternion.Euler(0f, 90f * Turns(facing), 0f));
         }
 
         // ------------------------------------------------------------------------------------------------ furniture
 
         /// <summary>
-        /// The rooms of §8 furnished. <c>Against</c> sets a block's back to a wall line with its front into the room,
-        /// <c>Hang</c> hangs a shelf, a board or a painting on a wall's face, and <c>Put</c> places by the south-west
-        /// corner of the turned footprint.
+        /// The rooms of plan §7 furnished from the pack and §6's themed props. <c>Against</c> sets a block's back to a wall
+        /// line with its front into the room, <c>Hang</c> hangs a picture, a lamp or a shelf on a wall's face, and
+        /// <c>Put</c> places by the south-west corner of the turned footprint. A piece three cells wide never stands in a
+        /// corner: the side wall's dado meets it (plan §3).
         /// </summary>
         private static void Furnish(string id)
         {
             switch (id)
             {
                 case VeilmouthScene.SootAndBellId:
-                    // The bar stands 1.5 m before its back cabinet, the keeper between, so the taproom keeps its floor
-                    // (owner's fourth play test, 2026-11-06: the bar stood out in the room, far from its keeper).
-                    Put("BarCounter", 12, 8, 2).name = "Bar";
-                    Against("BarCabinet", S, 12, 12);
-                    Put("Barrel", 17, 10);
-                    Put("Barrel", 18, 10);
-                    Against("BkStove", E, 0, 5).name = "Fireplace";
-                    Hang("BkPainting", E, 0, 8, 1.6f);
-                    foreach (var (tx, tz) in new[] { (3, 1), (3, 7), (15, 1) })
-                    {
-                        Put("BkTavernTable", tx, tz);
-                        Put("BkStool", tx - 1, tz);
-                        Put("BkStool", tx + 2, tz + 1);
-                    }
-
-                    Hang("BkBottleShelf", S, 12, 16, 1.5f);
-                    Against("BkStove", E, 0, 17);
-                    Against("BkSink", S, 20, 4);
-                    Against("BkCupboard", W, 8, 13);
-                    Put("BkKitchenTable", 3, 15, 1);
-                    Put("BkBasket", 1, 12);
-                    Put("Bed", 16, 16).name = "Bed (a room for the night)";
-                    Against("BkDrawer", S, 20, 13);
-                    Put("BkChair", 17, 13);
-                    Put("BkCarpet", 15, 13);
-                    Hang("BkPainting", N, 0, 5, 1.9f);
-                    Hang("BkPainting", W, 20, 9, 1.9f);
-                    Against("BkSideTable", N, 0, 4);
-                    Put("BkLogs", 1, 4);
-                    Hang("BkDishShelf", S, 20, 1, 1.7f);
-                    Against("BkDresser", E, 12, 13);
-                    Hang("BkPainting", E, 8, 13, 1.9f);
-                    Hang("BkPainting", W, 20, 13, 1.9f);
-                    Put("BkTrunk", 13, 12);
-                    VeilmouthDressing.Person("Yellow", false, 15.3f, 10.4f, 180f, "Tavern keeper", 0f);
-                    VeilmouthDressing.Person("Brown", false, 2.0f, 8.7f, 90f, "Veinmarket at a table", 0f);
+                    SootAndBell();
                     break;
-
                 case "harrow-apothecary":
-                    Put("BkCounter", 3, 4, 2).name = "Counter";
-                    Put("BkCounter", 5, 4, 2).name = "Counter";
-                    Hang("BkBottleShelf", S, 8, 1, 1.4f);
-                    Hang("BkBottleShelf", S, 8, 4, 1.4f);
-                    Against("BkCupboardGlass", E, 0, 1);
-                    Against("BkDrawer", W, 12, 1);
-                    Against("BkLabBench", S, 16, 1);
-                    Against("BkAlembic", S, 16, 4);
-                    Put("BkCauldron", 7, 11);
-                    Against("BkDesk", E, 0, 9);
-                    Put("BkStool", 3, 11);
-                    Hang("BkBookShelf", S, 16, 8, 1.6f);
-                    Hang("BkJarShelf", W, 12, 8, 1.5f);
-                    Put("Barrel", 13, 13);
-                    Put("Barrel", 13, 12);
-                    Put("BkBasket", 15, 9);
-                    Put("Crate", 13, 9);
-                    Hang("BkBottleShelf", S, 8, 1, 2.1f);
-                    Hang("BkBottleShelf", S, 8, 4, 2.1f);
-                    Put("BkBasketB", 1, 5);
-                    Put("Crate", 9, 5);
-                    Put("BkWorkTable", 8, 11);
-                    Hang("BkBookShelfB", S, 16, 8, 2.2f);
-                    Put("BkGlobe", 1, 13);
-                    Hang("BkJarShelf", E, 12, 9, 1.5f);
-                    VeilmouthDressing.Person("Green", false, 4.7f, 6.4f, 180f, "Harrow", 0f);
+                    Harrow();
                     break;
-
                 case "faction-house":
-                    Against("Rostrum", S, 12, 7);
-                    foreach (var z in new[] { 2, 5, 8 })
-                    {
-                        Put("Pew", 1, z);
-                        Put("Pew", 8, z);
-                    }
-
-                    Put("Candles", 4, 9);
-                    Put("Candles", 11, 9);
-                    Hang("BkPainting", E, 0, 8, 1.6f);
-                    Against("BkDesk", S, 20, 3);
-                    Put("BkChair", 4, 17);
-                    Against("BkCupboard", E, 0, 13);
-                    Put("BkCarpet", 3, 13);
-                    foreach (var a in new[] { 8, 11 })
-                    {
-                        Against("BkCupboardTall", S, 15, a);
-                    }
-
-                    Hang("BkBookShelf", E, 8, 13, 1.6f);
-                    Against("BkDesk", W, 16, 13);
-                    Hang("BkPainting", W, 16, 9, 1.9f);
-                    Put("BkCarpetLong", 5, 1);
-                    Put("BkCarpetLong", 5, 5);
-                    Hang("BkPainting", N, 12, 5, 1.9f);
-                    Against("BkSideTable", W, 8, 16);
-                    Hang("BkBookShelfB", E, 8, 13, 2.2f);
-                    Hang("BkBookShelfC", E, 8, 16, 1.6f);
-                    Hang("BkBookShelf", E, 8, 16, 2.2f);
-                    Put("BkTrunk", 12, 16);
-                    VeilmouthDressing.Person("Teal", false, 8.0f, 9.9f, 180f, "Faction member", 0f);
-                    VeilmouthDressing.Person("Teal", true, 3.3f, 16.5f, 0f, "Faction member", 0f);
+                    FactionHouse();
                     break;
-
                 case "wardens-lockup":
-                    Put("BkDesk", 4, 4, 2).name = "Front desk";
-                    Against("Pew", E, 1, 1);
-                    Hang("BkBoard", W, 12, 1, 1.0f).name = "Notices";
-                    Against("BkDesk", W, 20, 3);
-                    Put("BkChair", 16, 4);
-                    Against("BkCupboard", S, 8, 15);
-                    Hang("BkPainting", N, 0, 13, 1.6f);
-                    Put("BkStool", 1, 13);
-                    Put("BkBasket", 5, 13);
-                    Put("BkLogs", 9, 13);
-                    Against("BkStove", W, 20, 12);
-                    Put("BkDiningTable", 13, 11);
-                    Put("BkStool", 16, 11);
-                    Against("BkCupboardTall", S, 16, 12);
-                    Hang("BkPainting", N, 0, 1, 1.9f);
-                    Against("BkCupboard", E, 0, 5);
-                    Against("BkCupboardGlass", N, 0, 12);
-                    Hang("BkPainting", S, 8, 16, 1.9f);
-                    Against("BkArmsTable", S, 16, 16);
-                    VeilmouthDressing.Person("Blue", false, 5.3f, 6.1f, 180f, "Warden", 0f);
-                    VeilmouthDressing.Person("Blue", true, 14.7f, 14.0f, 180f, "Warden", 0f);
+                    Lockup();
                     break;
-
                 case "missing-room":
-                    Put("Bed", 1, 8);
-                    Against("BkStove", S, 12, 5);
-                    Against("BkDrawer", W, 8, 5).name = "Wash stand";
-                    Put("BkDiningTable", 4, 5);
-                    Put("BkChair", 7, 4);
-                    Put("BkTrunk", 4, 8).name = "The cache";
-                    Hang("BkBookShelf", E, 0, 5, 1.6f);
-                    Hang("BkPainting", S, 12, 1, 1.9f);
-                    Against("BkDresser", S, 4, 4);
+                    MissingRoom();
                     break;
-
                 case "soot-stair-cellar":
-                    Put("Barrels", 1, 4);
-                    Put("Barrel", 5, 5);
-                    Put("Barrel", 5, 4);
-                    Put("Box", 5, 1);
-                    Put("Firewood", 4, 1);
-                    Put("Barrels", 21, 4);
-                    Put("Box", 25, 1);
-                    Put("BkLogs", 25, 5);
-                    Put("BkBasketB", 1, 7);
-                    Put("Crate", 21, 1);
-                    Put("Candles", 9, 11);
-                    Put("Candles", 19, 11);
-                    VeilmouthDressing.Circle(new Vector3(14f, 0f, 6f), "Candidate 2, the cellar under the Soot Stair");
+                    Cellar();
                     break;
-
                 case "old-chapel":
-                    Against("Rostrum", S, 20, 5);
-                    foreach (var z in new[] { 4, 7, 10, 13, 16 })
-                    {
-                        Put("Pew", 0, z);
-                        Put("Pew", 6, z);
-                    }
-
-                    Put("Candles", 3, 17);
-                    Put("Candles", 8, 17);
-                    Against("BkCupboardTall", S, 20, 12);
-                    Against("BkDesk", W, 16, 13);
-                    Put("BkCarpetLong", 4, 4);
-                    Put("BkCarpetLong", 4, 8);
-                    Put("BkCarpetLong", 4, 12);
-                    Hang("BkPainting", W, 12, 9, 2.0f);
-                    Put("BkTrunk", 13, 16);
+                    Chapel();
                     break;
             }
+        }
+
+        private static void SootAndBell()
+        {
+            // Taproom: the hearth on the west wall, the bar before its cabinet with the keeper between, four tables.
+            Fireplace(E, 0, 6);
+            Against("BarCabinet", S, 12, 13);
+            Put("BarCounter", 12, 8, 2).name = "Bar";
+            Put("Barrel", 18, 10);
+            Put("Barrel", 19, 10);
+            Table(4, 2);
+            Table(4, 6);
+            Table(15, 3);
+            Table(18, 6);
+            Put("ViCoatStand", 7, 1);
+            Chandelier(5, 4);
+            Chandelier(15, 4);
+            Against("ViClock", E, 0, 10);
+            Put("ViPlantC", 18, 0);
+            Hang("ViPicture3", S, 12, 0, 1.6f);
+            Hang("ViPicture6", S, 12, 6, 1.6f);
+            Hang("ViPicture7", W, 21, 0, 1.6f);
+            Hang("ViPicture2", W, 21, 9, 1.6f);
+            Hang("ViWallLamp", E, 0, 0, 2.2f);
+            Hang("ViWallLamp", W, 21, 3, 2.2f);
+            Hang("ViWallLamp", N, 0, 6, 2.2f);
+            Hang("ViWallLamp", N, 0, 12, 2.2f);
+            VeilmouthDressing.Person("Yellow", false, 15.3f, 10.45f, 180f, "Tavern keeper", 0f);
+            VeilmouthDressing.Person("Brown", false, 6.6f, 6.5f, 270f, "Veinmarket at a table", 0f);
+
+            // Kitchen: the hearth burns all day.
+            Fireplace(E, 0, 15, true);
+            Put("ViKitchenTable", 3, 15);
+            Put("ViChair", 3, 14);
+            Put("ViChair", 5, 14);
+            Put("ViChair", 4, 17, 2);
+            Against("ViCupboardGlass", S, 21, 6);
+            Against("ViShelves", W, 9, 13);
+            Against("ViBasin", E, 0, 19);
+            Put("ViBucket", 1, 13);
+            Hang("ViWallLamp", N, 12, 0, 2.2f);
+
+            // Passage and the let room.
+            Hang("ViPicture2", E, 9, 15, 1.6f);
+            Hang("ViWallLamp", W, 12, 18, 2.2f);
+            Against("ViBed", S, 21, 18).name = "Bed (a room for the night)";
+            Against("ViCabinet", N, 12, 19);
+            Put("ViOilLamp", 19, 12, 0, 1.2f);
+            Against("ViBasin", W, 21, 13);
+            Put("ViTableRound", 14, 18);
+            Put("ViChair", 14, 17);
+            Put("ViRug", 15, 15);
+            Hang("ViPicture8", E, 12, 18, 1.6f);
+        }
+
+        private static void Harrow()
+        {
+            // Shop: two counters with Harrow behind them, BK's bottle shelves on the wall behind (themed, plan §6).
+            Put("ViCounter", 3, 4, 2).name = "Counter";
+            Put("ViCounter", 6, 4, 2).name = "Counter";
+            foreach (var a in new[] { 0, 3 })
+            {
+                Hang("BkBottleShelf", S, 9, a, 1.4f);
+                Hang("BkBottleShelf", S, 9, a, 2.1f);
+            }
+
+            Against("ViCupboardGlass", E, 0, 6);
+            Against("ViShelves", W, 12, 1);
+            Against("ViClock", W, 12, 6);
+            Put("ViRug", 4, 1);
+            Put("ViCoatStand", 1, 1);
+            Chandelier(5, 1);
+            Hang("ViPicture4", N, 0, 0, 1.7f);
+            Hang("ViPicture1", N, 0, 6, 1.7f);
+            VeilmouthDressing.Person("Green", false, 4.7f, 6.6f, 180f, "Harrow", 0f);
+
+            // Laboratory (themed): bench, alembic, cauldron and work table; a desk and books.
+            Against("BkLabBench", S, 18, 1);
+            Against("BkAlembic", S, 18, 9);
+            Put("BkCauldron", 7, 13);
+            Put("BkWorkTable", 4, 12);
+            Against("ViDesk", E, 0, 13);
+            Put("ViChair", 2, 14, 3);
+            Hang("BkJarShelf", W, 12, 15, 1.5f);
+            Against("ViBookcaseLow", N, 9, 3);
+            Put("BkGlobe", 10, 10);
+            Hang("ViWallLamp", W, 12, 9, 2.2f);
+
+            // Store room.
+            // Only the middle cell is clear of both walls' dados.
+            Put("Barrel", 13, 16);
+            Put("Barrel", 13, 14);
+            Put("Crate", 13, 12);
+            Put("BkBasket", 13, 10);
+        }
+
+        private static void FactionHouse()
+        {
+            // Hall: the rostrum on the north wall, pews either side of the aisle under the door, the hearth on the west.
+            var rostrum = _kit["Rostrum"].Width;
+            Against("Rostrum", S, 12, (21 - rostrum) / 2);
+            foreach (var z in new[] { 3, 5, 7 })
+            {
+                Put("Pew", 4, z);
+                Put("Pew", 13, z);
+            }
+
+            Put("Candles", 6, 9);
+            Put("Candles", 14, 9);
+            Fireplace(E, 0, 3);
+            Chandelier(9, 4);
+            Put("ViCarpetB", 8, 2);
+            Hang("ViWallLamp", E, 0, 9, 2.2f);
+            Hang("ViWallLamp", W, 18, 9, 2.2f);
+            Hang("ViPicture1", E, 0, 0, 1.7f);
+            Hang("ViPicture5", W, 18, 0, 1.7f);
+            VeilmouthDressing.Person("Teal", false, 10.5f, 9.2f, 180f, "Faction member", 0f);
+
+            // Office: the desk under the window, a bookcase, armchairs by a round table.
+            Against("ViDesk", S, 21, 1);
+            Put("ViChair", 3, 18);
+            Against("ViBookcase", E, 0, 15);
+            Put("ViArmchair", 6, 14, 3);
+            Put("ViArmchair", 6, 16, 3);
+            Put("ViTableRound", 5, 15);
+            Put("ViRug", 3, 14);
+            Against("ViClock", N, 12, 7);
+            Hang("ViPicture6", E, 0, 12, 1.7f);
+            Hang("ViWallLamp", E, 0, 18, 2.2f);
+            VeilmouthDressing.Person("Teal", true, 3.5f, 16.5f, 0f, "Faction member", 0f);
+
+            // Archive: bookcases full of books on three walls, a reading table.
+            Against("ViBookcase", S, 21, 12);
+            Against("ViBookcase", W, 18, 15);
+            Against("ViBookcase", E, 9, 15);
+            Against("ViShelves", N, 12, 15);
+            Put("ViTable", 12, 16);
+            Put("ViChair", 12, 15);
+            Put("ViOilLamp", 13, 16, 0, 1.0f);
+            Hang("ViWallLamp", N, 12, 9, 2.2f);
+        }
+
+        private static void Lockup()
+        {
+            // Front desk room.
+            Put("ViCounter", 4, 4, 2).name = "Front desk";
+            Put("ViChair", 1, 6, 1);
+            Put("ViChair", 1, 7, 1);
+            Hang("BkBoard", W, 12, 6, 1.0f).name = "Notices";
+            Against("ViCabinet", S, 9, 1);
+            Hang("ViPicture7", N, 0, 0, 1.7f);
+            Hang("ViWallLamp", E, 0, 0, 2.2f);
+            VeilmouthDressing.Person("Blue", false, 5.5f, 6.7f, 180f, "Warden", 0f);
+
+            // Office: a desk and a clock.
+            Against("ViDesk", S, 9, 14);
+            Put("ViChair", 15, 6);
+            Against("ViClock", E, 12, 7);
+            Against("ViCupboardGlass", N, 0, 18);
+            Put("ViRug", 15, 2);
+            Hang("ViPicture3", W, 21, 6, 1.7f);
+            Hang("ViWallLamp", N, 0, 12, 2.2f);
+
+            // Corridor and the cells (themed, stone).
+            Hang("ViWallLamp", N, 9, 9, 2.2f);
+            Put("ViBucket", 1, 16);
+            Put("ViBox", 4, 16);
+            Put("ViBucket", 7, 16);
+
+            // Guard room: the hearth, a table with chairs, the weapons table (themed).
+            Fireplace(S, 18, 15);
+            Put("ViKitchenTable", 14, 12);
+            Put("ViChair", 14, 11);
+            Put("ViChair", 16, 11);
+            Put("ViChair", 15, 14, 2);
+            Against("BkArmsTable", W, 21, 15);
+            Against("ViCupboardGlass", E, 12, 15);
+            Hang("ViWallLamp", E, 12, 12, 2.2f);
+            VeilmouthDressing.Person("Blue", true, 18.3f, 15.5f, 90f, "Warden", 0f);
+        }
+
+        private static void MissingRoom()
+        {
+            // One poor room: bed, hearth, table and chairs, a wash stand, the cache.
+            Against("ViBed", S, 12, 6);
+            Fireplace(E, 0, 6);
+            Put("ViTableB", 3, 6);
+            Put("ViChair", 3, 5);
+            Put("ViChair", 4, 7, 2);
+            Put("ViCandle", 4, 6, 0, 0.9f);
+            Against("ViBasin", W, 9, 4).name = "Wash stand";
+            Put("ViBucket", 7, 4);
+            Put("ViBox", 5, 11).name = "The cache";
+            Hang("ViPicture8", N, 3, 3, 1.7f);
+        }
+
+        private static void Cellar()
+        {
+            // Three stone vaults (themed): barrels, boxes, firewood; candles burn always, for no window opens here.
+            Put("Barrels", 1, 6);
+            Put("Barrel", 6, 6);
+            Put("Barrel", 7, 6);
+            Put("Box", 6, 1);
+            Put("Firewood", 4, 1);
+            Put("Candles", 7, 3);
+            Put("Barrels", 23, 6);
+            Put("Box", 27, 1);
+            Put("BkLogs", 27, 6);
+            Put("Crate", 22, 1);
+            Put("Candles", 28, 3);
+            Put("Candles", 10, 9);
+            Put("Candles", 19, 9);
+            VeilmouthDressing.Circle(new Vector3(15f, 0f, 6f), "Candidate 2, the cellar under the Soot Stair");
+        }
+
+        private static void Chapel()
+        {
+            // Nave: the rostrum on the north wall over the aisle, five rows of pews, candle stands (themed).
+            var rostrum = _kit["Rostrum"].Width;
+            Against("Rostrum", S, 21, (15 - rostrum) / 2);
+            foreach (var z in new[] { 4, 7, 10, 13, 16 })
+            {
+                Put("Pew", 2, z);
+                Put("Pew", 9, z);
+            }
+
+            Put("Candles", 4, 18);
+            Put("Candles", 10, 18);
+
+            // Vestry.
+            Against("ViCabinet", W, 18, 13);
+            Put("ViCandle", 17, 13, 0, 1.2f);
+            Against("ViShelfSmall", W, 18, 18);
+            Put("ViChair", 16, 16);
+        }
+
+        /// <summary>A two-cell table with two chairs on either long side, facing it.</summary>
+        private static void Table(int x, int z)
+        {
+            Put("ViTable", x, z);
+            Put("ViChair", x, z - 1);
+            Put("ViChair", x + 1, z - 1);
+            Put("ViChair", x, z + 1, 2);
+            Put("ViChair", x + 1, z + 1, 2);
+        }
+
+        /// <summary>
+        /// The pack's mantel against a wall, with the pack's fire in its firebox (measured: 1.27 × 1.23 m, 0.37 m deep,
+        /// its middle 0.52 m out from the wall's line) and a warm flickering light; a kitchen hearth burns all day.
+        /// </summary>
+        private static void Fireplace(Vector2Int facing, int line, int a, bool kitchen = false)
+        {
+            var block = Against("ViFireplace", facing, line, a);
+            block.name = kitchen ? "Kitchen hearth" : "Fireplace";
+            var fire = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(FirePath), block.transform);
+            fire.name = "Fire";
+            fire.transform.localPosition = new Vector3(Module * 0.5f, 0.05f, 0.52f);
+            var light = new GameObject("Fire light").AddComponent<Light>();
+            light.transform.SetParent(block.transform, false);
+            light.transform.localPosition = new Vector3(Module * 0.5f, 0.6f, 1.1f);
+            light.type = LightType.Point;
+            light.color = new Color(1f, 0.55f, 0.25f);
+            light.range = 7f;
+            light.intensity = 2.5f;
+            light.shadows = LightShadows.None;
+            Hearths.Add(new InteriorLighting.Hearth { Light = light, Flames = fire.GetComponent<ParticleSystem>(), AllDay = kitchen });
+        }
+
+        /// <summary>The pack's chandelier under the ceiling; it is only emissive, so it carries a warm light of our own.</summary>
+        private static void Chandelier(int x, int z)
+        {
+            var block = Put("ViChandelier", x, z, 0, 3.3f);
+            var light = new GameObject("Chandelier light").AddComponent<Light>();
+            light.transform.SetParent(block.transform, false);
+            light.transform.localPosition = new Vector3(1f, -0.9f, 1f);
+            light.type = LightType.Point;
+            light.color = new Color(1f, 0.8f, 0.55f);
+            light.range = 9f;
+            light.intensity = 3f;
+            light.shadows = LightShadows.None;
         }
 
         // ------------------------------------------------------------------------------------------------ placing
@@ -546,10 +897,7 @@ namespace GameDev.Slice.EditorTools
             return Put(key, line - e.Depth, a, turns);
         }
 
-        /// <summary>
-        /// A Face block hung on the wall line, facing into the room, centred on the wall segment that holds
-        /// <paramref name="a"/> (owner's play test, 2026-11-06: a board across a post read lopsided).
-        /// </summary>
+        /// <summary>A hung block on the wall line, facing into the room, on the 3 m segment that holds <paramref name="a"/>.</summary>
         private static GameObject Hang(string key, Vector2Int facing, int line, int a, float y)
         {
             var e = _kit[key];
@@ -600,11 +948,11 @@ namespace GameDev.Slice.EditorTools
             return t;
         }
 
-        private static void Report(string path)
+        private static void Report(string path, int windows, int lamps, int hearths)
         {
             var blocks = Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude);
             var faults = KitLayoutCheck.Check(blocks);
-            Debug.Log($"[VeilmouthInteriors] {path}: {blocks.Length} blocks, {faults.Count} kit faults" +
+            Debug.Log($"[VeilmouthInteriors] {path}: {blocks.Length} blocks, {windows} windows, {lamps} lamps, {hearths} hearths, {faults.Count} kit faults" +
                       (faults.Count > 0 ? ":\n  " + string.Join("\n  ", faults.Take(40).Select(f => f.ToString())) : "."));
         }
     }

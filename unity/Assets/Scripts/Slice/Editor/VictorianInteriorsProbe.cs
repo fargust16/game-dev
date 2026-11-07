@@ -43,6 +43,14 @@ namespace GameDev.Slice.EditorTools
                 }
 
                 report.AppendLine();
+                report.AppendLine("Recesses (VI-2): cells whose first surface lies deeper than the front plateau, seen from each side.");
+                foreach (var name in new[] { "Wall_3", "Wall_6", "Mantel" })
+                {
+                    Recess(name, Vector3.back, report);
+                    Recess(name, Vector3.forward, report);
+                }
+
+                report.AppendLine();
                 StairProfile(report);
                 report.AppendLine();
                 report.AppendLine("Lights, particle systems and transparent materials inside the prefabs:");
@@ -58,6 +66,10 @@ namespace GameDev.Slice.EditorTools
 
             Directory.CreateDirectory(Path.GetDirectoryName(Report));
             File.WriteAllText(Report, report.ToString());
+            foreach (var name in new[] { "Wall_3", "Wall_6" })
+            {
+                Front(name);
+            }
             Debug.Log($"[VictorianInteriorsProbe] written to {Report}");
         }
 
@@ -218,6 +230,113 @@ namespace GameDev.Slice.EditorTools
             report.AppendLine($"{name}: bounds x {b.min.x:0.00}..{b.max.x:0.00}, y {b.min.y:0.00}..{b.max.y:0.00}, z {b.min.z:0.00}..{b.max.z:0.00}");
             report.AppendLine($"  faces {Describe(FaceAreas(go), "+Z", "-Z", "+X", "-X", "+Y", "-Y")}");
             Object.DestroyImmediate(go);
+        }
+
+        /// <summary>
+        /// The depth of the first surface on a raster seen along <paramref name="dir"/>: the most common depth is the
+        /// front plateau, and the largest connected region at least 0.04 m deeper is the recess (a pane, a firebox).
+        /// </summary>
+        private static void Recess(string name, Vector3 dir, StringBuilder report)
+        {
+            var go = Place(name);
+            var b = Seen(go);
+            var start = dir.z < 0f ? b.max.z + 1f : b.min.z - 1f;
+            var depth = new Dictionary<(int, int), float>();
+            var nx = Mathf.RoundToInt(b.size.x / Step);
+            var ny = Mathf.RoundToInt(b.size.y / Step);
+            for (var ix = 1; ix < nx; ix++)
+            {
+                for (var iy = 1; iy < ny; iy++)
+                {
+                    var origin = new Vector3(b.min.x + ix * Step, b.min.y + iy * Step, start);
+                    if (Physics.Raycast(origin, dir, out var hit, b.size.z + 2f))
+                    {
+                        depth[(ix, iy)] = hit.distance - 1f;
+                    }
+                }
+            }
+
+            var plateau = depth.Values.GroupBy(d => Mathf.Round(d * 50f) / 50f).OrderByDescending(g => g.Count()).First().Key;
+            var deep = new HashSet<(int, int)>(depth.Where(kv => kv.Value > plateau + 0.04f).Select(kv => kv.Key));
+            var best = new List<(int, int)>();
+            var seen = new HashSet<(int, int)>();
+            foreach (var s in deep)
+            {
+                if (!seen.Add(s))
+                {
+                    continue;
+                }
+
+                var region = new List<(int, int)>();
+                var queue = new Queue<(int, int)>();
+                queue.Enqueue(s);
+                while (queue.Count > 0)
+                {
+                    var c = queue.Dequeue();
+                    region.Add(c);
+                    foreach (var d in new[] { (1, 0), (-1, 0), (0, 1), (0, -1) })
+                    {
+                        var n = (c.Item1 + d.Item1, c.Item2 + d.Item2);
+                        if (deep.Contains(n) && seen.Add(n))
+                        {
+                            queue.Enqueue(n);
+                        }
+                    }
+                }
+
+                if (region.Count > best.Count)
+                {
+                    best = region;
+                }
+            }
+
+            float X(int i) => b.min.x + i * Step;
+            float Y(int i) => b.min.y + i * Step;
+            var side = dir.z < 0f ? "from +Z" : "from -Z";
+            var text = best.Count == 0
+                ? "none"
+                : $"x {X(best.Min(c => c.Item1)):0.00}..{X(best.Max(c => c.Item1)):0.00}, y {Y(best.Min(c => c.Item2)):0.00}..{Y(best.Max(c => c.Item2)):0.00}, {best.Count * Step * Step:0.00} m2, depth {best.Average(c => depth[c]) - plateau:0.00} m behind the plateau at {plateau:0.00} m in";
+            report.AppendLine($"{name} {side}: {text}");
+            Object.DestroyImmediate(go);
+        }
+
+        /// <summary>
+        /// An orthographic front view of a 3 x 3.5 m wall from +Z at 200 px per metre, with a 0.1 m grid of dots, to read
+        /// a painted window's panes: Logs/SliceSurvey/vinterior_front_NAME.png.
+        /// </summary>
+        private static void Front(string name)
+        {
+            var go = Place(name);
+            var light = new GameObject("Light").AddComponent<Light>();
+            light.type = LightType.Directional;
+            light.transform.rotation = Quaternion.Euler(20f, 180f, 0f);
+            var camera = new GameObject("Camera").AddComponent<Camera>();
+            camera.orthographic = true;
+            camera.orthographicSize = 1.75f;
+            camera.transform.SetPositionAndRotation(new Vector3(0f, 1.75f, 5f), Quaternion.Euler(0f, 180f, 0f));
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = Color.magenta;
+            var target = new RenderTexture(600, 700, 24);
+            camera.targetTexture = target;
+            camera.aspect = 600f / 700f;
+            camera.Render();
+            RenderTexture.active = target;
+            var image = new Texture2D(600, 700, TextureFormat.RGB24, false);
+            image.ReadPixels(new Rect(0, 0, 600, 700), 0, 0);
+            for (var x = 0; x < 600; x += 20)
+            {
+                for (var y = 0; y < 700; y += 20)
+                {
+                    image.SetPixel(x, y, x % 100 == 0 && y % 100 == 0 ? Color.red : Color.yellow);
+                }
+            }
+
+            RenderTexture.active = null;
+            File.WriteAllBytes($"Logs/SliceSurvey/vinterior_front_{name}.png", image.EncodeToPNG());
+            Object.DestroyImmediate(camera.gameObject);
+            Object.DestroyImmediate(light.gameObject);
+            Object.DestroyImmediate(go);
+            target.Release();
         }
 
         /// <summary>The top surface under rays straight down, along the stair's long axis at its middle and its sides.</summary>

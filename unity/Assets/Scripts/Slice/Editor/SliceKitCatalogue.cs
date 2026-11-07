@@ -140,7 +140,7 @@ namespace GameDev.Slice.EditorTools
             ["BkChair"] = 7f, ["BkStool"] = 4f, ["BkBasket"] = 2f, ["BkBasketB"] = 2f, ["BkLogs"] = 20f, ["BkGlobe"] = 8f,
             ["BkCauldron"] = 30f, ["BkDiningTable"] = 60f, ["BkKitchenTable"] = 45f, ["BkDesk"] = 70f, ["BkSideTable"] = 15f,
             ["BkRoundTable"] = 40f, ["BkWorkTable"] = 70f, ["BkArmsTable"] = 80f, ["BkLabBench"] = 120f, ["BkTavernTable"] = 50f,
-            ["ViChair"] = 7f, ["ViArmchair"] = 14f, ["ViFootstool"] = 5f, ["ViTable"] = 15f, ["ViTableB"] = 12f, ["ViTableRound"] = 15f,
+            ["ViChair"] = 7f, ["ViArmchair"] = 14f, ["ViFootstool"] = 5f, ["ViTable"] = 40f, ["ViTableB"] = 35f, ["ViTableRound"] = 20f, // oak, 2 m long: a walker does not shove it
             ["ViDiningTable"] = 90f, ["ViKitchenTable"] = 45f, ["ViBucket"] = 3f, ["ViBox"] = 5f,
         };
 
@@ -534,7 +534,11 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            CellFront(entries["CellBars"], entries["CellDoor"]);
+            if (!_measureOnly)
+            {
+                CellFront(entries["CellBars"], entries["CellDoor"]);
+            }
+
             foreach (var entry in new[]
                      {
                          Paving("Street", "M_YFPM_Pavement01"), Paving("Square", "M_YFPM_Mediterranean01"), PortalLeaf("PortalLeaf", "Leaf", 3),
@@ -548,6 +552,26 @@ namespace GameDev.Slice.EditorTools
             Debug.Log($"Slice kit catalogue: {entries.Count} blocks under {Folder}.\n" +
                       string.Join("\n", entries.Values.Select(e => $"  {e.Key}: {e.Width} x {e.Depth} cells, {e.Height:0.##} m, {e.Path}")));
             return entries;
+        }
+
+        private static bool _measureOnly;
+
+        /// <summary>
+        /// Every block's entry as <see cref="BuildAll"/> measures it, writing no prefab that is already on disk: the owner
+        /// may have changed a wrapper by hand (the BK bottle shelf and counter, 2026-11-07), and a pass that only places
+        /// blocks must keep that.
+        /// </summary>
+        public static Dictionary<string, Entry> Load()
+        {
+            _measureOnly = true;
+            try
+            {
+                return BuildAll();
+            }
+            finally
+            {
+                _measureOnly = false;
+            }
         }
 
         private static Entry Wrap(Spec spec)
@@ -690,7 +714,10 @@ namespace GameDev.Slice.EditorTools
             if (!loose || !Loose(root, baseModel, mass, false))
             {
                 loose = false;
-                AddBody(root, spec.Body, spec.On != null ? Seen(baseModel) : b, width, depth, linear, spec.OpenWidth, spec.OpenHeight, spec.LineBody);
+                if (!RaisedBack(root, spec, baseModel, things, width, depth))
+                {
+                    AddBody(root, spec.Body, spec.On != null ? Seen(baseModel) : b, width, depth, linear, spec.OpenWidth, spec.OpenHeight, spec.LineBody);
+                }
             }
 
             // A shelf hung on a wall keeps its things still, as part of it: packed against the wall and the board, they
@@ -970,6 +997,39 @@ namespace GameDev.Slice.EditorTools
             box.isTrigger = body == Body.Trigger;
         }
 
+        /// <summary>
+        /// A set whose base rises behind its things, as a writing desk's back does over its top (Victorian Interiors'
+        /// desk: top 1.03 m, back 1.44 m, measured 2026-11-07): one box up to the top under the things, and one box for the
+        /// raised back behind them. One box over all would hold the things inside it and fling them when woken.
+        /// False where the set's top is level with its things.
+        /// </summary>
+        private static bool RaisedBack(GameObject root, Spec spec, GameObject baseModel, List<(GameObject Thing, string File)> things, int width, int depth)
+        {
+            if (spec.On == null || spec.Body != Body.Box || things.Count == 0)
+            {
+                return false;
+            }
+
+            var seen = Seen(baseModel);
+            var placed = things.Select(t => Seen(t.Thing)).ToList();
+            var top = placed.Min(t => t.min.y);
+            var front = placed.Min(t => t.min.z) - 0.02f;
+            if (top > seen.max.y - 0.05f)
+            {
+                return false;
+            }
+
+            var min = Vector3.Max(seen.min, Vector3.zero);
+            var max = Vector3.Min(seen.max, new Vector3(width, seen.max.y, depth));
+            Box(root, min, new Vector3(max.x, top, max.z));
+            if (front - min.z > 0.05f)
+            {
+                Box(root, new Vector3(min.x, top, min.z), new Vector3(max.x, max.y, front));
+            }
+
+            return true;
+        }
+
         private static void Box(GameObject root, Vector3 min, Vector3 max)
         {
             var box = root.AddComponent<BoxCollider>();
@@ -1189,7 +1249,11 @@ namespace GameDev.Slice.EditorTools
             var folder = $"{Folder}/{family}";
             KitStandIns.EnsureFolder(folder);
             var path = $"{folder}/{root.name}.prefab";
-            PrefabUtility.SaveAsPrefabAsset(root, path);
+            if (!_measureOnly || !File.Exists(path))
+            {
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+            }
+
             Object.DestroyImmediate(root);
             return new Entry { Key = key, Path = path, Width = width, Depth = depth, Height = height };
         }

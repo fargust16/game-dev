@@ -39,6 +39,12 @@ namespace GameDev.Slice.EditorTools
         /// <summary>Measured (probe of 2026-11-07): the clear opening of the doorway walls, 1.35 × 2.18 m.</summary>
         public const float ViOpenWidth = 1.35f, ViOpenHeight = 2.18f;
 
+        /// <summary>BK's 2.5 m wall module at x1.2 is the pack's 3 m; stretched up, its 2.5 m wall stands the 3.5 m storey.</summary>
+        public const float ViStoneFactor = 1.2f, ViStoneStretch = ViStorey / 2.5f / ViStoneFactor;
+
+        /// <summary>Authoring default, m: a stone wall's brick stands here from its line, its timbers about 0.15 m further in.</summary>
+        public const float ViStoneInfill = 0.03f;
+
         /// <summary>The keys of the room family's walls, by finish: plain, doorway, window (null where the pack has none).</summary>
         public static readonly IReadOnlyDictionary<string, (string Plain, string Doorway, string Window)> ViFinishes =
             new Dictionary<string, (string, string, string)>
@@ -104,6 +110,59 @@ namespace GameDev.Slice.EditorTools
             var banister = R("ViBanister", "Banister", ng, Body.None, Anchor.Centre);
             banister.ModelYaw = 180f;
             yield return banister;
+
+            // Stone (owner, 2026-11-07: the cellar's vaults, the cells and the chapel's nave): the pack has none, so BK's
+            // brick between timbers and its stone floor, at x1.2 along (a 3 m module) and stretched to the 3.5 m storey.
+            // Each BK wall is drawn on its local +Z side only, so a wall between two stone rooms gets a seen face turned
+            // to the second. Its infill stands ViStoneInfill from its line, its timbers 0.15 m further in.
+            Spec Stone(string key, string file, string layer, Body body, Anchor anchor)
+            {
+                var spec = S(key, "ViStone", key.Substring(7), Bk + "/Architecture", file, layer, body, anchor);
+                spec.Factor = ViStoneFactor;
+                spec.Stretch = anchor == Anchor.Centre ? 1f : ViStoneStretch;
+                spec.Pack = "BK";
+                spec.NoLights = true;
+                spec.LineBody = true;
+                if (anchor == Anchor.Linear)
+                {
+                    spec.Width = ViModule;
+                    spec.Infill = body != Body.Leaf;
+                    spec.InfillAt = ViStoneInfill;
+                    spec.OpenWidth = 1.1f * ViStoneFactor;
+                    spec.OpenHeight = 1.98f * ViStoneFactor * ViStoneStretch;
+                }
+
+                return spec;
+            }
+
+            yield return Stone("ViStoneWall", "IntWall02a", st, Body.Box, Anchor.Linear);
+            yield return Stone("ViStoneWallB", "IntWall02b", st, Body.Box, Anchor.Linear);
+            yield return Stone("ViStoneDoorway", "IntWall02door", st, Body.Doorway, Anchor.Linear);
+            foreach (var (key, file) in new[] { ("ViStoneWallFace", "IntWall02a"), ("ViStoneWallBFace", "IntWall02b"), ("ViStoneDoorwayFace", "IntWall02door") })
+            {
+                yield return Stone(key, file, ng, Body.None, Anchor.Linear);
+            }
+
+            var stoneDoor = Stone("ViStoneDoor", "Door", st, Body.Leaf, Anchor.Linear);
+            stoneDoor.Shift = 0.14f * ViStoneFactor / BkArchitecture; // BK's measured frame centre, at this scale
+            yield return stoneDoor;
+            yield return Stone("ViStoneWindow", "IntWall02window01", st, Body.Box, Anchor.Linear);
+            yield return Stone("ViStonePost", "VerticalPillar", ng, Body.None, Anchor.Node);
+
+            // The cells' fronts on the 3 m module: the owner's Tripo bars squeezed to 3 m at their own height, and the cell
+            // door in their doorway (CellFront, as for the 4 m bars).
+            var bars = S("ViCellBars", "ViStone", "CellBars", Tripo, "rusty_iron_gate_3d_model", st, Body.None, Anchor.Linear);
+            bars.SizeX = ViModule;
+            bars.SizeY = 2.76f;
+            bars.Uniform = false;
+            yield return bars;
+            var cellDoor = S("ViCellDoor", "ViStone", "CellDoor", Tripo, "rusty_iron_jail_door_3d_model", ia, anchor: Anchor.Linear);
+            cellDoor.SizeX = 0.9f;
+            cellDoor.SizeY = 2.13f;
+            cellDoor.Uniform = false;
+            cellDoor.Width = ViModule;
+            yield return cellDoor;
+            yield return Stone("ViStoneFloor", "StoneFloor01", KitLayers.Ground, Body.Ground, Anchor.Centre);
 
             Spec F(string key, string file, string layer = pr, Body body = Body.Box, Anchor anchor = Anchor.Centre)
             {
@@ -228,6 +287,7 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
+            CellFront(entries["ViCellBars"], entries["ViCellDoor"]);
             AssetDatabase.SaveAssets();
             Debug.Log($"Slice kit catalogue: {entries.Count} Victorian Interiors blocks.\n" +
                       string.Join("\n", entries.Values.Select(e => $"  {e.Key}: {e.Width} x {e.Depth} cells, {e.Height:0.##} m, {e.Path}")));

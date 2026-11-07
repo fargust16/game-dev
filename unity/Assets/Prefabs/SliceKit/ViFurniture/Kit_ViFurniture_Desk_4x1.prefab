@@ -166,6 +166,7 @@ GameObject:
   - component: {fileID: 2922037714953562035}
   - component: {fileID: 4984827679285927682}
   - component: {fileID: 6043055790804332174}
+  - component: {fileID: 8779492681695332312}
   m_Layer: 10
   m_Name: Kit_ViFurniture_Desk_4x1
   m_TagString: Untagged
@@ -220,8 +221,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3.1977239, y: 1.4375639, z: 1.2101231}
-  m_Center: {x: 2, y: 0.71878195, z: 0.7650616}
+  m_Size: {x: 3.1977239, y: 1.0345123, z: 1.2101231}
+  m_Center: {x: 2, y: 0.51725614, z: 0.7650616}
+--- !u!65 &8779492681695332312
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1546016959661922482}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3.1977239, y: 0.4030516, z: 0.17244545}
+  m_Center: {x: 2, y: 1.2360381, z: 0.24622275}
 --- !u!1 &2401422999495144792
 GameObject:
   m_ObjectHideFlags: 0

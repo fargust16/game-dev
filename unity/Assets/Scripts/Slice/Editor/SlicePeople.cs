@@ -37,10 +37,10 @@ namespace GameDev.Slice.EditorTools
         /// <summary>Where the new people may stand, first free first (authoring defaults, m), with the facing, and the person whose group they join.</summary>
         private static readonly Dictionary<string, (Vector3[] at, float yaw, string beside)> New = new Dictionary<string, (Vector3[], float, string)>
         {
-            // The apothecary's back room, between the desk, the lab bench, and the work table.
-            { "pip", (new[] { new Vector3(5.5f, 0f, 12.5f), new Vector3(10.5f, 0f, 14.5f), new Vector3(5.5f, 0f, 9.5f), new Vector3(10.5f, 0f, 9.5f) }, 180f, "harrow") },
+            // The apothecary's laboratory, between the lab bench, the cauldron, and the work table (Victorian rebuild, VI-2).
+            { "pip", (new[] { new Vector3(5.5f, 0f, 15.5f), new Vector3(9.5f, 0f, 14.5f), new Vector3(6.5f, 0f, 11.5f), new Vector3(9f, 0f, 12.5f) }, 180f, "harrow") },
             // The Soot & Bell, by the table under the east window; the evening and her tenement come with S5c.
-            { "lottie", (new[] { new Vector3(13.5f, 0f, 2.5f), new Vector3(11f, 0f, 4f), new Vector3(7f, 0f, 6f), new Vector3(12f, 0f, 6f) }, 270f, "nell") },
+            { "lottie", (new[] { new Vector3(17.5f, 0f, 5.5f), new Vector3(14f, 0f, 6f), new Vector3(7f, 0f, 4.5f), new Vector3(12.5f, 0f, 6.5f) }, 270f, "nell") },
             // The Market square, before the Masters' stalls.
             { "kit", (new[] { new Vector3(60f, 0f, -262f), new Vector3(52f, 0f, -263f), new Vector3(68f, 0f, -263f), new Vector3(60f, 0f, -238f), new Vector3(58f, 0f, -270f) }, 0f, "tobias") },
         };
@@ -62,19 +62,24 @@ namespace GameDev.Slice.EditorTools
                 var scene = EditorSceneManager.OpenScene(ScenePath(group.Key), OpenSceneMode.Single);
                 Physics.SyncTransforms();
                 var placed = new Dictionary<string, GameObject>();
+                var changed = false;
                 foreach (var entry in group.OrderBy(e => New.ContainsKey(e.Id)))
                 {
-                    placed[entry.Id] = Place(entry, placed);
+                    placed[entry.Id] = Place(entry, placed, ref changed);
                 }
 
-                EditorSceneManager.MarkSceneDirty(scene);
-                EditorSceneManager.SaveScene(scene);
+                // A scene where everyone already stood is not saved: it may be the owner's (Veilmouth is).
+                if (changed)
+                {
+                    EditorSceneManager.MarkSceneDirty(scene);
+                    EditorSceneManager.SaveScene(scene);
+                }
             }
 
             Debug.Log("[SlicePeople] The fourteen named people are placed.");
         }
 
-        private static GameObject Place(SliceRoster.Entry entry, Dictionary<string, GameObject> placed)
+        private static GameObject Place(SliceRoster.Entry entry, Dictionary<string, GameObject> placed, ref bool changed)
         {
             var existing = Object.FindObjectsByType<NamedPerson>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(p => p.Id == entry.Id);
             if (existing != null)
@@ -83,6 +88,7 @@ namespace GameDev.Slice.EditorTools
                 return existing.gameObject;
             }
 
+            changed = true;
             Transform parent;
             Vector3 position;
             Quaternion rotation;

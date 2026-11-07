@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.2
+Version: 0.3
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 done, VI-2 … VI-5 wait for the owner
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 and VI-2 done, VI-3 … VI-5 wait for the owner
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-07 (VI-1: the kit families built and measured; the windows are opaque, so daylight comes through lit panes; the owner's answers in §9)
+Last Updated: 2026-11-07 (VI-2: the seven rebuilt on the 3 m module, with light from the clock; what changed from §5 and §7 is in §8. Earlier: VI-1, the kit families built and measured; the windows are opaque, so daylight comes through lit panes; the owner's answers in §9)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -152,7 +152,7 @@ A rich shop house keeps its shop and back room downstairs. Its living rooms move
 **Windows.**
 
 - Every window is a window wall, with the pack's `Curtain` hung inside it.
-- The curtains are drawn open by day and closed by night, from the clock. They do not move while the player watches; they change at the tick of dusk or dawn. Authoring defaults.
+- The curtains are drawn open by day and closed by night, from the clock. They do not move while the player watches; they change at the tick of dusk or dawn. Authoring defaults. **In VI-2 they stay open:** the pack has one curtain, tied back, and nothing to draw. Closing them waits for a drawn curtain (`SLICE_MODELS_WANTED.md`).
 - The pack's window panes are opaque (§2), so no sun can shine through them. Each window instead carries a **lit pane**: a quad of our own unlit material just inside the glass, whose colour follows the sky at the hour. It is our own material, never a change to a vendor file.
 
 **Daylight** (changed in VI-1 from a directional sun, which the opaque windows would block):
@@ -161,7 +161,8 @@ A rich shop house keeps its shop and back room downstairs. Its living rooms move
 - The spot casts no shadow; at most the room's main window may, inside the light budget below.
 - Ambient light comes from the sky at the hour.
 - Through a window the player sees the sky and the light, not the street (owner, §9).
-- The hour comes from `WorldClock`, as for `S0_LightingController` outside. No second clock is made.
+- The hour comes from the slice's running clock (`GameClockDriver.Running`), as outside. No second clock is made. `InteriorLighting` holds each interior's lights and sets them from the hour.
+- Hours (authoring defaults): daylight from 05:00 to 20:00, full from 07:00 to 18:00; lamps burn while less than half the day's light stands; a fireplace burns 06:00–10:00 and 17:00–23:00, a kitchen hearth 06:00–22:00. A room with no window, the cellar, keeps its candles lit.
 
 **Lamps and candles:**
 
@@ -170,7 +171,7 @@ A rich shop house keeps its shop and back room downstairs. Its living rooms move
 | Rich, middling | a chandelier (`Lamp_1`) in the main rooms; wall lamps (`Lamp_2`) in halls, studies and bedrooms |
 | Poor | candles (`Candle_1…4`) on tables and mantels |
 
-- Each lamp or candle carries one warm point light of its own. It replaces the present hidden light under each ceiling.
+- Each lamp or candle carries one warm point light of its own. It replaces the present hidden light under each ceiling. The pack lit its lamps for baked light at 0.9; real-time, each burns at 2.5 at least and reaches 6–9 m (authoring defaults). The chandelier has no light of its own and carries one.
 - Lamps are lit from dusk to dawn by the clock. Once the slice has resident schedules (S5c), lamps are lit only where someone is at home and awake.
 - A fireplace burns with the pack's fire and a flickering light. It burns in the morning and the evening, and the kitchen hearth burns all day. Authoring defaults.
 
@@ -180,7 +181,7 @@ A rich shop house keeps its shop and back room downstairs. Its living rooms move
 
 - Point lights cast no shadows.
 - At most eight real-time lights stand in one room, the sun included. A room that asks for more lights the extra pieces with emission only.
-- The figure is an authoring default, to be checked in VI-2 against the frame time.
+- The figure is an authoring default. VI-2 keeps it: window spots burn by day and lamps by night, never together, so the most lights at once in a room is seven, in the Soot & Bell's taproom at night. The frame time itself was not measured in batch; VI-5 checks it in play.
 
 ## 6. Themed props kept from other packs
 
@@ -206,11 +207,11 @@ The room programmes stay those of city plan §8, rebuilt on the 3 m module and d
 |---|---|
 | Soot & Bell | taproom 21 × 12 with the bar, a fireplace, tables with chairs, pictures; kitchen 9 × 9 with the hearth; scullery; a stair to the let rooms on the first floor (owner, §9) |
 | Harrow & Tincture | shop 12 × 9 with counters, glazed cupboards and bottle shelves; laboratory 12 × 9 (themed); store room 3 × 9 |
-| Faction's house | hall 15 × 12 with the rostrum, pews and a fireplace; office 9 × 9 with a desk, bookcase and armchairs; archive 9 × 9 with bookcases full of books |
+| Faction's house | hall 18 × 12 with the rostrum, pews and a fireplace; office 9 × 9 with a desk, bookcase and armchairs; archive 9 × 9 with bookcases full of books |
 | Wardens' station | front desk room 12 × 9; office 9 × 9 with a desk and a clock; guard room 9 × 9 with a hearth, table and chairs; corridor and three cells (themed) |
 | Missing person's room | the landing and one poor Room 9 × 9: bed, hearth, table, chair, washstand, the cache |
 | Cellar | three vaults (themed, §9) |
-| Old chapel | nave 12 × 21 and vestry (themed walls, §9), with the pack's candles, books and carpets |
+| Old chapel | nave 15 × 21 and vestry (themed walls, §9), with candle stands |
 
 Rebuilding these scenes needs the owner's request each time, and the owner has given it now: the scenes are the owner's (AGENTS, *Slice assets*). `VeilmouthInteriors` is rebuilt for the pack, and its run replaces only its own root.
 
@@ -221,15 +222,26 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 | Step | Work | Done when |
 |---|---|---|
 | **VI-1 Kit** | Wrap the pack as `ViRoom` and `ViFurniture`: colliders, layers, 1 m placement, back-anchored footprints, pivots corrected. Measure what §3 lists. One sample room of each finish, rendered. | the kit check passes on every wrapper; §3's measurements are recorded here. **Done 2026-11-07:** 74 wrappers, three sample rooms and a gallery of 298 blocks with no kit fault (`VictorianInteriorsSamples`, `VictorianKitTests`) |
-| **VI-2 The seven, ground floors and light** | `VeilmouthInteriors` on the 3 m module with `ViRoom`; §7's rooms dressed from `ViFurniture` and §6; fireplaces, curtains, lamps and candles; daylight through each window's lit pane and spot, from the clock (§5). | the seven build with no kit fault; the portal, people and S1 tests pass; renders at noon and at night |
+| **VI-2 The seven, ground floors and light** | `VeilmouthInteriors` on the 3 m module with `ViRoom`; §7's rooms dressed from `ViFurniture` and §6; fireplaces, curtains, lamps and candles; daylight through each window's lit pane and spot, from the clock (§5). | the seven build with no kit fault; the portal, people and S1 tests pass; renders at noon and at night. **Done 2026-11-07:** the seven with 55–207 blocks each and no kit fault; 24 EditMode and 29 PlayMode tests pass; renders `room_*_noon`, `room_*_night` and `roomeye_*` |
 | **VI-3 Stairs and floors** | The assembler learns storeys: a floor at each 3.5 m plus the ceiling, a stair well, the stair and banister, ceilings that are the next floor, the camera kept under each storey. The Combat Grid reads the storey the fight is on. The Soot & Bell's let rooms go upstairs (owner, §9). | a character walks up and down every stair; the Combat Grid builds on an upper floor; tests |
 | **VI-4 Dwellings** | `DwellingPlanner` gains §4's room types and the washing by wealth; rich houses get their storeys from the baked house; furnishing lists move to `ViFurniture`; the Stash keeps its rooms and chances. | the sample homes plan and build with no kit fault, each wealth and kind; the PlayMode walk into each kind and back; renders |
 | **VI-5 Play test** | The owner walks the seven and a home of each kind. | the owner's remarks, recorded as in city plan §15 |
 
+**What VI-2 changed from §5 and §7** (authoring defaults unless the owner's):
+
+- The faction's hall is 18 × 12, not 15 × 12, so the aisle runs under the street door between two rows of pews. The chapel's nave is 15 × 21, not 12 × 21, for the same reason.
+- The Soot & Bell's let room stands downstairs, behind the passage, until VI-3 takes it up the stair. The scullery comes with VI-3.
+- Harrow's laboratory has no hearth: its fire is the cauldron's.
+- The cells are three stone rooms of 3 × 6 behind one bar front each, with its door.
+- Stone walls are BK's brick at ×1.2, stretched to the 3.5 m storey. A wall never stands between a stone room and a finished one. BK's stone window shows a recessed opening of 0.9 × 1.6 m, found by rays; its lit pane stands on its glass.
+- The street door carries the pack's door leaf, shut, with the portal before it, as before.
+- A desk whose back rises above its top got a body of two boxes, one under its things and one for the back. One box over all held the things inside it, and they were flung out when woken (`SliceKitCatalogue.RaisedBack`).
+- The pack's open shelves (`ViShelves`) stand empty: only bookcases are filled. Seen from far above, a floor shows its lower-detail mesh in patches; at a walker's height it does not.
+
 **Risks:**
 
 - **Stairs and the Combat Grid.** The stair is steep: 4.69 m over 6.35 m, if all of its height is the rise. The grid has so far read only one level. VI-3 carries this risk, and a fight on a stair may need its own rule.
-- **Lights and frame time.** These are measured in VI-2 against §5's budget.
+- **Lights and frame time.** The count stays within §5's budget (§5); the frame time is checked in VI-5.
 - **Room size.** The 3 m module must not bring back the cramped feeling the owner reported on 2026-11-06. §3's table keeps the floor area, and VI-5 checks it.
 
 ## 9. The owner's answers (2026-11-07)

@@ -60,20 +60,39 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// Each C1 interior from above with its ceilings hidden, and each room from a walker's eye in its south-west
-        /// corner toward the far corner. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderInteriors
+        /// Each interior from above with its ceilings hidden, and each room from a walker's eye in its south-west
+        /// corner toward the far corner, at the scene's preview hour. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderInteriors
         /// </summary>
         [MenuItem("GameDev/Slice/Render Veilmouth Interiors")]
-        public static void RenderInteriors()
+        public static void RenderInteriors() => RenderInteriorsAt(null, "");
+
+        /// <summary>
+        /// The interiors at noon and at 23:00 (VI-2's acceptance, VICTORIAN_INTERIORS_PLAN §8): daylight through the
+        /// windows, then lamps, candles and the evening fire. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderInteriorsNoonAndNight
+        /// </summary>
+        public static void RenderInteriorsNoonAndNight()
+        {
+            RenderInteriorsAt(12 * 60, "_noon");
+            RenderInteriorsAt(23 * 60, "_night");
+        }
+
+        private static void RenderInteriorsAt(int? minute, string suffix)
         {
             Directory.CreateDirectory(OutputFolder);
             foreach (var (_, path) in VeilmouthInteriors.All)
             {
                 EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
                 ShowCircles();
-                var name = Path.GetFileNameWithoutExtension(path);
+                var lighting = Object.FindFirstObjectByType<Interiors.InteriorLighting>();
+                if (lighting != null)
+                {
+                    lighting.Apply(minute ?? lighting.PreviewMinute);
+                }
+
+                var name = Path.GetFileNameWithoutExtension(path) + suffix;
                 var ceilings = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None)
-                    .Where(t => t.name.StartsWith("Kit_BkRoom_Ceiling")).Select(t => t.gameObject).ToArray();
+                    .Where(t => t.name.StartsWith("Kit_BkRoom_Ceiling") || t.name.StartsWith("Kit_ViRoom_Ceiling"))
+                    .Select(t => t.gameObject).ToArray();
                 foreach (var c in ceilings)
                 {
                     c.SetActive(false);

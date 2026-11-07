@@ -44,7 +44,7 @@ namespace GameDev.Slice.Tests
         {
             yield return LoadScene("Assets/Scenes/Slice/Interiors/SootAndBell.unity");
             var table = Object.FindObjectsByType<LooseProp>(FindObjectsInactive.Exclude)
-                .Where(p => !p.IsThing && p.name.Contains("TavernTable")).OrderBy(p => p.name).FirstOrDefault();
+                .Where(p => !p.IsThing && p.name.Contains("Kit_ViFurniture_Table_")).OrderBy(p => p.name).FirstOrDefault();
             Assert.IsNotNull(table, "the tavern has a table");
             yield return Push(table, 0.05f, false);
         }
