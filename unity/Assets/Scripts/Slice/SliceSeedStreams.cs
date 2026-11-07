@@ -23,6 +23,9 @@ namespace GameDev.Slice
         /// <summary>A dwelling's rooms, furniture and Stash (15; 10.3 §6.1); fork it with the door's place as the keys.</summary>
         public const string Dwellings = "slice.dwellings";
 
-        public static readonly IReadOnlyList<string> All = new[] { RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings };
+        /// <summary>How a POI ends when nobody comes (04; 11.1); fork it with the POI's id hashed as the key.</summary>
+        public const string PoiUnattended = "slice.poi.unattended";
+
+        public static readonly IReadOnlyList<string> All = new[] { RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended };
     }
 }
