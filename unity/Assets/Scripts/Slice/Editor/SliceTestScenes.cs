@@ -248,6 +248,8 @@ namespace GameDev.Slice.EditorTools
             document.panelSettings = PanelSettingsAsset();
             document.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(HudPath);
             hud.AddComponent<HudView>();
+
+            SliceWorldSetup.AddWorld();
         }
 
         /// <summary>The slice's one panel: Unity's default runtime theme, scaled from 1920 × 1080 (authoring default).</summary>

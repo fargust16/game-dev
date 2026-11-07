@@ -32,3 +32,40 @@
 .hud__prompt--visible {
     display: flex;
 }
+
+/* The plain panel of S1.3: what a source says, until S2's dialogue replaces it. */
+.hud__reading {
+    position: absolute;
+    left: 30%;
+    right: 30%;
+    bottom: 28%;
+    padding: 18px 22px;
+    background-color: rgba(24, 20, 16, 0.88);
+    border-width: 1px;
+    border-color: rgb(120, 104, 80);
+    display: none;
+}
+
+.hud__reading--visible {
+    display: flex;
+}
+
+.hud__reading-title {
+    font-size: 22px;
+    -unity-font-style: bold;
+    color: rgb(236, 228, 210);
+    margin-bottom: 10px;
+}
+
+.hud__reading-text {
+    font-size: 19px;
+    white-space: normal;
+    color: rgb(236, 228, 210);
+}
+
+.hud__reading-close {
+    font-size: 16px;
+    margin-top: 12px;
+    -unity-text-align: middle-right;
+    color: rgb(190, 178, 156);
+}

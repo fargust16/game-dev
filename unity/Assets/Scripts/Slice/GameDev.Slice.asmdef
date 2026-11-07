@@ -4,7 +4,11 @@
     "references": [
         "GameDev.World.Seed",
         "GameDev.World.Time",
-        "GameDev.Locomotion"
+        "GameDev.Locomotion",
+        "GameDev.Input",
+        "GameDev.UI",
+        "GameDev.World.State",
+        "GameDev.World.Poi"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

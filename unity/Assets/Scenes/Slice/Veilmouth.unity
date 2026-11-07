@@ -67239,13 +67239,37 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7964897076008366724, guid: de6a2a59e3d4d174dace9ce4b8b0dc3e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 756859920}
   m_SourcePrefab: {fileID: 100100000, guid: de6a2a59e3d4d174dace9ce4b8b0dc3e, type: 3}
 --- !u!4 &756859918 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6040017186925183899, guid: de6a2a59e3d4d174dace9ce4b8b0dc3e, type: 3}
   m_PrefabInstance: {fileID: 756859917}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &756859919 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7964897076008366724, guid: de6a2a59e3d4d174dace9ce4b8b0dc3e, type: 3}
+  m_PrefabInstance: {fileID: 756859917}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &756859920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 756859919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a14414e0d83ffb2489a20685b84e7354, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.TipSourcePoint
+  source: 0
+  title: Notice Board
+  nothingLine: Nothing new on the board.
+  interactRadius: 2.5
 --- !u!1001 &758081508
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -170779,6 +170803,56 @@ MonoBehaviour:
   arriveOnPositiveZ: 1
   interactRadius: 1.5
   arrivalDistance: 1
+--- !u!1 &2121016868
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2121016870}
+  - component: {fileID: 2121016869}
+  m_Layer: 0
+  m_Name: SliceWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2121016869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2121016868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 133aa55fbb0a0f14bb1270b349e76a55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.SliceWorldDriver
+  settings: {fileID: 11400000, guid: 8d3d203705f912548a7b9b7d430f09d7, type: 2}
+  pois:
+  - {fileID: 11400000, guid: 1d3d9d0cb6654077ac21992cc277ad91, type: 2}
+  - {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
+  - {fileID: 11400000, guid: 1afbb87f59ce4488b916e8e08b724d91, type: 2}
+  tips: {fileID: 11400000, guid: 2d6a9e5f2e884da4abd1b13c1146f7c7, type: 2}
+--- !u!4 &2121016870
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2121016868}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2122604393
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -172900,3 +172974,4 @@ SceneRoots:
   - {fileID: 1179161075}
   - {fileID: 1276947071}
   - {fileID: 558627434}
+  - {fileID: 2121016870}

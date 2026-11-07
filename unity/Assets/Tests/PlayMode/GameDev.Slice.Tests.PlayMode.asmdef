@@ -13,7 +13,9 @@
         "GameDev.World.Portals",
         "GameDev.World.Interiors",
         "GameDev.UI",
-        "GameDev.Slice"
+        "GameDev.Slice",
+        "GameDev.World.Poi",
+        "GameDev.World.State"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
