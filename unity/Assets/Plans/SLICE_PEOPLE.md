@@ -1,8 +1,8 @@
 # Vertical Slice — People (content piece C1)
 
-Status: Draft — **proposed by the agent, 2026-11-06; not accepted**. Names are placeholders and mutable.
+Status: Draft — proposed by the agent on 2026-11-06 and **accepted by the owner on 2026-11-07**: all fourteen, with the agent's placeholder names, which stay mutable.
 Created: 2026-11-06
-Last Updated: 2026-11-06 (first draft for the owner)
+Last Updated: 2026-11-07 (accepted by the owner: the roster and the placeholder names. Earlier: first draft for the owner)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](../../../11.1%20Vertical%20Slice%20POIs.md), [09 Information Sources](../../../09%20Information%20Sources.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §5
 Related: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1 (colours), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §21 (places)
 
@@ -46,8 +46,6 @@ The lines are 11.1's, sorted by source; S1 needs nothing more. Times are 11's au
 
 At most one rumour a day may be false, never about a Ritual Weak Point (09). The traces of the run's Weak Points are placed by the seed among these people (11 *Finding the traces*) and come with S6.
 
-## 3. Open for the owner
+## 3. The owner's answers
 
-- The roster: these fourteen, fewer, or others.
-- The names: placeholders the agent proposes and the owner changes, or the owner's own.
-- See the open questions of S1 in the implementation plan.
+Owner, 2026-11-07: all fourteen; the agent's placeholder names, which the owner may change at any time. Schedules, what each person knows beyond §2, and the traces they carry come with their milestones (S5c, S2, S6).
