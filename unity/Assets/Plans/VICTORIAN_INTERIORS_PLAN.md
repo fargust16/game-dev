@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.7
+Version: 0.8
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-5 done; VI-6 … VI-8 build [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md), each on the owner's word
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-6 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings; VI-7 (the seven) and VI-8 (play test) follow, each on the owner's word
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-07 (the owner's four decisions on the furnishing rules: VI-6 … VI-8 added to §8, the poor washroom replaces §9.3. The earlier note is in §10)
+Last Updated: 2026-11-07 (VI-6 done: the Dwellings furnished by rules; a middling terrace or shop washes in a bathroom of 3 × 6, a poor home in its washroom. The earlier note is in §10)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -131,7 +131,7 @@ The houses follow the layout of a British-style town house of the late 18th to t
 | Shop room, back room | trade at the front, the shopkeeper's room behind | shop | counter, shelves; the back room as a poor or middling Room |
 | Office, store | the warehouse's clerk and its goods | warehouse | desk, chair, cupboard; crates and barrels (§6) |
 
-**Washing by wealth.** A poor household has a washroom of 3 × 3 m with a basin, a bucket and a toilet. A middling house has a WC and a wash place. A rich house has a full bathroom. The owner set the poor washroom on 2026-11-07 after VI-5, replacing §9.3 (furnishing rules §9).
+**Washing by wealth.** A poor household has a washroom of 3 × 3 m with a basin, a bucket and a toilet. A middling terrace, villa or shop has a bathroom of 3 × 6 m with a bath, a toilet and a basin; a middling flat a WC of 3 × 3 with a toilet and a basin. A rich house has a full bathroom on its first floor and a second under the roof (VI-6, furnishing rules §5). The owner set the poor washroom on 2026-11-07 after VI-5, replacing §9.3 (furnishing rules §9).
 
 **Layout by floor, rich house:**
 
@@ -257,7 +257,7 @@ Each iteration ends with tests, renders in `Logs/SliceSurvey/`, a commit, and a 
 - **Floors.** Every rich terrace, villa and shop house has three floors. §4.1 gives them three or four storeys outside, and an interior keeps at most three. Middling and poor homes, tenement flats and warehouses keep one (owner, §9).
 - **The stair hall.** A rich house's hall is 12 × 12 with a switchback: the first flight climbs east in its middle row to the first floor, the second climbs west in the row behind to the second. Each storey's landing is a Landing room over the hall. A plan mirrored left to right turns both flights.
 - **Rich house, 24 × 21 m.** Ground floor: drawing room 6 × 12, dining room 6 × 12, study 9 × 9 in panelling, kitchen 9 × 9, scullery 6 × 9. First floor: bedroom and second bedroom 6 × 12, dressing room 6 × 9, bathroom 6 × 9, guest room 12 × 9. Second floor: nursery, servant's room, box room. A rich shop house keeps its shop, back room and kitchen downstairs; drawing room, dining room, bathroom and study go to the first floor, bedrooms, servant's room and box room to the second.
-- **Middling and poor homes.** A terrace or villa has a hall, parlour 9 × 9, kitchen 9 × 6 with its hearth, a closet of 3 × 3, a pantry and a bedroom 12 × 6. The closet is the WC in a middling house and a coal store in a poor one (washing by wealth, §9). A middling shop has a shop room 12 × 9, kitchen, WC, store and back room; a poor shop a shop room and a back room. A tenement flat is one room, or a room and a kitchen.
+- **Middling and poor homes** (as rebuilt in VI-6, furnishing rules §5). A middling terrace or villa has a hall, parlour 9 × 9, kitchen 9 × 6 with its hearth, a bathroom 3 × 6 beside it and a bedroom 12 × 6. A poor one is entered into its kitchen-living room 12 × 9, with a coal store, a bedroom, a washroom 3 × 3 and a back bedroom. A middling shop has a shop room 12 × 9, a kitchen, a bathroom and a back room; a poor shop a shop room, a back room where the household cooks and sleeps, and a washroom. A tenement flat is one room, or a kitchen and a bedroom, with a washroom (a WC if middling).
 - **A 6 × 6 kitchen cannot hold a fireplace.** A fireplace stands against an inner wall with a room behind it, and three modules leave no such wall free of the doorways. Kitchens are 9 × 6.
 - **Warehouse.** The store and office take the dark finish, not stone: §9 keeps stone for the cellar vaults, the cells and the chapel's nave only.
 - **Furnishing.** Every room kind has its own list from `ViFurniture`, each item with the wealth it starts from and, where it stops, the wealth it ends at: candles in poor homes, wall lamps in middling and rich, a chandelier and a fireplace in every rich main room, a picture drawn from the pack's eight by the seed. Chairs stand at a table's sides facing it. A desk wider than a module takes two wall segments. A closet of one module keeps only the first row inside its door clear. Crates and barrels stay in stores and box rooms (§6). Two pieces put free never touch: a crate's body juts 1 cm past its cell, and two side by side broke the kit check.
@@ -305,6 +305,8 @@ The owner accepted all five recommendations and authorised VI-1. These are now d
 
 ## 10. Update history
 
+- 2026-11-07 (v0.8): VI-6, the Dwellings furnished by `INTERIOR_FURNISHING_RULES.md` §7: places, rooms, the planner and its check; a washroom or bathroom in every home, servants in rich houses, the burglary numbers checked again (10.3 §6).
+- 2026-11-07 (v0.7): the owner's four decisions on the furnishing rules: VI-6 … VI-8 added to §8, the poor washroom replaces §9.3.
 - 2026-11-07 (v0.6): VI-5, the owner's eight remarks; the balustrades, talking through floors, the walls' LOD and the sky round doors fixed; furnishing by rules drafted in `INTERIOR_FURNISHING_RULES.md`.
 - 2026-11-07 (v0.5): VI-4, the Dwellings rebuilt from Victorian Interiors, with §4's rooms, washing by wealth, and rich houses on three floors joined by a switchback stair.
 - 2026-11-07 (v0.4): VI-3, storeys, the stair and its well, the Soot & Bell's let rooms upstairs, the Combat Grid on the storey of the fight.

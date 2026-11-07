@@ -24,6 +24,7 @@ MonoBehaviour:
       y: 0
       width: 3
       height: 3
+    height: 0
   - key: ViCeiling
     prefab: {fileID: 1903438837858176508, guid: 9e69a56b478798048b4482c18e7addaa, type: 3}
     width: 3
@@ -35,6 +36,7 @@ MonoBehaviour:
       y: 0
       width: 0
       height: 0
+    height: 0.22528368
   - key: ViPaper
     prefab: {fileID: 5340873840852906996, guid: ae870a8d8c90d2c42b35fc0d1d215183, type: 3}
     width: 3
@@ -46,6 +48,7 @@ MonoBehaviour:
       y: -0.058458596
       width: 2.6799998
       height: 0.21845862
+    height: 3.499999
   - key: ViPaperDoorway
     prefab: {fileID: 4726604649597656862, guid: 220beb1dcb2dcb542869e961e33d20b8, type: 3}
     width: 3
@@ -57,6 +60,7 @@ MonoBehaviour:
       y: -0.1002402
       width: 2.6004806
       height: 0.3
+    height: 3.4999995
   - key: ViPaperWindow
     prefab: {fileID: 8686921683493993363, guid: bb5027b853be7344fbfa5e4a8b52323f, type: 3}
     width: 3
@@ -68,6 +72,7 @@ MonoBehaviour:
       y: -0.102815494
       width: 2.6056309
       height: 0.3
+    height: 3.4999993
   - key: ViDark
     prefab: {fileID: 4434577520177296664, guid: 67b7a7fac5d5a094387832bac1fa33ff, type: 3}
     width: 3
@@ -79,6 +84,7 @@ MonoBehaviour:
       y: -0.10922903
       width: 2.7815418
       height: 0.21845809
+    height: 3.499999
   - key: ViDarkDoorway
     prefab: {fileID: 4310150033674446116, guid: 2a9be46e7080bd44caf391399c30116e, type: 3}
     width: 3
@@ -90,6 +96,7 @@ MonoBehaviour:
       y: -0.15329513
       width: 2.69341
       height: 0.3
+    height: 3.499999
   - key: ViDarkWindow
     prefab: {fileID: 7276918382831160504, guid: e544b5fa1567bd145b53168d513fd88f, type: 3}
     width: 3
@@ -101,6 +108,7 @@ MonoBehaviour:
       y: -0.14999983
       width: 2.6999998
       height: 0.3
+    height: 3.499999
   - key: ViPanel
     prefab: {fileID: 295517570313226032, guid: addb9d60daf1dec41a28e9bbf33c096c, type: 3}
     width: 3
@@ -112,6 +120,7 @@ MonoBehaviour:
       y: -0.118458554
       width: 2.763083
       height: 0.2184586
+    height: 3.499999
   - key: ViDoor
     prefab: {fileID: 7312406339525530521, guid: c3ea68a4a22a7024d86b92afde6811a0, type: 3}
     width: 3
@@ -123,6 +132,7 @@ MonoBehaviour:
       y: -0.05
       width: 1.3499999
       height: 0.1
+    height: 2.1185033
   - key: ViCurtain
     prefab: {fileID: 6026061150496759856, guid: 1bf7a038e6ae8e148b3c5d9849f873de, type: 3}
     width: 3
@@ -134,6 +144,7 @@ MonoBehaviour:
       y: 0
       width: 0
       height: 0
+    height: 3.0825045
   - key: PortalLeaf
     prefab: {fileID: 8665231005878041080, guid: 2ee0cc5cc03619e4d9459e2cda43632b, type: 3}
     width: 3
@@ -145,347 +156,7 @@ MonoBehaviour:
       y: 0
       width: 0
       height: 0
-  - key: ViClock
-    prefab: {fileID: 2076264145155440915, guid: 6687fb94e39fda846adda343beb747f0, type: 3}
-    width: 1
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.04916799
-      y: 0.15999997
-      width: 0.901664
-      height: 0.4164139
-  - key: ViCoatStand
-    prefab: {fileID: 4242578803162436466, guid: c70d4e5b50e7b8645a40c76335a27c27, type: 3}
-    width: 1
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.3253674
-      y: 0.30273056
-      width: 0.34926522
-      height: 0.39453888
-  - key: ViMirror
-    prefab: {fileID: 5337677858488679567, guid: 5f2a15812ecb9c44aa82b7c6791d2530, type: 3}
-    width: 3
-    depth: 0
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViPlant
-    prefab: {fileID: 8720781882914028748, guid: 4ce5c2fac27980f4ab5aa670ee404a1d, type: 3}
-    width: 2
-    depth: 2
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.3614359
-      y: 0.27591407
-      width: 1.2771282
-      height: 1.4481719
-  - key: ViWallLamp
-    prefab: {fileID: 8234737949085347516, guid: 77aecd579926873469a7cca73512cb8b, type: 3}
-    width: 3
-    depth: 0
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViRug
-    prefab: {fileID: 4313728973739735630, guid: bc903158a4341034f953a66e80df0ffe, type: 3}
-    width: 3
-    depth: 3
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViPlantB
-    prefab: {fileID: 8597764471476773535, guid: d06cb43b7cffcf14daf6ab955b111247, type: 3}
-    width: 2
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.47486436
-      y: 0
-      width: 1.0502713
-      height: 1
-  - key: ViArmchair
-    prefab: {fileID: 3869948934864922322, guid: f1d9c08616178494f97cbd99e258fb3d, type: 3}
-    width: 1
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.061531782
-      y: 0.08409554
-      width: 0.8769363
-      height: 0.8318088
-  - key: ViFireplace
-    prefab: {fileID: 7039861906772512152, guid: 2f9fe8ac6d960c94fac119a05578a62d, type: 3}
-    width: 3
-    depth: 2
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.0432415
-      y: 0.16000009
-      width: 2.913517
-      height: 0.89375687
-  - key: ViSofaGreen
-    prefab: {fileID: 5520536166108954918, guid: d83e516696c71fc4bb2e00432d32519c, type: 3}
-    width: 3
-    depth: 2
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.40100813
-      y: 0.15999997
-      width: 2.1979837
-      height: 1.0626127
-  - key: ViBookcaseLow
-    prefab: {fileID: 8201862342875163901, guid: 69cfb8842da4d3542a826404ba1299bc, type: 3}
-    width: 3
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.39730597
-      y: 0.15999997
-      width: 2.205388
-      height: 0.6183773
-  - key: ViTableRound
-    prefab: {fileID: 2571297377308037041, guid: ddb971ee4e81515499b14f0c6a1fddb4, type: 3}
-    width: 1
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.02178055
-      y: 0.02178061
-      width: 0.9564389
-      height: 0.956439
-  - key: ViCarpet
-    prefab: {fileID: 2187816338858859326, guid: 6ab7e7a30280b3646b8faddf9927d0e2, type: 3}
-    width: 4
-    depth: 6
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViChandelier
-    prefab: {fileID: 3522400181447335565, guid: a2e32b9a6c25cf740b68c90fffe6cc77, type: 3}
-    width: 2
-    depth: 2
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViPalm
-    prefab: {fileID: 7860678495968881624, guid: d320b1311e3b13c4eaa4576df01a1de6, type: 3}
-    width: 2
-    depth: 2
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.30552065
-      y: 0.45311165
-      width: 1.3889587
-      height: 1.0937767
-  - key: ViVase
-    prefab: {fileID: 4804995628380967446, guid: 442e738289984cc4b8e30c10ca461aad, type: 3}
-    width: 1
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.29177177
-      y: 0.29177177
-      width: 0.41645646
-      height: 0.41645646
-  - key: ViSofa
-    prefab: {fileID: 6705102054000465093, guid: 23c5f5bf982cfd64d9c95c08e173081a, type: 3}
-    width: 3
-    depth: 2
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.40100813
-      y: 0.15999997
-      width: 2.1979837
-      height: 1.0626127
-  - key: ViChair
-    prefab: {fileID: 442525268445947614, guid: 41b58c45468e3024b99173040d9c582d, type: 3}
-    width: 1
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.1009388
-      y: 0.07600832
-      width: 0.7981223
-      height: 0.84798324
-  - key: ViCandle
-    prefab: {fileID: 3551229381681677241, guid: 09e4deb14dd1c834e96a41c1be40263c, type: 3}
-    width: 1
-    depth: 1
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViDiningTable
-    prefab: {fileID: 560778208438483108, guid: 69770b2cab6736949bb16e2b39509ff3, type: 3}
-    width: 4
-    depth: 2
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.08959627
-      y: 0.0713712
-      width: 3.8208075
-      height: 1.8572576
-  - key: ViCupboardGlass
-    prefab: {fileID: 2260291520996424526, guid: 35028ed9b08ef7b4e89ffc91c2a9caaf, type: 3}
-    width: 2
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.39469886
-      y: 0.16000003
-      width: 1.2106023
-      height: 0.76125467
-  - key: ViSideboard
-    prefab: {fileID: 7289587153264682936, guid: ed8859afc119c7f4287e44eae3aaa743, type: 3}
-    width: 3
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.31160593
-      y: 0.15999997
-      width: 2.3767881
-      height: 0.51686394
-  - key: ViCarpetB
-    prefab: {fileID: 4935250639241239754, guid: 86203eed84c2e1c4d916189c86b72445, type: 3}
-    width: 4
-    depth: 6
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViDesk
-    prefab: {fileID: 1546016959661922482, guid: b3bea48947917a242a1126fc342ea431, type: 3}
-    width: 4
-    depth: 2
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.40113807
-      y: 0.16000003
-      width: 3.1977239
-      height: 1.2101231
-  - key: ViBookcase
-    prefab: {fileID: 7916980926247421505, guid: 18833e3d3945dbf4fb7012cdfbad8c99, type: 3}
-    width: 3
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.0818634
-      y: 0.15999997
-      width: 2.8362732
-      height: 0.6183773
-  - key: ViKitchenTable
-    prefab: {fileID: 5573280094078705106, guid: 7ae1cc367a3d1af459f91385be77f43e, type: 3}
-    width: 3
-    depth: 2
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.16042542
-      y: 0.36113787
-      width: 2.6791492
-      height: 1.2777243
-  - key: ViBucket
-    prefab: {fileID: 7016900038411079383, guid: 11c56c8be758fa249a02246f78417b9b, type: 3}
-    width: 1
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.31061774
-      y: 0.33661604
-      width: 0.3787645
-      height: 0.32676792
-  - key: ViBasin
-    prefab: {fileID: 7963722257194469766, guid: f5905943812f1b24eb9ebed6d92b7d1f, type: 3}
-    width: 1
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.10653067
-      y: 0.15999997
-      width: 0.78693867
-      height: 0.772735
-  - key: ViShelvesB
-    prefab: {fileID: 6419036991110937076, guid: 69022085feeaf414794c74ec0332383c, type: 3}
-    width: 2
-    depth: 2
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.103425026
-      y: 0.15999997
-      width: 1.79315
-      height: 0.951391
-  - key: ViBox
-    prefab: {fileID: 1187972972192660342, guid: abc4c176341054345813864b3c13e565, type: 3}
-    width: 1
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.19034994
-      y: 0.29911554
-      width: 0.6193001
-      height: 0.40176892
-  - key: BkBasket
-    prefab: {fileID: 2046260983633417291, guid: aec8f646b7630d7419342aab37309432, type: 3}
-    width: 1
-    depth: 1
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.26621747
-      y: 0.26621747
-      width: 0.46756518
-      height: 0.46756506
+    height: 2.2
   - key: ViBed
     prefab: {fileID: 6427960734995565220, guid: 2af0b0cc46b5d6c4b8add333fae06499, type: 3}
     width: 2
@@ -497,8 +168,9 @@ MonoBehaviour:
       y: 0.16000009
       width: 1.7809675
       height: 3.1373105
-  - key: ViCabinet
-    prefab: {fileID: 5424685864822318406, guid: 66d94007eff9b454c816454906c02331, type: 3}
+    height: 1.9172667
+  - key: ViNightstandPoor
+    prefab: {fileID: 1706170921585447395, guid: d8a4b7d07194d7b4eb2b84d22577f508, type: 3}
     width: 1
     depth: 1
     solid: 1
@@ -508,28 +180,31 @@ MonoBehaviour:
       y: 0.15999997
       width: 0.977649
       height: 0.50112593
-  - key: ViTableB
-    prefab: {fileID: 4902240475037099815, guid: d2b89647f51fc3f4986fd6845b21f665, type: 3}
-    width: 2
+    height: 1.4497106
+  - key: ViNightstand
+    prefab: {fileID: 7139684325479102205, guid: 20f6dd351b1f6864cb51eb61205eccf8, type: 3}
+    width: 1
     depth: 1
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.41042507
-      y: 0.1611377
-      width: 1.1791496
-      height: 0.6777245
-  - key: ViMirrorSmall
-    prefab: {fileID: 6976357446008359794, guid: af776bfbe7cc4834590b620a33fa6015, type: 3}
+      x: 0.011175513
+      y: 0.15999997
+      width: 0.977649
+      height: 0.50112593
+    height: 1.5437586
+  - key: ViSideboard
+    prefab: {fileID: 7289587153264682936, guid: ed8859afc119c7f4287e44eae3aaa743, type: 3}
     width: 3
-    depth: 0
-    solid: 0
+    depth: 1
+    solid: 1
     body:
       serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
+      x: 0.31160593
+      y: 0.15999997
+      width: 2.3767881
+      height: 0.51686394
+    height: 1.780432
   - key: ViMirrorTall
     prefab: {fileID: 1384391188353130729, guid: fd8ff0fcf1bfd8148861ab3be5ff650f, type: 3}
     width: 1
@@ -541,8 +216,117 @@ MonoBehaviour:
       y: 0.15999997
       width: 0.98941207
       height: 0.41090423
-  - key: ViBath
-    prefab: {fileID: 3074846362405144654, guid: 19dbb61e2a712a74ea76dd8c79828789, type: 3}
+    height: 2.2654
+  - key: ViCoatStand
+    prefab: {fileID: 4242578803162436466, guid: c70d4e5b50e7b8645a40c76335a27c27, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.3253674
+      y: 0.30273056
+      width: 0.34926522
+      height: 0.39453888
+    height: 2.2046223
+  - key: ViFireplace
+    prefab: {fileID: 7039861906772512152, guid: 2f9fe8ac6d960c94fac119a05578a62d, type: 3}
+    width: 3
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.0432415
+      y: 0.16000009
+      width: 2.913517
+      height: 0.89375687
+    height: 3.5095665
+  - key: ViChair
+    prefab: {fileID: 442525268445947614, guid: 41b58c45468e3024b99173040d9c582d, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.1009388
+      y: 0.07600832
+      width: 0.7981223
+      height: 0.84798324
+    height: 1.2642448
+  - key: ViArmchair
+    prefab: {fileID: 3869948934864922322, guid: f1d9c08616178494f97cbd99e258fb3d, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.061531782
+      y: 0.08409554
+      width: 0.8769363
+      height: 0.8318088
+    height: 1.4030981
+  - key: ViRug
+    prefab: {fileID: 4313728973739735630, guid: bc903158a4341034f953a66e80df0ffe, type: 3}
+    width: 3
+    depth: 3
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 0.032342784
+  - key: ViDresser
+    prefab: {fileID: 8730406486001753893, guid: 902e6ad1af1b90446bb43f011d89f872, type: 3}
+    width: 2
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.103425026
+      y: 0.15999997
+      width: 1.79315
+      height: 0.951391
+    height: 3.2937288
+  - key: ViBasinSet
+    prefab: {fileID: 5047004149356226948, guid: 6054f9c8b32c8f54f9b85cc418c4a58f, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.10653067
+      y: 0.15999997
+      width: 0.78693867
+      height: 0.772735
+    height: 1.3284402
+  - key: ViBucket
+    prefab: {fileID: 7016900038411079383, guid: 11c56c8be758fa249a02246f78417b9b, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.31061774
+      y: 0.33661604
+      width: 0.3787645
+      height: 0.32676792
+    height: 0.31592992
+  - key: ViMirrorSmall
+    prefab: {fileID: 6976357446008359794, guid: af776bfbe7cc4834590b620a33fa6015, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 0.51468354
+  - key: ViBathSet
+    prefab: {fileID: 4139754905836436930, guid: cbbf401975945bd4cb90dea6dd213b52, type: 3}
     width: 3
     depth: 2
     solid: 1
@@ -552,6 +336,7 @@ MonoBehaviour:
       y: 0.15999997
       width: 2.326766
       height: 1.2931836
+    height: 1.1035999
   - key: ViToilet
     prefab: {fileID: 3673523434457266290, guid: f366889b8fd80f842b16efdb7ff042af, type: 3}
     width: 1
@@ -563,6 +348,19 @@ MonoBehaviour:
       y: 0.16000009
       width: 0.74116576
       height: 1.0671918
+    height: 1.3457708
+  - key: ViShelfWash
+    prefab: {fileID: 243023590908953331, guid: f5983d3a9388fbb49b38beeb750f2d45, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.12317759
+      y: 0.16000003
+      width: 0.7536448
+      height: 0.44222772
+    height: 1.8034858
   - key: ViTowelRail
     prefab: {fileID: 5831826132270677595, guid: 7cad6b97e86bec44191ac2a2cfd5ba02, type: 3}
     width: 2
@@ -574,8 +372,177 @@ MonoBehaviour:
       y: 0.15999997
       width: 1.2359595
       height: 0.62823784
-  - key: ViTowelBar
-    prefab: {fileID: 6238015758641663658, guid: 0669439d0e3aae84abf41cff1acb0141, type: 3}
+    height: 1.6225432
+  - key: ViKitchenTable
+    prefab: {fileID: 5573280094078705106, guid: 7ae1cc367a3d1af459f91385be77f43e, type: 3}
+    width: 3
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.16042542
+      y: 0.36113787
+      width: 2.6791492
+      height: 1.2777243
+    height: 1.0116985
+  - key: ViTableBSet
+    prefab: {fileID: 599118910614321522, guid: 7b79edccdef147b4ea5cc819399883ae, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.4104252
+      y: 0.16113776
+      width: 1.1791496
+      height: 0.6777245
+    height: 1.1766565
+  - key: ViDiningTable
+    prefab: {fileID: 560778208438483108, guid: 69770b2cab6736949bb16e2b39509ff3, type: 3}
+    width: 4
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.08959627
+      y: 0.0713712
+      width: 3.8208075
+      height: 1.8572576
+    height: 1.3965249
+  - key: ViSideboardSet
+    prefab: {fileID: 4589487648568991923, guid: 4f286afa52e25d343be432c493e55125, type: 3}
+    width: 3
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.31160593
+      y: 0.15999997
+      width: 2.3767881
+      height: 0.51686394
+    height: 2.1338668
+  - key: ViCupboardGlass
+    prefab: {fileID: 2260291520996424526, guid: 35028ed9b08ef7b4e89ffc91c2a9caaf, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.39469886
+      y: 0.16000003
+      width: 1.2106023
+      height: 0.76125467
+    height: 3.2846584
+  - key: ViSofa
+    prefab: {fileID: 6705102054000465093, guid: 23c5f5bf982cfd64d9c95c08e173081a, type: 3}
+    width: 3
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.40100813
+      y: 0.15999997
+      width: 2.1979837
+      height: 1.0626127
+    height: 1.3695698
+  - key: ViSofaGreen
+    prefab: {fileID: 5520536166108954918, guid: d83e516696c71fc4bb2e00432d32519c, type: 3}
+    width: 3
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.40100813
+      y: 0.15999997
+      width: 2.1979837
+      height: 1.0626127
+    height: 1.3695698
+  - key: ViTableRoundSet
+    prefab: {fileID: 6715594581258306645, guid: e74fda5052056624f869abe53145f07a, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.02178073
+      y: 0.02178073
+      width: 0.95643854
+      height: 0.95643854
+    height: 1.4914063
+  - key: ViPalm
+    prefab: {fileID: 7860678495968881624, guid: d320b1311e3b13c4eaa4576df01a1de6, type: 3}
+    width: 2
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.30552065
+      y: 0.45311165
+      width: 1.3889587
+      height: 1.0937767
+    height: 3.1473694
+  - key: ViBookcaseLow
+    prefab: {fileID: 8201862342875163901, guid: 69cfb8842da4d3542a826404ba1299bc, type: 3}
+    width: 3
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.39730597
+      y: 0.15999997
+      width: 2.205388
+      height: 0.6183773
+    height: 2.3061998
+  - key: ViBookcase
+    prefab: {fileID: 7916980926247421505, guid: 18833e3d3945dbf4fb7012cdfbad8c99, type: 3}
+    width: 3
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.0818634
+      y: 0.15999997
+      width: 2.8362732
+      height: 0.6183773
+    height: 3.1764438
+  - key: ViDesk
+    prefab: {fileID: 1546016959661922482, guid: b3bea48947917a242a1126fc342ea431, type: 3}
+    width: 4
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.40113807
+      y: 0.16000003
+      width: 3.1977239
+      height: 1.2101231
+    height: 1.4375639
+  - key: ViClock
+    prefab: {fileID: 2076264145155440915, guid: 6687fb94e39fda846adda343beb747f0, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.04916799
+      y: 0.15999997
+      width: 0.901664
+      height: 0.4164139
+    height: 2.4829984
+  - key: ViHallTable
+    prefab: {fileID: 524943894509403198, guid: 75898e18be9b1544d919c275fff3f2a4, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.4104252
+      y: 0.16113776
+      width: 1.1791496
+      height: 0.6777245
+    height: 1.3024527
+  - key: ViMirror
+    prefab: {fileID: 5337677858488679567, guid: 5f2a15812ecb9c44aa82b7c6791d2530, type: 3}
     width: 3
     depth: 0
     solid: 0
@@ -585,39 +552,79 @@ MonoBehaviour:
       y: 0
       width: 0
       height: 0
-  - key: ViRugB
-    prefab: {fileID: 4101553700839700511, guid: cf9e4372e3aabc146827f1ec3c09c046, type: 3}
+    height: 1.0441439
+  - key: ViSettee
+    prefab: {fileID: 3680406643652861102, guid: e867c3710bc6def42bd5e60286cbaf7f, type: 3}
     width: 3
-    depth: 3
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViPlantC
-    prefab: {fileID: 5328343779026917585, guid: 4bbee961a9751d34ba43c96e67ef6bad, type: 3}
-    width: 2
     depth: 2
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.41529095
-      y: 0.4159323
-      width: 1.1694181
-      height: 1.1681354
-  - key: Crate
-    prefab: {fileID: 8139367422513150409, guid: 8252dd84c1b66ec48833d9c2c77ce791, type: 3}
+      x: 0.071442604
+      y: 0.15999997
+      width: 2.8571148
+      height: 1.0169804
+    height: 1.2682618
+  - key: ViFootstool
+    prefab: {fileID: 2894831047654219830, guid: 956d52bad7a3f274a80e10c41851e9dc, type: 3}
     width: 1
     depth: 1
     solid: 1
     body:
       serializedVersion: 2
-      x: -0.0147976875
-      y: 0.106039345
-      width: 1.0295954
-      height: 0.7879213
+      x: 0.18360662
+      y: 0.1791628
+      width: 0.63278663
+      height: 0.6416741
+    height: 0.50282145
+  - key: ViCounterSet
+    prefab: {fileID: 543659659351387474, guid: 4993c963e89d1724abe0cd4825a9ed11, type: 3}
+    width: 3
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.16788387
+      y: 0.15999997
+      width: 2.6642323
+      height: 1.0485549
+    height: 1.4745342
+  - key: ViShopShelves
+    prefab: {fileID: 9077784191181507104, guid: f3dfd266e1a836c479b8a878dd92d492, type: 3}
+    width: 2
+    depth: 2
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.103425145
+      y: 0.15999997
+      width: 1.7931497
+      height: 0.95139146
+    height: 3.2937288
+  - key: ViBox
+    prefab: {fileID: 1187972972192660342, guid: abc4c176341054345813864b3c13e565, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.19034994
+      y: 0.29911554
+      width: 0.6193001
+      height: 0.40176892
+    height: 0.34969246
+  - key: BkBasket
+    prefab: {fileID: 2046260983633417291, guid: aec8f646b7630d7419342aab37309432, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.26621747
+      y: 0.26621747
+      width: 0.46756518
+      height: 0.46756506
+    height: 0.36444166
   - key: BkBasketB
     prefab: {fileID: 1307891116020750097, guid: 12e91c751fc878842b3c786bbe3e2141, type: 3}
     width: 1
@@ -629,28 +636,7 @@ MonoBehaviour:
       y: 0.2557
       width: 0.48860002
       height: 0.48860002
-  - key: ViCounter
-    prefab: {fileID: 4755286011254069428, guid: 9543d02e6f6d9334ba0eea858a2d92d2, type: 3}
-    width: 3
-    depth: 2
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.16788387
-      y: 0.15999997
-      width: 2.6642323
-      height: 1.0485549
-  - key: ViShelves
-    prefab: {fileID: 1312367316984825920, guid: 69f149e510a22484681413f2a9fe6495, type: 3}
-    width: 2
-    depth: 2
-    solid: 1
-    body:
-      serializedVersion: 2
-      x: 0.103425145
-      y: 0.15999997
-      width: 1.7931497
-      height: 0.95139146
+    height: 0.3644416
   - key: Barrel
     prefab: {fileID: 3178616073441222896, guid: af08d6e3d3f8d0243954eb24a0895cd5, type: 3}
     width: 1
@@ -662,8 +648,21 @@ MonoBehaviour:
       y: 0.013714194
       width: 0.97257185
       height: 0.97257185
-  - key: ViPicture1
-    prefab: {fileID: 6256122228130560646, guid: a9affbeabfa718147afe4fd7a5a3109c, type: 3}
+    height: 1.1940454
+  - key: Crate
+    prefab: {fileID: 8139367422513150409, guid: 8252dd84c1b66ec48833d9c2c77ce791, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: -0.0147976875
+      y: 0.106039345
+      width: 1.0295954
+      height: 0.7879213
+    height: 0.4967049
+  - key: ViWallLamp
+    prefab: {fileID: 8234737949085347516, guid: 77aecd579926873469a7cca73512cb8b, type: 3}
     width: 3
     depth: 0
     solid: 0
@@ -673,10 +672,11 @@ MonoBehaviour:
       y: 0
       width: 0
       height: 0
-  - key: ViPicture2
-    prefab: {fileID: 2877177928080722502, guid: 3f8ad3fd9bdbfd2468605314f99fb290, type: 3}
-    width: 3
-    depth: 0
+    height: 0.42051458
+  - key: ViCarpet
+    prefab: {fileID: 2187816338858859326, guid: 6ab7e7a30280b3646b8faddf9927d0e2, type: 3}
+    width: 4
+    depth: 6
     solid: 0
     body:
       serializedVersion: 2
@@ -684,10 +684,11 @@ MonoBehaviour:
       y: 0
       width: 0
       height: 0
-  - key: ViPicture3
-    prefab: {fileID: 1260125395853452165, guid: 5056ac583d2e84543b8904f6fa4aed55, type: 3}
-    width: 3
-    depth: 0
+    height: 0.09317959
+  - key: ViCarpetB
+    prefab: {fileID: 4935250639241239754, guid: 86203eed84c2e1c4d916189c86b72445, type: 3}
+    width: 4
+    depth: 6
     solid: 0
     body:
       serializedVersion: 2
@@ -695,61 +696,7 @@ MonoBehaviour:
       y: 0
       width: 0
       height: 0
-  - key: ViPicture4
-    prefab: {fileID: 2652371749035682195, guid: e0572306361408d4c9af49ba7beb0a6d, type: 3}
-    width: 3
-    depth: 0
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViPicture5
-    prefab: {fileID: 2592721538780327218, guid: 0afa4192cc05ecb4b8b254a1e793c761, type: 3}
-    width: 3
-    depth: 0
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViPicture6
-    prefab: {fileID: 7390918410355482411, guid: 6559eae71ec8253459f9570cfc3702f8, type: 3}
-    width: 3
-    depth: 0
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViPicture7
-    prefab: {fileID: 3419529122007747906, guid: dbc07869aff91f04b883b2965425bdf1, type: 3}
-    width: 3
-    depth: 0
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-  - key: ViPicture8
-    prefab: {fileID: 2293589990064366043, guid: e53bd2d508559cf48b8cd1fdf9404365, type: 3}
-    width: 3
-    depth: 0
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
+    height: 0.084872186
   - key: BkTrunk
     prefab: {fileID: 1453890088661769057, guid: 3659b6db3be821d478e3b04f4ab140fa, type: 3}
     width: 1
@@ -761,6 +708,7 @@ MonoBehaviour:
       y: 0.24674869
       width: 0.8703338
       height: 0.5065026
+    height: 0.38820437
   - key: ViStair
     prefab: {fileID: 6113479377190297725, guid: 617557d2cc11fea40b052c7ad483d52b, type: 3}
     width: 3
@@ -772,6 +720,7 @@ MonoBehaviour:
       y: 0.167737
       width: 2.6697001
       height: 6.952263
+    height: 4.6947412
   - key: ViBanister
     prefab: {fileID: 753626291178626472, guid: 2c7cd308def53c346a9c2e47bfbf6c8e, type: 3}
     width: 3
@@ -783,6 +732,115 @@ MonoBehaviour:
       y: 0.6559055
       width: 2.9984796
       height: 0.3440945
+    height: 1.4337971
+  - key: ViChandelier
+    prefab: {fileID: 3522400181447335565, guid: a2e32b9a6c25cf740b68c90fffe6cc77, type: 3}
+    width: 2
+    depth: 2
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 1.1582302
+  - key: ViPicture1
+    prefab: {fileID: 6256122228130560646, guid: a9affbeabfa718147afe4fd7a5a3109c, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 1.0484773
+  - key: ViPicture2
+    prefab: {fileID: 2877177928080722502, guid: 3f8ad3fd9bdbfd2468605314f99fb290, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 1.0484774
+  - key: ViPicture3
+    prefab: {fileID: 1260125395853452165, guid: 5056ac583d2e84543b8904f6fa4aed55, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 1.0484773
+  - key: ViPicture4
+    prefab: {fileID: 2652371749035682195, guid: e0572306361408d4c9af49ba7beb0a6d, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 1.0484774
+  - key: ViPicture5
+    prefab: {fileID: 2592721538780327218, guid: 0afa4192cc05ecb4b8b254a1e793c761, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 1.0484773
+  - key: ViPicture6
+    prefab: {fileID: 7390918410355482411, guid: 6559eae71ec8253459f9570cfc3702f8, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 1.0484774
+  - key: ViPicture7
+    prefab: {fileID: 3419529122007747906, guid: dbc07869aff91f04b883b2965425bdf1, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 1.0484774
+  - key: ViPicture8
+    prefab: {fileID: 2293589990064366043, guid: e53bd2d508559cf48b8cd1fdf9404365, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 1.0484773
   fire: {fileID: 8815679994851198048, guid: c21c5c6cc00bae1478ae61b12e50cb6a, type: 3}
   pane: {fileID: 2100000, guid: b8ff7779b128c0c4ebf9c6eb012da000, type: 2}
   glass:

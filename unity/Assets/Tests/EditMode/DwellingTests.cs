@@ -76,7 +76,7 @@ namespace GameDev.Slice.Tests
                     Assert.AreEqual(key.StreetPortalId, door.Target.ArrivalPortalId);
                     var rooms = root.GetComponentsInChildren<Transform>().Count(t => t.name.StartsWith(DwellingAssembler.RoomMarker));
                     Assert.GreaterOrEqual(rooms, archetype == DwellingArchetype.Tenement ? 1 : 2, $"{archetype}");
-                    Assert.LessOrEqual(rooms, wealth == DwellingWealth.Rich ? 16 : 6, $"{archetype}");
+                    Assert.LessOrEqual(rooms, wealth == DwellingWealth.Rich ? 17 : 6, $"{archetype}");
                     var furniture = root.Find("Furniture");
                     Assert.GreaterOrEqual(furniture.childCount, rooms * 2, $"{archetype} {wealth} #{n} is furnished");
                     // Every home has a bed (owner, 2026-11-06); a warehouse is no home.
@@ -117,7 +117,10 @@ namespace GameDev.Slice.Tests
             }
         }
 
-        /// <summary>Plan §4.2 (owner): a rich house has a bathroom, a middling one a WC; a poor one only a basin and a bucket.</summary>
+        /// <summary>
+        /// Furnishing rules §5, §9 (owner): every home washes. A rich house and a middling house have a bathroom, a middling
+        /// flat a WC; a poor home a washroom of 3 × 3 m with a basin, a bucket and a toilet, and no bath.
+        /// </summary>
         [Test]
         public void WashingFollowsWealth()
         {
@@ -129,31 +132,72 @@ namespace GameDev.Slice.Tests
                 {
                     var plan = DwellingRuntime.PlanFor(VeilmouthDwellings.PreviewKey(archetype, wealth, 70 + (n * 19), 30 + (n * 11)), settings, kit);
                     var keys = plan.Furniture.Select(f => f.Key).ToList();
-                    var what = $"{archetype} {wealth} #{n}";
-                    switch (wealth)
+                    var what = $"{archetype} {wealth} #{n}: {string.Join(", ", plan.Unplaced)}";
+                    if (wealth == DwellingWealth.Poor)
                     {
-                        case DwellingWealth.Rich:
-                            Assert.IsTrue(plan.Rooms.Any(r => r.Kind == RoomKind.Bathroom), what);
-                            CollectionAssert.IsSubsetOf(new[] { "ViBath", "ViToilet", "ViBasin" }, keys, what);
-                            break;
-                        case DwellingWealth.Middling:
-                            Assert.IsFalse(plan.Rooms.Any(r => r.Kind == RoomKind.Bathroom), what);
-                            if (archetype != DwellingArchetype.Tenement)
-                            {
-                                Assert.IsTrue(plan.Rooms.Any(r => r.Kind == RoomKind.WC), what);
-                                CollectionAssert.Contains(keys, "ViToilet", what);
-                            }
-
-                            break;
-                        default:
-                            Assert.IsFalse(plan.Rooms.Any(r => r.Kind == RoomKind.Bathroom || r.Kind == RoomKind.WC), what);
-                            CollectionAssert.DoesNotContain(keys, "ViToilet", what);
-                            CollectionAssert.DoesNotContain(keys, "ViBath", what);
-                            CollectionAssert.IsSubsetOf(new[] { "ViBasin", "ViBucket" }, keys, what);
-                            break;
+                        var washroom = plan.Rooms.Single(r => r.Kind == RoomKind.Washroom);
+                        Assert.AreEqual((3, 3), (washroom.Width, washroom.Depth), what);
+                        CollectionAssert.IsSubsetOf(new[] { DwellingPlanner.BasinKey, "ViBucket", "ViToilet" }, keys, what);
+                        CollectionAssert.DoesNotContain(keys, DwellingPlanner.BathKey, what);
+                    }
+                    else if (archetype == DwellingArchetype.Tenement)
+                    {
+                        Assert.IsTrue(plan.Rooms.Any(r => r.Kind == RoomKind.WC), what);
+                        CollectionAssert.IsSubsetOf(new[] { DwellingPlanner.BasinKey, "ViToilet" }, keys, what);
+                    }
+                    else
+                    {
+                        Assert.IsTrue(plan.Rooms.Any(r => r.Kind == RoomKind.Bathroom), what);
+                        CollectionAssert.IsSubsetOf(new[] { DwellingPlanner.BathKey, "ViToilet", DwellingPlanner.BasinKey }, keys, what);
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Furnishing rules §7.5, VI-6's acceptance: every sample home can sleep, cook and wash, its ways in reach one
+        /// another past its furniture, nothing stands in a doorway, no small thing lies on a floor where G5 forbids it,
+        /// and every seat faces a table, a desk or a hearth; every required place found its spot.
+        /// </summary>
+        [Test]
+        public void SampleHomesKeepTheFurnishingRules()
+        {
+            var kit = VeilmouthDwellings.Kit;
+            var settings = VeilmouthDwellings.Settings;
+            foreach (var (archetype, wealth) in Kinds)
+            {
+                for (var n = 0; n < 12; n++)
+                {
+                    var plan = DwellingRuntime.PlanFor(VeilmouthDwellings.PreviewKey(archetype, wealth, 11 + (n * 37), -7 - (n * 23)), settings, kit);
+                    var faults = DwellingPlanner.Audit(plan, kit, archetype != DwellingArchetype.Warehouse);
+                    var what = $"{archetype} {wealth} #{n}";
+                    CollectionAssert.IsEmpty(faults, $"{what}: {string.Join("; ", faults)}");
+                    CollectionAssert.IsEmpty(plan.Unplaced, $"{what}: unplaced {string.Join("; ", plan.Unplaced)}");
+                }
+            }
+        }
+
+        /// <summary>Furnishing rules §9 (owner): a rich house has one servant, half of them a second, each with a bed.</summary>
+        [Test]
+        public void RichHousesKeepServants()
+        {
+            var kit = VeilmouthDwellings.Kit;
+            var settings = VeilmouthDwellings.Settings;
+            const int houses = 200;
+            var two = 0;
+            for (var n = 0; n < houses; n++)
+            {
+                var plan = DwellingRuntime.PlanFor(VeilmouthDwellings.PreviewKey(DwellingArchetype.Villa, DwellingWealth.Rich, n * 17, n * 5), settings, kit);
+                Assert.That(plan.Servants, Is.InRange(1, 2), $"#{n}");
+                var room = plan.Rooms.Single(r => r.Kind == RoomKind.ServantRoom);
+                var beds = plan.Furniture.Count(f => f.Key == "ViBed" && f.Level == room.Level && room.Contains(f.X + 0.5f, f.Z + 0.5f));
+                Assert.AreEqual(plan.Servants, beds, $"#{n}: a bed for each servant; {string.Join(", ", plan.Unplaced)}");
+                two += plan.Servants == 2 ? 1 : 0;
+            }
+
+            Assert.AreEqual(DwellingPlanner.SecondServantChance, two / (double)houses, 0.1);
+            var poor = DwellingRuntime.PlanFor(VeilmouthDwellings.PreviewKey(DwellingArchetype.Terrace, DwellingWealth.Middling, 3, 3), settings, kit);
+            Assert.AreEqual(0, poor.Servants);
         }
 
         /// <summary>Plan §4.2 (owner): the pack's mantel stands wherever a stove stood, the kitchen's hearth included.</summary>

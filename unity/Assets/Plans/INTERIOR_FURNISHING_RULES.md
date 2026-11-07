@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.2
+Version: 0.3
 
-Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; nothing here is built yet, VI-6 builds it
+Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1), the seven wait for VI-7
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-07 (§9: the owner accepted the four recommendations: a poor washroom, the taproom 7 m, servants' numbers, VI-6 … VI-8)
+Last Updated: 2026-11-07 (§7.1: VI-6 built the places, rooms, planner and check for the Dwellings; what the kit's measurements changed)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -132,12 +132,24 @@ The rules become data and one planner, used by the Dwelling scene and by the sev
 5. **A check** proves the rules for every sample: no piece on a reserved path, every chair at a table or hearth, no small prop on the floor except G5's, every home has its sleep, cook and wash, symmetry where it was asked for.
 6. **The seven** are rebuilt by the same places, hand-placed where the plan of §6 decides, so a hand-built room and a generated one obey one set of rules.
 
+### 7.1 As built for the Dwellings (VI-6)
+
+`DwellingFurnishing.cs` holds the places and rooms as data and the planner; `DwellingPlanner.cs` keeps the layouts and the stair. Every list and number is an authoring default.
+
+- **Walk-ways by reach, not by reserved paths.** Item 4's reserved path became a check after every piece: the room's ways in (doorways, a stair's foot and head) must reach one another, and every placed piece must keep one of its use cells in reach (a bed its foot or sides, a chair the cells beside it). A piece that breaks reach is taken back, its place tries the next spot. This keeps rooms fuller than a fixed corridor would and still never shuts a door or a place.
+- **Order.** In each room: the hearth first where a room has one (a fixed feature, G8), then the required places, then the optional ones, then lamps, pictures, a chandelier and a carpet, and last the Stash.
+- **Small things are sets.** A nightstand with its candle, a basin with soap and a brush, a shop's shelves of goods, a kitchen dresser of plates and pots, a counter with its box and papers: the kit wraps each as one block (`SliceKitVictorian`), so nothing small is ever placed on a floor by the planner except G5's boxes, baskets, buckets, barrels and crates.
+- **What the kit's measurements changed.** A side wall's face stands 0.16 m into the room, and the toilet's body comes within 0.13 m of its cell's side, the basin's within 0.11 m, so neither fits a corner: both stand in a segment's middle. In a closet of 3 × 3 m (the poor washroom, a flat's WC) the toilet's body reaches 1.07 m from its wall, so the basin's front cell lies under the toilet's footprint while the floor between the door and the toilet's front (1.6 m) stays free; the basin is used from there. Only the palm keeps clear of both walls of a corner, so it is the corner plant. A hearth rug keeps its cells free of later pieces, and a carpet lies under a centre group or on open floor, never under a piece against a wall or on a rug. A kitchen 6 m wide could not hold the hearth with its door in the middle of the inner wall, so the narrow flat's door to the bedroom moved to the wall's end.
+- **Seats.** A table moves along its room before it loses a chair, and keeps chairs on both long sides before it seats one side only.
+- **The check** (`DwellingPlanner.Audit`, `DwellingTests.SampleHomesKeepTheFurnishingRules`, 84 sample homes): sleep, cook and wash in every home; ways in that reach one another; nothing in a doorway or on a stair's foot; no small thing on a forbidden floor; every seat facing a table, a desk or a hearth within two cells. Symmetry is sought by the placement score, not yet checked.
+- **Servants.** A rich house's plan carries its servants, one and in half the houses two (`SecondServantChance`), and its servant's room a bed for each. Their schedule, cones and running for a Warden belong to the break-in work of 10.3 §6 and are not built yet.
+
 ## 8. Pieces the pack lacks
 
 Victorian Interiors has no nightstand, coal scuttle, bench or settle, piano, stage, wall cabinet, towel rail or kitchen range. By the interiors plan's §6, a themed prop from another pack may stand in for a piece a room's purpose needs. Until the owner chooses:
 
-- a nightstand is the pack's smallest table (`Table_*`, measured in the implementation);
-- a towel rail is a hook (`Hanger*`), and a wall cabinet the wall shelf (`Shelf_4`);
+- a nightstand is the pack's smallest cabinet, `Shelve_5`, with a candle on it (VI-6: no `Table_*` fits a bedside cell);
+- a towel rail is the pack's standing hanger (`Hanger_2`), and a wall cabinet the wall shelf (`Shelf_4`);
 - the range stays the fireplace (owner);
 - a bench, a piano and a stage platform are listed in [SLICE_MODELS_WANTED.md](SLICE_MODELS_WANTED.md); the stage can be built from floor pieces at once.
 
@@ -158,5 +170,6 @@ The owner accepted all four recommendations. These are now decisions:
 
 ## Update history
 
+- 2026-11-07 (v0.3): §7.1, as built in VI-6 for the Dwellings; §8's nightstand and towel rail as measured.
 - 2026-11-07 (v0.2): the owner's four decisions in §9.
 - 2026-11-07 (v0.1): first draft: the furnishing grammar from building purpose to small props, from the owner's remarks 4, 5, 7 and 8 of VI-5.

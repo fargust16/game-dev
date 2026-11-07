@@ -75,7 +75,7 @@ namespace GameDev.Slice.EditorTools
                 var (solid, body) = Measure(entry.Prefab);
                 blocks.Add(new DwellingKit.Block
                 {
-                    key = key, prefab = entry.Prefab, width = entry.Width, depth = entry.Depth, solid = solid, body = body,
+                    key = key, prefab = entry.Prefab, width = entry.Width, depth = entry.Depth, solid = solid, body = body, height = entry.Height,
                 });
             }
 

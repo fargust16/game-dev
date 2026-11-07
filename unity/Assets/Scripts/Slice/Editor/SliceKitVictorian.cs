@@ -239,13 +239,31 @@ namespace GameDev.Slice.EditorTools
                 ("Ink", 0.62f, 0.35f), ("Pen", 0.66f, 0.35f), ("Paper_1", 0.45f, 0.3f), ("Paper_2", 0.5f, 0.35f),
                 ("Book_1", 0.2f, 0.35f), ("Candle_2", 0.85f, 0.4f));
 
+            // Sets of the furnishing rules (G5, VI-6): small things on their pieces, never on the floor.
+            yield return Set(Back("ViNightstand", "Shelve_5"), ("Candle_1", 0.3f, 0.5f), ("Book_1", 0.7f, 0.5f));
+            yield return Set(Back("ViNightstandPoor", "Shelve_5"), ("Candle_2", 0.5f, 0.5f));
+            yield return Set(Back("ViBasinSet", "Sink"), ("Soap", 0.15f, 0.5f), ("Brush_1", 0.85f, 0.5f));
+            yield return Set(Back("ViBathSet", "Bathtub"), ("Sponge_1", 0.06f, 0.5f), ("Soap", 0.94f, 0.5f));
+            yield return Set(Back("ViShelfWash", "Shelf_4"), ("Bottle_1", 0.3f, 0.5f), ("Brush_2", 0.7f, 0.5f));
+            yield return Set(Back("ViCounterSet", "Counter"), ("Box_2", 0.2f, 0.5f), ("Paper_3", 0.5f, 0.5f), ("Bottle_2", 0.8f, 0.5f));
+            yield return Set(Back("ViSideboardSet", "Cupboard_4"), ("Vase_2", 0.15f, 0.5f), ("Candle_3", 0.5f, 0.5f), ("Vase_2", 0.85f, 0.5f));
+            var shopShelves = Back("ViShopShelves", "Shelve_3");
+            shopShelves.Goods = ShopGoods;
+            yield return shopShelves;
+            var dresser = Back("ViDresser", "Shelve_4");
+            dresser.Goods = DresserGoods;
+            yield return dresser;
+            yield return Set(F("ViTableRoundSet", "Table_3"), ("Cup_1", 0.35f, 0.4f), ("Vase_3", 0.6f, 0.6f));
+            yield return Set(F("ViTableBSet", "Table_2"), ("Candle_2", 0.3f, 0.5f), ("Cup_2", 0.7f, 0.5f));
+            yield return Set(F("ViHallTable", "Table_2"), ("Candle_1", 0.25f, 0.5f), ("Vase_2", 0.7f, 0.5f));
+
             // In the room.
             yield return Set(F("ViDiningTable", "Table_4"),
                 ("Plate_1", 0.2f, 0.25f), ("Plate_1", 0.4f, 0.25f), ("Plate_1", 0.6f, 0.25f), ("Plate_1", 0.8f, 0.25f),
                 ("Plate_1", 0.2f, 0.75f), ("Plate_1", 0.4f, 0.75f), ("Plate_1", 0.6f, 0.75f), ("Plate_1", 0.8f, 0.75f),
                 ("Cup_1", 0.3f, 0.3f), ("Cup_1", 0.7f, 0.7f), ("Candle_3", 0.5f, 0.5f), ("Vase_1", 0.3f, 0.5f));
             yield return Set(F("ViKitchenTable", "Table_5"),
-                ("Plate_2", 0.25f, 0.5f), ("Cup_2", 0.45f, 0.4f), ("Knife", 0.6f, 0.5f), ("Pot", 0.8f, 0.5f));
+                ("Plate_2", 0.25f, 0.5f), ("Cup_2", 0.45f, 0.4f), ("Cup_1", 0.6f, 0.55f), ("Pot", 0.8f, 0.5f)); // the pack's knife stands on its edge and falls (VI-6)
             yield return F("ViTable", "Table_1");
             yield return F("ViTableB", "Table_2");
             yield return F("ViTableRound", "Table_3");
@@ -318,6 +336,14 @@ namespace GameDev.Slice.EditorTools
         // Standing books of the pack, by file: 0.23–0.25 m deep, 0.35 m high, 0.05–0.07 m thick along their local Z.
         private static readonly string[] StandingBooks = { "Book_3", "Book_4", "Book_5", "Book_6", "Book_7", "Book_8", "Book_9", "Book_10" };
 
+        /// <summary>Authoring defaults: what a shop's shelves and a kitchen dresser hold, files of the pack (rules G5).</summary>
+        private static readonly string[] ShopGoods = { "Bottle_1", "Bottle_2", "Bottle_3", "Bottle_4", "Pot_1", "Pot_2", "Box_1", "Box_2", "Vase_4", "Vase_5" };
+
+        private static readonly string[] DresserGoods = { "Plate_3", "Pot_1", "Pot_2", "Cup_2", "Bottle_3", "Plate_2" };
+
+        /// <summary>Authoring default, m: the space between goods standing on a shelf.</summary>
+        private const float GoodsGap = 0.04f;
+
         /// <summary>Authoring default, m: a shelf takes books when it has this much room above it; each book must still fit.</summary>
         private const float BookRoom = 0.3f;
 
@@ -326,7 +352,7 @@ namespace GameDev.Slice.EditorTools
         /// The shelves and the bays between dividers are found by rays on the case's own meshes; a span behind
         /// a door takes none. The books are still, part of the case (kit standard §4).
         /// </summary>
-        private static void FillShelves(GameObject model, string key)
+        private static void FillShelves(GameObject model, string key, string[] goods = null)
         {
             var probes = new List<MeshCollider>();
             foreach (var f in model.GetComponentsInChildren<MeshFilter>())
@@ -387,19 +413,29 @@ namespace GameDev.Slice.EditorTools
                 // are single planes, so the crossings do not alternate between entering and leaving.
                 var shelves = new List<(float Y, float Room)>();
                 var diagnosis = new List<string>();
-                foreach (var fx in new[] { 0.2f, 0.5f, 0.8f })
+                // A case whose cornice stands proud of its shelves is probed further back (measured: Shelve_3 and _4).
+                foreach (var depthIn in new[] { 0.2f, 0.35f, 0.5f })
                 {
-                    var x = Mathf.Lerp(b.min.x, b.max.x, fx);
-                    var top = b.max.y + 0.5f;
-                    var c = Crossings(new Vector3(x, top, z), Vector3.down, b.size.y + 1f);
-                    diagnosis.Add($"x {x:0.00}: " + string.Join(" ", c.Select(d => (top - d).ToString("0.00"))));
-                    for (var i = 0; i + 1 < c.Count; i++)
+                    if (shelves.Count > 0)
                     {
-                        var above = top - c[i];
-                        var below = top - c[i + 1];
-                        if (above - below >= BookRoom && !shelves.Any(s => Mathf.Abs(s.Y - below) < 0.03f) && OpenAtFront(x, (above + below) / 2f))
+                        break;
+                    }
+
+                    z = b.max.z - depthIn;
+                    foreach (var fx in new[] { 0.2f, 0.5f, 0.8f })
+                    {
+                        var x = Mathf.Lerp(b.min.x, b.max.x, fx);
+                        var top = b.max.y + 0.5f;
+                        var c = Crossings(new Vector3(x, top, z), Vector3.down, b.size.y + 1f);
+                        diagnosis.Add($"x {x:0.00}: " + string.Join(" ", c.Select(d => (top - d).ToString("0.00"))));
+                        for (var i = 0; i + 1 < c.Count; i++)
                         {
-                            shelves.Add((below, above - below));
+                            var above = top - c[i];
+                            var below = top - c[i + 1];
+                            if (above - below >= BookRoom && !shelves.Any(s => Mathf.Abs(s.Y - below) < 0.03f) && OpenAtFront(x, (above + below) / 2f))
+                            {
+                                shelves.Add((below, above - below));
+                            }
                         }
                     }
                 }
@@ -429,7 +465,7 @@ namespace GameDev.Slice.EditorTools
                             }
 
                             var book = (GameObject)PrefabUtility.InstantiatePrefab(
-                                AssetDatabase.LoadAssetAtPath<GameObject>(Find(Vi, StandingBooks[rng.Next(StandingBooks.Length)])), model.transform);
+                                AssetDatabase.LoadAssetAtPath<GameObject>(Find(Vi, goods == null ? StandingBooks[rng.Next(StandingBooks.Length)] : goods[rng.Next(goods.Length)])), model.transform);
                             foreach (var col in book.GetComponentsInChildren<Collider>(true))
                             {
                                 Object.DestroyImmediate(col);
@@ -440,7 +476,11 @@ namespace GameDev.Slice.EditorTools
                                 Object.DestroyImmediate(body);
                             }
 
-                            book.transform.rotation = Quaternion.Euler(0f, 90f, 0f) * book.transform.rotation; // its thickness along the shelf
+                            if (goods == null)
+                            {
+                                book.transform.rotation = Quaternion.Euler(0f, 90f, 0f) * book.transform.rotation; // its thickness along the shelf
+                            }
+
                             var s = Seen(book);
                             if (s.size.y > room - 0.01f)
                             {
@@ -461,8 +501,8 @@ namespace GameDev.Slice.EditorTools
                             }
 
                             book.transform.position += new Vector3(x - s.min.x, y - s.min.y, z - s.center.z);
-                            book.name = "Book";
-                            x += s.size.x + 0.003f;
+                            book.name = goods == null ? "Book" : "Goods";
+                            x += s.size.x + (goods == null ? 0.003f : GoodsGap);
                             count++;
                         }
                     }

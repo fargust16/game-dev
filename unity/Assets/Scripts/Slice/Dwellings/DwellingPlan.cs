@@ -27,6 +27,7 @@ namespace GameDev.Slice.Dwellings
         BoxRoom,
         Landing,
         Pantry,
+        Washroom,
     }
 
     /// <summary>What closes a wall segment of one module.</summary>
@@ -171,6 +172,9 @@ namespace GameDev.Slice.Dwellings
 
         /// <summary>Furniture the rooms call for that found no room, as "room: key"; for review, never shown in play.</summary>
         public readonly List<string> Unplaced = new List<string>();
+
+        /// <summary>How many servants live in (rules §9): one in every rich house, a second in half of them; else 0.</summary>
+        public int Servants { get; set; }
 
         /// <summary>The street segment's start; it always runs along +X on the front, z = 0, on the ground floor.</summary>
         public (int X, int Z) Street;

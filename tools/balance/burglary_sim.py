@@ -2,7 +2,8 @@
 
 A burglar spends one night (22:00-06:00, 480 ticks of one in-game minute) breaking into dwellings of one
 class, one after another, until the night ends, the picks run out, or the Wardens arrest the burglar. A
-greedy burglar goes on all night; a careful one stops after three dwellings.
+greedy burglar goes on all night; a careful one stops after three dwellings. A rich house's servants add to
+the chance of being noticed inside (furnishing rules §9).
 It reports what a night brings against the run's budget of 19 §6.3: about 10 000 bronze for two days'
 honest work, about 5 000 a day.
 
@@ -38,6 +39,12 @@ CLASSES = {
 }
 ARREST = 0.6               # a noticed burglar is caught by a Warden before getting away
 
+# Furnishing rules §9 (owner, 2026-11-07): every rich house keeps one servant and half of them a second. A
+# servant asleep in the servant's room may wake while the burglar searches, and runs for a Warden like any
+# witness; each adds this chance of notice to the residents' (an authoring default, not a rule).
+SECOND_SERVANT = 0.5
+SERVANT_NOTICE = 0.03
+
 CHARACTERS = {
     "new (Dex 3, Theft 1)": (3, 1),
     "practised (Dex 5, Theft 5)": (5, 5),
@@ -71,7 +78,8 @@ def night(rng, dex, theft, cls, limit=None):
         if not opened:
             break
         t += SEARCH
-        if rng.random() < c["inside"]:
+        servants = 0 if cls != "rich" else 1 + (rng.random() < SECOND_SERVANT)
+        if rng.random() < 1 - (1 - c["inside"]) * (1 - SERVANT_NOTICE) ** servants:
             return arrested(rng, carried, houses, t)
         houses += 1
         if rng.random() < c["stash"]:

@@ -22,6 +22,9 @@ namespace GameDev.Slice.Dwellings
             public bool solid;
             [Tooltip("The solid body in the footprint's metres: x along local X, y along local Z.")]
             public Rect body;
+
+            /// <summary>The height of what is seen, m (a piece under a window, or under a hung one).</summary>
+            public float height;
         }
 
         /// <summary>
@@ -85,7 +88,7 @@ namespace GameDev.Slice.Dwellings
         public bool TryGet(string key, out Footprint footprint)
         {
             var b = Get(key);
-            footprint = b == null ? default : new Footprint(b.width, b.depth, b.solid, b.body);
+            footprint = b == null ? default : new Footprint(b.width, b.depth, b.solid, b.body, b.height);
             return b != null && b.prefab != null;
         }
 

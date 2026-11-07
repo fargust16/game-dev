@@ -7,23 +7,26 @@ using Random = System.Random;
 namespace GameDev.Slice.Dwellings
 {
     /// <summary>
-    /// A kit block's footprint in whole cells along its local X and Z, whether it is solid (anything but NoGrid), and
-    /// its solid body in the footprint's own metres: the pivot at the back-left corner, the front toward +Z.
+    /// A kit block's footprint in whole cells along its local X and Z, whether it is solid (anything but NoGrid), its
+    /// solid body in the footprint's own metres (the pivot at the back-left corner, the front toward +Z), and the height
+    /// of what is seen.
     /// </summary>
     public readonly struct Footprint
     {
-        public Footprint(int width, int depth, bool solid, Rect body)
+        public Footprint(int width, int depth, bool solid, Rect body, float height = 0f)
         {
             Width = width;
             Depth = depth;
             Solid = solid;
             Body = body;
+            Height = height;
         }
 
         public int Width { get; }
         public int Depth { get; }
         public bool Solid { get; }
         public Rect Body { get; }
+        public float Height { get; }
     }
 
     public interface IDwellingFootprints
@@ -32,16 +35,22 @@ namespace GameDev.Slice.Dwellings
     }
 
     /// <summary>
-    /// Plans a dwelling from its key and its own seed stream (15, *The slice's Dwellings*; VICTORIAN_INTERIORS_PLAN §4,
-    /// VI-4): the rooms of its kind and wealth on the 3 m module, storey by storey, turned left or right by the seed;
-    /// the stair and its balustrades; then the furniture its rooms and wealth call for, from Victorian Interiors, and the
-    /// Stash by 19 §6.3's chances. The same key and seed always give the same plan. Every layout and list here is an
-    /// authoring default.
+    /// Plans a dwelling from its key and its own seed stream (15, *The slice's Dwellings*; VICTORIAN_INTERIORS_PLAN §4;
+    /// INTERIOR_FURNISHING_RULES.md): the rooms of its kind and wealth on the 3 m module, storey by storey, turned left or
+    /// right by the seed; the stair and its balustrades; then its rooms furnished place by place (the other part of this
+    /// class), and the Stash by 19 §6.3's chances. The same key and seed always give the same plan. Every layout here is
+    /// an authoring default.
     /// </summary>
-    public static class DwellingPlanner
+    public static partial class DwellingPlanner
     {
         /// <summary>19 §6.3, authoring defaults checked by burglary_sim.py: a Stash in half the poor homes, 60 % and 70 %.</summary>
         public static double StashChance(DwellingWealth wealth) => wealth == DwellingWealth.Poor ? 0.5 : wealth == DwellingWealth.Middling ? 0.6 : 0.7;
+
+        /// <summary>
+        /// Furnishing rules §9 (owner, 2026-11-07; authoring defaults): every rich house has one servant, and half of them
+        /// a second.
+        /// </summary>
+        public const double SecondServantChance = 0.5;
 
         /// <summary>The pack has no chest, so the Stash stays BK's trunk (plan §6: a themed piece the pack lacks).</summary>
         public const string StashKey = "BkTrunk";
@@ -65,191 +74,7 @@ namespace GameDev.Slice.Dwellings
                 ? Mathf.Clamp(StoreysOutside(key.Archetype), 2, 3)
                 : 1;
 
-        private const float PictureHeight = 1.6f, LampHeight = 2.2f, MirrorHeight = 1.5f, TowelHeight = 1.0f;
-
-        /// <summary>Measured (plan §3): a pack table stands 0.93 m; a candle goes on it.</summary>
-        private const float TableTop = 0.93f;
-
-        /// <summary>The chandelier's pivot under the ceiling, as in the seven (`VeilmouthInteriors.Chandelier`).</summary>
-        private const float ChandelierHeight = 3.3f;
-
-        /// <summary>
-        /// Measured (plan §3): a wall's body runs 0.16 m into the room, its dado, and a piece's back stands on it
-        /// (`ViBack`). A solid body may touch it within the layout check's tolerance of 0.01 m, so a piece three cells
-        /// wide never stands in a corner, where the side wall's dado meets it.
-        /// </summary>
-        private const float WallClearance = 0.16f - 0.005f;
-
-        private enum Spot
-        {
-            Wall,    // against a wall
-            Inner,   // against a wall with a room behind it, never a window: a fireplace (plan §4.2)
-            Middle,  // in the room, clear of the walls
-            Free,    // anywhere free
-            Hang,    // on a wall's face
-            AtTable, // a chair at a table already placed, facing it
-            OnTable, // on a table already placed: a candle
-            Ceiling, // under the ceiling, in the room's middle: a chandelier
-        }
-
-        private readonly struct Item
-        {
-            public Item(string key, Spot spot, DwellingWealth from = DwellingWealth.Poor, int count = 1, float y = 0f, DwellingWealth upTo = DwellingWealth.Rich)
-            {
-                Key = key;
-                Spot = spot;
-                From = from;
-                UpTo = upTo;
-                Count = count;
-                Y = y;
-            }
-
-            public string Key { get; }
-            public Spot Spot { get; }
-            public DwellingWealth From { get; }
-            public DwellingWealth UpTo { get; }
-            public int Count { get; }
-            public float Y { get; }
-        }
-
         private const DwellingWealth Poor = DwellingWealth.Poor, Middling = DwellingWealth.Middling, Rich = DwellingWealth.Rich;
-
-        private static Item Picture(DwellingWealth from = Middling, int count = 1) => new Item("ViPicture", Spot.Hang, from, count, PictureHeight);
-        private static Item Lamp(DwellingWealth from = Middling, int count = 1) => new Item("ViWallLamp", Spot.Hang, from, count, LampHeight);
-        private static Item Candle(DwellingWealth upTo = Poor) => new Item("ViCandle", Spot.OnTable, Poor, 1, TableTop, upTo);
-
-        /// <summary>
-        /// Each room kind's furniture from Victorian Interiors (plan §4.2), from the poorest household up; a richer home
-        /// also has the later lines. "ViPicture" takes one of the pack's eight pictures by the seed. Lamps light the
-        /// middling and rich rooms, candles the poor ones (plan §5).
-        /// </summary>
-        private static readonly Dictionary<RoomKind, Item[]> Furnishings = new Dictionary<RoomKind, Item[]>
-        {
-            [RoomKind.Hall] = new[]
-            {
-                new Item("ViClock", Spot.Wall, Rich), new Item("ViCoatStand", Spot.Free, Middling), new Item("ViMirror", Spot.Hang, Middling, y: MirrorHeight),
-                new Item("ViPlant", Spot.Free, Middling), Lamp(), new Item("ViRug", Spot.Middle, Rich),
-            },
-            [RoomKind.Landing] = new[]
-            {
-                new Item("ViPlantB", Spot.Free), new Item("ViArmchair", Spot.Free, Rich), Lamp(Poor), Picture(Poor),
-            },
-            [RoomKind.DrawingRoom] = new[]
-            {
-                new Item(FireplaceKey, Spot.Inner), new Item("ViSofaGreen", Spot.Wall), new Item("ViBookcaseLow", Spot.Wall),
-                new Item("ViTableRound", Spot.Middle), new Item("ViArmchair", Spot.AtTable, count: 2), new Item("ViCarpet", Spot.Middle),
-                new Item(ChandelierKey, Spot.Ceiling), Picture(Poor, 2), new Item("ViPalm", Spot.Free), new Item("ViVase", Spot.Free),
-            },
-            [RoomKind.Parlour] = new[]
-            {
-                new Item(FireplaceKey, Spot.Inner), new Item("ViSofa", Spot.Wall), new Item("ViTableRound", Spot.Middle),
-                new Item("ViChair", Spot.AtTable, count: 2), Candle(), new Item("ViBookcaseLow", Spot.Wall, Middling),
-                new Item("ViRug", Spot.Middle, Middling), Picture(), Lamp(), new Item("ViPlant", Spot.Free, Middling),
-            },
-            [RoomKind.DiningRoom] = new[]
-            {
-                new Item("ViDiningTable", Spot.Middle), new Item("ViChair", Spot.AtTable, count: 6), new Item("ViCupboardGlass", Spot.Wall),
-                new Item(FireplaceKey, Spot.Inner, Rich), new Item("ViSideboard", Spot.Wall, Rich), new Item(ChandelierKey, Spot.Ceiling),
-                new Item("ViCarpetB", Spot.Middle, Rich), Picture(Poor),
-            },
-            [RoomKind.Study] = new[]
-            {
-                new Item("ViDesk", Spot.Wall), new Item("ViChair", Spot.Free), new Item("ViBookcase", Spot.Wall, count: 2),
-                new Item(FireplaceKey, Spot.Inner, Rich), new Item("ViArmchair", Spot.Free), new Item("ViCarpetB", Spot.Middle),
-                Lamp(Poor), Picture(Poor),
-            },
-            [RoomKind.Kitchen] = new[]
-            {
-                new Item(FireplaceKey, Spot.Inner), new Item("ViKitchenTable", Spot.Middle), new Item("ViChair", Spot.AtTable, count: 2),
-                Candle(), new Item("ViBucket", Spot.Free), new Item("ViBasin", Spot.Wall, Middling), new Item("ViCupboardGlass", Spot.Wall, Middling),
-                new Item("ViShelvesB", Spot.Wall, Middling), new Item("ViBox", Spot.Free, Middling), Lamp(),
-            },
-            [RoomKind.Scullery] = new[]
-            {
-                new Item("ViBasin", Spot.Wall), new Item("ViBucket", Spot.Free, count: 2), new Item("BkBasket", Spot.Free), new Item("ViBox", Spot.Free),
-            },
-            [RoomKind.Bedroom] = new[]
-            {
-                new Item("ViBed", Spot.Wall), new Item(FireplaceKey, Spot.Inner, Rich), new Item("ViCabinet", Spot.Wall, Middling),
-                new Item("ViTableB", Spot.Middle, upTo: Poor), new Item("ViChair", Spot.AtTable, upTo: Poor), Candle(),
-                new Item("ViChair", Spot.Free, Middling), new Item("ViMirrorSmall", Spot.Hang, Middling, y: MirrorHeight),
-                new Item("ViRug", Spot.Middle, Middling, upTo: Middling), new Item("ViCarpet", Spot.Middle, Rich), Lamp(), Picture(),
-            },
-            [RoomKind.DressingRoom] = new[]
-            {
-                new Item("ViMirrorTall", Spot.Wall), new Item("ViCabinet", Spot.Wall), new Item("ViChair", Spot.Free),
-                new Item("ViCoatStand", Spot.Free, count: 2), new Item("ViRug", Spot.Middle), Lamp(Poor),
-            },
-            [RoomKind.Bathroom] = new[]
-            {
-                new Item("ViBath", Spot.Wall), new Item("ViToilet", Spot.Wall), new Item("ViBasin", Spot.Wall), new Item("ViTowelRail", Spot.Wall),
-                new Item("ViMirrorSmall", Spot.Hang, y: MirrorHeight), new Item("ViTowelBar", Spot.Hang, y: TowelHeight),
-                new Item("ViRugB", Spot.Middle), new Item("ViPlantC", Spot.Free), Lamp(Poor),
-            },
-            [RoomKind.WC] = new[]
-            {
-                new Item("ViToilet", Spot.Wall), new Item("ViBasin", Spot.Wall),
-            },
-            [RoomKind.Nursery] = new[]
-            {
-                new Item("ViBed", Spot.Wall, count: 2), new Item("ViTableRound", Spot.Middle), new Item("ViChair", Spot.AtTable),
-                new Item("ViRug", Spot.Middle), new Item("ViBox", Spot.Free, count: 2), Picture(Poor), Lamp(Poor),
-            },
-            [RoomKind.ServantRoom] = new[]
-            {
-                new Item("ViBed", Spot.Wall), new Item("ViTableB", Spot.Middle), new Item("ViChair", Spot.AtTable), Candle(Rich),
-            },
-            [RoomKind.BoxRoom] = new[]
-            {
-                new Item("ViBox", Spot.Free, count: 3), new Item("Crate", Spot.Free, count: 2), new Item("BkBasketB", Spot.Free),
-            },
-            [RoomKind.Room] = new[]
-            {
-                // The poor family's one room (plan §4.2): they live, sleep, cook and wash here.
-                new Item("ViBed", Spot.Wall), new Item(FireplaceKey, Spot.Inner), new Item("ViKitchenTable", Spot.Middle),
-                new Item("ViChair", Spot.AtTable, count: 2), Candle(Rich), new Item("ViBasin", Spot.Wall), new Item("ViBucket", Spot.Free),
-                new Item("ViCabinet", Spot.Wall, Middling), new Item("ViRug", Spot.Middle, Middling),
-            },
-            [RoomKind.ShopRoom] = new[]
-            {
-                new Item("ViCounter", Spot.Middle), new Item("ViShelves", Spot.Wall), new Item("ViShelvesB", Spot.Wall), new Item("Crate", Spot.Free),
-                new Item("ViCabinet", Spot.Wall, Middling), new Item("Barrel", Spot.Free, Middling), Lamp(),
-            },
-            [RoomKind.BackRoom] = new[]
-            {
-                // The shopkeeper sleeps behind the shop (owner, 2026-11-06: a bed in every home); a poor one cooks and washes here.
-                new Item("ViBed", Spot.Wall), new Item(FireplaceKey, Spot.Inner, upTo: Poor), new Item("ViTableB", Spot.Middle),
-                new Item("ViChair", Spot.AtTable), Candle(), new Item("ViBasin", Spot.Wall, upTo: Poor), new Item("ViBucket", Spot.Free, upTo: Poor),
-                new Item("Crate", Spot.Free), new Item("ViCabinet", Spot.Wall, Middling), Lamp(),
-            },
-            [RoomKind.Pantry] = new[]
-            {
-                // A closet of 3 × 3: small things only, which keep clear of its walls (a pantry, a coal store, a shop's store).
-                new Item("ViBox", Spot.Free, count: 2), new Item("BkBasket", Spot.Free), new Item("ViBucket", Spot.Free), new Item("BkBasketB", Spot.Free),
-            },
-            [RoomKind.Store] = new[]
-            {
-                new Item("Crate", Spot.Free, count: 4), new Item("Barrel", Spot.Free, count: 3), new Item("BkBasketB", Spot.Free),
-            },
-            [RoomKind.Office] = new[]
-            {
-                new Item("ViDesk", Spot.Wall), new Item("ViChair", Spot.Free), new Item("ViCabinet", Spot.Wall), new Item("ViShelves", Spot.Wall), Lamp(Poor),
-            },
-        };
-
-        private static readonly string[] Pictures = Enumerable.Range(1, 8).Select(i => $"ViPicture{i}").ToArray();
-
-        /// <summary>Every kit key the planner may place, so the kit asset holds them all.</summary>
-        public static IEnumerable<string> Keys =>
-            Furnishings.Values.SelectMany(items => items.Select(i => i.Key)).Where(k => k != "ViPicture").Concat(Pictures)
-                .Append(StashKey).Append(StairKey).Append(BalustradeKey).Distinct();
-
-        /// <summary>Where a household keeps its Stash, in order of preference.</summary>
-        private static readonly RoomKind[] StashRooms =
-        {
-            RoomKind.Bedroom, RoomKind.Study, RoomKind.Room, RoomKind.BackRoom, RoomKind.DressingRoom, RoomKind.Office,
-            RoomKind.BoxRoom, RoomKind.Store, RoomKind.Kitchen,
-        };
 
         private static readonly Vector2Int N = new Vector2Int(0, 1), S = new Vector2Int(0, -1), E = new Vector2Int(1, 0), W = new Vector2Int(-1, 0);
 
@@ -263,6 +88,9 @@ namespace GameDev.Slice.Dwellings
                 plan = Mirror(plan);
             }
 
+            plan.Servants = key.Wealth == Rich && plan.Rooms.Any(r => r.Kind == RoomKind.ServantRoom)
+                ? 1 + (rng.NextDouble() < SecondServantChance ? 1 : 0)
+                : 0;
             Furnish(plan, key.Wealth, rng, kit);
             return plan;
         }
@@ -272,15 +100,17 @@ namespace GameDev.Slice.Dwellings
         private const int M = DwellingPlan.Module;
 
         /// <summary>
-        /// The rooms of plan §4.2 on the 3 m module (sizes of §3's table); the street door is on the front, z = 0. A poor
-        /// household has no WC: its closet is a coal store (plan §4.2, *Washing by wealth*).
+        /// The rooms of furnishing rules §5 on the 3 m module (sizes of the interiors plan §3); the street door is on the
+        /// front, z = 0. Every home has somewhere to sleep, to cook and to wash (owner, VI-5): a poor home is entered into
+        /// its kitchen-living room and washes in a washroom of 3 × 3 m (rules §9); a middling house has a hall, a parlour,
+        /// a kitchen, a bedroom and a bathroom.
         /// </summary>
         private static DwellingPlan Layout(DwellingArchetype archetype, DwellingWealth wealth, int floors, Random rng)
         {
             var poor = wealth == Poor;
             var finish = poor ? Finish.Dark : Finish.Paper;
-            var closet = poor ? RoomKind.Pantry : RoomKind.WC;
-            var closetName = poor ? "Coal store" : "WC";
+            var wash = poor ? RoomKind.Washroom : RoomKind.WC;
+            var washName = poor ? "Washroom" : "WC";
             if (floors > 1)
             {
                 return archetype == DwellingArchetype.Shop ? RichShop(floors) : RichHouse(floors);
@@ -289,39 +119,56 @@ namespace GameDev.Slice.Dwellings
             switch (archetype)
             {
                 case DwellingArchetype.Tenement:
-                    // One flat: a room, or a room and a kitchen.
+                    // One flat: a room that is kitchen, living room and bedroom at once, or a kitchen-living room and a
+                    // bedroom; a washroom (a WC in a middling flat) either way.
                     return rng.Next(2) == 0
                         ? new DwellingPlan()
-                            .Room("Room", RoomKind.Room, 0, 0, 9, 9, finish)
-                            .Open(Opening.Street, 0, 0).Open(Opening.Window, 3, 9).Open(Opening.Window, 9, 3, true)
+                            .Room("Room", RoomKind.Room, 0, 0, 9, 9, finish).Room(washName, wash, 9, 0, 3, 3, Finish.Dark)
+                            .Open(Opening.Street, 0, 0).Open(Opening.Window, 3, 9).Open(Opening.Window, 9, 3, true).Open(Opening.Door, 9, 0, true)
                         : new DwellingPlan()
-                            .Room("Room", RoomKind.Room, 0, 0, 9, 9, finish).Room("Kitchen", RoomKind.Kitchen, 9, 0, 6, 9, Finish.Dark)
-                            .Open(Opening.Street, 0, 0).Open(Opening.Door, 9, 3, true).Open(Opening.Window, 3, 9).Open(Opening.Window, 12, 9);
+                            .Room("Kitchen", RoomKind.Kitchen, 0, 0, 6, 9, Finish.Dark).Room("Bedroom", RoomKind.Bedroom, 6, 0, 9, 9, finish)
+                            .Room(washName, wash, 0, 9, 3, 3, Finish.Dark)
+                            .Open(Opening.Street, 0, 0).Open(Opening.Window, 0, 3, true).Open(Opening.Door, 6, 0, true).Open(Opening.Door, 0, 9)
+                            .Open(Opening.Window, 9, 9).Open(Opening.Window, 15, 3, true);
                 case DwellingArchetype.Terrace:
                 case DwellingArchetype.Villa:
-                    // A hall along the side and the parlour at the front; the kitchen behind them with its closet and
-                    // pantry; the bedroom across the back. A fireplace needs a wall's middle module, so no room with one
-                    // is 6 × 6 (plan §3).
+                    if (poor)
+                    {
+                        // The kitchen-living room across the front, entered from the street; the coal store beside its
+                        // hearth; a bedroom behind with the washroom off it, and a back bedroom.
+                        return new DwellingPlan()
+                            .Room("Kitchen", RoomKind.Kitchen, 0, 0, 12, 9, Finish.Dark).Room("Coal store", RoomKind.Pantry, 9, 9, 3, 3, Finish.Dark)
+                            .Room("Bedroom", RoomKind.Bedroom, 0, 9, 9, 6, finish).Room("Washroom", RoomKind.Washroom, 9, 12, 3, 3, Finish.Dark)
+                            .Room("Back bedroom", RoomKind.Bedroom, 0, 15, 12, 6, finish)
+                            .Open(Opening.Street, 3, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 9, 0).Open(Opening.Window, 12, 3, true)
+                            .Open(Opening.Door, 3, 9).Open(Opening.Door, 9, 9).Open(Opening.Door, 9, 12, true).Open(Opening.Door, 3, 15)
+                            .Open(Opening.Window, 0, 12, true)
+                            .Open(Opening.Window, 0, 18, true).Open(Opening.Window, 3, 21).Open(Opening.Window, 9, 21).Open(Opening.Window, 12, 18, true);
+                    }
+
+                    // A hall along the side and the parlour at the front; the kitchen behind them with the bathroom
+                    // beside it; the bedroom across the back.
                     return new DwellingPlan()
                         .Room("Hall", RoomKind.Hall, 0, 0, 3, 9, finish).Room("Parlour", RoomKind.Parlour, 3, 0, 9, 9, finish)
-                        .Room("Kitchen", RoomKind.Kitchen, 0, 9, 9, 6, Finish.Dark).Room(closetName, closet, 9, 9, 3, 3, Finish.Dark)
-                        .Room("Pantry", RoomKind.Pantry, 9, 12, 3, 3, Finish.Dark).Room("Bedroom", RoomKind.Bedroom, 0, 15, 12, 6, finish)
+                        .Room("Kitchen", RoomKind.Kitchen, 0, 9, 9, 6, Finish.Dark).Room("Bathroom", RoomKind.Bathroom, 9, 9, 3, 6, Finish.Dark)
+                        .Room("Bedroom", RoomKind.Bedroom, 0, 15, 12, 6, finish)
                         .Open(Opening.Street, 0, 0).Open(Opening.Window, 3, 0).Open(Opening.Window, 9, 0).Open(Opening.Window, 12, 3, true)
-                        .Open(Opening.Door, 3, 3, true).Open(Opening.Door, 0, 9).Open(Opening.Door, 9, 9, true).Open(Opening.Door, 9, 12, true)
+                        .Open(Opening.Door, 3, 3, true).Open(Opening.Door, 0, 9).Open(Opening.Door, 9, 9, true)
                         .Open(Opening.Door, 3, 15).Open(Opening.Window, 0, 12, true)
                         .Open(Opening.Window, 0, 18, true).Open(Opening.Window, 3, 21).Open(Opening.Window, 9, 21).Open(Opening.Window, 12, 18, true);
                 case DwellingArchetype.Shop:
                     return poor
                         ? new DwellingPlan()
                             .Room("Shop", RoomKind.ShopRoom, 0, 0, 9, 9, Finish.Dark).Room("Back room", RoomKind.BackRoom, 0, 9, 9, 6, Finish.Dark)
+                            .Room("Washroom", RoomKind.Washroom, 9, 9, 3, 3, Finish.Dark)
                             .Open(Opening.Street, 3, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 6, 0)
-                            .Open(Opening.Door, 6, 9).Open(Opening.Window, 0, 12, true).Open(Opening.Window, 6, 15)
+                            .Open(Opening.Door, 6, 9).Open(Opening.Door, 9, 9, true).Open(Opening.Window, 0, 12, true).Open(Opening.Window, 6, 15)
                         : new DwellingPlan()
                             .Room("Shop", RoomKind.ShopRoom, 0, 0, 12, 9, Finish.Panel).Room("Kitchen", RoomKind.Kitchen, 0, 9, 9, 6, Finish.Dark)
-                            .Room(closetName, closet, 9, 9, 3, 3, Finish.Dark).Room("Store", RoomKind.Pantry, 9, 12, 3, 3, Finish.Dark)
+                            .Room("Bathroom", RoomKind.Bathroom, 9, 9, 3, 6, Finish.Dark)
                             .Room("Back room", RoomKind.BackRoom, 0, 15, 12, 6, finish)
                             .Open(Opening.Street, 3, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 6, 0).Open(Opening.Window, 9, 0)
-                            .Open(Opening.Door, 6, 9).Open(Opening.Door, 9, 9, true).Open(Opening.Door, 9, 12, true).Open(Opening.Door, 3, 15)
+                            .Open(Opening.Door, 6, 9).Open(Opening.Door, 9, 9, true).Open(Opening.Door, 3, 15)
                             .Open(Opening.Window, 0, 12, true).Open(Opening.Window, 0, 18, true).Open(Opening.Window, 3, 21).Open(Opening.Window, 9, 21)
                             .Open(Opening.Window, 12, 18, true);
                 case DwellingArchetype.Warehouse:
@@ -356,9 +203,9 @@ namespace GameDev.Slice.Dwellings
         }
 
         /// <summary>
-        /// A rich house (plan §4.2, *Layout by floor*): the hall with the stair between the drawing room and the dining
-        /// room, the study, the kitchen and the scullery behind; the bedrooms, the dressing room and the bathroom upstairs;
-        /// the nursery, the servant's room and the box room under the roof.
+        /// A rich house (plan §4.2, *Layout by floor*; rules §5): the hall with the stair between the drawing room and the
+        /// dining room, the study, the kitchen and the scullery behind; three bedrooms, the dressing room and the bathroom
+        /// upstairs; the nursery, the servant's room, a second bathroom and the box room under the roof.
         /// </summary>
         private static DwellingPlan RichHouse(int floors)
         {
@@ -384,10 +231,10 @@ namespace GameDev.Slice.Dwellings
             if (floors > 2)
             {
                 plan.Room("Nursery", RoomKind.Nursery, 0, 0, 6, 12, Finish.Paper, 2).Room("Servant's room", RoomKind.ServantRoom, 18, 0, 6, 12, Finish.Dark, 2)
-                    .Room("Box room", RoomKind.BoxRoom, 6, 12, 12, 9, Finish.Dark, 2)
+                    .Room("Top bathroom", RoomKind.Bathroom, 6, 12, 6, 9, Finish.Dark, 2).Room("Box room", RoomKind.BoxRoom, 12, 12, 6, 9, Finish.Dark, 2)
                     .Open(Opening.Window, 3, 0, false, 2).Open(Opening.Window, 0, 6, true, 2).Open(Opening.Window, 9, 0, false, 2).Open(Opening.Window, 15, 0, false, 2)
                     .Open(Opening.Window, 18, 0, false, 2).Open(Opening.Window, 24, 6, true, 2).Open(Opening.Window, 12, 21, false, 2)
-                    .Open(Opening.Door, 6, 0, true, 2).Open(Opening.Door, 18, 0, true, 2).Open(Opening.Door, 9, 12, false, 2);
+                    .Open(Opening.Door, 6, 0, true, 2).Open(Opening.Door, 18, 0, true, 2).Open(Opening.Door, 9, 12, false, 2).Open(Opening.Door, 12, 12, false, 2);
             }
 
             return plan;
@@ -411,7 +258,7 @@ namespace GameDev.Slice.Dwellings
             if (floors > 2)
             {
                 plan.Room("Bedroom", RoomKind.Bedroom, 0, 0, 12, 12, Finish.Paper, 2).Room("Second bedroom", RoomKind.Bedroom, 0, 12, 12, 9, Finish.Paper, 2)
-                    .Room("Servant's room", RoomKind.ServantRoom, 12, 12, 6, 9, Finish.Dark, 2).Room("Box room", RoomKind.BoxRoom, 18, 12, 6, 9, Finish.Dark, 2)
+                    .Room("Servant's room", RoomKind.ServantRoom, 12, 12, 6, 9, Finish.Dark, 2).Room("Top bathroom", RoomKind.Bathroom, 18, 12, 6, 9, Finish.Dark, 2)
                     .Open(Opening.Window, 3, 0, false, 2).Open(Opening.Window, 6, 0, false, 2).Open(Opening.Window, 15, 0, false, 2).Open(Opening.Window, 0, 6, true, 2)
                     .Open(Opening.Window, 0, 15, true, 2).Open(Opening.Window, 6, 21, false, 2).Open(Opening.Window, 24, 15, true, 2)
                     .Open(Opening.Door, 12, 3, true, 2).Open(Opening.Door, 6, 12, false, 2).Open(Opening.Door, 12, 12, false, 2).Open(Opening.Door, 18, 12, false, 2);
@@ -444,69 +291,13 @@ namespace GameDev.Slice.Dwellings
             return mirrored;
         }
 
-        // ------------------------------------------------------------------------------------------- furniture
-
-        private sealed class Room
-        {
-            public DwellingRoom Data;
-            public readonly HashSet<(int, int)> Taken = new HashSet<(int, int)>();
-            public readonly HashSet<(int, int, bool)> UsedWalls = new HashSet<(int, int, bool)>();
-            public readonly List<(int X, int Z, bool AlongZ, Vector2Int Facing, int Line)> Walls = new List<(int, int, bool, Vector2Int, int)>();
-            public readonly List<RectInt> Tables = new List<RectInt>();
-
-            /// <summary>The bodies of the solid pieces put free in the room; a crate's body juts 1 cm past its cell.</summary>
-            public readonly List<Rect> Bodies = new List<Rect>();
-        }
-
-        private static void Furnish(DwellingPlan plan, DwellingWealth wealth, Random rng, IDwellingFootprints kit)
-        {
-            var rooms = plan.Rooms.Select(r => Prepare(plan, r)).ToList();
-            Stairs(plan, rooms);
-            var stashRoom = Array.FindIndex(StashRooms, k => rooms.Any(r => r.Data.Kind == k));
-            var stash = rng.NextDouble() < StashChance(wealth) && stashRoom >= 0;
-
-            foreach (var room in rooms)
-            {
-                // In the list's order: what stands against the walls and in the middle comes before the chairs at its
-                // tables and the candles on them; pictures and lamps take what wall is left.
-                foreach (var item in Furnishings[room.Data.Kind].Where(i => i.From <= wealth && wealth <= i.UpTo).OrderBy(Order))
-                {
-                    for (var n = 0; n < item.Count; n++)
-                    {
-                        var key = item.Key == "ViPicture" ? Pictures[rng.Next(Pictures.Length)] : item.Key;
-                        if (!Place(plan, room, new Item(key, item.Spot, item.From, 1, item.Y), rng, kit, false))
-                        {
-                            plan.Unplaced.Add($"{room.Data.Name}: {key}");
-                        }
-                    }
-                }
-
-                if (stash && room.Data.Kind == StashRooms[stashRoom])
-                {
-                    stash = !Place(plan, room, new Item(StashKey, Spot.Free), rng, kit, true);
-                }
-            }
-        }
-
-        private static int Order(Item item)
-        {
-            switch (item.Spot)
-            {
-                case Spot.Inner: return 0;
-                case Spot.Wall: return 1;
-                case Spot.Middle: return 2;
-                case Spot.AtTable: return 3;
-                case Spot.OnTable: return 4;
-                case Spot.Free: return 5;
-                default: return 6;
-            }
-        }
+        // ------------------------------------------------------------------------------------------- stairs
 
         /// <summary>
         /// Each well's stair on the storey below and its balustrades round the well (VI-3, plan §8): the stair climbs from
         /// one metre under the floor before the well to the module line at its far end; balustrades guard the well's long
-        /// sides, unless the next flight stands there, and its low end. The well, the stair, its foot and its head are
-        /// kept clear of furniture.
+        /// sides, unless the next flight stands there, and its low end. The stair, the well and the balustrades block the
+        /// way; the stair's foot and head stay clear and are ways in and out of their rooms (rules G1).
         /// </summary>
         private static void Stairs(DwellingPlan plan, List<Room> rooms)
         {
@@ -518,12 +309,12 @@ namespace GameDev.Slice.Dwellings
                 var cells = new RectInt(x, w.Z, 7, DwellingWell.Depth);
                 stairs.Add((cells, below));
                 plan.Furniture.Add(new Placement(StairKey, PlacementMode.Put, x, w.Z, w.ClimbsEast ? 1 : 3, N, 0, 0, 0f, false, below, "Stair"));
-                Keep(rooms, cells, below);
-                Keep(rooms, new RectInt(w.ClimbsEast ? x - 1 : x + 7, w.Z, 1, DwellingWell.Depth), below); // its foot
+                Keep(rooms, cells, below, true, false);
+                Keep(rooms, new RectInt(w.ClimbsEast ? x - 1 : x + 7, w.Z, 1, DwellingWell.Depth), below, false, true); // its foot
                 // Under its head: the newel stands 0.12 m past the footprint (VI-5), and its rails' bounds reach the floor.
-                Keep(rooms, new RectInt(w.ClimbsEast ? x + 7 : x - 1, w.Z, 1, DwellingWell.Depth), below);
-                Keep(rooms, new RectInt(w.X, w.Z, DwellingWell.Width, DwellingWell.Depth), w.Level);
-                Keep(rooms, new RectInt(w.ClimbsEast ? w.X + DwellingWell.Width : w.X - 1, w.Z, 1, DwellingWell.Depth), w.Level); // its head
+                Keep(rooms, new RectInt(w.ClimbsEast ? x + 7 : x - 1, w.Z, 1, DwellingWell.Depth), below, false, false);
+                Keep(rooms, new RectInt(w.X, w.Z, DwellingWell.Width, DwellingWell.Depth), w.Level, true, false);
+                Keep(rooms, new RectInt(w.ClimbsEast ? w.X + DwellingWell.Width : w.X - 1, w.Z, 1, DwellingWell.Depth), w.Level, false, true); // its head
             }
 
             // A balustrade's side stands flush with its footprint's front, which faces the well, so it stands on the well's
@@ -550,21 +341,37 @@ namespace GameDev.Slice.Dwellings
             }
 
             plan.Furniture.Add(new Placement(BalustradeKey, PlacementMode.Put, cells.x, cells.y, turns, N, 0, 0, 0f, false, level, "Balustrade"));
-            Keep(rooms, cells, level);
+            Keep(rooms, cells, level, true, false);
         }
 
-        private static void Keep(List<Room> rooms, RectInt cells, int level)
+        /// <summary>
+        /// Keeps cells of a storey free of furniture: <paramref name="block"/> when nobody walks there either (a stair, a
+        /// well, a balustrade); <paramref name="entry"/> when the cells are a way into the room that must stay reachable.
+        /// </summary>
+        private static void Keep(List<Room> rooms, RectInt cells, int level, bool block, bool entry)
         {
             foreach (var room in rooms.Where(r => r.Data.Level == level))
             {
-                foreach (var c in cells.allPositionsWithin)
+                var inside = Cells(cells.x, cells.y, cells.width, cells.height).Where(room.Inside).ToList();
+                foreach (var c in inside)
                 {
-                    room.Taken.Add((c.x, c.y));
+                    room.Taken.Add(c);
+                    if (block)
+                    {
+                        room.Blocked.Add(c);
+                    }
+                }
+
+                if (entry && inside.Count > 0)
+                {
+                    room.Entries.Add(inside[inside.Count / 2]);
                 }
             }
         }
 
-        /// <summary>The room's own wall segments, and the cells kept clear inside each doorway.</summary>
+        // ------------------------------------------------------------------------------------------- geometry
+
+        /// <summary>The room's own wall segments, its doorways' cells kept clear, and each doorway as a way in.</summary>
         private static Room Prepare(DwellingPlan plan, DwellingRoom r)
         {
             var room = new Room { Data = r };
@@ -590,7 +397,7 @@ namespace GameDev.Slice.Dwellings
 
                 // A doorway keeps the cells along its segment clear, and the one behind its middle: the pack's opening
                 // is 1.35 m wide over the segment's middle (plan §3). A closet of one module keeps only the first row,
-                // or its WC would have no room for the toilet.
+                // or its WC would have no room for the toilet (rules G1).
                 for (var i = 0; i < M; i++)
                 {
                     room.Taken.Add(Cell(wall, i, 0));
@@ -600,6 +407,8 @@ namespace GameDev.Slice.Dwellings
                 {
                     room.Taken.Add(Cell(wall, M / 2, 1));
                 }
+
+                room.Entries.Add(Cell(wall, M / 2, 0));
             }
 
             return room;
@@ -624,192 +433,6 @@ namespace GameDev.Slice.Dwellings
             return plan.Rooms.Any(o => o.Level == r.Level && o.Contains(px, pz));
         }
 
-        private static bool Place(DwellingPlan plan, Room room, Item item, Random rng, IDwellingFootprints kit, bool stash)
-        {
-            if (!kit.TryGet(item.Key, out var fp))
-            {
-                return false;
-            }
-
-            var r = room.Data;
-            var width = fp.Width;
-            var depth = Mathf.Max(fp.Depth, 1);
-            var solid = fp.Solid;
-            switch (item.Spot)
-            {
-                case Spot.Wall:
-                case Spot.Inner:
-                case Spot.Hang:
-                {
-                    var hang = item.Spot == Spot.Hang;
-                    // A piece wider than a module (the desk, 4 m) spans the next segment along the wall too.
-                    var span = width > M ? 2 : 1;
-                    if (width > span * M || (hang && span > 1))
-                    {
-                        return false;
-                    }
-
-                    var walls = Shuffled(room.Walls, rng);
-                    if (item.Spot == Spot.Inner)
-                    {
-                        // A fireplace's back faces another room, never a window (plan §4.2); an outer wall only if none.
-                        walls = walls.Where(w => Inner(plan, r, w)).Concat(walls.Where(w => !Inner(plan, r, w))).ToList();
-                    }
-
-                    foreach (var wall in walls)
-                    {
-                        if (plan.OpeningAt(wall.X, wall.Z, wall.AlongZ, r.Level) != Opening.Wall || room.UsedWalls.Contains((wall.X, wall.Z, wall.AlongZ)))
-                        {
-                            continue;
-                        }
-
-                        var next = wall.AlongZ ? (wall.X, wall.Z + M, true) : (wall.X + M, wall.Z, false);
-                        if (span > 1 && (!room.Walls.Any(w => w.X == next.Item1 && w.Z == next.Item2 && w.AlongZ == next.Item3 && w.Line == wall.Line)
-                                         || plan.OpeningAt(next.Item1, next.Item2, next.Item3, r.Level) != Opening.Wall || room.UsedWalls.Contains(next)))
-                        {
-                            continue;
-                        }
-
-                        var start = wall.AlongZ ? wall.Z : wall.X;
-                        if (hang)
-                        {
-                            var at = start + ((M - width) / 2);
-                            room.UsedWalls.Add((wall.X, wall.Z, wall.AlongZ));
-                            plan.Furniture.Add(new Placement(item.Key, PlacementMode.Hang, 0, 0, Turns(wall.Facing), wall.Facing, wall.Line, at, item.Y, stash, r.Level));
-                            return true;
-                        }
-
-                        foreach (var offset in Shuffled(Enumerable.Range(0, (span * M) - width + 1).ToList(), rng))
-                        {
-                            var a = start + offset;
-                            var (x, z) = AgainstCorner(wall.Facing, wall.Line, a, width, depth);
-                            var turns = Turns(wall.Facing);
-                            var cells = Cells(x, z, turns % 2 == 0 ? width : depth, turns % 2 == 0 ? depth : width).ToList();
-                            if (!Fits(room, cells) || (solid && !Clear(r, fp, x, z, turns)))
-                            {
-                                continue;
-                            }
-
-                            Take(room, cells, solid);
-                            room.UsedWalls.Add((wall.X, wall.Z, wall.AlongZ));
-                            if (span > 1)
-                            {
-                                room.UsedWalls.Add(next);
-                            }
-
-                            plan.Furniture.Add(new Placement(item.Key, PlacementMode.Against, x, z, turns, wall.Facing, wall.Line, a, 0f, stash, r.Level));
-                            return true;
-                        }
-                    }
-
-                    return false;
-                }
-
-                case Spot.AtTable:
-                {
-                    // Along a table's long sides first, facing it (as the seven's tables: `VeilmouthInteriors.Table`).
-                    foreach (var t in room.Tables)
-                    {
-                        var seats = new List<(int X, int Z, int Turns, bool Long)>();
-                        for (var x = t.xMin; x < t.xMax; x++)
-                        {
-                            seats.Add((x, t.yMin - 1, 0, t.width >= t.height));
-                            seats.Add((x, t.yMax, 2, t.width >= t.height));
-                        }
-
-                        for (var z = t.yMin; z < t.yMax; z++)
-                        {
-                            seats.Add((t.xMin - 1, z, 1, t.height > t.width));
-                            seats.Add((t.xMax, z, 3, t.height > t.width));
-                        }
-
-                        foreach (var (x, z, turns, _) in seats.OrderByDescending(s => s.Long).ThenBy(_ => rng.Next()))
-                        {
-                            var cells = Cells(x, z, 1, 1).ToList();
-                            if (Fits(room, cells) && (!solid || Clear(r, fp, x, z, turns)))
-                            {
-                                Take(room, cells, solid);
-                                plan.Furniture.Add(new Placement(item.Key, PlacementMode.Put, x, z, turns, N, 0, 0, 0f, stash, r.Level));
-                                return true;
-                            }
-                        }
-                    }
-
-                    return false;
-                }
-
-                case Spot.OnTable:
-                {
-                    if (room.Tables.Count == 0)
-                    {
-                        return false;
-                    }
-
-                    var t = room.Tables[rng.Next(room.Tables.Count)];
-                    plan.Furniture.Add(new Placement(item.Key, PlacementMode.Put, t.x + rng.Next(t.width), t.y + rng.Next(t.height), rng.Next(4), N, 0, 0, item.Y, stash, r.Level));
-                    return true;
-                }
-
-                case Spot.Ceiling:
-                {
-                    plan.Furniture.Add(new Placement(item.Key, PlacementMode.Put, r.X + ((r.Width - width) / 2), r.Z + ((r.Depth - depth) / 2), 0, N, 0, 0, item.Y > 0f ? item.Y : ChandelierHeight, stash, r.Level));
-                    return true;
-                }
-
-                default:
-                {
-                    var middle = item.Spot == Spot.Middle;
-                    var turns = middle ? (r.Width >= r.Depth ? 0 : 1) : rng.Next(4);
-                    var w = turns % 2 == 0 ? width : depth;
-                    var d = turns % 2 == 0 ? depth : width;
-                    var inset = middle && r.Width - w >= 2 && r.Depth - d >= 2 ? 1 : 0;
-                    var spots = new List<(int X, int Z)>();
-                    for (var x = r.X + inset; x + w <= r.X + r.Width - inset; x++)
-                    {
-                        for (var z = r.Z + inset; z + d <= r.Z + r.Depth - inset; z++)
-                        {
-                            spots.Add((x, z));
-                        }
-                    }
-
-                    var centre = new Vector2(r.X + (r.Width - w) / 2f, r.Z + (r.Depth - d) / 2f);
-                    var ordered = middle
-                        ? spots.OrderBy(s => (new Vector2(s.X, s.Z) - centre).sqrMagnitude).ThenBy(_ => rng.Next()).ToList()
-                        : Shuffled(spots, rng);
-                    foreach (var (x, z) in ordered)
-                    {
-                        var cells = Cells(x, z, w, d).ToList();
-                        if (solid && (!Fits(room, cells) || !Clear(r, fp, x, z, turns) || Touches(room, BodyAt(fp, x, z, turns))))
-                        {
-                            continue;
-                        }
-
-                        if (solid)
-                        {
-                            room.Bodies.Add(BodyAt(fp, x, z, turns));
-                        }
-
-                        // A carpet lies under the rest, but never over a well or a stair.
-                        if (!solid && cells.Any(c => room.Taken.Contains(c) && Kept(plan, r, c)))
-                        {
-                            continue;
-                        }
-
-                        Take(room, cells, solid);
-                        if (item.Key.Contains("Table") || item.Key == "ViCounter")
-                        {
-                            room.Tables.Add(new RectInt(x, z, w, d));
-                        }
-
-                        plan.Furniture.Add(new Placement(item.Key, PlacementMode.Put, x, z, turns, N, 0, 0, 0f, stash, r.Level));
-                        return true;
-                    }
-
-                    return false;
-                }
-            }
-        }
-
         /// <summary>True when the cell lies on a stair, its well or a balustrade of the room's storey.</summary>
         private static bool Kept(DwellingPlan plan, DwellingRoom r, (int X, int Z) c) =>
             plan.Furniture.Any(f => f.Level == r.Level && f.Name != null && Covers(f, c)) || plan.InWell(c.X, c.Z, r.Level);
@@ -823,15 +446,6 @@ namespace GameDev.Slice.Dwellings
             }
 
             return c.X >= f.X && c.X < f.X + w && c.Z >= f.Z && c.Z < f.Z + d;
-        }
-
-        /// <summary>The turned footprint's south-west corner of a piece with its back on a wall line.</summary>
-        private static (int X, int Z) AgainstCorner(Vector2Int facing, int line, int a, int width, int depth)
-        {
-            if (facing == N) return (a, line);
-            if (facing == S) return (a, line - depth);
-            if (facing == E) return (line, a);
-            return (line - depth, a);
         }
 
         /// <summary>
@@ -849,6 +463,13 @@ namespace GameDev.Slice.Dwellings
                 .Select(c => (rotation * c) + offset).ToArray();
             return Rect.MinMaxRect(body.Min(c => c.x), body.Min(c => c.z), body.Max(c => c.x), body.Max(c => c.z));
         }
+
+        /// <summary>
+        /// Measured (plan §3): a wall's body runs 0.16 m into the room, its dado, and a piece's back stands on it
+        /// (`ViBack`). A solid body may touch it within the layout check's tolerance of 0.01 m, so a piece three cells
+        /// wide never stands in a corner, where the side wall's dado meets it.
+        /// </summary>
+        private const float WallClearance = 0.16f - 0.005f;
 
         /// <summary>True when the body keeps clear of the room's walls.</summary>
         private static bool Clear(DwellingRoom r, Footprint fp, int x, int z, int turns)
@@ -869,30 +490,11 @@ namespace GameDev.Slice.Dwellings
             }
         }
 
-        /// <summary>True when the body overlaps a piece already put free by more than half the kit check's 1 cm.</summary>
+        /// <summary>True when the body overlaps a piece already put by more than half the kit check's 1 cm.</summary>
         private static bool Touches(Room room, Rect body)
         {
             var inner = Rect.MinMaxRect(body.xMin + 0.005f, body.yMin + 0.005f, body.xMax - 0.005f, body.yMax - 0.005f);
             return room.Bodies.Any(b => b.Overlaps(inner));
-        }
-
-        private static bool Fits(Room room, List<(int, int)> cells)
-        {
-            var r = room.Data;
-            return cells.All(c => c.Item1 >= r.X && c.Item1 < r.X + r.Width && c.Item2 >= r.Z && c.Item2 < r.Z + r.Depth && !room.Taken.Contains(c));
-        }
-
-        private static void Take(Room room, List<(int, int)> cells, bool solid)
-        {
-            if (!solid)
-            {
-                return; // a carpet lies under the rest
-            }
-
-            foreach (var c in cells)
-            {
-                room.Taken.Add(c);
-            }
         }
 
         private static List<T> Shuffled<T>(IList<T> items, Random rng)

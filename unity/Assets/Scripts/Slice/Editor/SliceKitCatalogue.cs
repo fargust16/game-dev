@@ -90,6 +90,7 @@ namespace GameDev.Slice.EditorTools
             public float? Face;       // where a Back or Face piece's back stands, m from the wall's line (BK's when unset)
             public bool Top;          // what is seen hangs below the pivot: a ceiling, a chandelier
             public bool Books;        // a bookcase: rows of the pack's books stand on each of its shelves
+            public string[] Goods;    // shelves of goods: the pack's files stand in rows on each shelf, as books do
         }
 
         public sealed class Entry
@@ -701,9 +702,9 @@ namespace GameDev.Slice.EditorTools
             }
 
             model.transform.localPosition += offset;
-            if (spec.Books)
+            if (spec.Books || spec.Goods != null)
             {
-                FillShelves(model, spec.Key);
+                FillShelves(model, spec.Key, spec.Goods);
             }
 
             b = Seen(model);
