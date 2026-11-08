@@ -130,16 +130,24 @@ namespace GameDev.Slice.EditorTools
             stair.Shift = ViStairNewel;
             yield return stair;
             // The balustrade round a stair well on the upper floor: solid, so nobody walks into the well (VI-3). It lies
-            // along X, 3 m, with its side flush with its footprint's front, so placed in the row beside the well it stands
-            // on the well's edge, not in the middle of the row half a metre off (owner's play test VI-5, remark 1).
+            // along X, 3 m, in the row beside the well. Measured from the model's own mesh (VI-8, remark 2): its floor line
+            // is its pivot; on one side the balusters and handrail (0–0.15 m, the rail's top 1.11 m), on the other a nosing
+            // on the floor's edge (0.13–0.34 m) whose fascia hangs 0.32 m below the floor over the slab's edge, with a
+            // soffit under it. So the nosing's side faces the well, flush with the footprint's front and 5 mm past it so
+            // the fascia does not fight the floor's edge, and the floor line stays on the floor. Placed by its bounds,
+            // as before VI-8, it stood 0.32 m too high and turned back to front: its fascia lay on the landing as a
+            // "lower beam" and the balusters stood off the well's edge.
             var banister = R("ViBanister", "Banister", st, Body.Box, Anchor.Front);
-            banister.ModelYaw = 90f;
+            banister.ModelYaw = -90f;
+            banister.KeepY = true;
+            banister.Shift = 0.005f;
             banister.Lengthen = 3f / 2.94f; // measured 2.94 m: two in a row left a 6 cm gap (VI-5)
             yield return banister;
             // The pack's newel post, where two balustrades meet at a corner: each stands on its own side of the well, so
             // they touch only at the corner's point and leave a square notch the width of a rail (owner, VI-8 remark 4).
-            // Measured 0.257 m square and 1.34 m high; widened to 0.34 m, the rail's measured 0.344 m less 4 mm, so it
-            // fills the notch without touching either rail. Its pivot is the corner's grid node and the post stands half a rail's
+            // Measured 0.257 m square and 1.34 m high, so it stands 0.23 m over the handrails it joins; widened to 0.34 m,
+            // the rail's measured 0.344 m less 4 mm, so it fills the notch and takes both handrails' ends without touching
+            // either rail. Its pivot is the corner's grid node and the post stands half a rail's
             // depth off it toward -X and -Z, so turned by 90° steps it fills the notch of any corner (NewelSpots).
             var newel = R("ViNewel", "Banister_End", st, Body.Box, Anchor.Node);
             newel.Shift = 0.344f * 0.5f; // the rail's measured depth, 0.344 m

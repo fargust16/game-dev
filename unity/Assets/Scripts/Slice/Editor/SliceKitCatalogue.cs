@@ -89,6 +89,7 @@ namespace GameDev.Slice.EditorTools
             public float? InfillAt;   // where an Infill wall's infill plane is set, m from its line (WallInfill when unset)
             public float? Face;       // where a Back or Face piece's back stands, m from the wall's line (BK's when unset)
             public bool Top;          // what is seen hangs below the pivot: a ceiling, a chandelier
+            public bool KeepY;        // the model's own floor line (y 0) stands on the floor, and what lies below it hangs below: the balustrade's fascia over the well's edge
             public bool Books;        // a bookcase: rows of the pack's books stand on each of its shelves
             public string[] Goods;    // shelves of goods: the pack's files stand in rows on each shelf, as books do
         }
@@ -283,6 +284,14 @@ namespace GameDev.Slice.EditorTools
             var ore = S("IronOre", "Resource", "IronOre", Tripo, "rugged_rock_formation_3d_model", ia);
             ore.SizeX = 2f; // 2 × 1.5 × 1.26 m
             yield return ore;
+            // The owner's garden ornaments (2026-11-08): a stone birdbath and an angel pouring water, for squares and
+            // gardens (city plan §6.1). Sizes are authoring defaults: the birdbath 0.95 m high, the angel 2.2 m with its base.
+            var birdbath = S("Birdbath", "Street", "Birdbath", Tripo, "ornate_stone_birdbath_3d_model", pr);
+            birdbath.SizeY = 0.95f;
+            yield return birdbath;
+            var angel = S("AngelStatue", "Street", "AngelStatue", Tripo, "angel_statue_3d_model_1", st);
+            angel.SizeY = 2.2f;
+            yield return angel;
 
             // Trees, herbs, and flax (Stylized Trees Pack); a fellable tree is a resource node, the others are cover.
             foreach (var n in new[] { "Birch 001", "Birch 002", "Birch 003", "Warped 001", "Warped 002", "Warped 003" })
@@ -700,6 +709,10 @@ namespace GameDev.Slice.EditorTools
             if (spec.Top)
             {
                 offset.y = -b.max.y;
+            }
+            else if (spec.KeepY)
+            {
+                offset.y = 0f;
             }
 
             model.transform.localPosition += offset;

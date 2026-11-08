@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.10
+Version: 0.11
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-7 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings and VI-7 the seven by the same rules; VI-8 (play test) held, its eight remarks fixed (§8)
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-7 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings and VI-7 the seven by the same rules; VI-8 (play test) held, its eight remarks and its follow-up fixed (§8)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-08 (VI-8: the owner's eight remarks recorded and fixed in §8: the frieze in wood, a primitive stage, real fire, chandeliers only under a high ceiling, a newel at the balustrades' corner, a doorway check, Forward+. The earlier note is in §10)
+Last Updated: 2026-11-08 (VI-8 follow-up in §8: a lower, wider fire sunk into the logs, the balustrade seated by its own design, a newel above the handrails, names hidden behind walls, and why the rails failed three times. The earlier note is in §10)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -322,6 +322,17 @@ The remarks are recorded here as in VI-5.
 
 The detail asked for at the end of the remarks — props that would make the rooms lived in — is listed in `SLICE_MODELS_WANTED.md`, *Interior detail*.
 
+**VI-8, the follow-up** (owner, 2026-11-08) and what was done:
+
+| # | Remark | Done |
+|---|---|---|
+| 1 | The fire rises too high; sink its foot into the logs; wider than tall | Vefects' fire is squashed to ×1.35 across and ×0.55 up of its scale 0.85 (`DwellingAssembler.FireShape`), and its foot sinks 0.06 m into the logs (`FireSink`). Its own distortion and particle lights are off; the hearth's flickering light stays. Authoring defaults, to be judged in play. |
+| 2 | The balustrade's lower beam is offset: the rails hang in the air, a void at the well | The balustrade now stands by its own design (below). Its balusters stand on the nosing at the well's edge, and the fascia hangs down the well's side, as the model was made. |
+| 3 | NPC names show through walls | A name shows only when nothing solid (ground, walls, floors, furniture, doors) stands between the camera and the head (`HudView.InSight`). |
+| 4 | The corner newel stands lower than the rails meet; no gaps | The newel is the pack's `Banister_End` at 0.34 × 1.34 m, its top 0.23 m above the handrails, which now die into its sides. |
+
+**Why the rails failed three times.** The balustrade was placed by its bounding box: its lowest point on the floor and its side flush with the well. But the model's lowest point is the fascia, which hangs 0.32 m below its floor line to cover the well's edge. So the rail stood 0.32 m too high and back to front: the fascia lay on the landing as a "lower beam", the balusters stood beyond the edge, and every newel, measured to the floor, came out below the handrails. The kit check reads colliders, not seams, and whole-room renders were too far away to show the joints, so each fix treated a symptom. Now the rail keeps its own floor line (`KeepY`) and is turned so its nosing meets the well; its sections were measured from the FBX (`tools/assets/fbx_sections.py`); and the Soot & Bell's render pass takes close-ups of each joint (`detail_sb_newel_*`, `detail_sb_rail_*`, `detail_sb_fascia_below`). A rule against placing a vendor model by its bounding box alone is in `AGENTS.md`.
+
 **Risks:**
 
 - **A fight on a stair.** The stair is one grid cell wide. Whether a fight there needs a rule of its own (a narrow place, Surrounded impossible) is left to VI-5 and to the Combat Grid's own documents.
@@ -340,6 +351,7 @@ The owner accepted all five recommendations and authorised VI-1. These are now d
 
 ## 10. Update history
 
+- 2026-11-08 (v0.11): VI-8's follow-up: the fire, the balustrade's seat, the newel, names behind walls, and why the rails failed (§8).
 - 2026-11-08 (v0.10): VI-8, the owner's eight remarks and what was done (§8); chandeliers only under a high ceiling and Forward+ (§5); the real fire.
 - 2026-11-08: VI-8 authorised; its route recorded in §8.
 - 2026-11-08 (v0.9): VI-7, the seven furnished by the rules; the Soot & Bell to the pub plan with its 7 m taproom, its back range 12 m deep and a back landing; the faction's hall 21 m wide.

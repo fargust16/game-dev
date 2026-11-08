@@ -207,7 +207,8 @@ namespace GameDev.UI
             ShowNameTag();
         }
 
-        // The nearest named person within reach and in front of the camera, named over their head.
+        // The nearest named person within reach, in front of the camera and in its sight, named over their head: a wall,
+        // a floor, a door or a piece of furniture between hides the name (owner, after VI-8).
         private void ShowNameTag()
         {
             if (_nameTag == null)
@@ -229,7 +230,7 @@ namespace GameDev.UI
                     }
 
                     var distance = (person.TagPosition - position).sqrMagnitude;
-                    if (distance <= best && camera.WorldToViewportPoint(person.TagPosition).z > 0f)
+                    if (distance <= best && camera.WorldToViewportPoint(person.TagPosition).z > 0f && InSight(camera, person))
                     {
                         best = distance;
                         nearest = person;
@@ -249,6 +250,25 @@ namespace GameDev.UI
             _nameTag.style.top = at.y;
             _nameTag.AddToClassList(NameTagVisible);
         }
+
+        /// <summary>
+        /// True when nothing solid stands between the camera and the name: the ground, walls and floors, furniture and
+        /// doors block it; people, plants and loose props on their own layers do not.
+        /// </summary>
+        private static bool InSight(Camera camera, INameTag person)
+        {
+            if (_sightMask == 0)
+            {
+                _sightMask = LayerMask.GetMask("Ground", "Structure", "Prop", "Interactable");
+            }
+
+            // The person's own body, last on the line, does not hide their name.
+            return _sightMask == 0
+                   || !Physics.Linecast(camera.transform.position, person.TagPosition, out var hit, _sightMask, QueryTriggerInteraction.Ignore)
+                   || (person is Component c && hit.collider.transform.IsChildOf(c.transform));
+        }
+
+        private static int _sightMask;
 
         private string Prompt()
         {

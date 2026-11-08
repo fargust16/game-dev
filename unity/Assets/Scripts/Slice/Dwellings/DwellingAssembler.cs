@@ -300,12 +300,15 @@ namespace GameDev.Slice.Dwellings
         {
             var fire = Object.Instantiate(prefab, hearth);
             fire.name = "Fire";
-            fire.transform.localPosition = new Vector3(Module * 0.5f, 0.05f, 0.52f);
+            fire.transform.localPosition = new Vector3(Module * 0.5f, FireSink, 0.52f);
             fire.transform.localRotation = Quaternion.identity;
-            fire.transform.localScale = Vector3.one * FireScale;
+            // Its systems scale by the hierarchy and simulate locally, so the root's scale shapes the whole fire: wider
+            // than tall, a hearth fire rather than a bonfire (owner, VI-8 follow-up).
+            fire.transform.localScale = FireShape * FireScale;
             foreach (var t in fire.GetComponentsInChildren<Transform>(true))
             {
-                if (t.name == "Lights")
+                // Its own particle lights: the hearth's one light is the fire's. Its heat haze drew rings round the flames.
+                if (t.name == "Lights" || t.name == "Distortion")
                 {
                     t.gameObject.SetActive(false);
                 }
@@ -316,6 +319,12 @@ namespace GameDev.Slice.Dwellings
 
         /// <summary>Authoring default: the small fire's scale in a firebox 1.27 m wide.</summary>
         public const float FireScale = 0.85f;
+
+        /// <summary>Authoring default: the fire's shape, 1.35 as wide and 0.55 as high as the pack's (owner, VI-8 follow-up).</summary>
+        public static readonly Vector3 FireShape = new Vector3(1.35f, 0.55f, 1f);
+
+        /// <summary>Authoring default, m: the emitter's height over the hearth, sunk among the logs so flames rise from them.</summary>
+        public const float FireSink = -0.06f;
 
         /// <summary>
         /// The pack's fire in the mantel's firebox (measured: its middle 0.52 m out from the wall's line) and a warm,

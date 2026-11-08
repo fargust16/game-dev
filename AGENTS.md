@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 1.72
+Version: 1.73
 
 Status: Draft
 
-Last Updated: 2026-11-08 (furnishing: a chandelier only under a high ceiling, a missing piece wanted and never pieced together, by the owner after play test VI-8)
+Last Updated: 2026-11-08 (a vendor model is placed by its measured parts and checked in close-ups, never by its bounding box alone, after the balustrade failed three times in play tests VI-5 to VI-8)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -372,6 +372,7 @@ If they conflict, Canonical documents win, and agent rules must be corrected.
 - Do not use failure that only wastes time.
 - Do not contradict higher-level documents silently.
 - Do not rebuild a node-graph terrain framework. The terrain pipeline is TerrainGen → Unity `TerrainData`; the surface, trees and ground cover are project-owned rules over the final relief (`TerrainSurfaceRules`, `TerrainVegetationRules`, applied by `OverworldTerrainBuilder`). Change a rule on those types; never add a parallel generator, an optional bake path or a compatibility layer.
+- Do not place a vendor model by its bounding box alone: measure its parts and pivot (`tools/assets/fbx_sections.py`) and check its joints in close-up renders; the kit check reads colliders, not seams.
 - Keep terrain rule changes measured: a new or changed threshold carries its world unit and is labelled either **measured** (with the measurement) or **authoring default**.
 
 ---
