@@ -70,7 +70,10 @@ namespace GameDev.VictorianKit.EditorTools
             importer.sRGBTexture = srgb;
             importer.wrapMode = TextureWrapMode.Repeat;
             importer.mipmapEnabled = true;
-            importer.anisoLevel = 8;
+
+            // Trilinear blends the mip levels instead of meeting in lines across a wall (reference plan R2.6).
+            importer.filterMode = FilterMode.Trilinear;
+            importer.anisoLevel = 16;
             importer.maxTextureSize = 2048;
             importer.textureCompression = TextureImporterCompression.CompressedHQ;
             importer.SaveAndReimport();

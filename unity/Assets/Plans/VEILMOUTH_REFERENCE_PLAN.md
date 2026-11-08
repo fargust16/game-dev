@@ -1,12 +1,12 @@
 # Veilmouth Reference Plan
 
-Version: 0.2
+Version: 0.3
 
-Status: Draft — the agent's plan from the owner's walk of C3 and reference images (2026-11-08). The owner chose D3 (a) the same day, and R1's steps 0–1 are built: every door takes about half a second. The other steps wait for the owner's decisions in §5
+Status: Draft — the agent's plan from the owner's walk of C3 and reference images (2026-11-08). The owner chose D3 (a) and D5 the same day: R1's steps 0–1 are built, every door taking about half a second, and R2's steps 1 and 6 are set, the editor and the game at the quality level High. The other steps wait for the owner's decisions in §5
 
 Created: 2026-11-08
 
-Last Updated: 2026-11-08 (R1: the owner chose D3 (a), doors in 1–3 s; the city is kept behind interiors, measured at 0.45–0.62 s a door, so step 2, the preload, is not built. Earlier: first draft: the owner's six remarks traced to their causes in the project, the reference read, and eight workstreams with checks)
+Last Updated: 2026-11-08 (R2 steps 1 and 6: the owner chose D5; the editor, the tests and every desktop build use High, with anisotropic filtering forced on and MSAA 4×, and the kit's textures filter trilinear at 16×. Earlier: R1: the owner chose D3 (a), doors in 1–3 s; the city is kept behind interiors, measured at 0.45–0.62 s a door, so step 2, the preload, is not built. Earlier: first draft: the owner's six remarks traced to their causes in the project, the reference read, and eight workstreams with checks)
 
 Depends On:
 [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §24, [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md) (I.1–I.2), [99 Open Questions](../../../99%20Open%20Questions.md) (VS-C3, VS-COLOR)
@@ -129,12 +129,15 @@ How games hide distance changes, and what applies here:
 
 Steps:
 
-1. **Quality level.** The editor's current level becomes the level the slice ships at (High), with anisotropic filtering forced on, full-size textures, `lodBias` 1 and MSAA 4× or SMAA. One level is used by the editor, the tests and the build. (A project-settings change: the owner's approval, §5 D5.)
+1. **Quality level.** The editor's current level becomes the level the slice ships at (High), with anisotropic filtering forced on, full-size textures, `lodBias` 1 and MSAA 4× or SMAA. One level is used by the editor, the tests and the build. (A project-settings change: the owner's approval, §5 D5.) **Done** (owner, D5, 2026-11-08):
+   - `QualitySettings`: the editor's level is High, and High is the default of every desktop and console build (it was Ultra); High forces anisotropic filtering on and keeps `lodBias` 1 and full-size textures. The levels below stay for the owner's choice in a later options menu.
+   - The pipeline (`URP_Pipeline.asset`, shared by every level) draws with MSAA 4×; the renderer is Forward+, which takes it.
+   - What it changes, from `VeilmouthRenders.RenderQuality` (the same street views at Very Low and High, noon): the houses keep their window surrounds, quoins and chimneys at 60–100 m, where Very Low had dropped them; the rooms behind the windows show at 15–40 m, where Very Low had culled them; the far street is sharp instead of smeared. By calculation from §1 (c), the rooms now vanish at about 47 m (14 m ÷ 0.3), just past the glass's turn to the mapped room at 46 m, so the empty houses of 14–32 m are gone; steps 2–3 make it exact and smooth.
 2. **Houses' LOD.** `fadeMode` CrossFade with animated cross-fading on every house; the detail level drops only pipes, brackets, pots and small rails, at 4 % of the screen; surrounds, cornices, bands and sills stay in every level. The window shader (`VicWindow`) gets the cross-fade keyword the facade shader already has.
 3. **Rooms by distance.** The rooms behind the windows switch on and off by distance from the camera through one `CullingGroup` with hysteresis (on within 40 m, off beyond 48 m), independent of `lodBias`; the glass is fully mapped from 46 m, so the switch is never seen. Within 32 m the built room shows through clear glass.
 4. **Matching mapped rooms.** At bake, a small set of interior cubemaps is captured from built rooms of each kind and wealth (parlour, kitchen, bedroom, shop, stair); each far window maps the cubemap of its own room's kind with its own tint. The near-to-far turn then changes only the parallax, not the room.
 5. **Glass.** Fresnel reflection of the sky and a reflection probe per street, stronger with distance and at grazing angles; dimmer rooms by day, as real rooms are dark against daylight.
-6. **Textures.** Trilinear filtering on every kit and street texture, anisotropic 8–16.
+6. **Textures.** Trilinear filtering on every kit and street texture, anisotropic 8–16. **Done** with step 1: the kit's 21 maps filter trilinear at 16× (`VicTextures.Configure` sets it on every rebuild); the street's pavement maps already did. The packs' own textures (rooms, props, trees) take the forced anisotropic filtering of step 1; their filter mode stays the packs'.
 7. **Shadows.** 4096 px, four cascades over 150 m, cascade borders checked; beyond 150 m the haze of R3 carries the depth.
 8. **Optional, after measuring:** GPU Resident Drawer with occlusion culling, once the facade and window shaders take DOTS instancing.
 
@@ -235,7 +238,7 @@ What the packs lack goes on the wanted list; another pack needs the owner.
 
 | Step | What | Why first | Depends on |
 |---|---|---|---|
-| 1 | R2.1 quality level, R2.6 filtering | one setting, fixes most of remark 4 at once | D5 |
+| 1 | R2.1 quality level, R2.6 filtering (**done** 2026-11-08) | one setting, fixes most of remark 4 at once | D5, chosen |
 | 2 | R1.1 additive interiors (**done** 2026-11-08; R1.2, the preload, not needed) | the owner's worst pain | D3 (a), chosen |
 | 3 | R3.1–R3.7 colour, sky, haze, light, grade | decides most of the look, needs no rebuild of the city | D2 |
 | 4 | R2.2–R2.5, R2.7 LOD, rooms, glass, shadows | needs the houses baked again | step 1 |
@@ -256,7 +259,7 @@ Each step ends with its check, the narrowest test set that covers it, renders fo
 | D2 | Colour space (VS-COLOR) | (a) keep Gamma; (b) Linear, every material and light checked again | (b) |
 | D3 | How doors load | (a) additive interiors with the city kept loaded, separate scenes as now; (b) seamless interiors in the city scene | **Decided by the owner, 2026-11-08: (a)**, built in R1 |
 | D4 | Rooms behind windows | (a) built rooms near, matching mapped rooms far (R2.3–R2.4); (b) mapped rooms only, cheaper to load | (a) |
-| D5 | The quality level the editor and game use | High for both | High |
+| D5 | The quality level the editor and game use | High for both | **Decided by the owner, 2026-11-08: High**, set in R2 step 1 |
 | D6 | Tiled roofs | (a) slate only, as now; (b) terracotta in parts of the city | owner's taste |
 | D7 | Trees and greenery | (a) the present packs, retinted; (b) a more realistic tree pack | (a) first |
 

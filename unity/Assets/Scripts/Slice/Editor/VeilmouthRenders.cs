@@ -504,9 +504,80 @@ namespace GameDev.Slice.EditorTools
             Debug.Log($"Veilmouth mystic views written to {OutputFolder}.");
         }
 
+        /// <summary>
+        /// The same street views at noon at the quality level the editor used to play at (Very Low) and at the one the
+        /// editor and the game use now (High; reference plan R2, step 1), left and right in one picture. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderQuality
+        /// </summary>
+        public static void RenderQuality()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>()?.Apply(12 * 60);
+            var saved = QualitySettings.GetQualityLevel();
+            var levels = new[] { ("verylow", System.Array.IndexOf(QualitySettings.names, "Very Low")), ("high", System.Array.IndexOf(QualitySettings.names, "High")) };
+            var views = new[]
+            {
+                ("highstreet", -10f, -235f, 100f, -235f, 3f),
+                ("parade", 0f, -174f, 120f, -174f, 3f),
+                ("bellstreet", 195f, -278f, 100f, -278f, 2.5f),
+                ("terraces", 22f, -184f, 22f, -215f, 2f),
+            };
+            _skyAndGrade = true;
+            try
+            {
+                // The first picture after opening the scene was drawn before every texture had loaded: draw one to waste.
+                Eye("quality_warmup", views[0].Item2, views[0].Item3, views[0].Item4, views[0].Item5, views[0].Item6);
+                File.Delete($"{OutputFolder}/quality_warmup.png");
+                foreach (var (view, x, z, toX, toZ, up) in views)
+                {
+                    foreach (var (label, level) in levels)
+                    {
+                        QualitySettings.SetQualityLevel(level, true);
+                        Eye($"quality_{view}_{label}", x, z, toX, toZ, up);
+                    }
+
+                    SideBySide($"quality_{view}", levels.Select(l => $"{OutputFolder}/quality_{view}_{l.Item1}.png").ToArray());
+                }
+            }
+            finally
+            {
+                QualitySettings.SetQualityLevel(saved, true);
+                _skyAndGrade = false;
+            }
+
+            Debug.Log($"Veilmouth quality views written to {OutputFolder}.");
+        }
+
+        private static void SideBySide(string name, string[] files)
+        {
+            var parts = files.Select(f =>
+            {
+                var t = new Texture2D(2, 2);
+                t.LoadImage(File.ReadAllBytes(f));
+                return t;
+            }).ToArray();
+            var sheet = new Texture2D(parts.Sum(p => p.width), parts.Max(p => p.height), TextureFormat.RGB24, false);
+            var x = 0;
+            foreach (var part in parts)
+            {
+                sheet.SetPixels(x, 0, part.width, part.height, part.GetPixels());
+                x += part.width;
+                Object.DestroyImmediate(part);
+            }
+
+            sheet.Apply();
+            File.WriteAllBytes($"{OutputFolder}/{name}.png", sheet.EncodeToPNG());
+            Object.DestroyImmediate(sheet);
+        }
+
         private static void Shoot(Camera camera, string name, int width, int height)
         {
-            var target = new RenderTexture(width, height, 24);
+            // The pipeline's multisampling, as the player's camera draws (reference plan R2, step 1).
+            var samples = UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset urp ? urp.msaaSampleCount : 1;
+            var target = new RenderTexture(width, height, 24) { antiAliasing = Mathf.Max(1, samples) };
             if (_skyAndGrade)
             {
                 Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>()?.FaceMoon(camera.transform.position);
@@ -514,6 +585,11 @@ namespace GameDev.Slice.EditorTools
 
             camera.targetTexture = target;
             camera.Render();
+            if (target.antiAliasing > 1)
+            {
+                target.ResolveAntiAliasedSurface();
+            }
+
             RenderTexture.active = target;
             var image = new Texture2D(width, height, TextureFormat.RGB24, false);
             image.ReadPixels(new Rect(0, 0, width, height), 0, 0);
