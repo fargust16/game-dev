@@ -116,6 +116,55 @@ namespace GameDev.Slice.EditorTools
             Joints(null, "lab_sb", scene.GetRootGameObjects());
         }
 
+        /// <summary>
+        /// The Soot & Bell's yard in the city, read only: the house, the yard's walls and props, and pictures of the
+        /// house's side on the yard, to place the back door (owner, VI-8 second follow-up).
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.StairLab.ProbeBellYard
+        /// </summary>
+        public static void ProbeBellYard()
+        {
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            Physics.SyncTransforms();
+            var log = new StringBuilder("[StairLab] the Soot & Bell's yard:\n");
+            var yard = new Bounds(new Vector3(197.5f, 0f, -262.5f), new Vector3(12f, 400f, 22f));
+            foreach (var go in Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude)
+                         .Where(t => (t.parent == null || t.parent.parent == null || t.GetComponent<GameDev.Slice.Kit.KitBlock>() != null || t.GetComponent<GameDev.World.Portals.Portal>() != null)
+                                     && yard.Contains(t.position)))
+            {
+                log.AppendLine($"  '{go.name}' pos {go.position:F2} rot {go.eulerAngles.y:F0} parent '{(go.parent ? go.parent.name : "-")}'");
+            }
+
+            var bell = GameObject.Find("The Soot & Bell");
+            if (bell != null)
+            {
+                var b = bell.GetComponentInChildren<Renderer>().bounds;
+                log.AppendLine($"  house pivot {bell.transform.position:F2} rot {bell.transform.eulerAngles.y:F0} bounds {b.min:F2}..{b.max:F2}");
+            }
+
+            float Ground(float x, float z) =>
+                Physics.Raycast(new Vector3(x, 300f, z), Vector3.down, out var hit, 400f, LayerMask.GetMask(GameDev.Slice.Kit.KitLayers.Ground)) ? hit.point.y : 0f;
+            var g = Ground(197.5f, -262.5f);
+            log.AppendLine($"  ground at the yard's middle {g:F2}");
+            Debug.Log(log.ToString());
+            Lit();
+            Shot("lab_yard_side", new Vector3(199.5f, g + 1.7f, -268.5f), new Vector3(195f, g + 1.5f, -258f));
+            Shot("lab_yard_north", new Vector3(198f, g + 1.7f, -269.5f), new Vector3(197f, g + 1.2f, -255f));
+            Shot("lab_yard_above", new Vector3(206f, g + 14f, -272f), new Vector3(196f, g, -261f));
+            Shot("lab_yard_door", new Vector3(199.5f, g + 1.7f, -261.5f), new Vector3(195f, g + 1.3f, -261.5f));
+
+            // The yard door from the stair hall inside.
+            EditorSceneManager.OpenScene(VeilmouthScene.SootAndBellScenePath, OpenSceneMode.Single);
+            Lit();
+            Shot("lab_yard_door_inside", new Vector3(16.5f, 1.7f, 22.5f), new Vector3(21f, 1.3f, 22.5f));
+            Shot("lab_yard_door_close", new Vector3(19.4f, 1.6f, 21.6f), new Vector3(21f, 1.4f, 23.2f));
+            Shot("lab_street_door_inside", new Vector3(10.5f, 1.7f, 4.5f), new Vector3(10.5f, 1.3f, 0f));
+            foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude).Where(t => t.name is "Yard door" or "Street door"))
+            {
+                var b = t.GetComponentsInChildren<Renderer>().Select(r => r.bounds).Aggregate((a, c) => { a.Encapsulate(c); return a; });
+                Debug.Log($"[StairLab] '{t.name}' pos {t.position:F3} rot {t.eulerAngles.y:F0} bounds {b.min:F3}..{b.max:F3}; doorway '{t.parent.name}' pos {t.parent.position:F3} rot {t.parent.eulerAngles.y:F0}");
+            }
+        }
+
         public const string LabScene = "Assets/Scenes/Slice/Lab/StairLab.unity";
 
         /// <summary>

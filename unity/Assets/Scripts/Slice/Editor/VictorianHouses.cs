@@ -42,6 +42,7 @@ namespace GameDev.Slice.EditorTools
             public int Depth;      // modules from the street back
             public int Storeys;
             public int[] Doors = { };     // front modules with the house door
+            public int[] YardDoors = { }; // a shop's modules on its Left side, counted from the back, with the shop's own door to a yard
             public bool Shop;             // the ground floor is a shop front with awnings
             public string Facade = "Wall1"; // the walls' material: Wall1–Wall4, Brick01, Brick02, Stone wall
             public bool Dormers = true;
@@ -141,7 +142,8 @@ namespace GameDev.Slice.EditorTools
                         }
                         else if (faced || shopFloor)
                         {
-                            var module = up ? "UpWindow1" : spec.Shop ? "WoodenWallBlue" : "GroundWindow1";
+                            // A yard door is the pack's own shop door in the shop front (owner, VI-8 second follow-up).
+                            var module = up ? "UpWindow1" : !spec.Shop ? "GroundWindow1" : left && spec.YardDoors.Contains(j) ? "WoddenDoorBlue" : "WoodenWallBlue";
                             Put(parent, Modules + module, centre, sideYaw, module.StartsWith("Wo") ? 0.95f : 0f);
                         }
                         else
@@ -499,7 +501,8 @@ namespace GameDev.Slice.EditorTools
             new Spec { Name = "Civic16", Front = 16, Depth = 8, Storeys = 3, Doors = new[] { 7, 8 } },
             new Spec { Name = "Wing12", Front = 12, Depth = 6, Storeys = 2 },
             new Spec { Name = "Arch4", Front = 4, Depth = 3, Storeys = 4, Arch = 1 },
-            new Spec { Name = "Tavern6", Front = 6, Depth = 6, Storeys = 3, Doors = new[] { 2 }, Shop = true },
+            // The Soot & Bell: its yard lies on its Left (east in the city), the back door two modules from the back.
+            new Spec { Name = "Tavern6", Front = 6, Depth = 6, Storeys = 3, Doors = new[] { 2 }, Shop = true, YardDoors = new[] { 2 } },
             new Spec { Name = "Tower2", Front = 2, Depth = 2, Storeys = 5, Dormers = false },
         };
 
@@ -537,7 +540,7 @@ namespace GameDev.Slice.EditorTools
                     var spec = new Spec
                     {
                         Name = side == Side.None ? $"{type}_{facade}" : CornerKey($"{type}_{facade}", side), Front = source.Front,
-                        Depth = source.Depth, Storeys = source.Storeys, Doors = source.Doors, Shop = source.Shop,
+                        Depth = source.Depth, Storeys = source.Storeys, Doors = source.Doors, YardDoors = source.YardDoors, Shop = source.Shop,
                         Dormers = source.Dormers, Arch = source.Arch, Faced = side == Side.None ? source.Faced : side,
                     };
                     var entry = Bake(spec, Facade(facade, shop, source.Shop));
@@ -548,6 +551,25 @@ namespace GameDev.Slice.EditorTools
 
             AssetDatabase.SaveAssets();
             return entries;
+        }
+
+        /// <summary>
+        /// Bakes one plain variant again, in place: its prefab keeps its path and guid, so the houses standing in a scene
+        /// take the change. For a change to one type, never the whole kit.
+        /// </summary>
+        public static SliceKitCatalogue.Entry BakeOne(string type, string facade)
+        {
+            var (_, _, shop) = Variants.Single(v => v.Type == type && v.Facade == facade);
+            var source = Types.Single(t => t.Name == type);
+            var spec = new Spec
+            {
+                Name = $"{type}_{facade}", Front = source.Front, Depth = source.Depth, Storeys = source.Storeys, Doors = source.Doors,
+                YardDoors = source.YardDoors, Shop = source.Shop, Dormers = source.Dormers, Arch = source.Arch, Faced = source.Faced,
+            };
+            var entry = Bake(spec, Facade(facade, shop, source.Shop));
+            entry.Key = Key(type, facade);
+            AssetDatabase.SaveAssets();
+            return entry;
         }
 
         /// <summary>The house door's middle from the footprint's west edge, or the middle of the front.</summary>

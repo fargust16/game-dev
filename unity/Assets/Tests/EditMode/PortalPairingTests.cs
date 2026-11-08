@@ -16,8 +16,9 @@ namespace GameDev.Slice.Tests
         private static readonly string[] VeilmouthPaths =
             new[] { VeilmouthScene.ScenePath, VeilmouthScene.SootAndBellScenePath }.Concat(VeilmouthDressing.InteriorScenePaths).ToArray();
 
-        // The test scenes have one pair of doors; Veilmouth has seven, one for each building that opens (C0).
-        private static readonly object[] SceneSets = { new object[] { ScenePaths, 2 }, new object[] { VeilmouthPaths, 14 } };
+        // The test scenes have one pair of doors; Veilmouth has seven, one for each building that opens (C0), and the
+        // Soot & Bell's back door to its yard (VI-8 second follow-up).
+        private static readonly object[] SceneSets = { new object[] { ScenePaths, 2 }, new object[] { VeilmouthPaths, 16 } };
 
         private readonly List<UnityEngine.SceneManagement.Scene> _opened = new List<UnityEngine.SceneManagement.Scene>();
 

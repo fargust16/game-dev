@@ -118,7 +118,8 @@ namespace GameDev.Slice.EditorTools
             Wall,
             Door,    // an open doorway between rooms
             Street,  // the doorway to the street: a shut leaf and the portal
-            Closed,  // a doorway with its leaf shut (a back door, a door to nowhere the player goes)
+            Closed,  // a doorway with its leaf shut (a door to nowhere the player goes)
+            Yard,    // a back door to the building's yard: a shut leaf and the portal to the yard (owner, VI-8 second follow-up)
             Window,
             Cell,    // a cell's front: the bars with their door
             None,    // no wall: one room open into the next (the Soot & Bell's back landing, VI-7)
@@ -226,7 +227,9 @@ namespace GameDev.Slice.EditorTools
                     // let room stands over the stair hall: the stair climbs east from x 11 to the well's end at x 18, and
                     // upstairs the landing keeps the well's south and west sides, the second let room its north. No wall
                     // closes the landing's west strip to the north: the well's west balustrade runs to the module line,
-                    // where a wall's body would meet it, so the strip opens into a back landing.
+                    // where a wall's body would meet it, so the strip opens into a back landing. The back door to the yard
+                    // is in the stair hall's east wall, as the yard lies east of the house in the city (owner, VI-8 second
+                    // follow-up: a door leads out or goes).
                     return new Plan()
                         .Room("Taproom", 0, 0, 21, 12, panel).Room("Kitchen", 0, 12, 6, 12, dark).Room("Scullery", 6, 12, 3, 12, dark)
                         .Room("Stair hall", 9, 12, 12, 12, dark)
@@ -237,7 +240,7 @@ namespace GameDev.Slice.EditorTools
                         .Open(Opening.Street, 9, 0).Open(Opening.Window, 3, 0).Open(Opening.Window, 15, 0)
                         .Open(Opening.Window, 0, 3, true).Open(Opening.Window, 21, 6, true)
                         .Open(Opening.Door, 0, 12).Open(Opening.Door, 18, 12).Open(Opening.Door, 6, 15, true).Open(Opening.Door, 9, 18, true)
-                        .Open(Opening.Closed, 18, 24).Open(Opening.Window, 0, 18, true).Open(Opening.Window, 0, 21, true).Open(Opening.Window, 3, 24)
+                        .Open(Opening.Yard, 21, 21, true).Open(Opening.Window, 0, 18, true).Open(Opening.Window, 0, 21, true).Open(Opening.Window, 3, 24)
                         .Open(Opening.Window, 6, 24).Open(Opening.Window, 15, 24).Open(Opening.Window, 21, 15, true).Open(Opening.Window, 21, 18, true)
                         .Open(Opening.Window, 3, 0, false, 1).Open(Opening.Window, 9, 0, false, 1).Open(Opening.Window, 15, 0, false, 1)
                         .Open(Opening.Window, 0, 6, true, 1).Open(Opening.Window, 21, 6, true, 1)
@@ -425,6 +428,10 @@ namespace GameDev.Slice.EditorTools
                     Shut(Segment(doorway, x, z, alongZ, facing), "ViDoor", x, z, alongZ, facing).name = "Street door";
                     StreetPortal(id, x, z, alongZ);
                     break;
+                case Opening.Yard:
+                    Shut(Segment(doorway, x, z, alongZ, facing), "ViDoor", x, z, alongZ, facing).name = "Yard door";
+                    YardPortal(id, x, z, alongZ, facing);
+                    break;
                 case Opening.Window:
                     var wall = Segment(window, x, z, alongZ, facing);
                     Daylight(wall, window, x, z, alongZ, facing);
@@ -458,6 +465,10 @@ namespace GameDev.Slice.EditorTools
                     Shut(Segment("ViStoneDoorway", x, z, alongZ, facing), "ViStoneDoor", x, z, alongZ, facing).name = "Street door";
                     StreetPortal(id, x, z, alongZ);
                     break;
+                case Opening.Yard:
+                    Shut(Segment("ViStoneDoorway", x, z, alongZ, facing), "ViStoneDoor", x, z, alongZ, facing).name = "Yard door";
+                    YardPortal(id, x, z, alongZ, facing);
+                    break;
                 case Opening.Window:
                     var wall = Segment("ViStoneWindow", x, z, alongZ, facing);
                     Daylight(wall, "ViStoneWindow", x, z, alongZ, facing);
@@ -479,6 +490,18 @@ namespace GameDev.Slice.EditorTools
             portal.Configure(id + ".inside", SliceTestScenes.SceneName(VeilmouthScene.ScenePath), id + ".street", true);
             PrefabUtility.RecordPrefabInstancePropertyModifications(portal);
             portal.gameObject.name = $"Portal - {id}.inside";
+        }
+
+        /// <summary>
+        /// The back door's portal to the building's yard in the city (`{id}.yard`): on the wall segment like the wall
+        /// itself, its local +Z into the room, where a player coming in from the yard arrives.
+        /// </summary>
+        private static void YardPortal(string id, int x, int z, bool alongZ, Vector2Int facing)
+        {
+            var portal = Segment("PortalLeaf", x, z, alongZ, facing).GetComponent<Portal>();
+            portal.Configure(id + ".yard.inside", SliceTestScenes.SceneName(VeilmouthScene.ScenePath), id + ".yard", true);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(portal);
+            portal.gameObject.name = $"Portal - {id}.yard.inside";
         }
 
         /// <summary>
@@ -1260,7 +1283,7 @@ namespace GameDev.Slice.EditorTools
             var faults = new List<string>();
             foreach (var kv in plan.Openings)
             {
-                if (kv.Value is not (Opening.Door or Opening.Street or Opening.Closed or Opening.None))
+                if (kv.Value is not (Opening.Door or Opening.Street or Opening.Yard or Opening.Closed or Opening.None))
                 {
                     continue;
                 }
@@ -1284,7 +1307,7 @@ namespace GameDev.Slice.EditorTools
                             var block = hit.GetComponentInParent<KitBlock>();
                             var name = block != null ? block.name : hit.name == "Stage" ? "Stage" : null;
                             if (name == null || name == "Stair" || (name.StartsWith("Kit_ViRoom_") && !name.StartsWith("Kit_ViRoom_Banister")) ||
-                                name.StartsWith("Kit_ViStone_") || name.StartsWith("Portal") || name.StartsWith("Street door"))
+                                name.StartsWith("Kit_ViStone_") || name.StartsWith("Portal") || name.StartsWith("Street door") || name.StartsWith("Yard door"))
                             {
                                 continue;
                             }

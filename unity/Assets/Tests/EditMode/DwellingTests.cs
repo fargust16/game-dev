@@ -253,9 +253,9 @@ namespace GameDev.Slice.Tests
 
             CollectionAssert.AreEquivalent(Enum.GetValues(typeof(DwellingArchetype)), kinds, "every kind of house has dwellings");
 
-            // The seven that open keep their own doors.
+            // The seven that open keep their own doors, and the Soot & Bell its back door to its yard (VI-8).
             var all = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Portal>()).ToList();
-            Assert.AreEqual(7, all.Count - doors.Count);
+            Assert.AreEqual(8, all.Count - doors.Count);
         }
 
         private static string Describe(DwellingPlan plan) =>
