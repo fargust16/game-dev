@@ -381,63 +381,62 @@ namespace GameDev.Slice.Dwellings
 
         // ------------------------------------------------------------------------------------------- stairs
 
+        /// <summary>Measured (StairLab): a balustrade's handrails run on this line, in from the well's edge, m.</summary>
+        public const float RailLine = 0.0445f;
+
         /// <summary>
-        /// Where a newel post stands: at each corner where a balustrade along X and one along Z meet. Each stands on its own
-        /// side of the well, its body outside it, so the two touch only at the corner's point and leave a square notch the
-        /// width of a rail, which read as a hole in the rail (owner, VI-8 remark 4). The newel's pivot is the corner's grid
-        /// node on the floor the balustrades stand on, turned so that its post, which stands off the pivot toward its local
-        /// -X and -Z, fills the notch. Read from their colliders, so it holds for any plan, the seven's and the Dwellings'.
+        /// Where the pack's newel post stands, as in its own demo scene (StairLab): at each corner where two balustrades
+        /// meet, and at each free end of a balustrade, whose open section it closes (owner, VI-8 follow-up). A balustrade's
+        /// edge line is its footprint's front, on the well's edge, from its local x 0 to 3; its local +Z is toward the well.
+        /// The post's pivot is the corner or the end, a grid node, turned so that its post, which stands off the pivot
+        /// toward its local -X and -Z by <see cref="RailLine"/>, stands on both handrails' line: into the floor from both
+        /// edges at a corner, into the floor and back along the rail at an end. Two rails in a row need none, and an end
+        /// buried in a wall needs none. Read from the balustrades' transforms, so it holds for any plan.
         /// </summary>
         public static List<(Vector3 Node, Quaternion Rotation)> NewelSpots(Transform root)
         {
             Physics.SyncTransforms();
-            var rails = new List<(Bounds Box, float Floor)>();
-            foreach (var block in root.GetComponentsInChildren<KitBlock>().Where(k => k.name == "Balustrade"))
+            var ends = new List<(Vector3 At, Vector3 Out, Vector3 Well, KitBlock Rail)>();
+            foreach (var rail in root.GetComponentsInChildren<KitBlock>().Where(k => k.name == "Balustrade"))
             {
-                var colliders = block.GetComponentsInChildren<Collider>().Where(c => c.enabled && !c.isTrigger).ToList();
-                if (colliders.Count == 0)
-                {
-                    continue;
-                }
-
-                var box = colliders[0].bounds;
-                foreach (var c in colliders.Skip(1))
-                {
-                    box.Encapsulate(c.bounds);
-                }
-
-                rails.Add((box, block.transform.position.y));
+                var t = rail.transform;
+                ends.Add((t.TransformPoint(0f, 0f, 1f), -t.right, t.forward, rail));
+                ends.Add((t.TransformPoint(Module, 0f, 1f), t.right, t.forward, rail));
             }
 
-            const float touch = 0.03f;
-            static bool Meet(float aMin, float aMax, float bMin, float bMax) =>
-                Mathf.Abs(aMin - bMax) < touch || Mathf.Abs(aMax - bMin) < touch;
             var spots = new List<(Vector3 Node, Quaternion Rotation)>();
-            foreach (var (a, floor) in rails.Where(r => r.Box.size.x > r.Box.size.z))
+            void Add(Vector3 node, Vector3 d)
             {
-                foreach (var (b, _) in rails.Where(r => r.Box.size.z > r.Box.size.x && Mathf.Abs(r.Floor - floor) < 0.5f))
+                // The post stands at node - RailLine × R(1, 0, 1); Euler y of k × 90° turns (1, 1) to (1, 1), (1, -1), (-1, -1), (-1, 1).
+                var turns = d.x > 0f ? (d.z > 0f ? 0 : 1) : (d.z > 0f ? 3 : 2);
+                node = new Vector3(Mathf.Round(node.x), node.y, Mathf.Round(node.z));
+                if (!spots.Any(s => (s.Node - node).sqrMagnitude < 0.01f))
                 {
-                    // a's end meets b's side line in X, and b's end meets a's side line in Z: they touch at one corner.
-                    if (!Meet(a.min.x, a.max.x, b.min.x, b.max.x) || !Meet(b.min.z, b.max.z, a.min.z, a.max.z))
-                    {
-                        continue;
-                    }
+                    spots.Add((node, Quaternion.Euler(0f, 90f * turns, 0f)));
+                }
+            }
 
-                    var notch = new Vector3(b.center.x, floor, a.center.z);
-                    var node = new Vector3(Mathf.Round(notch.x), floor, Mathf.Round(notch.z));
-                    // Local (-1, -1) turned by k × 90° about Y: k 0 (-, -), 1 (-, +), 2 (+, +), 3 (+, -).
-                    var east = notch.x > node.x;
-                    var north = notch.z > node.z;
-                    var turns = east ? (north ? 2 : 3) : (north ? 1 : 0);
-                    if (!spots.Any(s => (s.Node - node).sqrMagnitude < 0.01f))
-                    {
-                        spots.Add((node, Quaternion.Euler(0f, 90f * turns, 0f)));
-                    }
+            foreach (var e in ends)
+            {
+                var others = ends.Where(o => o.Rail != e.Rail && (o.At - e.At).sqrMagnitude < 0.0025f).ToList();
+                var corner = others.FirstOrDefault(o => Mathf.Abs(Vector3.Dot(o.Out, e.Out)) < 0.1f);
+                if (corner.Rail != null)
+                {
+                    Add(e.At, e.Well + corner.Well);
+                }
+                else if (others.Count == 0 && !Buried(e.At - (e.Well * RailLine) - (e.Out * 0.05f) + (Vector3.up * 1f), root))
+                {
+                    Add(e.At, e.Well + e.Out);
                 }
             }
 
             return spots;
         }
+
+        // A point of the handrail just short of its end inside a wall's body: the wall closes the end.
+        private static bool Buried(Vector3 point, Transform root) =>
+            Physics.OverlapSphere(point, 0.02f, LayerMask.GetMask(KitLayers.Structure), QueryTriggerInteraction.Ignore)
+                .Any(c => c.transform.IsChildOf(root) && !c.GetComponentsInParent<KitBlock>().Any(p => p.name is "Balustrade" or "Newel" or "Stair"));
 
         /// <summary>
         /// A stair's solid bounds are its whole slope, so the floor tiles about its foot and its head and the balustrade at

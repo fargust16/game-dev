@@ -89,6 +89,7 @@ namespace GameDev.Slice.EditorTools
             public float? InfillAt;   // where an Infill wall's infill plane is set, m from its line (WallInfill when unset)
             public float? Face;       // where a Back or Face piece's back stands, m from the wall's line (BK's when unset)
             public bool Top;          // what is seen hangs below the pivot: a ceiling, a chandelier
+            public string RailPosts;  // the stair: this newel post at each end of each of its rails, as the pack's demo stands them (StairLab)
             public bool KeepY;        // the model's own floor line (y 0) stands on the floor, and what lies below it hangs below: the balustrade's fascia over the well's edge
             public bool Books;        // a bookcase: rows of the pack's books stand on each of its shelves
             public string[] Goods;    // shelves of goods: the pack's files stand in rows on each shelf, as books do
@@ -716,6 +717,11 @@ namespace GameDev.Slice.EditorTools
             }
 
             model.transform.localPosition += offset;
+            if (spec.RailPosts != null)
+            {
+                AddRailPosts(root, model, spec);
+            }
+
             if (spec.Books || spec.Goods != null)
             {
                 FillShelves(model, spec.Key, spec.Goods);
@@ -1360,6 +1366,53 @@ namespace GameDev.Slice.EditorTools
                 .Where(p => Path.GetFileNameWithoutExtension(p) == name && (p.EndsWith(".prefab") || p.EndsWith(".fbx")))
                 .OrderBy(p => p.EndsWith(".prefab") ? 0 : 1)
                 .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// The pack's newel post at each end of each of a stair's rails, which the stair's model leaves open (owner, VI-8
+        /// follow-up), where the pack's demo stands them (StairLab): on each rail's centre line, measured from the rails'
+        /// own vertices, the foot post 0.018 m inside the rails' foot and the head post 0.054 m past their head, on the
+        /// floor above. Children of the block, beside its model, so the stair's width scale does not squash them; no body.
+        /// </summary>
+        private static void AddRailPosts(GameObject root, GameObject model, Spec spec)
+        {
+            const float footInside = 0.018f, headPast = 0.054f, band = 0.25f;
+            var source = Find(spec.Folder, spec.RailPosts);
+            var points = model.GetComponentsInChildren<MeshFilter>(true)
+                .Where(f => f.sharedMesh != null && f.name.Contains("Banister"))
+                .SelectMany(f => f.sharedMesh.vertices.Select(v => root.transform.InverseTransformPoint(f.transform.TransformPoint(v))))
+                .ToList();
+            if (source == null || points.Count == 0)
+            {
+                Debug.LogError($"Slice kit catalogue: {spec.Key} has no rail meshes or no '{spec.RailPosts}' for its rail posts.");
+                return;
+            }
+
+            // The stair climbs toward its front, local +Z: the rails' foot is their least Z, their head their greatest.
+            var foot = points.Min(p => p.z);
+            var head = points.Max(p => p.z);
+            var mid = (points.Min(p => p.x) + points.Max(p => p.x)) * 0.5f;
+            foreach (var (end, z, y) in new[] { (foot, foot + footInside, 0f), (head, head + headPast, ViStorey) })
+            {
+                var near = points.Where(p => Mathf.Abs(p.z - end) < band).ToList();
+                foreach (var side in new[] { near.Where(p => p.x < mid).ToList(), near.Where(p => p.x >= mid).ToList() })
+                {
+                    if (side.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    var post = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(source), root.transform);
+                    post.name = "Rail post";
+                    KeepFinestLevel(post);
+                    foreach (var c in post.GetComponentsInChildren<Collider>(true))
+                    {
+                        Object.DestroyImmediate(c);
+                    }
+
+                    post.transform.localPosition = new Vector3((side.Min(p => p.x) + side.Max(p => p.x)) * 0.5f, y, z);
+                }
+            }
         }
 
         /// <summary>

@@ -161,14 +161,14 @@ MonoBehaviour:
     prefab: {fileID: 6001406795216103118, guid: 3c18e5b09b25ccb4c9523c13cff943e2, type: 3}
     width: 0
     depth: 0
-    solid: 1
+    solid: 0
     body:
       serializedVersion: 2
-      x: -0.342
-      y: -0.342
-      width: 0.34
-      height: 0.34
-    height: 1.3399999
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 1.339341
   - key: ViBed
     prefab: {fileID: 6427960734995565220, guid: 2af0b0cc46b5d6c4b8add333fae06499, type: 3}
     width: 2
@@ -728,9 +728,9 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.15555143
+      x: 0.26222086
       y: 0.167737
-      width: 2.6697001
+      width: 2.4570107
       height: 6.952263
     height: 4.6947412
   - key: ViBanister
@@ -741,9 +741,9 @@ MonoBehaviour:
     body:
       serializedVersion: 2
       x: 0.00076007843
-      y: 0.6609055
+      y: 0.87490547
       width: 2.9984798
-      height: 0.33909452
+      height: 0.12509453
     height: 1.4337971
   - key: ViChandelier
     prefab: {fileID: 3522400181447335565, guid: a2e32b9a6c25cf740b68c90fffe6cc77, type: 3}

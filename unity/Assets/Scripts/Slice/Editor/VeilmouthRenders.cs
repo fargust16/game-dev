@@ -272,13 +272,7 @@ namespace GameDev.Slice.EditorTools
                 Eye("detail_sb_well_sw_corner", new Vector3(14f, up + 1.6f, 12.8f), new Vector3(11.8f, up + 0.4f, 15.2f));
                 Eye("detail_sb_well_nw_corner", new Vector3(10.5f, up + 1.6f, 20f), new Vector3(12f, up + 0.4f, 17.5f));
                 Eye("detail_sb_stair_from_foot", new Vector3(9.6f, 1.7f, 16.5f), new Vector3(18f, up + 1f, 16.5f));
-                // Every joint of the balustrades close up (VI-8: whole-room views never showed them): the corner newel
-                // from the landing, low and high, the rails' seat on the well's edge, and the fascia from the hall below.
-                Eye("detail_sb_newel_low", new Vector3(12.6f, up + 0.9f, 13.4f), new Vector3(11.8f, up + 0.6f, 14.8f));
-                Eye("detail_sb_newel_high", new Vector3(13.0f, up + 1.9f, 13.2f), new Vector3(11.8f, up + 0.9f, 14.8f));
-                Eye("detail_sb_rail_seat", new Vector3(14.5f, up + 0.6f, 13.3f), new Vector3(14.5f, up + 0.1f, 15.2f));
-                Eye("detail_sb_rail_end_north", new Vector3(10.4f, up + 1.2f, 19.5f), new Vector3(11.8f, up + 0.6f, 17.8f));
-                Eye("detail_sb_fascia_below", new Vector3(14.5f, 1.6f, 13.2f), new Vector3(14.5f, up - 0.1f, 15.2f));
+                // Every joint of the balustrades close up is StairLab.RenderSootAndBell's, found from the posts and rails.
             }
 
             Debug.Log("[VeilmouthRenders] the Soot & Bell's details rendered.");
@@ -343,10 +337,11 @@ namespace GameDev.Slice.EditorTools
             Eye(name, new Vector3(x, Ground(x, z) + 1.7f, z), new Vector3(toX, Ground(toX, toZ) + up, toZ));
         }
 
-        private static void Eye(string name, Vector3 from, Vector3 to)
+        internal static void Eye(string name, Vector3 from, Vector3 to, float fieldOfView = 65f)
         {
+            Directory.CreateDirectory(OutputFolder);
             var camera = Make();
-            camera.fieldOfView = 65f;
+            camera.fieldOfView = fieldOfView;
             camera.transform.SetPositionAndRotation(from, Quaternion.LookRotation(to - from));
             camera.farClipPlane = 1500f;
             Shoot(camera, name, 1600, 900);

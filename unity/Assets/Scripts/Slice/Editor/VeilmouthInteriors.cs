@@ -270,9 +270,11 @@ namespace GameDev.Slice.EditorTools
                         .Open(Opening.Window, 15, 0).Open(Opening.Window, 21, 3, true).Open(Opening.Window, 21, 12, true)
                         .Open(Opening.Cell, 0, 12).Open(Opening.Cell, 3, 12).Open(Opening.Cell, 6, 12);
                 case "missing-room":
+                    // The landing had a closed neighbour's door (city plan §14) that led nowhere; it is a wall (owner, VI-8
+                    // follow-up: a door that is no way out is taken away).
                     return new Plan()
                         .Room("Landing", 0, 0, 9, 3, dark).Room("Room", 0, 3, 9, 9, dark)
-                        .Open(Opening.Street, 3, 0).Open(Opening.Closed, 0, 0, true).Open(Opening.Door, 0, 3)
+                        .Open(Opening.Street, 3, 0).Open(Opening.Door, 0, 3)
                         .Open(Opening.Window, 3, 12);
                 case "soot-stair-cellar":
                     return new Plan()

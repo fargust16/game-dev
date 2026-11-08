@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.11
+Version: 0.12
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-7 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings and VI-7 the seven by the same rules; VI-8 (play test) held, its eight remarks and its follow-up fixed (§8)
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-7 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings and VI-7 the seven by the same rules; VI-8 (play test) held, its eight remarks and both follow-ups fixed (§8)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-08 (VI-8 follow-up in §8: a lower, wider fire sunk into the logs, the balustrade seated by its own design, a newel above the handrails, names hidden behind walls, and why the rails failed three times. The earlier note is in §10)
+Last Updated: 2026-11-08 (VI-8 second follow-up in §8: the balustrade assembled as the pack's own demo scene assembles it, its ends capped by newels, the stair narrowed and its rails capped, the stair lab scene, the missing room's blind door removed. The earlier note is in §10)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -333,6 +333,17 @@ The detail asked for at the end of the remarks — props that would make the roo
 
 **Why the rails failed three times.** The balustrade was placed by its bounding box: its lowest point on the floor and its side flush with the well. But the model's lowest point is the fascia, which hangs 0.32 m below its floor line to cover the well's edge. So the rail stood 0.32 m too high and back to front: the fascia lay on the landing as a "lower beam", the balusters stood beyond the edge, and every newel, measured to the floor, came out below the handrails. The kit check reads colliders, not seams, and whole-room renders were too far away to show the joints, so each fix treated a symptom. Now the rail keeps its own floor line (`KeepY`) and is turned so its nosing meets the well; its sections were measured from the FBX (`tools/assets/fbx_sections.py`); and the Soot & Bell's render pass takes close-ups of each joint (`detail_sb_newel_*`, `detail_sb_rail_*`, `detail_sb_fascia_below`). A rule against placing a vendor model by its bounding box alone is in `AGENTS.md`.
 
+**VI-8, the second follow-up** (owner, 2026-11-08) and what was done. The owner asked to settle the rails for good, in a scene of their own if need be:
+
+| # | Remark | Done |
+|---|---|---|
+| 1 | The rails' ends are open; close them with a piece of the pack, or say there is none | The pack's piece is `Banister_End`, the newel post. A newel now stands at every free end of a gallery rail that does not die into a wall, and at both ends of each stair rail: the foot post 0.018 m inside the rail's foot, the head post 0.054 m past its head on the upper floor, as in the pack's demo (`SliceKitCatalogue.AddRailPosts`). |
+| 2 | Press the upper rails onto the beam at the well | The balustrade's balusters now stand on the well's edge, its nosing 0.219 m over the well and its fascia down the well's side (`ViRailOverhang`, **measured** from the demo). |
+| 3 | The corner rails do not meet the corner post; build the stair in a scene of its own | The newel is `Banister_End` at its own size, 0.257 m square and 1.34 m tall, on the floor, centred on the handrails' line 0.0445 m in from the edge (`DwellingAssembler.RailLine`, **measured**), so both handrails die into its sides as in the demo. The stair is narrowed ×0.92 to 2.534 m so its handrail clears the gallery's fascia. `StairLab` builds a rich villa by the game's own assembler in `Assets/Scenes/Slice/Lab/StairLab.unity` and renders every newel, rail seat and stair post close; `StairLab.ProbeVendor` measures and renders the demo. |
+| 4 | Extra doors leading nowhere | Only two leaves led nowhere, both in the seven; the Dwellings have their street door alone. The missing room's neighbour's door on the landing is now a wall. The Soot & Bell's back door to its yard stays as city plan §8 plans it; making it an exit needs a portal in the city scene, which is the owner's, and waits for the owner. |
+
+**Why the rails kept failing.** Every placement was derived from the models' bounds and our own reading of them. The pack's demo scene (`Victorian Interiors/Test Scene.unity`), where the author assembled the stair, the balustrade and the newel, was never opened. It is now the reference for every joint, and `AGENTS.md`'s rule on vendor models asks for the pack's own demo first.
+
 **Risks:**
 
 - **A fight on a stair.** The stair is one grid cell wide. Whether a fight there needs a rule of its own (a narrow place, Surrounded impossible) is left to VI-5 and to the Combat Grid's own documents.
@@ -351,6 +362,7 @@ The owner accepted all five recommendations and authorised VI-1. These are now d
 
 ## 10. Update history
 
+- 2026-11-08 (v0.12): VI-8's second follow-up: the rails by the pack's demo scene, newels at their ends, the stair lab, the missing room's blind door (§8).
 - 2026-11-08 (v0.11): VI-8's follow-up: the fire, the balustrade's seat, the newel, names behind walls, and why the rails failed (§8).
 - 2026-11-08 (v0.10): VI-8, the owner's eight remarks and what was done (§8); chandeliers only under a high ceiling and Forward+ (§5); the real fire.
 - 2026-11-08: VI-8 authorised; its route recorded in §8.

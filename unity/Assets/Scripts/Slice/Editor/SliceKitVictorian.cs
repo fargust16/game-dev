@@ -63,7 +63,14 @@ namespace GameDev.Slice.EditorTools
                 ["Panel"] = ("ViPanel", null, null),
             };
 
-        private const float DwellingNewelWidth = 0.34f;
+        /// <summary>Measured (StairLab): a balustrade's nosing and fascia reach this far over the well past its edge, m.</summary>
+        public const float ViRailOverhang = 0.219f;
+
+        /// <summary>Measured (StairLab): the handrails' centre line stands this far in from the well's edge, m.</summary>
+        public const float ViRailLine = Dwellings.DwellingAssembler.RailLine;
+
+        /// <summary>Authoring default: the stair's width scale, so its handrail clears a gallery's fascia (2.52 m wide).</summary>
+        public const float ViStairNarrow = 0.92f;
 
         public static IEnumerable<Spec> ViSpecs()
         {
@@ -128,33 +135,37 @@ namespace GameDev.Slice.EditorTools
             stair.ModelYaw = 180f;
             stair.Ramp = true;
             stair.Shift = ViStairNewel;
+            // Measured 2.744 m wide with its rails, in a 3 m well: 0.13 m each side, while a gallery balustrade's
+            // nosing and fascia reach 0.219 m into the well (below), so the stair's handrail ran through the fascia
+            // where it passes the upper floor. At x0.92 it is 2.52 m wide, 0.24 m from each edge; the pack's demo
+            // leaves 0.23 m (StairLab).
+            stair.Lengthen = ViStairNarrow;
+            // Its rails end open at the foot and the head; the pack's demo stands its newel post at each (VI-8 follow-up).
+            stair.RailPosts = "Banister_End";
             yield return stair;
             // The balustrade round a stair well on the upper floor: solid, so nobody walks into the well (VI-3). It lies
             // along X, 3 m, in the row beside the well. Measured from the model's own mesh (VI-8, remark 2): its floor line
-            // is its pivot; on one side the balusters and handrail (0–0.15 m, the rail's top 1.11 m), on the other a nosing
-            // on the floor's edge (0.13–0.34 m) whose fascia hangs 0.32 m below the floor over the slab's edge, with a
-            // soffit under it. So the nosing's side faces the well, flush with the footprint's front and 5 mm past it so
-            // the fascia does not fight the floor's edge, and the floor line stays on the floor. Placed by its bounds,
-            // as before VI-8, it stood 0.32 m too high and turned back to front: its fascia lay on the landing as a
-            // "lower beam" and the balusters stood off the well's edge.
+            // is its pivot; on the floor a shoe rail (0–0.15 m) carries the balusters (0.03–0.12 m) and the handrail
+            // (0–0.145 m, its top 1.11 m); beyond it a nosing (0.13–0.34 m) whose fascia hangs 0.32 m below the floor, with
+            // a soffit under it. As the pack's own demo stands it (StairLab, Test Scene), the balusters' outer face, 0.118 m,
+            // is on the well's edge, so the shoe rail stands on the floor's last 0.12 m and the nosing and fascia reach
+            // 0.219 m over the well, covering the slab's edge: the front of the bounds stands 0.219 m past the footprint's
+            // front (owner, VI-8 follow-up: the rails stood 0.22 m back from the well, the nosing between them and it).
             var banister = R("ViBanister", "Banister", st, Body.Box, Anchor.Front);
             banister.ModelYaw = -90f;
             banister.KeepY = true;
-            banister.Shift = 0.005f;
+            banister.Shift = ViRailOverhang;
             banister.Lengthen = 3f / 2.94f; // measured 2.94 m: two in a row left a 6 cm gap (VI-5)
             yield return banister;
-            // The pack's newel post, where two balustrades meet at a corner: each stands on its own side of the well, so
-            // they touch only at the corner's point and leave a square notch the width of a rail (owner, VI-8 remark 4).
-            // Measured 0.257 m square and 1.34 m high, so it stands 0.23 m over the handrails it joins; widened to 0.34 m,
-            // the rail's measured 0.344 m less 4 mm, so it fills the notch and takes both handrails' ends without touching
-            // either rail. Its pivot is the corner's grid node and the post stands half a rail's
-            // depth off it toward -X and -Z, so turned by 90° steps it fills the notch of any corner (NewelSpots).
-            var newel = R("ViNewel", "Banister_End", st, Body.Box, Anchor.Node);
-            newel.Shift = 0.344f * 0.5f; // the rail's measured depth, 0.344 m
-            newel.SizeX = DwellingNewelWidth;
-            newel.SizeZ = DwellingNewelWidth;
-            newel.SizeY = 1.34f;
-            newel.Uniform = false;
+            // The pack's newel post, at its own size (0.257 m square, 1.34 m, 0.23 m over the handrails), as its demo uses
+            // it: at a corner where two balustrades meet, and at each free end of a balustrade, whose open section it
+            // closes (owner, VI-8 follow-up). Its centre stands on both handrails' centre line, 0.0445 m in from the
+            // well's edge (0.118 - 0.0735, measured), so each handrail and shoe rail runs into its side. Its pivot is a grid
+            // node (the corner, or the rail's end) and the post stands 0.0445 m off it toward local -X and -Z; turned by
+            // 90° steps that is into the floor and back along the rail (NewelSpots). No body of its own, so off the grid's
+            // layers like a ceiling: the rails' bodies guard the well, and a post's body would overlap theirs.
+            var newel = R("ViNewel", "Banister_End", ng, Body.None, Anchor.Node);
+            newel.Shift = ViRailLine;
             yield return newel;
 
             // Stone (owner, 2026-11-07: the cellar's vaults, the cells and the chapel's nave): the pack has none, so BK's
