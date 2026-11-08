@@ -30,8 +30,6 @@ namespace GameDev.Slice.Dwellings
 
         private const float PictureHeight = 1.6f, LampHeight = 2.2f, MirrorHeight = 1.5f;
 
-        /// <summary>The chandelier's pivot under the ceiling, as in the seven (`VeilmouthInteriors.Chandelier`).</summary>
-        private const float ChandelierHeight = 3.3f;
 
         /// <summary>Authoring default, m: a piece this low may stand under a window (a bucket, a box).</summary>
         private const float LowHeight = 0.6f;
@@ -1211,9 +1209,9 @@ namespace GameDev.Slice.Dwellings
         private static readonly HashSet<RoomKind> Unlit = new HashSet<RoomKind> { RoomKind.Pantry, RoomKind.BoxRoom, RoomKind.Washroom, RoomKind.WC };
 
         /// <summary>
-        /// Light follows use (G9): wall lamps beside the places used at night, a chandelier over a rich room's centre
-        /// group; pictures on what wall is left; a carpet under a rich room's group. A poor home is lit by the candles of
-        /// its sets.
+        /// Light follows use (G9): wall lamps beside the places used at night, one more in a rich main room; a chandelier
+        /// hangs only under a ceiling higher than one storey, which no home has (owner, VI-8 remark 7); pictures on what
+        /// wall is left; a carpet under a rich room's group. A poor home is lit by the candles of its sets.
         /// </summary>
         private static void Decorate(Job j)
         {
@@ -1221,7 +1219,8 @@ namespace GameDev.Slice.Dwellings
             var kind = r.Kind;
             if (j.Wealth != Poor && !Unlit.Contains(kind))
             {
-                var lamps = j.Wealth == Rich && r.Width * r.Depth >= 72 ? 2 : 1;
+                var main = j.Wealth == Rich && (kind == RoomKind.DrawingRoom || kind == RoomKind.DiningRoom || kind == RoomKind.Hall);
+                var lamps = (j.Wealth == Rich && r.Width * r.Depth >= 72 ? 2 : 1) + (main ? 1 : 0);
                 for (var n = 0; n < lamps; n++)
                 {
                     HangNear(j, LampKey, LampHeight);
@@ -1234,16 +1233,6 @@ namespace GameDev.Slice.Dwellings
                 for (var n = 0; n < pictures; n++)
                 {
                     HangNear(j, Pictures[j.Rng.Next(Pictures.Length)], PictureHeight);
-                }
-            }
-
-            if (j.Wealth == Rich && (kind == RoomKind.DrawingRoom || kind == RoomKind.DiningRoom || kind == RoomKind.Hall))
-            {
-                var centre = j.Room.Pieces.Where(p => p.Place == Dine.Name).Select(p => p.Cells.center).DefaultIfEmpty(new Vector2(r.X + r.Width * 0.5f, r.Z + r.Depth * 0.5f)).First();
-                if (!kind.Equals(RoomKind.Hall) || !j.Plan.Wells.Any())
-                {
-                    j.Plan.Furniture.Add(new Placement(ChandelierKey, PlacementMode.Put, Mathf.RoundToInt(centre.x - 1f), Mathf.RoundToInt(centre.y - 1f), 0, N, 0, 0,
-                        ChandelierHeight, false, r.Level));
                 }
             }
 

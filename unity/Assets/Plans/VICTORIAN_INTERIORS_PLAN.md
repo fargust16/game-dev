@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.9
+Version: 0.10
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-7 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings and VI-7 the seven by the same rules; VI-8 (play test) under way, the owner's remarks awaited
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-7 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings and VI-7 the seven by the same rules; VI-8 (play test) held, its eight remarks fixed (§8)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-08 (VI-7 done: the seven furnished by the rules; the Soot & Bell's taproom 7 m high to the pub plan, its back range 12 m deep; the faction's hall 21 m wide. The earlier note is in §10)
+Last Updated: 2026-11-08 (VI-8: the owner's eight remarks recorded and fixed in §8: the frieze in wood, a primitive stage, real fire, chandeliers only under a high ceiling, a newel at the balustrades' corner, a doorway check, Forward+. The earlier note is in §10)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -168,12 +168,12 @@ A rich shop house keeps its shop and back room downstairs. Its living rooms move
 
 | Wealth | Light pieces |
 |---|---|
-| Rich, middling | a chandelier (`Lamp_1`) in the main rooms; wall lamps (`Lamp_2`) in halls, studies and bedrooms |
+| Rich, middling | wall lamps (`Lamp_2`) in every room, two or more in a large one; a chandelier (`Lamp_1`) only under a ceiling higher than a storey, the Soot & Bell's taproom alone in the slice (owner, VI-8 remark 7) |
 | Poor | candles (`Candle_1…4`) on tables and mantels |
 
 - Each lamp or candle carries one warm point light of its own. It replaces the present hidden light under each ceiling. The pack lit its lamps for baked light at 0.9; real-time, each burns at 2.5 at least and reaches 6–9 m (authoring defaults). The chandelier has no light of its own and carries one.
 - Lamps are lit from dusk to dawn by the clock. Once the slice has resident schedules (S5c), lamps are lit only where someone is at home and awake.
-- A fireplace burns with the pack's fire and a flickering light. It burns in the morning and the evening, and the kitchen hearth burns all day. Authoring defaults.
+- A fireplace burns with Vefects' small fire (asset map: *Fire*) and a flickering light, lit and put out together: a lit hearth shows its flames, a cold one sheds no light at all (owner, VI-8 remark 6). It burns in the morning and the evening, and the kitchen hearth burns all day. Authoring defaults.
 
 **Why this matters.** Darkness adds to Stealth skill ([10.3](../../../10.3%20Stealth%20and%20Detection.md)), so an unlit house at night is a different place to break into from a lit one. Light is information, not decoration.
 
@@ -181,6 +181,7 @@ A rich shop house keeps its shop and back room downstairs. Its living rooms move
 
 - Point lights cast no shadows.
 - At most eight real-time lights stand in one room, the sun included. A room that asks for more lights the extra pieces with emission only.
+- The renderer is **Forward+** (VI-8). Under Forward a mesh took at most four extra lights, chosen per object by the view, so the hearth's light fell on the floor from one angle and not from another (remark 6). Forward+ lights every pixel from every light in range.
 - The figure is an authoring default. VI-2 keeps it: window spots burn by day and lamps by night, never together, so the most lights at once in a room is seven, in the Soot & Bell's taproom at night. The frame time itself was not measured in batch; VI-5 checks it in play.
 
 ## 6. Themed props kept from other packs
@@ -306,6 +307,21 @@ What to look for, besides the owner's own eye: whether rooms feel cramped on the
 
 The remarks are recorded here as in VI-5.
 
+**VI-8, the owner's remarks** (2026-11-08) and what was done:
+
+| # | Remark | Done |
+|---|---|---|
+| 1 | Between the taproom's storeys a band of wood panelling seems missing; fix it in every like place | The pack's dark walls (`Wall_5`, `Wall_6`, `Wall_8`) carry a frieze of light red damask under the cornice, which reads as a gap where no panel stands. Our own copy of each material (`ViFrieze`) recolours the damask in the panels' wood, its pattern left faintly; every room built of those walls takes it, the Dwellings too. The pack's files are untouched. |
+| 2 | What are the rails and chairs by the bar for? | The rails were the pack's banister standing in for the low partition between saloon and public bar (§6's pub plan); the chairs faced the stage. They read as a lost stair rail, so the partition is out and wanted in `SLICE_MODELS_WANTED.md`. |
+| 3 | Every wall seems to lose a panel just under the ceiling | The same frieze (remark 1). |
+| 4 | A hole in the stair's balustrade | Two balustrades each stand on their own side of the well, so at a corner they touched at one point and left a notch a rail wide. The pack's newel post (`Banister_End`) now stands in every such corner, found from the balustrades' bodies (`DwellingAssembler.NewelSpots`), in the seven and the Dwellings. |
+| 5 | The stage is a few floor tiles; a missing piece is never pieced together from others: it goes to the wanted list, and a primitive with a texture may stand in | The stage is one box of our own with the pack's parquet (`ViStage_3x6`). The rule is in the furnishing rules, G10. |
+| 6 | The hearth's light falls on the floor from one angle and not another; a fire is either really burning or out | Forward+ (§5). The hearth now burns with Vefects' fire, its light lit and put out with its flames, and the fire's own particle lights are off. |
+| 7 | The great chandelier only in high halls; wall lamps in ordinary rooms | Chandeliers only in the taproom; Harrow's shop, the faction's hall and the Dwellings' rooms take wall lamps (§5, rules G9). |
+| 8 | A globe in the middle of a passage; no small thing on a floor | The globe stands in the study's corner. A doorway check now runs on every build: two metres before each doorway on both sides its middle metre must be clear; it found and cleared a chair in the chapel's vestry and the scullery's basket and bucket. |
+
+The detail asked for at the end of the remarks — props that would make the rooms lived in — is listed in `SLICE_MODELS_WANTED.md`, *Interior detail*.
+
 **Risks:**
 
 - **A fight on a stair.** The stair is one grid cell wide. Whether a fight there needs a rule of its own (a narrow place, Surrounded impossible) is left to VI-5 and to the Combat Grid's own documents.
@@ -324,6 +340,7 @@ The owner accepted all five recommendations and authorised VI-1. These are now d
 
 ## 10. Update history
 
+- 2026-11-08 (v0.10): VI-8, the owner's eight remarks and what was done (§8); chandeliers only under a high ceiling and Forward+ (§5); the real fire.
 - 2026-11-08: VI-8 authorised; its route recorded in §8.
 - 2026-11-08 (v0.9): VI-7, the seven furnished by the rules; the Soot & Bell to the pub plan with its 7 m taproom, its back range 12 m deep and a back landing; the faction's hall 21 m wide.
 - 2026-11-07 (v0.8): VI-6, the Dwellings furnished by `INTERIOR_FURNISHING_RULES.md` §7: places, rooms, the planner and its check; a washroom or bathroom in every home, servants in rich houses, the burglary numbers checked again (10.3 §6).

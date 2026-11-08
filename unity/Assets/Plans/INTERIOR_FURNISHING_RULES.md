@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1), the seven wait for VI-7
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-08 (§7.2: VI-7 furnished the seven by the rules, the Soot & Bell to §6's plan. The earlier note is in the update history)
+Last Updated: 2026-11-08 (after play test VI-8: G9's chandelier only under a ceiling higher than a storey; G10, a missing piece is never pieced together; G11, the doorway check; G12, a hearth burns or is out. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -47,7 +47,13 @@ These hold in every room. A later rule never overrides an earlier one.
 
 **G8. Window and door walls.** A bed's head, a fireplace and a tall cupboard never stand on a window's segment. Nothing stands in a doorway's swing (its cell and the cell before it). A fireplace stands on an inner wall (VICTORIAN_INTERIORS_PLAN §4).
 
-**G9. Light follows use.** A lamp or candle stands at each place that is used at night: by the bed, at the table, at the desk, at the hearth. A chandelier hangs over a centre group.
+**G9. Light follows use.** A lamp or candle stands at each place that is used at night: by the bed, at the table, at the desk, at the hearth. A chandelier hangs over a centre group only under a ceiling higher than a storey; a room of a storey's height takes wall lamps, two or more when it is large (owner, VI-8).
+
+**G10. A missing piece is never pieced together.** When the pack lacks a piece, it is not made up of other pieces (floor tiles for a stage, a banister for a partition). It is listed in [SLICE_MODELS_WANTED.md](SLICE_MODELS_WANTED.md), or the row added if missing, and the place goes without it; where the owner allows, a primitive with a texture stands in (owner, VI-8).
+
+**G11. The doorway check.** Every build checks two metres before each doorway on both sides: its middle metre stays clear of every piece but the room's own walls, the stair and people. It reports and never moves a piece.
+
+**G12. A hearth burns or is out.** A lit hearth shows its fire and lights the room; a cold one sheds no light. Its light and its flames are lit and put out together (owner, VI-8).
 
 ## 3. Places
 
@@ -149,7 +155,8 @@ The rules become data and one planner, used by the Dwelling scene and by the sev
 The seven stay hand-placed in `VeilmouthInteriors`, by §6 and the places of §3; the planner's check is not run on them. Their plans are in the interiors plan, §8 (*What VI-7 changed*).
 
 - **The pub.** Every line of §6 holds in the Soot & Bell except the fixed benches and the piano, which the pack lacks (§8): the public bar seats on stools and chairs. The back-bar cabinet stands half a metre off the bar's axis, since a 4 m piece cannot centre on the 1 m grid.
-- **The stage** is four layers of the pack's 0.1 m floor tile, 0.4 m high, 1 m off the end wall: a tile touching the wall's line would meet the wall's body.
+- **The stage** is one box of our own, 0.4 m high, with the pack's parquet, by G10 (VI-8); it was four layers of floor tile in VI-7.
+- **After VI-8** the partition between saloon and public bar is out (G10), the chandeliers hang only in the taproom (G9), and a newel stands where two balustrades meet at a corner.
 - **Symmetry.** The faction's hall was widened to 21 m so that its rows, hearths, chandeliers and doors mirror about the street door; the chapel already did.
 
 ## 8. Pieces the pack lacks
@@ -159,7 +166,7 @@ Victorian Interiors has no nightstand, coal scuttle, bench or settle, piano, sta
 - a nightstand is the pack's smallest cabinet, `Shelve_5`, with a candle on it (VI-6: no `Table_*` fits a bedside cell);
 - a towel rail is the pack's standing hanger (`Hanger_2`), and a wall cabinet the wall shelf (`Shelf_4`);
 - the range stays the fireplace (owner);
-- a bench, a piano and a stage platform are listed in [SLICE_MODELS_WANTED.md](SLICE_MODELS_WANTED.md); the stage can be built from floor pieces at once.
+- a bench, a piano, a stage platform and a low pub partition are listed in [SLICE_MODELS_WANTED.md](SLICE_MODELS_WANTED.md); until then the stage is a primitive box with the pack's parquet (G10), and the rest wait.
 
 ## 9. The owner's decisions (2026-11-07)
 
@@ -178,6 +185,7 @@ The owner accepted all four recommendations. These are now decisions:
 
 ## Update history
 
+- 2026-11-08 (v0.5): after play test VI-8: G9 (chandeliers), G10 (no pieced-together pieces), G11 (doorway check), G12 (hearths); §7.2 and §8 as rebuilt.
 - 2026-11-08 (v0.4): §7.2, as built in VI-7 for the seven.
 - 2026-11-07 (v0.3): §7.1, as built in VI-6 for the Dwellings; §8's nightstand and towel rail as measured.
 - 2026-11-07 (v0.2): the owner's four decisions in §9.

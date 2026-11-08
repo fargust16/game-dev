@@ -79,7 +79,7 @@ namespace GameDev.Slice.EditorTools
             public float Stretch = 1f; // a vertical scale on top of Factor (BK's rooms: walls 3.6 m, owner 2026-11-06)
             public float Lengthen = 1f; // a scale along X, after ModelYaw, on top of Factor (the balustrade: 2.94 m to 3 m, VI-5)
             public bool Infill;        // a BK wall set with its infill plane (InfillPlane) at WallInfill instead of centred
-            public float Shift;        // m added to a centred linear block's depth (BK's door leaf in its aligned frame), or past a front-anchored block's front (the stair)
+            public float Shift;        // m added to a centred linear block's depth (BK's door leaf in its aligned frame), past a front-anchored block's front (the stair), or a node block's seen piece off its node toward -X and -Z (the newel)
             public float Out;          // m a flat hung piece stands off the wall's infill (owner's play test, 2026-11-06)
             public bool LineBody;      // a linear block whose body is the full 0.3 m on its line, whatever is seen
             public string Pack;       // a pack whose built-in materials get URP copies (SliceUrpMaterials)
@@ -686,7 +686,8 @@ namespace GameDev.Slice.EditorTools
                     offset = new Vector3(0.5f, -Mathf.Min(0f, b.min.y), 0.5f);
                     break;
                 case Anchor.Node:
-                    offset = new Vector3(-b.center.x, -b.min.y, -b.center.z);
+                    // Shift sets what is seen off the node toward local -X and -Z (the newel in a balustrades' corner).
+                    offset = new Vector3(-b.center.x - spec.Shift, -b.min.y, -b.center.z - spec.Shift);
                     break;
                 case Anchor.Face:
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, (spec.Face ?? WallInfill) + spec.Out - b.min.z);
@@ -989,7 +990,7 @@ namespace GameDev.Slice.EditorTools
                 min.x = Mathf.Max(min.x, reach);
                 max.x = Mathf.Min(max.x, width - reach);
             }
-            else
+            else if (width > 0 || depth > 0) // a node block has no footprint to clamp to: its body is what is seen (the newel)
             {
                 min = Vector3.Max(min, new Vector3(0f, 0f, 0f));
                 max = Vector3.Min(max, new Vector3(width, max.y, depth));

@@ -48,8 +48,11 @@ namespace GameDev.Slice.Dwellings
         public static readonly string[] Keys =
         {
             "ViFloor", "ViCeiling", "ViPaper", "ViPaperDoorway", "ViPaperWindow", "ViDark", "ViDarkDoorway", "ViDarkWindow", "ViPanel",
-            "ViDoor", "ViCurtain", "PortalLeaf",
+            "ViDoor", "ViCurtain", "PortalLeaf", NewelKey,
         };
+
+        /// <summary>The pack's newel post at a corner of two balustrades (owner, VI-8 remark 4).</summary>
+        public const string NewelKey = "ViNewel";
 
         private sealed class Job
         {
@@ -97,6 +100,17 @@ namespace GameDev.Slice.Dwellings
             }
 
             b.FloorY = 0f;
+            var newel = kit.Get(NewelKey);
+            if (newel?.prefab != null)
+            {
+                foreach (var (node, rotation) in NewelSpots(parent))
+                {
+                    var post = Object.Instantiate(newel.prefab, b.Parent);
+                    post.name = "Newel";
+                    post.transform.SetPositionAndRotation(node, rotation);
+                }
+            }
+
             NestOnStairs(parent);
             Lighting(b, parent);
             return portal;
@@ -277,6 +291,33 @@ namespace GameDev.Slice.Dwellings
         // ------------------------------------------------------------------------------------------- fire and lamps
 
         /// <summary>
+        /// Vefects' small fire (asset map: Fire) in a mantel's firebox, at <see cref="FireScale"/> so its flames stay
+        /// inside the opening (measured: 1.27 x 1.23 m, 0.37 m deep, its middle 0.52 m out from the wall's line). Its own
+        /// particle lights are switched off: the hearth's one light, lit and put out with the flames by
+        /// <see cref="InteriorLighting"/>, is the fire's light (owner, VI-8 remark 6). Shared by the Dwellings and the seven.
+        /// </summary>
+        public static ParticleSystem PlaceFire(GameObject prefab, Transform hearth)
+        {
+            var fire = Object.Instantiate(prefab, hearth);
+            fire.name = "Fire";
+            fire.transform.localPosition = new Vector3(Module * 0.5f, 0.05f, 0.52f);
+            fire.transform.localRotation = Quaternion.identity;
+            fire.transform.localScale = Vector3.one * FireScale;
+            foreach (var t in fire.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name == "Lights")
+                {
+                    t.gameObject.SetActive(false);
+                }
+            }
+
+            return fire.GetComponent<ParticleSystem>();
+        }
+
+        /// <summary>Authoring default: the small fire's scale in a firebox 1.27 m wide.</summary>
+        public const float FireScale = 0.85f;
+
+        /// <summary>
         /// The pack's fire in the mantel's firebox (measured: its middle 0.52 m out from the wall's line) and a warm,
         /// flickering light; a kitchen hearth, and the hearth of a poor family's room, burns all day (plan §4.2, §5).
         /// </summary>
@@ -285,14 +326,7 @@ namespace GameDev.Slice.Dwellings
             var room = b.Plan.Rooms.FirstOrDefault(r => r.Level == f.Level && r.Contains(f.X + 0.5f, f.Z + 0.5f));
             var allDay = room.Kind == RoomKind.Kitchen || room.Kind == RoomKind.Room || room.Kind == RoomKind.BackRoom;
             block.name = allDay ? "Kitchen hearth" : "Fireplace";
-            ParticleSystem flames = null;
-            if (b.Kit.Fire != null)
-            {
-                var fire = Object.Instantiate(b.Kit.Fire, block.transform);
-                fire.name = "Fire";
-                fire.transform.localPosition = new Vector3(Module * 0.5f, 0.05f, 0.52f);
-                flames = fire.GetComponent<ParticleSystem>();
-            }
+            var flames = b.Kit.Fire != null ? PlaceFire(b.Kit.Fire, block.transform) : null;
 
             var light = new GameObject("Fire light").AddComponent<Light>();
             light.transform.SetParent(block.transform, false);
@@ -339,6 +373,64 @@ namespace GameDev.Slice.Dwellings
         // ------------------------------------------------------------------------------------------- stairs
 
         /// <summary>
+        /// Where a newel post stands: at each corner where a balustrade along X and one along Z meet. Each stands on its own
+        /// side of the well, its body outside it, so the two touch only at the corner's point and leave a square notch the
+        /// width of a rail, which read as a hole in the rail (owner, VI-8 remark 4). The newel's pivot is the corner's grid
+        /// node on the floor the balustrades stand on, turned so that its post, which stands off the pivot toward its local
+        /// -X and -Z, fills the notch. Read from their colliders, so it holds for any plan, the seven's and the Dwellings'.
+        /// </summary>
+        public static List<(Vector3 Node, Quaternion Rotation)> NewelSpots(Transform root)
+        {
+            Physics.SyncTransforms();
+            var rails = new List<(Bounds Box, float Floor)>();
+            foreach (var block in root.GetComponentsInChildren<KitBlock>().Where(k => k.name == "Balustrade"))
+            {
+                var colliders = block.GetComponentsInChildren<Collider>().Where(c => c.enabled && !c.isTrigger).ToList();
+                if (colliders.Count == 0)
+                {
+                    continue;
+                }
+
+                var box = colliders[0].bounds;
+                foreach (var c in colliders.Skip(1))
+                {
+                    box.Encapsulate(c.bounds);
+                }
+
+                rails.Add((box, block.transform.position.y));
+            }
+
+            const float touch = 0.03f;
+            static bool Meet(float aMin, float aMax, float bMin, float bMax) =>
+                Mathf.Abs(aMin - bMax) < touch || Mathf.Abs(aMax - bMin) < touch;
+            var spots = new List<(Vector3 Node, Quaternion Rotation)>();
+            foreach (var (a, floor) in rails.Where(r => r.Box.size.x > r.Box.size.z))
+            {
+                foreach (var (b, _) in rails.Where(r => r.Box.size.z > r.Box.size.x && Mathf.Abs(r.Floor - floor) < 0.5f))
+                {
+                    // a's end meets b's side line in X, and b's end meets a's side line in Z: they touch at one corner.
+                    if (!Meet(a.min.x, a.max.x, b.min.x, b.max.x) || !Meet(b.min.z, b.max.z, a.min.z, a.max.z))
+                    {
+                        continue;
+                    }
+
+                    var notch = new Vector3(b.center.x, floor, a.center.z);
+                    var node = new Vector3(Mathf.Round(notch.x), floor, Mathf.Round(notch.z));
+                    // Local (-1, -1) turned by k × 90° about Y: k 0 (-, -), 1 (-, +), 2 (+, +), 3 (+, -).
+                    var east = notch.x > node.x;
+                    var north = notch.z > node.z;
+                    var turns = east ? (north ? 2 : 3) : (north ? 1 : 0);
+                    if (!spots.Any(s => (s.Node - node).sqrMagnitude < 0.01f))
+                    {
+                        spots.Add((node, Quaternion.Euler(0f, 90f * turns, 0f)));
+                    }
+                }
+            }
+
+            return spots;
+        }
+
+        /// <summary>
         /// A stair's solid bounds are its whole slope, so the floor tiles about its foot and its head and the balustrade at
         /// its well's low end stand inside them though they touch nothing of it. They are nested under the stair as its
         /// own pieces (kit standard §6), as in the seven (VI-3).
@@ -377,7 +469,7 @@ namespace GameDev.Slice.Dwellings
 
                 var inside = bounds.Value;
                 inside.Expand(-0.02f);
-                foreach (var piece in blocks.Where(k => k != stair && (k.name.StartsWith("Kit_ViRoom_Floor") || k.name == "Balustrade")))
+                foreach (var piece in blocks.Where(k => k != stair && (k.name.StartsWith("Kit_ViRoom_Floor") || k.name == "Balustrade" || k.name == "Newel")))
                 {
                     var other = Solid(piece);
                     if (other.HasValue && inside.Intersects(other.Value) && piece.transform.parent.GetComponentInParent<KitBlock>() == null)

@@ -237,6 +237,46 @@ namespace GameDev.Slice.EditorTools
             Debug.Log($"[Dwelling] details of {n} stairs rendered.");
         }
 
+        /// <summary>
+        /// The Soot & Bell's places from the owner's VI-8 remarks, close up: the walls between the taproom's storeys and
+        /// under a ceiling, the stage, the hearth by day and by night, the stair well's balustrades.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderSootAndBellDetails
+        /// </summary>
+        [MenuItem("GameDev/Slice/Render Soot and Bell Details")]
+        public static void RenderSootAndBellDetails()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.SootAndBellScenePath, OpenSceneMode.Single);
+            var lighting = Object.FindFirstObjectByType<Interiors.InteriorLighting>();
+            const float up = VeilmouthInteriors.Storey;
+            foreach (var (minute, suffix) in new[] { (12 * 60, "noon"), (21 * 60, "night") })
+            {
+                lighting.Apply(minute);
+                // A still renders particles only once simulated: two seconds of the lit fires' flames.
+                foreach (var ps in Object.FindObjectsByType<ParticleSystem>(FindObjectsInactive.Exclude))
+                {
+                    ps.Simulate(2f, true, true);
+                }
+
+                Eye($"detail_sb_{suffix}_hearth", new Vector3(4.5f, 1.5f, 7.5f), new Vector3(0.6f, 0.7f, 7.5f));
+                if (suffix == "night")
+                {
+                    continue;
+                }
+
+                Eye("detail_sb_frieze_back", new Vector3(10.5f, 1.7f, 3f), new Vector3(10.5f, 3.6f, 12f));
+                Eye("detail_sb_frieze_front", new Vector3(10.5f, 1.7f, 9f), new Vector3(4f, 3.6f, 0f));
+                Eye("detail_sb_stage", new Vector3(12f, 1.7f, 5f), new Vector3(19.5f, 0.3f, 6f));
+                Eye("detail_sb_hall_ceiling", new Vector3(14f, 1.7f, 20f), new Vector3(21f, 3.2f, 22f));
+                Eye("detail_sb_well_from_west", new Vector3(10f, up + 1.7f, 16.5f), new Vector3(16f, up - 0.5f, 16.5f));
+                Eye("detail_sb_well_sw_corner", new Vector3(14f, up + 1.6f, 12.8f), new Vector3(11.8f, up + 0.4f, 15.2f));
+                Eye("detail_sb_well_nw_corner", new Vector3(10.5f, up + 1.6f, 20f), new Vector3(12f, up + 0.4f, 17.5f));
+                Eye("detail_sb_stair_from_foot", new Vector3(9.6f, 1.7f, 16.5f), new Vector3(18f, up + 1f, 16.5f));
+            }
+
+            Debug.Log("[VeilmouthRenders] the Soot & Bell's details rendered.");
+        }
+
         private static void ShowCircles()
         {
             foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)

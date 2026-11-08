@@ -44,7 +44,8 @@ namespace GameDev.Slice.EditorTools
         private const float LampIntensity = 2.5f;
         private const string ChandelierLight = "Chandelier light";
 
-        internal const string FirePath = "Assets/Victorian Interiors/Victorian Interiors/Prefabs/Particle System.prefab";
+        /// <summary>The hearths' fire: Vefects' small fire (asset map: Fire; owner, VI-8 remark 6), shared with the Dwellings.</summary>
+        internal const string FirePath = "Assets/Vefects/Free Fire VFX URP/Particles/VFX_Fire_01_Small.prefab";
 
         // Measured (probe front views of 2026-11-07, m from the window's middle): the glass painted on each window wall.
         internal static readonly Dictionary<string, (float U0, float U1, float Y0, float Y1, float ProbeU, float ProbeY)> Glass = new()
@@ -209,7 +210,7 @@ namespace GameDev.Slice.EditorTools
             new GameObject("Interior").AddComponent<InteriorRuntime>().Configure(id);
             SliceTestScenes.AddPlayerRig(new Vector3(plan.Street.X + Module * 0.5f, 0.1f, plan.Street.Z + 1.6f));
             SliceTestScenes.Save(scene, path);
-            Report(path, WindowLights.Count, lamps.Length, Hearths.Count);
+            Report(path, WindowLights.Count, lamps.Length, Hearths.Count, Doorways(plan));
         }
 
         private static Plan PlanFor(string id)
@@ -668,11 +669,12 @@ namespace GameDev.Slice.EditorTools
         private static void SootAndBell()
         {
             // Taproom, by the pub plan of rules §6: the bar faces the street door across the room, on its axis, the
-            // back-bar cabinet behind it and the keeper between; nothing stands on the 5 m way from the door to the bar,
-            // which two low partitions edge. West of them the saloon: carpet, upholstered chairs, the hearth and two
-            // snug tables; east the public bar: tables with stools on the bare floor, and a small stage at the end wall
-            // on the room's axis, chairs facing it and no table within 2 m of its front. Its piano is missing from the
-            // pack (SLICE_MODELS_WANTED). Three chandeliers hang in the 7 m height.
+            // back-bar cabinet behind it and the keeper between; nothing stands on the 5 m way from the door to the bar.
+            // West of it the saloon: carpet, upholstered chairs, the hearth and two snug tables; east the public bar:
+            // tables with stools on the bare floor, and a small stage at the end wall on the room's axis, chairs facing it
+            // and no table within 2 m of its front. The low partition between them, the fixed benches and the piano are
+            // missing from the pack and wait in SLICE_MODELS_WANTED; a piece is not made up of other pieces (owner, VI-8
+            // remark 5). Three chandeliers hang in the 7 m height, the one room of the seven higher than a storey.
             Fireplace(E, 0, 6);
             Put("BarCounter", 8, 8, 2).name = "Bar";
             Against("BarCabinet", S, 12, 9);
@@ -680,8 +682,6 @@ namespace GameDev.Slice.EditorTools
             Put("Barrel", 7, 10);
             Hang("BkBottleShelf", S, 12, 6, 1.6f);
             Hang("BkBottleShelf", S, 12, 6, 2.3f);
-            Put("ViBanister", 7, 4, 1).name = "Partition";
-            Put("ViBanister", 13, 4, 3).name = "Partition";
 
             // The saloon.
             Put("ViCarpet", 2, 4);
@@ -698,12 +698,10 @@ namespace GameDev.Slice.EditorTools
             Table(13, 9, "BkStool");
             foreach (var z in new[] { 4, 5, 6, 7 })
             {
-                Put("BkChair", 15, z, 1);
+                Put("BkChair", 16, z, 1);
             }
 
-            // The stage stands a metre off the end wall, whose body its tiles would meet; the strip behind is the
-            // performers' way on.
-            Stage(17, 3, 1, 2);
+            Stage(18, 3, 1, 2);
             Put("ViPlantC", 19, 0);
             Against("ViClock", W, 21, 10);
 
@@ -736,10 +734,8 @@ namespace GameDev.Slice.EditorTools
             Put("ViBucket", 5, 13);
             Hang("ViWallLamp", N, 12, 3, 2.2f);
 
-            // Scullery: the sink, a bucket and a basket in the one column clear of both walls.
+            // Scullery: the sink. Its one column clear of both walls is its walk-way, so nothing stands in it (VI-8).
             Against("ViBasin", E, 6, 13).name = "Scullery sink";
-            Put("BkBasket", 7, 22);
-            Put("ViBucket", 7, 23);
 
             // Stair hall: the stair climbs east to the landing (VI-3); the tap's stock at the back.
             Put("ViStair", 11, 15, 1).name = "Stair";
@@ -761,6 +757,14 @@ namespace GameDev.Slice.EditorTools
             foreach (var (bx, bz, bt) in new[] { (12, 14, 0), (15, 14, 0), (11, 15, 1) })
             {
                 Put("ViBanister", bx, bz, bt).name = "Balustrade";
+            }
+
+            // A newel post where the west and south balustrades meet (VI-8 remark 4).
+            foreach (var (node, rotation) in Dwellings.DwellingAssembler.NewelSpots(_parent))
+            {
+                var post = (GameObject)PrefabUtility.InstantiatePrefab(_kit[Dwellings.DwellingAssembler.NewelKey].Prefab, _parent);
+                post.name = "Newel";
+                post.transform.SetPositionAndRotation(node, rotation);
             }
 
             Put("ViPlant", 19, 12);
@@ -813,7 +817,8 @@ namespace GameDev.Slice.EditorTools
             Against("ViClock", W, 12, 6);
             Put("ViRug", 4, 1);
             Put("ViCoatStand", 1, 1);
-            Chandelier(5, 1);
+            Hang("ViWallLamp", N, 0, 6, 2.2f);
+            Hang("ViWallLamp", W, 12, 3, 2.2f);
             Hang("ViPicture4", N, 0, 0, 1.7f);
             Hang("ViPicture1", N, 0, 6, 1.7f);
             VeilmouthDressing.Person("Green", false, 6f, 6.7f, 180f, "Harrow", 0f);
@@ -827,7 +832,7 @@ namespace GameDev.Slice.EditorTools
             Put("ViChair", 2, 14, 3);
             Hang("BkJarShelf", W, 12, 15, 1.5f);
             Against("ViBookcaseLow", N, 9, 3);
-            Put("BkGlobe", 11, 13);
+            Put("BkGlobe", 0, 17); // in the corner beside the desk, out of the store room's doorway (VI-8 remark 8)
             Hang("ViWallLamp", W, 12, 9, 2.2f);
 
             // Store room.
@@ -841,7 +846,8 @@ namespace GameDev.Slice.EditorTools
         private static void FactionHouse()
         {
             // Hall, symmetric about the street door's axis (rules §6): the rostrum on the north wall over the clear
-            // 3 m aisle, three rows of pews either side, candle stands, a hearth on each side wall, two chandeliers.
+            // 3 m aisle, three rows of pews either side, candle stands, a hearth on each side wall, wall lamps in pairs:
+            // a chandelier hangs only under a ceiling higher than a storey (VI-8 remark 7).
             var rostrum = _kit["Rostrum"].Width;
             Against("Rostrum", S, 12, (21 - rostrum) / 2);
             foreach (var z in new[] { 3, 5, 7 })
@@ -854,8 +860,10 @@ namespace GameDev.Slice.EditorTools
             Put("Candles", 14, 9);
             Fireplace(E, 0, 3);
             Fireplace(W, 21, 3);
-            Chandelier(5, 5);
-            Chandelier(14, 5);
+            Hang("ViWallLamp", N, 0, 0, 2.2f);
+            Hang("ViWallLamp", N, 0, 18, 2.2f);
+            Hang("ViWallLamp", S, 12, 6, 2.2f);
+            Hang("ViWallLamp", S, 12, 12, 2.2f);
             Hang("ViWallLamp", E, 0, 9, 2.2f);
             Hang("ViWallLamp", W, 21, 9, 2.2f);
             Hang("ViPicture1", E, 0, 0, 1.7f);
@@ -939,7 +947,7 @@ namespace GameDev.Slice.EditorTools
             Put("ViChair", 4, 7, 2);
             Put("ViCandle", 4, 6, 0, 0.9f);
             Against("ViBasinSet", W, 9, 4).name = "Wash stand";
-            Put("ViBucket", 7, 4);
+            Put("ViBucket", 8, 5);
             Put("ViBox", 5, 11).name = "The cache";
             Hang("ViPicture8", N, 3, 3, 1.7f);
         }
@@ -981,7 +989,7 @@ namespace GameDev.Slice.EditorTools
             Against("ViCabinet", W, 18, 13);
             Put("ViCandle", 17, 13, 0, 1.2f);
             Against("ViShelfSmall", W, 18, 18);
-            Put("ViChair", 16, 16);
+            Put("ViChair", 16, 19); // north of the vestry door's way (doorway check, VI-8)
         }
 
         /// <summary>
@@ -1015,7 +1023,7 @@ namespace GameDev.Slice.EditorTools
 
                 var inside = bounds.Value;
                 inside.Expand(-0.02f);
-                foreach (var piece in blocks.Where(k => k.name.StartsWith("Kit_ViRoom_Floor") || k.name == "Balustrade"))
+                foreach (var piece in blocks.Where(k => k.name.StartsWith("Kit_ViRoom_Floor") || k.name == "Balustrade" || k.name == "Newel"))
                 {
                     var other = Solid(piece);
                     if (other.HasValue && inside.Intersects(other.Value))
@@ -1037,43 +1045,100 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// A small stage of the pack's floor tiles (rules §6; the pack has no stage): <paramref name="w"/> × <paramref name="d"/>
-        /// modules from (x, z), stacked until it stands 0.4 m high (rules §3); each tile's slab is measured, so the stack
-        /// is solid with no gap and no overlap.
+        /// A small stage (rules §3, §6): one box of our own, 0.4 m high, <paramref name="w"/> × <paramref name="d"/>
+        /// modules from (x, z), with the pack's parquet on top and a darker parquet on its sides, its UVs in metres so the
+        /// parquet keeps the floor's scale. The pack has no stage, and a piece is not made of other pieces (owner, VI-8
+        /// remark 5); a finished stage with an edge and steps waits in SLICE_MODELS_WANTED. Not a kit block: the kit check
+        /// does not read it, and its box collider is the floor the Combat Grid reads.
         /// </summary>
         private static void Stage(int x, int z, int w, int d)
         {
-            var probe = (GameObject)Object.Instantiate(_kit["ViFloor"].Prefab);
-            Physics.SyncTransforms();
-            var colliders = probe.GetComponentsInChildren<Collider>().Where(c => c.enabled && !c.isTrigger).ToArray();
-            var slab = colliders.Length > 0 ? colliders.Max(c => c.bounds.max.y) - colliders.Min(c => c.bounds.min.y) : 0.1f;
-            Object.DestroyImmediate(probe);
-            var step = Mathf.Max(0.1f, Mathf.Round(slab * 10f) / 10f);
-            var layers = Mathf.Clamp(Mathf.CeilToInt(0.4f / step - 0.01f), 1, 4);
-            Debug.Log($"[VeilmouthInteriors] stage: floor slab {slab:0.000} m, {layers} layers of {step:0.0} m.");
-            for (var i = 1; i <= layers; i++)
+            const float height = 0.4f;
+            var size = new Vector3(w * Module, height, d * Module);
+            var stage = new GameObject("Stage");
+            stage.transform.SetParent(_parent, false);
+            stage.transform.position = new Vector3(x, _floorY, z);
+            var box = stage.AddComponent<BoxCollider>();
+            box.center = size * 0.5f;
+            box.size = size;
+            stage.AddComponent<MeshFilter>().sharedMesh = StageMesh(size);
+            var renderer = stage.AddComponent<MeshRenderer>();
+            renderer.sharedMaterials = new[] { StageMaterial("ViStageTop", 1f), StageMaterial("ViStageSide", 0.55f) };
+        }
+
+        private static Mesh StageMesh(Vector3 size)
+        {
+            var path = $"{ViFrieze.Folder}/ViStage_{size.x:0}x{size.z:0}.asset";
+            var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+            if (mesh != null)
             {
-                for (var cx = x; cx < x + w * Module; cx += Module)
-                {
-                    for (var cz = z; cz < z + d * Module; cz += Module)
-                    {
-                        At("ViFloor", new Vector3(cx, step * i, cz), Quaternion.identity).name = "Stage";
-                    }
-                }
+                return mesh;
             }
+
+            var vertices = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var uvs = new List<Vector2>();
+            var top = new List<int>();
+            var sides = new List<int>();
+            void Face(Vector3 o, Vector3 u, Vector3 v, Vector3 n, List<int> into)
+            {
+                // UVs in metres over the floor tile's 3 m, so the parquet keeps its scale on every face.
+                var i = vertices.Count;
+                foreach (var (a, b) in new[] { (0f, 0f), (1f, 0f), (1f, 1f), (0f, 1f) })
+                {
+                    vertices.Add(o + (u * a) + (v * b));
+                    normals.Add(n);
+                    uvs.Add(new Vector2(a * u.magnitude, b * v.magnitude) / Module);
+                }
+
+                into.AddRange(new[] { i, i + 2, i + 1, i, i + 3, i + 2 });
+            }
+
+            float sx = size.x, sy = size.y, sz = size.z;
+            Face(new Vector3(0f, sy, 0f), Vector3.right * sx, Vector3.forward * sz, Vector3.up, top);
+            Face(Vector3.zero, Vector3.right * sx, Vector3.up * sy, Vector3.back, sides);
+            Face(new Vector3(sx, 0f, sz), Vector3.left * sx, Vector3.up * sy, Vector3.forward, sides);
+            Face(new Vector3(0f, 0f, sz), Vector3.back * sz, Vector3.up * sy, Vector3.left, sides);
+            Face(new Vector3(sx, 0f, 0f), Vector3.forward * sz, Vector3.up * sy, Vector3.right, sides);
+            mesh = new Mesh { name = "ViStage" };
+            mesh.SetVertices(vertices);
+            mesh.SetNormals(normals);
+            mesh.SetUVs(0, uvs);
+            mesh.subMeshCount = 2;
+            mesh.SetTriangles(top, 0);
+            mesh.SetTriangles(sides, 1);
+            mesh.RecalculateBounds();
+            mesh.RecalculateTangents();
+            KitStandIns.EnsureFolder(ViFrieze.Folder);
+            AssetDatabase.CreateAsset(mesh, path);
+            return mesh;
+        }
+
+        /// <summary>Our copy of the pack's parquet, <paramref name="shade"/> times as bright (authoring default).</summary>
+        private static Material StageMaterial(string name, float shade)
+        {
+            var path = $"{ViFrieze.Folder}/{name}.mat";
+            var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (material == null)
+            {
+                material = new Material(AssetDatabase.LoadAssetAtPath<Material>("Assets/Victorian Interiors/Victorian Interiors/Materials/Floor.mat"));
+                material.SetColor("_BaseColor", new Color(shade, shade, shade, 1f));
+                KitStandIns.EnsureFolder(ViFrieze.Folder);
+                AssetDatabase.CreateAsset(material, path);
+            }
+
+            return material;
         }
 
         /// <summary>
-        /// The pack's mantel against a wall, with the pack's fire in its firebox (measured: 1.27 × 1.23 m, 0.37 m deep,
-        /// its middle 0.52 m out from the wall's line) and a warm flickering light; a kitchen hearth burns all day.
+        /// The pack's mantel against a wall, with the fire in its firebox (<see cref="Dwellings.DwellingAssembler.PlaceFire"/>)
+        /// and a warm flickering light, both lit and put out together; a kitchen hearth burns all day.
         /// </summary>
         private static void Fireplace(Vector2Int facing, int line, int a, bool kitchen = false)
         {
             var block = Against("ViFireplace", facing, line, a);
             block.name = kitchen ? "Kitchen hearth" : "Fireplace";
-            var fire = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(FirePath), block.transform);
-            fire.name = "Fire";
-            fire.transform.localPosition = new Vector3(Module * 0.5f, 0.05f, 0.52f);
+            var flames = Dwellings.DwellingAssembler.PlaceFire(AssetDatabase.LoadAssetAtPath<GameObject>(FirePath), block.transform);
             var light = new GameObject("Fire light").AddComponent<Light>();
             light.transform.SetParent(block.transform, false);
             light.transform.localPosition = new Vector3(Module * 0.5f, 0.6f, 1.1f);
@@ -1082,7 +1147,7 @@ namespace GameDev.Slice.EditorTools
             light.range = 7f;
             light.intensity = 2.5f;
             light.shadows = LightShadows.None;
-            Hearths.Add(new InteriorLighting.Hearth { Light = light, Flames = fire.GetComponent<ParticleSystem>(), AllDay = kitchen });
+            Hearths.Add(new InteriorLighting.Hearth { Light = light, Flames = flames, AllDay = kitchen });
         }
 
         /// <summary>The pack's chandelier under the ceiling; it is only emissive, so it carries a warm light of our own.</summary>
@@ -1173,12 +1238,66 @@ namespace GameDev.Slice.EditorTools
             return t;
         }
 
-        private static void Report(string path, int windows, int lamps, int hearths)
+        private static void Report(string path, int windows, int lamps, int hearths, List<string> doorways)
         {
             var blocks = Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude);
             var faults = KitLayoutCheck.Check(blocks);
             Debug.Log($"[VeilmouthInteriors] {path}: {blocks.Length} blocks, {windows} windows, {lamps} lamps, {hearths} hearths, {faults.Count} kit faults" +
-                      (faults.Count > 0 ? ":\n  " + string.Join("\n  ", faults.Take(40).Select(f => f.ToString())) : "."));
+                      (faults.Count > 0 ? ":\n  " + string.Join("\n  ", faults.Take(40).Select(f => f.ToString())) : ".") +
+                      $" {doorways.Count} doorway faults" + (doorways.Count > 0 ? ":\n  " + string.Join("\n  ", doorways) : "."));
+        }
+
+        /// <summary>
+        /// The walk-way check (furnishing rules G1; owner, VI-8 remark 8): before every doorway, on both sides, the
+        /// doorway's middle metre stays clear for two metres of anything solid but the room's own pieces, the stair and
+        /// the people. It reports and never moves a piece.
+        /// </summary>
+        private static List<string> Doorways(Plan plan)
+        {
+            Physics.SyncTransforms();
+            var faults = new List<string>();
+            foreach (var kv in plan.Openings)
+            {
+                if (kv.Value is not (Opening.Door or Opening.Street or Opening.Closed or Opening.None))
+                {
+                    continue;
+                }
+
+                var (x, z, alongZ, level) = kv.Key;
+                var mid = alongZ ? new Vector2(x, z + (Module * 0.5f)) : new Vector2(x + (Module * 0.5f), z);
+                var across = alongZ ? Vector2.right : Vector2.up;
+                foreach (var side in new[] { 1f, -1f })
+                {
+                    foreach (var depth in new[] { 0.5f, 1.5f })
+                    {
+                        var c = mid + (across * (side * depth));
+                        if (!plan.Rooms.Any(r => r.Level == level && c.x > r.X && c.x < r.X + r.W && c.y > r.Z && c.y < r.Z + r.D))
+                        {
+                            continue;
+                        }
+
+                        var centre = new Vector3(c.x, (level * Storey) + 1.05f, c.y);
+                        foreach (var hit in Physics.OverlapBox(centre, new Vector3(0.45f, 0.9f, 0.45f), Quaternion.identity, ~0, QueryTriggerInteraction.Ignore))
+                        {
+                            var block = hit.GetComponentInParent<KitBlock>();
+                            var name = block != null ? block.name : hit.name == "Stage" ? "Stage" : null;
+                            if (name == null || name == "Stair" || (name.StartsWith("Kit_ViRoom_") && !name.StartsWith("Kit_ViRoom_Banister")) ||
+                                name.StartsWith("Kit_ViStone_") || name.StartsWith("Portal") || name.StartsWith("Street door"))
+                            {
+                                continue;
+                            }
+
+                            var fault = $"'{name}' in the way of the doorway at ({x}, {z}{(alongZ ? ", along Z" : string.Empty)}, storey {level}), {depth + 0.5f:0} m in";
+                            if (!faults.Contains(fault))
+                            {
+                                faults.Add(fault);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return faults;
         }
     }
 }

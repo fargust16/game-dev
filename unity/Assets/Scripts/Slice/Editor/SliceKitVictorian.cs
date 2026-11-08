@@ -63,6 +63,8 @@ namespace GameDev.Slice.EditorTools
                 ["Panel"] = ("ViPanel", null, null),
             };
 
+        private const float DwellingNewelWidth = 0.34f;
+
         public static IEnumerable<Spec> ViSpecs()
         {
             const string st = KitLayers.Structure, pr = KitLayers.Prop, ia = KitLayers.Interactable, ng = KitLayers.NoGrid;
@@ -86,11 +88,17 @@ namespace GameDev.Slice.EditorTools
                 spec.InfillAt = ViFace;
                 spec.OpenWidth = ViOpenWidth;
                 spec.OpenHeight = ViOpenHeight;
+                // The dark walls' damask frieze in wood (VI-8 remarks 1 and 3; ViFrieze).
+                if (file == "Wall_5" || file == "Wall_6" || file == "Wall_8")
+                {
+                    spec.Material = ViFrieze.Ensure(file);
+                }
+
                 return spec;
             }
 
             // The probe's sheets: Wall_1, 2, 3 are patterned paper over a dark dado (plain, doorway, window); Wall_5, 8, 6
-            // the plain dark finish under a patterned frieze; Wall_4 wood panelling. The windows' panes are part of the
+            // the plain dark finish under a patterned frieze, which our copy of their material turns to wood (VI-8); Wall_4 wood panelling. The windows' panes are part of the
             // wall and opaque (no glass, no hole), so daylight comes in as a lit pane and its light (plan §5).
             yield return Wall("ViPaper", "Wall_1");
             yield return Wall("ViPaperDoorway", "Wall_2", Body.Doorway);
@@ -128,6 +136,18 @@ namespace GameDev.Slice.EditorTools
             banister.ModelYaw = 90f;
             banister.Lengthen = 3f / 2.94f; // measured 2.94 m: two in a row left a 6 cm gap (VI-5)
             yield return banister;
+            // The pack's newel post, where two balustrades meet at a corner: each stands on its own side of the well, so
+            // they touch only at the corner's point and leave a square notch the width of a rail (owner, VI-8 remark 4).
+            // Measured 0.257 m square and 1.34 m high; widened to 0.34 m, the rail's measured 0.344 m less 4 mm, so it
+            // fills the notch without touching either rail. Its pivot is the corner's grid node and the post stands half a rail's
+            // depth off it toward -X and -Z, so turned by 90° steps it fills the notch of any corner (NewelSpots).
+            var newel = R("ViNewel", "Banister_End", st, Body.Box, Anchor.Node);
+            newel.Shift = 0.344f * 0.5f; // the rail's measured depth, 0.344 m
+            newel.SizeX = DwellingNewelWidth;
+            newel.SizeZ = DwellingNewelWidth;
+            newel.SizeY = 1.34f;
+            newel.Uniform = false;
+            yield return newel;
 
             // Stone (owner, 2026-11-07: the cellar's vaults, the cells and the chapel's nave): the pack has none, so BK's
             // brick between timbers and its stone floor, at x1.2 along (a 3 m module) and stretched to the 3.5 m storey.
