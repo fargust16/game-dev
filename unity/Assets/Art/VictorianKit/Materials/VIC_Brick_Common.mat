@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: VIC_Brick_Common
+  m_Shader: {fileID: 4800000, guid: c42eec0c73a087c4fae2ac2f8d24c6b8, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: e2e39b3554ac79b42b4556c3e74937f8, type: 3}
+        m_Scale: {x: 0.5, y: 0.6666667}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 2800000, guid: dbb32cad94737da499c12c343de690b5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MaskMap:
+        m_Texture: {fileID: 2800000, guid: 80a2d1fba3213b64d8179b4d6564bbc5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BumpScale: 1
+    - _Cutoff: 0.5
+    - _DirtAmount: 0.45
+    - _DirtHeight: 2.5
+    - _Metallic: 0
+    - _MossAmount: 0.12
+    - _NoiseScale: 0.35
+    - _Roughness: 1
+    - _Roughness2: 0.9
+    - _Tint2Amount: 1
+    - _Tint2Sharp: 1
+    - _ToneVar: 0.08
+    - _WorldUV: 0
+    m_Colors:
+    - _BaseColor: {r: 0.64220726, g: 0.2907694, b: 0.21141252, a: 1}
+    - _DirtColor: {r: 0.35, g: 0.32, b: 0.28, a: 1}
+    - _MossColor: {r: 0.2, g: 0.26, b: 0.1, a: 1}
+    - _Tint2: {r: 0.7413044, g: 0.7202103, b: 0.6674749, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
