@@ -158,10 +158,128 @@ namespace GameDev.Slice.EditorTools
             Shot("lab_yard_door_inside", new Vector3(16.5f, 1.7f, 22.5f), new Vector3(21f, 1.3f, 22.5f));
             Shot("lab_yard_door_close", new Vector3(19.4f, 1.6f, 21.6f), new Vector3(21f, 1.4f, 23.2f));
             Shot("lab_street_door_inside", new Vector3(10.5f, 1.7f, 4.5f), new Vector3(10.5f, 1.3f, 0f));
+            Shot("lab_street_door_foot", new Vector3(10.1f, 0.35f, 1.1f), new Vector3(10.5f, 0.05f, 0f));
+            Shot("lab_street_door_head", new Vector3(9.6f, 1.9f, 0.9f), new Vector3(10.2f, 2.15f, 0f));
             foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude).Where(t => t.name is "Yard door" or "Street door"))
             {
                 var b = t.GetComponentsInChildren<Renderer>().Select(r => r.bounds).Aggregate((a, c) => { a.Encapsulate(c); return a; });
                 Debug.Log($"[StairLab] '{t.name}' pos {t.position:F3} rot {t.eulerAngles.y:F0} bounds {b.min:F3}..{b.max:F3}; doorway '{t.parent.name}' pos {t.parent.position:F3} rot {t.parent.eulerAngles.y:F0}");
+            }
+        }
+
+        /// <summary>
+        /// How the pack's demo scene seats a door leaf in its doorway (owner, after the yard door: a strip of sky shows
+        /// round our shut leaves): every Door_1 / Door_2 and every doorway wall (Wall_2, Wall_8), with their transforms
+        /// and bounds, and pictures of each door from both sides. Read only, never saved.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.StairLab.ProbeVendorDoor
+        /// </summary>
+        public static void ProbeVendorDoor()
+        {
+            EditorSceneManager.OpenScene(VendorScene, OpenSceneMode.Single);
+            var log = new StringBuilder("[StairLab] the pack's demo doors:\n");
+            var kinds = new[] { "Door_1", "Door_2", "Wall_2", "Wall_8" };
+            var doors = new List<Transform>();
+            foreach (var go in Object.FindObjectsByType<GameObject>(FindObjectsInactive.Exclude))
+            {
+                var source = PrefabUtility.GetCorrespondingObjectFromOriginalSource(go);
+                if (source == null || !PrefabUtility.IsAnyPrefabInstanceRoot(go) || !kinds.Contains(source.name))
+                {
+                    continue;
+                }
+
+                var b = go.GetComponentsInChildren<Renderer>().Select(r => r.bounds).Aggregate((a, c) => { a.Encapsulate(c); return a; });
+                log.AppendLine($"  {source.name,-7} '{go.name}' pos {go.transform.position:F3} rot {go.transform.eulerAngles:F1} scale {go.transform.lossyScale:F3} bounds {b.min:F3}..{b.max:F3}");
+                if (source.name.StartsWith("Door"))
+                {
+                    doors.Add(go.transform);
+                }
+            }
+
+            // Each demo door against the doorway wall it stands in, in the wall's frame (its pivot is the opening's middle).
+            var walls = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Exclude)
+                .Where(g => PrefabUtility.IsAnyPrefabInstanceRoot(g) && PrefabUtility.GetCorrespondingObjectFromOriginalSource(g)?.name is "Wall_2" or "Wall_8")
+                .Select(g => g.transform).ToList();
+            foreach (var d in doors)
+            {
+                var wall = walls.OrderBy(w => (w.position - d.position).sqrMagnitude).First();
+                log.AppendLine($"  '{d.name}' in '{wall.name}': leaf pivot in the wall's frame {wall.InverseTransformPoint(d.position):F3}, turn {Mathf.DeltaAngle(wall.eulerAngles.y, d.eulerAngles.y):F0}");
+                Measure(wall, d, 0f, log);
+            }
+
+            Debug.Log(log.ToString());
+            Lit();
+            var i = 0;
+            foreach (var d in doors)
+            {
+                var b = d.GetComponentsInChildren<Renderer>().Select(r => r.bounds).Aggregate((a, c) => { a.Encapsulate(c); return a; });
+                var thin = b.size.x < b.size.z ? Vector3.right : Vector3.forward;
+                var c0 = b.center;
+                Shot($"lab_vendor_door{i}_a", c0 + (thin * 2.2f) + (Vector3.up * 0.3f), c0);
+                Shot($"lab_vendor_door{i}_b", c0 - (thin * 2.2f) + (Vector3.up * 0.3f), c0);
+                Shot($"lab_vendor_door{i}_top", c0 + (thin * 0.9f) + (Vector3.up * 0.4f), c0 + (Vector3.up * 1.0f));
+                i++;
+            }
+        }
+
+        /// <summary>
+        /// Our doorways measured by rays against their own meshes: for each shut leaf in the Soot & Bell, its doorway's
+        /// jambs and head across the wall's depth, and the leaf's own extent, in the doorway's frame. Read only.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.StairLab.MeasureDoorways
+        /// </summary>
+        public static void MeasureDoorways()
+        {
+            EditorSceneManager.OpenScene(VeilmouthScene.SootAndBellScenePath, OpenSceneMode.Single);
+            var log = new StringBuilder("[StairLab] doorways measured:\n");
+            foreach (var leaf in Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude).Where(t => t.name is "Street door" or "Yard door"))
+            {
+                Measure(leaf.parent, leaf, 1.5f, log);
+            }
+
+            Debug.Log(log.ToString());
+        }
+
+        /// <summary>
+        /// A doorway's jambs and head by rays from its opening's middle (local x <paramref name="middle"/>, 1 m up) across
+        /// the wall's depth, and the leaf's and the wall's extents, all in the doorway's frame.
+        /// </summary>
+        private static void Measure(Transform doorway, Transform leaf, float middle, StringBuilder log)
+        {
+            {
+                var added = new List<MeshCollider>();
+                foreach (var f in doorway.GetComponentsInChildren<MeshFilter>().Where(f => !f.transform.IsChildOf(leaf)))
+                {
+                    var c = f.gameObject.AddComponent<MeshCollider>();
+                    c.sharedMesh = f.sharedMesh;
+                    added.Add(c);
+                }
+
+                Physics.SyncTransforms();
+                float? Ray(Vector3 localFrom, Vector3 localDir)
+                {
+                    var from = doorway.TransformPoint(localFrom);
+                    var dir = doorway.TransformDirection(localDir);
+                    var hits = Physics.RaycastAll(from, dir, 3f, ~0, QueryTriggerInteraction.Ignore).Where(h => added.Contains(h.collider as MeshCollider)).ToList();
+                    return hits.Count == 0 ? null : hits.Min(h => h.distance);
+                }
+
+                log.AppendLine($"  '{leaf.name}' in '{doorway.name}' at {doorway.position:F2} turn {doorway.eulerAngles.y:F0}");
+                foreach (var z in new[] { -0.12f, -0.08f, -0.04f, 0f, 0.04f, 0.08f, 0.12f })
+                {
+                    var left = Ray(new Vector3(middle, 1.0f, z), Vector3.left);
+                    var right = Ray(new Vector3(middle, 1.0f, z), Vector3.right);
+                    var head = Ray(new Vector3(middle, 1.0f, z), Vector3.up);
+                    log.AppendLine($"    z {z,5:F2}: jambs x {(left.HasValue ? middle - left.Value : float.NaN):F3}..{(right.HasValue ? middle + right.Value : float.NaN):F3}, head y {(head.HasValue ? 1.0f + head.Value : float.NaN):F3}");
+                }
+
+                var lb = leaf.GetComponentsInChildren<MeshFilter>().SelectMany(f => f.sharedMesh.vertices.Select(v => doorway.InverseTransformPoint(f.transform.TransformPoint(v)))).ToList();
+                log.AppendLine($"    leaf x {lb.Min(v => v.x):F3}..{lb.Max(v => v.x):F3} y {lb.Min(v => v.y):F3}..{lb.Max(v => v.y):F3} z {lb.Min(v => v.z):F3}..{lb.Max(v => v.z):F3}");
+                var wb = doorway.GetComponentsInChildren<MeshFilter>().Where(f => !f.transform.IsChildOf(leaf))
+                    .SelectMany(f => f.sharedMesh.vertices.Select(v => doorway.InverseTransformPoint(f.transform.TransformPoint(v)))).ToList();
+                log.AppendLine($"    wall x {wb.Min(v => v.x):F3}..{wb.Max(v => v.x):F3} z {wb.Min(v => v.z):F3}..{wb.Max(v => v.z):F3}");
+                foreach (var c in added)
+                {
+                    Object.DestroyImmediate(c);
+                }
             }
         }
 

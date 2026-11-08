@@ -1,12 +1,12 @@
 # Victorian Interiors — Rebuild Plan
 
-Version: 0.13
+Version: 0.14
 
 Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-7 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings and VI-7 the seven by the same rules; VI-8 (play test) held, its eight remarks and both follow-ups fixed (§8)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-08 (VI-8 second follow-up in §8: the balustrade assembled as the pack's own demo scene assembles it, its ends capped by newels, the stair narrowed and its rails capped, the stair lab scene, the missing room's blind door removed, the Soot & Bell's back door made an exit to its yard. The earlier note is in §10)
+Last Updated: 2026-11-08 (VI-8 second follow-up in §8: the balustrade assembled as the pack's own demo scene assembles it, its ends capped by newels, the stair narrowed and its rails capped, the stair lab scene, the missing room's blind door removed, the Soot & Bell's back door made an exit to its yard, every shut leaf seated in its doorway as the pack's demo seats it. The earlier note is in §10)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -341,6 +341,7 @@ The detail asked for at the end of the remarks — props that would make the roo
 | 2 | Press the upper rails onto the beam at the well | The balustrade's balusters now stand on the well's edge, its nosing 0.219 m over the well and its fascia down the well's side (`ViRailOverhang`, **measured** from the demo). |
 | 3 | The corner rails do not meet the corner post; build the stair in a scene of its own | The newel is `Banister_End` at its own size, 0.257 m square and 1.34 m tall, on the floor, centred on the handrails' line 0.0445 m in from the edge (`DwellingAssembler.RailLine`, **measured**), so both handrails die into its sides as in the demo. The stair is narrowed ×0.92 to 2.534 m so its handrail clears the gallery's fascia. `StairLab` builds a rich villa by the game's own assembler in `Assets/Scenes/Slice/Lab/StairLab.unity` and renders every newel, rail seat and stair post close; `StairLab.ProbeVendor` measures and renders the demo. |
 | 4 | Extra doors leading nowhere | Only two leaves led nowhere, both in the seven; the Dwellings have their street door alone. The missing room's neighbour's door on the landing is now a wall. The Soot & Bell's back door is now an exit to its yard, at the owner's word: inside it moved to the stair hall's east wall (21, 21), as the yard lies east of the house; outside the house is baked again with the pack's own shop door in its yard side (`VictorianHouses` `YardDoors`), and `VeilmouthYardDoor.Place` sets the paired portal (`soot-and-bell.yard`) in it, touching nothing else in the city scene. |
+| 5 | A strip of sky round the shut leaves (seen at the new yard door) | Measured by rays on our doorway (`StairLab.MeasureDoorways`) and in the pack's demo (`StairLab.ProbeVendorDoor`): the opening runs 0.789–2.162 m along the block, 0.0245 m short of the block's middle, and its head is at 2.179 m. Our leaf stood on the floor at the block's middle, leaving 2.5 cm of sky at one jamb and 6 cm under the head. The demo raises the leaf 0.06 m onto the doorway's own threshold, its top meeting the head, and centres it on the opening; every Door_1 and Door_2 now stands so (`ViLeafSeat`, **measured**), within 1 mm of each jamb. |
 
 **Why the rails kept failing.** Every placement was derived from the models' bounds and our own reading of them. The pack's demo scene (`Victorian Interiors/Test Scene.unity`), where the author assembled the stair, the balustrade and the newel, was never opened. It is now the reference for every joint, and `AGENTS.md`'s rule on vendor models asks for the pack's own demo first.
 
@@ -362,6 +363,7 @@ The owner accepted all five recommendations and authorised VI-1. These are now d
 
 ## 10. Update history
 
+- 2026-11-08 (v0.14): every shut leaf seated as the pack's demo seats it (§8).
 - 2026-11-08 (v0.13): the Soot & Bell's back door made an exit to its yard (§8).
 - 2026-11-08 (v0.12): VI-8's second follow-up: the rails by the pack's demo scene, newels at their ends, the stair lab, the missing room's blind door (§8).
 - 2026-11-08 (v0.11): VI-8's follow-up: the fire, the balustrade's seat, the newel, names behind walls, and why the rails failed (§8).

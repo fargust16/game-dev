@@ -91,6 +91,7 @@ namespace GameDev.Slice.EditorTools
             public bool Top;          // what is seen hangs below the pivot: a ceiling, a chandelier
             public string RailPosts;  // the stair: this newel post at each end of each of its rails, as the pack's demo stands them (StairLab)
             public bool KeepY;        // the model's own floor line (y 0) stands on the floor, and what lies below it hangs below: the balustrade's fascia over the well's edge
+            public Vector3? Seat;     // a linear leaf seated as the pack's demo seats it: its middle this far along from the block's middle, its foot this high, its own pivot plane this far across the line (StairLab.MeasureDoorways)
             public bool Books;        // a bookcase: rows of the pack's books stand on each of its shelves
             public string[] Goods;    // shelves of goods: the pack's files stand in rows on each shelf, as books do
         }
@@ -685,6 +686,10 @@ namespace GameDev.Slice.EditorTools
             {
                 case Anchor.Front:
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, depth - b.max.z + spec.Shift);
+                    break;
+                case Anchor.Linear when spec.Seat is { } seat:
+                    // By its own pivot plane, not its bounds, which take in the knob on one side only.
+                    offset = new Vector3(width * 0.5f + seat.x - b.center.x, seat.y - b.min.y, seat.z - model.transform.localPosition.z);
                     break;
                 case Anchor.Linear:
                     offset = new Vector3(width * 0.5f - b.center.x, -b.min.y, spec.Infill ? (spec.InfillAt ?? WallInfill) - InfillPlane(model) : spec.Shift - b.center.z);

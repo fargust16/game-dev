@@ -39,6 +39,15 @@ namespace GameDev.Slice.EditorTools
         /// <summary>Measured (probe of 2026-11-07): the clear opening of the doorway walls, 1.35 × 2.18 m.</summary>
         public const float ViOpenWidth = 1.35f, ViOpenHeight = 2.18f;
 
+        /// <summary>
+        /// The shut leaf as the pack's demo scene seats Door_1 and Door_2 in Wall_2 (StairLab.ProbeVendorDoor), measured
+        /// on our doorway by rays (StairLab.MeasureDoorways): the opening runs 0.789–2.162 m along the block, so its middle
+        /// is 0.0245 m short of the block's middle; its head is at 2.179 m, and the leaf, 2.1185 m tall, is raised 0.06 m
+        /// to meet it. Centred on the block's middle and on the floor it left 2.5 cm of sky at one jamb and 6 cm under the
+        /// head (owner, after the yard door). Its own pivot plane, the leaf's middle, stands on the wall's line.
+        /// </summary>
+        public static readonly Vector3 ViLeafSeat = new Vector3(-0.0245f, 0.06f, 0f);
+
         /// <summary>BK's 2.5 m wall module at x1.2 is the pack's 3 m; stretched up, its 2.5 m wall stands the 3.5 m storey.</summary>
         public const float ViStoneFactor = 1.2f, ViStoneStretch = ViStorey / 2.5f / ViStoneFactor;
 
@@ -116,10 +125,11 @@ namespace GameDev.Slice.EditorTools
             yield return Wall("ViPanel", "Wall_4");
             foreach (var (key, file) in new[] { ("ViDoor", "Door_1"), ("ViDoorB", "Door_2") })
             {
-                // A shut leaf is solid, centred on its line in the doorway's opening.
+                // A shut leaf is solid, seated in the doorway's opening as the pack's demo seats it (ViLeafSeat).
                 var door = R(key, file, st, Body.Leaf, Anchor.Linear);
                 door.OpenWidth = ViOpenWidth;
                 door.OpenHeight = ViOpenHeight;
+                door.Seat = ViLeafSeat;
                 yield return door;
             }
 
