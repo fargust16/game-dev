@@ -73,6 +73,28 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// Reference plan §4 step 4 in one run: the shadows, the mapped rooms' tones, the room turn rendered before the
+        /// houses are told their rooms, every house's rooms built again with their panes told (RedressAll), the room
+        /// turn again, the reflections baked, and the five views. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthLook.Step4AndRender -lookLabel s4
+        /// </summary>
+        public static void Step4AndRender()
+        {
+            ApplyShadows();
+            GameDev.VictorianKit.EditorTools.VicMaterials.BuildAll();
+            AssetDatabase.SaveAssets();
+            VeilmouthRenders.RenderRoomTurn("roomturn_before");
+            GameDev.VictorianKit.EditorTools.VicRooms.PanesTold = 0;
+            GameDev.VictorianKit.EditorTools.VicRooms.PanesUntold = 0;
+            VeilmouthKitHouses.RedressAll();
+            Debug.Log($"[VeilmouthLook] panes told their room: {GameDev.VictorianKit.EditorTools.VicRooms.PanesTold}, untold: {GameDev.VictorianKit.EditorTools.VicRooms.PanesUntold}.");
+            VeilmouthRenders.RenderRoomTurn("roomturn_after");
+            VeilmouthReflections.Bake();
+            VeilmouthRenders.RenderLook();
+            VeilmouthRenders.RenderRoomTurn("roomturn_probes");
+        }
+
+        /// <summary>
         /// Brings the slice's three street layers to <see cref="Streets"/> by the layer's own tint, measured against its
         /// texture's mean. The layers are tuned in the Inspector (VeilmouthCity), so a layer whose tint is no longer the
         /// default is left as it is: this is the agent's one pass, never an override of the owner's.
@@ -96,31 +118,12 @@ namespace GameDev.Slice.EditorTools
                     continue;
                 }
 
-                var mean = LinearMean(layer.diffuseTexture);
+                var mean = GameDev.VictorianKit.EditorTools.VicTextures.LinearMean(layer.diffuseTexture);
                 float Scale(float target, float m) => Mathf.Clamp(Mathf.GammaToLinearSpace(target) / Mathf.Max(m, 0.01f), 0f, 1.5f);
                 layer.diffuseRemapMax = new Vector4(Scale(look.r, mean.r), Scale(look.g, mean.g), Scale(look.b, mean.b), 1f);
                 EditorUtility.SetDirty(layer);
                 Debug.Log($"[VeilmouthLook] {name}: texture linear mean {mean}, tint {layer.diffuseRemapMax}.");
             }
-        }
-
-        /// <summary>A texture's mean colour in linear space, read from its small mip through a float target.</summary>
-        private static Color LinearMean(Texture texture)
-        {
-            const int size = 32;
-            var target = RenderTexture.GetTemporary(size, size, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-            Graphics.Blit(texture, target);
-            var previous = RenderTexture.active;
-            RenderTexture.active = target;
-            var read = new Texture2D(size, size, TextureFormat.RGBAFloat, false, true);
-            read.ReadPixels(new Rect(0, 0, size, size), 0, 0);
-            read.Apply();
-            RenderTexture.active = previous;
-            RenderTexture.ReleaseTemporary(target);
-            var pixels = read.GetPixels();
-            Object.DestroyImmediate(read);
-            var sum = pixels.Aggregate(Vector4.zero, (s, p) => s + (Vector4)p);
-            return sum / pixels.Length;
         }
 
         /// <summary>
@@ -139,9 +142,42 @@ namespace GameDev.Slice.EditorTools
             var pipeline = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(PipelinePath);
             pipeline.colorGradingMode = ColorGradingMode.HighDynamicRange;
             EditorUtility.SetDirty(pipeline);
+            Shadows(pipeline);
             Occlusion(AssetDatabase.LoadAssetAtPath<UniversalRendererData>(RendererPath));
             AssetDatabase.SaveAssets();
             Debug.Log($"[VeilmouthLook] colour space {PlayerSettings.colorSpace}, grading {pipeline.colorGradingMode}, occlusion on {RendererPath}.");
+        }
+
+        /// <summary>
+        /// The sun's shadows sized to the city (reference plan R2 step 7): a 4096 px map over 150 m in four cascades, at
+        /// 10, 30 and 70 m, where it was 2048 px over 350 m (cascades at 23, 70 and 163 m), so the nearest cascade holds
+        /// about 1 cm a texel instead of 4.5 cm; the last 20 % fades out, and beyond 150 m the haze of R3 carries the
+        /// depth. Soft shadows at High quality, so their edges are smooth up close (R3 step 6). Authoring defaults.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthLook.ApplyShadows
+        /// </summary>
+        [MenuItem("GameDev/Slice/Reference Look/Apply Shadows")]
+        public static void ApplyShadows()
+        {
+            Shadows(AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(PipelinePath));
+            AssetDatabase.SaveAssets();
+        }
+
+        private static void Shadows(UniversalRenderPipelineAsset pipeline)
+        {
+            pipeline.mainLightShadowmapResolution = 4096;
+            pipeline.shadowDistance = 150f;
+            pipeline.shadowCascadeCount = 4;
+            pipeline.cascade4Split = new Vector3(0.067f, 0.2f, 0.467f);
+            pipeline.cascadeBorder = 0.2f;
+            var so = new SerializedObject(pipeline);
+            so.FindProperty("m_SoftShadowsSupported").boolValue = true;
+            so.FindProperty("m_SoftShadowQuality").intValue = (int)SoftShadowQuality.High;
+            // The street probes (VeilmouthReflections) blend where they meet.
+            so.FindProperty("m_ReflectionProbeBlending").boolValue = true;
+            so.FindProperty("m_ReflectionProbeBoxProjection").boolValue = true;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(pipeline);
+            Debug.Log($"[VeilmouthLook] shadows {pipeline.mainLightShadowmapResolution} px over {pipeline.shadowDistance} m, {pipeline.shadowCascadeCount} cascades.");
         }
 
         /// <summary>

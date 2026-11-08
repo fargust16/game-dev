@@ -28,6 +28,30 @@ namespace GameDev.VictorianKit.EditorTools
 
         public static string PathOf(string slot, string map) => $"{VicKitPaths.TextureFolder}/T_Vic_{slot}_{map}.jpg";
 
+        /// <summary>A texture's mean colour in linear space, read from its small mip through a float target.</summary>
+        public static Color LinearMean(Texture texture)
+        {
+            const int size = 32;
+            var target = RenderTexture.GetTemporary(size, size, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+            Graphics.Blit(texture, target);
+            var previous = RenderTexture.active;
+            RenderTexture.active = target;
+            var read = new Texture2D(size, size, TextureFormat.RGBAFloat, false, true);
+            read.ReadPixels(new Rect(0, 0, size, size), 0, 0);
+            read.Apply();
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(target);
+            var sum = Vector4.zero;
+            var pixels = read.GetPixels();
+            foreach (var p in pixels)
+            {
+                sum += (Vector4)p;
+            }
+
+            UnityEngine.Object.DestroyImmediate(read);
+            return sum / pixels.Length;
+        }
+
         [MenuItem("GameDev/Victorian Kit/Build Textures")]
         public static void BuildAll()
         {

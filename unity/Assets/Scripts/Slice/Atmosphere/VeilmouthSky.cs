@@ -79,6 +79,9 @@ namespace GameDev.Slice.Atmosphere
         [Tooltip("The moon's disc: a quad kept at MoonDistance from the eye, drawn over the sky, unfogged and unlit.")]
         [SerializeField] private Transform moon;
 
+        [Tooltip("The streets' reflection probes, baked at noon (VeilmouthReflections): dimmed with the day.")]
+        [SerializeField] private ReflectionProbe[] streetProbes = Array.Empty<ReflectionProbe>();
+
         [Tooltip("The minute of the day shown while no game clock runs: in the editor and in renders.")]
         [SerializeField] private int previewMinute = 12 * 60;
 
@@ -112,6 +115,9 @@ namespace GameDev.Slice.Atmosphere
             glassLit = lit;
             fogBanks = banks;
         }
+
+        /// <summary>Editor setup: the street probes the reflections pass baked.</summary>
+        public void SetProbes(ReflectionProbe[] probes) => streetProbes = probes;
 
         private void Start()
         {
@@ -176,9 +182,18 @@ namespace GameDev.Slice.Atmosphere
             RenderSettings.fogColor = Blend(Haze);
             RenderSettings.fogDensity = Mathf.Lerp(HazeDensity[from], HazeDensity[to], t);
 
-            // The environment reflection holds the day sky, so glossy surfaces and the water dim with the light, as
-            // the kit's street probes do (VicStreetLighting).
-            RenderSettings.reflectionIntensity = Mathf.Lerp(NightReflection, 1f, day);
+            // The environment reflection and the street probes hold the day, so glossy surfaces, glass and the water
+            // dim with the light, as the kit's street probes do (VicStreetLighting).
+            var reflection = Mathf.Lerp(NightReflection, 1f, day);
+            RenderSettings.reflectionIntensity = reflection;
+            foreach (var probe in streetProbes)
+            {
+                if (probe != null)
+                {
+                    probe.intensity = reflection;
+                }
+            }
+
             Shader.SetGlobalFloat(VicStreetLighting.NightId, 1f - day);
             if (twilight != null)
             {

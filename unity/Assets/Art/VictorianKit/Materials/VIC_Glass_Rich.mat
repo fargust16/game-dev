@@ -51,9 +51,14 @@ Material:
     - _Transmit: 0.77000004
     m_Colors:
     - _BaseColor: {r: 0.9, g: 0.95, b: 1, a: 1}
+    - _CeilingTone: {r: 0.29939422, g: 0.16221422, b: 0.104219295, a: 1}
     - _CurtainColor: {r: 0.5, g: 0.14, b: 0.12, a: 1}
+    - _FloorTone: {r: 0.35457873, g: 0.25403616, b: 0.13143593, a: 1}
     - _NightColor: {r: 1, g: 0.72, b: 0.42, a: 1}
     - _RoomTint: {r: 1, g: 0.97, b: 0.92, a: 1}
     - _Tint2: {r: 0.42, g: 0.4, b: 0.34, a: 1}
+    - _WallDark: {r: 0.27853346, g: 0.1571835, b: 0.1127182, a: 1}
+    - _WallPanel: {r: 0.25895402, g: 0.15976098, b: 0.10413603, a: 1}
+    - _WallPaper: {r: 0.32782176, g: 0.20079523, b: 0.106480874, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

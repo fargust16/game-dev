@@ -704,6 +704,85 @@ namespace GameDev.Slice.EditorTools
             }
         }
 
+        /// <summary>
+        /// The check of reference plan R2 step 4: the same street views with every window glass forced to its near look
+        /// (the built rooms through clear glass) and to its far look (the mapped room), at noon and at 21:00, side by
+        /// side, so the turn between them can be judged; each pair's mean difference over the image goes to
+        /// <c>room_turn.txt</c>. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderRoomTurn
+        /// </summary>
+        public static void RenderRoomTurn() => RenderRoomTurn("roomturn");
+
+        /// <inheritdoc cref="RenderRoomTurn()"/>
+        public static void RenderRoomTurn(string label)
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            var glasses = new[] { "Glass_Rich", "Glass_Poor" }.Select(GameDev.VictorianKit.EditorTools.VicMaterials.Load).Where(m => m != null).ToList();
+            var saved = glasses.Select(m => (m.GetFloat("_RoomNear"), m.GetFloat("_RoomFar"))).ToList();
+            // Windows 12–45 m away, within the built rooms' 48 m.
+            var views = new (string Name, Vector3 From, Vector3 To)[]
+            {
+                ("highstreet", Ground(40f, -238f, 1.7f), Ground(72f, -226f, 4f)),
+                ("market", Ground(60f, -252f, 1.7f), Ground(95f, -270f, 4f)),
+            };
+            var report = new System.Text.StringBuilder("view\thour\tmean difference (0-255)\n");
+            _skyAndGrade = true;
+            try
+            {
+                foreach (var (minute, hour) in new[] { (12 * 60, "1200"), (21 * 60, "2100") })
+                {
+                    sky.Apply(minute);
+                    foreach (var view in views)
+                    {
+                        var files = new System.Collections.Generic.List<string>();
+                        foreach (var (look, near, far) in new[] { ("near", 1000f, 1001f), ("far", 0f, 0.01f) })
+                        {
+                            foreach (var m in glasses)
+                            {
+                                m.SetFloat("_RoomNear", near);
+                                m.SetFloat("_RoomFar", far);
+                            }
+
+                            var name = $"{label}_{view.Name}_{hour}_{look}";
+                            Eye(name, view.From, view.To, 55f);
+                            Eye(name, view.From, view.To, 55f); // the first picture after a change is drawn before the rooms switch
+                            files.Add($"{OutputFolder}/{name}.png");
+                        }
+
+                        SideBySide($"{label}_{view.Name}_{hour}", files.ToArray());
+                        var a = new Texture2D(2, 2);
+                        var b = new Texture2D(2, 2);
+                        a.LoadImage(File.ReadAllBytes(files[0]));
+                        b.LoadImage(File.ReadAllBytes(files[1]));
+                        var pa = a.GetPixels32();
+                        var pb = b.GetPixels32();
+                        double sum = 0;
+                        for (var k = 0; k < pa.Length; k++)
+                        {
+                            sum += (Mathf.Abs(pa[k].r - pb[k].r) + Mathf.Abs(pa[k].g - pb[k].g) + Mathf.Abs(pa[k].b - pb[k].b)) / 3.0;
+                        }
+
+                        report.Append($"{view.Name}\t{hour}\t{sum / pa.Length:0.00}\n");
+                        Object.DestroyImmediate(a);
+                        Object.DestroyImmediate(b);
+                    }
+                }
+            }
+            finally
+            {
+                _skyAndGrade = false;
+                for (var k = 0; k < glasses.Count; k++)
+                {
+                    glasses[k].SetFloat("_RoomNear", saved[k].Item1);
+                    glasses[k].SetFloat("_RoomFar", saved[k].Item2);
+                }
+            }
+
+            File.WriteAllText($"{OutputFolder}/{label}.txt", report.ToString());
+            Debug.Log($"[VeilmouthRenders] room turn ({label}):\n{report}");
+        }
+
         /// <summary>A point <paramref name="up"/> metres above Veilmouth's ground at (x, z).</summary>
         private static Vector3 Ground(float x, float z, float up)
         {

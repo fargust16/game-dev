@@ -24,6 +24,11 @@ half4 _CurtainColor;
 half _Transmit;
 half _RoomNear;
 half _RoomFar;
+half4 _WallDark;
+half4 _WallPanel;
+half4 _WallPaper;
+half4 _FloorTone;
+half4 _CeilingTone;
 CBUFFER_END
 
 TEXTURE2D(_MaskMap);

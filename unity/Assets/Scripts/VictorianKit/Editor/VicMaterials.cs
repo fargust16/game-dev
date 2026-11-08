@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -112,6 +113,47 @@ namespace GameDev.VictorianKit.EditorTools
             }
         }
 
+        /// <summary>The built rooms' finishes, floor and ceiling, each the block VicRooms lines them with.</summary>
+        private static readonly (string Property, string Block)[] RoomBlocks =
+        {
+            ("_WallDark", "Kit_ViRoom_Dark_3x3"), ("_WallPanel", "Kit_ViRoom_Panel_3x3"), ("_WallPaper", "Kit_ViRoom_Paper_3x3"),
+            ("_FloorTone", "Kit_ViRoom_Floor_3x1"), ("_CeilingTone", "Kit_ViRoom_Ceiling_3x1"),
+        };
+
+        /// <summary>
+        /// The colours the mapped rooms take (reference plan R2 step 4), measured: each room block's mean albedo, its
+        /// main texture's linear mean times its colour, over the material of its largest part, given as sRGB for
+        /// <see cref="Material.SetColor(string, Color)"/>. A block that is missing keeps the shader's default.
+        /// </summary>
+        private static IEnumerable<(string Property, Color Tone)> RoomTones()
+        {
+            foreach (var (property, block) in RoomBlocks)
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{VicRooms.RoomFolder}/{block}.prefab");
+                var part = prefab == null ? null : prefab.GetComponentsInChildren<MeshFilter>(true)
+                    .Where(f => f.sharedMesh != null && f.GetComponent<MeshRenderer>() != null)
+                    .SelectMany(f => Enumerable.Range(0, Mathf.Min(f.sharedMesh.subMeshCount, f.GetComponent<MeshRenderer>().sharedMaterials.Length))
+                        .Select(s => (Material: f.GetComponent<MeshRenderer>().sharedMaterials[s], Size: f.sharedMesh.GetIndexCount(s))))
+                    .Where(p => p.Material != null)
+                    .OrderByDescending(p => p.Size)
+                    .Select(p => p.Material)
+                    .FirstOrDefault();
+                if (part == null)
+                {
+                    Debug.LogWarning($"[VicKit] room tone: {block} or its material is missing.");
+                    continue;
+                }
+
+                var map = part.HasProperty("_BaseMap") ? part.GetTexture("_BaseMap") : part.HasProperty("_MainTex") ? part.GetTexture("_MainTex") : null;
+                var tint = part.HasProperty("_BaseColor") ? part.GetColor("_BaseColor") : part.HasProperty("_Color") ? part.GetColor("_Color") : Color.white;
+                var mean = map != null ? VicTextures.LinearMean(map) : Color.white;
+                var tone = (mean * tint.linear).gamma;
+                tone.a = 1f;
+                Debug.Log($"[VicKit] room tone {property}: {block} ({part.name}) sRGB {tone}");
+                yield return (property, tone);
+            }
+        }
+
         public static string PathOf(string name) => $"{VicKitPaths.MaterialFolder}/VIC_{name}.mat";
 
         public static Material Load(string name) => AssetDatabase.LoadAssetAtPath<Material>(PathOf(name));
@@ -144,6 +186,7 @@ namespace GameDev.VictorianKit.EditorTools
                 EditorUtility.SetDirty(m);
             }
 
+            var tones = RoomTones().ToList();
             foreach (var pair in Glasses)
             {
                 var m = Ensure(pair.Key, WindowShader);
@@ -153,6 +196,11 @@ namespace GameDev.VictorianKit.EditorTools
                 m.SetFloat("_RoomDay", pair.Value.day);
                 m.SetColor("_RoomTint", pair.Value.room);
                 m.SetColor("_CurtainColor", pair.Value.curtain);
+                foreach (var (property, tone) in tones)
+                {
+                    m.SetColor(property, tone);
+                }
+
                 // Transparent since the rooms behind were built (§4.4): the queue from the shader, less light through grimy glass.
                 m.SetFloat("_Transmit", 0.85f - pair.Value.grime);
                 m.renderQueue = -1;

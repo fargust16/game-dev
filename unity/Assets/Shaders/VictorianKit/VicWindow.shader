@@ -3,7 +3,9 @@
 // mask, curtains drawn on the pane, and lit rooms after dark from the global _VicNight. Beyond _RoomNear the pane turns
 // opaque toward a room by interior mapping, reached at _RoomFar, where the built rooms are culled.
 // A window's insert has its UV in metres: u = 0 at the pane's middle, v = 0 at the sill, 0.85 m above the storey floor;
-// the mapped room is 2 m wide, 3 m high and _RoomDepth deep. Each window's look comes from a hash of its own anchor,
+// the mapped room is the built room behind the pane when its house recorded it (VicWindowRooms, the renderer's shader
+// user value: its finish, depth, walls, floor and ceiling), else 2 m wide, 3 m high and _RoomDepth deep. The rest of a
+// window's look comes from a hash of its own anchor,
 // the world point where its UV is zero, which static batching keeps. Premultiplied alpha: the colour is what the glass
 // adds, the alpha how much of the room behind it hides. It casts no shadow, so the sun falls into the rooms.
 Shader "GameDev/VictorianKit/Window"
@@ -29,6 +31,11 @@ Shader "GameDev/VictorianKit/Window"
         _NightColor("Lamp light", Color) = (1, 0.72, 0.42, 1)
         _NightIntensity("Lamp strength", Float) = 2.2
         _CurtainColor("Curtain", Color) = (0.55, 0.18, 0.14, 1)
+        _WallDark("Built rooms: dark finish", Color) = (0.3, 0.24, 0.18, 1)
+        _WallPanel("Built rooms: panelled finish", Color) = (0.36, 0.26, 0.18, 1)
+        _WallPaper("Built rooms: papered finish", Color) = (0.55, 0.5, 0.42, 1)
+        _FloorTone("Built rooms: floor", Color) = (0.3, 0.22, 0.15, 1)
+        _CeilingTone("Built rooms: ceiling", Color) = (0.75, 0.72, 0.66, 1)
         [HideInInspector] _Cutoff("Alpha cutoff", Range(0, 1)) = 0.5
     }
 
@@ -125,26 +132,65 @@ Shader "GameDev/VictorianKit/Window"
                 return tones[min((int)(h * 5.0), 4)];
             }
 
-            // The far look: a room by interior mapping in the pane's frame, a box x ∈ [-1, 1], y ∈ [-0.85, 2.15],
-            // z ∈ [-depth, 0] behind the pane, with the same curtains and blind as the near look.
-            half3 MappedRoom(float3 dir, float2 pane, float h1, float h2, float h3, float night, bool lit, out float fade)
+            // The room behind a pane, in the pane's UV metres: walls at x0 and x1, floor at y0 and ceiling at y1 from the
+            // sill, its back wall depth behind the glass, and its finish, floor and ceiling colours.
+            struct RoomBox
+            {
+                float x0, x1, y0, y1, depth;
+                half3 wall, floor, ceiling;
+            };
+
+            // The built room recorded for this renderer (VicWindowRooms.Pack: finish 2 bits, then depth, left wall,
+            // right wall, ceiling over the sill and floor under it, 6 bits each in tenths of a metre), else the old
+            // made-up room from the window's hash.
+            RoomBox ReadRoom(uint room, float h1, float h3)
+            {
+                RoomBox b;
+                if (room == 0u)
+                {
+                    b.x0 = -1.0;
+                    b.x1 = 1.0;
+                    b.y0 = -0.85;
+                    b.y1 = 2.15;
+                    b.depth = _RoomDepth * (0.8 + 0.4 * h3);
+                    b.wall = Wallpaper(h1) * _RoomTint.rgb;
+                    b.floor = half3(0.26, 0.17, 0.10);
+                    b.ceiling = half3(0.75, 0.72, 0.66);
+                    return b;
+                }
+
+                uint finish = room & 3u;
+                b.depth = max(((room >> 2) & 63u) * 0.1, 0.8);
+                b.x0 = -max(((room >> 8) & 63u) * 0.1, 0.6);
+                b.x1 = max(((room >> 14) & 63u) * 0.1, 0.6);
+                b.y1 = max(((room >> 20) & 63u) * 0.1, 1.6);
+                b.y0 = -max(((room >> 26) & 63u) * 0.1, 0.2);
+                b.wall = finish == 1u ? _WallDark.rgb : (finish == 2u ? _WallPanel.rgb : _WallPaper.rgb);
+                b.floor = _FloorTone.rgb;
+                b.ceiling = _CeilingTone.rgb;
+                return b;
+            }
+
+            // The far look: a room by interior mapping in the pane's frame, the box of ReadRoom behind the pane, with
+            // the same curtains and blind as the near look.
+            half3 MappedRoom(float3 dir, float2 pane, RoomBox b, float h2, float night, bool lit, out float fade)
             {
                 dir.z = min(dir.z, -1e-3);
                 float3 p0 = float3(pane.x, pane.y, 0.0);
-                float depth = _RoomDepth * (0.8 + 0.4 * h3);
-                float tx = ((dir.x > 0 ? 1.0 : -1.0) - p0.x) / (abs(dir.x) > 1e-4 ? dir.x : 1e-4);
-                float ty = ((dir.y > 0 ? 2.15 : -0.85) - p0.y) / (abs(dir.y) > 1e-4 ? dir.y : 1e-4);
+                float depth = b.depth;
+                float tx = max(((dir.x > 0 ? b.x1 : b.x0) - p0.x) / (abs(dir.x) > 1e-4 ? dir.x : 1e-4), 0.0);
+                float ty = max(((dir.y > 0 ? b.y1 : b.y0) - p0.y) / (abs(dir.y) > 1e-4 ? dir.y : 1e-4), 0.0);
                 float tz = -depth / dir.z;
                 float t = min(min(tx, ty), tz);
                 float3 hit = p0 + dir * t;
 
-                half3 wall = Wallpaper(h1) * _RoomTint.rgb;
+                half3 wall = b.wall;
                 half3 room;
                 if (t == tz)
                 {
                     room = wall * (0.92 + 0.08 * step(0.5, frac(hit.x * 6.0)));
                     room *= hit.y < 0.05 ? 0.55 : 1.0;
-                    float2 pic = abs(hit.xy - float2((h2 - 0.5) * 0.8, 1.0)) - float2(0.25, 0.18);
+                    float2 pic = abs(hit.xy - float2(clamp((h2 - 0.5) * 0.8, b.x0 + 0.4, b.x1 - 0.4), 1.0)) - float2(0.25, 0.18);
                     room = max(pic.x, pic.y) < 0 ? half3(0.18, 0.14, 0.1) : room;
                 }
                 else if (t == tx)
@@ -153,17 +199,22 @@ Shader "GameDev/VictorianKit/Window"
                 }
                 else if (dir.y < 0)
                 {
-                    room = half3(0.26, 0.17, 0.10) * (0.85 + 0.15 * step(0.5, frac(hit.x * 5.0)));
+                    room = b.floor * (0.85 + 0.15 * step(0.5, frac(hit.x * 5.0)));
                 }
                 else
                 {
-                    room = half3(0.75, 0.72, 0.66);
+                    room = b.ceiling;
                 }
 
                 fade = saturate(t / (depth * 1.6));
                 room *= lerp(1.0, 0.45, fade);
-                float lamp = lit ? _NightIntensity * (0.6 + 0.4 * (1.0 - fade)) : 0.02;
-                return room * lerp(_RoomDay, 0.0, night) + room * _NightColor.rgb * lamp * night;
+                // After dark a lit room glows as the near look's lamp glow does, whatever its finish: the room's own
+                // shading over its walls' brightness, so a dark panelled room is as bright as a papered one.
+                half shade = 1.0 / max(dot(wall, half3(0.2126, 0.7152, 0.0722)), 0.02);
+                float lamp = lit ? _NightIntensity * 0.35 * min(shade, 40.0) * (0.6 + 0.4 * (1.0 - fade)) : 0.02;
+                // The lamp's light takes over the finish's hue, as the near look's glow is the lamp's colour.
+                half3 lampLit = lerp(room, dot(room, half3(0.2126, 0.7152, 0.0722)).xxx, 0.6);
+                return room * lerp(_RoomDay, 0.0, night) + lampLit * _NightColor.rgb * lamp * night;
             }
 
             half4 Frag(Varyings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
@@ -199,12 +250,12 @@ Shader "GameDev/VictorianKit/Window"
                 float3 d = -V;
                 float3 dir = float3(dot(d, T), dot(d, B), dot(d, N));
 
-                // Curtains at the sides and a blind from the top, just behind the pane. Near, they are narrow so the room
-                // shows; the mapped room keeps the wider ones it always had.
+                // Curtains at the sides and a blind from the top, just behind the pane, narrow so the room shows; the
+                // mapped room keeps the same ones, so the turn from near to far changes no curtain (R2 step 4).
                 float3 nearHit = float3(pane, 0.0) + dir * (-0.06 / min(dir.z, -1e-3));
-                float edge = lerp(0.40 + 0.12 * h2, 0.16 + 0.22 * h2, far);
+                float edge = 0.40 + 0.12 * h2;
                 bool curtain = abs(nearHit.x) > edge && nearHit.y > -0.1 && h1 > 0.25;
-                bool blindOn = nearHit.y > lerp(1.6 - 0.3 * h3 * h3, 1.45 - 0.55 * h3 * h3, far) && h2 > 0.4;
+                bool blindOn = nearHit.y > 1.6 - 0.3 * h3 * h3 && h2 > 0.4;
                 half3 curtainColor = _CurtainColor.rgb * (0.7 + 0.6 * h1) * (0.85 + 0.15 * sin(nearHit.x * 40.0));
                 half3 blindColor = half3(0.62, 0.56, 0.44) * (0.9 + 0.1 * h2);
 
@@ -240,7 +291,7 @@ Shader "GameDev/VictorianKit/Window"
                 if (far > 0.0)
                 {
                     float fade;
-                    half3 inside = MappedRoom(dir, pane, h1, h2, h3, night, lit, fade);
+                    half3 inside = MappedRoom(dir, pane, ReadRoom(unity_RendererUserValue, h1, h3), h2, night, lit, fade);
                     inside = curtain ? curtainColor * (lerp(_RoomDay, 0.0, night) + _NightColor.rgb * (lit ? 0.6 : 0.0) * night) : inside;
                     inside = blindOn ? blindColor * lerp(_RoomDay, 0.0, night) : inside;
                     float reflectFar = saturate((0.08 + 0.92 * fresnel) * _Reflect);

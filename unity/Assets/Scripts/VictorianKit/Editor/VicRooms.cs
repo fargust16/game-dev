@@ -199,8 +199,161 @@ namespace GameDev.VictorianKit.EditorTools
                     + $"\ttaken: {string.Join(" ", r.Taken.Select(t => $"[{t.xMin:F1},{t.yMin:F1},{t.xMax:F1},{t.yMax:F1}]"))}\tbox [{r.Box.xMin:F1},{r.Box.yMin:F1},{r.Box.xMax:F1},{r.Box.yMax:F1}]");
             }
 
+            Panes(h, root.gameObject);
             Finish(root.gameObject);
             return root.gameObject;
+        }
+
+        // ------------------------------------------------------------------------------------------------ the panes
+
+        /// <summary>Panes told their room, and panes matched to none, since the counts were last cleared.</summary>
+        public static int PanesTold, PanesUntold;
+
+        /// <summary>
+        /// Records on the rooms' root which room stands behind each pane of the house's windows
+        /// (<see cref="VicWindowRooms"/>, reference plan R2 step 4): the room's finish, its back wall's depth behind the
+        /// glass, and its side walls, floor and ceiling from the pane's middle and sill, in the pane's own UV metres. A
+        /// pane belongs to the room whose window or glazed door it stands in; a pane matched to none keeps the window
+        /// shader's made-up room.
+        /// </summary>
+        private static void Panes(House h, GameObject root)
+        {
+            var model = h.Root.parent;
+            var panes = new List<MeshRenderer>();
+            var rooms = new List<uint>();
+            foreach (var r in model.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                if (r.transform.IsChildOf(h.Root))
+                {
+                    continue;
+                }
+
+                var slot = Array.FindIndex(r.sharedMaterials, m => m != null && m.shader != null && m.shader.name == VicMaterials.WindowShader);
+                var filter = r.GetComponent<MeshFilter>();
+                var mesh = filter != null ? filter.sharedMesh : null;
+                if (slot < 0 || mesh == null || slot >= mesh.subMeshCount)
+                {
+                    continue;
+                }
+
+                var room = PaneShape(model, r.transform, mesh, slot) is { } shape ? PaneRoom(h, shape) : 0u;
+                if (room == 0u)
+                {
+                    PanesUntold++;
+                    continue;
+                }
+
+                panes.Add(r);
+                rooms.Add(room);
+                PanesTold++;
+            }
+
+            if (panes.Count > 0)
+            {
+                root.AddComponent<VicWindowRooms>().Configure(panes.ToArray(), rooms.ToArray());
+            }
+        }
+
+        /// <summary>
+        /// A pane's frame in the house's space, fitted to its glass's vertices by least squares: the point where its UV
+        /// is zero (the pane's middle at the sill) and the steps of one UV metre along u and along v.
+        /// </summary>
+        private static (Vector3 Anchor, Vector3 PerU, Vector3 PerV)? PaneShape(Transform model, Transform pane, Mesh mesh, int slot)
+        {
+            var vertices = mesh.vertices;
+            var uvs = mesh.uv;
+            if (uvs.Length != vertices.Length)
+            {
+                return null;
+            }
+
+            var used = mesh.GetIndices(slot).Distinct().ToArray();
+            if (used.Length < 3)
+            {
+                return null;
+            }
+
+            // Normal equations of P = anchor + u·perU + v·perV over the glass's vertices.
+            var a = Matrix4x4.zero;
+            Vector3 s1 = Vector3.zero, su = Vector3.zero, sv = Vector3.zero;
+            foreach (var i in used)
+            {
+                var (u, v) = (uvs[i].x, uvs[i].y);
+                var p = model.InverseTransformPoint(pane.TransformPoint(vertices[i]));
+                a[0, 0] += 1f;
+                a[0, 1] += u;
+                a[0, 2] += v;
+                a[1, 1] += u * u;
+                a[1, 2] += u * v;
+                a[2, 2] += v * v;
+                s1 += p;
+                su += u * p;
+                sv += v * p;
+            }
+
+            a[1, 0] = a[0, 1];
+            a[2, 0] = a[0, 2];
+            a[2, 1] = a[1, 2];
+            a[3, 3] = 1f;
+            if (Mathf.Abs(a.determinant) < 1e-6f)
+            {
+                return null;
+            }
+
+            var inv = a.inverse;
+            Vector3 Row(int k) => (inv[k, 0] * s1) + (inv[k, 1] * su) + (inv[k, 2] * sv);
+            return (Row(0), Row(1), Row(2));
+        }
+
+        /// <summary>The packed room behind a pane (<see cref="VicWindowRooms.Pack"/>), or 0 when it stands in no room's opening.</summary>
+        private static uint PaneRoom(House h, (Vector3 Anchor, Vector3 PerU, Vector3 PerV) pane)
+        {
+            var (anchor, perU, perV) = pane;
+            var scale = perU.magnitude;
+            var rise = perV.magnitude;
+            if (scale < 0.1f || rise < 0.1f)
+            {
+                return 0u;
+            }
+
+            Room best = null;
+            Side side = null;
+            var bestOut = float.MaxValue;
+            foreach (var r in h.Rooms)
+            {
+                if (anchor.y < r.Floor - 0.2f || anchor.y > r.Floor + r.Height)
+                {
+                    continue;
+                }
+
+                foreach (var s in r.Sides)
+                {
+                    var outside = -Vector3.Dot(anchor - s.Start, s.In); // how far the glass stands before the side's line
+                    var along = s.Along(anchor);
+                    if (outside < -0.3f || outside > 1.5f || !s.Windows.Concat(s.Doors).Any(w => along > w.A - 0.3f && along < w.B + 0.3f))
+                    {
+                        continue;
+                    }
+
+                    if (outside < bestOut)
+                    {
+                        (best, side, bestOut) = (r, s, outside);
+                    }
+                }
+            }
+
+            if (best == null)
+            {
+                return 0u;
+            }
+
+            var at = side.Along(anchor);
+            var plus = Vector3.Dot(perU, side.U) >= 0f;
+            var (left, right) = plus ? (at, side.Length - at) : (side.Length - at, at);
+            var across = (Mathf.Abs(side.In.x) * best.Cells.width * 2f) + (Mathf.Abs(side.In.z) * best.Cells.height * 2f);
+            var depth = across - (2f * OuterLine) + bestOut;
+            var finish = best.Finish switch { "Dark" => 1, "Panel" => 2, _ => 3 };
+            return VicWindowRooms.Pack(finish, depth / scale, left / scale, right / scale, (best.Floor + best.Height - anchor.y) / rise, (anchor.y - best.Floor) / rise);
         }
 
         // ------------------------------------------------------------------------------------------------ openings

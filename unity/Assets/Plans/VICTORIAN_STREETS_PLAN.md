@@ -1,12 +1,12 @@
 # Victorian Streets — Showcase Plan
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft — the owner's brief of 2026-11-08 (in chat), formalised by the agent before implementation; the streets accepted by the owner the same day
 
 Created: 2026-11-08
 
-Last Updated: 2026-11-08 (§7: the project renders in Linear, by the owner; the showcase keeps its Gamma-era light until rebuilt. Earlier: §4.4: the rooms switch by distance instead of an LOD group, and attic rooms stand under the mansard's flat only (VEILMOUTH_REFERENCE_PLAN R2 steps 2–3). Earlier: §4.4: rooms behind every window, from Victorian Interiors, and clear glass, at the owner's request after accepting the streets. Earlier: after the first renders: tints in linear space, a linear mortar mask, panes drawn from both sides, light set for the project's Gamma colour space, a night sky)
+Last Updated: 2026-11-09 (§4.2: the far look maps the room built behind each pane, told by the house's `VicWindowRooms`, with the rooms' own finish colours; the glass reflects the street probes and the painted sky (VEILMOUTH_REFERENCE_PLAN R2 steps 4–5). Earlier: §7: the project renders in Linear, by the owner; the showcase keeps its Gamma-era light until rebuilt. Earlier: §4.4: the rooms switch by distance instead of an LOD group, and attic rooms stand under the mansard's flat only (VEILMOUTH_REFERENCE_PLAN R2 steps 2–3). Earlier: §4.4: rooms behind every window, from Victorian Interiors, and clear glass, at the owner's request after accepting the streets. Earlier: after the first renders: tints in linear space, a linear mortar mask, panes drawn from both sides, light set for the project's Gamma colour space, a night sky)
 
 Authority: the owner's brief of 2026-11-08; the kit's rules `victorian_kit/СБОРКА.md` (§ Правила first) and the package README (`Packages/com.victorian.kit`, a local `file:` package)
 
@@ -107,7 +107,11 @@ Every set is 1024 px/m (2048 px over 2 m), above the brief's street range of 256
   - grime over both;
   - lit rooms after dark, from the global `_VicNight`: near, a warm glow behind the glass; far, the mapped room lit.
 
-  Each window's curtains, blind and lamp come from a hash of the window's own anchor (world position minus u·T + v·B), so variety survives static batching. Curtains stand at the pane's edges near the eye and close further at a distance.
+  **The far look maps the room built behind the pane** (VEILMOUTH_REFERENCE_PLAN R2 step 4, approved under D4 (a)). When `VicRooms` builds a house's rooms, it fits each pane's plane from its glass vertices, finds the room and the side behind it, and packs into one 32-bit value the room's finish (dark, panelled or papered), the back wall's depth behind the glass, the side walls left and right of the pane's middle, and the ceiling and floor about the sill, in tenths of a metre. The house's `VicWindowRooms` keeps the panes and their values and sets each on its renderer's shader user value (`SetShaderUserValue`, read as `unity_RendererUserValue`, kept by the SRP Batcher and not saved, so it is set again on enable). `VicMaterials` gives the glass the mean linear colour of each finish's wall, floor and ceiling block, measured from the kit's textures. A pane with no value, such as a strange window's, keeps the made-up room. In the 55 houses of C3, 1 715 of 1 762 panes were told their room; the rest stand where no built room is. After dark, a lit far room is lit to a set brightness whatever its finish, so dark-panelled rooms do not go dim.
+
+  Each window's curtains, blind and lamp come from a hash of the window's own anchor (world position minus u·T + v·B), so variety survives static batching. Curtains stand at the pane's edges, the same near the eye and far from it, so the turn from the built room to the mapped one changes only the parallax.
+
+  **The glass reflects the street.** A baked reflection probe stands in every open 30 m cell of the city, and the painted sky is the scene's environment reflection (VEILMOUTH_REFERENCE_PLAN R2 step 5). The pipeline blends probes and projects them; the probes themselves are not box-projected.
 
   **The pane is drawn from both sides.** The kit's upper sash pane faces into the house, and with back faces culled the street looked through it into the hollow house (render `seam_u_2m` of the first build). The shader takes T and B from the mesh's UV tangents whichever way the face points, then turns only the normal toward the viewer. No mesh changes.
 
