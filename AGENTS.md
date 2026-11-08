@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 1.75
+Version: 1.76
 
 Status: Draft
 
-Last Updated: 2026-11-08 (slice assets: the city plan C3, the kit city, replaces C2 at the owner's request, with the world style guide; the entry's full text moved to the record)
+Last Updated: 2026-11-08 (engine: the project renders in Linear colour space, by the owner's choice of the reference plan's D2)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -420,6 +420,7 @@ An entry marked † is the short binding form. Its full text is in [91 Agent Dec
 ## Engine and terrain
 
 - † **Engine**: Unity (URP, C#, folder `unity/`). Free 3P overworld and interiors plus a custom Combat Grid; no marketplace tactics kit as architecture. Systems map: [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md). World gen: **Overworld V0** (shipped) per `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`; the slice is a hand-built scene by its own plan; OrganicTown is pre-pivot archive. No monolithic managers; ScriptableObjects hold immutable data only; chunk size V0 = 64 m. Exterior shells follow the **Shell Non-Overlap Rule** (`unity/Assets/Plans/SHELL_NON_OVERLAP_RULE.md`), and `ShellOverlapGuard` must pass.
+- **Colour space** (owner, 2026-11-08; [99 Open Questions](99%20Open%20Questions.md) VS-COLOR): the project renders in **Linear**. Materials, light and grades are tuned for Linear; never return to Gamma or tune a value for it.
 - † **Overworld terrain stack**: **TerrainGen is the terrain authority and Unity `TerrainData` is the representation.** `OverworldTerrainBake` is the one production path, writing 2×2 × 1400 m tiles through `OverworldTerrainBuilder`; nothing is read back from `TerrainData` into TerrainGen. The terrain material is URP TerrainLit; MicroSplat is out of the pipeline. Five surface layers keep `TerrainSurfaceLayer` order. V0 water is ocean only, at Sea Level 24 m. There is no second grass system. Architecture: `unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md`.
 - **Terrain rules (hard):** every surface and vegetation threshold is a **world quantity** — metres, degrees, square metres — on `TerrainSurfaceRules` / `TerrainVegetationRules`; no normalised per-biome height and no hidden vertical scale. Randomness comes only from `TerrainHash` stream keys forked from the world seed, evaluated **statelessly per world cell** so tiles, tests and future chunks agree; never `UnityEngine.Random`. Layers are applied by priority cover, so weights always sum to 1. Coastal rule: seabed rock is allowed at 22 m and suppressed at the 24 m waterline — coastal land never receives seabed rock.
 - † **Unity terrain traps**: read the full entry before touching the bake, `TerrainData` assets, tree prototypes, terrain details or terrain equality tests. Rebaked terrain leaves the saved `Overworld_Generator` town on old ground, the order of asset creation and alphamap writes matters, and some setters discard data.

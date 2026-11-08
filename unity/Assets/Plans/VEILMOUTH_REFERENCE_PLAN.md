@@ -1,12 +1,12 @@
 # Veilmouth Reference Plan
 
-Version: 0.4
+Version: 0.5
 
-Status: Draft — the agent's plan from the owner's walk of C3 and reference images (2026-11-08). The owner chose D3 (a) and D5 the same day: R1's steps 0–1 are built, every door taking about half a second, R2's steps 1 and 6 are set, the editor and the game at the quality level High, and R2's steps 2–3, the smooth LOD the owner asked for next, are built. The other steps wait for the owner's decisions in §5
+Status: Draft — the agent's plan from the owner's walk of C3 and reference images (2026-11-08). The owner chose D3 (a) and D5 the same day: R1's steps 0–1 are built, every door taking about half a second, R2's steps 1 and 6 are set, the editor and the game at the quality level High, and R2's steps 2–3, the smooth LOD the owner asked for next, are built. For R3, next in §4's order, the owner chose D2 (b), Linear, D7 (a), the present trees retinted, and the painted skies of the project's packs. D1, D4 and D6 wait for the owner
 
 Created: 2026-11-08
 
-Last Updated: 2026-11-08 (R2 steps 2–3, at the owner's request: only the houses' small details cross-fade out, below 4 % of the screen; the rooms behind the windows switch by distance, on within 48 m and off beyond 53 m, behind glass already opaque; the pictures that check it found attic rooms standing out through the mansards, now built under the flat only. Earlier: R2 steps 1 and 6: the owner chose D5; the editor, the tests and every desktop build use High, with anisotropic filtering forced on and MSAA 4×, and the kit's textures filter trilinear at 16×. Earlier: R1: the owner chose D3 (a), doors in 1–3 s; the city is kept behind interiors, measured at 0.45–0.62 s a door, so step 2, the preload, is not built. Earlier: first draft: the owner's six remarks traced to their causes in the project, the reference read, and eight workstreams with checks)
+Last Updated: 2026-11-08 (§5: the owner chose D2 (b) Linear and D7 (a) the present trees retinted, and R3 step 4's painted skies from the packs already in the project; only Free HDR Sky holds sky images there, so the day and dusk skies are its two. Earlier: R2 steps 2–3, at the owner's request: only the houses' small details cross-fade out, below 4 % of the screen; the rooms behind the windows switch by distance, on within 48 m and off beyond 53 m, behind glass already opaque; the pictures that check it found attic rooms standing out through the mansards, now built under the flat only. Earlier: R2 steps 1 and 6: the owner chose D5; the editor, the tests and every desktop build use High, with anisotropic filtering forced on and MSAA 4×, and the kit's textures filter trilinear at 16×. Earlier: R1: the owner chose D3 (a), doors in 1–3 s; the city is kept behind interiors, measured at 0.45–0.62 s a door, so step 2, the preload, is not built. Earlier: first draft: the owner's six remarks traced to their causes in the project, the reference read, and eight workstreams with checks)
 
 Depends On:
 [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §24, [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md) (I.1–I.2), [99 Open Questions](../../../99%20Open%20Questions.md) (VS-C3, VS-COLOR)
@@ -249,7 +249,7 @@ What the packs lack goes on the wanted list; another pack needs the owner.
 |---|---|---|---|
 | 1 | R2.1 quality level, R2.6 filtering (**done** 2026-11-08) | one setting, fixes most of remark 4 at once | D5, chosen |
 | 2 | R1.1 additive interiors (**done** 2026-11-08; R1.2, the preload, not needed) | the owner's worst pain | D3 (a), chosen |
-| 3 | R3.1–R3.7 colour, sky, haze, light, grade | decides most of the look, needs no rebuild of the city | D2 |
+| 3 | R3.1–R3.8 colour, sky, haze, light, grade, trees | decides most of the look, needs no rebuild of the city | D2 and D7, chosen |
 | 4 | R2.2–R2.5, R2.7 LOD, rooms, glass, shadows | needs the houses baked again | step 1 |
 | 5 | R4, R5 streets, pavements, passages (C4) | one rebuild of the city | D1 |
 | 6 | R6 porches | joins the house bake of step 4 or 5 | measurement |
@@ -265,12 +265,14 @@ Each step ends with its check, the narrowest test set that covers it, renders fo
 | # | Question | Options | Recommended |
 |---|---|---|---|
 | D1 | Wider roads on which area? | (a) C3's area, shallower yards and two fewer lanes; (b) a larger city; and whether a round place at the centre is wanted | (a), without the round place |
-| D2 | Colour space (VS-COLOR) | (a) keep Gamma; (b) Linear, every material and light checked again | (b) |
+| D2 | Colour space (VS-COLOR) | (a) keep Gamma; (b) Linear, every material and light checked again | **Decided by the owner, 2026-11-08: (b) Linear**, R3 step 1 |
 | D3 | How doors load | (a) additive interiors with the city kept loaded, separate scenes as now; (b) seamless interiors in the city scene | **Decided by the owner, 2026-11-08: (a)**, built in R1 |
 | D4 | Rooms behind windows | (a) built rooms near, matching mapped rooms far (R2.3–R2.4); (b) mapped rooms only, cheaper to load | (a) |
 | D5 | The quality level the editor and game use | High for both | **Decided by the owner, 2026-11-08: High**, set in R2 step 1 |
 | D6 | Tiled roofs | (a) slate only, as now; (b) terracotta in parts of the city | owner's taste |
-| D7 | Trees and greenery | (a) the present packs, retinted; (b) a more realistic tree pack | (a) first |
+| D7 | Trees and greenery | (a) the present packs, retinted; (b) a more realistic tree pack | **Decided by the owner, 2026-11-08: (a)**, R3 step 8 |
+
+The owner also chose, for R3 step 4, the painted skies of the packs already in the project over the procedural ones (2026-11-08). Of the two packs the step names, only Free HDR Sky (`Assets/Skybox/`) holds sky images in the project, a day and a sunset; 8K Skybox Pack Free holds only its example scenes' lighting settings. So the day and dusk skies are Free HDR Sky's, and the night stays the agent's own dark sky with the crimson moon.
 
 ---
 
