@@ -1,13 +1,13 @@
-# Veilmouth City Plan (C1, C2)
+# Veilmouth City Plan (C1, C2, C3)
 
-Version: 0.23
+Version: 0.24
 
-Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; sizes remain authoring defaults
+Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08 and waiting for the owner's walk; sizes remain authoring defaults
 
-Last Updated: 2026-11-08 (§23: the owner's second set of ornaments: three different angels in green places in three parts of the city, a pair of great lions before the Governor's Palace, birdbaths in every rich garden; the first angel turned to its gate. Earlier: §13, §14: the Soot & Bell's back door is an exit to its yard, the pack's shop door in the house's yard side with its portal, by the owner after VI-8. Earlier: §14: the missing room's landing no longer has a closed neighbour's door, which led nowhere (owner, VI-8). Earlier: §23: the owner's garden ornaments placed: the angel pouring water at the heart of Wardley Garden, birdbaths in two Ridge villas' front gardens and the faction's. Earlier: §22: VI-4 rebuilt the Dwellings, so §14's and §16's rooms are replaced by `VICTORIAN_INTERIORS_PLAN.md` §7–§8. Earlier: §22: Victorian Interiors chosen by the owner for every interior; the rebuild planned in `VICTORIAN_INTERIORS_PLAN.md`. Earlier: §21: C2 accepted by the owner and built: the ground shaped again and the city rebuilt. Earlier: §21: C2, the smaller city, proposed: 300 × 204 m at the owner's ×0.6, crossroads every 40–90 m, the Ridge 4 m high. Earlier: §20: the owner's fourth play test: railings without holes, the bridge closed against the ground, the bar by its keeper; a smaller city with more crossroads waits for C2. Earlier: §19: detached houses, by the owner after the third play test: every railed house stands alone on its own green plot, railed all round with one gate opposite its door; §3.3, §3.4 and §5.2 changed to match. Earlier: §18, remark 7: loose props built, by kit standard §4. Earlier: §18: the owner's third play test: shelves, paintings, and beds fixed; detached houses, loose props, a room constructor, transport, cabs, and animals recorded. Earlier: §17: the owner's second play test fixed and rerun at the owner's request: still dressing, game scale ×1.2, BK's 4 m module, walls set by their infill, one-style steps, props on slopes, railings without holes, blue shop floors; §14 and §16 resized. Earlier: §16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-08 (§24: C3, the kit city, at the owner's request: realistic street sections on the same area, the Market Place on the Crown Axis, passages and yards, the owner's Victorian Kit at ×1.25 for every house, and a mystic layer by the new world style guide. Earlier: §23: the owner's second set of ornaments: three different angels in green places in three parts of the city, a pair of great lions before the Governor's Palace, birdbaths in every rich garden; the first angel turned to its gate. Earlier: §13, §14: the Soot & Bell's back door is an exit to its yard, the pack's shop door in the house's yard side with its portal, by the owner after VI-8. Earlier: §14: the missing room's landing no longer has a closed neighbour's door, which led nowhere (owner, VI-8). Earlier: §23: the owner's garden ornaments placed: the angel pouring water at the heart of Wardley Garden, birdbaths in two Ridge villas' front gardens and the faction's. Earlier: §22: VI-4 rebuilt the Dwellings, so §14's and §16's rooms are replaced by `VICTORIAN_INTERIORS_PLAN.md` §7–§8. Earlier: §22: Victorian Interiors chosen by the owner for every interior; the rebuild planned in `VICTORIAN_INTERIORS_PLAN.md`. Earlier: §21: C2 accepted by the owner and built: the ground shaped again and the city rebuilt. Earlier: §21: C2, the smaller city, proposed: 300 × 204 m at the owner's ×0.6, crossroads every 40–90 m, the Ridge 4 m high. Earlier: §20: the owner's fourth play test: railings without holes, the bridge closed against the ground, the bar by its keeper; a smaller city with more crossroads waits for C2. Earlier: §19: detached houses, by the owner after the third play test: every railed house stands alone on its own green plot, railed all round with one gate opposite its door; §3.3, §3.4 and §5.2 changed to match. Earlier: §18, remark 7: loose props built, by kit standard §4. Earlier: §18: the owner's third play test: shelves, paintings, and beds fixed; detached houses, loose props, a room constructor, transport, cabs, and animals recorded. Earlier: §17: the owner's second play test fixed and rerun at the owner's request: still dressing, game scale ×1.2, BK's 4 m module, walls set by their infill, one-style steps, props on slopes, railings without holes, blue shop floors; §14 and §16 resized. Earlier: §16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
-[11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md)
+[11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
 
 Referenced By:
 [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) S0.6, [99 Open Questions](../../../99%20Open%20Questions.md)
@@ -546,4 +546,196 @@ The owner added two models, a stone birdbath and an angel pouring water, to be u
 | Birdbaths | the front gardens of all four Ridge villas (528, 652), (581, 652), (673, 652), (708, 652) and of the faction's house (636, 652); the gardens of both detached houses on Terrace Street (513, 700), (530, 697); Wardley Garden, either side of the angel (549, 697), (565, 697) | rich and middle-class gardens; the faction's house keeps the villas' manner |
 
 Each stands on a grid node on the highest ground under it, rounded up to 0.1 m. Sizes are authoring defaults: the angels 2.2, 2.6 and 2.4 m tall with their bases, the lion 3.5 m, the birdbath 0.95 m. The owner's models all face north (+Z) unturned, as the renders show; the first angel had stood with its back to its gate and is now turned to it. "Злачные районы" was read with the owner's next words, a show of power and greatness: the lions stand at the palace, not in Lower Veil. A third lion was tried before the Customs House, but the free ground nearest it lay in Bell Street's row of shops, so it was left out; two lions are inside the owner's two or three. The poorer districts take none; a pump and a horse trough are still wanted there (asset map §9 row 22).
+
+---
+
+# 24. C3: the kit city, 2026-11-08
+
+**Status: asked for by the owner on 2026-11-08 and designed by the agent the same day; the build is recorded in §24.7 when it stands; it waits for the owner's walk ([99 Open Questions](../../../99%20Open%20Questions.md) VS-C3).** After accepting the Victorian show streets ([VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md)), the owner asked for Veilmouth's plan to be reviewed and improved directly on its scene, with these goals:
+
+- the map and the way streets and districts are formed are remade;
+- roads, pavements, squares and districts take realistic sizes;
+- the city's area stays the same, so the gain comes from placement;
+- the city and the land round it read as a Victorian fantasy of the 18th to early 20th century with a little mysticism;
+- the game and the world share one style through geometry, textures and the models themselves.
+
+The owner's answers the same day:
+
+| Question | Answer |
+|---|---|
+| Houses | The owner's Victorian Kit everywhere in the city at ×1.25, civic buildings included. It replaces Modular Victorian City. |
+| Mysticism | A crimson moon and fog, a Gothic skyline and occult signs. "Alchemy and soot" was not chosen. |
+| Ground | Shaped again from C3 by §9's tool; the owner's hand changes to it, if any, are lost. |
+| Windows | Real rooms behind them ([VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md) §4.4). |
+
+The map is [VEILMOUTH_CITY_PLAN_C3.svg](VEILMOUTH_CITY_PLAN_C3.svg). The style that binds the city, its interiors and the land round it is [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md).
+
+Plan coordinates stay those of C1 and C2: world X = px − 500 and Z = 500 − py. Every number is an authoring default.
+
+## 24.1 What C2 got wrong
+
+Real Victorian streets set the measure:
+
+- **Byelaws:** the model byelaws of the 1870s asked about 36 ft (11 m) for a new street, and London about 40 ft (12 m) for a carriage street.
+- **Carriages:** a carriage is about 2.2 m wide, and two pass in 6 m.
+
+Against that measure, C2 had these faults:
+
+- **Narrow carriageways.** Ridge Street, Terrace Street, Mercers Row and Bell Street had carriageways of 4 m, where two carriages cannot pass.
+- **Pavements wider than the road.** The High Street had pavements of 5 m and the side streets 4 m beside starved carriageways.
+- **An oversized avenue.** The avenue was 36 m wide in a city 300 m across, a third of the slope between the Ridge and the High Street.
+- **No breaks or yards.** Houses stood wall to wall for 50–100 m with no passage, and rows stood back to back with no yards.
+- **A small, misplaced market.** The market square was 50 × 26 m and lay off the axis that the palace and the avenue set.
+
+## 24.2 Street sections
+
+| Street | Total | Section | Surface |
+|---|---|---|---|
+| High Street | 18 m | 4 m pavement, 10 m carriageway (two carriages pass with a third standing), 4 m pavement | setts; asphalt waits for a texture |
+| Crown Avenue | 24 m | 3 m, 6 m, a 6 m mall of trees and benches, 6 m, 3 m | setts; the mall in cobbles |
+| The Parade (C2's Ridge Street) | 12 m | 3 m pavement, 6 m carriageway, and a 3 m promenade along the Ridge's retaining wall, whose parapet is its balustrade | setts |
+| Byelaw streets: Terrace Street with Cheap Street, Market Street, Dock Road, Mercers Row, Bell Street | 12 m | 3 + 6 + 3 m | setts |
+| North Road | 10 m | carriageway only, to the North Gate | setts |
+| Lanes: Ridge Lane, Stair Lane, Loom Lane | 6 m | shared, no pavement | cobbles |
+| Garden Walk | 4 m | a path under the Ridge's wall | cobbles |
+| Passages | 3 m | through a row, open to the sky; the kit has no arch to pass under | cobbles |
+| Soot Stair | 8 m | flights and landings between blind walls | cobbles |
+| Tanners Slant | 8 m | at 45° under a `KitFrame` (§12) | setts |
+
+Kerbs and lamps follow §4. A passage is 3 m wide rather than 2.5 m, to keep the 1 m grid. Like every alley, it runs at right angles (§12).
+
+## 24.3 The plan
+
+Coordinates are plan metres, px × py.
+
+**The Ridge** (py 626–680, 29.9 m):
+
+- **The Parade** runs from the chapel's forecourt to North Road (480–742 × 668–680). North Road leads to the North Gate (742–752 × 626–668); the gate's opening is 740–754, with towers at 735–740 and 754–759.
+- **North of the Parade**, every plot is railed on the line of its pavement (py 668). From west to east they hold:
+  - the old chapel with its forecourt (480–502 × 650–668, Candidate 3) and graveyard (503–530 × 628–650);
+  - villas in 530–558 and 558–586;
+  - the Governor's Palace (592–632, front at py 650) behind its forecourt (586–638 × 650–668), with the lions;
+  - the faction's house in 638–676;
+  - villas in 676–707 and 707–738;
+  - the gate lodge east of North Road (754–778).
+- **A villa** is a house of 15 × 15 m with a front garden of 6 m and a back garden running to py 628.
+
+**The slope** (py 680–726) is low town except the avenue's ramp:
+
+- **Crown Avenue** (600–624 × 680–726) climbs 4 m over 46 m (8.7 %) from the High Street to the Parade. The Crown Column stands at the foot of its mall.
+- **The Town Hall** (582–597 × 686–716) faces the avenue from a podium over the ramp. Its **clock tower** (592–597 × 721–726) stands at the corner of the avenue and the High Street: six storeys, about 26 m, the tallest thing in the city.
+- **The Assize and the Wardens' station** (627–642 × 686–716) face the Town Hall across the avenue.
+- **The Terraces**, west of the avenue:
+  - Terrace Street (516–528 × 680–726);
+  - four detached houses of 10 × 10 m on plots 16 m along the street (500–516 and 528–544, each × 684–700 and 700–716);
+  - Wardley Garden (546–570 × 684–712), which opens north on the Garden Walk (528–572 × 680–684);
+  - the Town Hall's yard (570–582 × 686–716).
+- **Under the Ridge**, east of the avenue:
+  - Ridge Lane (642–700 × 696–702) and the Soot Stair (700–708 × 680–714);
+  - the cellar yard (709–721 × 690–726, Candidate 2), with the cellar door in the stair's east wall;
+  - Stair Lane (721–778 × 696–702);
+  - tenements 7.5 m deep along both lanes, with yards behind them;
+  - Ridge Alley (670–673 × 702–726) down to the High Street.
+
+**The High Street** (py 726–744) runs from the West Gate (opening 728–742) to the bridge. Its shops stand four storeys wall to wall, broken by passages, and its south side opens on the Market Place.
+
+**The Market Quarter** (py 744–830, px 480–606):
+
+- **The Market Place** (550–606 × 744–784, 56 × 40 m) lies on the Crown Axis.
+  - It opens on the High Street to the north and on Market Street to the east, and Mercers Row (480–550 × 772–784) enters its west side.
+  - It holds the Masters' stalls, the trader, the seer, and the Item Creation yard in its south-west corner.
+- **Cheap Street** (516–528 × 744–812) runs south to the sea, and Tanners Slant runs from (486, 744) to (516, 774).
+- **Market Street** (606–618 × 744–812) carries the axis on to the Sea Quay.
+- **Warehouses** face the Sea Quay, with yards behind them.
+
+**Lower Veil** (py 744–830, px 618–778):
+
+- **Bell Street** (618–701 × 772–784) holds:
+  - the Soot & Bell (680–695 × 757–772), with its yard (695–701 × 757–772) on Dock Road;
+  - Harrow & Tincture (670–680 × 762–772);
+  - the Notice Board at the yard's gate;
+  - the player's start, before the tavern.
+- **The Tenement Court** (646–660 × 754–762) is reached by passages from the High Street and from Bell Street, which makes it a stealth route.
+- **Loom Lane** (618–701 × 796–802) holds the missing person's tenement (662–672 × 802–810) and the pawnbroker's corner (690–696 × 802–810).
+- **The Ritual Square** (630–656 × 784–810, Candidate 1) lies between Bell Street and the sea, and Loom Lane crosses it.
+- **Dock Road** (701–713 × 744–812) is lined with warehouses.
+- **The Customs House** (745–775 × 769–784) stands on the Basin Quay (713–780 × 784–790).
+
+**The edge** stays as it was:
+
+- the town wall and the West Gate;
+- the river and its embankment, and the Veil Bridge;
+- the basin and the Sea Quay.
+
+Only the gate towers change: they become kit towers.
+
+**Axes and breaks.** The Crown Axis runs from the palace through the avenue, the clock tower's corner and Market Street to the sea at px 612. A long row is broken at least every 40 m, by a street, a passage or a square.
+
+## 24.4 Houses from the kit
+
+The houses are the Victorian Kit at ×1.25.
+
+**Scale.** At ×1.25 the module is 2.5 m and the storey 3.75 m. Every street door stands on a plinth of 0.75 m, with the kit's own stone steps and rails. **Measured:** `SM_Vic_Steps_Single` reaches 1.1 m out and 0.6 m up at ×1, so 1.375 m and 0.75 m in the city.
+
+**Modules stay separate.** Each module stays a prefab instance; no mesh is merged and no atlas baked (the kit's rules).
+
+**Baked types.** `VeilmouthKitHouses` bakes each house type once as a project prefab of those instances. Each prefab carries:
+
+- its rooms behind the windows ([VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md) §4.4), whose furniture keeps its own size under the house's scale;
+- the kit standard's body and front colliders;
+- a `Door` marker at each street door, so the city places it as it placed C2's houses.
+
+**Sizes on the grid.**
+
+- Widths are whole multiples of 5 m (two kit modules), so rows stay on the 1 m grid.
+- A pitched roof spans at most 6 m of the kit, so a tenement is 7.5 m deep on a plot 8 m deep.
+
+| Type | Kit plan (m) | In the city (m) | Storeys | Roof | Where |
+|---|---|---|---|---|---|
+| Shop house | 8 × 8, 12 × 8 | 10 × 10, 15 × 10 | 4 | mansard with lucarnes | High Street, Market Place |
+| Town house | 8 × 8, 12 × 8 | 10 × 10, 15 × 10 | 3 | mansard | side streets |
+| Tenement | 8 × 6, 12 × 6 | 10 × 7.5, 15 × 7.5 | 2–3 | gable or hip | Under the Ridge, Lower Veil |
+| Detached house | 8 × 8 | 10 × 10 | 3 | mansard, porch | Terraces, gate lodge |
+| Villa | 12 × 10 with a 4 × 2 pavilion | 15 × 15 | 3 | mansard, porch, balcony, vane | the Ridge, the faction's house |
+| Civic | 24 × 10 with an 8 × 2 pavilion | 30 × 15 | 3 | mansard, porch | Town Hall, Assize, Customs House |
+| Palace | 32 × 10 with a 12 × 2 pavilion | 40 × 15 | 3 | mansard, porch, balcony, vane | the Governor's Palace |
+| Tavern | 12 × 12 | 15 × 15 | 3 | mansard | the Soot & Bell |
+| Warehouse | 12 × 6 | 15 × 7.5 | 3 | gable | quays, Dock Road |
+| Tower | 4 × 4 | 5 × 5 | 5–6 | hipped pyramid | gate towers, clock tower |
+
+**Facades.**
+
+- A house's party walls are plain. The house at a row's end shows a second facade on the side street, as C2's corner houses did.
+- Each district takes its own palette from the kit's: rich districts in stucco and rich brick; middling ones in common brick; poor ones in stock or poor brick with oxblood, green or brown woodwork.
+- The kit has no shop front, so a shop shows double doors and double windows on its ground floor until a shop front is made (asset map §9).
+
+## 24.5 The mystic layer
+
+The details are in [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md) §6.
+
+**Sky and light:**
+
+- a crimson moon that rises over the sea in the south-east by night;
+- a twilight grade at dusk;
+- gas lamps with a cold green-blue flame.
+
+**Fog:** low fog along the river, the basin, the docks, Lower Veil's courts, the graveyard and the Soot Stair.
+
+**Skyline:** the clock tower and the gate towers stand over the roofs. Spires, gargoyles and veiled statues wait for models (asset map §9).
+
+**Old wards:**
+
+- **Where:** faint signs over the keystones of chosen doors, and runes on old walls: the town wall by the gates, the retaining wall, the Soot Stair's walls, and the three Ritual Site Candidates.
+- **What they are not:** they carry no rule and are not the traces of a Weak Point ([21](../../../21%20Cult%20Campaign%20and%20City%20Control.md) §4).
+
+**Strange windows:** a dim violet-green glass in Harrow & Tincture and a few shops of Lower Veil.
+
+## 24.6 What stays
+
+- the seven buildings that open, with their portals;
+- the Dwelling doors and the Masters;
+- the Ritual Site Candidates, each within its own place;
+- the furniture rules (§4) and the detached plots (§19);
+- the ornaments (§23), which move with their gardens;
+- outside the city: the ground, the forest, the fields, the hill and the beasts.
 
