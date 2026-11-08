@@ -2,7 +2,7 @@
 
 Version: 0.9
 
-Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-7 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings and VI-7 the seven by the same rules; VI-8 (play test) follows on the owner's word
+Status: Draft — the owner's decision of 2026-11-07, formalised by the agent; the owner's answers in §9; VI-1 … VI-7 done, VI-6 having built [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) for the Dwellings and VI-7 the seven by the same rules; VI-8 (play test) under way, the owner's remarks awaited
 
 Created: 2026-11-07
 
@@ -297,6 +297,15 @@ What to look for, besides the owner's own eye: whether rooms feel cramped on the
 | 7 | A hall of barrels and crates, a chair in the middle of a room; every home must have a bedroom, a kitchen and a bath | The rules §5: a home always has somewhere to sleep, to cook and to wash. |
 | 8 | The same faults everywhere: build from purpose to places to rooms to buildings; small props on surfaces; shops with a counter across the width; servants in rich houses who run for the Wardens | The rules §1–§7; servants §5, their numbers a decision of §9. |
 
+**VI-8, the route** (2026-11-08). As VI-5's route, from Bell Street before the Soot & Bell, by day and by night, with these to look at besides the owner's own eye:
+
+- **The Soot & Bell.** Whether the bar reads from the street door, the way to it stays clear, the taproom feels high and the saloon and public bar read as two sides; the stage without its piano; the stair, the landing and the back landing, both let rooms; that Nell answers only from the floor (VI-5 remark 2).
+- **Harrow & Tincture, the Wardens' lock-up.** Whether each greets across the room from its counter or desk.
+- **The faction's house.** Whether the widened hall reads as symmetric, the aisle clear to the rostrum.
+- **A home of each kind** (the six doors of VI-5's route, and the Dwelling scene for the kinds C2 lacks): somewhere to sleep, cook and wash; walk-ways clear; small things on surfaces; servants' rooms in the rich villa.
+
+The remarks are recorded here as in VI-5.
+
 **Risks:**
 
 - **A fight on a stair.** The stair is one grid cell wide. Whether a fight there needs a rule of its own (a narrow place, Surrounded impossible) is left to VI-5 and to the Combat Grid's own documents.
@@ -315,6 +324,7 @@ The owner accepted all five recommendations and authorised VI-1. These are now d
 
 ## 10. Update history
 
+- 2026-11-08: VI-8 authorised; its route recorded in §8.
 - 2026-11-08 (v0.9): VI-7, the seven furnished by the rules; the Soot & Bell to the pub plan with its 7 m taproom, its back range 12 m deep and a back landing; the faction's hall 21 m wide.
 - 2026-11-07 (v0.8): VI-6, the Dwellings furnished by `INTERIOR_FURNISHING_RULES.md` §7: places, rooms, the planner and its check; a washroom or bathroom in every home, servants in rich houses, the burglary numbers checked again (10.3 §6).
 - 2026-11-07 (v0.7): the owner's four decisions on the furnishing rules: VI-6 … VI-8 added to §8, the poor washroom replaces §9.3.
