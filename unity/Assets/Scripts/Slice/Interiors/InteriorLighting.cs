@@ -34,6 +34,7 @@ namespace GameDev.Slice.Interiors
         private static readonly Color NoonLight = new(1f, 0.96f, 0.88f), LowLight = new(1f, 0.72f, 0.5f);
         private static readonly Color NoonSky = new(0.78f, 0.86f, 0.95f), LowSky = new(0.95f, 0.62f, 0.42f), NightSky = new(0.04f, 0.06f, 0.11f);
         private static readonly Color DayAmbient = new(0.42f, 0.4f, 0.36f), NightAmbient = new(0.08f, 0.08f, 0.11f);
+        private const float DayReflection = 0.3f, NightReflection = 0.05f;
 
         [SerializeField] private Light[] windows = Array.Empty<Light>();
         [SerializeField] private Renderer[] panes = Array.Empty<Renderer>();
@@ -167,6 +168,10 @@ namespace GameDev.Slice.Interiors
 
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.ambientLight = Color.Lerp(NightAmbient, DayAmbient, day);
+
+            // A room reflects itself, not the sky. In Linear (owner, 2026-11-08) the sky's reflection at full strength laid
+            // a grey sheen over every dark surface, by night too, so it is kept faint. Authoring defaults.
+            RenderSettings.reflectionIntensity = Mathf.Lerp(NightReflection, DayReflection, day);
         }
 
         /// <summary>

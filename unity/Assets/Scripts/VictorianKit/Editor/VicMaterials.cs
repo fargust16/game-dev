@@ -48,34 +48,40 @@ namespace GameDev.VictorianKit.EditorTools
 
         private static readonly Dictionary<string, Spec> Facades = new Dictionary<string, Spec>
         {
-            // Brick: the texture's bricks average about 0.74 linear, its mortar 0.88.
-            { "Brick_Rich", new Spec { Set = "Brick", Tint = Over(0.66f, 0.36f, 0.24f, 0.74f), Tint2 = Over(0.86f, 0.83f, 0.76f, 0.88f), Tint2Amount = 1f, Dirt = 0.25f, Moss = 0.04f } },
-            { "Brick_Common", new Spec { Set = "Brick", Tint = Over(0.56f, 0.25f, 0.18f, 0.74f), Tint2 = Over(0.70f, 0.68f, 0.63f, 0.88f), Tint2Amount = 1f, Dirt = 0.45f, Moss = 0.12f } },
-            { "Brick_Poor", new Spec { Set = "Brick", Tint = Over(0.40f, 0.21f, 0.17f, 0.74f), Tint2 = Over(0.48f, 0.46f, 0.43f, 0.88f), Tint2Amount = 1f, Rough = 1.08f, Dirt = 0.85f, DirtHeight = 3.2f, Moss = 0.35f, Tone = 0.14f } },
-            { "Brick_Stock", new Spec { Set = "Brick", Tint = Over(0.60f, 0.53f, 0.40f, 0.74f), Tint2 = Over(0.58f, 0.56f, 0.52f, 0.88f), Tint2Amount = 1f, Rough = 1.05f, Dirt = 0.7f, DirtHeight = 3.0f, Moss = 0.28f, Tone = 0.12f } },
+            // The reference palette (Plans/VEILMOUTH_REFERENCE_PLAN.md R3 step 2; WORLD_STYLE_GUIDE.md §2), for the Linear
+            // colour space: soot-browned brick, greyed cream, cold slate, dark paint. No look is above 40 % saturation
+            // (HSV), so the grade, not the albedo, sets the warmth. Every value is an authoring default.
+
+            // Brick: the texture's bricks average about 0.74 linear, its mortar 0.88. The mortar is soot-grey, never white.
+            { "Brick_Rich", new Spec { Set = "Brick", Tint = Over(0.40f, 0.30f, 0.26f, 0.74f), Tint2 = Over(0.62f, 0.60f, 0.55f, 0.88f), Tint2Amount = 1f, Dirt = 0.4f, Moss = 0.04f } },
+            { "Brick_Common", new Spec { Set = "Brick", Tint = Over(0.36f, 0.27f, 0.235f, 0.74f), Tint2 = Over(0.52f, 0.50f, 0.46f, 0.88f), Tint2Amount = 1f, Dirt = 0.6f, Moss = 0.12f } },
+            { "Brick_Poor", new Spec { Set = "Brick", Tint = Over(0.28f, 0.22f, 0.19f, 0.74f), Tint2 = Over(0.38f, 0.36f, 0.33f, 0.88f), Tint2Amount = 1f, Rough = 1.08f, Dirt = 0.95f, DirtHeight = 3.2f, Moss = 0.35f, Tone = 0.14f } },
+            { "Brick_Stock", new Spec { Set = "Brick", Tint = Over(0.40f, 0.36f, 0.29f, 0.74f), Tint2 = Over(0.48f, 0.46f, 0.42f, 0.88f), Tint2Amount = 1f, Rough = 1.05f, Dirt = 0.8f, DirtHeight = 3.0f, Moss = 0.28f, Tone = 0.12f } },
 
             // Stucco: mean 0.86; the score lines take a darker tint of the same render.
-            { "Stucco_Cream", new Spec { Set = "Stucco", Tint = Over(0.80f, 0.74f, 0.60f, 0.86f), Tint2 = Over(0.68f, 0.62f, 0.50f, 0.86f), Tint2Amount = 1f, Dirt = 0.3f, Moss = 0.04f, Tone = 0.05f } },
-            { "Stucco_White", new Spec { Set = "Stucco", Tint = Over(0.78f, 0.77f, 0.73f, 0.86f), Tint2 = Over(0.64f, 0.63f, 0.60f, 0.86f), Tint2Amount = 1f, Dirt = 0.3f, Moss = 0.04f, Tone = 0.05f } },
+            // The palette sheet showed the noon sun and the warm grade adding about 12 points of saturation to a pale
+            // surface, so stucco and stone start nearly grey and are lit warm.
+            { "Stucco_Cream", new Spec { Set = "Stucco", Tint = Over(0.64f, 0.61f, 0.55f, 0.86f), Tint2 = Over(0.52f, 0.49f, 0.44f, 0.86f), Tint2Amount = 1f, Dirt = 0.45f, Moss = 0.04f, Tone = 0.05f } },
+            { "Stucco_White", new Spec { Set = "Stucco", Tint = Over(0.66f, 0.65f, 0.62f, 0.86f), Tint2 = Over(0.54f, 0.53f, 0.50f, 0.86f), Tint2Amount = 1f, Dirt = 0.45f, Moss = 0.04f, Tone = 0.05f } },
 
             // Stone: linear mean 0.74; G collects grime in pits.
-            { "Stone_Light", new Spec { Set = "Stone", Tint = Over(0.80f, 0.77f, 0.68f, 0.74f), Tint2 = Over(0.55f, 0.52f, 0.46f, 0.74f), Tint2Amount = 0.15f, Tint2Sharp = 3f, Dirt = 0.25f, Moss = 0.04f } },
-            { "Stone_Medium", new Spec { Set = "Stone", Tint = Over(0.66f, 0.62f, 0.55f, 0.74f), Tint2 = Over(0.42f, 0.40f, 0.36f, 0.74f), Tint2Amount = 0.25f, Tint2Sharp = 3f, Dirt = 0.45f, Moss = 0.12f } },
-            { "Stone_Dirty", new Spec { Set = "Stone", Tint = Over(0.52f, 0.49f, 0.44f, 0.74f), Tint2 = Over(0.30f, 0.29f, 0.26f, 0.74f), Tint2Amount = 0.4f, Tint2Sharp = 3f, Rough = 1.08f, Dirt = 0.85f, DirtHeight = 3.2f, Moss = 0.35f, Tone = 0.14f } },
+            { "Stone_Light", new Spec { Set = "Stone", Tint = Over(0.62f, 0.60f, 0.55f, 0.74f), Tint2 = Over(0.44f, 0.42f, 0.38f, 0.74f), Tint2Amount = 0.15f, Tint2Sharp = 3f, Dirt = 0.4f, Moss = 0.04f } },
+            { "Stone_Medium", new Spec { Set = "Stone", Tint = Over(0.55f, 0.53f, 0.48f, 0.74f), Tint2 = Over(0.36f, 0.34f, 0.31f, 0.74f), Tint2Amount = 0.25f, Tint2Sharp = 3f, Dirt = 0.55f, Moss = 0.12f } },
+            { "Stone_Dirty", new Spec { Set = "Stone", Tint = Over(0.47f, 0.45f, 0.41f, 0.74f), Tint2 = Over(0.26f, 0.25f, 0.23f, 0.74f), Tint2Amount = 0.4f, Tint2Sharp = 3f, Rough = 1.08f, Dirt = 0.85f, DirtHeight = 3.2f, Moss = 0.35f, Tone = 0.14f } },
 
             // Slate: linear mean 0.70; G picks odd slates for the second tint. Dry slate is matte, so roughness sits above the mask.
-            { "Slate_Even", new Spec { Set = "Slate", Tint = Over(0.30f, 0.33f, 0.38f, 0.70f), Tint2 = Over(0.32f, 0.33f, 0.36f, 0.70f), Tint2Amount = 0.1f, Tint2Sharp = 40f, Rough = 1.15f, Dirt = 0.15f, Moss = 0.04f } },
-            { "Slate_Common", new Spec { Set = "Slate", Tint = Over(0.28f, 0.30f, 0.33f, 0.70f), Tint2 = Over(0.30f, 0.33f, 0.30f, 0.70f), Tint2Amount = 0.15f, Tint2Sharp = 40f, Rough = 1.25f, Dirt = 0.3f, Moss = 0.15f } },
-            { "Slate_Rough", new Spec { Set = "Slate", Tint = Over(0.25f, 0.26f, 0.28f, 0.70f), Tint2 = Over(0.30f, 0.26f, 0.27f, 0.70f), Tint2Amount = 0.3f, Tint2Sharp = 40f, Rough = 1.4f, Dirt = 0.5f, Moss = 0.5f, Tone = 0.14f } },
+            { "Slate_Even", new Spec { Set = "Slate", Tint = Over(0.23f, 0.24f, 0.26f, 0.70f), Tint2 = Over(0.25f, 0.25f, 0.26f, 0.70f), Tint2Amount = 0.1f, Tint2Sharp = 40f, Rough = 1.15f, Dirt = 0.15f, Moss = 0.04f } },
+            { "Slate_Common", new Spec { Set = "Slate", Tint = Over(0.21f, 0.22f, 0.23f, 0.70f), Tint2 = Over(0.23f, 0.24f, 0.22f, 0.70f), Tint2Amount = 0.15f, Tint2Sharp = 40f, Rough = 1.25f, Dirt = 0.3f, Moss = 0.15f } },
+            { "Slate_Rough", new Spec { Set = "Slate", Tint = Over(0.18f, 0.185f, 0.19f, 0.70f), Tint2 = Over(0.22f, 0.19f, 0.19f, 0.70f), Tint2Amount = 0.3f, Tint2Sharp = 40f, Rough = 1.4f, Dirt = 0.5f, Moss = 0.5f, Tone = 0.14f } },
 
             // Wood: paint mean 0.85; G is the chip field, bare wood where the paint has gone.
             { "Wood_Rich", new Spec { Set = "Wood", Tint = Over(0.10f, 0.14f, 0.11f, 0.85f), Tint2 = Over(0.40f, 0.34f, 0.26f, 0.85f), Tint2Amount = 0f, Rough = 0.9f, Dirt = 0.15f, Moss = 0f } },
-            { "Wood_Brown", new Spec { Set = "Wood", Tint = Over(0.36f, 0.24f, 0.15f, 0.85f), Tint2 = Over(0.42f, 0.36f, 0.28f, 0.85f), Tint2Amount = 0.06f, Tint2Sharp = 10f, Dirt = 0.35f, Moss = 0.02f } },
-            { "Wood_Green", new Spec { Set = "Wood", Tint = Over(0.30f, 0.36f, 0.28f, 0.85f), Tint2 = Over(0.45f, 0.40f, 0.33f, 0.85f), Tint2Amount = 0.25f, Tint2Sharp = 10f, Rough = 1.3f, Dirt = 0.6f, Moss = 0.08f, Tone = 0.12f } },
-            { "Wood_Oxblood", new Spec { Set = "Wood", Tint = Over(0.36f, 0.15f, 0.12f, 0.85f), Tint2 = Over(0.45f, 0.40f, 0.33f, 0.85f), Tint2Amount = 0.22f, Tint2Sharp = 10f, Rough = 1.3f, Dirt = 0.6f, Moss = 0.08f, Tone = 0.12f } },
+            { "Wood_Brown", new Spec { Set = "Wood", Tint = Over(0.20f, 0.16f, 0.125f, 0.85f), Tint2 = Over(0.30f, 0.26f, 0.21f, 0.85f), Tint2Amount = 0.06f, Tint2Sharp = 10f, Dirt = 0.35f, Moss = 0.02f } },
+            { "Wood_Green", new Spec { Set = "Wood", Tint = Over(0.17f, 0.20f, 0.16f, 0.85f), Tint2 = Over(0.32f, 0.28f, 0.23f, 0.85f), Tint2Amount = 0.25f, Tint2Sharp = 10f, Rough = 1.3f, Dirt = 0.6f, Moss = 0.08f, Tone = 0.12f } },
+            { "Wood_Oxblood", new Spec { Set = "Wood", Tint = Over(0.20f, 0.135f, 0.125f, 0.85f), Tint2 = Over(0.32f, 0.28f, 0.23f, 0.85f), Tint2Amount = 0.22f, Tint2Sharp = 10f, Rough = 1.3f, Dirt = 0.6f, Moss = 0.08f, Tone = 0.12f } },
 
-            // Iron: mean 0.8; G is the rust field.
-            { "Iron", new Spec { Set = "Iron", Tint = Over(0.07f, 0.075f, 0.08f, 0.8f), Tint2 = Over(0.40f, 0.22f, 0.12f, 0.8f), Tint2Amount = 0.12f, Tint2Sharp = 5f, Metallic = 0.55f, Dirt = 0.3f, Moss = 0f } },
+            // Iron: mean 0.8; G is the rust field, a small share of the surface, so the rust alone may pass 40 %.
+            { "Iron", new Spec { Set = "Iron", Tint = Over(0.07f, 0.075f, 0.08f, 0.8f), Tint2 = Over(0.30f, 0.19f, 0.13f, 0.8f), Tint2Amount = 0.12f, Tint2Sharp = 5f, Metallic = 0.55f, Dirt = 0.3f, Moss = 0f } },
 
             // Street ground, not a kit slot: flagstones from the stucco set's scoring, setts from the brick set.
             { "Ground_Pave", new Spec { Set = "Stucco", Tint = Over(0.52f, 0.50f, 0.47f, 0.86f), Tint2 = Over(0.22f, 0.21f, 0.20f, 0.86f), Tint2Amount = 1f, Rough = 1.1f, Bump = 2f, Dirt = 0.4f, Moss = 0.2f, Tone = 0.2f, Tiling = new Vector2(0.45f, 0.45f), WorldUV = true } },

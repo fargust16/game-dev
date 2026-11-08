@@ -1,12 +1,12 @@
 # World Style Guide
 
-Version: 0.3
+Version: 0.4
 
-Status: Draft — written by the agent from the owner's answers of 2026-11-08 (city plan §24); the light and the mystic layer built in Veilmouth (city plan §24.7). After walking C3 the owner asked for one warm, muted range with haze and a quiet sky, after reference images: §2 and §5 are to be reworked by [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R3 once the owner has decided its D2 and D6
+Status: Draft — written by the agent from the owner's answers of 2026-11-08 (city plan §24); the light and the mystic layer built in Veilmouth (city plan §24.7). After walking C3 the owner asked for one warm, muted range with haze and a quiet sky, after reference images: §2 and §5 are reworked by [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R3, awaiting the owner's judgement of its views; the roofs wait for its D6
 
 Created: 2026-11-08
 
-Last Updated: 2026-11-08 (Status: the owner's reference look, to be worked in by the reference plan's R3. Earlier: §5, §6: built in Veilmouth by `VeilmouthSky` and `VeilmouthMystic`, as city plan §24.7 records; the moon rises at 20:00 and fades in over its first hour. Earlier: first draft: one style for the city, its interiors and the land round it, and the mystic layer the owner chose)
+Last Updated: 2026-11-08 (§2, §5, §8: the reference look by the reference plan's R3: Linear colour space, the muted palette with its targets, the painted sky, haze, a lower golden sun, SSAO, the HDR grade, olive trees. Earlier: Status: the owner's reference look, to be worked in by the reference plan's R3. Earlier: §5, §6: built in Veilmouth by `VeilmouthSky` and `VeilmouthMystic`, as city plan §24.7 records; the moon rises at 20:00 and fades in over its first hour. Earlier: first draft: one style for the city, its interiors and the land round it, and the mystic layer the owner chose)
 
 Depends On:
 [00 Vision](../../../00%20Vision.md), [11 Vertical Slice](../../../11%20Vertical%20Slice.md) (*Era and Mood*), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §24, [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md)
@@ -40,9 +40,11 @@ Three tests for any new piece:
 
 The kit's materials are the palette (`VicMaterials`): seven tiling sets on two SRP Batcher shaders. A new material is a copy of one of them with its own tint, never a new shader.
 
+The palette is one warm, muted range after the owner's reference images (reference plan R3 step 2), with albedo targets in sRGB: brick 0.25–0.40 in value and at most 35 % saturation, browner than red; stucco and stone 0.55–0.68, a warm grey, never above 0.72; slate 0.18–0.25, blue-grey toward grey; wood and iron dark, 0.08–0.20; mortar soot-grey, never white; grime stronger, so no wall reads clean. No material's main colour is above 40 % saturation. The grade, not the albedo, carries the warmth (§5).
+
 | Group | Materials | Where |
 |---|---|---|
-| Brick | `Brick_Rich` (warm red), `Brick_Common` (brown-red), `Brick_Poor` (dark, rough), `Brick_Stock` (yellow London stock) | rich, middling, poor and dock districts in that order |
+| Brick | `Brick_Rich` (soot-brown red), `Brick_Common` (brown), `Brick_Poor` (dark, rough), `Brick_Stock` (greyed London stock) | rich, middling, poor and dock districts in that order |
 | Stucco | `Stucco_Cream`, `Stucco_White` | the Ridge, the civic buildings, the palace |
 | Stone | `Stone_Light`, `Stone_Medium`, `Stone_Dirty` | dressings, plinths, steps; dirtier toward the river |
 | Slate | `Slate_Even`, `Slate_Common`, `Slate_Rough` | every roof; the city has no tiled or thatched roof |
@@ -90,11 +92,12 @@ Veilmouth's light follows the game clock (one tick is one game minute). Authorin
 
 | Time | Sun or moon | Sky and fog | Lamps |
 |---|---|---|---|
-| Day (07:00–18:00) | a pale, warm sun, soft shadows | overcast blue-grey sky, a thin haze | off |
-| Dusk (18:00–20:30), dawn (05:00–07:00) | a low amber sun going under | violet sky toward the east, fog rising in the low town | the lamps come on at 19:00 |
-| Night (20:30–05:00) | the crimson moon, low over the sea in the south-east, with soft red light from it | a deep blue-black sky; fog low and thick by the water | teal gas flames; warm windows |
+| Day (07:00–18:00) | a warm sun at most 42° high, golden from 15:00 | a painted sky of broken cloud (Free HDR Sky), washed toward grey, never saturated blue; a distance haze in the horizon's colour from about 60 m | off |
+| Dusk (18:00–20:30), dawn (05:00–07:00) | a low amber sun going under, its painted sun turned to stand where the light comes from | the sunset's painted clouds, rose and umber; fog rising in the low town | the lamps come on at 19:00 |
+| Night (20:30–05:00) | the crimson moon, low over the sea in the south-east, with a faint soft red light from it | the sunset's clouds, dark and cool; fog low and thick by the water | teal gas flames; warm windows |
 
-- **The colour space is Gamma** (the project's setting). The kit's materials and light were set for it (streets plan). A change to Linear is the owner's choice ([99 Open Questions](../../../99%20Open%20Questions.md) VS-COLOR).
+- **The colour space is Linear** (owner, 2026-11-08; [99 Open Questions](../../../99%20Open%20Questions.md) VS-COLOR). Light, fog and the grade are tuned for it; the sun is about 2, twice its Gamma-era value.
+- **The grade** (reference plan R3 step 7) is HDR with the Neutral tone mapper: saturation taken down by about a fifth by day, highlights warm and shadows a little cool, bloom only over the HDR highlights; the twilight grade blends in at dusk by the clock. Screen-space ambient occlusion grounds every corner, sill and doorway.
 - **Darkness is a mechanic.** By night the streets between lamps must be dark enough to hide in ([10.3](../../../10.3%20Stealth%20and%20Detection.md): darkness adds to the Stealth skill). The moon gives shape, not reading light. Lamps are pools, not floodlights: Lower Veil keeps its dark stretches.
 - **Interiors** keep their own warm light, lit by the clock (interiors plan).
 - **Built** in Veilmouth by `VeilmouthSky`, a component that sets the sun or moon, sky, ambient light, haze, lamps and fog from the game clock (city plan §24.7). The moon is up 20:00–05:00 and fades in and out over an hour, so the night of the table begins with it already risen.
@@ -167,4 +170,4 @@ Wanted, with no stand-in until the models exist:
 |---|---|
 | The city | the kit's houses and palettes (§2–§4), the street surfaces, the light (§5), the mystic layer (§6) |
 | Interiors | Victorian Interiors, warm lamp light, the same period |
-| Outside the walls | Polytope's green trees and grass, farms from FantasyMedievalTown_LITE until Victorian ones exist, the same sky, moon and fog |
+| Outside the walls | Polytope's trees in olive (retinted, reference plan R3 step 8) and its grass, farms from FantasyMedievalTown_LITE until Victorian ones exist, the same sky, moon and fog |

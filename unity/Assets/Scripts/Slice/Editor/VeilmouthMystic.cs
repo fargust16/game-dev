@@ -93,11 +93,7 @@ namespace GameDev.Slice.EditorTools
 
             sun.shadows = LightShadows.Soft;
             sun.shadowStrength = 0.85f;
-            var day = Sky("Veilmouth_SkyDay", 1.1f, new Color(0.5f, 0.5f, 0.5f), new Color(0.37f, 0.35f, 0.34f), 0.9f, 0.035f);
-            // A thick dusk atmosphere strips the violet out and leaves yellow-green (first render): the default thickness.
-            var dusk = Sky("Veilmouth_SkyDusk", 0.9f, new Color(0.58f, 0.4f, 0.66f), new Color(0.3f, 0.22f, 0.24f), 1.05f, 0.05f);
-            var night = Sky("Veilmouth_SkyNight", 0.12f, new Color(0.25f, 0.3f, 0.5f), new Color(0.05f, 0.05f, 0.06f), 0.5f, 0.09f);
-
+            var (day, dusk, night) = Skies();
             Volume(root.transform, "Post", PostProfile(), 0);
             var twilight = Volume(root.transform, "Twilight", TwilightProfile(), 1);
             var lamps = Lamps(root.transform, out var glassUnlit, out var glassLit);
@@ -115,18 +111,60 @@ namespace GameDev.Slice.EditorTools
             return sky;
         }
 
+        /// <summary>
+        /// The reference look's sky and grade (reference plan R3 steps 4 and 7) written again into their assets, which the
+        /// saved scene's <see cref="VeilmouthSky"/> and volumes already hold: the scene itself is not touched. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthMystic.Relight
+        /// </summary>
+        [MenuItem("GameDev/Slice/Relight Veilmouth Sky and Grade")]
+        public static void Relight()
+        {
+            Directory.CreateDirectory(Folder);
+            Skies();
+            PostProfile();
+            TwilightProfile();
+            AssetDatabase.SaveAssets();
+            Debug.Log("[VeilmouthMystic] the painted skies and the grade written to their assets.");
+        }
+
         // ------------------------------------------------------------------------------------------------ sky
 
-        private static Material Sky(string name, float exposure, Color tint, Color ground, float thickness, float sunSize)
+        public const string SkyShader = "GameDev/Slice/Sky";
+
+        /// <summary>Free HDR Sky's two painted skies (owner, 2026-11-08: the sky packs already in the project).</summary>
+        private const string DayCube = "Assets/Skybox/Cubemaps/daytime.hdr", SunsetCube = "Assets/Skybox/Cubemaps/sunset.hdr";
+
+        /// <summary>
+        /// The day, dusk and night looks on the painted-sky shader. All three hold both cubemaps, so the clock blends their
+        /// numbers: by day the clouds of the day sky, washed toward grey and warmed; at dusk the sunset; by night the
+        /// sunset's clouds, dark and cool, under the crimson moon. Authoring defaults, in sRGB.
+        /// </summary>
+        private static (Material Day, Material Dusk, Material Night) Skies()
         {
-            var sky = Asset(name, () => new Material(Shader.Find("Skybox/Procedural")));
-            sky.SetFloat("_SunDisk", 2f);
-            sky.SetFloat("_Exposure", exposure);
-            sky.SetColor("_SkyTint", tint);
-            sky.SetColor("_GroundColor", ground);
-            sky.SetFloat("_AtmosphereThickness", thickness);
-            sky.SetFloat("_SunSize", sunSize);
-            sky.SetFloat("_SunSizeConvergence", 8f);
+            var day = Sky("Veilmouth_SkyDay", 0f, new Color(1f, 0.93f, 0.82f), 0.85f, new Color(1f, 0.9f, 0.85f), 1f, 0.22f, 0.18f, 0.9f);
+            var dusk = Sky("Veilmouth_SkyDusk", 1f, new Color(1f, 0.92f, 0.86f), 0.6f, new Color(1f, 0.88f, 0.82f), 1f, 0.6f, 0.15f, 0.8f);
+            var night = Sky("Veilmouth_SkyNight", 1f, new Color(0.6f, 0.65f, 0.9f), 0.02f, new Color(0.55f, 0.62f, 0.95f), 0.035f, 0.35f, 0.25f, 0.9f);
+            return (day, dusk, night);
+        }
+
+        private static Material Sky(string name, float blend, Color tintA, float exposureA, Color tintB, float exposureB,
+            float saturation, float hazeHeight, float hazeStrength)
+        {
+            var shader = Shader.Find(SkyShader);
+            var sky = Asset(name, () => new Material(shader));
+            sky.shader = shader;
+            sky.SetTexture("_TexA", AssetDatabase.LoadAssetAtPath<Cubemap>(DayCube));
+            sky.SetTexture("_TexB", AssetDatabase.LoadAssetAtPath<Cubemap>(SunsetCube));
+            sky.SetFloat("_Blend", blend);
+            sky.SetColor("_TintA", tintA);
+            sky.SetFloat("_ExposureA", exposureA);
+            sky.SetFloat("_RotationA", 0f);
+            sky.SetColor("_TintB", tintB);
+            sky.SetFloat("_ExposureB", exposureB);
+            sky.SetFloat("_RotationB", 0f); // turned by the clock behind the light (VeilmouthSky)
+            sky.SetFloat("_Saturation", saturation);
+            sky.SetFloat("_HazeHeight", hazeHeight);
+            sky.SetFloat("_HazeStrength", hazeStrength);
             EditorUtility.SetDirty(sky);
             return sky;
         }
@@ -181,14 +219,30 @@ namespace GameDev.Slice.EditorTools
             return volume;
         }
 
-        /// <summary>Bloom only, over the HDR highlights: the gas flames and the lit windows glow, nothing else changes.</summary>
+        /// <summary>
+        /// The grade under every hour (reference plan R3 step 7), graded in HDR: the Neutral tone mapper, colour taken down
+        /// toward the reference's muted range, highlights warm and shadows a little cool, and bloom over the HDR highlights
+        /// only, so the gas flames and the lit windows glow. Authoring defaults.
+        /// </summary>
         private static VolumeProfile PostProfile()
         {
             var profile = Profile("Veilmouth_Post");
             var bloom = Component<Bloom>(profile);
-            bloom.intensity.Override(0.6f);
-            bloom.threshold.Override(1.1f);
+            bloom.intensity.Override(0.5f);
+            bloom.threshold.Override(1.2f);
             bloom.scatter.Override(0.65f);
+            var tone = Component<Tonemapping>(profile);
+            tone.mode.Override(TonemappingMode.Neutral);
+            var colour = Component<ColorAdjustments>(profile);
+            colour.saturation.Override(-22f);
+            colour.contrast.Override(6f);
+            colour.colorFilter.Override(Color.white);
+            var split = Component<SplitToning>(profile);
+            split.shadows.Override(new Color(0.45f, 0.49f, 0.55f));
+            split.highlights.Override(new Color(0.62f, 0.55f, 0.45f));
+            split.balance.Override(10f);
+            var white = Component<WhiteBalance>(profile);
+            white.temperature.Override(2f); // the sun and the split toning carry the warmth; more turned cream stucco yellow
             return profile;
         }
 
@@ -202,7 +256,7 @@ namespace GameDev.Slice.EditorTools
             split.balance.Override(-15f);
             var colour = Component<ColorAdjustments>(profile);
             colour.colorFilter.Override(new Color(1f, 0.9f, 0.95f));
-            colour.saturation.Override(8f);
+            colour.saturation.Override(-8f); // muted with the day grade (reference plan R3); it was +8 before
             return profile;
         }
 

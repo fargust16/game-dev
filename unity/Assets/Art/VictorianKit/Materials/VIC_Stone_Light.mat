@@ -39,7 +39,7 @@ Material:
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
-    - _DirtAmount: 0.25
+    - _DirtAmount: 0.4
     - _DirtHeight: 2.5
     - _Metallic: 0
     - _MossAmount: 0.04
@@ -51,9 +51,9 @@ Material:
     - _ToneVar: 0.08
     - _WorldUV: 0
     m_Colors:
-    - _BaseColor: {r: 0.91428816, g: 0.88027793, b: 0.77824765, a: 1}
+    - _BaseColor: {r: 0.71022743, g: 0.68755406, b: 0.63087046, a: 1}
     - _DirtColor: {r: 0.35, g: 0.32, b: 0.28, a: 1}
     - _MossColor: {r: 0.2, g: 0.26, b: 0.1, a: 1}
-    - _Tint2: {r: 0.63087046, g: 0.59686047, b: 0.5288401, a: 1}
+    - _Tint2: {r: 0.50616676, g: 0.48349333, b: 0.43814653, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

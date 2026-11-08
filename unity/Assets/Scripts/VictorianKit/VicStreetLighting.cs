@@ -19,10 +19,11 @@ namespace GameDev.VictorianKit
         public ReflectionProbe[] Probes;
         [Range(0f, 1f)] public float Night;
 
-        // The project renders in Gamma colour space (ProjectSettings, measured 2026-11-08), so light multiplies gamma
-        // albedo directly: a sun of about 1 shows a facade in full sun near its material's look. Authoring defaults.
+        // The project renders in Linear colour space (owner, 2026-11-08; AGENTS.md *Colour space*): light multiplies
+        // linear albedo, so a sun of about 2 shows a facade in full sun near its material's look, twice the Gamma-era
+        // 1.05. A scene saved before the switch keeps its own value until it is rebuilt. Authoring defaults.
         public Color DaySun = new Color(1f, 0.96f, 0.9f);
-        public float DaySunIntensity = 1.05f;
+        public float DaySunIntensity = 2f;
         public Color DaySky = new Color(0.42f, 0.47f, 0.55f);
         public Color DayEquator = new Color(0.38f, 0.38f, 0.37f);
         public Color DayGround = new Color(0.22f, 0.2f, 0.18f);

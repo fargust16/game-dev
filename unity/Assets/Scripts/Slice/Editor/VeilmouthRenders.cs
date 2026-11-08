@@ -506,6 +506,251 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// The reference look's check (reference plan R3): five fixed views, the High Street, the Market Place, Bell
+        /// Street, the Ridge and the river, at 08:00, 16:00, 19:30 and 23:00, with the sky and the grade the player
+        /// sees; each view's four hours also go in one sheet at half size. The command-line argument
+        /// <c>-lookLabel name</c> prefixes the files, so a before and an after stand side by side. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderLook
+        /// </summary>
+        public static void RenderLook()
+        {
+            var label = Argument("-lookLabel") ?? "look";
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            if (sky == null)
+            {
+                Debug.LogError("[VeilmouthRenders] the scene has no VeilmouthSky: place the mystic layer first.");
+                return;
+            }
+
+            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            var street = VeilmouthScene.StreetLevel;
+            var views = new (string Name, Vector3 From, Vector3 To)[]
+            {
+                ("highstreet", Ground(-10f, -235f, 1.7f), Ground(100f, -235f, 3f)),
+                ("market", Ground(54f, -248f, 1.7f), Ground(100f, -282f, 2f)),
+                ("bellstreet", Ground(195f, -278f, 1.7f), Ground(100f, -278f, 2.5f)),
+                ("ridge", Ground(0f, -174f, 1.7f), Ground(120f, -174f, 3f)),
+                // From the High Street's bridge down the River Veil toward the basin and the sea; the eye stands at a
+                // fixed height over the parapet, since the ground under a bridge is the riverbed.
+                ("river", new Vector3(300f, street + 7f, -232f), new Vector3(300f, street - 2f, -330f)),
+            };
+            var hours = new[] { (8 * 60, "0800"), (16 * 60, "1600"), ((19 * 60) + 30, "1930"), (23 * 60, "2300") };
+            _skyAndGrade = true;
+            try
+            {
+                // The first picture after opening the scene is drawn before every texture has loaded: one to waste.
+                sky.Apply(hours[0].Item1);
+                Eye("look_warmup", views[0].From, views[0].To);
+                File.Delete($"{OutputFolder}/look_warmup.png");
+                foreach (var (minute, hour) in hours)
+                {
+                    sky.Apply(minute);
+                    foreach (var fog in Object.FindObjectsByType<ParticleSystem>(FindObjectsSortMode.None))
+                    {
+                        fog.Simulate(30f, true, true);
+                    }
+
+                    foreach (var view in views)
+                    {
+                        Eye($"{label}_{view.Name}_{hour}", view.From, view.To);
+                    }
+                }
+
+                foreach (var view in views)
+                {
+                    Grid($"{label}_{view.Name}", hours.Select(h => $"{OutputFolder}/{label}_{view.Name}_{h.Item2}.png").ToArray(), 2);
+                }
+            }
+            finally
+            {
+                _skyAndGrade = false;
+            }
+
+            Debug.Log($"[VeilmouthRenders] the reference look's views written to {OutputFolder} as {label}_*.");
+        }
+
+        /// <summary>
+        /// The project's painted skies (Free HDR Sky) seen from an empty scene: north, east, south, west at 10° up and
+        /// straight up, so the sun and the horizon can be found before the sky is set by the clock. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderSkies
+        /// </summary>
+        public static void RenderSkies()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            foreach (var path in new[] { "Assets/Skybox/Materials/Skybox_Daytime.mat", "Assets/Skybox/Materials/Skybox_Sunset.mat" })
+            {
+                RenderSettings.skybox = AssetDatabase.LoadAssetAtPath<Material>(path);
+                var name = Path.GetFileNameWithoutExtension(path).ToLowerInvariant();
+                var files = new System.Collections.Generic.List<string>();
+                foreach (var (dir, yaw, pitch) in new[] { ("n", 0f, -10f), ("e", 90f, -10f), ("s", 180f, -10f), ("w", 270f, -10f), ("up", 0f, -90f) })
+                {
+                    var camera = new GameObject("SkyCamera").AddComponent<Camera>();
+                    camera.clearFlags = CameraClearFlags.Skybox;
+                    camera.fieldOfView = 90f;
+                    camera.transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+                    Shoot(camera, $"sky_{name}_{dir}", 800, 800);
+                    files.Add($"{OutputFolder}/sky_{name}_{dir}.png");
+                }
+
+                SideBySide($"sky_{name}", files.ToArray());
+            }
+
+            Debug.Log($"[VeilmouthRenders] the painted skies written to {OutputFolder} as sky_*.");
+        }
+
+        /// <summary>
+        /// The palette sheet (reference plan R3 step 2): a swatch of every kit material and of the retinted leaves, in
+        /// rows, facing Veilmouth's noon sun under its sky and grade, high over the city where nothing shades them. Each
+        /// swatch's mean colour is measured from the picture, and its value and saturation (HSV of the sRGB mean) go to
+        /// <c>palette.txt</c>, with a mark on any above 40 %. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderPalette
+        /// </summary>
+        public static void RenderPalette()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            if (sky == null)
+            {
+                Debug.LogError("[VeilmouthRenders] the scene has no VeilmouthSky: place the mystic layer first.");
+                return;
+            }
+
+            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            sky.Apply(12 * 60);
+            var swatches = GameDev.VictorianKit.EditorTools.VicMaterials.Names.Where(n => !n.StartsWith("Glass"))
+                .Select(n => (Name: n, Material: GameDev.VictorianKit.EditorTools.VicMaterials.Load(n)))
+                .Concat(AssetDatabase.FindAssets("t:Material", new[] { VeilmouthLook.Folder }).Select(AssetDatabase.GUIDToAssetPath)
+                    .Select(p => (Name: Path.GetFileNameWithoutExtension(p), Material: AssetDatabase.LoadAssetAtPath<Material>(p))))
+                .Where(s => s.Material != null).ToList();
+
+            // The board faces the sun across the ground, so every swatch takes the same light, as a sunlit wall does.
+            var sun = Object.FindObjectsByType<Light>(FindObjectsSortMode.None).First(l => l.type == LightType.Directional && l.enabled && l.intensity > 0f);
+            var toSun = -sun.transform.forward;
+            toSun.y = 0f;
+            toSun.Normalize();
+            var facing = Quaternion.LookRotation(-toSun);
+            var right = facing * Vector3.right;
+            const int columns = 6;
+            const float size = 1.6f, step = 2f;
+            var rows = (swatches.Count + columns - 1) / columns;
+            var centre = new Vector3(100f, VeilmouthScene.StreetLevel + 150f, -250f);
+            var at = new Vector3[swatches.Count];
+            var board = new GameObject("PaletteBoard");
+            for (var k = 0; k < swatches.Count; k++)
+            {
+                at[k] = centre + (right * ((k % columns) - ((columns - 1) * 0.5f)) * step) + (Vector3.up * (((rows - 1) * 0.5f) - (k / columns)) * step);
+                var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                quad.name = swatches[k].Name;
+                quad.transform.SetParent(board.transform);
+                quad.transform.SetPositionAndRotation(at[k], facing);
+                quad.transform.localScale = new Vector3(size, size, 1f);
+                quad.GetComponent<Renderer>().sharedMaterial = swatches[k].Material;
+            }
+
+            _skyAndGrade = true;
+            try
+            {
+                for (var pass = 0; pass < 2; pass++) // the first picture is drawn before every texture has loaded
+                {
+                    var camera = Make();
+                    camera.fieldOfView = 40f;
+                    camera.aspect = 16f / 9f;
+                    camera.farClipPlane = 1500f;
+                    camera.transform.SetPositionAndRotation(centre + (toSun * 12f), facing);
+                    var rects = at.Select(p => (Lo: camera.WorldToViewportPoint(p - (right * size * 0.3f) - (Vector3.up * size * 0.3f)), Hi: camera.WorldToViewportPoint(p + (right * size * 0.3f) + (Vector3.up * size * 0.3f)))).ToArray();
+                    Shoot(camera, "palette", 1600, 900);
+                    if (pass == 0)
+                    {
+                        continue;
+                    }
+
+                    var image = new Texture2D(2, 2);
+                    image.LoadImage(File.ReadAllBytes($"{OutputFolder}/palette.png"));
+                    var report = new System.Text.StringBuilder("material\tvalue\tsaturation\tsRGB mean\n");
+                    for (var k = 0; k < swatches.Count; k++)
+                    {
+                        var sum = Vector3.zero;
+                        var n = 0;
+                        for (var y = (int)(rects[k].Lo.y * image.height); y < (int)(rects[k].Hi.y * image.height); y++)
+                        {
+                            for (var x = (int)(rects[k].Lo.x * image.width); x < (int)(rects[k].Hi.x * image.width); x++)
+                            {
+                                var c = image.GetPixel(x, y);
+                                sum += new Vector3(Mathf.GammaToLinearSpace(c.r), Mathf.GammaToLinearSpace(c.g), Mathf.GammaToLinearSpace(c.b));
+                                n++;
+                            }
+                        }
+
+                        var mean = new Color(Mathf.LinearToGammaSpace(sum.x / n), Mathf.LinearToGammaSpace(sum.y / n), Mathf.LinearToGammaSpace(sum.z / n));
+                        Color.RGBToHSV(mean, out _, out var s, out var v);
+                        report.Append($"{swatches[k].Name}\t{v:0.00}\t{s:0.00}{(s > 0.4f ? " OVER 40 %" : string.Empty)}\t({mean.r:0.00}, {mean.g:0.00}, {mean.b:0.00})\n");
+                    }
+
+                    Object.DestroyImmediate(image);
+                    File.WriteAllText($"{OutputFolder}/palette.txt", report.ToString());
+                    Debug.Log($"[VeilmouthRenders] palette sheet, left to right and top to bottom:\n{report}");
+                }
+            }
+            finally
+            {
+                _skyAndGrade = false;
+                Object.DestroyImmediate(board);
+            }
+        }
+
+        /// <summary>A point <paramref name="up"/> metres above Veilmouth's ground at (x, z).</summary>
+        private static Vector3 Ground(float x, float z, float up)
+        {
+            var terrain = Terrain.activeTerrain;
+            return new Vector3(x, terrain.SampleHeight(new Vector3(x, 0f, z)) + terrain.transform.position.y + up, z);
+        }
+
+        /// <summary>The value after <paramref name="name"/> on the command line, or null.</summary>
+        private static string Argument(string name)
+        {
+            var args = System.Environment.GetCommandLineArgs();
+            var i = System.Array.IndexOf(args, name);
+            return i >= 0 && i + 1 < args.Length ? args[i + 1] : null;
+        }
+
+        /// <summary>Pictures of one size at half size in a grid of <paramref name="columns"/>, left to right and top to bottom.</summary>
+        private static void Grid(string name, string[] files, int columns)
+        {
+            var parts = files.Select(f =>
+            {
+                var t = new Texture2D(2, 2);
+                t.LoadImage(File.ReadAllBytes(f));
+                return t;
+            }).ToArray();
+            int w = parts[0].width / 2, h = parts[0].height / 2, rows = (parts.Length + columns - 1) / columns;
+            var sheet = new Texture2D(w * columns, h * rows, TextureFormat.RGB24, false);
+            for (var k = 0; k < parts.Length; k++)
+            {
+                var ox = (k % columns) * w;
+                var oy = (rows - 1 - (k / columns)) * h; // the first picture at the top left
+                for (var y = 0; y < h; y++)
+                {
+                    for (var x = 0; x < w; x++)
+                    {
+                        sheet.SetPixel(ox + x, oy + y, parts[k].GetPixelBilinear((x + 0.5f) / w, (y + 0.5f) / h));
+                    }
+                }
+
+                Object.DestroyImmediate(parts[k]);
+            }
+
+            sheet.Apply();
+            File.WriteAllBytes($"{OutputFolder}/{name}.png", sheet.EncodeToPNG());
+            Object.DestroyImmediate(sheet);
+        }
+
+        /// <summary>
         /// The same street views at noon at the quality level the editor used to play at (Very Low) and at the one the
         /// editor and the game use now (High; reference plan R2, step 1), left and right in one picture. Batch:
         /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderQuality

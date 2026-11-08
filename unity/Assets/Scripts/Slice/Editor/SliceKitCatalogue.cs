@@ -634,6 +634,7 @@ namespace GameDev.Slice.EditorTools
                 SliceUrpMaterials.Apply(model, spec.Pack);
             }
 
+            VeilmouthLook.Retint(model); // the reference look's olive leaves (reference plan R3 step 8)
             model.transform.localRotation = Quaternion.Euler(0f, spec.ModelYaw, 0f) * model.transform.localRotation;
             var things = new List<(GameObject Thing, string File)>();
             if (spec.On != null)

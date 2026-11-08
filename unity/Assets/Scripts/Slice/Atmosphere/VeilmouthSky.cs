@@ -11,7 +11,8 @@ namespace GameDev.Slice.Atmosphere
     /// <summary>
     /// Veilmouth's sky from the game clock (WORLD_STYLE_GUIDE §5, §6.1; city plan §24.5). One directional light is the
     /// sun by day and the crimson moon by night, low over the sea in the south-east; the sky blends day, dusk and night
-    /// materials; the ambient light, a thin distance haze and the twilight grade follow the hour; the gas lamps burn
+    /// materials of the painted skies (reference plan R3: Free HDR Sky's day and sunset on <c>GameDev/Slice/Sky</c>);
+    /// the ambient light, the distance haze and the twilight grade follow the hour; the gas lamps burn
     /// from 19:00 (<see cref="InteriorLighting.LampsLit"/>); the low fog banks thicken by night; and the kit's window
     /// shader reads the night from <see cref="VicStreetLighting.NightId"/>.
     /// <para>
@@ -33,17 +34,34 @@ namespace GameDev.Slice.Atmosphere
 
         // The sun rises at 05:00 and sets at 20:00, as InteriorLighting's daylight; the moon rules 20:00–05:00.
         private const int Sunrise = 5 * 60, Sunset = 20 * 60, Night = 9 * 60;
-        private const float SunHighest = 48f, MoonLow = 6f, MoonClimb = 22f;
+        // A lower sun than before (reference plan R3 step 6): the reference's long light, golden from 15:00.
+        private const float SunHighest = 42f, MoonLow = 6f, MoonClimb = 22f;
+        private const int GoldenFrom = 15 * 60, GoldenFull = 19 * 60, MorningGolden = 8 * 60;
 
-        private static readonly Color DaySun = new(1f, 0.96f, 0.9f), LowSun = new(1f, 0.62f, 0.38f);
-        private static readonly Color Moon = new(0.85f, 0.18f, 0.16f);
-        private const float SunIntensity = 1.05f, MoonIntensity = 0.3f;
+        private static readonly Color DaySun = new(1f, 0.93f, 0.82f), LowSun = new(1f, 0.62f, 0.36f);
+        // The moon's light is a soft red, less saturated than its disc: in Linear a pure red light floods the streets.
+        private static readonly Color Moon = new(0.85f, 0.3f, 0.26f);
 
-        private static readonly Color[] Sky = { new(0.42f, 0.47f, 0.55f), new(0.42f, 0.34f, 0.48f), new(0.05f, 0.07f, 0.12f) };
-        private static readonly Color[] Equator = { new(0.38f, 0.38f, 0.37f), new(0.45f, 0.32f, 0.28f), new(0.04f, 0.045f, 0.06f) };
-        private static readonly Color[] Ground = { new(0.22f, 0.2f, 0.18f), new(0.16f, 0.13f, 0.14f), new(0.02f, 0.02f, 0.025f) };
-        private static readonly Color[] Haze = { new(0.62f, 0.66f, 0.7f), new(0.46f, 0.38f, 0.5f), new(0.03f, 0.035f, 0.05f) };
-        private static readonly float[] HazeDensity = { 0.0016f, 0.0024f, 0.003f };
+        // The project renders in Linear (owner, 2026-11-08, VS-COLOR): light adds in linear space, so the sun is about
+        // twice the Gamma-era 1.05 to light a facade near its material's look, and the ambient colours below, given in
+        // sRGB, act as before on surfaces in shade. The moon gives shape, not reading light (WORLD_STYLE_GUIDE §5), so
+        // it is a third of its Gamma-era 0.45. Authoring defaults.
+        private const float SunIntensity = 2f, MoonIntensity = 0.15f, NightReflection = 0.12f;
+
+        // [day, dusk, night], sRGB: warm greys by day, rose and umber at dusk, a dark blue-grey night (reference plan R3).
+        private static readonly Color[] Sky = { new(0.5f, 0.51f, 0.53f), new(0.46f, 0.39f, 0.44f), new(0.06f, 0.065f, 0.09f) };
+        private static readonly Color[] Equator = { new(0.47f, 0.45f, 0.41f), new(0.5f, 0.38f, 0.31f), new(0.045f, 0.045f, 0.055f) };
+        private static readonly Color[] Ground = { new(0.27f, 0.24f, 0.21f), new(0.2f, 0.16f, 0.14f), new(0.02f, 0.02f, 0.025f) };
+
+        /// <summary>
+        /// The distance haze [day, dusk, night]: exponential, about 7 % at 60 m and 30 % at 300 m by day, so the far
+        /// roofs fade as in the reference; the painted sky takes the same colour over its horizon.
+        /// </summary>
+        private static readonly Color[] Haze = { new(0.71f, 0.69f, 0.64f), new(0.6f, 0.49f, 0.45f), new(0.045f, 0.05f, 0.065f) };
+        private static readonly float[] HazeDensity = { 0.0012f, 0.0016f, 0.0022f };
+
+        /// <summary>Where the sunset cubemap's painted sun stands with no turn, degrees from north toward east (RenderSkies).</summary>
+        private const float SunsetSunYaw = 315f;
 
         /// <summary>
         /// The low fog's colour and opacity [day, dusk, night]: pale and thin by day, violet at dusk, a dark blue-grey
@@ -67,7 +85,7 @@ namespace GameDev.Slice.Atmosphere
         /// <summary>The moon's distance from the eye, m: inside the player camera's 1000 m far plane, beyond every street.</summary>
         public const float MoonDistance = 800f;
 
-        private static readonly int SunDisk = Shader.PropertyToID("_SunDisk");
+        private static readonly int RotationB = Shader.PropertyToID("_RotationB");
 
         private Material _sky;
         private int _shown = -1;
@@ -148,15 +166,19 @@ namespace GameDev.Slice.Atmosphere
             Color Blend(Color[] c) => Color.Lerp(c[from], c[to], t);
 
             SunAndMoon(minute, day);
-            Skybox(from, to, t);
+            Skybox(from, to, t, minute);
             RenderSettings.ambientMode = AmbientMode.Trilight;
             RenderSettings.ambientSkyColor = Blend(Sky);
             RenderSettings.ambientEquatorColor = Blend(Equator);
             RenderSettings.ambientGroundColor = Blend(Ground);
             RenderSettings.fog = true;
-            RenderSettings.fogMode = FogMode.ExponentialSquared;
+            RenderSettings.fogMode = FogMode.Exponential;
             RenderSettings.fogColor = Blend(Haze);
             RenderSettings.fogDensity = Mathf.Lerp(HazeDensity[from], HazeDensity[to], t);
+
+            // The environment reflection holds the day sky, so glossy surfaces and the water dim with the light, as
+            // the kit's street probes do (VicStreetLighting).
+            RenderSettings.reflectionIntensity = Mathf.Lerp(NightReflection, 1f, day);
             Shader.SetGlobalFloat(VicStreetLighting.NightId, 1f - day);
             if (twilight != null)
             {
@@ -182,8 +204,7 @@ namespace GameDev.Slice.Atmosphere
                 var f = (minute - Sunrise) / (float)(Sunset - Sunrise);
                 elevation = SunHighest * Mathf.Sin(Mathf.PI * f);
                 azimuth = Mathf.Lerp(80f, 280f, f);
-                var low = Mathf.Clamp01(1f - (elevation / 25f));
-                sun.color = Color.Lerp(DaySun, LowSun, low * low);
+                sun.color = Color.Lerp(DaySun, LowSun, Golden(minute));
                 sun.intensity = SunIntensity * day;
             }
             else
@@ -201,7 +222,33 @@ namespace GameDev.Slice.Atmosphere
             RenderSettings.sun = sun;
         }
 
-        private void Skybox(int from, int to, float t)
+        /// <summary>
+        /// How golden the sun is, 0–1: from 15:00 it warms toward the low sun by 19:00, and in the morning it is golden
+        /// at sunrise and white again by 08:00 (reference plan R3 step 6).
+        /// </summary>
+        private static float Golden(int minute)
+        {
+            var evening = Mathf.InverseLerp(GoldenFrom, GoldenFull, minute);
+            var morning = 1f - Mathf.InverseLerp(Sunrise, MorningGolden, minute);
+            return Mathf.SmoothStep(0f, 1f, Mathf.Max(evening, morning));
+        }
+
+        /// <summary>
+        /// The way the light comes from, degrees from north toward east, carried on through the night so it never jumps:
+        /// the sun's 80°–280° by day, then on round through the north to 440° (80°) by sunrise. The sunset cubemap turns
+        /// with it, so its painted sun stands behind the low sun at dusk.
+        /// </summary>
+        private static float LightTrack(int minute)
+        {
+            if (minute >= Sunrise && minute <= Sunset)
+            {
+                return Mathf.Lerp(80f, 280f, (minute - Sunrise) / (float)(Sunset - Sunrise));
+            }
+
+            return Mathf.Lerp(280f, 440f, ((minute - Sunset + 1440) % 1440) / (float)Night);
+        }
+
+        private void Skybox(int from, int to, float t, int minute)
         {
             var looks = new[] { daySky, duskSky, nightSky };
             if (looks[from] == null || looks[to] == null)
@@ -214,22 +261,9 @@ namespace GameDev.Slice.Atmosphere
                 _sky = new Material(daySky) { name = "Veilmouth Sky (live)", hideFlags = HideFlags.DontSave };
             }
 
+            // The looks share the two cubemaps, so blending their numbers blends the sky; the moon is its own quad.
             _sky.Lerp(looks[from], looks[to], t);
-
-            // The sky's own disc follows the one directional light, and would burn white where the moon stands: by
-            // night the disc is off and the moon is its own quad, red and a little too large (style guide §6.1).
-            _sky.SetFloat(SunDisk, _moonUp ? 0f : 2f);
-            if (_moonUp)
-            {
-                _sky.DisableKeyword("_SUNDISK_HIGH_QUALITY");
-                _sky.EnableKeyword("_SUNDISK_NONE");
-            }
-            else
-            {
-                _sky.DisableKeyword("_SUNDISK_NONE");
-                _sky.EnableKeyword("_SUNDISK_HIGH_QUALITY");
-            }
-
+            _sky.SetFloat(RotationB, Mathf.Repeat(LightTrack(minute) - SunsetSunYaw, 360f));
             RenderSettings.skybox = _sky;
         }
 
