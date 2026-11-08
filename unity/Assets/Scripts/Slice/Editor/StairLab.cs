@@ -101,7 +101,25 @@ namespace GameDev.Slice.EditorTools
             System.IO.Directory.CreateDirectory("Assets/Scenes/Slice/Lab");
             EditorSceneManager.SaveScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene(), LabScene);
             Joints(root, "lab_villa");
+            Views(root);
             Debug.Log($"[StairLab] the lab villa built and saved, {faults.Count} kit faults.");
+        }
+
+        /// <summary>
+        /// The wells as a player sees them, at eye height (1.6 m) on each upper floor: over the gallery's rails into the
+        /// well, along the side where the next flight climbs, and from above (owner, VI-8 third remarks). The lab villa's
+        /// wells: the first over x 9–15, z 3–6 on the first floor (3.5 m), the second over x 9–15, z 6–9 on the second (7 m).
+        /// </summary>
+        private static void Views(Transform root)
+        {
+            Vector3 P(float x, float y, float z) => root.TransformPoint(x, y, z);
+            Shot("lab_view_well1_over", P(12f, 5.1f, 1.4f), P(12f, 3.2f, 4.5f));
+            Shot("lab_view_well1_flight", P(7.6f, 5.1f, 7.2f), P(12.5f, 3.3f, 5.6f));
+            Shot("lab_view_well1_flight_east", P(16.6f, 5.1f, 7.4f), P(12f, 3.3f, 5.6f));
+            Shot("lab_view_well1_top", P(12f, 6.6f, 1.6f), P(12f, 3.4f, 4.6f));
+            Shot("lab_view_well1_edge", P(12.4f, 4.3f, 2.3f), P(12.4f, 3.3f, 3.4f));
+            Shot("lab_view_well2_over", P(12f, 8.6f, 10.6f), P(12f, 6.7f, 7.5f));
+            Shot("lab_view_well2_edge", P(12.4f, 7.8f, 9.7f), P(12.4f, 6.8f, 8.6f));
         }
 
         /// <summary>

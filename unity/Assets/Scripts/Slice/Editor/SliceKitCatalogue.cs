@@ -294,6 +294,18 @@ namespace GameDev.Slice.EditorTools
             var angel = S("AngelStatue", "Street", "AngelStatue", Tripo, "angel_statue_3d_model_1", st);
             angel.SizeY = 2.2f;
             yield return angel;
+            // The owner's second set (2026-11-08): two more angels of other proportions, so the city's three differ, and a
+            // great marble lion, shown at the palace as the crown's power (city plan §23). Authoring defaults: the angels
+            // 2.6 and 2.4 m with their bases, the lion 3.5 m, a monument over a man's head.
+            var angelB = S("AngelStatueB", "Street", "AngelStatueB", Tripo, "angel_statue_3d_model", st);
+            angelB.SizeY = 2.6f;
+            yield return angelB;
+            var angelC = S("AngelStatueC", "Street", "AngelStatueC", Tripo, "angel_statue_3d_model_2", st);
+            angelC.SizeY = 2.4f;
+            yield return angelC;
+            var lion = S("LionStatue", "Street", "LionStatue", Tripo, "marble_lion_statue_3d_model", st);
+            lion.SizeY = 3.5f;
+            yield return lion;
 
             // Trees, herbs, and flax (Stylized Trees Pack); a fellable tree is a resource node, the others are cover.
             foreach (var n in new[] { "Birch 001", "Birch 002", "Birch 003", "Warped 001", "Warped 002", "Warped 003" })

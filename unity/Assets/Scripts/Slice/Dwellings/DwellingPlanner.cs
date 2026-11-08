@@ -296,18 +296,17 @@ namespace GameDev.Slice.Dwellings
         /// <summary>
         /// Each well's stair on the storey below and its balustrades round the well (VI-3, plan §8): the stair climbs from
         /// one metre under the floor before the well to the module line at its far end; balustrades guard the well's long
-        /// sides, unless the next flight stands there, and its low end. The stair, the well and the balustrades block the
+        /// sides and its low end, also beside the next flight: narrowed (ViStairNarrow), that flight stands 0.23 m in from
+        /// the well's edge, which its own rail no longer closed (owner, VI-8 third remarks: holes in the floor beside it). The stair, the well and the balustrades block the
         /// way; the stair's foot and head stay clear and are ways in and out of their rooms (rules G1).
         /// </summary>
         private static void Stairs(DwellingPlan plan, List<Room> rooms)
         {
-            var stairs = new List<(RectInt Cells, int Level)>();
             foreach (var w in plan.Wells)
             {
                 var below = w.Level - 1;
                 var x = w.ClimbsEast ? w.X - 1 : w.X;
                 var cells = new RectInt(x, w.Z, 7, DwellingWell.Depth);
-                stairs.Add((cells, below));
                 plan.Furniture.Add(new Placement(StairKey, PlacementMode.Put, x, w.Z, w.ClimbsEast ? 1 : 3, N, 0, 0, 0f, false, below, "Stair"));
                 Keep(rooms, cells, below, true, false);
                 Keep(rooms, new RectInt(w.ClimbsEast ? x - 1 : x + 7, w.Z, 1, DwellingWell.Depth), below, false, true); // its foot
@@ -322,24 +321,19 @@ namespace GameDev.Slice.Dwellings
             foreach (var w in plan.Wells)
             {
                 var low = new RectInt(w.ClimbsEast ? w.X - 1 : w.X + DwellingWell.Width, w.Z, 1, DwellingWell.Depth);
-                Balustrade(plan, rooms, stairs, low, w.ClimbsEast ? 1 : 3, w.Level);
+                Balustrade(plan, rooms, low, w.ClimbsEast ? 1 : 3, w.Level);
                 foreach (var (z, turns) in new[] { (w.Z - 1, 0), (w.Z + DwellingWell.Depth, 2) })
                 {
                     for (var x = w.X; x < w.X + DwellingWell.Width; x += M)
                     {
-                        Balustrade(plan, rooms, stairs, new RectInt(x, z, M, 1), turns, w.Level);
+                        Balustrade(plan, rooms, new RectInt(x, z, M, 1), turns, w.Level);
                     }
                 }
             }
         }
 
-        private static void Balustrade(DwellingPlan plan, List<Room> rooms, List<(RectInt Cells, int Level)> stairs, RectInt cells, int turns, int level)
+        private static void Balustrade(DwellingPlan plan, List<Room> rooms, RectInt cells, int turns, int level)
         {
-            if (stairs.Any(s => s.Level == level && s.Cells.Overlaps(cells)))
-            {
-                return; // the next flight's own rail guards that side
-            }
-
             plan.Furniture.Add(new Placement(BalustradeKey, PlacementMode.Put, cells.x, cells.y, turns, N, 0, 0, 0f, false, level, "Balustrade"));
             Keep(rooms, cells, level, true, false);
         }

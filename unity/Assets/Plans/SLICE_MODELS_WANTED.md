@@ -1,10 +1,10 @@
 # Slice Models Wanted
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft
 
-Last Updated: 2026-11-08 (the city: a statue in a square is covered for now by the owner's angel in Wardley Garden; fountains to come from the owner. Earlier: *Interior detail*: the props that would fill the interiors with life, room by room, asked by the owner after play test VI-8; a low pub partition. Earlier: Interiors: a fixed wall bench or settle, an upright piano and a stage platform, which the furnishing rules §8 and the Soot & Bell's pub plan need (VI-7). Earlier: Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
+Last Updated: 2026-11-08 (the city: statues covered by the owner's three angels and two lions at the palace. Earlier: the city: a statue in a square is covered for now by the owner's angel in Wardley Garden; fountains to come from the owner. Earlier: *Interior detail*: the props that would fill the interiors with life, room by room, asked by the owner after play test VI-8; a low pub partition. Earlier: Interiors: a fixed wall bench or settle, an upright piano and a stage platform, which the furnishing rules §8 and the Soot & Bell's pub plan need (VI-7). Earlier: Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
 
 Depends On: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §8 and §14, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -180,7 +180,7 @@ The owner asked on 2026-11-06 which things would make the city read as lived in:
 | Rubbish heaps, broken crates, puddles and soot as decals | Lower Veil, lanes | — | C | Poverty read from the ground |
 | Pigeons and crows, stray dogs and cats, rats | Squares, roofs, lanes | — | C | Rigged animals: a pack, not Tripo |
 | Horse-drawn cab and carriage, with a horse | Crown Avenue, the High Street | 4 × 2 × 2.5 | C | Rigged; parked ones first |
-| Bandstand or gazebo, fountain, statue on a plinth | A square, the Palace Forecourt | 6 × 6 × 5 | C | Row 22 of the asset map. A statue: the owner's angel pouring water stands in Wardley Garden, and birdbaths in gardens (city plan §23, 2026-11-08); fountains and more statues to come from the owner |
+| Bandstand or gazebo, fountain, statue on a plinth | A square, the Palace Forecourt | 6 × 6 × 5 | C | Row 22 of the asset map. Statues: the owner's three angels stand in Wardley Garden, the graveyard and an east villa's garden, two marble lions at the Palace Forecourt, and birdbaths in gardens (city plan §23, 2026-11-08); fountains to come from the owner |
 | Flower bed or urn | Gardens, the Palace Forecourt | 1 × 1 × 0.8 | C | |
 | Ivy and moss on walls, as decals | The Ridge's gardens, the old chapel | — | C | |
 
