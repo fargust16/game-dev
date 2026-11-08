@@ -41,8 +41,10 @@ namespace GameDev.VictorianKit.EditorTools
 
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             var lighting = Lighting();
+            VicRooms.Report.Clear();
             var rich = Street("Street_Rich", VicHousePlans.RichStreet(), 0f);
             var poor = Street("Street_Poor", VicHousePlans.PoorStreet(), PoorZ);
+            File.WriteAllLines(Path.Combine(VicKitPaths.LogFolder, "rooms.txt"), VicRooms.Report.Concat(VicRooms.SizeReport()));
             Ground();
             var probes = new List<ReflectionProbe>
             {
@@ -79,6 +81,7 @@ namespace GameDev.VictorianKit.EditorTools
                 go.transform.SetParent(root.transform, false);
                 go.transform.localPosition = new Vector3(spec.X, 0f, 0f);
                 MarkStatic(go);
+                VicRooms.Build(spec, go.transform); // the rooms behind the glass (§4.4)
             }
 
             return root;
@@ -311,10 +314,25 @@ namespace GameDev.VictorianKit.EditorTools
             VicShots.Eye("street_poor_roofs", new Vector3(43f, 32f, z - 28f), new Vector3(43f, 6f, z + 3f), 50f);
             VicShots.Eye("street_poor_close", new Vector3(26f, 2f, z - 7f), new Vector3(36f, 4f, z + 1f), 60f);
 
+            // The rooms behind the glass (§4.4): close looks through the windows and plan sections of each storey.
+            VicShots.Eye("rooms_rich_R1_ground", new Vector3(3f, 1.9f, -4.5f), new Vector3(3f, 1.7f, 4f), 55f);
+            VicShots.Eye("rooms_rich_R2_first", new Vector3(33f, 4.8f, -5.5f), new Vector3(33f, 4.4f, 4f), 50f);
+            VicShots.Eye("rooms_rich_R3_ground", new Vector3(54f, 1.9f, -4.5f), new Vector3(54f, 1.7f, 4f), 55f);
+            VicShots.Eye("rooms_poor_P2", new Vector3(15f, 2.2f, z - 4.5f), new Vector3(15f, 2.0f, z + 3f), 55f);
+            VicShots.Eye("rooms_poor_P4", new Vector3(28f, 1.9f, z - 4f), new Vector3(28f, 1.6f, z + 3f), 55f);
+            VicShots.Eye("rooms_poor_P8", new Vector3(80f, 4.6f, z - 5f), new Vector3(80f, 4.2f, z + 3f), 55f);
+            for (var storey = 0; storey < 3; storey++)
+            {
+                var cut = (float)VicKit.FloorZ(storey) + 2.2f;
+                VicShots.Section($"plan_rich_{storey}", new Vector3(31f, 0f, 6f), cut, 34f);
+                VicShots.Section($"plan_poor_{storey}", new Vector3(45f, 0f, z + 3f), cut, 48f);
+            }
+
             lighting.Night = 1f;
             lighting.Apply();
             VicShots.Eye("street_rich_night", new Vector3(-6f, 1.7f, -9f), new Vector3(40f, 6f, 2f), 60f);
             VicShots.Eye("street_poor_night", new Vector3(-6f, 1.7f, z - 9f), new Vector3(50f, 5f, z + 2f), 60f);
+            VicShots.Eye("rooms_rich_night", new Vector3(33f, 4.8f, -5.5f), new Vector3(33f, 4.4f, 4f), 50f);
             lighting.Night = 0f;
             lighting.Apply();
         }

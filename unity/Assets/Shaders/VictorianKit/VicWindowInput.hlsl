@@ -21,6 +21,9 @@ half _LitFraction;
 half4 _NightColor;
 half _NightIntensity;
 half4 _CurtainColor;
+half _Transmit;
+half _RoomNear;
+half _RoomFar;
 CBUFFER_END
 
 TEXTURE2D(_MaskMap);

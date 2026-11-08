@@ -16,6 +16,9 @@ namespace GameDev.VictorianKit.EditorTools
         /// <summary>The plan's outline kind, for the rule that neighbours differ: "U", "L oriel", "8x4" …</summary>
         public string PlanKind;
 
+        /// <summary>The footprint on the 2 m grid, which the rooms behind the windows are cut from (VicRooms).</summary>
+        public VicPlan Plan;
+
         /// <summary>The roof's highest line above the ground, metres.</summary>
         public double Ridge;
 
@@ -340,6 +343,7 @@ namespace GameDev.VictorianKit.EditorTools
                 Roof = roof,
                 House = h,
                 PlanKind = kind,
+                Plan = plan,
                 Ridge = ridge,
             };
         }

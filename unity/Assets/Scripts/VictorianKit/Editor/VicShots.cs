@@ -29,6 +29,23 @@ namespace GameDev.VictorianKit.EditorTools
             Shoot(camera, name, size, size);
         }
 
+        /// <summary>A plan section: an orthographic view straight down from height <paramref name="cut"/>, seeing only what lies below it.</summary>
+        public static void Section(string name, Vector3 centre, float cut, float half, int size = 1200)
+        {
+            var camera = Make();
+            camera.orthographic = true;
+            camera.orthographicSize = half;
+            camera.transform.SetPositionAndRotation(new Vector3(centre.x, cut, centre.z), Quaternion.LookRotation(Vector3.down, Vector3.forward));
+            camera.nearClipPlane = 0.01f;
+            camera.farClipPlane = cut + 2f;
+
+            // The rooms behind the windows cull by screen size, which an orthographic view of a whole street falls under.
+            var bias = QualitySettings.lodBias;
+            QualitySettings.lodBias = 1000f;
+            Shoot(camera, name, size, size);
+            QualitySettings.lodBias = bias;
+        }
+
         private static Camera Make()
         {
             var camera = new GameObject("VicShotCamera").AddComponent<Camera>();

@@ -45,7 +45,10 @@ Material:
     - _Reflect: 1
     - _RoomDay: 0.38
     - _RoomDepth: 3.5
+    - _RoomFar: 46
+    - _RoomNear: 32
     - _Roughness: 1
+    - _Transmit: 0.5
     m_Colors:
     - _BaseColor: {r: 0.9, g: 0.95, b: 1, a: 1}
     - _CurtainColor: {r: 0.48, g: 0.44, b: 0.36, a: 1}

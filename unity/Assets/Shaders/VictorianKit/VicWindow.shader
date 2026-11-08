@@ -1,8 +1,11 @@
-// The glass face of the Victorian Kit's windows (Plans/VICTORIAN_STREETS_PLAN.md §4.2): opaque, a room behind the pane
-// by interior mapping in the pane's tangent space, the reflection probe through Fresnel, grime from the mask, and
-// lit rooms after dark from the global _VicNight. A window's insert has its UV in metres: u = 0 at the pane's middle,
-// v = 0 at the sill, 0.85 m above the storey floor; the room is 2 m wide, 3 m high and _RoomDepth deep. Each window's
-// look comes from a hash of its own anchor, the world point where its UV is zero, which static batching keeps.
+// The glass face of the Victorian Kit's windows (Plans/VICTORIAN_STREETS_PLAN.md §4.2, §4.4): transparent, so the rooms
+// built behind the facade (VicRooms) are seen through it, with the reflection probe through Fresnel, grime from the
+// mask, curtains drawn on the pane, and lit rooms after dark from the global _VicNight. Beyond _RoomNear the pane turns
+// opaque toward a room by interior mapping, reached at _RoomFar, where the built rooms are culled.
+// A window's insert has its UV in metres: u = 0 at the pane's middle, v = 0 at the sill, 0.85 m above the storey floor;
+// the mapped room is 2 m wide, 3 m high and _RoomDepth deep. Each window's look comes from a hash of its own anchor,
+// the world point where its UV is zero, which static batching keeps. Premultiplied alpha: the colour is what the glass
+// adds, the alpha how much of the room behind it hides. It casts no shadow, so the sun falls into the rooms.
 Shader "GameDev/VictorianKit/Window"
 {
     Properties
@@ -16,6 +19,9 @@ Shader "GameDev/VictorianKit/Window"
         _BumpScale("Ripple scale", Float) = 0.6
         _Roughness("Roughness scale", Range(0, 2)) = 1
         _Reflect("Reflection", Range(0, 2)) = 1
+        _Transmit("Light through the glass", Range(0, 1)) = 0.8
+        _RoomNear("Built rooms fade out from (m)", Float) = 32
+        _RoomFar("Mapped rooms only beyond (m)", Float) = 46
         _RoomTint("Room tint", Color) = (1, 1, 1, 1)
         _RoomDepth("Room depth (m)", Float) = 3.5
         _RoomDay("Room brightness by day", Range(0, 1)) = 0.22
@@ -30,7 +36,8 @@ Shader "GameDev/VictorianKit/Window"
     {
         Tags
         {
-            "RenderType" = "Opaque"
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
             "RenderPipeline" = "UniversalPipeline"
             "IgnoreProjector" = "True"
         }
@@ -41,7 +48,8 @@ Shader "GameDev/VictorianKit/Window"
             Name "ForwardLit"
             Tags { "LightMode" = "UniversalForward" }
             Cull Off
-            ZWrite On
+            ZWrite Off
+            Blend One OneMinusSrcAlpha
 
             HLSLPROGRAM
             #pragma target 3.0
@@ -117,6 +125,47 @@ Shader "GameDev/VictorianKit/Window"
                 return tones[min((int)(h * 5.0), 4)];
             }
 
+            // The far look: a room by interior mapping in the pane's frame, a box x ∈ [-1, 1], y ∈ [-0.85, 2.15],
+            // z ∈ [-depth, 0] behind the pane, with the same curtains and blind as the near look.
+            half3 MappedRoom(float3 dir, float2 pane, float h1, float h2, float h3, float night, bool lit, out float fade)
+            {
+                dir.z = min(dir.z, -1e-3);
+                float3 p0 = float3(pane.x, pane.y, 0.0);
+                float depth = _RoomDepth * (0.8 + 0.4 * h3);
+                float tx = ((dir.x > 0 ? 1.0 : -1.0) - p0.x) / (abs(dir.x) > 1e-4 ? dir.x : 1e-4);
+                float ty = ((dir.y > 0 ? 2.15 : -0.85) - p0.y) / (abs(dir.y) > 1e-4 ? dir.y : 1e-4);
+                float tz = -depth / dir.z;
+                float t = min(min(tx, ty), tz);
+                float3 hit = p0 + dir * t;
+
+                half3 wall = Wallpaper(h1) * _RoomTint.rgb;
+                half3 room;
+                if (t == tz)
+                {
+                    room = wall * (0.92 + 0.08 * step(0.5, frac(hit.x * 6.0)));
+                    room *= hit.y < 0.05 ? 0.55 : 1.0;
+                    float2 pic = abs(hit.xy - float2((h2 - 0.5) * 0.8, 1.0)) - float2(0.25, 0.18);
+                    room = max(pic.x, pic.y) < 0 ? half3(0.18, 0.14, 0.1) : room;
+                }
+                else if (t == tx)
+                {
+                    room = wall * 0.7 * (hit.y < 0.05 ? 0.55 : 1.0);
+                }
+                else if (dir.y < 0)
+                {
+                    room = half3(0.26, 0.17, 0.10) * (0.85 + 0.15 * step(0.5, frac(hit.x * 5.0)));
+                }
+                else
+                {
+                    room = half3(0.75, 0.72, 0.66);
+                }
+
+                fade = saturate(t / (depth * 1.6));
+                room *= lerp(1.0, 0.45, fade);
+                float lamp = lit ? _NightIntensity * (0.6 + 0.4 * (1.0 - fade)) : 0.02;
+                return room * lerp(_RoomDay, 0.0, night) + room * _NightColor.rgb * lamp * night;
+            }
+
             half4 Frag(Varyings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(input);
@@ -142,63 +191,27 @@ Shader "GameDev/VictorianKit/Window"
                 half3 ripple = UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap, sampler_BaseMap, input.uv), _BumpScale);
                 float3 Np = normalize(ripple.x * T + ripple.y * B + ripple.z * N);
 
-                // Interior: a box x ∈ [-1, 1], y ∈ [-0.85, 2.15], z ∈ [-depth, 0] behind the pane.
-                float3 d = -V;
-                float3 dir = float3(dot(d, T), dot(d, B), dot(d, N));
-                dir.z = min(dir.z, -1e-3);
-                float3 p0 = float3(pane.x, pane.y, 0.0);
-                float depth = _RoomDepth * (0.8 + 0.4 * h3);
-                float tx = ((dir.x > 0 ? 1.0 : -1.0) - p0.x) / (abs(dir.x) > 1e-4 ? dir.x : 1e-4);
-                float ty = ((dir.y > 0 ? 2.15 : -0.85) - p0.y) / (abs(dir.y) > 1e-4 ? dir.y : 1e-4);
-                float tz = -depth / dir.z;
-                float t = min(min(tx, ty), tz);
-                float3 hit = p0 + dir * t;
-
-                half3 wall = Wallpaper(h1) * _RoomTint.rgb;
-                half3 room;
-                if (t == tz)
-                {
-                    room = wall * (0.92 + 0.08 * step(0.5, frac(hit.x * 6.0)));
-                    room *= hit.y < 0.05 ? 0.55 : 1.0;
-                    // A picture on the back wall.
-                    float2 pic = abs(hit.xy - float2((h2 - 0.5) * 0.8, 1.0)) - float2(0.25, 0.18);
-                    room = max(pic.x, pic.y) < 0 ? half3(0.18, 0.14, 0.1) : room;
-                }
-                else if (t == tx)
-                {
-                    room = wall * 0.7 * (hit.y < 0.05 ? 0.55 : 1.0);
-                }
-                else if (dir.y < 0)
-                {
-                    room = half3(0.26, 0.17, 0.10) * (0.85 + 0.15 * step(0.5, frac(hit.x * 5.0)));
-                }
-                else
-                {
-                    room = half3(0.75, 0.72, 0.66);
-                }
-
-                float fade = saturate(t / (depth * 1.6));
-                room *= lerp(1.0, 0.45, fade);
-
-                // Curtains at the sides and a blind from the top, just behind the pane.
-                float curtainEdge = 0.16 + 0.22 * h2;
-                float blind = 1.45 - 0.55 * h3 * h3;
-                float3 nearHit = p0 + dir * (-0.06 / dir.z);
-                bool curtain = abs(nearHit.x) > curtainEdge && nearHit.y > -0.1;
-                bool blindOn = nearHit.y > blind;
-                half3 curtainColor = _CurtainColor.rgb * (0.7 + 0.6 * h1) * (0.85 + 0.15 * sin(nearHit.x * 40.0));
-                room = curtain ? curtainColor : room;
-                room = blindOn ? half3(0.62, 0.56, 0.44) * (0.9 + 0.1 * h2) : room;
-
-                // Day: a dim room; night: lamp light in some rooms, dark in the rest.
                 float night = saturate(_VicNight);
                 bool lit = h3 < _LitFraction;
-                float lamp = lit ? _NightIntensity * (0.6 + 0.4 * (1.0 - fade)) : 0.02;
-                half3 inside = room * lerp(_RoomDay, 0.0, night) + room * _NightColor.rgb * lamp * night;
-                if (curtain || blindOn)
-                {
-                    inside += _NightColor.rgb * _CurtainColor.rgb * (lit ? 0.6 : 0.0) * night;
-                }
+                float far = smoothstep(_RoomNear, _RoomFar, distance(GetCameraPositionWS(), input.positionWS));
+
+                // The pane's own frame of the view, into the room (−N is inward from whichever side is seen).
+                float3 d = -V;
+                float3 dir = float3(dot(d, T), dot(d, B), dot(d, N));
+
+                // Curtains at the sides and a blind from the top, just behind the pane. Near, they are narrow so the room
+                // shows; the mapped room keeps the wider ones it always had.
+                float3 nearHit = float3(pane, 0.0) + dir * (-0.06 / min(dir.z, -1e-3));
+                float edge = lerp(0.40 + 0.12 * h2, 0.16 + 0.22 * h2, far);
+                bool curtain = abs(nearHit.x) > edge && nearHit.y > -0.1 && h1 > 0.25;
+                bool blindOn = nearHit.y > lerp(1.6 - 0.3 * h3 * h3, 1.45 - 0.55 * h3 * h3, far) && h2 > 0.4;
+                half3 curtainColor = _CurtainColor.rgb * (0.7 + 0.6 * h1) * (0.85 + 0.15 * sin(nearHit.x * 40.0));
+                half3 blindColor = half3(0.62, 0.56, 0.44) * (0.9 + 0.1 * h2);
+
+                float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
+                Light sun = GetMainLight(shadowCoord);
+                half3 ambient = SampleSH(N);
+                half3 sunOnPane = sun.color * saturate(dot(N, sun.direction)) * sun.shadowAttenuation;
 
                 // Reflection through Fresnel, plus the sun's highlight.
                 float NdotV = saturate(dot(Np, V));
@@ -206,80 +219,45 @@ Shader "GameDev/VictorianKit/Window"
                 half rough = saturate(mask.r * _Roughness);
                 float3 R = reflect(-V, Np);
                 half3 env = GlossyEnvironmentReflection(R, input.positionWS, rough, 1.0h, GetNormalizedScreenSpaceUV(input.positionCS));
-                float reflectAmount = saturate((0.08 + 0.92 * fresnel) * _Reflect);
-
-                float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
-                Light sun = GetMainLight(shadowCoord);
                 float3 H = normalize(sun.direction + V);
                 half spec = pow(saturate(dot(Np, H)), 300.0) * 3.0 * sun.shadowAttenuation * (1.0 - rough);
-
                 half3 glass = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv).rgb * _BaseColor.rgb;
-                half3 color = inside * glass * (1.0 - reflectAmount) + env * reflectAmount + spec * sun.color;
+                half grime = saturate((mask.g - (1.0h - _Grime)) * 4.0) * 0.7;
+                half3 grimeColor = _Tint2.rgb * (ambient + sunOnPane * 0.3);
 
-                // Grime: a film that catches the ambient light.
-                half grime = saturate((mask.g - (1.0h - _Grime)) * 4.0);
-                half3 ambient = SampleSH(N);
-                color = lerp(color, _Tint2.rgb * (ambient + sun.color * saturate(dot(N, sun.direction)) * sun.shadowAttenuation * 0.3), grime * 0.7);
+                // Near: the reflection lies over the room seen through the pane; a curtain or blind hides the room.
+                float reflectNear = saturate(fresnel * _Reflect);
+                half3 fabricLight = ambient * (1.0 - night) + _NightColor.rgb * (lit ? 0.9 : 0.03) * night;
+                half3 lampGlow = _NightColor.rgb * _NightIntensity * 0.35 * (lit ? 1.0 : 0.0) * night;
+                bool covered = curtain || blindOn;
+                half3 behind = covered ? (curtain ? curtainColor : blindColor) * fabricLight : lampGlow * glass;
+                float through = covered ? 0.0 : _Transmit * dot(glass, half3(0.3333, 0.3333, 0.3333)) * (lit && night > 0.5 ? 0.55 : 1.0);
+                half3 nearColor = env * reflectNear + spec * sun.color + behind * (1.0 - reflectNear);
+                float nearAlpha = 1.0 - (1.0 - reflectNear) * through;
 
-                color = MixFog(color, InitializeInputDataFog(float4(input.positionWS, 1.0), input.fogFactor));
-                return half4(color, 1.0);
+                // Far: the opaque mapped room, as before the rooms were built.
+                half3 farColor = nearColor;
+                if (far > 0.0)
+                {
+                    float fade;
+                    half3 inside = MappedRoom(dir, pane, h1, h2, h3, night, lit, fade);
+                    inside = curtain ? curtainColor * (lerp(_RoomDay, 0.0, night) + _NightColor.rgb * (lit ? 0.6 : 0.0) * night) : inside;
+                    inside = blindOn ? blindColor * lerp(_RoomDay, 0.0, night) : inside;
+                    float reflectFar = saturate((0.08 + 0.92 * fresnel) * _Reflect);
+                    farColor = inside * glass * (1.0 - reflectFar) + env * reflectFar + spec * sun.color;
+                }
+
+                half3 color = lerp(nearColor, farColor, far);
+                float alpha = lerp(nearAlpha, 1.0, far);
+
+                // Grime: a film that catches the ambient light, over everything behind it.
+                color = color * (1.0 - grime) + grimeColor * grime;
+                alpha = alpha * (1.0 - grime) + grime;
+
+                // Premultiplied fog: the room behind was fogged where it stands; the glass fogs only what it adds.
+                color = MixFogColor(color, unity_FogColor.rgb * alpha, InitializeInputDataFog(float4(input.positionWS, 1.0), input.fogFactor));
+                return half4(color, alpha);
             }
-            ENDHLSL
-        }
-
-        Pass
-        {
-            Name "ShadowCaster"
-            Tags { "LightMode" = "ShadowCaster" }
-            ZWrite On
-            ZTest LEqual
-            ColorMask 0
-            Cull Off
-
-            HLSLPROGRAM
-            #pragma target 2.0
-            #pragma vertex ShadowPassVertex
-            #pragma fragment ShadowPassFragment
-            #pragma multi_compile_instancing
-            #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
-            #include "VicWindowInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
-            ENDHLSL
-        }
-
-        Pass
-        {
-            Name "DepthOnly"
-            Tags { "LightMode" = "DepthOnly" }
-            ZWrite On
-            ColorMask R
-            Cull Off
-
-            HLSLPROGRAM
-            #pragma target 2.0
-            #pragma vertex DepthOnlyVertex
-            #pragma fragment DepthOnlyFragment
-            #pragma multi_compile_instancing
-            #include "VicWindowInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
-            ENDHLSL
-        }
-
-        Pass
-        {
-            Name "DepthNormals"
-            Tags { "LightMode" = "DepthNormals" }
-            ZWrite On
-            Cull Off
-
-            HLSLPROGRAM
-            #pragma target 2.0
-            #pragma vertex DepthNormalsVertex
-            #pragma fragment DepthNormalsFragment
-            #pragma multi_compile_instancing
-            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
-            #include "VicWindowInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
             ENDHLSL
         }
 

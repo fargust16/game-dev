@@ -147,6 +147,9 @@ namespace GameDev.VictorianKit.EditorTools
                 m.SetFloat("_RoomDay", pair.Value.day);
                 m.SetColor("_RoomTint", pair.Value.room);
                 m.SetColor("_CurtainColor", pair.Value.curtain);
+                // Transparent since the rooms behind were built (§4.4): the queue from the shader, less light through grimy glass.
+                m.SetFloat("_Transmit", 0.85f - pair.Value.grime);
+                m.renderQueue = -1;
                 EditorUtility.SetDirty(m);
             }
 
