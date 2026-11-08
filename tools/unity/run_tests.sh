@@ -19,7 +19,7 @@ project="$(cd "$(dirname "$0")/../../unity" && pwd)"
 
 case "$set_name" in
   slice)      args=(-testPlatform EditMode -assemblyNames GameDev.Slice.Tests.EditMode) ;;
-  slice-play) args=(-testPlatform PlayMode -assemblyNames GameDev.Slice.Tests.PlayMode) ;;
+  slice-play) args=(-testPlatform PlayMode -assemblyNames GameDev.Slice.Tests.PlayMode -testCategory "!Diagnostic") ;;
   world)      args=(-testPlatform EditMode -assemblyNames Assembly-CSharp-Editor -testCategory '!Slow') ;;
   slow)       args=(-testPlatform EditMode -testCategory Slow) ;;
   all)        args=(-testPlatform EditMode) ;;

@@ -1,10 +1,10 @@
 # Test Runs and Heavy Operations
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft
 
-Last Updated: 2026-11-06 (`run_tests.ps1` for PowerShell, since PowerShell cannot run the `.sh` and its `bash` is WSL's. Earlier: first version: test sets, the Slow category, and how heavy runs are done, by the owner's request for faster runs)
+Last Updated: 2026-11-08 (§2, §5: the scene load diagnostic, run by name; `slice-play` leaves the Diagnostic category out, since a run by assembly also runs explicit tests. Earlier: `run_tests.ps1` for PowerShell, since PowerShell cannot run the `.sh` and its `bash` is WSL's. Earlier: first version: test sets, the Slow category, and how heavy runs are done, by the owner's request for faster runs)
 
 Depends On:
 [AGENTS.md](../../../AGENTS.md)
@@ -30,7 +30,7 @@ So runs get faster by running less: the narrowest set that covers a change.
 | Set | Unity arguments | What it holds | Measured, 2026-11-06 |
 |---|---|---|---|
 | `slice` | `-testPlatform EditMode -assemblyNames GameDev.Slice.Tests.EditMode` | the slice's EditMode tests, 67 | under 10 s of tests |
-| `slice-play` | `-testPlatform PlayMode -assemblyNames GameDev.Slice.Tests.PlayMode` | the slice's PlayMode tests, 19 | 58 s |
+| `slice-play` | `-testPlatform PlayMode -assemblyNames GameDev.Slice.Tests.PlayMode -testCategory "!Diagnostic"` | the slice's PlayMode tests without the diagnostics, 39 | 58 s for 19 tests; 551 s for 40 with the scene load diagnostic (2026-11-08), which is why it is left out |
 | `world` | `-testPlatform EditMode -assemblyNames Assembly-CSharp-Editor -testCategory "!Slow"` | the world's tests without the Slow ones, 302 | 5 s of tests, 19 s with Unity's start |
 | `slow` | `-testPlatform EditMode -testCategory Slow` | the 17 Slow fixtures, 293 tests | about 31 min |
 | `all` | `-testPlatform EditMode` | every EditMode test, 662 | about 31 min |
@@ -57,6 +57,7 @@ Every set also takes `-batchmode -nographics -projectPath . -runTests -testResul
 - A run expected to take over two minutes goes to the background. The agent tells the owner what is running.
 - Unity writes a test XML only at the end, so a missing file is not a hang. Progress is read from the log and from the process's CPU time; a run is stuck only if its process takes no CPU.
 - Renders need graphics, so they leave out `-nographics`. PlayMode tests run with it.
+- **The scene load diagnostic** (`SceneLoadTimingTests`, category Diagnostic, explicit) runs only by name, with graphics: `-testPlatform PlayMode -assemblyNames GameDev.Slice.Tests.PlayMode -testFilter GameDev.Slice.Tests.SceneLoadTimingTests`, and `-sceneLoadProfile` to add the profiler's breakdown. A batch run selected by assembly runs `[Explicit]` tests too (measured 2026-11-08), so the `slice-play` set leaves the category out, and the diagnostic is run with this command line, not through the scripts. It takes about 3 minutes and writes `Logs/SceneLoad/`. Run it after any change to the city's content or to how scenes load ([VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R1).
 - Python balance simulations run outside Unity and may run alongside it.
 
 # 6. The agent's shell

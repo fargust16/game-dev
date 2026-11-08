@@ -1,18 +1,18 @@
 # World Style Guide
 
-Version: 0.2
+Version: 0.3
 
-Status: Draft — written by the agent from the owner's answers of 2026-11-08 (city plan §24); the light and the mystic layer built in Veilmouth (city plan §24.7); waits for the owner's walk of C3
+Status: Draft — written by the agent from the owner's answers of 2026-11-08 (city plan §24); the light and the mystic layer built in Veilmouth (city plan §24.7). After walking C3 the owner asked for one warm, muted range with haze and a quiet sky, after reference images: §2 and §5 are to be reworked by [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R3 once the owner has decided its D2 and D6
 
 Created: 2026-11-08
 
-Last Updated: 2026-11-08 (§5, §6: built in Veilmouth by `VeilmouthSky` and `VeilmouthMystic`, as city plan §24.7 records; the moon rises at 20:00 and fades in over its first hour. Earlier: first draft: one style for the city, its interiors and the land round it, and the mystic layer the owner chose)
+Last Updated: 2026-11-08 (Status: the owner's reference look, to be worked in by the reference plan's R3. Earlier: §5, §6: built in Veilmouth by `VeilmouthSky` and `VeilmouthMystic`, as city plan §24.7 records; the moon rises at 20:00 and fades in over its first hour. Earlier: first draft: one style for the city, its interiors and the land round it, and the mystic layer the owner chose)
 
 Depends On:
 [00 Vision](../../../00%20Vision.md), [11 Vertical Slice](../../../11%20Vertical%20Slice.md) (*Era and Mood*), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §24, [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md)
 
 Referenced By:
-[VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §24, [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md)
+[VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §24, [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md)
 
 ---
 

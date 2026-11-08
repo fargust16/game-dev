@@ -33,6 +33,15 @@ namespace GameDev.Core.Scenes
         /// <summary>Lifts the veil once the new scene has settled.</summary>
         internal static void In() => Instance.StartCoroutine(Instance.Fade(0f, InSeconds, SettleFrames, null));
 
+        /// <summary>Calls <paramref name="then"/> on the next frame, after every new object's Start (a batch run draws nothing to hook).</summary>
+        internal static void NextFrame(Action then) => Instance.StartCoroutine(AfterAFrame(then));
+
+        private static IEnumerator AfterAFrame(Action then)
+        {
+            yield return null;
+            then();
+        }
+
         private static ScreenFade Instance
         {
             get

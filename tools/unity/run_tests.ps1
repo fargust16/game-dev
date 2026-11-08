@@ -19,7 +19,7 @@ $project = (Resolve-Path (Join-Path $PSScriptRoot '..\..\unity')).Path
 
 switch ($Set) {
     'slice'      { $setArgs = @('-testPlatform', 'EditMode', '-assemblyNames', 'GameDev.Slice.Tests.EditMode') }
-    'slice-play' { $setArgs = @('-testPlatform', 'PlayMode', '-assemblyNames', 'GameDev.Slice.Tests.PlayMode') }
+    'slice-play' { $setArgs = @('-testPlatform', 'PlayMode', '-assemblyNames', 'GameDev.Slice.Tests.PlayMode', '-testCategory', '!Diagnostic') }
     'world'      { $setArgs = @('-testPlatform', 'EditMode', '-assemblyNames', 'Assembly-CSharp-Editor', '-testCategory', '!Slow') }
     'slow'       { $setArgs = @('-testPlatform', 'EditMode', '-testCategory', 'Slow') }
     'all'        { $setArgs = @('-testPlatform', 'EditMode') }
