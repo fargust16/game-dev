@@ -1,7 +1,9 @@
 {
     "name": "GameDev.World.Interiors",
     "rootNamespace": "GameDev.World.Interiors",
-    "references": [],
+    "references": [
+        "GameDev.Core.Scenes"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

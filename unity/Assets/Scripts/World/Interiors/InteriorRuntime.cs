@@ -1,3 +1,4 @@
+using GameDev.Core.Scenes;
 using UnityEngine;
 
 namespace GameDev.World.Interiors
@@ -32,6 +33,9 @@ namespace GameDev.World.Interiors
         private void OnEnable()
         {
             Current = this;
+
+            // Leaving this scene unloads it, and the street it was entered from stays loaded behind it (17 I.2).
+            SceneTransition.MarkInterior(gameObject.scene);
         }
 
         private void OnDisable()

@@ -21,9 +21,10 @@ namespace GameDev.Slice.Tests
 {
     /// <summary>
     /// A diagnostic, not an acceptance test (owner, 2026-11-08: every door took about a minute): Veilmouth loads cold,
-    /// the player goes into the Soot &amp; Bell and back, and each step is timed, the scenes counted, and the longest
-    /// frames of each journey broken down by the profiler's markers. The report goes to Logs/SceneLoad. It runs only
-    /// when named: <c>-testFilter GameDev.Slice.Tests.SceneLoadTimingTests</c>, best with graphics.
+    /// the player goes into the Soot &amp; Bell and back twice and into a dwelling and back, and each step is timed, the
+    /// scenes counted, the longest frames of each journey broken down by the profiler's markers, and each arrival
+    /// photographed. The report and the pictures go to Logs/SceneLoad. It runs only when named:
+    /// <c>-testFilter GameDev.Slice.Tests.SceneLoadTimingTests</c>, best with graphics.
     /// </summary>
     [Explicit("diagnostic: run by name"), Category("Diagnostic")]
     public sealed class SceneLoadTimingTests : SliceInputTestBase
@@ -72,25 +73,73 @@ namespace GameDev.Slice.Tests
             StopProfiling("cold load");
             Debug.Log("[SceneLoadTiming] profiled the cold load");
             Census(SceneManager.GetActiveScene());
+            Directory.CreateDirectory(Folder);
+            yield return new WaitForSeconds(0.3f);
+            Snapshot(City);
 
-            // 2. Into the tavern through its street door.
-            var street = Object.FindObjectsByType<Portal>(FindObjectsInactive.Exclude).Single(p => p.Id == "soot-and-bell.street");
+            // 2. Into the tavern through its street door and back, twice: the city is kept behind the interior.
+            for (var round = 1; round <= 2; round++)
+            {
+                yield return GoInAndBack("soot-and-bell.street", "soot-and-bell.inside", Tavern, round == 1);
+            }
+
+            // 3. Into a dwelling and back: most of the city's doors lead to the shared Dwelling scene.
+            var dwelling = Object.FindObjectsByType<Portal>(FindObjectsInactive.Exclude)
+                .Where(p => p.Target.SceneName == "Dwelling").OrderBy(p => p.Id, System.StringComparer.Ordinal).First();
+            yield return GoInAndBack(dwelling.Id, dwelling.Id + ".inside", "Dwelling", false);
+
+            Application.targetFrameRate = savedRate;
+            var file = Path.Combine(Folder, $"scene_load_{_stamp}.txt");
+            File.WriteAllText(file, _report.ToString());
+            Debug.Log($"[SceneLoadTiming] report written to {file}\n{_report}");
+        }
+
+        private static readonly string Folder = Path.Combine(Application.dataPath, "..", "Logs", "SceneLoad");
+        private readonly string _stamp = System.DateTime.Now.ToString("yyyyMMdd-HHmmss");
+        private int _shots;
+
+        private static Portal FindPortal(string id) =>
+            Object.FindObjectsByType<Portal>(FindObjectsInactive.Exclude).Single(p => p.Id == id);
+
+        private IEnumerator GoInAndBack(string streetId, string insideId, string interior, bool census)
+        {
+            var street = FindPortal(streetId);
             var pose = street.ArrivalPose;
             Object.FindAnyObjectByType<PlayerLocomotion>().Teleport(pose.position, pose.rotation);
             yield return new WaitForSeconds(0.3f);
-            yield return Journey(street.Target, Tavern);
-            Census(SceneManager.GetActiveScene());
+            yield return Journey(street.Target, interior);
+            if (census)
+            {
+                Census(SceneManager.GetActiveScene());
+            }
 
-            // 3. Back to the street.
-            var inside = Object.FindObjectsByType<Portal>(FindObjectsInactive.Exclude).Single(p => p.Id == "soot-and-bell.inside");
-            yield return Journey(inside.Target, City);
+            yield return Journey(FindPortal(insideId).Target, City);
+        }
 
-            Application.targetFrameRate = savedRate;
-            var folder = Path.Combine(Application.dataPath, "..", "Logs", "SceneLoad");
-            Directory.CreateDirectory(folder);
-            var file = Path.Combine(folder, $"scene_load_{System.DateTime.Now:yyyyMMdd-HHmmss}.txt");
-            File.WriteAllText(file, _report.ToString());
-            Debug.Log($"[SceneLoadTiming] report written to {file}\n{_report}");
+        /// <summary>What the camera shows after a journey, beside the report: the light and the sky must be the scene's own.</summary>
+        private void Snapshot(string name)
+        {
+            var camera = Camera.main;
+            if (camera == null || SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null)
+            {
+                return;
+            }
+
+            const int width = 960, height = 540;
+            var target = RenderTexture.GetTemporary(width, height, 24);
+            var saved = camera.targetTexture;
+            camera.targetTexture = target;
+            camera.Render();
+            camera.targetTexture = saved;
+            var active = RenderTexture.active;
+            RenderTexture.active = target;
+            var picture = new Texture2D(width, height, TextureFormat.RGB24, false);
+            picture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+            picture.Apply();
+            RenderTexture.active = active;
+            RenderTexture.ReleaseTemporary(target);
+            File.WriteAllBytes(Path.Combine(Folder, $"scene_load_{_stamp}_{++_shots:00}_{name}.png"), picture.EncodeToPNG());
+            Object.Destroy(picture);
         }
 
         private IEnumerator Journey(TravelRequest request, string scene)
@@ -111,6 +160,7 @@ namespace GameDev.Slice.Tests
             Debug.Log($"[SceneLoadTiming] journey {SceneTransition.LastJourney}");
             StopProfiling($"journey to {scene}");
             yield return new WaitForSeconds(0.3f);
+            Snapshot(scene);
         }
 
         // ------------------------------------------------------------------ what the scene holds

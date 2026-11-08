@@ -97,13 +97,29 @@ namespace GameDev.Slice.Tests
             var middle = Now(clock);
             Assert.Greater(middle, before);
 
+            // The reference plan's R1: the street stays loaded behind the interior, switched off.
+            Assert.AreEqual(streetScene, SceneTransition.KeptScene.name, "the street is kept behind the interior");
+            Assert.AreEqual(1, Object.FindObjectsByType<PlayerLocomotion>(FindObjectsInactive.Exclude).Length,
+                "only the interior's player is awake");
+
             yield return UseDoorAndWaitFor(streetScene);
             Assert.IsNull(InteriorRuntime.Current);
+            Assert.IsFalse(SceneManager.GetSceneByName(interiorScene).isLoaded, "the interior is unloaded behind the traveller");
+            Assert.IsFalse(SceneTransition.KeptScene.IsValid(), "nothing is kept in the street");
             var outside = Object.FindAnyObjectByType<PlayerLocomotion>();
             Assert.Less(Vector3.Distance(outside.transform.position, entrance.position), 0.3f, Describe(outside));
             Assert.Less(Quaternion.Angle(outside.transform.rotation, entrance.rotation), 1f);
             Assert.AreSame(clock, GameClockDriver.Running);
             Assert.Greater(Now(clock), middle);
+
+            // The street's own camera, switched on again, stands behind the player as a newly loaded one would.
+            var rig = Object.FindAnyObjectByType<GameDev.Cameras.ThirdPersonCamera>();
+            if (rig != null)
+            {
+                var look = Vector3.ProjectOnPlane(rig.transform.forward, Vector3.up).normalized;
+                Assert.Greater(Vector3.Dot(look, outside.transform.forward), 0.7f, "the camera looks the way the player faces");
+                Assert.Less(Vector3.Distance(rig.transform.position, outside.transform.position), 10f, "the camera is with the player");
+            }
         }
 
         [UnityTest]

@@ -186,7 +186,8 @@ namespace GameDev.Slice
 
         private HudView Hud()
         {
-            if (_hud == null)
+            // A city kept behind an interior keeps its HUD, switched off (17 I.2): look again for the one shown.
+            if (_hud == null || !_hud.isActiveAndEnabled)
             {
                 _hud = FindAnyObjectByType<HudView>();
             }

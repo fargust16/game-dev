@@ -1,16 +1,16 @@
 # 17 Game Systems Architecture
 
-Version: 1.22
+Version: 1.23
 
 Status: Draft
 
-Last Updated: 2026-11-06 (Later waves: loose props V1 built in the slice's kit. Earlier: Later waves: the owner's requests of 2026-11-06, loose props, a room constructor, street animals, city transport, and cabs, named with their open questions. Earlier: X.3 and X.6: the save contract and the first HUD, from S0.5. Earlier: I.1–I.3: the first doors, from S0.4. Earlier: L.1–L.3: the code lives in its owning folders, from S0.3. Earlier: X.1: the first `IWorldClock` contract, from S0.1. Earlier: next code default: the Vertical Slice implementation plan, in one hand-built scene, by the owner's decision. Earlier: the slice's Suspend Save, townsfolk schedules, and the Item Creation workshop, by the owner's answers. Earlier: unseen fights run the tactical rules without drawing, by the owner. Earlier: faction state holds forces and City Control; Influence is read from them. Earlier: Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
+Last Updated: 2026-11-08 (I.2, I.3 and the interior-load default: the street stays loaded behind an interior, by the owner's choice of D3 (a) in the Veilmouth reference plan; a door takes about 0.5 s, measured. Earlier: Later waves: loose props V1 built in the slice's kit. Earlier: Later waves: the owner's requests of 2026-11-06, loose props, a room constructor, street animals, city transport, and cabs, named with their open questions. Earlier: X.3 and X.6: the save contract and the first HUD, from S0.5. Earlier: I.1–I.3: the first doors, from S0.4. Earlier: L.1–L.3: the code lives in its owning folders, from S0.3. Earlier: X.1: the first `IWorldClock` contract, from S0.1. Earlier: next code default: the Vertical Slice implementation plan, in one hand-built scene, by the owner's decision. Earlier: the slice's Suspend Save, townsfolk schedules, and the Item Creation workshop, by the owner's answers. Earlier: unseen fights run the tactical rules without drawing, by the owner. Earlier: faction state holds forces and City Control; Influence is read from them. Earlier: Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
 
 Depends On:
 [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
 
 Referenced By:
-[AGENTS.md](AGENTS.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`, `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`, `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md`
+[AGENTS.md](AGENTS.md), [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [90 Glossary](90%20Glossary.md), [99 Open Questions](99%20Open%20Questions.md), `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`, `unity/Assets/Plans/AGENT_HANDOFF_WORLD_GEN.md`, `unity/Assets/Plans/SETTLEMENT_PROPERTY_V0.md`, `unity/Assets/Plans/VEILMOUTH_REFERENCE_PLAN.md`
 
 ---
 
@@ -69,7 +69,7 @@ Interior ── Confront ──┘
 | Campaign target world | **4200 × 4200 m** — 3×3 tiles of 1400 m, with 5–7 cities ([21](21%20Cult%20Campaign%20and%20City%20Control.md)). A game-design target: it changes no V0 default and authorises no production terrain work. |
 | Terrain height budget / sea level | **700 m** / **24 m** |
 | Terrain resolution | heightmap **513**, alphamap **512**, details **512** per tile — written by the terrain bake from TerrainGen ([OVERWORLD_TERRAIN_ARCHITECTURE](unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md)) |
-| Interior load | **Single-scene swap** (additive later) |
+| Interior load | **Additive**: the street stays loaded, switched off, behind an interior (I.2; owner, 2026-11-08) |
 | OrganicTown / TownGridBaker continuous path | **Deprecated** — archive only, not a reuse source ([13](13%20City%20Generation.md)) |
 | Combat depth in near-term | Combat Grid V0 TB skeleton; BG3-depth is long-horizon |
 
@@ -389,15 +389,15 @@ Code state after slice iteration S0.3: L.1–L.3 each have their own assembly in
 
 | Field | Content |
 |-------|---------|
-| **Responsibilities** | Execute V0 **single-scene swap** with loading gate; pass travel payload (key, return pose, theme tags). |
-| **Dependencies** | Portal/Door; Unity SceneManager. |
-| **Public interfaces** | `ISceneTransition { void Travel(TravelRequest); event TravelCompleted; }` |
-| **Data flow** | Request → unload source → load dest → spawn player → completed. |
+| **Responsibilities** | Move the traveller between scenes behind a loading gate and a darkening veil; pass travel payload (key, return pose, theme tags). **The street left for an interior stays loaded** (owner, 2026-11-08, [VEILMOUTH_REFERENCE_PLAN.md](unity/Assets/Plans/VEILMOUTH_REFERENCE_PLAN.md) R1, D3 (a)): its roots are switched off and the interior loads additively beside it; leaving the interior unloads it and switches the street on again. Leaving an interior for a scene not kept is a single-scene swap, so at most one scene is kept. |
+| **Dependencies** | Portal/Door; Interior Runtime (an interior marks its scene); Unity SceneManager. |
+| **Public interfaces** | `SceneTransition.Travel(TravelRequest)`, events `Arriving` (before the new scene's Start) and `TravelCompleted`; `MarkInterior(Scene)`; `KeptScene`; `LastJourney` times every journey. |
+| **Data flow** | Request → darken → keep the street (switch its roots off) and load the interior additively, or unload the interior and switch the kept street on → arrival places the player → completed → veil lifts. |
 | **Save/load** | Persist last stable pose before travel. |
 | **Multiplayer** | Server-authoritative travel; clients load same scene id. |
-| **Performance** | Accept hitch in V0; async additive later. |
-| **Extensibility** | Swap implementation to additive without changing `TravelRequest`. |
-| **V1 scope / Deferred** | V0 single-scene swap locked in this doc. |
+| **Performance** | **Measured** 2026-11-08 in Veilmouth (150 000 objects): about 0.5 s a door each way, darkening included; the city's first load, 12 s, happens once a session. Behind the veil loading runs at High background priority. |
+| **Extensibility** | `TravelRequest` unchanged since V0. A preload of the door ahead stays possible if a door misses 1 s. |
+| **V1 scope / Deferred** | Each scene keeps its own player, camera and HUD, switched off with it; the clock and the world driver live through every journey. Deferred: one player set crossing with the traveller, a preload. |
 | **Owning folder** | `unity/Assets/Scripts/Core/Scenes/` |
 
 ## I.3 Interior Runtime
@@ -410,7 +410,7 @@ Code state after slice iteration S0.3: L.1–L.3 each have their own assembly in
 | **Data flow** | On enter compile/spawn → play → exit Travel back. |
 | **Save/load** | Interior mutables by building id. |
 | **Multiplayer** | Instance policy via Networking. |
-| **Performance** | One interior loaded. |
+| **Performance** | One interior loaded, beside the street kept behind it (I.2). |
 | **Extensibility** | Hooks for NPC/Dialogue systems. |
 | **V1 scope / Deferred** | Interior V0 greybox room. |
 | **Owning folder** | `unity/Assets/Scripts/World/Interiors/` |

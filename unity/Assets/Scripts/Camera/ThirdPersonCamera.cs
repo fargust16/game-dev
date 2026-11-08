@@ -62,19 +62,21 @@ namespace GameDev.Cameras
             collisionMask = mask;
         }
 
+        /// <summary>
+        /// A new scene, or a kept city switched on again behind an interior's door (17 I.2), starts behind its player,
+        /// who may have just been placed there by a door: the camera snaps on its first LateUpdate after it is enabled,
+        /// which comes after the door's arrival in the same frame.
+        /// </summary>
         private void OnEnable()
         {
             SetCursorLocked(true);
+            _snapPending = true;
         }
 
-        /// <summary>A new scene starts behind its player, who may have just been placed there by a door.</summary>
-        private void Start()
-        {
-            if (target == null)
-            {
-                return;
-            }
+        private bool _snapPending;
 
+        private void SnapBehindTarget()
+        {
             _yaw = target.eulerAngles.y;
             var pivot = target.position + targetOffset;
             _smoothedPivot = pivot;
@@ -95,6 +97,12 @@ namespace GameDev.Cameras
             if (target == null)
             {
                 return;
+            }
+
+            if (_snapPending)
+            {
+                _snapPending = false;
+                SnapBehindTarget();
             }
 
             var input = GameInputService.Instance;

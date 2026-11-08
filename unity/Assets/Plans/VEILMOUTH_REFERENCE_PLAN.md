@@ -1,12 +1,12 @@
 # Veilmouth Reference Plan
 
-Version: 0.1
+Version: 0.2
 
-Status: Draft — the agent's plan from the owner's walk of C3 and reference images (2026-11-08); waits for the owner's decisions in §5 before any step past R0
+Status: Draft — the agent's plan from the owner's walk of C3 and reference images (2026-11-08). The owner chose D3 (a) the same day, and R1's steps 0–1 are built: every door takes about half a second. The other steps wait for the owner's decisions in §5
 
 Created: 2026-11-08
 
-Last Updated: 2026-11-08 (first draft: the owner's six remarks traced to their causes in the project, the reference read, and eight workstreams with checks)
+Last Updated: 2026-11-08 (R1: the owner chose D3 (a), doors in 1–3 s; the city is kept behind interiors, measured at 0.45–0.62 s a door, so step 2, the preload, is not built. Earlier: first draft: the owner's six remarks traced to their causes in the project, the reference read, and eight workstreams with checks)
 
 Depends On:
 [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §24, [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md) (I.1–I.2), [99 Open Questions](../../../99%20Open%20Questions.md) (VS-C3, VS-COLOR)
@@ -78,11 +78,14 @@ Each workstream lists its steps and the check that closes it. Numbers are author
 
 **Measured** (`SceneLoadTimingTests`, editor in batch mode with Direct3D 12, 30 frames a second, 2026-11-08; reports in `Logs/SceneLoad/`):
 
-| Step | Before | With the load behind the veil at High priority |
-|---|---|---|
-| Veilmouth, cold | 54.1 s (file read 3.5 s, the rest bringing objects to life) | 12.3 s |
-| Veilmouth → Soot & Bell | 1.24 s | 1.01 s |
-| Soot & Bell → Veilmouth | 51.7 s | 10.5 s |
+| Step | Before | Step 0: the load behind the veil at High priority | Step 1: the city kept behind interiors |
+|---|---|---|---|
+| Veilmouth, cold | 54.1 s (file read 3.5 s, the rest bringing objects to life) | 12.3 s | 12.0 s (once a session) |
+| Veilmouth → Soot & Bell | 1.24 s | 1.01 s | 0.62 s, the second time 0.45 s |
+| Soot & Bell → Veilmouth | 51.7 s | 10.5 s | 0.52 s, the second time 0.54 s |
+| Veilmouth → a dwelling → Veilmouth | — | — | 0.53 s in, 0.59 s out |
+
+Each door's time includes the darkening, about 0.3 s. In step 1 the city's roots switch off in 0.05–0.08 s and on again in 0.18–0.22 s (measured 2026-11-08, `scene_load_20261108-210622.txt`).
 
 - **The interiors are not the problem:** the Soot & Bell holds 1 431 game objects and loads in under a second. Every minute was the city loading again on the way out.
 - **Veilmouth holds 149 775 game objects, 91 701 of them (61 %) in the rooms behind the windows.** It has 87 274 mesh renderers, and tens of thousands of components switched off by the rooms: 28 068 kit blocks, 22 316 box colliders, 2 786 mesh colliders, 1 729 lights and 2 183 loose props, with 2 259 bodies.
@@ -94,14 +97,17 @@ Each workstream lists its steps and the check that closes it. Numbers are author
 Steps, in order; each is measured by R0's test before the next:
 
 0. **Load behind the veil at High priority.** Done and measured, above.
-1. **Keep the city loaded (recommended).** Interiors stay separate scenes, as [16](../../../16%20Architecture%20Pivot.md) and the accepted Confront entry require, but load **additively**: entering loads the interior beside the city, switches the city's roots off and makes the interior the active scene (its light and fog settings); coming out unloads the interior and switches the city back on. The city is never destroyed and loaded again, so coming out costs only the switch, and going in costs only the interior's own load. The player, the camera and the clock are one set that crosses with the traveller instead of one per scene. `SceneTransition` keeps its gate, the darkening and the `Arriving` event, so portals, the Dwelling and the HUD keep working.
-2. **Preload the door ahead.** When the player comes within about 6 m of a street door, its interior starts loading in the background with activation held back; the key then only activates it. A Dwelling is one shared scene that builds its rooms on arrival, so it stays loaded once loaded.
+1. **Keep the city loaded.** Chosen by the owner (D3 (a), 2026-11-08), built and measured, above. Interiors stay separate scenes, as [16](../../../16%20Architecture%20Pivot.md) and the accepted Confront entry require, but load **additively**: entering switches the city's roots off, loads the interior beside it and makes the interior the active scene (its light and sky); coming out unloads the interior and switches the city back on. The city is never destroyed and loaded again, so coming out costs only the switch, and going in costs only the interior's own load. As built (`SceneTransition`, 17 I.2):
+   - an interior names itself through `InteriorRuntime`; leaving it for the kept city switches the city on, and leaving it for any other scene is the old single swap, so at most one scene is kept;
+   - each scene keeps its own player, camera and HUD, switched off with it; the clock and the world driver already lived through scene changes. The kept city's camera snaps behind its player when it is switched on, as a newly loaded one does;
+   - `SceneTransition` keeps its gate, the darkening and the `Arriving` event, so portals, the Dwelling and the HUD work unchanged; `DoorTests` check that the city is kept, the interior unloaded, and the camera behind the player.
+2. **Preload the door ahead. Not built:** step 1 already brings every door under 0.7 s, and a load held back in Unity blocks every later load until it is let through, so a preload would add risk for a few tenths of a second. It is reconsidered only if a door misses 1 s.
 3. **Lighten the city's first load,** which still happens once per session (12 s now). By the census of R0: rooms behind windows built as render-only pieces at bake time, with their colliders, bodies, lights and scripts left out instead of switched off by overrides (this also ends the file-ID fragility of city plan §24.7); pieces of a module wrapper flattened where nothing reads the wrapper at run time; dressing that nobody walks into kept out of the physics scene. The rooms are 61 % of the city's objects, so this step is expected to roughly halve the first load.
 4. **Measure a build.** A development build of Veilmouth and one interior with the same diagnostic: the editor merges prefab instances when it loads a scene, a build does not, so the build's numbers are the game's.
 
-**Seamless interiors** (doors that open straight into rooms built in the city scene) are the alternative only if steps 1–3 miss the target. They would change accepted decisions (interiors as separate scenes, the generated Dwelling scene of the break-in rules), put the seven interiors and every dwelling into the city's load, and need rooms and corridors rebuilt wider. The plan does not recommend them.
+**Seamless interiors** (doors that open straight into rooms built in the city scene) were the alternative if steps 1–3 missed the target. They would have changed accepted decisions (interiors as separate scenes, the generated Dwelling scene of the break-in rules), put the seven interiors and every dwelling into the city's load, and needed rooms and corridors rebuilt wider. With step 1 measured they are not needed.
 
-**Check:** R0's test shows, in the editor, city → Soot & Bell ≤ 3 s and back ≤ 1 s; the slice's PlayMode set passes; the door tests (`DoorTests`) pass unchanged.
+**Check:** R0's test shows, in the editor, city → Soot & Bell ≤ 3 s and back ≤ 1 s; the slice's PlayMode set passes; the door tests (`DoorTests`) pass. **Met** after step 1 (2026-11-08): 0.62 s in and 0.52 s back. Steps 3 and 4 remain for the first load, 12 s once a session.
 
 **For the owner's editor:** R0's test also runs from the Test Runner window (PlayMode, *SceneLoadTimingTests*, run selected). There it includes the editor's own windows, which a batch run does not have, so its numbers are the ones the owner feels.
 
@@ -230,7 +236,7 @@ What the packs lack goes on the wanted list; another pack needs the owner.
 | Step | What | Why first | Depends on |
 |---|---|---|---|
 | 1 | R2.1 quality level, R2.6 filtering | one setting, fixes most of remark 4 at once | D5 |
-| 2 | R1.1–R1.2 additive interiors and preload | the owner's worst pain | D3 |
+| 2 | R1.1 additive interiors (**done** 2026-11-08; R1.2, the preload, not needed) | the owner's worst pain | D3 (a), chosen |
 | 3 | R3.1–R3.7 colour, sky, haze, light, grade | decides most of the look, needs no rebuild of the city | D2 |
 | 4 | R2.2–R2.5, R2.7 LOD, rooms, glass, shadows | needs the houses baked again | step 1 |
 | 5 | R4, R5 streets, pavements, passages (C4) | one rebuild of the city | D1 |
@@ -248,7 +254,7 @@ Each step ends with its check, the narrowest test set that covers it, renders fo
 |---|---|---|---|
 | D1 | Wider roads on which area? | (a) C3's area, shallower yards and two fewer lanes; (b) a larger city; and whether a round place at the centre is wanted | (a), without the round place |
 | D2 | Colour space (VS-COLOR) | (a) keep Gamma; (b) Linear, every material and light checked again | (b) |
-| D3 | How doors load | (a) additive interiors with the city kept loaded, separate scenes as now; (b) seamless interiors in the city scene | (a); (b) only if (a) misses 3 s |
+| D3 | How doors load | (a) additive interiors with the city kept loaded, separate scenes as now; (b) seamless interiors in the city scene | **Decided by the owner, 2026-11-08: (a)**, built in R1 |
 | D4 | Rooms behind windows | (a) built rooms near, matching mapped rooms far (R2.3–R2.4); (b) mapped rooms only, cheaper to load | (a) |
 | D5 | The quality level the editor and game use | High for both | High |
 | D6 | Tiled roofs | (a) slate only, as now; (b) terracotta in parts of the city | owner's taste |

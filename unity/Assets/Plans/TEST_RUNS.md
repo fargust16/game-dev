@@ -1,10 +1,10 @@
 # Test Runs and Heavy Operations
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft
 
-Last Updated: 2026-11-08 (§2, §5: the scene load diagnostic, run by name; `slice-play` leaves the Diagnostic category out, since a run by assembly also runs explicit tests. Earlier: `run_tests.ps1` for PowerShell, since PowerShell cannot run the `.sh` and its `bash` is WSL's. Earlier: first version: test sets, the Slow category, and how heavy runs are done, by the owner's request for faster runs)
+Last Updated: 2026-11-08 (§5: the scene load diagnostic also goes into a dwelling and photographs each arrival. Earlier: §2, §5: the scene load diagnostic, run by name; `slice-play` leaves the Diagnostic category out, since a run by assembly also runs explicit tests. Earlier: `run_tests.ps1` for PowerShell, since PowerShell cannot run the `.sh` and its `bash` is WSL's. Earlier: first version: test sets, the Slow category, and how heavy runs are done, by the owner's request for faster runs)
 
 Depends On:
 [AGENTS.md](../../../AGENTS.md)
@@ -57,7 +57,7 @@ Every set also takes `-batchmode -nographics -projectPath . -runTests -testResul
 - A run expected to take over two minutes goes to the background. The agent tells the owner what is running.
 - Unity writes a test XML only at the end, so a missing file is not a hang. Progress is read from the log and from the process's CPU time; a run is stuck only if its process takes no CPU.
 - Renders need graphics, so they leave out `-nographics`. PlayMode tests run with it.
-- **The scene load diagnostic** (`SceneLoadTimingTests`, category Diagnostic, explicit) runs only by name, with graphics: `-testPlatform PlayMode -assemblyNames GameDev.Slice.Tests.PlayMode -testFilter GameDev.Slice.Tests.SceneLoadTimingTests`, and `-sceneLoadProfile` to add the profiler's breakdown. A batch run selected by assembly runs `[Explicit]` tests too (measured 2026-11-08), so the `slice-play` set leaves the category out, and the diagnostic is run with this command line, not through the scripts. It takes about 3 minutes and writes `Logs/SceneLoad/`. Run it after any change to the city's content or to how scenes load ([VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R1).
+- **The scene load diagnostic** (`SceneLoadTimingTests`, category Diagnostic, explicit) runs only by name, with graphics: `-testPlatform PlayMode -assemblyNames GameDev.Slice.Tests.PlayMode -testFilter GameDev.Slice.Tests.SceneLoadTimingTests`, and `-sceneLoadProfile` to add the profiler's breakdown. A batch run selected by assembly runs `[Explicit]` tests too (measured 2026-11-08), so the `slice-play` set leaves the category out, and the diagnostic is run with this command line, not through the scripts. It takes about 3 minutes and writes its report and a picture of each arrival to `Logs/SceneLoad/`: the city cold, the Soot & Bell twice and a dwelling, each in and out. Run it after any change to the city's content or to how scenes load ([VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R1).
 - Python balance simulations run outside Unity and may run alongside it.
 
 # 6. The agent's shell
