@@ -1,12 +1,12 @@
 # Victorian Streets — Showcase Plan
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft — the owner's brief of 2026-11-08 (in chat), formalised by the agent before implementation; the streets accepted by the owner the same day
 
 Created: 2026-11-08
 
-Last Updated: 2026-11-08 (§4.4: rooms behind every window, from Victorian Interiors, and clear glass, at the owner's request after accepting the streets. Earlier: after the first renders: tints in linear space, a linear mortar mask, panes drawn from both sides, light set for the project's Gamma colour space, a night sky)
+Last Updated: 2026-11-08 (§4.4: the rooms switch by distance instead of an LOD group, and attic rooms stand under the mansard's flat only (VEILMOUTH_REFERENCE_PLAN R2 steps 2–3). Earlier: §4.4: rooms behind every window, from Victorian Interiors, and clear glass, at the owner's request after accepting the streets. Earlier: after the first renders: tints in linear space, a linear mortar mask, panes drawn from both sides, light set for the project's Gamma colour space, a night sky)
 
 Authority: the owner's brief of 2026-11-08; the kit's rules `victorian_kit/СБОРКА.md` (§ Правила first) and the package README (`Packages/com.victorian.kit`, a local `file:` package)
 
@@ -140,11 +140,11 @@ No trim sheet in this pass. Signs, ivy and broken panes are later decals or smal
 
 The owner, accepting the streets (2026-11-08): a look through a window must find floors, walls, furniture and stair flights, not an empty box. Every house therefore holds simple rooms of Victorian Interiors, built by `VicRooms` from the house's own plan and openings. They are **dressing**: nobody enters them, every collider and light of the pack's blocks is off, and the seven interiors and the Dwellings stay separate scenes ([VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md)).
 
-- **Rooms.** The plan is cut into rectangles row by row. A hall one cell wide runs back from the street door where the rectangle is at least 4 cells deep and 3 wide; deeper rectangles split into front and back bands, and each band into rooms of about 5 m. Every storey has the same cut, and lucarnes open an attic under the mansard. A room is a front room when any part of its street side looks onto the street.
+- **Rooms.** The plan is cut into rectangles row by row. A hall one cell wide runs back from the street door where the rectangle is at least 4 cells deep and 3 wide; deeper rectangles split into front and back bands, and each band into rooms of about 5 m. Every storey has the same cut, and lucarnes open an attic under the mansard: its rooms stand under the flat deck only, read from the house's flat tiles, with the knee walls 0.4 m inside its edge, so nothing of them stands out through a slope (2026-11-08). A room is a front room when any part of its street side looks onto the street.
 - **Kinds by wealth** (authoring defaults): rich houses have a dining room, study and parlour at the front of the ground floor, kitchen and scullery behind, a drawing room and bedrooms above, a bathroom on each upper storey and a servant's room in the attic; common houses have a parlour and dining room, a kitchen and scullery, bedrooms; poor houses have living rooms, a washroom, bedrooms. Halls, kitchens and living rooms are dark-panelled, a rich study panelled, the rest papered.
 - **Shell.** Floors and ceilings are the pack's 3 m tiles stretched to the room. Linings stand on the inside of the outer walls with gaps for the windows and doors; partitions stand on the cell edges. Each room has **one doorway**, to the hall or landing where it touches it and otherwise to the neighbour nearer it, by the longest shared wall, with the doorway by the wall's corner, as Victorian rooms have it, so the other walls stay free for furniture (rules G2). The stair rises along the hall's wall, or along the back wall in a shallow house, with balustrades round the well on every upper storey.
 - **Furniture** by kind follows [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) in short: an anchor (a fireplace, bed, sideboard, bookcases, bath) centred on the longest plain wall's clear stretch, or failing that on any other wall; its companions round it; nothing taller than the sill before a window; wall lamps on the plain walls. A piece taller than the room shrinks to fit under its ceiling. The pack's one bed is 3.1 m long with its steps and its fireplace 2.9 m wide, so a small room with doors and windows on every wall stays bare or keeps only a dresser; no smaller piece is made up (G10).
-- **Cost.** The rooms take light probes, cast no shadows, use no reflection probe, are static, and one LOD group per house culls them beyond 48 m, where the glass has turned to its mapped room.
+- **Cost.** The rooms take light probes, cast no shadows, use no reflection probe and are static. They are drawn only near: `VicRoomsSwitch` turns them on within 48 m of the nearest point of their box and off beyond 53 m, whatever the quality level, behind glass that is opaque from 46 m (VEILMOUTH_REFERENCE_PLAN R2 step 3). The show streets keep the older LOD group by screen size until they are built again.
 - **Measured, 2026-11-08** (`Logs/VictorianKit/rooms.txt`, a line per room with its kind, openings, what stands and what did not fit): of 125 rooms seen through a window on the two streets, 103 are furnished with 179 pieces; the 22 bare ones are attic rooms under 1.5 m wide and the smallest rooms of the poor houses.
 
 In Veilmouth the kit stands at ×1.25 and the furniture keeps its own size, so the same rooms are a quarter larger round the same pieces.

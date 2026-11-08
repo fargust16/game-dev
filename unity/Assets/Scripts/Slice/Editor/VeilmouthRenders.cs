@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using GameDev.VictorianKit;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -549,6 +550,277 @@ namespace GameDev.Slice.EditorTools
             }
 
             Debug.Log($"Veilmouth quality views written to {OutputFolder}.");
+        }
+
+        /// <summary>
+        /// The rooms' distance switch checked by pictures (reference plan R2, step 3): the four street views at noon and at
+        /// night, each drawn as the switch leaves it, with every room on, and with every room off. The switch is unseen
+        /// when the first two match, and the rooms near the camera are drawn when the first and the last differ. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderRoomsSwitch
+        /// </summary>
+        public static void RenderRoomsSwitch()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            Shader.SetGlobalVector("_Growth_WindSettings", Vector4.zero); // no wind: the leaves stand still between the pictures
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            var switches = Object.FindObjectsByType<VicRoomsSwitch>(FindObjectsSortMode.None);
+            var views = new[]
+            {
+                ("highstreet", -10f, -235f, 100f, -235f, 3f),
+                ("parade", 0f, -174f, 120f, -174f, 3f),
+                ("bellstreet", 195f, -278f, 100f, -278f, 2.5f),
+                ("terraces", 22f, -184f, 22f, -215f, 2f),
+            };
+
+            // Only the houses are drawn for the comparison: leaves and people differ from one picture to the next.
+            var houses = new System.Collections.Generic.HashSet<Transform>(switches.Select(s => s.GetComponentInParent<GameDev.Slice.Kit.KitBlock>()).Where(b => b != null).Select(b => b.transform));
+            bool InHouse(Transform t)
+            {
+                for (; t != null; t = t.parent)
+                {
+                    if (houses.Contains(t))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            var others = Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None).Where(r => !r.forceRenderingOff && !InHouse(r.transform)).ToArray();
+            var report = new System.Collections.Generic.List<string> { $"{switches.Length} houses with rooms; {others.Length} other renderers hidden for the comparison" };
+            _skyAndGrade = true;
+            try
+            {
+                sky?.Apply(12 * 60);
+                Eye("rooms_warmup", views[0].Item2, views[0].Item3, views[0].Item4, views[0].Item5, views[0].Item6);
+                File.Delete($"{OutputFolder}/rooms_warmup.png");
+                foreach (var (time, minute) in new[] { ("noon", 12 * 60), ("night", 23 * 60) })
+                {
+                    sky?.Apply(minute);
+                    foreach (var (view, x, z, toX, toZ, up) in views)
+                    {
+                        var name = $"rooms_{view}_{time}";
+                        foreach (var r in others)
+                        {
+                            r.forceRenderingOff = true;
+                        }
+
+                        Eye(name + "_switch", x, z, toX, toZ, up);
+                        var shown = switches.Count(s => s.Shown);
+                        ForceRooms(switches, true);
+                        Eye(name + "_on", x, z, toX, toZ, up);
+                        ForceRooms(switches, false);
+                        Eye(name + "_off", x, z, toX, toZ, up);
+                        ReleaseRooms(switches);
+                        var (unseen, worst) = Differ($"{OutputFolder}/{name}_switch.png", $"{OutputFolder}/{name}_on.png");
+                        var (near, _) = Differ($"{OutputFolder}/{name}_switch.png", $"{OutputFolder}/{name}_off.png");
+                        report.Add($"{name}: rooms on in {shown} of {switches.Length} houses; {unseen} pixels differ from every room on (largest {worst}/255), " +
+                                   $"{near} from every room off");
+                        if (time == "noon")
+                        {
+                            report.AddRange(Culprits(name, x, z, toX, toZ, up, switches));
+                        }
+
+                        foreach (var r in others)
+                        {
+                            r.forceRenderingOff = false;
+                        }
+                        SideBySide(name, new[] { $"{OutputFolder}/{name}_switch.png", $"{OutputFolder}/{name}_off.png" });
+                    }
+                }
+            }
+            finally
+            {
+                ReleaseRooms(switches);
+                foreach (var r in others)
+                {
+                    r.forceRenderingOff = false;
+                }
+
+                _skyAndGrade = false;
+            }
+
+            File.WriteAllLines($"{OutputFolder}/rooms_switch.txt", report);
+            Debug.Log("[RoomsSwitch]\n" + string.Join("\n", report));
+        }
+
+        /// <summary>
+        /// The houses whose rooms make the difference between a view as the switch leaves it and with every room on: a
+        /// ray through each differing pixel to the nearest rooms' box it passes within 3 m of, counted by house; the
+        /// four worst are drawn close up with every room on and every room off.
+        /// </summary>
+        private static System.Collections.Generic.IEnumerable<string> Culprits(string name, float x, float z, float toX, float toZ, float up, VicRoomsSwitch[] switches)
+        {
+            var terrain = Terrain.activeTerrain;
+            float Ground(float gx, float gz) => terrain.SampleHeight(new Vector3(gx, 0f, gz)) + terrain.transform.position.y;
+            var from = new Vector3(x, Ground(x, z) + 1.7f, z);
+            var to = new Vector3(toX, Ground(toX, toZ) + up, toZ);
+            var camera = Make();
+            camera.fieldOfView = 65f;
+            camera.aspect = 1600f / 900f;
+            camera.transform.SetPositionAndRotation(from, Quaternion.LookRotation(to - from));
+            var mask = new Texture2D(2, 2);
+            mask.LoadImage(File.ReadAllBytes($"{OutputFolder}/{name}_on_diff.png"));
+            var pixels = mask.GetPixels32();
+            var hits = new System.Collections.Generic.Dictionary<VicRoomsSwitch, (int Count, Vector3 Point)>();
+            for (var i = 0; i < pixels.Length; i += 1)
+            {
+                if (pixels[i].r != 255 || pixels[i].g != 0)
+                {
+                    continue;
+                }
+
+                var ray = camera.ViewportPointToRay(new Vector3(((i % mask.width) + 0.5f) / mask.width, ((i / mask.width) + 0.5f) / mask.height, 0f));
+                VicRoomsSwitch best = null;
+                var bestT = float.MaxValue;
+                foreach (var s in switches.Where(s => !s.Shown))
+                {
+                    var local = new Ray(s.transform.InverseTransformPoint(ray.origin), s.transform.InverseTransformDirection(ray.direction));
+                    var grown = s.Box;
+                    grown.Expand(3f);
+                    if (grown.IntersectRay(local, out var t) && t < bestT)
+                    {
+                        (best, bestT) = (s, t);
+                    }
+                }
+
+                if (best != null)
+                {
+                    var point = best.transform.TransformPoint(new Ray(best.transform.InverseTransformPoint(ray.origin), best.transform.InverseTransformDirection(ray.direction)).GetPoint(bestT));
+                    hits[best] = hits.TryGetValue(best, out var h) ? (h.Count + 1, h.Point) : (1, point);
+                }
+            }
+
+            Object.DestroyImmediate(mask);
+            Object.DestroyImmediate(camera.gameObject);
+            var lines = new System.Collections.Generic.List<string>();
+            var k = 0;
+            foreach (var (rooms, (count, point)) in hits.OrderByDescending(p => p.Value.Count).Select(p => (p.Key, p.Value)))
+            {
+                var house = rooms.GetComponentInParent<GameDev.Slice.Kit.KitBlock>();
+                var label = house != null ? house.name : rooms.transform.root.name;
+                lines.Add($"  {count} pixels: {label} at {point.x:0},{point.y:0},{point.z:0}, {rooms.DistanceFrom(from):0.0} m from the rooms' box");
+                if (k >= 4)
+                {
+                    continue;
+                }
+
+                // Close up: 14 m back toward the view and 4 m up, every room on, then off.
+                var back = from - point;
+                back.y = 0f;
+                var eye = point + (back.normalized * 14f) + (Vector3.up * 4f);
+                var shot = $"{name}_culprit{k}";
+                ForceRooms(switches, true);
+                Eye(shot + "_on", eye, point);
+                ForceRooms(switches, false);
+                Eye(shot + "_off", eye, point);
+                ReleaseRooms(switches);
+                SideBySide(shot, new[] { $"{OutputFolder}/{shot}_on.png", $"{OutputFolder}/{shot}_off.png" });
+                k++;
+            }
+
+            return lines;
+        }
+
+        // The switches stand aside while every room is drawn or hidden by hand, and take over again with their own state.
+        private static void ForceRooms(VicRoomsSwitch[] switches, bool on)
+        {
+            foreach (var s in switches)
+            {
+                s.enabled = false;
+                foreach (var r in s.GetComponentsInChildren<Renderer>(true))
+                {
+                    r.forceRenderingOff = !on;
+                }
+            }
+        }
+
+        private static void ReleaseRooms(VicRoomsSwitch[] switches)
+        {
+            foreach (var s in switches)
+            {
+                s.enabled = true;
+                foreach (var r in s.GetComponentsInChildren<Renderer>(true))
+                {
+                    r.forceRenderingOff = !s.Shown;
+                }
+            }
+        }
+
+        /// <summary>
+        /// How many pixels of two pictures differ by more than 2 of 255 in any channel, and the largest difference; the
+        /// differing pixels are written red over the first picture, darkened, as "{b}_diff.png".
+        /// </summary>
+        private static (int Count, int Largest) Differ(string a, string b)
+        {
+            var ta = new Texture2D(2, 2);
+            var tb = new Texture2D(2, 2);
+            ta.LoadImage(File.ReadAllBytes(a));
+            tb.LoadImage(File.ReadAllBytes(b));
+            var pa = ta.GetPixels32();
+            var pb = tb.GetPixels32();
+            var mask = new Color32[pa.Length];
+            int count = 0, largest = 0;
+            for (var i = 0; i < pa.Length; i++)
+            {
+                var d = Mathf.Max(Mathf.Abs(pa[i].r - pb[i].r), Mathf.Abs(pa[i].g - pb[i].g), Mathf.Abs(pa[i].b - pb[i].b));
+                largest = Mathf.Max(largest, d);
+                mask[i] = d > 2 ? new Color32(255, 0, 0, 255) : new Color32((byte)(pa[i].r / 3), (byte)(pa[i].g / 3), (byte)(pa[i].b / 3), 255);
+                if (d > 2)
+                {
+                    count++;
+                }
+            }
+
+            var diff = new Texture2D(ta.width, ta.height, TextureFormat.RGB24, false);
+            diff.SetPixels32(mask);
+            diff.Apply();
+            File.WriteAllBytes(Path.ChangeExtension(b, null) + "_diff.png", diff.EncodeToPNG());
+            Object.DestroyImmediate(diff);
+
+            // The six 40-pixel tiles with the most differing pixels, each 120 pixels round it from both pictures, ×3.
+            const int tile = 40, half = 60, zoom = 3;
+            var tiles = new System.Collections.Generic.Dictionary<int, int>();
+            for (var i = 0; i < pa.Length; i++)
+            {
+                if (mask[i].r == 255 && mask[i].g == 0)
+                {
+                    var key = ((i / ta.width / tile) * 1000) + ((i % ta.width) / tile);
+                    tiles[key] = tiles.TryGetValue(key, out var n) ? n + 1 : 1;
+                }
+            }
+
+            var worst = tiles.OrderByDescending(t => t.Value).Take(6).ToList();
+            if (worst.Count > 0)
+            {
+                var side = 2 * half * zoom;
+                var sheet = new Texture2D(side * 2, side * worst.Count, TextureFormat.RGB24, false);
+                for (var k = 0; k < worst.Count; k++)
+                {
+                    var cy = ((worst[k].Key / 1000) * tile) + (tile / 2);
+                    var cx = ((worst[k].Key % 1000) * tile) + (tile / 2);
+                    for (var y = 0; y < side; y++)
+                    {
+                        for (var x = 0; x < side; x++)
+                        {
+                            var sx = Mathf.Clamp(cx - half + (x / zoom), 0, ta.width - 1);
+                            var sy = Mathf.Clamp(cy - half + (y / zoom), 0, ta.height - 1);
+                            sheet.SetPixel(x, (k * side) + y, pa[(sy * ta.width) + sx]);
+                            sheet.SetPixel(side + x, (k * side) + y, pb[(sy * ta.width) + sx]);
+                        }
+                    }
+                }
+
+                sheet.Apply();
+                File.WriteAllBytes(Path.ChangeExtension(b, null) + "_zoom.png", sheet.EncodeToPNG());
+                Object.DestroyImmediate(sheet);
+            }
+            Object.DestroyImmediate(ta);
+            Object.DestroyImmediate(tb);
+            return (count, largest);
         }
 
         private static void SideBySide(string name, string[] files)

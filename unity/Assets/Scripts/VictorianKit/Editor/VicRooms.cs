@@ -16,8 +16,8 @@ namespace GameDev.VictorianKit.EditorTools
     /// house's plan and placed by its openings, so that a look through the glass finds a room and not a box.
     /// <para>
     /// Dressing only: nobody enters, so every collider is off, every body still and every light out; the rooms take
-    /// light probes, cast no shadows and are culled with one LOD group beyond <see cref="CullDistance"/>, where the
-    /// window shader has turned to its mapped room. The furniture follows Plans/INTERIOR_FURNISHING_RULES.md in short:
+    /// light probes, cast no shadows and are switched off by distance (<see cref="VicRoomsSwitch"/>) behind glass the
+    /// window shader has already turned to its mapped room. The furniture follows Plans/INTERIOR_FURNISHING_RULES.md in short:
     /// an anchor centred on the wall the windows face (G2, G3), its companions round it (G4), nothing tall before a
     /// window (G8), wall lamps where the room is a storey high (G9).
     /// </para>
@@ -33,9 +33,6 @@ namespace GameDev.VictorianKit.EditorTools
         public const string RoomFolder = "Assets/Prefabs/SliceKit/ViRoom";
         public const string FurnitureFolder = "Assets/Prefabs/SliceKit/ViFurniture";
         public const string RootName = "Rooms";
-
-        /// <summary>Beyond this distance, m, the rooms are culled; the window shader's _RoomFar lies inside it.</summary>
-        public const float CullDistance = 48f;
 
         /// <summary>One line per room of every house built since it was last cleared: kind, size, openings, what stands and what did not fit.</summary>
         public static readonly List<string> Report = new List<string>();
@@ -54,8 +51,11 @@ namespace GameDev.VictorianKit.EditorTools
         /// <summary>A lining's line from the outline: its back on the kit wall's inner face, 0.25 m in.</summary>
         private static readonly float OuterLine = (float)VicKit.WallT + WallBehind;
 
-        /// <summary>In the mansard, the knee wall stands this far in from the outline, under the flat (inset 2 m).</summary>
-        private const float KneeInset = 2.4f;
+        /// <summary>
+        /// In the mansard, the knee wall's back stands this far inside the edge of the flat deck (VicRoofs.Mansard):
+        /// 2.4 m from a straight outline, as before, and never under a slope.
+        /// </summary>
+        private const float KneeInset = 0.4f;
 
         /// <summary>Half a window's or door's 2 m module, along the wall: nothing tall stands in it.</summary>
         private const float OpeningHalf = 0.95f;
@@ -148,6 +148,7 @@ namespace GameDev.VictorianKit.EditorTools
             public readonly Dictionary<(int Storey, int I, int J), Room> At = new Dictionary<(int, int, int), Room>();
             public Stair Stair;
             public int Storeys; // with the attic, if any
+            public readonly HashSet<(int I, int J)> Flat = new HashSet<(int, int)>(); // the mansard's flat deck tiles, by cell
         }
 
         // ------------------------------------------------------------------------------------------------ entry
@@ -198,7 +199,7 @@ namespace GameDev.VictorianKit.EditorTools
                     + $"\ttaken: {string.Join(" ", r.Taken.Select(t => $"[{t.xMin:F1},{t.yMin:F1},{t.xMax:F1},{t.yMax:F1}]"))}\tbox [{r.Box.xMin:F1},{r.Box.yMin:F1},{r.Box.xMax:F1},{r.Box.yMax:F1}]");
             }
 
-            Finish(root.gameObject, houseScale);
+            Finish(root.gameObject);
             return root.gameObject;
         }
 
@@ -211,6 +212,12 @@ namespace GameDev.VictorianKit.EditorTools
             var attic = -1;
             foreach (var p in h.Spec.House.Pieces)
             {
+                if (p.Id == "SM_Vic_Roof_Flat_Deck")
+                {
+                    h.Flat.Add((Mathf.RoundToInt((float)p.X / 2f), Mathf.RoundToInt((float)p.Y / 2f)));
+                    continue;
+                }
+
                 var window = p.Id.StartsWith("SM_Vic_Window_", StringComparison.Ordinal);
                 var door = p.Id.StartsWith("SM_Vic_Door_", StringComparison.Ordinal);
                 var lucarne = p.Id.StartsWith("SM_Vic_Lucarne_", StringComparison.Ordinal);
@@ -332,8 +339,15 @@ namespace GameDev.VictorianKit.EditorTools
             for (var storey = 0; storey < h.Storeys; storey++)
             {
                 var attic = storey >= h.Spec.Floors;
-                foreach (var (cells, hall) in cut)
+                foreach (var (whole, hall) in cut)
                 {
+                    var under = attic ? UnderFlat(h, whole) : whole;
+                    if (under == null)
+                    {
+                        continue;
+                    }
+
+                    var cells = under.Value;
                     var room = new Room
                     {
                         Index = h.Rooms.Count,
@@ -359,6 +373,36 @@ namespace GameDev.VictorianKit.EditorTools
             }
 
             Kinds(h);
+        }
+
+        /// <summary>
+        /// The largest part of <paramref name="cells"/> under the mansard's flat, read from the house's own flat deck
+        /// tiles (a row's flat runs to an open end, and stops 2 m inside a faced one); null where none is. An attic room
+        /// stands only there: the slope rises from the outline over every other cell, and attic walls built over a
+        /// pavilion stood out through it (seen 2026-11-08).
+        /// </summary>
+        private static RectInt? UnderFlat(House h, RectInt cells)
+        {
+            RectInt? best = null;
+            for (var x0 = cells.xMin; x0 < cells.xMax; x0++)
+            {
+                for (var y0 = cells.yMin; y0 < cells.yMax; y0++)
+                {
+                    for (var x1 = x0 + 1; x1 <= cells.xMax; x1++)
+                    {
+                        for (var y1 = y0 + 1; y1 <= cells.yMax; y1++)
+                        {
+                            var r = new RectInt(x0, y0, x1 - x0, y1 - y0);
+                            if ((best == null || r.width * r.height > best.Value.width * best.Value.height) && Cells(r).All(c => h.Flat.Contains((c.x, c.y))))
+                            {
+                                best = r;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return best;
         }
 
         private static List<RectInt> Rectangles(VicPlan plan)
@@ -476,7 +520,9 @@ namespace GameDev.VictorianKit.EditorTools
                 }
 
                 var alongX = s.Index == 0 || s.Index == 2;
-                foreach (var o in openings.Where(o => o.AlongX == alongX && Mathf.Abs(o.Line - s.Edge) < 0.05f))
+                // An attic side stands on the flat's edge, 2 m in from the outline whose lucarnes it looks out through.
+                var line = r.Attic ? s.Edge - ((float)VicKit.MansardInset * (alongX ? s.In.z : s.In.x)) : s.Edge;
+                foreach (var o in openings.Where(o => o.AlongX == alongX && Mathf.Abs(o.Line - line) < 0.05f))
                 {
                     // Only where this side is the outer wall.
                     var p = alongX ? new Vector3(o.Centre, 0f, s.Edge) : new Vector3(s.Edge, 0f, o.Centre);
@@ -749,14 +795,8 @@ namespace GameDev.VictorianKit.EditorTools
 
             if (r.Attic)
             {
-                // Only the flat is a ceiling; the slopes close the rest.
-                var inset = (float)VicKit.MansardInset;
-                var flat = Rect.MinMaxRect(area.xMin + (Trim(3) > 0 ? inset : 0f), area.yMin + (Trim(0) > 0 ? inset : 0f),
-                                           area.xMax - (Trim(1) > 0 ? inset : 0f), area.yMax - (Trim(2) > 0 ? inset : 0f));
-                if (flat.width > 0.2f && flat.height > 0.2f)
-                {
-                    Tiles(h, Prefab("ViRoom", "Ceiling"), flat, r.Floor + r.Height + 0.05f, 1f);
-                }
+                // An attic room stands under the flat only (UnderFlat), so all of it has the flat's ceiling.
+                Tiles(h, Prefab("ViRoom", "Ceiling"), area, r.Floor + r.Height + 0.05f, 1f);
             }
             else
             {
@@ -973,13 +1013,16 @@ namespace GameDev.VictorianKit.EditorTools
                             var alongX = s.Index == 0 || s.Index == 2;
                             float Trim(float end, float dir)
                             {
-                                // An end on the outline stops at the outer wall's inner face.
+                                // An end on the outline stops at the outer wall's inner face; in the attic, at the flat's
+                                // edge, it stops at the knee wall's back, since a partition carried to the outer wall
+                                // stood out through the slope and the lucarnes (seen 2026-11-08).
                                 var p = end + (dir * 0.5f);
                                 var edgeCell = Mathf.FloorToInt(s.Edge / 2f);
                                 var cellA = alongX ? (Mathf.FloorToInt(p / 2f), edgeCell) : (edgeCell, Mathf.FloorToInt(p / 2f));
                                 var cellB = alongX ? (Mathf.FloorToInt(p / 2f), edgeCell - 1) : (edgeCell - 1, Mathf.FloorToInt(p / 2f));
-                                var outside = !h.Spec.Plan.Inside(cellA.Item1, cellA.Item2) || !h.Spec.Plan.Inside(cellB.Item1, cellB.Item2);
-                                return outside ? end - (dir * ((float)VicKit.WallT + 0.02f)) : end;
+                                var outside = !h.At.ContainsKey((r.Storey, cellA.Item1, cellA.Item2)) || !h.At.ContainsKey((r.Storey, cellB.Item1, cellB.Item2));
+                                var wall = r.Attic ? KneeInset : (float)VicKit.WallT;
+                                return outside ? end - (dir * (wall + 0.02f)) : end;
                             }
 
                             var pa = Trim(a, -1f);
@@ -1614,8 +1657,8 @@ namespace GameDev.VictorianKit.EditorTools
             }
         }
 
-        /// <summary>Static for batching, lit by probes, no shadows, and one LOD group that culls the rooms beyond <see cref="CullDistance"/>.</summary>
-        private static void Finish(GameObject root, float houseScale)
+        /// <summary>Static for batching, lit by probes, no shadows, and switched off by distance (<see cref="Switch"/>).</summary>
+        private static void Finish(GameObject root)
         {
             foreach (var t in root.GetComponentsInChildren<Transform>(true))
             {
@@ -1635,17 +1678,52 @@ namespace GameDev.VictorianKit.EditorTools
                 r.reflectionProbeUsage = ReflectionProbeUsage.Off;
             }
 
-            if (renderers.Length == 0)
+            Switch(root);
+        }
+
+        /// <summary>
+        /// Gives built rooms their distance switch, with the box of every renderer under <paramref name="root"/> in the
+        /// root's own space, and removes the LOD group that culled them by screen size before (it depended on the
+        /// lodBias and on the room's centre, not its nearest point). Run on a fresh build and on a baked house alike.
+        /// </summary>
+        public static VicRoomsSwitch Switch(GameObject root)
+        {
+            var old = root.GetComponent<LODGroup>();
+            if (old != null)
             {
-                return;
+                Object.DestroyImmediate(old, true);
             }
 
-            var lod = root.AddComponent<LODGroup>();
-            lod.SetLODs(new[] { new LOD(0.1f, renderers) });
-            lod.RecalculateBounds();
-            var size = lod.size * houseScale;
-            var height = size / (2f * CullDistance * Mathf.Tan(30f * Mathf.Deg2Rad));
-            lod.SetLODs(new[] { new LOD(Mathf.Clamp(height, 0.005f, 0.9f), renderers) });
+            var toRoot = root.transform.worldToLocalMatrix;
+            var box = default(Bounds);
+            var first = true;
+            foreach (var r in root.GetComponentsInChildren<Renderer>(true))
+            {
+                var local = r.localBounds;
+                var m = toRoot * r.transform.localToWorldMatrix;
+                for (var corner = 0; corner < 8; corner++)
+                {
+                    var p = m.MultiplyPoint3x4(local.center + Vector3.Scale(local.extents, new Vector3((corner & 1) == 0 ? -1 : 1, (corner & 2) == 0 ? -1 : 1, (corner & 4) == 0 ? -1 : 1)));
+                    if (first)
+                    {
+                        box = new Bounds(p, Vector3.zero);
+                        first = false;
+                    }
+                    else
+                    {
+                        box.Encapsulate(p);
+                    }
+                }
+            }
+
+            var rooms = root.GetComponent<VicRoomsSwitch>();
+            if (rooms == null)
+            {
+                rooms = root.AddComponent<VicRoomsSwitch>();
+            }
+
+            rooms.Box = box;
+            return rooms;
         }
     }
 }

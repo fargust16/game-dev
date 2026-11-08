@@ -40,13 +40,20 @@ namespace GameDev.Slice.EditorTools
         /// <summary>The kit steps' riser and tread in the city, m (measured: 0.6 m up over 1.1 m in four steps at ×1), which the city's steps continue.</summary>
         public const float StepRise = Scale * 0.6f / StepCount, StepTread = Scale * 1.1f / StepCount;
 
-        /// <summary>Beyond this share of the screen a house shows only its walls, openings and roofs, not its trims and pipes.</summary>
-        private const float DetailScreen = 0.15f;
+        /// <summary>
+        /// Below this share of the screen a house cross-fades out its <see cref="Details"/> (authoring default: with the
+        /// 60° view, about 21.7 × the house's largest size, so 320–410 m for the city's houses).
+        /// </summary>
+        public const float DetailScreen = 0.04f;
 
-        private static readonly string[] Details =
+        /// <summary>
+        /// The pieces a far house drops: downpipes and their fittings, brackets, chimney pots and the small rails (R2
+        /// step 2). Surrounds, cornices, bands, sills, quoins, pilasters, gutters and roof edges stand at every distance.
+        /// </summary>
+        public static readonly string[] Details =
         {
-            "SM_Vic_Trim_", "SM_Vic_Rain_", "SM_Vic_ChimneyPot_", "SM_Vic_Rail_", "SM_Vic_Quoin_", "SM_Vic_Bracket", "SM_Vic_Roof_Flashing",
-            "SM_Vic_Roof_Soffit", "SM_Vic_WeatherVane", "SM_Vic_Roof_MansardEdge", "SM_Vic_Pilaster",
+            "SM_Vic_Rain_Pipe", "SM_Vic_Rain_Bracket", "SM_Vic_Rain_Shoe", "SM_Vic_Rain_Elbow", "SM_Vic_Rain_Hopper", "SM_Vic_Rain_Outlet",
+            "SM_Vic_ChimneyPot_", "SM_Vic_Rail_", "SM_Vic_Bracket",
         };
 
         private delegate VicHouseSpec RowMaker(string name, int width, string palette, VicEnd left, VicEnd right);
@@ -392,19 +399,15 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// Static for batching, occlusion and probes, lit by light probes (Veilmouth has no lightmaps); one LOD group that
-        /// drops the trims, pipes, pots and rails beyond <see cref="DetailScreen"/> and keeps walls, openings and roofs.
+        /// Static for batching, occlusion and probes, lit by light probes (Veilmouth has no lightmaps), and the
+        /// <see cref="DetailLod"/>.
         /// </summary>
         private static void Dress(GameObject model)
         {
             const StaticEditorFlags flags = StaticEditorFlags.BatchingStatic | StaticEditorFlags.OccluderStatic | StaticEditorFlags.OccludeeStatic |
                                             StaticEditorFlags.ReflectionProbeStatic;
-            var all = new List<Renderer>();
-            var kept = new List<Renderer>();
             foreach (Transform piece in model.transform)
             {
-                var id = piece.name.Substring(0, piece.name.LastIndexOf('_'));
-                var detail = Details.Any(id.StartsWith);
                 foreach (var t in piece.GetComponentsInChildren<Transform>(true))
                 {
                     GameObjectUtility.SetStaticEditorFlags(t.gameObject, flags);
@@ -413,17 +416,128 @@ namespace GameDev.Slice.EditorTools
                 foreach (var r in piece.GetComponentsInChildren<MeshRenderer>(true))
                 {
                     r.receiveGI = ReceiveGI.LightProbes;
+                }
+            }
+
+            DetailLod(model);
+        }
+
+        /// <summary>
+        /// One LOD group over the house's <see cref="Details"/> only, which cross-fade out below
+        /// <see cref="DetailScreen"/> of the screen; its size and centre are the whole house's, so the share is the
+        /// house's. Every other piece stands in no LOD level and is drawn at every distance, so no level ever swaps
+        /// a wall, a frame or a pane (R2 step 2; the window glass therefore needs no cross-fade). Replaces an older group.
+        /// </summary>
+        public static LODGroup DetailLod(GameObject model)
+        {
+            var all = new List<Renderer>();
+            var details = new List<Renderer>();
+            foreach (Transform piece in model.transform)
+            {
+                var cut = piece.name.LastIndexOf('_');
+                if (piece.name == VicRooms.RootName || cut < 0)
+                {
+                    continue;
+                }
+
+                var detail = Details.Any(piece.name.Substring(0, cut).StartsWith);
+                foreach (var r in piece.GetComponentsInChildren<MeshRenderer>(true))
+                {
                     all.Add(r);
-                    if (!detail)
+                    if (detail)
                     {
-                        kept.Add(r);
+                        details.Add(r);
                     }
                 }
             }
 
-            var lod = model.AddComponent<LODGroup>();
-            lod.SetLODs(new[] { new LOD(DetailScreen, all.ToArray()), new LOD(0.004f, kept.ToArray()) });
+            var lod = model.GetComponent<LODGroup>();
+            if (lod == null)
+            {
+                lod = model.AddComponent<LODGroup>();
+            }
+
+            lod.SetLODs(new[] { new LOD(DetailScreen, all.ToArray()) });
             lod.RecalculateBounds();
+            var (size, centre) = (lod.size, lod.localReferencePoint);
+            lod.SetLODs(new[] { new LOD(DetailScreen, details.ToArray()) });
+            lod.size = size;
+            lod.localReferencePoint = centre;
+            lod.fadeMode = LODFadeMode.CrossFade;
+            lod.animateCrossFading = true;
+            return lod;
+        }
+
+        /// <summary>
+        /// The baked houses given <see cref="DetailLod"/> and their rooms built again (with their distance switch) in
+        /// place, without baking the houses again: a bake gives every piece a new file ID, and the city's strange
+        /// windows override the house's pieces by ID. The rooms' pieces are overridden nowhere, so they may be new.
+        /// </summary>
+        public static void RedressAll()
+        {
+            var makers = Types().ToDictionary(t => PrefabStem(t.Key), t => (t.Key, t.Make));
+            int houses = 0, always = 0, detail = 0;
+            VicRooms.Report.Clear();
+            foreach (var path in Directory.GetFiles(Folder, "Kit_House_*.prefab").Select(p => p.Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal))
+            {
+                var name = Path.GetFileNameWithoutExtension(path);
+                var stem = name.Substring(0, name.LastIndexOf('_'));
+                if (!makers.TryGetValue(stem, out var maker))
+                {
+                    throw new InvalidOperationException($"{path} is no type the city bakes.");
+                }
+
+                var root = PrefabUtility.LoadPrefabContents(path);
+                try
+                {
+                    var model = root.transform.Find("Model");
+                    if (model == null)
+                    {
+                        throw new InvalidOperationException($"{path} has no Model.");
+                    }
+
+                    var lod = DetailLod(model.gameObject);
+                    var old = model.Find(VicRooms.RootName);
+                    if (old != null)
+                    {
+                        Object.DestroyImmediate(old.gameObject);
+                    }
+
+                    var rooms = VicRooms.Build(maker.Make(maker.Key), model, Scale).transform;
+
+                    var dropped = new HashSet<Renderer>(lod.GetLODs()[0].renderers);
+                    foreach (var f in model.GetComponentsInChildren<MeshFilter>(true))
+                    {
+                        if (f.sharedMesh == null || (rooms != null && f.transform.IsChildOf(rooms)))
+                        {
+                            continue;
+                        }
+
+                        var tris = (int)Enumerable.Range(0, f.sharedMesh.subMeshCount).Sum(s => (long)f.sharedMesh.GetIndexCount(s)) / 3;
+                        if (dropped.Contains(f.GetComponent<Renderer>()))
+                        {
+                            detail += tris;
+                        }
+                        else
+                        {
+                            always += tris;
+                        }
+                    }
+
+                    PrefabUtility.SaveAsPrefabAsset(root, path);
+                    houses++;
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(root);
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+            Directory.CreateDirectory("Logs/VictorianKit");
+            File.WriteAllLines("Logs/VictorianKit/veilmouth_rooms.txt", VicRooms.Report);
+            Debug.Log($"[VeilmouthKitHouses] redressed {houses} houses: {always} triangles stand at every distance, {detail} fade out " +
+                      $"below {DetailScreen:P0} of the screen (one of each type); a line per room in Logs/VictorianKit/veilmouth_rooms.txt.");
         }
 
         /// <summary>A placed piece's footprint in the block, from its module's own footprint (lowest and highest corners).</summary>
