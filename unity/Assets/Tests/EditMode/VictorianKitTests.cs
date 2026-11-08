@@ -8,14 +8,15 @@ namespace GameDev.Slice.Tests
 {
     /// <summary>
     /// VI-1 (VICTORIAN_INTERIORS_PLAN §8): every Victorian Interiors block builds as a kit block, the bookcases carry
-    /// their books, and the sample rooms stand without a kit fault. The wrappers are rebuilt the same each time.
+    /// their books, and the sample rooms stand without a kit fault. The wrappers on disk are read, not rebuilt: a rebuild
+    /// gives a set's parts new file IDs, and the kit houses' rooms turn those parts off by ID (VEILMOUTH_CITY_PLAN §24.7).
     /// </summary>
     public sealed class VictorianKitTests
     {
         [Test]
         public void EveryVictorianBlockBuildsAndTheSamplesAreClean()
         {
-            var kit = SliceKitCatalogue.BuildVictorian();
+            var kit = SliceKitCatalogue.LoadVictorian();
             var specs = SliceKitCatalogue.ViSpecs().Select(s => s.Key).ToList();
             CollectionAssert.AreEquivalent(specs, kit.Keys, "a Victorian spec built no block");
 

@@ -10,7 +10,11 @@
         "GameDev.World.Portals",
         "GameDev.World.Interiors",
         "GameDev.UI",
-        "GameDev.World.Poi"
+        "GameDev.World.Poi",
+        "GameDev.VictorianKit",
+        "GameDev.VictorianKit.Editor",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime"
     ],
     "includePlatforms": [
         "Editor"

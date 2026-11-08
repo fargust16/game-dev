@@ -34,17 +34,19 @@ namespace GameDev.Slice.EditorTools
         private static readonly (string Key, float Px, float Py, int X0, int Y0, int X1, int Y1, int Turns, string Name)[] Spots =
         {
             ("AngelStatue", 557.5f, 697f, 557, 696, 558, 698, 0, "Angel fountain, Wardley Garden"),
-            ("AngelStatueB", 512f, 646f, 503, 629, 522, 647, 0, "Angel, the old chapel's graveyard"),
-            ("AngelStatueC", 731f, 655f, 718, 649, 736, 660, 2, "Angel, the east villa's garden"),
-            ("LionStatue", 602f, 655f, 588, 649, 609, 660, 2, "Lion, the palace forecourt (west)"),
-            ("LionStatue", 618f, 655f, 611, 649, 632, 660, 2, "Lion, the palace forecourt (east)"),
-            ("Birdbath", 528.5f, 652.5f, 525, 649, 554, 660, 0, "Birdbath, Ridge villa (west)"),
-            ("Birdbath", 582f, 653f, 557, 649, 585, 660, 0, "Birdbath, Ridge villa (stucco)"),
-            ("Birdbath", 636.5f, 652.5f, 635, 649, 668, 660, 0, "Birdbath, the faction's garden"),
-            ("Birdbath", 674f, 653f, 671, 649, 702, 660, 0, "Birdbath, Ridge villa (grey)"),
-            ("Birdbath", 708.5f, 652.5f, 705, 649, 718, 660, 0, "Birdbath, Ridge villa (east)"),
-            ("Birdbath", 511f, 699f, 501, 686, 515, 707, 0, "Birdbath, detached house (stucco)"),
-            ("Birdbath", 532f, 699f, 529, 686, 543, 707, 0, "Birdbath, detached house (brick)"),
+            // City plan C3 (§24.3): the villas' side gardens north of the Parade, the forecourt either side of the Crown
+            // Axis (px 612), and the Terraces' plots of 16 m.
+            ("AngelStatueB", 512f, 646f, 503, 629, 529, 649, 0, "Angel, the old chapel's graveyard"),
+            ("AngelStatueC", 734f, 655f, 731, 640, 737, 661, 2, "Angel, the east villa's garden"),
+            ("LionStatue", 602f, 657f, 588, 651, 609, 666, 2, "Lion, the palace forecourt (west)"),
+            ("LionStatue", 622f, 657f, 615, 651, 636, 666, 2, "Lion, the palace forecourt (east)"),
+            ("Birdbath", 533f, 655f, 531, 640, 535, 661, 0, "Birdbath, Ridge villa (west)"),
+            ("Birdbath", 582.5f, 655f, 580, 640, 585, 661, 0, "Birdbath, Ridge villa (stucco)"),
+            ("Birdbath", 643f, 655f, 639, 640, 648, 661, 0, "Birdbath, the faction's garden"),
+            ("Birdbath", 680f, 655f, 677, 640, 683, 661, 0, "Birdbath, Ridge villa (white)"),
+            ("Birdbath", 711f, 655f, 708, 640, 714, 661, 0, "Birdbath, Ridge villa (east)"),
+            ("Birdbath", 507f, 698.5f, 501, 697, 515, 700, 0, "Birdbath, detached house (west)"),
+            ("Birdbath", 537f, 698.5f, 529, 697, 543, 700, 0, "Birdbath, detached house (east)"),
             ("Birdbath", 550f, 698f, 546, 686, 556, 710, 0, "Birdbath, Wardley Garden (west)"),
             ("Birdbath", 566f, 698f, 560, 686, 569, 710, 0, "Birdbath, Wardley Garden (east)"),
         };

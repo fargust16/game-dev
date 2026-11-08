@@ -12,8 +12,8 @@ namespace GameDev.Slice.EditorTools
     /// interior. From then on both scenes are hand-built, so this never overwrites one that exists.
     /// <para>
     /// It writes: a flat terrain over the whole area at one level, which <see cref="VeilmouthGround"/> shapes once
-    /// from the city plan C2 (kit standard §7); the water at Sea Level beneath it, which shows wherever the ground is
-    /// dug below the sea; the C2 map as <see cref="LayoutZone"/> guides; and a stand-in street in Lower Veil with the Soot &amp; Bell, whose door
+    /// from the city plan C3 (kit standard §7); the water at Sea Level beneath it, which shows wherever the ground is
+    /// dug below the sea; the C3 map as <see cref="LayoutZone"/> guides; and a stand-in street in Lower Veil with the Soot &amp; Bell, whose door
     /// leads to its interior and back.
     /// </para>
     /// </summary>
@@ -30,7 +30,7 @@ namespace GameDev.Slice.EditorTools
         /// <summary>The playable area's side, city plan C1 §3. The scene's origin is the area's centre; north is +Z.</summary>
         public const float Extent = 1000f;
 
-        public const string MapName = "C2 Map";
+        public const string MapName = "C3 Map";
 
         /// <summary>WorldScale.SeaLevelMeters: the Combat Grid reads every surface below it as water.</summary>
         public const float SeaLevel = 24f;
@@ -41,8 +41,8 @@ namespace GameDev.Slice.EditorTools
         /// <summary>A street tile lies on the ground, so its top is 0.1 m higher (kit standard §2).</summary>
         public const float StreetLevel = 26f;
 
-        /// <summary>Where the scene starts the player: on Bell Street in front of the Soot &amp; Bell (C2, plan 688, 775).</summary>
-        public static readonly Vector3 Spawn = new Vector3(188f, StreetLevel + 0.1f, -275f);
+        /// <summary>Where the scene starts the player: on Bell Street in front of the Soot &amp; Bell (C3, plan 687.5, 778).</summary>
+        public static readonly Vector3 Spawn = new Vector3(187.5f, StreetLevel + 0.1f, -278f);
 
         /// <summary>The Soot &amp; Bell's south-west corner node; its door is 2 m along the south wall.</summary>
         private static readonly Vector3 SootAndBellCorner = new Vector3(100f, StreetLevel, -180f);
@@ -69,7 +69,7 @@ namespace GameDev.Slice.EditorTools
         private static readonly Color City = new Color(1f, 0.8f, 0.2f, 0.9f);
         private static readonly Color Ritual = new Color(1f, 0.3f, 0.3f, 0.9f);
 
-        /// <summary>The C2 map (VEILMOUTH_CITY_PLAN.md §21 and its svg): name, centre (x, z), size (x, z), colour.</summary>
+        /// <summary>The C3 map (VEILMOUTH_CITY_PLAN.md §24 and its svg): name, centre (x, z), size (x, z), colour.</summary>
         private static readonly (string Name, float X, float Z, float SizeX, float SizeZ, Color Color)[] Zones =
         {
             ("Sea", 0f, -415f, 1000f, 170f, Water),
@@ -77,20 +77,21 @@ namespace GameDev.Slice.EditorTools
             ("Veil Bridge", 300f, -235f, 40f, 16f, City),
             ("City", 130f, -228f, 300f, 204f, City),
             ("Ridge", 130f, -153f, 300f, 54f, City),
-            ("Government Quarter", 110f, -170.5f, 76f, 89f, City),
-            ("High Street", 130f, -235f, 300f, 18f, City),
-            ("Terraces", 26f, -203f, 92f, 46f, City),
-            ("Under the Ridge", 214f, -203f, 132f, 46f, City),
-            ("Market Quarter", 50f, -287f, 140f, 86f, City),
-            ("Lower Veil", 200f, -287f, 160f, 86f, City),
+            ("Government Quarter", 106f, -180.5f, 72f, 91f, City),
+            ("High Street", 129f, -235f, 298f, 18f, City),
+            ("Terraces", 31f, -203f, 102f, 46f, City),
+            ("Under the Ridge", 210f, -203f, 136f, 46f, City),
+            ("Market Quarter", 49f, -287f, 138f, 86f, City),
+            ("Market Place", 78f, -264f, 56f, 40f, City),
+            ("Lower Veil", 198f, -287f, 160f, 86f, City),
             ("Soot Stair", 204f, -197f, 8f, 34f, City),
-            ("Old Chapel", 1f, -144f, 42f, 36f, City),
+            ("Old Chapel", 5f, -148f, 50f, 40f, City),
             ("Fields", -370f, -155f, 260f, 350f, Land),
             ("Forest", -110f, 265f, 780f, 470f, Land),
             ("Ore Hill", 420f, 140f, 150f, 340f, Land),
-            ("Ritual Site Candidate 1 - Ritual Square", 142.5f, -293f, 25f, 26f, Ritual),
-            ("Ritual Site Candidate 2 - Soot Stair Cellar", 213f, -202f, 8f, 8f, Ritual),
-            ("Ritual Site Candidate 3 - Old Chapel", -9f, -156f, 12f, 12f, Ritual),
+            ("Ritual Site Candidate 1 - Ritual Square", 143f, -297f, 26f, 26f, Ritual),
+            ("Ritual Site Candidate 2 - Soot Stair Cellar", 213f, -200f, 8f, 8f, Ritual),
+            ("Ritual Site Candidate 3 - Old Chapel", -9f, -159f, 12f, 12f, Ritual),
         };
 
         public static string[] ZoneNames => Zones.Select(z => z.Name).ToArray();

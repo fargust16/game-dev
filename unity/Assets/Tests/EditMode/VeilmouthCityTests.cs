@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S0.6, §4–§5, §12, §21: the city built from the plan C2 by <see cref="VeilmouthCity"/>.</summary>
+    /// <summary>S0.6, §4–§5, §12, §24: the city built from the plan C3 by <see cref="VeilmouthCity"/>, with its mystic layer.</summary>
     public sealed class VeilmouthCityTests
     {
         private UnityEngine.SceneManagement.Scene _scene;
@@ -51,7 +51,7 @@ namespace GameDev.Slice.Tests
                 doors.Add((t.position + (t.right * 1.5f), t.forward, t.right));
             }
 
-            Assert.Greater(doors.Count, 120); // C2 (city plan §21): 173 doors
+            Assert.Greater(doors.Count, 120); // C3 (city plan §24.7): street doors plus the Dwelling and building portals
             var faults = new List<string>();
             foreach (var lamp in lamps)
             {
@@ -71,7 +71,7 @@ namespace GameDev.Slice.Tests
             CollectionAssert.IsEmpty(faults);
         }
 
-        /// <summary>§5.3: the seven buildings that open, each with its door on the street.</summary>
+        /// <summary>§5.3: the seven buildings that open, each with its door on the street, and the Soot & Bell's yard door (§13).</summary>
         [Test]
         public void TheSevenBuildingsOpenFromTheStreet()
         {
@@ -87,7 +87,8 @@ namespace GameDev.Slice.Tests
                 Assert.AreEqual(1, ids.Count(n => n == $"Portal - {id}"), id);
             }
 
-            Assert.AreEqual(7, ids.Length);
+            Assert.AreEqual(1, ids.Count(n => n == $"Portal - {VeilmouthScene.SootAndBellId}.yard"), "the Soot & Bell's back door to its yard");
+            Assert.AreEqual(8, ids.Length);
         }
 
         /// <summary>§12: Tanners Slant stands at 45° under a kit frame on a world node, with houses along it.</summary>
@@ -112,14 +113,38 @@ namespace GameDev.Slice.Tests
             StringAssert.StartsWith("Overworld_", layers[4].name);
         }
 
-        /// <summary>The C0 dressing and the C1 city are gone; the C2 city stands under its own root.</summary>
+        /// <summary>The C0 dressing and the C1 and C2 cities are gone; the C3 city stands under its own root (§24).</summary>
         [Test]
-        public void TheC2CityReplacesTheEarlierLayouts()
+        public void TheC3CityReplacesTheEarlierLayouts()
         {
             var roots = _scene.GetRootGameObjects().Select(g => g.name).ToArray();
+            Assert.AreEqual("Veilmouth C3", VeilmouthCity.RootName);
             CollectionAssert.Contains(roots, VeilmouthCity.RootName);
             CollectionAssert.DoesNotContain(roots, VeilmouthDressing.RootName);
             CollectionAssert.DoesNotContain(roots, "Veilmouth C1");
+            CollectionAssert.DoesNotContain(roots, "Veilmouth C2");
+        }
+
+        /// <summary>
+        /// The mystic layer (WORLD_STYLE_GUIDE §6) is only seen: nothing under it has a collider or a kit block, all of
+        /// it is on NoGrid, every street lamp has its gas light, the moon is down at the preview noon, and fog and wards stand.
+        /// </summary>
+        [Test]
+        public void TheMysticLayerIsOnlySeen()
+        {
+            var root = _scene.GetRootGameObjects().Single(g => g.name == VeilmouthMystic.RootName);
+            CollectionAssert.IsEmpty(root.GetComponentsInChildren<Collider>(true).Select(c => c.name));
+            CollectionAssert.IsEmpty(root.GetComponentsInChildren<KitBlock>(true).Select(b => b.name));
+            var noGrid = LayerMask.NameToLayer(KitLayers.NoGrid);
+            CollectionAssert.IsEmpty(root.GetComponentsInChildren<Transform>(true).Where(t => t.gameObject.layer != noGrid).Select(t => t.name));
+
+            var lamps = All<KitBlock>().Count(b => b.name.StartsWith("Kit_Street_Lamp"));
+            Assert.AreEqual(lamps, root.GetComponentsInChildren<Light>(true).Count(l => l.name == "Gaslight"));
+            Assert.Greater(root.GetComponentsInChildren<ParticleSystem>(true).Length, 8, "fog banks");
+            Assert.Greater(root.GetComponentsInChildren<Transform>(true).Count(t => t.name.StartsWith("Ward - door")), 5);
+            Assert.Greater(root.GetComponentsInChildren<Transform>(true).Count(t => t.name.StartsWith("Runes - ")), 8);
+            Assert.IsFalse(root.GetComponentsInChildren<Transform>(true).Single(t => t.name == "Crimson Moon").gameObject.activeSelf);
+            Assert.IsNotNull(root.GetComponent<GameDev.Slice.Atmosphere.VeilmouthSky>());
         }
     }
 }

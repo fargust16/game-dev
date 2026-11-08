@@ -7,9 +7,10 @@ using UnityEngine;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// Shapes Veilmouth's ground once from the city plan C2 (VEILMOUTH_CITY_PLAN.md §9, §21), at the owner's request of
-    /// 2026-11-06 (C1's ground of 2026-11-05 is replaced); the ground is the owner's afterwards, so the tool refuses to run on ground it has already shaped. It is
-    /// authored content, not the production terrain pipeline, and touches nothing of TerrainGen.
+    /// Shapes Veilmouth's ground once from the city plan C3 (VEILMOUTH_CITY_PLAN.md §9, §24), at the owner's request of
+    /// 2026-11-08 (C2's ground of 2026-11-06 is replaced, with any hand changes to it); the ground is the owner's
+    /// afterwards, so the tool refuses to run on ground it has already shaped. It is authored content, not the
+    /// production terrain pipeline, and touches nothing of TerrainGen.
     /// <para>
     /// Positions are the plan's: <c>px</c> runs east and <c>py</c> south, 1 m each, world X = px − 500 and world Z =
     /// 500 − py. Every height is an authoring default in metres above the scene's zero.
@@ -21,21 +22,24 @@ namespace GameDev.Slice.EditorTools
         public const int AlphamapResolution = 512;
 
         public const float Low = VeilmouthScene.TerrainLevel;
-        public const float Ridge = Low + 4f; // C2 (§21): 4 m, so the shorter avenue keeps its 10 % climb
+        public const float Ridge = Low + 4f; // C2 (§21) and C3 (§24.3): 4 m, the avenue's 8.7 % climb over 46 m
         public const float RiverBed = 21f;
         public const float SeaBed = 19.5f;
         public const float HillTop = 70f;
 
         private const float Size = VeilmouthScene.Extent;
 
-        // City rectangle and its features, in plan metres (C2 svg, VEILMOUTH_CITY_PLAN_C2.svg).
+        // City rectangle and its features, in plan metres (C3 svg, VEILMOUTH_CITY_PLAN_C3.svg).
         private const float CityWest = 480f, CityEast = 780f, CityNorth = 626f, CitySouth = 830f;
         private const float RidgeEdge = 680f;
-        private const float AvenueX = 610f, AvenueFoot = 715f, AvenueHead = 674f;
+        private const float AvenueX = 612f, AvenueFoot = 726f, AvenueHead = 680f;
+
+        /// <summary>The avenue's ramp: its full 24 m (±12 m), easing to the low town 20 m from the axis, under the Town Hall and the Assize.</summary>
+        private const float AvenueHalf = 12f, AvenueEase = 20f;
         private const float RiverWest = 780f, RiverEast = 820f;
         private const float StairWest = 700f, StairEast = 708f, StairTop = 680f, StairFoot = 714f;
 
-        [MenuItem("GameDev/Slice/Shape Veilmouth Ground from C2 (once)")]
+        [MenuItem("GameDev/Slice/Shape Veilmouth Ground from C3 (once)")]
         public static void Shape()
         {
             var data = AssetDatabase.LoadAssetAtPath<TerrainData>(VeilmouthScene.TerrainDataPath);
@@ -49,7 +53,7 @@ namespace GameDev.Slice.EditorTools
             var roots = scene.GetRootGameObjects();
             if (roots.Any(r => r.name == VeilmouthScene.MapName))
             {
-                Debug.LogWarning("[VeilmouthGround] the ground is already shaped from C2 and is the owner's now; nothing changed.");
+                Debug.LogWarning("[VeilmouthGround] the ground is already shaped from C3 and is the owner's now; nothing changed.");
                 return;
             }
 
@@ -70,7 +74,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             data.SetHeights(0, 0, normalised);
-            // The city's street layers may follow the canonical five (C2 reshapes built ground); they are zero here
+            // The city's street layers may follow the canonical five (C3 reshapes built ground); they are zero here
             // until VeilmouthCity paints them again.
             var canonical = Paint(heights);
             var weights = new float[AlphamapResolution, AlphamapResolution, Mathf.Max(5, data.terrainLayers.Length)];
@@ -96,7 +100,7 @@ namespace GameDev.Slice.EditorTools
             water.transform.localScale = new Vector3(Size / 10f, 1f, Size / 10f);
 
             var player = roots.FirstOrDefault(r => r.GetComponentInChildren<CharacterController>() != null);
-            foreach (var old in roots.Where(r => r.name == "C0 Map" || r.name == "C1 Map"))
+            foreach (var old in roots.Where(r => r.name == "C0 Map" || r.name == "C1 Map" || r.name == "C2 Map"))
             {
                 Object.DestroyImmediate(old);
             }
@@ -108,7 +112,20 @@ namespace GameDev.Slice.EditorTools
             }
 
             EditorSceneManager.SaveScene(scene);
-            Debug.Log("[VeilmouthGround] shaped from C2: 1000 × 1000 m; the ground is the owner's from here on.");
+            Debug.Log("[VeilmouthGround] shaped from C3: 1000 × 1000 m; the ground is the owner's from here on.");
+        }
+
+        /// <summary>Batch only, for the agent's iterations on C3: drops the map guides so <see cref="Shape"/> runs again.</summary>
+        public static void ShapeReplacing()
+        {
+            var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            foreach (var old in scene.GetRootGameObjects().Where(r => r.name == VeilmouthScene.MapName))
+            {
+                Object.DestroyImmediate(old);
+            }
+
+            EditorSceneManager.SaveScene(scene);
+            Shape();
         }
 
         /// <summary>Heights in metres on the heightmap's lattice, [z, x], z north and x east.</summary>
@@ -156,7 +173,7 @@ namespace GameDev.Slice.EditorTools
             return h;
         }
 
-        /// <summary>The Ridge 4 m up behind its retaining wall; Crown Avenue's 10 % climb; the Soot Stair's causeway.</summary>
+        /// <summary>The Ridge 4 m up behind its retaining wall; Crown Avenue's 8.7 % climb; the Soot Stair's causeway.</summary>
         private static float City(float px, float py)
         {
             var h = py < RidgeEdge ? Ridge : Low;
@@ -164,7 +181,7 @@ namespace GameDev.Slice.EditorTools
             var avenue = Low + ((Ridge - Low) * Mathf.Clamp01((AvenueFoot - py) / (AvenueFoot - AvenueHead)));
             if (py >= 640f && py <= AvenueFoot)
             {
-                var w = 1f - Smooth(28f, 40f, Mathf.Abs(px - AvenueX));
+                var w = 1f - Smooth(AvenueHalf, AvenueEase, Mathf.Abs(px - AvenueX));
                 h = Mathf.Lerp(h, avenue, w);
             }
 

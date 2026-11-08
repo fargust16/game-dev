@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace GameDev.Slice.EditorTools
 {
@@ -57,6 +58,42 @@ namespace GameDev.Slice.EditorTools
 
             RenderInteriors();
             Debug.Log($"Veilmouth views written to {OutputFolder}.");
+        }
+
+        /// <summary>
+        /// The city of plan C3 (VEILMOUTH_CITY_PLAN.md §24) from above and from a walker's height, without the interiors.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderC3
+        /// </summary>
+        public static void RenderC3()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            ShowCircles();
+            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            Top("c3_city", new Vector3(130f, 0f, -228f), 160f);
+            Top("c3_government", new Vector3(106f, 0f, -180f), 55f);
+            Top("c3_market", new Vector3(60f, 0f, -270f), 60f);
+            Top("c3_lowerveil", new Vector3(198f, 0f, -287f), 60f);
+            Top("c3_ridge_west", new Vector3(50f, 0f, -150f), 55f);
+            Top("c3_ridge_east", new Vector3(210f, 0f, -150f), 55f);
+            Top("c3_underridge", new Vector3(210f, 0f, -205f), 50f);
+            Eye("c3_eye_highstreet", -10f, -235f, 100f, -235f, 3f);
+            Eye("c3_eye_avenue", 112f, -232f, 112f, -160f, 6f);
+            Eye("c3_eye_palace", 112f, -178f, 112f, -140f, 8f);
+            Eye("c3_eye_parade", 0f, -174f, 120f, -174f, 3f);
+            Eye("c3_eye_bellstreet", 195f, -278f, 100f, -278f, 2.5f);
+            Eye("c3_eye_market", 54f, -248f, 100f, -282f, 2f);
+            Eye("c3_eye_clocktower", 135f, -238f, 94.5f, -223.5f, 18f);
+            Eye("c3_eye_court", 151.5f, -246f, 151.5f, -258f, 2f);
+            Eye("c3_eye_slant", -11f, -247f, 14f, -272f, 2f);
+            Eye("c3_eye_sootstair", 204f, -178f, 204f, -215f, 0f);
+            Eye("c3_eye_quay", 100f, -318f, 230f, -330f, 0f);
+            Eye("c3_eye_westgate", -80f, -235f, 20f, -220f, 4f);
+            Eye("c3_eye_northgate", 247f, -140f, 247f, -118f, 4f);
+            Eye("c3_eye_terraces", 22f, -184f, 22f, -215f, 2f);
+            Eye("c3_eye_ritual", 143f, -287f, 143f, -305f, 1f);
+            Debug.Log($"Veilmouth C3 views written to {OutputFolder}.");
         }
 
         /// <summary>
@@ -393,18 +430,88 @@ namespace GameDev.Slice.EditorTools
             Shoot(camera, name, 900, 900);
         }
 
+        /// <summary>While set, the cameras draw the scene's sky and its post-processing volumes, as the player's camera does.</summary>
+        private static bool _skyAndGrade;
+
         private static Camera Make()
         {
             var camera = new GameObject("RenderCamera").AddComponent<Camera>();
             camera.nearClipPlane = 0.05f;
-            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.clearFlags = _skyAndGrade ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0.62f, 0.74f, 0.86f);
+            camera.GetUniversalAdditionalCameraData().renderPostProcessing = _skyAndGrade;
             return camera;
+        }
+
+        /// <summary>
+        /// The mystic layer (WORLD_STYLE_GUIDE §5–§6) at noon, at dusk and at night: streets, the crimson moon over the
+        /// sea, a ward and runes up close, the strange windows and a fogged court. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderMystic
+        /// </summary>
+        public static void RenderMystic()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            if (sky == null)
+            {
+                Debug.LogError("[VeilmouthRenders] the scene has no VeilmouthSky: place the mystic layer first.");
+                return;
+            }
+
+            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            var root = GameObject.Find(VeilmouthMystic.RootName).transform;
+            Transform First(string prefix) => root.GetComponentsInChildren<Transform>().FirstOrDefault(t => t.name.StartsWith(prefix));
+            var ward = First("Ward - door");
+            var gate = First("Runes - west gate");
+            _skyAndGrade = true;
+            try
+            {
+                foreach (var (minute, label) in new[] { (12 * 60, "noon"), (19 * 60, "dusk"), ((23 * 60) + 30, "night") })
+                {
+                    sky.Apply(minute);
+                    var banks = Object.FindObjectsByType<ParticleSystem>(FindObjectsSortMode.None);
+                    foreach (var fog in banks)
+                    {
+                        fog.Simulate(30f, true, true);
+                    }
+
+                    Debug.Log($"[VeilmouthRenders] {label}: {banks.Length} particle systems, {banks.Sum(b => b.particleCount)} particles.");
+
+                    Eye($"mystic_{label}_highstreet", -10f, -235f, 100f, -235f, 3f);
+                    Eye($"mystic_{label}_bellstreet", 195f, -278f, 100f, -278f, 2.5f);
+                    Eye($"mystic_{label}_sootstair", 204f, -178f, 204f, -215f, 0f);
+                    Eye($"mystic_{label}_court", 151.5f, -246f, 151.5f, -258f, 2f);
+                    Eye($"mystic_{label}_harrow", 175f, -280f, 175f, -271f, 5f);
+                    Eye($"mystic_{label}_moon", new Vector3(60f, VeilmouthScene.StreetLevel + 1.8f, -318f), new Vector3(129.5f, 70f, -390f));
+                    if (ward != null)
+                    {
+                        Eye($"mystic_{label}_ward", ward.position - (ward.forward * 3.5f) + (Vector3.down * 1.6f), ward.position, 50f);
+                    }
+
+                    if (gate != null)
+                    {
+                        Eye($"mystic_{label}_runes", gate.position - (gate.forward * 3f) + (Vector3.down * 0.2f), gate.position, 55f);
+                    }
+                }
+            }
+            finally
+            {
+                _skyAndGrade = false;
+            }
+
+            Debug.Log($"Veilmouth mystic views written to {OutputFolder}.");
         }
 
         private static void Shoot(Camera camera, string name, int width, int height)
         {
             var target = new RenderTexture(width, height, 24);
+            if (_skyAndGrade)
+            {
+                Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>()?.FaceMoon(camera.transform.position);
+            }
+
             camera.targetTexture = target;
             camera.Render();
             RenderTexture.active = target;

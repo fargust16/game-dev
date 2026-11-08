@@ -373,7 +373,11 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            CellFront(entries["ViCellBars"], entries["ViCellDoor"]);
+            if (!_measureOnly)
+            {
+                CellFront(entries["ViCellBars"], entries["ViCellDoor"]);
+            }
+
             AssetDatabase.SaveAssets();
             Debug.Log($"Slice kit catalogue: {entries.Count} Victorian Interiors blocks.\n" +
                       string.Join("\n", entries.Values.Select(e => $"  {e.Key}: {e.Width} x {e.Depth} cells, {e.Height:0.##} m, {e.Path}")));
@@ -381,6 +385,24 @@ namespace GameDev.Slice.EditorTools
         }
 
         public static void BuildVictorianBatch() => BuildVictorian();
+
+        /// <summary>
+        /// The Victorian blocks as <see cref="BuildVictorian"/> measures them, writing no wrapper already on disk. A rebuilt
+        /// set gets new file IDs for its parts, and the rooms of the kit houses (VicRooms) turn those parts off by ID: a
+        /// rebuild leaves their candles and vases loose and their colliders on (2026-11-08).
+        /// </summary>
+        public static Dictionary<string, Entry> LoadVictorian()
+        {
+            _measureOnly = true;
+            try
+            {
+                return BuildVictorian();
+            }
+            finally
+            {
+                _measureOnly = false;
+            }
+        }
 
         // Standing books of the pack, by file: 0.23–0.25 m deep, 0.35 m high, 0.05–0.07 m thick along their local Z.
         private static readonly string[] StandingBooks = { "Book_3", "Book_4", "Book_5", "Book_6", "Book_7", "Book_8", "Book_9", "Book_10" };

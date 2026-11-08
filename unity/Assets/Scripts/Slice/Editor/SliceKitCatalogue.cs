@@ -103,6 +103,7 @@ namespace GameDev.Slice.EditorTools
             public float Height;
             public float DoorX;
             public float Stoop; // a house door's own steps, m out from its front; the city's steps start beyond them
+            public float StoopWidth; // those steps' width, m, when it is not C2's (VictorianHouses.StoopWidth)
             public GameObject Prefab => AssetDatabase.LoadAssetAtPath<GameObject>(Path);
         }
 

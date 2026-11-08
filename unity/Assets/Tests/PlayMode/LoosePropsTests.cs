@@ -90,7 +90,8 @@ namespace GameDev.Slice.Tests
         private IEnumerator Settles(string scene)
         {
             yield return LoadScene(scene);
-            var props = Object.FindObjectsByType<LooseProp>(FindObjectsInactive.Exclude);
+            // A turned-off prop is dressing in the rooms behind a kit house's windows (VicRooms): it never wakes.
+            var props = Object.FindObjectsByType<LooseProp>(FindObjectsInactive.Exclude).Where(p => p.enabled).ToArray();
             Assert.IsNotEmpty(props, "the scene has loose props");
             foreach (var thing in props.Where(p => p.IsThing))
             {

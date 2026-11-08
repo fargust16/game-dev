@@ -87,7 +87,9 @@ namespace GameDev.Slice.EditorTools
 
             foreach (var block in blocks)
             {
-                if (block == null)
+                // A turned-off block is dressing: the rooms behind a kit house's windows turn their blocks off (VicRooms),
+                // since nobody enters them and nothing collides there.
+                if (block == null || !block.enabled)
                 {
                     continue;
                 }

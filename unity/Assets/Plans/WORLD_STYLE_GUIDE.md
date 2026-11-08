@@ -1,12 +1,12 @@
 # World Style Guide
 
-Version: 0.1
+Version: 0.2
 
-Status: Draft — written by the agent from the owner's answers of 2026-11-08 (city plan §24); waits for the owner's walk of C3
+Status: Draft — written by the agent from the owner's answers of 2026-11-08 (city plan §24); the light and the mystic layer built in Veilmouth (city plan §24.7); waits for the owner's walk of C3
 
 Created: 2026-11-08
 
-Last Updated: 2026-11-08 (first draft: one style for the city, its interiors and the land round it, and the mystic layer the owner chose)
+Last Updated: 2026-11-08 (§5, §6: built in Veilmouth by `VeilmouthSky` and `VeilmouthMystic`, as city plan §24.7 records; the moon rises at 20:00 and fades in over its first hour. Earlier: first draft: one style for the city, its interiors and the land round it, and the mystic layer the owner chose)
 
 Depends On:
 [00 Vision](../../../00%20Vision.md), [11 Vertical Slice](../../../11%20Vertical%20Slice.md) (*Era and Mood*), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §24, [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md)
@@ -97,12 +97,15 @@ Veilmouth's light follows the game clock (one tick is one game minute). Authorin
 - **The colour space is Gamma** (the project's setting). The kit's materials and light were set for it (streets plan). A change to Linear is the owner's choice ([99 Open Questions](../../../99%20Open%20Questions.md) VS-COLOR).
 - **Darkness is a mechanic.** By night the streets between lamps must be dark enough to hide in ([10.3](../../../10.3%20Stealth%20and%20Detection.md): darkness adds to the Stealth skill). The moon gives shape, not reading light. Lamps are pools, not floodlights: Lower Veil keeps its dark stretches.
 - **Interiors** keep their own warm light, lit by the clock (interiors plan).
+- **Built** in Veilmouth by `VeilmouthSky`, a component that sets the sun or moon, sky, ambient light, haze, lamps and fog from the game clock (city plan §24.7). The moon is up 20:00–05:00 and fades in and out over an hour, so the night of the table begins with it already risen.
 
 ---
 
 # 6. The mystic layer
 
 The owner chose three parts on 2026-11-08: the crimson moon and fog, the Gothic skyline, and occult signs. The fourth offered part, alchemy and soot, was not chosen and is not built.
+
+`VeilmouthMystic` builds the moon, fog, lamps, wards and strange windows once under the `Veilmouth Sky` root, with their counts in city plan §24.7. The Gothic skyline stands as far as the kit's towers, chimneys and railings allow; its wanted pieces (§6.2) are not built.
 
 ## 6.1 The crimson moon and fog
 

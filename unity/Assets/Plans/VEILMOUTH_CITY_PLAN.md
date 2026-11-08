@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3)
 
-Version: 0.24
+Version: 0.25
 
-Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08 and waiting for the owner's walk; sizes remain authoring defaults
+Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and waiting for the owner's walk; sizes remain authoring defaults
 
-Last Updated: 2026-11-08 (§24: C3, the kit city, at the owner's request: realistic street sections on the same area, the Market Place on the Crown Axis, passages and yards, the owner's Victorian Kit at ×1.25 for every house, and a mystic layer by the new world style guide. Earlier: §23: the owner's second set of ornaments: three different angels in green places in three parts of the city, a pair of great lions before the Governor's Palace, birdbaths in every rich garden; the first angel turned to its gate. Earlier: §13, §14: the Soot & Bell's back door is an exit to its yard, the pack's shop door in the house's yard side with its portal, by the owner after VI-8. Earlier: §14: the missing room's landing no longer has a closed neighbour's door, which led nowhere (owner, VI-8). Earlier: §23: the owner's garden ornaments placed: the angel pouring water at the heart of Wardley Garden, birdbaths in two Ridge villas' front gardens and the faction's. Earlier: §22: VI-4 rebuilt the Dwellings, so §14's and §16's rooms are replaced by `VICTORIAN_INTERIORS_PLAN.md` §7–§8. Earlier: §22: Victorian Interiors chosen by the owner for every interior; the rebuild planned in `VICTORIAN_INTERIORS_PLAN.md`. Earlier: §21: C2 accepted by the owner and built: the ground shaped again and the city rebuilt. Earlier: §21: C2, the smaller city, proposed: 300 × 204 m at the owner's ×0.6, crossroads every 40–90 m, the Ridge 4 m high. Earlier: §20: the owner's fourth play test: railings without holes, the bridge closed against the ground, the bar by its keeper; a smaller city with more crossroads waits for C2. Earlier: §19: detached houses, by the owner after the third play test: every railed house stands alone on its own green plot, railed all round with one gate opposite its door; §3.3, §3.4 and §5.2 changed to match. Earlier: §18, remark 7: loose props built, by kit standard §4. Earlier: §18: the owner's third play test: shelves, paintings, and beds fixed; detached houses, loose props, a room constructor, transport, cabs, and animals recorded. Earlier: §17: the owner's second play test fixed and rerun at the owner's request: still dressing, game scale ×1.2, BK's 4 m module, walls set by their infill, one-style steps, props on slopes, railings without holes, blue shop floors; §14 and §16 resized. Earlier: §16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-08 (§24.7: C3 built once by `VeilmouthCity.RebuildC3`: the ground, 2 799 kit blocks with no kit fault, 55 baked house types, and the mystic layer: sky by the clock, the crimson moon, 106 gas lamps, 27 fog banks, 27 wards and 4 strange windows. Earlier: §24: C3, the kit city, at the owner's request: realistic street sections on the same area, the Market Place on the Crown Axis, passages and yards, the owner's Victorian Kit at ×1.25 for every house, and a mystic layer by the new world style guide. Earlier: §23: the owner's second set of ornaments: three different angels in green places in three parts of the city, a pair of great lions before the Governor's Palace, birdbaths in every rich garden; the first angel turned to its gate. Earlier: §13, §14: the Soot & Bell's back door is an exit to its yard, the pack's shop door in the house's yard side with its portal, by the owner after VI-8. Earlier: §14: the missing room's landing no longer has a closed neighbour's door, which led nowhere (owner, VI-8). Earlier: §23: the owner's garden ornaments placed: the angel pouring water at the heart of Wardley Garden, birdbaths in two Ridge villas' front gardens and the faction's. Earlier: §22: VI-4 rebuilt the Dwellings, so §14's and §16's rooms are replaced by `VICTORIAN_INTERIORS_PLAN.md` §7–§8. Earlier: §22: Victorian Interiors chosen by the owner for every interior; the rebuild planned in `VICTORIAN_INTERIORS_PLAN.md`. Earlier: §21: C2 accepted by the owner and built: the ground shaped again and the city rebuilt. Earlier: §21: C2, the smaller city, proposed: 300 × 204 m at the owner's ×0.6, crossroads every 40–90 m, the Ridge 4 m high. Earlier: §20: the owner's fourth play test: railings without holes, the bridge closed against the ground, the bar by its keeper; a smaller city with more crossroads waits for C2. Earlier: §19: detached houses, by the owner after the third play test: every railed house stands alone on its own green plot, railed all round with one gate opposite its door; §3.3, §3.4 and §5.2 changed to match. Earlier: §18, remark 7: loose props built, by kit standard §4. Earlier: §18: the owner's third play test: shelves, paintings, and beds fixed; detached houses, loose props, a room constructor, transport, cabs, and animals recorded. Earlier: §17: the owner's second play test fixed and rerun at the owner's request: still dressing, game scale ×1.2, BK's 4 m module, walls set by their infill, one-style steps, props on slopes, railings without holes, blue shop floors; §14 and §16 resized. Earlier: §16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -738,4 +738,66 @@ The details are in [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md) §6.
 - the furniture rules (§4) and the detached plots (§19);
 - the ornaments (§23), which move with their gardens;
 - outside the city: the ground, the forest, the fields, the hill and the beasts.
+
+## 24.7 As built
+
+C3 was built once on 2026-11-08 by `VeilmouthCity.RebuildC3`. The run:
+
+- shapes the ground (`VeilmouthGround`);
+- builds the city;
+- places the dogs (`SliceDogs`), the ornaments (`VeilmouthOrnaments`) and the mystic layer (`VeilmouthMystic`);
+- writes the survey renders (`VeilmouthRenders.RenderC3`, `RenderMystic`).
+
+From here on the ground and the scene are the owner's to change by hand. The agent reruns nothing unless the owner asks (AGENTS.md, *Slice assets*).
+
+**The city.**
+
+| What | Count |
+|---|---|
+| kit blocks | 2 799 |
+| street doors | 111 |
+| street surfaces | 62 |
+| baked house types (`Assets/Prefabs/SliceKit/KitHouses`) | 55 |
+| dogs | 5 |
+| ornaments (§23) | 14 |
+| kit faults | 0 |
+
+- The least room between a door's steps and its railings is 2.6 m; §19 asks for 1.5 m.
+- The last fixes before the clean check:
+  - a bay's collider box starts at the front's face;
+  - the Market Place's west row stands at px 551, with a 3 m yard behind it;
+  - the weapons stall, the barrels, a fence and a court lamp moved off the houses.
+- The rooms behind the windows turn off their furniture's kit blocks (`VicRooms`), so the kit check (`KitLayoutCheck`) skips a turned-off block.
+- The builder loads the kit's wrappers (`SliceKitCatalogue.Load`) and never bakes them again. A rebake under the owner's newer packs and editor had turned the lockup's cell bars into another model with no collider; the wrappers were restored from git.
+- The wrappers on disk must keep their file IDs. A rebuild of a composite set gives its parts new IDs, and the rooms behind the windows turn those parts off by ID, so after one their furniture woke again: props fell, colliders and kit blocks came back. The Victorian kit test therefore reads the wrappers (`SliceKitCatalogue.LoadVictorian`) instead of rebuilding them. After any deliberate rebuild of the catalogue, bake the kit houses again (`VeilmouthKitHouses.BakeAllBatch`) and then the city.
+- The city stands Dummies at the named people's places, and `SlicePeople.PlaceAll` puts the roster's people in their stead, Edda Brann at the weapons stall among them.
+- `SliceWorldSetup.AddToVeilmouth` gives the Notice Board, by the Soot & Bell's yard, its tips (S1.3).
+- The player's map (S1.6) is `Assets/Data/Slice/Map/VeilmouthC3Plan.xml`, copied by hand from the C3 plan without its legend, heights, Crown Axis, start or Ritual Site Candidates. POIs A, B and C keep their places: the C3 doors stand within 3 m of them.
+- The slice's EditMode tests pass, 100 of 100, and its PlayMode tests 39 of 39 (about 10 minutes); neither run rewrote a wrapper.
+
+**Houses.** `VeilmouthKitHouses` bakes each house type once as a prefab of separate module instances, with no merged mesh and no atlas (§24.4).
+
+- A four-storey shop house holds about 1 870 module instances.
+- One LOD group per house drops the trims, pipes, pots and rails below 15 % of the screen.
+- The rooms behind the windows are culled at 48 m. Between 32 m and 46 m the glass turns to the mapped room.
+- The 55 prefabs take about 151 MB of text on disk. The largest, the Governor's Palace, takes 9.5 MB.
+
+**The mystic layer** stands under its own root, `Veilmouth Sky` (WORLD_STYLE_GUIDE §5–§6). It is only seen: it has no collider and no kit block, and all of it is on the NoGrid layer. The Combat Grid, sight and stealth never read it (test `TheMysticLayerIsOnlySeen`).
+
+| Part | As built |
+|---|---|
+| Sky and light | `VeilmouthSky` follows the game clock. One directional light is the sun by day (05:00–20:00, at most 48° high). By night (20:00–05:00) it is the crimson moon: 6–28° high in the south-east, intensity 0.3, fading in and out over an hour. Three procedural skies (day, dusk, night) are blended, with trilight ambient and haze by the hour. |
+| Moon | A separate disc about 4° across, drawn after the sky. The procedural sun disc is off while the moon is up: it burned white even under a red light. |
+| Twilight grade | A post volume (bloom) and a twilight volume (violet shadows, amber highlights), weighted by dusk. |
+| Gas lamps | 106, each with one teal point light (range 10 m, intensity 10), lit in the windows' lamp hours. The lamp glass turns to an emissive gaslight material. |
+| Fog | 27 banks of unlit particles, 1–3 m deep over their ground: the river, the basin, the Sea Quay, Dock Road, Loom Lane, Tenement Court, the Soot & Bell's yard, Pawn Corner, the graveyard and the Soot Stair. Pale and thin by day, violet at dusk, blue-grey and thickest by night. |
+| Wards | 27. Door signs over about one door in eight in Lower Veil and Under the Ridge. Runes by the west and north gates, on the retaining wall, on the Soot Stair's parapets, and by the three Ritual Site Candidates. |
+| Strange windows | 4: Harrow & Tincture and three shops of Lower Veil, in a dim violet-green glass, a material variant of the kit's poor glass. |
+
+- **Measured:** soft particles faded every fog puff to nothing in the renders, so the fog material has none. The puff's own soft edge hides where it meets the ground.
+- The fog, lamp and sky numbers are authoring defaults.
+
+**Still wanted** (asset map §9, style guide §6.2): spires for the chapel and a church, a clock face, gargoyles, statues with covered faces, pointed lucarnes, and a shop front.
+
+**Open until the owner's walk:** 99 VS-C3.
 

@@ -29,7 +29,7 @@ namespace GameDev.Slice.EditorTools
             return driver;
         }
 
-        /// <summary>The driver's assets: the settings, the POIs, the tips, and the city plan C2 for the map (S1.6).</summary>
+        /// <summary>The driver's assets: the settings, the POIs, the tips, and the city plan C3 for the map (S1.6, C3 §24.7).</summary>
         private static void Set(SliceWorldDriver driver)
         {
             driver.Configure(
@@ -40,7 +40,7 @@ namespace GameDev.Slice.EditorTools
             EditorUtility.SetDirty(driver);
         }
 
-        private const string PlanPath = "Assets/Data/Slice/Map/VeilmouthC2Plan.xml";
+        private const string PlanPath = "Assets/Data/Slice/Map/VeilmouthC3Plan.xml";
 
         /// <summary>Adds what Veilmouth lacks of the world, and sets the existing driver's assets again (S1.6 added the plan).</summary>
         [MenuItem("GameDev/Slice/World/Add the Slice World and the Notice Board to Veilmouth (once)")]

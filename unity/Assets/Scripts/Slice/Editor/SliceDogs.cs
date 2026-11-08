@@ -35,8 +35,8 @@ namespace GameDev.Slice.EditorTools
         private const float Width = 0.32f;       // m, the body box
         private const float Length = 0.95f;      // m
 
-        /// <summary>Where the dogs stand, world X and Z (plan px − 500, 500 − py): Bell Street by the player's start, the Market square, High Street, Ridge Street, and the Sea Quay.</summary>
-        public static readonly Vector2[] Places = { new Vector2(176f, -275f), new Vector2(63f, -257f), new Vector2(165f, -235f), new Vector2(60f, -168f), new Vector2(100f, -321f) };
+        /// <summary>Where the dogs stand, world X and Z (plan px − 500, 500 − py): Bell Street by the player's start, the Market Place, High Street, the Parade, and the Sea Quay (city plan C3, §24.3).</summary>
+        public static readonly Vector2[] Places = { new Vector2(176f, -275f), new Vector2(75f, -265f), new Vector2(165f, -235f), new Vector2(60f, -174f), new Vector2(100f, -321f) };
 
         private static string[] Feet => new[] { "DEF-foot.L", "DEF-foot.R", "DEF-front_foot.L", "DEF-front_foot.R" };
 
@@ -56,6 +56,9 @@ namespace GameDev.Slice.EditorTools
             RenderPoses();
             Place(true);
         }
+
+        /// <summary>The agent's batch rebuild of the city: the dogs placed again from the prefab as it is.</summary>
+        public static void PlaceReplacing() => Place(true);
 
         /// <summary>The agent's check of the clips alone: the prefab and the poses, the scene untouched.</summary>
         public static void BuildAndRender()
