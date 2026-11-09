@@ -1,10 +1,10 @@
 # 17 Game Systems Architecture
 
-Version: 1.23
+Version: 1.24
 
 Status: Draft
 
-Last Updated: 2026-11-08 (I.2, I.3 and the interior-load default: the street stays loaded behind an interior, by the owner's choice of D3 (a) in the Veilmouth reference plan; a door takes about 0.5 s, measured. Earlier: Later waves: loose props V1 built in the slice's kit. Earlier: Later waves: the owner's requests of 2026-11-06, loose props, a room constructor, street animals, city transport, and cabs, named with their open questions. Earlier: X.3 and X.6: the save contract and the first HUD, from S0.5. Earlier: I.1–I.3: the first doors, from S0.4. Earlier: L.1–L.3: the code lives in its owning folders, from S0.3. Earlier: X.1: the first `IWorldClock` contract, from S0.1. Earlier: next code default: the Vertical Slice implementation plan, in one hand-built scene, by the owner's decision. Earlier: the slice's Suspend Save, townsfolk schedules, and the Item Creation workshop, by the owner's answers. Earlier: unseen fights run the tactical rules without drawing, by the owner. Earlier: faction state holds forces and City Control; Influence is read from them. Earlier: Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
+Last Updated: 2026-11-09 (X.7 Localization: every player-facing string by key, Russian and English, by the owner; the project's own string tables as the authoring default. Earlier: I.2, I.3 and the interior-load default: the street stays loaded behind an interior, by the owner's choice of D3 (a) in the Veilmouth reference plan; a door takes about 0.5 s, measured. Earlier: Later waves: loose props V1 built in the slice's kit. Earlier: Later waves: the owner's requests of 2026-11-06, loose props, a room constructor, street animals, city transport, and cabs, named with their open questions. Earlier: X.3 and X.6: the save contract and the first HUD, from S0.5. Earlier: I.1–I.3: the first doors, from S0.4. Earlier: L.1–L.3: the code lives in its owning folders, from S0.3. Earlier: X.1: the first `IWorldClock` contract, from S0.1. Earlier: next code default: the Vertical Slice implementation plan, in one hand-built scene, by the owner's decision. Earlier: the slice's Suspend Save, townsfolk schedules, and the Item Creation workshop, by the owner's answers. Earlier: unseen fights run the tactical rules without drawing, by the owner. Earlier: faction state holds forces and City Control; Influence is read from them. Earlier: Social Checks added to A.3 Dialogue. Earlier: stealth added to Wave C. Earlier: CC-33 gate passed; colliders added to Wave C. Earlier: Combat Grid build cost measured. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: Combat Grid card updated: around the player only. Earlier: Track C rebuilt for combat in place. Earlier: Vertical Slice scope updated for the one-city slice. Earlier: the campaign's 3×3 target world recorded next to the V0 default. Earlier: Track E gains the City Control and Force Generation card from 21. Earlier: Player-system track now includes mandatory potion-only Alchemy; detailed profession rules remain in 20.)
 
 Depends On:
 [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md), [15 Procedural Building Generation](15%20Procedural%20Building%20Generation.md), [12 Engine Choice](12%20Engine%20Choice.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md)
@@ -776,6 +776,25 @@ Code state after slice iteration S0.5: `GameDev.Core.Save` holds the contract wi
 | **Owning folder** | `unity/Assets/Scripts/UI/`, `unity/Assets/Scripts/Audio/` |
 
 Code state after slice iteration S0.5: `GameDev.UI` holds the slice HUD on UI Toolkit (authoring default): `HudView` reads the running clock and the doors in reach and changes nothing; its layout is `Assets/UI/Hud/Hud.uxml` with its style sheet, under one panel on Unity's default runtime theme.
+
+## X.7 Localization
+
+Owner, 2026-11-09: every line, name and piece of UI is translatable from the start; Russian and English for now.
+
+| Field | Content |
+|-------|---------|
+| **Responsibilities** | Every player-facing string by key: dialogue lines, tips and notes, names of people and places, POI titles, prompts, the HUD and the map. The current language, a fallback to English and then to the key itself, so a missing text shows and never breaks. |
+| **Dependencies** | None; every system that shows text depends on it. |
+| **Public interfaces** | `Loc.Get(key)`, `Loc.Format(key, args)`, `Loc.Language`, `Loc.Changed`. |
+| **Data flow** | String tables → `Loc` → views, which redraw on `Loc.Changed`. Data assets and saves hold keys or ids, never text, so a save made in one language loads in another. |
+| **Save/load** | The language is a setting of the machine, not of the run. |
+| **Multiplayer** | Local. |
+| **Performance** | Tables loaded once; a lookup is a dictionary read. |
+| **Extensibility** | A language is a new column in every table, with no new code. |
+| **V1 scope / Deferred** | Russian and English; a language chosen by the system's language and switchable in the game. Plural forms, right-to-left scripts and voice are deferred. |
+| **Owning folder** | `unity/Assets/Scripts/Core/Localization/`; tables in `unity/Assets/Resources/Localization/` |
+
+Authoring default (2026-11-09): the project's own string tables, not Unity's Localization package. The package brings Addressables, a build step of its own and a change to the package manifest, while the slice needs only keyed strings in two languages; keys and tables can move into the package later if voice, plural rules or a translators' workflow ask for it.
 
 ---
 
