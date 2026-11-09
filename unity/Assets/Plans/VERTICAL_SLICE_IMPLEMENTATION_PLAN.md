@@ -407,4 +407,5 @@ Content is written with the owner, by the usual method, just before the mileston
 ## 7. Open
 
 - The triangle and texture budget of the kit (kit standard, *Open*).
+- The News Pool (owner, 2026-11-09; [09](../../../09%20Information%20Sources.md) § News Pool) has no milestone yet: NEWS-5 recommends S5c, with POI A's and B's events as its first items.
 - Whether the full game later reuses the slice's city as a hand-built landmark on the seeded Overworld, or rebuilds it.
