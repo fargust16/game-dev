@@ -11,11 +11,13 @@ using UnityEngine;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// S2.5, once: POI A's scene before Harrow &amp; Tincture in Veilmouth (11.1 POI A §1): Harrow held by two Wardens on the
-    /// cobbles, a third in his door, and three neighbours facing them, all posed and hidden until the player enters the
-    /// area within the window (<see cref="PoiStage"/>). The stage talks through <see cref="PersonTalk"/> with POI A's
-    /// conversation. Places are measured from the shop's street door, so they follow the house; a scene that already has
-    /// the stage is left as it is, as Veilmouth is the owner's.
+    /// Once each, the POIs' scenes in Veilmouth, posed and hidden until the player enters the area within the window
+    /// (<see cref="PoiStage"/>), each talking through <see cref="PersonTalk"/> with its POI's conversation. S2.5, POI A
+    /// before Harrow &amp; Tincture (11.1 POI A §1): Harrow held by two Wardens on the cobbles, a third in his door, and three
+    /// neighbours facing them, measured from the shop's street door. S2.6, POI B on Loom Lane (11.1 POI B §1): two
+    /// Veinmarket collectors dragging a mill girl toward the coal stairs, another girl torn free, and an old woman in a
+    /// doorway, measured from the lane's middle found near the POI's place. A scene that already has its stage is left as it
+    /// is, as Veilmouth is the owner's.
     /// </summary>
     public static class SlicePoiStages
     {
@@ -33,6 +35,18 @@ namespace GameDev.Slice.EditorTools
         private const float NeighboursSide = 2.2f;
         private const float TalkReach = 3f;
         private const float AppearRadius = 60f;
+
+        public const string PoiBStage = "POI B - Eleventh-Bell Collectors";
+        public const string PoiBPath = "Assets/Data/Slice/Poi/PoiB.asset";
+        public const string PoiBDialoguePath = "Assets/Data/Slice/Dialogue/PoiBDialogue.asset";
+        private const string PoiCPath = "Assets/Data/Slice/Poi/PoiC.asset";
+
+        // Authoring defaults, m: where the lane's middle is sought around POI B's place, how far a wall is looked for,
+        // and how wide a lane may be.
+        private const float LaneSearch = 8f;
+        private const float Probe = 30f;
+        private const float NarrowestLane = 4f;
+        private const float WidestLane = 16f;
 
         [MenuItem("GameDev/Slice/POI/Stage POI A before Harrow & Tincture in Veilmouth (once)")]
         public static void StagePoiA()
@@ -86,9 +100,15 @@ namespace GameDev.Slice.EditorTools
             Person(cast, "Blue", Feet(door, harrow + (right * HoldingSide)), facing, "POI A - Warden holding him (right)");
 
             var crowd = door + (outward * NeighboursOut);
-            Neighbour(cast, SliceTownsfolk.PrefabPath, Feet(door, crowd - (right * NeighboursSide)), harrow, "POI A - Neighbour (left)");
-            Neighbour(cast, SliceTownsfolk.WomanPrefabPath, Feet(door, crowd + (outward * 0.6f)), harrow, "POI A - Neighbour (middle)");
-            Neighbour(cast, SliceTownsfolk.PrefabPath, Feet(door, crowd + (right * NeighboursSide)), harrow, "POI A - Neighbour (right)");
+            foreach (var (path, at, name) in new[]
+                     {
+                         (SliceTownsfolk.PrefabPath, Feet(door, crowd - (right * NeighboursSide)), "POI A - Neighbour (left)"),
+                         (SliceTownsfolk.WomanPrefabPath, Feet(door, crowd + (outward * 0.6f)), "POI A - Neighbour (middle)"),
+                         (SliceTownsfolk.PrefabPath, Feet(door, crowd + (right * NeighboursSide)), "POI A - Neighbour (right)"),
+                     })
+            {
+                Townsfolk(cast, path, at, harrow - at, name);
+            }
 
             stage.AddComponent<PersonTalk>().Configure(dialogue, TalkReach);
             stage.AddComponent<PoiStage>().Configure(poi, cast, AppearRadius);
@@ -106,14 +126,133 @@ namespace GameDev.Slice.EditorTools
             person.SetParent(cast.transform, true);
         }
 
-        private static void Neighbour(GameObject cast, string prefabPath, Vector3 at, Vector3 lookAt, string name)
+        [MenuItem("GameDev/Slice/POI/Stage POI B on Loom Lane in Veilmouth (once)")]
+        public static void StagePoiB()
         {
-            var neighbour = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath), cast.transform);
-            neighbour.name = name;
-            neighbour.transform.SetPositionAndRotation(at, Quaternion.Euler(0f, Yaw(Flat(lookAt - at)), 0f));
+            var scene = EditorSceneManager.OpenScene(SlicePeople.ScenePath(SliceRoster.Veilmouth), OpenSceneMode.Single);
+            var poi = AssetDatabase.LoadAssetAtPath<PoiDefinition>(PoiBPath);
+            var stairs = AssetDatabase.LoadAssetAtPath<PoiDefinition>(PoiCPath);
+            var dialogue = AssetDatabase.LoadAssetAtPath<DialogueDefinition>(PoiBDialoguePath);
+            if (poi == null || stairs == null || dialogue == null)
+            {
+                Debug.LogError("[SlicePoiStages] POI B, POI C or B's conversation is missing.");
+                return;
+            }
 
-            // A neighbour stands; the stage gives the pose (PoiStage).
-            if (neighbour.TryGetComponent<TownsfolkWalker>(out var walker))
+            if (Object.FindObjectsByType<PoiStage>(FindObjectsInactive.Include).Any(s => s.Poi == poi))
+            {
+                Debug.Log("[SlicePoiStages] POI B is already staged in Veilmouth; left as it is.");
+                return;
+            }
+
+            Physics.SyncTransforms();
+            if (!LaneMiddle(poi.Place, out var middle, out var along))
+            {
+                Debug.LogError($"[SlicePoiStages] No lane found within {LaneSearch} m of POI B's place {poi.Place}.");
+                return;
+            }
+
+            // Along the lane toward the coal stairs (POI C), where the collectors drag her.
+            if (Vector3.Dot(Flat(stairs.Place - middle), along) < 0f)
+            {
+                along = -along;
+            }
+
+            var side = Vector3.Cross(Vector3.up, along);
+            var stage = new GameObject(PoiBStage);
+            stage.transform.SetPositionAndRotation(middle, Quaternion.LookRotation(-along));
+            var cast = new GameObject("Cast");
+            cast.transform.SetParent(stage.transform, false);
+
+            var dragged = Feet(middle, middle + (along * 2f));
+            Townsfolk(cast, SliceTownsfolk.WomanPrefabPath, dragged, along, "POI B - Mill girl, dragged");
+            Person(cast, "Brown", Feet(middle, dragged + (side * 0.7f)), Yaw(along), "POI B - Collector, holding her");
+            Person(cast, "Brown", Feet(middle, dragged + (along * 0.6f) - (side * 0.6f)), Yaw(-along), "POI B - Collector, watching the lane");
+            var free = Feet(middle, middle - (along * 1f) + (side * 1.2f));
+            Townsfolk(cast, SliceTownsfolk.WomanPrefabPath, free, dragged - free, "POI B - Mill girl, torn free");
+
+            // The old woman in a doorway on the nearer side of the lane, looking into it.
+            var wallSide = Clearance(middle, side) <= Clearance(middle, -side) ? side : -side;
+            var doorway = Feet(middle, middle - (along * 2.5f) + (wallSide * Mathf.Max(0f, Clearance(middle, wallSide) - 0.6f)));
+            Townsfolk(cast, SliceTownsfolk.WomanPrefabPath, doorway, -wallSide, "POI B - Old woman in a doorway");
+
+            stage.AddComponent<PersonTalk>().Configure(dialogue, TalkReach);
+            stage.AddComponent<PoiStage>().Configure(poi, cast, AppearRadius);
+            cast.SetActive(false);
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log($"[SlicePoiStages] POI B staged in the lane's middle at {middle}, toward the stairs {along}, the old woman at {doorway}.");
+        }
+
+        /// <summary>
+        /// The middle of the lane near <paramref name="place"/>: of the free points within <see cref="LaneSearch"/> m, the one
+        /// most nearly between the walls either side of its longest view, on a lane neither too narrow nor a square.
+        /// </summary>
+        private static bool LaneMiddle(Vector3 place, out Vector3 middle, out Vector3 along)
+        {
+            middle = place;
+            along = Vector3.forward;
+            var best = float.MaxValue;
+            for (var dx = -LaneSearch; dx <= LaneSearch; dx += 1f)
+            {
+                for (var dz = -LaneSearch; dz <= LaneSearch; dz += 1f)
+                {
+                    var at = place + new Vector3(dx, 0f, dz);
+                    if (!Free(place, at))
+                    {
+                        continue;
+                    }
+
+                    var feet = Feet(place, at);
+                    var axis = Vector3.forward;
+                    var longest = 0f;
+                    for (var k = 0; k < 8; k++)
+                    {
+                        var direction = Quaternion.Euler(0f, k * 22.5f, 0f) * Vector3.forward;
+                        var length = Clearance(feet, direction) + Clearance(feet, -direction);
+                        if (length > longest)
+                        {
+                            longest = length;
+                            axis = direction;
+                        }
+                    }
+
+                    var across = Vector3.Cross(Vector3.up, axis);
+                    var left = Clearance(feet, across);
+                    var right = Clearance(feet, -across);
+                    if (left + right < NarrowestLane || left + right > WidestLane)
+                    {
+                        continue;
+                    }
+
+                    var score = Mathf.Abs(left - right) + (0.25f * new Vector2(dx, dz).magnitude);
+                    if (score < best)
+                    {
+                        best = score;
+                        middle = feet;
+                        along = axis;
+                    }
+                }
+            }
+
+            return best < float.MaxValue;
+        }
+
+        /// <summary>How far a wall stands from <paramref name="feet"/> along <paramref name="direction"/>, at chest height, up to <see cref="Probe"/> m.</summary>
+        private static float Clearance(Vector3 feet, Vector3 direction)
+        {
+            var walls = LayerMask.GetMask(KitLayers.Structure);
+            return Physics.Raycast(feet + (Vector3.up * 1.4f), direction, out var hit, Probe, walls, QueryTriggerInteraction.Ignore) ? hit.distance : Probe;
+        }
+
+        /// <summary>An ordinary townsperson standing, facing <paramref name="facing"/>; the stage gives the pose (PoiStage).</summary>
+        private static void Townsfolk(GameObject cast, string prefabPath, Vector3 at, Vector3 facing, string name)
+        {
+            var person = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath), cast.transform);
+            person.name = name;
+            person.transform.SetPositionAndRotation(at, Quaternion.Euler(0f, Yaw(Flat(facing)), 0f));
+            if (person.TryGetComponent<TownsfolkWalker>(out var walker))
             {
                 Object.DestroyImmediate(walker);
             }

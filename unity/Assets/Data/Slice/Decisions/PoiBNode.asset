@@ -1,0 +1,120 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c6e8a0b2d3f4a7b9c1d3e5f7a9b1c3d, type: 3}
+  m_Name: PoiBNode
+  m_EditorClassIdentifier: 
+  id: poi-b
+  title: "Eleventh-Bell Collectors"
+  situation: "After the eleventh bell Loom Lane empties faster than it should. A side-coach without crest lamps waits past the coal stairs. Two figures in coach-coats drag a screaming mill girl toward the alley; another girl fights free for one breath. A distant Warden whistle is too far. (11.1 POI B)"
+  poi: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
+  scene: {fileID: 11400000, guid: 3f5b7d9e1a2c4e5f7a9b1c3d5e7f9a2b, type: 2}
+  primaryAxis: 2
+  secondaryAxis: 1
+  options:
+  - name: "Protect the victims now"
+    axes:
+    - 2
+    - 1
+    approaches:
+    - 5
+    - 1
+    - 2
+    dialogueOptions:
+    - swarm
+    - threaten
+    cost: "A threat on the collectors is a Final Check: a failure is a fight, which before S3 ends the scene as if fled (the lane's Veinmarket outcome)"
+    consequence: "The girls free tonight"
+    opens: "Gratitude, and the girl's word that the collectors asked who bought black cough from Harrow"
+    closes: "A clean trail to the destination; Veinmarket's goodwill, as the collectors are its men (11)"
+    failure: "Roused doors stay shut; a failed threat loses the girls"
+    residue:
+    - aftermath.loom_lane.girls_freed
+    - against.veinmarket
+    - poi.b.heard.harrow_buyers
+    countsAsWithdraw: 0
+    prepares: 0
+    later: 
+  - name: "Follow the coach instead"
+    axes:
+    - 2
+    - 1
+    - 3
+    approaches:
+    - 4
+    dialogueOptions: []
+    cost: "The victims stay in danger; the risk of being spotted"
+    consequence: "The coal-stair landing or the warehouse shutters"
+    opens: "A strong start for POI C"
+    closes: "Rescue gratitude"
+    failure: "Spotted: a forced Confront in a worse position, or the coach lost but Veinmarket's chalk seen"
+    residue: []
+    countsAsWithdraw: 0
+    prepares: 0
+    later: S3
+  - name: "Signal or fetch Wardens"
+    axes:
+    - 2
+    - 1
+    approaches:
+    - 1
+    - 2
+    - 3
+    dialogueOptions:
+    - urge
+    - promise_tip
+    cost: "Minutes; a tip owed to the brass-numbers when promised"
+    consequence: "The official version written into the lane: the whistle, and the snatch spoiled"
+    opens: "The Wardens' fighter at the invasion (11); report access"
+    closes: "Underworld informants"
+    failure: "The Warden shrugs it off as not his beat; a promised tip still brings him"
+    residue:
+    - aftermath.loom_lane.snatch_spoiled
+    - aftermath.loom_lane.wardens_fetched
+    - debt.wardens
+    countsAsWithdraw: 0
+    prepares: 0
+    later: 
+  - name: "Exchange for a tip before moving"
+    axes:
+    - 3
+    - 1
+    approaches:
+    - 3
+    dialogueOptions:
+    - promise
+    cost: "A promise to the door-watcher; coin waits for S5a"
+    consequence: "Which stair they always use: an Argument against the collectors, and a lead for POI C"
+    opens: "A threat the collectors believe"
+    closes: "The door-watcher may sell the player out later"
+    failure: "Not in S2: the promise always buys the tip"
+    residue:
+    - poi.b.heard.stair
+    countsAsWithdraw: 0
+    prepares: 1
+    later: 
+  - name: "Leave Loom Lane"
+    axes:
+    - 0
+    - 3
+    approaches:
+    - 6
+    dialogueOptions:
+    - leave
+    cost: "Misses the live scene"
+    consequence: "Morning Symptoms and a colder Trace: the window closes at 02:00 unattended"
+    opens: "An investigator's angle into POI C without blood on the hands"
+    closes: "Rescue debts and the live destination"
+    failure: "The world shows what a collector night looks like after"
+    residue: []
+    countsAsWithdraw: 1
+    prepares: 0
+    later: 

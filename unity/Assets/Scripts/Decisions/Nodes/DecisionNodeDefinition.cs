@@ -50,6 +50,9 @@ namespace GameDev.Decisions
         [Tooltip("Walking away: it settles nothing, and the POI resolves unattended when its window closes (04).")]
         public bool countsAsWithdraw;
 
+        [Tooltip("A step before the choice, such as buying a tip (03.1 *Exchange for a tip before moving*): it settles nothing and leaves the POI open.")]
+        public bool prepares;
+
         [Tooltip("The milestone that builds it, e.g. S3, while no conversation option takes it yet.")]
         public string later = "";
     }
@@ -143,7 +146,7 @@ namespace GameDev.Decisions
                     }
 
                     var settles = said.success.settles == poi;
-                    if (settles == option.countsAsWithdraw)
+                    if (settles == (option.countsAsWithdraw || option.prepares))
                     {
                         problems.Add($"{id}.{option.name}: '{optionId}' {(settles ? "settles" : "does not settle")} POI {poi.Id}");
                     }

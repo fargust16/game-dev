@@ -36,3 +36,34 @@ dialogue.poia.freed,"Bless you. They'll be back, but not tonight. I'll not forge
 dialogue.poia.freed.done,Go and open your shop.,"Идите, откройте лавку."
 dialogue.poia.taken,"Obliged, citizen. The Wardens remember a helpful face.","Благодарю, гражданин. Стража помнит тех, кто помогает."
 dialogue.poia.taken.nod,Nod and step aside.,Кивнуть и отойти.
+# POI B, the Eleventh-Bell Collectors on Loom Lane (S2.6; 11.1); the collectors are Veinmarket's men, so a check on them is Final
+dialogue.poib.who.collectors,Collector,Сборщик
+dialogue.poib.who.lane,Loom Lane,Ткацкий переулок
+dialogue.poib.who.crone,Old woman in a doorway,Старуха в дверях
+dialogue.poib.who.warden,Warden,Стражник
+dialogue.poib.who.girl,Mill girl,Фабричная девушка
+dialogue.poib.scene,"After the eleventh bell Loom Lane has emptied too fast. Two men in coach-coats drag a screaming mill girl toward the alley that runs to the coal stairs; another girl has torn free and stands, not daring to run. An old woman watches from a doorway. Somewhere far off a Warden's whistle sounds, too far to matter.","После одиннадцатого колокола Ткацкий переулок опустел слишком быстро. Двое в кучерских пальто тащат кричащую фабричную девушку к проулку, что ведёт к угольной лестнице; другая вырвалась и стоит, не смея бежать. Из дверей смотрит старуха. Где-то вдали свистит стражник — слишком далеко, чтобы это что-то значило."
+dialogue.poib.scene.step,Step into the lane.,Шагнуть в переулок.
+dialogue.poib.lane,"Walk on, friend. None of this is yours.","Проходи, приятель. Тебя это не касается."
+dialogue.poib.lane.swarm,"Loom Lane! They're taking your daughters off your own doorsteps. Out, all of you!","Ткацкий переулок! Ваших дочерей уводят прямо с порога. Выходите, все!"
+dialogue.poib.lane.threaten,"Let her go. You're no cabmen, and by morning the Wardens will know your stair.","Отпустите её. Никакие вы не извозчики, и к утру Стража будет знать вашу лестницу."
+dialogue.poib.lane.ask_crone,Ask the old woman in the doorway what she knows.,"Спросить старуху в дверях, что она знает."
+dialogue.poib.lane.run,Run for the Warden whose whistle you heard.,"Бежать за стражником, чей свисток слышен."
+dialogue.poib.lane.leave,Leave Loom Lane to its night.,Оставить Ткацкий переулок его ночи.
+dialogue.poib.crone,"Knowing's not free, dearie. Not on this lane.","Знать — это не даром, милок. Не в этом переулке."
+dialogue.poib.crone.promise,I'll keep your name out of whatever comes of this.,"Твоё имя нигде не всплывёт, что бы ни случилось."
+dialogue.poib.crone.never,Never mind.,Неважно.
+dialogue.poib.stair,Coal stairs. Always the coal stairs. Their coach waits past the third landing.,Угольная лестница. Всегда угольная лестница. Карета ждёт за третьим пролётом.
+dialogue.poib.stair.onward,Turn back to the lane.,Вернуться в переулок.
+dialogue.poib.warden,Eh? Speak up. I'm on my round.,А? Говори громче. Я на обходе.
+dialogue.poib.warden.urge,"They're dragging a mill girl into a coach on Loom Lane, now. Blow your whistle and come.",На Ткацком переулке прямо сейчас тащат в карету фабричную девушку. Свисти и идём.
+dialogue.poib.warden.promise_tip,"Come now, and I'll tell you where their coach goes.","Идём сейчас — и я скажу тебе, куда ездит их карета."
+dialogue.poib.warden.back,Go back to the lane alone.,Вернуться в переулок одному.
+dialogue.poib.shrugged,Loom Lane's not my beat. Find the night sergeant.,Ткацкий переулок не мой участок. Ищи ночного сержанта.
+dialogue.poib.shrugged.away,Try him another way.,Попробовать иначе.
+dialogue.poib.shut,Shutters slam along the lane. Nobody comes out.,Вдоль переулка хлопают ставни. Никто не выходит.
+dialogue.poib.shut.turn,Turn back to the collectors.,Снова повернуться к сборщикам.
+dialogue.poib.freed,They asked me who bought black cough from old Harrow. Why would they ask a mill girl that?,"Они спрашивали меня, кто покупал чёрную микстуру у старого Харроу. Зачем спрашивать такое у фабричной девчонки?"
+dialogue.poib.freed.home,"Get home, quickly.",Скорее домой.
+dialogue.poib.whistle,"The Warden's whistle shrieks down the lane. The coach-coats let go and run, and the coach rolls off with nobody in it.","Свисток стражника визжит на весь переулок. Кучерские пальто бросают девушку и бегут, а карета укатывает пустой."
+dialogue.poib.whistle.breathe,Catch your breath.,Перевести дух.

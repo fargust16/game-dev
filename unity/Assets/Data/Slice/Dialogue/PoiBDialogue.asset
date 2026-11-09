@@ -1,0 +1,486 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a7c9e1b3d5f4a7c9e1b3d5f7a9c1e3b, type: 3}
+  m_Name: PoiBDialogue
+  m_EditorClassIdentifier: 
+  id: poib
+  listeners:
+  - id: collectors
+    nameKey: dialogue.poib.who.collectors
+    enemy: 1
+    strength: 5
+    intelligence: 5
+    will: 5
+  - id: lane
+    nameKey: dialogue.poib.who.lane
+    enemy: 0
+    strength: 5
+    intelligence: 5
+    will: 5
+  - id: crone
+    nameKey: dialogue.poib.who.crone
+    enemy: 0
+    strength: 5
+    intelligence: 5
+    will: 5
+  - id: warden
+    nameKey: dialogue.poib.who.warden
+    enemy: 0
+    strength: 10
+    intelligence: 10
+    will: 10
+  - id: girl
+    nameKey: dialogue.poib.who.girl
+    enemy: 0
+    strength: 5
+    intelligence: 5
+    will: 5
+  nodes:
+  - id: scene
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: step
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: lane
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: lane
+    speaker: collectors
+    saysTips: 0
+    source: 0
+    options:
+    - id: swarm
+      approach: 1
+      kind: 1
+      arguments:
+      - tip.board.girls.heard
+      - tip.nell.collectors.heard
+      - tip.kit.coachcoats.heard
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: lane
+      asks: 
+      success:
+        next: freed
+        raises:
+        - aftermath.loom_lane.girls_freed
+        - against.veinmarket
+        - poi.b.heard.harrow_buyers
+        settles: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
+        tells: []
+        minutes: 0
+      failure:
+        next: shut
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: threaten
+      approach: 2
+      kind: 1
+      arguments:
+      - tip.kit.coachcoats.heard
+      - poi.b.heard.stair
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 2
+      request: 1
+      listener: collectors
+      asks: 
+      success:
+        next: freed
+        raises:
+        - aftermath.loom_lane.girls_freed
+        - against.veinmarket
+        - poi.b.heard.harrow_buyers
+        settles: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises:
+        - aftermath.loom_lane.girls_taken
+        - poi.b.fled
+        settles: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
+        tells: []
+        minutes: 0
+    - id: ask_crone
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy:
+      - poi.b.heard.stair
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: crone
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: run
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: warden
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: leave
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: crone
+    speaker: crone
+    saysTips: 0
+    source: 0
+    options:
+    - id: promise
+      approach: 3
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: stair
+        raises:
+        - poi.b.heard.stair
+        - promise.crone
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: never
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: lane
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: stair
+    speaker: crone
+    saysTips: 0
+    source: 0
+    options:
+    - id: onward
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: lane
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: warden
+    speaker: warden
+    saysTips: 0
+    source: 0
+    options:
+    - id: urge
+      approach: 1
+      kind: 1
+      arguments:
+      - tip.board.girls.heard
+      - tip.nell.collectors.heard
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: warden
+      asks: 
+      success:
+        next: whistle
+        raises:
+        - aftermath.loom_lane.snatch_spoiled
+        - aftermath.loom_lane.wardens_fetched
+        - debt.wardens
+        settles: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
+        tells: []
+        minutes: 5
+      failure:
+        next: shrugged
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: promise_tip
+      approach: 3
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: whistle
+        raises:
+        - aftermath.loom_lane.snatch_spoiled
+        - aftermath.loom_lane.wardens_fetched
+        - debt.wardens
+        - promise.wardens.tip
+        settles: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
+        tells: []
+        minutes: 5
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: back
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: lane
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: shrugged
+    speaker: warden
+    saysTips: 0
+    source: 0
+    options:
+    - id: away
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: warden
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: shut
+    speaker: lane
+    saysTips: 0
+    source: 0
+    options:
+    - id: turn
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: lane
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: freed
+    speaker: girl
+    saysTips: 0
+    source: 0
+    options:
+    - id: home
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: whistle
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: breathe
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  start: scene
