@@ -241,6 +241,9 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(_rules.Strike(glowing, ReferenceEight(), default, Scripted(0, 0.99, 0.5, 0.29)).Poisoned, "30 %");
             Assert.IsFalse(_rules.Strike(glowing, ReferenceEight(), default, Scripted(0, 0.99, 0.5, 0.31)).Poisoned);
             Assert.IsFalse(_rules.Strike(ReferenceEight(), ReferenceEight(), default, Scripted(0, 0, 0.5)).Bleeds, "a sword's critical hit draws no Bleeding");
+            var parrying = ReferenceEight();
+            parrying.Reserve = 2;
+            Assert.IsFalse(_rules.Strike(wolf, parrying, default, Scripted(0, 0, 0.5, 0.1)).Bleeds, "a parried critical bite draws none");
         }
 
         [TestCase("Dagger", 3, 3, 10, 25, Guard.Parry, 0.30, 1.0, 0, 0, false, false, 1)]
@@ -428,24 +431,6 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual((6 + 3) / 2d - 10, _rules.Accuracy(shooter), Tight, "ranged: ((D + P) / 2 + Ranged Skill) / 2");
         }
 
-        /// <summary>Rolls in the order given: each NextDouble, and Next(min, max) read from it.</summary>
         private static Random Scripted(params double[] draws) => new ScriptedRolls(draws);
-
-        private sealed class ScriptedRolls : Random
-        {
-            private readonly Queue<double> _draws;
-
-            public ScriptedRolls(IEnumerable<double> draws) => _draws = new Queue<double>(draws);
-
-            public override double NextDouble()
-            {
-                Assert.IsNotEmpty(_draws, "the strike drew more rolls than the test gave");
-                return _draws.Dequeue();
-            }
-
-            protected override double Sample() => NextDouble();
-
-            public override int Next(int minValue, int maxValue) => minValue + (int)(NextDouble() * (maxValue - minValue));
-        }
     }
 }

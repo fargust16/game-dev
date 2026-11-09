@@ -42,7 +42,7 @@ namespace GameDev.Confront.Rules
 
         public bool Stunned;
 
-        /// <summary>A beast's critical hit: the target bleeds (10.2 §5b *Beasts of the slice*).</summary>
+        /// <summary>A beast's critical hit that deals damage: the target bleeds (10.2 §5b *Beasts of the slice*).</summary>
         public bool Bleeds;
 
         /// <summary>A glowing beast's bite: the target is poisoned.</summary>

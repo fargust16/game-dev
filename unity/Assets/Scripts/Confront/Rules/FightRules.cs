@@ -89,7 +89,35 @@ namespace GameDev.Confront.Rules
         [Tooltip("Initiative = (Dexterity + Perception) / 2 + 1d this.")]
         [SerializeField] private int initiativeDie = 20;
 
+        [Header("10.2 §5b Position")]
+        [Tooltip("Points to hit against a fighter Surrounded by two enemies at its sides.")]
+        [SerializeField] private float surroundedByTwo = 10f;
+
+        [Tooltip("Points to hit against a fighter Surrounded by three or four.")]
+        [SerializeField] private float surroundedByMore = 20f;
+
+        [Header("10.2 First Aid and conditions in the slice: Bleeding")]
+        [Tooltip("The share of maximum HP Bleeding takes each tick; a round is one tick.")]
+        [SerializeField, Range(0f, 1f)] private float bleedingShare = 0.01f;
+
+        [Tooltip("Bleeding ends by itself at Endurance × this a tick, Endurance / 2 %.")]
+        [SerializeField] private float bleedingEndsPerEndurance = 0.005f;
+
+        [Header("A headless fight, with no space (combat_sim.py)")]
+        [Tooltip("AP a melee fighter spends closing in on its first turn, combat_sim.py's CLOSE_IN_CELLS.")]
+        [SerializeField] private int closeInAp = 6;
+
+        [Tooltip("A headless fight still undecided after this many rounds is a draw.")]
+        [SerializeField] private int headlessRounds = 60;
+
         public int ReactionAp => reactionAp;
+        public double BleedingShare => bleedingShare;
+        public double BleedingEndsPerEndurance => bleedingEndsPerEndurance;
+        public int CloseInAp => closeInAp;
+        public int HeadlessRounds => headlessRounds;
+
+        /// <summary>10.2 §5b Position: points to hit against a fighter with this many enemies at its sides.</summary>
+        public double SurroundedBonus(int enemiesBeside) => enemiesBeside >= 3 ? surroundedByMore : enemiesBeside == 2 ? surroundedByTwo : 0d;
 
         /// <summary>A fighter for a fight, at full HP; its gear is refused if no character could hold it so.</summary>
         public Fighter Fighter(
@@ -317,7 +345,7 @@ namespace GameDev.Confront.Rules
                 target.LostTurns = Math.Max(target.LostTurns, 1);
             }
 
-            result.Bleeds = result.Critical && weapon.BleedsOnCritical && !target.Down;
+            result.Bleeds = result.Critical && weapon.BleedsOnCritical && damage > 0d && !target.Down;
             result.Poisoned = weapon.PoisonOnHit > 0f && !target.Down && rolls.NextDouble() < weapon.PoisonOnHit;
             return result;
         }

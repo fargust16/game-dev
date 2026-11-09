@@ -57,3 +57,9 @@ MonoBehaviour:
   apDexterityDivisor: 20
   reactionAp: 2
   initiativeDie: 20
+  surroundedByTwo: 10
+  surroundedByMore: 20
+  bleedingShare: 0.01
+  bleedingEndsPerEndurance: 0.005
+  closeInAp: 6
+  headlessRounds: 60

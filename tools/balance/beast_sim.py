@@ -5,6 +5,11 @@ combat_sim.py. A wolf's or a boar's critical hit causes Bleeding, 1 % of maximum
 ends by itself at Endurance / 2 % a round (10.2 § First Aid and conditions in the slice). A glowing
 beast's bite poisons, which only blocks recovery, so it changes no fight here.
 
+A blow is 10.2 §5b's, as the slice's C# fight rules strike it (S3a.2): a critical melee blow halves
+physical defence, and a weapon above its user aims worse. combat_sim.strike predates the first rule.
+A tie in Initiative goes to the higher Dexterity, then at random. The table of 10.2 *Beasts of the
+slice* is this script's output at seed 7, and the C# parity test lands within 3 points of it.
+
 Run: python tools/balance/beast_sim.py
 """
 import random
@@ -12,7 +17,7 @@ import random
 import combat_sim as cs
 from combat_sim import Unit, Weapon, Gear, alive, take_turn
 
-RUNS = 4000
+RUNS = 40000
 cs.ARMOUR["hide"] = (4, 0)
 cs.ARMOUR["thick hide"] = (8, 0)
 cs.ARMOUR_WEIGHT["hide"] = 0.0
@@ -47,20 +52,36 @@ def beast(u):
     return u.name.endswith("wolf") or u.name.endswith("boar")
 
 
-def strike_with_bleed(a, t, *args, **kwargs):
-    """A critical hit deals more than the largest ordinary blow, so a beast's critical hit is read from the damage."""
-    before = t.hp
-    hit = ORIGINAL_STRIKE(a, t, *args, **kwargs)
-    if hit and beast(a):
-        w = a.weapon
-        largest = w.base * (1 + a.str / 50) * 1.15 * (1 - cs.mitigation(t.defence() * cs.CRIT_PIERCE))
-        if before - t.hp > largest:
-            t.extra["bleeding"] = True
-    return hit
+def strike(a, t, foes_of_t=(), side_of_t=(), bonus_crit=0.0, crit_extra=0.0, mult=1.0, unguarded=False, surround=0):
+    """combat_sim.strike with 10.2 §5b's critical pierce and aim; a beast's critical hit that deals damage bleeds."""
+    bonus_hit = cs.SURROUND_HIT.get(surround, 0.0)
+    if t.exposed:
+        bonus_hit += 0.10
+        t.exposed = False
+    if random.random() >= cs.hit_chance(a, t, bonus_hit) * a.aim():
+        return False
+    raw = a.crit_raw() + bonus_crit
+    crit = 1.0
+    if random.random() < min(0.95, raw):
+        crit = cs.CRIT + max(0, raw - 0.95) + crit_extra + a.gear.crit_damage
+    pierce = cs.CRIT_PIERCE if crit > 1 and not a.weapon.ranged else 0.0
+    defence = t.defence(side_of_t) * (cs.ARMOUR_RANGED if a.weapon.ranged else 1) * (1 - pierce)
+    damage = a.damage_roll() * crit * mult * (1 - cs.mitigation(defence))
+    if t.brace:
+        damage *= 1 - cs.BRACE_REDUCTION
+    if not unguarded and not a.weapon.ranged and t.weapon.guard and t.reserve >= cs.REACTION_AP and not t.asleep and not t.skip:
+        t.reserve -= cs.REACTION_AP
+        if random.random() < t.weapon.guard_chance:
+            damage *= 1 - t.weapon.guard_absorb
+    t.hp -= damage
+    if t.asleep and damage > 0:
+        t.asleep = 0
+    if crit > 1 and damage > 0 and t.hp > 0 and beast(a):
+        t.extra["bleeding"] = True
+    return True
 
 
-ORIGINAL_STRIKE = cs.strike
-cs.strike = strike_with_bleed
+cs.strike = strike
 
 
 def fight(side_a, side_b, max_rounds=60):
@@ -68,7 +89,7 @@ def fight(side_a, side_b, max_rounds=60):
     for u in units:
         u.reset()
         u.extra.pop("bleeding", None)
-    order = sorted(units, key=lambda u: -u.initiative())
+    order = sorted(units, key=lambda u: (-u.initiative(), -u.dex, random.random()))
     for rnd in range(1, max_rounds + 1):
         for u in order:
             if u.hp <= 0:
