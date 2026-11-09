@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System;
+using GameDev.Confront.Grid;
 using GameDev.Grid;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -100,7 +101,7 @@ namespace GameDev.EditorTools
                 var z = bounds.min.z + (float)rng.NextDouble() * bounds.size.z;
                 var reader = new CombatGridReader(1f);
                 if (reader.TryFindStart(new Vector3(x, 0f, z), out var ix, out var iz, out var level)
-                    && reader.Build(ix, iz, level).Reachable.Count >= MinOpenCells)
+                    && reader.Build(ix, iz, level).ReachableCount >= MinOpenCells)
                 {
                     return reader.Center(ix, iz, reader.Column(ix, iz)[level].Y);
                 }

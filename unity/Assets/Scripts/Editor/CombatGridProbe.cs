@@ -6,7 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using GameDev.Grid;
+using GameDev.Confront.Grid;
 using GameDev.World;
 using GameDev.World.Buildings.Shell;
 using GameDev.World.Settlement;
@@ -192,12 +192,12 @@ namespace GameDev.EditorTools
             row.CoverMs = window.CoverMs;
             row.Standable = window.Standable;
             row.MultiLevel = window.MultiLevel;
-            row.Reachable = window.Reachable.Count;
+            row.Reachable = window.ReachableCount;
             row.LowCover = window.LowCover;
             row.HighCover = window.HighCover;
             row.TerrainCoverRays = reader.TerrainCoverRays;
             row.OverflowColumns = reader.OverflowColumns;
-            row.ReachableCells = window.Reachable;
+            row.ReachableCells = reader.ReachableKeys();
 
             WalkTheGrid(row, startX, startZ, startLevel, cell);
             CountAirWalls(row, reader, window);
@@ -207,7 +207,7 @@ namespace GameDev.EditorTools
             if (before != null)
             {
                 // By column: a new piece adds a level, which renumbers the surfaces below it.
-                var after = new HashSet<long>(window.Reachable.Select(k => k >> 4));
+                var after = new HashSet<long>(row.ReachableCells.Select(k => k >> 4));
                 row.Flips = before.Select(k => k >> 4).Distinct().Count(k => !after.Contains(k));
             }
 
@@ -230,7 +230,7 @@ namespace GameDev.EditorTools
 
             for (var step = 0; step < WalkSteps; step++)
             {
-                if (!TryNextCell(window, visited, x, z, ref level, out var nextX, out var nextZ))
+                if (!TryNextCell(moving, visited, x, z, ref level, out var nextX, out var nextZ))
                 {
                     break;
                 }
@@ -262,7 +262,7 @@ namespace GameDev.EditorTools
         }
 
         private static bool TryNextCell(
-            CombatGridWindow window,
+            CombatGridReader reader,
             HashSet<long> visited,
             int x,
             int z,
@@ -277,7 +277,7 @@ namespace GameDev.EditorTools
                 for (var l = 0; l < CombatGridReader.MaxLevels; l++)
                 {
                     var key = CombatGridReader.Pack(nextX, nextZ, l);
-                    if (window.Reachable.Contains(key) && !visited.Contains(key))
+                    if (reader.IsReachable(nextX, nextZ, l) && !visited.Contains(key))
                     {
                         level = l;
                         return true;
@@ -347,7 +347,7 @@ namespace GameDev.EditorTools
                 var iz = Mathf.FloorToInt(tree.z / cell);
                 for (var l = 0; l < CombatGridReader.MaxLevels; l++)
                 {
-                    if (window.Reachable.Contains(CombatGridReader.Pack(ix, iz, l)))
+                    if (row.ReachableCells.Contains(CombatGridReader.Pack(ix, iz, l)))
                     {
                         row.TreesInReachableCells++;
                         break;
@@ -371,7 +371,7 @@ namespace GameDev.EditorTools
 
             var walker = report.Controller.Create();
             var rng = new Random(ProbeSeed + site.Index * 31 + site.ClassName[0] * 1009);
-            var keys = window.Reachable.OrderBy(k => k).ToList();
+            var keys = row.ReachableCells.OrderBy(k => k).ToList();
             var passable = 0;
             var blocked = 0;
 
@@ -763,7 +763,7 @@ namespace GameDev.EditorTools
                 var position = new Vector3(x, bounds.min.y, z);
                 var reader = new CombatGridReader(1f);
                 if (reader.TryFindStart(position, out var ix, out var iz, out var level)
-                    && reader.Build(ix, iz, level).Reachable.Count >= MinTownReachable)
+                    && reader.Build(ix, iz, level).ReachableCount >= MinTownReachable)
                 {
                     sites.Add(new Site(className, sites.Count, position));
                 }
@@ -810,7 +810,7 @@ namespace GameDev.EditorTools
             var column = reader.Column(ix, iz);
             for (var l = 0; l < column.Length; l++)
             {
-                if (!window.Reachable.Contains(CombatGridReader.Pack(ix, iz, l)))
+                if (!reader.IsReachable(ix, iz, l))
                 {
                     continue;
                 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using GameDev.Cameras;
+using GameDev.Confront.Grid;
 using GameDev.Player;
 using GameDev.World.Buildings.Shell;
 using UnityEngine;
@@ -59,6 +60,7 @@ namespace GameDev.Grid
 
         private CombatGridReader _reader;
         private CombatGridWindow _window;
+        private readonly List<CombatCell> _cells = new List<CombatCell>();
         private Camera _camera;
         private ThirdPersonCamera _freeCamera;
         private Mesh _overlay;
@@ -221,9 +223,10 @@ namespace GameDev.Grid
             _colors.Clear();
             _indices.Clear();
 
-            foreach (var key in _window.Reachable)
+            _reader.CopyReachable(_cells);
+            foreach (var cell in _cells)
             {
-                CombatGridReader.Unpack(key, out var ix, out var iz, out var level);
+                int ix = cell.X, iz = cell.Z, level = cell.Level;
                 var y = _reader.Column(ix, iz)[level].Y;
                 var cover = _reader.Cover(ix, iz, level);
                 var color = cover.High != 0 ? HighCover : cover.Low != 0 ? LowCover : Open;
@@ -458,7 +461,7 @@ namespace GameDev.Grid
         {
             var text = _fightView
                 ? "G: выйти из боя   Q / E или ПКМ: поворот камеры   колесо: зум   WASD: ходьба\n"
-                  + $"Клеток достижимо: {(_window != null ? _window.Reachable.Count : 0)}   "
+                  + $"Клеток достижимо: {(_window != null ? _window.ReachableCount : 0)}   "
                   + $"сдвигов сетки: {_gridMoves}   последний сдвиг: {_lastStepMs:F1} мс   "
                   + $"скрыто зданий: {_hiddenUntil.Count}"
                 : "G: режим боя";
@@ -511,7 +514,7 @@ namespace GameDev.Grid
             RenderTexture.active = null;
             _camera.targetTexture = null;
             File.WriteAllBytes(Path.Combine(smokeOut, fileName), image.EncodeToPNG());
-            Debug.Log($"[CombatGridLab] {fileName}: {_window.Reachable.Count} cells, {_hiddenUntil.Count} hidden buildings");
+            Debug.Log($"[CombatGridLab] {fileName}: {_window.ReachableCount} cells, {_hiddenUntil.Count} hidden buildings");
             Destroy(image);
             Destroy(target);
         }

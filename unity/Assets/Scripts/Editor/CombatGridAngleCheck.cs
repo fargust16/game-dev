@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using GameDev.Grid;
+using GameDev.Confront.Grid;
 using GameDev.World;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -105,7 +105,7 @@ public static class CombatGridAngleCheck
                 }
 
                 standable++;
-                var reached = window.Reachable.Contains(CombatGridReader.Pack(ix, iz, floorLevel));
+                var reached = reader.IsReachable(ix, iz, floorLevel);
                 if (reached && local.z < -Length * 0.5f + 4f)
                 {
                     nearEnd.Add((ix, iz));
@@ -184,7 +184,7 @@ public static class CombatGridAngleCheck
         var column = reader.Column(ix, iz);
         for (var l = 0; l < column.Length; l++)
         {
-            if (Mathf.Abs(column[l].Y - y) < 0.05f && window.Reachable.Contains(CombatGridReader.Pack(ix, iz, l)))
+            if (Mathf.Abs(column[l].Y - y) < 0.05f && reader.IsReachable(ix, iz, l))
             {
                 return true;
             }

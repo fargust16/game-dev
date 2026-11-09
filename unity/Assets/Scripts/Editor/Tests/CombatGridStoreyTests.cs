@@ -1,5 +1,6 @@
+using System.Collections.Generic;
 using System.Linq;
-using GameDev.Grid;
+using GameDev.Confront.Grid;
 using NUnit.Framework;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -27,12 +28,10 @@ namespace GameDev.Grid.Tests
             var start = reader.Column(ix, iz)[level].Y;
             Assert.AreEqual(Storey, start, 0.1f, "the fight's cell is on the landing");
 
-            var window = reader.Build(ix, iz, level);
-            var heights = window.Reachable.Select(key =>
-            {
-                CombatGridReader.Unpack(key, out var x, out var z, out var l);
-                return reader.Column(x, z)[l].Y;
-            }).ToList();
+            reader.Build(ix, iz, level);
+            var cells = new List<CombatCell>();
+            reader.CopyReachable(cells);
+            var heights = cells.Select(c => reader.Column(c.X, c.Z)[c.Level].Y).ToList();
             Assert.Greater(heights.Count(y => Mathf.Abs(y - Storey) < 0.1f), 40, "the landing and the let rooms are on the grid");
             Assert.Greater(heights.Count(y => y > 0.5f && y < Storey - 0.5f), 3, "the stair's steps are on the grid");
             Assert.Greater(heights.Count(y => Mathf.Abs(y) < 0.1f), 20, "the ground floor is reached down the stair");

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using GameDev.Grid;
+using GameDev.Confront.Grid;
 using GameDev.Slice.Dwellings;
 using GameDev.Slice.EditorTools;
 using GameDev.Slice.Kit;
@@ -12,6 +12,7 @@ using GameDev.World.Portals;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using static GameDev.Slice.EditorTools.SliceGridReadings;
 
 namespace GameDev.EditorTools
 {
@@ -31,7 +32,6 @@ namespace GameDev.EditorTools
         private const float MinFrontsClosed = 0.99f; // house fronts whose edge into the house is closed
         private const float MinLowCover = 0.9f;      // railing and fence sides that read low cover, not high
         private const float MinRailEdges = 0.95f;    // railing and fence crossings the grid closes
-        private const float LevelTolerance = 0.6f;   // a stoop of three 0.17 m steps still counts as the street's level
 
         [MenuItem("GameDev/Slice/Check the Combat Grid in Veilmouth")]
         public static void RunMenu()
@@ -127,9 +127,9 @@ namespace GameDev.EditorTools
                 }
 
                 var window = reader.Build(ix, iz, level);
-                var pass = window.Reachable.Count >= MinStreetCells;
+                var pass = window.ReachableCount >= MinStreetCells;
                 ok &= pass;
-                report.AppendLine($"  {(pass ? "ok  " : "FAIL")} {name}: reached {window.Reachable.Count}, standable {window.Standable}, low cover {window.LowCover}, high cover {window.HighCover}");
+                report.AppendLine($"  {(pass ? "ok  " : "FAIL")} {name}: reached {window.ReachableCount}, standable {window.Standable}, low cover {window.LowCover}, high cover {window.HighCover}");
                 WriteMap(Path.Combine(OutDir, $"street_{Safe(name)}.png"), reader, window);
             }
 
@@ -145,10 +145,8 @@ namespace GameDev.EditorTools
             var failures = new List<string>();
             foreach (var door in UnityEngine.Object.FindObjectsByType<Portal>(FindObjectsSortMode.None).Where(p => p.Target.SceneName == dwellingScene))
             {
-                var t = door.transform;
-                var street = t.position + (t.forward * 0.6f);
-                var inside = t.position - (t.forward * 0.6f);
-                switch (Passes(reader, street, inside, t.position.y))
+                // From the street's own surface: a door's threshold stands above the street in the C3 city (S3a.3).
+                switch (EntersHouse(reader, door.transform))
                 {
                     case 0: closed++; break;
                     case 1: open++; failures.Add(door.Id); break;
@@ -159,7 +157,7 @@ namespace GameDev.EditorTools
             var share = closed / (float)Math.Max(1, closed + open);
             var pass = share >= MinFrontsClosed && closed > 0;
             report.AppendLine();
-            report.AppendLine($"House fronts (the edge from the street into the house is closed): {(pass ? "ok" : "FAIL")}, {closed} closed, {open} open, {unmeasured} with no street cell to stand on ({share:P1} closed; at least {MinFrontsClosed:P0}).");
+            report.AppendLine($"House fronts (from the street before each door the grid reaches no cell behind the front): {(pass ? "ok" : "FAIL")}, {closed} closed, {open} open, {unmeasured} with no street cell to stand on ({share:P1} closed; at least {MinFrontsClosed:P0}).");
             foreach (var id in failures.Take(20))
             {
                 report.AppendLine($"  open: {id}");
@@ -249,14 +247,14 @@ namespace GameDev.EditorTools
         private static bool Doorways(string sceneName, CombatGridReader reader, StringBuilder report)
         {
             var blocks = UnityEngine.Object.FindObjectsByType<KitBlock>(FindObjectsSortMode.None);
-            var leaves = blocks.Where(b => b.gameObject.name.StartsWith("Kit_BkRoom_Door_"))
+            var leaves = blocks.Where(b => IsDoorLeaf(b.gameObject.name))
                 .Select(b => TryBody(b.transform, out var body) ? body : new Bounds()).Where(b => b.size != Vector3.zero).ToList();
-            int open = 0, leafed = 0, faults = 0;
+            int open = 0, leafed = 0, outer = 0, faults = 0;
             var notes = new List<string>();
             foreach (var block in blocks)
             {
                 var name = block.gameObject.name;
-                if (!(name.StartsWith("Kit_BkRoom_Doorway_") || name.StartsWith("Kit_BkRoom_PlasterDoorway_")) || !TryBody(block.transform, out var body))
+                if (!IsDoorway(name) || !TryBody(block.transform, out var body))
                 {
                     continue;
                 }
@@ -283,7 +281,11 @@ namespace GameDev.EditorTools
                 // A doorway over a node passes the two cells either side of it (BK's 4 m wall, its 1.76 m opening over
                 // the middle node, 2026-11-06); one over a cell's middle passes that cell.
                 var expected = hasLeaf ? 0 : Mathf.Abs(at - Mathf.Round(at)) < 0.25f ? 2 : 1;
-                if (passes == expected && (hasLeaf || measured > 0))
+                if (measured == 0 && !hasLeaf)
+                {
+                    outer++; // the entry in the room's outer wall: no floor beyond it, the portal takes one through
+                }
+                else if (passes == expected && (hasLeaf || measured > 0))
                 {
                     if (hasLeaf) leafed++;
                     else open++;
@@ -295,7 +297,7 @@ namespace GameDev.EditorTools
                 }
             }
 
-            report.AppendLine($"  {(faults == 0 ? "ok  " : "FAIL")} {sceneName}: {open} open doorways pass their cells, {leafed} with a leaf pass none, {faults} faults");
+            report.AppendLine($"  {(faults == 0 ? "ok  " : "FAIL")} {sceneName}: {open} open doorways pass their cells, {leafed} with a leaf pass none, {outer} in the outer wall, {faults} faults");
             foreach (var note in notes.Take(10))
             {
                 report.AppendLine($"       {note}");
@@ -313,75 +315,7 @@ namespace GameDev.EditorTools
             };
 
         // ------------------------------------------------------------------------------------------- readings
-
-        /// <summary>1 when the grid steps from the cell under <paramref name="a"/> to the one under <paramref name="b"/>
-        /// at about height <paramref name="y"/>, 0 when it cannot, and −1 when either has no standable surface there.</summary>
-        private static int Passes(CombatGridReader reader, Vector3 a, Vector3 b, float y)
-        {
-            int ax = Mathf.FloorToInt(a.x), az = Mathf.FloorToInt(a.z), bx = Mathf.FloorToInt(b.x), bz = Mathf.FloorToInt(b.z);
-            if (ax == bx && az == bz)
-            {
-                return -1;
-            }
-
-            var la = LevelNear(reader.Column(ax, az), y);
-            if (la < 0)
-            {
-                return -1;
-            }
-
-            var column = reader.Column(bx, bz);
-            var any = false;
-            for (var lb = 0; lb < column.Length; lb++)
-            {
-                if (!column[lb].Standable || Mathf.Abs(column[lb].Y - y) > 1.5f)
-                {
-                    continue;
-                }
-
-                any = true;
-                if (reader.EdgeBetween(ax, az, la, bx, bz, lb))
-                {
-                    return 1;
-                }
-            }
-
-            // A house cell with no standable floor near the street is closed: nothing in it can be stood on.
-            return any || column.Length > 0 ? 0 : -1;
-        }
-
-        private static int LevelNear(CombatGridSurface[] column, float y)
-        {
-            var best = -1;
-            for (var l = 0; l < column.Length; l++)
-            {
-                if (column[l].Standable && Mathf.Abs(column[l].Y - y) <= LevelTolerance
-                    && (best < 0 || Mathf.Abs(column[l].Y - y) < Mathf.Abs(column[best].Y - y)))
-                {
-                    best = l;
-                }
-            }
-
-            return best;
-        }
-
-        private static bool TryBody(Transform block, out Bounds body)
-        {
-            body = default;
-            var colliders = block.GetComponentsInChildren<Collider>().Where(c => c.enabled && !c.isTrigger).ToArray();
-            if (colliders.Length == 0)
-            {
-                return false;
-            }
-
-            body = colliders[0].bounds;
-            foreach (var c in colliders.Skip(1))
-            {
-                body.Encapsulate(c.bounds);
-            }
-
-            return true;
-        }
+        // Passes, LevelNear and TryBody are SliceGridReadings', shared with the slice's grid tests (S3a.3).
 
         /// <summary>What the high cover strip of a cell meets, as CombatGridReader's cover reads it.</summary>
         private static string HighHits(float groundY, int ix, int iz, Vector3 toward)
@@ -394,8 +328,7 @@ namespace GameDev.EditorTools
             return string.Join(", ", hits.Select(h => h.transform.root == h.transform ? h.name : $"{h.transform.parent?.name}/{h.name}").Distinct().Take(3));
         }
 
-        private static int Direction(Vector3 toward) =>
-            Mathf.Abs(toward.x) > 0.5f ? (toward.x > 0 ? 0 : 1) : (toward.z > 0 ? 2 : 3);
+        private static int Direction(Vector3 toward) => (int)Side(toward);
 
         private static string Round(Vector3 v) => $"({v.x:0.0}, {v.y:0.0}, {v.z:0.0})";
 
@@ -418,7 +351,7 @@ namespace GameDev.EditorTools
                     var colour = new Color(0.12f, 0.12f, 0.14f);
                     for (var l = 0; l < column.Length; l++)
                     {
-                        if (window.Reachable.Contains(CombatGridReader.Pack(ix, iz, l)))
+                        if (reader.IsReachable(ix, iz, l))
                         {
                             var cover = reader.Cover(ix, iz, l);
                             colour = cover.High != 0 ? new Color(0.95f, 0.55f, 0.15f) : cover.Low != 0 ? new Color(0.95f, 0.85f, 0.2f) : new Color(0.3f, 0.75f, 0.35f);
