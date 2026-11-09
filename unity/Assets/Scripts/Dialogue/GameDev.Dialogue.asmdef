@@ -1,0 +1,22 @@
+{
+    "name": "GameDev.Dialogue",
+    "rootNamespace": "GameDev.Dialogue",
+    "references": [
+        "GameDev.Core.Localization",
+        "GameDev.Player.Progression",
+        "GameDev.Player.Standing",
+        "GameDev.World.Poi",
+        "GameDev.World.Seed",
+        "GameDev.World.State",
+        "GameDev.World.Time"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
