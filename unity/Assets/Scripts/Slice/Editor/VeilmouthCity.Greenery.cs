@@ -10,8 +10,9 @@ namespace GameDev.Slice.EditorTools
     /// <summary>
     /// The city's greenery and the roadside (VEILMOUTH_CITY_PLAN.md §25, owner 2026-11-09, §26, the owner's fifth play
     /// test, and §27): street trees in square pits on the carriageway by the kerb, in the lamps' line, on both kerbs of a
-    /// wide street and one of a narrow one, Veilmouth's own thin trees made in Blender (VeilmouthTrees), the Stylized
-    /// Trees Pack's bushes, clipped hedges round beds and a parterre,
+    /// wide street and one of a narrow one, the owner's mature tree along the roads and Veilmouth's earlier trees in the
+    /// gardens, all made in Blender (VeilmouthTrees), the Stylized Trees Pack's bushes, clipped hedges round beds and a
+    /// parterre,
     /// grass on the gardens' earth, and Roadside Tales' walls, fences and posts by the roads and farms outside the walls.
     /// Every number is an authoring default unless marked.
     /// </summary>
@@ -35,13 +36,16 @@ namespace GameDev.Slice.EditorTools
         // off the roads' middles with a 3 m gap every 33 m, and a post on a verge every 40 m.
         private const int YardDepth = 10, WallGapEvery = 33, PostEvery = 40;
 
-        // §27 (owner, 2026-11-09): Veilmouth's own thin trees from Blender in the fruit tree's place: one kind along a
-        // street, its two variants taking turns down the row; the garden trees and both street kinds in the gardens.
-        private static readonly string[][] StreetKinds =
-        {
-            new[] { "CityTree_StreetHornbeamA", "CityTree_StreetHornbeamB" },
-            new[] { "CityTree_StreetBeechA", "CityTree_StreetBeechB" },
-        };
+        // §27.10 (owner, 2026-11-10): the owner's mature tree along every road, Crown Avenue's mall with them; Veilmouth's
+        // earlier trees stay in the parks, the rich houses' gardens and the palace forecourt's corners.
+        private const string RoadTree = "CityTree_MatureHornbeamA";
+
+        // The mature tree's crown is 12.3 m across one way and 10.7 m the other (its plan y at yaw 0; measured): a road's
+        // tree turns its narrow way across the road, flipped or not by its plan point, within 15° of square, so a row
+        // never repeats and the crown reaches 0.8 m less toward the houses (authoring default).
+        private const float RoadYawJitter = 15f;
+
+        private static readonly string[] CornerTrees = { "CityTree_StreetBeechA", "CityTree_StreetBeechB" };
 
         private static readonly string[] GardenTrees =
             { "CityTree_GardenBeechA", "CityTree_GardenHornbeamB", "CityTree_GardenBeechA", "CityTree_StreetBeechB", "CityTree_StreetHornbeamA" };
@@ -61,11 +65,16 @@ namespace GameDev.Slice.EditorTools
         private static readonly (float Px, float Py, Facing F)[] Farms =
             { (150f, 640f, Facing.S), (200f, 700f, Facing.N), (110f, 705f, Facing.N), (230f, 600f, Facing.E) };
 
-        /// <summary>A street's tree: one kind along a street, so it reads as one planting, its variants in turn.</summary>
-        private static string RowTree(int street, int i) => StreetKinds[Math.Abs(street) % StreetKinds.Length][Math.Abs(i) % 2];
+        /// <summary>A road's tree's crown yaw, degrees, for a road along plan x (else along plan y) at its plan point.</summary>
+        private static float RoadYaw(bool alongX, Vector2 c)
+        {
+            var hash = (((int)(c.x * 10f) * 73856093) ^ ((int)(c.y * 10f) * 19349663)) & 0x7fffffff;
+            var jitter = (hash / 2 % ((2 * (int)RoadYawJitter) + 1)) - RoadYawJitter;
+            return (alongX ? 0f : 90f) + (hash % 2 == 0 ? 0f : 180f) + jitter;
+        }
 
-        /// <summary>A square's row (Crown Avenue's mall, the palace's corners): the beech, its variants in turn.</summary>
-        private static string RowTree(int i) => RowTree(1, i);
+        /// <summary>The palace forecourt's corners: the street beech, its variants in turn.</summary>
+        private static string CornerTree(int i) => CornerTrees[Math.Abs(i) % 2];
 
         private static string GardenTree(Random rng) => GardenTrees[rng.Next(GardenTrees.Length)];
 
@@ -101,21 +110,21 @@ namespace GameDev.Slice.EditorTools
                 oneSided += far.HasValue && !both ? 1 : 0;
                 if (nearSide)
                 {
-                    planted += TreeRow(alongX, near, 1, a0, a1, street);
+                    planted += TreeRow(alongX, near, 1, a0, a1);
                 }
 
                 if (far.HasValue && (both || !nearSide))
                 {
-                    planted += TreeRow(alongX, far.Value, -1, a0, a1, street);
+                    planted += TreeRow(alongX, far.Value, -1, a0, a1);
                 }
 
                 street++;
             }
 
-            Debug.Log($"[VeilmouthCity] street trees (§25.3, §26, §27): {planted}, each in its pit by the kerb; {oneSided} narrow streets planted on one side.");
+            Debug.Log($"[VeilmouthCity] street trees (§25.3, §26, §27.10): {planted} of the mature tree, each in its pit by the kerb; {oneSided} narrow streets planted on one side.");
         }
 
-        private static int TreeRow(bool alongX, float line, int side, int a0, int a1, int street)
+        private static int TreeRow(bool alongX, float line, int side, int a0, int a1)
         {
             var last = float.MinValue;
             var planted = 0;
@@ -138,7 +147,7 @@ namespace GameDev.Slice.EditorTools
                     continue;
                 }
 
-                if (OnCarriageway(RowTree(street, planted), c, VeilmouthPavements.PitSize) != null)
+                if (OnCarriageway(RoadTree, c, VeilmouthPavements.PitSize, RoadYaw(alongX, c)) != null)
                 {
                     _pavements.Pit(c);
                     last = along;

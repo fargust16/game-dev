@@ -474,9 +474,10 @@ namespace GameDev.Slice.EditorTools
 
         /// <summary>
         /// A prop if its cells are free, or, when <paramref name="force"/>, wherever no house stands; it takes them.
-        /// (px0, py0) is the footprint's north-west corner.
+        /// (px0, py0) is the footprint's north-west corner. A city tree's crown takes <paramref name="crownYaw"/>, degrees,
+        /// where it is given.
         /// </summary>
-        private static GameObject Prop(string key, Facing f, float px0, float py0, string name = null, bool force = false)
+        private static GameObject Prop(string key, Facing f, float px0, float py0, string name = null, bool force = false, float? crownYaw = null)
         {
             var e = _kit[key];
             var turned = f == Facing.E || f == Facing.W;
@@ -511,12 +512,12 @@ namespace GameDev.Slice.EditorTools
             }
 
             // §27: a city tree's crown turned about its trunk by its plan point, so the two variants of a row never
-            // repeat; the trunk, its body and its cell stay where they are.
+            // repeat, or as the caller turns it (a road's tree, §27.10); the trunk, its body and its cell stay put.
             var crown = key.StartsWith("CityTree_") ? go.transform.Find("Model") : null;
             if (crown != null)
             {
-                var yaw = (((int)(px0 * 10f) * 73856093) ^ ((int)(py0 * 10f) * 19349663)) & 0x7fffffff;
-                crown.rotation = Quaternion.AngleAxis(yaw % 360, Vector3.up) * crown.rotation;
+                var hash = (((int)(px0 * 10f) * 73856093) ^ ((int)(py0 * 10f) * 19349663)) & 0x7fffffff;
+                crown.rotation = Quaternion.AngleAxis(crownYaw ?? hash % 360, Vector3.up) * crown.rotation;
                 PrefabUtility.RecordPrefabInstancePropertyModifications(crown);
             }
 
@@ -1914,9 +1915,10 @@ namespace GameDev.Slice.EditorTools
         {
             // Crown Avenue's mall (§24.2): a tree every 10 m down its middle, benches either side between them, and the
             // Crown Column at its foot.
+            // Its trees are the road's tree (§27.10), the avenue running along plan y.
             for (var py = 684; py < 714; py += 10)
             {
-                Prop(RowTree((py - 684) / 10), Facing.N, 611f, py);
+                Prop(RoadTree, Facing.N, 611f, py, crownYaw: RoadYaw(false, new Vector2(611f, py)));
                 Prop("Bench", Facing.E, 609f, py + 4f);
                 Prop("Bench", Facing.W, 614f, py + 4f);
             }
@@ -1924,7 +1926,7 @@ namespace GameDev.Slice.EditorTools
             Prop("Column", Facing.N, 611f, 719f, "The Crown Column");
             foreach (var (px, py) in new[] { (588, 653), (636, 653) })
             {
-                Prop(RowTree(px), Facing.N, px, py);
+                Prop(CornerTree(px), Facing.N, px, py);
             }
 
             var rng = new Random(606);
@@ -2099,9 +2101,10 @@ namespace GameDev.Slice.EditorTools
         /// A block of one cell at a carriageway's plan point, if nothing solid stands within the square of
         /// <paramref name="size"/> m round it, which it then takes; set on the carriageway's own ground. The block keeps
         /// its grid cell, and what is seen moves inside the cell to the point with its body, so the Combat Grid reads it in
-        /// the same cell: a lamp's post 0.3 m from the kerb, a tree's trunk in the middle of its pit (§26.1).
+        /// the same cell: a lamp's post 0.3 m from the kerb, a tree's trunk in the middle of its pit (§26.1), its crown
+        /// turned to <paramref name="crownYaw"/> where it is given.
         /// </summary>
-        private static GameObject OnCarriageway(string key, Vector2 c, float size)
+        private static GameObject OnCarriageway(string key, Vector2 c, float size, float? crownYaw = null)
         {
             var area = Rect(c.x - (size / 2f), c.y - (size / 2f), c.x + (size / 2f), c.y + (size / 2f));
             if (_taken.Any(t => t.Use == Use.Solid && Overlap(t.Quad, area)))
@@ -2109,7 +2112,7 @@ namespace GameDev.Slice.EditorTools
                 return null;
             }
 
-            var go = Prop(key, Facing.N, c.x - 0.5f, c.y - 0.5f, force: true);
+            var go = Prop(key, Facing.N, c.x - 0.5f, c.y - 0.5f, force: true, crownYaw: crownYaw);
             if (go == null)
             {
                 return null;
