@@ -39,6 +39,12 @@ namespace GameDev.World.Portals
 
         public string Id => portalId;
 
+        /// <summary>
+        /// A door sealed shut, such as a shop the Wardens sealed with wax and brass (11.1 POI A; S2.7): Interact no longer
+        /// sends the player through, but a player already behind it still comes out here.
+        /// </summary>
+        public bool Sealed { get; set; }
+
         public TravelRequest Target => new TravelRequest(targetScene, targetPortalId, travelContext);
 
         /// <summary>
@@ -110,7 +116,7 @@ namespace GameDev.World.Portals
         private void Update()
         {
             var input = GameInputService.Instance;
-            if (input == null || !input.InteractPressed || SceneTransition.IsTraveling)
+            if (Sealed || input == null || !input.InteractPressed || SceneTransition.IsTraveling)
             {
                 return;
             }

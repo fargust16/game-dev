@@ -98,7 +98,59 @@ MonoBehaviour:
         - nell.collectors
         minutes: 60
       failure:
-        next: 
+        next:
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: lie
+      approach: 1
+      kind: 1
+      arguments:
+      - tip.board.wren.heard
+      - tip.board.girls.heard
+      needs: []
+      hiddenBy: []
+      item:
+      skill: 1
+      request: 1
+      listener:
+      asks: nell.collectors
+      success:
+        next: told
+        raises: []
+        settles: {fileID: 0}
+        tells:
+        - nell.collectors
+        minutes: 0
+      failure:
+        next: refused
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: cold
+      approach: 0
+      kind: 0
+      arguments: []
+      needs:
+      - exposed.nell
+      hiddenBy:
+      - nell.found_out.heard
+      item:
+      skill: 0
+      request: 1
+      listener:
+      asks:
+      success:
+        next: found_out
+        raises:
+        - nell.found_out.heard
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next:
         raises: []
         settles: {fileID: 0}
         tells: []
@@ -210,4 +262,32 @@ MonoBehaviour:
         settles: {fileID: 0}
         tells: []
         minutes: 0
-  start: 
+  - id: found_out
+    speaker: nell
+    saysTips: 0
+    source: 0
+    options:
+    - id: sorry
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item:
+      skill: 0
+      request: 1
+      listener:
+      asks:
+      success:
+        next:
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next:
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  start:

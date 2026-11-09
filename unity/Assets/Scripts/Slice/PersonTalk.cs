@@ -9,6 +9,7 @@ using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Player.Standing;
 using GameDev.UI;
+using GameDev.World.Portals;
 using UnityEngine;
 
 namespace GameDev.Slice
@@ -35,6 +36,7 @@ namespace GameDev.Slice
         private PlayerLocomotion _player;
         private HudView _hud;
         private IDialogueRunner _talk;
+        private Portal[] _doors;
 
         public DialogueDefinition Dialogue => dialogue;
 
@@ -218,7 +220,11 @@ namespace GameDev.Slice
                 return;
             }
 
-            if (inReach && input != null && input.InteractPressed)
+            // A door in reach takes Interact, as it takes the HUD's prompt: a scene before a shop's door (S2.5) is
+            // not opened by going in.
+            _doors ??= FindObjectsByType<Portal>(FindObjectsInactive.Exclude);
+            if (inReach && input != null && input.InteractPressed
+                && !_doors.Any(d => d != null && d.isActiveAndEnabled && d.InReach(_player.transform.position)))
             {
                 Open();
             }

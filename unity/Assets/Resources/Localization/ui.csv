@@ -1,6 +1,7 @@
 ﻿key,en,ru
 "# The HUD and its prompts (HudView, Hud.uxml); a key's letter is the key bound to it"
 ui.prompt.enter,E  Enter,E  Войти
+ui.prompt.sealed,Sealed with wax and brass,Опечатано сургучом и латунью
 ui.prompt.read,E  Read,E  Читать
 ui.prompt.talk,E  Talk,E  Говорить
 ui.hud.time,Day {0} · {1:00}:{2:00},День {0} · {1:00}:{2:00}

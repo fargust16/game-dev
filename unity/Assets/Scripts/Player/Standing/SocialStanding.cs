@@ -54,6 +54,13 @@ namespace GameDev.Player.Standing
 
         private const string AttitudePrefix = "attitude.";
         private const string LiePrefix = "lie.";
+        private const string ExposedPrefix = "exposed.";
+
+        /// <summary>
+        /// How many of the character's lies to this person have come out (S2.7), a world state key that a conversation
+        /// can read, as Nell does the next day.
+        /// </summary>
+        public static string ExposedKey(string personId) => ExposedPrefix + personId;
 
         private static readonly RequestSize[] Requests = (RequestSize[])Enum.GetValues(typeof(RequestSize));
 
@@ -183,6 +190,7 @@ namespace GameDev.Player.Standing
                 {
                     Add(ReputationKey, -_rules.LieCost);
                     ChangeAttitude(personId, -_rules.ExposedCost);
+                    Add(ExposedKey(personId), 1);
                     LieFoundOut?.Invoke(personId);
                 }
             }

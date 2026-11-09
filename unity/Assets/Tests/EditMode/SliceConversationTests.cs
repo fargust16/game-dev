@@ -110,8 +110,8 @@ namespace GameDev.Slice.Tests
 
             _tips.Read(TipSource.NoticeBoard, _clock.Tick);
             var again = Talk("NellDialogue");
-            CollectionAssert.AreEqual(new[] { "convince", "threaten", "exchange", "leave" }, again.Options.Select(o => o.id),
-                "the board's missing girls are an Argument for Convince");
+            CollectionAssert.AreEqual(new[] { "convince", "threaten", "exchange", "lie", "leave" }, again.Options.Select(o => o.id),
+                "the board's missing girls are an Argument for Convince, and the Wren notice for a lie (S2.7)");
             again.Leave();
         }
 

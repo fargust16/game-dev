@@ -73,6 +73,9 @@ namespace GameDev.Slice.Tests
         private IEnumerator GoInAndBack(string streetScenePath, System.Func<Portal> pickStreet, string insideId, string buildingId)
         {
             var streetScene = System.IO.Path.GetFileNameWithoutExtension(streetScenePath);
+
+            // A fresh morning: a world left by an earlier test may stand a POI's scene before the door (S2.5's arrest).
+            yield return ForgetTheWorld();
             yield return LoadScene(streetScenePath);
             var clock = GameClockDriver.Running;
             Assert.IsNotNull(clock);

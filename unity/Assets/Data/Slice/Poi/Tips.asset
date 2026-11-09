@@ -103,3 +103,57 @@ MonoBehaviour:
     requiresKey: poi.b.phase
     requiresAtLeast: 2
     needsApproach: 0
+  - id: nell.harrow_open
+    source: 1
+    day: 2
+    fromMinute: 480
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: aftermath.harrow.defended
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: nell.harrow_sealed
+    source: 1
+    day: 2
+    fromMinute: 480
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: aftermath.harrow.shop_sealed
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: nell.harrow_gone
+    source: 1
+    day: 2
+    fromMinute: 480
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: aftermath.harrow.vanished
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: nell.lane_freed
+    source: 1
+    day: 2
+    fromMinute: 480
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: aftermath.loom_lane.girls_freed
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: nell.lane_taken
+    source: 1
+    day: 2
+    fromMinute: 480
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: aftermath.loom_lane.girls_taken
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: nell.lane_spoiled
+    source: 1
+    day: 2
+    fromMinute: 480
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: aftermath.loom_lane.snatch_spoiled
+    requiresAtLeast: 1
+    needsApproach: 0

@@ -2,7 +2,7 @@
 
 Status: Draft — proposed by the agent on 2026-11-06 and **accepted by the owner on 2026-11-07**: all fourteen, with the agent's placeholder names, which stay mutable.
 Created: 2026-11-06
-Last Updated: 2026-11-09 (S2.4: Nell and Kit are talked to; Nell's Approaches, their Arguments and the Exchange, authoring defaults. Earlier: S2.0: the names, roles and lines are in the string tables, in English and Russian. Earlier: accepted by the owner: the roster and the placeholder names. Earlier: first draft for the owner)
+Last Updated: 2026-11-09 (S2.7: Nell's lie and her day-2 lines by outcome, authoring defaults. Earlier: S2.4: Nell and Kit are talked to; Nell's Approaches, their Arguments and the Exchange, authoring defaults. Earlier: S2.0: the names, roles and lines are in the string tables, in English and Russian. Earlier: accepted by the owner: the roster and the placeholder names. Earlier: first draft for the owner)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](../../../11.1%20Vertical%20Slice%20POIs.md), [09 Information Sources](../../../09%20Information%20Sources.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §5
 Related: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1 (colours), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §21 (places)
 
@@ -53,8 +53,11 @@ Since S2.4 Nell and Kit are talked to in the dialogue column (`NellDialogue` and
 | Convince | Persuasion, a Small request: the girls vanish, say who takes them | The board's missing girls, the Wren notice, Kit's coach-coats |
 | Threaten | Intimidation, a Small request: she warned of the Wardens' raid, so they could hear who warns their marks | Her own Harrow tip, the seizure notice |
 | Exchange | A service, no check: an hour's work behind the bar, the world running on by 60 minutes | — |
+| Convince, a lie (S2.7) | Deception, an Ordinary request: Lottie Wren sent the character, because one of the girls is her cousin. Found out at midnight 20 % of the time; the next morning Nell is cold and, asked why, says she knows, once | The Wren notice, the board's missing girls |
 
-Her Listener Value is 1 for every check (Strength, Intelligence and Will 10), Kit's 0. A failed check leaves the other two; Threaten costs a step of her Attitude either way (10.4 §5).
+Her Listener Value is 1 for every check (Strength, Intelligence and Will 10), Kit's 0. A failed check leaves the other ways; Threaten costs a step of her Attitude either way (10.4 §5).
+
+Since S2.7 Nell also says, from 08:00 on day 2, what became of Harrow's shop (open, sealed or emptied) and of the girls (freed, taken, or the snatch spoiled), one line for each outcome of POI A and B: the tips `nell.harrow_*` and `nell.lane_*`, authoring defaults.
 
 At most one rumour a day may be false, never about a Ritual Weak Point (09). The traces of the run's Weak Points are placed by the seed among these people (11 *Finding the traces*) and come with S6.
 

@@ -119,7 +119,7 @@ namespace GameDev.Slice.EditorTools
             Debug.Log($"[SlicePoiStages] POI A staged before the door at {door}, the street {outward}, Harrow at {harrow}.");
         }
 
-        private static void Person(GameObject cast, string colour, Vector3 at, float yaw, string name)
+        internal static void Person(GameObject cast, string colour, Vector3 at, float yaw, string name)
         {
             VeilmouthDressing.Person(colour, false, at.x, at.z, yaw, name, at.y);
             var person = Object.FindObjectsByType<Transform>(FindObjectsInactive.Include).Last(t => t.name == name);
@@ -259,7 +259,7 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>Whether a person can stand at <paramref name="at"/>: ground under it near the door's level, and no wall in the way.</summary>
-        private static bool Free(Vector3 door, Vector3 at)
+        internal static bool Free(Vector3 door, Vector3 at)
         {
             var notCharacters = ~LayerMask.GetMask(KitLayers.Character);
             if (!Physics.Raycast(at + (Vector3.up * 1.6f), Vector3.down, out var floor, 3.2f, notCharacters, QueryTriggerInteraction.Ignore)
@@ -272,7 +272,7 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>The ground under <paramref name="at"/>, or the door's level when none is found.</summary>
-        private static Vector3 Feet(Vector3 door, Vector3 at)
+        internal static Vector3 Feet(Vector3 door, Vector3 at)
         {
             var ground = LayerMask.GetMask(KitLayers.Ground, KitLayers.Structure);
             return Physics.Raycast(at + (Vector3.up * 1.6f), Vector3.down, out var floor, 3.2f, ground, QueryTriggerInteraction.Ignore)
@@ -280,12 +280,12 @@ namespace GameDev.Slice.EditorTools
                 : new Vector3(at.x, door.y, at.z);
         }
 
-        private static Vector3 Flat(Vector3 direction)
+        internal static Vector3 Flat(Vector3 direction)
         {
             direction.y = 0f;
             return direction.sqrMagnitude > 1e-6f ? direction.normalized : Vector3.forward;
         }
 
-        private static float Yaw(Vector3 direction) => Quaternion.LookRotation(direction).eulerAngles.y;
+        internal static float Yaw(Vector3 direction) => Quaternion.LookRotation(direction).eulerAngles.y;
     }
 }

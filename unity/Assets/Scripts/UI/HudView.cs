@@ -401,7 +401,7 @@ namespace GameDev.UI
             {
                 if (portal != null && portal.InReach(position))
                 {
-                    return Loc.Get("ui.prompt.enter");
+                    return Loc.Get(portal.Sealed ? "ui.prompt.sealed" : "ui.prompt.enter");
                 }
             }
 
