@@ -67,6 +67,13 @@ namespace GameDev.Slice.EditorTools
             public int Layer;
             public bool Carriage;
             public bool PaintOnly; // painted, but neither reserved nor a street that breaks a kerb
+            public Use Use;
+
+            /// <summary>A carriageway: setts that carts drive on, which a pavement never crosses (R4).</summary>
+            public bool Road => !PaintOnly && Use == Use.Road && Layer == Setts;
+
+            /// <summary>A raised pavement: a street's pavement lane, or Crown Avenue's mall between its carriageways (R4).</summary>
+            public bool Pavement => !PaintOnly && Use == Use.Walk && (Layer == Flags || (Street == "Crown Avenue" && Layer == Square));
         }
 
         private static Dictionary<string, SliceKitCatalogue.Entry> _kit;
@@ -77,8 +84,11 @@ namespace GameDev.Slice.EditorTools
         private static List<(Vector2 At, Vector2 Out)> _doors;   // plan point and outward direction
         private static List<(bool AlongX, float Front, float At)> _partyWalls;
         private static Works _works;
-        private static Works _kerbs;
+        private static VeilmouthPavements _pavements; // the raised pavements (R4), known once the streets are
+        private static int _passages, _openSpans; // R5: passages left between houses, spans no house fits
         private static List<Vector2[]> _houses;  // every house's plan footprint, in the order built
+        private static List<Vector2[]> _stoops;  // the plan bounds of the houses' own stoops, side doors' among them
+        private static List<(Facing F, float Front, int A0, int A1, int Depth)> _backs; // passages' backs, placed after the houses
         private static HashSet<(bool AlongX, float Line, int A0, int A1)> _fenced; // railing lines already set
         private static Transform _gardens;
         private static float _stepsClear; // the least room left between a plot's front steps and its railings, m
@@ -130,6 +140,26 @@ namespace GameDev.Slice.EditorTools
             VeilmouthMystic.Place();
             VeilmouthRenders.RenderC3();
             VeilmouthRenders.RenderMystic();
+        }
+
+        /// <summary>
+        /// Batch only, the reference plan's step 5 (R4, R5): the city built again on its present ground, which is the
+        /// owner's to change by hand and is not shaped again, with the raised pavements and the passages; then the passes
+        /// beside its root, the street probes baked again, and the views. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthCity.RebuildStreets -lookLabel r4
+        /// </summary>
+        public static void RebuildStreets()
+        {
+            Run(true);
+            SlicePeople.PlaceAll();
+            SliceWorldSetup.AddToVeilmouth();
+            SliceDogs.PlaceReplacing();
+            VeilmouthOrnaments.Place();
+            VeilmouthMystic.Place();
+            VeilmouthReflections.Bake();
+            VeilmouthRenders.RenderC3();
+            VeilmouthRenders.RenderPavements();
+            VeilmouthRenders.RenderLook();
         }
 
         private static void Run(bool replace)
@@ -185,20 +215,26 @@ namespace GameDev.Slice.EditorTools
             _doors = new List<(Vector2, Vector2)>();
             _partyWalls = new List<(bool, float, float)>();
             _houses = new List<Vector2[]>();
+            _stoops = new List<Vector2[]>();
+            _backs = new List<(Facing, float, int, int, int)>();
             _fenced = new HashSet<(bool, float, int, int)>();
             _stepsClear = float.MaxValue;
             _lampsAt.Clear();
+            _pavements = null;
+            _passages = 0;
+            _openSpans = 0;
 
             _root = new GameObject(RootName).transform;
             _people = Group("People");
             _gardens = Group("Gardens");
             VeilmouthDressing.Wind(_root);
             _works = new Works(Group("Stone Works"), true);
-            _kerbs = new Works(Group("Kerbs"), false);
 
             Streets();
             PaintStreets();
-            Kerbs();
+            // The raised pavements (R4) are known from the streets, so everything placed after stands on them.
+            _pavements = new VeilmouthPavements(_lanes.Where(l => l.Pavement).Select(l => l.Quad),
+                _lanes.Where(l => l.Road).Select(l => (l.Street, l.Quad)), BareGround);
 
             _parent = Group("Walls and Gates");
             Walls();
@@ -209,6 +245,12 @@ namespace GameDev.Slice.EditorTools
             Slant();
             _parent = Group("Houses");
             Houses();
+            foreach (var b in _backs)
+            {
+                PlaceBack(b.F, b.Front, b.A0, b.A1, b.Depth);
+            }
+
+            _backs.Clear();
             _parent = Group("Squares and Yards");
             Market();
             Squares();
@@ -223,7 +265,13 @@ namespace GameDev.Slice.EditorTools
             VeilmouthDwellings.AddDoors(_root);
 
             _works.Finish(WallStone);
-            _kerbs.Finish(KerbStone);
+            var works = SliceKitCatalogue.Folder + "/Works";
+            var built = _pavements.Build(_root, _houses, works);
+            AssetDatabase.DeleteAsset($"{works}/Kerbs - {KerbStone}.asset"); // C3's kerb ribbons, replaced by the islands
+            Debug.Log($"[VeilmouthCity] pavements (R4): {built.Islands} outlines, {built.Area:0} m², {built.Triangles} triangles " +
+                      $"({built.Slabs} whole slabs), {built.KerbLength:0} m of kerb, {built.WetLength:0} m of wet gutter; " +
+                      $"{_pavements.Carried} carriageway ends carried on, {_pavements.Fillets} rounded corners. " +
+                      $"Passages (R5): {_passages} left between houses, {_openSpans} spans with no house, {Slots()} gaps under {PassageWidth} m in a row.");
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Report();
@@ -242,8 +290,12 @@ namespace GameDev.Slice.EditorTools
 
         private static Vector2 Plan(Vector3 world) => new Vector2(world.x + 500f, 500f - world.z);
 
-        private static float Ground(float px, float py) =>
+        private static float BareGround(float px, float py) =>
             _terrain.SampleHeight(World(px, py)) + _terrain.transform.position.y;
+
+        /// <summary>What stands at a plan point stands on: a raised pavement's top (R4), or the ground.</summary>
+        private static float Ground(float px, float py) =>
+            _pavements != null && _pavements.On(px, py) ? _pavements.Top(px, py) : BareGround(px, py);
 
         private static Vector2[] Rect(float px0, float py0, float px1, float py1) =>
             new[] { new Vector2(px0, py0), new Vector2(px1, py0), new Vector2(px1, py1), new Vector2(px0, py1) };
@@ -500,6 +552,19 @@ namespace GameDev.Slice.EditorTools
             Take(quad, Use.Solid);
             _houses.Add(quad);
             var (min, max) = GroundUnder(quad);
+            // A door is never below the pavement before it (R4: steps start from the pavement's top).
+            var outward = Outward(f);
+            var run = new Vector2(Mathf.Abs(outward.y), Mathf.Abs(outward.x));
+            var start = f == Facing.N || f == Facing.S ? new Vector2(a, front) : new Vector2(front, a);
+            foreach (var t in new[] { 0.1f, 0.5f, 0.9f })
+            {
+                var q = start + (run * (e.Width * t)) + (outward * 0.5f);
+                if (_pavements != null && _pavements.On(q.x, q.y))
+                {
+                    max = Mathf.Max(max, _pavements.Top(q.x, q.y));
+                }
+            }
+
             var floor = Mathf.Min(Up(max) + raise, ceiling);
             var lo = new Vector2(quad.Min(p => p.x), quad.Min(p => p.y));
             var hi = new Vector2(quad.Max(p => p.x), quad.Max(p => p.y));
@@ -526,7 +591,31 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
+            Stoops(house);
             return house;
+        }
+
+        /// <summary>
+        /// Records a house's own stoops. A corner house's side door has its stoop outside the plot, in the passage beside
+        /// it. The baked house marks its steps with box colliders under "Stoop" (VeilmouthKitHouses), read here corner by
+        /// corner, since a collider's bounds wait for the physics scene.
+        /// </summary>
+        private static void Stoops(GameObject house)
+        {
+            foreach (Transform child in house.transform)
+            {
+                if (child.name != "Stoop")
+                {
+                    continue;
+                }
+
+                foreach (var box in child.GetComponentsInChildren<BoxCollider>())
+                {
+                    var corners = Enumerable.Range(0, 8).Select(k => Plan(box.transform.TransformPoint(box.center + Vector3.Scale(box.size * 0.5f,
+                        new Vector3((k & 1) == 0 ? -1f : 1f, (k & 2) == 0 ? -1f : 1f, (k & 4) == 0 ? -1f : 1f))))).ToArray();
+                    _stoops.Add(Rect(corners.Min(c => c.x), corners.Min(c => c.y), corners.Max(c => c.x), corners.Max(c => c.y)));
+                }
+            }
         }
 
         /// <summary>
@@ -611,8 +700,8 @@ namespace GameDev.Slice.EditorTools
         /// A row of houses along a street: fronts on <paramref name="front"/>, from a0 to a1 along it, drawn from a
         /// palette. A terrace (no <paramref name="gap"/>) is laid span by span between what already stands: wall to
         /// wall, a corner house at each end of a span with its second facade on the side street, and what does not fill
-        /// a house (less than the narrowest) closed by a yard wall in the middle (owner's play test, 2026-11-06: no
-        /// empty corners of varying width).
+        /// a house left as a passage of 4 m or more (reference plan R5; it replaced the yard walls of the owner's play
+        /// test of 2026-11-06, which read as partitions).
         /// </summary>
         private static void Row(Facing f, float front, int a0, int a1, string[] palette, int seed, float raise = 0f, int gap = 0)
         {
@@ -675,36 +764,67 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// One span of a terrace, filled as <see cref="Row"/> describes. A kit house is open at its party walls and faced
-        /// at a row's ends (VicCityHouses), so each run of houses between yard walls gets its faced ends: a corner house
-        /// at each end, a detached one when it stands alone. A faced eave overhangs its wall by 0.375 m, so a span that
-        /// meets a building keeps 1 m off it, closed by a yard wall, and no two eaves meet.
+        /// One span of a terrace, filled as <see cref="Row"/> describes, with passages instead of partitions (reference
+        /// plan R5). A kit house is open at its party walls and faced at a row's ends (VicCityHouses), so each run of
+        /// houses gets its faced ends: a corner house at each end, a detached one when it stands alone. A faced eave
+        /// overhangs its wall by 0.375 m, so a span never meets a building flush: it leaves a passage of
+        /// <see cref="PassageWidth"/> to the yard behind. What no house fills joins that passage, or stands in the middle
+        /// as a passage of its own; a remainder under 4 m is filled again with 4 m less of house, and a span no house then
+        /// fits stays open. So every gap between houses is 0 or at least 4 m, and no yard wall stands on a front.
         /// </summary>
         private static void Terrace(Facing f, float front, int s0, int s1, string[] palette, Random rng, float raise)
         {
             var depth = palette.Max(k => _kit[k].Depth);
             bool Building(int a) => _houses.Any(h => Overlap(h, Footprint(f, front, a + 0.25f, 0.5f, depth)));
-            if (s1 - s0 > 2 && Building(s0 - 1))
+            int Width(List<string> k) => k.Sum(x => _kit[x].Width);
+            // A building within a passage's width beyond a span's end leaves the rest of the passage to the span.
+            int Gap(int from, int step)
             {
-                YardWall(f, front, s0, s0 + 1);
-                s0 += 1;
+                for (var k = 0; k < PassageWidth; k++)
+                {
+                    if (Building(from + (step * k)))
+                    {
+                        return PassageWidth - k;
+                    }
+                }
+
+                return 0;
             }
 
-            if (s1 - s0 > 2 && Building(s1))
+            var gap0 = Gap(s0 - 1, -1);
+            var gap1 = Gap(s1, 1);
+            var room = s1 - s0 - gap0 - gap1;
+            var keys = room > 0 ? Fill(room, palette, rng) : new List<string>();
+            var left = room - Width(keys);
+            if (keys.Count > 0 && gap0 == 0 && gap1 == 0 && left > 0 && left < PassageWidth)
             {
-                YardWall(f, front, s1 - 1, s1);
-                s1 -= 1;
+                keys = Fill(room - PassageWidth, palette, rng);
+                left = room - Width(keys);
             }
 
-            var keys = Fill(s1 - s0, palette, rng);
             if (keys.Count == 0)
             {
-                if (s1 - s0 > 0)
+                _openSpans++;
+                Debug.Log($"[VeilmouthCity] R5: {s1 - s0} m left open on {f} {front} at {s0} to {s1}; no house fits.");
+                Take(Footprint(f, front, s0, s1 - s0, depth), Use.Walk);
+                if (s1 - s0 >= PassageWidth)
                 {
-                    YardWall(f, front, s0, s1);
+                    PassageBack(f, front, s0, s1, depth);
                 }
 
                 return;
+            }
+
+            // The remainder joins an end's passage when there is one, else stands in the middle as a passage.
+            if (gap0 > 0)
+            {
+                gap0 += left;
+                left = 0;
+            }
+            else if (gap1 > 0)
+            {
+                gap1 += left;
+                left = 0;
             }
 
             // Local −X of a house is the row's start for fronts facing N or E, its end for S and W.
@@ -726,10 +846,9 @@ namespace GameDev.Slice.EditorTools
                 return alike.Length > 0 ? VictorianHouses.CornerKey(alike[rng.Next(alike.Length)], side) : key;
             }
 
-            // What no house fills goes to a yard wall in the middle, and the runs either side of it get their own ends.
-            var left = s1 - s0 - keys.Sum(k => _kit[k].Width);
-            var wallAt = left > 0 ? keys.Count / 2 : keys.Count;
-            foreach (var (from, to) in new[] { (0, wallAt), (wallAt, keys.Count) })
+            // A middle passage splits the houses into two runs, each with its own faced ends.
+            var passageAt = left > 0 ? keys.Count / 2 : keys.Count;
+            foreach (var (from, to) in new[] { (0, passageAt), (passageAt, keys.Count) })
             {
                 if (to - from == 1)
                 {
@@ -742,12 +861,17 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            var a = (float)s0;
+            if (gap0 > 0)
+            {
+                Passage(f, front, s0, s0 + gap0, depth);
+            }
+
+            var a = s0 + gap0;
             for (var i = 0; i < keys.Count; i++)
             {
-                if (i == wallAt && left > 0)
+                if (i == passageAt && left > 0)
                 {
-                    YardWall(f, front, a, a + left);
+                    Passage(f, front, a, a + left, depth);
                     a += left;
                 }
 
@@ -758,6 +882,98 @@ namespace GameDev.Slice.EditorTools
 
                 a += _kit[keys[i]].Width;
             }
+
+            if (gap1 > 0)
+            {
+                Passage(f, front, s1 - gap1, s1, depth);
+            }
+        }
+
+        /// <summary>The least gap between two houses of a row, m (R5): a real passage to the yard behind, never a slot.</summary>
+        private const int PassageWidth = 4;
+
+        private static void Passage(Facing f, float front, int a0, int a1, int depth)
+        {
+            _passages++;
+            PassageBack(f, front, a0, a1, depth);
+        }
+
+        /// <summary>
+        /// R5's check: a gap between two buildings that share a front or back line is 0 or at least
+        /// <see cref="PassageWidth"/>. Counts and logs the gaps that are neither.
+        /// </summary>
+        private static int Slots()
+        {
+            var boxes = _houses.Select(q => (Min: new Vector2(q.Min(p => p.x), q.Min(p => p.y)), Max: new Vector2(q.Max(p => p.x), q.Max(p => p.y)))).ToList();
+            var slots = 0;
+            for (var i = 0; i < boxes.Count; i++)
+            {
+                for (var j = i + 1; j < boxes.Count; j++)
+                {
+                    var (a, b) = (boxes[i], boxes[j]);
+                    for (var axis = 0; axis < 2; axis++)
+                    {
+                        var other = 1 - axis;
+                        var gap = Mathf.Max(a.Min[axis] - b.Max[axis], b.Min[axis] - a.Max[axis]);
+                        var line = Mathf.Abs(a.Min[other] - b.Min[other]) < 0.3f || Mathf.Abs(a.Max[other] - b.Max[other]) < 0.3f;
+                        if (line && gap > 0.05f && gap < PassageWidth - 0.05f)
+                        {
+                            slots++;
+                            Debug.Log($"[VeilmouthCity] R5: a gap of {gap:0.00} m between buildings at {a.Min}–{a.Max} and {b.Min}–{b.Max}.");
+                        }
+                    }
+                }
+            }
+
+            return slots;
+        }
+
+        /// <summary>
+        /// A passage's ground is taken as walk, so no later row builds into it and leaves a slot; its back waits until
+        /// every house stands, so it knows the stoops of the houses on both sides.
+        /// </summary>
+        private static void PassageBack(Facing f, float front, int a0, int a1, int depth)
+        {
+            Take(Footprint(f, front, a0, a1 - a0, depth), Use.Walk);
+            _backs.Add((f, front, a0, a1, depth));
+        }
+
+        /// <summary>
+        /// A passage's back on the houses' back line: a railing across it with an opening of 2 m in its middle, to the
+        /// yard behind (R5). The kit has no gate; a piece that would meet a house, a stoop or anything solid is left out.
+        /// </summary>
+        private static void PlaceBack(Facing f, float front, int a0, int a1, int depth)
+        {
+            var o = Outward(f);
+            var back = front - ((o.x + o.y) * depth);
+            var alongX = f == Facing.N || f == Facing.S;
+            var g0 = ((a0 + a1) / 2) - 1;
+            void Run(int from, int to)
+            {
+                for (var a = from; a < to;)
+                {
+                    var length = to - a >= 2 ? 2 : 1;
+                    var key = length == 2 ? "Railing" : "RailingShort";
+                    // Never across a stoop: a corner house's side door opens into the passage.
+                    var piece = alongX ? Rect(a - 0.2f, back - 0.3f, a + length + 0.2f, back + 1.1f) : Rect(back - 0.3f, a - 0.2f, back + 1.1f, a + length + 0.2f);
+                    if (!_stoops.Any(s => Overlap(s, piece)))
+                    {
+                        if (alongX)
+                        {
+                            Prop(key, Facing.N, a, back - 0.1f);
+                        }
+                        else
+                        {
+                            Prop(key, Facing.E, back - 0.1f, a);
+                        }
+                    }
+
+                    a += length;
+                }
+            }
+
+            Run(a0, g0);
+            Run(g0 + 2, a1);
         }
 
         /// <summary>
@@ -817,20 +1033,6 @@ namespace GameDev.Slice.EditorTools
             }
 
             return keys;
-        }
-
-        /// <summary>A yard wall between two houses of a terrace where no house fits: brick, 3.5 m, on the front line.</summary>
-        private static void YardWall(Facing f, float front, float a0, float a1)
-        {
-            var along = f == Facing.N || f == Facing.S;
-            var outward = Outward(f);
-            var mid = (a0 + a1) / 2f;
-            var c = (along ? new Vector2(mid, front) : new Vector2(front, mid)) - (outward * 0.3f);
-            var ground = Ground(c.x, c.y);
-            var size = along ? new Vector3(a1 - a0, 4f, 0.6f) : new Vector3(0.6f, 4f, a1 - a0);
-            _works.Box(World(c.x, c.y, ground + 1.5f), size, 0f);
-            var lo = c - new Vector2(size.x, size.z) / 2f;
-            Take(Rect(lo.x, lo.y, lo.x + size.x, lo.y + size.z), Use.Solid);
         }
 
         private static readonly string[] TerraceKeys = Keys("Terrace8", "white", "rich")
@@ -1073,7 +1275,7 @@ namespace GameDev.Slice.EditorTools
 
         private static void Lanes(string street, int layer, bool carriage, Vector2[] quad, Use use)
         {
-            _lanes.Add(new Lane { Street = street, Quad = quad, Layer = layer, Carriage = carriage });
+            _lanes.Add(new Lane { Street = street, Quad = quad, Layer = layer, Carriage = carriage, Use = use });
             Take(quad, use);
         }
 
@@ -1140,13 +1342,13 @@ namespace GameDev.Slice.EditorTools
             StreetX("Loom Lane", 618, 701, 796, 802, 0, Cobbles);
             StreetX("Ridge Lane", 642, 700, 696, 702, 0, Cobbles);
             StreetX("Stair Lane", 721, 778, 696, 702, 0, Cobbles);
-            StreetY("Ridge Alley", 670, 673, 702, 726, 0, Cobbles);
+            StreetY("Ridge Alley", 669, 673, 702, 726, 0, Cobbles); // a passage of 4 m (reference plan R5)
             StreetX("Garden Walk", 528, 572, 680, 684, 0, Cobbles);
-            // Passages of 3 m through the rows, open to the sky: to Wardley Garden, and to the Tenement Court from the
-            // High Street and from Bell Street (§24.2–§24.3).
-            StreetY("Wardley Passage", 557, 560, 712, 726, 0, Cobbles);
-            StreetY("Court Passage", 650, 653, 744, 754, 0, Cobbles);
-            StreetY("Bell Passage", 655, 658, 762, 772, 0, Cobbles);
+            // Passages of 4 m through the rows, open to the sky (R4's sections, from C3's 3 m): to Wardley Garden, and to
+            // the Tenement Court from the High Street and from Bell Street (§24.2–§24.3).
+            StreetY("Wardley Passage", 557, 561, 712, 726, 0, Cobbles);
+            StreetY("Court Passage", 650, 654, 744, 754, 0, Cobbles);
+            StreetY("Bell Passage", 655, 659, 762, 772, 0, Cobbles);
             Lanes("Sea Quay", Setts, false, Rect(480, 812, 740, 830), Use.Walk);
             Lanes("Basin Quay", Setts, false, Rect(713, 784, 780, 790), Use.Walk);
 
@@ -1222,6 +1424,9 @@ namespace GameDev.Slice.EditorTools
             var cell = VeilmouthScene.Extent / AlphamapResolution;
             foreach (var lane in _lanes)
             {
+                // No pavement paint any more (R4): under the raised islands, and where a carriageway now crosses a
+                // pavement lane, the ground is the carriageway's setts.
+                var layer = lane.Layer == Flags ? Setts : lane.Layer;
                 var x0 = Mathf.Max(0, Mathf.FloorToInt(lane.Quad.Min(p => p.x) / cell) - 1);
                 var x1 = Mathf.Min(AlphamapResolution - 1, Mathf.CeilToInt(lane.Quad.Max(p => p.x) / cell) + 1);
                 var z0 = Mathf.Max(0, Mathf.FloorToInt((VeilmouthScene.Extent - lane.Quad.Max(p => p.y)) / cell) - 1);
@@ -1238,7 +1443,7 @@ namespace GameDev.Slice.EditorTools
 
                         for (var l = 0; l < layers.Count; l++)
                         {
-                            maps[z, x, l] = l == lane.Layer ? 1f : 0f;
+                            maps[z, x, l] = l == layer ? 1f : 0f;
                         }
                     }
                 }
@@ -1268,64 +1473,6 @@ namespace GameDev.Slice.EditorTools
             };
             AssetDatabase.CreateAsset(layer, path);
             return layer;
-        }
-
-        /// <summary>Stone kerbs, 0.15 m, along every pavement's edge, broken where another street crosses.</summary>
-        private static void Kerbs()
-        {
-            foreach (var lane in _lanes.Where(l => l.Carriage))
-            {
-                var lo = new Vector2(lane.Quad.Min(p => p.x), lane.Quad.Min(p => p.y));
-                var hi = new Vector2(lane.Quad.Max(p => p.x), lane.Quad.Max(p => p.y));
-                var alongX = hi.x - lo.x > hi.y - lo.y;
-                foreach (var line in alongX ? new[] { lo.y, hi.y } : new[] { lo.x, hi.x })
-                {
-                    var inward = line == (alongX ? lo.y : lo.x) ? -1f : 1f; // the kerb stands on the pavement's side
-                    var cuts = _lanes.Where(o => o.Street != lane.Street && !o.PaintOnly).Select(o => (
-                            Lo: new Vector2(o.Quad.Min(p => p.x), o.Quad.Min(p => p.y)),
-                            Hi: new Vector2(o.Quad.Max(p => p.x), o.Quad.Max(p => p.y))))
-                        .Where(o => alongX ? o.Lo.y < line + 4.5f && o.Hi.y > line - 4.5f : o.Lo.x < line + 4.5f && o.Hi.x > line - 4.5f)
-                        .Select(o => alongX ? (o.Lo.x, o.Hi.x) : (o.Lo.y, o.Hi.y)).OrderBy(c => c.Item1).ToList();
-                    var start = alongX ? lo.x : lo.y;
-                    var end = alongX ? hi.x : hi.y;
-                    var a = start;
-                    foreach (var (c0, c1) in cuts)
-                    {
-                        if (c1 <= a || c0 >= end)
-                        {
-                            continue;
-                        }
-
-                        if (c0 > a)
-                        {
-                            Kerb(alongX, line + (inward * 0.15f), a, c0);
-                        }
-
-                        a = Mathf.Max(a, c1);
-                    }
-
-                    if (a < end)
-                    {
-                        Kerb(alongX, line + (inward * 0.15f), a, end);
-                    }
-                }
-            }
-        }
-
-        private static void Kerb(bool alongX, float line, float a0, float a1)
-        {
-            if (a1 - a0 < 0.5f)
-            {
-                return;
-            }
-
-            for (var a = a0; a < a1 - 0.01f; a += 1f)
-            {
-                var b = Mathf.Min(a + 1f, a1);
-                var p0 = alongX ? new Vector2(a, line) : new Vector2(line, a);
-                var p1 = alongX ? new Vector2(b, line) : new Vector2(line, b);
-                _kerbs.Ribbon(p0, p1, 0.3f, 0.15f);
-            }
         }
 
         // ------------------------------------------------------------------------------------------- walls
@@ -1624,6 +1771,8 @@ namespace GameDev.Slice.EditorTools
                         }
                     }
 
+                    Stoops(house);
+
                     if (Up(max) - min > 0.25f)
                     {
                         var centre = frame.transform.TransformPoint(new Vector3(x + (e.Width / 2f), 0f, z0 + (e.Depth / 2f)));
@@ -1872,6 +2021,19 @@ namespace GameDev.Slice.EditorTools
         /// <summary>A lamp on a crossroads' corner cell unless one already stands within 4 m or a door is before it.</summary>
         private static void CornerLamp(float px, float py)
         {
+            // The corner cell lies in the kerb's rounding (R4): the lamp moves a metre diagonally onto the pavement.
+            if (_pavements.Cut(px + 0.5f, py + 0.5f))
+            {
+                var onto = new[] { (-1, -1), (1, -1), (-1, 1), (1, 1) }.Where(d => _pavements.On(px + d.Item1 + 0.5f, py + d.Item2 + 0.5f)).ToList();
+                if (onto.Count == 0)
+                {
+                    return;
+                }
+
+                px += onto[0].Item1;
+                py += onto[0].Item2;
+            }
+
             var centre = new Vector2(px + 0.5f, py + 0.5f);
             if (_lampsAt.Any(l => (l - centre).sqrMagnitude < 16f) || _doors.Any(d =>
                 {
@@ -1901,6 +2063,12 @@ namespace GameDev.Slice.EditorTools
                 foreach (var at in walls.Distinct())
                 {
                     var centre = at - 0.5f;
+                    // Never where a carriageway now crosses the pavement lane, or in a kerb's rounding (R4).
+                    if (alongX ? _pavements.Cut(centre, cell + 0.5f) : _pavements.Cut(cell + 0.5f, centre))
+                    {
+                        continue;
+                    }
+
                     // A lamp's centre is half a cell past its cell line, so the door's 8 m reach counts to that centre.
                     if (_doors.Any(d => Mathf.Abs((alongX ? d.At.y : d.At.x) - cell) < 8.5f &&Mathf.Abs((alongX ? d.At.x : d.At.y) - centre) < 2.2f))
                     {
@@ -2282,33 +2450,6 @@ namespace GameDev.Slice.EditorTools
                 var box = holder.gameObject.AddComponent<BoxCollider>();
                 box.center = holder == _owner ? centre : Vector3.zero;
                 box.size = size;
-            }
-
-            /// <summary>A strip from a to b (plan) on the ground, <paramref name="width"/> wide and <paramref name="height"/> above it.</summary>
-            public void Ribbon(Vector2 a, Vector2 b, float width, float height)
-            {
-                var ga = Ground(a.x, a.y);
-                var gb = Ground(b.x, b.y);
-                var wa = World(a.x, a.y, ga);
-                var wb = World(b.x, b.y, gb);
-                var dir = (wb - wa).normalized;
-                var side = Vector3.Cross(Vector3.up, dir).normalized * (width / 2f);
-                var up = Vector3.up * height;
-                var down = Vector3.up * -0.2f;
-                var p = Part("");
-                void Quad(Vector3 q0, Vector3 q1, Vector3 q2, Vector3 q3, Vector3 n, float len)
-                {
-                    var s = p.V.Count;
-                    p.V.AddRange(new[] { q0, q1, q2, q3 });
-                    p.N.AddRange(new[] { n, n, n, n });
-                    p.UV.AddRange(new[] { new Vector2(0f, 0f), new Vector2(len, 0f), new Vector2(len, 0.3f), new Vector2(0f, 0.3f) });
-                    p.I.AddRange(new[] { s, s + 1, s + 2, s, s + 2, s + 3 });
-                }
-
-                var len = Vector3.Distance(wa, wb) / 2.5f;
-                Quad(wa - side + up, wa + side + up, wb + side + up, wb - side + up, Vector3.up, len);
-                Quad(wa + side + down, wb + side + down, wb + side + up, wa + side + up, side.normalized, len);
-                Quad(wb - side + down, wa - side + down, wa - side + up, wb - side + up, -side.normalized, len);
             }
 
             public void Finish(string defaultMaterial)

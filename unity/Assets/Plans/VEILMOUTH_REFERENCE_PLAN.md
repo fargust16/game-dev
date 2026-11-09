@@ -1,12 +1,12 @@
 # Veilmouth Reference Plan
 
-Version: 0.7
+Version: 0.8
 
-Status: Draft — the agent's plan from the owner's walk of C3 and reference images (2026-11-08). The owner chose D3 (a) and D5 the same day: R1's steps 0–1 are built, every door taking about half a second, R2's steps 1 and 6 are set, the editor and the game at the quality level High, and R2's steps 2–3, the smooth LOD the owner asked for next, are built. For R3 the owner chose D2 (b), Linear, D7 (a), the present trees retinted, and the painted skies of the project's packs; R3 is built, and its views wait for the owner's judgement. The owner's authorization of 2026-11-08 to finish the plan approved the agent's recommendations as they stand, so D1 and D4 are (a); D6 had no recommendation and stays the owner's. R2's steps 4, 5 and 7 are built
+Status: Draft — the agent's plan from the owner's walk of C3 and reference images (2026-11-08). The owner chose D3 (a) and D5 the same day: R1's steps 0–1 are built, every door taking about half a second, R2's steps 1 and 6 are set, the editor and the game at the quality level High, and R2's steps 2–3, the smooth LOD the owner asked for next, are built. For R3 the owner chose D2 (b), Linear, D7 (a), the present trees retinted, and the painted skies of the project's packs; R3 is built, and its views wait for the owner's judgement. The owner's authorization of 2026-11-08 to finish the plan approved the agent's recommendations as they stand, so D1 and D4 are (a); D6 had no recommendation and stays the owner's. R2's steps 4, 5 and 7 are built, and R4's pavements and R5's passages; the wider roads wait for a C4
 
 Created: 2026-11-08
 
-Last Updated: 2026-11-09 (R2 steps 4, 5 and 7 built: every pane told its room, so the far look maps the built room's finish, depth and walls; the painted sky as the city's reflection and 70 street probes baked at noon and dimmed by the clock; shadows of 4096 px over 150 m. §5: D1 and D4 (a) by the owner's authorization to finish the plan. Earlier: R3 built: Linear, the palette to its targets with a palette sheet, the street surfaces' tints, the painted sky, haze, a lower golden sun, SSAO, the HDR grade, olive trees; what the check changed, and the parts not built, under each step; the gutters' wetness moves to R4. Earlier: §5: the owner chose D2 (b) Linear and D7 (a) the present trees retinted, and R3 step 4's painted skies from the packs already in the project; only Free HDR Sky holds sky images there, so the day and dusk skies are its two. Earlier: R2 steps 2–3, at the owner's request: only the houses' small details cross-fade out, below 4 % of the screen; the rooms behind the windows switch by distance, on within 48 m and off beyond 53 m, behind glass already opaque; the pictures that check it found attic rooms standing out through the mansards, now built under the flat only. Earlier: R2 steps 1 and 6: the owner chose D5; the editor, the tests and every desktop build use High, with anisotropic filtering forced on and MSAA 4×, and the kit's textures filter trilinear at 16×. Earlier: R1: the owner chose D3 (a), doors in 1–3 s; the city is kept behind interiors, measured at 0.45–0.62 s a door, so step 2, the preload, is not built. Earlier: first draft: the owner's six remarks traced to their causes in the project, the reference read, and eight workstreams with checks)
+Last Updated: 2026-11-09 (R4 and R5 built: raised pavements in 16 closed outlines, kerbs and rounded corners, carriageway ends carried across, a wet band along the gutters; passages of 4 m, a railing at each back, no gap under 4 m, 93 houses from 103; the wider roads not built, since every block would lose 4–8 m of depth, so they wait for a C4. Earlier: R2 steps 4, 5 and 7 built: every pane told its room, so the far look maps the built room's finish, depth and walls; the painted sky as the city's reflection and 70 street probes baked at noon and dimmed by the clock; shadows of 4096 px over 150 m. §5: D1 and D4 (a) by the owner's authorization to finish the plan. Earlier: R3 built: Linear, the palette to its targets with a palette sheet, the street surfaces' tints, the painted sky, haze, a lower golden sun, SSAO, the HDR grade, olive trees; what the check changed, and the parts not built, under each step; the gutters' wetness moves to R4. Earlier: §5: the owner chose D2 (b) Linear and D7 (a) the present trees retinted, and R3 step 4's painted skies from the packs already in the project; only Free HDR Sky holds sky images there, so the day and dusk skies are its two. Earlier: R2 steps 2–3, at the owner's request: only the houses' small details cross-fade out, below 4 % of the screen; the rooms behind the windows switch by distance, on within 48 m and off beyond 53 m, behind glass already opaque; the pictures that check it found attic rooms standing out through the mansards, now built under the flat only. Earlier: R2 steps 1 and 6: the owner chose D5; the editor, the tests and every desktop build use High, with anisotropic filtering forced on and MSAA 4×, and the kit's textures filter trilinear at 16×. Earlier: R1: the owner chose D3 (a), doors in 1–3 s; the city is kept behind interiors, measured at 0.45–0.62 s a door, so step 2, the preload, is not built. Earlier: first draft: the owner's six remarks traced to their causes in the project, the reference read, and eight workstreams with checks)
 
 Depends On:
 [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §24, [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [16 Architecture Pivot](../../../16%20Architecture%20Pivot.md), [17 Game Systems Architecture](../../../17%20Game%20Systems%20Architecture.md) (I.1–I.2), [99 Open Questions](../../../99%20Open%20Questions.md) (VS-C3, VS-COLOR)
@@ -216,6 +216,27 @@ On C3's area the widening takes about 5 % more ground, met by shallower yards an
 
 **Check:** a top view shows every block ringed by an unbroken pavement; no pavement crosses a carriageway; the player walks round a block without a fall or a gap; the slice's tests pass; the Combat Grid probe reads the kerb as a step.
 
+**Pavements done** (2026-11-09, `VeilmouthPavements`, built by `VeilmouthCity.RebuildStreets`):
+
+- The pavement is the walk strips of §24.2's sections taken together, less every carriageway.
+- A carriageway that ends against another street is carried on to that street's middle, so the pavement stops at its mouth: 11 ends. The 27 corners where two carriageways meet are rounded at 2 m.
+- Lanes and passages carry no carriages and do not break it. Where the ground across a mouth differs by 1 m or more, the mouth is left as it is.
+- **Built:** 16 closed outlines, 6 525 m², 0.15 m above the carriageway.
+  - The top is the kit's paving: whole 1 m slabs where they fit (3 547) and 0.25 m cells along the curves.
+  - Every edge has a kerb face in the kit's light stone, 3 292 m in all, and the islands carry one mesh collider on the Ground layer. A kerb face against a house is left out.
+  - The mesh has 161 722 triangles, in two separate assets under `Works`; the kerb ribbons of C3 are deleted.
+- **Wet band:** a transparent, glossy band 0.5 m wide along 2 079 m of gutter, on the NoGrid layer, with no shadow (R3 step 3's wetness).
+- **Standing on it:** a house's floor, its door and its stoop rise to the pavement's top when it stands on one. Lamps, props and walkers stand on its top. A corner lamp that would stand where the kerb's curve cuts its cell moves to the pavement.
+- **Paint:** the walk strips are painted as setts beneath the islands. No pavement paint is seen any more.
+- **Checked:**
+  - the top views `r4_top_*` show every block ringed and no pavement across a carriageway;
+  - the views at eye height `r4_eye_*` show the kerb, the rounded corner and the wet band;
+  - the kit check finds no fault;
+  - the slice's EditMode tests pass, 103 of 103, and its PlayMode tests 38 of 39, with no failure: `RenderTheMap` skips itself without graphics.
+- **Not checked:** a walk round a block in play, and a Combat Grid probe on the kerb. The collider is continuous by construction and on the layer the grid reads.
+
+**The wider roads are not built.** To widen the streets as the table asks on C3's area, every block would lose 4–8 m of depth. The blocks cannot give it: their yards are 2–6 m deep, and the yard doors need their clearances. So the widening needs a new layout of the city, a C4, which is more than this step's rebuild. D1 (a) stands as the choice of area, and the widening waits until the owner asks for a C4. Only the passages are widened, from 3 m to 4 m (R5).
+
 ## R5 Passages instead of partitions (remark 1)
 
 - A terrace span ends **flush** against the next building where both eaves allow it, or leaves a real **passage of 4 m** to the yard behind, with its own ground and a gate or railing at the back; never a 1 m slot and never a free-standing pier on the front line.
@@ -223,6 +244,22 @@ On C3's area the widening takes about 5 % more ground, met by shallower yards an
 - Every house beside a passage shows a faced end (the kit's corner houses), so no open party wall shows.
 
 **Check:** no `YardWall` on a front line in the built city; every gap between houses is 0 or at least 4 m; the kit check finds no fault.
+
+**Done** (2026-11-09, `VeilmouthCity.Terrace`):
+
+- `YardWall` is removed.
+- **Where a span meets a building,** or comes within 4 m of one, it leaves a passage that makes the gap 4 m.
+- **What no house fills** joins an end's passage, or stands as a middle passage, with each run of houses keeping its faced ends. A remainder under 4 m is filled again with 4 m less of house.
+- **A span no house fits** stays open.
+- **Ground:** a passage and an open span take their ground as walk, so no later row builds into them.
+- **The back:** each passage, and each open span of 4 m or more, has a railing on the houses' back line with a 2 m opening to the yard; the kit has no gate.
+  - The railing is placed after every house stands, so it keeps clear of the corner houses' side stoops.
+- **Widened to 4 m:** the passages to Wardley Garden, the two to the Tenement Court, and Ridge Alley.
+- **Built:**
+  - 22 passages between houses, and 18 spans left open, 2–12 m;
+  - 93 houses with 101 street doors. C3 had 103 houses with 111.
+  - The ten houses lost were in spans between two buildings, which now need 8 m of passages besides a house. The open spans read as gaps in the row with the yard behind.
+- **Checked:** the city's report counts the gaps under 4 m between buildings that share a front or back line, and finds none. The kit check finds no fault.
 
 ## R6 Porches (remark 3)
 
@@ -266,8 +303,8 @@ What the packs lack goes on the wanted list; another pack needs the owner.
 | 1 | R2.1 quality level, R2.6 filtering (**done** 2026-11-08) | one setting, fixes most of remark 4 at once | D5, chosen |
 | 2 | R1.1 additive interiors (**done** 2026-11-08; R1.2, the preload, not needed) | the owner's worst pain | D3 (a), chosen |
 | 3 | R3.1–R3.8 colour, sky, haze, light, grade, trees | decides most of the look, needs no rebuild of the city | D2 and D7, chosen |
-| 4 | R2.2–R2.5, R2.7 LOD, rooms, glass, shadows | needs the houses baked again | step 1 |
-| 5 | R4, R5 streets, pavements, passages (C4) | one rebuild of the city | D1 |
+| 4 | R2.2–R2.5, R2.7 LOD, rooms, glass, shadows (**done** 2026-11-09) | needs the houses baked again | step 1 |
+| 5 | R4, R5 streets, pavements, passages (**done** 2026-11-09, without the wider roads, which need a C4) | one rebuild of the city | D1 |
 | 6 | R6 porches | joins the house bake of step 4 or 5 | measurement |
 | 7 | R1.3–R1.4 lighter first load, build measured | after the city's content settles | step 5 |
 | 8 | R7, R8 dressing and skyline | content on a settled city | D6, D7 |
@@ -280,7 +317,7 @@ Each step ends with its check, the narrowest test set that covers it, renders fo
 
 | # | Question | Options | Recommended |
 |---|---|---|---|
-| D1 | Wider roads on which area? | (a) C3's area, shallower yards and two fewer lanes; (b) a larger city; and whether a round place at the centre is wanted | (a), without the round place; **approved by the owner's authorization of 2026-11-08** |
+| D1 | Wider roads on which area? | (a) C3's area, shallower yards and two fewer lanes; (b) a larger city; and whether a round place at the centre is wanted | (a), without the round place; **approved by the owner's authorization of 2026-11-08**. The pavements and passages are built; the wider roads need a C4 layout (R4) |
 | D2 | Colour space (VS-COLOR) | (a) keep Gamma; (b) Linear, every material and light checked again | **Decided by the owner, 2026-11-08: (b) Linear**, R3 step 1 |
 | D3 | How doors load | (a) additive interiors with the city kept loaded, separate scenes as now; (b) seamless interiors in the city scene | **Decided by the owner, 2026-11-08: (a)**, built in R1 |
 | D4 | Rooms behind windows | (a) built rooms near, matching mapped rooms far (R2.3–R2.4); (b) mapped rooms only, cheaper to load | (a); **approved by the owner's authorization of 2026-11-08**, built in R2 step 4 |

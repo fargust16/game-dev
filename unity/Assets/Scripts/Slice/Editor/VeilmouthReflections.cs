@@ -132,7 +132,8 @@ namespace GameDev.Slice.EditorTools
 
         private static Texture BakeOne(ReflectionProbe probe, string path)
         {
-            if (!Lightmapping.BakeReflectionProbe(probe, path))
+            // A second try: the file can be held a moment by another process (2026-11-09, "could not write" once in 70).
+            if (!Lightmapping.BakeReflectionProbe(probe, path) && !Lightmapping.BakeReflectionProbe(probe, path))
             {
                 Debug.LogError($"[VeilmouthReflections] {path} did not bake.");
                 return null;
@@ -164,6 +165,12 @@ namespace GameDev.Slice.EditorTools
                     var floor = Mathf.Max(ground, VeilmouthScene.SeaLevel); // over the river, the water
                     var hits = Physics.RaycastAll(new Vector3(p.x, floor + 200f, p.z), Vector3.down, 200f - OpenAbove, ~0, QueryTriggerInteraction.Ignore);
                     if (hits.Length > 0)
+                    {
+                        continue;
+                    }
+
+                    // Nor within 0.75 m of anything at the probe's height: a lamp's head beside it fills its cubemap.
+                    if (Physics.CheckSphere(new Vector3(p.x, floor + Eye, p.z), 0.75f, ~0, QueryTriggerInteraction.Ignore))
                     {
                         continue;
                     }

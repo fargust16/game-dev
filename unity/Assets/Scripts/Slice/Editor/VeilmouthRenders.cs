@@ -573,6 +573,45 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// The raised pavements and passages (reference plan R4, R5) at noon: junctions from above, where carriageways cut
+        /// the pavements and the kerbs turn round, and two views from the carriageway at the kerb. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderPavements -lookLabel r4
+        /// </summary>
+        public static void RenderPavements()
+        {
+            var label = Argument("-lookLabel") ?? "r4";
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            _skyAndGrade = sky != null;
+            try
+            {
+                sky?.Apply(12 * 60);
+                Eye($"{label}_warmup", Ground(5f, -235f, 1.7f), Ground(19f, -242f, 0.3f));
+                File.Delete($"{OutputFolder}/{label}_warmup.png");
+                // Plan (px, py) is world (px − 500, 500 − py).
+                Top($"{label}_top_cheap", new Vector3(22f, 0f, -240f), 14f);   // the High Street meets Cheap Street
+                Top($"{label}_top_crown", new Vector3(112f, 0f, -232f), 18f);  // Crown Avenue's mall at the High Street
+                Top($"{label}_top_bell", new Vector3(205f, 0f, -278f), 16f);   // Bell Street meets Dock Road
+                Top($"{label}_top_mercers", new Vector3(22f, 0f, -278f), 14f); // Mercers Row crosses Cheap Street
+                Top($"{label}_top_parade", new Vector3(245f, 0f, -172f), 14f); // North Road meets the Parade
+                Top($"{label}_top_slant", new Vector3(-10f, 0f, -246f), 16f);  // Tanners Slant leaves the High Street
+                Top($"{label}_top_lowerveil", new Vector3(160f, 0f, -270f), 45f);
+                Eye($"{label}_eye_corner", Ground(5f, -235f, 1.7f), Ground(19f, -242f, 0.3f));
+                Eye($"{label}_eye_kerb", Ground(30f, -238.5f, 1.2f), Ground(70f, -241f, 0.2f));
+                Eye($"{label}_eye_crown", Ground(112f, -238f, 1.7f), Ground(112f, -200f, 1f));
+            }
+            finally
+            {
+                _skyAndGrade = false;
+            }
+
+            Debug.Log($"[VeilmouthRenders] the pavements' views written to {OutputFolder} as {label}_*.");
+        }
+
+        /// <summary>
         /// The project's painted skies (Free HDR Sky) seen from an empty scene: north, east, south, west at 10° up and
         /// straight up, so the sun and the horizon can be found before the sky is set by the clock. Batch:
         /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderSkies
