@@ -713,7 +713,13 @@ namespace GameDev.Slice.EditorTools
                 Object.DestroyImmediate(body);
             }
 
-            KeepFinestLevel(model);
+            // A tree is seen from far off and keeps its LOD group (Veilmouth's mature tree: 255 thousand triangles at
+            // LOD0, 2.3 at LOD2; 2026-11-09).
+            if (spec.Family != "Tree")
+            {
+                KeepFinestLevel(model);
+            }
+
             if (!sizedBase)
             {
                 Scale(model, spec);
@@ -1524,7 +1530,7 @@ namespace GameDev.Slice.EditorTools
         /// <summary>
         /// Victorian Interiors' walls and furniture carry LOD groups whose coarser meshes differ in their panels and
         /// mouldings, so a wall changed its look as the camera moved (owner's play test VI-5, remark 3). Rooms are seen
-        /// from close by, so a wrapper keeps the finest level only and drops the group.
+        /// from close by, so a wrapper keeps the finest level only and drops the group; a tree keeps its group.
         /// </summary>
         private static void KeepFinestLevel(GameObject model)
         {

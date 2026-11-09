@@ -8,9 +8,10 @@ namespace GameDev.Slice.EditorTools
 {
     /// <summary>
     /// Veilmouth's trees made in Blender from Easy Tree (VEILMOUTH_CITY_PLAN.md §27; tools/blender/veilmouth_trees.py):
-    /// how their FBX and textures are imported, and their three materials on GameDev/Slice/Tree. An FBX's material
-    /// names (VeilmouthBark, VeilmouthLeaves_&lt;kind&gt;) pick the project's materials; its _LOD0, _LOD1 (and _LOD2)
-    /// objects become a LOD Group. Every number is an authoring default. Batch:
+    /// how their FBX and textures are imported, and their materials on GameDev/Slice/Tree. An FBX's material names
+    /// (VeilmouthBark, VeilmouthLeaves_&lt;kind&gt; for cards, VeilmouthLeaf_&lt;kind&gt; for single leaves) pick the
+    /// project's materials; its _LOD0, _LOD1 (and _LOD2) objects become a LOD Group. Every number is an authoring
+    /// default. Batch:
     /// -executeMethod GameDev.Slice.EditorTools.VeilmouthTrees.Setup
     /// </summary>
     public sealed class VeilmouthTrees : AssetPostprocessor
@@ -24,12 +25,15 @@ namespace GameDev.Slice.EditorTools
 
         public static readonly string[] Garden = { "GardenBeechA", "GardenHornbeamB" };
 
-        /// <summary>The owner's mature tree, 11 m high and 12.5 m across, grown by Easy Tree from the owner's own values (§27.7).</summary>
+        /// <summary>The owner's mature tree, 11.3 m high and 12.3 m across: Easy Tree's own tree from the owner's values, with our leaves (§27.7–§27.8).</summary>
         public static readonly string[] Mature = { "MatureHornbeamA" };
+
+        /// <summary>The kinds whose single leaves (the leaf atlas itself) a tree wears: the mature tree's hornbeam (§27.8).</summary>
+        private static readonly string[] SingleLeaves = { "Hornbeam" };
 
         // A tree of two LODs (street and garden) is LOD0 while it fills over 18 % of the screen's height (about 45 m away
         // for 9 m at 60°), LOD1 down to 2.5 % (about 310 m), and is not drawn beyond, which the haze already hides. A
-        // tree of three (the mature tree, 11.9, 5 and 1.7 thousand triangles) is LOD0 to 25 % (about 38 m for 11 m),
+        // tree of three (the mature tree, 267.5, 5.7 and 2.3 thousand triangles) is LOD0 to 25 % (about 38 m for 11 m),
         // LOD1 to 7 % (about 135 m) and LOD2 to 2.5 % (about 380 m).
         private static readonly float[] TwoLods = { 0.18f, 0.025f }, ThreeLods = { 0.25f, 0.07f, 0.025f };
 
@@ -53,6 +57,8 @@ namespace GameDev.Slice.EditorTools
         public static string BarkMaterial => $"{MaterialFolder}/VeilmouthBark.mat";
 
         public static string LeavesMaterial(string kind) => $"{MaterialFolder}/VeilmouthLeaves_{kind}.mat";
+
+        public static string LeafMaterial(string kind) => $"{MaterialFolder}/VeilmouthLeaf_{kind}.mat";
 
         /// <summary>The materials made or brought up to date, then every tree imported again so it wears them.</summary>
         public static void Setup()
@@ -86,21 +92,30 @@ namespace GameDev.Slice.EditorTools
 
             foreach (var (kind, tint) in Leaves)
             {
-                var leaves = MaterialAt(LeavesMaterial(kind));
-                leaves.SetTexture("_BaseMap", TextureAt($"Tree_Twig_{kind}.png"));
-                leaves.SetTexture("_BumpMap", TextureAt($"Tree_Twig_{kind}_Normal.png"));
-                leaves.SetColor("_BaseColor", tint);
-                leaves.SetFloat("_Smoothness", 0.2f);
-                leaves.SetFloat("_Cull", (float)CullMode.Off);
-                leaves.SetFloat("_AlphaClip", 1f);
-                leaves.SetFloat("_Cutoff", 0.5f);
-                leaves.EnableKeyword("_ALPHATEST_ON");
-                leaves.SetFloat("_Translucency", LeafTranslucency);
-                leaves.renderQueue = (int)RenderQueue.AlphaTest;
-                Wind(leaves);
+                Foliage(MaterialAt(LeavesMaterial(kind)), $"Tree_Twig_{kind}", tint);
+                if (SingleLeaves.Contains(kind))
+                {
+                    Foliage(MaterialAt(LeafMaterial(kind)), $"Tree_Leaf_{kind}", tint);
+                }
             }
 
             AssetDatabase.SaveAssets();
+        }
+
+        /// <summary>A leaves material: cut out, both sides, the kind's tint and the sun through it, with the wind.</summary>
+        private static void Foliage(Material leaves, string texture, Color tint)
+        {
+            leaves.SetTexture("_BaseMap", TextureAt($"{texture}.png"));
+            leaves.SetTexture("_BumpMap", TextureAt($"{texture}_Normal.png"));
+            leaves.SetColor("_BaseColor", tint);
+            leaves.SetFloat("_Smoothness", 0.2f);
+            leaves.SetFloat("_Cull", (float)CullMode.Off);
+            leaves.SetFloat("_AlphaClip", 1f);
+            leaves.SetFloat("_Cutoff", 0.5f);
+            leaves.EnableKeyword("_ALPHATEST_ON");
+            leaves.SetFloat("_Translucency", LeafTranslucency);
+            leaves.renderQueue = (int)RenderQueue.AlphaTest;
+            Wind(leaves);
         }
 
         private static void Wind(Material material)
@@ -231,8 +246,8 @@ namespace GameDev.Slice.EditorTools
             importer.wrapMode = Path.GetFileName(assetPath).StartsWith("Tree_Bark") ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
             if (!normal && assetPath.EndsWith(".png"))
             {
-                // A twig card: its colour spread under the cut-out, and its leaves' coverage kept at every mip so a
-                // far crown does not thin out.
+                // A twig card or the leaf atlas: its colour spread under the cut-out, and its leaves' coverage kept at
+                // every mip so a far crown does not thin out.
                 importer.alphaSource = TextureImporterAlphaSource.FromInput;
                 importer.alphaIsTransparency = true;
                 importer.mipMapsPreserveCoverage = true;
