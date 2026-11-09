@@ -197,7 +197,7 @@ The owner's walk of C3 found the porch of columns and a bare beam out of place, 
 | A church or cathedral with a spire, seen from the city | The Ridge or beyond the walls | 20 × 40 × 45 | B | Asset map §9 row 23. R3's haze makes it the reference's landmark. Seen, not entered, in the slice |
 | Clock face for a tower | The town hall or the Tower6 | 2 × 0.2 × 2 | C | Asset map §9 row 24. A lit face at night |
 | Clay roof tiles as a texture set on the slate slot | Parts of the city, if the owner wants them | — | C | Only with the owner's D6 (b); style guide §2 has no tiled roof |
-| Square planter or cast-iron tree grate for a street tree | The High Street, Crown Avenue | 1.2 × 1.2 × 0.5 | B | Reference plan R7.2. Without it a tree cannot stand in the paving |
+| Square planter or cast-iron tree grate for a street tree | The High Street, Crown Avenue | 1.2 × 1.2 × 0.5 | B | Reference plan R7.2. Until it comes, the street trees the owner asked for (city plan §25.3) stand in the paving |
 | Double gas lamp, two lanterns on one post | Squares, the Palace Forecourt | 1.4 × 0.4 × 4.5 | B | R7.2. The kit's lamp post has one lantern, and two posts are not one lamp |
 | Bunting and a string of lamps between two posts | The Market Place | 8 m spans | C | R7.4. Lit at night |
 | Flower cart or flower seller's stand | The Market Place, the High Street | 1.5 × 1 × 1.2 | C | R7.4 |

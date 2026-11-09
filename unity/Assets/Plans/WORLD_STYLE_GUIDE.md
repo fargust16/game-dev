@@ -1,12 +1,12 @@
 # World Style Guide
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft — written by the agent from the owner's answers of 2026-11-08 (city plan §24); the light and the mystic layer built in Veilmouth (city plan §24.7). After walking C3 the owner asked for one warm, muted range with haze and a quiet sky, after reference images: §2 and §5 are reworked by [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R3, awaiting the owner's judgement of its views; the roofs wait for its D6
 
 Created: 2026-11-08
 
-Last Updated: 2026-11-09 (§3: pavements are raised islands behind a stone kerb with a wet gutter band (reference plan R4). Earlier: §5: soft, fine sun shadows; glass and wet stone reflect the street, not the sky alone (reference plan R2 steps 5 and 7). Earlier: §2, §5, §8: the reference look by the reference plan's R3: Linear colour space, the muted palette with its targets, the painted sky, haze, a lower golden sun, SSAO, the HDR grade, olive trees. Earlier: Status: the owner's reference look, to be worked in by the reference plan's R3. Earlier: §5, §6: built in Veilmouth by `VeilmouthSky` and `VeilmouthMystic`, as city plan §24.7 records; the moon rises at 20:00 and fades in over its first hour. Earlier: first draft: one style for the city, its interiors and the land round it, and the mystic layer the owner chose)
+Last Updated: 2026-11-09 (§8: the city's green, by the owner: the Stylized Trees Pack's trees and bushes in a muted city green, street trees, hedges and grass (city plan §25). Earlier: §3: pavements are raised islands behind a stone kerb with a wet gutter band (reference plan R4). Earlier: §5: soft, fine sun shadows; glass and wet stone reflect the street, not the sky alone (reference plan R2 steps 5 and 7). Earlier: §2, §5, §8: the reference look by the reference plan's R3: Linear colour space, the muted palette with its targets, the painted sky, haze, a lower golden sun, SSAO, the HDR grade, olive trees. Earlier: Status: the owner's reference look, to be worked in by the reference plan's R3. Earlier: §5, §6: built in Veilmouth by `VeilmouthSky` and `VeilmouthMystic`, as city plan §24.7 records; the moon rises at 20:00 and fades in over its first hour. Earlier: first draft: one style for the city, its interiors and the land round it, and the mystic layer the owner chose)
 
 Depends On:
 [00 Vision](../../../00%20Vision.md), [11 Vertical Slice](../../../11%20Vertical%20Slice.md) (*Era and Mood*), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §24, [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md)
@@ -172,4 +172,5 @@ Wanted, with no stand-in until the models exist:
 |---|---|
 | The city | the kit's houses and palettes (§2–§4), the street surfaces, the light (§5), the mystic layer (§6) |
 | Interiors | Victorian Interiors, warm lamp light, the same period |
-| Outside the walls | Polytope's trees in olive (retinted, reference plan R3 step 8) and its grass, farms from FantasyMedievalTown_LITE until Victorian ones exist, the same sky, moon and fog |
+| The city's green | the Stylized Trees Pack's trees and bushes in a muted green, darker and greyer than a park and a little greener than the forest's olive, enough to contrast with the stone and never bright (owner, 2026-11-09); trees along the pavements, clipped hedges, grass on the gardens' earth (city plan §25) |
+| Outside the walls | Roadside Tales' walls, fences and posts by the roads and farms (city plan §25.5); Polytope's trees in olive (retinted, reference plan R3 step 8) and its grass, farms from FantasyMedievalTown_LITE until Victorian ones exist, the same sky, moon and fog |
