@@ -1,0 +1,17 @@
+{
+    "name": "GameDev.Decisions",
+    "rootNamespace": "GameDev.Decisions",
+    "references": [
+        "GameDev.Dialogue",
+        "GameDev.World.Poi"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

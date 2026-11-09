@@ -1,0 +1,371 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a7c9e1b3d5f4a7c9e1b3d5f7a9c1e3b, type: 3}
+  m_Name: PoiADialogue
+  m_EditorClassIdentifier: 
+  id: poia
+  listeners:
+  - id: wardens
+    nameKey: dialogue.poia.who.wardens
+    enemy: 0
+    strength: 10
+    intelligence: 10
+    will: 10
+  - id: neighbours
+    nameKey: dialogue.poia.who.neighbours
+    enemy: 0
+    strength: 5
+    intelligence: 5
+    will: 5
+  - id: harrow
+    nameKey: person.harrow.name
+    enemy: 0
+    strength: 5
+    intelligence: 10
+    will: 5
+  nodes:
+  - id: scene
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: step
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: street
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: street
+    speaker: wardens
+    saysTips: 0
+    source: 0
+    options:
+    - id: ask
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy:
+      - poi.a.heard.neighbours
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: neighbours
+        raises:
+        - poi.a.heard.neighbours
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: defend
+      approach: 1
+      kind: 1
+      arguments:
+      - poi.a.heard.neighbours
+      - tip.kit.drawers.heard
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: wardens
+      asks: 
+      success:
+        next: freed
+        raises:
+        - aftermath.harrow.defended
+        - debt.veinmarket
+        - debt.harrow
+        settles: {fileID: 11400000, guid: 1d3d9d0cb6654077ac21992cc277ad91, type: 2}
+        tells: []
+        minutes: 0
+      failure:
+        next: rebuffed
+        raises:
+        - poi.a.heard.cabinet
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: threaten
+      approach: 2
+      kind: 1
+      arguments:
+      - poi.a.heard.neighbours
+      - tip.kit.drawers.heard
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 2
+      request: 1
+      listener: wardens
+      asks: 
+      success:
+        next: freed
+        raises:
+        - aftermath.harrow.defended
+        - debt.veinmarket
+        - debt.harrow
+        settles: {fileID: 11400000, guid: 1d3d9d0cb6654077ac21992cc277ad91, type: 2}
+        tells: []
+        minutes: 0
+      failure:
+        next: rebuffed
+        raises:
+        - poi.a.heard.cabinet
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: testify
+      approach: 1
+      kind: 1
+      arguments:
+      - tip.nell.harrow.heard
+      - tip.board.seizure.heard
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: neighbours
+      asks: 
+      success:
+        next: taken
+        raises:
+        - aftermath.harrow.taken
+        - aftermath.harrow.shop_sealed
+        - debt.wardens
+        - aftermath.harrow.testified
+        settles: {fileID: 11400000, guid: 1d3d9d0cb6654077ac21992cc277ad91, type: 2}
+        tells: []
+        minutes: 0
+      failure:
+        next: jeered
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: hold
+      approach: 3
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: taken
+        raises:
+        - aftermath.harrow.taken
+        - aftermath.harrow.shop_sealed
+        - debt.wardens
+        - aftermath.harrow.crowd_held
+        settles: {fileID: 11400000, guid: 1d3d9d0cb6654077ac21992cc277ad91, type: 2}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: walk
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: neighbours
+    speaker: neighbours
+    saysTips: 0
+    source: 0
+    options:
+    - id: back
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: street
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: rebuffed
+    speaker: wardens
+    saysTips: 0
+    source: 0
+    options:
+    - id: retreat
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: street
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: jeered
+    speaker: neighbours
+    saysTips: 0
+    source: 0
+    options:
+    - id: shrug
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: street
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: freed
+    speaker: harrow
+    saysTips: 0
+    source: 0
+    options:
+    - id: done
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: taken
+    speaker: wardens
+    saysTips: 0
+    source: 0
+    options:
+    - id: nod
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  start: scene

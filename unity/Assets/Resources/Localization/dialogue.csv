@@ -14,3 +14,25 @@ dialogue.nell.angry.out,Back away.,Отступить.
 # Kit Mallow on the Market square (S2.4; SLICE_PEOPLE §2)
 dialogue.kit.news,Nothing fresh. Come back tomorrow.,Свежего ничего. Приходи завтра.
 dialogue.kit.news.leave,"See you around, Kit.","Ещё увидимся, Кит."
+# POI A, the Brass-Number Arrest at Harrow & Tincture (S2.5; 11.1); the Wardens' words to the street, the street's to the player
+dialogue.poia.who.wardens,Warden,Стражник
+dialogue.poia.who.neighbours,Neighbours,Соседи
+dialogue.poia.scene,"Gaslight sputters over Bell Street. Two Wardens with brass collar-numbers hold old Harrow by the arms at his shop door; a third stands in the doorway, eyeing a locked oak cabinet. Mill neighbours shout that he is the only one who sells cough draught they can pay for. Harrow swears the black tincture talk is a frame.","Над Колокольной улицей чадят газовые фонари. Двое стражников с медными номерами на воротниках держат старого Харроу под руки у дверей его лавки; третий стоит в дверях и не сводит глаз с запертого дубового шкафа. Фабричные соседи кричат, что только у него микстура от кашля им по карману. Харроу клянётся, что разговоры о чёрной тинктуре — навет."
+dialogue.poia.scene.step,Step up to the Wardens.,Подойти к стражникам.
+dialogue.poia.street,"Step back, citizen. This is Warden business.","Отойдите, гражданин. Это дело Стражи."
+dialogue.poia.street.ask,Ask the neighbours what he has done.,"Спросить соседей, что он натворил."
+dialogue.poia.street.defend,He's the only one on the street who sells cough draught the mill folk can pay for. Let him be.,Только у него на всей улице фабричным по карману микстура от кашля. Оставьте его.
+dialogue.poia.street.threaten,"Take him, and the whole street will know whose numbers did it.","Заберёте его — и вся улица узнает, чьи это были номера."
+dialogue.poia.street.testify,I heard it at the Soot & Bell: he sold black tincture to mill hands. Let the Wardens do their work.,Я слышал в «Саже и Колоколе»: он продавал фабричным чёрную тинктуру. Дайте Страже делать своё дело.
+dialogue.poia.street.hold,I'll hold the crowd back while you take him.,"Я придержу толпу, пока вы его уводите."
+dialogue.poia.street.walk,Walk on. It is not your quarrel.,Пройти мимо. Это не ваша ссора.
+dialogue.poia.neighbours,"He's the only one sells cough draught we can pay for! And the foreman's man came yesterday with a private order, and Harrow sent him packing.",Только у него микстура от кашля нам по карману! А вчера приходил человек от мастера с частным заказом — так Харроу его выставил.
+dialogue.poia.neighbours.back,Turn back to the Wardens.,Снова повернуться к стражникам.
+dialogue.poia.rebuffed,"Mind yourself, citizen. It's the cabinet we've come for. He's only in the way.","Попридержите язык, гражданин. Мы пришли за шкафом. А он только мешает."
+dialogue.poia.rebuffed.retreat,Step back.,Отступить.
+dialogue.poia.jeered,"Liar! Who's paying you, then?",Врёшь! Кто тебе платит?
+dialogue.poia.jeered.shrug,Let them shout.,Пусть кричат.
+dialogue.poia.freed,"Bless you. They'll be back, but not tonight. I'll not forget it: Harrow pays his debts.","Благослови вас бог. Они ещё вернутся, но не сегодня. Я этого не забуду: Харроу платит свои долги."
+dialogue.poia.freed.done,Go and open your shop.,"Идите, откройте лавку."
+dialogue.poia.taken,"Obliged, citizen. The Wardens remember a helpful face.","Благодарю, гражданин. Стража помнит тех, кто помогает."
+dialogue.poia.taken.nod,Nod and step aside.,Кивнуть и отойти.

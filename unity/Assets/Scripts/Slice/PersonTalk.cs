@@ -43,6 +43,9 @@ namespace GameDev.Slice
 
         public bool IsOpen => _talk != null && _talk.IsOpen;
 
+        /// <summary>Whether the conversation can be opened now; a POI's scene closes it while it is not there (S2.5). An open one runs on.</summary>
+        public bool Available { get; set; } = true;
+
         /// <summary>Setup for scenes built by code; a placed person is set in the Inspector.</summary>
         public void Configure(DialogueDefinition definition, float radius)
         {
@@ -52,13 +55,13 @@ namespace GameDev.Slice
 
         public bool InReach(Vector3 position) => InteractReach.Within(transform, position, interactRadius);
 
-        public string PromptFor(Vector3 player) => dialogue != null && !IsOpen && InReach(player) ? Loc.Get("ui.prompt.talk") : null;
+        public string PromptFor(Vector3 player) => Available && dialogue != null && !IsOpen && InReach(player) ? Loc.Get("ui.prompt.talk") : null;
 
         /// <summary>What Interact does: opens the conversation on its first node.</summary>
         public void Open()
         {
             var world = SliceWorldDriver.Running;
-            if (IsOpen || world == null || dialogue == null || Hud() == null)
+            if (IsOpen || !Available || world == null || dialogue == null || Hud() == null)
             {
                 return;
             }
