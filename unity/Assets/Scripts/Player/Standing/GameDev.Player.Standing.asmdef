@@ -1,0 +1,19 @@
+{
+    "name": "GameDev.Player.Standing",
+    "rootNamespace": "GameDev.Player.Standing",
+    "references": [
+        "GameDev.Player.Progression",
+        "GameDev.World.Seed",
+        "GameDev.World.State",
+        "GameDev.World.Time"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

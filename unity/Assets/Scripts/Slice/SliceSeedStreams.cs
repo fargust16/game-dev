@@ -35,9 +35,12 @@ namespace GameDev.Slice
         /// </summary>
         public const string SocialChecks = "slice.check.social";
 
+        /// <summary>Whether a lie that worked comes out at the next day boundary (10.4 §5); forked by the listener's id hashed and the new day.</summary>
+        public const string Lies = "slice.lies";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
-            RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks,
+            RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies,
         };
     }
 }

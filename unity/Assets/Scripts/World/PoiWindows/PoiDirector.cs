@@ -203,7 +203,7 @@ namespace GameDev.World.Poi
                 return outcomes.Length > 0 ? 0 : -1;
             }
 
-            var roll = _seed.Fork(_stream, StableHash(poi.Id)).NextDouble() * total;
+            var roll = _seed.Fork(_stream, StableHash.Of(poi.Id)).NextDouble() * total;
             for (var i = 0; i < outcomes.Length; i++)
             {
                 roll -= Math.Max(0f, outcomes[i].weight);
@@ -217,20 +217,5 @@ namespace GameDev.World.Poi
         }
 
         private static string Key(PoiDefinition poi, string part) => "poi." + poi.Id + "." + part;
-
-        /// <summary>FNV-1a over the id: string.GetHashCode differs between runtimes, and the draw must not.</summary>
-        private static int StableHash(string text)
-        {
-            unchecked
-            {
-                var hash = (int)2166136261;
-                foreach (var c in text)
-                {
-                    hash = (hash ^ c) * 16777619;
-                }
-
-                return hash;
-            }
-        }
     }
 }
