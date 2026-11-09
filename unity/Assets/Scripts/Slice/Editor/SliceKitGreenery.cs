@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using GameDev.Slice.Kit;
 
 namespace GameDev.Slice.EditorTools
@@ -43,6 +44,14 @@ namespace GameDev.Slice.EditorTools
             var fruit = S("CityTree_Fruit", "Tree", "CityFruit", Polytope + "/Trees", "PT_Fruit_Tree_01_green", KitLayers.Vegetation, Body.Trunk, Anchor.Pivot);
             fruit.SizeY = CityFruitTreeHeight;
             yield return fruit;
+
+            // Veilmouth's own thin trees (§27, owner 2026-11-09), made in Blender from Easy Tree with twig cards and wind
+            // weights (tools/blender/veilmouth_trees.py), at the heights Blender gave them: they replace the fruit tree
+            // and the warped trees in the streets, squares and gardens.
+            foreach (var name in VeilmouthTrees.Street.Concat(VeilmouthTrees.Garden))
+            {
+                yield return S("CityTree_" + name, "Tree", name, VeilmouthTrees.ArtFolder, "Tree_" + name, KitLayers.Vegetation, Body.Trunk, Anchor.Pivot);
+            }
 
             // Garden bushes, in the Polytope shrub's place inside the walls.
             foreach (var n in new[] { "Bush 006", "Bush 011", "Bush 015" })

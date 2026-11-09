@@ -510,6 +510,16 @@ namespace GameDev.Slice.EditorTools
                 Settle(go, quad, e.Depth == 0, turned);
             }
 
+            // §27: a city tree's crown turned about its trunk by its plan point, so the two variants of a row never
+            // repeat; the trunk, its body and its cell stay where they are.
+            var crown = key.StartsWith("CityTree_") ? go.transform.Find("Model") : null;
+            if (crown != null)
+            {
+                var yaw = (((int)(px0 * 10f) * 73856093) ^ ((int)(py0 * 10f) * 19349663)) & 0x7fffffff;
+                crown.rotation = Quaternion.AngleAxis(yaw % 360, Vector3.up) * crown.rotation;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(crown);
+            }
+
             return go;
         }
 

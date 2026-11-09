@@ -43,12 +43,13 @@ namespace GameDev.Slice.EditorTools
         public const float KerbTop = 0.3f;
 
         /// <summary>
-        /// A tree pit, m (authoring defaults): 1.6 m square outside, flush on the kerb, so a ring of earth shows round the
-        /// fruit tree's trunk, which is 1.1 m across at its foot at 1.5 times its height (measured, pt6 pit views); the
-        /// trunk stands in its middle, moved inside its block's cell. Its stone edge is 0.1 m wide and as high as the kerb,
-        /// its earth 0.08 m over the carriageway. Both stand clear of the terrain's level of detail, as the kerb does.
+        /// A tree pit, m (authoring defaults): 1.2 m square outside, flush on the kerb (§27, owner 2026-11-09: smaller than
+        /// the fruit tree's 1.6 m), so a ring of earth about 0.3 m wide shows round the Blender trees' trunks, which are
+        /// 0.30–0.36 m across at their foot (measured from their LOD0 meshes); the trunk stands in its middle, moved inside
+        /// its block's cell. Its stone edge is 0.1 m wide and as high as the kerb, its earth 0.08 m over the carriageway.
+        /// Both stand clear of the terrain's level of detail, as the kerb does.
         /// </summary>
-        public const float PitSize = 1.6f, PitEdge = 0.1f, PitEarth = 0.08f;
+        public const float PitSize = 1.2f, PitEdge = 0.1f, PitEarth = 0.08f;
 
         public const string RootName = "Pavements";
         public const string MaterialFolder = "Assets/Materials/Slice";

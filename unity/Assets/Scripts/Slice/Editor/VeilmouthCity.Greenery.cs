@@ -8,9 +8,10 @@ using Random = System.Random;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// The city's greenery and the roadside (VEILMOUTH_CITY_PLAN.md §25, owner 2026-11-09, and §26, the owner's fifth
-    /// play test): street trees in square pits on the carriageway by the kerb, in the lamps' line, Polytope's fruit tree
-    /// in the city's fuller green, the Stylized Trees Pack's trees and bushes, clipped hedges round beds and a parterre,
+    /// The city's greenery and the roadside (VEILMOUTH_CITY_PLAN.md §25, owner 2026-11-09, §26, the owner's fifth play
+    /// test, and §27): street trees in square pits on the carriageway by the kerb, in the lamps' line, on both kerbs of a
+    /// wide street and one of a narrow one, Veilmouth's own thin trees made in Blender (VeilmouthTrees), the Stylized
+    /// Trees Pack's bushes, clipped hedges round beds and a parterre,
     /// grass on the gardens' earth, and Roadside Tales' walls, fences and posts by the roads and farms outside the walls.
     /// Every number is an authoring default unless marked.
     /// </summary>
@@ -34,11 +35,21 @@ namespace GameDev.Slice.EditorTools
         // off the roads' middles with a 3 m gap every 33 m, and a post on a verge every 40 m.
         private const int YardDepth = 10, WallGapEvery = 33, PostEvery = 40;
 
-        // §26: the fruit tree in the birches' place, in the streets and in half the gardens' places.
-        private static readonly string[] RowTrees = { "CityTree_Fruit" };
+        // §27 (owner, 2026-11-09): Veilmouth's own thin trees from Blender in the fruit tree's place: one kind along a
+        // street, its two variants taking turns down the row; the garden trees and both street kinds in the gardens.
+        private static readonly string[][] StreetKinds =
+        {
+            new[] { "CityTree_StreetHornbeamA", "CityTree_StreetHornbeamB" },
+            new[] { "CityTree_StreetBeechA", "CityTree_StreetBeechB" },
+        };
 
         private static readonly string[] GardenTrees =
-            { "CityTree_Fruit", "CityTree_Fruit", "CityTree_Fruit", "CityTree_Warped1", "CityTree_Warped2", "CityTree_Warped3" };
+            { "CityTree_GardenBeechA", "CityTree_GardenHornbeamB", "CityTree_GardenBeechA", "CityTree_StreetBeechB", "CityTree_StreetHornbeamA" };
+
+        // §27 (owner, 2026-11-09): trees on both kerbs only where the carriageway between them is at least this wide, m;
+        // a narrower street has one row, on the kerbs of alternate sides street by street. Authoring default: the High
+        // Street's 10 m keeps both rows, the byelaw streets' 6 m keep one, so 4.8 m of carriageway stays clear by a pit.
+        private const float TwoRowsFrom = 8f;
 
         private static readonly string[] GardenBushes = { "CityBush_006", "CityBush_011", "CityBush_015" };
         private static readonly string[] Hedges = { "CityHedge_019", "CityHedge_020" };
@@ -50,8 +61,11 @@ namespace GameDev.Slice.EditorTools
         private static readonly (float Px, float Py, Facing F)[] Farms =
             { (150f, 640f, Facing.S), (200f, 700f, Facing.N), (110f, 705f, Facing.N), (230f, 600f, Facing.E) };
 
-        /// <summary>A row's tree: one kind along a street, so it reads as one planting.</summary>
-        private static string RowTree(int i) => RowTrees[Math.Abs(i) % RowTrees.Length];
+        /// <summary>A street's tree: one kind along a street, so it reads as one planting, its variants in turn.</summary>
+        private static string RowTree(int street, int i) => StreetKinds[Math.Abs(street) % StreetKinds.Length][Math.Abs(i) % 2];
+
+        /// <summary>A square's row (Crown Avenue's mall, the palace's corners): the beech, its variants in turn.</summary>
+        private static string RowTree(int i) => RowTree(1, i);
 
         private static string GardenTree(Random rng) => GardenTrees[rng.Next(GardenTrees.Length)];
 
@@ -60,31 +74,48 @@ namespace GameDev.Slice.EditorTools
         // ------------------------------------------------------------------------------------------- street trees
 
         /// <summary>
-        /// The street trees (§25.3, §26), after the lamps and the shop goods: each in a square pit on the carriageway, flush
-        /// on the kerb, in the lamps' line. A kerb is its plan line and the side its carriageway lies on.
+        /// The street trees (§25.3, §26, §27), after the lamps and the shop goods: each in a square pit on the carriageway,
+        /// flush on the kerb, in the lamps' line; both kerbs of a wide street, one kerb of a narrow one. A street is its
+        /// kerbs' plan lines, the near one's carriageway toward +, the far one's toward − (none where its other side has
+        /// no row, as the Parade's villas).
         /// </summary>
         private static void StreetTrees()
         {
             var planted = 0;
-            foreach (var (alongX, line, side, a0, a1) in new[]
+            var street = 0;
+            var oneSided = 0;
+            foreach (var (alongX, near, far, a0, a1) in new (bool, float, float?, int, int)[]
                      {
-                         (true, 726f + HighStreetWalk, 1, 480, 778), (true, 744f - HighStreetWalk, -1, 480, 778),
-                         (true, 668f + ParadeWalk, 1, 480, 752),
-                         (false, 516f + ByelawWalk, 1, 680, 726), (false, 528f - ByelawWalk, -1, 680, 726),
-                         (true, 772f + ByelawWalk, 1, 480, 550), (true, 784f - ByelawWalk, -1, 480, 550),
-                         (true, 772f + ByelawWalk, 1, 618, 701), (true, 784f - ByelawWalk, -1, 618, 701),
-                         (false, 516f + ByelawWalk, 1, 744, 812), (false, 528f - ByelawWalk, -1, 744, 812),
-                         (false, 606f + ByelawWalk, 1, 744, 812), (false, 618f - ByelawWalk, -1, 744, 812),
-                         (false, 701f + ByelawWalk, 1, 744, 812), (false, 713f - ByelawWalk, -1, 744, 812),
+                         (true, 726f + HighStreetWalk, 744f - HighStreetWalk, 480, 778),
+                         (true, 668f + ParadeWalk, null, 480, 752),
+                         (false, 516f + ByelawWalk, 528f - ByelawWalk, 680, 726),
+                         (true, 772f + ByelawWalk, 784f - ByelawWalk, 480, 550),
+                         (true, 772f + ByelawWalk, 784f - ByelawWalk, 618, 701),
+                         (false, 516f + ByelawWalk, 528f - ByelawWalk, 744, 812),
+                         (false, 606f + ByelawWalk, 618f - ByelawWalk, 744, 812),
+                         (false, 701f + ByelawWalk, 713f - ByelawWalk, 744, 812),
                      })
             {
-                planted += TreeRow(alongX, line, side, a0, a1);
+                var both = far.HasValue && far.Value - near >= TwoRowsFrom;
+                var nearSide = !far.HasValue || both || street % 2 == 0;
+                oneSided += far.HasValue && !both ? 1 : 0;
+                if (nearSide)
+                {
+                    planted += TreeRow(alongX, near, 1, a0, a1, street);
+                }
+
+                if (far.HasValue && (both || !nearSide))
+                {
+                    planted += TreeRow(alongX, far.Value, -1, a0, a1, street);
+                }
+
+                street++;
             }
 
-            Debug.Log($"[VeilmouthCity] street trees (§25.3, §26): {planted}, each in its pit by the kerb.");
+            Debug.Log($"[VeilmouthCity] street trees (§25.3, §26, §27): {planted}, each in its pit by the kerb; {oneSided} narrow streets planted on one side.");
         }
 
-        private static int TreeRow(bool alongX, float line, int side, int a0, int a1)
+        private static int TreeRow(bool alongX, float line, int side, int a0, int a1, int street)
         {
             var last = float.MinValue;
             var planted = 0;
@@ -107,7 +138,7 @@ namespace GameDev.Slice.EditorTools
                     continue;
                 }
 
-                if (OnCarriageway(RowTree(planted), c, VeilmouthPavements.PitSize) != null)
+                if (OnCarriageway(RowTree(street, planted), c, VeilmouthPavements.PitSize) != null)
                 {
                     _pavements.Pit(c);
                     last = along;
