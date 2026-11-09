@@ -27,9 +27,17 @@ namespace GameDev.Player.Progression
         [Tooltip("10.4 §2 Modifiers: their sum stays between minus and plus this.")]
         [SerializeField, Min(0)] private int modifierCap = 4;
 
+        [Tooltip("10.4 §3: the Intelligence from which an option shows the percentage of its check.")]
+        [SerializeField, Min(1)] private int chanceFromIntelligence = 10;
+
+        [Tooltip("10.4 §3: the Intelligence from which an option shows the modifiers behind its chance.")]
+        [SerializeField, Min(1)] private int modifiersFromIntelligence = 20;
+
         public int Request(RequestSize size) => requests[(int)size];
         public int Enemy => enemy;
         public int ValueStep => valueStep;
         public int ModifierCap => modifierCap;
+        public int ChanceFromIntelligence => chanceFromIntelligence;
+        public int ModifiersFromIntelligence => modifiersFromIntelligence;
     }
 }

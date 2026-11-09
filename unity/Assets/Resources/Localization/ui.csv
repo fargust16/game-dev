@@ -2,7 +2,7 @@
 "# The HUD and its prompts (HudView, Hud.uxml); a key's letter is the key bound to it"
 ui.prompt.enter,E  Enter,E  Войти
 ui.prompt.read,E  Read,E  Читать
-ui.prompt.ask,E  Ask,E  Спросить
+ui.prompt.talk,E  Talk,E  Говорить
 ui.hud.time,Day {0} · {1:00}:{2:00},День {0} · {1:00}:{2:00}
 ui.hud.reading.close,E  Close,E  Закрыть
 ui.hud.map.title,Veilmouth,Вейлмут
@@ -10,8 +10,19 @@ ui.hud.map.close,M  Close,M  Закрыть
 ui.hud.notes.title,Notes,Записи
 ui.hud.notes.close,J  Close,J  Закрыть
 ui.hud.notes.empty,Nothing noted yet.,Пока ничего не записано.
-"# The tip sources (TipSourcePoint): a board's title, and what each says when it has nothing now"
+"# The tip sources (TipSourcePoint): a board's title, and what it says when it has nothing now"
 source.board.title,Notice Board,Доска объявлений
 source.board.nothing,Nothing new on the board.,На доске ничего нового.
-source.nell.nothing,"""Not now, love. Come back of an evening.""","«Не сейчас, дорогуша. Загляни вечерком.»"
-source.kit.nothing,"""Nothing fresh. Come back tomorrow.""",«Свежего ничего. Приходи завтра.»
+"# The dialogue column (PersonTalk, S2.4): its keys, the character's name for itself, a check's tag by Intelligence (10.4 §3), and its result"
+ui.hud.dialogue.close,1–9  Answer    Esc  Leave,1–9  Ответить    Esc  Уйти
+ui.dialogue.you,You,Вы
+ui.dialogue.check,[{0}],[{0}]
+ui.dialogue.check.chance,[{0}: {1} %],[{0}: {1} %]
+ui.dialogue.check.modifiers,"(Attitude {0}, {1} {2}, Arguments {3})","(Отношение {0}, {1} {2}, Аргументы {3})"
+ui.dialogue.reputation,Reputation,Репутация
+ui.dialogue.danger,Danger,Опасность
+ui.dialogue.success,{0}: success.,{0}: успех.
+ui.dialogue.failure,{0}: failure.,{0}: неудача.
+ui.skill.persuasion,Persuasion,Убеждение
+ui.skill.deception,Deception,Обман
+ui.skill.intimidation,Intimidation,Запугивание

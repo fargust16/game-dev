@@ -1,7 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using GameDev.Core.Localization;
+using GameDev.Dialogue;
 using GameDev.Input;
 using GameDev.Locomotion;
+using GameDev.Player.Progression;
+using GameDev.Player.Standing;
 using GameDev.UI;
 using GameDev.World.Poi;
 using GameDev.World.State;
@@ -13,7 +18,8 @@ namespace GameDev.Slice
 {
     /// <summary>
     /// Owns the slice's run-time world: the world state store, the POI Director on the running clock, the tips the
-    /// sources say, the Character Notes on J, the map on M, and the next language on F10. It lives through scene changes like the clock; a
+    /// sources say, the character's values and standing, the conversations (S2.4), the Character Notes on J, the map
+    /// on M, and the next language on F10. It lives through scene changes like the clock; a
     /// driver that arrives with a later scene while one already runs removes itself, so a scene may carry one for testing.
     /// </summary>
     public sealed class SliceWorldDriver : MonoBehaviour
@@ -43,6 +49,42 @@ namespace GameDev.Slice
         public IWorldClock Clock { get; private set; }
 
         public CharacterNotes Notes { get; private set; }
+
+        /// <summary>The character's attributes and skills, all 1 until S5b's character creation (S2 authoring default).</summary>
+        public CharacterSheet Character { get; private set; }
+
+        /// <summary>The Deeds Record, Attitude and lies (10.4 §4–5).</summary>
+        public SocialStanding Standing { get; private set; }
+
+        private DialogueContext _talk;
+
+        /// <summary>10.4 §2–3's numbers, the Intelligence that shows a check's chance and its modifiers among them.</summary>
+        public SocialCheckRules CheckRules => settings != null ? settings.SocialChecks : null;
+
+        /// <summary>
+        /// Opens a conversation (10.4; S2.4): it pauses the world until it ends. Approaches a later milestone builds
+        /// stay hidden: Veil and Confront until S3 (owner, 2026-11-09).
+        /// </summary>
+        public IDialogueRunner Talk(DialogueDefinition dialogue) => new DialogueSession(dialogue, _talk);
+
+        /// <summary>
+        /// Development command (S2 authoring default): every attribute and skill of the character to the next of these
+        /// values, so the chance (Intelligence 10) and its modifiers (20) can be seen before S5b's character creation.
+        /// </summary>
+        public static readonly int[] DevelopmentValues = { CharacterSheet.Lowest, 10, 20 };
+
+        public void SetCharacterValues(int value)
+        {
+            foreach (CharacterAttribute attribute in Enum.GetValues(typeof(CharacterAttribute)))
+            {
+                Character.Set(attribute, value);
+            }
+
+            foreach (CharacterSkill skill in Enum.GetValues(typeof(CharacterSkill)))
+            {
+                Character.Set(skill, value);
+            }
+        }
 
         /// <summary>Setup for scenes built by code; a placed driver is set in the Inspector.</summary>
         public void Configure(SliceSettings sliceSettings, PoiDefinition[] definitions, TipCatalogue catalogue, TextAsset plan)
@@ -111,10 +153,33 @@ namespace GameDev.Slice
                 return;
             }
 
+            if (settings.SocialChecks == null || settings.Standing == null)
+            {
+                Debug.LogError("SliceSettings needs the SocialCheckRules and the StandingRules.", settings);
+                enabled = false;
+                return;
+            }
+
+            var seed = settings.CreateSeed();
             State = new WorldState();
-            Director = new PoiDirector(pois, State, settings.CreateSeed(), SliceSeedStreams.PoiUnattended, Clock);
+            Director = new PoiDirector(pois, State, seed, SliceSeedStreams.PoiUnattended, Clock);
             Director.Evaluate(Clock.Tick);
             Tips = new TipBook(tips, State, Director);
+            Character = new CharacterSheet();
+            Standing = new SocialStanding(State, settings.Standing, Clock, seed, SliceSeedStreams.Lies);
+            _talk = new DialogueContext
+            {
+                State = State,
+                Clock = Clock,
+                Seed = seed,
+                CheckStream = SliceSeedStreams.SocialChecks,
+                Rules = settings.SocialChecks,
+                Standing = Standing,
+                Character = Character,
+                Director = Director,
+                Tips = Tips,
+                Withheld = new HashSet<Approach> { Approach.Veil, Approach.Confront },
+            };
             Notes = new CharacterNotes(Tips);
             Notes.Added += _ => Refresh();
             State.Changed += (_, _, _) => Refresh();
@@ -133,6 +198,14 @@ namespace GameDev.Slice
             if (input.LanguagePressed)
             {
                 Loc.Next();
+            }
+
+            if (input.DevCharacterValuesPressed && Debug.isDebugBuild)
+            {
+                var now = Character.Get(CharacterAttribute.Intelligence);
+                var next = DevelopmentValues.FirstOrDefault(v => v > now);
+                SetCharacterValues(next == 0 ? DevelopmentValues[0] : next);
+                Debug.Log($"[Slice] Development command: every attribute and skill of the character is {Character.Get(CharacterAttribute.Intelligence)}.");
             }
 
             var hud = Hud();
@@ -207,6 +280,7 @@ namespace GameDev.Slice
             if (_running == this)
             {
                 Loc.Changed -= Refresh;
+                Standing?.Dispose();
                 Director?.Dispose();
                 _running = null;
             }

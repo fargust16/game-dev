@@ -12,8 +12,8 @@ namespace GameDev.UI
 {
     /// <summary>
     /// The slice HUD (17 X.6), on UI Toolkit: the day and time from the running clock, a prompt while the player is
-    /// within reach of a door or another <see cref="IPromptSource"/>, and the plain reading panel of S1.3. Presentation
-    /// only: it reads the clock, the doors, and the sources and changes nothing. Its own words are string table keys
+    /// within reach of a door or another <see cref="IPromptSource"/>, the plain reading panel of S1.3, and the dialogue
+    /// column of S2.4. Presentation only: it reads the clock, the doors, and the sources and changes nothing. Its own words are string table keys
     /// (17 X.7): a UXML label of the class <c>hud__loc</c> carries its key as its text, and every word follows a change of
     /// language.
     /// </summary>
@@ -45,6 +45,14 @@ namespace GameDev.UI
         private Label _nameTag;
 
         private const string NameTagVisible = "hud__nametag--visible";
+
+        private const string DialogueVisible = "hud__dialogue--visible";
+        private const string DialogueSpeakerClass = "hud__dialogue-speaker";
+        private const string DialogueLineClass = "hud__dialogue-line";
+        private const string DialogueOptionClass = "hud__dialogue-option";
+        private VisualElement _dialogue;
+        private ScrollView _dialogueLines;
+        private VisualElement _dialogueOptions;
 
         /// <summary>Authoring default, m: the HUD names a person within this reach.</summary>
         private const float NameReach = 6f;
@@ -150,6 +158,71 @@ namespace GameDev.UI
             _map?.RemoveFromClassList(MapVisible);
         }
 
+        public bool IsDialogueOpen => _dialogue != null && _dialogue.ClassListContains(DialogueVisible);
+
+        /// <summary>What the dialogue column shows as said, top first, without the speakers' names.</summary>
+        public IReadOnlyList<string> DialogueLines => Texts(_dialogueLines, DialogueLineClass);
+
+        /// <summary>The numbered options the dialogue column offers, as shown.</summary>
+        public IReadOnlyList<string> DialogueOptions => Texts(_dialogueOptions, DialogueOptionClass);
+
+        /// <summary>
+        /// Opens the dialogue column of S2.4 at the right edge, or refreshes it: what was said above, each with its
+        /// speaker or none, the latest at the bottom, and the numbered options below.
+        /// </summary>
+        public void ShowDialogue(IReadOnlyList<(string speaker, string text)> lines, IReadOnlyList<string> options)
+        {
+            if (!Bind() || _dialogue == null || _dialogueLines == null || _dialogueOptions == null)
+            {
+                return;
+            }
+
+            _dialogueLines.Clear();
+            Label last = null;
+            foreach (var (speaker, text) in lines)
+            {
+                if (!string.IsNullOrEmpty(speaker))
+                {
+                    _dialogueLines.Add(Text(speaker, DialogueSpeakerClass));
+                }
+
+                last = Text(text, DialogueLineClass);
+                _dialogueLines.Add(last);
+            }
+
+            _dialogueOptions.Clear();
+            foreach (var option in options)
+            {
+                _dialogueOptions.Add(Text(option, DialogueOptionClass));
+            }
+
+            CloseReading();
+            CloseNotes();
+            CloseMap();
+            _dialogue.AddToClassList(DialogueVisible);
+            if (last != null)
+            {
+                // Once laid out, the latest line is in view.
+                _dialogueLines.schedule.Execute(() => _dialogueLines.ScrollTo(last));
+            }
+        }
+
+        public void CloseDialogue()
+        {
+            _dialogue?.RemoveFromClassList(DialogueVisible);
+        }
+
+        private static Label Text(string text, string className)
+        {
+            var label = new Label(text) { pickingMode = PickingMode.Ignore };
+            label.AddToClassList(className);
+            return label;
+        }
+
+        private static IReadOnlyList<string> Texts(VisualElement within, string className) => within == null
+            ? new string[0]
+            : within.Query<Label>(className: className).ToList().Select(l => l.text).ToList();
+
         private void Start()
         {
             if (!Bind())
@@ -190,6 +263,9 @@ namespace GameDev.UI
             _notes = root.Q<VisualElement>("notes");
             _notesList = root.Q<ScrollView>("notes-list");
             _map = root.Q<VisualElement>("map");
+            _dialogue = root.Q<VisualElement>("dialogue");
+            _dialogueLines = root.Q<ScrollView>("dialogue-lines");
+            _dialogueOptions = root.Q<VisualElement>("dialogue-options");
             if (_time == null || _prompt == null || _reading == null || _readingTitle == null || _readingText == null || _notes == null || _notesList == null)
             {
                 _time = null;
@@ -239,7 +315,8 @@ namespace GameDev.UI
                 _time.text = HudText.DayAndTime(clock.Day, clock.MinuteOfDay);
             }
 
-            var prompt = Prompt();
+            // A conversation has its own keys; nothing else is offered while it is open.
+            var prompt = IsDialogueOpen ? null : Prompt();
             if (prompt != null)
             {
                 _prompt.text = prompt;

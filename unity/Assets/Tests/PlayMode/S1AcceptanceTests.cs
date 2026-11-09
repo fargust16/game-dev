@@ -22,18 +22,7 @@ namespace GameDev.Slice.Tests
         [UnityTest]
         public IEnumerator ATipMarksAPoiTheMapShowsItAndLeftAloneItLeavesItsAftermath()
         {
-            // A fresh world and clock: the ones from an earlier test live on through scene loads.
-            foreach (var old in Object.FindObjectsByType<SliceWorldDriver>(FindObjectsSortMode.None))
-            {
-                Object.Destroy(old.gameObject);
-            }
-
-            foreach (var old in Object.FindObjectsByType<GameClockDriver>(FindObjectsSortMode.None))
-            {
-                Object.Destroy(old.gameObject);
-            }
-
-            yield return null;
+            yield return ForgetTheWorld();
             yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
             var world = SliceWorldDriver.Running;
             var hud = Object.FindAnyObjectByType<HudView>();

@@ -34,6 +34,9 @@ namespace GameDev.Dialogue
 
         /// <summary>Whether the character holds an item; null hides every option that shows one.</summary>
         public Func<string, bool> Holds { get; set; }
+
+        /// <summary>What the sources say and the player has heard (09); null hides every option that asks for a tip.</summary>
+        public TipBook Tips { get; set; }
     }
 
     /// <summary>
@@ -57,8 +60,8 @@ namespace GameDev.Dialogue
                 throw new ArgumentException("A conversation needs the world state, the clock, the seed and its stream, the rules, the standing and the character.", nameof(world));
             }
 
-            Node = dialogue.Start ?? throw new ArgumentException($"Dialogue {dialogue.Id} has no start node.", nameof(dialogue));
             _pause = world.Clock.Pause();
+            Arrive(dialogue.Start ?? throw new ArgumentException($"Dialogue {dialogue.Id} has no start node.", nameof(dialogue)), new Tip[0]);
         }
 
         public event Action<DialogueEnd> Ended;
@@ -68,6 +71,8 @@ namespace GameDev.Dialogue
         public bool IsOpen => _pause != null;
 
         public DialogueNode Node { get; private set; }
+
+        public IReadOnlyList<Tip> Said { get; private set; } = new Tip[0];
 
         public DialogueEnd? EndedHow { get; private set; }
 
@@ -167,6 +172,11 @@ namespace GameDev.Dialogue
                 return false;
             }
 
+            if (!string.IsNullOrEmpty(option.asks) && (_world.Tips == null || !_world.Tips.CanTell(option.asks, _world.Clock.Tick)))
+            {
+                return false;
+            }
+
             return option.kind != OptionKind.ShowItem || (_world.Holds != null && _world.Holds(option.item));
         }
 
@@ -196,17 +206,31 @@ namespace GameDev.Dialogue
 
         private void Follow(DialogueOutcome outcome)
         {
-            Apply(outcome);
+            var told = Apply(outcome);
             if (string.IsNullOrEmpty(outcome.next))
             {
                 End(DialogueEnd.Finished);
                 return;
             }
 
-            Node = Dialogue.Node(outcome.next) ?? throw new InvalidOperationException($"Dialogue {Dialogue.Id} has no node {outcome.next}.");
+            Arrive(Dialogue.Node(outcome.next) ?? throw new InvalidOperationException($"Dialogue {Dialogue.Id} has no node {outcome.next}."), told);
         }
 
-        private void Apply(DialogueOutcome outcome)
+        /// <summary>The node shown now, and the tips said on arriving: those the outcome told, then its source's.</summary>
+        private void Arrive(DialogueNode node, IReadOnlyList<Tip> told)
+        {
+            Node = node;
+            var said = told.ToList();
+            if (node.saysTips && _world.Tips != null)
+            {
+                said.AddRange(_world.Tips.Read(node.source, _world.Clock.Tick).Where(t => !said.Contains(t)));
+            }
+
+            Said = said;
+        }
+
+        /// <summary>Raises its keys, settles its POI, tells its tips, then lets its minutes pass; returns the tips told.</summary>
+        private IReadOnlyList<Tip> Apply(DialogueOutcome outcome)
         {
             foreach (var key in outcome.raises)
             {
@@ -217,6 +241,23 @@ namespace GameDev.Dialogue
             {
                 _world.Director.ResolveParticipated(outcome.settles);
             }
+
+            var told = new List<Tip>();
+            foreach (var id in outcome.tells)
+            {
+                var tip = _world.Tips?.Tell(id, _world.Clock.Tick);
+                if (tip != null)
+                {
+                    told.Add(tip);
+                }
+            }
+
+            if (outcome.minutes > 0)
+            {
+                _world.Clock.AdvanceTicks(outcome.minutes);
+            }
+
+            return told;
         }
 
         private void End(DialogueEnd how)
@@ -224,6 +265,7 @@ namespace GameDev.Dialogue
             _pause.Dispose();
             _pause = null;
             Node = null;
+            Said = new Tip[0];
             EndedHow = how;
             _world.Clock.AdvanceTicks(1);
             Ended?.Invoke(how);

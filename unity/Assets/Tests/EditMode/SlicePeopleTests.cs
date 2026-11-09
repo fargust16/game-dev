@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GameDev.Slice.EditorTools;
 using GameDev.Slice.People;
-using GameDev.World.Poi;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -10,7 +9,7 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S1.5: every named person of SLICE_PEOPLE §1 stands at its place, once.</summary>
+    /// <summary>S1.5: every named person of SLICE_PEOPLE §1 stands at its place, once; Nell and Kit are talked to (S2.4).</summary>
     public sealed class SlicePeopleTests
     {
         [Test]
@@ -33,15 +32,17 @@ namespace GameDev.Slice.Tests
                     Assert.IsTrue(Physics.Raycast(person.transform.position + Vector3.up, Vector3.down, 1.3f, ~LayerMask.GetMask("Character")),
                         $"{entry.Name} stands on a floor at {person.transform.position}");
 
-                    var source = person.GetComponent<TipSourcePoint>();
+                    Assert.IsNull(person.GetComponent<TipSourcePoint>(), $"{entry.Name} is asked in conversation, not read as a board");
+                    var talk = person.GetComponent<PersonTalk>();
                     if (person.Id == "nell" || person.Id == "kit")
                     {
-                        Assert.IsNotNull(source, $"{entry.Name} is a tip source");
-                        Assert.AreEqual(person.Id == "nell" ? TipSource.Bartender : TipSource.StreetRumour, source.Source);
+                        Assert.IsNotNull(talk, $"{entry.Name} can be talked to");
+                        Assert.AreSame(SlicePeople.DialogueOf(person.Id), talk.Dialogue, $"{entry.Name}'s conversation");
+                        Assert.IsNotNull(talk.Dialogue);
                     }
                     else
                     {
-                        Assert.IsNull(source, $"{entry.Name} gives no S1 tips");
+                        Assert.IsNull(talk, $"{entry.Name} has no conversation before its milestone");
                     }
                 }
             }

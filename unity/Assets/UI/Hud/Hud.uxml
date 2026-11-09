@@ -15,6 +15,11 @@
             <ui:VisualElement name="map-area" class="hud__map-area" picking-mode="Ignore" />
             <ui:Label class="hud__reading-close hud__loc" text="ui.hud.map.close" picking-mode="Ignore" />
         </ui:VisualElement>
+        <ui:VisualElement name="dialogue" class="hud__dialogue" picking-mode="Ignore">
+            <ui:ScrollView name="dialogue-lines" class="hud__dialogue-lines" />
+            <ui:VisualElement name="dialogue-options" class="hud__dialogue-options" picking-mode="Ignore" />
+            <ui:Label class="hud__reading-close hud__loc" text="ui.hud.dialogue.close" picking-mode="Ignore" />
+        </ui:VisualElement>
         <ui:VisualElement name="notes" class="hud__notes">
             <ui:Label class="hud__notes-title hud__loc" text="ui.hud.notes.title" picking-mode="Ignore" />
             <ui:ScrollView name="notes-list" class="hud__notes-list" />

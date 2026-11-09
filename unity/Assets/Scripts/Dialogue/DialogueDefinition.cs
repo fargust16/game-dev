@@ -71,6 +71,12 @@ namespace GameDev.Dialogue
 
         [Tooltip("A POI this settles through ResolveParticipated, if its window is still open.")]
         public PoiDefinition settles;
+
+        [Tooltip("Tips told by it, by id (09): each is heard, if its source would say it now, and marks or hints its POI.")]
+        public string[] tells = new string[0];
+
+        [Tooltip("Game minutes it takes, such as a service done in Exchange (S2.4); the world runs on by them.")]
+        [Min(0)] public int minutes;
     }
 
     /// <summary>One numbered option (10.4; S2.3). Its words are <c>dialogue.&lt;dialogue&gt;.&lt;node&gt;.&lt;option&gt;</c>.</summary>
@@ -104,13 +110,20 @@ namespace GameDev.Dialogue
         [Tooltip("The listener a check addresses; empty for the node's speaker.")]
         public string listener = "";
 
+        [Tooltip("A tip asked for, by id: the option appears only while that tip could be told and is not yet heard (S2.4).")]
+        public string asks = "";
+
         public DialogueOutcome success = new DialogueOutcome();
 
         [Tooltip("Only for a check that fails.")]
         public DialogueOutcome failure = new DialogueOutcome();
     }
 
-    /// <summary>One step of a conversation: what its speaker says, <c>dialogue.&lt;dialogue&gt;.&lt;node&gt;</c>, and the options after it.</summary>
+    /// <summary>
+    /// One step of a conversation: what its speaker says, <c>dialogue.&lt;dialogue&gt;.&lt;node&gt;</c>, and the options
+    /// after it. The tips said on arriving, by the node's source or by the outcome that led there, take the place of
+    /// its line; the line is said when there are none.
+    /// </summary>
     [Serializable]
     public sealed class DialogueNode
     {
@@ -118,6 +131,12 @@ namespace GameDev.Dialogue
 
         [Tooltip("The listener who says the line, or empty for the scene itself.")]
         public string speaker = "";
+
+        [Tooltip("Says what its source says now (09; S2.4): those tips are heard on arriving, and its own line is said only when there are none.")]
+        public bool saysTips;
+
+        [Tooltip("The source whose tips it says, with Says Tips.")]
+        public TipSource source;
 
         public DialogueOption[] options = new DialogueOption[0];
     }

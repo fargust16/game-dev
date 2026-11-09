@@ -31,16 +31,42 @@ namespace GameDev.World.Poi
         public event Action<Tip> Heard;
 
         /// <summary>The lines <paramref name="source"/> says at <paramref name="tick"/>, in catalogue order.</summary>
-        public IReadOnlyList<Tip> Available(TipSource source, long tick)
+        public IReadOnlyList<Tip> Available(TipSource source, long tick) =>
+            _tips.Where(t => t.source == source && !t.needsApproach && Says(t, tick)).ToList();
+
+        /// <summary>
+        /// Whether the tip <paramref name="id"/> could be told now and has not been heard: its source's day, hour and
+        /// condition hold. A tip that needs an Approach is told only this way, by the conversation the Approach wins (S2.4).
+        /// </summary>
+        public bool CanTell(string id, long tick)
+        {
+            var tip = Find(id);
+            return tip != null && !HasHeard(tip) && Says(tip, tick);
+        }
+
+        /// <summary>Tells the tip <paramref name="id"/> if it can be told now: hears it and returns it, or returns null.</summary>
+        public Tip Tell(string id, long tick)
+        {
+            if (!CanTell(id, tick))
+            {
+                return null;
+            }
+
+            var tip = Find(id);
+            Hear(tip);
+            return tip;
+        }
+
+        /// <summary>The tip of this id in the catalogue, or null.</summary>
+        public Tip Find(string id) => _tips.FirstOrDefault(t => t.id == id);
+
+        private bool Says(Tip tip, long tick)
         {
             var day = (int)(tick / MinutesPerDay) + 1;
             var minute = (int)(tick % MinutesPerDay);
-            return _tips.Where(t => t.source == source
-                                    && !t.needsApproach
-                                    && (t.day == 0 || t.day == day)
-                                    && minute >= t.fromMinute
-                                    && (string.IsNullOrWhiteSpace(t.requiresKey) || _state.Get(t.requiresKey) >= t.requiresAtLeast))
-                .ToList();
+            return (tip.day == 0 || tip.day == day)
+                   && minute >= tip.fromMinute
+                   && (string.IsNullOrWhiteSpace(tip.requiresKey) || _state.Get(tip.requiresKey) >= tip.requiresAtLeast);
         }
 
         /// <summary>Reads the board or asks the person: hears and returns every line the source says now.</summary>

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using GameDev.Core.Localization;
@@ -11,17 +10,16 @@ using UnityEngine;
 namespace GameDev.Slice
 {
     /// <summary>
-    /// A source the player reads or asks (09; S1.3): the Notice Board, and the publican and the newsboy from S1.5.
-    /// Interact in reach shows what it says now in the HUD's plain panel until S2's dialogue replaces it; Interact
-    /// again, or walking away, closes it. Asking a person is dialogue, so the world pauses while the panel is open
-    /// and the talk costs one tick when it ends (10.4); reading a board does not pause it. Its words are string table
-    /// keys (17 X.7), and an open panel follows a change of language.
+    /// A source the player reads (09; S1.3): the Notice Board. Interact in reach shows what it says now in the HUD's
+    /// plain panel; Interact again, or walking away, closes it. Reading does not pause the world. People are asked in
+    /// conversation instead (<see cref="PersonTalk"/>, S2.4). Its words are string table keys (17 X.7), and an open panel
+    /// follows a change of language.
     /// </summary>
     public sealed class TipSourcePoint : MonoBehaviour, IPromptSource
     {
         [SerializeField] private TipSource source;
 
-        [Tooltip("The string table key of the panel's title, e.g. the board's or the person's name.")]
+        [Tooltip("The string table key of the panel's title, e.g. the board's name.")]
         [SerializeField] private string titleKey = "source.board.title";
 
         [Tooltip("The string table key of what the panel says when the source has nothing now.")]
@@ -32,7 +30,6 @@ namespace GameDev.Slice
 
         private PlayerLocomotion _player;
         private HudView _hud;
-        private IDisposable _pause;
         private IReadOnlyList<Tip> _shown = new Tip[0];
 
         public TipSource Source => source;
@@ -48,41 +45,10 @@ namespace GameDev.Slice
             interactRadius = radius;
         }
 
-        /// <summary>
-        /// True when the player stands within reach on the same level and sees the source: the publican could be asked
-        /// from the landing above the taproom (owner's play test VI-5, remark 2). Walls, floors and ceilings block the
-        /// sight line, taken at chest height; a counter, which is lower, does not.
-        /// </summary>
-        public bool InReach(Vector3 position)
-        {
-            var offset = position - transform.position;
-            if (offset.y < -SameLevel || offset.y > SameLevel)
-            {
-                return false;
-            }
+        /// <summary>True when the player stands within reach on the same level and sees the source.</summary>
+        public bool InReach(Vector3 position) => InteractReach.Within(transform, position, interactRadius);
 
-            offset.y = 0f;
-            if (offset.sqrMagnitude > interactRadius * interactRadius)
-            {
-                return false;
-            }
-
-            // The source's own body (a notice board) is the last thing on the line, so hitting it first means nothing
-            // stands between.
-            var mask = LayerMask.GetMask("Ground", "Structure");
-            return mask == 0
-                   || !Physics.Linecast(position + (Vector3.up * Chest), transform.position + (Vector3.up * Chest), out var hit, mask, QueryTriggerInteraction.Ignore)
-                   || hit.collider.transform.IsChildOf(transform);
-        }
-
-        /// <summary>Authoring default, m: a source more than this above or below the player stands on another level.</summary>
-        private const float SameLevel = 1.5f;
-
-        /// <summary>Authoring default, m: the sight line's height over the feet, above a counter's 1.05 m.</summary>
-        private const float Chest = 1.4f;
-
-        public string PromptFor(Vector3 player) =>
-            !IsOpen && InReach(player) ? Loc.Get(source == TipSource.NoticeBoard ? "ui.prompt.read" : "ui.prompt.ask") : null;
+        public string PromptFor(Vector3 player) => !IsOpen && InReach(player) ? Loc.Get("ui.prompt.read") : null;
 
         /// <summary>What Interact does: opens the panel with what the source says now, or closes it.</summary>
         public void Use()
@@ -103,10 +69,6 @@ namespace GameDev.Slice
             _shown = world.Tips.Read(source, world.Clock.Tick);
             IsOpen = true;
             Show();
-            if (source != TipSource.NoticeBoard)
-            {
-                _pause = world.Clock.Pause();
-            }
         }
 
         // What was said stays what was said; only its words follow the language.
@@ -127,12 +89,6 @@ namespace GameDev.Slice
         {
             IsOpen = false;
             Hud()?.CloseReading();
-            if (_pause != null)
-            {
-                _pause.Dispose();
-                _pause = null;
-                SliceWorldDriver.Running?.Clock.AdvanceTicks(1);
-            }
         }
 
         private void Update()

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using GameDev.Dialogue;
 using GameDev.Slice.People;
-using GameDev.World.Poi;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -11,8 +11,9 @@ namespace GameDev.Slice.EditorTools
     /// <summary>
     /// S1.5, once (SLICE_PEOPLE §1): the fourteen named people in the owner's scenes. Eleven take the place and pose of
     /// the Dummy that stood for their role; Pip, Lottie, and Kit are new, at the first free place of their list. Each
-    /// is a Dummy of the role's colour and the person's sex, named, with <see cref="NamedPerson"/>; Nell and Kit are
-    /// also the bartender and Street Rumour sources of S1.3. A person already placed is left as it is.
+    /// is a Dummy of the role's colour and the person's sex, named, with <see cref="NamedPerson"/>; Nell and Kit, the
+    /// bartender and Street Rumour sources of S1.3, are talked to through their conversations since S2.4
+    /// (<see cref="PersonTalk"/>). A person already placed is left as it is.
     /// </summary>
     public static class SlicePeople
     {
@@ -45,12 +46,17 @@ namespace GameDev.Slice.EditorTools
             { "kit", (new[] { new Vector3(60f, 0f, -262f), new Vector3(52f, 0f, -263f), new Vector3(68f, 0f, -263f), new Vector3(60f, 0f, -238f), new Vector3(58f, 0f, -270f) }, 0f, "tobias") },
         };
 
-        /// <summary>The people who are tip sources, and their reach, m; the panel's title is their name, and what they say with nothing now is <c>source.&lt;id&gt;.nothing</c>.</summary>
-        private static readonly Dictionary<string, (TipSource source, float reach)> Sources = new Dictionary<string, (TipSource, float)>
+        /// <summary>The people one talks to (S2.4): their conversation in <c>Assets/Data/Slice/Dialogue/</c>, and their reach, m.</summary>
+        private static readonly Dictionary<string, (string dialogue, float reach)> Talks = new Dictionary<string, (string, float)>
         {
-            { "nell", (TipSource.Bartender, 3f) },
-            { "kit", (TipSource.StreetRumour, 2f) },
+            { "nell", ("NellDialogue", 3f) },
+            { "kit", ("KitDialogue", 2f) },
         };
+
+        /// <summary>The conversation of the person <paramref name="id"/>, or null for one nobody talks to yet.</summary>
+        public static DialogueDefinition DialogueOf(string id) => Talks.TryGetValue(id, out var talk)
+            ? AssetDatabase.LoadAssetAtPath<DialogueDefinition>($"Assets/Data/Slice/Dialogue/{talk.dialogue}.asset")
+            : null;
 
         public static string ScenePath(string scene) =>
             scene == SliceRoster.Veilmouth ? "Assets/Scenes/Slice/Veilmouth.unity" : $"Assets/Scenes/Slice/Interiors/{scene}.unity";
@@ -128,9 +134,9 @@ namespace GameDev.Slice.EditorTools
             }
 
             person.AddComponent<NamedPerson>().Configure(entry.Id);
-            if (Sources.TryGetValue(entry.Id, out var source))
+            if (Talks.TryGetValue(entry.Id, out var talk))
             {
-                person.AddComponent<TipSourcePoint>().Configure(source.source, SliceRoster.NameKey(entry.Id), $"source.{entry.Id}.nothing", source.reach);
+                person.AddComponent<PersonTalk>().Configure(DialogueOf(entry.Id), talk.reach);
             }
 
             Debug.Log($"[SlicePeople] {entry.ObjectName}, {entry.Role}: {entry.Scene} at {position}{(oldName != null ? $", in place of '{oldName}'" : string.Empty)}.");

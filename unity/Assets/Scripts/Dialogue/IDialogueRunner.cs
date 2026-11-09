@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GameDev.Player.Standing;
+using GameDev.World.Poi;
 
 namespace GameDev.Dialogue
 {
@@ -69,6 +70,9 @@ namespace GameDev.Dialogue
 
         /// <summary>The node shown, or null once ended.</summary>
         DialogueNode Node { get; }
+
+        /// <summary>The tips said on arriving at the node (09; S2.4); with none, the node's own line is said.</summary>
+        IReadOnlyList<Tip> Said { get; }
 
         /// <summary>How it ended, once it has.</summary>
         DialogueEnd? EndedHow { get; }

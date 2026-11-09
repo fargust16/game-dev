@@ -2,7 +2,7 @@
 
 Status: Draft — proposed by the agent on 2026-11-06 and **accepted by the owner on 2026-11-07**: all fourteen, with the agent's placeholder names, which stay mutable.
 Created: 2026-11-06
-Last Updated: 2026-11-09 (S2.0: the names, roles and lines are in the string tables, in English and Russian. Earlier: accepted by the owner: the roster and the placeholder names. Earlier: first draft for the owner)
+Last Updated: 2026-11-09 (S2.4: Nell and Kit are talked to; Nell's Approaches, their Arguments and the Exchange, authoring defaults. Earlier: S2.0: the names, roles and lines are in the string tables, in English and Russian. Earlier: accepted by the owner: the roster and the placeholder names. Earlier: first draft for the owner)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](../../../11.1%20Vertical%20Slice%20POIs.md), [09 Information Sources](../../../09%20Information%20Sources.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §5
 Related: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1 (colours), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §21 (places)
 
@@ -45,6 +45,16 @@ The lines are 11.1's, sorted by source; S1 needs nothing more. Times are 11's au
 | Notice Board (renewed 08:00) | Morning: "Missing — mill girls, near Loom Lane", greased by soot thumbs (POI B, Hints); "Missing — Thomas Wren, clerk", posted by his sister (the trial's door); one task for money. 14:00, pinned: "Warden seizure notice — Harrow & Tincture, before second-shift bell" (POI A, Marks) | — | Morning: a new task; the Wren notice stays |
 | Nell Garrow, one tip each evening, more for Convince, Threaten, or Exchange | From 16:00: "Brass-numbers are taking old Harrow tonight…" (POI A, Marks); asked again with an Approach: "After the eleventh bell they take mill girls off Loom Lane. Tonight again." (POI B, Marks) | — | "Lane's wrong. Coal stairs got fresh chalk." (POI C, Marks) |
 | Kit Mallow, two or three lines a day, one a lead | "They want the drawers more than the man." (POI A, Hints); "Collectors in coach-coats. Not proper cabmen." (POI B, Hints) | — | "Wax seal melted funny on Harrow's door" or "glove by the coach ruts", by what happened (POI C, Hints) |
+
+Since S2.4 Nell and Kit are talked to in the dialogue column (`NellDialogue` and `KitDialogue` in `Assets/Data/Slice/Dialogue/`, their words in the `dialogue` table): each says the lines above on arriving, and the line for nothing new when there are none. Nell's Loom Lane tip, authoring defaults of 2026-11-09 the owner may change:
+
+| Approach | What it is | Argument (any one; each further +1) |
+|---|---|---|
+| Convince | Persuasion, a Small request: the girls vanish, say who takes them | The board's missing girls, the Wren notice, Kit's coach-coats |
+| Threaten | Intimidation, a Small request: she warned of the Wardens' raid, so they could hear who warns their marks | Her own Harrow tip, the seizure notice |
+| Exchange | A service, no check: an hour's work behind the bar, the world running on by 60 minutes | — |
+
+Her Listener Value is 1 for every check (Strength, Intelligence and Will 10), Kit's 0. A failed check leaves the other two; Threaten costs a step of her Attitude either way (10.4 §5).
 
 At most one rumour a day may be false, never about a Ritual Weak Point (09). The traces of the run's Weak Points are placed by the seed among these people (11 *Finding the traces*) and come with S6.
 

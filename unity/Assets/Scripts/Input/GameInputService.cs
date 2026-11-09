@@ -36,6 +36,7 @@ namespace GameDev.Input
         private InputAction _advanceHour;
         private InputAction _rewindHour;
         private InputAction _skipDayNight;
+        private InputAction _devCharacterValues;
 
         private InputAction _cancel;
         private InputAction _language;
@@ -143,6 +144,9 @@ namespace GameDev.Input
         public bool RewindHourPressed => _rewindHour != null && _rewindHour.WasPressedThisFrame();
         public bool SkipDayNightPressed => _skipDayNight != null && _skipDayNight.WasPressedThisFrame();
 
+        /// <summary>Development command (S2 authoring default, F8): the character's values to the next test step.</summary>
+        public bool DevCharacterValuesPressed => _devCharacterValues != null && _devCharacterValues.WasPressedThisFrame();
+
         public bool CancelPressed => _cancel != null && _cancel.WasPressedThisFrame();
 
         /// <summary>The next language (17 X.7); authoring default F10 until a settings page exists.</summary>
@@ -211,12 +215,14 @@ namespace GameDev.Input
             _rewindHour.AddBinding("<Keyboard>/leftBracket");
             _rewindHour.AddBinding("<Keyboard>/minus");
             _skipDayNight = _world.AddAction("SkipDayNight", InputActionType.Button, "<Keyboard>/n");
+            _devCharacterValues = _world.AddAction("DevCharacterValues", InputActionType.Button, "<Keyboard>/f8");
 
             _ui = new InputActionMap("UI");
             _cancel = _ui.AddAction("Cancel", InputActionType.Button, "<Keyboard>/escape");
             _language = _ui.AddAction("Language", InputActionType.Button, "<Keyboard>/f10");
-            _chooseOptions = new InputAction[5];
-            for (var i = 0; i < 5; i++)
+            // A conversation numbers up to nine options (S2.4).
+            _chooseOptions = new InputAction[9];
+            for (var i = 0; i < _chooseOptions.Length; i++)
             {
                 var action = _ui.AddAction($"Option{i + 1}", InputActionType.Button);
                 action.AddBinding($"<Keyboard>/{i + 1}");

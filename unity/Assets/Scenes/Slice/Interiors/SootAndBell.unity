@@ -13355,12 +13355,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 667046571}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a14414e0d83ffb2489a20685b84e7354, type: 3}
+  m_Script: {fileID: 11500000, guid: 7c1e3a5b9d2f4e6a8b0c2d4e6f8a1b3c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.TipSourcePoint
-  source: 1
-  titleKey: person.nell.name
-  nothingKey: source.nell.nothing
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.PersonTalk
+  dialogue: {fileID: 11400000, guid: a1c3e5f7b9d24f6a8c0e2b4d6f8a1c3e, type: 2}
   interactRadius: 3
 --- !u!114 &667046573
 MonoBehaviour:

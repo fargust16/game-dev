@@ -1,0 +1,213 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a7c9e1b3d5f4a7c9e1b3d5f7a9c1e3b, type: 3}
+  m_Name: NellDialogue
+  m_EditorClassIdentifier: 
+  id: nell
+  listeners:
+  - id: nell
+    nameKey: person.nell.name
+    enemy: 0
+    strength: 10
+    intelligence: 10
+    will: 10
+  nodes:
+  - id: evening
+    speaker: nell
+    saysTips: 1
+    source: 1
+    options:
+    - id: convince
+      approach: 1
+      kind: 1
+      arguments:
+      - tip.board.girls.heard
+      - tip.kit.coachcoats.heard
+      - tip.board.wren.heard
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 0
+      listener: 
+      asks: nell.collectors
+      success:
+        next: told
+        raises: []
+        settles: {fileID: 0}
+        tells:
+        - nell.collectors
+        minutes: 0
+      failure:
+        next: refused
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: threaten
+      approach: 2
+      kind: 1
+      arguments:
+      - tip.nell.harrow.heard
+      - tip.board.seizure.heard
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 2
+      request: 0
+      listener: 
+      asks: nell.collectors
+      success:
+        next: told
+        raises: []
+        settles: {fileID: 0}
+        tells:
+        - nell.collectors
+        minutes: 0
+      failure:
+        next: angry
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: exchange
+      approach: 3
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: nell.collectors
+      success:
+        next: told
+        raises: []
+        settles: {fileID: 0}
+        tells:
+        - nell.collectors
+        minutes: 60
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+    - id: leave
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: told
+    speaker: nell
+    saysTips: 0
+    source: 0
+    options:
+    - id: thanks
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: refused
+    speaker: nell
+    saysTips: 0
+    source: 0
+    options:
+    - id: go
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  - id: angry
+    speaker: nell
+    saysTips: 0
+    source: 0
+    options:
+    - id: out
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+  start: 

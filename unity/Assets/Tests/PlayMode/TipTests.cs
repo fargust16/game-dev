@@ -12,7 +12,10 @@ using UnityEngine.TestTools;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S1.3 in Veilmouth, in each language (S2.0): reading the Notice Board after 14:00 shows the seizure notice and marks POI A.</summary>
+    /// <summary>
+    /// S1.3 in Veilmouth, in each language (S2.0): reading the Notice Board after 14:00 shows the seizure notice and marks
+    /// POI A; since S2.4 the newsboy is talked to in the dialogue column.
+    /// </summary>
     public sealed class TipTests : SliceInputTestBase
     {
         private string _language;
@@ -75,9 +78,10 @@ namespace GameDev.Slice.Tests
         }
 
         [UnityTest]
-        public IEnumerator TheNewsboyIsNamedNearbyAndAskingHimPausesTheWorld([Values(Loc.English, Loc.Russian)] string language)
+        public IEnumerator TheNewsboyIsNamedNearbyAndTalkingToHimPausesTheWorld([Values(Loc.English, Loc.Russian)] string language)
         {
             Loc.Language = language;
+            yield return ForgetTheWorld();
             yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
             var world = SliceWorldDriver.Running;
             var kit = Object.FindObjectsByType<People.NamedPerson>(FindObjectsSortMode.None).Single(p => p.Id == "kit");
@@ -88,18 +92,21 @@ namespace GameDev.Slice.Tests
             var hud = Object.FindAnyObjectByType<HudView>();
             var name = Loc.Get("person.kit.name");
             Assert.AreEqual(name, hud.NameTagText, "the player sees the newsboy's name nearby");
-            Assert.AreEqual(Loc.Get("ui.prompt.ask"), hud.PromptText);
+            Assert.AreEqual(Loc.Get("ui.prompt.talk"), hud.PromptText);
 
             yield return Tap(Key.E);
 
-            Assert.IsTrue(hud.IsReadingOpen);
-            Assert.AreEqual(name, hud.ReadingTitle);
+            Assert.IsTrue(hud.IsDialogueOpen, "Interact opens the dialogue column");
+            CollectionAssert.AreEqual(new[] { Loc.Get("tip.kit.drawers.line"), Loc.Get("tip.kit.coachcoats.line") }, hud.DialogueLines,
+                "the morning's rumours, said on arriving");
+            CollectionAssert.AreEqual(new[] { "1. " + Loc.Get("dialogue.kit.news.leave") }, hud.DialogueOptions);
+            Assert.IsFalse(hud.IsPromptVisible, "no prompt while talking");
             Assert.IsTrue(world.Clock.IsPaused, "talk pauses the world (10.4)");
             var tick = world.Clock.Tick;
 
-            yield return Tap(Key.E);
+            yield return Tap(Key.Escape);
 
-            Assert.IsFalse(hud.IsReadingOpen);
+            Assert.IsFalse(hud.IsDialogueOpen, "Escape leaves");
             Assert.IsFalse(world.Clock.IsPaused);
             Assert.GreaterOrEqual(world.Clock.Tick, tick + 1, "the talk costs one tick when it ends");
         }

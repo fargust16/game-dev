@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections;
 using GameDev.Locomotion;
+using GameDev.World.Timekeeping;
 using NUnit.Framework;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -68,6 +69,22 @@ namespace GameDev.Slice.Tests
             return $"position {player.transform.position}, grounded {player.IsGrounded}, enabled {player.isActiveAndEnabled}, " +
                    $"input service {GameDev.Input.GameInputService.Instance != null}, move {GameDev.Input.GameInputService.Instance?.MoveVector}, " +
                    $"timeScale {Time.timeScale}, frame {Time.frameCount}, players {Object.FindObjectsByType<PlayerLocomotion>(FindObjectsInactive.Include).Length}";
+        }
+
+        /// <summary>Removes the world and the clock an earlier test left: they live on through scene loads.</summary>
+        protected static IEnumerator ForgetTheWorld()
+        {
+            foreach (var old in Object.FindObjectsByType<SliceWorldDriver>(FindObjectsSortMode.None))
+            {
+                Object.Destroy(old.gameObject);
+            }
+
+            foreach (var old in Object.FindObjectsByType<GameClockDriver>(FindObjectsSortMode.None))
+            {
+                Object.Destroy(old.gameObject);
+            }
+
+            yield return null;
         }
 
         protected static IEnumerator LoadScene(string path)

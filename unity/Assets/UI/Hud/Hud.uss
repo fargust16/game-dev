@@ -33,7 +33,7 @@
     display: flex;
 }
 
-/* The plain panel of S1.3: what a source says, until S2's dialogue replaces it. */
+/* The plain panel of S1.3: what a board says. People talk in the dialogue column of S2.4. */
 .hud__reading {
     position: absolute;
     left: 30%;
@@ -150,4 +150,58 @@
     background-color: rgba(255, 250, 235, 0.85);
     padding: 1px 4px;
     -unity-font-style: bold;
+}
+
+/* S2.4: a conversation, a column at the right edge as in Disco Elysium (owner, 2026-11-09): what was said above, the
+   latest at the bottom, the numbered options below, and the scene visible to its left. */
+.hud__dialogue {
+    position: absolute;
+    right: 24px;
+    top: 56px;
+    bottom: 24px;
+    width: 30%;
+    min-width: 360px;
+    padding: 18px 22px;
+    background-color: rgba(24, 20, 16, 0.9);
+    border-width: 1px;
+    border-color: rgb(120, 104, 80);
+    display: none;
+}
+
+.hud__dialogue--visible {
+    display: flex;
+}
+
+.hud__dialogue-lines {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.hud__dialogue-speaker {
+    font-size: 17px;
+    -unity-font-style: bold;
+    color: rgb(214, 176, 112);
+    margin-top: 10px;
+}
+
+.hud__dialogue-line {
+    font-size: 18px;
+    white-space: normal;
+    color: rgb(236, 228, 210);
+    margin-bottom: 4px;
+}
+
+.hud__dialogue-options {
+    flex-shrink: 0;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top-width: 1px;
+    border-color: rgb(120, 104, 80);
+}
+
+.hud__dialogue-option {
+    font-size: 18px;
+    white-space: normal;
+    color: rgb(222, 196, 150);
+    margin-bottom: 8px;
 }

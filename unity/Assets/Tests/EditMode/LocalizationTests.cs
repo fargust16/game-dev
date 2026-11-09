@@ -78,7 +78,7 @@ namespace GameDev.Slice.Tests
                 }
             }
 
-            Assert.AreEqual(3, found, "the board, the newsboy, and the publican");
+            Assert.AreEqual(1, found, "the board; the newsboy and the publican are talked to since S2.4");
         }
 
         [Test]
