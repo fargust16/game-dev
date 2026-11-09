@@ -4,7 +4,8 @@
     "references": [
         "GameDev.World.Portals",
         "GameDev.Core.Scenes",
-        "GameDev.Locomotion"
+        "GameDev.Locomotion",
+        "GameDev.World.Time"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
