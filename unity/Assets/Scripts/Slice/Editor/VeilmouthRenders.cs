@@ -25,7 +25,7 @@ namespace GameDev.Slice.EditorTools
             ShowCircles();
 
             // The wind controller runs only in an editor frame; a batch render sets its globals itself.
-            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
             // C2 views; an eye stands 1.7 m above the ground under it.
             Top("view_world", new Vector3(0f, 0f, 0f), 500f);
@@ -70,7 +70,7 @@ namespace GameDev.Slice.EditorTools
             Directory.CreateDirectory(OutputFolder);
             EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             ShowCircles();
-            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
             Top("c3_city", new Vector3(130f, 0f, -228f), 160f);
             Top("c3_government", new Vector3(106f, 0f, -180f), 55f);
@@ -460,7 +460,7 @@ namespace GameDev.Slice.EditorTools
                 return;
             }
 
-            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
             var root = GameObject.Find(VeilmouthMystic.RootName).transform;
             Transform First(string prefix) => root.GetComponentsInChildren<Transform>().FirstOrDefault(t => t.name.StartsWith(prefix));
@@ -524,7 +524,7 @@ namespace GameDev.Slice.EditorTools
                 return;
             }
 
-            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
             var street = VeilmouthScene.StreetLevel;
             var views = new (string Name, Vector3 From, Vector3 To)[]
@@ -583,7 +583,7 @@ namespace GameDev.Slice.EditorTools
             Directory.CreateDirectory(OutputFolder);
             EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
-            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
             _skyAndGrade = sky != null;
             try
@@ -623,7 +623,7 @@ namespace GameDev.Slice.EditorTools
             Directory.CreateDirectory(OutputFolder);
             EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
-            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
             _skyAndGrade = sky != null;
             try
@@ -712,7 +712,7 @@ namespace GameDev.Slice.EditorTools
             Directory.CreateDirectory(OutputFolder);
             EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
-            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
             _skyAndGrade = sky != null;
             try
@@ -788,7 +788,7 @@ namespace GameDev.Slice.EditorTools
                 return;
             }
 
-            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
             sky.Apply(12 * 60);
             var swatches = GameDev.VictorianKit.EditorTools.VicMaterials.Names.Where(n => !n.StartsWith("Glass"))
@@ -1006,7 +1006,7 @@ namespace GameDev.Slice.EditorTools
         {
             Directory.CreateDirectory(OutputFolder);
             EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
-            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
             Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>()?.Apply(12 * 60);
             var saved = QualitySettings.GetQualityLevel();

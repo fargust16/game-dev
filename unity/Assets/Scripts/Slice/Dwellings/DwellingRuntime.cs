@@ -108,7 +108,8 @@ namespace GameDev.Slice.Dwellings
             var door = DwellingAssembler.Build(Plan, kit, _built, key, key.StreetPortalId + ".inside");
             if (interior != null)
             {
-                interior.Configure(key.StreetPortalId);
+                // The dwelling's own id, the same through its street door and its back door.
+                interior.Configure(key.DwellingId);
             }
 
             // The door's arrival looks for the floor under it, which the physics scene knows only once synced.

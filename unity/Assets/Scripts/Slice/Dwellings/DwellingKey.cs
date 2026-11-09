@@ -3,7 +3,11 @@ using System.Globalization;
 
 namespace GameDev.Slice.Dwellings
 {
-    /// <summary>The kinds of house a dwelling's rooms come from (city plan C1 §8; 15).</summary>
+    /// <summary>
+    /// The kinds of house a dwelling's rooms come from (city plan C1 §8; 15). An Office is no home: every door of a civic
+    /// building, the palace and the clock tower opens into one, a reception, offices, an archive and a WC (owner, fifth
+    /// play test, 2026-11-09).
+    /// </summary>
     public enum DwellingArchetype
     {
         Terrace,
@@ -11,6 +15,7 @@ namespace GameDev.Slice.Dwellings
         Shop,
         Villa,
         Warehouse,
+        Office,
     }
 
     /// <summary>How well off a household is: it sets the Lock and the Stash (10.3 §6.1; 19 §6.3).</summary>
@@ -40,13 +45,19 @@ namespace GameDev.Slice.Dwellings
             Wealth = wealth;
         }
 
-        /// <summary>The street door's portal id, which is also the dwelling's id.</summary>
+        /// <summary>
+        /// The portal id of the door the journey came through, where the dwelling's door leads back: the street door, or a
+        /// back door of the same house.
+        /// </summary>
         public string StreetPortalId { get; }
+
+        /// <summary>The dwelling's own id, the street door's, the same whichever of its doors the journey came through.</summary>
+        public string DwellingId => IdAt(DoorX, DoorZ);
 
         /// <summary>The scene the street door stands in, where the dwelling's door leads back to.</summary>
         public string StreetScene { get; }
 
-        /// <summary>The street door's place in decimetres, world X and Z: the keys of the dwelling's seed stream.</summary>
+        /// <summary>The street door's place in decimetres, world X and Z: the keys of the dwelling's seed stream, also on a back door's key.</summary>
         public int DoorX { get; }
 
         public int DoorZ { get; }
@@ -60,6 +71,9 @@ namespace GameDev.Slice.Dwellings
 
         /// <summary>A street door's id from its place, in decimetres so two doors of a house never share one.</summary>
         public static string IdAt(int doorX, int doorZ) => $"dwelling.{doorX}.{doorZ}";
+
+        /// <summary>A back door's portal id: its street door's id and its own place, in decimetres.</summary>
+        public static string BackIdAt(int doorX, int doorZ, int backX, int backZ) => $"{IdAt(doorX, doorZ)}.back.{backX}.{backZ}";
 
         public string ToContext()
         {

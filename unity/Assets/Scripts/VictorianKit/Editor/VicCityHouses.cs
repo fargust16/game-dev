@@ -492,7 +492,8 @@ namespace GameDev.VictorianKit.EditorTools
                 {
                     if (e.Side == "front" && e.Y0 == 0)
                     {
-                        return f == 0 ? (b == door ? "door_arch_double" : "win_arch_d") : f == 1 ? "win_arch_d" : "win_arch_s";
+                        // The pavilion's ground-floor windows are single, so the doorcase's pilasters stand clear between them.
+                        return f == 0 ? (b == door ? "door_arch_double" : "win_arch_s") : f == 1 ? "win_arch_d" : "win_arch_s";
                     }
 
                     if (e.Side == "front")
@@ -510,7 +511,7 @@ namespace GameDev.VictorianKit.EditorTools
             };
             VicRoofs.Shell(h, plan, floors, facade);
             var doorX = px + 1 + (2 * door);
-            VicDress.Doorcase(h, new V3(doorX, 0, VicKit.FloorZ(0)), 0.0);
+            VicDress.Doorcase(h, new V3(doorX, 0, VicKit.FloorZ(0)), 0.0, wide: true);
             VicDress.Balcony(h, new V3(doorX, 0, VicKit.FloorZ(1)), 0.0, VicKit.FloorZ(1) + VicKit.WinSill - 0.02, true);
             var o = new VicMansardOptions();
             o.Chimneys.Add((1, 3));

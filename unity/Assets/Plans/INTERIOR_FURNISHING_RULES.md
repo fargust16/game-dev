@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-09 (§10: the hanging sign hangs outside, over two shop doors, by the owner's VS-SIGN (b). Earlier: the owner: G5, barrels and crates only in stores, warehouses and the port, a barrel rare in a home; §10, the owner's Tripo pieces for every interior and their places, and §3, §4 and §8 changed to match. The earlier note is in the update history)
+Last Updated: 2026-11-09 (§10: the owner's fifth play test: the Tripo pieces resized against the player, the piano by its keys; the Office, a civic building's Dwelling. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -206,6 +206,10 @@ The owner: take every piece from TripoModels for the interior scenes, and leave 
 
 The bed, the bar counter and its cabinet, the cell bars and door and the Notice Board were the owner's Tripo pieces already (asset map §4). The other models are not furnishing: the townsman, the woman and the dog are people and beasts, the angels, the lion and the birdbath are the garden ornaments of the city plan §23, the coins and firearms are items, the rock is the iron ore, and the hanging sign hangs outside, over the doors of Harrow & Tincture and the Soot & Bell (city plan §25.6, [99 Open Questions](../../../99%20Open%20Questions.md) VS-SIGN (b)).
 
+**Resized after the owner's fifth play test (2026-11-09).** The owner found the piano very small and asked that every Tripo piece fit the world. Measured beside the player (1.8 m) in one lineup, the tall pieces were raised to stand over a man's head as their true ones do. Game sizes: wardrobe 2.4 m, cheval glass 2.0 m, folding screen 2.0 m, display cabinet 2.1 m, coat stand 2.05 m, and wing chair 1.4 m, which is Victorian Interiors' own armchair. The piano is sized by its keys, which stand at 0.41 of its height: 0.82 m, a real upright's 0.72 m at game scale. That makes it 2.0 m over its carved top and two cells deep. The table's true sizes above are those before the play test. A wrapper whose footprint changes when it is rebuilt takes the old one's place, keeping its GUID, so the scenes follow it ([VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §26.1).
+
+**The Office** (owner, fifth play test). A civic building's, the palace's and the clock tower's doors open into an Office, a Dwelling that is no home. It has a reception at the door with a counter where a clerk receives callers, two offices with desks, an archive of shelves and boxes, and a WC; the clock tower has only its keeper's room. The rules of §1–§5 hold in it as in a rich home, with Work as its main purpose and no Sleep or Cook (city plan §26.3).
+
 The seven took them in place (`VeilmouthInteriors.EnrichWithTripo`), so what S2 wrote into their scenes stays. The barrels in the Soot & Bell's stair hall and Harrow's store room went out; a piano, log baskets and fire irons came in; and the pieces above replaced the pack's where the table says.
 
 ## Sources
@@ -216,6 +220,7 @@ The seven took them in place (`VeilmouthInteriors.EnrichWithTripo`), so what S2 
 
 ## Update history
 
+- 2026-11-09 (v0.7): §10, the hanging sign hangs outside, over two shop doors, by the owner's VS-SIGN (b).
 - 2026-11-09 (v0.6): the owner's word: G5's barrels and crates; §10, the owner's Tripo pieces and their places; §3, §4 and §8 changed to match.
 - 2026-11-08 (v0.5): after play test VI-8: G9 (chandeliers), G10 (no pieced-together pieces), G11 (doorway check), G12 (hearths); §7.2 and §8 as rebuilt.
 - 2026-11-08 (v0.4): §7.2, as built in VI-7 for the seven.

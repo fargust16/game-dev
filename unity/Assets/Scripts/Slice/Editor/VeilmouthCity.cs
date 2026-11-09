@@ -231,6 +231,8 @@ namespace GameDev.Slice.EditorTools
             _fenced = new HashSet<(bool, float, int, int)>();
             _stepsClear = float.MaxValue;
             _lampsAt.Clear();
+            _postsAt.Clear();
+            _postsAdded = _postsHidden = 0;
             _pavements = null;
             _passages = 0;
             _openSpans = 0;
@@ -262,6 +264,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             _backs.Clear();
+            BackDoors();
             _parent = Group("Squares and Yards");
             Market();
             Squares();
@@ -282,9 +285,10 @@ namespace GameDev.Slice.EditorTools
             var built = _pavements.Build(_root, _houses, works);
             AssetDatabase.DeleteAsset($"{works}/Kerbs - {KerbStone}.asset"); // C3's kerb ribbons, replaced by the islands
             Debug.Log($"[VeilmouthCity] pavements (R4): {built.Islands} outlines, {built.Area:0} m², {built.Triangles} triangles " +
-                      $"({built.Slabs} whole slabs), {built.KerbLength:0} m of kerb, {built.WetLength:0} m of wet gutter; " +
+                      $"({built.Slabs} whole slabs), {built.KerbLength:0} m of kerb, {built.Pits} tree pits; " +
                       $"{_pavements.Carried} carriageway ends carried on, {_pavements.Fillets} rounded corners. " +
-                      $"Passages (R5): {_passages} left between houses, {_openSpans} spans with no house, {Slots()} gaps under {PassageWidth} m in a row.");
+                      $"Passages (R5): {_passages} left between houses, {_openSpans} spans with no house, {Slots()} gaps under {PassageWidth} m in a row. " +
+                      $"Back doors: {_backDoorsOpen} open, {_backDoorsBlind} walled up. Railing posts: {_postsAdded} added at free ends, {_postsHidden} hidden at houses.");
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Report();
@@ -962,32 +966,12 @@ namespace GameDev.Slice.EditorTools
             var back = front - ((o.x + o.y) * depth);
             var alongX = f == Facing.N || f == Facing.S;
             var g0 = ((a0 + a1) / 2) - 1;
-            void Run(int from, int to)
-            {
-                for (var a = from; a < to;)
-                {
-                    var length = to - a >= 2 ? 2 : 1;
-                    var key = length == 2 ? "Railing" : "RailingShort";
-                    // Never across a stoop: a corner house's side door opens into the passage.
-                    var piece = alongX ? Rect(a - 0.2f, back - 0.3f, a + length + 0.2f, back + 1.1f) : Rect(back - 0.3f, a - 0.2f, back + 1.1f, a + length + 0.2f);
-                    if (!_stoops.Any(s => Overlap(s, piece)))
-                    {
-                        if (alongX)
-                        {
-                            Prop(key, Facing.N, a, back - 0.1f);
-                        }
-                        else
-                        {
-                            Prop(key, Facing.E, back - 0.1f, a);
-                        }
-                    }
-
-                    a += length;
-                }
-            }
-
-            Run(a0, g0);
-            Run(g0 + 2, a1);
+            // Never across a stoop: a corner house's side door opens into the passage.
+            bool Stoop(int a, int length) => _stoops.Any(s => Overlap(s, alongX
+                ? Rect(a - 0.2f, back - 0.3f, a + length + 0.2f, back + 1.1f)
+                : Rect(back - 0.3f, a - 0.2f, back + 1.1f, a + length + 0.2f)));
+            RailingRun(alongX, back, a0, g0, false, Stoop);
+            RailingRun(alongX, back, g0 + 2, a1, false, Stoop);
         }
 
         /// <summary>
@@ -1146,34 +1130,15 @@ namespace GameDev.Slice.EditorTools
                 return;
             }
 
-            void Run(int from, int to)
-            {
-                for (var a = from; a < to;)
-                {
-                    var length = to - a >= 2 ? 2 : 1;
-                    var key = length == 2 ? "Railing" : "RailingShort";
-                    if (alongX)
-                    {
-                        Prop(key, Facing.N, a, line - 0.1f, force: true);
-                    }
-                    else
-                    {
-                        Prop(key, Facing.E, line - 0.1f, a, force: true);
-                    }
-
-                    a += length;
-                }
-            }
-
             if (gate is float g)
             {
                 var g0 = Mathf.Clamp(Mathf.RoundToInt(g - 1.5f), a0, a1);
-                Run(a0, g0);
-                Run(Mathf.Min(a1, g0 + 3), a1);
+                RailingRun(alongX, line, a0, g0, true);
+                RailingRun(alongX, line, Mathf.Min(a1, g0 + 3), a1, true);
             }
             else
             {
-                Run(a0, a1);
+                RailingRun(alongX, line, a0, a1, true);
             }
         }
 
@@ -1242,43 +1207,96 @@ namespace GameDev.Slice.EditorTools
         /// before, though never through a house (owner's play test, 2026-11-06: gaps stood where no way in or out was
         /// meant).
         /// </summary>
-        private static void Railings(bool alongX, float line, int a0, int a1)
+        private static void Railings(bool alongX, float line, int a0, int a1) =>
+            RailingRun(alongX, line, a0, a1, true, (a, length) => _doors.Any(d =>
+            {
+                var across = (alongX ? d.At.y : d.At.x) - line;
+                var facing = alongX ? d.Out.y : d.Out.x;
+                return Mathf.Abs(across) < 5f && across * facing < 0f && Mathf.Abs(facing) > 0.5f &&
+                       Mathf.Abs((alongX ? d.At.x : d.At.y) - (a + (length / 2f))) < 1.6f;
+            }));
+
+        /// <summary>
+        /// A railing on a grid line from <paramref name="from"/> to <paramref name="to"/>, in segments of 2 m and one of
+        /// 1 m for an odd metre at the end, leaving any segment <paramref name="skip"/> names or that cannot stand; each
+        /// unbroken run then gets its posts (<see cref="RailingEnds"/>).
+        /// </summary>
+        private static void RailingRun(bool alongX, float line, int from, int to, bool force, Func<int, int, bool> skip = null)
         {
-            var segments = new List<(int A, int Length)>();
-            for (var a = a0; a + 2 <= a1; a += 2)
+            var run = new List<GameObject>();
+            var start = from;
+            for (var a = from; a < to;)
             {
-                segments.Add((a, 2));
-            }
-
-            if ((a1 - a0) % 2 == 1)
-            {
-                segments.Add((a1 - 1, 1));
-            }
-
-            foreach (var (a, length) in segments)
-            {
+                var length = to - a >= 2 ? 2 : 1;
                 var key = length == 2 ? "Railing" : "RailingShort";
-                var mid = a + (length / 2f);
-                if (_doors.Any(d =>
-                    {
-                        var across = (alongX ? d.At.y : d.At.x) - line;
-                        var facing = alongX ? d.Out.y : d.Out.x;
-                        return Mathf.Abs(across) < 5f && across * facing < 0f && Mathf.Abs(facing) > 0.5f &&
-                               Mathf.Abs((alongX ? d.At.x : d.At.y) - mid) < 1.6f;
-                    }))
+                var go = skip != null && skip(a, length) ? null
+                    : alongX ? Prop(key, Facing.N, a, line - 0.1f, force: force) : Prop(key, Facing.E, line - 0.1f, a, force: force);
+                if (go == null)
                 {
-                    continue;
-                }
-
-                if (alongX)
-                {
-                    Prop(key, Facing.N, a, line - 0.1f, force: true);
+                    RailingEnds(run, alongX, line, start, a);
+                    run = new List<GameObject>();
+                    start = a + length;
                 }
                 else
                 {
-                    Prop(key, Facing.E, line - 0.1f, a, force: true);
+                    run.Add(go);
+                }
+
+                a += length;
+            }
+
+            RailingEnds(run, alongX, line, start, to);
+        }
+
+        private static readonly List<Vector2> _postsAt = new List<Vector2>();
+        private static int _postsAdded, _postsHidden;
+
+        /// <summary>
+        /// The owner's fifth play test (2026-11-09): a railing's posts stand where a run ends free, at a gate, a gap or a
+        /// corner, and never at an end against a house, which its bare end abuts. The kit's module carries one post, at
+        /// one end: a free end with none gets a copy of its neighbour's post, unless a post of another run already stands
+        /// there, and a post at a house is hidden.
+        /// </summary>
+        private static void RailingEnds(List<GameObject> run, bool alongX, float line, int from, int to)
+        {
+            var posts = run.SelectMany(g => g.GetComponentsInChildren<Renderer>(true)).Where(r => r.name.StartsWith("Fence column")).ToList();
+            if (posts.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var (end, beyond) in new[] { (from, -1), (to, 1) })
+            {
+                var p = alongX ? new Vector2(end, line) : new Vector2(line, end);
+                var near = posts.Where(r => r.gameObject.activeSelf && (Plan(r.bounds.center) - p).magnitude < 0.45f).ToList();
+                float b0 = beyond < 0 ? end - 0.5f : end, b1 = beyond < 0 ? end : end + 0.5f;
+                var probe = alongX ? Rect(b0, line - 0.4f, b1, line + 0.4f) : Rect(line - 0.4f, b0, line + 0.4f, b1);
+                if (_houses.Any(h => Overlap(h, probe)))
+                {
+                    foreach (var r in near)
+                    {
+                        r.gameObject.SetActive(false);
+                        _postsHidden++;
+                    }
+                }
+                else if (near.Count == 0 && !_postsAt.Any(q => (q - p).sqrMagnitude < 0.35f * 0.35f))
+                {
+                    var nearest = posts.Where(r => r.gameObject.activeSelf).OrderBy(r => (Plan(r.bounds.center) - p).sqrMagnitude).FirstOrDefault();
+                    if (nearest == null)
+                    {
+                        continue;
+                    }
+
+                    var at = Plan(nearest.bounds.center);
+                    var copy = UnityEngine.Object.Instantiate(nearest.gameObject, nearest.transform.parent);
+                    copy.name = nearest.name + " (end)";
+                    copy.transform.position = nearest.transform.position + World(p.x, p.y, Ground(p.x, p.y) - Ground(at.x, at.y)) - World(at.x, at.y, 0f);
+                    posts.Add(copy.GetComponent<Renderer>());
+                    _postsAdded++;
                 }
             }
+
+            _postsAt.AddRange(posts.Where(r => r.gameObject.activeSelf).Select(r => Plan(r.bounds.center)));
         }
 
         private static string[] Keys(string type, params string[] facades) => facades.Select(f => VictorianHouses.Key(type, f)).ToArray();
@@ -1968,51 +1986,34 @@ namespace GameDev.Slice.EditorTools
         // ------------------------------------------------------------------------------------------- lamps
 
         /// <summary>
-        /// The furniture rules (§4): a lamp in the pavement's cell by the kerb, at a party wall where one is near, never
-        /// within 2 m of a door along the street; 25–30 m apart, the two sides staggered on streets wider than 12 m.
+        /// The furniture rules (§4), with the owner's fifth play test (2026-11-09, §26): a lamp on the carriageway by the
+        /// kerb, its post <see cref="LampFromKerb"/> out from it, at a party wall where one is near, never within 2 m of a
+        /// door along the street and never where a carriageway or a rounded corner breaks the kerb; 25–30 m apart, the two
+        /// sides staggered on streets wider than 12 m. The lamps that stood on the crossroads' corners are gone: a corner
+        /// is the kerb's rounding, and the rows' lamps light it.
         /// </summary>
         private static void AllLamps()
         {
-            // The High Street, 18 m, staggered; the Parade by its kerbs on the pavement and the promenade. A lamp's cell is
-            // the pavement's last whole metre by the kerb (§25.2).
-            Lamps(true, 726f + HighStreetWalk - 1f, 480, 778, 28f, 4f);
-            Lamps(true, 744f - HighStreetWalk, 480, 778, 28f, 18f);
-            Lamps(true, 668f + ParadeWalk - 1f, 480, 752, 27f, 6f);
-            Lamps(true, 677f, 480, 742, 27f, 6f);
-            // Crown Avenue and the byelaw streets of 12 m, by the kerb on both pavements.
-            Lamps(false, 602f, 680, 726, 25f, 5f);
-            Lamps(false, 621f, 680, 726, 25f, 5f);
-            Lamps(false, 518f, 680, 726, 26f, 8f);
-            Lamps(false, 525f, 680, 726, 26f, 8f);
-            Lamps(true, 774f, 480, 550, 27f, 5f);
-            Lamps(true, 781f, 480, 550, 27f, 5f);
-            Lamps(true, 774f, 618, 701, 27f, 5f);
-            Lamps(true, 781f, 618, 701, 27f, 5f);
-            Lamps(false, 518f, 744, 812, 27f, 12f);
-            Lamps(false, 525f, 744, 812, 27f, 12f);
-            Lamps(false, 608f, 744, 812, 27f, 12f);
-            Lamps(false, 615f, 744, 812, 27f, 12f);
-            Lamps(false, 703f, 744, 812, 27f, 12f);
-            Lamps(false, 710f, 744, 812, 27f, 12f);
-            Lamps(true, 813f, 480, 740, 30f, 10f);
-
-            // A lamp at every corner of the crossroads, on the pavement by both kerbs, where no door forbids it.
-            foreach (var (x0, x1, wx, y0, y1, wy) in new[]
+            // The High Street, 18 m, staggered; the Parade by its kerbs at the pavement and the promenade.
+            Lamps(true, 726f + HighStreetWalk, 1, 480, 778, 28f, 4f);
+            Lamps(true, 744f - HighStreetWalk, -1, 480, 778, 28f, 18f);
+            Lamps(true, 668f + ParadeWalk, 1, 480, 752, 27f, 6f);
+            Lamps(true, 677f, -1, 480, 742, 27f, 6f);
+            // Crown Avenue by its outer kerbs, and the byelaw streets of 12 m by both kerbs.
+            Lamps(false, 603f, 1, 680, 726, 25f, 5f);
+            Lamps(false, 621f, -1, 680, 726, 25f, 5f);
+            foreach (var (alongX, near, far, a0, a1, spacing, phase) in new[]
                      {
-                         (516, 528, ByelawWalk, 726, 744, HighStreetWalk), (606, 618, ByelawWalk, 726, 744, HighStreetWalk),
-                         (701, 713, ByelawWalk, 726, 744, HighStreetWalk), (600, 624, 3f, 726, 744, HighStreetWalk),
-                         (516, 528, ByelawWalk, 772, 784, ByelawWalk), (701, 713, ByelawWalk, 772, 784, ByelawWalk),
-                         (600, 624, 3f, 668, 680, ParadeWalk),
+                         (false, 516f, 528f, 680, 726, 26f, 8f), (true, 772f, 784f, 480, 550, 27f, 5f), (true, 772f, 784f, 618, 701, 27f, 5f),
+                         (false, 516f, 528f, 744, 812, 27f, 12f), (false, 606f, 618f, 744, 812, 27f, 12f), (false, 701f, 713f, 744, 812, 27f, 12f),
                      })
             {
-                // The corner cell is the pavement's last whole metre on both sides (§25.2: a 3.5 m pavement keeps 0.5 m by the kerb).
-                int Near(int edge, float walk) => edge + Mathf.FloorToInt(walk) - 1;
-                int Far(int edge, float walk) => edge - Mathf.FloorToInt(walk);
-                foreach (var (cx, cy) in new[] { (Near(x0, wx), Near(y0, wy)), (Far(x1, wx), Near(y0, wy)), (Near(x0, wx), Far(y1, wy)), (Far(x1, wx), Far(y1, wy)) })
-                {
-                    CornerLamp(cx, cy);
-                }
+                Lamps(alongX, near + ByelawWalk, 1, a0, a1, spacing, phase);
+                Lamps(alongX, far - ByelawWalk, -1, a0, a1, spacing, phase);
             }
+
+            // The Sea Quay has no carriageway: its lamps stand in the cell along its edge.
+            Lamps(true, 813f, 0, 480, 740, 30f, 10f);
 
             // The palace forecourt's gate, the Market Place's corners, the Ritual Square's and the courts' single lamps.
             foreach (var (px, py) in new[]
@@ -2024,71 +2025,119 @@ namespace GameDev.Slice.EditorTools
             }
         }
 
-        /// <summary>A lamp on a crossroads' corner cell unless one already stands within 4 m or a door is before it.</summary>
-        private static void CornerLamp(float px, float py)
-        {
-            // The corner cell lies in the kerb's rounding (R4): the lamp moves a metre diagonally onto the pavement.
-            if (_pavements.Cut(px + 0.5f, py + 0.5f))
-            {
-                var onto = new[] { (-1, -1), (1, -1), (-1, 1), (1, 1) }.Where(d => _pavements.On(px + d.Item1 + 0.5f, py + d.Item2 + 0.5f)).ToList();
-                if (onto.Count == 0)
-                {
-                    return;
-                }
-
-                px += onto[0].Item1;
-                py += onto[0].Item2;
-            }
-
-            var centre = new Vector2(px + 0.5f, py + 0.5f);
-            if (_lampsAt.Any(l => (l - centre).sqrMagnitude < 16f) || _doors.Any(d =>
-                {
-                    var off = centre - d.At;
-                    var outside = Vector2.Dot(off, d.Out);
-                    return outside > 0f && outside < 8.5f && Mathf.Abs(Vector2.Dot(off, new Vector2(-d.Out.y, d.Out.x))) < 2.2f;
-                }))
-            {
-                return;
-            }
-
-            if (Prop("LampPost", Facing.N, px, py) != null)
-            {
-                _lampsAt.Add(centre);
-            }
-        }
-
         private static readonly List<Vector2> _lampsAt = new List<Vector2>();
 
-        private static void Lamps(bool alongX, float cell, int a0, int a1, float spacing, float phase)
+        /// <summary>
+        /// A row of lamps by the kerb on the plan line <paramref name="line"/>, its carriageway on the side
+        /// <paramref name="side"/> (+1 toward the greater coordinate); with side 0, in the cell past the line instead.
+        /// </summary>
+        private static void Lamps(bool alongX, float line, int side, int a0, int a1, float spacing, float phase)
         {
+            var across = side == 0 ? line + 0.5f : line + (side * LampFromKerb);
             for (var target = a0 + phase; target < a1 - 1f; target += spacing)
             {
-                var walls = _partyWalls.Where(w => w.AlongX == alongX && Mathf.Abs(w.Front - cell) < 6f && Mathf.Abs(w.At - target) <= 5f)
+                var walls = _partyWalls.Where(w => w.AlongX == alongX && Mathf.Abs(w.Front - line) < 6f && Mathf.Abs(w.At - target) <= 5f)
                     .Select(w => w.At).OrderBy(w => Mathf.Abs(w - target)).ToList();
                 walls.Add(Mathf.Round(target));
                 foreach (var at in walls.Distinct())
                 {
-                    var centre = at - 0.5f;
-                    // Never where a carriageway now crosses the pavement lane, or in a kerb's rounding (R4).
-                    if (alongX ? _pavements.Cut(centre, cell + 0.5f) : _pavements.Cut(cell + 0.5f, centre))
+                    var along = at - 0.5f;
+                    var c = alongX ? new Vector2(along, across) : new Vector2(across, along);
+                    if (side != 0 ? !KerbRuns(alongX, line, side, along, 0.6f) : _pavements.Cut(c.x, c.y))
                     {
                         continue;
                     }
 
-                    // A lamp's centre is half a cell past its cell line, so the door's 8 m reach counts to that centre.
-                    if (_doors.Any(d => Mathf.Abs((alongX ? d.At.y : d.At.x) - cell) < 8.5f &&Mathf.Abs((alongX ? d.At.x : d.At.y) - centre) < 2.2f))
+                    // The door's 8 m reach counts to the lamp's centre.
+                    if (_doors.Any(d => Mathf.Abs((alongX ? d.At.y : d.At.x) - across) < 8.5f && Mathf.Abs((alongX ? d.At.x : d.At.y) - along) < 2.2f))
                     {
                         continue;
                     }
 
-                    var placed = alongX ? Prop("LampPost", Facing.N, at - 1f, cell) : Prop("LampPost", Facing.N, cell, at - 1f);
+                    var placed = side == 0
+                        ? alongX ? Prop("LampPost", Facing.N, along - 0.5f, line) : Prop("LampPost", Facing.N, line, along - 0.5f)
+                        : OnCarriageway("LampPost", c, 1f);
                     if (placed != null)
                     {
-                        _lampsAt.Add(alongX ? new Vector2(centre, cell + 0.5f) : new Vector2(cell + 0.5f, centre));
+                        _lampsAt.Add(c);
                         break;
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Whether the kerb on the plan line runs unbroken for <paramref name="half"/> m either side of a point along it:
+        /// the pavement on its inside, no carriageway or rounded corner crossing it.
+        /// </summary>
+        private static bool KerbRuns(bool alongX, float line, int side, float along, float half)
+        {
+            var inside = line - (side * 0.3f);
+            for (var d = -half; d <= half + 0.001f; d += half)
+            {
+                var p = alongX ? new Vector2(along + d, inside) : new Vector2(inside, along + d);
+                if (!_pavements.On(p.x, p.y))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// A block of one cell at a carriageway's plan point, if nothing solid stands within the square of
+        /// <paramref name="size"/> m round it, which it then takes; set on the carriageway's own ground. The block keeps
+        /// its grid cell, and what is seen moves inside the cell to the point with its body, so the Combat Grid reads it in
+        /// the same cell: a lamp's post 0.3 m from the kerb, a tree's trunk in the middle of its pit (§26.1).
+        /// </summary>
+        private static GameObject OnCarriageway(string key, Vector2 c, float size)
+        {
+            var area = Rect(c.x - (size / 2f), c.y - (size / 2f), c.x + (size / 2f), c.y + (size / 2f));
+            if (_taken.Any(t => t.Use == Use.Solid && Overlap(t.Quad, area)))
+            {
+                return null;
+            }
+
+            var go = Prop(key, Facing.N, c.x - 0.5f, c.y - 0.5f, force: true);
+            if (go == null)
+            {
+                return null;
+            }
+
+            Take(area, Use.Solid);
+            var d = c - Plan(go.transform.TransformPoint(new Vector3(0.5f, 0f, 0.5f)));
+            var shift = new Vector3(d.x, 0f, -d.y);
+            if (shift.sqrMagnitude > 1e-6f)
+            {
+                var model = go.transform.Find("Model");
+                if (model != null)
+                {
+                    model.position += shift;
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(model);
+                }
+
+                var local = go.transform.InverseTransformVector(shift);
+                foreach (var body in go.GetComponents<Collider>())
+                {
+                    switch (body)
+                    {
+                        case CapsuleCollider capsule: capsule.center += local; break;
+                        case BoxCollider box: box.center += local; break;
+                        case SphereCollider sphere: sphere.center += local; break;
+                    }
+
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(body);
+                }
+            }
+            if (!key.StartsWith("CityTree_"))
+            {
+                var p = go.transform.position;
+                // On the kit's 0.1 m height step, its foot sunk at most that much into the carriageway.
+                go.transform.position = new Vector3(p.x, Mathf.Floor((Ground(c.x, c.y) * 10f) + 0.02f) / 10f, p.z);
+            }
+
+            return go;
         }
 
         // ------------------------------------------------------------------------------------------- outside

@@ -86,23 +86,27 @@ namespace GameDev.Slice.EditorTools
             (string, string, float, float) Tr(string file, float fx, float fz) => (Tripo, file + "_3d_model", fx, fz);
 
             // Against a wall. True sizes: a wardrobe 1.9 m high, a chest of drawers 0.88 m, a writing desk with its
-            // gallery 0.95 m, a nightstand 0.67 m, a cheval glass 1.55 m, a folding screen 1.6 m, an upright piano 1.2 m,
-            // a narrow glazed cabinet 1.65 m.
-            yield return T("TrWardrobe", "antique_wardrobe", 2.3f, Anchor.Back);
+            // gallery 0.95 m, a nightstand 0.67 m, a cheval glass 1.55 m, a folding screen 1.6 m, a narrow glazed cabinet
+            // 1.65 m. The owner's fifth play test (2026-11-09) found the piano very small beside the player (1.8 m): its
+            // carved top makes it tall for its keys, which stand at 0.41 of its height (measured, pt5b lineup), so it is
+            // sized by its keys, 0.82 m, a real upright's 0.72 m at game scale. The tall pieces were measured against the
+            // player in the same lineup and raised a little, to stand over a man's head as their true ones do.
+            yield return T("TrWardrobe", "antique_wardrobe", 2.4f, Anchor.Back);
             yield return Set(T("TrNightstand", "antique_wood_nightstand", 0.8f, Anchor.Back), Vi("Candle_1", 0.3f, 0.6f), Vi("Book_1", 0.72f, 0.6f));
             yield return Set(T("TrNightstandLamp", "antique_wood_nightstand", 0.8f, Anchor.Back), Tr("decorative_table_lamp", 0.5f, 0.55f));
             yield return Set(T("TrDresser", "antique_wooden_dresser", 1.05f, Anchor.Back), Vi("Brush_1", 0.3f, 0.6f), Vi("Box_2", 0.72f, 0.6f));
             yield return Set(T("TrDesk", "antique_wooden_desk", 1.15f, Anchor.Back),
                 Tr("decorative_table_lamp", 0.14f, 0.6f), Tr("aged_parchment", 0.48f, 0.72f), Vi("Ink", 0.76f, 0.62f), Vi("Pen", 0.82f, 0.66f));
-            yield return T("TrMirror", "ornate_mirror", 1.85f, Anchor.Back);
-            yield return T("TrScreen", "ornate_wooden_screen", 1.9f, Anchor.Back);
-            yield return T("TrPiano", "ornate_piano", 1.45f, Anchor.Back);
-            yield return T("TrDisplay", "furniture", 2f, Anchor.Back);
+            yield return T("TrMirror", "ornate_mirror", 2f, Anchor.Back);
+            yield return T("TrScreen", "ornate_wooden_screen", 2f, Anchor.Back);
+            yield return T("TrPiano", "ornate_piano", 2f, Anchor.Back);
+            yield return T("TrDisplay", "furniture", 2.1f, Anchor.Back);
 
-            // In the room. True sizes: a wing chair 1.05 m high, a coat stand 1.5 m, a floor vase 0.75 m, a log basket
-            // 0.55 m, a stand of fire irons 0.67 m, a pedestal table 0.67 m.
-            yield return T("TrArmchair", "red_velvet_armchair", 1.25f);
-            yield return T("TrCoatRack", "wooden_coat_rack", 1.8f);
+            // In the room. True sizes: a wing chair 1.05 m high, a coat stand 1.7 m, a floor vase 0.75 m, a log basket
+            // 0.55 m, a stand of fire irons 0.67 m, a pedestal table 0.67 m. The armchair matches Victorian Interiors' own
+            // (1.4 m), which stands beside it in the same rooms.
+            yield return T("TrArmchair", "red_velvet_armchair", 1.4f);
+            yield return T("TrCoatRack", "wooden_coat_rack", 2.05f);
             yield return T("TrVase", "antique_vase", 0.9f);
             yield return T("TrLogHolder", "log_holder", 0.65f);
             yield return T("TrFireTools", "fireplace_tools_set", 0.8f);

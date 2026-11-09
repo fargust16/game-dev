@@ -220,15 +220,15 @@ MonoBehaviour:
   - key: TrWardrobe
     prefab: {fileID: 8252386424449714034, guid: 2b21b7cd1601e4248bdcdf8daa681f51, type: 3}
     width: 2
-    depth: 1
+    depth: 2
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.23258328
+      x: 0.19921732
       y: 0.16000009
-      width: 1.5348334
-      height: 0.8399999
-    height: 2.2999997
+      width: 1.6015654
+      height: 0.90645814
+    height: 2.3999999
   - key: ViMirrorTall
     prefab: {fileID: 1384391188353130729, guid: fd8ff0fcf1bfd8148861ab3be5ff650f, type: 3}
     width: 1
@@ -248,11 +248,11 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.081849456
+      x: 0.04794532
       y: 0.15999997
-      width: 0.8363011
-      height: 0.5104698
-    height: 1.85
+      width: 0.90410936
+      height: 0.55185926
+    height: 2
   - key: TrDresser
     prefab: {fileID: 5601940297248171637, guid: b2fa10f91091e474088f1a904804a75a, type: 3}
     width: 2
@@ -284,11 +284,11 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.2341305
-      y: 0.16000003
-      width: 1.531739
-      height: 0.4811238
-    height: 1.9
+      x: 0.19382155
+      y: 0.15999997
+      width: 1.6123569
+      height: 0.5064461
+    height: 2
   - key: ViCoatStand
     prefab: {fileID: 4242578803162436466, guid: c70d4e5b50e7b8645a40c76335a27c27, type: 3}
     width: 1
@@ -308,11 +308,11 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.1354208
-      y: 0.13189816
-      width: 0.7291584
-      height: 0.7362037
-    height: 1.8
+      x: 0.084784865
+      y: 0.08077288
+      width: 0.83043027
+      height: 0.83845425
+    height: 2.0499997
   - key: ViFireplace
     prefab: {fileID: 7039861906772512152, guid: 2f9fe8ac6d960c94fac119a05578a62d, type: 3}
     width: 3
@@ -356,11 +356,11 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.08292568
-      y: 0.048679054
-      width: 0.83414865
-      height: 0.9026419
-    height: 1.25
+      x: 0.03287685
+      y: 0
+      width: 0.9342463
+      height: 1
+    height: 1.4
   - key: ViRug
     prefab: {fileID: 4313728973739735630, guid: bc903158a4341034f953a66e80df0ffe, type: 3}
     width: 3
@@ -548,11 +548,11 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.024461865
+      x: 0.0006849766
       y: 0.15999997
-      width: 0.95107627
-      height: 0.62230945
-    height: 1.9999999
+      width: 0.99863005
+      height: 0.653425
+    height: 2.0999997
   - key: ViSofa
     prefab: {fileID: 6705102054000465093, guid: 23c5f5bf982cfd64d9c95c08e173081a, type: 3}
     width: 3
@@ -674,17 +674,17 @@ MonoBehaviour:
       height: 0.4164139
     height: 2.4829984
   - key: TrPiano
-    prefab: {fileID: 926870542877806437, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
+    prefab: {fileID: 5961054288153596105, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
     width: 2
-    depth: 1
+    depth: 2
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.34310198
+      x: 0.09393358
       y: 0.15999997
-      width: 1.313796
-      height: 0.84000003
-    height: 1.4499999
+      width: 1.8121328
+      height: 1.1859102
+    height: 2
   - key: TrGramophone
     prefab: {fileID: 265230165092889736, guid: eec3b867fa6bf1b44beb8f62313921ce, type: 3}
     width: 1

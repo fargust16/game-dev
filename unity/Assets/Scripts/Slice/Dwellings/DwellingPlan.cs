@@ -28,6 +28,8 @@ namespace GameDev.Slice.Dwellings
         Landing,
         Pantry,
         Washroom,
+        Reception, // an office's front room, where a clerk receives callers (owner, 2026-11-09)
+        Archive,   // an office's shelves of files and boxes
     }
 
     /// <summary>What closes a wall segment of one module.</summary>

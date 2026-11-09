@@ -12097,6 +12097,68 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6998615987170957394, guid: 9e69a56b478798048b4482c18e7addaa, type: 3}
   m_PrefabInstance: {fileID: 612342501}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &615851066
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 849391679}
+    m_Modifications:
+    - target: {fileID: 2932108273515941354, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932108273515941354, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932108273515941354, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932108273515941354, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932108273515941354, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932108273515941354, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932108273515941354, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932108273515941354, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932108273515941354, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932108273515941354, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5961054288153596105, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+      propertyPath: m_Name
+      value: Kit_Tripo_Piano_2x2
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+--- !u!4 &615851067 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2932108273515941354, guid: 2c9b36cdf2434fe44abc2a7d2ed8cb95, type: 3}
+  m_PrefabInstance: {fileID: 615851066}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &619914281
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13228,68 +13290,6 @@ CapsuleCollider:
   m_Height: 1.902692
   m_Direction: 1
   m_Center: {x: -0.000000006340997, y: 0.83916163, z: 0.07253255}
---- !u!1001 &670750482
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 849391679}
-    m_Modifications:
-    - target: {fileID: 38892145520842238, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 21
-      objectReference: {fileID: 0}
-    - target: {fileID: 38892145520842238, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 38892145520842238, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 38892145520842238, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 38892145520842238, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 38892145520842238, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 38892145520842238, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 38892145520842238, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 38892145520842238, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 38892145520842238, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 926870542877806437, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-      propertyPath: m_Name
-      value: Kit_Tripo_Piano_2x1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
---- !u!4 &670750483 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 38892145520842238, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
-  m_PrefabInstance: {fileID: 670750482}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &686838221
 GameObject:
   m_ObjectHideFlags: 0
@@ -25895,10 +25895,10 @@ Transform:
   - {fileID: 388240594}
   - {fileID: 230787873}
   - {fileID: 1195037248}
-  - {fileID: 670750483}
   - {fileID: 1639980022}
   - {fileID: 1112424678}
   - {fileID: 632134426}
+  - {fileID: 615851067}
   m_Father: {fileID: 2041302205}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &851012614

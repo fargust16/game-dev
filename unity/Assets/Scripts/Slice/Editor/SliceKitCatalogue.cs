@@ -1430,13 +1430,39 @@ namespace GameDev.Slice.EditorTools
             var folder = $"{Folder}/{family}";
             KitStandIns.EnsureFolder(folder);
             var path = $"{folder}/{root.name}.prefab";
-            if (!_measureOnly || !File.Exists(path) || (_rebuild != null && _rebuild.Contains(key)))
+            var rebuilding = _rebuild != null && _rebuild.Contains(key);
+            if (rebuilding && !File.Exists(path))
+            {
+                Resized(folder, root.name, path);
+            }
+
+            if (!_measureOnly || !File.Exists(path) || rebuilding)
             {
                 PrefabUtility.SaveAsPrefabAsset(root, path);
             }
 
             Object.DestroyImmediate(root);
             return new Entry { Key = key, Path = path, Width = width, Depth = depth, Height = height };
+        }
+
+        /// <summary>
+        /// A rebuilt wrapper whose footprint changed has a new name: the old one, the same name with another size, is moved
+        /// to it, so its GUID and every scene's instance follow, and no stale wrapper is left beside the new (the piano,
+        /// 2026-11-09).
+        /// </summary>
+        private static void Resized(string folder, string name, string path)
+        {
+            var stem = System.Text.RegularExpressions.Regex.Replace(name, @"_\d+x\d+$", "_");
+            var old = Directory.GetFiles(folder, stem + "*.prefab")
+                .Select(f => f.Replace('\\', '/'))
+                .FirstOrDefault(f => System.Text.RegularExpressions.Regex.IsMatch(Path.GetFileNameWithoutExtension(f), "^" + System.Text.RegularExpressions.Regex.Escape(stem) + @"\d+x\d+$"));
+            if (old == null)
+            {
+                return;
+            }
+
+            var error = AssetDatabase.MoveAsset(old, path);
+            Debug.Log(string.IsNullOrEmpty(error) ? $"Slice kit catalogue: {old} resized to {path}." : $"Slice kit catalogue: {old} not moved: {error}");
         }
 
         public static string Find(string folder, string name)

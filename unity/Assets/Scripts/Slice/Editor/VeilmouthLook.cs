@@ -36,6 +36,19 @@ namespace GameDev.Slice.EditorTools
         private const float FoliageTranslucency = 2.5f;
 
         /// <summary>
+        /// The leaves' own wind against the pack's (owner, fifth play test, 2026-11-09: a slight stir, not a sway): its
+        /// strength ×0.4 and its movement ×0.5. Authoring defaults.
+        /// </summary>
+        private const float FoliageWindStrength = 0.4f, FoliageWindMovement = 0.5f;
+
+        /// <summary>
+        /// The city's street and garden tree (owner, fifth play test, 2026-11-09): Polytope's fruit tree, which the owner
+        /// liked by the farms, in a fuller green than the forest's olive, sRGB. Authoring defaults.
+        /// </summary>
+        private static readonly (string Vendor, string Copy, Color Top, Color Ground) CityFruit =
+            ("PT_Fruit_Tree_Foliage_Mat", "City/City Fruit Tree Leaves", new Color(0.36f, 0.50f, 0.20f), new Color(0.13f, 0.22f, 0.08f));
+
+        /// <summary>
         /// The street surfaces' mean albedo in sRGB (reference plan R3 step 3): the carriageways' setts cool grey, the
         /// slabs warm grey, the squares', lanes' and yards' cobbles a warmer grey-brown, all inside the facades' range.
         /// </summary>
@@ -188,7 +201,8 @@ namespace GameDev.Slice.EditorTools
         public static void RetintTrees()
         {
             Directory.CreateDirectory(Folder);
-            foreach (var leaf in Foliage)
+            Directory.CreateDirectory(CityFolder);
+            foreach (var leaf in Foliage.Append(CityFruit))
             {
                 Copy(leaf);
             }
@@ -231,11 +245,33 @@ namespace GameDev.Slice.EditorTools
         /// project copies in the city's muted green, made on first use. The catalogue calls it for the <c>City*</c>
         /// wrappers only; the forest's fellable trees keep the pack's colours as resource markers.
         /// </summary>
-        public static int RetintCity(GameObject root) =>
-            Swap(root, CityFoliage
+        public static int RetintCity(GameObject root)
+        {
+            var swaps = CityFoliage
                 .Select(f => (From: AssetDatabase.LoadAssetAtPath<Material>(StylizedFoliage + f.Vendor + ".mat"), To: CityCopy(f.Vendor, f.Shade)))
                 .Where(s => s.From != null && s.To != null)
-                .ToDictionary(s => s.From, s => s.To));
+                .ToDictionary(s => s.From, s => s.To);
+
+            // The fruit tree's leaves, the pack's or the forest's olive copy, in the city's fuller green.
+            var path = $"{Folder}/{CityFruit.Copy}.mat";
+            if (AssetDatabase.LoadAssetAtPath<Material>(path) == null)
+            {
+                Directory.CreateDirectory(CityFolder);
+                Copy(CityFruit);
+                AssetDatabase.SaveAssets();
+            }
+
+            var fruit = AssetDatabase.LoadAssetAtPath<Material>(path);
+            foreach (var from in new[] { Polytope + CityFruit.Vendor + ".mat", $"{Folder}/{Foliage[0].Copy}.mat" }.Select(AssetDatabase.LoadAssetAtPath<Material>))
+            {
+                if (from != null && fruit != null)
+                {
+                    swaps[from] = fruit;
+                }
+            }
+
+            return Swap(root, swaps);
+        }
 
         private const string StylizedFoliage = "Assets/Stylized Trees Pack/Assets/Materials/Foliage/";
         public const string CityFolder = Folder + "/City";
@@ -352,6 +388,14 @@ namespace GameDev.Slice.EditorTools
             copy.SetColor("_GroundColor", leaf.Ground);
             copy.SetFloat("_Gradient", 1f);
             copy.SetFloat("_Translucency", FoliageTranslucency);
+            foreach (var (property, scale) in new[] { ("_WindStrength", FoliageWindStrength), ("_WindStrength1", FoliageWindStrength), ("_WindMovement", FoliageWindMovement), ("_WindMovement1", FoliageWindMovement) })
+            {
+                if (copy.HasProperty(property))
+                {
+                    copy.SetFloat(property, source.GetFloat(property) * scale);
+                }
+            }
+
             EditorUtility.SetDirty(copy);
         }
 

@@ -16,8 +16,15 @@ namespace GameDev.Slice.EditorTools
         public const float CityTreeHeight = 8f;
 
         /// <summary>
+        /// The city's street and garden tree (owner, fifth play test, 2026-11-09): Polytope's fruit tree, which the owner
+        /// liked by the farms at its own 6.58 m (measured), ×1.5 as the owner asked.
+        /// </summary>
+        public const float CityFruitTreeHeight = 6.58f * 1.5f;
+
+        /// <summary>
         /// A hedge block, m: one metre of line with the bush stretched to 1.3 m along it, so neighbours overlap 0.15 m
-        /// at each end and the hedge has no hole; 0.9 m high, low cover like a railing; 0.7 m deep. Authoring defaults.
+        /// at each end and the hedge has no hole; 0.9 m high; 0.7 m deep. Authoring defaults. A hedge is walked through
+        /// and gives no cover, as a bush does (owner, fifth play test, 2026-11-09); a tree stays solid.
         /// </summary>
         public const float HedgeLength = 1.3f, HedgeHeight = 0.9f, HedgeDepth = 0.7f;
 
@@ -32,6 +39,11 @@ namespace GameDev.Slice.EditorTools
                 yield return tree;
             }
 
+            // The street tree that replaced the birches, its leaves in the city's fuller green (VeilmouthLook.RetintCity).
+            var fruit = S("CityTree_Fruit", "Tree", "CityFruit", Polytope + "/Trees", "PT_Fruit_Tree_01_green", KitLayers.Vegetation, Body.Trunk, Anchor.Pivot);
+            fruit.SizeY = CityFruitTreeHeight;
+            yield return fruit;
+
             // Garden bushes, in the Polytope shrub's place inside the walls.
             foreach (var n in new[] { "Bush 006", "Bush 011", "Bush 015" })
             {
@@ -44,7 +56,7 @@ namespace GameDev.Slice.EditorTools
             // clipped to a metre of line.
             foreach (var n in new[] { "Bush 019", "Bush 020" })
             {
-                var hedge = S("CityHedge_" + n.Substring(5), "Hedge", "City" + n.Substring(5), Trees + "/Bushes", n, pr, Body.Box, Anchor.Linear);
+                var hedge = S("CityHedge_" + n.Substring(5), "Hedge", "City" + n.Substring(5), Trees + "/Bushes", n, KitLayers.NoGrid, Body.None, Anchor.Linear);
                 hedge.Width = 1;
                 hedge.SizeX = HedgeLength;
                 hedge.SizeY = HedgeHeight;

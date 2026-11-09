@@ -6,7 +6,6 @@ using GameDev.Slice.Kit;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Object = UnityEngine.Object;
 
 namespace GameDev.Slice.EditorTools
 {
@@ -16,8 +15,10 @@ namespace GameDev.Slice.EditorTools
     /// it, so it cuts the pavement across its mouth, and every corner where two carriageways meet is rounded with a kerb
     /// radius of <see cref="Radius"/>. A lane or passage with no carriages does not cut it: the pavement runs across its
     /// mouth. The island stands <see cref="Kerb"/> over the ground, its top in slabs with a kerb stone's top along the
-    /// carriageway, its edge a stone kerb face, with a mesh collider on the Ground layer; a wet band of
-    /// <see cref="Wet"/> darkens the carriageway along every kerb (moved from R3 step 3).
+    /// carriageway, its edge a stone kerb face, with a mesh collider on the Ground layer. The wet band that darkened the
+    /// carriageway along the kerb is gone (owner, fifth play test, 2026-11-09): laid 3 cm over the terrain, it came and
+    /// went with the terrain's level of detail. A street tree stands in a square pit on the carriageway by the kerb
+    /// (<see cref="Pit"/>), a stone edge round its earth.
     /// <para>
     /// The outline is the zero line of a distance field sampled every 0.25 m, so straight kerbs stay straight and the
     /// rounded corners are smooth. The top follows the ground through heights sampled once a metre and blended, so a
@@ -41,16 +42,23 @@ namespace GameDev.Slice.EditorTools
         /// <summary>The kerb stone's top along the carriageway, m.</summary>
         public const float KerbTop = 0.3f;
 
-        /// <summary>The wet band along the gutter, m.</summary>
-        public const float Wet = 0.5f;
+        /// <summary>
+        /// A tree pit, m (authoring defaults): 1.6 m square outside, flush on the kerb, so a ring of earth shows round the
+        /// fruit tree's trunk, which is 1.1 m across at its foot at 1.5 times its height (measured, pt6 pit views); the
+        /// trunk stands in its middle, moved inside its block's cell. Its stone edge is 0.1 m wide and as high as the kerb,
+        /// its earth 0.08 m over the carriageway. Both stand clear of the terrain's level of detail, as the kerb does.
+        /// </summary>
+        public const float PitSize = 1.6f, PitEdge = 0.1f, PitEarth = 0.08f;
 
         public const string RootName = "Pavements";
         public const string MaterialFolder = "Assets/Materials/Slice";
-        public const string WetName = "Veilmouth_Gutter_Wet";
+        public const string EarthName = "Veilmouth_TreePit_Earth";
+
+        /// <summary>The terrain layer whose earth the pits show.</summary>
+        public const string EarthLayer = "Assets/Settings/TerrainLayers/Overworld/Overworld_Soil.terrainlayer";
 
         private const float Cell = 0.25f;
         private const float Foot = 0.15f;     // how far a kerb face goes under the ground, m
-        private const float WetLift = 0.03f;  // the wet band over the ground, m
         private const float TexelMetres = 2.5f; // the kit's texture scale
 
         private readonly Convex[] _walks;
@@ -58,6 +66,10 @@ namespace GameDev.Slice.EditorTools
         private readonly (Convex Kite, Vector2 O)[] _fillets;
         private readonly Func<float, float, float> _terrain;
         private readonly Dictionary<(int, int), float> _lattice = new Dictionary<(int, int), float>();
+        private readonly List<Vector2> _pits = new List<Vector2>();
+
+        /// <summary>A tree pit centred on a plan point, built with the islands.</summary>
+        public void Pit(Vector2 centre) => _pits.Add(centre);
 
         /// <summary>The rounded corners found where carriageways meet.</summary>
         public int Fillets => _fillets.Length;
@@ -303,16 +315,16 @@ namespace GameDev.Slice.EditorTools
         /// <summary>What <see cref="Build"/> made.</summary>
         public readonly struct Report
         {
-            public readonly int Triangles, Islands, Slabs;
-            public readonly float KerbLength, WetLength, Area;
+            public readonly int Triangles, Islands, Slabs, Pits;
+            public readonly float KerbLength, Area;
 
-            public Report(int triangles, int islands, int slabs, float kerbLength, float wetLength, float area)
+            public Report(int triangles, int islands, int slabs, int pits, float kerbLength, float area)
             {
                 Triangles = triangles;
                 Islands = islands;
                 Slabs = slabs;
+                Pits = pits;
                 KerbLength = kerbLength;
-                WetLength = wetLength;
                 Area = area;
             }
         }
@@ -342,7 +354,7 @@ namespace GameDev.Slice.EditorTools
 
         /// <summary>
         /// Builds the islands under <paramref name="parent"/>: one mesh of slabs, kerb stone tops and kerb faces with its
-        /// collider, and the wet band apart, seen only. A kerb face against a house is left out.
+        /// collider, and the tree pits apart with theirs. A kerb face against a house is left out.
         /// </summary>
         public Report Build(Transform parent, IReadOnlyList<Vector2[]> houses, string meshFolder)
         {
@@ -378,7 +390,6 @@ namespace GameDev.Slice.EditorTools
 
             var slabs = new Part();
             var stone = new Part();
-            var wet = new Part();
             var done = new bool[nx - 1, ny - 1];
             var slabCount = 0;
             var area = 0f;
@@ -458,16 +469,13 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            // The kerbs: the outline chained into lines, a face down each and the wet band along the carriageway's side.
+            // The kerbs: the outline chained into lines, a face down each.
             var lines = Chain(segments);
             var shapes = houses.Select(h => new Convex(h)).ToArray();
             var kerbLength = 0f;
-            var wetLength = 0f;
             foreach (var line in lines)
             {
-                var (kerb, wetRun) = Edge(line, shapes, stone, wet);
-                kerbLength += kerb;
-                wetLength += wetRun;
+                kerbLength += Edge(line, shapes, stone);
             }
 
             var root = new GameObject(RootName);
@@ -476,13 +484,56 @@ namespace GameDev.Slice.EditorTools
             var island = Finish(root.transform, "Pavement Islands", $"{meshFolder}/Pavement Islands.asset",
                 new[] { (slabs, "VIC_Ground_Pave"), (stone, "VIC_Stone_Medium") }, KitLayers.Ground);
             island.AddComponent<MeshCollider>().sharedMesh = island.GetComponent<MeshFilter>().sharedMesh;
-            var gutter = Finish(root.transform, "Wet Gutters", $"{meshFolder}/Wet Gutters.asset", new[] { (wet, (string)null) }, KitLayers.NoGrid);
-            var wetRenderer = gutter.GetComponent<MeshRenderer>();
-            wetRenderer.sharedMaterial = WetMaterial();
-            wetRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            AssetDatabase.DeleteAsset($"{meshFolder}/Wet Gutters.asset");
+
+            // The tree pits: a stone edge of four boxes round the earth.
+            var edge = new Part();
+            var earth = new Part();
+            foreach (var c in _pits)
+            {
+                const float h = PitSize / 2f, i = h - PitEdge;
+                Box(edge, c + new Vector2(-h, -h), c + new Vector2(h, -i));
+                Box(edge, c + new Vector2(-h, i), c + new Vector2(h, h));
+                Box(edge, c + new Vector2(-h, -i), c + new Vector2(-i, i));
+                Box(edge, c + new Vector2(i, -i), c + new Vector2(h, i));
+                Top(earth, new List<Vector2> { c + new Vector2(-i, -i), c + new Vector2(i, -i), c + new Vector2(i, i), c + new Vector2(-i, i) }, PitEarth);
+            }
+
+            if (_pits.Count > 0)
+            {
+                var pits = Finish(root.transform, "Tree Pits", $"{meshFolder}/Tree Pits.asset",
+                    new[] { (edge, "VIC_Stone_Medium"), (earth, (string)null) }, KitLayers.Ground);
+                var materials = pits.GetComponent<MeshRenderer>().sharedMaterials;
+                materials[1] = EarthMaterial();
+                pits.GetComponent<MeshRenderer>().sharedMaterials = materials;
+                pits.AddComponent<MeshCollider>().sharedMesh = pits.GetComponent<MeshFilter>().sharedMesh;
+            }
 
             var triangles = (slabs.I.Count + stone.I.Count) / 3;
-            return new Report(triangles, lines.Count, slabCount, kerbLength, wetLength, area);
+            return new Report(triangles, lines.Count, slabCount, _pits.Count, kerbLength, area);
+        }
+
+        /// <summary>A stone box on the plan rectangle, from under the ground to the kerb's height, its top and four sides.</summary>
+        private void Box(Part part, Vector2 lo, Vector2 hi)
+        {
+            var p = new[] { lo, new Vector2(hi.x, lo.y), hi, new Vector2(lo.x, hi.y) };
+            Top(part, p.ToList(), Kerb);
+            for (var k = 0; k < 4; k++)
+            {
+                var a = p[k];
+                var b = p[(k + 1) % 4];
+                var d = b - a;
+                var outward = new Vector2(d.y, -d.x).normalized;
+                if (Vector2.Dot(outward, a - ((lo + hi) / 2f)) < 0f)
+                {
+                    outward = -outward;
+                }
+
+                float ha = Height(a.x, a.y), hb = Height(b.x, b.y), length = d.magnitude;
+                Quad(part, World(a, ha - Foot), World(b, hb - Foot), World(b, hb + Kerb), World(a, ha + Kerb),
+                    Normal(outward), Normal(outward), Normal(outward), Normal(outward),
+                    Vector2.zero, new Vector2(length, 0f), new Vector2(length, Foot + Kerb), new Vector2(0f, Foot + Kerb), outward);
+            }
         }
 
         /// <summary>The crossings on a cell's edges, paired round each outside corner, as outline segments.</summary>
@@ -564,8 +615,8 @@ namespace GameDev.Slice.EditorTools
             return lines;
         }
 
-        /// <summary>One outline's kerb faces and, where the carriageway lies outside, its wet band. Returns their lengths.</summary>
-        private (float Kerb, float Wet) Edge(List<Vector2> line, Convex[] houses, Part stone, Part wet)
+        /// <summary>One outline's kerb faces. Returns their length.</summary>
+        private float Edge(List<Vector2> line, Convex[] houses, Part stone)
         {
             var closed = line.Count > 3 && (line[0] - line[line.Count - 1]).sqrMagnitude < 1e-6f;
             var n = line.Count - 1;
@@ -593,7 +644,7 @@ namespace GameDev.Slice.EditorTools
                 return (normals[s] + normals[other]).normalized;
             }
 
-            float kerb = 0f, wetRun = 0f, along = 0f, wetAlong = 0f;
+            float kerb = 0f, along = 0f;
             for (var s = 0; s < n; s++)
             {
                 var a = line[s];
@@ -622,26 +673,9 @@ namespace GameDev.Slice.EditorTools
                 }
 
                 along += length;
-
-                var road = mid + (normals[s] * 0.25f);
-                if (hidden || Road(road) >= 0f)
-                {
-                    continue;
-                }
-
-                var qa = a + (na * Wet);
-                var qb = b + (nb * Wet);
-                Quad(wet,
-                    World(a, Height(a.x, a.y) + WetLift), World(b, Height(b.x, b.y) + WetLift),
-                    World(qb, Height(qb.x, qb.y) + WetLift), World(qa, Height(qa.x, qa.y) + WetLift),
-                    Vector3.up, Vector3.up, Vector3.up, Vector3.up,
-                    new Vector2(wetAlong / TexelMetres, 0f), new Vector2((wetAlong + length) / TexelMetres, 0f),
-                    new Vector2((wetAlong + length) / TexelMetres, 1f), new Vector2(wetAlong / TexelMetres, 1f), null);
-                wetAlong += length;
-                wetRun += length;
             }
 
-            return (kerb, wetRun);
+            return kerb;
         }
 
         private static Vector3 World(Vector2 plan, float y) => new Vector3(plan.x - 500f, y, 500f - plan.y);
@@ -670,13 +704,16 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>A convex top polygon on the pavement's top, fanned, facing up, its normal from the ground's slope.</summary>
-        private void Top(Part part, List<Vector2> poly)
+        private void Top(Part part, List<Vector2> poly) => Top(part, poly, Kerb);
+
+        /// <summary>A convex top polygon <paramref name="lift"/> over the ground, fanned, facing up.</summary>
+        private void Top(Part part, List<Vector2> poly, float lift)
         {
             var s = part.V.Count;
             foreach (var p in poly)
             {
                 var h = Height(p.x, p.y);
-                part.V.Add(World(p, h + Kerb));
+                part.V.Add(World(p, h + lift));
                 const float e = 0.25f;
                 var gx = (Height(p.x + e, p.y) - Height(p.x - e, p.y)) / (2f * e);
                 var gy = (Height(p.x, p.y + e) - Height(p.x, p.y - e)) / (2f * e);
@@ -799,55 +836,29 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// The wet band's material, created once and then tuned in the Inspector: URP Lit, transparent, dark and
-        /// glossy, fading out from the kerb by a ramp of our own.
+        /// The tree pits' earth, created once and then tuned in the Inspector: URP Lit with the soil terrain layer's own
+        /// texture, matt.
         /// </summary>
-        private static Material WetMaterial()
+        private static Material EarthMaterial()
         {
-            var path = $"{MaterialFolder}/{WetName}.mat";
+            var path = $"{MaterialFolder}/{EarthName}.mat";
             var material = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (material != null)
             {
                 return material;
             }
 
-            var rampPath = $"{MaterialFolder}/{WetName}.png";
-            var ramp = new Texture2D(4, 64, TextureFormat.RGBA32, false);
-            for (var y = 0; y < 64; y++)
+            var layer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(EarthLayer);
+            material = new Material(Shader.Find("Universal Render Pipeline/Lit")) { name = EarthName };
+            if (layer != null && layer.diffuseTexture != null)
             {
-                var t = (y + 0.5f) / 64f; // 0 at the kerb, 1 at the band's outer edge
-                var alpha = Mathf.Pow(1f - t, 1.6f);
-                for (var x = 0; x < 4; x++)
-                {
-                    ramp.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
-                }
+                material.SetTexture("_BaseMap", layer.diffuseTexture);
+                material.SetTextureScale("_BaseMap", Vector2.one * (TexelMetres / Mathf.Max(0.5f, layer.tileSize.x)));
             }
 
-            File.WriteAllBytes(rampPath, ramp.EncodeToPNG());
-            Object.DestroyImmediate(ramp);
-            AssetDatabase.ImportAsset(rampPath, ImportAssetOptions.ForceUpdate);
-            var importer = (TextureImporter)AssetImporter.GetAtPath(rampPath);
-            importer.alphaIsTransparency = true;
-            importer.wrapModeU = TextureWrapMode.Repeat;
-            importer.wrapModeV = TextureWrapMode.Clamp;
-            importer.mipmapEnabled = true;
-            importer.SaveAndReimport();
-
-            material = new Material(Shader.Find("Universal Render Pipeline/Lit")) { name = WetName };
-            material.SetTexture("_BaseMap", AssetDatabase.LoadAssetAtPath<Texture2D>(rampPath));
-            material.SetColor("_BaseColor", new Color(0.05f, 0.05f, 0.055f, 0.55f));
-            material.SetFloat("_Smoothness", 0.88f);
+            material.SetColor("_BaseColor", new Color(0.62f, 0.55f, 0.48f));
+            material.SetFloat("_Smoothness", 0.05f);
             material.SetFloat("_Metallic", 0f);
-            material.SetFloat("_Surface", 1f);
-            material.SetFloat("_Blend", 0f);
-            material.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha);
-            material.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
-            material.SetFloat("_SrcBlendAlpha", (float)BlendMode.One);
-            material.SetFloat("_DstBlendAlpha", (float)BlendMode.OneMinusSrcAlpha);
-            material.SetFloat("_ZWrite", 0f);
-            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-            material.SetOverrideTag("RenderType", "Transparent");
-            material.renderQueue = (int)RenderQueue.Transparent;
             AssetDatabase.CreateAsset(material, path);
             return material;
         }

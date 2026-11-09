@@ -19,8 +19,12 @@ namespace GameDev.Slice.Tests
             (DwellingArchetype.Tenement, DwellingWealth.Poor), (DwellingArchetype.Terrace, DwellingWealth.Middling),
             (DwellingArchetype.Terrace, DwellingWealth.Rich), (DwellingArchetype.Shop, DwellingWealth.Poor),
             (DwellingArchetype.Shop, DwellingWealth.Middling), (DwellingArchetype.Villa, DwellingWealth.Rich),
-            (DwellingArchetype.Warehouse, DwellingWealth.Poor),
+            (DwellingArchetype.Warehouse, DwellingWealth.Poor), (DwellingArchetype.Office, DwellingWealth.Rich),
+            (DwellingArchetype.Office, DwellingWealth.Poor),
         };
+
+        /// <summary>A warehouse and an office are no homes: no bed, no hearth required, an office washes in a WC.</summary>
+        private static bool Home(DwellingArchetype archetype) => archetype != DwellingArchetype.Warehouse && archetype != DwellingArchetype.Office;
 
         [Test]
         public void AKeySurvivesTheJourney()
@@ -75,12 +79,12 @@ namespace GameDev.Slice.Tests
                     Assert.AreEqual(key.StreetScene, door.Target.SceneName);
                     Assert.AreEqual(key.StreetPortalId, door.Target.ArrivalPortalId);
                     var rooms = root.GetComponentsInChildren<Transform>().Count(t => t.name.StartsWith(DwellingAssembler.RoomMarker));
-                    Assert.GreaterOrEqual(rooms, archetype == DwellingArchetype.Tenement ? 1 : 2, $"{archetype}");
+                    Assert.GreaterOrEqual(rooms, archetype == DwellingArchetype.Tenement || (archetype == DwellingArchetype.Office && wealth == DwellingWealth.Poor) ? 1 : 2, $"{archetype}");
                     Assert.LessOrEqual(rooms, wealth == DwellingWealth.Rich ? 17 : 6, $"{archetype}");
                     var furniture = root.Find("Furniture");
                     Assert.GreaterOrEqual(furniture.childCount, rooms * 2, $"{archetype} {wealth} #{n} is furnished");
-                    // Every home has a bed (owner, 2026-11-06); a warehouse is no home.
-                    if (archetype != DwellingArchetype.Warehouse)
+                    // Every home has a bed (owner, 2026-11-06); a warehouse and an office are no homes.
+                    if (Home(archetype))
                     {
                         Assert.IsTrue(furniture.Cast<Transform>().Any(t => t.name.StartsWith("Kit_ViFurniture_Bed")), $"{archetype} {wealth} #{n} has a bed");
                     }
@@ -105,7 +109,7 @@ namespace GameDev.Slice.Tests
                 {
                     var key = VeilmouthDwellings.PreviewKey(archetype, wealth, 500 + (n * 41), 900 - (n * 23));
                     var plan = DwellingRuntime.PlanFor(key, settings, kit);
-                    var floors = wealth == DwellingWealth.Rich && archetype != DwellingArchetype.Tenement && archetype != DwellingArchetype.Warehouse ? 3 : 1;
+                    var floors = wealth == DwellingWealth.Rich && Home(archetype) && archetype != DwellingArchetype.Tenement ? 3 : 1;
                     Assert.AreEqual(floors, plan.Floors, $"{archetype} {wealth}");
                     Assert.AreEqual(floors - 1, plan.Wells.Count, $"{archetype} {wealth}: a well over each stair");
                     Assert.AreEqual(floors - 1, plan.Furniture.Count(f => f.Name == "Stair"), $"{archetype} {wealth}: a stair to each floor");
@@ -126,7 +130,7 @@ namespace GameDev.Slice.Tests
         {
             var kit = VeilmouthDwellings.Kit;
             var settings = VeilmouthDwellings.Settings;
-            foreach (var (archetype, wealth) in Kinds.Where(k => k.Item1 != DwellingArchetype.Warehouse))
+            foreach (var (archetype, wealth) in Kinds.Where(k => Home(k.Item1) || (k.Item1 == DwellingArchetype.Office && k.Item2 == DwellingWealth.Rich)))
             {
                 for (var n = 0; n < 4; n++)
                 {
@@ -140,7 +144,7 @@ namespace GameDev.Slice.Tests
                         CollectionAssert.IsSubsetOf(new[] { DwellingPlanner.BasinKey, "ViBucket", "ViToilet" }, keys, what);
                         CollectionAssert.DoesNotContain(keys, DwellingPlanner.BathKey, what);
                     }
-                    else if (archetype == DwellingArchetype.Tenement)
+                    else if (archetype == DwellingArchetype.Tenement || archetype == DwellingArchetype.Office)
                     {
                         Assert.IsTrue(plan.Rooms.Any(r => r.Kind == RoomKind.WC), what);
                         CollectionAssert.IsSubsetOf(new[] { DwellingPlanner.BasinKey, "ViToilet" }, keys, what);
@@ -169,7 +173,7 @@ namespace GameDev.Slice.Tests
                 for (var n = 0; n < 12; n++)
                 {
                     var plan = DwellingRuntime.PlanFor(VeilmouthDwellings.PreviewKey(archetype, wealth, 11 + (n * 37), -7 - (n * 23)), settings, kit);
-                    var faults = DwellingPlanner.Audit(plan, kit, archetype != DwellingArchetype.Warehouse);
+                    var faults = DwellingPlanner.Audit(plan, kit, Home(archetype));
                     var what = $"{archetype} {wealth} #{n}";
                     CollectionAssert.IsEmpty(faults, $"{what}: {string.Join("; ", faults)}");
                     CollectionAssert.IsEmpty(plan.Unplaced, $"{what}: unplaced {string.Join("; ", plan.Unplaced)}");
@@ -206,7 +210,7 @@ namespace GameDev.Slice.Tests
         {
             var kit = VeilmouthDwellings.Kit;
             var settings = VeilmouthDwellings.Settings;
-            foreach (var (archetype, wealth) in Kinds.Where(k => k.Item1 != DwellingArchetype.Warehouse))
+            foreach (var (archetype, wealth) in Kinds.Where(k => Home(k.Item1)))
             {
                 for (var n = 0; n < 6; n++)
                 {
@@ -240,6 +244,23 @@ namespace GameDev.Slice.Tests
                 .Where(p => p.Target.SceneName == SliceTestScenes.SceneName(VeilmouthDwellings.ScenePath)).ToList();
             Assert.Greater(doors.Count, 60); // C2, the smaller city (city plan §21): 77 dwellings; C1 had 269
             Assert.AreEqual(doors.Count, doors.Select(d => d.Id).Distinct().Count(), "one id per door");
+
+            // Every door seen opens (owner, fifth play test, 2026-11-09): a back door leads into its house's own dwelling,
+            // and none is left without a portal unless it was walled up.
+            var backs = doors.Where(d => d.Id.Contains(".back.")).ToList();
+            Assert.Greater(backs.Count, 0, "back doors open");
+            foreach (var back in backs)
+            {
+                Assert.IsTrue(DwellingKey.TryParse(back.Target.Context, out var key), back.Id);
+                Assert.IsTrue(doors.Any(d => d.Id == key.DwellingId), $"{back.Id} leads into {key.DwellingId}, a dwelling with a street door");
+            }
+
+            var portals = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Portal>()).Select(p => p.transform.TransformPoint(new Vector3(1.5f, 0f, 0f))).ToList();
+            var shut = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Transform>())
+                .Where(t => t.name == VictorianHouses.DoorMarker || t.name == VeilmouthKitHouses.YardDoorMarker)
+                .Where(t => !portals.Any(p => new Vector2(p.x - t.position.x, p.z - t.position.z).magnitude < 2.5f))
+                .Select(t => $"{t.parent.name} {t.name} at {t.position}").ToList();
+            CollectionAssert.IsEmpty(shut, "every door that stays a door opens");
 
             var kinds = new HashSet<DwellingArchetype>();
             foreach (var door in doors)

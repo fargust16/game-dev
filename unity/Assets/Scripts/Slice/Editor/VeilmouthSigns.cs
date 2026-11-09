@@ -70,7 +70,16 @@ namespace GameDev.Slice.EditorTools
                 var sign = (GameObject)PrefabUtility.InstantiatePrefab(entry.Prefab, group);
                 sign.name = $"Sign - {house.name}";
                 var foot = new Vector3(face.x, sill + Clear, face.z);
-                sign.transform.SetPositionAndRotation(foot - (right * (entry.Width * 0.5f)), house.rotation);
+                // The block on the kit's grid and height step, the board moved inside it to hang where it should.
+                var at = foot - (right * (entry.Width * 0.5f));
+                var node = new Vector3(Mathf.Round(at.x), Mathf.Floor((at.y * 10f) + 0.02f) / 10f, Mathf.Round(at.z));
+                sign.transform.SetPositionAndRotation(node, house.rotation);
+                var model = sign.transform.Find("Model");
+                if (model != null)
+                {
+                    model.position += at - node;
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(model);
+                }
                 report.Add($"{house.name}: {(side > 0f ? "right" : "left")} of the door, bracket at {foot:F2}, " +
                            $"{(found ? $"on {hit.transform.name}" : "on the door's line")}");
                 shots.Add((foot + (Vector3.up * 0.6f), house.forward, right * side));

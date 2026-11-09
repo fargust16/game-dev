@@ -71,6 +71,7 @@ namespace GameDev.Slice.Dwellings
         /// </summary>
         public static int Floors(DwellingKey key) =>
             key.Wealth == DwellingWealth.Rich && key.Archetype != DwellingArchetype.Tenement && key.Archetype != DwellingArchetype.Warehouse
+            && key.Archetype != DwellingArchetype.Office
                 ? Mathf.Clamp(StoreysOutside(key.Archetype), 2, 3)
                 : 1;
 
@@ -171,6 +172,23 @@ namespace GameDev.Slice.Dwellings
                             .Open(Opening.Door, 6, 9).Open(Opening.Door, 9, 9, true).Open(Opening.Door, 3, 15)
                             .Open(Opening.Window, 0, 12, true).Open(Opening.Window, 0, 18, true).Open(Opening.Window, 3, 21).Open(Opening.Window, 9, 21)
                             .Open(Opening.Window, 12, 18, true);
+                case DwellingArchetype.Office:
+                    // An office (owner, fifth play test, 2026-11-09): a civic building's or the palace's is a reception at
+                    // the door, two offices, the archive and a WC; the clock tower's one room, its keeper's.
+                    return poor
+                        ? new DwellingPlan()
+                            .Room("Office", RoomKind.Office, 0, 0, 9, 6, Finish.Dark)
+                            .Open(Opening.Street, 3, 0).Open(Opening.Window, 0, 3, true).Open(Opening.Window, 9, 3, true)
+                        : new DwellingPlan()
+                            .Room("Reception", RoomKind.Reception, 0, 0, 9, 9, Finish.Panel).Room("Office", RoomKind.Office, 9, 0, 9, 9, Finish.Paper)
+                            .Room("Second office", RoomKind.Office, 0, 9, 9, 9, Finish.Paper).Room("Archive", RoomKind.Archive, 9, 9, 6, 9, Finish.Dark)
+                            .Room("WC", RoomKind.WC, 15, 9, 3, 3, Finish.Dark)
+                            .Open(Opening.Street, 3, 0).Open(Opening.Window, 0, 0).Open(Opening.Window, 6, 0).Open(Opening.Window, 0, 3, true)
+                            .Open(Opening.Door, 9, 3, true).Open(Opening.Door, 3, 9)
+                            .Open(Opening.Window, 9, 0).Open(Opening.Window, 15, 0).Open(Opening.Window, 18, 3, true)
+                            .Open(Opening.Door, 12, 9).Open(Opening.Door, 15, 9)
+                            .Open(Opening.Window, 0, 12, true).Open(Opening.Window, 3, 18)
+                            .Open(Opening.Window, 12, 18).Open(Opening.Window, 18, 9, true);
                 case DwellingArchetype.Warehouse:
                     return new DwellingPlan()
                         .Room("Store", RoomKind.Store, 0, 0, 12, 12, Finish.Dark).Room("Office", RoomKind.Office, 12, 0, 9, 9, Finish.Dark)

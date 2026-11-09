@@ -341,16 +341,30 @@ namespace GameDev.Slice.EditorTools
         public const string WindNoisePath = "Assets/Stylized Trees Pack/Shared/Textures/Noise/Wind Noise 001.png";
 
         /// <summary>
+        /// The scene's wind (owner, fifth play test, 2026-11-09: the trees and bushes swayed far too much; now a slight
+        /// stir). Authoring defaults against the pack's 0.2, 5, 1 and 1: strength 0.07, speed 2.5, a main wind of 0.6
+        /// and a turbulence of 0.3.
+        /// </summary>
+        public const float WindStrength = 0.07f, WindSpeed = 2.5f, WindMain = 0.6f, WindTurbulence = 0.3f;
+
+        /// <summary>The scene's wind from 60°, as its controller sets it each frame: for renders made outside play.</summary>
+        public static Vector4 WindSettings =>
+            new Vector4(Mathf.Sin(60f * Mathf.Deg2Rad) * WindStrength, Mathf.Cos(60f * Mathf.Deg2Rad) * WindStrength, WindMain * WindSpeed, WindTurbulence);
+
+        /// <summary>
         /// The Stylized Trees Pack's shaders bend every vertex by a global wind that its WindController sets each
         /// frame; with none in the scene the wind is zero, its direction undefined, and every tree and bush vanishes
-        /// (found 2026-11-05). One wind zone for the scene, at the pack's defaults.
+        /// (found 2026-11-05). One wind zone for the scene, a light one (<see cref="WindStrength"/>).
         /// </summary>
         internal static void Wind(Transform root)
         {
             var wind = new GameObject("Wind");
             wind.transform.SetParent(root, false);
             wind.transform.rotation = Quaternion.Euler(0f, 60f, 0f);
-            wind.AddComponent<WindZone>().mode = WindZoneMode.Directional;
+            var zone = wind.AddComponent<WindZone>();
+            zone.mode = WindZoneMode.Directional;
+            zone.windMain = WindMain;
+            zone.windTurbulence = WindTurbulence;
             var type = Type.GetType("Growth.WindController, Assembly-CSharp");
             if (type == null)
             {
@@ -360,6 +374,8 @@ namespace GameDev.Slice.EditorTools
 
             var controller = new SerializedObject(wind.AddComponent(type));
             controller.FindProperty("noise").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Texture2D>(WindNoisePath);
+            controller.FindProperty("strength").floatValue = WindStrength;
+            controller.FindProperty("speed").floatValue = WindSpeed;
             controller.ApplyModifiedPropertiesWithoutUndo();
         }
 

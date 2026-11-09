@@ -80,6 +80,10 @@ namespace GameDev.Slice.EditorTools
 
         public static LayerMask GroundMask => LayerMask.GetMask(KitLayers.Ground, KitLayers.Structure);
 
+        // What stands in a person's way above the line it walks: the ground's own bumps are left to the feet.
+        private static int StandMask =>
+            LayerMask.GetMask("Default", KitLayers.Structure, KitLayers.Prop, KitLayers.Vegetation, KitLayers.Interactable);
+
         [MenuItem("GameDev/Slice/Townsfolk/Build the Townsperson and Replace the Yellow Dummies in Veilmouth (once)")]
         public static void BuildAndReplace()
         {
@@ -639,8 +643,11 @@ namespace GameDev.Slice.EditorTools
         {
             y = 0f;
             var origin = new Vector3(x + 0.5f, nearY + 1.2f, z + 0.5f);
+            // A door's steps are no walkway: since every back door opens (city plan §26.1) a route would climb a house's
+            // back steps and down again.
             if (!Physics.Raycast(origin, Vector3.down, out var hit, 2.4f, BlockMask, QueryTriggerInteraction.Ignore)
                 || (GroundMask.value & (1 << hit.collider.gameObject.layer)) == 0
+                || hit.collider.gameObject.name == "Stoop"
                 || Vector3.Angle(hit.normal, Vector3.up) > 40f)
             {
                 return false;
@@ -712,8 +719,13 @@ namespace GameDev.Slice.EditorTools
                     return false;
                 }
 
+                // The person walks the straight line between the points, so its capsule must also fit at the line's own
+                // height, not only on each cell's floor: a door's stone step 0.2 m up lifts the floor's capsule clear of
+                // the stoop beside it while the line passes through its corner (owner's fifth play test, 2026-11-09).
+                var line = p;
                 p.y = y;
-                if (Physics.CheckCapsule(p + (Vector3.up * (Step + Radius)), p + (Vector3.up * (Height - Radius)), Radius, BlockMask, QueryTriggerInteraction.Ignore))
+                if (Physics.CheckCapsule(p + (Vector3.up * (Step + Radius)), p + (Vector3.up * (Height - Radius)), Radius, BlockMask, QueryTriggerInteraction.Ignore)
+                    || Physics.CheckCapsule(line + (Vector3.up * (Step + Radius)), line + (Vector3.up * (Height - Radius)), Radius, StandMask, QueryTriggerInteraction.Ignore))
                 {
                     return false;
                 }

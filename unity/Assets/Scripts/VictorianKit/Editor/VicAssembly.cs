@@ -387,9 +387,14 @@ namespace GameDev.VictorianKit.EditorTools
         /// until the kit has a porch roof, a door hood or a canopy: the owner found the bare beam out of place, and the
         /// balcony slab, 0.86 m deep, cannot roof columns 1.32 m out (reference plan R6; SLICE_MODELS_WANTED.md).
         /// </summary>
-        public static void Doorcase(VicHouse h, V3 door, double rot)
+        /// <remarks>
+        /// A double door's surround is 1.64 m wide, and pilasters 0.48 m wide at 0.28 and 1.72 stood over its arch (owner,
+        /// fifth play test, 2026-11-09): a <paramref name="wide"/> doorcase stands them outside it, at −0.075 and 2.075,
+        /// 0.015 m clear of the surround and of single windows' surrounds in the modules beside it.
+        /// </remarks>
+        public static void Doorcase(VicHouse h, V3 door, double rot, bool wide = false)
         {
-            foreach (var x in new[] { 0.28, 1.72 })
+            foreach (var x in wide ? new[] { -0.075, 2.075 } : new[] { 0.28, 1.72 })
             {
                 h.Drop("SM_Vic_Pilaster_3m", VicKit.WorldPoint(door, rot, x, 0.0, 0.0), rot);
             }

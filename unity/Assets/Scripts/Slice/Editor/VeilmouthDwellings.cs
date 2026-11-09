@@ -218,8 +218,10 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// A street door on every dwelling under <paramref name="root"/>: at each house's door marker, unless a building
-        /// that opens already has its own portal there. Returns how many were added.
+        /// A door on every dwelling and office under <paramref name="root"/>: at each house's street door marker, unless a
+        /// building that opens already has its own portal there, and at each of its back doors left open
+        /// (<see cref="VeilmouthCity"/>, owner's fifth play test, 2026-11-09), into the same dwelling. Returns how many
+        /// were added.
         /// </summary>
         public static int AddDoors(Transform root)
         {
@@ -230,17 +232,24 @@ namespace GameDev.Slice.EditorTools
             var dwellingScene = SliceTestScenes.SceneName(ScenePath);
             var ids = new HashSet<string>();
             var count = 0;
-            foreach (var marker in root.GetComponentsInChildren<Transform>(true).Where(t => t.name == VictorianHouses.DoorMarker).ToList())
+            var markers = root.GetComponentsInChildren<Transform>(true)
+                .Where(t => t.name == VictorianHouses.DoorMarker || t.name == VeilmouthKitHouses.YardDoorMarker).ToList();
+            foreach (var marker in markers)
             {
                 var at = marker.position;
-                if (existing.Any(p => Flat(p - at) < 2.5f) || !Classify(marker, out var archetype, out var wealth))
+                var street = marker.name == VictorianHouses.DoorMarker
+                    ? marker
+                    : marker.parent.Cast<Transform>().FirstOrDefault(t => t.name == VictorianHouses.DoorMarker);
+                if (street == null || existing.Any(p => Flat(p - at) < 2.5f || Flat(p - street.position) < 2.5f)
+                    || !Classify(street, out var archetype, out var wealth))
                 {
                     continue;
                 }
 
-                var x = Mathf.RoundToInt(at.x * 10f);
-                var z = Mathf.RoundToInt(at.z * 10f);
-                var key = new DwellingKey(DwellingKey.IdAt(x, z), streetScene, x, z, archetype, wealth);
+                var x = Mathf.RoundToInt(street.position.x * 10f);
+                var z = Mathf.RoundToInt(street.position.z * 10f);
+                var id = marker == street ? DwellingKey.IdAt(x, z) : DwellingKey.BackIdAt(x, z, Mathf.RoundToInt(at.x * 10f), Mathf.RoundToInt(at.z * 10f));
+                var key = new DwellingKey(id, streetScene, x, z, archetype, wealth);
                 if (!ids.Add(key.StreetPortalId))
                 {
                     Debug.LogWarning($"[VeilmouthDwellings] two doors share {key.StreetPortalId}; the second is left closed.");
@@ -261,8 +270,9 @@ namespace GameDev.Slice.EditorTools
 
         /// <summary>
         /// A dwelling's kind from its house's baked type, and its wealth from where it stands (19 §6.3): the Ridge is
-        /// rich, the High Street, the terraces and the shops middling, Lower Veil, the docks and the tenements poor.
-        /// Civic buildings, the tavern and the chapel are not dwellings.
+        /// rich, the High Street, the terraces and the shops middling, Lower Veil, the docks and the tenements poor. A
+        /// civic building and the palace open into a rich office, the clock tower into its keeper's room (owner,
+        /// 2026-11-09); the tavern and the chapel are not dwellings.
         /// </summary>
         public static bool Classify(Transform marker, out DwellingArchetype archetype, out DwellingWealth wealth)
         {
@@ -286,9 +296,12 @@ namespace GameDev.Slice.EditorTools
             else if (type.StartsWith("Villa")) archetype = DwellingArchetype.Villa;
             else if (type.StartsWith("Warehouse")) archetype = DwellingArchetype.Warehouse;
             else if (type.StartsWith("Arch")) archetype = facade == "stucco" ? DwellingArchetype.Terrace : DwellingArchetype.Tenement;
+            else if (type.StartsWith("Civic") || type.StartsWith("Palace") || type.StartsWith("Tower")) archetype = DwellingArchetype.Office;
             else return false;
 
-            wealth = WealthAt(marker.position, archetype);
+            wealth = archetype == DwellingArchetype.Office
+                ? type.StartsWith("Tower") ? DwellingWealth.Poor : DwellingWealth.Rich
+                : WealthAt(marker.position, archetype);
             return true;
         }
 

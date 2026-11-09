@@ -434,7 +434,9 @@ namespace GameDev.VictorianKit.EditorTools
         /// <summary>
         /// The plan's cells cut into rectangles row by row, a hall strip at the front door where the house is 8 m deep or
         /// more, each part into rooms of 4–6 m, and a front and a back band where it is 8 m deep. Every storey keeps the
-        /// same cut, so walls stand over walls.
+        /// same cut, so walls stand over walls. No wall meets the outline in a door's opening, and none in a window's
+        /// where another cut serves: in a house with 1 m corners the modules' middles fall on the 2 m cells' lines, and a
+        /// partition stood behind the middle of a door (owner, fifth play test, 2026-11-09).
         /// </summary>
         private static void CutRooms(House h)
         {
@@ -444,23 +446,25 @@ namespace GameDev.VictorianKit.EditorTools
             var parts = new List<(RectInt Cells, bool Hall)>();
             foreach (var r in rects)
             {
-                if (door.HasValue && r.Contains(new Vector2Int(door.Value.i, door.Value.j)) && door.Value.alongX && r.height >= 4 && r.width >= 3)
-                {
-                    var i = door.Value.i;
-                    if (i > r.xMin)
-                    {
-                        parts.Add((new RectInt(r.xMin, r.yMin, i - r.xMin, r.height), false));
-                    }
-
-                    parts.Add((new RectInt(i, r.yMin, 1, r.height), true));
-                    if (i + 1 < r.xMax)
-                    {
-                        parts.Add((new RectInt(i + 1, r.yMin, r.xMax - i - 1, r.height), false));
-                    }
-                }
-                else
+                var strip = door.HasValue && r.Contains(new Vector2Int(door.Value.i, door.Value.j)) && door.Value.alongX && r.height >= 4 && r.width >= 3
+                    ? HallStrip(h, r, door.Value.at.x)
+                    : null;
+                if (strip == null)
                 {
                     parts.Add((r, false));
+                    continue;
+                }
+
+                var (h0, h1) = strip.Value;
+                if (h0 > r.xMin)
+                {
+                    parts.Add((new RectInt(r.xMin, r.yMin, h0 - r.xMin, r.height), false));
+                }
+
+                parts.Add((new RectInt(h0, r.yMin, h1 - h0, r.height), true));
+                if (h1 < r.xMax)
+                {
+                    parts.Add((new RectInt(h1, r.yMin, r.xMax - h1, r.height), false));
                 }
             }
 
@@ -473,13 +477,10 @@ namespace GameDev.VictorianKit.EditorTools
                     continue;
                 }
 
-                var bands = cells.height >= 4
-                    ? new[] { (cells.yMin, (cells.height + 1) / 2), (cells.yMin + ((cells.height + 1) / 2), cells.height / 2) }
-                    : new[] { (cells.yMin, cells.height) };
-                foreach (var (y, depth) in bands)
+                foreach (var (y, depth) in Bands(h, cells))
                 {
                     var x = cells.xMin;
-                    foreach (var w in Widths(cells.width))
+                    foreach (var w in Widths(h, new RectInt(cells.xMin, y, cells.width, depth)))
                     {
                         cut.Add((new RectInt(x, y, w, depth), false));
                         x += w;
@@ -591,13 +592,127 @@ namespace GameDev.VictorianKit.EditorTools
             return rects;
         }
 
-        /// <summary>Room widths in 2 m cells: rooms of 4–6 m, the larger first.</summary>
-        private static IEnumerable<int> Widths(int cells)
+        /// <summary>A partition this near an opening's middle, kit m, stands in its hole: a double door's is 0.70 m, a double window's 0.75 m.</summary>
+        private const float OpeningClear = 0.85f;
+
+        /// <summary>
+        /// What a partition on <paramref name="line"/> meets where it reaches the outline at <paramref name="wall"/>: 2 in a
+        /// door's opening, 1 in a window's, 0 in neither. <paramref name="alongX"/> is the wall's direction; storeys of the
+        /// house only, since the attic's walls stop at the knee wall.
+        /// </summary>
+        private static int Meets(House h, bool alongX, float line, float wall)
         {
-            var n = Mathf.Max(1, Mathf.RoundToInt(cells / 2.5f));
-            for (var k = 0; k < n; k++)
+            var worst = 0;
+            for (var storey = 0; storey < h.Spec.Floors; storey++)
             {
-                yield return (cells / n) + (k < cells % n ? 1 : 0);
+                if (!h.Openings.TryGetValue(storey, out var list))
+                {
+                    continue;
+                }
+
+                foreach (var o in list)
+                {
+                    if (o.AlongX == alongX && Mathf.Abs(o.Line - wall) < 0.05f && Mathf.Abs(o.Centre - line) < OpeningClear)
+                    {
+                        worst = Mathf.Max(worst, o.Door ? 2 : 1);
+                    }
+                }
+            }
+
+            return worst;
+        }
+
+        /// <summary>What a partition across a part along Z, at cell line <paramref name="i"/>, meets at the part's front and back.</summary>
+        private static int MeetsAcross(House h, RectInt part, int i) =>
+            Mathf.Max(Meets(h, true, i * 2f, part.yMin * 2f), Meets(h, true, i * 2f, part.yMax * 2f));
+
+        /// <summary>
+        /// The hall strip at the street door at <paramref name="doorX"/>: one cell, or two where the door's middle falls on a
+        /// cell line, with the door inside it and neither wall in an opening; or none, and the door opens into a room.
+        /// </summary>
+        private static (int, int)? HallStrip(House h, RectInt part, float doorX)
+        {
+            foreach (var width in new[] { 1, 2 })
+            {
+                if (part.width < width + 2)
+                {
+                    continue;
+                }
+
+                for (var h0 = part.xMin; h0 + width <= part.xMax; h0++)
+                {
+                    var h1 = h0 + width;
+                    if (doorX < (h0 * 2f) + OpeningClear || doorX > (h1 * 2f) - OpeningClear)
+                    {
+                        continue;
+                    }
+
+                    if ((h0 == part.xMin || MeetsAcross(h, part, h0) == 0) && (h1 == part.xMax || MeetsAcross(h, part, h1) == 0))
+                    {
+                        return (h0, h1);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// A part 8 m deep or more as a front and a back band, split as near the middle as a line allows that meets no
+        /// door in the sides and the fewest windows; a shallower part, or one whose every line meets a door, as one band.
+        /// </summary>
+        private static IEnumerable<(int Y, int Depth)> Bands(House h, RectInt part)
+        {
+            if (part.height < 4)
+            {
+                return new[] { (part.yMin, part.height) };
+            }
+
+            var middle = part.yMin + ((part.height + 1) / 2);
+            int Meeting(int j) => Mathf.Max(Meets(h, false, j * 2f, part.xMin * 2f), Meets(h, false, j * 2f, part.xMax * 2f));
+            var split = Enumerable.Range(part.yMin + 2, part.height - 3).Where(j => Meeting(j) < 2)
+                .OrderBy(j => Meeting(j)).ThenBy(j => Mathf.Abs(j - middle)).Select(j => (int?)j).FirstOrDefault();
+            return split.HasValue
+                ? new[] { (part.yMin, split.Value - part.yMin), (split.Value, part.yMax - split.Value) }
+                : new[] { (part.yMin, part.height) };
+        }
+
+        /// <summary>
+        /// Room widths in 2 m cells across a band: rooms of 4–6 m, the larger first, with no wall in a door's opening and
+        /// one in a window's only where every other cut is worse (a room of 2 m, or one wider than 8 m).
+        /// </summary>
+        private static IEnumerable<int> Widths(House h, RectInt band)
+        {
+            float Size(int w) => w == 2 || w == 3 ? 0f : w == 4 ? 1f : w == 1 ? 3f : w - 3f;
+            var n = band.width;
+            var cost = new float[n + 1];
+            var count = new int[n + 1];
+            var step = new int[n + 1];
+            for (var k = n - 1; k >= 0; k--)
+            {
+                cost[k] = float.MaxValue;
+                for (var w = n - k; w >= 1; w--)
+                {
+                    var end = k + w;
+                    var meets = end == n ? 0 : MeetsAcross(h, band, band.xMin + end);
+                    if (meets == 2)
+                    {
+                        continue;
+                    }
+
+                    var c = Size(w) + (meets * 4f) + cost[end];
+                    if (c < cost[k] - 0.001f || (Mathf.Abs(c - cost[k]) <= 0.001f && 1 + count[end] < count[k]))
+                    {
+                        cost[k] = c;
+                        count[k] = 1 + count[end];
+                        step[k] = w;
+                    }
+                }
+            }
+
+            for (var k = 0; k < n; k += step[k])
+            {
+                yield return step[k];
             }
         }
 

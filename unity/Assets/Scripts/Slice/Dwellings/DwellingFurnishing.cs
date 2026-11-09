@@ -49,7 +49,7 @@ namespace GameDev.Slice.Dwellings
         private static readonly HashSet<RoomKind> FloorRooms = new HashSet<RoomKind>
         {
             RoomKind.Kitchen, RoomKind.Scullery, RoomKind.Pantry, RoomKind.Store, RoomKind.BoxRoom, RoomKind.BackRoom, RoomKind.Room,
-            RoomKind.Washroom, RoomKind.Nursery, RoomKind.Office,
+            RoomKind.Washroom, RoomKind.Nursery, RoomKind.Office, RoomKind.Archive,
         };
 
         /// <summary>Rules G4: what a seat may face.</summary>
@@ -309,6 +309,8 @@ namespace GameDev.Slice.Dwellings
             [RoomKind.Pantry] = new[] { May(Racks), May(Goods, count: 2) },
             [RoomKind.Store] = new[] { May(Racks, count: 8), May(Stacks) },
             [RoomKind.Office] = new[] { Must(Work), May(Books), May(Display) },
+            [RoomKind.Reception] = new[] { Must(Work), May(Settee, Rich), May(Clock, Rich), May(Coats), May(Plant, Middling) },
+            [RoomKind.Archive] = new[] { May(Racks, count: 6), May(Books, count: 2), May(Goods, count: 2) },
         };
 
         /// <summary>Where a household keeps its Stash, in order of preference.</summary>
