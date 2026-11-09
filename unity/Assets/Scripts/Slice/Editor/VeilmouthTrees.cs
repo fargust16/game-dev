@@ -9,8 +9,8 @@ namespace GameDev.Slice.EditorTools
     /// <summary>
     /// Veilmouth's trees made in Blender from Easy Tree (VEILMOUTH_CITY_PLAN.md §27; tools/blender/veilmouth_trees.py):
     /// how their FBX and textures are imported, and their three materials on GameDev/Slice/Tree. An FBX's material
-    /// names (VeilmouthBark, VeilmouthLeaves_&lt;kind&gt;) pick the project's materials; its _LOD0 and _LOD1 objects become
-    /// a LOD Group. Every number is an authoring default. Batch:
+    /// names (VeilmouthBark, VeilmouthLeaves_&lt;kind&gt;) pick the project's materials; its _LOD0, _LOD1 (and _LOD2)
+    /// objects become a LOD Group. Every number is an authoring default. Batch:
     /// -executeMethod GameDev.Slice.EditorTools.VeilmouthTrees.Setup
     /// </summary>
     public sealed class VeilmouthTrees : AssetPostprocessor
@@ -19,14 +19,19 @@ namespace GameDev.Slice.EditorTools
         public const string MaterialFolder = SliceKitCatalogue.MaterialFolder + "/Trees";
         private const string Textures = ArtFolder + "/Textures";
 
-        /// <summary>The trees tools/blender/veilmouth_trees.py makes: thin street trees of 8–9 m, and garden trees of 9.6–10 m.</summary>
+        /// <summary>The trees tools/blender/veilmouth_trees.py makes: thin street trees of 8–9 m, garden trees of 9.6–10 m, and the mature tree.</summary>
         public static readonly string[] Street = { "StreetHornbeamA", "StreetHornbeamB", "StreetBeechA", "StreetBeechB" };
 
         public static readonly string[] Garden = { "GardenBeechA", "GardenHornbeamB" };
 
-        // A street tree is LOD0 while it fills over 18 % of the screen's height (about 45 m away for 9 m at 60°),
-        // LOD1 down to 2.5 % (about 310 m), and is not drawn beyond, which the haze already hides.
-        private const float Lod0Until = 0.18f, Lod1Until = 0.025f;
+        /// <summary>The owner's mature tree, 11 m high and 12.5 m across, grown by Easy Tree from the owner's own values (§27.7).</summary>
+        public static readonly string[] Mature = { "MatureHornbeamA" };
+
+        // A tree of two LODs (street and garden) is LOD0 while it fills over 18 % of the screen's height (about 45 m away
+        // for 9 m at 60°), LOD1 down to 2.5 % (about 310 m), and is not drawn beyond, which the haze already hides. A
+        // tree of three (the mature tree, 11.9, 5 and 1.7 thousand triangles) is LOD0 to 25 % (about 38 m for 11 m),
+        // LOD1 to 7 % (about 135 m) and LOD2 to 2.5 % (about 380 m).
+        private static readonly float[] TwoLods = { 0.18f, 0.025f }, ThreeLods = { 0.25f, 0.07f, 0.025f };
 
         // The wind, the same on bark and leaves so a twig never leaves its branch: a lean of 0.22 m at the top that
         // breathes about every 7 s (2π / 0.9), gusts travelling along the wind as waves about 105 m long (2π / 0.06),
@@ -58,6 +63,8 @@ namespace GameDev.Slice.EditorTools
                 AssetDatabase.ImportAsset(AssetDatabase.GUIDToAssetPath(guid), ImportAssetOptions.ForceUpdate);
             }
 
+            // A tree new to the kit gets its wrapper (a wrapper already on disk is kept as it is).
+            SliceKitCatalogue.Load();
             Debug.Log($"[VeilmouthTrees] materials under {MaterialFolder}; the trees under {ArtFolder} imported again.");
         }
 
@@ -178,9 +185,19 @@ namespace GameDev.Slice.EditorTools
                 return;
             }
 
-            var lod0 = root.GetComponentsInChildren<Renderer>(true).Where(r => r.name.EndsWith("_LOD0")).ToArray();
-            var lod1 = root.GetComponentsInChildren<Renderer>(true).Where(r => r.name.EndsWith("_LOD1")).ToArray();
-            group.SetLODs(new[] { new LOD(Lod0Until, lod0), new LOD(Lod1Until, lod1) });
+            var renderers = root.GetComponentsInChildren<Renderer>(true);
+            var levels = Enumerable.Range(0, ThreeLods.Length)
+                .Select(k => renderers.Where(r => r.name.EndsWith($"_LOD{k}")).ToArray())
+                .TakeWhile(level => level.Length > 0)
+                .ToArray();
+            if (levels.Length < 2)
+            {
+                Debug.LogWarning($"[VeilmouthTrees] {assetPath}: {levels.Length} LOD object(s); its LOD Group is left as imported.");
+                return;
+            }
+
+            var until = levels.Length == ThreeLods.Length ? ThreeLods : TwoLods;
+            group.SetLODs(levels.Select((level, k) => new LOD(until[k], level)).ToArray());
             group.fadeMode = LODFadeMode.CrossFade;
             group.animateCrossFading = true;
         }

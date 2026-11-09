@@ -6,22 +6,26 @@ Run headless, from the repository root:
     blender -b --factory-startup -noaudio --python-exit-code 1 --python tools/blender/veilmouth_trees.py -- \
         --out unity/Assets/Art/Trees [--sheet <png>] [--only StreetHornbeamA] [--cards-only] [--seeds 8]
 
-Two Blender add-ons must be installed: MTree (Modular Tree 5.6, GPL-3) grows the branches, and Easy Tree only lends its
-CC0 textures from ambientCG (Bark001, LeafSet024 for the beech, LeafSet014 for the hornbeam). Neither's code is shipped.
+Two Blender add-ons must be installed: MTree (Modular Tree 5.6, GPL-3) grows the street and garden trees' branches, and
+Easy Tree grows the owner's mature tree (§27.7) and lends its CC0 textures from ambientCG (Bark001, LeafSet024 for the
+beech, LeafSet014 for the hornbeam). Neither's code is shipped.
 
 1. Cluster card (§27.5 step 1). A flat spray of photographed leaves on short shoots, as a beech or a hornbeam carries
    them, facing the viewer, rendered by Cycles into a card of colour with alpha and of normals (OpenGL, +Y up). The
    card's corners are cut where it is empty, so the card is an octagon.
-2. Skeleton (steps 2-3). MTree's trunk and three orders of branches; the limbs' lengths follow a crown envelope.
+2. Skeleton (steps 2-3). MTree's trunk and three orders of branches; the limbs' lengths follow a crown envelope. The
+   mature tree's is Easy Tree's Simple Tree Generator with the owner's own values (EASY_TREE): its branches' lines
+   with their radii and its twig points; its own tubes, twigs and leaves are left out.
 3. Leaves (step 4). One card on each point of a blue-noise set over the thinnest branches, kept in the crown's outer
    shell with a few inside, each pointing outward along its branch. The twigs' bark under the cards is removed.
-4. Bark decimated to a budget; the cards' normals turned outward from the crown's middle, so a crown shades as a
+4. Bark decimated to a budget (the mature tree's built from its branches' lines as tubes of few sides, thinned
+   until it fits the budget); the cards' normals turned outward from the crown's middle, so a crown shades as a
    whole; wind weights in the vertex colour (linear), read by GameDev/Slice/Tree:
      R  sway: (height / tree height) ^ 1.8, the same for bark and cards, so a card never leaves its branch;
      G  flutter: 0 on the bark, 0 at a card's foot to 1 at its top;
      B  phase: one random value for each card, from its foot.
-5. LOD1: about 45 % of the cards, each 1.3 times larger, on bark decimated further.
-6. FBX: one file per tree, objects <Name>_LOD0 and <Name>_LOD1, metres, +Y up, materials by name only.
+5. LOD1: about 45 % of the cards, each 1.3 times larger, on bark decimated further; the mature tree also has LOD2.
+6. FBX: one file per tree, objects <Name>_LOD0, <Name>_LOD1 (and _LOD2), metres, +Y up, materials by name only.
 
 Every size and count here is an authoring default unless it says measured.
 """
@@ -70,7 +74,30 @@ KINDS = {
                 spread=5.0),
         b2=dict(B2, length=1.5), b3=B3, shapes=("Spherical", "Hemispherical", "Conical"),
         cards=610, card=1.0, bark_tris=3400),
+    # The owner's mature tree (§27.7): its skeleton from Easy Tree (EASY_TREE), its cards on the twig points along the
+    # twigs (as Easy Tree's own twigs grow), a deeper shell as its crown is open, its bark built from the branches'
+    # lines to bark_cut m, and the owner's reference budgets: LOD0 8-12 thousand triangles, LOD1 4-6, LOD2 1.5-2.5
+    # (each farther LOD: the cards kept, how much larger, the bark against LOD0's, the bark's thinnest branch, m).
+    "mature": dict(cards=970, card=0.66, bark_tris=6200, bark_cut=0.006, shell=2.0, inner=0.25, along_twig=True,
+                   lods=[(0.5, 1.35, 0.4, 0.015), (0.2, 2.0, 0.12, 0.03)]),
 }
+
+# The owner's mature tree as the owner set it in Easy Tree, 2026-11-09 (its Random Angle 30 degrees, in radians);
+# the generator's tree is 29.4 units high and is scaled to the tree's height.
+EASY_TREE = {
+    "N Branches per Level": "Two Branches", "Trunk Height": 2, "Treetop Height": 2, "Num Levels": 8,
+    "Branch Length": 13, "Random Angle": math.radians(30.0), "Random Jitter": 0.1, "Gravity": -0.15,
+    "Thickness": 3.0, "Seed": 104, "Add Leaves": True, "Leaf Type": "Hornbeam", "Season": 0.0, "Min Height": 70,
+    "Leaf Density": 1.0, "Leaf Min Scale": 1.0, "Leaf Max Scale": 1.5, "Visible in Viewport": True,
+    "Custom Twig and Leaf": False,
+}
+BARK_SIDES = [(0.08, 6), (0.03, 4), (0.0, 3)]  # a branch's sides by its radius where it starts, m
+BARK_TILE = 1.0  # m of bark one repeat of its texture covers, along and round a branch
+BARK_TOLERANCE = 0.06  # m: how far a branch's tube may stray from its line, the same for thin and thick (thin ones lie
+                       # under the leaves, and there are hundreds of them)
+BARK_THIN = 0.03   # m: where a branch is thinner than this, its tube may stray BARK_LOOSE m from its line: the mature
+BARK_LOOSE = 0.25  # tree's bark to 0.6 cm is 8.9 thousand triangles at 0.06 m everywhere, 6.1 thousand so (its 384
+                   # thinnest branches are straight, 0.97 m long; measured 2026-11-09)
 
 # Each tree's silhouette to keep (measured on the Easy Tree versions of 2026-11-09): the crown's foot and top, m, and
 # its radius in eight bands from foot to top (the 90th percentile of the leaves' distance from the trunk), m. The
@@ -88,6 +115,7 @@ TREES = [
          target=(2.9, 10.0, [2.4, 3.0, 3.2, 3.2, 3.1, 2.8, 2.4, 1.7])),
     dict(name="GardenHornbeamB", kind="garden", leaf="Hornbeam", height=9.6, seed=89,
          target=(3.20, 9.6, [3.17, 3.05, 2.98, 2.89, 2.81, 2.61, 2.39, 1.98])),
+    dict(name="MatureHornbeamA", kind="mature", leaf="Hornbeam", height=11.0, seed=104, easy=EASY_TREE),
 ]
 
 # The leaves: the ambientCG atlas, its grid of leaves (columns, rows), and a leaf's length with its stalk, m.
@@ -118,6 +146,7 @@ LOD1_GROW = 1.3
 LOD1_BARK = 0.35
 LOD1_CUT = 0.025  # m: LOD1's bark keeps branches from this radius, under its larger cards (decimating LOD0's bark to
                   # 35 % stalled at 60-80 % on its many cut twigs: measured 2026-11-09)
+LODS = [(LOD1_KEEP, LOD1_GROW, LOD1_BARK, LOD1_CUT)]  # a kind's farther LODs unless it names its own
 SWAY_POWER = 1.8
 BARK = "VeilmouthBark"
 CARD_TEXTURE = "Tree_Twig_{leaf}"
@@ -709,15 +738,27 @@ def place_cards(obj, spec, inside, rng):
             point = a + (b - a) * r1 + (c - a) * r2
             if inside(point, 1.0):
                 candidates.append((point, tangent))
+    print(f"VEILMOUTH {spec['name']}: thin bark {total:.1f} m², {len(candidates)} candidates in the silhouette")
+    return choose_cards(candidates, spec, rng)
+
+
+def choose_cards(candidates, spec, rng):
+    """
+    Of the candidate (point, direction) pairs, those in the crown's outer shell (the kind's, else SHELL m) thinned to
+    blue noise to the kind's card count less a share deeper in (the kind's, else INNER_KEEP), thinned the same way;
+    the spacing is found for the count. Returns the chosen pairs and the crown's ellipsoid.
+    """
+    kind = KINDS[spec["kind"]]
     points = [p for p, _ in candidates]
     crown = crown_ellipsoid(points)
     depths = hull_depths(points, points)
-    shell = [(p, t) for (p, t), d in zip(candidates, depths) if d < SHELL]
-    inner = [(p, t) for (p, t), d in zip(candidates, depths) if d >= SHELL]
+    depth = kind.get("shell", SHELL)
+    shell = [(p, t) for (p, t), d in zip(candidates, depths) if d < depth]
+    inner = [(p, t) for (p, t), d in zip(candidates, depths) if d >= depth]
     rng.shuffle(shell)
     rng.shuffle(inner)
-    want = KINDS[spec["kind"]]["cards"]
-    want_inner = int(want * INNER_KEEP) if inner else 0
+    want = kind["cards"]
+    want_inner = int(want * kind.get("inner", INNER_KEEP)) if inner else 0
 
     def thinned(items, count):
         lo, hi = 0.02, 3.0
@@ -731,8 +772,8 @@ def place_cards(obj, spec, inside, rng):
 
     outer, spacing = thinned(shell, want - want_inner)
     deep, deep_spacing = thinned(inner, want_inner) if want_inner else ([], 0.0)
-    print(f"VEILMOUTH {spec['name']}: thin bark {total:.1f} m², {len(candidates)} candidates in the silhouette, "
-          f"{len(shell)} in the shell; {len(outer)} cards {spacing:.3f} m apart there, {len(deep)} inside {deep_spacing:.3f} m apart")
+    print(f"VEILMOUTH {spec['name']}: {len(shell)} of {len(candidates)} candidates in the {depth} m shell; "
+          f"{len(outer)} cards {spacing:.3f} m apart there, {len(deep)} inside {deep_spacing:.3f} m apart")
     return outer + deep, crown
 
 
@@ -740,20 +781,35 @@ def card_mesh(spec, card, placements, crown, rng):
     """
     One octagon a card, its foot on its point, its face outward from the crown and its length along the crown's surface
     (up its branch, a little lifted and tilted out), so a card on the crown's edge lies along the outline instead of
-    sticking out of it (a card along its branch and outward, as first tried, made the outline a fringe of fronds).
+    sticking out of it (a card along its branch and outward, as first tried, made the outline a fringe of fronds). A
+    kind along_twig lays each card along its twig instead, a little lifted, its foot a little back on the branch: the
+    owner's mature tree is that fringe of twigs.
     """
-    size = KINDS[spec["kind"]]["card"]
+    kind = KINDS[spec["kind"]]
+    size = kind["card"]
     bm = bmesh.new()
     uv = bm.loops.layers.uv.new("UVMap")
     for p, tangent in placements:
         out, _ = outward(p, crown)
-        along = tangent * 0.5 + Vector((0.0, 0.0, 0.5))
-        along = along - out * along.dot(out)
-        if along.length < 1e-3:
-            along = out.orthogonal()
-        along.normalize()
-        up = (along + out * math.tan(math.radians(rng.uniform(10.0, 30.0)))).normalized()
+        if kind.get("along_twig"):
+            # Half its outward part taken off, so a twig growing straight out of the crown's side does not lay its
+            # card flat and edge-on to a viewer at its side (tried 2026-11-09: the crown's sides were slivers).
+            up = tangent - out * tangent.dot(out) * 0.5
+            up = (up.normalized() + Vector((0.0, 0.0, rng.uniform(0.1, 0.4)))).normalized()
+            p = p - up * 0.1 * size
+        else:
+            along = tangent * 0.5 + Vector((0.0, 0.0, 0.5))
+            along = along - out * along.dot(out)
+            if along.length < 1e-3:
+                along = out.orthogonal()
+            along.normalize()
+            up = (along + out * math.tan(math.radians(rng.uniform(10.0, 30.0)))).normalized()
         facing = out - up * out.dot(up)
+        if facing.length < 0.2:
+            facing = Vector((0.0, 0.0, 1.0)) - up * up.z
+        if facing.length < 1e-3:
+            facing = up.orthogonal()
+        facing.normalize()
         # Turned up to 35 degrees about its length, so the cards on the crown's edge are not all seen edge-on.
         facing = (Matrix.Rotation(math.radians(rng.uniform(-35.0, 35.0)), 3, up) @ facing).normalized()
         spin = Matrix.Rotation(math.radians(rng.uniform(-25.0, 25.0)), 3, facing)
@@ -855,7 +911,9 @@ def assemble(name, bark, leaves, height, leaf):
     bm.free()
     for attribute in [a.name for a in mesh.attributes if a.name in ("radius", "stem_id", "hierarchy_depth",
                                                                    "branch_extent", "direction", "pivot_position",
-                                                                   "vein_distance", "phyllotaxis_angle")]:
+                                                                   "vein_distance", "phyllotaxis_angle", "tip",
+                                                                   "startHeight", "forward", "basePos", "height",
+                                                                   "offsetPos")]:
         mesh.attributes.remove(mesh.attributes[attribute])
     mesh.materials.append(material(BARK))
     mesh.materials.append(material(leaves_material(leaf)))
@@ -922,25 +980,226 @@ def grow(m, create_mesh, spec, seeds):
     return obj
 
 
-def build_tree(m, create_mesh, spec, cards, seeds):
-    rng = random.Random(f"cards-{spec['name']}")
-    obj = grow(m, create_mesh, spec, seeds)
-    inside = crown_limit(own_envelope(thin_points(obj)))
-    placements, crown = place_cards(obj, spec, inside, rng)
-    leaves = card_mesh(spec, cards[spec["leaf"]], placements, crown, rng)
-    bark = bark_mesh(obj, inside, BARK_CUT)
-    bark_far = bark_mesh(obj, inside, LOD1_CUT)
-    remove(obj)
-    budget = KINDS[spec["kind"]]["bark_tris"]
-    bark0 = decimate(bark, budget, spec["name"] + "_b0")
-    bark1 = decimate(bark_far, int(budget * LOD1_BARK), spec["name"] + "_b1")
-    leaves1 = leaves.copy()
-    thin(leaves1, LOD1_KEEP, LOD1_GROW)
-    lod0 = assemble(spec["name"] + "_LOD0", bark0, leaves, spec["height"], spec["leaf"])
-    lod1 = assemble(spec["name"] + "_LOD1", bark1, leaves1, spec["height"], spec["leaf"])
-    for bm in (bark, bark_far, leaves, bark0, bark1, leaves1):
+# --------------------------------------------------------------------------------------------- the mature tree
+
+def easy_generator():
+    """
+    Easy Tree's Simple Tree Generator, appended, with one more output, Skeleton: the branches' lines before they become
+    tubes, each point with its tube's radius ("radius", in the generator's units).
+    """
+    import addon_utils
+    module = addon("easy_tree")
+    addon_utils.enable(module.__name__, default_set=False, persistent=False)
+    if "Simple Tree Generator" not in bpy.data.node_groups:
+        blend = os.path.join(os.path.dirname(module.__file__), "assets", "assets.blend")
+        with bpy.data.libraries.load(blend, link=False) as (_, dst):
+            dst.node_groups = ["Simple Tree Generator"]
+    generator = bpy.data.node_groups["Simple Tree Generator"]
+    if any(item.name == "Skeleton" for item in generator.interface.items_tree):
+        return generator
+
+    def bring_out(group, socket):
+        group.interface.new_socket("Skeleton", in_out='OUTPUT', socket_type='NodeSocketGeometry')
+        output = next(n for n in group.nodes if n.bl_idname == 'NodeGroupOutput' and n.is_active_output)
+        group.links.new(socket, output.inputs["Skeleton"])
+
+    def user(group, inner):
+        return next(n for n in group.nodes if getattr(n, "node_tree", None) == inner)
+
+    mesher = bpy.data.node_groups["Tree to Mesh"]
+    tubes = next(n for n in mesher.nodes if n.bl_idname == 'GeometryNodeCurveToMesh')
+    circle = next(n for n in mesher.nodes if n.bl_idname == 'GeometryNodeCurvePrimitiveCircle')
+    store = mesher.nodes.new('GeometryNodeStoreNamedAttribute')
+    store.data_type = 'FLOAT'
+    store.domain = 'POINT'
+    store.inputs["Name"].default_value = "radius"
+    mesher.links.new(tubes.inputs["Curve"].links[0].from_socket, store.inputs["Geometry"])
+    # The tube's radius: the profile circle's radius times the scale Curve to Mesh gives it at each point.
+    scale = mesher.nodes.new('ShaderNodeMath')
+    scale.operation = 'MULTIPLY'
+    mesher.links.new(tubes.inputs["Scale"].links[0].from_socket, scale.inputs[0])
+    scale.inputs[1].default_value = circle.inputs["Radius"].default_value
+    mesher.links.new(scale.outputs[0], next(s for s in store.inputs if s.name == "Value" and s.enabled))
+    bring_out(mesher, store.outputs["Geometry"])
+    leaves = bpy.data.node_groups["Tree to Mesh and Leaves"]
+    bring_out(leaves, user(leaves, mesher).outputs["Skeleton"])
+    bring_out(generator, user(generator, leaves).outputs["Skeleton"])
+    return generator
+
+
+def easy_tree(spec):
+    """
+    The tree Easy Tree grows from the spec's values, scaled to the tree's height, its foot at the origin: its branches
+    as (points, radii) lines, m, each from where it leaves its parent's middle to its tip; and its twigs as (point,
+    direction) pairs: where each twig leaves its branch and the way it grows. Easy Tree's own tubes, twigs and leaves
+    are not used.
+    """
+    group = bpy.data.node_groups.new(f"Grow_{spec['name']}", 'GeometryNodeTree')
+    group.interface.new_socket("Geometry", in_out='OUTPUT', socket_type='NodeSocketGeometry')
+    out = group.nodes.new('NodeGroupOutput')
+    tree = group.nodes.new('GeometryNodeGroup')
+    tree.node_tree = easy_generator()
+    join = group.nodes.new('GeometryNodeJoinGeometry')
+    group.links.new(tree.outputs["Skeleton"], join.inputs[0])
+    group.links.new(tree.outputs["Geometry"], join.inputs[0])
+    group.links.new(join.outputs[0], out.inputs[0])
+    sockets = {" ".join(s.name.split()): s for s in tree.inputs}
+    for name, value in spec["easy"].items():
+        sockets[name].default_value = value
+    holder = new_object(spec["name"] + "_easy")
+    holder.modifiers.new("Easy Tree", 'NODES').node_group = group
+    evaluated = holder.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    geometry = evaluated.evaluated_geometry()  # held, or its parts are freed with it
+    lines = geometry.curves
+    points = [Vector(p.vector) for p in lines.attributes["position"].data]
+    factor = spec["height"] / max(p.z for p in points)
+    radii = [r.value * factor for r in lines.attributes["radius"].data]
+    offsets = [o.value for o in lines.curve_offset_data]
+    branches = [([p * factor for p in points[a:b]], radii[a:b]) for a, b in zip(offsets, offsets[1:])]
+    twigs = []
+    cloud = geometry.instances_pointcloud()
+    for item in next(a for a in cloud.attributes if a.name == "instance_transform").data:
+        location, rotation, _ = Matrix(item.value).decompose()
+        twigs.append((location * factor, (rotation @ Vector((0.0, 0.0, 1.0))).normalized()))
+    del geometry
+    remove(holder)
+    bpy.data.node_groups.remove(group)
+    print(f"VEILMOUTH {spec['name']}: Easy Tree's tree scaled by {factor:.4f}, {len(branches)} branches, "
+          f"{len(twigs)} twigs, trunk {2 * radii[0]:.2f} m across")
+    return branches, twigs
+
+
+def simplified(points, radii, tolerance):
+    """
+    The indices of a line's points kept so that every point (and its radius) lies within tolerance(its radius) m of the
+    line.
+    """
+    keep = {0, len(points) - 1}
+    stack = [(0, len(points) - 1)]
+    while stack:
+        a, b = stack.pop()
+        axis = points[b] - points[a]
+        length2 = max(axis.length_squared, 1e-12)
+        worst, at = 0.0, None
+        for i in range(a + 1, b):
+            t = max(0.0, min(1.0, (points[i] - points[a]).dot(axis) / length2))
+            off = max((points[a] + axis * t - points[i]).length, abs(radii[a] + (radii[b] - radii[a]) * t - radii[i]))
+            off /= tolerance(radii[i])
+            if off > worst:
+                worst, at = off, i
+        if at is not None and worst > 1.0:
+            keep.add(at)
+            stack += [(a, at), (at, b)]
+    return sorted(keep)
+
+
+def tube_bark(branches, cut, tris, coarse, name):
+    """
+    The bark built from the branches' lines: each branch up to where it thins to cut m, its line simplified within a
+    BARK_TOLERANCE (BARK_LOOSE where thinner than BARK_THIN), with the sides its radius gives it, ending in a point;
+    its start lies inside its parent. (Ending thin branches at the leaves' own outline, as bark_mesh does, cut none of
+    the mature tree's: its twig points reach as far as its branches. Tried 2026-11-09.)
+    While it is over tris triangles, cut grows. coarse (the LOD's number) loosens the line and takes sides off.
+    (Decimating Easy Tree's own tubes to a budget tore them into shards: tried 2026-11-09.)
+    """
+    while True:
+        bm = bmesh.new()
+        uv = bm.loops.layers.uv.new("UVMap")
+        layer = bm.verts.layers.float.new("radius")
+        kept = 0
+        for points, radii in branches:
+            if radii[0] < cut:
+                continue
+            end = next((i for i, r in enumerate(radii) if r < cut), None)
+            if end is not None:
+                f = (radii[end - 1] - cut) / max(1e-9, radii[end - 1] - radii[end])
+                points, radii = points[:end] + [points[end - 1].lerp(points[end], f)], radii[:end] + [cut]
+            if len(points) < 2 or sum((b - a).length for a, b in zip(points, points[1:])) < 0.05:
+                continue
+            r0 = radii[0]
+            index = simplified(points, radii, lambda r: (1 + coarse) * (BARK_TOLERANCE if r >= BARK_THIN else BARK_LOOSE))
+            points, radii = [points[i] for i in index], [radii[i] for i in index]
+            sides = max(3, next(s for least, s in BARK_SIDES if r0 >= least) - coarse)
+            turns = max(1, round(2.0 * math.pi * r0 / BARK_TILE))
+            tangents = [(points[min(len(points) - 1, i + 1)] - points[max(0, i - 1)]).normalized()
+                        for i in range(len(points))]
+            normal = tangents[0].orthogonal().normalized()
+            rings, along = [], 0.0
+            for i, (p, r, t) in enumerate(zip(points, radii, tangents)):
+                if i:
+                    normal = tangents[i - 1].rotation_difference(t) @ normal
+                    normal = (normal - t * normal.dot(t)).normalized()
+                    along += (p - points[i - 1]).length
+                if i == len(points) - 1:
+                    ring = [bm.verts.new(p)]
+                    ring[0][layer] = 0.0
+                else:
+                    side = t.cross(normal)
+                    ring = []
+                    for j in range(sides):
+                        a = 2.0 * math.pi * j / sides
+                        v = bm.verts.new(p + (normal * math.cos(a) + side * math.sin(a)) * r)
+                        v[layer] = r
+                        ring.append(v)
+                rings.append((ring, along / BARK_TILE))
+            for (ra, va), (rb, vb) in zip(rings, rings[1:]):
+                for j in range(sides):
+                    u0, u1 = turns * j / sides, turns * (j + 1) / sides
+                    if len(rb) == 1:
+                        face = bm.faces.new((ra[j], ra[(j + 1) % sides], rb[0]))
+                        uvs = ((u0, va), (u1, va), ((u0 + u1) / 2.0, vb))
+                    else:
+                        face = bm.faces.new((ra[j], ra[(j + 1) % sides], rb[(j + 1) % sides], rb[j]))
+                        uvs = ((u0, va), (u1, va), (u1, vb), (u0, vb))
+                    for loop, coords in zip(face.loops, uvs):
+                        loop[uv].uv = coords
+            kept += 1
+        count = sum(len(f.verts) - 2 for f in bm.faces)
+        if count <= tris or cut > 0.2:
+            break
         bm.free()
-    return lod0, lod1
+        cut *= 1.15
+    print(f"VEILMOUTH {name}: bark of {kept} branches to {100 * cut:.1f} cm, {count} triangles")
+    return bm
+
+
+def build_tree(m, create_mesh, spec, cards, seeds):
+    """The tree's LOD0 and its farther LODs (the kind's, else LODS), each one object."""
+    rng = random.Random(f"cards-{spec['name']}")
+    kind = KINDS[spec["kind"]]
+    budget = kind["bark_tris"]
+    obj = None
+    if "easy" in spec:
+        branches, twigs = easy_tree(spec)
+        placements, crown = choose_cards(twigs, spec, rng)
+
+        def bark_for(k, cut, share):
+            return tube_bark(branches, cut, int(budget * share), k, f"{spec['name']}_b{k}")
+    else:
+        obj = grow(m, create_mesh, spec, seeds)
+        inside = crown_limit(own_envelope(thin_points(obj)))
+        placements, crown = place_cards(obj, spec, inside, rng)
+
+        def bark_for(k, cut, share):
+            whole = bark_mesh(obj, inside, cut)
+            bm = decimate(whole, int(budget * share), f"{spec['name']}_b{k}")
+            whole.free()
+            return bm
+    leaves = card_mesh(spec, cards[spec["leaf"]], placements, crown, rng)
+    lods = []
+    farther = kind.get("lods", LODS)
+    for k, (keep, grow_by, share, cut) in enumerate([(1.0, 1.0, 1.0, kind.get("bark_cut", BARK_CUT))] + farther):
+        bark = bark_for(k, cut, share)
+        leaves_k = leaves.copy()
+        if k:
+            thin(leaves_k, keep, grow_by)
+        lods.append(assemble(f"{spec['name']}_LOD{k}", bark, leaves_k, spec["height"], spec["leaf"]))
+        bark.free()
+        leaves_k.free()
+    leaves.free()
+    if obj is not None:
+        remove(obj)
+    return lods
 
 
 # --------------------------------------------------------------------------------------------- export and preview
@@ -1064,9 +1323,11 @@ def main():
     for spec in TREES:
         if args.only and spec["name"] not in args.only.split(","):
             continue
-        lod0, lod1 = build_tree(m, create_mesh, spec, cards, args.seeds)
-        export([lod0, lod1], os.path.join(out, f"Tree_{spec['name']}.fbx"))
-        remove(lod1)
+        lods = build_tree(m, create_mesh, spec, cards, args.seeds)
+        export(lods, os.path.join(out, f"Tree_{spec['name']}.fbx"))
+        for far in lods[1:]:
+            remove(far)
+        lod0 = lods[0]
         if args.sheet:
             lod0.location.x = 9.0 * len(row)
             row.append(lod0)

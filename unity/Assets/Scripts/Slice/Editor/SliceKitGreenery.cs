@@ -47,8 +47,9 @@ namespace GameDev.Slice.EditorTools
 
             // Veilmouth's own thin trees (§27, owner 2026-11-09), made in Blender from Easy Tree with twig cards and wind
             // weights (tools/blender/veilmouth_trees.py), at the heights Blender gave them: they replace the fruit tree
-            // and the warped trees in the streets, squares and gardens.
-            foreach (var name in VeilmouthTrees.Street.Concat(VeilmouthTrees.Garden))
+            // and the warped trees in the streets, squares and gardens. The owner's mature tree (§27.7) is in the kit, and
+            // where it stands is the owner's to choose (99 VS-GREEN).
+            foreach (var name in VeilmouthTrees.Street.Concat(VeilmouthTrees.Garden).Concat(VeilmouthTrees.Mature))
             {
                 yield return S("CityTree_" + name, "Tree", name, VeilmouthTrees.ArtFolder, "Tree_" + name, KitLayers.Vegetation, Body.Trunk, Anchor.Pivot);
             }
