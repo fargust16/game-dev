@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-09 (the owner: G5, barrels and crates only in stores, warehouses and the port, a barrel rare in a home; §10, the owner's Tripo pieces for every interior and their places, and §3, §4 and §8 changed to match. The earlier note is in the update history)
+Last Updated: 2026-11-09 (§10: the hanging sign hangs outside, over two shop doors, by the owner's VS-SIGN (b). Earlier: the owner: G5, barrels and crates only in stores, warehouses and the port, a barrel rare in a home; §10, the owner's Tripo pieces for every interior and their places, and §3, §4 and §8 changed to match. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -204,7 +204,7 @@ The owner: take every piece from TripoModels for the interior scenes, and leave 
 | bracket lantern (`antique_wall_lantern`) | `TrLantern` | 0.5 m | the hall's and landing's wall lamps, poor and middling |
 | chandelier (`ornate_chandelier`) | `TrChandelier` | 1.2 m | the Soot & Bell's taproom, the one room higher than a storey (G9) |
 
-The bed, the bar counter and its cabinet, the cell bars and door and the Notice Board were the owner's Tripo pieces already (asset map §4). The other models are not furnishing: the townsman, the woman and the dog are people and beasts, the angels, the lion and the birdbath are the garden ornaments of the city plan §23, the coins and firearms are items, the rock is the iron ore, and the hanging sign belongs to a shop front and waits for the owner ([99 Open Questions](../../../99%20Open%20Questions.md) VS-SIGN).
+The bed, the bar counter and its cabinet, the cell bars and door and the Notice Board were the owner's Tripo pieces already (asset map §4). The other models are not furnishing: the townsman, the woman and the dog are people and beasts, the angels, the lion and the birdbath are the garden ornaments of the city plan §23, the coins and firearms are items, the rock is the iron ore, and the hanging sign hangs outside, over the doors of Harrow & Tincture and the Soot & Bell (city plan §25.6, [99 Open Questions](../../../99%20Open%20Questions.md) VS-SIGN (b)).
 
 The seven took them in place (`VeilmouthInteriors.EnrichWithTripo`), so what S2 wrote into their scenes stays. The barrels in the Soot & Bell's stair hall and Harrow's store room went out; a piano, log baskets and fire irons came in; and the pieces above replaced the pack's where the table says.
 

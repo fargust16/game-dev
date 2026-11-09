@@ -119,6 +119,14 @@ namespace GameDev.Slice.EditorTools
             lantern.ModelYaw = 90f; // survey: its wall plate is on +X
             yield return lantern;
 
+            // Outside, the one exception (99 VS-SIGN (b), owner 2026-11-09): a blank board under an iron bracket, about 1 m
+            // high true, hung on a shop's facade beside its door by VeilmouthSigns. Its back is the bracket's wall plate.
+            var sign = T("TrSign", "wooden_sign", 1.2f, Anchor.Face, ng, Body.None);
+            sign.ModelYaw = 90f; // survey: its wall plate is on +X, as the lantern's
+            sign.Face = 0f;      // on the facade itself, which has no infill plane
+            sign.Width = 1;
+            yield return sign;
+
             // Under a ceiling higher than a storey only (rules G9): 1.2 m true.
             var chandelier = T("TrChandelier", "ornate_chandelier", 1.4f, Anchor.Centre, ng, Body.None);
             chandelier.Top = true;

@@ -70935,6 +70935,39 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4352062465262212967, guid: 5cf08feef0b5b1b4b9b8c56ee18d3d69, type: 3}
   m_PrefabInstance: {fileID: 399438839}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &400633864
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 400633865}
+  m_Layer: 0
+  m_Name: Shop Signs
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &400633865
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 400633864}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1892540517}
+  - {fileID: 2116223358}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &400939873
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -358227,6 +358260,68 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 1892452189}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1892540516
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 400633865}
+    m_Modifications:
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 173.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 29.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -272.15997
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.00000004371139
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5491892751401679088, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_Name
+      value: Sign - Harrow & Tincture
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+--- !u!4 &1892540517 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+  m_PrefabInstance: {fileID: 1892540516}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1893745971
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -402150,6 +402245,68 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7864356638066234300, guid: 5fff4dab05b3000498d0d4d162a1e480, type: 3}
   m_PrefabInstance: {fileID: 2115208366}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2116223357
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 400633865}
+    m_Modifications:
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 189.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 29.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -272.15997
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.00000004371139
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5491892751401679088, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+      propertyPath: m_Name
+      value: Sign - The Soot & Bell
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+--- !u!4 &2116223358 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3734321792333322552, guid: b4238e2e67aa2314b9dc09995229f061, type: 3}
+  m_PrefabInstance: {fileID: 2116223357}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2116324459
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -407148,3 +407305,4 @@ SceneRoots:
   - {fileID: 1692410434}
   - {fileID: 1584273857}
   - {fileID: 1345180139}
+  - {fileID: 400633865}
