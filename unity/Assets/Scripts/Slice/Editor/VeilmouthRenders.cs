@@ -654,6 +654,45 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// The street dressing of reference plan R7 at noon: the High Street's shop fronts along both pavements, with the
+        /// goods set out by their doors, and a Ridge villa's iron balcony close up. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderDressing -lookLabel r7
+        /// </summary>
+        public static void RenderDressing()
+        {
+            var label = Argument("-lookLabel") ?? "r7";
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            _skyAndGrade = sky != null;
+            try
+            {
+                sky?.Apply(12 * 60);
+                Eye($"{label}_warmup", Ground(-5f, -228.5f, 1.7f), Ground(40f, -226f, 1f));
+                File.Delete($"{OutputFolder}/{label}_warmup.png");
+                // Plan (px, py) is world (px − 500, 500 − py): the High Street's shop fronts stand on py 726 and 744.
+                Eye($"{label}_shops_north", Ground(-5f, -228.8f, 1.7f), Ground(40f, -226.2f, 0.8f), 55f);
+                Eye($"{label}_shops_south", Ground(130f, -241.2f, 1.7f), Ground(85f, -243.8f, 0.8f), 55f);
+                string Source(Transform t) => PrefabUtility.IsAnyPrefabInstanceRoot(t.gameObject) ? PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject)?.name ?? "" : "";
+                var villa = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None)
+                    .Where(t => Source(t).StartsWith("Kit_House_Villa") && t.Find(VictorianHouses.DoorMarker) != null).OrderBy(t => Source(t)).FirstOrDefault();
+                if (villa != null)
+                {
+                    var door = villa.Find(VictorianHouses.DoorMarker).position;
+                    Eye($"{label}_villa_balcony", door + (villa.forward * 6f) + (villa.right * 2.5f) + (Vector3.up * 2.2f), door + (Vector3.up * 5f), 50f);
+                }
+            }
+            finally
+            {
+                _skyAndGrade = false;
+            }
+
+            Debug.Log($"[VeilmouthRenders] the street dressing's views written to {OutputFolder} as {label}_*.");
+        }
+
+        /// <summary>
         /// The project's painted skies (Free HDR Sky) seen from an empty scene: north, east, south, west at 10° up and
         /// straight up, so the sun and the horizon can be found before the sky is set by the clock. Batch:
         /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderSkies

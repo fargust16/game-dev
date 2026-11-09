@@ -88,6 +88,7 @@ namespace GameDev.Slice.EditorTools
         private static int _passages, _openSpans; // R5: passages left between houses, spans no house fits
         private static List<Vector2[]> _houses;  // every house's plan footprint, in the order built
         private static List<Vector2[]> _stoops;  // the plan bounds of the houses' own stoops, side doors' among them
+        private static List<(Vector2 At, Vector2 Out, float Front, float A0, float A1)> _shopDoors; // R7: a shop's front doors and its frontage
         private static List<(Facing F, float Front, int A0, int A1, int Depth)> _backs; // passages' backs, placed after the houses
         private static HashSet<(bool AlongX, float Line, int A0, int A1)> _fenced; // railing lines already set
         private static Transform _gardens;
@@ -227,6 +228,7 @@ namespace GameDev.Slice.EditorTools
             _partyWalls = new List<(bool, float, float)>();
             _houses = new List<Vector2[]>();
             _stoops = new List<Vector2[]>();
+            _shopDoors = new List<(Vector2, Vector2, float, float, float)>();
             _backs = new List<(Facing, float, int, int, int)>();
             _fenced = new HashSet<(bool, float, int, int)>();
             _stepsClear = float.MaxValue;
@@ -267,6 +269,8 @@ namespace GameDev.Slice.EditorTools
             Squares();
             _parent = Group("Lamps");
             AllLamps();
+            _parent = Group("Shop Goods");
+            ShopGoods();
             _parent = Group("Outside the Walls");
             Fields();
             Forest();
@@ -599,6 +603,11 @@ namespace GameDev.Slice.EditorTools
                 if (child.name == VictorianHouses.DoorMarker)
                 {
                     Doorway(child.position, Outward(f), floor, e.Stoop, e.StoopWidth);
+                    var at = Plan(child.position);
+                    if (key.Contains("_Shop") && Mathf.Abs((along ? at.y : at.x) - front) < 1f)
+                    {
+                        _shopDoors.Add((at, outward, front, along ? lo.x : lo.y, along ? hi.x : hi.y));
+                    }
                 }
             }
 
@@ -1973,6 +1982,65 @@ namespace GameDev.Slice.EditorTools
 
             Prop("Barrels", Facing.N, 716f, 785f);
             Prop("Crate", Facing.N, 726f, 785f);
+        }
+
+        /// <summary>
+        /// Goods set out before the shops (reference plan R7.1): beside each shop's front door a crate, a barrel or a box
+        /// on the pavement, 2.6 m from the door's middle, clear of the shop's stoop, 3.5 m wide (measured on the baked
+        /// shops), on the side the seed picks or else the other. It stands in the second metre from the front: blocks
+        /// stand on whole cells, and the shop front stands proud into the first (the kit check found every one there
+        /// touching it). It stands only before its own shop, with at least 1 m of pavement left beyond it, and never on
+        /// a step, a stoop or a lamp. What a Victorian shop front shows besides, an awning, a hanging sign,
+        /// a shop window, waits on the wanted list (SLICE_MODELS_WANTED.md). Sizes are authoring defaults.
+        /// </summary>
+        private static void ShopGoods()
+        {
+            var rng = new Random(724);
+            var keys = new[] { "Crate", "Barrel", "Box" };
+            var placed = 0;
+            int frontage = 0, pavement = 0, stoop = 0, taken = 0;
+            foreach (var (at, outward, front, a0, a1) in _shopDoors)
+            {
+                var alongX = Mathf.Abs(outward.y) > 0.5f;
+                var key = keys[rng.Next(keys.Length)];
+                var first = rng.Next(2) == 0 ? 1f : -1f;
+                foreach (var s in new[] { first, -first })
+                {
+                    var along = (alongX ? at.x : at.y) + (s * 2.6f);
+                    if (along - 0.5f < a0 + 0.2f || along + 0.5f > a1 - 0.2f)
+                    {
+                        frontage++;
+                        continue;
+                    }
+
+                    var outside = alongX ? outward.y : outward.x;
+                    var centre = alongX ? new Vector2(along, front + (outside * 1.5f)) : new Vector2(front + (outside * 1.5f), along);
+                    var beyond = centre + (outward * 1.5f);
+                    var quad = Rect(centre.x - 0.5f, centre.y - 0.5f, centre.x + 0.5f, centre.y + 0.5f);
+                    if (!_pavements.On(centre.x, centre.y) || !_pavements.On(beyond.x, beyond.y))
+                    {
+                        pavement++;
+                        continue;
+                    }
+
+                    if (_stoops.Any(t => Overlap(t, quad)))
+                    {
+                        stoop++;
+                        continue;
+                    }
+
+                    taken++;
+                    if (Prop(key, alongX ? (outside > 0f ? Facing.S : Facing.N) : (outside > 0f ? Facing.E : Facing.W), centre.x - 0.5f, centre.y - 0.5f) != null)
+                    {
+                        placed++;
+                        taken--;
+                        break;
+                    }
+                }
+            }
+
+            Debug.Log($"[VeilmouthCity] shop goods (R7.1): {placed} set out before {_shopDoors.Count} shop doors; places refused: " +
+                      $"{frontage} past the shop's frontage, {pavement} off the pavement or too narrow, {stoop} on a stoop, {taken} on something placed.");
         }
 
         // ------------------------------------------------------------------------------------------- lamps

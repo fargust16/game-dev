@@ -425,8 +425,8 @@ namespace GameDev.VictorianKit.EditorTools
         }
 
         /// <summary>
-        /// A villa: 12 × 10 m with a 4 × 2 m pavilion, three storeys. A doorcase at the pavilion's door and a stone balcony
-        /// over it, bay windows beside, lucarnes on the main fronts, chimneys and the vane on the flat (as R3, smaller).
+        /// A villa: 12 × 10 m with a 4 × 2 m pavilion, three storeys. A doorcase at the pavilion's door and an iron balcony
+        /// over it (Plans/VEILMOUTH_REFERENCE_PLAN.md R7.3: the Ridge's balconies have iron rails), bay windows beside, lucarnes on the main fronts, chimneys and the vane on the flat (as R3, smaller).
         /// </summary>
         public static VicHouseSpec Villa(string name, string palette)
         {
@@ -460,7 +460,7 @@ namespace GameDev.VictorianKit.EditorTools
             };
             VicRoofs.Shell(h, plan, 3, facade);
             VicDress.Doorcase(h, new V3(5, 0, VicKit.FloorZ(0)), 0.0);
-            VicDress.Balcony(h, new V3(5, 0, VicKit.FloorZ(1)), 0.0, VicKit.FloorZ(1) + VicKit.WinSill - 0.02, true);
+            VicDress.Balcony(h, new V3(5, 0, VicKit.FloorZ(1)), 0.0, VicKit.FloorZ(1) + VicKit.WinSill - 0.02, false);
             var o = new VicMansardOptions();
             o.Chimneys.Add((1, 3));
             o.Chimneys.Add((4, 3));

@@ -1,10 +1,10 @@
 # Slice Models Wanted
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft
 
-Last Updated: 2026-11-09 (*Porches, fronts and the skyline*: a porch roof with a cornice, a door hood on brackets, an iron-and-glass canopy, a shop front, a church with a spire, a clock face, and clay tiles only with D6 (b), from the reference plan R6–R8. Earlier: the city: statues covered by the owner's three angels and two lions at the palace. Earlier: the city: a statue in a square is covered for now by the owner's angel in Wardley Garden; fountains to come from the owner. Earlier: *Interior detail*: the props that would fill the interiors with life, room by room, asked by the owner after play test VI-8; a low pub partition. Earlier: Interiors: a fixed wall bench or settle, an upright piano and a stage platform, which the furnishing rules §8 and the Soot & Bell's pub plan need (VI-7). Earlier: Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
+Last Updated: 2026-11-09 (*Porches, fronts and the skyline*: a street tree's planter, a double gas lamp, bunting and a string of lamps, a flower cart and leaves as decals, from the reference plan R7; the other R7 pieces were listed already. Earlier: *Porches, fronts and the skyline*: a porch roof with a cornice, a door hood on brackets, an iron-and-glass canopy, a shop front, a church with a spire, a clock face, and clay tiles only with D6 (b), from the reference plan R6–R8. Earlier: the city: statues covered by the owner's three angels and two lions at the palace. Earlier: the city: a statue in a square is covered for now by the owner's angel in Wardley Garden; fountains to come from the owner. Earlier: *Interior detail*: the props that would fill the interiors with life, room by room, asked by the owner after play test VI-8; a low pub partition. Earlier: Interiors: a fixed wall bench or settle, an upright piano and a stage platform, which the furnishing rules §8 and the Soot & Bell's pub plan need (VI-7). Earlier: Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
 
 Depends On: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §8 and §14, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -197,6 +197,11 @@ The owner's walk of C3 found the porch of columns and a bare beam out of place, 
 | A church or cathedral with a spire, seen from the city | The Ridge or beyond the walls | 20 × 40 × 45 | B | Asset map §9 row 23. R3's haze makes it the reference's landmark. Seen, not entered, in the slice |
 | Clock face for a tower | The town hall or the Tower6 | 2 × 0.2 × 2 | C | Asset map §9 row 24. A lit face at night |
 | Clay roof tiles as a texture set on the slate slot | Parts of the city, if the owner wants them | — | C | Only with the owner's D6 (b); style guide §2 has no tiled roof |
+| Square planter or cast-iron tree grate for a street tree | The High Street, Crown Avenue | 1.2 × 1.2 × 0.5 | B | Reference plan R7.2. Without it a tree cannot stand in the paving |
+| Double gas lamp, two lanterns on one post | Squares, the Palace Forecourt | 1.4 × 0.4 × 4.5 | B | R7.2. The kit's lamp post has one lantern, and two posts are not one lamp |
+| Bunting and a string of lamps between two posts | The Market Place | 8 m spans | C | R7.4. Lit at night |
+| Flower cart or flower seller's stand | The Market Place, the High Street | 1.5 × 1 × 1.2 | C | R7.4 |
+| Fallen leaves gathered in gutters and corners, as decals | Every street, more by trees | — | C | R7.5, with the puddles of *Life in the street* |
 
 ## How to add one
 

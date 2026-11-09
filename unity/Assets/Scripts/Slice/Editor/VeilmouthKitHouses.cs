@@ -121,6 +121,25 @@ namespace GameDev.Slice.EditorTools
             Debug.Log($"[VeilmouthKitHouses] baked {entries.Count} types.");
         }
 
+        /// <summary>
+        /// Bakes again only the types whose key contains the text after <c>-bakeOnly</c> on the command line ("Villa"):
+        /// a bake gives every piece a new file ID, so this is only for types none of the city's overrides reach (the
+        /// strange windows are on shops and tenements, VeilmouthMystic), and the streets are rebuilt after it.
+        /// </summary>
+        public static void BakeOnlyBatch()
+        {
+            var args = Environment.GetCommandLineArgs();
+            var i = Array.IndexOf(args, "-bakeOnly");
+            if (i < 0 || i + 1 >= args.Length)
+            {
+                throw new ArgumentException("-bakeOnly <part of a type's key> is required.");
+            }
+
+            var part = args[i + 1];
+            var entries = BakeAll(k => k.Contains(part));
+            Debug.Log($"[VeilmouthKitHouses] baked {entries.Count} types with '{part}': {string.Join(", ", entries.Keys)}.");
+        }
+
         /// <summary>A few types, for a look and for the prefabs' size, without the whole set.</summary>
         public static void BakeProbe()
         {
