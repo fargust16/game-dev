@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.5
+Version: 0.6
 
-Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1), the seven wait for VI-7
+Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-08 (after play test VI-8: G9's chandelier only under a ceiling higher than a storey; G10, a missing piece is never pieced together; G11, the doorway check; G12, a hearth burns or is out. The earlier note is in the update history)
+Last Updated: 2026-11-09 (the owner: G5, barrels and crates only in stores, warehouses and the port, a barrel rare in a home; §10, the owner's Tripo pieces for every interior and their places, and §3, §4 and §8 changed to match. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -39,7 +39,7 @@ These hold in every room. A later rule never overrides an earlier one.
 
 **G4. Every piece belongs to a place.** A chair stands at its table, desk or hearth and faces it. A lamp stands where something is read, eaten or worked. A rug lies under its group. A piece with no place is not placed.
 
-**G5. Small things lie on surfaces.** A small prop stands on a surface of its place: a table, shelf, mantel, counter, nightstand, desk, washstand, bath's rim. Only what really lies on a floor may lie on one: books and papers in a study, a basket or bucket in a kitchen or scullery, crates, barrels, sacks and firewood in a store, a coal scuttle by a hearth.
+**G5. Small things lie on surfaces.** A small prop stands on a surface of its place: a table, shelf, mantel, counter, nightstand, desk, washstand, bath's rim. Only what really lies on a floor may lie on one: books and papers in a study, a basket or bucket in a kitchen or scullery, crates, barrels and sacks in a store, a log basket and fire irons by a hearth. **Barrels and crates are never filler** (owner, 2026-11-09): they stand in a store, a warehouse, a cellar store, the port, and at a bar's end, never in a hall, a stair hall, a yard or a living room for their own sake; in a home a barrel is rare.
 
 **G6. Plants and stands** go in a corner, beside a window, or beside a seat, on the floor or on a small table; never in a walk-way or the middle.
 
@@ -64,7 +64,7 @@ Each place has an anchor, its companions, where it stands, and the small things 
 | **Sleep** | bed (`Bed`) | a nightstand each side (rich, middling) or one (poor); a rug at the foot (rich) | head centred on a wall without a window segment, not the wall of the door if a better one exists; the open sides and the foot clear (G1) | candle or lamp on a nightstand; a book |
 | **Dress** | wardrobe or tall cupboard (`Cupboard_4`) | chest of drawers (`Cupboard_2`) with a mirror over it; a chair; a coat stand in a corner | wall opposite or beside the bed; tall pieces in corners (G3) | brush, small box on the chest |
 | **Wash** | basin (`Sink`) with a mirror (`Mirror_*`) over it | toilet (`Toilet_Seat`); bath (`Bathtub`); a wall shelf (`Shelf_4`) or cabinet; towel hook (`Hanger*`); bucket | bath along a wall, its long side to the wall; toilet against a wall beside a corner, its front cell clear; basin centred on its wall | soap and sponge on the basin and the bath's rim; brushes on the shelf |
-| **Hearth** | fireplace (`Mantel`) | an armchair each side facing in, or a settee facing it; a rug before it; a mirror or picture above | centred on an inner wall (G8) | clock, vases, candles on the mantel; a coal scuttle (*missing*) |
+| **Hearth** | fireplace (`Mantel`) | an armchair each side facing in, or a settee facing it; a rug before it; a mirror or picture above | centred on an inner wall (G8) | clock, vases, candles on the mantel; a log basket beside it, and fire irons in a middling room and up (Tripo, §10) |
 | **Sit** | settee (`Couch_*`) | a low table before it; armchairs each side facing in; a lamp; a plant in the corner beside | settee against a wall, the group facing the room's middle or the hearth | cups, a book, a vase on the low table |
 | **Eat** | table (`Table_*`) | chairs on its sides facing it (G4); a sideboard or glazed cupboard on a wall; a chandelier over it (rich) | centred in the room in a dining room; in a kitchen centred or against a wall when the room is small | plates, cups, cutlery, candles on the table; plates in the glazed cupboard |
 | **Cook** | range: the fireplace as hearth (`Mantel`, owner) | a work table; a dresser (shelves with plates); a basin and bucket; a cupboard | the hearth on an inner wall; the dresser and cupboard along the other walls | pots and plates on the dresser and hearth; a bucket by the basin |
@@ -73,7 +73,7 @@ Each place has an anchor, its companions, where it stands, and the small things 
 | **Sell** | counter (`Counter`) | shelves on the wall behind, the counter centred on them; a display table or chairs on the customers' side, against the walls | across almost the room's whole width, a third of the way in, with a 1 m flap at one end; the customers' half clear | goods on the shelves and the counter; a bell, a ledger |
 | **Serve** (bar) | bar counter (themed, §6 of the interiors plan) | back-bar shelves against the back wall, the counter centred on them; barrels at one end | opposite the entrance; 1–2 m for the keeper between counter and shelves | bottles and glasses on the back bar; cups on the counter |
 | **Drink** | table with chairs or stools | benches fixed along the walls (*missing*), booths along the side walls | along the walls and in the window bays; a few in the open, never on the path from the door to the bar | cups, bottles, a candle on each table |
-| **Perform** | a stage: a platform of 0.4 m (*missing*: built from floor pieces) | a piano (*missing*); chairs facing it | at the end wall, on the room's axis; its front clear of tables by 2 m | a candle row at the front |
+| **Perform** | a stage: a platform of 0.4 m (*missing*: a primitive box, G10) | a piano (Tripo, §10); chairs facing it | at the end wall, on the room's axis; its front clear of tables by 2 m | a candle row at the front |
 | **Pass** (hall, landing, corridor) | — | a coat stand by the door; a hall table with a mirror over it; a long-case clock; a runner rug | against the walls only; nothing on the middle line (G1); a plant only in a corner | a lamp and a tray on the hall table |
 
 ## 4. Rooms
@@ -86,11 +86,11 @@ A room is a set of places. *Required* places always come; *optional* ones come b
 | Kitchen | Cook, Eat | Store (a pantry shelf) |
 | Kitchen-living room (poor) | Cook, Eat, Hearth-side seat | a bed recess when the home has no bedroom |
 | Parlour | Hearth, Sit | Work (a small bookcase), a display cabinet |
-| Drawing room (rich) | Hearth, Sit | a second Sit group, a piano (*missing*), plants in the corners |
+| Drawing room (rich) | Hearth, Sit | a piano, books, a display cabinet, a gramophone, a floor vase (Tripo, §10), plants in the corners |
 | Dining room | Eat | Hearth, a sideboard |
 | Study or library | Work | Hearth, Sit (reading chair) |
-| Bedroom | Sleep | Dress, Hearth (rich), a chair by the window |
-| Dressing room | Dress | a mirror, a second wardrobe |
+| Bedroom | Sleep | Dress, a chest of drawers (middling and up), a folding screen (rich), Hearth (rich), a chair by the window |
+| Dressing room | Dress | a chest of drawers, a second wardrobe, a folding screen, a coat stand |
 | Bathroom | Wash with bath, toilet and basin | a wall shelf, towel hooks, a chair |
 | WC | Wash with toilet and basin | a wall shelf |
 | Washroom (poor) | Wash with a basin, a bucket and a tin bath or toilet | — |
@@ -161,12 +161,12 @@ The seven stay hand-placed in `VeilmouthInteriors`, by §6 and the places of §3
 
 ## 8. Pieces the pack lacks
 
-Victorian Interiors has no nightstand, coal scuttle, bench or settle, piano, stage, wall cabinet, towel rail or kitchen range. By the interiors plan's §6, a themed prop from another pack may stand in for a piece a room's purpose needs. Until the owner chooses:
+Victorian Interiors has no nightstand, coal scuttle, bench or settle, piano, stage, wall cabinet, towel rail or kitchen range. By the interiors plan's §6, a themed prop from another pack may stand in for a piece a room's purpose needs. The owner's Tripo models (§10) now give the nightstand, a log basket with fire irons for the coal scuttle, and the piano. For the rest, until the owner chooses:
 
-- a nightstand is the pack's smallest cabinet, `Shelve_5`, with a candle on it (VI-6: no `Table_*` fits a bedside cell);
+- a poor home's nightstand stays the pack's smallest cabinet, `Shelve_5`, with a candle on it (VI-6: no `Table_*` fits a bedside cell); a middling or rich one is Tripo's;
 - a towel rail is the pack's standing hanger (`Hanger_2`), and a wall cabinet the wall shelf (`Shelf_4`);
 - the range stays the fireplace (owner);
-- a bench, a piano, a stage platform and a low pub partition are listed in [SLICE_MODELS_WANTED.md](SLICE_MODELS_WANTED.md); until then the stage is a primitive box with the pack's parquet (G10), and the rest wait.
+- a bench, a stage platform and a low pub partition are listed in [SLICE_MODELS_WANTED.md](SLICE_MODELS_WANTED.md); until then the stage is a primitive box with the pack's parquet (G10), and the rest wait.
 
 ## 9. The owner's decisions (2026-11-07)
 
@@ -177,6 +177,37 @@ The owner accepted all four recommendations. These are now decisions:
 3. **Servants.** Every rich house has one servant at home in its working hours, 06:00–22:00, and half of them a second; at night they sleep in the servant's room. Authoring defaults. 10.3's burglary numbers are checked again with `tools/balance/burglary_sim.py` in VI-6.
 4. **The order of the work.** VI-6 builds the places, rooms and planner of §7 and refurnishes the Dwellings; VI-7 rebuilds the seven by the same rules, the Soot & Bell to §6's plan; VI-8 is the owner's play test. Each step waits for the owner's word.
 
+## 10. The owner's Tripo pieces (2026-11-09)
+
+The owner: take every piece from TripoModels for the interior scenes, and leave them out of the city's open plan, since each holds up to about 10 000 polygons (the table lamp 14 410, measured). So every interior piece among them furnishes the seven and the Dwellings, and none stands outside (city plan §25.6). Each model is normalised to 1 on its longest side; the wrapper (`SliceKitTripo.cs`) gives it its size at game scale, ×1.2 its true size. The sizes are authoring defaults, read from the survey's sheets (`SliceAssetSurvey.RunTripo`). The models carry no light, so a lamp among them carries a warm light of our own, as the pack's lamps carry theirs (G9).
+
+| Piece (Tripo file) | Key | True size | Where it stands |
+|---|---|---|---|
+| wardrobe (`antique_wardrobe`) | `TrWardrobe` | 1.9 m high | Dress, middling and rich |
+| nightstand with a candle and a book (`antique_wood_nightstand`) | `TrNightstand` | 0.67 m | Sleep, middling, a pair; the Soot & Bell's let rooms |
+| nightstand with a table lamp (and `decorative_table_lamp`) | `TrNightstandLamp` | 0.67 m | Sleep, rich, a pair |
+| chest of drawers with a brush and a box (`antique_wooden_dresser`) | `TrDresser` | 0.88 m | a bedroom's or dressing room's drawers, middling and up, a small mirror over it; the let room |
+| writing desk with a lamp, a parchment, ink and a pen (`antique_wooden_desk`, `aged_parchment`) | `TrDesk` | 0.95 m | Work, rich, a wall clock over it; the faction's and the lock-up's offices |
+| cheval glass (`ornate_mirror`) | `TrMirror` | 1.55 m | Dress, rich, beside the wardrobe |
+| folding screen (`ornate_wooden_screen`) | `TrScreen` | 1.6 m | a rich bedroom, a dressing room |
+| upright piano (`ornate_piano`) | `TrPiano` | 1.2 m | a rich drawing room, a chair at its keys; the Soot & Bell's stage |
+| glazed display cabinet (`furniture`) | `TrDisplay` | 1.65 m | Display, rich |
+| wing chair (`red_velvet_armchair`) | `TrArmchair` | 1.05 m | the hearth's pair, rich; the Soot & Bell's saloon and back landing, the faction's office |
+| coat stand (`wooden_coat_rack`) | `TrCoatRack` | 1.5 m | Coats, rich |
+| floor vase (`antique_vase`) | `TrVase` | 0.75 m | a rich hall or drawing room, in a corner (G6) |
+| log basket (`log_holder`) | `TrLogHolder` | 0.55 m | beside every hearth and kitchen range; the cellar's store |
+| fire irons (`fireplace_tools_set`) | `TrFireTools` | 0.67 m | beside a hearth of a middling room and up |
+| gramophone on a pedestal table (`wooden_round_table`, `vintage_gramophone`) | `TrGramophone` | 0.67 m table | a rich drawing room |
+| sewing table (the pack's `Table_2`, `sewing_machine`) | `TrSewing` | — | a poor or middling parlour, kitchen or room, with its chair |
+| wall clock (`ornate_grandfather_clock`, a regulator without a plinth) | `TrWallClock` | 0.9 m | over a rich desk |
+| two-arm sconce (`brass_wall_sconce`) | `TrSconce` | 0.45 m across | a rich room's wall lamps |
+| bracket lantern (`antique_wall_lantern`) | `TrLantern` | 0.5 m | the hall's and landing's wall lamps, poor and middling |
+| chandelier (`ornate_chandelier`) | `TrChandelier` | 1.2 m | the Soot & Bell's taproom, the one room higher than a storey (G9) |
+
+The bed, the bar counter and its cabinet, the cell bars and door and the Notice Board were the owner's Tripo pieces already (asset map §4). The other models are not furnishing: the townsman, the woman and the dog are people and beasts, the angels, the lion and the birdbath are the garden ornaments of the city plan §23, the coins and firearms are items, the rock is the iron ore, and the hanging sign belongs to a shop front and waits for the owner ([99 Open Questions](../../../99%20Open%20Questions.md) VS-SIGN).
+
+The seven took them in place (`VeilmouthInteriors.EnrichWithTripo`), so what S2 wrote into their scenes stays. The barrels in the Soot & Bell's stair hall and Harrow's store room went out; a piano, log baskets and fire irons came in; and the pieces above replaced the pack's where the table says.
+
 ## Sources
 
 - CAMRA, *Pub Heritage* records of historic pub interiors, e.g. [pubheritage.camra.org.uk/pubs/141](https://pubheritage.camra.org.uk/pubs/141), [/pubs/240](https://pubheritage.camra.org.uk/pubs/240), [/pubs/582](https://pubheritage.camra.org.uk/pubs/582).
@@ -185,6 +216,7 @@ The owner accepted all four recommendations. These are now decisions:
 
 ## Update history
 
+- 2026-11-09 (v0.6): the owner's word: G5's barrels and crates; §10, the owner's Tripo pieces and their places; §3, §4 and §8 changed to match.
 - 2026-11-08 (v0.5): after play test VI-8: G9 (chandeliers), G10 (no pieced-together pieces), G11 (doorway check), G12 (hearths); §7.2 and §8 as rebuilt.
 - 2026-11-08 (v0.4): §7.2, as built in VI-7 for the seven.
 - 2026-11-07 (v0.3): §7.1, as built in VI-6 for the Dwellings; §8's nightstand and towel rail as measured.

@@ -1,10 +1,10 @@
 # Slice Models Wanted
 
-Version: 0.8
+Version: 0.9
 
 Status: Draft
 
-Last Updated: 2026-11-09 (*Porches, fronts and the skyline*: a street tree's planter, a double gas lamp, bunting and a string of lamps, a flower cart and leaves as decals, from the reference plan R7; the other R7 pieces were listed already. Earlier: *Porches, fronts and the skyline*: a porch roof with a cornice, a door hood on brackets, an iron-and-glass canopy, a shop front, a church with a spire, a clock face, and clay tiles only with D6 (b), from the reference plan R6–R8. Earlier: the city: statues covered by the owner's three angels and two lions at the palace. Earlier: the city: a statue in a square is covered for now by the owner's angel in Wardley Garden; fountains to come from the owner. Earlier: *Interior detail*: the props that would fill the interiors with life, room by room, asked by the owner after play test VI-8; a low pub partition. Earlier: Interiors: a fixed wall bench or settle, an upright piano and a stage platform, which the furnishing rules §8 and the Soot & Bell's pub plan need (VI-7). Earlier: Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
+Last Updated: 2026-11-09 (Interiors: the upright piano, and the coal scuttle and fire irons (as a log basket and fire irons), are the owner's Tripo models; the hanging shop sign has the owner's Tripo sign, which waits for the owner's word on shop fronts (99 VS-SIGN). Earlier: *Porches, fronts and the skyline*: a street tree's planter, a double gas lamp, bunting and a string of lamps, a flower cart and leaves as decals, from the reference plan R7; the other R7 pieces were listed already. Earlier: *Porches, fronts and the skyline*: a porch roof with a cornice, a door hood on brackets, an iron-and-glass canopy, a shop front, a church with a spire, a clock face, and clay tiles only with D6 (b), from the reference plan R6–R8. Earlier: the city: statues covered by the owner's three angels and two lions at the palace. Earlier: the city: a statue in a square is covered for now by the owner's angel in Wardley Garden; fountains to come from the owner. Earlier: *Interior detail*: the props that would fill the interiors with life, room by room, asked by the owner after play test VI-8; a low pub partition. Earlier: Interiors: a fixed wall bench or settle, an upright piano and a stage platform, which the furnishing rules §8 and the Soot & Bell's pub plan need (VI-7). Earlier: Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
 
 Depends On: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §8 and §14, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -47,7 +47,7 @@ Priority A means the room reads as empty or wrong without the model. B means it 
 | Chapel altar, lectern and candelabra | Old chapel | 2 × 1 × 1.1 | B | The rostrum stands in for the altar now. |
 | Sacks of grain and of coal | Kitchen, store room, cellar | 0.6 × 0.4 × 0.8 | C | |
 | Fixed wall bench or settle, high-backed | Soot & Bell public bar and snugs; kitchens; the chapel | 2–3 × 0.6 × 1.2 | B | The pub plan's benches along the walls (rules §6). The public bar seats on stools and chairs until then |
-| Upright piano | Soot & Bell stage; a rich drawing room | 1.5 × 0.6 × 1.3 | B | The stage stands without one (VI-7) |
+| Upright piano | Soot & Bell stage; a rich drawing room | 1.5 × 0.6 × 1.3 | B | **Done** (2026-11-09): the owner's Tripo piano (furnishing rules §10) |
 | Stage platform with a front edge and steps | Soot & Bell taproom | 3 × 3 × 0.4 | C | Stands now as a primitive box with the pack's parquet (VI-8; a piece is never pieced together, furnishing rules G10); a model would give it a finished edge and steps |
 | Low partition with etched glass, a pub screen | Soot & Bell taproom, between saloon and public bar | 3 × 0.1 × 1.4 | B | The pub plan's divider (rules §6). The pack's banister stood in for it in VI-7 and read as a lost stair rail (VI-8 remark 2), so it was taken out |
 | Bar stools; casks on a rack | Soot & Bell taproom and cellar | 0.4 × 0.4 × 0.8; 2 × 0.8 × 1.5 | C | |
@@ -81,7 +81,7 @@ The owner's play test VI-8 found the rooms still bare: furniture alone does not 
 | Copper pans and a kettle; a hanging pot rail | 1.5 × 0.2 × 0.6 | A | Already wanted as the pot rail; with the pans on it |
 | Bread, vegetables in a basket, a cheese, a joint of meat on a hook | 0.3 × 0.3 × 0.2 | A | On the kitchen table, the dresser, the larder shelves |
 | Chopping board, rolling pin, mixing bowl, a pestle | 0.4 × 0.3 × 0.1 | B | On the table |
-| Coal scuttle and fire irons | 0.4 × 0.3 × 0.5 | B | Beside each hearth (rules §8 lacks it) |
+| Coal scuttle and fire irons | 0.4 × 0.3 × 0.5 | B | **Done** (2026-11-09) as the owner's Tripo log basket and fire irons (furnishing rules §10) |
 | Wash tub with a washboard; a mangle | 0.7 × 0.7 × 1 | B | Sculleries and poor homes' washrooms |
 | Stone jars and crocks; a butter churn | 0.3 × 0.3 × 0.5 | C | Larder, scullery |
 
@@ -145,7 +145,7 @@ The owner asked on 2026-11-06 which things would make the city read as lived in:
 | Cult marks and signs of a ritual: chalk and paint on walls and paving, as decals | Lanes, the ritual's Weak Point traces | 1 × 1 | A | The traces of a Weak Point ([11](../../../11%20Vertical%20Slice.md)) must be seen in the world. Decals the seed places |
 | Wayside shrine of each of the three churches, and a small statue of a saint or god | Street corners, the chapel road | 1 × 0.6 × 2 | A | The three church-associated factions should be seen in the street, not only in buildings |
 | Wardens' call box or sentry box, and a notice of the Wardens | The Ridge, the High Street, the docks | 1 × 1 × 2.4 | A | Where a witness runs to fetch a Warden ([10.3](../../../10.3%20Stealth%20and%20Detection.md) §6.2) |
-| Hanging shop signs on brackets, one per trade | Over every shop door | 0.8 × 0.1 × 0.6 | A | The player reads a shop from the street: apothecary, smith, tailor, pawnbroker, tavern. Tripo, one per trade |
+| Hanging shop signs on brackets, one per trade | Over every shop door | 0.8 × 0.1 × 0.6 | A | The player reads a shop from the street: apothecary, smith, tailor, pawnbroker, tavern. Tripo, one per trade. The owner's Tripo `wooden_sign` is a blank bracket sign; where and how it stands waits for the owner (99 VS-SIGN) |
 
 **The Victorian street** (B)
 
