@@ -1,3 +1,4 @@
+using GameDev.Confront.Rules;
 using GameDev.Player.Progression;
 using GameDev.Player.Standing;
 using GameDev.World.Seed;
@@ -18,11 +19,44 @@ namespace GameDev.Slice
         [Tooltip("10.4 §4–5's numbers: Reputation, Danger, Attitude and lies.")]
         [SerializeField] private StandingRules standing;
 
+        [Header("Confront (S3a.4)")]
+        [Tooltip("10.2 §5b's numbers for every fight.")]
+        [SerializeField] private FightRules fightRules;
+
+        [Tooltip("The development kit until S5a's shops (owner, 2026-11-09): a sword in hand, the rifle with its Cartridge Pouch as the second Weapon Set, and leather.")]
+        [SerializeField] private FightWeapon kitSword;
+        [SerializeField] private FightWeapon kitRifle;
+        [SerializeField] private FightOffHand kitPouch;
+        [SerializeField] private FightArmour kitArmour;
+
+        [Tooltip("The development fight's opponents: a model and the weapon each carries. Authoring defaults.")]
+        [SerializeField] private GameObject opponentModel;
+        [SerializeField] private FightWeapon opponentWeapon;
+
+        [Tooltip("The Combat Grid's cell outlines.")]
+        [SerializeField] private Material gridMaterial;
+
         public int Seed => seed;
 
         public SocialCheckRules SocialChecks => socialChecks;
 
         public StandingRules Standing => standing;
+
+        public FightRules FightRules => fightRules;
+
+        public FightWeapon KitSword => kitSword;
+
+        public FightWeapon KitRifle => kitRifle;
+
+        public FightOffHand KitPouch => kitPouch;
+
+        public FightArmour KitArmour => kitArmour;
+
+        public GameObject OpponentModel => opponentModel;
+
+        public FightWeapon OpponentWeapon => opponentWeapon;
+
+        public Material GridMaterial => gridMaterial;
 
         public IWorldSeed CreateSeed()
         {

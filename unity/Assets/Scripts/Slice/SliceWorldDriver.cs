@@ -7,6 +7,7 @@ using GameDev.Input;
 using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Player.Standing;
+using GameDev.Slice.Fights;
 using GameDev.UI;
 using GameDev.World.Poi;
 using GameDev.World.State;
@@ -52,6 +53,9 @@ namespace GameDev.Slice
 
         /// <summary>The character's attributes and skills, all 1 until S5b's character creation (S2 authoring default).</summary>
         public CharacterSheet Character { get; private set; }
+
+        /// <summary>The fights in the scene (S3a.4): the Encounter Lock, the turns and the Combat Grid; null without FightRules.</summary>
+        public SliceConfront Fights { get; private set; }
 
         /// <summary>The Deeds Record, Attitude and lies (10.4 §4–5).</summary>
         public SocialStanding Standing { get; private set; }
@@ -166,6 +170,11 @@ namespace GameDev.Slice
             Director.Evaluate(Clock.Tick);
             Tips = new TipBook(tips, State, Director);
             Character = new CharacterSheet();
+            if (settings.FightRules != null)
+            {
+                Fights = gameObject.AddComponent<SliceConfront>();
+                Fights.Configure(settings, seed, Clock, Character);
+            }
             Standing = new SocialStanding(State, settings.Standing, Clock, seed, SliceSeedStreams.Lies);
             _talk = new DialogueContext
             {

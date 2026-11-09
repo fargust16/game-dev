@@ -530,6 +530,15 @@ namespace GameDev.Confront.Grid
             }
         }
 
+        public bool TryCellAt(Vector3 position, out CombatCell cell)
+        {
+            var x = Mathf.FloorToInt(position.x / _cell);
+            var z = Mathf.FloorToInt(position.z / _cell);
+            var level = InBounds(x, z) ? LevelNear(x, z, position.y) : -1;
+            cell = new CombatCell(x, z, Mathf.Max(0, level));
+            return level >= 0 && IsWalkable(cell);
+        }
+
         public bool Follow(Vector3 position)
         {
             var x = Mathf.FloorToInt(position.x / _cell);

@@ -37,6 +37,7 @@ namespace GameDev.Input
         private InputAction _rewindHour;
         private InputAction _skipDayNight;
         private InputAction _devCharacterValues;
+        private InputAction _devFight;
 
         private InputAction _cancel;
         private InputAction _language;
@@ -147,6 +148,9 @@ namespace GameDev.Input
         /// <summary>Development command (S2 authoring default, F8): the character's values to the next test step.</summary>
         public bool DevCharacterValuesPressed => _devCharacterValues != null && _devCharacterValues.WasPressedThisFrame();
 
+        /// <summary>Development command (S3a.4 authoring default, F7): a fight with two opponents beside the player.</summary>
+        public bool DevFightPressed => _devFight != null && _devFight.WasPressedThisFrame();
+
         public bool CancelPressed => _cancel != null && _cancel.WasPressedThisFrame();
 
         /// <summary>The next language (17 X.7); authoring default F10 until a settings page exists.</summary>
@@ -216,6 +220,7 @@ namespace GameDev.Input
             _rewindHour.AddBinding("<Keyboard>/minus");
             _skipDayNight = _world.AddAction("SkipDayNight", InputActionType.Button, "<Keyboard>/n");
             _devCharacterValues = _world.AddAction("DevCharacterValues", InputActionType.Button, "<Keyboard>/f8");
+            _devFight = _world.AddAction("DevFight", InputActionType.Button, "<Keyboard>/f7");
 
             _ui = new InputActionMap("UI");
             _cancel = _ui.AddAction("Cancel", InputActionType.Button, "<Keyboard>/escape");

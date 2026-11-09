@@ -82,6 +82,9 @@ namespace GameDev.Confront.Grid
 
         Vector3 Center(CombatCell cell);
 
+        /// <summary>The walkable cell under a position, at the surface within 2 m of its height (S3a.4).</summary>
+        bool TryCellAt(Vector3 position, out CombatCell cell);
+
         /// <summary>The occupant standing in the cell, or −1.</summary>
         int OccupantAt(CombatCell cell);
 

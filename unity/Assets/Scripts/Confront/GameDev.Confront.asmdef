@@ -2,7 +2,8 @@
     "name": "GameDev.Confront",
     "rootNamespace": "GameDev.Confront",
     "references": [
-        "GameDev.Player.Progression"
+        "GameDev.Player.Progression",
+        "GameDev.World.Time"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
