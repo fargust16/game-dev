@@ -143,6 +143,17 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// Reference plan R6: the porches' columns and bare beams out of the baked houses, the city rebuilt on them, and
+        /// the doors rendered close up. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthCity.RebuildPorches -lookLabel r6
+        /// </summary>
+        public static void RebuildPorches()
+        {
+            VeilmouthKitHouses.StripPorches();
+            RebuildStreets();
+            VeilmouthRenders.RenderPorches();
+        }
+
+        /// <summary>
         /// Batch only, the reference plan's step 5 (R4, R5): the city built again on its present ground, which is the
         /// owner's to change by hand and is not shaped again, with the raised pavements and the passages; then the passes
         /// beside its root, the street probes baked again, and the views. Batch:

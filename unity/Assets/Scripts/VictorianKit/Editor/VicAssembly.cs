@@ -373,17 +373,26 @@ namespace GameDev.VictorianKit.EditorTools
         public static void Porch(VicHouse h, V3 door, double rot)
         {
             var y = -((4 * 0.28) + 0.20);
-            foreach (var x in new[] { 0.28, 1.72 })
-            {
-                h.Drop("SM_Vic_Pilaster_3m", VicKit.WorldPoint(door, rot, x, 0.0, 0.0), rot);
-            }
-
+            Doorcase(h, door, rot);
             foreach (var x in new[] { 0.20, 1.80 })
             {
                 h.Drop("SM_Vic_Column_3m", VicKit.WorldPoint(door, rot, x, y, -VicKit.Foundation), rot);
             }
 
             h.Drop("SM_Vic_Porch_Beam_2m", VicKit.WorldPoint(door, rot, 0.0, y, 2.40), rot);
+        }
+
+        /// <summary>
+        /// A doorcase: the porch's two pilasters on the wall, without its columns and beam. Veilmouth's houses use it
+        /// until the kit has a porch roof, a door hood or a canopy: the owner found the bare beam out of place, and the
+        /// balcony slab, 0.86 m deep, cannot roof columns 1.32 m out (reference plan R6; SLICE_MODELS_WANTED.md).
+        /// </summary>
+        public static void Doorcase(VicHouse h, V3 door, double rot)
+        {
+            foreach (var x in new[] { 0.28, 1.72 })
+            {
+                h.Drop("SM_Vic_Pilaster_3m", VicKit.WorldPoint(door, rot, x, 0.0, 0.0), rot);
+            }
         }
 
         /// <summary>The oriel's 4 m storey with its bands and three windows (proof_houses._oriel).</summary>

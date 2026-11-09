@@ -58,12 +58,12 @@ namespace GameDev.World.Tests
             Assert.AreEqual(3001, mat.renderQueue);
             if (mat.HasProperty("_BaseColor"))
             {
-                Assert.AreEqual(tint, mat.GetColor("_BaseColor"));
+                AssertSameColour(tint, mat.GetColor("_BaseColor"));
             }
 
             if (mat.HasProperty("_Color"))
             {
-                Assert.AreEqual(tint, mat.GetColor("_Color"));
+                AssertSameColour(tint, mat.GetColor("_Color"));
             }
         }
 
@@ -123,13 +123,24 @@ namespace GameDev.World.Tests
                     a.GetComponent<Renderer>().sharedMaterial,
                     b.GetComponent<Renderer>().sharedMaterial);
                 Assert.AreEqual(1, GeneratedTintMaterials.CachedCount);
-                Assert.AreEqual(tint, a.GetComponent<Renderer>().sharedMaterial.GetColor("_BaseColor"));
+                AssertSameColour(tint, a.GetComponent<Renderer>().sharedMaterial.GetColor("_BaseColor"));
             }
             finally
             {
                 Object.DestroyImmediate(a);
                 Object.DestroyImmediate(b);
             }
+        }
+
+        // In Linear colour space a material keeps its colour linear and GetColor converts it back
+        // to sRGB, so the value returns within float rounding of what was set, not bit for bit.
+        static void AssertSameColour(Color expected, Color actual)
+        {
+            const float Tolerance = 1e-4f;
+            Assert.AreEqual(expected.r, actual.r, Tolerance, "r");
+            Assert.AreEqual(expected.g, actual.g, Tolerance, "g");
+            Assert.AreEqual(expected.b, actual.b, Tolerance, "b");
+            Assert.AreEqual(expected.a, actual.a, Tolerance, "a");
         }
     }
 }

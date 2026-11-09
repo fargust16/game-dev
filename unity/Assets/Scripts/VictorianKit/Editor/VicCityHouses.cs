@@ -63,7 +63,7 @@ namespace GameDev.VictorianKit.EditorTools
             public bool Quoins, Stucco;
             public Func<string, int, bool> StoneRail = (s, b) => false;
 
-            /// <summary>A porch with columns before the front door in this bay, or none.</summary>
+            /// <summary>A doorcase round the front door in this bay, or none (reference plan R6: no porch until the kit has a roof for one).</summary>
             public int Porch = -1;
 
             /// <summary>Lucarnes over every other front bay that a straight slope carries.</summary>
@@ -94,7 +94,7 @@ namespace GameDev.VictorianKit.EditorTools
 
             if (o.Porch >= 0)
             {
-                VicDress.Porch(h, new V3(1 + (2 * o.Porch), 0, VicKit.FloorZ(0)), 0.0);
+                VicDress.Doorcase(h, new V3(1 + (2 * o.Porch), 0, VicKit.FloorZ(0)), 0.0);
             }
 
             return Spec(h, o.Palette, new VicPlan().Rect(0, 0, o.Width, o.Depth).Trace(), o.Floors, o.Roof, o.Kind ?? $"{o.Width}x{o.Depth}");
@@ -401,7 +401,7 @@ namespace GameDev.VictorianKit.EditorTools
             });
         }
 
-        /// <summary>A detached house of 8 × 8 m: three storeys, a mansard, quoins, bay windows and a porch at its door.</summary>
+        /// <summary>A detached house of 8 × 8 m: three storeys, a mansard, quoins, bay windows and a doorcase at its door.</summary>
         public static VicHouseSpec Detached(string name, string palette)
         {
             var stucco = palette == "stucco" || palette == "white";
@@ -425,7 +425,7 @@ namespace GameDev.VictorianKit.EditorTools
         }
 
         /// <summary>
-        /// A villa: 12 × 10 m with a 4 × 2 m pavilion, three storeys. A porch at the pavilion's door and a stone balcony
+        /// A villa: 12 × 10 m with a 4 × 2 m pavilion, three storeys. A doorcase at the pavilion's door and a stone balcony
         /// over it, bay windows beside, lucarnes on the main fronts, chimneys and the vane on the flat (as R3, smaller).
         /// </summary>
         public static VicHouseSpec Villa(string name, string palette)
@@ -459,7 +459,7 @@ namespace GameDev.VictorianKit.EditorTools
                 },
             };
             VicRoofs.Shell(h, plan, 3, facade);
-            VicDress.Porch(h, new V3(5, 0, VicKit.FloorZ(0)), 0.0);
+            VicDress.Doorcase(h, new V3(5, 0, VicKit.FloorZ(0)), 0.0);
             VicDress.Balcony(h, new V3(5, 0, VicKit.FloorZ(1)), 0.0, VicKit.FloorZ(1) + VicKit.WinSill - 0.02, true);
             var o = new VicMansardOptions();
             o.Chimneys.Add((1, 3));
@@ -473,7 +473,7 @@ namespace GameDev.VictorianKit.EditorTools
 
         /// <summary>
         /// A civic building: a main body <paramref name="w"/> × 10 m with a centred pavilion <paramref name="pavilion"/> × 2 m,
-        /// three storeys. Its door, double, in the pavilion's middle bay under a porch and a stone balcony; tall windows,
+        /// three storeys. Its door, double, in the pavilion's middle bay in a doorcase under a stone balcony; tall windows,
         /// arched on the piano nobile; quoins; lucarnes over the pavilion and the main fronts; chimneys and a vane.
         /// </summary>
         public static VicHouseSpec Civic(string name, string palette, int w = 24, int pavilion = 8, int floors = 3)
@@ -510,7 +510,7 @@ namespace GameDev.VictorianKit.EditorTools
             };
             VicRoofs.Shell(h, plan, floors, facade);
             var doorX = px + 1 + (2 * door);
-            VicDress.Porch(h, new V3(doorX, 0, VicKit.FloorZ(0)), 0.0);
+            VicDress.Doorcase(h, new V3(doorX, 0, VicKit.FloorZ(0)), 0.0);
             VicDress.Balcony(h, new V3(doorX, 0, VicKit.FloorZ(1)), 0.0, VicKit.FloorZ(1) + VicKit.WinSill - 0.02, true);
             var o = new VicMansardOptions();
             o.Chimneys.Add((1, 3));

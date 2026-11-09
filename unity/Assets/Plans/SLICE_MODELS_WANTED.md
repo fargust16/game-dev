@@ -1,10 +1,10 @@
 # Slice Models Wanted
 
-Version: 0.6
+Version: 0.7
 
 Status: Draft
 
-Last Updated: 2026-11-08 (the city: statues covered by the owner's three angels and two lions at the palace. Earlier: the city: a statue in a square is covered for now by the owner's angel in Wardley Garden; fountains to come from the owner. Earlier: *Interior detail*: the props that would fill the interiors with life, room by room, asked by the owner after play test VI-8; a low pub partition. Earlier: Interiors: a fixed wall bench or settle, an upright piano and a stage platform, which the furnishing rules §8 and the Soot & Bell's pub plan need (VI-7). Earlier: Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
+Last Updated: 2026-11-09 (*Porches, fronts and the skyline*: a porch roof with a cornice, a door hood on brackets, an iron-and-glass canopy, a shop front, a church with a spire, a clock face, and clay tiles only with D6 (b), from the reference plan R6–R8. Earlier: the city: statues covered by the owner's three angels and two lions at the palace. Earlier: the city: a statue in a square is covered for now by the owner's angel in Wardley Garden; fountains to come from the owner. Earlier: *Interior detail*: the props that would fill the interiors with life, room by room, asked by the owner after play test VI-8; a low pub partition. Earlier: Interiors: a fixed wall bench or settle, an upright piano and a stage platform, which the furnishing rules §8 and the Soot & Bell's pub plan need (VI-7). Earlier: Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
 
 Depends On: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §8 and §14, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -183,6 +183,20 @@ The owner asked on 2026-11-06 which things would make the city read as lived in:
 | Bandstand or gazebo, fountain, statue on a plinth | A square, the Palace Forecourt | 6 × 6 × 5 | C | Row 22 of the asset map. Statues: the owner's three angels stand in Wardley Garden, the graveyard and an east villa's garden, two marble lions at the Palace Forecourt, and birdbaths in gardens (city plan §23, 2026-11-08); fountains to come from the owner |
 | Flower bed or urn | Gardens, the Palace Forecourt | 1 × 1 × 0.8 | C | |
 | Ivy and moss on walls, as decals | The Ridge's gardens, the old chapel | — | C | |
+
+## Porches, fronts and the skyline (2026-11-09)
+
+The owner's walk of C3 found the porch of columns and a bare beam out of place, and the reference's skyline holds spires and a clock ([VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R6, R8). The Victorian Kit has no piece for either. Its balcony slab is 2 × 0.86 m and 0.12 m thick, while a porch's columns stand 1.32 m out (at ×1), so the slab cannot roof a porch. Under the kit's rule a porch is never pieced together from other modules. Until these pieces come, a raised door keeps its pilasters, its stoop and, on villas and civic houses, the stone balcony above it.
+
+| Model | Where | Size, m (at ×1) | Priority | Notes |
+|---|---|---|---|---|
+| Porch roof with a cornice, on two columns | Villas, civic houses, detached houses | 2 × 1.4 × 0.4, on the kit's columns at 3 m | B | Its top can carry the kit's balcony rails, making a portico. It fits the kit's porch beam line, 1.32 m out |
+| Door hood on two carved brackets, no columns | Every terrace door | 2 × 0.7 × 0.5 | B | The commonest Victorian door cover. Terraces keep the lintel trims alone until it comes |
+| Cast-iron and glass canopy on brackets or slim posts | Villas, shops, the Soot & Bell, the station of a later slice | 3 × 1.5 × 0.6 | B | Glass on the kit's glass material slot; no new slot |
+| Shop front of wood and glass with a fascia for a sign | Every shop house's ground floor | 2 m modules, 3.3 m high | B | Asset map §9 row 24. The kit's shop doors stand alone today |
+| A church or cathedral with a spire, seen from the city | The Ridge or beyond the walls | 20 × 40 × 45 | B | Asset map §9 row 23. R3's haze makes it the reference's landmark. Seen, not entered, in the slice |
+| Clock face for a tower | The town hall or the Tower6 | 2 × 0.2 × 2 | C | Asset map §9 row 24. A lit face at night |
+| Clay roof tiles as a texture set on the slate slot | Parts of the city, if the owner wants them | — | C | Only with the owner's D6 (b); style guide §2 has no tiled roof |
 
 ## How to add one
 

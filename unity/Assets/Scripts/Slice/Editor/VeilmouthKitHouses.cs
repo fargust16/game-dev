@@ -540,6 +540,49 @@ namespace GameDev.Slice.EditorTools
                       $"below {DetailScreen:P0} of the screen (one of each type); a line per room in Logs/VictorianKit/veilmouth_rooms.txt.");
         }
 
+        /// <summary>
+        /// The porches' columns and bare beams taken out of the baked houses in place, with their collider blocks, and
+        /// the detail LOD set again (reference plan R6). <see cref="VicCityHouses"/> now builds a doorcase instead, so a
+        /// later bake gives the same houses; doing it in place keeps every other piece's file ID, which the strange
+        /// windows override. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthKitHouses.StripPorches
+        /// </summary>
+        public static void StripPorches()
+        {
+            int houses = 0, pieces = 0;
+            foreach (var path in Directory.GetFiles(Folder, "Kit_House_*.prefab").Select(p => p.Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal))
+            {
+                var root = PrefabUtility.LoadPrefabContents(path);
+                try
+                {
+                    var model = root.transform.Find("Model");
+                    var porch = model == null ? new List<GameObject>() : model.Cast<Transform>()
+                        .Where(t => t.name.StartsWith("SM_Vic_Column_3m_") || t.name.StartsWith("SM_Vic_Porch_Beam_2m_")).Select(t => t.gameObject).ToList();
+                    var blocks = root.transform.Cast<Transform>().Where(t => t.name == "Column").Select(t => t.gameObject).ToList();
+                    if (porch.Count == 0 && blocks.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    pieces += porch.Count;
+                    foreach (var go in porch.Concat(blocks))
+                    {
+                        Object.DestroyImmediate(go);
+                    }
+
+                    DetailLod(model.gameObject);
+                    PrefabUtility.SaveAsPrefabAsset(root, path);
+                    houses++;
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(root);
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[VeilmouthKitHouses] porches stripped: {pieces} columns and beams from {houses} house types.");
+        }
+
         /// <summary>A placed piece's footprint in the block, from its module's own footprint (lowest and highest corners).</summary>
         private static (Vector3 Lo, Vector3 Hi) Footprint(VicPiece p, Func<double, double, double, Vector3> root)
         {

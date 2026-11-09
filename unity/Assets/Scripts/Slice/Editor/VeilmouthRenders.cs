@@ -612,6 +612,48 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// The raised doors that had porches (reference plan R6) close up at noon: both villas, a civic house, the palace
+        /// and a detached house of the Terraces, each from 7 m before its door and from the side. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderPorches -lookLabel r6
+        /// </summary>
+        public static void RenderPorches()
+        {
+            var label = Argument("-lookLabel") ?? "r6";
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            _skyAndGrade = sky != null;
+            try
+            {
+                sky?.Apply(12 * 60);
+                // A named building (the Town Hall, the palace) keeps its kit house as its prefab's source.
+                string Source(Transform t) => PrefabUtility.IsAnyPrefabInstanceRoot(t.gameObject) ? PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject)?.name ?? "" : "";
+                var houses = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None).Where(t => Source(t).StartsWith("Kit_House_")).OrderBy(t => Source(t)).ToList();
+                foreach (var kind in new[] { "Villa_stucco", "Villa_white", "Civic", "Palace", "Terrace8_white_detached" })
+                {
+                    var house = houses.FirstOrDefault(t => Source(t).Contains(kind) && t.Find(VictorianHouses.DoorMarker) != null);
+                    if (house == null)
+                    {
+                        Debug.LogWarning($"[VeilmouthRenders] no {kind} house with a door stands in the city.");
+                        continue;
+                    }
+
+                    var door = house.Find(VictorianHouses.DoorMarker).position;
+                    var at = door + (Vector3.up * 2.2f);
+                    var name = kind.ToLowerInvariant();
+                    Eye($"{label}_porch_{name}", door + (house.forward * 7f) + (Vector3.up * 1.7f), at, 50f);
+                    Eye($"{label}_porch_{name}_side", door + (house.forward * 4f) + (house.right * 4f) + (Vector3.up * 1.7f), at, 50f);
+                }
+            }
+            finally
+            {
+                _skyAndGrade = false;
+            }
+
+            Debug.Log($"[VeilmouthRenders] the doors' views written to {OutputFolder} as {label}_porch_*.");
+        }
+
+        /// <summary>
         /// The project's painted skies (Free HDR Sky) seen from an empty scene: north, east, south, west at 10° up and
         /// straight up, so the sun and the horizon can be found before the sky is set by the clock. Batch:
         /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderSkies
