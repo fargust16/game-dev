@@ -15,7 +15,7 @@ namespace GameDev.VictorianKit.EditorTools
     /// ceilings, wall finishes, partitions with doorways, a stair and furniture of Victorian Interiors, cut from the
     /// house's plan and placed by its openings, so that a look through the glass finds a room and not a box.
     /// <para>
-    /// Dressing only: nobody enters, so every collider is off, every body still and every light out; the rooms take
+    /// Dressing only: nobody enters, so every piece is a plain renderer, with no collider, body, light or script; the rooms take
     /// light probes, cast no shadows and are switched off by distance (<see cref="VicRoomsSwitch"/>) behind glass the
     /// window shader has already turned to its mapped room. The furniture follows Plans/INTERIOR_FURNISHING_RULES.md in short:
     /// an anchor centred on the wall the windows face (G2, G3), its companions round it (G4), nothing tall before a
@@ -1777,37 +1777,122 @@ namespace GameDev.VictorianKit.EditorTools
             return b;
         }
 
+        /// <summary>Pieces placed since the counts were last cleared, and parts that needed a holder (see <see cref="Put"/>).</summary>
+        public static int PiecesPut, PartsHeld;
+
+        /// <summary>
+        /// A block placed as dressing that only draws (Plans/VEILMOUTH_REFERENCE_PLAN.md R1.3): one game object for each
+        /// mesh the block shows, with its mesh, materials and layer, and none of the block's wrapper, colliders, body,
+        /// lights or scripts, which nobody behind a window would use. The city loads them as plain renderers, not as
+        /// tens of thousands of components switched off. A block with a LOD group gives its first level only. A part
+        /// whose place is no single transform (a stretch over a turned part would shear) keeps a holder with the
+        /// placement and the part beneath it.
+        /// </summary>
         private static void Put(Transform parent, GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, string name)
         {
-            var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
-            go.transform.localPosition = position;
-            go.transform.localRotation = rotation;
-            go.transform.localScale = scale;
-            if (name != null)
+            PiecesPut++;
+            var place = Matrix4x4.TRS(position, rotation, scale);
+            Transform holder = null;
+            foreach (var part in Parts(prefab))
             {
-                go.name = name;
+                var go = new GameObject(name ?? part.Name);
+                go.layer = part.Layer;
+                go.AddComponent<MeshFilter>().sharedMesh = part.Mesh;
+                go.AddComponent<MeshRenderer>().sharedMaterials = part.Materials;
+                if (Exact(place * part.Local, out var p, out var q, out var k))
+                {
+                    go.transform.SetParent(parent, false);
+                }
+                else
+                {
+                    if (holder == null)
+                    {
+                        holder = new GameObject(name ?? prefab.name).transform;
+                        holder.SetParent(parent, false);
+                        holder.localPosition = position;
+                        holder.localRotation = rotation;
+                        holder.localScale = scale;
+                    }
+
+                    PartsHeld++;
+                    Exact(part.Local, out p, out q, out k);
+                    go.transform.SetParent(holder, false);
+                }
+
+                go.transform.localPosition = p;
+                go.transform.localRotation = q;
+                go.transform.localScale = k;
+            }
+        }
+
+        private static readonly Dictionary<GameObject, (string Name, Mesh Mesh, Material[] Materials, Matrix4x4 Local, int Layer)[]> PartCache =
+            new Dictionary<GameObject, (string, Mesh, Material[], Matrix4x4, int)[]>();
+
+        /// <summary>The meshes a block shows, each in the block's own space: enabled, active, and of a LOD group's first level only.</summary>
+        private static (string Name, Mesh Mesh, Material[] Materials, Matrix4x4 Local, int Layer)[] Parts(GameObject prefab)
+        {
+            if (PartCache.TryGetValue(prefab, out var cached) && cached.All(c => c.Mesh != null))
+            {
+                return cached;
             }
 
-            // Dressing: nobody enters, nothing moves, nothing lights.
-            foreach (var c in go.GetComponentsInChildren<Collider>(true))
+            var later = new HashSet<Renderer>(prefab.GetComponentsInChildren<LODGroup>(true)
+                .SelectMany(g => g.GetLODs().Skip(1))
+                .SelectMany(l => l.renderers)
+                .Where(r => r != null));
+            var toBlock = prefab.transform.worldToLocalMatrix;
+            var parts = prefab.GetComponentsInChildren<MeshRenderer>(true)
+                .Where(r => r.enabled && !later.Contains(r) && Active(r.transform, prefab.transform))
+                .Select(r => (r, f: r.GetComponent<MeshFilter>()))
+                .Where(x => x.f != null && x.f.sharedMesh != null)
+                .Select(x => (x.r.gameObject.name, x.f.sharedMesh, x.r.sharedMaterials, toBlock * x.r.transform.localToWorldMatrix, x.r.gameObject.layer))
+                .ToArray();
+            PartCache[prefab] = parts;
+            return parts;
+        }
+
+        private static bool Active(Transform t, Transform root)
+        {
+            for (; t != null; t = t == root ? null : t.parent)
             {
-                c.enabled = false;
+                if (!t.gameObject.activeSelf)
+                {
+                    return false;
+                }
             }
 
-            foreach (var body in go.GetComponentsInChildren<Rigidbody>(true))
+            return true;
+        }
+
+        /// <summary>Splits <paramref name="m"/> into a transform's parts; false when they do not give it back (a shear).</summary>
+        private static bool Exact(Matrix4x4 m, out Vector3 position, out Quaternion rotation, out Vector3 scale)
+        {
+            // A mirrored part turns one axis inside out: split it with that axis flipped back, then flip its scale.
+            var mirror = m.determinant < 0f;
+            var n = m;
+            if (mirror)
             {
-                body.isKinematic = true;
+                n.SetColumn(0, -m.GetColumn(0));
             }
 
-            foreach (var light in go.GetComponentsInChildren<Light>(true))
+            position = m.GetColumn(3);
+            rotation = n.rotation;
+            scale = n.lossyScale;
+            if (mirror)
             {
-                light.enabled = false;
+                scale.x = -scale.x;
             }
 
-            foreach (var m in go.GetComponentsInChildren<MonoBehaviour>(true))
+            var back = Matrix4x4.TRS(position, rotation, scale);
+            for (var i = 0; i < 16; i++)
             {
-                m.enabled = false;
+                if (Mathf.Abs(back[i] - m[i]) > 1e-4f)
+                {
+                    return false;
+                }
             }
+
+            return true;
         }
 
         /// <summary>Static for batching, lit by probes, no shadows, and switched off by distance (<see cref="Switch"/>).</summary>

@@ -478,6 +478,7 @@ namespace GameDev.Slice.EditorTools
             var makers = Types().ToDictionary(t => PrefabStem(t.Key), t => (t.Key, t.Make));
             int houses = 0, always = 0, detail = 0;
             VicRooms.Report.Clear();
+            VicRooms.PiecesPut = VicRooms.PartsHeld = 0;
             foreach (var path in Directory.GetFiles(Folder, "Kit_House_*.prefab").Select(p => p.Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal))
             {
                 var name = Path.GetFileNameWithoutExtension(path);
@@ -537,7 +538,8 @@ namespace GameDev.Slice.EditorTools
             Directory.CreateDirectory("Logs/VictorianKit");
             File.WriteAllLines("Logs/VictorianKit/veilmouth_rooms.txt", VicRooms.Report);
             Debug.Log($"[VeilmouthKitHouses] redressed {houses} houses: {always} triangles stand at every distance, {detail} fade out " +
-                      $"below {DetailScreen:P0} of the screen (one of each type); a line per room in Logs/VictorianKit/veilmouth_rooms.txt.");
+                      $"below {DetailScreen:P0} of the screen (one of each type); rooms of {VicRooms.PiecesPut} pieces as plain renderers, " +
+                      $"{VicRooms.PartsHeld} parts under a holder; a line per room in Logs/VictorianKit/veilmouth_rooms.txt.");
         }
 
         /// <summary>
