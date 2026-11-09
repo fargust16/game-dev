@@ -1,0 +1,29 @@
+﻿key,en,ru
+"# The POIs (PoiDefinition): poi.<id>.title, and .urgency, the sources' words of urgency, never a countdown (04 rule 5)"
+poi.a.title,Brass-Number Arrest at Harrow & Tincture,Арест в «Харроу и Тинктуре»
+poi.a.urgency,before the whistle,до гудка
+poi.b.title,Eleventh-Bell Collectors,Сборщики одиннадцатого колокола
+poi.b.urgency,tonight,сегодня ночью
+poi.c.title,Soot Stair Trace,След на Сажной лестнице
+poi.c.urgency,before the rain,до дождя
+"# The tips (TipCatalogue): tip.<id>.line, what the source says, and .note, the fact in the character's own words"
+tip.board.girls.line,"MISSING. Mill girls, gone near Loom Lane. The paper's edges are greased by sooty thumbs.","ПРОПАЛИ. Фабричные девушки, близ Ткацкого переулка. Края листка засалены закопчёнными пальцами."
+tip.board.girls.note,A notice on the board: mill girls have gone missing near Loom Lane.,Объявление на доске: близ Ткацкого переулка пропадают фабричные девушки.
+tip.board.wren.line,"MISSING. Thomas Wren, clerk at the mill. Any word to his sister, Lottie Wren, at the Soot & Bell.","ПРОПАЛ. Томас Рен, конторщик с фабрики. Любые вести — его сестре, Лотти Рен, в «Сажу и Колокол»."
+tip.board.wren.note,"Thomas Wren, a clerk at the mill, is missing. His sister Lottie posted the notice.","Пропал Томас Рен, конторщик с фабрики. Объявление повесила его сестра Лотти."
+tip.board.seizure.line,"WARDEN SEIZURE NOTICE. Harrow & Tincture, Bell Street, before the second-shift bell. By order, brass number 14.","ПРЕДПИСАНИЕ СТРАЖИ ОБ ИЗЪЯТИИ. «Харроу и Тинктура», Колокольная улица, до колокола второй смены. По приказу, медный номер 14."
+tip.board.seizure.note,"The Wardens posted a seizure notice for Harrow & Tincture on Bell Street, to be done before the second-shift bell.",Стража вывесила предписание об изъятии в «Харроу и Тинктуре» на Колокольной улице — до колокола второй смены.
+tip.nell.harrow.line,"Brass-numbers are taking old Harrow tonight. Say he sold black tincture to mill hands. If you care, go before the whistle. After that it's paperwork and padlocks.","Медные номера сегодня берут старого Харроу. Говорят, продавал фабричным чёрную тинктуру. Если тебе не всё равно — иди до гудка. После него одни бумаги да замки."
+tip.nell.harrow.note,"Nell says the Wardens mean to take old Harrow tonight, for selling black tincture to mill hands.","Нелл говорит, Стража сегодня собирается взять старого Харроу — за то, что продавал фабричным чёрную тинктуру."
+tip.nell.collectors.line,After the eleventh bell they take mill girls off Loom Lane. Tonight again.,После одиннадцатого колокола с Ткацкого переулка уводят фабричных девушек. Сегодня опять.
+tip.nell.collectors.note,Nell says mill girls are taken off Loom Lane after the eleventh bell.,"Нелл говорит, после одиннадцатого колокола с Ткацкого переулка уводят фабричных девушек."
+tip.nell.chalk.line,Lane's wrong. Coal stairs got fresh chalk. Rain'll wash it by midweek.,Не в переулке дело. На угольной лестнице свежий мел. К середине недели дождём смоет.
+tip.nell.chalk.note,Nell says there is fresh chalk on the coal stairs.,"Нелл говорит, на угольной лестнице свежий мел."
+tip.kit.drawers.line,They want the drawers more than the man.,"Им ящики нужнее, чем сам человек."
+tip.kit.drawers.note,The newsboy says they want the drawers more than the man.,"Газетчик говорит, им ящики нужнее, чем сам человек."
+tip.kit.coachcoats.line,Collectors in coach-coats. Not proper cabmen.,Сборщики в кучерских пальто. Не настоящие извозчики.
+tip.kit.coachcoats.note,"The newsboy talks of collectors in coach-coats, not proper cabmen.",Газетчик говорит о сборщиках в кучерских пальто — не настоящих извозчиках.
+tip.kit.seal.line,Wax seal melted funny on Harrow's door.,Сургучная печать на двери Харроу странно оплыла.
+tip.kit.seal.note,The newsboy says the wax seal on Harrow's door melted oddly.,"Газетчик говорит, сургучная печать на двери Харроу странно оплыла."
+tip.kit.glove.line,"Glove by the coach ruts, down Loom Lane.","Перчатка у каретной колеи, внизу Ткацкого переулка."
+tip.kit.glove.note,The newsboy says there was a glove by the coach ruts on Loom Lane.,"Газетчик говорит, у каретной колеи на Ткацком переулке лежала перчатка."

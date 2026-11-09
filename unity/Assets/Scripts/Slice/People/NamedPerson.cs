@@ -1,36 +1,35 @@
 using System.Collections.Generic;
+using GameDev.Core.Localization;
 using GameDev.UI;
 using UnityEngine;
 
 namespace GameDev.Slice.People
 {
-    /// <summary>One of the slice's named people (SLICE_PEOPLE §1): who they are, so the HUD names them nearby. Their schedules come with S5c.</summary>
+    /// <summary>
+    /// One of the slice's named people (SLICE_PEOPLE §1): who they are, so the HUD names them nearby. The name and the
+    /// role are in the string tables (17 X.7) as <c>person.&lt;id&gt;.name</c> and <c>.role</c>, placeholders the owner may
+    /// change. Their schedules come with S5c.
+    /// </summary>
     public sealed class NamedPerson : MonoBehaviour, INameTag
     {
         [Tooltip("The roster's id; stable.")]
         [SerializeField] private string id;
-
-        [Tooltip("The name the player sees nearby; a placeholder the owner may change.")]
-        [SerializeField] private string displayName;
-
-        [SerializeField] private string role;
 
         /// <summary>Authoring default, m: the name hangs this high above the feet.</summary>
         private const float TagHeight = 2.05f;
 
         public string Id => id;
 
-        public string DisplayName => displayName;
+        /// <summary>The name the player sees nearby, in the language shown.</summary>
+        public string DisplayName => Loc.Get(SliceRoster.NameKey(id));
 
-        public string Role => role;
+        public string Role => Loc.Get(SliceRoster.RoleKey(id));
 
         public Vector3 TagPosition => transform.position + (Vector3.up * TagHeight);
 
-        public void Configure(string personId, string name, string personRole)
+        public void Configure(string personId)
         {
             id = personId;
-            displayName = name;
-            role = personRole;
         }
     }
 
@@ -39,19 +38,23 @@ namespace GameDev.Slice.People
     {
         public sealed class Entry
         {
-            public Entry(string id, string name, string role, string scene, bool female, string colour)
+            public Entry(string id, string scene, bool female, string colour)
             {
                 Id = id;
-                Name = name;
-                Role = role;
                 Scene = scene;
                 Female = female;
                 Colour = colour;
             }
 
             public string Id { get; }
-            public string Name { get; }
-            public string Role { get; }
+
+            /// <summary>The name in the language shown.</summary>
+            public string Name => Loc.Get(NameKey(Id));
+
+            /// <summary>The English name: the person's object in the scene carries it, whatever the language.</summary>
+            public string ObjectName => Loc.Tables.Get(NameKey(Id), Loc.English);
+
+            public string Role => Loc.Get(RoleKey(Id));
 
             /// <summary>The scene's file name under Assets/Scenes/Slice (interiors in Interiors/).</summary>
             public string Scene { get; }
@@ -68,22 +71,26 @@ namespace GameDev.Slice.People
         public const string Station = "WardensLockup";
         public const string FactionHouse = "FactionHouse";
 
+        public static string NameKey(string id) => $"person.{id}.name";
+
+        public static string RoleKey(string id) => $"person.{id}.role";
+
         public static readonly IReadOnlyList<Entry> All = new[]
         {
-            new Entry("nell", "Nell Garrow", "Publican of the Soot & Bell", Tavern, true, "Yellow"),
-            new Entry("harrow", "Josiah Harrow", "Apothecary", Apothecary, false, "Green"),
-            new Entry("pip", "Pip Vance", "Harrow's apprentice", Apothecary, false, "Green"),
-            new Entry("edda", "Edda Brann", "Master of Item Creation", Veilmouth, true, "Green"),
-            new Entry("silas", "Silas Quill", "Master of Enchanting", Veilmouth, false, "Green"),
-            new Entry("ada", "Ada Merrow", "Master of First Aid", Veilmouth, true, "Green"),
-            new Entry("tobias", "Tobias Penn", "Trader", Veilmouth, false, "Orange"),
-            new Entry("ruth", "Ruth Kettle", "Pawnbroker", Veilmouth, true, "Orange"),
-            new Entry("ilse", "Madame Ilse", "Seer", Veilmouth, true, "Orange"),
-            new Entry("coyle", "Sergeant Coyle", "Warden sergeant, brass number 14", Station, false, "Blue"),
-            new Entry("ashgrave", "Mr Ashgrave", "The faction's recruiter", FactionHouse, false, "Teal"),
-            new Entry("lottie", "Lottie Wren", "Thomas Wren's sister", Tavern, true, "Yellow"),
-            new Entry("dace", "Dace", "Veinmarket's contact", Tavern, false, "Brown"),
-            new Entry("kit", "Kit Mallow", "Newsboy", Veilmouth, false, "Yellow"),
+            new Entry("nell", Tavern, true, "Yellow"),
+            new Entry("harrow", Apothecary, false, "Green"),
+            new Entry("pip", Apothecary, false, "Green"),
+            new Entry("edda", Veilmouth, true, "Green"),
+            new Entry("silas", Veilmouth, false, "Green"),
+            new Entry("ada", Veilmouth, true, "Green"),
+            new Entry("tobias", Veilmouth, false, "Orange"),
+            new Entry("ruth", Veilmouth, true, "Orange"),
+            new Entry("ilse", Veilmouth, true, "Orange"),
+            new Entry("coyle", Station, false, "Blue"),
+            new Entry("ashgrave", FactionHouse, false, "Teal"),
+            new Entry("lottie", Tavern, true, "Yellow"),
+            new Entry("dace", Tavern, false, "Brown"),
+            new Entry("kit", Veilmouth, false, "Yellow"),
         };
     }
 }

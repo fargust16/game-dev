@@ -1,4 +1,5 @@
 using System;
+using GameDev.Core.Localization;
 using UnityEngine;
 
 namespace GameDev.World.Poi
@@ -19,7 +20,10 @@ namespace GameDev.World.Poi
         Marks,
     }
 
-    /// <summary>One line a source can say (SLICE_PEOPLE §2), when it says it, and what it tells of which POI.</summary>
+    /// <summary>
+    /// One line a source can say (SLICE_PEOPLE §2), when it says it, and what it tells of which POI. Its words are in the
+    /// string tables (17 X.7): <c>tip.&lt;id&gt;.line</c>, and <c>tip.&lt;id&gt;.note</c> for the Character Notes.
+    /// </summary>
     [Serializable]
     public sealed class Tip
     {
@@ -47,10 +51,18 @@ namespace GameDev.World.Poi
         [Tooltip("Said only to a character who uses Convince, Threaten, or Exchange: S2's dialogue; never offered in S1's plain panel.")]
         public bool needsApproach;
 
-        [TextArea(2, 4)] public string line;
+        public string LineKey => $"tip.{id}.line";
 
-        [Tooltip("The fact in the character's own words for the Character Notes (11): what was found, never what to do with it.")]
-        [TextArea(2, 4)] public string note;
+        /// <summary>The fact in the character's own words for the Character Notes (11): what was found, never what to do with it.</summary>
+        public string NoteKey => $"tip.{id}.note";
+
+        /// <summary>What the source says, in the language shown.</summary>
+        public string Line => Loc.Get(LineKey);
+
+        public bool HasNote => Loc.Exists(NoteKey);
+
+        /// <summary>The note in the language shown.</summary>
+        public string Note => Loc.Get(NoteKey);
     }
 
     /// <summary>The tips of the slice's sources as data (17 Q.2; 09 *Tips a day*). Immutable at run time.</summary>

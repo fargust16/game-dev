@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using GameDev.Core.Localization;
 using GameDev.Core.Save;
 using GameDev.UI;
 using GameDev.World.Timekeeping;
@@ -93,12 +94,22 @@ namespace GameDev.Slice.Tests
             CollectionAssert.AllItemsAreUnique(SaveSchema.Sections);
         }
 
-        [TestCase(1, 480, "Day 1 · 08:00")]
-        [TestCase(2, 0, "Day 2 · 00:00")]
-        [TestCase(2, 1439, "Day 2 · 23:59")]
-        public void TheHudWritesDayAndTime(int day, int minute, string expected)
+        [TestCase("en", 1, 480, "Day 1 · 08:00")]
+        [TestCase("en", 2, 0, "Day 2 · 00:00")]
+        [TestCase("en", 2, 1439, "Day 2 · 23:59")]
+        [TestCase("ru", 1, 480, "День 1 · 08:00")]
+        public void TheHudWritesDayAndTime(string language, int day, int minute, string expected)
         {
-            Assert.AreEqual(expected, HudText.DayAndTime(day, minute));
+            var was = Loc.Language;
+            try
+            {
+                Loc.Language = language;
+                Assert.AreEqual(expected, HudText.DayAndTime(day, minute));
+            }
+            finally
+            {
+                Loc.Language = was;
+            }
         }
     }
 }

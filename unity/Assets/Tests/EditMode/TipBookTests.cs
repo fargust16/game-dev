@@ -84,13 +84,13 @@ namespace GameDev.Slice.Tests
         {
             var poi = ScriptableObject.CreateInstance<PoiDefinition>();
             _made.Add(poi);
-            poi.Configure("x", "x", PoiWindowClass.Standard, "", 600, null, 60, -1, null, Vector3.zero, 30f);
+            poi.Configure("x", PoiWindowClass.Standard, 600, null, 60, -1, null, Vector3.zero, 30f);
             var catalogue = ScriptableObject.CreateInstance<TipCatalogue>();
             _made.Add(catalogue);
             catalogue.Configure(new[]
             {
-                new Tip { id = "r1", source = TipSource.StreetRumour, poi = poi, effect = TipEffect.Hints, line = "one" },
-                new Tip { id = "r2", source = TipSource.StreetRumour, poi = poi, effect = TipEffect.Hints, line = "two" },
+                new Tip { id = "r1", source = TipSource.StreetRumour, poi = poi, effect = TipEffect.Hints },
+                new Tip { id = "r2", source = TipSource.StreetRumour, poi = poi, effect = TipEffect.Hints },
             });
             using var director = new PoiDirector(new[] { poi }, _state, new WorldSeed(1), SliceSeedStreams.PoiUnattended, _clock);
             new TipBook(catalogue, _state, director).Read(TipSource.StreetRumour, _clock.Tick);

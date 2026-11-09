@@ -193,7 +193,7 @@ namespace GameDev.Slice.Tests
         private PoiDefinition Make(string id, int appearsAt, PoiDefinition[] after, int window, int closesAt, params PoiOutcome[] outcomes)
         {
             var poi = ScriptableObject.CreateInstance<PoiDefinition>();
-            poi.Configure(id, id, PoiWindowClass.Standard, "", appearsAt, after, window, closesAt, outcomes, Vector3.zero, 30f);
+            poi.Configure(id, PoiWindowClass.Standard, appearsAt, after, window, closesAt, outcomes, Vector3.zero, 30f);
             _made.Add(poi);
             return poi;
         }

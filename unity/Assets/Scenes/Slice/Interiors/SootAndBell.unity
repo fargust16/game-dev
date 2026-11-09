@@ -7661,8 +7661,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: lottie
-  displayName: Lottie Wren
-  role: Thomas Wren's sister
 --- !u!136 &319897264
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -13361,8 +13359,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.TipSourcePoint
   source: 1
-  title: Nell Garrow
-  nothingLine: '"Not now, love. Come back of an evening."'
+  titleKey: person.nell.name
+  nothingKey: source.nell.nothing
   interactRadius: 3
 --- !u!114 &667046573
 MonoBehaviour:
@@ -13377,8 +13375,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: nell
-  displayName: Nell Garrow
-  role: Publican of the Soot & Bell
 --- !u!136 &667046574
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -46537,8 +46533,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: dace
-  displayName: Dace
-  role: Veinmarket's contact
 --- !u!136 &1369994672
 CapsuleCollider:
   m_ObjectHideFlags: 0

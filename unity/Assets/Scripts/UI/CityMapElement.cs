@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using GameDev.Core.Localization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -32,7 +34,8 @@ namespace GameDev.UI
     /// <summary>
     /// Draws the city plan from its SVG (the subset the plan uses: rect, circle, line, polyline, polygon, text, and g
     /// carrying fill, stroke, and font size) with UI Toolkit's vector API, then the marks and the player on top. Plan
-    /// coordinates are the city plan's: world X = px − 500, Z = 500 − py.
+    /// coordinates are the city plan's: world X = px − 500, Z = 500 − py. A name written on the plan is shown from the
+    /// string tables (17 X.7) under <see cref="PlanKey"/>; the plan's own English name is its id.
     /// </summary>
     public sealed class CityMapElement : VisualElement
     {
@@ -47,6 +50,10 @@ namespace GameDev.UI
         private Rect _viewBox = new Rect(0, 0, 100, 100);
         private IReadOnlyList<MapMark> _marks = new MapMark[0];
         private Vector3? _player;
+        private string _language;
+
+        /// <summary>The string table key of a name written on the plan: <c>map.</c> and the name in lower case, every run of other characters one <c>_</c>.</summary>
+        public static string PlanKey(string name) => "map." + Regex.Replace((name ?? string.Empty).ToLowerInvariant(), "[^a-z0-9]+", "_").Trim('_');
 
         public CityMapElement()
         {
@@ -77,14 +84,14 @@ namespace GameDev.UI
             MarkDirtyRepaint();
         }
 
-        /// <summary>Sets the marks and the player; called every frame while open, it relabels only when the marks change.</summary>
+        /// <summary>Sets the marks and the player; called every frame while open, it relabels only when the marks or the language change.</summary>
         public void SetMarks(IReadOnlyList<MapMark> marks, Vector3? player)
         {
             marks ??= new MapMark[0];
             var same = marks.Count == _marks.Count && marks.Zip(_marks, (a, b) => a.Exact == b.Exact && a.Label == b.Label && a.World == b.World).All(x => x);
             _marks = marks;
             _player = player;
-            if (!same)
+            if (!same || _language != Loc.Language)
             {
                 Relabel();
             }
@@ -194,6 +201,7 @@ namespace GameDev.UI
         // Text is Labels: the plan's names, then the marks' words beside their pins and areas.
         private void Relabel()
         {
+            _language = Loc.Language;
             Clear();
             if (float.IsNaN(contentRect.width) || contentRect.width <= 0f)
             {
@@ -204,7 +212,8 @@ namespace GameDev.UI
             foreach (var text in _texts)
             {
                 var size = text.Style.FontSize * s;
-                var label = new Label(text.Text) { pickingMode = PickingMode.Ignore };
+                var key = PlanKey(text.Text);
+                var label = new Label(Loc.Exists(key) ? Loc.Get(key) : text.Text) { pickingMode = PickingMode.Ignore };
                 label.style.position = Position.Absolute;
                 var at = ToPanel(text.Points[0], text.Points[1]);
                 label.style.left = at.x;

@@ -2,6 +2,7 @@
     "name": "GameDev.Slice.Tests.EditMode",
     "rootNamespace": "GameDev.Slice.Tests",
     "references": [
+        "GameDev.Core.Localization",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "GameDev.World.Seed",

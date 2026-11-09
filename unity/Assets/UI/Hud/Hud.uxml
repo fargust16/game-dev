@@ -1,23 +1,24 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <Style src="Hud.uss" />
+    <!-- Every word is a string table key (17 X.7): a label of the class hud__loc carries its key as its text; the others are written by HudView. -->
     <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
-        <ui:Label name="time" class="hud__time" text="Day 1 · 08:00" picking-mode="Ignore" />
-        <ui:Label name="prompt" class="hud__prompt" text="E  Enter" picking-mode="Ignore" />
+        <ui:Label name="time" class="hud__time" text="" picking-mode="Ignore" />
+        <ui:Label name="prompt" class="hud__prompt" text="" picking-mode="Ignore" />
         <ui:Label name="nametag" class="hud__nametag" text="" picking-mode="Ignore" />
         <ui:VisualElement name="reading" class="hud__reading" picking-mode="Ignore">
-            <ui:Label name="reading-title" class="hud__reading-title" text="Notice Board" picking-mode="Ignore" />
+            <ui:Label name="reading-title" class="hud__reading-title" text="" picking-mode="Ignore" />
             <ui:Label name="reading-text" class="hud__reading-text" text="" picking-mode="Ignore" />
-            <ui:Label class="hud__reading-close" text="E  Close" picking-mode="Ignore" />
+            <ui:Label class="hud__reading-close hud__loc" text="ui.hud.reading.close" picking-mode="Ignore" />
         </ui:VisualElement>
         <ui:VisualElement name="map" class="hud__map">
-            <ui:Label class="hud__notes-title" text="Veilmouth" picking-mode="Ignore" />
+            <ui:Label class="hud__notes-title hud__loc" text="ui.hud.map.title" picking-mode="Ignore" />
             <ui:VisualElement name="map-area" class="hud__map-area" picking-mode="Ignore" />
-            <ui:Label class="hud__reading-close" text="M  Close" picking-mode="Ignore" />
+            <ui:Label class="hud__reading-close hud__loc" text="ui.hud.map.close" picking-mode="Ignore" />
         </ui:VisualElement>
         <ui:VisualElement name="notes" class="hud__notes">
-            <ui:Label class="hud__notes-title" text="Notes" picking-mode="Ignore" />
+            <ui:Label class="hud__notes-title hud__loc" text="ui.hud.notes.title" picking-mode="Ignore" />
             <ui:ScrollView name="notes-list" class="hud__notes-list" />
-            <ui:Label class="hud__reading-close" text="J  Close" picking-mode="Ignore" />
+            <ui:Label class="hud__reading-close hud__loc" text="ui.hud.notes.close" picking-mode="Ignore" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

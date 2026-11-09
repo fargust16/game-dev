@@ -38,6 +38,7 @@ namespace GameDev.Input
         private InputAction _skipDayNight;
 
         private InputAction _cancel;
+        private InputAction _language;
         private InputAction[] _chooseOptions;
 
         public static GameInputService EnsureExists()
@@ -144,6 +145,9 @@ namespace GameDev.Input
 
         public bool CancelPressed => _cancel != null && _cancel.WasPressedThisFrame();
 
+        /// <summary>The next language (17 X.7); authoring default F10 until a settings page exists.</summary>
+        public bool LanguagePressed => _language != null && _language.WasPressedThisFrame();
+
         public bool OptionPressed(int index1Based)
         {
             if (_chooseOptions == null || index1Based < 1 || index1Based > _chooseOptions.Length)
@@ -210,6 +214,7 @@ namespace GameDev.Input
 
             _ui = new InputActionMap("UI");
             _cancel = _ui.AddAction("Cancel", InputActionType.Button, "<Keyboard>/escape");
+            _language = _ui.AddAction("Language", InputActionType.Button, "<Keyboard>/f10");
             _chooseOptions = new InputAction[5];
             for (var i = 0; i < 5; i++)
             {

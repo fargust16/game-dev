@@ -45,10 +45,11 @@ namespace GameDev.Slice.EditorTools
             { "kit", (new[] { new Vector3(60f, 0f, -262f), new Vector3(52f, 0f, -263f), new Vector3(68f, 0f, -263f), new Vector3(60f, 0f, -238f), new Vector3(58f, 0f, -270f) }, 0f, "tobias") },
         };
 
-        private static readonly Dictionary<string, (TipSource source, string nothing, float reach)> Sources = new Dictionary<string, (TipSource, string, float)>
+        /// <summary>The people who are tip sources, and their reach, m; the panel's title is their name, and what they say with nothing now is <c>source.&lt;id&gt;.nothing</c>.</summary>
+        private static readonly Dictionary<string, (TipSource source, float reach)> Sources = new Dictionary<string, (TipSource, float)>
         {
-            { "nell", (TipSource.Bartender, "\"Not now, love. Come back of an evening.\"", 3f) },
-            { "kit", (TipSource.StreetRumour, "\"Nothing fresh. Come back tomorrow.\"", 2f) },
+            { "nell", (TipSource.Bartender, 3f) },
+            { "kit", (TipSource.StreetRumour, 2f) },
         };
 
         public static string ScenePath(string scene) =>
@@ -84,7 +85,7 @@ namespace GameDev.Slice.EditorTools
             var existing = Object.FindObjectsByType<NamedPerson>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(p => p.Id == entry.Id);
             if (existing != null)
             {
-                Debug.Log($"[SlicePeople] {entry.Name} already stands in {entry.Scene}; left as it is.");
+                Debug.Log($"[SlicePeople] {entry.ObjectName} already stands in {entry.Scene}; left as it is.");
                 return existing.gameObject;
             }
 
@@ -98,7 +99,7 @@ namespace GameDev.Slice.EditorTools
                 var old = Dummies().Where(d => d.name == oldName).OrderBy(d => IsFemale(d) == entry.Female ? 0 : 1).FirstOrDefault();
                 if (old == null)
                 {
-                    Debug.LogError($"[SlicePeople] {entry.Scene} has no Dummy '{oldName}' for {entry.Name}.");
+                    Debug.LogError($"[SlicePeople] {entry.Scene} has no Dummy '{oldName}' for {entry.ObjectName}.");
                     return null;
                 }
 
@@ -116,8 +117,8 @@ namespace GameDev.Slice.EditorTools
                 rotation = Quaternion.Euler(0f, yaw, 0f);
             }
 
-            VeilmouthDressing.Person(entry.Colour, entry.Female, position.x, position.z, rotation.eulerAngles.y, entry.Name, position.y);
-            var person = Dummies().Last(d => d.name == entry.Name);
+            VeilmouthDressing.Person(entry.Colour, entry.Female, position.x, position.z, rotation.eulerAngles.y, entry.ObjectName, position.y);
+            var person = Dummies().Last(d => d.name == entry.ObjectName);
             person.transform.SetParent(parent, true);
             if (sibling >= 0)
             {
@@ -126,13 +127,13 @@ namespace GameDev.Slice.EditorTools
                 person.transform.SetSiblingIndex(sibling);
             }
 
-            person.AddComponent<NamedPerson>().Configure(entry.Id, entry.Name, entry.Role);
+            person.AddComponent<NamedPerson>().Configure(entry.Id);
             if (Sources.TryGetValue(entry.Id, out var source))
             {
-                person.AddComponent<TipSourcePoint>().Configure(source.source, entry.Name, source.nothing, source.reach);
+                person.AddComponent<TipSourcePoint>().Configure(source.source, SliceRoster.NameKey(entry.Id), $"source.{entry.Id}.nothing", source.reach);
             }
 
-            Debug.Log($"[SlicePeople] {entry.Name}, {entry.Role}: {entry.Scene} at {position}{(oldName != null ? $", in place of '{oldName}'" : string.Empty)}.");
+            Debug.Log($"[SlicePeople] {entry.ObjectName}, {entry.Role}: {entry.Scene} at {position}{(oldName != null ? $", in place of '{oldName}'" : string.Empty)}.");
             return person;
         }
 
@@ -156,10 +157,10 @@ namespace GameDev.Slice.EditorTools
                     return feet;
                 }
 
-                Debug.Log($"[SlicePeople] {entry.Name}: {place} is taken by {string.Join(", ", blocked.Select(c => c.name).Distinct())}.");
+                Debug.Log($"[SlicePeople] {entry.ObjectName}: {place} is taken by {string.Join(", ", blocked.Select(c => c.name).Distinct())}.");
             }
 
-            Debug.LogWarning($"[SlicePeople] {entry.Name}: no free place on the list; the first is used.");
+            Debug.LogWarning($"[SlicePeople] {entry.ObjectName}: no free place on the list; the first is used.");
             return places[0];
         }
 

@@ -2257,8 +2257,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: pip
-  displayName: Pip Vance
-  role: Harrow's apprentice
 --- !u!136 &319897264
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -6667,8 +6665,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: harrow
-  displayName: Josiah Harrow
-  role: Apothecary
 --- !u!136 &1369994672
 CapsuleCollider:
   m_ObjectHideFlags: 0

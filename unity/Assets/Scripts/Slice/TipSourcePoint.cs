@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using GameDev.Core.Localization;
 using GameDev.Input;
 using GameDev.Locomotion;
 using GameDev.UI;
@@ -12,17 +14,18 @@ namespace GameDev.Slice
     /// A source the player reads or asks (09; S1.3): the Notice Board, and the publican and the newsboy from S1.5.
     /// Interact in reach shows what it says now in the HUD's plain panel until S2's dialogue replaces it; Interact
     /// again, or walking away, closes it. Asking a person is dialogue, so the world pauses while the panel is open
-    /// and the talk costs one tick when it ends (10.4); reading a board does not pause it.
+    /// and the talk costs one tick when it ends (10.4); reading a board does not pause it. Its words are string table
+    /// keys (17 X.7), and an open panel follows a change of language.
     /// </summary>
     public sealed class TipSourcePoint : MonoBehaviour, IPromptSource
     {
         [SerializeField] private TipSource source;
 
-        [Tooltip("The panel's title, e.g. the board's or the person's name.")]
-        [SerializeField] private string title = "Notice Board";
+        [Tooltip("The string table key of the panel's title, e.g. the board's or the person's name.")]
+        [SerializeField] private string titleKey = "source.board.title";
 
-        [Tooltip("What the panel says when the source has nothing now.")]
-        [SerializeField] private string nothingLine = "Nothing new.";
+        [Tooltip("The string table key of what the panel says when the source has nothing now.")]
+        [SerializeField] private string nothingKey = "source.board.nothing";
 
         [Tooltip("Authoring default, m: horizontal reach from this point.")]
         [SerializeField] private float interactRadius = 2f;
@@ -30,17 +33,18 @@ namespace GameDev.Slice
         private PlayerLocomotion _player;
         private HudView _hud;
         private IDisposable _pause;
+        private IReadOnlyList<Tip> _shown = new Tip[0];
 
         public TipSource Source => source;
 
         public bool IsOpen { get; private set; }
 
         /// <summary>Setup for scenes built by code; a placed source is set in the Inspector.</summary>
-        public void Configure(TipSource tipSource, string panelTitle, string nothing, float radius)
+        public void Configure(TipSource tipSource, string panelTitleKey, string nothingLineKey, float radius)
         {
             source = tipSource;
-            title = panelTitle;
-            nothingLine = nothing;
+            titleKey = panelTitleKey;
+            nothingKey = nothingLineKey;
             interactRadius = radius;
         }
 
@@ -78,7 +82,7 @@ namespace GameDev.Slice
         private const float Chest = 1.4f;
 
         public string PromptFor(Vector3 player) =>
-            !IsOpen && InReach(player) ? (source == TipSource.NoticeBoard ? "E  Read" : "E  Ask") : null;
+            !IsOpen && InReach(player) ? Loc.Get(source == TipSource.NoticeBoard ? "ui.prompt.read" : "ui.prompt.ask") : null;
 
         /// <summary>What Interact does: opens the panel with what the source says now, or closes it.</summary>
         public void Use()
@@ -96,13 +100,27 @@ namespace GameDev.Slice
                 return;
             }
 
-            var lines = world.Tips.Read(source, world.Clock.Tick);
-            hud.ShowReading(title, lines.Count > 0 ? string.Join("\n\n", lines.Select(t => t.line)) : nothingLine);
+            _shown = world.Tips.Read(source, world.Clock.Tick);
             IsOpen = true;
+            Show();
             if (source != TipSource.NoticeBoard)
             {
                 _pause = world.Clock.Pause();
             }
+        }
+
+        // What was said stays what was said; only its words follow the language.
+        private void Show()
+        {
+            if (IsOpen)
+            {
+                Hud()?.ShowReading(Loc.Get(titleKey), _shown.Count > 0 ? string.Join("\n\n", _shown.Select(t => t.Line)) : Loc.Get(nothingKey));
+            }
+        }
+
+        private void OnEnable()
+        {
+            Loc.Changed += Show;
         }
 
         private void Close()
@@ -144,6 +162,7 @@ namespace GameDev.Slice
 
         private void OnDisable()
         {
+            Loc.Changed -= Show;
             if (IsOpen)
             {
                 Close();

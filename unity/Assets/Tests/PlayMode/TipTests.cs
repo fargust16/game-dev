@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections;
 using System.Linq;
+using GameDev.Core.Localization;
 using GameDev.Locomotion;
 using GameDev.UI;
 using GameDev.World.Poi;
@@ -11,12 +12,27 @@ using UnityEngine.TestTools;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S1.3 in Veilmouth: reading the Notice Board after 14:00 shows the seizure notice and marks POI A.</summary>
+    /// <summary>S1.3 in Veilmouth, in each language (S2.0): reading the Notice Board after 14:00 shows the seizure notice and marks POI A.</summary>
     public sealed class TipTests : SliceInputTestBase
     {
-        [UnityTest]
-        public IEnumerator ReadingTheBoardMarksPoiA()
+        private string _language;
+
+        [SetUp]
+        public void KeepLanguage()
         {
+            _language = Loc.Language;
+        }
+
+        [TearDown]
+        public void RestoreLanguage()
+        {
+            Loc.Language = _language;
+        }
+
+        [UnityTest]
+        public IEnumerator ReadingTheBoardMarksPoiA([Values(Loc.English, Loc.Russian)] string language)
+        {
+            Loc.Language = language;
             yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
             var world = SliceWorldDriver.Running;
             Assert.IsNotNull(world, "Veilmouth carries the slice's world");
@@ -33,12 +49,13 @@ namespace GameDev.Slice.Tests
 
             var hud = Object.FindAnyObjectByType<HudView>();
             Assert.IsTrue(board.InReach(player.transform.position), Describe(player));
-            Assert.AreEqual("E  Read", hud.PromptText);
+            Assert.AreEqual(Loc.Get("ui.prompt.read"), hud.PromptText);
 
             yield return Tap(Key.E);
 
             Assert.IsTrue(hud.IsReadingOpen, "the plain panel opens");
-            StringAssert.Contains("SEIZURE", hud.ReadingText);
+            Assert.AreEqual(Loc.Get("source.board.title"), hud.ReadingTitle);
+            StringAssert.Contains(Loc.Get("tip.board.seizure.line"), hud.ReadingText);
             Assert.AreEqual(PoiDiscovery.Marked, world.Director.Discovery(poiA), "the notice marks POI A");
             Assert.IsFalse(world.Clock.IsPaused, "reading a board does not pause the world");
 
@@ -50,7 +67,7 @@ namespace GameDev.Slice.Tests
             yield return Tap(Key.J);
 
             Assert.IsTrue(hud.IsNotesOpen, "J opens the Notes");
-            Assert.IsTrue(hud.NoteLines.Any(l => l.Contains("seizure notice for Harrow & Tincture")), string.Join(" | ", hud.NoteLines));
+            CollectionAssert.Contains(hud.NoteLines, Loc.Get("tip.board.seizure.note"), string.Join(" | ", hud.NoteLines));
 
             yield return Tap(Key.J);
 
@@ -58,8 +75,9 @@ namespace GameDev.Slice.Tests
         }
 
         [UnityTest]
-        public IEnumerator TheNewsboyIsNamedNearbyAndAskingHimPausesTheWorld()
+        public IEnumerator TheNewsboyIsNamedNearbyAndAskingHimPausesTheWorld([Values(Loc.English, Loc.Russian)] string language)
         {
+            Loc.Language = language;
             yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
             var world = SliceWorldDriver.Running;
             var kit = Object.FindObjectsByType<People.NamedPerson>(FindObjectsSortMode.None).Single(p => p.Id == "kit");
@@ -68,13 +86,14 @@ namespace GameDev.Slice.Tests
             yield return new WaitForSeconds(0.5f);
 
             var hud = Object.FindAnyObjectByType<HudView>();
-            Assert.AreEqual("Kit Mallow", hud.NameTagText, "the player sees the newsboy's name nearby");
-            Assert.AreEqual("E  Ask", hud.PromptText);
+            var name = Loc.Get("person.kit.name");
+            Assert.AreEqual(name, hud.NameTagText, "the player sees the newsboy's name nearby");
+            Assert.AreEqual(Loc.Get("ui.prompt.ask"), hud.PromptText);
 
             yield return Tap(Key.E);
 
             Assert.IsTrue(hud.IsReadingOpen);
-            Assert.AreEqual("Kit Mallow", hud.ReadingTitle);
+            Assert.AreEqual(name, hud.ReadingTitle);
             Assert.IsTrue(world.Clock.IsPaused, "talk pauses the world (10.4)");
             var tick = world.Clock.Tick;
 

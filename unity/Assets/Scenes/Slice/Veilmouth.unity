@@ -54792,8 +54792,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: tobias
-  displayName: Tobias Penn
-  role: Trader
 --- !u!136 &375874110
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -75395,8 +75393,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: ada
-  displayName: Ada Merrow
-  role: Master of First Aid
 --- !u!136 &551967673
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -136143,8 +136139,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.TipSourcePoint
   source: 2
-  title: Kit Mallow
-  nothingLine: '"Nothing fresh. Come back tomorrow."'
+  titleKey: person.kit.name
+  nothingKey: source.kit.nothing
   interactRadius: 2
 --- !u!114 &1032938723
 MonoBehaviour:
@@ -136159,8 +136155,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: kit
-  displayName: Kit Mallow
-  role: Newsboy
 --- !u!136 &1032938724
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -163373,8 +163367,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: silas
-  displayName: Silas Quill
-  role: Master of Enchanting
 --- !u!136 &1238864477
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -168451,8 +168443,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.TipSourcePoint
   source: 0
-  title: Notice Board
-  nothingLine: Nothing new on the board.
+  titleKey: source.board.title
+  nothingKey: source.board.nothing
   interactRadius: 2.5
 --- !u!1001 &1297415716
 PrefabInstance:
@@ -182272,8 +182264,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: ruth
-  displayName: Ruth Kettle
-  role: Pawnbroker
 --- !u!136 &1421323769
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -211837,8 +211827,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: ilse
-  displayName: Madame Ilse
-  role: Seer
 --- !u!136 &1616423101
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -235914,8 +235902,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: edda
-  displayName: Edda Brann
-  role: Master of Item Creation
 --- !u!136 &1819272894
 CapsuleCollider:
   m_ObjectHideFlags: 0

@@ -4,7 +4,8 @@
     "references": [
         "GameDev.World.State",
         "GameDev.World.Seed",
-        "GameDev.World.Time"
+        "GameDev.World.Time",
+        "GameDev.Core.Localization"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

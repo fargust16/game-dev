@@ -2,6 +2,7 @@
     "name": "GameDev.UI",
     "rootNamespace": "GameDev.UI",
     "references": [
+        "GameDev.Core.Localization",
         "GameDev.Core.Scenes",
         "GameDev.World.Time",
         "GameDev.World.Portals",

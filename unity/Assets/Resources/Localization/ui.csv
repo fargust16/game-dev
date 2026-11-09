@@ -1,0 +1,17 @@
+﻿key,en,ru
+"# The HUD and its prompts (HudView, Hud.uxml); a key's letter is the key bound to it"
+ui.prompt.enter,E  Enter,E  Войти
+ui.prompt.read,E  Read,E  Читать
+ui.prompt.ask,E  Ask,E  Спросить
+ui.hud.time,Day {0} · {1:00}:{2:00},День {0} · {1:00}:{2:00}
+ui.hud.reading.close,E  Close,E  Закрыть
+ui.hud.map.title,Veilmouth,Вейлмут
+ui.hud.map.close,M  Close,M  Закрыть
+ui.hud.notes.title,Notes,Записи
+ui.hud.notes.close,J  Close,J  Закрыть
+ui.hud.notes.empty,Nothing noted yet.,Пока ничего не записано.
+"# The tip sources (TipSourcePoint): a board's title, and what each says when it has nothing now"
+source.board.title,Notice Board,Доска объявлений
+source.board.nothing,Nothing new on the board.,На доске ничего нового.
+source.nell.nothing,"""Not now, love. Come back of an evening.""","«Не сейчас, дорогуша. Загляни вечерком.»"
+source.kit.nothing,"""Nothing fresh. Come back tomorrow.""",«Свежего ничего. Приходи завтра.»

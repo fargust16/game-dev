@@ -1,4 +1,5 @@
 using System;
+using GameDev.Core.Localization;
 using UnityEngine;
 
 namespace GameDev.World.Poi
@@ -30,7 +31,8 @@ namespace GameDev.World.Poi
     /// <summary>
     /// A Point of Interest as data (17 Q.3; 04; 11.1): when it appears, how long its Active Window runs, and how it ends
     /// unattended. Immutable at run time; the run's state lives in the world state store under <c>poi.&lt;id&gt;.</c>.
-    /// Minutes count from day 1, 00:00, as the clock's ticks do.
+    /// Minutes count from day 1, 00:00, as the clock's ticks do. Its words are in the string tables (17 X.7):
+    /// <c>poi.&lt;id&gt;.title</c>, and <c>poi.&lt;id&gt;.urgency</c>, how the sources word its urgency, never a countdown (04 rule 5).
     /// </summary>
     [CreateAssetMenu(menuName = "GameDev/World/POI Definition", fileName = "Poi")]
     public sealed class PoiDefinition : ScriptableObject
@@ -38,12 +40,7 @@ namespace GameDev.World.Poi
         [Tooltip("A short stable id; the world state keys use it, so never change it after a save exists.")]
         [SerializeField] private string id = "a";
 
-        [SerializeField] private string title = "";
-
         [SerializeField] private PoiWindowClass windowClass = PoiWindowClass.Standard;
-
-        [Tooltip("How the sources word its urgency; never a countdown (04 rule 5).")]
-        [SerializeField] private string urgencyWords = "";
 
         [Tooltip("The minute it appears, or -1 when it appears only after another POI.")]
         [SerializeField] private int appearsAtMinute = -1;
@@ -66,9 +63,17 @@ namespace GameDev.World.Poi
         [SerializeField] private float hintRadius = 30f;
 
         public string Id => id;
-        public string Title => title;
+        public string TitleKey => $"poi.{id}.title";
+        public string UrgencyKey => $"poi.{id}.urgency";
+
+        /// <summary>The title in the language shown.</summary>
+        public string Title => Loc.Get(TitleKey);
+
         public PoiWindowClass WindowClass => windowClass;
-        public string UrgencyWords => urgencyWords;
+
+        /// <summary>The sources' words of urgency in the language shown, or empty when it has none.</summary>
+        public string UrgencyWords => Loc.Exists(UrgencyKey) ? Loc.Get(UrgencyKey) : string.Empty;
+
         public int AppearsAtMinute => appearsAtMinute;
         public PoiDefinition[] AppearsAfterAny => appearsAfterAny;
         public int WindowMinutes => windowMinutes;
@@ -78,13 +83,11 @@ namespace GameDev.World.Poi
         public float HintRadius => hintRadius;
 
         /// <summary>Authoring and tests: every field at once.</summary>
-        public void Configure(string poiId, string poiTitle, PoiWindowClass window, string urgency, int appearsAt, PoiDefinition[] after,
+        public void Configure(string poiId, PoiWindowClass window, int appearsAt, PoiDefinition[] after,
             int windowLength, int closesAt, PoiOutcome[] outcomes, Vector3 at, float hintArea)
         {
             id = poiId;
-            title = poiTitle;
             windowClass = window;
-            urgencyWords = urgency;
             appearsAtMinute = appearsAt;
             appearsAfterAny = after ?? new PoiDefinition[0];
             windowMinutes = windowLength;

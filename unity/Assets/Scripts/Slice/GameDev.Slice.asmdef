@@ -2,6 +2,7 @@
     "name": "GameDev.Slice",
     "rootNamespace": "GameDev.Slice",
     "references": [
+        "GameDev.Core.Localization",
         "GameDev.World.Seed",
         "GameDev.World.Time",
         "GameDev.Locomotion",

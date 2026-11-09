@@ -67,7 +67,7 @@ namespace GameDev.Slice.EditorTools
 
             if (board.GetComponent<TipSourcePoint>() == null)
             {
-                board.gameObject.AddComponent<TipSourcePoint>().Configure(TipSource.NoticeBoard, BoardName, "Nothing new on the board.", BoardReach);
+                board.gameObject.AddComponent<TipSourcePoint>().Configure(TipSource.NoticeBoard, "source.board.title", "source.board.nothing", BoardReach);
             }
 
             EditorSceneManager.MarkSceneDirty(scene);

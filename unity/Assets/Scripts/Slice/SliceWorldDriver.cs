@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GameDev.Core.Localization;
 using GameDev.Input;
 using GameDev.Locomotion;
 using GameDev.UI;
@@ -12,7 +13,7 @@ namespace GameDev.Slice
 {
     /// <summary>
     /// Owns the slice's run-time world: the world state store, the POI Director on the running clock, the tips the
-    /// sources say, the Character Notes on J, and the map on M. It lives through scene changes like the clock; a
+    /// sources say, the Character Notes on J, the map on M, and the next language on F10. It lives through scene changes like the clock; a
     /// driver that arrives with a later scene while one already runs removes itself, so a scene may carry one for testing.
     /// </summary>
     public sealed class SliceWorldDriver : MonoBehaviour
@@ -117,6 +118,7 @@ namespace GameDev.Slice
             Notes = new CharacterNotes(Tips);
             Notes.Added += _ => Refresh();
             State.Changed += (_, _, _) => Refresh();
+            Loc.Changed += Refresh;
         }
 
         // The pages belong to whichever scene's HUD is up; the keys work in every scene the world lives through.
@@ -126,6 +128,11 @@ namespace GameDev.Slice
             if (Notes == null || input == null)
             {
                 return;
+            }
+
+            if (input.LanguagePressed)
+            {
+                Loc.Next();
             }
 
             var hud = Hud();
@@ -199,6 +206,7 @@ namespace GameDev.Slice
         {
             if (_running == this)
             {
+                Loc.Changed -= Refresh;
                 Director?.Dispose();
                 _running = null;
             }

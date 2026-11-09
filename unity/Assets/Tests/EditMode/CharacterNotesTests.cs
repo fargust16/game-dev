@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GameDev.Core.Localization;
 using GameDev.World.Poi;
 using GameDev.World.Seed;
 using GameDev.World.State;
@@ -28,7 +29,7 @@ namespace GameDev.Slice.Tests
             book.Read(TipSource.NoticeBoard, clock.Tick);
 
             var tips = Catalogue().Tips.ToDictionary(t => t.id);
-            var expected = new[] { "kit.drawers", "kit.coachcoats", "board.girls", "board.wren", "board.seizure" }.Select(id => tips[id].note).ToList();
+            var expected = new[] { "kit.drawers", "kit.coachcoats", "board.girls", "board.wren", "board.seizure" }.Select(id => tips[id].Note).ToList();
             CollectionAssert.AreEqual(expected, notes.Lines);
             CollectionAssert.AreEqual(expected, added, "each fact is noted once, when found");
             director.Dispose();
@@ -39,8 +40,11 @@ namespace GameDev.Slice.Tests
         {
             foreach (var tip in Catalogue().Tips)
             {
-                Assert.IsFalse(string.IsNullOrWhiteSpace(tip.note), $"{tip.id} has a note");
-                Assert.AreNotEqual(tip.line, tip.note, $"{tip.id}: the note is the character's words, not the source's");
+                Assert.IsTrue(tip.HasNote, $"{tip.id} has a note");
+                foreach (var language in Loc.Languages)
+                {
+                    Assert.AreNotEqual(Loc.Tables.Get(tip.LineKey, language), Loc.Tables.Get(tip.NoteKey, language), $"{tip.id}, {language}: the note is the character's words, not the source's");
+                }
             }
         }
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GameDev.Core.Localization;
 using GameDev.Core.Scenes;
 using GameDev.Locomotion;
 using GameDev.World.Portals;
@@ -12,17 +13,19 @@ namespace GameDev.UI
     /// <summary>
     /// The slice HUD (17 X.6), on UI Toolkit: the day and time from the running clock, a prompt while the player is
     /// within reach of a door or another <see cref="IPromptSource"/>, and the plain reading panel of S1.3. Presentation
-    /// only: it reads the clock, the doors, and the sources and changes nothing.
+    /// only: it reads the clock, the doors, and the sources and changes nothing. Its own words are string table keys
+    /// (17 X.7): a UXML label of the class <c>hud__loc</c> carries its key as its text, and every word follows a change of
+    /// language.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public sealed class HudView : MonoBehaviour
     {
         private const string PromptVisible = "hud__prompt--visible";
         private const string ReadingVisible = "hud__reading--visible";
-        private const string DoorPrompt = "E  Enter";
         private const string NotesVisible = "hud__notes--visible";
         private const string NoteClass = "hud__note";
-        private const string NothingNoted = "Nothing noted yet.";
+        private const string LocalizedClass = "hud__loc";
+        private readonly List<(Label label, string key)> _localized = new List<(Label, string)>();
 
         private Label _time;
         private Label _prompt;
@@ -95,7 +98,7 @@ namespace GameDev.UI
             }
 
             _notesList.Clear();
-            foreach (var line in lines.Count > 0 ? lines : new[] { NothingNoted })
+            foreach (var line in lines.Count > 0 ? lines : new[] { Loc.Get("ui.hud.notes.empty") })
             {
                 var label = new Label(line);
                 label.AddToClassList(NoteClass);
@@ -124,11 +127,12 @@ namespace GameDev.UI
                 return;
             }
 
-            if (_mapView == null)
+            var area = _map.Q<VisualElement>("map-area");
+            if (_mapView == null || _mapView.parent != area)
             {
                 _mapView = new CityMapElement { pickingMode = PickingMode.Ignore };
                 _mapView.style.flexGrow = 1;
-                _map.Q<VisualElement>("map-area").Add(_mapView);
+                area.Add(_mapView);
             }
 
             if (!_mapView.HasPlan && !string.IsNullOrEmpty(planSvg))
@@ -160,17 +164,24 @@ namespace GameDev.UI
             var behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude);
             _sources = behaviours.OfType<IPromptSource>().ToList();
             _tags = behaviours.OfType<INameTag>().ToList();
-            _nameTag = GetComponent<UIDocument>().rootVisualElement.Q<Label>("nametag");
         }
 
+        // A UIDocument builds its tree again when it is enabled again, as a city's HUD is after an interior (17 I.2):
+        // labels no longer on a panel are looked up afresh, and the new tree gets its words.
         private bool Bind()
         {
-            if (_time != null)
+            if (_time != null && _time.panel != null)
             {
                 return true;
             }
 
             var root = GetComponent<UIDocument>().rootVisualElement;
+            if (root == null)
+            {
+                return false;
+            }
+
+            _nameTag = root.Q<Label>("nametag");
             _time = root.Q<Label>("time");
             _prompt = root.Q<Label>("prompt");
             _reading = root.Q<VisualElement>("reading");
@@ -185,11 +196,42 @@ namespace GameDev.UI
                 return false;
             }
 
+            // A key is read once per tree: a label already localized keeps the key it was found with.
+            var known = _localized.ToDictionary(l => l.label, l => l.key);
+            _localized.Clear();
+            root.Query<Label>(className: LocalizedClass).ForEach(label => _localized.Add((label, known.TryGetValue(label, out var key) ? key : label.text)));
+            Localize();
             return true;
+        }
+
+        /// <summary>The HUD's own words in the language shown; the clock's are written again at once.</summary>
+        private void Localize()
+        {
+            foreach (var (label, key) in _localized)
+            {
+                label.text = Loc.Get(key);
+            }
+
+            _shownTick = -1;
+        }
+
+        private void OnEnable()
+        {
+            Loc.Changed += Localize;
+        }
+
+        private void OnDisable()
+        {
+            Loc.Changed -= Localize;
         }
 
         private void Update()
         {
+            if (!Bind())
+            {
+                return;
+            }
+
             var clock = GameClockDriver.Running;
             if (clock != null && clock.Tick != _shownTick)
             {
@@ -282,7 +324,7 @@ namespace GameDev.UI
             {
                 if (portal != null && portal.InReach(position))
                 {
-                    return DoorPrompt;
+                    return Loc.Get("ui.prompt.enter");
                 }
             }
 
