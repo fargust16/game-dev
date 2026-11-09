@@ -10,7 +10,7 @@ namespace GameDev.Slice.EditorTools
     /// Veilmouth's trees made in Blender from Easy Tree (VEILMOUTH_CITY_PLAN.md §27; tools/blender/veilmouth_trees.py):
     /// how their FBX and textures are imported, and their materials on GameDev/Slice/Tree. An FBX's material names
     /// (VeilmouthBark, VeilmouthLeaves_&lt;kind&gt; for cards, VeilmouthLeaf_&lt;kind&gt; for single leaves) pick the
-    /// project's materials; its _LOD0, _LOD1 (and _LOD2) objects become a LOD Group. Every number is an authoring
+    /// project's materials; its _LOD0, _LOD1 (and _LOD2, _LOD3) objects become a LOD Group. Every number is an authoring
     /// default. Batch:
     /// -executeMethod GameDev.Slice.EditorTools.VeilmouthTrees.Setup
     /// </summary>
@@ -33,9 +33,12 @@ namespace GameDev.Slice.EditorTools
 
         // A tree of two LODs (street and garden) is LOD0 while it fills over 18 % of the screen's height (about 45 m away
         // for 9 m at 60°), LOD1 down to 2.5 % (about 310 m), and is not drawn beyond, which the haze already hides. A
-        // tree of three (the mature tree, 267.5, 5.7 and 2.3 thousand triangles) is LOD0 to 25 % (about 38 m for 11 m),
-        // LOD1 to 7 % (about 135 m) and LOD2 to 2.5 % (about 380 m).
+        // tree of three is LOD0 to 25 % (about 38 m for 11 m), LOD1 to 7 % (about 135 m) and LOD2 to 2.5 % (about
+        // 380 m). The mature tree has four (§27.9; 162.4, 94.8, 5.7 and 2.3 thousand triangles): Easy Tree's bark with
+        // its twigs only near, to 80 % (about 13.5 m for its LOD Group's 12.5 m, where a twig of 4 mm is under a third of
+        // a pixel), then the same without twigs to 25 % (about 43 m), then the thinned leaves.
         private static readonly float[] TwoLods = { 0.18f, 0.025f }, ThreeLods = { 0.25f, 0.07f, 0.025f };
+        private static readonly float[] FourLods = { 0.8f, 0.25f, 0.07f, 0.025f };
 
         // The wind, the same on bark and leaves so a twig never leaves its branch: a lean of 0.22 m at the top that
         // breathes about every 7 s (2π / 0.9), gusts travelling along the wind as waves about 105 m long (2π / 0.06),
@@ -201,7 +204,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             var renderers = root.GetComponentsInChildren<Renderer>(true);
-            var levels = Enumerable.Range(0, ThreeLods.Length)
+            var levels = Enumerable.Range(0, FourLods.Length)
                 .Select(k => renderers.Where(r => r.name.EndsWith($"_LOD{k}")).ToArray())
                 .TakeWhile(level => level.Length > 0)
                 .ToArray();
@@ -211,7 +214,7 @@ namespace GameDev.Slice.EditorTools
                 return;
             }
 
-            var until = levels.Length == ThreeLods.Length ? ThreeLods : TwoLods;
+            var until = new[] { TwoLods, ThreeLods, FourLods }[levels.Length - 2];
             group.SetLODs(levels.Select((level, k) => new LOD(until[k], level)).ToArray());
             group.fadeMode = LODFadeMode.CrossFade;
             group.animateCrossFading = true;

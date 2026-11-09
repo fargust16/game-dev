@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 1.86
+Version: 1.87
 
 Status: Draft
 
-Last Updated: 2026-11-09 (slice: the owner's mature tree built again with Easy Tree's own bark and twigs and one photographed leaf on each leaf place)
+Last Updated: 2026-11-10 (slice: the owner's mature tree with lighter tubes and its twigs drawn only near)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)

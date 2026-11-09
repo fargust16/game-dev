@@ -15,9 +15,10 @@ beech, LeafSet014 for the hornbeam). Neither's code is shipped.
    card's corners are cut where it is empty, so the card is an octagon.
 2. Skeleton (steps 2-3). MTree's trunk and three orders of branches; the limbs' lengths follow a crown envelope. The
    mature tree's is Easy Tree's Simple Tree Generator with the owner's own values and change (EASY_TREE,
-   easy_generator): its branches' lines with their radii. Its LOD0 is Easy Tree's own tree, its bark and twigs as
-   they are and one photographed leaf of the atlas (copied as Tree_Leaf_<leaf>) on each of Easy Tree's leaves'
-   places, with no cards (§27.8).
+   easy_generator): its branches' lines with their radii. Its LOD0 is Easy Tree's own tree, its bark and twigs with
+   fewer sides (EASY_SIDES) and one photographed leaf of the atlas (copied as Tree_Leaf_<leaf>) on each of Easy
+   Tree's leaves' places, with no cards; its LOD1 is the same without the twigs, which are under a pixel beyond a
+   few metres (§27.8).
 3. Leaves (step 4). One card on each point of a blue-noise set over the thinnest branches, kept in the crown's outer
    shell with a few inside, each pointing outward along its branch. The twigs' bark under the cards is removed.
 4. Bark decimated to a budget (the mature tree's farther LODs: built from its branches' lines as tubes of few sides,
@@ -26,9 +27,10 @@ beech, LeafSet014 for the hornbeam). Neither's code is shipped.
      R  sway: (height / tree height) ^ 1.8, the same for bark and leaves, so a leaf never leaves its branch;
      G  flutter: 0 on the bark, 0 at a card's or leaf's foot to 1 at its top;
      B  phase: one random value for each card or leaf, from its foot.
-5. LOD1: about 45 % of the cards, each 1.3 times larger, on bark decimated further; the mature tree's LOD1 and LOD2
-   keep 14 % and 6 % of its single leaves, 2 and 2.9 times larger, without Easy Tree's twigs.
-6. FBX: one file per tree, objects <Name>_LOD0, <Name>_LOD1 (and _LOD2), metres, +Y up, materials by name only.
+5. LOD1: about 45 % of the cards, each 1.3 times larger, on bark decimated further; the mature tree's LOD2 and LOD3
+   keep 14 % and 6 % of its single leaves, 2 and 2.9 times larger, on bark built from its lines.
+6. FBX: one file per tree, objects <Name>_LOD0, <Name>_LOD1 (and _LOD2, _LOD3), metres, +Y up, materials by name
+   only.
 
 Every size and count here is an authoring default unless it says measured.
 """
@@ -77,12 +79,13 @@ KINDS = {
                 spread=5.0),
         b2=dict(B2, length=1.5), b3=B3, shapes=("Spherical", "Hemispherical", "Conical"),
         cards=610, card=1.0, bark_tris=3400),
-    # The owner's mature tree (§27.7-§27.8): its LOD0 is Easy Tree's own tree (EASY_TREE) with its bark and twigs as
-    # they are and one of our photographed leaves on each of its leaves' places (easy_own); its farther LODs keep a
-    # share of the same leaves, each larger, on bark built from the branches' lines (each: the leaves kept, how much
-    # larger, the bark against bark_tris, the bark's thinnest branch, m), within the owner's reference budgets of LOD1
-    # 4-6 and LOD2 1.5-2.5 thousand triangles. (Cards there made clumps beside LOD0's open crown: tried 2026-11-09.)
-    # The owner chose Easy Tree's own bark for LOD0 over the budget of 8-12 thousand (2026-11-09).
+    # The owner's mature tree (§27.7-§27.8): its LOD0 is Easy Tree's own tree (EASY_TREE) with its bark and twigs at
+    # EASY_SIDES and one of our photographed leaves on each of its leaves' places (easy_own), and its LOD1 the same
+    # without the twigs; its farther LODs keep a share of the same leaves, each larger, on bark built from the
+    # branches' lines (each: the leaves kept, how much larger, the bark against bark_tris, the bark's thinnest branch,
+    # m), within the owner's reference budgets of 4-6 and 1.5-2.5 thousand triangles. (Cards there made clumps beside
+    # LOD0's open crown: tried 2026-11-09.) The owner chose Easy Tree's own bark for the near levels over the budget
+    # of 8-12 thousand (2026-11-09).
     "mature": dict(bark_tris=6200, lods=[(0.14, 2.0, 0.4, 0.015), (0.06, 2.9, 0.12, 0.03)]),
 }
 
@@ -97,6 +100,11 @@ EASY_TREE = {
     "Leaf Density": 2.0, "Leaf Min Scale": 1.0, "Leaf Max Scale": 1.5, "Visible in Viewport": True,
     "Custom Twig and Leaf": False,
 }
+# Easy Tree's tubes made lighter, by the owner's choice of 2026-11-09 (§27.8, VS-GREEN (b) with (d)): the bark's
+# profile circle of 6 sides for Easy Tree's 12, the twigs' of 3 without caps for its 4 with caps. LOD0 is then 168,568
+# triangles for 267,504, and the bark's front silhouette agrees with Easy Tree's at 0.972 (intersection over union;
+# measured 2026-11-09). Easy Tree's Subdivision Surface after the tubes is muted as it ships, so it changes nothing.
+EASY_SIDES = dict(bark=6, twig=3, twig_caps=False)
 BARK_SIDES = [(0.08, 6), (0.03, 4), (0.0, 3)]  # a branch's sides by its radius where it starts, m
 BARK_TILE = 1.0  # m of bark one repeat of its texture covers, along and round a branch
 BARK_TOLERANCE = 0.06  # m: how far a branch's tube may stray from its line, the same for thin and thick (thin ones lie
@@ -1030,7 +1038,7 @@ def easy_generator():
     The owner's change (2026-11-09): Make Tree Skeleton marks the trunk's last point a tip (its index equal to the
     trunk's point count less 1, Integer Math.013), and a tip forks into the treetop's branches; the owner's Subtract
     node makes it the count less -2, which no point has, so the trunk's top does not fork and the tree has fewer
-    branches.
+    branches. The tubes of the bark and the twigs get EASY_SIDES' sides.
     """
     import addon_utils
     module = addon("easy_tree")
@@ -1043,6 +1051,15 @@ def easy_generator():
         if top.operation != 'SUBTRACT' or top.inputs[1].is_linked or top.inputs[1].default_value != 1:
             raise RuntimeError("Easy Tree's Make Tree Skeleton is not the one the owner changed: update easy_generator")
         top.inputs[1].default_value = -2
+        bark_circle = bpy.data.node_groups["Tree to Mesh"].nodes["Curve Circle"]
+        twig = bpy.data.node_groups["Make Twig & Leaf"]
+        twig_circle, twig_tubes = twig.nodes["Curve Circle"], twig.nodes["Curve to Mesh"]
+        if (bark_circle.inputs["Resolution"].default_value != 12 or twig_circle.inputs["Resolution"].default_value != 4
+                or not twig_tubes.inputs["Fill Caps"].default_value):
+            raise RuntimeError("Easy Tree's tubes are not as it ships them: update easy_generator")
+        bark_circle.inputs["Resolution"].default_value = EASY_SIDES["bark"]
+        twig_circle.inputs["Resolution"].default_value = EASY_SIDES["twig"]
+        twig_tubes.inputs["Fill Caps"].default_value = EASY_SIDES["twig_caps"]
     generator = bpy.data.node_groups["Simple Tree Generator"]
     if any(item.name == "Skeleton" for item in generator.interface.items_tree):
         return generator
@@ -1086,7 +1103,8 @@ def easy_own(geometry, factor, spec):
     Tree's UVs kept, every edge smooth), and on each of a twig's leaves' places one of our photographed leaves in
     place of Easy Tree's: a flat quad of one cell of the leaf atlas (LEAVES, the cell at random), as long with its
     stalk as Easy Tree's leaf over 92 % of the cell's height (as on the cards), as wide as the cell's shape makes it,
-    its foot where Easy Tree's is. Returns (bark, leaves) bmeshes.
+    its foot where Easy Tree's is. Returns (near, bark, leaves) bmeshes: the bark with its twigs (LOD0), without them
+    (LOD1), and the leaves.
     """
     spec_leaf = LEAVES[spec["leaf"]]
     cols, rows = spec_leaf["grid"]
@@ -1094,7 +1112,8 @@ def easy_own(geometry, factor, spec):
     rng = random.Random(f"leaves-{spec['name']}")
     bark = bmesh.new()
     bark.from_mesh(geometry.mesh)
-    uv = bark.loops.layers.uv["UVMap"]
+    near = bark.copy()
+    uv = near.loops.layers.uv["UVMap"]
     twig = geometry.instance_references()[0]
     template = [Vector(v.co) for v in twig.mesh.vertices]
     twig_uv = twig.mesh.uv_layers["UVMap"].data
@@ -1110,9 +1129,9 @@ def easy_own(geometry, factor, spec):
     leaf_uv = leaves.loops.layers.uv.new("UVMap")
     twigs = instance_transforms(geometry.instances_pointcloud())
     for at in twigs:
-        verts = [bark.verts.new(at @ co) for co in template]
+        verts = [near.verts.new(at @ co) for co in template]
         for index, coords in faces:
-            face = bark.faces.new([verts[i] for i in index])
+            face = near.faces.new([verts[i] for i in index])
             for loop, c in zip(face.loops, coords):
                 loop[uv].uv = c
         for place in places:
@@ -1123,20 +1142,21 @@ def easy_own(geometry, factor, spec):
             for loop, (cu, cv) in zip(face.loops, [(0, 0), (1, 0), (1, 1), (0, 1)]):
                 # 1 % in from the cell's sides, so no sliver of the next leaf shows.
                 loop[leaf_uv].uv = (u0 + (0.01 + 0.98 * cu) * cell_w, v0 + (0.01 + 0.98 * cv) * cell_h)
-    for bm in (bark, leaves):
+    for bm in (near, bark, leaves):
         bmesh.ops.scale(bm, vec=(factor, factor, factor), verts=bm.verts)
-    for edge in bark.edges:
-        edge.smooth = True
+    for bm in (near, bark):
+        for edge in bm.edges:
+            edge.smooth = True
     print(f"VEILMOUTH {spec['name']}: Easy Tree's own bark and {len(twigs)} twigs, {len(twigs) * len(places)} leaves "
           f"{100 * h * factor:.1f}-{150 * h * factor:.1f} cm long with their stalks")
-    return bark, leaves
+    return near, bark, leaves
 
 
 def easy_tree(spec):
     """
     The tree Easy Tree grows from the spec's values, scaled to the tree's height, its foot at the origin: its branches
     as (points, radii) lines, m, each from where it leaves its parent's middle to its tip; and Easy Tree's own tree as
-    (bark, leaves) from easy_own.
+    (near, bark, leaves) from easy_own.
     """
     group = bpy.data.node_groups.new(f"Grow_{spec['name']}", 'GeometryNodeTree')
     group.interface.new_socket("Geometry", in_out='OUTPUT', socket_type='NodeSocketGeometry')
@@ -1266,7 +1286,8 @@ def tube_bark(branches, cut, tris, coarse, name):
 def build_tree(m, create_mesh, spec, cards, seeds):
     """
     The tree's LOD0 and its farther LODs (the kind's, else LODS), each one object: cards on the tree's bark, or, for
-    a tree from Easy Tree, Easy Tree's own tree and then its single leaves on bark built from its branches' lines.
+    a tree from Easy Tree, Easy Tree's own tree with its twigs and without them, then its single leaves on bark built
+    from its branches' lines.
     """
     rng = random.Random(f"cards-{spec['name']}")
     kind = KINDS[spec["kind"]]
@@ -1290,15 +1311,18 @@ def build_tree(m, create_mesh, spec, cards, seeds):
     if own is None:
         leaves = card_mesh(spec, cards[spec["leaf"]], placements, crown, rng)
         leaves_name = leaves_material(spec["leaf"])
+        own_levels = []
     else:
-        own_bark, leaves = own
+        *own_levels, leaves = own  # Easy Tree's bark with its twigs (LOD0), then without them (LOD1): §27.8
         leaves_name = leaf_material_name(spec["leaf"])
     lods = []
     farther = kind.get("lods", LODS)
-    for k, (keep, grow_by, share, cut) in enumerate([(1.0, 1.0, 1.0, kind.get("bark_cut", BARK_CUT))] + farther):
-        bark = own_bark if k == 0 and own is not None else bark_for(k, cut, share)
+    whole = (1.0, 1.0, 1.0, kind.get("bark_cut", BARK_CUT))
+    for k, (keep, grow_by, share, cut) in enumerate([whole] * max(1, len(own_levels)) + farther):
+        # A level built from the lines counts its coarseness from the first one after Easy Tree's own.
+        bark = own_levels[k] if k < len(own_levels) else bark_for(k - max(0, len(own_levels) - 1), cut, share)
         leaves_k = leaves.copy()
-        if k:
+        if (keep, grow_by) != (1.0, 1.0):
             thin(leaves_k, keep, grow_by)
         lods.append(assemble(f"{spec['name']}_LOD{k}", bark, leaves_k, spec["height"], leaves_name))
         bark.free()
