@@ -26,6 +26,18 @@ namespace GameDev.Slice
         /// <summary>How a POI ends when nobody comes (04; 11.1); fork it with the POI's id hashed as the key.</summary>
         public const string PoiUnattended = "slice.poi.unattended";
 
-        public static readonly IReadOnlyList<string> All = new[] { RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended };
+        /// <summary>Rolls of action checks (07.1 §8); the system that checks forks it with keys that no two attempts share.</summary>
+        public const string ActionChecks = "slice.check.action";
+
+        /// <summary>
+        /// Rolls of Social Checks (10.4 §2); fork it with the option's id hashed and the tick as the keys. A failed check
+        /// is never tried again on the spot, so the pair never repeats.
+        /// </summary>
+        public const string SocialChecks = "slice.check.social";
+
+        public static readonly IReadOnlyList<string> All = new[]
+        {
+            RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks,
+        };
     }
 }
