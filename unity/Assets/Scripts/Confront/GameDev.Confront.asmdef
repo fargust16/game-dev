@@ -1,0 +1,16 @@
+{
+    "name": "GameDev.Confront",
+    "rootNamespace": "GameDev.Confront",
+    "references": [
+        "GameDev.Player.Progression"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

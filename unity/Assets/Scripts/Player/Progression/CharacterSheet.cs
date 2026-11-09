@@ -16,14 +16,17 @@ namespace GameDev.Player.Progression
     }
 
     /// <summary>
-    /// The character's skills. The slice starts with the three of the Social Checks (10.4 §2); the rest of 07.1's
-    /// catalogue joins with the system that uses it.
+    /// The character's skills. The slice starts with the three of the Social Checks (10.4 §2) and the two weapon skills
+    /// of a fight (10.2 §5b *Attack*); the rest of 07.1's catalogue joins with the system that uses it. A new skill goes
+    /// at the end, because dialogue assets store a skill by its number.
     /// </summary>
     public enum CharacterSkill
     {
         Persuasion,
         Deception,
         Intimidation,
+        MeleeSkill,
+        RangedSkill,
     }
 
     /// <summary>What a check reads of a character.</summary>

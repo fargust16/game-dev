@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 300bc6b9cce947419583fd65f1d431a7, type: 3}
+  m_Name: FightRules
+  m_EditorClassIdentifier:
+  checks: {fileID: 11400000, guid: 9a4e1c7b3d5f4a2e8b6c0d9f1e3a5c7b, type: 2}
+  limitMultiplier:
+  - 3.52
+  - 3.06
+  - 2.66
+  - 2.31
+  - 2.01
+  - 1.75
+  - 1.52
+  - 1.32
+  - 1.15
+  - 1
+  hpBase: 20
+  hpPerEndurance: 0.8
+  baseHit: 0.7
+  hitFloor: 0.05
+  hitCeiling: 0.95
+  stageStep: 0.35
+  strengthDivisor: 50
+  spread: 0.15
+  defenceHalf: 50
+  reductionCap: 0.75
+  rangedArmour: 2
+  criticalMultiplier: 2
+  criticalPierce: 0.5
+  capacityBase: 20
+  carried: 3
+  loadBands:
+  - 1
+  - 1.25
+  - 1.5
+  loadEvasion:
+  - 0
+  - 8
+  - 16
+  - 24
+  loadAp:
+  - 0
+  - 0
+  - 1
+  - 2
+  apBase: 10
+  apDexterityDivisor: 20
+  reactionAp: 2
+  initiativeDie: 20
