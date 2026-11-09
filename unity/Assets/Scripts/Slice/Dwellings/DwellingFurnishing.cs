@@ -24,7 +24,16 @@ namespace GameDev.Slice.Dwellings
             HallTableKey = "ViHallTable", CounterKey = "ViCounterSet", SideboardKey = "ViSideboardSet", ShopShelvesKey = "ViShopShelves",
             DresserKey = "ViDresser";
 
-        public const string LampKey = "ViWallLamp";
+        /// <summary>
+        /// The owner's Tripo furniture (furnishing rules §10, 2026-11-09): a true nightstand, with a candle and a book or,
+        /// in a rich room, a table lamp; a wardrobe, a chest of drawers, a cheval glass, a screen, a wing chair, a piano,
+        /// a gramophone, a sewing table, a coat stand, a floor vase, a glazed cabinet, the hearth's log basket and fire
+        /// irons, a wall clock, and the rich home's sconces and the middling hall's lantern.
+        /// </summary>
+        public const string TrNightstandKey = "TrNightstand", TrNightstandLampKey = "TrNightstandLamp", TrDresserKey = "TrDresser",
+            LogsKey = "TrLogHolder", FireToolsKey = "TrFireTools";
+
+        public const string LampKey = "ViWallLamp", SconceKey = "TrSconce", LanternKey = "TrLantern";
         private const string PictureKey = "ViPicture";
         private static readonly string[] Pictures = Enumerable.Range(1, 8).Select(i => $"ViPicture{i}").ToArray();
 
@@ -46,10 +55,10 @@ namespace GameDev.Slice.Dwellings
         /// <summary>Rules G4: what a seat may face.</summary>
         private static readonly HashSet<string> SeatTargets = new HashSet<string>
         {
-            "ViKitchenTable", "ViDiningTable", SmallTableKey, SideTableKey, "ViDesk", FireplaceKey,
+            "ViKitchenTable", "ViDiningTable", SmallTableKey, SideTableKey, "ViDesk", "TrDesk", FireplaceKey, "TrPiano", "TrSewing",
         };
 
-        private static readonly HashSet<string> Seats = new HashSet<string> { "ViChair", "ViArmchair", "ViFootstool" };
+        private static readonly HashSet<string> Seats = new HashSet<string> { "ViChair", "ViArmchair", "ViFootstool", "TrArmchair" };
 
         // ------------------------------------------------------------------------------------------- places (rules §3)
 
@@ -117,21 +126,31 @@ namespace GameDev.Slice.Dwellings
             new With { Key = key, Rel = rel, From = from, UpTo = upTo, Y = y, N = n };
 
         private static readonly Place Sleep = P("Sleep", At.WallCentre, "ViBed", Use.Bed,
-            C(NightstandPoorKey, Rel.FlankOne, Poor, Poor), C(NightstandKey, Rel.Flank, Middling), C(PictureKey, Rel.Over, Middling, y: 2.0f));
+            C(NightstandPoorKey, Rel.FlankOne, Poor, Poor), C(TrNightstandKey, Rel.Flank, Middling, Middling), C(TrNightstandLampKey, Rel.Flank, Rich),
+            C(PictureKey, Rel.Over, Middling, y: 2.0f));
 
         private static readonly Place SleepPlain = P("Sleep", At.WallCentre, "ViBed", Use.Bed, C(NightstandPoorKey, Rel.FlankOne));
 
-        private static readonly Place Dress = P("Dress", At.Wall, null, "ViSideboard", "ViSideboard", Use.Front, C("ViMirrorTall", Rel.FlankOne));
+        private static readonly Place Dress = P("Dress", At.Wall, null, "TrWardrobe", "TrWardrobe", Use.Front,
+            C("ViMirrorTall", Rel.FlankOne, Middling, Middling), C("TrMirror", Rel.FlankOne, Rich));
 
-        private static readonly Place Coats = P("Coats", At.Corner, null, "ViCoatStand", "ViCoatStand", Use.None);
+        /// <summary>A chest of drawers with a mirror over it (rules §3, Dress).</summary>
+        private static readonly Place Drawers = P("Drawers", At.Wall, null, TrDresserKey, TrDresserKey, Use.Front, C("ViMirrorSmall", Rel.Over, Middling, y: MirrorHeight));
 
+        private static readonly Place Screen = P("Screen", At.Wall, null, "TrScreen", "TrScreen", Use.None);
+
+        private static readonly Place Coats = P("Coats", At.Corner, null, "ViCoatStand", "TrCoatRack", Use.None);
+
+        // The hearth's log basket on either side and, from a middling home up, its fire irons on the other (rules G5:
+        // what lies by a hearth); both give way to the hearth's chairs and the walk-ways.
         private static readonly Place Hearth = P("Hearth", At.InnerWall, FireplaceKey, Use.Front,
-            C("ViChair", Rel.FrontFlank, Poor, Poor), C("ViArmchair", Rel.FrontFlank, Middling), C("ViRug", Rel.Before, Middling));
+            C("ViChair", Rel.FrontFlank, Poor, Poor), C("ViArmchair", Rel.FrontFlank, Middling, Middling), C("TrArmchair", Rel.FrontFlank, Rich),
+            C("ViRug", Rel.Before, Middling), C(LogsKey, Rel.FlankOne), C(FireToolsKey, Rel.FlankOne, Middling));
 
-        private static readonly Place Cook = P("Cook", At.InnerWall, FireplaceKey, Use.Front);
+        private static readonly Place Cook = P("Cook", At.InnerWall, FireplaceKey, Use.Front, C(LogsKey, Rel.FlankOne));
 
         /// <summary>The kitchen-living room's hearth with a chair each side (rules §4, poor).</summary>
-        private static readonly Place CookAndSit = P("Cook", At.InnerWall, FireplaceKey, Use.Front, C("ViChair", Rel.FrontFlank));
+        private static readonly Place CookAndSit = P("Cook", At.InnerWall, FireplaceKey, Use.Front, C("ViChair", Rel.FrontFlank), C(LogsKey, Rel.FlankOne));
 
         private static readonly Place Dresser = P("Dresser", At.Wall, DresserKey, Use.Front);
 
@@ -168,18 +187,33 @@ namespace GameDev.Slice.Dwellings
 
         private static readonly Place Sideboard = P("Sideboard", At.WallCentre, null, SideboardKey, SideboardKey, Use.Front);
 
-        private static readonly Place Display = P("Display", At.Wall, null, "ViCupboardGlass", "ViCupboardGlass", Use.Front);
+        private static readonly Place Display = P("Display", At.Wall, null, "ViCupboardGlass", "TrDisplay", Use.Front);
 
         private static readonly Place Sit = P("Sit", At.Opposite, "ViSofa", "ViSofa", "ViSofaGreen", Use.Front,
             C(SideTableKey, Rel.Before, Middling), C(PictureKey, Rel.Over, Middling, y: 1.7f), C("ViPalm", Rel.Corners, Rich));
 
         private static readonly Place Books = P("Books", At.Wall, "ViBookcaseLow", "ViBookcaseLow", "ViBookcase", Use.Front);
 
-        private static readonly Place Work = P("Work", At.Wall, "ViDesk", Use.None, C("ViChair", Rel.Seat));
+        private static readonly Place Work = P("Work", At.Wall, "ViDesk", "ViDesk", "TrDesk", Use.None, C("ViChair", Rel.Seat),
+            C("TrWallClock", Rel.Over, Rich, y: 1.6f));
 
         private static readonly Place WorkSmall = P("Table", At.Wall, SmallTableKey, Use.None, C("ViChair", Rel.Seat));
 
         private static readonly Place Clock = P("Clock", At.Wall, null, null, "ViClock", Use.Front);
+
+        /// <summary>
+        /// A rich drawing room's upright piano with a chair at its keys (rules §4; the pack lacked one, §8). The pack's
+        /// footstool is 1.4 cm too wide for a seat cell by a wall (kit check, 2026-11-09), and it is a pouffe, not a stool.
+        /// </summary>
+        private static readonly Place Piano = P("Piano", At.Wall, null, null, "TrPiano", Use.None, C("ViChair", Rel.Seat));
+
+        private static readonly Place Gramophone = P("Gramophone", At.Wall, null, null, "TrGramophone", Use.Front);
+
+        /// <summary>A sewing table by the wall with its chair: the poor and middling home's work.</summary>
+        private static readonly Place Sew = P("Sew", At.Wall, "TrSewing", "TrSewing", null, Use.None, C("ViChair", Rel.Seat));
+
+        /// <summary>A rich floor vase in a corner (G6).</summary>
+        private static readonly Place Vase = P("Vase", At.Corner, null, null, "TrVase", Use.None);
 
         private static readonly Place HallTable = P("Hall table", At.Wall, null, HallTableKey, HallTableKey, Use.Front,
             C("ViMirror", Rel.Over, Middling, y: MirrorHeight));
@@ -211,9 +245,9 @@ namespace GameDev.Slice.Dwellings
 
         private static readonly Place[] AllPlaces =
         {
-            Sleep, SleepPlain, Dress, Coats, Hearth, Cook, CookAndSit, Dresser, Basin, ClosetBasin, Bath, Toilet, WashShelf, TowelRail, EatKitchen,
-            EatSmall, Dine, Sideboard, Display, Sit, Books, Work, WorkSmall, Clock, HallTable, Plant, Settee, Play, Sell, Racks, Goods,
-            Kitchenware, Toys, Stacks,
+            Sleep, SleepPlain, Dress, Drawers, Screen, Coats, Hearth, Cook, CookAndSit, Dresser, Basin, ClosetBasin, Bath, Toilet, WashShelf, TowelRail,
+            EatKitchen, EatSmall, Dine, Sideboard, Display, Sit, Books, Work, WorkSmall, Clock, Piano, Gramophone, Sew, Vase, HallTable, Plant, Settee,
+            Play, Sell, Racks, Goods, Kitchenware, Toys, Stacks,
         };
 
         // ------------------------------------------------------------------------------------------- rooms (rules §4)
@@ -245,26 +279,27 @@ namespace GameDev.Slice.Dwellings
         /// <summary>Rules §4: each room's places, required first, then the optional ones in order.</summary>
         private static readonly Dictionary<RoomKind, Step[]> RoomRules = new Dictionary<RoomKind, Step[]>
         {
-            [RoomKind.Hall] = new[] { May(HallTable, Middling), May(Clock, Rich), May(Coats, Middling), May(Plant, Rich) },
+            [RoomKind.Hall] = new[] { May(HallTable, Middling), May(Clock, Rich), May(Coats, Middling), May(Plant, Rich), May(Vase, Rich) },
             [RoomKind.Landing] = new[] { May(Settee, Rich), May(Plant, Middling) },
-            [RoomKind.Parlour] = new[] { Must(Hearth), May(Sit), May(Books, Middling) },
-            [RoomKind.DrawingRoom] = new[] { Must(Hearth), Must(Sit), May(Books), May(Display) },
+            [RoomKind.Parlour] = new[] { Must(Hearth), May(Sit), May(Books, Middling), May(Sew, Middling, Middling) },
+            [RoomKind.DrawingRoom] = new[] { Must(Hearth), Must(Sit), May(Piano, Rich), May(Books), May(Display), May(Gramophone, Rich), May(Vase, Rich) },
             [RoomKind.DiningRoom] = new[] { May(Hearth, Rich), Must(Dine), May(Sideboard), May(Display) },
             [RoomKind.Study] = new[] { May(Hearth, Rich), Must(Work), May(Books, count: 2) },
             [RoomKind.Kitchen] = new[]
             {
                 Must(CookAndSit, Poor, Poor), Must(Cook, Middling), Must(EatKitchen), May(Dresser), May(Basin, Poor, Middling), May(Kitchenware),
+                May(Sew, Poor, Poor),
             },
             [RoomKind.Scullery] = new[] { Must(Basin), May(Dresser), May(Kitchenware, count: 2) },
-            [RoomKind.Bedroom] = new[] { May(Hearth, Rich), Must(Sleep), May(Dress, Middling), May(Coats, Rich) },
-            [RoomKind.DressingRoom] = new[] { Must(Dress), May(Dress), May(Coats) },
+            [RoomKind.Bedroom] = new[] { May(Hearth, Rich), Must(Sleep), May(Dress, Middling), May(Drawers, Middling), May(Coats, Rich), May(Screen, Rich) },
+            [RoomKind.DressingRoom] = new[] { Must(Dress), May(Drawers), May(Dress), May(Screen), May(Coats) },
             [RoomKind.Bathroom] = new[] { Must(Bath), Must(Toilet), Must(Basin), May(WashShelf), May(TowelRail) },
             [RoomKind.WC] = new[] { Must(Toilet), Must(ClosetBasin), May(WashShelf) },
             [RoomKind.Washroom] = new[] { Must(Toilet), Must(ClosetBasin) },
             [RoomKind.Nursery] = new[] { Must(SleepPlain, count: 2), May(Play), May(Toys, count: 2) },
             [RoomKind.ServantRoom] = new[] { Must(SleepPlain, count: 0), May(WorkSmall) },
             [RoomKind.BoxRoom] = new[] { May(Goods, count: 4) },
-            [RoomKind.Room] = new[] { Must(Cook), Must(Sleep), May(EatSmall), May(Dresser), May(Kitchenware) },
+            [RoomKind.Room] = new[] { Must(Cook), Must(Sleep), May(EatSmall), May(Sew, Poor, Poor), May(Dresser), May(Kitchenware) },
             [RoomKind.ShopRoom] = new[] { Must(Sell) },
             [RoomKind.BackRoom] = new[]
             {
@@ -286,7 +321,7 @@ namespace GameDev.Slice.Dwellings
         /// <summary>Every kit key the planner may place, so the kit asset holds them all.</summary>
         public static IEnumerable<string> Keys =>
             AllPlaces.SelectMany(p => new[] { p.PoorKey, p.MiddlingKey, p.RichKey }.Concat(p.With.Select(w => w.Key)).Concat(p.Things ?? Array.Empty<string>()))
-                .Concat(new[] { ShopShelvesKey, "ViCupboardGlass", LampKey, "ViCarpet", "ViCarpetB", StashKey, StairKey, BalustradeKey, ChandelierKey })
+                .Concat(new[] { ShopShelvesKey, "ViCupboardGlass", LampKey, SconceKey, LanternKey, "ViCarpet", "ViCarpetB", StashKey, StairKey, BalustradeKey, ChandelierKey })
                 .Concat(Pictures)
                 .Where(k => k != null && k != PictureKey).Distinct();
 
@@ -1221,9 +1256,12 @@ namespace GameDev.Slice.Dwellings
             {
                 var main = j.Wealth == Rich && (kind == RoomKind.DrawingRoom || kind == RoomKind.DiningRoom || kind == RoomKind.Hall);
                 var lamps = (j.Wealth == Rich && r.Width * r.Depth >= 72 ? 2 : 1) + (main ? 1 : 0);
+
+                // A rich home's brass sconces; a middling hall's and landing's bracket lantern (furnishing rules §10).
+                var lamp = j.Wealth == Rich ? SconceKey : kind == RoomKind.Hall || kind == RoomKind.Landing ? LanternKey : LampKey;
                 for (var n = 0; n < lamps; n++)
                 {
-                    HangNear(j, LampKey, LampHeight);
+                    HangNear(j, lamp, LampHeight);
                 }
             }
 

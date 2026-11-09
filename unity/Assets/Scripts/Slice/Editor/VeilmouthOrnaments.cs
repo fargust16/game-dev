@@ -93,6 +93,14 @@ namespace GameDev.Slice.EditorTools
                 var go = (GameObject)PrefabUtility.InstantiatePrefab(entry.Prefab, group);
                 go.name = name;
                 go.transform.SetPositionAndRotation(centre - (rotation * new Vector3(entry.Width * 0.5f, 0f, entry.Depth * 0.5f)), rotation);
+                // The garden's grass (city plan §25.4) gives way to an ornament, as the middle tree gives way to the angel.
+                foreach (var grass in Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Include).Where(k => IsGrass(k) &&
+                             Mathf.Abs(k.transform.position.x + 0.5f - centre.x) < (wx * 0.5f) + Clear + 0.5f &&
+                             Mathf.Abs(k.transform.position.z + 0.5f - centre.z) < (wz * 0.5f) + Clear + 0.5f).ToList())
+                {
+                    Object.DestroyImmediate(grass.gameObject);
+                }
+
                 placed.Add($"{name}: {key} {wx}x{wz} at px {spot.X}, py {spot.Y}, y {spot.Floor.Value:F1}, " +
                            $"{Flat(centre - World(px, py)):F1} m from its wish");
                 shots.Add((centre, rotation * Vector3.forward, entry.Height));
@@ -166,10 +174,13 @@ namespace GameDev.Slice.EditorTools
             {
                 var p = k.transform.position;
                 return k.gameObject.layer != ground && Mathf.Abs(p.x - centre.x) < half.x && Mathf.Abs(p.z - centre.z) < half.z
-                       && Mathf.Abs(p.y - floor) < 3f && k.GetComponentInChildren<Collider>() == null;
+                       && Mathf.Abs(p.y - floor) < 3f && k.GetComponentInChildren<Collider>() == null && !IsGrass(k);
             });
             return blocked ? null : floor;
         }
+
+        /// <summary>A grass clump of the city's lawns (city plan §25.4): an ornament stands in its place.</summary>
+        private static bool IsGrass(KitBlock k) => k.name.StartsWith("Kit_Bush_Grass_");
 
         /// <summary>
         /// Read only: what stands in each place the ornaments may go, by block name, with the plan's metres.

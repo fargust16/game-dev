@@ -36,6 +36,7 @@ namespace GameDev.Slice.Tests
         public IEnumerator ReadingTheBoardMarksPoiA([Values(Loc.English, Loc.Russian)] string language)
         {
             Loc.Language = language;
+            yield return ForgetTheWorld(); // an earlier test (S2's acceptance) may have left the world on day 2
             yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
             var world = SliceWorldDriver.Running;
             Assert.IsNotNull(world, "Veilmouth carries the slice's world");

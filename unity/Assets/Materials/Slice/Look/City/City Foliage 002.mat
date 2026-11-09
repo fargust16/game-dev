@@ -1,0 +1,139 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: City Foliage 002
+  m_Shader: {fileID: 4800000, guid: 279d8efe6c2364d49ab4647f78eba70d, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Albedo:
+        m_Texture: {fileID: 2800000, guid: ea89ae5ae0f25744db3ee1eb1575d593, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FillMask:
+        m_Texture: {fileID: 2800000, guid: e7ebaf717ccef2a4d81c974028b994ec, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Gradient_gradienttexture:
+        m_Texture: {fileID: 6232597824901988087}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Gradient_gradienttexture1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GustNoiseMap:
+        m_Texture: {fileID: 2800000, guid: c56575d3804a4be384d9d91946009389, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AddPrecomputedVelocity: 1
+    - _AlphaCutoff: 0.5
+    - _BreezeSpeed: 3.5
+    - _BreezeStrength: 1
+    - _ColorHeader: 0
+    - _Cutoff: 0.55
+    - _Dither: 1
+    - _DraftFrequency: 0.027
+    - _DraftSpeed: 4
+    - _DraftStrength: 0.25
+    - _FillImpact: 0.15
+    - _LightFactor: 0.5
+    - _PerObjectWindRandomization: 1
+    - _PerVertexWindRandomization: 1
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _ReceiveShadows: 1
+    - _ShadowCutoff: 0.95
+    - _ShadowFactor: 0.25
+    - _SurfaceHeader: 0
+    - _WindHeader: 0
+    - _WindRooted: 1
+    - _WindSpeed: 1
+    m_Colors:
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ShadowCutoff: {r: 0, g: 0.95, b: 0, a: 1}
+    - _Vector0: {r: 0, g: 0.95, b: 0, a: 1}
+    - _WindDirection: {r: 0.5, g: -0.25, b: 0, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
+--- !u!28 &6232597824901988087
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: _Gradient_gradienttexture Texture{"mode":0,"colorKeys":[{"color":{"r":0.127199993,"g":0.16959998,"b":0.106,"a":1.0},"time":0},{"color":{"r":0.318,"g":0.3922,"b":0.212,"a":1.0},"time":0.78},{"color":{"r":0.5936,"g":0.636,"b":0.3816,"a":1.0},"time":1}],"alphaKeys":[{"alpha":1.0,"time":0.0},{"alpha":1.0,"time":1.0}]}
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 4
+  m_Width: 256
+  m_Height: 1
+  m_CompleteImageSize: 1024
+  m_MipsStripped: 0
+  m_TextureFormat: 5
+  m_MipCount: 1
+  m_IsReadable: 1
+  m_IsPreProcessed: 0
+  m_IgnoreMipmapLimit: 1
+  m_MipmapLimitGroupName: 
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_VTOnly: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_LightmapFormat: 0
+  m_ColorSpace: 1
+  m_PlatformBlob: 
+  image data: 1024
+  _typelessdata: ff202b1bff212c1bff212c1bff212c1bff212c1cff222d1cff222d1cff222d1cff222e1cff232e1cff232e1cff232e1dff232f1dff242f1dff242f1dff24301dff24301dff25301dff25301dff25311eff25311eff26311eff26321eff26321eff26321eff27321eff27331fff27331fff27331fff28341fff28341fff28341fff28341fff293520ff293520ff293520ff293620ff293620ff2a3620ff2a3620ff2a3720ff2a3721ff2b3721ff2b3821ff2b3821ff2b3821ff2c3821ff2c3921ff2c3922ff2c3922ff2d3a22ff2d3a22ff2d3a22ff2d3a22ff2e3b22ff2e3b23ff2e3b23ff2e3c23ff2f3c23ff2f3c23ff2f3c23ff2f3d23ff303d23ff303d24ff303e24ff303e24ff313e24ff313e24ff313f24ff313f24ff323f25ff324025ff324025ff324025ff334025ff334125ff334125ff334125ff344226ff344226ff344226ff344226ff344326ff354326ff354326ff354427ff354427ff364427ff364427ff364527ff364527ff374527ff374628ff374628ff374628ff384628ff384728ff384728ff384728ff394828ff394829ff394829ff394829ff3a4929ff3a4929ff3a4929ff3a4929ff3b4a2aff3b4a2aff3b4a2aff3b4b2aff3c4b2aff3c4b2aff3c4b2aff3c4c2bff3d4c2bff3d4c2bff3d4d2bff3d4d2bff3e4d2bff3e4d2bff3e4e2bff3e4e2cff3f4e2cff3f4f2cff3f4f2cff3f4f2cff404f2cff40502cff40502dff40502dff40512dff41512dff41512dff41512dff41522dff42522eff42522eff42532eff42532eff43532eff43532eff43542eff43542eff44542fff44552fff44552fff44552fff45552fff45562fff45562fff455630ff465730ff465730ff465730ff465730ff475830ff475830ff475831ff475931ff485931ff485931ff485931ff485a31ff495a31ff495a31ff495b32ff495b32ff4a5b32ff4a5b32ff4a5c32ff4a5c32ff4b5c32ff4b5d33ff4b5d33ff4b5d33ff4b5d33ff4c5e33ff4c5e33ff4c5e33ff4c5f33ff4d5f34ff4d5f34ff4d5f34ff4d6034ff4e6034ff4e6034ff4e6134ff4e6135ff4f6135ff4f6135ff4f6235ff4f6235ff506235ff506335ff506336ff506336ff516336ff516436ff516436ff526537ff546638ff556738ff566939ff576a3aff596b3bff5a6c3cff5b6d3cff5c6e3dff5e6f3eff5f703fff60713fff627340ff637441ff647542ff657642ff677743ff687844ff697945ff6a7a46ff6c7b46ff6d7d47ff6e7e48ff6f7f49ff718049ff72814aff73824bff74834cff76844cff77854dff78864eff79884fff7b8950ff7c8a50ff7d8b51ff7e8c52ff808d53ff818e53ff828f54ff839055ff859256ff869357ff879457ff889558ff8a9659ff8b975aff8c985aff8d995bff8f9a5cff909c5dff919d5dff929e5eff949f5fff95a060ff96a161ff97a261
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 

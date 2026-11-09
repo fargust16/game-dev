@@ -612,6 +612,54 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// The city's greenery and the roadside (city plan §25) at noon: Wardley Garden's beds, the forecourt's parterre and
+        /// a villa's hedge from above; the street trees, the beds and the hedges at eye height; the flax field, a farm's
+        /// yard and the two roads; and the joins of a wall, a plank fence and a hedge close up. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderGreenery
+        /// </summary>
+        public static void RenderGreenery()
+        {
+            const string label = "green";
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            Shader.SetGlobalVector("_Growth_WindSettings", new Vector4(0.17f, 0.1f, 5f, 1f));
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            _skyAndGrade = sky != null;
+            try
+            {
+                sky?.Apply(12 * 60);
+                // Plan (px, py) is world (px − 500, 500 − py).
+                Eye($"{label}_warmup", Ground(20f, -228.5f, 1.7f), Ground(80f, -229.5f, 2f));
+                File.Delete($"{OutputFolder}/{label}_warmup.png");
+                Top($"{label}_top_wardley", new Vector3(58f, 0f, -198f), 16f);
+                Top($"{label}_top_parterre", new Vector3(112f, 0f, -159f), 28f);
+                Top($"{label}_top_villa", new Vector3(44f, 0f, -160f), 18f);
+                Top($"{label}_top_highstreet", new Vector3(60f, 0f, -235f), 30f);
+                Top($"{label}_top_farm", new Vector3(-345f, 0f, -150f), 22f);
+                Eye($"{label}_eye_highstreet", Ground(20f, -228.5f, 1.7f), Ground(80f, -229.5f, 2f));
+                Eye($"{label}_eye_bell", Ground(190f, -276.5f, 1.7f), Ground(130f, -277f, 2f));
+                Eye($"{label}_eye_terrace", Ground(22f, -195f, 1.7f), Ground(22f, -215f, 1.5f));
+                Eye($"{label}_eye_villa", Ground(44f, -170f, 1.7f), Ground(44f, -163f, 0.8f));
+                Eye($"{label}_eye_wardley", Ground(58f, -209.5f, 1.7f), Ground(58f, -190f, 1f));
+                Eye($"{label}_eye_parterre", Ground(112f, -167f, 1.7f), Ground(112f, -150f, 1.5f));
+                Eye($"{label}_eye_flax", Ground(-322f, -244f, 1.7f), Ground(-322f, -268f, 0.5f));
+                Eye($"{label}_eye_farm", Ground(-338f, -162f, 1.7f), Ground(-346f, -144f, 1f));
+                Eye($"{label}_eye_westroad", Ground(-290f, -235f, 1.7f), Ground(-230f, -235f, 1f));
+                Eye($"{label}_eye_northroad", Ground(247f, -100f, 1.7f), Ground(247f, -20f, 1f));
+                Eye($"{label}_close_wall", Ground(-398f, -233f, 1.2f), Ground(-396f, -229f, 0.4f), 50f);
+                Eye($"{label}_close_plank", Ground(-349f, -152f, 1.2f), Ground(-352f, -148f, 0.6f), 50f);
+                Eye($"{label}_close_hedge", Ground(48f, -170f, 1.2f), Ground(46f, -166.8f, 0.4f), 50f);
+            }
+            finally
+            {
+                _skyAndGrade = false;
+            }
+
+            Debug.Log($"[VeilmouthRenders] the greenery's views written to {OutputFolder} as {label}_*.");
+        }
+
+        /// <summary>
         /// The raised doors that had porches (reference plan R6) close up at noon: both villas, a civic house, the palace
         /// and a detached house of the Terraces, each from 7 m before its door and from the side. Batch:
         /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderPorches -lookLabel r6

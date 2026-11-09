@@ -360,7 +360,7 @@ namespace GameDev.Slice.EditorTools
             poppy.SizeY = 0.5f;
             yield return poppy;
 
-            foreach (var spec in BkSpecs().Concat(ViSpecs()))
+            foreach (var spec in BkSpecs().Concat(ViSpecs()).Concat(GreenerySpecs()).Concat(TripoSpecs()))
             {
                 yield return spec;
             }
@@ -583,6 +583,24 @@ namespace GameDev.Slice.EditorTools
         }
 
         private static bool _measureOnly;
+        private static HashSet<string> _rebuild;
+
+        /// <summary>
+        /// As <see cref="Load"/>, but the named wrappers are written again in place, keeping their GUIDs, after their
+        /// spec changed (a wrapper the owner changed by hand is never named here).
+        /// </summary>
+        public static Dictionary<string, Entry> LoadRebuilding(params string[] keys)
+        {
+            _rebuild = new HashSet<string>(keys);
+            try
+            {
+                return Load();
+            }
+            finally
+            {
+                _rebuild = null;
+            }
+        }
 
         /// <summary>
         /// Every block's entry as <see cref="BuildAll"/> measures it, writing no prefab that is already on disk: the owner
@@ -635,8 +653,21 @@ namespace GameDev.Slice.EditorTools
             }
 
             VeilmouthLook.Retint(model); // the reference look's olive leaves (reference plan R3 step 8)
+            if (spec.Key.StartsWith("City"))
+            {
+                VeilmouthLook.RetintCity(model); // the city's muted green (city plan §25.1)
+            }
+
             model.transform.localRotation = Quaternion.Euler(0f, spec.ModelYaw, 0f) * model.transform.localRotation;
             var things = new List<(GameObject Thing, string File)>();
+
+            // A sized base (a Tripo set) takes its size before its things stand on it, so they keep their own.
+            var sizedBase = spec.On != null && (spec.SizeX.HasValue || spec.SizeY.HasValue || spec.SizeZ.HasValue);
+            if (sizedBase)
+            {
+                Scale(model, spec);
+            }
+
             if (spec.On != null)
             {
                 model = StandOn(root, model, spec, things);
@@ -683,7 +714,10 @@ namespace GameDev.Slice.EditorTools
             }
 
             KeepFinestLevel(model);
-            Scale(model, spec);
+            if (!sizedBase)
+            {
+                Scale(model, spec);
+            }
             var b = Seen(model);
             var linear = spec.Anchor == Anchor.Linear || spec.Anchor == Anchor.Face;
             var node = spec.Anchor == Anchor.Node;
@@ -736,6 +770,11 @@ namespace GameDev.Slice.EditorTools
             }
 
             model.transform.localPosition += offset;
+            if (TripoGlow.TryGetValue(spec.Key, out var glow))
+            {
+                Glow(root.transform, Seen(model), glow);
+            }
+
             if (spec.RailPosts != null)
             {
                 AddRailPosts(root, model, spec);
@@ -856,8 +895,12 @@ namespace GameDev.Slice.EditorTools
                 return;
             }
 
-            var image = AssetDatabase.FindAssets("t:Texture2D", new[] { folder }).Select(AssetDatabase.GUIDToAssetPath)
-                .Select(AssetDatabase.LoadAssetAtPath<Texture2D>).FirstOrDefault();
+            // The colour image only: the later models' folders also hold normal, metallic and roughness maps (2026-11-09),
+            // and the first image found was one of those.
+            var images = AssetDatabase.FindAssets("t:Texture2D", new[] { folder }).Select(AssetDatabase.GUIDToAssetPath).ToList();
+            var colour = images.FirstOrDefault(p => Path.GetFileName(p).StartsWith("tripo_image_")) ?? images.FirstOrDefault(p =>
+                !new[] { "normal", "metallic", "roughness", "smoothness" }.Any(Path.GetFileName(p).ToLowerInvariant().Contains));
+            var image = colour != null ? AssetDatabase.LoadAssetAtPath<Texture2D>(colour) : null;
             if (image == null)
             {
                 return;
@@ -1193,12 +1236,30 @@ namespace GameDev.Slice.EditorTools
                     Object.DestroyImmediate(light);
                 }
 
-                SliceUrpMaterials.Apply(thing, spec.Pack ?? "BK");
+                if (folder == Tripo)
+                {
+                    // The owner's Tripo things (§10 of the furnishing rules): their base maps, laid down if flat, sized.
+                    LinkTripoTextures(thing, source);
+                    var (longest, pitch) = TripoThings.TryGetValue(file, out var t) ? t : (0.3f, 0f);
+                    thing.transform.localRotation = Quaternion.Euler(pitch, 0f, 0f) * thing.transform.localRotation;
+                    var size = Seen(thing).size;
+                    thing.transform.localScale *= longest / UnityEngine.Mathf.Max(size.x, size.y, size.z, 0.001f);
+                }
+                else
+                {
+                    SliceUrpMaterials.Apply(thing, spec.Pack ?? "BK");
+                }
+
                 var seen = Seen(thing);
                 var x = top.min.x + fx * top.size.x;
                 var z = top.min.z + fz * top.size.z;
                 var at = new Vector3(x, Surface(baseModel, x, z, top.max.y), z);
                 thing.transform.position += at - new Vector3(seen.center.x, seen.min.y, seen.center.z);
+                if (folder == Tripo && TripoGlow.TryGetValue(file, out var glow))
+                {
+                    Glow(thing.transform, Seen(thing), glow);
+                }
+
                 things.Add((thing, file));
             }
 
@@ -1369,7 +1430,7 @@ namespace GameDev.Slice.EditorTools
             var folder = $"{Folder}/{family}";
             KitStandIns.EnsureFolder(folder);
             var path = $"{folder}/{root.name}.prefab";
-            if (!_measureOnly || !File.Exists(path))
+            if (!_measureOnly || !File.Exists(path) || (_rebuild != null && _rebuild.Contains(key)))
             {
                 PrefabUtility.SaveAsPrefabAsset(root, path);
             }

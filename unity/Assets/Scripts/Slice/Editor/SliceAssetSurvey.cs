@@ -65,6 +65,23 @@ namespace GameDev.Slice.EditorTools
                     : new string[0]),
         };
 
+        // The owner's Tripo models (2026-11-09): every model, before they furnish the interiors.
+        private const string TripoModels = "Assets/TripoModels";
+
+        private static readonly (string Group, string Folder, string[] Names)[] TripoGroups =
+        {
+            ("tripo_all", TripoModels,
+                Directory.Exists(TripoModels)
+                    ? Directory.GetFiles(TripoModels, "*.fbx", SearchOption.AllDirectories).Select(Path.GetFileNameWithoutExtension).OrderBy(n => n).ToArray()
+                    : new string[0]),
+        };
+
+        /// <summary>Only the Tripo models. Batch: -executeMethod GameDev.Slice.EditorTools.SliceAssetSurvey.RunTripo</summary>
+        public static void RunTripo()
+        {
+            Survey(TripoGroups, "tripo");
+        }
+
         [MenuItem("GameDev/Slice/Survey Slice Assets")]
         public static void Run()
         {

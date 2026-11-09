@@ -43,6 +43,7 @@ namespace GameDev.Slice.EditorTools
 
         private const float LampIntensity = 2.5f;
         private const string ChandelierLight = "Chandelier light";
+        private const string FireLight = "Fire light";
 
         /// <summary>The hearths' fire: Vefects' small fire (asset map: Fire; owner, VI-8 remark 6), shared with the Dwellings.</summary>
         internal const string FirePath = "Assets/Vefects/Free Fire VFX URP/Particles/VFX_Fire_01_Small.prefab";
@@ -67,6 +68,7 @@ namespace GameDev.Slice.EditorTools
 
         private static Dictionary<string, SliceKitCatalogue.Entry> _kit;
         private static Transform _parent;
+        private static Plan _plan;
 
         /// <summary>The floor of the storey being built or furnished: every placement stands this much higher (VI-3).</summary>
         private static float _floorY;
@@ -180,6 +182,7 @@ namespace GameDev.Slice.EditorTools
 
             var root = new GameObject(RootName).transform;
             var plan = PlanFor(id);
+            _plan = plan;
             WindowLights.Clear();
             Panes.Clear();
             Hearths.Clear();
@@ -211,7 +214,7 @@ namespace GameDev.Slice.EditorTools
             new GameObject("Interior").AddComponent<InteriorRuntime>().Configure(id);
             SliceTestScenes.AddPlayerRig(new Vector3(plan.Street.X + Module * 0.5f, 0.1f, plan.Street.Z + 1.6f));
             SliceTestScenes.Save(scene, path);
-            Report(path, WindowLights.Count, lamps.Length, Hearths.Count, Doorways(plan));
+            Report(path, $"{WindowLights.Count} windows, {lamps.Length} lamps, {Hearths.Count} hearths", Doorways(plan));
         }
 
         private static Plan PlanFor(string id)
@@ -697,9 +700,10 @@ namespace GameDev.Slice.EditorTools
             // back-bar cabinet behind it and the keeper between; nothing stands on the 5 m way from the door to the bar.
             // West of it the saloon: carpet, upholstered chairs, the hearth and two snug tables; east the public bar:
             // tables with stools on the bare floor, and a small stage at the end wall on the room's axis, chairs facing it
-            // and no table within 2 m of its front. The low partition between them, the fixed benches and the piano are
-            // missing from the pack and wait in SLICE_MODELS_WANTED; a piece is not made up of other pieces (owner, VI-8
-            // remark 5). Three chandeliers hang in the 7 m height, the one room of the seven higher than a storey.
+            // and no table within 2 m of its front, the owner's Tripo piano on it (furnishing rules §10). The low partition
+            // and the fixed benches are missing from the pack and wait in SLICE_MODELS_WANTED; a piece is not made up of
+            // other pieces (owner, VI-8 remark 5). Three Tripo chandeliers hang in the 7 m height, the one room of the seven
+            // higher than a storey; the saloon's chairs are the Tripo wing chairs.
             Fireplace(E, 0, 6);
             Put("BarCounter", 8, 8, 2).name = "Bar";
             Against("BarCabinet", S, 12, 9);
@@ -712,10 +716,10 @@ namespace GameDev.Slice.EditorTools
             Put("ViCarpet", 2, 4);
             Put("ViSofa", 4, 6, 3);
             Put("ViTableRound", 3, 7);
-            Put("ViArmchair", 3, 6);
-            Put("ViArmchair", 3, 8, 2);
-            Table(1, 2, "ViArmchair");
-            Table(4, 2, "ViArmchair");
+            Put("TrArmchair", 3, 6);
+            Put("TrArmchair", 3, 8, 2);
+            Table(1, 2, "TrArmchair");
+            Table(4, 2, "TrArmchair");
             Put("ViCoatStand", 7, 0);
 
             // The public bar and its stage.
@@ -730,9 +734,9 @@ namespace GameDev.Slice.EditorTools
             Put("ViPlantC", 19, 0);
             Against("ViClock", W, 21, 10);
 
-            Chandelier(3, 5, Storey);
-            Chandelier(9, 3, Storey);
-            Chandelier(15, 5, Storey);
+            Chandelier(3, 5, Storey, TaproomChandelier);
+            Chandelier(9, 3, Storey, TaproomChandelier);
+            Chandelier(15, 5, Storey, TaproomChandelier);
             Hang("ViWallLamp", N, 0, 6, 2.2f);
             Hang("ViWallLamp", N, 0, 12, 2.2f);
             Hang("ViWallLamp", E, 0, 9, 2.2f);
@@ -762,13 +766,11 @@ namespace GameDev.Slice.EditorTools
             // Scullery: the sink. Its one column clear of both walls is its walk-way, so nothing stands in it (VI-8).
             Against("ViBasin", E, 6, 13).name = "Scullery sink";
 
-            // Stair hall: the stair climbs east to the landing (VI-3); the tap's stock at the back.
+            // Stair hall: the stair climbs east to the landing (VI-3). No barrels or boxes: they stand only in stores,
+            // warehouses and the port, and at the bar's end (owner, 2026-11-09; furnishing rules G5).
             Put("ViStair", 11, 15, 1).name = "Stair";
             Put("ViCoatStand", 10, 12);
             Against("ViClock", W, 21, 21);
-            Put("Barrels", 10, 21);
-            Put("Crate", 14, 22);
-            Put("Box", 16, 22);
             Hang("ViWallLamp", E, 9, 12, 2.2f);
             Hang("ViWallLamp", W, 21, 12, 2.2f);
             Hang("ViWallLamp", S, 24, 12, 2.2f);
@@ -797,11 +799,11 @@ namespace GameDev.Slice.EditorTools
             Hang("ViWallLamp", E, 9, 12, 2.2f);
             Hang("ViPicture5", N, 12, 15, 1.6f);
 
-            // The let room over the kitchen: a bed with its nightstand, a wash stand, a dresser, a small table.
+            // The let room over the kitchen: a bed with its nightstand, a wash stand, a chest of drawers, a small table.
             Against("ViBed", S, 24, 3).name = "Bed (a room for the night)";
-            Against("ViNightstand", S, 24, 5);
+            Against("TrNightstand", S, 24, 5);
             Against("ViBasinSet", E, 0, 21).name = "Wash stand";
-            Against("ViDresser", N, 12, 1);
+            Against("TrDresser", N, 12, 1);
             Put("ViTableRoundSet", 5, 15);
             Put("ViChair", 6, 15, 3);
             Put("ViRug", 3, 17);
@@ -810,12 +812,12 @@ namespace GameDev.Slice.EditorTools
 
             // The back landing: a chair by a small table.
             Put("ViTableRoundSet", 10, 21);
-            Put("ViArmchair", 10, 22, 2);
+            Put("TrArmchair", 10, 22, 2);
             Hang("ViWallLamp", W, 12, 21, 2.2f);
 
             // Let room 2, over the stair hall.
             Against("ViBed", E, 12, 19);
-            Against("ViNightstand", E, 12, 21);
+            Against("TrNightstand", E, 12, 21);
             Against("ViBasinSet", S, 24, 13).name = "Wash stand";
             Against("ViCupboardGlass", W, 21, 22);
             Put("ViTableRoundSet", 16, 21);
@@ -823,6 +825,299 @@ namespace GameDev.Slice.EditorTools
             Hang("ViWallLamp", N, 18, 12, 2.2f);
             Hang("ViPicture1", N, 18, 15, 1.6f);
             _floorY = 0f;
+            SootAndBellTripo();
+        }
+
+        // ------------------------------------------------------------------------------------------------ Tripo
+
+        // The owner's Tripo pieces added to the seven (owner, 2026-11-09; furnishing rules §10), called by Furnish for a
+        // rebuild and by EnrichWithTripo for the saved scenes, so both put the same pieces in the same cells. The keys
+        // swapped in place are SwapsFor's; Furnish names the new keys directly. A log basket stands beside every hearth,
+        // fire irons beside a hearth of a middling room and up (rules §8).
+
+        private const string TaproomChandelier = "TrChandelier";
+
+        private static void SootAndBellTripo()
+        {
+            // The piano on the stage, its back on the end wall at the stage's north end, out of the performer's middle.
+            Put("TrPiano", 21 - _kit["TrPiano"].Depth, 7, 3, 0.4f);
+            Put("TrLogHolder", 0, 5); // the saloon hearth: under the window's sill, the irons on the other side
+            Put("TrFireTools", 0, 9);
+            Put("TrLogHolder", 0, 18); // the kitchen hearth
+        }
+
+        private static void FactionHouseTripo()
+        {
+            foreach (var x in new[] { 0, 20 })
+            {
+                Put("TrLogHolder", x, 6);
+                Put("TrFireTools", x, 2);
+            }
+        }
+
+        private static void LockupTripo()
+        {
+            Put("TrLogHolder", 18, 17);
+            Put("TrFireTools", 14, 17);
+        }
+
+        private static void MissingRoomTripo() => Put("TrLogHolder", 0, 5); // a poor room: the basket, no irons
+
+        private static void AddTripo(string id)
+        {
+            switch (id)
+            {
+                case VeilmouthScene.SootAndBellId:
+                    SootAndBellTripo();
+                    break;
+                case "faction-house":
+                    FactionHouseTripo();
+                    break;
+                case "wardens-lockup":
+                    LockupTripo();
+                    break;
+                case "missing-room":
+                    MissingRoomTripo();
+                    break;
+            }
+        }
+
+        /// <summary>What a saved scene swaps (the old key becomes the new one) and takes out, by the owner's word.</summary>
+        private static ((string From, string To)[] Swaps, (string Key, RectInt Where)[] Out) SwapsFor(string id)
+        {
+            var anywhere = new RectInt(-100, -100, 200, 200);
+            switch (id)
+            {
+                case VeilmouthScene.SootAndBellId:
+                    return (new[] { ("ViChandelier", TaproomChandelier), ("ViArmchair", "TrArmchair"), ("ViNightstand", "TrNightstand"), ("ViDresser", "TrDresser") },
+                        new[] { ("Barrels", new RectInt(9, 12, 12, 12)), ("Crate", new RectInt(9, 12, 12, 12)), ("Box", new RectInt(9, 12, 12, 12)) });
+                case "harrow-apothecary":
+                    return (new (string, string)[0], new[] { ("Barrel", anywhere) });
+                case "faction-house":
+                    return (new[] { ("ViDesk", "TrDesk"), ("ViArmchair", "TrArmchair") }, new (string, RectInt)[0]);
+                case "wardens-lockup":
+                    return (new[] { ("ViDesk", "TrDesk") }, new (string, RectInt)[0]);
+                case "soot-stair-cellar":
+                    return (new[] { ("Firewood", "TrLogHolder") }, new (string, RectInt)[0]);
+                default:
+                    return (new (string, string)[0], new (string, RectInt)[0]);
+            }
+        }
+
+        /// <summary>
+        /// Batch only (owner, 2026-11-09): brings the seven saved interiors to the Tripo furnishing in place, so what S2
+        /// wrote into them stays. A piece something in the scene refers to is left as it is and reported, but for the
+        /// room's lamp list, which is written again from the lights the furniture holds. It can run again: what is done
+        /// is found done, and an added piece already standing in its cell is not added twice.
+        /// </summary>
+        public static void EnrichWithTripo()
+        {
+            _kit = SliceKitCatalogue.Load();
+            foreach (var (id, path) in All)
+            {
+                var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+                var root = scene.GetRootGameObjects().FirstOrDefault(g => g.name == RootName);
+                _parent = root != null ? root.transform.Find("Furniture") : null;
+                if (_parent == null)
+                {
+                    Debug.LogWarning($"[VeilmouthInteriors] {path} has no {RootName}/Furniture; not enriched.");
+                    continue;
+                }
+
+                _plan = PlanFor(id);
+                _floorY = 0f;
+                var refs = SceneReferences(scene);
+                var done = new List<string>();
+                var (swaps, outs) = SwapsFor(id);
+                foreach (var (from, to) in swaps)
+                {
+                    done.Add($"{Swap(from, to, refs)} {from} to {to}");
+                }
+
+                foreach (var (key, where) in outs)
+                {
+                    var gone = 0;
+                    foreach (var block in Instances(key).Where(g => where.Contains(new Vector2Int(Mathf.FloorToInt(g.transform.position.x), Mathf.FloorToInt(g.transform.position.z)))))
+                    {
+                        if (Kept(block, refs))
+                        {
+                            continue;
+                        }
+
+                        Object.DestroyImmediate(block);
+                        gone++;
+                    }
+
+                    done.Add($"{gone} {key} out");
+                }
+
+                var standing = new HashSet<(string, Vector3)>(AddedKeys.SelectMany(k => Instances(k).Select(g => (k, g.transform.position))));
+                var before = new HashSet<Transform>(_parent.Cast<Transform>());
+                AddTripo(id);
+                var added = 0;
+                foreach (var t in _parent.Cast<Transform>().Where(t => !before.Contains(t)).ToList())
+                {
+                    var key = AddedKeys.FirstOrDefault(k => PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject) == _kit[k].Prefab);
+                    if (key != null && standing.Contains((key, t.position)))
+                    {
+                        Object.DestroyImmediate(t.gameObject);
+                        continue;
+                    }
+
+                    added++;
+                }
+
+                done.Add($"{added} added");
+                done.Add($"{RelinkLamps(root.GetComponentInChildren<InteriorLighting>())} lamps");
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+                Report(path, "enriched: " + string.Join(", ", done), Doorways(_plan));
+            }
+        }
+
+        /// <summary>
+        /// Batch: the Tripo wrappers (built by Load where missing), the seven enriched, the Dwellings' kit written again,
+        /// and their pictures. -executeMethod GameDev.Slice.EditorTools.VeilmouthInteriors.EnrichAndRender
+        /// </summary>
+        public static void EnrichAndRender()
+        {
+            // The wrappers whose Tripo lamps gained a light (2026-11-09), written again in place.
+            SliceKitCatalogue.LoadRebuilding("TrDesk", "TrNightstandLamp", "TrSconce", "TrLantern");
+            EnrichWithTripo();
+            VeilmouthDwellings.BuildKit(SliceKitCatalogue.Load());
+            VeilmouthRenders.RenderInteriors();
+            VeilmouthRenders.RenderDwellings();
+        }
+
+        /// <summary>The keys AddTripo places, so a second run can find what the first added.</summary>
+        private static readonly string[] AddedKeys = { "TrPiano", "TrLogHolder", "TrFireTools" };
+
+        /// <summary>
+        /// The room's lamp list written again from the lights the furniture holds, as BuildOne writes it: every light but a
+        /// hearth's, a new one set as BuildOne sets them, and the lamps shown at the scene's preview hour.
+        /// </summary>
+        private static int RelinkLamps(InteriorLighting lighting)
+        {
+            var lamps = _parent.GetComponentsInChildren<Light>(true).Where(l => l.name != FireLight).ToArray();
+            foreach (var lamp in lamps)
+            {
+                lamp.intensity = Mathf.Max(lamp.intensity, LampIntensity);
+                lamp.range = lamp.name == ChandelierLight ? lamp.range : Mathf.Clamp(lamp.range, 6f, 9f);
+                lamp.shadows = LightShadows.None;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(lamp);
+            }
+
+            var so = new SerializedObject(lighting);
+            var list = so.FindProperty("lamps");
+            list.arraySize = lamps.Length;
+            for (var i = 0; i < lamps.Length; i++)
+            {
+                list.GetArrayElementAtIndex(i).objectReferenceValue = lamps[i];
+            }
+
+            so.ApplyModifiedPropertiesWithoutUndo();
+            lighting.Apply(lighting.PreviewMinute);
+            return lamps.Length;
+        }
+
+        /// <summary>The instances of a wrapper among the furniture.</summary>
+        private static List<GameObject> Instances(string key)
+        {
+            var prefab = _kit[key].Prefab;
+            return _parent.GetComponentsInChildren<Transform>(true).Select(t => t.gameObject)
+                .Where(g => PrefabUtility.IsOutermostPrefabInstanceRoot(g) && PrefabUtility.GetCorrespondingObjectFromSource(g) == prefab).ToList();
+        }
+
+        /// <summary>
+        /// Every object reference a component in the scene holds, but a Transform's and the room's lamp list, which
+        /// RelinkLamps writes again.
+        /// </summary>
+        private static List<(Component From, Object To)> SceneReferences(UnityEngine.SceneManagement.Scene scene)
+        {
+            var refs = new List<(Component, Object)>();
+            foreach (var c in scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Component>(true)))
+            {
+                if (c == null || c is Transform)
+                {
+                    continue;
+                }
+
+                var p = new SerializedObject(c).GetIterator();
+                while (p.Next(true))
+                {
+                    if (p.propertyType == SerializedPropertyType.ObjectReference && p.objectReferenceValue != null &&
+                        !(c is InteriorLighting && p.propertyPath.StartsWith("lamps")))
+                    {
+                        refs.Add((c, p.objectReferenceValue));
+                    }
+                }
+            }
+
+            return refs;
+        }
+
+        /// <summary>Children added in the scene to a placed piece (a chandelier's light): they move to its replacement.</summary>
+        private static List<Transform> Added(GameObject block) =>
+            block.transform.Cast<Transform>().Where(c => PrefabUtility.IsAddedGameObjectOverride(c.gameObject)).ToList();
+
+        /// <summary>True, with a warning, when something outside the piece (and its added children) refers into it.</summary>
+        private static bool Kept(GameObject block, List<(Component From, Object To)> refs)
+        {
+            var moving = new HashSet<Transform>(Added(block).SelectMany(c => c.GetComponentsInChildren<Transform>(true)));
+            var inside = new HashSet<Object>();
+            foreach (var t in block.GetComponentsInChildren<Transform>(true).Where(t => !moving.Contains(t)))
+            {
+                inside.Add(t.gameObject);
+                foreach (var c in t.GetComponents<Component>())
+                {
+                    inside.Add(c);
+                }
+            }
+
+            var from = refs.FirstOrDefault(r => inside.Contains(r.To) && !inside.Contains(r.From)).From;
+            if (from == null)
+            {
+                return false;
+            }
+
+            Debug.LogWarning($"[VeilmouthInteriors] '{block.name}' at {block.transform.position} is kept: {from.GetType().Name} on '{from.name}' refers to it.");
+            return true;
+        }
+
+        /// <summary>
+        /// Each <paramref name="from"/> becomes a <paramref name="to"/> with its back on the same line and its middle where it
+        /// was, as Against and Put place them; its added children move across, and a name given in the scene stays.
+        /// </summary>
+        private static int Swap(string from, string to, List<(Component From, Object To)> refs)
+        {
+            var o = _kit[from];
+            var e = _kit[to];
+            var n = 0;
+            foreach (var old in Instances(from))
+            {
+                if (Kept(old, refs))
+                {
+                    continue;
+                }
+
+                var t = old.transform;
+                var go = At(to, t.position + (t.rotation * new Vector3((o.Width - e.Width) * 0.5f, 0f, 0f)), t.rotation);
+                go.transform.SetSiblingIndex(t.GetSiblingIndex());
+                if (old.name != o.Prefab.name)
+                {
+                    go.name = old.name;
+                }
+
+                foreach (var child in Added(old))
+                {
+                    child.SetParent(go.transform, false);
+                }
+
+                Object.DestroyImmediate(old);
+                n++;
+            }
+
+            return n;
         }
 
         private static void Harrow()
@@ -860,10 +1155,8 @@ namespace GameDev.Slice.EditorTools
             Put("BkGlobe", 0, 17); // in the corner beside the desk, out of the store room's doorway (VI-8 remark 8)
             Hang("ViWallLamp", W, 12, 9, 2.2f);
 
-            // Store room.
+            // Store room: a crate and a basket, no barrels (owner, 2026-11-09).
             // Only the middle cell is clear of both walls' dados.
-            Put("Barrel", 13, 16);
-            Put("Barrel", 13, 14);
             Put("Crate", 13, 12);
             Put("BkBasket", 13, 10);
         }
@@ -893,14 +1186,15 @@ namespace GameDev.Slice.EditorTools
             Hang("ViWallLamp", W, 21, 9, 2.2f);
             Hang("ViPicture1", E, 0, 0, 1.7f);
             Hang("ViPicture5", W, 21, 0, 1.7f);
+            FactionHouseTripo();
             VeilmouthDressing.Person("Teal", false, 10.5f, 9.2f, 180f, "Faction member", 0f);
 
-            // Office: the desk under the window, a bookcase, armchairs by a round table.
-            Against("ViDesk", S, 21, 1);
+            // Office: the Tripo writing desk under the window, a bookcase, wing chairs by a round table.
+            Against("TrDesk", S, 21, 2);
             Put("ViChair", 3, 18);
             Against("ViBookcase", E, 0, 15);
-            Put("ViArmchair", 6, 14, 3);
-            Put("ViArmchair", 6, 16, 3);
+            Put("TrArmchair", 6, 14, 3);
+            Put("TrArmchair", 6, 16, 3);
             Put("ViTableRound", 5, 15);
             Put("ViRug", 3, 14);
             Against("ViClock", N, 12, 7);
@@ -935,8 +1229,8 @@ namespace GameDev.Slice.EditorTools
             Hang("ViWallLamp", E, 0, 0, 2.2f);
             VeilmouthDressing.Person("Blue", false, 4.5f, 6.7f, 180f, "Warden", 0f);
 
-            // Office: a desk and a clock.
-            Against("ViDesk", S, 9, 14);
+            // Office: the Tripo writing desk and a clock.
+            Against("TrDesk", S, 9, 15);
             Put("ViChair", 15, 6);
             Against("ViClock", E, 12, 7);
             Against("ViCupboardGlass", N, 0, 18);
@@ -959,6 +1253,7 @@ namespace GameDev.Slice.EditorTools
             Against("BkArmsTable", W, 21, 15);
             Against("ViCupboardGlass", E, 12, 15);
             Hang("ViWallLamp", E, 12, 12, 2.2f);
+            LockupTripo();
             VeilmouthDressing.Person("Blue", true, 18.3f, 15.5f, 90f, "Warden", 0f);
         }
 
@@ -975,16 +1270,18 @@ namespace GameDev.Slice.EditorTools
             Put("ViBucket", 8, 5);
             Put("ViBox", 5, 11).name = "The cache";
             Hang("ViPicture8", N, 3, 3, 1.7f);
+            MissingRoomTripo();
         }
 
         private static void Cellar()
         {
-            // Three stone vaults (themed): barrels, boxes, firewood; candles burn always, for no window opens here.
+            // Three stone vaults (themed), a store: barrels, boxes, the Tripo log basket; candles burn always, for no
+            // window opens here.
             Put("Barrels", 1, 6);
             Put("Barrel", 6, 6);
             Put("Barrel", 7, 6);
             Put("Box", 6, 1);
-            Put("Firewood", 4, 1);
+            Put("TrLogHolder", 4, 1);
             Put("Candles", 7, 3);
             Put("Barrels", 23, 6);
             Put("Box", 27, 1);
@@ -1164,7 +1461,7 @@ namespace GameDev.Slice.EditorTools
             var block = Against("ViFireplace", facing, line, a);
             block.name = kitchen ? "Kitchen hearth" : "Fireplace";
             var flames = Dwellings.DwellingAssembler.PlaceFire(AssetDatabase.LoadAssetAtPath<GameObject>(FirePath), block.transform);
-            var light = new GameObject("Fire light").AddComponent<Light>();
+            var light = new GameObject(FireLight).AddComponent<Light>();
             light.transform.SetParent(block.transform, false);
             light.transform.localPosition = new Vector3(Module * 0.5f, 0.6f, 1.1f);
             light.type = LightType.Point;
@@ -1175,11 +1472,11 @@ namespace GameDev.Slice.EditorTools
             Hearths.Add(new InteriorLighting.Hearth { Light = light, Flames = flames, AllDay = kitchen });
         }
 
-        /// <summary>The pack's chandelier under the ceiling; it is only emissive, so it carries a warm light of our own.</summary>
-        private static void Chandelier(int x, int z, float raised = 0f)
+        /// <summary>A chandelier under the ceiling; it is only emissive, so it carries a warm light of our own.</summary>
+        private static void Chandelier(int x, int z, float raised = 0f, string key = "ViChandelier")
         {
             // Under the ceiling; a tall room's ceiling is <paramref name="raised"/> higher (the taproom, 7 m, VI-7).
-            var block = Put("ViChandelier", x, z, 0, 3.3f + raised);
+            var block = Put(key, x, z, 0, 3.3f + raised);
             var light = new GameObject(ChandelierLight).AddComponent<Light>();
             light.transform.SetParent(block.transform, false);
             light.transform.localPosition = new Vector3(1f, -0.9f, 1f);
@@ -1263,11 +1560,11 @@ namespace GameDev.Slice.EditorTools
             return t;
         }
 
-        private static void Report(string path, int windows, int lamps, int hearths, List<string> doorways)
+        private static void Report(string path, string what, List<string> doorways)
         {
             var blocks = Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude);
             var faults = KitLayoutCheck.Check(blocks);
-            Debug.Log($"[VeilmouthInteriors] {path}: {blocks.Length} blocks, {windows} windows, {lamps} lamps, {hearths} hearths, {faults.Count} kit faults" +
+            Debug.Log($"[VeilmouthInteriors] {path}: {blocks.Length} blocks, {what}, {faults.Count} kit faults" +
                       (faults.Count > 0 ? ":\n  " + string.Join("\n  ", faults.Take(40).Select(f => f.ToString())) : ".") +
                       $" {doorways.Count} doorway faults" + (doorways.Count > 0 ? ":\n  " + string.Join("\n  ", doorways) : "."));
         }

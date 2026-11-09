@@ -32,7 +32,7 @@ namespace GameDev.Slice.EditorTools
     /// seed. <see cref="BuildReplacing"/> replaces the root and is for the agent's iterations in batch runs only.
     /// </para>
     /// </summary>
-    public static class VeilmouthCity
+    public static partial class VeilmouthCity
     {
         public const string RootName = "Veilmouth C3";
         private static readonly string[] OldRootNames = { "Veilmouth C2", "Veilmouth C1" }; // C3 replaces their layouts (city plan §24)
@@ -88,7 +88,6 @@ namespace GameDev.Slice.EditorTools
         private static int _passages, _openSpans; // R5: passages left between houses, spans no house fits
         private static List<Vector2[]> _houses;  // every house's plan footprint, in the order built
         private static List<Vector2[]> _stoops;  // the plan bounds of the houses' own stoops, side doors' among them
-        private static List<(Vector2 At, Vector2 Out, float Front, float A0, float A1)> _shopDoors; // R7: a shop's front doors and its frontage
         private static List<(Facing F, float Front, int A0, int A1, int Depth)> _backs; // passages' backs, placed after the houses
         private static HashSet<(bool AlongX, float Line, int A0, int A1)> _fenced; // railing lines already set
         private static Transform _gardens;
@@ -228,7 +227,6 @@ namespace GameDev.Slice.EditorTools
             _partyWalls = new List<(bool, float, float)>();
             _houses = new List<Vector2[]>();
             _stoops = new List<Vector2[]>();
-            _shopDoors = new List<(Vector2, Vector2, float, float, float)>();
             _backs = new List<(Facing, float, int, int, int)>();
             _fenced = new HashSet<(bool, float, int, int)>();
             _stepsClear = float.MaxValue;
@@ -269,8 +267,8 @@ namespace GameDev.Slice.EditorTools
             Squares();
             _parent = Group("Lamps");
             AllLamps();
-            _parent = Group("Shop Goods");
-            ShopGoods();
+            _parent = Group("Street Trees");
+            StreetTrees();
             _parent = Group("Outside the Walls");
             Fields();
             Forest();
@@ -490,7 +488,8 @@ namespace GameDev.Slice.EditorTools
             Take(quad, Use.Solid);
             var (min, max) = GroundUnder(quad);
             // A plant is sunk below the lowest ground under it rather than left floating on a slope (owner, 2026-11-06).
-            var plant = key.StartsWith("Tree_") || key.StartsWith("Bush_") || key == "Shrub" || key == "Grass" || key == "Poppy";
+            var plant = key.StartsWith("Tree_") || key.StartsWith("Bush_") || key.StartsWith("CityTree_") || key.StartsWith("CityBush_") ||
+                        key == "Shrub" || key == "Grass" || key == "Poppy";
             // A loose prop stands on the ground at its centre, not on the rounded height, or it would drop when woken
             // (owner's fourth play test, 2026-11-06); Settle then tilts it to the slope.
             var loose = SliceKitCatalogue.LooseMass.ContainsKey(key);
@@ -513,7 +512,7 @@ namespace GameDev.Slice.EditorTools
         /// <summary>What stands plumb whatever the ground: posts, a column, a board on its legs, a grave, a stand.</summary>
         private static readonly HashSet<string> Upright = new HashSet<string>
         {
-            "LampPost", "Column", "NoticeBoard", "Grave", "GraveWall", "ArmourStand", "Candles",
+            "LampPost", "Column", "NoticeBoard", "Grave", "GraveWall", "ArmourStand", "Candles", "RoadPost",
         };
 
         /// <summary>
@@ -603,11 +602,6 @@ namespace GameDev.Slice.EditorTools
                 if (child.name == VictorianHouses.DoorMarker)
                 {
                     Doorway(child.position, Outward(f), floor, e.Stoop, e.StoopWidth);
-                    var at = Plan(child.position);
-                    if (key.Contains("_Shop") && Mathf.Abs((along ? at.y : at.x) - front) < 1f)
-                    {
-                        _shopDoors.Add((at, outward, front, along ? lo.x : lo.y, along ? hi.x : hi.y));
-                    }
                 }
             }
 
@@ -1211,27 +1205,22 @@ namespace GameDev.Slice.EditorTools
             var right = s1 - (a + width);
             if (left >= 3f)
             {
-                Plant("Tree_Fruit", s0 + 1f, depth - 2f);
+                Plant(GardenTree(rng), s0 + 1f, depth - 2f);
             }
 
             if (right >= 3f)
             {
-                Plant("Tree_Fruit", s1 - 2f, depth - 2f);
+                Plant(GardenTree(rng), s1 - 2f, depth - 2f);
             }
 
-            for (var v = 1f; v < depth - 3f; v += 2f)
+            for (var v = 2f; v < depth - 3f; v += 2f)
             {
-                Plant(rng.Next(4) == 0 ? "Poppy" : "Shrub", s0 + 0.2f, v);
-                Plant(rng.Next(4) == 0 ? "Poppy" : "Shrub", s1 - 1.2f, v);
+                Plant(rng.Next(4) == 0 ? "Poppy" : GardenBush(rng), s0 + 0.2f, v);
+                Plant(rng.Next(4) == 0 ? "Poppy" : GardenBush(rng), s1 - 1.2f, v);
             }
 
-            for (var u = s0 + 1.5f; u < s1 - 1.5f; u += 2f)
-            {
-                if (Mathf.Abs(u + 0.5f - gate) >= 2.5f)
-                {
-                    Plant(rng.Next(2) == 0 ? "Poppy" : "Shrub", u, 0.2f);
-                }
-            }
+            // A clipped hedge 1 m inside the front railings, broken at the gate's path (§25.4).
+            HedgeLine(alongX, line - s, s0 + 1, s1 - 1, rng, u => Mathf.Abs(u + 0.5f - gate) < 2.5f);
 
             if (Mathf.Max(left, right) >= 3f)
             {
@@ -1242,6 +1231,9 @@ namespace GameDev.Slice.EditorTools
                 var facing = alongX ? (toward ? Facing.E : Facing.W) : (toward ? Facing.S : Facing.N);
                 Prop("Bench", facing, p.x, p.y);
             }
+
+            // Grass on the garden's earth, last, round what stands in it (§25.4).
+            Lawn(PlotQuad(f, line - (s * garden), s0, s1, houseDepth, garden, behind), rng);
         }
 
         /// <summary>
@@ -1300,7 +1292,7 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>A street running along X: pavements of <paramref name="walk"/> m on both sides and a carriageway between.</summary>
-        private static void StreetX(string name, int px0, int px1, int py0, int py1, int walk, int surface)
+        private static void StreetX(string name, int px0, int px1, int py0, int py1, float walk, int surface)
         {
             if (walk > 0)
             {
@@ -1311,7 +1303,7 @@ namespace GameDev.Slice.EditorTools
             Lanes(name, surface, walk > 0, Rect(px0, py0 + walk, px1, py1 - walk), Use.Road);
         }
 
-        private static void StreetY(string name, int px0, int px1, int py0, int py1, int walk, int surface)
+        private static void StreetY(string name, int px0, int px1, int py0, int py1, float walk, int surface)
         {
             if (walk > 0)
             {
@@ -1346,19 +1338,20 @@ namespace GameDev.Slice.EditorTools
                 _lanes.Add(new Lane { Street = "Gardens", Quad = PlotQuad(Facing.S, VillaFront, s0, s1, villaDepth, VillaGarden, VillaBehind), Layer = Grass, PaintOnly = true });
             }
 
-            // §24.2 sections on C3's plan (§24.3). Order matters for paint: a later lane covers an earlier one where they cross.
+            // §24.2 sections on C3's plan (§24.3), the pavements widened from the carriageways by the owner (§25.2). Order
+            // matters for paint: a later lane covers an earlier one where they cross.
             // The Parade: a pavement, the carriageway and the promenade along the retaining wall, whose parapet is its balustrade.
-            Lanes("The Parade", Flags, false, Rect(480, 668, 752, 671), Use.Walk);
-            Lanes("The Parade", Setts, true, Rect(480, 671, 752, 677), Use.Road);
+            Lanes("The Parade", Flags, false, Rect(480, 668, 752, 668 + ParadeWalk), Use.Walk);
+            Lanes("The Parade", Setts, true, Rect(480, 668 + ParadeWalk, 752, 677), Use.Road);
             Lanes("The Parade", Flags, false, Rect(480, 677, 752, 680), Use.Walk);
             StreetY("North Road", 742, 752, 626, 668, 0, Setts);
-            StreetX("High Street", 480, 778, 726, 744, 4, Asphalt);
-            StreetY("Terrace Street", 516, 528, 680, 726, 3, Setts);
-            StreetX("Mercers Row", 480, 550, 772, 784, 3, Setts);
-            StreetX("Bell Street", 618, 701, 772, 784, 3, Setts);
-            StreetY("Cheap Street", 516, 528, 744, 812, 3, Setts);
-            StreetY("Market Street", 606, 618, 744, 812, 3, Setts);
-            StreetY("Dock Road", 701, 713, 744, 812, 3, Setts);
+            StreetX("High Street", 480, 778, 726, 744, HighStreetWalk, Asphalt);
+            StreetY("Terrace Street", 516, 528, 680, 726, ByelawWalk, Setts);
+            StreetX("Mercers Row", 480, 550, 772, 784, ByelawWalk, Setts);
+            StreetX("Bell Street", 618, 701, 772, 784, ByelawWalk, Setts);
+            StreetY("Cheap Street", 516, 528, 744, 812, ByelawWalk, Setts);
+            StreetY("Market Street", 606, 618, 744, 812, ByelawWalk, Setts);
+            StreetY("Dock Road", 701, 713, 744, 812, ByelawWalk, Setts);
             StreetX("Loom Lane", 618, 701, 796, 802, 0, Cobbles);
             StreetX("Ridge Lane", 642, 700, 696, 702, 0, Cobbles);
             StreetX("Stair Lane", 721, 778, 696, 702, 0, Cobbles);
@@ -1866,7 +1859,8 @@ namespace GameDev.Slice.EditorTools
         private static void Market()
         {
             // The Market Place (§24.3, §6.1): two rows of stalls with an aisle and benches between them, the Masters'
-            // counters and the seer's booth on the north row, the Item Creation yard fenced in the south-west corner.
+            // counters and the seer's booth on the north row, the Item Creation yard hedged in the south-west corner: no
+            // field fence stands inside the walls, and no barrel or firewood is set down for its own sake (§25.6).
             Prop("Stall_Goods", Facing.S, 560f, 750f, "The trader's stall");
             Prop("Stall_Empty", Facing.S, 569f, 750f, "Master of Enchanting");
             Prop("Stall_Empty", Facing.S, 578f, 750f, "Master of First Aid");
@@ -1877,16 +1871,11 @@ namespace GameDev.Slice.EditorTools
             Prop("Stall_Fish", Facing.N, 579f, 768f);
             Prop("Stall_Meat", Facing.N, 588f, 768f);
             Prop("Stall_Weapons", Facing.E, 553f, 772f, "Master of Item Creation");
-            for (var py = 770; py < 782; py += 2) // short of the south row's steps at 782–784
-            {
-                Prop("Fence", Facing.E, 565f, py);
-            }
+            HedgeLine(false, 565f, 770, 782, new Random(565)); // short of the south row's steps at 782–784
 
             Prop("Anvil", Facing.N, 559f, 775f);
             Prop("LeatherFrame", Facing.N, 560f, 779f);
             Prop("ArmourStand", Facing.N, 556f, 781f);
-            Prop("Firewood", Facing.N, 562f, 781f);
-            Prop("Barrel", Facing.N, 562f, 771f);
             foreach (var (px, py) in new[] { (572, 760), (580, 760), (588, 760) })
             {
                 Prop("Bench", Facing.N, px, py);
@@ -1899,7 +1888,7 @@ namespace GameDev.Slice.EditorTools
             // Crown Column at its foot.
             for (var py = 684; py < 714; py += 10)
             {
-                Prop("Tree_Fruit", Facing.N, 611f, py);
+                Prop(RowTree((py - 684) / 10), Facing.N, 611f, py);
                 Prop("Bench", Facing.E, 609f, py + 4f);
                 Prop("Bench", Facing.W, 614f, py + 4f);
             }
@@ -1907,8 +1896,11 @@ namespace GameDev.Slice.EditorTools
             Prop("Column", Facing.N, 611f, 719f, "The Crown Column");
             foreach (var (px, py) in new[] { (588, 653), (636, 653) })
             {
-                Prop("Tree_Fruit", Facing.N, px, py);
+                Prop(RowTree(px), Facing.N, px, py);
             }
+
+            var rng = new Random(606);
+            Parterre(rng);
 
             // Wardley Garden: railings round a lawn, trees at its corners, benches, a gate from the Garden Walk and one
             // to the passage down to the High Street.
@@ -1920,7 +1912,7 @@ namespace GameDev.Slice.EditorTools
             Railings(false, 569f, 685, 711);
             foreach (var (px, py) in new[] { (551, 689), (564, 689), (551, 706), (564, 706), (557, 697) })
             {
-                Prop("Tree_Fruit", Facing.N, px, py);
+                Prop(GardenTree(rng), Facing.N, px, py);
             }
 
             foreach (var (px, py, f) in new[] { (550, 693, Facing.S), (561, 693, Facing.S), (550, 701, Facing.N), (561, 701, Facing.N) })
@@ -1928,11 +1920,7 @@ namespace GameDev.Slice.EditorTools
                 Prop("Bench", f, px, py);
             }
 
-            var rng = new Random(606);
-            for (var i = 0; i < 20; i++)
-            {
-                Prop(i % 4 == 0 ? "Poppy" : "Shrub", Facing.N, 548 + rng.Next(20), 686 + rng.Next(24));
-            }
+            WardleyBeds(rng);
 
             // The chapel's graveyard and forecourt; Ritual Site Candidate 3 is the forecourt (§24.3).
             for (var px = 505; px <= 526; px += 3)
@@ -1949,6 +1937,8 @@ namespace GameDev.Slice.EditorTools
                 Prop("GraveWall", Facing.N, px, 649.9f);
             }
 
+            Lawn(Rect(503, 629, 527, 649), rng); // grass between the graves (§25.4)
+
             Circle(World(491f, 659f, Up(Ground(491f, 659f))), "Candidate 3, before the old chapel");
 
             // Ritual Site Candidate 1, the Ritual Square in Lower Veil, between Bell Street and the sea, across Loom Lane.
@@ -1957,22 +1947,13 @@ namespace GameDev.Slice.EditorTools
             Prop("TrashCan", Facing.N, 631f, 807f);
             Circle(World(643f, 797f, Up(Ground(643f, 797f))), "Candidate 1, the Ritual Square");
 
-            // The Soot & Bell's yard (§6.1) and the tenement court.
-            Prop("Barrels", Facing.N, 697f, 770f); // clear of the tavern's yard steps
-            Prop("Barrel", Facing.N, 699f, 760f);
-            Prop("Firewood", Facing.N, 696f, 764f);
-            Prop("Crate", Facing.N, 699f, 766f);
-            Prop("Barrel", Facing.N, 648f, 758f); // the court's middle: back steps reach 2.4 m in from both sides
-            Prop("Crate", Facing.N, 656f, 755f);
-            Prop("Box", Facing.N, 658f, 759f);
-
-            // The pawnbroker's counter in its corner off Loom Lane, and the cellar yard.
+            // The Soot & Bell's yard, the tenement court and the cellar yard stay clear: barrels, crates and boxes stand
+            // only in the port, on Dock Road and in stores (owner, 2026-11-09; §25.6).
+            // The pawnbroker's counter in its corner off Loom Lane.
             Prop("Counter", Facing.N, 691f, 803f, "Pawn shop counter");
             Prop("Chest", Facing.N, 693f, 808f, "Pawn shop chest");
-            Prop("Barrel", Facing.N, 715f, 693f);
-            Prop("Box", Facing.N, 718f, 691f);
 
-            // The docks (§6.1): cargo on the quays.
+            // The docks (§6.1): cargo on the quays, and at the warehouses on Dock Road.
             var cargo = new Random(812);
             for (var px = 490; px < 730; px += 22)
             {
@@ -1984,65 +1965,6 @@ namespace GameDev.Slice.EditorTools
             Prop("Crate", Facing.N, 726f, 785f);
         }
 
-        /// <summary>
-        /// Goods set out before the shops (reference plan R7.1): beside each shop's front door a crate, a barrel or a box
-        /// on the pavement, 2.6 m from the door's middle, clear of the shop's stoop, 3.5 m wide (measured on the baked
-        /// shops), on the side the seed picks or else the other. It stands in the second metre from the front: blocks
-        /// stand on whole cells, and the shop front stands proud into the first (the kit check found every one there
-        /// touching it). It stands only before its own shop, with at least 1 m of pavement left beyond it, and never on
-        /// a step, a stoop or a lamp. What a Victorian shop front shows besides, an awning, a hanging sign,
-        /// a shop window, waits on the wanted list (SLICE_MODELS_WANTED.md). Sizes are authoring defaults.
-        /// </summary>
-        private static void ShopGoods()
-        {
-            var rng = new Random(724);
-            var keys = new[] { "Crate", "Barrel", "Box" };
-            var placed = 0;
-            int frontage = 0, pavement = 0, stoop = 0, taken = 0;
-            foreach (var (at, outward, front, a0, a1) in _shopDoors)
-            {
-                var alongX = Mathf.Abs(outward.y) > 0.5f;
-                var key = keys[rng.Next(keys.Length)];
-                var first = rng.Next(2) == 0 ? 1f : -1f;
-                foreach (var s in new[] { first, -first })
-                {
-                    var along = (alongX ? at.x : at.y) + (s * 2.6f);
-                    if (along - 0.5f < a0 + 0.2f || along + 0.5f > a1 - 0.2f)
-                    {
-                        frontage++;
-                        continue;
-                    }
-
-                    var outside = alongX ? outward.y : outward.x;
-                    var centre = alongX ? new Vector2(along, front + (outside * 1.5f)) : new Vector2(front + (outside * 1.5f), along);
-                    var beyond = centre + (outward * 1.5f);
-                    var quad = Rect(centre.x - 0.5f, centre.y - 0.5f, centre.x + 0.5f, centre.y + 0.5f);
-                    if (!_pavements.On(centre.x, centre.y) || !_pavements.On(beyond.x, beyond.y))
-                    {
-                        pavement++;
-                        continue;
-                    }
-
-                    if (_stoops.Any(t => Overlap(t, quad)))
-                    {
-                        stoop++;
-                        continue;
-                    }
-
-                    taken++;
-                    if (Prop(key, alongX ? (outside > 0f ? Facing.S : Facing.N) : (outside > 0f ? Facing.E : Facing.W), centre.x - 0.5f, centre.y - 0.5f) != null)
-                    {
-                        placed++;
-                        taken--;
-                        break;
-                    }
-                }
-            }
-
-            Debug.Log($"[VeilmouthCity] shop goods (R7.1): {placed} set out before {_shopDoors.Count} shop doors; places refused: " +
-                      $"{frontage} past the shop's frontage, {pavement} off the pavement or too narrow, {stoop} on a stoop, {taken} on something placed.");
-        }
-
         // ------------------------------------------------------------------------------------------- lamps
 
         /// <summary>
@@ -2051,10 +1973,11 @@ namespace GameDev.Slice.EditorTools
         /// </summary>
         private static void AllLamps()
         {
-            // The High Street, 18 m, staggered; the Parade by its kerbs on the pavement and the promenade.
-            Lamps(true, 729f, 480, 778, 28f, 4f);
-            Lamps(true, 740f, 480, 778, 28f, 18f);
-            Lamps(true, 670f, 480, 752, 27f, 6f);
+            // The High Street, 18 m, staggered; the Parade by its kerbs on the pavement and the promenade. A lamp's cell is
+            // the pavement's last whole metre by the kerb (§25.2).
+            Lamps(true, 726f + HighStreetWalk - 1f, 480, 778, 28f, 4f);
+            Lamps(true, 744f - HighStreetWalk, 480, 778, 28f, 18f);
+            Lamps(true, 668f + ParadeWalk - 1f, 480, 752, 27f, 6f);
             Lamps(true, 677f, 480, 742, 27f, 6f);
             // Crown Avenue and the byelaw streets of 12 m, by the kerb on both pavements.
             Lamps(false, 602f, 680, 726, 25f, 5f);
@@ -2076,12 +1999,16 @@ namespace GameDev.Slice.EditorTools
             // A lamp at every corner of the crossroads, on the pavement by both kerbs, where no door forbids it.
             foreach (var (x0, x1, wx, y0, y1, wy) in new[]
                      {
-                         (516, 528, 3, 726, 744, 4), (606, 618, 3, 726, 744, 4), (701, 713, 3, 726, 744, 4),
-                         (600, 624, 3, 726, 744, 4), (516, 528, 3, 772, 784, 3), (701, 713, 3, 772, 784, 3),
-                         (600, 624, 3, 668, 680, 3),
+                         (516, 528, ByelawWalk, 726, 744, HighStreetWalk), (606, 618, ByelawWalk, 726, 744, HighStreetWalk),
+                         (701, 713, ByelawWalk, 726, 744, HighStreetWalk), (600, 624, 3f, 726, 744, HighStreetWalk),
+                         (516, 528, ByelawWalk, 772, 784, ByelawWalk), (701, 713, ByelawWalk, 772, 784, ByelawWalk),
+                         (600, 624, 3f, 668, 680, ParadeWalk),
                      })
             {
-                foreach (var (cx, cy) in new[] { (x0 + wx - 1, y0 + wy - 1), (x1 - wx, y0 + wy - 1), (x0 + wx - 1, y1 - wy), (x1 - wx, y1 - wy) })
+                // The corner cell is the pavement's last whole metre on both sides (§25.2: a 3.5 m pavement keeps 0.5 m by the kerb).
+                int Near(int edge, float walk) => edge + Mathf.FloorToInt(walk) - 1;
+                int Far(int edge, float walk) => edge - Mathf.FloorToInt(walk);
+                foreach (var (cx, cy) in new[] { (Near(x0, wx), Near(y0, wy)), (Far(x1, wx), Near(y0, wy)), (Near(x0, wx), Far(y1, wy)), (Far(x1, wx), Far(y1, wy)) })
                 {
                     CornerLamp(cx, cy);
                 }
@@ -2174,22 +2101,26 @@ namespace GameDev.Slice.EditorTools
                 House(farm, f, f == Facing.S ? py : f == Facing.N ? py : px, (int)(f == Facing.E ? py : px), force: true);
             }
 
-            // The flax field, fenced, a gap in its south side.
+            // The flax field, fenced with Roadside Tales' field fence (§25.5), a gap in its south side.
+            var fence = 0;
+            string FieldFence() => FieldFences[fence++ % FieldFences.Length];
             for (var px = 170; px < 186; px += 2)
             {
                 if (px != 178)
                 {
-                    Prop("Fence", Facing.N, px, 776f);
+                    Prop(FieldFence(), Facing.N, px, 776f - 0.1f, force: true);
                 }
 
-                Prop("Fence", Facing.N, px, 760f);
+                Prop(FieldFence(), Facing.N, px, 760f - 0.1f, force: true);
             }
 
             for (var py = 760; py < 776; py += 2)
             {
-                Prop("Fence", Facing.E, 170f, py);
-                Prop("Fence", Facing.E, 186f, py);
+                Prop(FieldFence(), Facing.E, 170f - 0.1f, py, force: true);
+                Prop(FieldFence(), Facing.E, 186f - 0.1f, py, force: true);
             }
+
+            Roadside();
 
             for (var i = 0; i < 5; i++)
             {

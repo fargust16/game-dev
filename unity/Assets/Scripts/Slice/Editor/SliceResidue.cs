@@ -35,7 +35,7 @@ namespace GameDev.Slice.EditorTools
         // stand, and how near Loom Lane a woman's walk must come for her to stay at home.
         private const float SealHeight = 1.3f;
         private const float LeafToDoor = 1.5f;
-        private const float PairsOut = 3.5f;
+        private const float PairsOut = 2f; // on the pavement, 3.5 m wide since city plan §25.2
         private static readonly float[] PairsAlong = { -7f, 9f };
         private const float LaneFear = 30f;
 

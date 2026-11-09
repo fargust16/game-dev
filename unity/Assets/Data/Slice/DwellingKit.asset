@@ -193,30 +193,42 @@ MonoBehaviour:
       width: 0.977649
       height: 0.50112593
     height: 1.4497106
-  - key: ViNightstand
-    prefab: {fileID: 7139684325479102205, guid: 20f6dd351b1f6864cb51eb61205eccf8, type: 3}
+  - key: TrNightstand
+    prefab: {fileID: 4344147593471466359, guid: d1142278b7344024e8fb8549017e332f, type: 3}
     width: 1
     depth: 1
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.011175513
-      y: 0.15999997
-      width: 0.977649
-      height: 0.50112593
-    height: 1.5437586
-  - key: ViSideboard
-    prefab: {fileID: 7289587153264682936, guid: ed8859afc119c7f4287e44eae3aaa743, type: 3}
-    width: 3
+      x: 0.22246718
+      y: 0.16283917
+      width: 0.44618392
+      height: 0.3804307
+    height: 1.1864488
+  - key: TrNightstandLamp
+    prefab: {fileID: 7085175952066398502, guid: 5447fb62fa38cc14eae7fe6347d1916a, type: 3}
+    width: 1
     depth: 1
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.31160593
-      y: 0.15999997
-      width: 2.3767881
-      height: 0.51686394
-    height: 1.780432
+      x: 0.27690804
+      y: 0.16388118
+      width: 0.44618392
+      height: 0.3804307
+    height: 1.3953035
+  - key: TrWardrobe
+    prefab: {fileID: 8252386424449714034, guid: 2b21b7cd1601e4248bdcdf8daa681f51, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.23258328
+      y: 0.16000009
+      width: 1.5348334
+      height: 0.8399999
+    height: 2.2999997
   - key: ViMirrorTall
     prefab: {fileID: 1384391188353130729, guid: fd8ff0fcf1bfd8148861ab3be5ff650f, type: 3}
     width: 1
@@ -229,6 +241,54 @@ MonoBehaviour:
       width: 0.98941207
       height: 0.41090423
     height: 2.2654
+  - key: TrMirror
+    prefab: {fileID: 7747627554501549088, guid: 0e04da308f8f0de41800960a61d98b60, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.081849456
+      y: 0.15999997
+      width: 0.8363011
+      height: 0.5104698
+    height: 1.85
+  - key: TrDresser
+    prefab: {fileID: 5601940297248171637, guid: b2fa10f91091e474088f1a904804a75a, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.39166677
+      y: 0.15999997
+      width: 1.2166665
+      height: 0.7166668
+    height: 1.4954507
+  - key: ViMirrorSmall
+    prefab: {fileID: 6976357446008359794, guid: af776bfbe7cc4834590b620a33fa6015, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 0.51468354
+  - key: TrScreen
+    prefab: {fileID: 421189310927021360, guid: 4f5fd90d9659e0145925b4a2787c004a, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.2341305
+      y: 0.16000003
+      width: 1.531739
+      height: 0.4811238
+    height: 1.9
   - key: ViCoatStand
     prefab: {fileID: 4242578803162436466, guid: c70d4e5b50e7b8645a40c76335a27c27, type: 3}
     width: 1
@@ -241,6 +301,18 @@ MonoBehaviour:
       width: 0.34926522
       height: 0.39453888
     height: 2.2046223
+  - key: TrCoatRack
+    prefab: {fileID: 6879504205129013342, guid: 20950e255e30e3e4e96853cda75839ca, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.1354208
+      y: 0.13189816
+      width: 0.7291584
+      height: 0.7362037
+    height: 1.8
   - key: ViFireplace
     prefab: {fileID: 7039861906772512152, guid: 2f9fe8ac6d960c94fac119a05578a62d, type: 3}
     width: 3
@@ -277,6 +349,18 @@ MonoBehaviour:
       width: 0.8769363
       height: 0.8318088
     height: 1.4030981
+  - key: TrArmchair
+    prefab: {fileID: 1935354448672677863, guid: d48f74abd72c49b48aed6ce9af0983f4, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.08292568
+      y: 0.048679054
+      width: 0.83414865
+      height: 0.9026419
+    height: 1.25
   - key: ViRug
     prefab: {fileID: 4313728973739735630, guid: bc903158a4341034f953a66e80df0ffe, type: 3}
     width: 3
@@ -289,6 +373,30 @@ MonoBehaviour:
       width: 0
       height: 0
     height: 0.032342784
+  - key: TrLogHolder
+    prefab: {fileID: 6592044877262407765, guid: b8b3b33910123c74c8d7e13dfb453b71, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.24845862
+      y: 0.25448155
+      width: 0.50308275
+      height: 0.4910369
+    height: 0.65
+  - key: TrFireTools
+    prefab: {fileID: 7439563694003741705, guid: 1a3c0eb12c7d9134d869df7df194db1f, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.32269865
+      y: 0.35071242
+      width: 0.3546027
+      height: 0.29857516
+    height: 0.8000001
   - key: ViDresser
     prefab: {fileID: 8730406486001753893, guid: 902e6ad1af1b90446bb43f011d89f872, type: 3}
     width: 2
@@ -325,18 +433,6 @@ MonoBehaviour:
       width: 0.3787645
       height: 0.32676792
     height: 0.31592992
-  - key: ViMirrorSmall
-    prefab: {fileID: 6976357446008359794, guid: af776bfbe7cc4834590b620a33fa6015, type: 3}
-    width: 3
-    depth: 0
-    solid: 0
-    body:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-    height: 0.51468354
   - key: ViBathSet
     prefab: {fileID: 4139754905836436930, guid: cbbf401975945bd4cb90dea6dd213b52, type: 3}
     width: 3
@@ -445,6 +541,18 @@ MonoBehaviour:
       width: 1.2106023
       height: 0.76125467
     height: 3.2846584
+  - key: TrDisplay
+    prefab: {fileID: 4751860777312507392, guid: cbc9ed84e4aae9343a5ce101643af51f, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.024461865
+      y: 0.15999997
+      width: 0.95107627
+      height: 0.62230945
+    height: 1.9999999
   - key: ViSofa
     prefab: {fileID: 6705102054000465093, guid: 23c5f5bf982cfd64d9c95c08e173081a, type: 3}
     width: 3
@@ -529,6 +637,30 @@ MonoBehaviour:
       width: 3.1977239
       height: 1.2101231
     height: 1.4375639
+  - key: TrDesk
+    prefab: {fileID: 3503770334103536868, guid: 372bc48e3cd784f409da6f36eb9f04ba, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.26789236
+      y: 0.15999997
+      width: 1.4728065
+      height: 0.7868422
+    height: 1.3522558
+  - key: TrWallClock
+    prefab: {fileID: 1241044995253652397, guid: a462dcc9b03bd844aa2be2306c93c069, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 1.1
   - key: ViClock
     prefab: {fileID: 2076264145155440915, guid: 6687fb94e39fda846adda343beb747f0, type: 3}
     width: 1
@@ -541,6 +673,54 @@ MonoBehaviour:
       width: 0.901664
       height: 0.4164139
     height: 2.4829984
+  - key: TrPiano
+    prefab: {fileID: 926870542877806437, guid: 48a0e0bb2d50dac498511ae237a506c8, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.34310198
+      y: 0.15999997
+      width: 1.313796
+      height: 0.84000003
+    height: 1.4499999
+  - key: TrGramophone
+    prefab: {fileID: 265230165092889736, guid: eec3b867fa6bf1b44beb8f62313921ce, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.1219179
+      y: 0.11878663
+      width: 0.7561642
+      height: 0.76242673
+    height: 1.4500003
+  - key: TrSewing
+    prefab: {fileID: 7492057537187063080, guid: 86127cf90bea99a4ca1fe2213e74128a, type: 3}
+    width: 2
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.4104252
+      y: 0.16113776
+      width: 1.1791496
+      height: 0.6777245
+    height: 1.2747452
+  - key: TrVase
+    prefab: {fileID: 4374298500177912590, guid: 539eb476feda89c48a3c16aaf29d9764, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.2615059
+      y: 0.2903726
+      width: 0.4769882
+      height: 0.41925478
+    height: 0.9
   - key: ViHallTable
     prefab: {fileID: 524943894509403198, guid: 75898e18be9b1544d919c275fff3f2a4, type: 3}
     width: 2
@@ -685,6 +865,30 @@ MonoBehaviour:
       width: 0
       height: 0
     height: 0.42051458
+  - key: TrSconce
+    prefab: {fileID: 4363583873177702657, guid: c9ab5fcbf24c6044987781530d38fee9, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 0.48972616
+  - key: TrLantern
+    prefab: {fileID: 1297630816340752087, guid: 8499c1ad1604cce4593fc3770f418ed0, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 0.6
   - key: ViCarpet
     prefab: {fileID: 2187816338858859326, guid: 6ab7e7a30280b3646b8faddf9927d0e2, type: 3}
     width: 4

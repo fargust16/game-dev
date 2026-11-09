@@ -220,12 +220,86 @@ namespace GameDev.Slice.EditorTools
         /// Swaps the pack's foliage for its olive copy on every renderer under <paramref name="root"/>, where the copy
         /// exists; the kit catalogue calls it when it wraps a model, so a rebuilt wrapper keeps the retint.
         /// </summary>
-        public static int Retint(GameObject root)
-        {
-            var swaps = Foliage
+        public static int Retint(GameObject root) =>
+            Swap(root, Foliage
                 .Select(f => (From: AssetDatabase.LoadAssetAtPath<Material>(Polytope + f.Vendor + ".mat"), To: AssetDatabase.LoadAssetAtPath<Material>($"{Folder}/{f.Copy}.mat")))
                 .Where(s => s.From != null && s.To != null)
-                .ToDictionary(s => s.From, s => s.To);
+                .ToDictionary(s => s.From, s => s.To));
+
+        /// <summary>
+        /// The city's trees and bushes (city plan §25.1, owner 2026-11-09): the Stylized Trees Pack's leaves swapped for
+        /// project copies in the city's muted green, made on first use. The catalogue calls it for the <c>City*</c>
+        /// wrappers only; the forest's fellable trees keep the pack's colours as resource markers.
+        /// </summary>
+        public static int RetintCity(GameObject root) =>
+            Swap(root, CityFoliage
+                .Select(f => (From: AssetDatabase.LoadAssetAtPath<Material>(StylizedFoliage + f.Vendor + ".mat"), To: CityCopy(f.Vendor, f.Shade)))
+                .Where(s => s.From != null && s.To != null)
+                .ToDictionary(s => s.From, s => s.To));
+
+        private const string StylizedFoliage = "Assets/Stylized Trees Pack/Assets/Materials/Foliage/";
+        public const string CityFolder = Folder + "/City";
+
+        /// <summary>The pack's leaf materials the trees and bushes wear, each copy a little lighter or darker for variety.</summary>
+        private static readonly (string Vendor, float Shade)[] CityFoliage = { ("Foliage 001", 1f), ("Foliage 002", 1.06f), ("Foliage 004", 0.92f) };
+
+        /// <summary>
+        /// The city's green in sRGB, from the shadowed inside of a crown to its lit top, on the pack's own gradient
+        /// (its middle key at 0.78, as the pack's): darker and greyer than the pack's teal and lime, a little greener
+        /// than the forest's olive, so it reads against the stone without shouting. Authoring defaults.
+        /// </summary>
+        private static readonly (Color Colour, float Time)[] CityGreen =
+        {
+            (new Color(0.12f, 0.16f, 0.10f), 0f), (new Color(0.30f, 0.37f, 0.20f), 0.78f), (new Color(0.56f, 0.60f, 0.36f), 1f),
+        };
+
+        /// <summary>
+        /// A copy of a pack leaf material with a gradient texture of its own, a 256 × 1 sRGB strip stored inside the copy
+        /// and named as the pack's drawer names it, so its Inspector still reads and edits the gradient.
+        /// </summary>
+        private static Material CityCopy(string vendor, float shade)
+        {
+            var path = $"{CityFolder}/City {vendor}.mat";
+            var copy = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (copy != null)
+            {
+                return copy;
+            }
+
+            var source = AssetDatabase.LoadAssetAtPath<Material>(StylizedFoliage + vendor + ".mat");
+            if (source == null)
+            {
+                Debug.LogError($"[VeilmouthLook] {vendor} is missing from the Stylized Trees Pack.");
+                return null;
+            }
+
+            Directory.CreateDirectory(CityFolder);
+            copy = new Material(source) { name = "City " + vendor };
+            AssetDatabase.CreateAsset(copy, path);
+            var keys = CityGreen.Select(k => (Colour: new Color(Mathf.Clamp01(k.Colour.r * shade), Mathf.Clamp01(k.Colour.g * shade), Mathf.Clamp01(k.Colour.b * shade), 1f), k.Time)).ToArray();
+            var gradient = new Gradient();
+            gradient.SetKeys(keys.Select(k => new GradientColorKey(k.Colour, k.Time)).ToArray(), new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(1f, 1f) });
+            string F(float v) => v.ToString("R", System.Globalization.CultureInfo.InvariantCulture);
+            var json = "{\"mode\":0,\"colorKeys\":[" +
+                       string.Join(",", keys.Select(k => $"{{\"color\":{{\"r\":{F(k.Colour.r)},\"g\":{F(k.Colour.g)},\"b\":{F(k.Colour.b)},\"a\":1.0}},\"time\":{F(k.Time)}}}")) +
+                       "],\"alphaKeys\":[{\"alpha\":1.0,\"time\":0.0},{\"alpha\":1.0,\"time\":1.0}]}";
+            var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false, false)
+            {
+                name = "_Gradient_gradienttexture Texture" + json,
+                wrapMode = TextureWrapMode.Clamp,
+            };
+            texture.SetPixels(Enumerable.Range(0, 256).Select(x => gradient.Evaluate(x / 255f)).ToArray());
+            texture.Apply(false, false);
+            AssetDatabase.AddObjectToAsset(texture, copy);
+            copy.SetTexture("_Gradient_gradienttexture", texture);
+            copy.SetTexture("_TextureSample1", texture);
+            EditorUtility.SetDirty(copy);
+            AssetDatabase.SaveAssets();
+            return copy;
+        }
+
+        private static int Swap(GameObject root, System.Collections.Generic.Dictionary<Material, Material> swaps)
+        {
             var count = 0;
             foreach (var r in root.GetComponentsInChildren<Renderer>(true))
             {
