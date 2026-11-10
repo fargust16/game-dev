@@ -89,6 +89,17 @@ namespace GameDev.Slice.Atmosphere
         // part's share. Authoring defaults.
         private const float HaloStrength = 0.6f, HaloCore = 0.18f, HaloRadius = 1.5f, HaloWide = 0.05f;
 
+        /// <summary>
+        /// The light's shafts through the gaps between roofs and trees (reference plan R3 step 6) [day, dusk, night]: their
+        /// strength, faint by day and strongest with the low sun; the night's is the crimson moon's, whose light is dim, so
+        /// its number is larger. How tightly the sky round the light counts, the power of the cosine: the moon is a small
+        /// source. Each of 24 steps toward the light counts <see cref="ShaftDecay"/> of the one before, over
+        /// <see cref="ShaftReach"/> of the way. Authoring defaults.
+        /// </summary>
+        private static readonly float[] Shafts = { 0.25f, 1.6f, 3f }, ShaftSharpness = { 24f, 16f, 60f };
+
+        private const float ShaftDecay = 0.95f, ShaftReach = 0.8f;
+
         [SerializeField] private Light sun;
         [SerializeField] private Material daySky, duskSky, nightSky;
         [SerializeField] private Volume twilight;
@@ -222,8 +233,9 @@ namespace GameDev.Slice.Atmosphere
 
             Lamps(InteriorLighting.LampsLit(minute));
             Fog(Blend(FogColour));
-            LowFog(Blend(Haze), Mathf.Lerp(LowFogDensity[from], LowFogDensity[to], t), Mathf.Lerp(Glow[from], Glow[to], t),
-                Mathf.Lerp(GlowSharpness[from], GlowSharpness[to], t));
+            float Mix(float[] v) => Mathf.Lerp(v[from], v[to], t);
+            LowFog(Blend(Haze), Mix(LowFogDensity), Mix(Glow), Mix(GlowSharpness));
+            Shader.SetGlobalVector(HeightFog.ShaftParamsId, new Vector4(Mix(Shafts), ShaftDecay, Mix(ShaftSharpness), ShaftReach));
         }
 
         /// <summary>The low fog's globals for <see cref="HeightFogFeature"/>: lit toward the sun by day, the moon by night.</summary>

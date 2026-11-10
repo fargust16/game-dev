@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
@@ -25,6 +26,7 @@ namespace GameDev.Slice.Atmosphere
         public static readonly int SunColourId = Shader.PropertyToID("_HeightFogSunColour");
         public static readonly int DriftId = Shader.PropertyToID("_HeightFogDrift");
         public static readonly int LampParamsId = Shader.PropertyToID("_HeightFogLampParams");
+        public static readonly int ShaftParamsId = Shader.PropertyToID("_HeightFogShaftParams");
 
         private static readonly List<(Vector3 Position, Color Colour)> Lamps = new();
         private static readonly float[] Distances = new float[MaxLamps];
@@ -149,8 +151,11 @@ namespace GameDev.Slice.Atmosphere
             private static readonly int LampsId = Shader.PropertyToID("_HeightFogLamps");
             private static readonly int LampColoursId = Shader.PropertyToID("_HeightFogLampColours");
             private static readonly int LampCountId = Shader.PropertyToID("_HeightFogLampCount");
+            private static readonly int ShaftsId = Shader.PropertyToID("_HeightFogShafts");
+            private static readonly int ShaftFadeId = Shader.PropertyToID("_HeightFogShaftFade");
 
             private readonly MaterialPropertyBlock _block = new();
+            private readonly MaterialPropertyBlock _shaftBlock = new();
             private Material _material;
 
             public HeightFogPass()
@@ -165,6 +170,8 @@ namespace GameDev.Slice.Atmosphere
                 internal Material Material;
                 internal MaterialPropertyBlock Block;
                 internal TextureHandle Source;
+                internal TextureHandle Shafts;
+                internal float Fade;
                 internal readonly Vector4[] Lamps = new Vector4[HeightFog.MaxLamps];
                 internal readonly Vector4[] Colours = new Vector4[HeightFog.MaxLamps];
                 internal int Count;
@@ -184,22 +191,28 @@ namespace GameDev.Slice.Atmosphere
                 description.name = "_HeightFogColour";
                 description.clearBuffer = false;
                 var destination = renderGraph.CreateTexture(description);
+                var eye = cameraData.camera.transform;
+                var shafts = Shafts(renderGraph, resources, cameraData, description, eye.forward, out var fade);
 
                 using (var builder = renderGraph.AddRasterRenderPass<PassData>("Height Fog", out var data, profilingSampler))
                 {
                     data.Material = _material;
                     data.Block = _block;
                     data.Source = source;
-                    var eye = cameraData.camera.transform;
+                    data.Shafts = shafts;
+                    data.Fade = fade;
                     data.Count = HeightFog.Nearest(eye.position, eye.forward, data.Lamps, data.Colours);
                     builder.UseTexture(source);
                     builder.UseTexture(resources.cameraDepthTexture);
+                    builder.UseTexture(shafts);
                     builder.SetRenderAttachment(destination, 0, AccessFlags.Write);
                     builder.SetRenderFunc(static (PassData d, RasterGraphContext context) =>
                     {
                         d.Block.Clear();
                         d.Block.SetTexture(BlitTextureId, d.Source);
                         d.Block.SetVector(BlitScaleBiasId, new Vector4(1f, 1f, 0f, 0f));
+                        d.Block.SetTexture(ShaftsId, d.Shafts);
+                        d.Block.SetFloat(ShaftFadeId, d.Fade);
                         d.Block.SetVectorArray(LampsId, d.Lamps);
                         d.Block.SetVectorArray(LampColoursId, d.Colours);
                         d.Block.SetFloat(LampCountId, d.Count);
@@ -208,6 +221,54 @@ namespace GameDev.Slice.Atmosphere
                 }
 
                 resources.cameraColor = destination;
+            }
+
+            /// <summary>
+            /// The light's shafts at half size (reference plan R3 step 6), drawn only while the sun or the moon stands
+            /// ahead of the eye and the clock gives them strength; otherwise black. <paramref name="fade"/> takes them
+            /// out as the light turns away from the eye.
+            /// </summary>
+            private TextureHandle Shafts(RenderGraph renderGraph, UniversalResourceData resources, UniversalCameraData cameraData,
+                TextureDesc colour, Vector3 forward, out float fade)
+            {
+                var sun = Shader.GetGlobalVector(HeightFog.SunId);
+                var strength = Shader.GetGlobalVector(HeightFog.ShaftParamsId).x;
+                fade = strength > 0f ? Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.15f, 0.45f, Vector3.Dot(forward, sun))) : 0f;
+                if (fade <= 0f)
+                {
+                    return renderGraph.defaultResources.blackTexture;
+                }
+
+                var description = colour;
+                description.name = "_HeightFogShafts";
+                description.sizeMode = TextureSizeMode.Explicit;
+                description.width = Mathf.Max(1, cameraData.cameraTargetDescriptor.width / 2);
+                description.height = Mathf.Max(1, cameraData.cameraTargetDescriptor.height / 2);
+                description.format = GraphicsFormat.R16_SFloat;
+                description.msaaSamples = MSAASamples.None;
+                description.depthBufferBits = DepthBits.None;
+                description.useMipMap = false;
+                description.clearBuffer = false;
+                var shafts = renderGraph.CreateTexture(description);
+
+                using var builder = renderGraph.AddRasterRenderPass<ShaftData>("Height Fog Shafts", out var data, profilingSampler);
+                data.Material = _material;
+                data.Block = _shaftBlock;
+                builder.UseTexture(resources.cameraDepthTexture);
+                builder.SetRenderAttachment(shafts, 0, AccessFlags.Write);
+                builder.SetRenderFunc(static (ShaftData d, RasterGraphContext context) =>
+                {
+                    d.Block.Clear();
+                    d.Block.SetVector(BlitScaleBiasId, new Vector4(1f, 1f, 0f, 0f));
+                    context.cmd.DrawProcedural(Matrix4x4.identity, d.Material, 1, MeshTopology.Triangles, 3, 1, d.Block);
+                });
+                return shafts;
+            }
+
+            private sealed class ShaftData
+            {
+                internal Material Material;
+                internal MaterialPropertyBlock Block;
             }
         }
     }

@@ -611,9 +611,9 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// The reference look's check (reference plan R3): five fixed views of C5, Long Tongue Street, the Penny, the quay,
-        /// the city from a pier and the river, at 08:00, 16:00, 19:30 and 23:00, with the sky and the grade the player
-        /// sees; each view's four hours also go in one sheet at half size. The command-line argument
+        /// The reference look's check (reference plan R3): six fixed views of C5, Long Tongue Street, the Penny, the quay,
+        /// the city from a pier, the river and Long Tongue westward, at 08:00, 16:00, 19:30 and 23:00, with the sky and the
+        /// grade the player sees; each view's four hours also go in one sheet at half size. The command-line argument
         /// <c>-lookLabel name</c> prefixes the files, so a before and an after stand side by side. Batch:
         /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderLook
         /// </summary>
@@ -633,9 +633,9 @@ namespace GameDev.Slice.EditorTools
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
             var street = VeilmouthScene.StreetLevel;
             // C5's streets (city plan §29): Long Tongue Street from the west gate to the Penny, the Penny's market round
-            // the statue, the quay with the sea on its right, the city from a pier's end across the water, and the river
-            // north from the west gate's bridge, the eye at a fixed height over the parapet, since the ground under a
-            // bridge is the riverbed.
+            // the statue, the quay with the sea on its right, the city from a pier's end across the water, the river
+            // north from the west gate's bridge (the eye at a fixed height over the parapet, since the ground under a
+            // bridge is the riverbed), and Long Tongue westward into the evening sun.
             var views = new (string Name, Vector3 From, Vector3 To)[]
             {
                 ("longtongue", Ground(-75f, 60f, 1.7f), Ground(35f, 60f, 3f)),
@@ -643,6 +643,8 @@ namespace GameDev.Slice.EditorTools
                 ("quay", Ground(170f, -40f, 1.7f), Ground(170f, 120f, 2f)),
                 ("pier", new Vector3(238f, street + 1.7f, 61f), new Vector3(120f, street + 6f, 61f)),
                 ("river", new Vector3(-101f, street + 5f, 64f), new Vector3(-101f, street - 2f, 250f)),
+                // Long Tongue back toward the west gate, into the low evening sun through the street trees (R3 step 6).
+                ("westward", Ground(22f, 61f, 1.7f), Ground(-75f, 61f, 4f)),
             };
             var hours = new[] { (8 * 60, "0800"), (16 * 60, "1600"), ((19 * 60) + 30, "1930"), (23 * 60, "2300") };
             _skyAndGrade = true;
