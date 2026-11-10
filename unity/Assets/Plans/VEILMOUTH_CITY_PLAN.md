@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4, C5)
 
-Version: 0.65
+Version: 0.66
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; the owner's walk of C5 and its fixes in §31 (2026-11-10); sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§31: the owner's walk of C5: lamps and road trees in one rhythm of 30 m bays on each kerb, a lamp's base clear of the kerb and its foot on the ground, wards as chalk on whole faces, railings drawn out to their walls and posts at every free end, stone under the works' bank, wing walls at the bridges, one parapet between bridges, every carriageway in setts; §31.4 as built; the hole of item 6 not found, its place asked of the owner. Earlier: §30.2: the lamps, their glass and the statue built; the gaslight made unlit, since its emission keyword was never kept; the frame with the Tripo lamps and people at most 11.95 ms in any view, so the lamp needs no far level. Earlier: §30: the owner's Tripo street lamp in the place of every lamp post and one bronze statue on Drowsy Steps, two more exceptions to §25.6. Earlier: §29.11: the far LOD built and measured: every view's median frame within the 16.7 ms budget, the swap unseen; the yard doors left out of it; its glass a variant of the kit glass that writes depth and reads the panes' rooms.)
+Last Updated: 2026-11-10 (§32: a row on one level: each run of houses wall to wall set on its highest floor, so no band breaks at a party wall; 0 of 58 pairs stepped, 30 before; §31.3: item 6 closed as not reproduced. Earlier: §31: the owner's walk of C5: lamps and road trees in one rhythm of 30 m bays on each kerb, a lamp's base clear of the kerb and its foot on the ground, wards as chalk on whole faces, railings drawn out to their walls and posts at every free end, stone under the works' bank, wing walls at the bridges, one parapet between bridges, every carriageway in setts; §31.4 as built; the hole of item 6 not found, its place asked of the owner. Earlier: §30.2: the lamps, their glass and the statue built; the gaslight made unlit, since its emission keyword was never kept; the frame with the Tripo lamps and people at most 11.95 ms in any view, so the lamp needs no far level. Earlier: §30: the owner's Tripo street lamp in the place of every lamp post and one bronze statue on Drowsy Steps, two more exceptions to §25.6. Earlier: §29.11: the far LOD built and measured: every view's median frame within the 16.7 ms budget, the swap unseen; the yard doors left out of it; its glass a variant of the kit glass that writes depth and reads the panes' rooms.)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -2257,7 +2257,7 @@ The owner's sixth screenshot shows the inner walls of a house and the setts unde
 - **The walled-up back doors.** Each of the 77 has the kit's plain wall in the house's paint. A yard door's pieces stay out of the far LOD and draw at every distance (§29.11).
 - **A house standing over its ground.** Rays cast inward 5 cm over the ground, 0.4 m out from the walls, flag a gap of more than 8 cm. They flag all 145 houses, so the check cannot tell a gap from a house's base and reads nothing.
 
-**Not found.** Renders from 2.5 m outside each flagged spot, and from further off, showed built walls; the narrow yards' renders landed inside the neighbouring rooms. The owner is asked where the screenshot was taken: a landmark, a street, or the camera's place.
+**Not found.** Renders from 2.5 m outside each flagged spot, and from further off, showed built walls; the narrow yards' renders landed inside the neighbouring rooms. The owner could not find the place again either (2026-11-10), and will name the building when a hole is seen next. The item is closed as not reproduced.
 
 ## 31.4 As built
 
@@ -2286,3 +2286,33 @@ Measured after the work by `VeilmouthWalkAudit` (`Logs/SliceSurvey/walk_audit.tx
 - **Corners and boards.** A square's corner lamp also stands 1.5 m clear of every solid piece, such as the Notice Board, and the Penny's ring lamps keep 2 m from a house, as a street lamp does (authoring defaults).
 - **Railings.** After the posts at a wall are hidden, the bars' end is measured again. An end that still stops 0.01–0.55 m short of the wall is drawn out once more (authoring default).
 - **Not yet seen by the owner.** These fixes wait for the owner's walk.
+
+# 32. A row on one level, 2026-11-10
+
+**The owner's remark** (screenshots 13 and 14): on sloping ground the houses of a row stand stepped, so their plinths and string courses jump at every party wall, and a plinth's cut end shows. The owner offered three ways: tilt each house to the ground, make the city's ground level, or stand a row on a level base that rises over the pavement on its low side, with steps up to its doors. The owner left the choice to the agent.
+
+**The cause** (measured): the city stands almost level, at 25.9 m with a 1.5 m rise under the Penny (§28.6), so a street falls 1.7 % at most. But each house took its own floor: the highest ground under it, or the pavement's top before it, rounded up to 0.1 m, and lowered 0.6 m if it stood on a plain stoop (§28.1 item 5). Of the 58 pairs of houses wall to wall, 30 stood on different levels, 0.1–0.4 m apart, and every band of their fronts broke at the wall between them.
+
+**The choice: a row on a level base.**
+
+- **Tilting** is rejected. A tilted house leans off the plumb, its windows and doors skew, and no real street builds so.
+- **A level city** is rejected. It takes away the rise under the Penny and the fall to the river and the sea, which the city's ground was shaped for (§28.6). The same stepped joints would come back on any later hill.
+- **A level base** is how Victorian terraces stand on a fall. A row keeps one ground floor, and its low end stands on a higher plinth, with more steps up to its doors. It needs no new piece: the stone plinth under a house where the ground falls and the steps from a raised door to the ground already exist (§13).
+
+**The rule** (`VeilmouthCity.Terrace`):
+
+- **One level for each run.** A run of houses wall to wall, between two passages or a row's ends, takes the highest own floor among its houses. Every other house in the run is raised to it, so its plinth, string courses and eaves meet its neighbours' flush.
+- **The low end.** A raised house's stone base shows under it, laid in the world's frame as the other stone works are, so it reads as one plinth along the run. Its door gets the steps it needs, as on any raised door.
+- **A run too steep for one level.** Where a run's own floors spread more than 1.2 m (authoring default: eight steps of 0.15 m), it is cut at a party wall into the fewest levels, from its start.
+- **A run is read by its floors as they would stand**, sunk or not: a house on a plain stoop beside one on its own stair is raised to it.
+- **What is not changed.** Detached houses, villas, civic fronts and the chapel that stand alone keep their own floors.
+
+**Checked by** `VeilmouthWalkAudit`: every pair of houses wall to wall, by their floors' difference, and the street doors highest over the ground before them, with renders.
+
+**As built** (`VeilmouthCity.Lifts` for the planner's buildings, `VeilmouthCity.Level` for each run; `Logs/SliceSurvey/walk_audit.txt`):
+
+- C5's block houses are the planner's buildings, one by one, so they are grouped into runs by their front and their touching ends. A first build levelled only the rows of the older path, which C5 leaves empty, and changed nothing.
+- **Party walls:** 0 of 58 pairs on different levels (30 before, up to 0.40 m apart).
+- **Lifts:** the most a house is raised is 0.70 m; no run spreads over 1.2 m, so none is cut.
+- **Doors:** of 138 street doors, 29 stand more than 0.5 m over the ground 1.5 m before them, the highest 0.83 m. Each has its stoop and the steps down from it (`walk_raised_*.png`).
+- **Not yet seen by the owner.**
