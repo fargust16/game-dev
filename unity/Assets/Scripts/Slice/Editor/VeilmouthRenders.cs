@@ -98,6 +98,43 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// The city of plan C4 (VEILMOUTH_CITY_PLAN.md §28) from above and from a walker's height. Until C4's people, dogs
+        /// and dressing are placed again (§28.4, step 8), every other root but the ground and the water is hidden for the
+        /// picture only. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderC4
+        /// </summary>
+        public static void RenderC4()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            foreach (var root in scene.GetRootGameObjects().Where(r => r.name != VeilmouthCity.RootName && r.GetComponentInChildren<Terrain>() == null &&
+                                                                      r.name != "Water" && r.GetComponentInChildren<Renderer>() != null))
+            {
+                root.SetActive(false);
+            }
+
+            ShowCircles();
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            Top("c4_city", new Vector3(50f, 0f, 20f), 175f);
+            Top("c4_penny", new Vector3(40f, 0f, 60f), 50f);
+            Top("c4_parsons", new Vector3(50f, 0f, 195f), 65f);
+            Top("c4_sleepy", new Vector3(-25f, 0f, 45f), 60f);
+            Top("c4_lowerveil", new Vector3(120f, 0f, 5f), 60f);
+            Top("c4_reek", new Vector3(50f, 0f, -145f), 75f);
+            Eye("c4_eye_longtongue", -70f, 60f, 40f, 60f, 3f);
+            Eye("c4_eye_saltgullet", 150f, 60f, 40f, 60f, 3f);
+            Eye("c4_eye_lenten", 40f, 128f, 40f, 60f, 4f);
+            Eye("c4_eye_smoked", 40f, -30f, 40f, 60f, 4f);
+            Eye("c4_eye_embankment", -70f, -47f, 150f, -47f, 2f);
+            Eye("c4_eye_gate", -140f, 60f, -60f, 60f, 4f);
+            Eye("c4_eye_grubby", 40f, -100f, 40f, -30f, 3f);
+            Eye("c4_eye_quay", 170f, -40f, 170f, 120f, 2f);
+            Eye("c4_eye_slant", 80f, 20f, 107f, -7f, 2f);
+            Eye("c4_eye_widows", -75f, 140f, 150f, 140f, 3f);
+            Debug.Log($"Veilmouth C4 views written to {OutputFolder}.");
+        }
+
+        /// <summary>
         /// C4's ground (VEILMOUTH_CITY_PLAN.md §28.5) from above and from a walker's height, with every built root hidden
         /// for the picture only: the river round the west and south, the sea, the rise under the Penny, the forest's land.
         /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderC4Ground

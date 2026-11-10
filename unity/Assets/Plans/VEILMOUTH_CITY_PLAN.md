@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4)
 
-Version: 0.51
+Version: 0.52
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10 and being built; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§28.6: C4's ground shaped from the layout: the city and the works level with a rise of 1.5 m under the Penny and the cathedral, the river and the sea dug under the one water plane, the land outside rolling with no pond, steep area edges and the West Road's pass; Widows' Row 17 m)
+Last Updated: 2026-11-10 (§28.7: C4's streets built from the layout: paint, raised pavements, the wall with its gate and towers, the stone banks and the quay wall, two bridges and two piers, lamps and 78 street trees)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1400,3 +1400,47 @@ The district names are Parsons' End, Sleepy Quarter, Salt End, Lower Veil and th
 Widows' Row's south pavement is 4 m, not 3.5 m, so every front behind it lies on a whole metre: the street is 17 m, py 352–369.
 
 Views: `Logs/SliceSurvey/c4_ground_*`.
+
+## 28.7 The streets, 2026-11-10
+
+`VeilmouthCity` now builds C4 from the layout file. C3's tables, its streets, its squares and its plots are gone from the builder, and the root is `Veilmouth C4`. Its new part, `VeilmouthCity.Layout.cs`, places what the layout names. All sizes are authoring defaults.
+
+- **Paint.** The order is:
+  1. cobbles over the city and the works;
+  2. grass on the plots' gardens;
+  3. the squares, as walking ground;
+  4. the Penny's setts ring (r 34 m) round its grass island (r 26 m);
+  5. each street's two pavements and its carriageway;
+  6. Squint Lane at 45°;
+  7. the bridges' city ends.
+
+  The canonical five layers keep their order.
+- **Pavements.** Pavements are raised 0.15 m (R4): 15 outlines, 9140 m², 4366 m of kerb, 3 carriageway ends carried on and 8 rounded corners. The Penny is flush paving with no kerb.
+- **The wall.**
+  - The town wall stands on the layout's lines, with the gate between two towers and a lintel over it.
+  - The north wall has four towers.
+  - The works keep their own west and south walls.
+- **The water's edge.**
+  - The river has a stone bank along the city and the works.
+  - Along the south leg, the city side has a parapet 1.1 m high and the works side a low kerb.
+  - The quay wall runs from the seabed to 0.3 m over the city.
+  - Every run is in 4 m stones and opens where a bridge or a pier meets it.
+- **Bridges and piers.**
+  - Last Farthing Bridge and Grubby Bridge have a deck, parapets, abutments and piers every 12 m or so.
+  - A bridge end on the natural bank runs 4 m onto the land.
+  - Tipsy Pier and the One-Eye's pier stand on piles every 6 m.
+  - A deck is what stands on it stands on.
+- **Lamps.**
+  - Along each street's kerbs every 27 m, the far side staggered where the street is wider than 12 m.
+  - Along the quay's edge.
+  - Eight round the Penny.
+  - One on a corner of each of the four small squares.
+  - Two at each bridge end and at each pier's end.
+- **Trees.**
+  - 78 of the owner's mature tree stand in kerb pits.
+  - A street marked for both sides gets both kerbs when its carriageway is 8 m or more, else one row on alternate sides; two streets are planted on one side.
+  - None stand in the slums or the works (§28.1).
+
+Houses come next (step 6), so the passage and back-door counts are 0 for now. The people, the dogs, the mystic layer and the POI stages that C3 placed stay on its coordinates until step 8.
+
+Views: `Logs/SliceSurvey/c4_*` (top: `c4_city`, `c4_penny`, the districts; at eye height: `c4_eye_*`).

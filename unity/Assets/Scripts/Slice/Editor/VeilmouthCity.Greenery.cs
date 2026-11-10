@@ -18,10 +18,6 @@ namespace GameDev.Slice.EditorTools
     /// </summary>
     public static partial class VeilmouthCity
     {
-        // §26, the owner's choice: the pavements back as they were before §25.2 widened them, m, since the trees and
-        // lamps now stand on the carriageway.
-        private const float HighStreetWalk = 4f, ParadeWalk = 3f, ByelawWalk = 3f;
-
         // §26: a lamp's post 0.3 m out from the kerb onto the carriageway; a tree's pit flush on the kerb.
         private const float LampFromKerb = 0.3f, TreeFromKerb = VeilmouthPavements.PitSize / 2f;
 
@@ -81,48 +77,6 @@ namespace GameDev.Slice.EditorTools
         private static string GardenBush(Random rng) => GardenBushes[rng.Next(GardenBushes.Length)];
 
         // ------------------------------------------------------------------------------------------- street trees
-
-        /// <summary>
-        /// The street trees (§25.3, §26, §27), after the lamps and the shop goods: each in a square pit on the carriageway,
-        /// flush on the kerb, in the lamps' line; both kerbs of a wide street, one kerb of a narrow one. A street is its
-        /// kerbs' plan lines, the near one's carriageway toward +, the far one's toward − (none where its other side has
-        /// no row, as the Parade's villas).
-        /// </summary>
-        private static void StreetTrees()
-        {
-            var planted = 0;
-            var street = 0;
-            var oneSided = 0;
-            foreach (var (alongX, near, far, a0, a1) in new (bool, float, float?, int, int)[]
-                     {
-                         (true, 726f + HighStreetWalk, 744f - HighStreetWalk, 480, 778),
-                         (true, 668f + ParadeWalk, null, 480, 752),
-                         (false, 516f + ByelawWalk, 528f - ByelawWalk, 680, 726),
-                         (true, 772f + ByelawWalk, 784f - ByelawWalk, 480, 550),
-                         (true, 772f + ByelawWalk, 784f - ByelawWalk, 618, 701),
-                         (false, 516f + ByelawWalk, 528f - ByelawWalk, 744, 812),
-                         (false, 606f + ByelawWalk, 618f - ByelawWalk, 744, 812),
-                         (false, 701f + ByelawWalk, 713f - ByelawWalk, 744, 812),
-                     })
-            {
-                var both = far.HasValue && far.Value - near >= TwoRowsFrom;
-                var nearSide = !far.HasValue || both || street % 2 == 0;
-                oneSided += far.HasValue && !both ? 1 : 0;
-                if (nearSide)
-                {
-                    planted += TreeRow(alongX, near, 1, a0, a1);
-                }
-
-                if (far.HasValue && (both || !nearSide))
-                {
-                    planted += TreeRow(alongX, far.Value, -1, a0, a1);
-                }
-
-                street++;
-            }
-
-            Debug.Log($"[VeilmouthCity] street trees (§25.3, §26, §27.10): {planted} of the mature tree, each in its pit by the kerb; {oneSided} narrow streets planted on one side.");
-        }
 
         private static int TreeRow(bool alongX, float line, int side, int a0, int a1)
         {
@@ -192,42 +146,6 @@ namespace GameDev.Slice.EditorTools
             HedgeLine(false, x1, y0, y1, rng, force: true);
             Prop(rng.Next(3) == 0 ? "Poppy" : GardenBush(rng), Facing.N, x0 + 1 + rng.Next(Mathf.Max(1, x1 - x0 - 2)), y0 + 1 + rng.Next(Mathf.Max(1, y1 - y0 - 2)));
             Lawn(Rect(x0 + 0.4f, y0 + 0.4f, x1 - 0.4f, y1 - 0.4f), rng);
-        }
-
-        /// <summary>
-        /// Wardley Garden (§25.4): four hedged beds round a cross of paths, north to south between the gates (px 554–562)
-        /// and east to west between the benches (py 692–703); each bed holds one of the corner trees, the middle one gives
-        /// its place to the angel.
-        /// </summary>
-        private static void WardleyBeds(Random rng)
-        {
-            foreach (var (x0, y0) in new[] { (549, 687), (562, 687), (549, 703), (562, 703) })
-            {
-                HedgeBed(x0, y0, x0 + 5, y0 + 5, rng);
-            }
-        }
-
-        /// <summary>
-        /// The palace forecourt's parterre (§25.4): either side of the Crown axis's way a hedged bed of 8 × 10 m quartered
-        /// by a cross of hedge, clear of the lions (city plan §23), the corner trees and the gate's lamps.
-        /// </summary>
-        private static void Parterre(Random rng)
-        {
-            foreach (var x0 in new[] { 590, 626 })
-            {
-                const int y0 = 654, y1 = 664;
-                var x1 = x0 + 8;
-                HedgeLine(true, y0, x0, x1, rng, force: true);
-                HedgeLine(true, y1, x0, x1, rng, force: true);
-                HedgeLine(false, x0, y0, y1, rng, force: true);
-                HedgeLine(false, x1, y0, y1, rng, force: true);
-                HedgeLine(false, x0 + 4, y0, y1, rng, force: true);
-                HedgeLine(true, y0 + 5, x0, x1, rng, force: true);
-                foreach (var (qx, qy) in new[] { (x0, y0), (x0 + 4, y0), (x0, y0 + 5), (x0 + 4, y0 + 5) })
-                {
-                    Lawn(Rect(qx + 0.4f, qy + 0.4f, qx + 3.6f, qy + 4.6f), rng);
-                }
-            }
         }
 
         /// <summary>

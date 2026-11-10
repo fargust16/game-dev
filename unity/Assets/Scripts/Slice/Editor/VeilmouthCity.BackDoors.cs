@@ -49,7 +49,7 @@ namespace GameDev.Slice.EditorTools
                 entries.TryGetValue(source != null ? source : house.gameObject, out var entry);
                 var dwelling = street != null && VeilmouthDwellings.Classify(street, out _, out _);
                 var outward = Plan(marker.position + marker.forward) - Plan(marker.position);
-                var floor = house.position.y;
+                var floor = house.position.y + (_sunk.Contains(house) ? Sink : 0f);
                 if (own || !dwelling || entry == null || !OpensOnto(marker, outward, floor, entry.Stoop))
                 {
                     Blind(house, marker);
