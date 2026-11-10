@@ -250,6 +250,7 @@ namespace GameDev.Slice.EditorTools
             SliceMixamo.Person(WomanController, "Idle");
             SliceMixamo.Person(SliceMixamo.WardenController, "Attention");
             SliceMixamo.Person(SliceMixamo.WardenWomanController, "AttentionWoman");
+            SliceMixamo.Person(SliceMixamo.BlacksmithController, "Hammer");
             SliceMixamo.Person(SliceCharacterLook.PersonIdlePath, "Idle");
             Repoint(ManWalkerController, SliceMixamo.Get("Idle"), SliceMixamo.Get("Walk"));
             Repoint(WomanWalkerController, SliceMixamo.Get("Idle"), SliceMixamo.Get("Walk"));
@@ -409,8 +410,10 @@ namespace GameDev.Slice.EditorTools
         /// <summary>A standing look's idle: a Warden's at attention, a woman Warden's in the women's pose.</summary>
         private static string IdleUse(Look look) => look == Officer ? "Attention" : look == WardenWoman ? "AttentionWoman" : "Idle";
 
+        /// <summary>A standing look's controller: the Wardens' at attention, the blacksmith's hammering at the anvil (A3).</summary>
         private static string StandingController(Look look) =>
-            look == Officer ? SliceMixamo.WardenController : look == WardenWoman ? SliceMixamo.WardenWomanController : look.Female ? WomanController : ManController;
+            look == Officer ? SliceMixamo.WardenController : look == WardenWoman ? SliceMixamo.WardenWomanController :
+            look == Blacksmith ? SliceMixamo.BlacksmithController : look.Female ? WomanController : ManController;
 
         /// <summary>A loose copy of <paramref name="look"/>'s model under a root of its own, at its stature in the clip's first pose; the caller destroys the root.</summary>
         internal static Animator Fitted(Look look, AnimationClip clip)

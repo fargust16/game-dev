@@ -23,6 +23,9 @@ namespace GameDev.Slice.EditorTools
     /// 4 pistol; 5 rifle), the hit on Hit and the death while Down.</item>
     /// <item>The player's: the locomotion blend at Speed 0–3 (idle, walk, run, sprint), each clip sped to the player's
     /// pace, the jump, and the same fight.</item>
+    /// <item>The clips Mixamo lacks (A3: Mining, Chopping, Hammering, Surrender), made by
+    /// <c>tools/blender/animation/a3_clips.py</c> on the same armature and imported the same way from
+    /// <see cref="BlenderFolder"/>. The blacksmith hammers as its idle.</item>
     /// </list>
     /// </summary>
     public static class SliceMixamo
@@ -31,6 +34,10 @@ namespace GameDev.Slice.EditorTools
         public const string ControllerFolder = "Assets/Animation/Controllers";
         public const string WardenController = ControllerFolder + "/Warden.controller";
         public const string WardenWomanController = ControllerFolder + "/WardenWoman.controller";
+        public const string BlacksmithController = ControllerFolder + "/Blacksmith.controller";
+
+        /// <summary>The clips made in Blender (A3), one file a clip named by its use.</summary>
+        public const string BlenderFolder = "Assets/Animation/Blender";
         private const string Body = "human_body_3d_model@";
         private const string StillJump = "Jump Still In Place";
 
@@ -105,6 +112,15 @@ namespace GameDev.Slice.EditorTools
             ("GetUp", "Standing Up From The Ground", false),
         };
 
+        /// <summary>The clips Mixamo lacks, made in Blender by <c>tools/blender/animation/a3_clips.py</c> (A3), and whether each loops.</summary>
+        public static readonly (string Use, bool Loop)[] Made =
+        {
+            ("Mine", true),
+            ("Chop", true),
+            ("Hammer", true),
+            ("Yield", false),
+        };
+
         /// <summary>The still jump's three parts, cut from its file at the measured takeoff and landing.</summary>
         public static readonly string[] JumpParts = { "JumpUp", "JumpAir", "JumpLand" };
 
@@ -115,6 +131,11 @@ namespace GameDev.Slice.EditorTools
 
         public static string PathOf(string use)
         {
+            if (Made.Any(m => m.Use == use))
+            {
+                return $"{BlenderFolder}/{use}.fbx";
+            }
+
             var file = JumpParts.Contains(use) ? StillJump : Clips.FirstOrDefault(c => c.Use == use).File;
             return file == null ? null : $"{Folder}/{Body}{file}.fbx";
         }
@@ -126,7 +147,7 @@ namespace GameDev.Slice.EditorTools
             var clip = path == null ? null : AssetDatabase.LoadAllAssetsAtPath(path).OfType<AnimationClip>().FirstOrDefault(c => c.name == use);
             if (clip == null)
             {
-                throw new InvalidOperationException($"[SliceMixamo] no clip '{use}' in {path ?? "the table"}: import the Mixamo files first");
+                throw new InvalidOperationException($"[SliceMixamo] no clip '{use}' in {path ?? "the table"}: import the Mixamo and Blender files first");
             }
 
             return clip;
@@ -134,12 +155,15 @@ namespace GameDev.Slice.EditorTools
 
         // ------------------------------------------------------------------------------------------- import
 
-        /// <summary>Every file of the table imported as Humanoid with one clip named by its use; the still jump cut in three.</summary>
+        /// <summary>
+        /// Every file of the table and every Blender clip imported as Humanoid with one clip named by its use; the still
+        /// jump cut in three.
+        /// </summary>
         public static void Import(StringBuilder report)
         {
-            foreach (var (use, file, loop) in Clips)
+            foreach (var (use, loop) in Clips.Select(c => (c.Use, c.Loop)).Concat(Made))
             {
-                var path = $"{Folder}/{Body}{file}.fbx";
+                var path = PathOf(use);
                 if (!(AssetImporter.GetAtPath(path) is ModelImporter importer))
                 {
                     throw new InvalidOperationException($"[SliceMixamo] {use}: no file at {path}");
@@ -150,7 +174,7 @@ namespace GameDev.Slice.EditorTools
 
             CutJump(report);
             var broken = 0;
-            foreach (var use in Clips.Select(c => c.Use).Concat(JumpParts))
+            foreach (var use in Clips.Select(c => c.Use).Concat(JumpParts).Concat(Made.Select(m => m.Use)))
             {
                 var clip = Get(use);
                 var curves = AnimationUtility.GetCurveBindings(clip).Count(b => b.type == typeof(Animator));

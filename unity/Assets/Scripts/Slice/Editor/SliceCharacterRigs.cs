@@ -207,11 +207,13 @@ namespace GameDev.Slice.EditorTools
 
         /// <summary>
         /// The Mixamo clips every person is posed in before they are wired (ANIMATION_PIPELINE_PLAN.md §7): the idle, the
-        /// walk at mid-stride, the talk, a sword's blow, the rifle's aim and the end of a death.
+        /// walk at mid-stride, the talk, a sword's blow, the rifle's aim and the end of a death; and the Blender clips
+        /// (A3): the pick striking the ground, the axe drawn back, the hammer raised and the end of a surrender.
         /// </summary>
         private static readonly (string Use, float At)[] Poses =
         {
             ("Idle", 0.5f), ("Walk", 0.25f), ("Talk", 0.5f), ("SwordSlash", 0.45f), ("RifleIdle", 0.5f), ("Die", 0.97f),
+            ("Mine", 0.23f), ("Chop", 0f), ("Hammer", 0f), ("Yield", 1f),
         };
 
         [MenuItem("GameDev/Slice/People/Check the Tripo People's Rigs")]

@@ -61,12 +61,14 @@ namespace GameDev.Slice.Tests
 
         /// <summary>
         /// A standing person's controller plays the Mixamo clips (ANIMATION_PIPELINE_PLAN.md A1–A2): its idle, the talk
-        /// while Talking, and the fight's guard, blow, hit and death, every clip Humanoid and from the Mixamo folder.
+        /// while Talking, and the fight's guard, blow, hit and death, every clip Humanoid and from the Mixamo folder or,
+        /// for the blacksmith's hammering, the Blender folder (A3).
         /// </summary>
         [TestCase(SlicePeopleModels.ManController, "Idle")]
         [TestCase(SlicePeopleModels.WomanController, "Idle")]
         [TestCase(SliceMixamo.WardenController, "Attention")]
         [TestCase(SliceMixamo.WardenWomanController, "AttentionWoman")]
+        [TestCase(SliceMixamo.BlacksmithController, "Hammer")]
         public void AStandingPersonTalksAndFightsInTheMixamoClips(string path, string idle)
         {
             var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
@@ -82,12 +84,35 @@ namespace GameDev.Slice.Tests
             foreach (var clip in controller.animationClips)
             {
                 Assert.IsTrue(clip.humanMotion, $"{clip.name} is Humanoid");
-                StringAssert.StartsWith(SliceMixamo.Folder + "/", AssetDatabase.GetAssetPath(clip), $"{clip.name} is a Mixamo clip");
+                var clipPath = AssetDatabase.GetAssetPath(clip);
+                Assert.IsTrue(clipPath.StartsWith(SliceMixamo.Folder + "/") || clipPath.StartsWith(SliceMixamo.BlenderFolder + "/"), $"{clip.name} is a Mixamo or Blender clip: {clipPath}");
             }
 
             var guard = (BlendTree)states["Fight"].motion;
             Assert.AreEqual("Weapon", guard.blendParameter);
             CollectionAssert.AreEqual(new[] { 1f, 2f, 3f, 4f, 5f }, guard.children.Select(c => c.threshold).ToArray(), "one guard a weapon kind");
+        }
+
+        /// <summary>
+        /// The clips Mixamo lacks, made in Blender (A3): each Humanoid with muscle curves, from the Blender folder, a cycle
+        /// looping and the surrender held; the blacksmith at the anvil hammers.
+        /// </summary>
+        [Test]
+        public void TheBlenderClipsAreHumanoidAndTheBlacksmithHammers()
+        {
+            foreach (var (use, loop) in SliceMixamo.Made)
+            {
+                var clip = SliceMixamo.Get(use);
+                Assert.IsTrue(clip.humanMotion, $"{use} is Humanoid");
+                Assert.Greater(AnimationUtility.GetCurveBindings(clip).Count(b => b.type == typeof(Animator)), 90, $"{use} has its muscle curves");
+                Assert.AreEqual($"{SliceMixamo.BlenderFolder}/{use}.fbx", AssetDatabase.GetAssetPath(clip));
+                Assert.AreEqual(loop, clip.isLooping, $"{use} loops: {loop}");
+            }
+
+            var blacksmith = AssetDatabase.LoadAssetAtPath<GameObject>(SlicePeopleModels.Blacksmith.Standing);
+            Assert.IsNotNull(blacksmith, SlicePeopleModels.Blacksmith.Standing);
+            var controller = blacksmith.GetComponentInChildren<Animator>(true).runtimeAnimatorController;
+            Assert.AreEqual(SliceMixamo.BlacksmithController, AssetDatabase.GetAssetPath(controller), "the blacksmith's controller");
         }
 
         /// <summary>The owner's female Warden and the player's two bodies (owner, 2026-11-10; asset map §1).</summary>
