@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4, C5)
 
-Version: 0.60
+Version: 0.61
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§29.9: the frame's holder measured in a development build: the main thread holds it, 2.1 ms plus 0.37 ms for every thousand draw calls, the render thread waits for it, shadows take 22–29 % of a city view; §29.7's render-thread reading refuted; the budget and the next lever open. Earlier: §29.7–§29.8: the GPU Resident Drawer measured with the kit's shaders made DOTS-ready, 97 % of renderers taken, −8 % of a build's frame and +237 % in the editor, the frame bound by the CPU, the drawer left off; C5's cold load 10.39 s in the editor)
+Last Updated: 2026-11-10 (§29.10: the owner's frame budget of 16.7 ms and the merged far LOD for each house type, designed: one mesh a type built in place, the switch at 50 m with no cross-fade, the panes' rooms in the mesh, a sync for the houses the city changed. Earlier: §29.9: the frame's holder measured in a development build: the main thread holds it, 2.1 ms plus 0.37 ms for every thousand draw calls, the render thread waits for it, shadows take 22–29 % of a city view; §29.7's render-thread reading refuted; the budget and the next lever open)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -2038,3 +2038,41 @@ A third mode turns the camera's shadows off. The views, the build and the rounds
   - (b) each house's pieces merged at every distance. The *Kit houses* rule of the record forbids it, so only the owner can open it.
   - (e) SSAO without its prepass: after the opaques, from depth. It changes the grade, so it is measured first.
 - **The agent leans to (c) with the part of (d) that keeps the look,** each measured with `FrameProbe` before and after, once the owner sets the budget.
+
+## 29.10 The frame budget and the merged far LOD, 2026-11-10
+
+**The owner's decision** (2026-11-10, after §29.9):
+
+- **The frame budget is 16.7 ms**, which is 60 frames a second. It is measured by `FrameProbe` in the development build, at 1920 × 1080, on High quality, on the owner's machine.
+- **The merged far LOD for each house type is built.** §28.1 item 17 allowed it once the budget is not met, and the budget is not met: as the game ships, the long views take 20–29 ms.
+- **Its shadows are part of it,** as far as they keep the look (§29.9 (d)).
+
+**Reading of the budget** (the agent's, an authoring default): every one of `FrameProbe`'s seven views keeps its median frame within 16.7 ms. A pooled median would hide the long views.
+
+**The far LOD** (the agent's design, authoring defaults; `VeilmouthFarLod`):
+
+1. **One far LOD per house type,** built in place in the 67 baked prefabs of `VeilmouthKitHouses`, as `RedressAll` builds the rooms. A bake would give every piece a new file ID, and the city's overrides find the pieces by their IDs. The far LOD is a child of the house's Model, named `FarLod`.
+2. **What it is.** One mesh for the type, with one submesh for each material. It is drawn by one renderer for each shadow setting: the pieces that cast shadows, and the glass, which casts none. Its geometry is the kit's own: every piece's mesh, baked into the Model's space, with the same materials. Nothing is simplified, atlased or made new.
+3. **What it leaves out:**
+   - the Details, which keep their own LOD group and fade (R2 step 2);
+   - the rooms, which keep their own distance switch.
+4. **The switch.** A second LOD group stands on the house's root:
+   - LOD0 holds the pieces the far LOD holds;
+   - LOD1 is the far LOD, and it is never culled.
+
+   The switch comes at 50 m (authoring default), set for each type from its own size with the camera's 60° view. 50 m lies beyond the built rooms' 46 m, so a far house is a shell, as its rooms are already off. The switch has no cross-fade. Both levels draw the same geometry with the same materials, so the swap cannot be seen, and the window glass has no cross-fade. With no animated cross-fade, the group also stays open to the GPU Resident Drawer (§29.7).
+5. **Windows.** A pane finds its built room through its renderer's user value (`VicWindowRooms`), and one renderer for a whole house has one value. So the far mesh carries each pane's room in its third UV channel, as two 16-bit halves. The window shader reads that value where it is not zero, and the renderer's own value elsewhere, so every pane keeps its far look.
+6. **The scene.** After placing the houses, the city changed some of them:
+   - strange glass on four houses (`VeilmouthMystic`);
+   - walled-up back doors (`VeilmouthCity.BackDoors`);
+   - hidden stoop rails (`SinkStoops`).
+
+   Rails are Details, so they are not in the far LOD. For every other house that differs from its type, a sync over Veilmouth handles the far LOD:
+   - where only materials differ, the house keeps the type's mesh, with its own materials mapped;
+   - where pieces differ, the house gets a far mesh of its own, built from its own active pieces;
+   - either way, its LOD0 is set from its own pieces.
+
+   The sync runs once, at the owner's request, and the scene is saved.
+7. **Shadows** (the look-keeping part of §29.9 (d)): a far house casts its shadow through its far LOD's one renderer instead of through its pieces. The Details keep their own shadows.
+8. **Memory.** The far LOD is not static for batching, so each type's mesh stays shared by all its houses. Its memory is reported when it is built.
+9. **Checks.** Tests check that the far LOD holds every triangle of the pieces it replaces, with the same materials, and that panes keep their rooms. Views at the switch distance, before and after, check the look. `FrameProbe` measures the frame before and after.
