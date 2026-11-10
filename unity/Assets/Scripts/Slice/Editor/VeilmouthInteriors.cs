@@ -1051,11 +1051,18 @@ namespace GameDev.Slice.EditorTools
         /// Batch: the Tripo wrappers (built by Load where missing), the seven enriched, the Dwellings' kit written again,
         /// and their pictures. -executeMethod GameDev.Slice.EditorTools.VeilmouthInteriors.EnrichAndRender
         /// </summary>
+        /// <summary>
+        /// The wrappers changed in place by the furnishing rules' §11 (owner's walk, 2026-11-10): the desks, the radiator,
+        /// the kitchen table, the candle stand and the nightstands at their true sizes ×1.2. A batch that also builds the city
+        /// rebuilds them first: a measuring Load writes a missing wrapper under its new size's name, and the old one, which
+        /// the scenes hold, would then stay beside it. (The street lamp's wrapper is left alone: the city's lamps carry
+        /// overrides on its model.)
+        /// </summary>
+        public static readonly string[] Resized = { "TrDesk", "TrRadiator", "ViKitchenTable", "ViStandLamp", "ViDesk", "ViNightstand", "ViNightstandPoor" };
+
         public static void EnrichAndRender()
         {
-            // The wrappers changed in place by the owner's new Tripo pieces (2026-11-10): the desk's inkstand and magnifier,
-            // the street lamp's new model with its glass, and the radiator off the wall on its brackets.
-            SliceKitCatalogue.LoadRebuilding("TrDesk", "LampPost", "TrRadiator");
+            SliceKitCatalogue.LoadRebuilding(Resized);
             EnrichWithTripo();
             VeilmouthDwellings.BuildKit(SliceKitCatalogue.Load());
             VeilmouthRenders.RenderInteriors();

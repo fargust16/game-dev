@@ -199,9 +199,9 @@ namespace GameDev.Slice.EditorTools
             _backs = new List<(Facing, float, int, int, int)>();
             _fenced = new HashSet<(bool, float, int, int)>();
             _stepsClear = float.MaxValue;
-            _lampsAt.Clear();
+            _lampsDropped = 0;
             _postsAt.Clear();
-            _postsAdded = _postsHidden = 0;
+            _postsAdded = _postsHidden = _railingsDrawnOut = 0;
             _pavements = null;
             _passages = 0;
             _openSpans = 0;
@@ -249,10 +249,13 @@ namespace GameDev.Slice.EditorTools
                 Circle(World(c.x, c.y, Up(Ground(c.x, c.y))), c.name);
             }
 
-            _parent = Group("Lamps");
+            var lampGroup = Group("Lamps");
+            _parent = lampGroup;
             LampsC4();
             _parent = Group("Street Trees");
             StreetTreesC4();
+            _parent = lampGroup;
+            SquareLamps();
             _parent = Group("Parks");
             Parks();
             _parent = Group("Yards");
@@ -272,7 +275,7 @@ namespace GameDev.Slice.EditorTools
                       $"({built.Slabs} whole slabs), {built.KerbLength:0} m of kerb, {built.Pits} tree pits; " +
                       $"{_pavements.Carried} carriageway ends carried on, {_pavements.Fillets} rounded corners. " +
                       $"Passages (R5): {_passages} left between houses, {_openSpans} spans with no house, {Slots()} gaps under {PassageWidth} m in a row. " +
-                      $"Back doors: {_backDoorsOpen} open, {_backDoorsBlind} walled up. Railing posts: {_postsAdded} added at free ends, {_postsHidden} hidden at houses.");
+                      $"Back doors: {_backDoorsOpen} open, {_backDoorsBlind} walled up. Railing posts: {_postsAdded} added at free ends, {_postsHidden} hidden at walls; {_railingsDrawnOut} railing ends drawn out to a wall (§31).");
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Report();
@@ -1269,54 +1272,159 @@ namespace GameDev.Slice.EditorTools
         }
 
         private static readonly List<Vector2> _postsAt = new List<Vector2>();
-        private static int _postsAdded, _postsHidden;
+        private static int _postsAdded, _postsHidden, _railingsDrawnOut;
+
+        /// <summary>Authoring default, m (§31): a railing's end this near a wall along its line is drawn out to meet it.</summary>
+        private const float RailingReach = 1.6f;
 
         /// <summary>
-        /// The owner's fifth play test (2026-11-09): a railing's posts stand where a run ends free, at a gate, a gap or a
-        /// corner, and never at an end against a house, which its bare end abuts. The kit's module carries one post, at
-        /// one end: a free end with none gets a copy of its neighbour's post, unless a post of another run already stands
-        /// there, and a post at a house is hidden.
+        /// The owner's fifth play test (2026-11-09) and walk (2026-11-10, §31): a railing's posts stand where a run ends
+        /// free, at a gate, a gap or a corner; an end with a wall within <see cref="RailingReach"/> m along its line is drawn
+        /// out to meet it (<see cref="DrawOut"/>), and its bare end abuts the wall with no post. The wall is read from the
+        /// colliders, not the plots, which reach past a house's face. The kit's module carries one post, at one end: a free
+        /// end with none gets a copy of its neighbour's post, unless a post of another run already stands there.
         /// </summary>
         private static void RailingEnds(List<GameObject> run, bool alongX, float line, int from, int to)
         {
-            var posts = run.SelectMany(g => g.GetComponentsInChildren<Renderer>(true)).Where(r => r.name.StartsWith("Fence column")).ToList();
-            if (posts.Count == 0)
+            if (run.Count == 0 || Posts(run).Count == 0)
             {
                 return;
             }
 
-            foreach (var (end, beyond) in new[] { (from, -1), (to, 1) })
+            Physics.SyncTransforms();
+
+            // The post a free end copies, taken before any is hidden: a run of one module whose only post stood at its wall
+            // end still gets a post at its free end (§31, the owner's walk).
+            var template = Posts(run)[0];
+            var templateAt = Plan(template.bounds.center);
+            var templatePosition = template.transform.position;
+            foreach (var (end, beyond, module) in new[] { (from, -1, run[0]), (to, 1, run[run.Count - 1]) })
             {
                 var p = alongX ? new Vector2(end, line) : new Vector2(line, end);
-                var near = posts.Where(r => r.gameObject.activeSelf && (Plan(r.bounds.center) - p).magnitude < 0.45f).ToList();
-                float b0 = beyond < 0 ? end - 0.5f : end, b1 = beyond < 0 ? end : end + 0.5f;
-                var probe = alongX ? Rect(b0, line - 0.4f, b1, line + 0.4f) : Rect(line - 0.4f, b0, line + 0.4f, b1);
-                if (_houses.Any(h => Overlap(h, probe)))
+                var dir = alongX ? new Vector3(beyond, 0f, 0f) : new Vector3(0f, 0f, -beyond);
+                var gap = WallAhead(World(p.x, p.y, Ground(p.x, p.y) + 0.5f) - (dir * 0.05f), dir, RailingReach + 0.05f) - 0.05f;
+                var posts = Posts(run);
+                if (gap < RailingReach)
                 {
-                    foreach (var r in near)
+                    if (gap > 0.02f)
+                    {
+                        DrawOut(module, dir, gap);
+                        _railingsDrawnOut++;
+                    }
+
+                    var at = p + (new Vector2(dir.x, -dir.z) * Mathf.Max(gap, 0f));
+                    foreach (var r in Posts(run).Where(r => (Plan(r.bounds.center) - at).magnitude < 0.45f))
                     {
                         r.gameObject.SetActive(false);
                         _postsHidden++;
                     }
-                }
-                else if (near.Count == 0 && !_postsAt.Any(q => (q - p).sqrMagnitude < 0.35f * 0.35f))
-                {
-                    var nearest = posts.Where(r => r.gameObject.activeSelf).OrderBy(r => (Plan(r.bounds.center) - p).sqrMagnitude).FirstOrDefault();
-                    if (nearest == null)
-                    {
-                        continue;
-                    }
 
-                    var at = Plan(nearest.bounds.center);
+                    // The bars stopped at the hidden post's inner face: drawn out again until they meet the wall.
+                    var bars = module.GetComponentsInChildren<Renderer>(false).Where(r => !r.name.StartsWith("Fence column")).ToList();
+                    if (bars.Count > 0)
+                    {
+                        Physics.SyncTransforms();
+                        var front = bars.Max(r => Vector3.Dot(r.bounds.center, dir) + (Mathf.Abs(Vector3.Dot(r.bounds.size, dir)) / 2f));
+                        var barsEnd = World(p.x, p.y, Ground(p.x, p.y) + 0.5f);
+                        barsEnd += dir * (front - Vector3.Dot(barsEnd, dir));
+                        var rest = WallAhead(barsEnd - (dir * 0.05f), dir, 0.6f) - 0.05f;
+                        if (rest > 0.01f && rest < 0.55f)
+                        {
+                            DrawOut(module, dir, rest);
+                        }
+                    }
+                }
+                else if (!posts.Any(r => (Plan(r.bounds.center) - p).magnitude < 0.45f) && !_postsAt.Any(q => (q - p).sqrMagnitude < 0.35f * 0.35f))
+                {
+                    var nearest = posts.OrderBy(r => (Plan(r.bounds.center) - p).sqrMagnitude).FirstOrDefault() ?? template;
+                    var at = nearest == template ? templateAt : Plan(nearest.bounds.center);
+                    var from3 = nearest == template ? templatePosition : nearest.transform.position;
                     var copy = UnityEngine.Object.Instantiate(nearest.gameObject, nearest.transform.parent);
                     copy.name = nearest.name + " (end)";
-                    copy.transform.position = nearest.transform.position + World(p.x, p.y, Ground(p.x, p.y) - Ground(at.x, at.y)) - World(at.x, at.y, 0f);
-                    posts.Add(copy.GetComponent<Renderer>());
+                    copy.SetActive(true);
+                    copy.transform.position = from3 + World(p.x, p.y, Ground(p.x, p.y) - Ground(at.x, at.y)) - World(at.x, at.y, 0f);
                     _postsAdded++;
                 }
             }
 
-            _postsAt.AddRange(posts.Where(r => r.gameObject.activeSelf).Select(r => Plan(r.bounds.center)));
+            _postsAt.AddRange(Posts(run).Select(r => Plan(r.bounds.center)));
+        }
+
+        /// <summary>A run's posts that stand: the kit's "Fence column" renderers, active.</summary>
+        private static List<Renderer> Posts(List<GameObject> run) =>
+            run.SelectMany(g => g.GetComponentsInChildren<Renderer>(false)).Where(r => r.name.StartsWith("Fence column")).ToList();
+
+        /// <summary>
+        /// The distance to the first wall along a level ray: a collider at least 1.5 m high, upright, that is no street
+        /// furniture and no tree; infinity when none within <paramref name="reach"/>.
+        /// </summary>
+        private static float WallAhead(Vector3 from, Vector3 dir, float reach)
+        {
+            var best = float.PositiveInfinity;
+            foreach (var h in Physics.RaycastAll(from, dir, reach, ~0, QueryTriggerInteraction.Ignore))
+            {
+                var block = h.collider.GetComponentInParent<KitBlock>();
+                if (Mathf.Abs(h.normal.y) > 0.3f || h.collider.bounds.size.y < 1.5f ||
+                    (block != null && (block.name.StartsWith("Kit_Street_") || block.name.StartsWith("Kit_Tree_"))))
+                {
+                    continue;
+                }
+
+                best = Mathf.Min(best, h.distance);
+            }
+
+            return best;
+        }
+
+        /// <summary>
+        /// A railing's end module drawn out by <paramref name="gap"/> m along <paramref name="dir"/> to meet a wall (§31):
+        /// its model stretched along the run, its posts keeping their width, its other end where it was, the block on its
+        /// cell. At most 1.6 m on a 2 m module, so its bars stand at most 1.8 times as far apart.
+        /// </summary>
+        private static void DrawOut(GameObject module, Vector3 dir, float gap)
+        {
+            var model = module.transform.Find("Model");
+            var rs = model == null ? new Renderer[0] : model.GetComponentsInChildren<Renderer>();
+            if (rs.Length == 0)
+            {
+                return;
+            }
+
+            Bounds Seen()
+            {
+                var b = rs[0].bounds;
+                foreach (var r in rs)
+                {
+                    b.Encapsulate(r.bounds);
+                }
+
+                return b;
+            }
+
+            float Back(Bounds b) => Vector3.Dot(b.center, dir) - (Mathf.Abs(Vector3.Dot(b.size, dir)) / 2f);
+            var before = Seen();
+            var length = Mathf.Abs(Vector3.Dot(before.size, dir));
+            var k = (length + gap) / length;
+            var scale = model.localScale;
+            scale[Axis(model, dir)] *= k;
+            model.localScale = scale;
+            foreach (var post in model.GetComponentsInChildren<Renderer>(true).Where(r => r.name.StartsWith("Fence column")))
+            {
+                var s = post.transform.localScale;
+                s[Axis(post.transform, dir)] /= k;
+                post.transform.localScale = s;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(post.transform);
+            }
+
+            model.position += dir * (Back(before) - Back(Seen()));
+            PrefabUtility.RecordPrefabInstancePropertyModifications(model);
+        }
+
+        /// <summary>The index of a transform's local axis that lies nearest a world direction.</summary>
+        private static int Axis(Transform t, Vector3 dir)
+        {
+            float x = Mathf.Abs(Vector3.Dot(t.right, dir)), y = Mathf.Abs(Vector3.Dot(t.up, dir)), z = Mathf.Abs(Vector3.Dot(t.forward, dir));
+            return x >= y && x >= z ? 0 : y >= z ? 1 : 2;
         }
 
         private static string[] Keys(string type, params string[] facades) => facades.Select(f => VictorianHouses.Key(type, f)).ToArray();
@@ -1483,8 +1591,6 @@ namespace GameDev.Slice.EditorTools
 
         // ------------------------------------------------------------------------------------------- lamps
 
-        private static readonly List<Vector2> _lampsAt = new List<Vector2>();
-
         /// <summary>
         /// A row of lamps by the kerb on the plan line <paramref name="line"/>, its carriageway on the side
         /// <paramref name="side"/> (+1 toward the greater coordinate); with side 0, in the cell past the line instead.
@@ -1507,7 +1613,8 @@ namespace GameDev.Slice.EditorTools
                     }
 
                     // The door's 8 m reach counts to the lamp's centre.
-                    if (_doors.Any(d => Mathf.Abs((alongX ? d.At.y : d.At.x) - across) < 8.5f && Mathf.Abs((alongX ? d.At.x : d.At.y) - along) < 2.2f))
+                    if (_doors.Any(d => Mathf.Abs((alongX ? d.At.y : d.At.x) - across) < 8.5f && Mathf.Abs((alongX ? d.At.x : d.At.y) - along) < 2.2f) ||
+                        !LampRoom(c, null, 0, alongX, side != 0))
                     {
                         continue;
                     }
@@ -1517,7 +1624,7 @@ namespace GameDev.Slice.EditorTools
                         : OnCarriageway("LampPost", c, 1f);
                     if (placed != null)
                     {
-                        _lampsAt.Add(c);
+                        _lamps.Add((c, null, 0));
                         break;
                     }
                 }
@@ -1592,8 +1699,17 @@ namespace GameDev.Slice.EditorTools
             if (!key.StartsWith("CityTree_"))
             {
                 var p = go.transform.position;
-                // On the kit's 0.1 m height step, its foot sunk at most that much into the carriageway.
-                go.transform.position = new Vector3(p.x, Mathf.Floor((Ground(c.x, c.y) * 10f) + 0.02f) / 10f, p.z);
+                // The block on the kit's 0.1 m height step; what is seen stands on the carriageway itself. Left on the step, a
+                // lamp's foot sank up to 0.1 m into the setts (§31, the owner's walk: lamps stuck in the paving).
+                var ground = Ground(c.x, c.y);
+                var step = Mathf.Floor((ground * 10f) + 0.02f) / 10f;
+                go.transform.position = new Vector3(p.x, step, p.z);
+                var seen = go.transform.Find("Model");
+                if (seen != null && ground - step > 0.001f)
+                {
+                    seen.position += Vector3.up * (ground - step);
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(seen);
+                }
             }
 
             return go;
@@ -1714,12 +1830,16 @@ namespace GameDev.Slice.EditorTools
                     var start = p.V.Count;
                     var corners = new[] { c - du - dv, c + du - dv, c + du + dv, c - du + dv };
                     var uvs = new[] { new Vector2(0f, 0f), new Vector2(su, 0f), new Vector2(su, sv), new Vector2(0f, sv) };
+                    // §31 (owner's walk, 2026-11-10): the texture laid in the world's own frame, so boxes side by side read as
+                    // one length of stone, with no joint where one ends.
+                    var wu = rotation * u;
+                    var wv = rotation * v;
                     for (var k = 0; k < 4; k++)
                     {
                         var world = centre + (rotation * corners[k]);
                         p.V.Add(world);
                         p.N.Add(rotation * n);
-                        p.UV.Add(uvs[k] / 2.5f);
+                        p.UV.Add(new Vector2(Vector3.Dot(world, wu), Vector3.Dot(world, wv)) / 2.5f);
                     }
 
                     p.I.AddRange(new[] { start, start + 2, start + 1, start, start + 3, start + 2 });

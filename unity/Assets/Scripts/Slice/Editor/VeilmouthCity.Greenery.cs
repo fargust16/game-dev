@@ -18,12 +18,22 @@ namespace GameDev.Slice.EditorTools
     /// </summary>
     public static partial class VeilmouthCity
     {
-        // §26: a lamp's post 0.3 m out from the kerb onto the carriageway; a tree's pit flush on the kerb.
-        private const float LampFromKerb = 0.3f, TreeFromKerb = VeilmouthPavements.PitSize / 2f;
+        // §26, §31: a lamp's post LampFromKerb m out from the kerb onto the carriageway, its base clear of the kerb: the
+        // owner's lamp's base reaches 0.366 m from its axis in its lowest 0.3 m (measured, VeilmouthWalkAudit), with
+        // 0.084 m to spare (authoring default). A tree's pit flush on the kerb.
+        private const float LampFromKerb = 0.45f, TreeFromKerb = VeilmouthPavements.PitSize / 2f;
 
-        // §25.3: a street tree about every 11 m, at least 4 m from a lamp, never within 2.5 m along of a door that
-        // stands up to 12 m across, nor within 6 m of an alley's or a lane's mouth.
-        private const float TreeSpacing = 11f, TreeFromLamp = 4f, TreeDoorAlong = 2.5f, TreeDoorAcross = 12f, LaneMouth = 6f;
+        // §31 (owner's walk, 2026-11-10), authoring defaults unless marked: a lamp in the middle of each bay of about
+        // 30 m on a kerb's run (Victorian gas lamps stood 25-35 m apart), moved at most 3 m to a party wall or off a
+        // door; no two lamps within 12 m but a wide street's opposite pair; no lamp nearer a road tree's trunk than its
+        // crown's reach, 6.15 m (measured), and 0.35 m more; off a kerb, no lamp within 2 m of a house; a kerb run under
+        // 8 m has no lamp, one under 6 m no tree; road trees at least 8 m apart.
+        private const float Bay = 30f, LampShift = 3f, LampFromLamp = 12f, LampFromTree = 6.5f, LampFromWall = 2f, MinLampRun = 8f, MinTreeRun = 6f,
+            TreeFromTree = 8f;
+
+        // §25.3: no street tree within 2.5 m along of a door that stands up to 12 m across, nor within 6 m of an alley's
+        // or a lane's mouth.
+        private const float TreeDoorAlong = 2.5f, TreeDoorAcross = 12f, LaneMouth = 6f;
 
         // §25.4: one grass clump in each 2 × 2 m of a garden's earth.
         private const int LawnStep = 2;
@@ -74,34 +84,46 @@ namespace GameDev.Slice.EditorTools
 
         // ------------------------------------------------------------------------------------------- street trees
 
+        /// <summary>
+        /// A kerb's road trees (§31): on each run, two in each bay, a quarter of the bay either side of its middle, each
+        /// moved at most 2 m to a clear metre: off a door's and a lane's way, a crown's reach from every lamp and 8 m
+        /// from the next tree.
+        /// </summary>
         private static int TreeRow(bool alongX, float line, int side, int a0, int a1)
         {
-            var last = float.MinValue;
             var planted = 0;
             var across = line + (side * TreeFromKerb);
-            for (var at = a0 + 1; at < a1 - 1; at++)
+            foreach (var run in KerbRunsOf(alongX, line, side, a0, a1).Where(r => r.R1 - r.R0 >= MinTreeRun))
             {
-                var along = at + 0.5f;
-                if (along - last < TreeSpacing)
+                var (count, bay) = Bays(run);
+                for (var i = 0; i < count; i++)
                 {
-                    continue;
-                }
+                    foreach (var f in new[] { 0.25f, 0.75f })
+                    {
+                        var station = run.R0 + (bay * (i + f));
+                        foreach (var shift in new[] { 0, 1, -1, 2, -2 })
+                        {
+                            var along = Mathf.Floor(station) + 0.5f + shift;
+                            var c = alongX ? new Vector2(along, across) : new Vector2(across, along);
+                            if (along < run.R0 + 1f || along > run.R1 - 1f || !KerbRuns(alongX, line, side, along, TreeFromKerb + 0.1f) ||
+                                _lamps.Any(l => (l.C - c).sqrMagnitude < LampFromTree * LampFromTree) ||
+                                _roadTrees.Any(t => (t - c).sqrMagnitude < TreeFromTree * TreeFromTree) ||
+                                _doors.Any(d => Mathf.Abs((alongX ? d.At.y : d.At.x) - across) < TreeDoorAcross &&
+                                                Mathf.Abs((alongX ? d.At.x : d.At.y) - along) < TreeDoorAlong) ||
+                                _lanes.Any(l => l.Use == Use.Road && !l.Carriage && !l.PaintOnly && Overlap(l.Quad, Rect(c.x - LaneMouth, c.y - LaneMouth, c.x + LaneMouth, c.y + LaneMouth))))
+                            {
+                                continue;
+                            }
 
-                var c = alongX ? new Vector2(along, across) : new Vector2(across, along);
-                if (!KerbRuns(alongX, line, side, along, TreeFromKerb + 0.1f) ||
-                    _lampsAt.Any(l => (l - c).sqrMagnitude < TreeFromLamp * TreeFromLamp) ||
-                    _doors.Any(d => Mathf.Abs((alongX ? d.At.y : d.At.x) - across) < TreeDoorAcross &&
-                                    Mathf.Abs((alongX ? d.At.x : d.At.y) - along) < TreeDoorAlong) ||
-                    _lanes.Any(l => l.Use == Use.Road && !l.Carriage && !l.PaintOnly && Overlap(l.Quad, Rect(c.x - LaneMouth, c.y - LaneMouth, c.x + LaneMouth, c.y + LaneMouth))))
-                {
-                    continue;
-                }
-
-                if (OnCarriageway(RoadTree, c, VeilmouthPavements.PitSize, RoadYaw(alongX, c)) != null)
-                {
-                    _pavements.Pit(c);
-                    last = along;
-                    planted++;
+                            if (OnCarriageway(RoadTree, c, VeilmouthPavements.PitSize, RoadYaw(alongX, c)) != null)
+                            {
+                                _pavements.Pit(c);
+                                _roadTrees.Add(c);
+                                planted++;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 

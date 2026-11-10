@@ -100,7 +100,10 @@ namespace GameDev.Slice.EditorTools
             yield return Set(T("TrDresser", "antique_wooden_dresser", 1.05f, Anchor.Back), Vi("Brush_1", 0.3f, 0.6f), Vi("Box_2", 0.72f, 0.6f));
             // The rich desk's inkstand and magnifying glass are the owner's of 2026-11-10 (rules §10), in the place of the
             // pack's ink and pen.
-            yield return Set(T("TrDesk", "antique_wooden_desk", 1.15f, Anchor.Back),
+            // §11 of the furnishing rules (owner's walk, 2026-11-10: the desk looked a toy beside the pack's chair): sized by
+            // its writing top, 0.91 m at game scale as the pack's tables' (a true desk's 0.76 m), which stands at 0.661 of its
+            // height with the gallery (measured, VeilmouthWalkAudit).
+            yield return Set(T("TrDesk", "antique_wooden_desk", 1.38f, Anchor.Back),
                 Tr("decorative_table_lamp", 0.14f, 0.6f), Tr("aged_parchment", 0.48f, 0.72f), Tr("ornate_ink_desk_3d_model_Clone1", 0.8f, 0.62f),
                 Tr("magnifying_glass", 0.62f, 0.8f));
             yield return T("TrMirror", "ornate_mirror", 2f, Anchor.Back);
@@ -150,7 +153,12 @@ namespace GameDev.Slice.EditorTools
             yield return Set(T("TrCabinetLamp", "antique_wooden_cabinet_3d_model_Clone1", 0.8f, Anchor.Back), Tr("decorative_table_lamp", 0.5f, 0.55f));
             yield return T("TrVaseOrnate", "ornate_vase", 0.9f);
             // On its brackets, 5 cm off the wall (authoring default): a window's frame stands 3.7 cm into the room (measured, kit check).
-            var radiator = T("TrRadiator", "ornate_radiator", 0.58f, Anchor.Back);
+            // §11 of the furnishing rules (owner's walk, 2026-11-10: it looked a toy): 0.64 m high, 4 cm under the lowest sill of
+            // the pack's windows (0.68 m, measured), and 0.95 m wide, a true column radiator's 0.8 m under a window; drawn out
+            // along its width alone (authoring defaults).
+            var radiator = T("TrRadiator", "ornate_radiator", 0.64f, Anchor.Back);
+            radiator.SizeX = 0.95f;
+            radiator.Uniform = false;
             radiator.Face = ViBack + 0.05f;
             yield return radiator;
             yield return T("TrUmbrellas", "decorative_vase_3d_model_Clone1", 0.72f);

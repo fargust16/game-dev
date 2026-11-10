@@ -219,8 +219,11 @@ namespace GameDev.Slice.EditorTools
             // The cells' fronts on the 3 m module: the owner's Tripo bars squeezed to 3 m at their own height, and the cell
             // door in their doorway (CellFront, as for the 4 m bars).
             var bars = S("ViCellBars", "ViStone", "CellBars", Tripo, "rusty_iron_gate_3d_model", st, Body.None, Anchor.Linear);
+            // Its size as built and seen by the owner, 2.41 m high and 0.35 m deep (measured): the 2.76 m once asked went to its
+            // depth while the catalogue scaled a turned model's axes wrongly, and is not wanted now (furnishing rules §11).
             bars.SizeX = ViModule;
-            bars.SizeY = 2.76f;
+            bars.SizeY = 2.41f;
+            bars.SizeZ = 0.35f;
             bars.Uniform = false;
             yield return bars;
             var cellDoor = S("ViCellDoor", "ViStone", "CellDoor", Tripo, "rusty_iron_jail_door_3d_model", ia, anchor: Anchor.Linear);
@@ -284,13 +287,27 @@ namespace GameDev.Slice.EditorTools
             yield return Back("ViMirrorTall", "Mirror_1");
             yield return Back("ViTowelRail", "Hanger_2");
             yield return Back("ViCounter", "Counter");
-            yield return Set(Back("ViDesk", "Table_6"),
+            // §11 of the furnishing rules (owner's walk, 2026-11-10): the desk's top stood 1.04 m at game scale, a true 0.87 m,
+            // under a gallery to 1.44 m (measured, VeilmouthWalkAudit). Its height alone is brought down by 0.91/1.04, so its top
+            // stands at the tables' 0.91 m; its 3.20 × 1.21 m footprint is kept, since a narrower desk moved inside its block
+            // and reached 0.05 m into Harrow's lab bench.
+            var desk = Back("ViDesk", "Table_6");
+            desk.SizeX = 3.2f;
+            desk.SizeY = 1.44f * 0.91f / 1.04f;
+            desk.SizeZ = 1.21f;
+            desk.Uniform = false;
+            yield return Set(desk,
                 ("Ink", 0.62f, 0.35f), ("Pen", 0.66f, 0.35f), ("Paper_1", 0.45f, 0.3f), ("Paper_2", 0.5f, 0.35f),
                 ("Book_1", 0.2f, 0.35f), ("Candle_2", 0.85f, 0.4f));
 
-            // Sets of the furnishing rules (G5, VI-6): small things on their pieces, never on the floor.
-            yield return Set(Back("ViNightstand", "Shelve_5"), ("Candle_1", 0.3f, 0.5f), ("Book_1", 0.7f, 0.5f));
-            yield return Set(Back("ViNightstandPoor", "Shelve_5"), ("Candle_2", 0.5f, 0.5f));
+            // Sets of the furnishing rules (G5, VI-6): small things on their pieces, never on the floor. §11: the pack's
+            // smallest cabinet stood 1.16 m as a nightstand, a true 0.97 m; scaled whole to the Tripo nightstand's 0.80 m.
+            var nightstand = Back("ViNightstand", "Shelve_5");
+            nightstand.Factor = 0.8f / 1.16f;
+            yield return Set(nightstand, ("Candle_1", 0.3f, 0.5f), ("Book_1", 0.7f, 0.5f));
+            var nightstandPoor = Back("ViNightstandPoor", "Shelve_5");
+            nightstandPoor.Factor = 0.8f / 1.16f;
+            yield return Set(nightstandPoor, ("Candle_2", 0.5f, 0.5f));
             yield return Set(Back("ViBasinSet", "Sink"), ("Soap", 0.15f, 0.5f), ("Brush_1", 0.85f, 0.5f));
             yield return Set(Back("ViBathSet", "Bathtub"), ("Sponge_1", 0.06f, 0.5f), ("Soap", 0.94f, 0.5f));
             yield return Set(Back("ViShelfWash", "Shelf_4"), ("Bottle_1", 0.3f, 0.5f), ("Brush_2", 0.7f, 0.5f));
@@ -311,7 +328,14 @@ namespace GameDev.Slice.EditorTools
                 ("Plate_1", 0.2f, 0.25f), ("Plate_1", 0.4f, 0.25f), ("Plate_1", 0.6f, 0.25f), ("Plate_1", 0.8f, 0.25f),
                 ("Plate_1", 0.2f, 0.75f), ("Plate_1", 0.4f, 0.75f), ("Plate_1", 0.6f, 0.75f), ("Plate_1", 0.8f, 0.75f),
                 ("Cup_1", 0.3f, 0.3f), ("Cup_1", 0.7f, 0.7f), ("Candle_3", 0.5f, 0.5f), ("Vase_1", 0.3f, 0.5f));
-            yield return Set(F("ViKitchenTable", "Table_5"),
+            // §11 of the furnishing rules (owner's walk, 2026-11-10): the kitchen table's top was 0.78 m at game scale, a true
+            // 0.65 m; raised to the other tables' 0.9 m, its footprint kept (measured, VeilmouthWalkAudit).
+            var kitchenTable = F("ViKitchenTable", "Table_5");
+            kitchenTable.SizeX = 2.68f;
+            kitchenTable.SizeY = 0.9f;
+            kitchenTable.SizeZ = 1.28f;
+            kitchenTable.Uniform = false;
+            yield return Set(kitchenTable,
                 ("Plate_2", 0.25f, 0.5f), ("Cup_2", 0.45f, 0.4f), ("Cup_1", 0.6f, 0.55f), ("Pot", 0.8f, 0.5f)); // the pack's knife stands on its edge and falls (VI-6)
             yield return F("ViTable", "Table_1");
             yield return F("ViTableB", "Table_2");
@@ -320,7 +344,10 @@ namespace GameDev.Slice.EditorTools
             yield return F("ViArmchair", "Chair_2");
             yield return F("ViFootstool", "Chair_Small");
             yield return F("ViCoatStand", "Hanger");
-            yield return F("ViStandLamp", "Holder");
+            // §11 of the furnishing rules: the pack's candle stand stood 3.29 m, a true 2.74 m; a torchère's 1.7 m true (authoring default).
+            var standLamp = F("ViStandLamp", "Holder");
+            standLamp.SizeY = 2.05f;
+            yield return standLamp;
             yield return F("ViPalm", "Plant_1");
             yield return F("ViPlant", "Plant_2");
             yield return F("ViPlantB", "Plant_3");

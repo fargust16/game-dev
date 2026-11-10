@@ -214,6 +214,19 @@ namespace GameDev.Slice.EditorTools
             RenderPeople();
         }
 
+        /// <summary>
+        /// Batch, after the city is built again: the people's looks, their paces, the blacksmith and the walkers' routes in
+        /// the slice's scenes, with the prefabs as they stand. -executeMethod GameDev.Slice.EditorTools.SlicePeopleModels.ScenesOnly
+        /// </summary>
+        public static void ScenesOnly()
+        {
+            var speeds = new[] { SliceTownsfolk.PrefabPath, SliceTownsfolk.WomanPrefabPath }.Concat(NewWalkers.Select(l => l.Walking))
+                .ToDictionary(p => p, p => AssetDatabase.LoadAssetAtPath<GameObject>(p).GetComponent<TownsfolkWalker>().Speed);
+            var report = new StringBuilder();
+            Scenes(speeds, report);
+            Debug.Log("[SlicePeopleModels] scenes:\n" + report);
+        }
+
         // ------------------------------------------------------------------------------------------- clips
 
         private static void StandInClips(StringBuilder report)

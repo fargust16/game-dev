@@ -39,6 +39,7 @@ Material:
     m_Floats:
     - _BumpScale: 0.6
     - _Cutoff: 0.5
+    - _FarLod: 0
     - _Grime: 0.35
     - _LitFraction: 1
     - _NightIntensity: 0.75

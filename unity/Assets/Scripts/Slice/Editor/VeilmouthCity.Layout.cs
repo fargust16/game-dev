@@ -41,6 +41,9 @@ namespace GameDev.Slice.EditorTools
         /// </summary>
         private const float Coping = 1.5f, CopingTop = Low + VeilmouthPavements.Kerb;
 
+        /// <summary>Authoring default, m (§31): stone under a bank's edge beside a kerb or a bridge's abutment, out from it.</summary>
+        private const float BankFill = 1.5f;
+
         private static Facing FacingOf(string f) => f switch { "N" => Facing.N, "E" => Facing.E, "S" => Facing.S, _ => Facing.W };
 
         private static int SurfaceLayer(string surface) => surface switch
@@ -86,7 +89,8 @@ namespace GameDev.Slice.EditorTools
         {
             foreach (var area in new[] { _layout.City, _layout.Works })
             {
-                _lanes.Add(new Lane { Street = "Yards", Quad = Rect(area.x0, area.y0, area.x1, area.y1), Layer = Cobbles, PaintOnly = true });
+                // Setts under all, so the corners the pavements round off at a junction read as the carriageway (§31).
+                _lanes.Add(new Lane { Street = "Yards", Quad = Rect(area.x0, area.y0, area.x1, area.y1), Layer = Setts, PaintOnly = true });
             }
 
             foreach (var b in _layout.blocks.Where(b => b.yard != null && b.yard.x1 > b.yard.x0))
@@ -151,7 +155,8 @@ namespace GameDev.Slice.EditorTools
                     Lanes(s.name, Flags, false, Band(s.c1 - s.walk1, s.c1), Use.Walk);
                 }
 
-                Lanes(s.name, SurfaceLayer(s.surface), s.walk0 > 0f || s.walk1 > 0f, Band(s.c0 + s.walk0, s.c1 - s.walk1), Use.Road);
+                // §31 (owner's walk, 2026-11-10): every carriageway in the one texture, the setts.
+                Lanes(s.name, s.surface == "grass" ? Grass : Setts, s.walk0 > 0f || s.walk1 > 0f, Band(s.c0 + s.walk0, s.c1 - s.walk1), Use.Road);
             }
 
             // Squint Lane at 45° (§12): setts, no pavements, run 2 m into the squares at its ends.
@@ -177,6 +182,9 @@ namespace GameDev.Slice.EditorTools
                     : _layout.streets.Where(s => !s.AlongX && s.c0 < mid && s.c1 > mid && s.a1 <= b.y0 + 0.01f).OrderBy(s => b.y0 - s.a1).FirstOrDefault();
                 var half = (street.c1 - street.walk1 - street.c0 - street.walk0) / 2f;
                 var (r0, r1) = onward != null ? (onward.c0 + onward.walk0, onward.c1 - onward.walk1) : (mid - half, mid + half);
+                // No wider than the bridge, so the pavement meets its parapet with no strip of ground between (§31).
+                var (bc0, bc1) = b.axis == "x" ? (b.y0, b.y1) : (b.x0, b.x1);
+                (r0, r1) = (Mathf.Max(r0, bc0), Mathf.Min(r1, bc1));
                 var quad = b.axis == "x"
                     ? Rect(b.x1 - 2f, r0, street.a0, r1)
                     : Rect(r0, street.c1 - street.walk1, r1, b.y0);
@@ -276,11 +284,18 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            // Along the south leg: the promenade's parapet on the city's side, a low kerb on the works' side.
+            // Along the south leg: the promenade's parapet on the city's side, one length between two bridges at the height
+            // of the bridges' own parapets, so no step and no joint shows (§31); a low kerb on the works' side, with stone
+            // under the bank's edge beyond it a little under the ground, so no slit of water shows between them (§31).
+            foreach (var (px0, px1) in Runs(city.x0 - 2f, sea, crossY))
+            {
+                Slab(px0, px1, south.y0 - 0.1f, south.y0 + 1.2f, VeilmouthGround.RiverBed - 0.5f, DeckTop + ParapetHeight);
+            }
+
             foreach (var (px0, px1) in Spans(city.x0 - 2f, sea, crossY))
             {
-                Slab(px0, px1, south.y0 - 0.1f, south.y0 + 1.2f, VeilmouthGround.RiverBed - 0.5f, Ground((px0 + px1) / 2f, south.y0 - 1f) + ParapetHeight);
                 Slab(px0, px1, south.y1 - 1.2f, south.y1 + 0.1f, VeilmouthGround.RiverBed - 0.5f, Low + 0.3f);
+                Slab(px0, px1, south.y1 + 0.1f, south.y1 + BankFill, VeilmouthGround.RiverBed - 0.5f, Low - 0.05f);
             }
 
             // The quay wall along the sea, the city's and the works', from the north wall's footing; under a pier's deck
@@ -385,6 +400,17 @@ namespace GameDev.Slice.EditorTools
             Box(start, end, c1 - Parapet, c1, DeckTop - DeckDepth, DeckTop + ParapetHeight);
             Box(start, w0 + 2.5f, c0, c1, VeilmouthGround.RiverBed - 0.5f, DeckTop - DeckDepth);
             Box(w1 - 2.5f, end, c0, c1, VeilmouthGround.RiverBed - 0.5f, DeckTop - DeckDepth);
+
+            // §31 (owner's walk, 2026-11-10): on a natural bank, wing walls either side of the abutment, a little under the
+            // ground, so the bank meets the bridge with no slit of water beside it.
+            foreach (var (a0, a1, natural) in new[] { (start, w0 + 0.5f, !Built(w0 - 2f)), (w1 - 0.5f, end, !Built(w1 + 2f)) })
+            {
+                if (natural)
+                {
+                    Box(a0, a1, c0 - BankFill, c0, VeilmouthGround.RiverBed - 0.5f, Low - 0.05f);
+                    Box(a0, a1, c1, c1 + BankFill, VeilmouthGround.RiverBed - 0.5f, Low - 0.05f);
+                }
+            }
             var spans = Mathf.Max(1, Mathf.RoundToInt((w1 - w0 - 5f) / 12f));
             for (var k = 1; k < spans; k++)
             {
@@ -661,33 +687,59 @@ namespace GameDev.Slice.EditorTools
 
         // ------------------------------------------------------------------------------------------- lamps
 
+        /// <summary>Every lamp placed: its plan point, and for a kerb's lamp its street's id and its kerb (+1 near, −1 far).</summary>
+        private static readonly List<(Vector2 C, string Street, int Side)> _lamps = new List<(Vector2, string, int)>();
+
+        /// <summary>Every road tree's trunk, plan.</summary>
+        private static readonly List<Vector2> _roadTrees = new List<Vector2>();
+
         /// <summary>
-        /// The furniture rules (§4), with the owner's fifth play test (2026-11-09, §26): a lamp on the carriageway by the
-        /// kerb, its post <see cref="LampFromKerb"/> out from it, at a party wall where one is near, never within 2 m of a
-        /// door along the street and never where a carriageway or a rounded corner breaks the kerb; 27 m apart, the two
-        /// sides staggered on streets wider than 12 m. A quay's lamps stand in the cell along its edge, the Penny's round
-        /// its ring, and a square's in its corners.
+        /// The owner's walk of 2026-11-10 (§31): a street's lamps and trees keep one rhythm on each unbroken run of kerb
+        /// between its junctions. The lamps go first: the bridges', the Penny's ring, the quay's, then each street's kerbs
+        /// (<see cref="StreetLamps"/>); the trees follow (<see cref="StreetTreesC4"/>), and a square's corners last
+        /// (<see cref="SquareLamps"/>), only where no lamp is near.
         /// </summary>
         private static void LampsC4()
         {
-            const float spacing = 27f;
-            foreach (var s in _layout.streets.Where(s => s.walk0 > 0f || s.walk1 > 0f))
-            {
-                var stagger = s.c1 - s.c0 > 12f ? spacing / 2f : 0f;
-                if (s.walk0 > 0f)
-                {
-                    Lamps(s.AlongX, s.c0 + s.walk0, 1, (int)s.a0, (int)s.a1, spacing, 4f);
-                }
+            _lamps.Clear();
+            _roadTrees.Clear();
+            _planted.Clear();
 
-                if (s.walk1 > 0f)
+            // Every door a lamp keeps clear of: the recorded doors, and each portal's door at its middle, 1.5 m along it, as
+            // VeilmouthCityTests reads it (a building that opens has its door where its portal is, not at its marker).
+            _doorPoints = _doors.Select(d => d.At)
+                .Concat(_root.GetComponentsInChildren<GameDev.World.Portals.Portal>(true).Select(p => Plan(p.transform.position + (p.transform.right * 1.5f))))
+                .ToList();
+
+            // A bridge's lamps at the ends of its parapets, a pier's at its far end.
+            foreach (var b in _layout.bridges)
+            {
+                var alongX = b.axis == "x";
+                var (s0, s1) = alongX ? (b.x0, b.x1) : (b.y0, b.y1);
+                var (c0, c1) = alongX ? (b.y0, b.y1) : (b.x0, b.x1);
+                foreach (var along in new[] { s0 + 1f, s1 - 2f })
                 {
-                    Lamps(s.AlongX, s.c1 - s.walk1, -1, (int)s.a0, (int)s.a1, spacing, 4f + stagger);
+                    foreach (var across in new[] { c0 + Parapet, c1 - Parapet - 1f })
+                    {
+                        var (px, py) = alongX ? (along, across) : (across, along);
+                        if (Prop("LampPost", Facing.N, px, py, force: true) != null)
+                        {
+                            _lamps.Add((new Vector2(px + 0.5f, py + 0.5f), null, 0));
+                        }
+                    }
                 }
             }
 
-            // The quay's lamps in the cell inside the quay wall's coping.
-            var quay = _layout.SquareById("quay");
-            Lamps(false, quay.x1 - Coping - 1.5f, 0, (int)quay.y0, (int)quay.y1, 30f, 8f);
+            foreach (var s in _layout.squares.Where(s => s.x0 >= _layout.Sea.x0 - 0.01f))
+            {
+                foreach (var (px, py) in new[] { (s.x1 - 2f, s.y0 + 0.5f), (s.x1 - 2f, s.y1 - 1.5f) })
+                {
+                    if (Prop("LampPost", Facing.N, px, py, force: true) != null)
+                    {
+                        _lamps.Add((new Vector2(px + 0.5f, py + 0.5f), null, 0));
+                    }
+                }
+            }
 
             // Round the Penny's ring, 2 m out from it, off the streets' axes, each turned along the ring until it stands in no
             // door's way (9 m before a door and 2.5 m to its side, a little wider than VeilmouthCityTests reads).
@@ -713,97 +765,277 @@ namespace GameDev.Slice.EditorTools
                     var at = new Vector2(plaza.cx, plaza.cy) + (new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * (plaza.ringOuter + 2f));
                     var corner = new Vector2(Mathf.Round(at.x - 0.5f), Mathf.Round(at.y - 0.5f));
                     if (!InADoorsWay(corner + new Vector2(0.5f, 0.5f)) && !InADoorsWay(corner + new Vector2(0.5f, -0.5f)) &&
+                        LampRoom(corner + new Vector2(0.5f, 0.5f), null, 0, false, false) &&
                         Prop("LampPost", Facing.N, corner.x, corner.y) != null)
                     {
+                        _lamps.Add((corner + new Vector2(0.5f, 0.5f), null, 0));
                         break;
                     }
                 }
             }
 
-            foreach (var id in new[] { "drowsy", "black_puddle", "deaf_boiler" })
+            // The quay's lamps in the cell inside the quay wall's coping.
+            var quay = _layout.SquareById("quay");
+            Lamps(false, quay.x1 - Coping - 1.5f, 0, (int)quay.y0, (int)quay.y1, Bay, 8f);
+
+            var alternate = 0;
+            foreach (var s in _layout.streets.Where(s => s.walk0 > 0f || s.walk1 > 0f))
             {
-                var q = _layout.SquareById(id);
-                foreach (var (px, py) in new[] { (q.x0 + 1f, q.y0 + 1f), (q.x1 - 2f, q.y0 + 1f), (q.x0 + 1f, q.y1 - 2f), (q.x1 - 2f, q.y1 - 2f) })
+                _planted[s] = PlantedKerbs(s, ref alternate);
+            }
+
+            foreach (var s in _layout.streets.Where(s => s.walk0 > 0f || s.walk1 > 0f))
+            {
+                StreetLamps(s);
+            }
+        }
+
+        /// <summary>Each street's planted kerbs (§27): both where the carriageway is TwoRowsFrom m or more, else one.</summary>
+        private static readonly Dictionary<VeilmouthLayout.Street, (bool Near, bool Far)> _planted = new Dictionary<VeilmouthLayout.Street, (bool, bool)>();
+
+        /// <summary>
+        /// The street trees' kerbs (§25.3, §26, §27.10): a main or ring street has both kerbs planted where its carriageway
+        /// is 8 m or more; a side street and the embankment have one row, on the kerb of their wider pavement, under which
+        /// the crowns reach; a narrower main street has one row on alternate sides street by street; the slums' lanes and
+        /// the works have none.
+        /// </summary>
+        private static (bool Near, bool Far) PlantedKerbs(VeilmouthLayout.Street s, ref int alternate)
+        {
+            if (s.trees == "none")
+            {
+                return (false, false);
+            }
+
+            bool near, far;
+            if (s.trees == "both")
+            {
+                var both = (s.c1 - s.walk1) - (s.c0 + s.walk0) >= TwoRowsFrom;
+                near = both || alternate % 2 == 0;
+                far = both || !near;
+            }
+            else
+            {
+                near = s.walk0 >= s.walk1;
+                far = !near;
+            }
+
+            alternate++;
+            return (near && s.walk0 > 0f, far && s.walk1 > 0f);
+        }
+
+        /// <summary>
+        /// A street's kerb lamps (§31): one in the middle of each bay of about <see cref="Bay"/> m on a kerb's run. Both
+        /// kerbs planted: a lamp on each, opposite. One planted: the lamps on the other kerb, or on the planted one between
+        /// its trees where the other has no pavement. None: on a street wider than 12 m the kerbs take the bays in turn,
+        /// else the wider pavement's kerb takes them all.
+        /// </summary>
+        private static void StreetLamps(VeilmouthLayout.Street s)
+        {
+            var (treesNear, treesFar) = _planted[s];
+            bool hasNear = s.walk0 > 0f, hasFar = s.walk1 > 0f;
+            if (treesNear && treesFar)
+            {
+                KerbLamps(s, true, _ => true);
+                KerbLamps(s, false, _ => true);
+            }
+            else if (treesNear || treesFar)
+            {
+                var near = treesNear ? !hasFar : hasNear;
+                KerbLamps(s, near, _ => true);
+            }
+            else if (hasNear && hasFar && s.c1 - s.c0 > 12f)
+            {
+                KerbLamps(s, true, i => i % 2 == 0);
+                KerbLamps(s, false, i => i % 2 == 1);
+            }
+            else
+            {
+                KerbLamps(s, hasNear && (!hasFar || s.walk0 >= s.walk1), _ => true);
+            }
+        }
+
+        /// <summary>The unbroken runs of a kerb, as metre cells [R0, R1): the pavement on its inside, no carriageway or rounded corner crossing it.</summary>
+        private static List<(int R0, int R1)> KerbRunsOf(bool alongX, float line, int side, int a0, int a1)
+        {
+            var runs = new List<(int, int)>();
+            var start = -1;
+            for (var at = a0; at <= a1; at++)
+            {
+                var ok = at < a1 && KerbRuns(alongX, line, side, at + 0.5f, 0.6f);
+                if (ok && start < 0)
                 {
-                    Prop("LampPost", Facing.N, px, py);
+                    start = at;
+                }
+                else if (!ok && start >= 0)
+                {
+                    runs.Add((start, at));
+                    start = -1;
                 }
             }
 
-            // A bridge's lamps at the ends of its parapets, a pier's at its far end.
-            foreach (var b in _layout.bridges)
+            return runs;
+        }
+
+        /// <summary>A kerb run's bays: as many of about <see cref="Bay"/> m as fit, at least one, and their length.</summary>
+        private static (int Count, float Length) Bays((int R0, int R1) run)
+        {
+            var length = run.R1 - run.R0;
+            var count = Mathf.Max(1, Mathf.RoundToInt(length / Bay));
+            return (count, length / (float)count);
+        }
+
+        private static void KerbLamps(VeilmouthLayout.Street s, bool near, System.Func<int, bool> takes)
+        {
+            var line = near ? s.c0 + s.walk0 : s.c1 - s.walk1;
+            var side = near ? 1 : -1;
+            foreach (var run in KerbRunsOf(s.AlongX, line, side, (int)s.a0, (int)s.a1).Where(r => r.R1 - r.R0 >= MinLampRun))
             {
-                var alongX = b.axis == "x";
-                var (s0, s1) = alongX ? (b.x0, b.x1) : (b.y0, b.y1);
-                var (c0, c1) = alongX ? (b.y0, b.y1) : (b.x0, b.x1);
-                foreach (var along in new[] { s0 + 1f, s1 - 2f })
+                var (count, bay) = Bays(run);
+                for (var i = 0; i < count; i++)
                 {
-                    foreach (var across in new[] { c0 + Parapet, c1 - Parapet - 1f })
+                    if (takes(i))
                     {
-                        if (alongX)
+                        KerbLamp(s, line, side, run, run.R0 + (bay * (i + 0.5f)));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// One kerb lamp at a bay's middle, or moved by at most <see cref="LampShift"/> m: to a party wall first, the nearest,
+        /// then to the nearest metre clear of a door's way (§26) and of other lamps and trees (<see cref="LampRoom"/>);
+        /// none where nothing is clear.
+        /// </summary>
+        private static void KerbLamp(VeilmouthLayout.Street s, float line, int side, (int R0, int R1) run, float station)
+        {
+            var alongX = s.AlongX;
+            var across = line + (side * LampFromKerb);
+            var tries = _partyWalls.Where(w => w.AlongX == alongX && Mathf.Abs(w.Front - line) < 6f && Mathf.Abs(w.At - station) <= LampShift)
+                .Select(w => w.At).OrderBy(w => Mathf.Abs(w - station)).ToList();
+            for (var k = 0; k <= LampShift; k++)
+            {
+                tries.Add(Mathf.Round(station) + k);
+                tries.Add(Mathf.Round(station) - k);
+            }
+
+            foreach (var at in tries.Distinct())
+            {
+                var along = at - 0.5f;
+                var c = alongX ? new Vector2(along, across) : new Vector2(across, along);
+                if (along < run.R0 + 0.5f || along > run.R1 - 0.5f || !KerbRuns(alongX, line, side, along, 0.6f) ||
+                    _doorPoints.Any(d => Mathf.Abs((alongX ? d.y : d.x) - across) < 8.5f && Mathf.Abs((alongX ? d.x : d.y) - along) < 2.2f) ||
+                    !LampRoom(c, s.id, side, alongX, true))
+                {
+                    continue;
+                }
+
+                if (OnCarriageway("LampPost", c, 1f) != null)
+                {
+                    _lamps.Add((c, s.id, side));
+                    return;
+                }
+            }
+
+            _lampsDropped++;
+        }
+
+        private static int _lampsDropped;
+
+        /// <summary>The doors' plan points a kerb lamp keeps clear of, gathered by <see cref="LampsC4"/>.</summary>
+        private static List<Vector2> _doorPoints = new List<Vector2>();
+
+        /// <summary>
+        /// Whether a lamp may stand at a plan point (§31): no lamp within <see cref="LampFromLamp"/> m but a wide street's
+        /// lamp opposite on its other kerb; no road tree within <see cref="LampFromTree"/> m; and, off a kerb, no house
+        /// within <see cref="LampFromWall"/> m.
+        /// </summary>
+        private static bool LampRoom(Vector2 c, string street, int side, bool alongX, bool kerb)
+        {
+            foreach (var l in _lamps)
+            {
+                var d = l.C - c;
+                if (d.sqrMagnitude >= LampFromLamp * LampFromLamp)
+                {
+                    continue;
+                }
+
+                if (street == null || l.Street != street || l.Side != -side || Mathf.Abs(alongX ? d.x : d.y) > LampShift)
+                {
+                    return false;
+                }
+            }
+
+            if (_roadTrees.Any(t => (t - c).sqrMagnitude < LampFromTree * LampFromTree))
+            {
+                return false;
+            }
+
+            // Off a kerb, no house and no mass of the works or the cathedral within LampFromWall m (§31: a corner lamp of Deaf
+            // Boiler Yard stood 1.5 m from the works' wall).
+            var room = Rect(c.x - LampFromWall, c.y - LampFromWall, c.x + LampFromWall, c.y + LampFromWall);
+            return kerb || !(_houses.Any(h => Overlap(h, room)) || _layout.boxes.Any(b => Overlap(Rect(b.x0, b.y0, b.x1, b.y1), room)));
+        }
+
+        /// <summary>
+        /// A square's lamps in its corners (§4), each only where no lamp stands within <see cref="LampFromLamp"/> m and no
+        /// house within <see cref="LampFromWall"/> m, tried 1 m further in along the diagonal when a house is near (§31).
+        /// </summary>
+        private static void SquareLamps()
+        {
+            foreach (var id in new[] { "drowsy", "black_puddle", "deaf_boiler" })
+            {
+                var q = _layout.SquareById(id);
+                foreach (var (px, py, dx, dy) in new[] { (q.x0 + 1f, q.y0 + 1f, 1, 1), (q.x1 - 2f, q.y0 + 1f, -1, 1), (q.x0 + 1f, q.y1 - 2f, 1, -1), (q.x1 - 2f, q.y1 - 2f, -1, -1) })
+                {
+                    for (var k = 0; k < 3; k++)
+                    {
+                        var (x, y) = (px + (dx * k), py + (dy * k));
+                        var c = new Vector2(x + 0.5f, y + 0.5f);
+                        // §31: a corner lamp also keeps 1.5 m from anything solid on the square, such as the Notice Board
+                        // (authoring default; one stood behind the board on the Black Puddle).
+                        if (!LampRoom(c, null, 0, false, false) ||
+                            _taken.Any(t => t.Item2 == Use.Solid && Overlap(t.Item1, Rect(c.x - 1.5f, c.y - 1.5f, c.x + 1.5f, c.y + 1.5f))))
                         {
-                            Prop("LampPost", Facing.N, along, across, force: true);
+                            continue;
                         }
-                        else
+
+                        if (Prop("LampPost", Facing.N, x, y) != null)
                         {
-                            Prop("LampPost", Facing.N, across, along, force: true);
+                            _lamps.Add((c, null, 0));
+                            break;
                         }
                     }
                 }
             }
 
-            foreach (var s in _layout.squares.Where(s => s.x0 >= _layout.Sea.x0 - 0.01f))
-            {
-                Prop("LampPost", Facing.N, s.x1 - 2f, s.y0 + 0.5f, force: true);
-                Prop("LampPost", Facing.N, s.x1 - 2f, s.y1 - 1.5f, force: true);
-            }
+            Debug.Log($"[VeilmouthCity] lamps (§31): {_lamps.Count}, {_lampsDropped} bay stations left without a lamp; {_roadTrees.Count} road trees.");
         }
 
         // ------------------------------------------------------------------------------------------- street trees
 
         /// <summary>
-        /// The street trees (§25.3, §26, §27.10, §28.1 item 6): the owner's mature tree in square pits on the carriageway,
-        /// flush on the kerb, in the lamps' line. A main or ring street has both kerbs planted where its carriageway is
-        /// 8 m or more; a side street and the embankment have one row, on the kerb of their wider pavement, under which
-        /// the crowns reach; the slums' lanes and the works have none.
+        /// The street trees (§25.3, §26, §27.10, §31): the owner's mature tree in square pits on the carriageway, flush on
+        /// the kerb, on the planted kerbs (<see cref="PlantedKerbs"/>), two in each of a run's bays, a quarter of the bay
+        /// from its lamp station either way, so a tree stands midway between lamps and none within a crown of one.
         /// </summary>
         private static void StreetTreesC4()
         {
             var planted = 0;
-            var oneSided = 0;
-            var street = 0;
-            foreach (var s in _layout.streets.Where(s => s.trees != "none" && (s.walk0 > 0f || s.walk1 > 0f)))
+            foreach (var s in _layout.streets.Where(s => s.walk0 > 0f || s.walk1 > 0f))
             {
-                var near = s.c0 + s.walk0;
-                var far = s.c1 - s.walk1;
-                bool nearSide, farSide;
-                if (s.trees == "both")
+                var (near, far) = _planted[s];
+                if (near)
                 {
-                    var both = far - near >= TwoRowsFrom;
-                    nearSide = both || street % 2 == 0;
-                    farSide = both || !nearSide;
-                    oneSided += both ? 0 : 1;
-                }
-                else
-                {
-                    nearSide = s.walk0 >= s.walk1;
-                    farSide = !nearSide;
-                    oneSided++;
+                    planted += TreeRow(s.AlongX, s.c0 + s.walk0, 1, (int)s.a0, (int)s.a1);
                 }
 
-                if (nearSide && s.walk0 > 0f)
+                if (far)
                 {
-                    planted += TreeRow(s.AlongX, near, 1, (int)s.a0, (int)s.a1);
+                    planted += TreeRow(s.AlongX, s.c1 - s.walk1, -1, (int)s.a0, (int)s.a1);
                 }
-
-                if (farSide && s.walk1 > 0f)
-                {
-                    planted += TreeRow(s.AlongX, far, -1, (int)s.a0, (int)s.a1);
-                }
-
-                street++;
             }
 
-            Debug.Log($"[VeilmouthCity] street trees (§26, §27.10): {planted} of the mature tree, each in its pit by the kerb; {oneSided} streets planted on one side.");
+            Debug.Log($"[VeilmouthCity] street trees (§26, §27.10, §31): {planted} of the mature tree, each in its pit by the kerb; {_planted.Values.Count(p => p.Near != p.Far)} streets planted on one side.");
         }
     }
 }

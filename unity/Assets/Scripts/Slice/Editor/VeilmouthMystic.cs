@@ -35,7 +35,9 @@ namespace GameDev.Slice.EditorTools
         public const string Folder = "Assets/Materials/Slice/Mystic";
 
         private static readonly Color Gaslight = new(0.55f, 0.95f, 0.85f);
-        private static readonly Color WardColour = new(0.6f, 0.75f, 1f);
+        // §31 (owner's walk, 2026-11-10): the wards are old chalk and paint on the stone, lit as the wall is and only a
+        // little lighter than it, never glowing (authoring default).
+        private static readonly Color WardColour = new(0.78f, 0.8f, 0.84f);
 
         /// <summary>A gas lamp's pool: about one lamp spacing, so the streets keep dark stretches between (style guide §5).</summary>
         private const float LampRange = 10f, LampIntensity = 10f;
@@ -500,8 +502,8 @@ namespace GameDev.Slice.EditorTools
         private static int Wards(Transform parent)
         {
             var group = Make("Wards", parent).transform;
-            var sign = WardMaterial("Veilmouth_WardSign", Texture("Veilmouth_WardSign", 256, 256, TextureWrapMode.Clamp, Sign), 0.5f);
-            var runes = WardMaterial("Veilmouth_WardRunes", Texture("Veilmouth_WardRunes", 512, 64, TextureWrapMode.Repeat, RuneRow()), 0.4f);
+            var sign = WardMaterial("Veilmouth_WardSign", Texture("Veilmouth_WardSign", 256, 256, TextureWrapMode.Clamp, Sign), 0.42f);
+            var runes = WardMaterial("Veilmouth_WardRunes", Texture("Veilmouth_WardRunes", 512, 64, TextureWrapMode.Repeat, RuneRow()), 0.34f);
             var quad = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
             var count = 0;
 
@@ -520,9 +522,8 @@ namespace GameDev.Slice.EditorTools
                 }
 
                 var from = door.position + (Vector3.up * KeystoneHeight) + (door.forward * 1.2f);
-                if (OnWall(from, -door.forward, 2.5f, out var hit))
+                if (OnWall(from, -door.forward, 2.5f, out var hit) && Put(group, "Ward - door", quad, sign, hit, new Vector2(0.5f, 0.5f)))
                 {
-                    Put(group, "Ward - door", quad, sign, hit, new Vector2(0.5f, 0.5f));
                     count++;
                 }
             }
@@ -563,8 +564,7 @@ namespace GameDev.Slice.EditorTools
                     .Where(p => p.hit.HasValue).OrderBy(p => p.hit.Value.distance).Take(2).ToList();
                 foreach (var (_, hit) in around)
                 {
-                    Put(group, $"Runes - {name}", quad, runes, hit.Value, new Vector2(2.4f, 0.3f));
-                    count++;
+                    count += Put(group, $"Runes - {name}", quad, runes, hit.Value, new Vector2(2.4f, 0.3f)) ? 1 : 0;
                 }
             }
 
@@ -580,8 +580,7 @@ namespace GameDev.Slice.EditorTools
                 return false;
             }
 
-            Put(group, $"Runes - {name}", quad, runes, hit, new Vector2(2.4f, 0.3f));
-            return true;
+            return Put(group, $"Runes - {name}", quad, runes, hit, new Vector2(2.4f, 0.3f));
         }
 
         /// <summary>Casts for an upright wall at least 2 m wide: a lamp post, a bench or a tree is not old stone.</summary>
@@ -601,24 +600,69 @@ namespace GameDev.Slice.EditorTools
             return false;
         }
 
-        private static void Put(Transform group, string name, Mesh quad, Material material, RaycastHit hit, Vector2 size)
+        /// <summary>
+        /// A ward on the wall a ray hit, only where the wall's face lies under the whole of it (§31, the owner's walk of
+        /// 2026-11-10: strips hung past a wall's end): slid along the wall up to 1.5 m, then narrowed to two thirds, to
+        /// find such a place, else not put.
+        /// </summary>
+        private static bool Put(Transform group, string name, Mesh quad, Material material, RaycastHit hit, Vector2 size)
         {
-            var go = Make(name, group);
-            // Off the collider's face by the depth of the kit's mouldings, so a string course never swallows the sign.
-            go.transform.SetPositionAndRotation(hit.point + (hit.normal * 0.06f), Quaternion.LookRotation(-hit.normal, Vector3.up));
-            go.transform.localScale = new Vector3(size.x, size.y, 1f);
-            go.AddComponent<MeshFilter>().sharedMesh = quad;
-            var renderer = go.AddComponent<MeshRenderer>();
-            renderer.sharedMaterial = material;
-            renderer.shadowCastingMode = ShadowCastingMode.Off;
-            renderer.receiveShadows = false;
+            var along = Vector3.Cross(Vector3.up, hit.normal).normalized;
+            foreach (var width in new[] { size.x, size.x * 2f / 3f })
+            {
+                for (var k = 0; k <= 12; k++)
+                {
+                    var centre = hit.point + (along * ((k % 2 == 0 ? 1f : -1f) * ((k + 1) / 2) * 0.25f));
+                    if (!Covered(centre, hit.normal, along, new Vector2(width, size.y)))
+                    {
+                        continue;
+                    }
+
+                    var go = Make(name, group);
+                    // Off the collider's face by the depth of the kit's mouldings, so a string course never swallows the sign.
+                    go.transform.SetPositionAndRotation(centre + (hit.normal * 0.06f), Quaternion.LookRotation(-hit.normal, Vector3.up));
+                    go.transform.localScale = new Vector3(width, size.y, 1f);
+                    go.AddComponent<MeshFilter>().sharedMesh = quad;
+                    var renderer = go.AddComponent<MeshRenderer>();
+                    renderer.sharedMaterial = material;
+                    renderer.shadowCastingMode = ShadowCastingMode.Off;
+                    renderer.receiveShadows = true;
+                    return true;
+                }
+            }
+
+            Debug.LogWarning($"[VeilmouthMystic] no whole face of wall for the {name} at ({hit.point.x + 500f:0.0}, {500f - hit.point.z:0.0}).");
+            return false;
+        }
+
+        /// <summary>Whether one flat face lies under a ward's whole rectangle: 5 × 3 rays onto it, each 0.5 m ± 0.1 m and square to it.</summary>
+        private static bool Covered(Vector3 centre, Vector3 normal, Vector3 along, Vector2 size)
+        {
+            for (var u = -2; u <= 2; u++)
+            {
+                for (var v = -1; v <= 1; v++)
+                {
+                    var p = centre + (along * (u * size.x / 4f)) + (Vector3.up * (v * size.y / 2f));
+                    if (!Physics.Raycast(p + (normal * 0.5f), -normal, out var h, 0.8f, ~0, QueryTriggerInteraction.Ignore) ||
+                        Mathf.Abs(h.distance - 0.5f) > 0.1f || Vector3.Dot(h.normal, normal) < 0.95f)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         private static Material WardMaterial(string name, Texture2D texture, float alpha)
         {
-            var material = Asset(name, () => new Material(Shader.Find("Universal Render Pipeline/Unlit")));
+            const string lit = "Universal Render Pipeline/Simple Lit";
+            var material = Asset(name, () => new Material(Shader.Find(lit)));
+            material.shader = Shader.Find(lit);
             material.SetTexture("_BaseMap", texture);
             material.SetColor("_BaseColor", new Color(WardColour.r, WardColour.g, WardColour.b, alpha));
+            material.SetColor("_SpecColor", Color.black);
+            material.SetFloat("_Smoothness", 0f);
             Transparent(material);
             EditorUtility.SetDirty(material);
             return material;

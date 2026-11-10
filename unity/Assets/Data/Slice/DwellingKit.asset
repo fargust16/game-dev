@@ -188,11 +188,11 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.011175513
+      x: 0.1628797
       y: 0.15999997
-      width: 0.977649
-      height: 0.50112593
-    height: 1.4497106
+      width: 0.6742406
+      height: 0.34560418
+    height: 0.99980044
   - key: TrNightstand
     prefab: {fileID: 4344147593471466359, guid: d1142278b7344024e8fb8549017e332f, type: 3}
     width: 1
@@ -488,11 +488,11 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.16042542
-      y: 0.36113787
-      width: 2.6791492
-      height: 1.2777243
-    height: 1.0116985
+      x: 0.15999985
+      y: 0.36
+      width: 2.6800003
+      height: 1.28
+    height: 1.1310083
   - key: ViTableBSet
     prefab: {fileID: 599118910614321522, guid: 7b79edccdef147b4ea5cc819399883ae, type: 3}
     width: 2
@@ -632,23 +632,23 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.40113807
+      x: 0.39999986
       y: 0.16000003
-      width: 3.1977239
-      height: 1.2101231
-    height: 1.4375639
+      width: 3.2
+      height: 1.21
+    height: 1.2600002
   - key: TrDesk
     prefab: {fileID: 3503770334103536868, guid: 372bc48e3cd784f409da6f36eb9f04ba, type: 3}
     width: 2
-    depth: 1
+    depth: 2
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.26789236
-      y: 0.15999997
-      width: 1.4728065
-      height: 0.7868422
-    height: 1.3522558
+      x: 0.11631608
+      y: 0.16000009
+      width: 1.7673678
+      height: 0.9442105
+    height: 1.502707
   - key: TrWallClock
     prefab: {fileID: 1241044995253652397, guid: a462dcc9b03bd844aa2be2306c93c069, type: 3}
     width: 3
@@ -884,11 +884,11 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.15456879
+      x: 0.024999976
       y: 0.21000001
-      width: 0.6908624
-      height: 0.16088587
-    height: 0.58
+      width: 0.95000005
+      height: 0.19938111
+    height: 0.64
   - key: ViWallLamp
     prefab: {fileID: 8234737949085347516, guid: 77aecd579926873469a7cca73512cb8b, type: 3}
     width: 3

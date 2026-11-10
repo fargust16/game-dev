@@ -995,7 +995,23 @@ namespace GameDev.Slice.EditorTools
             var rz = Ratio(spec.SizeZ, size.z);
             ratios.AddRange(new[] { rx, ry, rz }.Where(r => r.HasValue).Select(r => r.Value));
             var mean = ratios.Average();
-            var factor = spec.Uniform ? Vector3.one * mean : new Vector3(rx ?? mean, ry ?? mean, rz ?? mean);
+            var world = new Vector3(rx ?? mean, ry ?? mean, rz ?? mean);
+            var factor = Vector3.one * mean;
+            if (!spec.Uniform)
+            {
+                // The ratios are read on the world's axes and the scale is the model's own: a model turned in its wrapper
+                // (Tripo's −90° about X) takes each ratio on the local axis that lies along that world axis. Before
+                // (2026-11-10, furnishing rules §11), its height took the depth's ratio, and the radiator stood 0.72 m.
+                var t = model.transform;
+                var locals = new[] { t.right, t.up, t.forward };
+                for (var i = 0; i < 3; i++)
+                {
+                    var d = locals[i];
+                    var axis = Mathf.Abs(d.x) >= Mathf.Abs(d.y) && Mathf.Abs(d.x) >= Mathf.Abs(d.z) ? 0 : Mathf.Abs(d.y) >= Mathf.Abs(d.z) ? 1 : 2;
+                    factor[i] = world[axis];
+                }
+            }
+
             model.transform.localScale = Vector3.Scale(model.transform.localScale, factor);
         }
 
