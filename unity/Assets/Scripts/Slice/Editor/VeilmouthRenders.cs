@@ -98,6 +98,30 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// C4's ground (VEILMOUTH_CITY_PLAN.md §28.5) from above and from a walker's height, with every built root hidden
+        /// for the picture only: the river round the west and south, the sea, the rise under the Penny, the forest's land.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderC4Ground
+        /// </summary>
+        public static void RenderC4Ground()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            foreach (var root in scene.GetRootGameObjects().Where(r => r.GetComponentInChildren<Terrain>() == null && r.name != "Water" &&
+                                                                      r.GetComponentInChildren<Renderer>() != null))
+            {
+                root.SetActive(false);
+            }
+
+            Top("c4_ground_world", Vector3.zero, 500f);
+            Top("c4_ground_city", new Vector3(50f, 0f, -20f), 190f);
+            Eye("c4_ground_gate", -150f, 60f, -60f, 60f, 2f);
+            Eye("c4_ground_river_south", 40f, -110f, 40f, -40f, 2f);
+            Eye("c4_ground_coast", 150f, 300f, 220f, 200f, 0f);
+            Eye("c4_ground_rise", -60f, 0f, 40f, 60f, 2f);
+            Debug.Log($"Veilmouth C4 ground views written to {OutputFolder}.");
+        }
+
+        /// <summary>
         /// Each interior from above with its ceilings hidden, and each room from a walker's eye in its south-west
         /// corner toward the far corner, at the scene's preview hour. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderInteriors
         /// </summary>

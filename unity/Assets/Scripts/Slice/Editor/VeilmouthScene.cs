@@ -12,8 +12,8 @@ namespace GameDev.Slice.EditorTools
     /// interior. From then on both scenes are hand-built, so this never overwrites one that exists.
     /// <para>
     /// It writes: a flat terrain over the whole area at one level, which <see cref="VeilmouthGround"/> shapes once
-    /// from the city plan C3 (kit standard §7); the water at Sea Level beneath it, which shows wherever the ground is
-    /// dug below the sea; the C3 map as <see cref="LayoutZone"/> guides; and a stand-in street in Lower Veil with the Soot &amp; Bell, whose door
+    /// from the city plan C4 (kit standard §7); the water at Sea Level beneath it, which shows wherever the ground is
+    /// dug below the sea; the C4 map as <see cref="LayoutZone"/> guides; and a stand-in street in Lower Veil with the Soot &amp; Bell, whose door
     /// leads to its interior and back.
     /// </para>
     /// </summary>
@@ -30,7 +30,7 @@ namespace GameDev.Slice.EditorTools
         /// <summary>The playable area's side, city plan C1 §3. The scene's origin is the area's centre; north is +Z.</summary>
         public const float Extent = 1000f;
 
-        public const string MapName = "C3 Map";
+        public const string MapName = "C4 Map";
 
         /// <summary>WorldScale.SeaLevelMeters: the Combat Grid reads every surface below it as water.</summary>
         public const float SeaLevel = 24f;
@@ -41,8 +41,11 @@ namespace GameDev.Slice.EditorTools
         /// <summary>A street tile lies on the ground, so its top is 0.1 m higher (kit standard §2).</summary>
         public const float StreetLevel = 26f;
 
-        /// <summary>Where the scene starts the player: on Bell Street in front of the Soot &amp; Bell (C3, plan 687.5, 778).</summary>
-        public static readonly Vector3 Spawn = new Vector3(187.5f, StreetLevel + 0.1f, -278f);
+        /// <summary>
+        /// Where the scene starts the player: on Powder Embankment before the Black Puddle and the Soot &amp; Bell (C4, plan
+        /// 620, 541; the layout's spawn).
+        /// </summary>
+        public static readonly Vector3 Spawn = new Vector3(120f, StreetLevel + 0.1f, -41f);
 
         /// <summary>The Soot &amp; Bell's south-west corner node; its door is 2 m along the south wall.</summary>
         private static readonly Vector3 SootAndBellCorner = new Vector3(100f, StreetLevel, -180f);
@@ -69,30 +72,58 @@ namespace GameDev.Slice.EditorTools
         private static readonly Color City = new Color(1f, 0.8f, 0.2f, 0.9f);
         private static readonly Color Ritual = new Color(1f, 0.3f, 0.3f, 0.9f);
 
-        /// <summary>The C3 map (VEILMOUTH_CITY_PLAN.md §24 and its svg): name, centre (x, z), size (x, z), colour.</summary>
-        private static readonly (string Name, float X, float Z, float SizeX, float SizeZ, Color Color)[] Zones =
+        /// <summary>
+        /// The C4 map (VEILMOUTH_CITY_PLAN.md §28.5 and its svg), from the layout: its named districts, squares and water,
+        /// the forest, the village and the Ritual Site Candidates; name, centre (x, z), size (x, z), colour.
+        /// </summary>
+        private static (string Name, float X, float Z, float SizeX, float SizeZ, Color Color)[] Zones
         {
-            ("Sea", 0f, -415f, 1000f, 170f, Water),
-            ("River Veil", 300f, 85f, 40f, 830f, Water),
-            ("Veil Bridge", 300f, -235f, 40f, 16f, City),
-            ("City", 130f, -228f, 300f, 204f, City),
-            ("Ridge", 130f, -153f, 300f, 54f, City),
-            ("Government Quarter", 106f, -180.5f, 72f, 91f, City),
-            ("High Street", 129f, -235f, 298f, 18f, City),
-            ("Terraces", 31f, -203f, 102f, 46f, City),
-            ("Under the Ridge", 210f, -203f, 136f, 46f, City),
-            ("Market Quarter", 49f, -287f, 138f, 86f, City),
-            ("Market Place", 78f, -264f, 56f, 40f, City),
-            ("Lower Veil", 198f, -287f, 160f, 86f, City),
-            ("Soot Stair", 204f, -197f, 8f, 34f, City),
-            ("Old Chapel", 5f, -148f, 50f, 40f, City),
-            ("Fields", -370f, -155f, 260f, 350f, Land),
-            ("Forest", -110f, 265f, 780f, 470f, Land),
-            ("Ore Hill", 420f, 140f, 150f, 340f, Land),
-            ("Ritual Site Candidate 1 - Ritual Square", 143f, -297f, 26f, 26f, Ritual),
-            ("Ritual Site Candidate 2 - Soot Stair Cellar", 213f, -200f, 8f, 8f, Ritual),
-            ("Ritual Site Candidate 3 - Old Chapel", -9f, -159f, 12f, 12f, Ritual),
-        };
+            get
+            {
+                var layout = VeilmouthLayout.Load();
+                var zones = new System.Collections.Generic.List<(string, float, float, float, float, Color)>();
+                void Add(string name, float x0, float y0, float x1, float y1, Color colour) =>
+                    zones.Add((name, ((x0 + x1) / 2f) - 500f, 500f - ((y0 + y1) / 2f), x1 - x0, y1 - y0, colour));
+
+                var city = layout.City;
+                Add("City", city.x0, city.y0, city.x1, city.y1, City);
+                var works = layout.Works;
+                Add("The Reek", works.x0, works.y0, works.x1, works.y1, City);
+                foreach (var d in layout.districts.Where(d => !string.IsNullOrEmpty(d.name) && d.name != "THE REEK"))
+                {
+                    Add(Title(d.name), d.x0, d.y0, d.x1, d.y1, City);
+                }
+
+                foreach (var s in layout.squares.Where(s => !string.IsNullOrEmpty(s.name)))
+                {
+                    Add(s.name, s.x0, s.y0, s.x1, s.y1, City);
+                }
+
+                foreach (var w in layout.water.Where(w => !string.IsNullOrEmpty(w.name)))
+                {
+                    Add(w.name, w.x0, w.y0, w.x1, Mathf.Min(w.y1, Extent), Water);
+                }
+
+                for (var i = 0; i < layout.forest.rects.Length; i++)
+                {
+                    var r = layout.forest.rects[i];
+                    Add($"Gloomwood {i + 1}", r.x0, r.y0, r.x1, r.y1, Land);
+                }
+
+                var hamlet = layout.cottages;
+                Add("Crooked Hamlet", hamlet.Min(c => c.a) - 10f, 410f, hamlet.Max(c => c.a) + 20f, 470f, Land);
+                foreach (var c in layout.candidates)
+                {
+                    Add(c.name, c.x - (c.size / 2f), c.y - (c.size / 2f), c.x + (c.size / 2f), c.y + (c.size / 2f), Ritual);
+                }
+
+                return zones.ToArray();
+            }
+        }
+
+        /// <summary>A district's name on the plan, in capitals, as a zone's: "LOWER VEIL" → "Lower Veil".</summary>
+        private static string Title(string name) =>
+            string.Join(" ", name.Split(' ').Select(w => w.Length > 1 ? w[0] + w.Substring(1).ToLowerInvariant() : w));
 
         public static string[] ZoneNames => Zones.Select(z => z.Name).ToArray();
 

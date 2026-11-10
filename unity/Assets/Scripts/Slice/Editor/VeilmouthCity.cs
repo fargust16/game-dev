@@ -54,7 +54,6 @@ namespace GameDev.Slice.EditorTools
         // The stone works take the kit's own stones (WORLD_STYLE_GUIDE.md §3): one style for houses, walls and steps.
         private const string WallStone = "VIC_Stone_Dirty", KerbStone = "VIC_Stone_Medium", StepStone = "VIC_Stone_Light", DeckStone = "VIC_Ground_Setts";
         private const float Low = VeilmouthGround.Low;
-        private const float RidgeLevel = VeilmouthGround.Ridge;
 
         private enum Use { Road, Walk, Solid }
 

@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4)
 
-Version: 0.50
+Version: 0.51
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10 and being built; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§28.5: C4's plan, written with the builder's layout and the player's map by tools/slice/veilmouth_c4_plan.py: about 260 × 290 m inside the wall and about 102 buildings; the Penny, 80 m with its ring and Stone Grandad; Long Tongue and Salt Gullet, Lenten and Smoked Streets, Widows' Row, Powder Embankment, Squint Lane; Parsons' End, Sleepy Quarter, Salt End, Lower Veil, the Reek; folk names in map.csv)
+Last Updated: 2026-11-10 (§28.6: C4's ground shaped from the layout: the city and the works level with a rise of 1.5 m under the Penny and the cathedral, the river and the sea dug under the one water plane, the land outside rolling with no pond, steep area edges and the West Road's pass; Widows' Row 17 m)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1337,7 +1337,7 @@ A change to the layout is made in the script, and the three files are written ag
 | Salt Gullet | main, 22 m | the Penny → Fishlip Quay |
 | Lenten Street | ring, 20 m | the Penny → Drowsy Steps before the cathedral |
 | Smoked Street | ring, 20 m | the Penny → Powder Embankment and Grubby Bridge |
-| Widows' Row | side, 16.5 m | the wall → the quay, along the religious quarter's south edge |
+| Widows' Row | side, 17 m (§28.6) | the wall → the quay, along the religious quarter's south edge |
 | Powder Embankment | a 3 m pavement, 7 m of carriageway and the 6 m promenade, 16 m | the wall → the quay, along the river |
 | Squint Lane | 8 m of setts at 45° | the Penny's south-east corner → the Black Puddle |
 | Last Turning, Draught Lane | lanes, 5 m | by the cemetery; through the port's slum |
@@ -1385,3 +1385,18 @@ The player starts on the embankment before the Black Puddle.
 - mysterious: Quiet Whistle Garden, Deaf Boiler Yard.
 
 The district names are Parsons' End, Sleepy Quarter, Salt End, Lower Veil and the Reek; the village is Crooked Hamlet, and the forest Gloomwood.
+
+
+## 28.6 The ground, 2026-11-10
+
+`VeilmouthGround` shapes the ground once from the layout, as it did from C3. Its old hills, the Ridge and the ore hill, are gone, and so are the owner's hand changes to C3's ground (§28.1 item 19). `VeilmouthLayout` reads the layout for the ground, the city and the map's zones. All heights are authoring defaults.
+
+- **The city and the works** stand level at 25.9 m. A rise of 1.5 m lies under the Penny and runs on to the cathedral's west front. It is full within 30 m of that line and gone at 120 m.
+- **The river** is dug to a bed at 21 m under the one water plane at 24 m. Its bank is natural outside the walls and stone along the city and the works; the stone banks are built with the city (step 5).
+- **The sea** has a bed at 19.5 m by the quay, deepening 2.5 m over 200 m. The open coast falls over rocks within 12 m of the water.
+- **The land outside** rolls by up to 5 m and rises 6 m inland. It never sinks below 26.2 m, so no pond forms: water is only the river and the sea (§28.1 item 13). The north, west and south edges rise 45 m, steeper than a walker can climb, and the West Road leaves through a pass.
+- **Paint**: built ground is soil until the city paints its streets; then rock on cliffs and on the open coast, sand below 25.2 m, soil on the West Road, and grass with forest floor in Gloomwood.
+
+Widows' Row's south pavement is 4 m, not 3.5 m, so every front behind it lies on a whole metre: the street is 17 m, py 352–369.
+
+Views: `Logs/SliceSurvey/c4_ground_*`.

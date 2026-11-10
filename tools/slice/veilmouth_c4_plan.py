@@ -33,7 +33,7 @@ PLAYER_SVG = ROOT / "unity/Assets/Data/Slice/Map/VeilmouthC4Plan.xml"
 SECTIONS = {
     "main": (6.0, 10.0, 6.0),
     "ring": (6.0, 8.0, 6.0),
-    "side": (6.0, 7.0, 3.5),        # the 6 m pavement carries the one row of trees; flipped by "flip"
+    "side": (6.0, 7.0, 4.0),        # the 6 m pavement carries the one row of trees; flipped by "flip"
     "embankment": (3.0, 7.0, 6.0),  # a 3 m pavement before the houses (authoring default), the promenade of 6 m by the river
     "works": (2.5, 9.0, 2.5),
     "lane": (0.0, 5.0, 0.0),
@@ -141,8 +141,8 @@ MAIN = 429           # the main street's north edge: py 429-451
 street("main_w", "Long Tongue", "x", X_IN, C[0] - HALF, MAIN, "main")
 street("main_e", "Salt Gullet", "x", C[0] + HALF, QUAY, MAIN, "main")
 WIDOWS = 352
-street("widows", "Widows' Row", "x", X_IN, QUAY, WIDOWS, "side")                      # 352-368.5, trees on the north
-street("lenten", "Lenten Street", "y", WIDOWS + 16.5, C[1] - HALF, 530, "ring")
+WIDOWS_S = street("widows", "Widows' Row", "x", X_IN, QUAY, WIDOWS, "side")           # 352-369, trees on the north
+street("lenten", "Lenten Street", "y", WIDOWS_S, C[1] - HALF, 530, "ring")
 street("smoked", "Smoked Street", "y", C[1] + HALF, EMBANK, 530, "ring")
 street("embankment", "Powder Embankment", "x", X_IN, QUAY, EMBANK, "embankment")      # 534-550, the promenade by the river
 street("last_turning", "Last Turning", "y", WALL_N + 2, WIDOWS, 434, "lane", surface="cobbles")
@@ -174,7 +174,7 @@ layout["plaza"] = {"cx": C[0], "cy": C[1], "half": HALF, "ringOuter": 34.0, "rin
 square("drowsy", "Drowsy Steps", 505, 322, 575, WIDOWS)
 square("bawling", "Bawling Square", 432, MAIN + 22, 470, 500)
 square("black_puddle", "Black Puddle", 606, 496, 640, EMBANK)
-square("quay", "Fishlip Quay", QUAY, WIDOWS + 16.5, COAST, RIVER_S[1], surface="setts")
+square("quay", "Fishlip Quay", QUAY, WIDOWS_S, COAST, RIVER_S[1], surface="setts")
 square("tipsy", "Tipsy Pier", COAST, 433, 742, 447, surface="setts")
 square("one_eye_pier", "", COAST, 520, 752, 530, surface="setts", label=False)
 square("cemetery", "Last Turning Cemetery", 440, WALL_N + 4, 478, 334, surface="grass")
@@ -244,11 +244,11 @@ row("S", MAIN, 590, 645, "shop", 121)
 row("N", MAIN + 22, 590, 650, "town", 122)
 
 # Widows' Row's south side: detached houses and villas on their plots (§19), railed on its pavement.
-plot("N", WIDOWS + 16.5 + 4, X_IN + 2, 438, "detached", 4, 2, 141)
-plot("N", WIDOWS + 16.5 + 4, 438, 454, "detached", 4, 2, 142)
-plot("N", WIDOWS + 16.5 + 4, 456, 490, "villa", 4, 6, 143)
-plot("N", WIDOWS + 16.5 + 4, 582, 613, "villa", 4, 6, 144)
-plot("N", WIDOWS + 16.5 + 4, 613, 644, "villa", 4, 6, 145)
+plot("N", WIDOWS_S + 4, X_IN + 2, 438, "detached", 4, 2, 141)
+plot("N", WIDOWS_S + 4, 438, 454, "detached", 4, 2, 142)
+plot("N", WIDOWS_S + 4, 456, 490, "villa", 4, 6, 143)
+plot("N", WIDOWS_S + 4, 582, 613, "villa", 4, 6, 144)
+plot("N", WIDOWS_S + 4, 613, 644, "villa", 4, 6, 145)
 # The faction's house by the cathedral (item 9), on its plot in Quiet Whistle Garden.
 plot("S", WIDOWS - 6, 580, 614, "villa_stucco", 6, 15, 160, name="The faction's house")
 # The embankment's north side: detached houses on their plots with the river before them.
@@ -296,13 +296,13 @@ layout["forest"] = {"rects": [
 
 # ----------------------------------------------------------------------------------------------- districts, labels, zones
 
-district("", 470, WIDOWS + 16.5, 606, 496, "#efe2c8", label=False)   # the Penny's square names it
+district("", 470, WIDOWS_S, 606, 496, "#efe2c8", label=False)   # the Penny's square names it
 district("PARSONS' END", X_IN, WALL_N + 2, COAST, WIDOWS, "#e3d6f0")
-district("SLEEPY QUARTER", X_IN, WIDOWS + 16.5, 530, EMBANK, "#f6e3c4")
-district("SALT END", 550, WIDOWS + 16.5, QUAY, MAIN + 22, "#e8dcc8")
+district("SLEEPY QUARTER", X_IN, WIDOWS_S, 530, EMBANK, "#f6e3c4")
+district("SALT END", 550, WIDOWS_S, QUAY, MAIN + 22, "#e8dcc8")
 district("LOWER VEIL", 550, MAIN + 22, QUAY, RIVER_S[1], "#e9cfc7")
 district("THE REEK", WORKS[0], WORKS[1], WORKS[2], WORKS[3], "#d8d2c8")
-district("", QUAY, WIDOWS + 16.5, COAST, RIVER_S[1], "#d6d0c4", label=False)
+district("", QUAY, WIDOWS_S, COAST, RIVER_S[1], "#d6d0c4", label=False)
 
 layout["candidates"] += [
     {"name": "Ritual Site Candidate 1 - Black Puddle", "x": 623, "y": 518, "size": 26},

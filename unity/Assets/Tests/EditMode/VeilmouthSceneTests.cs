@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S0.6, §24: Veilmouth.unity holds the C3 map, ground over the whole area shaped from C3, and the sea under it.</summary>
+    /// <summary>S0.6, §28: Veilmouth.unity holds the C4 map, ground over the whole area shaped from C4, and the sea under it.</summary>
     public sealed class VeilmouthSceneTests
     {
         private UnityEngine.SceneManagement.Scene _scene;
@@ -41,15 +41,15 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(VeilmouthScene.TerrainLevel, ground, 0.01f);
         }
 
-        /// <summary>C3 §24.3: the Ridge 4 m up, the avenue's climb, the river and the sea dug below Sea Level, the hill.</summary>
-        [TestCase(40f, -168f, VeilmouthGround.Ridge, 0.05f)] // the Parade
-        [TestCase(50f, -235f, VeilmouthGround.Low, 0.05f)] // High Street
-        [TestCase(112f, -203f, 27.9f, 0.1f)] // halfway up Crown Avenue (py 680–726)
-        [TestCase(204f, -197f, 27.9f, 0.3f)] // halfway down the Soot Stair
-        [TestCase(300f, -100f, VeilmouthGround.RiverBed, 0.05f)]
-        [TestCase(0f, -400f, VeilmouthGround.SeaBed, 0.5f)]
-        [TestCase(420f, 140f, VeilmouthGround.HillTop, 4f)] // the ore hill's top
-        public void TheGroundFollowsC3(float x, float z, float height, float tolerance)
+        /// <summary>C4 §28.5: the low rise under the Penny and the cathedral, the level town, the river and the sea dug below Sea Level.</summary>
+        [TestCase(40f, 60f, VeilmouthGround.Low + VeilmouthGround.Rise, 0.05f)] // the Penny's statue
+        [TestCase(40f, 178f, VeilmouthGround.Low + VeilmouthGround.Rise, 0.05f)] // the cathedral's west front
+        [TestCase(-75f, 60f, VeilmouthGround.Low, 0.1f)] // Long Tongue by Creaking Gate
+        [TestCase(-50f, -40f, VeilmouthGround.Low, 0.05f)] // Powder Embankment
+        [TestCase(-102f, 200f, VeilmouthGround.RiverBed, 0.05f)] // the river's west leg
+        [TestCase(0f, -68f, VeilmouthGround.RiverBed, 0.05f)] // the river's south leg
+        [TestCase(200f, 50f, VeilmouthGround.SeaBed, 0.1f)] // the sea by the quay
+        public void TheGroundFollowsC4(float x, float z, float height, float tolerance)
         {
             var terrain = All<Terrain>().Single();
             var ground = terrain.SampleHeight(new Vector3(x, 0f, z)) + terrain.transform.position.y;
@@ -63,7 +63,7 @@ namespace GameDev.Slice.Tests
             float At(float x, float z) => terrain.SampleHeight(new Vector3(x, 0f, z));
             Assert.Greater(At(-498f, 100f) - At(-460f, 100f), 30f, "the west edge rises");
             Assert.Greater(Mathf.Atan((At(-480f, 100f) - At(-470f, 100f)) / 10f) * Mathf.Rad2Deg, 45f, "steeper than 45 degrees");
-            Assert.Less(At(-498f, -235f) - At(-460f, -235f), 8f, "the West road leaves through a pass");
+            Assert.Less(At(-498f, 60f) - At(-460f, 60f), 8f, "the West Road leaves through a pass");
         }
 
         [Test]
@@ -76,18 +76,19 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
-        public void TheC3MapIsLaidOut()
+        public void TheC4MapIsLaidOut()
         {
-            Assert.AreEqual("C3 Map", VeilmouthScene.MapName);
+            Assert.AreEqual("C4 Map", VeilmouthScene.MapName);
             var zones = All<LayoutZone>().Where(z => z.transform.parent != null && z.transform.parent.name == VeilmouthScene.MapName).ToArray();
             CollectionAssert.AreEquivalent(VeilmouthScene.ZoneNames, zones.Select(z => z.name));
 
             var zone = zones.ToDictionary(z => z.name);
             Assert.IsTrue(zone["Lower Veil"].Covers(VeilmouthScene.Spawn), "the player starts in Lower Veil");
-            Assert.IsTrue(zone["Market Quarter"].Covers(zone["Market Place"].transform.position), "the Market Place lies in its quarter");
-            Assert.IsTrue(zone["City"].Covers(zone["Ridge"].transform.position));
-            Assert.IsFalse(zone["City"].Covers(zone["River Veil"].transform.position), "the river runs east of the city");
-            Assert.IsTrue(zone["Sea"].transform.position.z < zone["City"].transform.position.z, "the sea is south");
+            Assert.IsTrue(zone["Lower Veil"].Covers(zone["Black Puddle"].transform.position), "the Black Puddle lies in Lower Veil");
+            Assert.IsTrue(zone["City"].Covers(zone["The Penny"].transform.position));
+            Assert.IsFalse(zone["City"].Covers(zone["River Veil"].transform.position), "the river runs west of the city");
+            Assert.IsTrue(zone["The sea"].transform.position.x > zone["City"].transform.position.x, "the sea is east");
+            Assert.IsTrue(zone["The Reek"].transform.position.z < zone["City"].transform.position.z, "the works lie south, over the river");
         }
     }
 }

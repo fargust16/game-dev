@@ -7,10 +7,16 @@ using UnityEngine;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// Shapes Veilmouth's ground once from the city plan C3 (VEILMOUTH_CITY_PLAN.md §9, §24), at the owner's request of
-    /// 2026-11-08 (C2's ground of 2026-11-06 is replaced, with any hand changes to it); the ground is the owner's
+    /// Shapes Veilmouth's ground once from the layout C4 (VEILMOUTH_CITY_PLAN.md §28, §28.5), at the owner's request of
+    /// 2026-11-10, which drops the owner's hand changes to C3's ground (§28.1 item 19); the ground is the owner's
     /// afterwards, so the tool refuses to run on ground it has already shaped. It is authored content, not the
     /// production terrain pipeline, and touches nothing of TerrainGen.
+    /// <para>
+    /// The city and the works stand level at <see cref="Low"/> with a low rise under the Penny and the cathedral (§28.1
+    /// item 13); the river and the sea are dug to their beds under one water plane at Sea Level, with stone embankments
+    /// along the city and the works and natural banks elsewhere; the open coast is rock; the forest's ground rolls and
+    /// rises to the area's land edges, with a pass for the West Road.
+    /// </para>
     /// <para>
     /// Positions are the plan's: <c>px</c> runs east and <c>py</c> south, 1 m each, world X = px − 500 and world Z =
     /// 500 − py. Every height is an authoring default in metres above the scene's zero.
@@ -22,24 +28,20 @@ namespace GameDev.Slice.EditorTools
         public const int AlphamapResolution = 512;
 
         public const float Low = VeilmouthScene.TerrainLevel;
-        public const float Ridge = Low + 4f; // C2 (§21) and C3 (§24.3): 4 m, the avenue's 8.7 % climb over 46 m
         public const float RiverBed = 21f;
         public const float SeaBed = 19.5f;
-        public const float HillTop = 70f;
+
+        /// <summary>The rise under the Penny and the cathedral, m over <see cref="Low"/>, falling to nothing 120 m away.</summary>
+        public const float Rise = 1.5f;
+
+        private const float RiseFull = 30f, RiseEnd = 120f;
+
+        /// <summary>The cathedral's west front, the north end of the rise's spine from the Penny (§28.5).</summary>
+        private static readonly Vector2 Cathedral = new Vector2(540f, 300f);
 
         private const float Size = VeilmouthScene.Extent;
 
-        // City rectangle and its features, in plan metres (C3 svg, VEILMOUTH_CITY_PLAN_C3.svg).
-        private const float CityWest = 480f, CityEast = 780f, CityNorth = 626f, CitySouth = 830f;
-        private const float RidgeEdge = 680f;
-        private const float AvenueX = 612f, AvenueFoot = 726f, AvenueHead = 680f;
-
-        /// <summary>The avenue's ramp: its full 24 m (±12 m), easing to the low town 20 m from the axis, under the Town Hall and the Assize.</summary>
-        private const float AvenueHalf = 12f, AvenueEase = 20f;
-        private const float RiverWest = 780f, RiverEast = 820f;
-        private const float StairWest = 700f, StairEast = 708f, StairTop = 680f, StairFoot = 714f;
-
-        [MenuItem("GameDev/Slice/Shape Veilmouth Ground from C3 (once)")]
+        [MenuItem("GameDev/Slice/Shape Veilmouth Ground from C4 (once)")]
         public static void Shape()
         {
             var data = AssetDatabase.LoadAssetAtPath<TerrainData>(VeilmouthScene.TerrainDataPath);
@@ -53,7 +55,7 @@ namespace GameDev.Slice.EditorTools
             var roots = scene.GetRootGameObjects();
             if (roots.Any(r => r.name == VeilmouthScene.MapName))
             {
-                Debug.LogWarning("[VeilmouthGround] the ground is already shaped from C3 and is the owner's now; nothing changed.");
+                Debug.LogWarning("[VeilmouthGround] the ground is already shaped from C4 and is the owner's now; nothing changed.");
                 return;
             }
 
@@ -74,8 +76,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             data.SetHeights(0, 0, normalised);
-            // The city's street layers may follow the canonical five (C3 reshapes built ground); they are zero here
-            // until VeilmouthCity paints them again.
+            // The city's street layers may follow the canonical five; they are zero here until VeilmouthCity paints them.
             var canonical = Paint(heights);
             var weights = new float[AlphamapResolution, AlphamapResolution, Mathf.Max(5, data.terrainLayers.Length)];
             for (var z = 0; z < AlphamapResolution; z++)
@@ -100,9 +101,9 @@ namespace GameDev.Slice.EditorTools
             water.transform.localScale = new Vector3(Size / 10f, 1f, Size / 10f);
 
             var player = roots.FirstOrDefault(r => r.GetComponentInChildren<CharacterController>() != null);
-            foreach (var old in roots.Where(r => r.name == "C0 Map" || r.name == "C1 Map" || r.name == "C2 Map"))
+            foreach (var old in roots.Where(r => r.name.EndsWith(" Map")))
             {
-                Object.DestroyImmediate(old);
+                Object.DestroyImmediate(old); // C0's to C3's map guides
             }
 
             VeilmouthScene.CreateZones();
@@ -112,14 +113,14 @@ namespace GameDev.Slice.EditorTools
             }
 
             EditorSceneManager.SaveScene(scene);
-            Debug.Log("[VeilmouthGround] shaped from C3: 1000 × 1000 m; the ground is the owner's from here on.");
+            Debug.Log("[VeilmouthGround] shaped from C4: 1000 × 1000 m; the ground is the owner's from here on.");
         }
 
-        /// <summary>Batch only, for the agent's iterations on C3: drops the map guides so <see cref="Shape"/> runs again.</summary>
+        /// <summary>Batch only, for the agent's iterations on C4: drops the map guides so <see cref="Shape"/> runs again.</summary>
         public static void ShapeReplacing()
         {
             var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
-            foreach (var old in scene.GetRootGameObjects().Where(r => r.name == VeilmouthScene.MapName))
+            foreach (var old in scene.GetRootGameObjects().Where(r => r.name.EndsWith(" Map")))
             {
                 Object.DestroyImmediate(old);
             }
@@ -128,16 +129,24 @@ namespace GameDev.Slice.EditorTools
             Shape();
         }
 
+        /// <summary>Batch only: <see cref="ShapeReplacing"/>, then the bare ground's views.</summary>
+        public static void ShapeReplacingAndRender()
+        {
+            ShapeReplacing();
+            VeilmouthRenders.RenderC4Ground();
+        }
+
         /// <summary>Heights in metres on the heightmap's lattice, [z, x], z north and x east.</summary>
         public static float[,] Heights()
         {
+            var layout = VeilmouthLayout.Load();
             var heights = new float[HeightmapResolution, HeightmapResolution];
             var step = Size / (HeightmapResolution - 1);
             for (var z = 0; z < HeightmapResolution; z++)
             {
                 for (var x = 0; x < HeightmapResolution; x++)
                 {
-                    heights[z, x] = Mathf.Min(Height(x * step, Size - (z * step)), VeilmouthScene.HeightBudget - 1f);
+                    heights[z, x] = Mathf.Min(Height(layout, x * step, Size - (z * step)), VeilmouthScene.HeightBudget - 1f);
                 }
             }
 
@@ -145,91 +154,87 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>The designed height at a plan point.</summary>
-        public static float Height(float px, float py)
+        public static float Height(VeilmouthLayout layout, float px, float py)
         {
-            var h = InCity(px, py) ? City(px, py) : Natural(px, py);
-            h += Edge(px, py);
-            h = River(px, py, h);
-            return Sea(px, py, h);
-        }
-
-        public static bool InCity(float px, float py) => px >= CityWest && px <= CityEast && py >= CityNorth && py <= CitySouth;
-
-        /// <summary>The coastal plain at the low level, rising to the upland north of the Ridge's line, with the ore hill.</summary>
-        private static float Natural(float px, float py)
-        {
-            var h = Low + ((Ridge - Low) * Smooth(710f, 650f, py)) + (4f * Smooth(640f, 540f, py));
-            var amplitude = 0.5f + (3.5f * Smooth(560f, 300f, py));
-            amplitude *= Smooth(0f, 40f, DistanceToCity(px, py)) * (1f - (0.8f * Roads(px, py)));
-            h += Noise(px, py) * amplitude;
-
-            var d = Mathf.Sqrt(Sq((px - 920f) / 75f) + Sq((py - 360f) / 170f));
-            if (d < 1f)
+            if (Built(layout, px, py))
             {
-                var bump = Smooth(1f, 0.1f, d);
-                h += ((HillTop - Ridge) * bump) + (3f * bump * Noise(px * 2.3f, py * 2.3f));
+                return Low + RiseAt(layout, px, py); // stone embankments and quay walls: the built ground meets the water upright
             }
 
-            return h;
-        }
-
-        /// <summary>The Ridge 4 m up behind its retaining wall; Crown Avenue's 8.7 % climb; the Soot Stair's causeway.</summary>
-        private static float City(float px, float py)
-        {
-            var h = py < RidgeEdge ? Ridge : Low;
-
-            var avenue = Low + ((Ridge - Low) * Mathf.Clamp01((AvenueFoot - py) / (AvenueFoot - AvenueHead)));
-            if (py >= 640f && py <= AvenueFoot)
+            var h = Natural(layout, px, py);
+            foreach (var river in layout.Rivers)
             {
-                var w = 1f - Smooth(AvenueHalf, AvenueEase, Mathf.Abs(px - AvenueX));
-                h = Mathf.Lerp(h, avenue, w);
+                h = Mathf.Min(h, Bank(river, px, py, RiverBed, 22f));
             }
 
-            if (px >= StairWest && px <= StairEast && py >= StairTop && py <= StairFoot)
-            {
-                h = Ridge - ((Ridge - Low) * (py - StairTop) / (StairFoot - StairTop));
-            }
-
-            return h;
+            return Coast(layout, px, py, h);
         }
 
-        /// <summary>The area's north, west, and east edges rise steeper than 45°, with a pass for each road out.</summary>
-        private static float Edge(float px, float py)
+        /// <summary>The city or the works inside their walls, or a wall's own footing.</summary>
+        public static bool Built(VeilmouthLayout layout, float px, float py) =>
+            layout.City.Contains(px, py) || layout.Works.Contains(px, py) ||
+            layout.walls.Any(w => (w.axis == "y" ? px >= w.t0 - 1f && px <= w.t1 + 1f && py >= w.a0 && py <= w.a1
+                                                  : py >= w.t0 - 1f && py <= w.t1 + 1f && px >= w.a0 && px <= w.a1));
+
+        /// <summary>The low rise under the Penny and the cathedral, along the spine between them.</summary>
+        public static float RiseAt(VeilmouthLayout layout, float px, float py)
         {
-            var d = Mathf.Min(px, Mathf.Min(Size - px, py));
-            return 45f * Smooth(45f, 5f, d) * Smooth(840f, 760f, py) * (1f - (0.85f * Roads(px, py)));
+            var a = new Vector2(layout.plaza.cx, layout.plaza.cy);
+            var p = new Vector2(px, py);
+            var ab = Cathedral - a;
+            var t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / ab.sqrMagnitude);
+            var d = (p - (a + (ab * t))).magnitude;
+            return Rise * Smooth(RiseEnd, RiseFull, d);
         }
 
-        /// <summary>A 40 m channel, its bed at 21 m: stone embankments in the city, banks of 25 m outside it.</summary>
-        private static float River(float px, float py, float h)
+        /// <summary>The land outside the walls: rolling, rising inland, and steep at the area's land edges.</summary>
+        private static float Natural(VeilmouthLayout layout, float px, float py)
         {
-            var inBasin = px >= 740f && px <= 860f && py >= 790f && py <= CitySouth;
-            if ((px >= RiverWest && px <= RiverEast) || inBasin)
-            {
-                return py > 790f ? Mathf.Lerp(RiverBed, SeaBed, (py - 790f) / 40f) : RiverBed;
-            }
-
-            var walled = py >= CityNorth && px < RiverWest;
-            var distance = px < RiverWest ? RiverWest - px : px - RiverEast;
-            return walled ? h : Mathf.Lerp(RiverBed, h, Smooth(0f, 25f, distance));
+            var near = Mathf.Min(layout.City.Distance(px, py), layout.Works.Distance(px, py));
+            var road = Roads(layout, px, py);
+            var inland = 6f * Smooth(120f, 380f, Mathf.Min(near, 380f));
+            var amplitude = (1f + (4f * Smooth(40f, 260f, near))) * Smooth(0f, 30f, near) * (1f - (0.85f * road));
+            // The rise runs on past the north wall, so the ground meets the wall at one level on both sides.
+            var h = Low + RiseAt(layout, px, py) + (inland * (1f - (0.6f * road))) + (Noise(px, py) * amplitude);
+            // The north, west and south edges rise steeper than 45°, with a pass for the West Road.
+            var edge = Mathf.Min(px, Mathf.Min(py, Size - py));
+            h += 45f * Smooth(45f, 5f, edge) * Smooth(layout.OpenCoast + 40f, layout.OpenCoast - 60f, px) * (1f - (0.85f * road));
+            // No hollow sinks under the sea's level or to the shore's sand: water is the river and the sea only (§28.1).
+            return Mathf.Max(h, Low + 0.3f);
         }
 
-        /// <summary>The sea south of 830: quay walls along the city and the basin, a beach elsewhere.</summary>
-        private static float Sea(float px, float py, float h)
+        /// <summary>
+        /// A river's channel: its bed inside, a natural bank of <paramref name="bank"/> m outside; built ground keeps its
+        /// stone embankment (checked before this is called).
+        /// </summary>
+        private static float Bank(VeilmouthLayout.Water river, float px, float py, float bed, float bank)
         {
-            var bed = SeaBed - (1.5f * Smooth(850f, Size, py));
-            var quay = px >= CityWest && px <= 860f;
-            if (quay)
+            var dx = Mathf.Max(river.x0 - px, Mathf.Max(0f, px - river.x1));
+            var dy = Mathf.Max(river.y0 - py, Mathf.Max(0f, py - river.y1));
+            var d = Mathf.Sqrt((dx * dx) + (dy * dy));
+            return d <= 0f ? bed : Mathf.Lerp(bed, 99f, Smooth(0f, bank, d));
+        }
+
+        /// <summary>The sea: its bed deepening from the coast, the open coast's rocks falling steeply into it.</summary>
+        private static float Coast(VeilmouthLayout layout, float px, float py, float h)
+        {
+            var sea = layout.Sea;
+            var coast = py >= sea.y0 && py <= sea.y1 ? sea.x0 : layout.OpenCoast;
+            var bed = SeaBed - (2.5f * Smooth(coast, coast + 200f, px));
+            if (px >= coast)
             {
-                return py > CitySouth ? bed : h;
+                return bed;
             }
 
-            return Mathf.Lerp(h, bed, Smooth(812f, 850f, py));
+            // Rocks within 12 m of the open coast, so the land falls into the sea over them (§28.1 item 13).
+            var rocky = Mathf.Lerp(bed, h, Smooth(0f, 12f, coast - px));
+            return Mathf.Min(h, rocky + (Mathf.Abs(Noise(px * 4f, py * 4f)) * 1.5f * Smooth(0f, 6f, coast - px)));
         }
 
         /// <summary>Weights for the five canonical layers (grass, sand, soil, cliff, rock), by priority cover.</summary>
         public static float[,,] Paint(float[,] heights, int resolution = AlphamapResolution)
         {
+            var layout = VeilmouthLayout.Load();
             var maps = new float[resolution, resolution, 5];
             var cell = Size / (HeightmapResolution - 1);
             for (var z = 0; z < resolution; z++)
@@ -245,7 +250,7 @@ namespace GameDev.Slice.EditorTools
 
                     var px = hx * cell;
                     var py = Size - (hz * cell);
-                    var w = Weights(px, py, h, slope);
+                    var w = Weights(layout, px, py, h, slope);
                     for (var l = 0; l < 5; l++)
                     {
                         maps[z, x, l] = w[l];
@@ -256,40 +261,38 @@ namespace GameDev.Slice.EditorTools
             return maps;
         }
 
-        private static float[] Weights(float px, float py, float h, float slope)
+        private static float[] Weights(VeilmouthLayout layout, float px, float py, float h, float slope)
         {
             var w = new float[5];
             const int grass = 0, sand = 1, soil = 2, cliff = 3, rock = 4;
-            if (slope > 40f)
+            var coast = py >= layout.Sea.y0 && py <= layout.Sea.y1 ? layout.Sea.x0 : layout.OpenCoast;
+            if (Built(layout, px, py))
+            {
+                w[soil] = 1f; // the builder paints its streets, squares and gardens over it
+            }
+            else if (slope > 40f)
             {
                 w[h > 45f ? rock : cliff] = 1f;
+            }
+            else if (coast - px < 16f)
+            {
+                w[rock] = 0.8f; // the open coast's rocks
+                w[grass] = 0.2f;
             }
             else if (h < 25.2f)
             {
                 w[sand] = 1f;
             }
-            else if (InCity(px, py))
-            {
-                var garden = py < RidgeEdge ? 0.7f : 0f;
-                w[grass] = garden;
-                w[soil] = 1f - garden;
-            }
-            else if (Roads(px, py) > 0.5f)
+            else if (Roads(layout, px, py) > 0.5f)
             {
                 w[soil] = 1f;
             }
-            else if (h > 50f || Edge(px, py) > 8f)
+            else if (h > 50f)
             {
                 w[rock] = 0.7f;
                 w[grass] = 0.3f;
             }
-            else if (px < 260f && py > 480f)
-            {
-                var strip = Mathf.Sin(py / 9f) > 0f ? 0.85f : 0.2f; // field strips
-                w[soil] = strip;
-                w[grass] = 1f - strip;
-            }
-            else if (py < 470f)
+            else if (layout.forest.rects.Any(r => r.Contains(px, py)))
             {
                 var floor = 0.25f + (0.25f * Noise(px * 3f, py * 3f));
                 w[soil] = floor;
@@ -303,21 +306,9 @@ namespace GameDev.Slice.EditorTools
             return w;
         }
 
-        /// <summary>1 on the West road, the North road, and the East road past the bridge; 0 from 20 m away.</summary>
-        private static float Roads(float px, float py)
-        {
-            var west = px < CityWest ? 1f - Smooth(4f, 20f, Mathf.Abs(py - 735f)) : 0f;
-            var east = px > RiverEast ? 1f - Smooth(4f, 20f, Mathf.Abs(py - 735f)) : 0f;
-            var north = py < CityNorth ? 1f - Smooth(4f, 20f, Mathf.Abs(px - 747f)) : 0f;
-            return Mathf.Max(west, Mathf.Max(east, north));
-        }
-
-        private static float DistanceToCity(float px, float py)
-        {
-            var dx = Mathf.Max(CityWest - px, Mathf.Max(0f, px - CityEast));
-            var dy = Mathf.Max(CityNorth - py, Mathf.Max(0f, py - CitySouth));
-            return Mathf.Sqrt((dx * dx) + (dy * dy));
-        }
+        /// <summary>1 on the roads outside the walls (the West Road), 0 from 20 m away.</summary>
+        private static float Roads(VeilmouthLayout layout, float px, float py) =>
+            layout.roads.Select(r => 1f - Smooth(2f, 20f, r.Distance(px, py))).DefaultIfEmpty(0f).Max();
 
         /// <summary>Three octaves of Perlin noise in −1…1 over 120 m; deterministic, with fixed offsets.</summary>
         private static float Noise(float px, float py)
@@ -341,7 +332,5 @@ namespace GameDev.Slice.EditorTools
             var t = Mathf.Clamp01((v - from) / (to - from));
             return t * t * (3f - (2f * t));
         }
-
-        private static float Sq(float v) => v * v;
     }
 }
