@@ -97,6 +97,7 @@ namespace GameDev.Slice.EditorTools
                 "antique_wooden_cabinet_3d_model_Clone1", "ornate_vase_3d_model", "classical_bust_3d_model", "antique_barometer_3d_model",
                 "bronze_statue_3d_model", "vintage_street_lamp_3d_model", "decorative_vase_3d_model_Clone1", "magnifying_glass_3d_model",
                 "ornate_ink_desk_3d_model_Clone1", "ornate_radiator_3d_model",
+                "military_uniform_3d_model", "human_figure_3d_model", "human_body_3d_model",
             };
             Directory.CreateDirectory(OutputFolder);
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);

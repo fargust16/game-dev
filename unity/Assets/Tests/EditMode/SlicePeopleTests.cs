@@ -57,5 +57,30 @@ namespace GameDev.Slice.Tests
 
             Assert.AreEqual(14, SliceRoster.All.Count);
         }
+
+        /// <summary>The owner's female Warden and the player's two bodies (owner, 2026-11-10; asset map §1).</summary>
+        [Test]
+        public void TheFemaleWardensAndThePlayerWearTheOwnersModels()
+        {
+            foreach (var (scene, name) in new[] { (VeilmouthScene.ScenePath, "Warden at the Black Puddle"), (VeilmouthDressing.LockupScenePath, "Warden") })
+            {
+                EditorSceneManager.OpenScene(scene, OpenSceneMode.Single);
+                var wardens = Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                    .Where(t => t.name == name && PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject))
+                    .Select(t => PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(t.gameObject)).ToList();
+                Assert.AreEqual(1, wardens.Count(p => p == SlicePeopleModels.WardenWoman.Standing), $"{name} in {scene}: one woman Warden");
+            }
+
+            foreach (var (path, look) in new[] { (SliceTestScenes.PlayerPrefabPath, SlicePeopleModels.PlayerMan), (SlicePeopleModels.PlayerWomanPrefab, SlicePeopleModels.PlayerWoman) })
+            {
+                var player = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                Assert.IsNotNull(player, path);
+                var animator = player.transform.Find("Model").GetComponent<Animator>();
+                Assert.AreEqual(look.Model, AssetDatabase.GetAssetPath(animator.avatar), $"{path} wears {look.File}");
+                Assert.IsTrue(animator.avatar.isHuman);
+                Assert.IsNotNull(animator.runtimeAnimatorController);
+                Assert.AreEqual(1, player.GetComponentsInChildren<Animator>(true).Length, $"{path} has one body");
+            }
+        }
     }
 }

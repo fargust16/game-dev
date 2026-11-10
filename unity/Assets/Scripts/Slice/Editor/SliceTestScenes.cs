@@ -32,8 +32,6 @@ namespace GameDev.Slice.EditorTools
         /// <summary>Where the movement test puts the player: a clear run of 18 m to the north.</summary>
         public static readonly Vector3 MovementSpawn = new Vector3(-2f, 0.1f, -12f);
 
-        private const string CharacterPrefabPath = "Assets/Kevin Iglesias/Human Character Dummy/Prefabs/HumanDummy_M White.prefab";
-        private const string AnimatorPath = "Assets/Settings/OverworldPlayerAnimator.controller";
         private const string ClockSettingsPath = "Assets/Data/Slice/GameClockSettings.asset";
         private const string PanelSettingsPath = "Assets/UI/SlicePanelSettings.asset";
         private const string ThemePath = "Assets/UI/SliceRuntimeTheme.tss";
@@ -58,14 +56,6 @@ namespace GameDev.Slice.EditorTools
         [MenuItem("GameDev/Slice/Build Player Prefab")]
         public static void BuildPlayerPrefab()
         {
-            var character = AssetDatabase.LoadAssetAtPath<GameObject>(CharacterPrefabPath);
-            var animatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(AnimatorPath);
-            if (character == null || animatorController == null)
-            {
-                Debug.LogError($"Slice player needs '{CharacterPrefabPath}' and '{AnimatorPath}'.");
-                return;
-            }
-
             var root = new GameObject("SlicePlayer");
             var controller = root.AddComponent<CharacterController>();
             controller.height = PlayerHeight;
@@ -82,23 +72,8 @@ namespace GameDev.Slice.EditorTools
             root.AddComponent<FallGuard>();
             root.AddComponent<PushLooseProps>(); // kit standard §4: the player pushes loose props
 
-            var model = (GameObject)PrefabUtility.InstantiatePrefab(character, root.transform);
-            model.name = "Model";
-            foreach (var collider in model.GetComponentsInChildren<Collider>())
-            {
-                Object.DestroyImmediate(collider);
-            }
-
-            var animator = model.GetComponent<Animator>();
-            if (animator == null)
-            {
-                animator = model.AddComponent<Animator>();
-            }
-
-            animator.runtimeAnimatorController = animatorController;
-            animator.applyRootMotion = false;
-            FitHeight(model, PlayerHeight);
-            SliceCharacterLook.Look(model);
+            // The owner's Tripo body (owner, 2026-11-10; asset map §1): the man by default, the woman a prefab of her own.
+            SlicePeopleModels.Wear(root, SlicePeopleModels.PlayerMan);
 
             SetLayer(root, KitLayers.Character);
             KitStandIns.EnsureFolder("Assets/Prefabs/Slice");
@@ -312,25 +287,6 @@ namespace GameDev.Slice.EditorTools
             var block = (GameObject)PrefabUtility.InstantiatePrefab(asset);
             block.transform.SetPositionAndRotation(at, Quaternion.Euler(0f, yaw, 0f));
             return block;
-        }
-
-        private static void FitHeight(GameObject model, float height)
-        {
-            var renderers = model.GetComponentsInChildren<Renderer>();
-            if (renderers.Length == 0)
-            {
-                return;
-            }
-
-            var bounds = renderers.Skip(1).Aggregate(renderers[0].bounds, (b, r) =>
-            {
-                b.Encapsulate(r.bounds);
-                return b;
-            });
-            if (bounds.size.y > 0.05f)
-            {
-                model.transform.localScale = Vector3.one * (height / bounds.size.y);
-            }
         }
 
         private static void SetLayer(GameObject root, string layer)

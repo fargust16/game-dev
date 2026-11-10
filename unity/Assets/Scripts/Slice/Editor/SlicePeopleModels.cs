@@ -81,7 +81,15 @@ namespace GameDev.Slice.EditorTools
         public static readonly Look Townsman = new Look("Townsman", "stylized_male_character_3d_model", false, SliceTownsfolk.Height);
         public static readonly Look Matron = new Look("Matron", "historical_woman_3d_model", true, 1.65f);
 
-        public static readonly Look[] All = { Gentleman, Lady, WorkingWoman, Officer, Detective, Blacksmith, Townsman, Matron };
+        public static readonly Look WardenWoman = new Look("WardenWoman", "military_uniform_3d_model", true, 1.70f);
+
+        public static readonly Look[] All = { Gentleman, Lady, WorkingWoman, Officer, Detective, Blacksmith, Townsman, Matron, WardenWoman };
+
+        /// <summary>The player's two bodies (owner, 2026-11-10): worn by the player's prefabs, with no standing prefab of their own.</summary>
+        public static readonly Look PlayerMan = new Look("PlayerMan", "human_figure_3d_model", false, 1.80f);
+        public static readonly Look PlayerWoman = new Look("PlayerWoman", "human_body_3d_model", true, 1.68f);
+        public const string PlayerWomanPrefab = "Assets/Prefabs/Slice/SlicePlayerWoman.prefab";
+        private const string PlayerWomanController = "Assets/Settings/OverworldPlayerAnimator_Woman.overrideController";
 
         /// <summary>The looks with a walking prefab of their own here; the townsman and the matron walk as the townsfolk.</summary>
         private static readonly Look[] NewWalkers = { Gentleman, Lady, WorkingWoman };
@@ -94,7 +102,7 @@ namespace GameDev.Slice.EditorTools
         {
             if (name.Contains("Warden") || name == "Sergeant Coyle")
             {
-                return Officer;
+                return female ? WardenWoman : Officer;
             }
 
             if (name.StartsWith("Development opponent") || name.StartsWith("Cult"))
@@ -931,7 +939,153 @@ namespace GameDev.Slice.EditorTools
             AssetDatabase.SaveAssets();
         }
 
+        // ------------------------------------------------------------------------------------------- the female Warden and the player
+
+        /// <summary>
+        /// The owner's second models of 2026-11-10: the female Warden's prefab, C5's two female Wardens in it, and the
+        /// player's two bodies. Batch: -executeMethod GameDev.Slice.EditorTools.SlicePeopleModels.WardensAndPlayer
+        /// </summary>
+        public static void WardensAndPlayer()
+        {
+            var report = new StringBuilder();
+            Build(WardenWoman, false, null, report);
+            FemaleWardens(report);
+            WearPlayer(SliceTestScenes.PlayerPrefabPath, PlayerMan, report);
+            WearPlayer(PlayerWomanPrefab, PlayerWoman, report);
+            Directory.CreateDirectory(OutputFolder);
+            File.WriteAllText($"{OutputFolder}/people_wardens_player.txt", report.ToString());
+            Debug.Log("[SlicePeopleModels]\n" + report);
+            CheckSheet();
+            PlayerSheet();
+            RenderPeople();
+        }
+
+        /// <summary>
+        /// The Wardens placed as women, who wore the Officer until the owner's female Warden came: C5's at the Black
+        /// Puddle (VeilmouthCity.Districts) and the lock-up's in its office (VeilmouthInteriors.Lockup). A rebuild places
+        /// them through <see cref="LookFor"/>, which now gives a woman the female Warden.
+        /// </summary>
+        private static void FemaleWardens(StringBuilder report)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(WardenWoman.Standing);
+            foreach (var (scenePath, name, at) in new[]
+                     {
+                         (VeilmouthScene.ScenePath, "Warden at the Black Puddle", (Vector2?)null),
+                         (VeilmouthDressing.LockupScenePath, "Warden", new Vector2(18.3f, 15.5f)),
+                     })
+            {
+                var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+                var wardens = Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                    .Where(t => t.name == name && PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject)
+                                && PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(t.gameObject) == Officer.Standing)
+                    .Where(t => at == null || Vector2.Distance(new Vector2(t.localPosition.x, t.localPosition.z), at.Value) < 0.6f)
+                    .ToList();
+                foreach (var t in wardens)
+                {
+                    Replace(t.gameObject, prefab);
+                }
+
+                report.AppendLine($"{scenePath}: {name}: {wardens.Count} to {WardenWoman.Name}");
+                if (wardens.Count > 0)
+                {
+                    EditorSceneManager.MarkSceneDirty(scene);
+                    EditorSceneManager.SaveScene(scene);
+                }
+            }
+        }
+
+        /// <summary>The player prefab at <paramref name="path"/> in <paramref name="look"/>'s body; the woman's is made from the man's.</summary>
+        private static void WearPlayer(string path, Look look, StringBuilder report)
+        {
+            var root = PrefabUtility.LoadPrefabContents(SliceTestScenes.PlayerPrefabPath);
+            report.AppendLine($"{path}: {Wear(root, look)}");
+            PrefabUtility.SaveAsPrefabAsset(root, path);
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+
+        /// <summary>
+        /// <paramref name="look"/>'s body under the player's <paramref name="root"/>, named Model in place of the old one:
+        /// at its stature, in the idle's first pose, playing the player's locomotion; the woman's through an override of
+        /// its clips by her own stand-ins. The root and its components stay. Returns a line for the report.
+        /// </summary>
+        internal static string Wear(GameObject root, Look look)
+        {
+            var old = root.transform.Find("Model");
+            if (old != null)
+            {
+                Object.DestroyImmediate(old.gameObject);
+            }
+
+            var model = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(look.Model), root.transform);
+            model.name = "Model";
+            model.transform.SetSiblingIndex(0);
+            SliceKitCatalogue.LinkTripoTextures(model, look.Model);
+            var animator = Animated(model, look);
+            animator.runtimeAnimatorController = look.Female ? WomanPlayer() : AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(PlayerController);
+            animator.applyRootMotion = false;
+            var stature = Fit(model, Clip(look.Female ? WomanIdle : ManIdle), look.Height, false);
+            var head = Keep(model, animator);
+            SliceKitCatalogue.SetLayer(model, KitLayers.Character);
+            return $"{look.File}, {stature:0.00} m (head bone at {head:0.00} m), {animator.runtimeAnimatorController.name}, upper arm {ArmDrop(animator):0}° from down";
+        }
+
+        /// <summary>The player's controller with the woman's idle and walk in place of the man's (stand-ins until A1).</summary>
+        private static RuntimeAnimatorController WomanPlayer()
+        {
+            var basis = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(PlayerController);
+            var woman = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(PlayerWomanController);
+            if (woman == null)
+            {
+                woman = new AnimatorOverrideController(basis);
+                AssetDatabase.CreateAsset(woman, PlayerWomanController);
+            }
+
+            woman.runtimeAnimatorController = basis;
+            var overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>();
+            woman.GetOverrides(overrides);
+            for (var i = 0; i < overrides.Count; i++)
+            {
+                var key = AssetDatabase.GetAssetPath(overrides[i].Key);
+                overrides[i] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[i].Key,
+                    key == ManIdle ? Clip(WomanIdle) : key == ManWalk ? Clip(WomanWalk) : null);
+            }
+
+            woman.ApplyOverrides(overrides);
+            EditorUtility.SetDirty(woman);
+            AssetDatabase.SaveAssets();
+            return woman;
+        }
+
         // ------------------------------------------------------------------------------------------- checks
+
+        /// <summary>The player's two prefabs standing in their idle and stepping in their walk, front and side (`people_player.png`).</summary>
+        private static void PlayerSheet()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            var light = new GameObject("Light").AddComponent<Light>();
+            light.type = LightType.Directional;
+            light.transform.rotation = Quaternion.Euler(40f, -30f, 0f);
+            RenderSettings.ambientLight = new Color(0.55f, 0.55f, 0.55f);
+            const int tile = 256;
+            var players = new[] { (SliceTestScenes.PlayerPrefabPath, PlayerMan), (PlayerWomanPrefab, PlayerWoman) };
+            var sheet = new Texture2D(4 * tile, players.Length * tile, TextureFormat.RGB24, false);
+            for (var row = 0; row < players.Length; row++)
+            {
+                var (path, look) = players[row];
+                var column = 0;
+                foreach (var (clipPath, at) in new[] { (look.Female ? WomanIdle : ManIdle, 0.5f), (look.Female ? WomanWalk : ManWalk, 0.25f) })
+                {
+                    var go = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path));
+                    var clip = Clip(clipPath);
+                    Pose(go.GetComponentInChildren<Animator>(), clip, clip.length * at);
+                    SliceCharacterRigs.Draw(go, sheet, row, ref column, tile, players.Length);
+                    Object.DestroyImmediate(go);
+                }
+            }
+
+            sheet.Apply();
+            File.WriteAllBytes($"{OutputFolder}/people_player.png", sheet.EncodeToPNG());
+        }
 
         /// <summary>Every look standing in its idle and stepping in its walk, front and side (`people_check.png`).</summary>
         private static void CheckSheet()
@@ -966,7 +1120,7 @@ namespace GameDev.Slice.EditorTools
         {
             EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             var people = Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-            var shots = new[] { "Blacksmith", "Warden at the station", "Tobias Penn", "Madame Ilse", "Drunkard" }
+            var shots = new[] { "Blacksmith", "Warden at the station", "Warden at the Black Puddle", "Tobias Penn", "Madame Ilse", "Drunkard" }
                 .Select(n => people.FirstOrDefault(t => t.name == n)).Where(t => t != null).ToList();
             foreach (var path in new[] { Gentleman.Walking, Lady.Walking, WorkingWoman.Walking })
             {

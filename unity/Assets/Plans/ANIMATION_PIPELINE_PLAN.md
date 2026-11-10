@@ -1,12 +1,12 @@
 # Animation Pipeline — Blender and Mixamo to Unity
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft — the owner's decision of 2026-11-10, planned by the agent; the steps wait for the owner's word, as every slice milestone does
 
 Created: 2026-11-10
 
-Last Updated: 2026-11-10 (§5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
+Last Updated: 2026-11-10 (§1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1–§2, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -21,6 +21,7 @@ The owner, 2026-11-10:
 - The downloaded animation packs cannot be used commercially, so they leave the project: Kevin Iglesias' Human Animations (Human Basic Motions, Crafting, Melee, Soldier and Spellcasting FREE), already removed; DoubleL's RPG_Animations_Pack_FREE; and the clips of Bublisher's 3D Stylized Animated Dogs Kit. The owner removes them.
 - Every clip of the player and the NPCs is our own. The beasts but the dog are animated already. The dog's clips are crooked and are to be replaced.
 - New clips are made with Blender and Mixamo and used in Unity.
+- With the player's two bodies and the women Wardens' uniform, the same day: the animations are the agent's work. The agent never signs in to Mixamo, so who downloads its clips is open ([99](../../../99%20Open%20Questions.md) VS-ANIM).
 
 ## 2. What the rigs allow (measured, 2026-11-10)
 
@@ -28,6 +29,8 @@ The owner, 2026-11-10:
 
 - The six new models carry Mixamo's skeleton (`mixamorig:*`, 65 bones); the townsman and woman carry Tripo's own bone names (67). Each imports as a valid Unity **Humanoid**, the two older ones mapped by name (`Logs/SliceSurvey/rigs.txt`).
 - A Humanoid clip plays on every one of them. The check posed all eight in the woman's Tripo idle and walk and in a one-handed attack; each pose came across clean, arms and legs where the clip puts them (`Logs/SliceSurvey/rig_check.png`).
+
+- **The owner's second list** (2026-11-10): the player's man and woman and the women Wardens' uniform. The owner made their skeletons for Unity. They carry Tripo's own bone names, as the historical woman does (67 bones), and Unity maps each as a Humanoid itself. All three pose clean in the same clips, so the slice has eleven Humanoid people.
 
 So **the characters need not go to Blender before the work starts.** A clip is made once on any Humanoid skeleton and Unity's retargeting carries it to every model. Mixamo's own skeleton matches six of the eight bone for bone.
 
@@ -73,10 +76,10 @@ Each phase waits for the owner's word.
   - `ManIdle` (461 frames) and `ManWalk` (71 frames), baked from the borrowed Generic clips;
   - `WomanIdle` and `WomanWalk`, the historical woman's own `idle.001` and `walk.001`.
 - **The controllers.** Every standing person has `Man.controller` or `Woman.controller` in the same folder. The townsfolk walk in `SliceTownsfolk` and `SliceTownswoman`, repointed to the stand-ins.
-- **The player.** Its controller's blend tree plays idle, then the man's walk at 1, 1.5 and 1.9 times. Its other states play the man's idle until A1.
+- **The player.** Its controller's blend tree plays idle, then the man's walk at 1, 1.5 and 1.9 times. Its other states play the man's idle until A1. The man's body plays it as it is; the woman's plays `OverworldPlayerAnimator_Woman`, an override with the woman's idle and walk.
 - **No person plays a clip from a downloaded pack any more.** The dog keeps the Dogs Kit's clips until A4.
 
-**A1 — the Mixamo base set (owner downloads, agent wires).** The clips of §6 marked A1. The agent imports them, checks them on all eight models, and builds one Animator Controller a role: the player, the townsfolk, the Wardens, the Cult Forces.
+**A1 — the Mixamo base set (owner downloads, agent wires).** The clips of §6 marked A1. The agent imports them, checks them on all eleven models, and builds one Animator Controller a role: the player, the townsfolk, the Wardens, the Cult Forces.
 
 **A2 — combat from Mixamo (owner downloads, agent wires).** The clips of §6 marked A2, wired into the Combat Grid's actions; what is rough is listed for A3.
 
