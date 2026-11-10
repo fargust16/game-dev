@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4)
 
-Version: 0.49
+Version: 0.50
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10 and being built; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§28: C4, the owner's map: a round centre with four straight streets and one at 45°, every other street straight at right angles, 100–120 buildings, the river round the west and south, one gate in a stone wall, the port on the east, the works over the river, the cathedral with parks, a village across the river and then the forest; streets of the accepted sections, wider pavements and lower, narrower stoops in place of crowns in the walls; folk street names; the agent builds it step by step without stops, by the owner. Earlier: §27.10: the owner's mature tree along every road, Crown Avenue's mall with them, and Veilmouth's earlier trees in the parks, the rich houses' gardens and the palace forecourt's corners, by the owner: 90 placed, each crown turned its narrow way across its road; in 41 of the 66 road trees near a house part of the crown reaches into a wall, 1.1 % of it, open. Earlier: §27.9: the mature tree's lighter tubes, 6 bark sides and 3-sided twigs, and its twigs only near, by the owner's choice: four LODs of 162.4, 94.8, 5.7 and 2.3 thousand triangles in Unity, LOD0 to about 13.5 m. Earlier: 2026-11-09: §27.8: LOD0's weight measured at the owner's request: Easy Tree's subdivision is already off, and 8 or 6 bark sides with 3-sided twigs take 29 % or 37 % off; the twigs are under a pixel beyond a few metres. Earlier: §27.8: the owner's mature tree built again at the owner's request: the owner's second setting and change to Easy Tree, Easy Tree's own bark and twigs kept, one photographed hornbeam leaf on each of its leaf places, the far LODs from the same leaves thinned; LOD0 255 thousand triangles by the owner's choice; tree wrappers keep their LOD Groups. Earlier: §27.7: the owner's mature tree, set by the owner in Easy Tree, built with the project's leaf cards: its branches as tubes of few sides, three LODs within the reference budgets, a kit wrapper; where it stands open. Earlier: §27.6: the owner's reference tree assessed with a prototype from MTree: how studios build such trees, three 11 m prototypes measured, and where it would stand. Earlier: §27.5: the trees grown again with MTree after the owner's analysis request: cluster cards of photographed leaves, street trees on a leader and garden domes, the cards in the crown's outer shell and nothing sticking out of it; measured against the first trees; the owner's reference tree under assessment. Earlier: §27: Veilmouth's own trees, at the owner's request: six thin hornbeams and beeches made in Blender with Easy Tree, with twig cards, two LODs and wind in their own shader, in place of the fruit and warped trees; tree pits of 1.2 m; one row of trees where a carriageway is under 8 m wide. Earlier: §26: the owner's fifth play test: back doors opened or walled up, every door entered, Offices for civic buildings, the Tripo pieces resized, hedges walked through, rooms cut round doors, tree pits and lamps on the carriageway with the pavements back, the wet band gone, railing posts at free ends, less wind, Polytope's fruit tree in the birches' place; the land outside the walls planned in §26.2. Earlier: §25.6: the hanging sign over Harrow's and the Soot & Bell's doors, by the owner's VS-SIGN (b). Earlier: §25.8: the greenery as built, counted in the saved scene. Earlier: §25.6: no field fence inside the walls, only hedges or stone; no barrel, crate or box set down for its own sake: they stand in the port, on Dock Road and in stores, so the shop goods and the yards' and the court's barrels are gone; the owner's Tripo pieces furnish interiors only; §6.1 changed to match. Earlier: §25: the city's greenery by the owner: Stylized Trees Pack trees and bushes in a muted city green, wider pavements taken from the carriageways (§24.2), street trees, hedges, beds and grass, and Roadside Tales outside the walls; §6.2 changed to match. Earlier: §24.7: goods before 32 shop doors and iron rails on the Ridge villas' balconies (reference plan R7). Earlier: §24.7: the rooms behind the windows are plain renderers, with no wrapper, collider, body, light or script, so the city's first load fell from 11.8 s to 7.9 s in the editor (reference plan R1.3). Earlier: §24.7: a raised door keeps a doorcase of two pilasters; the porch columns and bare beams are gone, since the kit's balcony slab cannot roof a porch, and the porch pieces are wanted (reference plan R6). Earlier: §24.2, §24.3, §24.7: raised pavements as islands with kerbs, rounded corners and a wet band, and passages of 4 m with railed backs instead of yard walls (reference plan R4–R5); Ridge Alley and the three passages widened to 4 m; 93 houses. Earlier: §24.7: the far windows map the rooms built behind them, the glass reflects 70 street probes and the painted sky, and the sun's shadows are finer and soft (reference plan R2 steps 4, 5 and 7). Earlier: §24.7: the reference look's colour and air (reference plan R3): Linear colour space, painted skies, haze, a lower golden sun, a faint red moon, the HDR grade and SSAO. Earlier: §24.7: the houses' smooth LOD, at the owner's request: only small details cross-fade out, the rooms behind the windows switch by distance, attic rooms stand under the mansard's flat only, and the 55 houses were given it in place. Earlier: §24.7: the editor and the game draw at the quality level High, by the owner's choice. Earlier: §24.7: the city stays loaded behind its interiors, by the owner's choice; a door takes about 0.5 s. Earlier: §24.7: the owner's walk of C3, its six faults sent to the reference plan; doors load at High priority. Earlier: §24.7: C3 built once by `VeilmouthCity.RebuildC3`: the ground, 2 799 kit blocks with no kit fault, 55 baked house types, and the mystic layer: sky by the clock, the crimson moon, 106 gas lamps, 27 fog banks, 27 wards and 4 strange windows. Earlier: §24: C3, the kit city, at the owner's request: realistic street sections on the same area, the Market Place on the Crown Axis, passages and yards, the owner's Victorian Kit at ×1.25 for every house, and a mystic layer by the new world style guide. Earlier: §23: the owner's second set of ornaments: three different angels in green places in three parts of the city, a pair of great lions before the Governor's Palace, birdbaths in every rich garden; the first angel turned to its gate. Earlier: §13, §14: the Soot & Bell's back door is an exit to its yard, the pack's shop door in the house's yard side with its portal, by the owner after VI-8. Earlier: §14: the missing room's landing no longer has a closed neighbour's door, which led nowhere (owner, VI-8). Earlier: §23: the owner's garden ornaments placed: the angel pouring water at the heart of Wardley Garden, birdbaths in two Ridge villas' front gardens and the faction's. Earlier: §22: VI-4 rebuilt the Dwellings, so §14's and §16's rooms are replaced by `VICTORIAN_INTERIORS_PLAN.md` §7–§8. Earlier: §22: Victorian Interiors chosen by the owner for every interior; the rebuild planned in `VICTORIAN_INTERIORS_PLAN.md`. Earlier: §21: C2 accepted by the owner and built: the ground shaped again and the city rebuilt. Earlier: §21: C2, the smaller city, proposed: 300 × 204 m at the owner's ×0.6, crossroads every 40–90 m, the Ridge 4 m high. Earlier: §20: the owner's fourth play test: railings without holes, the bridge closed against the ground, the bar by its keeper; a smaller city with more crossroads waits for C2. Earlier: §19: detached houses, by the owner after the third play test: every railed house stands alone on its own green plot, railed all round with one gate opposite its door; §3.3, §3.4 and §5.2 changed to match. Earlier: §18, remark 7: loose props built, by kit standard §4. Earlier: §18: the owner's third play test: shelves, paintings, and beds fixed; detached houses, loose props, a room constructor, transport, cabs, and animals recorded. Earlier: §17: the owner's second play test fixed and rerun at the owner's request: still dressing, game scale ×1.2, BK's 4 m module, walls set by their infill, one-style steps, props on slopes, railings without holes, blue shop floors; §14 and §16 resized. Earlier: §16: the Dwelling scene, its generator, and a street door on all 265 dwellings, built by step 4a's first half; breaking in waits on S2, S3, S5a, and S5c. Earlier: §15: the owner's remarks after the play test of the built city and interiors fixed in both passes, rerun at the owner's request; §2, §13 and §14 changed to match. Earlier: §14: the seven interiors built once from §8 by `VeilmouthInteriors`, BK's walls measured as single-sided, brick for stone rooms and plaster for the rest, ceilings at 2.9 m. Earlier: §8, §11: the Dwelling scene for every NPC home, by the owner, after the seven interiors. Earlier: §13: the city built once from C1 by `VeilmouthCity`, with its streets, works, houses, doors, lamps, green, and what is still missing. Earlier: §9: the ground shaped once from C1 by `VeilmouthGround`. Earlier: §2, §8: the modules and BK_AlchemistHouse measured; the Victorian modules are built at ×1.25 and BK's rooms at ×1.2, so interior ceilings are 3 m. Earlier: §12: the Combat Grid and the kit check tested at 45°; streets at 45° are allowed from 3 m wide. Earlier: accepted by the owner with every remark: the Governor's Palace, right-angled streets with some at 45° once the Combat Grid is checked at that angle, and the size. Earlier: first draft, from the owner's fifteen remarks after playing the dressed C0)
+Last Updated: 2026-11-10 (§28.5: C4's plan, written with the builder's layout and the player's map by tools/slice/veilmouth_c4_plan.py: about 260 × 290 m inside the wall and about 102 buildings; the Penny, 80 m with its ring and Stone Grandad; Long Tongue and Salt Gullet, Lenten and Smoked Streets, Widows' Row, Powder Embankment, Squint Lane; Parsons' End, Sleepy Quarter, Salt End, Lower Veil, the Reek; folk names in map.csv)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1288,3 +1288,100 @@ Views: Blender's LOD row, and `Logs/SliceSurvey/green_*` of C3, rendered with th
 ## 28.4 Status
 
 Being built, step by step (§28.1, item 20). Each step adds its section here.
+
+## 28.5 The plan, 2026-11-10
+
+Plan: [VEILMOUTH_CITY_PLAN_C4.svg](VEILMOUTH_CITY_PLAN_C4.svg).
+
+**One source.** `tools/slice/veilmouth_c4_plan.py` holds the layout and writes three files from it:
+
+- the layout the builder reads, `Assets/Data/Slice/Map/VeilmouthC4Layout.json`;
+- this plan;
+- the player's map without the planner's notes, `Assets/Data/Slice/Map/VeilmouthC4Plan.xml`, which replaces C3's (S1.6).
+
+A change to the layout is made in the script, and the three files are written again.
+
+**Size.**
+
+- Inside its wall the city is about 260 × 290 m, px 420–680 and py 260–550, close to C3's 300 × 204 m.
+- The works over the river add 260 × 116 m.
+- The script estimates about 102 buildings:
+  - 66 in rows and 6 on Squint Lane;
+  - 10 on plots;
+  - 14 single buildings;
+  - 6 works blocks.
+- The builder's count replaces this estimate at step 5.
+- Eight cottages stand in the village, counted apart (§28.2).
+
+**The land.**
+
+- River Veil is 36 m wide. It comes down the west at px 380–416, turns east along the south at py 550–586, and runs into the sea.
+- The city's quay wall stands at px 680, and the open coast at px 700.
+- The town wall runs on the north at py 258 and on the river's west bank at px 418. It is 2 m thick and 6 m high, with five towers. Creaking Gate stands in it on the main street, between two of them.
+- Last Farthing Bridge carries the West Road over the river to the gate.
+- Grubby Bridge carries Smoked Street over the river to the works, which have a wall of 4 m on their land sides.
+
+**The centre, the Penny.**
+
+- It is a square of 80 m. Its facades stand 40 m from the statue, so a civic front of 30 m fits each half of a side between its streets.
+- A ring of setts, 8 m wide at radius 26–34 m, runs round an island of 26 m. Stone Grandad, the patron saint, stands on his plinth in its middle.
+- Between the ring and the facades there are 6 m at the middle of each side, like the main streets' pavements.
+- The Town Hall stands on the north-west, with its clock tower at the corner; the Assize with the Wardens on the north-east; the Governor's House on the south-west.
+- Rich shops line the west and east sides.
+
+**The streets.**
+
+| Street | Section | Runs |
+|---|---|---|
+| Long Tongue | main, 22 m | Creaking Gate → the Penny |
+| Salt Gullet | main, 22 m | the Penny → Fishlip Quay |
+| Lenten Street | ring, 20 m | the Penny → Drowsy Steps before the cathedral |
+| Smoked Street | ring, 20 m | the Penny → Powder Embankment and Grubby Bridge |
+| Widows' Row | side, 16.5 m | the wall → the quay, along the religious quarter's south edge |
+| Powder Embankment | a 3 m pavement, 7 m of carriageway and the 6 m promenade, 16 m | the wall → the quay, along the river |
+| Squint Lane | 8 m of setts at 45° | the Penny's south-east corner → the Black Puddle |
+| Last Turning, Draught Lane | lanes, 5 m | by the cemetery; through the port's slum |
+| Furnace Road, Clinker Road | works roads, 14 m | through the works |
+| Rats' Choir | an alley, 6 m | through the workers' slum |
+
+The embankment has a 3 m pavement before its houses, which the 13 m of §28.1 item 4 did not include (authoring default).
+
+**The districts.**
+
+- **Parsons' End**, the religious quarter, north of Widows' Row:
+  - the old chapel before Last Turning Cemetery, and the slum of Parsons' End beside it on Last Turning;
+  - Bishop's Garden;
+  - the cathedral on Drowsy Steps;
+  - Quiet Whistle Garden with the faction's house;
+  - the Brothers' House round its garth by the sea.
+- **Sleepy Quarter**, the west:
+  - shops on Long Tongue;
+  - Bawling Square by the gate, with shops round it;
+  - villas and detached houses on Widows' Row and on Powder Embankment.
+- **Salt End**, the north-east: shops, villas, and the Customs House on Fishlip Quay.
+- **Lower Veil**, the south-east:
+  - Squint Lane;
+  - the Black Puddle, with the Soot & Bell and Harrow & Tincture on it;
+  - the slum on Draught Lane;
+  - the quay's warehouses;
+  - Tipsy Pier, and the One-Eye on its own pier.
+- **The Reek**, the works: six blocks, Deaf Boiler Yard and Rats' Choir.
+- **Outside the walls**: Crooked Hamlet by the West Road, and then Gloomwood.
+
+**The Ritual Site Candidates**:
+
+1. the Black Puddle;
+2. Deaf Boiler Yard, with the cellar's door in a works block;
+3. the old chapel's forecourt.
+
+The player starts on the embankment before the Black Puddle.
+
+**Names.** `Resources/Localization/map.csv` gives the 49 names on the map in English and Russian, and C3's names leave it. They follow §28.1 item 16's five kinds:
+
+- nicknames: Long Tongue, Salt Gullet, Squint Lane, Fishlip Quay, Stone Grandad, the One-Eye;
+- ironic: Powder Embankment, Drowsy Steps, Tipsy Pier, Last Farthing Bridge, Rats' Choir;
+- grim: Widows' Row, Last Turning, the Black Puddle;
+- everyday: Lenten Street, Smoked Street, Draught Lane, Furnace Road, Clinker Road;
+- mysterious: Quiet Whistle Garden, Deaf Boiler Yard.
+
+The district names are Parsons' End, Sleepy Quarter, Salt End, Lower Veil and the Reek; the village is Crooked Hamlet, and the forest Gloomwood.

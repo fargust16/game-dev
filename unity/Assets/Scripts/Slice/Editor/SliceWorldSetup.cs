@@ -40,7 +40,7 @@ namespace GameDev.Slice.EditorTools
             EditorUtility.SetDirty(driver);
         }
 
-        private const string PlanPath = "Assets/Data/Slice/Map/VeilmouthC3Plan.xml";
+        private const string PlanPath = "Assets/Data/Slice/Map/VeilmouthC4Plan.xml";
 
         /// <summary>Adds what Veilmouth lacks of the world, and sets the existing driver's assets again (S1.6 added the plan).</summary>
         [MenuItem("GameDev/Slice/World/Add the Slice World and the Notice Board to Veilmouth (once)")]
