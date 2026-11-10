@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using GameDev.Slice.Interiors;
 using GameDev.VictorianKit;
 using GameDev.World.Timekeeping;
@@ -68,6 +69,25 @@ namespace GameDev.Slice.Atmosphere
         /// and thickest by night (WORLD_STYLE_GUIDE §6.1). The particles are unlit, so the colour is set here.
         /// </summary>
         private static readonly Color[] FogColour = { new(0.8f, 0.82f, 0.86f, 0.3f), new(0.6f, 0.5f, 0.66f, 0.45f), new(0.17f, 0.19f, 0.26f, 0.6f) };
+
+        /// <summary>
+        /// The low fog (reference plan R3 step 5; <see cref="HeightFog"/>) [day, dusk, night]: its density at the sea's
+        /// surface, 1/m, thinning by e every <see cref="LowFogScale"/> metres up; thin by day and thickest by night, as
+        /// the fog banks. Its colour is the haze's. Authoring defaults.
+        /// </summary>
+        private static readonly float[] LowFogDensity = { 0.009f, 0.012f, 0.016f };
+
+        /// <summary>How strongly the fog glows toward the sun or the moon [day, dusk, night], and how tight the glow is.</summary>
+        private static readonly float[] Glow = { 0.35f, 1.1f, 0.6f }, GlowSharpness = { 8f, 4f, 6f };
+
+        // The fog's height scale and a sky ray's length, m; the patches' unevenness, size and drift (m/s, toward the
+        // north-east, off the sea). The sea's level is WorldScale.SeaLevelMeters. Authoring defaults.
+        private const float LowFogScale = 5f, SkyRay = 600f, SeaLevel = 24f, Patchiness = 0.35f, PatchSize = 45f;
+        private static readonly Vector2 Drift = new(0.5f, 0.3f);
+
+        // The gas lamps' halos in the fog: strength; the radius of a halo's bright core and of the halo, m; the faint wide
+        // part's share. Authoring defaults.
+        private const float HaloStrength = 0.6f, HaloCore = 0.18f, HaloRadius = 1.5f, HaloWide = 0.05f;
 
         [SerializeField] private Light sun;
         [SerializeField] private Material daySky, duskSky, nightSky;
@@ -202,6 +222,21 @@ namespace GameDev.Slice.Atmosphere
 
             Lamps(InteriorLighting.LampsLit(minute));
             Fog(Blend(FogColour));
+            LowFog(Blend(Haze), Mathf.Lerp(LowFogDensity[from], LowFogDensity[to], t), Mathf.Lerp(Glow[from], Glow[to], t),
+                Mathf.Lerp(GlowSharpness[from], GlowSharpness[to], t));
+        }
+
+        /// <summary>The low fog's globals for <see cref="HeightFogFeature"/>: lit toward the sun by day, the moon by night.</summary>
+        private void LowFog(Color haze, float density, float glow, float sharpness)
+        {
+            HeightFog.Own(this);
+            Shader.SetGlobalVector(HeightFog.ColourId, haze.linear);
+            Shader.SetGlobalVector(HeightFog.ParamsId, new Vector4(density, LowFogScale, SeaLevel, SkyRay));
+            var light = sun != null ? sun.color.linear * Mathf.Max(sun.intensity, _moonUp ? MoonIntensity : 0f) : Color.black;
+            Shader.SetGlobalVector(HeightFog.SunId, new Vector4(_moonDirection.x, _moonDirection.y, _moonDirection.z, glow));
+            Shader.SetGlobalVector(HeightFog.SunColourId, new Vector4(light.r, light.g, light.b, sharpness));
+            Shader.SetGlobalVector(HeightFog.DriftId, new Vector4(Drift.x, Drift.y, Patchiness, 1f / PatchSize));
+            Shader.SetGlobalVector(HeightFog.LampParamsId, new Vector4(HaloStrength, SeaLevel, HaloCore, HaloWide));
         }
 
         /// <summary>The sun on its arc from east-north-east through the south, or the moon low in the south-east.</summary>
@@ -290,6 +325,9 @@ namespace GameDev.Slice.Atmosphere
             }
 
             _lampsLit = lit;
+            HeightFog.SetLamps(lit
+                ? lamps.Where(l => l.Light != null).Select(l => (l.Light.transform.position, Halo(l.Light)))
+                : null);
             foreach (var lamp in lamps)
             {
                 if (lamp.Light != null)
@@ -307,6 +345,13 @@ namespace GameDev.Slice.Atmosphere
                     }
                 }
             }
+        }
+
+        /// <summary>A lamp's halo for <see cref="HeightFog"/>: its light's linear colour times its intensity, and the halo's radius.</summary>
+        private static Color Halo(Light light)
+        {
+            var c = light.color.linear * light.intensity;
+            return new Color(c.r, c.g, c.b, HaloRadius);
         }
 
         private void Fog(Color colour)

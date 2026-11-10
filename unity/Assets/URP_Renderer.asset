@@ -1,5 +1,19 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-2751195966365499575
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ded27070c8118d145b604f21a7c7448a, type: 3}
+  m_Name: HeightFog
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.Atmosphere.HeightFogFeature
+  m_Active: 1
+  shader: {fileID: 4800000, guid: b406e1b3c4353ab4f87ee8e04c9712ae, type: 3}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26,7 +40,8 @@ MonoBehaviour:
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
   - {fileID: 2349391872391989998}
-  m_RendererFeatureMap: ee4a1dd875b79a20l
+  - {fileID: -2751195966365499575}
+  m_RendererFeatureMap: ee4a1dd875b79a2049ff4b55d8c9d1d9l
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   m_AssetVersion: 3
   m_PrepassLayerMask:
