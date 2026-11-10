@@ -844,6 +844,7 @@ namespace GameDev.Slice.EditorTools
             Put("TrLogHolder", 0, 5); // the saloon hearth: under the window's sill, the irons on the other side
             Put("TrFireTools", 0, 9);
             Put("TrLogHolder", 0, 18); // the kitchen hearth
+            Radiators("Stair hall", "Let room", "Let room 2"); // the taproom and the kitchen have their hearths (rules §10.1)
         }
 
         private static void FactionHouseTripo()
@@ -853,12 +854,80 @@ namespace GameDev.Slice.EditorTools
                 Put("TrLogHolder", x, 6);
                 Put("TrFireTools", x, 2);
             }
+
+            // By the street door (owner, 2026-11-10; rules §10): the barometer on the front wall's segment west of it,
+            // the umbrella stand in the cell east of it, clear of the pews and the aisle.
+            Hang("TrBarometer", N, 0, 6, 1.5f);
+            Put("TrUmbrellas", 12, 0);
+            Radiators("Office");
         }
 
         private static void LockupTripo()
         {
             Put("TrLogHolder", 18, 17);
             Put("TrFireTools", 14, 17);
+            Radiators("Front desk", "Office");
+        }
+
+        private static void HarrowTripo() => Radiators("Shop", "Laboratory");
+
+        /// <summary>
+        /// Rules §10.1 in the seven: one gas radiator in each named room, under its first window whose cell is free, else
+        /// none. A cell is free when no body stands in its middle (the furniture's and the people's colliders).
+        /// </summary>
+        private static void Radiators(params string[] rooms)
+        {
+            Physics.SyncTransforms();
+            var floor = _floorY;
+            foreach (var r in _plan.Rooms.Where(r => rooms.Contains(r.Name)))
+            {
+                _floorY = r.Level * Storey;
+                // Its body tells a radiator's room: the wrapper's corner lies on the wall's line, shared with the next room.
+                var heaters = Instances("TrRadiator").Where(g =>
+                {
+                    var c = g.GetComponentsInChildren<Renderer>().Select(x => x.bounds).Aggregate((p, q) => { p.Encapsulate(q); return p; }).center;
+                    return Mathf.Abs(c.y - _floorY) < 1.5f && c.x > r.X && c.x < r.X + r.W && c.z > r.Z && c.z < r.Z + r.D;
+                }).ToList();
+                foreach (var extra in heaters.Skip(1))
+                {
+                    Object.DestroyImmediate(extra); // a second enrichment's, from before this check read the body
+                }
+
+                if (heaters.Count > 0)
+                {
+                    continue; // heated already
+                }
+
+                var walls = new List<(Vector2Int Facing, int Line, int Start, int Length, bool AlongZ)>
+                {
+                    (N, r.Z, r.X, r.W, false), (S, r.Z + r.D, r.X, r.W, false), (E, r.X, r.Z, r.D, true), (W, r.X + r.W, r.Z, r.D, true),
+                };
+                var placed = false;
+                foreach (var (facing, line, start, length, alongZ) in walls)
+                {
+                    for (var seg = start; seg < start + length && !placed; seg += Module)
+                    {
+                        var key = alongZ ? (line, seg, true, r.Level) : (seg, line, false, r.Level);
+                        if (!_plan.Openings.TryGetValue(key, out var o) || o != Opening.Window)
+                        {
+                            continue;
+                        }
+
+                        var a = seg + 1;
+                        var cell = alongZ ? new Vector2(facing == E ? line + 0.5f : line - 0.5f, a + 0.5f) : new Vector2(a + 0.5f, facing == N ? line + 0.5f : line - 0.5f);
+                        var centre = new Vector3(cell.x, _floorY + 0.35f, cell.y);
+                        if (Physics.CheckBox(centre, new Vector3(0.3f, 0.25f, 0.3f), Quaternion.identity, ~0, QueryTriggerInteraction.Ignore))
+                        {
+                            continue;
+                        }
+
+                        Against("TrRadiator", facing, line, a);
+                        placed = true;
+                    }
+                }
+            }
+
+            _floorY = floor;
         }
 
         private static void MissingRoomTripo() => Put("TrLogHolder", 0, 5); // a poor room: the basket, no irons
@@ -878,6 +947,9 @@ namespace GameDev.Slice.EditorTools
                     break;
                 case "missing-room":
                     MissingRoomTripo();
+                    break;
+                case "harrow-apothecary":
+                    HarrowTripo();
                     break;
             }
         }
@@ -981,8 +1053,9 @@ namespace GameDev.Slice.EditorTools
         /// </summary>
         public static void EnrichAndRender()
         {
-            // The wrappers whose Tripo lamps gained a light (2026-11-09), written again in place.
-            SliceKitCatalogue.LoadRebuilding("TrDesk", "TrNightstandLamp", "TrSconce", "TrLantern");
+            // The wrappers changed in place by the owner's new Tripo pieces (2026-11-10): the desk's inkstand and magnifier,
+            // the street lamp's new model with its glass, and the radiator off the wall on its brackets.
+            SliceKitCatalogue.LoadRebuilding("TrDesk", "LampPost", "TrRadiator");
             EnrichWithTripo();
             VeilmouthDwellings.BuildKit(SliceKitCatalogue.Load());
             VeilmouthRenders.RenderInteriors();
@@ -990,7 +1063,7 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>The keys AddTripo places, so a second run can find what the first added.</summary>
-        private static readonly string[] AddedKeys = { "TrPiano", "TrLogHolder", "TrFireTools" };
+        private static readonly string[] AddedKeys = { "TrPiano", "TrLogHolder", "TrFireTools", "TrRadiator", "TrBarometer", "TrUmbrellas" };
 
         /// <summary>
         /// The room's lamp list written again from the lights the furniture holds, as BuildOne writes it: every light but a
@@ -1159,6 +1232,7 @@ namespace GameDev.Slice.EditorTools
             // Only the middle cell is clear of both walls' dados.
             Put("Crate", 13, 12);
             Put("BkBasket", 13, 10);
+            HarrowTripo();
         }
 
         private static void FactionHouse()
@@ -1186,7 +1260,6 @@ namespace GameDev.Slice.EditorTools
             Hang("ViWallLamp", W, 21, 9, 2.2f);
             Hang("ViPicture1", E, 0, 0, 1.7f);
             Hang("ViPicture5", W, 21, 0, 1.7f);
-            FactionHouseTripo();
             VeilmouthDressing.Person("Teal", false, 10.5f, 9.2f, 180f, "Faction member", 0f);
 
             // Office: the Tripo writing desk under the window, a bookcase, wing chairs by a round table.
@@ -1213,6 +1286,7 @@ namespace GameDev.Slice.EditorTools
             Put("ViChair", 14, 17, 2);
             Put("ViOilLamp", 14, 16, 0, 1.0f);
             Hang("ViWallLamp", N, 12, 9, 2.2f);
+            FactionHouseTripo(); // last, so its radiators find the rooms furnished
         }
 
         private static void Lockup()
@@ -1253,8 +1327,8 @@ namespace GameDev.Slice.EditorTools
             Against("BkArmsTable", W, 21, 15);
             Against("ViCupboardGlass", E, 12, 15);
             Hang("ViWallLamp", E, 12, 12, 2.2f);
-            LockupTripo();
             VeilmouthDressing.Person("Blue", true, 18.3f, 15.5f, 90f, "Warden", 0f);
+            LockupTripo();
         }
 
         private static void MissingRoom()

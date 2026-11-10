@@ -27,8 +27,11 @@ namespace GameDev.Slice.Tests
                     Assert.IsNotNull(entry, $"{person.name} in {scene} is on the roster");
                     Assert.AreEqual(entry.Name, person.DisplayName);
                     Assert.AreEqual(entry.ObjectName, person.name, "the object carries the person's English name");
+                    // The owner's Tripo person for the role (owner, 2026-11-10; asset map §1), of the person's sex.
                     var prefab = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(person.gameObject);
-                    StringAssert.Contains(entry.Female ? "HumanDummy_F" : "HumanDummy_M", prefab, $"{entry.Name}'s Dummy");
+                    var look = SlicePeopleModels.LookFor(entry.ObjectName, entry.Female);
+                    Assert.AreEqual(look.Standing, prefab, $"{entry.Name}'s model");
+                    Assert.AreEqual(entry.Female, look.Female, $"{entry.Name}'s model is of the person's sex");
                     Assert.IsTrue(Physics.Raycast(person.transform.position + Vector3.up, Vector3.down, 1.3f, ~LayerMask.GetMask("Character")),
                         $"{entry.Name} stands on a floor at {person.transform.position}");
 

@@ -231,6 +231,19 @@ The owner: a house has only one or two fireplaces, on the ground floor; every ot
 
 These counts are authoring defaults.
 
+**As built, 2026-11-10** (`DwellingFurnishing`, `VeilmouthInteriors`):
+
+- **The radiator stands 5 cm off the wall**, on its brackets. Set flush, it ran 3.7 cm into a window's frame in every Dwelling, so 36 faults stood in the kit check.
+- **The fourteen sample Dwellings** show no kit fault. Their hearths are at most two and none stands above the ground floor; `DwellingFurnishing.Audit` checks this, and `SampleHomesKeepTheFurnishingRules` runs the check.
+- **Radiators in the Dwellings.** A heated room with no hearth gets a radiator where a window or a plain wall is free. The audit does not yet count the rooms left without one.
+- **The seven interiors** have eight radiators, each under the first free window of its room:
+  - the Soot & Bell's stair hall and its two let rooms;
+  - the faction house's office;
+  - the lock-up's front desk and office;
+  - Harrow's shop and laboratory.
+
+  A second enrichment finds a room's radiator by its body and adds no second one.
+
 ## Sources
 
 - CAMRA, *Pub Heritage* records of historic pub interiors, e.g. [pubheritage.camra.org.uk/pubs/141](https://pubheritage.camra.org.uk/pubs/141), [/pubs/240](https://pubheritage.camra.org.uk/pubs/240), [/pubs/582](https://pubheritage.camra.org.uk/pubs/582).
@@ -239,6 +252,7 @@ These counts are authoring defaults.
 
 ## Update history
 
+- 2026-11-10 (v0.9, later): §10.1 as built: the radiator 5 cm off the wall, the sample Dwellings and the seven's eight radiators.
 - 2026-11-10 (v0.9): §10, the owner's ten Tripo pieces of 2026-11-10; §10.1, the owner's rule on fireplaces and radiators.
 - 2026-11-09 (v0.8): §10, the owner's fifth play test: the Tripo pieces resized against the player, the piano by its keys; the Office, a civic building's Dwelling.
 - 2026-11-09 (v0.7): §10, the hanging sign hangs outside, over two shop doors, by the owner's VS-SIGN (b).

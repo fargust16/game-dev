@@ -853,6 +853,42 @@ MonoBehaviour:
       width: 1.0295954
       height: 0.7879213
     height: 0.4967049
+  - key: TrBust
+    prefab: {fileID: 3682759703917882539, guid: 46cf90e5b37f9b1469414cd9c619e765, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.1219179
+      y: 0.11878663
+      width: 0.7561642
+      height: 0.76242673
+    height: 1.3500003
+  - key: TrUmbrellas
+    prefab: {fileID: 7930632271602316869, guid: 14055ea7a80c5d844b16e3a34b01878f, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.29780823
+      y: 0.32880622
+      width: 0.40438354
+      height: 0.34238756
+    height: 0.72
+  - key: TrRadiator
+    prefab: {fileID: 6231307834139608449, guid: 9bfb1d083d251fa49be5ec3549037633, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.15456879
+      y: 0.21000001
+      width: 0.6908624
+      height: 0.16088587
+    height: 0.58
   - key: ViWallLamp
     prefab: {fileID: 8234737949085347516, guid: 77aecd579926873469a7cca73512cb8b, type: 3}
     width: 3
@@ -961,6 +997,54 @@ MonoBehaviour:
       width: 0
       height: 0
     height: 1.1582302
+  - key: TrBarometer
+    prefab: {fileID: 9111090666266907335, guid: 6a1b1219e051d024a80068fb812c237c, type: 3}
+    width: 3
+    depth: 0
+    solid: 0
+    body:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    height: 0.45
+  - key: TrCabinet
+    prefab: {fileID: 4516567029719187786, guid: 533674228fe4ebf4f991c4765da0e2af, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.19241369
+      y: 0.15999997
+      width: 0.52966595
+      height: 0.48251492
+    height: 1.1911454
+  - key: TrCabinetLamp
+    prefab: {fileID: 416398551138154810, guid: 3e592fb4ebd3f43438193d7471e41920, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.23516703
+      y: 0.15999997
+      width: 0.52966595
+      height: 0.48251492
+    height: 1.4000003
+  - key: TrVaseOrnate
+    prefab: {fileID: 8242977122958599960, guid: 0275aec548bc96646b0e2842e72ee8f0, type: 3}
+    width: 1
+    depth: 1
+    solid: 1
+    body:
+      serializedVersion: 2
+      x: 0.25078285
+      y: 0.3071428
+      width: 0.4984343
+      height: 0.3857144
+    height: 0.90000004
   - key: ViPicture1
     prefab: {fileID: 6256122228130560646, guid: a9affbeabfa718147afe4fd7a5a3109c, type: 3}
     width: 3

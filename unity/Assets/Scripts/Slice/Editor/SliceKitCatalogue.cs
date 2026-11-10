@@ -223,7 +223,11 @@ namespace GameDev.Slice.EditorTools
             yield return Game(S("Crate", "Market", "Crate", Market, "wooden_box", pr));
 
             // Street props.
-            yield return S("LampPost", "Street", "Lamp", VictorianStreet, "Lamp post", pr);
+            // Every street lamp is the owner's Tripo lamp (owner, 2026-11-10; city plan §30), 4 m high as the Victorian
+            // City lamp post it replaces under the same key, with a glass of our own (LampGlass).
+            var lamp = S("LampPost", "Street", "Lamp", Tripo, "vintage_street_lamp_3d_model", pr);
+            lamp.SizeY = 4f;
+            yield return lamp;
             yield return Game(S("Bench", "Street", "Bench", VictorianStreet, "Wooden bench", pr, anchor: Anchor.Front));
             yield return Game(S("TrashCan", "Street", "TrashCan", VictorianStreet, "Trash can", pr));
             yield return Game(S("Barrel", "Props", "Barrel", PropsLite, "Barrel_01", pr));
@@ -307,6 +311,11 @@ namespace GameDev.Slice.EditorTools
             var lion = S("LionStatue", "Street", "LionStatue", Tripo, "marble_lion_statue_3d_model", st);
             lion.SizeY = 3.5f;
             yield return lion;
+            // The owner's bronze gentleman on his pedestal (2026-11-10): one statue in the whole city (city plan §30).
+            // Authoring default: 4.8 m with the pedestal, which is the lower 0.35 of it (measured), so the figure is 3.1 m.
+            var bronze = S("BronzeStatue", "Street", "BronzeStatue", Tripo, "bronze_statue_3d_model", st);
+            bronze.SizeY = 4.8f;
+            yield return bronze;
 
             // Trees, herbs, and flax (Stylized Trees Pack); a fellable tree is a resource node, the others are cover.
             foreach (var n in new[] { "Birch 001", "Birch 002", "Birch 003", "Warped 001", "Warped 002", "Warped 003" })
@@ -636,6 +645,10 @@ namespace GameDev.Slice.EditorTools
             if (spec.Folder == Tripo)
             {
                 LinkTripoTextures(model, source);
+                if (spec.Key == "LampPost")
+                {
+                    LampGlass(model);
+                }
             }
 
             if (spec.Material != null)
@@ -1246,8 +1259,8 @@ namespace GameDev.Slice.EditorTools
                 {
                     // The owner's Tripo things (§10 of the furnishing rules): their base maps, laid down if flat, sized.
                     LinkTripoTextures(thing, source);
-                    var (longest, pitch) = TripoThings.TryGetValue(file, out var t) ? t : (0.3f, 0f);
-                    thing.transform.localRotation = Quaternion.Euler(pitch, 0f, 0f) * thing.transform.localRotation;
+                    var (longest, pitch, roll) = TripoThings.TryGetValue(file, out var t) ? t : (0.3f, 0f, 0f);
+                    thing.transform.localRotation = Quaternion.Euler(pitch, 0f, roll) * thing.transform.localRotation;
                     var size = Seen(thing).size;
                     thing.transform.localScale *= longest / UnityEngine.Mathf.Max(size.x, size.y, size.z, 0.001f);
                 }

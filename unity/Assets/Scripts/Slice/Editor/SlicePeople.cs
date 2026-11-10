@@ -171,12 +171,18 @@ namespace GameDev.Slice.EditorTools
             return places[0];
         }
 
+        // The people standing for roles: the Dummies before 2026-11-10, the owner's Tripo people since (asset map §1).
         private static IEnumerable<GameObject> Dummies() =>
             Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)
                 .Select(t => t.gameObject)
                 .Where(g => PrefabUtility.IsOutermostPrefabInstanceRoot(g)
-                            && PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g).Contains(DummyFolder));
+                            && (PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g).Contains(DummyFolder)
+                                || PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g).StartsWith(SlicePeopleModels.Folder)));
 
-        private static bool IsFemale(GameObject dummy) => PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(dummy).Contains("HumanDummy_F");
+        private static bool IsFemale(GameObject dummy)
+        {
+            var path = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(dummy);
+            return path.Contains("HumanDummy_F") || SlicePeopleModels.All.Any(l => l.Female && l.Standing == path);
+        }
     }
 }

@@ -195,30 +195,11 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// A person in the asset map's colour for their role (§1), standing idle. Not a kit block: the Character layer.
-        /// Teal and brown have no Dummy prefab, so a white Dummy wears a project material.
+        /// A person of their role, standing idle: one of the owner's Tripo people (owner, 2026-11-10; asset map §1),
+        /// chosen by name, else by the role's old stand-in colour. Not a kit block: the Character layer.
         /// </summary>
-        internal static void Person(string colour, bool female, float x, float z, float yaw, string name, float y = S)
-        {
-            var custom = colour == "Teal" || colour == "Brown";
-            var path = $"{Dummies}/HumanDummy_{(female ? "F" : "M")} {(custom ? "White" : colour)}.prefab";
-            var go = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path), _people);
-            go.name = name;
-            go.transform.SetPositionAndRotation(new Vector3(x, y, z), Quaternion.Euler(0f, yaw, 0f));
-            Stand(go, 1.8f);
-            SliceCharacterLook.Fix(go);
-
-            if (custom)
-            {
-                var material = colour == "Teal"
-                    ? SliceKitCatalogue.Colour("Dummy_Teal", new Color(0.1f, 0.58f, 0.58f), false)
-                    : SliceKitCatalogue.Colour("Dummy_Brown", new Color(0.45f, 0.29f, 0.16f), false);
-                foreach (var r in go.GetComponentsInChildren<Renderer>())
-                {
-                    r.sharedMaterials = r.sharedMaterials.Select(_ => material).ToArray();
-                }
-            }
-        }
+        internal static void Person(string colour, bool female, float x, float z, float yaw, string name, float y = S) =>
+            SlicePeopleModels.Instantiate(name, female, colour, _people, new Vector3(x, y, z), yaw);
 
         /// <summary>A beast's stand-in (asset map §6): a dragon scaled to a wolf's or a boar's length, feet on the ground.</summary>
         private static void Beast(string path, float length, float x, float z, float yaw, string name)

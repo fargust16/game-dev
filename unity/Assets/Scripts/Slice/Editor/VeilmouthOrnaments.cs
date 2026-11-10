@@ -42,6 +42,9 @@ namespace GameDev.Slice.EditorTools
             ("Birdbath", 506.5f, 471f, 496, 463, 517, 479, 0, "Birdbath, the Governor's yard"),
             ("Birdbath", 573.5f, 406.5f, 563, 396, 584, 417, 0, "Birdbath, the Assize's yard"),
             ("Birdbath", 512f, 400f, 505, 396, 517, 405, 0, "Birdbath, the Town Hall's yard"),
+            // The owner's one bronze statue (2026-11-10, city plan §30.1): on Drowsy Steps on the cathedral's axis, clear
+            // of its door, its face down the steps to the south.
+            ("BronzeStatue", 540f, 350f, 530, 340, 550, 362, 2, "Bronze statue, Drowsy Steps"),
         };
 
         /// <summary>

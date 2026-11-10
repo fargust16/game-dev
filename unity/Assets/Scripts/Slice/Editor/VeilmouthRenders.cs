@@ -555,6 +555,62 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// The owner's street lamp (city plan §30) at noon and at night, with the sky and the grade the player sees: three
+        /// of C5's lamps from a passer-by's eye 7 m off, on a side with nothing in the way, and the middle one close by.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderLamps
+        /// </summary>
+        public static void RenderLamps()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            if (sky == null)
+            {
+                Debug.LogError("[VeilmouthRenders] the scene has no VeilmouthSky: place the mystic layer first.");
+                return;
+            }
+
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            Physics.SyncTransforms();
+            var lamps = Object.FindObjectsByType<GameDev.Slice.Kit.KitBlock>(FindObjectsSortMode.None).Where(b => b.name.StartsWith("Kit_Street_Lamp"))
+                .OrderBy(b => b.transform.position.x).ThenBy(b => b.transform.position.z).ToList();
+            if (lamps.Count == 0)
+            {
+                Debug.LogError("[VeilmouthRenders] no street lamps in Veilmouth.");
+                return;
+            }
+
+            var picks = new[] { lamps[lamps.Count / 4], lamps[lamps.Count / 2], lamps[(3 * lamps.Count) / 4] };
+            _skyAndGrade = true;
+            try
+            {
+                foreach (var (minute, label) in new[] { (12 * 60, "noon"), ((23 * 60) + 30, "night") })
+                {
+                    sky.Apply(minute);
+                    for (var i = 0; i < picks.Length; i++)
+                    {
+                        var b = picks[i].GetComponentsInChildren<Renderer>().Select(r => r.bounds).Aggregate((p, q) => { p.Encapsulate(q); return p; });
+                        var head = new Vector3(b.center.x, b.max.y - 0.45f, b.center.z);
+                        var side = new[] { Vector3.forward, Vector3.right, Vector3.back, Vector3.left }
+                            .OrderBy(d => Physics.Raycast(head + (Vector3.down * 2.2f), d, 7.5f, ~0, QueryTriggerInteraction.Ignore) ? 1 : 0).First();
+                        Eye($"lamp_{label}_{i}", new Vector3(head.x, b.min.y + 1.7f, head.z) + (side * 7f), head + (Vector3.down * 1.3f), 60f);
+                        if (i == 1)
+                        {
+                            Eye($"lamp_{label}_close", head + (side * 1.4f) + (Vector3.down * 0.4f), head, 40f);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                _skyAndGrade = false;
+            }
+
+            Debug.Log($"[VeilmouthRenders] {lamps.Count} street lamps; views of three written to {OutputFolder}.");
+        }
+
+        /// <summary>
         /// The reference look's check (reference plan R3): five fixed views, the High Street, the Market Place, Bell
         /// Street, the Ridge and the river, at 08:00, 16:00, 19:30 and 23:00, with the sky and the grade the player
         /// sees; each view's four hours also go in one sheet at half size. The command-line argument

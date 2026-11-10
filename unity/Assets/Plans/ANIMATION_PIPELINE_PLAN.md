@@ -6,7 +6,7 @@ Status: Draft — the owner's decision of 2026-11-10, planned by the agent; the 
 
 Created: 2026-11-10
 
-Last Updated: 2026-11-10 (first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
+Last Updated: 2026-11-10 (§5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1–§2, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -66,6 +66,15 @@ Unity import: Rig → Humanoid, Avatar *Create From This Model*; Animation → L
 Each phase waits for the owner's word.
 
 **A0 — stand-ins, now (agent).** The eight models are Humanoid. The townsfolk, the named people and the player walk and stand in Tripo clips until A1: the women in the woman's own idle and walk; the men in the earlier walk and idle baked once from the borrowed Generic clips into Humanoid clips. The player's locomotion, whose clips were Kevin Iglesias', uses the same stand-ins. No combat clip exists until A1.
+
+*A0 built, 2026-11-10* (`SlicePeopleModels`; report `Logs/SliceSurvey/people.txt`):
+
+- **The four stand-ins** are in `Assets/Animation/StandIn`, all Humanoid with human motion:
+  - `ManIdle` (461 frames) and `ManWalk` (71 frames), baked from the borrowed Generic clips;
+  - `WomanIdle` and `WomanWalk`, the historical woman's own `idle.001` and `walk.001`.
+- **The controllers.** Every standing person has `Man.controller` or `Woman.controller` in the same folder. The townsfolk walk in `SliceTownsfolk` and `SliceTownswoman`, repointed to the stand-ins.
+- **The player.** Its controller's blend tree plays idle, then the man's walk at 1, 1.5 and 1.9 times. Its other states play the man's idle until A1.
+- **No person plays a clip from a downloaded pack any more.** The dog keeps the Dogs Kit's clips until A4.
 
 **A1 — the Mixamo base set (owner downloads, agent wires).** The clips of §6 marked A1. The agent imports them, checks them on all eight models, and builds one Animator Controller a role: the player, the townsfolk, the Wardens, the Cult Forces.
 

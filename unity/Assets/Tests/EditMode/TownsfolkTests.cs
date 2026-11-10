@@ -9,11 +9,14 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>The ordinary townsfolk: the owner's gentleman and woman, 8 and 7, replace every yellow Dummy, each on a clear closed route.</summary>
+    /// <summary>The ordinary townsfolk: ten men and ten women of the owner's people replace every yellow Dummy, each on a clear closed route.</summary>
     public sealed class TownsfolkTests
     {
         [TestCase(SliceTownsfolk.PrefabPath)]
         [TestCase(SliceTownsfolk.WomanPrefabPath)]
+        [TestCase(SlicePeopleModels.Folder + "/GentlemanWalker.prefab")]
+        [TestCase(SlicePeopleModels.Folder + "/LadyWalker.prefab")]
+        [TestCase(SlicePeopleModels.Folder + "/WorkingWomanWalker.prefab")]
         public void TheTownsfolkWalkAndIdleInLoops(string path)
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
@@ -39,10 +42,10 @@ namespace GameDev.Slice.Tests
                 && PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject) is GameObject s && s.name.Contains("Yellow")), "no unnamed yellow Dummy is left");
             var walkers = people.GetComponentsInChildren<TownsfolkWalker>();
             Assert.AreEqual(20, walkers.Length, "the townsfolk and their farmer, on C5 (city plan §28.10, §29.4)");
-            var women = walkers.Count(w => PrefabUtility.GetCorrespondingObjectFromSource(w.gameObject) is GameObject s && s.name == "Townswoman");
-            var men = walkers.Count(w => PrefabUtility.GetCorrespondingObjectFromSource(w.gameObject) is GameObject s && s.name == "Townsperson");
-            Assert.AreEqual(10, women, "townswomen");
-            Assert.AreEqual(10, men, "townsmen");
+            // Each walks in a model by its block's wealth (owner's people, 2026-11-10; asset map §1).
+            var looks = walkers.Select(w => SlicePeopleModels.All.Single(l => l.Walking == PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(w.gameObject))).ToList();
+            Assert.AreEqual(10, looks.Count(l => l.Female), "townswomen");
+            Assert.AreEqual(10, looks.Count(l => !l.Female), "townsmen");
             Physics.SyncTransforms();
 
             // A person's capsule fits all along each route; the walkers themselves are left out.

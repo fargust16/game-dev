@@ -82,6 +82,220 @@ namespace GameDev.Slice.EditorTools
             Survey(TripoGroups, "tripo");
         }
 
+        /// <summary>
+        /// The owner's Tripo models of 2026-11-10, before they are wrapped or worn: each drawn with its colour image from
+        /// the front (+Z), the side (+X) and above, with its seen size and its triangles. The colour image goes on an
+        /// in-memory copy of the material, so no asset changes. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.SliceAssetSurvey.RunTripoNew
+        /// </summary>
+        public static void RunTripoNew()
+        {
+            var names = new[]
+            {
+                "military_officer_3d_model", "victorian_woman_3d_model", "medieval_blacksmith_3d_model", "steampunk_detective_3d_model",
+                "vintage_gentleman_3d_model", "victorian_dress_3d_model", "stylized_male_character_3d_model", "historical_woman_3d_model",
+                "antique_wooden_cabinet_3d_model_Clone1", "ornate_vase_3d_model", "classical_bust_3d_model", "antique_barometer_3d_model",
+                "bronze_statue_3d_model", "vintage_street_lamp_3d_model", "decorative_vase_3d_model_Clone1", "magnifying_glass_3d_model",
+                "ornate_ink_desk_3d_model_Clone1", "ornate_radiator_3d_model",
+            };
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            var light = new GameObject("Light").AddComponent<Light>();
+            light.type = LightType.Directional;
+            light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+            RenderSettings.ambientLight = Color.gray;
+            var report = new StringBuilder("name\tsize_x\tsize_y\tsize_z\tmin_y\ttriangles\trenderers\tbones\n");
+            var tiles = new List<Texture2D>();
+            foreach (var name in names)
+            {
+                var path = Find(TripoModels, name);
+                if (path == null)
+                {
+                    report.Append($"{name}\tMISSING\n");
+                    continue;
+                }
+
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path));
+                Colour(instance, path);
+                var renderers = instance.GetComponentsInChildren<Renderer>();
+                var bounds = Bounds(renderers);
+                var triangles = renderers.Select(r => r is SkinnedMeshRenderer s ? s.sharedMesh : r.GetComponent<MeshFilter>()?.sharedMesh)
+                    .Where(m => m != null).Sum(m => (long)m.triangles.Length / 3);
+                var bones = renderers.OfType<SkinnedMeshRenderer>().Sum(s => s.bones.Length);
+                report.Append($"{name}\t{bounds.size.x:0.###}\t{bounds.size.y:0.###}\t{bounds.size.z:0.###}\t{bounds.min.y:0.###}\t{triangles}\t{renderers.Length}\t{bones}\n");
+                var size = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z, 0.1f);
+                var views = new[]
+                {
+                    Render(bounds.center + Vector3.forward * size * 2f, Quaternion.LookRotation(Vector3.back), size),
+                    Render(bounds.center + Vector3.right * size * 2f, Quaternion.LookRotation(Vector3.left), size),
+                    Render(bounds.center + Vector3.up * size * 2f, Quaternion.LookRotation(Vector3.down, Vector3.forward), size),
+                };
+                foreach (var view in views)
+                {
+                    for (var x = 0; x < Tile; x++)
+                    {
+                        view.SetPixel(x, Tile - 1, Color.red);
+                    }
+
+                    view.Apply();
+                }
+
+                tiles.AddRange(views);
+                Object.DestroyImmediate(instance);
+            }
+
+            // Three views a model: front, side, top, two models a row.
+            File.WriteAllBytes($"{OutputFolder}/tripo_new.png", Sheet3(tiles).EncodeToPNG());
+            File.WriteAllText($"{OutputFolder}/tripo_new.tsv", report.ToString());
+            Debug.Log($"[SliceAssetSurvey] the new Tripo models written to {OutputFolder}/tripo_new.*");
+        }
+
+        /// <summary>
+        /// Measurements the wrappers of 2026-11-10 need, written to `tripo_profiles.txt`: each model's width across X and Z
+        /// in 25 slices up its height (the street lamp's lantern, the statue's pedestal), the turn about Z that lays the
+        /// magnifying glass flat, and a close view of the lamp's head, front and side (`lamp_head.png`). Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.SliceAssetSurvey.RunTripoProfiles
+        /// </summary>
+        public static void RunTripoProfiles()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            var light = new GameObject("Light").AddComponent<Light>();
+            light.type = LightType.Directional;
+            light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+            RenderSettings.ambientLight = Color.gray;
+            var report = new StringBuilder();
+            foreach (var name in new[] { "vintage_street_lamp_3d_model", "bronze_statue_3d_model", "classical_bust_3d_model", "ornate_radiator_3d_model", "magnifying_glass_3d_model" })
+            {
+                var path = Find(TripoModels, name);
+                var model = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path));
+                var points = Points(model);
+                var b = Bounds(model.GetComponentsInChildren<Renderer>());
+                report.Append($"{name}: bounds min {b.min:F3} max {b.max:F3}\n  slice  y0     width_x width_z centre_x centre_z\n");
+                const int slices = 25;
+                for (var i = 0; i < slices; i++)
+                {
+                    var y0 = b.min.y + (b.size.y * i / slices);
+                    var y1 = y0 + (b.size.y / slices);
+                    var s = points.Where(p => p.y >= y0 && p.y <= y1).ToList();
+                    if (s.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    report.Append($"  {i,5}  {y0:0.000}  {s.Max(p => p.x) - s.Min(p => p.x):0.000}   {s.Max(p => p.z) - s.Min(p => p.z):0.000}   " +
+                                  $"{(s.Max(p => p.x) + s.Min(p => p.x)) / 2f:0.000}    {(s.Max(p => p.z) + s.Min(p => p.z)) / 2f:0.000}\n");
+                }
+
+                if (name.StartsWith("magnifying"))
+                {
+                    var centre = b.center;
+                    var best = Enumerable.Range(-30, 61).SelectMany(pitch => Enumerable.Range(-90, 181).Select(roll => (pitch, roll))).Select(t =>
+                    {
+                        var q = Quaternion.Euler(t.pitch, 0f, t.roll);
+                        var ys = points.Select(p => (q * (p - centre)).y).ToList();
+                        return (t.pitch, t.roll, height: ys.Max() - ys.Min());
+                    }).OrderBy(t => t.height).First();
+                    report.Append($"  flattest turn: {best.pitch}° about X, {best.roll}° about Z (height {best.height:0.000} of {b.size.y:0.000})\n");
+                }
+
+                if (name.StartsWith("vintage_street_lamp"))
+                {
+                    // The lantern's faces: in each 5 mm band, how far out the points of the faces' middles lie (not the corners).
+                    report.Append("  lantern  y      n   face_out_max face_out_min\n");
+                    for (var y = 0.70f; y < 0.90f; y += 0.005f)
+                    {
+                        var band = points.Where(p => p.y >= y && p.y < y + 0.005f)
+                            .Select(p => (Out: Mathf.Max(Mathf.Abs(p.x), Mathf.Abs(p.z)), Side: Mathf.Min(Mathf.Abs(p.x), Mathf.Abs(p.z))))
+                            .Where(p => p.Side < p.Out * 0.6f && p.Out > 0.012f).ToList();
+                        if (band.Count > 0)
+                        {
+                            report.Append($"  {y:0.000}  {band.Count,4}  {band.Max(p => p.Out):0.0000}  {band.Min(p => p.Out):0.0000}\n");
+                        }
+                    }
+                }
+
+                if (name.StartsWith("vintage_street_lamp"))
+                {
+                    Colour(model, path);
+                    var head = new Bounds(new Vector3(b.center.x, b.max.y - (b.size.y * 0.15f), b.center.z), new Vector3(b.size.x, b.size.y * 0.3f, b.size.z));
+                    var size = head.size.y;
+                    var views = new List<Texture2D>
+                    {
+                        Render(head.center + Vector3.forward * size * 2f, Quaternion.LookRotation(Vector3.back), size),
+                        Render(head.center + Vector3.right * size * 2f, Quaternion.LookRotation(Vector3.left), size),
+                    };
+                    File.WriteAllBytes($"{OutputFolder}/lamp_head.png", Sheet3(views).EncodeToPNG());
+                }
+
+                Object.DestroyImmediate(model);
+            }
+
+            File.WriteAllText($"{OutputFolder}/tripo_profiles.txt", report.ToString());
+            Debug.Log($"[SliceAssetSurvey] profiles written to {OutputFolder}/tripo_profiles.txt");
+        }
+
+        private static List<Vector3> Points(GameObject model)
+        {
+            var points = new List<Vector3>();
+            foreach (var f in model.GetComponentsInChildren<MeshFilter>())
+            {
+                var m = f.transform.localToWorldMatrix;
+                points.AddRange(f.sharedMesh.vertices.Select(v => m.MultiplyPoint3x4(v)));
+            }
+
+            return points;
+        }
+
+        /// <summary>The model's colour image on in-memory copies of its materials (the Tripo Bridge leaves the base map empty).</summary>
+        internal static void Colour(GameObject model, string source)
+        {
+            var folder = Path.ChangeExtension(source, ".fbm").Replace('\\', '/');
+            if (!AssetDatabase.IsValidFolder(folder))
+            {
+                return;
+            }
+
+            var colour = AssetDatabase.FindAssets("t:Texture2D", new[] { folder }).Select(AssetDatabase.GUIDToAssetPath)
+                .FirstOrDefault(p => Path.GetFileName(p).StartsWith("tripo_image_"));
+            var image = colour != null ? AssetDatabase.LoadAssetAtPath<Texture2D>(colour) : null;
+            if (image == null)
+            {
+                return;
+            }
+
+            foreach (var r in model.GetComponentsInChildren<Renderer>())
+            {
+                r.sharedMaterials = r.sharedMaterials.Select(m =>
+                {
+                    if (m == null || !m.HasProperty("_BaseMap"))
+                    {
+                        return m;
+                    }
+
+                    var copy = new Material(m);
+                    copy.SetTexture("_BaseMap", image);
+                    copy.SetColor("_BaseColor", Color.white);
+                    return copy;
+                }).ToArray();
+            }
+        }
+
+        private static Texture2D Sheet3(List<Texture2D> tiles)
+        {
+            const int perRow = 6;
+            var rows = Mathf.CeilToInt(tiles.Count / (float)perRow);
+            var sheet = new Texture2D(perRow * Tile, Mathf.Max(1, rows) * Tile, TextureFormat.RGB24, false);
+            for (var i = 0; i < tiles.Count; i++)
+            {
+                sheet.SetPixels(i % perRow * Tile, (rows - 1 - i / perRow) * Tile, Tile, Tile, tiles[i].GetPixels());
+                Object.DestroyImmediate(tiles[i]);
+            }
+
+            sheet.Apply();
+            return sheet;
+        }
+
         [MenuItem("GameDev/Slice/Survey Slice Assets")]
         public static void Run()
         {

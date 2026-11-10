@@ -312,7 +312,9 @@ namespace GameDev.Slice.EditorTools
                 }
 
                 var light = Make("Gaslight", group).AddComponent<Light>();
-                light.transform.position = new Vector3(centre.x, top - 0.45f, centre.z);
+                // In the lantern's glass where the lamp has one of ours (the owner's Tripo lamp, city plan §30.1), else
+                // under the head as on the pack's lamp post.
+                light.transform.position = lamp.Renderer != null ? lamp.Renderer.bounds.center : new Vector3(centre.x, top - 0.45f, centre.z);
                 light.type = LightType.Point;
                 light.color = Gaslight;
                 light.range = LampRange;
@@ -326,11 +328,12 @@ namespace GameDev.Slice.EditorTools
             if (unlit != null)
             {
                 // Our own glowing pane, not a copy of the pack's glass: its transparent copy dimmed the flame to nothing.
-                lit = Asset("Veilmouth_Gaslight", () => new Material(Shader.Find("Universal Render Pipeline/Lit")));
-                lit.SetColor("_BaseColor", Gaslight * 0.5f);
-                lit.SetFloat("_Smoothness", 0.8f);
-                lit.EnableKeyword("_EMISSION");
-                lit.SetColor("_EmissionColor", Gaslight * 1.6f);
+                // Unlit, so it burns at its own colour: the Lit copy's _EMISSION keyword was never kept in the asset
+                // (its m_ValidKeywords stayed empty since C3), and the Tripo lamp's panes rendered black at night (2026-11-10).
+                var unlitShader = Shader.Find("Universal Render Pipeline/Unlit");
+                lit = Asset("Veilmouth_Gaslight", () => new Material(unlitShader));
+                lit.shader = unlitShader;
+                lit.SetColor("_BaseColor", Gaslight * 1.15f);
                 lit.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
                 EditorUtility.SetDirty(lit);
             }

@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4, C5)
 
-Version: 0.63
+Version: 0.64
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§30: the owner's Tripo street lamp in the place of every lamp post and one bronze statue on Drowsy Steps, two more exceptions to §25.6. Earlier: §29.11: the far LOD built and measured: every view's median frame within the 16.7 ms budget, the swap unseen; the yard doors left out of it; its glass a variant of the kit glass that writes depth and reads the panes' rooms. Earlier: §29.10: the owner's frame budget of 16.7 ms and the merged far LOD for each house type, designed: one mesh a type built in place, the switch at 50 m with no cross-fade, the panes' rooms in the mesh, a sync for the houses the city changed)
+Last Updated: 2026-11-10 (§30.2: the lamps, their glass and the statue built; the gaslight made unlit, since its emission keyword was never kept; the frame with the Tripo lamps and people at most 11.95 ms in any view, so the lamp needs no far level. Earlier: §30: the owner's Tripo street lamp in the place of every lamp post and one bronze statue on Drowsy Steps, two more exceptions to §25.6. Earlier: §29.11: the far LOD built and measured: every view's median frame within the 16.7 ms budget, the swap unseen; the yard doors left out of it; its glass a variant of the kit glass that writes depth and reads the panes' rooms. Earlier: §29.10: the owner's frame budget of 16.7 ms and the merged far LOD for each house type, designed: one mesh a type built in place, the switch at 50 m with no cross-fade, the panes' rooms in the mesh, a sync for the houses the city changed)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -2141,3 +2141,36 @@ Both are exceptions to §25.6's rule that the Tripo models furnish interiors onl
 - **Its glass.** The Tripo lamp is one mesh with one material, so the whole lamp cannot glow. A small box of our own, the lantern's glass, stands inside the lantern; its material's name holds "glass", which is how `VeilmouthMystic.Lamps` finds the panes it lights at night.
 - **Its weight.** The lamp holds 4 935 triangles, 1.24 million for 251 lamps, against the old post's lighter mesh. It is measured with FrameProbe against the 16.7 ms budget (§29.10); if a view breaks the budget, the lamp gets a far level beyond 60 m (authoring default) that casts no shadow.
 - **The statue stands on Drowsy Steps**, the raised square before the cathedral, in the middle of its open paving and facing south down the steps, 4.8 m high with its pedestal (authoring default), so the figure reads larger than life over the passers-by. It is not Stone Grandad: Stone Grandad keeps its 12 m placeholder on the Penny's island until its own model comes (SLICE_MODELS_WANTED.md § C4); the owner may put this statue there instead.
+
+## 30.2 Built and measured, 2026-11-10
+
+**The lamps** (`SliceKitTripo.LampGlass`, `VeilmouthMystic`; renders `Logs/SliceSurvey/lamp_{noon,night}_{0,1,2}.png` and `lamp_*_close.png`):
+
+- **In place.** All 251 lamps of C5 wear the Tripo model under the kit key `LampPost`, 4 m high.
+- **The glass** is not the box §30.1 planned but eight quads of our own. Two sit on each face of the lantern, either side of its middle bar, just outside the measured panes (0.745–0.840 of the lamp's height). By day their material, `Kit_LampGlass`, is a dark pane.
+- **Built upright first.** The glass is built in the wrapper's upright frame and then hung under the model. Built in the model's own frame, which Tripo turns −90° about X, it lay flat, and its collider stood 3.5 m out.
+- **By night** `VeilmouthSky` swaps the glass for `Veilmouth_Gaslight`, and each lamp's light burns at the glass's centre.
+  - The gaslight is now **URP Unlit**, at 1.15 × the gaslight colour.
+  - Before, it was a Lit material whose `_EMISSION` keyword the asset never kept: its `m_ValidKeywords` had stayed empty since C3. The new panes therefore rendered black at night until this change.
+- **Checks.** The mystic layer's city check finds no kit fault in 5 794 blocks. One walker's route met a new lamp; its route was planned again, 62 m long, and no route meets a lamp or the statue.
+
+**The statue** (`VeilmouthOrnaments`; render `orn_09.png`) stands on Drowsy Steps at plan (539, 350), 27.6 m up, on the cathedral's axis and clear of its door, facing south down the steps.
+
+**The frame** (`FrameProbe`, development build, 1920 × 1080, High, the owner's machine; `Logs/SliceSurvey/c5_frames_tripo.txt`; medians of 3 rounds of 120 frames, ms). The city now has the Tripo lamps, the statue, and the Tripo people in place of the Dummies.
+
+| View | As shipped | No shadows |
+|---|---|---|
+| down Long Tongue | 10.02 | 8.88 |
+| down Salt Gullet | 11.95 | 9.39 |
+| across the Penny | 6.82 | 5.87 |
+| down Thimble Street | 10.33 | 8.54 |
+| Draught Lane | 10.13 | 9.35 |
+| the West Road | 8.46 | 7.75 |
+| in Gloomwood | 4.58 | 4.20 |
+
+- **Within budget.** Every view keeps its median within the 16.7 ms budget (§29.10), 9.62 ms pooled, so the lamp needs no far level; §30.1's fallback is not built.
+- **What the lamps and people add.** Pooled over the views, against §29.11's last run:
+  - triangles rose from 14.3 to 16.2 million;
+  - draw calls fell from 13 490 to 13 361;
+  - shadow casters fell from 7 384 to 7 237.
+- **Not a speed-up.** The frames are lower than §29.11's last runs, but the machine's load differed between those runs (§29.11). They show only that the budget holds, not that the frame got faster.

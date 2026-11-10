@@ -34,6 +34,39 @@ namespace GameDev.Slice.Dwellings
             LogsKey = "TrLogHolder", FireToolsKey = "TrFireTools";
 
         public const string LampKey = "ViWallLamp", SconceKey = "TrSconce", LanternKey = "TrLantern";
+
+        /// <summary>
+        /// The owner's pieces of 2026-11-10 (furnishing rules §10, §10.1): a gas radiator in every heated room without a
+        /// fireplace, and by the street door a barometer on the wall and an umbrella stand in the corner.
+        /// </summary>
+        public const string RadiatorKey = "TrRadiator", BarometerKey = "TrBarometer", UmbrellasKey = "TrUmbrellas";
+
+        /// <summary>
+        /// Kinds of one piece, chosen by the seed once for each place (rules §10, G3: the bed's pair is alike): the two
+        /// nightstands with a candle and a book, the two with a lamp, the two floor vases.
+        /// </summary>
+        private static readonly Dictionary<string, string[]> Kinds = new Dictionary<string, string[]>
+        {
+            [TrNightstandKey] = new[] { TrNightstandKey, "TrCabinet" },
+            [TrNightstandLampKey] = new[] { TrNightstandLampKey, "TrCabinetLamp" },
+            ["TrVase"] = new[] { "TrVase", "TrVaseOrnate" },
+        };
+
+        /// <summary>
+        /// Rules §10.1 (owner, 2026-11-10): a home has at most this many fireplaces, its kitchen range among them, and
+        /// only on the ground floor.
+        /// </summary>
+        public const int MostFireplaces = 2;
+
+        /// <summary>Rules §10.1: the rooms people live, work or wash in, which a radiator heats where no fireplace does.</summary>
+        private static readonly HashSet<RoomKind> HeatedRooms = new HashSet<RoomKind>
+        {
+            RoomKind.Hall, RoomKind.Parlour, RoomKind.DrawingRoom, RoomKind.DiningRoom, RoomKind.DressingRoom, RoomKind.Study, RoomKind.Bedroom,
+            RoomKind.Nursery, RoomKind.ServantRoom, RoomKind.Bathroom, RoomKind.BackRoom, RoomKind.ShopRoom, RoomKind.Office, RoomKind.Reception,
+            RoomKind.Room,
+        };
+
+        private const float BarometerHeight = 1.5f;
         private const string PictureKey = "ViPicture";
         private static readonly string[] Pictures = Enumerable.Range(1, 8).Select(i => $"ViPicture{i}").ToArray();
 
@@ -71,6 +104,7 @@ namespace GameDev.Slice.Dwellings
             Opposite,   // against the wall facing the room's hearth, on its axis (a settee)
             Centre,     // a centre group in the room (a table and its chairs)
             Corner,     // in a corner (a plant, a coat stand)
+            Window,     // under a window, centred on it, else against a plain wall (a radiator, rules §10.1)
             Sell,       // a shop's counter across the room and its shelves behind (rules §6)
             Racks,      // shelves along the walls (a store)
             Floor,      // small things on a store's or kitchen's floor, by the walls (G5)
@@ -212,6 +246,15 @@ namespace GameDev.Slice.Dwellings
         /// <summary>A sewing table by the wall with its chair: the poor and middling home's work.</summary>
         private static readonly Place Sew = P("Sew", At.Wall, "TrSewing", "TrSewing", null, Use.None, C("ViChair", Rel.Seat));
 
+        /// <summary>A rich woman's bust on its pedestal table against a wall (rules §10).</summary>
+        private static readonly Place Bust = P("Bust", At.Wall, null, null, "TrBust", Use.None);
+
+        /// <summary>The umbrella stand in the hall's corner nearest the street door (rules §10).</summary>
+        private static readonly Place Umbrellas = P("Umbrellas", At.Corner, null, UmbrellasKey, UmbrellasKey, Use.None);
+
+        /// <summary>A gas radiator under a window (rules §10.1).</summary>
+        private static readonly Place Heat = P("Heat", At.Window, RadiatorKey, Use.None);
+
         /// <summary>A rich floor vase in a corner (G6).</summary>
         private static readonly Place Vase = P("Vase", At.Corner, null, null, "TrVase", Use.None);
 
@@ -247,7 +290,7 @@ namespace GameDev.Slice.Dwellings
         {
             Sleep, SleepPlain, Dress, Drawers, Screen, Coats, Hearth, Cook, CookAndSit, Dresser, Basin, ClosetBasin, Bath, Toilet, WashShelf, TowelRail,
             EatKitchen, EatSmall, Dine, Sideboard, Display, Sit, Books, Work, WorkSmall, Clock, Piano, Gramophone, Sew, Vase, HallTable, Plant, Settee,
-            Play, Sell, Racks, Goods, Kitchenware, Toys, Stacks,
+            Play, Sell, Racks, Goods, Kitchenware, Toys, Stacks, Bust, Umbrellas, Heat,
         };
 
         // ------------------------------------------------------------------------------------------- rooms (rules §4)
@@ -279,12 +322,12 @@ namespace GameDev.Slice.Dwellings
         /// <summary>Rules §4: each room's places, required first, then the optional ones in order.</summary>
         private static readonly Dictionary<RoomKind, Step[]> RoomRules = new Dictionary<RoomKind, Step[]>
         {
-            [RoomKind.Hall] = new[] { May(HallTable, Middling), May(Clock, Rich), May(Coats, Middling), May(Plant, Rich), May(Vase, Rich) },
+            [RoomKind.Hall] = new[] { May(HallTable, Middling), May(Clock, Rich), May(Coats, Middling), May(Umbrellas, Middling), May(Plant, Rich), May(Vase, Rich), May(Bust, Rich) },
             [RoomKind.Landing] = new[] { May(Settee, Rich), May(Plant, Middling) },
             [RoomKind.Parlour] = new[] { Must(Hearth), May(Sit), May(Books, Middling), May(Sew, Middling, Middling) },
-            [RoomKind.DrawingRoom] = new[] { Must(Hearth), Must(Sit), May(Piano, Rich), May(Books), May(Display), May(Gramophone, Rich), May(Vase, Rich) },
+            [RoomKind.DrawingRoom] = new[] { Must(Hearth), Must(Sit), May(Piano, Rich), May(Books), May(Display), May(Gramophone, Rich), May(Vase, Rich), May(Bust, Rich) },
             [RoomKind.DiningRoom] = new[] { May(Hearth, Rich), Must(Dine), May(Sideboard), May(Display) },
-            [RoomKind.Study] = new[] { May(Hearth, Rich), Must(Work), May(Books, count: 2) },
+            [RoomKind.Study] = new[] { May(Hearth, Rich), Must(Work), May(Books, count: 2), May(Bust, Rich) },
             [RoomKind.Kitchen] = new[]
             {
                 Must(CookAndSit, Poor, Poor), Must(Cook, Middling), Must(EatKitchen), May(Dresser), May(Basin, Poor, Middling), May(Kitchenware),
@@ -323,7 +366,8 @@ namespace GameDev.Slice.Dwellings
         /// <summary>Every kit key the planner may place, so the kit asset holds them all.</summary>
         public static IEnumerable<string> Keys =>
             AllPlaces.SelectMany(p => new[] { p.PoorKey, p.MiddlingKey, p.RichKey }.Concat(p.With.Select(w => w.Key)).Concat(p.Things ?? Array.Empty<string>()))
-                .Concat(new[] { ShopShelvesKey, "ViCupboardGlass", LampKey, SconceKey, LanternKey, "ViCarpet", "ViCarpetB", StashKey, StairKey, BalustradeKey, ChandelierKey })
+                .Concat(new[] { ShopShelvesKey, "ViCupboardGlass", LampKey, SconceKey, LanternKey, "ViCarpet", "ViCarpetB", StashKey, StairKey, BalustradeKey, ChandelierKey, BarometerKey })
+                .Concat(Kinds.Values.SelectMany(k => k))
                 .Concat(Pictures)
                 .Where(k => k != null && k != PictureKey).Distinct();
 
@@ -499,19 +543,36 @@ namespace GameDev.Slice.Dwellings
             var stashRoom = Array.FindIndex(StashRooms, k => rooms.Any(r => r.Data.Kind == k));
             var stash = rng.NextDouble() < StashChance(wealth) && stashRoom >= 0;
 
+            // Rules §10.1: the ranges a home must have come first; what is left of two may be hearths, on the ground
+            // floor, in the rooms' order (the parlour, the drawing room).
+            var hearths = MostFireplaces - rooms.Count(r => RoomRules[r.Data.Kind].Any(s => s.Required && s.From <= wealth && wealth <= s.UpTo && (s.Place == Cook || s.Place == CookAndSit)));
             foreach (var room in rooms)
             {
                 var j = new Job { Plan = plan, Room = room, Wealth = wealth, Rng = rng, Kit = kit };
                 foreach (var step in RoomRules[room.Data.Kind].Where(s => s.From <= wealth && wealth <= s.UpTo))
                 {
+                    if (step.Place == Hearth && (room.Data.Level > 0 || hearths <= 0))
+                    {
+                        continue; // a radiator heats it instead
+                    }
+
                     var count = step.Count > 0 ? step.Count : Mathf.Max(1, plan.Servants);
                     for (var n = 0; n < count; n++)
                     {
-                        if (!Fill(j, step.Place) && step.Required)
+                        if (Fill(j, step.Place))
+                        {
+                            hearths -= step.Place == Hearth ? 1 : 0;
+                        }
+                        else if (step.Required)
                         {
                             plan.Unplaced.Add($"{room.Data.Name}: {step.Place.Name}");
                         }
                     }
+                }
+
+                if (HeatedRooms.Contains(room.Data.Kind) && room.Pieces.All(p => p.Key != FireplaceKey))
+                {
+                    Fill(j, Heat);
                 }
 
                 Decorate(j);
@@ -525,7 +586,7 @@ namespace GameDev.Slice.Dwellings
         /// <summary>One place in the room, anchor first, then its companions (G7); false when its anchor found no spot.</summary>
         private static bool Fill(Job j, Place p)
         {
-            var key = p.Anchor(j.Wealth);
+            var key = Kind(j, p.Anchor(j.Wealth));
             if (key == null || !j.Kit.TryGet(key, out var fp))
             {
                 return false;
@@ -556,7 +617,7 @@ namespace GameDev.Slice.Dwellings
                     continue;
                 }
 
-                foreach (var with in p.With.Where(w => w.From <= j.Wealth && j.Wealth <= w.UpTo))
+                foreach (var with in p.With.Where(w => w.From <= j.Wealth && j.Wealth <= w.UpTo).Select(w => Kinds.ContainsKey(w.Key) ? KindOf(j, w) : w))
                 {
                     var mw = Begin(j);
                     if (!Companion(j, with, s, a, fp) || !Connected(j.Room))
@@ -570,6 +631,20 @@ namespace GameDev.Slice.Dwellings
 
             return false;
         }
+
+        /// <summary>One kind of a piece that has several (<see cref="Kinds"/>), by the seed, among those the kit holds.</summary>
+        private static string Kind(Job j, string key)
+        {
+            if (key == null || !Kinds.TryGetValue(key, out var kinds))
+            {
+                return key;
+            }
+
+            var held = kinds.Where(k => j.Kit.TryGet(k, out _)).ToArray();
+            return held.Length == 0 ? key : held[j.Rng.Next(held.Length)];
+        }
+
+        private static With KindOf(Job j, With w) => new With { Key = Kind(j, w.Key), Rel = w.Rel, From = w.From, UpTo = w.UpTo, Y = w.Y, N = w.N };
 
         /// <summary>
         /// The anchor's spots against the walls, best first: the place's whole group free on its wall, centred on the
@@ -598,7 +673,7 @@ namespace GameDev.Slice.Dwellings
                     var score = j.Rng.NextDouble() * 0.5;
                     var g0 = a - left;
                     var g1 = a + fp.Width + right;
-                    if (g0 < 0 || g1 > s.Length || !GroupFree(j, s, g0, g1, depth))
+                    if (g0 < 0 || g1 > s.Length || !GroupFree(j, s, g0, g1, depth, p.At == At.Window && fp.Height <= LowHeight))
                     {
                         score += 100;
                     }
@@ -633,6 +708,9 @@ namespace GameDev.Slice.Dwellings
                         case At.Segment:
                             score += Math.Abs((a + fp.Width * 0.5) - segCentre) * 10;
                             break;
+                        case At.Window:
+                            score += (OpeningOf(j, s, a) == Opening.Window ? 0 : 8) + Math.Abs((a + fp.Width * 0.5) - segCentre) * 2;
+                            break;
                         default:
                             score += Math.Abs((a + fp.Width * 0.5) - segCentre);
                             break;
@@ -651,12 +729,16 @@ namespace GameDev.Slice.Dwellings
             return j.Plan.OpeningAt(x, z, alongZ, j.Room.Data.Level);
         }
 
-        /// <summary>True when the cells from g0 to g1 along the wall, d deep, are free and the wall there is plain.</summary>
-        private static bool GroupFree(Job j, Side s, int g0, int g1, int d)
+        /// <summary>
+        /// True when the cells from g0 to g1 along the wall, d deep, are free and the wall there is plain, or a window
+        /// over a piece low enough (<paramref name="underWindow"/>).
+        /// </summary>
+        private static bool GroupFree(Job j, Side s, int g0, int g1, int d, bool underWindow = false)
         {
             for (var i = g0; i < g1; i++)
             {
-                if (OpeningOf(j, s, i) != Opening.Wall)
+                var o = OpeningOf(j, s, i);
+                if (o != Opening.Wall && !(underWindow && o == Opening.Window))
                 {
                     return false;
                 }
@@ -984,7 +1066,24 @@ namespace GameDev.Slice.Dwellings
             return true;
         }
 
-        /// <summary>A piece in a corner, the corner nearest the way in first (a coat stand by the door).</summary>
+        /// <summary>The middle cell inside the room's street doorway, if it has one.</summary>
+        private static (int, int)? StreetDoor(Job j)
+        {
+            foreach (var s in SidesOf(j.Room.Data))
+            {
+                for (var a = 0; a < s.Length; a += M)
+                {
+                    if (OpeningOf(j, s, a) == Opening.Street)
+                    {
+                        return s.At(a + 1, 0);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>A piece in a corner, the corner nearest the way in first, the street door before the others (a coat stand by the door).</summary>
         private static bool InCorner(Job j, string key, string place)
         {
             if (!j.Kit.TryGet(key, out var fp))
@@ -992,7 +1091,7 @@ namespace GameDev.Slice.Dwellings
                 return false;
             }
 
-            var entry = j.Room.Entries.Count > 0 ? j.Room.Entries[0] : (j.Room.Data.X, j.Room.Data.Z);
+            var entry = StreetDoor(j) ?? (j.Room.Entries.Count > 0 ? j.Room.Entries[0] : (j.Room.Data.X, j.Room.Data.Z));
             var spots = new List<(Side S, int A, double Score)>();
             foreach (var s in SidesOf(j.Room.Data))
             {
@@ -1254,6 +1353,11 @@ namespace GameDev.Slice.Dwellings
         {
             var r = j.Room.Data;
             var kind = r.Kind;
+            if (kind == RoomKind.Hall && j.Wealth != Poor && StreetDoor(j) is { } door)
+            {
+                HangNear(j, BarometerKey, BarometerHeight, new[] { new Vector2(door.Item1 + 0.5f, door.Item2 + 0.5f) }); // rules §10: by the entrance
+            }
+
             if (j.Wealth != Poor && !Unlit.Contains(kind))
             {
                 var main = j.Wealth == Rich && (kind == RoomKind.DrawingRoom || kind == RoomKind.DiningRoom || kind == RoomKind.Hall);
@@ -1309,18 +1413,18 @@ namespace GameDev.Slice.Dwellings
             }
         }
 
-        /// <summary>A hung piece on a free wall segment, the one nearest the room's anchors first.</summary>
-        private static void HangNear(Job j, string key, float y)
+        /// <summary>A hung piece on a free wall segment, the one nearest the room's anchors (or <paramref name="near"/>) first.</summary>
+        private static void HangNear(Job j, string key, float y, IReadOnlyList<Vector2> near = null)
         {
-            var anchors = j.Room.Pieces.Where(p => p.Place != null).Select(p => p.Cells.center).ToList();
+            var anchors = near?.ToList() ?? j.Room.Pieces.Where(p => p.Place != null).Select(p => p.Cells.center).ToList();
             var spots = new List<(Side S, int A, double Score)>();
             foreach (var s in SidesOf(j.Room.Data))
             {
                 for (var a = 0; a < s.Length; a += M)
                 {
                     var c = s.At(a + 1, 0);
-                    var near = anchors.Count == 0 ? 0 : anchors.Min(p => Mathf.Abs(p.x - c.Item1) + Mathf.Abs(p.y - c.Item2));
-                    spots.Add((s, a, near + j.Rng.NextDouble() * 2));
+                    var distance = anchors.Count == 0 ? 0 : anchors.Min(p => Mathf.Abs(p.x - c.Item1) + Mathf.Abs(p.y - c.Item2));
+                    spots.Add((s, a, distance + j.Rng.NextDouble() * 2));
                 }
             }
 
@@ -1486,6 +1590,12 @@ namespace GameDev.Slice.Dwellings
                 {
                     faults.Add($"{room.Data.Name}: a {f.Key} at ({f.X}, {f.Z}) faces no table, desk or hearth (G4)");
                 }
+            }
+
+            var fires = plan.Furniture.Where(f => f.Key == FireplaceKey).ToList();
+            if (fires.Count > MostFireplaces || fires.Any(f => f.Level > 0))
+            {
+                faults.Add($"{fires.Count} fireplaces, {fires.Count(f => f.Level > 0)} above the ground floor (rules §10.1)");
             }
 
             if (home)

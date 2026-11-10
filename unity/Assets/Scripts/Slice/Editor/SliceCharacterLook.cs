@@ -29,7 +29,6 @@ namespace GameDev.Slice.EditorTools
     {
         private const string MaterialFolder = "Assets/Materials/Slice/Dummy";
         private const string AnimatorFolder = "Assets/Settings/Slice";
-        private const string PersonIdleSource = "Assets/Kevin Iglesias/Human Animations/Animations/Male/Idles/HumanM@Idle01.fbx";
         public const string PersonIdlePath = AnimatorFolder + "/SlicePersonIdle.controller";
         private const string PortalLeafPath = SliceKitCatalogue.Folder + "/Portal/Kit_Portal_Leaf_3x2.prefab";
 
@@ -140,7 +139,8 @@ namespace GameDev.Slice.EditorTools
                 return existing;
             }
 
-            var clip = AssetDatabase.LoadAllAssetsAtPath(PersonIdleSource).OfType<AnimationClip>().First(c => !c.name.StartsWith("__preview"));
+            // The A0 stand-in (ANIMATION_PIPELINE_PLAN.md): Kevin Iglesias' clips left the project (owner, 2026-11-10).
+            var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(SlicePeopleModels.ManIdle);
             Directory.CreateDirectory(AnimatorFolder);
             return AnimatorController.CreateAnimatorControllerAtPathWithClip(PersonIdlePath, clip);
         }

@@ -15,9 +15,8 @@ namespace GameDev.Slice.EditorTools
         public const string GridMaterialPath = "Assets/Materials/Slice/Confront_Grid.mat";
         private const string Data = "Assets/Data/Confront";
 
-        // Authoring default: a red Human Character Dummy, as the slice's other stand-ins (asset map §1), reads as a
-        // development opponent and nothing else.
-        private const string OpponentModel = "Assets/Kevin Iglesias/Human Character Dummy/Prefabs/HumanDummy_M Red.prefab";
+        // The Cult Forces' model, the owner's detective (owner, 2026-11-10; asset map §1).
+        private const string OpponentModel = SlicePeopleModels.Folder + "/Detective.prefab";
 
         // Authoring default: a pale, muted line that reads on the setts and the grass by day and under gaslight.
         private static readonly Color GridColour = new Color(0.78f, 0.82f, 0.72f);

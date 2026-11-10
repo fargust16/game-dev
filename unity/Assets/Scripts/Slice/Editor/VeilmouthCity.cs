@@ -1607,11 +1607,12 @@ namespace GameDev.Slice.EditorTools
         {
             if (colour == "Yellow")
             {
-                // Ordinary townsfolk are the owner's gentleman and woman, walking a closed route round their place (2026-11-06).
+                // Ordinary townsfolk walk a closed route round their place (2026-11-06), in a model by the nearest block's
+                // wealth (owner's people, 2026-11-10).
                 Physics.SyncTransforms();
                 var at = World(px, py, Ground(px, py));
                 var route = SliceTownsfolk.PlanRoute(at);
-                var prefab = female ? SliceTownsfolk.WomanPrefabPath : SliceTownsfolk.PrefabPath;
+                var prefab = name == "Farmer" ? SliceTownsfolk.PrefabPath : SlicePeopleModels.WalkerLook(female, at, _layout).Walking;
                 var walker = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(prefab), _people);
                 walker.name = female && name == "Townsperson" ? "Townswoman" : name;
                 walker.transform.SetPositionAndRotation(route.Length > 0 ? route[0] : at, Quaternion.Euler(0f, yaw, 0f));
@@ -1620,23 +1621,7 @@ namespace GameDev.Slice.EditorTools
                 return;
             }
 
-            var custom = colour == "Teal" || colour == "Brown";
-            var path = $"{VeilmouthDressing.Dummies}/HumanDummy_{(female ? "F" : "M")} {(custom ? "White" : colour)}.prefab";
-            var go = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path), _people);
-            go.name = name;
-            go.transform.SetPositionAndRotation(World(px, py, Ground(px, py)), Quaternion.Euler(0f, yaw, 0f));
-            VeilmouthDressing.Stand(go, 1.8f);
-            SliceCharacterLook.Fix(go);
-            if (custom)
-            {
-                var material = colour == "Teal"
-                    ? SliceKitCatalogue.Colour("Dummy_Teal", new Color(0.1f, 0.58f, 0.58f), false)
-                    : SliceKitCatalogue.Colour("Dummy_Brown", new Color(0.45f, 0.29f, 0.16f), false);
-                foreach (var r in go.GetComponentsInChildren<Renderer>())
-                {
-                    r.sharedMaterials = r.sharedMaterials.Select(_ => material).ToArray();
-                }
-            }
+            SlicePeopleModels.Instantiate(name, female, colour, _people, World(px, py, Ground(px, py)), yaw);
         }
 
         private static void Beast(string path, float length, float px, float py, float yaw, string name)
