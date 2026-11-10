@@ -96,6 +96,35 @@ namespace GameDev.Confront.Rules
         [Tooltip("Points to hit against a fighter Surrounded by three or four.")]
         [SerializeField] private float surroundedByMore = 20f;
 
+        [Tooltip("Points to hit and to the critical chance from higher ground.")]
+        [SerializeField] private float higherGround = 10f;
+
+        [SerializeField] private float higherGroundCritical = 10f;
+
+        [Tooltip("Metres the attacker's cell stands above the target's for higher ground. Elevation bands are open (10.2 §7); S3a.6 authoring default.")]
+        [SerializeField] private float higherGroundRise = 1.5f;
+
+        [Tooltip("Points to hit lost against a target in Half Cover and in Full Cover, ranged and magical attacks only.")]
+        [SerializeField] private float halfCover = 15f;
+
+        [SerializeField] private float fullCover = 30f;
+
+        [Tooltip("10.2 §5b Firearms: points to hit a firearm loses while an enemy stands beside the shooter.")]
+        [SerializeField] private float pointBlank = 10f;
+
+        [Header("10.2 §5b Wait and Defensive Stance")]
+        [Tooltip("Evasion each AP held in a Defensive Stance adds.")]
+        [SerializeField] private float stanceEvasion = 1.5f;
+
+        [Tooltip("Each AP held in a Defensive Stance multiplies the chance to block or parry by (1 + this), as tactical_sim.py does.")]
+        [SerializeField] private float stanceGuard = 0.03f;
+
+        [Tooltip("A Counterattack costs the weapon's attack AP plus this.")]
+        [SerializeField] private int counterattackAp = 2;
+
+        [Tooltip("AP to change the Weapon Set in hand.")]
+        [SerializeField] private int weaponSetAp = 2;
+
         [Header("10.2 First Aid and conditions in the slice: Bleeding")]
         [Tooltip("The share of maximum HP Bleeding takes each tick; a round is one tick.")]
         [SerializeField, Range(0f, 1f)] private float bleedingShare = 0.01f;
@@ -115,6 +144,15 @@ namespace GameDev.Confront.Rules
         public double BleedingEndsPerEndurance => bleedingEndsPerEndurance;
         public int CloseInAp => closeInAp;
         public int HeadlessRounds => headlessRounds;
+        public double HigherGround => higherGround;
+        public double HigherGroundCritical => higherGroundCritical;
+        public float HigherGroundRise => higherGroundRise;
+        public double PointBlank => pointBlank;
+        public int CounterattackAp => counterattackAp;
+        public int WeaponSetAp => weaponSetAp;
+
+        /// <summary>10.2 §5b Position: points to hit a ranged or magical attack loses against a target in this cover.</summary>
+        public double CoverPenalty(Grid.CoverLevel level) => level == Grid.CoverLevel.Full ? fullCover : level == Grid.CoverLevel.Half ? halfCover : 0d;
 
         /// <summary>10.2 §5b Position: points to hit against a fighter with this many enemies at its sides.</summary>
         public double SurroundedBonus(int enemiesBeside) => enemiesBeside >= 3 ? surroundedByMore : enemiesBeside == 2 ? surroundedByTwo : 0d;
@@ -227,11 +265,19 @@ namespace GameDev.Confront.Rules
             return own + fighter.Modifiers.accuracy + fighter.Weapon.ToHit;
         }
 
-        /// <summary>10.2 §5b Attack: `(Dexterity + Perception) / 2`, less the load, or zero for a target that cannot evade.</summary>
+        /// <summary>
+        /// 10.2 §5b Attack: `(Dexterity + Perception) / 2`, less the load, and in a Defensive Stance 1.5 for each AP held;
+        /// zero for a target that cannot evade.
+        /// </summary>
         public double Evasion(Fighter fighter) =>
             fighter.CanEvade
                 ? (fighter.Get(CharacterAttribute.Dexterity) + fighter.Get(CharacterAttribute.Perception)) / 2d + fighter.Modifiers.evasion - fighter.LoadEvasion
+                  + (fighter.Stance ? stanceEvasion * fighter.Reserve : 0d)
                 : 0d;
+
+        /// <summary>The chance its parry or block succeeds: the Weapon Set's, raised in a Defensive Stance by each AP held.</summary>
+        public double GuardChance(Fighter fighter) =>
+            fighter.Set.GuardChance * (fighter.Stance ? 1d + stanceGuard * fighter.Reserve : 1d);
 
         /// <summary>10.2 §5b Attribute Requirements: below its weapon's requirements a fighter hits that share as often.</summary>
         public static double Aim(Fighter fighter) => Fit(fighter.Values, fighter.Weapon.Requirements, fighter.Weapon.Stage);
@@ -346,9 +392,10 @@ namespace GameDev.Confront.Rules
 
             if (!context.Unguarded && !weapon.Ranged && CanGuard(target))
             {
+                var chance = GuardChance(target); // read before the reaction spends its AP
                 target.Reserve -= reactionAp;
                 result.GuardTried = true;
-                if (rolls.NextDouble() < target.Set.GuardChance)
+                if (rolls.NextDouble() < chance)
                 {
                     result.Guarded = true;
                     damage *= 1d - target.Set.GuardStops;

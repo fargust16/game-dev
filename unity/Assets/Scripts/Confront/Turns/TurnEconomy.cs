@@ -12,9 +12,12 @@ namespace GameDev.Confront.Turns
     /// The fight's turns on the Combat Grid (S3a.4; 17 C.5), on the rules of <see cref="FightRules"/>. Initiative is rolled
     /// once, as 10.2 §5b sets it, and a combatant who joins later rolls its own. Each turn gets a fresh AP pool, the AP
     /// kept from the last one expiring; a step to a cell beside costs 1 AP, a blow its weapon's AP, and what is left
-    /// stays for reactions. A melee blow goes across a cell's side, a shot within the weapon's range. A combatant with
-    /// no will of its own walks toward the nearest enemy and strikes while its AP last, until Target Rules V0 (S3a.8);
-    /// line of sight, cover, reactions and the Reaction Attack come with S3a.6, conditions with S3a.7.
+    /// stays for reactions. A melee blow goes across a cell's side, a shot within the weapon's range and in sight. A
+    /// combatant with no will of its own walks toward the nearest enemy and strikes while its AP last, until Target Rules
+    /// V0 (S3a.8). Since S3a.6 (10.2 §5b *Position*, *Wait and Defensive Stance*): leaving the side of a melee enemy draws
+    /// its Reaction Attack, once a round from each enemy; Surrounded, higher ground, cover and the Point-Blank Shot set a
+    /// blow's or a shot's context; a combatant can wait to the end of the round, end its turn in a Defensive Stance that
+    /// answers a melee attack with a Counterattack, or change its Weapon Set. Conditions come with S3a.7.
     /// </summary>
     public sealed class TurnEconomy : ITurnEconomy
     {
@@ -31,6 +34,7 @@ namespace GameDev.Confront.Turns
         private readonly List<CombatCell> _candidate = new List<CombatCell>();
         private readonly List<CombatCell> _best = new List<CombatCell>();
         private readonly List<CombatCell> _walked = new List<CombatCell>();
+        private readonly List<Combatant> _waiting = new List<Combatant>();
         private Random _rolls;
         private int _turn;
         private int _turnsThisRound;
@@ -61,6 +65,8 @@ namespace GameDev.Confront.Turns
 
         public event Action<Combatant, IReadOnlyList<CombatCell>> Walked;
 
+        public event Action<Combatant> GuardChanged;
+
         public void BeginEncounter(IReadOnlyList<Combatant> combatants, Random rolls)
         {
             if (IsRunning)
@@ -71,6 +77,7 @@ namespace GameDev.Confront.Turns
             _rolls = rolls;
             _order.Clear();
             _joining.Clear();
+            _waiting.Clear();
             Round = 1;
             _turn = -1;
             _turnsThisRound = 0;
@@ -113,6 +120,12 @@ namespace GameDev.Confront.Turns
                 case IntentKind.Attack:
                     var target = Find(intent.Target);
                     return target != null && Strike(c, target);
+                case IntentKind.Wait:
+                    return Wait(c);
+                case IntentKind.Stance:
+                    return Stand(c);
+                case IntentKind.ChangeSet:
+                    return ChangeSet(c);
                 default:
                     EndTurn(c);
                     return true;
@@ -172,11 +185,63 @@ namespace GameDev.Confront.Turns
                 return -1;
             }
 
+            // A shot is taken from the first cell on the way that has the target in range and in sight.
+            if (attacker.Fighter.Weapon.Ranged)
+            {
+                for (var i = 0; i < _candidate.Count; i++)
+                {
+                    if (ReachesFrom(attacker, _candidate[i], target))
+                    {
+                        steps = i + 1;
+                        _candidate.RemoveRange(steps, _candidate.Count - steps);
+                        break;
+                    }
+                }
+            }
+
             path?.AddRange(_candidate);
             return steps;
         }
 
-        public StrikeContext ContextFor(CombatCell from, Combatant target) => new StrikeContext { Beyond = Distance(from, target.Cell) > 1 };
+        public StrikeContext ContextFor(Combatant attacker, CombatCell from, Combatant target)
+        {
+            var context = new StrikeContext { Beyond = Distance(from, target.Cell) > 1 };
+            var bonus = _rules.SurroundedBonus(EnemiesBeside(target, attacker, from));
+            if (attacker.Fighter.Weapon != null && attacker.Fighter.Weapon.Ranged)
+            {
+                if (EnemyBeside(attacker, from))
+                {
+                    bonus -= _rules.PointBlank;
+                }
+
+                if (context.Beyond)
+                {
+                    bonus -= _rules.CoverPenalty(CoverFacing(target.Cell, from));
+                }
+            }
+
+            if (_grid.Center(from).y - _grid.Center(target.Cell).y >= _rules.HigherGroundRise)
+            {
+                bonus += _rules.HigherGround;
+                context.CriticalBonus += _rules.HigherGroundCritical;
+            }
+
+            context.HitBonus = bonus;
+            return context;
+        }
+
+        public bool ReachesFrom(Combatant attacker, CombatCell from, Combatant target)
+        {
+            var weapon = attacker.Fighter.Weapon;
+            if (weapon == null)
+            {
+                return false;
+            }
+
+            return weapon.Ranged
+                ? Distance(from, target.Cell) <= weapon.RangeCells && _grid.CanSee(from, target.Cell)
+                : Beside(from, target.Cell);
+        }
 
         public void Join(Combatant combatant)
         {
@@ -218,6 +283,8 @@ namespace GameDev.Confront.Turns
             c.Cell = cell;
             c.Position = _grid.Center(cell);
             c.State = CombatantState.Fighting;
+            c.Waited = c.Waiting = c.Attacked = c.Reacted = false;
+            c.Fighter.Stance = false;
             _rules.Enter(c.Fighter, _rolls);
             c.Initiative = _rules.Initiative(c.Fighter, _rolls);
             c.Tie = _rolls.NextDouble();
@@ -269,13 +336,28 @@ namespace GameDev.Confront.Turns
             });
         }
 
+        /// <summary>
+        /// The next turn in Initiative's order; after the last, those who waited, the lowest Initiative first, each with
+        /// the AP it kept less what its reactions spent; then the round ends.
+        /// </summary>
         private void NextTurn()
         {
             Acting = null;
             while (IsRunning)
             {
-                _turn++;
-                if (_turn >= _order.Count)
+                Combatant c;
+                var resumed = false;
+                if (_turn + 1 < _order.Count)
+                {
+                    _turn++;
+                    c = _order[_turn];
+                }
+                else if (TakeWaiting(out c))
+                {
+                    resumed = true;
+                    c.Waiting = false;
+                }
+                else
                 {
                     EndRound();
                     if (!IsRunning)
@@ -283,16 +365,25 @@ namespace GameDev.Confront.Turns
                         return;
                     }
 
-                    _turn = 0;
+                    _turn = -1;
+                    continue;
                 }
 
-                var c = _order[_turn];
                 if (!c.Standing)
                 {
                     continue;
                 }
 
                 _turnsThisRound++;
+                c.Reacted = false;
+                c.Attacked = false;
+                if (c.Fighter.Stance)
+                {
+                    c.Fighter.Stance = false; // a stance holds until the fighter's next turn
+                    GuardChanged?.Invoke(c);
+                }
+
+                var held = resumed ? Math.Min(c.HeldAp, c.Fighter.Reserve) : 0;
                 c.Fighter.Reserve = 0; // the AP kept for reactions expire as the new turn begins (10.2 §5)
                 if (c.Fighter.LostTurns > 0)
                 {
@@ -300,11 +391,27 @@ namespace GameDev.Confront.Turns
                     continue;
                 }
 
-                ApLeft = _rules.TurnAp(c.Fighter);
+                ApLeft = resumed ? held : _rules.TurnAp(c.Fighter);
                 Acting = c;
                 TurnAdvanced?.Invoke(c);
                 return;
             }
+        }
+
+        /// <summary>The waiting combatant with the lowest Initiative, the lower Dexterity on a tie (10.2 §5b Wait).</summary>
+        private bool TakeWaiting(out Combatant next)
+        {
+            next = null;
+            foreach (var c in _waiting)
+            {
+                if (next == null || c.Initiative < next.Initiative
+                    || (c.Initiative == next.Initiative && c.Fighter.Get(CharacterAttribute.Dexterity) < next.Fighter.Get(CharacterAttribute.Dexterity)))
+                {
+                    next = c;
+                }
+            }
+
+            return next != null && _waiting.Remove(next);
         }
 
         private void EndRound()
@@ -318,6 +425,12 @@ namespace GameDev.Confront.Turns
             }
 
             Round++;
+            _waiting.Clear();
+            foreach (var c in _order)
+            {
+                c.Waited = c.Waiting = false;
+            }
+
             foreach (var c in _joining)
             {
                 if (c.State == CombatantState.Joining && Place(c))
@@ -392,19 +505,67 @@ namespace GameDev.Confront.Turns
             NextTurn();
         }
 
-        /// <summary>Walks a path a step at a time while AP last, stopping once <paramref name="target"/> is reached.</summary>
+        /// <summary>10.2 §5b Wait: once a round, the turn goes to the end of the round, and its AP wait in the pool for reactions.</summary>
+        private bool Wait(Combatant c)
+        {
+            if (c.Waited)
+            {
+                return false;
+            }
+
+            c.Waited = c.Waiting = true;
+            c.HeldAp = ApLeft;
+            c.Fighter.Reserve = ApLeft;
+            _waiting.Add(c);
+            NextTurn();
+            return true;
+        }
+
+        /// <summary>10.2 §5b Defensive Stance: a combatant that has not attacked ends its turn in a stance, its AP left held.</summary>
+        private bool Stand(Combatant c)
+        {
+            if (c.Attacked)
+            {
+                return false;
+            }
+
+            c.Fighter.Stance = true;
+            GuardChanged?.Invoke(c);
+            EndTurn(c);
+            return true;
+        }
+
+        /// <summary>10.2 §5b: the second Weapon Set to hand, for its AP.</summary>
+        private bool ChangeSet(Combatant c)
+        {
+            if (ApLeft < _rules.WeaponSetAp || !c.Fighter.SwapSets())
+            {
+                return false;
+            }
+
+            ApLeft -= _rules.WeaponSetAp;
+            GuardChanged?.Invoke(c);
+            return true;
+        }
+
+        /// <summary>
+        /// Walks a path a step at a time while AP last, stopping once <paramref name="target"/> is reached. Leaving the
+        /// side of a melee enemy draws its Reaction Attack first; a walker who falls to one stops, and its turn ends.
+        /// </summary>
         private int Walk(Combatant c, List<CombatCell> path, int steps, Combatant target)
         {
             var walked = 0;
             _walked.Clear();
             for (var i = 0; i < steps && i < path.Count && ApLeft > 0; i++)
             {
-                if (!_grid.Occupy(c.Id, path[i]))
+                var occupant = _grid.OccupantAt(path[i]);
+                if ((occupant >= 0 && occupant != c.Id) || !ReactionAttacks(c) || !_grid.Occupy(c.Id, path[i]))
                 {
                     break;
                 }
 
                 c.Cell = path[i];
+                c.Position = _grid.Center(c.Cell);
                 _walked.Add(path[i]);
                 ApLeft--;
                 walked++;
@@ -415,12 +576,60 @@ namespace GameDev.Confront.Turns
             }
 
             c.Position = _grid.Center(c.Cell);
-            if (walked > 0)
+            FlushWalk(c);
+            if (!c.Standing && IsRunning && !CheckEnd() && Acting == c)
             {
-                Walked?.Invoke(c, _walked);
+                NextTurn();
             }
 
             return walked;
+        }
+
+        /// <summary>Tells the cells walked since the last telling, so a blow on the way is shown where it falls.</summary>
+        private void FlushWalk(Combatant c)
+        {
+            if (_walked.Count > 0)
+            {
+                Walked?.Invoke(c, _walked);
+                _walked.Clear();
+            }
+        }
+
+        /// <summary>
+        /// 10.2 §5b Position: each enemy with a melee weapon at a side of the walker's cell strikes as it leaves, once a
+        /// round, for no AP; the walker may parry or block with the AP it has left. False if the walker fell.
+        /// </summary>
+        private bool ReactionAttacks(Combatant c)
+        {
+            foreach (var e in _order)
+            {
+                if (!c.Standing)
+                {
+                    break;
+                }
+
+                var weapon = e.Fighter.Weapon;
+                if (e == c || !e.Standing || e.Side == c.Side || e.Reacted || e.Fighter.LostTurns > 0 || weapon == null || weapon.Ranged
+                    || !Beside(e.Cell, c.Cell))
+                {
+                    continue;
+                }
+
+                FlushWalk(c);
+                e.Reacted = true;
+                c.Fighter.Reserve = ApLeft;
+                var result = _rules.Strike(e.Fighter, c.Fighter, ContextFor(e, e.Cell, c), _rolls);
+                ApLeft = c.Fighter.Reserve;
+                c.Fighter.Reserve = 0;
+                if (c.Fighter.Down)
+                {
+                    _grid.Vacate(c.Id);
+                }
+
+                Struck?.Invoke(e, c, result);
+            }
+
+            return c.Standing;
         }
 
         private bool Strike(Combatant c, Combatant target)
@@ -432,34 +641,110 @@ namespace GameDev.Confront.Turns
             }
 
             ApLeft -= weapon.AttackAp;
-            var result = _rules.Strike(c.Fighter, target.Fighter, ContextFor(c.Cell, target), _rolls);
+            c.Attacked = true;
+            var result = _rules.Strike(c.Fighter, target.Fighter, ContextFor(c, c.Cell, target), _rolls);
             if (target.Fighter.Down)
             {
                 _grid.Vacate(target.Id);
             }
 
             Struck?.Invoke(c, target, result);
+            Counterattack(target, c);
+            if (!CheckEnd() && !c.Standing && Acting == c)
+            {
+                NextTurn();
+            }
 
-            CheckEnd();
             return true;
         }
 
-        private bool Reaches(Combatant c, Combatant target)
+        /// <summary>
+        /// 10.2 §5b Defensive Stance: a defender in a stance answers a melee attack, hit or miss, with a blow for its
+        /// weapon's AP plus 2 from those it holds; a Counterattack is not itself answered.
+        /// </summary>
+        private void Counterattack(Combatant defender, Combatant attacker)
         {
-            var weapon = c.Fighter.Weapon;
-            if (weapon == null)
+            var weapon = defender.Fighter.Weapon;
+            if (!defender.Fighter.Stance || !defender.Standing || !attacker.Standing || defender.Fighter.LostTurns > 0 || weapon == null
+                || weapon.Ranged || attacker.Fighter.Weapon.Ranged)
             {
-                return false;
+                return;
             }
 
-            if (weapon.Ranged)
+            var price = weapon.AttackAp + _rules.CounterattackAp;
+            if (defender.Fighter.Reserve < price || !Reaches(defender, attacker))
             {
-                return Distance(c.Cell, target.Cell) <= weapon.RangeCells;
+                return;
             }
 
-            // A melee blow goes across a cell's side only (10.2 §5b *Melee position*), and never through a wall.
-            return Math.Abs(c.Cell.X - target.Cell.X) + Math.Abs(c.Cell.Z - target.Cell.Z) == 1 && _grid.CanStep(c.Cell, target.Cell);
+            defender.Fighter.Reserve -= price;
+            var result = _rules.Strike(defender.Fighter, attacker.Fighter, ContextFor(defender, defender.Cell, attacker), _rolls);
+            if (attacker.Fighter.Down)
+            {
+                _grid.Vacate(attacker.Id);
+            }
+
+            Struck?.Invoke(defender, attacker, result);
         }
+
+        private bool Reaches(Combatant c, Combatant target) => ReachesFrom(c, c.Cell, target);
+
+        /// <summary>Two cells side by side with no wall between: a melee blow goes across a side only (10.2 §5b Position).</summary>
+        private bool Beside(CombatCell a, CombatCell b) => Math.Abs(a.X - b.X) + Math.Abs(a.Z - b.Z) == 1 && _grid.CanStep(a, b);
+
+        /// <summary>Enemies of the target at its sides able to act, with the attacker counted where it would strike from.</summary>
+        private int EnemiesBeside(Combatant target, Combatant attacker, CombatCell from)
+        {
+            var n = 0;
+            foreach (var other in _order)
+            {
+                if (other != attacker && other != target && other.Standing && other.Side != target.Side && other.Fighter.LostTurns == 0
+                    && Beside(other.Cell, target.Cell))
+                {
+                    n++;
+                }
+            }
+
+            return attacker.Side != target.Side && Beside(from, target.Cell) ? n + 1 : n;
+        }
+
+        /// <summary>An enemy at a side of the cell a shooter would shoot from (10.2 §5b Point-Blank Shot).</summary>
+        private bool EnemyBeside(Combatant shooter, CombatCell from)
+        {
+            foreach (var other in _order)
+            {
+                if (other != shooter && other.Standing && other.Side != shooter.Side && Beside(from, other.Cell))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// The best cover on the sides of the target's cell that face the shooter: a side counts when the shooter stands
+        /// at least half as far along its axis as across it (S3a.6 working reading).
+        /// </summary>
+        private CoverLevel CoverFacing(CombatCell cell, CombatCell from)
+        {
+            var dx = from.X - cell.X;
+            var dz = from.Z - cell.Z;
+            var best = CoverLevel.None;
+            if (dx != 0 && Math.Abs(dx) * 2 >= Math.Abs(dz))
+            {
+                best = Higher(best, _grid.CoverOn(cell, dx > 0 ? GridSide.PlusX : GridSide.MinusX));
+            }
+
+            if (dz != 0 && Math.Abs(dz) * 2 >= Math.Abs(dx))
+            {
+                best = Higher(best, _grid.CoverOn(cell, dz > 0 ? GridSide.PlusZ : GridSide.MinusZ));
+            }
+
+            return best;
+        }
+
+        private static CoverLevel Higher(CoverLevel a, CoverLevel b) => (int)a >= (int)b ? a : b;
 
         /// <summary>The enemy fewest steps away, the weaker on a tie, with the path to it in <see cref="_best"/>; 0 steps when it is reached.</summary>
         private Combatant Nearest(Combatant c, out int steps)

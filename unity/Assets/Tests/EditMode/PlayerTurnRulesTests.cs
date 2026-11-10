@@ -109,8 +109,8 @@ namespace GameDev.Slice.Tests
             CollectionAssert.AreEqual(new[] { new CombatCell(6, 5, 0), new CombatCell(7, 5, 0), new CombatCell(8, 5, 0) }, walked, "told cell by cell");
             Assert.AreEqual(ap - 3, turns.ApLeft);
             Assert.AreEqual(0, turns.PathToStrike(player, enemy, path), "beside it, the blow reaches");
-            Assert.IsFalse(turns.ContextFor(player.Cell, enemy).Beyond, "a blow from beside is not beyond the next cell");
-            Assert.IsTrue(turns.ContextFor(new CombatCell(5, 5, 0), enemy).Beyond, "four cells off it is");
+            Assert.IsFalse(turns.ContextFor(player, player.Cell, enemy).Beyond, "a blow from beside is not beyond the next cell");
+            Assert.IsTrue(turns.ContextFor(player, new CombatCell(5, 5, 0), enemy).Beyond, "four cells off it is");
         }
     }
 }

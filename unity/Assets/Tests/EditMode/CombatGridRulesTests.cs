@@ -95,8 +95,7 @@ namespace GameDev.Slice.Tests
         public void AFenceIsHalfCoverAndAWallFullCoverOnTheirSides()
         {
             // A fence 1 m high just past the line x = 6, a wall 3 m high just short of the line x = 5: the cell (5, 5)
-            // stands between them. Both stay clear of the strips of the cell's other two sides, which run across its
-            // whole width: a wall on the grid line itself would cross them too.
+            // stands between them.
             Block("Fence", 6.02f, 3f, 0.1f, 5f, 0f, 1f);
             Block("Wall", 4.88f, 3f, 0.1f, 5f, 0f, 3f);
             var grid = Grid(5, 5);
@@ -108,6 +107,20 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(CoverLevel.Half, grid.CoverOn(Cell(6, 5), GridSide.MinusX), "the fence covers its other side too");
             Assert.IsFalse(grid.CanStep(Cell(5, 5), Cell(6, 5)), "a fence closes its edge");
             Assert.IsFalse(grid.CanStep(Cell(5, 5), Cell(4, 5)), "a wall closes its edge");
+        }
+
+        [Test]
+        public void AWallOnTheGridLineCoversOnlyTheSideItStandsOn()
+        {
+            // S3a.6: a side's strip is 0.6 m wide, the cell's middle, so a wall along one side never reads on the two
+            // sides it meets at the corners.
+            Block("Wall", 5.9f, 3f, 0.2f, 5f, 0f, 3f);
+            var grid = Grid(5, 5);
+
+            Assert.AreEqual(CoverLevel.Full, grid.CoverOn(Cell(5, 5), GridSide.PlusX), "the wall's side");
+            Assert.AreEqual(CoverLevel.None, grid.CoverOn(Cell(5, 5), GridSide.PlusZ), "not the side it meets");
+            Assert.AreEqual(CoverLevel.None, grid.CoverOn(Cell(5, 5), GridSide.MinusZ), "nor the other");
+            Assert.AreEqual(CoverLevel.Full, grid.CoverOn(Cell(6, 5), GridSide.MinusX), "and the cell across it is covered the other way");
         }
 
         [Test]

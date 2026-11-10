@@ -11,9 +11,15 @@ namespace GameDev.Confront.Turns
         Move,
         Attack,
         EndTurn,
+        Wait,
+        Stance,
+        ChangeSet,
     }
 
-    /// <summary>What the acting combatant does next: walk to a cell, strike a combatant, or end its turn.</summary>
+    /// <summary>
+    /// What the acting combatant does next: walk to a cell, strike a combatant, end its turn, wait to the end of the
+    /// round, end its turn in a Defensive Stance, or change its Weapon Set (10.2 §5b, S3a.6).
+    /// </summary>
     public readonly struct TurnIntent
     {
         private TurnIntent(IntentKind kind, CombatCell cell, int target)
@@ -35,6 +41,15 @@ namespace GameDev.Confront.Turns
         public static TurnIntent Attack(int target) => new TurnIntent(IntentKind.Attack, default, target);
 
         public static TurnIntent EndTurn => new TurnIntent(IntentKind.EndTurn, default, -1);
+
+        /// <summary>Hands the turn to the end of the round, once a round, the AP kept.</summary>
+        public static TurnIntent Wait => new TurnIntent(IntentKind.Wait, default, -1);
+
+        /// <summary>Ends the turn in a Defensive Stance, if it has not attacked.</summary>
+        public static TurnIntent Stance => new TurnIntent(IntentKind.Stance, default, -1);
+
+        /// <summary>The second Weapon Set to hand, for its AP.</summary>
+        public static TurnIntent ChangeSet => new TurnIntent(IntentKind.ChangeSet, default, -1);
     }
 
     /// <summary>
@@ -73,8 +88,14 @@ namespace GameDev.Confront.Turns
         /// </summary>
         int PathToStrike(Combatant attacker, Combatant target, List<CombatCell> path);
 
-        /// <summary>What the place adds to a blow or shot from a cell at the target (S3a.5; S3a.6 brings cover and position).</summary>
-        StrikeContext ContextFor(CombatCell from, Combatant target);
+        /// <summary>
+        /// What the place adds to the attacker's blow or shot from a cell at the target (10.2 §5b Position, Firearms):
+        /// Surrounded, higher ground, and for a shot the Point-Blank Shot and the target's cover (S3a.6).
+        /// </summary>
+        StrikeContext ContextFor(Combatant attacker, CombatCell from, Combatant target);
+
+        /// <summary>Whether the attacker's weapon reaches the target from a cell: across a side for a blow, in range and in sight for a shot.</summary>
+        bool ReachesFrom(Combatant attacker, CombatCell from, Combatant target);
 
         /// <summary>A combatant who entered the grid; it comes in at the next round.</summary>
         void Join(Combatant combatant);
@@ -98,5 +119,8 @@ namespace GameDev.Confront.Turns
         /// along them. The list is the economy's own and changes with the next walk: read it at once.
         /// </summary>
         event Action<Combatant, IReadOnlyList<CombatCell>> Walked;
+
+        /// <summary>Raised when a combatant changes its Weapon Set, or takes or leaves a Defensive Stance, so the scene shows its guard.</summary>
+        event Action<Combatant> GuardChanged;
     }
 }

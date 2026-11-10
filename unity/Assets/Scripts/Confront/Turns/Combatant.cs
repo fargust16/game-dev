@@ -50,5 +50,20 @@ namespace GameDev.Confront.Turns
         internal double Tie { get; set; }
 
         public bool Standing => State == CombatantState.Fighting && !Fighter.Down;
+
+        /// <summary>It has handed its turn to the end of this round (10.2 §5b Wait), once a round.</summary>
+        public bool Waited { get; internal set; }
+
+        /// <summary>It waits now: its turn has not yet come back.</summary>
+        public bool Waiting { get; internal set; }
+
+        /// <summary>It has attacked in this turn, so it cannot take a Defensive Stance.</summary>
+        public bool Attacked { get; internal set; }
+
+        /// <summary>It gave its Reaction Attack since its own turn began, once a round from each enemy (10.2 §5b Position).</summary>
+        internal bool Reacted { get; set; }
+
+        /// <summary>The AP it kept when it waited, which reactions spend before its turn comes back.</summary>
+        internal int HeldAp { get; set; }
     }
 }

@@ -100,7 +100,8 @@ namespace GameDev.Slice.Fights
             var whom = _name(target);
             var line = !result.Hit
                 ? Loc.Format("ui.fight.log.miss", who, whom)
-                : Loc.Format(result.Critical ? "ui.fight.log.critical" : "ui.fight.log.hit", who, whom, Math.Max(1, (int)Math.Round(result.Damage)));
+                : Loc.Format(result.Guarded ? "ui.fight.log.guarded" : result.Critical ? "ui.fight.log.critical" : "ui.fight.log.hit", who, whom,
+                    Math.Max(0, (int)Math.Round(result.Damage)));
             if (result.Downed)
             {
                 line += "  " + Loc.Format("ui.fight.log.down", whom);
@@ -155,7 +156,17 @@ namespace GameDev.Slice.Fights
                 chip.EnableInClassList(ChipActing, c == turns.Acting);
                 chip.EnableInClassList(ChipEnemy, c.Side != SliceConfront.PlayerSide);
                 chip.Add(Text(_name(c), "hud__fight-chip-name"));
-                chip.Add(Text(c.Side == SliceConfront.PlayerSide ? $"{Hp(c.Fighter.Hp)} / {Hp(c.Fighter.MaxHp)}" : Condition(c.Fighter), "hud__fight-chip-state"));
+                var state = c.Side == SliceConfront.PlayerSide ? $"{Hp(c.Fighter.Hp)} / {Hp(c.Fighter.MaxHp)}" : Condition(c.Fighter);
+                if (c.Fighter.Stance)
+                {
+                    state += " · " + Loc.Get("ui.fight.stance");
+                }
+                else if (c.Waiting)
+                {
+                    state += " · " + Loc.Get("ui.fight.waiting");
+                }
+
+                chip.Add(Text(state, "hud__fight-chip-state"));
                 _order.Add(chip);
             }
         }
@@ -218,6 +229,11 @@ namespace GameDev.Slice.Fights
             else
             {
                 _text.Append(cursor.Steps < 0 ? Loc.Get("ui.fight.noway") : Loc.Format(cursor.Affordable ? "ui.fight.move" : "ui.fight.far", cursor.Cost));
+            }
+
+            if (cursor.Provokes)
+            {
+                _text.Append('\n').Append(Loc.Get("ui.fight.provokes"));
             }
 
             _tip.text = _text.ToString();

@@ -72,6 +72,9 @@ namespace GameDev.Slice.Fights
 
         public IReadOnlyList<CombatCell> Path => _path;
 
+        /// <summary>The walk shown leaves an enemy's side and draws its Reaction Attack (S3a.6).</summary>
+        public bool Provokes { get; private set; }
+
         /// <summary>Reads what the cursor points at for the player's turn, draws the path, and sets the cursor's shape.</summary>
         public void Point(Combatant player, Camera camera, Vector2 mouse)
         {
@@ -80,6 +83,7 @@ namespace GameDev.Slice.Fights
             Cost = 0;
             Steps = 0;
             Affordable = false;
+            Provokes = false;
             _path.Clear();
             if (player == null || camera == null || !_turns.IsRunning || _turns.Acting != player)
             {
@@ -94,7 +98,8 @@ namespace GameDev.Slice.Fights
                 var from = Steps > 0 ? _path[_path.Count - 1] : player.Cell;
                 Cost = Steps < 0 ? 0 : Steps + player.Fighter.Weapon.AttackAp;
                 Affordable = Steps >= 0 && Cost <= _turns.ApLeft;
-                Forecast = _rules.Forecast(player.Fighter, Target.Fighter, _turns.ContextFor(from, Target));
+                Forecast = _rules.Forecast(player.Fighter, Target.Fighter, _turns.ContextFor(player, from, Target));
+                Provokes = Steps > 0 && Leaves(player);
                 Show(Affordable ? Shape.Attack : Shape.AttackBlocked, Affordable ? Steps : Math.Min(Math.Max(Steps, 0), _turns.ApLeft));
                 return;
             }
@@ -109,7 +114,33 @@ namespace GameDev.Slice.Fights
             Steps = _grid.FindPath(player.Cell, cell, _path);
             Cost = Math.Max(Steps, 0);
             Affordable = Steps > 0 && Steps <= _turns.ApLeft;
+            Provokes = Steps > 0 && Leaves(player);
             Show(Affordable ? Shape.Move : Shape.Blocked, Math.Min(Math.Max(Steps, 0), _turns.ApLeft));
+        }
+
+        /// <summary>
+        /// Whether the walk shown leaves a cell at the side of an enemy holding a melee weapon, which draws its Reaction
+        /// Attack (10.2 §5b Position): the player's own cell and every cell on the way but the last.
+        /// </summary>
+        private bool Leaves(Combatant player)
+        {
+            var from = player.Cell;
+            for (var i = 0; i < _path.Count; i++)
+            {
+                foreach (var e in _turns.Order)
+                {
+                    var weapon = e.Fighter.Weapon;
+                    if (e.Standing && e.Side != player.Side && weapon != null && !weapon.Ranged && e.Fighter.LostTurns == 0
+                        && Math.Abs(e.Cell.X - from.X) + Math.Abs(e.Cell.Z - from.Z) == 1 && _grid.CanStep(from, e.Cell))
+                    {
+                        return true;
+                    }
+                }
+
+                from = _path[i];
+            }
+
+            return false;
         }
 
         /// <summary>Walks to the cell, or walks to the enemy and strikes it, as last pointed at; false when nothing could be done.</summary>

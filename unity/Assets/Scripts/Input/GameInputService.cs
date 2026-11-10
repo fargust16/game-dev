@@ -33,6 +33,9 @@ namespace GameDev.Input
         private InputAction _camFast;
         private InputAction _camTurn;
         private InputAction _endTurn;
+        private InputAction _waitTurn;
+        private InputAction _stance;
+        private InputAction _changeSet;
 
         private InputAction _pause;
         private InputAction _advanceHour;
@@ -145,6 +148,14 @@ namespace GameDev.Input
 
         /// <summary>Ends the player's turn in a fight (S3a.5 authoring default: Space or Enter).</summary>
         public bool EndTurnPressed => _endTurn != null && _endTurn.WasPressedThisFrame();
+
+        /// <summary>S3a.6 authoring defaults in a fight: R waits to the end of the round, G ends the turn in a Defensive Stance, X changes the Weapon Set.</summary>
+        public bool WaitTurnPressed => _waitTurn != null && _waitTurn.WasPressedThisFrame();
+
+        public bool StancePressed => _stance != null && _stance.WasPressedThisFrame();
+
+        public bool ChangeSetPressed => _changeSet != null && _changeSet.WasPressedThisFrame();
+
         public Vector2 MousePosition => Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
         public Vector2 MouseDelta => Mouse.current != null ? Mouse.current.delta.ReadValue() : Vector2.zero;
 
@@ -205,6 +216,9 @@ namespace GameDev.Input
             _endTurn.AddBinding("<Keyboard>/space");
             _endTurn.AddBinding("<Keyboard>/enter");
             _endTurn.AddBinding("<Keyboard>/numpadEnter");
+            _waitTurn = _player.AddAction("WaitTurn", InputActionType.Button, "<Keyboard>/r");
+            _stance = _player.AddAction("DefensiveStance", InputActionType.Button, "<Keyboard>/g");
+            _changeSet = _player.AddAction("ChangeWeaponSet", InputActionType.Button, "<Keyboard>/x");
 
             _camera = new InputActionMap("Camera");
             _camPan = _camera.AddAction("Pan", InputActionType.Value);

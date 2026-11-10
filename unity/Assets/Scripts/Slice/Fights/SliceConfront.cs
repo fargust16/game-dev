@@ -135,6 +135,7 @@ namespace GameDev.Slice.Fights
             _turns.Struck += OnStruck;
             _turns.Walked += OnWalked;
             _turns.TurnAdvanced += OnTurnAdvanced;
+            _turns.GuardChanged += OnGuardChanged;
             _view = CombatGridView.Create(transform, settings.GridMaterial);
             _beats = new FightBeats(Animated, Place);
             _beats.Landed += OnLanded;
@@ -258,6 +259,16 @@ namespace GameDev.Slice.Fights
             _cursor.Point(player, _camera.View != null ? _camera.View : Camera.main, input.MousePosition);
             if (input.ClickMovePressed && _cursor.Click(player))
             {
+                _hud.MarkDirty();
+                return;
+            }
+
+            // S3a.6: R waits to the end of the round, G ends the turn in a Defensive Stance, X changes the Weapon Set.
+            if ((input.WaitTurnPressed && _turns.SubmitIntent(TurnIntent.Wait))
+                || (input.StancePressed && _turns.SubmitIntent(TurnIntent.Stance))
+                || (input.ChangeSetPressed && _turns.SubmitIntent(TurnIntent.ChangeSet)))
+            {
+                _cursor.Clear();
                 _hud.MarkDirty();
                 return;
             }
@@ -460,6 +471,17 @@ namespace GameDev.Slice.Fights
             animator.SetFloat(WeaponHash, Motion(c.Fighter.Weapon));
             animator.SetBool(DownHash, c.Fighter.Down);
             animator.SetBool(FightingHash, fighting);
+        }
+
+        /// <summary>A Weapon Set changed or a stance taken or left: the body takes the guard of the weapon now in hand.</summary>
+        private void OnGuardChanged(Combatant c)
+        {
+            if (_bodies.TryGetValue(c, out var body) && body != null && c.Standing)
+            {
+                Guard(c, body, true);
+            }
+
+            _hud.MarkDirty();
         }
 
         /// <summary>The walk is shown cell by cell, from where the body stands.</summary>

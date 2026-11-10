@@ -26,10 +26,16 @@ namespace GameDev.Confront.Rules
         public int? Limit { get; }
 
         /// <summary>The Weapon Set in hand.</summary>
-        public WeaponSet Set { get; }
+        public WeaponSet Set { get; private set; }
 
         /// <summary>The second Weapon Set, empty if it carries none; its weight counts in Load in a Fight.</summary>
-        public WeaponSet Second { get; }
+        public WeaponSet Second { get; private set; }
+
+        /// <summary>
+        /// 10.2 §5b Wait and Defensive Stance: until its next turn, each AP it holds adds to its Evasion and to its chance
+        /// to block or parry, and it answers a melee attack with a Counterattack (S3a.6).
+        /// </summary>
+        public bool Stance { get; set; }
 
         /// <summary>Null for no armour.</summary>
         public FightArmour Armour { get; }
@@ -61,6 +67,18 @@ namespace GameDev.Confront.Rules
         public bool CanEvade { get; set; } = true;
 
         public bool Down => Hp <= 0d;
+
+        /// <summary>10.2 §5b: the second Weapon Set comes to hand and the first goes to the back; false if it carries none.</summary>
+        public bool SwapSets()
+        {
+            if (Second.IsEmpty)
+            {
+                return false;
+            }
+
+            (Set, Second) = (Second, Set);
+            return true;
+        }
 
         public int Get(CharacterAttribute attribute) => Values.Get(attribute);
 

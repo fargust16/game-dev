@@ -88,11 +88,17 @@ namespace GameDev.Confront.Grid
 
         // Cover reads a strip beside each side of the cell, not one ray from its middle, so a wall at any angle gives
         // the same cover as one on the grid lines (Veilmouth C1 §12, 2026-11-05). The strip runs from 0.3 m (the
-        // person's radius) to 0.9 m out from the cell's middle, across the cell's whole width, a thin slice at each
-        // cover height. Authoring defaults: a wall on a grid line, 0.5 m out, still gives cover as before.
+        // person's radius) to 0.9 m out from the cell's middle, a thin slice at each cover height. Authoring defaults:
+        // a wall on a grid line, 0.5 m out, still gives cover as before. Since S3a.6 the strip spans a person's
+        // shoulders, 0.6 m, not the cell's whole width, so a wall on one side no longer reads as cover on the two
+        // sides beside it.
         private const float CoverNear = 0.3f;
         private const float CoverFar = 0.9f;
+        private const float CoverHalfWidth = 0.3f;
         private const float CoverSlice = 0.05f;
+
+        // Authoring default, S3a.6: a shot's line runs from and to a standing person's chest, 1.4 m over the surface.
+        private const float ChestHeight = 1.4f;
         private const int CoordOffset = 32768;
 
         // The ring holds the window and one column beyond each edge, so a reading just outside (an overlay's corner, a
@@ -428,6 +434,18 @@ namespace GameDev.Confront.Grid
 
         public CoverLevel CoverOn(CombatCell cell, GridSide side) =>
             IsWalkable(cell) ? Cover(cell.X, cell.Z, cell.Level).On(side) : CoverLevel.None;
+
+        public bool CanSee(CombatCell from, CombatCell to)
+        {
+            if (!IsWalkable(from) || !IsWalkable(to))
+            {
+                return false;
+            }
+
+            var a = Center(from) + (Vector3.up * ChestHeight);
+            var b = Center(to) + (Vector3.up * ChestHeight);
+            return !Physics.Linecast(a, b, Mask, QueryTriggerInteraction.Ignore);
+        }
 
         /// <summary>
         /// The 10.1 tag of what stands between two cells when no step joins them: a person's capsule, as an edge reads
@@ -777,7 +795,7 @@ namespace GameDev.Confront.Grid
             var depth = (CoverFar - CoverNear) * _cell;
             var centre = origin + direction * ((CoverNear * _cell) + depth * 0.5f);
             var across = Vector3.Cross(Vector3.up, direction);
-            var half = (direction * (depth * 0.5f)) + (across * (_cell * 0.5f));
+            var half = (direction * (depth * 0.5f)) + (across * (_cell * CoverHalfWidth));
             var extents = new Vector3(Mathf.Abs(half.x), CoverSlice, Mathf.Abs(half.z));
             var count = Physics.OverlapBoxNonAlloc(centre, extents, _near, Quaternion.identity, Mask, QueryTriggerInteraction.Ignore);
             for (var i = 0; i < count; i++)

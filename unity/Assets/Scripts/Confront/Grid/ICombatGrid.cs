@@ -77,6 +77,12 @@ namespace GameDev.Confront.Grid
 
         CoverLevel CoverOn(CombatCell cell, GridSide side);
 
+        /// <summary>
+        /// A clear line from a person standing in one cell to a person standing in the other, chest to chest, past every
+        /// body (S3a.6): a shot needs it.
+        /// </summary>
+        bool CanSee(CombatCell from, CombatCell to);
+
         /// <summary>The 10.1 tag of the block that closes the way from one cell toward another.</summary>
         bool TryGetEnvironmentAction(CombatCell from, CombatCell to, out IEnvironmentAction action);
 

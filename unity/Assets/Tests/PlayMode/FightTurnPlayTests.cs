@@ -81,11 +81,19 @@ namespace GameDev.Slice.Tests
                     Assert.AreEqual(FightCursor.Shape.Move, cursor.Current, "the cursor shows a walk");
                     Assert.AreEqual(1, cursor.Cost, "one step, 1 AP");
                     Assert.IsTrue(fights.PathView.Shown, "the path is drawn");
-                    Assert.AreEqual(Loc.Format("ui.fight.move", 1), fights.Hud.TipText, "the tip says the walk's AP");
+                    StringAssert.StartsWith(Loc.Format("ui.fight.move", 1), fights.Hud.TipText, "the tip says the walk's AP");
+                    Assert.AreEqual(cursor.Provokes, fights.Hud.TipText.Contains(Loc.Get("ui.fight.provokes")), "and warns of a Reaction Attack when the step leaves an enemy's side");
+
+                    // Leaving an enemy's side draws its Reaction Attack (S3a.6), which the player may parry from the AP left.
+                    var parries = 0;
+                    void Parried(Combatant attacker, Combatant target, GameDev.Confront.Rules.StrikeResult result) => parries += target == me && result.GuardTried ? 1 : 0;
+                    turns.Struck += Parried;
                     yield return Click();
                     yield return Settle(fights);
+                    turns.Struck -= Parried;
                     Assert.AreEqual(cell, me.Cell, "the click walks");
-                    Assert.AreEqual(startAp - 1, turns.ApLeft, "the step cost 1 AP");
+                    var reaction = UnityEditor.AssetDatabase.LoadAssetAtPath<GameDev.Confront.Rules.FightRules>("Assets/Data/Confront/FightRules.asset").ReactionAp;
+                    Assert.AreEqual(startAp - 1 - (parries * reaction), turns.ApLeft, "the step cost 1 AP, and each parry on the way its own");
                     moved = true;
                     break;
                 }
