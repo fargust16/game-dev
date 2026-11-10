@@ -67,10 +67,13 @@ namespace GameDev.Slice.EditorTools
             ("Shop8", 8, new[] { "stucco", "brick" }, VicCityHouses.Shop),
             ("Shop12", 12, new[] { "rich" }, VicCityHouses.Shop),
             ("Terrace8", 8, new[] { "brick", "stock" }, (n, w, p, l, r) => VicCityHouses.Town(n, w, p, l, r, false)),
+            // C5's 15 m fronts (city plan §29.4): runs that 10 m fronts alone cannot fill.
+            ("Terrace12", 12, new[] { "brick", "stock" }, (n, w, p, l, r) => VicCityHouses.Town(n, w, p, l, r, false)),
             ("ShopTown8", 8, new[] { "dark" }, (n, w, p, l, r) => VicCityHouses.Town(n, w, p, l, r, true)),
             ("Tenement8", 8, new[] { "poor", "brick" }, (n, w, p, l, r) => VicCityHouses.Tenement(n, w, 3, p, l, r)),
             ("Tenement12", 12, new[] { "dark" }, (n, w, p, l, r) => VicCityHouses.Tenement(n, w, 3, p, l, r)),
             ("TenementLow8", 8, new[] { "poor" }, (n, w, p, l, r) => VicCityHouses.Tenement(n, w, 2, p, l, r)),
+            ("TenementLow12", 12, new[] { "poor" }, (n, w, p, l, r) => VicCityHouses.Tenement(n, w, 2, p, l, r)),
             ("Warehouse12", 12, new[] { "stock" }, VicCityHouses.Warehouse),
         };
 

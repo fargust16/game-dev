@@ -84,7 +84,7 @@ namespace GameDev.Slice.Tests
         [Test]
         public void EveryNameOnTheCityPlanHasAKey()
         {
-            var plan = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/Data/Slice/Map/VeilmouthC4Plan.xml");
+            var plan = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/Data/Slice/Map/VeilmouthC5Plan.xml");
             var names = XElement.Parse(plan.text).Descendants().Where(e => e.Name.LocalName == "text").Select(e => e.Value).Distinct().ToList();
             Assert.Greater(names.Count, 30);
             foreach (var name in names)

@@ -13,15 +13,16 @@ using Random = System.Random;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// Builds Veilmouth once from the city plan C4 (VEILMOUTH_CITY_PLAN.md §28, by the rules of §2–§7, §19 and §25–§27),
-    /// the owner's map of 2026-11-10, on the ground <see cref="VeilmouthGround"/> shaped from it. Everything goes under
-    /// one root, <c>Veilmouth C4</c>, and from then on the owner moves, removes and adds by hand: it refuses to run twice.
+    /// Builds Veilmouth once from the city plan C5 (VEILMOUTH_CITY_PLAN.md §29, by the rules of §2–§7, §19 and §25–§27),
+    /// the owner's map of 2026-11-10 cut into blocks, on the ground <see cref="VeilmouthGround"/> shaped from C4, whose walls,
+    /// river and sea C5 keeps. Everything goes under one root, <c>Veilmouth C5</c>, and from then on the owner moves, removes
+    /// and adds by hand: it refuses to run twice.
     /// <para>
     /// The layout is the planner's (<see cref="VeilmouthLayout"/>); this builder places what it names by the kit's rules.
     /// It paints the streets into the ground (three appended layers after the canonical five, which keep their order),
     /// raises the pavements, the town wall with its gate and towers, the stone banks, the quay wall, the bridges and the
-    /// piers as stone works, and puts up the owner's Victorian Kit at ×1.25 (<see cref="VeilmouthKitHouses"/>) in rows
-    /// and on plots, the lamps by the furniture rules (§4) and the trees by §26–§27.
+    /// piers as stone works, and puts up the owner's Victorian Kit at ×1.25 (<see cref="VeilmouthKitHouses"/>) round the
+    /// blocks as the planner placed every house, the lamps by the furniture rules (§4) and the trees by §26–§27.
     /// </para>
     /// <para>
     /// Plan coordinates as in the plan: px east and py south from the area's north-west corner, so world X = px − 500 and
@@ -31,8 +32,8 @@ namespace GameDev.Slice.EditorTools
     /// </summary>
     public static partial class VeilmouthCity
     {
-        public const string RootName = "Veilmouth C4";
-        private static readonly string[] OldRootNames = { "Veilmouth C3", "Veilmouth C2", "Veilmouth C1" }; // C4 replaces their layouts (city plan §28)
+        public const string RootName = "Veilmouth C5";
+        private static readonly string[] OldRootNames = { "Veilmouth C4", "Veilmouth C3", "Veilmouth C2", "Veilmouth C1" }; // C5 replaces their layouts (city plan §29)
         public const int AlphamapResolution = 1024;
         public const string LayerFolder = "Assets/Settings/TerrainLayers/Slice";
 
@@ -65,8 +66,11 @@ namespace GameDev.Slice.EditorTools
             public bool PaintOnly; // painted, but neither reserved nor a street that breaks a kerb
             public Use Use;
 
-            /// <summary>A carriageway: setts that carts drive on, which a pavement never crosses (R4).</summary>
-            public bool Road => !PaintOnly && Use == Use.Road && Layer == Setts;
+            /// <summary>
+            /// A carriageway that carts drive on, setts or a lane's cobbles, which a pavement never crosses (R4; §29.1 item 2:
+            /// every street has pavements and its carriageway runs unbroken, a lane's too).
+            /// </summary>
+            public bool Road => !PaintOnly && Use == Use.Road && Carriage;
 
             /// <summary>A raised pavement: a street's pavement lane (R4).</summary>
             public bool Pavement => !PaintOnly && Use == Use.Walk && Layer == Flags;
@@ -89,7 +93,7 @@ namespace GameDev.Slice.EditorTools
         private static Transform _gardens;
         private static float _stepsClear; // the least room left between a plot's front steps and its railings, m
 
-        [MenuItem("GameDev/Slice/Build Veilmouth City from C4 (once)")]
+        [MenuItem("GameDev/Slice/Build Veilmouth City from C5 (once)")]
         public static void Build() => Run(false);
 
         /// <summary>Batch only, for the agent's iterations: replaces this builder's own root.</summary>
@@ -101,11 +105,11 @@ namespace GameDev.Slice.EditorTools
             VeilmouthRenders.RenderAll();
         }
 
-        /// <summary>Batch only, the agent's C4 steps (§28.4): the city built again on the present ground, then its views.</summary>
-        public static void BuildC4AndRender()
+        /// <summary>Batch only, the agent's C5 steps (§29.3): the city built again on the present ground, then its views.</summary>
+        public static void BuildC5AndRender()
         {
             Run(true);
-            VeilmouthRenders.RenderC4();
+            VeilmouthRenders.RenderC5();
         }
 
         /// <summary>
@@ -146,7 +150,7 @@ namespace GameDev.Slice.EditorTools
             {
                 if (!replace)
                 {
-                    Debug.LogWarning($"{VeilmouthScene.ScenePath} already holds the C4 city; the builder does not run twice.");
+                    Debug.LogWarning($"{VeilmouthScene.ScenePath} already holds the C5 city; the builder does not run twice.");
                     return;
                 }
             }
@@ -174,7 +178,7 @@ namespace GameDev.Slice.EditorTools
             scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             foreach (var old in scene.GetRootGameObjects().Where(g => g.name == RootName || OldRootNames.Contains(g.name) || g.name == VeilmouthDressing.RootName))
             {
-                Object.DestroyImmediate(old); // C0's dressing, C1's to C3's cities: C4 replaces their layout (city plan §28)
+                Object.DestroyImmediate(old); // C0's dressing, C1's to C4's cities: C5 replaces their layout (city plan §29)
             }
 
             // The layout zones again, now that the cellar's door and the chapel's forecourt have their places.
@@ -211,7 +215,7 @@ namespace GameDev.Slice.EditorTools
             VeilmouthDressing.Wind(_root);
             _works = new Works(Group("Stone Works"), true);
 
-            StreetsC4();
+            Streets();
             PaintStreets();
             // The raised pavements (R4) are known from the streets, so everything placed after stands on them.
             _pavements = new VeilmouthPavements(_lanes.Where(l => l.Pavement).Select(l => l.Quad),
@@ -1054,9 +1058,9 @@ namespace GameDev.Slice.EditorTools
 
         // The row families (§24.4): houses of one family share height, depth and roof, so their open ends meet.
         private static readonly string[] ShopRow = VeilmouthKitHouses.Keys("Shop8", "Shop12");
-        private static readonly string[] TownRow = VeilmouthKitHouses.Keys("Terrace8", "ShopTown8");
+        private static readonly string[] TownRow = VeilmouthKitHouses.Keys("Terrace8", "Terrace12", "ShopTown8");
         private static readonly string[] TenementRow = VeilmouthKitHouses.Keys("Tenement8", "Tenement12");
-        private static readonly string[] LowTenementRow = VeilmouthKitHouses.Keys("TenementLow8");
+        private static readonly string[] LowTenementRow = VeilmouthKitHouses.Keys("TenementLow8", "TenementLow12");
         // A warehouse and a tenement are one family: three storeys under a gable of the kit's 6 m (VicCityHouses).
         private static readonly string[] WarehouseRow = VeilmouthKitHouses.Keys("Warehouse12", "Tenement8");
 
@@ -1361,7 +1365,8 @@ namespace GameDev.Slice.EditorTools
             }
 
             var cell = VeilmouthScene.Extent / AlphamapResolution;
-            foreach (var lane in _lanes)
+            // Every carriageway last, so no pavement, square or yard painted after it breaks it (§29.1 item 2).
+            foreach (var lane in _lanes.Where(l => !l.Road).Concat(_lanes.Where(l => l.Road)))
             {
                 // No pavement paint any more (R4): under the raised islands, and where a carriageway now crosses a
                 // pavement lane, the ground is the carriageway's setts.

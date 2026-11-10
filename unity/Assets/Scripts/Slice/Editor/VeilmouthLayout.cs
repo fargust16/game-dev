@@ -6,15 +6,15 @@ using UnityEngine;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// Veilmouth's layout C4 (VEILMOUTH_CITY_PLAN.md §28.5), as tools/slice/veilmouth_c4_plan.py writes it: streets,
-    /// squares, rows, plots, single buildings, stone masses, water, walls, the works and the outskirts, in plan metres
+    /// Veilmouth's layout C5 (VEILMOUTH_CITY_PLAN.md §29), as tools/slice/veilmouth_c5_plan.py writes it: streets, squares,
+    /// blocks with their yards and passages, every building, stone masses, water, walls, the works and the outskirts, in plan metres
     /// (px east, py south from the area's north-west corner; world X = px − 500, world Z = 500 − py). The planner is the
     /// one source: the ground, the city and the zones read this, and the plan and the player's map are written with it.
     /// </summary>
     [Serializable]
     public sealed class VeilmouthLayout
     {
-        public const string Path = "Assets/Data/Slice/Map/VeilmouthC4Layout.json";
+        public const string Path = "Assets/Data/Slice/Map/VeilmouthC5Layout.json";
 
         public string version;
         public Street[] streets;
@@ -30,6 +30,8 @@ namespace GameDev.Slice.EditorTools
         public SlantSpec[] slants;
         public District[] districts;
         public Candidate[] candidates;
+        public BlockSpec[] blocks;
+        public PassageSpec[] passages;
         public Area[] roads;
         public PlazaSpec plaza;
         public Cottage[] cottages;
@@ -139,7 +141,7 @@ namespace GameDev.Slice.EditorTools
         [Serializable]
         public sealed class BuildingSpec
         {
-            public string id, key, facing, name, stoop;
+            public string id, key, facing, name, stoop, block;
             public float front, a;
         }
 
@@ -230,6 +232,39 @@ namespace GameDev.Slice.EditorTools
         {
             public string name;
             public float cx, cy, half, ringOuter, ringInner, island, plinth, statue;
+            public StallSpec stalls;
+        }
+
+        /// <summary>The market round the statue (§29.1 item 5): stalls on a circle, facing the ring's road.</summary>
+        [Serializable]
+        public sealed class StallSpec
+        {
+            public string name;
+            public float radius, width, depth;
+            public int count;
+        }
+
+        /// <summary>
+        /// A city block (§29.2): its rectangle, ringed by its streets' pavements; an L-block's notch, given to the Penny;
+        /// the inner yard behind its houses; its wealth (rich, middling, poor, works, cemetery, close).
+        /// </summary>
+        [Serializable]
+        public sealed class BlockSpec
+        {
+            public string id, wealth, district;
+            public float x0, y0, x1, y1;
+            public Area notch, yard;
+
+            /// <summary>JsonUtility reads a null notch as an empty area.</summary>
+            public bool HasNotch => notch != null && notch.x1 > notch.x0;
+        }
+
+        /// <summary>A passage between a block's houses (R5), from the pavement to the yard: its side, front line, span and depth.</summary>
+        [Serializable]
+        public sealed class PassageSpec
+        {
+            public string block, facing;
+            public float front, a0, a1, depth;
         }
 
         [Serializable]

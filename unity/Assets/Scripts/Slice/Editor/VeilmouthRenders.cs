@@ -73,6 +73,56 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// The city of plan C5 (VEILMOUTH_CITY_PLAN.md §29) from above and from a walker's height: the blocks ringed by
+        /// pavements, carriageways unbroken through every junction, lanes, the Penny with Bawling Row, the quay's edge and
+        /// a pier's foot, the yards. Plan to world: X = px − 500, Z = 500 − py.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderC5
+        /// </summary>
+        public static void RenderC5()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            ShowCircles();
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            Top("c5_world", Vector3.zero, 500f);
+            Top("c5_city", new Vector3(50f, 0f, 18f), 225f);
+            Top("c5_penny", new Vector3(40f, 0f, 60f), 34f);
+            Top("c5_parsons", new Vector3(45f, 0f, 185f), 70f);
+            Top("c5_sleepy", new Vector3(-20f, 0f, 40f), 60f);
+            Top("c5_lowerveil", new Vector3(107f, 0f, 0f), 60f);
+            Top("c5_reek", new Vector3(50f, 0f, -145f), 75f);
+            Top("c5_port", new Vector3(170f, 0f, 60f), 30f);
+            Top("c5_junction", new Vector3(-22f, 0f, 4f), 14f); // Thimble Street over Button Lane
+            Eye("c5_eye_longtongue", -75f, 60f, 35f, 60f, 3f);
+            Eye("c5_eye_saltgullet", 150f, 60f, 40f, 60f, 3f);
+            Eye("c5_eye_lenten", 40f, 125f, 40f, 60f, 4f);
+            Eye("c5_eye_smoked", 40f, -40f, 40f, 60f, 4f);
+            Eye("c5_eye_embankment", -70f, -40.5f, 150f, -40.5f, 2f);
+            Eye("c5_eye_gate", -140f, 60f, -60f, 60f, 4f);
+            Eye("c5_eye_grubby", 40f, -100f, 40f, -30f, 3f);
+            Eye("c5_eye_quay", 170f, -40f, 170f, 120f, 2f);
+            Eye("c5_eye_quayedge", 177f, 40f, 180f, 58f, 1.7f);
+            Eye("c5_eye_widows", -75f, 123.5f, 150f, 123.5f, 3f);
+            Eye("c5_eye_button", -75f, 4f, 35f, 4f, 1.7f);
+            Eye("c5_eye_spade", -75f, 179f, -15f, 179f, 1.7f);
+            Eye("c5_eye_thimble", -22f, 120f, -22f, -40f, 1.7f);
+            Eye("c5_eye_nettle", 102f, 230f, 102f, 5f, 1.7f);
+            Eye("c5_eye_penny", 2f, 58f, 40f, 60f, 2f);
+            Eye("c5_eye_market", 40f, 75f, 40f, 60f, 1.7f);
+            Eye("c5_eye_cathedral", 40f, 118f, 40f, 186f, 2f);
+            Eye("c5_eye_puddle", 100f, -30f, 140f, -5f, 1.7f);
+            Eye("c5_eye_works", 40f, -108f, 40f, -190f, 2f);
+            Eye("c5_eye_deafboiler", 141f, -146f, 141f, -173f, 1.7f);
+            // Step 5 (§29.3): a block's corner where two rows meet flush, a passage into a yard, a poor yard and a rich one.
+            Eye("c5_eye_corner", -26f, -9f, -15f, 0f, 1.7f);
+            Eye("c5_eye_passage", -21f, 88.5f, -4f, 88.5f, 1.7f);
+            Eye("c5_eye_yard_poor", 120f, 22f, 136f, 34f, 1.7f);
+            Eye("c5_eye_yard_rich", -56f, 84f, -40f, 102f, 1.7f);
+            Debug.Log($"Veilmouth C5 views written to {OutputFolder}.");
+        }
+
+        /// <summary>
         /// C4's ground (VEILMOUTH_CITY_PLAN.md §28.5) from above and from a walker's height, with every built root hidden
         /// for the picture only: the river round the west and south, the sea, the rise under the Penny, the forest's land.
         /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderC4Ground

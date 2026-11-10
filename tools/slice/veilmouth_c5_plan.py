@@ -595,8 +595,9 @@ W2A = Block("W2A", (THIMBLE + 12, WIDOWS + 17, LENTEN, MAIN), "rich", "THE PENNY
             {"N": ("side", "town"), "E": ("main", "shop"), "S": ("main", None), "W": ("street", "town"),
              "notch": ("penny", "shop_rich")}, notch=("SE", N15, N15))
 W2A.on("S", THIMBLE + 12, "Civic_rich", "town_hall", "The Town Hall")
-# The clock tower rises behind the Town Hall, 0.5 m off its back wall (its eave overhangs 0.375 m).
-W2A.stand("Tower6_white", "S", MAIN - 15.5, THIMBLE + 12 + 12.5, "clock_tower", "The clock tower")
+# The clock tower rises behind the Town Hall, 0.5 m off its back wall (its eave overhangs 0.375 m); its door and
+# stoop open north on the yard, since facing south its stoop ran 0.4 m into the Town Hall (kit check, 2026-11-10).
+W2A.stand("Tower6_white", "N", MAIN - 21.5, THIMBLE + 12 + 12.5, "clock_tower", "The clock tower")
 W2B = Block("W2B", (THIMBLE + 12, MAIN + 22, LENTEN, BUTTON), "rich", "THE PENNY",
             {"N": ("main", None), "E": ("main", "shop"), "S": ("lane", "town"), "W": ("street", "town"),
              "notch": ("penny", "shop_rich")}, notch=("NE", N15, N15))

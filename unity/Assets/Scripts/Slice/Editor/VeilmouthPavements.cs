@@ -482,9 +482,29 @@ namespace GameDev.Slice.EditorTools
             var root = new GameObject(RootName);
             root.transform.SetParent(parent, false);
             SliceKitCatalogue.SetLayer(root, KitLayers.Ground);
-            var island = Finish(root.transform, "Pavement Islands", $"{meshFolder}/Pavement Islands.asset",
-                new[] { (slabs, "VIC_Ground_Pave"), (stone, "VIC_Stone_Medium") }, KitLayers.Ground);
-            island.AddComponent<MeshCollider>().sharedMesh = island.GetComponent<MeshFilter>().sharedMesh;
+            // One mesh per 64 m chunk (the project's chunk, §17): C5's single mesh reached 101 MB as text, over GitHub's
+            // 100 MB file limit, and a chunk each lets the camera and GPU occlusion culling drop the islands out of view.
+            var slabTiles = Tiles(slabs);
+            var stoneTiles = Tiles(stone);
+            var kept = new HashSet<string>();
+            foreach (var key in slabTiles.Keys.Union(stoneTiles.Keys).OrderBy(k => k.x).ThenBy(k => k.y))
+            {
+                var name = $"Pavement Islands {key.x}_{key.y}";
+                kept.Add($"{meshFolder}/{name}.asset");
+                var island = Finish(root.transform, name, $"{meshFolder}/{name}.asset", new[]
+                {
+                    (slabTiles.TryGetValue(key, out var s) ? s : new Part(), "VIC_Ground_Pave"),
+                    (stoneTiles.TryGetValue(key, out var k) ? k : new Part(), "VIC_Stone_Medium"),
+                }, KitLayers.Ground);
+                island.AddComponent<MeshCollider>().sharedMesh = island.GetComponent<MeshFilter>().sharedMesh;
+            }
+
+            foreach (var stale in AssetDatabase.FindAssets("Pavement Islands", new[] { meshFolder }).Select(AssetDatabase.GUIDToAssetPath)
+                         .Where(p => !kept.Contains(p)).ToList())
+            {
+                AssetDatabase.DeleteAsset(stale);
+            }
+
             AssetDatabase.DeleteAsset($"{meshFolder}/Wet Gutters.asset");
 
             // The tree pits: a stone edge of four boxes round the earth.
@@ -775,6 +795,43 @@ namespace GameDev.Slice.EditorTools
             }
 
             return Mathf.Abs(sum) / 2f;
+        }
+
+        /// <summary>The project's chunk, m (§17, chunk size V0).</summary>
+        private const float TileSize = 64f;
+
+        /// <summary>A part's triangles split by the 64 m chunk their centre falls in, world X and Z, each with its own vertices.</summary>
+        private static Dictionary<(int x, int y), Part> Tiles(Part part)
+        {
+            var tiles = new Dictionary<(int x, int y), Part>();
+            var maps = new Dictionary<(int x, int y), Dictionary<int, int>>();
+            for (var t = 0; t + 2 < part.I.Count; t += 3)
+            {
+                var c = (part.V[part.I[t]] + part.V[part.I[t + 1]] + part.V[part.I[t + 2]]) / 3f;
+                var key = (Mathf.FloorToInt(c.x / TileSize), Mathf.FloorToInt(c.z / TileSize));
+                if (!tiles.TryGetValue(key, out var tile))
+                {
+                    tiles[key] = tile = new Part();
+                    maps[key] = new Dictionary<int, int>();
+                }
+
+                var map = maps[key];
+                for (var k = 0; k < 3; k++)
+                {
+                    var i = part.I[t + k];
+                    if (!map.TryGetValue(i, out var j))
+                    {
+                        map[i] = j = tile.V.Count;
+                        tile.V.Add(part.V[i]);
+                        tile.N.Add(part.N[i]);
+                        tile.UV.Add(part.UV[i]);
+                    }
+
+                    tile.I.Add(j);
+                }
+            }
+
+            return tiles;
         }
 
         private static GameObject Finish(Transform parent, string name, string path, (Part Part, string Material)[] parts, string layer)

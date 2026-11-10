@@ -35,6 +35,12 @@ namespace GameDev.Slice.EditorTools
         /// <summary>A deck's thickness and a parapet's, m.</summary>
         private const float DeckDepth = 1.2f, Parapet = 0.6f, ParapetHeight = 1.1f;
 
+        /// <summary>
+        /// How far the quay wall's coping and a pier's deck reach inland over the ground's edge, m: past the terrain's
+        /// last sample on land (0.98 m apart) and its level of detail; and the coping's top, a kerb over the quay.
+        /// </summary>
+        private const float Coping = 1.5f, CopingTop = Low + VeilmouthPavements.Kerb;
+
         private static Facing FacingOf(string f) => f switch { "N" => Facing.N, "E" => Facing.E, "S" => Facing.S, _ => Facing.W };
 
         private static int SurfaceLayer(string surface) => surface switch
@@ -56,16 +62,48 @@ namespace GameDev.Slice.EditorTools
 
         // ------------------------------------------------------------------------------------------- streets
 
+        /// <summary>The ground of a block's inner yard by its wealth (§29.2): a rich yard's grass, a poor one's bare earth, else cobbles.</summary>
+        private static int YardLayer(string wealth) => wealth switch
+        {
+            "rich" => Grass, "poor" => YardEarth, _ => Cobbles,
+        };
+
+        /// <summary>A poor yard's mud: the canonical soil layer.</summary>
+        private const int YardEarth = 2;
+
+        /// <summary>The sides of the Penny's ring of setts, as many as the island's disc has (<see cref="Disc"/>).</summary>
+        private const int RingSides = 48;
+
         /// <summary>
-        /// The streets, squares and gardens as lanes, in the order they are painted: a later lane covers an earlier one.
-        /// The yards and courts inside the walls are cobbled; the gardens and parks are green; the Penny is paved with its
-        /// ring of setts round a green island, flush (§28.1 item 3).
+        /// The streets, squares, blocks and gardens as lanes, in the order they are painted, every carriageway last
+        /// (<see cref="PaintStreets"/>, §29.1 item 2). The ground inside the walls is cobbled; a block's inner yard is grass,
+        /// cobbles or earth by its wealth, its passages cobbled; the gardens and parks are green. The squares that houses
+        /// front, the Penny's frame and the island with the statue are raised pavements, so every way into a building is
+        /// from a pavement (§29.1 item 1); the Penny's ring is a carriageway of setts in segments round the island, and the
+        /// streets' carriageways run on into it unbroken.
         /// </summary>
-        private static void StreetsC4()
+        private static void Streets()
         {
             foreach (var area in new[] { _layout.City, _layout.Works })
             {
                 _lanes.Add(new Lane { Street = "Yards", Quad = Rect(area.x0, area.y0, area.x1, area.y1), Layer = Cobbles, PaintOnly = true });
+            }
+
+            foreach (var b in _layout.blocks.Where(b => b.yard != null && b.yard.x1 > b.yard.x0))
+            {
+                _lanes.Add(new Lane
+                {
+                    Street = $"{b.id}'s yard", Quad = Rect(b.yard.x0, b.yard.y0, b.yard.x1, b.yard.y1), Layer = YardLayer(b.wealth), PaintOnly = true,
+                });
+            }
+
+            foreach (var p in _layout.passages)
+            {
+                _lanes.Add(new Lane
+                {
+                    Street = $"{p.block}'s passage", Quad = Footprint(FacingOf(p.facing), p.front, p.a0, p.a1 - p.a0, p.depth), Layer = Cobbles,
+                    PaintOnly = true,
+                });
             }
 
             foreach (var p in _layout.plots)
@@ -78,15 +116,27 @@ namespace GameDev.Slice.EditorTools
                 });
             }
 
+            // A paved square is a raised pavement; a court, a yard, the quay's apron and the green ones lie flush.
             foreach (var s in _layout.squares.Where(s => s.x0 < _layout.Sea.x0 - 0.01f)) // the piers are decks over the sea
             {
-                Lanes(string.IsNullOrEmpty(s.name) ? s.id : s.name, SurfaceLayer(s.surface), false, Rect(s.x0, s.y0, s.x1, s.y1), Use.Walk);
+                var layer = s.surface == "square" ? Flags : SurfaceLayer(s.surface);
+                Lanes(string.IsNullOrEmpty(s.name) ? s.id : s.name, layer, false, Rect(s.x0, s.y0, s.x1, s.y1), Use.Walk);
             }
 
             var plaza = _layout.plaza;
             var centre = new Vector2(plaza.cx, plaza.cy);
-            _lanes.Add(new Lane { Street = "The Penny's ring", Quad = Disc(centre, plaza.ringOuter), Layer = Setts, PaintOnly = true });
-            _lanes.Add(new Lane { Street = "The Penny's island", Quad = Disc(centre, plaza.island), Layer = Grass, PaintOnly = true });
+            Vector2 Dir(int k) => new Vector2(Mathf.Cos(k * 2f * Mathf.PI / RingSides), Mathf.Sin(k * 2f * Mathf.PI / RingSides));
+            for (var k = 0; k < RingSides; k++)
+            {
+                var quad = new[]
+                {
+                    centre + (Dir(k) * plaza.ringInner), centre + (Dir(k) * plaza.ringOuter), centre + (Dir(k + 1) * plaza.ringOuter),
+                    centre + (Dir(k + 1) * plaza.ringInner),
+                };
+                Lanes("The Penny's ring", Setts, true, quad, Use.Road);
+            }
+
+            Lanes("The Penny's island", Flags, false, Disc(centre, plaza.island), Use.Walk);
 
             foreach (var s in _layout.streets)
             {
@@ -111,7 +161,8 @@ namespace GameDev.Slice.EditorTools
             }
 
             // Each bridge's carriageway is carried through the pavement or the gate at its city end, so the kerb opens
-            // onto it: Grubby Bridge through the embankment's promenade, Last Farthing Bridge through Creaking Gate.
+            // onto it: Grubby Bridge through the embankment's promenade, as wide as Smoked Street's carriageway that runs
+            // on over it, and Last Farthing Bridge through Creaking Gate.
             foreach (var b in _layout.bridges)
             {
                 var street = Nearest(b);
@@ -120,11 +171,15 @@ namespace GameDev.Slice.EditorTools
                     continue;
                 }
 
-                var half = (street.c1 - street.walk1 - street.c0 - street.walk0) / 2f;
                 var mid = b.axis == "x" ? (b.y0 + b.y1) / 2f : (b.x0 + b.x1) / 2f;
+                var onward = b.axis == "x"
+                    ? street
+                    : _layout.streets.Where(s => !s.AlongX && s.c0 < mid && s.c1 > mid && s.a1 <= b.y0 + 0.01f).OrderBy(s => b.y0 - s.a1).FirstOrDefault();
+                var half = (street.c1 - street.walk1 - street.c0 - street.walk0) / 2f;
+                var (r0, r1) = onward != null ? (onward.c0 + onward.walk0, onward.c1 - onward.walk1) : (mid - half, mid + half);
                 var quad = b.axis == "x"
-                    ? Rect(b.x1 - 2f, mid - half, street.a0, mid + half)
-                    : Rect(mid - half, street.c1 - street.walk1, mid + half, b.y0);
+                    ? Rect(b.x1 - 2f, r0, street.a0, r1)
+                    : Rect(r0, street.c1 - street.walk1, r1, b.y0);
                 if (quad.Max(q => q.x) - quad.Min(q => q.x) > 0.5f && quad.Max(q => q.y) - quad.Min(q => q.y) > 0.5f)
                 {
                     Lanes(b.name, Setts, true, quad, Use.Road);
@@ -228,14 +283,22 @@ namespace GameDev.Slice.EditorTools
                 Slab(px0, px1, south.y1 - 1.2f, south.y1 + 0.1f, VeilmouthGround.RiverBed - 0.5f, Low + 0.3f);
             }
 
-            // The quay wall along the sea, the city's and the works'; under a pier's deck where one meets it.
+            // The quay wall along the sea, the city's and the works', from the north wall's footing; under a pier's deck
+            // where one meets it. Its coping reaches Coping m inland over the ground's edge, where the terrain falls to the
+            // sea bed between two of its samples and opened a gap a walker fell into (the owner's walk of C4, §29.1 item 6);
+            // its top is a deck a kerb's height over the quay.
             var piers = _layout.squares.Where(s => s.x0 >= sea - 0.01f).ToList();
             var moored = piers.Select(s => (s.y0, s.y1)).ToArray();
-            foreach (var (from, to) in new[] { (city.y0, city.y1), (works.y0, works.y1 + 2f) })
+            foreach (var (from, to) in new[] { (city.y0 - 3f, city.y1), (works.y0, works.y1 + 2f) })
             {
                 foreach (var (py0, py1) in Spans(from, to, moored))
                 {
-                    Slab(sea, sea + 1.2f, py0, py1, VeilmouthGround.SeaBed - 3f, Low + 0.3f);
+                    Slab(sea - Coping, sea + 1.2f, py0, py1, VeilmouthGround.SeaBed - 3f, CopingTop);
+                }
+
+                foreach (var (py0, py1) in Runs(from, to, moored))
+                {
+                    _decks.Add((Rect(sea - Coping, py0, sea + 1.2f, py1), CopingTop));
                 }
             }
 
@@ -248,6 +311,26 @@ namespace GameDev.Slice.EditorTools
             foreach (var b in _layout.bridges)
             {
                 Bridge(b, b.axis == "x" ? west : south);
+            }
+        }
+
+        /// <summary>The unbroken runs from <paramref name="from"/> to <paramref name="to"/> between the holes.</summary>
+        private static IEnumerable<(float A0, float A1)> Runs(float from, float to, IReadOnlyList<(float A, float B)> holes)
+        {
+            var a = from;
+            foreach (var (h0, h1) in holes.Where(h => h.B > from && h.A < to).OrderBy(h => h.A))
+            {
+                if (h0 > a + 0.01f)
+                {
+                    yield return (a, h0);
+                }
+
+                a = Mathf.Max(a, h1);
+            }
+
+            if (to > a + 0.01f)
+            {
+                yield return (a, to);
             }
         }
 
@@ -316,10 +399,13 @@ namespace GameDev.Slice.EditorTools
             Take(deck, Use.Walk);
         }
 
-        /// <summary>A pier: a stone deck at the streets' level over the sea on square piles every 6 m along both edges.</summary>
+        /// <summary>
+        /// A pier: a stone deck at the streets' level over the sea on square piles every 6 m along both edges; it starts
+        /// <see cref="Coping"/> m inland, over the ground's edge, as the quay wall's coping does.
+        /// </summary>
         private static void Pier(VeilmouthLayout.Square s)
         {
-            Slab(s.x0, s.x1, s.y0, s.y1, DeckTop - DeckDepth, DeckTop, DeckStone);
+            Slab(s.x0 - Coping, s.x1, s.y0, s.y1, DeckTop - DeckDepth, DeckTop, DeckStone);
             for (var px = s.x0 + 3f; px < s.x1 - 0.5f; px += 6f)
             {
                 foreach (var py in new[] { s.y0 + 0.5f, s.y1 - 0.5f })
@@ -328,7 +414,7 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            var deck = Rect(s.x0, s.y0, s.x1, s.y1);
+            var deck = Rect(s.x0 - Coping, s.y0, s.x1, s.y1);
             _decks.Add((deck, DeckTop));
             Take(deck, Use.Walk);
         }
@@ -385,13 +471,15 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// The single buildings (§28.5): the Penny's civic fronts, the chapel, the Brothers' House, the Customs House, the
-        /// One-Eye, and Lower Veil's openable houses with their doors into their interiors (§5.3).
+        /// Every building the planner placed (§29.4): the blocks' row houses, each with its faced ends as the planner chose
+        /// them, sunk on its plain stoop; the Penny's civic fronts, the chapel, the Brothers' House, the Customs House, the
+        /// One-Eye, the faction's house, and Lower Veil's openable houses with their doors into their interiors (§5.3).
         /// </summary>
         private static void Buildings()
         {
             var portals = new Dictionary<string, (string Id, string Scene, string Target)>
             {
+                ["faction_house"] = ("faction-house.street", VeilmouthDressing.FactionHouseScenePath, "faction-house.inside"),
                 ["assize"] = ("wardens-lockup.street", VeilmouthDressing.LockupScenePath, "wardens-lockup.inside"),
                 ["soot_bell"] = (VeilmouthScene.SootAndBellStreetPortalId, VeilmouthScene.SootAndBellScenePath, VeilmouthScene.SootAndBellInsidePortalId),
                 ["harrow"] = ("harrow-apothecary.street", VeilmouthDressing.HarrowScenePath, "harrow-apothecary.inside"),
@@ -486,7 +574,13 @@ namespace GameDev.Slice.EditorTools
                 _sinking = false;
             }
 
-            Debug.Log($"[VeilmouthCity] C4 houses: {_houses.Count} footprints, {_sunk.Count} sunk on plain stoops (§28.1 item 5).");
+            // The planner's passages into the yards (§29.4, R5): their ground taken as walk, their backs railed once every house stands.
+            foreach (var p in _layout.passages)
+            {
+                Passage(FacingOf(p.facing), p.front, Mathf.RoundToInt(p.a0), Mathf.RoundToInt(p.a1), Mathf.RoundToInt(p.depth));
+            }
+
+            Debug.Log($"[VeilmouthCity] C5 houses: {_houses.Count} footprints, {_sunk.Count} sunk on plain stoops (§28.1 item 5), {_passages} passages.");
         }
 
         /// <summary>
@@ -591,8 +685,9 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
+            // The quay's lamps in the cell inside the quay wall's coping.
             var quay = _layout.SquareById("quay");
-            Lamps(false, quay.x1 - 2f, 0, (int)quay.y0, (int)quay.y1, 30f, 8f);
+            Lamps(false, quay.x1 - Coping - 1.5f, 0, (int)quay.y0, (int)quay.y1, 30f, 8f);
 
             // Round the Penny's ring, 2 m out from it, off the streets' axes, each turned along the ring until it stands in no
             // door's way (9 m before a door and 2.5 m to its side, a little wider than VeilmouthCityTests reads).
@@ -625,7 +720,7 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            foreach (var id in new[] { "drowsy", "bawling", "black_puddle", "deaf_boiler" })
+            foreach (var id in new[] { "drowsy", "black_puddle", "deaf_boiler" })
             {
                 var q = _layout.SquareById(id);
                 foreach (var (px, py) in new[] { (q.x0 + 1f, q.y0 + 1f), (q.x1 - 2f, q.y0 + 1f), (q.x0 + 1f, q.y1 - 2f), (q.x1 - 2f, q.y1 - 2f) })

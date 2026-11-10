@@ -7,10 +7,10 @@ using Random = System.Random;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// C4's districts and outskirts (VEILMOUTH_CITY_PLAN.md §28.9): what the layout names besides its streets and
+    /// The districts and outskirts (VEILMOUTH_CITY_PLAN.md §28.9, C5's §29): what the layout names besides its streets and
     /// houses. Stone Grandad, the cathedral and the works are stone masses until their models come
-    /// (SLICE_MODELS_WANTED.md § C4). The parks, the cemetery and the garth are planted, the market is set out on
-    /// Bawling Square, and cargo stands on the quay and Tipsy Pier only. The cellar door opens on Deaf Boiler Yard, and
+    /// (SLICE_MODELS_WANTED.md § C4). The parks, the cemetery and the garth are planted, the market is set out round the
+    /// statue as Bawling Row, and cargo stands on the quay and Tipsy Pier only. The cellar door opens on Deaf Boiler Yard, and
     /// the three ritual circles wait hidden at their candidates. Outside the walls are Crooked Hamlet's cottages and farm
     /// yards, Gloomwood with its glades, beasts and herbs, and the iron veins at the foot of the area's rock. Every size
     /// and count is an authoring default; the randomness is a fixed System.Random, never the world seed.
@@ -70,7 +70,7 @@ namespace GameDev.Slice.EditorTools
             works.Finish(WorksBrick);
         }
 
-        /// <summary>Stone Grandad on the Penny's island, and four benches facing him across the grass.</summary>
+        /// <summary>Stone Grandad on the Penny's island, inside the ring of Bawling Row's stalls (<see cref="Market"/>).</summary>
         private static void Statue()
         {
             var p = _layout.plaza;
@@ -83,17 +83,13 @@ namespace GameDev.Slice.EditorTools
             Stage(FigureHalf, g + PlinthHeight + PedestalHeight, g + p.statue, WallStone);
             statue.Finish(KerbStone);
             Take(Rect(p.cx - p.plinth, p.cy - p.plinth, p.cx + p.plinth, p.cy + p.plinth), Use.Solid);
-            foreach (var (dx, dy, f) in new[] { (-1f, -11f, Facing.S), (-1f, 10f, Facing.N), (-11f, -1f, Facing.E), (10f, -1f, Facing.W) })
-            {
-                Prop("Bench", f, p.cx + dx, p.cy + dy);
-            }
         }
 
-        /// <summary>The cellar door in works block 6's west wall, opening on Deaf Boiler Yard (§5.3).</summary>
+        /// <summary>The cellar door in the east shed's west wall, opening on Deaf Boiler Yard (§5.3), outside the ritual circle.</summary>
         private static void CellarDoor()
         {
             var yard = _layout.SquareById("deaf_boiler");
-            var px = _layout.boxes.First(b => b.id == "works_6").x0;
+            var px = _layout.boxes.First(b => b.id == "ES2_e").x0;
             // The door's middle on the half metre, so the leaf's hinge, 1.5 m off, keeps the 1 m grid.
             var py = Mathf.Round((yard.y0 + yard.y1) / 2f) - 0.5f;
             var floor = Up(Ground(px - 1f, py));
@@ -182,31 +178,34 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// The market on Bawling Square (§6.1): a row of stalls with the Masters' counters and the seer's, a row of food
-        /// stalls, benches in the aisle between, and the Item Creation corner; 6 m clear before every front.
+        /// Bawling Row (§29.1 item 5, §29.4): the market round Stone Grandad on the Penny's island, every stall facing the
+        /// ring's road with the island's walk before it for the customers, its back 2 m off the plinth. The kit's stalls
+        /// are 6 to 9 m long (measured), so a side holds two, not the plan's three: six stalls and five small pieces in the
+        /// corners, every corner within 12.2 m of the statue, inside the ring's 48-sided kerb at 12.9 m. North, toward
+        /// Lenten Street: the trader and the Master of Enchanting; east: food and the seer's counter with her candles;
+        /// south: the Master of First Aid and fish; west: the Master of Item Creation between the armour stand and the
+        /// anvil; the leather frame in the south-east corner. Footprints in whole metres from the statue (north-west corner,
+        /// plan x east and y south), so the world grid rounds none of them.
         /// </summary>
         private static void Market()
         {
-            var s = _layout.SquareById("bawling");
-            float X(float dx) => s.x0 + dx;
-            float Y(float dy) => s.y0 + dy;
-            Prop("Stall_Goods", Facing.S, X(8), Y(9), "The trader's stall");
-            Prop("Stall_Empty", Facing.S, X(16), Y(9), "Master of Enchanting");
-            Prop("Stall_Empty", Facing.S, X(24), Y(9), "Master of First Aid");
-            Prop("Counter", Facing.S, X(30), Y(10), "The seer's counter");
-            Prop("Candles", Facing.S, X(32), Y(10));
-            foreach (var dx in new[] { 12, 20, 28 })
+            var p = _layout.plaza;
+            var pieces = new (string Key, Facing F, int X, int Y, string Name)[]
             {
-                Prop("Bench", Facing.N, X(dx), Y(19));
-            }
-
-            Prop("Stall_Food", Facing.N, X(12), Y(28));
-            Prop("Stall_Fish", Facing.N, X(20), Y(28));
-            Prop("Stall_Meat", Facing.N, X(28), Y(28));
-            Prop("Stall_Weapons", Facing.N, X(9), Y(37), "Master of Item Creation");
-            Prop("Anvil", Facing.N, X(16), Y(39));
-            Prop("LeatherFrame", Facing.N, X(20), Y(39));
-            Prop("ArmourStand", Facing.N, X(24), Y(39));
+                ("Stall_Goods", Facing.N, -7, -10, "The trader's stall"),
+                ("Stall_Empty", Facing.N, 1, -10, "Master of Enchanting"),
+                ("Stall_Food", Facing.E, 7, -2, null),
+                ("Counter", Facing.E, 9, -5, "The seer's counter"),
+                ("Candles", Facing.E, 8, -5, null),
+                ("Stall_Empty", Facing.S, -7, 6, "Master of First Aid"),
+                ("Stall_Fish", Facing.S, 0, 6, null),
+                ("Stall_Weapons", Facing.W, -11, -4, "Master of Item Creation"),
+                ("ArmourStand", Facing.W, -10, -6, null),
+                ("Anvil", Facing.W, -10, 6, null),
+                ("LeatherFrame", Facing.S, 8, 6, null),
+            };
+            var placed = pieces.Count(s => Prop(s.Key, s.F, p.cx + s.X, p.cy + s.Y, s.Name) != null);
+            Debug.Log($"[VeilmouthCity] {p.stalls.name}: {placed} of {pieces.Length} stalls and pieces round {p.name}.");
 
             // The pawnbroker's counter in the Black Puddle's north-east corner, 3 m off the fronts: well outside the circle.
             var puddle = _layout.SquareById("black_puddle");
@@ -262,25 +261,28 @@ namespace GameDev.Slice.EditorTools
             var puddle = _layout.SquareById("black_puddle");
             Person("Blue", true, puddle.x0 + 5f, puddle.y0 + 3.5f, 135f, "Warden at the Black Puddle");
 
-            // The faction's front garden: beside its middle walk, facing the street.
-            var plot = _layout.plots.First(p => p.name == "The faction's house");
-            var pf = FacingOf(plot.facing);
-            var garden = new Vector2((plot.s0 + plot.s1) / 2f, plot.front) - (Outward(pf) * (plot.garden / 2f));
-            Person("Teal", false, garden.x - 4f, garden.y, Turns(pf) * 90f, "Faction member");
-            Person("Teal", true, garden.x + 4f, garden.y, Turns(pf) * 90f, "Faction member");
+            // The faction's members before its house in the cathedral's close, facing the street.
+            var faction = _layout.buildings.First(b => b.id == "faction_house");
+            var fy = Turns(FacingOf(faction.facing)) * 90f;
+            foreach (var (along, female) in new[] { (-4f, false), (4f, true) })
+            {
+                var at = BeforeFront(faction, along, 3f);
+                Person("Teal", female, at.x, at.y, fy, "Faction member");
+            }
 
-            // Veinmarket by the east end of Draught Lane, where its houses stop short of the quay.
+            // Veinmarket on Draught Lane's north pavement, by Lower Veil's tenements.
             var lane = _layout.StreetById("draught");
-            Person("Brown", false, lane.a1 - 12f, lane.c0 + 1.5f, 0f, "Veinmarket");
-            Person("Brown", false, lane.a1 - 10f, lane.c0 + 3f, 270f, "Veinmarket");
+            Person("Brown", false, lane.a1 - 24f, lane.c0 + (lane.walk0 / 2f), 0f, "Veinmarket");
+            Person("Brown", false, lane.a1 - 22f, lane.c0 + (lane.walk0 / 2f), 270f, "Veinmarket");
 
-            // The Masters and the sellers before their stalls (Market), as C3 stood them; the roster's sex for each.
-            var s = _layout.SquareById("bawling");
-            Person("Orange", false, s.x0 + 11f, s.y0 + 15f, 180f, "The trader");
-            Person("Green", false, s.x0 + 19f, s.y0 + 15f, 180f, "Master of Enchanting");
-            Person("Green", true, s.x0 + 27f, s.y0 + 15f, 180f, "Master of First Aid");
-            Person("Orange", true, s.x0 + 32f, s.y0 + 14f, 180f, "The seer");
-            Person("Green", true, s.x0 + 12f, s.y0 + 35f, 0f, "Master of Item Creation");
+            // The Masters and the sellers on the island's walk before their stalls on Bawling Row (Market), facing out to
+            // their customers; the roster's sex for each.
+            var pz = _layout.plaza;
+            Person("Orange", false, pz.cx - 4f, pz.cy - 11.5f, 0f, "The trader");
+            Person("Green", false, pz.cx + 4f, pz.cy - 11.5f, 0f, "Master of Enchanting");
+            Person("Green", true, pz.cx - 4f, pz.cy + 11.5f, 180f, "Master of First Aid");
+            Person("Orange", true, pz.cx + 11f, pz.cy - 4f, 90f, "The seer");
+            Person("Green", true, pz.cx - 12f, pz.cy, 270f, "Master of Item Creation");
 
             Person("Orange", true, puddle.x1 - 6.5f, puddle.y0 + 2f, 180f, "The pawnbroker");
 
@@ -297,14 +299,14 @@ namespace GameDev.Slice.EditorTools
                      {
                          (Pave("main_w", 470f, true), 90f, true), (Pave("main_w", 440f, false), 270f, false),
                          (Pave("main_e", 600f, true), 90f, false), (Pave("main_e", 640f, false), 270f, true),
-                         (new Vector2(515f, 415f), 45f, true), (new Vector2(566f, 414f), 315f, false),
+                         (new Vector2(521.5f, 421.5f), 45f, true), (new Vector2(558.5f, 421.5f), 315f, false), // the Penny's frame
                          (Pave("lenten", 385f, false), 0f, true), (Pave("smoked", 505f, true), 180f, false),
-                         (new Vector2(450f, 349f), 90f, true), (Pave("widows", 520f, true), 270f, false),
+                         (new Vector2(450f, 355f), 90f, true), (Pave("widows", 520f, true), 270f, false), // the chapel's court
                          (Pave("embankment", 480f, true), 90f, true), (Pave("embankment", 600f, true), 270f, false),
-                         (new Vector2(677.5f, 400f), 0f, false), (new Vector2(677.5f, 505f), 180f, true),
-                         (new Vector2(540f, 335f), 180f, true), (new Vector2(466f, 476f), 0f, false),
+                         (new Vector2(666f, 400f), 0f, false), (new Vector2(666f, 505f), 180f, true), // the quay
+                         (new Vector2(540f, 335f), 180f, true), (Pave("thimble", 476f, false), 0f, false), // Drowsy Steps
                          (Pave("works_s", 620f, false), 0f, false), (Pave("works_x", 480f, false), 90f, true),
-                         (new Vector2(618f, 476.5f), 90f, true), // a mill woman on Draught Lane, whom POI B's fear keeps at home (SliceResidue)
+                         (Pave("draught", 618f, false), 90f, true), // a mill woman on Draught Lane, whom POI B's fear keeps at home (SliceResidue)
                      })
             {
                 Person("Yellow", female, at.x, at.y, yaw, "Townsperson");
