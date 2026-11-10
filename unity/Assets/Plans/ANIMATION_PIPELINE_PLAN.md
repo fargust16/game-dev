@@ -1,12 +1,12 @@
 # Animation Pipeline — Blender and Mixamo to Unity
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft — the owner's decision of 2026-11-10, planned by the agent; the steps wait for the owner's word, as every slice milestone does
 
 Created: 2026-11-10
 
-Last Updated: 2026-11-10 (§1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
+Last Updated: 2026-11-10 (§6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1–§2, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -21,7 +21,7 @@ The owner, 2026-11-10:
 - The downloaded animation packs cannot be used commercially, so they leave the project: Kevin Iglesias' Human Animations (Human Basic Motions, Crafting, Melee, Soldier and Spellcasting FREE), already removed; DoubleL's RPG_Animations_Pack_FREE; and the clips of Bublisher's 3D Stylized Animated Dogs Kit. The owner removes them.
 - Every clip of the player and the NPCs is our own. The beasts but the dog are animated already. The dog's clips are crooked and are to be replaced.
 - New clips are made with Blender and Mixamo and used in Unity.
-- With the player's two bodies and the women Wardens' uniform, the same day: the animations are the agent's work. The agent never signs in to Mixamo, so who downloads its clips is open ([99](../../../99%20Open%20Questions.md) VS-ANIM).
+- With the player's two bodies and the women Wardens' uniform, the same day: the animations are the agent's work. The agent never signs in to Mixamo, so the owner downloads its clips (VS-ANIM (a), owner, 2026-11-10), by the list of §6.1.
 
 ## 2. What the rigs allow (measured, 2026-11-10)
 
@@ -125,6 +125,67 @@ The search words are Mixamo's usual names; the agent takes the closest clip, and
 | Brewing at the alchemy table | — | A3 |
 | First Aid | Kneeling, edited | A3 |
 | Picking a lock, stealing | — | A3 |
+
+### 6.1 The download list (owner, 2026-11-10)
+
+The owner downloads; the agent imports, renames each clip by its use, checks it on all eleven models and wires it. Settings as §4: FBX for Unity, Without Skin, 30 fps, no keyframe reduction, *In Place* ticked where Mixamo offers it. The files go to `unity/Assets/Animation/Mixamo/` under Mixamo's own names. Where a name is not found, the closest clip of the same kind does; the agent notes the swap.
+
+**A1, everyday (27):**
+
+1. Breathing Idle
+2. Happy Idle
+3. Walking, in place
+4. Running, in place
+5. Fast Run, in place
+6. Left Turn 90
+7. Right Turn 90
+8. Jump, in place where offered
+9. Standing At Attention
+10. Talking
+11. Arguing
+12. Head Nod Yes
+13. Waving
+14. Pointing
+15. Sitting Idle
+16. Stand To Sit
+17. Sit To Stand
+18. Drinking
+19. Sneak Walk, in place
+20. Crouched Walking, in place
+21. Crouch Idle
+22. Picking Up
+23. Kneeling Idle
+24. Gathering Objects
+25. Mining
+26. Chopping
+27. Hammering
+
+**A2, combat (17):**
+
+28. Sword And Shield Idle
+29. Sword And Shield Slash
+30. Sword And Shield Block
+31. Great Sword Idle
+32. Great Sword Slash
+33. Stabbing
+34. Pistol Idle
+35. Pistol Shoot
+36. Rifle Aiming Idle
+37. Shooting (rifle)
+38. Standing 1H Magic Attack 01
+39. Standing 2H Magic Area Attack 01
+40. Spell Casting
+41. Hit Reaction
+42. Dying
+43. Death From The Front
+44. Walking Backwards, in place
+
+**Bases for A3's edits (4):**
+
+45. Sword And Shield Block Idle: the Defensive Stance
+46. Surrender: Yield
+47. Sleeping Idle: Дрёма and sleep
+48. Lying Down: lying down and waking
 
 ## 7. Checks
 
