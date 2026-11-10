@@ -1253,6 +1253,38 @@ The owner drew a map of the city's scheme: districts, roads and the kind of buil
   - A house's plinth is as high as its steps, and the house is set down by the rest.
 - **The beasts' territories and the gathering places** move into the forest across the river.
 
-## 28.3 Status
+## 28.3 The mature tree's third setting, 2026-11-10
+
+The owner found the leaves too faint and gave a third setting in Easy Tree:
+
+- Branch Length 13 for 11;
+- Random Angle 40° for 30°;
+- Min Height 65 for 55;
+- Leaf Min and Max Scale 1.5–2.5 for 1.0–1.5.
+
+The other values are as in §27.8. `veilmouth_trees.py` builds the tree as in §27.9. Easy Tree scales each twig with its leaves by Leaf Min–Max Scale, so our leaves grow with it. The build's report now measures the leaves it makes; it used to print a range worked out for the scale of 1.0–1.5.
+
+| MatureHornbeamA (measured) | Second setting (§27.9) | Third setting |
+|---|---|---|
+| Size | 12.28 × 10.69 × 11.30 m | 12.74 × 11.61 × 11.40 m |
+| Twigs, leaves | 2 048, 14 336 | 2 496, 17 472 |
+| Leaf with its stalk (5th–95th percentile) | about 15–22 cm | 20.5–32.4 cm |
+| Trunk at the foot | 0.36 m | 0.32 m |
+| LOD0 in Unity (bark at 6 sides, twigs at 3, every leaf) | 162 424 | 195 792 |
+| LOD1 (no twigs) | 94 840 | 113 424 |
+| LOD2, LOD3 | 5 687, 2 268 | 6 305, 2 748 |
+
+The LOD Group keeps §27.9's levels, LOD0 to about 13.5 m. The kit wrapper `Kit_Tree_MatureHornbeamA_1x12` was rebuilt in place with its GUID (`VeilmouthTrees.SetupMature`).
+
+**The crown's reach from the trunk** (LOD1 above 3 m, measured in Blender):
+
+- the wide way: 6.51 m and 6.22 m at most, 5.03 m and 4.86 m at the 95th percentile;
+- the narrow way: 6.12 m and 5.49 m at most, 4.35 m and 4.19 m at the 95th percentile.
+
+In C4 a road tree turns its narrow way across its road, its shorter side toward its own pavement. Its trunk stands 0.6 m into the carriageway from the kerb, so a 6 m pavement puts a facade 6.6 m from the trunk. That is beyond the crown's farthest point on either side, so no crown reaches a wall (calculated from the measured reach). The pavement under trees is therefore 6 m, as §28.1 item 4 expected.
+
+Views: Blender's LOD row, and `Logs/SliceSurvey/green_*` of C3, rendered with the new tree before C3 is replaced.
+
+## 28.4 Status
 
 Being built, step by step (§28.1, item 20). Each step adds its section here.

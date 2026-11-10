@@ -89,15 +89,15 @@ KINDS = {
     "mature": dict(bark_tris=6200, lods=[(0.14, 2.0, 0.4, 0.015), (0.06, 2.9, 0.12, 0.03)]),
 }
 
-# The owner's mature tree as the owner set it in Easy Tree, the second time on 2026-11-09 (its Random Angle 30
-# degrees, in radians), with the owner's change to the generator (easy_generator); the generator's tree is 24.2 units
-# high and is scaled to the tree's height. Its bark is 67,704 faces (132,336 triangles), as the owner's Tree.blend
-# shows, with 2048 twigs of seven leaves each (measured 2026-11-09).
+# The owner's mature tree as the owner set it in Easy Tree, the third time on 2026-11-10 for more visible leaves (city
+# plan §28.1): Branch Length 13 for 11, Random Angle 40 degrees for 30 (in radians), Min Height 65 for 55, leaves 1.5-2.5
+# for 1.0-1.5; with the owner's change to the generator (easy_generator). The generator's tree is scaled to the
+# tree's height. (The second setting, of 2026-11-09, gave 67,704 bark faces and 2048 twigs of seven leaves each.)
 EASY_TREE = {
     "N Branches per Level": "Two Branches", "Trunk Height": 3, "Treetop Height": 2, "Num Levels": 7,
-    "Branch Length": 11, "Random Angle": math.radians(30.0), "Random Jitter": 0.0, "Gravity": 0.0,
-    "Thickness": 3.0, "Seed": 105, "Add Leaves": True, "Leaf Type": "Hornbeam", "Season": 0.0, "Min Height": 55,
-    "Leaf Density": 2.0, "Leaf Min Scale": 1.0, "Leaf Max Scale": 1.5, "Visible in Viewport": True,
+    "Branch Length": 13, "Random Angle": math.radians(40.0), "Random Jitter": 0.0, "Gravity": 0.0,
+    "Thickness": 3.0, "Seed": 105, "Add Leaves": True, "Leaf Type": "Hornbeam", "Season": 0.0, "Min Height": 65,
+    "Leaf Density": 2.0, "Leaf Min Scale": 1.5, "Leaf Max Scale": 2.5, "Visible in Viewport": True,
     "Custom Twig and Leaf": False,
 }
 # Easy Tree's tubes made lighter, by the owner's choice of 2026-11-09 (§27.8, VS-GREEN (b) with (d)): the bark's
@@ -1147,8 +1147,12 @@ def easy_own(geometry, factor, spec):
     for bm in (near, bark):
         for edge in bm.edges:
             edge.smooth = True
+    # The leaves' lengths with their stalks as built (Easy Tree scales each twig by its Leaf Min-Max Scale), 5th-95th
+    # percentile.
+    lengths = sorted((f.verts[3].co - f.verts[0].co).length for f in leaves.faces)
+    cut = len(lengths) // 20
     print(f"VEILMOUTH {spec['name']}: Easy Tree's own bark and {len(twigs)} twigs, {len(twigs) * len(places)} leaves "
-          f"{100 * h * factor:.1f}-{150 * h * factor:.1f} cm long with their stalks")
+          f"{100 * lengths[cut]:.1f}-{100 * lengths[-cut - 1]:.1f} cm long with their stalks")
     return near, bark, leaves
 
 

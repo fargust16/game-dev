@@ -25,7 +25,7 @@ namespace GameDev.Slice.EditorTools
 
         public static readonly string[] Garden = { "GardenBeechA", "GardenHornbeamB" };
 
-        /// <summary>The owner's mature tree, 11.3 m high and 12.3 m across: Easy Tree's own tree from the owner's values, with our leaves (§27.7–§27.8).</summary>
+        /// <summary>The owner's mature tree, 11.4 m high and 12.7 × 11.6 m across: Easy Tree's own tree from the owner's values, with our leaves (§27.7–§28.3).</summary>
         public static readonly string[] Mature = { "MatureHornbeamA" };
 
         /// <summary>The kinds whose single leaves (the leaf atlas itself) a tree wears: the mature tree's hornbeam (§27.8).</summary>
@@ -75,6 +75,24 @@ namespace GameDev.Slice.EditorTools
             // A tree new to the kit gets its wrapper (a wrapper already on disk is kept as it is).
             SliceKitCatalogue.Load();
             Debug.Log($"[VeilmouthTrees] materials under {MaterialFolder}; the trees under {ArtFolder} imported again.");
+        }
+
+        /// <summary>
+        /// <see cref="Setup"/>, then the mature tree's wrapper built again in place with its GUID, as after the tree is grown
+        /// again; logs each LOD's triangles as imported. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthTrees.SetupMature
+        /// </summary>
+        public static void SetupMature()
+        {
+            Setup();
+            SliceKitCatalogue.LoadRebuilding(Mature.Select(m => "CityTree_" + m).ToArray());
+            foreach (var name in Mature)
+            {
+                var model = AssetDatabase.LoadAssetAtPath<GameObject>($"{ArtFolder}/Tree_{name}.fbx");
+                var tris = model.GetComponentsInChildren<MeshFilter>(true).OrderBy(m => m.name)
+                    .Select(m => $"{m.name} {m.sharedMesh.triangles.Length / 3}");
+                Debug.Log($"[VeilmouthTrees] {name}: {string.Join(", ", tris)}");
+            }
         }
 
         [MenuItem("GameDev/Slice/Trees/Create Materials")]
