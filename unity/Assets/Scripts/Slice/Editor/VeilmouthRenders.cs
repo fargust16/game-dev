@@ -1000,6 +1000,173 @@ namespace GameDev.Slice.EditorTools
             Debug.Log($"[VeilmouthRenders] room turn ({label}):\n{report}");
         }
 
+        /// <summary>
+        /// The merged far LOD against the pieces it replaces (city plan §29.10): FrameProbe's seven views with the player's
+        /// 60° at 16:00 and 23:00, each drawn with the kit houses alone forced to their pieces, then to their far LOD, then
+        /// the whole city as built, and the difference of the first two four times as bright, with its mean and the share
+        /// of pixels differing by more than 8 of 255. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderFarLod
+        /// </summary>
+        public static void RenderFarLod()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            var views = new (string Name, Vector3 From, Vector3 To)[]
+            {
+                ("longtongue", Ground(-70f, 60f, 1.7f), Ground(30f, 60f, 2f)),
+                ("saltgullet", Ground(150f, 60f, 1.7f), Ground(40f, 60f, 2f)),
+                ("penny", Ground(2f, 58f, 1.7f), Ground(40f, 60f, 2f)),
+                ("thimble", Ground(-22f, 115f, 1.7f), Ground(-22f, -40f, 2f)),
+                ("draught", Ground(150f, 4f, 1.7f), Ground(50f, 4f, 2f)),
+                ("westroad", Ground(-140f, 60f, 1.7f), Ground(-60f, 60f, 2f)),
+                ("gloomwood", Ground(-240f, -50f, 1.7f), Ground(-200f, -110f, 2f)),
+            };
+            var houses = Object.FindObjectsByType<LODGroup>(FindObjectsSortMode.None).Where(l => l.transform.Find("Model/" + VeilmouthFarLod.Name) != null).ToList();
+            var houseRoots = new System.Collections.Generic.HashSet<Transform>(houses.Select(l => l.transform));
+            var others = Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None).Where(r =>
+            {
+                for (var t = r.transform; t != null; t = t.parent)
+                {
+                    if (houseRoots.Contains(t))
+                    {
+                        return false;
+                    }
+                }
+
+                return !r.forceRenderingOff;
+            }).ToList();
+            var report = new System.Collections.Generic.List<string>
+            {
+                $"{houses.Count} kit houses with a far LOD, drawn alone; their pieces against as played (the switch at {VeilmouthFarLod.FarDistance:0} m) and against the far LOD forced, 0–255 per channel:",
+            };
+            _skyAndGrade = sky != null;
+            try
+            {
+                sky?.Apply(16 * 60);
+                Eye("farlod_warmup", views[0].From, views[0].To, 60f);
+                File.Delete($"{OutputFolder}/farlod_warmup.png");
+                foreach (var (minute, hour) in new[] { (16 * 60, "1600"), (23 * 60, "2300") })
+                {
+                    sky?.Apply(minute);
+                    foreach (var fog in Object.FindObjectsByType<ParticleSystem>(FindObjectsSortMode.None))
+                    {
+                        fog.Simulate(30f, true, true);
+                    }
+
+                    foreach (var view in views)
+                    {
+                        var stem = $"{OutputFolder}/farlod_{view.Name}_{hour}";
+                        // The kit houses alone forced to their pieces, forced to their far LOD, and switching by distance as in
+                        // play, so the trees' wind is no difference; then the whole city as built.
+                        foreach (var (level, alone, label) in new[] { (0, true, "near"), (1, true, "far"), (-1, true, "auto"), (-1, false, "built") })
+                        {
+                            others.ForEach(r => r.forceRenderingOff = alone);
+                            houses.ForEach(l => l.ForceLOD(level));
+                            Eye(Path.GetFileName($"{stem}_{label}"), view.From, view.To, 60f);
+                        }
+
+                        var (mean, share, _) = Difference($"{stem}_near.png", $"{stem}_far.png", $"{stem}_diff.png");
+                        var (playMean, playShare, worst) = Difference($"{stem}_near.png", $"{stem}_auto.png", $"{stem}_playdiff.png");
+                        Grid(Path.GetFileName($"{stem}_sheet"), new[] { $"{stem}_near.png", $"{stem}_auto.png", $"{stem}_built.png", $"{stem}_playdiff.png" }, 2);
+                        Crop($"{stem}_crop.png", worst, new[] { $"{stem}_near.png", $"{stem}_auto.png", $"{stem}_far.png", $"{stem}_playdiff.png" });
+                        report.Add($"{view.Name} {hour}: as played mean {playMean:0.000}, {playShare:P3} of pixels over 8; all far mean {mean:0.000}, {share:P3}; " +
+                                   $"worst box at ({worst.x}, {worst.y})");
+                    }
+                }
+            }
+            finally
+            {
+                houses.ForEach(l => l.ForceLOD(-1));
+                others.ForEach(r => r.forceRenderingOff = false);
+                _skyAndGrade = false;
+            }
+
+            File.WriteAllLines($"{OutputFolder}/c5_farlod_views.txt", report);
+            Debug.Log($"[VeilmouthRenders] far LOD views written to {OutputFolder} as farlod_*:\n{string.Join("\n", report)}");
+        }
+
+        private const int CropWidth = 200, CropHeight = 112;
+
+        /// <summary>The same box from each picture, side by side, three times as large.</summary>
+        private static void Crop(string output, RectInt box, string[] files)
+        {
+            const int scale = 3;
+            var sheet = new Texture2D((box.width * scale * files.Length) + (4 * (files.Length - 1)), box.height * scale, TextureFormat.RGB24, false);
+            var white = Enumerable.Repeat(new Color32(255, 255, 255, 255), sheet.width * sheet.height).ToArray();
+            sheet.SetPixels32(white);
+            for (var k = 0; k < files.Length; k++)
+            {
+                var t = new Texture2D(2, 2);
+                t.LoadImage(File.ReadAllBytes(files[k]));
+                for (var y = 0; y < box.height * scale; y++)
+                {
+                    for (var x = 0; x < box.width * scale; x++)
+                    {
+                        sheet.SetPixel((k * ((box.width * scale) + 4)) + x, y, t.GetPixel(box.x + (x / scale), box.y + (y / scale)));
+                    }
+                }
+            }
+
+            sheet.Apply();
+            File.WriteAllBytes(output, sheet.EncodeToPNG());
+        }
+
+        /// <summary>
+        /// The mean channel difference of two pictures, the share of pixels differing by more than 8 in any channel, and
+        /// the box of <see cref="CropWidth"/> × <see cref="CropHeight"/> where they differ most; the difference ×4 written out.
+        /// </summary>
+        private static (double Mean, double Share, RectInt Worst) Difference(string a, string b, string output)
+        {
+            var ta = new Texture2D(2, 2);
+            var tb = new Texture2D(2, 2);
+            ta.LoadImage(File.ReadAllBytes(a));
+            tb.LoadImage(File.ReadAllBytes(b));
+            var pa = ta.GetPixels32();
+            var pb = tb.GetPixels32();
+            var diff = new Color32[pa.Length];
+            long sum = 0;
+            var over = 0;
+            for (var i = 0; i < pa.Length; i++)
+            {
+                int dr = Mathf.Abs(pa[i].r - pb[i].r), dg = Mathf.Abs(pa[i].g - pb[i].g), db = Mathf.Abs(pa[i].b - pb[i].b);
+                sum += dr + dg + db;
+                over += Mathf.Max(dr, Mathf.Max(dg, db)) > 8 ? 1 : 0;
+                diff[i] = new Color32((byte)Mathf.Min(255, dr * 4), (byte)Mathf.Min(255, dg * 4), (byte)Mathf.Min(255, db * 4), 255);
+            }
+
+            var t = new Texture2D(ta.width, ta.height, TextureFormat.RGB24, false);
+            t.SetPixels32(diff);
+            File.WriteAllBytes(output, t.EncodeToPNG());
+
+            // The worst box, on a grid of a quarter box.
+            var worst = new RectInt(0, 0, CropWidth, CropHeight);
+            long most = -1;
+            for (var y0 = 0; y0 + CropHeight <= ta.height; y0 += CropHeight / 4)
+            {
+                for (var x0 = 0; x0 + CropWidth <= ta.width; x0 += CropWidth / 4)
+                {
+                    long box = 0;
+                    for (var y = y0; y < y0 + CropHeight; y++)
+                    {
+                        for (var x = x0; x < x0 + CropWidth; x++)
+                        {
+                            var c = diff[(y * ta.width) + x];
+                            box += c.r + c.g + c.b;
+                        }
+                    }
+
+                    if (box > most)
+                    {
+                        (most, worst) = (box, new RectInt(x0, y0, CropWidth, CropHeight));
+                    }
+                }
+            }
+
+            return (sum / (3.0 * pa.Length), (double)over / pa.Length, worst);
+        }
+
         /// <summary>A point <paramref name="up"/> metres above Veilmouth's ground at (x, z).</summary>
         private static Vector3 Ground(float x, float z, float up)
         {

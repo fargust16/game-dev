@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4, C5)
 
-Version: 0.61
+Version: 0.62
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§29.10: the owner's frame budget of 16.7 ms and the merged far LOD for each house type, designed: one mesh a type built in place, the switch at 50 m with no cross-fade, the panes' rooms in the mesh, a sync for the houses the city changed. Earlier: §29.9: the frame's holder measured in a development build: the main thread holds it, 2.1 ms plus 0.37 ms for every thousand draw calls, the render thread waits for it, shadows take 22–29 % of a city view; §29.7's render-thread reading refuted; the budget and the next lever open)
+Last Updated: 2026-11-10 (§29.11: the far LOD built and measured: every view's median frame within the 16.7 ms budget, the swap unseen; the yard doors left out of it; its glass a variant of the kit glass that writes depth and reads the panes' rooms. Earlier: §29.10: the owner's frame budget of 16.7 ms and the merged far LOD for each house type, designed: one mesh a type built in place, the switch at 50 m with no cross-fade, the panes' rooms in the mesh, a sync for the houses the city changed)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1987,7 +1987,7 @@ Step 8.
 
 - Squint Lane;
 - the yards' missing rubbish and poses;
-- the frame budget and its next lever (§29.9);
+- the frame budget and its next lever (§29.9); *met by the far LOD, §29.11*;
 - the owner's walk of C5.
 
 ## 29.9 The frame's holder, measured, 2026-11-10
@@ -2076,3 +2076,52 @@ A third mode turns the camera's shadows off. The views, the build and the rounds
 7. **Shadows** (the look-keeping part of §29.9 (d)): a far house casts its shadow through its far LOD's one renderer instead of through its pieces. The Details keep their own shadows.
 8. **Memory.** The far LOD is not static for batching, so each type's mesh stays shared by all its houses. Its memory is reported when it is built.
 9. **Checks.** Tests check that the far LOD holds every triangle of the pieces it replaces, with the same materials, and that panes keep their rooms. Views at the switch distance, before and after, check the look. `FrameProbe` measures the frame before and after.
+
+## 29.11 The far LOD built and measured, 2026-11-10
+
+Built by `VeilmouthFarLod` as §29.10 designed, with the changes the building found. Batch: `-executeMethod GameDev.Slice.EditorTools.VeilmouthFarLod.Run` (the types, then the scene); report in `Logs/SliceSurvey/c5_farlod.txt`.
+
+**What was built:**
+
+- **The 67 house types** have their far LOD: 22 512 renderers and 24 797 draws near against 412 draws far. Its 67 meshes hold 1 565 628 vertices: 65.4 MB of vertex and index data, 131.2 MB of asset files in git.
+- **One renderer a type, not two** (revises §29.10 item 2). Every piece the far LOD holds casts shadows in the kit's settings, the glass included, so the glass needs no renderer of its own: the window shader has no shadow pass, and the glass casts none either way.
+- **The vertex** is 40 bytes: the position as three floats, the normal and tangent as four SNorm16 each, the UV as two floats, and the pane's room as two UNorm16 halves in the third UV channel. SNorm16 is one part in 32 767, far finer than a house 50 m away shows. The far mesh matches its pieces' glass vertices to five decimals.
+- **The yard doors stay out** (revises §29.10 item 6). The city walls up some back doors (`VeilmouthCity.BackDoors`), and with them in, 77 houses needed a far mesh of their own, 64 MB more. A yard door's pieces are now left out of the far LOD and drawn at every distance, as the Details are: the door, its wall, trim, steps and rail within 1.7 m of the door's marker (`VeilmouthKitHouses.AtYardDoor`). Every house then keeps its type's mesh. Of Veilmouth's 145 kit houses, 144 are as their type, and one, Harrow & Tincture, has its own materials mapped onto the type's mesh; none needs a mesh of its own. The scene's houses draw 46 573 times near against 882 far.
+- **The far glass** is a material variant of each kit glass, kept in `FarLod/Glass/`, which overrides only the window shader's `_FarLod`. A later change to a kit glass reaches its variant. `_FarLod` does two things:
+  1. **It writes depth.** One renderer draws its panes in their index order, and beyond 46 m a house's rooms are off. So through a front window the back window of the empty house shows, and with no depth written it drew over the front pane wherever it came later in the mesh. Beyond 46 m a pane is opaque, so writing depth changes nothing else.
+  2. **It reads each pane's room from the mesh.** A kit mesh has no third UV channel, and what a shader reads from a missing channel is undefined. In the first build the kit's own glass read noise there and took it for a room, a fault in the near look between 32 and 50 m. Now only the far glass reads the channel; the kit glass reads its renderer's value as before.
+- **The window hash** takes its half-metre cell with an odd sixty-fourth (+0.28125) instead of +0.25. The kit puts anchors on a sixteenth of a metre, and with +0.25 some lay on a cell's edge, where the last bit of a float chose the cell, so the far LOD could light another pane, or half of one. Which windows are lit at night changes once with it.
+- **Builds keep the far LOD.** `VeilmouthKitHouses.Bake`, `RedressAll` and `StripPorches` build it again, reusing its objects and meshes, so their file IDs, GUIDs and the scene's overrides hold.
+
+**The look** (`VeilmouthRenders.RenderFarLod`; `Logs/SliceSurvey/farlod_*`, `c5_farlod_views.txt`). The seven views of `FrameProbe` were rendered at 16:00 and 23:00, with the kit houses alone so that the trees' wind is no difference. Each view compares the houses drawn with their pieces against the houses as played, switching at 50 m, and a crop shows the box that differs most:
+
+- **As played,** the houses differ from their pieces in at most 0.002 % of a view's pixels by more than 8 of 255 in any channel, with a mean difference of 0.000, by day and by night. The swap cannot be seen.
+- **The first build** differed in up to 1.07 % at night, across the Penny: lit windows that differed, from the two faults the far glass now fixes.
+- **With the far LOD forced at every distance,** at most 0.036 % differs (Thimble Street at night). This happens only in houses nearer than 50 m, which never draw their far LOD in play.
+
+**The frame** (`FrameProbe` in the development build, 1920 × 1080, High, the owner's machine; `Logs/SliceSurvey/c5_frames_farlod*.txt`; medians of 3 rounds of 120 frames, ms):
+
+| View | As shipped (§29.9, 14:27) | Far LOD, first build (15:14) | Far LOD with its glass, three runs (15:51–16:10) |
+|---|---|---|---|
+| down Long Tongue | 24.55 | 9.35 | 11.00–12.32 |
+| down Salt Gullet | 24.90 | 12.04 | 13.13–15.17 |
+| across the Penny | 14.22 | 6.33 | 7.29–10.36 |
+| down Thimble Street | 19.70 | 9.72 | 12.89–16.04 |
+| Draught Lane | 22.68 | 9.18 | 12.80–14.46 |
+| the West Road | 28.60 | 7.57 | 10.70–12.80 |
+| in Gloomwood | 7.36 | 5.23 | 6.96–8.54 |
+| all seven | 22.15 | 8.77 | 11.33–12.86 |
+
+- **The budget is met.** Every view's median frame is within 16.7 ms in every run.
+- **What the far LOD takes away.** In the first build the pooled frame falls from 22.15 to 8.77 ms, and the main thread from 22.09 to 8.32 ms. The median view's draw calls fall from 55 187 to 13 490, and its shadow casters from 33 460 to 7 384. The GPU stays at about 4 ms and the render thread at about 2 ms. With the drawer the pooled frame is 9.01 ms, and with no shadows 7.64 ms.
+- **The later runs were taken on a busier machine.** Gloomwood is the control: its draw calls (7 272 against 7 304) and set-pass calls (204) are the same in every run, yet its frame rose by 33–63 % between them. The owner's browser was working at the time. The far glass adds no draw call and 22–58 set-pass calls in the city's views, where its depth state alternates with the kit glass's; its cost cannot be told from that noise.
+- **The margin.** On the busier machine, Thimble Street keeps 0.7 ms of the budget. If a later change eats it, the next lever is §29.9's (d) beyond what this LOD took: fewer cascades or a shorter shadow distance. That changes the look, so it is the owner's call; no shadows saves about 1.1 ms of the pooled frame.
+
+**Tests:** `KitHouseFarLodTests`:
+
+- every house switches at 50 m with no cross-fade, and its LOD0 is the pieces merged, with no detail or room;
+- every far LOD holds every triangle of its pieces by shadow setting and material, with kit glass drawn by its far variant;
+- every pane keeps its room;
+- the far glass is the kit glass with only `_FarLod` overridden, and no kit glass sets it.
+
+`VeilmouthSceneTests.EveryKitHouseFarLodHoldsItsOwnPieces` checks the city's houses against their own pieces. EditMode 308/308. PlayMode 53/53: `LoosePropsTests.ThePlayerDoesNotShoveATable`, in the tavern, which this work does not touch, failed once in the full run (the table moved 1.06 m) and passed alone with its fixture, 11/11. Its push is moved by the frame's length, so it can fail on a slow frame.

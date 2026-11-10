@@ -29,6 +29,7 @@ half4 _WallPanel;
 half4 _WallPaper;
 half4 _FloorTone;
 half4 _CeilingTone;
+half _FarLod;
 CBUFFER_END
 
 // The GPU Resident Drawer draws through DOTS instancing (VEILMOUTH_CITY_PLAN.md §29.7), which asks for one block of

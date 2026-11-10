@@ -386,6 +386,7 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
+            VeilmouthFarLod.Build(root, Path.GetFileNameWithoutExtension(path));
             foreach (var t in root.GetComponentsInChildren<Transform>(true))
             {
                 t.gameObject.layer = LayerMask.NameToLayer(KitLayers.Structure);
@@ -456,13 +457,12 @@ namespace GameDev.Slice.EditorTools
             var details = new List<Renderer>();
             foreach (Transform piece in model.transform)
             {
-                var cut = piece.name.LastIndexOf('_');
-                if (piece.name == VicRooms.RootName || cut < 0)
+                if (!IsPiece(piece))
                 {
                     continue;
                 }
 
-                var detail = Details.Any(piece.name.Substring(0, cut).StartsWith);
+                var detail = IsDetail(piece);
                 foreach (var r in piece.GetComponentsInChildren<MeshRenderer>(true))
                 {
                     all.Add(r);
@@ -488,6 +488,36 @@ namespace GameDev.Slice.EditorTools
             lod.fadeMode = LODFadeMode.CrossFade;
             lod.animateCrossFading = true;
             return lod;
+        }
+
+        /// <summary>
+        /// A kit piece under a house's Model, named "{module}_{n}": not the rooms, the far LOD (<see cref="VeilmouthFarLod"/>)
+        /// or anything else put there unnamed.
+        /// </summary>
+        public static bool IsPiece(Transform child) =>
+            child.name != VicRooms.RootName && child.name != VeilmouthFarLod.Name && child.name.LastIndexOf('_') > 0;
+
+        /// <summary>A piece that is one of the <see cref="Details"/>, by its module's name.</summary>
+        public static bool IsDetail(Transform piece) => Details.Any(piece.name.Substring(0, piece.name.LastIndexOf('_')).StartsWith);
+
+        /// <summary>The modules of a yard door that <c>VeilmouthCity.BackDoors</c> may wall up.</summary>
+        public static readonly string[] YardDoorPieces = { "SM_Vic_Wall_Door_", "SM_Vic_Door_", "SM_Vic_Trim_Door_", "SM_Vic_Steps_", "SM_Vic_Rail_" };
+
+        /// <summary>The kit's plain wall put into a walled-up yard door is named after its module with this.</summary>
+        public const string WalledUp = " (walled-up door)";
+
+        /// <summary>
+        /// Whether a piece belongs to a yard door at one of <paramref name="doors"/> (their markers' positions): one of
+        /// <see cref="YardDoorPieces"/>, or a plain wall that walled one up, within 1.7 m across and 1.2 m up or down.
+        /// </summary>
+        public static bool AtYardDoor(Transform piece, IEnumerable<Vector3> doors)
+        {
+            if (!YardDoorPieces.Any(piece.name.StartsWith) && !piece.name.EndsWith(WalledUp))
+            {
+                return false;
+            }
+
+            return doors.Any(d => new Vector2(piece.position.x - d.x, piece.position.z - d.z).magnitude <= 1.7f && Mathf.Abs(piece.position.y - d.y) <= 1.2f);
         }
 
         /// <summary>
@@ -531,7 +561,7 @@ namespace GameDev.Slice.EditorTools
                     var dropped = new HashSet<Renderer>(lod.GetLODs()[0].renderers);
                     foreach (var f in model.GetComponentsInChildren<MeshFilter>(true))
                     {
-                        if (f.sharedMesh == null || (rooms != null && f.transform.IsChildOf(rooms)))
+                        if (f.sharedMesh == null || (rooms != null && f.transform.IsChildOf(rooms)) || f.transform.parent.name == VeilmouthFarLod.Name)
                         {
                             continue;
                         }
@@ -547,6 +577,7 @@ namespace GameDev.Slice.EditorTools
                         }
                     }
 
+                    VeilmouthFarLod.Build(root, name);
                     PrefabUtility.SaveAsPrefabAsset(root, path);
                     houses++;
                 }
@@ -594,6 +625,7 @@ namespace GameDev.Slice.EditorTools
                     }
 
                     DetailLod(model.gameObject);
+                    VeilmouthFarLod.Build(root, Path.GetFileNameWithoutExtension(path));
                     PrefabUtility.SaveAsPrefabAsset(root, path);
                     houses++;
                 }

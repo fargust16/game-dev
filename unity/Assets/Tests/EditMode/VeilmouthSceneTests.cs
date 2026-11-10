@@ -26,6 +26,33 @@ namespace GameDev.Slice.Tests
         private T[] All<T>() where T : Component =>
             _scene.GetRootGameObjects().SelectMany(go => go.GetComponentsInChildren<T>()).ToArray();
 
+        /// <summary>§29.10: every kit house's far LOD holds its own pieces, the houses the city changed included.</summary>
+        [Test]
+        public void EveryKitHouseFarLodHoldsItsOwnPieces()
+        {
+            var houses = 0;
+            foreach (var lod in All<LODGroup>())
+            {
+                var model = lod.transform.Find("Model");
+                var far = model != null ? model.Find(VeilmouthFarLod.Name) : null;
+                if (far == null)
+                {
+                    continue;
+                }
+
+                houses++;
+                var sources = VeilmouthFarLod.Sources(model);
+                var renderers = far.GetComponentsInChildren<MeshRenderer>(true).Where(r => r.enabled).ToArray();
+                var levels = lod.GetLODs();
+                Assert.AreEqual(2, levels.Length, lod.name);
+                CollectionAssert.AreEquivalent(sources.Select(s => (Renderer)s.Renderer), levels[0].renderers, $"{lod.name}: LOD0 is its own pieces");
+                CollectionAssert.AreEquivalent(renderers, levels[1].renderers, lod.name);
+                KitHouseFarLodTests.AssertSame(lod.name, sources, renderers);
+            }
+
+            Assert.Greater(houses, 100, "the city's kit houses");
+        }
+
         [Test]
         public void TheGroundCoversTheAreaAboveTheSea()
         {

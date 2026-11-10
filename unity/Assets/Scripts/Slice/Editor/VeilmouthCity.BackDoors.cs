@@ -109,14 +109,7 @@ namespace GameDev.Slice.EditorTools
             foreach (Transform piece in model)
             {
                 var n = piece.name;
-                if (!(n.StartsWith("SM_Vic_Wall_Door_") || n.StartsWith("SM_Vic_Door_") || n.StartsWith("SM_Vic_Trim_Door_")
-                      || n.StartsWith("SM_Vic_Steps_") || n.StartsWith("SM_Vic_Rail_")))
-                {
-                    continue;
-                }
-
-                var d = piece.position - marker.position;
-                if (Flat(d) > 1.7f || Mathf.Abs(d.y) > 1.2f)
+                if (n.EndsWith(VeilmouthKitHouses.WalledUp) || !VeilmouthKitHouses.AtYardDoor(piece, new[] { marker.position }))
                 {
                     continue;
                 }
@@ -132,7 +125,7 @@ namespace GameDev.Slice.EditorTools
             if (wall != null)
             {
                 var plain = (GameObject)PrefabUtility.InstantiatePrefab(VicKitPaths.LoadModule("SM_Vic_Wall_Plain_2m"), model);
-                plain.name = "SM_Vic_Wall_Plain_2m (walled-up door)";
+                plain.name = "SM_Vic_Wall_Plain_2m" + VeilmouthKitHouses.WalledUp;
                 plain.transform.SetLocalPositionAndRotation(wall.localPosition, wall.localRotation);
                 plain.transform.localScale = wall.localScale;
                 var paint = wall.GetComponentsInChildren<MeshRenderer>(true).FirstOrDefault()?.sharedMaterials;

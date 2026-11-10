@@ -91,7 +91,9 @@ namespace GameDev.Slice.Tests
                 var scale = rooms.lossyScale.x;
                 foreach (var r in prefab.transform.Find("Model").GetComponentsInChildren<Renderer>(true))
                 {
-                    if (r.transform.IsChildOf(rooms) || !r.sharedMaterials.Any(m => m != null && m.shader != null && m.shader.name == WindowShader))
+                    // The far LOD's glass is the pieces' glass with the same material, so at any distance it hides as much.
+                    if (r.transform.IsChildOf(rooms) || r.transform.parent.name == VeilmouthFarLod.Name ||
+                        !r.sharedMaterials.Any(m => m != null && m.shader != null && m.shader.name == WindowShader))
                     {
                         continue;
                     }

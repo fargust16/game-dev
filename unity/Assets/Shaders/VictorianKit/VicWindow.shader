@@ -4,7 +4,8 @@
 // opaque toward a room by interior mapping, reached at _RoomFar, where the built rooms are culled.
 // A window's insert has its UV in metres: u = 0 at the pane's middle, v = 0 at the sill, 0.85 m above the storey floor;
 // the mapped room is the built room behind the pane when its house recorded it (VicWindowRooms, the renderer's shader
-// user value: its finish, depth, walls, floor and ceiling), else 2 m wide, 3 m high and _RoomDepth deep. The rest of a
+// user value: its finish, depth, walls, floor and ceiling; in a house's merged far LOD the same value rides in the mesh's
+// third UV channel), else 2 m wide, 3 m high and _RoomDepth deep. The rest of a
 // window's look comes from a hash of its own anchor,
 // the world point where its UV is zero, which static batching keeps. Premultiplied alpha: the colour is what the glass
 // adds, the alpha how much of the room behind it hides. It casts no shadow, so the sun falls into the rooms.
@@ -37,6 +38,9 @@ Shader "GameDev/VictorianKit/Window"
         _FloorTone("Built rooms: floor", Color) = (0.3, 0.22, 0.15, 1)
         _CeilingTone("Built rooms: ceiling", Color) = (0.75, 0.72, 0.66, 1)
         [HideInInspector] _Cutoff("Alpha cutoff", Range(0, 1)) = 0.5
+        // Set only on a house's merged far LOD glass (VeilmouthFarLod): its panes are opaque there, so it writes depth
+        // and a pane behind cannot draw over one before it, and each pane's room comes from the mesh.
+        [HideInInspector] _FarLod("Far LOD glass", Float) = 0
     }
 
     SubShader
@@ -55,7 +59,7 @@ Shader "GameDev/VictorianKit/Window"
             Name "ForwardLit"
             Tags { "LightMode" = "UniversalForward" }
             Cull Off
-            ZWrite Off
+            ZWrite [_FarLod]
             Blend One OneMinusSrcAlpha
 
             HLSLPROGRAM
@@ -82,11 +86,16 @@ Shader "GameDev/VictorianKit/Window"
                 float3 normalOS : NORMAL;
                 float4 tangentOS : TANGENT;
                 float2 texcoord : TEXCOORD0;
+                // A house's merged far LOD carries each pane's room here as its low and high 16 bits (VEILMOUTH_CITY_PLAN.md
+                // §29.10), as two UNorm16 values, since its one renderer has one user value. A kit pane has no such channel,
+                // and what a missing channel reads is undefined, so only the far LOD's glass (_FarLod) reads it.
+                float2 roomUV : TEXCOORD2;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
             {
+                nointerpolation float2 room : TEXCOORD6;
                 float2 uvPane : TEXCOORD0;
                 float2 uv : TEXCOORD1;
                 float3 positionWS : TEXCOORD2;
@@ -106,6 +115,7 @@ Shader "GameDev/VictorianKit/Window"
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
                 VertexPositionInputs p = GetVertexPositionInputs(input.positionOS.xyz);
                 VertexNormalInputs n = GetVertexNormalInputs(input.normalOS, input.tangentOS);
+                o.room = input.roomUV * 65535.0;
                 o.uvPane = input.texcoord;
                 o.uv = TRANSFORM_TEX(input.texcoord, _BaseMap);
                 o.positionWS = p.positionWS;
@@ -232,12 +242,16 @@ Shader "GameDev/VictorianKit/Window"
                 N = IS_FRONT_VFACE(face, N, -N);
                 float3 V = GetWorldSpaceNormalizeViewDir(input.positionWS);
 
-                // The window's anchor: the world point where its pane UV is zero, the same for all its fragments.
+                // The window's anchor: the world point where its pane UV is zero, the same for all its fragments. Its
+                // half-metre cell is offset by an odd sixty-fourth: the kit puts anchors on a sixteenth of a metre, and
+                // with +0.25 some lay on a cell's edge, where the last bit of a float chose the cell, so a house's far
+                // LOD could light another pane, or half of one (VEILMOUTH_CITY_PLAN.md §29.10).
                 float2 pane = input.uvPane;
                 float3 anchor = input.positionWS - pane.x * T - pane.y * B;
-                float h1 = Hash13(floor(anchor * 2.0 + 0.25) + 0.37);
-                float h2 = Hash13(floor(anchor * 2.0 + 0.25) + 5.11);
-                float h3 = Hash13(floor(anchor * 2.0 + 0.25) + 9.73);
+                float3 cell = floor(anchor * 2.0 + 0.28125);
+                float h1 = Hash13(cell + 0.37);
+                float h2 = Hash13(cell + 5.11);
+                float h3 = Hash13(cell + 9.73);
 
                 half4 mask = SAMPLE_TEXTURE2D(_MaskMap, sampler_BaseMap, input.uv);
                 half3 ripple = UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap, sampler_BaseMap, input.uv), _BumpScale);
@@ -292,7 +306,8 @@ Shader "GameDev/VictorianKit/Window"
                 if (far > 0.0)
                 {
                     float fade;
-                    half3 inside = MappedRoom(dir, pane, ReadRoom(unity_RendererUserValue, h1, h3), h2, night, lit, fade);
+                    uint merged = (uint)(input.room.x + 0.5) | ((uint)(input.room.y + 0.5) << 16);
+                    half3 inside = MappedRoom(dir, pane, ReadRoom(_FarLod > 0.5 ? merged : unity_RendererUserValue, h1, h3), h2, night, lit, fade);
                     inside = curtain ? curtainColor * (lerp(_RoomDay, 0.0, night) + _NightColor.rgb * (lit ? 0.6 : 0.0) * night) : inside;
                     inside = blindOn ? blindColor * lerp(_RoomDay, 0.0, night) : inside;
                     float reflectFar = saturate((0.08 + 0.92 * fresnel) * _Reflect);
