@@ -222,9 +222,22 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// Sets the grade's two profiles again from the code, with nothing else of the mystic layer rebuilt. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthMystic.Regrade
+        /// </summary>
+        public static void Regrade()
+        {
+            PostProfile();
+            TwilightProfile();
+            AssetDatabase.SaveAssets();
+            Debug.Log("[VeilmouthMystic] the grade's profiles set from the code.");
+        }
+
+        /// <summary>
         /// The grade under every hour (reference plan R3 step 7), graded in HDR: the Neutral tone mapper, colour taken down
         /// toward the reference's muted range, highlights warm and shadows a little cool, and bloom over the HDR highlights
-        /// only, so the gas flames and the lit windows glow. Authoring defaults.
+        /// only, so the gas flames and the lit windows glow. Saturation sits at the plan's richer end, −15 (it was −22
+        /// until the owner asked for richer views, 2026-11-10), with a little more contrast. Authoring defaults.
         /// </summary>
         private static VolumeProfile PostProfile()
         {
@@ -236,8 +249,8 @@ namespace GameDev.Slice.EditorTools
             var tone = Component<Tonemapping>(profile);
             tone.mode.Override(TonemappingMode.Neutral);
             var colour = Component<ColorAdjustments>(profile);
-            colour.saturation.Override(-22f);
-            colour.contrast.Override(6f);
+            colour.saturation.Override(-15f);
+            colour.contrast.Override(10f);
             colour.colorFilter.Override(Color.white);
             var split = Component<SplitToning>(profile);
             split.shadows.Override(new Color(0.45f, 0.49f, 0.55f));

@@ -282,12 +282,35 @@ namespace GameDev.Slice.EditorTools
         /// <summary>
         /// The city's green in sRGB, from the shadowed inside of a crown to its lit top, on the pack's own gradient
         /// (its middle key at 0.78, as the pack's): darker and greyer than the pack's teal and lime, a little greener
-        /// than the forest's olive, so it reads against the stone without shouting. Authoring defaults.
+        /// than the forest's olive, so it reads against the stone without shouting. Each key stays at or under about
+        /// 35 % saturation, as the warm noon light and the grade add six to nine points and the palette sheet allows
+        /// 40 % (2026-11-11, measured: a middle key of 46 % read 49 % on the sheet, one of 36 % read 42 %). Authoring defaults.
         /// </summary>
         private static readonly (Color Colour, float Time)[] CityGreen =
         {
-            (new Color(0.12f, 0.16f, 0.10f), 0f), (new Color(0.30f, 0.37f, 0.20f), 0.78f), (new Color(0.56f, 0.60f, 0.36f), 1f),
+            (new Color(0.12f, 0.155f, 0.10f), 0f), (new Color(0.31f, 0.355f, 0.24f), 0.78f), (new Color(0.56f, 0.60f, 0.40f), 1f),
         };
+
+        /// <summary>
+        /// The city leaves' gradient painted afresh into the copies that exist, in place, so every tree keeps its link.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthLook.RepaintCityGreen
+        /// </summary>
+        public static void RepaintCityGreen()
+        {
+            var painted = 0;
+            foreach (var (vendor, shade) in CityFoliage)
+            {
+                var copy = AssetDatabase.LoadAssetAtPath<Material>($"{CityFolder}/City {vendor}.mat");
+                if (copy != null)
+                {
+                    Paint(copy, shade);
+                    painted++;
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[VeilmouthLook] the city green repainted on {painted} leaf materials.");
+        }
 
         /// <summary>
         /// A copy of a pack leaf material with a gradient texture of its own, a 256 × 1 sRGB strip stored inside the copy
@@ -312,6 +335,14 @@ namespace GameDev.Slice.EditorTools
             Directory.CreateDirectory(CityFolder);
             copy = new Material(source) { name = "City " + vendor };
             AssetDatabase.CreateAsset(copy, path);
+            Paint(copy, shade);
+            AssetDatabase.SaveAssets();
+            return copy;
+        }
+
+        /// <summary>The city green, lightened or darkened by <paramref name="shade"/>, into the copy's own gradient strip, made on first use.</summary>
+        private static void Paint(Material copy, float shade)
+        {
             var keys = CityGreen.Select(k => (Colour: new Color(Mathf.Clamp01(k.Colour.r * shade), Mathf.Clamp01(k.Colour.g * shade), Mathf.Clamp01(k.Colour.b * shade), 1f), k.Time)).ToArray();
             var gradient = new Gradient();
             gradient.SetKeys(keys.Select(k => new GradientColorKey(k.Colour, k.Time)).ToArray(), new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(1f, 1f) });
@@ -319,19 +350,20 @@ namespace GameDev.Slice.EditorTools
             var json = "{\"mode\":0,\"colorKeys\":[" +
                        string.Join(",", keys.Select(k => $"{{\"color\":{{\"r\":{F(k.Colour.r)},\"g\":{F(k.Colour.g)},\"b\":{F(k.Colour.b)},\"a\":1.0}},\"time\":{F(k.Time)}}}")) +
                        "],\"alphaKeys\":[{\"alpha\":1.0,\"time\":0.0},{\"alpha\":1.0,\"time\":1.0}]}";
-            var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false, false)
+            var texture = AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GetAssetPath(copy)).OfType<Texture2D>().FirstOrDefault();
+            if (texture == null)
             {
-                name = "_Gradient_gradienttexture Texture" + json,
-                wrapMode = TextureWrapMode.Clamp,
-            };
+                texture = new Texture2D(256, 1, TextureFormat.ARGB32, false, false) { wrapMode = TextureWrapMode.Clamp };
+                AssetDatabase.AddObjectToAsset(texture, copy);
+            }
+
+            texture.name = "_Gradient_gradienttexture Texture" + json;
             texture.SetPixels(Enumerable.Range(0, 256).Select(x => gradient.Evaluate(x / 255f)).ToArray());
             texture.Apply(false, false);
-            AssetDatabase.AddObjectToAsset(texture, copy);
+            EditorUtility.SetDirty(texture);
             copy.SetTexture("_Gradient_gradienttexture", texture);
             copy.SetTexture("_TextureSample1", texture);
             EditorUtility.SetDirty(copy);
-            AssetDatabase.SaveAssets();
-            return copy;
         }
 
         private static int Swap(GameObject root, System.Collections.Generic.Dictionary<Material, Material> swaps)
