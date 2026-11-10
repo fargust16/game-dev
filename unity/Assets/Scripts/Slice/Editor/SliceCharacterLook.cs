@@ -139,10 +139,8 @@ namespace GameDev.Slice.EditorTools
                 return existing;
             }
 
-            // The A0 stand-in (ANIMATION_PIPELINE_PLAN.md): Kevin Iglesias' clips left the project (owner, 2026-11-10).
-            var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(SlicePeopleModels.ManIdle);
-            Directory.CreateDirectory(AnimatorFolder);
-            return AnimatorController.CreateAnimatorControllerAtPathWithClip(PersonIdlePath, clip);
+            // A standing person's controller on the Mixamo clips (ANIMATION_PIPELINE_PLAN.md A1).
+            return SliceMixamo.Person(PersonIdlePath, "Idle");
         }
 
         /// <summary>The pack's own idle, alone: no demo chain from one clip to the next.</summary>

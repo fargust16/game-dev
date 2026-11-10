@@ -31,7 +31,15 @@ namespace GameDev.Slice.Fights
         private const int Opponents = 2;
         private const float OpponentHeight = 1.8f; // m, a person (kit standard §3)
 
+        // The fight clips' parameters (ANIMATION_PIPELINE_PLAN.md A2), on the controllers SliceMixamo builds.
+        private static readonly int FightingHash = Animator.StringToHash("Fighting");
+        private static readonly int WeaponHash = Animator.StringToHash("Weapon");
+        private static readonly int AttackHash = Animator.StringToHash("Attack");
+        private static readonly int HitHash = Animator.StringToHash("Hit");
+        private static readonly int DownHash = Animator.StringToHash("Down");
+
         private readonly Dictionary<Combatant, Transform> _bodies = new Dictionary<Combatant, Transform>();
+        private readonly Dictionary<Transform, Animator> _animated = new Dictionary<Transform, Animator>();
         private readonly List<GameObject> _developmentOpponents = new List<GameObject>();
         private readonly List<CombatCell> _ring = new List<CombatCell>();
         private SliceSettings _settings;
@@ -69,6 +77,7 @@ namespace GameDev.Slice.Fights
             _lock.ConfrontStarted += OnStarted;
             _lock.ConfrontEnded += OnEnded;
             _turns.RoundEnded += OnRoundEnded;
+            _turns.Struck += OnStruck;
             _view = CombatGridView.Create(transform, settings.GridMaterial);
             _audio = gameObject.AddComponent<AudioSource>();
             _audio.playOnAwake = false;
@@ -170,8 +179,9 @@ namespace GameDev.Slice.Fights
             var playerBody = _player != null ? _player.transform : null;
             foreach (var pair in _bodies)
             {
-                // A fallen body lies down until the death clips of S3a.5.
-                if (pair.Key.Fighter.Down && pair.Value != null && pair.Value != playerBody && Vector3.Dot(pair.Value.up, Vector3.up) > 0.5f)
+                // A fallen body with no death clip lies down; one with a clip plays it (OnStruck).
+                if (pair.Key.Fighter.Down && pair.Value != null && pair.Value != playerBody && Animated(pair.Value) == null
+                    && Vector3.Dot(pair.Value.up, Vector3.up) > 0.5f)
                 {
                     pair.Value.rotation = Quaternion.LookRotation(Vector3.up, pair.Value.forward);
                 }
@@ -201,6 +211,11 @@ namespace GameDev.Slice.Fights
             _view.Show(_grid);
             _audio.PlayOneShot(_formed);
             _wait = TurnPause;
+            foreach (var pair in _bodies)
+            {
+                Guard(pair.Key, pair.Value, true);
+            }
+
             Debug.Log($"[Confront] fight {_fights} begins ({request.Reason}): {request.Combatants.Count} combatants, {_view.Cells} cells.");
         }
 
@@ -218,6 +233,7 @@ namespace GameDev.Slice.Fights
                 {
                     c.Position = fighter.transform.position;
                     _bodies[c] = fighter.transform;
+                    Guard(c, fighter.transform, true);
                     _turns.Join(c);
                 }
             }
@@ -232,6 +248,12 @@ namespace GameDev.Slice.Fights
                 _player.enabled = true;
             }
 
+            foreach (var pair in _bodies)
+            {
+                Guard(pair.Key, pair.Value, false);
+            }
+
+            _animated.Clear();
             foreach (var opponent in _developmentOpponents)
             {
                 if (opponent != null)
@@ -242,6 +264,109 @@ namespace GameDev.Slice.Fights
 
             _developmentOpponents.Clear();
             _bodies.Clear();
+        }
+
+        /// <summary>
+        /// A body into its guard by its weapon, or out of it, where its controller has the fight clips; one that is down
+        /// lies in its death. A body without them is noted as such, and Mirror lays it down when it falls.
+        /// </summary>
+        private void Guard(Combatant c, Transform body, bool fighting)
+        {
+            var animator = Animated(body);
+            if (animator == null)
+            {
+                return;
+            }
+
+            animator.SetFloat(WeaponHash, Motion(c.Fighter.Weapon));
+            animator.SetBool(DownHash, c.Fighter.Down);
+            animator.SetBool(FightingHash, fighting);
+        }
+
+        /// <summary>The attacker turns to its target and plays its blow or shot; the target its hit, or its death if it fell.</summary>
+        private void OnStruck(Combatant attacker, Combatant target, StrikeResult result)
+        {
+            if (!_bodies.TryGetValue(attacker, out var body) || body == null)
+            {
+                return;
+            }
+
+            var look = target.Position - attacker.Position;
+            look.y = 0f;
+            if (look.sqrMagnitude > 1e-4f)
+            {
+                if (_player != null && body == _player.transform)
+                {
+                    _player.Teleport(body.position, Quaternion.LookRotation(look));
+                }
+                else
+                {
+                    body.rotation = Quaternion.LookRotation(look);
+                }
+            }
+
+            var animator = Animated(body);
+            if (animator != null)
+            {
+                animator.SetFloat(WeaponHash, Motion(attacker.Fighter.Weapon));
+                animator.SetTrigger(AttackHash);
+            }
+
+            var struck = _bodies.TryGetValue(target, out var targetBody) ? Animated(targetBody) : null;
+            if (struck == null)
+            {
+                return;
+            }
+
+            if (target.Fighter.Down)
+            {
+                struck.SetBool(DownHash, true);
+            }
+            else if (result.Damage > 0d)
+            {
+                struck.SetTrigger(HitHash);
+            }
+        }
+
+        /// <summary>The body's Animator if its controller carries the fight clips' parameters, else null; looked up once a fight.</summary>
+        private Animator Animated(Transform body)
+        {
+            if (body == null)
+            {
+                return null;
+            }
+
+            if (!_animated.TryGetValue(body, out var animator))
+            {
+                animator = body.GetComponentInChildren<Animator>();
+                if (animator == null || animator.runtimeAnimatorController == null || !System.Array.Exists(animator.parameters, p => p.nameHash == DownHash))
+                {
+                    animator = null;
+                }
+
+                _animated[body] = animator;
+            }
+
+            return animator;
+        }
+
+        /// <summary>
+        /// The weapon's clips, 1 to 5 on the controllers' Weapon blend: sword, axe or mace (with a shield's guard),
+        /// greatsword, greataxe or maul, dagger, pistol, rifle.
+        /// </summary>
+        private static float Motion(FightWeapon weapon)
+        {
+            if (weapon == null)
+            {
+                return 1f;
+            }
+
+            if (weapon.Ranged)
+            {
+                return weapon.TwoHanded ? 5f : 4f;
+            }
+
+            return weapon.TwoHanded ? 2f : weapon.TakesShield ? 1f : 3f;
         }
 
         /// <summary>Two free cells the given distance from the player, as far apart as the ring gives, into <see cref="_ring"/>.</summary>

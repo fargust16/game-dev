@@ -206,14 +206,12 @@ namespace GameDev.Slice.EditorTools
         // ------------------------------------------------------------------------------------------- check
 
         /// <summary>
-        /// The clips every person is posed in: the Tripo woman's own idle and walk (Humanoid once she is), and a raised
-        /// one-handed blow from the DoubleL pack, there only to show the arms (a diagnostic, never shipped).
+        /// The Mixamo clips every person is posed in before they are wired (ANIMATION_PIPELINE_PLAN.md §7): the idle, the
+        /// walk at mid-stride, the talk, a sword's blow, the rifle's aim and the end of a death.
         /// </summary>
-        private static readonly (string Model, string Clip, float At)[] Poses =
+        private static readonly (string Use, float At)[] Poses =
         {
-            (ModelPath("historical_woman_3d_model"), "idle.001", 0.5f),
-            (ModelPath("historical_woman_3d_model"), "walk.001", 0.25f),
-            ("Assets/DoubleL/FBX Unity/One Hand Up/Attack_A/InPlace/1Hand_Up_Attack_A_1_InPlace.fbx", null, 0.45f),
+            ("Idle", 0.5f), ("Walk", 0.25f), ("Talk", 0.5f), ("SwordSlash", 0.45f), ("RifleIdle", 0.5f), ("Die", 0.97f),
         };
 
         [MenuItem("GameDev/Slice/People/Check the Tripo People's Rigs")]
@@ -225,8 +223,7 @@ namespace GameDev.Slice.EditorTools
             light.transform.rotation = Quaternion.Euler(40f, -30f, 0f);
             RenderSettings.ambientLight = new Color(0.55f, 0.55f, 0.55f);
 
-            var clips = Poses.Select(p => (Clip: AssetDatabase.LoadAllAssetsAtPath(p.Model).OfType<AnimationClip>()
-                .FirstOrDefault(c => !c.name.StartsWith("__preview") && (p.Clip == null || c.name == p.Clip)), p.At)).ToList();
+            var clips = Poses.Select(p => (Clip: SliceMixamo.Get(p.Use), p.At)).ToList();
             const int tile = 256;
             var muscles = new HashSet<string>(HumanTrait.MuscleName.Select(ClipMuscle));
             foreach (var (clip, _) in clips.Where(c => c.Clip != null))

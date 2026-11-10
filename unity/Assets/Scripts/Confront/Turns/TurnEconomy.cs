@@ -56,6 +56,8 @@ namespace GameDev.Confront.Turns
 
         public event Action<int> Ended;
 
+        public event Action<Combatant, Combatant, StrikeResult> Struck;
+
         public void BeginEncounter(IReadOnlyList<Combatant> combatants, Random rolls)
         {
             if (IsRunning)
@@ -394,11 +396,13 @@ namespace GameDev.Confront.Turns
             }
 
             ApLeft -= weapon.AttackAp;
-            _rules.Strike(c.Fighter, target.Fighter, new StrikeContext { Beyond = Distance(c.Cell, target.Cell) > 1 }, _rolls);
+            var result = _rules.Strike(c.Fighter, target.Fighter, new StrikeContext { Beyond = Distance(c.Cell, target.Cell) > 1 }, _rolls);
             if (target.Fighter.Down)
             {
                 _grid.Vacate(target.Id);
             }
+
+            Struck?.Invoke(c, target, result);
 
             CheckEnd();
             return true;

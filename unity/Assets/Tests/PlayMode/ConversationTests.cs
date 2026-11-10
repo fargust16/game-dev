@@ -48,6 +48,8 @@ namespace GameDev.Slice.Tests
             yield return Tap(Key.E);
 
             Assert.IsTrue(hud.IsDialogueOpen, "Interact opens the dialogue column");
+            var body = Object.FindObjectsByType<PersonTalk>(FindObjectsSortMode.None).Single(t => t.Dialogue.Id == "nell").GetComponentInChildren<Animator>();
+            Assert.IsTrue(body.GetBool("Talking"), "Nell plays her talk while the conversation is open");
             CollectionAssert.AreEqual(new[] { Loc.Get("tip.nell.harrow.line") }, hud.DialogueLines, "her evening tip, said on arriving");
             var options = hud.DialogueOptions;
             Assert.AreEqual(3, options.Count, string.Join(" | ", options));
@@ -70,6 +72,7 @@ namespace GameDev.Slice.Tests
 
             Assert.IsFalse(hud.IsDialogueOpen);
             Assert.IsFalse(world.Clock.IsPaused);
+            Assert.IsFalse(body.GetBool("Talking"), "and stops as it ends");
 
             yield return Tap(Key.J);
 

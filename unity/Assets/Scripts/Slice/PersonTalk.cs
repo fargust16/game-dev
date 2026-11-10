@@ -26,6 +26,8 @@ namespace GameDev.Slice
         /// <summary>A conversation numbers up to nine options, one for each number key.</summary>
         public const int MostOptions = 9;
 
+        private static readonly int TalkingHash = Animator.StringToHash("Talking");
+
         [SerializeField] private DialogueDefinition dialogue;
 
         [Tooltip("Authoring default, m: horizontal reach from the person.")]
@@ -70,7 +72,12 @@ namespace GameDev.Slice
 
             _history.Clear();
             _talk = world.Talk(dialogue);
-            _talk.Ended += _ => Hud()?.CloseDialogue();
+            _talk.Ended += _ =>
+            {
+                Hud()?.CloseDialogue();
+                Talking(false);
+            };
+            Talking(true);
             Hear();
             Show();
         }
@@ -239,6 +246,16 @@ namespace GameDev.Slice
         {
             Loc.Changed -= Show;
             Leave();
+        }
+
+        /// <summary>The person's body plays its talk while the conversation is open, where its controller has one (ANIMATION_PIPELINE_PLAN.md A1).</summary>
+        private void Talking(bool on)
+        {
+            var animator = GetComponentInChildren<Animator>();
+            if (animator != null && animator.runtimeAnimatorController != null && animator.parameters.Any(p => p.nameHash == TalkingHash))
+            {
+                animator.SetBool(TalkingHash, on);
+            }
         }
 
         private HudView Hud()

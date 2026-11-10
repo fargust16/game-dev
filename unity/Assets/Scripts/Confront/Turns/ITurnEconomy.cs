@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GameDev.Confront.Grid;
+using GameDev.Confront.Rules;
 using Random = System.Random;
 
 namespace GameDev.Confront.Turns
@@ -79,5 +80,8 @@ namespace GameDev.Confront.Turns
 
         /// <summary>Raised once when the encounter ends, with the side left standing or −1.</summary>
         event Action<int> Ended;
+
+        /// <summary>Raised after each attack with the attacker, its target and what the blow did, before the end is checked.</summary>
+        event Action<Combatant, Combatant, StrikeResult> Struck;
     }
 }
