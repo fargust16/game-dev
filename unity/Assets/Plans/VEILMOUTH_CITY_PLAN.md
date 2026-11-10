@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4, C5)
 
-Version: 0.56
+Version: 0.57
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§29: C5, the owner's map cut into blocks: a pavement along every road, unbroken carriageways, rectangular blocks with houses flush round small yards, rich yards as parks and poor ones in mud and rubbish, the market round the statue on a smaller island, the port's joint, about 155 buildings in the same walls, GPU occlusion culling part of the work; the agent's readings and the steps)
+Last Updated: 2026-11-10 (§29.4: C5's plan from one source: 154 buildings in 23 blocks with 26 passages, corner owners searched, 15 m terrace and low tenement, Cold Shoulder a 12 m street, the cathedral 8 m south, the Penny and Bawling Row, fifteen new folk names)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1743,3 +1743,81 @@ As C4 was (§28.1 item 20), C5 is built step by step without stops, each step en
 6. the slice's places on C5: people, dogs, POIs, the mystic layer, reflections, and the tests;
 7. the GPU Resident Drawer and GPU occlusion culling, measured before and after;
 8. the cold load, the views and the documents.
+
+## 29.4 The plan, 2026-11-10
+
+C5 has one source, `tools/slice/veilmouth_c5_plan.py`. It writes three files from one table: the builder's layout `Data/Slice/Map/VeilmouthC5Layout.json`, the plan `VEILMOUTH_CITY_PLAN_C5.svg`, and the player's map `Data/Slice/Map/VeilmouthC5Plan.xml`. With `--png` it also draws a preview. It stops with an error when:
+
+- two buildings overlap;
+- a gap between two buildings on one line is between 0 and 4 m (R5);
+- a building stands outside its block or in its notch;
+- a side cannot be filled.
+
+The builder still reads C4 until step 3 switches it.
+
+**As planned.** There are 154 buildings inside the walls and in the works, against the owner's about 155:
+
+- 124 row houses, 73 of them with a faced end;
+- 15 single buildings;
+- 15 works sheds.
+
+They stand in 23 blocks, with 26 passages into the yards, 4–13 m wide. The village keeps its 8 cottages outside the walls.
+
+| Kind of block | Blocks |
+|---|---|
+| rich | 5 |
+| middling | 5 |
+| poor | 5 |
+| works | 6 |
+| cemetery | 1 |
+| close | 1 |
+
+Readings that changed from §29.2 while the plan was solved (authoring defaults):
+
+- **Corners are searched, not ranked.** Every combination of a block's corner owners is tried, and the best is kept. The order of preference:
+  1. no broken rule;
+  2. one or two ways into the yard;
+  3. a yard with a way in;
+  4. the fewest corners given to the lower street;
+  5. the least ground left as passages.
+
+  A single building never takes a flush join. An end that no house can reach becomes a passage beside the corner house's back wall.
+- **Two 15 m row houses join the kit**, because 10 m fronts alone left runs of 21, 25 and 42 m that nothing could fill:
+  - *Terrace12*, brick or stock;
+  - *TenementLow12*, poor.
+
+  Both are baked in step 4.
+- **Cold Shoulder, inside the west wall, is a 12 m street (3 + 6 + 3)**, not a lane, so the west blocks are 40 m deep. Crows' Walk is the lane inside the north wall.
+- **The cathedral moves 8 m south** to clear Crows' Walk. Its close stays one block with Bishop's Garden, Quiet Whistle Garden, Drowsy Steps and the faction's house, a stucco villa facing south.
+- **The Penny** is 52 m square (514–566 × 414–466).
+  - Its ring carriageway runs from 13 m to 21 m from the centre.
+  - The island has a 13 m radius. Stone Grandad, 12 m high, stands on a plinth of 4 m radius.
+  - *Bawling Row* is 12 stalls, 3 × 2 m, on a 9 m radius, facing the road.
+  - The four civic buildings fill the L-blocks' main-street sides up to the notch: the Town Hall and the Governor's House face each other across Long Tongue, and the Assize and the guild hall across Salt Gullet.
+  - The clock tower stands free behind the Town Hall, in its block's yard.
+- **The Customs House** stands at E2A's north-east corner, facing the quay.
+- **The Brothers' House** is two ranges, north and west, round the garth, with a free bell tower. Town houses close the block's east side.
+- **E1C has three ways into its yard.** The Soot & Bell and Harrow are single buildings, so passages open beside them. The rule asks for one or two; this exception is accepted.
+- **The works.** Each works block holds two sheds 14 m deep. ES2 is a ring of five boxes round Deaf Boiler Yard, whose one way in is 6 m wide off Clinker Road.
+
+**New folk names** (`map.csv`), in Russian and English:
+
+| English | Russian |
+|---|---|
+| Crows' Walk | Воронья Тропа |
+| Cold Shoulder | Холодное Плечо |
+| Spade Lane | Лопатный переулок |
+| Thimble Street | Напёрсточная улица |
+| Nettle Street | Крапивная улица |
+| Button Lane | Пуговичный переулок |
+| Tar Row | Смоляной Ряд |
+| Ash Bank | Пепельный Берег |
+| Cinder Lane | Переулок Окалины |
+| Coughing Lane | Кашляющий переулок |
+| Brine Lane | Рассольный переулок |
+| Bellows Lane | Переулок Мехов |
+| Kettle Lane | Котелковый переулок |
+| Bawling Row | Горластый Ряд |
+| Guild Hall | Гильдейский дом |
+
+C4's Bawling Square and Squint Lane stay in the table until step 6 moves their references.
