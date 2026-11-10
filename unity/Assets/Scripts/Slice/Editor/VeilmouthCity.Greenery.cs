@@ -28,9 +28,9 @@ namespace GameDev.Slice.EditorTools
         // §25.4: one grass clump in each 2 × 2 m of a garden's earth.
         private const int LawnStep = 2;
 
-        // §25.5: farm yards 10 m deep with a 4 m way in, a vegetable bed of 6 × 4 m beside each, dry-stone walls 6 m
-        // off the roads' middles with a 3 m gap every 33 m, and a post on a verge every 40 m.
-        private const int YardDepth = 10, WallGapEvery = 33, PostEvery = 40;
+        // §25.5: farm yards 10 m deep with a 4 m way in, a vegetable bed of 6 × 4 m beside each, and a post on a verge
+        // every 40 m.
+        private const int YardDepth = 10, PostEvery = 40;
 
         // §27.10 (owner, 2026-11-10): the owner's mature tree along every road, Crown Avenue's mall with them; Veilmouth's
         // earlier trees stay in the parks, the rich houses' gardens and the palace forecourt's corners.
@@ -56,10 +56,6 @@ namespace GameDev.Slice.EditorTools
         private static readonly string[] FieldFences = { "FieldFenceA", "FieldFenceB", "FieldFenceC" };
         private static readonly string[] PlankFences = { "PlankFenceA", "PlankFenceB", "PlankFenceC" };
         private static readonly string[] BedFences = { "BedFenceA", "BedFenceB" };
-
-        /// <summary>The farms outside the walls (§3.8): the plan point of each, and the way its front faces.</summary>
-        private static readonly (float Px, float Py, Facing F)[] Farms =
-            { (150f, 640f, Facing.S), (200f, 700f, Facing.N), (110f, 705f, Facing.N), (230f, 600f, Facing.E) };
 
         /// <summary>A road's tree's crown yaw, degrees, for a road along plan x (else along plan y) at its plan point.</summary>
         private static float RoadYaw(bool alongX, Vector2 c)
@@ -180,58 +176,6 @@ namespace GameDev.Slice.EditorTools
 
         // ------------------------------------------------------------------------------------------- outside the walls
 
-        /// <summary>Roadside Tales by meaning (§25.5): the farms' yards and beds, dry-stone walls and posts by the roads.</summary>
-        private static void Roadside()
-        {
-            var rng = new Random(2525); // authoring layout only, fixed; never the world seed
-            foreach (var (px, py, f) in Farms)
-            {
-                FarmYard(px, py, f, rng);
-            }
-
-            // The West road (py 735, its soil 4 m either side) by the farms' fields, and the North road (px 747) across
-            // the open land between the forest and the North Gate; a gap toward the flax field.
-            var walls = 0;
-            walls += Wall(true, 729f, 70, 250, rng, a => false);
-            walls += Wall(true, 741f, 90, 262, rng, a => a + 3 > 175 && a < 181);
-            walls += Wall(false, 741f, 470, 602, rng, a => false);
-            walls += Wall(false, 753f, 470, 602, rng, a => false);
-
-            var posts = 0;
-            for (var px = 70; px < 462; px += PostEvery)
-            {
-                posts += Prop("RoadPost", Facing.N, px, 739f) != null ? 1 : 0;
-            }
-
-            for (var py = 80; py < 606; py += PostEvery)
-            {
-                posts += Prop("RoadPost", Facing.N, 742f, py) != null ? 1 : 0;
-            }
-
-            Debug.Log($"[VeilmouthCity] roadside (§25.5): {walls} wall pieces, {posts} posts, {Farms.Length} farm yards.");
-        }
-
-        /// <summary>
-        /// A dry-stone wall on a grid line, a piece every 3 m, with a 3 m gap every <see cref="WallGapEvery"/> m and where
-        /// <paramref name="gap"/> says.
-        /// </summary>
-        private static int Wall(bool alongX, float line, int a0, int a1, Random rng, Func<int, bool> gap)
-        {
-            var placed = 0;
-            for (var a = a0; a + 3 <= a1; a += 3)
-            {
-                if ((a - a0) % WallGapEvery >= WallGapEvery - 3 || gap(a))
-                {
-                    continue;
-                }
-
-                var go = alongX ? Prop("RoadWall", Facing.N, a, line - 0.1f, force: true) : Prop("RoadWall", Facing.E, line - 0.1f, a, force: true);
-                placed += go != null ? 1 : 0;
-            }
-
-            return placed;
-        }
-
         /// <summary>
         /// A farm's yard before its front, fenced with planks on three sides with a way in of 4 m before the door, and a
         /// vegetable bed fenced beside it (§25.5).
@@ -308,16 +252,20 @@ namespace GameDev.Slice.EditorTools
         // ------------------------------------------------------------------------------------------- the rebuild
 
         /// <summary>
-        /// Batch only (§25.6): the city built again on its present ground with its greenery, the passes beside its root,
-        /// then POI A's and POI B's stages and the next day's residue placed again, since they stood among the old
-        /// walkers and on the old kerb line, and the greenery's views. Batch:
-        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthCity.RebuildGreenery -lookLabel green
+        /// Batch only (§25.6): since C4 (§28.10) the whole chain is <see cref="RebuildStreets"/>, which stages the POIs and
+        /// places the residue again itself. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthCity.RebuildGreenery
         /// </summary>
-        public static void RebuildGreenery()
+        public static void RebuildGreenery() => RebuildStreets();
+
+        /// <summary>
+        /// POI A's and POI B's stages and the next day's residue placed again, since they stood among the old walkers and on
+        /// the old streets; C3's residue under its old street names goes with them.
+        /// </summary>
+        private static void Restage()
         {
-            RebuildStreets();
             var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, UnityEditor.SceneManagement.OpenSceneMode.Single);
-            var stale = new[] { SlicePoiStages.PoiAStage, SlicePoiStages.PoiBStage, SliceResidue.SealedName, SliceResidue.PairsName, SliceResidue.FearName };
+            var stale = new[] { SlicePoiStages.PoiAStage, SlicePoiStages.PoiBStage, SliceResidue.SealedName, SliceResidue.PairsName, SliceResidue.FearName }
+                .Concat(SliceResidue.OldNames).ToArray();
             foreach (var old in scene.GetRootGameObjects().Where(g => stale.Contains(g.name)).ToList())
             {
                 Object.DestroyImmediate(old);
@@ -328,7 +276,6 @@ namespace GameDev.Slice.EditorTools
             SlicePoiStages.StagePoiA();
             SlicePoiStages.StagePoiB();
             SliceResidue.PlaceAll();
-            VeilmouthRenders.RenderGreenery();
         }
     }
 }

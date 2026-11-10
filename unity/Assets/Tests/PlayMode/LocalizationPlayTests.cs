@@ -87,14 +87,14 @@ namespace GameDev.Slice.Tests
             var map = root.Q<VisualElement>("map");
             yield return new WaitForSeconds(0.2f);
             Assert.AreEqual(tables.Get("ui.hud.map.title", Loc.English), map.Q<Label>(className: "hud__notes-title").text);
-            CollectionAssert.Contains(PlanWords(map), "Loom Lane");
+            CollectionAssert.Contains(PlanWords(map), "Draught Lane");
 
             yield return Tap(Key.F10);
             yield return null;
 
             Assert.AreEqual(tables.Get("ui.hud.map.title", Loc.Russian), map.Q<Label>(className: "hud__notes-title").text);
-            CollectionAssert.Contains(PlanWords(map), tables.Get("map.loom_lane", Loc.Russian), "the plan's names follow the language");
-            CollectionAssert.DoesNotContain(PlanWords(map), "Loom Lane");
+            CollectionAssert.Contains(PlanWords(map), tables.Get("map.draught_lane", Loc.Russian), "the plan's names follow the language");
+            CollectionAssert.DoesNotContain(PlanWords(map), "Draught Lane");
             foreach (var poi in world.Director.Pois)
             {
                 Assert.IsFalse(hud.MapMarks.Any(m => m.Label.StartsWith(tables.Get(poi.TitleKey, Loc.English))), $"{poi.Id}: a mark's words follow the language");

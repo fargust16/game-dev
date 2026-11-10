@@ -36,8 +36,8 @@ namespace GameDev.Slice.Tests
 
         // The residue SliceResidue placed, by name.
         private const string Sealed = "Residue - Harrow & Tincture sealed";
-        private const string Pairs = "Residue - Warden pairs on Bell Street";
-        private const string Fear = "Residue - Fear on Loom Lane";
+        private const string Pairs = "Residue - Warden pairs on the Black Puddle";
+        private const string Fear = "Residue - Fear on Draught Lane";
         private string _language;
         private IDisposable _hold;
 
@@ -108,11 +108,11 @@ namespace GameDev.Slice.Tests
             AdvanceTo(world, NextMorning);
             Release();
             yield return null;
-            Assert.IsTrue(Residue(Pairs).IsShowing, "Warden pairs on Bell Street the next morning");
+            Assert.IsTrue(Residue(Pairs).IsShowing, "Warden pairs on the Black Puddle the next morning");
             Assert.IsTrue(Residue(Pairs).Shows.All(o => o.activeSelf));
-            Assert.IsFalse(Residue(Fear).IsShowing, "the girls went free: no fear on Loom Lane");
+            Assert.IsFalse(Residue(Fear).IsShowing, "the girls went free: no fear on Draught Lane");
 
-            // Kit on the Market square first, far enough for the night's scenes to have gone.
+            // Kit on Bawling Square first, far enough for the night's scenes to have gone.
             yield return TalkTo(player, "kit");
             CollectionAssert.Contains(hud.DialogueLines, Loc.Get("tip.kit.seal.line"), "Kit's day-2 rumour follows the seal");
             yield return Tap(Key.Escape);

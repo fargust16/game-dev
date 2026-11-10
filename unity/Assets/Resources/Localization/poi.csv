@@ -7,16 +7,16 @@ poi.b.urgency,tonight,сегодня ночью
 poi.c.title,Soot Stair Trace,След на Сажной лестнице
 poi.c.urgency,before the rain,до дождя
 "# The tips (TipCatalogue): tip.<id>.line, what the source says, and .note, the fact in the character's own words"
-tip.board.girls.line,"MISSING. Mill girls, gone near Loom Lane. The paper's edges are greased by sooty thumbs.","ПРОПАЛИ. Фабричные девушки, близ Ткацкого переулка. Края листка засалены закопчёнными пальцами."
-tip.board.girls.note,A notice on the board: mill girls have gone missing near Loom Lane.,Объявление на доске: близ Ткацкого переулка пропадают фабричные девушки.
+tip.board.girls.line,"MISSING. Mill girls, gone near Draught Lane. The paper's edges are greased by sooty thumbs.","ПРОПАЛИ. Фабричные девушки, близ переулка Сквозняк. Края листка засалены закопчёнными пальцами."
+tip.board.girls.note,A notice on the board: mill girls have gone missing near Draught Lane.,Объявление на доске: близ переулка Сквозняк пропадают фабричные девушки.
 tip.board.wren.line,"MISSING. Thomas Wren, clerk at the mill. Any word to his sister, Lottie Wren, at the Soot & Bell.","ПРОПАЛ. Томас Рен, конторщик с фабрики. Любые вести — его сестре, Лотти Рен, в «Сажу и Колокол»."
 tip.board.wren.note,"Thomas Wren, a clerk at the mill, is missing. His sister Lottie posted the notice.","Пропал Томас Рен, конторщик с фабрики. Объявление повесила его сестра Лотти."
-tip.board.seizure.line,"WARDEN SEIZURE NOTICE. Harrow & Tincture, Bell Street, before the second-shift bell. By order, brass number 14.","ПРЕДПИСАНИЕ СТРАЖИ ОБ ИЗЪЯТИИ. «Харроу и Тинктура», Колокольная улица, до колокола второй смены. По приказу, медный номер 14."
-tip.board.seizure.note,"The Wardens posted a seizure notice for Harrow & Tincture on Bell Street, to be done before the second-shift bell.",Стража вывесила предписание об изъятии в «Харроу и Тинктуре» на Колокольной улице — до колокола второй смены.
+tip.board.seizure.line,"WARDEN SEIZURE NOTICE. Harrow & Tincture, Black Puddle, before the second-shift bell. By order, brass number 14.","ПРЕДПИСАНИЕ СТРАЖИ ОБ ИЗЪЯТИИ. «Харроу и Тинктура», Чёрная Лужа, до колокола второй смены. По приказу, медный номер 14."
+tip.board.seizure.note,"The Wardens posted a seizure notice for Harrow & Tincture on the Black Puddle, to be done before the second-shift bell.",Стража вывесила предписание об изъятии в «Харроу и Тинктуре» на Чёрной Луже — до колокола второй смены.
 tip.nell.harrow.line,"Brass-numbers are taking old Harrow tonight. Say he sold black tincture to mill hands. If you care, go before the whistle. After that it's paperwork and padlocks.","Медные номера сегодня берут старого Харроу. Говорят, продавал фабричным чёрную тинктуру. Если тебе не всё равно — иди до гудка. После него одни бумаги да замки."
 tip.nell.harrow.note,"Nell says the Wardens mean to take old Harrow tonight, for selling black tincture to mill hands.","Нелл говорит, Стража сегодня собирается взять старого Харроу — за то, что продавал фабричным чёрную тинктуру."
-tip.nell.collectors.line,After the eleventh bell they take mill girls off Loom Lane. Tonight again.,После одиннадцатого колокола с Ткацкого переулка уводят фабричных девушек. Сегодня опять.
-tip.nell.collectors.note,Nell says mill girls are taken off Loom Lane after the eleventh bell.,"Нелл говорит, после одиннадцатого колокола с Ткацкого переулка уводят фабричных девушек."
+tip.nell.collectors.line,After the eleventh bell they take mill girls off Draught Lane. Tonight again.,После одиннадцатого колокола из переулка Сквозняк уводят фабричных девушек. Сегодня опять.
+tip.nell.collectors.note,Nell says mill girls are taken off Draught Lane after the eleventh bell.,"Нелл говорит, после одиннадцатого колокола из переулка Сквозняк уводят фабричных девушек."
 tip.nell.chalk.line,Lane's wrong. Coal stairs got fresh chalk. Rain'll wash it by midweek.,Не в переулке дело. На угольной лестнице свежий мел. К середине недели дождём смоет.
 tip.nell.chalk.note,Nell says there is fresh chalk on the coal stairs.,"Нелл говорит, на угольной лестнице свежий мел."
 tip.kit.drawers.line,They want the drawers more than the man.,"Им ящики нужнее, чем сам человек."
@@ -25,8 +25,8 @@ tip.kit.coachcoats.line,Collectors in coach-coats. Not proper cabmen.,Сборщ
 tip.kit.coachcoats.note,"The newsboy talks of collectors in coach-coats, not proper cabmen.",Газетчик говорит о сборщиках в кучерских пальто — не настоящих извозчиках.
 tip.kit.seal.line,Wax seal melted funny on Harrow's door.,Сургучная печать на двери Харроу странно оплыла.
 tip.kit.seal.note,The newsboy says the wax seal on Harrow's door melted oddly.,"Газетчик говорит, сургучная печать на двери Харроу странно оплыла."
-tip.kit.glove.line,"Glove by the coach ruts, down Loom Lane.","Перчатка у каретной колеи, внизу Ткацкого переулка."
-tip.kit.glove.note,The newsboy says there was a glove by the coach ruts on Loom Lane.,"Газетчик говорит, у каретной колеи на Ткацком переулке лежала перчатка."
+tip.kit.glove.line,"Glove by the coach ruts, down Draught Lane.","Перчатка у каретной колеи, внизу переулка Сквозняк."
+tip.kit.glove.note,The newsboy says there was a glove by the coach ruts on Draught Lane.,"Газетчик говорит, у каретной колеи в переулке Сквозняк лежала перчатка."
 "# Nell's talk the next day, by what happened (S2.7): residue, read from the world state, pointing to no POI"
 tip.nell.harrow_open.line,"Harrow had his shutters up by seven. The mill mothers queue for his cough draught and say a stranger stood up to the brass-numbers.","Харроу поднял ставни к семи. Фабричные матери стоят в очереди за его микстурой от кашля и говорят, что какой-то чужак заступился перед медными номерами."
 tip.nell.harrow_open.note,"Harrow's shop is open again, and the street credits a stranger for it.","Лавка Харроу снова открыта, и улица благодарит за это какого-то чужака."
@@ -34,9 +34,9 @@ tip.nell.harrow_sealed.line,"Brass seal on Harrow's door. The mill mothers pay t
 tip.nell.harrow_sealed.note,The Wardens sealed Harrow's shop; cough draughts cost twice as much at the market.,Стража опечатала лавку Харроу; микстура от кашля на рынке стоит вдвое дороже.
 tip.nell.harrow_gone.line,"Harrow went out his back door with his drawers. Glass all over his floor, and nobody left to sell a cough draught.","Харроу ушёл через чёрный ход вместе со своими ящиками. Весь пол в стекле, и микстуру продать некому."
 tip.nell.harrow_gone.note,"Harrow fled out the back with his drawers, leaving broken glass.","Харроу сбежал через чёрный ход с ящиками, оставив битое стекло."
-tip.nell.lane_freed.line,"The Loom Lane girls walked to the early shift in threes this morning. Somebody stood up for them last night.","Девушки с Ткацкого переулка шли сегодня на раннюю смену по трое. Кто-то вступился за них ночью."
-tip.nell.lane_freed.note,"Someone saved the mill girls on Loom Lane; they now walk to work in threes.","Кто-то спас фабричных девушек на Ткацком переулке; теперь они ходят на работу по трое."
-tip.nell.lane_taken.line,"Another girl gone off Loom Lane. Half the early shift stayed home behind their shutters.","С Ткацкого переулка пропала ещё одна девушка. Половина ранней смены осталась дома за ставнями."
-tip.nell.lane_taken.note,"The collectors took a girl off Loom Lane; the lane's women stay home in fear.","Сборщики увели девушку с Ткацкого переулка; женщины переулка в страхе сидят по домам."
-tip.nell.lane_spoiled.line,"Brass-numbers came running down Loom Lane in the night. The collectors scattered, and so did the girls.","Ночью по Ткацкому переулку прибежали медные номера. Сборщики разбежались, а с ними и девушки."
-tip.nell.lane_spoiled.note,"The Wardens broke up the collectors on Loom Lane, but the trail went cold.","Стража разогнала сборщиков на Ткацком переулке, но след остыл."
+tip.nell.lane_freed.line,"The Draught Lane girls walked to the early shift in threes this morning. Somebody stood up for them last night.","Девушки из переулка Сквозняк шли сегодня на раннюю смену по трое. Кто-то вступился за них ночью."
+tip.nell.lane_freed.note,"Someone saved the mill girls on Draught Lane; they now walk to work in threes.","Кто-то спас фабричных девушек в переулке Сквозняк; теперь они ходят на работу по трое."
+tip.nell.lane_taken.line,"Another girl gone off Draught Lane. Half the early shift stayed home behind their shutters.","Из переулка Сквозняк пропала ещё одна девушка. Половина ранней смены осталась дома за ставнями."
+tip.nell.lane_taken.note,"The collectors took a girl off Draught Lane; the lane's women stay home in fear.","Сборщики увели девушку из переулка Сквозняк; женщины переулка в страхе сидят по домам."
+tip.nell.lane_spoiled.line,"Brass-numbers came running down Draught Lane in the night. The collectors scattered, and so did the girls.","Ночью по переулку Сквозняк прибежали медные номера. Сборщики разбежались, а с ними и девушки."
+tip.nell.lane_spoiled.note,"The Wardens broke up the collectors on Draught Lane, but the trail went cold.","Стража разогнала сборщиков в переулке Сквозняк, но след остыл."

@@ -8,13 +8,11 @@ using UnityEngine;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// The owner's garden ornaments in Veilmouth (2026-11-08, city plan §23): three different angels, each in a green place
-    /// in another part of the city (Wardley Garden, where the plan asks for "a fountain or a statue" in a square, §6.1,
-    /// in place of the garden's middle tree; the old chapel's graveyard; the east villa's garden on the Ridge); a pair of
-    /// great lions before the Governor's Palace, the crown's power at the head of the avenue; stone
-    /// birdbaths in the gardens of the villas, the faction's house, the detached houses and Wardley Garden. The scene is
-    /// the owner's, so this pass touches only its own group, `Ornaments`, and that one tree; run again, it replaces its
-    /// own group. Each ornament takes the grid node nearest its wished centre whose footprint lies in its place, on even
+    /// The owner's garden ornaments in Veilmouth (2026-11-08, city plan §23, placed on C4 by §28.10): three different
+    /// angels, each in a green place in another part of the city (Bishop's Garden, Last Turning Cemetery, the west villa's
+    /// garden on Widows' Row); a pair of great lions before the Governor's House on the Penny, the crown's power facing the
+    /// square; stone birdbaths in Bishop's Garden and the front gardens of the faction's house and the detached houses.
+    /// The scene is the owner's, so this pass touches only its own group, `Ornaments`; run again, it replaces its own group. Each ornament takes the grid node nearest its wished centre whose footprint lies in its place, on even
     /// ground, with <see cref="Clear"/> free all round for walking. Then each is rendered from the front.
     /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthOrnaments.Place
     /// </summary>
@@ -30,26 +28,52 @@ namespace GameDev.Slice.EditorTools
 
         // (key, wished centre px, py, its place px0, py0, px1, py1 (the footprint stays inside), quarter turns, name).
         // Every model faces +Z (north, toward the smaller py), as the renders show: no turn faces north, two face south.
-        // The lions lie along X with the head at the east end, so turned twice the head is west, looking down the avenue.
-        private static readonly (string Key, float Px, float Py, int X0, int Y0, int X1, int Y1, int Turns, string Name)[] Spots =
+        // City plan C4 (§28.10): Bishop's Garden's middle walk, the cemetery, the west villa's side garden on Widows' Row,
+        // and the front gardens of the faction's house and the detached houses.
+        private static readonly (string Key, float Px, float Py, int X0, int Y0, int X1, int Y1, int Turns, string Name)[] Fixed =
         {
-            ("AngelStatue", 557.5f, 697f, 557, 696, 558, 698, 0, "Angel fountain, Wardley Garden"),
-            // City plan C3 (§24.3): the villas' side gardens north of the Parade, the forecourt either side of the Crown
-            // Axis (px 612), and the Terraces' plots of 16 m.
-            ("AngelStatueB", 512f, 646f, 503, 629, 529, 649, 0, "Angel, the old chapel's graveyard"),
-            ("AngelStatueC", 734f, 655f, 731, 640, 737, 661, 2, "Angel, the east villa's garden"),
-            ("LionStatue", 602f, 657f, 588, 651, 609, 666, 2, "Lion, the palace forecourt (west)"),
-            ("LionStatue", 622f, 657f, 615, 651, 636, 666, 2, "Lion, the palace forecourt (east)"),
-            ("Birdbath", 533f, 655f, 531, 640, 535, 661, 0, "Birdbath, Ridge villa (west)"),
-            ("Birdbath", 582.5f, 655f, 580, 640, 585, 661, 0, "Birdbath, Ridge villa (stucco)"),
-            ("Birdbath", 643f, 655f, 639, 640, 648, 661, 0, "Birdbath, the faction's garden"),
-            ("Birdbath", 680f, 655f, 677, 640, 683, 661, 0, "Birdbath, Ridge villa (white)"),
-            ("Birdbath", 711f, 655f, 708, 640, 714, 661, 0, "Birdbath, Ridge villa (east)"),
-            ("Birdbath", 507f, 698.5f, 501, 697, 515, 700, 0, "Birdbath, detached house (west)"),
-            ("Birdbath", 537f, 698.5f, 529, 697, 543, 700, 0, "Birdbath, detached house (east)"),
-            ("Birdbath", 550f, 698f, 546, 686, 556, 710, 0, "Birdbath, Wardley Garden (west)"),
-            ("Birdbath", 566f, 698f, 560, 686, 569, 710, 0, "Birdbath, Wardley Garden (east)"),
+            ("AngelStatue", 491.5f, 330f, 482, 312, 501, 348, 2, "Angel, Bishop's Garden"),
+            ("AngelStatueB", 459f, 298f, 441, 263, 477, 333, 2, "Angel, Last Turning Cemetery"),
+            ("AngelStatueC", 459f, 386f, 457, 374, 489, 398, 0, "Angel, the west villa's garden"),
+            ("Birdbath", 491.5f, 300f, 482, 290, 501, 310, 0, "Birdbath, Bishop's Garden"),
+            ("Birdbath", 585f, 343f, 581, 341, 613, 345, 0, "Birdbath, the faction's garden"),
+            ("Birdbath", 425f, 375f, 423, 374, 437, 377, 0, "Birdbath, Widows' Row detached house (west)"),
+            ("Birdbath", 441f, 375f, 439, 374, 453, 377, 0, "Birdbath, Widows' Row detached house (east)"),
+            ("Birdbath", 425f, 528f, 423, 526, 445, 529, 0, "Birdbath, embankment house (1)"),
+            ("Birdbath", 449f, 528f, 447, 526, 469, 529, 0, "Birdbath, embankment house (2)"),
+            ("Birdbath", 473f, 528f, 471, 526, 493, 529, 0, "Birdbath, embankment house (3)"),
+            ("Birdbath", 497f, 528f, 495, 526, 518, 529, 0, "Birdbath, embankment house (4)"),
         };
+
+        /// <summary>
+        /// Every ornament's place: the fixed ones, and the pair of great lions either side of the Governor's House's door on
+        /// the Penny, 3 m before its front, the crown's power facing the square. A lion lies along X with its head at the
+        /// east end, so three quarter turns put the head north.
+        /// </summary>
+        private static IEnumerable<(string Key, float Px, float Py, int X0, int Y0, int X1, int Y1, int Turns, string Name)> Spots()
+        {
+            foreach (var spot in Fixed)
+            {
+                yield return spot;
+            }
+
+            var governor = Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+                .FirstOrDefault(t => t.name == "The Governor's House");
+            if (governor == null)
+            {
+                Debug.LogWarning("[VeilmouthOrnaments] no Governor's House: the lions are not placed.");
+                yield break;
+            }
+
+            var bounds = governor.GetComponentsInChildren<Renderer>().Select(r => r.bounds).Aggregate((a, b) => { a.Encapsulate(b); return a; });
+            var (mid, front) = (bounds.center.x + 500f, 500f - bounds.max.z);
+            foreach (var side in new[] { -1, 1 })
+            {
+                var px = mid + (side * 7f);
+                yield return ("LionStatue", px, front - 3f, Mathf.FloorToInt(px - 5f), Mathf.FloorToInt(front - 9f), Mathf.CeilToInt(px + 5f),
+                    Mathf.FloorToInt(front), 3, side < 0 ? "Lion, the Governor's House (west)" : "Lion, the Governor's House (east)");
+            }
+        }
 
         [MenuItem("GameDev/Slice/Place Veilmouth Ornaments")]
         public static void Place()
@@ -62,19 +86,10 @@ namespace GameDev.Slice.EditorTools
                 Object.DestroyImmediate(old);
             }
 
-            // The middle tree of Wardley Garden gives its place to the angel.
-            var heart = World(557.5f, 696.5f);
-            foreach (var tree in Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Include)
-                         .Where(k => k.name.Contains("Tree") && Flat(k.transform.position + new Vector3(0.5f, 0f, 0.5f) - heart) < 1.2f).ToList())
-            {
-                Debug.Log($"[VeilmouthOrnaments] '{tree.name}' at {tree.transform.position:F1} gives its place to the angel.");
-                Object.DestroyImmediate(tree.gameObject);
-            }
-
             var group = new GameObject(GroupName).transform;
             var placed = new List<string>();
             var shots = new List<(Vector3 Centre, Vector3 Facing, float Height)>();
-            foreach (var (key, px, py, x0, y0, x1, y1, turns, name) in Spots)
+            foreach (var (key, px, py, x0, y0, x1, y1, turns, name) in Spots().ToList())
             {
                 var entry = kit[key];
                 var (wx, wz) = turns % 2 == 0 ? (entry.Width, entry.Depth) : (entry.Depth, entry.Width);
@@ -191,10 +206,9 @@ namespace GameDev.Slice.EditorTools
             EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             var areas = new (string Name, int X0, int Y0, int X1, int Y1)[]
             {
-                ("graves", 498, 626, 526, 650), ("palace forecourt", 586, 646, 634, 664), ("villa 524", 522, 636, 557, 664),
-                ("villa 555", 553, 636, 588, 664), ("faction", 632, 636, 672, 664), ("villa 670", 668, 636, 706, 664),
-                ("villa 704", 702, 636, 739, 664), ("Wardley", 544, 682, 572, 714), ("house 500", 498, 682, 518, 708),
-                ("house 528", 526, 682, 546, 708), ("Customs", 736, 762, 780, 794), ("Circus", 584, 715, 626, 746),
+                ("Bishop's Garden", 480, 262, 503, 352), ("cemetery", 440, 262, 478, 334), ("villa 456", 456, 373, 490, 400),
+                ("Governor's front", 495, 466, 585, 482), ("faction", 580, 330, 614, 346), ("Widows' detached", 422, 373, 454, 400),
+                ("embankment plots", 422, 510, 519, 530),
             };
             var log = new System.Text.StringBuilder("[VeilmouthOrnaments] probe\n");
             var blocks = Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude);

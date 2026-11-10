@@ -157,12 +157,12 @@ namespace GameDev.Slice.Tests
             Debug.Log("[RenderTheArrest] Logs/SliceDialogue/" + name);
         }
 
-        /// <summary>The player before Kit on the Market square, out of the scene's area (the Notice Board, 25 m away on Bell Street, is in it).</summary>
+        /// <summary>The player before Kit on Bawling Square, out of the scene's area.</summary>
         private static IEnumerator GoFar(PlayerLocomotion player, PoiStage stage)
         {
             var kit = Object.FindObjectsByType<PersonTalk>().Single(t => t.Dialogue != null && t.Dialogue.Id == "kit");
             var place = kit.transform.position + (kit.transform.forward * 1.5f) + (Vector3.up * 0.1f);
-            Assert.IsFalse(stage.Within(place), "the Market square stands out of the scene's area");
+            Assert.IsFalse(stage.Within(place), "Bawling Square stands out of the scene's area");
             player.Teleport(place, player.transform.rotation);
             yield return new WaitForSeconds(0.3f);
         }

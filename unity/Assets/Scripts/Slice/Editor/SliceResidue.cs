@@ -13,16 +13,19 @@ namespace GameDev.Slice.EditorTools
     /// <summary>
     /// S2.7, once: what the next day shows of POI A and B (11.1 §6; 11 *World residue*), as <see cref="WorldResidue"/>s
     /// read from the world state. In Veilmouth: Harrow &amp; Tincture's street door sealed with wax and brass once the
-    /// Wardens seal it; two Warden pairs on Bell Street, 11.1's Tincture Row, from the next morning once they have taken
-    /// him; and the women who walk near Loom Lane kept at home from the next morning once the collectors have taken a
-    /// girl. In the apothecary: Harrow away while the Wardens hold him in the street, and once he is taken or gone. A scene
+    /// Wardens seal it; two Warden pairs before it on the Black Puddle (C4, city plan §28.10), from the next morning once
+    /// they have taken him; and the women who walk near Draught Lane kept at home from the next morning once the
+    /// collectors have taken a girl. In the apothecary: Harrow away while the Wardens hold him in the street, and once he is taken or gone. A scene
     /// that already has its residue is left as it is, as Veilmouth is the owner's.
     /// </summary>
     public static class SliceResidue
     {
         public const string SealedName = "Residue - Harrow & Tincture sealed";
-        public const string PairsName = "Residue - Warden pairs on Bell Street";
-        public const string FearName = "Residue - Fear on Loom Lane";
+        public const string PairsName = "Residue - Warden pairs on the Black Puddle";
+        public const string FearName = "Residue - Fear on Draught Lane";
+
+        /// <summary>The same residue's names in C3, whose streets C4 renamed: a rebuild removes them too.</summary>
+        public static readonly string[] OldNames = { "Residue - Warden pairs on Bell Street", "Residue - Fear on Loom Lane" };
         public const string HarrowAwayName = "Residue - Harrow away";
 
         /// <summary>Day 2, 08:00: the next morning in the slice, whose POIs all fall on day 1.</summary>
@@ -32,7 +35,7 @@ namespace GameDev.Slice.EditorTools
         private const string MaterialFolder = "Assets/Materials/Slice/Residue";
 
         // Authoring defaults, m: the seal's height on the door, how far out and along the street the Warden pairs
-        // stand, and how near Loom Lane a woman's walk must come for her to stay at home.
+        // stand, and how near Draught Lane a woman's walk must come for her to stay at home.
         private const float SealHeight = 1.3f;
         private const float LeafToDoor = 1.5f;
         private const float PairsOut = 2f; // on the pavement, 3.5 m wide since city plan §25.2
@@ -148,7 +151,7 @@ namespace GameDev.Slice.EditorTools
             return wanted;
         }
 
-        /// <summary>The townswomen whose walk comes within <see cref="LaneFear"/> m of Loom Lane stay at home.</summary>
+        /// <summary>The townswomen whose walk comes within <see cref="LaneFear"/> m of Draught Lane stay at home.</summary>
         private static void Fear(Vector3 lane)
         {
             var women = Object.FindObjectsByType<TownsfolkWalker>(FindObjectsInactive.Include)
@@ -158,14 +161,14 @@ namespace GameDev.Slice.EditorTools
                 .ToArray();
             if (women.Length == 0)
             {
-                Debug.LogWarning($"[SliceResidue] No townswoman walks within {LaneFear} m of Loom Lane; its fear shows only in talk.");
+                Debug.LogWarning($"[SliceResidue] No townswoman walks within {LaneFear} m of Draught Lane; its fear shows only in talk.");
             }
 
             var root = new GameObject(FearName);
             root.transform.position = lane;
             root.AddComponent<WorldResidue>().Configure(new[] { new StateCondition("aftermath.loom_lane.girls_taken") }, NextMorning,
                 new GameObject[0], women, new Portal[0]);
-            Debug.Log($"[SliceResidue] Fear on Loom Lane keeps at home: {string.Join(", ", women.Select(w => w.name))}.");
+            Debug.Log($"[SliceResidue] Fear on Draught Lane keeps at home: {string.Join(", ", women.Select(w => w.name))}.");
         }
 
         private static void PlaceInTheApothecary()

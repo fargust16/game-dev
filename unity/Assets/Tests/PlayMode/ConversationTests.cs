@@ -59,7 +59,7 @@ namespace GameDev.Slice.Tests
 
             yield return Tap(Key.Digit2);
 
-            Assert.AreEqual(PoiDiscovery.Marked, world.Director.Discovery(poiB), "Nell's Loom Lane tip, given for Exchange, marks POI B");
+            Assert.AreEqual(PoiDiscovery.Marked, world.Director.Discovery(poiB), "Nell's Draught Lane tip, given for Exchange, marks POI B");
             Assert.AreEqual(Loc.Get("tip.nell.collectors.line"), hud.DialogueLines.Last());
             CollectionAssert.Contains(hud.DialogueLines, Loc.Get("dialogue.nell.evening.exchange"), "the character's answer stays above");
             Assert.GreaterOrEqual(world.Clock.Tick, tick + 60, "an hour's work behind the bar");

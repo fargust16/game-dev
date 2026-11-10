@@ -29,7 +29,7 @@ namespace GameDev.Slice.EditorTools
             return driver;
         }
 
-        /// <summary>The driver's assets: the settings, the POIs, the tips, and the city plan C3 for the map (S1.6, C3 §24.7).</summary>
+        /// <summary>The driver's assets: the settings, the POIs, the tips, and the city plan C4 for the map (S1.6, city plan §28.5).</summary>
         private static void Set(SliceWorldDriver driver)
         {
             driver.Configure(

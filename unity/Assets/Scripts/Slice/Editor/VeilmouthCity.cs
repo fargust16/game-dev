@@ -120,10 +120,10 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// Batch only, the reference plan's step 5 (R4, R5): the city built again on its present ground, which is the
-        /// owner's to change by hand and is not shaped again, with the raised pavements and the passages; then the passes
-        /// beside its root, the street probes baked again, and the views. Batch:
-        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthCity.RebuildStreets -lookLabel r4
+        /// Batch only, the whole chain (C4, §28.10): the city built again on its present ground, which is the owner's to
+        /// change by hand and is not shaped again; then the passes beside its root (the named people, the world driver,
+        /// the dogs, the ornaments, the mystic layer), the street probes baked again, the POIs staged and the residue
+        /// placed again, and C4's views. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthCity.RebuildStreets
         /// </summary>
         public static void RebuildStreets()
         {
@@ -134,9 +134,8 @@ namespace GameDev.Slice.EditorTools
             VeilmouthOrnaments.Place();
             VeilmouthMystic.Place();
             VeilmouthReflections.Bake();
+            Restage();
             VeilmouthRenders.RenderC4();
-            VeilmouthRenders.RenderPavements();
-            VeilmouthRenders.RenderLook();
         }
 
         private static void Run(bool replace)
@@ -255,6 +254,7 @@ namespace GameDev.Slice.EditorTools
             _parent = Group("Outskirts");
             Hamlet();
             Gloomwood();
+            PeopleC4();
             // A street door on every dwelling (15, *The slice's Dwellings*), after every building stands.
             VeilmouthDwellings.AddDoors(_root);
 
@@ -1321,29 +1321,6 @@ namespace GameDev.Slice.EditorTools
         {
             _lanes.Add(new Lane { Street = street, Quad = quad, Layer = layer, Carriage = carriage, Use = use });
             Take(quad, use);
-        }
-
-        /// <summary>A street running along X: pavements of <paramref name="walk"/> m on both sides and a carriageway between.</summary>
-        private static void StreetX(string name, int px0, int px1, int py0, int py1, float walk, int surface)
-        {
-            if (walk > 0)
-            {
-                Lanes(name, Flags, false, Rect(px0, py0, px1, py0 + walk), Use.Walk);
-                Lanes(name, Flags, false, Rect(px0, py1 - walk, px1, py1), Use.Walk);
-            }
-
-            Lanes(name, surface, walk > 0, Rect(px0, py0 + walk, px1, py1 - walk), Use.Road);
-        }
-
-        private static void StreetY(string name, int px0, int px1, int py0, int py1, float walk, int surface)
-        {
-            if (walk > 0)
-            {
-                Lanes(name, Flags, false, Rect(px0, py0, px0 + walk, py1), Use.Walk);
-                Lanes(name, Flags, false, Rect(px1 - walk, py0, px1, py1), Use.Walk);
-            }
-
-            Lanes(name, surface, walk > 0, Rect(px0 + walk, py0, px1 - walk, py1), Use.Road);
         }
 
         private static void PaintStreets()

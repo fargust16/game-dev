@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4)
 
-Version: 0.54
+Version: 0.55
 
-Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10 and being built; sizes remain authoring defaults
+Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day, and waiting for the owner's walk; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§28.9: C4's districts and outskirts: the cathedral, the works and Stone Grandad as stone masses, the cellar door, the ritual circles, the cemetery, the parks, the market, cargo on the quay, Crooked Hamlet's farms, and Gloomwood in stands with its glades, beasts and iron veins)
+Last Updated: 2026-11-10 (§28.10: the slice's places on C4: people, dogs, ornaments, the mystic layer, reflections, dwelling wealth, the POIs and their residue, C3's names renamed in the story; the slice's tests; the cold load and Gloomwood's cost measured, the city's frame budget open)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1287,7 +1287,7 @@ Views: Blender's LOD row, and `Logs/SliceSurvey/green_*` of C3, rendered with th
 
 ## 28.4 Status
 
-Being built, step by step (§28.1, item 20). Each step adds its section here.
+Built, 2026-11-10, step by step without stops (§28.1, item 20): the plan (§28.5), the ground (§28.6), the streets (§28.7), the houses (§28.8), the districts and the outskirts (§28.9), and the slice's places, tests and cost (§28.10). It waits for the owner's walk (99 VS-C4); its frame budget is open (99 VS-FRAME).
 
 ## 28.5 The plan, 2026-11-10
 
@@ -1505,3 +1505,156 @@ Views: `Logs/SliceSurvey/c4_*`.
 Kit check: 7043 blocks, 140 doors, 0 kit faults. The 4013 forest trees are the larger share of the blocks, and step 8 measures their cost. Unity's terrain trees would cost less at this count, but they need the vendor's prefab on the terrain, not a kit wrapper, so they wait for the owner.
 
 Views: `Logs/SliceSurvey/c4_world`, `c4_city`, `c4_hamlet`, `c4_eye_penny`, `c4_eye_cathedral`, `c4_eye_market`, `c4_eye_cemetery`, `c4_eye_works`, `c4_eye_hamlet`, `c4_eye_gloomwood`.
+
+## 28.10 The slice's places, tests and cost, 2026-11-10
+
+Step 8 moves what C3 placed on its own coordinates onto C4, checks the city with the slice's tests, and measures what it costs. All places and counts are authoring defaults; the POI places are working readings, not owner decisions.
+
+**One rebuild.** `VeilmouthCity.RebuildStreets` now runs the whole chain once, and `RebuildGreenery` is the same chain:
+
+1. the city (`Run`);
+2. the named people (`SlicePeople.PlaceAll`);
+3. the slice's world and the Notice Board's tips (`SliceWorldSetup.AddToVeilmouth`);
+4. the dogs (`SliceDogs.PlaceReplacing`);
+5. the ornaments (`VeilmouthOrnaments.Place`);
+6. the mystic layer (`VeilmouthMystic.Place`);
+7. the reflections (`VeilmouthReflections.Bake`);
+8. the POI stages and their residue (`Restage`);
+9. the C4 views (`VeilmouthRenders.RenderC4`).
+
+**People** (`PeopleC4`, before `SlicePeople` puts each named person in place of the Dummy of that name):
+
+- **Wardens**, four:
+  - two at the Assize's door;
+  - one on Salt Gullet's north pavement;
+  - one at the Black Puddle.
+- **The faction**: two members in the Brothers' front garden.
+- **Veinmarket**: two by the east end of Draught Lane.
+- **The market.** On Bawling Square, before their stalls as C3 stood them:
+  - the trader;
+  - the Masters of Enchanting, First Aid and Item Creation;
+  - the seer.
+  The pawnbroker stands at her counter and chest in the Black Puddle's north-east corner, clear of the hidden ritual circle.
+- **Townsfolk**: twenty walkers, ten women and ten men. They walk:
+  - on the main streets' pavements;
+  - at the Penny's corners;
+  - on the embankment's river walk;
+  - on the quay, in the squares, and in the works;
+  - one, the mill woman, on Draught Lane, whom POI B's fear keeps at home;
+  - one farmer on the West Road.
+  A pavement point is taken from its street (`Pave`), inside the street's c0..c1 along its edge. The first placing had read the pavements as lying outside c0..c1, which put twelve walkers and a Warden in houses or the river.
+- **Named people.** `SlicePeople` placed Edda, Silas, Ada, Tobias, Ruth, Ilse and Kit where their Dummies stand; the kit's new stand-ins are on Bawling Square beside Tobias.
+
+**Dogs**: five:
+
+- by the player's start on Powder Embankment;
+- on Bawling Square;
+- on Salt Gullet's carriageway;
+- on Drowsy Steps by Widows' Row;
+- on Fishlip Quay.
+
+The first placing put one dog in the river and one on a roof, so both moved onto the carriageway.
+
+**Ornaments**: thirteen.
+
+- Three angels: Bishop's Garden, the cemetery, and the west villa's garden.
+- Eight birdbaths: Bishop's Garden, the faction's garden, two in Widows' Row's detached gardens, and four in the embankment houses' gardens.
+- Two lions before the Governor's House, measured from its own bounds.
+
+**The mystic layer** (WORLD_STYLE_GUIDE §6, with C4's names):
+
+- **112 gas lamps.**
+- **31 fog banks**: over the river's two legs from the north wall to the quay, the sea by Fishlip Quay, Draught Lane, Rats' Choir, the Black Puddle, Deaf Boiler Yard and the cemetery.
+- **Wards over 4 of the 44 doors** in Lower Veil and the Reek, about one in eight by a hash of the door's place.
+- **Runes, 14 sets**:
+  - either side of Creaking Gate;
+  - three along the north wall;
+  - on the works' west and south walls;
+  - on the brick blocks either side of Furnace Road;
+  - on the two nearest walls round each Ritual Site Candidate.
+- **Strange windows**: Harrow & Tincture and three tenements of Lower Veil.
+
+**Reflections**: the sky and 90 street probes in 30 m cells over world X −80…180 and Z −56…240, all baked.
+
+**A dwelling's wealth** (`VeilmouthDwellings.WealthAt`), which furnishes the generated Dwelling scene:
+
+| Where | Wealth |
+| --- | --- |
+| tenements and warehouses, anywhere | poor |
+| villas, anywhere | rich |
+| Lower Veil, the Reek and the quay | poor |
+| round the Penny | rich |
+| Parsons' End west of Last Turning | poor |
+| Parsons' End east of Last Turning | rich |
+| everywhere else | middling |
+
+**The POIs** (11.1 § *Places in C4*):
+
+- **POI A** stands before Harrow & Tincture's street door on the Black Puddle.
+- **POI B** stands in the middle of Draught Lane, C3's Loom Lane.
+- **POI C** begins at the cellar door on Deaf Boiler Yard.
+- **The residue.**
+  - The seal goes on Harrow & Tincture's door.
+  - The Warden pairs stand on the Black Puddle (`Residue - Warden pairs on the Black Puddle`).
+  - The fear on Draught Lane keeps at home the one townswoman whose walk comes within 30 m of the lane (`Residue - Fear on Draught Lane`; C3 had two).
+  - The C3 residue roots are removed by their old names.
+- **The Notice Board** stands on the Black Puddle, 3 m out from the Soot & Bell's front. At 1 m out, one stoop refused it and the tavern's stoop touched it by 0.14 m: the kit check caught the touch, which the free-place test does not see.
+
+**C3's names in the story follow the map:**
+
+| C3 | C4 | Russian |
+| --- | --- | --- |
+| Loom Lane | Draught Lane | переулок Сквозняк |
+| Bell Street | the Black Puddle | Чёрная Лужа |
+| the Market square | Bawling Square | Горластая площадь |
+
+They changed in the dialogue and POI string tables, in the POI cards (`PoiANode`, `PoiBNode`, the option *Leave Draught Lane*), and in the tests' messages. Asset ids and string keys keep C3's names, for example `aftermath.loom_lane.*`.
+
+**Fixed on the way:**
+
+- A lamp round the Penny stood 6.5 m before a corner house's door. Each of the eight is now turned along the ring, by up to 12°, until it stands in no door's way.
+- `TownsfolkTests`, in EditMode and in PlayMode, count C4's twenty walkers.
+- `VeilmouthCityTests` ask for at least 3 warded doors of C4's 44, where C3's larger poor districts gave more than 5.
+
+**Tests**:
+
+- The EditMode set (`GameDev.Slice.Tests.EditMode`) passed 303 of 303 after the last rebuild.
+- In the PlayMode set (slice-play, without the Diagnostic category), 52 of 53 passed, and the five render tests, which run only on request, were skipped.
+- The one failure was the PlayMode `TownsfolkTests`, which still counted C3's fifteen walkers. Counting twenty, it passed on its own run, with every walker walking on the ground and keeping to its route.
+
+**Cost**, measured 2026-11-10 (`VeilmouthFrameProbe`, the editor's batch render, Direct3D 12, an RTX 5070 Ti laptop GPU):
+
+- **The scene.** 115 236 game objects and 90 476 mesh renderers, against C3's 99 898 and 82 345 (scene-load diagnostic, 2026-11-10 00:21). Without the forest's 23 299 objects the scene holds 91 937, fewer than C3.
+- **Gloomwood's cover.** 3 981 trees by the probe's test: a pivot inside the forest's rectangles, which leaves out a few at their edges of the 4 013 built. They hold 23 299 game objects (20 % of the scene) and 11 943 mesh renderers (13 %). Each tree has an LOD group, and all their meshes' levels sum to 8.7 million triangles.
+- **Frames.** Five views at 1920 × 1080 at a walker's height. For each view, four rounds with the trees shown and four with them hidden, taken in turn, of 9 frames after 3 warm-ups each. Each frame is waited for by reading one pixel back. Median ms, with the trees / without them:
+
+| View | With | Without | Difference |
+| --- | --- | --- | --- |
+| in Gloomwood | 9.70 | 6.58 | +3.13 |
+| Crooked Hamlet toward the wood | 7.65 | 5.99 | +1.66 |
+| the West Road toward the gate | 50.79 | 49.92 | +0.87 |
+| down Salt Gullet | 53.23 | 48.00 | +5.22 |
+| across the Penny | 31.25 | 31.22 | +0.03 |
+
+What the figures say:
+
+- The forest's kit trees add 2–3 ms to views of the wood and 0–5 ms to the city's long views. So §28.9's question about Unity's terrain trees is answered by measurement: they are not needed for cost.
+- The city itself costs 31–53 ms an editor frame in its long views. An editor frame carries the editor's own overhead, and no frame has been measured in a player build. The frame budget and that measure are open for the owner (99 VS-FRAME). The owner already allows the GPU Resident Drawer and GPU occlusion culling (§28.1 item 17), but they need DOTS instancing in the facade and window shaders.
+- A first run that measured the trees shown before hidden gave the wrong sign in the wood (−5 ms). Taking the rounds in turn removed it.
+
+**Load** (`SceneLoadTimingTests`, 2026-11-10 03:46, in the editor with graphics):
+
+- Veilmouth's cold load reads in 3.38 s, wakes in 7.89 s and draws its first frame at 8.32 s. C3 took 3.62, 8.47 and 8.93 s (00:21), though C4 holds 115 237 game objects against C3's 99 898.
+- A door's journey takes 0.44–0.80 s, and the first entry into the Dwelling is the longest.
+
+**Not redone.** The older survey renders (`RenderLook`, `RenderPavements`, `RenderGreenery`, `RenderPorches`, `RenderTownsfolk`, `RenderOrnaments`, `RenderMystic`, `RenderDressing`) still hold C3's camera places. They are left until a pass needs them; `RenderC4` covers C4.
+
+**Counts since earlier steps.** There are 77 street trees, not §28.7's 78: one pit went to a house in step 6. The kit has 7 045 blocks, two more than §28.9's, for the pawnbroker's counter and chest.
+
+Views: `Logs/SliceSurvey/c4_*`, with five new views:
+
+- `c4_eye_masters`: the Masters before their stalls;
+- `c4_eye_assize`: the Wardens at the Assize;
+- `c4_eye_puddle`: the Black Puddle with the pawnbroker and a Warden;
+- `c4_eye_draught`: Draught Lane, where POI B happens;
+- `c4_eye_lions`: the lions before the Governor's House.

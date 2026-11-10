@@ -16,7 +16,7 @@ namespace GameDev.Slice.Tests
 {
     /// <summary>
     /// S2.7's EditMode done-when (VERTICAL_SLICE_IMPLEMENTATION_PLAN): what Nell and Kit say the next day follows what
-    /// happened to Harrow and on Loom Lane (11.1 §6; SLICE_PEOPLE §2), and a lie to Nell that comes out at the day
+    /// happened to Harrow and on Draught Lane (11.1 §6; SLICE_PEOPLE §2), and a lie to Nell that comes out at the day
     /// boundary turns her cold the next morning (10.4 §5), on a clock driven by hand.
     /// </summary>
     public sealed class ResidueTalkTests
@@ -140,7 +140,7 @@ namespace GameDev.Slice.Tests
 
             Assert.AreEqual(CheckResult.Success, nell.Choose(lie));
 
-            Assert.IsTrue(_state.IsSet("tip.nell.collectors.heard"), "the lie gets her Loom Lane tip");
+            Assert.IsTrue(_state.IsSet("tip.nell.collectors.heard"), "the lie gets her Draught Lane tip");
             Assert.AreEqual(1, _state.Get("lie.ordinary.nell"), "an Ordinary lie may come out at the next boundary");
             nell.Leave();
             _clock.AdvanceTicks((int)(Midnight - _clock.Tick));

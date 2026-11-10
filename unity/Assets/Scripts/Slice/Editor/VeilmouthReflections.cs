@@ -16,8 +16,8 @@ namespace GameDev.Slice.EditorTools
     /// (<see cref="VeilmouthSky"/>), since they hold the day.
     /// <para>
     /// The sky: the scene's own sky drawn alone into a cubemap, with its haze and muted colour, replacing Unity's default
-    /// sky, which the scene had never baked. The streets: one probe in each 30 m cell over the city's quarters (C3, city
-    /// plan §24), at the open point nearest the cell's middle, 3 m over the ground, influence 34 × 50 × 34 m with a 4 m
+    /// sky, which the scene had never baked. The streets: one probe in each 30 m cell over the city inside its walls (C4,
+    /// city plan §28.10), at the open point nearest the cell's middle, 3 m over the ground, influence 34 × 50 × 34 m with a 4 m
     /// blend; a cell with no open point within 12 m (a block of houses) has none. No box projection: a cell's box would
     /// not match its street's fronts. The probes stand under their own root, outside the city's, and are baked again
     /// after the city is rebuilt. Every size here is an authoring default. Batch:
@@ -29,8 +29,9 @@ namespace GameDev.Slice.EditorTools
         public const string RootName = "Veilmouth Reflections";
         public const string Folder = "Assets/Scenes/Slice/VeilmouthReflections";
 
-        // The quarters of C3 (VeilmouthScene's zones), with a cell's margin: X −20…280, Z −335…−130.
-        private const float West = -20f, East = 280f, South = -335f, North = -130f;
+        // The city inside the walls, C4 (city plan §28.10): px 420…680, py 260…556 (to the embankment's river walk), so
+        // X −80…180, Z −56…240. The works' brick blocks keep the sky's reflection.
+        private const float West = -80f, East = 180f, South = -56f, North = 240f;
         private const float Cell = 30f, Search = 12f, Step = 3f, Eye = 3f;
         private static readonly Vector3 Influence = new(34f, 50f, 34f);
         private const float Blend = 4f;
@@ -62,7 +63,7 @@ namespace GameDev.Slice.EditorTools
             var root = new GameObject(RootName).transform;
 
             // The sky alone, from high over the city.
-            var skyProbe = Probe(root, "Sky", new Vector3(130f, VeilmouthScene.StreetLevel + 60f, -235f));
+            var skyProbe = Probe(root, "Sky", new Vector3(40f, VeilmouthScene.StreetLevel + 60f, 60f)); // over the Penny
             skyProbe.cullingMask = 0;
             var skyMap = BakeOne(skyProbe, $"{Folder}/Sky.exr");
             Object.DestroyImmediate(skyProbe.gameObject);

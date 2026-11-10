@@ -64,7 +64,7 @@ namespace GameDev.Slice.Tests
             _book.Read(TipSource.NoticeBoard, _clock.Tick);
 
             Assert.AreEqual(PoiDiscovery.Marked, _director.Discovery(_a), "the notice names the shop");
-            Assert.AreEqual(PoiDiscovery.Hinted, _director.Discovery(_b), "'near Loom Lane' only hints");
+            Assert.AreEqual(PoiDiscovery.Hinted, _director.Discovery(_b), "'near Draught Lane' only hints");
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace GameDev.Slice.Tests
         {
             CollectionAssert.IsEmpty(Ids(TipSource.Bartender), "Nell has nothing before 16:00");
             _clock.AdvanceTicks(960 - 480);
-            CollectionAssert.AreEqual(new[] { "nell.harrow" }, Ids(TipSource.Bartender), "the Loom Lane tip needs an Approach");
+            CollectionAssert.AreEqual(new[] { "nell.harrow" }, Ids(TipSource.Bartender), "the Draught Lane tip needs an Approach");
         }
 
         [Test]

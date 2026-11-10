@@ -305,23 +305,48 @@ namespace GameDev.Slice.EditorTools
             return true;
         }
 
-        /// <summary>City plan C3 (§24.3), in plan coordinates (px = X + 500, py = 500 − Z): Lower Veil from Market Street east, and Under the Ridge.</summary>
+        private static VeilmouthLayout _layout;
+
+        /// <summary>
+        /// City plan C4 (§28.1 item 7, §28.10), in plan coordinates (px = X + 500, py = 500 − Z): wealth falls with the
+        /// distance from the Penny. Tenements and warehouses are poor anywhere, villas rich anywhere; the Penny's own
+        /// district is rich; Lower Veil, the Reek, the quay and the low row on Last Turning by the cemetery are poor;
+        /// everything else, the Sleepy Quarter, Salt End and Crooked Hamlet, is middling.
+        /// </summary>
         public static DwellingWealth WealthAt(Vector3 world, DwellingArchetype archetype)
         {
-            var px = world.x + 500f;
-            var py = 500f - world.z;
-            if (py < 680f)
-            {
-                return DwellingWealth.Rich; // the Ridge
-            }
-
             if (archetype == DwellingArchetype.Tenement || archetype == DwellingArchetype.Warehouse)
             {
                 return DwellingWealth.Poor;
             }
 
-            var lowerVeil = (px >= 618f && py >= 744f) || (px >= 642f && py > 680f && py < 726f);
-            return lowerVeil ? DwellingWealth.Poor : DwellingWealth.Middling;
+            if (archetype == DwellingArchetype.Villa)
+            {
+                return DwellingWealth.Rich;
+            }
+
+            var px = world.x + 500f;
+            var py = 500f - world.z;
+            _layout ??= VeilmouthLayout.Load();
+            // The poor districts first: Lower Veil reaches into the Penny's box, and its slums stay slums there.
+            var quay = _layout.SquareById("quay").x0;
+            var at = _layout.districts.Where(d => px >= d.x0 && px <= d.x1 && py >= d.y0 && py <= d.y1).ToList();
+            if (at.Any(d => d.name == "LOWER VEIL" || d.name == "THE REEK" || (d.name.Length == 0 && d.x0 >= quay)))
+            {
+                return DwellingWealth.Poor;
+            }
+
+            if (at.Any(d => d.name.Length == 0))
+            {
+                return DwellingWealth.Rich; // the Penny's own district
+            }
+
+            if (at.Any(d => d.name == "PARSONS' END"))
+            {
+                return px < _layout.StreetById("last_turning").c1 ? DwellingWealth.Poor : DwellingWealth.Rich;
+            }
+
+            return DwellingWealth.Middling;
         }
 
         // ------------------------------------------------------------------------------------------- checks

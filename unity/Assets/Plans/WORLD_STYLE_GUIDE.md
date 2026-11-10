@@ -1,12 +1,12 @@
 # World Style Guide
 
-Version: 0.7
+Version: 0.8
 
 Status: Draft — written by the agent from the owner's answers of 2026-11-08 (city plan §24); the light and the mystic layer built in Veilmouth (city plan §24.7). After walking C3 the owner asked for one warm, muted range with haze and a quiet sky, after reference images: §2 and §5 are reworked by [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R3, awaiting the owner's judgement of its views; the roofs wait for its D6
 
 Created: 2026-11-08
 
-Last Updated: 2026-11-09 (§8: the city's green, by the owner: the Stylized Trees Pack's trees and bushes in a muted city green, street trees, hedges and grass (city plan §25). Earlier: §3: pavements are raised islands behind a stone kerb with a wet gutter band (reference plan R4). Earlier: §5: soft, fine sun shadows; glass and wet stone reflect the street, not the sky alone (reference plan R2 steps 5 and 7). Earlier: §2, §5, §8: the reference look by the reference plan's R3: Linear colour space, the muted palette with its targets, the painted sky, haze, a lower golden sun, SSAO, the HDR grade, olive trees. Earlier: Status: the owner's reference look, to be worked in by the reference plan's R3. Earlier: §5, §6: built in Veilmouth by `VeilmouthSky` and `VeilmouthMystic`, as city plan §24.7 records; the moon rises at 20:00 and fades in over its first hour. Earlier: first draft: one style for the city, its interiors and the land round it, and the mystic layer the owner chose)
+Last Updated: 2026-11-10 (§2 and §6.3 follow C4's names: wear toward the water and away from the Penny; runes by Creaking Gate, the north wall, the works' walls and the candidates; wards in Lower Veil and the Reek. Earlier: §8: the city's green, by the owner: the Stylized Trees Pack's trees and bushes in a muted city green, street trees, hedges and grass (city plan §25). Earlier: §3: pavements are raised islands behind a stone kerb with a wet gutter band (reference plan R4). Earlier: §5: soft, fine sun shadows; glass and wet stone reflect the street, not the sky alone (reference plan R2 steps 5 and 7). Earlier: §2, §5, §8: the reference look by the reference plan's R3: Linear colour space, the muted palette with its targets, the painted sky, haze, a lower golden sun, SSAO, the HDR grade, olive trees. Earlier: Status: the owner's reference look, to be worked in by the reference plan's R3. Earlier: §5, §6: built in Veilmouth by `VeilmouthSky` and `VeilmouthMystic`, as city plan §24.7 records; the moon rises at 20:00 and fades in over its first hour. Earlier: first draft: one style for the city, its interiors and the land round it, and the mystic layer the owner chose)
 
 Depends On:
 [00 Vision](../../../00%20Vision.md), [11 Vertical Slice](../../../11%20Vertical%20Slice.md) (*Era and Mood*), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §24, [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md)
@@ -70,7 +70,7 @@ What the city does not have: saturated blue, purple or pink walls, white marble 
 
 - **Brick everywhere it is affordable, stucco where it is rich.** The kit's grime runs down from sills and up from the plinth; it is never cleaned away for the rich.
 - **The ground:** setts on carriageways, flagstones on pavements, cobbles on lanes, yards and squares (city plan §13). A pavement is a raised island 0.15 m above the carriageway, its edge a light-stone kerb, rounded at 2 m where carriageways meet, with a wet, darker band along the gutter (reference plan R4). Asphalt waits for a texture. Mud and sand only outside the walls and on the shore.
-- **Wear grows toward the water and down the slope.** The Ridge is clean, the High Street worn, Lower Veil and the docks dirty.
+- **Wear grows toward the water and away from the centre.** The houses round the Penny are clean, the rows of the Sleepy Quarter and Salt End worn, Lower Veil, the quay and the Reek dirty (C4, city plan §28).
 - **One scale of detail.** A brick is a brick at the same world size on every house. The kit at ×1.25 keeps its brick's world size by redrawing it (owner, 2026-11-08), so a brick never grows with the house.
 
 ---
@@ -110,7 +110,7 @@ Veilmouth's light follows the game clock (one tick is one game minute). Authorin
 
 The owner chose three parts on 2026-11-08: the crimson moon and fog, the Gothic skyline, and occult signs. The fourth offered part, alchemy and soot, was not chosen and is not built.
 
-`VeilmouthMystic` builds the moon, fog, lamps, wards and strange windows once under the `Veilmouth Sky` root, with their counts in city plan §24.7. The Gothic skyline stands as far as the kit's towers, chimneys and railings allow; its wanted pieces (§6.2) are not built.
+`VeilmouthMystic` builds the moon, fog, lamps, wards and strange windows once under the `Veilmouth Sky` root, with their counts in city plan §24.7, and for C4 in §28.10. The Gothic skyline stands as far as the kit's towers, chimneys and railings allow; its wanted pieces (§6.2) are not built.
 
 ## 6.1 The crimson moon and fog
 
@@ -140,10 +140,11 @@ Wanted, with no stand-in until the models exist:
 ## 6.3 Occult signs
 
 - **Old wards.** A faint sign over the keystone of a door, and runes on old stone:
-  - the town wall by the gates;
-  - the Ridge's retaining wall;
-  - the Soot Stair's blind walls;
+  - the town wall by Creaking Gate and along the north;
+  - the works' walls and Furnace Road's blind walls;
   - the three Ritual Site Candidates.
+
+  (C3 had the Ridge's retaining wall and the Soot Stair; C4 has neither, city plan §28.10.)
 
   They are centuries old, barely lit, and seen only up close or by night.
 - **Strange windows.** A dim violet-green glow behind the glass of Harrow & Tincture and a few shops in Lower Veil.
@@ -151,7 +152,7 @@ Wanted, with no stand-in until the models exist:
   - A ward carries no rule.
   - It is not an Information Source or a trace of a Weak Point. Those traces are left by people who joined the General ([21](../../../21%20Cult%20Campaign%20and%20City%20Control.md) §4, [11](../../../11%20Vertical%20Slice.md)) and must not be confused with dressing.
   - Whether wards later carry knowledge is an open question (99 VS-WARD).
-- **How few.** A ward stands over about one door in eight in Lower Veil and Under the Ridge, and over none on the Ridge. Signs are rare, so each one is noticed.
+- **How few.** A ward stands over about one door in eight in Lower Veil and the Reek, and over none round the Penny (C4; C3 had Lower Veil and Under the Ridge). Signs are rare, so each one is noticed.
 
 ---
 

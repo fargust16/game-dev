@@ -207,6 +207,11 @@ namespace GameDev.Slice.EditorTools
             Prop("Anvil", Facing.N, X(16), Y(39));
             Prop("LeatherFrame", Facing.N, X(20), Y(39));
             Prop("ArmourStand", Facing.N, X(24), Y(39));
+
+            // The pawnbroker's counter in the Black Puddle's north-east corner, 3 m off the fronts: well outside the circle.
+            var puddle = _layout.SquareById("black_puddle");
+            Prop("Counter", Facing.S, puddle.x1 - 8f, puddle.y0 + 3f, "Pawn shop counter");
+            Prop("Chest", Facing.S, puddle.x1 - 4f, puddle.y0 + 3f, "Pawn shop chest");
         }
 
         /// <summary>Cargo only where the port works (owner, 2026-11-09): on Fishlip Quay before the warehouses, and on Tipsy Pier.</summary>
@@ -230,6 +235,93 @@ namespace GameDev.Slice.EditorTools
             var tipsy = _layout.SquareById("tipsy");
             Prop("Barrels", Facing.N, tipsy.x1 - 14, tipsy.y0 + 1);
             Prop("Crate", Facing.N, tipsy.x1 - 9, tipsy.y1 - 4);
+        }
+
+        // ------------------------------------------------------------------------------------------- people
+
+        /// <summary>
+        /// C4's people (§28.10), placed after every building, lamp and tree so a walker's route goes round them:
+        /// Wardens, blue, at the Assize's door, on Salt Gullet and by the Black Puddle; the faction, teal, in its front
+        /// garden; Veinmarket, brown, on Draught Lane; the Masters, green, and the sellers, orange, before their stalls on
+        /// Bawling Square; the pawnbroker at her counter in the Black Puddle's north-east corner, clear of the ritual
+        /// circle; townsfolk, yellow, on the main streets, the Penny, the embankment, the quay and the squares; a farmer on
+        /// the West Road. <see cref="SlicePeople"/> puts the named people in place of the Dummies of these names.
+        /// </summary>
+        private static void PeopleC4()
+        {
+            var assize = _layout.buildings.First(b => b.id == "assize");
+            var outward = Turns(FacingOf(assize.facing)) * 90f;
+            foreach (var along in new[] { -2f, 2f })
+            {
+                var at = BeforeFront(assize, along, 3f);
+                Person("Blue", false, at.x, at.y, outward, "Warden at the station");
+            }
+
+            var gullet = _layout.StreetById("main_e");
+            Person("Blue", false, (gullet.a0 + gullet.a1) / 2f + 5f, gullet.c0 + (gullet.walk0 / 2f) + 0.5f, 90f, "Warden on Salt Gullet");
+            var puddle = _layout.SquareById("black_puddle");
+            Person("Blue", true, puddle.x0 + 5f, puddle.y0 + 3.5f, 135f, "Warden at the Black Puddle");
+
+            // The faction's front garden: beside its middle walk, facing the street.
+            var plot = _layout.plots.First(p => p.name == "The faction's house");
+            var pf = FacingOf(plot.facing);
+            var garden = new Vector2((plot.s0 + plot.s1) / 2f, plot.front) - (Outward(pf) * (plot.garden / 2f));
+            Person("Teal", false, garden.x - 4f, garden.y, Turns(pf) * 90f, "Faction member");
+            Person("Teal", true, garden.x + 4f, garden.y, Turns(pf) * 90f, "Faction member");
+
+            // Veinmarket by the east end of Draught Lane, where its houses stop short of the quay.
+            var lane = _layout.StreetById("draught");
+            Person("Brown", false, lane.a1 - 12f, lane.c0 + 1.5f, 0f, "Veinmarket");
+            Person("Brown", false, lane.a1 - 10f, lane.c0 + 3f, 270f, "Veinmarket");
+
+            // The Masters and the sellers before their stalls (Market), as C3 stood them; the roster's sex for each.
+            var s = _layout.SquareById("bawling");
+            Person("Orange", false, s.x0 + 11f, s.y0 + 15f, 180f, "The trader");
+            Person("Green", false, s.x0 + 19f, s.y0 + 15f, 180f, "Master of Enchanting");
+            Person("Green", true, s.x0 + 27f, s.y0 + 15f, 180f, "Master of First Aid");
+            Person("Orange", true, s.x0 + 32f, s.y0 + 14f, 180f, "The seer");
+            Person("Green", true, s.x0 + 12f, s.y0 + 35f, 0f, "Master of Item Creation");
+
+            Person("Orange", true, puddle.x1 - 6.5f, puddle.y0 + 2f, 180f, "The pawnbroker");
+
+            // Townsfolk: on pavements, the Penny's corners, the embankment's river walk, the quay and the squares. A street's
+            // pavements lie inside its c0..c1, along its edges (Band(c0, c0 + walk0) and Band(c1 - walk1, c1)).
+            Vector2 Pave(string id, float along, bool far)
+            {
+                var st = _layout.StreetById(id);
+                var across = far ? st.c1 - (st.walk1 / 2f) : st.c0 + (st.walk0 / 2f);
+                return st.AlongX ? new Vector2(along, across) : new Vector2(across, along);
+            }
+
+            foreach (var (at, yaw, female) in new (Vector2, float, bool)[]
+                     {
+                         (Pave("main_w", 470f, true), 90f, true), (Pave("main_w", 440f, false), 270f, false),
+                         (Pave("main_e", 600f, true), 90f, false), (Pave("main_e", 640f, false), 270f, true),
+                         (new Vector2(515f, 415f), 45f, true), (new Vector2(566f, 414f), 315f, false),
+                         (Pave("lenten", 385f, false), 0f, true), (Pave("smoked", 505f, true), 180f, false),
+                         (new Vector2(450f, 349f), 90f, true), (Pave("widows", 520f, true), 270f, false),
+                         (Pave("embankment", 480f, true), 90f, true), (Pave("embankment", 600f, true), 270f, false),
+                         (new Vector2(677.5f, 400f), 0f, false), (new Vector2(677.5f, 505f), 180f, true),
+                         (new Vector2(540f, 335f), 180f, true), (new Vector2(466f, 476f), 0f, false),
+                         (Pave("works_s", 620f, false), 0f, false), (Pave("works_x", 480f, false), 90f, true),
+                         (new Vector2(618f, 476.5f), 90f, true), // a mill woman on Draught Lane, whom POI B's fear keeps at home (SliceResidue)
+                     })
+            {
+                Person("Yellow", female, at.x, at.y, yaw, "Townsperson");
+            }
+
+            var road = _layout.roads.First(r => r.name == "West Road");
+            Person("Yellow", false, 300f, (road.y0 + road.y1) / 2f, 90f, "Farmer");
+        }
+
+        /// <summary>A plan point <paramref name="ahead"/> m before a building's front, <paramref name="along"/> m from its middle.</summary>
+        private static Vector2 BeforeFront(VeilmouthLayout.BuildingSpec b, float along, float ahead)
+        {
+            var f = FacingOf(b.facing);
+            var e = _kit[KitKey(b.key)];
+            var o = Outward(f);
+            var mid = Centre(Footprint(f, b.front, b.a, e.Width, e.Depth)) + (o * (e.Depth / 2f));
+            return mid + (o * ahead) + (new Vector2(-o.y, o.x) * along);
         }
 
         // ------------------------------------------------------------------------------------------- outside the walls

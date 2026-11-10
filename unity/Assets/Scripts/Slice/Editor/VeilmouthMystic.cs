@@ -16,12 +16,12 @@ using Random = System.Random;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// The mystic layer over Veilmouth C3 (Plans/WORLD_STYLE_GUIDE.md §5–§6, city plan §24.5; owner 2026-11-08: the
-    /// crimson moon and fog, the Gothic skyline, occult signs). Under one root, <see cref="RootName"/>, it places the
-    /// clock-driven <see cref="VeilmouthSky"/> with its day, dusk and night skies and the twilight grade; a teal gas
-    /// light in every street lamp; low fog banks by the water, in Lower Veil's courts, the graveyard and on the Soot
-    /// Stair; faint old wards over about one door in eight in Lower Veil and Under the Ridge and runes on old stone; and
-    /// violet-green glass in Harrow &amp; Tincture and a few Lower Veil shops.
+    /// The mystic layer over Veilmouth (Plans/WORLD_STYLE_GUIDE.md §5–§6, city plan §24.5, placed on C4 by §28.10;
+    /// owner 2026-11-08: the crimson moon and fog, the Gothic skyline, occult signs). Under one root, <see cref="RootName"/>,
+    /// it places the clock-driven <see cref="VeilmouthSky"/> with its day, dusk and night skies and the twilight grade; a
+    /// teal gas light in every street lamp; low fog banks on River Veil and the sea by the quay, in Lower Veil's and the
+    /// Reek's lanes and yards and the cemetery; faint old wards over about one door in eight in Lower Veil and the Reek and
+    /// runes on old stone; and violet-green glass in Harrow &amp; Tincture and a few Lower Veil houses.
     /// <para>
     /// Everything here is seen only: no collider, the NoGrid layer, so the Combat Grid, sight and stealth never read
     /// it, and a ward carries no rule and is no trace of a Weak Point (style guide §6.3). Variants are material assets;
@@ -58,7 +58,7 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// The layer on the saved C3 scene, the city's kit check without the rooms' dressing, and its renders.
+        /// The layer on the saved scene, the city's kit check without the rooms' dressing, and its renders.
         /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthMystic.PlaceAndRender
         /// </summary>
         public static void PlaceAndRender()
@@ -346,20 +346,34 @@ namespace GameDev.Slice.EditorTools
 
         // ------------------------------------------------------------------------------------------------ fog
 
-        /// <summary>The low fog's places, plan metres (style guide §6.1): the river, the basin, the docks, Lower Veil, the graveyard, the Soot Stair.</summary>
-        private static readonly (string Name, float X0, float Y0, float X1, float Y1, bool Water)[] FogPlaces =
+        /// <summary>
+        /// The low fog's places, plan metres (style guide §6.1), from the C4 layout (city plan §28.10): River Veil where it
+        /// runs by the town wall and the embankment, the sea before Fishlip Quay, Draught Lane, Rats' Choir, the Black
+        /// Puddle, Deaf Boiler Yard and Last Turning Cemetery.
+        /// </summary>
+        private static IEnumerable<(string Name, float X0, float Y0, float X1, float Y1, bool Water)> FogPlaces(VeilmouthLayout layout)
         {
-            ("River", 780f, 626f, 820f, 790f, true),
-            ("Basin", 715f, 790f, 850f, 828f, true),
-            ("Sea Quay", 480f, 812f, 740f, 842f, true),
-            ("Dock Road", 701f, 744f, 713f, 812f, false),
-            ("Loom Lane", 618f, 796f, 701f, 802f, false),
-            ("Tenement Court", 646f, 754f, 660f, 762f, false),
-            ("Soot & Bell Yard", 695f, 757f, 701f, 772f, false),
-            ("Pawn Corner", 688f, 800f, 698f, 810f, false),
-            ("Graveyard", 503f, 629f, 528f, 647f, false),
-            ("Soot Stair", 699f, 677f, 709f, 726f, false),
-        };
+            var north = layout.Wall("Town wall (north)").t0;
+            var quay = layout.SquareById("quay");
+            foreach (var r in layout.Rivers)
+            {
+                // Only the reach the city sees: from the north wall down, and no farther east than the quay.
+                yield return ("River Veil", r.x0, Mathf.Max(r.y0, north), Mathf.Min(r.x1, quay.x1), r.y1, true);
+            }
+
+            yield return ("Sea by Fishlip Quay", quay.x1, quay.y0, quay.x1 + 40f, quay.y1, true);
+            foreach (var id in new[] { "draught", "rats_choir" })
+            {
+                var lane = layout.StreetById(id);
+                yield return (lane.name, lane.a0, lane.c0, lane.a1, lane.c1, false);
+            }
+
+            foreach (var id in new[] { "black_puddle", "deaf_boiler", "cemetery" })
+            {
+                var q = layout.SquareById(id);
+                yield return (q.name, q.x0, q.y0, q.x1, q.y1, false);
+            }
+        }
 
         private static ParticleSystem[] FogBanks(Transform parent)
         {
@@ -367,7 +381,7 @@ namespace GameDev.Slice.EditorTools
             var material = FogMaterial();
             var banks = new List<ParticleSystem>();
             var seed = 1u;
-            foreach (var place in FogPlaces)
+            foreach (var place in FogPlaces(VeilmouthLayout.Load()))
             {
                 // Long places go in pieces of at most 40 m, each on its own ground, so the fog follows a slope.
                 var alongX = place.X1 - place.X0 >= place.Y1 - place.Y0;
@@ -488,16 +502,16 @@ namespace GameDev.Slice.EditorTools
             var quad = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
             var count = 0;
 
-            // Over the keystone of about one door in eight in Lower Veil and Under the Ridge, none on the Ridge.
+            // Over the keystone of about one door in eight in Lower Veil and the Reek, none in the richer districts (C4, §28.10).
+            var layout = VeilmouthLayout.Load();
+            var poor = layout.districts.Where(d => d.name == "LOWER VEIL" || d.name == "THE REEK").ToList();
             var city = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None).FirstOrDefault(t => t.parent == null && t.name == VeilmouthCity.RootName);
             var doors = city == null ? new List<Transform>() : city.GetComponentsInChildren<Transform>().Where(t => t.name == VictorianHouses.DoorMarker).ToList();
             foreach (var door in doors.OrderBy(t => t.position.x).ThenBy(t => t.position.z))
             {
                 var (px, py) = (door.position.x + 500f, 500f - door.position.z);
-                var lowerVeil = px >= 618f && py >= 744f;
-                var underRidge = px >= 642f && py > 680f && py < 726f;
                 var hash = (Mathf.RoundToInt(px * 10f) * 73856093) ^ (Mathf.RoundToInt(py * 10f) * 19349663);
-                if ((!lowerVeil && !underRidge) || Math.Abs(hash % WardEvery) != 0)
+                if (!poor.Any(d => px >= d.x0 && px <= d.x1 && py >= d.y0 && py <= d.y1) || Math.Abs(hash % WardEvery) != 0)
                 {
                     continue;
                 }
@@ -510,30 +524,39 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            // Runes on old stone: the town wall by both gates, the Ridge's retaining wall, the Soot Stair's walls.
-            // Plan directions: Vector2.down is north. The Soot Stair's parapets are low, so its runes sit at knee height
-            // (the first pass, at 1.9 m, went over them onto the houses beyond).
-            var rays = new List<(float px, float py, Vector2 dir, string name, float up, float reach)>
+            var poorDoors = doors.Count(t => poor.Any(d => t.position.x + 500f >= d.x0 && t.position.x + 500f <= d.x1 && 500f - t.position.z >= d.y0 && 500f - t.position.z <= d.y1));
+            Debug.Log($"[VeilmouthMystic] {count} wards over {poorDoors} doors in Lower Veil and the Reek.");
+
+            // Runes on old stone (C4, §28.10): the town wall either side of the Creaking Gate and along the north, the works'
+            // walls and the brick blocks either side of Furnace Road. Plan directions: Vector2.down is north.
+            var gate = layout.Wall("Town wall (west)");
+            var gap = gate.gaps[0];
+            var northWall = layout.Wall("Town wall (north)");
+            var furnace = layout.StreetById("works_s");
+            var clinker = layout.StreetById("works_x");
+            var worksWest = layout.Wall("Works wall (west)");
+            var worksSouth = layout.Wall("Works wall (south)");
+            var rays = new List<(float px, float py, Vector2 dir, string name)>
             {
-                (486f, 722f, Vector2.left, "west gate", 1.9f, 12f), (486f, 748f, Vector2.left, "west gate", 1.9f, 12f),
-                (474f, 722f, Vector2.right, "west gate", 1.9f, 12f), (474f, 748f, Vector2.right, "west gate", 1.9f, 12f),
-                (738f, 632f, Vector2.down, "north gate", 1.9f, 12f), (756f, 632f, Vector2.down, "north gate", 1.9f, 12f),
-                (738f, 620f, Vector2.up, "north gate", 1.9f, 12f), (756f, 620f, Vector2.up, "north gate", 1.9f, 12f),
-                (540f, 690f, Vector2.down, "retaining wall", 1.9f, 12f), (590f, 690f, Vector2.down, "retaining wall", 1.9f, 12f),
-                (634f, 690f, Vector2.down, "retaining wall", 1.9f, 12f), (735f, 690f, Vector2.down, "retaining wall", 1.9f, 12f),
-                (704f, 690f, Vector2.left, "Soot Stair", 0.55f, 6f), (704f, 712f, Vector2.right, "Soot Stair", 0.55f, 6f),
+                (gate.t1 + 6f, gap.a - 3f, Vector2.left, "Creaking Gate"), (gate.t1 + 6f, gap.b + 3f, Vector2.left, "Creaking Gate"),
+                (430f, northWall.t1 + 6f, Vector2.down, "north wall"), (590f, northWall.t1 + 6f, Vector2.down, "north wall"),
+                (670f, northWall.t1 + 6f, Vector2.down, "north wall"),
+                (worksWest.t1 + 6f, (clinker.c0 + clinker.c1) / 2f, Vector2.left, "works wall"),
+                ((furnace.c0 + furnace.c1) / 2f, worksSouth.t0 - 6f, Vector2.up, "works wall"),
+                (furnace.c0 + 2f, 612f, Vector2.left, "works"), (furnace.c1 - 2f, 612f, Vector2.right, "works"),
             };
-            foreach (var (px, py, dir, name, up, reach) in rays)
+            foreach (var (px, py, dir, name) in rays)
             {
-                count += Runes(group, quad, runes, px, py, dir, up, reach, name) ? 1 : 0;
+                count += Runes(group, quad, runes, px, py, dir, 1.9f, 12f, name) ? 1 : 0;
             }
 
-            // The three Ritual Site Candidates: the two nearest walls round each.
-            foreach (var (px, py, name) in new[] { (491f, 659f, "Candidate 3"), (643f, 797f, "Candidate 1"), (715f, 708f, "Candidate 2") })
+            // The three Ritual Site Candidates: the two nearest walls round each, from the circle's middle past its rim.
+            foreach (var c in layout.candidates)
             {
+                var (px, py, name, reach) = (c.x, c.y, c.name, (c.size / 2f) + 10f);
                 var around = Enumerable.Range(0, 8)
                     .Select(k => new Vector2(Mathf.Cos(k * Mathf.PI / 4f), Mathf.Sin(k * Mathf.PI / 4f)))
-                    .Select(dir => (dir, hit: OnWall(At(px, py, 1.9f), new Vector3(dir.x, 0f, -dir.y), 14f, out var h) ? h : (RaycastHit?)null))
+                    .Select(dir => (dir, hit: OnWall(At(px, py, 1.9f), new Vector3(dir.x, 0f, -dir.y), reach, out var h) ? h : (RaycastHit?)null))
                     .Where(p => p.hit.HasValue).OrderBy(p => p.hit.Value.distance).Take(2).ToList();
                 foreach (var (_, hit) in around)
                 {
@@ -693,9 +716,11 @@ namespace GameDev.Slice.EditorTools
             }
 
             var all = city.GetComponentsInChildren<Transform>();
-            // Three Lower Veil shops or tenements spread along the district: Lower Veil has a single ShopTown8 front.
-            var houses = all.Where(t => t.name.StartsWith("Kit_House_Shop") || t.name.StartsWith("Kit_House_Tenement"))
-                .Where(t => t.position.x + 500f >= 618f && 500f - t.position.z >= 744f)
+            // Three of Lower Veil's houses spread through the district (C4, §28.10), besides Harrow & Tincture.
+            var veil = VeilmouthLayout.Load().districts.First(d => d.name == "LOWER VEIL");
+            var houses = all.Where(t => t.parent != null && t.parent.name == "Houses" && t.GetComponentsInChildren<Renderer>(true)
+                    .Any(r => r.sharedMaterials.Any(m => m == poor || m == rich)))
+                .Where(t => t.position.x + 500f >= veil.x0 && t.position.x + 500f <= veil.x1 && 500f - t.position.z >= veil.y0 && 500f - t.position.z <= veil.y1)
                 .OrderBy(t => t.position.x).ThenBy(t => t.position.z).ToList();
             var chosen = all.Where(t => t.name == "Harrow & Tincture")
                 .Concat(Enumerable.Range(0, Math.Min(3, houses.Count)).Select(i => houses[((2 * i) + 1) * houses.Count / 6])).Distinct().ToList();

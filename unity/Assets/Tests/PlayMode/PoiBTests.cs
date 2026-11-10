@@ -15,7 +15,7 @@ using Object = UnityEngine.Object;
 namespace GameDev.Slice.Tests
 {
     /// <summary>
-    /// S2.6's PlayMode done-when (VERTICAL_SLICE_IMPLEMENTATION_PLAN) in Veilmouth: POI B's scene stands on Loom Lane only
+    /// S2.6's PlayMode done-when (VERTICAL_SLICE_IMPLEMENTATION_PLAN) in Veilmouth: POI B's scene stands on Draught Lane only
     /// once the player enters its area within the night window (04 *Lazy activation*), and the snatch is settled by two
     /// Approaches without a fight: by Convince, the lane's people swarming, and in a fresh world by Exchange, a tip
     /// promised to a Warden. The clock is held while the player talks, so a check rolls at a known tick.
@@ -164,12 +164,12 @@ namespace GameDev.Slice.Tests
             Debug.Log("[RenderTheSnatch] Logs/SliceDialogue/" + name);
         }
 
-        /// <summary>The player before Kit on the Market square, out of the scene's area.</summary>
+        /// <summary>The player before Kit on Bawling Square, out of the scene's area.</summary>
         private static IEnumerator GoFar(PlayerLocomotion player, PoiStage stage)
         {
             var kit = Object.FindObjectsByType<PersonTalk>().Single(t => t.Dialogue != null && t.Dialogue.Id == "kit");
             var place = kit.transform.position + (kit.transform.forward * 1.5f) + (Vector3.up * 0.1f);
-            Assert.IsFalse(stage.Within(place), "the Market square stands out of the scene's area");
+            Assert.IsFalse(stage.Within(place), "Bawling Square stands out of the scene's area");
             player.Teleport(place, player.transform.rotation);
             yield return new WaitForSeconds(0.3f);
         }

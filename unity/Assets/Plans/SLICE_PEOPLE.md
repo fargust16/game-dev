@@ -2,13 +2,15 @@
 
 Status: Draft — proposed by the agent on 2026-11-06 and **accepted by the owner on 2026-11-07**: all fourteen, with the agent's placeholder names, which stay mutable.
 Created: 2026-11-06
-Last Updated: 2026-11-09 (S2.7: Nell's lie and her day-2 lines by outcome, authoring defaults. Earlier: S2.4: Nell and Kit are talked to; Nell's Approaches, their Arguments and the Exchange, authoring defaults. Earlier: S2.0: the names, roles and lines are in the string tables, in English and Russian. Earlier: accepted by the owner: the roster and the placeholder names. Earlier: first draft for the owner)
+Last Updated: 2026-11-10 (names since C4: Bell Street is the Black Puddle, Loom Lane Draught Lane, the Market square Bawling Square; the records keep their day's names (city plan §28.10). Earlier: S2.7: Nell's lie and her day-2 lines by outcome, authoring defaults. Earlier: S2.4: Nell and Kit are talked to; Nell's Approaches, their Arguments and the Exchange, authoring defaults. Earlier: S2.0: the names, roles and lines are in the string tables, in English and Russian. Earlier: accepted by the owner: the roster and the placeholder names. Earlier: first draft for the owner)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](../../../11.1%20Vertical%20Slice%20POIs.md), [09 Information Sources](../../../09%20Information%20Sources.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §5
 Related: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1 (colours), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §21 (places)
 
 Content piece C1 of the implementation plan's §5, not the city plan C1. S1 needs it: the named people placed in the city (A.1), and the tips of the Notice Board, the bartender, and Street Rumour (Q.2).
 
 Since S2.0 (17 X.7) the game reads every name, role and line below from the string tables, in English and Russian: `Resources/Localization/people.csv` (`person.<id>.name`, `.role`) and `poi.csv` (`tip.<id>.line`, `.note`). This document keeps the roster and the English placeholders; a name or a line is changed in the table, and here when its English changes.
+
+**Names since C4** ([VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §28.10, 2026-11-10): Bell Street is the Black Puddle, Loom Lane is Draught Lane, and the Market square is Bawling Square. The records below keep the names and places of the city they were built in.
 
 ---
 

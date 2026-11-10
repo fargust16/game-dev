@@ -16,7 +16,7 @@ namespace GameDev.Slice.Tests
         {
             yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
             var walkers = Object.FindObjectsByType<TownsfolkWalker>(FindObjectsSortMode.None);
-            Assert.AreEqual(15, walkers.Length, "every yellow townsperson walks");
+            Assert.AreEqual(20, walkers.Length, "every yellow townsperson walks: C4's nineteen and its farmer (city plan §28.10)");
             var start = walkers.Select(w => w.transform.position).ToArray();
 
             yield return new WaitForSeconds(3f);

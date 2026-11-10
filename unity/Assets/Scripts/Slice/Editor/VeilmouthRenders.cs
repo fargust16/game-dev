@@ -20,98 +20,20 @@ namespace GameDev.Slice.EditorTools
         [MenuItem("GameDev/Slice/Render Veilmouth Views")]
         public static void RenderAll()
         {
-            Directory.CreateDirectory(OutputFolder);
-            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
-            ShowCircles();
-
-            // The wind controller runs only in an editor frame; a batch render sets its globals itself.
-            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
-            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
-            // C2 views; an eye stands 1.7 m above the ground under it.
-            Top("view_world", new Vector3(0f, 0f, 0f), 500f);
-            Top("view_city", new Vector3(130f, 0f, -228f), 160f);
-            Top("view_lowerveil", new Vector3(200f, 0f, -287f), 60f);
-            Top("view_government", new Vector3(110f, 0f, -170f), 60f);
-            Top("view_market", new Vector3(50f, 0f, -287f), 60f);
-            Top("view_hill", new Vector3(420f, 0f, 140f), 180f);
-            Eye("eye_bellstreet", 195f, -275f, 100f, -275f, 2.5f);
-            Eye("eye_highstreet", -10f, -235f, 100f, -235f, 3f);
-            Eye("eye_avenue", 110f, -218f, 110f, -160f, 4f);
-            Eye("eye_ridgestreet", 0f, -168f, 120f, -168f, 3f);
-            Eye("eye_sootstair", 204f, -178f, 204f, -215f, 0f);
-            Eye("eye_bridge", 300f, -235f, 200f, -235f, 4f);
-            Eye("eye_quay", 100f, -318f, 230f, -330f, 0f);
-            Eye("eye_westgate", -80f, -235f, 20f, -220f, 4f);
-            Eye("eye_forest", 123f, 120f, 123f, 300f, 2f);
-            Eye("eye_hill", 340f, 0f, 420f, 140f, 20f);
-            // The owner's remarks of 2026-11-06: the terraces' gardens, a corner house, a villa's garden, the North Gate.
-            Eye("eye_terraces", 22f, -184f, 22f, -215f, 2f);
-            Eye("eye_corner", 30f, -237f, 2f, -213f, 3f);
-            Eye("eye_villa", 40f, -168f, 18f, -147f, 3f);
-            Eye("eye_northgate", 247f, -140f, 247f, -118f, 4f);
-            Eye("eye_shopfront", 60f, -235f, 60f, -223f, 1.5f);
-            // Detached houses on their plots (city plan §19): the Terraces and the Ridge from above, a gate, a villa's side.
-            Top("view_terraces", new Vector3(26f, 0f, -203f), 50f);
-            Top("view_ridge_west", new Vector3(55f, 0f, -150f), 50f);
-            Top("view_ridge_east", new Vector3(220f, 0f, -150f), 50f);
-            Eye("eye_plot_gate", 18f, -199f, 7f, -199f, 1.7f);
-            Eye("eye_villa_side", 40f, -172f, 21f, -146f, 1.7f);
-
+            // Since C4 (city plan §28.10) the city's views are C4's; the interiors follow.
+            RenderC4();
             RenderInteriors();
             Debug.Log($"Veilmouth views written to {OutputFolder}.");
         }
 
         /// <summary>
-        /// The city of plan C3 (VEILMOUTH_CITY_PLAN.md §24) from above and from a walker's height, without the interiors.
-        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderC3
-        /// </summary>
-        public static void RenderC3()
-        {
-            Directory.CreateDirectory(OutputFolder);
-            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
-            ShowCircles();
-            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
-            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
-            Top("c3_city", new Vector3(130f, 0f, -228f), 160f);
-            Top("c3_government", new Vector3(106f, 0f, -180f), 55f);
-            Top("c3_market", new Vector3(60f, 0f, -270f), 60f);
-            Top("c3_lowerveil", new Vector3(198f, 0f, -287f), 60f);
-            Top("c3_ridge_west", new Vector3(50f, 0f, -150f), 55f);
-            Top("c3_ridge_east", new Vector3(210f, 0f, -150f), 55f);
-            Top("c3_underridge", new Vector3(210f, 0f, -205f), 50f);
-            Eye("c3_eye_highstreet", -10f, -235f, 100f, -235f, 3f);
-            Eye("c3_eye_avenue", 112f, -232f, 112f, -160f, 6f);
-            Eye("c3_eye_palace", 112f, -178f, 112f, -140f, 8f);
-            Eye("c3_eye_parade", 0f, -174f, 120f, -174f, 3f);
-            Eye("c3_eye_bellstreet", 195f, -278f, 100f, -278f, 2.5f);
-            Eye("c3_eye_market", 54f, -248f, 100f, -282f, 2f);
-            Eye("c3_eye_clocktower", 135f, -238f, 94.5f, -223.5f, 18f);
-            Eye("c3_eye_court", 151.5f, -246f, 151.5f, -258f, 2f);
-            Eye("c3_eye_slant", -11f, -247f, 14f, -272f, 2f);
-            Eye("c3_eye_sootstair", 204f, -178f, 204f, -215f, 0f);
-            Eye("c3_eye_quay", 100f, -318f, 230f, -330f, 0f);
-            Eye("c3_eye_westgate", -80f, -235f, 20f, -220f, 4f);
-            Eye("c3_eye_northgate", 247f, -140f, 247f, -118f, 4f);
-            Eye("c3_eye_terraces", 22f, -184f, 22f, -215f, 2f);
-            Eye("c3_eye_ritual", 143f, -287f, 143f, -305f, 1f);
-            Debug.Log($"Veilmouth C3 views written to {OutputFolder}.");
-        }
-
-        /// <summary>
-        /// The city of plan C4 (VEILMOUTH_CITY_PLAN.md §28) from above and from a walker's height. Until C4's people, dogs
-        /// and dressing are placed again (§28.4, step 8), every other root but the ground and the water is hidden for the
-        /// picture only. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderC4
+        /// The city of plan C4 (VEILMOUTH_CITY_PLAN.md §28) from above and from a walker's height, with its people, dogs,
+        /// ornaments and mystic layer (§28.10). Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderC4
         /// </summary>
         public static void RenderC4()
         {
             Directory.CreateDirectory(OutputFolder);
-            var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
-            foreach (var root in scene.GetRootGameObjects().Where(r => r.name != VeilmouthCity.RootName && r.GetComponentInChildren<Terrain>() == null &&
-                                                                      r.name != "Water" && r.GetComponentInChildren<Renderer>() != null))
-            {
-                root.SetActive(false);
-            }
-
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             ShowCircles();
             Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
@@ -140,6 +62,13 @@ namespace GameDev.Slice.EditorTools
             Eye("c4_eye_works", 40f, -108f, 40f, -190f, 2f);
             Eye("c4_eye_hamlet", -135f, 60f, -250f, 60f, 2f);
             Eye("c4_eye_gloomwood", -240f, -50f, -200f, -110f, 2f);
+            // The slice's places (§28.10): the Masters before their stalls, the Wardens at the Assize, the Black Puddle with
+            // the pawnbroker, Draught Lane where POI B happens, the lions before the Governor's House.
+            Eye("c4_eye_masters", -49f, 28f, -55f, 40f, 1.7f);
+            Eye("c4_eye_assize", 66f, 88f, 66f, 103f, 1.7f);
+            Eye("c4_eye_puddle", 112f, -30f, 133f, -1f, 1.7f);
+            Eye("c4_eye_draught", 158f, 23.5f, 115f, 23.5f, 1.7f);
+            Eye("c4_eye_lions", 15f, 40f, 15f, 18f, 2f);
             Debug.Log($"Veilmouth C4 views written to {OutputFolder}.");
         }
 

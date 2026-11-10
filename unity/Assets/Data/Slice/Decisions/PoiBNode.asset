@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: poi-b
   title: "Eleventh-Bell Collectors"
-  situation: "After the eleventh bell Loom Lane empties faster than it should. A side-coach without crest lamps waits past the coal stairs. Two figures in coach-coats drag a screaming mill girl toward the alley; another girl fights free for one breath. A distant Warden whistle is too far. (11.1 POI B)"
+  situation: "After the eleventh bell Draught Lane empties faster than it should. A side-coach without crest lamps waits past the coal stairs. Two figures in coach-coats drag a screaming mill girl toward the alley; another girl fights free for one breath. A distant Warden whistle is too far. (11.1 POI B)"
   poi: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
   scene: {fileID: 11400000, guid: 3f5b7d9e1a2c4e5f7a9b1c3d5e7f9a2b, type: 2}
   primaryAxis: 2
@@ -101,7 +101,7 @@ MonoBehaviour:
     countsAsWithdraw: 0
     prepares: 1
     later: 
-  - name: "Leave Loom Lane"
+  - name: "Leave Draught Lane"
     axes:
     - 0
     - 3

@@ -101,7 +101,7 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual("poib", node.Scene.Id);
             Assert.AreEqual(DecisionAxis.Allegiance, node.PrimaryAxis);
             Assert.AreEqual(DecisionAxis.Approach, node.SecondaryAxis);
-            CollectionAssert.AreEqual(new[] { "Protect the victims now", "Follow the coach instead", "Signal or fetch Wardens", "Exchange for a tip before moving", "Leave Loom Lane" },
+            CollectionAssert.AreEqual(new[] { "Protect the victims now", "Follow the coach instead", "Signal or fetch Wardens", "Exchange for a tip before moving", "Leave Draught Lane" },
                 node.Options.Select(o => o.name), "11.1's five options");
             CollectionAssert.AreEqual(new[] { "S3" }, node.Options.Where(o => o.dialogueOptions.Length == 0).Select(o => o.later), "following the coach waits for S3");
             Assert.IsTrue(node.Options.Single(o => o.name == "Exchange for a tip before moving").prepares, "the tip settles nothing by itself");

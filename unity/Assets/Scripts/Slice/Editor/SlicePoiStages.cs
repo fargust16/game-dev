@@ -14,7 +14,7 @@ namespace GameDev.Slice.EditorTools
     /// Once each, the POIs' scenes in Veilmouth, posed and hidden until the player enters the area within the window
     /// (<see cref="PoiStage"/>), each talking through <see cref="PersonTalk"/> with its POI's conversation. S2.5, POI A
     /// before Harrow &amp; Tincture (11.1 POI A §1): Harrow held by two Wardens on the cobbles, a third in his door, and three
-    /// neighbours facing them, measured from the shop's street door. S2.6, POI B on Loom Lane (11.1 POI B §1): two
+    /// neighbours facing them, measured from the shop's street door. S2.6, POI B on Draught Lane (11.1 POI B §1; Loom Lane before C4): two
     /// Veinmarket collectors dragging a mill girl toward the coal stairs, another girl torn free, and an old woman in a
     /// doorway, measured from the lane's middle found near the POI's place. A scene that already has its stage is left as it
     /// is, as Veilmouth is the owner's.
@@ -126,7 +126,7 @@ namespace GameDev.Slice.EditorTools
             person.SetParent(cast.transform, true);
         }
 
-        [MenuItem("GameDev/Slice/POI/Stage POI B on Loom Lane in Veilmouth (once)")]
+        [MenuItem("GameDev/Slice/POI/Stage POI B on Draught Lane in Veilmouth (once)")]
         public static void StagePoiB()
         {
             var scene = EditorSceneManager.OpenScene(SlicePeople.ScenePath(SliceRoster.Veilmouth), OpenSceneMode.Single);

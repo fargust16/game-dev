@@ -425,9 +425,17 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            // The Notice Board on the Black Puddle, by the Soot & Bell's door.
+            // The Notice Board on the Black Puddle by the Soot & Bell, 3 m out from the square's west fronts, beyond the reach of
+            // their stoops (1 m out, it was refused by one stoop and touched the tavern's by 0.14 m, which the free-place test
+            // does not see), and north of the hidden ritual circle.
             var puddle = _layout.SquareById("black_puddle");
-            Prop("NoticeBoard", Facing.E, puddle.x0 + 1f, puddle.y0 + 3f, "Notice Board");
+            var board = new[] { (3f, 3f), (3f, 6f), (4f, 2f), (5f, 4f) }
+                .Select(o => Prop("NoticeBoard", Facing.E, puddle.x0 + o.Item1, puddle.y0 + o.Item2, "Notice Board"))
+                .FirstOrDefault(p => p != null);
+            if (board == null)
+            {
+                Debug.LogError("[VeilmouthCity] no free place for the Notice Board on the Black Puddle.");
+            }
         }
 
         /// <summary>The old chapel, its door's portal at the kit's door point, opening on its forecourt (§28.5).</summary>
@@ -586,13 +594,35 @@ namespace GameDev.Slice.EditorTools
             var quay = _layout.SquareById("quay");
             Lamps(false, quay.x1 - 2f, 0, (int)quay.y0, (int)quay.y1, 30f, 8f);
 
-            // Round the Penny's ring, 2 m out from it, off the streets' axes.
+            // Round the Penny's ring, 2 m out from it, off the streets' axes, each turned along the ring until it stands in no
+            // door's way (9 m before a door and 2.5 m to its side, a little wider than VeilmouthCityTests reads).
             var plaza = _layout.plaza;
+            var doors = _root.GetComponentsInChildren<Transform>(true).Where(t => t.name == VictorianHouses.DoorMarker).ToList();
+            bool InADoorsWay(Vector2 plan)
+            {
+                var at = new Vector3(plan.x - 500f, 0f, 500f - plan.y);
+                return doors.Any(d =>
+                {
+                    var off = at - d.position;
+                    off.y = 0f;
+                    var outside = Vector3.Dot(off, d.forward);
+                    return outside > 0f && outside < 9f && Mathf.Abs(Vector3.Dot(off, d.right)) < 2.5f;
+                });
+            }
+
             for (var k = 0; k < 8; k++)
             {
-                var angle = (22.5f + (45f * k)) * Mathf.Deg2Rad;
-                var at = new Vector2(plaza.cx, plaza.cy) + (new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * (plaza.ringOuter + 2f));
-                Prop("LampPost", Facing.N, Mathf.Round(at.x - 0.5f), Mathf.Round(at.y - 0.5f));
+                foreach (var turn in new[] { 0f, 6f, -6f, 12f, -12f })
+                {
+                    var angle = (22.5f + (45f * k) + turn) * Mathf.Deg2Rad;
+                    var at = new Vector2(plaza.cx, plaza.cy) + (new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * (plaza.ringOuter + 2f));
+                    var corner = new Vector2(Mathf.Round(at.x - 0.5f), Mathf.Round(at.y - 0.5f));
+                    if (!InADoorsWay(corner + new Vector2(0.5f, 0.5f)) && !InADoorsWay(corner + new Vector2(0.5f, -0.5f)) &&
+                        Prop("LampPost", Facing.N, corner.x, corner.y) != null)
+                    {
+                        break;
+                    }
+                }
             }
 
             foreach (var id in new[] { "drowsy", "bawling", "black_puddle", "deaf_boiler" })

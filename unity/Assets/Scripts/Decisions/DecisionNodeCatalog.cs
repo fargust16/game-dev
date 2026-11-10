@@ -147,7 +147,7 @@ namespace GameDev.Decisions
                         "Bad tip into a dead yard; coach already rolling",
                         new[] { "residue_tip_bought", "rumour_merrin_tipster" }),
                     Opt(
-                        "Leave Loom Lane",
+                        "Leave Draught Lane",
                         "Attention + Commitment",
                         ApproachType.Withdraw,
                         "Withdraw",
