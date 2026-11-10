@@ -20,6 +20,18 @@
             <ui:VisualElement name="dialogue-options" class="hud__dialogue-options" picking-mode="Ignore" />
             <ui:Label class="hud__reading-close hud__loc" text="ui.hud.dialogue.close" picking-mode="Ignore" />
         </ui:VisualElement>
+        <!-- S3a.5: the fight. FightHud writes it; the hint below is a key like every hud__loc label. -->
+        <ui:VisualElement name="fight" class="hud__fight" picking-mode="Ignore">
+            <ui:VisualElement name="fight-order" class="hud__fight-order" picking-mode="Ignore" />
+            <ui:Label name="fight-who" class="hud__fight-who" text="" picking-mode="Ignore" />
+            <ui:Label name="fight-log" class="hud__fight-log" text="" picking-mode="Ignore" />
+            <ui:VisualElement name="fight-bar" class="hud__fight-bar" picking-mode="Ignore">
+                <ui:Label name="fight-hp" class="hud__fight-hp" text="" picking-mode="Ignore" />
+                <ui:VisualElement name="fight-ap" class="hud__fight-ap" picking-mode="Ignore" />
+                <ui:Label class="hud__fight-hint hud__loc" text="ui.fight.hint" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label name="fight-tip" class="hud__fight-tip" text="" picking-mode="Ignore" />
+        </ui:VisualElement>
         <ui:VisualElement name="notes" class="hud__notes">
             <ui:Label class="hud__notes-title hud__loc" text="ui.hud.notes.title" picking-mode="Ignore" />
             <ui:ScrollView name="notes-list" class="hud__notes-list" />

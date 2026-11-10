@@ -23,3 +23,9 @@ MonoBehaviour:
   opponentModel: {fileID: 6665424575185744845, guid: 9fea873044392c744863f2c285c6839c, type: 3}
   opponentWeapon: {fileID: 11400000, guid: 7d5ac9fe2dcf482d9bc1a7dc4d8b420a, type: 2}
   gridMaterial: {fileID: 2100000, guid: 2df79b3057456e74fa4b498a77bb2ca8, type: 2}
+  fightCursors:
+  - {fileID: 2800000, guid: 51cb6ee928f89b64691ef4dfd57c03e9, type: 3}
+  - {fileID: 2800000, guid: 583ebe40474f892468eb72f2bb7ea4a8, type: 3}
+  - {fileID: 2800000, guid: ce683041f000c7c48b73e8fbda566384, type: 3}
+  - {fileID: 2800000, guid: ce5dc72a2c53d5e49917ae08ad7172d5, type: 3}
+  - {fileID: 2800000, guid: 0561d5958b7b1b14fb067879aaa7b5f3, type: 3}

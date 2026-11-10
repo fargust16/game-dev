@@ -30,6 +30,7 @@ namespace GameDev.Confront.Turns
         private readonly List<CombatCell> _path = new List<CombatCell>();
         private readonly List<CombatCell> _candidate = new List<CombatCell>();
         private readonly List<CombatCell> _best = new List<CombatCell>();
+        private readonly List<CombatCell> _walked = new List<CombatCell>();
         private Random _rolls;
         private int _turn;
         private int _turnsThisRound;
@@ -57,6 +58,8 @@ namespace GameDev.Confront.Turns
         public event Action<int> Ended;
 
         public event Action<Combatant, Combatant, StrikeResult> Struck;
+
+        public event Action<Combatant, IReadOnlyList<CombatCell>> Walked;
 
         public void BeginEncounter(IReadOnlyList<Combatant> combatants, Random rolls)
         {
@@ -148,6 +151,32 @@ namespace GameDev.Confront.Turns
                 EndTurn(c);
             }
         }
+
+        public int PathToStrike(Combatant attacker, Combatant target, List<CombatCell> path)
+        {
+            path?.Clear();
+            if (!IsRunning || attacker == null || target == null || attacker.Fighter.Weapon == null || !attacker.Standing
+                || !target.Standing || target.Side == attacker.Side)
+            {
+                return -1;
+            }
+
+            if (Reaches(attacker, target))
+            {
+                return 0;
+            }
+
+            var steps = StepsBeside(attacker, target);
+            if (steps == int.MaxValue)
+            {
+                return -1;
+            }
+
+            path?.AddRange(_candidate);
+            return steps;
+        }
+
+        public StrikeContext ContextFor(CombatCell from, Combatant target) => new StrikeContext { Beyond = Distance(from, target.Cell) > 1 };
 
         public void Join(Combatant combatant)
         {
@@ -367,6 +396,7 @@ namespace GameDev.Confront.Turns
         private int Walk(Combatant c, List<CombatCell> path, int steps, Combatant target)
         {
             var walked = 0;
+            _walked.Clear();
             for (var i = 0; i < steps && i < path.Count && ApLeft > 0; i++)
             {
                 if (!_grid.Occupy(c.Id, path[i]))
@@ -375,6 +405,7 @@ namespace GameDev.Confront.Turns
                 }
 
                 c.Cell = path[i];
+                _walked.Add(path[i]);
                 ApLeft--;
                 walked++;
                 if (target != null && Reaches(c, target))
@@ -384,6 +415,11 @@ namespace GameDev.Confront.Turns
             }
 
             c.Position = _grid.Center(c.Cell);
+            if (walked > 0)
+            {
+                Walked?.Invoke(c, _walked);
+            }
+
             return walked;
         }
 
@@ -396,7 +432,7 @@ namespace GameDev.Confront.Turns
             }
 
             ApLeft -= weapon.AttackAp;
-            var result = _rules.Strike(c.Fighter, target.Fighter, new StrikeContext { Beyond = Distance(c.Cell, target.Cell) > 1 }, _rolls);
+            var result = _rules.Strike(c.Fighter, target.Fighter, ContextFor(c.Cell, target), _rolls);
             if (target.Fighter.Down)
             {
                 _grid.Vacate(target.Id);

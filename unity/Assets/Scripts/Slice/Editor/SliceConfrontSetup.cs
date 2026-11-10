@@ -21,6 +21,12 @@ namespace GameDev.Slice.EditorTools
         // Authoring default: a pale, muted line that reads on the setts and the grass by day and under gaslight.
         private static readonly Color GridColour = new Color(0.78f, 0.82f, 0.72f);
 
+        // S3a.5: Basic RPG Cursors (asset map §5) for FightCursor's shapes, in their order: the bronze arrow, the four
+        // arrows, the sword, and the arrow and the sword with their red mark for what the AP do not reach. The pack's
+        // shot cursor is a crossbow, which the setting has not, so a shot shows the sword too.
+        private const string Cursors = "Assets/Cursors/Cursors 64/";
+        private static readonly string[] FightCursors = { "Cursor_Basic2", "Cursor_Move1", "Cursor_Attack", "Cursor_Basic2_R", "Cursor_Attack_R" };
+
         public static void Configure()
         {
             var settings = AssetDatabase.LoadAssetAtPath<SliceSettings>(SettingsPath);
@@ -33,6 +39,13 @@ namespace GameDev.Slice.EditorTools
             so.FindProperty("opponentModel").objectReferenceValue = Load<GameObject>(OpponentModel);
             so.FindProperty("opponentWeapon").objectReferenceValue = Load<FightWeapon>($"{Data}/Weapons/Dagger.asset");
             so.FindProperty("gridMaterial").objectReferenceValue = GridMaterial();
+            var cursors = so.FindProperty("fightCursors");
+            cursors.arraySize = FightCursors.Length;
+            for (var i = 0; i < FightCursors.Length; i++)
+            {
+                cursors.GetArrayElementAtIndex(i).objectReferenceValue = Cursor(FightCursors[i]);
+            }
+
             so.ApplyModifiedPropertiesWithoutUndo();
             AssetDatabase.SaveAssets();
             Debug.Log("[SliceConfrontSetup] the slice's settings carry the fight's numbers, the development kit, the opponents and the grid's material.");
@@ -50,6 +63,20 @@ namespace GameDev.Slice.EditorTools
             material.SetColor("_BaseColor", GridColour);
             EditorUtility.SetDirty(material);
             return material;
+        }
+
+        /// <summary>A pack image imported as a cursor, which <c>Cursor.SetCursor</c> needs: the pack ships them as sprites.</summary>
+        private static Texture2D Cursor(string name)
+        {
+            var path = $"{Cursors}{name}.png";
+            if (AssetImporter.GetAtPath(path) is TextureImporter importer && importer.textureType != TextureImporterType.Cursor)
+            {
+                importer.textureType = TextureImporterType.Cursor;
+                importer.mipmapEnabled = false;
+                importer.SaveAndReimport();
+            }
+
+            return Load<Texture2D>(path);
         }
 
         private static T Load<T>(string path)

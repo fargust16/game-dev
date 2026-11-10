@@ -67,6 +67,15 @@ namespace GameDev.Confront.Turns
         /// <summary>Plays the acting combatant's whole turn by the rule that stands until Target Rules V0 (S3a.8).</summary>
         void PlayTurn();
 
+        /// <summary>
+        /// The fewest steps the attacker takes to a cell from which its weapon reaches the target, the cells in
+        /// <paramref name="path"/>: 0 when it reaches it now, −1 when there is no way or no blow (S3a.5).
+        /// </summary>
+        int PathToStrike(Combatant attacker, Combatant target, List<CombatCell> path);
+
+        /// <summary>What the place adds to a blow or shot from a cell at the target (S3a.5; S3a.6 brings cover and position).</summary>
+        StrikeContext ContextFor(CombatCell from, Combatant target);
+
         /// <summary>A combatant who entered the grid; it comes in at the next round.</summary>
         void Join(Combatant combatant);
 
@@ -83,5 +92,11 @@ namespace GameDev.Confront.Turns
 
         /// <summary>Raised after each attack with the attacker, its target and what the blow did, before the end is checked.</summary>
         event Action<Combatant, Combatant, StrikeResult> Struck;
+
+        /// <summary>
+        /// Raised after a combatant walks, with the cells it stepped into in order (S3a.5), so the scene can walk its body
+        /// along them. The list is the economy's own and changes with the next walk: read it at once.
+        /// </summary>
+        event Action<Combatant, IReadOnlyList<CombatCell>> Walked;
     }
 }

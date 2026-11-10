@@ -1,12 +1,12 @@
 # Animation Pipeline — Blender and Mixamo to Unity
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft — the owner's decision of 2026-11-10, planned by the agent; the steps wait for the owner's word, as every slice milestone does
 
 Created: 2026-11-10
 
-Last Updated: 2026-11-10 (§3, §5, §6: A3's first four clips, Mining, Chopping, Hammering and Surrender, made in Blender by a script that is their source; the blacksmith hammers at the anvil; the rest of A3 waits for its actions. Earlier: §5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
+Last Updated: 2026-11-11 (§5 A fight: the walk in a fight and the hit or the death at the blow's impact, shown beat by beat by S3a.5's `FightBeats`. Earlier: 2026-11-10: §3, §5, §6: A3's first four clips, Mining, Chopping, Hammering and Surrender, made in Blender by a script that is their source; the blacksmith hammers at the anvil; the rest of A3 waits for its actions. Earlier: §5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1–§2, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -101,10 +101,11 @@ Each phase waits for the owner's word.
   - **The townsfolk:** the walk and the idle, each walker's pace measured again from the new walk: 1.18 to 1.57 m/s.
   - **Standing people:** the idle. A Warden stands at attention (`Warden.controller`), and a woman Warden in the women's pose, a hand on the hip (`WardenWoman.controller`). The people's controllers are in `Assets/Animation/Controllers`.
   - **Talking:** a person the player talks to plays the talk (`Talking 1`) while the conversation is open (`PersonTalk`, the Animator's `Talking`).
-  - **A fight** (`SliceConfront`, on the turns' `Struck`):
+  - **A fight** (`SliceConfront`, on the turns' `Struck` and `Walked`, shown beat by beat by `FightBeats` since S3a.5):
+    - A fighter walks its path cell by cell in the walk clip, the player's locomotion at a walk or a person's own walk, and goes back into its guard.
     - Every fighter takes its guard as the fight begins and leaves it as it ends.
     - The guard and the blow follow the weapon, on the controllers' `Weapon` 1–5: sword, axe and mace with the sword and shield's clips; greatsword, greataxe and maul; the dagger, a stab from the sword's guard, as Mixamo has no dagger guard; pistol; rifle.
-    - The attacker turns to its target. The target plays its hit when the blow takes HP, and its death (`Dying`) when it goes down.
+    - The attacker turns to its target. The target plays its hit when the blow takes HP, and its death (`Dying`) when it goes down, at the blow's impact, 0.35 s into it.
     - A body with a death clip no longer turns on its back; one without, as a beast's, still does.
 - **Kept for their systems**, imported and named but not wired, since the slice has no such action yet: turns on the spot, the gestures (wave, point, nod, argue), sitting, drinking, crouching and sneaking, picking up, kneeling and gathering, the magic attacks and casting, the shield block, the step back, and lying down, sleeping and getting up. Each is wired with the system that brings its action.
 

@@ -36,6 +36,10 @@ namespace GameDev.Slice
         [Tooltip("The Combat Grid's cell outlines.")]
         [SerializeField] private Material gridMaterial;
 
+        [Header("The player's turn (S3a.5)")]
+        [Tooltip("Basic RPG Cursors (asset map §5), one for each FightCursor shape in its order: plain, walk, strike, a walk the AP do not reach, a blow they do not reach. SliceConfrontSetup imports them as cursors.")]
+        [SerializeField] private Texture2D[] fightCursors;
+
         public int Seed => seed;
 
         public SocialCheckRules SocialChecks => socialChecks;
@@ -57,6 +61,8 @@ namespace GameDev.Slice
         public FightWeapon OpponentWeapon => opponentWeapon;
 
         public Material GridMaterial => gridMaterial;
+
+        public Texture2D[] FightCursors => fightCursors;
 
         public IWorldSeed CreateSeed()
         {

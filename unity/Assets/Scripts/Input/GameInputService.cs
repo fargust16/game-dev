@@ -31,6 +31,8 @@ namespace GameDev.Input
         private InputAction _camZoom;
         private InputAction _camFocus;
         private InputAction _camFast;
+        private InputAction _camTurn;
+        private InputAction _endTurn;
 
         private InputAction _pause;
         private InputAction _advanceHour;
@@ -137,6 +139,12 @@ namespace GameDev.Input
         }
         public bool CameraFocusPressed => _camFocus != null && _camFocus.WasPressedThisFrame();
         public bool CameraFastHeld => _camFast != null && _camFast.IsPressed();
+
+        /// <summary>The fight camera's turn (S3a.5, the grid lab's keys): −1 for Q, +1 for E.</summary>
+        public float CameraTurn => _camTurn != null ? _camTurn.ReadValue<float>() : 0f;
+
+        /// <summary>Ends the player's turn in a fight (S3a.5 authoring default: Space or Enter).</summary>
+        public bool EndTurnPressed => _endTurn != null && _endTurn.WasPressedThisFrame();
         public Vector2 MousePosition => Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
         public Vector2 MouseDelta => Mouse.current != null ? Mouse.current.delta.ReadValue() : Vector2.zero;
 
@@ -193,6 +201,10 @@ namespace GameDev.Input
             _sprint = _player.AddAction("Sprint", InputActionType.Button);
             _sprint.AddBinding("<Keyboard>/leftShift");
             _sprint.AddBinding("<Keyboard>/rightShift");
+            _endTurn = _player.AddAction("EndTurn", InputActionType.Button);
+            _endTurn.AddBinding("<Keyboard>/space");
+            _endTurn.AddBinding("<Keyboard>/enter");
+            _endTurn.AddBinding("<Keyboard>/numpadEnter");
 
             _camera = new InputActionMap("Camera");
             _camPan = _camera.AddAction("Pan", InputActionType.Value);
@@ -209,6 +221,10 @@ namespace GameDev.Input
             _camFast = _camera.AddAction("Fast", InputActionType.Button);
             _camFast.AddBinding("<Keyboard>/leftShift");
             _camFast.AddBinding("<Keyboard>/rightShift");
+            _camTurn = _camera.AddAction("Turn", InputActionType.Value);
+            _camTurn.AddCompositeBinding("1DAxis")
+                .With("Negative", "<Keyboard>/q")
+                .With("Positive", "<Keyboard>/e");
 
             _world = new InputActionMap("World");
             _pause = _world.AddAction("Pause", InputActionType.Button, "<Keyboard>/p");

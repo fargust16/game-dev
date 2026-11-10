@@ -299,6 +299,25 @@ namespace GameDev.Confront.Rules
             return weapon.BaseDamage * StageFactor(weapon.Stage) * strength * (1d + attacker.Modifiers.damage);
         }
 
+        /// <summary>
+        /// What a blow or shot in this context is likely to do (S3a.5): the chance of <see cref="HitChance"/>, and an
+        /// ordinary hit's damage, the roll's whole spread through the armour it meets.
+        /// </summary>
+        public StrikeForecast Forecast(Fighter attacker, Fighter target, StrikeContext context)
+        {
+            var through = BaseDamage(attacker) * (1d - Reduction(DefenceAgainst(attacker, target, context.Beyond, false)));
+            return new StrikeForecast(
+                HitChance(attacker, target, context.HitBonus),
+                through * (1d - spread),
+                through * (1d + spread),
+                baseHit,
+                Accuracy(attacker),
+                Evasion(target),
+                context.HitBonus,
+                attacker.Get(CharacterAttribute.Luck),
+                Aim(attacker));
+        }
+
         /// <summary>A melee hit can be parried or blocked by a target holding the reaction's AP and able to act.</summary>
         public bool CanGuard(Fighter target) =>
             target.Set.Guard != Guard.None && target.Reserve >= reactionAp && target.LostTurns == 0 && target.CanEvade && !target.Down;

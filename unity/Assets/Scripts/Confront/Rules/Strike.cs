@@ -1,6 +1,52 @@
 namespace GameDev.Confront.Rules
 {
     /// <summary>
+    /// What a blow or shot is likely to do, before it is made (S3a.5): the chance and the damage the player is shown from
+    /// Intelligence 10, and the parts of the chance shown from 20 (10.4 §3, 07.1's progressive disclosure). The damage is
+    /// an ordinary hit's, through the target's armour, with no critical hit and no guard.
+    /// </summary>
+    public readonly struct StrikeForecast
+    {
+        public StrikeForecast(double chance, double low, double high, double baseHit, double accuracy, double evasion, double situational, int luck, double fit)
+        {
+            Chance = chance;
+            Low = low;
+            High = high;
+            BaseHit = baseHit;
+            Accuracy = accuracy;
+            Evasion = evasion;
+            Situational = situational;
+            Luck = luck;
+            Fit = fit;
+        }
+
+        /// <summary>The hit chance, 0 to 1.</summary>
+        public double Chance { get; }
+
+        public double Low { get; }
+
+        public double High { get; }
+
+        /// <summary>The peers' chance before anything else, 0 to 1.</summary>
+        public double BaseHit { get; }
+
+        /// <summary>The attacker's accuracy, in points.</summary>
+        public double Accuracy { get; }
+
+        /// <summary>The target's Evasion, in points.</summary>
+        public double Evasion { get; }
+
+        /// <summary>Points the place and the moment add.</summary>
+        public double Situational { get; }
+
+        /// <summary>The attacker's Luck, which multiplies the chance by (1 + Luck / 100).</summary>
+        public int Luck { get; }
+
+        /// <summary>The share of its weapon the attacker meets, which multiplies the chance last.</summary>
+        public double Fit { get; }
+    }
+
+    /// <summary>
     /// What the place and the moment add to one blow or shot (10.2 §5b *Position*, *Firearms*). The grid fills it from
     /// S3a.6; a strike with the default context is a plain blow at a target beside the attacker.
     /// </summary>
