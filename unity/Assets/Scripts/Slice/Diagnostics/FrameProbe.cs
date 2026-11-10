@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using GameDev.Core.Scenes;
 using GameDev.Locomotion;
+using Unity.Profiling;
+using Unity.Profiling.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -17,16 +19,22 @@ using Object = UnityEngine.Object;
 namespace GameDev.Slice.Diagnostics
 {
     /// <summary>
-    /// The frame diagnostic in a development build (VEILMOUTH_CITY_PLAN.md §29.7): the editor's
+    /// The frame diagnostic in a development build (VEILMOUTH_CITY_PLAN.md §29.7–§29.9): the editor's
     /// <c>GpuResidentDrawerTimingTests</c> in a player, where the GPU Resident Drawer's jobs run Burst-compiled and
     /// without the editor's safety checks. It wakes only in a development build started with
     /// <c>-frameTiming &lt;report file&gt;</c> (<c>SliceLoadProbeBuild.BuildForFrames</c> makes one, keeping the
     /// BatchRendererGroup variants the drawer draws with). Veilmouth loads, the player's own figure is hidden, and from the
-    /// editor test's seven views the main camera draws, in turn for <see cref="Rounds"/> rounds, with the drawer off (the
-    /// SRP Batcher alone) and on with GPU occlusion culling: <see cref="WarmUps"/> frames after each switch, then
-    /// <see cref="Frames"/> measured, with no frame cap and no vertical sync. The report gives the median frame, and the
-    /// main thread's and the GPU's time from the FrameTimingManager where the player has it; then the player quits. An
-    /// exception or 20 minutes also write what was measured and quit.
+    /// editor test's seven views the main camera draws, in turn for <see cref="Rounds"/> rounds, in each of
+    /// <see cref="Modes"/>: the SRP Batcher alone, as the game ships; the drawer with GPU occlusion culling; and the SRP
+    /// Batcher alone with the camera's shadows off. Each switch is followed by <see cref="WarmUps"/> frames, then
+    /// <see cref="Frames"/> are measured, with no frame cap and no vertical sync.
+    /// <para>
+    /// The report gives medians: the frame; from the FrameTimingManager the main thread (from the frame's start to the end
+    /// of its work, so it holds its waits), the main thread's wait for Present, the render thread (from the start of its
+    /// work to Present) and the GPU; the renderer's counters (batches, set-pass calls, draw calls, triangles, shadow
+    /// casters); and every <c>Gfx.Wait…</c> marker the player has, summed over a frame on all threads. Then the player
+    /// quits. An exception or 20 minutes also write what was measured and quit.
+    /// </para>
     /// </summary>
     public sealed class FrameProbe : MonoBehaviour
     {
@@ -34,6 +42,11 @@ namespace GameDev.Slice.Diagnostics
         private const string City = "Veilmouth";
         private const int Rounds = 3, WarmUps = 60, Frames = 120;
         private const float Watchdog = 1200f; // s
+
+        private const string Frame = "frame", Main = "main thread", Wait = "its wait for Present", Render = "render thread", Gpu = "GPU";
+        private static readonly string[] Times = { Frame, Main, Wait, Render, Gpu };
+        private static readonly string[] Modes = { "SRP Batcher alone", "drawer with occlusion culling", "SRP Batcher alone, no shadows" };
+        private static readonly string[] Counters = { "Batches Count", "SetPass Calls Count", "Draw Calls Count", "Triangles Count", "Shadow Casters Count" };
 
         /// <summary>World X and Z of the eye and of what it looks at, as the editor test's.</summary>
         private static readonly (string Name, Vector2 From, Vector2 To)[] Views =
@@ -49,6 +62,7 @@ namespace GameDev.Slice.Diagnostics
 
         private readonly StringBuilder _report = new StringBuilder();
         private readonly FrameTiming[] _timing = new FrameTiming[1];
+        private readonly List<(string Name, bool Nanoseconds, ProfilerRecorder Recorder)> _recorders = new List<(string, bool, ProfilerRecorder)>();
         private string _file;
         private bool _done;
 
@@ -94,6 +108,16 @@ namespace GameDev.Slice.Diagnostics
             }
         }
 
+        private void OnDestroy()
+        {
+            foreach (var (_, _, recorder) in _recorders)
+            {
+                recorder.Dispose();
+            }
+
+            _recorders.Clear();
+        }
+
         private IEnumerator Start()
         {
             QualitySettings.vSyncCount = 0;
@@ -101,7 +125,7 @@ namespace GameDev.Slice.Diagnostics
             var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset
                       ?? throw new InvalidOperationException("the pipeline is not URP");
             _report.AppendLine($"Frame diagnostic in a development build, {DateTime.Now:yyyy-MM-dd HH:mm}, Unity {Application.unityVersion}, " +
-                               $"graphics {SystemInfo.graphicsDeviceType}, {SystemInfo.graphicsDeviceName}, " +
+                               $"graphics {SystemInfo.graphicsDeviceType}, {SystemInfo.graphicsDeviceName}, {SystemInfo.processorCount} logical processors, " +
                                $"quality '{QualitySettings.names[QualitySettings.GetQualityLevel()]}', {Screen.width}x{Screen.height}, " +
                                $"frame timing stats {(FrameTimingManager.IsFeatureEnabled() ? "on" : "off")}");
             yield return null;
@@ -136,37 +160,44 @@ namespace GameDev.Slice.Diagnostics
                 }
             }
 
+            // The city draws a few frames first, so the render thread's markers are registered before they are looked up.
+            for (var i = 0; i < 30; i++)
+            {
+                yield return null;
+            }
+
+            StartRecorders();
+            var camData = cam.GetUniversalAdditionalCameraData();
             var renderers = Object.FindObjectsByType<MeshRenderer>(FindObjectsInactive.Exclude).Length;
-            _report.AppendLine($"{City}: {renderers:N0} mesh renderers; camera field of view {cam.fieldOfView:0}°, far plane {cam.farClipPlane:0} m");
-            _report.AppendLine($"{Rounds} rounds in turn of {Frames} frames after {WarmUps} warm-ups, median ms, SRP Batcher alone -> GPU Resident Drawer with occlusion culling: " +
-                               "frame / main thread / GPU");
+            _report.AppendLine($"{City}: {renderers:N0} mesh renderers; camera field of view {cam.fieldOfView:0}°, far plane {cam.farClipPlane:0} m, " +
+                               $"shadows {(camData.renderShadows ? "on" : "off")} to {urp.shadowDistance:0} m");
+            _report.AppendLine($"Recorded: {string.Join(", ", _recorders.Select(r => r.Name))}");
+            _report.AppendLine($"{Rounds} rounds in turn of {Frames} frames after {WarmUps} warm-ups in each mode; medians, ms: {string.Join(" / ", Times)}");
 
             var terrain = Terrain.activeTerrain;
             float Ground(Vector2 p) => terrain != null ? terrain.SampleHeight(new Vector3(p.x, 0f, p.y)) + terrain.transform.position.y : 0f;
             urp.gpuResidentDrawerEnableOcclusionCullingInCameras = true;
             var ran = 0;
-            var all = new[] { new Laps(), new Laps() };
+            var all = Modes.Select(_ => new Laps()).ToArray();
             foreach (var (name, from, to) in Views)
             {
                 var eye = new Vector3(from.x, Ground(from) + 1.7f, from.y);
                 cam.transform.SetPositionAndRotation(eye, Quaternion.LookRotation(new Vector3(to.x, Ground(to) + 2f, to.y) - eye));
-                var view = new[] { new Laps(), new Laps() };
+                var view = Modes.Select(_ => new Laps()).ToArray();
                 for (var round = 0; round < Rounds; round++)
                 {
-                    for (var k = 0; k < 2; k++)
+                    for (var k = 0; k < Modes.Length; k++)
                     {
                         urp.gpuResidentDrawerMode = k == 1 ? GPUResidentDrawerMode.InstancedDrawing : GPUResidentDrawerMode.Disabled;
+                        camData.renderShadows = k != 2;
                         for (var i = 0; i < WarmUps + Frames; i++)
                         {
                             yield return null;
                             FrameTimingManager.CaptureFrameTimings();
-                            if (i < WarmUps)
+                            if (i >= WarmUps)
                             {
-                                continue;
+                                Sample(view[k]);
                             }
-
-                            var got = FrameTimingManager.GetLatestTimings(1, _timing) > 0;
-                            view[k].Add(Time.unscaledDeltaTime * 1000d, got ? _timing[0].cpuMainThreadFrameTime : double.NaN, got ? _timing[0].gpuFrameTime : double.NaN);
                         }
 
                         if (k == 1 && GPUResidentDrawer.IsInstanceOcclusionCullingEnabled())
@@ -176,14 +207,81 @@ namespace GameDev.Slice.Diagnostics
                     }
                 }
 
-                _report.AppendLine($"  {name}: {view[0]} -> {view[1]}");
-                all[0].AddAll(view[0]);
-                all[1].AddAll(view[1]);
+                _report.AppendLine($"  {name}:");
+                for (var k = 0; k < Modes.Length; k++)
+                {
+                    _report.AppendLine($"    {Modes[k]}: {view[k].Times()}; {view[k].Counts(_recorders)}");
+                    all[k].AddAll(view[k]);
+                }
             }
 
-            _report.AppendLine($"All views: {all[0]} -> {all[1]}; the drawer with occlusion culling ran in {ran} of {Views.Length * Rounds} switches on.");
+            _report.AppendLine($"All views (the drawer with occlusion culling ran in {ran} of {Views.Length * Rounds} switches on):");
+            for (var k = 0; k < Modes.Length; k++)
+            {
+                _report.AppendLine($"  {Modes[k]}: {all[k].Times()}; {all[k].Counts(_recorders)}");
+            }
+
             urp.gpuResidentDrawerMode = GPUResidentDrawerMode.Disabled;
+            camData.renderShadows = true;
             Finish("done");
+        }
+
+        /// <summary>
+        /// The renderer's counters by name, and every <c>Gfx.Wait…</c> or <c>Gfx.PresentFrame</c> marker the player has
+        /// registered, found by name whatever its category, each summed over a frame on all threads.
+        /// </summary>
+        private void StartRecorders()
+        {
+            foreach (var counter in Counters)
+            {
+                var recorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, counter);
+                if (recorder.Valid)
+                {
+                    _recorders.Add((counter, false, recorder));
+                }
+                else
+                {
+                    recorder.Dispose();
+                }
+            }
+
+            var handles = new List<ProfilerRecorderHandle>();
+            ProfilerRecorderHandle.GetAvailable(handles);
+            foreach (var handle in handles)
+            {
+                var description = ProfilerRecorderHandle.GetDescription(handle);
+                var markerName = description.Name;
+                if (!(markerName.StartsWith("Gfx.Wait", StringComparison.Ordinal) || markerName == "Gfx.PresentFrame")
+                    || _recorders.Any(r => r.Name == markerName))
+                {
+                    continue;
+                }
+
+                var recorder = new ProfilerRecorder(handle, 1, ProfilerRecorderOptions.Default);
+                recorder.Start();
+                _recorders.Add((markerName, description.UnitType == ProfilerMarkerDataUnit.TimeNanoseconds, recorder));
+            }
+        }
+
+        private void Sample(Laps laps)
+        {
+            laps.Add(Frame, Time.unscaledDeltaTime * 1000d);
+            if (FrameTimingManager.GetLatestTimings(1, _timing) > 0)
+            {
+                var t = _timing[0];
+                laps.Add(Main, t.cpuMainThreadFrameTime);
+                laps.Add(Wait, t.cpuMainThreadPresentWaitTime);
+                laps.Add(Render, t.cpuRenderThreadFrameTime);
+                if (t.gpuFrameTime > 0d)
+                {
+                    laps.Add(Gpu, t.gpuFrameTime);
+                }
+            }
+
+            foreach (var (name, nanoseconds, recorder) in _recorders)
+            {
+                laps.Add(name, nanoseconds ? recorder.LastValue / 1e6 : recorder.LastValue);
+            }
         }
 
         private void Finish(string how)
@@ -214,43 +312,51 @@ namespace GameDev.Slice.Diagnostics
             Application.Quit();
         }
 
-        /// <summary>Frame, main-thread and GPU times of the measured frames, in ms.</summary>
+        /// <summary>The measured frames' samples by name: times in ms, counters as counted.</summary>
         private sealed class Laps
         {
-            private readonly List<double> _frame = new List<double>(), _cpu = new List<double>(), _gpu = new List<double>();
+            private readonly Dictionary<string, List<double>> _samples = new Dictionary<string, List<double>>();
 
-            public void Add(double frame, double cpu, double gpu)
+            public void Add(string what, double value)
             {
-                _frame.Add(frame);
-                if (cpu > 0d)
+                if (double.IsNaN(value) || value < 0d)
                 {
-                    _cpu.Add(cpu);
+                    return;
                 }
 
-                if (gpu > 0d)
+                if (!_samples.TryGetValue(what, out var list))
                 {
-                    _gpu.Add(gpu);
+                    _samples[what] = list = new List<double>();
                 }
+
+                list.Add(value);
             }
 
             public void AddAll(Laps other)
             {
-                _frame.AddRange(other._frame);
-                _cpu.AddRange(other._cpu);
-                _gpu.AddRange(other._gpu);
+                foreach (var pair in other._samples)
+                {
+                    foreach (var value in pair.Value)
+                    {
+                        Add(pair.Key, value);
+                    }
+                }
             }
 
-            public override string ToString() => $"{Median(_frame)} / {Median(_cpu)} / {Median(_gpu)}";
+            public string Times() => string.Join(" / ", FrameProbe.Times.Select(t => Median(t, "0.00")));
 
-            private static string Median(List<double> times)
+            public string Counts(IEnumerable<(string Name, bool Nanoseconds, ProfilerRecorder Recorder)> recorders) =>
+                string.Join(", ", recorders.Select(r => $"{r.Name} {Median(r.Name, r.Nanoseconds ? "0.00 'ms'" : "N0")}"));
+
+            private string Median(string what, string format)
             {
-                if (times.Count == 0)
+                if (!_samples.TryGetValue(what, out var times) || times.Count == 0)
                 {
                     return "n/a";
                 }
 
                 var sorted = times.OrderBy(t => t).ToList();
-                return sorted[sorted.Count / 2].ToString("0.00");
+                return sorted[sorted.Count / 2].ToString(format);
             }
         }
     }

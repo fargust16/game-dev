@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4, C5)
 
-Version: 0.59
+Version: 0.60
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§29.7–§29.8: the GPU Resident Drawer measured with the kit's shaders made DOTS-ready, 97 % of renderers taken, −8 % of a build's frame and +237 % in the editor, the frame bound by the CPU, the drawer left off; C5's cold load 10.39 s in the editor. Earlier: §29.5–§29.6: C5's ground and houses as built; the yards dressed by wealth, Bawling Row's six stalls and five pieces round Stone Grandad, the slice's places on C5, the lions along the Governor's front, warehouses on the quay and a villa on the embankment, 153 buildings)
+Last Updated: 2026-11-10 (§29.9: the frame's holder measured in a development build: the main thread holds it, 2.1 ms plus 0.37 ms for every thousand draw calls, the render thread waits for it, shadows take 22–29 % of a city view; §29.7's render-thread reading refuted; the budget and the next lever open. Earlier: §29.7–§29.8: the GPU Resident Drawer measured with the kit's shaders made DOTS-ready, 97 % of renderers taken, −8 % of a build's frame and +237 % in the editor, the frame bound by the CPU, the drawer left off; C5's cold load 10.39 s in the editor)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1945,7 +1945,7 @@ Medians, in ms:
 **Readings** (the agent's):
 
 - **The city's frame is bound by the CPU.** The GPU works about 4 ms of a 22 ms frame, so GPU occlusion culling saves work the GPU does not need saved, and its own culling costs the GPU a little.
-- **The main thread is no longer what holds the frame.** The drawer takes a fifth off the main thread, but the frame hardly moves. With the drawer, the frame runs 2–5 ms longer than the main thread in the city's views. Something else, likely the render thread, then holds it. This is not measured.
+- **The main thread is no longer what holds the frame.** The drawer takes a fifth off the main thread, but the frame hardly moves. With the drawer, the frame runs 2–5 ms longer than the main thread in the city's views. Something else, likely the render thread, then holds it. This is not measured. *Refuted by §29.9:* with the drawer, the render thread works 5.4 ms and waits 8.8 ms for the main thread, and the gap is mostly the main thread's wait for Present.
 - **The editor is slower.** In the editor the drawer makes the frame two to three times slower. The likely cause is the editor's safety checks on the drawer's jobs. This is not measured.
 
 **Decision** (the agent's, an authoring default): **the drawer stays off in the pipeline asset.**
@@ -1964,7 +1964,7 @@ The shaders stay DOTS-ready. While the setting is not Keep All, a build strips t
 - (c) the merged far LOD for each house type that §28.1 item 17 allows;
 - (d) fewer shadow casters at a distance.
 
-The agent leans to (a), then (b).
+The agent leans to (a), then (b). *(a) is done in §29.9, which puts (c) first.*
 
 ## 29.8 The cold load and the views, 2026-11-10
 
@@ -1987,5 +1987,54 @@ Step 8.
 
 - Squint Lane;
 - the yards' missing rubbish and poses;
-- the frame budget and the frame's real holder (§29.7);
+- the frame budget and its next lever (§29.9);
 - the owner's walk of C5.
+
+## 29.9 The frame's holder, measured, 2026-11-10
+
+Asked for by the owner after §29.7, as its option (a) (VS-FRAME).
+
+**What `FrameProbe` records now.** Besides the frame, the main thread and the GPU, it records:
+
+- from the FrameTimingManager, the main thread's wait for Present and the render thread's time, from the start of its work to Present;
+- the renderer's counters: draw calls, set-pass calls, triangles and shadow casters;
+- every `Gfx.Wait…` marker the player has, summed over a frame on all threads. Among them, `Gfx.WaitForGfxCommandsFromMainThread` is the render thread waiting for the main thread.
+
+A third mode turns the camera's shadows off. The views, the build and the rounds are §29.7's: 3 rounds in turn, 120 frames after 60 warm-ups each. The report is `Logs/SliceSurvey/c5_frames_rt.txt`.
+
+**Times.** Medians of all seven views, in ms:
+
+| | Frame | Main thread | Its wait for Present | Render thread | Render thread waiting for the main thread | GPU |
+|---|---|---|---|---|---|---|
+| SRP Batcher alone, as the game ships | 22.15 | 22.09 | 0.02 | 3.21 | 13.74 | 3.97 |
+| Drawer with GPU occlusion culling | 19.90 | 17.88 | 1.41 | 5.41 | 8.76 | 4.31 |
+| SRP Batcher alone, no shadows | 16.85 | 16.80 | 0.02 | 2.41 | 11.10 | 3.05 |
+
+**Counters.** Medians of all seven views:
+
+| | Draw calls | Set-pass calls | Triangles | Shadow casters |
+|---|---|---|---|---|
+| SRP Batcher alone | 55 187 | 378 | 13.8 M | 33 460 |
+| Drawer | 116 086 | 354 | 6.6 M | 32 601 |
+| No shadows | 42 878 | 294 | 9.3 M | 0 |
+
+**Readings** (the agent's):
+
+- **The main thread holds the frame.** As the game ships, the main thread works all but 0.06 ms of the frame and does not wait for Present. The render thread works about 3 ms and then waits about 14 ms for the main thread's commands. The GPU works about 4 ms.
+- **§29.7's reading is refuted.** It guessed that the render thread holds the drawer's frame. With the drawer, the render thread works 5.4 ms and waits 8.8 ms. The 2 ms by which the drawer's frame outruns its main thread are mostly the main thread's wait for Present (1.4 ms). What that Present waits on is not measured.
+- **The main thread's cost follows the draws.** View by view, its time is 2.1 ms plus 0.37 ms for every thousand draw calls (R² 0.97). It runs from 6.8 ms for 13 113 draw calls in Gloomwood to 28.6 ms for 66 823 down the West Road. With the drawer, the slope falls to 0.11 ms per thousand, but the fixed cost rises to 5.0 ms.
+- **Shadows take 22–29 % of a city view's frame,** and 17 % in Gloomwood. That is 3.4 ms across the Penny and 8.2 ms down the West Road. In the long views they add only about 10 600 draw calls. So their cost lies mostly in culling about 45 000 shadow casters through four cascades, to 150 m, at a resolution of 4096.
+- **The GPU is not the limit.** It works 2–6 ms in every view and mode.
+- **Not measured:**
+  - The share of the main thread spent on the city's scripts. Gloomwood's 6.8 ms, with few draws, is its upper bound.
+  - The share of SSAO's depth-normals prepass in the draws. SSAO takes depth and normals in Forward+, so the prepass draws every opaque piece a second time.
+
+**Next** (open, VS-FRAME; the agent's reading):
+
+- **The budget.** The frame budget is still open. The agent proposes 16.7 ms (60 frames a second) as the measure: in this development build, at 1920 × 1080, on High quality, on the owner's machine. As the game ships, the long views take 20–29 ms and the Penny 14 ms.
+- **The levers,** by what they would take off the main thread:
+  - (c) the merged far LOD for each house type. Far houses make most of a long view's draws and casters. §28.1 item 17 allows it only if the budget is not met.
+  - (d) fewer shadow casters. If small details and far LODs cast no shadows, the look stays close. Fewer cascades or a shorter shadow distance change the look, and that is the owner's call.
+  - (b) each house's pieces merged at every distance. The *Kit houses* rule of the record forbids it, so only the owner can open it.
+  - (e) SSAO without its prepass: after the opaques, from depth. It changes the grade, so it is measured first.
+- **The agent leans to (c) with the part of (d) that keeps the look,** each measured with `FrameProbe` before and after, once the owner sets the budget.
