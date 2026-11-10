@@ -16,7 +16,7 @@ using Random = System.Random;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// The mystic layer over Veilmouth (Plans/WORLD_STYLE_GUIDE.md §5–§6, city plan §24.5, placed on C4 by §28.10;
+    /// The mystic layer over Veilmouth (Plans/WORLD_STYLE_GUIDE.md §5–§6, city plan §24.5, placed on C5 by §29.4;
     /// owner 2026-11-08: the crimson moon and fog, the Gothic skyline, occult signs). Under one root, <see cref="RootName"/>,
     /// it places the clock-driven <see cref="VeilmouthSky"/> with its day, dusk and night skies and the twilight grade; a
     /// teal gas light in every street lamp; low fog banks on River Veil and the sea by the quay, in Lower Veil's and the
@@ -347,7 +347,7 @@ namespace GameDev.Slice.EditorTools
         // ------------------------------------------------------------------------------------------------ fog
 
         /// <summary>
-        /// The low fog's places, plan metres (style guide §6.1), from the C4 layout (city plan §28.10): River Veil where it
+        /// The low fog's places, plan metres (style guide §6.1), from the C5 layout (city plan §29.4): River Veil where it
         /// runs by the town wall and the embankment, the sea before Fishlip Quay, Draught Lane, Rats' Choir, the Black
         /// Puddle, Deaf Boiler Yard and Last Turning Cemetery.
         /// </summary>
@@ -502,7 +502,7 @@ namespace GameDev.Slice.EditorTools
             var quad = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
             var count = 0;
 
-            // Over the keystone of about one door in eight in Lower Veil and the Reek, none in the richer districts (C4, §28.10).
+            // Over the keystone of about one door in eight in Lower Veil and the Reek, none in the richer districts (C5, §29.4).
             var layout = VeilmouthLayout.Load();
             var poor = layout.districts.Where(d => d.name == "LOWER VEIL" || d.name == "THE REEK").ToList();
             var city = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None).FirstOrDefault(t => t.parent == null && t.name == VeilmouthCity.RootName);
@@ -527,7 +527,7 @@ namespace GameDev.Slice.EditorTools
             var poorDoors = doors.Count(t => poor.Any(d => t.position.x + 500f >= d.x0 && t.position.x + 500f <= d.x1 && 500f - t.position.z >= d.y0 && 500f - t.position.z <= d.y1));
             Debug.Log($"[VeilmouthMystic] {count} wards over {poorDoors} doors in Lower Veil and the Reek.");
 
-            // Runes on old stone (C4, §28.10): the town wall either side of the Creaking Gate and along the north, the works'
+            // Runes on old stone (C5, §29.4): the town wall either side of the Creaking Gate and along the north, the works'
             // walls and the brick blocks either side of Furnace Road. Plan directions: Vector2.down is north.
             var gate = layout.Wall("Town wall (west)");
             var gap = gate.gaps[0];
@@ -716,7 +716,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             var all = city.GetComponentsInChildren<Transform>();
-            // Three of Lower Veil's houses spread through the district (C4, §28.10), besides Harrow & Tincture.
+            // Three of Lower Veil's houses spread through the district (C5, §29.4), besides Harrow & Tincture.
             var veil = VeilmouthLayout.Load().districts.First(d => d.name == "LOWER VEIL");
             var houses = all.Where(t => t.parent != null && t.parent.name == "Houses" && t.GetComponentsInChildren<Renderer>(true)
                     .Any(r => r.sharedMaterials.Any(m => m == poor || m == rich)))

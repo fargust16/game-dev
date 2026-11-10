@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4, C5)
 
-Version: 0.57
+Version: 0.58
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§29.4: C5's plan from one source: 154 buildings in 23 blocks with 26 passages, corner owners searched, 15 m terrace and low tenement, Cold Shoulder a 12 m street, the cathedral 8 m south, the Penny and Bawling Row, fifteen new folk names)
+Last Updated: 2026-11-10 (§29.5–§29.6: C5's ground and houses as built; the yards dressed by wealth, Bawling Row's six stalls and five pieces round Stone Grandad, the slice's places on C5, the lions along the Governor's front, warehouses on the quay and a villa on the embankment, 153 buildings. Earlier: §29.4: C5's plan from one source: 154 buildings in 23 blocks with 26 passages, corner owners searched, 15 m terrace and low tenement, Cold Shoulder a 12 m street, the cathedral 8 m south, the Penny and Bawling Row, fifteen new folk names)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1753,7 +1753,7 @@ C5 has one source, `tools/slice/veilmouth_c5_plan.py`. It writes three files fro
 - a building stands outside its block or in its notch;
 - a side cannot be filled.
 
-The builder still reads C4 until step 3 switches it.
+The builder still reads C4 until step 3 switches it (done, §29.5).
 
 **As planned.** There are 154 buildings inside the walls and in the works, against the owner's about 155:
 
@@ -1820,4 +1820,86 @@ Readings that changed from §29.2 while the plan was solved (authoring defaults)
 | Bawling Row | Горластый Ряд |
 | Guild Hall | Гильдейский дом |
 
-C4's Bawling Square and Squint Lane stay in the table until step 6 moves their references.
+C4's Bawling Square and Squint Lane stay in the table until step 6 moves their references. Step 6 moved them (§29.6); their two keys stay in `map.csv` only while C4's record map, `VeilmouthC4Plan.xml`, uses them.
+
+## 29.5 The ground and the houses, 2026-11-10
+
+Steps 3 and 4. The builder reads C5's layout.
+
+**The ground.**
+
+- **Carriageways.** Every carriageway is a road, painted after every pavement, so no pavement, band of setts or square crosses it. Where a carriageway ended at another street's pavement, it was carried on to the next carriageway; there were 5 such ends.
+- **Pavements.** Every street's pavements are raised, with kerbs and rounded corners, and ring every block:
+  - 50 outlines, 26,177 m², 10,538 m of kerb;
+  - 102 rounded corners;
+  - 82 tree pits, one for each street tree.
+
+  The mesh is cut into one piece for each 64 m chunk, 40 in all. As one piece it was 101 MB, over GitHub's limit of 100 MB for one file.
+- **The Penny.** Its frame and island are raised. Its ring carriageway is 48 road segments.
+- **Squares.** The Black Puddle and Drowsy Steps are raised squares.
+- **Yards** are painted by wealth: grass in a rich yard, cobbles in a middling one, mud in a poor one. The passages are cobbled.
+- **The port's joint.** A coping 1.5 m wide runs inland of the quay wall and closes the gap. The decks are laid one for each unbroken run, and the piers start on the coping.
+
+**The houses.** The rows stand round 23 blocks, their fronts flush on the pavement, with 27 passages into the yards.
+
+- R5 holds: no span is left without a house, and no gap in a row is under 4 m.
+- The 15 m terrace and the low tenement of §29.4 are baked into the kit.
+- Back doors: 54 open, and 77 are walled up where nothing lies behind them.
+- The clock tower's door and stoop open north onto its yard. Facing south, its stoop ran 0.4 m into the Town Hall.
+- **Counted:** 5,793 kit blocks with no kit fault, 194 doors and 186 lanes.
+
+## 29.6 The yards, the market and the slice's places, 2026-11-10
+
+Steps 5 and 6.
+
+**The yards' dressing** (§29.1 item 4). Each yard is dressed round its middle, so the 15 m houses that reach past the plan's yard edge never take a piece's place.
+
+| Yard | Dressing |
+|---|---|
+| rich | grass, a garden tree in each corner, two benches facing each other |
+| middling | cobbles, one garden tree in a corner, one bench |
+| poor | mud, dustbins in three corners and firewood in the fourth, a drunkard, and a second one in a yard over 500 m² |
+
+The Penny's four L-shaped corners each have a bench against the side wall.
+
+- **Counted:** 19 garden trees, 14 yard benches and 4 corner benches, 18 dustbins and firewood, and 10 drunkards.
+- **Wanted list** (§29.2): loose rubbish, and poses for the drunkards (sitting, lying, holding a bottle). Until they come, a drunkard is a standing purple Dummy.
+
+**Bawling Row.** The kit's stalls are 6–9 m long, not the plan's 3 × 2 m, so the Row is six stalls and five pieces round Stone Grandad. There are two to a side, facing the road. All 11 are placed.
+
+- The six stalls: the trader's, Enchanting, food, First Aid, fish, and Item Creation.
+- The five pieces: the seer's counter with its candles, the armour stand, the anvil and the leather frame.
+- The Masters and the sellers stand on the island's outer walk: Edda Brann, Silas Quill, Ada Merrow, Tobias Penn and Madame Ilse. Kit Mallow, the newsboy, stands between the trader and the Master of Enchanting.
+
+**The slice's places on C5** (working readings, not owner decisions):
+
+- **POI A** stands before Harrow & Tincture's street door on the Black Puddle.
+- **POI B** stands in Draught Lane's middle, between the Lower Veil blocks E1B and E1C, with house walls on both sides. Its earlier spot lay beside the open Black Puddle.
+- **POI C** begins at the cellar door on Deaf Boiler Yard.
+- **The residue** of POI A puts the seal and two Warden pairs on the Black Puddle. POI B's fear keeps a mill woman at home: she walks Draught Lane's north pavement from 5 m east of its stage, within the residue's 30 m. Her walk moved 38 m west along the lane, since at its old spot no townswoman was left within 30 m of the new stage.
+- **Dogs:** five dogs. The one that walked Bawling Square now walks Thimble Street.
+- **Townsfolk:** the same 20 walkers, on routes taken from their streets' pavements.
+- **Dwellings** take the wealth of the block they stand on, found within 2 m of the door:
+  - tenements and warehouses are poor anywhere, and villas rich anywhere;
+  - the works are poor;
+  - outside every block, a door on the quay or in the Reek is poor, and any other is middling.
+- **Ornaments:**
+  - the three angels, in Bishop's Garden, the cemetery and the Sleepy Quarter's yard;
+  - six birdbaths, in Bishop's Garden, Quiet Whistle Garden, the embankment yard, and the yards of the Governor's House, the Assize and the Town Hall;
+  - the great lions lie unturned along the Governor's House's front, either side of its door, both faces on Long Tongue. Turned to face the street, a lion 4 m deep left no way past on the 6 m pavement with its stoop and tree pits.
+- **The mystic layer:**
+  - 7 wards over 45 doors in Lower Veil and the Reek;
+  - 251 gas lamps;
+  - 35 fog banks.
+- **Reflections:** 90 street probes.
+
+**The plan, changed while placing** (authoring defaults):
+
+- **The quay's row is warehouses.** In the warehouse family the 15 m warehouse is preferred, and a tenement fills only what a warehouse cannot. The run had chosen 10 m tenements throughout, which left the port with no warehouse.
+- **A villa on the embankment**, at W1C's south-west corner in the Sleepy Quarter, is a rich dwelling. The faction's house had been C5's only villa, and it is no dwelling.
+- Since these two changes, every kind of house has dwellings. The plan stands at 153 buildings: 122 row houses, 16 single buildings and 15 works sheds, with 27 passages.
+
+**Tests.**
+
+- The railing test now leaves out a railing piece whose sampled cell meets a wall. A passage's railing ends at the houses (the owner's rule, §17), and in that cell the grid's cover probe, a cell wide, meets the wall's corner as well. That corner reading is Full Cover, and it is the wall's, not the railing's. Of 76 railings, 26 are left out; the other 100 sides are all Half Cover, and all 76 crossings are closed.
+- EditMode slice tests: 303 of 303 pass.

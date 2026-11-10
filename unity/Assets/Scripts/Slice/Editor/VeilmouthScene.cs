@@ -30,7 +30,10 @@ namespace GameDev.Slice.EditorTools
         /// <summary>The playable area's side, city plan C1 §3. The scene's origin is the area's centre; north is +Z.</summary>
         public const float Extent = 1000f;
 
-        public const string MapName = "C4 Map";
+        public const string MapName = "C5 Map";
+
+        /// <summary>The map's earlier names: the ground was shaped under "C4 Map" and is the owner's (city plan §29.4).</summary>
+        public static readonly string[] OldMapNames = { "C4 Map", "C2 Map" };
 
         /// <summary>WorldScale.SeaLevelMeters: the Combat Grid reads every surface below it as water.</summary>
         public const float SeaLevel = 24f;

@@ -112,7 +112,7 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(Residue(Pairs).Shows.All(o => o.activeSelf));
             Assert.IsFalse(Residue(Fear).IsShowing, "the girls went free: no fear on Draught Lane");
 
-            // Kit on Bawling Square first, far enough for the night's scenes to have gone.
+            // Kit at Bawling Row first, far enough for the night's scenes to have gone.
             yield return TalkTo(player, "kit");
             CollectionAssert.Contains(hud.DialogueLines, Loc.Get("tip.kit.seal.line"), "Kit's day-2 rumour follows the seal");
             yield return Tap(Key.Escape);

@@ -178,6 +178,113 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// The yards by their block's wealth (§29.1 item 4, §29.3): a rich yard is a small park, its grass with
+        /// Veilmouth's garden trees in its corners and two benches facing its middle; a middling yard keeps its cobbles
+        /// with a bench and a tree; a poor yard is bare earth with dustbins and firewood in its corners and a drunkard, two
+        /// in a yard over 500 m². Everything keeps 1.5 m off the yard's edges, where the back doors open, and the benches
+        /// stand on sides with no passage. The drunkards stand until their poses come (the wanted list); rubbish heaps are
+        /// wanted too, so the kit's dustbin stands for them. Then a bench in each of the Penny's four paved corners (§29.3),
+        /// against the side wall, facing the square.
+        /// </summary>
+        private static void Yards()
+        {
+            var rng = new Random(2911);
+            int trees = 0, benches = 0, bins = 0, drunk = 0;
+            foreach (var b in _layout.blocks.Where(b => b.wealth == "rich" || b.wealth == "middling" || b.wealth == "poor"))
+            {
+                var y = b.yard;
+                var (cx, cy) = ((y.x0 + y.x1) / 2f, (y.y0 + y.y1) / 2f);
+                // A bench is 3 × 2 m (kit); turned east or west it is 2 × 3. The 15 m houses reach 5 m past the plan's
+                // yard edge, so the benches face each other across the yard's middle, 2.5 m off it, or 1.5 m in a small
+                // yard; the first pair that fits, then any single one.
+                var seats = new[] { 2.5f, 1.5f }.SelectMany(g => new (Facing F, float X, float Y)[]
+                {
+                    (Facing.S, cx - 1.5f, cy - g - 2f), (Facing.N, cx - 1.5f, cy + g),
+                    (Facing.E, cx - g - 2f, cy - 1.5f), (Facing.W, cx + g, cy - 1.5f),
+                }).ToList();
+
+                var corners = new[] { (y.x0 + 1.5f, y.y0 + 1.5f), (y.x1 - 2.5f, y.y0 + 1.5f), (y.x1 - 2.5f, y.y1 - 2.5f), (y.x0 + 1.5f, y.y1 - 2.5f) };
+                switch (b.wealth)
+                {
+                    case "rich":
+                        foreach (var (tx, ty) in new[] { (y.x0 + 3f, y.y0 + 3f), (y.x1 - 5f, y.y0 + 3f), (y.x1 - 5f, y.y1 - 5f), (y.x0 + 3f, y.y1 - 5f) })
+                        {
+                            trees += Prop(GardenTree(rng), Facing.N, tx, ty) != null ? 1 : 0;
+                        }
+
+                        benches += Seat(seats, 2);
+                        break;
+                    case "middling":
+                        var (mx, my) = (rng.Next(2) == 0 ? y.x0 + 3f : y.x1 - 5f, rng.Next(2) == 0 ? y.y0 + 3f : y.y1 - 5f);
+                        trees += Prop(GardenTree(rng), Facing.N, mx, my) != null ? 1 : 0;
+                        benches += Seat(seats, 1);
+                        break;
+                    default:
+                        for (var k = 0; k < corners.Length; k++)
+                        {
+                            var (px, py) = corners[k];
+                            bins += Prop(k == 3 ? "Firewood" : "TrashCan", Facing.N, px, py, k == 3 ? "Firewood" : "Dustbin") != null ? 1 : 0;
+                        }
+
+                        var count = (y.x1 - y.x0) * (y.y1 - y.y0) > 500f ? 2 : 1;
+                        for (var k = 0; k < count; k++)
+                        {
+                            Person("Purple", false, cx + rng.Next(-3, 4) + (k * 4f), cy + rng.Next(-2, 3), rng.Next(360), "Drunkard");
+                            drunk++;
+                        }
+
+                        break;
+                }
+            }
+
+            var corner = 0;
+            foreach (var b in _layout.blocks.Where(b => b.HasNotch))
+            {
+                var n = b.notch;
+                // The notch's corner inside the block, and the way out of it toward the square.
+                var ix = n.x0 == b.x0 ? n.x1 : n.x0;
+                var iy = n.y0 == b.y0 ? n.y1 : n.y0;
+                var sx = ix == n.x0 ? 1f : -1f;
+                var sy = iy == n.y0 ? 1f : -1f;
+                var px0 = Mathf.Min(ix + sx, ix + (sx * 3f));
+                var py0 = Mathf.Min(iy + (sy * 4f), iy + (sy * 7f));
+                corner += Prop("Bench", sx > 0 ? Facing.E : Facing.W, px0, py0, "Bench") != null ? 1 : 0;
+            }
+
+            Debug.Log($"[VeilmouthCity] yards: {trees} garden trees, {benches} benches, {bins} dustbins and firewood, {drunk} drunkards; " +
+                      $"{corner} of 4 benches in the Penny's corners.");
+        }
+
+        /// <summary>Up to <paramref name="wanted"/> benches from the seats in order: a facing pair first (seats come in N, S, E, W fours).</summary>
+        private static int Seat(List<(Facing F, float X, float Y)> seats, int wanted)
+        {
+            var placed = 0;
+            for (var i = 0; i + 1 < seats.Count && placed < wanted; i += 2)
+            {
+                if (wanted - placed >= 2)
+                {
+                    // A pair only if both halves are free, so a yard never gets one bench of a pair facing a wall.
+                    var turned = seats[i].F == Facing.E || seats[i].F == Facing.W;
+                    var (w, d) = turned ? (2f, 3f) : (3f, 2f);
+                    if (!Free(Rect(seats[i].X, seats[i].Y, seats[i].X + w, seats[i].Y + d), false) ||
+                        !Free(Rect(seats[i + 1].X, seats[i + 1].Y, seats[i + 1].X + w, seats[i + 1].Y + d), false))
+                    {
+                        continue;
+                    }
+
+                    placed += Prop("Bench", seats[i].F, seats[i].X, seats[i].Y, "Bench") != null ? 1 : 0;
+                    placed += Prop("Bench", seats[i + 1].F, seats[i + 1].X, seats[i + 1].Y, "Bench") != null ? 1 : 0;
+                }
+                else
+                {
+                    placed += new[] { seats[i], seats[i + 1] }.Any(s => Prop("Bench", s.F, s.X, s.Y, "Bench") != null) ? 1 : 0;
+                }
+            }
+
+            return placed;
+        }
+
+        /// <summary>
         /// Bawling Row (§29.1 item 5, §29.4): the market round Stone Grandad on the Penny's island, every stall facing the
         /// ring's road with the island's walk before it for the customers, its back 2 m off the plinth. The kit's stalls
         /// are 6 to 9 m long (measured), so a side holds two, not the plan's three: six stalls and five small pieces in the
@@ -239,14 +346,14 @@ namespace GameDev.Slice.EditorTools
         // ------------------------------------------------------------------------------------------- people
 
         /// <summary>
-        /// C4's people (§28.10), placed after every building, lamp and tree so a walker's route goes round them:
-        /// Wardens, blue, at the Assize's door, on Salt Gullet and by the Black Puddle; the faction, teal, in its front
-        /// garden; Veinmarket, brown, on Draught Lane; the Masters, green, and the sellers, orange, before their stalls on
-        /// Bawling Square; the pawnbroker at her counter in the Black Puddle's north-east corner, clear of the ritual
-        /// circle; townsfolk, yellow, on the main streets, the Penny, the embankment, the quay and the squares; a farmer on
-        /// the West Road. <see cref="SlicePeople"/> puts the named people in place of the Dummies of these names.
+        /// The people (§28.10, on C5 by §29.6), placed after every building, lamp and tree so a walker's route goes round
+        /// them: Wardens, blue, at the Assize's door, on Salt Gullet and by the Black Puddle; the faction, teal, before its
+        /// house; Veinmarket, brown, on Draught Lane; the Masters, green, and the sellers, orange, on Bawling Row's island
+        /// walk before their stalls; the pawnbroker at her counter in the Black Puddle's north-east corner, clear of the
+        /// ritual circle; townsfolk, yellow, on the main streets, the Penny, the embankment, the quay and the squares; a
+        /// farmer on the West Road. <see cref="SlicePeople"/> puts the named people in place of the Dummies of these names.
         /// </summary>
-        private static void PeopleC4()
+        private static void People()
         {
             var assize = _layout.buildings.First(b => b.id == "assize");
             var outward = Turns(FacingOf(assize.facing)) * 90f;
@@ -306,7 +413,8 @@ namespace GameDev.Slice.EditorTools
                          (new Vector2(666f, 400f), 0f, false), (new Vector2(666f, 505f), 180f, true), // the quay
                          (new Vector2(540f, 335f), 180f, true), (Pave("thimble", 476f, false), 0f, false), // Drowsy Steps
                          (Pave("works_s", 620f, false), 0f, false), (Pave("works_x", 480f, false), 90f, true),
-                         (Pave("draught", 618f, false), 90f, true), // a mill woman on Draught Lane, whom POI B's fear keeps at home (SliceResidue)
+                         // A mill woman on Draught Lane's north pavement, 5 m east of POI B's stage, whom its fear keeps at home (SliceResidue's 30 m).
+                         (Pave("draught", 580f, false), 90f, true),
                      })
             {
                 Person("Yellow", female, at.x, at.y, yaw, "Townsperson");

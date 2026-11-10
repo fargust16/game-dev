@@ -42,8 +42,9 @@ namespace GameDev.Slice.EditorTools
             { "pip", (new[] { new Vector3(5.5f, 0f, 15.5f), new Vector3(9.5f, 0f, 14.5f), new Vector3(6.5f, 0f, 11.5f), new Vector3(9f, 0f, 12.5f) }, 180f, "harrow") },
             // The Soot & Bell, by a table of the public bar or the saloon (pub plan, VI-7); the evening and her tenement come with S5c.
             { "lottie", (new[] { new Vector3(15.5f, 0f, 1.5f), new Vector3(15.5f, 0f, 9.5f), new Vector3(6.6f, 0f, 2.5f) }, 270f, "nell") },
-            // Bawling Square (city plan C4, §28.10), in the aisle before the Masters' stalls, between the trader and the benches.
-            { "kit", (new[] { new Vector3(-53f, 0f, 32.5f), new Vector3(-57f, 0f, 32.5f), new Vector3(-45f, 0f, 32.5f), new Vector3(-41f, 0f, 32.5f), new Vector3(-49f, 0f, 27f) }, 0f, "tobias") },
+            // Bawling Row on the Penny's island (city plan C5, §29.4): on the walk between the trader's stall and the Master of
+            // Enchanting's, or at the island's north corners beside the armour stand and the seer's candles.
+            { "kit", (new[] { new Vector3(40f, 0f, 71.5f), new Vector3(32f, 0f, 68f), new Vector3(48f, 0f, 68f) }, 0f, "tobias") },
         };
 
         /// <summary>The people one talks to (S2.4): their conversation in <c>Assets/Data/Slice/Dialogue/</c>, and their reach, m.</summary>

@@ -38,7 +38,7 @@ namespace GameDev.Slice.Tests
             Assert.IsFalse(people.Cast<Transform>().Any(t => t.GetComponent<GameDev.Slice.People.NamedPerson>() == null
                 && PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject) is GameObject s && s.name.Contains("Yellow")), "no unnamed yellow Dummy is left");
             var walkers = people.GetComponentsInChildren<TownsfolkWalker>();
-            Assert.AreEqual(20, walkers.Length, "C4's townsfolk and its farmer (city plan §28.10)");
+            Assert.AreEqual(20, walkers.Length, "the townsfolk and their farmer, on C5 (city plan §28.10, §29.4)");
             var women = walkers.Count(w => PrefabUtility.GetCorrespondingObjectFromSource(w.gameObject) is GameObject s && s.name == "Townswoman");
             var men = walkers.Count(w => PrefabUtility.GetCorrespondingObjectFromSource(w.gameObject) is GameObject s && s.name == "Townsperson");
             Assert.AreEqual(10, women, "townswomen");

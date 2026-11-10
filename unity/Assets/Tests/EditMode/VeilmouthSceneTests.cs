@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S0.6, §28: Veilmouth.unity holds the C4 map, ground over the whole area shaped from C4, and the sea under it.</summary>
+    /// <summary>S0.6, §28, §29: Veilmouth.unity holds the C5 map, ground over the whole area shaped from C4 (C5 keeps its walls, river and sea), and the sea under it.</summary>
     public sealed class VeilmouthSceneTests
     {
         private UnityEngine.SceneManagement.Scene _scene;
@@ -76,9 +76,9 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
-        public void TheC4MapIsLaidOut()
+        public void TheC5MapIsLaidOut()
         {
-            Assert.AreEqual("C4 Map", VeilmouthScene.MapName);
+            Assert.AreEqual("C5 Map", VeilmouthScene.MapName);
             var zones = All<LayoutZone>().Where(z => z.transform.parent != null && z.transform.parent.name == VeilmouthScene.MapName).ToArray();
             CollectionAssert.AreEquivalent(VeilmouthScene.ZoneNames, zones.Select(z => z.name));
 

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S0.6, §4–§5, §12, §28: the city built from the plan C4 by <see cref="VeilmouthCity"/>, with its mystic layer.</summary>
+    /// <summary>S0.6, §4–§5, §12, §28, §29: the city built from the plan C5 by <see cref="VeilmouthCity"/>, with its mystic layer.</summary>
     public sealed class VeilmouthCityTests
     {
         private UnityEngine.SceneManagement.Scene _scene;
@@ -51,7 +51,7 @@ namespace GameDev.Slice.Tests
                 doors.Add((t.position + (t.right * 1.5f), t.forward, t.right));
             }
 
-            Assert.Greater(doors.Count, 120); // C4 (city plan §28.8): street doors plus the Dwelling and building portals
+            Assert.Greater(doors.Count, 120); // C5 (city plan §29.4): street doors plus the Dwelling and building portals
             var faults = new List<string>();
             foreach (var lamp in lamps)
             {
@@ -91,15 +91,18 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(8, ids.Length);
         }
 
-        /// <summary>§12, §28.8: Squint Lane stands at 45° under a kit frame on a world node, with houses along it.</summary>
+        /// <summary>
+        /// §29.2: C5's blocks are rectangular for now, so Squint Lane and its 45° kit frame are dropped; every block's
+        /// yard holds its wealth's dressing (§29.3).
+        /// </summary>
         [Test]
-        public void TheSlantStandsAt45DegreesUnderAFrame()
+        public void TheBlocksAreRectangularWithTheirYardsDressed()
         {
-            var frame = All<KitFrame>().Single();
-            Assert.AreEqual(45f, frame.transform.eulerAngles.y, 0.01f);
-            Assert.AreEqual(Mathf.Round(frame.transform.position.x), frame.transform.position.x, 0.001f);
-            Assert.AreEqual(Mathf.Round(frame.transform.position.z), frame.transform.position.z, 0.001f);
-            Assert.Greater(frame.GetComponentsInChildren<KitBlock>().Length, 4);
+            CollectionAssert.IsEmpty(All<KitFrame>().Select(f => f.name));
+            var yards = _scene.GetRootGameObjects().Single(g => g.name == VeilmouthCity.RootName).transform.Find("Yards");
+            Assert.IsNotNull(yards, "the yards' group");
+            Assert.Greater(yards.GetComponentsInChildren<KitBlock>().Count(b => b.name.Contains("Bench")), 8, "benches in the park yards");
+            Assert.Greater(All<Transform>().Count(t => t.name == "Drunkard"), 4, "drunkards in the poor yards");
         }
 
         /// <summary>The street surfaces follow the canonical five layers, within the eight URP's terrain draws.</summary>
@@ -113,17 +116,18 @@ namespace GameDev.Slice.Tests
             StringAssert.StartsWith("Overworld_", layers[4].name);
         }
 
-        /// <summary>The C0 dressing and the C1 to C3 cities are gone; the C4 city stands under its own root (§28).</summary>
+        /// <summary>The C0 dressing and the C1 to C4 cities are gone; the C5 city stands under its own root (§29).</summary>
         [Test]
-        public void TheC4CityReplacesTheEarlierLayouts()
+        public void TheC5CityReplacesTheEarlierLayouts()
         {
             var roots = _scene.GetRootGameObjects().Select(g => g.name).ToArray();
-            Assert.AreEqual("Veilmouth C4", VeilmouthCity.RootName);
+            Assert.AreEqual("Veilmouth C5", VeilmouthCity.RootName);
             CollectionAssert.Contains(roots, VeilmouthCity.RootName);
             CollectionAssert.DoesNotContain(roots, VeilmouthDressing.RootName);
             CollectionAssert.DoesNotContain(roots, "Veilmouth C1");
             CollectionAssert.DoesNotContain(roots, "Veilmouth C2");
             CollectionAssert.DoesNotContain(roots, "Veilmouth C3");
+            CollectionAssert.DoesNotContain(roots, "Veilmouth C4");
         }
 
         /// <summary>
@@ -142,7 +146,7 @@ namespace GameDev.Slice.Tests
             var lamps = All<KitBlock>().Count(b => b.name.StartsWith("Kit_Street_Lamp"));
             Assert.AreEqual(lamps, root.GetComponentsInChildren<Light>(true).Count(l => l.name == "Gaslight"));
             Assert.Greater(root.GetComponentsInChildren<ParticleSystem>(true).Length, 8, "fog banks");
-            // About one door in eight in Lower Veil and the Reek, whose doors number 44 in C4, 4 of them warded (city plan §28.10).
+            // About one door in eight in Lower Veil and the Reek (city plan §28.10, on C5 by §29.4).
             Assert.GreaterOrEqual(root.GetComponentsInChildren<Transform>(true).Count(t => t.name.StartsWith("Ward - door")), 3);
             Assert.Greater(root.GetComponentsInChildren<Transform>(true).Count(t => t.name.StartsWith("Runes - ")), 8);
             Assert.IsFalse(root.GetComponentsInChildren<Transform>(true).Single(t => t.name == "Crimson Moon").gameObject.activeSelf);

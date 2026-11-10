@@ -308,10 +308,10 @@ namespace GameDev.Slice.EditorTools
         private static VeilmouthLayout _layout;
 
         /// <summary>
-        /// City plan C4 (§28.1 item 7, §28.10), in plan coordinates (px = X + 500, py = 500 − Z): wealth falls with the
-        /// distance from the Penny. Tenements and warehouses are poor anywhere, villas rich anywhere; the Penny's own
-        /// district is rich; Lower Veil, the Reek, the quay and the low row on Last Turning by the cemetery are poor;
-        /// everything else, the Sleepy Quarter, Salt End and Crooked Hamlet, is middling.
+        /// City plan C5 (§29.3, §29.4), in plan coordinates (px = X + 500, py = 500 − Z): a dwelling takes its block's
+        /// wealth, the one its yard is dressed by. Tenements and warehouses are poor anywhere, villas rich anywhere; a door
+        /// stands on its block's edge, so the block is found within 2 m; a dwelling in no block (the quay's, Crooked
+        /// Hamlet's) is poor in the Reek and on the quay and middling elsewhere.
         /// </summary>
         public static DwellingWealth WealthAt(Vector3 world, DwellingArchetype archetype)
         {
@@ -328,25 +328,25 @@ namespace GameDev.Slice.EditorTools
             var px = world.x + 500f;
             var py = 500f - world.z;
             _layout ??= VeilmouthLayout.Load();
-            // The poor districts first: Lower Veil reaches into the Penny's box, and its slums stay slums there.
+            const float reach = 2f;
+            var block = _layout.blocks
+                .Where(b => px >= b.x0 - reach && px <= b.x1 + reach && py >= b.y0 - reach && py <= b.y1 + reach)
+                .OrderBy(b => Mathf.Max(Mathf.Max(b.x0 - px, px - b.x1), Mathf.Max(b.y0 - py, py - b.y1)))
+                .FirstOrDefault();
+            switch (block?.wealth)
+            {
+                case "rich":
+                    return DwellingWealth.Rich;
+                case "middling":
+                    return DwellingWealth.Middling;
+                case "poor":
+                case "works":
+                    return DwellingWealth.Poor;
+            }
+
             var quay = _layout.SquareById("quay").x0;
-            var at = _layout.districts.Where(d => px >= d.x0 && px <= d.x1 && py >= d.y0 && py <= d.y1).ToList();
-            if (at.Any(d => d.name == "LOWER VEIL" || d.name == "THE REEK" || (d.name.Length == 0 && d.x0 >= quay)))
-            {
-                return DwellingWealth.Poor;
-            }
-
-            if (at.Any(d => d.name.Length == 0))
-            {
-                return DwellingWealth.Rich; // the Penny's own district
-            }
-
-            if (at.Any(d => d.name == "PARSONS' END"))
-            {
-                return px < _layout.StreetById("last_turning").c1 ? DwellingWealth.Poor : DwellingWealth.Rich;
-            }
-
-            return DwellingWealth.Middling;
+            var reek = _layout.districts.FirstOrDefault(d => d.name == "THE REEK");
+            return px >= quay || (reek != null && py >= reek.y0) ? DwellingWealth.Poor : DwellingWealth.Middling;
         }
 
         // ------------------------------------------------------------------------------------------- checks

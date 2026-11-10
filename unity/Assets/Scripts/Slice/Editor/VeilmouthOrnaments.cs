@@ -8,10 +8,10 @@ using UnityEngine;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// The owner's garden ornaments in Veilmouth (2026-11-08, city plan §23, placed on C4 by §28.10): three different
-    /// angels, each in a green place in another part of the city (Bishop's Garden, Last Turning Cemetery, the west villa's
-    /// garden on Widows' Row); a pair of great lions before the Governor's House on the Penny, the crown's power facing the
-    /// square; stone birdbaths in Bishop's Garden and the front gardens of the faction's house and the detached houses.
+    /// The owner's garden ornaments in Veilmouth (2026-11-08, city plan §23, placed on C5 by §29.4): three different
+    /// angels, each in a green place in another part of the city (Bishop's Garden, Last Turning Cemetery, the Sleepy
+    /// Quarter's park yard); a pair of great lions before the Governor's House, the crown's power facing Long Tongue;
+    /// stone birdbaths in Bishop's and Quiet Whistle Gardens and the rich blocks' park yards.
     /// The scene is the owner's, so this pass touches only its own group, `Ornaments`; run again, it replaces its own group. Each ornament takes the grid node nearest its wished centre whose footprint lies in its place, on even
     /// ground, with <see cref="Clear"/> free all round for walking. Then each is rendered from the front.
     /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthOrnaments.Place
@@ -28,29 +28,27 @@ namespace GameDev.Slice.EditorTools
 
         // (key, wished centre px, py, its place px0, py0, px1, py1 (the footprint stays inside), quarter turns, name).
         // Every model faces +Z (north, toward the smaller py), as the renders show: no turn faces north, two face south.
-        // City plan C4 (§28.10): Bishop's Garden's middle walk, the cemetery, the west villa's side garden on Widows' Row,
-        // and the front gardens of the faction's house and the detached houses.
+        // City plan C5 (§29.3, §29.4): Bishop's Garden's middle walk, the cemetery, and the Sleepy Quarter's park yard for
+        // the angels; the birdbaths in the two gardens and the rich blocks' park yards, the houses now standing flush on
+        // the pavement with no front gardens.
         private static readonly (string Key, float Px, float Py, int X0, int Y0, int X1, int Y1, int Turns, string Name)[] Fixed =
         {
-            ("AngelStatue", 491.5f, 330f, 482, 312, 501, 348, 2, "Angel, Bishop's Garden"),
-            ("AngelStatueB", 459f, 298f, 441, 263, 477, 333, 2, "Angel, Last Turning Cemetery"),
-            ("AngelStatueC", 459f, 386f, 457, 374, 489, 398, 0, "Angel, the west villa's garden"),
-            ("Birdbath", 491.5f, 300f, 482, 290, 501, 310, 0, "Birdbath, Bishop's Garden"),
-            ("Birdbath", 585f, 343f, 581, 341, 613, 345, 0, "Birdbath, the faction's garden"),
-            ("Birdbath", 425f, 375f, 423, 374, 437, 377, 0, "Birdbath, Widows' Row detached house (west)"),
-            ("Birdbath", 441f, 375f, 439, 374, 453, 377, 0, "Birdbath, Widows' Row detached house (east)"),
-            ("Birdbath", 425f, 528f, 423, 526, 445, 529, 0, "Birdbath, embankment house (1)"),
-            ("Birdbath", 449f, 528f, 447, 526, 469, 529, 0, "Birdbath, embankment house (2)"),
-            ("Birdbath", 473f, 528f, 471, 526, 493, 529, 0, "Birdbath, embankment house (3)"),
-            ("Birdbath", 497f, 528f, 495, 526, 518, 529, 0, "Birdbath, embankment house (4)"),
+            ("AngelStatue", 499f, 330f, 486, 312, 512, 348, 2, "Angel, Bishop's Garden"),
+            ("AngelStatueB", 452f, 338f, 434, 328, 470, 349, 2, "Angel, Last Turning Cemetery"),
+            ("AngelStatueC", 452f, 406f, 444, 396, 460, 417, 2, "Angel, the Sleepy Quarter's yard"),
+            ("Birdbath", 499f, 300f, 486, 290, 512, 310, 0, "Birdbath, Bishop's Garden"),
+            ("Birdbath", 581f, 300f, 568, 280, 594, 320, 0, "Birdbath, Quiet Whistle Garden"),
+            ("Birdbath", 452f, 517.5f, 444, 513, 460, 522, 0, "Birdbath, the embankment yard"),
+            ("Birdbath", 506.5f, 471f, 496, 463, 517, 479, 0, "Birdbath, the Governor's yard"),
+            ("Birdbath", 573.5f, 406.5f, 563, 396, 584, 417, 0, "Birdbath, the Assize's yard"),
+            ("Birdbath", 512f, 400f, 505, 396, 517, 405, 0, "Birdbath, the Town Hall's yard"),
         };
 
         /// <summary>
         /// Every ornament's place: the fixed ones, and the pair of great lions either side of the Governor's House's door on
-        /// the Penny, 3 m before its front, the crown's power facing the square. A lion lies along X with its head at the
-        /// east end, so three quarter turns put the head north.
+        /// Long Tongue, along its front. A lion lies along X with its head at the east end, its face turned north.
         /// </summary>
-        private static IEnumerable<(string Key, float Px, float Py, int X0, int Y0, int X1, int Y1, int Turns, string Name)> Spots()
+        private static IEnumerable<(string Key, float Px, float Py, int X0, int Y0, int X1, int Y1, int Turns, string Name)> Spots(Dictionary<string, SliceKitCatalogue.Entry> kit)
         {
             foreach (var spot in Fixed)
             {
@@ -65,14 +63,37 @@ namespace GameDev.Slice.EditorTools
                 yield break;
             }
 
+            // C5 (§29.4): the house fronts Long Tongue's 6 m pavement, with its stoop at the door and the street trees in
+            // pits by the kerb, so a lion turned to the street (4 m deep) leaves no way past it. The pair lies unturned along
+            // the front instead, both faces on the street; a half turn would set the west lion's face on the wall. It takes
+            // the first spacing from the door, and distance from the front, at which both lions are free, nearest the wall
+            // first; a lion alone is never placed.
             var bounds = governor.GetComponentsInChildren<Renderer>().Select(r => r.bounds).Aggregate((a, b) => { a.Encapsulate(b); return a; });
             var (mid, front) = (bounds.center.x + 500f, 500f - bounds.max.z);
-            foreach (var side in new[] { -1, 1 })
+            var (wx, wz) = (kit["LionStatue"].Width, kit["LionStatue"].Depth);
+            Physics.SyncTransforms();
+            foreach (var off in new[] { 5f, 6f, 7f, 8f, 9f, 10f, 11f, 12f })
             {
-                var px = mid + (side * 7f);
-                yield return ("LionStatue", px, front - 3f, Mathf.FloorToInt(px - 5f), Mathf.FloorToInt(front - 9f), Mathf.CeilToInt(px + 5f),
-                    Mathf.FloorToInt(front), 3, side < 0 ? "Lion, the Governor's House (west)" : "Lion, the Governor's House (east)");
+                foreach (var back in new[] { -2, -1, 0, 1, 2 })
+                {
+                    var y = Mathf.FloorToInt(front) - wz - back;
+                    var pair = new[] { -1, 1 }.Select(side => Mathf.RoundToInt(mid + (side * off) - (wx * 0.5f))).ToArray();
+                    if (pair.Any(x => !Free(x, y, wx, wz).HasValue))
+                    {
+                        continue;
+                    }
+
+                    for (var k = 0; k < 2; k++)
+                    {
+                        yield return ("LionStatue", pair[k] + (wx * 0.5f), y + (wz * 0.5f), pair[k], y, pair[k] + wx, y + wz, 0,
+                            k == 0 ? "Lion, the Governor's House (west)" : "Lion, the Governor's House (east)");
+                    }
+
+                    yield break;
+                }
             }
+
+            Debug.LogWarning("[VeilmouthOrnaments] no room for the pair of lions before the Governor's House.");
         }
 
         [MenuItem("GameDev/Slice/Place Veilmouth Ornaments")]
@@ -89,7 +110,7 @@ namespace GameDev.Slice.EditorTools
             var group = new GameObject(GroupName).transform;
             var placed = new List<string>();
             var shots = new List<(Vector3 Centre, Vector3 Facing, float Height)>();
-            foreach (var (key, px, py, x0, y0, x1, y1, turns, name) in Spots().ToList())
+            foreach (var (key, px, py, x0, y0, x1, y1, turns, name) in Spots(kit).ToList())
             {
                 var entry = kit[key];
                 var (wx, wz) = turns % 2 == 0 ? (entry.Width, entry.Depth) : (entry.Depth, entry.Width);

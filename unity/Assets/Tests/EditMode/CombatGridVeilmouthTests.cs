@@ -68,7 +68,7 @@ namespace GameDev.Slice.Tests
         {
             Open(VeilmouthScene.ScenePath);
             var grid = new CombatGridReader(1f);
-            int sides = 0, half = 0, full = 0, crossings = 0, closed = 0;
+            int sides = 0, half = 0, full = 0, crossings = 0, closed = 0, walled = 0;
             var notes = new List<string>();
             CombatCell? sample = null;
             var sampleSide = GridSide.PlusX;
@@ -83,7 +83,12 @@ namespace GameDev.Slice.Tests
                 var across = body.size.x < body.size.z ? Vector3.right : Vector3.forward;
                 var a = body.center - (across * 0.6f);
                 var b = body.center + (across * 0.6f);
-                foreach (var (from, toward) in new[] { (a, across), (b, -across) })
+                // A passage's railing ends at the houses (C5, city plan §29.4): in the cell against a wall the reader meets
+                // the wall's corner as well, Full Cover that is the wall's reading, not the railing's, so that piece's sides
+                // are left out of the share; its crossing still counts.
+                var atWall = WallAtTheCell(a, across, body);
+                walled += atWall ? 1 : 0;
+                foreach (var (from, toward) in new[] { (a, across), (b, -across) }.Where(_ => !atWall))
                 {
                     int ix = Mathf.FloorToInt(from.x), iz = Mathf.FloorToInt(from.z);
                     var level = LevelNear(grid.Column(ix, iz), body.min.y);
@@ -124,7 +129,7 @@ namespace GameDev.Slice.Tests
 
             var halfShare = half / (float)Mathf.Max(1, sides);
             var closedShare = closed / (float)Mathf.Max(1, crossings);
-            TestContext.WriteLine($"Railings and fences: {sides} sides, {half} Half Cover ({halfShare:P1}), {full} Full; {closed} of {crossings} crossings closed ({closedShare:P1}).");
+            TestContext.WriteLine($"Railings and fences: {sides} sides, {half} Half Cover ({halfShare:P1}), {full} Full, {walled} pieces at a wall left out; {closed} of {crossings} crossings closed ({closedShare:P1}).");
             Assert.Greater(sides, 50, "Veilmouth's railings are read");
             Assert.GreaterOrEqual(halfShare, MinHalfCover, string.Join("\n", notes.Take(10)));
             Assert.GreaterOrEqual(closedShare, MinRailEdges);
@@ -234,6 +239,28 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(walk.Length, moves, "every position was a step");
             var sorted = ms.OrderBy(m => m).ToArray();
             TestContext.WriteLine($"{walk.Length} steps, none allocating; median {sorted[sorted.Length / 2]:F2} ms, worst {sorted[sorted.Length - 1]:F2} ms (G2: worst at most 8 ms).");
+        }
+
+        /// <summary>
+        /// Whether anything but a railing, a fence or the ground stands on the railing's line within the width of the cell
+        /// sampled at <paramref name="from"/>, as the reader's cover probe spans the cell's width.
+        /// </summary>
+        private static bool WallAtTheCell(Vector3 from, Vector3 across, Bounds body)
+        {
+            var cell = new Vector3(Mathf.FloorToInt(from.x) + 0.5f, body.center.y, Mathf.FloorToInt(from.z) + 0.5f);
+            var along = Vector3.Cross(Vector3.up, across);
+            var centre = body.center + (along * Vector3.Dot(cell - body.center, along));
+            var half = (along * 0.5f) + (across * 0.3f);
+            var extents = new Vector3(Mathf.Abs(half.x), body.extents.y * 0.8f, Mathf.Abs(half.z));
+            var ground = LayerMask.NameToLayer(KitLayers.Ground);
+            return Physics.OverlapBox(centre, extents, Quaternion.identity, ~0, QueryTriggerInteraction.Ignore)
+                .Any(c => !(c is TerrainCollider) && c.gameObject.layer != ground && !IsRailing(c));
+        }
+
+        private static bool IsRailing(Collider c)
+        {
+            var block = c.GetComponentInParent<KitBlock>();
+            return block != null && (block.gameObject.name.Contains("_Railing_") || block.gameObject.name.StartsWith("Kit_Fence_"));
         }
 
         /// <summary>Out along the first side with <paramref name="cells"/> reachable cells in a line, and back.</summary>

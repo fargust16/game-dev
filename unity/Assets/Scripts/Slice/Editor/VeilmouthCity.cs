@@ -124,10 +124,10 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// Batch only, the whole chain (C4, §28.10): the city built again on its present ground, which is the owner's to
+        /// Batch only, the whole chain (C5, §29.4): the city built again on its present ground, which is the owner's to
         /// change by hand and is not shaped again; then the passes beside its root (the named people, the world driver,
         /// the dogs, the ornaments, the mystic layer), the street probes baked again, the POIs staged and the residue
-        /// placed again, and C4's views. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthCity.RebuildStreets
+        /// placed again, and C5's views. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthCity.RebuildStreets
         /// </summary>
         public static void RebuildStreets()
         {
@@ -139,7 +139,7 @@ namespace GameDev.Slice.EditorTools
             VeilmouthMystic.Place();
             VeilmouthReflections.Bake();
             Restage();
-            VeilmouthRenders.RenderC4();
+            VeilmouthRenders.RenderC5();
         }
 
         private static void Run(bool replace)
@@ -182,7 +182,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             // The layout zones again, now that the cellar's door and the chapel's forecourt have their places.
-            foreach (var old in scene.GetRootGameObjects().Where(g => g.name == VeilmouthScene.MapName || g.name == "C2 Map"))
+            foreach (var old in scene.GetRootGameObjects().Where(g => g.name == VeilmouthScene.MapName || VeilmouthScene.OldMapNames.Contains(g.name)))
             {
                 Object.DestroyImmediate(old);
             }
@@ -255,10 +255,12 @@ namespace GameDev.Slice.EditorTools
             StreetTreesC4();
             _parent = Group("Parks");
             Parks();
+            _parent = Group("Yards");
+            Yards();
             _parent = Group("Outskirts");
             Hamlet();
             Gloomwood();
-            PeopleC4();
+            People();
             // A street door on every dwelling (15, *The slice's Dwellings*), after every building stands.
             VeilmouthDwellings.AddDoors(_root);
 
@@ -1671,7 +1673,9 @@ namespace GameDev.Slice.EditorTools
             // The rooms behind the windows are dressing whose KitBlock VicRooms switched off: not blocks of the city.
             var blocks = Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude).Where(b => b.enabled).ToArray();
             var faults = KitLayoutCheck.Check(blocks);
-            Debug.Log($"[VeilmouthCity] plots: the least room between a door's steps and its railings is {_stepsClear:0.00} m (§19 asks 1.5 m).");
+            Debug.Log(_stepsClear < float.MaxValue
+                ? $"[VeilmouthCity] plots: the least room between a door's steps and its railings is {_stepsClear:0.00} m (§19 asks 1.5 m)."
+                : "[VeilmouthCity] plots: none, every house stands in a block (§29).");
             Debug.Log($"[VeilmouthCity] {blocks.Length} blocks, {_doors.Count} doors, {_lanes.Count} lanes, {faults.Count} kit faults" +
                       (faults.Count > 0 ? ":\n  " + string.Join("\n  ", faults.Take(60).Select(f => f.ToString())) : "."));
         }

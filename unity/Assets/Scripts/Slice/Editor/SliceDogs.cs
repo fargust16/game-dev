@@ -35,8 +35,8 @@ namespace GameDev.Slice.EditorTools
         private const float Width = 0.32f;       // m, the body box
         private const float Length = 0.95f;      // m
 
-        /// <summary>Where the dogs stand, world X and Z (plan px − 500, 500 − py): Powder Embankment by the player's start, Bawling Square, Salt Gullet's carriageway, Drowsy Steps by Widows' Row, and Fishlip Quay (city plan C4, §28.10).</summary>
-        public static readonly Vector2[] Places = { new Vector2(126f, -42f), new Vector2(-48f, 6f), new Vector2(105f, 58f), new Vector2(20f, 151f), new Vector2(177f, 30f) };
+        /// <summary>Where the dogs stand, world X and Z (plan px − 500, 500 − py): Powder Embankment by the player's start, Thimble Street, Salt Gullet's carriageway, Drowsy Steps by Widows' Row, and Fishlip Quay (city plan C5, §29.4).</summary>
+        public static readonly Vector2[] Places = { new Vector2(126f, -42f), new Vector2(-22f, 30f), new Vector2(105f, 58f), new Vector2(20f, 151f), new Vector2(177f, 30f) };
 
         private static string[] Feet => new[] { "DEF-foot.L", "DEF-foot.R", "DEF-front_foot.L", "DEF-front_foot.R" };
 

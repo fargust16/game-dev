@@ -164,12 +164,12 @@ namespace GameDev.Slice.Tests
             Debug.Log("[RenderTheSnatch] Logs/SliceDialogue/" + name);
         }
 
-        /// <summary>The player before Kit on Bawling Square, out of the scene's area.</summary>
+        /// <summary>The player before Kit at Bawling Row, out of the scene's area.</summary>
         private static IEnumerator GoFar(PlayerLocomotion player, PoiStage stage)
         {
             var kit = Object.FindObjectsByType<PersonTalk>().Single(t => t.Dialogue != null && t.Dialogue.Id == "kit");
             var place = kit.transform.position + (kit.transform.forward * 1.5f) + (Vector3.up * 0.1f);
-            Assert.IsFalse(stage.Within(place), "Bawling Square stands out of the scene's area");
+            Assert.IsFalse(stage.Within(place), "Bawling Row stands out of the scene's area");
             player.Teleport(place, player.transform.rotation);
             yield return new WaitForSeconds(0.3f);
         }

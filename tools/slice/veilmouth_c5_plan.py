@@ -452,7 +452,10 @@ class Block:
                     ok = left >= PASSAGE - 0.01 if force else (abs(left) < 0.01 or left >= PASSAGE - 0.01)
                 if ok:
                     n = n10 + n15
-                    score = (s, -abs(n15 - n / 3.0))
+                    # The quay's row is warehouses, a tenement only where a warehouse cannot fit; other families mix
+                    # one wide house in three.
+                    mix = n15 if family == "warehouse" else -abs(n15 - n / 3.0)
+                    score = (s, mix)
                     if best is None or score > best[0]:
                         best = (score, n10, n15, left)
         return best
@@ -591,6 +594,8 @@ W1B = Block("W1B", (COLD + 12, MAIN + 22, THIMBLE, BUTTON), "middling", "SLEEPY 
             {"N": ("main", "shop"), "E": ("street", "town"), "S": ("lane", "town"), "W": ("wall", "town")})
 W1C = Block("W1C", (COLD + 12, BUTTON + 10, THIMBLE, EMBANK), "rich", "SLEEPY QUARTER",
             {"N": ("lane", "town"), "E": ("street", "town"), "S": ("embankment", "town"), "W": ("wall", "town")})
+# A rich family's villa on the embankment at the wall's corner, a dwelling like any house.
+W1C.on("S", COLD + 12, "Villa_stucco", "villa", "The embankment villa")
 W2A = Block("W2A", (THIMBLE + 12, WIDOWS + 17, LENTEN, MAIN), "rich", "THE PENNY",
             {"N": ("side", "town"), "E": ("main", "shop"), "S": ("main", None), "W": ("street", "town"),
              "notch": ("penny", "shop_rich")}, notch=("SE", N15, N15))

@@ -712,31 +712,31 @@
   },
   {
    "id": "",
-   "key": "Terrace12_brick_cornerR",
+   "key": "Terrace8_stock_cornerR",
    "facing": "S",
    "front": 534,
-   "a": 432,
+   "a": 452,
    "name": "",
    "stoop": "plain",
    "block": "W1C"
   },
   {
    "id": "",
-   "key": "Terrace12_brick",
-   "facing": "S",
-   "front": 534,
-   "a": 447,
-   "name": "",
-   "stoop": "plain",
-   "block": "W1C"
-  },
-  {
-   "id": "",
-   "key": "ShopTown8_dark_cornerL",
+   "key": "Terrace8_brick_cornerL",
    "facing": "S",
    "front": 534,
    "a": 462,
    "name": "",
+   "stoop": "plain",
+   "block": "W1C"
+  },
+  {
+   "id": "villa",
+   "key": "Villa_stucco",
+   "facing": "S",
+   "front": 534,
+   "a": 432,
+   "name": "The embankment villa",
    "stoop": "plain",
    "block": "W1C"
   },
@@ -1322,7 +1322,7 @@
   },
   {
    "id": "",
-   "key": "Tenement8_brick",
+   "key": "Warehouse12_stock",
    "facing": "E",
    "front": 648,
    "a": 461,
@@ -1332,20 +1332,10 @@
   },
   {
    "id": "",
-   "key": "Tenement8_poor",
+   "key": "Warehouse12_stock_cornerR",
    "facing": "E",
    "front": 648,
-   "a": 471,
-   "name": "",
-   "stoop": "plain",
-   "block": "E2B"
-  },
-  {
-   "id": "",
-   "key": "Tenement8_poor_cornerR",
-   "facing": "E",
-   "front": 648,
-   "a": 481,
+   "a": 476,
    "name": "",
    "stoop": "plain",
    "block": "E2B"
@@ -2707,10 +2697,18 @@
   },
   {
    "block": "W1C",
+   "facing": "S",
+   "front": 534,
+   "a0": 447,
+   "a1": 452,
+   "depth": 10
+  },
+  {
+   "block": "W1C",
    "facing": "W",
    "front": 432,
    "a0": 511,
-   "a1": 524,
+   "a1": 519,
    "depth": 10
   },
   {

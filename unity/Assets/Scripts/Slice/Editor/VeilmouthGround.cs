@@ -53,7 +53,8 @@ namespace GameDev.Slice.EditorTools
 
             var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             var roots = scene.GetRootGameObjects();
-            if (roots.Any(r => r.name == VeilmouthScene.MapName))
+            // C5 keeps C4's walls, river and sea on the owner's ground (city plan §29.4), so either map's name means shaped.
+            if (roots.Any(r => r.name == VeilmouthScene.MapName || VeilmouthScene.OldMapNames.Contains(r.name)))
             {
                 Debug.LogWarning("[VeilmouthGround] the ground is already shaped from C4 and is the owner's now; nothing changed.");
                 return;

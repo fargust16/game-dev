@@ -20,8 +20,8 @@ namespace GameDev.Slice.EditorTools
         [MenuItem("GameDev/Slice/Render Veilmouth Views")]
         public static void RenderAll()
         {
-            // Since C4 (city plan §28.10) the city's views are C4's; the interiors follow.
-            RenderC4();
+            // Since C5 (city plan §29.4) the city's views are C5's; the interiors follow.
+            RenderC5();
             RenderInteriors();
             Debug.Log($"Veilmouth views written to {OutputFolder}.");
         }
