@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4, C5)
 
-Version: 0.62
+Version: 0.63
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§29.11: the far LOD built and measured: every view's median frame within the 16.7 ms budget, the swap unseen; the yard doors left out of it; its glass a variant of the kit glass that writes depth and reads the panes' rooms. Earlier: §29.10: the owner's frame budget of 16.7 ms and the merged far LOD for each house type, designed: one mesh a type built in place, the switch at 50 m with no cross-fade, the panes' rooms in the mesh, a sync for the houses the city changed)
+Last Updated: 2026-11-10 (§30: the owner's Tripo street lamp in the place of every lamp post and one bronze statue on Drowsy Steps, two more exceptions to §25.6. Earlier: §29.11: the far LOD built and measured: every view's median frame within the 16.7 ms budget, the swap unseen; the yard doors left out of it; its glass a variant of the kit glass that writes depth and reads the panes' rooms. Earlier: §29.10: the owner's frame budget of 16.7 ms and the merged far LOD for each house type, designed: one mesh a type built in place, the switch at 50 m with no cross-fade, the panes' rooms in the mesh, a sync for the houses the city changed)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -883,7 +883,7 @@ The owner, 2026-11-09, after the greenery's first run:
 
 - **No field fence inside the walls.** A plot, a yard or a bed is closed by a hedge (§25.4), the city's iron railings, or a stone wall. The medieval props' plank fence and Roadside Tales' field fences stand only outside the walls (§25.5). The Item Creation yard on the Market Place is hedged.
 - **No barrel, crate or box set down for its own sake.** In a city barrels stand in the port and in warehouses; in a home a barrel is rare. So the goods before the shops (§24.7, R7.1) are taken away, and so are the barrels, crates, boxes and firewood of the Soot & Bell's yard, the tenement court, the cellar yard and the Item Creation yard. The quays' cargo and the warehouses' stock on Dock Road stay. Indoors the rule is [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) G5.
-- **The owner's Tripo models furnish interiors only.** Each holds up to about 10 000 polygons (the owner; the table lamp 14 410, measured), too many for the city's open plan. Their places are in the furnishing rules §10. The wooden hanging sign among them is the one exception: by the owner's word one hangs beside the street door of Harrow & Tincture and of the Soot & Bell, its bracket on the facade and its board's foot 2.6 m above the sill (`VeilmouthSigns`), blank until the trades' emblems come ([99 Open Questions](../../../99%20Open%20Questions.md) VS-SIGN (b)).
+- **The owner's Tripo models furnish interiors only.** Each holds up to about 10 000 polygons (the owner; the table lamp 14 410, measured), too many for the city's open plan. Their places are in the furnishing rules §10. The wooden hanging sign among them is the one exception: by the owner's word one hangs beside the street door of Harrow & Tincture and of the Soot & Bell, its bracket on the facade and its board's foot 2.6 m above the sill (`VeilmouthSigns`), blank until the trades' emblems come ([99 Open Questions](../../../99%20Open%20Questions.md) VS-SIGN (b)). By the owner's word of 2026-11-10 two more stand outside: the Tripo street lamp in the place of every lamp post, and one bronze statue (§30).
 
 ## 25.7 Build
 
@@ -2125,3 +2125,19 @@ Built by `VeilmouthFarLod` as §29.10 designed, with the changes the building fo
 - the far glass is the kit glass with only `_FarLod` overridden, and no kit glass sets it.
 
 `VeilmouthSceneTests.EveryKitHouseFarLodHoldsItsOwnPieces` checks the city's houses against their own pieces. EditMode 308/308. PlayMode 53/53: `LoosePropsTests.ThePlayerDoesNotShoveATable`, in the tavern, which this work does not touch, failed once in the full run (the table moved 1.06 m) and passed alone with its fixture, 11/11. Its push is moved by the frame's length, so it can fail on a slow frame.
+
+# 30. The owner's street lamp and statue, 2026-11-10
+
+The owner, 2026-11-10, with ten interior pieces and six people (asset map §1, §4; furnishing rules §10):
+
+- **Every street lamp is the owner's Tripo lamp** (`vintage_street_lamp`), a thin post with a box lantern, in the place of Modular Victorian City's lamp post.
+- **One bronze statue** (`bronze_statue`), a gentleman in a top hat on his pedestal, stands somewhere in the city: one in the whole city.
+
+Both are exceptions to §25.6's rule that the Tripo models furnish interiors only, by the owner's word, as the hanging sign is.
+
+## 30.1 The agent's readings (authoring defaults)
+
+- **The lamp keeps the kit key `LampPost`**, so the 251 lamps of C5 change in place: each keeps its cell, its kerb spot (§26.1) and its light. It stands 4 m high, the lamp post's measured height (§2), and its lantern is where the old one's was within 0.3 m, so `VeilmouthMystic.Lamps` puts the gas light in it as before.
+- **Its glass.** The Tripo lamp is one mesh with one material, so the whole lamp cannot glow. A small box of our own, the lantern's glass, stands inside the lantern; its material's name holds "glass", which is how `VeilmouthMystic.Lamps` finds the panes it lights at night.
+- **Its weight.** The lamp holds 4 935 triangles, 1.24 million for 251 lamps, against the old post's lighter mesh. It is measured with FrameProbe against the 16.7 ms budget (§29.10); if a view breaks the budget, the lamp gets a far level beyond 60 m (authoring default) that casts no shadow.
+- **The statue stands on Drowsy Steps**, the raised square before the cathedral, in the middle of its open paving and facing south down the steps, 4.8 m high with its pedestal (authoring default), so the figure reads larger than life over the passers-by. It is not Stone Grandad: Stone Grandad keeps its 12 m placeholder on the Penny's island until its own model comes (SLICE_MODELS_WANTED.md § C4); the owner may put this statue there instead.

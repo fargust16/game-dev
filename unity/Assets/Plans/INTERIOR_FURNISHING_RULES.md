@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.8
+Version: 0.9
 
-Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09)
+Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09, 2026-11-10); fireplaces and radiators in §10.1 (owner, 2026-11-10)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-09 (§10: the owner's fifth play test: the Tripo pieces resized against the player, the piano by its keys; the Office, a civic building's Dwelling. The earlier note is in the update history)
+Last Updated: 2026-11-10 (§10: the owner's ten Tripo pieces of 2026-11-10 and their places, a second nightstand among them; §10.1: one or two fireplaces a house, on the ground floor only, and a radiator in every other room, by the owner. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -203,14 +203,33 @@ The owner: take every piece from TripoModels for the interior scenes, and leave 
 | two-arm sconce (`brass_wall_sconce`) | `TrSconce` | 0.45 m across | a rich room's wall lamps |
 | bracket lantern (`antique_wall_lantern`) | `TrLantern` | 0.5 m | the hall's and landing's wall lamps, poor and middling |
 | chandelier (`ornate_chandelier`) | `TrChandelier` | 1.2 m | the Soot & Bell's taproom, the one room higher than a storey (G9) |
+| nightstand cabinet with a door and a drawer (`antique_wooden_cabinet_3d_model_Clone1`), a candle and a book or a table lamp | `TrCabinet`, `TrCabinetLamp` | 0.67 m | a second kind of nightstand, middling and rich: the bed's pair is one kind or the other, both alike (G3), chosen by the seed (owner, 2026-11-10) |
+| ornate floor vase, blue and gold (`ornate_vase`) | `TrVaseOrnate` | 0.75 m | a rich hall, drawing room or landing, in a corner; one of the two floor vases, chosen by the seed |
+| bust of a woman on its small base (`classical_bust`), on the pedestal table | `TrBust` | 0.45 m bust | a rich drawing room, study or hall, against a wall (owner: a woman's bust in rich houses) |
+| round wall barometer (`antique_barometer`) | `TrBarometer` | 0.38 m across | hung in a middling or rich hall, on the wall nearest the street door (owner: by the entrance) |
+| iron umbrella stand (`decorative_vase_3d_model_Clone1`) | `TrUmbrellas` | 0.6 m | a middling or rich hall, in the corner nearest the street door (owner: by the entrance) |
+| magnifying glass, laid flat (`magnifying_glass`) | on `TrDesk` | 0.2 m | on the rich writing desk, by the parchment (owner: on desks or in cabinets) |
+| inkstand with two wells and a pen (`ornate_ink_desk_3d_model_Clone1`) | on `TrDesk` | 0.25 m | on the rich writing desk, in the place of the pack's ink and pen (owner: rich interiors, on desks) |
+| gas radiator (`ornate_radiator`) | `TrRadiator` | 0.5 m high, 0.6 m wide | §10.1: every heated room without a fireplace, under a window where one is |
 
-The bed, the bar counter and its cabinet, the cell bars and door and the Notice Board were the owner's Tripo pieces already (asset map §4). The other models are not furnishing: the townsman, the woman and the dog are people and beasts, the angels, the lion and the birdbath are the garden ornaments of the city plan §23, the coins and firearms are items, the rock is the iron ore, and the hanging sign hangs outside, over the doors of Harrow & Tincture and the Soot & Bell (city plan §25.6, [99 Open Questions](../../../99%20Open%20Questions.md) VS-SIGN (b)).
+The bed, the bar counter and its cabinet, the cell bars and door and the Notice Board were the owner's Tripo pieces already (asset map §4). Of the owner's models of 2026-11-10, the street lamp and the bronze statue stand in the city, by the owner's word (city plan §30), and the six people are the asset map's §1. The other models are not furnishing: the townsman, the woman and the dog are people and beasts, the angels, the lion and the birdbath are the garden ornaments of the city plan §23, the coins and firearms are items, the rock is the iron ore, and the hanging sign hangs outside, over the doors of Harrow & Tincture and the Soot & Bell (city plan §25.6, [99 Open Questions](../../../99%20Open%20Questions.md) VS-SIGN (b)).
 
 **Resized after the owner's fifth play test (2026-11-09).** The owner found the piano very small and asked that every Tripo piece fit the world. Measured beside the player (1.8 m) in one lineup, the tall pieces were raised to stand over a man's head as their true ones do. Game sizes: wardrobe 2.4 m, cheval glass 2.0 m, folding screen 2.0 m, display cabinet 2.1 m, coat stand 2.05 m, and wing chair 1.4 m, which is Victorian Interiors' own armchair. The piano is sized by its keys, which stand at 0.41 of its height: 0.82 m, a real upright's 0.72 m at game scale. That makes it 2.0 m over its carved top and two cells deep. The table's true sizes above are those before the play test. A wrapper whose footprint changes when it is rebuilt takes the old one's place, keeping its GUID, so the scenes follow it ([VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §26.1).
 
 **The Office** (owner, fifth play test). A civic building's, the palace's and the clock tower's doors open into an Office, a Dwelling that is no home. It has a reception at the door with a counter where a clerk receives callers, two offices with desks, an archive of shelves and boxes, and a WC; the clock tower has only its keeper's room. The rules of §1–§5 hold in it as in a rich home, with Work as its main purpose and no Sleep or Cook (city plan §26.3).
 
 The seven took them in place (`VeilmouthInteriors.EnrichWithTripo`), so what S2 wrote into their scenes stays. The barrels in the Soot & Bell's stair hall and Harrow's store room went out; a piano, log baskets and fire irons came in; and the pieces above replaced the pack's where the table says.
+
+## 10.1 Fireplaces and radiators (owner, 2026-11-10)
+
+The owner: a house has only one or two fireplaces, on the ground floor; every other room has a radiator.
+
+- **One or two, the range among them.** The kitchen's range is the pack's fireplace (`ViFireplace`), so a home shows it as a fireplace. So the agent reads the rule as at most two fireplaces in a home, the range counted: a home that cooks keeps its range and one hearth more, in its first room by the rules' order (§4: the parlour, the drawing room). A home with no kitchen range may have two hearths.
+- **Ground floor only.** No hearth stands on a storey above the ground. A rich house's bedrooms, its study and dining room, which §4 gave a hearth, have a radiator instead.
+- **A radiator in every other room.** Each room that people live, work or wash in, and that has no fireplace, has one gas radiator (`TrRadiator`): the hall, parlour, drawing, dining and dressing rooms, study, bedroom, nursery, servant's room, bathroom, back room, shop, office and reception. A kitchen, a scullery, a store, a pantry, a box room, an archive, a landing, a WC and a washroom have none. It stands under a window where one is free, since it is low enough (G2, under 0.6 m), and else against a plain wall, and it never blocks a walk-way (G1). The agent applies it to every wealth, the poor included, by the owner's words; that a poor home has gas heat is the owner's world, not a history.
+- **The seven** already meet the first two parts: each has at most two fireplaces, all on the ground floor (the Soot & Bell's saloon and kitchen, the faction house's two hearths, the lock-up's guard room, the missing room's one). Radiators join their other rooms where a wall is free.
+
+These counts are authoring defaults.
 
 ## Sources
 
@@ -220,6 +239,8 @@ The seven took them in place (`VeilmouthInteriors.EnrichWithTripo`), so what S2 
 
 ## Update history
 
+- 2026-11-10 (v0.9): §10, the owner's ten Tripo pieces of 2026-11-10; §10.1, the owner's rule on fireplaces and radiators.
+- 2026-11-09 (v0.8): §10, the owner's fifth play test: the Tripo pieces resized against the player, the piano by its keys; the Office, a civic building's Dwelling.
 - 2026-11-09 (v0.7): §10, the hanging sign hangs outside, over two shop doors, by the owner's VS-SIGN (b).
 - 2026-11-09 (v0.6): the owner's word: G5's barrels and crates; §10, the owner's Tripo pieces and their places; §3, §4 and §8 changed to match.
 - 2026-11-08 (v0.5): after play test VI-8: G9 (chandeliers), G10 (no pieced-together pieces), G11 (doorway check), G12 (hearths); §7.2 and §8 as rebuilt.
