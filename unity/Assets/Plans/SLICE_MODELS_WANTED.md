@@ -1,10 +1,10 @@
 # Slice Models Wanted
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft
 
-Last Updated: 2026-11-09 (the owner's Tripo sign hangs, blank, over Harrow's and the Soot & Bell's doors; the trades' emblems are still wanted. Earlier: Interiors: the upright piano, and the coal scuttle and fire irons (as a log basket and fire irons), are the owner's Tripo models; the hanging shop sign has the owner's Tripo sign, which waits for the owner's word on shop fronts (99 VS-SIGN). Earlier: *Porches, fronts and the skyline*: a street tree's planter, a double gas lamp, bunting and a string of lamps, a flower cart and leaves as decals, from the reference plan R7; the other R7 pieces were listed already. Earlier: *Porches, fronts and the skyline*: a porch roof with a cornice, a door hood on brackets, an iron-and-glass canopy, a shop front, a church with a spire, a clock face, and clay tiles only with D6 (b), from the reference plan R6–R8. Earlier: the city: statues covered by the owner's three angels and two lions at the palace. Earlier: the city: a statue in a square is covered for now by the owner's angel in Wardley Garden; fountains to come from the owner. Earlier: *Interior detail*: the props that would fill the interiors with life, room by room, asked by the owner after play test VI-8; a low pub partition. Earlier: Interiors: a fixed wall bench or settle, an upright piano and a stage platform, which the furnishing rules §8 and the Soot & Bell's pub plan need (VI-7). Earlier: Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
+Last Updated: 2026-11-10 (C4 placeholders: the patron saint's statue, the cathedral, the lighthouse, the gatehouse, gravestones, a ship, factory pieces, a quay crane and slum sheds, by the owner's map (city plan §28). Earlier: 2026-11-09: the owner's Tripo sign hangs, blank, over Harrow's and the Soot & Bell's doors; the trades' emblems are still wanted. Earlier: Interiors: the upright piano, and the coal scuttle and fire irons (as a log basket and fire irons), are the owner's Tripo models; the hanging shop sign has the owner's Tripo sign, which waits for the owner's word on shop fronts (99 VS-SIGN). Earlier: *Porches, fronts and the skyline*: a street tree's planter, a double gas lamp, bunting and a string of lamps, a flower cart and leaves as decals, from the reference plan R7; the other R7 pieces were listed already. Earlier: *Porches, fronts and the skyline*: a porch roof with a cornice, a door hood on brackets, an iron-and-glass canopy, a shop front, a church with a spire, a clock face, and clay tiles only with D6 (b), from the reference plan R6–R8. Earlier: the city: statues covered by the owner's three angels and two lions at the palace. Earlier: the city: a statue in a square is covered for now by the owner's angel in Wardley Garden; fountains to come from the owner. Earlier: *Interior detail*: the props that would fill the interiors with life, room by room, asked by the owner after play test VI-8; a low pub partition. Earlier: Interiors: a fixed wall bench or settle, an upright piano and a stage platform, which the furnishing rules §8 and the Soot & Bell's pub plan need (VI-7). Earlier: Interiors: a drawn curtain for the pack's windows, so curtains can close at night (VI-2). Earlier: Interiors: Victorian Interiors, chosen by the owner for every interior, covers most of the interior list; what it covers is marked. Earlier: the city: the owner asked what would fill a Victorian town of a fantasy world; the list grew by play value)
 
 Depends On: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §8 and §14, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -202,6 +202,22 @@ The owner's walk of C3 found the porch of columns and a bare beam out of place, 
 | Bunting and a string of lamps between two posts | The Market Place | 8 m spans | C | R7.4. Lit at night |
 | Flower cart or flower seller's stand | The Market Place, the High Street | 1.5 × 1 × 1.2 | C | R7.4 |
 | Fallen leaves gathered in gutters and corners, as decals | Every street, more by trees | — | C | R7.5, with the puddles of *Life in the street* |
+
+## C4 placeholders (2026-11-10)
+
+The owner's map (city plan §28) asks for these. Until a model comes, each stands as a placeholder of kit pieces or plain boxes with colliders, by the owner's word.
+
+| Model | Where | Size, m (in the city) | Priority | Placeholder until it comes |
+|---|---|---|---|---|
+| Statue of the city's patron saint on a stepped plinth | The middle of the round centre | 10–15 high, plinth about 6 × 6 | A | A stepped stone plinth and a plain figure of about 12 m |
+| Cathedral with a spire, seen and not entered | The religious quarter, among its parks | about 30 × 60, spire 45–55 | A | Kit stone volumes: nave, transept and a tower with a pyramid spire |
+| Lighthouse | The end of the port's pier | 6 × 6 × 25 | B | A kit tower with a lantern cap |
+| Town gatehouse over a bridge | The West Gate | 12 × 8 × 12 | B | Two kit towers and a wall with the opening |
+| Gravestones, crosses and a tomb or two, a set of 6–8 | The cemetery by the old chapel | 0.6–2.5 high | B | Plain stone slabs |
+| Sailing ship moored at a quay | The port | about 30 long | C | None; the berth stays empty |
+| Factory pieces: a chimney, a shed with a saw-tooth roof, machines | The works | chimney 25–35 high | B | Plain brick boxes, no props (owner) |
+| Quay crane | The port's quays | 4 × 4 × 10 | C | None |
+| Slum sheds and lean-tos | The slums in the works and by the port | 3 × 4 × 3 | C | Low kit tenements in the poor palette |
 
 ## How to add one
 
