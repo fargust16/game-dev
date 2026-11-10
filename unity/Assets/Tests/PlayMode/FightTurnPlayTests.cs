@@ -146,6 +146,113 @@ namespace GameDev.Slice.Tests
             Assert.IsFalse(fights.PathView.Shown, "no path is left drawn");
         }
 
+        /// <summary>
+        /// The fight as the player sees it, drawn into <c>Logs/SliceFight/</c>: the camera's frame with the HUD over it, at
+        /// noon and at dusk, pointing at the nearest enemy (the walk, the blow's AP and its chance at Intelligence 10) and at
+        /// a far cell (the path red past the AP). The hardware cursor is not in the picture.
+        /// </summary>
+        [UnityTest, Explicit]
+        public IEnumerator RenderTheFightView([Values(12, 19)] int hour)
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene(Veilmouth);
+            var world = SliceWorldDriver.Running;
+            var fights = world.Fights;
+            fights.TurnPause = 0f;
+            fights.BeatPace = 4f;
+            if (world.Clock.Tick < hour * 60)
+            {
+                world.Clock.AdvanceTicks((int)((hour * 60) - world.Clock.Tick));
+            }
+
+            // The camera draws into a full-HD texture for the whole test, so the cursor's rays and the tip use its pixels.
+            const int width = 1920, height = 1080;
+            var frame = new RenderTexture(width, height, 24);
+            Camera.main.targetTexture = frame;
+            var document = Object.FindAnyObjectByType<GameDev.UI.HudView>().GetComponent<UnityEngine.UIElements.UIDocument>();
+            var overlay = new RenderTexture(width, height, 24);
+            var panel = Object.Instantiate(document.panelSettings);
+            panel.targetTexture = overlay;
+            panel.clearColor = true;
+            panel.colorClearValue = Color.clear;
+            document.panelSettings = panel;
+            yield return null;
+
+            yield return Tap(Key.F7);
+            yield return PlayersTurn(fights);
+            world.Character.Set(CharacterAttribute.Intelligence, 10);
+            var me = fights.PlayerCombatant;
+            var camera = fights.FightCamera.View;
+            var enemy = fights.Turns.Order.Where(c => c.Standing && c.Side != me.Side).OrderBy(c => (c.Position - me.Position).sqrMagnitude).First();
+            yield return Point(camera.WorldToScreenPoint(enemy.Position + (Vector3.up * 1.1f)));
+            yield return new WaitForSecondsRealtime(0.5f);
+            yield return null; // the camera has drawn into its texture
+            Shoot(frame, overlay, $"fight_{hour:00}_enemy.png");
+
+            // A far cell: the farthest reachable cell the grid has in the camera's view, so the path runs red past the AP.
+            var far = me.Cell;
+            var farthest = 0f;
+            for (var x = 0; x < 64; x++)
+            {
+                for (var z = 0; z < 64; z++)
+                {
+                    var at = fights.Grid.Center(me.Cell) + new Vector3((x - 32) * fights.Grid.CellSize, 0f, (z - 32) * fights.Grid.CellSize);
+                    if (!fights.Grid.TryCellAt(at, out var cell) || !fights.Grid.IsReachable(cell) || fights.Grid.OccupantAt(cell) >= 0)
+                    {
+                        continue;
+                    }
+
+                    var view = camera.WorldToViewportPoint(fights.Grid.Center(cell));
+                    var distance = (fights.Grid.Center(cell) - me.Position).magnitude;
+                    if (view.z > 0f && view.x > 0.1f && view.x < 0.9f && view.y > 0.15f && view.y < 0.85f && distance > farthest && distance < 11f)
+                    {
+                        farthest = distance;
+                        far = cell;
+                    }
+                }
+            }
+
+            yield return Point(camera.WorldToScreenPoint(fights.Grid.Center(far)));
+            yield return new WaitForSecondsRealtime(0.5f);
+            yield return null; // the camera has drawn into its texture
+            Shoot(frame, overlay, $"fight_{hour:00}_far.png");
+            Debug.Log($"[RenderTheFightView] {width}x{height}, path {fights.PathView.Steps} steps, {fights.PathView.Affordable} affordable, {fights.FightCamera.Hidden} hidden");
+            Camera.main.targetTexture = null;
+        }
+
+        /// <summary>The camera's frame with the HUD's panel laid over it, the panel's alpha premultiplied.</summary>
+        private static void Shoot(RenderTexture frame, RenderTexture overlay, string name)
+        {
+            var scene = Read(frame);
+            var hud = Read(overlay);
+            var a = scene.GetPixels32();
+            var b = hud.GetPixels32();
+            for (var i = 0; i < a.Length; i++)
+            {
+                var keep = 255 - b[i].a;
+                a[i] = new Color32(
+                    (byte)Mathf.Min(255, b[i].r + (a[i].r * keep / 255)),
+                    (byte)Mathf.Min(255, b[i].g + (a[i].g * keep / 255)),
+                    (byte)Mathf.Min(255, b[i].b + (a[i].b * keep / 255)),
+                    255);
+            }
+
+            scene.SetPixels32(a);
+            System.IO.Directory.CreateDirectory("Logs/SliceFight");
+            System.IO.File.WriteAllBytes("Logs/SliceFight/" + name, scene.EncodeToPNG());
+            Debug.Log("[RenderTheFightView] Logs/SliceFight/" + name);
+        }
+
+        private static Texture2D Read(RenderTexture texture)
+        {
+            var active = RenderTexture.active;
+            RenderTexture.active = texture;
+            var image = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
+            image.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
+            RenderTexture.active = active;
+            return image;
+        }
+
         /// <summary>Waits for the player's turn, with every earlier beat shown.</summary>
         private static IEnumerator PlayersTurn(SliceConfront fights)
         {

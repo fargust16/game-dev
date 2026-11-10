@@ -511,6 +511,13 @@ Working readings, not owner decisions:
 - Moves and blows are shown, not cut: a fight of three takes some seconds more than S3a.4's.
 - The camera's numbers, the beats' times and the colours are authoring defaults.
 
+**The fight's look (2026-11-11).** The explicit PlayMode `RenderTheFightView` draws the fight as the player sees it, the camera's frame with the HUD over it, at noon and at 19:00, into `Logs/SliceFight/`. Its first pictures showed two faults, both fixed:
+
+- **Trees hid the fight.** Seen from above, the street trees' crowns covered the fighters and the cells. The fight camera now also hides every tree on the line to the player, to each fighter standing and to the cell under the cursor, its shadow kept, as it hides a house; a tree gets no outline.
+- **The grid drowned the street.** Opaque pale lines over 41 by 41 cells glared, worst at dusk. The lines are now half see-through, fade from 5 m round the player to nothing at 14 m, and dim with the main light, by the slice's own unlit shader `GameDev/Combat Grid Line` (`Assets/Shaders/Slice/`). The grid draws with its own copy of the material, since the GPU Resident Drawer draws a renderer without its property block.
+
+The order's "Your turn" and the last blow moved below the chips, with a soft shadow in place of the outline. The fade's radii, the line's alpha 0.5 and its strength 0.45 under no light are authoring defaults.
+
 #### S3b — Stealth, beasts, the POIs
 
 | Iteration | Contents | Done when |

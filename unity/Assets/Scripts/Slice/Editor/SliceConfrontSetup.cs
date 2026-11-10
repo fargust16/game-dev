@@ -18,8 +18,10 @@ namespace GameDev.Slice.EditorTools
         // The Cult Forces' model, the owner's detective (owner, 2026-11-10; asset map §1).
         private const string OpponentModel = SlicePeopleModels.Folder + "/Detective.prefab";
 
-        // Authoring default: a pale, muted line that reads on the setts and the grass by day and under gaslight.
-        private static readonly Color GridColour = new Color(0.78f, 0.82f, 0.72f);
+        // Authoring default: a pale, muted line that reads on the setts and the grass by day and under gaslight, half
+        // see-through since S3a.5's look check, where opaque lines over the 41 by 41 cells drowned the street.
+        private static readonly Color GridColour = new Color(0.78f, 0.82f, 0.72f, 0.5f);
+        private const string GridShader = "GameDev/Combat Grid Line";
 
         // S3a.5: Basic RPG Cursors (asset map §5) for FightCursor's shapes, in their order: the bronze arrow, the four
         // arrows, the sword, and the arrow and the sword with their red mark for what the AP do not reach. The pack's
@@ -53,13 +55,15 @@ namespace GameDev.Slice.EditorTools
 
         private static Material GridMaterial()
         {
+            var shader = Shader.Find(GridShader) ?? throw new System.InvalidOperationException($"[SliceConfrontSetup] missing shader {GridShader}");
             var material = AssetDatabase.LoadAssetAtPath<Material>(GridMaterialPath);
             if (material == null)
             {
-                material = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+                material = new Material(shader);
                 AssetDatabase.CreateAsset(material, GridMaterialPath);
             }
 
+            material.shader = shader;
             material.SetColor("_BaseColor", GridColour);
             EditorUtility.SetDirty(material);
             return material;

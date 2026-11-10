@@ -263,26 +263,24 @@
 
 .hud__fight-who {
     position: absolute;
-    top: 72px;
+    top: 98px;
     left: 0;
     right: 0;
     font-size: 19px;
     -unity-text-align: middle-center;
     color: rgb(236, 228, 210);
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.85);
 }
 
 .hud__fight-log {
     position: absolute;
-    top: 100px;
+    top: 126px;
     left: 0;
     right: 0;
     font-size: 16px;
     -unity-text-align: middle-center;
     color: rgb(214, 196, 160);
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.85);
 }
 
 .hud__fight-bar {

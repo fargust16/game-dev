@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Confront_Grid
-  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
+  m_Shader: {fileID: 4800000, guid: d85003f2a8aa0e64b8efc5c6c39cff22, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -30,8 +30,7 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap:
-    RenderType: Opaque
+  stringTagMap: {}
   disabledShaderPasses:
   - MOTIONVECTORS
   m_LockedProperties: 
@@ -55,6 +54,7 @@ Material:
     - _BlendOp: 0
     - _Cull: 2
     - _Cutoff: 0.5
+    - _Dark: 0.45
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _QueueOffset: 0
@@ -65,7 +65,9 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.78, g: 0.82, b: 0.72, a: 1}
+    - _BaseColor: {r: 0.78, g: 0.82, b: 0.72, a: 0.5}
     - _Color: {r: 0.78, g: 0.82, b: 0.72, a: 1}
+    - _Fade: {r: 1000, g: 2000, b: 0, a: 0}
+    - _Focus: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

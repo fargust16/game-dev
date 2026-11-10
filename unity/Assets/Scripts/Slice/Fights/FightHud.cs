@@ -221,7 +221,9 @@ namespace GameDev.Slice.Fights
             }
 
             _tip.text = _text.ToString();
-            var at = RuntimePanelUtils.ScreenToPanel(_tip.panel, new Vector2(mouse.x, Screen.height - mouse.y));
+            // The mouse is read in the camera's pixels, which are the screen's unless the camera draws into a texture.
+            var height = Camera.main != null ? Camera.main.pixelHeight : Screen.height;
+            var at = RuntimePanelUtils.ScreenToPanel(_tip.panel, new Vector2(mouse.x, height - mouse.y));
             _tip.style.left = at.x + 26f;
             _tip.style.top = at.y + 22f;
             _tip.AddToClassList(TipVisible);

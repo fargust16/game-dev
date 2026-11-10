@@ -248,6 +248,7 @@ namespace GameDev.Slice.Fights
                 Mirror();
             }
 
+            Watch();
             _hud.Refresh(_turns, _playerCombatant, _cursor, _turnAp, input != null ? input.MousePosition : Vector2.zero, !_beats.Busy);
         }
 
@@ -265,6 +266,33 @@ namespace GameDev.Slice.Fights
             {
                 _cursor.Clear();
                 _turns.SubmitIntent(TurnIntent.EndTurn);
+            }
+        }
+
+        /// <summary>
+        /// The grid's fade follows the player's body, and the camera keeps in sight every fighter standing and the cell under
+        /// the cursor, hiding what stands in front of them.
+        /// </summary>
+        private void Watch()
+        {
+            if (_player != null)
+            {
+                _view.Focus(_player.transform.position);
+            }
+
+            var watched = _camera.Watched;
+            watched.Clear();
+            foreach (var pair in _bodies)
+            {
+                if (pair.Value != null && pair.Key.Standing)
+                {
+                    watched.Add(pair.Value.position + (Vector3.up * 1.2f));
+                }
+            }
+
+            if (_cursor.Cell is CombatCell cell)
+            {
+                watched.Add(_grid.Center(cell));
             }
         }
 

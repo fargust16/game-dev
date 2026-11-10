@@ -16,9 +16,16 @@ namespace GameDev.Slice.Fights
         private const float Inset = 0.06f;
         private const float Line = 0.035f;
 
+        // Authoring defaults, S3a.5: the lines fade from 5 m round the player to nothing at 14 m, a turn's walk and a
+        // little more, so the grid reads where the player can act and melts into the street beyond.
+        private static readonly Vector4 Fade = new Vector4(5f, 14f, 0f, 0f);
+        private static readonly int FocusId = Shader.PropertyToID("_Focus");
+        private static readonly int FadeId = Shader.PropertyToID("_Fade");
+
         private readonly List<CombatCell> _cells = new List<CombatCell>();
         private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<int> _triangles = new List<int>();
+        private Material _material;
         private Mesh _mesh;
 
         /// <summary>The cells drawn last.</summary>
@@ -30,8 +37,13 @@ namespace GameDev.Slice.Fights
         {
             var go = new GameObject("Combat Grid");
             go.transform.SetParent(parent, false);
-            go.AddComponent<MeshRenderer>().sharedMaterial = material;
             var view = go.AddComponent<CombatGridView>();
+
+            // Its own copy of the material, which the fade's centre is written to: the GPU Resident Drawer draws a
+            // renderer without its property block.
+            view._material = new Material(material) { name = "Combat Grid (fight)" };
+            view._material.SetVector(FadeId, Fade);
+            go.AddComponent<MeshRenderer>().sharedMaterial = view._material;
             view._mesh = new Mesh { name = "Combat Grid", indexFormat = IndexFormat.UInt32 };
             go.AddComponent<MeshFilter>().sharedMesh = view._mesh;
             var renderer = go.GetComponent<MeshRenderer>();
@@ -40,6 +52,9 @@ namespace GameDev.Slice.Fights
             go.SetActive(false);
             return view;
         }
+
+        /// <summary>Centres the lines' fade on the fighter the grid follows; cheap enough for every frame.</summary>
+        public void Focus(Vector3 at) => _material.SetVector(FocusId, at);
 
         public void Show(CombatGridReader grid)
         {
@@ -87,6 +102,11 @@ namespace GameDev.Slice.Fights
             if (_mesh != null)
             {
                 Destroy(_mesh);
+            }
+
+            if (_material != null)
+            {
+                Destroy(_material);
             }
         }
     }

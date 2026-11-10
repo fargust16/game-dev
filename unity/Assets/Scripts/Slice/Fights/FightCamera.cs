@@ -9,9 +9,10 @@ namespace GameDev.Slice.Fights
 {
     /// <summary>
     /// The fight's camera (S3a.5), the grid lab's: high over the player at an angle, turned by Q and E or by dragging
-    /// with the right button, brought nearer or farther by the wheel. A house standing between it and the player stops
-    /// drawing, its shadow kept, and its walls show as outlines (16), so the fight is always seen. The free camera
-    /// takes over again when the fight ends.
+    /// with the right button, brought nearer or farther by the wheel. A house standing between it and the player, a
+    /// fighter or the cell under the cursor stops drawing, its shadow kept, and its walls show as outlines (16); a tree
+    /// there stops drawing too, its shadow kept, so the fight is always seen. The free camera takes over again when the
+    /// fight ends.
     /// </summary>
     public sealed class FightCamera : MonoBehaviour
     {
@@ -31,7 +32,13 @@ namespace GameDev.Slice.Fights
         private const float OccluderRadius = 1.2f;
         private const float HoldSeconds = 0.4f;
 
+        // Authoring defaults, S3a.5's look check: the trees looked at, those within 45 m of the player as the fight
+        // begins (the grid reaches 20 cells, the camera 26 m back), and the margin round a tree's drawn bounds.
+        private const float TreeReach = 45f;
+        private const float TreeMargin = 0.3f;
+
         private readonly Dictionary<KitBlock, float> _hiddenUntil = new Dictionary<KitBlock, float>();
+        private readonly List<(KitBlock Block, Bounds Bounds)> _trees = new List<(KitBlock, Bounds)>();
         private readonly Dictionary<Renderer, ShadowCastingMode> _hidden = new Dictionary<Renderer, ShadowCastingMode>();
         private readonly List<KitBlock> _expired = new List<KitBlock>();
         private readonly RaycastHit[] _hits = new RaycastHit[64];
@@ -52,8 +59,11 @@ namespace GameDev.Slice.Fights
 
         public bool Active { get; private set; }
 
-        /// <summary>Houses hidden now.</summary>
+        /// <summary>Houses and trees hidden now.</summary>
         public int Hidden => _hiddenUntil.Count;
+
+        /// <summary>Points kept in sight besides the player, set every frame by the fight: the fighters and the cursor's cell.</summary>
+        public List<Vector3> Watched { get; } = new List<Vector3>();
 
         public Camera View => _camera;
 
@@ -98,8 +108,38 @@ namespace GameDev.Slice.Fights
             _distance = StartDistance;
             _eye = Eye();
             _eyeVelocity = Vector3.zero;
+            FindTrees(focus.position);
             Active = true;
             Place();
+        }
+
+        /// <summary>The trees near the fight, with the bounds they are drawn in.</summary>
+        private void FindTrees(Vector3 around)
+        {
+            _trees.Clear();
+            var layer = LayerMask.NameToLayer(KitLayers.Vegetation);
+            foreach (var block in FindObjectsByType<KitBlock>(FindObjectsSortMode.None))
+            {
+                if (block.gameObject.layer != layer || (block.transform.position - around).sqrMagnitude > TreeReach * TreeReach)
+                {
+                    continue;
+                }
+
+                var renderers = block.GetComponentsInChildren<Renderer>();
+                if (renderers.Length == 0)
+                {
+                    continue;
+                }
+
+                var bounds = renderers[0].bounds;
+                foreach (var r in renderers)
+                {
+                    bounds.Encapsulate(r.bounds);
+                }
+
+                bounds.Expand(TreeMargin * 2f);
+                _trees.Add((block, bounds));
+            }
         }
 
         /// <summary>Gives the camera back to the free camera, with every house drawn again.</summary>
@@ -121,6 +161,8 @@ namespace GameDev.Slice.Fights
 
             _hidden.Clear();
             _hiddenUntil.Clear();
+            _trees.Clear();
+            Watched.Clear();
             _outlineObject.SetActive(false);
             if (_free != null)
             {
@@ -166,32 +208,18 @@ namespace GameDev.Slice.Fights
             _camera.transform.SetPositionAndRotation(_eye + (rotation * (Vector3.back * _distance)), rotation);
         }
 
-        /// <summary>Every house the line from the camera to the player passes through is hidden, its shadow kept, and outlined.</summary>
+        /// <summary>
+        /// Every house the line from the camera to the player, a fighter or the cursor's cell passes through is hidden, its
+        /// shadow kept, and outlined; every tree on such a line is hidden, its shadow kept.
+        /// </summary>
         private void HideWhatHides()
         {
             var from = _camera.transform.position;
-            var to = _eye;
-            var distance = Vector3.Distance(from, to);
-            var count = distance > 0.01f
-                ? Physics.SphereCastNonAlloc(from, OccluderRadius, (to - from) / distance, _hits, distance, _mask, QueryTriggerInteraction.Ignore)
-                : 0;
-            var changed = false;
             var now = Time.unscaledTime;
-            for (var i = 0; i < count; i++)
+            var changed = HideOnTheWay(from, _eye, now);
+            foreach (var point in Watched)
             {
-                var block = _hits[i].collider.GetComponentInParent<KitBlock>();
-                if (block == null)
-                {
-                    continue;
-                }
-
-                if (!_hiddenUntil.ContainsKey(block))
-                {
-                    Hide(block);
-                    changed = true;
-                }
-
-                _hiddenUntil[block] = now + HoldSeconds;
+                changed |= HideOnTheWay(from, point, now);
             }
 
             _expired.Clear();
@@ -214,6 +242,53 @@ namespace GameDev.Slice.Fights
             {
                 Outline();
             }
+        }
+
+        /// <summary>Hides the houses and the trees between the camera and a point; true if one was newly hidden.</summary>
+        private bool HideOnTheWay(Vector3 from, Vector3 to, float now)
+        {
+            var distance = Vector3.Distance(from, to);
+            if (distance < 0.01f)
+            {
+                return false;
+            }
+
+            var direction = (to - from) / distance;
+            var changed = false;
+            var count = Physics.SphereCastNonAlloc(from, OccluderRadius, direction, _hits, distance, _mask, QueryTriggerInteraction.Ignore);
+            for (var i = 0; i < count; i++)
+            {
+                changed |= Keep(_hits[i].collider.GetComponentInParent<KitBlock>(), now);
+            }
+
+            var ray = new Ray(from, direction);
+            foreach (var (block, bounds) in _trees)
+            {
+                if (bounds.IntersectRay(ray, out var enter) && enter < distance)
+                {
+                    changed |= Keep(block, now);
+                }
+            }
+
+            return changed;
+        }
+
+        /// <summary>Keeps a block hidden a little longer; true if it was drawn until now.</summary>
+        private bool Keep(KitBlock block, float now)
+        {
+            if (block == null)
+            {
+                return false;
+            }
+
+            var hidden = !_hiddenUntil.ContainsKey(block);
+            if (hidden)
+            {
+                Hide(block);
+            }
+
+            _hiddenUntil[block] = now + HoldSeconds;
+            return hidden;
         }
 
         private void Hide(KitBlock block)
@@ -250,11 +325,12 @@ namespace GameDev.Slice.Fights
         {
             _vertices.Clear();
             _indices.Clear();
+            var structure = LayerMask.NameToLayer(KitLayers.Structure);
             foreach (var block in _hiddenUntil.Keys)
             {
-                if (block == null)
+                if (block == null || block.gameObject.layer != structure)
                 {
-                    continue;
+                    continue; // a tree is hidden with no outline
                 }
 
                 block.GetComponentsInChildren(_boxes);
