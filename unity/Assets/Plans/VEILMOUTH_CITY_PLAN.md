@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4, C5)
 
-Version: 0.64
+Version: 0.65
 
-Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; sizes remain authoring defaults
+Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; the owner's walk of C5 and its fixes in §31 (2026-11-10); sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§30.2: the lamps, their glass and the statue built; the gaslight made unlit, since its emission keyword was never kept; the frame with the Tripo lamps and people at most 11.95 ms in any view, so the lamp needs no far level. Earlier: §30: the owner's Tripo street lamp in the place of every lamp post and one bronze statue on Drowsy Steps, two more exceptions to §25.6. Earlier: §29.11: the far LOD built and measured: every view's median frame within the 16.7 ms budget, the swap unseen; the yard doors left out of it; its glass a variant of the kit glass that writes depth and reads the panes' rooms. Earlier: §29.10: the owner's frame budget of 16.7 ms and the merged far LOD for each house type, designed: one mesh a type built in place, the switch at 50 m with no cross-fade, the panes' rooms in the mesh, a sync for the houses the city changed)
+Last Updated: 2026-11-10 (§31: the owner's walk of C5: lamps and road trees in one rhythm of 30 m bays on each kerb, a lamp's base clear of the kerb and its foot on the ground, wards as chalk on whole faces, railings drawn out to their walls and posts at every free end, stone under the works' bank, wing walls at the bridges, one parapet between bridges, every carriageway in setts; §31.4 as built; the hole of item 6 not found, its place asked of the owner. Earlier: §30.2: the lamps, their glass and the statue built; the gaslight made unlit, since its emission keyword was never kept; the frame with the Tripo lamps and people at most 11.95 ms in any view, so the lamp needs no far level. Earlier: §30: the owner's Tripo street lamp in the place of every lamp post and one bronze statue on Drowsy Steps, two more exceptions to §25.6. Earlier: §29.11: the far LOD built and measured: every view's median frame within the 16.7 ms budget, the swap unseen; the yard doors left out of it; its glass a variant of the kit glass that writes depth and reads the panes' rooms.)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -854,6 +854,8 @@ Crown Avenue keeps its section, its mall already planted. A 5 m carriageway stil
 
 Since §26.1 (row 6) a street tree stands on the carriageway in a square pit flush on the kerb, not on the pavement. A city tree stands by the kerb in the lamps' line on the High Street, the Parade's pavement and the byelaw streets, about every 11 m (the owner's screenshot), so lamps and trees take turns. A tree stays at least 4 m from a lamp. Like a lamp, it never stands within a door's 8 m reach, nor before a stoop, by shop goods, in a kerb's rounding or in a passage's mouth. Until the tree grate on the wanted list comes, a tree stands in the paving.
 
+**Spacing superseded** by §31.1 (owner's walk, 2026-11-10): a street's lamps and trees keep one rhythm of bays on each kerb, a lamp in each bay's middle and two trees between lamps.
+
 ## 25.4 Hedges, beds and grass
 
 - **A hedge** is the pack's low round bushes (`019`, `020`) clipped to 0.8 m and set end to end on whole metres. Since §26.1 (row 4) it is walked through and gives no cover, as a bush.
@@ -921,9 +923,9 @@ The owner walked the greenery of §25 before S3a.4 and sent twelve remarks. By t
 | 3 | The piano is very small; fit all the Tripo pieces to the world | Measured against the player (1.8 m) in one lineup. The piano is sized by its keys, which stand at 0.41 of its height, to 0.82 m, so it is 2.0 m over its carved top and two cells deep. The wardrobe is 2.4 m, the cheval glass and the screen 2.0 m, the glazed cabinet 2.1 m, the coat stand 2.05 m, and the armchair 1.4 m, as Victorian Interiors' own. A rebuilt wrapper whose footprint changes takes the old one's place, so no stale wrapper is left ([INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) §10) |
 | 4 | Hedges must be passable; trees stay solid | A hedge is a `NoGrid` block with no collider: walked through, no cover. The trees keep their trunks |
 | 5 | Through doors and windows a wall stands right behind a door's middle | The rooms behind the windows are cut round every opening, the doors' too, so no inner wall stands behind a door (`VicRooms`) |
-| 6 | (owner) "A tree needs a special bed, as if it stood in the earth, fenced by a square bed; lamps and trees stand on the road, flush on the pavement, not on it" | The pavements of §25.2 go back: the High Street's are 4 m, the Parade's and the byelaw streets' 3 m. A street tree stands in a tree pit on the carriageway, flush on the kerb: a 1.6 m square (1.2 m since §27) of stone kerb 0.1 m wide at the kerb's height, round soil 0.08 m high in the soil layer's colour, so a ring of earth shows round the trunk, 1.1 m across at its foot. A lamp stands on the carriageway 0.3 m from the kerb. Each keeps its block's grid cell: the post or the trunk moves inside the cell with its body, so the Combat Grid reads it where it stands. Trees and lamps keep §25.3's spacing, and stay clear of a door's reach and a lane's mouth |
+| 6 | (owner) "A tree needs a special bed, as if it stood in the earth, fenced by a square bed; lamps and trees stand on the road, flush on the pavement, not on it" | The pavements of §25.2 go back: the High Street's are 4 m, the Parade's and the byelaw streets' 3 m. A street tree stands in a tree pit on the carriageway, flush on the kerb: a 1.6 m square (1.2 m since §27) of stone kerb 0.1 m wide at the kerb's height, round soil 0.08 m high in the soil layer's colour, so a ring of earth shows round the trunk, 1.1 m across at its foot. A lamp stands on the carriageway 0.3 m from the kerb (0.45 m since §31.1, so its base clears the kerb). Each keeps its block's grid cell: the post or the trunk moves inside the cell with its body, so the Combat Grid reads it where it stands. Trees and lamps keep §25.3's spacing, and stay clear of a door's reach and a lane's mouth |
 | 7 | The lines along the kerbs come and go with the camera | The wet band of R4 lay 3 cm over the terrain, which the terrain's own level of detail hid and showed. It is gone |
-| 8 | (owner) "The posts at a fence's ends must always form a passage, and an end without a post must meet the wall" | The railing module has one post, at one end. Each run of railing now gets a post at an end that stands free, at a gate or a gap, and loses its post at an end that meets a house, so the railing runs into the wall |
+| 8 | (owner) "The posts at a fence's ends must always form a passage, and an end without a post must meet the wall" | The railing module has one post, at one end. Each run of railing now gets a post at an end that stands free, at a gate or a gap, and loses its post at an end that meets a house, so the railing runs into the wall. Since §31.2 an end is read against the walls' colliders, and one that stops short is drawn out to meet its wall |
 | 9 | Less wind: a slight sway | The scene's wind is 0.07 in strength at a speed of 2.5, with a main wind of 0.6 and turbulence of 0.3, against the pack's 0.2, 5, 1 and 1 |
 | 11 | The tree of the owner's screenshot, greener and 1.5 times taller, in the city in place of the birches | Polytope's `PT_Fruit_Tree_01_green` at 1.5 times its height, 9.9 m, in the muted city green (§25.1), is the street tree and three of the six garden trees. The Warped trees stay in the gardens, and the birches are gone from the city. **Superseded** by §27: Veilmouth's own trees |
 
@@ -2174,3 +2176,113 @@ Both are exceptions to §25.6's rule that the Tripo models furnish interiors onl
   - draw calls fell from 13 490 to 13 361;
   - shadow casters fell from 7 384 to 7 237.
 - **Not a speed-up.** The frames are lower than §29.11's last runs, but the machine's load differed between those runs (§29.11). They show only that the budget holds, not that the frame got faster.
+
+# 31. The owner's walk of C5, 2026-11-10
+
+The owner walked C5 with the Tripo lamps and people and sent eleven remarks with screenshots. The first ten are the city's; the eleventh, the sizes of interior pieces, is in [INTERIOR_FURNISHING_RULES.md](INTERIOR_FURNISHING_RULES.md) §11.
+
+1. Trees and lamps stood along the roads at random, so a tree and a lamp could stand together, two lamps could stand side by side, and a lamp could stand on a pavement by a house. They should follow each street's own order, by the rules that streets are lit and planted by.
+2. Some lamps stood in the pavement, their bases inside the kerb.
+3. The wards stood out too much, and some hung in the air past a wall's end. They should read as graffiti, only a little lighter than the wall.
+4. Some railings stopped short of the house they belong to.
+5. Some railings had no end post on the side of the way through.
+6. One building had a hole: a wall not built, showing the inner walls and the setts under it.
+7. A slit of water stood between the bank and the river's stone edge.
+8. The joints of the river's parapet showed. They should not.
+9. A slit stood between the bank and a bridge. The bridges should meet the ground more tightly.
+10. Some roads were painted in another texture. Every road of the city should have the same one.
+
+**Measured before the work** (`VeilmouthWalkAudit`, `Logs/SliceSurvey/walk_audit.txt`):
+
+- 251 lamps and 82 road trees.
+  - 85 pairs of lamps stood under 12 m apart.
+  - 40 lamps stood within a road tree's crown, 6.5 m of its trunk.
+  - 6 lamps stood within 2 m of a wall.
+  - 115 lamps' bases reached into the kerb. The lamp's base reaches 0.366 m from its axis in its lowest 0.3 m, against §26's 0.3 m from the kerb.
+  - The lamps the owner saw sunk in the pavement were another fault, found later: a block on the carriageway stands on a 0.1 m step at or below the ground, so a lamp's foot sank up to 0.1 m into the setts (§31.4).
+- 2 of 19 wards were off their wall.
+- 76 railing pieces: 12 ends stopped short of a wall, and 53 free ends had no post. Most of those were posts hidden at a house's plot whose wall stood further off.
+- A continuous slit, 0.7 m wide, ran the length of the works' bank of the south river, between its kerb and the bank.
+- The promenade's parapet changed height three times, and its texture began again every 4 m.
+- The 145 houses were cast into at every storey; glass counts as a wall. No ray passed through a wall at any of the 77 walled-up back doors or anywhere else, so item 6 was not found (§31.3).
+
+## 31.1 Street lamps and road trees: one rhythm on each kerb
+
+**Sources** (the agent's reading, 2026-11-10):
+
+- SP 42.13330 (Russia) asks 4 m between a tree's trunk and a lighting post, 2 m from a trunk to the carriageway's edge, and 5 m from a trunk to a building's wall.
+- British practice lights a street on one side where it is narrow, staggered where it is middling, and on both sides opposite each other where it is wide. Where trees line a street, it sets the columns midway between the trees.
+- Victorian gas lamps stood about 25–35 m apart.
+
+**The rule.** A street's kerb is cut into runs where a junction, a carriageway or a rounded corner breaks it. Each run is divided into equal bays of about 30 m, with at least one bay. The lamps and the trees of a run keep the same bays:
+
+- **A lamp stands in the middle of each bay**, 0.45 m out from the kerb on the carriageway.
+- **A road tree stands at a quarter and at three quarters of each bay**, midway between two lamps, in its pit flush on the kerb. A 30 m bay's trees stand 15 m apart and 7.5 m from the lamps.
+- **Which kerb is lit:**
+  - Both kerbs planted, where the carriageway is 8 m or more (§27): a lamp on each kerb, opposite each other.
+  - One kerb planted: the lamps on the other kerb. Where the other kerb has no pavement, they go on the planted one, between its trees.
+  - No trees, on a street wider than 12 m: the two kerbs take the bays in turn, which staggers the lamps.
+  - No trees, narrower: one kerb, the wider pavement's.
+- **A station may move.** A lamp moves at most 3 m: to a party wall first, the nearest, then to the nearest metre that stands in no door's way (§26). A tree moves at most 2 m. A station with no such place stays empty.
+- **Clearances.** No two lamps stand within 12 m of each other, except a wide street's opposite pair. No lamp stands within 6.5 m of a road tree's trunk. That distance is the mature tree's crown, 6.15 m along the row (measured, §27), and 0.35 m more. Road trees stand at least 8 m apart.
+- **Order.** Lamps are placed first: a bridge's, the piers', the Penny's ring, the quay's, then each street's. Then the trees. A square's corner lamps come last, each only where no lamp stands within 12 m and no house within 2 m. Otherwise the lamp moves up to 2 m further in along the square's diagonal, or none stands there.
+- **The base clears the kerb.** The post stands 0.45 m out from the kerb: the base's measured 0.366 m from its axis, with 0.084 m to spare.
+
+**Authoring defaults:** the 30 m bay; the 3 m and 2 m moves; 12 m between lamps; 8 m between trees; 2 m from a house; a lamp only on a run of 8 m or more and a tree only on one of 6 m or more; and 0.084 m of spare. Two numbers are measured: the 6.15 m crown and the 0.366 m base.
+
+## 31.2 Wards, railings, the river's edges, bridges and carriageways
+
+- **Wards (item 3).** A ward is old chalk and paint, lit as its wall is and never glowing. Its colour is a pale grey (0.78, 0.80, 0.84) with alpha 0.42 for a door's sign and 0.34 for runes (authoring defaults). It is put only where one flat face of the wall lies under the whole of it, read by 5 × 3 rays. It may slide up to 1.5 m along the wall, then narrow to two thirds, to find such a place, or it is not put.
+- **Railings (items 4, 5).** An end is read against the colliders, not the plots, which reach past a house's face.
+  - An end with a wall within 1.6 m along its line is drawn out to meet it. The end piece is stretched along the run and its posts keep their width. The bare end then abuts the wall with no post.
+  - Every other end is free and has a post.
+  - Authoring default: the 1.6 m reach, at most 1.8 times the bars' spacing on a 2 m piece.
+- **The river's edges (items 7, 8).**
+  - The promenade's parapet is one length between two bridges, at the bridges' own parapet height, the deck's top + 1.1 m.
+  - The works' bank has stone under the bank's edge, 1.5 m beyond its kerb and 5 cm under the ground. No water shows between them.
+  - Every stone work lays its texture in the world's frame, so boxes side by side read as one length of stone.
+- **Bridges (item 9).**
+  - On a natural bank, wing walls of the same stone stand either side of the abutment, 1.5 m out and 5 cm under the ground.
+  - A bridge's carriageway through a pavement is no wider than the bridge, so the pavement meets its parapet.
+- **Carriageways (item 10).** Every street's carriageway is the setts, whatever its layout surface; grass is the one exception. The ground under the whole city is setts, so the corners the pavements round off at a junction read as carriageway, not as the old cobbles. Squares, yards, passages and gardens keep their own ground.
+
+## 31.3 The hole in a wall (item 6)
+
+The owner's sixth screenshot shows the inner walls of a house and the setts under it through an unbuilt wall. The agent looked for it in three ways:
+
+- **Rays through the walls.** Each of the 145 houses was cast into from every side at every storey, at a ray each 0.5 m. Its colliders were cooked for the cast, and glass, whose mesh cannot be read, took a box. A ray that went more than 0.8 m deeper than the side's median depth was flagged. The first pass also read the far LOD's merged mesh and flagged only two houses. Read without it, 12 are flagged:
+  - nine civic houses and villas, the Town Hall among them, whose stepped facades have a built deeper part, as a render of the Town Hall shows;
+  - three terraces and tenements with 1, 4 and 8 rays at an upper storey, through a window.
+  No hidden piece stands near any of them.
+- **The walled-up back doors.** Each of the 77 has the kit's plain wall in the house's paint. A yard door's pieces stay out of the far LOD and draw at every distance (§29.11).
+- **A house standing over its ground.** Rays cast inward 5 cm over the ground, 0.4 m out from the walls, flag a gap of more than 8 cm. They flag all 145 houses, so the check cannot tell a gap from a house's base and reads nothing.
+
+**Not found.** Renders from 2.5 m outside each flagged spot, and from further off, showed built walls; the narrow yards' renders landed inside the neighbouring rooms. The owner is asked where the screenshot was taken: a landmark, a street, or the camera's place.
+
+## 31.4 As built
+
+Measured after the work by `VeilmouthWalkAudit` (`Logs/SliceSurvey/walk_audit.txt`):
+
+| Check | Before | After |
+|---|---|---|
+| Street lamps | 251 | 149 |
+| Road trees | 82 | 51 |
+| Pairs of lamps under 12 m | 85 | 9, every one a wide street's opposite pair across 9.1–11 m |
+| Lamps within 6.5 m of a road tree | 40 | 0 |
+| Lamps within 2 m of a wall | 6 | 0 |
+| Lamps whose base reaches into the kerb | 115 | 0 |
+| A lamp's foot over the ground | down to −0.1 m | 0.000 m |
+| Road trees under 8 m of another | – | 0 |
+| Wards off their wall | 2 of 19 | 0 of 19 |
+| Railing ends short of a wall | 12 of 152 | 0 |
+| Free railing ends with no post | 53 | 0 |
+| Walled-up back doors with no plain wall | 0 of 77 | 0 of 77 |
+| Water edges with a slit | the works' bank, 79 readings | 0 of 12 profiles |
+| Steps in the promenade's parapet | 3 | 1 |
+| Kit faults in the seven interiors and the Dwellings | 0 | 0 |
+
+- **A lamp's foot.** A block on the carriageway keeps its 0.1 m step, and its model is raised to the ground, so no foot sinks.
+- **A building's door.** A kerb lamp keeps clear of every portal's door as well as of the recorded doors. A building that opens has its door where its portal is: a lamp stood 2.0 m beside such a door at plan (580.5, 429.0), which the door's marker did not show (`VeilmouthCityTests.NoLampStandsInFrontOfADoor`). It now stands 3 m from it.
+- **Corners and boards.** A square's corner lamp also stands 1.5 m clear of every solid piece, such as the Notice Board, and the Penny's ring lamps keep 2 m from a house, as a street lamp does (authoring defaults).
+- **Railings.** After the posts at a wall are hidden, the bars' end is measured again. An end that still stops 0.01–0.55 m short of the wall is drawn out once more (authoring default).
+- **Not yet seen by the owner.** These fixes wait for the owner's walk.

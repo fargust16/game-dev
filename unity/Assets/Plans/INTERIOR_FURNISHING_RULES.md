@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.9
+Version: 0.10
 
-Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09, 2026-11-10); fireplaces and radiators in §10.1 (owner, 2026-11-10)
+Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09, 2026-11-10); fireplaces and radiators in §10.1 (owner, 2026-11-10); every piece's size checked in §11 (owner's walk, 2026-11-10)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-10 (§10: the owner's ten Tripo pieces of 2026-11-10 and their places, a second nightstand among them; §10.1: one or two fireplaces a house, on the ground floor only, and a radiator in every other room, by the owner. The earlier note is in the update history)
+Last Updated: 2026-11-10 (§11: every piece measured as built against its usual true size; the Tripo desk, the radiator, the kitchen table, the partners' desk, the poor nightstand and the candle stand set to theirs ×1.2. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -163,7 +163,7 @@ The seven stay hand-placed in `VeilmouthInteriors`, by §6 and the places of §3
 
 Victorian Interiors has no nightstand, coal scuttle, bench or settle, piano, stage, wall cabinet, towel rail or kitchen range. By the interiors plan's §6, a themed prop from another pack may stand in for a piece a room's purpose needs. The owner's Tripo models (§10) now give the nightstand, a log basket with fire irons for the coal scuttle, and the piano. For the rest, until the owner chooses:
 
-- a poor home's nightstand stays the pack's smallest cabinet, `Shelve_5`, with a candle on it (VI-6: no `Table_*` fits a bedside cell); a middling or rich one is Tripo's;
+- a poor home's nightstand stays the pack's smallest cabinet, `Shelve_5`, scaled to a 0.80 m top (§11), with a candle on it (VI-6: no `Table_*` fits a bedside cell); a middling or rich one is Tripo's;
 - a towel rail is the pack's standing hanger (`Hanger_2`), and a wall cabinet the wall shelf (`Shelf_4`);
 - the range stays the fireplace (owner);
 - a bench, a stage platform and a low pub partition are listed in [SLICE_MODELS_WANTED.md](SLICE_MODELS_WANTED.md); until then the stage is a primitive box with the pack's parquet (G10), and the rest wait.
@@ -210,7 +210,7 @@ The owner: take every piece from TripoModels for the interior scenes, and leave 
 | iron umbrella stand (`decorative_vase_3d_model_Clone1`) | `TrUmbrellas` | 0.6 m | a middling or rich hall, in the corner nearest the street door (owner: by the entrance) |
 | magnifying glass, laid flat (`magnifying_glass`) | on `TrDesk` | 0.2 m | on the rich writing desk, by the parchment (owner: on desks or in cabinets) |
 | inkstand with two wells and a pen (`ornate_ink_desk_3d_model_Clone1`) | on `TrDesk` | 0.25 m | on the rich writing desk, in the place of the pack's ink and pen (owner: rich interiors, on desks) |
-| gas radiator (`ornate_radiator`) | `TrRadiator` | 0.5 m high, 0.6 m wide | §10.1: every heated room without a fireplace, under a window where one is |
+| gas radiator (`ornate_radiator`) | `TrRadiator` | 0.64 m high, 0.95 m wide (§11) | §10.1: every heated room without a fireplace, under a window where one is |
 
 The bed, the bar counter and its cabinet, the cell bars and door and the Notice Board were the owner's Tripo pieces already (asset map §4). Of the owner's models of 2026-11-10, the street lamp and the bronze statue stand in the city, by the owner's word (city plan §30), and the six people are the asset map's §1. The other models are not furnishing: the townsman, the woman and the dog are people and beasts, the angels, the lion and the birdbath are the garden ornaments of the city plan §23, the coins and firearms are items, the rock is the iron ore, and the hanging sign hangs outside, over the doors of Harrow & Tincture and the Soot & Bell (city plan §25.6, [99 Open Questions](../../../99%20Open%20Questions.md) VS-SIGN (b)).
 
@@ -226,7 +226,7 @@ The owner: a house has only one or two fireplaces, on the ground floor; every ot
 
 - **One or two, the range among them.** The kitchen's range is the pack's fireplace (`ViFireplace`), so a home shows it as a fireplace. So the agent reads the rule as at most two fireplaces in a home, the range counted: a home that cooks keeps its range and one hearth more, in its first room by the rules' order (§4: the parlour, the drawing room). A home with no kitchen range may have two hearths.
 - **Ground floor only.** No hearth stands on a storey above the ground. A rich house's bedrooms, its study and dining room, which §4 gave a hearth, have a radiator instead.
-- **A radiator in every other room.** Each room that people live, work or wash in, and that has no fireplace, has one gas radiator (`TrRadiator`): the hall, parlour, drawing, dining and dressing rooms, study, bedroom, nursery, servant's room, bathroom, back room, shop, office and reception. A kitchen, a scullery, a store, a pantry, a box room, an archive, a landing, a WC and a washroom have none. It stands under a window where one is free, since it is low enough (G2, under 0.6 m), and else against a plain wall, and it never blocks a walk-way (G1). The agent applies it to every wealth, the poor included, by the owner's words; that a poor home has gas heat is the owner's world, not a history.
+- **A radiator in every other room.** Each room that people live, work or wash in, and that has no fireplace, has one gas radiator (`TrRadiator`): the hall, parlour, drawing, dining and dressing rooms, study, bedroom, nursery, servant's room, bathroom, back room, shop, office and reception. A kitchen, a scullery, a store, a pantry, a box room, an archive, a landing, a WC and a washroom have none. It stands under a window where one is free, since it is low enough (0.64 m high, 4 cm under the lowest sill, the paper window's 0.68 m; §11), and else against a plain wall, and it never blocks a walk-way (G1). The agent applies it to every wealth, the poor included, by the owner's words; that a poor home has gas heat is the owner's world, not a history.
 - **The seven** already meet the first two parts: each has at most two fireplaces, all on the ground floor (the Soot & Bell's saloon and kitchen, the faction house's two hearths, the lock-up's guard room, the missing room's one). Radiators join their other rooms where a wall is free.
 
 These counts are authoring defaults.
@@ -244,6 +244,61 @@ These counts are authoring defaults.
 
   A second enrichment finds a room's radiator by its body and adds no second one.
 
+## 11. Sizes (owner's walk, 2026-11-10)
+
+The owner: the radiator and the table are deliberately small; every interior piece should have a sensible size.
+
+**Measured.** `VeilmouthWalkAudit.Furniture` reads every wrapper of Victorian Interiors, Tripo and BK as built (`Logs/SliceSurvey/walk_furniture.txt`):
+
+- its size;
+- its working top, the highest level that holds at least 20 % of its upward-facing area, read in 2 cm steps;
+- a window's sill.
+
+Furniture stands at game scale, ×1.2 its true size (kit standard §1). A true size is therefore the game size divided by 1.2.
+
+**The usual true sizes** the agent checks against (authoring defaults, from common furniture practice):
+
+| Piece | True height |
+|---|---|
+| A table's or a desk's top | 0.72–0.78 m |
+| A chair's seat | 0.42–0.46 m |
+| A bed's mattress | 0.5–0.6 m |
+| A nightstand | 0.6–0.7 m |
+| A standing lamp | 1.5–1.8 m |
+
+**Changed** (game sizes; `SliceKitTripo`, `SliceKitVictorian`):
+
+| Piece | Key | Measured | True | Now | True now |
+|---|---|---|---|---|---|
+| writing desk (Tripo) | `TrDesk` | top 0.76 m | 0.63 m | top 0.90 m, 1.77 × 0.94 m, scaled whole | 0.75 m |
+| gas radiator (Tripo) | `TrRadiator` | 0.69 m wide, 0.58 m high | 0.58 × 0.48 m | 0.95 m wide, 0.64 m high, 0.20 m deep | 0.79 × 0.53 m |
+| kitchen table | `ViKitchenTable` | top 0.78 m | 0.65 m | top 0.90 m, its 2.68 × 1.28 m kept | 0.75 m |
+| partners' desk | `ViDesk` | 3.20 × 1.21 m, top 1.04 m | 0.87 m | 3.20 × 1.21 m kept, top 0.90 m (height scaled by 0.91/1.04; its gallery 1.44 → 1.26 m) | 0.75 m |
+| poor nightstand (the pack's smallest cabinet, §8) | `ViNightstand`, `ViNightstandPoor` | 0.98 × 0.50 m, top 1.16 m | 0.97 m | 0.67 × 0.35 m, top 0.80 m, scaled whole, as the Tripo nightstand | 0.67 m |
+| candle stand | `ViStandLamp` | 3.29 m high | 2.74 m | 2.05 m high, 0.30 m across | 1.71 m |
+
+How each was changed:
+
+- **The radiator** is as wide as a window's middle and stays 4 cm under the lowest sill: the paper window's 0.68 m (measured). It may stand under any window (§10.1).
+- **The kitchen table and the partners' desk** are lowered or raised alone, since their footprints already fit their rooms. Scaled whole, the partners' desk was 1.06 m deep and reached 0.05 m into Harrow's lab bench, so only its height changes.
+- **The Tripo desk and the nightstand** are scaled whole, so their drawers and doors keep their shape.
+
+**How the sizes are applied** (`SliceKitCatalogue`):
+
+- **A turned model.** A size given per axis is read on the world's axes, but it is applied on the model's own axes. Tripo's models are turned −90° about X, so the radiator's height took its depth's ratio, and it stood 0.72 m. Each ratio now goes to the model's axis that lies along its world axis.
+- **The cell bars** keep the size the owner has seen, 2.41 m high and 0.35 m deep (measured). That size is now asked for outright, so the corrected sizing does not change them.
+- **A resized wrapper keeps its GUID.** A wrapper whose footprint changes is moved to its new name, so the seven's and the Dwellings' pieces follow it: the Tripo desk 2x1 → 2x2, the nightstand 1x2 → 1x1 and the candle stand 1x3 → 1x2. The partners' desk keeps its 4x1.
+- **Rebuild before measuring.** A batch that also builds the city rebuilds these wrappers first. The city's measuring pass writes any wrapper it does not find, and it would write one under its new name beside the old one.
+
+**Within the usual sizes** (unchanged, game and true):
+
+- Tables: `ViTable` 0.96 m (0.80), `ViTableB` and `ViHallTable` 0.88 m (0.73), `ViTableRound` and `ViDiningTable` 0.92 m (0.77), `TrSewing` 0.88 m (0.73).
+- Seats and beds: `ViChair`'s seat 0.50 m (0.42), `ViSofa`'s 0.54 m (0.45), `TrArmchair`'s 0.56 m (0.47), `ViBed`'s mattress 0.68 m (0.57).
+- Nightstands and counters: the Tripo nightstands' tops 0.80 m (0.67), `ViCounter` 1.02 m (0.85).
+- Low seats: `ViArmchair` and `ViSettee` seat low, 0.40 and 0.42 m (0.33 and 0.35), as Victorian low chairs and settees do. They are kept.
+
+These sizes are authoring defaults, and the measurements are the audit's.
+
 ## Sources
 
 - CAMRA, *Pub Heritage* records of historic pub interiors, e.g. [pubheritage.camra.org.uk/pubs/141](https://pubheritage.camra.org.uk/pubs/141), [/pubs/240](https://pubheritage.camra.org.uk/pubs/240), [/pubs/582](https://pubheritage.camra.org.uk/pubs/582).
@@ -252,6 +307,7 @@ These counts are authoring defaults.
 
 ## Update history
 
+- 2026-11-10 (v0.10): §11, the owner's walk: every piece measured as built against its usual true size, six set to theirs; §10's radiator row and §10.1's sill changed to match.
 - 2026-11-10 (v0.9, later): §10.1 as built: the radiator 5 cm off the wall, the sample Dwellings and the seven's eight radiators.
 - 2026-11-10 (v0.9): §10, the owner's ten Tripo pieces of 2026-11-10; §10.1, the owner's rule on fireplaces and radiators.
 - 2026-11-09 (v0.8): §10, the owner's fifth play test: the Tripo pieces resized against the player, the piano by its keys; the Office, a civic building's Dwelling.
