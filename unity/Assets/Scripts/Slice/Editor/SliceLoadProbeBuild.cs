@@ -2,8 +2,11 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
+using UnityEditor.Rendering;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace GameDev.Slice.EditorTools
 {
@@ -18,8 +21,47 @@ namespace GameDev.Slice.EditorTools
     {
         public const string Boot = "Assets/Scenes/Slice/LoadProbeBoot.unity";
         public const string Output = "Builds/LoadProbe/Veilmouth.exe";
+        public const string FramesOutput = "Builds/FrameProbe/Veilmouth.exe";
 
-        public static void Build()
+        public static void Build() => Build(Output);
+
+        /// <summary>
+        /// The same build for the frame diagnostic (<c>GameDev.Slice.Diagnostics.FrameProbe</c>, city plan §29.7), to
+        /// <c>Builds/FrameProbe</c>: the GPU Resident Drawer draws with the shaders' DOTS variants, which the build keeps
+        /// only with the Graphics settings' "BatchRendererGroup Variants" at Keep All, and its compute shaders only with
+        /// the drawer on in the pipeline asset; so both are set for the build and put back after it, the pipeline asset's
+        /// file as it was (a build saves the asset), and the player switches the drawer off and on itself. Run it with
+        /// <c>-frameTiming &lt;report file&gt;</c>.
+        /// </summary>
+        public static void BuildForFrames()
+        {
+            var settings = new SerializedObject(GraphicsSettings.GetGraphicsSettings());
+            var strip = settings.FindProperty("m_BrgStripping");
+            var was = strip.intValue;
+            var urp = (UniversalRenderPipelineAsset)GraphicsSettings.defaultRenderPipeline;
+            var (mode, occlusion) = (urp.gpuResidentDrawerMode, urp.gpuResidentDrawerEnableOcclusionCullingInCameras);
+            var path = AssetDatabase.GetAssetPath(urp);
+            var file = File.ReadAllBytes(path);
+            strip.intValue = (int)BatchRendererGroupStrippingMode.KeepAll;
+            settings.ApplyModifiedPropertiesWithoutUndo();
+            urp.gpuResidentDrawerMode = GPUResidentDrawerMode.InstancedDrawing;
+            urp.gpuResidentDrawerEnableOcclusionCullingInCameras = true;
+            try
+            {
+                Build(FramesOutput);
+            }
+            finally
+            {
+                urp.gpuResidentDrawerMode = mode;
+                urp.gpuResidentDrawerEnableOcclusionCullingInCameras = occlusion;
+                File.WriteAllBytes(path, file);
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+                strip.intValue = was;
+                settings.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
+        private static void Build(string output)
         {
             if (!File.Exists(Boot))
             {
@@ -33,12 +75,12 @@ namespace GameDev.Slice.EditorTools
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
             {
                 scenes = scenes,
-                locationPathName = Output,
+                locationPathName = output,
                 target = BuildTarget.StandaloneWindows64,
                 options = BuildOptions.Development,
             });
             var s = report.summary;
-            Debug.Log($"[SliceLoadProbeBuild] {s.result}: {scenes.Length} scenes, {s.totalSize / 1e6:0} MB, {s.totalErrors} errors, in {s.totalTime:hh\\:mm\\:ss} to {Output}");
+            Debug.Log($"[SliceLoadProbeBuild] {s.result}: {scenes.Length} scenes, {s.totalSize / 1e6:0} MB, {s.totalErrors} errors, in {s.totalTime:hh\\:mm\\:ss} to {output}");
             if (s.result != BuildResult.Succeeded && Application.isBatchMode)
             {
                 EditorApplication.Exit(1);

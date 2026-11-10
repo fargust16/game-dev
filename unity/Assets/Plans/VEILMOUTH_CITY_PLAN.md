@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4, C5)
 
-Version: 0.58
+Version: 0.59
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§29.5–§29.6: C5's ground and houses as built; the yards dressed by wealth, Bawling Row's six stalls and five pieces round Stone Grandad, the slice's places on C5, the lions along the Governor's front, warehouses on the quay and a villa on the embankment, 153 buildings. Earlier: §29.4: C5's plan from one source: 154 buildings in 23 blocks with 26 passages, corner owners searched, 15 m terrace and low tenement, Cold Shoulder a 12 m street, the cathedral 8 m south, the Penny and Bawling Row, fifteen new folk names)
+Last Updated: 2026-11-10 (§29.7–§29.8: the GPU Resident Drawer measured with the kit's shaders made DOTS-ready, 97 % of renderers taken, −8 % of a build's frame and +237 % in the editor, the frame bound by the CPU, the drawer left off; C5's cold load 10.39 s in the editor. Earlier: §29.5–§29.6: C5's ground and houses as built; the yards dressed by wealth, Bawling Row's six stalls and five pieces round Stone Grandad, the slice's places on C5, the lions along the Governor's front, warehouses on the quay and a villa on the embankment, 153 buildings)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1903,3 +1903,89 @@ The Penny's four L-shaped corners each have a bench against the side wall.
 
 - The railing test now leaves out a railing piece whose sampled cell meets a wall. A passage's railing ends at the houses (the owner's rule, §17), and in that cell the grid's cover probe, a cell wide, meets the wall's corner as well. That corner reading is Full Cover, and it is the wall's, not the railing's. Of 76 railings, 26 are left out; the other 100 sides are all Half Cover, and all 76 crossings are closed.
 - EditMode slice tests: 303 of 303 pass.
+- PlayMode slice tests: 53 of 53 pass, with the five diagnostics left out.
+
+## 29.7 The GPU Resident Drawer and GPU occlusion culling, 2026-11-10
+
+Step 7 (§29.1 item 8; [99 Open Questions](../../../99%20Open%20Questions.md) VS-FRAME). Unity 6's GPU Resident Drawer draws the city's renderers through the BatchRendererGroup, and with it comes GPU occlusion culling. It is measured against the SRP Batcher alone, which C5 draws with now.
+
+**What the drawer needed** (reference plan R2 step 8):
+
+- **The kit's shaders.** The facade and window shaders take DOTS instancing as URP's Lit does: `DOTS.hlsl` in every pass that draws the city, and one DOTS property block in each input file. The block holds only `_BaseColor`, which no renderer overrides, so every piece still reads its material's own values. A window still finds its room through its renderer's user value, which the drawer carries.
+- **What it takes.** With those shaders the drawer takes 103 138 of C5's 106 143 mesh renderers (97.2 %), against 60 356 (56.9 %) before. The views across the Penny and down Draught Lane look the same with the drawer on and off.
+- **What it leaves:**
+  - 2 712 renderers in LOD groups with animated cross-fade, which the drawer refuses. They are the houses' small details, whose animated fade the owner asked for (reference plan R2 step 2, 2026-11-08), and the city's trees.
+  - 293 renderers with a vendor shader that has no DOTS variant (`Growth/Foliage`).
+- **Project settings:**
+  - The Graphics settings' "BatchRendererGroup Variants" must be Keep All, or the editor turns the drawer off, and a build strips the shaders' DOTS variants.
+  - A build keeps the drawer's compute shaders only while the drawer is on in the pipeline asset.
+  - With Keep All, the DOTS variant of the vendor water shader `GapperGames/Volumetric_Water` does not compile.
+
+**Measured.** Seven walker's views at 1920 × 1080:
+
+| Probe | Run |
+|---|---|
+| Editor play mode, `GpuResidentDrawerTimingTests` | 3 rounds in turn; 60 frames after 30 warm-ups each |
+| Development build, `FrameProbe` | 3 rounds in turn; 120 frames after 60 warm-ups each; High quality, no frame cap, no vertical sync |
+
+The build is made by `SliceLoadProbeBuild.BuildForFrames` and started with `-frameTiming`. It sets Keep All and the drawer for the build only.
+
+Medians, in ms:
+
+| | SRP Batcher alone | Drawer with GPU occlusion culling | Change |
+|---|---|---|---|
+| Editor, frame | 100.4 | 338.1 | +237 % |
+| Build, frame | 21.6 | 20.0 | −8 % |
+| Build, main thread | 21.5 | 17.3 | −20 % |
+| Build, GPU | 4.0 | 4.3 | +8 % |
+
+- **In the build, view by view,** the pooled median falls by 8 %, but the frame moves by no more than 1 ms in six of the seven views. Only down the West Road does it fall, from 27.3 to 25.8 ms; down Long Tongue it rises from 24.2 to 24.5 ms. The main thread falls by 9–23 % in the six city views and rises by 5 % in Gloomwood.
+- **The editor's frame is not C4's.** This frame is the whole play-mode loop. VS-FRAME's 31–53 ms were the editor's `Camera.Render` alone, so the two cannot be compared.
+
+**Readings** (the agent's):
+
+- **The city's frame is bound by the CPU.** The GPU works about 4 ms of a 22 ms frame, so GPU occlusion culling saves work the GPU does not need saved, and its own culling costs the GPU a little.
+- **The main thread is no longer what holds the frame.** The drawer takes a fifth off the main thread, but the frame hardly moves. With the drawer, the frame runs 2–5 ms longer than the main thread in the city's views. Something else, likely the render thread, then holds it. This is not measured.
+- **The editor is slower.** In the editor the drawer makes the frame two to three times slower. The likely cause is the editor's safety checks on the drawer's jobs. This is not measured.
+
+**Decision** (the agent's, an authoring default): **the drawer stays off in the pipeline asset.**
+
+- It saves 8 % of the build's pooled frame, and view by view only down the West Road; the long views down Long Tongue and Salt Gullet do not gain.
+- It would make the owner's walks in the editor two to three times slower.
+- It needs Keep All in the project's Graphics settings. Those are the owner's local settings, which the agent does not commit, and a build with the drawer on and without Keep All loses its DOTS variants.
+- The vendor water's DOTS variant does not compile.
+
+The shaders stay DOTS-ready. While the setting is not Keep All, a build strips their DOTS variants, so they cost nothing. Both probes stay, so the drawer can be measured again once the frame's real holder is found.
+
+**Next** (open, VS-FRAME). The frame's cost is the CPU's, and C5 has 106 143 mesh renderers, 44 950 of them facade pieces. The options, measured before they are built:
+
+- (a) measure the render thread first, with the FrameTimingManager's render-thread time in `FrameProbe`;
+- (b) merge each house's pieces into one mesh per material, keeping their look;
+- (c) the merged far LOD for each house type that §28.1 item 17 allows;
+- (d) fewer shadow casters at a distance.
+
+The agent leans to (a), then (b).
+
+## 29.8 The cold load and the views, 2026-11-10
+
+Step 8.
+
+**Load** (`SceneLoadTimingTests`, 2026-11-10 14:08, in the editor with graphics):
+
+- **The cold load.** Veilmouth reads in 4.25 s, wakes in 9.77 s and draws its first frame at 10.39 s. C4 took 3.38, 7.89 and 8.32 s (§28.10).
+- **The scene.** C5 holds 130 101 game objects, 46 044 of them in rooms behind windows, with 107 061 mesh renderers and 4 879 LOD groups. C4 held 115 237 game objects, so for 13 % more objects the load takes about a quarter longer.
+- **A door's journey** takes 0.46–0.86 s. The first entries into the tavern and the Dwelling are the longest.
+- **Not measured:** C5's load in a build. The frame probe's build has the drawer on, so its load would not be the game's.
+
+**Views.** These are in `Logs/SliceSurvey`:
+
+- the walker's views of steps 4–6 (`c5_eye_*`);
+- the district views (`c5_city`, `c5_penny`, `c5_port` and the rest);
+- the drawer's pairs (`c5_grd_2_*` across the Penny, `c5_grd_4_*` down Draught Lane).
+
+**Open after C5** (99 VS-C5, VS-FRAME):
+
+- Squint Lane;
+- the yards' missing rubbish and poses;
+- the frame budget and the frame's real holder (§29.7);
+- the owner's walk of C5.

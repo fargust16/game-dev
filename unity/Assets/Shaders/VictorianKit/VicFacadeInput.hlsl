@@ -29,6 +29,26 @@ half _ToneVar;
 half _WorldUV;
 CBUFFER_END
 
+// The GPU Resident Drawer draws through DOTS instancing (VEILMOUTH_CITY_PLAN.md §29.7), which asks for one block of
+// DOTS properties. No renderer overrides it, so _BaseColor stays the material's own, read once per instance as
+// URP's Lit reads it.
+#ifdef UNITY_DOTS_INSTANCING_ENABLED
+UNITY_DOTS_INSTANCING_START(MaterialPropertyMetadata)
+    UNITY_DOTS_INSTANCED_PROP(float4, _BaseColor)
+UNITY_DOTS_INSTANCING_END(MaterialPropertyMetadata)
+
+static float4 unity_DOTS_Sampled_BaseColor;
+
+void SetupDOTSVicFacadeMaterialPropertyCaches()
+{
+    unity_DOTS_Sampled_BaseColor = UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4, _BaseColor);
+}
+
+#undef UNITY_SETUP_DOTS_MATERIAL_PROPERTY_CACHES
+#define UNITY_SETUP_DOTS_MATERIAL_PROPERTY_CACHES() SetupDOTSVicFacadeMaterialPropertyCaches()
+#define _BaseColor unity_DOTS_Sampled_BaseColor
+#endif
+
 TEXTURE2D(_MaskMap);
 
 // 0 by day, 1 at night (VicStreetLighting). Not a material property.

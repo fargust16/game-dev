@@ -77,6 +77,7 @@ Shader "GameDev/VictorianKit/Facade"
 
             #pragma multi_compile_instancing
             #pragma instancing_options renderinglayer
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
 
             #define VIC_FORWARD 1
             #include "VicFacadePasses.hlsl"
@@ -97,6 +98,7 @@ Shader "GameDev/VictorianKit/Facade"
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
             #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile _ LOD_FADE_CROSSFADE
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
             #include "VicFacadeInput.hlsl"
@@ -117,6 +119,7 @@ Shader "GameDev/VictorianKit/Facade"
             #pragma vertex DepthOnlyVertex
             #pragma fragment DepthOnlyFragment
             #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile _ LOD_FADE_CROSSFADE
             #include "VicFacadeInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
@@ -135,6 +138,7 @@ Shader "GameDev/VictorianKit/Facade"
             #pragma vertex DepthNormalsVertex
             #pragma fragment DepthNormalsFragment
             #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile _ LOD_FADE_CROSSFADE
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
             #include "VicFacadeInput.hlsl"
