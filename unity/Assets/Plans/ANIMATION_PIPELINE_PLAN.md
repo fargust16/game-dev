@@ -1,12 +1,12 @@
 # Animation Pipeline — Blender and Mixamo to Unity
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft — the owner's decision of 2026-11-10, planned by the agent; the steps wait for the owner's word, as every slice milestone does
 
 Created: 2026-11-10
 
-Last Updated: 2026-11-10 (§5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
+Last Updated: 2026-11-10 (§3, §5, §6: A3's first four clips, Mining, Chopping, Hammering and Surrender, made in Blender by a script that is their source; the blacksmith hammers at the anvil; the rest of A3 waits for its actions. Earlier: §5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1–§2, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -48,7 +48,7 @@ Blender is needed for three things only:
 - **In place.** Clips are in place; the code moves the character (`PlayerLocomotion`, `TownsfolkWalker`, the Combat Grid's steps). Mixamo's *In Place* box is ticked where it has one.
 - **One take, every model.** A clip is downloaded *Without Skin* once, not once a model. The agent checks it on all eleven models with the rig check before it is wired in.
 - **Mixamo's licence.** Mixamo's characters and clips may be used royalty-free in commercial games; they may not be sold or shared as raw files. The downloads live in `Assets/Animation/Mixamo/`, tracked in git (no skin, small). The owner signs in to Mixamo and downloads; the agent never signs in.
-- **Blender's clips** are authored on one armature, the Mixamo skeleton exported from one of the six models, in `tools/blender/animation/` (source `.blend` outside the repo or in git LFS, owner's choice) and exported as FBX to `Assets/Animation/Blender/`.
+- **Blender's clips** are authored on one armature, the Mixamo files' own (the player woman's body, Tripo's bone names), in `tools/blender/animation/`, and exported as FBX to `Assets/Animation/Blender/`, one file a clip named by its use. A clip built by a script has the script as its source, tracked in git: it builds every frame from the Mixamo files, so it keeps no `.blend`. Where a hand-keyed clip's `.blend` lives (outside the repo or in git LFS) stays the owner's choice (99 VS-ANIM).
 - **Names.** A clip's asset name is its use, `Walk`, `Idle`, `PistolShot`, never Mixamo's (`Standing Idle (2)`).
 
 ## 4. Download settings (Mixamo)
@@ -146,6 +146,19 @@ Fast Running In Place, a second sprint, is not used.
 
 **A3 — Blender (agent, owner's review).** The clips Mixamo lacks (§6, marked A3), made on the Mixamo armature. The firearms come first, since a shot includes its loading (10.2 §5b): a pistol shot of 4 AP and a rifle shot of 6 AP, each aim, fire and reload in one action, and the step back. Blender runs in the background (`-b --factory-startup`), never on the owner's open file.
 
+*A3's first four, owner's word of 2026-11-10* ("make A3", for the four clips not found on Mixamo; `tools/blender/animation/a3_clips.py`, its pose sheets and report written beside its exports when asked):
+
+- **Mine** (1.47 s, loops): the pick raised over the head, struck at the ground ahead with the body bent at the hips, pulled free and lifted past the right shoulder.
+- **Chop** (1.33 s, loops): the axe drawn back over the right shoulder, driven into a trunk ahead at the waist in a diagonal blow to the left.
+- **Hammer** (1.0 s, loops): the hammer raised beside the head, elbow out, brought down on the anvil with a rebound; the left hand holds the tongs still.
+- **Yield** (2.2 s, holds its last frame): the hands come up in front and open beside the head, palms forward; the feet step back one by one and the body goes down on both knees; the head bows.
+- **How they are made.** The body is Breathing Idle's; the two-handed grip is Great Sword Idle's hands, the hammer's Sword And Shield Idle's, the kneel Kneeling Idle's. Each clip is a few key poses joined by smooth curves. Arms and legs reach their marks by two-bone IK, each elbow and knee bending about its own hinge, measured from Great Sword Idle's elbows and Kneeling Idle's knees. The feet stay where they stood.
+- **Measured:** the Mixamo files' body stands about 1 m, its shoulders 0.78 m, so the poses are written for a body whose shoulders stand 1.40 m and scaled by 0.56. On that body the arm reaches 0.50 m from shoulder to wrist, and every hand's mark stays within it: at the key poses each hand ends within 0.04 m of its mark. The marks, the bends and the timings are authoring defaults.
+- **Checked:** the script's drawn sheets, front, side and above, by the agent; then the rig check on all eleven models, the pick striking the ground, the axe drawn back, the hammer raised and the end of the surrender, with no wrong mapping. `SliceMixamo` imports them as it imports Mixamo's files, Humanoid and in place, 130 curves each.
+- **Wired:** the blacksmith at Bawling Row's anvil hammers as its idle (`Blacksmith.controller`, the standing person's controller with Hammer for its idle). Mine, Chop and Yield are imported and checked but not yet played: the slice has no ore or wood gathering yet, and Confront's intents are Move, Attack and End Turn, with no Yield. Each is wired when its action is built.
+- **No tool is held.** The hands are posed as if gripping a handle. A pick, an axe or a hammer in the hand is a prop the code attaches to the hand, built with gathering and Item Creation.
+- **Left in A3:** the firearms' loading, the Defensive Stance, Дрёма and sleep, brewing, First Aid, picking a lock. Each is made when its action is built, the firearms first.
+
 **A4 — the dog (agent, owner's choice of source).** Mixamo has no quadrupeds. Open for the owner ([99](../../../99%20Open%20Questions.md) VS-ANIM): (a) the agent animates the Tripo shepherd's own rig in Blender (walk, trot, run, idle, sit, lie, bark, sniff, bite, death); (b) a commercially licensed dog pack the owner buys; (c) Tripo's animal clips, if the owner's account offers them. The agent leans to (a): ten clips, one rig, full control.
 
 **A5 — skirts (agent).** The three women's skirts smoothed between the thighs in Blender, so a run or a wide stance no longer tears them. Skirt bones with a jiggle are V2.
@@ -168,8 +181,8 @@ The search words are Mixamo's usual names; the agent takes the closest clip, and
 | Drinking in the tavern | Drinking | A1 |
 | Sneaking in Stealth Mode | Sneak Walk; Crouched Walking; Crouch Idle | A1 |
 | Gathering herbs and flax, Skinning | Picking Up; Kneeling; Gathering | A1 |
-| Mining ore, felling a tree | Mining; Chopping | A1 |
-| The blacksmith at the anvil; Item Creation | Hammering | A1 |
+| Mining ore, felling a tree | Mining; Chopping | A3, made (not on Mixamo) |
+| The blacksmith at the anvil; Item Creation | Hammering | A3, made (not on Mixamo) |
 | Sword, axe, mace: idle, blow | Sword And Shield Idle; Sword And Shield Slash | A2 |
 | Shield block | Sword And Shield Block | A2 |
 | Greatsword, greataxe, maul | Great Sword Idle; Great Sword Slash | A2 |
@@ -180,7 +193,7 @@ The search words are Mixamo's usual names; the agent takes the closest clip, and
 | Taking a hit, falling, dying | Hit Reaction; Dying; Death From The Front | A2 |
 | Break Away, stepping back | Walking Backwards | A2 |
 | Defensive Stance and Counterattack | Sword And Shield Block Idle, edited | A3 |
-| Yield | Surrender; Kneeling, edited | A3 |
+| Yield | Surrender; Kneeling, edited | A3, made |
 | Loading a flintlock pistol, a rifle | — | A3 |
 | Дрёма, sleeping, waking | Sleeping Idle; Lying Down, edited | A3 |
 | Brewing at the alchemy table | — | A3 |
