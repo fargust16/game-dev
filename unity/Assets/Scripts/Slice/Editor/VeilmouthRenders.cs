@@ -115,7 +115,9 @@ namespace GameDev.Slice.EditorTools
             ShowCircles();
             Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
-            Top("c4_city", new Vector3(50f, 0f, 20f), 175f);
+            Top("c4_world", Vector3.zero, 500f);
+            Top("c4_city", new Vector3(50f, 0f, 18f), 225f);
+            Top("c4_hamlet", new Vector3(-190f, 0f, 60f), 70f);
             Top("c4_penny", new Vector3(40f, 0f, 60f), 50f);
             Top("c4_parsons", new Vector3(50f, 0f, 195f), 65f);
             Top("c4_sleepy", new Vector3(-25f, 0f, 45f), 60f);
@@ -131,6 +133,13 @@ namespace GameDev.Slice.EditorTools
             Eye("c4_eye_quay", 170f, -40f, 170f, 120f, 2f);
             Eye("c4_eye_slant", 80f, 20f, 107f, -7f, 2f);
             Eye("c4_eye_widows", -75f, 140f, 150f, 140f, 3f);
+            Eye("c4_eye_penny", 2f, 58f, 40f, 60f, 2f);
+            Eye("c4_eye_cathedral", 40f, 108f, 40f, 186f, 2f);
+            Eye("c4_eye_market", -49f, 52f, -49f, 5f, 2f);
+            Eye("c4_eye_cemetery", -63f, 200f, -20f, 205f, 2f);
+            Eye("c4_eye_works", 40f, -108f, 40f, -190f, 2f);
+            Eye("c4_eye_hamlet", -135f, 60f, -250f, 60f, 2f);
+            Eye("c4_eye_gloomwood", -240f, -50f, -200f, -110f, 2f);
             Debug.Log($"Veilmouth C4 views written to {OutputFolder}.");
         }
 

@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4)
 
-Version: 0.53
+Version: 0.54
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10 and being built; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§28.8: C4's houses from the layout: 105 footprints with 0 kit faults, plain stoops sunk 0.6 m so one low step shows, rich rows and plots on the kit's full stoop within a quarter of the pavement; Bawling Square's corner and Harrow's passage fixed in the planner)
+Last Updated: 2026-11-10 (§28.9: C4's districts and outskirts: the cathedral, the works and Stone Grandad as stone masses, the cellar door, the ritual circles, the cemetery, the parks, the market, cargo on the quay, Crooked Hamlet's farms, and Gloomwood in stands with its glades, beasts and iron veins)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1471,3 +1471,37 @@ The builder puts up the layout's houses from the owner's Victorian Kit at ×1.25
 - The layout now names about 102 buildings inside the walls and the works.
 
 Views: `Logs/SliceSurvey/c4_*`.
+
+## 28.9 The districts and the outskirts, 2026-11-10
+
+`VeilmouthCity.Districts` places what the layout names besides the streets and the houses. All sizes and counts are authoring defaults. The randomness is a fixed System.Random, never the world seed.
+
+- **Stone masses.** These are placeholders until their models come (SLICE_MODELS_WANTED.md § C4), each group its own merged mesh with box colliders.
+  - The cathedral is a cross of light stone: nave 22 m, transept 20 m, apse 16 m and a tower of 44 m over its west front.
+  - The six works blocks are sooty brick, 10–16 m high.
+  - Stone Grandad on the Penny's island is 12 m in all: a stepped plinth of 8 × 8 m, a pedestal and the figure. Four benches face him across the grass.
+- **The cellar door** is in works block 6's west wall, opening on Deaf Boiler Yard, with its portal into the Soot Stair cellar.
+- **The ritual circles** wait hidden at the three candidates: the Black Puddle, Deaf Boiler Yard and the old chapel's court.
+- **Last Turning Cemetery** has 98 graves in rows. Its walls stand on the lane's side and the garden's side, with a gate from Last Turning.
+- **The parks** hold 31 garden trees (MTree):
+  - Bishop's Garden has two lines along its middle walk, with benches on the walk.
+  - Quiet Whistle Garden has a grove north of the faction's plot.
+  - The Brothers' garth has a lawn, one tree and a bench on each side.
+- **The market on Bawling Square.** A row of stalls holds the trader, the Masters of Enchanting and First Aid, and the seer's counter. A row of food stalls faces it, with benches in the aisle, and the Item Creation corner has its anvil, leather frame and armour stand. 6 m stays clear before every front.
+- **Cargo** stands only on Fishlip Quay before the warehouses and on Tipsy Pier.
+- **Crooked Hamlet.**
+  - Eight cottages stand by the West Road.
+  - Each farm has a plank yard of 5 m before its front, since the road runs 6 m from the fronts, and a fenced bed beside it.
+  - Fruit trees grow behind the farms, with posts along the road and grass and shrubs in the open land.
+- **Gloomwood.**
+  - Each of the eight glades has five fellable trees and up to four herbs, 40 fellable trees and 30 herbs in all.
+  - 4013 cover trees stand, three in four of them pines. Each 6 m cell gets one chance of a tree:
+    - 85 % in a 25 m belt along the edges that face open land, so the wood reads as a wall from the hamlet, the river and the walls;
+    - 45 % in the stands that a value noise on a 45 m lattice marks;
+    - 6 % between the stands, which leaves clearings.
+  - Six wolf and four boar territories hold their stand-ins.
+  - Twelve iron veins lie at the foot of the area's rising edges, out of the West Road's pass.
+
+Kit check: 7043 blocks, 140 doors, 0 kit faults. The 4013 forest trees are the larger share of the blocks, and step 8 measures their cost. Unity's terrain trees would cost less at this count, but they need the vendor's prefab on the terrain, not a kit wrapper, so they wait for the owner.
+
+Views: `Logs/SliceSurvey/c4_world`, `c4_city`, `c4_hamlet`, `c4_eye_penny`, `c4_eye_cathedral`, `c4_eye_market`, `c4_eye_cemetery`, `c4_eye_works`, `c4_eye_hamlet`, `c4_eye_gloomwood`.

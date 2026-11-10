@@ -236,7 +236,7 @@ namespace GameDev.Slice.EditorTools
         /// A farm's yard before its front, fenced with planks on three sides with a way in of 4 m before the door, and a
         /// vegetable bed fenced beside it (§25.5).
         /// </summary>
-        private static void FarmYard(float px, float py, Facing f, Random rng)
+        private static void FarmYard(float px, float py, Facing f, Random rng, int depth = YardDepth)
         {
             var e = _kit["House_Farm"];
             var alongX = f == Facing.N || f == Facing.S;
@@ -247,7 +247,7 @@ namespace GameDev.Slice.EditorTools
             var a0 = a - 2;
             var a1 = a + e.Width + 2;
             a1 += (a1 - a0) % 2;
-            var far = front + (s * YardDepth);
+            var far = front + (s * depth);
             var (near0, near1) = ((int)Mathf.Min(front, far), (int)Mathf.Max(front, far));
             var plank = 0;
             void Planks(bool along, float line, int from, int to, Func<int, bool> skip)

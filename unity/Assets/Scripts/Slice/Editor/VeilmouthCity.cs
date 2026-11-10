@@ -233,10 +233,28 @@ namespace GameDev.Slice.EditorTools
 
             _backs.Clear();
             BackDoors();
+            _parent = Group("Districts");
+            Masses();
+            Statue();
+            CellarDoor();
+            Cemetery();
+            Market();
+            Cargo();
+            _parent = Group("Ritual Circles");
+            foreach (var c in _layout.candidates)
+            {
+                Circle(World(c.x, c.y, Up(Ground(c.x, c.y))), c.name);
+            }
+
             _parent = Group("Lamps");
             LampsC4();
             _parent = Group("Street Trees");
             StreetTreesC4();
+            _parent = Group("Parks");
+            Parks();
+            _parent = Group("Outskirts");
+            Hamlet();
+            Gloomwood();
             // A street door on every dwelling (15, *The slice's Dwellings*), after every building stands.
             VeilmouthDwellings.AddDoors(_root);
 
