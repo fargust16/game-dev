@@ -203,7 +203,7 @@ building("customs", "Civic_white", "E", QUAY, 375, "The Customs House")
 building("one_eye", "Tower6_white", "W", 745, 520, "The One-Eye")
 # Lower Veil: the Soot & Bell and Harrow & Tincture on the Black Puddle; the missing person's tenement on its north side.
 building("soot_bell", "Tavern_brick", "E", 606, 504, "The Soot & Bell")
-building("harrow", "ShopTown8_dark_detached", "E", 606, 521, "Harrow & Tincture")
+building("harrow", "ShopTown8_dark_detached", "E", 606, 523, "Harrow & Tincture")  # a 4 m passage from the Soot & Bell (R5)
 building("missing", "Tenement8_poor_detached", "S", 496, 608, "The missing person's tenement")
 
 # The cathedral, a placeholder of stone masses until its model comes (item 9, SLICE_MODELS_WANTED.md § C4).
@@ -235,10 +235,9 @@ row("N", C[1] + HALF, 550, 570, "shop", 105)                            # south 
 
 # Long Tongue, the gate to the Penny; Bawling Square opens off its south side by the gate, shops round it.
 row("S", MAIN, X_IN + 2, 490, "shop", 111)
-row("N", MAIN + 22, 480, 490, "shop", 112)
 row("W", 470, MAIN + 22, 500, "shop", 113)
 row("N", 500, 432, 470, "shop", 114)
-row("E", 432, MAIN + 22, 510, "shop", 115)                              # against the town wall
+row("E", 432, MAIN + 22, 500, "shop", 115)                              # against the town wall, to the square's corner
 # Salt Gullet, the Penny to the quay.
 row("S", MAIN, 590, 645, "shop", 121)
 row("N", MAIN + 22, 590, 650, "town", 122)

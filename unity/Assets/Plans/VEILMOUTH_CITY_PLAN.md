@@ -1,10 +1,10 @@
 # Veilmouth City Plan (C1, C2, C3, C4)
 
-Version: 0.52
+Version: 0.53
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10 and being built; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§28.7: C4's streets built from the layout: paint, raised pavements, the wall with its gate and towers, the stone banks and the quay wall, two bridges and two piers, lamps and 78 street trees)
+Last Updated: 2026-11-10 (§28.8: C4's houses from the layout: 105 footprints with 0 kit faults, plain stoops sunk 0.6 m so one low step shows, rich rows and plots on the kit's full stoop within a quarter of the pavement; Bawling Square's corner and Harrow's passage fixed in the planner)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1444,3 +1444,30 @@ Views: `Logs/SliceSurvey/c4_ground_*`.
 Houses come next (step 6), so the passage and back-door counts are 0 for now. The people, the dogs, the mystic layer and the POI stages that C3 placed stay on its coordinates until step 8.
 
 Views: `Logs/SliceSurvey/c4_*` (top: `c4_city`, `c4_penny`, the districts; at eye height: `c4_eye_*`).
+
+## 28.8 The houses, 2026-11-10
+
+The builder puts up the layout's houses from the owner's Victorian Kit at ×1.25. It places:
+
+- the single buildings: the Penny's civic fronts, the chapel, the Brothers' House and its bell tower, the Customs House, the One-Eye, and Lower Veil's openable houses with their portals;
+- the rows, each of one family, wall to wall with passages (R5);
+- the plots, with a detached house or a villa in a railed garden;
+- the low tenements on Squint Lane at 45°.
+
+**Counts.** There are 105 footprints, the wall's six towers among them, with 137 doors. 0 kit faults remain, 21 passages run between houses, and no gap under 4 m is left in a row. Of the back doors, 39 open and 53 are walled up. The least room between a plot's steps and its railings is 1.57 m.
+
+**Stoops (§28.1 item 5, §28.2).**
+
+- A house on a plain stoop is set 0.6 m down through its plinth line. Only its top step, 0.15 m, shows over the pavement, and its stoop rails by the door are hidden. 75 houses stand so.
+- A rich row and every plot keep the kit's full stoop: four steps of 0.19 m reaching 1.4 m. That is under a quarter of a 6 m pavement. A plot's steps stay inside its railings.
+- The civic fronts, the towers, the chapel and the villas keep their own stairs and bases.
+- A buried step is not counted as a stoop, so grass and trees may stand over it.
+
+**Planner fixes.**
+
+- Bawling Square's west row now ends at the square's corner (py 500). It used to run 10 m past it into the south row.
+- The short row by the Penny on Long Tongue's south side is gone, since no house fitted there.
+- Harrow & Tincture stands 2 m further south, so a passage of 4 m lies between it and the Soot & Bell.
+- The layout now names about 102 buildings inside the walls and the works.
+
+Views: `Logs/SliceSurvey/c4_*`.

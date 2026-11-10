@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using GameDev.Slice.Kit;
+using UnityEditor;
 using UnityEngine;
+using Random = System.Random;
 
 namespace GameDev.Slice.EditorTools
 {
@@ -328,6 +331,230 @@ namespace GameDev.Slice.EditorTools
             var deck = Rect(s.x0, s.y0, s.x1, s.y1);
             _decks.Add((deck, DeckTop));
             Take(deck, Use.Walk);
+        }
+
+        // ------------------------------------------------------------------------------------------- buildings
+
+        /// <summary>The kit key of a layout's building: its own entry where the catalogue has one, else the baked house's.</summary>
+        private static string KitKey(string key) => _kit.ContainsKey(key) ? key : "House_" + key;
+
+        /// <summary>
+        /// Whether a building on a plain stoop is sunk (owner, 2026-11-10, §28.1 item 5): every house on a street's
+        /// pavement or a square, but the civic fronts, the towers and the chapel, which keep their own stairs and bases.
+        /// </summary>
+        private static bool Sinks(string key, string stoop) =>
+            stoop != "rich" && !key.Contains("Civic") && !key.Contains("Palace") && !key.Contains("Tower") && !key.Contains("Villa") && key != "Chapel";
+
+        /// <summary>The row families (§24.4, §28.5): houses of one family share height, depth and roof, so their open ends meet.</summary>
+        private static string[] Family(string family) => family switch
+        {
+            "shop_rich" => new[] { VictorianHouses.Key("Shop12", "rich"), VictorianHouses.Key("Shop8", "stucco") },
+            "shop" => ShopRow,
+            "town" => TownRow,
+            "tenement" => TenementRow,
+            "low" => LowTenementRow,
+            "warehouse" => WarehouseRow,
+            _ => throw new System.ArgumentException($"no row family '{family}'"),
+        };
+
+        /// <summary>While set, <see cref="House"/> sinks what it puts up by <see cref="Sink"/>.</summary>
+        private static bool _sinking;
+
+        /// <summary>
+        /// A sunk house's stoop rails are hidden: its stoop shows only its top step, 0.15 m over the pavement, which needs
+        /// none (owner, 2026-11-10: a house with no railings straight on the pavement has no stair, or a narrow low one).
+        /// </summary>
+        private static void SinkStoops(GameObject house)
+        {
+            _sunk.Add(house.transform);
+            var model = house.transform.Find("Model");
+            if (model == null)
+            {
+                return;
+            }
+
+            var doors = house.transform.Cast<Transform>().Where(t => t.name == VictorianHouses.DoorMarker || t.name == VeilmouthKitHouses.YardDoorMarker)
+                .Select(t => t.position).ToList();
+            foreach (var piece in model.GetComponentsInChildren<Transform>(true).Where(t => t.name.StartsWith("SM_Vic_Rail_")))
+            {
+                if (doors.Any(d => Flat(piece.position - d) < 2.2f && Mathf.Abs(piece.position.y - d.y) < 1.2f))
+                {
+                    piece.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The single buildings (§28.5): the Penny's civic fronts, the chapel, the Brothers' House, the Customs House, the
+        /// One-Eye, and Lower Veil's openable houses with their doors into their interiors (§5.3).
+        /// </summary>
+        private static void Buildings()
+        {
+            var portals = new Dictionary<string, (string Id, string Scene, string Target)>
+            {
+                ["assize"] = ("wardens-lockup.street", VeilmouthDressing.LockupScenePath, "wardens-lockup.inside"),
+                ["soot_bell"] = (VeilmouthScene.SootAndBellStreetPortalId, VeilmouthScene.SootAndBellScenePath, VeilmouthScene.SootAndBellInsidePortalId),
+                ["harrow"] = ("harrow-apothecary.street", VeilmouthDressing.HarrowScenePath, "harrow-apothecary.inside"),
+                ["missing"] = ("missing-room.street", VeilmouthDressing.MissingRoomScenePath, "missing-room.inside"),
+            };
+            foreach (var b in _layout.buildings)
+            {
+                var key = KitKey(b.key);
+                if (key == "Chapel")
+                {
+                    Chapel(b);
+                    continue;
+                }
+
+                _sinking = Sinks(key, b.stoop);
+                var house = House(key, FacingOf(b.facing), b.front, b.a, name: b.name, force: true);
+                _sinking = false;
+                if (house == null)
+                {
+                    continue;
+                }
+
+                if (portals.TryGetValue(b.id, out var portal))
+                {
+                    Entrance(house, portal.Id, portal.Scene, portal.Target);
+                }
+
+                if (b.id == "soot_bell")
+                {
+                    VeilmouthYardDoor.Leaf(house.transform, _kit, house.transform.parent);
+                }
+            }
+
+            // The Notice Board on the Black Puddle, by the Soot & Bell's door.
+            var puddle = _layout.SquareById("black_puddle");
+            Prop("NoticeBoard", Facing.E, puddle.x0 + 1f, puddle.y0 + 3f, "Notice Board");
+        }
+
+        /// <summary>The old chapel, its door's portal at the kit's door point, opening on its forecourt (§28.5).</summary>
+        private static void Chapel(VeilmouthLayout.BuildingSpec b)
+        {
+            const string key = "Chapel";
+            var f = FacingOf(b.facing);
+            var chapel = House(key, f, b.front, b.a, name: b.name, force: true);
+            var right = chapel.transform.right;
+            var door = chapel.transform.position + (chapel.transform.rotation * new Vector3(_kit[key].DoorX, 0f, _kit[key].Depth));
+            var leaf = (GameObject)PrefabUtility.InstantiatePrefab(_kit["PortalLeaf"].Prefab, _parent);
+            var start = door - (right * 1.5f);
+            leaf.transform.SetPositionAndRotation(new Vector3(Mathf.Round(start.x), Up(door.y), Mathf.Round(start.z)), chapel.transform.rotation);
+            Configure(leaf, "old-chapel.street", VeilmouthDressing.ChapelScenePath, "old-chapel.inside");
+            _doors.Add((Plan(door), Outward(f)));
+        }
+
+        /// <summary>
+        /// The rows and the plots (§28.5): a row of one family along its street, wall to wall with passages (R5), sunk
+        /// unless it is a rich row; a plot's detached house or villa in its railed garden (§19), on its full stair.
+        /// </summary>
+        private static void Houses()
+        {
+            foreach (var p in _layout.plots)
+            {
+                var keys = PlotKeys(p.kind);
+                var rng = new Random(p.seed);
+                var named = !string.IsNullOrEmpty(p.name);
+                var house = Plot(FacingOf(p.facing), p.front, (int)p.s0, (int)p.s1, keys[rng.Next(keys.Length)], p.garden, p.behind, rng,
+                    named ? p.name : null, p.at >= 0f ? p.at : (float?)null, named);
+                if (house != null && p.name == "The faction's house")
+                {
+                    Entrance(house, "faction-house.street", VeilmouthDressing.FactionHouseScenePath, "faction-house.inside");
+                }
+            }
+
+            foreach (var r in _layout.rows)
+            {
+                _sinking = r.stoop != "rich";
+                Row(FacingOf(r.facing), r.front, (int)r.a0, (int)r.a1, Family(r.family), r.seed);
+                _sinking = false;
+            }
+
+            foreach (var s in _layout.slants)
+            {
+                _sinking = true;
+                Slant(s);
+                _sinking = false;
+            }
+
+            Debug.Log($"[VeilmouthCity] C4 houses: {_houses.Count} footprints, {_sunk.Count} sunk on plain stoops (§28.1 item 5).");
+        }
+
+        /// <summary>
+        /// Squint Lane at 45° (§12): a frame on a world node; its houses keep the grid and the turns in its axes. The low
+        /// tenements of Lower Veil, a run on each side with its ends faced; a run stays unbroken, or its open ends would show.
+        /// </summary>
+        private static void Slant(VeilmouthLayout.SlantSpec s)
+        {
+            var from = new Vector2(s.x0, s.y0);
+            var to = new Vector2(s.x1, s.y1);
+            var frame = new GameObject($"{s.name} (45°)");
+            frame.transform.SetParent(_root, false);
+            var d = to - from;
+            frame.transform.SetPositionAndRotation(World(from.x, from.y), Quaternion.Euler(0f, Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg, 0f));
+            frame.AddComponent<KitFrame>();
+            var palette = Family(s.family);
+            var rng = new Random(45);
+            var half = s.width / 2f;
+            var length = d.magnitude;
+            foreach (var side in new[] { 1, -1 })
+            {
+                // In the frame's axes a house's local −X lies toward the lane's end (+X) on the side whose fronts turn
+                // round (side 1), toward its start on the other.
+                var placed = new List<(string Key, int X, Vector2[] Quad, float Z0)>();
+                for (var x = 6; x + 10 <= length - 6f; x += 10)
+                {
+                    var key = palette[rng.Next(palette.Length)];
+                    var e = _kit[key];
+                    var z0 = side > 0 ? half : -half - e.Depth;
+                    var local = new[] { new Vector2(x, z0), new Vector2(x + e.Width, z0), new Vector2(x + e.Width, z0 + e.Depth), new Vector2(x, z0 + e.Depth) };
+                    var quad = local.Select(l => Plan(frame.transform.TransformPoint(new Vector3(l.x, 0f, l.y)))).ToArray();
+                    if (!Free(quad, true))
+                    {
+                        break;
+                    }
+
+                    placed.Add((key, x, quad, z0));
+                }
+
+                var endSide = side > 0 ? VictorianHouses.Side.Left : VictorianHouses.Side.Right;
+                var startSide = side > 0 ? VictorianHouses.Side.Right : VictorianHouses.Side.Left;
+                for (var i = 0; i < placed.Count; i++)
+                {
+                    var (key, x, quad, z0) = placed[i];
+                    key = placed.Count == 1 ? VictorianHouses.CornerKey(key, VictorianHouses.Side.Both)
+                        : i == 0 ? VictorianHouses.CornerKey(key, startSide)
+                        : i == placed.Count - 1 ? VictorianHouses.CornerKey(key, endSide) : key;
+                    var e = _kit[key];
+                    Take(quad, Use.Solid);
+                    _houses.Add(quad);
+                    var (min, max) = GroundUnder(quad);
+                    var floor = Up(max) - (_sinking ? Sink : 0f);
+                    var house = Put(key, frame.transform, x, z0, side > 0 ? 2 : 0, floor);
+                    foreach (Transform child in house.transform)
+                    {
+                        if (child.name == VictorianHouses.DoorMarker)
+                        {
+                            var f = house.transform.forward;
+                            Doorway(child.position, new Vector2(f.x, -f.z), floor, e.Stoop, e.StoopWidth);
+                        }
+                    }
+
+                    Stoops(house);
+                    if (_sinking)
+                    {
+                        SinkStoops(house);
+                    }
+
+                    if (floor - min > 0.25f)
+                    {
+                        var centre = frame.transform.TransformPoint(new Vector3(x + (e.Width / 2f), 0f, z0 + (e.Depth / 2f)));
+                        _works.Box(new Vector3(centre.x, (floor + min - 0.6f) / 2f, centre.z), new Vector3(e.Width, floor - min + 0.6f, e.Depth),
+                            frame.transform.eulerAngles.y);
+                    }
+                }
+            }
         }
 
         // ------------------------------------------------------------------------------------------- lamps

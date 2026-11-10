@@ -340,15 +340,6 @@
    "stoop": "plain"
   },
   {
-   "facing": "N",
-   "front": 451,
-   "a0": 480,
-   "a1": 490,
-   "family": "shop",
-   "seed": 112,
-   "stoop": "plain"
-  },
-  {
    "facing": "W",
    "front": 470,
    "a0": 451,
@@ -370,7 +361,7 @@
    "facing": "E",
    "front": 432,
    "a0": 451,
-   "a1": 510,
+   "a1": 500,
    "family": "shop",
    "seed": 115,
    "stoop": "plain"
@@ -756,7 +747,7 @@
    "key": "ShopTown8_dark_detached",
    "facing": "E",
    "front": 606,
-   "a": 521,
+   "a": 523,
    "name": "Harrow & Tincture",
    "stoop": "plain"
   },

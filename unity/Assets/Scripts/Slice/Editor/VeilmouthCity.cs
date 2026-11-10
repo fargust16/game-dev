@@ -222,6 +222,17 @@ namespace GameDev.Slice.EditorTools
             WallsC4();
             _parent = Group("Bridges and Quays");
             Waterside();
+            _parent = Group("Civic Buildings");
+            Buildings();
+            _parent = Group("Houses");
+            Houses();
+            foreach (var b in _backs)
+            {
+                PlaceBack(b.F, b.Front, b.A0, b.A1, b.Depth);
+            }
+
+            _backs.Clear();
+            BackDoors();
             _parent = Group("Lamps");
             LampsC4();
             _parent = Group("Street Trees");
@@ -553,7 +564,8 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            var floor = Mathf.Min(Up(max) + raise, ceiling);
+            // A house on a plain stoop is sunk, so only its top step shows (§28.1 item 5).
+            var floor = Mathf.Min(Up(max) + raise, ceiling) - (_sinking ? Sink : 0f);
             var lo = new Vector2(quad.Min(p => p.x), quad.Min(p => p.y));
             var hi = new Vector2(quad.Max(p => p.x), quad.Max(p => p.y));
             var house = PutPlan(key, f, lo.x, lo.y, floor);
@@ -580,6 +592,11 @@ namespace GameDev.Slice.EditorTools
             }
 
             Stoops(house);
+            if (_sinking)
+            {
+                SinkStoops(house);
+            }
+
             return house;
         }
 
@@ -599,9 +616,18 @@ namespace GameDev.Slice.EditorTools
 
                 foreach (var box in child.GetComponentsInChildren<BoxCollider>())
                 {
-                    var corners = Enumerable.Range(0, 8).Select(k => Plan(box.transform.TransformPoint(box.center + Vector3.Scale(box.size * 0.5f,
-                        new Vector3((k & 1) == 0 ? -1f : 1f, (k & 2) == 0 ? -1f : 1f, (k & 4) == 0 ? -1f : 1f))))).ToArray();
-                    _stoops.Add(Rect(corners.Min(c => c.x), corners.Min(c => c.y), corners.Max(c => c.x), corners.Max(c => c.y)));
+                    var world = Enumerable.Range(0, 8).Select(k => box.transform.TransformPoint(box.center + Vector3.Scale(box.size * 0.5f,
+                        new Vector3((k & 1) == 0 ? -1f : 1f, (k & 2) == 0 ? -1f : 1f, (k & 4) == 0 ? -1f : 1f)))).ToArray();
+                    var corners = world.Select(Plan).ToArray();
+                    var rect = Rect(corners.Min(c => c.x), corners.Min(c => c.y), corners.Max(c => c.x), corners.Max(c => c.y));
+                    // A sunk house's buried steps are no stoop: only a step that shows over the ground counts (§28.1 item 5).
+                    var c0 = Centre(rect);
+                    if (world.Max(w => w.y) < Ground(c0.x, c0.y) + 0.05f)
+                    {
+                        continue;
+                    }
+
+                    _stoops.Add(rect);
                 }
             }
         }
