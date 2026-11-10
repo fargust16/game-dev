@@ -1,10 +1,10 @@
-# Veilmouth City Plan (C1, C2, C3, C4)
+# Veilmouth City Plan (C1, C2, C3, C4, C5)
 
-Version: 0.55
+Version: 0.56
 
-Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day, and waiting for the owner's walk; sizes remain authoring defaults
+Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; sizes remain authoring defaults
 
-Last Updated: 2026-11-10 (§28.10: the slice's places on C4: people, dogs, ornaments, the mystic layer, reflections, dwelling wealth, the POIs and their residue, C3's names renamed in the story; the slice's tests; the cold load and Gloomwood's cost measured, the city's frame budget open)
+Last Updated: 2026-11-10 (§29: C5, the owner's map cut into blocks: a pavement along every road, unbroken carriageways, rectangular blocks with houses flush round small yards, rich yards as parks and poor ones in mud and rubbish, the market round the statue on a smaller island, the port's joint, about 155 buildings in the same walls, GPU occlusion culling part of the work; the agent's readings and the steps)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -1658,3 +1658,88 @@ Views: `Logs/SliceSurvey/c4_*`, with five new views:
 - `c4_eye_puddle`: the Black Puddle with the pawnbroker and a Warden;
 - `c4_eye_draught`: Draught Lane, where POI B happens;
 - `c4_eye_lions`: the lions before the Governor's House.
+
+# 29. C5, the owner's map cut into blocks, 2026-11-10
+
+The owner walked C4 the day it was built and asked for its streets to be laid again. C5 keeps C4's map: the river, the wall and its gate, the port, the works over the river, the cathedral, the village and the forest, the ground's shape and the folk names. It replaces C4's streets, houses and squares inside the walls and in the works. Sections §28.5–§28.10 stay as the record of C4.
+
+## 29.1 The owner's decisions
+
+The owner gave five screenshots of C4 and one of a reference. The reference shows the principle: streets frame blocks, fronts stand on the pavement, and yards lie behind. It is not a map to copy.
+
+1. **A pavement along every road.** Lanes and alleys have pavements too, which replaces §28.1 item 4's lane and alley rows. Every way into a building is from a pavement. In C4, a lane's houses stood straight on its carriageway, and a carriageway ran into a house.
+2. **The carriageway runs unbroken** along its whole length. No pavement, band of setts, square or building crosses it or ends it. In C4:
+   - a pavement ran across a lane's mouth;
+   - a street painted later laid its pavement over an earlier one's carriageway.
+3. **Blocks.** The streets cut the city into blocks, rectangular or square for now. Some streets are wide and some are narrow lanes.
+   - A pavement rings every block.
+   - The houses stand flush on the pavement, back to back round a small inner yard.
+   - A yard has one way in, which is also its way out, or a way through the block.
+4. **Yards and open spaces.**
+   - A rich district's yard is a small park.
+   - A poor district's yard holds mud, rubbish, drunkards and the other marks of poverty.
+   - Where the houses cannot fill a block and an open space is left, a stall, a notice board or other props that fit the block stand there.
+5. **The market moves to the Penny.** The stalls stand round the statue facing the road, because most people are there. The island with the statue shrinks; C4's was so large that it left much empty space.
+6. **The port's joint.** Where the quay meets the shore, a gap opens that a walker falls into. It is a defect to fix.
+7. **Size.** The walls stay where they are, with about 155 buildings inside them and in the works. This replaces §28.1 item 3's 100–120 (the owner's answer, 2026-11-10). GPU occlusion culling, which §28.1 item 17 allowed, becomes part of the work, since dense blocks hide the most from it.
+
+## 29.2 The agent's readings (authoring defaults)
+
+- **Squint Lane at 45° is dropped** while blocks are rectangular (item 3, "for now"). It can come back when blocks may take other shapes.
+- **Street sections.** Pavement, carriageway and pavement, in metres. Trees stand only on pavements of about 6 m (§28.1 item 4), never in the slums or the works.
+
+  | Class | Section | Trees | Where |
+  |---|---|---|---|
+  | main | 6 + 10 + 6 | both sides | Long Tongue and Salt Gullet; Lenten Street and Smoked Street, to the Penny |
+  | side | 6 + 7 + 4 | the 6 m side | Widows' Row |
+  | street | 3 + 6 + 3 | none | the streets between blocks |
+  | lane | 2.5 + 5 + 2.5 | none | lanes, the lanes inside the walls, the slums |
+  | quay | 3 + 9 + 3 | none | the road along Fishlip Quay; the quay's apron lies east of it |
+  | embankment | 3 + 7 + 6 | on the promenade | Powder Embankment |
+  | works | 2.5 + 9 + 2.5 | none | the works' roads |
+
+- **Lanes inside the walls.** A lane runs inside the west and north walls, so no block stands against a wall and every block has a pavement on all sides.
+- **How a block is built.** Each side of a block holds one row of houses, its fronts on the pavement's inner edge.
+  - **Corners.** At an outer corner one row owns the corner, chosen by its street's rank (main, then side, street and lane) and then by its length. The owning row's end house is a corner house with its second facade on the other street. The other row starts behind it, its end house open and flush against the corner house's back wall.
+  - **Flush joins.** The kit's terrace houses are open at their party walls. A flush join is allowed only where the wall behind is at least as high and as wide as the open end (heights in the kit: shops 19 m, tenements and warehouses 16 m, terraces and civic fronts 15 m, low tenements 12 m). So one family, or a lower one against a higher one, meets at a corner.
+  - **Inner corners.** At an inner corner (only round the Penny) both rows run to the corner, each ending in a faced end.
+  - **Passages.** A gap between houses is a passage of at least 4 m (R5). Its houses are faced on it, and it is the yard's way in. A yard has one passage (a dead end) or two on opposite sides (a way through). A side whose length the houses' 10 m and 15 m fronts cannot fill takes its yard's passage there.
+- **Families by wealth.**
+  - Rich shops round the Penny.
+  - Shops on the main streets.
+  - Terraces in the middling blocks.
+  - Tenements toward Salt End and Lower Veil.
+  - Low tenements in the slums: Lower Veil, the cemetery's Parsons' End, the works.
+  - Warehouses on the quay.
+  - The civic buildings (the Town Hall with its clock tower, the Assize, the Governor's House and a guild hall) face the main streets at the Penny's four corners.
+- **The Penny.**
+  - A square frame of houses, 52 m across, round:
+    - a ring carriageway of 8 m;
+    - a raised island of 13 m radius, with the statue on its plinth and a ring of stalls facing the road.
+  - Customers stand on the island's outer walk.
+  - The frame's corners belong to four L-shaped blocks, the only blocks with an inner corner. They are paved to the facades, with lamps, benches and the Notice Board where open space is left.
+- **Squares and parks are blocks too**, ringed by pavement:
+  - the Black Puddle;
+  - the cathedral's close with Bishop's Garden and Quiet Whistle Garden, and the faction's house in it;
+  - Last Turning Cemetery with the old chapel and its court;
+  - the Brothers' House round its garth.
+- **The works** are blocks of plain boxes on the works' roads. Deaf Boiler Yard, with POI C's cellar door and Ritual Site Candidate 2, is the inner yard of a works block with one way in.
+- **Yards' dressing.**
+  - Rich: grass, Veilmouth's garden trees, benches and birdbaths.
+  - Middling: cobbles, with a bench or a tree.
+  - Poor: bare earth with rubbish and drunkards. Only what the asset map holds is used; what it lacks, rubbish and the drunkards' poses, goes on the wanted list.
+  - Barrels, crates and boxes stay as §25.6 and the furnishing rules say: never as filler.
+- **Names.** C4's names stay on the streets that keep their place. A new street takes a new folk name in Russian and English (§28.1 item 16). Bawling Square is no longer a square; its name goes with the market to the Penny's stalls, *Bawling Row*.
+
+## 29.3 Steps
+
+As C4 was (§28.1 item 20), C5 is built step by step without stops, each step ending with a commit, a push and views:
+
+1. this section, with the Glossary, the open questions and the agents' rules;
+2. the plan from one source: blocks, streets, squares and the Penny, with the builder's layout, the plan and the player's map;
+3. the ground's surfaces with continuous carriageways, the pavements round every block, and the port's joint;
+4. the houses round the blocks, with their corners, passages and yards;
+5. the yards' dressing, the Penny's market, trees, lamps and the props in open spaces;
+6. the slice's places on C5: people, dogs, POIs, the mystic layer, reflections, and the tests;
+7. the GPU Resident Drawer and GPU occlusion culling, measured before and after;
+8. the cold load, the views and the documents.
