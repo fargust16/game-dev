@@ -511,6 +511,7 @@ namespace GameDev.Slice.EditorTools
                 ["harrow"] = ("harrow-apothecary.street", VeilmouthDressing.HarrowScenePath, "harrow-apothecary.inside"),
                 ["missing"] = ("missing-room.street", VeilmouthDressing.MissingRoomScenePath, "missing-room.inside"),
             };
+            var lifts = Lifts();
             foreach (var b in _layout.buildings)
             {
                 var key = KitKey(b.key);
@@ -521,7 +522,7 @@ namespace GameDev.Slice.EditorTools
                 }
 
                 _sinking = Sinks(key, b.stoop);
-                var house = House(key, FacingOf(b.facing), b.front, b.a, name: b.name, force: true);
+                var house = House(key, FacingOf(b.facing), b.front, b.a, lifts.TryGetValue(b, out var lift) ? lift : 0f, b.name, true);
                 _sinking = false;
                 if (house == null)
                 {
@@ -550,6 +551,44 @@ namespace GameDev.Slice.EditorTools
             {
                 Debug.LogError("[VeilmouthCity] no free place for the Notice Board on the Black Puddle.");
             }
+        }
+
+        /// <summary>
+        /// §32: the planner's buildings wall to wall on one front, a run, set on one level (<see cref="Level"/>) by their
+        /// floors as they would stand, sunk or not; so a sunk house beside one on its own stair is raised to it. Returns
+        /// each building's lift.
+        /// </summary>
+        private static Dictionary<VeilmouthLayout.BuildingSpec, float> Lifts()
+        {
+            var lifts = new Dictionary<VeilmouthLayout.BuildingSpec, float>();
+            float Floor(VeilmouthLayout.BuildingSpec b) =>
+                OwnFloor(KitKey(b.key), FacingOf(b.facing), b.front, b.a) - (Sinks(KitKey(b.key), b.stoop) ? Sink : 0f);
+
+            foreach (var line in _layout.buildings.Where(b => KitKey(b.key) != "Chapel").GroupBy(b => (b.facing, Mathf.RoundToInt(b.front * 10f))))
+            {
+                var run = new List<VeilmouthLayout.BuildingSpec>();
+                foreach (var b in line.OrderBy(b => b.a).Append(null))
+                {
+                    var last = run.Count > 0 ? run[run.Count - 1] : null;
+                    if (last != null && (b == null || Mathf.Abs(last.a + _kit[KitKey(last.key)].Width - b.a) > 0.01f))
+                    {
+                        var lift = Level(run.Select(Floor).ToList());
+                        for (var i = 0; i < run.Count; i++)
+                        {
+                            lifts[run[i]] = lift[i];
+                        }
+
+                        run.Clear();
+                    }
+
+                    if (b != null)
+                    {
+                        run.Add(b);
+                    }
+                }
+            }
+
+            return lifts;
         }
 
         /// <summary>The old chapel, its door's portal at the kit's door point, opening on its forecourt (§28.5).</summary>
@@ -606,7 +645,8 @@ namespace GameDev.Slice.EditorTools
                 Passage(FacingOf(p.facing), p.front, Mathf.RoundToInt(p.a0), Mathf.RoundToInt(p.a1), Mathf.RoundToInt(p.depth));
             }
 
-            Debug.Log($"[VeilmouthCity] C5 houses: {_houses.Count} footprints, {_sunk.Count} sunk on plain stoops (§28.1 item 5), {_passages} passages.");
+            Debug.Log($"[VeilmouthCity] C5 houses: {_houses.Count} footprints, {_sunk.Count} sunk on plain stoops (§28.1 item 5), {_passages} passages; " +
+                $"rows on one level (§32): the most a house is raised {_terraceLift:0.00} m, {_terraceCuts} runs cut.");
         }
 
         /// <summary>

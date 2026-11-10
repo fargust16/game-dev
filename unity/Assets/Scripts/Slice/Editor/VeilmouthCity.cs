@@ -209,6 +209,7 @@ namespace GameDev.Slice.EditorTools
             _layout = VeilmouthLayout.Load();
             _decks.Clear();
             _sunk.Clear();
+            (_terraceCuts, _terraceLift) = (0, 0f);
             _root = new GameObject(RootName).transform;
             _people = Group("People");
             _gardens = Group("Gardens");
@@ -577,22 +578,10 @@ namespace GameDev.Slice.EditorTools
 
             Take(quad, Use.Solid);
             _houses.Add(quad);
-            var (min, max) = GroundUnder(quad);
-            // A door is never below the pavement before it (R4: steps start from the pavement's top).
-            var outward = Outward(f);
-            var run = new Vector2(Mathf.Abs(outward.y), Mathf.Abs(outward.x));
-            var start = f == Facing.N || f == Facing.S ? new Vector2(a, front) : new Vector2(front, a);
-            foreach (var t in new[] { 0.1f, 0.5f, 0.9f })
-            {
-                var q = start + (run * (e.Width * t)) + (outward * 0.5f);
-                if (_pavements != null && _pavements.On(q.x, q.y))
-                {
-                    max = Mathf.Max(max, _pavements.Top(q.x, q.y));
-                }
-            }
+            var min = GroundUnder(quad).Min;
 
             // A house on a plain stoop is sunk, so only its top step shows (§28.1 item 5).
-            var floor = Mathf.Min(Up(max) + raise, ceiling) - (_sinking ? Sink : 0f);
+            var floor = Mathf.Min(OwnFloor(key, f, front, a) + raise, ceiling) - (_sinking ? Sink : 0f);
             var lo = new Vector2(quad.Min(p => p.x), quad.Min(p => p.y));
             var hi = new Vector2(quad.Max(p => p.x), quad.Max(p => p.y));
             var house = PutPlan(key, f, lo.x, lo.y, floor);
@@ -625,6 +614,29 @@ namespace GameDev.Slice.EditorTools
             }
 
             return house;
+        }
+
+        /// <summary>
+        /// A house's own floor on a footprint, before any raise or sink: the highest ground under it, or the pavement's
+        /// top before its front if higher (R4: steps start from the pavement's top), rounded up to 0.1 m.
+        /// </summary>
+        private static float OwnFloor(string key, Facing f, float front, float a)
+        {
+            var e = _kit[key];
+            var max = GroundUnder(Footprint(f, front, a, e.Width, e.Depth)).Max;
+            var outward = Outward(f);
+            var run = new Vector2(Mathf.Abs(outward.y), Mathf.Abs(outward.x));
+            var start = f == Facing.N || f == Facing.S ? new Vector2(a, front) : new Vector2(front, a);
+            foreach (var t in new[] { 0.1f, 0.5f, 0.9f })
+            {
+                var q = start + (run * (e.Width * t)) + (outward * 0.5f);
+                if (_pavements != null && _pavements.On(q.x, q.y))
+                {
+                    max = Mathf.Max(max, _pavements.Top(q.x, q.y));
+                }
+            }
+
+            return Up(max);
         }
 
         /// <summary>
@@ -907,21 +919,34 @@ namespace GameDev.Slice.EditorTools
                 Passage(f, front, s0, s0 + gap0, depth);
             }
 
-            var a = s0 + gap0;
+            var at = new int[keys.Count];
+            var next = s0 + gap0;
+            for (var i = 0; i < keys.Count; i++)
+            {
+                next += i == passageAt && left > 0 ? left : 0;
+                at[i] = next;
+                next += _kit[keys[i]].Width;
+            }
+
+            // §32: each run of houses wall to wall, the two sides of a middle passage apart, on one level.
+            var lift = new float[keys.Count];
+            foreach (var (from, to) in new[] { (0, passageAt), (passageAt, keys.Count) })
+            {
+                var part = Level(Enumerable.Range(from, to - from).Select(i => OwnFloor(keys[i], f, front, at[i])).ToList());
+                part.CopyTo(lift, from);
+            }
+
             for (var i = 0; i < keys.Count; i++)
             {
                 if (i == passageAt && left > 0)
                 {
-                    Passage(f, front, a, a + left, depth);
-                    a += left;
+                    Passage(f, front, at[i] - left, at[i], depth);
                 }
 
-                if (House(keys[i], f, front, a, raise) == null)
+                if (House(keys[i], f, front, at[i], raise + lift[i]) == null)
                 {
-                    Debug.LogWarning($"[VeilmouthCity] a terrace house did not fit at {a} on {f} {front}.");
+                    Debug.LogWarning($"[VeilmouthCity] a terrace house did not fit at {at[i]} on {f} {front}.");
                 }
-
-                a += _kit[keys[i]].Width;
             }
 
             if (gap1 > 0)
@@ -932,6 +957,45 @@ namespace GameDev.Slice.EditorTools
 
         /// <summary>The least gap between two houses of a row, m (R5): a real passage to the yard behind, never a slot.</summary>
         private const int PassageWidth = 4;
+
+        /// <summary>
+        /// Authoring default, m (§32): the most a run's own floors may spread and stand on one level, eight steps of 0.15 m.
+        /// </summary>
+        private const float TerraceRise = 1.2f;
+
+        private static int _terraceCuts;
+        private static float _terraceLift;
+
+        /// <summary>
+        /// §32: one run of houses wall to wall, by their floors in order along it, set on one level, its highest floor, so the
+        /// bands of their fronts meet flush at every party wall. A run whose floors spread more than <see cref="TerraceRise"/>
+        /// is cut at party walls into the fewest such levels, from its start. Returns each house's lift.
+        /// </summary>
+        private static float[] Level(IReadOnlyList<float> floors)
+        {
+            var lift = new float[floors.Count];
+            var i = 0;
+            while (i < floors.Count)
+            {
+                var (lo, hi, j) = (floors[i], floors[i], i + 1);
+                while (j < floors.Count && Mathf.Max(hi, floors[j]) - Mathf.Min(lo, floors[j]) <= TerraceRise + 0.001f)
+                {
+                    (lo, hi) = (Mathf.Min(lo, floors[j]), Mathf.Max(hi, floors[j]));
+                    j++;
+                }
+
+                _terraceCuts += j < floors.Count ? 1 : 0;
+                for (var k = i; k < j; k++)
+                {
+                    lift[k] = hi - floors[k];
+                    _terraceLift = Mathf.Max(_terraceLift, lift[k]);
+                }
+
+                i = j;
+            }
+
+            return lift;
+        }
 
         private static void Passage(Facing f, float front, int a0, int a1, int depth)
         {

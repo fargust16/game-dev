@@ -35,6 +35,7 @@ namespace GameDev.Slice.EditorTools
             Lamps(blocks);
             Wards();
             Railings(blocks);
+            PartyWalls();
             Holes();
             Water();
             Directory.CreateDirectory(Path.GetDirectoryName(Report));
@@ -58,6 +59,17 @@ namespace GameDev.Slice.EditorTools
             SlicePeopleModels.ScenesOnly();
             VeilmouthFarLod.SyncScene();
             Run();
+        }
+
+        /// <summary>
+        /// Batch: this audit on the city as it stands, kept as walk_audit_before.txt, then <see cref="RebuildAndRun"/>.
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthWalkAudit.BeforeAndRebuild
+        /// </summary>
+        public static void BeforeAndRebuild()
+        {
+            Run();
+            File.Copy(Report, "Logs/SliceSurvey/walk_audit_before.txt", true);
+            RebuildAndRun();
         }
 
         /// <summary>
@@ -348,6 +360,93 @@ namespace GameDev.Slice.EditorTools
         // ------------------------------------------------------------------------------------------- holes
 
         private static int _floating;
+
+        /// <summary>
+        /// §32: every pair of houses wall to wall, by the difference of their floors. A row stands on one level, so the bands
+        /// of its fronts meet flush.
+        /// </summary>
+        private static void PartyWalls()
+        {
+            var city = GameObject.Find(VeilmouthCity.RootName);
+            var walls = new List<(Transform House, Bounds Box)>();
+            foreach (var h in city.GetComponentsInChildren<Transform>(true).Where(t => t.Find("Model") != null && t.GetComponent<KitBlock>() != null))
+            {
+                var rs = h.Find("Model").GetComponentsInChildren<Renderer>().Where(r => r.name.StartsWith("SM_Vic_Wall") || r.transform.parent.name.StartsWith("SM_Vic_Wall")).ToList();
+                if (rs.Count > 0)
+                {
+                    walls.Add((h, rs.Select(r => r.bounds).Aggregate((p, q) => { p.Encapsulate(q); return p; })));
+                }
+            }
+
+            var (pairs, stepped, worst) = (0, 0, 0f);
+            for (var i = 0; i < walls.Count; i++)
+            {
+                for (var j = i + 1; j < walls.Count; j++)
+                {
+                    var (a, b) = (walls[i], walls[j]);
+                    if (Quaternion.Angle(a.House.rotation, b.House.rotation) > 1f)
+                    {
+                        continue;
+                    }
+
+                    // The two walls' plan boxes, 0.2 m wider, meet in a strip across the row: a party wall, not a back.
+                    var ix = Mathf.Min(a.Box.max.x, b.Box.max.x) - Mathf.Max(a.Box.min.x, b.Box.min.x) + 0.4f;
+                    var iz = Mathf.Min(a.Box.max.z, b.Box.max.z) - Mathf.Max(a.Box.min.z, b.Box.min.z) + 0.4f;
+                    var alongX = Mathf.Abs(a.House.right.x) > Mathf.Abs(a.House.right.z);
+                    var (across, along) = alongX ? (ix, iz) : (iz, ix);
+                    if (across <= 0f || across > 1.2f || along < 2f)
+                    {
+                        continue;
+                    }
+
+                    pairs++;
+                    var dy = Mathf.Abs(a.House.position.y - b.House.position.y);
+                    if (dy <= 0.01f)
+                    {
+                        continue;
+                    }
+
+                    stepped++;
+                    worst = Mathf.Max(worst, dy);
+                    var at = (a.House.position + b.House.position) / 2f;
+                    if (stepped <= 12)
+                    {
+                        string Name(Transform h) => PrefabUtility.GetCorrespondingObjectFromSource(h.gameObject)?.name ?? h.name;
+                        Out.AppendLine($"  {Name(a.House)} and {Name(b.House)}: {dy:0.00} m apart at plan ({at.x + 500f:0.0}, {500f - at.z:0.0})");
+                    }
+
+                    if (stepped <= 3)
+                    {
+                        var joint = alongX ? new Vector3(Mathf.Max(a.Box.min.x, b.Box.min.x), at.y, at.z) : new Vector3(at.x, at.y, Mathf.Max(a.Box.min.z, b.Box.min.z));
+                        var door = a.House.Cast<Transform>().FirstOrDefault(t => t.name == VictorianHouses.DoorMarker);
+                        var outward = door != null ? door.forward : a.House.forward;
+                        Spots.Add(($"party_{stepped}", joint + (outward * 5f) + (Vector3.up * 1.6f), joint + (Vector3.up * 1f)));
+                    }
+                }
+            }
+
+            Out.AppendLine($"== Party walls: {pairs} pairs of houses wall to wall; on different levels: {stepped}, the most {worst:0.00} m apart");
+
+            // The street doors highest over the ground 1.5 m before them: a row's low end on its level base, seen from the street.
+            var rises = new List<(Transform Door, float Rise)>();
+            foreach (var door in city.GetComponentsInChildren<Transform>(true).Where(t => t.name == VictorianHouses.DoorMarker))
+            {
+                var probe = door.position + (door.forward * 1.5f) + (Vector3.up * 3f);
+                if (Physics.Raycast(probe, Vector3.down, out var hit, 8f))
+                {
+                    rises.Add((door, door.position.y - hit.point.y));
+                }
+            }
+
+            rises.Sort((p, q) => q.Rise.CompareTo(p.Rise));
+            Out.AppendLine($"== Street doors: {rises.Count}; over 0.5 m above the ground before them: {rises.Count(r => r.Rise > 0.5f)}, the most {(rises.Count > 0 ? rises[0].Rise : 0f):0.00} m");
+            for (var i = 0; i < Mathf.Min(3, rises.Count); i++)
+            {
+                var (door, rise) = rises[i];
+                Out.AppendLine($"  {rise:0.00} m at plan ({door.position.x + 500f:0.0}, {500f - door.position.z:0.0})");
+                Spots.Add(($"raised_{i + 1}", door.position + (door.forward * 7f) + (door.right * 4f) + (Vector3.up * (1.7f - rise)), door.position + (Vector3.up * 0.2f)));
+            }
+        }
 
         private static void Holes()
         {
