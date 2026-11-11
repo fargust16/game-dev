@@ -94,6 +94,8 @@ namespace GameDev.Slice.EditorTools
             public Vector3? Seat;     // a linear leaf seated as the pack's demo seats it: its middle this far along from the block's middle, its foot this high, its own pivot plane this far across the line (StairLab.MeasureDoorways)
             public bool Books;        // a bookcase: rows of the pack's books stand on each of its shelves
             public string[] Goods;    // shelves of goods: the pack's files stand in rows on each shelf, as books do
+            public GameDev.Confront.Grid.EnvironmentActionKind? Action; // the 10.1 tag the block carries (kit standard §5, S3a.7)
+            public GameDev.Confront.Grid.EnvironmentActionBand Band;
         }
 
         public sealed class Entry
@@ -235,6 +237,7 @@ namespace GameDev.Slice.EditorTools
             yield return Game(S("Firewood", "Props", "Firewood", PropsLite, "Firewood_01", pr));
             var fence = S("Fence", "Fence", "Field", PropsLite, "Fence_01", pr, anchor: Anchor.Linear);
             fence.SizeX = 2f;
+            fence.Action = GameDev.Confront.Grid.EnvironmentActionKind.VaultJump; // a low wall, Easy (10.1; S3a.7)
             yield return fence;
 
             // Interiors: Multistory Dungeons 2 furniture and alchemy, Low Poly Dungeons Lite walls and floors.
@@ -344,12 +347,14 @@ namespace GameDev.Slice.EditorTools
             railing.SizeX = 2f;
             railing.SizeY = 1.04f; // its collider then stands 1.2 m: low cover is 0.8–1.2 m (kit standard §3); at 1.36 m it read as high cover (grid check, 2026-11-06)
             railing.Uniform = false; // 2 m long whatever its height: a uniform scale left it short of its 2 m and the line full of holes (owner's fourth play test, 2026-11-06)
+            railing.Action = GameDev.Confront.Grid.EnvironmentActionKind.VaultJump; // vaulted in a fight, Easy (10.1; S3a.7)
             yield return railing;
             // The same railing 1 m long, for the odd metre of a line (owner's play test, 2026-11-06: gaps in railings).
             var railingShort = S("RailingShort", "Street", "Railing", "Assets/Modular Victorian City/Prefabs/Modules", "Fence", pr, anchor: Anchor.Linear);
             railingShort.SizeX = 1f;
             railingShort.SizeY = railing.SizeY;
             railingShort.Uniform = false;
+            railingShort.Action = railing.Action;
             yield return railingShort;
             var column = S("Column", "Street", "Column", VictorianStreet, "Column", st);
             column.SizeY = 8f;
@@ -810,6 +815,11 @@ namespace GameDev.Slice.EditorTools
             var name = $"Kit_{spec.Family}_{spec.Part}_{width}x{height}";
             root.name = name;
             root.AddComponent<KitBlock>();
+            if (spec.Action is GameDev.Confront.Grid.EnvironmentActionKind action)
+            {
+                root.AddComponent<KitEnvironmentAction>().Set(action, spec.Band);
+            }
+
             // A set's body covers its base only: its things are bodies of their own (kit standard §4).
             var baseModel = spec.On != null ? model.transform.Find("Base").gameObject : model;
             var loose = LooseMass.TryGetValue(spec.Key, out var mass);

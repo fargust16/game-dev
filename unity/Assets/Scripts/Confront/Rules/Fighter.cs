@@ -63,6 +63,15 @@ namespace GameDev.Confront.Rules
         /// <summary>The turns it will lose, as a stun takes them.</summary>
         public int LostTurns { get; set; }
 
+        /// <summary>10.2 Bleeding: it loses HP on each world tick until it ends by itself or a bandage ends it (S3a.7).</summary>
+        public bool Bleeding { get; set; }
+
+        /// <summary>10.2 Poison: no HP returns while it lasts, until it ends by itself or an antidote ends it.</summary>
+        public bool Poisoned { get; set; }
+
+        /// <summary>10.2: a broken leg is Immobilisation until a splint is set, so it takes no step and no Environment Action.</summary>
+        public bool LegBroken { get; set; }
+
         /// <summary>False for a target that cannot evade, with an Evasion of zero (10.2 §5b Attack); it cannot guard either.</summary>
         public bool CanEvade { get; set; } = true;
 

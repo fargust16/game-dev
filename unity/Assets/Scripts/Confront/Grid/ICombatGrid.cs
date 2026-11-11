@@ -86,6 +86,13 @@ namespace GameDev.Confront.Grid
         /// <summary>The 10.1 tag of the block that closes the way from one cell toward another.</summary>
         bool TryGetEnvironmentAction(CombatCell from, CombatCell to, out IEnvironmentAction action);
 
+        /// <summary>
+        /// Where an Environment Action lands (S3a.7): in the column <paramref name="dx"/>, <paramref name="dz"/> from a cell,
+        /// the walkable surface whose rise above the cell lies within <paramref name="lowest"/> and
+        /// <paramref name="highest"/> m, the one nearest the cell's own height.
+        /// </summary>
+        bool TryLand(CombatCell from, int dx, int dz, float lowest, float highest, out CombatCell landing);
+
         Vector3 Center(CombatCell cell);
 
         /// <summary>The walkable cell under a position, at the surface within 2 m of its height (S3a.4).</summary>

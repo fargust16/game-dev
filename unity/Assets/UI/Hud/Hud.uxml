@@ -5,6 +5,8 @@
         <ui:Label name="time" class="hud__time" text="" picking-mode="Ignore" />
         <ui:Label name="prompt" class="hud__prompt" text="" picking-mode="Ignore" />
         <ui:Label name="nametag" class="hud__nametag" text="" picking-mode="Ignore" />
+        <!-- S3a.7: the character's HP and conditions while it is hurt, and the last treatment. -->
+        <ui:Label name="life" class="hud__life" text="" picking-mode="Ignore" />
         <ui:VisualElement name="reading" class="hud__reading" picking-mode="Ignore">
             <ui:Label name="reading-title" class="hud__reading-title" text="" picking-mode="Ignore" />
             <ui:Label name="reading-text" class="hud__reading-text" text="" picking-mode="Ignore" />

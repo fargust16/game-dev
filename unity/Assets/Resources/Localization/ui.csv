@@ -34,7 +34,7 @@ ui.fight.someone,Someone,Кто-то
 ui.fight.turn.yours,Your turn,Ваш ход
 ui.fight.turn.other,Turn: {0},Ходит: {0}
 ui.fight.hp,HP {0} / {1},Здоровье {0} / {1}
-ui.fight.hint,Space  End turn     R  Wait     G  Defensive Stance     X  Change weapons     Q / E  Turn the camera     Wheel  Zoom,Пробел  Конец хода     R  Ждать     G  Защитная стойка     X  Сменить оружие     Q / E  Поворот камеры     Колесо  Масштаб
+ui.fight.hint,Space  End turn     R  Wait     G  Defensive Stance     X  Change weapons     B  First Aid     Q / E  Turn the camera     Wheel  Zoom,Пробел  Конец хода     R  Ждать     G  Защитная стойка     X  Сменить оружие     B  Первая помощь     Q / E  Поворот камеры     Колесо  Масштаб
 ui.fight.move,{0} AP,{0} ОД
 ui.fight.far,Too far: {0} AP,Слишком далеко: {0} ОД
 ui.fight.noway,No way there,Туда не пройти
@@ -61,3 +61,32 @@ ui.fight.provokes,Draws a Reaction Attack,Вызовет удар вдогонк
 ui.fight.stance,In a stance,В стойке
 ui.fight.waiting,Waiting,Ждёт
 ui.fight.log.guarded,"{0} → {1}: {2} damage, guarded","{0} → {1}: урон {2}, отражено"
+ui.fight.env.VaultJump,Vault: {0} AP,Перелезть: {0} ОД
+ui.fight.env.ClimbUp,Climb up: {0} AP,Забраться: {0} ОД
+ui.fight.env.ClimbThroughWindow,Through the window: {0} AP,Пролезть в окно: {0} ОД
+ui.fight.env.MantleOnto,Climb onto it: {0} AP,Взобраться: {0} ОД
+ui.fight.env.KickBreach,Break through: {0} AP,Выбить: {0} ОД
+ui.fight.env.chance,Chance {0} %,Шанс {0} %
+ui.fight.env.fall,A failure falls {0} m,Неудача — падение с {0} м
+ui.fight.env.name.VaultJump,vault,перелезть
+ui.fight.env.name.ClimbUp,climb up,забраться
+ui.fight.env.name.ClimbThroughWindow,climb through the window,пролезть в окно
+ui.fight.env.name.MantleOnto,climb onto it,взобраться
+ui.fight.env.name.KickBreach,break through,выбить
+ui.fight.log.env.done,"{0}: {1}, done",{0}: {1} — удалось
+ui.fight.log.env.failed,"{0}: {1}, failed",{0}: {1} — не удалось
+ui.fight.log.fell,{0} falls: {1} damage,"{0}: падение, урон {1}"
+ui.fight.log.treat.ok,"{0}: {1}, done",{0}: {1} — удалось
+ui.fight.log.treat.failed,"{0}: {1}, failed",{0}: {1} — не удалось
+ui.fight.log.bleeds,{0} bleeds: {1} damage,"{0}: кровотечение, урон {1}"
+ui.treatment.Bandage,bandage,перевязка
+ui.treatment.Antidote,antidote,противоядие
+ui.treatment.Splint,splint,шина
+ui.condition.bleeding,Bleeding,Кровотечение
+ui.condition.poisoned,Poisoned,Отравление
+ui.condition.leg,Broken leg,Сломана нога
+ui.life.hint,B  First Aid,B  Первая помощь
+ui.life.nothing,Nothing to treat,Лечить нечего
+ui.life.nosupply,Nothing to treat it with,Нечем лечить
+ui.life.treat.ok,"{0}: done",{0} — удалось
+ui.life.treat.failed,"{0}: failed",{0} — не удалось

@@ -33,6 +33,22 @@
     display: flex;
 }
 
+.hud__life {
+    position: absolute;
+    left: 24px;
+    bottom: 24px;
+    max-width: 28%;
+    font-size: 17px;
+    white-space: normal;
+    color: rgb(226, 206, 170);
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.85);
+    display: none;
+}
+
+.hud__life--visible {
+    display: flex;
+}
+
 /* The plain panel of S1.3: what a board says. People talk in the dialogue column of S2.4. */
 .hud__reading {
     position: absolute;

@@ -28,7 +28,7 @@ namespace GameDev.Slice.Fights
         private const string PipCost = "hud__fight-pip--cost";
 
         // Authoring defaults, S3a.5: the share of maximum HP from which each condition word holds, the highest first.
-        private static readonly (double Share, string Key)[] Conditions =
+        private static readonly (double Share, string Key)[] Wounds =
         {
             (1d, "ui.fight.condition.unhurt"),
             (0.75d, "ui.fight.condition.scratched"),
@@ -48,6 +48,7 @@ namespace GameDev.Slice.Fights
         private Label _log;
         private Label _hp;
         private Label _tip;
+        private Label _life;
         private bool _dirty = true;
 
         /// <param name="name">A combatant's name in the language shown.</param>
@@ -87,6 +88,30 @@ namespace GameDev.Slice.Fights
 
         /// <summary>The order and the bar are written again on the next <see cref="Refresh"/>.</summary>
         public void MarkDirty() => _dirty = true;
+
+        /// <summary>What the life line by the bottom left says, or null while it is hidden.</summary>
+        public string LifeText => Bind() && _life != null && _life.ClassListContains("hud__life--visible") ? _life.text : null;
+
+        /// <summary>S3a.7: the character's HP and conditions, in and out of fights; empty hides the line.</summary>
+        public void Life(string text)
+        {
+            if (!Bind() || _life == null)
+            {
+                return;
+            }
+
+            _life.text = text ?? string.Empty;
+            _life.EnableInClassList("hud__life--visible", !string.IsNullOrEmpty(text));
+        }
+
+        /// <summary>A line of the fight's own, said in the log's place: an Environment Action, a treatment, a condition's tick (S3a.7).</summary>
+        public void Line(string text)
+        {
+            if (Bind())
+            {
+                _log.text = text;
+            }
+        }
 
         /// <summary>The last blow, said as the log's line.</summary>
         public void Log(Combatant attacker, Combatant target, StrikeResult result)
@@ -166,6 +191,12 @@ namespace GameDev.Slice.Fights
                     state += " · " + Loc.Get("ui.fight.waiting");
                 }
 
+                var conditions = Conditions(c.Fighter);
+                if (conditions.Length > 0)
+                {
+                    state += " · " + conditions;
+                }
+
                 chip.Add(Text(state, "hud__fight-chip-state"));
                 _order.Add(chip);
             }
@@ -226,6 +257,26 @@ namespace GameDev.Slice.Fights
                     }
                 }
             }
+            else if (cursor.HasOption)
+            {
+                // S3a.7: an Environment Action across the edge; its chance shows as a blow's does (10.4 §3).
+                var option = cursor.Option;
+                _text.Append(Loc.Format("ui.fight.env." + option.Kind, cursor.Cost));
+                if (!cursor.Affordable)
+                {
+                    _text.Append('\n').Append(Loc.Format("ui.fight.far", cursor.Cost));
+                }
+
+                if (_disclosure != null && player.Fighter.Get(CharacterAttribute.Intelligence) >= _disclosure.ChanceFromIntelligence)
+                {
+                    _text.Append('\n').Append(Loc.Format("ui.fight.env.chance", Percent(option.Chance)));
+                }
+
+                if (option.Kind == Confront.Grid.EnvironmentActionKind.ClimbUp || option.Kind == Confront.Grid.EnvironmentActionKind.MantleOnto)
+                {
+                    _text.Append('\n').Append(Loc.Format("ui.fight.env.fall", option.Rise.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)));
+                }
+            }
             else
             {
                 _text.Append(cursor.Steps < 0 ? Loc.Get("ui.fight.noway") : Loc.Format(cursor.Affordable ? "ui.fight.move" : "ui.fight.far", cursor.Cost));
@@ -253,7 +304,7 @@ namespace GameDev.Slice.Fights
             }
 
             var share = fighter.MaxHp > 0d ? fighter.Hp / fighter.MaxHp : 0d;
-            foreach (var (from, key) in Conditions)
+            foreach (var (from, key) in Wounds)
             {
                 if (share >= from - 1e-9)
                 {
@@ -261,11 +312,33 @@ namespace GameDev.Slice.Fights
                 }
             }
 
-            return Loc.Get(Conditions[Conditions.Length - 1].Key);
+            return Loc.Get(Wounds[Wounds.Length - 1].Key);
+        }
+
+        /// <summary>The fighter's conditions as words, joined by a dot; empty when it has none (S3a.7).</summary>
+        public static string Conditions(Fighter fighter)
+        {
+            var words = string.Empty;
+            if (fighter.Bleeding)
+            {
+                words = Loc.Get("ui.condition.bleeding");
+            }
+
+            if (fighter.Poisoned)
+            {
+                words += (words.Length > 0 ? " · " : string.Empty) + Loc.Get("ui.condition.poisoned");
+            }
+
+            if (fighter.LegBroken)
+            {
+                words += (words.Length > 0 ? " · " : string.Empty) + Loc.Get("ui.condition.leg");
+            }
+
+            return words;
         }
 
         /// <summary>HP as the player reads it: whole, and never 0 while standing.</summary>
-        private static int Hp(double hp) => hp <= 0d ? 0 : Math.Max(1, (int)Math.Ceiling(hp - 1e-9));
+        public static int Hp(double hp) => hp <= 0d ? 0 : Math.Max(1, (int)Math.Ceiling(hp - 1e-9));
 
         private static int Percent(double share) => (int)Math.Round(share * 100d);
 
@@ -309,6 +382,7 @@ namespace GameDev.Slice.Fights
             _log = root.Q<Label>("fight-log");
             _hp = root.Q<Label>("fight-hp");
             _tip = root.Q<Label>("fight-tip");
+            _life = root.Q<Label>("life");
             _dirty = true;
             if (_order == null || _ap == null || _who == null || _log == null || _hp == null || _tip == null)
             {

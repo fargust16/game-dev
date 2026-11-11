@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2540083570885469620}
   - component: {fileID: 3655621971163439312}
   - component: {fileID: 2497778180177016673}
+  - component: {fileID: 5753547847236159621}
   m_Layer: 10
   m_Name: Kit_Fence_Field_2x1
   m_TagString: Untagged
@@ -67,6 +68,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.8288548, y: 1.2192366, z: 0.17114519}
   m_Center: {x: 1, y: 0.6096183, z: 0}
+--- !u!114 &5753547847236159621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4632394371378112647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f827199f748b8984086c59d832f7f774, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.Kit.KitEnvironmentAction
+  action: 0
+  band: 0
 --- !u!1001 &5861344744350969040
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -65,5 +65,11 @@ namespace GameDev.Confront.Turns
 
         /// <summary>The AP it kept when it waited, which reactions spend before its turn comes back.</summary>
         internal int HeldAp { get; set; }
+
+        /// <summary>It has taken the First Aid lesson, which an antidote and a splint need (10.2, S3a.7).</summary>
+        public bool KnowsFirstAid { get; set; }
+
+        /// <summary>The bandages, antidotes and splints it carries, by <see cref="Rules.Treatment"/>; a treatment that works uses one.</summary>
+        public int[] Supplies { get; } = new int[3];
     }
 }

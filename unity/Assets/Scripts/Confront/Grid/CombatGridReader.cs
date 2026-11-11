@@ -488,6 +488,46 @@ namespace GameDev.Confront.Grid
             return false;
         }
 
+        public bool TryLand(CombatCell from, int dx, int dz, float lowest, float highest, out CombatCell landing)
+        {
+            landing = default;
+            var x = from.X + dx;
+            var z = from.Z + dz;
+            if (!IsWalkable(from) || !InBounds(x, z))
+            {
+                return false;
+            }
+
+            var y = Center(from).y;
+            var column = Column(x, z);
+            var best = -1;
+            for (var l = 0; l < column.Length; l++)
+            {
+                var rise = column[l].Y - y;
+                if (column[l].Standable && rise >= lowest && rise <= highest
+                    && (best < 0 || Mathf.Abs(rise) < Mathf.Abs(column[best].Y - y)))
+                {
+                    best = l;
+                }
+            }
+
+            landing = new CombatCell(x, z, Mathf.Max(0, best));
+            return best >= 0;
+        }
+
+        /// <summary>
+        /// Reads the window again from the place, after a block in it is gone (S3a.7: a door or crate breached). It costs
+        /// what forming the grid costs, so it is for a change of the place, never for a step.
+        /// </summary>
+        public void Reread()
+        {
+            Array.Clear(_slotRead, 0, _slotRead.Length);
+            if (_built)
+            {
+                Build(_window.X, _window.Z, _window.Level);
+            }
+        }
+
         public int OccupantAt(CombatCell cell)
         {
             for (var i = 0; i < _occupantCount; i++)

@@ -10,6 +10,7 @@ using GameDev.Player.Progression;
 using GameDev.Slice.Kit;
 using GameDev.UI;
 using GameDev.World.Seed;
+using GameDev.World.State;
 using GameDev.World.Timekeeping;
 using UnityEngine;
 
@@ -23,7 +24,7 @@ namespace GameDev.Slice.Fights
     /// bodies show them beat by beat (<see cref="FightBeats"/>), the next turn waiting for the last beat. F7 starts a
     /// development fight.
     /// </summary>
-    public sealed class SliceConfront : MonoBehaviour
+    public sealed partial class SliceConfront : MonoBehaviour
     {
         public const int PlayerSide = 0;
         public const int HostileSide = 1;
@@ -121,11 +122,18 @@ namespace GameDev.Slice.Fights
         /// <summary>The player's combatant in the fight under way, or null.</summary>
         public Combatant PlayerCombatant => _playerCombatant;
 
-        public void Configure(SliceSettings settings, IWorldSeed seed, IWorldClock clock, CharacterSheet character)
+        /// <param name="state">The world state that keeps the character's HP, conditions and supplies between fights (S3a.7); none in a test that needs no life.</param>
+        public void Configure(SliceSettings settings, IWorldSeed seed, IWorldClock clock, CharacterSheet character, IWorldState state = null)
         {
             _settings = settings;
             _seed = seed;
             _character = character;
+            _state = state;
+            _clock = clock;
+            if (clock != null)
+            {
+                clock.TickBoundary += OnTick;
+            }
             _grid = new CombatGridReader(1f);
             _turns = new TurnEconomy(settings.FightRules, _grid);
             _lock = new EncounterLock(_turns, _grid, clock);
@@ -136,6 +144,9 @@ namespace GameDev.Slice.Fights
             _turns.Walked += OnWalked;
             _turns.TurnAdvanced += OnTurnAdvanced;
             _turns.GuardChanged += OnGuardChanged;
+            _turns.Traversed += OnTraversed;
+            _turns.Treated += OnTreated;
+            _turns.Conditioned += OnConditioned;
             _view = CombatGridView.Create(transform, settings.GridMaterial);
             _beats = new FightBeats(Animated, Place);
             _beats.Landed += OnLanded;
@@ -174,9 +185,8 @@ namespace GameDev.Slice.Fights
             _bodies.Clear();
             _names.Clear();
             var rules = _settings.FightRules;
-            var player = new Combatant(PlayerId, PlayerSide,
-                rules.Fighter(_character, null, new WeaponSet(_settings.KitSword), _settings.KitArmour, new WeaponSet(_settings.KitRifle, _settings.KitPouch)), at,
-                takesIntents: !AutoPlayer);
+            var player = new Combatant(PlayerId, PlayerSide, PlayerFighter(), at, takesIntents: !AutoPlayer);
+            Equip(player);
             var combatants = new List<Combatant> { player };
             _bodies[player] = _player.transform;
             _names[player] = "ui.fight.you";
@@ -219,7 +229,12 @@ namespace GameDev.Slice.Fights
                 {
                     StartDevelopmentFight();
                 }
+                else if (input != null && input.FirstAidPressed)
+                {
+                    TreatOutside();
+                }
 
+                ShowLife(null);
                 return;
             }
 
@@ -251,6 +266,7 @@ namespace GameDev.Slice.Fights
 
             Watch();
             _hud.Refresh(_turns, _playerCombatant, _cursor, _turnAp, input != null ? input.MousePosition : Vector2.zero, !_beats.Busy);
+            ShowLife(_playerCombatant?.Fighter);
         }
 
         /// <summary>The player's turn by the cursor: a click walks or strikes, Space ends the turn, and so do AP spent.</summary>
@@ -264,9 +280,11 @@ namespace GameDev.Slice.Fights
             }
 
             // S3a.6: R waits to the end of the round, G ends the turn in a Defensive Stance, X changes the Weapon Set.
+            // S3a.7: B treats the player's own most urgent condition.
             if ((input.WaitTurnPressed && _turns.SubmitIntent(TurnIntent.Wait))
                 || (input.StancePressed && _turns.SubmitIntent(TurnIntent.Stance))
-                || (input.ChangeSetPressed && _turns.SubmitIntent(TurnIntent.ChangeSet)))
+                || (input.ChangeSetPressed && _turns.SubmitIntent(TurnIntent.ChangeSet))
+                || (input.FirstAidPressed && TreatInFight(player)))
             {
                 _cursor.Clear();
                 _hud.MarkDirty();
@@ -420,6 +438,11 @@ namespace GameDev.Slice.Fights
         private void OnEnded(int side)
         {
             Debug.Log($"[Confront] fight {_fights} ends after {_turns.Round} rounds; side {side} stands.");
+            if (_playerCombatant != null)
+            {
+                Unequip(_playerCombatant);
+            }
+
             _ending = true;
             _cursor.Release();
         }
@@ -652,6 +675,11 @@ namespace GameDev.Slice.Fights
             if (_outline != null)
             {
                 Destroy(_outline);
+            }
+
+            if (_clock != null)
+            {
+                _clock.TickBoundary -= OnTick;
             }
         }
 

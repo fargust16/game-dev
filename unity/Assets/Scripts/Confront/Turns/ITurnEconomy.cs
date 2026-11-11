@@ -14,6 +14,25 @@ namespace GameDev.Confront.Turns
         Wait,
         Stance,
         ChangeSet,
+        Traverse,
+        Treat,
+    }
+
+    /// <summary>An Environment Action open across the edge to a cell beside (10.1, S3a.7): what it is, where it lands, and its AP and chance.</summary>
+    public struct TraverseOption
+    {
+        public EnvironmentActionKind Kind;
+        public EnvironmentActionBand Band;
+        public IEnvironmentAction Tag;
+
+        /// <summary>The cell it lands in; a breach lands nowhere and keeps its own cell.</summary>
+        public CombatCell Landing;
+
+        /// <summary>Metres from the cell left up to the landing; a failed climb or mantle falls this far.</summary>
+        public float Rise;
+
+        public int Ap;
+        public double Chance;
     }
 
     /// <summary>
@@ -22,19 +41,28 @@ namespace GameDev.Confront.Turns
     /// </summary>
     public readonly struct TurnIntent
     {
-        private TurnIntent(IntentKind kind, CombatCell cell, int target)
+        private TurnIntent(IntentKind kind, CombatCell cell, int target, Treatment treatment = default)
         {
             Kind = kind;
             Cell = cell;
             Target = target;
+            Treatment = treatment;
         }
 
         public IntentKind Kind { get; }
 
         public CombatCell Cell { get; }
 
-        /// <summary>The struck combatant's id.</summary>
+        /// <summary>The struck or treated combatant's id.</summary>
         public int Target { get; }
+
+        public Treatment Treatment { get; }
+
+        /// <summary>The Environment Action across the edge to a cell beside (10.1, S3a.7).</summary>
+        public static TurnIntent Traverse(CombatCell cell) => new TurnIntent(IntentKind.Traverse, cell, -1);
+
+        /// <summary>A First Aid treatment of itself or of an ally in the next cell (10.2, S3a.7).</summary>
+        public static TurnIntent Treat(Treatment treatment, int patient) => new TurnIntent(IntentKind.Treat, default, patient, treatment);
 
         public static TurnIntent MoveTo(CombatCell cell) => new TurnIntent(IntentKind.Move, cell, -1);
 
@@ -97,6 +125,9 @@ namespace GameDev.Confront.Turns
         /// <summary>Whether the attacker's weapon reaches the target from a cell: across a side for a blow, in range and in sight for a shot.</summary>
         bool ReachesFrom(Combatant attacker, CombatCell from, Combatant target);
 
+        /// <summary>The Environment Action open to the combatant across the edge to the cell beside it, if a tagged block closes that edge (10.1, S3a.7).</summary>
+        bool TraverseFrom(Combatant combatant, CombatCell to, out TraverseOption option);
+
         /// <summary>A combatant who entered the grid; it comes in at the next round.</summary>
         void Join(Combatant combatant);
 
@@ -122,5 +153,17 @@ namespace GameDev.Confront.Turns
 
         /// <summary>Raised when a combatant changes its Weapon Set, or takes or leaves a Defensive Stance, so the scene shows its guard.</summary>
         event Action<Combatant> GuardChanged;
+
+        /// <summary>
+        /// Raised after an Environment Action (S3a.7): who, what, whether it worked, and the HP a fall took. A walk to the
+        /// landing is told by <see cref="Walked"/> first; a breach that worked leaves the scene to clear the block.
+        /// </summary>
+        event Action<Combatant, TraverseOption, bool, double> Traversed;
+
+        /// <summary>Raised after a treatment: who treated, whom, with what, and whether it worked (10.2, S3a.7).</summary>
+        event Action<Combatant, Combatant, Treatment, bool> Treated;
+
+        /// <summary>Raised at a round's end for each combatant whose conditions did something on that world tick (S3a.7).</summary>
+        event Action<Combatant, ConditionTick> Conditioned;
     }
 }

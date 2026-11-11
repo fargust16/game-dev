@@ -36,6 +36,7 @@ namespace GameDev.Input
         private InputAction _waitTurn;
         private InputAction _stance;
         private InputAction _changeSet;
+        private InputAction _firstAid;
 
         private InputAction _pause;
         private InputAction _advanceHour;
@@ -156,6 +157,9 @@ namespace GameDev.Input
 
         public bool ChangeSetPressed => _changeSet != null && _changeSet.WasPressedThisFrame();
 
+        /// <summary>S3a.7 authoring default, B: First Aid on oneself, the most urgent condition first, in a fight and out of one.</summary>
+        public bool FirstAidPressed => _firstAid != null && _firstAid.WasPressedThisFrame();
+
         public Vector2 MousePosition => Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
         public Vector2 MouseDelta => Mouse.current != null ? Mouse.current.delta.ReadValue() : Vector2.zero;
 
@@ -219,6 +223,7 @@ namespace GameDev.Input
             _waitTurn = _player.AddAction("WaitTurn", InputActionType.Button, "<Keyboard>/r");
             _stance = _player.AddAction("DefensiveStance", InputActionType.Button, "<Keyboard>/g");
             _changeSet = _player.AddAction("ChangeWeaponSet", InputActionType.Button, "<Keyboard>/x");
+            _firstAid = _player.AddAction("FirstAid", InputActionType.Button, "<Keyboard>/b");
 
             _camera = new InputActionMap("Camera");
             _camPan = _camera.AddAction("Pan", InputActionType.Value);

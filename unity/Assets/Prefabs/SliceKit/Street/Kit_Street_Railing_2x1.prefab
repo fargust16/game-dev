@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1465701456434717364}
   - component: {fileID: 7881026417885645208}
   - component: {fileID: 3083958880536571500}
+  - component: {fileID: 3305996463454022064}
   m_Layer: 10
   m_Name: Kit_Street_Railing_2x1
   m_TagString: Untagged
@@ -67,6 +68,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.7, y: 1.04, z: 0.3}
   m_Center: {x: 1, y: 0.52, z: 0}
+--- !u!114 &3305996463454022064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6293638186062345563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f827199f748b8984086c59d832f7f774, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.Kit.KitEnvironmentAction
+  action: 0
+  band: 0
 --- !u!1001 &3730709301266986096
 PrefabInstance:
   m_ObjectHideFlags: 0

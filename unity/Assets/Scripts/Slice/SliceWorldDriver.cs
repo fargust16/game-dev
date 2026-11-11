@@ -173,7 +173,7 @@ namespace GameDev.Slice
             if (settings.FightRules != null)
             {
                 Fights = gameObject.AddComponent<SliceConfront>();
-                Fights.Configure(settings, seed, Clock, Character);
+                Fights.Configure(settings, seed, Clock, Character, State);
             }
             Standing = new SocialStanding(State, settings.Standing, Clock, seed, SliceSeedStreams.Lies);
             _talk = new DialogueContext

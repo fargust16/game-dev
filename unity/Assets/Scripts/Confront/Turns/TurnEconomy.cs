@@ -17,7 +17,9 @@ namespace GameDev.Confront.Turns
     /// V0 (S3a.8). Since S3a.6 (10.2 §5b *Position*, *Wait and Defensive Stance*): leaving the side of a melee enemy draws
     /// its Reaction Attack, once a round from each enemy; Surrounded, higher ground, cover and the Point-Blank Shot set a
     /// blow's or a shot's context; a combatant can wait to the end of the round, end its turn in a Defensive Stance that
-    /// answers a melee attack with a Counterattack, or change its Weapon Set. Conditions come with S3a.7.
+    /// answers a melee attack with a Counterattack, or change its Weapon Set. Since S3a.7 (10.1, 10.2): an Environment
+    /// Action crosses a tagged edge for its AP and check, a failed climb falls; Bleeding and Poison from a blow tick at
+    /// each round's end; a broken leg takes no step; and a bandage, an antidote or a splint ends its condition.
     /// </summary>
     public sealed class TurnEconomy : ITurnEconomy
     {
@@ -67,6 +69,12 @@ namespace GameDev.Confront.Turns
 
         public event Action<Combatant> GuardChanged;
 
+        public event Action<Combatant, TraverseOption, bool, double> Traversed;
+
+        public event Action<Combatant, Combatant, Treatment, bool> Treated;
+
+        public event Action<Combatant, ConditionTick> Conditioned;
+
         public void BeginEncounter(IReadOnlyList<Combatant> combatants, Random rolls)
         {
             if (IsRunning)
@@ -109,7 +117,7 @@ namespace GameDev.Confront.Turns
             switch (intent.Kind)
             {
                 case IntentKind.Move:
-                    var steps = _grid.FindPath(c.Cell, intent.Cell, _path);
+                    var steps = c.Fighter.LegBroken ? -1 : _grid.FindPath(c.Cell, intent.Cell, _path);
                     if (steps <= 0 || steps > ApLeft)
                     {
                         return false;
@@ -120,6 +128,10 @@ namespace GameDev.Confront.Turns
                 case IntentKind.Attack:
                     var target = Find(intent.Target);
                     return target != null && Strike(c, target);
+                case IntentKind.Traverse:
+                    return Traverse(c, intent.Cell);
+                case IntentKind.Treat:
+                    return Treat(c, intent.Treatment, Find(intent.Target));
                 case IntentKind.Wait:
                     return Wait(c);
                 case IntentKind.Stance:
@@ -177,6 +189,11 @@ namespace GameDev.Confront.Turns
             if (Reaches(attacker, target))
             {
                 return 0;
+            }
+
+            if (attacker.Fighter.LegBroken)
+            {
+                return -1;
             }
 
             var steps = StepsBeside(attacker, target);
@@ -418,6 +435,7 @@ namespace GameDev.Confront.Turns
         {
             var round = Round;
             _turnsThisRound = 0;
+            TickConditions();
             RoundEnded?.Invoke(round);
             if (!IsRunning)
             {
@@ -493,6 +511,7 @@ namespace GameDev.Confront.Turns
             _joining.Clear();
             if (played)
             {
+                TickConditions();
                 RoundEnded?.Invoke(Round);
             }
 
@@ -556,6 +575,11 @@ namespace GameDev.Confront.Turns
         {
             var walked = 0;
             _walked.Clear();
+            if (c.Fighter.LegBroken)
+            {
+                return 0;
+            }
+
             for (var i = 0; i < steps && i < path.Count && ApLeft > 0; i++)
             {
                 var occupant = _grid.OccupantAt(path[i]);
@@ -619,6 +643,7 @@ namespace GameDev.Confront.Turns
                 e.Reacted = true;
                 c.Fighter.Reserve = ApLeft;
                 var result = _rules.Strike(e.Fighter, c.Fighter, ContextFor(e, e.Cell, c), _rolls);
+                Afflict(c, result);
                 ApLeft = c.Fighter.Reserve;
                 c.Fighter.Reserve = 0;
                 if (c.Fighter.Down)
@@ -643,6 +668,7 @@ namespace GameDev.Confront.Turns
             ApLeft -= weapon.AttackAp;
             c.Attacked = true;
             var result = _rules.Strike(c.Fighter, target.Fighter, ContextFor(c, c.Cell, target), _rolls);
+            Afflict(target, result);
             if (target.Fighter.Down)
             {
                 _grid.Vacate(target.Id);
@@ -679,12 +705,162 @@ namespace GameDev.Confront.Turns
 
             defender.Fighter.Reserve -= price;
             var result = _rules.Strike(defender.Fighter, attacker.Fighter, ContextFor(defender, defender.Cell, attacker), _rolls);
+            Afflict(attacker, result);
             if (attacker.Fighter.Down)
             {
                 _grid.Vacate(attacker.Id);
             }
 
             Struck?.Invoke(defender, attacker, result);
+        }
+
+        /// <summary>10.2 *Beasts of the slice*: a beast's critical hit makes its target bleed, and a glowing bite may poison it.</summary>
+        private static void Afflict(Combatant target, StrikeResult result)
+        {
+            target.Fighter.Bleeding |= result.Bleeds;
+            target.Fighter.Poisoned |= result.Poisoned;
+        }
+
+        /// <summary>
+        /// One world tick of every standing combatant's conditions, at the round's end (10.2: a round is one tick). One
+        /// whom Bleeding brings down leaves its cell.
+        /// </summary>
+        private void TickConditions()
+        {
+            foreach (var c in _order)
+            {
+                if (!c.Standing)
+                {
+                    continue;
+                }
+
+                var tick = _rules.Tick(c.Fighter, _rolls, false);
+                if (c.Fighter.Down)
+                {
+                    _grid.Vacate(c.Id);
+                }
+
+                if (tick.Any)
+                {
+                    Conditioned?.Invoke(c, tick);
+                }
+            }
+        }
+
+        public bool TraverseFrom(Combatant combatant, CombatCell to, out TraverseOption option)
+        {
+            option = default;
+            var from = combatant.Cell;
+            var dx = to.X - from.X;
+            var dz = to.Z - from.Z;
+            if (Math.Abs(dx) + Math.Abs(dz) != 1 || !_grid.TryGetEnvironmentAction(from, to, out var tag))
+            {
+                return false;
+            }
+
+            option.Kind = tag.Action;
+            option.Band = tag.Band;
+            option.Tag = tag;
+            option.Ap = _rules.EnvironmentAp(tag.Action);
+            option.Chance = _rules.EnvironmentChance(combatant.Fighter.Values, tag.Action, tag.Band);
+            option.Landing = from;
+            if (tag.Action == EnvironmentActionKind.KickBreach)
+            {
+                return true;
+            }
+
+            // A vault clears a low wall into the cell beside, or a crate line into the cell past it.
+            var rise = _rules.LandingRise(tag.Action);
+            var landed = _grid.TryLand(from, dx, dz, rise.x, rise.y, out var landing) && _grid.OccupantAt(landing) < 0;
+            if (!landed && tag.Action == EnvironmentActionKind.VaultJump)
+            {
+                landed = _grid.TryLand(from, dx * 2, dz * 2, rise.x, rise.y, out landing) && _grid.OccupantAt(landing) < 0;
+            }
+
+            if (!landed)
+            {
+                return false;
+            }
+
+            option.Landing = landing;
+            option.Rise = _grid.Center(landing).y - _grid.Center(from).y;
+            return true;
+        }
+
+        /// <summary>
+        /// 10.1 Environment Actions: the AP are spent whatever comes. A success leaves the cell, drawing its Reaction
+        /// Attacks as a step does, and lands; a breach that works leaves the block for the scene to clear. A failed vault,
+        /// window or breach stays where it stood; a failed climb or mantle falls back the height it rose and ends the turn.
+        /// </summary>
+        private bool Traverse(Combatant c, CombatCell to)
+        {
+            if (c.Fighter.LegBroken || !TraverseFrom(c, to, out var option) || ApLeft < option.Ap)
+            {
+                return false;
+            }
+
+            ApLeft -= option.Ap;
+            var success = _rolls.NextDouble() < option.Chance;
+            var fallen = 0d;
+            if (success && option.Kind != EnvironmentActionKind.KickBreach && ReactionAttacks(c) && _grid.Occupy(c.Id, option.Landing))
+            {
+                c.Cell = option.Landing;
+                c.Position = _grid.Center(c.Cell);
+                _walked.Clear();
+                _walked.Add(option.Landing);
+                FlushWalk(c);
+            }
+            else if (!success && (option.Kind == EnvironmentActionKind.ClimbUp || option.Kind == EnvironmentActionKind.MantleOnto))
+            {
+                fallen = _rules.Fall(c.Fighter, option.Rise);
+                if (c.Fighter.Down)
+                {
+                    _grid.Vacate(c.Id);
+                }
+            }
+
+            Traversed?.Invoke(c, option, success, fallen);
+            if (CheckEnd() || Acting != c)
+            {
+                return true;
+            }
+
+            if (!c.Standing)
+            {
+                NextTurn();
+            }
+            else if (fallen > 0d)
+            {
+                EndTurn(c); // a fall ends the turn (10.1)
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 10.2 First Aid in the slice: a combatant treats itself or an ally in the next cell for the treatment's AP. An
+        /// antidote and a splint need the lesson. A success ends the condition and uses the item; a failure spends the
+        /// AP and keeps it.
+        /// </summary>
+        private bool Treat(Combatant c, Treatment treatment, Combatant patient)
+        {
+            if (patient == null || !patient.Standing || patient.Side != c.Side || Distance(c.Cell, patient.Cell) > 1
+                || !FightRules.Needs(patient.Fighter, treatment) || c.Supplies[(int)treatment] <= 0
+                || (_rules.TreatmentNeedsLesson(treatment) && !c.KnowsFirstAid) || ApLeft < _rules.TreatmentAp(treatment))
+            {
+                return false;
+            }
+
+            ApLeft -= _rules.TreatmentAp(treatment);
+            var success = _rolls.NextDouble() < _rules.TreatmentChance(c.Fighter.Values, treatment);
+            if (success)
+            {
+                FightRules.Cure(patient.Fighter, treatment);
+                c.Supplies[(int)treatment]--;
+            }
+
+            Treated?.Invoke(c, patient, treatment, success);
+            return true;
         }
 
         private bool Reaches(Combatant c, Combatant target) => ReachesFrom(c, c.Cell, target);

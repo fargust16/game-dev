@@ -155,6 +155,79 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// S3a.7 in play: a low wall tagged Vault / Jump stands beside the player in a Veilmouth street. The cursor over the
+        /// cell past it offers the vault and its 2 AP, and the click vaults: over the wall, or, failed, where it stood.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator AVaultInAStreetCrossesALowWall()
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene(Veilmouth);
+            var world = SliceWorldDriver.Running;
+            var fights = world.Fights;
+            fights.TurnPause = 0f;
+            fights.BeatPace = 4f;
+
+            yield return Tap(Key.F7);
+            yield return PlayersTurn(fights);
+            var turns = fights.Turns;
+            var me = fights.PlayerCombatant;
+            var grid = (CombatGridReader)fights.Grid;
+            var start = me.Cell;
+
+            // A side cell on the player's own level, and a wall 1 m high and 3 m long on the line between.
+            var over = start;
+            foreach (var cell in Neighbours(grid, start))
+            {
+                if (System.Math.Abs(cell.X - start.X) + System.Math.Abs(cell.Z - start.Z) == 1 && Mathf.Abs(grid.Center(cell).y - grid.Center(start).y) < 0.1f)
+                {
+                    over = cell;
+                    break;
+                }
+            }
+
+            Assert.AreNotEqual(start, over, $"a level side cell beside the player at {start}");
+            var across = over.X != start.X;
+            var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            wall.name = "TestLowWall";
+            wall.transform.position = ((grid.Center(start) + grid.Center(over)) * 0.5f) + (Vector3.up * 0.5f);
+            wall.transform.localScale = across ? new Vector3(0.2f, 1f, 3f) : new Vector3(3f, 1f, 0.2f);
+            wall.AddComponent<GameDev.Slice.Kit.KitEnvironmentAction>().Set(EnvironmentActionKind.VaultJump, EnvironmentActionBand.Easy);
+            Physics.SyncTransforms();
+            grid.Reread();
+            world.Character.Set(CharacterAttribute.Dexterity, 20);
+            world.Character.Set(CharacterAttribute.Strength, 20);
+
+            Assert.IsFalse(grid.CanStep(start, over), "no step crosses the wall");
+            Assert.IsTrue(turns.TraverseFrom(me, over, out var option), "the wall offers a vault");
+            Assert.AreEqual(over, option.Landing);
+
+            var cursor = fights.PlayerCursor;
+            yield return Point(fights.FightCamera.View.WorldToScreenPoint(grid.Center(over)));
+            Assert.AreEqual(over, cursor.Cell, "the cursor points past the wall");
+            Assert.IsTrue(cursor.HasOption, "and offers the vault");
+            Assert.AreEqual(EnvironmentActionKind.VaultJump, cursor.Option.Kind);
+            Assert.AreEqual(2, cursor.Cost, "for 2 AP");
+            Assert.IsTrue(cursor.Affordable);
+            StringAssert.StartsWith(Loc.Format("ui.fight.env.VaultJump", 2), fights.Hud.TipText, "the tip names it and its AP");
+
+            var ap = turns.ApLeft;
+            bool? vaulted = null;
+            turns.Traversed += (c, o, ok, fallen) => vaulted = c == me ? ok : vaulted;
+            yield return Click();
+            yield return Settle(fights);
+            Assert.IsTrue(vaulted.HasValue, "the click vaults");
+            Assert.AreEqual(vaulted.Value ? over : start, me.Cell, vaulted.Value ? "over the wall" : "a failed vault stays");
+            if (fights.InFight && turns.Acting == me)
+            {
+                Assert.AreEqual(ap - 2, turns.ApLeft, "2 AP");
+            }
+
+            StringAssert.Contains(Loc.Get("ui.fight.env.name.VaultJump"), fights.Hud.LogText, "the log tells it");
+            Object.Destroy(wall);
+        }
+
+        /// <summary>
         /// The fight as the player sees it, drawn into <c>Logs/SliceFight/</c>: the camera's frame with the HUD over it, at
         /// noon and at dusk, pointing at the nearest enemy (the walk, the blow's AP and its chance at Intelligence 10) and at
         /// a far cell (the path red past the AP). The hardware cursor is not in the picture.

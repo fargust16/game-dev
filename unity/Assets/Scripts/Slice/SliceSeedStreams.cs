@@ -38,9 +38,12 @@ namespace GameDev.Slice
         /// <summary>Whether a lie that worked comes out at the next day boundary (10.4 §5); forked by the listener's id hashed and the new day.</summary>
         public const string Lies = "slice.lies";
 
+        /// <summary>The character's conditions on world ticks outside a fight (10.2, S3a.7); fork it with the tick as the key.</summary>
+        public const string Conditions = "slice.conditions";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
-            RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies,
+            RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
         };
     }
 }

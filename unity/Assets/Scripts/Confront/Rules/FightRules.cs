@@ -15,7 +15,7 @@ namespace GameDev.Confront.Rules
     /// fight's number.
     /// </summary>
     [CreateAssetMenu(menuName = "GameDev/Confront/Fight Rules", fileName = "FightRules")]
-    public sealed class FightRules : ScriptableObject
+    public sealed partial class FightRules : ScriptableObject
     {
         [Tooltip("07.1 §7: the critical chance by Perception and its cap, shared with every action check.")]
         [SerializeField] private ActionCheckRules checks;

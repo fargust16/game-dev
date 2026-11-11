@@ -75,6 +75,11 @@ namespace GameDev.Slice.Fights
         /// <summary>The walk shown leaves an enemy's side and draws its Reaction Attack (S3a.6).</summary>
         public bool Provokes { get; private set; }
 
+        /// <summary>The cell pointed at lies across a tagged edge, and an Environment Action is the way there (S3a.7).</summary>
+        public bool HasOption { get; private set; }
+
+        public TraverseOption Option { get; private set; }
+
         /// <summary>Reads what the cursor points at for the player's turn, draws the path, and sets the cursor's shape.</summary>
         public void Point(Combatant player, Camera camera, Vector2 mouse)
         {
@@ -84,6 +89,7 @@ namespace GameDev.Slice.Fights
             Steps = 0;
             Affordable = false;
             Provokes = false;
+            HasOption = false;
             _path.Clear();
             if (player == null || camera == null || !_turns.IsRunning || _turns.Acting != player)
             {
@@ -104,7 +110,7 @@ namespace GameDev.Slice.Fights
                 return;
             }
 
-            if (!CellAt(camera, mouse, out var cell) || cell == player.Cell)
+            if (!CellAt(camera, mouse, player.Cell, out var cell) || cell == player.Cell)
             {
                 Show(Shape.Basic, 0);
                 return;
@@ -112,6 +118,26 @@ namespace GameDev.Slice.Fights
 
             Cell = cell;
             Steps = _grid.FindPath(player.Cell, cell, _path);
+
+            // S3a.7: across a tagged edge beside the player, the Environment Action, unless a walk round costs no more.
+            if (_turns.TraverseFrom(player, cell, out var option) && (Steps < 0 || Steps > option.Ap))
+            {
+                _path.Clear();
+                HasOption = true;
+                Option = option;
+                Steps = 1;
+                Cost = option.Ap;
+                Affordable = Cost <= _turns.ApLeft && !player.Fighter.LegBroken;
+                Provokes = option.Kind != EnvironmentActionKind.KickBreach && Leaves(player);
+                Show(Affordable ? Shape.Move : Shape.Blocked, 0);
+                return;
+            }
+
+            if (player.Fighter.LegBroken)
+            {
+                _path.Clear();
+                Steps = -1; // a broken leg takes no step (10.2)
+            }
             Cost = Math.Max(Steps, 0);
             Affordable = Steps > 0 && Steps <= _turns.ApLeft;
             Provokes = Steps > 0 && Leaves(player);
@@ -125,7 +151,7 @@ namespace GameDev.Slice.Fights
         private bool Leaves(Combatant player)
         {
             var from = player.Cell;
-            for (var i = 0; i < _path.Count; i++)
+            for (var i = 0; i < Math.Max(_path.Count, HasOption ? 1 : 0); i++)
             {
                 foreach (var e in _turns.Order)
                 {
@@ -137,7 +163,10 @@ namespace GameDev.Slice.Fights
                     }
                 }
 
-                from = _path[i];
+                if (i < _path.Count)
+                {
+                    from = _path[i];
+                }
             }
 
             return false;
@@ -159,6 +188,11 @@ namespace GameDev.Slice.Fights
                 }
 
                 return _turns.SubmitIntent(TurnIntent.Attack(Target.Id));
+            }
+
+            if (HasOption && Cell.HasValue)
+            {
+                return _turns.SubmitIntent(TurnIntent.Traverse(Cell.Value));
             }
 
             return Cell.HasValue && _turns.SubmitIntent(TurnIntent.MoveTo(Cell.Value));
@@ -237,7 +271,7 @@ namespace GameDev.Slice.Fights
                 }
             }
 
-            if (best != null || !CellAt(camera, mouse, out var cell))
+            if (best != null || !CellAt(camera, mouse, player.Cell, out var cell))
             {
                 return best;
             }
@@ -256,9 +290,11 @@ namespace GameDev.Slice.Fights
 
         /// <summary>
         /// The reachable cell under the cursor: the nearest surface along the ray that is one, so a hidden house's roof
-        /// in the way is passed through; else where the ray meets the level of the grid's centre.
+        /// in the way is passed through; else where the ray meets the level of the grid's centre. A walkable cell at a
+        /// side of the player's counts too, for an Environment Action across the edge between them (S3a.7). The ray passes
+        /// a tagged block's side, so a low wall seen from behind the player does not hide the cell past it.
         /// </summary>
-        private bool CellAt(Camera camera, Vector2 mouse, out CombatCell cell)
+        private bool CellAt(Camera camera, Vector2 mouse, CombatCell from, out CombatCell cell)
         {
             var ray = camera.ScreenPointToRay(mouse);
             var count = Physics.RaycastNonAlloc(ray, _hits, RayLength, CombatGridReader.Mask, QueryTriggerInteraction.Ignore);
@@ -267,7 +303,13 @@ namespace GameDev.Slice.Fights
             cell = default;
             for (var i = 0; i < count; i++)
             {
-                if (_hits[i].distance < best && _grid.TryCellAt(_hits[i].point + (Vector3.up * 0.05f), out var at) && _grid.IsReachable(at))
+                if (_hits[i].normal.y < 0.5f && _hits[i].collider.GetComponentInParent<IEnvironmentAction>() != null)
+                {
+                    continue;
+                }
+
+                if (_hits[i].distance < best && _grid.TryCellAt(_hits[i].point + (Vector3.up * 0.05f), out var at)
+                    && (_grid.IsReachable(at) || Math.Abs(at.X - from.X) + Math.Abs(at.Z - from.Z) == 1))
                 {
                     best = _hits[i].distance;
                     cell = at;
