@@ -9,7 +9,10 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>The ordinary townsfolk: ten men and ten women of the owner's people replace every yellow Dummy, each on a clear closed route.</summary>
+    /// <summary>
+    /// The ordinary townsfolk: ten men and ten women of the owner's people replace every yellow Dummy, and 26 more walk
+    /// since the owner's play test of S5a, each on a clear closed route, stopping at some of its turns.
+    /// </summary>
     public sealed class TownsfolkTests
     {
         [TestCase(SliceTownsfolk.PrefabPath)]
@@ -33,6 +36,27 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
+        public void AWalkerStopsAtAThirdOfItsTurnsForFourToTwelveSeconds()
+        {
+            var stops = 0;
+            for (var seed = 1u; seed <= 20u; seed++)
+            {
+                for (var turn = 0; turn < 30; turn++)
+                {
+                    var stop = TownsfolkWalker.StopAt(seed * 7919u, turn);
+                    Assert.AreEqual(stop, TownsfolkWalker.StopAt(seed * 7919u, turn), "the same turn stops alike on every run");
+                    if (stop > 0f)
+                    {
+                        stops++;
+                        Assert.That(stop, Is.InRange(TownsfolkWalker.StopShortest, TownsfolkWalker.StopLongest));
+                    }
+                }
+            }
+
+            Assert.That(stops / 600f, Is.InRange(0.27f, 0.40f), "about one turn in three");
+        }
+
+        [Test]
         public void InVeilmouthEveryYellowDummyIsAWalkingTownsperson()
         {
             var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
@@ -41,11 +65,11 @@ namespace GameDev.Slice.Tests
             Assert.IsFalse(people.Cast<Transform>().Any(t => t.GetComponent<GameDev.Slice.People.NamedPerson>() == null
                 && PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject) is GameObject s && s.name.Contains("Yellow")), "no unnamed yellow Dummy is left");
             var walkers = people.GetComponentsInChildren<TownsfolkWalker>();
-            Assert.AreEqual(20, walkers.Length, "the townsfolk and their farmer, on C5 (city plan §28.10, §29.4)");
+            Assert.AreEqual(46, walkers.Length, "the townsfolk and their farmer, on C5 (city plan §28.10, §29.4), and the play test's 26");
             // Each walks in a model by its block's wealth (owner's people, 2026-11-10; asset map §1).
             var looks = walkers.Select(w => SlicePeopleModels.All.Single(l => l.Walking == PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(w.gameObject))).ToList();
-            Assert.AreEqual(10, looks.Count(l => l.Female), "townswomen");
-            Assert.AreEqual(10, looks.Count(l => !l.Female), "townsmen");
+            Assert.AreEqual(23, looks.Count(l => l.Female), "townswomen");
+            Assert.AreEqual(23, looks.Count(l => !l.Female), "townsmen");
             Physics.SyncTransforms();
 
             // A person's capsule fits all along each route; the walkers themselves are left out.

@@ -13,6 +13,10 @@ namespace GameDev.Slice.People
     /// paused, a fight's round or a talk's end, it walks that tick's time at once, faster than life, so the world moves
     /// only after the round.
     /// </para>
+    /// <para>
+    /// At one turn of its route in three the walker stops and stands 4 to 12 s in its idle before it walks on (the owner's
+    /// play test of S5a: townsfolk who sometimes stop), the same turns on every run.
+    /// </para>
     /// </summary>
     public sealed class TownsfolkWalker : MonoBehaviour
     {
@@ -30,10 +34,24 @@ namespace GameDev.Slice.People
 
         [SerializeField] private float turnDegreesPerSecond = 270f;
 
+        /// <summary>Authoring default, the owner's play test of S5a: one turn in this many brings a stop.</summary>
+        public const int StopOneIn = 3;
+
+        /// <summary>Authoring default: a stop's shortest and longest standing, s.</summary>
+        public const float StopShortest = 4f;
+
+        public const float StopLongest = 12f;
+
+        private static readonly int WalkState = Animator.StringToHash("Walk");
+        private static readonly int IdleState = Animator.StringToHash("Idle");
+
         private int _next;
         private IWorldClock _clock;
         private Animator _animator;
         private float _owed;
+        private float _standing;
+        private uint _seed;
+        private int _turns;
 
         public Vector3[] Route => route;
 
@@ -41,6 +59,26 @@ namespace GameDev.Slice.People
 
         /// <summary>Seconds of walking the walker still owes the ticks a paused world was moved by.</summary>
         public float Owed => _owed;
+
+        /// <summary>Seconds the walker still stands at a turn of its route.</summary>
+        public float Standing => _standing;
+
+        /// <summary>How many times the walker has stopped at a turn.</summary>
+        public int Stops { get; private set; }
+
+        /// <summary>How many turns of its route the walker has reached.</summary>
+        public int Turns => _turns;
+
+        /// <summary>
+        /// Whether the walker stops at its <paramref name="turn"/>th turn, and for how long: one turn in
+        /// <see cref="StopOneIn"/>, for 4 to 12 s, by an FNV-1a hash of its route's start and the turn, so a walker
+        /// stops at the same turns on every run.
+        /// </summary>
+        public static float StopAt(uint seed, int turn)
+        {
+            var h = Fnv(seed, (uint)turn);
+            return h % StopOneIn != 0 ? 0f : StopShortest + ((StopLongest - StopShortest) * ((h / StopOneIn) % 1000u) / 999f);
+        }
 
         /// <summary>Editor setup.</summary>
         public void Configure(Vector3[] points, float metresPerSecond, LayerMask groundMask)
@@ -74,6 +112,7 @@ namespace GameDev.Slice.People
             }
 
             _animator = GetComponentInChildren<Animator>();
+            _seed = Fnv((uint)Mathf.RoundToInt(route[0].x * 10f), (uint)Mathf.RoundToInt(route[0].z * 10f));
 
             // Join the route at its nearest point and walk on from there.
             var best = float.MaxValue;
@@ -85,6 +124,13 @@ namespace GameDev.Slice.People
                     best = d;
                     _next = i;
                 }
+            }
+
+            // Standing on a turning point already, as a placed walker does, it sets out for the next: no stop before its
+            // first step.
+            if (best < 0.01f)
+            {
+                _next = (_next + 1) % route.Length;
             }
         }
 
@@ -156,6 +202,20 @@ namespace GameDev.Slice.People
 
         private void Walk(float seconds)
         {
+            // A stop at a turn takes its time from the walk, the time a paused world was moved by too.
+            if (_standing > 0f)
+            {
+                var stood = Mathf.Min(_standing, seconds);
+                _standing -= stood;
+                seconds -= stood;
+                if (_standing > 0f)
+                {
+                    return;
+                }
+
+                Play(WalkState);
+            }
+
             var position = transform.position;
             var step = speed * seconds;
             var target = route[_next];
@@ -163,6 +223,18 @@ namespace GameDev.Slice.People
             for (var guard = 0; to.magnitude <= step && guard < route.Length; guard++)
             {
                 _next = (_next + 1) % route.Length;
+                var stop = StopAt(_seed, _turns++);
+                if (stop > 0f)
+                {
+                    // The turn reached, the walker stands there a while before it walks on.
+                    target.y = GroundAt(target, target.y);
+                    transform.position = target;
+                    _standing = stop;
+                    Stops++;
+                    Play(IdleState);
+                    return;
+                }
+
                 target = route[_next];
                 to = Flat(target - position);
             }
@@ -179,6 +251,28 @@ namespace GameDev.Slice.People
 
             var facing = Quaternion.LookRotation(direction, Vector3.up);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, facing, turnDegreesPerSecond * seconds);
+        }
+
+        private void Play(int state)
+        {
+            if (_animator != null && _animator.isActiveAndEnabled && _animator.HasState(0, state))
+            {
+                _animator.CrossFadeInFixedTime(state, 0.3f);
+            }
+        }
+
+        private static uint Fnv(uint a, uint b)
+        {
+            var h = 2166136261u;
+            foreach (var v in new[] { a, b })
+            {
+                for (var i = 0; i < 4; i++)
+                {
+                    h = (h ^ ((v >> (8 * i)) & 0xFFu)) * 16777619u;
+                }
+            }
+
+            return h;
         }
 
         private float GroundAt(Vector3 at, float fallback)

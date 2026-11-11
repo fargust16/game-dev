@@ -499,6 +499,116 @@ namespace GameDev.Slice.EditorTools
 
             var road = _layout.roads.First(r => r.name == "West Road");
             Person("Yellow", false, 300f, (road.y0 + road.y1) / 2f, 90f, "Farmer");
+            foreach (var (at, female) in MoreWalkers(_layout))
+            {
+                Person("Yellow", female, at.x, at.y, 0f, "Townsperson");
+            }
+        }
+
+        /// <summary>
+        /// The owner's play test of S5a (2026-11-11), "an empty city": 26 more walkers on pavements across every district,
+        /// 13 women and 13 men, clear of the first twenty and of POI B's stage on Draught Lane. Authoring defaults.
+        /// </summary>
+        internal static IEnumerable<(Vector2 At, bool Female)> MoreWalkers(VeilmouthLayout layout)
+        {
+            Vector2 Pave(string id, float along, bool far)
+            {
+                var st = layout.StreetById(id);
+                var across = far ? st.c1 - (st.walk1 / 2f) : st.c0 + (st.walk0 / 2f);
+                return st.AlongX ? new Vector2(along, across) : new Vector2(across, along);
+            }
+
+            var female = true;
+            foreach (var (id, along, far) in new (string, float, bool)[]
+                     {
+                         // Parsons' End
+                         ("crows_walk", 470f, false), ("crows_walk", 600f, true), ("cold_shoulder", 300f, true), ("last_turning", 320f, false),
+                         ("nettle", 290f, false), ("nettle", 345f, true), ("widows", 450f, false),
+                         // Sleepy Quarter
+                         ("cold_shoulder", 420f, true), ("cold_shoulder", 500f, true), ("thimble", 410f, true), ("button", 450f, false),
+                         ("thimble", 520f, false),
+                         // Salt End
+                         ("nettle", 420f, true), ("tar_row", 420f, false), ("main_e", 590f, false),
+                         // round the market
+                         ("lenten", 400f, true), ("smoked", 480f, false), ("main_w", 485f, false),
+                         // Lower Veil
+                         ("nettle", 475f, false), ("draught", 650f, true), ("embankment", 540f, true), ("tar_row", 480f, false),
+                         // the Reek
+                         ("ash_bank", 500f, false), ("ash_bank", 620f, true), ("cinder", 640f, true), ("kettle", 660f, false),
+                     })
+            {
+                yield return (Pave(id, along, far), female);
+                female = !female;
+            }
+        }
+
+        /// <summary>
+        /// Once, in the owner's Veilmouth, without building the city again: the walkers of <see cref="MoreWalkers"/> join
+        /// the first twenty under People, each on a route planned round its place, in a model by its block's wealth. It
+        /// refuses to run where they already walk.
+        /// </summary>
+        [MenuItem("GameDev/Slice/Townsfolk/Add the Play Test's 26 Walkers to Veilmouth (once)")]
+        public static void AddMoreWalkers()
+        {
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, UnityEditor.SceneManagement.OpenSceneMode.Single);
+            var people = scene.GetRootGameObjects().FirstOrDefault(g => g.name == RootName)?.transform.Find("People");
+            if (people == null)
+            {
+                Debug.LogError("[VeilmouthCity] Veilmouth has no People group.");
+                return;
+            }
+
+            if (people.GetComponentsInChildren<GameDev.Slice.People.TownsfolkWalker>(true).Length > 20)
+            {
+                Debug.LogWarning("[VeilmouthCity] The play test's walkers already walk in Veilmouth; they are not added again.");
+                return;
+            }
+
+            var layout = VeilmouthLayout.Load();
+            var terrain = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Terrain>()).Single();
+            Physics.SyncTransforms();
+            var placed = new List<GameObject>();
+            foreach (var (plan, female) in MoreWalkers(layout))
+            {
+                var at = World(plan.x, plan.y);
+                at.y = FloorAt(terrain, at);
+                var route = SliceTownsfolk.PlanRoute(at);
+                var prefab = SlicePeopleModels.WalkerLook(female, at, layout).Walking;
+                var go = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(prefab), people);
+                go.name = female ? "Townswoman" : "Townsperson";
+                go.SetActive(false); // a route planned later does not swerve round one placed before it
+                go.transform.SetPositionAndRotation(route.Length > 0 ? route[0] : at, Quaternion.identity);
+                var walk = go.GetComponent<GameDev.Slice.People.TownsfolkWalker>();
+                walk.Configure(route, walk.Speed, SliceTownsfolk.GroundMask);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(walk);
+                placed.Add(go);
+                Debug.Log($"[VeilmouthCity] {go.name} at plan ({plan.x:0.#}, {plan.y:0.#}): {System.IO.Path.GetFileNameWithoutExtension(prefab)}, a route of {route.Length} points, {walk.Length:0} m.");
+            }
+
+            foreach (var go in placed)
+            {
+                go.SetActive(true);
+            }
+
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+            Debug.Log($"[VeilmouthCity] {placed.Count} walkers added; {people.GetComponentsInChildren<GameDev.Slice.People.TownsfolkWalker>(true).Length} walk in Veilmouth.");
+        }
+
+        /// <summary>The floor a walker stands on at <paramref name="at"/>: a raised pavement's top or the ground, never a roof.</summary>
+        private static float FloorAt(Terrain terrain, Vector3 at)
+        {
+            var bare = terrain.SampleHeight(at) + terrain.transform.position.y;
+            var best = bare;
+            foreach (var hit in Physics.RaycastAll(new Vector3(at.x, bare + 3f, at.z), Vector3.down, 6f, SliceTownsfolk.GroundMask, QueryTriggerInteraction.Ignore))
+            {
+                if (hit.point.y <= bare + 1f && hit.point.y > best)
+                {
+                    best = hit.point.y;
+                }
+            }
+
+            return best;
         }
 
         /// <summary>A plan point <paramref name="ahead"/> m before a building's front, <paramref name="along"/> m from its middle.</summary>
