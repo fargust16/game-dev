@@ -174,7 +174,10 @@ namespace GameDev.Slice.Fights
         /// The development fight against a group (S3a.9): cultists with daggers, who take no surrender, or Wardens with
         /// swords, who accept a Yield and may ask for mercy (Shift+F7).
         /// </summary>
-        public bool StartDevelopmentFight(string group)
+        public bool StartDevelopmentFight(string group) => StartDevelopmentFight(group, null);
+
+        /// <param name="places">Where the opponents stand, one for each place; null for two on the ring four cells off.</param>
+        public bool StartDevelopmentFight(string group, IReadOnlyList<Vector3> places)
         {
             _player = FindAnyObjectByType<PlayerLocomotion>();
             if (_lock == null || InFight || _died || _terms != null || _player == null || _settings.OpponentModel == null)
@@ -184,7 +187,7 @@ namespace GameDev.Slice.Fights
 
             var at = _player.transform.position;
             _grid.Follow(at);
-            if (!_grid.TryCellAt(at, out var home) || !Places(home, at.y))
+            if (!_grid.TryCellAt(at, out var home) || (places == null && !Places(home, at.y)))
             {
                 return false;
             }
@@ -200,9 +203,10 @@ namespace GameDev.Slice.Fights
             _bodies[player] = _player.transform;
             _names[player] = "ui.fight.you";
             _playerCombatant = player;
-            for (var i = 0; i < Opponents; i++)
+            var count = places?.Count ?? Opponents;
+            for (var i = 0; i < count; i++)
             {
-                var body = Opponent(_grid.Center(_ring[i]), at, i + 1);
+                var body = Opponent(places != null ? places[i] : _grid.Center(_ring[i]), at, i + 1);
                 var weapon = group == Wardens ? _settings.KitSword : _settings.OpponentWeapon;
                 var opponent = new Combatant(i + 1, HostileSide, rules.Fighter(new CharacterSheet(), null, new WeaponSet(weapon)), body.position)
                 {
