@@ -88,6 +88,51 @@ float VicEaves(float3 positionWS, float3 normalWS)
     return t > 0.0 ? _VicEavesLevel.x + t * _VicEavesLevel.y : 0.0;
 }
 
+// The sill map (VicGround): each column of windows seen from above, its lowest, second and highest sill in R, G and B,
+// each Level.x + texel × Level.y m, 0 for none, and how much of the texel it covers in A; above the second sill the
+// sills stand Level.z apart, one kit storey. Rect.z is 0 when none is given. Not material properties.
+TEXTURE2D(_VicSills);
+float4 _VicSillsRect;
+float4 _VicSillsLevel;
+
+// How far a facade point lies under the nearest sill over it, m, read 0.75 m inside its wall, and how much of its texel
+// the window's column covers; -1 where no sill stands over it or no map is given.
+float VicSillDepth(float3 positionWS, float3 normalWS, out half cover)
+{
+    cover = 0.0h;
+    if (_VicSillsRect.z <= 0.0)
+    {
+        return -1.0;
+    }
+
+    float2 uv = (positionWS.xz - normalWS.xz * 0.75 - _VicSillsRect.xy) * _VicSillsRect.zw;
+    if (any(uv < 0.0) || any(uv > 1.0))
+    {
+        return -1.0;
+    }
+
+    float4 t = SAMPLE_TEXTURE2D_LOD(_VicSills, sampler_vic_point_clamp, uv, 0);
+    cover = (half)SAMPLE_TEXTURE2D_LOD(_VicSills, sampler_vic_linear_clamp, uv, 0).a;
+    if (t.r <= 0.0 || cover <= 0.0h)
+    {
+        return -1.0;
+    }
+
+    float3 sills = _VicSillsLevel.x + t.rgb * _VicSillsLevel.y;
+    float sill = sills.x;
+    if (positionWS.y > sills.x)
+    {
+        if (t.g <= 0.0)
+        {
+            return -1.0;
+        }
+
+        sill = sills.y + max(ceil((positionWS.y - sills.y) / _VicSillsLevel.z - 0.001), 0.0) * _VicSillsLevel.z;
+    }
+
+    return sill <= sills.z + 0.2 ? sill - positionWS.y : -1.0;
+}
+
 // The ground's height under positionWS, m: the terrain's, or 0 with none.
 float VicGroundY(float3 positionWS)
 {
@@ -191,6 +236,22 @@ void VicSurfaceAt(float2 uv, float3 positionWS, half3 normalWS, out VicSurface s
     half cornice = eaves > 0.0 ? (half)(gather * gather) * wall * saturate(0.6h + 0.8h * (half)n) * _DirtAmount * _Streaks : 0.0h;
     albedo = lerp(albedo, soot, saturate(cornice) * 0.7h);
     rough = lerp(rough, max(rough, 0.85), saturate(cornice) * 0.5);
+
+    // Stains under the sills (R3 step 2): rain running off each sill carries soot down the wall under its window,
+    // darkest under the stone, fading over 1.4 m and narrowing as it runs, and breaking into drips of about 0.2 m
+    // further down, twice as strong as the material's dirt. Sizes are authoring defaults, in metres.
+    half cover;
+    float sillDepth = VicSillDepth(positionWS, (float3)normalWS, cover);
+    if (sillDepth >= 0.0)
+    {
+        float run = saturate(sillDepth / 1.4);
+        half narrow = smoothstep(0.2h + 0.45h * (half)run, 0.55h + 0.4h * (half)run, cover);
+        float3 dp = float3(positionWS.x * 5.0, positionWS.y * 0.5, positionWS.z * 5.0);
+        half drip = saturate(((half)VicValue3(dp) - 0.2h - 0.45h * (half)run) * 3.0h);
+        half stain = saturate((half)(1.0 - run) * narrow * drip * wall * _DirtAmount * _Streaks * 2.0h);
+        albedo = lerp(albedo, soot, stain * 0.7h);
+        rough = lerp(rough, max(rough, 0.85), stain * 0.5);
+    }
 
     half up = saturate((normalWS.y - 0.35) / 0.45);
     half low = saturate(1.0 - above / 0.6) * (1.0 - up);

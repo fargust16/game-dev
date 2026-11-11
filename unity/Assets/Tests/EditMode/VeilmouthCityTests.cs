@@ -207,6 +207,44 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// Reference plan R3 step 2: the sill map holds, behind every pane, the sills of its column, so the facade shader
+        /// finds each window's own sill to run its stain from: the lowest in R, the second in G, the highest in B, and
+        /// every sill above the second one storey over the one under it.
+        /// </summary>
+        [Test]
+        public void TheSillMapHoldsEachWindowsSill()
+        {
+            var ground = _scene.GetRootGameObjects().Single(g => g.name == VeilmouthMystic.RootName).GetComponent<GameDev.VictorianKit.VicGround>();
+            var map = ground.Sills;
+            Assert.IsNotNull(map, "the sill map is baked with the ground");
+            var rect = ground.SillsRect;
+            const float step = GameDev.VictorianKit.VicGround.SillsStep, storey = GameDev.VictorianKit.VicGround.Storey;
+            float Height(float t) => t > 0f ? GameDev.VictorianKit.VicGround.SillsBase + (Mathf.Round(t * 255f) * step) : 0f;
+            var panes = All<GameDev.VictorianKit.VicWindowRooms>().SelectMany(r => Enumerable.Range(0, r.Count).Select(i => r[i].Pane)).Where(p => p != null).ToList();
+            Assert.Greater(panes.Count, 1000, "the city's windows");
+            var missed = 0;
+            foreach (var pane in panes.Where((_, i) => i % 25 == 0))
+            {
+                var (centre, _, normal, _, sill) = VeilmouthEaves.Footprint(pane);
+                var p = centre + (normal * 0.5f);
+                var texel = map.GetPixel(Mathf.FloorToInt((p.x - rect.x) * rect.z * map.width), Mathf.FloorToInt((p.y - rect.y) * rect.w * map.height));
+                var (low, second, high) = (Height(texel.r), Height(texel.g), Height(texel.b));
+                Assert.Greater(texel.a, 0.5f, $"{pane.name}'s column covers the texel behind its middle");
+                // A stored height is the sill rounded up to the map's step, so it stands up to one step over the glass's bottom.
+                bool Near(float y) => y >= sill - 0.01f && y <= sill + step + 0.01f;
+                var found = Near(low) || (second > 0f && sill > second - 0.5f && sill < high + 0.5f &&
+                                          Near(second + (Mathf.Round((sill - second) / storey) * storey)));
+                if (!found)
+                {
+                    missed++;
+                }
+            }
+
+            Assert.AreEqual(0, missed, "every sampled pane's sill is in its column");
+            Assert.AreEqual(0f, map.GetPixel(0, 0).a, "no window stands in the map's margin");
+        }
+
+        /// <summary>
         /// §37–§38: the One-Eye's lantern and Stone Grandad's burn with the gas lamps, and the clock's dials glow with
         /// them, in their own glass or stucco by day, but none is a street lamp, so they add nothing to the Darkness of
         /// 10.3 §3.

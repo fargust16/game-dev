@@ -93,7 +93,7 @@ namespace GameDev.Slice.EditorTools
             EditorSceneManager.SaveScene(scene);
         }
 
-        /// <summary>The terrain under the city and the eaves map, given to the facade shader so its plinth dirt and wall-foot moss rise from the ground and soot gathers under the cornice.</summary>
+        /// <summary>The terrain under the city, the eaves map and the sill map, given to the facade shader so its plinth dirt and wall-foot moss rise from the ground, soot gathers under the cornice and stains run down under the sills.</summary>
         internal static void Ground(GameObject root)
         {
             var ground = root.GetComponent<VicGround>();
@@ -104,8 +104,9 @@ namespace GameDev.Slice.EditorTools
 
             ground.Terrain = Object.FindFirstObjectByType<Terrain>();
             (ground.Eaves, ground.EavesRect) = VeilmouthEaves.Bake();
+            (ground.Sills, ground.SillsRect) = VeilmouthEaves.BakeSills();
             ground.Apply();
-            Debug.Log($"[VeilmouthMystic] the facades' ground: {(ground.Terrain != null ? ground.Terrain.name : "none, so world height 0")}; eaves map {(ground.Eaves != null ? $"{ground.Eaves.width} × {ground.Eaves.height}" : "none")}.");
+            Debug.Log($"[VeilmouthMystic] the facades' ground: {(ground.Terrain != null ? ground.Terrain.name : "none, so world height 0")}; eaves map {(ground.Eaves != null ? $"{ground.Eaves.width} × {ground.Eaves.height}" : "none")}; sill map {(ground.Sills != null ? $"{ground.Sills.width} × {ground.Sills.height}" : "none")}.");
         }
 
         internal static VeilmouthSky Build()

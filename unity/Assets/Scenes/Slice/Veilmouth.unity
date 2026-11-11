@@ -293034,6 +293034,8 @@ MonoBehaviour:
   Terrain: {fileID: 847389676}
   Eaves: {fileID: 2800000, guid: 8a6a24ad87a3f1d4598b0c2d22715983, type: 3}
   EavesRect: {x: -465, y: -467, z: 0.0013927576, w: 0.0010752688}
+  Sills: {fileID: 2800000, guid: c2ecdc095ace0b44d874bdc6e918fff6, type: 3}
+  SillsRect: {x: -161, y: -197, z: 0.002406739, w: 0.0022396417}
 --- !u!1 &1302971333
 GameObject:
   m_ObjectHideFlags: 0
