@@ -207,24 +207,34 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
-        /// §38: the One-Eye's lantern burns with the gas lamps, its panes glowing at night and grimy by day, but it is no
-        /// street lamp, so it adds nothing to the Darkness of 10.3 §3.
+        /// §37–§38: the One-Eye's lantern and Stone Grandad's burn with the gas lamps, their panes glowing at night and in
+        /// their own glass by day, but neither is a street lamp, so they add nothing to the Darkness of 10.3 §3.
         /// </summary>
         [Test]
-        public void TheOneEyeBurnsWithTheLampsButLightsNoStreet()
+        public void TheBeaconsBurnWithTheLampsButLightNoStreet()
         {
             var sky = All<GameDev.Slice.Atmosphere.VeilmouthSky>().Single();
-            var beacon = sky.Beacons.Single();
-            Assert.AreEqual("The One-Eye's beacon", beacon.Light.name);
-            Assert.IsNotNull(beacon.Renderer, "the lantern's panes swap their glass");
-            Assert.IsFalse(sky.StreetLamps.Any(l => l.Light == beacon.Light), "the beacon is not a street lamp");
+            CollectionAssert.AreEquivalent(new[] { "The One-Eye's beacon", "Stone Grandad's lantern" }, sky.Beacons.Select(b => b.Light.name));
+            foreach (var beacon in sky.Beacons)
+            {
+                Assert.IsNotNull(beacon.Renderer, $"{beacon.Light.name}'s panes swap their glass");
+                Assert.IsNotNull(beacon.Unlit);
+                Assert.IsFalse(sky.StreetLamps.Any(l => l.Light == beacon.Light), $"{beacon.Light.name} is not a street lamp");
+            }
 
             sky.Apply(23 * 60);
-            Assert.IsTrue(beacon.Light.enabled, "lit at night");
-            Assert.AreEqual("Veilmouth_Gaslight", beacon.Renderer.sharedMaterials[beacon.Slot].name);
+            foreach (var beacon in sky.Beacons)
+            {
+                Assert.IsTrue(beacon.Light.enabled, $"{beacon.Light.name} lit at night");
+                Assert.AreEqual("Veilmouth_Gaslight", beacon.Renderer.sharedMaterials[beacon.Slot].name);
+            }
+
             sky.Apply(12 * 60);
-            Assert.IsFalse(beacon.Light.enabled, "out by day");
-            Assert.AreEqual("VIC_Glass_Grimy", beacon.Renderer.sharedMaterials[beacon.Slot].name);
+            foreach (var beacon in sky.Beacons)
+            {
+                Assert.IsFalse(beacon.Light.enabled, $"{beacon.Light.name} out by day");
+                Assert.AreEqual(beacon.Unlit.name, beacon.Renderer.sharedMaterials[beacon.Slot].name);
+            }
         }
     }
 }

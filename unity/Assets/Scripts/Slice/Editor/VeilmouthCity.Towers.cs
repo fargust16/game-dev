@@ -159,23 +159,26 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// The beacons the sky lights and puts out with its lamps: the One-Eye's light, and its panes, which swap between
-        /// their own grimy glass and the gas lamps' glowing glass.
+        /// The beacons the sky lights and puts out with its lamps: the One-Eye's light and Stone Grandad's lantern (§37),
+        /// each with its panes, which swap between their own glass and the gas lamps' glowing glass.
         /// </summary>
         internal static VeilmouthSky.Lamp[] Beacons()
         {
             var beacons = new List<VeilmouthSky.Lamp>();
-            var unlit = AssetDatabase.LoadAssetAtPath<Material>($"{GameDev.VictorianKit.EditorTools.VicKitPaths.MaterialFolder}/{Glazing}.mat");
-            foreach (var light in Object.FindObjectsByType<Light>(FindObjectsInactive.Include, FindObjectsSortMode.None).Where(l => l.name == BeaconName))
+            foreach (var (name, glass) in new[] { (BeaconName, Glazing), (LanternName, LanternGlass) })
             {
-                var panes = light.transform.parent != null ? light.transform.parent.Find(Glazing) : null;
-                var renderer = panes != null ? panes.GetComponent<MeshRenderer>() : null;
-                if (renderer != null)
+                var unlit = AssetDatabase.LoadAssetAtPath<Material>($"{GameDev.VictorianKit.EditorTools.VicKitPaths.MaterialFolder}/{glass}.mat");
+                foreach (var light in Object.FindObjectsByType<Light>(FindObjectsInactive.Include, FindObjectsSortMode.None).Where(l => l.name == name))
                 {
-                    GameObjectUtility.SetStaticEditorFlags(renderer.gameObject, 0); // its glass changes at dusk and dawn
-                }
+                    var panes = light.transform.parent != null ? light.transform.parent.Find(glass) : null;
+                    var renderer = panes != null ? panes.GetComponent<MeshRenderer>() : null;
+                    if (renderer != null)
+                    {
+                        GameObjectUtility.SetStaticEditorFlags(renderer.gameObject, 0); // its glass changes at dusk and dawn
+                    }
 
-                beacons.Add(new VeilmouthSky.Lamp { Light = light, Renderer = renderer, Slot = renderer != null ? 0 : -1, Unlit = unlit });
+                    beacons.Add(new VeilmouthSky.Lamp { Light = light, Renderer = renderer, Slot = renderer != null ? 0 : -1, Unlit = unlit });
+                }
             }
 
             return beacons.ToArray();
