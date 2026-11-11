@@ -671,6 +671,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             VeilmouthLook.Retint(model); // the reference look's olive leaves (reference plan R3 step 8)
+            VeilmouthChapelLook.Retint(model); // the old chapel in the city's stone and slate (city plan §44)
             if (spec.Key.StartsWith("City"))
             {
                 VeilmouthLook.RetintCity(model); // the city's muted green (city plan §25.1)

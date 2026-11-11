@@ -446,7 +446,7 @@ namespace GameDev.Slice.EditorTools
             EditorUtility.SetDirty(copy);
         }
 
-        private static int Swap(GameObject root, System.Collections.Generic.Dictionary<Material, Material> swaps)
+        internal static int Swap(GameObject root, System.Collections.Generic.Dictionary<Material, Material> swaps)
         {
             var count = 0;
             foreach (var r in root.GetComponentsInChildren<Renderer>(true))

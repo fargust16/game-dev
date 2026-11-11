@@ -338,6 +338,40 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// §44: the old chapel wears the project's copies of the Colonial pack's sheets, never the pack's pink, cream and
+        /// red, and the copies' paint stays in the style guide's muted range: a low mean saturation, and few strongly
+        /// coloured pixels (the pantiles and the cupola were most of them).
+        /// </summary>
+        [Test]
+        public void TheOldChapelWearsTheCitysStoneAndSlate()
+        {
+            // Every renderer of the city: the chapel's copies are worn, and the pack's sheets by nothing.
+            var worn = All<Renderer>().SelectMany(r => r.sharedMaterials).Where(m => m != null).Select(m => m.name).Distinct().ToList();
+            CollectionAssert.IsSubsetOf(new[] { "Veilmouth_Chapel_Front", "Veilmouth_Chapel_Back" }, worn, "the chapel wears the copies");
+            CollectionAssert.DoesNotContain(worn, "Church_From");
+            CollectionAssert.DoesNotContain(worn, "Church_Back");
+            foreach (var sheet in new[] { "Veilmouth_Chapel_Front", "Veilmouth_Chapel_Back" })
+            {
+                var texture = new Texture2D(2, 2);
+                texture.LoadImage(System.IO.File.ReadAllBytes($"{VeilmouthChapelLook.Folder}/{sheet}_BaseColor.png"));
+                var pixels = texture.GetPixels32();
+                Object.DestroyImmediate(texture);
+                var saturation = 0.0;
+                var strong = 0;
+                for (var i = 0; i < pixels.Length; i += 7)
+                {
+                    Color.RGBToHSV(pixels[i], out _, out var s, out var v);
+                    saturation += s;
+                    strong += s > 0.4f && v > 0.35f ? 1 : 0;
+                }
+
+                var samples = (pixels.Length + 6) / 7;
+                Assert.Less(saturation / samples, 0.22, $"{sheet}: muted on the whole");
+                Assert.Less(strong / (double)samples, 0.08, $"{sheet}: few strongly coloured pixels");
+            }
+        }
+
+        /// <summary>
         /// §37–§38: the One-Eye's lantern and Stone Grandad's burn with the gas lamps, and the clock's dials glow with
         /// them, in their own glass or stucco by day, but none is a street lamp, so they add nothing to the Darkness of
         /// 10.3 §3.
