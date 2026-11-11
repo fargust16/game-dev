@@ -172,6 +172,7 @@ namespace GameDev.Slice.EditorTools
             Eye(label + "_graves", -50f, 173f, -46f, 149f, 1.7f);
             Eye(label + "_gate", -140f, 60f, -60f, 60f, 4f); // §41: Creaking Gate from beyond the river
             Eye(label + "_gatein", -58f, 62f, -81f, 60f, 1.7f);
+            Eye(label + "_wall", -125f, 120f, -82f, 150f, 3f); // §42: the town wall north of the gate, from across the river
             Debug.Log($"Veilmouth dress views written to {OutputFolder}.");
         }
 

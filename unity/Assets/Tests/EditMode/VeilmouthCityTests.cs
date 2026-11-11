@@ -296,6 +296,26 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// §42: the town wall's coping, plinth and pilasters are drawn along the walls with no collider, and the coping
+        /// stands on the wall's slabs' tops, so the wall's colliders and the Combat Grid are as before.
+        /// </summary>
+        [Test]
+        public void TheTownWallWearsItsCoping()
+        {
+            var city = _scene.GetRootGameObjects().Single(g => g.name == VeilmouthCity.RootName).transform;
+            var dress = city.Find("The town wall's dress");
+            Assert.IsNotNull(dress, "the town wall's dress");
+            Assert.AreEqual(0, dress.GetComponentsInChildren<Collider>(true).Length, "the dress has no collider");
+            var bounds = dress.GetComponentsInChildren<MeshRenderer>().Select(r => r.bounds).ToList();
+            Assert.AreEqual(2, bounds.Count, "the coping and plinth in light stone, the pilasters in medium");
+            var all = bounds.Aggregate((a, b) => { a.Encapsulate(b); return a; });
+            Assert.Greater(Mathf.Max(all.size.x, all.size.z), 200f, "the dress runs along the walls");
+            var tops = city.Find("Stone Works").GetComponents<BoxCollider>().Select(b => b.bounds).Where(b => Mathf.Abs(Mathf.Min(b.size.x, b.size.z) - 2f) < 0.05f && b.size.y > 5f).ToList();
+            Assert.Greater(tops.Count, 100, "the walls' slabs");
+            Assert.LessOrEqual(all.max.y - tops.Max(b => b.max.y), 0.5f, "the coping stands on the slabs' tops, no higher");
+        }
+
+        /// <summary>
         /// §37–§38: the One-Eye's lantern and Stone Grandad's burn with the gas lamps, and the clock's dials glow with
         /// them, in their own glass or stucco by day, but none is a street lamp, so they add nothing to the Darkness of
         /// 10.3 §3.
