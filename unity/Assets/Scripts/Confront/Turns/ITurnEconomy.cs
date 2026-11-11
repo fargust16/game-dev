@@ -18,6 +18,7 @@ namespace GameDev.Confront.Turns
         Treat,
         Yield,
         Spare,
+        Hide,
     }
 
     /// <summary>An Environment Action open across the edge to a cell beside (10.1, S3a.7): what it is, where it lands, and its AP and chance.</summary>
@@ -59,6 +60,9 @@ namespace GameDev.Confront.Turns
         public int Target { get; }
 
         public Treatment Treatment { get; }
+
+        /// <summary>Entering Stealth Mode for 3 AP when no enemy's cone covers the fighter (10.3 §8, S3b.1).</summary>
+        public static TurnIntent Hide => new TurnIntent(IntentKind.Hide, default, -1);
 
         /// <summary>The Environment Action across the edge to a cell beside (10.1, S3a.7).</summary>
         public static TurnIntent Traverse(CombatCell cell) => new TurnIntent(IntentKind.Traverse, cell, -1);

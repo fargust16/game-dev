@@ -69,6 +69,9 @@ namespace GameDev.Confront.Rules
 
         /// <summary>The second strike of a cleave, for the weapon's share of the damage (10.2 §5b *Damage*).</summary>
         public bool Cleaving;
+
+        /// <summary>A stealth attack (10.3 §7): +50 points of critical chance after Luck, the weapon's stealth critical, never a stun.</summary>
+        public bool Stealth;
     }
 
     /// <summary>What one blow or shot did. The conditions it starts are applied by their own system (S3a.7).</summary>

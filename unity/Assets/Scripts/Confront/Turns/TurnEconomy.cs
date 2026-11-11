@@ -74,7 +74,13 @@ namespace GameDev.Confront.Turns
 
         public event Action<Combatant, ConditionTick> Conditioned;
 
-        public void BeginEncounter(IReadOnlyList<Combatant> combatants, Random rolls)
+        public void BeginEncounter(IReadOnlyList<Combatant> combatants, Random rolls) => BeginEncounter(combatants, rolls, null, null);
+
+        /// <summary>
+        /// An encounter that opens with <paramref name="opener"/>'s stealth attack on <paramref name="target"/> (10.3 §7),
+        /// struck before Initiative orders the round; with no opener, or a target out of reach, it opens as any other.
+        /// </summary>
+        public void BeginEncounter(IReadOnlyList<Combatant> combatants, Random rolls, Combatant opener, Combatant target)
         {
             if (IsRunning)
             {
@@ -102,6 +108,14 @@ namespace GameDev.Confront.Turns
                 }
             }
 
+            _covering.Clear();
+            FaceTheFight();
+            if (opener != null)
+            {
+                Ambush(opener, target);
+            }
+
+            CheckCones();
             Sort();
             if (!CheckEnd())
             {
@@ -121,7 +135,7 @@ namespace GameDev.Confront.Turns
             {
                 case IntentKind.Move:
                     var steps = c.Fighter.LegBroken ? -1 : _grid.FindPath(c.Cell, intent.Cell, _path);
-                    if (steps <= 0 || steps > ApLeft)
+                    if (steps <= 0 || WalkAp(c, steps) > ApLeft)
                     {
                         return false;
                     }
@@ -145,6 +159,8 @@ namespace GameDev.Confront.Turns
                     return Yield(c);
                 case IntentKind.Spare:
                     return Spare(c, Find(intent.Target));
+                case IntentKind.Hide:
+                    return Hide(c);
                 default:
                     EndTurn(c);
                     return true;
@@ -559,6 +575,12 @@ namespace GameDev.Confront.Turns
 
             for (var i = 0; i < steps && i < path.Count && ApLeft > 0; i++)
             {
+                var cost = WalkAp(c, walked + 1) - WalkAp(c, walked); // crouching: 2, then 1, for two cells
+                if (cost > ApLeft)
+                {
+                    break;
+                }
+
                 var occupant = _grid.OccupantAt(path[i]);
                 if ((occupant >= 0 && occupant != c.Id) || !ReactionAttacks(c) || !_grid.Occupy(c.Id, path[i]))
                 {
@@ -570,7 +592,7 @@ namespace GameDev.Confront.Turns
                 c.Cell = path[i];
                 c.Position = _grid.Center(c.Cell);
                 _walked.Add(path[i]);
-                ApLeft--;
+                ApLeft -= cost;
                 walked++;
                 if (target == null && BreaksAway(c, from))
                 {
@@ -586,6 +608,7 @@ namespace GameDev.Confront.Turns
 
             c.Position = _grid.Center(c.Cell);
             FlushWalk(c);
+            CheckCones();
             if (brokeAway)
             {
                 Depart(c, Departure.BrokeAway);
@@ -625,7 +648,7 @@ namespace GameDev.Confront.Turns
 
                 var weapon = e.Fighter.Weapon;
                 if (e == c || !e.Standing || e.Side == c.Side || e.Reacted || e.Helpless || weapon == null || weapon.Ranged
-                    || !Beside(e.Cell, c.Cell))
+                    || !Beside(e.Cell, c.Cell) || c.Hidden)
                 {
                     continue;
                 }
@@ -661,15 +684,19 @@ namespace GameDev.Confront.Turns
             c.Attacked = true;
             c.Fired |= weapon.Ranged;
             Face(c, target.Cell);
-            var result = _rules.Strike(c.Fighter, target.Fighter, ContextFor(c, c.Cell, target), _rolls);
+            var context = ContextFor(c, c.Cell, target);
+            context.Stealth = c.Hidden; // 10.3 §7: an attack from Stealth Mode, which it ends
+            var result = _rules.Strike(c.Fighter, target.Fighter, context, _rolls);
             Afflict(target, result);
             if (target.Fighter.Down)
             {
                 _grid.Vacate(target.Id);
             }
 
+            SetHidden(c, false);
             Struck?.Invoke(c, target, result);
             Counterattack(target, c);
+            CheckCones();
             if (!CheckEnd() && !c.Standing && Acting == c)
             {
                 NextTurn();

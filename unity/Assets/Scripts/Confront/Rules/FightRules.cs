@@ -370,7 +370,8 @@ namespace GameDev.Confront.Rules
 
         /// <summary>
         /// One blow or shot: the hit, the critical hit, damage through armour, the target's parry or block from the AP
-        /// it holds, then a stun if it still stands, and the conditions a beast's weapon starts. The draws come in that
+        /// it holds, then a stun if it still stands and the blow was no stealth attack (10.3 §7), and the conditions a
+        /// beast's weapon starts. The draws come in that
         /// order from the fight's rolls.
         /// </summary>
         public StrikeResult Strike(Fighter attacker, Fighter target, StrikeContext context, Random rolls)
@@ -383,9 +384,9 @@ namespace GameDev.Confront.Rules
             }
 
             result.Hit = true;
-            var raw = RawCritical(attacker, context.CriticalBonus);
+            var raw = RawCritical(attacker, CriticalPoints(context));
             result.Critical = rolls.NextDouble() < CriticalChance(raw);
-            var multiplier = result.Critical ? CriticalMultiplier(attacker, raw, context.CriticalExtra) : 1d;
+            var multiplier = result.Critical ? CriticalMultiplier(attacker, raw, CriticalExtraOf(weapon, context)) : 1d;
             var share = context.Cleaving ? weapon.Cleave : 1d;
             var rolled = BaseDamage(attacker) * (1d - spread + 2d * spread * rolls.NextDouble());
             var damage = rolled * multiplier * share * (1d - Reduction(DefenceAgainst(attacker, target, context.Beyond, result.Critical)));
@@ -405,7 +406,7 @@ namespace GameDev.Confront.Rules
             target.Hp -= damage;
             result.Damage = damage;
             result.Downed = target.Down;
-            if (!target.Down && weapon.Stun > 0f && rolls.NextDouble() < weapon.Stun)
+            if (!context.Stealth && !target.Down && weapon.Stun > 0f && rolls.NextDouble() < weapon.Stun)
             {
                 result.Stunned = true;
                 target.LostTurns = Math.Max(target.LostTurns, 1);

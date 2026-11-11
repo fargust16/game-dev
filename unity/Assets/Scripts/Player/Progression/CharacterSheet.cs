@@ -30,6 +30,9 @@ namespace GameDev.Player.Progression
 
         /// <summary>10.2 First Aid in the slice: a treatment's check takes `(Dexterity + First Aid) / 2` (S3a.7).</summary>
         FirstAid,
+
+        /// <summary>10.3 §3, §9: the Notice Meter weighs `(Dexterity + Stealth + Darkness) / 2` against Perception (S3b.1).</summary>
+        Stealth,
     }
 
     /// <summary>What a check reads of a character.</summary>

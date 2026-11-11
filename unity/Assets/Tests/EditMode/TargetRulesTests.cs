@@ -258,7 +258,7 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(Cell(11, 10), slow.Cell, "it walks into no enemy's reach");
             Assert.IsTrue(slow.Fighter.Stance, "and holds back in a Defensive Stance");
             Assert.AreEqual(10, slow.Fighter.Reserve, "with every AP held");
-            Assert.AreEqual(new Vector2Int(0, 0), slow.Facing, "having neither moved nor struck");
+            Assert.AreEqual(new Vector2Int(-1, 0), slow.Facing, "still facing the fight as it began, having neither moved nor struck");
             Assert.AreEqual(quick, _turns.Acting);
 
             _turns.PlayTurn();

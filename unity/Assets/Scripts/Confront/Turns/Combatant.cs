@@ -107,5 +107,11 @@ namespace GameDev.Confront.Turns
 
         /// <summary>It loses its turns or has asked for mercy, so Target Rules weigh it as no threat (10.2 §5a).</summary>
         internal bool Helpless => Fighter.LostTurns > 0 || AsksMercy;
+
+        /// <summary>
+        /// In Stealth Mode (10.3 §8): enemies do not target it, and its next attack is a stealth attack. Set before the
+        /// encounter begins for a fighter that enters it hidden; the economy sets it after.
+        /// </summary>
+        public bool Hidden { get; set; }
     }
 }

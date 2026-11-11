@@ -88,7 +88,7 @@ namespace GameDev.Confront.Turns
                 }
 
                 var cost = c.Fighter.Weapon.AttackAp;
-                if (first || c.Intent == null || !c.Intent.Standing || c.Intent.Side == c.Side)
+                if (first || c.Intent == null || !c.Intent.Standing || c.Intent.Side == c.Side || c.Intent.Hidden)
                 {
                     c.Intent = Best(c, _foes);
                 }
@@ -453,7 +453,7 @@ namespace GameDev.Confront.Turns
             into.Clear();
             foreach (var f in _order)
             {
-                if (f.Standing && f.Side != c.Side)
+                if (f.Standing && f.Side != c.Side && !f.Hidden)
                 {
                     into.Add(f);
                 }
@@ -466,7 +466,7 @@ namespace GameDev.Confront.Turns
             into.Clear();
             foreach (var f in _order)
             {
-                if (f.Standing && f.Side != c.Side && Beside(c.Cell, f.Cell))
+                if (f.Standing && f.Side != c.Side && !f.Hidden && Beside(c.Cell, f.Cell))
                 {
                     into.Add(f);
                 }
