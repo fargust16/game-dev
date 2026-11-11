@@ -53,10 +53,13 @@ namespace GameDev.Slice
         /// <summary>A skinning's check (S5a.6; 19 §6.4); fork it with the beast's id hashed.</summary>
         public const string Skinning = "slice.skinning";
 
+        /// <summary>A theft's bar and purse (S5a.8; 10.3 §6, 19 §6.3); fork it with the person's name hashed and the day.</summary>
+        public const string Theft = "slice.theft";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
-            ShopStock, Workshop, Gathering, Skinning,
+            ShopStock, Workshop, Gathering, Skinning, Theft,
         };
     }
 }

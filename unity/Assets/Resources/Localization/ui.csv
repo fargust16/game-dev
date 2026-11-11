@@ -270,3 +270,9 @@ ui.remains.fault.taken,Its parts are already taken.,Трофеи уже забр
 ui.remains.fault.skinned,Its hide is already off.,Шкура уже снята.
 ui.remains.fault.lesson,Skinning needs a lesson from Edda Brann.,Свежевать учит Эдда Бранн.
 ui.remains.fault.heavy,The bag can carry no more.,Больше не унести.
+# Theft from the townsfolk and the Reaction Check (S5a.8; 10.3 §6)
+ui.prompt.theft,E  Lift the purse,E  Срезать кошелёк
+ui.theft.caption,Space when the marker is in the zone,"Пробел, когда метка в зоне"
+ui.theft.lifted,Lifted unseen: {0}.,Срезано незаметно: {0}.
+ui.theft.noticed,Noticed! Nothing taken.,Заметили! Ничего не взято.
+ui.theft.shout,Thief!,Вор!

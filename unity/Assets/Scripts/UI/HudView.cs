@@ -137,6 +137,102 @@ namespace GameDev.UI
 
         public bool IsBagOpen => _bag != null && _bag.ClassListContains(NotesVisible);
 
+        // A Reaction Check's bar (S5a.8), built in code on the first check of each tree.
+        private VisualElement _reaction;
+        private VisualElement _reactionGood;
+        private VisualElement _reactionPerfect;
+        private VisualElement _reactionMarker;
+        private Label _reactionCaption;
+
+        /// <summary>Whether a Reaction Check's bar is on the screen.</summary>
+        public bool IsReactionShown => _reaction != null && _reaction.panel != null && _reaction.style.display.value == DisplayStyle.Flex;
+
+        /// <summary>
+        /// A Reaction Check's bar (S5a.8; 20 §3, 10.3 §6): its good zone, a perfect zone inside it when it has one, and
+        /// the marker, each as a share of the bar from 0 to 1, under a caption.
+        /// </summary>
+        public void ShowReaction(string caption, float goodStart, float goodWidth, float perfectStart, float perfectWidth, float marker)
+        {
+            if (!Bind())
+            {
+                return;
+            }
+
+            if (_reaction == null || _reaction.panel == null)
+            {
+                BuildReaction(GetComponent<UIDocument>().rootVisualElement);
+            }
+
+            _reactionCaption.text = caption;
+            _reactionGood.style.left = Length.Percent(goodStart * 100f);
+            _reactionGood.style.width = Length.Percent(goodWidth * 100f);
+            _reactionPerfect.style.display = perfectWidth > 0f ? DisplayStyle.Flex : DisplayStyle.None;
+            _reactionPerfect.style.left = Length.Percent(perfectStart * 100f);
+            _reactionPerfect.style.width = Length.Percent(perfectWidth * 100f);
+            _reactionMarker.style.left = Length.Percent(marker * 100f);
+            _reaction.style.display = DisplayStyle.Flex;
+        }
+
+        public void HideReaction()
+        {
+            if (_reaction != null)
+            {
+                _reaction.style.display = DisplayStyle.None;
+            }
+        }
+
+        // Authoring defaults: a dark bar edged in brass at the bottom centre, a muted green good zone, a gold perfect
+        // zone and an ivory marker, in the slice's Victorian palette.
+        private void BuildReaction(VisualElement root)
+        {
+            _reaction = new VisualElement { name = "reaction", pickingMode = PickingMode.Ignore };
+            _reaction.style.position = Position.Absolute;
+            _reaction.style.left = Length.Percent(30f);
+            _reaction.style.width = Length.Percent(40f);
+            _reaction.style.bottom = Length.Percent(22f);
+            _reactionCaption = new Label { pickingMode = PickingMode.Ignore };
+            _reactionCaption.style.unityTextAlign = TextAnchor.MiddleCenter;
+            _reactionCaption.style.color = new Color(0.93f, 0.89f, 0.80f);
+            _reactionCaption.style.fontSize = 18f;
+            _reactionCaption.style.marginBottom = 6f;
+            var bar = new VisualElement { pickingMode = PickingMode.Ignore };
+            bar.style.height = 20f;
+            bar.style.backgroundColor = new Color(0.07f, 0.06f, 0.05f, 0.88f);
+            var brass = new Color(0.62f, 0.50f, 0.30f);
+            bar.style.borderTopColor = brass;
+            bar.style.borderBottomColor = brass;
+            bar.style.borderLeftColor = brass;
+            bar.style.borderRightColor = brass;
+            bar.style.borderTopWidth = 1f;
+            bar.style.borderBottomWidth = 1f;
+            bar.style.borderLeftWidth = 1f;
+            bar.style.borderRightWidth = 1f;
+            _reactionGood = Zone(new Color(0.42f, 0.52f, 0.30f, 0.95f));
+            _reactionPerfect = Zone(new Color(0.86f, 0.72f, 0.36f, 1f));
+            _reactionMarker = Zone(new Color(0.96f, 0.94f, 0.88f, 1f));
+            _reactionMarker.style.width = 3f;
+            _reactionMarker.style.marginLeft = -1.5f;
+            _reactionMarker.style.top = -4f;
+            _reactionMarker.style.bottom = -4f;
+            bar.Add(_reactionGood);
+            bar.Add(_reactionPerfect);
+            bar.Add(_reactionMarker);
+            _reaction.Add(_reactionCaption);
+            _reaction.Add(bar);
+            _reaction.style.display = DisplayStyle.None;
+            root.Add(_reaction);
+        }
+
+        private static VisualElement Zone(Color colour)
+        {
+            var zone = new VisualElement { pickingMode = PickingMode.Ignore };
+            zone.style.position = Position.Absolute;
+            zone.style.top = 0f;
+            zone.style.bottom = 0f;
+            zone.style.backgroundColor = colour;
+            return zone;
+        }
+
         /// <summary>The bag page's lines, money and load first, then each stack and piece (S5a.1).</summary>
         public IReadOnlyList<string> BagLines => _bag == null
             ? new string[0]

@@ -83,6 +83,12 @@ namespace GameDev.Slice
         /// <summary>What fallen beasts leave (S5a.6): their ingredients, and their hides by Skinning; null without a bag or the beasts.</summary>
         public GameDev.Slice.Beasts.SliceRemains Remains { get; private set; }
 
+        /// <summary>A Reaction Check on the HUD (S5a.8): theft's now, breaking in's and brewing's later.</summary>
+        public SliceReaction Reaction { get; private set; }
+
+        /// <summary>Theft from the townsfolk (S5a.8); null without a bag or the Deeds Record.</summary>
+        public GameDev.Slice.Theft.SliceTheft Theft { get; private set; }
+
         /// <summary>11's start: plain clothes with no defence and 500 bronze, with no weapon or tool.</summary>
         public const int StartingBronze = 500;
 
@@ -304,6 +310,13 @@ namespace GameDev.Slice
                 FindCarcasses();
             }
 
+            Reaction = gameObject.AddComponent<SliceReaction>();
+            if (Bag != null && Standing != null)
+            {
+                Theft = new GameDev.Slice.Theft.SliceTheft(Bag, State, Clock, Character, Standing, seed);
+                FindPurses();
+            }
+
             _talk = new DialogueContext
             {
                 State = State,
@@ -482,6 +495,31 @@ namespace GameDev.Slice
             if (Remains != null)
             {
                 FindCarcasses();
+            }
+
+            if (Theft != null)
+            {
+                FindPurses();
+            }
+        }
+
+        /// <summary>A purse to lift on each walking townsperson in the loaded scenes (S5a.8).</summary>
+        private void FindPurses()
+        {
+            var added = false;
+            foreach (var walker in FindObjectsByType<TownsfolkWalker>(FindObjectsInactive.Exclude))
+            {
+                if (walker.GetComponent<GameDev.Slice.Theft.PurseTarget>() == null)
+                {
+                    walker.gameObject.AddComponent<GameDev.Slice.Theft.PurseTarget>().Configure(Theft, Reaction, () => Fights != null && Fights.InFight);
+                    added = true;
+                }
+            }
+
+            var hud = Hud();
+            if (added && hud != null)
+            {
+                hud.FindPromptSources();
             }
         }
 

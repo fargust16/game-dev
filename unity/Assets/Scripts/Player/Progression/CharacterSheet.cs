@@ -48,6 +48,9 @@ namespace GameDev.Player.Progression
 
         /// <summary>19 §6.4: a fallen beast's hide, `(Dexterity + Skinning) / 2` against D 2, after the lesson (S5a.6).</summary>
         Skinning,
+
+        /// <summary>10.3 §6: theft from a person and a lock, `(Dexterity + Theft) / 2` against Perception or the lock (S5a.8).</summary>
+        Theft,
     }
 
     /// <summary>What a check reads of a character.</summary>
