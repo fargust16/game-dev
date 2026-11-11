@@ -56,7 +56,7 @@ namespace GameDev.Slice.EditorTools
             var cathedralGroup = Group(CathedralGroup);
             var cathedral = new Works(cathedralGroup, true);
             var cathedralMasses = new List<Bounds>();
-            var works = new Works(Group("The works (placeholder)"), true);
+            var works = new Works(Group(WorksGroup), true);
             foreach (var b in _layout.boxes)
             {
                 var quad = Rect(b.x0, b.y0, b.x1, b.y1);

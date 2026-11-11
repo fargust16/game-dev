@@ -123,6 +123,28 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// City plan §35–§36: the cathedral's and the works' placeholder dress seen from the streets at noon.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderDress -lookLabel dress1
+        /// </summary>
+        public static void RenderDress()
+        {
+            var label = Argument("-lookLabel") ?? "dress";
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            Eye(label + "_works", 40f, -108f, 40f, -190f, 2f);
+            Eye(label + "_deafboiler", 141f, -146f, 141f, -173f, 1.7f);
+            Eye(label + "_grubby", 40f, -30f, 40f, -100f, 3f);
+            Eye(label + "_cathedral", 40f, 118f, 40f, 186f, 2f);
+            Eye(label + "_close", 85f, 200f, 50f, 200f, 1.7f);
+            Eye(label + "_lenten", 40f, 30f, 40f, -60f, 4f);
+            Eye(label + "_mill", 40f, -131f, 60f, -131f, 2f);
+            Eye(label + "_millstreet", 36f, -100f, 47f, -131f, 2f);
+            Debug.Log($"Veilmouth dress views written to {OutputFolder}.");
+        }
+
+        /// <summary>
         /// C4's ground (VEILMOUTH_CITY_PLAN.md §28.5) from above and from a walker's height, with every built root hidden
         /// for the picture only: the river round the west and south, the sea, the rise under the Penny, the forest's land.
         /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderC4Ground

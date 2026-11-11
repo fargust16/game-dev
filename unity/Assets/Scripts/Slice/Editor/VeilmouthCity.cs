@@ -243,6 +243,7 @@ namespace GameDev.Slice.EditorTools
             Masses();
             Statue();
             CellarDoor();
+            WorksDressOf(_root.Find(WorksGroup)); // §36, after the cellar door, which it keeps clear of
             Cemetery();
             Market();
             Cargo();

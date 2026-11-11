@@ -16,13 +16,13 @@ namespace GameDev.Slice.EditorTools
     /// <item>buttresses and lancet windows in bays along the walls, a string course and a cornice;</item>
     /// <item>on the front, a pointed portal, two lancets beside it, and a rose window.</item>
     /// </list>
-    /// One merged mesh for each material, on NoGrid with no collider, so nothing in play changes. Every size is an
-    /// authoring default, in metres.
+    /// One merged mesh for each material, on NoGrid with no collider, but for the buttresses, which stand out into the
+    /// close and are solid on Structure. Every size is an authoring default, in metres.
     /// </summary>
     public static partial class VeilmouthCity
     {
-        private const string CathedralGroup = "The cathedral (placeholder)", DressName = "The cathedral - Gothic dress";
-        private const string RoofSlate = "VIC_Slate_Rough", DarkGlass = "VIC_Iron", PortalWood = "VIC_Wood_Oxblood", FrameStone = "VIC_Stone_Medium";
+        private const string CathedralGroup = "The cathedral (placeholder)", DressName = "The cathedral - Gothic dress", ButtressName = "The cathedral - buttresses";
+        private const string RoofSlate = "VIC_Slate_Rough", DarkGlass = "VIC_Iron", Glazing = "VIC_Glass_Grimy", PortalWood = "VIC_Wood_Oxblood", FrameStone = "VIC_Stone_Medium";
 
         private const float RoofRise = 1f, Eaves = 0.4f, CathedralBay = 6f;
         private const float LancetWidth = 1.6f, LancetSill = 5f, LancetHead = 5f, LancetPoint = 1.3f;
@@ -76,6 +76,10 @@ namespace GameDev.Slice.EditorTools
             var owner = new GameObject(DressName).transform;
             owner.SetParent(group, false);
             var dress = new Works(owner, false);
+            // The buttresses stand 1.3 m out into the close, so they are solid: walking and the Combat Grid meet them.
+            var solidOwner = new GameObject(ButtressName).transform;
+            solidOwner.SetParent(owner, false);
+            var solid = new Works(solidOwner, true);
             var tower = masses.OrderByDescending(m => m.max.y).First();
             var body = masses.Where(m => m != tower).ToList();
             var bodyCentre = body.Count > 0 ? body.Aggregate(Vector3.zero, (s, m) => s + m.center) / body.Count : tower.center;
@@ -88,12 +92,13 @@ namespace GameDev.Slice.EditorTools
                 count[2]++;
                 foreach (var wall in Walls(m))
                 {
-                    Bays(dress, m, wall, masses, count);
+                    Bays(dress, solid, m, wall, masses, count);
                 }
             }
 
             Tower(dress, tower, front, count);
             dress.Finish(CathedralStone);
+            solid.Finish(CathedralStone);
             Debug.Log($"[VeilmouthCity] the cathedral's Gothic dress: {count[2]} roofs, {count[0]} lancets, {count[1]} buttresses, the spire's cross {tower.max.y + SpireHeight + 2f - GroundOf(tower):0.0} m over the ground, the front facing {front}.");
         }
 
@@ -155,7 +160,7 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>A wall's bays: buttresses between lancets, a string course under the sills and a cornice at the top.</summary>
-        private static void Bays(Works dress, Bounds m, Wall wall, IReadOnlyList<Bounds> masses, int[] count)
+        private static void Bays(Works dress, Works solid, Bounds m, Wall wall, IReadOnlyList<Bounds> masses, int[] count)
         {
             var ground = GroundOf(m);
             var top = m.max.y;
@@ -173,8 +178,8 @@ namespace GameDev.Slice.EditorTools
                     var y0 = ground - 0.3f;
                     var y1 = top - ButtressBelowTop;
                     var c = wall.At(s, (y0 + y1) / 2f) + (wall.Out * (ButtressDepth / 2f));
-                    dress.Box(c, Size(wall, ButtressWidth, y1 - y0, ButtressDepth), 0f, false);
-                    Pyramid(dress, wall.At(s, y1) + (wall.Out * (ButtressDepth / 2f)), Size(wall, ButtressWidth, 0f, ButtressDepth) / 2f, ButtressCap, null);
+                    solid.Box(c, Size(wall, ButtressWidth, y1 - y0, ButtressDepth), 0f);
+                    Pyramid(solid, wall.At(s, y1) + (wall.Out * (ButtressDepth / 2f)), Size(wall, ButtressWidth, 0f, ButtressDepth) / 2f, ButtressCap, null);
                     count[1]++;
                 }
 
@@ -191,7 +196,7 @@ namespace GameDev.Slice.EditorTools
                     continue;
                 }
 
-                Arch(dress, wall.At(mid, sill), wall.Along, wall.Out, LancetWidth, lintel - sill, LancetPoint, DarkGlass, 0.05f);
+                Arch(dress, wall.At(mid, sill), wall.Along, wall.Out, LancetWidth, lintel - sill, LancetPoint, Glazing, 0.05f);
                 count[0]++;
             }
         }
@@ -199,8 +204,8 @@ namespace GameDev.Slice.EditorTools
         private static Vector3 Size(Wall wall, float along, float height, float depth) =>
             new Vector3(Mathf.Abs(wall.Along.x) > 0.5f ? along : depth, height, Mathf.Abs(wall.Along.x) > 0.5f ? depth : along);
 
-        private static void Band(Works dress, Wall wall, float y, float height, float depth) =>
-            dress.Box(wall.At(wall.Length / 2f, y), Size(wall, wall.Length + depth, height, depth), 0f, false);
+        private static void Band(Works dress, Wall wall, float y, float height, float depth, string material = null) =>
+            dress.Box(wall.At(wall.Length / 2f, y), Size(wall, wall.Length + depth, height, depth), 0f, false, material);
 
         private static void Tower(Works dress, Bounds tower, Vector3 front, int[] count)
         {
@@ -225,7 +230,7 @@ namespace GameDev.Slice.EditorTools
                 // Two tall belfry lancets on each free face.
                 foreach (var side in new[] { -1f, 1f })
                 {
-                    Arch(dress, wall.At((wall.Length / 2f) + (side * wall.Length * 0.2f), t - 13f), wall.Along, wall.Out, 1.8f, 7.5f, 1.4f, DarkGlass, 0.05f);
+                    Arch(dress, wall.At((wall.Length / 2f) + (side * wall.Length * 0.2f), t - 13f), wall.Along, wall.Out, 1.8f, 7.5f, 1.4f, Glazing, 0.05f);
                     count[0]++;
                 }
 
@@ -270,13 +275,13 @@ namespace GameDev.Slice.EditorTools
             Arch(dress, wall.At(mid, ground - 0.1f), wall.Along, wall.Out, PortalWidth, PortalHeight, PortalPoint, PortalWood, 0.06f);
             foreach (var side in new[] { -1f, 1f })
             {
-                Arch(dress, wall.At(mid + (side * 6f), ground + 3f), wall.Along, wall.Out, LancetWidth, 9f, LancetPoint, DarkGlass, 0.05f);
+                Arch(dress, wall.At(mid + (side * 6f), ground + 3f), wall.Along, wall.Out, LancetWidth, 9f, LancetPoint, Glazing, 0.05f);
                 count[0]++;
             }
 
             var centre = wall.At(mid, ground + RoseHeight);
             Disc(dress, centre + (wall.Out * 0.03f), wall.Along, wall.Out, RoseRadius + 0.6f, FrameStone);
-            Disc(dress, centre + (wall.Out * 0.06f), wall.Along, wall.Out, RoseRadius, DarkGlass);
+            Disc(dress, centre + (wall.Out * 0.06f), wall.Along, wall.Out, RoseRadius, Glazing);
             for (var k = 0; k < 6; k++)
             {
                 var a = k * 30f * Mathf.Deg2Rad;
