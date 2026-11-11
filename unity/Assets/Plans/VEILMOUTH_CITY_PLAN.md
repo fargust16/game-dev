@@ -4,7 +4,7 @@ Version: 0.67
 
 Status: Draft — C1 accepted by the owner, 2026-11-05; C2 (§21), which replaces C1's layout, accepted 2026-11-06; C3 (§24), which replaces C2's layout and houses, asked for by the owner 2026-11-08, built, and walked by the owner the same day, whose remarks go to [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md); C4 (§28), the owner's map, which replaces C3's layout, ground and names, asked for by the owner 2026-11-10, built the same day and walked by the owner; C5 (§29), which cuts C4's map into blocks, asked for by the owner 2026-11-10 after that walk and being built step by step; the owner's walk of C5 and its fixes in §31 (2026-11-10); sizes remain authoring defaults
 
-Last Updated: 2026-11-11 (§25 colour and the look's table: the city green's middle and light keys a little greyer, (0.31, 0.355, 0.24) and (0.56, 0.60, 0.40), so the palette sheet stays under 40 % under the fuller day grade, saturation −15 (reference plan R3 step 7). Earlier: 2026-11-10: §32: a row on one level: each run of houses wall to wall set on its highest floor, so no band breaks at a party wall; 0 of 58 pairs stepped, 30 before; §31.3: item 6 closed as not reproduced. Earlier: §31: the owner's walk of C5: lamps and road trees in one rhythm of 30 m bays on each kerb, a lamp's base clear of the kerb and its foot on the ground, wards as chalk on whole faces, railings drawn out to their walls and posts at every free end, stone under the works' bank, wing walls at the bridges, one parapet between bridges, every carriageway in setts; §31.4 as built; the hole of item 6 not found, its place asked of the owner. Earlier: §30.2: the lamps, their glass and the statue built; the gaslight made unlit, since its emission keyword was never kept; the frame with the Tripo lamps and people at most 11.95 ms in any view, so the lamp needs no far level. Earlier: §30: the owner's Tripo street lamp in the place of every lamp post and one bronze statue on Drowsy Steps, two more exceptions to §25.6. Earlier: §29.11: the far LOD built and measured: every view's median frame within the 16.7 ms budget, the swap unseen; the yard doors left out of it; its glass a variant of the kit glass that writes depth and reads the panes' rooms.)
+Last Updated: 2026-11-11 (§33: the frame after S3a and S3b measured in the build: every view within the 16.7 ms budget, 10.83 ms pooled, at most 12.49 ms down Salt Gullet; the drawing fell, the scripts rose. Earlier: §25 colour and the look's table: the city green's middle and light keys a little greyer, (0.31, 0.355, 0.24) and (0.56, 0.60, 0.40), so the palette sheet stays under 40 % under the fuller day grade, saturation −15 (reference plan R3 step 7). Earlier: 2026-11-10: §32: a row on one level: each run of houses wall to wall set on its highest floor, so no band breaks at a party wall; 0 of 58 pairs stepped, 30 before; §31.3: item 6 closed as not reproduced. Earlier: §31: the owner's walk of C5: lamps and road trees in one rhythm of 30 m bays on each kerb, a lamp's base clear of the kerb and its foot on the ground, wards as chalk on whole faces, railings drawn out to their walls and posts at every free end, stone under the works' bank, wing walls at the bridges, one parapet between bridges, every carriageway in setts; §31.4 as built; the hole of item 6 not found, its place asked of the owner. Earlier: §30.2: the lamps, their glass and the statue built; the gaslight made unlit, since its emission keyword was never kept; the frame with the Tripo lamps and people at most 11.95 ms in any view, so the lamp needs no far level. Earlier: §30: the owner's Tripo street lamp in the place of every lamp post and one bronze statue on Drowsy Steps, two more exceptions to §25.6. Earlier: §29.11: the far LOD built and measured: every view's median frame within the 16.7 ms budget, the swap unseen; the yard doors left out of it; its glass a variant of the kit glass that writes depth and reads the panes' rooms.)
 
 Depends On:
 [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §2, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md), [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_STREETS_PLAN.md](VICTORIAN_STREETS_PLAN.md), [WORLD_STYLE_GUIDE.md](WORLD_STYLE_GUIDE.md)
@@ -2316,3 +2316,25 @@ Measured after the work by `VeilmouthWalkAudit` (`Logs/SliceSurvey/walk_audit.tx
 - **Lifts:** the most a house is raised is 0.70 m; no run spreads over 1.2 m, so none is cut.
 - **Doors:** of 138 street doors, 29 stand more than 0.5 m over the ground 1.5 m before them, the highest 0.83 m. Each has its stoop and the steps down from it (`walk_raised_*.png`).
 - **Not yet seen by the owner.**
+
+# 33. The frame after S3, measured, 2026-11-11
+
+The frame is measured again after S3a and S3b (vertical slice plan): the fight's services, Stealth Mode with every townsperson's Vision Cone and Notice Meter, the beasts in their ten territories and the POIs' people, and §31's lamps and trees, which C5 has had since §30.2.
+
+**Probe.** `FrameProbe` in a development build, as in §30.2: 1920 × 1080, High, the owner's machine, medians of 3 rounds of 120 frames after 60 warm-ups (`Logs/SliceSurvey/s3b_frames.txt`, ms).
+
+| View | As shipped, §30.2 | As shipped, now | No shadows, §30.2 | No shadows, now |
+|---|---|---|---|---|
+| down Long Tongue | 10.02 | 10.73 | 8.88 | 9.21 |
+| down Salt Gullet | 11.95 | 12.49 | 9.39 | 10.27 |
+| across the Penny | 6.82 | 7.12 | 5.87 | 6.20 |
+| down Thimble Street | 10.33 | 11.49 | 8.54 | 9.70 |
+| Draught Lane | 10.13 | 11.50 | 9.35 | 10.44 |
+| the West Road | 8.46 | 10.29 | 7.75 | 8.58 |
+| in Gloomwood | 4.58 | 5.91 | 4.20 | 5.22 |
+| pooled | 9.62 | 10.83 | – | 9.07 |
+
+- **Within budget.** Every view keeps its median within the 16.7 ms budget (§29.10). The worst, down Salt Gullet, leaves 4.2 ms.
+- **The drawing fell.** Pooled over the views, triangles fell from 16.2 to 15.1 million, draw calls from 13 361 to 12 990, and shadow casters from 7 237 to 7 088, since §31 took out 102 lamps and 31 road trees. The GPU works 4.1 ms of the frame.
+- **The main thread rose** by about 1.2 ms pooled, and the frame with it, so the rise is the scripts', not the drawing's. The largest rise, 1.3–1.8 ms, is in Gloomwood and on the West Road, where the beasts' territories lie near. Which system costs what is not measured.
+- **Reading** (the agent's): the machine's load differed between runs before (§29.11), so the rise is an upper bound. If the budget's margin shrinks, the beasts' and the observers' updates are profiled first.
