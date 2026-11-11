@@ -114,7 +114,7 @@ namespace GameDev.Slice.EditorTools
         {
             var panes = Object.FindObjectsByType<VicWindowRooms>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
                 .SelectMany(r => Enumerable.Range(0, r.Count).Select(i => r[i].Pane))
-                .Where(p => p != null && p.enabled)
+                .Where(p => p != null && p.enabled && p.name.IndexOf("_Door_", System.StringComparison.Ordinal) < 0) // a door's glass has no sill
                 .Select(Footprint)
                 .ToList();
             if (panes.Count == 0)

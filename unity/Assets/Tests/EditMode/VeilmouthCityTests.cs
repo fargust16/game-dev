@@ -220,7 +220,7 @@ namespace GameDev.Slice.Tests
             var rect = ground.SillsRect;
             const float step = GameDev.VictorianKit.VicGround.SillsStep, storey = GameDev.VictorianKit.VicGround.Storey;
             float Height(float t) => t > 0f ? GameDev.VictorianKit.VicGround.SillsBase + (Mathf.Round(t * 255f) * step) : 0f;
-            var panes = All<GameDev.VictorianKit.VicWindowRooms>().SelectMany(r => Enumerable.Range(0, r.Count).Select(i => r[i].Pane)).Where(p => p != null).ToList();
+            var panes = All<GameDev.VictorianKit.VicWindowRooms>().SelectMany(r => Enumerable.Range(0, r.Count).Select(i => r[i].Pane)).Where(p => p != null && !p.name.Contains("_Door_")).ToList();
             Assert.Greater(panes.Count, 1000, "the city's windows");
             var missed = 0;
             foreach (var pane in panes.Where((_, i) => i % 25 == 0))
