@@ -233,6 +233,7 @@ namespace GameDev.Slice.Atmosphere
             }
 
             Shader.SetGlobalFloat(VicStreetLighting.NightId, 1f - day);
+            Shader.SetGlobalFloat(VicStreetLighting.LateId, VicStreetLighting.Late(minute));
             if (twilight != null)
             {
                 twilight.weight = dusk;

@@ -55,5 +55,7 @@ void SetupDOTSVicWindowMaterialPropertyCaches()
 TEXTURE2D(_MaskMap);
 
 float _VicNight;
+// How late the night is, 0 until 22:00 and 1 from 01:00 until dawn (VicStreetLighting.LateId): fewer rooms stay lit.
+float _VicLate;
 
 #endif

@@ -36,5 +36,20 @@ namespace GameDev.Slice.Tests
             Assert.Greater(blocks, 250);
             CollectionAssert.IsEmpty(faults.Select(f => f.ToString()));
         }
+
+        /// <summary>The rooms behind the windows go dark from 22:00 to 01:00 and stay so until dawn (reference plan R3).</summary>
+        [Test]
+        public void TheNightGrowsLateFromTenToOne()
+        {
+            float Late(int hour, int minute = 0) => GameDev.VictorianKit.VicStreetLighting.Late((hour * 60) + minute);
+            Assert.AreEqual(0f, Late(12), 1e-5f);
+            Assert.AreEqual(0f, Late(21, 59), 1e-5f);
+            Assert.AreEqual(0f, Late(22), 1e-5f);
+            Assert.AreEqual(0.5f, Late(23, 30), 1e-5f);
+            Assert.AreEqual(1f, Late(1), 1e-5f);
+            Assert.AreEqual(1f, Late(5, 59), 1e-5f);
+            Assert.AreEqual(0f, Late(6), 1e-5f);
+            Assert.AreEqual(Late(23), GameDev.VictorianKit.VicStreetLighting.Late((23 * 60) + 1440), 1e-5f);
+        }
     }
 }

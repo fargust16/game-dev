@@ -184,7 +184,7 @@ Shader "GameDev/VictorianKit/Window"
 
             // The far look: a room by interior mapping in the pane's frame, the box of ReadRoom behind the pane, with
             // the same curtains and blind as the near look.
-            half3 MappedRoom(float3 dir, float2 pane, RoomBox b, float h2, float night, bool lit, out float fade)
+            half3 MappedRoom(float3 dir, float2 pane, RoomBox b, float h2, float night, bool lit, half3 lampColor, out float fade)
             {
                 dir.z = min(dir.z, -1e-3);
                 float3 p0 = float3(pane.x, pane.y, 0.0);
@@ -225,7 +225,7 @@ Shader "GameDev/VictorianKit/Window"
                 float lamp = lit ? _NightIntensity * 0.35 * min(shade, 40.0) * (0.6 + 0.4 * (1.0 - fade)) : 0.02;
                 // The lamp's light takes over the finish's hue, as the near look's glow is the lamp's colour.
                 half3 lampLit = lerp(room, dot(room, half3(0.2126, 0.7152, 0.0722)).xxx, 0.6);
-                return room * lerp(_RoomDay, 0.0, night) + lampLit * _NightColor.rgb * lamp * night;
+                return room * lerp(_RoomDay, 0.0, night) + lampLit * lampColor * lamp * night;
             }
 
             half4 Frag(Varyings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
@@ -258,12 +258,31 @@ Shader "GameDev/VictorianKit/Window"
                 float3 Np = normalize(ripple.x * T + ripple.y * B + ripple.z * N);
 
                 float night = saturate(_VicNight);
-                bool lit = h3 < _LitFraction;
+                // Each room keeps its own hours and lamp (reference plan R3, 2026-11-11). As the night grows late
+                // (_VicLate, 22:00 to 01:00) the rooms go dark one by one, the higher hash first, until 45 % of the
+                // evening's are lit; and a lit room's lamp is its own, a warm candle to a whiter oil lamp, from half to
+                // 1.2 times the material's strength. A glass lit in every pane (the strange windows, VeilmouthMystic)
+                // keeps its hours and its colour. Authoring defaults.
+                float h4 = Hash13(cell + 13.21);
+                float h5 = Hash13(cell + 17.47);
+                bool everyPane = _LitFraction > 0.999;
+                bool lit = h3 < (everyPane ? 1.0 : _LitFraction * (1.0 - 0.55 * saturate(_VicLate)));
+                half3 lampColor = _NightColor.rgb * (everyPane ? half3(1.0, 1.0, 1.0) : lerp(half3(1.0, 0.86, 0.72), half3(0.96, 1.04, 1.12), h5))
+                    * lerp(0.5, 1.2, h4);
                 float far = smoothstep(_RoomNear, _RoomFar, distance(GetCameraPositionWS(), input.positionWS));
 
                 // The pane's own frame of the view, into the room (−N is inward from whichever side is seen).
                 float3 d = -V;
                 float3 dir = float3(dot(d, T), dot(d, B), dot(d, N));
+
+                // The lamp stands in the room, so its light is brightest round it and moves with the eye: the nearest
+                // the view ray passes to a point 1.0–2.6 m behind the pane, by the window's hash, sets the light from 0.4
+                // to 1.7 times (authoring defaults). A pane lit in every room keeps an even light.
+                float3 lampAt = float3((h4 - 0.5) * 0.7, 0.9 + 0.5 * h5, -(1.0 + 1.6 * h2));
+                float3 rd = normalize(float3(dir.xy, min(dir.z, -1e-3)));
+                float3 toLamp = lampAt - float3(pane, 0.0);
+                float3 miss = toLamp - rd * max(dot(toLamp, rd), 0.0);
+                lampColor *= everyPane ? 1.0 : 0.4 + 1.3 * exp(-dot(miss, miss) / 0.25);
 
                 // Curtains at the sides and a blind from the top, just behind the pane, narrow so the room shows; the
                 // mapped room keeps the same ones, so the turn from near to far changes no curtain (R2 step 4).
@@ -293,8 +312,10 @@ Shader "GameDev/VictorianKit/Window"
 
                 // Near: the reflection lies over the room seen through the pane; a curtain or blind hides the room.
                 float reflectNear = saturate(fresnel * _Reflect);
-                half3 fabricLight = ambient * (1.0 - night) + _NightColor.rgb * (lit ? 0.9 : 0.03) * night;
-                half3 lampGlow = _NightColor.rgb * _NightIntensity * 0.35 * (lit ? 1.0 : 0.0) * night;
+                half3 fabricLight = ambient * (1.0 - night) + lampColor * (lit ? 0.9 : 0.03) * night;
+                // Near, the lamp's glow on the pane: 0.24 of its strength, so a lit window stays amber under the
+                // tonemapper and its lamp shows, where 0.35 turned every one an even cream (2026-11-11).
+                half3 lampGlow = lampColor * _NightIntensity * (everyPane ? 0.35 : 0.24) * (lit ? 1.0 : 0.0) * night;
                 bool covered = curtain || blindOn;
                 half3 behind = covered ? (curtain ? curtainColor : blindColor) * fabricLight : lampGlow * glass;
                 float through = covered ? 0.0 : _Transmit * dot(glass, half3(0.3333, 0.3333, 0.3333)) * (lit && night > 0.5 ? 0.55 : 1.0);
@@ -307,8 +328,8 @@ Shader "GameDev/VictorianKit/Window"
                 {
                     float fade;
                     uint merged = (uint)(input.room.x + 0.5) | ((uint)(input.room.y + 0.5) << 16);
-                    half3 inside = MappedRoom(dir, pane, ReadRoom(_FarLod > 0.5 ? merged : unity_RendererUserValue, h1, h3), h2, night, lit, fade);
-                    inside = curtain ? curtainColor * (lerp(_RoomDay, 0.0, night) + _NightColor.rgb * (lit ? 0.6 : 0.0) * night) : inside;
+                    half3 inside = MappedRoom(dir, pane, ReadRoom(_FarLod > 0.5 ? merged : unity_RendererUserValue, h1, h3), h2, night, lit, lampColor, fade);
+                    inside = curtain ? curtainColor * (lerp(_RoomDay, 0.0, night) + lampColor * (lit ? 0.6 : 0.0) * night) : inside;
                     inside = blindOn ? blindColor * lerp(_RoomDay, 0.0, night) : inside;
                     float reflectFar = saturate((0.08 + 0.92 * fresnel) * _Reflect);
                     farColor = inside * glass * (1.0 - reflectFar) + env * reflectFar + spec * sun.color;

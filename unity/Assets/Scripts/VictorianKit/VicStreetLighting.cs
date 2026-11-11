@@ -13,6 +13,25 @@ namespace GameDev.VictorianKit
         /// <summary>The global the window shader reads: 0 by day, 1 at night.</summary>
         public static readonly int NightId = Shader.PropertyToID("_VicNight");
 
+        /// <summary>
+        /// The global the window shader reads for how late the night is: 0 until 22:00, rising to 1 at 01:00 and held
+        /// until dawn, so fewer rooms stay lit (reference plan R3). Unset, it reads 0 and every evening room stays lit.
+        /// </summary>
+        public static readonly int LateId = Shader.PropertyToID("_VicLate");
+
+        /// <summary>How late the night is at <paramref name="minute"/> of the day (authoring defaults: 22:00 to 01:00).</summary>
+        public static float Late(int minute)
+        {
+            const int from = 22 * 60, span = 3 * 60, dawn = 6 * 60;
+            var m = ((minute % 1440) + 1440) % 1440;
+            if (m >= from)
+            {
+                return Mathf.Clamp01((m - from) / (float)span);
+            }
+
+            return m < dawn ? Mathf.Clamp01((m + 1440 - from) / (float)span) : 0f;
+        }
+
         public Light Sun;
 
         /// <summary>The streets' baked reflection probes: dimmed at night, since they hold the day sky.</summary>
