@@ -316,6 +316,25 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// §43: a cast-iron grate lies in the street trees' pits, with no collider, within the pits and no higher than
+        /// 0.1 m over their earth, so the pits' own collider and the Combat Grid are as before.
+        /// </summary>
+        [Test]
+        public void TheStreetTreesStandInGrates()
+        {
+            var city = _scene.GetRootGameObjects().Single(g => g.name == VeilmouthCity.RootName).transform;
+            var grates = city.Find("The tree grates");
+            Assert.IsNotNull(grates, "the tree grates");
+            Assert.AreEqual(0, grates.GetComponentsInChildren<Collider>(true).Length, "the grates have no collider");
+            var drawn = grates.GetComponentsInChildren<MeshRenderer>().ToList();
+            Assert.AreEqual(1, drawn.Count, "one merged mesh of the kit's iron");
+            var pits = _scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<MeshCollider>()).Single(c => c.name == "Tree Pits").bounds;
+            var b = drawn[0].bounds;
+            pits.Expand(0.2f);
+            Assert.IsTrue(pits.Contains(b.min) && pits.Contains(b.max), "the grates lie within the pits");
+        }
+
+        /// <summary>
         /// §37–§38: the One-Eye's lantern and Stone Grandad's burn with the gas lamps, and the clock's dials glow with
         /// them, in their own glass or stucco by day, but none is a street lamp, so they add nothing to the Darkness of
         /// 10.3 §3.

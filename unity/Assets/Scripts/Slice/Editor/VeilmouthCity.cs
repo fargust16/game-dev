@@ -284,6 +284,7 @@ namespace GameDev.Slice.EditorTools
             GravesDressOf(_root); // §40: Last Turning Cemetery's stones
             GatesDressOf(_root, _layout); // §41: the gatehouse over Creaking Gate
             WallDressOf(_root, _layout); // §42: the town wall's coping, plinth and pilasters
+            GratesOf(_root); // §43: a cast-iron grate in each street tree's pit
             var sky = scene.GetRootGameObjects().FirstOrDefault(g => g.name == VeilmouthMystic.RootName);
             if (sky != null)
             {
