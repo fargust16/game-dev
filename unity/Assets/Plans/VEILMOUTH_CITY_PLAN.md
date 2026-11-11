@@ -2493,7 +2493,7 @@ The frame is measured again after §34–§38: the setts, the night windows (ref
 - **Cost:** three merged meshes, one for each stone, of about 1 400 triangles and three draw calls, where 24 of the pack's tombs were drawn before. It is not measured in a build, since none of `FrameProbe`'s views looks at the cemetery.
 - Every size is an authoring default, in metres.
 
-**Checked** by `VeilmouthRenders.RenderDress` (`cem1_cemetery`, `cem1_graves` before; `cem2_*` after). From the gate the cemetery reads as headstones, crosses and obelisks under the cathedral's tower. `VeilmouthCityTests.TheCemeterysStonesStandInItsGraves` checks that every grave keeps its collider and block, that three keep the pack's tomb, and that the others have their stones.
+**Checked** by `VeilmouthRenders.RenderDress` (`cem1_cemetery`, `cem1_graves` before; `cem2_*` after). From the gate the cemetery reads as headstones, crosses and obelisks under the cathedral's tower. At 23:00 with the sky and the grade (`-lookMinute 1380`, `nightfin_cemetery`) the stones stand as dark shapes under the crimson moon, with the clock's dials glowing beyond. `VeilmouthCityTests.TheCemeterysStonesStandInItsGraves` checks that every grave keeps its collider and block, that three keep the pack's tomb, and that the others have their stones.
 
 **Not yet seen by the owner.**
 
@@ -2514,7 +2514,7 @@ The frame is measured again after §34–§38: the setts, the night windows (ref
 - **Cost:** three merged meshes of about 600 triangles and three draw calls. It is not measured in a build, since none of `FrameProbe`'s views looks at the gate.
 - Every size is an authoring default, in metres.
 
-**Checked** by `VeilmouthRenders.RenderDress` (`gate1_gate` from beyond the river, `gate1_gatein` from Long Tongue). From the river the gate reads as a crenellated gatehouse between its towers. From the city the arch frames the bridge and the road beyond. `VeilmouthCityTests.TheGatehouseStandsOverCreakingGate` checks that the dress meets both towers, has no collider, and hangs no lower than 2.5 m over the road.
+**Checked** by `VeilmouthRenders.RenderDress` (`gate1_gate` from beyond the river, `gate1_gatein` from Long Tongue). From the river the gate reads as a crenellated gatehouse between its towers. From the city the arch frames the bridge and the road beyond. At 23:00 (`nightfin_gatein`) it frames the bridge's gas lamps. `VeilmouthCityTests.TheGatehouseStandsOverCreakingGate` checks that the dress meets both towers, has no collider, and hangs no lower than 2.5 m over the road.
 
 **Not yet seen by the owner.**
 
