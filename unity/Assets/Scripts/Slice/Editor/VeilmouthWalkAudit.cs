@@ -55,9 +55,7 @@ namespace GameDev.Slice.EditorTools
         /// </summary>
         public static void RebuildAndRun()
         {
-            VeilmouthCity.RebuildStreets();
-            SlicePeopleModels.ScenesOnly();
-            VeilmouthFarLod.SyncScene();
+            VeilmouthCity.RebuildStreets(); // dresses the people and syncs the far LODs too
             Run();
         }
 
@@ -81,9 +79,7 @@ namespace GameDev.Slice.EditorTools
         {
             // The resized wrappers first, moved to their new names with their GUIDs, before the city's measuring Load runs.
             SliceKitCatalogue.LoadRebuilding(VeilmouthInteriors.Resized);
-            VeilmouthCity.RebuildStreets();
-            SlicePeopleModels.ScenesOnly();
-            VeilmouthFarLod.SyncScene();
+            VeilmouthCity.RebuildStreets(); // dresses the people and syncs the far LODs too
             VeilmouthInteriors.EnrichAndRender();
             Run();
         }

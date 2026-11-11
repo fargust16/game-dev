@@ -338,6 +338,9 @@ namespace GameDev.Slice.EditorTools
                 smr.BakeMesh(mesh, true);
                 var copy = new GameObject("Baked", typeof(MeshFilter), typeof(MeshRenderer));
                 copy.transform.SetPositionAndRotation(smr.transform.position, smr.transform.rotation);
+                // The bake keeps the renderer's own scale but not its parents' (a Tripo body's Model node is scaled):
+                // without it the skin drew at a fraction of the props beside it.
+                copy.transform.localScale = smr.transform.parent != null ? smr.transform.parent.lossyScale : Vector3.one;
                 copy.GetComponent<MeshFilter>().sharedMesh = mesh;
                 copy.GetComponent<MeshRenderer>().sharedMaterials = smr.sharedMaterials;
                 baked.Add(copy);

@@ -190,11 +190,56 @@ namespace GameDev.Slice.EditorTools
         /// The yards by their block's wealth (§29.1 item 4, §29.3): a rich yard is a small park, its grass with
         /// Veilmouth's garden trees in its corners and two benches facing its middle; a middling yard keeps its cobbles
         /// with a bench and a tree; a poor yard is bare earth with dustbins and firewood in its corners and a drunkard, two
-        /// in a yard over 500 m². Everything keeps 1.5 m off the yard's edges, where the back doors open, and the benches
+        /// in a yard over 500 m². A tree keeps 3 m off every house, and a middling yard's stands in a pit flush with its
+        /// cobbles (<see cref="YardTree"/>). Everything keeps 1.5 m off the yard's edges, where the back doors open, and the benches
         /// stand on sides with no passage. The drunkards stand until their poses come (the wanted list); rubbish heaps are
         /// wanted too, so the kit's dustbin stands for them. Then a bench in each of the Penny's four paved corners (§29.3),
         /// against the side wall, facing the square.
         /// </summary>
+        // Authoring default, m: a yard tree's trunk keeps this far from every house on both plan axes, so its crown of
+        // about 5 m clears the walls (owner's play test of 2026-11-11: a tree stood on the cobbles hard by a house).
+        private const float TreeFromHouse = 3f;
+
+        /// <summary>
+        /// A yard's tree, from its corner toward the yard's middle, at the first metre where its trunk keeps
+        /// <see cref="TreeFromHouse"/> off every house and its block is free. On cobbles, which are neither earth nor grass,
+        /// it stands in a square pit at the ground's level, as a street tree does (owner's play test of 2026-11-11).
+        /// </summary>
+        private static bool YardTree(string key, float tx, float ty, float cx, float cy, bool paved)
+        {
+            var to = new Vector2(cx - tx, cy - ty);
+            var far = to.magnitude;
+            var step = far > 0.01f ? to / far : Vector2.zero;
+            for (var d = 0f; d <= far; d += 1f)
+            {
+                var at = new Vector2(tx, ty) + (step * d);
+                var (px, py) = (Mathf.Round(at.x), Mathf.Round(at.y));
+                var e = _kit[key];
+                var trunk = new Vector2(px + (e.Width / 2f), py + (Mathf.Max(e.Depth, 1) / 2f));
+                var clear = Rect(trunk.x - TreeFromHouse, trunk.y - TreeFromHouse, trunk.x + TreeFromHouse, trunk.y + TreeFromHouse);
+                if (_houses.Any(h => Overlap(h, clear)))
+                {
+                    continue;
+                }
+
+                var tree = Prop(key, Facing.N, px, py);
+                if (tree == null)
+                {
+                    continue;
+                }
+
+                if (paved)
+                {
+                    var model = tree.transform.Find("Model");
+                    _pavements.Pit(Plan(model != null ? model.position : tree.transform.position));
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
         private static void Yards()
         {
             var rng = new Random(2911);
@@ -218,14 +263,14 @@ namespace GameDev.Slice.EditorTools
                     case "rich":
                         foreach (var (tx, ty) in new[] { (y.x0 + 3f, y.y0 + 3f), (y.x1 - 5f, y.y0 + 3f), (y.x1 - 5f, y.y1 - 5f), (y.x0 + 3f, y.y1 - 5f) })
                         {
-                            trees += Prop(GardenTree(rng), Facing.N, tx, ty) != null ? 1 : 0;
+                            trees += YardTree(GardenTree(rng), tx, ty, cx, cy, false) ? 1 : 0;
                         }
 
                         benches += Seat(seats, 2);
                         break;
                     case "middling":
                         var (mx, my) = (rng.Next(2) == 0 ? y.x0 + 3f : y.x1 - 5f, rng.Next(2) == 0 ? y.y0 + 3f : y.y1 - 5f);
-                        trees += Prop(GardenTree(rng), Facing.N, mx, my) != null ? 1 : 0;
+                        trees += YardTree(GardenTree(rng), mx, my, cx, cy, true) ? 1 : 0;
                         benches += Seat(seats, 1);
                         break;
                     default:

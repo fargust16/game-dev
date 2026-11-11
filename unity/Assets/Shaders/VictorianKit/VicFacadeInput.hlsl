@@ -224,9 +224,10 @@ void VicSurfaceAt(float2 uv, float3 positionWS, half3 normalWS, out VicSurface s
     // authoring defaults, in metres.
     float3 sp = float3(positionWS.x * 1.7, positionWS.y * 0.18, positionWS.z * 1.7);
     float s1 = VicValue3(sp) * 0.8 + VicValue3(sp * 2.3 + 5.0) * 0.2;
-    half streak = saturate(saturate((s1 - 0.54) * 9.0) * wall * saturate(0.45 + n) * _DirtAmount * _Streaks);
+    // Softer edges and a lighter film since the owner's play test of 2026-11-11 (the runs' outlines stood out).
+    half streak = saturate(saturate((s1 - 0.53) * 5.0) * wall * saturate(0.45 + n) * _DirtAmount * _Streaks);
     half3 soot = _DirtColor.rgb * 0.45h * (0.85h + 0.3h * (half)n2);
-    albedo = lerp(albedo, soot, streak * 0.75h);
+    albedo = lerp(albedo, lerp(albedo * 0.6h, soot, 0.5h), streak * 0.6h);
     rough = lerp(rough, max(rough, 0.85), streak * 0.5);
 
     // Soot gathered under the cornice (R3 step 2): darkest at the wall's top, fading over 3 m down it and over 1.5 m
@@ -240,18 +241,21 @@ void VicSurfaceAt(float2 uv, float3 positionWS, half3 normalWS, out VicSurface s
 
     // Stains under the sills (R3 step 2): rain running off each sill carries soot down the wall under its window,
     // darkest under the stone, fading over 1.4 m and narrowing as it runs, and breaking into drips of about 0.2 m
-    // further down, twice as strong as the material's dirt. Sizes are authoring defaults, in metres.
+    // further down. Sizes are authoring defaults, in metres. The owner's play test of 2026-11-11 found them too loud,
+    // their outlines and colour standing out: so they are as strong as the material's dirt, not twice, their edges and
+    // drips soft, and their tone the wall's own darkened, with a little of the soot.
     half cover;
     float sillDepth = VicSillDepth(positionWS, (float3)normalWS, cover);
     if (sillDepth >= 0.0)
     {
         float run = saturate(sillDepth / 1.4);
-        half narrow = smoothstep(0.2h + 0.45h * (half)run, 0.55h + 0.4h * (half)run, cover);
+        half narrow = smoothstep(0.05h + 0.4h * (half)run, 0.8h + 0.2h * (half)run, cover);
         float3 dp = float3(positionWS.x * 5.0, positionWS.y * 0.5, positionWS.z * 5.0);
-        half drip = saturate(((half)VicValue3(dp) - 0.2h - 0.45h * (half)run) * 3.0h);
-        half stain = saturate((half)(1.0 - run) * narrow * drip * wall * _DirtAmount * _Streaks * 2.0h);
-        albedo = lerp(albedo, soot, stain * 0.7h);
-        rough = lerp(rough, max(rough, 0.85), stain * 0.5);
+        half drip = saturate(((half)VicValue3(dp) - 0.1h - 0.45h * (half)run) * 1.4h);
+        half stain = saturate((half)(1.0 - run) * (half)(1.0 - run) * narrow * drip * wall * _DirtAmount * _Streaks);
+        half3 tone = lerp(albedo * 0.62h, soot, 0.3h);
+        albedo = lerp(albedo, tone, stain * 0.55h);
+        rough = lerp(rough, max(rough, 0.85), stain * 0.35);
     }
 
     half up = saturate((normalWS.y - 0.35) / 0.45);

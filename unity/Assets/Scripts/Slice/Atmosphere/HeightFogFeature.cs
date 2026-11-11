@@ -34,7 +34,11 @@ namespace GameDev.Slice.Atmosphere
         /// <summary>The fog draws while this lives.</summary>
         public static Object Owner { get; private set; }
 
-        public static bool Active => Owner != null;
+        /// <summary>
+        /// Whether the fog draws: while its owner lives and runs. A door switches the city's roots off and keeps them while
+        /// an interior is shown, and the city's fog drew on in the rooms (owner's play test of 2026-11-11).
+        /// </summary>
+        public static bool Active => Owner is Behaviour behaviour ? behaviour != null && behaviour.isActiveAndEnabled : Owner != null;
 
         /// <summary>Starts the fog for <paramref name="owner"/>'s scene.</summary>
         public static void Own(Object owner) => Owner = owner;

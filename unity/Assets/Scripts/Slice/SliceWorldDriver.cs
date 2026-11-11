@@ -193,6 +193,7 @@ namespace GameDev.Slice
                 Fights.Standing = Standing;
             }
 
+            DebugSight.On = Debug.isDebugBuild;
             if (settings.StealthRules != null)
             {
                 Hiding = gameObject.AddComponent<SliceStealth>();

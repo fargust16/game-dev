@@ -872,8 +872,11 @@ namespace GameDev.Slice.EditorTools
         private static void HarrowTripo() => Radiators("Shop", "Laboratory");
 
         /// <summary>
-        /// Rules §10.1 in the seven: one gas radiator in each named room, under its first window whose cell is free, else
-        /// none. A cell is free when no body stands in its middle (the furniture's and the people's colliders).
+        /// Rules §10.1 in the seven: one gas radiator in each named room, against the first stretch of plain wall whose
+        /// cells are free, else none. Since the owner's play test of 2026-11-11 the radiator stands 0.96 m high, above the
+        /// sills, so it leaves the windows; the old radiators under them were the old wrapper's, which Restale takes away. A
+        /// room already heated keeps its radiator. A stretch is free when no
+        /// body stands in the space in front of it (the furniture's and the people's colliders).
         /// </summary>
         private static void Radiators(params string[] rooms)
         {
@@ -895,7 +898,7 @@ namespace GameDev.Slice.EditorTools
 
                 if (heaters.Count > 0)
                 {
-                    continue; // heated already
+                    continue; // heated already: a radiator set again where it stood would be taken for a second run's copy
                 }
 
                 var walls = new List<(Vector2Int Facing, int Line, int Start, int Length, bool AlongZ)>
@@ -908,15 +911,16 @@ namespace GameDev.Slice.EditorTools
                     for (var seg = start; seg < start + length && !placed; seg += Module)
                     {
                         var key = alongZ ? (line, seg, true, r.Level) : (seg, line, false, r.Level);
-                        if (!_plan.Openings.TryGetValue(key, out var o) || o != Opening.Window)
+                        if (_plan.Openings.TryGetValue(key, out var o) && o != Opening.Wall)
                         {
-                            continue;
+                            continue; // a window, a door or a cell's bars
                         }
 
                         var a = seg + 1;
                         var cell = alongZ ? new Vector2(facing == E ? line + 0.5f : line - 0.5f, a + 0.5f) : new Vector2(a + 0.5f, facing == N ? line + 0.5f : line - 0.5f);
-                        var centre = new Vector3(cell.x, _floorY + 0.35f, cell.y);
-                        if (Physics.CheckBox(centre, new Vector3(0.3f, 0.25f, 0.3f), Quaternion.identity, ~0, QueryTriggerInteraction.Ignore))
+                        var centre = new Vector3(cell.x, _floorY + 0.5f, cell.y);
+                        var half = alongZ ? new Vector3(0.3f, 0.4f, 0.75f) : new Vector3(0.75f, 0.4f, 0.3f);
+                        if (Physics.CheckBox(centre, half, Quaternion.identity, ~0, QueryTriggerInteraction.Ignore))
                         {
                             continue;
                         }
@@ -1000,6 +1004,15 @@ namespace GameDev.Slice.EditorTools
                 _floorY = 0f;
                 var refs = SceneReferences(scene);
                 var done = new List<string>();
+                foreach (var key in Resized)
+                {
+                    var stale = Restale(key);
+                    if (stale > 0)
+                    {
+                        done.Add($"{stale} stale {key}");
+                    }
+                }
+
                 var (swaps, outs) = SwapsFor(id);
                 foreach (var (from, to) in swaps)
                 {
@@ -1064,6 +1077,7 @@ namespace GameDev.Slice.EditorTools
         {
             SliceKitCatalogue.LoadRebuilding(Resized);
             EnrichWithTripo();
+            DropStale();
             VeilmouthDwellings.BuildKit(SliceKitCatalogue.Load());
             VeilmouthRenders.RenderInteriors();
             VeilmouthRenders.RenderDwellings();
@@ -1101,6 +1115,85 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>The instances of a wrapper among the furniture.</summary>
+        private static readonly System.Text.RegularExpressions.Regex SizeSuffix = new System.Text.RegularExpressions.Regex(@"_(\d+)x(\d+)$");
+
+        /// <summary>
+        /// A Resized key's stale wrappers: the same name at another size, in the same folder. A measuring Load run after a
+        /// spec changed writes the wrapper under its new size's name before a rebuild can move the old one there (the desk
+        /// and the radiator, owner's play test of 2026-11-11), and the scenes keep the old one.
+        /// </summary>
+        private static List<string> StalePaths(string key)
+        {
+            var current = _kit[key].Path;
+            var folder = Path.GetDirectoryName(current).Replace('\\', '/');
+            var stem = SizeSuffix.Replace(Path.GetFileNameWithoutExtension(current), string.Empty);
+            return Directory.GetFiles(folder, stem + "_*.prefab").Select(f => f.Replace('\\', '/'))
+                .Where(f => f != current && SizeSuffix.Replace(Path.GetFileNameWithoutExtension(f), string.Empty) == stem).ToList();
+        }
+
+        /// <summary>
+        /// A stale wrapper's instances in the open scene swapped for the current wrapper where they stand, kept centred as
+        /// <see cref="Swap"/> keeps them; a radiator's are taken away, since <see cref="Radiators"/> sets them anew.
+        /// </summary>
+        private static int Restale(string key)
+        {
+            var stale = StalePaths(key).Select(AssetDatabase.LoadAssetAtPath<GameObject>).Where(g => g != null).ToList();
+            if (stale.Count == 0)
+            {
+                return 0;
+            }
+
+            var e = _kit[key];
+            var n = 0;
+            foreach (var old in _parent.GetComponentsInChildren<Transform>(true).Select(t => t.gameObject).ToList())
+            {
+                var source = old != null && PrefabUtility.IsOutermostPrefabInstanceRoot(old) ? PrefabUtility.GetCorrespondingObjectFromSource(old) : null;
+                if (source == null || !stale.Contains(source))
+                {
+                    continue;
+                }
+
+                if (key != "TrRadiator")
+                {
+                    var t = old.transform;
+                    var width = int.Parse(SizeSuffix.Match(source.name).Groups[1].Value);
+                    var go = At(key, t.position + (t.rotation * new Vector3((width - e.Width) * 0.5f, 0f, 0f)), t.rotation);
+                    go.transform.SetSiblingIndex(t.GetSiblingIndex());
+                    foreach (var child in Added(old))
+                    {
+                        child.SetParent(go.transform, false);
+                    }
+                }
+
+                Object.DestroyImmediate(old);
+                n++;
+            }
+
+            return n;
+        }
+
+        /// <summary>The stale wrappers no scene, prefab or data asset refers to any more, deleted.</summary>
+        private static void DropStale()
+        {
+            var texts = new[] { "Assets/Scenes", "Assets/Prefabs", "Assets/Data" }
+                .SelectMany(d => Directory.GetFiles(d, "*.*", SearchOption.AllDirectories))
+                .Where(f => f.EndsWith(".unity") || f.EndsWith(".prefab") || f.EndsWith(".asset")).ToList();
+            foreach (var path in Resized.SelectMany(StalePaths))
+            {
+                var guid = AssetDatabase.AssetPathToGUID(path);
+                var users = texts.Where(f => f.Replace('\\', '/') != path && File.Exists(f) && File.ReadAllText(f).Contains(guid)).ToList();
+                if (users.Count == 0)
+                {
+                    AssetDatabase.DeleteAsset(path);
+                    Debug.Log($"[VeilmouthInteriors] the stale wrapper {path} deleted");
+                }
+                else
+                {
+                    Debug.LogWarning($"[VeilmouthInteriors] the stale wrapper {path} is still held by {string.Join(", ", users)}");
+                }
+            }
+        }
+
         private static List<GameObject> Instances(string key)
         {
             var prefab = _kit[key].Prefab;

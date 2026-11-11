@@ -16,8 +16,6 @@ MonoBehaviour:
   socialChecks: {fileID: 11400000, guid: 2c7e5a9b1d3f4c6e8a0b2d4f6e8a1c3d, type: 2}
   standing: {fileID: 11400000, guid: 4e6a8c0b2d4f4e1a9c3b5d7f9a1c3e5b, type: 2}
   fightRules: {fileID: 11400000, guid: 5e5b78f18847436db073ddfde78a51e7, type: 2}
-  stealthRules: {fileID: 11400000, guid: 7b2d9e4f1a3c4e5b8d6f0a1c2e3b4d5f, type: 2}
-  beastRules: {fileID: 11400000, guid: 8a4c2e6f1b3d4f5a9c7e1b3d5f7a9c2e, type: 2}
   kitSword: {fileID: 11400000, guid: 3a0110b609ab45cb8ee6899999cb96a7, type: 2}
   kitRifle: {fileID: 11400000, guid: b02db0c189004cf9be52b34f264f1d79, type: 2}
   kitPouch: {fileID: 11400000, guid: 04aca85548654a408ed148b6df0c1383, type: 2}
@@ -26,9 +24,20 @@ MonoBehaviour:
   opponentWeapon: {fileID: 11400000, guid: 7d5ac9fe2dcf482d9bc1a7dc4d8b420a, type: 2}
   peoplePistol: {fileID: 11400000, guid: b4a04340c6a647988cf1fc295ab908a3, type: 2}
   gridMaterial: {fileID: 2100000, guid: 2df79b3057456e74fa4b498a77bb2ca8, type: 2}
+  stealthRules: {fileID: 11400000, guid: 7b2d9e4f1a3c4e5b8d6f0a1c2e3b4d5f, type: 2}
+  beastRules: {fileID: 11400000, guid: 8a4c2e6f1b3d4f5a9c7e1b3d5f7a9c2e, type: 2}
   fightCursors:
   - {fileID: 2800000, guid: 51cb6ee928f89b64691ef4dfd57c03e9, type: 3}
   - {fileID: 2800000, guid: 583ebe40474f892468eb72f2bb7ea4a8, type: 3}
   - {fileID: 2800000, guid: ce683041f000c7c48b73e8fbda566384, type: 3}
   - {fileID: 2800000, guid: ce5dc72a2c53d5e49917ae08ad7172d5, type: 3}
   - {fileID: 2800000, guid: 0561d5958b7b1b14fb067879aaa7b5f3, type: 3}
+  fightIcons:
+  - {fileID: 1386808307, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
+  - {fileID: -1552747657, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
+  - {fileID: -2081245629, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
+  - {fileID: 1510120445, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
+  - {fileID: 623849741, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
+  - {fileID: -248196999, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
+  - {fileID: -607346249, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
+  - {fileID: 381300419, guid: 132358e9bf26b60458b731bf001e31db, type: 3}

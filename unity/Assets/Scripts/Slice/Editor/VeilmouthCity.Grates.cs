@@ -51,6 +51,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             var trees = root.Find("Street Trees");
+            var yards = root.Find("Yards"); // a middling yard's tree stands in a pit too (owner's play test of 2026-11-11)
             var pits = Object.FindObjectsByType<MeshCollider>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).FirstOrDefault(c => c.name == "Tree Pits");
             if (trees == null || pits == null)
             {
@@ -63,7 +64,7 @@ namespace GameDev.Slice.EditorTools
             owner.SetParent(root, false);
             var grates = new Works(owner, false);
             var laid = 0;
-            foreach (var tree in trees.GetComponentsInChildren<Transform>(true))
+            foreach (var tree in trees.GetComponentsInChildren<Transform>(true).Concat(yards != null ? yards.GetComponentsInChildren<Transform>(true) : new Transform[0]))
             {
                 var trunk = tree.Find("Model");
                 if (!tree.name.StartsWith("Kit_Tree_") || trunk == null)

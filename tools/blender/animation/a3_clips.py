@@ -233,7 +233,7 @@ REST_POLE = {s: (head(f"{s}_LowerArm") - (head(f"{s}_UpperArm") + head(f"{s}_Han
 # ----------------------------------------------------------------------------------------------- curves
 
 PARAMS = ("hips_y", "hips_z", "hips_yaw", "hips_pitch", "pitch", "yaw", "look",
-          "lx", "ly", "lz", "rx", "ry", "rz", "lpx", "lpy", "lpz", "rpx", "rpy", "rpz")
+          "lx", "ly", "lz", "rx", "ry", "rz", "lpx", "lpy", "lpz", "rpx", "rpy", "rpz", "rkx", "rky", "rkz")
 
 
 def vector(key):
@@ -298,8 +298,27 @@ def tool_frame(p, grip):
 
     ik("Left_UpperArm", "Left_LowerArm", "Left_Hand", at(p["lx"], p["ly"], p["lz"]), direction(p["lpx"], p["lpy"], p["lpz"]))
     ik("Right_UpperArm", "Right_LowerArm", "Right_Hand", at(p["rx"], p["ry"], p["rz"]), direction(p["rpx"], p["rpy"], p["rpz"]))
+    if p["rkx"] or p["rky"] or p["rkz"]:
+        # The right fist turned so its knuckle line, little finger to index, along which a held handle runs, points
+        # along (rkx, rky, rkz), and its fingers carry on the forearm's line as far as that allows, so the wrist bends
+        # least: a hammer's handle raised back over the shoulder, level at the blow.
+        k = (head("Right_IndexProximal") - head("Right_PinkyProximal")).normalized()
+        f = head("Right_MiddleProximal") - head("Right_Hand")
+        f = (f - k * f.dot(k)).normalized()
+        d = direction(p["rkx"], p["rky"], p["rkz"])
+        fa = (head("Right_Hand") - head("Right_LowerArm")).normalized()
+        g = fa - d * fa.dot(d)
+        g = g.normalized() if g.length > 1e-4 else (-RIGHT).cross(d).normalized()
+        now = Matrix((k, f, k.cross(f))).transposed()
+        want = Matrix((d, g, d.cross(g))).transposed()
+        rotate_world("Right_Hand", (want @ now.transposed()).to_quaternion())
     for s, x, y, z in (("Left", p["lx"], p["ly"], p["lz"]), ("Right", p["rx"], p["ry"], p["rz"])):
         REACH[s] = {"shoulder": local(head(f"{s}_UpperArm")), "wrist": local(head(f"{s}_Hand")), "short by": round((head(f"{s}_Hand") - at(x, y, z)).length / K, 3)}
+        knuckles = (head(f"{s}_IndexProximal") - head(f"{s}_PinkyProximal")).normalized()
+        REACH[s]["knuckle line"] = [round(knuckles.dot(RIGHT), 2), round(knuckles.dot(FORWARD), 2), round(knuckles.dot(UP), 2)]
+        forearm = (head(f"{s}_Hand") - head(f"{s}_LowerArm")).normalized()
+        fingers = (head(f"{s}_MiddleProximal") - head(f"{s}_Hand")).normalized()
+        REACH[s]["wrist bend"] = round(math.degrees(forearm.angle(fingers)), 1)
 
 
 REACH = {}
@@ -404,15 +423,17 @@ CHOP = [  # the axe drawn back over the right shoulder, driven into a trunk ahea
          lx=0.14, ly=0.18, lz=1.28, rx=0.25, ry=0.10, rz=1.45, lpx=-0.3, lpy=0.8, lpz=-0.5, rpx=0.8, rpy=0.0, rpz=-0.6),
 ]
 
-HAMMER = [  # the hammer raised beside the head, elbow out and back, down on the anvil, a rebound; the left hand holds the tongs still
-    dict(f=0, hold=True, hips_pitch=10, pitch=15, yaw=8, look=22,
-         lx=-0.12, ly=0.40, lz=0.95, rx=0.22, ry=0.12, rz=1.60, lpx=-1.0, lpy=0.0, lpz=-0.5, rpx=0.6, rpy=-0.6, rpz=0.0),
-    dict(f=8, hold=True, hips_pitch=12, pitch=18, yaw=-3, look=24,
-         lx=-0.12, ly=0.40, lz=0.94, rx=0.10, ry=0.45, rz=0.98, lpx=-1.0, lpy=0.0, lpz=-0.5, rpx=0.5, rpy=-0.2, rpz=-0.8),
-    dict(f=13, hips_pitch=11, pitch=17, yaw=-1, look=24,
-         lx=-0.12, ly=0.40, lz=0.95, rx=0.14, ry=0.40, rz=1.12, lpx=-1.0, lpy=0.0, lpz=-0.5, rpx=0.6, rpy=-0.3, rpz=-0.6),
-    dict(f=22, hips_pitch=10, pitch=16, yaw=5, look=23,
-         lx=-0.12, ly=0.40, lz=0.95, rx=0.22, ry=0.25, rz=1.42, lpx=-1.0, lpy=0.0, lpz=-0.5, rpx=0.8, rpy=-0.4, rpz=-0.2),
+HAMMER = [  # the hammer raised above the right shoulder, elbow up and out, wrist cocked; brought down on the anvil at
+    # the height of a hanging hand, the body bent over it and the wrist laying the handle level; a rebound; lifted again.
+    # The left hand holds the tongs on the anvil's face beside the blow (owner's play test, 2026-11-11).
+    dict(f=0, hold=True, hips_pitch=8, pitch=14, yaw=10, look=26,
+         lx=-0.14, ly=0.46, lz=0.86, rx=0.24, ry=0.04, rz=1.66, lpx=-1.0, lpy=0.0, lpz=-0.6, rpx=0.8, rpy=-0.5, rpz=0.2, rkx=0.0, rky=-0.55, rkz=0.84),
+    dict(f=8, hold=True, hips_pitch=16, pitch=28, yaw=-4, look=28,
+         lx=-0.14, ly=0.46, lz=0.86, rx=0.08, ry=0.50, rz=0.88, lpx=-1.0, lpy=0.0, lpz=-0.6, rpx=0.5, rpy=-0.3, rpz=-0.8, rkx=0.0, rky=0.95, rkz=-0.3),
+    dict(f=13, hips_pitch=15, pitch=26, yaw=-2, look=28,
+         lx=-0.14, ly=0.46, lz=0.86, rx=0.10, ry=0.46, rz=1.02, lpx=-1.0, lpy=0.0, lpz=-0.6, rpx=0.6, rpy=-0.4, rpz=-0.6, rkx=0.0, rky=0.75, rkz=0.66),
+    dict(f=22, hips_pitch=11, pitch=19, yaw=6, look=27,
+         lx=-0.14, ly=0.46, lz=0.86, rx=0.22, ry=0.22, rz=1.44, lpx=-1.0, lpy=0.0, lpz=-0.6, rpx=0.8, rpy=-0.5, rpz=0.0, rkx=0.0, rky=0.2, rkz=0.98),
 ]
 
 CLIPS = [

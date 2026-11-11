@@ -129,7 +129,9 @@ namespace GameDev.Slice.EditorTools
         /// Batch only, the whole chain (C5, §29.4): the city built again on its present ground, which is the owner's to
         /// change by hand and is not shaped again; then the passes beside its root (the named people, the world driver,
         /// the dogs, the ornaments, the mystic layer), the street probes baked again, the POIs staged and the residue
-        /// placed again, and C5's views. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthCity.RebuildStreets
+        /// placed again, the blacksmith set at his anvil again, the POIs' people dressed, the far LODs synced to the houses as the passes left them
+        /// (the mystic layer's strange glass is Harrow &amp; Tincture's own material), and C5's views.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthCity.RebuildStreets
         /// </summary>
         public static void RebuildStreets()
         {
@@ -141,6 +143,9 @@ namespace GameDev.Slice.EditorTools
             VeilmouthMystic.Place();
             VeilmouthReflections.Bake();
             Restage();
+            SliceBlacksmith.Run(); // the market's anvil is built anew, so its stump and the smith's place with it
+            SlicePeopleModels.ScenesOnly(); // the POIs' Dummies dressed in the owner's people again, as Restage places them
+            VeilmouthFarLod.SyncScene(); // after every pass that paints a house; without it a far LOD keeps the type's glass
             VeilmouthRenders.RenderC5();
         }
 

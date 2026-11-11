@@ -93,6 +93,9 @@ namespace GameDev.Slice.Tests
 
             // Wait by time, not frames: a batch run draws thousands of frames a second, so frames carry almost no time.
             yield return new WaitForSeconds(0.5f);
+
+            // The development build's sight would show every disclosure; the tests read the rules themselves.
+            DebugSight.On = false;
         }
     }
 }

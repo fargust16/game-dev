@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using GameDev.Confront.Rules;
 using GameDev.Confront.Turns;
@@ -14,7 +15,8 @@ namespace GameDev.Slice.Fights
     /// The fight on the HUD (S3a.5): the order of Initiative across the top with the acting fighter lit, the player's HP
     /// as a number and every enemy's condition as a word; the player's HP and AP at the bottom; what the cursor points at
     /// beside it, its AP, and from Intelligence 10 the chance and the damage, from 20 the parts of the chance (10.4 §3);
-    /// and the last blow. Every word is a string table key (17 X.7). It writes into the HUD's own document.
+    /// and the last blow; under the HP and AP, the hotbar of the turn's actions (<see cref="FightHotbar"/>). Every word
+    /// is a string table key (17 X.7). It writes into the HUD's own document.
     /// </summary>
     public sealed class FightHud
     {
@@ -40,6 +42,7 @@ namespace GameDev.Slice.Fights
         private readonly Func<Combatant, string> _name;
         private readonly SocialCheckRules _disclosure;
         private readonly StringBuilder _text = new StringBuilder();
+        private readonly FightHotbar _bar;
         private UIDocument _document;
         private VisualElement _fight;
         private VisualElement _order;
@@ -53,11 +56,22 @@ namespace GameDev.Slice.Fights
 
         /// <param name="name">A combatant's name in the language shown.</param>
         /// <param name="disclosure">The Intelligence from which the chance and its parts show (10.4 §3).</param>
-        public FightHud(Func<Combatant, string> name, SocialCheckRules disclosure)
+        /// <param name="icons">The hotbar's icons, one for each <see cref="FightAction"/> after None.</param>
+        public FightHud(Func<Combatant, string> name, SocialCheckRules disclosure, IReadOnlyList<Sprite> icons = null)
         {
             _name = name;
             _disclosure = disclosure;
+            _bar = new FightHotbar(icons);
         }
+
+        /// <summary>The hotbar of the turn's actions.</summary>
+        public FightHotbar Bar => Bind() ? _bar : null;
+
+        /// <summary>True while the pointer is over the hotbar: no cell is pointed at and no click walks.</summary>
+        public bool OverBar => Bind() && _bar.Over;
+
+        /// <summary>The action clicked on the hotbar since the last call, once.</summary>
+        public FightAction Take() => _bar.Take();
 
         public bool Shown => Bind() && _fight.ClassListContains(Visible);
 
@@ -81,6 +95,7 @@ namespace GameDev.Slice.Fights
             }
 
             _fight.EnableInClassList(Visible, on);
+            _bar.Reset();
             _log.text = string.Empty;
             _tip.RemoveFromClassList(TipVisible);
             _dirty = true;
@@ -140,7 +155,9 @@ namespace GameDev.Slice.Fights
         /// Writes the order, the bar and the tip. <paramref name="settled"/> is false while the scene still shows earlier
         /// blows, and the order and the bar wait for it, so they never tell a blow before it is seen.
         /// </summary>
-        public void Refresh(ITurnEconomy turns, Combatant player, FightCursor cursor, int turnAp, Vector2 mouse, bool settled)
+        /// <param name="actions">Whether each hotbar action is usable now and its AP; null dims them all.</param>
+        public void Refresh(ITurnEconomy turns, Combatant player, FightCursor cursor, int turnAp, Vector2 mouse, bool settled,
+            Func<FightAction, (bool Usable, int Ap)> actions = null)
         {
             if (!Bind() || turns == null)
             {
@@ -164,6 +181,7 @@ namespace GameDev.Slice.Fights
             Pips(playersTurn ? turns.ApLeft : player?.Fighter.Reserve ?? 0, Math.Max(turnAp, playersTurn ? turns.ApLeft : 0),
                 playersTurn && cursor.Affordable ? cursor.Cost : 0);
             Tip(playersTurn ? cursor : null, player, mouse);
+            _bar.Refresh(actions);
         }
 
         private void Order(ITurnEconomy turns)
@@ -234,7 +252,7 @@ namespace GameDev.Slice.Fights
                 _text.Append(_name(cursor.Target)).Append(" — ").Append(Condition(cursor.Target.Fighter)).Append('\n');
                 _text.Append(cursor.Steps < 0 ? Loc.Get("ui.fight.noway")
                     : Loc.Format(cursor.Affordable ? "ui.fight.attack" : "ui.fight.attack.far", cursor.Cost));
-                var intelligence = player.Fighter.Get(CharacterAttribute.Intelligence);
+                var intelligence = DebugSight.Read(player.Fighter.Get(CharacterAttribute.Intelligence));
                 if (_disclosure != null && intelligence >= _disclosure.ChanceFromIntelligence && cursor.Steps >= 0)
                 {
                     var f = cursor.Forecast;
@@ -267,7 +285,7 @@ namespace GameDev.Slice.Fights
                     _text.Append('\n').Append(Loc.Format("ui.fight.far", cursor.Cost));
                 }
 
-                if (_disclosure != null && player.Fighter.Get(CharacterAttribute.Intelligence) >= _disclosure.ChanceFromIntelligence)
+                if (_disclosure != null && DebugSight.Read(player.Fighter.Get(CharacterAttribute.Intelligence)) >= _disclosure.ChanceFromIntelligence)
                 {
                     _text.Append('\n').Append(Loc.Format("ui.fight.env.chance", Percent(option.Chance)));
                 }
@@ -383,6 +401,7 @@ namespace GameDev.Slice.Fights
             _hp = root.Q<Label>("fight-hp");
             _tip = root.Q<Label>("fight-tip");
             _life = root.Q<Label>("life");
+            _bar.Bind(root.Q<VisualElement>("fight-panel"), root.Q<VisualElement>("fight-actions"), root.Q<Label>("fight-action-tip"));
             _dirty = true;
             if (_order == null || _ap == null || _who == null || _log == null || _hp == null || _tip == null)
             {

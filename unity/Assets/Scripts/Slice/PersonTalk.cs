@@ -181,7 +181,7 @@ namespace GameDev.Slice
             }
 
             var world = SliceWorldDriver.Running;
-            var intelligence = world != null ? world.Character.Get(CharacterAttribute.Intelligence) : CharacterSheet.Lowest;
+            var intelligence = DebugSight.Read(world != null ? world.Character.Get(CharacterAttribute.Intelligence) : CharacterSheet.Lowest);
             var node = _talk.Node;
             var options = new List<string>();
             foreach (var option in _talk.Options.Take(MostOptions))

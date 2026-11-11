@@ -216,7 +216,9 @@ namespace GameDev.Slice.EditorTools
             yield return S("Stall_Meat", "Market", "Meat", Market, "Meat_market_with_objects", pr, anchor: Anchor.Front);
             yield return S("Stall_Goods", "Market", "Goods", Market, "Vegetable_market_with_objects", pr, anchor: Anchor.Front);
             yield return S("Stall_Weapons", "Market", "Weapons", Market, "Weapon_Market_with_objects", pr, anchor: Anchor.Front);
-            yield return S("Anvil", "Market", "Anvil", Market, "anvil_with_hammer", pr);
+            yield return S("Anvil", "Market", "Anvil", Market, "anvil", pr);
+            // The blacksmith's hand hammer, held in his right hand (owner's play test, 2026-11-11; SliceBlacksmith): seen, never solid.
+            yield return S("SmithHammer", "Market", "SmithHammer", Market, "blacksmith_hammer", KitLayers.NoGrid, Body.None, Anchor.Node);
             yield return S("LeatherFrame", "Market", "LeatherFrame", Market, "leather_dressing_frame", pr);
             yield return S("ArmourStand", "Market", "ArmourStand", Market, "Armor_stand", pr);
             yield return S("BottleTable", "Market", "BottleTable", Market, "table_with_bottels", pr, anchor: Anchor.Front);

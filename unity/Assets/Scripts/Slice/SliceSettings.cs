@@ -52,6 +52,9 @@ namespace GameDev.Slice
         [Tooltip("Basic RPG Cursors (asset map §5), one for each FightCursor shape in its order: plain, walk, strike, a walk the AP do not reach, a blow they do not reach. SliceConfrontSetup imports them as cursors.")]
         [SerializeField] private Texture2D[] fightCursors;
 
+        [Tooltip("The fight hotbar's icons (Modern GDR pack, asset map), one for each FightAction after None in its order: end turn, wait, Defensive Stance, change weapons, First Aid, Stealth, Yield, Spare. SliceConfrontSetup sets them.")]
+        [SerializeField] private Sprite[] fightIcons;
+
         public int Seed => seed;
 
         public SocialCheckRules SocialChecks => socialChecks;
@@ -81,6 +84,8 @@ namespace GameDev.Slice
         public Material GridMaterial => gridMaterial;
 
         public Texture2D[] FightCursors => fightCursors;
+
+        public Sprite[] FightIcons => fightIcons;
 
         public IWorldSeed CreateSeed()
         {

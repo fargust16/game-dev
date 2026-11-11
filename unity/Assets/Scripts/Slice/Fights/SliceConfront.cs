@@ -164,7 +164,7 @@ namespace GameDev.Slice.Fights
             _camera = FightCamera.Create(transform, _outline);
             PathView = FightPathView.Create(transform, settings.GridMaterial);
             _cursor = new FightCursor(_turns, _grid, settings.FightRules, PathView, settings.FightCursors, CursorPoints);
-            _hud = new FightHud(Name, settings.SocialChecks);
+            _hud = new FightHud(Name, settings.SocialChecks, settings.FightIcons);
             _audio = gameObject.AddComponent<AudioSource>();
             _audio.playOnAwake = false;
             _audio.spatialBlend = 0f;
@@ -311,38 +311,89 @@ namespace GameDev.Slice.Fights
             }
 
             Watch();
-            _hud.Refresh(_turns, _playerCombatant, _cursor, _turnAp, input != null ? input.MousePosition : Vector2.zero, !_beats.Busy);
+            _hud.Refresh(_turns, _playerCombatant, _cursor, _turnAp, input != null ? input.MousePosition : Vector2.zero, !_beats.Busy, ActionState);
             ShowLife(_playerCombatant?.Fighter);
         }
 
-        /// <summary>The player's turn by the cursor: a click walks or strikes, Space ends the turn, and so do AP spent.</summary>
+        /// <summary>
+        /// The player's turn by the cursor: a click walks or strikes, Space ends the turn, and so do AP spent. Every action
+        /// is also a slot of the hotbar, clicked as its key is pressed; over the hotbar the cursor points at no cell.
+        /// </summary>
         private void PlayerTurn(Combatant player, GameInputService input)
         {
-            _cursor.Point(player, _camera.View != null ? _camera.View : Camera.main, input.MousePosition);
-            if (input.ClickMovePressed && _cursor.Click(player))
+            var picked = _hud.Take();
+            if (_hud.OverBar)
             {
-                _hud.MarkDirty();
-                return;
+                _cursor.Clear();
+            }
+            else
+            {
+                _cursor.Point(player, _camera.View != null ? _camera.View : Camera.main, input.MousePosition);
+                if (input.ClickMovePressed && _cursor.Click(player))
+                {
+                    _hud.MarkDirty();
+                    return;
+                }
             }
 
             // S3a.6: R waits to the end of the round, G ends the turn in a Defensive Stance, X changes the Weapon Set.
             // S3a.7: B treats the player's own most urgent condition. S3b.1: C enters Stealth Mode.
-            if ((input.WaitTurnPressed && _turns.SubmitIntent(TurnIntent.Wait))
-                || (input.StealthPressed && HideInFight(player))
-                || (input.StancePressed && _turns.SubmitIntent(TurnIntent.Stance))
-                || (input.ChangeSetPressed && _turns.SubmitIntent(TurnIntent.ChangeSet))
-                || (input.FirstAidPressed && TreatInFight(player))
-                || LeaveByWill(player, input))
+            if (((input.WaitTurnPressed || picked == FightAction.Wait) && _turns.SubmitIntent(TurnIntent.Wait))
+                || ((input.StealthPressed || picked == FightAction.Stealth) && HideInFight(player))
+                || ((input.StancePressed || picked == FightAction.Stance) && _turns.SubmitIntent(TurnIntent.Stance))
+                || ((input.ChangeSetPressed || picked == FightAction.ChangeSet) && _turns.SubmitIntent(TurnIntent.ChangeSet))
+                || ((input.FirstAidPressed || picked == FightAction.FirstAid) && TreatInFight(player))
+                || LeaveByWill(player, input.YieldPressed || picked == FightAction.Yield, input.SparePressed || picked == FightAction.Spare))
             {
                 _cursor.Clear();
                 _hud.MarkDirty();
                 return;
             }
 
-            if (input.EndTurnPressed || _turns.ApLeft <= 0)
+            if (input.EndTurnPressed || picked == FightAction.EndTurn || _turns.ApLeft <= 0)
             {
                 _cursor.Clear();
                 _turns.SubmitIntent(TurnIntent.EndTurn);
+            }
+        }
+
+        /// <summary>
+        /// Whether a hotbar action is usable now and its AP: none outside the player's own settled turn; changing the
+        /// Weapon Set needs a second set and its AP, First Aid a condition, a supply and its AP, Stealth no enemy cone,
+        /// a Yield its AP, Spare an enemy asking for mercy.
+        /// </summary>
+        private (bool Usable, int Ap) ActionState(FightAction action)
+        {
+            var player = _playerCombatant;
+            var rules = _settings != null ? _settings.FightRules : null;
+            var ours = player != null && rules != null && _turns != null && _turns.IsRunning && _turns.Acting == player && !_beats.Busy && _terms == null;
+            switch (action)
+            {
+                case FightAction.ChangeSet:
+                    return (ours && !player.Fighter.Second.IsEmpty && _turns.ApLeft >= rules.WeaponSetAp, rules != null ? rules.WeaponSetAp : 0);
+                case FightAction.FirstAid:
+                    var treatment = player != null && rules != null ? Choose(player.Fighter, t => player.Supplies[(int)t], player.KnowsFirstAid) : null;
+                    var treatAp = treatment.HasValue ? rules.TreatmentAp(treatment.Value) : 0;
+                    return (ours && treatment.HasValue && _turns.ApLeft >= treatAp, treatAp);
+                case FightAction.Stealth:
+                    return (ours && _turns.CanHide(player), _settings != null && _settings.StealthRules != null ? _settings.StealthRules.EnterAp : 0);
+                case FightAction.Yield:
+                    return (ours && _turns.ApLeft >= rules.YieldAp, rules != null ? rules.YieldAp : 0);
+                case FightAction.Spare:
+                    if (ours)
+                    {
+                        foreach (var c in _turns.Order)
+                        {
+                            if (c.AsksMercy && c.Standing && c.Side != player.Side)
+                            {
+                                return (true, 0);
+                            }
+                        }
+                    }
+
+                    return (false, 0);
+                default:
+                    return (ours, 0);
             }
         }
 

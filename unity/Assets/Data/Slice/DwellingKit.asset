@@ -638,16 +638,16 @@ MonoBehaviour:
       height: 1.21
     height: 1.2600002
   - key: TrDesk
-    prefab: {fileID: 3503770334103536868, guid: 372bc48e3cd784f409da6f36eb9f04ba, type: 3}
-    width: 2
+    prefab: {fileID: 2978054312931929110, guid: 8b0e923502973f447b5ded5ea3b210a5, type: 3}
+    width: 3
     depth: 2
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.11631608
-      y: 0.16000009
-      width: 1.7673678
-      height: 0.9442105
+      x: 0.3499999
+      y: 0.16000003
+      width: 2.3000002
+      height: 1.1499999
     height: 1.502707
   - key: TrWallClock
     prefab: {fileID: 1241044995253652397, guid: a462dcc9b03bd844aa2be2306c93c069, type: 3}
@@ -878,17 +878,17 @@ MonoBehaviour:
       height: 0.34238756
     height: 0.72
   - key: TrRadiator
-    prefab: {fileID: 6231307834139608449, guid: 9bfb1d083d251fa49be5ec3549037633, type: 3}
-    width: 1
+    prefab: {fileID: 4973311715186468862, guid: ea5c2b90177fa0146966b8e4086f9cac, type: 3}
+    width: 2
     depth: 1
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.024999976
-      y: 0.21000001
-      width: 0.95000005
-      height: 0.19938111
-    height: 0.64
+      x: 0.2850001
+      y: 0.20999998
+      width: 1.4299998
+      height: 0.2996539
+    height: 0.96000004
   - key: ViWallLamp
     prefab: {fileID: 8234737949085347516, guid: 77aecd579926873469a7cca73512cb8b, type: 3}
     width: 3

@@ -12,26 +12,39 @@ namespace GameDev.Slice.Fights
     /// </summary>
     public sealed class FightBeats
     {
-        // Authoring defaults, S3a.5: the walk's speed, m/s, as the player's walk; the blow's moment of impact and its
-        // end after it, s; the turn of a body toward where it goes, degrees a second.
+        // Authoring defaults, S3a.5: the walk's speed, m/s, as the player's walk; the blow's moment of impact for a body
+        // with no blow clip and the hold after any impact, s; the turn of a body toward where it goes, degrees a second.
         public const float WalkSpeed = 2f;
         public const float Impact = 0.35f;
         public const float StrikeHold = 0.65f;
         public const float TurnSpeed = 720f;
+
+        // Measured (SliceAnimationCheck, owner's play test of 2026-11-11: the hit came late): the moment each blow clip
+        // reaches its target, s into the clip, by the Weapon value 1–5 (sword slash, greatsword slash, stab, pistol shot,
+        // rifle shot); and the Hit clip's first frame of motion, 0.13 s, entered a little before it so the body answers
+        // the frame the blow lands. Blows and hits are cross-faded into directly, never through the guard's trigger.
+        private static readonly float[] Contact = { 0.57f, 0.90f, 0.53f, 0.37f, 0.23f };
+        public const float HitOnset = 0.10f;
+        private const float BlowFade = 0.08f;
+        private const float HitFade = 0.04f;
 
         private static readonly int FightingHash = Animator.StringToHash("Fighting");
         private static readonly int SpeedHash = Animator.StringToHash("Speed");
         private static readonly int AttackHash = Animator.StringToHash("Attack");
         private static readonly int HitHash = Animator.StringToHash("Hit");
         private static readonly int DownHash = Animator.StringToHash("Down");
+        private static readonly int WeaponHash = Animator.StringToHash("Weapon");
         private static readonly int WalkState = Animator.StringToHash("Walk");
         private static readonly int FightState = Animator.StringToHash("Fight");
+        private static readonly int AttackState = Animator.StringToHash("Attack");
+        private static readonly int HitState = Animator.StringToHash("Hit");
 
         private readonly Queue<Beat> _beats = new Queue<Beat>();
         private readonly Func<Transform, Animator> _animated;
         private readonly Action<Transform, Vector3, Quaternion> _place;
         private Beat _current;
         private float _time;
+        private float _impact;
         private int _leg;
         private bool _struck;
 
@@ -124,6 +137,7 @@ namespace GameDev.Slice.Fights
         private void Begin(Beat beat)
         {
             Started?.Invoke(beat);
+            _impact = Impact;
             var animator = beat.Body != null ? _animated(beat.Body) : null;
             if (animator == null)
             {
@@ -146,8 +160,24 @@ namespace GameDev.Slice.Fights
                 return;
             }
 
-            animator.SetFloat(Animator.StringToHash("Weapon"), beat.Weapon);
+            animator.SetFloat(WeaponHash, beat.Weapon);
+            if (animator.HasState(0, AttackState))
+            {
+                // Straight into the blow from whatever the body was doing, so it lands at its clip's own moment.
+                animator.SetBool(FightingHash, true);
+                animator.CrossFadeInFixedTime(AttackState, BlowFade, 0);
+                _impact = ContactOf(beat.Weapon);
+                return;
+            }
+
             animator.SetTrigger(AttackHash);
+        }
+
+        /// <summary>The moment the blow clip of this Weapon value reaches its target, s.</summary>
+        public static float ContactOf(float weapon)
+        {
+            var i = Mathf.RoundToInt(weapon) - 1;
+            return i >= 0 && i < Contact.Length ? Contact[i] : Impact;
         }
 
         /// <summary>Moves the body along its points; returns the time left over once it arrives.</summary>
@@ -222,19 +252,19 @@ namespace GameDev.Slice.Fights
 
             var before = _time;
             _time += dt;
-            if (!_struck && _time >= Impact)
+            if (!_struck && _time >= _impact)
             {
                 _struck = true;
                 Land(beat);
             }
 
-            if (_time < Impact + StrikeHold)
+            if (_time < _impact + StrikeHold)
             {
                 return 0f;
             }
 
             _current = null;
-            return _time - Mathf.Max(before, Impact + StrikeHold);
+            return _time - Mathf.Max(before, _impact + StrikeHold);
         }
 
         private void Land(Beat beat)
@@ -245,6 +275,10 @@ namespace GameDev.Slice.Fights
                 if (beat.Result.Downed)
                 {
                     struck.SetBool(DownHash, true);
+                }
+                else if (beat.Result.Damage > 0d && struck.HasState(0, HitState))
+                {
+                    struck.CrossFadeInFixedTime(HitState, HitFade, 0, HitOnset);
                 }
                 else if (beat.Result.Damage > 0d)
                 {

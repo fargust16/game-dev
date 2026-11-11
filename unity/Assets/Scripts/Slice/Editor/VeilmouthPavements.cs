@@ -17,8 +17,8 @@ namespace GameDev.Slice.EditorTools
     /// mouth. The island stands <see cref="Kerb"/> over the ground, its top in slabs with a kerb stone's top along the
     /// carriageway, its edge a stone kerb face, with a mesh collider on the Ground layer. The wet band that darkened the
     /// carriageway along the kerb is gone (owner, fifth play test, 2026-11-09): laid 3 cm over the terrain, it came and
-    /// went with the terrain's level of detail. A street tree stands in a square pit on the carriageway by the kerb
-    /// (<see cref="Pit"/>), a stone edge round its earth.
+    /// went with the terrain's level of detail. A street tree stands in a square pit on the carriageway by the kerb, and a
+    /// yard tree on cobbles in one on the yard (<see cref="Pit"/>): a stone edge round its earth, at the ground's level.
     /// <para>
     /// The outline is the zero line of a distance field sampled every 0.25 m, so straight kerbs stay straight and the
     /// rounded corners are smooth. The top follows the ground through heights sampled once a metre and blended, so a
@@ -46,10 +46,12 @@ namespace GameDev.Slice.EditorTools
         /// A tree pit, m (authoring defaults): 1.2 m square outside, flush on the kerb (§27, owner 2026-11-09: smaller than
         /// the fruit tree's 1.6 m), so a ring of earth about 0.3 m wide shows round the Blender trees' trunks, which are
         /// 0.30–0.36 m across at their foot (measured from their LOD0 meshes); the trunk stands in its middle, moved inside
-        /// its block's cell. Its stone edge is 0.1 m wide and as high as the kerb, its earth 0.08 m over the carriageway.
-        /// Both stand clear of the terrain's level of detail, as the kerb does.
+        /// its block's cell. Its stone edge is 0.1 m wide. Since the owner's play test of 2026-11-11 (a tree off earth or
+        /// grass stands in a square pit at the ground's level) the edge stands <see cref="PitLift"/> over the ground, no
+        /// longer as high as the kerb, and its earth 0.01 m under the edge. The wet band at 0.03 m came and went with the
+        /// terrain's level of detail, so 0.05 m is the lowest the agent sets (authoring default; to be seen in the walk).
         /// </summary>
-        public const float PitSize = 1.2f, PitEdge = 0.1f, PitEarth = 0.08f;
+        public const float PitSize = 1.2f, PitEdge = 0.1f, PitEarth = 0.04f, PitLift = 0.05f;
 
         public const string RootName = "Pavements";
         public const string MaterialFolder = "Assets/Materials/Slice";
@@ -513,10 +515,10 @@ namespace GameDev.Slice.EditorTools
             foreach (var c in _pits)
             {
                 const float h = PitSize / 2f, i = h - PitEdge;
-                Box(edge, c + new Vector2(-h, -h), c + new Vector2(h, -i));
-                Box(edge, c + new Vector2(-h, i), c + new Vector2(h, h));
-                Box(edge, c + new Vector2(-h, -i), c + new Vector2(-i, i));
-                Box(edge, c + new Vector2(i, -i), c + new Vector2(h, i));
+                Box(edge, c + new Vector2(-h, -h), c + new Vector2(h, -i), PitLift);
+                Box(edge, c + new Vector2(-h, i), c + new Vector2(h, h), PitLift);
+                Box(edge, c + new Vector2(-h, -i), c + new Vector2(-i, i), PitLift);
+                Box(edge, c + new Vector2(i, -i), c + new Vector2(h, i), PitLift);
                 Top(earth, new List<Vector2> { c + new Vector2(-i, -i), c + new Vector2(i, -i), c + new Vector2(i, i), c + new Vector2(-i, i) }, PitEarth);
             }
 
@@ -534,11 +536,11 @@ namespace GameDev.Slice.EditorTools
             return new Report(triangles, lines.Count, slabCount, _pits.Count, kerbLength, area);
         }
 
-        /// <summary>A stone box on the plan rectangle, from under the ground to the kerb's height, its top and four sides.</summary>
-        private void Box(Part part, Vector2 lo, Vector2 hi)
+        /// <summary>A stone box on the plan rectangle, from under the ground to <paramref name="lift"/> over it, its top and four sides.</summary>
+        private void Box(Part part, Vector2 lo, Vector2 hi, float lift)
         {
             var p = new[] { lo, new Vector2(hi.x, lo.y), hi, new Vector2(lo.x, hi.y) };
-            Top(part, p.ToList(), Kerb);
+            Top(part, p.ToList(), lift);
             for (var k = 0; k < 4; k++)
             {
                 var a = p[k];
@@ -551,9 +553,9 @@ namespace GameDev.Slice.EditorTools
                 }
 
                 float ha = Height(a.x, a.y), hb = Height(b.x, b.y), length = d.magnitude;
-                Quad(part, World(a, ha - Foot), World(b, hb - Foot), World(b, hb + Kerb), World(a, ha + Kerb),
+                Quad(part, World(a, ha - Foot), World(b, hb - Foot), World(b, hb + lift), World(a, ha + lift),
                     Normal(outward), Normal(outward), Normal(outward), Normal(outward),
-                    Vector2.zero, new Vector2(length, 0f), new Vector2(length, Foot + Kerb), new Vector2(0f, Foot + Kerb), outward);
+                    Vector2.zero, new Vector2(length, 0f), new Vector2(length, Foot + lift), new Vector2(0f, Foot + lift), outward);
             }
         }
 

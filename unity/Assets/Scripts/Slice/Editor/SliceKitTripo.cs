@@ -103,7 +103,13 @@ namespace GameDev.Slice.EditorTools
             // §11 of the furnishing rules (owner's walk, 2026-11-10: the desk looked a toy beside the pack's chair): sized by
             // its writing top, 0.91 m at game scale as the pack's tables' (a true desk's 0.76 m), which stands at 0.661 of its
             // height with the gallery (measured, VeilmouthWalkAudit).
-            yield return Set(T("TrDesk", "antique_wooden_desk", 1.38f, Anchor.Back),
+            // The owner's play test of 2026-11-11 (a bigger desk, a large work desk): its top kept at 0.91 m, its footprint
+            // drawn out from 1.77 × 0.94 m (measured, walk_furniture) to 2.3 × 1.15 m, about ×1.3 (authoring default).
+            var desk = T("TrDesk", "antique_wooden_desk", 1.38f, Anchor.Back);
+            desk.SizeX = 2.3f;
+            desk.SizeZ = 1.15f;
+            desk.Uniform = false;
+            yield return Set(desk,
                 Tr("decorative_table_lamp", 0.14f, 0.6f), Tr("aged_parchment", 0.48f, 0.72f), Tr("ornate_ink_desk_3d_model_Clone1", 0.8f, 0.62f),
                 Tr("magnifying_glass", 0.62f, 0.8f));
             yield return T("TrMirror", "ornate_mirror", 2f, Anchor.Back);
@@ -156,8 +162,10 @@ namespace GameDev.Slice.EditorTools
             // §11 of the furnishing rules (owner's walk, 2026-11-10: it looked a toy): 0.64 m high, 4 cm under the lowest sill of
             // the pack's windows (0.68 m, measured), and 0.95 m wide, a true column radiator's 0.8 m under a window; drawn out
             // along its width alone (authoring defaults).
-            var radiator = T("TrRadiator", "ornate_radiator", 0.64f, Anchor.Back);
-            radiator.SizeX = 0.95f;
+            // The owner's play test of 2026-11-11: ×1.5, so 0.96 m high and 1.43 m wide. It no longer goes under a sill, so it
+            // stands against a plain wall (rules §10.1).
+            var radiator = T("TrRadiator", "ornate_radiator", 0.96f, Anchor.Back);
+            radiator.SizeX = 1.43f;
             radiator.Uniform = false;
             radiator.Face = ViBack + 0.05f;
             yield return radiator;

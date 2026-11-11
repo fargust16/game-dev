@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09, 2026-11-10); fireplaces and radiators in §10.1 (owner, 2026-11-10); every piece's size checked in §11 (owner's walk, 2026-11-10)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-10 (§11: every piece measured as built against its usual true size; the Tripo desk, the radiator, the kitchen table, the partners' desk, the poor nightstand and the candle stand set to theirs ×1.2. The earlier note is in the update history)
+Last Updated: 2026-11-11 (§11.1, the owner's play test: the radiator ×1.5 against a plain wall, the Tripo desk 2.3 × 1.15 m at the same top. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -210,7 +210,7 @@ The owner: take every piece from TripoModels for the interior scenes, and leave 
 | iron umbrella stand (`decorative_vase_3d_model_Clone1`) | `TrUmbrellas` | 0.6 m | a middling or rich hall, in the corner nearest the street door (owner: by the entrance) |
 | magnifying glass, laid flat (`magnifying_glass`) | on `TrDesk` | 0.2 m | on the rich writing desk, by the parchment (owner: on desks or in cabinets) |
 | inkstand with two wells and a pen (`ornate_ink_desk_3d_model_Clone1`) | on `TrDesk` | 0.25 m | on the rich writing desk, in the place of the pack's ink and pen (owner: rich interiors, on desks) |
-| gas radiator (`ornate_radiator`) | `TrRadiator` | 0.64 m high, 0.95 m wide (§11) | §10.1: every heated room without a fireplace, under a window where one is |
+| gas radiator (`ornate_radiator`) | `TrRadiator` | 0.96 m high, 1.43 m wide (§11.1) | §10.1: every heated room without a fireplace, against a plain wall |
 
 The bed, the bar counter and its cabinet, the cell bars and door and the Notice Board were the owner's Tripo pieces already (asset map §4). Of the owner's models of 2026-11-10, the street lamp and the bronze statue stand in the city, by the owner's word (city plan §30), and the six people are the asset map's §1. The other models are not furnishing: the townsman, the woman and the dog are people and beasts, the angels, the lion and the birdbath are the garden ornaments of the city plan §23, the coins and firearms are items, the rock is the iron ore, and the hanging sign hangs outside, over the doors of Harrow & Tincture and the Soot & Bell (city plan §25.6, [99 Open Questions](../../../99%20Open%20Questions.md) VS-SIGN (b)).
 
@@ -226,7 +226,7 @@ The owner: a house has only one or two fireplaces, on the ground floor; every ot
 
 - **One or two, the range among them.** The kitchen's range is the pack's fireplace (`ViFireplace`), so a home shows it as a fireplace. So the agent reads the rule as at most two fireplaces in a home, the range counted: a home that cooks keeps its range and one hearth more, in its first room by the rules' order (§4: the parlour, the drawing room). A home with no kitchen range may have two hearths.
 - **Ground floor only.** No hearth stands on a storey above the ground. A rich house's bedrooms, its study and dining room, which §4 gave a hearth, have a radiator instead.
-- **A radiator in every other room.** Each room that people live, work or wash in, and that has no fireplace, has one gas radiator (`TrRadiator`): the hall, parlour, drawing, dining and dressing rooms, study, bedroom, nursery, servant's room, bathroom, back room, shop, office and reception. A kitchen, a scullery, a store, a pantry, a box room, an archive, a landing, a WC and a washroom have none. It stands under a window where one is free, since it is low enough (0.64 m high, 4 cm under the lowest sill, the paper window's 0.68 m; §11), and else against a plain wall, and it never blocks a walk-way (G1). The agent applies it to every wealth, the poor included, by the owner's words; that a poor home has gas heat is the owner's world, not a history.
+- **A radiator in every other room.** Each room that people live, work or wash in, and that has no fireplace, has one gas radiator (`TrRadiator`): the hall, parlour, drawing, dining and dressing rooms, study, bedroom, nursery, servant's room, bathroom, back room, shop, office and reception. A kitchen, a scullery, a store, a pantry, a box room, an archive, a landing, a WC and a washroom have none. It stands against a plain wall and never blocks a walk-way (G1). Until the owner's play test of 2026-11-11 it stood under a window where one was free, 0.64 m high, 4 cm under the lowest sill; at ×1.5 it stands 0.96 m high, above every sill (§11.1). The agent applies it to every wealth, the poor included, by the owner's words; that a poor home has gas heat is the owner's world, not a history.
 - **The seven** already meet the first two parts: each has at most two fireplaces, all on the ground floor (the Soot & Bell's saloon and kitchen, the faction house's two hearths, the lock-up's guard room, the missing room's one). Radiators join their other rooms where a wall is free.
 
 These counts are authoring defaults.
@@ -235,8 +235,8 @@ These counts are authoring defaults.
 
 - **The radiator stands 5 cm off the wall**, on its brackets. Set flush, it ran 3.7 cm into a window's frame in every Dwelling, so 36 faults stood in the kit check.
 - **The fourteen sample Dwellings** show no kit fault. Their hearths are at most two and none stands above the ground floor; `DwellingFurnishing.Audit` checks this, and `SampleHomesKeepTheFurnishingRules` runs the check.
-- **Radiators in the Dwellings.** A heated room with no hearth gets a radiator where a window or a plain wall is free. The audit does not yet count the rooms left without one.
-- **The seven interiors** have eight radiators, each under the first free window of its room:
+- **Radiators in the Dwellings.** A heated room with no hearth gets a radiator where a plain wall is free; at 0.96 m it no longer counts as low enough for a window (§11.1), so it goes under one only when no wall is free. The audit does not yet count the rooms left without one.
+- **The seven interiors** have eight radiators, each against the first free stretch of plain wall in its room (under its first free window until §11.1):
   - the Soot & Bell's stair hall and its two let rooms;
   - the faction house's office;
   - the lock-up's front desk and office;
@@ -290,6 +290,21 @@ How each was changed:
 - **A resized wrapper keeps its GUID.** A wrapper whose footprint changes is moved to its new name, so the seven's and the Dwellings' pieces follow it: the Tripo desk 2x1 → 2x2, the nightstand 1x2 → 1x1 and the candle stand 1x3 → 1x2. The partners' desk keeps its 4x1.
 - **Rebuild before measuring.** A batch that also builds the city rebuilds these wrappers first. The city's measuring pass writes any wrapper it does not find, and it would write one under its new name beside the old one.
 
+## 11.1 The owner's play test of 2026-11-11
+
+The owner: radiators ×1.5; a bigger writing desk, a large work desk.
+
+| Piece | Key | Before | Now (game size) | True now |
+|---|---|---|---|---|
+| gas radiator (Tripo) | `TrRadiator` | 0.95 m wide, 0.64 m high | 1.43 m wide, 0.96 m high, ×1.5, drawn out on width and height | 1.19 × 0.80 m |
+| writing desk (Tripo) | `TrDesk` | 1.77 × 0.94 m, top 0.90 m | 2.3 × 1.15 m, top 0.90 m kept: drawn out on width and depth, no longer scaled whole | 1.92 × 0.96 m, top 0.75 m |
+
+- **The radiator leaves the windows.** At 0.96 m it stands higher than every sill, so it goes against a plain wall: the first free stretch of the room in the seven, wherever a plain wall is free in the Dwellings. A true column radiator under a window is about 0.6 m high, and a tall one against a wall about 0.8–1.0 m, so the owner's size reads as a wall radiator.
+- **The desk** keeps its top at the tables' 0.90 m, so the chair still fits it. Its drawers and gallery widen with it, about ×1.3.
+- **The trap seen again.** A measuring pass ran after the specs changed, before the rebuild, and wrote the two wrappers under their new sizes' names (`Kit_Tripo_Desk_3x2`, `Kit_Tripo_Radiator_2x1`). The seven kept the old ones (`_2x2`, `_1x1`). The enrichment now swaps a stale wrapper's instances for the current one where they stand (`VeilmouthInteriors.Restale`), takes a stale radiator away for `Radiators` to set anew, and deletes the stale wrapper once nothing holds it (`DropStale`).
+- **As built** (2026-11-11): the seven keep their eight radiators, now `_2x1` against plain walls: three in the Soot & Bell, two at Harrow & Tincture, one in the Faction House and two in the Wardens' Lockup. The Faction House's and the Lockup's offices each have one `_3x2` desk. No scene holds a `_2x2` desk or a `_1x1` radiator, and `Kit_Tripo_Radiator_1x1` is deleted. Every interior has 0 kit faults and 0 doorway faults, and the 14 sample Dwellings have 0 kit faults.
+- **Seen in the renders** (`Logs/SliceSurvey/roomeye_*.png`): the offices' desks are clearly larger than the chairs before them, and the radiators stand at the walls' foot. The owner has not yet seen them in the game.
+
 **Within the usual sizes** (unchanged, game and true):
 
 - Tables: `ViTable` 0.96 m (0.80), `ViTableB` and `ViHallTable` 0.88 m (0.73), `ViTableRound` and `ViDiningTable` 0.92 m (0.77), `TrSewing` 0.88 m (0.73).
@@ -307,6 +322,7 @@ These sizes are authoring defaults, and the measurements are the audit's.
 
 ## Update history
 
+- 2026-11-11 (v0.11): §11.1, the owner's play test: the radiator ×1.5 against a plain wall, the Tripo desk larger at the same top; §10, §10.1 changed to match.
 - 2026-11-10 (v0.10): §11, the owner's walk: every piece measured as built against its usual true size, six set to theirs; §10's radiator row and §10.1's sill changed to match.
 - 2026-11-10 (v0.9, later): §10.1 as built: the radiator 5 cm off the wall, the sample Dwellings and the seven's eight radiators.
 - 2026-11-10 (v0.9): §10, the owner's ten Tripo pieces of 2026-11-10; §10.1, the owner's rule on fireplaces and radiators.

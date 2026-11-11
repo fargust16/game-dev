@@ -1,4 +1,5 @@
 using GameDev.Locomotion;
+using GameDev.World.Timekeeping;
 using UnityEngine;
 using Random = System.Random;
 
@@ -9,7 +10,7 @@ namespace GameDev.Slice.People
     /// random each time the last one ends, and greets the player with a wagging tail when the player comes close. A
     /// stand-in for the street animals of VS-BEASTS; it shows how the shepherd's clips play on the owner's dog.
     /// The Animator's states are named after the clips (<c>SliceDogs</c> builds it): Walking01, Breathing, SittingStart
-    /// (which goes on to SittingCycle by itself), and WigglingTail.
+    /// (which goes on to SittingCycle by itself), and WigglingTail. It stands still while the world clock is held.
     /// </summary>
     public sealed class StreetDog : MonoBehaviour
     {
@@ -89,6 +90,20 @@ namespace GameDev.Slice.People
 
         private void Update()
         {
+            // While the clock is held (a fight, a conversation) the dog stands as still as the townsfolk, its clip too.
+            var clock = GameClockDriver.Running;
+            var paused = clock != null && clock.IsPaused;
+            if (animator != null)
+            {
+                animator.speed = paused ? 0f : 1f;
+            }
+
+            if (paused)
+            {
+                _until += Time.deltaTime;
+                return;
+            }
+
             FindPlayer();
             var near = _player != null ? Flat(_player.position - transform.position).magnitude : float.MaxValue;
             if (_mode != Mode.Greeting && near <= greetDistance)

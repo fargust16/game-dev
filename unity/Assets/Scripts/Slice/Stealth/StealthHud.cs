@@ -74,8 +74,8 @@ namespace GameDev.Slice.Stealth
             }
 
             var character = _stealth.Character;
-            var showMeter = _stealth.Rules.ShowsMeter(character.Get(CharacterAttribute.Perception));
-            var opacity = _stealth.Active ? _stealth.Rules.ConeOpacity(character.Get(CharacterAttribute.Intelligence)) : 0f;
+            var showMeter = _stealth.Rules.ShowsMeter(DebugSight.Read(character.Get(CharacterAttribute.Perception)));
+            var opacity = _stealth.Active ? _stealth.Rules.ConeOpacity(DebugSight.Read(character.Get(CharacterAttribute.Intelligence))) : 0f;
             var eye = camera.transform.position;
             foreach (var o in StealthObserver.All)
             {

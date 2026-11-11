@@ -282,8 +282,19 @@ namespace GameDev.Slice.EditorTools
             var lift = Mathf.Sqrt(2f * Field("jumpHeight") * -Field("gravity"));
             var airtime = 2f * lift / -Field("gravity");
             var air = SliceMixamo.Get("JumpAir").length;
-            SliceMixamo.Player(PlayerController, scales, air / airtime);
+
+            // The sneak's own pace, which PlayerLocomotion matches by the Crouch state's Pace while it creeps.
+            var sneak = SliceMixamo.Get("Sneak");
+            var sneakPace = new[] { PlayerMan, PlayerWoman }.Select(look =>
+            {
+                var animator = Fitted(look, sneak);
+                var pace = Pace(animator, sneak, animator.transform.parent);
+                Object.DestroyImmediate(animator.transform.parent.gameObject);
+                return pace;
+            }).Average();
+            SliceMixamo.Player(PlayerController, scales, air / airtime, sneakPace);
             report.AppendLine($"Player jump: {airtime:0.00} s in the air (PlayerLocomotion), the clip's flight {air:0.00} s plays x{air / airtime:0.00}");
+            report.AppendLine($"Player sneak: paced {sneakPace:0.00} m/s (measured, the mean of both bodies), matched by the Crouch state's Pace");
             AssetDatabase.SaveAssets();
         }
 
@@ -398,6 +409,12 @@ namespace GameDev.Slice.EditorTools
             var path = walking ? look.Walking : look.Standing;
             var prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
+            if (look == Blacksmith && !walking)
+            {
+                SliceBlacksmith.Arm(report); // his hammer in his right hand
+                prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            }
+
             var saved = prefab.GetComponentsInChildren<Transform>(true);
             var upper = saved.FirstOrDefault(t => t.name == armNames.Item1);
             var lower = saved.FirstOrDefault(t => t.name == armNames.Item2);
@@ -687,7 +704,7 @@ namespace GameDev.Slice.EditorTools
         /// The blacksmith at Bawling Row's anvil (owner, 2026-11-10), beside Edda Brann's Item Creation stall: on the
         /// first side of the anvil with ground and room for a person, behind it toward the plinth first, facing it.
         /// </summary>
-        private static void PlaceBlacksmith(List<string> lines)
+        internal static void PlaceBlacksmith(List<string> lines)
         {
             if (Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None).Any(t => t.name == "Blacksmith"
                     && PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject) && PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(t.gameObject) == Blacksmith.Standing))

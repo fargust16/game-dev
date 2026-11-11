@@ -14,10 +14,10 @@ namespace GameDev.Slice.EditorTools
     /// Without Skin on the player woman's body, each imported as Humanoid with its own avatar and one clip named by its
     /// use, and the controllers that play them.
     /// <list type="bullet">
-    /// <item>Every clip is in place: root rotation, height and ground position baked into the pose as the file has them
-    /// (based upon Original), loop time and loop pose on the cycles. The jumps alone keep their feet on the root (height
-    /// based upon Feet), since the player's own jump lifts the body; the still jump is cut at its takeoff and landing,
-    /// measured from the feet, into JumpUp, JumpAir and JumpLand.</item>
+    /// <item>Every file shares the player woman's avatar (<see cref="SourceAvatar"/>), since a file Without Skin has no
+    /// rest pose of its own. Every clip is in place: root rotation and ground position baked into the pose, its height
+    /// based upon its feet, loop time and loop pose on the cycles; the still jump is cut at its takeoff and landing,
+    /// measured from the feet, into JumpUp, JumpAir and a short JumpLand.</item>
     /// <item>A standing person's controller: the idle (a Warden's at attention), the walk, the talk while Talking, and
     /// the fight: a guard and a blow by Weapon (1 sword, axe or mace; 2 greatsword, greataxe or maul; 3 dagger;
     /// 4 pistol; 5 rifle), the hit on Hit and the death while Down.</item>
@@ -46,6 +46,12 @@ namespace GameDev.Slice.EditorTools
 
         /// <summary>Authoring default, frames at 30 fps: the push before the takeoff that JumpUp keeps.</summary>
         private const int Push = 6;
+
+        /// <summary>
+        /// Authoring default, frames at 30 fps: the landing JumpLand keeps, the knees' give and the first rise (0.33 s).
+        /// The file's whole landing, 26 frames, held the walk back (owner's play test of 2026-11-11).
+        /// </summary>
+        private const int LandFrames = 10;
 
         /// <summary>Every clip by its use, its Mixamo file and whether it loops (the plan's table under A2).</summary>
         public static readonly (string Use, string File, bool Loop)[] Clips =
@@ -169,6 +175,12 @@ namespace GameDev.Slice.EditorTools
                     throw new InvalidOperationException($"[SliceMixamo] {use}: no file at {path}");
                 }
 
+                Rig(importer);
+                if (OwnRest(importer))
+                {
+                    TPose(importer, report);
+                }
+
                 Set(importer, Take(importer, use, loop, use.StartsWith("Jump")));
             }
 
@@ -178,7 +190,8 @@ namespace GameDev.Slice.EditorTools
             {
                 var clip = Get(use);
                 var curves = AnimationUtility.GetCurveBindings(clip).Count(b => b.type == typeof(Animator));
-                var avatar = AssetDatabase.LoadAllAssetsAtPath(PathOf(use)).OfType<Avatar>().FirstOrDefault();
+                var shared = (AssetImporter.GetAtPath(PathOf(use)) as ModelImporter)?.sourceAvatar;
+                var avatar = shared != null ? shared : AssetDatabase.LoadAllAssetsAtPath(PathOf(use)).OfType<Avatar>().FirstOrDefault();
                 var sound = clip.humanMotion && avatar != null && avatar.isValid && avatar.isHuman && curves > 0;
                 broken += sound ? 0 : 1;
                 report.AppendLine($"{use}: {clip.length:0.00} s{(clip.isLooping ? ", loops" : string.Empty)}, {curves} muscle and root curves" +
@@ -241,7 +254,7 @@ namespace GameDev.Slice.EditorTools
                 Take(importer, "Jump", false, true),
                 Take(importer, "JumpUp", false, true, first + Mathf.Max(0, takeoff - Push), first + takeoff),
                 Take(importer, "JumpAir", false, true, first + takeoff, first + landing),
-                Take(importer, "JumpLand", false, true, first + landing, last));
+                Take(importer, "JumpLand", false, true, first + landing, Mathf.Min(last, first + landing + LandFrames)));
             report.AppendLine($"The still jump: takeoff at frame {takeoff}, landing at {landing} of {frames} (measured, feet over {Lift} m; " +
                               $"highest {highest:0.00} m on the player man)");
         }
@@ -261,17 +274,188 @@ namespace GameDev.Slice.EditorTools
             clip.lockRootRotation = true;
             clip.keepOriginalOrientation = true;
             clip.lockRootHeightY = true;
-            clip.keepOriginalPositionY = !feet;
-            clip.heightFromFeet = feet;
+            // Every clip's height from its feet (owner's play test of 2026-11-11: the people's feet hung over the ground):
+            // the body stands so the lower foot meets the root, on every body whatever its legs' length.
+            clip.keepOriginalPositionY = false;
+            clip.heightFromFeet = true;
             clip.lockRootPositionXZ = true;
             clip.keepOriginalPositionXZ = true;
             return clip;
         }
 
-        private static void Set(ModelImporter importer, params ModelImporterClipAnimation[] clips)
+        /// <summary>
+        /// The avatar every clip file shares: the player woman's model's own, made from its skin in a true T-pose. The files
+        /// were downloaded Without Skin on that body, so they carry its skeleton bone for bone but no bind pose, and an
+        /// avatar made from such a file takes its first frame for its rest pose: the walk's knees bent at 115°, the run's
+        /// at 79°, so every frame came across offset by its first and the knees and ankles bent wrongly on every body
+        /// (measured by <see cref="SliceAnimationCheck"/>, 2026-11-11).
+        /// </summary>
+        public static Avatar SourceAvatar =>
+            AssetDatabase.LoadAllAssetsAtPath(SlicePeopleModels.PlayerWoman.Model).OfType<Avatar>().FirstOrDefault(a => a.isHuman) ??
+            throw new InvalidOperationException("[SliceMixamo] the player woman's model has no human avatar");
+
+        /// <summary>
+        /// The file's rig set to share <see cref="SourceAvatar"/> and imported so, before its clips are read: a file whose
+        /// last import failed has no default clip to cut from.
+        /// </summary>
+        private static void Rig(ModelImporter importer)
+        {
+            var own = OwnRest(importer);
+            var source = own ? null : SourceAvatar;
+            if (importer.animationType == ModelImporterAnimationType.Human && importer.preserveHierarchy == !own &&
+                importer.avatarSetup == (own ? ModelImporterAvatarSetup.CreateFromThisModel : ModelImporterAvatarSetup.CopyFromOther) &&
+                importer.sourceAvatar == source && importer.defaultClipAnimations.Length > 0)
+            {
+                return;
+            }
+
+            Avatar(importer);
+            importer.importAnimation = true;
+            importer.clipAnimations = Array.Empty<ModelImporterClipAnimation>();
+            importer.SaveAndReimport();
+            if (importer.defaultClipAnimations.Length == 0)
+            {
+                throw new InvalidOperationException($"[SliceMixamo] {importer.assetPath} imports no clip with the shared avatar: see the log's Rig Error");
+            }
+        }
+
+        /// <summary>
+        /// The Blender clips (A3) keep an avatar of their own: Blender writes the armature's rest pose into the file, and
+        /// its bones' lengths differ from the player woman's by up to 0.4 m, so Unity refuses to copy hers onto them.
+        /// </summary>
+        private static bool OwnRest(ModelImporter importer) => importer.assetPath.StartsWith(BlenderFolder + "/", StringComparison.Ordinal);
+
+        /// <summary>
+        /// A Blender clip's avatar given the player woman's T-pose for its rest (owner's play test of 2026-11-11: the
+        /// blacksmith's arm bent unnaturally). The script builds its clips on Breathing Idle's armature, so the file's rest
+        /// is that idle's first pose, arms down, and an avatar made from it took the hanging arm for a T-pose: every frame
+        /// came across with the arm turned by the difference, as the Mixamo files did before they shared her avatar. Each
+        /// bone of the rest, from the hips out, is pointed at its child as her T-pose points it, after the two bodies'
+        /// frames are matched (Unity's Enforce T-Pose, by direction), and the result is written as the avatar's skeleton.
+        /// </summary>
+        private static void TPose(ModelImporter importer, StringBuilder report)
+        {
+            var description = importer.humanDescription;
+            if (description.human == null || description.human.Length == 0)
+            {
+                throw new InvalidOperationException($"[SliceMixamo] {importer.assetPath} has no human mapping to give a T-pose");
+            }
+
+            var file = (GameObject)Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(importer.assetPath));
+            var woman = (GameObject)Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(SlicePeopleModels.PlayerWoman.Model));
+            try
+            {
+                Transform Find(GameObject root, string name) => root.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == name);
+                int Depth(Transform t)
+                {
+                    var d = 0;
+                    for (var p = t.parent; p != null; p = p.parent)
+                    {
+                        d++;
+                    }
+
+                    return d;
+                }
+
+                var bones = description.human.Select(h => (Human: h.humanName, File: Find(file, h.boneName), Woman: Find(woman, h.boneName)))
+                    .Where(b => b.File != null && b.Woman != null).ToDictionary(b => b.Human);
+
+                // The two bodies' frames: up from the hips to the head, right from the left thigh to the right. Blender's
+                // export may turn the whole armature, so the woman's directions are carried into the file's frame first.
+                Quaternion Frame(Func<string, Vector3> at)
+                {
+                    var up = (at("Head") - at("Hips")).normalized;
+                    var right = (at("RightUpperLeg") - at("LeftUpperLeg")).normalized;
+                    return Quaternion.LookRotation(Vector3.Cross(right, up).normalized, up);
+                }
+
+                var toFile = Frame(n => bones[n].File.position) * Quaternion.Inverse(Frame(n => bones[n].Woman.position));
+
+                // Each bone in turn from the hips out, pointed at its child as the woman's T-pose points it: Unity's own
+                // Enforce T-Pose, by direction.
+                string Child(string human) => human switch
+                {
+                    "Spine" => "Chest",
+                    "Chest" => bones.ContainsKey("UpperChest") ? "UpperChest" : "Neck",
+                    "UpperChest" => "Neck",
+                    "Neck" => "Head",
+                    "LeftShoulder" => "LeftUpperArm",
+                    "RightShoulder" => "RightUpperArm",
+                    "LeftUpperArm" => "LeftLowerArm",
+                    "RightUpperArm" => "RightLowerArm",
+                    "LeftLowerArm" => "LeftHand",
+                    "RightLowerArm" => "RightHand",
+                    "LeftHand" => "Left Middle Proximal",
+                    "RightHand" => "Right Middle Proximal",
+                    "LeftUpperLeg" => "LeftLowerLeg",
+                    "RightUpperLeg" => "RightLowerLeg",
+                    "LeftLowerLeg" => "LeftFoot",
+                    "RightLowerLeg" => "RightFoot",
+                    "LeftFoot" => "LeftToes",
+                    "RightFoot" => "RightToes",
+                    _ => null,
+                };
+
+                var worst = 0f;
+                foreach (var b in bones.Values.OrderBy(b => Depth(b.File)))
+                {
+                    var child = Child(b.Human);
+                    if (child == null || !bones.TryGetValue(child, out var c))
+                    {
+                        continue;
+                    }
+
+                    var want = toFile * (c.Woman.position - b.Woman.position);
+                    var have = c.File.position - b.File.position;
+                    worst = Mathf.Max(worst, Vector3.Angle(have, want));
+                    b.File.rotation = Quaternion.FromToRotation(have, want) * b.File.rotation;
+                }
+
+                description.skeleton = description.skeleton.Select(s =>
+                {
+                    var t = Find(file, s.name);
+                    if (t != null && t != file.transform)
+                    {
+                        s.rotation = t.localRotation;
+                    }
+
+                    return s;
+                }).ToArray();
+                importer.humanDescription = description;
+                importer.SaveAndReimport();
+                var down = toFile * Vector3.down;
+                var drop = Vector3.Angle(bones["LeftLowerArm"].File.position - bones["LeftUpperArm"].File.position, down);
+                report.AppendLine($"{Path.GetFileNameWithoutExtension(importer.assetPath)}: rest turned to the player woman's T-pose " +
+                                  $"(a bone turned by up to {worst:0}°; the arm now {drop:0}° from down)");
+            }
+            finally
+            {
+                Object.DestroyImmediate(file);
+                Object.DestroyImmediate(woman);
+            }
+        }
+
+        private static void Avatar(ModelImporter importer)
         {
             importer.animationType = ModelImporterAnimationType.Human;
-            importer.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel;
+            if (OwnRest(importer))
+            {
+                importer.preserveHierarchy = false;
+                importer.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel;
+                importer.sourceAvatar = null;
+                return;
+            }
+
+            // A file with one root node has it folded into the file's root, which left Hips one level higher than in the
+            // model whose avatar it copies, and Unity refuses the copy: keep the Armature as the model has it.
+            importer.preserveHierarchy = true;
+            importer.avatarSetup = ModelImporterAvatarSetup.CopyFromOther;
+            importer.sourceAvatar = SourceAvatar;
+        }
+
+        private static void Set(ModelImporter importer, params ModelImporterClipAnimation[] clips)
+        {
+            Avatar(importer);
             importer.importAnimation = true;
             importer.materialImportMode = ModelImporterMaterialImportMode.None;
             importer.importCameras = false;
@@ -290,9 +474,10 @@ namespace GameDev.Slice.EditorTools
             FightParameters(controller);
             var machine = controller.layers[0].stateMachine;
             var idle = State(machine, "Idle", Get(idleUse), new Vector3(300f, 0f));
-            State(machine, "Walk", Get("Walk"), new Vector3(300f, 120f));
+            var walk = State(machine, "Walk", Get("Walk"), new Vector3(300f, 120f));
             machine.defaultState = idle;
             var talk = State(machine, "Talk", Get("Talk"), new Vector3(300f, -120f));
+            idle.iKOnFeet = walk.iKOnFeet = talk.iKOnFeet = true; // the feet on the ground on every body
             On(idle, talk, 0.25f, "Talking", true);
             On(talk, idle, 0.25f, "Talking", false);
             Fight(controller, idle);
@@ -301,15 +486,25 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// The player's controller at <paramref name="path"/>: the locomotion blend at Speed 0, 1, 2 and 3, each clip at
-        /// its time scale; the jump's three parts, the flight at <paramref name="airSpeed"/>; and the fight.
+        /// The player's controller at <paramref name="path"/> (owner's play test of 2026-11-11). Its movement states have
+        /// no transitions of their own: <c>PlayerLocomotion</c> owns the state and cross-fades to it the moment it
+        /// changes, so no clip is waited out. The states:
+        /// <list type="bullet">
+        /// <item><c>Locomotion</c>, the blend at Speed 0, 1, 2 and 3 (idle, walk, run, sprint), each clip at its time scale;</item>
+        /// <item><c>Crouch</c>, the stealth blend at Speed 0 and 1 (crouched idle, sneak), its pace on the <c>Pace</c> float,
+        /// the sneak's own pace kept in <c>SneakPace</c>'s default (m/s, measured) for the code to match;</item>
+        /// <item><c>Fall</c>, the jump's flight at <paramref name="airSpeed"/>, holding its last pose; <c>JumpLand</c>, a short landing;</item>
+        /// <item>the fight, entered from <c>Locomotion</c> while Fighting.</item>
+        /// </list>
+        /// Foot IK on every standing state, so the feet meet the ground on every body.
         /// </summary>
-        public static AnimatorController Player(string path, float[] timeScales, float airSpeed)
+        public static AnimatorController Player(string path, float[] timeScales, float airSpeed, float sneakPace)
         {
             var controller = Fresh(path);
             controller.AddParameter("Speed", AnimatorControllerParameterType.Float);
             controller.AddParameter(new AnimatorControllerParameter { name = "Grounded", type = AnimatorControllerParameterType.Bool, defaultBool = true });
-            controller.AddParameter("Jump", AnimatorControllerParameterType.Trigger);
+            controller.AddParameter(new AnimatorControllerParameter { name = "Pace", type = AnimatorControllerParameterType.Float, defaultFloat = 1f });
+            controller.AddParameter(new AnimatorControllerParameter { name = "SneakPace", type = AnimatorControllerParameterType.Float, defaultFloat = sneakPace });
             FightParameters(controller);
             var machine = controller.layers[0].stateMachine;
 
@@ -329,17 +524,22 @@ namespace GameDev.Slice.EditorTools
             }
 
             tree.children = children;
+            locomotion.iKOnFeet = true;
             machine.defaultState = locomotion;
 
-            var up = State(machine, "JumpBegin", Get("JumpUp"), new Vector3(560f, -120f));
+            var crouch = controller.CreateBlendTreeInController("Crouch", out var low, 0);
+            low.blendParameter = "Speed";
+            low.useAutomaticThresholds = false;
+            low.AddChild(Get("Crouch"), 0f);
+            low.AddChild(Get("Sneak"), 1f);
+            crouch.iKOnFeet = true;
+            crouch.speedParameterActive = true;
+            crouch.speedParameter = "Pace";
+
             var air = State(machine, "Fall", Get("JumpAir"), new Vector3(560f, 0f));
             air.speed = airSpeed;
             var land = State(machine, "JumpLand", Get("JumpLand"), new Vector3(560f, 120f));
-            Transition(locomotion, up, 0.05f).AddCondition(AnimatorConditionMode.If, 0f, "Jump");
-            Transition(up, air, 0.1f).AddCondition(AnimatorConditionMode.IfNot, 0f, "Grounded");
-            Exit(up, air, 0.95f, 0.1f);
-            Transition(air, land, 0.05f).AddCondition(AnimatorConditionMode.If, 0f, "Grounded");
-            Exit(land, locomotion, 0.7f, 0.15f);
+            land.iKOnFeet = true;
             Fight(controller, locomotion);
             EditorUtility.SetDirty(controller);
             return controller;

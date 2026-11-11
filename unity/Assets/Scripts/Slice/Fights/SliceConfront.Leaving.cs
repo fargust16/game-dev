@@ -94,10 +94,10 @@ namespace GameDev.Slice.Fights
             _brokeAway = _yielded = false;
         }
 
-        /// <summary>The player's Yield and Spare in its turn (Y, V); a refused Yield says why.</summary>
-        private bool LeaveByWill(Combatant player, GameInputService input)
+        /// <summary>The player's Yield and Spare in its turn (Y, V, or their hotbar slots); a refused Yield says why.</summary>
+        private bool LeaveByWill(Combatant player, bool yield, bool spare)
         {
-            if (input.YieldPressed)
+            if (yield)
             {
                 if (!_turns.SubmitIntent(TurnIntent.Yield))
                 {
@@ -107,7 +107,7 @@ namespace GameDev.Slice.Fights
                 return true;
             }
 
-            if (!input.SparePressed)
+            if (!spare)
             {
                 return false;
             }

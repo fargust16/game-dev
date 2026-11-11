@@ -1,3 +1,4 @@
+using System.Linq;
 using GameDev.Confront.Rules;
 using UnityEditor;
 using UnityEngine;
@@ -29,6 +30,17 @@ namespace GameDev.Slice.EditorTools
         private const string Cursors = "Assets/Cursors/Cursors 64/";
         private static readonly string[] FightCursors = { "Cursor_Basic2", "Cursor_Move1", "Cursor_Attack", "Cursor_Basic2_R", "Cursor_Attack_R" };
 
+        // The fight hotbar's icons (owner's play test, 2026-11-11, after BG3's): the Modern GDR pack's bright atlas, which
+        // the asset map names for every icon of the game, tinted by the HUD, one for each FightAction after None: the
+        // skip for ending the turn, the clock for waiting, the shield for the Defensive Stance, the turning arrow for the
+        // other Weapon Set, the full heart for First Aid, the figure in shadow for Stealth, the way out for a Yield, the
+        // open heart for mercy.
+        private const string IconAtlas = "Assets/Modern GDR - Free icons pack/00_Atlas/BrightIcons.png";
+        private static readonly string[] FightIcons =
+        {
+            "Skip_Bright", "Watch_Bright", "Shield_Bright", "Reload_Bright", "Heart02_Bright", "Network_Bright", "Exit_Bright", "Heart01_Bright",
+        };
+
         public static void Configure()
         {
             var settings = AssetDatabase.LoadAssetAtPath<SliceSettings>(SettingsPath);
@@ -48,6 +60,16 @@ namespace GameDev.Slice.EditorTools
             for (var i = 0; i < FightCursors.Length; i++)
             {
                 cursors.GetArrayElementAtIndex(i).objectReferenceValue = Cursor(FightCursors[i]);
+            }
+
+            var sprites = AssetDatabase.LoadAllAssetsAtPath(IconAtlas).OfType<Sprite>().ToDictionary(sprite => sprite.name);
+            var icons = so.FindProperty("fightIcons");
+            icons.arraySize = FightIcons.Length;
+            for (var i = 0; i < FightIcons.Length; i++)
+            {
+                icons.GetArrayElementAtIndex(i).objectReferenceValue = sprites.TryGetValue(FightIcons[i], out var sprite)
+                    ? sprite
+                    : throw new System.InvalidOperationException($"[SliceConfrontSetup] missing icon {FightIcons[i]} in {IconAtlas}");
             }
 
             so.ApplyModifiedPropertiesWithoutUndo();

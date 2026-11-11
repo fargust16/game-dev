@@ -126,9 +126,23 @@ Shader "Hidden/GameDev/Slice/HeightFog"
         float3 end = eye + v * d;
         float H = _HeightFogParams.y;
         float atEye = Falloff(eye.y);
-        // The integral of the density along the ray, stable both ways: H (f(eye) - f(end)) / v.y.
+        // The integral of the density along the ray, stable both ways: H (f(low) - f(high)) / |v.y| over the part above
+        // the height where Falloff is held, plus that part's length times the held value below it. Without the second
+        // term two ends both below it gave no fog and a level ray all of it: a white line at the horizon (owner's play
+        // test of 2026-11-11, in the interiors, which stand below the sea's level).
         float rise = v.y * d;
-        float column = abs(rise) > 0.01 * H ? H * (atEye - Falloff(end.y)) / v.y : d * Falloff(eye.y + 0.5 * rise);
+        float column;
+        if (abs(rise) > 0.01 * H)
+        {
+            float low = min(eye.y, end.y), high = max(eye.y, end.y);
+            float held = _HeightFogParams.z - 4.0 * H;
+            float above = max(low, held);
+            column = H * max(Falloff(above) - Falloff(high), 0.0) / abs(v.y) + d * saturate((held - low) / (high - low)) * exp(4.0);
+        }
+        else
+        {
+            column = d * Falloff(eye.y + 0.5 * rise);
+        }
 
         // Uneven fog: slow drifting patches, read where the ray ends; the sky has none, since a sky ray's end runs in
         // columns across the screen.

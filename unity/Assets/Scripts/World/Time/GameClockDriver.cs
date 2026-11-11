@@ -16,6 +16,9 @@ namespace GameDev.World.Timekeeping
         /// <summary>The running clock, or null before a driver has woken.</summary>
         public static IWorldClock Running => _running != null ? _running._clock : null;
 
+        /// <summary>Real seconds a tick lasts while the clock runs; 0 before a driver has woken.</summary>
+        public static float RealSecondsPerTick => _running != null && _running.settings != null ? _running.settings.RealSecondsPerTick : 0f;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics()
         {
