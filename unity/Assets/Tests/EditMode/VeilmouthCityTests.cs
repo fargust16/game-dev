@@ -271,6 +271,31 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// §41: the gatehouse's dress over Creaking Gate stands between its two towers with no collider, and nothing of it
+        /// hangs lower than 2.5 m over the road, so the road, its pavements and the Combat Grid are as before.
+        /// </summary>
+        [Test]
+        public void TheGatehouseStandsOverCreakingGate()
+        {
+            var city = _scene.GetRootGameObjects().Single(g => g.name == VeilmouthCity.RootName).transform;
+            var dress = city.Find("The gates' dress");
+            Assert.IsNotNull(dress, "the gates' dress");
+            Assert.AreEqual(0, dress.GetComponentsInChildren<Collider>(true).Length, "the dress has no collider");
+            var bounds = dress.GetComponentsInChildren<MeshRenderer>().Select(r => r.bounds).ToList();
+            Assert.Greater(bounds.Count, 0, "the dress is drawn");
+            var all = bounds.Aggregate((a, b) => { a.Encapsulate(b); return a; });
+            var towers = city.GetComponentsInChildren<Transform>(true).Where(t => t.name.StartsWith("Creaking Gate - ")).ToList();
+            Assert.AreEqual(2, towers.Count, "Creaking Gate's two towers");
+            var foot = towers.SelectMany(t => t.GetComponentsInChildren<Collider>()).Where(c => !c.isTrigger).Min(c => c.bounds.min.y);
+            Assert.GreaterOrEqual(all.min.y - foot, 2.5f, "nothing of the dress hangs lower than 2.5 m over the road");
+            foreach (var t in towers)
+            {
+                Assert.IsTrue(all.Intersects(t.GetComponentsInChildren<Collider>().Where(c => !c.isTrigger).Select(c => c.bounds).Aggregate((a, b) => { a.Encapsulate(b); return a; })),
+                    $"the dress meets {t.name}");
+            }
+        }
+
+        /// <summary>
         /// §37–§38: the One-Eye's lantern and Stone Grandad's burn with the gas lamps, and the clock's dials glow with
         /// them, in their own glass or stucco by day, but none is a street lamp, so they add nothing to the Darkness of
         /// 10.3 §3.

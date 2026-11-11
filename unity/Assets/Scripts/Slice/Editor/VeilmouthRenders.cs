@@ -170,6 +170,8 @@ namespace GameDev.Slice.EditorTools
             Eye(label + "_millstreet", 36f, -100f, 47f, -131f, 2f);
             Eye(label + "_cemetery", -74f, 162f, -28f, 161f, 2f); // Last Turning Cemetery from its gate
             Eye(label + "_graves", -50f, 173f, -46f, 149f, 1.7f);
+            Eye(label + "_gate", -140f, 60f, -60f, 60f, 4f); // §41: Creaking Gate from beyond the river
+            Eye(label + "_gatein", -58f, 62f, -81f, 60f, 1.7f);
             Debug.Log($"Veilmouth dress views written to {OutputFolder}.");
         }
 

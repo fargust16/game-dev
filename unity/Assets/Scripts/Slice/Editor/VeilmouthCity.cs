@@ -282,6 +282,7 @@ namespace GameDev.Slice.EditorTools
                       $"Back doors: {_backDoorsOpen} open, {_backDoorsBlind} walled up. Railing posts: {_postsAdded} added at free ends, {_postsHidden} hidden at walls; {_railingsDrawnOut} railing ends drawn out to a wall (§31).");
             TowersDressOf(_root); // §38: the clock faces and the lighthouse's lantern
             GravesDressOf(_root); // §40: Last Turning Cemetery's stones
+            GatesDressOf(_root, _layout); // §41: the gatehouse over Creaking Gate
             var sky = scene.GetRootGameObjects().FirstOrDefault(g => g.name == VeilmouthMystic.RootName);
             if (sky != null)
             {
