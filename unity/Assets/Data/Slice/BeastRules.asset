@@ -72,6 +72,6 @@ MonoBehaviour:
   wolfEyes: 0.7
   boarEyes: 0.6
   glow: {r: 0.55, g: 0.95, b: 0.85, a: 1}
-  glowLight: 2.5
+  glowLight: 1.6
   glowRange: 7
-  glowEmission: 1.2
+  glowEmission: 0.06

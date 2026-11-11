@@ -472,6 +472,107 @@ namespace GameDev.Slice.EditorTools
             Debug.Log($"Townsfolk views written to {OutputFolder}.");
         }
 
+        /// <summary>
+        /// S3b.2: a wolf pack, a boar and a glowing wolf in their territories, at 10:00 and at 20:30, from a walker's eye
+        /// seven metres off, the eye placed where nothing stands between it and the beasts. Nothing is saved. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderBeasts
+        /// </summary>
+        public static void RenderBeasts()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            var beasts = Object.FindObjectsByType<GameDev.Slice.Beasts.SliceBeast>(FindObjectsSortMode.None).OrderBy(b => b.Id).ToList();
+            if (sky == null || beasts.Count == 0)
+            {
+                Debug.LogError("[VeilmouthRenders] Veilmouth needs its sky and its beasts (SliceBeastsSetup).");
+                return;
+            }
+
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            foreach (var b in beasts)
+            {
+                var animator = b.GetComponentInChildren<Animator>();
+                var idle = animator.runtimeAnimatorController.animationClips.FirstOrDefault(c => c.name.EndsWith("_Idle"));
+                if (idle != null)
+                {
+                    idle.SampleAnimation(animator.gameObject, 0.4f);
+                }
+            }
+
+            // The second pack's first wolf, glowing alone as the seed may make it, its pack gone for the picture.
+            var lone = beasts.First(b => b.Pack == 1);
+            foreach (var b in beasts.Where(b => b.Pack == 1 && b != lone))
+            {
+                b.gameObject.SetActive(false);
+            }
+
+            var rules = AssetDatabase.LoadAssetAtPath<GameDev.Slice.Beasts.BeastRules>("Assets/Data/Slice/BeastRules.asset");
+            lone.Glow(rules.Glow, rules.GlowLight, rules.GlowRange, rules.GlowEmission);
+
+            // The boar's HD body with its fur shells and the pack's mobile body, side by side, for the choice of body.
+            var boar = beasts.First(b => b.Kind == GameDev.Slice.Beasts.BeastKind.Boar);
+            var mobile = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Wild Boar/Prefabs/URP/Mobile/Wild_Boar.prefab"));
+            mobile.transform.SetPositionAndRotation(boar.transform.position + (boar.transform.right * 2f), boar.transform.rotation);
+            mobile.transform.localScale = boar.GetComponentInChildren<Animator>().transform.lossyScale;
+            var subjects = new (string Name, Vector3 At)[]
+            {
+                ("beasts_pack", Centre(beasts.Where(b => b.Pack == 0))),
+                ("beasts_boar", beasts.First(b => b.Kind == GameDev.Slice.Beasts.BeastKind.Boar).transform.position),
+                ("beasts_glowing", lone.transform.position),
+                ("beasts_boars", boar.transform.position + boar.transform.right),
+            };
+            var hours = new[] { (10 * 60, "1000"), ((20 * 60) + 30, "2030") };
+            _skyAndGrade = true;
+            try
+            {
+                sky.Apply(hours[0].Item1);
+                Eye("beasts_warmup", subjects[0].At + new Vector3(6f, 1.7f, 0f), subjects[0].At);
+                File.Delete($"{OutputFolder}/beasts_warmup.png");
+                foreach (var (minute, hour) in hours)
+                {
+                    sky.Apply(minute);
+                    foreach (var (name, at) in subjects)
+                    {
+                        var to = at + (Vector3.up * 0.45f);
+                        Eye($"{name}_{hour}", Clear(to, name == "beasts_boars" ? 4f : 7f), to, 50f);
+                    }
+                }
+            }
+            finally
+            {
+                _skyAndGrade = false;
+            }
+
+            Debug.Log($"[VeilmouthRenders] the beasts' views written to {OutputFolder} as beasts_*.");
+        }
+
+        private static Vector3 Centre(System.Collections.Generic.IEnumerable<GameDev.Slice.Beasts.SliceBeast> beasts)
+        {
+            var list = beasts.ToList();
+            return list.Aggregate(Vector3.zero, (sum, b) => sum + b.transform.position) / Mathf.Max(1, list.Count);
+        }
+
+        /// <summary>An eye at a walker's height this far from a place, on the first side with nothing in between.</summary>
+        private static Vector3 Clear(Vector3 to, float distance)
+        {
+            var terrain = Terrain.activeTerrain;
+            Vector3 eye = default;
+            for (var k = 0; k < 16; k++)
+            {
+                var flat = to + (Quaternion.Euler(0f, 200f + (k * 22.5f), 0f) * Vector3.forward * distance);
+                eye = new Vector3(flat.x, terrain.SampleHeight(flat) + terrain.transform.position.y + 1.7f, flat.z);
+                var hits = Physics.RaycastAll(eye, (to - eye).normalized, (to - eye).magnitude, ~0, QueryTriggerInteraction.Ignore);
+                if (!hits.Any(h => h.collider.GetComponentInParent<GameDev.Slice.Beasts.SliceBeast>() == null))
+                {
+                    return eye;
+                }
+            }
+
+            return eye;
+        }
+
         private static void Shot(string name, Vector3 from, Vector3 to)
         {
             var camera = Make();

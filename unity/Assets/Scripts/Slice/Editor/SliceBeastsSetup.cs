@@ -34,6 +34,13 @@ namespace GameDev.Slice.EditorTools
         private const float BoarLength = 1.5f;
         public const int WolfPacks = 6;
 
+        // Where a beast can stand, near the city plan's spot (authoring defaults): ground under 25°, nothing within 0.5 m,
+        // 1.5 m from the beast before it, and no farther than 12 m from the den.
+        private const float MaxSlope = 25f;
+        private const float BodyRadius = 0.5f;
+        private const float Apart = 1.5f;
+        private const float Wander = 12f;
+
         // A wolf pack's places round its den, in metres east and north, with each wolf's facing (city plan's stand-ins).
         private static readonly (float East, float North, float Yaw)[] Den = { (0f, 0f, 30f), (2.5f, -1.5f, 80f), (-1.5f, -2.5f, 200f) };
 
@@ -65,6 +72,43 @@ namespace GameDev.Slice.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log($"[SliceBeastsSetup] {placed} beasts placed in Veilmouth's territories.");
+        }
+
+        /// <summary>
+        /// Measures each territory: the ground's height at its centre against the city's street level, and the steepest
+        /// rise from the centre to its edge, so a den on a height the character cannot climb is seen. Writes the log only.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.SliceBeastsSetup.Survey
+        /// </summary>
+        public static void Survey()
+        {
+            var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var city = scene.GetRootGameObjects().First(g => g.name == VeilmouthCity.RootName);
+            var territories = city.transform.Find(TerritoriesName);
+            Physics.SyncTransforms();
+            var ground = ~LayerMask.GetMask(KitLayers.Character, KitLayers.NoGrid);
+            float Height(Vector3 at) => Physics.Raycast(at + (Vector3.up * 200f), Vector3.down, out var h, 400f, ground, QueryTriggerInteraction.Ignore) ? h.point.y : float.NaN;
+            foreach (Transform t in territories)
+            {
+                var c = t.position;
+                var centre = Height(c);
+                var steepest = 0f;
+                var lowestEdge = float.MaxValue;
+                for (var k = 0; k < 16; k++)
+                {
+                    var dir = Quaternion.Euler(0f, k * 22.5f, 0f) * Vector3.forward;
+                    var last = centre;
+                    for (var r = 2f; r <= 30f; r += 2f)
+                    {
+                        var h = Height(c + (dir * r));
+                        steepest = Mathf.Max(steepest, Mathf.Atan2(Mathf.Abs(h - last), 2f) * Mathf.Rad2Deg);
+                        last = h;
+                    }
+
+                    lowestEdge = Mathf.Min(lowestEdge, last);
+                }
+
+                Debug.Log($"[SliceBeastsSetup] {t.name} at ({c.x:0}, {c.z:0}): ground {centre:0.0} m, street {VeilmouthScene.StreetLevel:0.0} m, lowest ground 30 m out {lowestEdge:0.0} m, steepest 2 m step {steepest:0} deg");
+            }
         }
 
         /// <summary>The clips, the two controllers and the two prefabs.</summary>
@@ -109,6 +153,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             Physics.SyncTransforms();
+            Placed.Clear();
             var group = new GameObject(GroupName).transform;
             group.SetParent(city, false);
             var wolf = AssetDatabase.LoadAssetAtPath<GameObject>(WolfPrefabPath);
@@ -150,15 +195,55 @@ namespace GameDev.Slice.EditorTools
         {
             var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, group);
             go.name = $"{(kind == BeastKind.Wolf ? "Wolf" : "Boar")} {id}";
-            var ground = ~LayerMask.GetMask(KitLayers.Character, KitLayers.NoGrid);
-            if (Physics.Raycast(at + (Vector3.up * 40f), Vector3.down, out var hit, 80f, ground, QueryTriggerInteraction.Ignore))
-            {
-                at.y = hit.point.y;
-            }
-
+            at = Settle(id, at, home);
+            Placed.Add(at);
             go.transform.SetPositionAndRotation(at, Quaternion.Euler(0f, yaw, 0f));
             go.GetComponent<SliceBeast>().Configure(id, kind, pack, home);
             EditorUtility.SetDirty(go.GetComponent<SliceBeast>());
+        }
+
+        private static readonly List<Vector3> Placed = new List<Vector3>();
+
+        /// <summary>
+        /// The nearest place to the city plan's spot where a beast can stand: on ground under 25°, clear of trunks, rocks
+        /// and walls, apart from the beasts placed before it, and near its den; the spot itself when none is found.
+        /// </summary>
+        private static Vector3 Settle(string id, Vector3 at, Vector3 home)
+        {
+            var ground = ~LayerMask.GetMask(KitLayers.Character, KitLayers.NoGrid);
+            for (var ring = 0f; ring <= Wander; ring += 1f)
+            {
+                var steps = ring == 0f ? 1 : Mathf.CeilToInt(ring * 6f);
+                for (var k = 0; k < steps; k++)
+                {
+                    var probe = at + (Quaternion.Euler(0f, k * 360f / steps, 0f) * Vector3.forward * ring);
+                    var fromDen = probe - home;
+                    fromDen.y = 0f;
+                    if (fromDen.magnitude > Wander
+                        || !Physics.Raycast(probe + (Vector3.up * 40f), Vector3.down, out var hit, 80f, ground, QueryTriggerInteraction.Ignore)
+                        || Vector3.Angle(hit.normal, Vector3.up) > MaxSlope
+                        || Physics.CheckCapsule(hit.point + (Vector3.up * 0.85f), hit.point + (Vector3.up * 1.2f), BodyRadius, ground, QueryTriggerInteraction.Ignore)
+                        || Placed.Exists(p => (p - hit.point).sqrMagnitude < Apart * Apart))
+                    {
+                        continue;
+                    }
+
+                    if (ring > 0f)
+                    {
+                        Debug.Log($"[SliceBeastsSetup] {id} stands {ring:0} m from the plan's spot, on ground it can stand on.");
+                    }
+
+                    return hit.point;
+                }
+            }
+
+            Debug.LogWarning($"[SliceBeastsSetup] {id}: no ground to stand on within {Wander} m of its den; left at the plan's spot.");
+            if (Physics.Raycast(at + (Vector3.up * 40f), Vector3.down, out var down, 80f, ground, QueryTriggerInteraction.Ignore))
+            {
+                at.y = down.point.y;
+            }
+
+            return at;
         }
 
         /// <summary>A pack's clip as a project clip that loops or not, so the walk, run and rest repeat.</summary>

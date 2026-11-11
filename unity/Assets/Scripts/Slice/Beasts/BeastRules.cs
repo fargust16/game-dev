@@ -66,9 +66,9 @@ namespace GameDev.Slice.Beasts
 
         [Tooltip("The glow that shows from afar (10.2): a pale light on the beast and its fur lit from within (authoring defaults).")]
         [SerializeField] private Color glow = new Color(0.55f, 0.95f, 0.85f);
-        [SerializeField] private float glowLight = 2.5f;
+        [SerializeField] private float glowLight = 1.6f;
         [SerializeField] private float glowRange = 7f;
-        [SerializeField] private float glowEmission = 1.2f;
+        [SerializeField] private float glowEmission = 0.06f;
 
         public float TerritoryRadius => territoryRadius;
 

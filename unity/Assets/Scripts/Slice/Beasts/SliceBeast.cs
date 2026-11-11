@@ -95,7 +95,7 @@ namespace GameDev.Slice.Beasts
             Glowing = true;
             var lamp = new GameObject("Glow").AddComponent<Light>();
             lamp.transform.SetParent(transform, false);
-            lamp.transform.localPosition = Vector3.up * 0.8f / Mathf.Max(0.01f, transform.lossyScale.y);
+            lamp.transform.localPosition = Vector3.up * 1.6f / Mathf.Max(0.01f, transform.lossyScale.y);
             lamp.type = LightType.Point;
             lamp.color = colour;
             lamp.intensity = light;
