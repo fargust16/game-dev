@@ -14,7 +14,8 @@ namespace GameDev.Slice.Fights
     /// S3a.7: the character's life between fights. Its HP, its conditions and the supplies it carries are kept in the
     /// world state, so a fight starts with what the last one left and ends by writing it back; outside a fight the
     /// conditions and the ordinary return of HP run on the world clock's ticks (10.2). B gives First Aid to the character
-    /// itself, the most urgent condition first: in a fight for its AP, outside one for its ticks. An Environment Action,
+    /// itself, the most urgent condition first: in a fight for its AP, outside one for its ticks, with the supplies in the
+    /// bag (S5a.7, <see cref="SliceFirstAid"/>). An Environment Action,
     /// a treatment and a condition's tick are said in the fight's log, and the life line by the bottom left shows HP and
     /// conditions while the character is hurt.
     /// </summary>
@@ -27,16 +28,11 @@ namespace GameDev.Slice.Fights
         public const string PoisonedKey = "player.poisoned";
         public const string LegKey = "player.leg";
 
-        /// <summary>Set by the Master of First Aid's lesson (S5a); an antidote and a splint need it (10.2).</summary>
-        public const string LessonKey = "player.lesson.firstaid";
+        /// <summary>Set by the Master of First Aid's lesson (S5a.3); an antidote and a splint need it (10.2).</summary>
+        public const string LessonKey = SliceFirstAid.LessonKey;
 
-        /// <summary>The bandages, antidotes and splints carried, by <see cref="Treatment"/>.</summary>
-        public static readonly string[] SupplyKeys = { "player.kit.bandage", "player.kit.antidote", "player.kit.splint" };
-
-        // Authoring defaults, S3a.7: what the development kit tops the supplies up to until S5a's shops; and the order
-        // First Aid takes: the leg, which holds the character in place, then Bleeding, which takes HP, then Poison.
+        // Authoring default, S3a.7: what the development fight tops the bag's supplies up to, by Treatment.
         private static readonly int[] KitSupplies = { 2, 1, 1 };
-        private static readonly Treatment[] Urgency = { Treatment.Splint, Treatment.Bandage, Treatment.Antidote };
 
         private IWorldState _state;
         private IWorldClock _clock;
@@ -46,6 +42,9 @@ namespace GameDev.Slice.Fights
         private string _lifeNote;
         private float _lifeNoteUntil;
         private int _lifeShown = -1;
+
+        /// <summary>First Aid with the supplies in the bag (S5a.7); null in a test that needs none.</summary>
+        public SliceFirstAid FirstAid { get; set; }
 
         /// <summary>The character as a fighter in what it wears and holds (S5a.2); null leaves it the development kit.</summary>
         public Func<Fighter> WornFighter { get; set; }
@@ -89,29 +88,28 @@ namespace GameDev.Slice.Fights
         private bool Healthy => _state == null
             || (_state.Get(HpLostKey) == 0 && !_state.IsSet(BleedingKey) && !_state.IsSet(PoisonedKey) && !_state.IsSet(LegKey));
 
-        /// <summary>The development kit's supplies, topped up, and the lesson, carried into the fight.</summary>
-        private void Equip(Combatant player)
+        /// <summary>The lesson and the bag's supplies carried into the fight; the development fight tops them up first.</summary>
+        private void Equip(Combatant player, bool kit = false)
         {
-            player.KnowsFirstAid = _state != null && _state.IsSet(LessonKey);
-            for (var i = 0; i < SupplyKeys.Length; i++)
+            if (FirstAid == null)
             {
-                if (_state != null && _state.Get(SupplyKeys[i]) < KitSupplies[i])
-                {
-                    _state.Set(SupplyKeys[i], KitSupplies[i]);
-                }
-
-                player.Supplies[i] = _state != null ? _state.Get(SupplyKeys[i]) : KitSupplies[i];
+                player.KnowsFirstAid = _state != null && _state.IsSet(LessonKey);
+                return;
             }
+
+            for (var i = 0; kit && i < KitSupplies.Length; i++)
+            {
+                FirstAid.TopUp((Treatment)i, KitSupplies[i]);
+            }
+
+            FirstAid.Load(player);
         }
 
-        /// <summary>What the fight left: HP, conditions and the supplies still carried.</summary>
+        /// <summary>What the fight left: HP and conditions, and the supplies it used gone from the bag.</summary>
         private void Unequip(Combatant player)
         {
             SaveLife(player.Fighter);
-            for (var i = 0; i < SupplyKeys.Length && _state != null; i++)
-            {
-                _state.Set(SupplyKeys[i], player.Supplies[i]);
-            }
+            FirstAid?.Spend(player);
         }
 
         /// <summary>One world tick outside a fight (10.2): the conditions, then HP's ordinary return while nothing stops it.</summary>
@@ -139,22 +137,8 @@ namespace GameDev.Slice.Fights
             }
         }
 
-        /// <summary>The most urgent treatment the character can give itself now, or null.</summary>
-        private Treatment? Choose(Fighter fighter, Func<Treatment, int> supplies, bool knows)
-        {
-            foreach (var treatment in Urgency)
-            {
-                if (FightRules.Needs(fighter, treatment) && supplies(treatment) > 0 && (knows || !_settings.FightRules.TreatmentNeedsLesson(treatment)))
-                {
-                    return treatment;
-                }
-            }
-
-            return null;
-        }
-
         private bool TreatInFight(Combatant player) =>
-            Choose(player.Fighter, t => player.Supplies[(int)t], player.KnowsFirstAid) is Treatment treatment
+            FirstAid != null && FirstAid.Choose(player.Fighter, t => player.Supplies[(int)t], player.KnowsFirstAid) is Treatment treatment
             && _turns.SubmitIntent(TurnIntent.Treat(treatment, player.Id));
 
         /// <summary>
@@ -163,29 +147,16 @@ namespace GameDev.Slice.Fights
         /// </summary>
         public bool TreatOutside()
         {
-            if (_settings == null || _state == null || _clock == null)
+            if (_settings == null || _state == null || _clock == null || FirstAid == null)
             {
                 return false;
             }
 
-            var knows = _state.IsSet(LessonKey);
-            var choice = Choose(PlayerFighter(), t => _state.Get(SupplyKeys[(int)t]), knows);
-            if (!(choice is Treatment treatment))
+            var fault = FirstAid.TreatOutside(PlayerFighter, SaveLife, out var treatment, out var success);
+            if (fault != null)
             {
-                Note(Loc.Get(Healthy ? "ui.life.nothing" : "ui.life.nosupply"));
+                Note(Loc.Get(Healthy ? "ui.life.nothing" : fault));
                 return false;
-            }
-
-            var rules = _settings.FightRules;
-            _clock.AdvanceTicks(rules.TreatmentTicks(treatment));
-            var fighter = PlayerFighter();
-            var rolls = _seed.Fork(SliceSeedStreams.ActionChecks, (int)_clock.Tick, 7000 + (int)treatment);
-            var success = rolls.NextDouble() < rules.TreatmentChance(_character, treatment);
-            if (success)
-            {
-                FightRules.Cure(fighter, treatment);
-                SaveLife(fighter);
-                _state.Set(SupplyKeys[(int)treatment], _state.Get(SupplyKeys[(int)treatment]) - 1);
             }
 
             Note(Loc.Format(success ? "ui.life.treat.ok" : "ui.life.treat.failed", Loc.Get("ui.treatment." + treatment)));

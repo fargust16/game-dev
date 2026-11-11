@@ -251,6 +251,11 @@ namespace GameDev.Slice
                 Fights.WornFighter = () => Outfit.Fighter(settings.FightRules, Character, settings.Fists);
             }
 
+            if (Fights != null && Bag != null)
+            {
+                Fights.FirstAid = new SliceFirstAid(settings.FightRules, Bag, State, Clock, Character, seed);
+            }
+
             if (Bag != null && settings.Shops != null)
             {
                 Shops = new SliceShops(settings.Shops, settings.Items, seed, Clock, Bag, State);

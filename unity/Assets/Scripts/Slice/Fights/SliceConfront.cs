@@ -205,7 +205,7 @@ namespace GameDev.Slice.Fights
             _groups.Clear();
             var rules = _settings.FightRules;
             var player = new Combatant(PlayerId, PlayerSide, PlayerFighter(true), at, takesIntents: !AutoPlayer);
-            Equip(player);
+            Equip(player, kit: true);
             var combatants = new List<Combatant> { player };
             _bodies[player] = _player.transform;
             _names[player] = "ui.fight.you";
@@ -372,7 +372,7 @@ namespace GameDev.Slice.Fights
                 case FightAction.ChangeSet:
                     return (ours && !player.Fighter.Second.IsEmpty && _turns.ApLeft >= rules.WeaponSetAp, rules != null ? rules.WeaponSetAp : 0);
                 case FightAction.FirstAid:
-                    var treatment = player != null && rules != null ? Choose(player.Fighter, t => player.Supplies[(int)t], player.KnowsFirstAid) : null;
+                    var treatment = player != null && rules != null && FirstAid != null ? FirstAid.Choose(player.Fighter, t => player.Supplies[(int)t], player.KnowsFirstAid) : null;
                     var treatAp = treatment.HasValue ? rules.TreatmentAp(treatment.Value) : 0;
                     return (ours && treatment.HasValue && _turns.ApLeft >= treatAp, treatAp);
                 case FightAction.Stealth:
