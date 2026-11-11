@@ -42,14 +42,42 @@ namespace GameDev.Slice.Tests
         {
             Assert.AreEqual(0.20d, ReactionCheck.TheftWidth(3, 1, 2, false), 1e-9, "Dexterity 3 against a townsman: 20 %");
             Assert.AreEqual(0.128d, ReactionCheck.TheftWidth(3, 1, 4, false), 1e-9, "against a guard of Perception 4: 13 %");
-            Assert.AreEqual(0.390625d, ReactionCheck.TheftWidth(5, 5, 2, false), 1e-9, "a practised hand, Dexterity and Theft 5: 39 %");
+            Assert.AreEqual(0.35d, ReactionCheck.TheftWidth(5, 5, 2, false), 1e-9, "a practised hand, Dexterity and Theft 5: 39 %, held at 35 %");
             Assert.AreEqual(0.20d * Math.Pow(1.25d, -0.5d), ReactionCheck.TheftWidth(3, 1, 2, true), 1e-9, "an Alert townsman's Perception × 1.25");
             Assert.AreEqual(0.05d, ReactionCheck.TheftWidth(1, 1, 20, false), 1e-9, "never under 5 %");
-            Assert.AreEqual(0.60d, ReactionCheck.TheftWidth(60, 60, 2, false), 1e-9, "never over 60 %");
+            Assert.AreEqual(0.35d, ReactionCheck.TheftWidth(60, 60, 2, false), 1e-9, "never over 35 % (07.1 §8a, the owner's play test of S5a)");
 
-            _sheet.Set(CharacterAttribute.Dexterity, 5);
-            _sheet.Set(CharacterSkill.Theft, 5);
-            Assert.AreEqual(0.390625d, _theft.Width(2, false), 1e-9, "the character's own values");
+            _sheet.Set(CharacterAttribute.Dexterity, 4);
+            _sheet.Set(CharacterSkill.Theft, 4);
+            Assert.AreEqual(0.3125d, _theft.Width(2, false), 1e-9, "the character's own values");
+        }
+
+        [Test]
+        public void TheMarkersPaceFollows071s8a()
+        {
+            Assert.AreEqual(1.5d, ReactionCheck.Pace(0d), 1e-9, "even odds: 1.5 s, the slowest");
+            Assert.AreEqual(1.5d, ReactionCheck.Pace(6d), 1e-9, "never slower, however strong");
+            Assert.AreEqual(1.5d / 1.15d, ReactionCheck.Pace(-1d), 1e-9, "each point below speeds it");
+            Assert.AreEqual(1.5d * Math.Pow(1.15d, -4d), ReactionCheck.Pace(-4d), 1e-9, "0.86 s at Δ −4");
+            Assert.AreEqual(0.6d, ReactionCheck.Pace(-12d), 1e-9, "never faster than 0.6 s");
+
+            // The time to stop the marker in the zone: 0.3 s at even odds, 0.53 s at best, 0.07 s at Δ −4.
+            Assert.AreEqual(0.3d, ReactionCheck.Width(0d) * ReactionCheck.Pace(0d), 1e-9);
+            Assert.AreEqual(0.525d, ReactionCheck.Width(9d) * ReactionCheck.Pace(9d), 1e-9);
+            Assert.AreEqual(0.0703d, ReactionCheck.Width(-4d) * ReactionCheck.Pace(-4d), 1e-4);
+
+            var rolls = new Random(9);
+            for (var i = 0; i < 100; i++)
+            {
+                var bar = ReactionCheck.For(-2d, rolls, perfect: true);
+                Assert.AreEqual(ReactionCheck.Width(-2d), bar.GoodWidth, 1e-9);
+                Assert.AreEqual(ReactionCheck.Pace(-2d), bar.Seconds, 1e-9, "the bar keeps the pace");
+                Assert.AreEqual(bar.GoodWidth / 4d, bar.PerfectWidth, 1e-9, "a perfect zone a quarter of the good one");
+                Assert.AreEqual(bar.GoodStart + (bar.GoodWidth / 2d), bar.PerfectStart + (bar.PerfectWidth / 2d), 1e-9, "in its middle");
+                Assert.That(bar.GoodStart, Is.GreaterThanOrEqualTo(ReactionCheck.Lead));
+            }
+
+            Assert.AreEqual(0d, ReactionCheck.For(0d, rolls).PerfectWidth, "no perfect zone unless the use has one");
         }
 
         [Test]

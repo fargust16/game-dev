@@ -9,9 +9,10 @@ namespace GameDev.Slice.Gathering
 {
     /// <summary>
     /// A herb or flax patch, a fellable tree or an iron vein in the scene (S5a.5): E within reach begins gathering it, and
-    /// E again, a step, the bag or a fight ends it. While it is gathered the prompt shows what was taken and the Stamina
-    /// left; a spent node hides its models and colliders until it comes back. The driver puts one on each node's kit block
-    /// when a scene loads, so no scene is changed for it.
+    /// E again, a step, the bag or a fight ends it. Each cycle's tick shows its Reaction Check's bar, and Space settles the
+    /// cycle (the owner's play test of S5a). While it is gathered the prompt shows what was taken and the Stamina left; a
+    /// spent node hides its models and colliders until it comes back. The driver puts one on each node's kit block when a
+    /// scene loads, so no scene is changed for it.
     /// </summary>
     public sealed class GatherNode : MonoBehaviour, IPromptSource
     {
@@ -22,6 +23,8 @@ namespace GameDev.Slice.Gathering
         private static int _endedFrame = -1;
 
         private SliceGathering _gathering;
+        private SliceReaction _reaction;
+        private bool _barShown;
         private Func<bool> _busy;
         private PlayerLocomotion _player;
         private HudView _hud;
@@ -37,10 +40,12 @@ namespace GameDev.Slice.Gathering
         public bool IsActive => _gathering != null && _gathering.Active == Spot;
 
         /// <param name="busy">True while the character cannot gather: in a fight.</param>
-        public void Configure(SliceGathering gathering, GatherSpot spot, Func<bool> busy)
+        /// <param name="reaction">The bar each cycle is played on.</param>
+        public void Configure(SliceGathering gathering, GatherSpot spot, Func<bool> busy, SliceReaction reaction)
         {
             _gathering = gathering;
             _busy = busy;
+            _reaction = reaction;
             Spot = spot;
             _kind = spot.Rule.kind.ToString().ToLowerInvariant();
             spot.Shown = Show;
@@ -75,7 +80,14 @@ namespace GameDev.Slice.Gathering
             if (IsActive)
             {
                 var left = Mathf.RoundToInt((float)(_gathering.Stamina.Share * 100d));
-                return Loc.Format("ui.gather.working", Loc.Get("ui.gather.doing." + _kind), _gathering.TakenNow, left);
+                var tool = Spot.Rule.tool;
+                if (string.IsNullOrEmpty(tool))
+                {
+                    return Loc.Format("ui.gather.working", Loc.Get("ui.gather.doing." + _kind), _gathering.TakenNow, left);
+                }
+
+                var held = Mathf.RoundToInt(100f * (SliceGathering.ToolDurability - _gathering.Wear(tool)) / SliceGathering.ToolDurability);
+                return Loc.Format("ui.gather.working.tool", Loc.Get("ui.gather.doing." + _kind), _gathering.TakenNow, left, held);
             }
 
             if (!Shown || _gathering.Active != null || !InReach(player))
@@ -121,13 +133,47 @@ namespace GameDev.Slice.Gathering
             }
 
             var at = _player.transform.position;
+            if (_barShown && !IsActive)
+            {
+                // The gathering ended some other way, a beast's notice say, while the bar showed.
+                _barShown = false;
+                _reaction.Cancel();
+            }
+
             if (IsActive)
             {
                 _hud ??= FindAnyObjectByType<HudView>();
+                if (_barShown)
+                {
+                    if (_busy != null && _busy())
+                    {
+                        _gathering.Stop("ui.gather.stop.fight");
+                    }
+
+                    return;
+                }
+
+                if (_gathering.Due && _reaction != null && !_reaction.Running)
+                {
+                    var tick = _gathering.DueTick;
+                    _barShown = _reaction.Begin(_gathering.Bar(tick), "ui.gather.caption", r =>
+                    {
+                        _barShown = false;
+                        if (IsActive)
+                        {
+                            _gathering.Cycle(tick, r);
+                        }
+                    });
+                    return;
+                }
+
                 // A step or E is the player's own choice and ends the work with no note (owner's play test of S5a,
                 // 2026-11-11: "Interrupted, you moved" stayed on after walking away and back).
+                // Across the ground only: the Space that stops a bar may also make the character hop where it stands.
                 var step = _gathering.Rules.Step;
-                var own = (at - _from).sqrMagnitude > step * step || (input != null && input.InteractPressed);
+                var moved = at - _from;
+                moved.y = 0f;
+                var own = moved.sqrMagnitude > step * step || (input != null && input.InteractPressed);
                 var reason = _hud != null && _hud.IsBagOpen ? "ui.gather.stop.bag"
                     : _busy != null && _busy() ? "ui.gather.stop.fight"
                     : null;

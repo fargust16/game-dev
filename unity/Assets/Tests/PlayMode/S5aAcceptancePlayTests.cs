@@ -66,6 +66,7 @@ namespace GameDev.Slice.Tests
             character.Set(CharacterAttribute.Perception, 5);
             character.Set(CharacterSkill.MeleeSkill, 14);
             character.Set(CharacterSkill.Theft, 30);
+            character.Set(CharacterSkill.Stealth, 30);
             character.Set(CharacterSkill.FirstAid, 30);
             character.Set(CharacterSkill.Woodcutting, 30);
 
@@ -85,6 +86,7 @@ namespace GameDev.Slice.Tests
 
             yield return Tap(Key.Space);
             Assert.Greater(bag.Bronze, 500, "the first purse lifted");
+            world.Hiding.SetActive(false);
             foreach (var target in targets.Where(t => t != first))
             {
                 if (bag.Bronze >= 2800)
@@ -126,7 +128,7 @@ namespace GameDev.Slice.Tests
             for (var i = 0; i < 40 && tree.Shown; i++)
             {
                 world.Clock.AdvanceTicks(1);
-                yield return null;
+                yield return GatheringPlayTests.StopInZone(world.Reaction);
             }
 
             Assert.IsFalse(tree.Shown, "the tree felled");
@@ -142,7 +144,7 @@ namespace GameDev.Slice.Tests
             // Learns and crafts: Item Creation from Edda Brann, then a dagger at her workshop.
             Assert.IsNull(shops.Learn("edda", SliceWorkshop.Lesson));
             var dagger = bag.Catalogue.Find("dagger");
-            Assert.AreEqual(CraftOutcome.Made, world.Workshop.Make("edda", dagger, 9, null, out var piece));
+            Assert.AreEqual(CraftOutcome.Made, world.Workshop.Make("edda", dagger, 9, null, ReactionResult.Good, out var piece));
             Assert.AreEqual((0, 3), (bag.Count("iron_ore"), bag.Count("wood")), "its iron ore and a wood used");
 
             // Holds it: the fight's fighter is made from what the character wears and holds.

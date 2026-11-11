@@ -54,12 +54,14 @@ namespace GameDev.Slice.Theft
         public bool TriedToday(string person) => _state.Get(TriedKey(person)) == _clock.Day + 1;
 
         /// <summary>The good zone's width against a target of <paramref name="perception"/>, Alert or not.</summary>
-        public double Width(int perception, bool alert) =>
-            ReactionCheck.TheftWidth(_character.Get(CharacterAttribute.Dexterity), _character.Get(CharacterSkill.Theft), perception, alert);
+        public double Width(int perception, bool alert) => ReactionCheck.Width(Delta(perception, alert));
 
-        /// <summary>The bar for a try at <paramref name="person"/> today, its zone placed by the seed.</summary>
+        public double Delta(int perception, bool alert) =>
+            ReactionCheck.TheftDelta(_character.Get(CharacterAttribute.Dexterity), _character.Get(CharacterSkill.Theft), perception, alert);
+
+        /// <summary>The bar for a try at <paramref name="person"/> today, its zone and pace by 07.1 §8a, placed by the seed.</summary>
         public ReactionBar Bar(string person, int perception, bool alert) =>
-            ReactionCheck.Place(Width(perception, alert), _seed.Fork(SliceSeedStreams.Theft, Hash(person), _clock.Day * 2));
+            ReactionCheck.For(Delta(perception, alert), _seed.Fork(SliceSeedStreams.Theft, Hash(person), _clock.Day * 2));
 
         /// <summary>The person's purse today, by the seed.</summary>
         public int Purse(string person) => _seed.Fork(SliceSeedStreams.Theft, Hash(person), (_clock.Day * 2) + 1).Next(PurseLeast, PurseMost + 1);

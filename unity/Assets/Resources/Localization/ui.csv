@@ -238,6 +238,15 @@ ui.craft.made,"Made: {0}, in {1} minutes.","Сделано: {0}, за {1} мин
 ui.craft.interrupted,The work is interrupted; nothing is spent.,Работа прервана; ничего не потрачено.
 ui.craft.fault.lesson,Item Creation is not learned.,Создание предметов не изучено.
 ui.craft.fault.resources,Not enough resources.,Не хватает ресурсов.
+"# The anvil and the Reaction Check of Item Creation (the owner's play test of S5a; 19 §3, 07.1 §8a)"
+ui.prompt.anvil,E  Work at the anvil,E  Работать у наковальни
+ui.prompt.anvil_closed,The anvil's Master is away until {0}:00,Мастера наковальни нет до {0}:00
+ui.anvil.title,The anvil,Наковальня
+ui.anvil.hint,"Click a recipe: the work's minutes pass, then the last blow on the bar.","Щелчок по рецепту: пройдут минуты работы, затем последний удар по полосе."
+ui.craft.at_anvil,"Item Creation is worked at the anvil by the stall, {0} a piece.","Создание предметов — у наковальни рядом с лавкой, {0} за вещь."
+ui.craft.caption,The last blow: Space when the marker is in the zone,"Последний удар: пробел, когда метка в зоне"
+ui.craft.spoiled,The piece is spoiled: half the resources lost.,Вещь испорчена: потеряна половина ресурсов.
+ui.craft.fault.tired,Too tired for this work.,Слишком устали для этой работы.
 "# Gathering outside the walls (S5a.5; 19 §6.4, 07.2 §3.2)"
 ui.prompt.gather.herb,E  Gather herbs,E  Собрать травы
 ui.prompt.gather.flax,E  Gather flax,E  Собрать лён
@@ -257,6 +266,9 @@ ui.gather.stop.heavy,The bag can carry no more.,Больше не унести.
 ui.gather.stop.bag,Stopped for the bag.,Прервано: открыта сумка.
 ui.gather.stop.beast,Stopped: a beast has noticed you.,Прервано: вас заметил зверь.
 ui.gather.stop.fight,Stopped by a fight.,Прервано боем.
+ui.gather.stop.broken,The tool broke.,Инструмент сломался.
+ui.gather.caption,"Space when the marker is in the zone; its bright middle gives two","Пробел, когда метка в зоне; яркая середина даёт вдвое"
+ui.gather.working.tool,{0}: {1} taken · tool {3} % · Stamina {2} %   E  Stop,{0}: добыто {1} · инструмент {3} % · выносливость {2} %   E  Хватит
 "# A fallen beast's remains (S5a.6; 19 §6.4, 11 C3)"
 ui.prompt.remains.parts,E  Take its parts,E  Забрать трофеи
 ui.prompt.remains.skin,E  Skin it ({0} ticks),E  Снять шкуру ({0} тика)

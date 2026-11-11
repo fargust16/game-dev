@@ -262,6 +262,7 @@ namespace GameDev.Slice
                 Fights.FirstAid = new SliceFirstAid(settings.FightRules, Bag, State, Clock, Character, seed);
             }
 
+            Reaction = gameObject.AddComponent<SliceReaction>();
             if (Bag != null && settings.Shops != null)
             {
                 Shops = new SliceShops(settings.Shops, settings.Items, seed, Clock, Bag, State);
@@ -295,7 +296,12 @@ namespace GameDev.Slice
             if (Bag != null && settings.Gathering != null && settings.ActionChecks != null)
             {
                 Stamina = new SliceStamina(settings.Gathering, State, Clock, Character);
-                Gathering = new SliceGathering(settings.Gathering, Bag, State, Clock, Character, Stamina, settings.ActionChecks, seed);
+                Gathering = new SliceGathering(settings.Gathering, Bag, State, Clock, Character, Stamina, seed);
+                if (Workshop != null)
+                {
+                    Workshop.Stamina = Stamina;
+                }
+
                 if (Beasts != null)
                 {
                     Beasts.Warned += (_, _) => Gathering.Stop("ui.gather.stop.beast");
@@ -310,7 +316,6 @@ namespace GameDev.Slice
                 FindCarcasses();
             }
 
-            Reaction = gameObject.AddComponent<SliceReaction>();
             if (Bag != null && Standing != null)
             {
                 Theft = new GameDev.Slice.Theft.SliceTheft(Bag, State, Clock, Character, Standing, seed);
@@ -511,7 +516,7 @@ namespace GameDev.Slice
             {
                 if (walker.GetComponent<GameDev.Slice.Theft.PurseTarget>() == null)
                 {
-                    walker.gameObject.AddComponent<GameDev.Slice.Theft.PurseTarget>().Configure(Theft, Reaction, () => Fights != null && Fights.InFight);
+                    walker.gameObject.AddComponent<GameDev.Slice.Theft.PurseTarget>().Configure(Theft, Reaction, () => Fights != null && Fights.InFight, () => Hiding != null && Hiding.Active, Clock);
                     added = true;
                 }
             }
@@ -557,7 +562,7 @@ namespace GameDev.Slice
 
                 var at = block.transform.position;
                 var id = $"{rule.kind.ToString().ToLowerInvariant()}.{Mathf.RoundToInt(at.x * 10f)}.{Mathf.RoundToInt(at.z * 10f)}";
-                block.gameObject.AddComponent<GatherNode>().Configure(Gathering, Gathering.Spot(id, rule), () => Fights != null && Fights.InFight);
+                block.gameObject.AddComponent<GatherNode>().Configure(Gathering, Gathering.Spot(id, rule), () => Fights != null && Fights.InFight, Reaction);
                 added = true;
             }
 
@@ -579,6 +584,8 @@ namespace GameDev.Slice
                     person.gameObject.AddComponent<ShopCounter>().Configure(person.Id);
                     added = true;
                 }
+
+                added |= Workshop != null && Shops.Find(person.Id)?.workshop == true && OpenAnvil(person);
             }
 
             var hud = Hud();
@@ -586,6 +593,29 @@ namespace GameDev.Slice
             {
                 hud.FindPromptSources();
             }
+        }
+
+        /// <summary>Authoring default, m: how far from its Master a workshop's anvil may stand.</summary>
+        private const float AnvilReach = 25f;
+
+        /// <summary>
+        /// The anvil nearest a workshop's Master becomes its crafting station (19 §3, the owner's play test of S5a); true
+        /// when one was opened now.
+        /// </summary>
+        private static bool OpenAnvil(NamedPerson master)
+        {
+            var at = master.transform.position;
+            var anvil = FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude)
+                .Where(b => b.name.StartsWith("Kit_Market_Anvil") && (b.transform.position - at).sqrMagnitude < AnvilReach * AnvilReach)
+                .OrderBy(b => (b.transform.position - at).sqrMagnitude)
+                .FirstOrDefault();
+            if (anvil == null || anvil.GetComponent<CraftStation>() != null)
+            {
+                return false;
+            }
+
+            anvil.gameObject.AddComponent<CraftStation>().Configure(master.Id);
+            return true;
         }
 
         private void Refresh()

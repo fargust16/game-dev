@@ -6,15 +6,16 @@ using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Slice.Stealth;
 using GameDev.UI;
+using GameDev.World.Timekeeping;
 using UnityEngine;
 
 namespace GameDev.Slice.Theft
 {
     /// <summary>
-    /// A townsperson's purse as something to lift (S5a.8): within reach, E begins the Reaction Check of theft against the
-    /// person's Perception, Alert or not, in Stealth Mode or out of it. A good result takes the purse unseen; a bad one
-    /// makes the person notice the character, cry out and stop to face it. The driver puts one on every walking
-    /// townsperson when a scene loads.
+    /// A townsperson's purse as something to lift (S5a.8): within reach and in Stealth Mode only, E begins the Reaction
+    /// Check of theft against the person's Perception, Alert or not, and the world pauses while its bar shows (the owner's
+    /// play test of S5a, 10.3 §6). A good result takes the purse unseen; a bad one makes the person notice the character,
+    /// cry out and stop to face it. The driver puts one on every walking townsperson when a scene loads.
     /// </summary>
     public sealed class PurseTarget : MonoBehaviour, IPromptSource
     {
@@ -30,6 +31,8 @@ namespace GameDev.Slice.Theft
         private SliceTheft _theft;
         private SliceReaction _reaction;
         private Func<bool> _busy;
+        private Func<bool> _sneaking;
+        private IWorldClock _clock;
         private StealthObserver _eyes;
         private PlayerLocomotion _player;
         private HudView _hud;
@@ -39,15 +42,20 @@ namespace GameDev.Slice.Theft
         /// <summary>The person's name and place among its siblings in the scene, the same in every run, for the world state's keys.</summary>
         public string Person => $"{name}.{transform.GetSiblingIndex()}";
 
-        public void Configure(SliceTheft theft, SliceReaction reaction, Func<bool> busy)
+        /// <param name="sneaking">Whether the character is in Stealth Mode, the only state it steals in.</param>
+        /// <param name="clock">The clock paused while the bar shows.</param>
+        public void Configure(SliceTheft theft, SliceReaction reaction, Func<bool> busy, Func<bool> sneaking, IWorldClock clock)
         {
             _theft = theft;
             _reaction = reaction;
             _busy = busy;
+            _sneaking = sneaking;
+            _clock = clock;
             _eyes = GetComponent<StealthObserver>();
         }
 
-        private bool Ready => _theft != null && _reaction != null && !_reaction.Running && (_busy == null || !_busy());
+        private bool Ready => _theft != null && _reaction != null && !_reaction.Running && (_busy == null || !_busy())
+            && _sneaking != null && _sneaking();
 
         public string PromptFor(Vector3 player)
         {
@@ -99,7 +107,7 @@ namespace GameDev.Slice.Theft
                 _eyes = GetComponent<StealthObserver>();
                 var perception = _eyes != null ? _eyes.Perception : PlainPerception;
                 var alert = _eyes != null && _eyes.Meter != null && _eyes.Meter.Alert;
-                _reaction.Begin(_theft.Bar(Person, perception, alert), "ui.theft.caption", Settle);
+                _reaction.Begin(_theft.Bar(Person, perception, alert), "ui.theft.caption", Settle, _clock?.Pause());
             }
         }
 

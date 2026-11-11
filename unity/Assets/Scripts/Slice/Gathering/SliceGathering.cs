@@ -31,31 +31,40 @@ namespace GameDev.Slice.Gathering
     }
 
     /// <summary>
-    /// Gathering (S5a.5; 19 §6.4). The character begins at a node with its tool; then each world tick is one cycle, an
-    /// action check of 07.1 §4 on the node's attribute and skill against its D: a success gives one unit, a critical two,
-    /// a failure none, and every cycle spends 3 % of maximum Stamina. Gathering goes on until the character cancels it,
+    /// Gathering (S5a.5; 19 §6.4). The character begins at a node with its tool; then each world tick is one cycle, a
+    /// Reaction Check of 07.1 §8a on the node's attribute and skill against its D (the owner's play test of S5a): a perfect
+    /// result gives two units, a good one one, and a bad one none and wears the tool three times as much; every cycle spends
+    /// 3 % of maximum Stamina, and a worn-out tool stays in the bag broken (19 §4.3). Gathering goes on until the character cancels it,
     /// moves, opens the bag, a beast notices or attacks, the bag can carry no more, Stamina runs out, or the node is
     /// spent; a spent node leaves the world at once, and a herb or flax patch comes back 24 hours later. What is taken
     /// lives in the world state, keyed by the node's place.
     /// </summary>
     public sealed class SliceGathering
     {
+        /// <summary>Authoring default, 19 §4.3: what a gathering tool holds before it breaks.</summary>
+        public const int ToolDurability = 100;
+
+        /// <summary>Authoring default, 19 §4.3: the wear of a good or perfect cycle, and of a bad one.</summary>
+        public const int WearGood = 1;
+        public const int WearBad = 3;
+
+        /// <summary>A broken tool's catalogue id: the tool's, with this after it.</summary>
+        public const string Broken = "_broken";
+
         private readonly GatherRules _rules;
         private readonly Bag _bag;
         private readonly IWorldState _state;
         private readonly ICharacterValues _character;
-        private readonly ActionCheckRules _checks;
         private readonly IWorldSeed _seed;
         private readonly Dictionary<string, GatherSpot> _spots = new Dictionary<string, GatherSpot>();
 
         public SliceGathering(GatherRules rules, Bag bag, IWorldState state, IWorldClock clock, ICharacterValues character,
-            SliceStamina stamina, ActionCheckRules checks, IWorldSeed seed)
+            SliceStamina stamina, IWorldSeed seed)
         {
             _rules = rules;
             _bag = bag;
             _state = state;
             _character = character;
-            _checks = checks;
             _seed = seed;
             Stamina = stamina;
             clock.TickBoundary += OnTick;
@@ -81,6 +90,16 @@ namespace GameDev.Slice.Gathering
 
         /// <summary>How many times gathering has ended, so a view can tell a new end from an old one.</summary>
         public int Stops { get; private set; }
+
+        /// <summary>Whether a cycle waits for its Reaction Check, and the tick it is of.</summary>
+        public bool Due { get; private set; }
+
+        public long DueTick { get; private set; }
+
+        /// <summary>World state: the wear on the character's tool of kind <paramref name="tool"/> in use.</summary>
+        public static string WearKey(string tool) => $"tool.{tool}.wear";
+
+        public int Wear(string tool) => _state.Get(WearKey(tool));
 
         public IEnumerable<GatherSpot> Spots => _spots.Values;
 
@@ -143,32 +162,45 @@ namespace GameDev.Slice.Gathering
             StoppedAt = Active;
             Stopped = reason;
             Active = null;
+            Due = false;
             Stamina.Exerting = false;
             Stops++;
         }
 
-        /// <summary>19 §6.4: a success gives one unit, a critical success two, a failure none.</summary>
+        /// <summary>19 §6.4: a perfect result gives two units, a good one one, a bad one none.</summary>
         public static int UnitsOf(CheckOutcome outcome) => outcome == CheckOutcome.Critical ? 2 : outcome == CheckOutcome.Normal ? 1 : 0;
 
-        /// <summary>The chances of one cycle at <paramref name="spot"/> for the character as it is.</summary>
-        public ActionCheckChances Chances(GatherSpot spot)
+        /// <summary>07.1 §8a: a Reaction Check's results are §8's outcomes.</summary>
+        public static CheckOutcome OutcomeOf(ReactionResult result) =>
+            result == ReactionResult.Perfect ? CheckOutcome.Critical : result == ReactionResult.Good ? CheckOutcome.Normal : CheckOutcome.Failure;
+
+        /// <summary>The Reaction Check's Δ at <paramref name="spot"/> for the character as it is (07.1 §8a).</summary>
+        public double Delta(GatherSpot spot) =>
+            ReactionCheck.Delta(_character.Get(spot.Rule.attribute), _character.Get(spot.Rule.skill), spot.Rule.difficulty);
+
+        /// <summary>The bar of the active node's cycle at <paramref name="tick"/>: its zones and pace by Δ, placed by the seed.</summary>
+        public ReactionBar Bar(long tick)
         {
-            var rule = spot.Rule;
-            var preparation = ActionCheck.Preparation(_character.Get(rule.attribute), _character.Get(rule.skill));
-            return ActionCheck.Chances(_checks, preparation, rule.difficulty, _character.Get(CharacterAttribute.Perception),
-                _character.Get(CharacterAttribute.Luck));
+            var spot = Active;
+            return spot == null
+                ? default
+                : ReactionCheck.For(Delta(spot), _seed.Fork(SliceSeedStreams.Gathering, (int)tick, Hash(spot.Id)), perfect: true);
         }
 
-        /// <summary>One cycle at the active node, at <paramref name="tick"/>; the clock's tick does it during play.</summary>
-        public CheckOutcome Cycle(long tick)
+        /// <summary>
+        /// Settles the active node's cycle at <paramref name="tick"/> by its Reaction Check's <paramref name="result"/>:
+        /// the units it gives, the tool's wear and the Stamina it spends.
+        /// </summary>
+        public CheckOutcome Cycle(long tick, ReactionResult result)
         {
+            Due = false;
             var spot = Active;
             if (spot == null)
             {
                 return CheckOutcome.Failure;
             }
 
-            var outcome = ActionCheck.Roll(Chances(spot), _seed.Fork(SliceSeedStreams.Gathering, (int)tick, Hash(spot.Id)));
+            var outcome = OutcomeOf(result);
             var units = Math.Min(Left(spot), UnitsOf(outcome));
             if (units > 0 && !_bag.Add(spot.Rule.resource, units))
             {
@@ -179,12 +211,17 @@ namespace GameDev.Slice.Gathering
             _state.Set(spot.TakenKey, _state.Get(spot.TakenKey) + units);
             TakenNow += units;
             Stamina.Spend(_rules.CycleStamina);
+            var broke = WearTool(spot.Rule.tool, outcome == CheckOutcome.Failure ? WearBad : WearGood);
             Cycled?.Invoke(spot, outcome, units);
             if (Left(spot) <= 0)
             {
                 _state.Set(spot.EmptiedKey, (int)tick + 1);
                 spot.Shown?.Invoke(false);
                 Stop("ui.gather.stop.spent");
+            }
+            else if (broke && !HasTool(spot))
+            {
+                Stop("ui.gather.stop.broken");
             }
             else if (Stamina.Empty)
             {
@@ -194,11 +231,36 @@ namespace GameDev.Slice.Gathering
             return outcome;
         }
 
+        /// <summary>
+        /// 19 §4.3: wears the tool of kind <paramref name="tool"/> in use by <paramref name="wear"/>; one worn out stays in
+        /// the bag as a broken tool, and the next one begins unworn. True when it broke.
+        /// </summary>
+        public bool WearTool(string tool, int wear)
+        {
+            if (string.IsNullOrEmpty(tool) || _bag.Count(tool) <= 0)
+            {
+                return false;
+            }
+
+            var worn = Wear(tool) + wear;
+            if (worn < ToolDurability)
+            {
+                _state.Set(WearKey(tool), worn);
+                return false;
+            }
+
+            _state.Set(WearKey(tool), 0);
+            _bag.Remove(tool);
+            _bag.Add(tool + Broken);
+            return true;
+        }
+
         private void OnTick(long tick)
         {
-            if (Active != null)
+            if (Active != null && !Due)
             {
-                Cycle(tick);
+                Due = true;
+                DueTick = tick;
             }
 
             foreach (var spot in _spots.Values)

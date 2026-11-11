@@ -52,21 +52,27 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(Object.FindObjectsByType<TownsfolkWalker>(FindObjectsInactive.Exclude).Length, targets.Length, "a purse on every walker");
             Assert.AreEqual(targets.Length, targets.Select(t => t.Person).Distinct().Count(), "each one its own name");
 
-            // A practised hand: the zone at its widest, 60 %.
+            // A practised hand: the zone at its widest, 35 %, and a quiet step so the walkers do not notice it sneak up.
             world.Character.Set(CharacterAttribute.Dexterity, 30);
             world.Character.Set(CharacterSkill.Theft, 30);
+            world.Character.Set(CharacterSkill.Stealth, 30);
             var player = Object.FindAnyObjectByType<PlayerLocomotion>();
             var hud = Object.FindAnyObjectByType<HudView>();
             PurseTarget first = null;
             yield return Choose(targets, null, player, t => first = t);
             Assert.IsNotNull(first, "a walker with no other prompt beside it");
             Assert.AreEqual("E  Lift the purse", first.PromptFor(player.transform.position));
+            world.Hiding.SetActive(false);
+            Assert.IsNull(first.PromptFor(player.transform.position), "theft only in Stealth Mode");
+            Assert.IsTrue(world.Hiding.SetActive(true));
             var bronze = world.Bag.Bronze;
             yield return Tap(Key.E);
             Assert.IsTrue(world.Reaction.Running, "E shows the bar");
             Assert.IsTrue(hud.IsReactionShown);
             Assert.IsFalse(player.enabled, "the character stands still while it shows");
-            Assert.AreEqual(0.6d, world.Reaction.Bar.GoodWidth, 1e-9);
+            Assert.IsTrue(world.Clock.IsPaused, "the world pauses while theft's bar shows");
+            Assert.AreEqual(0.35d, world.Reaction.Bar.GoodWidth, 1e-9);
+            Assert.AreEqual(1.5d, world.Reaction.Bar.Seconds, 1e-9, "the slowest marker");
 
             var bar = world.Reaction.Bar;
             for (var t = 0f; t < 3f && world.Reaction.Marker < bar.GoodStart + (bar.GoodWidth * 0.3d); t += Time.deltaTime)
@@ -78,6 +84,7 @@ namespace GameDev.Slice.Tests
             Assert.IsFalse(world.Reaction.Running, "Space stops the marker");
             Assert.IsFalse(hud.IsReactionShown);
             Assert.IsTrue(player.enabled);
+            Assert.IsFalse(world.Clock.IsPaused, "the world runs again");
             Assert.That(world.Bag.Bronze - bronze, Is.InRange(SliceTheft.PurseLeast, SliceTheft.PurseMost), "the purse lifted unseen");
             Assert.IsTrue(world.Theft.TriedToday(first.Person));
             Assert.AreEqual(0, world.State.Get(Reputation));
@@ -91,6 +98,7 @@ namespace GameDev.Slice.Tests
             bronze = world.Bag.Bronze;
             yield return Tap(Key.E);
             Assert.IsTrue(world.Reaction.Running);
+            Assert.Less(world.Reaction.Bar.Seconds, 1.5d, "a clumsy hand's marker runs faster");
             for (var t = 0f; t < 3f && world.Reaction.Running; t += Time.deltaTime)
             {
                 yield return null;
@@ -111,13 +119,15 @@ namespace GameDev.Slice.Tests
 
         /// <summary>
         /// Finds the first walker, other than <paramref name="not"/>, behind which no other prompt answers E: no door,
-        /// talk or counter. It stands held with the character behind it, and <paramref name="found"/> is given it.
+        /// talk or counter. It stands held with the character behind it in Stealth Mode, and <paramref name="found"/> is
+        /// given it.
         /// </summary>
         internal static IEnumerator Choose(PurseTarget[] targets, PurseTarget not, PlayerLocomotion player, System.Action<PurseTarget> found)
         {
             foreach (var target in targets.Where(t => t != not))
             {
                 yield return StandBehind(target, player);
+                SliceWorldDriver.Running.Hiding.SetActive(true);
                 var at = player.transform.position;
                 var others = Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude)
                     .OfType<IPromptSource>().Where(s => !ReferenceEquals(s, target) && s.PromptFor(at) != null);

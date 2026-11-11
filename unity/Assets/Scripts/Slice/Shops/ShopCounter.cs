@@ -14,7 +14,7 @@ namespace GameDev.Slice.Shops
     /// <summary>
     /// A Master's or the trader's counter on Bawling Row (S5a.3): <c>E  Trade</c> within reach while the shop is open opens
     /// the shop page, whose lines are clicked: a thing on the shelf to buy it, a lesson to learn it, a carried thing to sell
-    /// one. E again, Escape, walking away or a fight closes it. The world is not paused. The driver puts one on each keeper
+    /// one. Item Creation is worked at the anvil beside the stall (<see cref="CraftStation"/>), not here. E again, Escape, walking away or a fight closes it. The world is not paused. The driver puts one on each keeper
     /// when a scene loads, so no scene is changed for it.
     /// </summary>
     public sealed class ShopCounter : MonoBehaviour, IPromptSource
@@ -26,6 +26,7 @@ namespace GameDev.Slice.Shops
         private HudView _hud;
         private Portal[] _doors;
         private PersonTalk[] _talks;
+        private CraftStation[] _stations;
         private string _note;
         private bool _open;
 
@@ -74,11 +75,20 @@ namespace GameDev.Slice.Shops
             _open = false;
         }
 
-        /// <summary>A conversation in reach or open takes E first: Kit stands by the trader's stall.</summary>
+        /// <summary>
+        /// A conversation in reach or open takes E first: Kit stands by the trader's stall. So does the anvil beside Edda
+        /// Brann's stall, in reach or with its page open.
+        /// </summary>
         private bool Yields(Vector3 player)
         {
             _talks ??= FindObjectsByType<PersonTalk>(FindObjectsInactive.Exclude);
-            return _talks.Any(t => t != null && t.isActiveAndEnabled && (t.IsOpen || t.PromptFor(player) != null));
+            if (_stations == null || _stations.Length == 0)
+            {
+                _stations = FindObjectsByType<CraftStation>(FindObjectsInactive.Exclude);
+            }
+
+            return _talks.Any(t => t != null && t.isActiveAndEnabled && (t.IsOpen || t.PromptFor(player) != null))
+                || _stations.Any(s => s != null && s.isActiveAndEnabled && (s.IsOpen || s.PromptFor(player) != null));
         }
 
         private static SliceShops Shops() => SliceWorldDriver.Running != null ? SliceWorldDriver.Running.Shops : null;
@@ -122,7 +132,8 @@ namespace GameDev.Slice.Shops
 
             if (shop.workshop && world.Workshop != null)
             {
-                AddWorkshop(lines, world.Workshop, world.Bag);
+                // Item Creation is worked at the anvil in the yard, not at the counter (the owner's play test of S5a).
+                lines.Add(new PageLine(Loc.Format("ui.craft.at_anvil", Coins.Show(world.Workshop.Rules.WorkshopFee))));
             }
 
             var sellable = shops.Sellable(Keeper, p => world.Outfit != null && world.Outfit.IsWorn(p));
@@ -141,49 +152,6 @@ namespace GameDev.Slice.Shops
 
             var title = Loc.Format("ui.shop.title", Loc.Get(GameDev.Slice.People.SliceRoster.NameKey(Keeper)));
             _hud.ShowShop(title, BagPage.Money(world.Bag), lines, _note ?? Loc.Get("ui.shop.hint"));
-        }
-
-        /// <summary>The workshop's lines (S5a.4): every recipe once Item Creation is learned, stage 8 too while its rare ingredient is carried.</summary>
-        private void AddWorkshop(List<PageLine> lines, SliceWorkshop workshop, Bag bag)
-        {
-            lines.Add(new PageLine(Loc.Format("ui.craft.heading", Coins.Show(workshop.Rules.WorkshopFee)), heading: true));
-            if (!workshop.Knows)
-            {
-                lines.Add(new PageLine(Loc.Get("ui.craft.unlearned")));
-                return;
-            }
-
-            var stages = bag.Count(workshop.Rules.RareIngredient) > 0 ? new[] { 9, 8 } : new[] { 9 };
-            foreach (var item in workshop.Bases)
-            {
-                foreach (var stage in stages)
-                {
-                    var i = item;
-                    var s = stage;
-                    var parts = string.Join(", ", workshop.Recipe(i, s).Select(p => Loc.Format("ui.craft.part", p.count, Loc.Get("item." + p.item))));
-                    var text = Loc.Format(s == 9 ? "ui.craft.recipe" : "ui.craft.recipe.eight", Loc.Get(i.NameKey), parts, workshop.Ticks(s));
-                    lines.Add(new PageLine(text, () => Craft(workshop, i, s)));
-                }
-            }
-        }
-
-        /// <summary>Makes the piece, the world running through its ticks; a fight in them interrupts it and nothing is spent.</summary>
-        private void Craft(SliceWorkshop workshop, ItemDefinition item, int stage)
-        {
-            var fault = workshop.Fault(Keeper, item, stage);
-            if (fault != null)
-            {
-                _note = Loc.Get(fault);
-            }
-            else
-            {
-                var outcome = workshop.Make(Keeper, item, stage, Busy, out var piece);
-                _note = outcome == CraftOutcome.Made
-                    ? Loc.Format("ui.craft.made", Name(item, piece), workshop.Ticks(stage))
-                    : Loc.Get("ui.craft.interrupted");
-            }
-
-            Show();
         }
 
         private void Act(string fault, string done, ItemDefinition item, string name = null)

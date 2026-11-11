@@ -26,14 +26,13 @@ namespace GameDev.Slice.Tests
         {
             _rules = AssetDatabase.LoadAssetAtPath<GatherRules>("Assets/Data/Slice/Gathering.asset");
             var items = AssetDatabase.LoadAssetAtPath<ItemCatalogue>("Assets/Data/Items/Items.asset");
-            var checks = AssetDatabase.LoadAssetAtPath<ActionCheckRules>("Assets/Data/Progression/ActionCheckRules.asset");
             _sheet = new CharacterSheet();
             _sheet.Set(CharacterAttribute.Strength, 20);
             _bag = SliceWorldDriver.StartingBag(items, _sheet);
             _state = new WorldState();
             _clock = new GameClock(1d, 9 * 60);
             _stamina = new SliceStamina(_rules, _state, _clock, _sheet);
-            _gathering = new SliceGathering(_rules, _bag, _state, _clock, _sheet, _stamina, checks, new WorldSeed(110201));
+            _gathering = new SliceGathering(_rules, _bag, _state, _clock, _sheet, _stamina, new WorldSeed(110201));
         }
 
         private GatherSpot Spot(GatherKind kind, int n = 0) => _gathering.Spot($"{kind}.{n}", _rules.RuleFor(kind));
@@ -83,31 +82,53 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
-        public void ACyclesOutcomesFollowTheCheck()
+        public void ACyclesResultFollowsItsBarAndWearsTheTool()
         {
             Assert.AreEqual(0, SliceGathering.UnitsOf(CheckOutcome.Failure));
             Assert.AreEqual(1, SliceGathering.UnitsOf(CheckOutcome.Normal));
             Assert.AreEqual(2, SliceGathering.UnitsOf(CheckOutcome.Critical));
 
             _bag.Add("woodcutting_axe");
-            const int Trees = 400;
-            var counts = new int[3];
-            var units = 0;
-            for (var n = 0; n < Trees; n++)
-            {
-                var tree = Spot(GatherKind.Tree, n);
-                Assert.IsNull(_gathering.Begin(tree));
-                counts[(int)_gathering.Cycle(1000 + n)]++;
-                units += _gathering.TakenNow;
-                Assert.AreEqual(_gathering.TakenNow, _bag.Count("wood"), "what is taken goes into the bag");
-                _bag.Remove("wood", _bag.Count("wood"));
-                _state.Set(SliceStamina.SpentKey, 0);
-            }
+            var tree = Spot(GatherKind.Tree);
+            Assert.IsNull(_gathering.Begin(tree));
+            Assert.IsFalse(_gathering.Due, "the first cycle comes at the next tick");
+            _clock.AdvanceTicks(1);
+            Assert.IsTrue(_gathering.Due, "a tick brings a cycle, which waits for its bar");
+            _clock.AdvanceTicks(3);
+            Assert.AreEqual(0, _bag.Count("wood"), "nothing is taken while the bar waits");
 
-            var chances = _gathering.Chances(Spot(GatherKind.Tree));
-            Assert.AreEqual(chances.Failure, counts[0] / (double)Trees, 0.07d, "failures");
-            Assert.AreEqual(chances.CriticalOutcome, counts[2] / (double)Trees, 0.05d, "criticals");
-            Assert.AreEqual(counts[1] + (2 * counts[2]), units, "a success one unit, a critical two");
+            // The bar by 07.1 §8a: Woodcutting 1 and Strength 20 against D 2 is Δ 8.5, the widest zone and the slowest marker.
+            var bar = _gathering.Bar(_gathering.DueTick);
+            Assert.AreEqual(ReactionCheck.MostWidth, bar.GoodWidth, 1e-9);
+            Assert.AreEqual(ReactionCheck.Seconds, bar.Seconds, 1e-9);
+            Assert.AreEqual(bar.GoodWidth / 4d, bar.PerfectWidth, 1e-9, "a perfect zone for two units");
+            _sheet.Set(CharacterAttribute.Strength, 1);
+            Assert.AreEqual(ReactionCheck.Width(-1d), _gathering.Bar(_gathering.DueTick).GoodWidth, 1e-9, "a weak arm: Δ −1");
+            Assert.Less(_gathering.Bar(_gathering.DueTick).Seconds, ReactionCheck.Seconds, "and a faster marker");
+
+            Assert.AreEqual(CheckOutcome.Critical, _gathering.Cycle(_gathering.DueTick, ReactionResult.Perfect));
+            Assert.AreEqual(2, _bag.Count("wood"), "a perfect stop: two units");
+            Assert.AreEqual(SliceGathering.WearGood, _gathering.Wear("woodcutting_axe"));
+            Assert.AreEqual(CheckOutcome.Normal, _gathering.Cycle(_clock.Tick, ReactionResult.Good));
+            Assert.AreEqual(3, _bag.Count("wood"), "a good one: one unit");
+            Assert.AreEqual(CheckOutcome.Failure, _gathering.Cycle(_clock.Tick, ReactionResult.Bad));
+            Assert.AreEqual(3, _bag.Count("wood"), "a bad one: nothing");
+            Assert.AreEqual((2 * SliceGathering.WearGood) + SliceGathering.WearBad, _gathering.Wear("woodcutting_axe"), "and the tool wears three times as much");
+            Assert.AreEqual(3, _gathering.TakenNow);
+
+            // A worn-out tool stays in the bag broken, and the work ends without another.
+            _state.Set(SliceGathering.WearKey("woodcutting_axe"), SliceGathering.ToolDurability - 1);
+            _gathering.Cycle(_clock.Tick, ReactionResult.Good);
+            Assert.AreEqual(0, _bag.Count("woodcutting_axe"));
+            Assert.AreEqual(1, _bag.Count("woodcutting_axe" + SliceGathering.Broken), "the broken axe kept");
+            Assert.AreEqual(0, _gathering.Wear("woodcutting_axe"), "the next axe begins unworn");
+            Assert.AreEqual("ui.gather.stop.broken", _gathering.Stopped);
+            Assert.AreEqual("ui.gather.fault.tool", _gathering.Begin(tree), "a broken axe fells nothing");
+
+            var herb = Spot(GatherKind.Herb);
+            Assert.IsNull(_gathering.Begin(herb));
+            _gathering.Cycle(_clock.Tick, ReactionResult.Bad);
+            Assert.AreEqual(0, _gathering.Wear(""), "hands do not wear");
         }
 
         [Test]
@@ -125,6 +146,8 @@ namespace GameDev.Slice.Tests
             while (_gathering.Active != null && cycles < 20)
             {
                 _clock.AdvanceTicks(1);
+                Assert.IsTrue(_gathering.Due);
+                _gathering.Cycle(_gathering.DueTick, ReactionResult.Good);
                 cycles++;
             }
 
@@ -163,7 +186,7 @@ namespace GameDev.Slice.Tests
             _bag.Add("woodcutting_axe");
             _stamina.Spend(0.97d);
             Assert.IsNull(_gathering.Begin(tree));
-            _gathering.Cycle(_clock.Tick + 1);
+            _gathering.Cycle(_clock.Tick + 1, ReactionResult.Good);
             Assert.AreEqual("ui.gather.stop.tired", _gathering.Stopped, "Gathering stops at 0 Stamina");
             Assert.AreEqual("ui.gather.fault.tired", _gathering.Begin(tree));
 
@@ -175,7 +198,7 @@ namespace GameDev.Slice.Tests
             Assert.IsNull(_gathering.Begin(ore));
             for (var i = 0; i < 10 && _gathering.Active != null; i++)
             {
-                _gathering.Cycle(_clock.Tick + 10 + i);
+                _gathering.Cycle(_clock.Tick + 10 + i, ReactionResult.Perfect);
             }
 
             Assert.AreEqual("ui.gather.stop.heavy", _gathering.Stopped, "a bag that can carry no more ends it");

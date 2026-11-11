@@ -82,7 +82,7 @@ namespace GameDev.Slice.Tests
             _bag.Add("wood", 4);
             var start = _clock.Tick;
 
-            Assert.AreEqual(CraftOutcome.Made, _workshop.Make("edda", _items.Find("dagger"), 9, () => false, out var low));
+            Assert.AreEqual(CraftOutcome.Made, _workshop.Make("edda", _items.Find("dagger"), 9, () => false, ReactionResult.Good, out var low));
             Assert.AreEqual(start + 10, _clock.Tick, "ten ticks, the world running");
             Assert.AreEqual(400, _bag.Bronze, "the workshop's 100 bronze");
             Assert.AreEqual(8, _bag.Count("iron_ore"));
@@ -98,7 +98,7 @@ namespace GameDev.Slice.Tests
             }
 
             _sheet.Set(CharacterSkill.ItemCreation, 100);
-            Assert.AreEqual(CraftOutcome.Made, _workshop.Make("edda", _items.Find("dagger"), 9, () => false, out var high));
+            Assert.AreEqual(CraftOutcome.Made, _workshop.Make("edda", _items.Find("dagger"), 9, () => false, ReactionResult.Good, out var high));
             Assert.GreaterOrEqual(high.modifiers.Count, 5, "at 100 / 100 / 100 each addition is 99 %");
             Assert.AreEqual(2, _state.Get(SliceWorkshop.MadeKey));
             Assert.AreNotEqual(low.modifiers.Count, high.modifiers.Count);
@@ -112,12 +112,54 @@ namespace GameDev.Slice.Tests
             _bag.Add("wood", 2);
             _bag.Add("glow_essence_8");
             var start = _clock.Tick;
-            Assert.AreEqual(CraftOutcome.Made, _workshop.Make("edda", _items.Find("sword"), 8, () => false, out var piece));
+            Assert.AreEqual(CraftOutcome.Made, _workshop.Make("edda", _items.Find("sword"), 8, () => false, ReactionResult.Good, out var piece));
             Assert.AreEqual(start + 20, _clock.Tick);
             Assert.AreEqual(8, piece.stage);
             Assert.AreEqual(0, _bag.Count("glow_essence_8"));
             Assert.AreEqual(0, _bag.Count("iron_ore"));
             Assert.IsTrue(piece.modifiers.All(m => m.tier <= 8 && m.tier >= 6), "a stage 8 piece rolls tiers 8 to 6");
+        }
+
+        [Test]
+        public void AFailedBarSpoilsThePieceAndHalfItsResources()
+        {
+            _state.Set(SliceShops.LessonKey(SliceWorkshop.Lesson), 1);
+            _bag.Add("iron_ore", 5);
+            _bag.Add("wood", 2);
+            _bag.Add("glow_essence_8");
+
+            // The bar by 07.1 §8a: Dexterity 1 and Item Creation 1 against 2 at stage 9 and 4 at stage 8.
+            Assert.AreEqual(ReactionCheck.Width(-1d), _workshop.Bar(9).GoodWidth, 1e-9);
+            Assert.AreEqual(ReactionCheck.Width(-3d), _workshop.Bar(8).GoodWidth, 1e-9);
+            Assert.AreEqual(ReactionCheck.Pace(-3d), _workshop.Bar(8).Seconds, 1e-9);
+            Assert.AreEqual(0d, _workshop.Bar(8).PerfectWidth, "Item Creation has a good zone only");
+
+            Assert.AreEqual(CraftOutcome.Spoiled, _workshop.Make("edda", _items.Find("sword"), 8, () => false, ReactionResult.Bad, out var piece));
+            Assert.IsNull(piece, "no piece");
+            Assert.AreEqual(400, _bag.Bronze, "the fee paid");
+            Assert.AreEqual(2, _bag.Count("iron_ore"), "5 asked: 3 lost, half rounded up");
+            Assert.AreEqual(1, _bag.Count("wood"), "2 asked: 1 lost");
+            Assert.AreEqual(0, _bag.Count("glow_essence_8"), "1 asked: 1 lost");
+            Assert.AreEqual(1, _bag.Pieces.Count, "only the plain clothes");
+            Assert.AreEqual(1, _state.Get(SliceWorkshop.MadeKey), "the next piece's bar is placed anew");
+        }
+
+        [Test]
+        public void TheWorkSpendsStamina()
+        {
+            var gathering = AssetDatabase.LoadAssetAtPath<GameDev.Slice.Gathering.GatherRules>("Assets/Data/Slice/Gathering.asset");
+            _workshop.Stamina = new GameDev.Slice.Gathering.SliceStamina(gathering, _state, _clock, _sheet);
+            _state.Set(SliceShops.LessonKey(SliceWorkshop.Lesson), 1);
+            _bag.Add("iron_ore", 3);
+            _bag.Add("wood");
+            var sword = _items.Find("sword");
+
+            _workshop.Stamina.Spend(0.85d);
+            Assert.AreEqual("ui.craft.fault.tired", _workshop.Fault("edda", sword, 9), "15 % left; a stage 9 piece needs 20 %");
+            _state.Set(GameDev.Slice.Gathering.SliceStamina.SpentKey, 0);
+            Assert.AreEqual(CraftOutcome.Made, _workshop.Make("edda", sword, 9, () => false, ReactionResult.Good, out _));
+            Assert.AreEqual(0.8d, _workshop.Stamina.Share, 1e-9, "2 % a tick of work, and none back during it");
+            Assert.IsFalse(_workshop.Stamina.Exerting);
         }
 
         [Test]
@@ -130,7 +172,7 @@ namespace GameDev.Slice.Tests
             var fight = false;
             _clock.TickBoundary += tick => fight |= tick >= start + 4;
 
-            Assert.AreEqual(CraftOutcome.Interrupted, _workshop.Make("edda", _items.Find("sword"), 9, () => fight, out var piece));
+            Assert.AreEqual(CraftOutcome.Interrupted, _workshop.Make("edda", _items.Find("sword"), 9, () => fight, ReactionResult.Good, out var piece));
             Assert.IsNull(piece);
             Assert.AreEqual(start + 4, _clock.Tick, "the work stops at the tick the fight begins");
             Assert.AreEqual(500, _bag.Bronze, "nothing paid");

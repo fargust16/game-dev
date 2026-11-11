@@ -62,18 +62,53 @@ namespace GameDev.Slice.Tests
             yield return Tap(Key.E);
             Assert.IsTrue(tree.IsActive, "E begins felling");
 
-            for (var i = 0; i < 30 && tree.Shown; i++)
+            world.Clock.AdvanceTicks(1);
+            for (var t = 0f; t < 2f && !world.Reaction.Running; t += Time.deltaTime)
             {
-                world.Clock.AdvanceTicks(1);
                 yield return null;
             }
 
+            Assert.IsTrue(world.Reaction.Running, "a tick brings the cycle's bar");
+            Assert.IsFalse(player.enabled, "the character stands still while it shows");
+            Assert.Greater(world.Reaction.Bar.PerfectWidth, 0d, "a perfect zone for two units");
+            var cycles = 0;
+            for (; cycles < 30 && tree.Shown; cycles++)
+            {
+                if (cycles > 0)
+                {
+                    world.Clock.AdvanceTicks(1);
+                }
+
+                yield return StopInZone(world.Reaction);
+            }
+
             Assert.IsFalse(tree.Shown, "the felled tree is gone, models and colliders");
+            Assert.That(cycles, Is.InRange(3, 6), "two units for a perfect stop, one for a good one");
+            Assert.AreEqual(cycles * SliceGathering.WearGood, world.Gathering.Wear("woodcutting_axe"), "each stop in the zone wears the axe 1");
             Assert.IsFalse(tree.GetComponentsInChildren<Renderer>().Any(r => r.enabled));
             Assert.AreEqual(6, world.Bag.Count("wood"), "its six units");
             Assert.AreEqual("ui.gather.stop.spent", world.Gathering.Stopped);
             Assert.Less(world.Stamina.Share, 1d, "felling spent Stamina");
             Assert.Greater(world.State.Get(tree.Spot.EmptiedKey), 0, "the run remembers it");
+        }
+
+        /// <summary>Waits for a Reaction Check's bar and stops its marker in the middle of its zones, as Space does.</summary>
+        internal static IEnumerator StopInZone(SliceReaction reaction)
+        {
+            for (var t = 0f; t < 2f && !reaction.Running; t += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            var bar = reaction.Bar;
+            for (var t = 0f; t < 3f && reaction.Running && reaction.Marker < bar.GoodStart + (bar.GoodWidth * 0.5d); t += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            reaction.Press();
+            yield return null;
+            yield return null;
         }
 
         /// <summary>A place on the ground 1.2 m from the tree's trunk with room for the character.</summary>

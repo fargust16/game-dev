@@ -123,6 +123,26 @@ MonoBehaviour:
     family: 
     fight: {fileID: 0}
     recipe: []
+  - id: woodcutting_axe_broken
+    kind: 2
+    weight: 2
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family: 
+    fight: {fileID: 0}
+    recipe: []
+  - id: pickaxe_broken
+    kind: 2
+    weight: 2.5
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family: 
+    fight: {fileID: 0}
+    recipe: []
   - id: lockpicks
     kind: 2
     weight: 0.1

@@ -39,7 +39,7 @@ namespace GameDev.Slice.Tests
                 Assert.IsTrue(Loc.Exists(item.NameKey), item.NameKey);
             }
 
-            Assert.AreEqual(55, _catalogue.Items.Count, "19's resources, ingredients, tools, supplies and equipment bases, Lockpicks and plain clothes");
+            Assert.AreEqual(57, _catalogue.Items.Count, "19's resources, ingredients, tools, supplies and equipment bases, Lockpicks, plain clothes, and the two broken tools (19 §4.3)");
             var settings = AssetDatabase.LoadAssetAtPath<SliceSettings>("Assets/Data/Slice/SliceSettings.asset");
             Assert.AreSame(_catalogue, settings.Items, "the slice's settings carry the catalogue");
         }
