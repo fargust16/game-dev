@@ -198,7 +198,7 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>A free place on the ground 9 m from the den, more than 3 m from every wolf.</summary>
-        private static bool Spot(List<SliceBeast> wolves, out Vector3 at)
+        internal static bool Spot(List<SliceBeast> wolves, out Vector3 at)
         {
             var den = wolves[0].Home;
             for (var k = 0; k < 16; k++)

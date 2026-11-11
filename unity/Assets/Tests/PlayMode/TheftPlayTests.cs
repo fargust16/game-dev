@@ -57,8 +57,8 @@ namespace GameDev.Slice.Tests
             world.Character.Set(CharacterSkill.Theft, 30);
             var player = Object.FindAnyObjectByType<PlayerLocomotion>();
             var hud = Object.FindAnyObjectByType<HudView>();
-            yield return Choose(targets, null, player);
-            var first = _chosen;
+            PurseTarget first = null;
+            yield return Choose(targets, null, player, t => first = t);
             Assert.IsNotNull(first, "a walker with no other prompt beside it");
             Assert.AreEqual("E  Lift the purse", first.PromptFor(player.transform.position));
             var bronze = world.Bag.Bronze;
@@ -85,8 +85,8 @@ namespace GameDev.Slice.Tests
             // A clumsy hand who lets the marker run out.
             world.Character.Set(CharacterAttribute.Dexterity, 1);
             world.Character.Set(CharacterSkill.Theft, 1);
-            yield return Choose(targets, first, player);
-            var second = _chosen;
+            PurseTarget second = null;
+            yield return Choose(targets, first, player, t => second = t);
             Assert.IsNotNull(second, "a second walker");
             bronze = world.Bag.Bronze;
             yield return Tap(Key.E);
@@ -109,12 +109,12 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual("Noticed! Nothing taken.", second.PromptFor(player.transform.position));
         }
 
-        private PurseTarget _chosen;
-
-        /// <summary>The first walker, other than <paramref name="not"/>, behind which no other prompt answers E: no door, talk or counter.</summary>
-        private IEnumerator Choose(PurseTarget[] targets, PurseTarget not, PlayerLocomotion player)
+        /// <summary>
+        /// Finds the first walker, other than <paramref name="not"/>, behind which no other prompt answers E: no door,
+        /// talk or counter. It stands held with the character behind it, and <paramref name="found"/> is given it.
+        /// </summary>
+        internal static IEnumerator Choose(PurseTarget[] targets, PurseTarget not, PlayerLocomotion player, System.Action<PurseTarget> found)
         {
-            _chosen = null;
             foreach (var target in targets.Where(t => t != not))
             {
                 yield return StandBehind(target, player);
@@ -123,7 +123,7 @@ namespace GameDev.Slice.Tests
                     .OfType<IPromptSource>().Where(s => !ReferenceEquals(s, target) && s.PromptFor(at) != null);
                 if (target.PromptFor(at) != null && !others.Any())
                 {
-                    _chosen = target;
+                    found(target);
                     yield break;
                 }
 

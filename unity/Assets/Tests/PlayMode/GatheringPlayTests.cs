@@ -77,7 +77,7 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>A place on the ground 1.2 m from the tree's trunk with room for the character.</summary>
-        private static bool Stand(GatherNode tree, out Vector3 at)
+        internal static bool Stand(GatherNode tree, out Vector3 at)
         {
             var ground = LayerMask.GetMask(KitLayers.Ground, KitLayers.Structure);
             var things = ~LayerMask.GetMask(KitLayers.Ground, KitLayers.Character);
