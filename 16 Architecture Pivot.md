@@ -1,10 +1,10 @@
 # 16 Architecture Pivot
 
-Version: 0.12
+Version: 0.13
 
 Status: Draft
 
-Last Updated: 2026-11-04 (the Vertical Slice is an owner-approved exception to the seeded Overworld: one hand-built scene. Earlier: the Combat Grid test is passed (CC-33). Earlier: the Combat Grid is built during a fight; the slice uses 20 cells, with 50 planned. Earlier: transparent walls detailed from the lab. Earlier: the Combat Grid follows the player. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: the Combat Grid forms around the player; interiors stay separate scenes; door and camera rules recorded. Earlier: what failed in 2026-08 stated exactly; the world lives between rounds; the door question added to the technical test. Earlier: owner replaced the Combat Arena with combat in place on a Combat Grid.)
+Last Updated: 2026-11-11 (§2: the character faces the camera and moves in eight directions, by the owner's decision. Earlier: the Vertical Slice is an owner-approved exception to the seeded Overworld: one hand-built scene. Earlier: the Combat Grid test is passed (CC-33). Earlier: the Combat Grid is built during a fight; the slice uses 20 cells, with 50 planned. Earlier: transparent walls detailed from the lab. Earlier: the Combat Grid follows the player. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: the Combat Grid forms around the player; interiors stay separate scenes; door and camera rules recorded. Earlier: what failed in 2026-08 stated exactly; the world lives between rounds; the door question added to the technical test. Earlier: owner replaced the Combat Arena with combat in place on a Combat Grid.)
 
 Depends On:
 [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
@@ -155,6 +155,7 @@ Detail roadmap evolves in [14 World Generation Roadmap](14%20World%20Generation%
 
 - Third-person free movement on overworld and in interiors.
 - Follow / orbit camera; mobile, dynamic feel as the target reference.
+- **The character faces the camera** (owner's decision, 2026-11-11): it always looks where the camera looks and walks, runs and sprints in eight directions, each with its own clip, turning in place when the camera turns past it while it stands. This replaces turning to the direction of movement.
 - Not feature parity with Genshin (no full elemental kit, climb-everything V1, etc.).
 
 ## Exploration interacts

@@ -1,18 +1,31 @@
-# Animation Pipeline — Blender and Mixamo to Unity
+# Animation Pipeline — Kevin Iglesias and Quaternius to Unity
 
-Version: 0.7
+Version: 0.8
 
-Status: Draft — the owner's decision of 2026-11-10, planned by the agent; the steps wait for the owner's word, as every slice milestone does
+Status: Draft — the owner's second direction of 2026-11-11 (§0); §1–§7 are the withdrawn Mixamo and Blender pipeline
 
 Created: 2026-11-10
 
-Last Updated: 2026-11-11 (§5 *The play test of 2026-11-11*: one shared avatar for the Mixamo files and a T-pose rest for the Blender clips, the movement state machine, the jump's landing, the blow's timing per weapon, the blacksmith's hammer, anvil and stump, and the sources. Earlier: §5 A fight: the walk in a fight and the hit or the death at the blow's impact, shown beat by beat by S3a.5's `FightBeats`. Earlier: 2026-11-10: §3, §5, §6: A3's first four clips, Mining, Chopping, Hammering and Surrender, made in Blender by a script that is their source; the blacksmith hammers at the anvil; the rest of A3 waits for its actions. Earlier: §5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
+Last Updated: 2026-11-11 (§0: the owner's second direction: Kevin Iglesias back, Quaternius for the gaps, Mixamo and Blender out, the character facing the camera, checks at the key frame. Earlier: §5 *The play test of 2026-11-11*: one shared avatar for the Mixamo files and a T-pose rest for the Blender clips, the movement state machine, the jump's landing, the blow's timing per weapon, the blacksmith's hammer, anvil and stump, and the sources. Earlier: §5 A fight: the walk in a fight and the hit or the death at the blow's impact, shown beat by beat by S3a.5's `FightBeats`. Earlier: 2026-11-10: §3, §5, §6: A3's first four clips, Mining, Chopping, Hammering and Surrender, made in Blender by a script that is their source; the blacksmith hammers at the anvil; the rest of A3 waits for its actions. Earlier: §5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1–§2, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
 Related: [10.2 Combat System Draft](../../../10.2%20Combat%20System%20Draft.md) §5a–§5b, [10.3 Stealth and Detection](../../../10.3%20Stealth%20and%20Detection.md), [99 Open Questions](../../../99%20Open%20Questions.md) VS-ANIM
 
 ---
+
+## 0. The owner's second direction (2026-11-11)
+
+After the play test of S5a the owner found the Mixamo clips crooked and angular and unfit for the game, and decided:
+
+- Kevin Iglesias' **Human Animations** come back: Human Basic Motions, Human Crafting Animations, Human Melee Animations, Human Soldier Animations and Human Spellcasting Animations, the FREE versions, in `Assets/Kevin Iglesias/Human Animations/`. Each pack's PDF gives the Standard Asset Store EULA / Fab Standard License: royalty-free, allowed in commercial games, no resale, no attribution needed. The reading of 2026-11-10 that they could not be used commercially (§1) was wrong.
+- The FREE packs have eight-way walking, running and sprinting, turns, the jump and fall, one- and two-handed blows, a shield blow, pistols and rifles, five kinds of cast, hits and deaths, talking, gathering, mining, hammering, farming and fishing. They lack swimming, crouching, sitting, drinking, praying, greeting, bargaining, chopping, First Aid, skinning, sleeping, Yield and blocking. By the owner's choice, **Quaternius' Universal Animation Library** (CC0, Humanoid) fills these, downloaded by the agent from Quaternius' own page on the owner's word.
+- The **Mixamo clips and the agent's Blender clips leave the project**, with their controllers; §1–§7 below stand as the history of that pipeline. Tripo's own clips stay stand-ins only.
+- The character **faces the camera** and moves in eight directions ([16](../../../16%20Architecture%20Pivot.md) §2).
+- Every Reaction Check comes at its animation's **key frame**, the world pausing for it, but theft ([07.1](../../../07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §8a).
+- New with this pass: swimming ([10.1](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md)), two weapons ([10.2](../../../10.2%20Combat%20System%20Draft.md) §5b), varied casts for the magic, and the walking townsfolk's Activity Spots ([11](../../../11%20Vertical%20Slice.md)).
+
+The work is the plan's AN1–AN7 (`VERTICAL_SLICE_IMPLEMENTATION_PLAN.md`); AN1 writes the clip map for every use here as §8.
 
 ## 1. The owner's decision
 
