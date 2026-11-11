@@ -20,7 +20,7 @@ namespace GameDev.Slice.EditorTools
         private const string CathedralStone = "VIC_Stone_Light", WorksBrick = "VIC_Brick_Poor";
 
         /// <summary>Stone Grandad's placeholder (§28.1 item 8): a stepped plinth, a pedestal and the figure, 12 m in all.</summary>
-        private const float PlinthHeight = 1.2f, PedestalHeight = 3.8f, PedestalHalf = 2f, FigureHalf = 1f;
+        private const float PlinthHeight = 1.2f, PedestalHeight = 3.8f, PedestalHalf = 2f, FigureHalf = 1f; // the plain figure, until §37
 
         /// <summary>A farm yard's depth before a cottage: the West Road runs 6 m before their fronts.</summary>
         private const int CottageYard = 5;
@@ -82,14 +82,15 @@ namespace GameDev.Slice.EditorTools
         private static void Statue()
         {
             var p = _layout.plaza;
-            var statue = new Works(Group($"{p.name} (placeholder)"), true);
+            var statueGroup = Group($"{p.name} (placeholder)");
+            var statue = new Works(statueGroup, true);
             var g = Ground(p.cx, p.cy);
             void Stage(float half, float y0, float y1, string material) =>
                 statue.Box(World(p.cx, p.cy, (y0 + y1) / 2f), new Vector3(half * 2f, y1 - y0, half * 2f), 0f, true, material);
             Stage(p.plinth, g - 0.5f, g + PlinthHeight, KerbStone);
             Stage(PedestalHalf, g + PlinthHeight, g + PlinthHeight + PedestalHeight, StepStone);
-            Stage(FigureHalf, g + PlinthHeight + PedestalHeight, g + p.statue, WallStone);
             statue.Finish(KerbStone);
+            SaintFigure(statueGroup, World(p.cx, p.cy, g + PlinthHeight + PedestalHeight), Vector3.left); // §37
             Take(Rect(p.cx - p.plinth, p.cy - p.plinth, p.cx + p.plinth, p.cy + p.plinth), Use.Solid);
         }
 
