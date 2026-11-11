@@ -55,6 +55,9 @@ namespace GameDev.Decisions
 
         [Tooltip("The milestone that builds it, e.g. S3, while no conversation option takes it yet.")]
         public string later = "";
+
+        [Tooltip("Played out in the world rather than settled in the conversation (S3b.3), e.g. Veil from Stealth Mode: the component that plays it. Its conversation option, if any, settles nothing; the play writes the residue.")]
+        public string inWorld = "";
     }
 
     /// <summary>
@@ -121,9 +124,10 @@ namespace GameDev.Decisions
             var spoken = scene.Nodes.SelectMany(n => n.options).ToList();
             foreach (var option in options)
             {
-                if (option.dialogueOptions.Length == 0 && string.IsNullOrWhiteSpace(option.later))
+                var played = !string.IsNullOrWhiteSpace(option.inWorld);
+                if (option.dialogueOptions.Length == 0 && string.IsNullOrWhiteSpace(option.later) && !played)
                 {
-                    problems.Add($"{id}.{option.name}: no conversation option takes it, and no later milestone is named");
+                    problems.Add($"{id}.{option.name}: no conversation option takes it, no later milestone is named, and nothing plays it in the world");
                 }
 
                 foreach (var optionId in option.dialogueOptions)
@@ -140,12 +144,24 @@ namespace GameDev.Decisions
                         problems.Add($"{id}.{option.name}: '{optionId}' is {said.approach}, not one of the card's Approaches");
                     }
 
-                    foreach (var key in option.residue.Where(k => !said.success.raises.Contains(k)))
+                    if (played)
+                    {
+                        if (said.success.settles != null)
+                        {
+                            problems.Add($"{id}.{option.name}: '{optionId}' settles POI {poi.Id}, which its play in the world does");
+                        }
+
+                        continue;
+                    }
+
+                    // A Confront writes its residue when its fight is won (S3b.3).
+                    var outcome = said.success.fights ? said.won : said.success;
+                    foreach (var key in option.residue.Where(k => !outcome.raises.Contains(k)))
                     {
                         problems.Add($"{id}.{option.name}: '{optionId}' does not raise '{key}'");
                     }
 
-                    var settles = said.success.settles == poi;
+                    var settles = outcome.settles == poi;
                     if (settles == (option.countsAsWithdraw || option.prepares))
                     {
                         problems.Add($"{id}.{option.name}: '{optionId}' {(settles ? "settles" : "does not settle")} POI {poi.Id}");

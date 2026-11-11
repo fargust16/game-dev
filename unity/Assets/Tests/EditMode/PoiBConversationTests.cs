@@ -33,7 +33,7 @@ namespace GameDev.Slice.Tests
 
         private static readonly string[] Protected = { "aftermath.loom_lane.girls_freed", "against.veinmarket", "poi.b.heard.harrow_buyers" };
         private static readonly string[] Fetched = { "aftermath.loom_lane.snatch_spoiled", "aftermath.loom_lane.wardens_fetched", "debt.wardens" };
-        private static readonly string[] Fled = { "aftermath.loom_lane.girls_taken", "poi.b.fled" };
+        private static readonly string[] Taken = { "aftermath.loom_lane.girls_taken" };
 
         private WorldState _state;
         private GameClock _clock;
@@ -103,7 +103,10 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(DecisionAxis.Approach, node.SecondaryAxis);
             CollectionAssert.AreEqual(new[] { "Protect the victims now", "Follow the coach instead", "Signal or fetch Wardens", "Exchange for a tip before moving", "Leave Draught Lane" },
                 node.Options.Select(o => o.name), "11.1's five options");
-            CollectionAssert.AreEqual(new[] { "S3" }, node.Options.Where(o => o.dialogueOptions.Length == 0).Select(o => o.later), "following the coach waits for S3");
+            CollectionAssert.IsEmpty(node.Options.Where(o => o.dialogueOptions.Length == 0 && string.IsNullOrEmpty(o.inWorld)), "every option is taken");
+            var follow = node.Options.Single(o => o.name == "Follow the coach instead");
+            Assert.AreEqual("PoiFollow", follow.inWorld, "following is played in the lane (S3b.3)");
+            CollectionAssert.AreEqual(new[] { "follow" }, follow.dialogueOptions);
             Assert.IsTrue(node.Options.Single(o => o.name == "Exchange for a tip before moving").prepares, "the tip settles nothing by itself");
 
             var choices = node.Options.SelectMany(o => o.dialogueOptions).ToList();
@@ -140,7 +143,7 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(CheckResult.Success, scene.Choose(Option(scene, "swarm")));
 
             Assert.AreEqual("freed", scene.Node.id);
-            AssertSettled(Protected, Fetched.Concat(Fled));
+            AssertSettled(Protected, Fetched.Concat(Taken));
             scene.Choose(Option(scene, "home"));
             Assert.AreEqual(DialogueEnd.Finished, scene.EndedHow);
         }
@@ -172,12 +175,12 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(CheckResult.Success, scene.Choose(Option(scene, "threaten")));
 
             Assert.AreEqual("freed", scene.Node.id);
-            AssertSettled(Protected, Fetched.Concat(Fled));
+            AssertSettled(Protected, Fetched.Concat(Taken));
             scene.Leave();
         }
 
         [Test]
-        public void AFailedThreatIsAFinalCheckAndTheCollectorsTakeTheGirls()
+        public void AFailedThreatIsAFinalCheckWhoseFightLostLetsThemTakeTheGirl()
         {
             Begin(Fails);
             _tips.Read(TipSource.StreetRumour, _clock.Tick);
@@ -187,7 +190,60 @@ namespace GameDev.Slice.Tests
 
             Assert.IsFalse(scene.IsOpen);
             Assert.AreEqual(DialogueEnd.Fight, scene.EndedHow, "a failed Final Check ends in a fight (10.4 §6)");
-            AssertSettled(Fled, Protected.Concat(Fetched));
+            Assert.AreEqual("collectors", scene.FightWith.id);
+            Assert.AreEqual(PoiPhase.Open, _director.Phase(_poiB), "S2's rule is retired: the fight decides it (S3b.3)");
+            scene.AfterFight(false);
+            AssertSettled(Taken, Protected.Concat(Fetched));
+        }
+
+        [Test]
+        public void AFailedThreatsFightWonFreesTheGirls()
+        {
+            Begin(Fails);
+            _tips.Read(TipSource.StreetRumour, _clock.Tick);
+            var scene = Lane();
+            scene.Choose(Option(scene, "threaten"));
+
+            scene.AfterFight(true);
+
+            AssertSettled(Protected, Fetched.Concat(Taken));
+        }
+
+        [Test]
+        public void FollowingIsOfferedOnlyInStealthModeAndLetsThemGoOn()
+        {
+            Begin();
+            var upright = Talk();
+            CollectionAssert.AreEqual(new[] { "step" }, Ids(upright), "Veil is withheld outside Stealth Mode");
+            upright.Leave();
+
+            _world.Withheld = new HashSet<Approach>();
+            var scene = Talk();
+            CollectionAssert.AreEqual(new[] { "step", "follow" }, Ids(scene));
+
+            Assert.AreEqual(CheckResult.None, scene.Choose(Option(scene, "follow")));
+
+            Assert.AreEqual(DialogueEnd.Finished, scene.EndedHow);
+            Assert.IsTrue(_state.IsSet("poi.b.following"), "the collectors go on, and the lane plays the follow");
+            Assert.AreEqual(PoiPhase.Open, _director.Phase(_poiB), "the follow settles it, not the conversation");
+            CollectionAssert.AreEqual(new[] { "step" }, Ids(Talk()), "once only");
+        }
+
+        [Test]
+        public void ConfrontChosenOutrightIsAFightWithTheCollectors()
+        {
+            Begin();
+            _world.Withheld = new HashSet<Approach> { Approach.Veil };
+            var scene = Lane();
+            CollectionAssert.AreEqual(new[] { "fight", "ask_crone", "run", "leave" }, Ids(scene), "Confront needs no Argument (S3b.3)");
+
+            Assert.AreEqual(CheckResult.None, scene.Choose(Option(scene, "fight")));
+
+            Assert.AreEqual(DialogueEnd.Fight, scene.EndedHow);
+            Assert.AreEqual("collectors", scene.FightWith.id);
+            Assert.AreEqual(PoiPhase.Open, _director.Phase(_poiB));
+            scene.AfterFight(true);
+            AssertSettled(Protected, Fetched.Concat(Taken));
         }
 
         [Test]
@@ -221,7 +277,7 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(CheckResult.Success, scene.Choose(Option(scene, "urge")));
 
             Assert.AreEqual("whistle", scene.Node.id);
-            AssertSettled(Fetched, Protected.Concat(Fled));
+            AssertSettled(Fetched, Protected.Concat(Taken));
             scene.Choose(Option(scene, "breathe"));
             Assert.GreaterOrEqual(_clock.Tick, before + 5, "running for the Warden takes five minutes");
         }
@@ -252,7 +308,7 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(CheckResult.None, scene.Choose(Option(scene, "promise_tip")));
 
             Assert.AreEqual("whistle", scene.Node.id);
-            AssertSettled(Fetched, Protected.Concat(Fled));
+            AssertSettled(Fetched, Protected.Concat(Taken));
             Assert.IsTrue(_state.IsSet("promise.wardens.tip"), "the Wardens are owed a tip");
             scene.Leave();
         }
@@ -270,7 +326,7 @@ namespace GameDev.Slice.Tests
 
             Assert.AreEqual(PoiResolution.Unattended, _director.Resolution(_poiB), "the window closes at 02:00");
             CollectionAssert.Contains(new[] { "wardens", "veinmarket" }, _director.Outcome(_poiB));
-            Assert.IsFalse(new[] { "debt.wardens", "against.veinmarket", "poi.b.fled" }.Any(_state.IsSet), "an unattended outcome puts nobody in debt (11)");
+            Assert.IsFalse(new[] { "debt.wardens", "against.veinmarket" }.Any(_state.IsSet), "an unattended outcome puts nobody in debt (11)");
         }
 
         private void AssertSettled(IEnumerable<string> raised, IEnumerable<string> notRaised)

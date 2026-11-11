@@ -78,6 +78,8 @@ namespace GameDev.Dialogue
 
         public DialogueListener FightWith { get; private set; }
 
+        public DialogueOption Fought { get; private set; }
+
         public IReadOnlyList<DialogueOption> Options => IsOpen ? Node.options.Where(Offered).ToList() : new List<DialogueOption>();
 
         /// <summary>The key under which a failed check stays locked.</summary>
@@ -113,7 +115,15 @@ namespace GameDev.Dialogue
 
             if (option.kind != OptionKind.Check)
             {
-                Follow(option.success);
+                if (option.success.fights)
+                {
+                    Fight(option, option.success);
+                }
+                else
+                {
+                    Follow(option.success);
+                }
+
                 return CheckResult.None;
             }
 
@@ -131,9 +141,7 @@ namespace GameDev.Dialogue
             _world.State.Raise(LockKey(Dialogue, option));
             if (listener.enemy)
             {
-                Apply(option.failure);
-                FightWith = listener;
-                End(DialogueEnd.Fight);
+                Fight(option, option.failure);
             }
             else
             {
@@ -149,6 +157,27 @@ namespace GameDev.Dialogue
             {
                 End(DialogueEnd.Left);
             }
+        }
+
+        public void AfterFight(bool won)
+        {
+            var option = Fought;
+            if (option == null || IsOpen)
+            {
+                return;
+            }
+
+            Fought = null;
+            Apply(won ? option.won : option.lost);
+        }
+
+        /// <summary>10.2, 10.4 §6: the conversation ends in a fight with the option's listener; the fight decides the rest.</summary>
+        private void Fight(DialogueOption option, DialogueOutcome first)
+        {
+            Apply(first);
+            Fought = option;
+            FightWith = ListenerOf(option);
+            End(DialogueEnd.Fight);
         }
 
         private bool Offered(DialogueOption option)

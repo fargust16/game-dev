@@ -31,7 +31,8 @@ MonoBehaviour:
     dialogueOptions:
     - defend
     - threaten
-    cost: "Warden heat; a threat costs the Wardens' Attitude either way (10.4 §5); Confront waits for S3"
+    - force
+    cost: "Warden heat; a threat costs the Wardens' Attitude either way (10.4 §5); freeing him by force is a fight with the three Wardens, and a fight lost lets them take him"
     consequence: "The shop stays open tonight; Harrow owes a debt"
     opens: "Cheap medicine, a later mixture clue, Veinmarket's fighter at the invasion (11)"
     closes: "Easy Warden mentorship; clean legal cover"
@@ -72,14 +73,15 @@ MonoBehaviour:
     approaches:
     - 4
     dialogueOptions: []
-    cost: "Spends the Short window; may miss the clean public save"
+    cost: "Spends the Short window; may miss the clean public save; the Warden in the door watches by his cone (Perception 4)"
     consequence: "Hears the crowned-buyer fragment"
     opens: "Better Exchange leverage; a smarter POI C start"
     closes: "Innocent-hero timing with the crowd"
     failure: "Spotted; both sides colder; still one partial tell"
     residue: []
     countsAsWithdraw: 0
-    later: S3
+    later: 
+    inWorld: PoiEavesdrop
   - name: "Buy a minute"
     axes:
     - 3

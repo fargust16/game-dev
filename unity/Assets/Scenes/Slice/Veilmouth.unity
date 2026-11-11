@@ -119436,13 +119436,37 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7909883042696630774, guid: 98832f82aed5ee44ea0b65ee9706a281, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 556399914}
   m_SourcePrefab: {fileID: 100100000, guid: 98832f82aed5ee44ea0b65ee9706a281, type: 3}
 --- !u!4 &556399912 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3096000797228523468, guid: 98832f82aed5ee44ea0b65ee9706a281, type: 3}
   m_PrefabInstance: {fileID: 556399911}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &556399913 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7909883042696630774, guid: 98832f82aed5ee44ea0b65ee9706a281, type: 3}
+  m_PrefabInstance: {fileID: 556399911}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &556399914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 556399913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eade12abdad54284b99952fe78fde763, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.Stealth.StealthObserver
+  perception: 3
+  walls:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &556755533
 GameObject:
   m_ObjectHideFlags: 0
@@ -146045,6 +146069,7 @@ GameObject:
   - component: {fileID: 674630206}
   - component: {fileID: 674630205}
   - component: {fileID: 674630204}
+  - component: {fileID: 674630207}
   m_Layer: 0
   m_Name: POI B - Eleventh-Bell Collectors
   m_TagString: Untagged
@@ -146067,6 +146092,14 @@ MonoBehaviour:
   poi: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
   cast: {fileID: 1175984863}
   appearRadius: 60
+  fighters:
+  - listener: collectors
+    group: veinmarket
+    bodies:
+    - {fileID: 628996736}
+    - {fileID: 556399912}
+  whenSpared:
+  - poi.b.heard.landing
 --- !u!114 &674630205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146097,6 +146130,46 @@ Transform:
   - {fileID: 1175984864}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &674630207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674630203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e3b7d1f5a2c4e8b9d6f0a3c7e1b5d42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.PoiFollow
+  walkers:
+  - {fileID: 628996736}
+  - {fileID: 556399912}
+  - {fileID: 1028776052}
+  lookout: {fileID: 556399914}
+  beginKey: poi.b.following
+  distance: 28
+  pace: 1.2
+  keepWithin: 18
+  glanceEvery: 6
+  glanceFor: 2
+  followed:
+  - poi.b.followed
+  - poi.b.heard.landing
+  - aftermath.loom_lane.girls_taken
+  lostThem:
+  - poi.b.heard.chalk
+  - aftermath.loom_lane.girls_taken
+  won:
+  - aftermath.loom_lane.girls_freed
+  - against.veinmarket
+  - poi.b.heard.harrow_buyers
+  lost:
+  - aftermath.loom_lane.girls_taken
+  fighters: collectors
+  spottedLine: dialogue.poib.spotted
+  followedHint: ui.poi.b.followed
+  lostHint: ui.poi.b.lost
 --- !u!1001 &674839316
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -294025,13 +294098,37 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8755413562499794411, guid: 9e1bf74a2f7b3b1438113504dab29124, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1316207404}
   m_SourcePrefab: {fileID: 100100000, guid: 9e1bf74a2f7b3b1438113504dab29124, type: 3}
 --- !u!4 &1316207402 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1730682751887845786, guid: 9e1bf74a2f7b3b1438113504dab29124, type: 3}
   m_PrefabInstance: {fileID: 1316207401}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1316207403 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8755413562499794411, guid: 9e1bf74a2f7b3b1438113504dab29124, type: 3}
+  m_PrefabInstance: {fileID: 1316207401}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1316207404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316207403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eade12abdad54284b99952fe78fde763, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.Stealth.StealthObserver
+  perception: 4
+  walls:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1001 &1316776118
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -314581,6 +314678,7 @@ GameObject:
   - component: {fileID: 1410821258}
   - component: {fileID: 1410821257}
   - component: {fileID: 1410821256}
+  - component: {fileID: 1410821259}
   m_Layer: 0
   m_Name: POI A - Brass-Number Arrest
   m_TagString: Untagged
@@ -314603,6 +314701,14 @@ MonoBehaviour:
   poi: {fileID: 11400000, guid: 1d3d9d0cb6654077ac21992cc277ad91, type: 2}
   cast: {fileID: 339970180}
   appearRadius: 60
+  fighters:
+  - listener: wardens
+    group: wardens
+    bodies:
+    - {fileID: 1568908028}
+    - {fileID: 2138878033}
+    - {fileID: 1316207402}
+  whenSpared: []
 --- !u!114 &1410821257
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -314633,6 +314739,31 @@ Transform:
   - {fileID: 339970181}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1410821259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1410821255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d8a1c6e2b9f4a3d8e5c7b1a9f2d6e30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.PoiEavesdrop
+  speaker: {fileID: 1316207404}
+  reach: 4
+  seconds: 6
+  heard:
+  - poi.a.heard.list
+  spotted:
+  - poi.a.heard.cabinet
+  - poi.a.spotted
+  colder:
+  - wardens
+  - neighbours
+  overheardLine: dialogue.poia.overheard
+  spottedLine: dialogue.poia.spotted
 --- !u!1001 &1410853541
 PrefabInstance:
   m_ObjectHideFlags: 0

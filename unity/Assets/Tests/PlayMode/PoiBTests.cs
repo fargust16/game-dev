@@ -4,6 +4,7 @@ using System.Collections;
 using System.Linq;
 using GameDev.Core.Localization;
 using GameDev.Locomotion;
+using GameDev.Player.Progression;
 using GameDev.UI;
 using GameDev.World.Poi;
 using NUnit.Framework;
@@ -82,7 +83,7 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(PoiResolution.Participated, world.Director.Resolution(stage.Poi), "B settled by Convince");
             Assert.IsTrue(world.State.IsSet("aftermath.loom_lane.girls_freed"));
             Assert.IsTrue(world.State.IsSet("against.veinmarket"), "Veinmarket will remember who stood in its way");
-            Assert.IsFalse(world.State.IsSet("poi.b.fled"), "no fight");
+            Assert.IsFalse(world.Fights.InFight, "no fight");
             Assert.AreEqual(Loc.Get("dialogue.poib.freed"), hud.DialogueLines.Last(), "the outcome is still read");
             yield return Tap(Key.Digit1);
             Assert.IsFalse(hud.IsDialogueOpen);
@@ -91,6 +92,115 @@ namespace GameDev.Slice.Tests
 
             yield return GoFar(player, stage);
             Assert.IsFalse(stage.IsShown, "they leave once the player is away");
+        }
+
+        /// <summary>S3b.3: Confront chosen outright in the lane is a fight with the two collectors where they stand, and a fight won frees the girls.</summary>
+        [UnityTest]
+        public IEnumerator TheCollectorsAreFoughtInTheLane()
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
+            var world = SliceWorldDriver.Running;
+            var stage = Object.FindObjectsByType<PoiStage>().Single(s => s.Poi.Id == "b");
+            var player = Object.FindAnyObjectByType<PlayerLocomotion>();
+            var hud = Object.FindAnyObjectByType<HudView>();
+            var collectors = stage.FightersOf("collectors");
+            Assert.AreEqual(2, collectors.Length, "the scene's two collectors fight as the collectors");
+            world.Clock.AdvanceTicks((int)(Night - world.Clock.Tick));
+            yield return Before(player, stage);
+
+            var character = world.Character;
+            character.Set(CharacterAttribute.Strength, 14);
+            character.Set(CharacterAttribute.Endurance, 10);
+            character.Set(CharacterAttribute.Dexterity, 6);
+            character.Set(CharacterSkill.MeleeSkill, 10);
+            var fights = world.Fights;
+            fights.TurnPause = 0f;
+            fights.AutoPlayer = true;
+            fights.BeatPace = 6f;
+
+            yield return Tap(Key.E);
+            yield return Tap(Key.Digit1);
+            var fight = hud.DialogueOptions.ToList().FindIndex(o => o.Contains(Loc.Get("dialogue.poib.lane.fight")));
+            Assert.That(fight, Is.InRange(0, 8), "Confront is offered outright: " + string.Join(" | ", hud.DialogueOptions));
+            yield return Tap(Key.Digit1 + fight);
+
+            Assert.IsFalse(hud.IsDialogueOpen, "the conversation ends in the fight");
+            Assert.IsTrue(fights.InFight, "the collectors fight where they stand");
+            Assert.AreEqual(3, fights.Turns.Order.Count, "the character and the two collectors");
+            Assert.AreEqual(PoiPhase.Open, world.Director.Phase(stage.Poi), "the fight decides it");
+
+            for (var t = 0f; t < 120f && fights.InFight; t += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(0.5f);
+            Assert.IsFalse(fights.InFight, "the fight ends");
+            Assert.AreEqual(PoiResolution.Participated, world.Director.Resolution(stage.Poi), "a fight won settles B");
+            Assert.IsTrue(world.State.IsSet("aftermath.loom_lane.girls_freed"));
+            Assert.IsTrue(world.State.IsSet("against.veinmarket"));
+            Assert.IsFalse(world.State.IsSet("aftermath.loom_lane.girls_taken"));
+            Assert.AreEqual(1, world.State.Get("fought.veinmarket"), "the fight is counted");
+            foreach (var c in collectors)
+            {
+                var animator = c.GetComponentInChildren<Animator>();
+                var fell = animator != null && animator.parameters.Any(p => p.name == "Down") && animator.GetBool("Down");
+                var lying = c.gameObject.activeInHierarchy && (fell || Vector3.Dot(c.up, Vector3.up) < 0.5f);
+                Assert.IsTrue(lying || !c.gameObject.activeInHierarchy, $"{c.name} lies where it fell or has left, spared");
+            }
+
+            Assert.AreEqual(collectors.Any(c => !c.gameObject.activeInHierarchy), world.State.IsSet("poi.b.heard.landing"), "a spared collector tells the landing");
+        }
+
+        /// <summary>
+        /// S3b.3, 11.1 POI B *Follow the coach instead*: in Stealth Mode the conversation lets the collectors go on, and a
+        /// follower who keeps 12 m behind, beyond the lookout's cone, sees them take the girl down to the landing.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator TheCollectorsAreFollowedFromStealthMode()
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
+            var world = SliceWorldDriver.Running;
+            var stage = Object.FindObjectsByType<PoiStage>().Single(s => s.Poi.Id == "b");
+            var follow = stage.GetComponent<PoiFollow>();
+            Assert.IsNotNull(follow, "POI B's collectors can be followed");
+            Assert.IsNotNull(follow.Lookout, "one of them looks back");
+            var player = Object.FindAnyObjectByType<PlayerLocomotion>();
+            var hud = Object.FindAnyObjectByType<HudView>();
+            world.Clock.AdvanceTicks((int)(Night - world.Clock.Tick));
+            yield return Before(player, stage);
+
+            Assert.IsTrue(world.Hiding.SetActive(true), "Stealth Mode");
+            yield return Tap(Key.E);
+            var index = hud.DialogueOptions.ToList().FindIndex(o => o.Contains(Loc.Get("dialogue.poib.scene.follow")));
+            Assert.That(index, Is.InRange(0, 8), "offered in Stealth Mode: " + string.Join(" | ", hud.DialogueOptions));
+            yield return Tap(Key.Digit1 + index);
+            Assert.IsFalse(hud.IsDialogueOpen);
+            for (var t = 0f; t < 3f && follow.Now == PoiFollow.Phase.Waiting; t += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            Assert.AreEqual(PoiFollow.Phase.Following, follow.Now, "they go on along the lane");
+            var along = -stage.transform.forward;
+            along.y = 0f;
+            along.Normalize();
+            for (var t = 0f; t < 60f && follow.Now == PoiFollow.Phase.Following; t += Time.deltaTime)
+            {
+                var going = follow.Walkers.Where(w => w.gameObject.activeInHierarchy).ToList();
+                var lead = going.Aggregate(Vector3.zero, (sum, w) => sum + w.position) / Mathf.Max(1, going.Count);
+                player.Teleport(lead - (along * 12f) + (Vector3.up * 0.1f), Quaternion.LookRotation(along));
+                yield return null;
+            }
+
+            Assert.AreEqual(PoiFollow.Phase.Followed, follow.Now, "kept near and unseen to the stairs");
+            Assert.AreEqual(PoiResolution.Participated, world.Director.Resolution(stage.Poi), "the follow settles B");
+            Assert.IsTrue(world.State.IsSet("poi.b.heard.landing"), "the coal-stair landing, for POI C");
+            Assert.IsTrue(world.State.IsSet("aftermath.loom_lane.girls_taken"), "the girl is taken all the same");
+            Assert.IsFalse(world.State.IsSet("aftermath.loom_lane.girls_freed"));
+            Assert.IsTrue(follow.Walkers.All(w => !w.gameObject.activeInHierarchy), "down the stairs, out of sight");
         }
 
         [UnityTest]
@@ -108,8 +218,8 @@ namespace GameDev.Slice.Tests
 
             yield return Tap(Key.E);
             yield return Tap(Key.Digit1);
-            Assert.AreEqual("2. " + Loc.Get("dialogue.poib.lane.run"), hud.DialogueOptions[1]);
-            yield return Tap(Key.Digit2);
+            Assert.AreEqual("3. " + Loc.Get("dialogue.poib.lane.run"), hud.DialogueOptions[2], "after Confront (S3b.3) and the old woman");
+            yield return Tap(Key.Digit3);
             Assert.AreEqual("1. " + Loc.Get("dialogue.poib.warden.promise_tip"), hud.DialogueOptions[0], "nothing heard: no Argument to urge the Warden with");
             yield return Tap(Key.Digit1);
 

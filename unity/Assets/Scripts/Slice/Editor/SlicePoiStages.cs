@@ -1,7 +1,9 @@
 using System.Linq;
 using GameDev.Dialogue;
+using GameDev.Slice.Fights;
 using GameDev.Slice.Kit;
 using GameDev.Slice.People;
+using GameDev.Slice.Stealth;
 using GameDev.World.Poi;
 using GameDev.World.Portals;
 using UnityEditor;
@@ -112,11 +114,82 @@ namespace GameDev.Slice.EditorTools
 
             stage.AddComponent<PersonTalk>().Configure(dialogue, TalkReach);
             stage.AddComponent<PoiStage>().Configure(poi, cast, AppearRadius);
+            Arm(stage.GetComponent<PoiStage>());
             cast.SetActive(false);
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log($"[SlicePoiStages] POI A staged before the door at {door}, the street {outward}, Harrow at {harrow}.");
+        }
+
+        /// <summary>
+        /// S3b.3: who fights in each staged POI when its conversation ends in a fight: A's three Wardens as the Wardens,
+        /// B's two collectors as Veinmarket's men, a spared collector telling the coal-stair landing (11.1 POI B §5).
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.SlicePoiStages.ArmStages
+        /// </summary>
+        [MenuItem("GameDev/Slice/POI/Arm the POI scenes in Veilmouth for their fights")]
+        public static void ArmStages()
+        {
+            var scene = EditorSceneManager.OpenScene(SlicePeople.ScenePath(SliceRoster.Veilmouth), OpenSceneMode.Single);
+            var stages = Object.FindObjectsByType<PoiStage>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (var stage in stages)
+            {
+                Arm(stage);
+                EditorUtility.SetDirty(stage);
+            }
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log($"[SlicePoiStages] {stages.Length} POI scenes armed.");
+        }
+
+        private static void Arm(PoiStage stage)
+        {
+            Transform[] Named(string prefix) => stage.Cast.GetComponentsInChildren<Transform>(true).Where(t => t.name.StartsWith(prefix)).OrderBy(t => t.name).ToArray();
+            if (stage.name == PoiAStage)
+            {
+                stage.Arm(new[] { new PoiStage.Fighters { listener = "wardens", group = SliceConfront.Wardens, bodies = Named("POI A - Warden") } }, new string[0]);
+
+                // 11.1 POI A *Veil and listen first*: the Warden in the door is overheard, and watches by his cone (10.3: Wardens 4).
+                var door = Named("POI A - Warden in the door").Single();
+                var eyes = Watcher(door, 4);
+                Component(stage, out PoiEavesdrop listening);
+                listening.Configure(eyes);
+            }
+            else if (stage.name == PoiBStage)
+            {
+                stage.Arm(new[] { new PoiStage.Fighters { listener = "collectors", group = SliceConfront.Veinmarket, bodies = Named("POI B - Collector") } },
+                    new[] { "poi.b.heard.landing" });
+
+                // 11.1 POI B *Follow the coach instead*: the collectors drag the girl on, and the one watching the lane looks back (Perception 3, authoring default).
+                var lookout = Watcher(Named("POI B - Collector, watching the lane").Single(), 3);
+                Component(stage, out PoiFollow follow);
+                follow.Configure(Named("POI B - Collector").Concat(Named("POI B - Mill girl, dragged")).ToArray(), lookout);
+            }
+
+            Debug.Log($"[SlicePoiStages] {stage.name}: {string.Join(", ", new[] { "wardens", "collectors" }.SelectMany(stage.FightersOf).Select(t => t.name))} fight.");
+        }
+
+        private static StealthObserver Watcher(Transform person, int perception)
+        {
+            if (!person.TryGetComponent<StealthObserver>(out var eyes))
+            {
+                eyes = person.gameObject.AddComponent<StealthObserver>();
+            }
+
+            eyes.Perception = perception;
+            EditorUtility.SetDirty(eyes);
+            return eyes;
+        }
+
+        private static void Component<T>(PoiStage stage, out T component) where T : Component
+        {
+            if (!stage.TryGetComponent(out component))
+            {
+                component = stage.gameObject.AddComponent<T>();
+            }
+
+            EditorUtility.SetDirty(component);
         }
 
         internal static void Person(GameObject cast, string colour, Vector3 at, float yaw, string name)
@@ -178,6 +251,7 @@ namespace GameDev.Slice.EditorTools
 
             stage.AddComponent<PersonTalk>().Configure(dialogue, TalkReach);
             stage.AddComponent<PoiStage>().Configure(poi, cast, AppearRadius);
+            Arm(stage.GetComponent<PoiStage>());
             cast.SetActive(false);
 
             EditorSceneManager.MarkSceneDirty(scene);

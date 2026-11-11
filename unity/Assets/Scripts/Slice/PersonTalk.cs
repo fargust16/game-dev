@@ -47,6 +47,9 @@ namespace GameDev.Slice
 
         public bool IsOpen => _talk != null && _talk.IsOpen;
 
+        /// <summary>Raised when a conversation opened here ends, after the dialogue column closes (S3b.3: a POI's fight).</summary>
+        public event Action<PersonTalk, DialogueEnd> Ended;
+
         /// <summary>Whether the conversation can be opened now; a POI's scene closes it while it is not there (S2.5). An open one runs on.</summary>
         public bool Available { get; set; } = true;
 
@@ -72,10 +75,11 @@ namespace GameDev.Slice
 
             _history.Clear();
             _talk = world.Talk(dialogue);
-            _talk.Ended += _ =>
+            _talk.Ended += how =>
             {
                 Hud()?.CloseDialogue();
                 Talking(false);
+                Ended?.Invoke(this, how);
             };
             Talking(true);
             Hear();

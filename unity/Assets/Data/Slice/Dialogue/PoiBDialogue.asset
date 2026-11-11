@@ -73,6 +73,31 @@ MonoBehaviour:
         settles: {fileID: 0}
         tells: []
         minutes: 0
+    - id: follow
+      approach: 4
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy:
+      - poi.b.following
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises:
+        - poi.b.following
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
   - id: lane
     speaker: collectors
     saysTips: 0
@@ -131,9 +156,63 @@ MonoBehaviour:
         minutes: 0
       failure:
         next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      won:
+        next: 
+        raises:
+        - aftermath.loom_lane.girls_freed
+        - against.veinmarket
+        - poi.b.heard.harrow_buyers
+        settles: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
+        tells: []
+        minutes: 0
+      lost:
+        next: 
         raises:
         - aftermath.loom_lane.girls_taken
-        - poi.b.fled
+        settles: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
+        tells: []
+        minutes: 0
+    - id: fight
+      approach: 5
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: collectors
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 1
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      won:
+        next: 
+        raises:
+        - aftermath.loom_lane.girls_freed
+        - against.veinmarket
+        - poi.b.heard.harrow_buyers
+        settles: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
+        tells: []
+        minutes: 0
+      lost:
+        next: 
+        raises:
+        - aftermath.loom_lane.girls_taken
         settles: {fileID: 11400000, guid: 5bbaf1dc5f44490bb3d32f8359246335, type: 2}
         tells: []
         minutes: 0

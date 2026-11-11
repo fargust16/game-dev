@@ -100,8 +100,9 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(DecisionAxis.Approach, node.SecondaryAxis);
             CollectionAssert.AreEqual(new[] { "Defend Harrow", "Help the Wardens seize him", "Veil and listen first", "Buy a minute", "Walk away before the whistle" },
                 node.Options.Select(o => o.name), "11.1's five options");
-            CollectionAssert.AreEqual(new[] { "S3", "S5a" }, node.Options.Where(o => o.dialogueOptions.Length == 0).Select(o => o.later),
-                "Veil waits for S3, a paid Exchange for S5a");
+            CollectionAssert.AreEqual(new[] { "S5a" }, node.Options.Where(o => o.dialogueOptions.Length == 0 && string.IsNullOrEmpty(o.inWorld)).Select(o => o.later),
+                "a paid Exchange waits for S5a");
+            Assert.AreEqual("PoiEavesdrop", node.Options.Single(o => o.name == "Veil and listen first").inWorld, "listening is played from Stealth Mode in the street (S3b.3)");
 
             var choices = node.Options.SelectMany(o => o.dialogueOptions).ToList();
             var withApproach = node.Scene.Nodes.SelectMany(n => n.options).Where(o => o.approach != Approach.None).Select(o => o.id);
@@ -153,6 +154,51 @@ namespace GameDev.Slice.Tests
             AssertSettled(Defended, Taken);
             scene.Choose(Option(scene, "done"));
             Assert.AreEqual(DialogueEnd.Finished, scene.EndedHow);
+        }
+
+        [Test]
+        public void FreeingHimByForceIsAFightAndAWonFightDefendsHim()
+        {
+            Begin();
+            _world.Withheld = new HashSet<Approach> { Approach.Veil };
+            var scene = Street();
+            CollectionAssert.AreEqual(new[] { "ask", "force", "hold", "walk" }, Ids(scene), "Confront needs no Argument (S3b.3)");
+
+            Assert.AreEqual(CheckResult.None, scene.Choose(Option(scene, "force")));
+
+            Assert.IsFalse(scene.IsOpen);
+            Assert.AreEqual(DialogueEnd.Fight, scene.EndedHow, "Confront ends the conversation in a fight (10.2)");
+            Assert.AreEqual("wardens", scene.FightWith.id);
+            Assert.AreEqual(PoiPhase.Open, _director.Phase(_poiA), "the fight decides it");
+            scene.AfterFight(true);
+            AssertSettled(Defended.Concat(new[] { "aftermath.harrow.freed_by_force", "against.wardens" }), Taken);
+            Assert.IsNull(scene.Fought, "once only");
+        }
+
+        [Test]
+        public void TheOverheardListIsAnArgumentForDefendingHim()
+        {
+            Begin();
+            _state.Raise("poi.a.heard.list");
+            var scene = Street();
+
+            CollectionAssert.AreEqual(new[] { "ask", "defend", "threaten", "hold", "walk" }, Ids(scene), "what the Warden in the door let slip opens the defence (11.1: better leverage)");
+            scene.Leave();
+        }
+
+        [Test]
+        public void AFightLostLetsTheWardensTakeHim()
+        {
+            Begin();
+            _world.Withheld = new HashSet<Approach> { Approach.Veil };
+            var scene = Street();
+            scene.Choose(Option(scene, "force"));
+
+            scene.AfterFight(false);
+
+            AssertSettled(new[] { "aftermath.harrow.taken", "aftermath.harrow.shop_sealed" }, Defended.Concat(new[] { "debt.wardens", "against.wardens" }));
+            scene.AfterFight(true);
+            Assert.IsFalse(_state.IsSet("aftermath.harrow.defended"), "a decided fight is not decided again");
         }
 
         [Test]

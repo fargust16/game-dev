@@ -241,6 +241,13 @@ namespace GameDev.Slice.Stealth
             Noticed?.Invoke(o);
         }
 
+        /// <summary>A line at the foot of the screen for so long, where the Stealth Mode badge shows (S3b.3: what a follow came to).</summary>
+        public void Show(string key, float seconds)
+        {
+            Hint = Loc.Get(key);
+            HintUntil = Time.time + seconds;
+        }
+
         private void Tell(string key)
         {
             Hint = Loc.Get(key);

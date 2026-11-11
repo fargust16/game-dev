@@ -76,7 +76,12 @@ namespace GameDev.Slice
         /// Opens a conversation (10.4; S2.4): it pauses the world until it ends. Approaches a later milestone builds
         /// stay hidden: Veil and Confront until S3 (owner, 2026-11-09).
         /// </summary>
-        public IDialogueRunner Talk(DialogueDefinition dialogue) => new DialogueSession(dialogue, _talk);
+        /// <summary>A conversation; its Veil options are offered only while the character is in Stealth Mode (S3b.3).</summary>
+        public IDialogueRunner Talk(DialogueDefinition dialogue)
+        {
+            _talk.Withheld = Hiding != null && Hiding.Active ? new HashSet<Approach>() : new HashSet<Approach> { Approach.Veil };
+            return new DialogueSession(dialogue, _talk);
+        }
 
         /// <summary>
         /// Development command (S2 authoring default): every attribute and skill of the character to the next of these
@@ -214,7 +219,7 @@ namespace GameDev.Slice
                 Character = Character,
                 Director = Director,
                 Tips = Tips,
-                Withheld = new HashSet<Approach> { Approach.Veil, Approach.Confront },
+                Withheld = new HashSet<Approach> { Approach.Veil },
             };
             Notes = new CharacterNotes(Tips);
             Notes.Added += _ => Refresh();

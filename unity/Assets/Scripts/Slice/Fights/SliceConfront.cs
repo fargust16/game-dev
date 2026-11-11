@@ -487,6 +487,7 @@ namespace GameDev.Slice.Fights
         private void OnEnded(int side)
         {
             Debug.Log($"[Confront] fight {_fights} ends after {_turns.Round} rounds; side {side} stands.");
+            _sideStanding = side;
             Residue();
             _yieldedTo = null;
             if (_playerCombatant != null)
@@ -526,6 +527,7 @@ namespace GameDev.Slice.Fights
 
             AfterFight(_yieldedTo);
             BeastsAfterFight();
+            PeopleAfterFight();
             Hiding?.SetActive(_playerCombatant != null && _playerCombatant.Hidden && !_died);
             _animated.Clear();
             foreach (var opponent in _developmentOpponents)

@@ -27,6 +27,9 @@ dialogue.poia.street,"Step back, citizen. This is Warden business.","Отойд�
 dialogue.poia.street.ask,Ask the neighbours what he has done.,"Спросить соседей, что он натворил."
 dialogue.poia.street.defend,He's the only one on the street who sells cough draught the mill folk can pay for. Let him be.,Только у него на всей улице фабричным по карману микстура от кашля. Оставьте его.
 dialogue.poia.street.threaten,"Take him, and the whole street will know whose numbers did it.","Заберёте его — и вся улица узнает, чьи это были номера."
+dialogue.poia.overheard,"Never mind the old man. It's the list we want, the crowned buyer's list. Find it before the whistle.","Да бросьте вы старика. Нам нужен список — список коронованного покупателя. Найдите его до гудка."
+dialogue.poia.spotted,"You, by the wall! What are you listening for?","Эй, ты, у стены! Чего подслушиваешь?"
+dialogue.poia.street.force,"Hand on the hilt, step between them and Harrow. Let go of him. Now.","Положить руку на эфес и встать между ними и Харроу. Отпустите его. Живо."
 dialogue.poia.street.testify,I heard it at the Soot & Bell: he sold black tincture to mill hands. Let the Wardens do their work.,Я слышал в «Саже и Колоколе»: он продавал фабричным чёрную тинктуру. Дайте Страже делать своё дело.
 dialogue.poia.street.hold,I'll hold the crowd back while you take him.,"Я придержу толпу, пока вы его уводите."
 dialogue.poia.street.walk,Walk on. It is not your quarrel.,Пройти мимо. Это не ваша ссора.
@@ -48,9 +51,12 @@ dialogue.poib.who.warden,Warden,Стражник
 dialogue.poib.who.girl,Mill girl,Фабричная девушка
 dialogue.poib.scene,"After the eleventh bell Draught Lane has emptied too fast. Two men in coach-coats drag a screaming mill girl toward the alley that runs to the coal stairs; another girl has torn free and stands, not daring to run. An old woman watches from a doorway. Somewhere far off a Warden's whistle sounds, too far to matter.","После одиннадцатого колокола переулок Сквозняк опустел слишком быстро. Двое в кучерских пальто тащат кричащую фабричную девушку к проулку, что ведёт к угольной лестнице; другая вырвалась и стоит, не смея бежать. Из дверей смотрит старуха. Где-то вдали свистит стражник — слишком далеко, чтобы это что-то значило."
 dialogue.poib.scene.step,Step into the lane.,Шагнуть в переулок.
+dialogue.poib.scene.follow,"Keep to the dark, let them pass, and follow where they take her.","Держаться в темноте, дать им пройти и пойти следом, куда её ведут."
+dialogue.poib.spotted,Someone's on our heels!,За нами хвост!
 dialogue.poib.lane,"Walk on, friend. None of this is yours.","Проходи, приятель. Тебя это не касается."
 dialogue.poib.lane.swarm,"Draught Lane! They're taking your daughters off your own doorsteps. Out, all of you!","Переулок Сквозняк! Ваших дочерей уводят прямо с порога. Выходите, все!"
 dialogue.poib.lane.threaten,"Let her go. You're no cabmen, and by morning the Wardens will know your stair.","Отпустите её. Никакие вы не извозчики, и к утру Стража будет знать вашу лестницу."
+dialogue.poib.lane.fight,"Say nothing more. Draw, and go for the one holding her.","Больше ни слова. Выхватить оружие и броситься на того, кто её держит."
 dialogue.poib.lane.ask_crone,Ask the old woman in the doorway what she knows.,"Спросить старуху в дверях, что она знает."
 dialogue.poib.lane.run,Run for the Warden whose whistle you heard.,"Бежать за стражником, чей свисток слышен."
 dialogue.poib.lane.leave,Leave Draught Lane to its night.,Оставить переулок Сквозняк его ночи.

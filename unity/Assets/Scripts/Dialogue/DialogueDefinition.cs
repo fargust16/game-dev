@@ -77,6 +77,9 @@ namespace GameDev.Dialogue
 
         [Tooltip("Game minutes it takes, such as a service done in Exchange (S2.4); the world runs on by them.")]
         [Min(0)] public int minutes;
+
+        [Tooltip("Confront (10.2; S3b.3): it ends the conversation in a fight with the option's listener, and the fight's end writes the option's Won or Lost.")]
+        public bool fights;
     }
 
     /// <summary>One numbered option (10.4; S2.3). Its words are <c>dialogue.&lt;dialogue&gt;.&lt;node&gt;.&lt;option&gt;</c>.</summary>
@@ -117,6 +120,15 @@ namespace GameDev.Dialogue
 
         [Tooltip("Only for a check that fails.")]
         public DialogueOutcome failure = new DialogueOutcome();
+
+        [Tooltip("For an option that can end in a fight, a Confront or a Final Check (10.4 §6; S3b.3): what the fight writes when the listener's side is beaten.")]
+        public DialogueOutcome won = new DialogueOutcome();
+
+        [Tooltip("What the fight writes when the character breaks away, yields, or falls.")]
+        public DialogueOutcome lost = new DialogueOutcome();
+
+        /// <summary>Whether choosing it can end in a fight: a Confront, or a check on an enemy, which is Final.</summary>
+        public bool CanFight(DialogueListener listener) => success.fights || (kind == OptionKind.Check && listener != null && listener.enemy);
     }
 
     /// <summary>
@@ -226,6 +238,17 @@ namespace GameDev.Dialogue
                         {
                             problems.Add($"{name}: no node '{outcome.next}'");
                         }
+                    }
+
+                    var addressed = Listener(string.IsNullOrEmpty(option.listener) ? node.speaker : option.listener);
+                    if (option.success.fights && addressed == null)
+                    {
+                        problems.Add($"{name}: a fight needs a listener to fight");
+                    }
+
+                    if (option.CanFight(addressed) && (option.won.settles == null) != (option.lost.settles == null))
+                    {
+                        problems.Add($"{name}: a fight settles its POI won or lost alike");
                     }
 
                     if (option.kind == OptionKind.Check)

@@ -70,8 +70,8 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(hud.IsDialogueOpen);
             CollectionAssert.AreEqual(new[] { Loc.Get("dialogue.poia.scene") }, hud.DialogueLines);
             yield return Tap(Key.Digit1);
-            CollectionAssert.AreEqual(new[] { "1. " + Loc.Get("dialogue.poia.street.ask"), "2. " + Loc.Get("dialogue.poia.street.hold"), "3. " + Loc.Get("dialogue.poia.street.walk") },
-                hud.DialogueOptions, "the service, walking away, and asking the street; a check needs an Argument");
+            CollectionAssert.AreEqual(new[] { "1. " + Loc.Get("dialogue.poia.street.ask"), "2. " + Loc.Get("dialogue.poia.street.force"), "3. " + Loc.Get("dialogue.poia.street.hold"), "4. " + Loc.Get("dialogue.poia.street.walk") },
+                hud.DialogueOptions, "the service, walking away, asking the street, and force (S3b.3); a check needs an Argument");
             yield return Tap(Key.Digit1);
             Assert.AreEqual(Loc.Get("dialogue.poia.neighbours"), hud.DialogueLines.Last());
             yield return Tap(Key.Digit1);
@@ -107,8 +107,8 @@ namespace GameDev.Slice.Tests
 
             yield return Tap(Key.E);
             yield return Tap(Key.Digit1);
-            Assert.AreEqual("2. " + Loc.Get("dialogue.poia.street.hold"), hud.DialogueOptions[1]);
-            yield return Tap(Key.Digit2);
+            Assert.AreEqual("3. " + Loc.Get("dialogue.poia.street.hold"), hud.DialogueOptions[2]);
+            yield return Tap(Key.Digit3);
 
             Assert.AreEqual(PoiResolution.Participated, world.Director.Resolution(stage.Poi), "A settled by Exchange: holding the crowd");
             Assert.IsTrue(world.State.IsSet("debt.wardens"), "the Wardens owe a fighter at the invasion (11)");
@@ -168,6 +168,57 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>The player on the cobbles before the scene, within its talk.</summary>
+        /// <summary>
+        /// S3b.3, 11.1 POI A *Veil and listen first*: in Stealth Mode beside the Warden in the door, out of his cone, the
+        /// character overhears what the Wardens came for, an Argument for the defence, and nothing is settled.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator TheWardenInTheDoorIsOverheardFromStealthMode()
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
+            var world = SliceWorldDriver.Running;
+            var stage = Object.FindObjectsByType<PoiStage>().Single(s => s.Poi.Id == "a");
+            var listening = stage.GetComponent<PoiEavesdrop>();
+            Assert.IsNotNull(listening, "POI A's scene can be overheard");
+            var player = Object.FindAnyObjectByType<PlayerLocomotion>();
+            world.Clock.AdvanceTicks((int)(Afternoon - world.Clock.Tick));
+            yield return Before(player, stage);
+            Assert.IsTrue(stage.IsShown);
+
+            // Beside him, out of his cone, on free ground.
+            var warden = listening.Speaker.transform;
+            var notCharacters = ~LayerMask.GetMask("Character");
+            Vector3? spot = null;
+            foreach (var distance in new[] { 2f, 2.5f, 3f, 3.5f })
+            {
+                for (var angle = 80f; angle <= 280f && spot == null; angle += 20f)
+                {
+                    var place = warden.position + (Quaternion.Euler(0f, angle, 0f) * warden.forward * distance);
+                    if (Physics.Raycast(place + Vector3.up, Vector3.down, out var floor, 2f, notCharacters, QueryTriggerInteraction.Ignore)
+                        && Mathf.Abs(floor.point.y - warden.position.y) < 0.6f
+                        && !Physics.CheckCapsule(floor.point + (Vector3.up * 0.4f), floor.point + (Vector3.up * 1.5f), 0.3f, notCharacters, QueryTriggerInteraction.Ignore))
+                    {
+                        spot = floor.point;
+                    }
+                }
+            }
+
+            Assert.IsTrue(spot.HasValue, "free ground beside the Warden in the door");
+            player.Teleport(spot.Value + (Vector3.up * 0.1f), player.transform.rotation);
+            yield return new WaitForSeconds(0.3f);
+            Assert.IsTrue(world.Hiding.SetActive(true), "Stealth Mode");
+            for (var t = 0f; t < listening.Seconds + 4f && !world.State.IsSet("poi.a.heard.list") && !world.State.IsSet("poi.a.spotted"); t += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            Assert.IsFalse(world.State.IsSet("poi.a.spotted"), "out of his cone he does not notice");
+            Assert.IsTrue(world.State.IsSet("poi.a.heard.list"), "the crowned buyer's list is overheard");
+            Assert.AreEqual(Loc.Get("dialogue.poia.overheard"), listening.Speaker.Line, "his words over his head");
+            Assert.AreEqual(PoiPhase.Open, world.Director.Phase(stage.Poi), "listening settles nothing");
+        }
+
         private static IEnumerator Before(PlayerLocomotion player, PoiStage stage)
         {
             var talk = stage.Talk;

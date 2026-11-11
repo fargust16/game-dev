@@ -31,7 +31,8 @@ MonoBehaviour:
     dialogueOptions:
     - swarm
     - threaten
-    cost: "A threat on the collectors is a Final Check: a failure is a fight, which before S3 ends the scene as if fled (the lane's Veinmarket outcome)"
+    - fight
+    cost: "Injury or death; a threat on the collectors is a Final Check, and a failure is the fight; a fight lost lets them take the girl, and a collector spared tells the landing"
     consequence: "The girls free tonight"
     opens: "Gratitude, and the girl's word that the collectors asked who bought black cough from Harrow"
     closes: "A clean trail to the destination; Veinmarket's goodwill, as the collectors are its men (11)"
@@ -50,8 +51,9 @@ MonoBehaviour:
     - 3
     approaches:
     - 4
-    dialogueOptions: []
-    cost: "The victims stay in danger; the risk of being spotted"
+    dialogueOptions:
+    - follow
+    cost: "The victims stay in danger; the risk of being spotted; offered in Stealth Mode, and the lookout glances back by his cone (Perception 3)"
     consequence: "The coal-stair landing or the warehouse shutters"
     opens: "A strong start for POI C"
     closes: "Rescue gratitude"
@@ -59,7 +61,8 @@ MonoBehaviour:
     residue: []
     countsAsWithdraw: 0
     prepares: 0
-    later: S3
+    later: 
+    inWorld: PoiFollow
   - name: "Signal or fetch Wardens"
     axes:
     - 2

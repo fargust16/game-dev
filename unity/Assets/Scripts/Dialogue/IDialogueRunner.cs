@@ -77,8 +77,11 @@ namespace GameDev.Dialogue
         /// <summary>How it ended, once it has.</summary>
         DialogueEnd? EndedHow { get; }
 
-        /// <summary>The listener a failed Final Check turned into a fight, or null.</summary>
+        /// <summary>The listener a Confront or a failed Final Check turned into a fight, or null.</summary>
         DialogueListener FightWith { get; }
+
+        /// <summary>The option whose fight has not yet been decided, or null (S3b.3).</summary>
+        DialogueOption Fought { get; }
 
         /// <summary>The options offered now, in their order.</summary>
         IReadOnlyList<DialogueOption> Options { get; }
@@ -88,5 +91,11 @@ namespace GameDev.Dialogue
         CheckResult Choose(DialogueOption option);
 
         void Leave();
+
+        /// <summary>
+        /// The fight the conversation ended in is decided: writes its option's Won when the listener's side was beaten,
+        /// its Lost otherwise. Once only.
+        /// </summary>
+        void AfterFight(bool won);
     }
 }

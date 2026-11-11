@@ -34,6 +34,9 @@ namespace GameDev.Slice
         [SerializeField] private GameObject opponentModel;
         [SerializeField] private FightWeapon opponentWeapon;
 
+        [Tooltip("The owner's answer of 2026-11-09: one Warden in three carries a pistol, and so does one of the collectors, with the Cartridge Pouch, their melee weapon the second Weapon Set.")]
+        [SerializeField] private FightWeapon peoplePistol;
+
         [Tooltip("The Combat Grid's cell outlines.")]
         [SerializeField] private Material gridMaterial;
 
@@ -72,6 +75,8 @@ namespace GameDev.Slice
         public GameObject OpponentModel => opponentModel;
 
         public FightWeapon OpponentWeapon => opponentWeapon;
+
+        public FightWeapon PeoplePistol => peoplePistol;
 
         public Material GridMaterial => gridMaterial;
 
