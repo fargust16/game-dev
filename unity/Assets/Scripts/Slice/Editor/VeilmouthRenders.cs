@@ -141,6 +141,8 @@ namespace GameDev.Slice.EditorTools
             Eye(label + "_lenten", 40f, 30f, 40f, -60f, 4f);
             Eye(label + "_mill", 40f, -131f, 60f, -131f, 2f);
             Eye(label + "_grandad", 8f, 60f, 40f, 60f, 2f);
+            Eye(label + "_clock", 30f, 40f, -4f, 92f, 4f);
+            Eye(label + "_lighthouse", 150f, -60f, 245f, -25f, 3f);
             Eye(label + "_grandadnear", 22f, 56f, 40f, 60f, 1.7f);
             Eye(label + "_millstreet", 36f, -100f, 47f, -131f, 2f);
             Debug.Log($"Veilmouth dress views written to {OutputFolder}.");
