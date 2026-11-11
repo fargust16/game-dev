@@ -281,6 +281,12 @@ namespace GameDev.Slice.EditorTools
                       $"Passages (R5): {_passages} left between houses, {_openSpans} spans with no house, {Slots()} gaps under {PassageWidth} m in a row. " +
                       $"Back doors: {_backDoorsOpen} open, {_backDoorsBlind} walled up. Railing posts: {_postsAdded} added at free ends, {_postsHidden} hidden at walls; {_railingsDrawnOut} railing ends drawn out to a wall (§31).");
             TowersDressOf(_root); // §38: the clock faces and the lighthouse's lantern
+            var sky = scene.GetRootGameObjects().FirstOrDefault(g => g.name == VeilmouthMystic.RootName);
+            if (sky != null)
+            {
+                VeilmouthMystic.Ground(sky); // the houses stand where they now stand: their eaves baked again (reference plan R3 step 2)
+            }
+
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Report();

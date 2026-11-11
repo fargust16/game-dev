@@ -177,6 +177,36 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// Reference plan R3 step 2's soot under the cornice: the eaves map holds, under each kit house's body, the top
+        /// of its walls, which its body colliders reach, and 0 where no house stands.
+        /// </summary>
+        [Test]
+        public void TheEavesMapHoldsEachHousesWallTop()
+        {
+            var ground = _scene.GetRootGameObjects().Single(g => g.name == VeilmouthMystic.RootName).GetComponent<GameDev.VictorianKit.VicGround>();
+            var map = ground.Eaves;
+            Assert.IsNotNull(map, "the eaves map is baked with the ground");
+            var rect = ground.EavesRect;
+            float At(Vector3 p)
+            {
+                var t = map.GetPixel(Mathf.FloorToInt((p.x - rect.x) * rect.z * map.width), Mathf.FloorToInt((p.z - rect.y) * rect.w * map.height)).r;
+                return t > 0f ? GameDev.VictorianKit.VicGround.EavesBase + (t * 255f * GameDev.VictorianKit.VicGround.EavesStep) : 0f;
+            }
+
+            var bodies = All<KitBlock>().Where(b => b.transform.Find("Model") != null)
+                .SelectMany(b => b.GetComponents<BoxCollider>()).Where(c => c.size.x > 3f && c.size.z > 3f).ToList();
+            Assert.Greater(bodies.Count, 100, "the city's houses");
+            foreach (var box in bodies.Take(40))
+            {
+                var centre = box.transform.TransformPoint(box.center);
+                var top = box.transform.TransformPoint(box.center + (Vector3.up * (box.size.y / 2f))).y;
+                Assert.GreaterOrEqual(At(centre), top - 0.13f, $"{box.name}'s wall top under its middle, to the map's step of 0.25 m");
+            }
+
+            Assert.AreEqual(0f, At(new Vector3(rect.x + 0.25f, 0f, rect.y + 0.25f)), "no house stands in the map's margin");
+        }
+
+        /// <summary>
         /// §38: the One-Eye's lantern burns with the gas lamps, its panes glowing at night and grimy by day, but it is no
         /// street lamp, so it adds nothing to the Darkness of 10.3 §3.
         /// </summary>

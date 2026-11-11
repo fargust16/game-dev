@@ -63,6 +63,31 @@ SAMPLER(sampler_vic_linear_clamp);
 float4 _VicGroundRect;
 float4 _VicGroundLevel;
 
+// The eaves map (VicGround): each house's wall top seen from above, an 8-bit texel of Level.x + texel × Level.y m,
+// 0 where none stands; Rect.z is 0 when none is given. Not material properties.
+TEXTURE2D(_VicEaves);
+SAMPLER(sampler_vic_point_clamp);
+float4 _VicEavesRect;
+float4 _VicEavesLevel;
+
+// The top of the wall a facade belongs to, m, read 0.75 m inside it; 0 where no house stands or no map is given.
+float VicEaves(float3 positionWS, float3 normalWS)
+{
+    if (_VicEavesRect.z <= 0.0)
+    {
+        return 0.0;
+    }
+
+    float2 uv = (positionWS.xz - normalWS.xz * 0.75 - _VicEavesRect.xy) * _VicEavesRect.zw;
+    if (any(uv < 0.0) || any(uv > 1.0))
+    {
+        return 0.0;
+    }
+
+    float t = SAMPLE_TEXTURE2D_LOD(_VicEaves, sampler_vic_point_clamp, uv, 0).r;
+    return t > 0.0 ? _VicEavesLevel.x + t * _VicEavesLevel.y : 0.0;
+}
+
 // The ground's height under positionWS, m: the terrain's, or 0 with none.
 float VicGroundY(float3 positionWS)
 {
@@ -157,6 +182,15 @@ void VicSurfaceAt(float2 uv, float3 positionWS, half3 normalWS, out VicSurface s
     half3 soot = _DirtColor.rgb * 0.45h * (0.85h + 0.3h * (half)n2);
     albedo = lerp(albedo, soot, streak * 0.75h);
     rough = lerp(rough, max(rough, 0.85), streak * 0.5);
+
+    // Soot gathered under the cornice (R3 step 2): darkest at the wall's top, fading over 3 m down it and over 1.5 m
+    // up the gables and stacks above it, as strong as the streaks. Sizes are authoring defaults, in metres.
+    float eaves = VicEaves(positionWS, (float3)normalWS);
+    float under = eaves - positionWS.y;
+    float gather = under >= 0.0 ? saturate(1.0 - under / 3.0) : saturate(1.0 + under / 1.5);
+    half cornice = eaves > 0.0 ? (half)(gather * gather) * wall * saturate(0.6h + 0.8h * (half)n) * _DirtAmount * _Streaks : 0.0h;
+    albedo = lerp(albedo, soot, saturate(cornice) * 0.7h);
+    rough = lerp(rough, max(rough, 0.85), saturate(cornice) * 0.5);
 
     half up = saturate((normalWS.y - 0.35) / 0.45);
     half low = saturate(1.0 - above / 0.6) * (1.0 - up);

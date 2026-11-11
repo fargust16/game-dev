@@ -4,7 +4,8 @@ namespace GameDev.VictorianKit
 {
     /// <summary>
     /// The ground the facade shader measures its plinth dirt and wall-foot moss from (reference plan R3 step 2): the
-    /// scene's terrain heightmap, given to the shader as globals. Without it, as in a lab at world height 0 or in an
+    /// scene's terrain heightmap, given to the shader as globals; and the eaves map, each house's wall top seen from
+    /// above, under which the shader gathers soot at the cornice. Without them, as in a lab at world height 0 or in an
     /// interior, the shader measures from world height 0 as before. Veilmouth's streets lie at 26 m, so there the
     /// dirt and the moss never showed until the ground was given. It changes no material, so the SRP Batcher keeps
     /// every facade in one batch.
@@ -15,21 +16,48 @@ namespace GameDev.VictorianKit
         public static readonly int HeightId = Shader.PropertyToID("_VicGroundHeight");
         public static readonly int RectId = Shader.PropertyToID("_VicGroundRect");
         public static readonly int LevelId = Shader.PropertyToID("_VicGroundLevel");
+        public static readonly int EavesId = Shader.PropertyToID("_VicEaves");
+        public static readonly int EavesRectId = Shader.PropertyToID("_VicEavesRect");
+        public static readonly int EavesLevelId = Shader.PropertyToID("_VicEavesLevel");
+
+        /// <summary>The eaves map's 8-bit texel: 0 where no house stands, else a wall top of base + texel × step, m.</summary>
+        public const float EavesBase = 20f, EavesStep = 0.25f;
 
         // Unity's heightmap texture keeps a height of the terrain's full size at 32766/65535 (TerrainLit's kMaxHeight).
         private const float MaxHeight = 32766f / 65535f;
 
         public Terrain Terrain;
 
+        [Tooltip("Each house's wall top in metres, seen from above; 0 where no house stands.")]
+        public Texture2D Eaves;
+
+        [Tooltip("Where the eaves map lies: (x0, z0, 1 / size x, 1 / size z), in metres.")]
+        public Vector4 EavesRect;
+
         private void OnEnable() => Apply();
 
         private void Update() => Apply(); // the heightmap's texture may be made again after an edit
 
-        private void OnDisable() => Shader.SetGlobalVector(LevelId, Vector4.zero);
+        private void OnDisable()
+        {
+            Shader.SetGlobalVector(LevelId, Vector4.zero);
+            Shader.SetGlobalVector(EavesRectId, Vector4.zero);
+        }
 
-        /// <summary>Gives the shader the terrain's heightmap and where it lies; with no terrain the shader measures from 0.</summary>
+        /// <summary>Gives the shader the terrain's heightmap and the eaves map, and where they lie; without them it measures from 0 and gathers no soot at the cornice.</summary>
         public void Apply()
         {
+            if (Eaves != null)
+            {
+                Shader.SetGlobalTexture(EavesId, Eaves);
+                Shader.SetGlobalVector(EavesRectId, EavesRect);
+                Shader.SetGlobalVector(EavesLevelId, new Vector4(EavesBase, EavesStep * 255f, 0f, 0f));
+            }
+            else
+            {
+                Shader.SetGlobalVector(EavesRectId, Vector4.zero);
+            }
+
             var data = Terrain != null ? Terrain.terrainData : null;
             var heights = data != null ? data.heightmapTexture : null;
             if (heights == null)
