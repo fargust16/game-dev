@@ -63,7 +63,8 @@ namespace GameDev.Confront.Turns
                 return;
             }
 
-            if (!c.Waited && Waits(c) && Wait(c))
+            // S3b.2: a beast with no enemy inside its territory goes back to it; a beast takes no Wait.
+            if (Withdraws(c) || (!c.Waited && !c.Beast && Waits(c) && Wait(c)))
             {
                 return;
             }
@@ -310,7 +311,7 @@ namespace GameDev.Confront.Turns
         /// </summary>
         private bool Holds(Combatant c, CombatCell cell, int ap)
         {
-            if (c.Attacked)
+            if (c.Attacked || c.Beast)
             {
                 return false;
             }

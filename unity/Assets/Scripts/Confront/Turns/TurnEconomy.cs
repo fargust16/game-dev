@@ -456,6 +456,12 @@ namespace GameDev.Confront.Turns
         /// <summary>Ends the encounter when no two sides stand in it; true when it ended.</summary>
         private bool CheckEnd()
         {
+            Rout(); // a pack breaks before the sides are counted (S3b.2)
+            if (!IsRunning)
+            {
+                return true;
+            }
+
             var any = false;
             var side = -1;
             foreach (var c in _order)
@@ -582,7 +588,7 @@ namespace GameDev.Confront.Turns
                 }
 
                 var occupant = _grid.OccupantAt(path[i]);
-                if ((occupant >= 0 && occupant != c.Id) || !ReactionAttacks(c) || !_grid.Occupy(c.Id, path[i]))
+                if ((occupant >= 0 && occupant != c.Id) || !MayEnter(c, path[i]) || !ReactionAttacks(c) || !_grid.Occupy(c.Id, path[i]))
                 {
                     break;
                 }

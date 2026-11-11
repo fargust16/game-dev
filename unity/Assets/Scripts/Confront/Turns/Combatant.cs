@@ -19,6 +19,12 @@ namespace GameDev.Confront.Turns
         BrokeAway,
         Spared,
         Yielded,
+
+        /// <summary>A beast whose pack broke when its first fell (10.2 *Beasts of the slice*, S3b.2).</summary>
+        Fled,
+
+        /// <summary>A beast with no enemy left inside its territory, gone back to it (10.2, S3b.2).</summary>
+        Withdrew,
     }
 
     /// <summary>
@@ -113,5 +119,17 @@ namespace GameDev.Confront.Turns
         /// encounter begins for a fighter that enters it hidden; the economy sets it after.
         /// </summary>
         public bool Hidden { get; set; }
+
+        /// <summary>The pack it runs with, or −1 (10.2 *Beasts of the slice*): when the first of a pack falls, the rest flee.</summary>
+        public int Pack { get; set; } = -1;
+
+        /// <summary>A beast (10.2): it takes no Wait and no Defensive Stance, and keeps to its territory.</summary>
+        public bool Beast { get; set; }
+
+        /// <summary>The centre of the territory it keeps to, with <see cref="Range"/>.</summary>
+        public Vector3 Home { get; set; }
+
+        /// <summary>How far from <see cref="Home"/> it goes, in metres on the ground; 0 for no territory.</summary>
+        public float Range { get; set; }
     }
 }
