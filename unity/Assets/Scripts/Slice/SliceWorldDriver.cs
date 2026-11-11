@@ -10,7 +10,9 @@ using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Player.Standing;
 using GameDev.Slice.Fights;
+using GameDev.Slice.Gathering;
 using GameDev.Slice.Gear;
+using GameDev.Slice.Kit;
 using GameDev.Slice.People;
 using GameDev.Slice.Shops;
 using GameDev.Slice.Stealth;
@@ -71,6 +73,12 @@ namespace GameDev.Slice
 
         /// <summary>Edda Brann's workshop (S5a.4); null without the shops.</summary>
         public SliceWorkshop Workshop { get; private set; }
+
+        /// <summary>The character's Stamina (S5a.5; 07.2 §3.2); null without the gathering rules.</summary>
+        public SliceStamina Stamina { get; private set; }
+
+        /// <summary>Gathering at the nodes outside the walls (S5a.5); null without a bag or the gathering rules.</summary>
+        public SliceGathering Gathering { get; private set; }
 
         /// <summary>11's start: plain clothes with no defence and 500 bronze, with no weapon or tool.</summary>
         public const int StartingBronze = 500;
@@ -270,6 +278,18 @@ namespace GameDev.Slice
                     Beasts.Configure(settings.BeastRules, Hiding, Fights, Clock, State, seed);
                 }
             }
+            if (Bag != null && settings.Gathering != null && settings.ActionChecks != null)
+            {
+                Stamina = new SliceStamina(settings.Gathering, State, Clock, Character);
+                Gathering = new SliceGathering(settings.Gathering, Bag, State, Clock, Character, Stamina, settings.ActionChecks, seed);
+                if (Beasts != null)
+                {
+                    Beasts.Warned += (_, _) => Gathering.Stop("ui.gather.stop.beast");
+                }
+
+                FindNodes();
+            }
+
             _talk = new DialogueContext
             {
                 State = State,
@@ -438,6 +458,36 @@ namespace GameDev.Slice
             if (Shops != null)
             {
                 OpenCounters();
+            }
+
+            if (Gathering != null)
+            {
+                FindNodes();
+            }
+        }
+
+        /// <summary>A gathering node on each herb, flax, fellable tree and iron vein block in the loaded scenes (S5a.5).</summary>
+        private void FindNodes()
+        {
+            var added = false;
+            foreach (var block in FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude))
+            {
+                var rule = Gathering.Rules.RuleFor(block.name);
+                if (rule == null || block.GetComponent<GatherNode>() != null)
+                {
+                    continue;
+                }
+
+                var at = block.transform.position;
+                var id = $"{rule.kind.ToString().ToLowerInvariant()}.{Mathf.RoundToInt(at.x * 10f)}.{Mathf.RoundToInt(at.z * 10f)}";
+                block.gameObject.AddComponent<GatherNode>().Configure(Gathering, Gathering.Spot(id, rule), () => Fights != null && Fights.InFight);
+                added = true;
+            }
+
+            var hud = Hud();
+            if (added && hud != null)
+            {
+                hud.FindPromptSources();
             }
         }
 

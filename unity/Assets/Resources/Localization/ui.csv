@@ -238,3 +238,24 @@ ui.craft.made,"Made: {0}, in {1} minutes.","Сделано: {0}, за {1} мин
 ui.craft.interrupted,The work is interrupted; nothing is spent.,Работа прервана; ничего не потрачено.
 ui.craft.fault.lesson,Item Creation is not learned.,Создание предметов не изучено.
 ui.craft.fault.resources,Not enough resources.,Не хватает ресурсов.
+"# Gathering outside the walls (S5a.5; 19 §6.4, 07.2 §3.2)"
+ui.prompt.gather.herb,E  Gather herbs,E  Собрать травы
+ui.prompt.gather.flax,E  Gather flax,E  Собрать лён
+ui.prompt.gather.tree,E  Fell the tree,E  Рубить дерево
+ui.prompt.gather.ore,E  Mine the vein,E  Добывать руду
+ui.gather.doing.herb,Gathering herbs,Сбор трав
+ui.gather.doing.flax,Gathering flax,Сбор льна
+ui.gather.doing.tree,Felling,Рубка
+ui.gather.doing.ore,Mining,Добыча руды
+ui.gather.working,{0}: {1} taken · Stamina {2} %   E  Stop,{0}: добыто {1} · выносливость {2} %   E  Хватит
+ui.gather.fault.spent,Nothing is left here.,Здесь ничего не осталось.
+ui.gather.fault.tool,Needs: {0}.,Нужно: {0}.
+ui.gather.fault.tired,Too tired; rest a while.,Слишком устали; передохните.
+ui.gather.stop.spent,Nothing more is left.,Больше ничего нет.
+ui.gather.stop.tired,Out of Stamina.,Выносливость кончилась.
+ui.gather.stop.heavy,The bag can carry no more.,Больше не унести.
+ui.gather.stop.moved,Stopped: you moved.,Прервано: вы сдвинулись.
+ui.gather.stop.bag,Stopped for the bag.,Прервано: открыта сумка.
+ui.gather.stop.beast,Stopped: a beast has noticed you.,Прервано: вас заметил зверь.
+ui.gather.stop.fight,Stopped by a fight.,Прервано боем.
+ui.gather.stop.player,Stopped.,Остановлено.

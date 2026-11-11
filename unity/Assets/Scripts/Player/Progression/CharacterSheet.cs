@@ -36,6 +36,15 @@ namespace GameDev.Player.Progression
 
         /// <summary>19 §3: the count of a made piece's modifiers rolls at Item Creation, then Perception and Luck (S5a.4).</summary>
         ItemCreation,
+
+        /// <summary>19 §6.4: herb and flax patches (S5a.5).</summary>
+        Herbalism,
+
+        /// <summary>19 §6.4: fellable trees (S5a.5).</summary>
+        Woodcutting,
+
+        /// <summary>19 §6.4: iron veins (S5a.5).</summary>
+        Mining,
     }
 
     /// <summary>What a check reads of a character.</summary>

@@ -42,6 +42,9 @@ namespace GameDev.Slice
         [Tooltip("The shops on Bawling Row, their keepers, goods and lessons (S5a.3).")]
         [SerializeField] private GameDev.Slice.Shops.ShopCatalogue shops;
 
+        [Tooltip("Gathering's nodes and Stamina (S5a.5; 19 §6.4, 07.2 §3.2).")]
+        [SerializeField] private GameDev.Slice.Gathering.GatherRules gathering;
+
         [Tooltip("The development fight's opponents: a model and the weapon each carries. Authoring defaults.")]
         [SerializeField] private GameObject opponentModel;
         [SerializeField] private FightWeapon opponentWeapon;
@@ -94,6 +97,8 @@ namespace GameDev.Slice
         public FightWeapon Fists => fists;
 
         public GameDev.Slice.Shops.ShopCatalogue Shops => shops;
+
+        public GameDev.Slice.Gathering.GatherRules Gathering => gathering;
 
         public GameObject OpponentModel => opponentModel;
 

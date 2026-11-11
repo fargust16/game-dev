@@ -47,10 +47,13 @@ namespace GameDev.Slice
         /// <summary>A piece made at a workshop (S5a.4; 19 §3); fork it with the count of pieces made before it.</summary>
         public const string Workshop = "slice.workshop";
 
+        /// <summary>A gathering cycle (S5a.5; 19 §6.4); fork it with the tick and the node's id hashed.</summary>
+        public const string Gathering = "slice.gathering";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
-            ShopStock, Workshop,
+            ShopStock, Workshop, Gathering,
         };
     }
 }
