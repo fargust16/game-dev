@@ -34,6 +34,7 @@ namespace GameDev.Slice.EditorTools
             var settings = AssetDatabase.LoadAssetAtPath<SliceSettings>(SettingsPath);
             var so = new SerializedObject(settings);
             so.FindProperty("fightRules").objectReferenceValue = Load<FightRules>($"{Data}/FightRules.asset");
+            so.FindProperty("stealthRules").objectReferenceValue = Load<GameDev.Confront.Stealth.StealthRules>($"{Data}/StealthRules.asset");
             so.FindProperty("kitSword").objectReferenceValue = Load<FightWeapon>($"{Data}/Weapons/Sword.asset");
             so.FindProperty("kitRifle").objectReferenceValue = Load<FightWeapon>($"{Data}/Weapons/Rifle.asset");
             so.FindProperty("kitPouch").objectReferenceValue = Load<FightOffHand>($"{Data}/Weapons/CartridgePouch.asset");

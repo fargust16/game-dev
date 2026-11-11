@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GameDev.Slice.Interiors;
 using GameDev.VictorianKit;
@@ -128,6 +129,12 @@ namespace GameDev.Slice.Atmosphere
         private Vector3 _moonDirection = Vector3.up;
 
         public int PreviewMinute => previewMinute;
+
+        /// <summary>The sun's light, for the shadow a hider stands in (10.3 §3, S3b.1).</summary>
+        public Light Sun => sun;
+
+        /// <summary>The street lamps, for the Darkness away from them at night (10.3 §3, S3b.1).</summary>
+        public IReadOnlyList<Lamp> StreetLamps => lamps;
 
         public Material DaySky => daySky;
 

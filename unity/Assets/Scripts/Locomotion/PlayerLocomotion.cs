@@ -37,6 +37,12 @@ namespace GameDev.Locomotion
 
         public bool IsGrounded => _controller != null && _controller.isGrounded;
 
+        /// <summary>
+        /// Stealth Mode (10.3 §1, S3b.1): the character moves at this share of walking speed and cannot sprint; zero
+        /// when it walks upright. The walk clip plays slower until a crouching clip exists (ANIMATION_PIPELINE_PLAN).
+        /// </summary>
+        public float CrouchShare { get; set; }
+
         /// <summary>Puts the player at a pose at once, as a door does; a CharacterController ignores a moved transform
         /// while it is enabled.</summary>
         public void Teleport(Vector3 position, Quaternion rotation)
@@ -90,8 +96,8 @@ namespace GameDev.Locomotion
 
             var moveInput = input.MoveVector;
             var hasInput = moveInput.sqrMagnitude > 0.01f;
-            var sprinting = hasInput && input.SprintHeld;
-            var targetAnimSpeed = hasInput ? (sprinting ? 3f : 2f) : 0f;
+            var sprinting = hasInput && input.SprintHeld && CrouchShare <= 0f;
+            var targetAnimSpeed = !hasInput ? 0f : CrouchShare > 0f ? CrouchShare : sprinting ? 3f : 2f;
             _animSpeed = Mathf.MoveTowards(_animSpeed, targetAnimSpeed, speedDamping * Time.deltaTime);
 
             var moveDir = CameraRelativeDirection(new Vector3(moveInput.x, 0f, moveInput.y));

@@ -114,7 +114,13 @@ namespace GameDev.Confront.Turns
         /// <summary>Every combatant in the fight, in the order Initiative set.</summary>
         IReadOnlyList<Combatant> Order { get; }
 
+        /// <summary>The AP a walk of this many steps costs the fighter: 3 for two cells crouching (10.3 §8, S3b.1).</summary>
+        int WalkAp(Combatant c, int steps);
+
         void BeginEncounter(IReadOnlyList<Combatant> combatants, Random rolls);
+
+        /// <summary>An encounter opened by a hidden fighter's stealth attack before Initiative (10.3 §7).</summary>
+        void BeginEncounter(IReadOnlyList<Combatant> combatants, Random rolls, Combatant opener, Combatant target);
 
         /// <summary>The acting combatant's next intent; false when it cannot be done, and nothing is spent.</summary>
         bool SubmitIntent(TurnIntent intent);

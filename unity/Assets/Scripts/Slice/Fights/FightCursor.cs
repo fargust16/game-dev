@@ -102,7 +102,7 @@ namespace GameDev.Slice.Fights
             {
                 Steps = _turns.PathToStrike(player, Target, _path);
                 var from = Steps > 0 ? _path[_path.Count - 1] : player.Cell;
-                Cost = Steps < 0 ? 0 : Steps + player.Fighter.Weapon.AttackAp;
+                Cost = Steps < 0 ? 0 : _turns.WalkAp(player, Steps) + player.Fighter.Weapon.AttackAp;
                 Affordable = Steps >= 0 && Cost <= _turns.ApLeft;
                 Forecast = _rules.Forecast(player.Fighter, Target.Fighter, _turns.ContextFor(player, from, Target));
                 Provokes = Steps > 0 && Leaves(player);
@@ -138,8 +138,8 @@ namespace GameDev.Slice.Fights
                 _path.Clear();
                 Steps = -1; // a broken leg takes no step (10.2)
             }
-            Cost = Math.Max(Steps, 0);
-            Affordable = Steps > 0 && Steps <= _turns.ApLeft;
+            Cost = _turns.WalkAp(player, Math.Max(Steps, 0)); // crouching: 3 AP for two cells (10.3 §8)
+            Affordable = Steps > 0 && Cost <= _turns.ApLeft;
             Provokes = Steps > 0 && Leaves(player);
             Show(Affordable ? Shape.Move : Shape.Blocked, Math.Min(Math.Max(Steps, 0), _turns.ApLeft));
         }

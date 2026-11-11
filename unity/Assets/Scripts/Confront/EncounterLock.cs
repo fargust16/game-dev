@@ -29,6 +29,12 @@ namespace GameDev.Confront
 
         /// <summary>What started it, for the log: an ambush, a refused Final Check, a development command.</summary>
         public string Reason { get; }
+
+        /// <summary>A hidden fighter whose stealth attack opens the fight before Initiative (10.3 §7), or null.</summary>
+        public Combatant Opener { get; set; }
+
+        /// <summary>The opener's target.</summary>
+        public Combatant Target { get; set; }
     }
 
     /// <summary>
@@ -90,7 +96,7 @@ namespace GameDev.Confront
             InConfront = true;
             _pause = _clock.Pause();
             ConfrontStarted?.Invoke(request);
-            _turns.BeginEncounter(request.Combatants, request.Rolls);
+            _turns.BeginEncounter(request.Combatants, request.Rolls, request.Opener, request.Target);
             return true;
         }
 

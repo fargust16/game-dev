@@ -36,7 +36,7 @@ ui.fight.someone,Someone,Кто-то
 ui.fight.turn.yours,Your turn,Ваш ход
 ui.fight.turn.other,Turn: {0},Ходит: {0}
 ui.fight.hp,HP {0} / {1},Здоровье {0} / {1}
-ui.fight.hint,Space  End turn     R  Wait     G  Defensive Stance     X  Change weapons     B  First Aid     Y  Yield     Q / E  Turn the camera     Wheel  Zoom,Пробел  Конец хода     R  Ждать     G  Защитная стойка     X  Сменить оружие     B  Первая помощь     Y  Сдаться     Q / E  Поворот камеры     Колесо  Масштаб
+ui.fight.hint,Space  End turn     R  Wait     G  Defensive Stance     X  Change weapons     B  First Aid     Y  Yield     C  Stealth     Q / E  Turn the camera     Wheel  Zoom,Пробел  Конец хода     R  Ждать     G  Защитная стойка     X  Сменить оружие     B  Первая помощь     Y  Сдаться     C  Скрытность     Q / E  Поворот камеры     Колесо  Масштаб
 ui.fight.move,{0} AP,{0} ОД
 ui.fight.far,Too far: {0} AP,Слишком далеко: {0} ОД
 ui.fight.noway,No way there,Туда не пройти
@@ -107,3 +107,13 @@ ui.lockup.released,"Let out of the lock-up at 08:00. Your weapons are held till 
 ui.yield.taken,"They took what you carried, and you owe them the rest.","У вас забрали всё, что было при себе, и вы остались им должны."
 ui.death.title,Your character has died,Ваш персонаж погиб
 ui.death.restart,Enter  Start again,Enter  Начать заново
+ui.stealth.mode,Stealth Mode    C  Stand up,Скрытность    C  Встать
+ui.stealth.watched,Someone is watching you,За вами наблюдают
+ui.stealth.noticed.1,Hey! What are you doing there?,Эй! Что это вы там делаете?
+ui.stealth.noticed.2,Who's skulking there?,Кто там крадётся?
+ui.stealth.noticed.3,Come out where I can see you.,А ну-ка выйдите на свет.
+ui.fight.nohide,An enemy is watching: no hiding now,Враг смотрит: не спрятаться
+ui.fight.hidden,Already hidden,Вы уже скрываетесь
+ui.fight.log.hidden,{0} hides,{0}: скрывается
+ui.fight.log.revealed,{0} is seen,{0}: замечен
+ui.fight.log.unseen,{1} does not notice {0},{1} не замечает: {0}

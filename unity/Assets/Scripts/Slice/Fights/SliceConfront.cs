@@ -135,7 +135,11 @@ namespace GameDev.Slice.Fights
                 clock.TickBoundary += OnTick;
             }
             _grid = new CombatGridReader(1f);
-            _turns = new TurnEconomy(settings.FightRules, _grid);
+            _turns = new TurnEconomy(settings.FightRules, _grid)
+            {
+                Stealth = settings.StealthRules,
+                DarknessAt = cell => Hiding != null ? Hiding.Darkness(_grid.Center(cell)) : 0,
+            };
             _lock = new EncounterLock(_turns, _grid, clock);
             _lock.ConfrontStarted += OnStarted;
             _lock.ConfrontEnded += OnEnded;
@@ -149,6 +153,8 @@ namespace GameDev.Slice.Fights
             _turns.Conditioned += OnConditioned;
             _turns.Departed += OnDeparted;
             _turns.MercyAsked += OnMercyAsked;
+            _turns.HiddenChanged += OnHiddenChanged;
+            _turns.ConeChecked += OnConeChecked;
             _view = CombatGridView.Create(transform, settings.GridMaterial);
             _beats = new FightBeats(Animated, Place);
             _beats.Landed += OnLanded;
@@ -219,7 +225,16 @@ namespace GameDev.Slice.Fights
                 combatants.Add(opponent);
             }
 
-            return _lock.TryBegin(new EncounterRequest(at, combatants, _seed.Fork(SliceSeedStreams.Combat, _fights), "development command"));
+            // 10.3 §7: from Stealth Mode the character enters the fight hidden, and strikes first if an opponent is in reach.
+            var request = new EncounterRequest(at, combatants, _seed.Fork(SliceSeedStreams.Combat, _fights), "development command");
+            if (Hiding != null && Hiding.Active)
+            {
+                player.Hidden = true;
+                request.Opener = player;
+                request.Target = Nearest(player, combatants);
+            }
+
+            return _lock.TryBegin(request);
         }
 
         private void Update()
@@ -310,8 +325,9 @@ namespace GameDev.Slice.Fights
             }
 
             // S3a.6: R waits to the end of the round, G ends the turn in a Defensive Stance, X changes the Weapon Set.
-            // S3a.7: B treats the player's own most urgent condition.
+            // S3a.7: B treats the player's own most urgent condition. S3b.1: C enters Stealth Mode.
             if ((input.WaitTurnPressed && _turns.SubmitIntent(TurnIntent.Wait))
+                || (input.StealthPressed && HideInFight(player))
                 || (input.StancePressed && _turns.SubmitIntent(TurnIntent.Stance))
                 || (input.ChangeSetPressed && _turns.SubmitIntent(TurnIntent.ChangeSet))
                 || (input.FirstAidPressed && TreatInFight(player))
@@ -508,6 +524,7 @@ namespace GameDev.Slice.Fights
             }
 
             AfterFight(_yieldedTo);
+            Hiding?.SetActive(_playerCombatant != null && _playerCombatant.Hidden && !_died);
             _animated.Clear();
             foreach (var opponent in _developmentOpponents)
             {

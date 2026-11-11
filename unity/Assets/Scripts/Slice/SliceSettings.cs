@@ -1,4 +1,5 @@
 using GameDev.Confront.Rules;
+using GameDev.Confront.Stealth;
 using GameDev.Player.Progression;
 using GameDev.Player.Standing;
 using GameDev.World.Seed;
@@ -36,6 +37,10 @@ namespace GameDev.Slice
         [Tooltip("The Combat Grid's cell outlines.")]
         [SerializeField] private Material gridMaterial;
 
+        [Header("Stealth (S3b.1)")]
+        [Tooltip("10.3's numbers: Stealth Mode, the Vision Cone and the Notice Meter.")]
+        [SerializeField] private StealthRules stealthRules;
+
         [Header("The player's turn (S3a.5)")]
         [Tooltip("Basic RPG Cursors (asset map §5), one for each FightCursor shape in its order: plain, walk, strike, a walk the AP do not reach, a blow they do not reach. SliceConfrontSetup imports them as cursors.")]
         [SerializeField] private Texture2D[] fightCursors;
@@ -47,6 +52,8 @@ namespace GameDev.Slice
         public StandingRules Standing => standing;
 
         public FightRules FightRules => fightRules;
+
+        public StealthRules StealthRules => stealthRules;
 
         public FightWeapon KitSword => kitSword;
 

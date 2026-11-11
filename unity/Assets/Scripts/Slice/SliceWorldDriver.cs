@@ -8,6 +8,7 @@ using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Player.Standing;
 using GameDev.Slice.Fights;
+using GameDev.Slice.Stealth;
 using GameDev.UI;
 using GameDev.World.Poi;
 using GameDev.World.State;
@@ -56,6 +57,9 @@ namespace GameDev.Slice
 
         /// <summary>The fights in the scene (S3a.4): the Encounter Lock, the turns and the Combat Grid; null without FightRules.</summary>
         public SliceConfront Fights { get; private set; }
+
+        /// <summary>Stealth in free movement (S3b.1); a fight takes it over while it lasts.</summary>
+        public SliceStealth Hiding { get; private set; }
 
         /// <summary>The Deeds Record, Attitude and lies (10.4 §4–5).</summary>
         public SocialStanding Standing { get; private set; }
@@ -179,6 +183,16 @@ namespace GameDev.Slice
             if (Fights != null)
             {
                 Fights.Standing = Standing;
+            }
+
+            if (settings.StealthRules != null)
+            {
+                Hiding = gameObject.AddComponent<SliceStealth>();
+                Hiding.Configure(settings.StealthRules, Character, Clock, () => Fights != null && Fights.InFight);
+                if (Fights != null)
+                {
+                    Fights.Hiding = Hiding;
+                }
             }
             _talk = new DialogueContext
             {

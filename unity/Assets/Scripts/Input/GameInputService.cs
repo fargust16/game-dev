@@ -39,6 +39,7 @@ namespace GameDev.Input
         private InputAction _firstAid;
         private InputAction _yield;
         private InputAction _spare;
+        private InputAction _stealth;
 
         private InputAction _pause;
         private InputAction _advanceHour;
@@ -167,6 +168,9 @@ namespace GameDev.Input
 
         public bool SparePressed => _spare != null && _spare.WasPressedThisFrame();
 
+        /// <summary>S3b.1 authoring default, C: Stealth Mode, in free movement and in a fight (10.3 §1, §8).</summary>
+        public bool StealthPressed => _stealth != null && _stealth.WasPressedThisFrame();
+
         public Vector2 MousePosition => Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
         public Vector2 MouseDelta => Mouse.current != null ? Mouse.current.delta.ReadValue() : Vector2.zero;
 
@@ -233,6 +237,7 @@ namespace GameDev.Input
             _firstAid = _player.AddAction("FirstAid", InputActionType.Button, "<Keyboard>/b");
             _yield = _player.AddAction("Yield", InputActionType.Button, "<Keyboard>/y");
             _spare = _player.AddAction("Spare", InputActionType.Button, "<Keyboard>/v");
+            _stealth = _player.AddAction("Stealth", InputActionType.Button, "<Keyboard>/c");
 
             _camera = new InputActionMap("Camera");
             _camPan = _camera.AddAction("Pan", InputActionType.Value);
