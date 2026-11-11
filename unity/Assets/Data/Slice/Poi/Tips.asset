@@ -247,3 +247,21 @@ MonoBehaviour:
     requiresKey: poi.c.phase
     requiresAtLeast: 1
     needsApproach: 1
+  - id: nell.c_link
+    source: 1
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: tip.trace.link.heard
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: nell.c_coach
+    source: 1
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: tip.sweep.coach.heard
+    requiresAtLeast: 1
+    needsApproach: 0

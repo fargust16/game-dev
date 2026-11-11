@@ -267,6 +267,25 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
+        public void NellsNextLineFollowsTheTellProved()
+        {
+            Begin();
+            CollectionAssert.IsEmpty(Bartender().Intersect(new[] { "nell.c_link", "nell.c_coach" }), "nothing proved, nothing said");
+
+            _tips.Tell("trace.misread", _clock.Tick);
+            CollectionAssert.DoesNotContain(Bartender(), "nell.c_link", "a misreading proves nothing");
+            _tips.Tell("trace.link", _clock.Tick);
+            CollectionAssert.Contains(Bartender(), "nell.c_link", "the close look's link: one buyer for the medicine and the girls");
+            CollectionAssert.DoesNotContain(Bartender(), "nell.c_coach");
+            _tips.Tell("sweep.coach", _clock.Tick);
+            CollectionAssert.Contains(Bartender(), "nell.c_coach", "the sweep's coach: up the hill");
+            foreach (var id in new[] { "nell.c_link", "nell.c_coach" })
+            {
+                Assert.IsTrue(Loc.Tables.Has($"tip.{id}.line", "ru") && Loc.Tables.Has($"tip.{id}.note", "ru"), id);
+            }
+        }
+
+        [Test]
         public void HeSeesAStandingCharacterInSightAndAHiderOnlyOnceNoticed()
         {
             var meter = new NoticeMeter(AssetDatabase.LoadAssetAtPath<StealthRules>("Assets/Data/Confront/StealthRules.asset"));
@@ -341,6 +360,8 @@ namespace GameDev.Slice.Tests
         }
 
         private static List<string> Ids(IDialogueRunner talk) => talk.Options.Select(o => o.id).ToList();
+
+        private List<string> Bartender() => _tips.Available(TipSource.Bartender, _clock.Tick).Select(t => t.id).ToList();
 
         private static T Rules<T>(string name) where T : Object
         {

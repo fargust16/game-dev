@@ -108,6 +108,21 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
+        public void CAppearsWhenBResolvesAndNotWithoutAnAftermath()
+        {
+            // In the slice A's window always closes before B's opens, so B alone is shown with A out of the run.
+            var state = new WorldState();
+            var clock = new GameClock(1d, 0);
+            using var director = new PoiDirector(new[] { _b, _c }, state, new WorldSeed(Seed), SliceSeedStreams.PoiUnattended, clock);
+
+            clock.AdvanceTicks(1559);
+            Assert.AreEqual(PoiPhase.Pending, director.Phase(_c), "no Aftermath, no C, however late (S4's acceptance)");
+            clock.AdvanceTicks(1);
+            Assert.AreEqual(PoiResolution.Unattended, director.Resolution(_b));
+            Assert.AreEqual(PoiPhase.Open, director.Phase(_c), "B's Aftermath opens C");
+        }
+
+        [Test]
         public void KnowledgeComesBeforeTheWindowAndNeverFalls()
         {
             var (director, clock, _) = Run(0);
