@@ -13,8 +13,9 @@ namespace GameDev.Slice.EditorTools
     /// S3b.2, content piece C3 (11; 10.2 *Beasts of the slice*): the wolves and boars of Veilmouth's territories, in the
     /// owner's packs (asset map: Wolf_URP and Wild_Boar). It copies the packs' clips into looping project clips, builds one
     /// controller for each kind with the states <see cref="SliceBeast"/> plays, saves a project prefab for each kind, and
-    /// replaces the dragon stand-ins of the city plan's territories with them: six wolf packs, of three and two in turn,
-    /// and four boars alone. The seed decides which glow when the slice runs.
+    /// replaces the dragon stand-ins of the city plan's territories with them: ten wolf packs, of three and two in turn,
+    /// and seven boars alone (since the owner's play test of S5a; six and four before). The seed decides
+    /// which glow when the slice runs.
     /// Batch: -executeMethod GameDev.Slice.EditorTools.SliceBeastsSetup.BuildAndPlace
     /// </summary>
     public static class SliceBeastsSetup
@@ -32,7 +33,7 @@ namespace GameDev.Slice.EditorTools
         // Authoring defaults (the city plan's stand-ins): a wolf 1.6 m long and a boar 1.5 m.
         private const float WolfLength = 1.6f;
         private const float BoarLength = 1.5f;
-        public const int WolfPacks = 6;
+        public const int WolfPacks = 10; // since the owner's play test of S5a (6 before)
 
         // Where a beast can stand, near the city plan's spot (authoring defaults): ground under 25°, nothing within 0.5 m,
         // 1.5 m from the beast before it, and no farther than 12 m from the den.

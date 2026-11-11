@@ -1830,7 +1830,7 @@ namespace GameDev.Slice.EditorTools
             go.layer = LayerMask.NameToLayer(KitLayers.NoGrid);
             go.transform.SetParent(parent, false);
             go.transform.position = World(px, py, Ground(px, py));
-            go.AddComponent<LayoutZone>().Configure(new Vector3(30f, 6f, 30f), new Color(0.6f, 0.35f, 0.15f, 0.9f));
+            go.AddComponent<LayoutZone>().Configure(new Vector3(TerritorySize, 6f, TerritorySize), new Color(0.6f, 0.35f, 0.15f, 0.9f));
         }
 
         /// <summary>The ritual's magic circle at a candidate, hidden: the ritual system shows the one the seed picks.</summary>

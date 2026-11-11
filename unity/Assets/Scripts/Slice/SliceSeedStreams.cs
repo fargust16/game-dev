@@ -56,10 +56,13 @@ namespace GameDev.Slice
         /// <summary>A theft's bar and purse (S5a.8; 10.3 §6, 19 §6.3); fork it with the person's name hashed and the day.</summary>
         public const string Theft = "slice.theft";
 
+        /// <summary>Where a beast pack wanders in its territory and when (10.2, the owner's play test of S5a); fork it with the pack and its wander.</summary>
+        public const string BeastWander = "slice.beasts.wander";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
-            ShopStock, Workshop, Gathering, Skinning, Theft,
+            ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander,
         };
     }
 }

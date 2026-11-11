@@ -12,7 +12,8 @@ namespace GameDev.Slice.Stealth
     /// Notice Meter over each observer, a mark with no numbers; with Intelligence 3 the Vision Cones on the ground in
     /// Stealth Mode, faint, and clear at 6. Everyone sees the result: the observer's line over its head, and the
     /// character standing up. The marks are drawn in the HUD's own panel; the cones are one mesh, rebuilt each frame,
-    /// stopped by walls.
+    /// stopped by walls. A beast's cone shows within 30 m of the character in and out of Stealth Mode (10.2, the owner's
+    /// play test of S5a).
     /// </summary>
     [RequireComponent(typeof(SliceStealth))]
     public sealed class StealthHud : MonoBehaviour
@@ -22,6 +23,11 @@ namespace GameDev.Slice.Stealth
         private const int Rays = 16;           // segments of a cone's fan
         private const float ConeLift = 0.06f;  // m over the observer's feet
         private const float RayHeight = 0.6f;  // m: the height a cone's ray is stopped by a wall
+
+        // 10.2, the owner's play test of S5a (authoring defaults): a beast's cone shows within 30 m of the character, in and
+        // out of Stealth Mode, as clear as a clear person's cone.
+        private const float BeastConeReach = 30f;
+        private const float BeastConeOpacity = 1f;
 
         // The LotM look: ink, parchment and old brass; a meter reddens toward the notice.
         private static readonly Color Ink = new Color(0.07f, 0.06f, 0.05f, 0.82f);
@@ -59,8 +65,13 @@ namespace GameDev.Slice.Stealth
         public string LineOver(StealthObserver o) =>
             _marks.TryGetValue(o, out var m) && m.Box.style.display == DisplayStyle.Flex && m.Line.style.display == DisplayStyle.Flex ? m.Line.text : null;
 
-        /// <summary>The cones' opacity now, 0 when none are drawn.</summary>
+        /// <summary>The people's cones' opacity now, 0 when none are drawn.</summary>
         public float ConeOpacity { get; private set; }
+
+        /// <summary>How many cones that always show, the beasts', were drawn this frame (for tests).</summary>
+        public int AlwaysShownCones { get; private set; }
+
+        private GameDev.Locomotion.PlayerLocomotion _player;
 
         private void Awake() => _stealth = GetComponent<SliceStealth>();
 
@@ -102,7 +113,7 @@ namespace GameDev.Slice.Stealth
             _hint.text = hint ?? string.Empty;
             _hint.style.display = hint != null ? DisplayStyle.Flex : DisplayStyle.None;
             ConeOpacity = opacity;
-            Cones(opacity > 0f ? camera : null);
+            Cones(camera);
         }
 
         private void Place(Mark mark, StealthObserver o, Camera camera, Vector3 eye, bool showMeter)
@@ -238,6 +249,7 @@ namespace GameDev.Slice.Stealth
         /// <summary>The Vision Cones of the observers near the character as one mesh, each ray stopped by a wall.</summary>
         private void Cones(Camera camera)
         {
+            AlwaysShownCones = 0;
             if (camera == null || _stealth.Rules == null)
             {
                 if (_cones != null)
@@ -248,20 +260,34 @@ namespace GameDev.Slice.Stealth
                 return;
             }
 
+            if (_player == null || !_player.isActiveAndEnabled)
+            {
+                _player = FindAnyObjectByType<GameDev.Locomotion.PlayerLocomotion>();
+            }
+
             Build();
             _vertices.Clear();
             _colours.Clear();
             _triangles.Clear();
             var rules = _stealth.Rules;
             var centre = camera.transform.position;
+            var character = _player != null ? _player.transform.position : centre;
             var reach = rules.ConeCells * 1f;
             var half = rules.ConeDegrees * 0.5f;
             foreach (var o in StealthObserver.All)
             {
                 var feet = o.transform.position;
-                if ((feet - centre).sqrMagnitude > ConeReach * ConeReach)
+                var opacity = o.ConeAlwaysShown
+                    ? ((feet - character).sqrMagnitude <= BeastConeReach * BeastConeReach ? BeastConeOpacity : 0f)
+                    : ((feet - centre).sqrMagnitude <= ConeReach * ConeReach ? ConeOpacity : 0f);
+                if (opacity <= 0f)
                 {
                     continue;
+                }
+
+                if (o.ConeAlwaysShown)
+                {
+                    AlwaysShownCones++;
                 }
 
                 var alarm = o.Meter != null ? o.Meter.Fill : 0f;
@@ -269,7 +295,7 @@ namespace GameDev.Slice.Stealth
                 var first = _vertices.Count;
                 var origin = feet + (Vector3.up * ConeLift);
                 _vertices.Add(origin);
-                _colours.Add(new Color(tint.r, tint.g, tint.b, 0.22f * ConeOpacity));
+                _colours.Add(new Color(tint.r, tint.g, tint.b, 0.22f * opacity));
                 var forward = o.transform.forward;
                 forward.y = 0f;
                 for (var i = 0; i <= Rays; i++)
@@ -280,7 +306,7 @@ namespace GameDev.Slice.Stealth
                         && hit.transform.GetComponentInParent<StealthObserver>() == null && !hit.collider.GetComponent<CharacterController>()
                         ? hit.distance : reach;
                     _vertices.Add(origin + (direction * length));
-                    _colours.Add(new Color(tint.r, tint.g, tint.b, 0.05f * ConeOpacity));
+                    _colours.Add(new Color(tint.r, tint.g, tint.b, 0.05f * opacity));
                     if (i > 0)
                     {
                         _triangles.Add(first);

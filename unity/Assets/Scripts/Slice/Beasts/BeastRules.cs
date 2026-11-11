@@ -50,8 +50,8 @@ namespace GameDev.Slice.Beasts
         [SerializeField] private Values glowingWolf = new Values();
         [SerializeField] private Values glowingBoar = new Values();
 
-        [Tooltip("10.2: a territory about 30 m across, so 15 m from its centre (m).")]
-        [SerializeField] private float territoryRadius = 15f;
+        [Tooltip("10.2: a territory 25 m round its den since the owner's play test of S5a, 15 m before (m, authoring default).")]
+        [SerializeField] private float territoryRadius = 25f;
 
         [Tooltip("10.2: it warns twice, a tick each, before it attacks.")]
         [SerializeField] private int warnings = 2;

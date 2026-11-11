@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using GameDev.Confront.Grid;
 using GameDev.Core.Localization;
 using GameDev.Locomotion;
 using GameDev.Slice.Fights;
+using GameDev.Slice.Kit;
 using GameDev.Slice.Stealth;
 using GameDev.World.Seed;
 using GameDev.World.State;
@@ -14,13 +16,16 @@ using Random = System.Random;
 namespace GameDev.Slice.Beasts
 {
     /// <summary>
-    /// The beasts' territories in free movement (10.2 *Beasts of the slice*, S3b.2). Each pack, or a boar alone, holds a
-    /// territory. A character not in Stealth Mode who comes inside is noticed; one in Stealth Mode only when a beast's
-    /// Notice Meter fills, by 10.3 §3 with the beast's own Perception. Having noticed it, the pack warns at once and at the
-    /// next tick, and attacks at the tick after, or at once when the character comes within 3 cells; leaving the territory
-    /// ends the warning. After the fight a fallen beast's carcass lies where it fell, a broken pack's wolves run and are
-    /// gone for the run, and the rest go back to rest. The seed makes two or three beasts glow, each alone: a glowing
-    /// wolf's pack shuns it and is gone.
+    /// The beasts' territories in free movement (10.2 *Beasts of the slice*, S3b.2; the owner's play test of S5a). Each
+    /// pack, or a boar alone, holds a territory 25 m round its den and wanders in it, the pack together, to a place the
+    /// seed picks every 8–20 s. Each beast's Vision Cone shows near the character. A character not in Stealth Mode is
+    /// noticed when it comes into a cone inside the territory; one in Stealth Mode only when a beast's Notice Meter fills,
+    /// by 10.3 §3 with the beast's own Perception. Having noticed it, the pack warns at once and at the next tick, and
+    /// attacks at the tick after, or at once when the character comes within 3 cells; leaving the territory ends the
+    /// warning. An attack starts the fight when the character is within 10 cells; farther, the pack runs at it until it
+    /// is, and gives up and goes home when the character leaves its territory. After the fight a fallen beast's
+    /// carcass lies where it fell, a broken pack's wolves run and are gone for the run, and the rest go back to rest. The
+    /// seed makes two or three beasts glow, each alone: a glowing wolf's pack shuns it and is gone.
     /// </summary>
     public sealed class SliceBeasts : MonoBehaviour
     {
@@ -31,6 +36,23 @@ namespace GameDev.Slice.Beasts
         private const float WalkHome = 1.4f;     // m/s
         private const float FleeSpeed = 6f;      // m/s
         private const float FleeDistance = 45f;  // m away from the character before it is gone
+
+        /// <summary>10.2 (owner, 2026-11-11): an attack starts the fight when the character is within this many cells.</summary>
+        public const float FightCells = 10f;
+
+        /// <summary>Authoring default, 10.2: a chasing beast's run, m/s; a sprinting character outruns it.</summary>
+        public const float ChaseSpeed = 6f;
+
+        /// <summary>Authoring defaults, 10.2: a pack sets out to a new place in its territory every 8 to 20 s.</summary>
+        public const float WanderLeast = 8f;
+
+        public const float WanderMost = 20f;
+
+        private const float MaxSlope = 25f;      // a wander's place: ground the beast stands on (SliceBeastsSetup's)
+        private const float BodyRadius = 0.5f;
+
+        // A pack's places round its leader on a wander, east and north, as round its den (SliceBeastsSetup).
+        private static readonly Vector3[] Around = { Vector3.zero, new Vector3(2.5f, 0f, -1.5f), new Vector3(-1.5f, 0f, -2.5f) };
 
         private readonly List<SliceBeast> _beasts = new List<SliceBeast>();
         private readonly SortedDictionary<int, Pack> _packs = new SortedDictionary<int, Pack>();
@@ -83,6 +105,12 @@ namespace GameDev.Slice.Beasts
 
         public bool HasNoticed(int pack) => _packs.TryGetValue(pack, out var p) && p.Noticed;
 
+        /// <summary>Whether the pack runs at the character, having decided to attack it from beyond 10 cells.</summary>
+        public bool IsChasing(int pack) => _packs.TryGetValue(pack, out var p) && p.Chasing;
+
+        /// <summary>Seconds until the pack sets out on its next wander.</summary>
+        public float WanderIn(int pack) => _packs.TryGetValue(pack, out var p) ? p.WanderIn : 0f;
+
         /// <summary>The beast's Vision Cone and Notice Meter.</summary>
         public StealthObserver EyesOf(SliceBeast beast) => _eyes.TryGetValue(beast, out var o) ? o : null;
 
@@ -122,11 +150,157 @@ namespace GameDev.Slice.Beasts
                 return;
             }
 
+            var feet = _player.transform.position;
             foreach (var pack in _packs.Values)
             {
-                Look(pack, _player.transform.position, Time.deltaTime);
+                if (pack.Chasing)
+                {
+                    Chase(pack, feet);
+                    continue;
+                }
+
+                Look(pack, feet, Time.deltaTime);
+                Roam(pack, Time.deltaTime);
             }
         }
+
+        /// <summary>A pack at rest that has noticed nobody sets out on a wander when its time comes.</summary>
+        private void Roam(Pack pack, float seconds)
+        {
+            if (pack.Noticed || pack.Attacking)
+            {
+                return;
+            }
+
+            pack.WanderIn -= seconds;
+            if (pack.WanderIn <= 0f)
+            {
+                Wander(pack.Number);
+            }
+        }
+
+        /// <summary>
+        /// 10.2: the pack walks together to a place in its territory, 25 m round its den, that the seed picks, a place its
+        /// leader can stand on above the water; its next wander comes 8–20 s later. False when it stays.
+        /// </summary>
+        public bool Wander(int number)
+        {
+            if (!_packs.TryGetValue(number, out var pack) || pack.Attacking || pack.Chasing || !pack.Present(out var first))
+            {
+                return false;
+            }
+
+            var rng = _seed != null ? _seed.Fork(SliceSeedStreams.BeastWander, pack.Number, pack.Wanders) : new Random(pack.Number * 7919 + pack.Wanders);
+            pack.Wanders++;
+            pack.WanderIn = WanderLeast + ((float)rng.NextDouble() * (WanderMost - WanderLeast));
+            for (var tries = 0; tries < 6; tries++)
+            {
+                var angle = rng.NextDouble() * Math.PI * 2d;
+                var reach = _rules.TerritoryRadius * Math.Sqrt(rng.NextDouble());
+                var place = first.Home + new Vector3((float)(Math.Cos(angle) * reach), 0f, (float)(Math.Sin(angle) * reach));
+                if (!Standable(ref place))
+                {
+                    continue;
+                }
+
+                var k = 0;
+                foreach (var b in pack.Members)
+                {
+                    if (b.isActiveAndEnabled && b.State == BeastState.Resting)
+                    {
+                        b.Go(place + Around[k % Around.Length], WalkHome, false);
+                        k++;
+                    }
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>Ground a beast can stand on: under 25°, clear of trunks and rocks, and above the water.</summary>
+        private static bool Standable(ref Vector3 place)
+        {
+            var ground = ~LayerMask.GetMask(KitLayers.Character, KitLayers.NoGrid);
+            if (!Physics.Raycast(place + (Vector3.up * 40f), Vector3.down, out var hit, 80f, ground, QueryTriggerInteraction.Ignore)
+                || Vector3.Angle(hit.normal, Vector3.up) > MaxSlope
+                || hit.point.y < CombatGridReader.SeaLevel + 0.3f
+                || Physics.CheckCapsule(hit.point + (Vector3.up * 0.85f), hit.point + (Vector3.up * 1.2f), BodyRadius, ground, QueryTriggerInteraction.Ignore))
+            {
+                return false;
+            }
+
+            place = hit.point;
+            return true;
+        }
+
+        /// <summary>
+        /// 10.2: a pack that decided to attack from beyond 10 cells runs at the character; within 10 cells the fight
+        /// begins, and when the character leaves its territory it gives up and goes home, as 10.2 has it.
+        /// </summary>
+        private void Chase(Pack pack, Vector3 feet)
+        {
+            if (!pack.Present(out var first))
+            {
+                pack.Chasing = false;
+                return;
+            }
+
+            if (!Inside(first, feet))
+            {
+                GiveUp(pack);
+                return;
+            }
+
+            if (Nearest(pack, feet) <= FightCells)
+            {
+                pack.Chasing = false;
+                Attack(pack);
+                return;
+            }
+
+            foreach (var b in pack.Members)
+            {
+                if (b.isActiveAndEnabled && b.State == BeastState.Resting)
+                {
+                    b.Go(feet, ChaseSpeed, false);
+                }
+            }
+        }
+
+        private void GiveUp(Pack pack)
+        {
+            pack.Chasing = false;
+            pack.Noticed = false;
+            pack.Warnings = 0;
+            foreach (var b in pack.Members)
+            {
+                if (b.isActiveAndEnabled && b.State == BeastState.Resting)
+                {
+                    b.Go(b.Spot, WalkHome, false);
+                }
+
+                EyesOf(b)?.Meter?.Reset();
+            }
+        }
+
+        /// <summary>The distance from the character to the pack's nearest beast at rest, m on the ground.</summary>
+        private static float Nearest(Pack pack, Vector3 feet)
+        {
+            var nearest = float.MaxValue;
+            foreach (var b in pack.Members)
+            {
+                if (b.isActiveAndEnabled && b.State == BeastState.Resting)
+                {
+                    nearest = Mathf.Min(nearest, Flat(b.transform.position - feet).magnitude);
+                }
+            }
+
+            return nearest;
+        }
+
+        private static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
 
         /// <summary>One frame of a pack's watch over its territory.</summary>
         private void Look(Pack pack, Vector3 feet, float seconds)
@@ -158,7 +332,11 @@ namespace GameDev.Slice.Beasts
 
                 if (!_hiding.Active)
                 {
-                    noticer ??= o; // a character walking upright in a territory is noticed (S3b.2 working reading)
+                    // A character walking upright is noticed when it comes into a cone (10.2, the play test of S5a).
+                    if (_hiding.Sees(o, feet, false))
+                    {
+                        noticer ??= o;
+                    }
                 }
                 else if (_hiding.Sees(o, feet, true))
                 {
@@ -176,6 +354,11 @@ namespace GameDev.Slice.Beasts
             if (!pack.Noticed && noticer != null)
             {
                 pack.Noticed = true;
+                foreach (var b in pack.Members)
+                {
+                    b.Stop(); // off its wander, to face the character
+                }
+
                 if (_hiding.Active)
                 {
                     _hiding.NoticedBy(noticer, Line(first));
@@ -215,7 +398,7 @@ namespace GameDev.Slice.Beasts
 
             foreach (var pack in _packs.Values)
             {
-                if (!pack.Noticed || pack.Attacking || !pack.Present(out var first) || !Inside(first, _player.transform.position))
+                if (!pack.Noticed || pack.Attacking || pack.Chasing || !pack.Present(out var first) || !Inside(first, _player.transform.position))
                 {
                     continue;
                 }
@@ -250,6 +433,13 @@ namespace GameDev.Slice.Beasts
 
         private void Attack(Pack pack)
         {
+            // 10.2: the fight begins within 10 cells; farther, the pack runs at the character first.
+            if (_player != null && Nearest(pack, _player.transform.position) > FightCells)
+            {
+                pack.Chasing = true;
+                return;
+            }
+
             _fighting.Clear();
             foreach (var b in pack.Members)
             {
@@ -285,11 +475,13 @@ namespace GameDev.Slice.Beasts
                 {
                     b.Die(false);
                     _state?.Set(DeadKey(b), 1);
+                    Blind(b);
                 }
                 else if (c.Departure == GameDev.Confront.Turns.Departure.Fled)
                 {
                     b.State = BeastState.Gone;
                     _state?.Set(GoneKey(b), 1);
+                    Blind(b);
                     var away = b.transform.position - from;
                     away.y = 0f;
                     away = away.sqrMagnitude > 1e-4f ? away.normalized : b.transform.forward;
@@ -307,6 +499,7 @@ namespace GameDev.Slice.Beasts
                 if (pack.Attacking)
                 {
                     pack.Attacking = false;
+                    pack.Chasing = false;
                     pack.Noticed = false;
                     pack.Warnings = 0;
                     foreach (var b in pack.Members)
@@ -347,6 +540,9 @@ namespace GameDev.Slice.Beasts
                 if (!_packs.TryGetValue(b.Pack, out var pack))
                 {
                     _packs[b.Pack] = pack = new Pack(b.Pack);
+
+                    // Its first wander after the least wait, spread by the pack's number so the woods do not move at once.
+                    pack.WanderIn = WanderLeast + ((b.Pack * 2.3f) % (WanderMost - WanderLeast));
                 }
 
                 pack.Members.Add(b);
@@ -410,10 +606,21 @@ namespace GameDev.Slice.Beasts
             }
 
             eyes.Managed = true;
+            eyes.ConeAlwaysShown = true;
+            eyes.enabled = true;
             eyes.Perception = _rules.Of(b.Kind, glowing).perception;
             eyes.EyeHeight = _rules.EyesOf(b.Kind);
             eyes.Bind(_hiding.Rules);
             _eyes[b] = eyes;
+        }
+
+        /// <summary>A fallen or fleeing beast notices no more, and its cone goes.</summary>
+        private void Blind(SliceBeast b)
+        {
+            if (EyesOf(b) is StealthObserver eyes)
+            {
+                eyes.enabled = false;
+            }
         }
 
         public static string DeadKey(SliceBeast b) => $"beast.{b.Id}.dead";
@@ -456,6 +663,12 @@ namespace GameDev.Slice.Beasts
             public int Warnings { get; set; }
 
             public bool Attacking { get; set; }
+
+            public bool Chasing { get; set; }
+
+            public float WanderIn { get; set; }
+
+            public int Wanders { get; set; }
 
             /// <summary>Whether a member stands in the scene, alive and at rest, the first of them given.</summary>
             public bool Present(out SliceBeast first)

@@ -32,9 +32,75 @@ namespace GameDev.Slice.EditorTools
             new Vector2(150, 300), new Vector2(260, 560), new Vector2(120, 800), new Vector2(520, 860),
         };
 
-        /// <summary>The beast territories (§2 of the implementation plan): about 30 m across and at least 60 m apart.</summary>
-        private static readonly (int Px, int Py)[] WolfTerritories = { (200, 150), (420, 80), (600, 90), (90, 330), (200, 700), (450, 900) };
-        private static readonly (int Px, int Py)[] BoarTerritories = { (330, 300), (100, 600), (300, 880), (620, 800) };
+        /// <summary>
+        /// The beast territories (§2 of the implementation plan): 25 m round each den since the owner's play test of S5a,
+        /// and at least 98 m apart. Ten wolf packs and seven boars since then, the last four and three added (authoring
+        /// defaults; six and four before).
+        /// </summary>
+        /// <summary>A territory zone's side in the editor, m: 25 m round its den (BeastRules).</summary>
+        private const float TerritorySize = 50f;
+
+        internal static readonly (int Px, int Py)[] WolfTerritories =
+        {
+            (200, 150), (420, 80), (600, 90), (90, 330), (200, 700), (450, 900),
+            (320, 200), (520, 200), (300, 640), (90, 900),
+        };
+
+        internal static readonly (int Px, int Py)[] BoarTerritories =
+        {
+            (330, 300), (100, 600), (300, 880), (620, 800),
+            (240, 260), (480, 760), (330, 760),
+        };
+
+        /// <summary>
+        /// Once, in the owner's Veilmouth, without building the city again: the territories the play test of S5a added
+        /// join Beast Territories, every territory's zone shows its 25 m, and the beasts are placed again in all of them,
+        /// those before at the same places (SliceBeastsSetup.Populate).
+        /// </summary>
+        [MenuItem("GameDev/Slice/Beasts: Add the Play Test's Territories to Veilmouth (once)")]
+        public static void AddBeastTerritories()
+        {
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, UnityEditor.SceneManagement.OpenSceneMode.Single);
+            var root = scene.GetRootGameObjects().FirstOrDefault(g => g.name == RootName);
+            var territories = root != null ? root.transform.Find(SliceBeastsSetup.TerritoriesName) : null;
+            if (territories == null)
+            {
+                Debug.LogError("[VeilmouthCity] Veilmouth has no beast territories.");
+                return;
+            }
+
+            _terrain = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Terrain>()).Single();
+            var added = 0;
+            void Add(string name, int px, int py)
+            {
+                if (territories.Find(name) == null)
+                {
+                    Territory(territories, name, px, py);
+                    added++;
+                }
+            }
+
+            for (var i = 0; i < WolfTerritories.Length; i++)
+            {
+                Add($"Wolf Territory {i + 1}", WolfTerritories[i].Px, WolfTerritories[i].Py);
+            }
+
+            for (var i = 0; i < BoarTerritories.Length; i++)
+            {
+                Add($"Boar Territory {i + 1}", BoarTerritories[i].Px, BoarTerritories[i].Py);
+            }
+
+            foreach (var zone in territories.GetComponentsInChildren<LayoutZone>())
+            {
+                zone.Configure(new Vector3(TerritorySize, 6f, TerritorySize), new Color(0.6f, 0.35f, 0.15f, 0.9f));
+                EditorUtility.SetDirty(zone);
+            }
+
+            var placed = SliceBeastsSetup.Populate(root.transform);
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+            Debug.Log($"[VeilmouthCity] {added} territories added; {placed} beasts stand in {territories.childCount} territories.");
+        }
 
         /// <summary>
         /// Gloomwood's cover (§28.9): one chance of a tree in each 6 m cell, taken most often in the belt along the forest's

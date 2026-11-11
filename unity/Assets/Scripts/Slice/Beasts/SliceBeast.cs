@@ -190,7 +190,9 @@ namespace GameDev.Slice.Beasts
 
         private void Update()
         {
-            if (!_going || _dead)
+            // A paused world holds a beast mid-stride, as it holds the townsfolk.
+            var clock = GameDev.World.Timekeeping.GameClockDriver.Running;
+            if (!_going || _dead || (clock != null && clock.IsPaused))
             {
                 return;
             }

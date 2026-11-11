@@ -53,7 +53,7 @@ C0, accepted by the owner as the agent drafted it, 2026-11-04. After the play te
 | Forest | north and west, around the fields and the city: trees and herbs; wolves deeper in, boars at its edge |
 | Hill | north-east, across the river: the ore, so a trip for ore crosses the bridge |
 | Road | from the Ridge north through the forest to the edge of the area |
-| Beasts | 6 wolf packs deeper in the forest and 4 boars at the forest edge and in the fields, in territories about 30 m across, at least 60 m apart ([11](../../../11%20Vertical%20Slice.md)) |
+| Beasts | 6 wolf packs deeper in the forest and 4 boars at the forest edge and in the fields, in territories about 30 m across, at least 60 m apart ([11](../../../11%20Vertical%20Slice.md)); since the owner's play test of S5a, 10 wolf packs and 7 boars in territories about 50 m across, centres at least 98 m apart |
 | Resource nodes | about 40 trees in the forest, 12 ore veins on the hill, 30 herb patches in forest glades, 10 flax patches in the fields ([11](../../../11%20Vertical%20Slice.md)) |
 
 **Districts.**
@@ -1138,10 +1138,10 @@ Tests: EditMode `TheftTests` (10.3's three examples of the width, an Alert targe
 | 3. "Interrupted, you moved" stays | A step or E ends gathering with no note; only the bag and a fight leave one (done, 7bb599ef) |
 | 4. Herbs float | The herb and flax set 0.18 m into the ground by their measured leaf edges, the 17 kept heights with them (done, 7bb599ef) |
 | 5. An unseen wall by Edda Brann's stall | Every market stall's body is made of its own meshes, not its bounding box (done, 7bb599ef) |
-| 1, 2. The bar for every use, theft paused | PT1: `ReactionCheck` gives the zone and the marker's pace by Δ with 07.1 §8a's bounds; theft only in Stealth Mode, the clock paused while its bar shows |
-| 2, 6. Gathering and crafting by the bar | PT2: each gathering cycle is a bar, a bad one wearing the tool 3 and a good one 1, a broken tool kept in the bag; Item Creation at the anvil in the Master's yard, its ticks then the bar, a failure losing half of each resource |
-| 9. Stamina | PT3: the HUD's Stamina bar under HP, the sprint spending it, recovery over real time and 2.5 s after it runs out; gathering and crafting spending it |
-| 7. An empty city | PT4: about 45 walkers across the districts, each sometimes stopping a few seconds at a turn of its route |
+| 1, 2. The bar for every use, theft paused | PT1: `ReactionCheck` gives the zone and the marker's pace by Δ with 07.1 §8a's bounds; theft only in Stealth Mode, the clock paused while its bar shows (done, 23001517) |
+| 2, 6. Gathering and crafting by the bar | PT2: each gathering cycle is a bar, a bad one wearing the tool 3 and a good one 1, a broken tool kept in the bag; Item Creation at the anvil in the Master's yard, its ticks then the bar, a failure losing half of each resource (done, 23001517) |
+| 9. Stamina | PT3: the HUD's Stamina bar under HP, the sprint spending it, recovery over real time and 2.5 s after it runs out; gathering and crafting spending it (done, 2fedc533) |
+| 7. An empty city | PT4: 46 walkers across the districts, 26 of them new, each stopping 4–12 s at a third of its turns, the seed of its route deciding which (done, bb11f5ae) |
 | 8. Beasts | PT5: ten wolf packs and seven boars, wandering in their 25 m territories, their cones shown near the player, and the fight within 10 cells |
 
 ### S5b — Arcana, Alchemy, progression, Sanity

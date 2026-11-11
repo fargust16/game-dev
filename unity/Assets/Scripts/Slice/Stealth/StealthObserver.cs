@@ -50,6 +50,12 @@ namespace GameDev.Slice.Stealth
         /// <summary>The height of its eyes for the cone's sight, in metres; 0 for a person's (<see cref="StealthRules.EyeHeight"/>).</summary>
         public float EyeHeight { get; set; }
 
+        /// <summary>
+        /// Its Vision Cone shows near the character in and out of Stealth Mode, as a beast's does (10.2, the owner's play
+        /// test of S5a); a person's shows only in Stealth Mode, by 10.3 §4's disclosure.
+        /// </summary>
+        public bool ConeAlwaysShown { get; set; }
+
         /// <summary>The line it says over its head when it notices the character, and until when it shows.</summary>
         public string Line { get; private set; }
 
