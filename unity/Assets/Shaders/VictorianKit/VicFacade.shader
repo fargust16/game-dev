@@ -17,6 +17,7 @@ Shader "GameDev/VictorianKit/Facade"
         _DirtColor("Dirt", Color) = (0.35, 0.32, 0.28, 1)
         _DirtAmount("Dirt amount", Range(0, 1.5)) = 0.3
         _DirtHeight("Dirt height above plinth (m)", Float) = 2.5
+        _Streaks("Soot streaks on walls (x dirt amount)", Range(0, 2)) = 1
         _MossColor("Moss", Color) = (0.2, 0.26, 0.1, 1)
         _MossAmount("Moss amount", Range(0, 1)) = 0.1
         _NoiseScale("World noise scale (1/m)", Float) = 0.35

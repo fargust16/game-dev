@@ -1,6 +1,7 @@
 // The Victorian Kit's facade surface (Plans/VICTORIAN_STREETS_PLAN.md §4.2): one tiling set per slot, a tint and a
 // second tint through the mask's G, roughness from the mask's R, cavity from its B, and world-space dirt from the
-// height above the 0.60 m plinth, broken up by large noise, with moss on up-facing surfaces. Every material property
+// height above the 0.60 m plinth, broken up by large noise, soot streaks running down the walls, and moss on up-facing
+// surfaces (reference plan R3 step 2). Every material property
 // is in UnityPerMaterial, so the SRP Batcher keeps one batch; variants are material assets, never property blocks.
 #ifndef VIC_FACADE_INPUT_INCLUDED
 #define VIC_FACADE_INPUT_INCLUDED
@@ -22,6 +23,7 @@ half _Cutoff;
 half4 _DirtColor;
 half _DirtAmount;
 half _DirtHeight;
+half _Streaks;
 half4 _MossColor;
 half _MossAmount;
 half _NoiseScale;
@@ -123,6 +125,19 @@ void VicSurfaceAt(float2 uv, float3 positionWS, half3 normalWS, out VicSurface s
     albedo = lerp(albedo, albedo * _DirtColor.rgb * 2.0, dirt);
     rough = lerp(rough, max(rough, 0.9), dirt * 0.5);
 
+    // Soot washed down the walls by rain (reference plan R3 step 2, "no wall reads clean"): noise stretched about
+    // ten to one down the wall, streaks about 0.6 m wide and 4-6 m long, on upright faces only, patchy from house to
+    // house by the large noise, and as strong as the material's dirt. A streak is a film of soot over the face, so it
+    // greys the material toward a dark soot, flattening the brick's joints, rather than only darkening it. Sizes are
+    // authoring defaults, in metres.
+    half wall = saturate(1.0h - abs(normalWS.y) * 3.0h);
+    float3 sp = float3(positionWS.x * 1.7, positionWS.y * 0.18, positionWS.z * 1.7);
+    float s1 = VicValue3(sp) * 0.8 + VicValue3(sp * 2.3 + 5.0) * 0.2;
+    half streak = saturate(saturate((s1 - 0.54) * 9.0) * wall * saturate(0.45 + n) * _DirtAmount * _Streaks);
+    half3 soot = _DirtColor.rgb * 0.45h * (0.85h + 0.3h * (half)n2);
+    albedo = lerp(albedo, soot, streak * 0.75h);
+    rough = lerp(rough, max(rough, 0.85), streak * 0.5);
+
     half up = saturate((normalWS.y - 0.35) / 0.45);
     half low = saturate(1.0 - above / 0.6) * (1.0 - up);
     half moss = saturate((n2 - (1.0 - _MossAmount)) * 4.0) * saturate(max(up, low * 0.7));
@@ -132,7 +147,7 @@ void VicSurfaceAt(float2 uv, float3 positionWS, half3 normalWS, out VicSurface s
 
     s.albedo = albedo;
     s.normalTS = normalTS;
-    s.metallic = _Metallic * (1.0 - moss) * (1.0 - dirt * 0.5);
+    s.metallic = _Metallic * (1.0 - moss) * (1.0 - max(dirt, streak) * 0.5);
     s.smoothness = 1.0 - rough;
     s.occlusion = lerp(1.0h, mask.b, 0.8h);
 }
