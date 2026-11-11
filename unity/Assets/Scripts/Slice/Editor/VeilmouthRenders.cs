@@ -168,6 +168,8 @@ namespace GameDev.Slice.EditorTools
             Eye(label + "_lighthouse", 150f, -60f, 245f, -25f, 3f);
             Eye(label + "_grandadnear", 22f, 56f, 40f, 60f, 1.7f);
             Eye(label + "_millstreet", 36f, -100f, 47f, -131f, 2f);
+            Eye(label + "_cemetery", -74f, 162f, -28f, 161f, 2f); // Last Turning Cemetery from its gate
+            Eye(label + "_graves", -50f, 173f, -46f, 149f, 1.7f);
             Debug.Log($"Veilmouth dress views written to {OutputFolder}.");
         }
 

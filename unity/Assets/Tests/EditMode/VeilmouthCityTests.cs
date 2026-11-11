@@ -245,6 +245,32 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// §40: Last Turning Cemetery's stones stand in its graves' cells, which keep their kit roots, blocks and colliders,
+        /// so the layout and the Combat Grid read them as before; three graves keep the pack's tomb.
+        /// </summary>
+        [Test]
+        public void TheCemeterysStonesStandInItsGraves()
+        {
+            var city = _scene.GetRootGameObjects().Single(g => g.name == VeilmouthCity.RootName).transform;
+            var graves = city.GetComponentsInChildren<Transform>(true).Where(t => t.name.StartsWith("Kit_Chapel_Grave")).ToList();
+            Assert.Greater(graves.Count, 20, "the cemetery's graves in rows");
+            Assert.IsTrue(graves.All(g => g.GetComponent<BoxCollider>() != null && g.GetComponent<KitBlock>() != null), "every grave keeps its collider and block");
+            Assert.AreEqual(3, graves.Count(g => g.Find("Model").gameObject.activeSelf), "three graves keep the pack's tomb");
+            var stones = city.Find("Last Turning's stones");
+            Assert.IsNotNull(stones, "the cemetery's stones");
+            var bounds = stones.GetComponentsInChildren<MeshRenderer>().Select(r => r.bounds).ToList();
+            Assert.Greater(bounds.Count, 0, "the stones are drawn");
+            var all = bounds.Aggregate((a, b) => { a.Encapsulate(b); return a; });
+            foreach (var g in graves.Where(g => !g.Find("Model").gameObject.activeSelf))
+            {
+                var cell = g.TransformPoint(g.GetComponent<BoxCollider>().center);
+                Assert.IsTrue(all.Contains(new Vector3(cell.x, all.center.y, cell.z)), $"{g.name} at {cell} has its stone");
+            }
+
+            Assert.LessOrEqual(all.max.y - graves.Max(g => g.position.y), 2.6f, "no stone stands over the wanted list's 2.5 m by much");
+        }
+
+        /// <summary>
         /// §37–§38: the One-Eye's lantern and Stone Grandad's burn with the gas lamps, and the clock's dials glow with
         /// them, in their own glass or stucco by day, but none is a street lamp, so they add nothing to the Darkness of
         /// 10.3 §3.

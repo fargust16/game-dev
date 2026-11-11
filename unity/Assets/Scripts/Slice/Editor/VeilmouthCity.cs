@@ -281,6 +281,7 @@ namespace GameDev.Slice.EditorTools
                       $"Passages (R5): {_passages} left between houses, {_openSpans} spans with no house, {Slots()} gaps under {PassageWidth} m in a row. " +
                       $"Back doors: {_backDoorsOpen} open, {_backDoorsBlind} walled up. Railing posts: {_postsAdded} added at free ends, {_postsHidden} hidden at walls; {_railingsDrawnOut} railing ends drawn out to a wall (§31).");
             TowersDressOf(_root); // §38: the clock faces and the lighthouse's lantern
+            GravesDressOf(_root); // §40: Last Turning Cemetery's stones
             var sky = scene.GetRootGameObjects().FirstOrDefault(g => g.name == VeilmouthMystic.RootName);
             if (sky != null)
             {
