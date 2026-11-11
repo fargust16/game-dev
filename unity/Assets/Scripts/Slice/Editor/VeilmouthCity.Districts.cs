@@ -595,18 +595,16 @@ namespace GameDev.Slice.EditorTools
             {
                 var (px, py) = WolfTerritories[i];
                 Territory(territories, $"Wolf Territory {i + 1}", px, py);
-                foreach (var (dx, dy, yaw) in new[] { (0f, 0f, 30f), (2.5f, 1.5f, 80f), (-1.5f, 2.5f, 200f) })
-                {
-                    Beast(VeilmouthDressing.WolfPath, 1.6f, px + dx, py + dy, yaw, $"Wolf {i + 1} (dragon stand-in)");
-                }
             }
 
             for (var i = 0; i < BoarTerritories.Length; i++)
             {
                 var (px, py) = BoarTerritories[i];
                 Territory(territories, $"Boar Territory {i + 1}", px, py);
-                Beast(VeilmouthDressing.BoarPath, 1.5f, px, py, 45f * i, $"Boar {i + 1} (dragon stand-in)");
             }
+
+            // S3b.2: the wolves and boars of the territories, as SliceBeastsSetup places them in the owner's scene.
+            SliceBeastsSetup.Populate(_root);
 
             // The veins at the foot of the north, west and south edges, which rise from 45 m in (VeilmouthGround), never
             // in the West Road's pass, 30 m apart at least.

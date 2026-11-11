@@ -41,6 +41,10 @@ namespace GameDev.Slice
         [Tooltip("10.3's numbers: Stealth Mode, the Vision Cone and the Notice Meter.")]
         [SerializeField] private StealthRules stealthRules;
 
+        [Header("Beasts (S3b.2)")]
+        [Tooltip("10.2's beasts: their values, territory, warnings, glow, and what they leave.")]
+        [SerializeField] private GameDev.Slice.Beasts.BeastRules beastRules;
+
         [Header("The player's turn (S3a.5)")]
         [Tooltip("Basic RPG Cursors (asset map §5), one for each FightCursor shape in its order: plain, walk, strike, a walk the AP do not reach, a blow they do not reach. SliceConfrontSetup imports them as cursors.")]
         [SerializeField] private Texture2D[] fightCursors;
@@ -54,6 +58,8 @@ namespace GameDev.Slice
         public FightRules FightRules => fightRules;
 
         public StealthRules StealthRules => stealthRules;
+
+        public GameDev.Slice.Beasts.BeastRules BeastRules => beastRules;
 
         public FightWeapon KitSword => kitSword;
 

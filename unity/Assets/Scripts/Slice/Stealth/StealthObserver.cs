@@ -44,6 +44,12 @@ namespace GameDev.Slice.Stealth
 
         public NoticeMeter Meter { get; private set; }
 
+        /// <summary>Its meter is filled and acted on by another host, as a beast's by <c>SliceBeasts</c> (S3b.2).</summary>
+        public bool Managed { get; set; }
+
+        /// <summary>The height of its eyes for the cone's sight, in metres; 0 for a person's (<see cref="StealthRules.EyeHeight"/>).</summary>
+        public float EyeHeight { get; set; }
+
         /// <summary>The line it says over its head when it notices the character, and until when it shows.</summary>
         public string Line { get; private set; }
 

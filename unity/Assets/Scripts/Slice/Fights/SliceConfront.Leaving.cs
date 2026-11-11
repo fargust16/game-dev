@@ -130,6 +130,8 @@ namespace GameDev.Slice.Fights
             {
                 Departure.BrokeAway => "ui.fight.log.brokeaway",
                 Departure.Spared => "ui.fight.log.spared",
+                Departure.Fled => "ui.fight.log.fled",
+                Departure.Withdrew => "ui.fight.log.withdrew",
                 _ => "ui.fight.log.yield",
             };
             _hud.Line(Loc.Format(key, Name(c)));

@@ -1804,17 +1804,6 @@ namespace GameDev.Slice.EditorTools
             SlicePeopleModels.Instantiate(name, female, colour, _people, World(px, py, Ground(px, py)), yaw);
         }
 
-        private static void Beast(string path, float length, float px, float py, float yaw, string name)
-        {
-            var go = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path), _people);
-            go.name = name;
-            go.transform.SetPositionAndRotation(World(px, py, Ground(px, py)), Quaternion.Euler(0f, yaw, 0f));
-            var size = VeilmouthDressing.Seen(go).size;
-            go.transform.localScale = Vector3.one * (length / Mathf.Max(size.x, size.z));
-            VeilmouthDressing.Stand(go, 0f);
-            SliceCharacterLook.Fix(go);
-        }
-
         private static void Territory(Transform parent, string name, float px, float py)
         {
             var go = new GameObject(name);

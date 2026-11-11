@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d1f3b8a2e4c4a9f8b7e0c5d3a1f9e26, type: 3}
+  m_Name: BeastRules
+  m_EditorClassIdentifier:
+  wolf:
+    strength: 4
+    endurance: 3
+    dexterity: 6
+    perception: 5
+    meleeSkill: 4
+    weapon: {fileID: 11400000, guid: fdd6bc03a6db4d82b3405e3aafcacfe9, type: 2}
+    armour: {fileID: 11400000, guid: 128da626b6004a62a07c6d7e231313ed, type: 2}
+    hpAdded: 0
+    nameKey: ui.fight.wolf
+    leather: 1
+    ingredients: 1
+    magical: 0
+  boar:
+    strength: 8
+    endurance: 8
+    dexterity: 2
+    perception: 2
+    meleeSkill: 4
+    weapon: {fileID: 11400000, guid: 683fb9b881e240318726dd6549987eaf, type: 2}
+    armour: {fileID: 11400000, guid: bfd423816b6b4f5393bed763be69e498, type: 2}
+    hpAdded: 0
+    nameKey: ui.fight.boar
+    leather: 2
+    ingredients: 1
+    magical: 0
+  glowingWolf:
+    strength: 9
+    endurance: 8
+    dexterity: 11
+    perception: 10
+    meleeSkill: 9
+    weapon: {fileID: 11400000, guid: 53b1387851f946a6ba575896c02ea01e, type: 2}
+    armour: {fileID: 11400000, guid: 128da626b6004a62a07c6d7e231313ed, type: 2}
+    hpAdded: 1
+    nameKey: ui.fight.glowingwolf
+    leather: 1
+    ingredients: 1
+    magical: 1
+  glowingBoar:
+    strength: 10
+    endurance: 10
+    dexterity: 4
+    perception: 4
+    meleeSkill: 6
+    weapon: {fileID: 11400000, guid: 683fb9b881e240318726dd6549987eaf, type: 2}
+    armour: {fileID: 11400000, guid: bfd423816b6b4f5393bed763be69e498, type: 2}
+    hpAdded: 0.25
+    nameKey: ui.fight.glowingboar
+    leather: 2
+    ingredients: 1
+    magical: 1
+  territoryRadius: 15
+  warnings: 2
+  attackCells: 3
+  glowingLeast: 2
+  glowingMost: 3
+  wolfEyes: 0.7
+  boarEyes: 0.6
+  glow: {r: 0.55, g: 0.95, b: 0.85, a: 1}
+  glowLight: 2.5
+  glowRange: 7
+  glowEmission: 1.2

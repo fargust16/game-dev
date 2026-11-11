@@ -148,7 +148,7 @@ namespace GameDev.Slice.Stealth
         /// <summary>Whether the observer has the character in its cone and in sight.</summary>
         public bool Sees(StealthObserver o, Vector3 feet, bool crouching)
         {
-            var eye = o.transform.position + (Vector3.up * _rules.EyeHeight);
+            var eye = o.transform.position + (Vector3.up * (o.EyeHeight > 0f ? o.EyeHeight : _rules.EyeHeight));
             var head = feet + (Vector3.up * (crouching ? _rules.CrouchHeight : StandingHeight));
             return _rules.InCone(o.transform.position, o.transform.forward, feet, 1f) && !Blocked(eye, head, o.transform, _player.transform);
         }
@@ -200,6 +200,11 @@ namespace GameDev.Slice.Stealth
 
         private void Look(StealthObserver o, Vector3 feet, float seconds)
         {
+            if (o.Managed)
+            {
+                return; // a beast's watch is its host's (S3b.2)
+            }
+
             if (o.Meter == null)
             {
                 o.Bind(_rules);
@@ -225,11 +230,13 @@ namespace GameDev.Slice.Stealth
             o.Behave(feet, seconds);
         }
 
-        private void Notice(StealthObserver o)
+        private void Notice(StealthObserver o) => NoticedBy(o, Loc.Get($"ui.stealth.noticed.{1 + (Stable(o.name) % Lines)}"));
+
+        /// <summary>An observer noticed the character in Stealth Mode: it says its line, and the character stands up.</summary>
+        public void NoticedBy(StealthObserver o, string line)
         {
             LastNoticer = o;
-            var line = 1 + (Stable(o.name) % Lines);
-            o.Say(Loc.Get($"ui.stealth.noticed.{line}"), LineSeconds);
+            o.Say(line, LineSeconds);
             SetActive(false);
             Noticed?.Invoke(o);
         }

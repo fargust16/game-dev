@@ -52,6 +52,9 @@ namespace GameDev.Slice.Fights
         /// <summary>Raised as a blow lands, with the attacker's body, the target's and what it did, for the fight's log.</summary>
         public event Action<Beat> Landed;
 
+        /// <summary>Raised as a beat begins, a walk or a blow, for bodies that play their own clips (S3b.2's beasts).</summary>
+        public event Action<Beat> Started;
+
         public void Clear()
         {
             _beats.Clear();
@@ -120,6 +123,7 @@ namespace GameDev.Slice.Fights
 
         private void Begin(Beat beat)
         {
+            Started?.Invoke(beat);
             var animator = beat.Body != null ? _animated(beat.Body) : null;
             if (animator == null)
             {

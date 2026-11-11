@@ -61,6 +61,9 @@ namespace GameDev.Slice
         /// <summary>Stealth in free movement (S3b.1); a fight takes it over while it lasts.</summary>
         public SliceStealth Hiding { get; private set; }
 
+        /// <summary>The beasts' territories outside the walls (S3b.2).</summary>
+        public GameDev.Slice.Beasts.SliceBeasts Beasts { get; private set; }
+
         /// <summary>The Deeds Record, Attitude and lies (10.4 §4–5).</summary>
         public SocialStanding Standing { get; private set; }
 
@@ -192,6 +195,12 @@ namespace GameDev.Slice
                 if (Fights != null)
                 {
                     Fights.Hiding = Hiding;
+                }
+
+                if (settings.BeastRules != null)
+                {
+                    Beasts = gameObject.AddComponent<GameDev.Slice.Beasts.SliceBeasts>();
+                    Beasts.Configure(settings.BeastRules, Hiding, Fights, Clock, State, seed);
                 }
             }
             _talk = new DialogueContext

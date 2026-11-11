@@ -158,6 +158,7 @@ namespace GameDev.Slice.Fights
             _view = CombatGridView.Create(transform, settings.GridMaterial);
             _beats = new FightBeats(Animated, Place);
             _beats.Landed += OnLanded;
+            _beats.Started += OnBeatStarted;
             _outline = new Material(settings.GridMaterial) { name = "Fight Outlines" };
             _outline.SetColor("_BaseColor", OutlineColour);
             _camera = FightCamera.Create(transform, _outline);
@@ -390,7 +391,7 @@ namespace GameDev.Slice.Fights
             foreach (var pair in _bodies)
             {
                 // A fallen body with no death clip lies down; one with a clip plays it (FightBeats).
-                if (pair.Key.Fighter.Down && pair.Value != null && pair.Value != playerBody && Animated(pair.Value) == null
+                if (pair.Key.Fighter.Down && pair.Value != null && pair.Value != playerBody && Animated(pair.Value) == null && !IsBeast(pair.Value)
                     && Vector3.Dot(pair.Value.up, Vector3.up) > 0.5f)
                 {
                     pair.Value.rotation = Quaternion.LookRotation(Vector3.up, pair.Value.forward);
@@ -472,7 +473,7 @@ namespace GameDev.Slice.Fights
             foreach (var fighter in SliceFighter.All)
             {
                 var c = fighter.Combatant;
-                if (c != null && c.State != CombatantState.Fighting && !c.Fighter.Down && _grid.TryCellAt(fighter.transform.position, out _))
+                if (c != null && c.State != CombatantState.Fighting && !c.Fighter.Down && c.Departure == Departure.None && _grid.TryCellAt(fighter.transform.position, out _))
                 {
                     c.Position = fighter.transform.position;
                     _bodies[c] = fighter.transform;
@@ -524,6 +525,7 @@ namespace GameDev.Slice.Fights
             }
 
             AfterFight(_yieldedTo);
+            BeastsAfterFight();
             Hiding?.SetActive(_playerCombatant != null && _playerCombatant.Hidden && !_died);
             _animated.Clear();
             foreach (var opponent in _developmentOpponents)
@@ -604,6 +606,7 @@ namespace GameDev.Slice.Fights
             var attacker = beat.AttackerKey as Combatant;
             var target = beat.TargetKey as Combatant;
             _hud.Log(attacker, target, beat.Result);
+            BeastStruck(beat);
             BlowShown?.Invoke(attacker, target, beat.Result);
         }
 
