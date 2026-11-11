@@ -268,6 +268,9 @@ namespace GameDev.Slice.Tests
             }
 
             Assert.LessOrEqual(all.max.y - graves.Max(g => g.position.y), 2.6f, "no stone stands over the wanted list's 2.5 m by much");
+            var walls = city.GetComponentsInChildren<Transform>(true).Where(t => t.name.StartsWith("Kit_Chapel_Wall")).ToList();
+            Assert.Greater(walls.Count, 0, "the cemetery's wall panels");
+            Assert.IsTrue(walls.All(w => w.GetComponent<BoxCollider>() != null && !w.Find("Model").gameObject.activeSelf), "every wall panel keeps its collider, in stone in place of the pack's panel");
         }
 
         /// <summary>

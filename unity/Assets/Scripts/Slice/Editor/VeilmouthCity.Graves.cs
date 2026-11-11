@@ -22,6 +22,10 @@ namespace GameDev.Slice.EditorTools
         private static readonly string[] GraveStones = { "VIC_Stone_Dirty", "VIC_Stone_Medium", "VIC_Stone_Light" };
         private const int KeptTombs = 3;
 
+        // The cemetery wall's panels (the Colonial pack's) and the stone wall's thickness that stands in their place.
+        private const string GraveWallPrefab = "Kit_Chapel_Wall";
+        private const float GraveWallThick = 0.3f;
+
         // The plot's kerb: its inner size, its stone's width and height above the grass; and how deep every stone is sunk.
         private const float PlotWidth = 0.8f, PlotLength = 1.8f, PlotKerb = 0.09f, PlotKerbHeight = 0.12f, Sunk = 0.12f;
 
@@ -86,9 +90,42 @@ namespace GameDev.Slice.EditorTools
                 kinds[Gravestone(stones, grave, cell, terrain)]++;
             }
 
+            // The cemetery's walls: the pack's pale panels, which read as concrete, switched off; in their place a wall of
+            // the dirty stone with a light coping, and a pier with a cap at each panel's start. Each panel keeps its root,
+            // block and collider.
+            var walls = root.GetComponentsInChildren<Transform>(true)
+                .Where(t => t.name.StartsWith(GraveWallPrefab) && t.GetComponent<BoxCollider>() != null && t.Find("Model") != null).ToList();
+            foreach (var wall in walls)
+            {
+                var model = wall.Find("Model").gameObject;
+                model.SetActive(false);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(model);
+                GraveWallStones(stones, wall);
+            }
+
             stones.Finish(GraveStones[0]);
             Debug.Log($"[VeilmouthCity] the cemetery's stones: {graves.Count} graves, {KeptTombs} tombs kept, " +
-                      $"{kinds[0]} round-headed and {kinds[1]} pointed headstones, {kinds[2]} crosses, {kinds[3]} obelisks.");
+                      $"{kinds[0]} round-headed and {kinds[1]} pointed headstones, {kinds[2]} crosses, {kinds[3]} obelisks; {walls.Count} wall panels in stone.");
+        }
+
+        /// <summary>One panel of the cemetery's wall in stone, along its collider, with a pier at its start.</summary>
+        private static void GraveWallStones(Works stones, Transform wall)
+        {
+            var box = wall.GetComponent<BoxCollider>();
+            var along = wall.right;
+            along.y = 0f;
+            along.Normalize();
+            // LookRotation's right is up x forward, so a forward of along x up puts the frame's x along the wall.
+            var m = Matrix4x4.TRS(new Vector3(wall.position.x, wall.position.y - Sunk, wall.position.z), Quaternion.LookRotation(Vector3.Cross(along, Vector3.up)), Vector3.one);
+            var length = box.size.x * wall.lossyScale.x;
+            var start = wall.TransformPoint(box.center - new Vector3(box.size.x / 2f, 0f, 0f));
+            var u0 = Vector3.Dot(start - wall.position, along);
+            var high = (box.size.y * wall.lossyScale.y) + Sunk;
+            // In the frame m, x runs along the wall from the root, y up, z across it.
+            Block(stones, m, new Vector3(u0 + (length / 2f), high / 2f, 0f), new Vector3(length, high, GraveWallThick), GraveStones[0]);
+            Block(stones, m, new Vector3(u0 + (length / 2f), high + 0.05f, 0f), new Vector3(length, 0.1f, GraveWallThick + 0.1f), GraveStones[2]);
+            Block(stones, m, new Vector3(u0 + 0.22f, (high + 0.3f) / 2f, 0f), new Vector3(0.44f, high + 0.3f, 0.44f), GraveStones[0]);
+            Block(stones, m, new Vector3(u0 + 0.22f, high + 0.36f, 0f), new Vector3(0.54f, 0.12f, 0.54f), GraveStones[2]);
         }
 
         /// <summary>One grave's stone in its cell at <paramref name="cell"/>; returns its kind (0 round, 1 pointed, 2 cross, 3 obelisk).</summary>
