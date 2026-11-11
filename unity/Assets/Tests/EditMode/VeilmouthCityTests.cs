@@ -207,32 +207,34 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
-        /// §37–§38: the One-Eye's lantern and Stone Grandad's burn with the gas lamps, their panes glowing at night and in
-        /// their own glass by day, but neither is a street lamp, so they add nothing to the Darkness of 10.3 §3.
+        /// §37–§38: the One-Eye's lantern and Stone Grandad's burn with the gas lamps, and the clock's dials glow with
+        /// them, in their own glass or stucco by day, but none is a street lamp, so they add nothing to the Darkness of
+        /// 10.3 §3.
         /// </summary>
         [Test]
         public void TheBeaconsBurnWithTheLampsButLightNoStreet()
         {
             var sky = All<GameDev.Slice.Atmosphere.VeilmouthSky>().Single();
-            CollectionAssert.AreEquivalent(new[] { "The One-Eye's beacon", "Stone Grandad's lantern" }, sky.Beacons.Select(b => b.Light.name));
+            CollectionAssert.AreEquivalent(new[] { "The One-Eye's beacon", "Stone Grandad's lantern" }, sky.Beacons.Where(b => b.Light != null).Select(b => b.Light.name));
+            Assert.AreEqual("VIC_Stucco_Cream", sky.Beacons.Single(b => b.Light == null).Renderer.name, "the clock's dials glow with no light");
             foreach (var beacon in sky.Beacons)
             {
-                Assert.IsNotNull(beacon.Renderer, $"{beacon.Light.name}'s panes swap their glass");
+                Assert.IsNotNull(beacon.Renderer, $"{beacon.Renderer}'s panes swap their glass");
                 Assert.IsNotNull(beacon.Unlit);
-                Assert.IsFalse(sky.StreetLamps.Any(l => l.Light == beacon.Light), $"{beacon.Light.name} is not a street lamp");
+                Assert.IsFalse(beacon.Light != null && sky.StreetLamps.Any(l => l.Light == beacon.Light), $"{beacon.Light} is not a street lamp");
             }
 
             sky.Apply(23 * 60);
             foreach (var beacon in sky.Beacons)
             {
-                Assert.IsTrue(beacon.Light.enabled, $"{beacon.Light.name} lit at night");
+                Assert.IsTrue(beacon.Light == null || beacon.Light.enabled, $"{beacon.Light} lit at night");
                 Assert.AreEqual("Veilmouth_Gaslight", beacon.Renderer.sharedMaterials[beacon.Slot].name);
             }
 
             sky.Apply(12 * 60);
             foreach (var beacon in sky.Beacons)
             {
-                Assert.IsFalse(beacon.Light.enabled, $"{beacon.Light.name} out by day");
+                Assert.IsTrue(beacon.Light == null || !beacon.Light.enabled, $"{beacon.Light} out by day");
                 Assert.AreEqual(beacon.Unlit.name, beacon.Renderer.sharedMaterials[beacon.Slot].name);
             }
         }

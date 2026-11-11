@@ -145,6 +145,7 @@ namespace GameDev.Slice.EditorTools
                     Eye(label + "_lenten", 40f, 30f, 40f, -60f, 4f);
                     Eye(label + "_grandad", 8f, 60f, 40f, 60f, 2f); // §37: Stone Grandad's lantern over the Penny
                     Eye(label + "_grandadnear", 22f, 56f, 40f, 60f, 1.7f);
+                    Eye(label + "_clock", 30f, 40f, -4f, 92f, 4f); // §38: the clock's dials glow with the lamps
                 }
                 finally
                 {

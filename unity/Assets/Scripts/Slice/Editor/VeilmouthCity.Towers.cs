@@ -13,7 +13,8 @@ namespace GameDev.Slice.EditorTools
     /// cap). The kit's white towers stay as they are, with their colliders:
     /// <list type="bullet">
     /// <item>the clock tower gets a clock face on each of its four sides in its top storey: a stone ring, a cream dial,
-    /// twelve hour marks and two iron hands at ten past ten;</item>
+    /// twelve hour marks and two iron hands at ten past ten. At night the dials glow with the gas lamps' glass, as the
+    /// wanted list asks, with no light of their own;</item>
     /// <item>the One-Eye, the lighthouse at the end of its pier, gets a lantern over its roof: a drum, a gallery, eight
     /// panes of dark glass between iron posts, an iron dome and a finial. At night the lantern burns with the gas lamps:
     /// a teal light in it and its panes glowing, but it is no street lamp and lights no street (10.3 §3's Darkness).</item>
@@ -160,7 +161,8 @@ namespace GameDev.Slice.EditorTools
 
         /// <summary>
         /// The beacons the sky lights and puts out with its lamps: the One-Eye's light and Stone Grandad's lantern (§37),
-        /// each with its panes, which swap between their own glass and the gas lamps' glowing glass.
+        /// each with its panes, which swap between their own glass and the gas lamps' glowing glass; and the clock's
+        /// dials, which glow the same way with no light.
         /// </summary>
         internal static VeilmouthSky.Lamp[] Beacons()
         {
@@ -178,6 +180,18 @@ namespace GameDev.Slice.EditorTools
                     }
 
                     beacons.Add(new VeilmouthSky.Lamp { Light = light, Renderer = renderer, Slot = renderer != null ? 0 : -1, Unlit = unlit });
+                }
+            }
+
+            var face = AssetDatabase.LoadAssetAtPath<Material>($"{GameDev.VictorianKit.EditorTools.VicKitPaths.MaterialFolder}/{DialFace}.mat");
+            foreach (var dress in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None).Where(t => t.name == TowersDressName))
+            {
+                var dials = dress.Find(DialFace);
+                var renderer = dials != null ? dials.GetComponent<MeshRenderer>() : null;
+                if (renderer != null)
+                {
+                    GameObjectUtility.SetStaticEditorFlags(renderer.gameObject, 0);
+                    beacons.Add(new VeilmouthSky.Lamp { Renderer = renderer, Slot = 0, Unlit = face });
                 }
             }
 
