@@ -45,6 +45,9 @@ namespace GameDev.Player.Progression
 
         /// <summary>19 §6.4: iron veins (S5a.5).</summary>
         Mining,
+
+        /// <summary>19 §6.4: a fallen beast's hide, `(Dexterity + Skinning) / 2` against D 2, after the lesson (S5a.6).</summary>
+        Skinning,
     }
 
     /// <summary>What a check reads of a character.</summary>

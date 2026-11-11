@@ -80,6 +80,9 @@ namespace GameDev.Slice
         /// <summary>Gathering at the nodes outside the walls (S5a.5); null without a bag or the gathering rules.</summary>
         public SliceGathering Gathering { get; private set; }
 
+        /// <summary>What fallen beasts leave (S5a.6): their ingredients, and their hides by Skinning; null without a bag or the beasts.</summary>
+        public GameDev.Slice.Beasts.SliceRemains Remains { get; private set; }
+
         /// <summary>11's start: plain clothes with no defence and 500 bronze, with no weapon or tool.</summary>
         public const int StartingBronze = 500;
 
@@ -290,6 +293,12 @@ namespace GameDev.Slice
                 FindNodes();
             }
 
+            if (Bag != null && Beasts != null && settings.ActionChecks != null)
+            {
+                Remains = new GameDev.Slice.Beasts.SliceRemains(settings.BeastRules, Bag, State, Clock, Character, settings.ActionChecks, seed);
+                FindCarcasses();
+            }
+
             _talk = new DialogueContext
             {
                 State = State,
@@ -463,6 +472,31 @@ namespace GameDev.Slice
             if (Gathering != null)
             {
                 FindNodes();
+            }
+
+            if (Remains != null)
+            {
+                FindCarcasses();
+            }
+        }
+
+        /// <summary>Remains on each beast in the loaded scenes, to take from once it has fallen (S5a.6).</summary>
+        private void FindCarcasses()
+        {
+            var added = false;
+            foreach (var beast in FindObjectsByType<GameDev.Slice.Beasts.SliceBeast>(FindObjectsInactive.Exclude))
+            {
+                if (beast.GetComponent<GameDev.Slice.Beasts.BeastRemains>() == null)
+                {
+                    beast.gameObject.AddComponent<GameDev.Slice.Beasts.BeastRemains>().Configure(Remains, () => Fights != null && Fights.InFight);
+                    added = true;
+                }
+            }
+
+            var hud = Hud();
+            if (added && hud != null)
+            {
+                hud.FindPromptSources();
             }
         }
 

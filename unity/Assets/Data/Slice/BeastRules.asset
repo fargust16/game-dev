@@ -25,6 +25,7 @@ MonoBehaviour:
     leather: 1
     ingredients: 1
     magical: 0
+    ingredient: wolf_fang
   boar:
     strength: 8
     endurance: 8
@@ -38,6 +39,7 @@ MonoBehaviour:
     leather: 2
     ingredients: 1
     magical: 0
+    ingredient: boar_tusk
   glowingWolf:
     strength: 9
     endurance: 8
@@ -51,6 +53,7 @@ MonoBehaviour:
     leather: 1
     ingredients: 1
     magical: 1
+    ingredient: wolf_fang
   glowingBoar:
     strength: 10
     endurance: 10
@@ -64,6 +67,7 @@ MonoBehaviour:
     leather: 2
     ingredients: 1
     magical: 1
+    ingredient: boar_tusk
   territoryRadius: 15
   warnings: 2
   attackCells: 3
@@ -75,3 +79,7 @@ MonoBehaviour:
   glowLight: 1.6
   glowRange: 7
   glowEmission: 0.06
+  magicalItem: glow_essence_8
+  hideItem: leather
+  skinningTicks: 3
+  skinningDifficulty: 2

@@ -36,10 +36,13 @@ namespace GameDev.Slice.Beasts
             [Tooltip("Its name in a fight, a string-table key.")]
             public string nameKey;
 
-            [Tooltip("19 §3, 11 C3: leather by Skinning (which needs a lesson), the ordinary ingredient, and a glowing beast's magical one. Taking them waits for S5a's inventory.")]
+            [Tooltip("19 §6.4, 11 C3: leather by Skinning (which needs a lesson), the ordinary ingredient, and a glowing beast's magical one (S5a.6).")]
             public int leather;
             public int ingredients;
             public int magical;
+
+            [Tooltip("The ordinary ingredient's item id: the wolf's fang, the boar's tusk.")]
+            public string ingredient;
         }
 
         [SerializeField] private Values wolf = new Values();
@@ -70,6 +73,16 @@ namespace GameDev.Slice.Beasts
         [SerializeField] private float glowRange = 7f;
         [SerializeField] private float glowEmission = 0.06f;
 
+        [Tooltip("19 §3, §6.3: a glowing beast's magical ingredient, the stage 8 rare ingredient, by item id.")]
+        [SerializeField] private string magicalItem = "glow_essence_8";
+
+        [Tooltip("19 §6.4: what Skinning gives, by item id.")]
+        [SerializeField] private string hideItem = "leather";
+
+        [Tooltip("19 §6.4: Skinning takes 3 ticks and is checked against D 2.")]
+        [SerializeField] private int skinningTicks = 3;
+        [SerializeField] private int skinningDifficulty = 2;
+
         public float TerritoryRadius => territoryRadius;
 
         public int Warnings => warnings;
@@ -87,6 +100,14 @@ namespace GameDev.Slice.Beasts
         public float GlowRange => glowRange;
 
         public float GlowEmission => glowEmission;
+
+        public string MagicalItem => magicalItem;
+
+        public string HideItem => hideItem;
+
+        public int SkinningTicks => skinningTicks;
+
+        public int SkinningDifficulty => skinningDifficulty;
 
         public float EyesOf(BeastKind kind) => kind == BeastKind.Wolf ? wolfEyes : boarEyes;
 

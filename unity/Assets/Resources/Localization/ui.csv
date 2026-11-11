@@ -259,3 +259,14 @@ ui.gather.stop.bag,Stopped for the bag.,Прервано: открыта сум�
 ui.gather.stop.beast,Stopped: a beast has noticed you.,Прервано: вас заметил зверь.
 ui.gather.stop.fight,Stopped by a fight.,Прервано боем.
 ui.gather.stop.player,Stopped.,Остановлено.
+"# A fallen beast's remains (S5a.6; 19 §6.4, 11 C3)"
+ui.prompt.remains.parts,E  Take its parts,E  Забрать трофеи
+ui.prompt.remains.skin,E  Skin it ({0} ticks),E  Снять шкуру ({0} тика)
+ui.remains.taken,Taken: {0}.,Взято: {0}.
+ui.remains.skinned,Skinned: {0} leather.,Шкура снята: кожи {0}.
+ui.remains.spoiled,The hide was spoiled: {0} leather.,Шкура испорчена: кожи {0}.
+ui.remains.interrupted,Skinning interrupted; the hide is still on.,Свежевание прервано; шкура осталась на туше.
+ui.remains.fault.taken,Its parts are already taken.,Трофеи уже забраны.
+ui.remains.fault.skinned,Its hide is already off.,Шкура уже снята.
+ui.remains.fault.lesson,Skinning needs a lesson from Edda Brann.,Свежевать учит Эдда Бранн.
+ui.remains.fault.heavy,The bag can carry no more.,Больше не унести.

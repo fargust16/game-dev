@@ -7,8 +7,12 @@ using GameDev.Items;
 using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Slice.Beasts;
+using GameDev.Slice.Gathering;
+using GameDev.Slice.Kit;
+using GameDev.Slice.Shops;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.TestTools;
 
 namespace GameDev.Slice.Tests
@@ -16,7 +20,8 @@ namespace GameDev.Slice.Tests
     /// <summary>
     /// S3b.2 in play, in Veilmouth's wolf territories: the beasts stand in their territories, two or three of them glow,
     /// each alone; a character walking into a pack's territory is noticed, warned twice, a tick each, and then attacked;
-    /// the pack breaks when its first wolf falls, the rest running and gone for the run, and the carcass stays.
+    /// the pack breaks when its first wolf falls, the rest running and gone for the run, and the carcass stays. E at the
+    /// carcass takes its fang with no lesson, and its hide only after the Skinning lesson (S5a.6).
     /// </summary>
     public sealed class BeastPlayTests : SliceInputTestBase
     {
@@ -137,6 +142,59 @@ namespace GameDev.Slice.Tests
 
             Assert.IsFalse(wolves.Any(w => w.State == BeastState.Gone && w.gameObject.activeInHierarchy), "they run off and do not come back");
             Assert.IsFalse(fights.Turns.IsRunning);
+
+            // S5a.6: the carcass gives its fang to anyone, and its hide only after the lesson.
+            var carcass = dead[0];
+            var remains = carcass.GetComponent<BeastRemains>();
+            Assert.IsNotNull(remains, "the driver made every beast's remains");
+            Assert.IsTrue(Beside(carcass.transform.position, out var by), "room beside the carcass, away from every node");
+            player.Teleport(by, Quaternion.LookRotation(Flat(carcass.transform.position - by)));
+            yield return new WaitForSeconds(0.3f);
+            Assert.AreEqual(Loc.Get("ui.prompt.remains.parts"), remains.PromptFor(player.transform.position));
+            var fangs = world.Bag.Count("wolf_fang");
+            yield return Tap(Key.E);
+            Assert.AreEqual(fangs + 1, world.Bag.Count("wolf_fang"), "E takes its fang, with no lesson");
+            Assert.IsTrue(world.Remains.PartsTaken(carcass.Id));
+            yield return new WaitForSeconds(BeastRemains.NoteSeconds + 0.2f);
+            Assert.AreEqual(Loc.Get("ui.remains.fault.lesson"), remains.PromptFor(player.transform.position), "the hide waits for the lesson");
+            yield return Tap(Key.E);
+            Assert.IsFalse(world.Remains.Skinned(carcass.Id), "no skinning without it");
+
+            world.State.Set(SliceShops.LessonKey(SliceRemains.Lesson), 1);
+            yield return new WaitForSeconds(BeastRemains.NoteSeconds + 0.2f);
+            Assert.AreEqual(Loc.Format("ui.prompt.remains.skin", 3), remains.PromptFor(player.transform.position));
+            var tick = world.Clock.Tick;
+            var leather = world.Bag.Count("leather");
+            yield return Tap(Key.E);
+            Assert.IsTrue(world.Remains.Skinned(carcass.Id), "E skins it once the lesson is learned");
+            Assert.GreaterOrEqual(world.Clock.Tick - tick, 3L, "in 3 ticks");
+            Assert.That(world.Bag.Count("leather") - leather, Is.InRange(0, 1), "a wolf's leather, or none on a failure");
+        }
+
+        /// <summary>A place on the ground 1.2 m from the carcass with room for the character and no gathering node in reach.</summary>
+        private static bool Beside(Vector3 carcass, out Vector3 at)
+        {
+            var nodes = Object.FindObjectsByType<GatherNode>(FindObjectsInactive.Exclude);
+            var things = ~LayerMask.GetMask(KitLayers.Ground, KitLayers.Character);
+            for (var k = 0; k < 16; k++)
+            {
+                var probe = carcass + (Quaternion.Euler(0f, k * 22.5f, 0f) * Vector3.forward * 1.2f);
+                if (!Physics.Raycast(probe + (Vector3.up * 10f), Vector3.down, out var hit, 30f, ~LayerMask.GetMask("Character", "NoGrid"), QueryTriggerInteraction.Ignore))
+                {
+                    continue;
+                }
+
+                var point = hit.point;
+                if (Vector3.Angle(hit.normal, Vector3.up) < 30f && !nodes.Any(n => n.Shown && n.InReach(point))
+                    && !Physics.CheckCapsule(point + (Vector3.up * 0.45f), point + (Vector3.up * 1.6f), 0.3f, things, QueryTriggerInteraction.Ignore))
+                {
+                    at = point + (Vector3.up * 0.05f);
+                    return true;
+                }
+            }
+
+            at = default;
+            return false;
         }
 
         /// <summary>A free place on the ground 9 m from the den, more than 3 m from every wolf.</summary>
