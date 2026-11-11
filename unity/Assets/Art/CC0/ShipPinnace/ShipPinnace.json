@@ -1,0 +1,80 @@
+{
+ "name": "ShipPinnace",
+ "asset": "Ship Pinnace",
+ "source": "ship_pinnace.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 179027,
+ "triangles": 119999,
+ "size_m": [
+  9.607,
+  39.789,
+  32.575
+ ],
+ "texture": 1024,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "ShipPinnace_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.294,
+   "base": "ShipPinnace_0_base.png",
+   "normal": "ShipPinnace_0_normal.png",
+   "metal": "ShipPinnace_0_metal.png"
+  },
+  {
+   "material": "ShipPinnace_1",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 1.0,
+   "base": "ShipPinnace_1_base.png",
+   "normal": "ShipPinnace_1_normal.png",
+   "metal": "ShipPinnace_1_metal.png"
+  },
+  {
+   "material": "ShipPinnace_2",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 1.0,
+   "base": "ShipPinnace_2_base.png",
+   "normal": "ShipPinnace_2_normal.png",
+   "metal": "ShipPinnace_2_metal.png"
+  },
+  {
+   "material": "ShipPinnace_3",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 1.0,
+   "base": "ShipPinnace_3_base.png",
+   "normal": "ShipPinnace_3_normal.png",
+   "metal": "ShipPinnace_3_metal.png"
+  },
+  {
+   "material": "ShipPinnace_4",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 1.0,
+   "base": "ShipPinnace_4_base.png",
+   "normal": "ShipPinnace_4_normal.png",
+   "metal": "ShipPinnace_4_metal.png"
+  },
+  {
+   "material": "ShipPinnace_5",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 1.0,
+   "base": "ShipPinnace_5_base.png",
+   "normal": "ShipPinnace_5_normal.png",
+   "metal": "ShipPinnace_5_metal.png"
+  },
+  {
+   "material": "ShipPinnace_6",
+   "alpha_cut": true,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 1.0,
+   "base": "ShipPinnace_6_base.png",
+   "normal": "ShipPinnace_6_normal.png",
+   "metal": "ShipPinnace_6_metal.png"
+  }
+ ]
+}

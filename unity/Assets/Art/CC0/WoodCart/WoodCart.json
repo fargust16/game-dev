@@ -1,0 +1,26 @@
+{
+ "name": "WoodCart",
+ "asset": "Wood Cart",
+ "source": "wood-cart-1758862.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 19770,
+ "triangles": 8000,
+ "size_m": [
+  5.199,
+  1.711,
+  1.535
+ ],
+ "texture": 1024,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "WoodCart_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.003,
+   "smoothness_mean": 0.499,
+   "base": "WoodCart_0_base.png",
+   "normal": "WoodCart_0_normal.png",
+   "metal": "WoodCart_0_metal.png"
+  }
+ ]
+}

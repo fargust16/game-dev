@@ -1,0 +1,53 @@
+{
+ "name": "AnvilBlock",
+ "asset": "Anvil Wooden Block",
+ "source": "Charge_Assets_Tools.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 15096,
+ "triangles": 5999,
+ "size_m": [
+  0.503,
+  0.573,
+  0.789
+ ],
+ "texture": 1024,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "AnvilBlock_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.298,
+   "smoothness_mean": 0.664,
+   "base": "AnvilBlock_0_base.png",
+   "normal": "AnvilBlock_0_normal.png",
+   "metal": "AnvilBlock_0_metal.png"
+  },
+  {
+   "material": "AnvilBlock_1",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.418,
+   "base": "AnvilBlock_1_base.png",
+   "normal": "AnvilBlock_1_normal.png",
+   "metal": "AnvilBlock_1_metal.png"
+  },
+  {
+   "material": "AnvilBlock_2",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.538,
+   "base": "AnvilBlock_2_base.png",
+   "normal": "AnvilBlock_2_normal.png",
+   "metal": "AnvilBlock_2_metal.png"
+  },
+  {
+   "material": "AnvilBlock_3",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.501,
+   "base": "AnvilBlock_3_base.png",
+   "normal": "AnvilBlock_3_normal.png",
+   "metal": "AnvilBlock_3_metal.png"
+  }
+ ]
+}

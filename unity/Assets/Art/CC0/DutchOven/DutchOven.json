@@ -1,0 +1,26 @@
+{
+ "name": "DutchOven",
+ "asset": "Cast Iron Dutch Oven",
+ "source": "cast-iron-dutch-oven-2061570.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 1990,
+ "triangles": 1990,
+ "size_m": [
+  0.318,
+  0.318,
+  0.2
+ ],
+ "texture": 512,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "DutchOven_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.674,
+   "base": "DutchOven_0_base.png",
+   "normal": "DutchOven_0_normal.png",
+   "metal": "DutchOven_0_metal.png"
+  }
+ ]
+}

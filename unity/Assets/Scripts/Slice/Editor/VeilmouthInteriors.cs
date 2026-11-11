@@ -826,6 +826,7 @@ namespace GameDev.Slice.EditorTools
             Hang("ViPicture1", N, 18, 15, 1.6f);
             _floorY = 0f;
             SootAndBellTripo();
+            SootAndBellCc0();
         }
 
         // ------------------------------------------------------------------------------------------------ Tripo
@@ -845,6 +846,43 @@ namespace GameDev.Slice.EditorTools
             Put("TrFireTools", 0, 9);
             Put("TrLogHolder", 0, 18); // the kitchen hearth
             Radiators("Stair hall", "Let room", "Let room 2"); // the taproom and the kitchen have their hearths (rules §10.1)
+        }
+
+        // The CC0 pieces (2026-11-11; SLICE_ASSET_MAP.md §4b, furnishing rules §12), called as the Tripo ones are, by Furnish
+        // for a rebuild and by EnrichWithTripo for the saved scenes.
+
+        private static void SootAndBellCc0()
+        {
+            // A game of chess laid out on the saloon's round table by the sofa: the table in that cell becomes ViTableChess.
+            var probe = Put("ViTableRound", 3, 7);
+            var cell = probe.transform.position;
+            Object.DestroyImmediate(probe);
+            foreach (var table in Instances("ViTableRound").Where(g => (g.transform.position - cell).sqrMagnitude < 0.01f))
+            {
+                Object.DestroyImmediate(table);
+            }
+
+            Put("ViTableChess", 3, 7);
+            // The public bar's plainness (SLICE_MODELS_WANTED, the pub, C), on the first walled segment of the back wall that
+            // holds no picture (3 and 15 do).
+            HangOnWall("Dartboard", S, 12, 1.45f, 9, 12, 6, 0);
+        }
+
+        private static void CellarCc0()
+        {
+            // Sacks and a stepladder in the store, four plates of melted candles round the circle, about 4.5 m out, and damp
+            // running down the brick from the street above.
+            // The side vaults are 9 m deep and the circle vault 12 m (PlanFor).
+            Put("SacksSmall", 24, 1); // clear of the stair's doorway at (0, 0)
+            Put("StepLadder", 28, 8); // the east vault's far corner; its legs spread past its cell, 0.13 m into a wall at 29
+            foreach (var (x, z) in new[] { (19, 5), (14, 1), (10, 6), (15, 10) })
+            {
+                Put("CandlePlate", x, z);
+            }
+
+            HangOnWall("DampStain", N, 0, 1.2f, 12, 9, 15);
+            HangOnWall("DampStain", S, 9, 1.2f, 3, 6, 0);
+            HangOnWall("DampStain", S, 9, 1.2f, 24, 21, 27);
         }
 
         private static void FactionHouseTripo()
@@ -942,6 +980,10 @@ namespace GameDev.Slice.EditorTools
             {
                 case VeilmouthScene.SootAndBellId:
                     SootAndBellTripo();
+                    SootAndBellCc0();
+                    break;
+                case "soot-stair-cellar":
+                    CellarCc0();
                     break;
                 case "faction-house":
                     FactionHouseTripo();
@@ -974,7 +1016,9 @@ namespace GameDev.Slice.EditorTools
                 case "wardens-lockup":
                     return (new[] { ("ViDesk", "TrDesk") }, new (string, RectInt)[0]);
                 case "soot-stair-cellar":
-                    return (new[] { ("Firewood", "TrLogHolder") }, new (string, RectInt)[0]);
+                    // CellarCc0's pieces are taken out and laid again, so a change of place never leaves the old one.
+                    return (new[] { ("Firewood", "TrLogHolder") },
+                            new[] { ("SacksSmall", anywhere), ("StepLadder", anywhere), ("CandlePlate", anywhere), ("DampStain", anywhere) });
                 default:
                     return (new (string, string)[0], new (string, RectInt)[0]);
             }
@@ -1084,7 +1128,11 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>The keys AddTripo places, so a second run can find what the first added.</summary>
-        private static readonly string[] AddedKeys = { "TrPiano", "TrLogHolder", "TrFireTools", "TrRadiator", "TrBarometer", "TrUmbrellas" };
+        private static readonly string[] AddedKeys =
+        {
+            "TrPiano", "TrLogHolder", "TrFireTools", "TrRadiator", "TrBarometer", "TrUmbrellas",
+            "ViTableChess", "Dartboard", "SacksSmall", "StepLadder", "CandlePlate", "DampStain", // CC0, 2026-11-11
+        };
 
         /// <summary>
         /// The room's lamp list written again from the lights the furniture holds, as BuildOne writes it: every light but a
@@ -1465,6 +1513,7 @@ namespace GameDev.Slice.EditorTools
             Put("Candles", 10, 9);
             Put("Candles", 19, 9);
             VeilmouthDressing.Circle(new Vector3(15f, 0f, 6f), "Candidate 2, the cellar under the Soot Stair");
+            CellarCc0();
         }
 
         private static void Chapel()
@@ -1681,6 +1730,36 @@ namespace GameDev.Slice.EditorTools
             if (facing == S) return Put(key, a, line - e.Depth, turns);
             if (facing == E) return Put(key, line, a, turns);
             return Put(key, line - e.Depth, a, turns);
+        }
+
+        /// <summary>
+        /// Hangs the block on the first of the given 3 m segments of the wall line that has a wall behind it within 0.4 m, so
+        /// a piece never stands in the air over a doorway or a gap; if none has, nothing is hung and it is reported.
+        /// </summary>
+        private static GameObject HangOnWall(string key, Vector2Int facing, int line, float y, params int[] spans)
+        {
+            foreach (var a in spans)
+            {
+                var hung = Hang(key, facing, line, a, y);
+                if (WallBehind(hung))
+                {
+                    return hung;
+                }
+
+                Object.DestroyImmediate(hung);
+            }
+
+            Debug.Log($"[VeilmouthInteriors] {key}: no wall on line {line} at {string.Join(", ", spans)}; not hung.");
+            return null;
+        }
+
+        private static bool WallBehind(GameObject hung)
+        {
+            Physics.SyncTransforms();
+            var seen = hung.GetComponentsInChildren<Renderer>().Select(r => r.bounds).Aggregate((a, b) => { a.Encapsulate(b); return a; });
+            var back = -hung.transform.forward;
+            var from = seen.center - (back * 0.3f);
+            return Physics.Raycast(from, back, 0.7f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
         }
 
         /// <summary>A hung block on the wall line, facing into the room, on the 3 m segment that holds <paramref name="a"/>.</summary>

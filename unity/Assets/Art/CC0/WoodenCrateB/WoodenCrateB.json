@@ -1,0 +1,26 @@
+{
+ "name": "WoodenCrateB",
+ "asset": "Wooden Crate B",
+ "source": "wooden-crate-b-2761658.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 1348,
+ "triangles": 1348,
+ "size_m": [
+  0.99,
+  0.99,
+  0.989
+ ],
+ "texture": 1024,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "WoodenCrateB_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.886,
+   "base": "WoodenCrateB_0_base.png",
+   "normal": "WoodenCrateB_0_normal.png",
+   "metal": "WoodenCrateB_0_metal.png"
+  }
+ ]
+}

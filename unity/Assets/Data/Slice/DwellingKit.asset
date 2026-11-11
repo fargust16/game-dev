@@ -492,7 +492,7 @@ MonoBehaviour:
       y: 0.36
       width: 2.6800003
       height: 1.28
-    height: 1.1310083
+    height: 1.193532
   - key: ViTableBSet
     prefab: {fileID: 599118910614321522, guid: 7b79edccdef147b4ea5cc819399883ae, type: 3}
     width: 2
@@ -836,11 +836,11 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: 0.013714194
-      y: 0.013714194
-      width: 0.97257185
-      height: 0.97257185
-    height: 1.1940454
+      x: 0.0033857226
+      y: 0.003385663
+      width: 0.99322855
+      height: 0.99322855
+    height: 1.1973988
   - key: Crate
     prefab: {fileID: 8139367422513150409, guid: 8252dd84c1b66ec48833d9c2c77ce791, type: 3}
     width: 1
@@ -848,11 +848,11 @@ MonoBehaviour:
     solid: 1
     body:
       serializedVersion: 2
-      x: -0.0147976875
-      y: 0.106039345
-      width: 1.0295954
-      height: 0.7879213
-    height: 0.4967049
+      x: -0.00042581558
+      y: -0.00047171116
+      width: 1.0008518
+      height: 1.0009435
+    height: 0.99999994
   - key: TrBust
     prefab: {fileID: 3682759703917882539, guid: 46cf90e5b37f9b1469414cd9c619e765, type: 3}
     width: 1

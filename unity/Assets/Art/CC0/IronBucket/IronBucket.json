@@ -1,0 +1,26 @@
+{
+ "name": "IronBucket",
+ "asset": "Bucket Metal Distressed",
+ "source": "Charge_Assets_Scrapyard_Metal_Buckets.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 3796,
+ "triangles": 2199,
+ "size_m": [
+  0.166,
+  0.186,
+  0.177
+ ],
+ "texture": 512,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "IronBucket_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.684,
+   "smoothness_mean": 0.333,
+   "base": "IronBucket_0_base.png",
+   "normal": "IronBucket_0_normal.png",
+   "metal": "IronBucket_0_metal.png"
+  }
+ ]
+}

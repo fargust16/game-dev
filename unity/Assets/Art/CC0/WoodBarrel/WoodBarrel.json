@@ -1,0 +1,26 @@
+{
+ "name": "WoodBarrel",
+ "asset": "Wood Barrel",
+ "source": "wood-barrel-1413769.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 6618,
+ "triangles": 3999,
+ "size_m": [
+  0.828,
+  0.828,
+  0.998
+ ],
+ "texture": 1024,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "WoodBarrel_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.06,
+   "smoothness_mean": 0.778,
+   "base": "WoodBarrel_0_base.png",
+   "normal": "WoodBarrel_0_normal.png",
+   "metal": "WoodBarrel_0_metal.png"
+  }
+ ]
+}

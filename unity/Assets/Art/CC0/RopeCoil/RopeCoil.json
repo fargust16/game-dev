@@ -1,0 +1,26 @@
+{
+ "name": "RopeCoil",
+ "asset": "Rope",
+ "source": "rope-1667448.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 3756,
+ "triangles": 3756,
+ "size_m": [
+  0.677,
+  0.627,
+  0.173
+ ],
+ "texture": 1024,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "RopeCoil_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.948,
+   "base": "RopeCoil_0_base.png",
+   "normal": "RopeCoil_0_normal.png",
+   "metal": "RopeCoil_0_metal.png"
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "name": "BurlapSacksA",
+ "asset": "Burlap Sack A",
+ "source": "burlap-sack-a-9694933.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 9468,
+ "triangles": 4996,
+ "size_m": [
+  2.223,
+  1.203,
+  0.858
+ ],
+ "texture": 1024,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "BurlapSacksA_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.492,
+   "base": "BurlapSacksA_0_base.png",
+   "normal": "BurlapSacksA_0_normal.png",
+   "metal": "BurlapSacksA_0_metal.png"
+  }
+ ]
+}

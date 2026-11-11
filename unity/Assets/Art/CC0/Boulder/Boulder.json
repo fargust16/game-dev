@@ -1,0 +1,26 @@
+{
+ "name": "Boulder",
+ "asset": "Boulder 01",
+ "source": "boulder_01.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 66122,
+ "triangles": 4000,
+ "size_m": [
+  1.284,
+  1.832,
+  0.996
+ ],
+ "texture": 1024,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "Boulder_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.188,
+   "base": "Boulder_0_base.png",
+   "normal": "Boulder_0_normal.png",
+   "metal": "Boulder_0_metal.png"
+  }
+ ]
+}

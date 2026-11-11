@@ -1,0 +1,26 @@
+{
+ "name": "SewerCover",
+ "asset": "ManholeCover001",
+ "source": "ambientCG",
+ "license": "CC0-1.0",
+ "triangles_source": 2,
+ "triangles": 2,
+ "size_m": [
+  0.7,
+  0.7,
+  0.0
+ ],
+ "texture": 1024,
+ "bake_device": "none",
+ "materials": [
+  {
+   "material": "SewerCover_0",
+   "alpha_cut": true,
+   "metallic_mean": 0.332,
+   "smoothness_mean": 0.47,
+   "base": "SewerCover_0_base.png",
+   "metal": "SewerCover_0_metal.png",
+   "normal": "SewerCover_0_normal.png"
+  }
+ ]
+}

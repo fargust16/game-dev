@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.11
+Version: 0.12
 
-Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09, 2026-11-10); fireplaces and radiators in §10.1 (owner, 2026-11-10); every piece's size checked in §11 (owner's walk, 2026-11-10)
+Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09, 2026-11-10); fireplaces and radiators in §10.1 (owner, 2026-11-10); every piece's size checked in §11 (owner's walk, 2026-11-10); the CC0 pieces in §12 (2026-11-11)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-11 (§11.1, the owner's play test: the radiator ×1.5 against a plain wall, the Tripo desk 2.3 × 1.15 m at the same top. The earlier note is in the update history)
+Last Updated: 2026-11-11 (§12, the CC0 pieces from the owner's four Blender libraries: a chess table and a dartboard in the Soot & Bell, sacks, a ladder, candle plates and damp in the cellar, food, pots, a watch and spectacles on the Victorian tables, a travelling trunk. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -314,6 +314,23 @@ The owner: radiators ×1.5; a bigger writing desk, a large work desk.
 
 These sizes are authoring defaults, and the measurements are the audit's.
 
+## 12. The CC0 pieces (2026-11-11)
+
+The owner added four CC0 libraries to Blender and gave the agent the choice and the placing ([SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §4b). Indoors they fill gaps from §8 and the wanted list; every place below is an authoring default.
+
+**On pieces already standing.** These are part of the wrapper, so every interior and Dwelling that holds the piece gains them with no new placing:
+
+- `ViKitchenTable` keeps a loaf, an apple, a cast-iron pot and a tea kettle on its top, in place of the Victorian Interiors pot.
+- `ViNightstand` holds a pocket watch, and `ViDesk` a pair of round spectacles, their glass left out.
+- `Chest`, at a bed's foot, is now Poly Haven's iron-bound travelling trunk in place of the medieval chest.
+
+**Placed by the enrichment** (`VeilmouthInteriors.SootAndBellCc0`, `CellarCc0`), into the saved scenes without a rebuild:
+
+- **The Soot & Bell.** The round table by the saloon's sofa becomes `ViTableChess`, the same table with a game of chess laid out. A dartboard hangs on the public bar's back wall, 1.45 m to its middle, on the first segment with a wall behind it and no picture.
+- **The Soot Stair cellar.** A small heap of sacks in the east vault, clear of the stair's doorway, and a step ladder in that vault's far corner. Four plates of melted candles round the circle, about 4.5 m out. Damp stains run down the brick from the street above: on each side vault's far wall and on the circle vault's entry wall. On a rebuild the enrichment takes these pieces out and lays them again, so a changed place leaves no old one.
+
+**A hung piece needs a wall.** `HangOnWall` tries the given 3 m segments in turn and keeps the first with a wall within 0.4 m behind it; with none, nothing is hung and it is reported. One hung over a doorway or a gap would stand in the air.
+
 ## Sources
 
 - CAMRA, *Pub Heritage* records of historic pub interiors, e.g. [pubheritage.camra.org.uk/pubs/141](https://pubheritage.camra.org.uk/pubs/141), [/pubs/240](https://pubheritage.camra.org.uk/pubs/240), [/pubs/582](https://pubheritage.camra.org.uk/pubs/582).
@@ -322,6 +339,7 @@ These sizes are authoring defaults, and the measurements are the audit's.
 
 ## Update history
 
+- 2026-11-11 (v0.12): §12, the CC0 pieces from the owner's four Blender libraries, on the Victorian tables and placed in the Soot & Bell and the cellar; `HangOnWall`.
 - 2026-11-11 (v0.11): §11.1, the owner's play test: the radiator ×1.5 against a plain wall, the Tripo desk larger at the same top; §10, §10.1 changed to match.
 - 2026-11-10 (v0.10): §11, the owner's walk: every piece measured as built against its usual true size, six set to theirs; §10's radiator row and §10.1's sill changed to match.
 - 2026-11-10 (v0.9, later): §10.1 as built: the radiator 5 cm off the wall, the sample Dwellings and the seven's eight radiators.

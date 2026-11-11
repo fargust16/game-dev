@@ -1,0 +1,26 @@
+{
+ "name": "TravelTrunk",
+ "asset": "Treasure Chest",
+ "source": "treasure_chest.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 103330,
+ "triangles": 4000,
+ "size_m": [
+  0.96,
+  0.52,
+  0.618
+ ],
+ "texture": 1024,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "TravelTrunk_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.362,
+   "smoothness_mean": 0.378,
+   "base": "TravelTrunk_0_base.png",
+   "normal": "TravelTrunk_0_normal.png",
+   "metal": "TravelTrunk_0_metal.png"
+  }
+ ]
+}

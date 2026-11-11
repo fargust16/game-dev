@@ -241,6 +241,33 @@ namespace GameDev.Slice.EditorTools
             Planks(!alongX, a1, near0, near1, _ => false);
             Planks(alongX, far, a0, a1, at => Mathf.Abs(at + 1f - doorAlong) < 2f);
 
+            // CC0 (2026-11-11): two bales of hay in the yard's far corner by its side fence, and in one yard of three, by its
+            // plan point, a wagon without its horse along the other side fence (§26.2 10f's hamlet).
+            var hayOut = s < 0 ? far + 1f : far - 2f; // whole metres: a block's pivot is rounded to the grid
+            foreach (var along in new[] { a0 + 1f, a0 + 3f })
+            {
+                if (alongX)
+                {
+                    Prop("HayBale", Facing.N, along, hayOut);
+                }
+                else
+                {
+                    Prop("HayBale", Facing.E, hayOut, along);
+                }
+            }
+
+            if (depth >= 8 && ((((int)px * 31) + (int)py) & 0x7fffffff) % 3 == 0)
+            {
+                if (alongX)
+                {
+                    Prop("WoodCart", Facing.E, a1 - 3f, near0 + 1f);
+                }
+                else
+                {
+                    Prop("WoodCart", Facing.N, near0 + 1f, a1 - 3f);
+                }
+            }
+
             // The bed: 6 m along beyond the yard's side, 4 m out, 2 m from the house's front line.
             var b0 = a1 + 2;
             var b1 = b0 + 6;

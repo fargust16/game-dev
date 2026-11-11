@@ -363,6 +363,7 @@ namespace GameDev.Slice.EditorTools
                 ("Stall_Weapons", Facing.W, -11, -4, "Master of Item Creation"),
                 ("ArmourStand", Facing.W, -10, -6, null),
                 ("Anvil", Facing.W, -10, 6, null),
+                ("QuenchBucket", Facing.W, -10, 5, null), // the slack tub's bucket, north of the anvil: the smith stands east of it
                 ("LeatherFrame", Facing.S, 8, 6, null),
             };
             var placed = pieces.Count(s => Prop(s.Key, s.F, p.cx + s.X, p.cy + s.Y, s.Name) != null);
@@ -374,11 +375,17 @@ namespace GameDev.Slice.EditorTools
             Prop("Chest", Facing.S, puddle.x1 - 4f, puddle.y0 + 3f, "Pawn shop chest");
         }
 
-        /// <summary>Cargo only where the port works (owner, 2026-11-09): on Fishlip Quay before the warehouses, and on Tipsy Pier.</summary>
+        /// <summary>
+        /// Cargo only where the port works (owner, 2026-11-09): on Fishlip Quay before the warehouses, and on Tipsy Pier.
+        /// Each pile has sacks beside it and every other one a handcart, and one wagon stands on the quay lengthwise (CC0 kit,
+        /// 2026-11-11), from their own stream so the crates and boxes keep their places.
+        /// </summary>
         private static void Cargo()
         {
             var quay = _layout.SquareById("quay");
             var rng = new Random(812);
+            var load = new Random(813);
+            var wagon = false;
             var keep = _layout.squares.Where(q => q.id == "tipsy" || q.id == "one_eye_pier").Select(q => (q.y0, q.y1))
                 .Concat(_layout.streets.Where(t => t.kind == "main").Select(t => (y0: t.c0, y1: t.c1))).ToList();
             for (var py = quay.y0 + 6f; py < quay.y1 - 4f; py += 18f)
@@ -390,11 +397,27 @@ namespace GameDev.Slice.EditorTools
 
                 Prop(rng.Next(2) == 0 ? "Barrels" : "Crate", Facing.N, quay.x0 + 8 + rng.Next(3), py + rng.Next(3));
                 Prop("Box", Facing.N, quay.x0 + 12 + rng.Next(3), py + 2 + rng.Next(3));
+                Prop(load.Next(2) == 0 ? "Sacks" : "SacksSmall", Facing.N, quay.x0 + 8 + load.Next(3), py + 7);
+                if (load.Next(2) == 0)
+                {
+                    Prop("Handcart", Facing.N, quay.x0 + 12 + load.Next(2), py + 10);
+                }
+                else if (!wagon)
+                {
+                    wagon = Prop("WoodCart", Facing.E, quay.x0 + 12, py + 9) != null;
+                }
             }
 
             var tipsy = _layout.SquareById("tipsy");
             Prop("Barrels", Facing.N, tipsy.x1 - 14, tipsy.y0 + 1);
             Prop("Crate", Facing.N, tipsy.x1 - 9, tipsy.y1 - 4);
+
+            // §12, §46: the pinnace moored along Tipsy Pier's south side, her bow to the sea, afloat at her draught, and
+            // coils of rope on the pier by her (CC0, 2026-11-11).
+            var ship = PutPlan("Ship", Facing.E, tipsy.x0 + 12f, tipsy.y1 + 1f, VeilmouthScene.SeaLevel - SliceKitCatalogue.ShipDraught);
+            ship.name = "The pinnace at Tipsy Pier";
+            Prop("RopeCoil", Facing.N, tipsy.x0 + 16, tipsy.y1 - 2);
+            Prop("RopeCoil", Facing.N, tipsy.x0 + 34, tipsy.y1 - 2);
         }
 
         // ------------------------------------------------------------------------------------------- people

@@ -1,0 +1,26 @@
+{
+ "name": "HayBale",
+ "asset": "Hay Bale",
+ "source": "hay-bale-8987499.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 2386,
+ "triangles": 2386,
+ "size_m": [
+  1.181,
+  0.728,
+  0.514
+ ],
+ "texture": 1024,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "HayBale_0",
+   "alpha_cut": true,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.676,
+   "base": "HayBale_0_base.png",
+   "normal": "HayBale_0_normal.png",
+   "metal": "HayBale_0_metal.png"
+  }
+ ]
+}

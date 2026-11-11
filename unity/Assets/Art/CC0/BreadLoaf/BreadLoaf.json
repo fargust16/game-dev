@@ -1,0 +1,26 @@
+{
+ "name": "BreadLoaf",
+ "asset": "3DBread003_LQ-1K-JPG",
+ "source": "3DBread003_LQ-1K-JPG.packed.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 500,
+ "triangles": 500,
+ "size_m": [
+  0.322,
+  0.193,
+  0.104
+ ],
+ "texture": 512,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "BreadLoaf_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.688,
+   "base": "BreadLoaf_0_base.png",
+   "normal": "BreadLoaf_0_normal.png",
+   "metal": "BreadLoaf_0_metal.png"
+  }
+ ]
+}

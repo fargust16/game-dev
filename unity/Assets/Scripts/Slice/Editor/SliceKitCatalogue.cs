@@ -216,15 +216,24 @@ namespace GameDev.Slice.EditorTools
             yield return S("Stall_Meat", "Market", "Meat", Market, "Meat_market_with_objects", pr, anchor: Anchor.Front);
             yield return S("Stall_Goods", "Market", "Goods", Market, "Vegetable_market_with_objects", pr, anchor: Anchor.Front);
             yield return S("Stall_Weapons", "Market", "Weapons", Market, "Weapon_Market_with_objects", pr, anchor: Anchor.Front);
-            yield return S("Anvil", "Market", "Anvil", Market, "anvil", pr);
-            // The blacksmith's hand hammer, held in his right hand (owner's play test, 2026-11-11; SliceBlacksmith): seen, never solid.
-            yield return S("SmithHammer", "Market", "SmithHammer", Market, "blacksmith_hammer", KitLayers.NoGrid, Body.None, Anchor.Node);
+            // The anvil on its oak block (Charge, CC0; 2026-11-11, in place of the Medieval Market's bare anvil on a stump of
+            // ours): sized so its face stands where the smith's blow comes down (SliceBlacksmith), an authoring default.
+            var anvil = S("Anvil", "Market", "Anvil", Cc0, "AnvilBlock", pr);
+            anvil.SizeY = AnvilHeight;
+            yield return anvil;
+            // The blacksmith's forging hammer (Charge, CC0), held in his right hand (owner's play test, 2026-11-11;
+            // SliceBlacksmith): seen, never solid.
+            yield return S("SmithHammer", "Market", "SmithHammer", Cc0, "ForgeHammer", KitLayers.NoGrid, Body.None, Anchor.Node);
             yield return S("LeatherFrame", "Market", "LeatherFrame", Market, "leather_dressing_frame", pr);
             yield return S("ArmourStand", "Market", "ArmourStand", Market, "Armor_stand", pr);
             yield return S("BottleTable", "Market", "BottleTable", Market, "table_with_bottels", pr, anchor: Anchor.Front);
             yield return S("WeaponTable", "Market", "WeaponTable", Market, "Table_with_weapon", pr, anchor: Anchor.Front);
             yield return S("Counter", "Market", "Counter", Market, "stand_01", pr, anchor: Anchor.Front);
-            yield return Game(S("Crate", "Market", "Crate", Market, "wooden_box", pr));
+            // A shipping crate of planks and battens (rileyb3d, CC0; 2026-11-11, in place of the Medieval Market's box): its
+            // true 1 m, so it keeps its one cell.
+            var crate = S("Crate", "Market", "Crate", Cc0, "WoodenCrateB", pr);
+            crate.SizeY = 1f;
+            yield return crate;
 
             // Street props.
             // Every street lamp is the owner's Tripo lamp (owner, 2026-11-10; city plan §30), 4 m high as the Victorian
@@ -234,8 +243,8 @@ namespace GameDev.Slice.EditorTools
             yield return lamp;
             yield return Game(S("Bench", "Street", "Bench", VictorianStreet, "Wooden bench", pr, anchor: Anchor.Front));
             yield return Game(S("TrashCan", "Street", "TrashCan", VictorianStreet, "Trash can", pr));
-            yield return Game(S("Barrel", "Props", "Barrel", PropsLite, "Barrel_01", pr));
-            yield return Game(S("Box", "Props", "Box", PropsLite, "Box_01", pr));
+            yield return Game(S("Barrel", "Props", "Barrel", Cc0, "WoodBarrel", pr)); // rileyb3d, CC0 (2026-11-11), in place of the low-poly barrel
+            yield return Game(S("Box", "Props", "Box", Cc0, "WoodenCrateC", pr)); // rileyb3d, CC0 (2026-11-11), in place of the low-poly box
             yield return Game(S("Firewood", "Props", "Firewood", PropsLite, "Firewood_01", pr));
             var fence = S("Fence", "Fence", "Field", PropsLite, "Fence_01", pr, anchor: Anchor.Linear);
             fence.SizeX = 2f;
@@ -258,7 +267,11 @@ namespace GameDev.Slice.EditorTools
             yield return Game(S("Rostrum", "Furniture", "Rostrum", Dungeon2, "Rostrum_Preset_01", pr, anchor: Anchor.Back));
             yield return Game(S("Candles", "Furniture", "Candles", Dungeon2, "Candlestick_Floor_01_Lit", pr));
             yield return Game(S("Drawer", "Furniture", "Drawer", Dungeon2, "Drawer_Preset_01", pr, anchor: Anchor.Front));
-            yield return Game(S("Chest", "Furniture", "Chest", Dungeon2, "Treasure_Chest_01", ia));
+            // A travelling trunk of leather and iron straps (Poly Haven, CC0, 2026-11-11) in place of the dungeon's treasure
+            // chest: a pawnbroker's or a lodger's, at its true 0.95 m so it keeps the chest's one cell.
+            var chest = S("Chest", "Furniture", "Chest", Cc0, "TravelTrunk", ia);
+            chest.SizeX = 0.95f;
+            yield return chest;
             yield return Game(S("Books", "Furniture", "Books", Dungeon2, "Books_Preset_01", pr));
             yield return Game(S("Retort", "Furniture", "Retort", Dungeon2, "Retort_Preset_01", pr));
             var wall = S("RoomWall", "Room", "Wall", DungeonLite, "Wall_27", st, anchor: Anchor.Linear);
@@ -376,7 +389,7 @@ namespace GameDev.Slice.EditorTools
             poppy.SizeY = 0.5f;
             yield return poppy;
 
-            foreach (var spec in BkSpecs().Concat(ViSpecs()).Concat(GreenerySpecs()).Concat(TripoSpecs()))
+            foreach (var spec in BkSpecs().Concat(ViSpecs()).Concat(GreenerySpecs()).Concat(TripoSpecs()).Concat(Cc0Specs()))
             {
                 yield return spec;
             }
@@ -1290,6 +1303,13 @@ namespace GameDev.Slice.EditorTools
                     LinkTripoTextures(thing, source);
                     var (longest, pitch, roll) = TripoThings.TryGetValue(file, out var t) ? t : (0.3f, 0f, 0f);
                     thing.transform.localRotation = Quaternion.Euler(pitch, 0f, roll) * thing.transform.localRotation;
+                    var size = Seen(thing).size;
+                    thing.transform.localScale *= longest / UnityEngine.Mathf.Max(size.x, size.y, size.z, 0.001f);
+                }
+                else if (folder == Cc0)
+                {
+                    // A CC0 thing (SliceKitCc0): already on URP Lit, sized by its longest side.
+                    var longest = Cc0Things.TryGetValue(file, out var l) ? l : 0.3f;
                     var size = Seen(thing).size;
                     thing.transform.localScale *= longest / UnityEngine.Mathf.Max(size.x, size.y, size.z, 0.001f);
                 }

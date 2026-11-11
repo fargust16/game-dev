@@ -1,0 +1,26 @@
+{
+ "name": "StepLadder",
+ "asset": "Wooden Ladder",
+ "source": "wooden_ladder.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 8492,
+ "triangles": 1999,
+ "size_m": [
+  0.959,
+  0.5,
+  1.335
+ ],
+ "texture": 512,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "StepLadder_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.026,
+   "smoothness_mean": 0.396,
+   "base": "StepLadder_0_base.png",
+   "normal": "StepLadder_0_normal.png",
+   "metal": "StepLadder_0_metal.png"
+  }
+ ]
+}

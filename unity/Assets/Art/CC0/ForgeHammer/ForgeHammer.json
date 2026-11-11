@@ -1,0 +1,35 @@
+{
+ "name": "ForgeHammer",
+ "asset": "Hammer Forge",
+ "source": "Charge_Assets_Tools_Hammers.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 2640,
+ "triangles": 2640,
+ "size_m": [
+  0.094,
+  0.039,
+  0.201
+ ],
+ "texture": 512,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "ForgeHammer_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.682,
+   "base": "ForgeHammer_0_base.png",
+   "normal": "ForgeHammer_0_normal.png",
+   "metal": "ForgeHammer_0_metal.png"
+  },
+  {
+   "material": "ForgeHammer_1",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.722,
+   "base": "ForgeHammer_1_base.png",
+   "normal": "ForgeHammer_1_normal.png",
+   "metal": "ForgeHammer_1_metal.png"
+  }
+ ]
+}

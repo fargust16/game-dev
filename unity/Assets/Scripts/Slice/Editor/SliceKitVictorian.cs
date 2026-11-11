@@ -296,15 +296,19 @@ namespace GameDev.Slice.EditorTools
             desk.SizeY = 1.44f * 0.91f / 1.04f;
             desk.SizeZ = 1.21f;
             desk.Uniform = false;
-            yield return Set(desk,
+            Set(desk,
                 ("Ink", 0.62f, 0.35f), ("Pen", 0.66f, 0.35f), ("Paper_1", 0.45f, 0.3f), ("Paper_2", 0.5f, 0.35f),
                 ("Book_1", 0.2f, 0.35f), ("Candle_2", 0.85f, 0.4f));
+            desk.On = desk.On.Append((Cc0, "Spectacles", 0.3f, 0.32f)).ToArray(); // CC0 (2026-11-11), by the book
+            yield return desk;
 
             // Sets of the furnishing rules (G5, VI-6): small things on their pieces, never on the floor. §11: the pack's
             // smallest cabinet stood 1.16 m as a nightstand, a true 0.97 m; scaled whole to the Tripo nightstand's 0.80 m.
             var nightstand = Back("ViNightstand", "Shelve_5");
             nightstand.Factor = 0.8f / 1.16f;
-            yield return Set(nightstand, ("Candle_1", 0.3f, 0.5f), ("Book_1", 0.7f, 0.5f));
+            Set(nightstand, ("Candle_1", 0.3f, 0.5f), ("Book_1", 0.7f, 0.5f));
+            nightstand.On = nightstand.On.Append((Cc0, "PocketWatch", 0.5f, 0.3f)).ToArray(); // CC0 (2026-11-11)
+            yield return nightstand;
             var nightstandPoor = Back("ViNightstandPoor", "Shelve_5");
             nightstandPoor.Factor = 0.8f / 1.16f;
             yield return Set(nightstandPoor, ("Candle_2", 0.5f, 0.5f));
@@ -335,11 +339,21 @@ namespace GameDev.Slice.EditorTools
             kitchenTable.SizeY = 0.9f;
             kitchenTable.SizeZ = 1.28f;
             kitchenTable.Uniform = false;
-            yield return Set(kitchenTable,
-                ("Plate_2", 0.25f, 0.5f), ("Cup_2", 0.45f, 0.4f), ("Cup_1", 0.6f, 0.55f), ("Pot", 0.8f, 0.5f)); // the pack's knife stands on its edge and falls (VI-6)
+            // The pack's knife stands on its edge and falls (VI-6). The CC0 kitchen (2026-11-11): a cast-iron pot in place of
+            // the pack's, a kettle, a loaf and an apple (SLICE_MODELS_WANTED, kitchens, A).
+            Set(kitchenTable, ("Plate_2", 0.2f, 0.5f), ("Cup_2", 0.33f, 0.35f), ("Cup_1", 0.62f, 0.4f));
+            kitchenTable.On = kitchenTable.On.Concat(new[]
+            {
+                (Cc0, "BreadLoaf", 0.47f, 0.58f), (Cc0, "Apple", 0.34f, 0.68f), (Cc0, "TeaKettle", 0.68f, 0.64f), (Cc0, "DutchOven", 0.85f, 0.5f),
+            }).ToArray();
+            yield return kitchenTable;
             yield return F("ViTable", "Table_1");
             yield return F("ViTableB", "Table_2");
             yield return F("ViTableRound", "Table_3");
+            // The saloon's game: the round table with a chess set on it (Poly Haven, CC0, 2026-11-11).
+            var chess = F("ViTableChess", "Table_3");
+            chess.On = new[] { (Cc0, "ChessSet", 0.5f, 0.5f) };
+            yield return chess;
             yield return F("ViChair", "Chair_1");
             yield return F("ViArmchair", "Chair_2");
             yield return F("ViFootstool", "Chair_Small");

@@ -1,0 +1,26 @@
+{
+ "name": "Dartboard",
+ "asset": "Dartboard",
+ "source": "dartboard.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 6800,
+ "triangles": 1499,
+ "size_m": [
+  0.451,
+  0.04,
+  0.451
+ ],
+ "texture": 512,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "Dartboard_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.076,
+   "smoothness_mean": 0.331,
+   "base": "Dartboard_0_base.png",
+   "normal": "Dartboard_0_normal.png",
+   "metal": "Dartboard_0_metal.png"
+  }
+ ]
+}

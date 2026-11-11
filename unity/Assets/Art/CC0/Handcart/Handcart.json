@@ -1,0 +1,26 @@
+{
+ "name": "Handcart",
+ "asset": "Handcart",
+ "source": "handcart-3988532.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 5308,
+ "triangles": 5308,
+ "size_m": [
+  1.419,
+  2.711,
+  1.34
+ ],
+ "texture": 1024,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "Handcart_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.487,
+   "base": "Handcart_0_base.png",
+   "normal": "Handcart_0_normal.png",
+   "metal": "Handcart_0_metal.png"
+  }
+ ]
+}

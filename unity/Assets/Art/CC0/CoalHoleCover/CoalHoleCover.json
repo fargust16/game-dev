@@ -1,0 +1,26 @@
+{
+ "name": "CoalHoleCover",
+ "asset": "ManholeCover006",
+ "source": "ambientCG",
+ "license": "CC0-1.0",
+ "triangles_source": 2,
+ "triangles": 2,
+ "size_m": [
+  0.45,
+  0.45,
+  0.0
+ ],
+ "texture": 1024,
+ "bake_device": "none",
+ "materials": [
+  {
+   "material": "CoalHoleCover_0",
+   "alpha_cut": true,
+   "metallic_mean": 0.391,
+   "smoothness_mean": 0.344,
+   "base": "CoalHoleCover_0_base.png",
+   "metal": "CoalHoleCover_0_metal.png",
+   "normal": "CoalHoleCover_0_normal.png"
+  }
+ ]
+}

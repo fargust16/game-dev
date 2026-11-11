@@ -1,0 +1,26 @@
+{
+ "name": "DampStain",
+ "asset": "Leaking002",
+ "source": "ambientCG",
+ "license": "CC0-1.0",
+ "triangles_source": 2,
+ "triangles": 2,
+ "size_m": [
+  2.0,
+  0.0,
+  2.0
+ ],
+ "texture": 1024,
+ "bake_device": "none",
+ "materials": [
+  {
+   "material": "DampStain_0",
+   "alpha_cut": true,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.318,
+   "base": "DampStain_0_base.png",
+   "metal": "DampStain_0_metal.png",
+   "normal": "DampStain_0_normal.png"
+  }
+ ]
+}

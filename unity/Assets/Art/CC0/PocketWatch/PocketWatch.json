@@ -1,0 +1,26 @@
+{
+ "name": "PocketWatch",
+ "asset": "Pocket Watch",
+ "source": "pocket_watch.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 13311,
+ "triangles": 1499,
+ "size_m": [
+  0.058,
+  0.013,
+  0.076
+ ],
+ "texture": 256,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "PocketWatch_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.666,
+   "smoothness_mean": 0.841,
+   "base": "PocketWatch_0_base.png",
+   "normal": "PocketWatch_0_normal.png",
+   "metal": "PocketWatch_0_metal.png"
+  }
+ ]
+}

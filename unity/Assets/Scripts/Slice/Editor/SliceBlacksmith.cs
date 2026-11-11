@@ -41,6 +41,9 @@ namespace GameDev.Slice.EditorTools
 
         // Authoring default: at the blow the handle runs forward from the fist, its head this many degrees lower.
         private const float HandleTilt = 15f;
+
+        /// <summary>The most an anvil's block is set into the ground to bring its face to the blow, m (authoring default).</summary>
+        private const float MaxSink = 0.15f;
         private static readonly Vector3 BarSize = new Vector3(0.22f, 0.022f, 0.032f);
 
         /// <summary>The strike, as the clip plays it: when, and where the hammer's lowest point is, in the root's space over the soles.</summary>
@@ -334,6 +337,7 @@ namespace GameDev.Slice.EditorTools
         {
             public string AnvilPrefab;
             public Matrix4x4 AnvilFromSmith;
+            public Vector3 AnvilModel; // the anvil's Model in its wrapper, its block set into the ground (Stump)
             public Vector3 Bar;
             public Quaternion BarTurn;
             public Matrix4x4? StumpFromSmith;
@@ -358,17 +362,13 @@ namespace GameDev.Slice.EditorTools
                 return null;
             }
 
-            // The anvil's face: the top of the anvil's own mesh (the pack's hammer lying on it is left out), and the middle
-            // of what lies within 1.5 cm of that top. The anvil first stands on its stump (Stump).
+            // The anvil's face (Face), on the anvil's own mesh. The anvil first stands on a stump if its face is too low (Stump).
             var mesh = anvil.GetComponentsInChildren<MeshFilter>().Where(f => f.sharedMesh != null)
                 .OrderByDescending(f => f.name == "anvil" ? 1 : 0).ThenByDescending(f => f.sharedMesh.vertexCount).First();
             Stump(anvil.transform, mesh, strike.Point.y - BarSize.y, lines);
             Physics.SyncTransforms();
-            var points = mesh.sharedMesh.vertices.Select(v => mesh.transform.TransformPoint(v)).ToList();
-            var top = points.Max(p => p.y);
-            var face = points.Where(p => p.y >= top - 0.015f).ToList();
-            var centre = Mean(face);
-            centre.y = top;
+            var centre = Face(mesh);
+            var top = centre.y;
 
             var turn = smith.rotation;
             var reach = turn * new Vector3(strike.Point.x, 0f, strike.Point.z);
@@ -402,6 +402,7 @@ namespace GameDev.Slice.EditorTools
                 StumpFromSmith = stump != null ? smith.worldToLocalMatrix * stump.localToWorldMatrix : (Matrix4x4?)null,
                 AnvilPrefab = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(anvil.gameObject),
                 AnvilFromSmith = smith.worldToLocalMatrix * anvil.transform.localToWorldMatrix,
+                AnvilModel = anvil.transform.Find("Model") is { } anvilModel ? anvilModel.localPosition : Vector3.zero,
                 Bar = smith.InverseTransformPoint(bar.position),
                 BarTurn = Quaternion.Inverse(smith.rotation) * bar.rotation,
             };
@@ -415,6 +416,13 @@ namespace GameDev.Slice.EditorTools
         /// </summary>
         private static void Stump(Transform anvil, MeshFilter mesh, float face, List<string> lines)
         {
+            // A block set into the ground by an earlier run stands up again first, so a run never sinks it further.
+            var model = anvil.Find("Model");
+            if (model != null && PrefabUtility.IsPartOfPrefabInstance(model))
+            {
+                PrefabUtility.RevertObjectOverride(model, InteractionMode.AutomatedAction);
+            }
+
             var old = anvil.parent != null ? anvil.parent.Find(StumpName) : null;
             var lifted = old != null ? old.localScale.y * 2f : 0f;
             var points = mesh.sharedMesh.vertices.Select(v => mesh.transform.TransformPoint(v)).ToList();
@@ -425,7 +433,7 @@ namespace GameDev.Slice.EditorTools
             var floor = Physics.Raycast(new Vector3(centre.x, points.Max(p => p.y) + 2f, centre.z), Vector3.down, out var hit, 8f, ground, QueryTriggerInteraction.Ignore)
                 ? hit.point.y
                 : bottom - lifted;
-            var rest = points.Max(p => p.y) - lifted - floor; // the face's height with the anvil on the ground
+            var rest = Face(mesh).y - lifted - floor; // the face's height with the anvil on the ground
             // The kit's 0.1 m height step (KitLayoutCheck): the anvil stays on it, the face within 5 cm of the blow.
             var lift = Mathf.Max(0f, Mathf.Round((face - rest) / KitLayoutCheck.HeightStep) * KitLayoutCheck.HeightStep);
             Undo.RecordObject(anvil, "Anvil on its stump");
@@ -437,6 +445,17 @@ namespace GameDev.Slice.EditorTools
 
             if (lift < 0.05f)
             {
+                // An anvil on its own block whose face stands over the blow (the CC0 anvil, 2026-11-11): the block is set into
+                // the ground, as a smith sets his, by at most MaxSink; only its Model moves, so the wrapper keeps the kit's step.
+                var sink = Mathf.Clamp(rest - face, 0f, MaxSink);
+                if (sink > 0.02f && model != null)
+                {
+                    Undo.RecordObject(model, "Anvil's block set into the ground");
+                    model.position += Vector3.down * sink;
+                    lines.Add($"Anvil: its block set {sink:0.00} m into the ground, so its face stands {rest - sink:0.00} m over it, where the blow comes down (standing on it, {rest:0.00} m); no stump");
+                    return;
+                }
+
                 lines.Add($"Anvil: its face stands {rest:0.00} m high on the ground, where the blow comes down; no stump");
                 return;
             }
@@ -452,6 +471,48 @@ namespace GameDev.Slice.EditorTools
             stump.GetComponent<MeshRenderer>().sharedMaterial = SliceKitCatalogue.Colour("AnvilStump", new Color(0.30f, 0.21f, 0.13f), false);
             SliceKitCatalogue.SetLayer(stump, KitLayers.Prop);
             lines.Add($"Anvil: on an oak stump {lift:0.00} m high and {radius * 2f:0.00} m across, its face now {rest + lift:0.00} m over the ground (the pack's {rest:0.00} m)");
+        }
+
+        /// <summary>
+        /// The anvil's face, in the world: the level band (1.5 cm deep) holding the most area of upward-facing triangles in
+        /// the mesh's top fifth, at its area-weighted middle. Not the highest vertex: a horn or a hardy may stand over the
+        /// face, as on the CC0 anvil on its block (SliceKitCc0), and the block's own top, lower down, is left out.
+        /// </summary>
+        private static Vector3 Face(MeshFilter mesh)
+        {
+            var m = mesh.sharedMesh;
+            var points = m.vertices.Select(v => mesh.transform.TransformPoint(v)).ToArray();
+            var normals = m.normals.Select(n => mesh.transform.TransformDirection(n)).ToArray();
+            var tris = m.triangles;
+            var low = points.Min(p => p.y);
+            var high = points.Max(p => p.y);
+            var flats = new List<(float Y, float Area, Vector3 Mid)>();
+            for (var i = 0; i + 2 < tris.Length; i += 3)
+            {
+                var a = points[tris[i]];
+                var b = points[tris[i + 1]];
+                var c = points[tris[i + 2]];
+                var up = normals.Length == points.Length ? (normals[tris[i]] + normals[tris[i + 1]] + normals[tris[i + 2]]).normalized.y : 1f;
+                var area = Vector3.Cross(b - a, c - a).magnitude * 0.5f;
+                var mid = (a + b + c) / 3f;
+                if (up >= 0.9f && area > 1e-8f && mid.y >= high - ((high - low) * 0.2f))
+                {
+                    flats.Add((mid.y, area, mid));
+                }
+            }
+
+            if (flats.Count == 0)
+            {
+                var top = points.Where(p => p.y >= high - 0.015f).ToList();
+                var mean = Mean(top);
+                mean.y = high;
+                return mean;
+            }
+
+            var best = flats.OrderByDescending(f => flats.Where(g => Mathf.Abs(g.Y - f.Y) <= 0.015f).Sum(g => g.Area)).First();
+            var band = flats.Where(g => Mathf.Abs(g.Y - best.Y) <= 0.015f).ToList();
+            var total = band.Sum(g => g.Area);
+            return band.Aggregate(Vector3.zero, (s, g) => s + (g.Mid * g.Area)) / total;
         }
 
         /// <summary>The hot iron: a bar of the project's own glowing material, seen and never solid (replaces an earlier one).</summary>
@@ -511,6 +572,11 @@ namespace GameDev.Slice.EditorTools
             var anvil = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(set.AnvilPrefab));
             var world = smith.transform.localToWorldMatrix * set.AnvilFromSmith;
             anvil.transform.SetPositionAndRotation(world.GetColumn(3), world.rotation);
+            if (anvil.transform.Find("Model") is { } anvilModel)
+            {
+                anvilModel.localPosition = set.AnvilModel;
+            }
+
             var bar = GameObject.CreatePrimitive(PrimitiveType.Cube);
             bar.transform.SetPositionAndRotation(smith.transform.TransformPoint(set.Bar), smith.transform.rotation * set.BarTurn);
             bar.transform.localScale = new Vector3(BarSize.z, BarSize.y, BarSize.x);

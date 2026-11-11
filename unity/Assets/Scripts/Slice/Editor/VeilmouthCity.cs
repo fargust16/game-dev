@@ -290,6 +290,7 @@ namespace GameDev.Slice.EditorTools
             GatesDressOf(_root, _layout); // §41: the gatehouse over Creaking Gate
             WallDressOf(_root, _layout); // §42: the town wall's coping, plinth and pilasters
             GratesOf(_root); // §43: a cast-iron grate in each street tree's pit
+            CoversOf(_root); // §46: coal-hole and sewer covers in the paving
             var sky = scene.GetRootGameObjects().FirstOrDefault(g => g.name == VeilmouthMystic.RootName);
             if (sky != null)
             {

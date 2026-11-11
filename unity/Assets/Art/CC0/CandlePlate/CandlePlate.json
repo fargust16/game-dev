@@ -1,0 +1,35 @@
+{
+ "name": "CandlePlate",
+ "asset": "Candle Plate Large",
+ "source": "Charge_Assets_Scrapyard_Organic.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 24074,
+ "triangles": 3000,
+ "size_m": [
+  0.224,
+  0.207,
+  0.17
+ ],
+ "texture": 512,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "CandlePlate_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.168,
+   "smoothness_mean": 0.835,
+   "base": "CandlePlate_0_base.png",
+   "normal": "CandlePlate_0_normal.png",
+   "metal": "CandlePlate_0_metal.png"
+  },
+  {
+   "material": "CandlePlate_1",
+   "alpha_cut": false,
+   "metallic_mean": 0.0,
+   "smoothness_mean": 0.707,
+   "base": "CandlePlate_1_base.png",
+   "normal": "CandlePlate_1_normal.png",
+   "metal": "CandlePlate_1_metal.png"
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "name": "TeaKettle",
+ "asset": "Metal Tea Kettle",
+ "source": "metal-tea-kettle-7888355.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 2702,
+ "triangles": 2700,
+ "size_m": [
+  0.27,
+  0.206,
+  0.256
+ ],
+ "texture": 512,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "TeaKettle_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.258,
+   "smoothness_mean": 0.746,
+   "base": "TeaKettle_0_base.png",
+   "normal": "TeaKettle_0_normal.png",
+   "metal": "TeaKettle_0_metal.png"
+  }
+ ]
+}

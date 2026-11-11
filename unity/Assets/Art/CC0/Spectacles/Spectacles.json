@@ -1,0 +1,26 @@
+{
+ "name": "Spectacles",
+ "asset": "Round Spectacles",
+ "source": "round_spectacles.blend",
+ "license": "CC0-1.0",
+ "triangles_source": 10474,
+ "triangles": 1200,
+ "size_m": [
+  0.158,
+  0.149,
+  0.046
+ ],
+ "texture": 256,
+ "bake_device": "OPTIX",
+ "materials": [
+  {
+   "material": "Spectacles_0",
+   "alpha_cut": false,
+   "metallic_mean": 0.663,
+   "smoothness_mean": 0.745,
+   "base": "Spectacles_0_base.png",
+   "normal": "Spectacles_0_normal.png",
+   "metal": "Spectacles_0_metal.png"
+  }
+ ]
+}

@@ -183,6 +183,55 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// City plan §46: the CC0 pieces in the city at noon: the pinnace at Tipsy Pier, the cargo on Fishlip Quay, a coal hole
+        /// and a sewer cover, the smith's anvil, and a farm yard's hay and wagon, each found where the rebuild laid it.
+        /// Batch, with graphics: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderCc0
+        /// </summary>
+        public static void RenderCc0()
+        {
+            Directory.CreateDirectory(OutputFolder);
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
+            Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            var all = Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            Transform First(string start) => all.Where(t => t.name.StartsWith(start)).OrderBy(t => t.position.x).ThenBy(t => t.position.z).FirstOrDefault();
+            void Near(string name, Transform t, Vector3 off, float up)
+            {
+                if (t == null)
+                {
+                    Debug.LogWarning($"[VeilmouthRenders] {name}: nothing to look at.");
+                    return;
+                }
+
+                var at = t.GetComponentsInChildren<Renderer>().Select(r => r.bounds).Aggregate((a, b) => { a.Encapsulate(b); return a; }).center;
+                Eye(name, at + off, at + (Vector3.up * up), 55f);
+            }
+
+            // The noon sky and grade the player sees: without them the sea renders clear at a steep look and shows the keel.
+            var sky = Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>();
+            _skyAndGrade = sky != null;
+            try
+            {
+                sky?.Apply(12 * 60);
+                Eye("cc0_ship", 176f, 26f, 212f, 47f, 4f);
+                Eye("cc0_shipfar", 172f, 100f, 212f, 47f, 6f);
+                Eye("cc0_cargo", 172f, -40f, 172f, 60f, 1.5f);
+                // Close views from nearly overhead, so no wall stands between the eye and the piece.
+                Near("cc0_coalhole", First("Kit_Street_CoalHoleCover"), new Vector3(0.5f, 1.8f, 0.5f), 0f);
+                Near("cc0_sewer", First("Kit_Street_SewerCover"), new Vector3(1.2f, 2.4f, 1.2f), 0f);
+                Near("cc0_anvil", First("Kit_Market_Anvil"), new Vector3(1.4f, 0.9f, 1.4f), 0f);
+                Near("cc0_hay", First("Kit_Props_HayBale"), new Vector3(3f, 4f, 3f), 0f);
+                Near("cc0_wagon", First("Kit_Props_WoodCart"), new Vector3(4f, 5f, 4f), 0f);
+            }
+            finally
+            {
+                _skyAndGrade = false;
+            }
+
+            Debug.Log($"Veilmouth CC0 views written to {OutputFolder}.");
+        }
+
+        /// <summary>
         /// C4's ground (VEILMOUTH_CITY_PLAN.md §28.5) from above and from a walker's height, with every built root hidden
         /// for the picture only: the river round the west and south, the sea, the rise under the Penny, the forest's land.
         /// Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthRenders.RenderC4Ground
