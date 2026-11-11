@@ -66,6 +66,18 @@ namespace GameDev.Confront.Turns
         /// <summary>The AP it kept when it waited, which reactions spend before its turn comes back.</summary>
         internal int HeldAp { get; set; }
 
+        /// <summary>
+        /// The way it faces, one cell's step along X and Z: the way it last moved or struck (S3a.8). The Vision Cones of
+        /// 10.3 start from it; zero until it has done either.
+        /// </summary>
+        public Vector2Int Facing { get; internal set; }
+
+        /// <summary>It has fired in this fight, so a firearm carried to open the fight gives way to its melee set (10.2 §5b).</summary>
+        internal bool Fired { get; set; }
+
+        /// <summary>The enemy its Target Rules chose this turn, kept while the enemy stands (10.2 §5a).</summary>
+        internal Combatant Intent { get; set; }
+
         /// <summary>It has taken the First Aid lesson, which an antidote and a splint need (10.2, S3a.7).</summary>
         public bool KnowsFirstAid { get; set; }
 

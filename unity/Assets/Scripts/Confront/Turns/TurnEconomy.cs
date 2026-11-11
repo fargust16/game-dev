@@ -13,15 +13,14 @@ namespace GameDev.Confront.Turns
     /// once, as 10.2 §5b sets it, and a combatant who joins later rolls its own. Each turn gets a fresh AP pool, the AP
     /// kept from the last one expiring; a step to a cell beside costs 1 AP, a blow its weapon's AP, and what is left
     /// stays for reactions. A melee blow goes across a cell's side, a shot within the weapon's range and in sight. A
-    /// combatant with no will of its own walks toward the nearest enemy and strikes while its AP last, until Target Rules
-    /// V0 (S3a.8). Since S3a.6 (10.2 §5b *Position*, *Wait and Defensive Stance*): leaving the side of a melee enemy draws
+    /// combatant with no will of its own plays its turn by Target Rules V0 (S3a.8, <c>TurnEconomy.Npc.cs</c>). Since S3a.6 (10.2 §5b *Position*, *Wait and Defensive Stance*): leaving the side of a melee enemy draws
     /// its Reaction Attack, once a round from each enemy; Surrounded, higher ground, cover and the Point-Blank Shot set a
     /// blow's or a shot's context; a combatant can wait to the end of the round, end its turn in a Defensive Stance that
     /// answers a melee attack with a Counterattack, or change its Weapon Set. Since S3a.7 (10.1, 10.2): an Environment
     /// Action crosses a tagged edge for its AP and check, a failed climb falls; Bleeding and Poison from a blow tick at
     /// each round's end; a broken leg takes no step; and a bandage, an antidote or a splint ends its condition.
     /// </summary>
-    public sealed class TurnEconomy : ITurnEconomy
+    public sealed partial class TurnEconomy : ITurnEconomy
     {
         // A combatant whose own cell is taken or unwalkable takes the nearest free one this many cells away (authoring default).
         private const int PlaceRing = 2;
@@ -93,6 +92,8 @@ namespace GameDev.Confront.Turns
             IsRunning = true;
             foreach (var combatant in combatants)
             {
+                combatant.Fired = false;
+                combatant.Intent = null;
                 if (Place(combatant))
                 {
                     _order.Add(combatant);
@@ -141,39 +142,6 @@ namespace GameDev.Confront.Turns
                 default:
                     EndTurn(c);
                     return true;
-            }
-        }
-
-        public void PlayTurn()
-        {
-            var c = Acting;
-            while (c != null && IsRunning && Acting == c)
-            {
-                var target = Nearest(c, out var steps);
-                if (target == null)
-                {
-                    break;
-                }
-
-                if (steps == 0)
-                {
-                    if (!Strike(c, target))
-                    {
-                        break;
-                    }
-
-                    continue;
-                }
-
-                if (Walk(c, _best, _best.Count, target) == 0 || !Reaches(c, target))
-                {
-                    break;
-                }
-            }
-
-            if (c != null && IsRunning && Acting == c)
-            {
-                EndTurn(c);
             }
         }
 
@@ -588,6 +556,7 @@ namespace GameDev.Confront.Turns
                     break;
                 }
 
+                Face(c, path[i]);
                 c.Cell = path[i];
                 c.Position = _grid.Center(c.Cell);
                 _walked.Add(path[i]);
@@ -641,6 +610,7 @@ namespace GameDev.Confront.Turns
 
                 FlushWalk(c);
                 e.Reacted = true;
+                Face(e, c.Cell);
                 c.Fighter.Reserve = ApLeft;
                 var result = _rules.Strike(e.Fighter, c.Fighter, ContextFor(e, e.Cell, c), _rolls);
                 Afflict(c, result);
@@ -667,6 +637,8 @@ namespace GameDev.Confront.Turns
 
             ApLeft -= weapon.AttackAp;
             c.Attacked = true;
+            c.Fired |= weapon.Ranged;
+            Face(c, target.Cell);
             var result = _rules.Strike(c.Fighter, target.Fighter, ContextFor(c, c.Cell, target), _rolls);
             Afflict(target, result);
             if (target.Fighter.Down)
@@ -704,6 +676,7 @@ namespace GameDev.Confront.Turns
             }
 
             defender.Fighter.Reserve -= price;
+            Face(defender, attacker.Cell);
             var result = _rules.Strike(defender.Fighter, attacker.Fighter, ContextFor(defender, defender.Cell, attacker), _rolls);
             Afflict(attacker, result);
             if (attacker.Fighter.Down)
@@ -800,6 +773,7 @@ namespace GameDev.Confront.Turns
             }
 
             ApLeft -= option.Ap;
+            Face(c, to);
             var success = _rolls.NextDouble() < option.Chance;
             var fallen = 0d;
             if (success && option.Kind != EnvironmentActionKind.KickBreach && ReactionAttacks(c) && _grid.Occupy(c.Id, option.Landing))
@@ -921,35 +895,6 @@ namespace GameDev.Confront.Turns
         }
 
         private static CoverLevel Higher(CoverLevel a, CoverLevel b) => (int)a >= (int)b ? a : b;
-
-        /// <summary>The enemy fewest steps away, the weaker on a tie, with the path to it in <see cref="_best"/>; 0 steps when it is reached.</summary>
-        private Combatant Nearest(Combatant c, out int steps)
-        {
-            Combatant chosen = null;
-            steps = int.MaxValue;
-            _best.Clear();
-            foreach (var target in _order)
-            {
-                if (!target.Standing || target.Side == c.Side)
-                {
-                    continue;
-                }
-
-                var own = Reaches(c, target) ? 0 : StepsBeside(c, target);
-                if (own < steps || (own == steps && own != int.MaxValue && target.Fighter.Hp < chosen.Fighter.Hp))
-                {
-                    chosen = target;
-                    steps = own;
-                    _best.Clear();
-                    if (own > 0)
-                    {
-                        _best.AddRange(_candidate);
-                    }
-                }
-            }
-
-            return chosen;
-        }
 
         /// <summary>The fewest steps to a free cell beside the target from which a blow reaches it, its path in <see cref="_candidate"/>.</summary>
         private int StepsBeside(Combatant c, Combatant target)
