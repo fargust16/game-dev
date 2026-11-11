@@ -1,4 +1,5 @@
 using System.Linq;
+using GameDev.Dialogue;
 using GameDev.Slice.Kit;
 using GameDev.Slice.People;
 using GameDev.World.Poi;
@@ -104,6 +105,123 @@ namespace GameDev.Slice.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log($"[SlicePoiC] {laid} traces laid before the cellar door at {door}, the yard toward {outward}.");
+        }
+
+        public const string SweepName = "POI C - The sweep on Deaf Boiler Yard";
+        public const string SweepDialoguePath = "Assets/Data/Slice/Dialogue/SweepDialogue.asset";
+
+        /// <summary>11.1 *Slice build (S4)*: a threat, worked or failed, sends the sweep away for good.</summary>
+        public const string SweepGone = "poi.c.sweep_gone";
+
+        // Authoring defaults: his hours on the yard, minutes of the day; his reach, m; how far he keeps from any trace, m,
+        // so a trace's reach of 1.2 m and his of 2 m never meet and one Interact does one thing.
+        public const int SweepFrom = 8 * 60;
+        public const int SweepUntil = 18 * 60;
+        private const float SweepReach = 2f;
+        public const float SweepClear = 4f;
+
+        /// <summary>Where the sweep may stand, out from the wall and along it from the door's middle, first free first.</summary>
+        private static readonly (float outward, float along)[] SweepPlaces = { (3f, 8f), (3f, -8f), (5f, 7.5f), (5f, -7.5f), (7f, 0f) };
+
+        /// <summary>
+        /// S4.2: the chimney sweep, a Witness, on Deaf Boiler Yard by day while C is open: a working man of the asset map
+        /// (§1) at his rods, a <see cref="PoiStage"/> keeping his hours, and his conversation. Placed again on each run.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.SlicePoiC.PlaceSweep
+        /// </summary>
+        [MenuItem("GameDev/Slice/POI/Place POI C's sweep on Deaf Boiler Yard in Veilmouth")]
+        public static void PlaceSweep()
+        {
+            var scene = EditorSceneManager.OpenScene(SlicePeople.ScenePath(SliceRoster.Veilmouth), OpenSceneMode.Single);
+            var poi = AssetDatabase.LoadAssetAtPath<PoiDefinition>(PoiCPath);
+            var dialogue = AssetDatabase.LoadAssetAtPath<DialogueDefinition>(SweepDialoguePath);
+            var body = AssetDatabase.LoadAssetAtPath<GameObject>(SlicePeopleModels.Townsman.Standing);
+            var portal = Object.FindObjectsByType<Portal>(FindObjectsInactive.Include).FirstOrDefault(p => p.Id == CellarStreetDoor);
+            if (poi == null || dialogue == null || body == null || portal == null)
+            {
+                Debug.LogError("[SlicePoiC] POI C, the sweep's conversation, the townsman or the cellar door is missing.");
+                return;
+            }
+
+            foreach (var old in scene.GetRootGameObjects().Where(g => g.name == SweepName))
+            {
+                Object.DestroyImmediate(old);
+            }
+
+            Physics.SyncTransforms();
+            if (!Yard(portal, out var door, out var outward))
+            {
+                Debug.LogError($"[SlicePoiC] No free yard before the cellar door at {portal.transform.position}.");
+                return;
+            }
+
+            var along = Vector3.Cross(Vector3.up, outward);
+            var traces = Object.FindObjectsByType<TraceSpot>(FindObjectsInactive.Include).Select(t => t.transform.position).ToList();
+            Vector3? found = null;
+            foreach (var (out_, side) in SweepPlaces)
+            {
+                var at = door + (outward * out_) + (along * side);
+                if (!SlicePoiStages.Free(door, at))
+                {
+                    continue;
+                }
+
+                var feet = SlicePoiStages.Feet(door, at);
+                if (traces.All(t => FlatDistance(t, feet) >= SweepClear))
+                {
+                    found = feet;
+                    break;
+                }
+            }
+
+            if (found == null)
+            {
+                Debug.LogError("[SlicePoiC] No free place on the yard for the sweep, clear of the traces.");
+                return;
+            }
+
+            var stand = found.Value;
+            var facing = SlicePoiStages.Flat(door - stand);
+            var stage = new GameObject(SweepName);
+            stage.transform.SetPositionAndRotation(stand, Quaternion.LookRotation(facing));
+            var cast = new GameObject("Cast");
+            cast.transform.SetParent(stage.transform, false);
+
+            var sweep = (GameObject)PrefabUtility.InstantiatePrefab(body, cast.transform);
+            sweep.name = "POI C - The sweep";
+            sweep.transform.SetPositionAndRotation(stand, Quaternion.LookRotation(facing));
+            if (sweep.TryGetComponent<TownsfolkWalker>(out var walker))
+            {
+                Object.DestroyImmediate(walker);
+            }
+
+            Rods(cast.transform, stand, facing);
+            stage.AddComponent<PersonTalk>().Configure(dialogue, SweepReach);
+            var keeps = stage.AddComponent<PoiStage>();
+            keeps.Configure(poi, cast, 60f);
+            keeps.Keep(SweepFrom, SweepUntil, SweepGone);
+            cast.SetActive(false);
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log($"[SlicePoiC] The sweep stands at {stand}, {Vector3.Distance(stand, door):0.0} m from the cellar door.");
+        }
+
+        public static float FlatDistance(Vector3 a, Vector3 b) => new Vector2(a.x - b.x, a.z - b.z).magnitude;
+
+        // His rods and brush, laid at his side: placeholders of our own until a model comes (SLICE_MODELS_WANTED).
+        private static void Rods(Transform cast, Vector3 feet, Vector3 facing)
+        {
+            var side = Vector3.Cross(Vector3.up, facing);
+            var turn = Quaternion.LookRotation(facing);
+            var rod = Material("Sweep_Rods", new Color(0.09f, 0.075f, 0.06f), 0.15f);
+            for (var k = 0; k < 5; k++)
+            {
+                var at = feet + (side * (0.55f + (k * 0.025f))) + (Vector3.up * (0.012f + ((k % 2) * 0.02f)));
+                Piece(cast, PrimitiveType.Cylinder, at, turn * Quaternion.Euler(90f, k * 2f, 0f), new Vector3(0.022f, 0.75f, 0.022f), rod);
+            }
+
+            var brush = feet + (side * 0.6f) + (facing * 0.8f) + (Vector3.up * 0.09f);
+            Piece(cast, PrimitiveType.Sphere, brush, turn, new Vector3(0.36f, 0.18f, 0.36f), Material("Sweep_Brush", new Color(0.03f, 0.03f, 0.03f), 0.05f));
         }
 
         /// <summary>The door's middle and the way out into the yard, the side of the wall where a person can stand.</summary>

@@ -37,7 +37,7 @@ namespace GameDev.Slice.Tests
         public void EveryTipPoiAndPersonHasItsKeys()
         {
             var tips = AssetDatabase.LoadAssetAtPath<TipCatalogue>(PoiFolder + "Tips.asset");
-            Assert.AreEqual(24, tips.Tips.Length, "S1's ten, Nell's six lines of the next day (S2.7) and POI C's eight Physical Traces (S4.1)");
+            Assert.AreEqual(25, tips.Tips.Length, "S1's ten, Nell's six lines of the next day (S2.7), POI C's eight Physical Traces (S4.1) and the sweep's coach (S4.2)");
             foreach (var tip in tips.Tips)
             {
                 Assert.IsTrue(Loc.Exists(tip.LineKey), tip.LineKey);

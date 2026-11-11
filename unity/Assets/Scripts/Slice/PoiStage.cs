@@ -3,6 +3,7 @@ using System.Linq;
 using GameDev.Dialogue;
 using GameDev.Locomotion;
 using GameDev.World.Poi;
+using GameDev.World.State;
 using UnityEngine;
 
 namespace GameDev.Slice
@@ -14,7 +15,8 @@ namespace GameDev.Slice
     /// one already open runs on to its end, so the outcome that settles the POI is still read. Once the POI has resolved,
     /// its people leave when the player is out of the area, so nobody sees them go. S3b.3: a conversation that ends in a
     /// fight, a Confront or a lost Final Check, is fought here by the people its listener names, and the fight's end
-    /// writes the option's Won or Lost.
+    /// writes the option's Won or Lost. S4.2: a person of the place, such as POI C's sweep, keeps hours and can be sent
+    /// away for good by a world state key; outside them it counts as closed.
     /// </summary>
     public sealed class PoiStage : MonoBehaviour
     {
@@ -46,6 +48,16 @@ namespace GameDev.Slice
 
         [Tooltip("World state keys raised when a fight here is won and one of them was spared (11.1: Spare can buy a fragment).")]
         [SerializeField] private string[] whenSpared = new string[0];
+
+        [Header("A person of the place (S4.2)")]
+        [Tooltip("Authoring default: the minute of the day the people come, 0–1439; -1, with Until -1, for any hour.")]
+        [SerializeField] private int fromMinute = -1;
+
+        [Tooltip("Authoring default: the minute of the day they go, after From.")]
+        [SerializeField] private int untilMinute = -1;
+
+        [Tooltip("A world state key that sends them away for good, e.g. poi.c.sweep_gone; empty for none.")]
+        [SerializeField] private string goneKey = "";
 
         private PersonTalk _talk;
         private PlayerLocomotion _player;
@@ -79,6 +91,40 @@ namespace GameDev.Slice
         {
             fighters = who ?? new Fighters[0];
             whenSpared = spared ?? new string[0];
+        }
+
+        /// <summary>Setup for scenes built by code: the hours its people keep, and the key that sends them away for good.</summary>
+        public void Keep(int from, int until, string gone)
+        {
+            fromMinute = from;
+            untilMinute = until;
+            goneKey = gone ?? "";
+        }
+
+        public int FromMinute => fromMinute;
+
+        public int UntilMinute => untilMinute;
+
+        public string GoneKey => goneKey;
+
+        /// <summary>
+        /// Whether the people are there at <paramref name="tick"/>, minutes from day 1's midnight: within their hours, or
+        /// at any hour without them, and not sent away for good.
+        /// </summary>
+        public static bool Present(IWorldState state, long tick, int from, int until, string gone)
+        {
+            if (!string.IsNullOrEmpty(gone) && state.IsSet(gone))
+            {
+                return false;
+            }
+
+            if (from < 0 || until < 0)
+            {
+                return true;
+            }
+
+            var minute = tick % (24 * 60);
+            return minute >= from && minute < until;
         }
 
         /// <summary>Whether <paramref name="position"/> is inside the scene's area.</summary>
@@ -170,7 +216,8 @@ namespace GameDev.Slice
                 }
             }
 
-            var open = world.Director.Phase(poi) == PoiPhase.Open;
+            // S4.2: a person of the place keeps hours and may be sent away; like a resolved scene, they go unseen.
+            var open = world.Director.Phase(poi) == PoiPhase.Open && Present(world.State, world.Clock.Tick, fromMinute, untilMinute, goneKey);
             var near = Within(_player.transform.position);
             var talking = Talk != null && Talk.IsOpen;
             if (!IsShown && open && near)
