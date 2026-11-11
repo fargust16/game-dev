@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using GameDev.Slice.Atmosphere;
 using GameDev.Slice.Kit;
+using GameDev.VictorianKit;
 using GameDev.VictorianKit.EditorTools;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -73,6 +74,39 @@ namespace GameDev.Slice.EditorTools
             VeilmouthRenders.RenderMystic();
         }
 
+        /// <summary>
+        /// Gives the saved scene's facades their ground (reference plan R3 step 2's fix) without placing the layer again,
+        /// and saves the scene. Batch: -executeMethod GameDev.Slice.EditorTools.VeilmouthMystic.PlaceGround
+        /// </summary>
+        public static void PlaceGround()
+        {
+            var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var root = scene.GetRootGameObjects().FirstOrDefault(g => g.name == RootName);
+            if (root == null)
+            {
+                Debug.LogError($"[VeilmouthMystic] no {RootName} in the scene: place the mystic layer first.");
+                return;
+            }
+
+            Ground(root);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+        }
+
+        /// <summary>The terrain under the city, given to the facade shader so its plinth dirt and wall-foot moss rise from the ground.</summary>
+        private static void Ground(GameObject root)
+        {
+            var ground = root.GetComponent<VicGround>();
+            if (ground == null)
+            {
+                ground = root.AddComponent<VicGround>();
+            }
+
+            ground.Terrain = Object.FindFirstObjectByType<Terrain>();
+            ground.Apply();
+            Debug.Log($"[VeilmouthMystic] the facades' ground: {(ground.Terrain != null ? ground.Terrain.name : "none, so world height 0")}.");
+        }
+
         internal static VeilmouthSky Build()
         {
             foreach (var old in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)
@@ -107,6 +141,7 @@ namespace GameDev.Slice.EditorTools
             var sky = root.AddComponent<VeilmouthSky>();
             sky.Configure(sun, day, dusk, night, twilight, lamps, glassUnlit, glassLit, banks, moon);
             sky.SetBeacons(VeilmouthCity.Beacons()); // the One-Eye's lantern (city plan §38), when the city has it
+            Ground(root);
             sky.Apply(sky.PreviewMinute);
             RenderSettings.skybox = day; // the saved scene holds the asset, never the live blend
             AssetDatabase.SaveAssets();

@@ -154,6 +154,29 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// Reference plan R3 step 2's fix: the facade shader measures its plinth dirt from the terrain under the city,
+        /// whose streets lie at 26 m, not from world height 0, and the globals map a terrain's corners onto its heightmap's
+        /// first and last texel centres.
+        /// </summary>
+        [Test]
+        public void TheFacadesMeasureTheirPlinthFromTheGround()
+        {
+            var root = _scene.GetRootGameObjects().Single(g => g.name == VeilmouthMystic.RootName);
+            var ground = root.GetComponent<GameDev.VictorianKit.VicGround>();
+            Assert.IsNotNull(ground, "the mystic layer gives the facades their ground");
+            Assert.IsNotNull(ground.Terrain);
+            Assert.AreEqual(All<Terrain>().Single(), ground.Terrain);
+
+            const int resolution = 513;
+            var (rect, level) = GameDev.VictorianKit.VicGround.Globals(new Vector3(-500f, 2f, -500f), new Vector3(1000f, 80f, 1000f), resolution);
+            float U(float x) => Mathf.Clamp01((x - rect.x) * rect.z) + level.w;
+            Assert.AreEqual(0.5f / resolution, U(-500f), 1e-6f, "the west edge is the first texel's centre");
+            Assert.AreEqual((resolution - 0.5f) / resolution, U(500f), 1e-6f, "the east edge is the last texel's centre");
+            Assert.AreEqual(2f + 80f, level.x + ((32766f / 65535f) * level.y), 1e-3f, "a full texel is the terrain's full height");
+            Assert.AreEqual(1f, level.z);
+        }
+
+        /// <summary>
         /// §38: the One-Eye's lantern burns with the gas lamps, its panes glowing at night and grimy by day, but it is no
         /// street lamp, so it adds nothing to the Darkness of 10.3 §3.
         /// </summary>

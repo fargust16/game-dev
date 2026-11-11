@@ -56,6 +56,25 @@ TEXTURE2D(_MaskMap);
 // 0 by day, 1 at night (VicStreetLighting). Not a material property.
 float _VicNight;
 
+// The ground under the walls (VicGround): the terrain's heightmap, where it lies, and its height scale. Level.z is 0
+// when no ground is given, and the plinth is then measured from world height 0. Not material properties.
+TEXTURE2D(_VicGroundHeight);
+SAMPLER(sampler_vic_linear_clamp);
+float4 _VicGroundRect;
+float4 _VicGroundLevel;
+
+// The ground's height under positionWS, m: the terrain's, or 0 with none.
+float VicGroundY(float3 positionWS)
+{
+    if (_VicGroundLevel.z < 0.5)
+    {
+        return 0.0;
+    }
+
+    float2 uv = saturate((positionWS.xz - _VicGroundRect.xy) * _VicGroundRect.zw) + _VicGroundLevel.w;
+    return _VicGroundLevel.x + SAMPLE_TEXTURE2D_LOD(_VicGroundHeight, sampler_vic_linear_clamp, uv, 0).r * _VicGroundLevel.y;
+}
+
 float VicHash13(float3 p)
 {
     p = frac(p * 0.1031);
@@ -117,8 +136,10 @@ void VicSurfaceAt(float2 uv, float3 positionWS, half3 normalWS, out VicSurface s
     float n2 = VicFbm3(p * 2.7 + 17.0);
     albedo *= 1.0 + (n - 0.5) * _ToneVar;
 
-    float above = positionWS.y - 0.60;
-    float rise = saturate(1.0 - above / max(_DirtHeight, 0.01));
+    // Dirt rises from the plinth on walls only: a pavement or a step is the ground itself (R3 step 2's fix).
+    half wall = saturate(1.0h - abs(normalWS.y) * 3.0h);
+    float above = positionWS.y - VicGroundY(positionWS) - 0.60;
+    float rise = saturate(1.0 - above / max(_DirtHeight, 0.01)) * wall;
     float dirt = saturate(rise * rise * (0.55 + 0.9 * n) * _DirtAmount);
     dirt = max(dirt, saturate((n - 0.55) * 2.0) * _DirtAmount * 0.35);
     dirt = saturate(dirt + (1.0 - mask.b) * _DirtAmount * 0.45);
@@ -130,7 +151,6 @@ void VicSurfaceAt(float2 uv, float3 positionWS, half3 normalWS, out VicSurface s
     // house by the large noise, and as strong as the material's dirt. A streak is a film of soot over the face, so it
     // greys the material toward a dark soot, flattening the brick's joints, rather than only darkening it. Sizes are
     // authoring defaults, in metres.
-    half wall = saturate(1.0h - abs(normalWS.y) * 3.0h);
     float3 sp = float3(positionWS.x * 1.7, positionWS.y * 0.18, positionWS.z * 1.7);
     float s1 = VicValue3(sp) * 0.8 + VicValue3(sp * 2.3 + 5.0) * 0.2;
     half streak = saturate(saturate((s1 - 0.54) * 9.0) * wall * saturate(0.45 + n) * _DirtAmount * _Streaks);

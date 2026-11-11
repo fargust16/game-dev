@@ -292313,6 +292313,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1302576197}
   - component: {fileID: 1302576196}
+  - component: {fileID: 1302576198}
   m_Layer: 14
   m_Name: Veilmouth Sky
   m_TagString: Untagged
@@ -293091,6 +293092,19 @@ Transform:
   - {fileID: 1785904142}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1302576198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1302576195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ed275bf3d06e3d43b1e2503401ddb07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.VictorianKit::GameDev.VictorianKit.VicGround
+  Terrain: {fileID: 847389676}
 --- !u!1 &1302971333
 GameObject:
   m_ObjectHideFlags: 0
