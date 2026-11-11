@@ -1,10 +1,10 @@
 # 20 Alchemy and Potioncraft
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft — owner-approved foundation; skill progression, mini-game, recipes, and balance remain open
 
-Last Updated: 2026-11-05 (the price in bronze, by 19 §6.3. Earlier: an interrupted brewing loses its ordinary ingredients and keeps the magical one, authoring default. Earlier: the brewing mini-game is a Reaction Check once a tick, and its results change the potion's Sanity cost and attribute rise, by the owner. Earlier: the potion shop's Master teaches Alchemy as a working reading. Earlier: the Alchemical Flask rejected by the owner. Earlier: the Alchemical Flask proposal noted. Earlier: the V1 question follows the slice's Limits. Earlier: terms renamed to Arcana and Limit. Earlier: potion-making included in the Vertical Slice.)
+Last Updated: 2026-11-11 (§3: brewing's bar is brought to 07.1 §8a's rule in S5b, by the owner's direction of 2026-11-11. Earlier: the price in bronze, by 19 §6.3. Earlier: an interrupted brewing loses its ordinary ingredients and keeps the magical one, authoring default. Earlier: the brewing mini-game is a Reaction Check once a tick, and its results change the potion's Sanity cost and attribute rise, by the owner. Earlier: the potion shop's Master teaches Alchemy as a working reading. Earlier: the Alchemical Flask rejected by the owner. Earlier: the Alchemical Flask proposal noted. Earlier: the V1 question follows the slice's Limits. Earlier: terms renamed to Arcana and Limit. Earlier: potion-making included in the Vertical Slice.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -53,7 +53,7 @@ Owner-approved, 2026-11-03: the mini-game is a series of Reaction Checks. A **Re
 - A bad result still gives a potion, but each one raises the Sanity cost. Six bad results take a great deal of Sanity and give almost none of the attribute rise.
 - The correct potion still grants its Limit: brewing changes only its price and its rise ([05 Progression](05%20Progression.md)).
 
-Authoring defaults: each perfect result lowers the Limit's mandatory Sanity cost by 10 % and each bad one raises it by 25 %, so six perfect results take 40 % of it and six bad ones 250 %. Three perfect results add 1 to both primary attributes and six add 2. Each bad result takes 15 % of the attribute rise away, so six leave a tenth of it. The good zone is a quarter of the bar and the perfect zone 6 %, and the marker crosses the bar in 1.5 seconds; Alchemy skill widens both zones, to 40 % and 10 % at skill 100 (working reading).
+Authoring defaults: each perfect result lowers the Limit's mandatory Sanity cost by 10 % and each bad one raises it by 25 %, so six perfect results take 40 % of it and six bad ones 250 %. Three perfect results add 1 to both primary attributes and six add 2. Each bad result takes 15 % of the attribute rise away, so six leave a tenth of it. The good zone is a quarter of the bar and the perfect zone 6 %, and the marker crosses the bar in 1.5 seconds; Alchemy skill widens both zones, to 40 % and 10 % at skill 100 (working reading). Owner's direction, 2026-11-11: every Reaction Check's zone and marker pace follow attribute and skill, with a widest zone and a slowest marker ([07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §8a); brewing's numbers here are brought to that rule when S5b builds brewing.
 
 **Interruption.** Authoring default, 2026-11-04: moving away, being attacked, or a fight starting interrupts a brewing. The ordinary ingredients are lost and the magical one is kept, so an interruption costs time and herbs but never the trip for a glowing beast or 15 000 bronze.
 
