@@ -35,7 +35,7 @@ namespace GameDev.Slice.Fights
         private const int Opponents = 2;
         private const float OpponentHeight = 1.8f; // m, a person (kit standard §3)
 
-        // The fight clips' parameters (ANIMATION_PIPELINE_PLAN.md A2), on the controllers SliceMixamo builds.
+        // The fight clips' parameters (ANIMATION_PIPELINE_PLAN.md §8), on the controllers SliceClips builds.
         private static readonly int FightingHash = Animator.StringToHash("Fighting");
         private static readonly int WeaponHash = Animator.StringToHash("Weapon");
         private static readonly int DownHash = Animator.StringToHash("Down");

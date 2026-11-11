@@ -14,10 +14,9 @@ namespace GameDev.Slice.EditorTools
 {
     /// <summary>
     /// Every person, the player too, is one of the owner's Tripo people, by role (owner, 2026-11-10; SLICE_ASSET_MAP.md
-    /// §1), playing the Mixamo clips of ANIMATION_PIPELINE_PLAN.md A1 and A2 (<see cref="SliceMixamo"/>).
+    /// §1), playing Kevin Iglesias' and Quaternius' clips (ANIMATION_PIPELINE_PLAN.md §0 and §8; <see cref="SliceClips"/>).
     /// <list type="bullet">
-    /// <item>Every clip is Humanoid and in place, the same for men and women; a Warden stands at attention, a woman
-    /// Warden in the women's pose. The player's locomotion plays each clip at the player's pace, measured from the
+    /// <item>Every clip is Humanoid and in place, a woman playing the women's takes; a Warden stands at attention. The player's locomotion plays each clip at the player's pace, measured from the
     /// feet.</item>
     /// <item>A model's prefab is fitted in its first pose: turned to face +Z by its shoulders, scaled to its height by
     /// its eyes (eye height 93.6 % of stature, an anthropometric mean) where the avatar maps them, else by its mesh, so
@@ -35,8 +34,8 @@ namespace GameDev.Slice.EditorTools
     public static class SlicePeopleModels
     {
         public const string Folder = "Assets/Prefabs/Slice/People";
-        public const string ManController = SliceMixamo.ControllerFolder + "/Man.controller";
-        public const string WomanController = SliceMixamo.ControllerFolder + "/Woman.controller";
+        public const string ManController = SliceClips.ControllerFolder + "/Man.controller";
+        public const string WomanController = SliceClips.ControllerFolder + "/Woman.controller";
         private const string StandIns = "Assets/Animation/StandIn";
         private const string OldWomanPlayer = "Assets/Settings/OverworldPlayerAnimator_Woman.overrideController";
         private const string ManWalkerController = "Assets/Settings/Slice/Townsfolk/SliceTownsfolk.controller";
@@ -46,8 +45,7 @@ namespace GameDev.Slice.EditorTools
 
         /// <summary>
         /// Authoring default: the player's locomotion plays a clip at most this much faster, so a step keeps a human
-        /// cadence (the sprint at 4.9 steps a second); Mixamo's in-place strides are shorter than the player's speeds,
-        /// and the feet slide the rest.
+        /// cadence; where a clip's in-place stride is shorter than the player's speed, the feet slide the rest.
         /// </summary>
         private const float MostTimeScale = 1.3f;
 
@@ -192,7 +190,7 @@ namespace GameDev.Slice.EditorTools
         public static void Run()
         {
             var report = new StringBuilder();
-            SliceMixamo.Import(report);
+            SliceClips.Import(report);
             Controllers(report);
             var speeds = new Dictionary<string, float>
             {
@@ -239,21 +237,21 @@ namespace GameDev.Slice.EditorTools
         // ------------------------------------------------------------------------------------------- controllers
 
         /// <summary>
-        /// The controllers on the Mixamo clips (<see cref="SliceMixamo"/>): the standing people's, the Wardens' at
-        /// attention, the townsfolk's walk and idle, and the player's locomotion at the player's own pace. The A0
-        /// stand-ins go.
+        /// The controllers on the clips of <see cref="SliceClips"/>: the standing people's, a woman's in the women's
+        /// takes, the Wardens' at attention, the townsfolk's walk and idle, and the player's locomotion at the player's
+        /// own pace. The A0 stand-ins go.
         /// </summary>
         private static void Controllers(StringBuilder report)
         {
             Tidy();
-            SliceMixamo.Person(ManController, "Idle");
-            SliceMixamo.Person(WomanController, "Idle");
-            SliceMixamo.Person(SliceMixamo.WardenController, "Attention");
-            SliceMixamo.Person(SliceMixamo.WardenWomanController, "AttentionWoman");
-            SliceMixamo.Person(SliceMixamo.BlacksmithController, "Hammer");
-            SliceMixamo.Person(SliceCharacterLook.PersonIdlePath, "Idle");
-            Repoint(ManWalkerController, SliceMixamo.Get("Idle"), SliceMixamo.Get("Walk"));
-            Repoint(WomanWalkerController, SliceMixamo.Get("Idle"), SliceMixamo.Get("Walk"));
+            SliceClips.Person(ManController, "Idle", false);
+            SliceClips.Person(WomanController, "Idle", true);
+            SliceClips.Person(SliceClips.WardenController, "Attention", false);
+            SliceClips.Person(SliceClips.WardenWomanController, "Attention", true);
+            SliceClips.Person(SliceClips.BlacksmithController, "HammerDown", false, "HammerUp");
+            SliceClips.Person(SliceCharacterLook.PersonIdlePath, "Idle", false);
+            Repoint(ManWalkerController, SliceClips.Get("Idle"), SliceClips.Get("Walk"));
+            Repoint(WomanWalkerController, SliceClips.Get("Idle", true), SliceClips.Get("Walk", true));
 
             // The player's pace in each clip, measured from the feet on both bodies at their statures (the mean, as one
             // controller plays both), against PlayerLocomotion's speeds; the flight against its jump's airtime.
@@ -266,7 +264,7 @@ namespace GameDev.Slice.EditorTools
             scales[0] = 1f;
             for (var i = 1; i < uses.Length; i++)
             {
-                var clip = SliceMixamo.Get(uses[i]);
+                var clip = SliceClips.Get(uses[i]);
                 var paces = new[] { PlayerMan, PlayerWoman }.Select(look =>
                 {
                     var animator = Fitted(look, clip);
@@ -279,12 +277,8 @@ namespace GameDev.Slice.EditorTools
                                   $"{speeds[i]:0.0} m/s would play it x{speeds[i] / paces.Average():0.00}, plays it x{scales[i]:0.00}");
             }
 
-            var lift = Mathf.Sqrt(2f * Field("jumpHeight") * -Field("gravity"));
-            var airtime = 2f * lift / -Field("gravity");
-            var air = SliceMixamo.Get("JumpAir").length;
-
             // The sneak's own pace, which PlayerLocomotion matches by the Crouch state's Pace while it creeps.
-            var sneak = SliceMixamo.Get("Sneak");
+            var sneak = SliceClips.Get("Sneak");
             var sneakPace = new[] { PlayerMan, PlayerWoman }.Select(look =>
             {
                 var animator = Fitted(look, sneak);
@@ -292,8 +286,7 @@ namespace GameDev.Slice.EditorTools
                 Object.DestroyImmediate(animator.transform.parent.gameObject);
                 return pace;
             }).Average();
-            SliceMixamo.Player(PlayerController, scales, air / airtime, sneakPace);
-            report.AppendLine($"Player jump: {airtime:0.00} s in the air (PlayerLocomotion), the clip's flight {air:0.00} s plays x{air / airtime:0.00}");
+            SliceClips.Player(PlayerController, scales, sneakPace);
             report.AppendLine($"Player sneak: paced {sneakPace:0.00} m/s (measured, the mean of both bodies), matched by the Crouch state's Pace");
             AssetDatabase.SaveAssets();
         }
@@ -301,7 +294,7 @@ namespace GameDev.Slice.EditorTools
         /// <summary>The A0 stand-ins leave: their four clips and the woman player's override go, and the people's two controllers move beside the Wardens'.</summary>
         private static void Tidy()
         {
-            if (!AssetDatabase.IsValidFolder(SliceMixamo.ControllerFolder))
+            if (!AssetDatabase.IsValidFolder(SliceClips.ControllerFolder))
             {
                 AssetDatabase.CreateFolder("Assets/Animation", "Controllers");
             }
@@ -309,9 +302,9 @@ namespace GameDev.Slice.EditorTools
             foreach (var name in new[] { "Man.controller", "Woman.controller" })
             {
                 var old = $"{StandIns}/{name}";
-                if (AssetDatabase.LoadAssetAtPath<Object>(old) != null && AssetDatabase.LoadAssetAtPath<Object>($"{SliceMixamo.ControllerFolder}/{name}") == null)
+                if (AssetDatabase.LoadAssetAtPath<Object>(old) != null && AssetDatabase.LoadAssetAtPath<Object>($"{SliceClips.ControllerFolder}/{name}") == null)
                 {
-                    AssetDatabase.MoveAsset(old, $"{SliceMixamo.ControllerFolder}/{name}");
+                    AssetDatabase.MoveAsset(old, $"{SliceClips.ControllerFolder}/{name}");
                 }
             }
 
@@ -353,7 +346,7 @@ namespace GameDev.Slice.EditorTools
             var root = PrefabUtility.LoadPrefabContents(prefabPath);
             var model = root.transform.Find("Model").gameObject;
             var animator = Animated(model, look);
-            var walk = SliceMixamo.Get("Walk");
+            var walk = SliceClips.Get("Walk", look.Female);
             var stature = Fit(model, walk, look.Height, !rescale);
             var speed = Speed(animator, walk, root.transform);
             var head = Keep(model, animator);
@@ -370,8 +363,8 @@ namespace GameDev.Slice.EditorTools
 
         private static GameObject Build(Look look, bool walking, Vector3? scale, StringBuilder report)
         {
-            var idle = SliceMixamo.Get(IdleUse(look));
-            var walk = SliceMixamo.Get("Walk");
+            var idle = SliceClips.Get(IdleUse(look), look.Female);
+            var walk = SliceClips.Get("Walk", look.Female);
             var root = new GameObject(look.Name);
             var model = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(look.Model), root.transform);
             model.name = "Model";
@@ -424,13 +417,13 @@ namespace GameDev.Slice.EditorTools
             return prefab;
         }
 
-        /// <summary>A standing look's idle: a Warden's at attention, a woman Warden's in the women's pose.</summary>
-        private static string IdleUse(Look look) => look == Officer ? "Attention" : look == WardenWoman ? "AttentionWoman" : "Idle";
+        /// <summary>A standing look's idle: a Warden's at attention, a man's or a woman's.</summary>
+        private static string IdleUse(Look look) => look == Officer || look == WardenWoman ? "Attention" : "Idle";
 
         /// <summary>A standing look's controller: the Wardens' at attention, the blacksmith's hammering at the anvil (A3).</summary>
         private static string StandingController(Look look) =>
-            look == Officer ? SliceMixamo.WardenController : look == WardenWoman ? SliceMixamo.WardenWomanController :
-            look == Blacksmith ? SliceMixamo.BlacksmithController : look.Female ? WomanController : ManController;
+            look == Officer ? SliceClips.WardenController : look == WardenWoman ? SliceClips.WardenWomanController :
+            look == Blacksmith ? SliceClips.BlacksmithController : look.Female ? WomanController : ManController;
 
         /// <summary>A loose copy of <paramref name="look"/>'s model under a root of its own, at its stature in the clip's first pose; the caller destroys the root.</summary>
         internal static Animator Fitted(Look look, AnimationClip clip)
@@ -904,7 +897,7 @@ namespace GameDev.Slice.EditorTools
             var animator = Animated(model, look);
             animator.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(PlayerController);
             animator.applyRootMotion = false;
-            var stature = Fit(model, SliceMixamo.Get("Idle"), look.Height, false);
+            var stature = Fit(model, SliceClips.Get("Idle", look.Female), look.Height, false);
             var head = Keep(model, animator);
             SliceKitCatalogue.SetLayer(model, KitLayers.Character);
             return $"{look.File}, {stature:0.00} m (head bone at {head:0.00} m), {animator.runtimeAnimatorController.name}, upper arm {ArmDrop(animator):0}° from down";
@@ -927,7 +920,7 @@ namespace GameDev.Slice.EditorTools
             {
                 var (path, look) = players[row];
                 var column = 0;
-                foreach (var (clip, at) in new[] { (SliceMixamo.Get("Idle"), 0.5f), (SliceMixamo.Get("Walk"), 0.25f) })
+                foreach (var (clip, at) in new[] { (SliceClips.Get("Idle", look.Female), 0.5f), (SliceClips.Get("Walk", look.Female), 0.25f) })
                 {
                     var go = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path));
                     Pose(go.GetComponentInChildren<Animator>(), clip, clip.length * at);
@@ -954,7 +947,7 @@ namespace GameDev.Slice.EditorTools
             {
                 var look = All[row];
                 var column = 0;
-                foreach (var (clip, at) in new[] { (SliceMixamo.Get(IdleUse(look)), 0.5f), (SliceMixamo.Get("Walk"), 0.25f) })
+                foreach (var (clip, at) in new[] { (SliceClips.Get(IdleUse(look), look.Female), 0.5f), (SliceClips.Get("Walk", look.Female), 0.25f) })
                 {
                     var go = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(look.Standing));
                     Pose(go.GetComponentInChildren<Animator>(), clip, clip.length * at);

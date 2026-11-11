@@ -140,7 +140,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             // A standing person's controller on the Mixamo clips (ANIMATION_PIPELINE_PLAN.md A1).
-            return SliceMixamo.Person(PersonIdlePath, "Idle");
+            return SliceClips.Person(PersonIdlePath, "Idle", false);
         }
 
         /// <summary>The pack's own idle, alone: no demo chain from one clip to the next.</summary>

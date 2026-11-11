@@ -1,12 +1,12 @@
 # Animation Pipeline — Kevin Iglesias and Quaternius to Unity
 
-Version: 0.8
+Version: 0.9
 
-Status: Draft — the owner's second direction of 2026-11-11 (§0); §1–§7 are the withdrawn Mixamo and Blender pipeline
+Status: Draft — the owner's second direction of 2026-11-11 (§0) and its clip map (§8); §1–§7 are the withdrawn Mixamo and Blender pipeline
 
 Created: 2026-11-10
 
-Last Updated: 2026-11-11 (§0: the owner's second direction: Kevin Iglesias back, Quaternius for the gaps, Mixamo and Blender out, the character facing the camera, checks at the key frame. Earlier: §5 *The play test of 2026-11-11*: one shared avatar for the Mixamo files and a T-pose rest for the Blender clips, the movement state machine, the jump's landing, the blow's timing per weapon, the blacksmith's hammer, anvil and stump, and the sources. Earlier: §5 A fight: the walk in a fight and the hit or the death at the blow's impact, shown beat by beat by S3a.5's `FightBeats`. Earlier: 2026-11-10: §3, §5, §6: A3's first four clips, Mining, Chopping, Hammering and Surrender, made in Blender by a script that is their source; the blacksmith hammers at the anvil; the rest of A3 waits for its actions. Earlier: §5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
+Last Updated: 2026-11-11 (§8: the clip map of AN1: every use's clip from Kevin Iglesias' FREE packs or Quaternius' Universal Animation Library 1 and 2, each work clip's key frame measured, the Mixamo and Blender clips deleted. Earlier: §0: the owner's second direction: Kevin Iglesias back, Quaternius for the gaps, Mixamo and Blender out, the character facing the camera, checks at the key frame. Earlier: §5 *The play test of 2026-11-11*: one shared avatar for the Mixamo files and a T-pose rest for the Blender clips, the movement state machine, the jump's landing, the blow's timing per weapon, the blacksmith's hammer, anvil and stump, and the sources. Earlier: §5 A fight: the walk in a fight and the hit or the death at the blow's impact, shown beat by beat by S3a.5's `FightBeats`. Earlier: 2026-11-10: §3, §5, §6: A3's first four clips, Mining, Chopping, Hammering and Surrender, made in Blender by a script that is their source; the blacksmith hammers at the anvil; the rest of A3 waits for its actions. Earlier: §5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1–§2, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -302,3 +302,61 @@ The owner downloads; the agent imports, renames each clip by its use, checks it 
 - The rig check (`SliceCharacterRigs.Check`) poses each new clip on all eleven models, front and side, before it is wired.
 - A role's controller is built by code, as the townsfolk's is (`SliceTownsfolk`), so it can be built again.
 - The slice's PlayMode tests that walk the townsfolk and the player pass after each phase.
+
+## 8. The clip map (AN1, 2026-11-12)
+
+`SliceClips` holds this table in code, a use to its clip, and builds the controllers from it; `SliceClipSurvey` measures every clip on the player man (`Logs/SliceSurvey/clip_survey.txt`). The Mixamo and Blender clips, their importer and `tools/blender/animation/a3_clips.py` are deleted.
+
+**Sources.**
+
+- **Kevin Iglesias' Human Animations**, the FREE packs (Basic Motions, Crafting, Melee, Soldier, Spellcasting), in `Assets/Kevin Iglesias/Human Animations/Animations/`: a man's take under `Male/` as `HumanM@…`, a woman's under `Female/` as `HumanF@…`, the same 189 clips each. They keep the pack's own import: Humanoid on the pack's avatar, in place. A woman plays the women's takes.
+- **Quaternius' Universal Animation Library 1 and 2**, the Standard tier, CC0, from Quaternius' own itch.io pages (the free download, 15.9 MB and 18.7 MB): the root-motion-free Unity files `Assets/Quaternius/UAL1_Standard.fbx` and `UAL2_Standard.fbx`, 43 takes each. `SliceClips` imports each as Humanoid with an avatar of its own, made from the mannequin it carries, and cuts out each take used under its use's name, in place. Both packs are vendor folders outside git; a fresh copy is downloaded again from the same pages.
+
+**The map.** *Key* is a work clip's key frame, where its Reaction Check comes (07.1 §8a), measured by `SliceClipSurvey` (s into the clip, authoring measurement).
+
+| Use | Clip | Where it plays | Key |
+|---|---|---|---|
+| Idle, Idle2, Idle3 | K Idle01–03 | standing people, the player; the townsfolk vary among them (AN6) | |
+| Attention | K MilitaryIdle01 | the Wardens, men and women | |
+| Walk and its seven directions | K Walk01_* | the player's eight-way walk (AN2), every walker | |
+| Run and its seven directions | K Run01_* | the player's eight-way run (AN2) | |
+| Sprint, SprintForwardLeft/Right, SprintLeft/Right | K Sprint01_* | the player's sprint; the pack has no sprint backward, so a sprint backward is a run | |
+| TurnLeft, TurnRight | K Turn01_* | turning on the spot (AN2) | |
+| JumpUp, Fall, JumpLand | K Jump01 Begin, Fall01, Jump01 Land | the jump and any fall | |
+| Crouch, Sneak | Q1 Crouch_Idle, Crouch_Fwd | Stealth Mode | |
+| Swim, SwimIdle | Q1 Swim_Fwd, Swim_Idle | swimming (AN5); the fast swim plays Swim faster | |
+| WalkFormal, Carry | Q1 Walk_Formal, Q2 Walk_Carry | gentlemen and porters among the walkers (AN6) | |
+| Guard | K CombatIdle01 | a fighter with no weapon | |
+| Guard1H, Attack1H, Attack1HLeft | K CombatIdle1H01, Attack1H01_R, _L | sword, axe, mace and dagger (Weapon 1 and 3); two weapons strike right and left in turn (AN4) | |
+| Guard2H, Attack2H | K CombatIdle2H01, Attack2H01 | greatsword, greataxe and maul (Weapon 2) | |
+| ShieldAttack, ShieldGuard, ShieldBash | K AttackShield01; Q2 Idle_Shield, Shield_OneShot | a weapon and a shield (AN4) | |
+| Block | Q2 Sword_Block | the Defensive Stance and its Counterattack (AN4) | |
+| PistolAim, PistolShot, PistolLoad | K Gun_Aim01, _Shoot01, Gun_Reload01 | the pistol (Weapon 4): its shot includes loading (10.2 §5b), so the shot plays the shot and then the load | |
+| RifleAim, RifleShot, RifleLoad | K Rifle_Aim01, _Shoot01, Rifle_Reload01 | the rifle (Weapon 5), as the pistol | |
+| Hit, Hit2, GuardHit, HitChest, HitHead, Knockback | K Damage01–02, CombatDamage01; Q1 Hit_Chest, Hit_Head; Q2 Hit_Knockback | hits | |
+| Die, Die2, Die3 | K Death01–03 | deaths | |
+| GetUp | Q2 LayToIdle | getting up from the ground, waking from Дрёма (AN4) | |
+| CastIdle, CastEnter, CastExit, CastHit | K CastingIdle01, Enter01, Exit01, CastingDamage01 | a mage's guard and its hit | |
+| CastCall, CastDirectLeft, CastDirectRight, CastDirect2H, CastOmni | K MagicAttack* | each ability its own cast (AN4) | |
+| SpellEnter, SpellIdle, SpellShot, SpellExit | Q1 Spell_Simple_* | a quick cast (AN4) | |
+| Talk, TalkIdle, SitTalk | K Talk01; Q1 Idle_Talking, Sitting_Talking | a conversation; townsfolk talking together (AN6) | |
+| Nod, ShakeHead | Q2 Yes, Idle_No | a greeting in passing; bargaining at a stall (AN6) | |
+| FoldArms, Lean, LeanCall, Lantern | Q2 Idle_FoldArms, Idle_Rail, Idle_Rail_Call, Idle_Lantern | townsfolk standing about, a night watchman (AN6) | |
+| Sit, StandToSit, SitToStand | Q1 Sitting_* | benches, the tavern's chairs, the chapel's pews (AN6) | |
+| Drink | Q2 Consume | the tavern (AN6) | |
+| Gather | K Gathering01 | reaching for goods at a stall (AN6) | |
+| Chop | Q2 TreeChopping_Loop | felling a tree | the right hand furthest out, 0.53 of 0.97 s |
+| Mine | K MiningOneHand01_R Ground | an iron vein | the fist lowest, 0.40 of 0.97 s |
+| HammerDown, HammerUp | K MiningOneHand01_R Ground, cut 0–0.38 s and 0.81–0.97 s | the blacksmith at the anvil, the blow and its rebound in turn; Item Creation, the check on the last blow | the end of HammerDown, where the hammer meets the anvil's face, 0.38 s |
+| Harvest | Q2 Farm_Harvest | a herb or flax patch, one check | the hips begin to rise, 1.27 of 2.50 s |
+| Kneel | Q1 Fixing_Kneeling | Skinning and First Aid | the hips begin to rise, 4.30 of 5.20 s |
+| Interact, PickUp, OpenChest | Q1 Interact, PickUp_Table; Q2 Chest_Open | a lock, theft, a Stash (AN3 measures their keys) | |
+| Gather2, Gather3, MineWall | K | spare: crouched gathering, a pick at a wall | |
+
+**Choices the packs forced** (the agent's, under the owner's grant of 2026-11-11):
+
+- *The anvil.* Kevin Iglesias' hammering kneels and strikes the ground, the fist down to 0.28 m, under any anvil's face. At the anvil the smith and the player strike with the pick's blow from above instead, cut where the anvil stops it: the blow down to the hammer meeting the face, 0.38 s, and the rebound from 0.81 s, the lower part left out. `SliceBlacksmith` measures the armed smith and sets the anvil on an oak stump 0.10 m high, its face 0.85 m over the ground, the hammer coming down to 0.90 m (`Logs/SliceSurvey/blacksmith.txt`). *Weak point:* the blow is the pick's blow at the ground, so the smith drops into a deep crouch before it lands; neither pack has a standing blow from above. A standing smith's blow wants a clip the packs lack, and is listed for the owner.
+- *Gathering.* Kevin Iglesias' gathering clips are loops, one at chest height and two crouched, with no stooping or rising. A herb patch, one check, wants the whole motion, so Quaternius' harvest plays: it stoops, picks, and stands.
+- *What neither pack has:* a kneeling prayer, a wave, a surrender and a sleeping loop. The faithful sit in the pews; a nod greets; Yield holds the crouch; a sleeper lies in the last pose of a death clip, and GetUp brings it up.
+- *Not used:* Kevin Iglesias' fishing, ploughing, polearm, bazooka, grenade, assault rifle and dual pistols, and Quaternius' dance, driving, punches, roll, slides, ninja jumps, zombies, phone and climbing: no slice action, or out of the Victorian style.
+- *The survey's scale.* `SliceClipSurvey` fits the model to each clip's first pose, so a clip that starts crouched, sitting or lying reads up to a third larger; its times are exact.

@@ -206,14 +206,14 @@ namespace GameDev.Slice.EditorTools
         // ------------------------------------------------------------------------------------------- check
 
         /// <summary>
-        /// The Mixamo clips every person is posed in before they are wired (ANIMATION_PIPELINE_PLAN.md §7): the idle, the
-        /// walk at mid-stride, the talk, a sword's blow, the rifle's aim and the end of a death; and the Blender clips
-        /// (A3): the pick striking the ground, the axe drawn back, the hammer raised and the end of a surrender.
+        /// The clips every person is posed in before they are wired (ANIMATION_PIPELINE_PLAN.md §8): Kevin Iglesias' idle,
+        /// walk at mid-stride, talk, one-handed blow, rifle's aim, end of a death, pick and hammer; Quaternius' axe, swim,
+        /// seat and drink.
         /// </summary>
         private static readonly (string Use, float At)[] Poses =
         {
-            ("Idle", 0.5f), ("Walk", 0.25f), ("Talk", 0.5f), ("SwordSlash", 0.45f), ("RifleIdle", 0.5f), ("Die", 0.97f),
-            ("Mine", 0.23f), ("Chop", 0f), ("Hammer", 0f), ("Yield", 1f),
+            ("Idle", 0.5f), ("Walk", 0.25f), ("Talk", 0.5f), ("Attack1H", 0.45f), ("RifleAim", 0.5f), ("Die", 0.97f),
+            ("Mine", 0.3f), ("HammerDown", 1f), ("Chop", 0.3f), ("Swim", 0.25f), ("Sit", 0.5f), ("Drink", 0.5f),
         };
 
         [MenuItem("GameDev/Slice/People/Check the Tripo People's Rigs")]
@@ -225,7 +225,7 @@ namespace GameDev.Slice.EditorTools
             light.transform.rotation = Quaternion.Euler(40f, -30f, 0f);
             RenderSettings.ambientLight = new Color(0.55f, 0.55f, 0.55f);
 
-            var clips = Poses.Select(p => (Clip: SliceMixamo.Get(p.Use), p.At)).ToList();
+            var clips = Poses.Select(p => (Clip: SliceClips.Get(p.Use), p.At)).ToList();
             const int tile = 256;
             var muscles = new HashSet<string>(HumanTrait.MuscleName.Select(ClipMuscle));
             foreach (var (clip, _) in clips.Where(c => c.Clip != null))

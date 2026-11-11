@@ -24,20 +24,18 @@ namespace GameDev.Slice.EditorTools
             var report = new StringBuilder();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             report.AppendLine("Rest poses (arm drop from down, 90 = T-pose; knee angle, 180 = straight; foot pitch, toes below ankle +):");
-            foreach (var path in new[] { SlicePeopleModels.PlayerWoman.Model, SlicePeopleModels.PlayerMan.Model, SliceMixamo.PathOf("Idle"), SliceMixamo.PathOf("Walk"), SliceMixamo.PathOf("Run"), SliceMixamo.PathOf("Hammer") })
+            foreach (var path in new[] { SlicePeopleModels.PlayerWoman.Model, SlicePeopleModels.PlayerMan.Model, SliceClips.PathOf("Idle"), SliceClips.PathOf("Walk"), SliceClips.PathOf("Run"), SliceClips.Q1, SliceClips.Q2 })
             {
                 report.AppendLine($"  {Path.GetFileNameWithoutExtension(path)}: {Rest(path)}");
             }
 
-            // The clip's first frame as its file holds it (the rest pose above, for a file with no skin) against the same
-            // frame retargeted onto the player woman, whose skeleton the files were downloaded on: equal when the
-            // clip's avatar knows its true rest pose.
+            // The clip's first frame retargeted onto the player woman: the knees and the feet as the clip bends them.
             report.AppendLine();
-            report.AppendLine("First frame retargeted onto the player woman (same skeleton as the files): knees and feet pitch:");
+            report.AppendLine("First frame retargeted onto the player woman: knees and feet pitch:");
             foreach (var use in new[] { "Idle", "Walk", "Run" })
             {
-                var animator = SlicePeopleModels.Fitted(SlicePeopleModels.PlayerWoman, SliceMixamo.Get(use));
-                SlicePeopleModels.Pose(animator, SliceMixamo.Get(use), 0f);
+                var animator = SlicePeopleModels.Fitted(SlicePeopleModels.PlayerWoman, SliceClips.Get(use, true));
+                SlicePeopleModels.Pose(animator, SliceClips.Get(use, true), 0f);
                 report.AppendLine($"  {use}: knees {Knee(animator, true):0} / {Knee(animator, false):0}, feet pitch {Pitch(animator, true):0} / {Pitch(animator, false):0}");
                 Object.DestroyImmediate(animator.transform.parent.gameObject);
             }
@@ -47,9 +45,9 @@ namespace GameDev.Slice.EditorTools
             // faster than 0.6 m/s. FightBeats' impact and the Hit state's start are set from these.
             report.AppendLine();
             report.AppendLine("Blow contact and hit onset, measured on the player man (seconds into each clip):");
-            foreach (var use in new[] { "SwordSlash", "GreatswordSlash", "Stab", "PistolShot", "RifleShot", "Hit" })
+            foreach (var use in new[] { "Attack1H", "Attack1HLeft", "Attack2H", "ShieldAttack", "PistolShot", "RifleShot", "Hit" })
             {
-                var clip = SliceMixamo.Get(use);
+                var clip = SliceClips.Get(use);
                 var animator = SlicePeopleModels.Fitted(SlicePeopleModels.PlayerMan, clip);
                 var root = animator.transform.parent;
                 var frames = Mathf.RoundToInt(clip.length * clip.frameRate);

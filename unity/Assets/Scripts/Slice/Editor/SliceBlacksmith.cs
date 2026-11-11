@@ -103,7 +103,7 @@ namespace GameDev.Slice.EditorTools
                 // The hammer is set on the body as it stands at the blow, then the body goes back to its own pose and
                 // the hammer stays in the hand: the clip's fist after the Humanoid retarget, not the bind pose's, holds it.
                 var bones = animator.GetComponentsInChildren<Transform>(true).Select(t => (t, t.localPosition, t.localRotation, t.localScale)).ToList();
-                var blow = LowestHand(animator, root.transform, SliceMixamo.Get("Hammer"));
+                var blow = LowestHand(animator, root.transform, SliceClips.Get("HammerDown"));
                 var hammer = (GameObject)PrefabUtility.InstantiatePrefab(hammerPrefab, hand);
                 hammer.name = HammerName;
                 report.AppendLine(Hold(hammer.transform, animator, root.transform, blow));
@@ -239,16 +239,18 @@ namespace GameDev.Slice.EditorTools
         {
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             var smith = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(SlicePeopleModels.Blacksmith.Standing));
-            var clip = SliceMixamo.Get("Hammer");
+            var clip = SliceClips.Get("HammerDown");
             var animator = smith.GetComponentInChildren<Animator>();
             var sole = Sole(animator, smith.transform);
             var strike = new Strike { Point = new Vector3(0f, float.MaxValue, 0f), Length = clip.length };
             var frames = Mathf.RoundToInt(clip.length * clip.frameRate);
             float highest = float.MinValue;
+            var path = new StringBuilder("Blacksmith: the hammer's lowest point frame by frame (s: m):");
             for (var f = 0; f <= frames; f++)
             {
                 var t = f / clip.frameRate;
                 var lowest = Lowest(Pose(animator, smith.transform, clip, t, sole), smith.transform);
+                path.Append($" {t:0.00}: {lowest.y:0.00};");
                 highest = Mathf.Max(highest, lowest.y);
                 if (lowest.y < strike.Point.y)
                 {
@@ -257,6 +259,7 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
+            report.AppendLine(path.ToString());
             report.AppendLine($"Blacksmith: the Hammer clip is {clip.length:0.00} s; the hammer's lowest point comes down to {strike.Point.y:0.00} m over his soles " +
                               $"at {strike.Time:0.00} s, {strike.Point.z:0.00} m in front and {strike.Point.x:+0.00;-0.00} m to his left/right; at its highest it is {highest:0.00} m up");
             Object.DestroyImmediate(smith);
@@ -591,7 +594,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             var animator = smith.GetComponentInChildren<Animator>();
-            var clip = SliceMixamo.Get("Hammer");
+            var clip = SliceClips.Get("HammerDown");
             var sole = Sole(animator, smith.transform);
             var times = new[] { -0.36f, -0.18f, -0.06f, 0f, 0.12f }.Select(d => Mathf.Repeat(strike.Time + d, strike.Length)).ToArray();
             const int tile = 384;
