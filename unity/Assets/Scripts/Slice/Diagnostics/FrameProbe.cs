@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using GameDev.Core.Scenes;
 using GameDev.Locomotion;
+using GameDev.Slice.Atmosphere;
+using GameDev.World.Timekeeping;
 using Unity.Profiling;
 using Unity.Profiling.LowLevel.Unsafe;
 using UnityEngine;
@@ -25,8 +27,11 @@ namespace GameDev.Slice.Diagnostics
     /// <c>-frameTiming &lt;report file&gt;</c> (<c>SliceLoadProbeBuild.BuildForFrames</c> makes one, keeping the
     /// BatchRendererGroup variants the drawer draws with). Veilmouth loads, the player's own figure is hidden, and from the
     /// editor test's seven views the main camera draws, in turn for <see cref="Rounds"/> rounds, in each of
-    /// <see cref="Modes"/>: the SRP Batcher alone, as the game ships; the drawer with GPU occlusion culling; and the SRP
-    /// Batcher alone with the camera's shadows off. Each switch is followed by <see cref="WarmUps"/> frames, then
+    /// <see cref="Modes"/>: the SRP Batcher alone, as the game ships; the drawer with GPU occlusion culling; the SRP
+    /// Batcher alone with the camera's shadows off; and the SRP Batcher alone with the height fog off (reference plan R3
+    /// step 5), so its pass's cost is the difference from the first. With <c>-frameMinute &lt;minute of the day&gt;</c> the
+    /// game's clock is first moved on to that minute, so the night's lamps and their halos in the fog are measured too.
+    /// Each switch is followed by <see cref="WarmUps"/> frames, then
     /// <see cref="Frames"/> are measured, with no frame cap and no vertical sync.
     /// <para>
     /// The report gives medians: the frame; from the FrameTimingManager the main thread (from the frame's start to the end
@@ -38,14 +43,14 @@ namespace GameDev.Slice.Diagnostics
     /// </summary>
     public sealed class FrameProbe : MonoBehaviour
     {
-        private const string Flag = "-frameTiming";
+        private const string Flag = "-frameTiming", MinuteFlag = "-frameMinute";
         private const string City = "Veilmouth";
         private const int Rounds = 3, WarmUps = 60, Frames = 120;
         private const float Watchdog = 1200f; // s
 
         private const string Frame = "frame", Main = "main thread", Wait = "its wait for Present", Render = "render thread", Gpu = "GPU";
         private static readonly string[] Times = { Frame, Main, Wait, Render, Gpu };
-        private static readonly string[] Modes = { "SRP Batcher alone", "drawer with occlusion culling", "SRP Batcher alone, no shadows" };
+        private static readonly string[] Modes = { "SRP Batcher alone", "drawer with occlusion culling", "SRP Batcher alone, no shadows", "SRP Batcher alone, no height fog" };
         private static readonly string[] Counters = { "Batches Count", "SetPass Calls Count", "Draw Calls Count", "Triangles Count", "Shadow Casters Count" };
 
         /// <summary>World X and Z of the eye and of what it looks at, as the editor test's.</summary>
@@ -64,6 +69,7 @@ namespace GameDev.Slice.Diagnostics
         private readonly FrameTiming[] _timing = new FrameTiming[1];
         private readonly List<(string Name, bool Nanoseconds, ProfilerRecorder Recorder)> _recorders = new List<(string, bool, ProfilerRecorder)>();
         private string _file;
+        private int _minute = -1;
         private bool _done;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -88,6 +94,11 @@ namespace GameDev.Slice.Diagnostics
             probe._file = i + 1 < args.Length && !args[i + 1].StartsWith("-", StringComparison.Ordinal)
                 ? args[i + 1]
                 : Path.Combine(Application.persistentDataPath, "frame_timing.txt");
+            var m = Array.IndexOf(args, MinuteFlag);
+            if (m >= 0 && m + 1 < args.Length && int.TryParse(args[m + 1], out var minute))
+            {
+                probe._minute = minute;
+            }
             Application.logMessageReceived += probe.OnLog;
         }
 
@@ -145,6 +156,13 @@ namespace GameDev.Slice.Diagnostics
                 yield return null;
             }
 
+            var clock = GameClockDriver.Running;
+            if (_minute >= 0 && clock != null)
+            {
+                clock.AdvanceTicks((_minute - clock.MinuteOfDay + GameClock.MinutesPerDay) % GameClock.MinutesPerDay);
+                yield return new WaitForSeconds(0.3f);
+            }
+
             var cam = Camera.main ?? throw new InvalidOperationException("the city has no main camera");
             foreach (var b in cam.GetComponents<Behaviour>().Where(b => (b.GetType().Namespace ?? string.Empty).StartsWith("GameDev", StringComparison.Ordinal)))
             {
@@ -177,6 +195,8 @@ namespace GameDev.Slice.Diagnostics
             var terrain = Terrain.activeTerrain;
             float Ground(Vector2 p) => terrain != null ? terrain.SampleHeight(new Vector3(p.x, 0f, p.y)) + terrain.transform.position.y : 0f;
             urp.gpuResidentDrawerEnableOcclusionCullingInCameras = true;
+            var fog = HeightFog.Owner;
+            _report.AppendLine($"Height fog {(fog != null ? "on" : "off")}; the game's clock at minute {(clock != null ? clock.MinuteOfDay.ToString() : "n/a")} of the day");
             var ran = 0;
             var all = Modes.Select(_ => new Laps()).ToArray();
             foreach (var (name, from, to) in Views)
@@ -190,6 +210,7 @@ namespace GameDev.Slice.Diagnostics
                     {
                         urp.gpuResidentDrawerMode = k == 1 ? GPUResidentDrawerMode.InstancedDrawing : GPUResidentDrawerMode.Disabled;
                         camData.renderShadows = k != 2;
+                        HeightFog.Own(k == 3 ? null : fog);
                         for (var i = 0; i < WarmUps + Frames; i++)
                         {
                             yield return null;
@@ -223,6 +244,7 @@ namespace GameDev.Slice.Diagnostics
 
             urp.gpuResidentDrawerMode = GPUResidentDrawerMode.Disabled;
             camData.renderShadows = true;
+            HeightFog.Own(fog);
             Finish("done");
         }
 
