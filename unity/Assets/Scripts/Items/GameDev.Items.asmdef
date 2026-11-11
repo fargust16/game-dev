@@ -1,0 +1,17 @@
+{
+    "name": "GameDev.Items",
+    "rootNamespace": "GameDev.Items",
+    "references": [
+        "GameDev.Core.Localization",
+        "GameDev.Player.Progression"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

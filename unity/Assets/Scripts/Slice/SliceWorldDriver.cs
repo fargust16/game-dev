@@ -4,6 +4,7 @@ using System.Linq;
 using GameDev.Core.Localization;
 using GameDev.Dialogue;
 using GameDev.Input;
+using GameDev.Items;
 using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Player.Standing;
@@ -21,7 +22,7 @@ namespace GameDev.Slice
     /// <summary>
     /// Owns the slice's run-time world: the world state store, the POI Director on the running clock, the tips the
     /// sources say, the character's values and standing, the conversations (S2.4), the Character Notes on J, the map
-    /// on M, and the next language on F10. It lives through scene changes like the clock; a
+    /// on M, the bag on I (S5a.1), and the next language on F10. It lives through scene changes like the clock; a
     /// driver that arrives with a later scene while one already runs removes itself, so a scene may carry one for testing.
     /// </summary>
     public sealed class SliceWorldDriver : MonoBehaviour
@@ -54,6 +55,22 @@ namespace GameDev.Slice
 
         /// <summary>The character's attributes and skills, all 1 until S5b's character creation (S2 authoring default).</summary>
         public CharacterSheet Character { get; private set; }
+
+        /// <summary>The character's bag and purse (S5a.1); null when the settings carry no item catalogue.</summary>
+        public Bag Bag { get; private set; }
+
+        /// <summary>11's start: plain clothes with no defence and 500 bronze, with no weapon or tool.</summary>
+        public const int StartingBronze = 500;
+
+        public const string PlainClothes = "plain_clothes";
+
+        public static Bag StartingBag(ItemCatalogue catalogue, ICharacterValues character)
+        {
+            var bag = new Bag(catalogue, character);
+            bag.AddPiece(new ItemPiece(PlainClothes));
+            bag.Earn(StartingBronze);
+            return bag;
+        }
 
         /// <summary>The fights in the scene (S3a.4): the Encounter Lock, the turns and the Combat Grid; null without FightRules.</summary>
         public SliceConfront Fights { get; private set; }
@@ -189,6 +206,12 @@ namespace GameDev.Slice
             Director.Evaluate(Clock.Tick);
             Tips = new TipBook(tips, State, Director);
             Character = new CharacterSheet();
+            if (settings.Items != null)
+            {
+                Bag = StartingBag(settings.Items, Character);
+                Bag.Changed += Refresh;
+            }
+
             if (settings.FightRules != null)
             {
                 Fights = gameObject.AddComponent<SliceConfront>();
@@ -276,6 +299,18 @@ namespace GameDev.Slice
                 }
             }
 
+            if (input.BagPressed && Bag != null)
+            {
+                if (hud.IsBagOpen)
+                {
+                    hud.CloseBag();
+                }
+                else
+                {
+                    ShowBag(hud);
+                }
+            }
+
             if (input.MapPressed)
             {
                 if (hud.IsMapOpen)
@@ -305,12 +340,22 @@ namespace GameDev.Slice
             hud.ShowMap(cityPlan != null ? cityPlan.text : null, MapMarks(), player);
         }
 
+        private void ShowBag(HudView hud)
+        {
+            hud.ShowBag(BagPage.Money(Bag), BagPage.Load(Bag), BagPage.Lines(Bag));
+        }
+
         private void Refresh()
         {
             var hud = Hud();
             if (hud != null && hud.IsNotesOpen)
             {
                 hud.ShowNotes(Notes.Lines);
+            }
+
+            if (hud != null && hud.IsBagOpen && Bag != null)
+            {
+                ShowBag(hud);
             }
         }
 

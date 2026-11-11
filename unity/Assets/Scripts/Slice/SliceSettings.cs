@@ -33,6 +33,9 @@ namespace GameDev.Slice
         [SerializeField] private FightOffHand kitPouch;
         [SerializeField] private FightArmour kitArmour;
 
+        [Tooltip("Every item of the slice (S5a.1; 19 §4.1, §6.3).")]
+        [SerializeField] private GameDev.Items.ItemCatalogue items;
+
         [Tooltip("The development fight's opponents: a model and the weapon each carries. Authoring defaults.")]
         [SerializeField] private GameObject opponentModel;
         [SerializeField] private FightWeapon opponentWeapon;
@@ -79,6 +82,8 @@ namespace GameDev.Slice
         public FightOffHand KitPouch => kitPouch;
 
         public FightArmour KitArmour => kitArmour;
+
+        public GameDev.Items.ItemCatalogue Items => items;
 
         public GameObject OpponentModel => opponentModel;
 

@@ -24,6 +24,7 @@ namespace GameDev.Input
         private InputAction _jump;
         private InputAction _notes;
         private InputAction _map;
+        private InputAction _bag;
         private InputAction _sprint;
 
         private InputAction _camPan;
@@ -116,6 +117,9 @@ namespace GameDev.Input
         public bool JumpPressed => _jump != null && _jump.WasPressedThisFrame();
         public bool NotesPressed => _notes != null && _notes.WasPressedThisFrame();
         public bool MapPressed => _map != null && _map.WasPressedThisFrame();
+
+        /// <summary>I: the bag page (S5a.1).</summary>
+        public bool BagPressed => _bag != null && _bag.WasPressedThisFrame();
         public bool SprintHeld => _sprint != null && _sprint.IsPressed();
 
         public Vector2 CameraPanVector => _camPan != null ? _camPan.ReadValue<Vector2>() : Vector2.zero;
@@ -224,6 +228,7 @@ namespace GameDev.Input
             _jump = _player.AddAction("Jump", InputActionType.Button, "<Keyboard>/space");
             _notes = _player.AddAction("Notes", InputActionType.Button, "<Keyboard>/j");
             _map = _player.AddAction("Map", InputActionType.Button, "<Keyboard>/m");
+            _bag = _player.AddAction("Bag", InputActionType.Button, "<Keyboard>/i");
             _sprint = _player.AddAction("Sprint", InputActionType.Button);
             _sprint.AddBinding("<Keyboard>/leftShift");
             _sprint.AddBinding("<Keyboard>/rightShift");

@@ -35,6 +35,10 @@ namespace GameDev.UI
         private VisualElement _notes;
         private ScrollView _notesList;
         private VisualElement _map;
+        private VisualElement _bag;
+        private Label _bagMoney;
+        private Label _bagLoad;
+        private ScrollView _bagList;
         private CityMapElement _mapView;
         private const string MapVisible = "hud__map--visible";
         private long _shownTick = -1;
@@ -114,12 +118,48 @@ namespace GameDev.UI
             }
 
             CloseMap();
+            CloseBag();
             _notes.AddToClassList(NotesVisible);
         }
 
         public void CloseNotes()
         {
             _notes?.RemoveFromClassList(NotesVisible);
+        }
+
+        public bool IsBagOpen => _bag != null && _bag.ClassListContains(NotesVisible);
+
+        /// <summary>The bag page's lines, money and load first, then each stack and piece (S5a.1).</summary>
+        public IReadOnlyList<string> BagLines => _bag == null
+            ? new string[0]
+            : new[] { _bagMoney.text, _bagLoad.text }.Concat(Texts(_bagList, NoteClass)).ToList();
+
+        /// <summary>Opens the bag page on I (S5a.1), or refreshes it while open: the money, the load, and what is carried.</summary>
+        public void ShowBag(string money, string load, IReadOnlyList<string> lines)
+        {
+            if (!Bind() || _bag == null)
+            {
+                return;
+            }
+
+            _bagMoney.text = money;
+            _bagLoad.text = load;
+            _bagList.Clear();
+            foreach (var line in lines.Count > 0 ? lines : new[] { Loc.Get("ui.hud.bag.empty") })
+            {
+                var label = new Label(line);
+                label.AddToClassList(NoteClass);
+                _bagList.Add(label);
+            }
+
+            CloseMap();
+            CloseNotes();
+            _bag.AddToClassList(NotesVisible);
+        }
+
+        public void CloseBag()
+        {
+            _bag?.RemoveFromClassList(NotesVisible);
         }
 
         public bool IsMapOpen => _map != null && _map.ClassListContains(MapVisible);
@@ -150,6 +190,7 @@ namespace GameDev.UI
 
             _mapView.SetMarks(marks, player);
             CloseNotes();
+            CloseBag();
             _map.AddToClassList(MapVisible);
         }
 
@@ -199,6 +240,7 @@ namespace GameDev.UI
             CloseReading();
             CloseNotes();
             CloseMap();
+            CloseBag();
             _dialogue.AddToClassList(DialogueVisible);
             if (last != null)
             {
@@ -262,6 +304,10 @@ namespace GameDev.UI
             _readingText = root.Q<Label>("reading-text");
             _notes = root.Q<VisualElement>("notes");
             _notesList = root.Q<ScrollView>("notes-list");
+            _bag = root.Q<VisualElement>("bag");
+            _bagMoney = root.Q<Label>("bag-money");
+            _bagLoad = root.Q<Label>("bag-load");
+            _bagList = root.Q<ScrollView>("bag-list");
             _map = root.Q<VisualElement>("map");
             _dialogue = root.Q<VisualElement>("dialogue");
             _dialogueLines = root.Q<ScrollView>("dialogue-lines");

@@ -159,3 +159,23 @@ ui.fight.log.revealed,{0} is seen,{0}: замечен
 ui.fight.log.unseen,{1} does not notice {0},{1} не замечает: {0}
 ui.trace.title,What lies here,Что здесь лежит
 ui.prompt.open_shutters,E  Open the shutters,E  Открыть ставни
+"# The bag page on I and money in coins (S5a.1; 19 §4.1, §6.3; 07.2 §5.2)"
+ui.coins.gold,{0} gold,{0} зол.
+ui.coins.silver,{0} silver,{0} сер.
+ui.coins.bronze,{0} bronze,{0} бронз.
+ui.hud.bag.title,Bag,Сумка
+ui.hud.bag.close,I  Close,I  Закрыть
+ui.hud.bag.empty,The bag is empty.,Сумка пуста.
+ui.hud.bag.money,Money: {0},Деньги: {0}
+ui.hud.bag.load,"Load: {0} of {1} kg, {2}","Груз: {0} из {1} кг, {2}"
+ui.hud.bag.band.normal,normal,обычный
+ui.hud.bag.band.high,high,высокий
+ui.hud.bag.band.overloaded,overloaded,перегруз
+ui.hud.bag.band.critical,critical overload,крайний перегруз
+ui.hud.bag.stack,"{0} × {1}, {2} kg","{0} × {1}, {2} кг"
+ui.hud.bag.piece,"{0} ({1}), {2} kg","{0} ({1}), {2} кг"
+ui.quality.normal,Normal,обычное
+ui.quality.magic,Magic,магическое
+ui.quality.rare,Rare,редкое
+ui.quality.epic,Epic,эпическое
+ui.quality.legendary,Legendary,легендарное
