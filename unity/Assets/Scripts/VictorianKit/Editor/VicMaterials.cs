@@ -37,6 +37,7 @@ namespace GameDev.VictorianKit.EditorTools
             public float Tone = 0.08f;
             public Vector2 Tiling = new Vector2(-1f, -1f);
             public bool WorldUV;
+            public float Puddles; // the street's paving only (reference plan R3 step 3)
         }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace GameDev.VictorianKit.EditorTools
             { "Iron", new Spec { Set = "Iron", Tint = Over(0.07f, 0.075f, 0.08f, 0.8f), Tint2 = Over(0.30f, 0.19f, 0.13f, 0.8f), Tint2Amount = 0.12f, Tint2Sharp = 5f, Metallic = 0.55f, Dirt = 0.3f, Moss = 0f } },
 
             // Street ground, not a kit slot: flagstones from the stucco set's scoring, setts from the brick set.
-            { "Ground_Pave", new Spec { Set = "Stucco", Tint = Over(0.52f, 0.50f, 0.47f, 0.86f), Tint2 = Over(0.22f, 0.21f, 0.20f, 0.86f), Tint2Amount = 1f, Rough = 1.1f, Bump = 2f, Dirt = 0.4f, Moss = 0.2f, Tone = 0.2f, Tiling = new Vector2(0.45f, 0.45f), WorldUV = true } },
+            { "Ground_Pave", new Spec { Set = "Stucco", Tint = Over(0.52f, 0.50f, 0.47f, 0.86f), Tint2 = Over(0.22f, 0.21f, 0.20f, 0.86f), Tint2Amount = 1f, Rough = 1.1f, Bump = 2f, Dirt = 0.4f, Moss = 0.2f, Tone = 0.2f, Tiling = new Vector2(0.45f, 0.45f), WorldUV = true, Puddles = 1f } },
             { "Ground_Setts", new Spec { Set = "Brick", Tint = Over(0.36f, 0.35f, 0.34f, 0.74f), Tint2 = Over(0.18f, 0.17f, 0.16f, 0.88f), Tint2Amount = 1f, Rough = 1.05f, Bump = 1.5f, Dirt = 0.4f, Moss = 0.15f, Tone = 0.25f, Tiling = new Vector2(0.625f, 0.4167f), WorldUV = true } },
         };
 
@@ -183,6 +184,7 @@ namespace GameDev.VictorianKit.EditorTools
                 m.SetFloat("_MossAmount", s.Moss);
                 m.SetFloat("_ToneVar", s.Tone);
                 m.SetFloat("_WorldUV", s.WorldUV ? 1f : 0f);
+                m.SetFloat("_Puddles", s.Puddles);
                 EditorUtility.SetDirty(m);
             }
 

@@ -24,6 +24,7 @@ half4 _DirtColor;
 half _DirtAmount;
 half _DirtHeight;
 half _Streaks;
+half _Puddles;
 half4 _MossColor;
 half _MossAmount;
 half _NoiseScale;
@@ -260,11 +261,31 @@ void VicSurfaceAt(float2 uv, float3 positionWS, half3 normalWS, out VicSurface s
     rough = lerp(rough, 0.95, moss);
     normalTS = normalize(lerp(normalTS, half3(0, 0, 1), moss * 0.6));
 
+    // Puddles in the hollows of the street's paving (reference plan R3 step 3, "a wetness mask along gutters and in
+    // hollows"; the gutters are R4's wet band): where _Puddles is set, flat up-facing faces hold standing water in
+    // patches about 0.5-2 m across, dark and glossy, so the gas lamps glint in them, each in a damp rim. A few
+    // hundredths of the paving hold water. The water's reflection is softened and dimmed, as a shallow puddle on dark
+    // stone shows the sky dimly, or it reads as a pale blot from afar. Sizes are authoring defaults, in metres.
+    half water = 0.0h;
+    half flat = saturate((normalWS.y - 0.92h) * 12.5h) * _Puddles;
+    if (flat > 0.0h)
+    {
+        float pn = VicValue3(float3(positionWS.x * 0.6, 3.7, positionWS.z * 0.6)) * 0.7 +
+                   VicValue3(float3(positionWS.x * 2.1, 9.1, positionWS.z * 2.1)) * 0.3;
+        half damp = (half)smoothstep(0.54, 0.67, pn) * flat;
+        water = (half)smoothstep(0.665, 0.70, pn) * flat;
+        albedo *= lerp(1.0h, 0.75h, damp) * lerp(1.0h, 0.55h, water);
+        rough = lerp(rough, rough * 0.65, damp);
+        rough = lerp(rough, 0.2, water);
+        moss *= 1.0h - water;
+        normalTS = normalize(lerp(normalTS, half3(0, 0, 1), water));
+    }
+
     s.albedo = albedo;
     s.normalTS = normalTS;
     s.metallic = _Metallic * (1.0 - moss) * (1.0 - max(dirt, streak) * 0.5);
     s.smoothness = 1.0 - rough;
-    s.occlusion = lerp(1.0h, mask.b, 0.8h);
+    s.occlusion = lerp(1.0h, mask.b, 0.8h) * (1.0h - water * 0.4h);
 }
 
 #endif
