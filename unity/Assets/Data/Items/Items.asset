@@ -17,6 +17,7 @@ MonoBehaviour:
     kind: 0
     weight: 1
     price: 250
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -25,6 +26,7 @@ MonoBehaviour:
     kind: 0
     weight: 1.5
     price: 100
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -33,6 +35,7 @@ MonoBehaviour:
     kind: 0
     weight: 0.5
     price: 250
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -41,6 +44,7 @@ MonoBehaviour:
     kind: 0
     weight: 0.2
     price: 100
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -49,6 +53,7 @@ MonoBehaviour:
     kind: 0
     weight: 0.1
     price: 100
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -57,6 +62,7 @@ MonoBehaviour:
     kind: 1
     weight: 0.2
     price: 100
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -65,6 +71,7 @@ MonoBehaviour:
     kind: 1
     weight: 0.2
     price: 100
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -73,6 +80,7 @@ MonoBehaviour:
     kind: 1
     weight: 0.1
     price: 2000
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -81,6 +89,7 @@ MonoBehaviour:
     kind: 1
     weight: 0.1
     price: 15000
+    sale: 4000
     slot: 0
     stage: 9
     family: 
@@ -89,6 +98,7 @@ MonoBehaviour:
     kind: 2
     weight: 2
     price: 700
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -97,6 +107,7 @@ MonoBehaviour:
     kind: 2
     weight: 2.5
     price: 700
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -105,6 +116,7 @@ MonoBehaviour:
     kind: 2
     weight: 0.1
     price: 300
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -113,6 +125,7 @@ MonoBehaviour:
     kind: 3
     weight: 0.1
     price: 200
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -121,6 +134,7 @@ MonoBehaviour:
     kind: 3
     weight: 0.5
     price: 400
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -129,6 +143,7 @@ MonoBehaviour:
     kind: 3
     weight: 0.2
     price: 600
+    sale: 0
     slot: 0
     stage: 9
     family: 
@@ -137,6 +152,7 @@ MonoBehaviour:
     kind: 4
     weight: 1.5
     price: 0
+    sale: 0
     slot: 4
     stage: 9
     family: 
@@ -145,6 +161,7 @@ MonoBehaviour:
     kind: 4
     weight: 1
     price: 500
+    sale: 0
     slot: 1
     stage: 9
     family: 
@@ -153,6 +170,7 @@ MonoBehaviour:
     kind: 4
     weight: 2
     price: 500
+    sale: 0
     slot: 1
     stage: 9
     family: 
@@ -161,6 +179,7 @@ MonoBehaviour:
     kind: 4
     weight: 2.2
     price: 500
+    sale: 0
     slot: 1
     stage: 9
     family: 
@@ -169,6 +188,7 @@ MonoBehaviour:
     kind: 4
     weight: 2.5
     price: 500
+    sale: 0
     slot: 1
     stage: 9
     family: 
@@ -177,6 +197,7 @@ MonoBehaviour:
     kind: 4
     weight: 4.5
     price: 500
+    sale: 0
     slot: 2
     stage: 9
     family: 
@@ -185,6 +206,7 @@ MonoBehaviour:
     kind: 4
     weight: 5
     price: 500
+    sale: 0
     slot: 2
     stage: 9
     family: 
@@ -193,6 +215,7 @@ MonoBehaviour:
     kind: 4
     weight: 6
     price: 500
+    sale: 0
     slot: 2
     stage: 9
     family: 
@@ -201,6 +224,7 @@ MonoBehaviour:
     kind: 4
     weight: 1.2
     price: 500
+    sale: 0
     slot: 1
     stage: 9
     family: 
@@ -209,6 +233,7 @@ MonoBehaviour:
     kind: 4
     weight: 4
     price: 500
+    sale: 0
     slot: 2
     stage: 9
     family: 
@@ -217,6 +242,7 @@ MonoBehaviour:
     kind: 4
     weight: 0.5
     price: 500
+    sale: 0
     slot: 12
     stage: 9
     family: 
@@ -225,6 +251,7 @@ MonoBehaviour:
     kind: 4
     weight: 2.5
     price: 500
+    sale: 0
     slot: 12
     stage: 9
     family: 
@@ -233,6 +260,7 @@ MonoBehaviour:
     kind: 4
     weight: 4
     price: 500
+    sale: 0
     slot: 12
     stage: 9
     family: 
@@ -241,6 +269,7 @@ MonoBehaviour:
     kind: 4
     weight: 0.05
     price: 500
+    sale: 0
     slot: 10
     stage: 9
     family: 
@@ -249,6 +278,7 @@ MonoBehaviour:
     kind: 4
     weight: 0.1
     price: 500
+    sale: 0
     slot: 11
     stage: 9
     family: 
@@ -257,6 +287,7 @@ MonoBehaviour:
     kind: 4
     weight: 0.25
     price: 500
+    sale: 0
     slot: 7
     stage: 9
     family: 
@@ -265,6 +296,7 @@ MonoBehaviour:
     kind: 4
     weight: 0.5
     price: 500
+    sale: 0
     slot: 3
     stage: 9
     family: cloth
@@ -273,6 +305,7 @@ MonoBehaviour:
     kind: 4
     weight: 2
     price: 500
+    sale: 0
     slot: 4
     stage: 9
     family: cloth
@@ -281,6 +314,7 @@ MonoBehaviour:
     kind: 4
     weight: 0.8
     price: 500
+    sale: 0
     slot: 5
     stage: 9
     family: cloth
@@ -289,6 +323,7 @@ MonoBehaviour:
     kind: 4
     weight: 0.4
     price: 500
+    sale: 0
     slot: 6
     stage: 9
     family: cloth
@@ -297,6 +332,7 @@ MonoBehaviour:
     kind: 4
     weight: 1.2
     price: 500
+    sale: 0
     slot: 8
     stage: 9
     family: cloth
@@ -305,6 +341,7 @@ MonoBehaviour:
     kind: 4
     weight: 0.8
     price: 500
+    sale: 0
     slot: 9
     stage: 9
     family: cloth
@@ -313,6 +350,7 @@ MonoBehaviour:
     kind: 4
     weight: 1
     price: 500
+    sale: 0
     slot: 3
     stage: 9
     family: leather
@@ -321,6 +359,7 @@ MonoBehaviour:
     kind: 4
     weight: 4
     price: 500
+    sale: 0
     slot: 4
     stage: 9
     family: leather
@@ -329,6 +368,7 @@ MonoBehaviour:
     kind: 4
     weight: 1.5
     price: 500
+    sale: 0
     slot: 5
     stage: 9
     family: leather
@@ -337,6 +377,7 @@ MonoBehaviour:
     kind: 4
     weight: 0.8
     price: 500
+    sale: 0
     slot: 6
     stage: 9
     family: leather
@@ -345,6 +386,7 @@ MonoBehaviour:
     kind: 4
     weight: 2.5
     price: 500
+    sale: 0
     slot: 8
     stage: 9
     family: leather
@@ -353,6 +395,7 @@ MonoBehaviour:
     kind: 4
     weight: 1.5
     price: 500
+    sale: 0
     slot: 9
     stage: 9
     family: leather
@@ -361,6 +404,7 @@ MonoBehaviour:
     kind: 4
     weight: 1.8
     price: 500
+    sale: 0
     slot: 3
     stage: 9
     family: chain
@@ -369,6 +413,7 @@ MonoBehaviour:
     kind: 4
     weight: 7.5
     price: 500
+    sale: 0
     slot: 4
     stage: 9
     family: chain
@@ -377,6 +422,7 @@ MonoBehaviour:
     kind: 4
     weight: 3
     price: 500
+    sale: 0
     slot: 5
     stage: 9
     family: chain
@@ -385,6 +431,7 @@ MonoBehaviour:
     kind: 4
     weight: 1.4
     price: 500
+    sale: 0
     slot: 6
     stage: 9
     family: chain
@@ -393,6 +440,7 @@ MonoBehaviour:
     kind: 4
     weight: 4.5
     price: 500
+    sale: 0
     slot: 8
     stage: 9
     family: chain
@@ -401,6 +449,7 @@ MonoBehaviour:
     kind: 4
     weight: 3
     price: 500
+    sale: 0
     slot: 9
     stage: 9
     family: chain
@@ -409,6 +458,7 @@ MonoBehaviour:
     kind: 4
     weight: 2.8
     price: 500
+    sale: 0
     slot: 3
     stage: 9
     family: plate
@@ -417,6 +467,7 @@ MonoBehaviour:
     kind: 4
     weight: 11
     price: 500
+    sale: 0
     slot: 4
     stage: 9
     family: plate
@@ -425,6 +476,7 @@ MonoBehaviour:
     kind: 4
     weight: 4.5
     price: 500
+    sale: 0
     slot: 5
     stage: 9
     family: plate
@@ -433,6 +485,7 @@ MonoBehaviour:
     kind: 4
     weight: 2
     price: 500
+    sale: 0
     slot: 6
     stage: 9
     family: plate
@@ -441,6 +494,7 @@ MonoBehaviour:
     kind: 4
     weight: 7
     price: 500
+    sale: 0
     slot: 8
     stage: 9
     family: plate
@@ -449,6 +503,7 @@ MonoBehaviour:
     kind: 4
     weight: 4.5
     price: 500
+    sale: 0
     slot: 9
     stage: 9
     family: plate

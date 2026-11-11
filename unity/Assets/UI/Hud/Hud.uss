@@ -127,6 +127,15 @@
     color: rgb(255, 214, 140);
 }
 
+/* S5a.3: a part's heading in a page's list. */
+.hud__page-heading {
+    font-size: 18px;
+    -unity-font-style: bold;
+    color: rgb(214, 196, 160);
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
 .hud__bag-note {
     font-size: 16px;
     white-space: normal;

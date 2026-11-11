@@ -46,6 +46,13 @@
             <ui:ScrollView name="notes-list" class="hud__notes-list" />
             <ui:Label class="hud__reading-close hud__loc" text="ui.hud.notes.close" picking-mode="Ignore" />
         </ui:VisualElement>
+        <ui:VisualElement name="shop" class="hud__notes">
+            <ui:Label name="shop-title" class="hud__notes-title" text="" picking-mode="Ignore" />
+            <ui:Label name="shop-money" class="hud__note" text="" picking-mode="Ignore" />
+            <ui:ScrollView name="shop-list" class="hud__notes-list" />
+            <ui:Label name="shop-note" class="hud__bag-note" text="" picking-mode="Ignore" />
+            <ui:Label class="hud__reading-close hud__loc" text="ui.hud.shop.close" picking-mode="Ignore" />
+        </ui:VisualElement>
         <ui:VisualElement name="bag" class="hud__notes">
             <ui:Label class="hud__notes-title hud__loc" text="ui.hud.bag.title" picking-mode="Ignore" />
             <ui:Label name="bag-money" class="hud__note" text="" picking-mode="Ignore" />

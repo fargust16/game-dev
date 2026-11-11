@@ -48,6 +48,9 @@ namespace GameDev.Items
         [Tooltip("bronze, 19 §6.3; for equipment, the Normal price")]
         public int price;
 
+        [Tooltip("What a shop pays, bronze, when not a quarter of the price (19 §6.3); 0 for a quarter.")]
+        public int sale;
+
         public EquipSlot slot;
 
         [Tooltip("The item stage, 9 lowest (19 §2.1).")]

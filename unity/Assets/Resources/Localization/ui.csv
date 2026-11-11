@@ -189,3 +189,42 @@ ui.bag.fault.not_worn,This is not worn.,Это не надевается.
 ui.bag.fault.firearm,A firearm is held only with a free Cartridge Pouch in the other hand.,Огнестрельное оружие держат только со свободной патронной сумкой в другой руке.
 ui.bag.fault.shield,"A shield goes only beside a sword, an axe or a mace.","Щит берут только к мечу, топору или булаве."
 ui.bag.fault.pouch,A Cartridge Pouch goes only beside a firearm.,Патронная сумка нужна только к огнестрельному оружию.
+"# The shops on Bawling Row and the modifiers in words (S5a.3; 19 §2.4, §6)"
+ui.prompt.trade,E  Trade,E  Торговать
+ui.prompt.shop_closed,Closed until {0}:00,Закрыто до {0}:00
+ui.hud.shop.close,E  Leave,E  Уйти
+ui.shop.title,{0},{0}
+ui.shop.hint,"Click a line to buy, learn or sell.","Щелчок по строке: купить, научиться или продать."
+ui.shop.for_sale,For sale,На продажу
+ui.shop.lessons,Lessons,Уроки
+ui.shop.to_sell,Yours to sell,Ваше на продажу
+ui.shop.good,{0} × {1} — {2},{0} × {1} — {2}
+ui.shop.equipment,"{0}, {1} kg — {2}","{0}, {1} кг — {2}"
+ui.shop.piece,{0} ({1}),{0} ({1})
+ui.shop.sell,{0} × {1} — {2} each,{0} × {1} — по {2}
+ui.shop.lesson,{0} — {1},{0} — {1}
+ui.shop.lesson.known,{0} — learned,{0} — изучено
+ui.shop.bought,Bought: {0}.,Куплено: {0}.
+ui.shop.sold,Sold: {0}.,Продано: {0}.
+ui.shop.learned,Learned: {0}.,Изучено: {0}.
+ui.shop.fault.closed,The stall is closed.,Лавка закрыта.
+ui.shop.fault.gone,That is not to be had here.,Здесь этого нет.
+ui.shop.fault.money,Not enough money.,Не хватает денег.
+ui.shop.fault.heavy,Too heavy to carry.,"Слишком тяжело, не унести."
+ui.shop.fault.known,Already learned.,Уже изучено.
+ui.lesson.firstaid,First Aid,Первая помощь
+ui.lesson.itemcreation,Item Creation,Создание предметов
+ui.lesson.skinning,Skinning,Свежевание
+ui.mod.damage,+{0} % damage,+{0} % урона
+ui.mod.accuracy,+{0} accuracy,+{0} к точности
+ui.mod.criticalchance,+{0} % critical chance,+{0} % к шансу крита
+ui.mod.criticaldamage,+{0} % critical damage,+{0} % к урону крита
+ui.mod.maxhp,+{0} % HP,+{0} % здоровья
+ui.mod.physicaldefence,+{0} defence,+{0} к защите
+ui.mod.magicaldefence,+{0} magical defence,+{0} к магической защите
+ui.mod.magicaldamage,+{0} % magical damage,+{0} % магического урона
+ui.mod.maxwillpower,+{0} % Will Power,+{0} % силы воли
+ui.mod.evasion,+{0} evasion,+{0} к уклонению
+ui.mod.ap,+{0} AP,+{0} ОД
+ui.mod.initiative,+{0} initiative,+{0} к инициативе
+ui.mod.willagainstcontrol,+{0} Will against control,+{0} к воле против контроля

@@ -30,6 +30,12 @@ namespace GameDev.Items
             {
                 var item = bag.Catalogue.Find(piece.item);
                 var line = Loc.Format("ui.hud.bag.piece", Loc.Get(item.NameKey), Loc.Get(QualityKey(piece.Quality)), Kg(item.weight));
+                var mods = ItemMaker.Describe(piece.modifiers);
+                if (mods.Length > 0)
+                {
+                    line += ": " + mods;
+                }
+
                 var extra = note?.Invoke(piece);
                 lines.Add(string.IsNullOrEmpty(extra) ? line : line + extra);
             }

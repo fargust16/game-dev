@@ -11,6 +11,8 @@ using GameDev.Player.Progression;
 using GameDev.Player.Standing;
 using GameDev.Slice.Fights;
 using GameDev.Slice.Gear;
+using GameDev.Slice.People;
+using GameDev.Slice.Shops;
 using GameDev.Slice.Stealth;
 using GameDev.UI;
 using GameDev.World.Poi;
@@ -63,6 +65,9 @@ namespace GameDev.Slice
 
         /// <summary>What the character wears and holds (S5a.2); null without a bag.</summary>
         public Outfit Outfit { get; private set; }
+
+        /// <summary>The shops on Bawling Row (S5a.3); null without a bag or the shops' data.</summary>
+        public SliceShops Shops { get; private set; }
 
         /// <summary>11's start: plain clothes with no defence and 500 bronze, with no weapon or tool.</summary>
         public const int StartingBronze = 500;
@@ -179,6 +184,7 @@ namespace GameDev.Slice
             _running = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         // Start, not Awake: the clock's driver wakes in the same scene, in an order Unity does not promise.
@@ -229,6 +235,12 @@ namespace GameDev.Slice
             {
                 Outfit.Locked = () => Fights.InFight;
                 Fights.WornFighter = () => Outfit.Fighter(settings.FightRules, Character, settings.Fists);
+            }
+
+            if (Bag != null && settings.Shops != null)
+            {
+                Shops = new SliceShops(settings.Shops, settings.Items, seed, Clock, Bag, State);
+                OpenCounters();
             }
 
             Standing = new SocialStanding(State, settings.Standing, Clock, seed, SliceSeedStreams.Lies);
@@ -326,7 +338,7 @@ namespace GameDev.Slice
                 }
             }
 
-            FreeCursorForBag(hud.IsBagOpen);
+            FreeCursorForPage(hud.IsBagOpen || hud.IsShopOpen);
 
             if (input.MapPressed)
             {
@@ -396,8 +408,8 @@ namespace GameDev.Slice
             return fit < 0.995d ? note + Loc.Format("ui.hud.bag.fit", Mathf.RoundToInt((float)(fit * 100d))) : note;
         }
 
-        /// <summary>The cursor is free while the bag is open outside a fight, so its lines can be clicked, and the look waits.</summary>
-        private void FreeCursorForBag(bool open)
+        /// <summary>The cursor is free while the bag or a shop is open outside a fight, so their lines can be clicked, and the look waits.</summary>
+        private void FreeCursorForPage(bool open)
         {
             var free = open && (Fights == null || !Fights.InFight);
             if (free && _freedLook == null)
@@ -414,6 +426,34 @@ namespace GameDev.Slice
             {
                 _freedLook.LookEnabled = true;
                 _freedLook = null;
+            }
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (Shops != null)
+            {
+                OpenCounters();
+            }
+        }
+
+        /// <summary>A counter on each keeper in the loaded scenes, and the HUD told of them (S5a.3).</summary>
+        private void OpenCounters()
+        {
+            var added = false;
+            foreach (var person in FindObjectsByType<NamedPerson>(FindObjectsInactive.Exclude))
+            {
+                if (Shops.Find(person.Id) != null && person.GetComponent<ShopCounter>() == null)
+                {
+                    person.gameObject.AddComponent<ShopCounter>().Configure(person.Id);
+                    added = true;
+                }
+            }
+
+            var hud = Hud();
+            if (added && hud != null)
+            {
+                hud.FindPromptSources();
             }
         }
 
@@ -446,6 +486,7 @@ namespace GameDev.Slice
         {
             if (_running == this)
             {
+                SceneManager.sceneLoaded -= OnSceneLoaded;
                 Loc.Changed -= Refresh;
                 Standing?.Dispose();
                 Director?.Dispose();

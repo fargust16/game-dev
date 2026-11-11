@@ -40,6 +40,12 @@ namespace GameDev.UI
         private Label _bagLoad;
         private ScrollView _bagList;
         private Label _bagNote;
+        private VisualElement _shop;
+        private Label _shopTitle;
+        private Label _shopMoney;
+        private ScrollView _shopList;
+        private Label _shopNote;
+        private readonly List<System.Action> _shopActions = new List<System.Action>();
         private readonly List<System.Action> _bagActions = new List<System.Action>();
         private CityMapElement _mapView;
         private const string MapVisible = "hud__map--visible";
@@ -180,12 +186,75 @@ namespace GameDev.UI
 
             CloseMap();
             CloseNotes();
+            CloseShop();
             _bag.AddToClassList(NotesVisible);
         }
 
         public void CloseBag()
         {
             _bag?.RemoveFromClassList(NotesVisible);
+        }
+
+        public bool IsShopOpen => _shop != null && _shop.ClassListContains(NotesVisible);
+
+        public string ShopTitle => _shopTitle != null ? _shopTitle.text : null;
+
+        /// <summary>The shop page's list, headings included, in order (S5a.3).</summary>
+        public IReadOnlyList<string> ShopLines => _shopList == null
+            ? new string[0]
+            : _shopList.Query<Label>().ToList().Select(l => l.text).ToList();
+
+        public string ShopNote => _shopNote != null ? _shopNote.text : null;
+
+        /// <summary>Opens a shop's page, or refreshes it: the keeper, the purse, the lines to click, and a note (S5a.3).</summary>
+        public void ShowShop(string title, string money, IReadOnlyList<PageLine> lines, string note)
+        {
+            if (!Bind() || _shop == null)
+            {
+                return;
+            }
+
+            _shopTitle.text = title;
+            _shopMoney.text = money;
+            _shopList.Clear();
+            _shopActions.Clear();
+            foreach (var line in lines)
+            {
+                var label = new Label(line.Text);
+                label.AddToClassList(line.Heading ? "hud__page-heading" : NoteClass);
+                _shopActions.Add(line.Action);
+                if (line.Action != null)
+                {
+                    var action = line.Action;
+                    label.AddToClassList("hud__bag-action");
+                    label.RegisterCallback<ClickEvent>(_ => action());
+                }
+
+                _shopList.Add(label);
+            }
+
+            _shopNote.text = note ?? string.Empty;
+            CloseMap();
+            CloseNotes();
+            CloseBag();
+            _shop.AddToClassList(NotesVisible);
+        }
+
+        public void CloseShop()
+        {
+            _shop?.RemoveFromClassList(NotesVisible);
+        }
+
+        /// <summary>Clicks the n-th line of the shop's list, as the mouse does; false if it has no action.</summary>
+        public bool ClickShopLine(int index)
+        {
+            if (!IsShopOpen || index < 0 || index >= _shopActions.Count || _shopActions[index] == null)
+            {
+                return false;
+            }
+
+            _shopActions[index]();
+            return true;
         }
 
         /// <summary>Clicks the n-th line of the bag's list, as the mouse does; false if it has no action.</summary>
@@ -312,6 +381,12 @@ namespace GameDev.UI
                 return;
             }
 
+            FindPromptSources();
+        }
+
+        /// <summary>Looks again for the doors, the prompt sources and the name tags, as after a source was added at run time (S5a.3).</summary>
+        public void FindPromptSources()
+        {
             _player = FindAnyObjectByType<PlayerLocomotion>();
             _portals = FindObjectsByType<Portal>(FindObjectsInactive.Exclude);
             var behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude);
@@ -347,6 +422,11 @@ namespace GameDev.UI
             _bagLoad = root.Q<Label>("bag-load");
             _bagList = root.Q<ScrollView>("bag-list");
             _bagNote = root.Q<Label>("bag-note");
+            _shop = root.Q<VisualElement>("shop");
+            _shopTitle = root.Q<Label>("shop-title");
+            _shopMoney = root.Q<Label>("shop-money");
+            _shopList = root.Q<ScrollView>("shop-list");
+            _shopNote = root.Q<Label>("shop-note");
             _map = root.Q<VisualElement>("map");
             _dialogue = root.Q<VisualElement>("dialogue");
             _dialogueLines = root.Q<ScrollView>("dialogue-lines");

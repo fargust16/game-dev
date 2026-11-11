@@ -22,6 +22,7 @@ MonoBehaviour:
   kitPouch: {fileID: 11400000, guid: 04aca85548654a408ed148b6df0c1383, type: 2}
   kitArmour: {fileID: 11400000, guid: e1f1e992ff70458d95cc71d397551626, type: 2}
   items: {fileID: 11400000, guid: 8f4b0d2c6e3a4f5b9c1d3e5f7a9b2c4d, type: 2}
+  shops: {fileID: 11400000, guid: b74e8f5bc663434e99c94dc04de8b2be, type: 2}
   fists: {fileID: 11400000, guid: 0e85fff3d0f74be59fadb2be9ff8cda0, type: 2}
   opponentModel: {fileID: 6665424575185744845, guid: 9fea873044392c744863f2c285c6839c, type: 3}
   opponentWeapon: {fileID: 11400000, guid: 7d5ac9fe2dcf482d9bc1a7dc4d8b420a, type: 2}

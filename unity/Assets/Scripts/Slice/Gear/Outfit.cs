@@ -148,7 +148,44 @@ namespace GameDev.Slice.Gear
             var second = SetOf(WearSlot.WeaponTwo, WearSlot.OffHandTwo) ?? default(WeaponSet);
             var armour = Armour(rules, values);
             var held = first.Weight + second.Weight + (armour != null ? armour.Weight : 0f);
-            return rules.Fighter(values, null, first, armour, second, carried: Math.Max(0d, _bag.Weight - held));
+            return rules.Fighter(values, null, first, armour, second, Modifiers(values), Math.Max(0d, _bag.Weight - held));
+        }
+
+        /// <summary>
+        /// What the modifiers of every worn and held piece add up to in a fight (19 §2.4, 10.2 §5b), each piece's by the share
+        /// of it its wearer meets. Magical defence, Magical Damage, Will Power and Will against control are carried but give
+        /// nothing in the slice's fights until 10.2's magic is in them.
+        /// </summary>
+        public FightModifiers Modifiers(ICharacterValues values)
+        {
+            var sum = new FightModifiers();
+            foreach (var piece in _worn.Values)
+            {
+                var fit = (float)FitOf(piece, values);
+                foreach (var modifier in piece.modifiers)
+                {
+                    if (!ItemMaker.TryType(modifier, out var type))
+                    {
+                        continue;
+                    }
+
+                    var v = modifier.value * fit;
+                    switch (type)
+                    {
+                        case ModifierType.Damage: sum.damage += v; break;
+                        case ModifierType.Accuracy: sum.accuracy += v; break;
+                        case ModifierType.CriticalChance: sum.critical += v; break;
+                        case ModifierType.CriticalDamage: sum.criticalDamage += v; break;
+                        case ModifierType.MaxHp: sum.hp += v; break;
+                        case ModifierType.PhysicalDefence: sum.defence += v; break;
+                        case ModifierType.Evasion: sum.evasion += v; break;
+                        case ModifierType.Ap: sum.ap += v; break;
+                        case ModifierType.Initiative: sum.initiative += v; break;
+                    }
+                }
+            }
+
+            return sum;
         }
 
         /// <summary>The worn armour pieces as one armour, or null when none is worn.</summary>
