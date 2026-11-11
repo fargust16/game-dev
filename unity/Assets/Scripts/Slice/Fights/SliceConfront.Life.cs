@@ -3,6 +3,7 @@ using GameDev.Confront.Grid;
 using GameDev.Confront.Rules;
 using GameDev.Confront.Turns;
 using GameDev.Core.Localization;
+using GameDev.Locomotion;
 using GameDev.World.State;
 using GameDev.World.Timekeeping;
 using UnityEngine;
@@ -62,7 +63,7 @@ namespace GameDev.Slice.Fights
             return fighter;
         }
 
-        /// <summary>Keeps the fighter's HP and conditions. Until S3a.9 brings death, a character keeps a thousandth of its HP.</summary>
+        /// <summary>Keeps the fighter's HP and conditions; at 0 HP the character is dead (S3a.9).</summary>
         private void SaveLife(Fighter fighter)
         {
             if (_state == null)
@@ -71,7 +72,7 @@ namespace GameDev.Slice.Fights
             }
 
             var lost = (int)Math.Round((1d - (fighter.Hp / fighter.MaxHp)) * 1000d);
-            _state.Set(HpLostKey, Mathf.Clamp(lost, 0, 999));
+            _state.Set(HpLostKey, fighter.Down ? 1000 : Mathf.Clamp(lost, 0, 999));
             _state.Set(BleedingKey, fighter.Bleeding ? 1 : 0);
             _state.Set(PoisonedKey, fighter.Poisoned ? 1 : 0);
             _state.Set(LegKey, fighter.LegBroken ? 1 : 0);
@@ -108,7 +109,7 @@ namespace GameDev.Slice.Fights
         /// <summary>One world tick outside a fight (10.2): the conditions, then HP's ordinary return while nothing stops it.</summary>
         private void OnTick(long tick)
         {
-            if (_settings == null || _state == null || InFight || Healthy)
+            if (_settings == null || _state == null || InFight || _died || Healthy)
             {
                 return;
             }
@@ -116,6 +117,18 @@ namespace GameDev.Slice.Fights
             var fighter = PlayerFighter();
             _settings.FightRules.Tick(fighter, _seed.Fork(SliceSeedStreams.Conditions, (int)tick), true);
             SaveLife(fighter);
+            if (fighter.Down && !_died)
+            {
+                // Bled out after a fight: the run ends as a death in one does (S3a.9).
+                _died = true;
+                _player ??= FindAnyObjectByType<PlayerLocomotion>();
+                if (_player != null)
+                {
+                    _player.enabled = false;
+                }
+
+                SliceDeathScreen.Show(_clock);
+            }
         }
 
         /// <summary>The most urgent treatment the character can give itself now, or null.</summary>

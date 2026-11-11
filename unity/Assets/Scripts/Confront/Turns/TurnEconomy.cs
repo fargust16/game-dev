@@ -94,6 +94,8 @@ namespace GameDev.Confront.Turns
             {
                 combatant.Fired = false;
                 combatant.Intent = null;
+                combatant.AsksMercy = false;
+                combatant.Departure = Departure.None;
                 if (Place(combatant))
                 {
                     _order.Add(combatant);
@@ -139,6 +141,10 @@ namespace GameDev.Confront.Turns
                     return Stand(c);
                 case IntentKind.ChangeSet:
                     return ChangeSet(c);
+                case IntentKind.Yield:
+                    return Yield(c);
+                case IntentKind.Spare:
+                    return Spare(c, Find(intent.Target));
                 default:
                     EndTurn(c);
                     return true;
@@ -537,11 +543,14 @@ namespace GameDev.Confront.Turns
 
         /// <summary>
         /// Walks a path a step at a time while AP last, stopping once <paramref name="target"/> is reached. Leaving the
-        /// side of a melee enemy draws its Reaction Attack first; a walker who falls to one stops, and its turn ends.
+        /// side of a melee enemy draws its Reaction Attack first; a walker who falls to one stops, and its turn ends. A
+        /// walk with no target, a move or a step back, breaks away at the first step that leaves every enemy far enough
+        /// behind (S3a.9); a walk toward a target never does, so a fighter coming round a house from afar stays in.
         /// </summary>
         private int Walk(Combatant c, List<CombatCell> path, int steps, Combatant target)
         {
             var walked = 0;
+            var brokeAway = false;
             _walked.Clear();
             if (c.Fighter.LegBroken)
             {
@@ -557,11 +566,18 @@ namespace GameDev.Confront.Turns
                 }
 
                 Face(c, path[i]);
+                var from = c.Cell;
                 c.Cell = path[i];
                 c.Position = _grid.Center(c.Cell);
                 _walked.Add(path[i]);
                 ApLeft--;
                 walked++;
+                if (target == null && BreaksAway(c, from))
+                {
+                    brokeAway = true;
+                    break;
+                }
+
                 if (target != null && Reaches(c, target))
                 {
                     break;
@@ -570,6 +586,12 @@ namespace GameDev.Confront.Turns
 
             c.Position = _grid.Center(c.Cell);
             FlushWalk(c);
+            if (brokeAway)
+            {
+                Depart(c, Departure.BrokeAway);
+                return walked;
+            }
+
             if (!c.Standing && IsRunning && !CheckEnd() && Acting == c)
             {
                 NextTurn();
@@ -602,7 +624,7 @@ namespace GameDev.Confront.Turns
                 }
 
                 var weapon = e.Fighter.Weapon;
-                if (e == c || !e.Standing || e.Side == c.Side || e.Reacted || e.Fighter.LostTurns > 0 || weapon == null || weapon.Ranged
+                if (e == c || !e.Standing || e.Side == c.Side || e.Reacted || e.Helpless || weapon == null || weapon.Ranged
                     || !Beside(e.Cell, c.Cell))
                 {
                     continue;
@@ -776,13 +798,16 @@ namespace GameDev.Confront.Turns
             Face(c, to);
             var success = _rolls.NextDouble() < option.Chance;
             var fallen = 0d;
+            var brokeAway = false;
             if (success && option.Kind != EnvironmentActionKind.KickBreach && ReactionAttacks(c) && _grid.Occupy(c.Id, option.Landing))
             {
+                var from = c.Cell;
                 c.Cell = option.Landing;
                 c.Position = _grid.Center(c.Cell);
                 _walked.Clear();
                 _walked.Add(option.Landing);
                 FlushWalk(c);
+                brokeAway = BreaksAway(c, from);
             }
             else if (!success && (option.Kind == EnvironmentActionKind.ClimbUp || option.Kind == EnvironmentActionKind.MantleOnto))
             {
@@ -794,6 +819,12 @@ namespace GameDev.Confront.Turns
             }
 
             Traversed?.Invoke(c, option, success, fallen);
+            if (brokeAway)
+            {
+                Depart(c, Departure.BrokeAway);
+                return true;
+            }
+
             if (CheckEnd() || Acting != c)
             {
                 return true;

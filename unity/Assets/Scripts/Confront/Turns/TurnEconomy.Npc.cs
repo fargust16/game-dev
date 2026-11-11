@@ -39,6 +39,30 @@ namespace GameDev.Confront.Turns
                 return;
             }
 
+            // S3a.9: a fighter of people who is losing asks for mercy and strikes no more; one facing only those asking spares them.
+            if (c.AsksMercy || AsksForMercy(c))
+            {
+                if (!c.AsksMercy)
+                {
+                    c.AsksMercy = true;
+                    c.Intent = null;
+                    MercyAsked?.Invoke(c);
+                }
+
+                EndTurn(c);
+                return;
+            }
+
+            if (SparesTheAsking(c))
+            {
+                if (IsRunning && Acting == c)
+                {
+                    EndTurn(c);
+                }
+
+                return;
+            }
+
             if (!c.Waited && Waits(c) && Wait(c))
             {
                 return;
@@ -182,7 +206,7 @@ namespace GameDev.Confront.Turns
                 value *= _rules.KillBonus;
             }
 
-            if (e.Fighter.LostTurns > 0)
+            if (e.Helpless)
             {
                 value *= _rules.HelplessFactor;
             }
@@ -306,7 +330,7 @@ namespace GameDev.Confront.Turns
                 }
 
                 // One cell short of that enemy's reach (tactical_sim.py: steps − 1).
-                threatened |= Pending(f) && Melee(f) && f.Fighter.LostTurns == 0
+                threatened |= Pending(f) && Melee(f) && !f.Helpless
                     && StepsToSide(f.Cell, cell) - 1 <= _rules.FullAp(f.Fighter) - f.Fighter.Weapon.AttackAp;
             }
 
@@ -329,7 +353,7 @@ namespace GameDev.Confront.Turns
             var touched = false;
             foreach (var f in _foes)
             {
-                touched |= f.Fighter.LostTurns == 0 && Beside(c.Cell, f.Cell);
+                touched |= !f.Helpless && Beside(c.Cell, f.Cell);
             }
 
             var shooter = Shooter(c);
@@ -365,7 +389,7 @@ namespace GameDev.Confront.Turns
                     return;
                 }
 
-                if (Melee(f) && f.Fighter.LostTurns == 0 && (nearest == null || Distance(c.Cell, f.Cell) < Distance(c.Cell, nearest.Cell)))
+                if (Melee(f) && !f.Helpless && (nearest == null || Distance(c.Cell, f.Cell) < Distance(c.Cell, nearest.Cell)))
                 {
                     nearest = f;
                 }
@@ -393,7 +417,8 @@ namespace GameDev.Confront.Turns
                     {
                         if ((dx == 0 && dz == 0)
                             || !_grid.TryCellAt(new Vector3((here.X + dx + 0.5f) * size, _grid.Center(here).y, (here.Z + dz + 0.5f) * size), out var cell)
-                            || !_grid.CanStep(here, cell) || (_grid.OccupantAt(cell) >= 0 && _grid.OccupantAt(cell) != c.Id) || _route.Contains(cell))
+                            || !_grid.CanStep(here, cell) || (_grid.OccupantAt(cell) >= 0 && _grid.OccupantAt(cell) != c.Id) || _route.Contains(cell)
+                            || NearestFoe(c, cell) >= _rules.BreakAwayCells) // a step back keeps the shooter in the fight (S3a.9)
                         {
                             continue;
                         }

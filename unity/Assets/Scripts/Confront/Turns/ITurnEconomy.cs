@@ -16,6 +16,8 @@ namespace GameDev.Confront.Turns
         ChangeSet,
         Traverse,
         Treat,
+        Yield,
+        Spare,
     }
 
     /// <summary>An Environment Action open across the edge to a cell beside (10.1, S3a.7): what it is, where it lands, and its AP and chance.</summary>
@@ -78,6 +80,12 @@ namespace GameDev.Confront.Turns
 
         /// <summary>The second Weapon Set to hand, for its AP.</summary>
         public static TurnIntent ChangeSet => new TurnIntent(IntentKind.ChangeSet, default, -1);
+
+        /// <summary>A Yield to people, for its AP: the fight ends at once (10.2 §9, S3a.9).</summary>
+        public static TurnIntent Yield => new TurnIntent(IntentKind.Yield, default, -1);
+
+        /// <summary>Spares an enemy that asks for mercy: it leaves the fight (08 §7, S3a.9).</summary>
+        public static TurnIntent Spare(int target) => new TurnIntent(IntentKind.Spare, default, target);
     }
 
     /// <summary>
@@ -133,6 +141,18 @@ namespace GameDev.Confront.Turns
 
         /// <summary>A combatant who left the grid; it drops out at once.</summary>
         void Leave(Combatant combatant);
+
+        /// <summary>Ends the encounter at once with no side standing, −1: the place the fight was kept round has left it (S3a.9).</summary>
+        void Stop();
+
+        /// <summary>
+        /// Raised as a combatant leaves the fight before its end, its <see cref="Combatant.Departure"/> saying how: broken
+        /// away, spared, or yielded (S3a.9). A yield ends the fight next.
+        /// </summary>
+        event Action<Combatant> Departed;
+
+        /// <summary>Raised when a combatant of people asks for mercy (08 §7, S3a.9).</summary>
+        event Action<Combatant> MercyAsked;
 
         event Action<Combatant> TurnAdvanced;
 

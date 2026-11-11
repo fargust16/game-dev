@@ -12,6 +12,15 @@ namespace GameDev.Confront.Turns
         Out,
     }
 
+    /// <summary>How a combatant left a fight before its end, or <see cref="None"/> (08 §7; 10.2 §9; S3a.9).</summary>
+    public enum Departure
+    {
+        None,
+        BrokeAway,
+        Spared,
+        Yielded,
+    }
+
     /// <summary>
     /// One fighter in an encounter (17 C.5): its <see cref="Rules.Fighter"/>, its side, and its place. Every two sides
     /// are hostile (S3a.4 authoring default, until factions' standing decides it). The economy moves it a cell at a time
@@ -83,5 +92,20 @@ namespace GameDev.Confront.Turns
 
         /// <summary>The bandages, antidotes and splints it carries, by <see cref="Rules.Treatment"/>; a treatment that works uses one.</summary>
         public int[] Supplies { get; } = new int[3];
+
+        /// <summary>
+        /// It is of people who bargain (10.2 §9): it accepts a Yield and may ask for mercy. Never the cult, which takes no
+        /// surrender, nor beasts, which do not bargain (S3a.9).
+        /// </summary>
+        public bool AcceptsYield { get; set; }
+
+        /// <summary>It has asked for mercy in this fight (08 §7): it strikes no more and waits to be spared or not.</summary>
+        public bool AsksMercy { get; internal set; }
+
+        /// <summary>How it left the fight before its end, if it did.</summary>
+        public Departure Departure { get; internal set; }
+
+        /// <summary>It loses its turns or has asked for mercy, so Target Rules weigh it as no threat (10.2 §5a).</summary>
+        internal bool Helpless => Fighter.LostTurns > 0 || AsksMercy;
     }
 }

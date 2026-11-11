@@ -30,11 +30,13 @@ ui.skill.intimidation,Intimidation,Запугивание
 "# The fight (S3a.5, FightHud): the order, the bar, the cursor's tip and the last blow"
 ui.fight.you,You,Вы
 ui.fight.cultist,Cultist,Культист
+ui.fight.warden,Warden,Стражник
+ui.fight.veinmarket,Veinmarket man,Человек Вейнмаркета
 ui.fight.someone,Someone,Кто-то
 ui.fight.turn.yours,Your turn,Ваш ход
 ui.fight.turn.other,Turn: {0},Ходит: {0}
 ui.fight.hp,HP {0} / {1},Здоровье {0} / {1}
-ui.fight.hint,Space  End turn     R  Wait     G  Defensive Stance     X  Change weapons     B  First Aid     Q / E  Turn the camera     Wheel  Zoom,Пробел  Конец хода     R  Ждать     G  Защитная стойка     X  Сменить оружие     B  Первая помощь     Q / E  Поворот камеры     Колесо  Масштаб
+ui.fight.hint,Space  End turn     R  Wait     G  Defensive Stance     X  Change weapons     B  First Aid     Y  Yield     Q / E  Turn the camera     Wheel  Zoom,Пробел  Конец хода     R  Ждать     G  Защитная стойка     X  Сменить оружие     B  Первая помощь     Y  Сдаться     Q / E  Поворот камеры     Колесо  Масштаб
 ui.fight.move,{0} AP,{0} ОД
 ui.fight.far,Too far: {0} AP,Слишком далеко: {0} ОД
 ui.fight.noway,No way there,Туда не пройти
@@ -90,3 +92,18 @@ ui.life.nothing,Nothing to treat,Лечить нечего
 ui.life.nosupply,Nothing to treat it with,Нечем лечить
 ui.life.treat.ok,"{0}: done",{0} — удалось
 ui.life.treat.failed,"{0}: failed",{0} — не удалось
+"# Leaving a fight (S3a.9): Break Away, a Yield and its terms, mercy, the lock-up, and death"
+ui.fight.log.brokeaway,{0} breaks away,{0}: вырвался из боя
+ui.fight.log.spared,{0} is spared and leaves,{0}: пощажён и уходит
+ui.fight.log.mercy,{0} asks for mercy,{0} просит пощады
+ui.fight.log.yield,{0} yields,{0}: сдаётся
+ui.fight.mercy,V  Spare those who ask for mercy,V  Пощадить просящих пощады
+ui.fight.noyield,They take no surrender,Сдачи здесь не принимают
+ui.yield.wardens.line,"Drop it. You're coming with us: a night in the lock-up, and your weapons stay in our store till you pay the fine, a thousand bronze.","Бросай оружие. Пойдёшь с нами: ночь в камере, а оружие полежит у нас на складе, пока не заплатишь штраф — тысячу бронзовых."
+ui.yield.wardens.go,Go with them,Пойти с ними
+ui.yield.take.line,"Sensible. Turn out your pockets, every coin of it.","Разумно. Выворачивай карманы, всё до монеты."
+ui.yield.take.go,Hand it over,Отдать
+ui.lockup.released,"Let out of the lock-up at 08:00. Your weapons are held till the fine is paid.","В 08:00 вас выпустили из камеры. Оружие удержано до уплаты штрафа."
+ui.yield.taken,"They took what you carried, and you owe them the rest.","У вас забрали всё, что было при себе, и вы остались им должны."
+ui.death.title,Your character has died,Ваш персонаж погиб
+ui.death.restart,Enter  Start again,Enter  Начать заново

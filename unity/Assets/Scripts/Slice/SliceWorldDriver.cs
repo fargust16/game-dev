@@ -176,6 +176,10 @@ namespace GameDev.Slice
                 Fights.Configure(settings, seed, Clock, Character, State);
             }
             Standing = new SocialStanding(State, settings.Standing, Clock, seed, SliceSeedStreams.Lies);
+            if (Fights != null)
+            {
+                Fights.Standing = Standing;
+            }
             _talk = new DialogueContext
             {
                 State = State,

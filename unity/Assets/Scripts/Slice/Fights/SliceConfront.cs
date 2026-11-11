@@ -147,6 +147,8 @@ namespace GameDev.Slice.Fights
             _turns.Traversed += OnTraversed;
             _turns.Treated += OnTreated;
             _turns.Conditioned += OnConditioned;
+            _turns.Departed += OnDeparted;
+            _turns.MercyAsked += OnMercyAsked;
             _view = CombatGridView.Create(transform, settings.GridMaterial);
             _beats = new FightBeats(Animated, Place);
             _beats.Landed += OnLanded;
@@ -166,10 +168,16 @@ namespace GameDev.Slice.Fights
         /// Development command (S3a.4): two opponents with daggers four cells from the player, and a fight. The player's
         /// character takes the development kit for it, a sword, leather, and the rifle as its second set.
         /// </summary>
-        public bool StartDevelopmentFight()
+        public bool StartDevelopmentFight() => StartDevelopmentFight(Cult);
+
+        /// <summary>
+        /// The development fight against a group (S3a.9): cultists with daggers, who take no surrender, or Wardens with
+        /// swords, who accept a Yield and may ask for mercy (Shift+F7).
+        /// </summary>
+        public bool StartDevelopmentFight(string group)
         {
             _player = FindAnyObjectByType<PlayerLocomotion>();
-            if (_lock == null || InFight || _player == null || _settings.OpponentModel == null)
+            if (_lock == null || InFight || _died || _terms != null || _player == null || _settings.OpponentModel == null)
             {
                 return false;
             }
@@ -184,6 +192,7 @@ namespace GameDev.Slice.Fights
             _fights++;
             _bodies.Clear();
             _names.Clear();
+            _groups.Clear();
             var rules = _settings.FightRules;
             var player = new Combatant(PlayerId, PlayerSide, PlayerFighter(), at, takesIntents: !AutoPlayer);
             Equip(player);
@@ -194,10 +203,15 @@ namespace GameDev.Slice.Fights
             for (var i = 0; i < Opponents; i++)
             {
                 var body = Opponent(_grid.Center(_ring[i]), at, i + 1);
-                var opponent = new Combatant(i + 1, HostileSide, rules.Fighter(new CharacterSheet(), null, new WeaponSet(_settings.OpponentWeapon)), body.position);
+                var weapon = group == Wardens ? _settings.KitSword : _settings.OpponentWeapon;
+                var opponent = new Combatant(i + 1, HostileSide, rules.Fighter(new CharacterSheet(), null, new WeaponSet(weapon)), body.position)
+                {
+                    AcceptsYield = TakesYield(group),
+                };
                 body.GetComponent<SliceFighter>().Combatant = opponent;
                 _bodies[opponent] = body;
-                _names[opponent] = "ui.fight.cultist";
+                _names[opponent] = group == Wardens ? "ui.fight.warden" : "ui.fight.cultist";
+                _groups[opponent] = group;
                 combatants.Add(opponent);
             }
 
@@ -223,11 +237,23 @@ namespace GameDev.Slice.Fights
             }
 
             var input = GameInputService.Instance;
+            if (_terms != null)
+            {
+                TermsInput(input);
+                return;
+            }
+
             if (!_lock.InConfront)
             {
+                ClearBodies();
+                if (_died)
+                {
+                    return;
+                }
+
                 if (input != null && input.DevFightPressed && Debug.isDebugBuild)
                 {
-                    StartDevelopmentFight();
+                    StartDevelopmentFight(input.SprintHeld ? Wardens : Cult);
                 }
                 else if (input != null && input.FirstAidPressed)
                 {
@@ -284,7 +310,8 @@ namespace GameDev.Slice.Fights
             if ((input.WaitTurnPressed && _turns.SubmitIntent(TurnIntent.Wait))
                 || (input.StancePressed && _turns.SubmitIntent(TurnIntent.Stance))
                 || (input.ChangeSetPressed && _turns.SubmitIntent(TurnIntent.ChangeSet))
-                || (input.FirstAidPressed && TreatInFight(player)))
+                || (input.FirstAidPressed && TreatInFight(player))
+                || LeaveByWill(player, input))
             {
                 _cursor.Clear();
                 _hud.MarkDirty();
@@ -396,6 +423,7 @@ namespace GameDev.Slice.Fights
             _beats.Clear();
             _hud.Show(true);
             _cursor.Clear();
+            ResetLeaving();
             foreach (var pair in _bodies)
             {
                 Guard(pair.Key, pair.Value, true);
@@ -438,9 +466,20 @@ namespace GameDev.Slice.Fights
         private void OnEnded(int side)
         {
             Debug.Log($"[Confront] fight {_fights} ends after {_turns.Round} rounds; side {side} stands.");
+            Residue();
+            _yieldedTo = null;
             if (_playerCombatant != null)
             {
                 Unequip(_playerCombatant);
+                _died = _playerCombatant.Fighter.Down;
+                foreach (var pair in _groups)
+                {
+                    if (_yielded && pair.Key.Side == side)
+                    {
+                        _yieldedTo = pair.Value;
+                        break;
+                    }
+                }
             }
 
             _ending = true;
@@ -464,6 +503,7 @@ namespace GameDev.Slice.Fights
                 Guard(pair.Key, pair.Value, false);
             }
 
+            AfterFight(_yieldedTo);
             _animated.Clear();
             foreach (var opponent in _developmentOpponents)
             {
@@ -476,6 +516,7 @@ namespace GameDev.Slice.Fights
             _developmentOpponents.Clear();
             _bodies.Clear();
             _names.Clear();
+            _groups.Clear();
             _playerCombatant = null;
         }
 
@@ -527,6 +568,7 @@ namespace GameDev.Slice.Fights
         /// <summary>The blow is shown as a beat: the attacker turns and strikes, the target is hit or falls at the impact.</summary>
         private void OnStruck(Combatant attacker, Combatant target, StrikeResult result)
         {
+            CountKill(attacker, target);
             if (!_bodies.TryGetValue(attacker, out var body) || body == null)
             {
                 return;

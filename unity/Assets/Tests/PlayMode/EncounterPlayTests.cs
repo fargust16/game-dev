@@ -109,8 +109,19 @@ namespace GameDev.Slice.Tests
             Assert.GreaterOrEqual(rounds, 1, "the fight lasted rounds");
             Assert.AreEqual(rounds, atEnd - atStart, "every round costs one world tick, and nothing else moves the clock");
             Assert.IsTrue(side == SliceConfrontSides.Player || side == SliceConfrontSides.Hostile, $"one side stands at the end, not {side}");
-            Assert.IsFalse(world.Clock.IsPaused, "the world runs again");
-            Assert.IsTrue(player.enabled, "free movement returns");
+            if (fights.Dead)
+            {
+                // S3a.9: the character fell, and the run ends on its plain screen, the world waiting behind it.
+                Assert.IsTrue(Fights.SliceDeathScreen.Shown, "the death screen shows");
+                Assert.IsTrue(world.Clock.IsPaused, "the world waits");
+                Assert.IsFalse(player.enabled, "the dead do not walk");
+            }
+            else
+            {
+                Assert.IsFalse(world.Clock.IsPaused, "the world runs again");
+                Assert.IsTrue(player.enabled, "free movement returns");
+            }
+
             Assert.IsFalse(fights.GridShown, "the grid is gone");
             Assert.Greater(strikes, 0, "blows were struck");
             CollectionAssert.IsEmpty(unseen, "who falls plays its death");

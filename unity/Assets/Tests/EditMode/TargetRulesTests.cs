@@ -194,9 +194,9 @@ namespace GameDev.Slice.Tests
         public void AShooterShootsItsTargetInRangeAndStepsBackWithTheAPLeft()
         {
             var shooter = At(0, 0, Fighter(100, melee: 1, ranged: 8, shooter: true), 10, 10);
-            var blade = At(1, 1, Fighter(), 10, 16);
+            var blade = At(1, 1, Fighter(), 10, 13); // near enough that the step back stays inside Break Away's ten cells (S3a.9)
             Begin(shooter, blade);
-            Assert.IsTrue(_turns.ReachesFrom(shooter, shooter.Cell, blade), "6 cells, in the rifle's range and in sight");
+            Assert.IsTrue(_turns.ReachesFrom(shooter, shooter.Cell, blade), "3 cells, in the rifle's range and in sight");
             var ap = _turns.ApLeft;
 
             _turns.PlayTurn();
