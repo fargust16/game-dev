@@ -1920,6 +1920,52 @@ namespace GameDev.Slice.EditorTools
                 box.size = size;
             }
 
+            /// <summary>
+            /// A flat convex polygon facing <paramref name="outward"/> (its order is turned if it faces the other way),
+            /// laid with the texture in the world's frame as the boxes are; two-sided where it is seen from both sides,
+            /// as a roof's slope from under its eaves. It has no collider.
+            /// </summary>
+            public void Poly(IReadOnlyList<Vector3> points, Vector3 outward, string material = null, bool twoSided = false)
+            {
+                var n = Vector3.zero;
+                for (var k = 0; k < points.Count; k++)
+                {
+                    var a = points[k];
+                    var b = points[(k + 1) % points.Count];
+                    n += new Vector3((a.y - b.y) * (a.z + b.z), (a.z - b.z) * (a.x + b.x), (a.x - b.x) * (a.y + b.y));
+                }
+
+                // Newell's normal has the sign of the fan's cross products, (b - a) x (c - a), which is the side Unity
+                // draws as the front (the boxes' faces above wind the same way).
+                n = n.normalized;
+                var order = Vector3.Dot(n, outward) >= 0f ? points : points.Reverse().ToList();
+                n = Vector3.Dot(n, outward) >= 0f ? n : -n;
+                Add(order, n, material);
+                if (twoSided)
+                {
+                    Add(order.Reverse().ToList(), -n, material);
+                }
+            }
+
+            private void Add(IReadOnlyList<Vector3> loop, Vector3 n, string material)
+            {
+                var p = Part(material ?? "");
+                var u = Mathf.Abs(n.y) > 0.99f ? Vector3.right : Vector3.Cross(Vector3.up, n).normalized;
+                var v = Vector3.Cross(n, u);
+                var start = p.V.Count;
+                foreach (var world in loop)
+                {
+                    p.V.Add(world);
+                    p.N.Add(n);
+                    p.UV.Add(new Vector2(Vector3.Dot(world, u), Vector3.Dot(world, v)) / 2.5f);
+                }
+
+                for (var k = 1; k + 1 < loop.Count; k++)
+                {
+                    p.I.AddRange(new[] { start, start + k, start + k + 1 });
+                }
+            }
+
             public void Finish(string defaultMaterial)
             {
                 foreach (var pair in _parts)

@@ -53,7 +53,9 @@ namespace GameDev.Slice.EditorTools
         /// <summary>The cathedral's and the works' stone masses, each group its own merged mesh with box colliders.</summary>
         private static void Masses()
         {
-            var cathedral = new Works(Group("The cathedral (placeholder)"), true);
+            var cathedralGroup = Group(CathedralGroup);
+            var cathedral = new Works(cathedralGroup, true);
+            var cathedralMasses = new List<Bounds>();
             var works = new Works(Group("The works (placeholder)"), true);
             foreach (var b in _layout.boxes)
             {
@@ -63,10 +65,16 @@ namespace GameDev.Slice.EditorTools
                 var bottom = min - 0.5f;
                 var top = max + b.@base + b.height;
                 var centre = World((b.x0 + b.x1) / 2f, (b.y0 + b.y1) / 2f, (bottom + top) / 2f);
-                (b.material == "cathedral" ? cathedral : works).Box(centre, new Vector3(b.x1 - b.x0, top - bottom, b.y1 - b.y0), 0f);
+                var size = new Vector3(b.x1 - b.x0, top - bottom, b.y1 - b.y0);
+                (b.material == "cathedral" ? cathedral : works).Box(centre, size, 0f);
+                if (b.material == "cathedral")
+                {
+                    cathedralMasses.Add(new Bounds(centre, size));
+                }
             }
 
             cathedral.Finish(CathedralStone);
+            GothicDress(cathedralGroup, cathedralMasses); // §35
             works.Finish(WorksBrick);
         }
 
