@@ -9,8 +9,9 @@ namespace GameDev.Slice.EditorTools
 {
     /// <summary>
     /// S5a.5: 11's ten flax patches (19 §6.4), which the C4 city left out, planted in Crooked Hamlet's fenced farm beds:
-    /// two in each of the five beds farthest west, a third and two thirds along the bed's long side. One pass: a scene that
-    /// already holds flax is left as it is.
+    /// two in each of the five beds farthest west, a third and two thirds along the bed's long side, each on the kit's 1 m
+    /// grid and 0.1 m height step, the step below the ground so it never floats. One pass: a scene that already holds flax
+    /// only has its patches set on that grid.
     /// </summary>
     public static class SliceFlaxBeds
     {
@@ -24,9 +25,20 @@ namespace GameDev.Slice.EditorTools
         {
             EditorSceneManager.OpenScene(Scene, OpenSceneMode.Single);
             var blocks = Object.FindObjectsByType<KitBlock>(FindObjectsInactive.Include);
-            if (blocks.Any(b => b.name.StartsWith("Kit_Resource_Flax")))
+            Physics.SyncTransforms();
+            var ground = LayerMask.GetMask(KitLayers.Ground);
+            var held = blocks.Where(b => b.name.StartsWith("Kit_Resource_Flax")).ToList();
+            if (held.Count > 0)
             {
-                Debug.Log("[SliceFlaxBeds] Veilmouth already holds flax; left as it is.");
+                foreach (var b in held)
+                {
+                    b.transform.position = OnGrid(b.transform.position, ground);
+                    EditorUtility.SetDirty(b.transform);
+                }
+
+                EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+                EditorSceneManager.SaveOpenScenes();
+                Debug.Log($"[SliceFlaxBeds] Veilmouth already holds flax; its {held.Count} patches set on the kit grid.");
                 return;
             }
 
@@ -39,8 +51,6 @@ namespace GameDev.Slice.EditorTools
                 return;
             }
 
-            Physics.SyncTransforms();
-            var ground = LayerMask.GetMask(KitLayers.Ground);
             var planted = 0;
             foreach (var bed in beds)
             {
@@ -52,9 +62,8 @@ namespace GameDev.Slice.EditorTools
                     var at = alongX
                         ? new Vector3(Mathf.Lerp(box.min.x, box.max.x, t), 0f, box.center.z)
                         : new Vector3(box.center.x, 0f, Mathf.Lerp(box.min.z, box.max.z, t));
-                    at.y = Physics.Raycast(new Vector3(at.x, box.max.y + 5f, at.z), Vector3.down, out var hit, 20f, ground, QueryTriggerInteraction.Ignore)
-                        ? hit.point.y
-                        : box.min.y;
+                    at.y = box.min.y;
+                    at = OnGrid(at, ground);
                     var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, bed[0].transform.parent);
                     go.transform.SetPositionAndRotation(at, Quaternion.Euler(0f, 90f * planted, 0f));
                     planted++;
@@ -65,6 +74,18 @@ namespace GameDev.Slice.EditorTools
             EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
             EditorSceneManager.SaveOpenScenes();
             Debug.Log($"[SliceFlaxBeds] {planted} flax patches planted in {beds.Count} beds of {Cluster(fences).Count}.");
+        }
+
+        /// <summary>
+        /// The kit grid's node nearest a place, on the ground there at the 0.1 m step below it (the kit standard's §2):
+        /// the flax sinks up to 0.1 m more, and never floats.
+        /// </summary>
+        private static Vector3 OnGrid(Vector3 at, int ground)
+        {
+            var x = Mathf.Round(at.x);
+            var z = Mathf.Round(at.z);
+            var y = Physics.Raycast(new Vector3(x, at.y + 10f, z), Vector3.down, out var hit, 30f, ground, QueryTriggerInteraction.Ignore) ? hit.point.y : at.y;
+            return new Vector3(x, Mathf.Floor((y * 10f) + 0.001f) / 10f, z);
         }
 
         /// <summary>The fence pieces gathered into beds: a piece within <see cref="SameBed"/> of one in a bed joins it.</summary>
