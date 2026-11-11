@@ -228,3 +228,13 @@ ui.mod.evasion,+{0} evasion,+{0} к уклонению
 ui.mod.ap,+{0} AP,+{0} ОД
 ui.mod.initiative,+{0} initiative,+{0} к инициативе
 ui.mod.willagainstcontrol,+{0} Will against control,+{0} к воле против контроля
+# Item Creation at Edda Brann's workshop (S5a.4; 19 §3)
+ui.craft.heading,Workshop: {0} a piece,Мастерская: {0} за вещь
+ui.craft.unlearned,Learn Item Creation to work here.,"Чтобы работать здесь, изучите создание предметов."
+ui.craft.recipe,Make {0}: {1} · {2} min,Сделать: {0} — {1} · {2} мин
+ui.craft.recipe.eight,"Make {0}, stage 8: {1} · {2} min","Сделать: {0}, ступень 8 — {1} · {2} мин"
+ui.craft.part,{1} × {0},{1} × {0}
+ui.craft.made,"Made: {0}, in {1} minutes.","Сделано: {0}, за {1} мин."
+ui.craft.interrupted,The work is interrupted; nothing is spent.,Работа прервана; ничего не потрачено.
+ui.craft.fault.lesson,Item Creation is not learned.,Создание предметов не изучено.
+ui.craft.fault.resources,Not enough resources.,Не хватает ресурсов.

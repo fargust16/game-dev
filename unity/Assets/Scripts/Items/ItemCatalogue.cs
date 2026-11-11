@@ -35,6 +35,20 @@ namespace GameDev.Items
         OffHand,
     }
 
+    /// <summary>One resource of a recipe and how many of it (19 §3).</summary>
+    [Serializable]
+    public struct RecipePart
+    {
+        public string item;
+        public int count;
+
+        public RecipePart(string item, int count)
+        {
+            this.item = item;
+            this.count = count;
+        }
+    }
+
     /// <summary>One kind of item, as 19 gives it: its weight in kg and its shop price in bronze (§4.1, §6.3).</summary>
     [Serializable]
     public sealed class ItemDefinition
@@ -61,6 +75,9 @@ namespace GameDev.Items
 
         [Tooltip("Equipment: its numbers in a fight, 10.2 §5b: a weapon, a shield or the pouch, or the whole set of its armour family (S5a.2).")]
         public ScriptableObject fight;
+
+        [Tooltip("Equipment: what a stage 9 piece is made of at a workshop (19 §3); empty for a base nobody makes.")]
+        public RecipePart[] recipe = new RecipePart[0];
 
         public string NameKey => $"item.{id}";
 

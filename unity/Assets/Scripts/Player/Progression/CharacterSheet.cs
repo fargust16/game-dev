@@ -33,6 +33,9 @@ namespace GameDev.Player.Progression
 
         /// <summary>10.3 §3, §9: the Notice Meter weighs `(Dexterity + Stealth + Darkness) / 2` against Perception (S3b.1).</summary>
         Stealth,
+
+        /// <summary>19 §3: the count of a made piece's modifiers rolls at Item Creation, then Perception and Luck (S5a.4).</summary>
+        ItemCreation,
     }
 
     /// <summary>What a check reads of a character.</summary>

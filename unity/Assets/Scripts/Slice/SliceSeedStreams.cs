@@ -44,10 +44,13 @@ namespace GameDev.Slice
         /// <summary>A shop's morning shelf (S5a.3; 19 §6.3); fork it with the shop's index and the day.</summary>
         public const string ShopStock = "slice.shop.stock";
 
+        /// <summary>A piece made at a workshop (S5a.4; 19 §3); fork it with the count of pieces made before it.</summary>
+        public const string Workshop = "slice.workshop";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
-            ShopStock,
+            ShopStock, Workshop,
         };
     }
 }

@@ -120,6 +120,11 @@ namespace GameDev.Slice.Shops
                 }
             }
 
+            if (shop.workshop && world.Workshop != null)
+            {
+                AddWorkshop(lines, world.Workshop, world.Bag);
+            }
+
             var sellable = shops.Sellable(Keeper, p => world.Outfit != null && world.Outfit.IsWorn(p));
             if (sellable.Count > 0)
             {
@@ -136,6 +141,49 @@ namespace GameDev.Slice.Shops
 
             var title = Loc.Format("ui.shop.title", Loc.Get(GameDev.Slice.People.SliceRoster.NameKey(Keeper)));
             _hud.ShowShop(title, BagPage.Money(world.Bag), lines, _note ?? Loc.Get("ui.shop.hint"));
+        }
+
+        /// <summary>The workshop's lines (S5a.4): every recipe once Item Creation is learned, stage 8 too while its rare ingredient is carried.</summary>
+        private void AddWorkshop(List<PageLine> lines, SliceWorkshop workshop, Bag bag)
+        {
+            lines.Add(new PageLine(Loc.Format("ui.craft.heading", Coins.Show(workshop.Rules.WorkshopFee)), heading: true));
+            if (!workshop.Knows)
+            {
+                lines.Add(new PageLine(Loc.Get("ui.craft.unlearned")));
+                return;
+            }
+
+            var stages = bag.Count(workshop.Rules.RareIngredient) > 0 ? new[] { 9, 8 } : new[] { 9 };
+            foreach (var item in workshop.Bases)
+            {
+                foreach (var stage in stages)
+                {
+                    var i = item;
+                    var s = stage;
+                    var parts = string.Join(", ", workshop.Recipe(i, s).Select(p => Loc.Format("ui.craft.part", p.count, Loc.Get("item." + p.item))));
+                    var text = Loc.Format(s == 9 ? "ui.craft.recipe" : "ui.craft.recipe.eight", Loc.Get(i.NameKey), parts, workshop.Ticks(s));
+                    lines.Add(new PageLine(text, () => Craft(workshop, i, s)));
+                }
+            }
+        }
+
+        /// <summary>Makes the piece, the world running through its ticks; a fight in them interrupts it and nothing is spent.</summary>
+        private void Craft(SliceWorkshop workshop, ItemDefinition item, int stage)
+        {
+            var fault = workshop.Fault(Keeper, item, stage);
+            if (fault != null)
+            {
+                _note = Loc.Get(fault);
+            }
+            else
+            {
+                var outcome = workshop.Make(Keeper, item, stage, Busy, out var piece);
+                _note = outcome == CraftOutcome.Made
+                    ? Loc.Format("ui.craft.made", Name(item, piece), workshop.Ticks(stage))
+                    : Loc.Get("ui.craft.interrupted");
+            }
+
+            Show();
         }
 
         private void Act(string fault, string done, ItemDefinition item, string name = null)

@@ -22,6 +22,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: wood
     kind: 0
     weight: 1.5
@@ -31,6 +32,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: leather
     kind: 0
     weight: 0.5
@@ -40,6 +42,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: flax
     kind: 0
     weight: 0.2
@@ -49,6 +52,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: herb
     kind: 0
     weight: 0.1
@@ -58,6 +62,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: wolf_fang
     kind: 1
     weight: 0.2
@@ -67,6 +72,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: boar_tusk
     kind: 1
     weight: 0.2
@@ -76,6 +82,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: glow_essence_9
     kind: 1
     weight: 0.1
@@ -85,6 +92,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: glow_essence_8
     kind: 1
     weight: 0.1
@@ -94,6 +102,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: woodcutting_axe
     kind: 2
     weight: 2
@@ -103,6 +112,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: pickaxe
     kind: 2
     weight: 2.5
@@ -112,6 +122,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: lockpicks
     kind: 2
     weight: 0.1
@@ -121,6 +132,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: bandage
     kind: 3
     weight: 0.1
@@ -130,6 +142,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: splint
     kind: 3
     weight: 0.5
@@ -139,6 +152,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: antidote
     kind: 3
     weight: 0.2
@@ -148,6 +162,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: plain_clothes
     kind: 4
     weight: 1.5
@@ -157,6 +172,7 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe: []
   - id: dagger
     kind: 4
     weight: 1
@@ -166,6 +182,11 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: 7d5ac9fe2dcf482d9bc1a7dc4d8b420a, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 2
+    - item: wood
+      count: 1
   - id: sword
     kind: 4
     weight: 2
@@ -175,6 +196,11 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: 3a0110b609ab45cb8ee6899999cb96a7, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 3
+    - item: wood
+      count: 1
   - id: axe
     kind: 4
     weight: 2.2
@@ -184,6 +210,11 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: 16599103bb234bb083407f650200eb2a, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 3
+    - item: wood
+      count: 2
   - id: mace
     kind: 4
     weight: 2.5
@@ -193,6 +224,11 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: 27a803eaa9f44d0d9613e524ad9fc3a8, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 4
+    - item: wood
+      count: 1
   - id: greatsword
     kind: 4
     weight: 4.5
@@ -202,6 +238,11 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: f1df711bbb1044f6ba61253d0501292b, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 5
+    - item: wood
+      count: 1
   - id: greataxe
     kind: 4
     weight: 5
@@ -211,6 +252,11 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: 5a93dd3d88e8450a8f6fda6832c626ea, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 5
+    - item: wood
+      count: 2
   - id: maul
     kind: 4
     weight: 6
@@ -220,6 +266,11 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: b9182fd59df34bd89d7fdc70304bde57, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 6
+    - item: wood
+      count: 2
   - id: pistol
     kind: 4
     weight: 1.2
@@ -229,6 +280,11 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: b4a04340c6a647988cf1fc295ab908a3, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 3
+    - item: wood
+      count: 2
   - id: rifle
     kind: 4
     weight: 4
@@ -238,6 +294,11 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: b02db0c189004cf9be52b34f264f1d79, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 4
+    - item: wood
+      count: 3
   - id: cartridge_pouch
     kind: 4
     weight: 0.5
@@ -247,6 +308,9 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: 04aca85548654a408ed148b6df0c1383, type: 2}
+    recipe:
+    - item: leather
+      count: 2
   - id: wooden_shield
     kind: 4
     weight: 2.5
@@ -256,6 +320,9 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: 97e10b2379dd4f2a95789d114bf278ba, type: 2}
+    recipe:
+    - item: wood
+      count: 4
   - id: metal_shield
     kind: 4
     weight: 4
@@ -265,6 +332,11 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 11400000, guid: 90a46d768454485b889779ffc8abca3f, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 5
+    - item: wood
+      count: 1
   - id: ring
     kind: 4
     weight: 0.05
@@ -274,6 +346,9 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe:
+    - item: iron_ore
+      count: 1
   - id: necklace
     kind: 4
     weight: 0.1
@@ -283,6 +358,9 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe:
+    - item: iron_ore
+      count: 2
   - id: belt
     kind: 4
     weight: 0.25
@@ -292,6 +370,9 @@ MonoBehaviour:
     stage: 9
     family: 
     fight: {fileID: 0}
+    recipe:
+    - item: leather
+      count: 1
   - id: cloth_head
     kind: 4
     weight: 0.5
@@ -301,6 +382,9 @@ MonoBehaviour:
     stage: 9
     family: cloth
     fight: {fileID: 11400000, guid: 20abef5896ae476baeb1e0f2f60d3a10, type: 2}
+    recipe:
+    - item: flax
+      count: 2
   - id: cloth_body
     kind: 4
     weight: 2
@@ -310,6 +394,9 @@ MonoBehaviour:
     stage: 9
     family: cloth
     fight: {fileID: 11400000, guid: 20abef5896ae476baeb1e0f2f60d3a10, type: 2}
+    recipe:
+    - item: flax
+      count: 4
   - id: cloth_shoulders
     kind: 4
     weight: 0.8
@@ -319,6 +406,9 @@ MonoBehaviour:
     stage: 9
     family: cloth
     fight: {fileID: 11400000, guid: 20abef5896ae476baeb1e0f2f60d3a10, type: 2}
+    recipe:
+    - item: flax
+      count: 2
   - id: cloth_gloves
     kind: 4
     weight: 0.4
@@ -328,6 +418,9 @@ MonoBehaviour:
     stage: 9
     family: cloth
     fight: {fileID: 11400000, guid: 20abef5896ae476baeb1e0f2f60d3a10, type: 2}
+    recipe:
+    - item: flax
+      count: 1
   - id: cloth_trousers
     kind: 4
     weight: 1.2
@@ -337,6 +430,9 @@ MonoBehaviour:
     stage: 9
     family: cloth
     fight: {fileID: 11400000, guid: 20abef5896ae476baeb1e0f2f60d3a10, type: 2}
+    recipe:
+    - item: flax
+      count: 3
   - id: cloth_boots
     kind: 4
     weight: 0.8
@@ -346,6 +442,9 @@ MonoBehaviour:
     stage: 9
     family: cloth
     fight: {fileID: 11400000, guid: 20abef5896ae476baeb1e0f2f60d3a10, type: 2}
+    recipe:
+    - item: flax
+      count: 2
   - id: leather_head
     kind: 4
     weight: 1
@@ -355,6 +454,9 @@ MonoBehaviour:
     stage: 9
     family: leather
     fight: {fileID: 11400000, guid: e1f1e992ff70458d95cc71d397551626, type: 2}
+    recipe:
+    - item: leather
+      count: 1
   - id: leather_body
     kind: 4
     weight: 4
@@ -364,6 +466,9 @@ MonoBehaviour:
     stage: 9
     family: leather
     fight: {fileID: 11400000, guid: e1f1e992ff70458d95cc71d397551626, type: 2}
+    recipe:
+    - item: leather
+      count: 3
   - id: leather_shoulders
     kind: 4
     weight: 1.5
@@ -373,6 +478,9 @@ MonoBehaviour:
     stage: 9
     family: leather
     fight: {fileID: 11400000, guid: e1f1e992ff70458d95cc71d397551626, type: 2}
+    recipe:
+    - item: leather
+      count: 2
   - id: leather_gloves
     kind: 4
     weight: 0.8
@@ -382,6 +490,9 @@ MonoBehaviour:
     stage: 9
     family: leather
     fight: {fileID: 11400000, guid: e1f1e992ff70458d95cc71d397551626, type: 2}
+    recipe:
+    - item: leather
+      count: 1
   - id: leather_trousers
     kind: 4
     weight: 2.5
@@ -391,6 +502,9 @@ MonoBehaviour:
     stage: 9
     family: leather
     fight: {fileID: 11400000, guid: e1f1e992ff70458d95cc71d397551626, type: 2}
+    recipe:
+    - item: leather
+      count: 2
   - id: leather_boots
     kind: 4
     weight: 1.5
@@ -400,6 +514,9 @@ MonoBehaviour:
     stage: 9
     family: leather
     fight: {fileID: 11400000, guid: e1f1e992ff70458d95cc71d397551626, type: 2}
+    recipe:
+    - item: leather
+      count: 1
   - id: chain_head
     kind: 4
     weight: 1.8
@@ -409,6 +526,9 @@ MonoBehaviour:
     stage: 9
     family: chain
     fight: {fileID: 11400000, guid: 3c213918e29c4b77b35709daf921b39b, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 2
   - id: chain_body
     kind: 4
     weight: 7.5
@@ -418,6 +538,9 @@ MonoBehaviour:
     stage: 9
     family: chain
     fight: {fileID: 11400000, guid: 3c213918e29c4b77b35709daf921b39b, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 6
   - id: chain_shoulders
     kind: 4
     weight: 3
@@ -427,6 +550,9 @@ MonoBehaviour:
     stage: 9
     family: chain
     fight: {fileID: 11400000, guid: 3c213918e29c4b77b35709daf921b39b, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 3
   - id: chain_gloves
     kind: 4
     weight: 1.4
@@ -436,6 +562,9 @@ MonoBehaviour:
     stage: 9
     family: chain
     fight: {fileID: 11400000, guid: 3c213918e29c4b77b35709daf921b39b, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 2
   - id: chain_trousers
     kind: 4
     weight: 4.5
@@ -445,6 +574,9 @@ MonoBehaviour:
     stage: 9
     family: chain
     fight: {fileID: 11400000, guid: 3c213918e29c4b77b35709daf921b39b, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 4
   - id: chain_boots
     kind: 4
     weight: 3
@@ -454,6 +586,9 @@ MonoBehaviour:
     stage: 9
     family: chain
     fight: {fileID: 11400000, guid: 3c213918e29c4b77b35709daf921b39b, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 2
   - id: plate_head
     kind: 4
     weight: 2.8
@@ -463,6 +598,9 @@ MonoBehaviour:
     stage: 9
     family: plate
     fight: {fileID: 11400000, guid: 92c70121f1b54019920dab22ef0c7667, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 3
   - id: plate_body
     kind: 4
     weight: 11
@@ -472,6 +610,9 @@ MonoBehaviour:
     stage: 9
     family: plate
     fight: {fileID: 11400000, guid: 92c70121f1b54019920dab22ef0c7667, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 9
   - id: plate_shoulders
     kind: 4
     weight: 4.5
@@ -481,6 +622,9 @@ MonoBehaviour:
     stage: 9
     family: plate
     fight: {fileID: 11400000, guid: 92c70121f1b54019920dab22ef0c7667, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 4
   - id: plate_gloves
     kind: 4
     weight: 2
@@ -490,6 +634,9 @@ MonoBehaviour:
     stage: 9
     family: plate
     fight: {fileID: 11400000, guid: 92c70121f1b54019920dab22ef0c7667, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 2
   - id: plate_trousers
     kind: 4
     weight: 7
@@ -499,6 +646,9 @@ MonoBehaviour:
     stage: 9
     family: plate
     fight: {fileID: 11400000, guid: 92c70121f1b54019920dab22ef0c7667, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 6
   - id: plate_boots
     kind: 4
     weight: 4.5
@@ -508,3 +658,6 @@ MonoBehaviour:
     stage: 9
     family: plate
     fight: {fileID: 11400000, guid: 92c70121f1b54019920dab22ef0c7667, type: 2}
+    recipe:
+    - item: iron_ore
+      count: 3

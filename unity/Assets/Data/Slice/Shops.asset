@@ -25,6 +25,7 @@ MonoBehaviour:
     lessons:
     - itemcreation
     - skinning
+    workshop: 1
   - keeper: silas
     sells:
     - glow_essence_9
@@ -54,3 +55,7 @@ MonoBehaviour:
   lessonPrice: 1000
   leastStock: 1
   mostStock: 3
+  workshopFee: 100
+  stageNineTicks: 10
+  stageEightTicks: 20
+  rareIngredient: glow_essence_8

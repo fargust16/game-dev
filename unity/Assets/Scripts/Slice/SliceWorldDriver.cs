@@ -69,6 +69,9 @@ namespace GameDev.Slice
         /// <summary>The shops on Bawling Row (S5a.3); null without a bag or the shops' data.</summary>
         public SliceShops Shops { get; private set; }
 
+        /// <summary>Edda Brann's workshop (S5a.4); null without the shops.</summary>
+        public SliceWorkshop Workshop { get; private set; }
+
         /// <summary>11's start: plain clothes with no defence and 500 bronze, with no weapon or tool.</summary>
         public const int StartingBronze = 500;
 
@@ -240,6 +243,7 @@ namespace GameDev.Slice
             if (Bag != null && settings.Shops != null)
             {
                 Shops = new SliceShops(settings.Shops, settings.Items, seed, Clock, Bag, State);
+                Workshop = new SliceWorkshop(Shops, settings.Items, seed, Clock, Bag, State, Character);
                 OpenCounters();
             }
 

@@ -19,6 +19,9 @@ namespace GameDev.Slice.Shops
 
         [Tooltip("The professions it teaches, by lesson id: firstaid, itemcreation, skinning.")]
         public string[] lessons = new string[0];
+
+        [Tooltip("Its keeper's workshop, where one who learned Item Creation makes a piece (19 §3; S5a.4).")]
+        public bool workshop;
     }
 
     /// <summary>
@@ -49,6 +52,17 @@ namespace GameDev.Slice.Shops
 
         [SerializeField] private int mostStock = 3;
 
+        [Tooltip("19 §3: what the workshop asks a piece, bronze.")]
+        [SerializeField] private int workshopFee = 100;
+
+        [Tooltip("19 §3: the ticks a stage 9 piece takes, and a stage 8 piece.")]
+        [SerializeField] private int stageNineTicks = 10;
+
+        [SerializeField] private int stageEightTicks = 20;
+
+        [Tooltip("19 §3, §2.1: the rare ingredient a stage 8 piece needs besides its resources.")]
+        [SerializeField] private string rareIngredient = "glow_essence_8";
+
         public IReadOnlyList<ShopEntry> Shops => shops;
         public int ShopSkill => shopSkill;
         public int SkillPerDay => skillPerDay;
@@ -57,5 +71,9 @@ namespace GameDev.Slice.Shops
         public int LessonPrice => lessonPrice;
         public int LeastStock => leastStock;
         public int MostStock => mostStock;
+        public int WorkshopFee => workshopFee;
+        public int StageNineTicks => stageNineTicks;
+        public int StageEightTicks => stageEightTicks;
+        public string RareIngredient => rareIngredient;
     }
 }
