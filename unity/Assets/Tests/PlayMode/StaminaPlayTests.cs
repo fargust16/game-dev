@@ -47,12 +47,11 @@ namespace GameDev.Slice.Tests
             Hold();
             yield return null;
 
-            // A tick after the rest of 2.5 s, a quarter of a tick, gives back three quarters of 5 %: still tired.
-            world.Clock.AdvanceTicks(1);
-            yield return null;
-            Assert.That(world.Stamina.Share, Is.InRange(0.03d, 0.06d), "5 % a tick after the rest");
+            // The rest of 2.5 s over, it comes back at 20 % a tick, 2 % a real second here: still tired below a tenth.
+            yield return new WaitForSeconds(2.6f);
+            Assert.That(world.Stamina.Share, Is.InRange(0.0001d, 0.05d), "it comes back after the rest");
             Assert.IsTrue(world.Stamina.Tired, "tired until a tenth has come back");
-            world.Clock.AdvanceTicks(2);
+            world.Clock.AdvanceTicks(1);
             yield return null;
             yield return null;
             Assert.IsFalse(world.Stamina.Tired);

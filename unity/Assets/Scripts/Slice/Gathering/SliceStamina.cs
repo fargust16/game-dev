@@ -8,8 +8,9 @@ namespace GameDev.Slice.Gathering
     /// <summary>
     /// The character's Stamina (07.2 §3.2; S5a.5; the owner's play test of S5a): its maximum is (20 + 1.6 × Endurance) × S,
     /// with S = 1 until S5b's Limits. The sprint, gathering and Item Creation spend it; without exertion it comes back at
-    /// 5 % of the maximum a world tick, spread over the tick's real time, and none while the world is paused. Run out, the
-    /// character rests 2.5 real seconds before it begins to come back, and stays tired, unable to sprint or begin work,
+    /// 20 % of the maximum a world tick (2 % a real second in the slice), spread over the tick's real time, and none while
+    /// the world is paused. Run out, the character rests 2.5 real seconds before it begins to come back, and stays tired,
+    /// unable to sprint or begin work,
     /// until a tenth has come back; work stopped before the pool ran out lets it come back at once. The spent share is
     /// kept in the world state in millionths, so it lives with the run.
     /// </summary>

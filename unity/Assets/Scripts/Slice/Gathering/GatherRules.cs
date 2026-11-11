@@ -62,8 +62,8 @@ namespace GameDev.Slice.Gathering
 
         [SerializeField] private float staminaPerEndurance = 1.6f;
 
-        [Tooltip("07.2 §3.2: the share of maximum Stamina recovered each world tick without exertion.")]
-        [SerializeField] private float staminaRecovery = 0.05f;
+        [Tooltip("07.2 §3.2: the share of maximum Stamina recovered each world tick without exertion (20 %, the owner's change after the play test of S5a).")]
+        [SerializeField] private float staminaRecovery = 0.2f;
 
         public IReadOnlyList<GatherNodeRule> Nodes => nodes;
         public float CycleStamina => cycleStamina;

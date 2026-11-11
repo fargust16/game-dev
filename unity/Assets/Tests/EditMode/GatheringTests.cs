@@ -65,24 +65,24 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(1d, _stamina.Share);
 
             _stamina.Exerting = true;
-            _stamina.Spend(0.03d);
-            _stamina.Spend(0.03d);
-            Assert.AreEqual(0.94d, _stamina.Share, 1e-9);
+            _stamina.Spend(0.3d);
+            _stamina.Spend(0.3d);
+            Assert.AreEqual(0.4d, _stamina.Share, 1e-9);
             _clock.AdvanceTicks(3);
-            Assert.AreEqual(0.94d, _stamina.Share, 1e-9, "no return while exerting");
+            Assert.AreEqual(0.4d, _stamina.Share, 1e-9, "no return while exerting");
             _stamina.Exerting = false;
             _clock.AdvanceTicks(1);
-            Assert.AreEqual(0.99d, _stamina.Share, 1e-9, "5 % a tick");
-            _clock.AdvanceTicks(1);
+            Assert.AreEqual(0.6d, _stamina.Share, 1e-9, "20 % a tick (the owner's change after the play test of S5a)");
+            _clock.AdvanceTicks(3);
             Assert.AreEqual(1d, _stamina.Share, 1e-9, "never above the maximum");
             _stamina.Spend(2d);
             Assert.IsTrue(_stamina.Empty);
             Assert.IsTrue(_stamina.Tired, "run out, the character is tired");
-            _clock.AdvanceTicks(20);
-            Assert.AreEqual(0.9875d, _stamina.Share, 1e-9, "20 ticks less the rest of 2.5 s, a quarter of a tick");
+            _clock.AdvanceTicks(5);
+            Assert.AreEqual(0.95d, _stamina.Share, 1e-9, "5 ticks less the rest of 2.5 s, a quarter of a tick");
             Assert.IsFalse(_stamina.Tired);
             _clock.AdvanceTicks(1);
-            Assert.AreEqual(1d, _stamina.Share, 1e-9, "an empty pool in about 20 ticks");
+            Assert.AreEqual(1d, _stamina.Share, 1e-9, "an empty pool in about 5 ticks");
         }
 
         [Test]
@@ -94,19 +94,19 @@ namespace GameDev.Slice.Tests
             stamina.Spend(0.5d);
             _clock.AdvanceRealTime(0.5d);
             stamina.CatchUp();
-            Assert.AreEqual(0.525d, stamina.Share, 1e-9, "half a tick gives back half of 5 %");
+            Assert.AreEqual(0.6d, stamina.Share, 1e-9, "half a tick gives back half of 20 %");
             using (_clock.Pause())
             {
                 _clock.AdvanceRealTime(5d);
                 stamina.CatchUp();
-                Assert.AreEqual(0.525d, stamina.Share, 1e-9, "none while the world is paused");
+                Assert.AreEqual(0.6d, stamina.Share, 1e-9, "none while the world is paused");
             }
 
             stamina.Sprinting = true;
             stamina.Spend(SliceStamina.SprintShare);
             _clock.AdvanceRealTime(0.25d);
             stamina.CatchUp();
-            Assert.AreEqual(0.505d, stamina.Share, 1e-9, "a second of sprint spends 2 %, and none comes back meanwhile");
+            Assert.AreEqual(0.58d, stamina.Share, 1e-9, "a second of sprint spends 2 %, and none comes back meanwhile");
             stamina.Sprinting = false;
 
             stamina.Spend(1d);
@@ -115,11 +115,11 @@ namespace GameDev.Slice.Tests
             _clock.AdvanceRealTime(2d);
             stamina.CatchUp();
             Assert.AreEqual(0d, stamina.Share, 1e-9, "2.5 s of rest after running out");
-            _clock.AdvanceRealTime(1d);
+            _clock.AdvanceRealTime(0.75d);
             stamina.CatchUp();
-            Assert.AreEqual(0.025d, stamina.Share, 1e-9);
+            Assert.AreEqual(0.05d, stamina.Share, 1e-9);
             Assert.IsTrue(stamina.Tired, "tired until a tenth has come back");
-            _clock.AdvanceRealTime(1.5d);
+            _clock.AdvanceRealTime(0.25d);
             stamina.CatchUp();
             Assert.AreEqual(0.1d, stamina.Share, 1e-9);
             Assert.IsFalse(stamina.Tired);
@@ -129,7 +129,7 @@ namespace GameDev.Slice.Tests
             stamina.Exerting = false;
             _clock.AdvanceRealTime(0.2d);
             stamina.CatchUp();
-            Assert.AreEqual(0.06d, stamina.Share, 1e-9, "work stopped before the pool ran out lets it come back at once");
+            Assert.AreEqual(0.09d, stamina.Share, 1e-9, "work stopped before the pool ran out lets it come back at once");
         }
 
         [Test]
