@@ -238,3 +238,12 @@ MonoBehaviour:
     requiresKey: poi.c.phase
     requiresAtLeast: 1
     needsApproach: 1
+  - id: drop.note
+    source: 3
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 11400000, guid: 1afbb87f59ce4488b916e8e08b724d91, type: 2}
+    effect: 2
+    requiresKey: poi.c.phase
+    requiresAtLeast: 1
+    needsApproach: 1

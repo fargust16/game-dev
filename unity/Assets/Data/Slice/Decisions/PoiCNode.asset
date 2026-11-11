@@ -1,0 +1,164 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c6e8a0b2d3f4a7b9c1d3e5f7a9b1c3d, type: 3}
+  m_Name: PoiCNode
+  m_EditorClassIdentifier: 
+  id: poi-c
+  title: "Soot Stair Trace"
+  situation: "Beneath the works' wall on Deaf Boiler Yard, the cellar door smells of soot and sweet chemical. Something was moved here after the arrest and the collectors' night. The player can read the trace, ask the sweep, sneak into the shuttered nook in the cellar, or leave the stairs to the rain; in the nook, or from a polite stranger in a too-clean coat, waits the black drop. (11.1 POI C, Slice build (S4))"
+  poi: {fileID: 11400000, guid: 1afbb87f59ce4488b916e8e08b724d91, type: 2}
+  scene: {fileID: 11400000, guid: 7d2b9e4c1a6f4b8e9c3d5f7a1b2c4e6d, type: 2}
+  primaryAxis: 0
+  secondaryAxis: 1
+  options:
+  - name: "Study the Physical Trace"
+    axes:
+    - 0
+    - 1
+    approaches:
+    - 0
+    - 4
+    dialogueOptions: []
+    cost: "Time: 20 minutes for the close look; a sweeper clears the easy tells at day 2, 20:00"
+    consequence: "One solid tell linking A and B: Harrow's black tincture and the girls taken go down the same stair"
+    opens: "A clearer crowned-buyer hypothesis; better Bargain judgment; an Argument against the stranger"
+    closes: "None major"
+    failure: "A misreading: soot and a chemical sweetness lie together, and no more"
+    residue: []
+    countsAsWithdraw: 0
+    prepares: 0
+    later: 
+    inWorld: "TraceSpot"
+  - name: "Talk to the sweep"
+    axes:
+    - 0
+    - 1
+    approaches:
+    - 1
+    - 2
+    - 3
+    dialogueOptions: []
+    cost: "A service of 30 minutes, or his enmity"
+    consequence: "A crestless coach, its men speaking like the clerks up the hill"
+    opens: "Social confirmation of the class divide behind the crime"
+    closes: "If Threaten, the sweep leaves for good"
+    failure: "Silence; the trace on the ground stays"
+    residue: []
+    countsAsWithdraw: 0
+    prepares: 0
+    later: 
+    inWorld: "PoiStage (SweepDialogue)"
+  - name: "Enter the shuttered nook"
+    axes:
+    - 0
+    - 1
+    approaches:
+    - 0
+    - 4
+    dialogueOptions:
+    - unfold
+    - unfold_empty
+    - hear
+    cost: "Trespass; the Bargain's temptation"
+    consequence: "The note and the black drop, or the stranger's offer if he sees the character"
+    opens: "The Bargain tease"
+    closes: "Nothing yet"
+    failure: "Seen: the stranger steps in and makes the offer himself"
+    residue: []
+    countsAsWithdraw: 0
+    prepares: 0
+    later: 
+    inWorld: "NookSpot"
+  - name: "Threaten the stranger"
+    axes:
+    - 1
+    - 2
+    approaches:
+    - 2
+    dialogueOptions:
+    - threaten
+    cost: "His Attitude"
+    consequence: "He leaves the cellar; the drop stays on the shelf"
+    opens: "The nook, unwatched"
+    closes: "His offer"
+    failure: "He takes the drop with him and leaves only the note (11.1: the watcher flees leaving only the note)"
+    residue: []
+    countsAsWithdraw: 0
+    prepares: 1
+    later: 
+    inWorld: ""
+  - name: "Accept the black drop"
+    axes:
+    - 4
+    - 3
+    approaches:
+    - 0
+    dialogueOptions:
+    - drink
+    - s_drink
+    cost: "Darkness no longer adds to Stealth skill; a later price only foreshadowed (99 VS-DROP)"
+    consequence: "Fog sense: every observer's Notice Meter and its clear Vision Cone, as Perception 4 and Intelligence 6 would show"
+    opens: "Priced power proven"
+    closes: "Refusal's purity; later Soft Memory hooks out of slice scope"
+    failure: "None in the slice"
+    residue:
+    - poi.c.drank
+    - bargain.black_drop
+    countsAsWithdraw: 0
+    prepares: 0
+    later: 
+    inWorld: ""
+  - name: "Refuse the black drop"
+    axes:
+    - 4
+    - 0
+    approaches:
+    - 6
+    dialogueOptions:
+    - leave
+    - smash
+    - keep_note
+    - s_refuse
+    - s_smash
+    cost: "No fog sense"
+    consequence: "The note's words kept as Knowledge; a smashed drop stains the stone"
+    opens: "A moral and knowledge path; safer research beyond the slice"
+    closes: "The fog sense"
+    failure: "None: refusal is a valid success of judgment"
+    residue: []
+    countsAsWithdraw: 0
+    prepares: 0
+    later: 
+    inWorld: ""
+  - name: "Leave the stairs to the rain"
+    axes:
+    - 0
+    - 3
+    approaches:
+    - 6
+    dialogueOptions:
+    - close
+    - walk
+    - close_empty
+    - walk_empty
+    - not_now
+    - s_walk
+    cost: "Evidence decay"
+    consequence: "C stays open until the invasion closes it as trace faded"
+    opens: "Acceptance that not every Trace must be finished"
+    closes: "The best A and B link"
+    failure: "Curiosity unpaid; the chalk still proves a timed world"
+    residue: []
+    countsAsWithdraw: 1
+    prepares: 0
+    later: 
+    inWorld: ""

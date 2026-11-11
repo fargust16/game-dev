@@ -138,7 +138,7 @@ namespace GameDev.Slice.Fights
             _turns = new TurnEconomy(settings.FightRules, _grid)
             {
                 Stealth = settings.StealthRules,
-                DarknessAt = cell => Hiding != null ? Hiding.Darkness(_grid.Center(cell)) : 0,
+                DarknessAt = cell => Hiding != null ? Hiding.HidingDarkness(_grid.Center(cell)) : 0,
             };
             _lock = new EncounterLock(_turns, _grid, clock);
             _lock.ConfrontStarted += OnStarted;

@@ -58,6 +58,34 @@ namespace GameDev.Slice.Stealth
 
         public event Action<StealthObserver> Noticed;
 
+        /// <summary>S4.4: the world state key the black drop raises when drunk (11.1 *Slice build (S4)*; 99 VS-DROP).</summary>
+        public const string FogKey = "bargain.black_drop";
+
+        /// <summary>Whether the fog speaks for the character, the black drop drunk; set by the world.</summary>
+        public Func<bool> FogSpeaks { get; set; }
+
+        private bool Fog => FogSpeaks != null && FogSpeaks();
+
+        /// <summary>
+        /// The Perception the stealth HUD reads for the Notice Meter (10.3 §4). The fog speaks the enemies' steps: the
+        /// black drop shows every meter, as Perception 4 would.
+        /// </summary>
+        public int SightPerception => FogValue(_character.Get(CharacterAttribute.Perception), _rules.MeterFromPerception, Fog);
+
+        /// <summary>The Intelligence the stealth HUD reads for the Vision Cones: the black drop shows them clear, as Intelligence 6 would.</summary>
+        public int SightIntelligence => FogValue(_character.Get(CharacterAttribute.Intelligence), _rules.ConesClearFromIntelligence, Fog);
+
+        /// <summary>What the fog makes of a value the HUD reads: at least <paramref name="floor"/> once it speaks.</summary>
+        public static int FogValue(int actual, int floor, bool fog) => fog ? Math.Max(actual, floor) : actual;
+
+        /// <summary>
+        /// The Darkness added to the hider's Stealth skill (10.3 §3). The black drop's price: the fog speaks the
+        /// character's steps too, so no shadow hides it, and Darkness adds nothing.
+        /// </summary>
+        public int HidingDarkness(Vector3 at) => HiddenBy(Darkness(at), Fog);
+
+        public static int HiddenBy(int darkness, bool fog) => fog ? 0 : darkness;
+
         public void Configure(StealthRules rules, CharacterSheet character, IWorldClock clock, Func<bool> inFight)
         {
             _rules = rules;
@@ -139,7 +167,7 @@ namespace GameDev.Slice.Stealth
         /// <summary>The time a meter takes to fill against this observer at this distance, 10.3 §3.</summary>
         public double TimeToFill(StealthObserver o, Vector3 at)
         {
-            var delta = _rules.Delta(_character.Get(CharacterAttribute.Dexterity), _character.Get(CharacterSkill.Stealth), Darkness(at),
+            var delta = _rules.Delta(_character.Get(CharacterAttribute.Dexterity), _character.Get(CharacterSkill.Stealth), HidingDarkness(at),
                 o.Perception, o.Meter.Alert);
             var cells = Flat(at - o.transform.position).magnitude; // the slice's cells are 1 m
             return _rules.TimeToFill(delta, cells);

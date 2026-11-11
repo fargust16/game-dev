@@ -33,6 +33,15 @@ namespace GameDev.Slice
         [Tooltip("Authoring default, m: horizontal reach from the person.")]
         [SerializeField] private float interactRadius = 2f;
 
+        [Tooltip("S4.3: the node Interact opens on; empty for the conversation's start.")]
+        [SerializeField] private string startNode = "";
+
+        [Tooltip("S4.3: whether Interact in reach opens it; off for a conversation another component opens, such as POI C's nook.")]
+        [SerializeField] private bool opensItself = true;
+
+        [Tooltip("The prompt's key while it can be opened.")]
+        [SerializeField] private string promptKey = "ui.prompt.talk";
+
         // Each entry gives its speaker and words afresh, so the column follows a change of language.
         private readonly List<Func<(string speaker, string text)>> _history = new List<Func<(string, string)>>();
         private PlayerLocomotion _player;
@@ -60,12 +69,28 @@ namespace GameDev.Slice
             interactRadius = radius;
         }
 
+        /// <summary>Setup for scenes built by code (S4.3): the node it opens on, whether Interact opens it, and its prompt.</summary>
+        public void Configure(DialogueDefinition definition, float radius, string start, bool opens, string prompt = "ui.prompt.talk")
+        {
+            Configure(definition, radius);
+            startNode = start ?? "";
+            opensItself = opens;
+            promptKey = string.IsNullOrEmpty(prompt) ? "ui.prompt.talk" : prompt;
+        }
+
+        public string StartNode => startNode;
+
+        public bool OpensItself => opensItself;
+
         public bool InReach(Vector3 position) => InteractReach.Within(transform, position, interactRadius);
 
-        public string PromptFor(Vector3 player) => Available && dialogue != null && !IsOpen && InReach(player) ? Loc.Get("ui.prompt.talk") : null;
+        public string PromptFor(Vector3 player) => opensItself && Available && dialogue != null && !IsOpen && InReach(player) ? Loc.Get(promptKey) : null;
 
         /// <summary>What Interact does: opens the conversation on its first node.</summary>
-        public void Open()
+        public void Open() => Open(null);
+
+        /// <summary>Opens the conversation on <paramref name="node"/>, or on its own first node when null (S4.3).</summary>
+        public void Open(string node)
         {
             var world = SliceWorldDriver.Running;
             if (IsOpen || !Available || world == null || dialogue == null || Hud() == null)
@@ -74,7 +99,8 @@ namespace GameDev.Slice
             }
 
             _history.Clear();
-            _talk = world.Talk(dialogue);
+            var first = string.IsNullOrEmpty(node) ? startNode : node;
+            _talk = world.Talk(dialogue, string.IsNullOrEmpty(first) ? null : first);
             _talk.Ended += how =>
             {
                 Hud()?.CloseDialogue();
@@ -234,7 +260,7 @@ namespace GameDev.Slice
             // A door in reach takes Interact, as it takes the HUD's prompt: a scene before a shop's door (S2.5) is
             // not opened by going in.
             _doors ??= FindObjectsByType<Portal>(FindObjectsInactive.Exclude);
-            if (inReach && input != null && input.InteractPressed
+            if (opensItself && inReach && input != null && input.InteractPressed
                 && !_doors.Any(d => d != null && d.isActiveAndEnabled && d.InReach(_player.transform.position)))
             {
                 Open();

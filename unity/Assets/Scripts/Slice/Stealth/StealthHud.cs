@@ -73,9 +73,9 @@ namespace GameDev.Slice.Stealth
                 return;
             }
 
-            var character = _stealth.Character;
-            var showMeter = _stealth.Rules.ShowsMeter(DebugSight.Read(character.Get(CharacterAttribute.Perception)));
-            var opacity = _stealth.Active ? _stealth.Rules.ConeOpacity(DebugSight.Read(character.Get(CharacterAttribute.Intelligence))) : 0f;
+            // S4.4: the black drop's fog sense reads as Perception 4 and Intelligence 6 (SliceStealth.SightPerception).
+            var showMeter = _stealth.Rules.ShowsMeter(DebugSight.Read(_stealth.SightPerception));
+            var opacity = _stealth.Active ? _stealth.Rules.ConeOpacity(DebugSight.Read(_stealth.SightIntelligence)) : 0f;
             var eye = camera.transform.position;
             foreach (var o in StealthObserver.All)
             {

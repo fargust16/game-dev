@@ -83,10 +83,10 @@ namespace GameDev.Slice
         /// stay hidden: Veil and Confront until S3 (owner, 2026-11-09).
         /// </summary>
         /// <summary>A conversation; its Veil options are offered only while the character is in Stealth Mode (S3b.3).</summary>
-        public IDialogueRunner Talk(DialogueDefinition dialogue)
+        public IDialogueRunner Talk(DialogueDefinition dialogue, string startNode = null)
         {
             _talk.Withheld = Hiding != null && Hiding.Active ? new HashSet<Approach>() : new HashSet<Approach> { Approach.Veil };
-            return new DialogueSession(dialogue, _talk);
+            return new DialogueSession(dialogue, _talk, startNode);
         }
 
         /// <summary>
@@ -205,6 +205,7 @@ namespace GameDev.Slice
             {
                 Hiding = gameObject.AddComponent<SliceStealth>();
                 Hiding.Configure(settings.StealthRules, Character, Clock, () => Fights != null && Fights.InFight);
+                Hiding.FogSpeaks = () => State.IsSet(SliceStealth.FogKey);
                 if (Fights != null)
                 {
                     Fights.Hiding = Hiding;

@@ -208,6 +208,218 @@ namespace GameDev.Slice.EditorTools
 
         public static float FlatDistance(Vector3 a, Vector3 b) => new Vector2(a.x - b.x, a.z - b.z).magnitude;
 
+        public const string NookName = "POI C - The nook";
+        public const string StrangerName = "POI C - The stranger";
+        public const string PoiCDialoguePath = "Assets/Data/Slice/Dialogue/PoiCDialogue.asset";
+        private const string StealthRulesPath = "Assets/Data/Confront/StealthRules.asset";
+        private const string CellarInside = "soot-stair-cellar.inside";
+
+        // Authoring defaults, m. The cellar's plan (VeilmouthInteriors): the west vault 0–9 × 0–9, the circle vault 9–21 ×
+        // 0–12, the open doorway between them on x = 9 about z = 4.5. The stranger stands in the circle vault looking
+        // west through it; the nook is the wall place of the west vault he sees from farthest, while the stair's foot,
+        // where the character comes in, is out of his sight, so the nook is reached unseen by keeping out of his cone.
+        private static readonly Vector3[] StrangerPlaces =
+        {
+            new Vector3(12.5f, 0f, 4.5f), new Vector3(12f, 0f, 4.5f), new Vector3(11.5f, 0f, 4.5f), new Vector3(11f, 0f, 4.5f),
+            new Vector3(10.5f, 0f, 4.5f), new Vector3(10f, 0f, 4.5f),
+        };
+        private static readonly Vector3 Doorway = new Vector3(9f, 0f, 4.5f);
+        private static readonly Vector3 WestVault = new Vector3(4.5f, 0f, 4.5f);
+        private const float NookOut = 0.6f;
+        private const float NookReach = 1.2f;
+        private const float StrangerReach = 2.2f;
+        private const float StrangerArea = 40f;
+        private const float SeenWithin = 9.5f;
+
+        /// <summary>Authoring default, m: how far round the nook the places the character opens it from are checked for his sight.</summary>
+        private const float ReachAround = 0.8f;
+
+        /// <summary>
+        /// S4.3: the cellar under the Soot Stair. The stranger in a coat too clean for the Reek, a gentleman of the asset map
+        /// (§1) watching by his own Vision Cone with Perception 3, and the shuttered nook with the folded note and the black
+        /// drop, placeholders of our own. Both talk through POI C's conversation; the drop and the stains follow the
+        /// choice (S4.5). Placed again on each run.
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.SlicePoiC.StageCellar
+        /// </summary>
+        [MenuItem("GameDev/Slice/POI/Stage POI C's nook and stranger in the cellar under the Soot Stair")]
+        public static void StageCellar()
+        {
+            var scene = EditorSceneManager.OpenScene(VeilmouthDressing.CellarScenePath, OpenSceneMode.Single);
+            var poi = AssetDatabase.LoadAssetAtPath<PoiDefinition>(PoiCPath);
+            var dialogue = AssetDatabase.LoadAssetAtPath<DialogueDefinition>(PoiCDialoguePath);
+            var rules = AssetDatabase.LoadAssetAtPath<GameDev.Confront.Stealth.StealthRules>(StealthRulesPath);
+            var body = AssetDatabase.LoadAssetAtPath<GameObject>(SlicePeopleModels.Gentleman.Standing);
+            var stair = Object.FindObjectsByType<Portal>(FindObjectsInactive.Include).FirstOrDefault(p => p.Id == CellarInside);
+            if (poi == null || dialogue == null || rules == null || body == null || stair == null)
+            {
+                Debug.LogError("[SlicePoiC] POI C, its conversation, the stealth rules, the gentleman or the cellar's stair door is missing.");
+                return;
+            }
+
+            foreach (var old in scene.GetRootGameObjects().Where(g => g.name == NookName || g.name == StrangerName))
+            {
+                Object.DestroyImmediate(old);
+            }
+
+            Physics.SyncTransforms();
+            var floor = stair.transform.position;
+            var entry = new[] { 1f, 2f, 3f }.Select(d => stair.transform.position + (SlicePoiStages.Flat(stair.transform.forward) * d)).ToArray();
+            foreach (var place in StrangerPlaces)
+            {
+                var stand = SlicePoiStages.Feet(floor, place);
+                if (!SlicePoiStages.Free(floor, stand))
+                {
+                    continue;
+                }
+
+                var facing = SlicePoiStages.Flat(Doorway - stand);
+                if (entry.Any(e => SeenFrom(rules, stand, facing, e)))
+                {
+                    continue;
+                }
+
+                if (!Nook(rules, floor, stand, facing, stair, out var nookAt, out var wall))
+                {
+                    continue;
+                }
+
+                Build(poi, dialogue, body, stand, facing, nookAt, wall);
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+                Debug.Log($"[SlicePoiC] The stranger stands at {stand} facing {facing}; the nook at {nookAt}, its wall toward {wall}, {FlatDistance(stand, nookAt):0.0} m from him.");
+                return;
+            }
+
+            Debug.LogError("[SlicePoiC] No place for the stranger that leaves the stair's foot unseen and sees a free wall of the west vault.");
+        }
+
+        /// <summary>Whether an observer standing at <paramref name="feet"/>, facing <paramref name="facing"/>, sees a standing character at <paramref name="at"/>.</summary>
+        private static bool SeenFrom(GameDev.Confront.Stealth.StealthRules rules, Vector3 feet, Vector3 facing, Vector3 at)
+        {
+            if (FlatDistance(feet, at) > SeenWithin || !rules.InCone(feet, facing, at, 1f))
+            {
+                return false;
+            }
+
+            var notCharacters = ~LayerMask.GetMask(KitLayers.Character);
+            var eye = feet + (Vector3.up * rules.EyeHeight);
+            var head = at + (Vector3.up * 1.6f);
+            return !Physics.Linecast(eye, head, notCharacters, QueryTriggerInteraction.Ignore);
+        }
+
+        /// <summary>The free place before a wall of the west vault that the stranger sees from farthest, at least 2 m from the stair door.</summary>
+        private static bool Nook(GameDev.Confront.Stealth.StealthRules rules, Vector3 floor, Vector3 stand, Vector3 facing, Portal stair,
+            out Vector3 at, out Vector3 wall)
+        {
+            at = Vector3.zero;
+            wall = Vector3.zero;
+            var best = -1f;
+            // The walls, not the furniture standing before them.
+            var walls = ~LayerMask.GetMask(KitLayers.Character, KitLayers.Prop, KitLayers.NoGrid, "Ignore Raycast");
+            var middle = WestVault + (Vector3.up * 1.3f);
+            foreach (var toward in new[] { Vector3.forward, Vector3.left, Vector3.back })
+            {
+                if (!Physics.Raycast(middle, toward, out var face, 8f, walls, QueryTriggerInteraction.Ignore))
+                {
+                    continue;
+                }
+
+                var along = Vector3.Cross(Vector3.up, toward);
+                for (var step = -3.5f; step <= 3.5f; step += 0.5f)
+                {
+                    var onWall = face.point + (along * step);
+                    if (!Physics.Raycast(onWall - (toward * 0.5f), toward, out var here, 1f, walls, QueryTriggerInteraction.Ignore))
+                    {
+                        continue; // a doorway or a corner: no wall here
+                    }
+
+                    var place = SlicePoiStages.Feet(floor, here.point - (toward * NookOut) - (Vector3.up * 1.3f));
+                    var distance = FlatDistance(stand, place);
+                    // He must see the nook and every place the character opens it from, not only its edge of the doorway.
+                    var reach = new[] { place, place - (toward * ReachAround), place + (along * ReachAround), place - (along * ReachAround) };
+                    if (distance <= best || FlatDistance(place, stair.transform.position) < 2f || !SlicePoiStages.Free(floor, place)
+                        || !reach.All(r => SeenFrom(rules, stand, facing, r)))
+                    {
+                        continue;
+                    }
+
+                    best = distance;
+                    at = place;
+                    wall = toward;
+                }
+            }
+
+            return best > 0f;
+        }
+
+        private static void Build(PoiDefinition poi, DialogueDefinition dialogue, GameObject body, Vector3 stand, Vector3 facing, Vector3 nookAt, Vector3 wall)
+        {
+            // The stranger: his scene, his eyes, his conversation, and the stain left if the drop is struck from his hand.
+            var strangerRoot = new GameObject(StrangerName);
+            strangerRoot.transform.SetPositionAndRotation(stand, Quaternion.LookRotation(facing));
+            var cast = new GameObject("Cast");
+            cast.transform.SetParent(strangerRoot.transform, false);
+            var gentleman = (GameObject)PrefabUtility.InstantiatePrefab(body, cast.transform);
+            gentleman.name = "POI C - The stranger in the clean coat";
+            gentleman.transform.SetPositionAndRotation(stand, Quaternion.LookRotation(facing));
+            if (gentleman.TryGetComponent<TownsfolkWalker>(out var walker))
+            {
+                Object.DestroyImmediate(walker);
+            }
+
+            var eyes = gentleman.AddComponent<GameDev.Slice.Stealth.StealthObserver>();
+            eyes.Perception = 3;
+            strangerRoot.AddComponent<PersonTalk>().Configure(dialogue, StrangerReach, NookSpot.StrangerNode, true);
+            var stage = strangerRoot.AddComponent<PoiStage>();
+            stage.Configure(poi, cast, StrangerArea);
+            stage.Keep(-1, -1, NookSpot.StrangerGone);
+            cast.SetActive(false);
+            var strangerStain = Stain(strangerRoot.transform, stand + (facing * 0.7f), "Stain - where the drop was struck");
+            strangerRoot.AddComponent<WorldResidue>().Configure(new[] { new StateCondition("poi.c.smashed.stranger") }, 0, new[] { strangerStain }, new GameObject[0], new Portal[0]);
+
+            // The nook: shutters on the wall, a shelf, the note and the drop; the place before it opens the conversation.
+            var nook = new GameObject(NookName);
+            nook.transform.SetPositionAndRotation(nookAt, Quaternion.LookRotation(wall));
+            var look = new GameObject("Look");
+            look.transform.SetParent(nook.transform, false);
+            var turn = Quaternion.LookRotation(wall);
+            var face = nookAt + (wall * NookOut);
+            var wood = Material("Nook_Shutters", new Color(0.22f, 0.15f, 0.1f), 0.2f);
+            Piece(look.transform, PrimitiveType.Cube, face + (Vector3.up * 1.05f) - (wall * 0.06f), turn, new Vector3(0.8f, 0.04f, 0.22f), Material("Nook_Shelf", new Color(0.3f, 0.29f, 0.27f), 0.1f));
+            foreach (var side in new[] { -1f, 1f })
+            {
+                var leaf = face + (turn * new Vector3(side * 0.55f, 1.3f, -0.18f));
+                Piece(look.transform, PrimitiveType.Cube, leaf, turn * Quaternion.Euler(0f, side * 70f, 0f), new Vector3(0.4f, 0.6f, 0.03f), wood);
+            }
+
+            var note = new GameObject("Note");
+            note.transform.SetParent(look.transform, false);
+            Piece(note.transform, PrimitiveType.Cube, face + (turn * new Vector3(-0.18f, 1.08f, -0.08f)), turn * Quaternion.Euler(0f, 12f, 0f), new Vector3(0.11f, 0.012f, 0.08f), Material("Nook_Note", new Color(0.82f, 0.78f, 0.68f), 0.05f));
+            var drop = new GameObject("Drop");
+            drop.transform.SetParent(look.transform, false);
+            var bead = face + (turn * new Vector3(0.14f, 1.1f, -0.08f));
+            Piece(drop.transform, PrimitiveType.Sphere, bead, turn, Vector3.one * 0.045f, Material("Nook_Glass", new Color(0.55f, 0.6f, 0.62f), 0.95f));
+            Piece(drop.transform, PrimitiveType.Sphere, bead, turn, Vector3.one * 0.022f, Material("Nook_Drop", new Color(0.01f, 0.01f, 0.012f), 0.9f));
+            var nookStain = Stain(nook.transform, nookAt + (wall * 0.35f), "Stain - where the drop was smashed");
+
+            var talk = nook.AddComponent<PersonTalk>();
+            talk.Configure(dialogue, NookReach, NookSpot.NookNode, false, "ui.prompt.open_shutters");
+            nook.AddComponent<NookSpot>().Configure(poi, talk, stage, eyes, NookReach);
+            var gone = new[] { "poi.c.drank", "poi.c.smashed", NookSpot.DropTaken, "poi.c.refused" }.Select(k => new StateCondition(k)).ToArray();
+            nook.AddComponent<WorldResidue>().Configure(gone, 0, new GameObject[0], new[] { drop }, new Portal[0]);
+            nook.AddComponent<WorldResidue>().Configure(new[] { new StateCondition("poi.c.smashed.nook") }, 0, new[] { nookStain }, new GameObject[0], new Portal[0]);
+        }
+
+        // The sweet black stain a smashed drop leaves on the flags (11.1 §6), hidden until it is smashed.
+        private static GameObject Stain(Transform parent, Vector3 at, string name)
+        {
+            var stain = new GameObject(name);
+            stain.transform.SetParent(parent, true);
+            Piece(stain.transform, PrimitiveType.Cylinder, at + (Vector3.up * 0.004f), Quaternion.Euler(0f, 37f, 0f), new Vector3(0.55f, 0.003f, 0.42f), Material("Drop_Stain", new Color(0.02f, 0.018f, 0.02f), 0.75f));
+            stain.SetActive(false);
+            return stain;
+        }
+
         // His rods and brush, laid at his side: placeholders of our own until a model comes (SLICE_MODELS_WANTED).
         private static void Rods(Transform cast, Vector3 feet, Vector3 facing)
         {

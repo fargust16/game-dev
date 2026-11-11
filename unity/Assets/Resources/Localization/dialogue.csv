@@ -92,3 +92,44 @@ dialogue.sweep.scared,There. Now let me be.,Вот. А теперь отстан
 dialogue.sweep.scared.off,Let him go.,Отпустить его.
 dialogue.sweep.gone,He snatches up his rods and is off across the yard without a word.,Он хватает свои шесты и молча уходит через двор.
 dialogue.sweep.gone.watch,Watch him go.,Смотреть ему вслед.
+"# POI C's nook and stranger in the cellar under the Soot Stair, the black drop's Bargain (S4.3-S4.4; 11.1 Slice build (S4)); a node's line is said when it says no tip"
+dialogue.poic.who.stranger,The stranger in the clean coat,Незнакомец в чистом пальто
+dialogue.poic.nook,"Behind the shutters, on a shelf of damp stone: a folded note, and a single black drop sealed in a bead of glass.","За ставнями, на полке из сырого камня: сложенная записка и одна чёрная капля, запаянная в стеклянную бусину."
+dialogue.poic.nook.unfold,Unfold the note.,Развернуть записку.
+dialogue.poic.nook.close,Close the shutters.,Закрыть ставни.
+dialogue.poic.note,"Drink, and the fog will speak your enemies' steps. It speaks yours as well: no shadow will hide you. Refuse, and remain ordinary lungs in an ordinary choke. What the fog lends, it comes back for.","Выпей — и туман заговорит шагами твоих врагов. Твоими тоже: ни одна тень тебя не скроет. Откажись — и останься обычными лёгкими в обычном смоге. Что туман одалживает, за тем он возвращается."
+dialogue.poic.note.drink,Break the bead and drink the drop.,Разбить бусину и выпить каплю.
+dialogue.poic.note.leave,"Leave the drop on its shelf, and keep the words.","Оставить каплю на полке, а слова запомнить."
+dialogue.poic.note.smash,Smash the drop on the stone.,Разбить каплю о камень.
+dialogue.poic.note.walk,Close the shutters and think it over.,Закрыть ставни и подумать.
+dialogue.poic.nook_empty,"Behind the shutters, on a shelf of damp stone: a folded note, and a ring in the dust where something stood.","За ставнями, на полке из сырого камня: сложенная записка и круг в пыли там, где что-то стояло."
+dialogue.poic.nook_empty.unfold_empty,Unfold the note.,Развернуть записку.
+dialogue.poic.nook_empty.close_empty,Close the shutters.,Закрыть ставни.
+dialogue.poic.note_empty,"Drink, and the fog will speak your enemies' steps. It speaks yours as well: no shadow will hide you. Refuse, and remain ordinary lungs in an ordinary choke. What the fog lends, it comes back for.","Выпей — и туман заговорит шагами твоих врагов. Твоими тоже: ни одна тень тебя не скроет. Откажись — и останься обычными лёгкими в обычном смоге. Что туман одалживает, за тем он возвращается."
+dialogue.poic.note_empty.keep_note,"Keep the words, and leave the empty shelf.",Запомнить слова и оставить пустую полку.
+dialogue.poic.note_empty.walk_empty,Close the shutters.,Закрыть ставни.
+dialogue.poic.stranger,"Ah. You found the stair, and my shutters. Few look down here. I have something for one who looks.","А. Вы нашли лестницу, и мои ставни. Сюда мало кто заглядывает. У меня есть кое-что для того, кто смотрит."
+dialogue.poic.stranger.hear,What is it?,Что это?
+dialogue.poic.stranger.threaten,"Chalk on the door, a coach in the night, girls gone. Get out of this cellar before I drag you up to the Wardens.","Мел на двери, карета ночью, пропавшие девушки. Убирайся из подвала, пока я не выволок тебя к стражникам."
+dialogue.poic.stranger.not_now,Not today.,Не сегодня.
+dialogue.poic.offer,"Drink, and the fog will speak your enemies' steps. It speaks yours as well: no shadow will hide you. Refuse, and remain ordinary lungs in an ordinary choke. What the fog lends, it comes back for.","Выпей — и туман заговорит шагами твоих врагов. Твоими тоже: ни одна тень тебя не скроет. Откажись — и останься обычными лёгкими в обычном смоге. Что туман одалживает, за тем он возвращается."
+dialogue.poic.offer.s_drink,Take the bead and drink.,Взять бусину и выпить.
+dialogue.poic.offer.s_refuse,Refuse it.,Отказаться.
+dialogue.poic.offer.s_smash,Strike it from his hand.,Выбить её у него из руки.
+dialogue.poic.offer.s_walk,Step back and think it over.,Отступить и подумать.
+dialogue.poic.drank,"It is cold, and tastes of the river at low tide. Your breath rasps once, as if the fog had answered it.","Она холодная, со вкусом реки в отлив. Дыхание один раз хрипит, будто туман ему ответил."
+dialogue.poic.drank.done_drank,Breathe.,Дышать.
+dialogue.poic.left,You fold the note away and close the shutters on the drop.,Вы прячете записку и закрываете ставни перед каплей.
+dialogue.poic.left.done_left,Go.,Уйти.
+dialogue.poic.smashed,"The bead bursts on the stone. A sweet chemical reek rises, and the flags take a black stain.","Бусина лопается о камень. Поднимается сладкий химический смрад, и на плитах остаётся чёрное пятно."
+dialogue.poic.smashed.done_smashed,Step back from the reek.,Отступить от смрада.
+dialogue.poic.kept,You keep the note's words and leave the empty shelf to the damp.,Вы запоминаете слова записки и оставляете пустую полку сырости.
+dialogue.poic.kept.done_kept,Go.,Уйти.
+dialogue.poic.refused,"He pockets the bead, touches his hat, and goes up the stair without hurry.","Он прячет бусину в карман, касается шляпы и не спеша поднимается по лестнице."
+dialogue.poic.refused.done_refused,Watch him go.,Смотреть ему вслед.
+dialogue.poic.struck,"You strike the bead from his glove. It bursts on the flags in a sweet black stain. He looks at it, then at you, and goes up the stair without a word.","Вы выбиваете бусину из его перчатки. Она лопается о плиты сладким чёрным пятном. Он смотрит на пятно, потом на вас, и молча поднимается по лестнице."
+dialogue.poic.struck.done_struck,Let him go.,Отпустить его.
+dialogue.poic.fled,"He lifts his hands, smiling as if at a joke, and goes up the stair. Behind the shutters the drop stays on its shelf.","Он поднимает руки, улыбаясь, будто шутке, и поднимается по лестнице. За ставнями капля остаётся на полке."
+dialogue.poic.fled.done_fled,Let him go.,Отпустить его.
+dialogue.poic.took,"He tuts, takes the glass bead from behind the shutters, and goes up the stair, unhurried. The folded note is left on the shelf.","Он цокает языком, забирает стеклянную бусину из-за ставней и неторопливо поднимается по лестнице. Сложенная записка остаётся на полке."
+dialogue.poic.took.done_took,Let him go.,Отпустить его.

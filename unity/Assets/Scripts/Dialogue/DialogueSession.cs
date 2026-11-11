@@ -50,7 +50,8 @@ namespace GameDev.Dialogue
         private readonly DialogueContext _world;
         private IDisposable _pause;
 
-        public DialogueSession(DialogueDefinition dialogue, DialogueContext world)
+        /// <param name="startNode">S4.3: the node it opens on, for a conversation with more than one way in; null for its start.</param>
+        public DialogueSession(DialogueDefinition dialogue, DialogueContext world, string startNode = null)
         {
             Dialogue = dialogue != null ? dialogue : throw new ArgumentNullException(nameof(dialogue));
             _world = world ?? throw new ArgumentNullException(nameof(world));
@@ -61,7 +62,8 @@ namespace GameDev.Dialogue
             }
 
             _pause = world.Clock.Pause();
-            Arrive(dialogue.Start ?? throw new ArgumentException($"Dialogue {dialogue.Id} has no start node.", nameof(dialogue)), new Tip[0]);
+            var first = string.IsNullOrEmpty(startNode) ? dialogue.Start : dialogue.Node(startNode);
+            Arrive(first ?? throw new ArgumentException($"Dialogue {dialogue.Id} has no node '{startNode ?? "start"}'.", nameof(dialogue)), new Tip[0]);
         }
 
         public event Action<DialogueEnd> Ended;

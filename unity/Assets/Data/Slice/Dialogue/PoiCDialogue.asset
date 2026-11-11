@@ -1,0 +1,1094 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a7c9e1b3d5f4a7c9e1b3d5f7a9c1e3b, type: 3}
+  m_Name: PoiCDialogue
+  m_EditorClassIdentifier: 
+  id: poic
+  listeners:
+  - id: stranger
+    nameKey: dialogue.poic.who.stranger
+    enemy: 0
+    strength: 3
+    intelligence: 8
+    will: 8
+  nodes:
+  - id: nook
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: unfold
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: note
+        raises: []
+        settles: {fileID: 0}
+        tells:
+        - drop.note
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: close
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: note
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: drink
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: drank
+        raises:
+        - poi.c.drank
+        - bargain.black_drop
+        settles: {fileID: 11400000, guid: 1afbb87f59ce4488b916e8e08b724d91, type: 2}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: leave
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: left
+        raises:
+        - poi.c.left
+        settles: {fileID: 11400000, guid: 1afbb87f59ce4488b916e8e08b724d91, type: 2}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: smash
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: smashed
+        raises:
+        - poi.c.smashed
+        - poi.c.smashed.nook
+        settles: {fileID: 11400000, guid: 1afbb87f59ce4488b916e8e08b724d91, type: 2}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: walk
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: nook_empty
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: unfold_empty
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: note_empty
+        raises: []
+        settles: {fileID: 0}
+        tells:
+        - drop.note
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: close_empty
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: note_empty
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: keep_note
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: kept
+        raises:
+        - poi.c.note_kept
+        settles: {fileID: 11400000, guid: 1afbb87f59ce4488b916e8e08b724d91, type: 2}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: walk_empty
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: stranger
+    speaker: stranger
+    saysTips: 0
+    source: 0
+    options:
+    - id: hear
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: offer
+        raises: []
+        settles: {fileID: 0}
+        tells:
+        - drop.note
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: threaten
+      approach: 2
+      kind: 1
+      arguments:
+      - tip.trace.chalk.heard
+      - tip.trace.link.heard
+      - tip.trace.misread.heard
+      - tip.trace.rag.heard
+      - tip.sweep.coach.heard
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 2
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: fled
+        raises:
+        - poi.c.stranger_gone
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: took
+        raises:
+        - poi.c.stranger_gone
+        - poi.c.drop_taken
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: not_now
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: offer
+    speaker: stranger
+    saysTips: 0
+    source: 0
+    options:
+    - id: s_drink
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: drank
+        raises:
+        - poi.c.drank
+        - bargain.black_drop
+        - poi.c.stranger_gone
+        settles: {fileID: 11400000, guid: 1afbb87f59ce4488b916e8e08b724d91, type: 2}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: s_refuse
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: refused
+        raises:
+        - poi.c.refused
+        - poi.c.stranger_gone
+        settles: {fileID: 11400000, guid: 1afbb87f59ce4488b916e8e08b724d91, type: 2}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: s_smash
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: struck
+        raises:
+        - poi.c.smashed
+        - poi.c.smashed.stranger
+        - poi.c.stranger_gone
+        settles: {fileID: 11400000, guid: 1afbb87f59ce4488b916e8e08b724d91, type: 2}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: s_walk
+      approach: 6
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: drank
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: done_drank
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: left
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: done_left
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: smashed
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: done_smashed
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: kept
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: done_kept
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: refused
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: done_refused
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: struck
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: done_struck
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: fled
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: done_fled
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: took
+    speaker: 
+    saysTips: 0
+    source: 0
+    options:
+    - id: done_took
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  start: nook

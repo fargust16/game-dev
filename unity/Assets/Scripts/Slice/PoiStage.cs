@@ -216,7 +216,9 @@ namespace GameDev.Slice
                 }
             }
 
-            // S4.2: a person of the place keeps hours and may be sent away; like a resolved scene, they go unseen.
+            // S4.2: a person of the place keeps hours, and like a resolved scene goes unseen at their end. One sent away
+            // for good goes as soon as no conversation holds them, as its words say (S4.3: the sweep, the stranger).
+            var gone = !string.IsNullOrEmpty(goneKey) && world.State.IsSet(goneKey);
             var open = world.Director.Phase(poi) == PoiPhase.Open && Present(world.State, world.Clock.Tick, fromMinute, untilMinute, goneKey);
             var near = Within(_player.transform.position);
             var talking = Talk != null && Talk.IsOpen;
@@ -224,7 +226,7 @@ namespace GameDev.Slice
             {
                 Show();
             }
-            else if (IsShown && !open && !near && !talking)
+            else if (IsShown && !talking && (gone || (!open && !near)))
             {
                 cast.SetActive(false);
             }
