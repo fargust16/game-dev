@@ -34,5 +34,23 @@ namespace GameDev.Confront.Rules
         public float Weight => weight;
         public int Stage => stage;
         public IReadOnlyList<AttributeRequirement> Requirements => requirements;
+
+        /// <summary>
+        /// Pieces of several families worn together as one armour (S5a.2): its defence already counts each piece's
+        /// Stage Factor and the share of it its wearer meets, so it is of stage 9 and asks nothing more.
+        /// </summary>
+        public static FightArmour Worn(float physicalDefence, float magicalDefence, float kg)
+        {
+            var armour = CreateInstance<FightArmour>();
+            armour.name = "Worn";
+            armour.hideFlags = HideFlags.DontSave;
+            armour.section = "S5a.2 worn pieces";
+            armour.physical = physicalDefence;
+            armour.magical = magicalDefence;
+            armour.weight = kg;
+            armour.stage = 9;
+            armour.requirements = new AttributeRequirement[0];
+            return armour;
+        }
     }
 }

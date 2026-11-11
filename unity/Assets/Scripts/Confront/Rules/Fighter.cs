@@ -42,6 +42,9 @@ namespace GameDev.Confront.Rules
 
         public FightModifiers Modifiers { get; }
 
+        /// <summary>What it carries besides its armour and Weapon Sets, in kg; null for 10.2's reference load (S5a.2).</summary>
+        public double? Carried { get; internal set; }
+
         public FightWeapon Weapon => Set.Weapon;
 
         public double MaxHp { get; internal set; }

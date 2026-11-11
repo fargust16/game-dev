@@ -30,6 +30,9 @@ namespace GameDev.Items
         Boots,
         Ring,
         Necklace,
+
+        /// <summary>A shield or a Cartridge Pouch, beside a weapon in a Weapon Set (19 §4.2; S5a.2).</summary>
+        OffHand,
     }
 
     /// <summary>One kind of item, as 19 gives it: its weight in kg and its shop price in bronze (§4.1, §6.3).</summary>
@@ -52,6 +55,9 @@ namespace GameDev.Items
 
         [Tooltip("Armour's family: cloth, leather, chain or plate; empty for anything else.")]
         public string family;
+
+        [Tooltip("Equipment: its numbers in a fight, 10.2 §5b: a weapon, a shield or the pouch, or the whole set of its armour family (S5a.2).")]
+        public ScriptableObject fight;
 
         public string NameKey => $"item.{id}";
 

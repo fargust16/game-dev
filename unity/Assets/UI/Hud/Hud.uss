@@ -122,6 +122,18 @@
     margin-bottom: 10px;
 }
 
+/* S5a.2: a bag line that can be clicked, and the note under the list. */
+.hud__bag-action:hover {
+    color: rgb(255, 214, 140);
+}
+
+.hud__bag-note {
+    font-size: 16px;
+    white-space: normal;
+    margin-top: 8px;
+    color: rgb(214, 196, 160);
+}
+
 /* S1.5: the name of the nearest named person, over their head. */
 .hud__nametag {
     position: absolute;

@@ -15,7 +15,10 @@ namespace GameDev.Items
         public static string Load(Bag bag) =>
             Loc.Format("ui.hud.bag.load", Kg(bag.Weight), Kg(bag.Comfortable), Loc.Get(BandKey(bag.Band)));
 
-        public static IReadOnlyList<string> Lines(Bag bag)
+        public static IReadOnlyList<string> Lines(Bag bag) => Lines(bag, null);
+
+        /// <param name="note">What a piece's line adds, such as where it is worn; null or empty for nothing.</param>
+        public static IReadOnlyList<string> Lines(Bag bag, System.Func<ItemPiece, string> note)
         {
             var lines = new List<string>();
             foreach (var (item, count) in bag.Stacks)
@@ -26,7 +29,9 @@ namespace GameDev.Items
             foreach (var piece in bag.Pieces)
             {
                 var item = bag.Catalogue.Find(piece.item);
-                lines.Add(Loc.Format("ui.hud.bag.piece", Loc.Get(item.NameKey), Loc.Get(QualityKey(piece.Quality)), Kg(item.weight)));
+                var line = Loc.Format("ui.hud.bag.piece", Loc.Get(item.NameKey), Loc.Get(QualityKey(piece.Quality)), Kg(item.weight));
+                var extra = note?.Invoke(piece);
+                lines.Add(string.IsNullOrEmpty(extra) ? line : line + extra);
             }
 
             return lines;

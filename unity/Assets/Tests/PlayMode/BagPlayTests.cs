@@ -42,7 +42,20 @@ namespace GameDev.Slice.Tests
 
             Assert.IsTrue(hud.IsBagOpen, "I opens the bag");
             Assert.AreEqual("Money: 5 silver", hud.BagLines[0]);
+            CollectionAssert.Contains(hud.BagLines, "Plain clothes (Normal), 1.5 kg · worn", string.Join(" | ", hud.BagLines));
+            Assert.AreEqual(Loc.Get("ui.hud.bag.hint"), hud.BagNote);
+
+            // S5a.2: a click takes the clothes off and puts them on again; with no weapon the character fights with fists.
+            Assert.IsTrue(hud.ClickBagLine(0));
+            yield return null;
+
             CollectionAssert.Contains(hud.BagLines, "Plain clothes (Normal), 1.5 kg", string.Join(" | ", hud.BagLines));
+            Assert.IsFalse(world.Outfit.IsWorn(world.Bag.Pieces[0]));
+            Assert.IsTrue(hud.ClickBagLine(0));
+            yield return null;
+
+            Assert.IsTrue(world.Outfit.IsWorn(world.Bag.Pieces[0]));
+            Assert.AreEqual("Fists", world.Fights.PlayerFighter().Weapon.name);
 
             world.Bag.Earn(75);
             yield return null;

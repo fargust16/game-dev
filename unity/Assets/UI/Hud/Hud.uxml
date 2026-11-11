@@ -51,6 +51,7 @@
             <ui:Label name="bag-money" class="hud__note" text="" picking-mode="Ignore" />
             <ui:Label name="bag-load" class="hud__note" text="" picking-mode="Ignore" />
             <ui:ScrollView name="bag-list" class="hud__notes-list" />
+            <ui:Label name="bag-note" class="hud__bag-note" text="" picking-mode="Ignore" />
             <ui:Label class="hud__reading-close hud__loc" text="ui.hud.bag.close" picking-mode="Ignore" />
         </ui:VisualElement>
     </ui:VisualElement>

@@ -164,7 +164,8 @@ namespace GameDev.Confront.Rules
             WeaponSet set,
             FightArmour armour = null,
             WeaponSet second = default,
-            FightModifiers modifiers = default)
+            FightModifiers modifiers = default,
+            double? carried = null)
         {
             var fault = set.Fault() ?? (second.IsEmpty ? null : second.Fault());
             if (fault != null)
@@ -172,7 +173,7 @@ namespace GameDev.Confront.Rules
                 throw new ArgumentException(fault, nameof(set));
             }
 
-            var fighter = new Fighter(values, limit, set, second, armour, modifiers);
+            var fighter = new Fighter(values, limit, set, second, armour, modifiers) { Carried = carried };
             fighter.MaxHp = (hpBase + hpPerEndurance * values.Get(CharacterAttribute.Endurance)) * LimitMultiplier(limit) * (1d + modifiers.hp);
             fighter.Hp = fighter.MaxHp;
             var band = LoadBand(LoadShare(fighter));
@@ -223,7 +224,7 @@ namespace GameDev.Confront.Rules
         /// <summary>10.2 §5b Load in a Fight: armour, both Weapon Sets and what it carries, over comfortable capacity.</summary>
         public double LoadShare(Fighter fighter)
         {
-            var kg = (fighter.Armour != null ? fighter.Armour.Weight : 0f) + fighter.Set.Weight + fighter.Second.Weight + carried;
+            var kg = (fighter.Armour != null ? fighter.Armour.Weight : 0f) + fighter.Set.Weight + fighter.Second.Weight + (fighter.Carried ?? carried);
             return kg / (capacityBase + fighter.Get(CharacterAttribute.Strength));
         }
 

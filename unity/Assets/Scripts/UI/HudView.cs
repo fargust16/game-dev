@@ -39,6 +39,8 @@ namespace GameDev.UI
         private Label _bagMoney;
         private Label _bagLoad;
         private ScrollView _bagList;
+        private Label _bagNote;
+        private readonly List<System.Action> _bagActions = new List<System.Action>();
         private CityMapElement _mapView;
         private const string MapVisible = "hud__map--visible";
         private long _shownTick = -1;
@@ -134,8 +136,17 @@ namespace GameDev.UI
             ? new string[0]
             : new[] { _bagMoney.text, _bagLoad.text }.Concat(Texts(_bagList, NoteClass)).ToList();
 
+        /// <summary>The note under the bag's list: the last refusal, or the hint (S5a.2).</summary>
+        public string BagNote => _bagNote != null ? _bagNote.text : null;
+
         /// <summary>Opens the bag page on I (S5a.1), or refreshes it while open: the money, the load, and what is carried.</summary>
-        public void ShowBag(string money, string load, IReadOnlyList<string> lines)
+        public void ShowBag(string money, string load, IReadOnlyList<string> lines) => ShowBag(money, load, lines, null, null);
+
+        /// <summary>
+        /// The bag page with a click on each line that has an action, the n-th action for the n-th line, and a note under
+        /// the list (S5a.2).
+        /// </summary>
+        public void ShowBag(string money, string load, IReadOnlyList<string> lines, IReadOnlyList<System.Action> actions, string note)
         {
             if (!Bind() || _bag == null)
             {
@@ -145,11 +156,26 @@ namespace GameDev.UI
             _bagMoney.text = money;
             _bagLoad.text = load;
             _bagList.Clear();
-            foreach (var line in lines.Count > 0 ? lines : new[] { Loc.Get("ui.hud.bag.empty") })
+            _bagActions.Clear();
+            var shown = lines.Count > 0 ? lines : new[] { Loc.Get("ui.hud.bag.empty") };
+            for (var i = 0; i < shown.Count; i++)
             {
-                var label = new Label(line);
+                var label = new Label(shown[i]);
                 label.AddToClassList(NoteClass);
+                var action = actions != null && i < actions.Count && lines.Count > 0 ? actions[i] : null;
+                _bagActions.Add(action);
+                if (action != null)
+                {
+                    label.AddToClassList("hud__bag-action");
+                    label.RegisterCallback<ClickEvent>(_ => action());
+                }
+
                 _bagList.Add(label);
+            }
+
+            if (_bagNote != null)
+            {
+                _bagNote.text = note ?? string.Empty;
             }
 
             CloseMap();
@@ -160,6 +186,18 @@ namespace GameDev.UI
         public void CloseBag()
         {
             _bag?.RemoveFromClassList(NotesVisible);
+        }
+
+        /// <summary>Clicks the n-th line of the bag's list, as the mouse does; false if it has no action.</summary>
+        public bool ClickBagLine(int index)
+        {
+            if (!IsBagOpen || index < 0 || index >= _bagActions.Count || _bagActions[index] == null)
+            {
+                return false;
+            }
+
+            _bagActions[index]();
+            return true;
         }
 
         public bool IsMapOpen => _map != null && _map.ClassListContains(MapVisible);
@@ -308,6 +346,7 @@ namespace GameDev.UI
             _bagMoney = root.Q<Label>("bag-money");
             _bagLoad = root.Q<Label>("bag-load");
             _bagList = root.Q<ScrollView>("bag-list");
+            _bagNote = root.Q<Label>("bag-note");
             _map = root.Q<VisualElement>("map");
             _dialogue = root.Q<VisualElement>("dialogue");
             _dialogueLines = root.Q<ScrollView>("dialogue-lines");

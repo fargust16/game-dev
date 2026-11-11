@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using GameDev.Core.Localization;
 using GameDev.Dialogue;
+using GameDev.Cameras;
 using GameDev.Input;
 using GameDev.Items;
 using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Player.Standing;
 using GameDev.Slice.Fights;
+using GameDev.Slice.Gear;
 using GameDev.Slice.Stealth;
 using GameDev.UI;
 using GameDev.World.Poi;
@@ -58,6 +60,9 @@ namespace GameDev.Slice
 
         /// <summary>The character's bag and purse (S5a.1); null when the settings carry no item catalogue.</summary>
         public Bag Bag { get; private set; }
+
+        /// <summary>What the character wears and holds (S5a.2); null without a bag.</summary>
+        public Outfit Outfit { get; private set; }
 
         /// <summary>11's start: plain clothes with no defence and 500 bronze, with no weapon or tool.</summary>
         public const int StartingBronze = 500;
@@ -210,6 +215,9 @@ namespace GameDev.Slice
             {
                 Bag = StartingBag(settings.Items, Character);
                 Bag.Changed += Refresh;
+                Outfit = new Outfit(Bag);
+                Outfit.Wear(Bag.Pieces[0]);
+                Outfit.Changed += Refresh;
             }
 
             if (settings.FightRules != null)
@@ -217,6 +225,12 @@ namespace GameDev.Slice
                 Fights = gameObject.AddComponent<SliceConfront>();
                 Fights.Configure(settings, seed, Clock, Character, State);
             }
+            if (Fights != null && Outfit != null && settings.Fists != null)
+            {
+                Outfit.Locked = () => Fights.InFight;
+                Fights.WornFighter = () => Outfit.Fighter(settings.FightRules, Character, settings.Fists);
+            }
+
             Standing = new SocialStanding(State, settings.Standing, Clock, seed, SliceSeedStreams.Lies);
             if (Fights != null)
             {
@@ -307,9 +321,12 @@ namespace GameDev.Slice
                 }
                 else
                 {
+                    _bagNote = null;
                     ShowBag(hud);
                 }
             }
+
+            FreeCursorForBag(hud.IsBagOpen);
 
             if (input.MapPressed)
             {
@@ -340,9 +357,64 @@ namespace GameDev.Slice
             hud.ShowMap(cityPlan != null ? cityPlan.text : null, MapMarks(), player);
         }
 
+        private string _bagNote;
+        private ThirdPersonCamera _freedLook;
+
+        /// <summary>
+        /// The bag page (S5a.1–S5a.2): each piece's line says where it is worn and how much of it works, and a click puts it
+        /// on or takes it off; the note says why a click was refused.
+        /// </summary>
         private void ShowBag(HudView hud)
         {
-            hud.ShowBag(BagPage.Money(Bag), BagPage.Load(Bag), BagPage.Lines(Bag));
+            var actions = new List<Action>();
+            actions.AddRange(Enumerable.Repeat<Action>(null, Bag.Stacks.Count));
+            foreach (var piece in Bag.Pieces)
+            {
+                var p = piece;
+                actions.Add(Outfit != null ? () => TogglePiece(p) : (Action)null);
+            }
+
+            hud.ShowBag(BagPage.Money(Bag), BagPage.Load(Bag), BagPage.Lines(Bag, PieceNote), actions,
+                _bagNote != null ? Loc.Get(_bagNote) : Outfit != null ? Loc.Get("ui.hud.bag.hint") : null);
+        }
+
+        private void TogglePiece(ItemPiece piece)
+        {
+            _bagNote = Outfit.Toggle(piece);
+            Refresh();
+        }
+
+        private string PieceNote(ItemPiece piece)
+        {
+            if (Outfit == null || !(Outfit.SlotOf(piece) is WearSlot slot))
+            {
+                return null;
+            }
+
+            var note = Loc.Format(slot >= WearSlot.WeaponOne ? "ui.hud.bag.held" : "ui.hud.bag.worn", Outfit.IsSecondSet(slot) ? 2 : 1);
+            var fit = Outfit.FitOf(piece, Character);
+            return fit < 0.995d ? note + Loc.Format("ui.hud.bag.fit", Mathf.RoundToInt((float)(fit * 100d))) : note;
+        }
+
+        /// <summary>The cursor is free while the bag is open outside a fight, so its lines can be clicked, and the look waits.</summary>
+        private void FreeCursorForBag(bool open)
+        {
+            var free = open && (Fights == null || !Fights.InFight);
+            if (free && _freedLook == null)
+            {
+                _freedLook = FindAnyObjectByType<ThirdPersonCamera>();
+                if (_freedLook != null)
+                {
+                    _freedLook.LookEnabled = false;
+                    Cursor.lockState = CursorLockMode.None;
+                    Cursor.visible = true;
+                }
+            }
+            else if (!free && _freedLook != null)
+            {
+                _freedLook.LookEnabled = true;
+                _freedLook = null;
+            }
         }
 
         private void Refresh()

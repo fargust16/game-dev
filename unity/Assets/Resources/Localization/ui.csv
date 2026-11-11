@@ -179,3 +179,13 @@ ui.quality.magic,Magic,магическое
 ui.quality.rare,Rare,редкое
 ui.quality.epic,Epic,эпическое
 ui.quality.legendary,Legendary,легендарное
+"# Wearing and holding from the bag page (S5a.2; 19 §4.2, 10.2 §5b)"
+ui.hud.bag.hint,Click a piece to put it on or take it off.,Щелчок по вещи надевает её или снимает.
+ui.hud.bag.worn, · worn, · надето
+ui.hud.bag.held, · set {0}, · набор {0}
+ui.hud.bag.fit,", works at {0} %",", действует на {0} %"
+ui.bag.fault.fight,Nothing is put on or taken off in a fight.,В бою ничего не надеть и не снять.
+ui.bag.fault.not_worn,This is not worn.,Это не надевается.
+ui.bag.fault.firearm,A firearm is held only with a free Cartridge Pouch in the other hand.,Огнестрельное оружие держат только со свободной патронной сумкой в другой руке.
+ui.bag.fault.shield,"A shield goes only beside a sword, an axe or a mace.","Щит берут только к мечу, топору или булаве."
+ui.bag.fault.pouch,A Cartridge Pouch goes only beside a firearm.,Патронная сумка нужна только к огнестрельному оружию.

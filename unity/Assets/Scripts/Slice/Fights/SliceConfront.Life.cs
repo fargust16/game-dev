@@ -47,11 +47,19 @@ namespace GameDev.Slice.Fights
         private float _lifeNoteUntil;
         private int _lifeShown = -1;
 
-        /// <summary>The character's life as a fight sees it: a fighter in the development kit, with the kept HP and conditions.</summary>
-        public Fighter PlayerFighter()
+        /// <summary>The character as a fighter in what it wears and holds (S5a.2); null leaves it the development kit.</summary>
+        public Func<Fighter> WornFighter { get; set; }
+
+        /// <summary>The character's life as a fight sees it: a fighter in what it wears, with the kept HP and conditions.</summary>
+        public Fighter PlayerFighter() => PlayerFighter(false);
+
+        /// <param name="kit">The development command's kit, a sword, leather, and the rifle as its second set (S3a.4).</param>
+        private Fighter PlayerFighter(bool kit)
         {
-            var fighter = _settings.FightRules.Fighter(_character, null, new WeaponSet(_settings.KitSword), _settings.KitArmour,
-                new WeaponSet(_settings.KitRifle, _settings.KitPouch));
+            var fighter = !kit && WornFighter != null
+                ? WornFighter()
+                : _settings.FightRules.Fighter(_character, null, new WeaponSet(_settings.KitSword), _settings.KitArmour,
+                    new WeaponSet(_settings.KitRifle, _settings.KitPouch));
             if (_state != null)
             {
                 fighter.Hp = fighter.MaxHp * (1d - (Mathf.Clamp(_state.Get(HpLostKey), 0, 1000) / 1000d));

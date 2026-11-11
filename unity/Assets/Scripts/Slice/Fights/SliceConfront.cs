@@ -204,7 +204,7 @@ namespace GameDev.Slice.Fights
             _names.Clear();
             _groups.Clear();
             var rules = _settings.FightRules;
-            var player = new Combatant(PlayerId, PlayerSide, PlayerFighter(), at, takesIntents: !AutoPlayer);
+            var player = new Combatant(PlayerId, PlayerSide, PlayerFighter(true), at, takesIntents: !AutoPlayer);
             Equip(player);
             var combatants = new List<Combatant> { player };
             _bodies[player] = _player.transform;

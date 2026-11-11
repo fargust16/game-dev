@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GameDev.Core.Localization;
+using GameDev.Items;
 using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Slice.Beasts;
@@ -57,6 +58,15 @@ namespace GameDev.Slice.Tests
             character.Set(CharacterAttribute.Dexterity, 6);
             character.Set(CharacterAttribute.Perception, 5);
             character.Set(CharacterSkill.MeleeSkill, 10);
+
+            // It fights with what it carries (S5a.2): a sword and the leather set.
+            foreach (var id in new[] { "sword", "leather_head", "leather_body", "leather_shoulders", "leather_gloves", "leather_trousers", "leather_boots" })
+            {
+                var piece = new ItemPiece(id);
+                Assert.IsTrue(world.Bag.AddPiece(piece), id);
+                Assert.IsNull(world.Outfit.Wear(piece), id);
+            }
+
             var fights = world.Fights;
             fights.TurnPause = 0f;
             fights.AutoPlayer = true;
