@@ -139,6 +139,86 @@ namespace GameDev.Slice.EditorTools
             }
         }
 
+        /// <summary>The carriageways' own setts (R3 step 3, 2026-11-11), made by <c>tools/assets/setts_from_paving.py</c>.</summary>
+        public const string SettsDiffuse = "Assets/Art/Streets/Setts_Victorian_d.png";
+        public const string SettsNormal = "Assets/Art/Streets/Setts_Victorian_n.png";
+
+        /// <summary>
+        /// One tile of the setts, in metres (authoring default): the texture holds about 8.5 stones along and 13.5
+        /// courses across, so a stone is about 0.24 × 0.15 m, the size of a Victorian granite sett.
+        /// </summary>
+        public const float SettsTile = 2f;
+
+        private const string SettsBefore = "T_YFPM_Rough01_d";
+
+        /// <summary>
+        /// R3 step 3 again (2026-11-11, on the owner's grant of autonomous work): the carriageways' setts become coursed
+        /// granite setts. Yughues' Rough01 at a 4 m tile read as cracked flagstones half a metre across. The new texture
+        /// is Modular Victorian City's coursed paving made the city's own by <c>tools/assets/setts_from_paving.py</c>:
+        /// greyed to the setts' 0.34, moss turned to soot in the joints, a normal from its occlusion, and the smoothness
+        /// in its alpha (stone tops 0.50, joints 0.18), which TerrainLit reads as the layer's source says. The agent's
+        /// one pass, like <see cref="TuneStreets"/>: a layer that no longer wears Rough01 is left as it is. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.VeilmouthLook.SettsFromVictorianPaving
+        /// </summary>
+        public static void SettsFromVictorianPaving()
+        {
+            ImportStreetTexture(SettsDiffuse, false);
+            ImportStreetTexture(SettsNormal, true);
+            var path = $"{VeilmouthCity.LayerFolder}/Slice_Setts.terrainlayer";
+            var layer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(path);
+            if (layer == null)
+            {
+                Debug.LogError($"[VeilmouthLook] {path} is missing.");
+                return;
+            }
+
+            if (layer.diffuseTexture != null && layer.diffuseTexture.name != SettsBefore)
+            {
+                Debug.Log($"[VeilmouthLook] the setts wear {layer.diffuseTexture.name}, not {SettsBefore}; left as they are.");
+                return;
+            }
+
+            layer.diffuseTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(SettsDiffuse);
+            layer.normalMapTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(SettsNormal);
+            layer.tileSize = new Vector2(SettsTile, SettsTile);
+            layer.tileOffset = Vector2.zero;
+            layer.diffuseRemapMin = Vector4.zero;
+            layer.diffuseRemapMax = Vector4.one; // the texture is made at the setts' grey
+            layer.normalScale = 1f;
+            layer.metallic = 0f;
+            layer.smoothness = 1f;
+            layer.smoothnessSource = TerrainLayerSmoothnessSource.DiffuseAlphaChannel;
+            EditorUtility.SetDirty(layer);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[VeilmouthLook] the setts are coursed granite setts, a {SettsTile} m tile.");
+        }
+
+        private static void ImportStreetTexture(string path, bool normal)
+        {
+            if (!(AssetImporter.GetAtPath(path) is TextureImporter importer))
+            {
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
+                importer = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (importer == null)
+                {
+                    Debug.LogError($"[VeilmouthLook] {path} is not a texture.");
+                    return;
+                }
+            }
+
+            importer.textureType = normal ? TextureImporterType.NormalMap : TextureImporterType.Default;
+            importer.sRGBTexture = !normal;
+            importer.alphaSource = normal ? TextureImporterAlphaSource.None : TextureImporterAlphaSource.FromInput;
+            importer.alphaIsTransparency = false;
+            importer.mipmapEnabled = true;
+            importer.wrapMode = TextureWrapMode.Repeat;
+            importer.filterMode = FilterMode.Trilinear;
+            importer.anisoLevel = 8;
+            importer.maxTextureSize = 1024;
+            importer.textureCompression = TextureImporterCompression.CompressedHQ;
+            importer.SaveAndReimport();
+        }
+
         /// <summary>
         /// The colour space, the HDR grade and the occlusion. Changing the colour space reimports every texture, so this
         /// runs on its own before anything is rendered. Batch:

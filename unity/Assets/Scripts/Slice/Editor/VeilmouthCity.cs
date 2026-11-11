@@ -42,6 +42,8 @@ namespace GameDev.Slice.EditorTools
         // lanes and yards another; the plan's asphalt (§2) has no texture in the agreed packs yet.
         private const int Grass = 0, Setts = 5, Flags = 6, Cobbles = 7, Asphalt = Setts, Square = Cobbles;
 
+        // A layer is created once from these and then kept. Since 2026-11-11 the setts wear Veilmouth's own coursed
+        // granite setts (VeilmouthLook.SettsFromVictorianPaving), which converts a layer still made from Rough01.
         private static readonly (string Name, string Texture, float Tile)[] StreetLayers =
         {
             ("Setts", "Rough01", 4f), ("Flags", "SmoothSquare", 2f), ("Cobbles", "Mediterranean01", 4f),
