@@ -133,6 +133,26 @@ namespace GameDev.Slice.EditorTools
             EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
             Shader.SetGlobalVector("_Growth_WindSettings", VeilmouthDressing.WindSettings);
             Shader.SetGlobalTexture("_Growth_WindNoise", AssetDatabase.LoadAssetAtPath<Texture2D>(VeilmouthDressing.WindNoisePath));
+            // -lookMinute 1410: the night lighthouse with the sky and the grade the player sees (city plan §38).
+            if (int.TryParse(Argument("-lookMinute"), out var minute) && Object.FindFirstObjectByType<GameDev.Slice.Atmosphere.VeilmouthSky>() is { } sky)
+            {
+                _skyAndGrade = true;
+                try
+                {
+                    sky.Apply(minute);
+                    Eye(label + "_lighthouse", 150f, -60f, 245f, -25f, 3f);
+                    Eye(label + "_pier", 120f, -10f, 245f, -25f, 2f);
+                    Eye(label + "_lenten", 40f, 30f, 40f, -60f, 4f);
+                }
+                finally
+                {
+                    _skyAndGrade = false;
+                }
+
+                Debug.Log($"Veilmouth night dress views written to {OutputFolder}.");
+                return;
+            }
+
             Eye(label + "_works", 40f, -108f, 40f, -190f, 2f);
             Eye(label + "_deafboiler", 141f, -146f, 141f, -173f, 1.7f);
             Eye(label + "_grubby", 40f, -30f, 40f, -100f, 3f);

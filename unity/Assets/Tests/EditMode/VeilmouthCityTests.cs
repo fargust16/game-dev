@@ -152,5 +152,26 @@ namespace GameDev.Slice.Tests
             Assert.IsFalse(root.GetComponentsInChildren<Transform>(true).Single(t => t.name == "Crimson Moon").gameObject.activeSelf);
             Assert.IsNotNull(root.GetComponent<GameDev.Slice.Atmosphere.VeilmouthSky>());
         }
+
+        /// <summary>
+        /// §38: the One-Eye's lantern burns with the gas lamps, its panes glowing at night and grimy by day, but it is no
+        /// street lamp, so it adds nothing to the Darkness of 10.3 §3.
+        /// </summary>
+        [Test]
+        public void TheOneEyeBurnsWithTheLampsButLightsNoStreet()
+        {
+            var sky = All<GameDev.Slice.Atmosphere.VeilmouthSky>().Single();
+            var beacon = sky.Beacons.Single();
+            Assert.AreEqual("The One-Eye's beacon", beacon.Light.name);
+            Assert.IsNotNull(beacon.Renderer, "the lantern's panes swap their glass");
+            Assert.IsFalse(sky.StreetLamps.Any(l => l.Light == beacon.Light), "the beacon is not a street lamp");
+
+            sky.Apply(23 * 60);
+            Assert.IsTrue(beacon.Light.enabled, "lit at night");
+            Assert.AreEqual("Veilmouth_Gaslight", beacon.Renderer.sharedMaterials[beacon.Slot].name);
+            sky.Apply(12 * 60);
+            Assert.IsFalse(beacon.Light.enabled, "out by day");
+            Assert.AreEqual("VIC_Glass_Grimy", beacon.Renderer.sharedMaterials[beacon.Slot].name);
+        }
     }
 }

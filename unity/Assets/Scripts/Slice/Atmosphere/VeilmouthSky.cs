@@ -32,6 +32,9 @@ namespace GameDev.Slice.Atmosphere
             public Light Light;
             public Renderer Renderer;
             public int Slot;
+
+            [Tooltip("The glass this lamp wears unlit, when it is not the street lamps' glass (the One-Eye's panes); empty for a street lamp.")]
+            public Material Unlit;
         }
 
         // The sun rises at 05:00 and sets at 20:00, as InteriorLighting's daylight; the moon rules 20:00–05:00.
@@ -106,6 +109,9 @@ namespace GameDev.Slice.Atmosphere
         [SerializeField] private Volume twilight;
         [SerializeField] private Lamp[] lamps = Array.Empty<Lamp>();
         [SerializeField] private Material glassUnlit, glassLit;
+
+        [Tooltip("Beacons that burn with the lamps but light no street, as the One-Eye's lantern (city plan §38): they are not counted in the Darkness.")]
+        [SerializeField] private Lamp[] beacons = Array.Empty<Lamp>();
         [SerializeField] private ParticleSystem[] fogBanks = Array.Empty<ParticleSystem>();
 
         [Tooltip("The moon's disc: a quad kept at MoonDistance from the eye, drawn over the sky, unfogged and unlit.")]
@@ -153,6 +159,15 @@ namespace GameDev.Slice.Atmosphere
             glassLit = lit;
             fogBanks = banks;
         }
+
+        /// <summary>Editor setup: the beacons, lit and put out with the lamps.</summary>
+        public void SetBeacons(Lamp[] lit)
+        {
+            beacons = lit ?? Array.Empty<Lamp>();
+            _lampsLit = null;
+        }
+
+        public IReadOnlyList<Lamp> Beacons => beacons;
 
         /// <summary>Editor setup: the street probes the reflections pass baked.</summary>
         public void SetProbes(ReflectionProbe[] probes) => streetProbes = probes;
@@ -347,20 +362,21 @@ namespace GameDev.Slice.Atmosphere
             _lampsLit = lit;
             HeightFog.SetLamps(lit
                 ? lamps.Where(l => l.Light != null).Select(l => (l.Light.transform.position, Halo(l.Light)))
-                : null);
-            foreach (var lamp in lamps)
+                : null); // a beacon burns too high for the low fog to hold its halo (city plan §38)
+            foreach (var lamp in lamps.Concat(beacons))
             {
                 if (lamp.Light != null)
                 {
                     lamp.Light.enabled = lit;
                 }
 
-                if (lamp.Renderer != null && glassLit != null && glassUnlit != null)
+                var unlit = lamp.Unlit != null ? lamp.Unlit : glassUnlit;
+                if (lamp.Renderer != null && glassLit != null && unlit != null)
                 {
                     var materials = lamp.Renderer.sharedMaterials;
                     if (lamp.Slot >= 0 && lamp.Slot < materials.Length)
                     {
-                        materials[lamp.Slot] = lit ? glassLit : glassUnlit;
+                        materials[lamp.Slot] = lit ? glassLit : unlit;
                         lamp.Renderer.sharedMaterials = materials;
                     }
                 }

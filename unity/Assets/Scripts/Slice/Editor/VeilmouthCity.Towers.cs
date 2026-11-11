@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using GameDev.Slice.Atmosphere;
 using GameDev.Slice.Kit;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
@@ -13,7 +15,8 @@ namespace GameDev.Slice.EditorTools
     /// <item>the clock tower gets a clock face on each of its four sides in its top storey: a stone ring, a cream dial,
     /// twelve hour marks and two iron hands at ten past ten;</item>
     /// <item>the One-Eye, the lighthouse at the end of its pier, gets a lantern over its roof: a drum, a gallery, eight
-    /// panes of dark glass between iron posts, an iron dome and a finial. The lantern is unlit for now.</item>
+    /// panes of dark glass between iron posts, an iron dome and a finial. At night the lantern burns with the gas lamps:
+    /// a teal light in it and its panes glowing, but it is no street lamp and lights no street (10.3 §3's Darkness).</item>
     /// </list>
     /// One merged mesh for each material, on NoGrid with no collider, in a group of its own beside the houses, so no kit
     /// prefab is changed. Every size is an authoring default, in metres; the kit's storey of 3.75 m (3 m at ×1.25) is
@@ -25,6 +28,11 @@ namespace GameDev.Slice.EditorTools
         private const string DialFace = "VIC_Stucco_Cream", DialRing = "VIC_Stone_Light";
         private const float KitStorey = 3.75f, TowerHalf = 2.5f, DialRadius = 1.25f, DialRim = 0.22f, DialBelowEaves = 2.1f;
         private const float DrumRadius = 1.6f, GalleryRadius = 2.2f, LanternRadius = 1.25f, LanternHeight = 2.2f, DomeHeight = 1.3f;
+        private const string BeaconName = "The One-Eye's beacon";
+
+        // The beacon's light: it reaches the gallery, the dome's underside and the pier's end below, m, and burns twice as
+        // bright as a gas lamp's (VeilmouthMystic: range 10, intensity 10). Authoring defaults.
+        private const float BeaconRange = 22f, BeaconIntensity = 20f;
 
         /// <summary>
         /// Dresses the saved Veilmouth scene's clock tower and lighthouse again, and saves the scene.
@@ -66,12 +74,28 @@ namespace GameDev.Slice.EditorTools
                 ClockFaces(dress, clock, 6);
             }
 
-            if (lighthouse != null)
+            var flame = lighthouse != null ? Lantern(dress, lighthouse, 6) : (Vector3?)null;
+            dress.Finish(DialRing);
+            if (flame.HasValue)
             {
-                Lantern(dress, lighthouse, 6);
+                var light = new GameObject(BeaconName) { layer = owner.gameObject.layer }.AddComponent<Light>();
+                light.transform.SetParent(owner, false);
+                light.transform.position = flame.Value;
+                light.type = LightType.Point;
+                light.color = VeilmouthMystic.Gaslight;
+                light.range = BeaconRange;
+                light.intensity = BeaconIntensity;
+                light.shadows = LightShadows.None;
+                light.enabled = false;
             }
 
-            dress.Finish(DialRing);
+            var sky = Object.FindFirstObjectByType<VeilmouthSky>();
+            if (sky != null)
+            {
+                sky.SetBeacons(Beacons());
+                EditorUtility.SetDirty(sky);
+            }
+
             Debug.Log($"[VeilmouthCity] the towers' dress: clock faces {(clock != null ? "on" : "missing from")} {ClockTowerName}, a lantern {(lighthouse != null ? "on" : "missing from")} {LighthouseName}.");
         }
 
@@ -134,7 +158,31 @@ namespace GameDev.Slice.EditorTools
             }
         }
 
-        private static void Lantern(Works dress, Transform house, int storeys)
+        /// <summary>
+        /// The beacons the sky lights and puts out with its lamps: the One-Eye's light, and its panes, which swap between
+        /// their own grimy glass and the gas lamps' glowing glass.
+        /// </summary>
+        internal static VeilmouthSky.Lamp[] Beacons()
+        {
+            var beacons = new List<VeilmouthSky.Lamp>();
+            var unlit = AssetDatabase.LoadAssetAtPath<Material>($"{GameDev.VictorianKit.EditorTools.VicKitPaths.MaterialFolder}/{Glazing}.mat");
+            foreach (var light in Object.FindObjectsByType<Light>(FindObjectsInactive.Include, FindObjectsSortMode.None).Where(l => l.name == BeaconName))
+            {
+                var panes = light.transform.parent != null ? light.transform.parent.Find(Glazing) : null;
+                var renderer = panes != null ? panes.GetComponent<MeshRenderer>() : null;
+                if (renderer != null)
+                {
+                    GameObjectUtility.SetStaticEditorFlags(renderer.gameObject, 0); // its glass changes at dusk and dawn
+                }
+
+                beacons.Add(new VeilmouthSky.Lamp { Light = light, Renderer = renderer, Slot = renderer != null ? 0 : -1, Unlit = unlit });
+            }
+
+            return beacons.ToArray();
+        }
+
+        /// <summary>The lantern over the tower's roof; returns the middle of its panes, where its flame burns.</summary>
+        private static Vector3 Lantern(Works dress, Transform house, int storeys)
         {
             var (centre, eaves, apex) = TowerFrame(house, storeys);
             var foot = new Vector3(centre.x, 0f, centre.z);
@@ -171,6 +219,7 @@ namespace GameDev.Slice.EditorTools
 
             dress.Box(crown + (Vector3.up * 0.18f), new Vector3(0.3f, 0.3f, 0.3f), 45f, false, DarkGlass);
             dress.Box(crown + (Vector3.up * 0.75f), new Vector3(0.05f, 0.9f, 0.05f), 0f, false, DarkGlass);
+            return foot + (Vector3.up * (deckTop + 0.5f + ((LanternHeight - 0.5f) / 2f)));
         }
     }
 }

@@ -34,7 +34,7 @@ namespace GameDev.Slice.EditorTools
         public const string RootName = "Veilmouth Sky";
         public const string Folder = "Assets/Materials/Slice/Mystic";
 
-        private static readonly Color Gaslight = new(0.55f, 0.95f, 0.85f);
+        internal static readonly Color Gaslight = new(0.55f, 0.95f, 0.85f);
         // §31 (owner's walk, 2026-11-10): the wards are old chalk and paint on the stone, lit as the wall is and only a
         // little lighter than it, never glowing (authoring default).
         private static readonly Color WardColour = new(0.78f, 0.8f, 0.84f);
@@ -106,6 +106,7 @@ namespace GameDev.Slice.EditorTools
 
             var sky = root.AddComponent<VeilmouthSky>();
             sky.Configure(sun, day, dusk, night, twilight, lamps, glassUnlit, glassLit, banks, moon);
+            sky.SetBeacons(VeilmouthCity.Beacons()); // the One-Eye's lantern (city plan §38), when the city has it
             sky.Apply(sky.PreviewMinute);
             RenderSettings.skybox = day; // the saved scene holds the asset, never the live blend
             AssetDatabase.SaveAssets();
