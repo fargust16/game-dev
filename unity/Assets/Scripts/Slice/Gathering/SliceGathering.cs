@@ -132,7 +132,7 @@ namespace GameDev.Slice.Gathering
                 return "ui.gather.fault.tool";
             }
 
-            return Stamina.Empty ? "ui.gather.fault.tired" : null;
+            return Stamina.Tired ? "ui.gather.fault.tired" : null;
         }
 
         /// <summary>Begins gathering the node; the key of why it cannot, or null. The first cycle comes at the next tick.</summary>

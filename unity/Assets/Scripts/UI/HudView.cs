@@ -233,6 +233,77 @@ namespace GameDev.UI
             return zone;
         }
 
+        // Stamina's bar (07.2 §3.2; the owner's play test of S5a), built in code the first time it shows.
+        private VisualElement _stamina;
+        private VisualElement _staminaFill;
+
+        /// <summary>Whether Stamina's bar is on the screen.</summary>
+        public bool IsStaminaShown => _stamina != null && _stamina.panel != null && _stamina.style.display.value == DisplayStyle.Flex;
+
+        /// <summary>The share of Stamina's bar filled, from 0 to 1.</summary>
+        public float StaminaShown => _staminaFill == null ? 1f : _staminaFill.style.width.value.value / 100f;
+
+        // Authoring defaults: an amber fill, dull red while tired.
+        private static readonly Color StaminaColour = new Color(0.80f, 0.64f, 0.30f, 0.95f);
+        private static readonly Color TiredColour = new Color(0.62f, 0.28f, 0.22f, 0.95f);
+
+        /// <summary>
+        /// Stamina's bar at <paramref name="share"/> of its width, shown while any Stamina is spent and hidden when it is
+        /// full; dull red while <paramref name="tired"/>.
+        /// </summary>
+        public void ShowStamina(float share, bool tired)
+        {
+            if (share >= 0.999f)
+            {
+                if (_stamina != null)
+                {
+                    _stamina.style.display = DisplayStyle.None;
+                }
+
+                return;
+            }
+
+            if (!Bind())
+            {
+                return;
+            }
+
+            if (_stamina == null || _stamina.panel == null)
+            {
+                BuildStamina(GetComponent<UIDocument>().rootVisualElement);
+            }
+
+            _staminaFill.style.width = Length.Percent(Mathf.Clamp01(share) * 100f);
+            _staminaFill.style.backgroundColor = tired ? TiredColour : StaminaColour;
+            _stamina.style.display = DisplayStyle.Flex;
+        }
+
+        // Authoring defaults: a thin dark bar edged in brass at the bottom left, under the life line.
+        private void BuildStamina(VisualElement root)
+        {
+            _stamina = new VisualElement { name = "stamina", pickingMode = PickingMode.Ignore };
+            _stamina.style.position = Position.Absolute;
+            _stamina.style.left = 24f;
+            _stamina.style.bottom = 10f;
+            _stamina.style.width = 220f;
+            _stamina.style.height = 8f;
+            _stamina.style.backgroundColor = new Color(0.07f, 0.06f, 0.05f, 0.82f);
+            var brass = new Color(0.62f, 0.50f, 0.30f);
+            _stamina.style.borderTopColor = brass;
+            _stamina.style.borderBottomColor = brass;
+            _stamina.style.borderLeftColor = brass;
+            _stamina.style.borderRightColor = brass;
+            _stamina.style.borderTopWidth = 1f;
+            _stamina.style.borderBottomWidth = 1f;
+            _stamina.style.borderLeftWidth = 1f;
+            _stamina.style.borderRightWidth = 1f;
+            _staminaFill = Zone(StaminaColour);
+            _staminaFill.style.left = 0f;
+            _stamina.Add(_staminaFill);
+            _stamina.style.display = DisplayStyle.None;
+            root.Add(_stamina);
+        }
+
         /// <summary>The bag page's lines, money and load first, then each stack and piece (S5a.1).</summary>
         public IReadOnlyList<string> BagLines => _bag == null
             ? new string[0]

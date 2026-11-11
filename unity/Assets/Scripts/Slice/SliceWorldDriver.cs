@@ -45,6 +45,7 @@ namespace GameDev.Slice
 
         private static SliceWorldDriver _running;
         private HudView _hud;
+        private PlayerLocomotion _walker;
 
         /// <summary>The running world, or null before a driver has started.</summary>
         public static SliceWorldDriver Running => _running != null && _running.Tips != null ? _running : null;
@@ -295,7 +296,7 @@ namespace GameDev.Slice
             }
             if (Bag != null && settings.Gathering != null && settings.ActionChecks != null)
             {
-                Stamina = new SliceStamina(settings.Gathering, State, Clock, Character);
+                Stamina = new SliceStamina(settings.Gathering, State, Clock, Character, GameClockDriver.RealSecondsPerTick);
                 Gathering = new SliceGathering(settings.Gathering, Bag, State, Clock, Character, Stamina, seed);
                 if (Workshop != null)
                 {
@@ -368,6 +369,8 @@ namespace GameDev.Slice
             {
                 return;
             }
+
+            KeepStamina(hud);
 
             if (input.NotesPressed)
             {
@@ -630,6 +633,46 @@ namespace GameDev.Slice
             {
                 ShowBag(hud);
             }
+        }
+
+        /// <summary>
+        /// 07.2 §3.2: the sprint spends Stamina each real second and holds its return; run out, the character cannot
+        /// sprint until a tenth has come back. The HUD shows its bar while any is spent.
+        /// </summary>
+        private void KeepStamina(HudView hud)
+        {
+            if (Stamina == null)
+            {
+                return;
+            }
+
+            if (_walker == null || !_walker.gameObject.activeInHierarchy)
+            {
+                _walker = FindAnyObjectByType<PlayerLocomotion>();
+            }
+
+            var sprinting = _walker != null && _walker.isActiveAndEnabled && _walker.IsSprinting;
+            if (sprinting != Stamina.Sprinting)
+            {
+                Stamina.Sprinting = sprinting;
+            }
+
+            if (sprinting)
+            {
+                Stamina.Spend(SliceStamina.SprintShare * Time.deltaTime);
+            }
+            else
+            {
+                Stamina.CatchUp();
+            }
+
+            var tired = Stamina.Tired;
+            if (_walker != null)
+            {
+                _walker.SprintAllowed = !tired;
+            }
+
+            hud.ShowStamina((float)Stamina.Share, tired);
         }
 
         private HudView Hud()

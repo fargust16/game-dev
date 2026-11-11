@@ -106,6 +106,15 @@ namespace GameDev.Locomotion
         /// </summary>
         public float CrouchShare { get; set; }
 
+        /// <summary>
+        /// While false the character cannot sprint, as when Stamina has run out and not yet come back to a tenth (07.2
+        /// §3.2); true by default.
+        /// </summary>
+        public bool SprintAllowed { get; set; } = true;
+
+        /// <summary>True while the character sprints: Shift held, input given, upright and allowed.</summary>
+        public bool IsSprinting { get; private set; }
+
         /// <summary>Puts the player at a pose at once, as a door does; a CharacterController ignores a moved transform
         /// while it is enabled.</summary>
         public void Teleport(Vector3 position, Quaternion rotation)
@@ -153,6 +162,7 @@ namespace GameDev.Locomotion
         {
             // Back to the plain locomotion standing still, from which a fight's guard and a talk are entered.
             _velocity = Vector3.zero;
+            IsSprinting = false;
             if (_animator != null && _animator.isActiveAndEnabled)
             {
                 _animator.SetFloat(SpeedParam, 0f);
@@ -176,11 +186,12 @@ namespace GameDev.Locomotion
             var hasInput = moveInput.sqrMagnitude > 0.01f;
             var crouching = CrouchShare > 0f;
             var direction = CameraRelativeDirection(new Vector3(moveInput.x, 0f, moveInput.y));
+            IsSprinting = hasInput && !crouching && SprintAllowed && input.SprintHeld;
 
             // The wanted speed: a crouch at its share of the walk, else a run, a sprint with Shift; a light stick walks.
             var wanted = !hasInput ? 0f
                 : crouching ? walkSpeed * CrouchShare
-                : input.SprintHeld ? sprintSpeed
+                : IsSprinting ? sprintSpeed
                 : Mathf.Lerp(walkSpeed, runSpeed, Mathf.InverseLerp(0.5f, 0.9f, moveInput.magnitude));
 
             // The jump: a press kept for a moment before landing, honoured a moment after leaving an edge.

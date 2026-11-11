@@ -77,8 +77,59 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(1d, _stamina.Share, 1e-9, "never above the maximum");
             _stamina.Spend(2d);
             Assert.IsTrue(_stamina.Empty);
+            Assert.IsTrue(_stamina.Tired, "run out, the character is tired");
             _clock.AdvanceTicks(20);
-            Assert.AreEqual(1d, _stamina.Share, 1e-9, "an empty pool in 20 ticks");
+            Assert.AreEqual(0.9875d, _stamina.Share, 1e-9, "20 ticks less the rest of 2.5 s, a quarter of a tick");
+            Assert.IsFalse(_stamina.Tired);
+            _clock.AdvanceTicks(1);
+            Assert.AreEqual(1d, _stamina.Share, 1e-9, "an empty pool in about 20 ticks");
+        }
+
+        [Test]
+        public void StaminaComesBackOverTheTicksRealTimeAndRestsAfterRunningOut()
+        {
+            // Its own state, so the fixture's Stamina does not reckon the same pool; a tick of 1 s, as this clock's,
+            // so the rest of 2.5 s is 2.5 ticks.
+            var stamina = new SliceStamina(_rules, new WorldState(), _clock, _sheet, 1d);
+            stamina.Spend(0.5d);
+            _clock.AdvanceRealTime(0.5d);
+            stamina.CatchUp();
+            Assert.AreEqual(0.525d, stamina.Share, 1e-9, "half a tick gives back half of 5 %");
+            using (_clock.Pause())
+            {
+                _clock.AdvanceRealTime(5d);
+                stamina.CatchUp();
+                Assert.AreEqual(0.525d, stamina.Share, 1e-9, "none while the world is paused");
+            }
+
+            stamina.Sprinting = true;
+            stamina.Spend(SliceStamina.SprintShare);
+            _clock.AdvanceRealTime(0.25d);
+            stamina.CatchUp();
+            Assert.AreEqual(0.505d, stamina.Share, 1e-9, "a second of sprint spends 2 %, and none comes back meanwhile");
+            stamina.Sprinting = false;
+
+            stamina.Spend(1d);
+            Assert.IsTrue(stamina.Empty);
+            Assert.IsTrue(stamina.Tired);
+            _clock.AdvanceRealTime(2d);
+            stamina.CatchUp();
+            Assert.AreEqual(0d, stamina.Share, 1e-9, "2.5 s of rest after running out");
+            _clock.AdvanceRealTime(1d);
+            stamina.CatchUp();
+            Assert.AreEqual(0.025d, stamina.Share, 1e-9);
+            Assert.IsTrue(stamina.Tired, "tired until a tenth has come back");
+            _clock.AdvanceRealTime(1.5d);
+            stamina.CatchUp();
+            Assert.AreEqual(0.1d, stamina.Share, 1e-9);
+            Assert.IsFalse(stamina.Tired);
+
+            stamina.Exerting = true;
+            stamina.Spend(0.05d);
+            stamina.Exerting = false;
+            _clock.AdvanceRealTime(0.2d);
+            stamina.CatchUp();
+            Assert.AreEqual(0.06d, stamina.Share, 1e-9, "work stopped before the pool ran out lets it come back at once");
         }
 
         [Test]
