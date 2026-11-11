@@ -20,6 +20,9 @@ namespace GameDev.Slice
         [Tooltip("10.4 §4–5's numbers: Reputation, Danger, Attitude and lies.")]
         [SerializeField] private StandingRules standing;
 
+        [Tooltip("07.1 §4–8's curve for action checks outside a fight, such as a close look at a Physical Trace (S4.1).")]
+        [SerializeField] private ActionCheckRules actionChecks;
+
         [Header("Confront (S3a.4)")]
         [Tooltip("10.2 §5b's numbers for every fight.")]
         [SerializeField] private FightRules fightRules;
@@ -60,6 +63,8 @@ namespace GameDev.Slice
         public SocialCheckRules SocialChecks => socialChecks;
 
         public StandingRules Standing => standing;
+
+        public ActionCheckRules ActionChecks => actionChecks;
 
         public FightRules FightRules => fightRules;
 

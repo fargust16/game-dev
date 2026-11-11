@@ -67,6 +67,12 @@ namespace GameDev.Slice
         /// <summary>The Deeds Record, Attitude and lies (10.4 §4–5).</summary>
         public SocialStanding Standing { get; private set; }
 
+        /// <summary>The slice's one world seed; every random choice forks it by name (SliceSeedStreams).</summary>
+        public GameDev.World.Seed.IWorldSeed Seed { get; private set; }
+
+        /// <summary>07.1's curve for action checks outside a fight (S4.1).</summary>
+        public ActionCheckRules ActionChecks => settings != null ? settings.ActionChecks : null;
+
         private DialogueContext _talk;
 
         /// <summary>10.4 §2–3's numbers, the Intelligence that shows a check's chance and its modifiers among them.</summary>
@@ -177,6 +183,7 @@ namespace GameDev.Slice
             }
 
             var seed = settings.CreateSeed();
+            Seed = seed;
             State = new WorldState();
             Director = new PoiDirector(pois, State, seed, SliceSeedStreams.PoiUnattended, Clock);
             Director.Evaluate(Clock.Tick);

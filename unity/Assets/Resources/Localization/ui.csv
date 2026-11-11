@@ -4,6 +4,8 @@ ui.prompt.enter,E  Enter,E  Войти
 ui.prompt.sealed,Sealed with wax and brass,Опечатано сургучом и латунью
 ui.prompt.read,E  Read,E  Читать
 ui.prompt.talk,E  Talk,E  Говорить
+ui.prompt.examine,E  Examine,E  Осмотреть
+ui.prompt.look_closer,E  Look closer,E  Присмотреться
 ui.hud.time,Day {0} · {1:00}:{2:00},День {0} · {1:00}:{2:00}
 ui.hud.reading.close,E  Close,E  Закрыть
 ui.hud.map.title,Veilmouth,Вейлмут
@@ -155,3 +157,4 @@ ui.fight.hidden,Already hidden,Вы уже скрываетесь
 ui.fight.log.hidden,{0} hides,{0}: скрывается
 ui.fight.log.revealed,{0} is seen,{0}: замечен
 ui.fight.log.unseen,{1} does not notice {0},{1} не замечает: {0}
+ui.trace.title,What lies here,Что здесь лежит

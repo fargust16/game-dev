@@ -4,12 +4,22 @@ using UnityEngine;
 
 namespace GameDev.World.Poi
 {
-    /// <summary>Who says a tip (09 §3). The slice's S1 sources; Witnesses, Faction Contacts, and Physical Traces come with their scenes.</summary>
+    /// <summary>
+    /// Who says a tip (09 §3). The slice's S1 sources, and S4's Physical Traces and Witnesses, which are told by their
+    /// scenes rather than read (<see cref="TipBook.Tell"/>). Faction Contacts come with theirs. Values are saved in data:
+    /// add new ones at the end.
+    /// </summary>
     public enum TipSource
     {
         NoticeBoard,
         Bartender,
         StreetRumour,
+
+        /// <summary>09 §7: something found where it lies, which does not argue back but can be misread (S4.1).</summary>
+        PhysicalTrace,
+
+        /// <summary>09 §6: someone tied to a scene, who tells by Convince, Threaten, or Exchange (S4.2).</summary>
+        Witness,
     }
 
     /// <summary>What hearing a tip does to its POI (09 *Hinted to Marked*): a tip that names a place a person can walk to Marks it, one that names only a district, a kind of event, or a time Hints it.</summary>
