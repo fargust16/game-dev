@@ -156,8 +156,8 @@ namespace GameDev.Slice.Tests
             var tree = Spot(GatherKind.Tree);
             Assert.AreEqual("ui.gather.fault.tool", _gathering.Begin(tree), "a tree needs an axe");
             Assert.IsNull(_gathering.Begin(Spot(GatherKind.Flax)), "flax needs only hands");
-            _gathering.Stop("ui.gather.stop.moved");
-            Assert.AreEqual("ui.gather.stop.moved", _gathering.Stopped);
+            _gathering.Stop("ui.gather.stop.bag");
+            Assert.AreEqual("ui.gather.stop.bag", _gathering.Stopped);
             Assert.IsFalse(_stamina.Exerting);
 
             _bag.Add("woodcutting_axe");

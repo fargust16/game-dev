@@ -254,11 +254,9 @@ ui.gather.fault.tired,Too tired; rest a while.,Слишком устали; пе
 ui.gather.stop.spent,Nothing more is left.,Больше ничего нет.
 ui.gather.stop.tired,Out of Stamina.,Выносливость кончилась.
 ui.gather.stop.heavy,The bag can carry no more.,Больше не унести.
-ui.gather.stop.moved,Stopped: you moved.,Прервано: вы сдвинулись.
 ui.gather.stop.bag,Stopped for the bag.,Прервано: открыта сумка.
 ui.gather.stop.beast,Stopped: a beast has noticed you.,Прервано: вас заметил зверь.
 ui.gather.stop.fight,Stopped by a fight.,Прервано боем.
-ui.gather.stop.player,Stopped.,Остановлено.
 "# A fallen beast's remains (S5a.6; 19 §6.4, 11 C3)"
 ui.prompt.remains.parts,E  Take its parts,E  Забрать трофеи
 ui.prompt.remains.skin,E  Skin it ({0} ticks),E  Снять шкуру ({0} тика)

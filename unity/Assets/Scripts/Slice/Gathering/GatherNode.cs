@@ -124,13 +124,14 @@ namespace GameDev.Slice.Gathering
             if (IsActive)
             {
                 _hud ??= FindAnyObjectByType<HudView>();
+                // A step or E is the player's own choice and ends the work with no note (owner's play test of S5a,
+                // 2026-11-11: "Interrupted, you moved" stayed on after walking away and back).
                 var step = _gathering.Rules.Step;
-                var reason = (at - _from).sqrMagnitude > step * step ? "ui.gather.stop.moved"
-                    : _hud != null && _hud.IsBagOpen ? "ui.gather.stop.bag"
+                var own = (at - _from).sqrMagnitude > step * step || (input != null && input.InteractPressed);
+                var reason = _hud != null && _hud.IsBagOpen ? "ui.gather.stop.bag"
                     : _busy != null && _busy() ? "ui.gather.stop.fight"
-                    : input != null && input.InteractPressed ? "ui.gather.stop.player"
                     : null;
-                if (reason != null)
+                if (own || reason != null)
                 {
                     _gathering.Stop(reason);
                     _endedFrame = Time.frameCount;

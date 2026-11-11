@@ -32,6 +32,7 @@ namespace GameDev.Slice.EditorTools
             None,     // NoGrid: seen, never solid
             Doorway,  // a linear wall with an opening in its middle: two side boxes and a lintel
             Leaf,     // a door leaf: one box filling its doorway's opening, 0.1 m thick on the line
+            Mesh,     // the model's own meshes as static colliders: walked under an awning, stopped by its posts and tables (market stalls, S5a play test)
         }
 
         public enum Anchor
@@ -91,6 +92,7 @@ namespace GameDev.Slice.EditorTools
             public bool Top;          // what is seen hangs below the pivot: a ceiling, a chandelier
             public string RailPosts;  // the stair: this newel post at each end of each of its rails, as the pack's demo stands them (StairLab)
             public bool KeepY;        // the model's own floor line (y 0) stands on the floor, and what lies below it hangs below: the balustrade's fascia over the well's edge
+            public float Sink;        // m what is seen is set into the ground: leaf cards whose clear edges reach below the leaves (S5a play test)
             public Vector3? Seat;     // a linear leaf seated as the pack's demo seats it: its middle this far along from the block's middle, its foot this high, its own pivot plane this far across the line (StairLab.MeasureDoorways)
             public bool Books;        // a bookcase: rows of the pack's books stand on each of its shelves
             public string[] Goods;    // shelves of goods: the pack's files stand in rows on each shelf, as books do
@@ -210,12 +212,12 @@ namespace GameDev.Slice.EditorTools
             yield return graveWall;
 
             // The market and the Master of Item Creation's yard.
-            yield return S("Stall_Food", "Market", "Bakery", Market, "Bakery_market_with_food", pr, anchor: Anchor.Front);
-            yield return S("Stall_Empty", "Market", "Awning", Market, "BakeryMarket", pr, anchor: Anchor.Front);
-            yield return S("Stall_Fish", "Market", "Fish", Market, "Fish_market_with_sections", pr, anchor: Anchor.Front);
-            yield return S("Stall_Meat", "Market", "Meat", Market, "Meat_market_with_objects", pr, anchor: Anchor.Front);
-            yield return S("Stall_Goods", "Market", "Goods", Market, "Vegetable_market_with_objects", pr, anchor: Anchor.Front);
-            yield return S("Stall_Weapons", "Market", "Weapons", Market, "Weapon_Market_with_objects", pr, anchor: Anchor.Front);
+            yield return S("Stall_Food", "Market", "Bakery", Market, "Bakery_market_with_food", pr, Body.Mesh, Anchor.Front);
+            yield return S("Stall_Empty", "Market", "Awning", Market, "BakeryMarket", pr, Body.Mesh, Anchor.Front);
+            yield return S("Stall_Fish", "Market", "Fish", Market, "Fish_market_with_sections", pr, Body.Mesh, Anchor.Front);
+            yield return S("Stall_Meat", "Market", "Meat", Market, "Meat_market_with_objects", pr, Body.Mesh, Anchor.Front);
+            yield return S("Stall_Goods", "Market", "Goods", Market, "Vegetable_market_with_objects", pr, Body.Mesh, Anchor.Front);
+            yield return S("Stall_Weapons", "Market", "Weapons", Market, "Weapon_Market_with_objects", pr, Body.Mesh, Anchor.Front);
             // The anvil on its oak block (Charge, CC0; 2026-11-11, in place of the Medieval Market's bare anvil on a stump of
             // ours): sized so its face stands where the smith's blow comes down (SliceBlacksmith), an authoring default.
             var anvil = S("Anvil", "Market", "Anvil", Cc0, "AnvilBlock", pr);
@@ -345,9 +347,13 @@ namespace GameDev.Slice.EditorTools
 
             var herb = S("Herb", "Resource", "Herb", Trees + "/Bushes", "Bush 003", ia, Body.Trigger, Anchor.Pivot);
             herb.SizeY = 0.7f;
+            // Measured (SlicePlayTestS5a, owner's play test of S5a, 2026-11-11: the herbs floated): the leaves begin 0.17–0.18 m
+            // up, where 2–5 % of the cards' area lies; below that the cards are clear. Set into the ground by that much.
+            herb.Sink = 0.18f;
             yield return herb;
             var flax = S("Flax", "Resource", "Flax", Trees + "/Bushes", "Bush 017", ia, Body.Trigger, Anchor.Pivot);
             flax.SizeY = 0.9f;
+            flax.Sink = 0.18f; // measured as the herb's: leaves from 0.17–0.18 m
             yield return flax;
             foreach (var n in new[] { "Bush 006", "Bush 011", "Bush 021" })
             {
@@ -809,6 +815,7 @@ namespace GameDev.Slice.EditorTools
                 offset.y = 0f;
             }
 
+            offset.y -= spec.Sink;
             model.transform.localPosition += offset;
             if (TripoGlow.TryGetValue(spec.Key, out var glow))
             {
@@ -1108,6 +1115,19 @@ namespace GameDev.Slice.EditorTools
                 }
                 case Body.Keep:
                 case Body.None:
+                    return;
+                case Body.Mesh:
+                    // Owner's play test of S5a (2026-11-11): one box over a stall took in its awning and the tables before
+                    // it, an invisible wall. Each seen mesh is its own collider, so the space under the awning is open.
+                    foreach (var filter in root.GetComponentsInChildren<MeshFilter>(true))
+                    {
+                        var renderer = filter.GetComponent<MeshRenderer>();
+                        if (filter.sharedMesh != null && renderer != null && renderer.enabled)
+                        {
+                            filter.gameObject.AddComponent<MeshCollider>().sharedMesh = filter.sharedMesh;
+                        }
+                    }
+
                     return;
                 case Body.Leaf:
                     Box(root, new Vector3(width * 0.5f - openWidth * 0.5f, 0f, -0.05f),
