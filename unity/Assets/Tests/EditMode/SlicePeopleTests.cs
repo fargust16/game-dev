@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GameDev.Locomotion;
 using GameDev.Slice.EditorTools;
 using GameDev.Slice.People;
 using NUnit.Framework;
@@ -91,6 +92,47 @@ namespace GameDev.Slice.Tests
             var guard = (BlendTree)states["Fight"].motion;
             Assert.AreEqual("Weapon", guard.blendParameter);
             CollectionAssert.AreEqual(new[] { 1f, 2f, 3f, 4f, 5f }, guard.children.Select(c => c.threshold).ToArray(), "one guard a weapon kind");
+        }
+
+        /// <summary>
+        /// AN2: the player's controller moves in eight directions: its Locomotion is a 2D blend on MoveX and MoveZ with the
+        /// idle at the centre and every walk, run and sprint of the table at its direction and gait, each played at the pace
+        /// the body moves; it turns on the spot; the woman player's override plays the women's takes; and the body faces the
+        /// camera.
+        /// </summary>
+        [Test]
+        public void ThePlayerMovesInEightDirectionsFacingTheCamera()
+        {
+            var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(SlicePeopleModels.PlayerController);
+            Assert.IsNotNull(controller, SlicePeopleModels.PlayerController);
+            var names = controller.parameters.Select(p => p.name).ToList();
+            CollectionAssert.IsSubsetOf(new[] { "Speed", "MoveX", "MoveZ", "TurnRate" }, names);
+            var states = controller.layers[0].stateMachine.states.Select(s => s.state).ToList();
+            var tree = (BlendTree)states.Single(s => s.name == "Locomotion").motion;
+            Assert.AreEqual(BlendTreeType.FreeformDirectional2D, tree.blendType);
+            Assert.AreEqual(("MoveX", "MoveZ"), (tree.blendParameter, tree.blendParameterY));
+            var moves = SliceClips.Moves().ToList();
+            Assert.AreEqual(21, moves.Count, "eight walks, eight runs and five sprints");
+            Assert.AreEqual(moves.Count + 1, tree.children.Length);
+            Assert.AreSame(SliceClips.Get("Idle"), tree.children[0].motion);
+            Assert.AreEqual(Vector2.zero, tree.children[0].position);
+            foreach (var (use, gait, way) in moves)
+            {
+                var child = tree.children.Single(c => c.motion == SliceClips.Get(use));
+                Assert.Less(Vector2.Distance(way * gait, child.position), 0.01f, $"{use} at {child.position}");
+                Assert.That(child.timeScale, Is.InRange(0.6f, 1.3f), $"{use} plays at the body's pace");
+            }
+
+            Assert.IsTrue(states.Any(s => s.name == "TurnLeft") && states.Any(s => s.name == "TurnRight"), "it turns on the spot");
+
+            var woman = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(SlicePeopleModels.WomanPlayerController);
+            Assert.IsNotNull(woman, SlicePeopleModels.WomanPlayerController);
+            Assert.AreSame(SliceClips.Get("Walk", true), woman[SliceClips.Get("Walk")], "the woman walks in the women's take");
+            var womanPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(SlicePeopleModels.PlayerWomanPrefab);
+            Assert.AreSame(woman, womanPrefab.GetComponentInChildren<Animator>(true).runtimeAnimatorController);
+
+            var locomotion = AssetDatabase.LoadAssetAtPath<GameObject>(SliceTestScenes.PlayerPrefabPath).GetComponentInChildren<PlayerLocomotion>(true);
+            Assert.IsTrue(new SerializedObject(locomotion).FindProperty("faceCamera").boolValue, "the body faces the camera");
         }
 
         /// <summary>

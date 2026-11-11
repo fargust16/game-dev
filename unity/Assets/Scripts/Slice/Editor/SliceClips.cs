@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -262,6 +263,26 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
+            // A moving clip that travels in its own curves would carry the body off and spring it back at each loop, as
+            // the code moves the body: its travel is left out of the pose (more than 0.3 m/s, authoring default).
+            foreach (var (use, _, _) in Moves())
+            {
+                foreach (var female in new[] { false, true })
+                {
+                    var drift = Drift(Get(use, female));
+                    var path = PathOf(use, female);
+                    var importer = (ModelImporter)AssetImporter.GetAtPath(path);
+                    var clips = importer.clipAnimations.Length > 0 ? importer.clipAnimations : importer.defaultClipAnimations;
+                    if (drift.magnitude > 0.3f && clips[0].lockRootPositionXZ)
+                    {
+                        clips[0].lockRootPositionXZ = false;
+                        importer.clipAnimations = clips;
+                        importer.SaveAndReimport();
+                        report.AppendLine($"{Path.GetFileNameWithoutExtension(path)}: travels {drift.magnitude:0.00} m/s ({drift.x:+0.00;-0.00}, {drift.y:+0.00;-0.00}) in its curves, left out of the pose");
+                    }
+                }
+            }
+
             var broken = 0;
             foreach (var e in Clips)
             {
@@ -274,11 +295,13 @@ namespace GameDev.Slice.EditorTools
                     }
 
                     var clip = Get(e.Use, female);
-                    if (e.Kevin && !e.Cut && clip.isLooping != e.Loop)
+                    var turn = e.Use == "TurnLeft" || e.Use == "TurnRight";
+                    if (e.Kevin && !e.Cut && (clip.isLooping != e.Loop || (turn && Baked(path))))
                     {
                         // The pack's own takes differ here and there between a man and a woman (Idle03 loops only in the
-                        // man's): the table decides.
-                        Loop(path, e.Loop, report);
+                        // man's): the table decides. A turn on the spot leaves its rotation to the code, which turns the
+                        // body; baked into the pose, the body would turn twice and spring back at each loop.
+                        Loop(path, e.Loop, report, turn);
                         clip = Get(e.Use, female);
                     }
                     var curves = AnimationUtility.GetCurveBindings(clip).Count(b => b.type == typeof(Animator));
@@ -296,12 +319,25 @@ namespace GameDev.Slice.EditorTools
             }
         }
 
+        /// <summary>Whether a file's own clip bakes its root rotation into the pose.</summary>
+        private static bool Baked(string path)
+        {
+            var importer = (ModelImporter)AssetImporter.GetAtPath(path);
+            var clips = importer.clipAnimations.Length > 0 ? importer.clipAnimations : importer.defaultClipAnimations;
+            return clips[0].lockRootRotation;
+        }
+
         /// <summary>A Kevin Iglesias file's own clip set to loop or not, its other settings as the pack made them.</summary>
-        private static void Loop(string path, bool loop, StringBuilder report)
+        private static void Loop(string path, bool loop, StringBuilder report, bool freeRotation = false)
         {
             var importer = (ModelImporter)AssetImporter.GetAtPath(path);
             var clips = importer.clipAnimations.Length > 0 ? importer.clipAnimations : importer.defaultClipAnimations;
             clips[0].loopTime = loop;
+            if (freeRotation)
+            {
+                clips[0].lockRootRotation = false;
+            }
+
             importer.clipAnimations = clips;
             importer.SaveAndReimport();
             report.AppendLine($"{Path.GetFileNameWithoutExtension(path)}: set to {(loop ? "loop" : "play once")}, as the table says");
@@ -451,7 +487,10 @@ namespace GameDev.Slice.EditorTools
         /// The player's controller at <paramref name="path"/>. Its movement states have no transitions of their own:
         /// <c>PlayerLocomotion</c> owns the state and cross-fades to it the moment it changes, so no clip is waited out.
         /// <list type="bullet">
-        /// <item><c>Locomotion</c>, the blend at Speed 0, 1, 2 and 3 (idle, walk, run, sprint), each clip at its time scale;</item>
+        /// <item><c>Locomotion</c>, a 2D freeform directional blend on MoveX and MoveZ, the body's own velocity on the scale
+        /// 0–3: the idle at the centre, the eight walks at 1, the eight runs at 2 and the five sprints at 3 (forward, the
+        /// diagonals forward and the sides), each pace's clips at its time scale;</item>
+        /// <item><c>TurnLeft</c> and <c>TurnRight</c>, a turn on the spot;</item>
         /// <item><c>Crouch</c>, the stealth blend at Speed 0 and 1 (crouched idle, sneak), its pace on the <c>Pace</c> float,
         /// the sneak's own pace kept in <c>SneakPace</c>'s default (m/s, measured) for the code to match;</item>
         /// <item><c>Fall</c>, the fall's loop; <c>JumpLand</c>, the landing;</item>
@@ -459,34 +498,46 @@ namespace GameDev.Slice.EditorTools
         /// </list>
         /// Foot IK on every standing state, so the feet meet the ground on every body.
         /// </summary>
-        public static AnimatorController Player(string path, float[] timeScales, float sneakPace)
+        public static AnimatorController Player(string path, IReadOnlyDictionary<string, float> timeScales, float sneakPace, float turnRate)
         {
             var controller = Fresh(path);
             controller.AddParameter("Speed", AnimatorControllerParameterType.Float);
+            controller.AddParameter("MoveX", AnimatorControllerParameterType.Float);
+            controller.AddParameter("MoveZ", AnimatorControllerParameterType.Float);
             controller.AddParameter(new AnimatorControllerParameter { name = "Grounded", type = AnimatorControllerParameterType.Bool, defaultBool = true });
             controller.AddParameter(new AnimatorControllerParameter { name = "Pace", type = AnimatorControllerParameterType.Float, defaultFloat = 1f });
             controller.AddParameter(new AnimatorControllerParameter { name = "SneakPace", type = AnimatorControllerParameterType.Float, defaultFloat = sneakPace });
+            controller.AddParameter(new AnimatorControllerParameter { name = "TurnRate", type = AnimatorControllerParameterType.Float, defaultFloat = turnRate });
             FightParameters(controller);
             var machine = controller.layers[0].stateMachine;
 
             var locomotion = controller.CreateBlendTreeInController("Locomotion", out var tree, 0);
-            tree.blendParameter = "Speed";
-            tree.useAutomaticThresholds = false;
-            var uses = new[] { "Idle", "Walk", "Run", "Sprint" };
-            for (var i = 0; i < uses.Length; i++)
+            tree.blendType = BlendTreeType.FreeformDirectional2D;
+            tree.blendParameter = "MoveX";
+            tree.blendParameterY = "MoveZ";
+            var paces = new List<(string Use, Vector2 At)> { ("Idle", Vector2.zero) };
+            paces.AddRange(Moves().Select(m => (m.Use, m.Way * m.Gait)));
+            foreach (var (use, at) in paces)
             {
-                tree.AddChild(Get(uses[i]), i);
+                tree.AddChild(Get(use), at);
             }
 
             var children = tree.children;
             for (var i = 0; i < children.Length; i++)
             {
-                children[i].timeScale = timeScales[i];
+                children[i].timeScale = timeScales.TryGetValue(paces[i].Use, out var scale) ? scale : 1f;
             }
 
             tree.children = children;
             locomotion.iKOnFeet = true;
             machine.defaultState = locomotion;
+            foreach (var (turn, y) in new[] { ("TurnLeft", 240f), ("TurnRight", 300f) })
+            {
+                var state = State(machine, turn, Get(turn), new Vector3(300f, y));
+                state.iKOnFeet = true;
+                state.speedParameterActive = true;
+                state.speedParameter = "TurnRate";
+            }
 
             var crouch = controller.CreateBlendTreeInController("Crouch", out var low, 0);
             low.blendParameter = "Speed";
@@ -503,6 +554,81 @@ namespace GameDev.Slice.EditorTools
             Fight(controller, locomotion, false);
             EditorUtility.SetDirty(controller);
             return controller;
+        }
+
+        /// <summary>
+        /// The player's moving clips: each gait (walk 1, run 2, sprint 3, the blend's scale) in each direction the table
+        /// has, with the direction in the body's own frame, x to the right and y forward.
+        /// </summary>
+        public static IEnumerable<(string Use, int Gait, Vector2 Way)> Moves()
+        {
+            var d = Mathf.Sqrt(0.5f);
+            var ways = new (string Suffix, Vector2 Way)[]
+            {
+                (string.Empty, new Vector2(0f, 1f)), ("ForwardRight", new Vector2(d, d)), ("Right", new Vector2(1f, 0f)), ("BackRight", new Vector2(d, -d)),
+                ("Back", new Vector2(0f, -1f)), ("BackLeft", new Vector2(-d, -d)), ("Left", new Vector2(-1f, 0f)), ("ForwardLeft", new Vector2(-d, d)),
+            };
+            var gaits = new[] { "Walk", "Run", "Sprint" };
+            for (var g = 0; g < gaits.Length; g++)
+            {
+                foreach (var (suffix, way) in ways)
+                {
+                    var use = gaits[g] + suffix;
+                    if (Clips.Any(c => c.Use == use))
+                    {
+                        yield return (use, g + 1, way);
+                    }
+                }
+            }
+        }
+
+        /// <summary>How fast a clip carries its body over the ground in its own curves, x to the side and y forward (m/s).</summary>
+        public static Vector2 Drift(AnimationClip clip)
+        {
+            var travel = SliceCharacterRigs.PoseAt(clip, clip.length).bodyPosition - SliceCharacterRigs.PoseAt(clip, 0f).bodyPosition;
+            return new Vector2(travel.x, travel.z) / clip.length;
+        }
+
+        /// <summary>
+        /// Degrees a second a clip turns its body, read from its root rotation, which the import may discard (left turns
+        /// negative).
+        /// </summary>
+        public static float TurnSpeed(AnimationClip clip)
+        {
+            const int samples = 60;
+            var total = 0f;
+            var before = SliceCharacterRigs.PoseAt(clip, 0f).bodyRotation * Vector3.forward;
+            for (var i = 1; i <= samples; i++)
+            {
+                var now = SliceCharacterRigs.PoseAt(clip, clip.length * i / samples).bodyRotation * Vector3.forward;
+                total += Vector3.SignedAngle(new Vector3(before.x, 0f, before.z), new Vector3(now.x, 0f, now.z), Vector3.up);
+                before = now;
+            }
+
+            return total / clip.length;
+        }
+
+        /// <summary>
+        /// An override of <paramref name="controller"/> at <paramref name="path"/> playing each Kevin Iglesias clip in its
+        /// women's take; Quaternius' clips have one take and stay.
+        /// </summary>
+        public static AnimatorOverrideController WomanOverride(AnimatorController controller, string path)
+        {
+            var woman = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(path);
+            if (woman == null)
+            {
+                woman = new AnimatorOverrideController(controller);
+                AssetDatabase.CreateAsset(woman, path);
+            }
+
+            woman.runtimeAnimatorController = controller;
+            var takes = Clips.Where(c => c.Kevin).ToDictionary(c => Get(c.Use), c => Get(c.Use, true));
+            var pairs = new List<KeyValuePair<AnimationClip, AnimationClip>>();
+            woman.GetOverrides(pairs);
+            woman.ApplyOverrides(pairs.Select(p => new KeyValuePair<AnimationClip, AnimationClip>(p.Key,
+                takes.TryGetValue(p.Key, out var take) ? take : null)).ToList());
+            EditorUtility.SetDirty(woman);
+            return woman;
         }
 
         private static void FightParameters(AnimatorController controller)

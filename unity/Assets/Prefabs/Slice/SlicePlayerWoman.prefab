@@ -80,6 +80,10 @@ MonoBehaviour:
   groundDeceleration: 38
   airAcceleration: 9
   turnSpeed: 900
+  faceCamera: 1
+  idleTurnAngle: 60
+  idleTurnSpeed: 240
+  sprintArc: 100
   jumpHeight: 1.2
   gravity: -18
   coyoteTime: 0.12
@@ -1590,7 +1594,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: f5a8da1d1cf1c5b4bbeb3fd0a986da1c, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 1b93dcb9e867f3349acb0c9c9a35fd51, type: 2}
+      objectReference: {fileID: 22100000, guid: 2c8c539c70e204744a696f9bb60ad995, type: 2}
     - target: {fileID: 5866666021909216657, guid: f5a8da1d1cf1c5b4bbeb3fd0a986da1c, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0

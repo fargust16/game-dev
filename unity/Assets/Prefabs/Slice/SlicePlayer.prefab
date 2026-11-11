@@ -33,7 +33,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8581973726079789848}
+  - {fileID: 4736979471880078763}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &8983101080103702359
@@ -80,6 +80,10 @@ MonoBehaviour:
   groundDeceleration: 38
   airAcceleration: 9
   turnSpeed: 900
+  faceCamera: 1
+  idleTurnAngle: 60
+  idleTurnSpeed: 240
+  sprintArc: 100
   jumpHeight: 1.2
   gravity: -18
   coyoteTime: 0.12
@@ -111,7 +115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c11cf6b121289d84ea5b59d79aba8269, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.Kit.PushLooseProps
---- !u!1001 &8112094393550621939
+--- !u!1001 &5059680682931364416
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -1924,8 +1928,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cb9dc8aefb1ab164da681fd828c06086, type: 3}
---- !u!4 &8581973726079789848 stripped
+--- !u!4 &4736979471880078763 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cb9dc8aefb1ab164da681fd828c06086, type: 3}
-  m_PrefabInstance: {fileID: 8112094393550621939}
+  m_PrefabInstance: {fileID: 5059680682931364416}
   m_PrefabAsset: {fileID: 0}

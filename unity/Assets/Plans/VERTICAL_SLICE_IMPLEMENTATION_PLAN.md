@@ -1149,8 +1149,8 @@ Tests: EditMode `TheftTests` (10.3's three examples of the width, an Alert targe
 | Step | Work |
 |---|---|
 | AN0 | The decisions recorded |
-| AN1 | Sources: Quaternius' UAL downloaded and imported as Humanoid, every clip of both sources mapped to its use (pipeline plan §8), the Mixamo and Blender clips and their controllers removed |
-| AN2 | Movement: the player and every person on the new clips, man and woman; the character facing the camera, walking, running and sprinting in eight directions, turning in place, starting, stopping, jumping and falling without sliding |
+| AN1 | Sources: Quaternius' UAL downloaded and imported as Humanoid, every clip of both sources mapped to its use (pipeline plan §8), the Mixamo and Blender clips and their controllers removed (done, df7fb6e0) |
+| AN2 | Movement: the player and every person on the new clips, man and woman; the character facing the camera, walking, running and sprinting in eight directions, turning in place, starting, stopping, jumping and falling without sliding (done: pipeline plan §9) |
 | AN3 | Work by key frame: a swing at a tree or a vein, a patch in one go, skinning, First Aid, the anvil and a lock, each check at its key frame with the world paused; theft without the pause, called off at 1 m |
 | AN4 | Combat: one-handed, two-handed, weapon and shield, two weapons with their rules and `build_sim.py`, pistol and rifle, a cast for each ability, hits, deaths, the Defensive Stance, Yield and sleep |
 | AN5 | Swimming: deep water, the swim and the fast swim, Stamina, half speed overloaded, no fight in water, beasts giving up at the shore |

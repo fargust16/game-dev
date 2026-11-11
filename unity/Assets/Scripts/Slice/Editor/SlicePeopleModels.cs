@@ -37,10 +37,11 @@ namespace GameDev.Slice.EditorTools
         public const string ManController = SliceClips.ControllerFolder + "/Man.controller";
         public const string WomanController = SliceClips.ControllerFolder + "/Woman.controller";
         private const string StandIns = "Assets/Animation/StandIn";
-        private const string OldWomanPlayer = "Assets/Settings/OverworldPlayerAnimator_Woman.overrideController";
+        /// <summary>The woman player's controller: the player's, with every Kevin Iglesias clip in its women's take.</summary>
+        public const string WomanPlayerController = "Assets/Settings/OverworldPlayerAnimator_Woman.overrideController";
         private const string ManWalkerController = "Assets/Settings/Slice/Townsfolk/SliceTownsfolk.controller";
         private const string WomanWalkerController = "Assets/Settings/Slice/Townsfolk/Woman/SliceTownswoman.controller";
-        private const string PlayerController = "Assets/Settings/OverworldPlayerAnimator.controller";
+        public const string PlayerController = "Assets/Settings/OverworldPlayerAnimator.controller";
         private const string OutputFolder = "Logs/SliceSurvey";
 
         /// <summary>
@@ -48,6 +49,9 @@ namespace GameDev.Slice.EditorTools
         /// cadence; where a clip's in-place stride is shorter than the player's speed, the feet slide the rest.
         /// </summary>
         private const float MostTimeScale = 1.3f;
+
+        /// <summary>The slowest a moving clip plays to keep pace with the body (authoring default).</summary>
+        private const float LeastTimeScale = 0.6f;
 
         /// <summary>Authoring default: eye height as a share of stature (adult mean).</summary>
         private const float EyeShare = 0.936f;
@@ -253,29 +257,38 @@ namespace GameDev.Slice.EditorTools
             Repoint(ManWalkerController, SliceClips.Get("Idle"), SliceClips.Get("Walk"));
             Repoint(WomanWalkerController, SliceClips.Get("Idle", true), SliceClips.Get("Walk", true));
 
-            // The player's pace in each clip, measured from the feet on both bodies at their statures (the mean, as one
-            // controller plays both), against PlayerLocomotion's speeds; the flight against its jump's airtime.
+            // The player's pace in each moving clip: how fast its planted feet slide on both bodies at their statures (the
+            // mean, as one controller plays both), against PlayerLocomotion's speed for its gait. The pack's eight
+            // directions keep the place their names give them in the blend: the feet's own direction reads up to 55 deg off
+            // the name as the hips swing (measured), while their speed is one within 10 % for every direction of a gait.
             var locomotion = AssetDatabase.LoadAssetAtPath<GameObject>(SliceTestScenes.PlayerPrefabPath).GetComponentInChildren<PlayerLocomotion>(true);
             var so = new SerializedObject(locomotion);
             float Field(string name) => so.FindProperty(name).floatValue;
             var speeds = new[] { 0f, Field("walkSpeed"), Field("runSpeed"), Field("sprintSpeed") };
-            var uses = new[] { "Idle", "Walk", "Run", "Sprint" };
-            var scales = new float[uses.Length];
-            scales[0] = 1f;
-            for (var i = 1; i < uses.Length; i++)
+            var scales = new Dictionary<string, float>();
+            foreach (var (use, gait, way) in SliceClips.Moves())
             {
-                var clip = SliceClips.Get(uses[i]);
-                var paces = new[] { PlayerMan, PlayerWoman }.Select(look =>
+                var clip = SliceClips.Get(use);
+                var travels = new[] { PlayerMan, PlayerWoman }.Select(look =>
                 {
                     var animator = Fitted(look, clip);
-                    var pace = Pace(animator, clip, animator.transform.parent);
+                    var travel = Travel(animator, clip, animator.transform.parent);
                     Object.DestroyImmediate(animator.transform.parent.gameObject);
-                    return pace;
+                    return travel;
                 }).ToList();
-                scales[i] = Mathf.Min(speeds[i] / paces.Average(), MostTimeScale);
-                report.AppendLine($"Player {uses[i]}: paced {paces[0]:0.00} m/s on the man, {paces[1]:0.00} on the woman (measured); " +
-                                  $"{speeds[i]:0.0} m/s would play it x{speeds[i] / paces.Average():0.00}, plays it x{scales[i]:0.00}");
+                var mean = travels.Average(t => t.magnitude);
+                scales[use] = mean > 0.2f ? Mathf.Clamp(speeds[gait] / mean, LeastTimeScale, MostTimeScale) : 1f;
+                report.AppendLine($"Player {use}: paced {travels[0].magnitude:0.00} m/s on the man, {travels[1].magnitude:0.00} on the woman (measured), " +
+                                  $"the man's feet {Mathf.Atan2(travels[0].x, travels[0].y) * Mathf.Rad2Deg:0} deg against the name's {Mathf.Atan2(way.x, way.y) * Mathf.Rad2Deg:0}; " +
+                                  (mean > 0.2f ? $"{speeds[gait]:0.0} m/s would play it x{speeds[gait] / mean:0.00}, " : "too slow to measure, ") +
+                                  $"plays it x{scales[use]:0.00}");
             }
+
+            // The turn on the spot: its clip played at the pace PlayerLocomotion turns the body.
+            var clipTurn = Mathf.Abs(SliceClips.TurnSpeed(SliceClips.Get("TurnRight")));
+            var bodyTurn = Field("idleTurnSpeed");
+            var turnRate = clipTurn > 20f ? Mathf.Clamp(bodyTurn / clipTurn, 0.5f, 2f) : 1f;
+            report.AppendLine($"Player turn: the clip turns {clipTurn:0} deg/s (measured), the body {bodyTurn:0} deg/s, so it plays x{turnRate:0.00}");
 
             // The sneak's own pace, which PlayerLocomotion matches by the Crouch state's Pace while it creeps.
             var sneak = SliceClips.Get("Sneak");
@@ -286,7 +299,8 @@ namespace GameDev.Slice.EditorTools
                 Object.DestroyImmediate(animator.transform.parent.gameObject);
                 return pace;
             }).Average();
-            SliceClips.Player(PlayerController, scales, sneakPace);
+            var player = SliceClips.Player(PlayerController, scales, sneakPace, turnRate);
+            SliceClips.WomanOverride(player, WomanPlayerController);
             report.AppendLine($"Player sneak: paced {sneakPace:0.00} m/s (measured, the mean of both bodies), matched by the Crouch state's Pace");
             AssetDatabase.SaveAssets();
         }
@@ -308,7 +322,7 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            foreach (var old in new[] { "ManIdle", "ManWalk", "WomanIdle", "WomanWalk" }.Select(n => $"{StandIns}/{n}.anim").Append(OldWomanPlayer))
+            foreach (var old in new[] { "ManIdle", "ManWalk", "WomanIdle", "WomanWalk" }.Select(n => $"{StandIns}/{n}.anim"))
             {
                 if (AssetDatabase.LoadAssetAtPath<Object>(old) != null)
                 {
@@ -536,21 +550,93 @@ namespace GameDev.Slice.EditorTools
         private static float Speed(Animator animator, AnimationClip walk, Transform root) => Mathf.Clamp(Pace(animator, walk, root), 0.6f, 2f);
 
         /// <summary>The clip is in place: the lower foot moves back as fast as the body would go forward (median over the clip).</summary>
-        internal static float Pace(Animator animator, AnimationClip walk, Transform root)
+        internal static float Pace(Animator animator, AnimationClip walk, Transform root) => LowerFootPace(animator, walk, root, Vector3.forward);
+
+        /// <summary>
+        /// The pace of a clip that moves the body along <paramref name="way"/>, in the body's own frame: the lower foot
+        /// moves against it as fast as the body would go (median over the clip).
+        /// </summary>
+        internal static float Pace(Animator animator, AnimationClip walk, Transform root, Vector3 way)
         {
+            var travel = Travel(animator, walk, root);
+            return Vector2.Dot(travel, new Vector2(way.x, way.z).normalized);
+        }
+
+        /// <summary>
+        /// Where an in-place clip would carry the body, x to the right and y forward (m/s): each foot counts only while it
+        /// is planted, within 3 cm of its lowest point over the clip (authoring default), and the body goes against the
+        /// planted feet's slide (median of each component).
+        /// </summary>
+        internal static Vector2 Travel(Animator animator, AnimationClip walk, Transform root)
+        {
+            const int samples = 120;
+            const float planted = 0.03f;
+            var feet = new[] { animator.GetBoneTransform(HumanBodyBones.LeftFoot), animator.GetBoneTransform(HumanBodyBones.RightFoot) };
+            var dt = walk.length / samples;
+            var track = new Vector3[2, samples + 1];
+            for (var i = 0; i <= samples; i++)
+            {
+                Pose(animator, walk, i * dt);
+                for (var f = 0; f < 2; f++)
+                {
+                    track[f, i] = root.InverseTransformPoint(feet[f].position);
+                }
+            }
+
+            Pose(animator, walk, 0f);
+            var xs = new List<float>();
+            var zs = new List<float>();
+            for (var f = 0; f < 2; f++)
+            {
+                var lowest = Enumerable.Range(0, samples + 1).Min(i => track[f, i].y);
+                for (var i = 1; i <= samples; i++)
+                {
+                    if (track[f, i].y <= lowest + planted && track[f, i - 1].y <= lowest + planted)
+                    {
+                        xs.Add(-(track[f, i].x - track[f, i - 1].x) / dt);
+                        zs.Add(-(track[f, i].z - track[f, i - 1].z) / dt);
+                    }
+                }
+            }
+
+            if (xs.Count == 0)
+            {
+                return Vector2.zero;
+            }
+
+            xs.Sort();
+            zs.Sort();
+            return new Vector2(xs[xs.Count / 2], zs[zs.Count / 2]);
+        }
+
+        /// <summary>The old lower-foot pace, kept for the walkers' own measure.</summary>
+        private static float LowerFootPace(Animator animator, AnimationClip walk, Transform root, Vector3 way)
+        {
+            way = way.normalized;
             var left = animator.GetBoneTransform(HumanBodyBones.LeftFoot);
             var right = animator.GetBoneTransform(HumanBodyBones.RightFoot);
+            var hips = animator.GetBoneTransform(HumanBodyBones.Hips);
+
+            // The feet against the hips, so a clip whose curves carry the body along, its travel left out of the pose,
+            // reads as the game shows it.
+            Vector3 At(Transform foot)
+            {
+                var under = root.InverseTransformPoint(hips.position);
+                under.y = 0f;
+                return root.InverseTransformPoint(foot.position) - under;
+            }
+
             const int samples = 120;
             var dt = walk.length / samples;
             var speeds = new List<float>();
             Pose(animator, walk, 0f);
-            var before = (L: root.InverseTransformPoint(left.position), R: root.InverseTransformPoint(right.position));
+            var before = (L: At(left), R: At(right));
             for (var i = 1; i <= samples; i++)
             {
                 Pose(animator, walk, i * dt);
-                var now = (L: root.InverseTransformPoint(left.position), R: root.InverseTransformPoint(right.position));
+                var now = (L: At(left), R: At(right));
                 var lower = now.L.y < now.R.y;
-                speeds.Add(-((lower ? now.L.z - before.L.z : now.R.z - before.R.z) / dt));
+                speeds.Add(-Vector3.Dot(lower ? now.L - before.L : now.R - before.R, way) / dt);
                 before = now;
             }
 
@@ -895,7 +981,7 @@ namespace GameDev.Slice.EditorTools
             model.transform.SetSiblingIndex(0);
             SliceKitCatalogue.LinkTripoTextures(model, look.Model);
             var animator = Animated(model, look);
-            animator.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(PlayerController);
+            animator.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(look.Female ? WomanPlayerController : PlayerController);
             animator.applyRootMotion = false;
             var stature = Fit(model, SliceClips.Get("Idle", look.Female), look.Height, false);
             var head = Keep(model, animator);

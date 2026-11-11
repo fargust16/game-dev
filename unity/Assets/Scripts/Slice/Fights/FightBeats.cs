@@ -30,6 +30,7 @@ namespace GameDev.Slice.Fights
 
         private static readonly int FightingHash = Animator.StringToHash("Fighting");
         private static readonly int SpeedHash = Animator.StringToHash("Speed");
+        private static readonly int MoveZHash = Animator.StringToHash("MoveZ");
         private static readonly int AttackHash = Animator.StringToHash("Attack");
         private static readonly int HitHash = Animator.StringToHash("Hit");
         private static readonly int DownHash = Animator.StringToHash("Down");
@@ -151,6 +152,10 @@ namespace GameDev.Slice.Fights
                 if (Has(animator, SpeedHash))
                 {
                     animator.SetFloat(SpeedHash, 1f);
+                    if (Has(animator, MoveZHash))
+                    {
+                        animator.SetFloat(MoveZHash, 1f); // the player's eight-way blend, walking forward
+                    }
                 }
                 else if (animator.HasState(0, WalkState))
                 {
@@ -223,6 +228,11 @@ namespace GameDev.Slice.Fights
                 if (Has(animator, SpeedHash))
                 {
                     animator.SetFloat(SpeedHash, 0f);
+                    if (Has(animator, MoveZHash))
+                    {
+                        animator.SetFloat(MoveZHash, 0f);
+                    }
+
                     animator.SetBool(FightingHash, true);
                 }
                 else

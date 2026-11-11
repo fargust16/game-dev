@@ -110,6 +110,7 @@ namespace GameDev.Slice.EditorTools
                 {
                     animator.Rebind();
                     animator.SetFloat("Speed", speed);
+                    animator.SetFloat("MoveZ", speed); // the eight-way blend, straight ahead
                     animator.Update(0f);
                     float low = float.MaxValue, high = float.MinValue, kneeMin = 999f;
                     for (var i = 0; i < 60; i++)

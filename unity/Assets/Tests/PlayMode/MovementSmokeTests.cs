@@ -56,6 +56,41 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(player.IsGrounded);
             Assert.AreEqual(start.y, player.transform.position.y, 0.15f);
         }
+
+        /// <summary>
+        /// AN2 (owner, 2026-11-11): the character faces the camera and moves in eight directions: holding right it steps
+        /// east with its face to the north, where the camera looks, and holding back it backs away south still facing north.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ThePlayerStepsSidewaysAndBacksAwayFacingTheCamera([Values(Key.D, Key.S)] Key key)
+        {
+            yield return LoadScene();
+            var player = Object.FindAnyObjectByType<PlayerLocomotion>();
+            var camera = Object.FindAnyObjectByType<ThirdPersonCamera>();
+            var start = player.transform.position;
+
+            Hold(key);
+            yield return new WaitForSeconds(1.2f);
+            var look = Vector3.ProjectOnPlane(camera.transform.forward, Vector3.up).normalized;
+            var face = player.transform.forward;
+            var animator = player.GetComponentInChildren<Animator>();
+            var blend = new Vector2(animator.GetFloat("MoveX"), animator.GetFloat("MoveZ"));
+            Hold();
+            yield return null;
+
+            var moved = player.transform.position - start;
+            var way = key == Key.D ? Vector3.Cross(Vector3.up, look) : -look;
+            Assert.Greater(Vector3.Dot(moved, way), 1.2f, $"the player should have gone {(key == Key.D ? "right" : "back")}; moved {moved}; {Describe(player)}");
+            Assert.Greater(Vector3.Dot(face, look), 0.95f, $"the player faces where the camera looks; face {face}, camera {look}");
+            if (key == Key.D)
+            {
+                Assert.Greater(blend.x, 0.6f, $"the blend steps right: {blend}");
+            }
+            else
+            {
+                Assert.Less(blend.y, -0.6f, $"the blend steps back: {blend}");
+            }
+        }
     }
 }
 #endif
