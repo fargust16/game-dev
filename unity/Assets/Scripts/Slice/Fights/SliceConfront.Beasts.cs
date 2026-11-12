@@ -28,7 +28,7 @@ namespace GameDev.Slice.Fights
         public bool StartBeastFight(IReadOnlyList<SliceBeast> beasts, BeastRules rules)
         {
             _player = FindAnyObjectByType<PlayerLocomotion>();
-            if (_lock == null || InFight || _died || _terms != null || _player == null || beasts == null || beasts.Count == 0 || rules == null)
+            if (_lock == null || InFight || _died || _terms != null || _player == null || _player.InWater || beasts == null || beasts.Count == 0 || rules == null)
             {
                 return false;
             }

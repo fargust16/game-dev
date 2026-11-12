@@ -30,7 +30,7 @@ namespace GameDev.Slice.Fights
         public bool StartPeopleFight(string group, IReadOnlyList<Transform> bodies, Action<bool, int> ended)
         {
             _player = FindAnyObjectByType<PlayerLocomotion>();
-            if (_lock == null || InFight || _died || _terms != null || _player == null || bodies == null || bodies.Count == 0)
+            if (_lock == null || InFight || _died || _terms != null || _player == null || _player.InWater || bodies == null || bodies.Count == 0)
             {
                 return false;
             }

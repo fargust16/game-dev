@@ -76,6 +76,33 @@ namespace GameDev.Slice.EditorTools
             report.AppendLine($"  Onset = {{ {string.Join(", ", onset.Select(v => $"{Mathf.Max(0f, v - 0.03f):0.00}f"))} }} (entered 0.03 s before)");
             report.AppendLine($"  BlockPeak = {block:0.00}f, KnockOnset = {Mathf.Max(0f, knock - 0.03f):0.00}f");
 
+            // AN5: how high the swimming clips hold the chest and the head over the root, on the player man fitted standing,
+            // so PlayerLocomotion floats the root that far under the water and the head stays out of it.
+            report.AppendLine();
+            report.AppendLine("Swimming, the player man fitted standing (m over the root, mean and range over the clip; AN5):");
+            foreach (var use in new[] { "Swim", "SwimIdle", "ClimbOut" })
+            {
+                var clip = SliceClips.Get(use);
+                var animator = SlicePeopleModels.Fitted(SlicePeopleModels.PlayerMan, SliceClips.Get("Idle"));
+                var root = animator.transform.parent;
+                var frames = Mathf.Max(1, Mathf.RoundToInt(clip.length * clip.frameRate));
+                float chestSum = 0f, headLow = float.MaxValue, headHigh = float.MinValue, chestLow = float.MaxValue, chestHigh = float.MinValue;
+                for (var f = 0; f <= frames; f++)
+                {
+                    SlicePeopleModels.Pose(animator, clip, clip.length * f / frames);
+                    var chest = root.InverseTransformPoint(animator.GetBoneTransform(HumanBodyBones.Chest).position).y;
+                    var head = root.InverseTransformPoint(animator.GetBoneTransform(HumanBodyBones.Head).position).y;
+                    chestSum += chest;
+                    chestLow = Mathf.Min(chestLow, chest);
+                    chestHigh = Mathf.Max(chestHigh, chest);
+                    headLow = Mathf.Min(headLow, head);
+                    headHigh = Mathf.Max(headHigh, head);
+                }
+
+                Object.DestroyImmediate(root.gameObject);
+                report.AppendLine($"  {use}: {clip.length:0.00} s, the chest at {chestSum / (frames + 1):0.00} m ({chestLow:0.00}–{chestHigh:0.00}), the head {headLow:0.00}–{headHigh:0.00} m");
+            }
+
             report.AppendLine();
             report.AppendLine("The player's prefab playing its controller (feet = the lower ankle's height over the root, minus its rest height; knees in degrees):");
             foreach (var prefab in new[] { SliceTestScenes.PlayerPrefabPath, SlicePeopleModels.PlayerWomanPrefab })

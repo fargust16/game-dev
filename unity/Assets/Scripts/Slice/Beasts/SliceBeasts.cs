@@ -159,7 +159,12 @@ namespace GameDev.Slice.Beasts
                     continue;
                 }
 
-                Look(pack, feet, Time.deltaTime);
+                // 10.1: a swimmer is out of a beast's reach, and not noticed.
+                if (!_player.InWater)
+                {
+                    Look(pack, feet, Time.deltaTime);
+                }
+
                 Roam(pack, Time.deltaTime);
             }
         }
@@ -247,7 +252,8 @@ namespace GameDev.Slice.Beasts
                 return;
             }
 
-            if (!Inside(first, feet))
+            // 10.1: a beast gives up a chase at deep water, as at its territory's edge.
+            if (!Inside(first, feet) || _player.InWater)
             {
                 GiveUp(pack);
                 return;
@@ -398,6 +404,12 @@ namespace GameDev.Slice.Beasts
 
             foreach (var pack in _packs.Values)
             {
+                if (_player.InWater && pack.Noticed && !pack.Attacking && !pack.Chasing)
+                {
+                    GiveUp(pack);
+                    continue;
+                }
+
                 if (!pack.Noticed || pack.Attacking || pack.Chasing || !pack.Present(out var first) || !Inside(first, _player.transform.position))
                 {
                     continue;

@@ -26,7 +26,14 @@ namespace GameDev.Locomotion
     /// the body's own velocity on the scale 0–3 of idle, walk, run and sprint; a controller with the old 1D blend reads
     /// Speed), <c>TurnLeft</c> and <c>TurnRight</c> (a turn on the spot), <c>Crouch</c> (blend on Speed 0–1, crouched
     /// idle and sneak, its pace on <c>Pace</c> against the sneak's own in <c>SneakPace</c>), <c>Fall</c> and
-    /// <c>JumpLand</c>. A controller without one of them falls back to <c>Locomotion</c>.
+    /// <c>JumpLand</c>, <c>Swim</c> (blend on Speed 0–1, the float and the stroke, played faster on Pace for the fast
+    /// swim) and <c>ClimbOut</c>. A controller without one of them falls back to <c>Locomotion</c>.
+    /// </para>
+    /// <para>
+    /// Swimming (10.1, AN5): where a <see cref="SwimWater"/> lies <see cref="wadeDepth"/> or more over the bed, the
+    /// character swims, free as a run, the fast swim with Shift spending Stamina as the sprint, at half speed when
+    /// overloaded (<see cref="SwimShare"/>), its body turned to where it goes. Space at a bank whose top stands no more
+    /// than <see cref="climbOutHeight"/> over the water climbs out onto it; where the bed rises the character wades out.
     /// </para>
     /// Every number is an authoring default.
     /// </summary>
@@ -40,6 +47,8 @@ namespace GameDev.Locomotion
             Crouched,
             Airborne,
             Landing,
+            Swimming,
+            Climbing,
         }
 
         [Header("Speeds (m/s) - match Animator Speed blend positions 0/1/2/3")]
@@ -79,6 +88,19 @@ namespace GameDev.Locomotion
         [Tooltip("s in the air before a landing plays at all.")]
         [SerializeField] private float landingAfter = 0.45f;
 
+        [Header("Swimming (10.1, AN5)")]
+        [Tooltip("m of water over the bed from which the character swims: chest-deep on a person 1.8 m tall (authoring default).")]
+        [SerializeField] private float wadeDepth = 1.3f;
+        [Tooltip("m the root floats over the water while swimming: the Swim clip holds the chest 0.12 m under the root and the head from 0.04 m under it to 0.08 m over (measured, SliceAnimationCheck).")]
+        [SerializeField] private float floatHeight = 0.05f;
+        [SerializeField] private float swimSpeed = 1.8f;
+        [SerializeField] private float fastSwimSpeed = 3f;
+        [Tooltip("m/s² toward the wanted velocity in the water.")]
+        [SerializeField] private float swimAcceleration = 6f;
+        [Tooltip("m over the water a bank's top may stand for Space to climb out onto it: the city's quays stand 1.9 m over the sea (measured: built ground 25.9 m, Sea Level 24 m).")]
+        [SerializeField] private float climbOutHeight = 2.1f;
+        [SerializeField] private float climbOutSeconds = 0.8f;
+
         private const float LocomotionFade = 0.12f;
         private const float CrouchFade = 0.15f;
         private const float AirFade = 0.08f;
@@ -97,6 +119,8 @@ namespace GameDev.Locomotion
         private static readonly int CrouchState = Animator.StringToHash("Crouch");
         private static readonly int FallState = Animator.StringToHash("Fall");
         private static readonly int LandState = Animator.StringToHash("JumpLand");
+        private static readonly int SwimState = Animator.StringToHash("Swim");
+        private static readonly int ClimbState = Animator.StringToHash("ClimbOut");
 
         private CharacterController _controller;
         private Animator _animator;
@@ -112,11 +136,20 @@ namespace GameDev.Locomotion
         private bool _hasPace;
         private bool _hasMove;
         private int _turning;
+        private float _climbTime;
+        private Vector3 _climbFrom;
+        private Vector3 _climbTo;
 
         /// <summary>The movement state now.</summary>
         public Move State { get; private set; } = Move.Grounded;
 
         public bool IsGrounded => _grounded;
+
+        /// <summary>True while the character swims or climbs out of the water: no fight starts, and beasts give up (10.1).</summary>
+        public bool InWater => State == Move.Swimming || State == Move.Climbing;
+
+        /// <summary>The share of swimming speed: a half when the character is overloaded (10.1), set by whoever holds the bag.</summary>
+        public float SwimShare { get; set; } = 1f;
 
         /// <summary>The body's speed over the ground now, m/s.</summary>
         public float PlanarSpeed => new Vector3(_velocity.x, 0f, _velocity.z).magnitude;
@@ -182,6 +215,14 @@ namespace GameDev.Locomotion
 
         private void OnDisable()
         {
+            // A climb out of the water broken off ends on the bank.
+            if (State == Move.Climbing && _controller != null)
+            {
+                transform.position = _climbTo;
+                _controller.enabled = true;
+                State = Move.Grounded;
+            }
+
             // Back to the plain locomotion standing still, from which a fight's guard and a talk are entered.
             _velocity = Vector3.zero;
             IsSprinting = false;
@@ -216,6 +257,30 @@ namespace GameDev.Locomotion
             var crouching = CrouchShare > 0f;
             var direction = CameraRelativeDirection(new Vector3(moveInput.x, 0f, moveInput.y));
             var look = CameraForward();
+            if (State == Move.Climbing)
+            {
+                Climb(dt);
+                Drive(dt);
+                return;
+            }
+
+            var water = SwimWater.LevelAt(transform.position, out var level);
+            if (State == Move.Swimming)
+            {
+                if (!water)
+                {
+                    Enter(Move.Airborne);
+                }
+                else if (Swim(input, hasInput, direction, level, dt))
+                {
+                    return;
+                }
+                else
+                {
+                    // Wading out: the root set down on the rising bed, where the standing pose holds the chest as the stroke did.
+                    WadeOut(level);
+                }
+            }
             var strafing = faceCamera && !crouching && look.sqrMagnitude > 0.5f;
             IsSprinting = hasInput && !crouching && SprintAllowed && input.SprintHeld &&
                           (!strafing || Vector3.Angle(look, direction) <= sprintArc);
@@ -269,7 +334,126 @@ namespace GameDev.Locomotion
 
             Face(strafing, look, direction, hasInput, dt);
             Step(hasInput, crouching, dt);
+            if (water && Deep(level))
+            {
+                _verticalVelocity = 0f;
+                IsSprinting = false;
+                Enter(Move.Swimming);
+            }
+
             Drive(dt);
+        }
+
+        /// <summary>The character has gone into water at least <see cref="wadeDepth"/> deep, walking or falling in.</summary>
+        private bool Deep(float level) => transform.position.y <= level - wadeDepth + 0.05f && Bed(level) <= level - wadeDepth;
+
+        /// <summary>The bed under the water at the character's place: the first thing under the surface, or far down.</summary>
+        private float Bed(float level)
+        {
+            var from = new Vector3(transform.position.x, level - 0.01f, transform.position.z);
+            return Physics.Raycast(from, Vector3.down, out var hit, 50f, ~0, QueryTriggerInteraction.Ignore) && !hit.collider.transform.IsChildOf(transform)
+                ? hit.point.y
+                : level - 50f;
+        }
+
+        /// <summary>One frame in the water; false once the bed has risen to wading depth.</summary>
+        private bool Swim(GameInputService input, bool hasInput, Vector3 direction, float level, float dt)
+        {
+            if (Bed(level) > level - wadeDepth + 0.15f)
+            {
+                return false;
+            }
+
+            if (input.JumpPressed && Bank(level, out var top))
+            {
+                _climbFrom = transform.position;
+                _climbTo = top;
+                _climbTime = 0f;
+                _controller.enabled = false;
+                IsSprinting = false;
+                Enter(Move.Climbing);
+                Drive(dt);
+                return true;
+            }
+
+            // The fast swim spends Stamina as the sprint does (07.2 §3.2).
+            IsSprinting = hasInput && SprintAllowed && input.SprintHeld;
+            var wanted = !hasInput ? 0f : (IsSprinting ? fastSwimSpeed : swimSpeed) * Mathf.Clamp01(SwimShare);
+            _velocity = Vector3.MoveTowards(_velocity, direction * wanted, swimAcceleration * dt);
+
+            // The root eased to its float over the water, so a body that fell in comes up and one that waded in rises.
+            _verticalVelocity = Mathf.Clamp((level + floatHeight - transform.position.y) * 6f, -4f, 4f);
+            var flags = _controller.Move((_velocity + (Vector3.up * _verticalVelocity)) * dt);
+            if ((flags & CollisionFlags.Sides) != 0)
+            {
+                var actual = _controller.velocity;
+                _velocity = Vector3.ClampMagnitude(new Vector3(actual.x, 0f, actual.z), _velocity.magnitude);
+            }
+
+            _grounded = false;
+            _sinceGround = 0f;
+            Face(false, Vector3.zero, direction, hasInput, dt);
+            Drive(dt);
+            return true;
+        }
+
+        private void WadeOut(float level)
+        {
+            var bed = Bed(level);
+            var drop = transform.position.y - bed;
+            if (drop > 0f && drop < 3f)
+            {
+                _controller.Move(Vector3.down * drop);
+            }
+
+            _verticalVelocity = -2f;
+            _grounded = true;
+            Enter(Move.Grounded);
+        }
+
+        /// <summary>The top of a bank ahead within <see cref="climbOutHeight"/> over the water, with room to stand on it.</summary>
+        private bool Bank(float level, out Vector3 top)
+        {
+            top = default;
+            var forward = Flat(transform.forward);
+            var from = transform.position + (forward * (_controller.radius + 0.7f));
+            from.y = level + climbOutHeight + 0.3f;
+            if (!Physics.Raycast(from, Vector3.down, out var hit, climbOutHeight + 0.6f, ~0, QueryTriggerInteraction.Ignore) ||
+                hit.collider.transform.IsChildOf(transform) || hit.point.y < level + 0.2f || hit.point.y > level + climbOutHeight ||
+                Vector3.Angle(hit.normal, Vector3.up) > _controller.slopeLimit)
+            {
+                return false;
+            }
+
+            var low = hit.point + (Vector3.up * (_controller.radius + 0.05f));
+            var high = hit.point + (Vector3.up * (_controller.height - _controller.radius));
+            if (Physics.CheckCapsule(low, high, _controller.radius * 0.9f, ~0, QueryTriggerInteraction.Ignore))
+            {
+                return false;
+            }
+
+            top = hit.point;
+            return true;
+        }
+
+        /// <summary>The climb out: up the bank's face, then over its edge onto the top.</summary>
+        private void Climb(float dt)
+        {
+            _climbTime += dt;
+            var t = Mathf.Clamp01(_climbTime / climbOutSeconds);
+            var up = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / 0.7f));
+            var over = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((t - 0.4f) / 0.6f));
+            transform.position = new Vector3(Mathf.Lerp(_climbFrom.x, _climbTo.x, over), Mathf.Lerp(_climbFrom.y, _climbTo.y, up), Mathf.Lerp(_climbFrom.z, _climbTo.z, over));
+            if (t < 1f)
+            {
+                return;
+            }
+
+            _controller.enabled = true;
+            _velocity = Vector3.zero;
+            _verticalVelocity = -2f;
+            _grounded = true;
+            Enter(Move.Grounded);
         }
 
         /// <summary>
@@ -415,6 +599,12 @@ namespace GameDev.Locomotion
                 case Move.Landing:
                     Play(Has(LandState) ? LandState : LocomotionState, LandFade);
                     break;
+                case Move.Swimming:
+                    Play(Has(SwimState) ? SwimState : LocomotionState, CrouchFade);
+                    break;
+                case Move.Climbing:
+                    Play(Has(ClimbState) ? ClimbState : LocomotionState, AirFade);
+                    break;
             }
         }
 
@@ -429,7 +619,13 @@ namespace GameDev.Locomotion
             var speed = PlanarSpeed;
             float blend;
             var pace = 1f;
-            if (State == Move.Crouched)
+            if (InWater)
+            {
+                // The stroke by the swimming speed, played faster for the fast swim.
+                blend = Mathf.Clamp01(speed / swimSpeed);
+                pace = speed > swimSpeed ? Mathf.Clamp(speed / swimSpeed, 1f, 1.8f) : 1f;
+            }
+            else if (State == Move.Crouched)
             {
                 var creep = Mathf.Max(0.01f, walkSpeed * Mathf.Max(CrouchShare, 0.01f));
                 blend = Mathf.Clamp01(speed / creep);

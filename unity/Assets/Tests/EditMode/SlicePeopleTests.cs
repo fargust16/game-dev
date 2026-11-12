@@ -102,6 +102,23 @@ namespace GameDev.Slice.Tests
             }
         }
 
+        /// <summary>AN5, 10.1: the player's controller swims, the float and the stroke on Speed, the fast swim on Pace, and climbs out of the water, all Quaternius' clips.</summary>
+        [Test]
+        public void ThePlayerSwimsAndClimbsOut()
+        {
+            var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(SlicePeopleModels.PlayerController);
+            Assert.IsNotNull(controller, SlicePeopleModels.PlayerController);
+            var states = controller.layers[0].stateMachine.states.Select(s => s.state).ToDictionary(s => s.name);
+            var swim = states["Swim"];
+            Assert.IsTrue(swim.speedParameterActive && swim.speedParameter == "Pace", "the fast swim plays the stroke faster");
+            var tree = (BlendTree)swim.motion;
+            Assert.AreEqual("Speed", tree.blendParameter);
+            CollectionAssert.AreEqual(new[] { SliceClips.Get("SwimIdle"), SliceClips.Get("Swim") }, tree.children.Select(c => c.motion).ToArray());
+            CollectionAssert.AreEqual(new[] { 0f, 1f }, tree.children.Select(c => c.threshold).ToArray());
+            Assert.AreSame(SliceClips.Get("ClimbOut"), states["ClimbOut"].motion);
+            Assert.AreEqual(SliceClips.Q2, AssetDatabase.GetAssetPath(SliceClips.Get("ClimbOut")), "Quaternius' ClimbUp_1m");
+        }
+
         /// <summary>
         /// AN2: the player's controller moves in eight directions: its Locomotion is a 2D blend on MoveX and MoveZ with the
         /// idle at the centre and every walk, run and sprint of the table at its direction and gait, each played at the pace

@@ -220,6 +220,11 @@ namespace GameDev.Slice
             }
 
             Clock = GameClockDriver.Running;
+            for (var i = 0; i < SceneManager.sceneCount; i++)
+            {
+                MarkWater(SceneManager.GetSceneAt(i));
+            }
+
             if (settings == null || tips == null || Clock == null)
             {
                 Debug.LogError("SliceWorldDriver needs SliceSettings, a TipCatalogue, and a running clock.", this);
@@ -498,6 +503,7 @@ namespace GameDev.Slice
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            MarkWater(scene);
             if (Shops != null)
             {
                 OpenCounters();
@@ -516,6 +522,26 @@ namespace GameDev.Slice
             if (Theft != null)
             {
                 FindPurses();
+            }
+        }
+
+        /// <summary>
+        /// AN5: the city's sheet of water at Sea Level, named Water by its builder, is water the character swims in (10.1);
+        /// the sheet has no collider, because the grid reads water by height.
+        /// </summary>
+        private static void MarkWater(Scene scene)
+        {
+            if (!scene.IsValid() || !scene.isLoaded)
+            {
+                return;
+            }
+
+            foreach (var root in scene.GetRootGameObjects())
+            {
+                if (root.name == "Water" && root.GetComponent<SwimWater>() == null)
+                {
+                    root.AddComponent<SwimWater>();
+                }
             }
         }
 
@@ -678,6 +704,9 @@ namespace GameDev.Slice
             if (_walker != null)
             {
                 _walker.SprintAllowed = !tired;
+
+                // 10.1: an overloaded character swims at half speed (Overloaded and Critical Overload, 07.2 §5.2).
+                _walker.SwimShare = Bag != null && Bag.Band >= LoadBand.Overloaded ? 0.5f : 1f;
             }
 
             hud.ShowStamina((float)Stamina.Share, tired);

@@ -191,7 +191,7 @@ namespace GameDev.Slice.Fights
         public bool StartDevelopmentFight(string group, IReadOnlyList<Vector3> places)
         {
             _player = FindAnyObjectByType<PlayerLocomotion>();
-            if (_lock == null || InFight || _died || _terms != null || _player == null || _settings.OpponentModel == null)
+            if (_lock == null || InFight || _died || _terms != null || _player == null || _player.InWater || _settings.OpponentModel == null)
             {
                 return false;
             }

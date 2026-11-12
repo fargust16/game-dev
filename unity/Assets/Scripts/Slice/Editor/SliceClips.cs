@@ -197,6 +197,7 @@ namespace GameDev.Slice.EditorTools
             Q("GetUp", Q2, "LayToIdle"),
             Q("Carry", Q2, "Walk_Carry_Loop", true),
             Q("OpenChest", Q2, "Chest_Open"),
+            Q("ClimbOut", Q2, "ClimbUp_1m"),
         };
 
         public static Entry EntryOf(string use)
@@ -543,6 +544,17 @@ namespace GameDev.Slice.EditorTools
             crouch.iKOnFeet = true;
             crouch.speedParameterActive = true;
             crouch.speedParameter = "Pace";
+
+            // AN5: swimming (10.1), the float and the stroke on Speed, the fast swim the stroke played faster on Pace; and
+            // the climb out of the water onto a bank (pipeline plan §12).
+            var swim = controller.CreateBlendTreeInController("Swim", out var water, 0);
+            water.blendParameter = "Speed";
+            water.useAutomaticThresholds = false;
+            water.AddChild(Get("SwimIdle"), 0f);
+            water.AddChild(Get("Swim"), 1f);
+            swim.speedParameterActive = true;
+            swim.speedParameter = "Pace";
+            State(machine, "ClimbOut", Get("ClimbOut"), new Vector3(560f, 240f));
 
             State(machine, "Fall", Get("Fall"), new Vector3(560f, 0f));
             var land = State(machine, "JumpLand", Get("JumpLand"), new Vector3(560f, 120f));
