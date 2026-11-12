@@ -168,6 +168,7 @@ namespace GameDev.Slice.Fights
 
         private void OnMercyAsked(Combatant c)
         {
+            Crouch(c);
             _hud.Line(Loc.Format("ui.fight.log.mercy", Name(c)) + "     " + Loc.Get("ui.fight.mercy"));
             _hud.MarkDirty();
         }

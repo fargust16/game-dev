@@ -123,6 +123,43 @@ namespace GameDev.Slice.Gear
             return null;
         }
 
+        /// <summary>
+        /// 10.2 §5b *Two weapons*: puts a carried one-handed melee weapon in the other hand of the first set whose main hand
+        /// holds one, in place of what that hand held; any other piece is put on as <see cref="Wear"/> puts it. The key of
+        /// the reason it cannot, or null.
+        /// </summary>
+        public string WearOffHand(ItemPiece piece)
+        {
+            if (Locked != null && Locked())
+            {
+                return "ui.bag.fault.fight";
+            }
+
+            var item = piece != null && _bag.Pieces.Contains(piece) ? _bag.Catalogue.Find(piece.item) : null;
+            if (!(item?.fight is FightWeapon weapon) || !WeaponSet.OneHandedMelee(weapon))
+            {
+                return Wear(piece);
+            }
+
+            if (IsWorn(piece))
+            {
+                return null;
+            }
+
+            foreach (var (main, off) in new[] { (WearSlot.WeaponOne, WearSlot.OffHandOne), (WearSlot.WeaponTwo, WearSlot.OffHandTwo) })
+            {
+                if (WeaponOf(this[main]) is FightWeapon held && new WeaponSet(held, null, weapon).Fault() == null)
+                {
+                    Remove(off);
+                    Put(off, piece);
+                    Changed?.Invoke();
+                    return null;
+                }
+            }
+
+            return "ui.bag.fault.pair";
+        }
+
         /// <summary>Takes a piece off, and a weapon's other hand with it, or a firearm with its pouch; the key of the reason it cannot, or null.</summary>
         public string TakeOff(ItemPiece piece)
         {
@@ -269,7 +306,7 @@ namespace GameDev.Slice.Gear
                 Remove(off);
                 Put(off, pouch);
             }
-            else if (this[off] != null && new WeaponSet(weapon, OffOf(this[off])).Fault() != null)
+            else if (this[off] != null && new WeaponSet(weapon, OffOf(this[off]), WeaponOf(this[off])).Fault() != null)
             {
                 Remove(off);
             }
@@ -295,7 +332,7 @@ namespace GameDev.Slice.Gear
         }
 
         private WeaponSet? SetOf(WearSlot main, WearSlot off) =>
-            WeaponOf(this[main]) is FightWeapon weapon ? new WeaponSet(weapon, OffOf(this[off])) : (WeaponSet?)null;
+            WeaponOf(this[main]) is FightWeapon weapon ? new WeaponSet(weapon, OffOf(this[off]), WeaponOf(this[off])) : (WeaponSet?)null;
 
         private FightWeapon WeaponOf(ItemPiece piece) => piece != null ? _bag.Catalogue.Find(piece.item)?.fight as FightWeapon : null;
 

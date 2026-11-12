@@ -45,7 +45,17 @@ namespace GameDev.Confront.Rules
         /// <summary>What it carries besides its armour and Weapon Sets, in kg; null for 10.2's reference load (S5a.2).</summary>
         public double? Carried { get; internal set; }
 
-        public FightWeapon Weapon => Set.Weapon;
+        /// <summary>
+        /// 10.2 §5b *Two weapons*: the next blow is struck with the other hand's weapon. The turns set it for one blow and
+        /// clear it after, so outside a blow it is false and <see cref="Weapon"/> is the main hand's.
+        /// </summary>
+        public bool OffHand { get; internal set; }
+
+        /// <summary>The weapon that strikes: the main hand's, or the other hand's while <see cref="OffHand"/> is set.</summary>
+        public FightWeapon Weapon => OffHand && Set.OffWeapon != null ? Set.OffWeapon : Set.Weapon;
+
+        /// <summary>The AP of the cheapest blow in hand: its weapon's, or with two weapons the lighter one's.</summary>
+        public int BlowAp => Set.Paired ? System.Math.Min(Set.Weapon.AttackAp, Set.OffWeapon.AttackAp) : Weapon.AttackAp;
 
         public double MaxHp { get; internal set; }
 
@@ -89,6 +99,7 @@ namespace GameDev.Confront.Rules
             }
 
             (Set, Second) = (Second, Set);
+            OffHand = false;
             return true;
         }
 

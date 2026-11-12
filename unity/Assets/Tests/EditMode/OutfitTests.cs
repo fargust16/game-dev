@@ -135,6 +135,31 @@ namespace GameDev.Slice.Tests
             Assert.IsFalse(_outfit.IsWorn(shield));
         }
 
+        /// <summary>AN4, 10.2 §5b *Two weapons*: Shift and a click holds a one-handed melee weapon in the other hand.</summary>
+        [Test]
+        public void ASecondWeaponGoesInTheOtherHandBesideAOneHandedOne()
+        {
+            var greatsword = Give("greatsword");
+            var dagger = Give("dagger");
+            Assert.IsNull(_outfit.WearOffHand(greatsword), "a piece that pairs with nothing is put on as a click puts it");
+            Assert.AreSame(greatsword, _outfit[WearSlot.WeaponOne]);
+            Assert.AreEqual("ui.bag.fault.pair", _outfit.WearOffHand(dagger), "nothing goes beside a greatsword, and no other set holds a weapon");
+
+            var sword = Give("sword");
+            Assert.IsNull(_outfit.Wear(sword));
+            Assert.AreSame(sword, _outfit[WearSlot.WeaponTwo]);
+            Assert.IsNull(_outfit.WearOffHand(dagger));
+            Assert.AreSame(dagger, _outfit[WearSlot.OffHandTwo], "the dagger goes beside the sword");
+            Assert.IsNull(_outfit.WearOffHand(dagger), "already held");
+
+            var fighter = _outfit.Fighter(_rules, _sheet, _fists);
+            Assert.IsTrue(fighter.Second.Paired, "the second set is a pair");
+            Assert.AreSame(Asset<FightWeapon>("Weapons/Dagger.asset"), fighter.Second.OffWeapon);
+
+            Assert.IsNull(_outfit.TakeOff(sword));
+            Assert.IsNull(_outfit[WearSlot.OffHandTwo], "a weapon taken off takes the other hand's with it");
+        }
+
         [Test]
         public void AFirearmIsNeverHeldWithoutItsPouch()
         {

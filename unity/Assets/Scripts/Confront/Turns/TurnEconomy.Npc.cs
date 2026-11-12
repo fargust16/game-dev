@@ -88,7 +88,7 @@ namespace GameDev.Confront.Turns
                     continue;
                 }
 
-                var cost = c.Fighter.Weapon.AttackAp;
+                var cost = c.Fighter.BlowAp;
                 if (first || c.Intent == null || !c.Intent.Standing || c.Intent.Side == c.Side || c.Intent.Hidden)
                 {
                     c.Intent = Best(c, _foes);
@@ -259,7 +259,7 @@ namespace GameDev.Confront.Turns
             return n == 0 ? 0d : Blows(e) * sum / n;
         }
 
-        private int Blows(Combatant c) => Math.Max(1, _rules.FullAp(c.Fighter) / Math.Max(1, c.Fighter.Weapon.AttackAp));
+        private int Blows(Combatant c) => Math.Max(1, _rules.FullAp(c.Fighter) / Math.Max(1, c.Fighter.BlowAp));
 
         /// <summary>A blow's or a shot's chance times an ordinary hit's mean damage through the target's armour.</summary>
         private double ExpectedBlow(Combatant a, CombatCell from, Combatant t)
@@ -285,7 +285,7 @@ namespace GameDev.Confront.Turns
                 return false;
             }
 
-            var reach = _rules.FullAp(c.Fighter) - weapon.AttackAp;
+            var reach = _rules.FullAp(c.Fighter) - c.Fighter.BlowAp;
             var later = false;
             foreach (var f in _order)
             {
@@ -316,7 +316,7 @@ namespace GameDev.Confront.Turns
                 return false;
             }
 
-            var cost = c.Fighter.Weapon.AttackAp;
+            var cost = c.Fighter.BlowAp;
             var threatened = false;
             foreach (var f in _order)
             {
@@ -332,7 +332,7 @@ namespace GameDev.Confront.Turns
 
                 // One cell short of that enemy's reach (tactical_sim.py: steps − 1).
                 threatened |= Pending(f) && Melee(f) && !f.Helpless
-                    && StepsToSide(f.Cell, cell) - 1 <= _rules.FullAp(f.Fighter) - f.Fighter.Weapon.AttackAp;
+                    && StepsToSide(f.Cell, cell) - 1 <= _rules.FullAp(f.Fighter) - f.Fighter.BlowAp;
             }
 
             return threatened;

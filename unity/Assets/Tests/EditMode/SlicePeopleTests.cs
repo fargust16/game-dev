@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameDev.Locomotion;
 using GameDev.Slice.EditorTools;
+using GameDev.Slice.Fights;
 using GameDev.Slice.People;
 using NUnit.Framework;
 using UnityEditor;
@@ -62,8 +63,9 @@ namespace GameDev.Slice.Tests
 
         /// <summary>
         /// A standing person's controller plays Kevin Iglesias' clips (owner's second direction, 2026-11-11;
-        /// ANIMATION_PIPELINE_PLAN.md §8): its idle, the talk while Talking, and the fight's guard, blow, hit and death,
-        /// every clip Humanoid and a woman's from the women's takes. No Mixamo or Blender clip is left.
+        /// ANIMATION_PIPELINE_PLAN.md §8, §11): its idle, the talk while Talking, and the fight's guard, blow, load, hits,
+        /// knockback, getting up, Defensive Stance, crouch for mercy and deaths, from FightBeats' tables, every clip Humanoid
+        /// and a woman's from the women's takes, Quaternius' where Kevin Iglesias has none. No Mixamo or Blender clip is left.
         /// </summary>
         [TestCase(SlicePeopleModels.ManController, "Idle", false)]
         [TestCase(SlicePeopleModels.WomanController, "Idle", true)]
@@ -75,23 +77,29 @@ namespace GameDev.Slice.Tests
             var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
             Assert.IsNotNull(controller, path);
             var states = controller.layers[0].stateMachine.states.Select(s => s.state).ToDictionary(s => s.name);
-            foreach (var name in new[] { "Idle", "Walk", "Talk", "Fight", "Attack", "Hit", "Die" })
+            foreach (var name in new[] { "Idle", "Walk", "Talk", "Fight", "Attack", "Load", "Hit", "Die", "Knockback", "GetUp", "Stance", "Yield" })
             {
                 Assert.IsTrue(states.ContainsKey(name), $"{path} has {name}");
             }
 
             Assert.AreSame(SliceClips.Get(idle, female), states["Idle"].motion, $"{path} idles in {idle}");
-            CollectionAssert.IsSubsetOf(new[] { "Talking", "Fighting", "Weapon", "Attack", "Hit", "Down" }, controller.parameters.Select(p => p.name).ToList());
+            CollectionAssert.IsSubsetOf(new[] { "Talking", "Fighting", "Weapon", "Attack", "Hit", "Down", "Struck", "Death" }, controller.parameters.Select(p => p.name).ToList());
+            Assert.AreEqual(0f, states["Stance"].speed, "the Defensive Stance holds the Block clip still");
             foreach (var clip in controller.animationClips)
             {
                 Assert.IsTrue(clip.humanMotion, $"{clip.name} is Humanoid");
                 var clipPath = AssetDatabase.GetAssetPath(clip);
-                Assert.IsTrue(clipPath.StartsWith($"{SliceClips.KevinFolder}/{(female ? "Female" : "Male")}/"), $"{clip.name} is a Kevin Iglesias clip of the person's sex: {clipPath}");
+                Assert.IsTrue(clipPath.StartsWith($"{SliceClips.KevinFolder}/{(female ? "Female" : "Male")}/") || clipPath == SliceClips.Q1 || clipPath == SliceClips.Q2,
+                    $"{clip.name} is a Kevin Iglesias clip of the person's sex, or Quaternius': {clipPath}");
             }
 
-            var guard = (BlendTree)states["Fight"].motion;
-            Assert.AreEqual("Weapon", guard.blendParameter);
-            CollectionAssert.AreEqual(new[] { 1f, 2f, 3f, 4f, 5f }, guard.children.Select(c => c.threshold).ToArray(), "one guard a weapon kind");
+            foreach (var (name, parameter, uses) in new[] { ("Fight", "Weapon", FightBeats.Guards), ("Attack", "Weapon", FightBeats.Blows), ("Hit", "Struck", FightBeats.Hits), ("Die", "Death", FightBeats.Deaths) })
+            {
+                var tree = (BlendTree)states[name].motion;
+                Assert.AreEqual(parameter, tree.blendParameter, name);
+                CollectionAssert.AreEqual(Enumerable.Range(1, uses.Length).Select(i => (float)i).ToArray(), tree.children.Select(c => c.threshold).ToArray(), $"{name}: one clip a value");
+                CollectionAssert.AreEqual(uses.Select(u => SliceClips.Get(u, female)).ToArray(), tree.children.Select(c => c.motion).ToArray(), $"{name} plays FightBeats' table");
+            }
         }
 
         /// <summary>

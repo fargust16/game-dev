@@ -75,6 +75,9 @@ namespace GameDev.Confront.Turns
         /// <summary>It has attacked in this turn, so it cannot take a Defensive Stance.</summary>
         public bool Attacked { get; internal set; }
 
+        /// <summary>10.2 §5b *Two weapons*: its last blow was struck with the other hand's weapon.</summary>
+        public bool LastOffHand { get; internal set; }
+
         /// <summary>It gave its Reaction Attack since its own turn began, once a round from each enemy (10.2 §5b Position).</summary>
         internal bool Reacted { get; set; }
 

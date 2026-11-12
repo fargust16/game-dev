@@ -44,13 +44,14 @@ namespace GameDev.Confront.Turns
     /// </summary>
     public readonly struct TurnIntent
     {
-        private TurnIntent(IntentKind kind, CombatCell cell, int target, Treatment treatment = default, bool? success = null)
+        private TurnIntent(IntentKind kind, CombatCell cell, int target, Treatment treatment = default, bool? success = null, bool? offHand = null)
         {
             Kind = kind;
             Cell = cell;
             Target = target;
             Treatment = treatment;
             Success = success;
+            OffHand = offHand;
         }
 
         public IntentKind Kind { get; }
@@ -64,6 +65,12 @@ namespace GameDev.Confront.Turns
 
         /// <summary>A treatment's result already decided, by the player's Reaction Check (07.1 §8a); null rolls its Action Check.</summary>
         public bool? Success { get; }
+
+        /// <summary>
+        /// 10.2 §5b *Two weapons*: the hand an attack strikes with, true for the other hand's weapon; null lets the turns
+        /// choose the hand whose blow opens the most harmful mix of blows the AP left can buy.
+        /// </summary>
+        public bool? OffHand { get; }
 
         /// <summary>Entering Stealth Mode for 3 AP when no enemy's cone covers the fighter (10.3 §8, S3b.1).</summary>
         public static TurnIntent Hide => new TurnIntent(IntentKind.Hide, default, -1);
@@ -80,7 +87,7 @@ namespace GameDev.Confront.Turns
 
         public static TurnIntent MoveTo(CombatCell cell) => new TurnIntent(IntentKind.Move, cell, -1);
 
-        public static TurnIntent Attack(int target) => new TurnIntent(IntentKind.Attack, default, target);
+        public static TurnIntent Attack(int target, bool? offHand = null) => new TurnIntent(IntentKind.Attack, default, target, offHand: offHand);
 
         public static TurnIntent EndTurn => new TurnIntent(IntentKind.EndTurn, default, -1);
 
@@ -147,6 +154,12 @@ namespace GameDev.Confront.Turns
         /// Surrounded, higher ground, and for a shot the Point-Blank Shot and the target's cover (S3a.6).
         /// </summary>
         StrikeContext ContextFor(Combatant attacker, CombatCell from, Combatant target);
+
+        /// <summary>10.2 §5b *Two weapons*: whether a fighter holding two weapons would strike from a cell with the other hand's weapon, with the AP given left.</summary>
+        bool OffHandFor(Combatant c, Combatant target, CombatCell from, int ap);
+
+        /// <summary>The forecast of a blow from a cell, with the other hand's weapon when asked.</summary>
+        StrikeForecast ForecastFor(Combatant c, Combatant target, CombatCell from, bool offHand);
 
         /// <summary>Whether the attacker's weapon reaches the target from a cell: across a side for a blow, in range and in sight for a shot.</summary>
         bool ReachesFrom(Combatant attacker, CombatCell from, Combatant target);

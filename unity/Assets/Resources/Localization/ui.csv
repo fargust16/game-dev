@@ -181,15 +181,17 @@ ui.quality.rare,Rare,редкое
 ui.quality.epic,Epic,эпическое
 ui.quality.legendary,Legendary,легендарное
 "# Wearing and holding from the bag page (S5a.2; 19 §4.2, 10.2 §5b)"
-ui.hud.bag.hint,Click a piece to put it on or take it off.,Щелчок по вещи надевает её или снимает.
+ui.hud.bag.hint,"Click a piece to put it on or take it off; Shift and a click holds a one-handed weapon in the other hand.","Щелчок по вещи надевает её или снимает; Shift и щелчок берёт одноручное оружие во вторую руку."
 ui.hud.bag.worn, · worn, · надето
 ui.hud.bag.held, · set {0}, · набор {0}
+ui.hud.bag.held_off," · set {0}, other hand"," · набор {0}, вторая рука"
 ui.hud.bag.fit,", works at {0} %",", действует на {0} %"
 ui.bag.fault.fight,Nothing is put on or taken off in a fight.,В бою ничего не надеть и не снять.
 ui.bag.fault.not_worn,This is not worn.,Это не надевается.
 ui.bag.fault.firearm,A firearm is held only with a free Cartridge Pouch in the other hand.,Огнестрельное оружие держат только со свободной патронной сумкой в другой руке.
 ui.bag.fault.shield,"A shield goes only beside a sword, an axe or a mace.","Щит берут только к мечу, топору или булаве."
 ui.bag.fault.pouch,A Cartridge Pouch goes only beside a firearm.,Патронная сумка нужна только к огнестрельному оружию.
+ui.bag.fault.pair,"A second weapon goes only beside a dagger, a sword, an axe or a mace.","Второе оружие берут только к кинжалу, мечу, топору или булаве."
 "# The shops on Bawling Row and the modifiers in words (S5a.3; 19 §2.4, §6)"
 ui.prompt.trade,E  Trade,E  Торговать
 ui.prompt.shop_closed,Closed until {0}:00,Закрыто до {0}:00

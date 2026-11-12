@@ -38,6 +38,9 @@ namespace GameDev.Slice.Fights
         // The fight clips' parameters (ANIMATION_PIPELINE_PLAN.md §8), on the controllers SliceClips builds.
         private static readonly int FightingHash = Animator.StringToHash("Fighting");
         private static readonly int WeaponHash = Animator.StringToHash("Weapon");
+        private static readonly int StanceState = Animator.StringToHash("Stance");
+        private static readonly int GuardState = Animator.StringToHash("Fight");
+        private static readonly int YieldState = Animator.StringToHash("Yield");
         private static readonly int DownHash = Animator.StringToHash("Down");
 
         // Basic RPG Cursors' points, pixels from the top left of their 64-pixel images (measured on the images): the
@@ -159,6 +162,7 @@ namespace GameDev.Slice.Fights
             _beats = new FightBeats(Animated, Place);
             _beats.Landed += OnLanded;
             _beats.Started += OnBeatStarted;
+            _beats.Finished += OnBeatFinished;
             _outline = new Material(settings.GridMaterial) { name = "Fight Outlines" };
             _outline.SetColor("_BaseColor", OutlineColour);
             _camera = FightCamera.Create(transform, _outline);
@@ -616,20 +620,75 @@ namespace GameDev.Slice.Fights
                 return;
             }
 
-            animator.SetFloat(WeaponHash, Motion(c.Fighter.Weapon));
+            animator.SetFloat(WeaponHash, Motion(c.Fighter));
             animator.SetBool(DownHash, c.Fighter.Down);
             animator.SetBool(FightingHash, fighting);
+            Stance(c, animator, fighting);
         }
 
-        /// <summary>A Weapon Set changed or a stance taken or left: the body takes the guard of the weapon now in hand.</summary>
+        /// <summary>
+        /// AN4: a melee fighter with no shield in a Defensive Stance holds the Block clip at its height; out of the stance it
+        /// takes its guard again. A shield's guard and a firearm's aim are their stances already.
+        /// </summary>
+        private static void Stance(Combatant c, Animator animator, bool fighting)
+        {
+            if (!animator.HasState(0, StanceState))
+            {
+                return;
+            }
+
+            var motion = Mathf.RoundToInt(Motion(c.Fighter));
+            var holds = fighting && c.Standing && c.Fighter.Stance && motion != FightBeats.Shield && motion != FightBeats.Pistol && motion != FightBeats.Rifle;
+            var inStance = animator.GetCurrentAnimatorStateInfo(0).shortNameHash == StanceState;
+            if (holds && !inStance)
+            {
+                animator.CrossFadeInFixedTime(StanceState, 0.2f, 0, FightBeats.BlockPeak);
+            }
+            else if (!holds && inStance && fighting)
+            {
+                animator.CrossFadeInFixedTime(GuardState, 0.2f, 0);
+            }
+        }
+
+        /// <summary>A Weapon Set changed or a stance taken or left: the body takes the guard of the weapon now in hand, in its turn among the beats.</summary>
         private void OnGuardChanged(Combatant c)
         {
             if (_bodies.TryGetValue(c, out var body) && body != null && c.Standing)
             {
-                Guard(c, body, true);
+                _beats.Pose(body, () =>
+                {
+                    if (c.Standing)
+                    {
+                        Guard(c, body, true);
+                    }
+                });
             }
 
             _hud.MarkDirty();
+        }
+
+        /// <summary>A blow has played: its attacker takes back the pose it fights in, as a Defensive Stance after its Counterattack.</summary>
+        private void OnBeatFinished(FightBeats.Beat beat)
+        {
+            if (beat.AttackerKey is Combatant c && c.Standing && _bodies.TryGetValue(c, out var body) && Animated(body) is Animator animator)
+            {
+                Stance(c, animator, true);
+            }
+        }
+
+        /// <summary>AN4: one who asks for mercy crouches in its turn among the beats, until it is spared or the fight ends.</summary>
+        private void Crouch(Combatant c)
+        {
+            if (_bodies.TryGetValue(c, out var body) && Animated(body) is Animator animator && animator.HasState(0, YieldState))
+            {
+                _beats.Pose(body, () =>
+                {
+                    if (c.Standing)
+                    {
+                        animator.CrossFadeInFixedTime(YieldState, 0.3f, 0);
+                    }
+                });
+            }
         }
 
         /// <summary>The walk is shown cell by cell, from where the body stands.</summary>
@@ -659,7 +718,7 @@ namespace GameDev.Slice.Fights
             }
 
             _bodies.TryGetValue(target, out var targetBody);
-            _beats.Strike(body, targetBody, Motion(attacker.Fighter.Weapon), result, attacker, target);
+            _beats.Strike(body, targetBody, Motion(attacker.Fighter, result.OffHand), result, attacker, target);
         }
 
         private void OnLanded(FightBeats.Beat beat)
@@ -711,22 +770,40 @@ namespace GameDev.Slice.Fights
         }
 
         /// <summary>
-        /// The weapon's clips, 1 to 5 on the controllers' Weapon blend: sword, axe or mace (with a shield's guard),
-        /// greatsword, greataxe or maul, dagger, pistol, rifle.
+        /// The set's clips on the controllers' Weapon blends (<see cref="FightBeats"/>' values): a sword, an axe or a mace, a
+        /// two-handed weapon, a dagger, a pistol, a rifle, a weapon and a shield, and two weapons, whose blow is the main
+        /// hand's or, with <paramref name="offHand"/>, the other hand's.
         /// </summary>
-        private static float Motion(FightWeapon weapon)
+        private static float Motion(Fighter fighter, bool offHand = false)
         {
+            var set = fighter.Set;
+            var weapon = set.Weapon;
             if (weapon == null)
             {
-                return 1f;
+                return FightBeats.OneHand;
             }
 
             if (weapon.Ranged)
             {
-                return weapon.TwoHanded ? 5f : 4f;
+                return weapon.TwoHanded ? FightBeats.Rifle : FightBeats.Pistol;
             }
 
-            return weapon.TwoHanded ? 2f : weapon.TakesShield ? 1f : 3f;
+            if (weapon.TwoHanded)
+            {
+                return FightBeats.TwoHand;
+            }
+
+            if (set.Paired)
+            {
+                return offHand ? FightBeats.PairOff : FightBeats.PairMain;
+            }
+
+            if (set.OffHand != null && set.OffHand.Kind == OffHandKind.Shield)
+            {
+                return FightBeats.Shield;
+            }
+
+            return weapon.TakesShield ? FightBeats.OneHand : FightBeats.Dagger;
         }
 
         /// <summary>Two free cells the given distance from the player, as far apart as the ring gives, into <see cref="_ring"/>.</summary>

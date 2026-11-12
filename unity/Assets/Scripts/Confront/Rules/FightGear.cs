@@ -53,32 +53,47 @@ namespace GameDev.Confront.Rules
 
     /// <summary>
     /// A weapon and what its other hand holds (10.2 §5b): a shield only with a weapon that takes one, a sword, an axe or a
-    /// mace, and a firearm only with a Cartridge Pouch. An empty set is a second set the fighter does not carry.
+    /// mace, a firearm only with a Cartridge Pouch, and a second one-handed melee weapon only beside another (*Two
+    /// weapons*). An empty set is a second set the fighter does not carry.
     /// </summary>
     public readonly struct WeaponSet
     {
-        public WeaponSet(FightWeapon weapon, FightOffHand offHand = null)
+        public WeaponSet(FightWeapon weapon, FightOffHand offHand = null, FightWeapon offWeapon = null)
         {
             Weapon = weapon;
             OffHand = offHand;
+            OffWeapon = offWeapon;
         }
 
+        /// <summary>The main hand's weapon.</summary>
         public FightWeapon Weapon { get; }
 
         public FightOffHand OffHand { get; }
 
-        public bool IsEmpty => Weapon == null && OffHand == null;
+        /// <summary>10.2 §5b *Two weapons*: the other hand's one-handed melee weapon, or null.</summary>
+        public FightWeapon OffWeapon { get; }
 
-        public float Weight => (Weapon != null ? Weapon.Weight : 0f) + (OffHand != null ? OffHand.Weight : 0f);
+        /// <summary>A one-handed melee weapon in each hand.</summary>
+        public bool Paired => OffWeapon != null;
+
+        public bool IsEmpty => Weapon == null && OffHand == null && OffWeapon == null;
+
+        public float Weight => (Weapon != null ? Weapon.Weight : 0f) + (OffHand != null ? OffHand.Weight : 0f) + (OffWeapon != null ? OffWeapon.Weight : 0f);
 
         private bool Shielded => OffHand != null && OffHand.Guard != Guard.None;
 
-        /// <summary>The set's answer to a melee hit: a shield's block over the weapon's own guard.</summary>
-        public Guard Guard => Shielded ? OffHand.Guard : Weapon.Guard;
+        /// <summary>The weapon that parries: two weapons parry with the better of the two.</summary>
+        private FightWeapon Parrying => Paired && OffWeapon.GuardChance > Weapon.GuardChance ? OffWeapon : Weapon;
 
-        public float GuardChance => Shielded ? OffHand.GuardChance : Weapon.GuardChance;
+        /// <summary>The set's answer to a melee hit: a shield's block over the weapon's own guard, or the better weapon's parry.</summary>
+        public Guard Guard => Shielded ? OffHand.Guard : Parrying.Guard;
 
-        public float GuardStops => Shielded ? OffHand.GuardStops : Weapon.GuardStops;
+        public float GuardChance => Shielded ? OffHand.GuardChance : Parrying.GuardChance;
+
+        public float GuardStops => Shielded ? OffHand.GuardStops : Parrying.GuardStops;
+
+        /// <summary>A weapon that may go in either hand beside another: a dagger, a sword, an axe or a mace.</summary>
+        public static bool OneHandedMelee(FightWeapon weapon) => weapon != null && !weapon.Ranged && !weapon.TwoHanded;
 
         /// <summary>Why the set cannot be held, or null when it can.</summary>
         public string Fault()
@@ -102,6 +117,16 @@ namespace GameDev.Confront.Rules
             if (OffHand != null && OffHand.Kind == OffHandKind.Shield && !Weapon.TakesShield)
             {
                 return $"a shield goes only with a sword, an axe or a mace, not {Weapon.name}";
+            }
+
+            if (OffWeapon != null && OffHand != null)
+            {
+                return $"the other hand holds {OffWeapon.name} or {OffHand.name}, not both";
+            }
+
+            if (OffWeapon != null && (!OneHandedMelee(Weapon) || !OneHandedMelee(OffWeapon)))
+            {
+                return $"two weapons are one-handed melee weapons, not {Weapon.name} and {OffWeapon.name}";
             }
 
             return null;

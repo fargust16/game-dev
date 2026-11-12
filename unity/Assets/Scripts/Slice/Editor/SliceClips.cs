@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using GameDev.Slice.Fights;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -197,11 +198,6 @@ namespace GameDev.Slice.EditorTools
             Q("Carry", Q2, "Walk_Carry_Loop", true),
             Q("OpenChest", Q2, "Chest_Open"),
         };
-
-        /// <summary>The guard and the blow of each Weapon value, 1 to 5; the dagger guards and strikes as a one-handed weapon.</summary>
-        private static readonly string[] Guards = { "Guard1H", "Guard2H", "Guard1H", "PistolAim", "RifleAim" };
-
-        private static readonly string[] Blows = { "Attack1H", "Attack2H", "Attack1H", "PistolShot", "RifleShot" };
 
         public static Entry EntryOf(string use)
         {
@@ -645,24 +641,46 @@ namespace GameDev.Slice.EditorTools
             controller.AddParameter("Attack", AnimatorControllerParameterType.Trigger);
             controller.AddParameter("Hit", AnimatorControllerParameterType.Trigger);
             controller.AddParameter("Down", AnimatorControllerParameterType.Bool);
+            controller.AddParameter(new AnimatorControllerParameter { name = "Struck", type = AnimatorControllerParameterType.Float, defaultFloat = 1f });
+            controller.AddParameter(new AnimatorControllerParameter { name = "Death", type = AnimatorControllerParameterType.Float, defaultFloat = 1f });
         }
 
         /// <summary>
-        /// The fight on <paramref name="home"/>: into the guard while Fighting, the blow on Attack, the hit on Hit from
-        /// anywhere unless Down, and the death while Down, out of which only a body no longer down comes back.
+        /// The fight on <paramref name="home"/> (AN4, pipeline plan §11), from <see cref="FightBeats"/>' tables: the guard of
+        /// each Weapon value while Fighting, its blow on Attack or cross-faded into, a shot through its load back to the
+        /// guard; the hits on the Struck value, the hit on Hit from anywhere unless Down; the knockback of a stun and the
+        /// getting up after it; the Defensive Stance, the Block clip held still at the height the code enters it at; the
+        /// crouch of one asking for mercy; and the deaths on the Death value while Down, out of which a body no longer down
+        /// gets up.
         /// </summary>
         private static void Fight(AnimatorController controller, AnimatorState home, bool female)
         {
             var machine = controller.layers[0].stateMachine;
-            var guard = WeaponBlend(controller, "Fight", Guards, female);
-            var blow = WeaponBlend(controller, "Attack", Blows, female);
-            var hit = State(machine, "Hit", Get("Hit", female), new Vector3(820f, 120f));
-            var die = State(machine, "Die", Get("Die", female), new Vector3(820f, 240f));
+            var guard = Blend(controller, "Fight", "Weapon", FightBeats.Guards, female);
+            var blow = Blend(controller, "Attack", "Weapon", FightBeats.Blows, female);
+            var load = Blend(controller, "Load", "Weapon", FightBeats.Loads.Select((l, i) => l ?? FightBeats.Guards[i]).ToArray(), female);
+            var hit = Blend(controller, "Hit", "Struck", FightBeats.Hits, female);
+            var die = Blend(controller, "Die", "Death", FightBeats.Deaths, female);
+            var knock = State(machine, "Knockback", Get("Knockback", female), new Vector3(820f, 360f));
+            var getUp = State(machine, "GetUp", Get("GetUp", female), new Vector3(1080f, 360f));
+            var stance = State(machine, "Stance", Get("Block", female), new Vector3(560f, 360f));
+            stance.speed = 0f;
+            var yield = State(machine, "Yield", Get("Crouch", female), new Vector3(560f, 480f));
             On(home, guard, 0.25f, "Fighting", true);
             On(guard, home, 0.3f, "Fighting", false);
             Transition(guard, blow, 0.1f).AddCondition(AnimatorConditionMode.If, 0f, "Attack");
-            Exit(blow, guard, 0.9f, 0.15f);
+            var melee = Exit(blow, guard, 0.9f, 0.15f);
+            melee.AddCondition(AnimatorConditionMode.Less, FightBeats.Pistol - 0.5f, "Weapon");
+            Exit(blow, guard, 0.9f, 0.15f).AddCondition(AnimatorConditionMode.Greater, FightBeats.Rifle + 0.5f, "Weapon");
+            var shot = Exit(blow, load, 0.95f, 0.08f);
+            shot.AddCondition(AnimatorConditionMode.Greater, FightBeats.Pistol - 0.5f, "Weapon");
+            shot.AddCondition(AnimatorConditionMode.Less, FightBeats.Rifle + 0.5f, "Weapon");
+            Exit(load, guard, 0.9f, 0.2f);
             Exit(hit, guard, 0.85f, 0.15f);
+            Exit(knock, getUp, 0.95f, 0.1f);
+            Exit(getUp, guard, 0.9f, 0.2f);
+            On(stance, home, 0.3f, "Fighting", false);
+            On(yield, home, 0.4f, "Fighting", false);
 
             var toHit = machine.AddAnyStateTransition(hit);
             toHit.duration = 0.05f;
@@ -672,13 +690,14 @@ namespace GameDev.Slice.EditorTools
             toDie.duration = 0.15f;
             toDie.canTransitionToSelf = false;
             toDie.AddCondition(AnimatorConditionMode.If, 0f, "Down");
-            On(die, home, 0.3f, "Down", false);
+            On(die, getUp, 0.2f, "Down", false);
         }
 
-        private static AnimatorState WeaponBlend(AnimatorController controller, string name, string[] uses, bool female)
+        /// <summary>A blend tree on <paramref name="parameter"/>, each use at its place in the table from 1.</summary>
+        private static AnimatorState Blend(AnimatorController controller, string name, string parameter, string[] uses, bool female)
         {
             var state = controller.CreateBlendTreeInController(name, out var tree, 0);
-            tree.blendParameter = "Weapon";
+            tree.blendParameter = parameter;
             tree.useAutomaticThresholds = false;
             for (var i = 0; i < uses.Length; i++)
             {
@@ -756,12 +775,13 @@ namespace GameDev.Slice.EditorTools
         private static void On(AnimatorState from, AnimatorState to, float duration, string parameter, bool value) =>
             Transition(from, to, duration).AddCondition(value ? AnimatorConditionMode.If : AnimatorConditionMode.IfNot, 0f, parameter);
 
-        private static void Exit(AnimatorState from, AnimatorState to, float exitTime, float duration)
+        private static AnimatorStateTransition Exit(AnimatorState from, AnimatorState to, float exitTime, float duration)
         {
             var t = from.AddTransition(to);
             t.hasExitTime = true;
             t.exitTime = exitTime;
             t.duration = duration;
+            return t;
         }
     }
 }

@@ -1,12 +1,12 @@
 # Animation Pipeline — Kevin Iglesias and Quaternius to Unity
 
-Version: 0.11
+Version: 0.12
 
 Status: Draft — the owner's second direction of 2026-11-11 (§0) and its clip map (§8); §1–§7 are the withdrawn Mixamo and Blender pipeline
 
 Created: 2026-11-10
 
-Last Updated: 2026-11-12 (§10: AN3, the work played to its key frame for every Reaction Check: the swing, the patch, the anvil, the kneel and the pocket; §8: theft on the crouched reach, the keys of the lock's and brewing's clips measured. Earlier: §9: AN2, the player's eight-way movement facing the camera, each clip at the pace its feet measure, the turn on the spot and the woman player's own takes. Earlier: §8: the clip map of AN1: every use's clip from Kevin Iglesias' FREE packs or Quaternius' Universal Animation Library 1 and 2, each work clip's key frame measured, the Mixamo and Blender clips deleted. Earlier: §0: the owner's second direction: Kevin Iglesias back, Quaternius for the gaps, Mixamo and Blender out, the character facing the camera, checks at the key frame. Earlier: §5 *The play test of 2026-11-11*: one shared avatar for the Mixamo files and a T-pose rest for the Blender clips, the movement state machine, the jump's landing, the blow's timing per weapon, the blacksmith's hammer, anvil and stump, and the sources. Earlier: §5 A fight: the walk in a fight and the hit or the death at the blow's impact, shown beat by beat by S3a.5's `FightBeats`. Earlier: 2026-11-10: §3, §5, §6: A3's first four clips, Mining, Chopping, Hammering and Surrender, made in Blender by a script that is their source; the blacksmith hammers at the anvil; the rest of A3 waits for its actions. Earlier: §5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
+Last Updated: 2026-11-12 (§11: AN4, the fight: one table for the code and the controllers, two weapons' right and left blows, a shield, shots through their loads, hits, knockback, deaths, the Defensive Stance, Yield, and each ability's cast chosen for S5b. Earlier: §10: AN3, the work played to its key frame for every Reaction Check: the swing, the patch, the anvil, the kneel and the pocket; §8: theft on the crouched reach, the keys of the lock's and brewing's clips measured. Earlier: §9: AN2, the player's eight-way movement facing the camera, each clip at the pace its feet measure, the turn on the spot and the woman player's own takes. Earlier: §8: the clip map of AN1: every use's clip from Kevin Iglesias' FREE packs or Quaternius' Universal Animation Library 1 and 2, each work clip's key frame measured, the Mixamo and Blender clips deleted. Earlier: §0: the owner's second direction: Kevin Iglesias back, Quaternius for the gaps, Mixamo and Blender out, the character facing the camera, checks at the key frame. Earlier: §5 *The play test of 2026-11-11*: one shared avatar for the Mixamo files and a T-pose rest for the Blender clips, the movement state machine, the jump's landing, the blow's timing per weapon, the blacksmith's hammer, anvil and stump, and the sources. Earlier: §5 A fight: the walk in a fight and the hit or the death at the blow's impact, shown beat by beat by S3a.5's `FightBeats`. Earlier: 2026-11-10: §3, §5, §6: A3's first four clips, Mining, Chopping, Hammering and Surrender, made in Blender by a script that is their source; the blacksmith hammers at the anvil; the rest of A3 waits for its actions. Earlier: §5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1–§2, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -386,3 +386,37 @@ The owner downloads; the agent imports, renames each clip by its use, checks it 
 - **In a fight** First Aid's bar shows as soon as it is chosen and its AP are in hand, the treatment then given with its result (`TurnIntent.Treat` carries it); Space for the bar does not also end the turn. No kneel is played (open for the owner, 99 VS-ANIM).
 - **Not built yet:** a lock and brewing; their clips' key frames are in §8.
 - **Checked by** EditMode `GatheringTests`, `RemainsTests`, `FirstAidTests`, `EnvironmentConditionTests` and `SlicePeopleTests.ThePlayerWorksEachClipToItsKeyFrame`; PlayMode `GatheringPlayTests` (a tree and a herb patch), `TheftPlayTests` (a purse lifted, a theft noticed, a try called off), `BeastPlayTests` (skinning), `ShopPlayTests` (the anvil) and `S5aAcceptancePlayTests`.
+
+## 11. Combat (AN4, 2026-11-12)
+
+- **One table for the code and the controllers.** `FightBeats` holds each Weapon value's guard, blow and load, the hits and the deaths, and `SliceClips` builds every fighter's blend trees from those tables, so a clip changed in one place is changed in both. The Weapon values: 1 a sword, an axe or a mace; 2 a two-handed weapon; 3 a dagger; 4 a pistol; 5 a rifle; 6 a weapon and a shield; 7 and 8 two weapons, the right hand's blow and the left's.
+- **The guards and the blows** (§8): Guard1H and Attack1H for one hand, Guard2H and Attack2H for two, ShieldGuard and ShieldAttack for a shield, PistolAim and RifleAim with their shots. Two weapons guard as one hand and strike with Attack1H for the main hand and Attack1HLeft for the other, the hand the turns chose ([10.2](../../../10.2%20Combat%20System%20Draft.md) §5b *Two weapons*). A shot plays its shot and then its load, since the shot includes loading, and the beat holds until the load is over.
+- **Measured** by `SliceAnimationCheck` on the player man (`Logs/SliceSurvey/animation_check.txt`): a blow's contact is the frame the striking hand is furthest out ahead of the chest, the left hand for the left's blow; a shot's is the frame the hand jumps back fastest; a hit's onset is the first frame the head moves faster than 0.6 m/s, entered 0.03 s before.
+
+  | Weapon value | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+  |---|---:|---:|---:|---:|---:|---:|---:|---:|
+  | Contact, s | 0.33 | 0.57 | 0.33 | 0.03 | 0.10 | 0.37 | 0.33 | 0.40 |
+  | The beat holds after it, s | 0.65 | 0.65 | 0.65 | 2.47 | 2.40 | 0.65 | 0.65 | 0.65 |
+
+  Hits: Hit 0.14 s, HitChest 0.04 s, HitHead 0, Hit2 0, GuardHit 0.04 s. The Block clip's right hand is highest over the chest at 0.63 s; the knockback moves from its first frame; GetUp lasts 1.53 s.
+- **Hits.** A plain hit plays Hit, HitChest and HitHead in turn, a critical hit Hit2, a hit through a guard that failed GuardHit, each entered at its onset at the blow's contact. A parry or a block that holds plays Block so that its height, 0.63 s in, meets the blow. A stun knocks the fighter down with Knockback, and it gets up with GetUp.
+- **Deaths.** Die, Die2 and Die3 in turn. A body brought back from Down gets up with GetUp.
+- **The Defensive Stance.** A melee fighter with no shield in the stance holds the Block clip still at its height until its next turn, and after its Counterattack takes the stance again; a shield's guard and a firearm's aim are their stances already.
+- **Yield.** One who asks for mercy crouches, Quaternius' Crouch_Idle, in its turn among the beats, until it is spared or the fight ends; neither pack has a surrender.
+- **Beats.** A pose, a set changed, a stance taken or mercy asked, waits its turn among the walks and blows, so a body never changes pose in the middle of another's blow.
+- **Casts, for S5b.** The abilities are not in the game yet, so no cast is wired. Each has its clip chosen now, from §8:
+
+  | Arcana | Ability | Cast |
+  |---|---|---|
+  | Жрица | Дрёма | CastDirectRight at the target; the sleeper lies in the last pose of Die and gets up with GetUp when damage or an ally wakes it |
+  | Жрица | Укол разума | SpellShot, the quick cast, at the target |
+  | Жрица | Завеса | CastOmni |
+  | Жрица | Чужой сон | Kneel's touch, its check at 4.30 s as First Aid's |
+  | Император | Не сдвинуть | CastEnter into CastIdle, held until its next turn |
+  | Император | Стой! | CastCall at the target |
+  | Император | Столп | CastOmni |
+  | Император | Сокрушение | CastDirect2H as the blow, its contact to be measured |
+
+  Опора, Родство, Чуткое ухо and Внушение are passive or spoken and play no cast.
+- **Not built yet:** the casts above and Дрёма's sleep; a key for the player to choose the hand of a blow (99 VS-ANIM).
+- **Checked by** EditMode `TwoWeaponsTests` (a pair's rules, its parry and weight, a sword and a dagger striking 4 + 3 + 3 in 10 AP, two swords taking turns, a hand asked for), `OutfitTests.ASecondWeaponGoesInTheOtherHandBesideAOneHandedOne` and `SlicePeopleTests.AStandingPersonTalksAndFightsInKevinIglesiasClips` (every fight state and blend from `FightBeats`' tables); PlayMode `FightTurnPlayTests`, `LeavingFightPlayTests`, `BeastPlayTests`, `S3aAcceptanceTests` and `S5aAcceptancePlayTests`.

@@ -19,14 +19,46 @@ namespace GameDev.Slice.Fights
         public const float StrikeHold = 0.65f;
         public const float TurnSpeed = 720f;
 
-        // Measured (SliceAnimationCheck, owner's play test of 2026-11-11: the hit came late): the moment each blow clip
-        // reaches its target, s into the clip, by the Weapon value 1–5 (sword slash, greatsword slash, stab, pistol shot,
-        // rifle shot); and the Hit clip's first frame of motion, 0.13 s, entered a little before it so the body answers
-        // the frame the blow lands. Blows and hits are cross-faded into directly, never through the guard's trigger.
-        private static readonly float[] Contact = { 0.57f, 0.90f, 0.53f, 0.37f, 0.23f };
-        public const float HitOnset = 0.10f;
+        // AN4 (pipeline plan §11): the Weapon values of the controllers' guard, blow and load blends, which SliceClips
+        // builds from these tables: a sword, an axe or a mace; a two-handed weapon; a dagger; a pistol; a rifle; a weapon
+        // and a shield; two weapons, the main hand's blow and the other hand's.
+        public const int OneHand = 1;
+        public const int TwoHand = 2;
+        public const int Dagger = 3;
+        public const int Pistol = 4;
+        public const int Rifle = 5;
+        public const int Shield = 6;
+        public const int PairMain = 7;
+        public const int PairOff = 8;
+
+        public static readonly string[] Guards = { "Guard1H", "Guard2H", "Guard1H", "PistolAim", "RifleAim", "ShieldGuard", "Guard1H", "Guard1H" };
+        public static readonly string[] Blows = { "Attack1H", "Attack2H", "Attack1H", "PistolShot", "RifleShot", "ShieldAttack", "Attack1H", "Attack1HLeft" };
+
+        /// <summary>A shot's load, played after it (10.2 §5b: the shot includes loading); null where nothing loads.</summary>
+        public static readonly string[] Loads = { null, null, null, "PistolLoad", "RifleLoad", null, null, null };
+
+        // The hit blend's Struck values: three plain hits in turn, a critical hit, a hit through a guard that failed, and a
+        // parry or a block that held, raised before the blow lands. The death blend's Death values, in turn.
+        public const int HitPlain = 1;
+        public const int HitCritical = 4;
+        public const int HitThroughGuard = 5;
+        public const int HitGuarded = 6;
+        public static readonly string[] Hits = { "Hit", "HitChest", "HitHead", "Hit2", "GuardHit", "Block" };
+        public static readonly string[] Deaths = { "Die", "Die2", "Die3" };
+
+        // Measured by SliceAnimationCheck on the player man (Logs/SliceSurvey/animation_check.txt, AN4): the moment each
+        // blow reaches its target, s into the clip, by Weapon value (the striking hand furthest out, a shot's recoil);
+        // how long a shot's beat holds after it, the rest of the shot and the whole load; the first frame of motion of
+        // each hit, entered a little before it so the body answers the frame the blow lands; the Block clip's height,
+        // where a guard that holds meets the blow and the Defensive Stance stands; and the knockback's onset.
+        private static readonly float[] Contact = { 0.33f, 0.57f, 0.33f, 0.03f, 0.10f, 0.37f, 0.33f, 0.40f };
+        private static readonly float[] ShotHold = { 0f, 0f, 0f, 2.47f, 2.40f, 0f, 0f, 0f };
+        private static readonly float[] Onset = { 0.14f, 0.04f, 0f, 0f, 0.04f, 0f };
+        public const float BlockPeak = 0.63f;
+        public const float KnockOnset = 0f;
         private const float BlowFade = 0.08f;
         private const float HitFade = 0.04f;
+        private const float GuardFade = 0.06f;
 
         private static readonly int FightingHash = Animator.StringToHash("Fighting");
         private static readonly int SpeedHash = Animator.StringToHash("Speed");
@@ -35,10 +67,13 @@ namespace GameDev.Slice.Fights
         private static readonly int HitHash = Animator.StringToHash("Hit");
         private static readonly int DownHash = Animator.StringToHash("Down");
         private static readonly int WeaponHash = Animator.StringToHash("Weapon");
+        private static readonly int StruckHash = Animator.StringToHash("Struck");
+        private static readonly int DeathHash = Animator.StringToHash("Death");
         private static readonly int WalkState = Animator.StringToHash("Walk");
         private static readonly int FightState = Animator.StringToHash("Fight");
         private static readonly int AttackState = Animator.StringToHash("Attack");
         private static readonly int HitState = Animator.StringToHash("Hit");
+        private static readonly int KnockbackState = Animator.StringToHash("Knockback");
 
         private readonly Queue<Beat> _beats = new Queue<Beat>();
         private readonly Func<Transform, Animator> _animated;
@@ -46,8 +81,12 @@ namespace GameDev.Slice.Fights
         private Beat _current;
         private float _time;
         private float _impact;
+        private float _hold;
         private int _leg;
         private bool _struck;
+        private bool _guarded;
+        private int _hits;
+        private int _deaths;
 
         /// <param name="animated">The body's Animator with the fight clips, or null.</param>
         /// <param name="place">Sets a body where it stands and how it faces.</param>
@@ -68,6 +107,9 @@ namespace GameDev.Slice.Fights
 
         /// <summary>Raised as a beat begins, a walk or a blow, for bodies that play their own clips (S3b.2's beasts).</summary>
         public event Action<Beat> Started;
+
+        /// <summary>Raised as a blow's beat ends, so its attacker can take back the pose it fights in (a Defensive Stance).</summary>
+        public event Action<Beat> Finished;
 
         public void Clear()
         {
@@ -90,6 +132,15 @@ namespace GameDev.Slice.Fights
             }
 
             _beats.Enqueue(beat);
+        }
+
+        /// <summary>A change of a body's pose in its turn among the beats, such as a stance taken or mercy asked.</summary>
+        public void Pose(Transform body, Action apply)
+        {
+            if (body != null && apply != null)
+            {
+                _beats.Enqueue(new Beat { Body = body, Apply = apply });
+            }
         }
 
         /// <summary>The attacker turns to its target and strikes; at the impact the target is hit, or falls.</summary>
@@ -128,6 +179,14 @@ namespace GameDev.Slice.Fights
                     _time = 0f;
                     _leg = 0;
                     _struck = false;
+                    _guarded = false;
+                    if (_current.Apply != null)
+                    {
+                        _current.Apply();
+                        _current = null;
+                        continue;
+                    }
+
                     Begin(_current);
                 }
 
@@ -139,6 +198,7 @@ namespace GameDev.Slice.Fights
         {
             Started?.Invoke(beat);
             _impact = Impact;
+            _hold = StrikeHold;
             var animator = beat.Body != null ? _animated(beat.Body) : null;
             if (animator == null)
             {
@@ -172,6 +232,7 @@ namespace GameDev.Slice.Fights
                 animator.SetBool(FightingHash, true);
                 animator.CrossFadeInFixedTime(AttackState, BlowFade, 0);
                 _impact = ContactOf(beat.Weapon);
+                _hold = HoldOf(beat.Weapon);
                 return;
             }
 
@@ -183,6 +244,13 @@ namespace GameDev.Slice.Fights
         {
             var i = Mathf.RoundToInt(weapon) - 1;
             return i >= 0 && i < Contact.Length ? Contact[i] : Impact;
+        }
+
+        /// <summary>How long a blow's beat holds after its contact, s: a shot's rest and its whole load, else <see cref="StrikeHold"/>.</summary>
+        public static float HoldOf(float weapon)
+        {
+            var i = Mathf.RoundToInt(weapon) - 1;
+            return i >= 0 && i < ShotHold.Length && ShotHold[i] > 0f ? ShotHold[i] : StrikeHold;
         }
 
         /// <summary>Moves the body along its points; returns the time left over once it arrives.</summary>
@@ -262,35 +330,71 @@ namespace GameDev.Slice.Fights
 
             var before = _time;
             _time += dt;
+            if (!_guarded && beat.Result.Guarded && _time >= _impact - BlockPeak)
+            {
+                // A parry or a block that holds is raised so that its height meets the blow.
+                _guarded = true;
+                React(beat.Target, HitGuarded, Mathf.Max(0f, BlockPeak - _impact), GuardFade);
+            }
+
             if (!_struck && _time >= _impact)
             {
                 _struck = true;
                 Land(beat);
             }
 
-            if (_time < _impact + StrikeHold)
+            if (_time < _impact + _hold)
             {
                 return 0f;
             }
 
             _current = null;
-            return _time - Mathf.Max(before, _impact + StrikeHold);
+            Finished?.Invoke(beat);
+            return _time - Mathf.Max(before, _impact + _hold);
         }
 
+        /// <summary>The target into one of its hits, at the given point of the clip.</summary>
+        private void React(Transform target, int kind, float offset, float fade)
+        {
+            var struck = target != null ? _animated(target) : null;
+            if (struck == null || !struck.HasState(0, HitState))
+            {
+                return;
+            }
+
+            struck.SetFloat(StruckHash, kind);
+            struck.CrossFadeInFixedTime(HitState, fade, 0, offset);
+        }
+
+        /// <summary>
+        /// The blow lands: the target falls in one of its deaths in turn; a stun knocks it down, and it gets up; a critical hit,
+        /// a hit through a guard that failed, or one of three plain hits in turn; a guard that held is already up.
+        /// </summary>
         private void Land(Beat beat)
         {
             var struck = beat.Target != null ? _animated(beat.Target) : null;
+            var result = beat.Result;
             if (struck != null)
             {
-                if (beat.Result.Downed)
+                if (result.Downed)
                 {
+                    struck.SetFloat(DeathHash, 1 + (_deaths++ % Deaths.Length));
                     struck.SetBool(DownHash, true);
                 }
-                else if (beat.Result.Damage > 0d && struck.HasState(0, HitState))
+                else if (result.Guarded)
                 {
-                    struck.CrossFadeInFixedTime(HitState, HitFade, 0, HitOnset);
+                    // raised before the blow
                 }
-                else if (beat.Result.Damage > 0d)
+                else if (result.Stunned && struck.HasState(0, KnockbackState))
+                {
+                    struck.CrossFadeInFixedTime(KnockbackState, HitFade, 0, KnockOnset);
+                }
+                else if (result.Damage > 0d && struck.HasState(0, HitState))
+                {
+                    var kind = result.Critical ? HitCritical : result.GuardTried ? HitThroughGuard : HitPlain + (_hits++ % 3);
+                    React(beat.Target, kind, Onset[kind - 1], HitFade);
+                }
+                else if (result.Damage > 0d)
                 {
                     struck.SetTrigger(HitHash);
                 }
@@ -319,6 +423,7 @@ namespace GameDev.Slice.Fights
             internal Vector3[] Points;
             internal Transform Target;
             internal float Weapon;
+            internal Action Apply;
 
             public StrikeResult Result { get; internal set; }
 

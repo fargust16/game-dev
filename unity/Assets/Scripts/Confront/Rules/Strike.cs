@@ -99,5 +99,8 @@ namespace GameDev.Confront.Rules
 
         /// <summary>The target fell to 0 HP or below.</summary>
         public bool Downed;
+
+        /// <summary>10.2 §5b *Two weapons*: the blow was struck with the other hand's weapon.</summary>
+        public bool OffHand;
     }
 }

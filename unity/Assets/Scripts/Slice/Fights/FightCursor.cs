@@ -102,9 +102,13 @@ namespace GameDev.Slice.Fights
             {
                 Steps = _turns.PathToStrike(player, Target, _path);
                 var from = Steps > 0 ? _path[_path.Count - 1] : player.Cell;
-                Cost = Steps < 0 ? 0 : _turns.WalkAp(player, Steps) + player.Fighter.Weapon.AttackAp;
+                // 10.2 §5b *Two weapons*: the blow of the hand the turns will choose with the AP the walk leaves.
+                var walk = Steps < 0 ? 0 : _turns.WalkAp(player, Steps);
+                var offHand = Steps >= 0 && _turns.OffHandFor(player, Target, from, _turns.ApLeft - walk);
+                var set = player.Fighter.Set;
+                Cost = Steps < 0 ? 0 : walk + (offHand ? set.OffWeapon : set.Weapon).AttackAp;
                 Affordable = Steps >= 0 && Cost <= _turns.ApLeft;
-                Forecast = _rules.Forecast(player.Fighter, Target.Fighter, _turns.ContextFor(player, from, Target));
+                Forecast = _turns.ForecastFor(player, Target, from, offHand);
                 Provokes = Steps > 0 && Leaves(player);
                 Show(Affordable ? Shape.Attack : Shape.AttackBlocked, Affordable ? Steps : Math.Min(Math.Max(Steps, 0), _turns.ApLeft));
                 return;

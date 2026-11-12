@@ -144,7 +144,7 @@ namespace GameDev.Confront.Turns
                     return true;
                 case IntentKind.Attack:
                     var target = Find(intent.Target);
-                    return target != null && Strike(c, target);
+                    return target != null && Strike(c, target, intent.OffHand);
                 case IntentKind.Traverse:
                     return Traverse(c, intent.Cell);
                 case IntentKind.Treat:
@@ -678,11 +678,18 @@ namespace GameDev.Confront.Turns
             return c.Standing;
         }
 
-        private bool Strike(Combatant c, Combatant target)
+        private bool Strike(Combatant c, Combatant target, bool? offHand = null)
         {
-            var weapon = c.Fighter.Weapon;
-            if (weapon == null || !target.Standing || target.Side == c.Side || ApLeft < weapon.AttackAp || !Reaches(c, target))
+            if (c.Fighter.Set.Weapon == null || !target.Standing || target.Side == c.Side)
             {
+                return false;
+            }
+
+            c.Fighter.OffHand = c.Fighter.Set.Paired && (offHand ?? Hand(c, target, c.Cell, ApLeft));
+            var weapon = c.Fighter.Weapon;
+            if (ApLeft < weapon.AttackAp || !Reaches(c, target))
+            {
+                c.Fighter.OffHand = false;
                 return false;
             }
 
@@ -693,6 +700,9 @@ namespace GameDev.Confront.Turns
             var context = ContextFor(c, c.Cell, target);
             context.Stealth = c.Hidden; // 10.3 §7: an attack from Stealth Mode, which it ends
             var result = _rules.Strike(c.Fighter, target.Fighter, context, _rolls);
+            result.OffHand = c.Fighter.OffHand;
+            c.LastOffHand = result.OffHand;
+            c.Fighter.OffHand = false;
             Afflict(target, result);
             if (target.Fighter.Down)
             {
@@ -709,6 +719,61 @@ namespace GameDev.Confront.Turns
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// 10.2 §5b *Two weapons*: whether <paramref name="c"/>, holding two weapons, would strike <paramref name="target"/>
+        /// from <paramref name="from"/> with the other hand's weapon, with <paramref name="ap"/> left; the fight cursor
+        /// shows that blow.
+        /// </summary>
+        public bool OffHandFor(Combatant c, Combatant target, CombatCell from, int ap) =>
+            c != null && target != null && c.Fighter.Set.Paired && Hand(c, target, from, ap);
+
+        /// <summary>The forecast of <paramref name="c"/>'s blow at <paramref name="target"/> from <paramref name="from"/>, with the other hand's weapon when <paramref name="offHand"/>.</summary>
+        public StrikeForecast ForecastFor(Combatant c, Combatant target, CombatCell from, bool offHand)
+        {
+            c.Fighter.OffHand = offHand && c.Fighter.Set.Paired;
+            var forecast = _rules.Forecast(c.Fighter, target.Fighter, ContextFor(c, from, target));
+            c.Fighter.OffHand = false;
+            return forecast;
+        }
+
+        /// <summary>
+        /// 10.2 §5b *Two weapons*: the hand to strike with, true for the other hand's weapon: the first blow of the mix of
+        /// blows <paramref name="ap"/> can buy that does most harm, the main hand's first when the mix holds both.
+        /// </summary>
+        private bool Hand(Combatant c, Combatant target, CombatCell from, int ap)
+        {
+            var f = c.Fighter;
+            f.OffHand = false;
+            var mainAp = f.Weapon.AttackAp;
+            var main = ExpectedBlow(c, from, target);
+            f.OffHand = true;
+            var offAp = f.Weapon.AttackAp;
+            var off = ExpectedBlow(c, from, target);
+            f.OffHand = false;
+
+            // The most harm the AP left after a first blow can still buy.
+            double Rest(int left)
+            {
+                var most = 0d;
+                for (var k = 0; k * mainAp <= left; k++)
+                {
+                    most = Math.Max(most, (k * main) + ((left - (k * mainAp)) / offAp * off));
+                }
+
+                return most;
+            }
+
+            var mainFirst = mainAp <= ap ? main + Rest(ap - mainAp) : -1d;
+            var offFirst = offAp <= ap ? off + Rest(ap - offAp) : -1d;
+            if (Math.Abs(mainFirst - offFirst) > 1e-9)
+            {
+                return offFirst > mainFirst;
+            }
+
+            // Even either way: the other hand than the last blow's, the main hand to begin.
+            return c.Attacked && !c.LastOffHand;
         }
 
         /// <summary>

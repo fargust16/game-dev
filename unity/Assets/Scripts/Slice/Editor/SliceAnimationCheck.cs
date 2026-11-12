@@ -1,6 +1,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using GameDev.Slice.Fights;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -40,61 +41,40 @@ namespace GameDev.Slice.EditorTools
                 Object.DestroyImmediate(animator.transform.parent.gameObject);
             }
 
-            // The blows' contact: the frame the striking hand is furthest out ahead of the chest (a slash or a stab), and for
-            // a shot the frame the hand jumps back fastest (the recoil). The hit's onset: the first frame the head moves
-            // faster than 0.6 m/s. FightBeats' impact and the Hit state's start are set from these.
+            // AN4: FightBeats' tables. A blow's contact: the frame the striking hand, the left for the other hand's blow, is
+            // furthest out ahead of the chest; a shot's: the frame the hand jumps back fastest (the recoil). A shot's beat holds
+            // for the rest of the shot and the whole load. A hit's onset: the first frame the head moves faster than 0.6 m/s.
+            // The Block clip's height: the frame the right hand is highest over the chest.
             report.AppendLine();
-            report.AppendLine("Blow contact and hit onset, measured on the player man (seconds into each clip):");
-            foreach (var use in new[] { "Attack1H", "Attack1HLeft", "Attack2H", "ShieldAttack", "PistolShot", "RifleShot", "Hit" })
+            report.AppendLine("Blow contact and hit onset, measured on the player man (seconds into each clip), FightBeats' tables (AN4):");
+            var contact = new float[FightBeats.Blows.Length];
+            var hold = new float[FightBeats.Blows.Length];
+            for (var i = 0; i < FightBeats.Blows.Length; i++)
             {
+                var use = FightBeats.Blows[i];
                 var clip = SliceClips.Get(use);
-                var animator = SlicePeopleModels.Fitted(SlicePeopleModels.PlayerMan, clip);
-                var root = animator.transform.parent;
-                var frames = Mathf.RoundToInt(clip.length * clip.frameRate);
-                var dt = 1f / clip.frameRate;
-                float best = float.MinValue, at = 0f, fastest = 0f, onset = -1f;
-                Vector3 lastHand = default, lastHead = default;
-                for (var f = 0; f <= frames; f++)
-                {
-                    SlicePeopleModels.Pose(animator, clip, f * dt);
-                    var chest = root.InverseTransformPoint(animator.GetBoneTransform(HumanBodyBones.Chest).position);
-                    var hand = root.InverseTransformPoint(animator.GetBoneTransform(HumanBodyBones.RightHand).position);
-                    var head = root.InverseTransformPoint(animator.GetBoneTransform(HumanBodyBones.Head).position);
-                    if (use.EndsWith("Shot"))
-                    {
-                        var back = f > 0 ? (lastHand.z - hand.z) / dt : 0f;
-                        if (back > fastest)
-                        {
-                            fastest = back;
-                            at = f * dt;
-                        }
-                    }
-                    else if (use == "Hit")
-                    {
-                        if (f > 0 && onset < 0f && (head - lastHead).magnitude / dt > 0.6f)
-                        {
-                            onset = f * dt;
-                        }
-                    }
-                    else
-                    {
-                        var reach = new Vector2(hand.x - chest.x, hand.z - chest.z).magnitude + Mathf.Max(0f, hand.z - chest.z);
-                        if (reach > best)
-                        {
-                            best = reach;
-                            at = f * dt;
-                        }
-                    }
-
-                    lastHand = hand;
-                    lastHead = head;
-                }
-
-                report.AppendLine(use == "Hit"
-                    ? $"  Hit: {clip.length:0.00} s, the head starts to move at {onset:0.00} s"
-                    : $"  {use}: {clip.length:0.00} s, contact at {at:0.00} s");
-                Object.DestroyImmediate(root.gameObject);
+                contact[i] = Measure(clip, use.EndsWith("Shot") ? Reading.Recoil : use.EndsWith("Left") ? Reading.LeftReach : Reading.Reach);
+                var load = FightBeats.Loads[i] != null ? SliceClips.Get(FightBeats.Loads[i]) : null;
+                hold[i] = load != null ? clip.length - contact[i] + load.length : 0f;
+                report.AppendLine($"  {i + 1} {use}: {clip.length:0.00} s, contact at {contact[i]:0.00} s" +
+                                  (load != null ? $", then {FightBeats.Loads[i]} {load.length:0.00} s: the beat holds {hold[i]:0.00} s" : string.Empty));
             }
+
+            var onset = new float[FightBeats.Hits.Length];
+            for (var i = 0; i < FightBeats.Hits.Length; i++)
+            {
+                var clip = SliceClips.Get(FightBeats.Hits[i]);
+                onset[i] = FightBeats.Hits[i] == "Block" ? 0f : Measure(clip, Reading.Onset);
+                report.AppendLine($"  hit {i + 1} {FightBeats.Hits[i]}: {clip.length:0.00} s" + (FightBeats.Hits[i] == "Block" ? ", raised before the blow" : $", the head starts to move at {onset[i]:0.00} s"));
+            }
+
+            var block = Measure(SliceClips.Get("Block"), Reading.Height);
+            var knock = Measure(SliceClips.Get("Knockback"), Reading.Onset);
+            report.AppendLine($"  Block: the right hand highest over the chest at {block:0.00} s; Knockback {SliceClips.Get("Knockback").length:0.00} s, the head starts to move at {knock:0.00} s; GetUp {SliceClips.Get("GetUp").length:0.00} s");
+            report.AppendLine($"  Contact = {{ {string.Join(", ", contact.Select(v => $"{v:0.00}f"))} }}");
+            report.AppendLine($"  ShotHold = {{ {string.Join(", ", hold.Select(v => $"{v:0.00}f"))} }}");
+            report.AppendLine($"  Onset = {{ {string.Join(", ", onset.Select(v => $"{Mathf.Max(0f, v - 0.03f):0.00}f"))} }} (entered 0.03 s before)");
+            report.AppendLine($"  BlockPeak = {block:0.00}f, KnockOnset = {Mathf.Max(0f, knock - 0.03f):0.00}f");
 
             report.AppendLine();
             report.AppendLine("The player's prefab playing its controller (feet = the lower ankle's height over the root, minus its rest height; knees in degrees):");
@@ -131,6 +111,67 @@ namespace GameDev.Slice.EditorTools
             Directory.CreateDirectory(Path.GetDirectoryName(Report) ?? ".");
             File.WriteAllText(Report, report.ToString());
             Debug.Log($"[SliceAnimationCheck] written to {Report}\n{report}");
+        }
+
+        private enum Reading
+        {
+            Reach,
+            LeftReach,
+            Recoil,
+            Onset,
+            Height,
+        }
+
+        /// <summary>A moment of a clip on the player man, s, as <paramref name="reading"/> reads it.</summary>
+        private static float Measure(AnimationClip clip, Reading reading)
+        {
+            var animator = SlicePeopleModels.Fitted(SlicePeopleModels.PlayerMan, clip);
+            var root = animator.transform.parent;
+            var frames = Mathf.RoundToInt(clip.length * clip.frameRate);
+            var dt = 1f / clip.frameRate;
+            float best = float.MinValue, at = 0f;
+            var onset = -1f;
+            Vector3 lastHand = default, lastHead = default;
+            for (var f = 0; f <= frames; f++)
+            {
+                SlicePeopleModels.Pose(animator, clip, f * dt);
+                var chest = root.InverseTransformPoint(animator.GetBoneTransform(HumanBodyBones.Chest).position);
+                var hand = root.InverseTransformPoint(animator.GetBoneTransform(reading == Reading.LeftReach ? HumanBodyBones.LeftHand : HumanBodyBones.RightHand).position);
+                var head = root.InverseTransformPoint(animator.GetBoneTransform(HumanBodyBones.Head).position);
+                var value = float.MinValue;
+                switch (reading)
+                {
+                    case Reading.Reach:
+                    case Reading.LeftReach:
+                        value = new Vector2(hand.x - chest.x, hand.z - chest.z).magnitude + Mathf.Max(0f, hand.z - chest.z);
+                        break;
+                    case Reading.Recoil:
+                        value = f > 0 ? (lastHand.z - hand.z) / dt : float.MinValue;
+                        break;
+                    case Reading.Height:
+                        value = hand.y - chest.y;
+                        break;
+                    case Reading.Onset:
+                        if (f > 0 && onset < 0f && (head - lastHead).magnitude / dt > 0.6f)
+                        {
+                            onset = f * dt;
+                        }
+
+                        break;
+                }
+
+                if (value > best)
+                {
+                    best = value;
+                    at = f * dt;
+                }
+
+                lastHand = hand;
+                lastHead = head;
+            }
+
+            Object.DestroyImmediate(root.gameObject);
+            return reading == Reading.Onset ? Mathf.Max(0f, onset) : at;
         }
 
         private static string Rest(string path)

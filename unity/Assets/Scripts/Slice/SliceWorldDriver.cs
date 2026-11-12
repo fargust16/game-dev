@@ -454,9 +454,11 @@ namespace GameDev.Slice
                 _bagNote != null ? Loc.Get(_bagNote) : Outfit != null ? Loc.Get("ui.hud.bag.hint") : null);
         }
 
+        /// <summary>A click puts a piece on or takes it off; Shift and a click holds a one-handed melee weapon in the other hand (10.2 §5b *Two weapons*).</summary>
         private void TogglePiece(ItemPiece piece)
         {
-            _bagNote = Outfit.Toggle(piece);
+            var shift = GameInputService.Instance != null && GameInputService.Instance.SprintHeld;
+            _bagNote = shift && !Outfit.IsWorn(piece) ? Outfit.WearOffHand(piece) : Outfit.Toggle(piece);
             Refresh();
         }
 
@@ -467,7 +469,8 @@ namespace GameDev.Slice
                 return null;
             }
 
-            var note = Loc.Format(slot >= WearSlot.WeaponOne ? "ui.hud.bag.held" : "ui.hud.bag.worn", Outfit.IsSecondSet(slot) ? 2 : 1);
+            var other = (slot == WearSlot.OffHandOne || slot == WearSlot.OffHandTwo) && Bag.Catalogue.Find(piece.item)?.fight is GameDev.Confront.Rules.FightWeapon;
+            var note = Loc.Format(other ? "ui.hud.bag.held_off" : slot >= WearSlot.WeaponOne ? "ui.hud.bag.held" : "ui.hud.bag.worn", Outfit.IsSecondSet(slot) ? 2 : 1);
             var fit = Outfit.FitOf(piece, Character);
             return fit < 0.995d ? note + Loc.Format("ui.hud.bag.fit", Mathf.RoundToInt((float)(fit * 100d))) : note;
         }
