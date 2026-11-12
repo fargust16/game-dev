@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using GameDev.Slice.Fights;
+using GameDev.Slice.Gear;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -621,8 +622,73 @@ namespace GameDev.Slice.EditorTools
             }
 
             Fight(controller, locomotion, false);
+            AimLayer(controller);
             EditorUtility.SetDirty(controller);
             return controller;
+        }
+
+        /// <summary>The upper body's mask: the spine, the head and both arms with their fingers, never the legs or the root.</summary>
+        public const string UpperBodyMask = ControllerFolder + "/UpperBody.mask";
+
+        /// <summary>
+        /// 10.2 §5e (PB8b): the player's second layer, <see cref="PlayerAim.Layer"/>, over the upper body only, its weight
+        /// set by the code: the firearm's aim (<see cref="PlayerAim.AimState"/>, the guards on Weapon, so a pistol and a
+        /// rifle each hold their own) while the legs walk any way, and each firearm's load paced to its loading out of a
+        /// fight, 1.5 s and 2.5 s.
+        /// </summary>
+        private static void AimLayer(AnimatorController controller)
+        {
+            controller.AddLayer(PlayerAim.Layer);
+            var layers = controller.layers;
+            var index = layers.Length - 1;
+            layers[index].avatarMask = UpperBody();
+            layers[index].defaultWeight = 0f;
+            layers[index].blendingMode = AnimatorLayerBlendingMode.Override;
+            controller.layers = layers;
+
+            var machine = controller.layers[index].stateMachine;
+            var aim = controller.CreateBlendTreeInController(PlayerAim.AimState, out var tree, index);
+            tree.blendParameter = "Weapon";
+            tree.useAutomaticThresholds = false;
+            for (var i = 0; i < FightBeats.Guards.Length; i++)
+            {
+                tree.AddChild(Get(FightBeats.Guards[i]), i + 1);
+            }
+
+            machine.defaultState = aim;
+            foreach (var (state, use, seconds, y) in new[]
+                     {
+                         (PlayerAim.PistolLoadState, FightBeats.Loads[FightBeats.Pistol - 1], PlayerAim.PistolLoadSeconds, 120f),
+                         (PlayerAim.RifleLoadState, FightBeats.Loads[FightBeats.Rifle - 1], PlayerAim.RifleLoadSeconds, 180f),
+                     })
+            {
+                var clip = Get(use);
+                var load = State(machine, state, clip, new Vector3(300f, y));
+                load.speed = clip.length / seconds;
+            }
+        }
+
+        private static AvatarMask UpperBody()
+        {
+            var mask = AssetDatabase.LoadAssetAtPath<AvatarMask>(UpperBodyMask);
+            if (mask == null)
+            {
+                mask = new AvatarMask();
+                AssetDatabase.CreateAsset(mask, UpperBodyMask);
+            }
+
+            var upper = new[]
+            {
+                AvatarMaskBodyPart.Body, AvatarMaskBodyPart.Head, AvatarMaskBodyPart.LeftArm, AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.LeftFingers, AvatarMaskBodyPart.RightFingers, AvatarMaskBodyPart.LeftHandIK, AvatarMaskBodyPart.RightHandIK,
+            };
+            for (var part = AvatarMaskBodyPart.Root; part < AvatarMaskBodyPart.LastBodyPart; part++)
+            {
+                mask.SetHumanoidBodyPartActive(part, System.Array.IndexOf(upper, part) >= 0);
+            }
+
+            EditorUtility.SetDirty(mask);
+            return mask;
         }
 
         /// <summary>

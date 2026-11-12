@@ -15,7 +15,8 @@ namespace GameDev.Slice.Fights
     /// are, and when it gets there the post's Wardens set out; at an empty post nothing happens, and a runner fallen on its
     /// way brings nobody. A Warden who comes when the fight is over looks round 3 ticks before it goes back. In an Assault
     /// the Wardens take the side of the one struck, against the character; in a fight with the cult, the Veinmarket or
-    /// beasts they join the character (owner, 2026-11-12, VS-ALARM (i)); in any other fight an Alarm brings nobody.
+    /// beasts they join the character (owner, 2026-11-12, VS-ALARM (i)); in any other fight an Alarm brings nobody. A shot
+    /// out of a fight (PB8b) sends every free Warden who hears it to the shooter's place to look round.
     /// </summary>
     public sealed partial class SliceConfront
     {
@@ -70,6 +71,12 @@ namespace GameDev.Slice.Fights
                         Say(body, "ui.fight.help.heard");
                     }
                 }
+            }
+
+            if (!InFight && alarm.Kind == AlarmKind.Shot)
+            {
+                Debug.Log($"[Confront] a shot out of a fight: {LookAt(alarm.At)} Wardens go to look.");
+                return;
             }
 
             var side = Assaulting ? HostileSide : WardensJoinTheCharacter() ? PlayerSide : -1;
@@ -130,19 +137,51 @@ namespace GameDev.Slice.Fights
         /// <summary>A Warden runs to <paramref name="at"/> and joins the fight on <paramref name="side"/> at the end of the round by which it is there.</summary>
         private void Come(Transform body, Vector3 at, int side)
         {
-            var back = _returning.Find(r => r.Body == body);
+            // One on its way to look at a shot, or standing where a fight drew it, keeps the post it goes back to.
+            var back = _returning.Find(r => r.Body == body) ?? _late.Find(k => k.Body == body);
             _returning.RemoveAll(r => r.Body == body);
+            _late.RemoveAll(k => k.Body == body);
             _coming.Add(new Coming
             {
                 Body = body,
                 Combatant = Person(body, Wardens, _nextId++, side: side),
                 Round = _lastRound + TicksToRun(body.position, at),
                 To = at,
-                Allied = side == PlayerSide,
+                OnlyLooks = side == PlayerSide,
                 Post = back != null ? back.Post : body.position,
                 PostFacing = back != null ? back.PostFacing : body.rotation,
             });
             Say(body, "ui.fight.help.warden");
+        }
+
+        /// <summary>
+        /// 10.2 §5e: a shot out of a fight. Every free Warden who hears it goes to the shooter's place, reckoned at 4.5 m/s
+        /// as ever, looks round 3 ticks and goes back; a fight that starts meanwhile takes it in as any free Warden.
+        /// </summary>
+        private int LookAt(Vector3 at)
+        {
+            var came = 0;
+            foreach (var body in PeopleAround.Wardens(at))
+            {
+                if (!SliceAlarm.Hears(at, body.position) || !Free(body) || _late.Exists(k => k.Body == body))
+                {
+                    continue;
+                }
+
+                _late.Add(new Coming
+                {
+                    Body = body,
+                    Arrives = Time.time + (TicksToRun(body.position, at) * SecondsPerTick),
+                    To = at,
+                    OnlyLooks = true,
+                    Post = body.position,
+                    PostFacing = body.rotation,
+                });
+                Say(body, "ui.fight.shot.heard");
+                came++;
+            }
+
+            return came;
         }
 
         /// <summary>The fight is over: the Wardens still on their way come late, each when its run is done.</summary>
@@ -157,10 +196,13 @@ namespace GameDev.Slice.Fights
             _coming.Clear();
         }
 
-        /// <summary>A Warden who can answer: standing, in no fight, on no errand or search, and not already on its way.</summary>
+        /// <summary>
+        /// A Warden who can answer: standing, in no fight, on no errand or search, and not already on its way to a fight;
+        /// one on its way only to look answers a call.
+        /// </summary>
         private bool Free(Transform body) =>
             body != null && body.gameObject.activeInHierarchy && !Lying(body) && !IsPlayer(body) && !_peopleInFight.Contains(body)
-            && !_coming.Exists(k => k.Body == body) && !_late.Exists(k => k.Body == body)
+            && !_coming.Exists(k => k.Body == body) && !_late.Exists(k => k.Body == body && !k.OnlyLooks)
             && body.GetComponent<FightSearch>() == null && body.GetComponent<WardenErrand>() == null
             && !(body.TryGetComponent<SliceFighter>(out var fighter) && fighter.Combatant != null);
 

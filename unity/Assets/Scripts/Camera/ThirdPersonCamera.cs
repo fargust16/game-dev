@@ -43,8 +43,32 @@ namespace GameDev.Cameras
         private float _clearSince;
         private Vector3 _smoothedPivot;
 
+        // 10.2 §5e: aimed, the look reaches further up and down than the orbit's, degrees.
+        private const float AimMinPitch = -60f;
+        private const float AimMaxPitch = 60f;
+        private const float AimNearClip = 0.03f;
+
+        private Camera _camera;
+        private float _orbitFieldOfView = -1f;
+        private float _orbitNearClip = -1f;
+
         /// <summary>False while a menu or dialogue owns the mouse: the camera keeps following but stops orbiting.</summary>
         public bool LookEnabled { get; set; } = true;
+
+        /// <summary>The aimed view the camera blends into by its weight (10.2 §5e); null for the orbit alone.</summary>
+        public IAimView Aim { get; set; }
+
+        /// <summary>The look the mouse gives, degrees: the yaw round the up axis and the pitch down from level.</summary>
+        public float Yaw => _yaw;
+
+        public float Pitch => pitch;
+
+        /// <summary>Points the look as the mouse would, degrees: the yaw round the up axis and the pitch down from level.</summary>
+        public void Look(float yaw, float down)
+        {
+            _yaw = yaw;
+            pitch = Mathf.Clamp(down, Mathf.Min(minPitch, AimMinPitch), Mathf.Max(maxPitch, AimMaxPitch));
+        }
 
         public Transform Target => target;
 
@@ -105,6 +129,7 @@ namespace GameDev.Cameras
                 SnapBehindTarget();
             }
 
+            var aimed = Aim != null ? Mathf.Clamp01(Aim.Weight) : 0f;
             var input = GameInputService.Instance;
             if (input != null && LookEnabled)
             {
@@ -122,13 +147,13 @@ namespace GameDev.Cameras
 
                 if (Cursor.lockState == CursorLockMode.Locked)
                 {
-                    var delta = input.MouseDelta;
+                    var delta = input.MouseDelta * (aimed > 0f ? Mathf.Lerp(1f, Aim.MouseShare, aimed) : 1f);
                     _yaw += delta.x * mouseSensitivity * 0.02f;
-                    pitch = Mathf.Clamp(pitch - delta.y * mouseSensitivity * 0.02f, minPitch, maxPitch);
+                    pitch = Mathf.Clamp(pitch - delta.y * mouseSensitivity * 0.02f, Mathf.Lerp(minPitch, AimMinPitch, aimed), Mathf.Lerp(maxPitch, AimMaxPitch, aimed));
                 }
 
                 var scroll = input.CameraZoomDelta;
-                if (Mathf.Abs(scroll) > 0.01f)
+                if (Mathf.Abs(scroll) > 0.01f && aimed <= 0f)
                 {
                     distance = Mathf.Clamp(distance - scroll * zoomSpeed, minDistance, maxDistance);
                 }
@@ -153,9 +178,53 @@ namespace GameDev.Cameras
             // The pivot follows the character smoothly; the arm's length is smoothed apart from it, so a wall never
             // drags the whole view sideways.
             _smoothedPivot = Vector3.SmoothDamp(_smoothedPivot, pivot, ref _velocity, positionSmoothTime);
-            transform.position = _smoothedPivot + desiredOffset.normalized * _armLength;
+            var orbit = _smoothedPivot + desiredOffset.normalized * _armLength;
+            transform.position = aimed > 0f ? Vector3.Lerp(orbit, Aim.Eye, Smooth(aimed)) : orbit;
             transform.rotation = rotation;
+            Narrow(aimed);
+            if (aimed > 0f)
+            {
+                Aim.Placed(_camera);
+            }
         }
+
+        /// <summary>The field of view and the near clip between the orbit's and the aimed view's (10.2 §5e).</summary>
+        private void Narrow(float aimed)
+        {
+            if (_camera == null)
+            {
+                _camera = GetComponent<Camera>();
+                if (_camera == null)
+                {
+                    return;
+                }
+            }
+
+            if (aimed <= 0f)
+            {
+                // Back in the orbit: its own view again, which another owner may change while nothing is aimed.
+                if (_orbitFieldOfView >= 0f)
+                {
+                    _camera.fieldOfView = _orbitFieldOfView;
+                    _camera.nearClipPlane = _orbitNearClip;
+                    _orbitFieldOfView = -1f;
+                }
+
+                return;
+            }
+
+            if (_orbitFieldOfView < 0f)
+            {
+                _orbitFieldOfView = _camera.fieldOfView;
+                _orbitNearClip = _camera.nearClipPlane;
+            }
+
+            var share = Smooth(aimed);
+            _camera.fieldOfView = Mathf.Lerp(_orbitFieldOfView, Aim.FieldOfView, share);
+            _camera.nearClipPlane = Mathf.Lerp(_orbitNearClip, AimNearClip, share);
+        }
+
+        private static float Smooth(float t) => t * t * (3f - (2f * t));
 
         /// <summary>Spring arm: pulls the camera in along the same ray when something sits between the pivot and the
         /// desired position. Hits on the target's own colliders are skipped, because the chest-height pivot sits inside

@@ -192,6 +192,182 @@ namespace GameDev.Slice.EditorTools
             EditorUtility.SetDirty(settings);
             AssetDatabase.SaveAssets();
             report.AppendLine($"{entries.Count} held models in {ModelsPath}, on {SliceConfrontSetup.SettingsPath}");
+            Sights(report);
+        }
+
+        // ------------------------------------------------------------------------------------------- the sights
+
+        /// <summary>Batch: only the firearms' sights on the held prefabs as they stand (PB8b), the report in sights.txt.</summary>
+        public static void SightsOnly()
+        {
+            var report = new StringBuilder();
+            Sights(report);
+            Directory.CreateDirectory(Output);
+            File.WriteAllText($"{Output}/sights.txt", report.ToString());
+            Debug.Log($"[SliceWeapons] sights\n{report}");
+        }
+
+        /// <summary>
+        /// 10.2 §5e (PB8b): each firearm's rear sight, front sight and muzzle, measured on its held prefab and kept there as
+        /// the children <see cref="PlayerAim.RearSight"/>, <see cref="PlayerAim.FrontSight"/> and <see cref="PlayerAim.Muzzle"/>.
+        /// In the prefab's frame the muzzle lies along +Y and the barrel's top along +Z. The muzzle is the middle of the
+        /// last section; the firearm's top is read section by section in the barrel's own plane; the front sight is the
+        /// highest top within the last 6 % of the length. The rear sight is where the eye looks over the firearm: of the
+        /// tops in front of the grip and behind the front sight, the one the front sight's top sees highest, so that the
+        /// sight line from it to the front sight clears the whole firearm, as a front sight stands in its notch. A sight
+        /// line along the barrel would pass through a revolver's frame or a rifle's lock, which hide the front sight.
+        /// </summary>
+        public static void Sights(StringBuilder report)
+        {
+            foreach (var asset in new[] { "Pistol", "Rifle" })
+            {
+                var path = $"{HeldFolder}/Held_{asset}.prefab";
+                if (AssetDatabase.LoadAssetAtPath<GameObject>(path) == null)
+                {
+                    report.AppendLine($"{asset} sights: NO {path}");
+                    continue;
+                }
+
+                var root = PrefabUtility.LoadPrefabContents(path);
+                try
+                {
+                    foreach (var old in new[] { PlayerAim.RearSight, PlayerAim.FrontSight, PlayerAim.Muzzle, PlayerAim.Forend })
+                    {
+                        var child = root.transform.Find(old);
+                        if (child != null)
+                        {
+                            Object.DestroyImmediate(child.gameObject);
+                        }
+                    }
+
+                    var triangles = new List<(Vector3, Vector3, Vector3)>();
+                    foreach (var f in root.GetComponentsInChildren<MeshFilter>().Where(f => f.sharedMesh != null))
+                    {
+                        var v = f.sharedMesh.vertices.Select(p => root.transform.InverseTransformPoint(f.transform.TransformPoint(p))).ToArray();
+                        var t = f.sharedMesh.triangles;
+                        for (var i = 0; i + 2 < t.Length; i += 3)
+                        {
+                            triangles.Add((v[t[i]], v[t[i + 1]], v[t[i + 2]]));
+                        }
+                    }
+
+                    if (triangles.Count == 0)
+                    {
+                        report.AppendLine($"{asset} sights: NO MESH");
+                        continue;
+                    }
+
+                    var (rear, front, muzzle, note) = MeasureSights(triangles);
+                    Mark(root.transform, PlayerAim.RearSight, rear);
+                    Mark(root.transform, PlayerAim.FrontSight, front);
+                    Mark(root.transform, PlayerAim.Muzzle, muzzle);
+                    var forend = Forend(triangles, muzzle);
+                    if (forend.HasValue)
+                    {
+                        Mark(root.transform, PlayerAim.Forend, forend.Value);
+                        note += $"; the forend at {forend.Value.ToString("F3")}";
+                    }
+
+                    PrefabUtility.SaveAsPrefabAsset(root, path);
+                    report.AppendLine($"{asset} sights: rear {rear.ToString("F3")}, front {front.ToString("F3")}, muzzle {muzzle.ToString("F3")} (m, the prefab's frame, the grip at 0); " +
+                                      $"sight base {Vector3.Distance(rear, front):0.000} m, the sight line {Vector3.Angle(front - rear, Vector3.up):0.0} deg off the barrel's way; {note}");
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(root);
+                }
+            }
+        }
+
+        /// <summary>
+        /// A long firearm's forend, where the left hand holds it: the middle of its section <see cref="ForendShare"/> of the
+        /// way from the grip to the muzzle; none on a firearm shorter than <see cref="LongArm"/>, held in one hand.
+        /// </summary>
+        private static Vector3? Forend(List<(Vector3, Vector3, Vector3)> triangles, Vector3 muzzle)
+        {
+            if (muzzle.y < LongArm)
+            {
+                return null;
+            }
+
+            var y = ForendShare * muzzle.y;
+            var section = Cut(triangles, 1, y).Where(p => Mathf.Abs(p.x - muzzle.x) <= 0.05f).ToList();
+            return section.Count == 0 ? (Vector3?)null : new Vector3(muzzle.x, y, Mid(section, 2));
+        }
+
+        // Authoring defaults, m and share: a firearm reaching this far from the grip to its muzzle is held in both hands,
+        // the left hand 0.4 of the way to the muzzle.
+        private const float LongArm = 0.6f;
+        private const float ForendShare = 0.4f;
+
+        private static void Mark(Transform root, string name, Vector3 at)
+        {
+            var mark = new GameObject(name).transform;
+            mark.SetParent(root, false);
+            mark.localPosition = at;
+        }
+
+        private static (Vector3 Rear, Vector3 Front, Vector3 Muzzle, string Note) MeasureSights(List<(Vector3, Vector3, Vector3)> triangles)
+        {
+            const int bands = 120;
+            var all = triangles.SelectMany(t => new[] { t.Item1, t.Item2, t.Item3 }).ToList();
+            var low = all.Min(p => p.y);
+            var high = all.Max(p => p.y);
+            var length = high - low;
+            float At(int k) => low + ((k + 0.5f) / bands * length);
+
+            // The muzzle: the middle of the last section; the barrel's plane and thickness from it.
+            var last = Cut(triangles, 1, high - (0.005f * length));
+            var cx = Mid(last, 0);
+            var cz = Mid(last, 2);
+            var thick = Mathf.Max(Range(last, 0), Range(last, 2), 0.004f);
+            var muzzle = new Vector3(cx, high, cz);
+
+            // The barrel's top, section by section, in its own plane.
+            var tops = new float?[bands];
+            for (var k = 0; k < bands; k++)
+            {
+                var near = Cut(triangles, 1, At(k)).Where(p => Mathf.Abs(p.x - cx) <= thick * 0.75f).ToList();
+                tops[k] = near.Count > 0 ? near.Max(p => p.z) : (float?)null;
+            }
+
+            int Band(float y) => Mathf.Clamp(Mathf.FloorToInt((y - low) / length * bands), 0, bands - 1);
+
+            // The front sight: the highest top within the last 6 %.
+            var frontK = -1;
+            for (var k = Band(high - (0.06f * length)); k < bands; k++)
+            {
+                if (tops[k].HasValue && (frontK < 0 || tops[k].Value > tops[frontK].Value))
+                {
+                    frontK = k;
+                }
+            }
+
+            var front = frontK >= 0 ? new Vector3(cx, At(frontK), tops[frontK].Value) : new Vector3(cx, high, cz + (thick * 0.5f));
+
+            // The rear sight: the top in front of the grip and a tenth of the length behind the front sight that the front
+            // sight's top sees highest; with none, the barrel's top straight behind the front sight.
+            var rear = new Vector3(cx, Mathf.Max(0f, front.y - (0.5f * length)), front.z);
+            var steepest = float.NegativeInfinity;
+            for (var k = Band(0f); k < bands; k++)
+            {
+                var y = At(k);
+                if (y < 0f || y > front.y - (0.1f * length) || !tops[k].HasValue)
+                {
+                    continue;
+                }
+
+                var rise = Mathf.Atan2(tops[k].Value - front.z, front.y - y);
+                if (rise > steepest)
+                {
+                    steepest = rise;
+                    rear = new Vector3(cx, y, tops[k].Value);
+                }
+            }
+
+            var profile = string.Join(" ", Enumerable.Range(0, bands).Where(k => k % 4 == 0).Select(k => tops[k].HasValue ? $"{At(k):0.00}:{tops[k].Value:0.000}" : $"{At(k):0.00}:-"));
+            return (rear, front, muzzle,
+                $"barrel {thick * 1000f:0} mm thick, the sight line {Mathf.Rad2Deg * steepest:0.0} deg down from the rear sight to the front sight; tops (y:z): {profile}");
         }
 
         private struct HeldFrame

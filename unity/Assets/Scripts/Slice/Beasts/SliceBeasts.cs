@@ -626,6 +626,51 @@ namespace GameDev.Slice.Beasts
             _eyes[b] = eyes;
         }
 
+        /// <summary>
+        /// 10.2 §5e (PB8b): a shot out of a fight touched <paramref name="beast"/>, fired from <paramref name="from"/>. The
+        /// roll is the fight's; a beast killed falls as in a fight, and one hit or grazed turns on the shot: seeing the
+        /// shooter its pack attacks at once, running at it from beyond 10 cells; not seeing it, the beast is Alert and
+        /// goes to the shot's source if that lies in its territory, where its watch may notice the character.
+        /// </summary>
+        public void Shot(SliceBeast beast, Vector3 from)
+        {
+            if (beast == null || _rules == null || _fights == null || _fights.InFight || !beast.isActiveAndEnabled || beast.State != BeastState.Resting)
+            {
+                return;
+            }
+
+            _fights.BeastShot(beast, _rules, from);
+            if (beast.Hp <= 0d)
+            {
+                beast.Die(false);
+                _state?.Set(DeadKey(beast), 1);
+                Blind(beast);
+                return;
+            }
+
+            beast.Stop();
+            beast.Face(from, 360f);
+            var eyes = EyesOf(beast);
+            _player = _player != null ? _player : FindAnyObjectByType<PlayerLocomotion>();
+            if (!_packs.TryGetValue(beast.Pack, out var pack))
+            {
+                return;
+            }
+
+            if (_player != null && eyes != null && _hiding != null && !_hiding.Active && _hiding.Sees(eyes, _player.transform.position, false))
+            {
+                pack.Noticed = true;
+                Attack(pack);
+                return;
+            }
+
+            eyes?.Meter?.Alarm();
+            if (Inside(beast, from))
+            {
+                beast.Go(from, ChaseSpeed, false);
+            }
+        }
+
         /// <summary>A fallen or fleeing beast notices no more, and its cone goes.</summary>
         private void Blind(SliceBeast b)
         {

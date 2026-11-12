@@ -68,10 +68,13 @@ namespace GameDev.Slice
         /// <summary>Whether a resident searches for a character who broke away, one in ten (10.2 §5a, §9; PB5b); fork it with the person's name hashed.</summary>
         public const string Search = "slice.search";
 
+        /// <summary>The roll of an Aimed Shot that touched someone out of a fight (10.2 §5e; PB8b); fork it with the shot's count.</summary>
+        public const string Shots = "slice.shots";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
-            ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles, Search,
+            ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles, Search, Shots,
 
         };
     }

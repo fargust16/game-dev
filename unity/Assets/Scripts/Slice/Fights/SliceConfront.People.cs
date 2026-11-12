@@ -103,7 +103,7 @@ namespace GameDev.Slice.Fights
         {
             var role = group == Wardens ? ResidentRole.Warden : group == Residents ? PersonRole.Of(body) : ResidentRole.Cult;
             var made = ResidentRoles.Make(role, Who(body), _seed);
-            return _settings.FightRules.Fighter(made.Sheet, made.Limit, Arms(made.Firearm));
+            return Wounded(body, _settings.FightRules.Fighter(made.Sheet, made.Limit, Arms(made.Firearm)));
         }
 
         private WeaponSet Arms(RoleFirearm firearm) => firearm switch

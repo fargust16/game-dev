@@ -80,7 +80,12 @@ namespace GameDev.Slice.Fights
         /// 10.2 §5c: the character strikes <paramref name="victim"/>, who is not fighting: the fight starts with that blow.
         /// False when no fight can start here.
         /// </summary>
-        public bool StartAssault(Transform victim)
+        /// <param name="fighter">The one struck as it already is, as one a shot wounded; null makes it from who it is.</param>
+        /// <param name="opened">
+        /// The opening strike was dealt already (10.2 §5e: a shot seen by the one it touched, rolled on the touch), so the
+        /// fight strikes it no more.
+        /// </param>
+        public bool StartAssault(Transform victim, Fighter fighter = null, bool opened = false)
         {
             _player = FindAnyObjectByType<PlayerLocomotion>();
             if (_lock == null || InFight || _died || _terms != null || _player == null || _player.InWater || victim == null ||
@@ -113,7 +118,7 @@ namespace GameDev.Slice.Fights
             _playerCombatant = player;
 
             var warden = PeopleAround.IsWarden(victim);
-            var struck = Person(victim, warden ? Wardens : Residents, 1);
+            var struck = Person(victim, warden ? Wardens : Residents, 1, fighter);
             _bodies[struck] = victim;
             combatants.Add(struck);
             _nextId = 2;
@@ -141,12 +146,13 @@ namespace GameDev.Slice.Fights
             var joined = JoinTheCall(player.Fighter, lawful, victim, ref _nextId);
             Debug.Log($"[Confront] the call: {_coming.Count} Wardens coming, {joined} residents join.");
 
-            // The blow is the fight's opening strike, a stealth attack only from Stealth Mode (10.3 §7).
-            player.Hidden = Hiding != null && Hiding.Active;
+            // The blow is the fight's opening strike, a stealth attack only from Stealth Mode (10.3 §7); a shot rolled on
+            // its touch is struck already.
+            player.Hidden = !opened && Hiding != null && Hiding.Active;
             var request = new EncounterRequest(at, combatants, _seed.Fork(SliceSeedStreams.Combat, _fights), "assault")
             {
-                Opener = player,
-                Target = struck,
+                Opener = opened ? null : player,
+                Target = opened ? null : struck,
             };
             if (_lock.TryBegin(request))
             {
@@ -294,9 +300,9 @@ namespace GameDev.Slice.Fights
                 Place(late.Body, Ground(late.To + (way * LateStandOff)), _player.transform.position);
                 late.LookUntil = (_clock != null ? _clock.Tick : 0) + FightSearch.LookTicks; // 10.2 §5e: it looks round
                 _returning.Add(late);
-                if (!late.Allied)
+                if (!late.OnlyLooks)
                 {
-                    (arrived ??= new List<Transform>()).Add(late.Body); // one come to the character's help fights nobody
+                    (arrived ??= new List<Transform>()).Add(late.Body); // one come to help or to a shot fights nobody
                 }
             }
 
@@ -465,8 +471,11 @@ namespace GameDev.Slice.Fights
             /// <summary>The place it runs to, the Alarm's.</summary>
             public Vector3 To;
 
-            /// <summary>It comes to the character's help (VS-ALARM (i)), not against it.</summary>
-            public bool Allied;
+            /// <summary>
+            /// It fights nobody when it comes and only looks round: one come to the character's help (VS-ALARM (i)), or
+            /// one come to a shot heard out of a fight (10.2 §5e).
+            /// </summary>
+            public bool OnlyLooks;
 
             public Vector3 Post;
             public Quaternion PostFacing;

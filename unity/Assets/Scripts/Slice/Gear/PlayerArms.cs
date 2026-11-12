@@ -11,20 +11,19 @@ namespace GameDev.Slice.Gear
     /// <summary>
     /// 10.2 §5c in free exploration: R draws the active Weapon Set and sheathes it again; drawn, the character holds its
     /// guard while it stands and walks and runs with the weapon in hand, and a click strikes. A melee blow reaches the
-    /// person straight ahead, a shot the person nearest the camera's aim; a blow at someone who is not fighting is an
-    /// Assault and goes to <see cref="Assault"/>, which starts the fight, and with nobody there the blow plays at the air.
-    /// A sprint, the water, a crouch, work or E sheathes the weapon first. A fight draws and sheathes on its own.
+    /// person straight ahead; a blow at someone who is not fighting is an Assault and goes to <see cref="Assault"/>, which
+    /// starts the fight, and with nobody there the blow plays at the air. A firearm's click is a shot (§5e, PB8b): the
+    /// projectile from the muzzle at what the screen's centre shows, aimed through the sights or not
+    /// (<see cref="PlayerAim"/>), and only what it touches is rolled. While the aim is held or the firearm loads, the legs
+    /// keep the walk. A sprint, the water, a crouch, work or E sheathes the weapon first. A fight draws and sheathes on its own.
     /// </summary>
     public sealed class PlayerArms : MonoBehaviour
     {
         // Authoring defaults, 10.2 §5c: the draw's 0.4 s before a blow can follow; a melee blow's 1.5 m and 45° either side of
-        // the facing; a shot's 20 m and 15° either side of the camera's aim; the speed under which the body stands in its
-        // guard, m/s.
+        // the facing; the speed under which the body stands in its guard, m/s.
         public const float DrawSeconds = 0.4f;
         public const float Reach = 1.5f;
         public const float ReachAngle = 45f;
-        public const float AimRange = 20f;
-        public const float AimAngle = 15f;
         public const float StandingSpeed = 0.25f;
 
         private static readonly int FightingHash = Animator.StringToHash("Fighting");
@@ -57,10 +56,16 @@ namespace GameDev.Slice.Gear
         public Func<IEnumerable<Transform>> People { get; set; }
 
         /// <summary>
-        /// A blow at a person, and whether it was a shot: true when it started a fight, which then shows the blow as its
-        /// opening strike; false lets the blow play at the air.
+        /// A melee blow at a person: true when it started a fight, which then shows the blow as its opening strike; false
+        /// lets the blow play at the air.
         /// </summary>
-        public Func<Transform, bool, bool> Assault { get; set; }
+        public Func<Transform, bool> Assault { get; set; }
+
+        /// <summary>The firearm's aim and shot out of a fight (10.2 §5e); with none a firearm's click does nothing.</summary>
+        public PlayerAim Aim { get; set; }
+
+        /// <summary>True while a firearm is drawn.</summary>
+        public bool Ranged => _motion == FightBeats.Pistol || _motion == FightBeats.Rifle;
 
         /// <param name="fighter">The character as a fighter in what it wears and holds.</param>
         /// <param name="inFight">True while a fight runs: it draws and sheathes the weapons itself.</param>
@@ -120,19 +125,13 @@ namespace GameDev.Slice.Gear
                 return false;
             }
 
-            var ranged = _motion == FightBeats.Pistol || _motion == FightBeats.Rifle;
-            var target = ranged ? Aimed() : Ahead();
-            if (ranged)
+            if (Ranged)
             {
-                var way = target != null ? target.position - _player.transform.position : Look();
-                way.y = 0f;
-                if (way.sqrMagnitude > 1e-4f)
-                {
-                    _player.transform.rotation = Quaternion.LookRotation(way.normalized, Vector3.up);
-                }
+                return Aim != null && Aim.Fire();
             }
 
-            if (target != null && Assault != null && Assault(target, ranged))
+            var target = Ahead();
+            if (target != null && Assault != null && Assault(target))
             {
                 return true;
             }
@@ -215,7 +214,8 @@ namespace GameDev.Slice.Gear
             if (_animator.isActiveAndEnabled)
             {
                 _animator.SetFloat(WeaponHash, _motion);
-                _animator.SetBool(FightingHash, _player.IsGrounded && _player.State == PlayerLocomotion.Move.Grounded && _player.PlanarSpeed < StandingSpeed && input.MoveVector.sqrMagnitude < 0.01f);
+                var aiming = Aim != null && (Aim.Held || Aim.Loading);
+                _animator.SetBool(FightingHash, !aiming && _player.IsGrounded && _player.State == PlayerLocomotion.Move.Grounded && _player.PlanarSpeed < StandingSpeed && input.MoveVector.sqrMagnitude < 0.01f);
             }
 
             if (input.AttackPressed)
@@ -241,12 +241,6 @@ namespace GameDev.Slice.Gear
         private bool MustSheathe() =>
             _player.IsSprinting || _player.InWater || _player.State == PlayerLocomotion.Move.Crouched || (_busy != null && _busy());
 
-        private Vector3 Look()
-        {
-            var camera = Camera.main;
-            return camera != null ? camera.transform.forward : _player.transform.forward;
-        }
-
         /// <summary>The person straight ahead within reach: the nearest within <see cref="Reach"/> and <see cref="ReachAngle"/> of the facing.</summary>
         private Transform Ahead()
         {
@@ -262,33 +256,6 @@ namespace GameDev.Slice.Gear
                 {
                     best = person;
                     nearest = distance;
-                }
-            }
-
-            return best;
-        }
-
-        /// <summary>The person nearest the camera's aim within <see cref="AimRange"/> and <see cref="AimAngle"/>.</summary>
-        private Transform Aimed()
-        {
-            var camera = Camera.main;
-            var eye = camera != null ? camera.transform.position : _player.transform.position + Vector3.up * 1.6f;
-            var look = Look();
-            Transform best = null;
-            var closest = AimAngle;
-            foreach (var person in Candidates())
-            {
-                var chest = person.position + (Vector3.up * 1.2f);
-                if (Vector3.Distance(person.position, _player.transform.position) > AimRange)
-                {
-                    continue;
-                }
-
-                var angle = Vector3.Angle(look, chest - eye);
-                if (angle <= closest)
-                {
-                    best = person;
-                    closest = angle;
                 }
             }
 

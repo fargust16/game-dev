@@ -138,6 +138,10 @@ namespace GameDev.Slice.Beasts
             _dead = true;
             _going = false;
             State = BeastState.Dead;
+            if (TryGetComponent<BoxCollider>(out var body))
+            {
+                body.enabled = false;
+            }
             if (_animator != null && _animator.HasState(0, DeadState))
             {
                 if (atOnce)
@@ -186,6 +190,52 @@ namespace GameDev.Slice.Beasts
             }
 
             _ground = ~LayerMask.GetMask(KitLayers.Character, KitLayers.NoGrid);
+            Body();
+        }
+
+        /// <summary>
+        /// 10.2 §5e: a shot out of a fight touches what it flies into, so a beast has a body to touch, as a person has: a
+        /// box round its model as it stands, on the characters' layer, which neither the ground under a beast nor the
+        /// Combat Grid reads. A fallen beast's body stops nothing.
+        /// </summary>
+        private void Body()
+        {
+            if (GetComponent<Collider>() != null)
+            {
+                return;
+            }
+
+            var turn = transform.rotation;
+            transform.rotation = Quaternion.identity;
+            var seen = default(Bounds);
+            var any = false;
+            foreach (var r in GetComponentsInChildren<Renderer>())
+            {
+                if (r is ParticleSystemRenderer || r is TrailRenderer)
+                {
+                    continue;
+                }
+
+                if (any)
+                {
+                    seen.Encapsulate(r.bounds);
+                }
+                else
+                {
+                    seen = r.bounds;
+                    any = true;
+                }
+            }
+
+            if (any)
+            {
+                var scale = transform.lossyScale;
+                var box = gameObject.AddComponent<BoxCollider>();
+                box.center = transform.InverseTransformPoint(seen.center);
+                box.size = new Vector3(seen.size.x / Mathf.Max(1e-4f, scale.x), seen.size.y / Mathf.Max(1e-4f, scale.y), seen.size.z / Mathf.Max(1e-4f, scale.z));
+            }
+
+            transform.rotation = turn;
         }
 
         private void Update()

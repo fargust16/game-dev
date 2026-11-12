@@ -81,6 +81,12 @@ namespace GameDev.Slice.Fights
         /// <summary>A development opponent, gone when its search is over.</summary>
         public bool Development { get; private set; }
 
+        /// <summary>
+        /// It searches for whoever shot it out of a fight (10.2 §5e, PB8b): finding the character, it starts an Assault
+        /// instead of a fight taken up again.
+        /// </summary>
+        public bool Shot { get; set; }
+
         /// <summary>Its eyes, the cone its host reads.</summary>
         public StealthObserver Eyes => _eyes;
 

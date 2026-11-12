@@ -19,7 +19,8 @@ namespace GameDev.Locomotion
     /// The body always faces where it goes (owner, 2026-11-12; 16 §2): the keys pick a way relative to the camera, the body
     /// turns to it at <see cref="turnSpeed"/> and walks, runs or sprints face first, never backward or sideways. The camera
     /// only looks; standing still, the body keeps the way it last faced. This replaces the owner's earlier choice of
-    /// 2026-11-11, a body facing the camera and stepping in eight directions.
+    /// 2026-11-11, a body facing the camera and stepping in eight directions. The one exception is the Aimed Walk
+    /// (<see cref="AimFacing"/>): a firearm aimed, the body faces the aim and walks any way.
     /// </para>
     /// <para>
     /// The Animator's states, by name, where the controller has them: <c>Locomotion</c> (a 2D blend on MoveX and MoveZ
@@ -219,6 +220,16 @@ namespace GameDev.Locomotion
         /// <summary>True while the character sprints: Shift held, input given, upright and allowed.</summary>
         public bool IsSprinting { get; private set; }
 
+        /// <summary>
+        /// The Aimed Walk (owner, 2026-11-12, VS-ALARM (h); 10.2 §5e): while set, the body faces this way instead of where
+        /// it goes and walks any way the keys choose, sideways and backward too, never running or sprinting, the blend
+        /// playing its side and back walks. Null for the body that faces where it goes.
+        /// </summary>
+        public Vector3? AimFacing { get; set; }
+
+        /// <summary>The walking speed, m/s: the blend's 1.</summary>
+        public float WalkSpeed => walkSpeed;
+
         /// <summary>Puts the player at a pose at once, as a door does; a CharacterController ignores a moved transform
         /// while it is enabled.</summary>
         public void Teleport(Vector3 position, Quaternion rotation)
@@ -344,11 +355,14 @@ namespace GameDev.Locomotion
                 }
             }
 
-            IsSprinting = hasInput && !crouching && SprintAllowed && input.SprintHeld;
+            var aiming = AimFacing.HasValue;
+            IsSprinting = hasInput && !crouching && !aiming && SprintAllowed && input.SprintHeld;
 
             // The wanted speed: a crouch at its share of the walk, else a run, a sprint with Shift; a light stick walks.
+            // Aimed, the body walks and never runs (10.2 §5e).
             var wanted = !hasInput ? 0f
                 : crouching ? walkSpeed * CrouchShare
+                : aiming ? walkSpeed
                 : IsSprinting ? sprintSpeed
                 : Mathf.Lerp(walkSpeed, runSpeed, Mathf.InverseLerp(0.5f, 0.9f, moveInput.magnitude));
 
@@ -371,11 +385,12 @@ namespace GameDev.Locomotion
             // The body turns first, and on the ground the run goes the way it faces, so a turn carries the run round
             // with it and never slides it on the old way (owner, 2026-11-12). A turn sharper than ReverseAngle, and a
             // stop, brake on the old way as before; the landing brakes to a stop.
-            Face(direction, dt);
+            // Aimed, the body faces the aim and the velocity goes where the keys point, sideways and backward too.
+            Face(aiming ? Flat(AimFacing.Value) : direction, dt);
             var target = State == Move.Landing ? Vector3.zero : direction * wanted;
             var airborne = State == Move.Airborne;
             var speedNow = PlanarSpeed;
-            if (!airborne && State != Move.Landing && hasInput && (speedNow < 0.1f || Vector3.Angle(_velocity, direction) < ReverseAngle))
+            if (!aiming && !airborne && State != Move.Landing && hasInput && (speedNow < 0.1f || Vector3.Angle(_velocity, direction) < ReverseAngle))
             {
                 var along = Mathf.MoveTowards(speedNow, wanted, (wanted < speedNow ? groundDeceleration : groundAcceleration) * dt);
                 _velocity = Flat(transform.forward) * along;
@@ -743,7 +758,15 @@ namespace GameDev.Locomotion
             }
 
             _animator.SetFloat(SpeedParam, blend, BlendDamp, dt);
-            if (_hasMove)
+            if (_hasMove && AimFacing.HasValue && !InWater && State != Move.Crouched)
+            {
+                // The Aimed Walk (10.2 §5e): the velocity in the body's own frame, the walk at 1, so the blend plays
+                // its side and back walks.
+                var local = transform.InverseTransformDirection(new Vector3(_velocity.x, 0f, _velocity.z)) / Mathf.Max(0.01f, walkSpeed);
+                _animator.SetFloat(MoveXParam, local.x, BlendDamp, dt);
+                _animator.SetFloat(MoveZParam, local.z, BlendDamp, dt);
+            }
+            else if (_hasMove)
             {
                 // Straight ahead only: the body faces where it goes, so it walks face first even while it turns round
                 // (owner, 2026-11-12). The blend's side and back clips stay in the controller, unplayed.

@@ -109,7 +109,19 @@ namespace GameDev.Slice.Fights
             {
                 foreach (var s in _searching)
                 {
-                    if (s.Now != FightSearch.Phase.Done && Sees(s, player.transform.position) && Resume())
+                    if (s.Now == FightSearch.Phase.Done || !Sees(s, player.transform.position))
+                    {
+                        continue;
+                    }
+
+                    // One the character shot unseen starts an Assault (10.2 §5e); the list has changed either way.
+                    if (s.Shot)
+                    {
+                        ShotSearcherSees(s);
+                        return;
+                    }
+
+                    if (Resume())
                     {
                         return;
                     }

@@ -95,6 +95,9 @@ namespace GameDev.Slice
         /// <summary>The weapon drawn on R in free exploration and a click's blow (10.2 §5c); null without fights or fists.</summary>
         public PlayerArms Arms { get; private set; }
 
+        /// <summary>10.2 §5e: the firearm's aim through the sights and its shot out of a fight (PB8b).</summary>
+        public PlayerAim Aim { get; private set; }
+
         /// <summary>10.4 §6 *Accusation* (WA5): a Warden stops a character of low Reputation.</summary>
         public WardenAccusation Accusation { get; private set; }
 
@@ -287,7 +290,11 @@ namespace GameDev.Slice
                 Arms = gameObject.AddComponent<PlayerArms>();
                 Arms.Configure(settings, Fights.WornFighter, () => Fights.InFight, () => Work.Busy || PageOpen());
                 Arms.People = PeopleAround.InSight;
-                Arms.Assault = (target, _) => Fights.StartAssault(target);
+                Arms.Assault = target => Fights.StartAssault(target);
+                Aim = gameObject.AddComponent<PlayerAim>();
+                Aim.Configure(Arms);
+                Aim.Touched = Shot;
+                Arms.Aim = Aim;
                 Accusation = gameObject.AddComponent<WardenAccusation>();
                 Accusation.Configure(this);
             }
@@ -886,6 +893,34 @@ namespace GameDev.Slice
             }
 
             hud.ShowStamina((float)Stamina.Share, tired);
+        }
+
+        /// <summary>
+        /// 10.2 §5e: what a shot out of a fight touched, fired from <paramref name="from"/>: a beast or a person is rolled
+        /// and turns to the shot; anything else, or nothing, is a miss with no roll.
+        /// </summary>
+        private void Shot(Collider touched, Vector3 at, Vector3 from)
+        {
+            if (touched == null || Fights == null || Fights.InFight)
+            {
+                return;
+            }
+
+            var beast = touched.GetComponentInParent<GameDev.Slice.Beasts.SliceBeast>();
+            if (beast != null)
+            {
+                Beasts?.Shot(beast, from);
+                return;
+            }
+
+            foreach (var body in PeopleAround.InSight())
+            {
+                if (body != null && touched.transform.IsChildOf(body))
+                {
+                    Fights.PersonShot(body, from);
+                    return;
+                }
+            }
         }
 
         // A conversation, a page or a shop puts the weapon away (10.2 §5c).

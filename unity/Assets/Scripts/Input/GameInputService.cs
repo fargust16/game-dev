@@ -167,6 +167,9 @@ namespace GameDev.Input
         /// <summary>10.2 §5c in free exploration: the left button strikes with the drawn weapon.</summary>
         public bool AttackPressed => ClickMovePressed;
 
+        /// <summary>10.2 §5e in free exploration: the right button, held, aims the drawn firearm; in a fight it orbits the camera.</summary>
+        public bool AimHeld => CameraOrbitHeld;
+
         public bool StancePressed => _stance != null && _stance.WasPressedThisFrame();
 
         public bool ChangeSetPressed => _changeSet != null && _changeSet.WasPressedThisFrame();
