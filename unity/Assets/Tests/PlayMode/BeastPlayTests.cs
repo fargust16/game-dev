@@ -165,9 +165,18 @@ namespace GameDev.Slice.Tests
             var tick = world.Clock.Tick;
             var leather = world.Bag.Count("leather");
             yield return Tap(Key.E);
-            Assert.IsTrue(world.Remains.Skinned(carcass.Id), "E skins it once the lesson is learned");
-            Assert.GreaterOrEqual(world.Clock.Tick - tick, 3L, "in 3 ticks");
-            Assert.That(world.Bag.Count("leather") - leather, Is.InRange(0, 1), "a wolf's leather, or none on a failure");
+            Assert.IsTrue(world.Work.Busy, "E kneels at the carcass once the lesson is learned");
+            Assert.GreaterOrEqual(world.Clock.Tick - tick, 3L, "its 3 ticks pass");
+            Assert.IsFalse(world.Remains.Skinned(carcass.Id), "and the hide waits for the check");
+            yield return GatheringPlayTests.AtKey(world);
+            Assert.IsTrue(world.Reaction.Running, "where the character begins to rise");
+            Assert.IsTrue(world.Clock.IsPaused, "the world paused");
+            Assert.AreEqual(0d, world.Reaction.Bar.PerfectWidth, "a good zone only");
+            yield return GatheringPlayTests.StopInZone(world.Reaction);
+            Assert.IsTrue(world.Remains.Skinned(carcass.Id), "the hide off");
+            Assert.AreEqual(1, world.Bag.Count("leather") - leather, "a wolf's whole leather for a good stop");
+            yield return GatheringPlayTests.PlayedOut(world);
+            Assert.IsTrue(player.enabled, "the character stands and walks again");
         }
 
         /// <summary>

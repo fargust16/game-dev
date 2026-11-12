@@ -87,6 +87,9 @@ namespace GameDev.Slice
         /// <summary>A Reaction Check on the HUD (S5a.8): theft's now, breaking in's and brewing's later.</summary>
         public SliceReaction Reaction { get; private set; }
 
+        /// <summary>The player's work by its animation, each Reaction Check at its key frame (AN3, 07.1 §8a).</summary>
+        public PlayerWork Work { get; private set; }
+
         /// <summary>Theft from the townsfolk (S5a.8); null without a bag or the Deeds Record.</summary>
         public GameDev.Slice.Theft.SliceTheft Theft { get; private set; }
 
@@ -264,6 +267,8 @@ namespace GameDev.Slice
             }
 
             Reaction = gameObject.AddComponent<SliceReaction>();
+            Work = gameObject.AddComponent<PlayerWork>();
+            Work.Configure(Reaction, Clock);
             if (Bag != null && settings.Shops != null)
             {
                 Shops = new SliceShops(settings.Shops, settings.Items, seed, Clock, Bag, State);
@@ -311,9 +316,9 @@ namespace GameDev.Slice
                 FindNodes();
             }
 
-            if (Bag != null && Beasts != null && settings.ActionChecks != null)
+            if (Bag != null && Beasts != null)
             {
-                Remains = new GameDev.Slice.Beasts.SliceRemains(settings.BeastRules, Bag, State, Clock, Character, settings.ActionChecks, seed);
+                Remains = new GameDev.Slice.Beasts.SliceRemains(settings.BeastRules, Bag, State, Clock, Character, seed);
                 FindCarcasses();
             }
 
@@ -519,7 +524,7 @@ namespace GameDev.Slice
             {
                 if (walker.GetComponent<GameDev.Slice.Theft.PurseTarget>() == null)
                 {
-                    walker.gameObject.AddComponent<GameDev.Slice.Theft.PurseTarget>().Configure(Theft, Reaction, () => Fights != null && Fights.InFight, () => Hiding != null && Hiding.Active, Clock);
+                    walker.gameObject.AddComponent<GameDev.Slice.Theft.PurseTarget>().Configure(Theft, Work, () => Fights != null && Fights.InFight, () => Hiding != null && Hiding.Active);
                     added = true;
                 }
             }
@@ -539,7 +544,7 @@ namespace GameDev.Slice
             {
                 if (beast.GetComponent<GameDev.Slice.Beasts.BeastRemains>() == null)
                 {
-                    beast.gameObject.AddComponent<GameDev.Slice.Beasts.BeastRemains>().Configure(Remains, () => Fights != null && Fights.InFight);
+                    beast.gameObject.AddComponent<GameDev.Slice.Beasts.BeastRemains>().Configure(Remains, () => Fights != null && Fights.InFight, Work);
                     added = true;
                 }
             }
@@ -565,7 +570,7 @@ namespace GameDev.Slice
 
                 var at = block.transform.position;
                 var id = $"{rule.kind.ToString().ToLowerInvariant()}.{Mathf.RoundToInt(at.x * 10f)}.{Mathf.RoundToInt(at.z * 10f)}";
-                block.gameObject.AddComponent<GatherNode>().Configure(Gathering, Gathering.Spot(id, rule), () => Fights != null && Fights.InFight, Reaction);
+                block.gameObject.AddComponent<GatherNode>().Configure(Gathering, Gathering.Spot(id, rule), () => Fights != null && Fights.InFight, Work);
                 added = true;
             }
 

@@ -551,6 +551,13 @@ namespace GameDev.Slice.EditorTools
             State(machine, "Fall", Get("Fall"), new Vector3(560f, 0f));
             var land = State(machine, "JumpLand", Get("JumpLand"), new Vector3(560f, 120f));
             land.iKOnFeet = true;
+
+            // AN3: the work clips, each played by PlayerWork to its key frame for the Reaction Check (pipeline plan §10).
+            for (var i = 0; i < PlayerWork.Clips.Length; i++)
+            {
+                State(machine, PlayerWork.Clips[i], Get(PlayerWork.Clips[i]), new Vector3(1080f, i * 60f)).iKOnFeet = true;
+            }
+
             Fight(controller, locomotion, false);
             EditorUtility.SetDirty(controller);
             return controller;

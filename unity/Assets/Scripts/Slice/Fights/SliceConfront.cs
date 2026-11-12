@@ -321,6 +321,14 @@ namespace GameDev.Slice.Fights
         /// </summary>
         private void PlayerTurn(Combatant player, GameInputService input)
         {
+            // While First Aid's bar shows, and in the frame it was stopped, Space belongs to the bar, not to the turn's end.
+            var reaction = SliceWorldDriver.Running != null ? SliceWorldDriver.Running.Reaction : null;
+            if ((reaction != null && reaction.Running) || Time.frameCount == _checkedFrame)
+            {
+                _cursor.Clear();
+                return;
+            }
+
             var picked = _hud.Take();
             if (_hud.OverBar)
             {

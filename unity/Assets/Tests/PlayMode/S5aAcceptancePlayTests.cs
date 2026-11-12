@@ -77,6 +77,7 @@ namespace GameDev.Slice.Tests
             yield return TheftPlayTests.Choose(targets, null, player, t => first = t);
             Assert.IsNotNull(first);
             yield return Tap(Key.E);
+            yield return GatheringPlayTests.AtKey(world);
             Assert.IsTrue(world.Reaction.Running);
             var bar = world.Reaction.Bar;
             for (var t = 0f; t < 3f && world.Reaction.Marker < bar.GoodStart + (bar.GoodWidth * 0.3d); t += Time.deltaTime)
@@ -86,6 +87,7 @@ namespace GameDev.Slice.Tests
 
             yield return Tap(Key.Space);
             Assert.Greater(bag.Bronze, 500, "the first purse lifted");
+            yield return GatheringPlayTests.PlayedOut(world);
             world.Hiding.SetActive(false);
             foreach (var target in targets.Where(t => t != first))
             {
@@ -115,7 +117,7 @@ namespace GameDev.Slice.Tests
             Assert.IsNull(shops.Buy("ada", shops.Shelf("ada").First(s => s.Item.id == "bandage")), "a bandage");
             Assert.AreEqual((1, 2, 1), (bag.Count("woodcutting_axe"), bag.Count("iron_ore"), bag.Count("bandage")));
 
-            // Gathers: beside the tree farthest from every beast, E fells it, a cycle a tick, until it is gone.
+            // Gathers: beside the tree farthest from every beast, E fells it, a check a swing, until it is gone.
             var homes = world.Beasts.Beasts.Select(b => b.Home).ToList();
             var tree = Object.FindObjectsByType<GatherNode>(FindObjectsInactive.Exclude).Where(n => n.Spot.Rule.kind == GatherKind.Tree && n.Shown)
                 .OrderByDescending(n => homes.Min(h => Vector3.Distance(h, n.transform.position))).First();
@@ -127,11 +129,11 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(tree.IsActive, "E begins felling");
             for (var i = 0; i < 40 && tree.Shown; i++)
             {
-                world.Clock.AdvanceTicks(1);
                 yield return GatheringPlayTests.StopInZone(world.Reaction);
             }
 
             Assert.IsFalse(tree.Shown, "the tree felled");
+            yield return GatheringPlayTests.PlayedOut(world);
             Assert.AreEqual(6, bag.Count("wood"));
 
             // Earns: sells two wood back to Edda Brann.
@@ -153,12 +155,14 @@ namespace GameDev.Slice.Tests
             var fights = world.Fights;
             Assert.AreSame(dagger.fight, fights.PlayerFighter().Weapon, "it fights with the dagger it made");
 
-            // Binds a wound: Bleeding, and B with the bandage it bought.
-            // A failed check keeps the bandage, so it is tried again.
+            // Binds a wound: Bleeding, and B with the bandage it bought, kneeling to its check.
+            // A bad stop keeps the bandage, so it is tried again.
             world.State.Set(SliceConfront.BleedingKey, 1);
             for (var i = 0; i < 6 && world.State.IsSet(SliceConfront.BleedingKey); i++)
             {
                 Assert.IsTrue(fights.TreatOutside());
+                yield return GatheringPlayTests.StopInZone(world.Reaction);
+                yield return GatheringPlayTests.PlayedOut(world);
             }
 
             Assert.IsFalse(world.State.IsSet(SliceConfront.BleedingKey), "the bandage stops the bleeding");

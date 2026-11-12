@@ -136,6 +136,33 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// AN3: the player's controller carries every work clip PlayerWork plays, and each key frame falls inside its clip,
+        /// the hips of a patch and a kneel beginning to rise there (pipeline plan §10).
+        /// </summary>
+        [Test]
+        public void ThePlayerWorksEachClipToItsKeyFrame()
+        {
+            var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(SlicePeopleModels.PlayerController);
+            var states = controller.layers[0].stateMachine.states.Select(s => s.state).ToDictionary(s => s.name);
+            foreach (var clip in PlayerWork.Clips)
+            {
+                Assert.IsTrue(states.ContainsKey(clip), $"{clip} in the player's controller");
+                Assert.AreSame(SliceClips.Get(clip), states[clip].motion, clip);
+            }
+
+            foreach (var key in PlayerWork.Keys)
+            {
+                CollectionAssert.Contains(PlayerWork.Clips, key.Key);
+                var length = SliceClips.Get(key.Key).length;
+                Assert.That(key.Value, Is.InRange(0.1f, length + 0.01f), $"{key.Key}'s key frame inside its {length:0.00} s");
+            }
+
+            Assert.IsFalse(SliceClips.Get("Harvest").isLooping, "the patch is stooped over and risen from once");
+            Assert.IsFalse(SliceClips.Get("Kneel").isLooping, "and the kneel");
+            Assert.IsTrue(SliceClips.Get("Chop").isLooping && SliceClips.Get("Mine").isLooping, "a tree and a vein swing on");
+        }
+
+        /// <summary>
         /// Every clip of the table, Kevin Iglesias' a man's and a woman's take and Quaternius' cut from its two files, is
         /// Humanoid with muscle curves and loops as the table says; the Mixamo and Blender folders are gone, and the
         /// blacksmith at the anvil hammers.

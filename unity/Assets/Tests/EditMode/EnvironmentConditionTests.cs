@@ -252,12 +252,17 @@ namespace GameDev.Slice.Tests
             var ap = _turns.ApLeft;
             var success = false;
             _turns.Treated += (c, p, t, ok) => success = ok;
-            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.Treat(Treatment.Splint, faller.Id)), "a splint on its own leg");
+            // The player's treatment carries its Reaction Check's result (AN3); an NPC's rolls its Action Check.
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.Treat(Treatment.Splint, faller.Id, false)), "a splint on its own leg, stopped badly");
             Assert.AreEqual(ap - 6, _turns.ApLeft, "6 AP");
-            Assert.AreEqual(!success, f.LegBroken, "a set splint ends it");
-            Assert.AreEqual(success ? 0 : 1, faller.Supplies[(int)Treatment.Splint], "and is used; a failure keeps it");
+            Assert.IsFalse(success);
+            Assert.IsTrue(f.LegBroken, "a bad stop leaves the leg");
+            Assert.AreEqual(1, faller.Supplies[(int)Treatment.Splint], "and keeps the splint");
+            Assert.AreEqual(_turns.ApLeft >= 6, _turns.SubmitIntent(TurnIntent.Treat(Treatment.Splint, faller.Id, true)), "again while its AP last");
             if (success)
             {
+                Assert.IsFalse(f.LegBroken, "a set splint ends it");
+                Assert.AreEqual(0, faller.Supplies[(int)Treatment.Splint], "and is used");
                 Assert.IsTrue(_turns.SubmitIntent(TurnIntent.MoveTo(Cell(5, 6))), "and the fighter walks again");
             }
         }

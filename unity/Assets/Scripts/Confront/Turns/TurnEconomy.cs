@@ -148,7 +148,7 @@ namespace GameDev.Confront.Turns
                 case IntentKind.Traverse:
                     return Traverse(c, intent.Cell);
                 case IntentKind.Treat:
-                    return Treat(c, intent.Treatment, Find(intent.Target));
+                    return Treat(c, intent.Treatment, Find(intent.Target), intent.Success);
                 case IntentKind.Wait:
                     return Wait(c);
                 case IntentKind.Stance:
@@ -880,7 +880,7 @@ namespace GameDev.Confront.Turns
         /// antidote and a splint need the lesson. A success ends the condition and uses the item; a failure spends the
         /// AP and keeps it.
         /// </summary>
-        private bool Treat(Combatant c, Treatment treatment, Combatant patient)
+        private bool Treat(Combatant c, Treatment treatment, Combatant patient, bool? decided)
         {
             if (patient == null || !patient.Standing || patient.Side != c.Side || Distance(c.Cell, patient.Cell) > 1
                 || !FightRules.Needs(patient.Fighter, treatment) || c.Supplies[(int)treatment] <= 0
@@ -890,7 +890,7 @@ namespace GameDev.Confront.Turns
             }
 
             ApLeft -= _rules.TreatmentAp(treatment);
-            var success = _rolls.NextDouble() < _rules.TreatmentChance(c.Fighter.Values, treatment);
+            var success = decided ?? (_rolls.NextDouble() < _rules.TreatmentChance(c.Fighter.Values, treatment));
             if (success)
             {
                 FightRules.Cure(patient.Fighter, treatment);

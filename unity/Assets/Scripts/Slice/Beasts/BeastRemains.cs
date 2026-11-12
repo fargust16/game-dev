@@ -10,8 +10,10 @@ namespace GameDev.Slice.Beasts
 {
     /// <summary>
     /// A fallen beast's carcass as something to take from (S5a.6): within reach, E takes its ingredients, and E again
-    /// skins it once Skinning is learned, 3 ticks with the world running. The prompt says what is left or why not, and
-    /// for a few seconds after, what was taken. The driver puts one on every beast; it speaks only while the beast is dead.
+    /// skins it once Skinning is learned: the character kneels at the carcass, its 3 ticks pass with the world running,
+    /// and the Reaction Check comes where it begins to rise, the world paused (the owner's second direction of 2026-11-11).
+    /// The prompt says what is left or why not, and for a few seconds after, what was taken. The driver puts one on every
+    /// beast; it speaks only while the beast is dead.
     /// </summary>
     public sealed class BeastRemains : MonoBehaviour, IPromptSource
     {
@@ -21,21 +23,28 @@ namespace GameDev.Slice.Beasts
         /// <summary>Authoring default, s: how long what was taken stays in the prompt.</summary>
         public const float NoteSeconds = 4f;
 
+        /// <summary>Authoring default, m: how far beyond the carcass's edge the character kneels, its hands at the hide.</summary>
+        public const float KneelReach = 0.35f;
+
         private SliceBeast _beast;
         private SliceRemains _remains;
         private Func<bool> _busy;
+        private PlayerWork _work;
         private PlayerLocomotion _player;
         private string _note;
         private float _noteUntil;
 
-        public void Configure(SliceRemains remains, Func<bool> busy)
+        /// <param name="work">The character's work by its animation, the check where the kneeling character rises.</param>
+        public void Configure(SliceRemains remains, Func<bool> busy, PlayerWork work)
         {
             _remains = remains;
             _busy = busy;
+            _work = work;
             _beast = GetComponent<SliceBeast>();
         }
 
-        private bool Ready => _remains != null && _beast != null && _beast.State == BeastState.Dead && (_busy == null || !_busy());
+        private bool Ready => _remains != null && _beast != null && _beast.State == BeastState.Dead && (_busy == null || !_busy())
+            && (_work == null || !_work.Busy);
 
         public string PromptFor(Vector3 player)
         {
@@ -96,12 +105,40 @@ namespace GameDev.Slice.Beasts
                 return;
             }
 
-            var outcome = _remains.Skin(_beast.Id, _beast.Kind, _beast.Glowing, _busy, out var leather, out var refused);
-            var whole = _remains.Rules.Of(_beast.Kind, _beast.Glowing).leather;
-            Say(outcome == SkinOutcome.Refused ? Loc.Get(refused)
-                : outcome == SkinOutcome.Interrupted ? Loc.Get("ui.remains.interrupted")
-                : leather < whole ? Loc.Format("ui.remains.spoiled", leather)
-                : Loc.Format("ui.remains.skinned", leather));
+            var refused = _remains.SkinFault(_beast.Id, _beast.Kind, _beast.Glowing);
+            if (refused != null || _work == null)
+            {
+                Say(Loc.Get(refused ?? "ui.remains.interrupted"));
+                return;
+            }
+
+            var beast = _beast;
+            var stroke = new WorkStroke
+            {
+                Clip = "Kneel",
+                Steady = true,
+                Bar = () => _remains.Bar(beast.Id),
+                CaptionKey = "ui.remains.caption",
+                Settle = result =>
+                {
+                    var leather = _remains.Finish(beast.Id, beast.Kind, beast.Glowing, result);
+                    var whole = _remains.Rules.Of(beast.Kind, beast.Glowing).leather;
+                    Say(leather < whole ? Loc.Format("ui.remains.spoiled", leather) : Loc.Format("ui.remains.skinned", leather));
+                },
+                Face = transform,
+                StandOff = PlayerWork.Radius(transform) + KneelReach,
+            };
+            if (!_work.Begin(stroke))
+            {
+                return;
+            }
+
+            // The ticks pass as the character kneels; a fight begun in them ends the work with the hide still on.
+            if (_remains.Work(beast.Id, beast.Kind, beast.Glowing, _busy, out _) != SkinOutcome.Ready)
+            {
+                _work.Stop();
+                Say(Loc.Get("ui.remains.interrupted"));
+            }
         }
 
         private void Say(string note)

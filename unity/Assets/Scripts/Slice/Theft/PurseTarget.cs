@@ -6,16 +6,17 @@ using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Slice.Stealth;
 using GameDev.UI;
-using GameDev.World.Timekeeping;
 using UnityEngine;
 
 namespace GameDev.Slice.Theft
 {
     /// <summary>
-    /// A townsperson's purse as something to lift (S5a.8): within reach and in Stealth Mode only, E begins the Reaction
-    /// Check of theft against the person's Perception, Alert or not, and the world pauses while its bar shows (the owner's
-    /// play test of S5a, 10.3 §6). A good result takes the purse unseen; a bad one makes the person notice the character,
-    /// cry out and stop to face it. The driver puts one on every walking townsperson when a scene loads.
+    /// A townsperson's purse as something to lift (S5a.8): within reach and in Stealth Mode only, E sends the crouched
+    /// hand to the pocket, and where it reaches in the Reaction Check of theft shows, against the person's Perception,
+    /// Alert or not. The world does not pause for it, and the try is called off, not spent, once the person has moved
+    /// 1 m from where it stood (the owner's second direction of 2026-11-11, 10.3 §6). A good result takes the purse
+    /// unseen; a bad one makes the person notice the character, cry out and stop to face it. The driver puts one on every
+    /// walking townsperson when a scene loads.
     /// </summary>
     public sealed class PurseTarget : MonoBehaviour, IPromptSource
     {
@@ -25,36 +26,41 @@ namespace GameDev.Slice.Theft
         /// <summary>Authoring default, s: how long the outcome stays in the prompt, and the cry over the person's head.</summary>
         public const float NoteSeconds = 4f;
 
+        /// <summary>The owner's, m (2026-11-11): how far the person may move from where it stood before the try is called off.</summary>
+        public const float CallOffDistance = 1f;
+
+        /// <summary>Authoring default, m: how far from the person's pivot the character crouches to reach the pocket.</summary>
+        public const float StandOff = 0.6f;
+
         /// <summary>Authoring default: the Perception of a person with no Vision Cone, a townsman's (10.3 §6).</summary>
         public const int PlainPerception = 2;
 
         private SliceTheft _theft;
-        private SliceReaction _reaction;
+        private PlayerWork _work;
         private Func<bool> _busy;
         private Func<bool> _sneaking;
-        private IWorldClock _clock;
         private StealthObserver _eyes;
         private PlayerLocomotion _player;
         private HudView _hud;
         private string _note;
         private float _noteUntil;
+        private bool _settled;
 
         /// <summary>The person's name and place among its siblings in the scene, the same in every run, for the world state's keys.</summary>
         public string Person => $"{name}.{transform.GetSiblingIndex()}";
 
+        /// <param name="work">The character's work by its animation, the check where the hand reaches the pocket.</param>
         /// <param name="sneaking">Whether the character is in Stealth Mode, the only state it steals in.</param>
-        /// <param name="clock">The clock paused while the bar shows.</param>
-        public void Configure(SliceTheft theft, SliceReaction reaction, Func<bool> busy, Func<bool> sneaking, IWorldClock clock)
+        public void Configure(SliceTheft theft, PlayerWork work, Func<bool> busy, Func<bool> sneaking)
         {
             _theft = theft;
-            _reaction = reaction;
+            _work = work;
             _busy = busy;
             _sneaking = sneaking;
-            _clock = clock;
             _eyes = GetComponent<StealthObserver>();
         }
 
-        private bool Ready => _theft != null && _reaction != null && !_reaction.Running && (_busy == null || !_busy())
+        private bool Ready => _theft != null && _work != null && !_work.Busy && (_busy == null || !_busy())
             && _sneaking != null && _sneaking();
 
         public string PromptFor(Vector3 player)
@@ -107,12 +113,34 @@ namespace GameDev.Slice.Theft
                 _eyes = GetComponent<StealthObserver>();
                 var perception = _eyes != null ? _eyes.Perception : PlainPerception;
                 var alert = _eyes != null && _eyes.Meter != null && _eyes.Meter.Alert;
-                _reaction.Begin(_theft.Bar(Person, perception, alert), "ui.theft.caption", Settle, _clock?.Pause());
+                var stood = Flat(transform.position);
+                _settled = false;
+                _work.Begin(new WorkStroke
+                {
+                    Clip = "Gather2",
+                    Bar = () => _theft.Bar(Person, perception, alert),
+                    CaptionKey = "ui.theft.caption",
+                    PauseWorld = false,
+                    Settle = Settle,
+                    CalledOff = () => Vector3.Distance(Flat(transform.position), stood) > CallOffDistance,
+                    Ended = broken =>
+                    {
+                        if (broken && !_settled)
+                        {
+                            Say(Loc.Get("ui.theft.called_off"));
+                        }
+                    },
+                    Face = transform,
+                    StandOff = StandOff,
+                });
             }
         }
 
+        private static Vector3 Flat(Vector3 at) => new Vector3(at.x, 0f, at.z);
+
         private void Settle(ReactionResult result)
         {
+            _settled = true;
             if (_theft.Resolve(Person, result, out var bronze) == TheftOutcome.Lifted)
             {
                 Say(Loc.Format("ui.theft.lifted", Coins.Show(bronze)));

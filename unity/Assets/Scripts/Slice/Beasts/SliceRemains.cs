@@ -18,15 +18,17 @@ namespace GameDev.Slice.Beasts
         /// <summary>A fight began in its ticks; the hide is still on the carcass.</summary>
         Interrupted,
 
-        /// <summary>Its ticks passed and the check was rolled; the hide is off, whole or spoiled by half.</summary>
-        Done,
+        /// <summary>Its ticks passed: the hide comes off at the Reaction Check, whole or spoiled by half.</summary>
+        Ready,
     }
 
     /// <summary>
     /// What a fallen beast leaves (S5a.6; 19 §6.4, 11 C3): its ordinary ingredients, and a glowing beast's magical one,
     /// taken by anyone with no lesson; its hide only by Skinning, once its lesson is learned from the Master of Item
-    /// Creation, in 3 ticks with the world running, a check on (Dexterity + Skinning) / 2 against D 2. A success gives the
-    /// beast's whole leather, a failure half of it, rounded down. What was taken lives in the world state by the beast's id.
+    /// Creation, in 3 ticks with the world running, then a Reaction Check of 07.1 §8a on (Dexterity + Skinning) / 2
+    /// against D 2, made where the kneeling character begins to rise (the owner's second direction of 2026-11-11). A good
+    /// result gives the beast's whole leather, a bad one half of it, rounded down; the bar has no perfect zone. What was
+    /// taken lives in the world state by the beast's id.
     /// </summary>
     public sealed class SliceRemains
     {
@@ -38,18 +40,15 @@ namespace GameDev.Slice.Beasts
         private readonly IWorldState _state;
         private readonly IWorldClock _clock;
         private readonly ICharacterValues _character;
-        private readonly ActionCheckRules _checks;
         private readonly IWorldSeed _seed;
 
-        public SliceRemains(BeastRules rules, Bag bag, IWorldState state, IWorldClock clock, ICharacterValues character,
-            ActionCheckRules checks, IWorldSeed seed)
+        public SliceRemains(BeastRules rules, Bag bag, IWorldState state, IWorldClock clock, ICharacterValues character, IWorldSeed seed)
         {
             _rules = rules;
             _bag = bag;
             _state = state;
             _clock = clock;
             _character = character;
-            _checks = checks;
             _seed = seed;
         }
 
@@ -136,21 +135,19 @@ namespace GameDev.Slice.Beasts
             return _bag.CanCarry(WeightOf(_rules.HideItem) * whole) ? null : "ui.remains.fault.heavy";
         }
 
-        public ActionCheckChances Chances()
-        {
-            var preparation = ActionCheck.Preparation(_character.Get(CharacterAttribute.Dexterity), _character.Get(CharacterSkill.Skinning));
-            return ActionCheck.Chances(_checks, preparation, _rules.SkinningDifficulty, _character.Get(CharacterAttribute.Perception),
-                _character.Get(CharacterAttribute.Luck));
-        }
+        /// <summary>The Reaction Check's Δ: `(Dexterity + Skinning) / 2 − D` (07.1 §8a).</summary>
+        public double Delta() => ReactionCheck.Delta(_character.Get(CharacterAttribute.Dexterity), _character.Get(CharacterSkill.Skinning),
+            _rules.SkinningDifficulty);
+
+        /// <summary>The beast's bar: its zone and pace by Δ, placed by the seed by the beast, with no perfect zone.</summary>
+        public ReactionBar Bar(string beast) => ReactionCheck.For(Delta(), _seed.Fork(SliceSeedStreams.Skinning, Hash(beast), 0));
 
         /// <summary>
-        /// Skins the beast through its ticks, the world running through each. <paramref name="interrupted"/> is asked
-        /// after each tick; when it answers true the work stops and the hide stays on. Otherwise the check is rolled from
-        /// the seed by the beast, the leather goes into the bag, and the hide is off for good.
+        /// Works the beast through its ticks, the world running through each. <paramref name="interrupted"/> is asked after
+        /// each tick; when it answers true the work stops and the hide stays on. Otherwise the hide waits for its check.
         /// </summary>
-        public SkinOutcome Skin(string beast, BeastKind kind, bool glowing, Func<bool> interrupted, out int leather, out string fault)
+        public SkinOutcome Work(string beast, BeastKind kind, bool glowing, Func<bool> interrupted, out string fault)
         {
-            leather = 0;
             fault = SkinFault(beast, kind, glowing);
             if (fault != null)
             {
@@ -166,15 +163,20 @@ namespace GameDev.Slice.Beasts
                 }
             }
 
-            var outcome = ActionCheck.Roll(Chances(), _seed.Fork(SliceSeedStreams.Skinning, Hash(beast), 0));
-            leather = LeatherOf(kind, glowing, outcome);
+            return SkinOutcome.Ready;
+        }
+
+        /// <summary>Takes the hide off by the check's <paramref name="result"/>: the leather goes into the bag, the hide is off for good.</summary>
+        public int Finish(string beast, BeastKind kind, bool glowing, ReactionResult result)
+        {
+            var leather = LeatherOf(kind, glowing, result == ReactionResult.Bad ? CheckOutcome.Failure : CheckOutcome.Normal);
             if (leather > 0)
             {
                 _bag.Add(_rules.HideItem, leather);
             }
 
             _state.Set(SkinnedKey(beast), 1);
-            return SkinOutcome.Done;
+            return leather;
         }
 
         private float WeightOf(string item) => _bag.Catalogue != null ? _bag.Catalogue.Find(item)?.weight ?? 0f : 0f;

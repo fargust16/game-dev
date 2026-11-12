@@ -97,6 +97,9 @@ namespace GameDev.Confront.Rules
 
         public int TreatmentTicks(Treatment treatment) => treatmentTicks[(int)treatment];
 
+        /// <summary>A treatment's D on the curve of 07.1, the same for its Action Check and the player's Reaction Check.</summary>
+        public int TreatmentDifficulty(Treatment treatment) => treatmentDifficulty[(int)treatment];
+
         public bool TreatmentNeedsLesson(Treatment treatment) => treatmentNeedsLesson[(int)treatment];
 
         /// <summary>

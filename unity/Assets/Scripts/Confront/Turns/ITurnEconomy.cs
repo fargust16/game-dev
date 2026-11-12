@@ -44,12 +44,13 @@ namespace GameDev.Confront.Turns
     /// </summary>
     public readonly struct TurnIntent
     {
-        private TurnIntent(IntentKind kind, CombatCell cell, int target, Treatment treatment = default)
+        private TurnIntent(IntentKind kind, CombatCell cell, int target, Treatment treatment = default, bool? success = null)
         {
             Kind = kind;
             Cell = cell;
             Target = target;
             Treatment = treatment;
+            Success = success;
         }
 
         public IntentKind Kind { get; }
@@ -61,14 +62,21 @@ namespace GameDev.Confront.Turns
 
         public Treatment Treatment { get; }
 
+        /// <summary>A treatment's result already decided, by the player's Reaction Check (07.1 §8a); null rolls its Action Check.</summary>
+        public bool? Success { get; }
+
         /// <summary>Entering Stealth Mode for 3 AP when no enemy's cone covers the fighter (10.3 §8, S3b.1).</summary>
         public static TurnIntent Hide => new TurnIntent(IntentKind.Hide, default, -1);
 
         /// <summary>The Environment Action across the edge to a cell beside (10.1, S3a.7).</summary>
         public static TurnIntent Traverse(CombatCell cell) => new TurnIntent(IntentKind.Traverse, cell, -1);
 
-        /// <summary>A First Aid treatment of itself or of an ally in the next cell (10.2, S3a.7).</summary>
-        public static TurnIntent Treat(Treatment treatment, int patient) => new TurnIntent(IntentKind.Treat, default, patient, treatment);
+        /// <summary>
+        /// A First Aid treatment of itself or of an ally in the next cell (10.2, S3a.7); <paramref name="success"/> is the
+        /// player's Reaction Check's result, and an NPC's treatment, null, rolls its Action Check.
+        /// </summary>
+        public static TurnIntent Treat(Treatment treatment, int patient, bool? success = null) =>
+            new TurnIntent(IntentKind.Treat, default, patient, treatment, success);
 
         public static TurnIntent MoveTo(CombatCell cell) => new TurnIntent(IntentKind.Move, cell, -1);
 

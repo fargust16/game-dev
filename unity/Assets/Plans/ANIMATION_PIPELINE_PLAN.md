@@ -1,12 +1,12 @@
 # Animation Pipeline — Kevin Iglesias and Quaternius to Unity
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft — the owner's second direction of 2026-11-11 (§0) and its clip map (§8); §1–§7 are the withdrawn Mixamo and Blender pipeline
 
 Created: 2026-11-10
 
-Last Updated: 2026-11-11 (§9: AN2, the player's eight-way movement facing the camera, each clip at the pace its feet measure, the turn on the spot and the woman player's own takes. Earlier: §8: the clip map of AN1: every use's clip from Kevin Iglesias' FREE packs or Quaternius' Universal Animation Library 1 and 2, each work clip's key frame measured, the Mixamo and Blender clips deleted. Earlier: §0: the owner's second direction: Kevin Iglesias back, Quaternius for the gaps, Mixamo and Blender out, the character facing the camera, checks at the key frame. Earlier: §5 *The play test of 2026-11-11*: one shared avatar for the Mixamo files and a T-pose rest for the Blender clips, the movement state machine, the jump's landing, the blow's timing per weapon, the blacksmith's hammer, anvil and stump, and the sources. Earlier: §5 A fight: the walk in a fight and the hit or the death at the blow's impact, shown beat by beat by S3a.5's `FightBeats`. Earlier: 2026-11-10: §3, §5, §6: A3's first four clips, Mining, Chopping, Hammering and Surrender, made in Blender by a script that is their source; the blacksmith hammers at the anvil; the rest of A3 waits for its actions. Earlier: §5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
+Last Updated: 2026-11-12 (§10: AN3, the work played to its key frame for every Reaction Check: the swing, the patch, the anvil, the kneel and the pocket; §8: theft on the crouched reach, the keys of the lock's and brewing's clips measured. Earlier: §9: AN2, the player's eight-way movement facing the camera, each clip at the pace its feet measure, the turn on the spot and the woman player's own takes. Earlier: §8: the clip map of AN1: every use's clip from Kevin Iglesias' FREE packs or Quaternius' Universal Animation Library 1 and 2, each work clip's key frame measured, the Mixamo and Blender clips deleted. Earlier: §0: the owner's second direction: Kevin Iglesias back, Quaternius for the gaps, Mixamo and Blender out, the character facing the camera, checks at the key frame. Earlier: §5 *The play test of 2026-11-11*: one shared avatar for the Mixamo files and a T-pose rest for the Blender clips, the movement state machine, the jump's landing, the blow's timing per weapon, the blacksmith's hammer, anvil and stump, and the sources. Earlier: §5 A fight: the walk in a fight and the hit or the death at the blow's impact, shown beat by beat by S3a.5's `FightBeats`. Earlier: 2026-11-10: §3, §5, §6: A3's first four clips, Mining, Chopping, Hammering and Surrender, made in Blender by a script that is their source; the blacksmith hammers at the anvil; the rest of A3 waits for its actions. Earlier: §5: A1 and A2 built and wired to the slice's actions: the clip table, the player's paces and the jump's cut measured, the talk and the fight, A0's stand-ins retired; Mining, Chopping, Hammering and Surrender not found, to A3. Earlier: §6.1: the download list, 48 clips; the owner downloads from Mixamo. Earlier: §1, §2, §5: the owner's player bodies and the women Wardens' uniform, Humanoid by Unity's own mapping; the animations are the agent's work. Earlier: §5: A0 built, the four stand-in clips and their controllers, the player's locomotion on them. Earlier: first version: the downloaded clip packs leave the project, the slice's own clips come from Mixamo and Blender, the rigs checked, the phases and the clip list)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1–§2, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md)
 
@@ -347,11 +347,12 @@ The owner downloads; the agent imports, renames each clip by its use, checks it 
 | Gather | K Gathering01 | reaching for goods at a stall (AN6) | |
 | Chop | Q2 TreeChopping_Loop | felling a tree | the right hand furthest out, 0.53 of 0.97 s |
 | Mine | K MiningOneHand01_R Ground | an iron vein | the fist lowest, 0.40 of 0.97 s |
-| HammerDown, HammerUp | K MiningOneHand01_R Ground, cut 0–0.38 s and 0.81–0.97 s | the blacksmith at the anvil, the blow and its rebound in turn; Item Creation, the check on the last blow | the end of HammerDown, where the hammer meets the anvil's face, 0.38 s |
+| HammerDown, HammerUp | K MiningOneHand01_R Ground, cut 0–0.38 s and 0.81–0.97 s | the blacksmith at the anvil, the blow and its rebound in turn; Item Creation, the check on the last blow | the end of HammerDown, where the hammer meets the anvil's face, 0.37 s as the cut reads |
 | Harvest | Q2 Farm_Harvest | a herb or flax patch, one check | the hips begin to rise, 1.27 of 2.50 s |
 | Kneel | Q1 Fixing_Kneeling | Skinning and First Aid | the hips begin to rise, 4.30 of 5.20 s |
-| Interact, PickUp, OpenChest | Q1 Interact, PickUp_Table; Q2 Chest_Open | a lock, theft, a Stash (AN3 measures their keys) | |
-| Gather2, Gather3, MineWall | K | spare: crouched gathering, a pick at a wall | |
+| Gather2 | K Gathering02 | theft: the character steals in Stealth Mode, so the crouched hand reaches into the pocket (AN3) | the left hand furthest out, 0.60 of 1.00 s |
+| Interact, PickUp, OpenChest | Q1 Interact, PickUp_Table; Q2 Chest_Open | a lock and brewing, not built yet; a Stash | the left hand furthest out: Interact 0.77 of 2.00 s, PickUp 0.33 of 0.83 s (measured in AN3) |
+| Gather3, MineWall | K | spare: crouched gathering, a pick at a wall | |
 
 **Choices the packs forced** (the agent's, under the owner's grant of 2026-11-11):
 
@@ -360,6 +361,7 @@ The owner downloads; the agent imports, renames each clip by its use, checks it 
 - *What neither pack has:* a kneeling prayer, a wave, a surrender and a sleeping loop. The faithful sit in the pews; a nod greets; Yield holds the crouch; a sleeper lies in the last pose of a death clip, and GetUp brings it up.
 - *Not used:* Kevin Iglesias' fishing, ploughing, polearm, bazooka, grenade, assault rifle and dual pistols, and Quaternius' dance, driving, punches, roll, slides, ninja jumps, zombies, phone and climbing: no slice action, or out of the Victorian style.
 - *The survey's scale.* `SliceClipSurvey` fits the model to each clip's first pose, so a clip that starts crouched, sitting or lying reads up to a third larger; its times are exact.
+- *The survey's way.* Since AN3 it reads the body's way across the thighs, as a bone's own axes are the rig's, and reports the left hand and either hand's height too: Quaternius' Interact, PickUp_Table, Consume and Chest_Open work with the left hand.
 
 ## 9. Movement (AN2, 2026-11-12)
 
@@ -369,3 +371,18 @@ The owner downloads; the agent imports, renames each clip by its use, checks it 
 - **The turn.** Kevin Iglesias' Turn01 steps in place with no root rotation of its own (measured 0°/s), so the code turns the body and the clip plays at ×1. The import leaves any turn's root rotation out of the pose, and a take that loops only in one sex is set as the table says (Idle03, Turn01, Talk01, Gathering01–03).
 - **The woman player.** `OverworldPlayerAnimator_Woman.overrideController` is the player's controller with every Kevin Iglesias clip in its women's take; the woman player's prefab plays it. Quaternius' clips have one take.
 - **Checked by** `SlicePeopleTests.ThePlayerMovesInEightDirectionsFacingTheCamera` and `MovementSmokeTests.ThePlayerStepsSidewaysAndBacksAwayFacingTheCamera` (right and back), with the door and stair walks.
+
+## 10. Work by key frame (AN3, 2026-11-12)
+
+- **One component for all of it.** `PlayerWork` (beside the Reaction Check on the world's driver) plays a `WorkStroke` on the player's own controller. It turns the character to the work and steps it to its place in 0.3 s, plays any lead-in clips whole, plays the stroke to its key frame, stops the clip there and shows the bar, the world paused but for theft; after the check the clip, or the clip that follows it, plays to its end. The character is held while it works and walks again when the work is over. The places are the thing's own edge, read from its colliders, plus the clip's reach: a swing 0.75 m, a patch or a carcass 0.35 m, the anvil 0.45 m, and a pocket 0.6 m from the person's pivot (authoring defaults).
+- **The key frames** (§8, `SliceClipSurvey`, `Logs/SliceSurvey/clip_survey.txt`): Chop 0.53 s, Mine 0.40 s, HammerDown 0.37 s, its end, Harvest 1.27 s, Kneel 4.30 s, Gather2 0.60 s. `SliceClips.Player` gives the player's controller every work clip, `PlayerWork.Clips`, and the woman's controller takes their women's takes.
+- **Each action.**
+  - *A tree or a vein:* one check a swing, the next swing once the last has played out, while the gathering lasts.
+  - *A herb or flax patch:* the whole harvest once, its check as the hips begin to rise; the patch is empty after it whatever came of it, and the rise plays out though the gathering has ended.
+  - *The anvil:* the piece's ticks pass as the character steps up, then two blows with their rebounds, the last blow to the anvil's face, its check, its rebound, and the page again with what came of it.
+  - *A carcass and a wound:* the character kneels, the ticks pass as it kneels, the check comes at 4.30 s, and it rises.
+  - *A pocket:* the crouched reach; the world runs on, and the try is called off, not spent, once the person stands 1 m from where it stood.
+- **Breaking off.** A move key breaks the work off before its check at a tree, a vein, a patch or a pocket. Work whose ticks have passed, at the anvil, over a carcass or a wound, is steady and plays to its end.
+- **In a fight** First Aid's bar shows as soon as it is chosen and its AP are in hand, the treatment then given with its result (`TurnIntent.Treat` carries it); Space for the bar does not also end the turn. No kneel is played (open for the owner, 99 VS-ANIM).
+- **Not built yet:** a lock and brewing; their clips' key frames are in §8.
+- **Checked by** EditMode `GatheringTests`, `RemainsTests`, `FirstAidTests`, `EnvironmentConditionTests` and `SlicePeopleTests.ThePlayerWorksEachClipToItsKeyFrame`; PlayMode `GatheringPlayTests` (a tree and a herb patch), `TheftPlayTests` (a purse lifted, a theft noticed, a try called off), `BeastPlayTests` (skinning), `ShopPlayTests` (the anvil) and `S5aAcceptancePlayTests`.

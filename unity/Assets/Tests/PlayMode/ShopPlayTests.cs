@@ -126,10 +126,16 @@ namespace GameDev.Slice.Tests
             yield return null;
 
             Assert.GreaterOrEqual(world.Clock.Tick, tick + 10, "ten ticks pass at the work");
-            Assert.IsTrue(world.Reaction.Running, "then the last blow's bar");
-            Assert.IsFalse(hud.IsShopOpen, "the page gives way to the bar");
+            Assert.IsTrue(world.Work.Busy, "the character strikes the anvil");
+            Assert.IsFalse(hud.IsShopOpen, "the page gives way to the work");
+            yield return GatheringPlayTests.AtKey(world);
+            Assert.IsTrue(world.Reaction.Running, "the last blow's bar, where the hammer meets the anvil");
+            Assert.IsTrue(player.GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0).IsName("HammerDown"));
+            Assert.IsTrue(world.Clock.IsPaused, "the world paused");
             Assert.AreEqual(0d, world.Reaction.Bar.PerfectWidth, "a good zone only");
             yield return GatheringPlayTests.StopInZone(world.Reaction);
+            Assert.IsFalse(hud.IsShopOpen, "the hammer comes up first");
+            yield return GatheringPlayTests.PlayedOut(world);
 
             Assert.IsTrue(world.Bag.Pieces.Any(p => p.item == "dagger"), "the dagger is in the bag");
             Assert.AreEqual(0, world.Bag.Count("iron_ore"));

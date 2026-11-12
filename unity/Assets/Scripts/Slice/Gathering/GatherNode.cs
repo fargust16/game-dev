@@ -9,8 +9,10 @@ namespace GameDev.Slice.Gathering
 {
     /// <summary>
     /// A herb or flax patch, a fellable tree or an iron vein in the scene (S5a.5): E within reach begins gathering it, and
-    /// E again, a step, the bag or a fight ends it. Each cycle's tick shows its Reaction Check's bar, and Space settles the
-    /// cycle (the owner's play test of S5a). While it is gathered the prompt shows what was taken and the Stamina left; a
+    /// E again, a move key, the bag or a fight ends it. The work goes by its animation (07.1 §8a, the owner's second
+    /// direction of 2026-11-11): at a tree or a vein each swing stops where the blade or the pick meets it for its Reaction
+    /// Check, the world paused, and the next swing follows once the last has played out; a patch is picked in one go, its
+    /// check as the character begins to rise. While it is gathered the prompt shows what was taken and the Stamina left; a
     /// spent node hides its models and colliders until it comes back. The driver puts one on each node's kit block when a
     /// scene loads, so no scene is changed for it.
     /// </summary>
@@ -19,17 +21,26 @@ namespace GameDev.Slice.Gathering
         /// <summary>Authoring default, s: how long the reason gathering ended stays in the prompt.</summary>
         public const float NoteSeconds = 4f;
 
+        /// <summary>
+        /// Authoring defaults, m: how far beyond the node's collider the character stands to work it, so the axe meets the
+        /// trunk and the pick the rock (their reach ahead of the chest, measured in `clip_survey.txt`), and the hands the patch.
+        /// </summary>
+        public const float SwingReach = 0.75f;
+
+        public const float PickReach = 0.35f;
+
         // E that ends one gathering must not begin another at a node beside it in the same frame.
         private static int _endedFrame = -1;
 
         private SliceGathering _gathering;
-        private SliceReaction _reaction;
-        private bool _barShown;
+        private PlayerWork _work;
+        private WorkStroke _stroke;
         private Func<bool> _busy;
         private PlayerLocomotion _player;
         private HudView _hud;
-        private Vector3 _from;
         private int _seenStops;
+        private int _begunFrame;
+        private bool _finishing;
         private float _noteUntil;
         private string _kind;
 
@@ -39,13 +50,16 @@ namespace GameDev.Slice.Gathering
 
         public bool IsActive => _gathering != null && _gathering.Active == Spot;
 
+        /// <summary>Whether the spot is a herb or flax patch, picked in one go.</summary>
+        public bool Patch => Spot != null && (Spot.Rule.kind == GatherKind.Herb || Spot.Rule.kind == GatherKind.Flax);
+
         /// <param name="busy">True while the character cannot gather: in a fight.</param>
-        /// <param name="reaction">The bar each cycle is played on.</param>
-        public void Configure(SliceGathering gathering, GatherSpot spot, Func<bool> busy, SliceReaction reaction)
+        /// <param name="work">The character's work by its animation, with its Reaction Check at each key frame.</param>
+        public void Configure(SliceGathering gathering, GatherSpot spot, Func<bool> busy, PlayerWork work)
         {
             _gathering = gathering;
             _busy = busy;
-            _reaction = reaction;
+            _work = work;
             Spot = spot;
             _kind = spot.Rule.kind.ToString().ToLowerInvariant();
             spot.Shown = Show;
@@ -125,6 +139,18 @@ namespace GameDev.Slice.Gathering
                 }
             }
 
+            if (_stroke != null && !IsActive && !_finishing)
+            {
+                // The gathering ended some other way, a beast's notice say: the swing and its bar go with it. A check that
+                // ended it itself, the patch picked or the node spent, lets its swing play out.
+                var stroke = _stroke;
+                _stroke = null;
+                if (_work != null && _work.Stroke == stroke)
+                {
+                    _work.Stop();
+                }
+            }
+
             var input = GameInputService.Instance;
             _player ??= FindAnyObjectByType<PlayerLocomotion>();
             if (_player == null)
@@ -132,52 +158,16 @@ namespace GameDev.Slice.Gathering
                 return;
             }
 
-            var at = _player.transform.position;
-            if (_barShown && !IsActive)
-            {
-                // The gathering ended some other way, a beast's notice say, while the bar showed.
-                _barShown = false;
-                _reaction.Cancel();
-            }
-
             if (IsActive)
             {
+                // E is the player's own choice and ends the work with no note (owner's play test of S5a, 2026-11-11); a
+                // move key ends it too, through the work itself.
                 _hud ??= FindAnyObjectByType<HudView>();
-                if (_barShown)
-                {
-                    if (_busy != null && _busy())
-                    {
-                        _gathering.Stop("ui.gather.stop.fight");
-                    }
-
-                    return;
-                }
-
-                if (_gathering.Due && _reaction != null && !_reaction.Running)
-                {
-                    var tick = _gathering.DueTick;
-                    _barShown = _reaction.Begin(_gathering.Bar(tick), "ui.gather.caption", r =>
-                    {
-                        _barShown = false;
-                        if (IsActive)
-                        {
-                            _gathering.Cycle(tick, r);
-                        }
-                    });
-                    return;
-                }
-
-                // A step or E is the player's own choice and ends the work with no note (owner's play test of S5a,
-                // 2026-11-11: "Interrupted, you moved" stayed on after walking away and back).
-                // Across the ground only: the Space that stops a bar may also make the character hop where it stands.
-                var step = _gathering.Rules.Step;
-                var moved = at - _from;
-                moved.y = 0f;
-                var own = moved.sqrMagnitude > step * step || (input != null && input.InteractPressed);
+                var own = input != null && input.InteractPressed && Time.frameCount != _begunFrame;
                 var reason = _hud != null && _hud.IsBagOpen ? "ui.gather.stop.bag"
                     : _busy != null && _busy() ? "ui.gather.stop.fight"
                     : null;
-                if (own || reason != null)
+                if (own || reason != null || _stroke == null)
                 {
                     _gathering.Stop(reason);
                     _endedFrame = Time.frameCount;
@@ -187,10 +177,61 @@ namespace GameDev.Slice.Gathering
             }
 
             if (input != null && input.InteractPressed && Shown && _gathering.Active == null && _endedFrame != Time.frameCount
-                && InReach(at) && (_busy == null || !_busy()) && _gathering.Begin(Spot) == null)
+                && _work != null && !_work.Busy && InReach(_player.transform.position) && (_busy == null || !_busy())
+                && _gathering.Begin(Spot) == null)
             {
-                _from = at;
+                _begunFrame = Time.frameCount;
+                _finishing = false;
+                _stroke = Stroke();
+                if (!_work.Begin(_stroke))
+                {
+                    _stroke = null;
+                    _gathering.Stop(null);
+                }
             }
+        }
+
+        /// <summary>The work at this node: a swing at a tree or a vein, again and again, or a patch picked in one go.</summary>
+        private WorkStroke Stroke()
+        {
+            var patch = Patch;
+            return new WorkStroke
+            {
+                Clip = patch ? "Harvest" : Spot.Rule.kind == GatherKind.Tree ? "Chop" : "Mine",
+                Bar = () => _gathering.NextBar(),
+                CaptionKey = patch ? "ui.gather.caption.patch" : "ui.gather.caption",
+                Settle = result =>
+                {
+                    if (!IsActive)
+                    {
+                        return;
+                    }
+
+                    if (patch)
+                    {
+                        _gathering.Harvest(result);
+                    }
+                    else
+                    {
+                        _gathering.Cycle(result);
+                    }
+
+                    _finishing = !IsActive;
+                },
+                Again = () => IsActive && !patch,
+                Ended = broken =>
+                {
+                    _stroke = null;
+                    _finishing = false;
+                    if (IsActive)
+                    {
+                        _gathering.Stop(null);
+                        _endedFrame = Time.frameCount;
+                    }
+                },
+                Face = transform,
+                StandOff = PlayerWork.Radius(transform) + (patch ? PickReach : SwingReach),
+            };
         }
 
         // A scene left behind leaves its nodes: the spot no longer tells this view, and a gathering here ends.

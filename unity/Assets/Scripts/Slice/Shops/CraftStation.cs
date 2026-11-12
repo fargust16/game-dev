@@ -14,15 +14,25 @@ namespace GameDev.Slice.Shops
     /// <summary>
     /// The anvil in a Master's yard, where Item Creation is worked (19 §3; the owner's play test of S5a: crafting at a
     /// station, not through the Master). <c>E  Work at the anvil</c> within reach opens its page of recipes; a click works
-    /// the piece through its ticks, the world running, and then its Reaction Check's bar shows: a good stop makes the
-    /// piece, a bad one spoils it and half of each resource. The page opens again with what came of it. E again, Escape,
-    /// walking away or a fight closes it. The driver puts one on the anvil nearest each workshop's Master when a scene
-    /// loads, so no scene is changed for it.
+    /// the piece through its ticks, the world running, as the character steps to the anvil and strikes it; its Reaction
+    /// Check comes on the last blow, where the hammer meets the anvil's face, the world paused (the owner's second
+    /// direction of 2026-11-11): a good stop makes the piece, a bad one spoils it and half of each resource. The page
+    /// opens again with what came of it once the hammer has come up. E again, Escape, walking away or a fight closes it.
+    /// The driver puts one on the anvil nearest each workshop's Master when a scene loads, so no scene is changed for it.
     /// </summary>
     public sealed class CraftStation : MonoBehaviour, IPromptSource
     {
         /// <summary>Authoring default, m: how near the anvil the character stands to work it.</summary>
         public const float Reach = 2.2f;
+
+        /// <summary>
+        /// Authoring default, m: how far beyond the anvil's edge the character stands to strike it, the hammer's head
+        /// reaching about this far ahead of the chest at the blow (`clip_survey.txt`, HammerDown).
+        /// </summary>
+        public const float StrikeReach = 0.45f;
+
+        /// <summary>The blows before the last, each struck whole: two blows with their rebounds.</summary>
+        private static readonly string[] LeadIn = { "HammerDown", "HammerUp", "HammerDown", "HammerUp" };
 
         private PlayerLocomotion _player;
         private HudView _hud;
@@ -75,7 +85,7 @@ namespace GameDev.Slice.Shops
             _open = false;
         }
 
-        private static bool Working(SliceWorldDriver world) => world.Reaction != null && world.Reaction.Running;
+        private static bool Working(SliceWorldDriver world) => (world.Reaction != null && world.Reaction.Running) || (world.Work != null && world.Work.Busy);
 
         private static bool Busy()
         {
@@ -112,35 +122,54 @@ namespace GameDev.Slice.Shops
             _hud.ShowShop(Loc.Get("ui.anvil.title"), BagPage.Money(world.Bag), lines, _note ?? Loc.Get("ui.anvil.hint"));
         }
 
-        /// <summary>Works the piece through its ticks, then shows its bar; a fight in the ticks interrupts it and nothing is spent.</summary>
+        /// <summary>
+        /// Works the piece: the character steps to the anvil and strikes, the piece's ticks pass, and the last blow brings
+        /// its bar; a fight in the ticks interrupts it and nothing is spent.
+        /// </summary>
         private void Craft(ItemDefinition item, int stage)
         {
             var world = SliceWorldDriver.Running;
             var workshop = world.Workshop;
             var fault = workshop.Fault(Keeper, item, stage);
-            if (fault != null)
+            if (fault != null || world.Work == null)
             {
-                _note = Loc.Get(fault);
+                _note = Loc.Get(fault ?? "ui.craft.interrupted");
                 Show();
+                return;
+            }
+
+            Close();
+            var stroke = new WorkStroke
+            {
+                Clip = "HammerDown",
+                LeadIn = LeadIn,
+                Then = "HammerUp",
+                Steady = true,
+                Bar = () => workshop.Bar(stage),
+                CaptionKey = "ui.craft.caption",
+                Settle = result =>
+                {
+                    var outcome = workshop.Finish(item, stage, result, out var piece);
+                    _note = outcome == CraftOutcome.Made ? Loc.Format("ui.craft.made", Name(item, piece), workshop.Ticks(stage))
+                        : outcome == CraftOutcome.Spoiled ? Loc.Get("ui.craft.spoiled")
+                        : Loc.Get("ui.craft.interrupted");
+                },
+                Ended = broken => Open(),
+                Face = transform,
+                StandOff = PlayerWork.Radius(transform) + StrikeReach,
+            };
+            if (!world.Work.Begin(stroke))
+            {
+                _note = Loc.Get("ui.craft.interrupted");
+                Open();
                 return;
             }
 
             if (workshop.Work(Keeper, item, stage, Busy) != CraftOutcome.Worked)
             {
                 _note = Loc.Get("ui.craft.interrupted");
-                Show();
-                return;
+                world.Work.Stop();
             }
-
-            Close();
-            world.Reaction.Begin(workshop.Bar(stage), "ui.craft.caption", result =>
-            {
-                var outcome = workshop.Finish(item, stage, result, out var piece);
-                _note = outcome == CraftOutcome.Made ? Loc.Format("ui.craft.made", Name(item, piece), workshop.Ticks(stage))
-                    : outcome == CraftOutcome.Spoiled ? Loc.Get("ui.craft.spoiled")
-                    : Loc.Get("ui.craft.interrupted");
-                Open();
-            });
         }
 
         private static string Name(ItemDefinition item, ItemPiece piece) => piece == null

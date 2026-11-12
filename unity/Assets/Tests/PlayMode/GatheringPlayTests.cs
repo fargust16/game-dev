@@ -14,7 +14,10 @@ using UnityEngine.TestTools;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S5a.5 in Gloomwood: E at a fellable tree with an axe in the bag fells it, a cycle a tick, until it is gone.</summary>
+    /// <summary>
+    /// S5a.5 in Gloomwood: E at a fellable tree with an axe in the bag fells it, a check at each swing's key frame with the
+    /// world paused, until it is gone; E at a herb patch picks it in one check as the character begins to rise (AN3).
+    /// </summary>
     public sealed class GatheringPlayTests : SliceInputTestBase
     {
         private string _language;
@@ -61,24 +64,18 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual("E  Fell the tree", hud.PromptText, Describe(player));
             yield return Tap(Key.E);
             Assert.IsTrue(tree.IsActive, "E begins felling");
+            Assert.IsTrue(world.Work.Busy, "the character swings");
 
-            world.Clock.AdvanceTicks(1);
-            for (var t = 0f; t < 2f && !world.Reaction.Running; t += Time.deltaTime)
-            {
-                yield return null;
-            }
-
-            Assert.IsTrue(world.Reaction.Running, "a tick brings the cycle's bar");
+            yield return AtKey(world);
+            Assert.IsTrue(world.Reaction.Running, "the blade meeting the trunk brings the swing's bar");
+            Assert.IsTrue(world.Work.AtKey);
+            Assert.AreEqual(0f, player.GetComponentInChildren<Animator>().speed, "the swing stands still at its key frame");
+            Assert.IsTrue(world.Clock.IsPaused, "and the world with it");
             Assert.IsFalse(player.enabled, "the character stands still while it shows");
             Assert.Greater(world.Reaction.Bar.PerfectWidth, 0d, "a perfect zone for two units");
             var cycles = 0;
             for (; cycles < 30 && tree.Shown; cycles++)
             {
-                if (cycles > 0)
-                {
-                    world.Clock.AdvanceTicks(1);
-                }
-
                 yield return StopInZone(world.Reaction);
             }
 
@@ -90,12 +87,71 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual("ui.gather.stop.spent", world.Gathering.Stopped);
             Assert.Less(world.Stamina.Share, 1d, "felling spent Stamina");
             Assert.Greater(world.State.Get(tree.Spot.EmptiedKey), 0, "the run remembers it");
+            yield return PlayedOut(world);
+            Assert.IsTrue(player.enabled, "the last swing played out, the character walks again");
+        }
+
+        [UnityTest]
+        public IEnumerator AHerbPatchIsPickedInOneCheck()
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
+            var world = SliceWorldDriver.Running;
+            var homes = world.Beasts != null ? world.Beasts.Beasts.Select(b => b.Home).ToList() : new System.Collections.Generic.List<Vector3>();
+            var patch = Object.FindObjectsByType<GatherNode>(FindObjectsInactive.Exclude).Where(n => n.Spot.Rule.kind == GatherKind.Herb && n.Shown)
+                .OrderByDescending(n => homes.Count == 0 ? 0f : homes.Min(h => Vector3.Distance(h, n.transform.position))).First();
+            var player = Object.FindAnyObjectByType<PlayerLocomotion>();
+            Assert.IsTrue(Stand(patch, out var at), "room beside the patch");
+            player.Teleport(at, Quaternion.LookRotation(Flat(patch.transform.position - at)));
+            yield return new WaitForSeconds(0.5f);
+
+            var hud = Object.FindAnyObjectByType<HudView>();
+            Assert.AreEqual(Loc.Get("ui.prompt.gather.herb"), hud.PromptText, Describe(player));
+            yield return Tap(Key.E);
+
+            // Patches grow close together: E takes whichever is in reach, so the one begun is the one checked.
+            patch = Object.FindObjectsByType<GatherNode>(FindObjectsInactive.Exclude).Single(n => n.IsActive);
+            Assert.IsTrue(patch.Patch, "a herb patch begun");
+            yield return AtKey(world);
+            Assert.IsTrue(world.Reaction.Running, "the hands done at the ground bring the one bar");
+            var animator = player.GetComponentInChildren<Animator>();
+            Assert.IsTrue(animator.GetCurrentAnimatorStateInfo(0).IsName("Harvest"), "stooping over the patch");
+            Assert.Greater(world.Reaction.Bar.PerfectWidth, 0d, "a perfect zone for one more");
+            yield return StopInZone(world.Reaction);
+
+            Assert.That(world.Bag.Count("herb"), Is.InRange(3, 4), "the patch's three units, a perfect stop one more");
+            Assert.IsFalse(patch.Shown, "the patch is picked clean in one check");
+            Assert.AreEqual("ui.gather.stop.picked", world.Gathering.Stopped);
+            Assert.IsTrue(world.Work.Busy, "the character rises after the check");
+            Assert.IsTrue(animator.GetCurrentAnimatorStateInfo(0).IsName("Harvest"), "rising on the same clip");
+            yield return PlayedOut(world);
+            Assert.IsTrue(player.enabled, "and walks again once it stands");
+        }
+
+        /// <summary>Waits for the work's clip to reach its key frame, where the bar shows.</summary>
+        internal static IEnumerator AtKey(SliceWorldDriver world)
+        {
+            for (var t = 0f; t < 6f && !world.Reaction.Running; t += Time.deltaTime)
+            {
+                yield return null;
+            }
+        }
+
+        /// <summary>Waits for the work to play out to its clip's end.</summary>
+        internal static IEnumerator PlayedOut(SliceWorldDriver world)
+        {
+            for (var t = 0f; t < 6f && world.Work.Busy; t += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            yield return null;
         }
 
         /// <summary>Waits for a Reaction Check's bar and stops its marker in the middle of its zones, as Space does.</summary>
         internal static IEnumerator StopInZone(SliceReaction reaction)
         {
-            for (var t = 0f; t < 2f && !reaction.Running; t += Time.deltaTime)
+            for (var t = 0f; t < 6f && !reaction.Running; t += Time.deltaTime)
             {
                 yield return null;
             }

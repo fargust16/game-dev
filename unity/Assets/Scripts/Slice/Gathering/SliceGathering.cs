@@ -31,10 +31,12 @@ namespace GameDev.Slice.Gathering
     }
 
     /// <summary>
-    /// Gathering (S5a.5; 19 §6.4). The character begins at a node with its tool; then each world tick is one cycle, a
-    /// Reaction Check of 07.1 §8a on the node's attribute and skill against its D (the owner's play test of S5a): a perfect
-    /// result gives two units, a good one one, and a bad one none and wears the tool three times as much; every cycle spends
-    /// 3 % of maximum Stamina, and a worn-out tool stays in the bag broken (19 §4.3). Gathering goes on until the character cancels it,
+    /// Gathering (S5a.5; 19 §6.4). The character begins at a node with its tool; then each swing of its animation is one
+    /// cycle, a Reaction Check of 07.1 §8a on the node's attribute and skill against its D at the swing's key frame (the
+    /// owner's second direction of 2026-11-11): a perfect result gives two units, a good one one, and a bad one none and
+    /// wears the tool three times as much. A herb or flax patch is picked in one go, one check that empties it: a good result
+    /// gives what it holds, a perfect one that and one more, a bad one nothing. Every check spends 3 % of maximum Stamina,
+    /// and a worn-out tool stays in the bag broken (19 §4.3). Gathering goes on until the character cancels it,
     /// moves, opens the bag, a beast notices or attacks, the bag can carry no more, Stamina runs out, or the node is
     /// spent; a spent node leaves the world at once, and a herb or flax patch comes back 24 hours later. What is taken
     /// lives in the world state, keyed by the node's place.
@@ -56,7 +58,9 @@ namespace GameDev.Slice.Gathering
         private readonly IWorldState _state;
         private readonly ICharacterValues _character;
         private readonly IWorldSeed _seed;
+        private readonly IWorldClock _clock;
         private readonly Dictionary<string, GatherSpot> _spots = new Dictionary<string, GatherSpot>();
+        private int _strokes;
 
         public SliceGathering(GatherRules rules, Bag bag, IWorldState state, IWorldClock clock, ICharacterValues character,
             SliceStamina stamina, IWorldSeed seed)
@@ -66,6 +70,7 @@ namespace GameDev.Slice.Gathering
             _state = state;
             _character = character;
             _seed = seed;
+            _clock = clock;
             Stamina = stamina;
             clock.TickBoundary += OnTick;
         }
@@ -90,11 +95,6 @@ namespace GameDev.Slice.Gathering
 
         /// <summary>How many times gathering has ended, so a view can tell a new end from an old one.</summary>
         public int Stops { get; private set; }
-
-        /// <summary>Whether a cycle waits for its Reaction Check, and the tick it is of.</summary>
-        public bool Due { get; private set; }
-
-        public long DueTick { get; private set; }
 
         /// <summary>World state: the wear on the character's tool of kind <paramref name="tool"/> in use.</summary>
         public static string WearKey(string tool) => $"tool.{tool}.wear";
@@ -135,7 +135,7 @@ namespace GameDev.Slice.Gathering
             return Stamina.Tired ? "ui.gather.fault.tired" : null;
         }
 
-        /// <summary>Begins gathering the node; the key of why it cannot, or null. The first cycle comes at the next tick.</summary>
+        /// <summary>Begins gathering the node; the key of why it cannot, or null. The first swing begins at once.</summary>
         public string Begin(GatherSpot spot)
         {
             var fault = Fault(spot);
@@ -162,7 +162,6 @@ namespace GameDev.Slice.Gathering
             StoppedAt = Active;
             Stopped = reason;
             Active = null;
-            Due = false;
             Stamina.Exerting = false;
             Stops++;
         }
@@ -178,7 +177,7 @@ namespace GameDev.Slice.Gathering
         public double Delta(GatherSpot spot) =>
             ReactionCheck.Delta(_character.Get(spot.Rule.attribute), _character.Get(spot.Rule.skill), spot.Rule.difficulty);
 
-        /// <summary>The bar of the active node's cycle at <paramref name="tick"/>: its zones and pace by Δ, placed by the seed.</summary>
+        /// <summary>The bar of the active node's check keyed by <paramref name="tick"/>: its zones and pace by Δ, placed by the seed.</summary>
         public ReactionBar Bar(long tick)
         {
             var spot = Active;
@@ -187,13 +186,51 @@ namespace GameDev.Slice.Gathering
                 : ReactionCheck.For(Delta(spot), _seed.Fork(SliceSeedStreams.Gathering, (int)tick, Hash(spot.Id)), perfect: true);
         }
 
+        /// <summary>The bar of the active node's next check: several come in a tick, each placed afresh by the seed.</summary>
+        public ReactionBar NextBar() => Bar((_clock.Tick * 64L) + (_strokes++ & 63));
+
+        /// <summary>Settles the active node's swing by its Reaction Check's <paramref name="result"/>, now.</summary>
+        public CheckOutcome Cycle(ReactionResult result) => Cycle(_clock.Tick, result);
+
+        /// <summary>
+        /// Settles the active herb or flax patch in one go by its Reaction Check's <paramref name="result"/> (19 §6.4, the
+        /// owner's second direction of 2026-11-11): a good result gives what it holds, a perfect one that and one more, a bad
+        /// one nothing, and the patch is empty whatever came of it, its check costing a cycle's Stamina. A bag that cannot
+        /// carry the units ends the gathering with the patch as it was.
+        /// </summary>
+        public CheckOutcome Harvest(ReactionResult result)
+        {
+            var spot = Active;
+            if (spot == null)
+            {
+                return CheckOutcome.Failure;
+            }
+
+            var outcome = OutcomeOf(result);
+            var left = Left(spot);
+            var units = outcome == CheckOutcome.Critical ? left + 1 : outcome == CheckOutcome.Normal ? left : 0;
+            if (units > 0 && !_bag.Add(spot.Rule.resource, units))
+            {
+                Stop("ui.gather.stop.heavy");
+                return outcome;
+            }
+
+            _state.Set(spot.TakenKey, spot.Rule.units);
+            TakenNow += units;
+            Stamina.Spend(_rules.CycleStamina);
+            Cycled?.Invoke(spot, outcome, units);
+            _state.Set(spot.EmptiedKey, (int)_clock.Tick + 1);
+            spot.Shown?.Invoke(false);
+            Stop(units > 0 ? "ui.gather.stop.picked" : "ui.gather.stop.lost");
+            return outcome;
+        }
+
         /// <summary>
         /// Settles the active node's cycle at <paramref name="tick"/> by its Reaction Check's <paramref name="result"/>:
         /// the units it gives, the tool's wear and the Stamina it spends.
         /// </summary>
         public CheckOutcome Cycle(long tick, ReactionResult result)
         {
-            Due = false;
             var spot = Active;
             if (spot == null)
             {
@@ -257,12 +294,6 @@ namespace GameDev.Slice.Gathering
 
         private void OnTick(long tick)
         {
-            if (Active != null && !Due)
-            {
-                Due = true;
-                DueTick = tick;
-            }
-
             foreach (var spot in _spots.Values)
             {
                 var emptied = _state.Get(spot.EmptiedKey);

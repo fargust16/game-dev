@@ -37,7 +37,20 @@ namespace GameDev.Slice.Tests
             _life = _rules.Fighter(_sheet, null, new WeaponSet(settings.Fists));
         }
 
-        private string Treat(out Treatment treatment, out bool success) => _aid.TreatOutside(() => _life, f => _life = f, out treatment, out success);
+        /// <summary>First Aid outside a fight as the character kneels: its fault, its ticks, then its check's <paramref name="result"/>.</summary>
+        private string Treat(ReactionResult result, out Treatment treatment, out bool success)
+        {
+            success = false;
+            var fault = _aid.Fault(_life, out treatment);
+            if (fault != null)
+            {
+                return fault;
+            }
+
+            _aid.Work(treatment);
+            success = _aid.Finish(() => _life, f => _life = f, treatment, result);
+            return null;
+        }
 
         private void Learn() => _state.Set(SliceFirstAid.LessonKey, 1);
 
@@ -55,7 +68,7 @@ namespace GameDev.Slice.Tests
                 _life.Poisoned = treatment == Treatment.Antidote;
                 _life.LegBroken = treatment == Treatment.Splint;
                 var from = _clock.Tick;
-                Assert.IsNull(Treat(out var given, out var success), item);
+                Assert.IsNull(Treat(ReactionResult.Good, out var given, out var success), item);
                 Assert.AreEqual(treatment, given);
                 Assert.AreEqual((long)ticks, _clock.Tick - from, $"a {item} takes {ticks} ticks");
                 Assert.AreEqual(!success, FightRules.Needs(_life, treatment), $"a {item} that works ends its condition");
@@ -74,13 +87,13 @@ namespace GameDev.Slice.Tests
             _bag.Add("antidote");
             _bag.Add("splint");
             var start = _clock.Tick;
-            Assert.AreEqual("ui.life.nosupply", Treat(out _, out _), "neither without the lesson");
+            Assert.AreEqual("ui.life.nosupply", Treat(ReactionResult.Good, out _, out _), "neither without the lesson");
             Assert.AreEqual(start, _clock.Tick, "and no time spent");
 
             _life.Bleeding = true;
-            Assert.AreEqual("ui.life.nosupply", Treat(out _, out _), "bleeding with no bandage");
+            Assert.AreEqual("ui.life.nosupply", Treat(ReactionResult.Good, out _, out _), "bleeding with no bandage");
             _bag.Add("bandage");
-            Assert.IsNull(Treat(out var given, out _));
+            Assert.IsNull(Treat(ReactionResult.Good, out var given, out _));
             Assert.AreEqual(Treatment.Bandage, given, "a bandage needs no lesson");
 
             Learn();
@@ -88,32 +101,25 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
-        public void AFailedCheckKeepsTheItemAndSpendsTheTicks()
+        public void ABadCheckKeepsTheItemAndSpendsTheTicks()
         {
             Learn();
-            const int Tries = 200;
-            var failed = 0;
             _bag.Add("splint");
-            for (var n = 0; n < Tries; n++)
-            {
-                _life.LegBroken = true;
-                var from = _clock.Tick;
-                Assert.IsNull(Treat(out _, out var success));
-                Assert.AreEqual(3L, _clock.Tick - from);
-                if (!success)
-                {
-                    failed++;
-                    Assert.IsTrue(_life.LegBroken, "a failure leaves the leg");
-                    Assert.AreEqual(1, _bag.Count("splint"), "and keeps the splint");
-                }
-                else
-                {
-                    Assert.AreEqual(0, _bag.Count("splint"));
-                    _bag.Add("splint");
-                }
-            }
+            _life.LegBroken = true;
+            var from = _clock.Tick;
+            Assert.IsNull(Treat(ReactionResult.Bad, out _, out var success));
+            Assert.IsFalse(success);
+            Assert.AreEqual(3L, _clock.Tick - from, "the ticks are spent all the same");
+            Assert.IsTrue(_life.LegBroken, "a bad stop leaves the leg");
+            Assert.AreEqual(1, _bag.Count("splint"), "and keeps the splint");
 
-            Assert.AreEqual(1d - _rules.TreatmentChance(_sheet, Treatment.Splint), failed / (double)Tries, 0.08d, "at Dexterity and First Aid 1, a splint fails about half the time");
+            // 07.1 §8a: Δ = (Dexterity + First Aid) / 2 − D, a splint's D 3; the bar has no perfect zone.
+            _sheet.Set(CharacterAttribute.Dexterity, 3);
+            _sheet.Set(CharacterSkill.FirstAid, 1);
+            Assert.AreEqual(2d - _rules.TreatmentDifficulty(Treatment.Splint), _aid.Delta(Treatment.Splint), 1e-9);
+            var bar = _aid.Bar(Treatment.Splint);
+            Assert.AreEqual(ReactionCheck.Width(_aid.Delta(Treatment.Splint)), bar.GoodWidth, 1e-9);
+            Assert.AreEqual(0d, bar.PerfectWidth, 1e-9);
         }
 
         [Test]

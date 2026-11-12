@@ -17,9 +17,10 @@ using UnityEngine.TestTools;
 namespace GameDev.Slice.Tests
 {
     /// <summary>
-    /// S5a.8 in Veilmouth: beside a walking townsperson E shows the Reaction Check's bar; Space with the marker in the
-    /// good zone lifts the purse unseen, and a marker run out means the next person notices, cries out and the Deeds
-    /// Record keeps it.
+    /// S5a.8 in Veilmouth: beside a walking townsperson E sends the crouched hand to the pocket, where the Reaction
+    /// Check's bar shows, the world running on (AN3); Space with the marker in the good zone lifts the purse unseen, a
+    /// marker run out means the next person notices, cries out and the Deeds Record keeps it, and a person who moves 1 m
+    /// calls the try off unspent.
     /// </summary>
     public sealed class TheftPlayTests : SliceInputTestBase
     {
@@ -67,10 +68,12 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(world.Hiding.SetActive(true));
             var bronze = world.Bag.Bronze;
             yield return Tap(Key.E);
-            Assert.IsTrue(world.Reaction.Running, "E shows the bar");
+            Assert.IsTrue(world.Work.Busy, "E sends the hand to the pocket");
+            yield return GatheringPlayTests.AtKey(world);
+            Assert.IsTrue(world.Reaction.Running, "where it reaches in the bar shows");
             Assert.IsTrue(hud.IsReactionShown);
             Assert.IsFalse(player.enabled, "the character stands still while it shows");
-            Assert.IsTrue(world.Clock.IsPaused, "the world pauses while theft's bar shows");
+            Assert.IsFalse(world.Clock.IsPaused, "theft does not pause the world (the owner, 2026-11-11)");
             Assert.AreEqual(0.35d, world.Reaction.Bar.GoodWidth, 1e-9);
             Assert.AreEqual(1.5d, world.Reaction.Bar.Seconds, 1e-9, "the slowest marker");
 
@@ -83,8 +86,8 @@ namespace GameDev.Slice.Tests
             yield return Tap(Key.Space);
             Assert.IsFalse(world.Reaction.Running, "Space stops the marker");
             Assert.IsFalse(hud.IsReactionShown);
-            Assert.IsTrue(player.enabled);
-            Assert.IsFalse(world.Clock.IsPaused, "the world runs again");
+            yield return GatheringPlayTests.PlayedOut(world);
+            Assert.IsTrue(player.enabled, "the hand drawn back, the character moves again");
             Assert.That(world.Bag.Bronze - bronze, Is.InRange(SliceTheft.PurseLeast, SliceTheft.PurseMost), "the purse lifted unseen");
             Assert.IsTrue(world.Theft.TriedToday(first.Person));
             Assert.AreEqual(0, world.State.Get(Reputation));
@@ -97,6 +100,7 @@ namespace GameDev.Slice.Tests
             Assert.IsNotNull(second, "a second walker");
             bronze = world.Bag.Bronze;
             yield return Tap(Key.E);
+            yield return GatheringPlayTests.AtKey(world);
             Assert.IsTrue(world.Reaction.Running);
             Assert.Less(world.Reaction.Bar.Seconds, 1.5d, "a clumsy hand's marker runs faster");
             for (var t = 0f; t < 3f && world.Reaction.Running; t += Time.deltaTime)
@@ -115,6 +119,22 @@ namespace GameDev.Slice.Tests
             }
 
             Assert.AreEqual("Noticed! Nothing taken.", second.PromptFor(player.transform.position));
+            yield return GatheringPlayTests.PlayedOut(world);
+
+            // A person who moves on calls the try off: the bar goes, nothing is spent, and it may be tried again.
+            PurseTarget third = null;
+            yield return Choose(targets.Where(t => t != first).ToArray(), second, player, t => third = t);
+            Assert.IsNotNull(third, "a third walker");
+            yield return Tap(Key.E);
+            yield return GatheringPlayTests.AtKey(world);
+            Assert.IsTrue(world.Reaction.Running);
+            third.transform.position += Vector3.ProjectOnPlane(third.transform.forward, Vector3.up).normalized * 1.2f;
+            yield return null;
+            yield return null;
+            Assert.IsFalse(world.Reaction.Running, "1 m away the bar goes");
+            Assert.IsFalse(world.Work.Busy, "and the work with it");
+            Assert.IsFalse(world.Theft.TriedToday(third.Person), "the try is not spent");
+            Assert.AreEqual("They moved off; the try is called off.", third.PromptFor(third.transform.position));
         }
 
         /// <summary>

@@ -12,8 +12,9 @@ namespace GameDev.Slice.Fights
     /// <summary>
     /// First Aid with what the character carries (S5a.7; 10.2 *First Aid*): the bandages, antidotes and splints are
     /// items in the bag, bought from the Master of First Aid; an antidote and a splint need the Master's lesson. In a fight
-    /// a treatment costs its AP, outside one its ticks, the world running through them; then a check on Dexterity and
-    /// First Aid. A success ends the condition and uses the item, a failure keeps it.
+    /// a treatment costs its AP, outside one its ticks, the world running through them; then the player's Reaction Check
+    /// of 07.1 §8a on `(Dexterity + First Aid) / 2 − D` (the owner's second direction of 2026-11-11). A good result ends the
+    /// condition and uses the item, a bad one keeps it.
     /// </summary>
     public sealed class SliceFirstAid
     {
@@ -97,32 +98,48 @@ namespace GameDev.Slice.Fights
         }
 
         /// <summary>
-        /// First Aid outside a fight on the character itself, its most urgent condition first: the treatment's ticks pass,
-        /// the world running through them, and then its check. <paramref name="load"/> reads the character's life as it
-        /// stands and <paramref name="save"/> keeps it. Returns the key of why nothing was done, or null.
+        /// The treatment First Aid outside a fight gives the character itself, its most urgent condition first; the key of
+        /// why there is none, or null.
         /// </summary>
-        public string TreatOutside(Func<Fighter> load, Action<Fighter> save, out Treatment treatment, out bool success)
+        public string Fault(Fighter fighter, out Treatment treatment)
         {
             treatment = default;
-            success = false;
-            if (!(Choose(load(), Count, Knows) is Treatment chosen))
+            if (!(Choose(fighter, Count, Knows) is Treatment chosen))
             {
                 return "ui.life.nosupply";
             }
 
             treatment = chosen;
-            _clock.AdvanceTicks(_rules.TreatmentTicks(chosen));
-            var fighter = load();
-            var rolls = _seed.Fork(SliceSeedStreams.ActionChecks, (int)_clock.Tick, 7000 + (int)chosen);
-            success = rolls.NextDouble() < _rules.TreatmentChance(_character, chosen);
-            if (success)
+            return null;
+        }
+
+        /// <summary>The treatment's ticks outside a fight, the world running through them.</summary>
+        public void Work(Treatment treatment) => _clock.AdvanceTicks(_rules.TreatmentTicks(treatment));
+
+        /// <summary>The Reaction Check's Δ: `(Dexterity + First Aid) / 2 − D` (07.1 §8a, 10.2).</summary>
+        public double Delta(Treatment treatment) => ReactionCheck.Delta(_character.Get(CharacterAttribute.Dexterity),
+            _character.Get(CharacterSkill.FirstAid), _rules.TreatmentDifficulty(treatment));
+
+        /// <summary>The treatment's bar: its zone and pace by Δ, placed by the seed by the tick, with no perfect zone.</summary>
+        public ReactionBar Bar(Treatment treatment) =>
+            ReactionCheck.For(Delta(treatment), _seed.Fork(SliceSeedStreams.ActionChecks, (int)_clock.Tick, 7000 + (int)treatment));
+
+        /// <summary>
+        /// Settles a treatment outside a fight by its check's <paramref name="result"/>: a good one ends the condition and
+        /// uses the item. <paramref name="load"/> reads the character's life as it stands and <paramref name="save"/> keeps it.
+        /// </summary>
+        public bool Finish(Func<Fighter> load, Action<Fighter> save, Treatment treatment, ReactionResult result)
+        {
+            if (result == ReactionResult.Bad)
             {
-                FightRules.Cure(fighter, chosen);
-                save(fighter);
-                _bag.Remove(SupplyItems[(int)chosen]);
+                return false;
             }
 
-            return null;
+            var fighter = load();
+            FightRules.Cure(fighter, treatment);
+            save(fighter);
+            _bag.Remove(SupplyItems[(int)treatment]);
+            return true;
         }
     }
 }

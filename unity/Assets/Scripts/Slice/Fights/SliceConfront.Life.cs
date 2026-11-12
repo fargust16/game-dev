@@ -4,6 +4,7 @@ using GameDev.Confront.Rules;
 using GameDev.Confront.Turns;
 using GameDev.Core.Localization;
 using GameDev.Locomotion;
+using GameDev.Player.Progression;
 using GameDev.World.State;
 using GameDev.World.Timekeeping;
 using UnityEngine;
@@ -41,6 +42,9 @@ namespace GameDev.Slice.Fights
 
         private string _lifeNote;
         private float _lifeNoteUntil;
+
+        // The frame First Aid's bar in a fight was stopped: its Space must not also end the turn.
+        private int _checkedFrame = -1;
         private int _lifeShown = -1;
 
         /// <summary>First Aid with the supplies in the bag (S5a.7); null in a test that needs none.</summary>
@@ -137,13 +141,37 @@ namespace GameDev.Slice.Fights
             }
         }
 
-        private bool TreatInFight(Combatant player) =>
-            FirstAid != null && FirstAid.Choose(player.Fighter, t => player.Supplies[(int)t], player.KnowsFirstAid) is Treatment treatment
-            && _turns.SubmitIntent(TurnIntent.Treat(treatment, player.Id));
+        /// <summary>
+        /// First Aid in a fight (10.2): with the treatment chosen and its AP in hand, the player's Reaction Check shows at
+        /// once, as the fight's turn stands still anyway, and the treatment is given with its result. A Kneel of five
+        /// seconds would hold every turn up, so the fight plays none.
+        /// </summary>
+        private bool TreatInFight(Combatant player)
+        {
+            var reaction = SliceWorldDriver.Running != null ? SliceWorldDriver.Running.Reaction : null;
+            if (FirstAid == null || reaction == null || reaction.Running
+                || !(FirstAid.Choose(player.Fighter, t => player.Supplies[(int)t], player.KnowsFirstAid) is Treatment treatment)
+                || _turns.ApLeft < _settings.FightRules.TreatmentAp(treatment))
+            {
+                return false;
+            }
+
+            var id = player.Id;
+            return reaction.Begin(FirstAid.Bar(treatment), "ui.life.treat.caption", result =>
+            {
+                _checkedFrame = Time.frameCount;
+                if (_turns != null && _turns.IsRunning)
+                {
+                    _turns.SubmitIntent(TurnIntent.Treat(treatment, id, result != ReactionResult.Bad));
+                    _hud.MarkDirty();
+                }
+            });
+        }
 
         /// <summary>
-        /// First Aid outside a fight (10.2): the treatment takes its ticks, through which the conditions run on, and then its
-        /// check; a success ends the condition and uses the item, a failure keeps it.
+        /// First Aid outside a fight (10.2): the character kneels, the treatment's ticks pass with the conditions running
+        /// on, and the Reaction Check comes where it begins to rise, the world paused (07.1 §8a); a good result ends the
+        /// condition and uses the item, a bad one keeps it. False when it could not begin.
         /// </summary>
         public bool TreatOutside()
         {
@@ -152,14 +180,31 @@ namespace GameDev.Slice.Fights
                 return false;
             }
 
-            var fault = FirstAid.TreatOutside(PlayerFighter, SaveLife, out var treatment, out var success);
+            var fault = FirstAid.Fault(PlayerFighter(), out var treatment);
             if (fault != null)
             {
                 Note(Loc.Get(Healthy ? "ui.life.nothing" : fault));
                 return false;
             }
 
-            Note(Loc.Format(success ? "ui.life.treat.ok" : "ui.life.treat.failed", Loc.Get("ui.treatment." + treatment)));
+            var work = SliceWorldDriver.Running != null ? SliceWorldDriver.Running.Work : null;
+            if (work == null || !work.Begin(new WorkStroke
+                {
+                    Clip = "Kneel",
+                    Steady = true,
+                    Bar = () => FirstAid.Bar(treatment),
+                    CaptionKey = "ui.life.treat.caption",
+                    Settle = result =>
+                    {
+                        var success = FirstAid.Finish(PlayerFighter, SaveLife, treatment, result);
+                        Note(Loc.Format(success ? "ui.life.treat.ok" : "ui.life.treat.failed", Loc.Get("ui.treatment." + treatment)));
+                    },
+                }))
+            {
+                return false;
+            }
+
+            FirstAid.Work(treatment);
             return true;
         }
 

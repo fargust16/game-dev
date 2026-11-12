@@ -120,6 +120,7 @@ ui.life.nothing,Nothing to treat,Лечить нечего
 ui.life.nosupply,Nothing to treat it with,Нечем лечить
 ui.life.treat.ok,"{0}: done",{0} — удалось
 ui.life.treat.failed,"{0}: failed",{0} — не удалось
+ui.life.treat.caption,"Space when the marker is in the zone","Пробел, когда метка в зоне"
 "# Leaving a fight (S3a.9): Break Away, a Yield and its terms, mercy, the lock-up, and death"
 ui.fight.log.brokeaway,{0} breaks away,{0}: вырвался из боя
 ui.fight.log.spared,{0} is spared and leaves,{0}: пощажён и уходит
@@ -268,6 +269,9 @@ ui.gather.stop.beast,Stopped: a beast has noticed you.,Прервано: вас 
 ui.gather.stop.fight,Stopped by a fight.,Прервано боем.
 ui.gather.stop.broken,The tool broke.,Инструмент сломался.
 ui.gather.caption,"Space when the marker is in the zone; its bright middle gives two","Пробел, когда метка в зоне; яркая середина даёт вдвое"
+ui.gather.caption.patch,"Space when the marker is in the zone; its bright middle gives one more","Пробел, когда метка в зоне; яркая середина даёт ещё одну"
+ui.gather.stop.picked,Picked clean.,Собрано подчистую.
+ui.gather.stop.lost,"Fumbled: nothing gathered, the patch is trampled.","Неловко: ничего не собрано, всё помято."
 ui.gather.working.tool,{0}: {1} taken · tool {3} % · Stamina {2} %   E  Stop,{0}: добыто {1} · инструмент {3} % · выносливость {2} %   E  Хватит
 "# A fallen beast's remains (S5a.6; 19 §6.4, 11 C3)"
 ui.prompt.remains.parts,E  Take its parts,E  Забрать трофеи
@@ -276,6 +280,7 @@ ui.remains.taken,Taken: {0}.,Взято: {0}.
 ui.remains.skinned,Skinned: {0} leather.,Шкура снята: кожи {0}.
 ui.remains.spoiled,The hide was spoiled: {0} leather.,Шкура испорчена: кожи {0}.
 ui.remains.interrupted,Skinning interrupted; the hide is still on.,Свежевание прервано; шкура осталась на туше.
+ui.remains.caption,"The last cut: Space when the marker is in the zone","Последний надрез: пробел, когда метка в зоне"
 ui.remains.fault.taken,Its parts are already taken.,Трофеи уже забраны.
 ui.remains.fault.skinned,Its hide is already off.,Шкура уже снята.
 ui.remains.fault.lesson,Skinning needs a lesson from Edda Brann.,Свежевать учит Эдда Бранн.
@@ -286,3 +291,4 @@ ui.theft.caption,Space when the marker is in the zone,"Пробел, когда 
 ui.theft.lifted,Lifted unseen: {0}.,Срезано незаметно: {0}.
 ui.theft.noticed,Noticed! Nothing taken.,Заметили! Ничего не взято.
 ui.theft.shout,Thief!,Вор!
+ui.theft.called_off,"They moved off; the try is called off.","Человек отошёл — кража сорвалась."

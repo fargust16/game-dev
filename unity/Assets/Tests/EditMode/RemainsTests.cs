@@ -27,12 +27,11 @@ namespace GameDev.Slice.Tests
         {
             _rules = AssetDatabase.LoadAssetAtPath<BeastRules>("Assets/Data/Slice/BeastRules.asset");
             var items = AssetDatabase.LoadAssetAtPath<ItemCatalogue>("Assets/Data/Items/Items.asset");
-            var checks = AssetDatabase.LoadAssetAtPath<ActionCheckRules>("Assets/Data/Progression/ActionCheckRules.asset");
             _sheet = new CharacterSheet();
             _bag = SliceWorldDriver.StartingBag(items, _sheet);
             _state = new WorldState();
             _clock = new GameClock(1d, 9 * 60);
-            _remains = new SliceRemains(_rules, _bag, _state, _clock, _sheet, checks, new WorldSeed(110206));
+            _remains = new SliceRemains(_rules, _bag, _state, _clock, _sheet, new WorldSeed(110206));
             _start = _clock.Tick;
         }
 
@@ -70,37 +69,37 @@ namespace GameDev.Slice.Tests
         [Test]
         public void TheHideNeedsTheLesson()
         {
-            Assert.AreEqual(SkinOutcome.Refused, _remains.Skin("boar.7.a", BeastKind.Boar, false, null, out var leather, out var fault));
+            Assert.AreEqual(SkinOutcome.Refused, _remains.Work("boar.7.a", BeastKind.Boar, false, null, out var fault));
             Assert.AreEqual("ui.remains.fault.lesson", fault);
             Assert.AreEqual((0, _start), (_bag.Count("leather"), _clock.Tick), "nothing taken, no time spent");
 
             Learn();
-            _sheet.Set(CharacterAttribute.Dexterity, 60);
-            _sheet.Set(CharacterSkill.Skinning, 60);
-            Assert.AreEqual(SkinOutcome.Done, _remains.Skin("boar.7.a", BeastKind.Boar, false, null, out leather, out fault));
+            Assert.AreEqual(SkinOutcome.Ready, _remains.Work("boar.7.a", BeastKind.Boar, false, null, out fault));
             Assert.IsNull(fault);
             Assert.AreEqual(3L, _clock.Tick - _start, "3 ticks with the world running");
-            Assert.That(leather, Is.EqualTo(2).Or.EqualTo(1));
-            Assert.AreEqual(leather, _bag.Count("leather"));
+            Assert.IsFalse(_remains.Skinned("boar.7.a"), "the hide waits for its check");
+            var whole = _rules.Of(BeastKind.Boar, false).leather;
+            Assert.AreEqual(whole, _remains.Finish("boar.7.a", BeastKind.Boar, false, ReactionResult.Good));
+            Assert.AreEqual(whole, _bag.Count("leather"));
             Assert.IsTrue(_remains.Skinned("boar.7.a"));
-            Assert.AreEqual(SkinOutcome.Refused, _remains.Skin("boar.7.a", BeastKind.Boar, false, null, out _, out fault));
+            Assert.AreEqual(SkinOutcome.Refused, _remains.Work("boar.7.a", BeastKind.Boar, false, null, out fault));
             Assert.AreEqual("ui.remains.fault.skinned", fault, "a hide comes off once");
         }
 
         [Test]
-        public void ASkinningsOutcomesFollowTheCheck()
+        public void ASkinningsOutcomeFollowsItsReactionCheck()
         {
             Learn();
-            const int Boars = 400;
-            var spoiled = 0;
-            for (var n = 0; n < Boars; n++)
-            {
-                Assert.AreEqual(SkinOutcome.Done, _remains.Skin($"boar.{n}", BeastKind.Boar, false, null, out var leather, out _));
-                spoiled += leather == 1 ? 1 : 0;
-                _bag.Remove("leather", _bag.Count("leather"));
-            }
+            var whole = _rules.Of(BeastKind.Boar, false).leather;
+            Assert.AreEqual(whole / 2, _remains.Finish("boar.1", BeastKind.Boar, false, ReactionResult.Bad), "half the hide on a bad stop");
 
-            Assert.AreEqual(_remains.Chances().Failure, spoiled / (double)Boars, 0.07d, "half the hide on a failed check");
+            // 07.1 §8a: Δ = (Dexterity + Skinning) / 2 − D 2; the bar has no perfect zone.
+            _sheet.Set(CharacterAttribute.Dexterity, 3);
+            _sheet.Set(CharacterSkill.Skinning, 1);
+            Assert.AreEqual(2d - _rules.SkinningDifficulty, _remains.Delta(), 1e-9);
+            var bar = _remains.Bar("boar.2");
+            Assert.AreEqual(ReactionCheck.Width(_remains.Delta()), bar.GoodWidth, 1e-9);
+            Assert.AreEqual(0d, bar.PerfectWidth, 1e-9);
         }
 
         [Test]
@@ -108,10 +107,10 @@ namespace GameDev.Slice.Tests
         {
             Learn();
             var asked = 0;
-            Assert.AreEqual(SkinOutcome.Interrupted, _remains.Skin("wolf.2.b", BeastKind.Wolf, false, () => ++asked == 2, out var leather, out _));
-            Assert.AreEqual((0, 0, 2L), (leather, _bag.Count("leather"), _clock.Tick - _start));
+            Assert.AreEqual(SkinOutcome.Interrupted, _remains.Work("wolf.2.b", BeastKind.Wolf, false, () => ++asked == 2, out _));
+            Assert.AreEqual((0, 2L), (_bag.Count("leather"), _clock.Tick - _start));
             Assert.IsFalse(_remains.Skinned("wolf.2.b"), "the hide is still on");
-            Assert.AreEqual(SkinOutcome.Done, _remains.Skin("wolf.2.b", BeastKind.Wolf, false, () => false, out _, out _));
+            Assert.AreEqual(SkinOutcome.Ready, _remains.Work("wolf.2.b", BeastKind.Wolf, false, () => false, out _));
         }
 
         [Test]
