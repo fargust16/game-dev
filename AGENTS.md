@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 2.05
+Version: 2.06
 
 Status: Draft
 
-Last Updated: 2026-11-12 (Furnishing: by the owner's play test, a sitter's chair cannot be knocked away, nobody sits where a chair is gone, and wrecked furniture is back in place an hour later)
+Last Updated: 2026-11-12 (Assault: by the owner's play test, R draws, a click strikes, striking anyone starts a fight the Wardens join, Reputation falls by the harm and for any kill, and low Reputation brings an Accusation)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -418,6 +418,7 @@ An entry marked † is the short binding form. Its full text is in [91 Agent Dec
 - † **City greenery** (owner, 2026-11-09; [VEILMOUTH_CITY_PLAN.md](unity/Assets/Plans/VEILMOUTH_CITY_PLAN.md) §25–§27): a muted city green, with hedges walked through, beds and grass off the roads; the owner's mature tree from Easy Tree along every road and Veilmouth's own thin trees grown in Blender (MTree) in parks and gardens, with wind in their shader, in 1.2 m pits and lamps on the carriageway by the kerb, one row of trees where a carriageway is under 8 m, pavements of about 6 m under trees and no tree in the slums or the works (C4); Roadside Tales outside the walls, whose land pass is planned (S3b.0). Inside the walls no field fence stands, only hedges, railings or stone, and barrels, crates and boxes stand only in the port, by warehouses and in stores, never as filler.
 - † **Furnishing** (owner, 2026-11-07 to 2026-11-12; [INTERIOR_FURNISHING_RULES.md](unity/Assets/Plans/INTERIOR_FURNISHING_RULES.md)): every interior is furnished by rules: clear walk-ways, small things on surfaces, a chandelier only under a ceiling higher than a storey, a missing piece on the wanted list. Barrels are never filler, and rare in a home. The owner's Tripo pieces furnish interiors only (§10), never the city's open plan, but for the hanging sign over Harrow's and the Soot & Bell's doors, the street lamps and one statue. A house has one or two fireplaces, its range counted, on the ground floor only, and a radiator in every other room (§10.1, owner 2026-11-10). A seat's top stands 0.42 m over the floor in the game, 0.45 m deep to its back, 1 m to a person, and the sitter's feet stay on the floor (§13, owner 2026-11-12); the kit's seats leave ×1.2 and are scaled so that their top stands 0.42 m, and only the pew and the plain kit chair get new models (owner, 2026-11-12); whether the tables come down is open (VS-SEAT). A sitter's chair cannot be knocked away, nobody sits where a chair is gone, and wrecked furniture is back in place an hour later (owner, 2026-11-12).
 - **Break-ins** (owner, 2026-11-06; [10.3](10.3%20Stealth%20and%20Detection.md) §6.1–6.2, [10.4](10.4%20Dialogue%20and%20Social%20Checks.md) §6): every dwelling opens into one generated Dwelling scene; a lock is a Reaction Check of Theft and Dexterity with Lockpicks; anyone outside who sees it notices, residents inside; a witness fetches a Warden, and an Arrest keeps the Arguments rule; a Stash reads from who lives there.
+- **Assault** (owner, 2026-11-12; [10.2](10.2%20Combat%20System%20Draft.md) §5c, [10.4](10.4%20Dialogue%20and%20Social%20Checks.md) §4, §6): R draws a weapon and a click strikes. A blow at anyone not fighting starts a fight, and the Wardens come and fight by the rules. Reputation falls by the harm, and for a kill even unseen: the goddess tells the Wardens. A body lies a game day or until a Warden takes it. Low Reputation brings an Accusation, and paying it lifts the name.
 - Vertical Slice mood: Lord of the Mysteries-like 18–19th century industrial-occult transition; the slice's city is Veilmouth, and Lower Veil is one of its districts; only the internal-order faction is joinable; Wardens and Veinmarket are local groups; placeholder names mutable.
 
 ## Engine and terrain
