@@ -5,7 +5,8 @@ Combat Grid of tactical_sim.py, averaged over how far apart a fight starts. The 
 of 10.2: a mage beats plate, plate beats a shooter, a shooter beats a mage, attack
 and critical hits sit between them, and no build is best overall. The lines below
 the five main builds are the choices a player could make instead: they check that
-no such choice beats the main builds. Every value is an authoring default.
+no such choice beats the main builds; those that name two weapons hold one in each
+hand (10.2 *Two weapons*). Every value is an authoring default.
 
 Run: python tools/balance/build_sim.py [fights per cell] [none | 8 | 7]
 
@@ -95,6 +96,16 @@ def make_builds():
         "crit, mace": variant(crit, second=c.MACE),
         "crit, one set": variant(crit, weapon=c.DAGGER, second=None, opener=False),
         "crit, Initiative": variant(crit, mods=TEMPO),
+        "attack, sword": variant(attack, second=c.SWORD),
+        "attack, mace": variant(attack, second=c.MACE),
+        "crit, two daggers": variant(crit, second=c.paired(c.DAGGER, c.DAGGER)),
+        "crit, sword, dagger": variant(crit, second=c.paired(c.SWORD, c.DAGGER)),
+        "crit, two axes": variant(crit, second=c.paired(c.AXE, c.AXE)),
+        "attack, two swords": variant(attack, second=c.paired(c.SWORD, c.SWORD)),
+        "attack, two axes": variant(attack, second=c.paired(c.AXE, c.AXE)),
+        "attack, two maces": variant(attack, second=c.paired(c.MACE, c.MACE)),
+        "plate, two maces": variant(plate, second=c.paired(c.MACE, c.MACE)),
+        "plate, two swords": variant(plate, second=c.paired(c.SWORD, c.SWORD)),
         "plate, mace": variant(plate, second=c.shielded(c.MACE)),
         "plate, axe": variant(plate, second=c.shielded(c.AXE)),
         "plate, no shield": variant(plate, second=c.SWORD),

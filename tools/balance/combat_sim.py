@@ -59,6 +59,7 @@ class Weapon:
     stun: float = 0.0
     cleave: float = 0.0
     req: tuple = ()
+    off: object = None
 
 
 SHIELD_BLOCK = 0.50
@@ -83,6 +84,15 @@ MAUL = Weapon("maul", 10.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.
 ONE_HAND = SWORD
 TWO_HAND = GREATSWORD
 SHIELDED = shielded(SWORD)
+
+
+def paired(main, off):
+    """Two weapons (10.2 §5b, owner 2026-11-11): a one-handed melee weapon in each hand, never with a shield or a
+    firearm. Each blow is struck with either hand at that weapon's own AP, aim, damage, critical chance and trait,
+    so the AP a turn leaves after the heavier weapon's blows can pay for the lighter one's. The pair parries with the
+    better weapon; both weights count in Load, and each weapon keeps its requirements. Checked by build_sim.py."""
+    return replace(main, name=f"{main.name} and {off.name}", off=off, weight=main.weight + off.weight,
+                   guard_chance=max(main.guard_chance, off.guard_chance))
 RIFLE = Weapon("rifle", 6.75, 6, True, range=16, weight=4.0, req=(("per", 3),))
 PISTOL = Weapon("pistol", 5, 4, True, range=6, weight=1.2, accuracy=-10, req=(("dex", 3),))
 

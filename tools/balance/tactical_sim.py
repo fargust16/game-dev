@@ -407,6 +407,8 @@ class Fight:
             if not self.strike(u, t, mult=1.5, unguarded=True):
                 u.exposed = True
             return u.weapon.ap + 1
+        if u.weapon.off:
+            return self.pair(u, t, ap)
         self.strike(u, t)
         if u.weapon.cleave:
             # The sweep reaches a cell beside the target, across the attacker's corner.
@@ -414,6 +416,32 @@ class Fight:
             if rest:
                 self.strike(u, random.choice(rest), mult=u.weapon.cleave)
         return u.weapon.ap
+
+    def cost(self, u):
+        """The AP of the cheapest blow open to u: its weapon's, or the lighter of two."""
+        w = u.weapon
+        return min(w.ap, w.off.ap) if w.off else w.ap
+
+    def pair(self, u, t, ap):
+        """A blow with two weapons, with the hand that opens the mix of blows the AP left can buy that does most harm."""
+        main = u.weapon
+        worth = {}
+        for h in (main, main.off):
+            u.weapon = h
+            worth[id(h)] = self.expected_blow(u, t)
+        u.weapon = main
+
+        def best(left):
+            options = [(worth[id(h)] + best(left - h.ap)[0], h) for h in (main, main.off) if h.ap <= left]
+            return max(options, key=lambda o: o[0]) if options else (0.0, None)
+
+        hand = best(ap)[1] or min((main, main.off), key=lambda h: h.ap)
+        u.weapon = hand
+        try:
+            self.strike(u, t)
+        finally:
+            u.weapon = main
+        return hand.ap
 
     def full_ap(self, u):
         return math.floor(10 + u.dex / 20 + u.gear.ap - u.burden[1])
@@ -485,7 +513,7 @@ class Fight:
                 ap -= SWAP_AP
                 u.weapon, u.second = u.second, u.weapon
                 continue
-            cost = u.weapon.ap
+            cost = self.cost(u)
             if u.intent not in foes or first:
                 u.intent = self.best(u, foes, ap)
             if taunter in foes:
