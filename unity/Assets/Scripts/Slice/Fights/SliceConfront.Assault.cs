@@ -353,6 +353,7 @@ namespace GameDev.Slice.Fights
 
             LastHarm = harm;
             Standing?.RecordHarm(harm);
+            Debug.Log($"[Confront] the Assault's harm {harm:0.#} HP, {_fallen.Count} fallen.");
             _innocents.Clear();
         }
 
@@ -399,6 +400,7 @@ namespace GameDev.Slice.Fights
             }
 
             _errand = WardenErrand.Send(taker, waiting.ConvertAll(f => f.Body), post != null ? post.Post : taker.position, post != null ? post.PostFacing : taker.rotation);
+            Debug.Log($"[Confront] {taker.name} goes to take up {waiting.Count} fallen.");
         }
 
         /// <summary>The cell nearest the grid's edge toward <paramref name="from"/>, or null.</summary>
@@ -426,7 +428,7 @@ namespace GameDev.Slice.Fights
 
         private static Vector3 Ground(Vector3 at)
         {
-            return Physics.Raycast(at + (Vector3.up * 3f), Vector3.down, out var hit, 8f, ~0, QueryTriggerInteraction.Ignore) ? hit.point : at;
+            return PeopleAround.Ground(at, 3f, 8f);
         }
 
         /// <summary>A body that lies fallen: its controller's Down is set.</summary>

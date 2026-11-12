@@ -59,10 +59,13 @@ namespace GameDev.Slice
         /// <summary>Where a beast pack wanders in its territory and when (10.2, the owner's play test of S5a); fork it with the pack and its wander.</summary>
         public const string BeastWander = "slice.beasts.wander";
 
+        /// <summary>Which Wardens take a bribe (10.4 §6; WA5); fork it with the Warden's place in the scene hashed.</summary>
+        public const string Wardens = "slice.wardens";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
-            ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander,
+            ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens,
         };
     }
 }

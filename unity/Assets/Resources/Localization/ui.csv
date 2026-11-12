@@ -296,3 +296,16 @@ ui.theft.noticed,"Failed: you were noticed","Провал — вас замет�
 ui.theft.shout,Thief!,Вор!
 ui.theft.called_off,"Failed: the target moved off","Провал — цель отошла"
 ui.theft.went_in,"Failed: the target went inside","Провал — цель зашла внутрь"
+"# A Warden's Accusation of a character of low Reputation (WA5; 10.4 §6 Accusation)"
+ui.accuse.line,"You. Your name's spoken at the station: blood in the street, and the goddess felt it. That's a fine of {0}, or a night in the lock-up.","Ты. О тебе говорят в участке: кровь на улице, и богиня это почувствовала. Штраф {0} — или ночь в камере."
+ui.accuse.pay,Pay the fine ({0}).,Заплатить штраф ({0}).
+ui.accuse.lockup,I'll come with you.,Я пойду с вами.
+ui.accuse.bribe,Offer {0} to forget it.,"Предложить {0}, чтобы забыть об этом."
+ui.accuse.persuade,"The Wardens owe me. Let it go, this once.","Стража у меня в долгу. Отпустите, в этот раз."
+ui.accuse.fight,Draw on the Warden.,Напасть на стражника.
+ui.accuse.run,Run.,Бежать.
+ui.accuse.paid,"Paid. Keep your hands clean.","Уплачено. Держи руки чистыми."
+ui.accuse.bribe.taken,"Never saw you. Move along.","Я тебя не видел. Проходи."
+ui.accuse.bribe.refused,"A bribe, to a Warden? The fine's {0} now.","Взятка стражнику? Теперь штраф {0}."
+ui.accuse.letoff,"Once. Next time it's the lock-up.","Один раз. В следующий раз — камера."
+ui.accuse.persuade.failed,"Save it for the magistrate.","Прибереги это для судьи."

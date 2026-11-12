@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GameDev.Locomotion;
 using UnityEngine;
 
 namespace GameDev.Slice.People
@@ -6,6 +7,7 @@ namespace GameDev.Slice.People
     /// <summary>
     /// The people of the loaded scenes a blow can reach and the Wardens among them (10.2 §5c): every human body whose
     /// controller carries the fight, a walker or a named person by its own root, never one out of sight inside a door.
+    /// Any other person is the body that carries its capsule, as a Warden on post, a prefab whose model is a child.
     /// </summary>
     public static class PeopleAround
     {
@@ -29,7 +31,7 @@ namespace GameDev.Slice.People
                 }
 
                 var named = animator.GetComponentInParent<NamedPerson>();
-                var body = walker != null ? walker.transform : named != null ? named.transform : animator.transform;
+                var body = walker != null ? walker.transform : named != null ? named.transform : Body(animator.transform);
                 if (!people.Contains(body))
                 {
                     people.Add(body);
@@ -53,6 +55,42 @@ namespace GameDev.Slice.People
             var wardens = InSight().FindAll(IsWarden);
             wardens.Sort((a, b) => (a.position - to).sqrMagnitude.CompareTo((b.position - to).sqrMagnitude));
             return wardens;
+        }
+
+        /// <summary>Whether <paramref name="c"/> is part of a person, the player's too: people stop no sight and are no ground.</summary>
+        public static bool IsPerson(Collider c) =>
+            c != null && (c.GetComponentInParent<Animator>() != null || c.GetComponentInParent<TownsfolkWalker>() != null || c.GetComponentInParent<PlayerLocomotion>() != null
+                          || (c is CapsuleCollider && c.GetComponentInChildren<Animator>() != null));
+
+        /// <summary>The highest surface under <paramref name="at"/> within reach that is no person; <paramref name="at"/> itself when none.</summary>
+        public static Vector3 Ground(Vector3 at, float above = 2f, float depth = 5f)
+        {
+            var best = float.MaxValue;
+            var y = at.y;
+            foreach (var hit in Physics.RaycastAll(at + (Vector3.up * above), Vector3.down, depth, ~0, QueryTriggerInteraction.Ignore))
+            {
+                if (hit.distance < best && !IsPerson(hit.collider))
+                {
+                    best = hit.distance;
+                    y = hit.point.y;
+                }
+            }
+
+            return new Vector3(at.x, y, at.z);
+        }
+
+        // The nearest of the model and its parents that carries a capsule: the whole person moves with it.
+        private static Transform Body(Transform model)
+        {
+            for (var t = model; t != null; t = t.parent)
+            {
+                if (t.GetComponent<CapsuleCollider>() != null)
+                {
+                    return t;
+                }
+            }
+
+            return model;
         }
 
         private static bool Fights(Animator animator)

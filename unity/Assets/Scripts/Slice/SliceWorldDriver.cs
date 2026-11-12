@@ -93,6 +93,9 @@ namespace GameDev.Slice
         /// <summary>The weapon drawn on R in free exploration and a click's blow (10.2 §5c); null without fights or fists.</summary>
         public PlayerArms Arms { get; private set; }
 
+        /// <summary>10.4 §6 *Accusation* (WA5): a Warden stops a character of low Reputation.</summary>
+        public WardenAccusation Accusation { get; private set; }
+
         /// <summary>Theft from the townsfolk (S5a.8); null without a bag or the Deeds Record.</summary>
         public GameDev.Slice.Theft.SliceTheft Theft { get; private set; }
 
@@ -283,6 +286,8 @@ namespace GameDev.Slice
                 Arms.Configure(settings, Fights.WornFighter, () => Fights.InFight, () => Work.Busy || PageOpen());
                 Arms.People = PeopleAround.InSight;
                 Arms.Assault = (target, _) => Fights.StartAssault(target);
+                Accusation = gameObject.AddComponent<WardenAccusation>();
+                Accusation.Configure(this);
             }
             if (Bag != null && settings.Shops != null)
             {

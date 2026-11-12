@@ -98,7 +98,7 @@ namespace GameDev.Slice.People
 
             var step = Mathf.Min(way.magnitude - reach, WalkSpeed * Time.deltaTime);
             var next = transform.position + (way.normalized * step);
-            next.y = Ground(next, transform.position.y);
+            next = PeopleAround.Ground(new Vector3(next.x, transform.position.y, next.z));
             var turn = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(way.normalized, Vector3.up), TurnDegreesPerSecond * Time.deltaTime);
             transform.SetPositionAndRotation(next, turn);
             Play(WalkState);
@@ -115,22 +115,5 @@ namespace GameDev.Slice.People
             _animator.CrossFadeInFixedTime(state, 0.2f, 0);
         }
 
-        // The ground under a point: the nearest surface below that is no person's body.
-        private static float Ground(Vector3 at, float fallback)
-        {
-            var hits = Physics.RaycastAll(at + (Vector3.up * 2f), Vector3.down, 5f, ~0, QueryTriggerInteraction.Ignore);
-            var best = float.MaxValue;
-            var y = fallback;
-            foreach (var hit in hits)
-            {
-                if (hit.distance < best && hit.collider.GetComponentInParent<Animator>() == null && hit.collider.GetComponentInParent<TownsfolkWalker>() == null)
-                {
-                    best = hit.distance;
-                    y = hit.point.y;
-                }
-            }
-
-            return y;
-        }
     }
 }

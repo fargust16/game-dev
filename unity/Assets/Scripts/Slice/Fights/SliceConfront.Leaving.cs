@@ -337,6 +337,21 @@ namespace GameDev.Slice.Fights
             SceneTransition.Travel(new TravelRequest(LockupScene, LockupArrival));
         }
 
+        /// <summary>
+        /// 10.4 §6 *Accusation*: the character goes with the Wardens to the lock-up, on a Yield's terms, owing
+        /// <paramref name="extraFine"/> bronze more, what an honest Warden refused.
+        /// </summary>
+        public void GoToLockUp(int extraFine = 0)
+        {
+            if (_state != null && extraFine > 0)
+            {
+                _state.Set(OwedKey(Wardens), _state.Get(OwedKey(Wardens)) + extraFine);
+            }
+
+            _terms = Wardens;
+            AcceptTerms();
+        }
+
         private HudView DialogueColumn()
         {
             if (_hudView == null)
