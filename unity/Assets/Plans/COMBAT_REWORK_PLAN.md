@@ -1,12 +1,12 @@
 # Combat Rework Plan
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft — §0 is the owner's concept as given and binds; the audit, the questions and the stages are the agent's working plan.
 
 Created: 2026-11-13
 
-Last Updated: 2026-11-13 (first version: the owner's concept recorded as given, the working method, the first audit's contradictions, the questions put to the owner, the stages)
+Last Updated: 2026-11-13 (§3a: the owner's answers to Q1–Q11 and the main goal, a firearm first and melee once an enemy has closed in; Perception leaves accuracy for the critical chance. Earlier: first version: the owner's concept recorded as given, the working method, the first audit's contradictions, the questions put to the owner, the stages)
 
 Depends On:
 [07.1](../../../07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2](../../../07.2%20Derived%20Character%20Statistics.md), [10.1](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2](../../../10.2%20Combat%20System%20Draft.md), [10.3](../../../10.3%20Stealth%20and%20Detection.md), [05.1](../../../05.1%20Arcana%20and%20Limits.md), [19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [17](../../../17%20Game%20Systems%20Architecture.md), [99](../../../99%20Open%20Questions.md) VS-RANGED
@@ -815,6 +815,23 @@ Each has the agent's recommendation first. What the owner leaves to the recommen
 - **Q9 Melee in the slice.** (a) Now: the Wardens' baton, which subdues: a target it brings to 0 HP falls unconscious and is arrested, not killed; fists; beasts. Shields and other melee weapons are designed now and built after the slice. (b) As (a), and the Wardens' shields in the slice. (c) Every melee weapon and the shield back as before 10.2 §5d, retuned.
 - **Q10 Shots in a fight.** (a) One tracer for both modes: at the moment of a shot its line is traced against the scene's classified colliders; a solid obstacle stops it, so a target behind one cannot be chosen; a partial one gives a penalty; each person on the line intercepts it with a high chance before the target is rolled; the seen projectile flies to whoever it struck; a missed shot is lost, no stray hit beyond (VS-ALARM (g)). (b) In a fight too every shot is a free projectile with spread by its chance, striking whatever it meets.
 - **Q11 What enters the slice.** (a) The systems only, with the twelve abilities refitted and only what Q5 needs added. (b) The systems, and one ability of each new way of acting: an area spell, a smoke or magic screen, an illusory double, a step behind an enemy, so that the rules of sight, partial obstacles and area are tried in play. (c) Everything the concept names.
+
+## 3a. The owner's answers (2026-11-13)
+
+The owner answered every question and set the rework's main goal: **in a fight a firearm is the first choice, and melee only once an enemy has closed in.** The answers bind; where one departs from §0 it governs.
+
+- **Q1: accuracy is the profile attribute and the skill; Perception is the attribute of the critical chance alone.** This overrides §0 §3.1, §3.2 and rule 3, which made Perception the common attribute of accuracy: Perception leaves accuracy and stays, as in 07.1 §7, the one attribute behind the critical chance, of attacks and of every other check. The profile attributes do not set the critical chance (§0 §3.4 is answered this way).
+- **Q2 (a):** Luck multiplies every probability as today, the hit chance and the critical chance included.
+- **Q3 (a):** five skills: light melee, heavy melee, light firearms, heavy firearms, and one skill of each Arcana for its abilities.
+- **Q4 (b):** a weapon asks only its profile attribute, so the rifle asks Dexterity in place of Perception; the share met works as today.
+- **Q5 (b):** a Limit opens a pool of 4–6 abilities; the character picks some on reaching it and learns the rest later.
+- **Q6:** 10 Prepared Abilities at Intelligence + Will = 100; the set is changed only out of a fight and takes one tick; passive abilities always work and take no slot.
+- **Q7 (a):** Infusion stays: Will Power for each shot or blow adds a fixed share of the weapon's base as magical damage, with no attribute in it; enchanted ammunition is the magical modifiers of the Cartridge Pouch and its cartridges (19).
+- **Q8 (c):** cartridges stay endless; a kind of cartridge is a kind of pouch, changed in a fight for 2 AP, as today.
+- **Q9 (a):** in the slice now the Wardens' baton, which subdues: a target it brings to 0 HP falls unconscious and is arrested, not killed; fists; beasts. Shields and the other melee weapons are designed now and built after the slice.
+- **Q10 (a):** one tracer for a fight and for the Aimed Shot: a solid obstacle stops the line, so a target behind one cannot be chosen; a partial one gives a penalty; each person on the line intercepts the shot with a high chance before the target is rolled; the seen projectile flies to whoever it struck; a missed shot is lost, with no stray hit beyond it.
+- **Q11 (b):** the systems, and one ability of each new way of acting: an area spell, a smoke or magic screen, an illusory double, and a step behind an enemy.
+- **Way of working:** autonomous until the documents are rewritten and the decided system is built in the game, unless the owner says stop; checks, mathematics and balance are the agent's.
 
 # 4. Stages
 
