@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 2.09
+Version: 2.10
 
 Status: Draft
 
-Last Updated: 2026-11-12 (Aimed Shot and Alarm, the owner's direction after the next play test with the agent's Draft accepted; Assault, Residents in a fight, Stealth and News Pool follow it)
+Last Updated: 2026-11-12 (Aimed Shot and Alarm: the owner's answers to VS-ALARM (a)–(g), the aim through the sights)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -421,7 +421,7 @@ An entry marked † is the short binding form. Its full text is in [91 Agent Dec
 - **Break-ins** (owner, 2026-11-06; [10.3](10.3%20Stealth%20and%20Detection.md) §6.1–6.2, [10.4](10.4%20Dialogue%20and%20Social%20Checks.md) §6): every dwelling opens into one generated Dwelling scene; a lock is a Reaction Check of Theft and Dexterity with Lockpicks; anyone outside who sees it notices, residents inside; a witness fetches a Warden, and an Arrest keeps the Arguments rule; a Stash reads from who lives there.
 - **Assault** (owner, 2026-11-12; [10.2](10.2%20Combat%20System%20Draft.md) §5c, [10.4](10.4%20Dialogue%20and%20Social%20Checks.md) §4, §6): R draws a weapon and a click strikes. A blow at anyone not fighting who sees it starts a fight, and the Wardens come and fight by the rules. Reputation falls by the seen harm, and for a kill even unseen: the goddess tells the Wardens. A body lies a game day or until a Warden takes it. Low Reputation brings an Accusation, and paying it lifts the name.
 - **Residents in a fight** (owner, 2026-11-12; [10.2](10.2%20Combat%20System%20Draft.md) §5a): residents avoid fights and go for help. One attacked by the player or a beast fights back if it has a chance, and very rarely chases. It calls first, an Alarm heard within 30 cells, for now as a line over the head. Each role has no Limit or one of 9–7 (VS-ROLES).
-- † **Aimed Shot and Alarm** (owner, 2026-11-12; [10.2](10.2%20Combat%20System%20Draft.md) §5e): out of a fight the right mouse button aims with no crosshair, and a seen projectile is rolled only when it touches someone. A shot, a Call for Help and a Warden's whistle are Alarms heard within 30 cells, and every hearer acts by one Alarm Check, by its kind. A shot the one hit does not see makes it Alert, not a fight. Open: VS-ALARM.
+- † **Aimed Shot and Alarm** (owner, 2026-11-12; [10.2](10.2%20Combat%20System%20Draft.md) §5e): out of a fight the right mouse button raises the firearm to the eye as at a shooting range, the front sight the only mark, and a seen projectile is rolled only when it touches someone. A shot, a Call for Help and a Warden's whistle are Alarms heard within 30 cells, and every hearer acts by one Alarm Check, by its kind. A shot the one hit does not see makes it Alert, not a fight. Open: VS-ALARM (h).
 - Vertical Slice mood: Lord of the Mysteries-like 18–19th century industrial-occult transition; the slice's city is Veilmouth, and Lower Veil is one of its districts; only the internal-order faction is joinable; Wardens and Veinmarket are local groups; placeholder names mutable.
 
 ## Engine and terrain
