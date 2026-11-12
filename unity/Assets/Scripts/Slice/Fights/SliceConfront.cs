@@ -67,6 +67,7 @@ namespace GameDev.Slice.Fights
         private FightBeats _beats;
         private FightCamera _camera;
         private FightCursor _cursor;
+        private FightTargetLight _target;
         private FightHud _hud;
         private Material _outline;
         private AudioSource _audio;
@@ -116,6 +117,9 @@ namespace GameDev.Slice.Fights
 
         /// <summary>The player's cursor in a fight.</summary>
         public FightCursor PlayerCursor => _cursor;
+
+        /// <summary>The body of the enemy lit under the cursor on the player's turn, or null.</summary>
+        public Transform TargetLit => _target?.Body;
 
         public FightHud Hud => _hud;
 
@@ -169,6 +173,7 @@ namespace GameDev.Slice.Fights
             _camera = FightCamera.Create(transform, _outline);
             PathView = FightPathView.Create(transform, settings.GridMaterial);
             _cursor = new FightCursor(_turns, _grid, settings.FightRules, PathView, settings.FightCursors, CursorPoints);
+            _target = new FightTargetLight(settings.TargetOutline);
             _hud = new FightHud(Name, settings.SocialChecks, settings.FightIcons);
             _audio = gameObject.AddComponent<AudioSource>();
             _audio.playOnAwake = false;
@@ -177,14 +182,14 @@ namespace GameDev.Slice.Fights
         }
 
         /// <summary>
-        /// Development command (S3a.4): two opponents with daggers four cells from the player, and a fight. The player's
-        /// character takes the development kit for it, a sword, leather, and the rifle as its second set.
+        /// Development command (S3a.4): two opponents with pistols four cells from the player, and a fight. The player's
+        /// character takes the development kit for it, a pistol, leather, and the rifle as its second set (10.2 §5d).
         /// </summary>
         public bool StartDevelopmentFight() => StartDevelopmentFight(Cult);
 
         /// <summary>
-        /// The development fight against a group (S3a.9): cultists with daggers, who take no surrender, or Wardens with
-        /// swords, who accept a Yield and may ask for mercy (Shift+F7).
+        /// The development fight against a group (S3a.9): cultists with pistols, who take no surrender, or Wardens with
+        /// pistols or a rifle, who accept a Yield and may ask for mercy (Shift+F7).
         /// </summary>
         public bool StartDevelopmentFight(string group) => StartDevelopmentFight(group, null);
 
@@ -208,7 +213,6 @@ namespace GameDev.Slice.Fights
             _bodies.Clear();
             _names.Clear();
             _groups.Clear();
-            var rules = _settings.FightRules;
             var player = new Combatant(PlayerId, PlayerSide, PlayerFighter(true), at, takesIntents: !AutoPlayer);
             Equip(player, kit: true);
             var combatants = new List<Combatant> { player };
@@ -219,8 +223,7 @@ namespace GameDev.Slice.Fights
             for (var i = 0; i < count; i++)
             {
                 var body = Opponent(places != null ? places[i] : _grid.Center(_ring[i]), at, i + 1);
-                var weapon = group == Wardens ? _settings.KitSword : _settings.OpponentWeapon;
-                var opponent = new Combatant(i + 1, HostileSide, rules.Fighter(new CharacterSheet(), null, new WeaponSet(weapon)), body.position)
+                var opponent = new Combatant(i + 1, HostileSide, Armed(body, group), body.position)
                 {
                     AcceptsYield = TakesYield(group),
                 };
@@ -264,6 +267,7 @@ namespace GameDev.Slice.Fights
             var input = GameInputService.Instance;
             if (_terms != null)
             {
+                _target.Hide();
                 TermsInput(input);
                 return;
             }
@@ -310,6 +314,9 @@ namespace GameDev.Slice.Fights
             {
                 _cursor.Clear();
             }
+
+            // The owner's play test of 2026-11-12: on the player's own turn the enemy under the cursor is lit.
+            _target.Show(settled && acting != null && acting.TakesIntents && _cursor.Target != null && _bodies.TryGetValue(_cursor.Target, out var aimed) ? aimed : null);
 
             if (!_beats.Busy && _lock.InConfront)
             {
@@ -572,6 +579,7 @@ namespace GameDev.Slice.Fights
 
             _ending = true;
             _cursor.Release();
+            _target.Hide();
         }
 
         private void Finish()
@@ -904,6 +912,7 @@ namespace GameDev.Slice.Fights
 
         private void OnDestroy()
         {
+            _target?.Dispose();
             if (_outline != null)
             {
                 Destroy(_outline);

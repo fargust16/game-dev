@@ -5,6 +5,7 @@ using GameDev.Confront.Turns;
 using GameDev.Core.Localization;
 using GameDev.Locomotion;
 using GameDev.Player.Progression;
+using GameDev.Slice.People;
 using GameDev.World.State;
 using GameDev.World.Timekeeping;
 using UnityEngine;
@@ -50,13 +51,12 @@ namespace GameDev.Slice.Fights
         /// <summary>The character's life as a fight sees it: a fighter in what it wears, with the kept HP and conditions.</summary>
         public Fighter PlayerFighter() => PlayerFighter(false);
 
-        /// <param name="kit">The development command's kit, a sword, leather, and the rifle as its second set (S3a.4).</param>
+        /// <param name="kit">The development command's kit, a pistol, leather, and the rifle as its second set (S3a.4; 10.2 §5d).</param>
         private Fighter PlayerFighter(bool kit)
         {
             var fighter = !kit && WornFighter != null
                 ? WornFighter()
-                : _settings.FightRules.Fighter(_character, null, new WeaponSet(_settings.KitSword), _settings.KitArmour,
-                    new WeaponSet(_settings.KitRifle, _settings.KitPouch));
+                : _settings.FightRules.Fighter(_character, null, Arms(RoleFirearm.Pistol), _settings.KitArmour, Arms(RoleFirearm.Rifle));
             if (_state != null)
             {
                 fighter.Hp = fighter.MaxHp * (1d - (Mathf.Clamp(_state.Get(HpLostKey), 0, 1000) / 1000d));

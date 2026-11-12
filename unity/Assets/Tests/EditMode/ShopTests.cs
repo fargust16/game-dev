@@ -99,8 +99,11 @@ namespace GameDev.Slice.Tests
         public void AMorningFillsEachShelfByTheSeed()
         {
             var tobias = _shops.Shelf("tobias");
-            var bases = _items.Items.Count(i => i.kind == ItemKind.Equipment && i.price > 0);
+            var bases = _items.Items.Count(i => i.kind == ItemKind.Equipment && i.price > 0 && !SliceShops.Withheld(i));
             Assert.AreEqual(bases, tobias.Count(s => s.Piece != null), "one piece of each base");
+            Assert.IsFalse(tobias.Any(s => SliceShops.Withheld(s.Item)), "10.2 §5d: no melee weapon or shield on the shelf");
+            Assert.IsTrue(tobias.Any(s => s.Item.id == "pistol") && tobias.Any(s => s.Item.id == "rifle") && tobias.Any(s => s.Item.id == "cartridge_pouch"), "the firearms and their pouch");
+            Assert.IsTrue(SliceShops.Withheld(_items.Find("sword")) && SliceShops.Withheld(_items.Find("dagger")) && SliceShops.Withheld(_items.Find("metal_shield")), "the sword, the dagger and the shield stay as data");
             Assert.That(tobias.Single(s => s.Piece == null).Count, Is.InRange(1, 3), "Lockpicks, one to three");
             Assert.AreEqual(6, _shops.Shelf("edda").Count);
             Assert.IsTrue(_shops.Shelf("edda").All(s => s.Count >= 1 && s.Count <= 3));
@@ -154,7 +157,8 @@ namespace GameDev.Slice.Tests
         {
             _bag.Earn(30000);
             var outfit = new Outfit(_bag);
-            var piece = _shops.Shelf("tobias").First(s => s.Piece != null && s.Piece.modifiers.Count > 0);
+            // A piece worn alone: a firearm needs its pouch beside it (10.2 §5b), so a piece of armour or jewellery.
+            var piece = _shops.Shelf("tobias").First(s => s.Piece != null && s.Piece.modifiers.Count > 0 && s.Item.slot > EquipSlot.TwoHands && s.Item.slot != EquipSlot.OffHand);
             Assert.IsNull(_shops.Buy("tobias", piece));
             CollectionAssert.Contains(_bag.Pieces, piece.Piece);
             outfit.Wear(piece.Piece);

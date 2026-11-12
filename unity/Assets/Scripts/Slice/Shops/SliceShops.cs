@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameDev.Confront.Rules;
 using GameDev.Items;
 using GameDev.World.Seed;
 using GameDev.World.State;
@@ -57,6 +58,14 @@ namespace GameDev.Slice.Shops
 
         /// <summary>Anything bought, sold or learned.</summary>
         public event Action Changed;
+
+        /// <summary>
+        /// 10.2 §5d (owner, 2026-11-12: firearms first): a melee weapon or a shield, which stays in the catalogue as data and
+        /// leaves the slice until VS-RANGED's rework: no shelf holds one, no shop buys one and no anvil makes one.
+        /// </summary>
+        public static bool Withheld(ItemDefinition item) => item.fight is FightWeapon weapon
+            ? !weapon.Ranged && !weapon.Unarmed
+            : item.fight is FightOffHand off && off.Kind == OffHandKind.Shield;
 
         public ShopCatalogue Rules => _rules;
 
@@ -223,7 +232,7 @@ namespace GameDev.Slice.Shops
         }
 
         private bool Buys(ShopEntry shop, ItemDefinition item) =>
-            shop.sells.Contains(item.id) || (shop.equipment && item.kind == ItemKind.Equipment && item.price > 0);
+            shop.sells.Contains(item.id) || (shop.equipment && item.kind == ItemKind.Equipment && item.price > 0 && !Withheld(item));
 
         /// <summary>A morning's shelf, by the world seed, the shop and the day.</summary>
         private List<ShelfItem> Fill(ShopEntry shop, int day)
@@ -243,7 +252,7 @@ namespace GameDev.Slice.Shops
             if (shop.equipment)
             {
                 var p = ItemMaker.ShopChance(_rules.ShopSkill + (_rules.SkillPerDay * (day - 1)));
-                foreach (var item in _items.Items.Where(i => i.kind == ItemKind.Equipment && i.price > 0))
+                foreach (var item in _items.Items.Where(i => i.kind == ItemKind.Equipment && i.price > 0 && !Withheld(i)))
                 {
                     shelf.Add(new ShelfItem(item, 1, ItemMaker.Make(item, item.stage, p, rolls)));
                 }

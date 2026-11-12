@@ -79,6 +79,7 @@ namespace GameDev.Slice.Tests
                 if (cursor.Cell == cell && cursor.Target == null)
                 {
                     Assert.AreEqual(FightCursor.Shape.Move, cursor.Current, "the cursor shows a walk");
+                    Assert.IsNull(fights.TargetLit, "over a cell nobody is lit");
                     Assert.AreEqual(1, cursor.Cost, "one step, 1 AP");
                     Assert.IsTrue(fights.PathView.Shown, "the path is drawn");
                     StringAssert.StartsWith(Loc.Format("ui.fight.move", 1), fights.Hud.TipText, "the tip says the walk's AP");
@@ -106,6 +107,13 @@ namespace GameDev.Slice.Tests
             var intelligence = world.Character.Get(CharacterAttribute.Intelligence);
             yield return Point(camera.WorldToScreenPoint(enemy.Position + (Vector3.up * 1.1f)));
             Assert.AreEqual(enemy, cursor.Target, "the cursor points at the enemy");
+
+            // The owner's play test of 2026-11-12: the enemy under the cursor is lit, its body ringed by the outline.
+            yield return null;
+            var body = Fights.SliceFighter.All.First(f => f.Combatant == enemy).transform;
+            Assert.AreSame(body, fights.TargetLit, "the enemy under the cursor is lit");
+            bool Ringed(Transform t) => t.GetComponentsInChildren<Renderer>().Any(r => r.sharedMaterials.Any(m => m != null && m.shader.name == "GameDev/Slice/Target Outline"));
+            Assert.IsTrue(Ringed(body), "its body carries the outline");
             Assert.IsTrue(cursor.Affordable, $"the walk and the blow, {cursor.Cost} AP, fit in {turns.ApLeft}");
             Assert.AreEqual(FightCursor.Shape.Attack, cursor.Current, "the cursor shows a blow");
             Assert.AreEqual(cursor.Steps + me.Fighter.Weapon.AttackAp, cursor.Cost, "the walk's steps and the weapon's AP");
@@ -127,6 +135,9 @@ namespace GameDev.Slice.Tests
             turns.Struck += (attacker, target, _) => struck |= attacker == me && target == enemy;
             yield return Click();
             Assert.IsTrue(struck, "the click strikes the enemy");
+            yield return null;
+            Assert.IsNull(fights.TargetLit, "while the blow plays nobody is lit");
+            Assert.IsFalse(Ringed(body), "and the outline is gone from the body");
             yield return Settle(fights);
 
             // The end of the turn.

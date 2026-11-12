@@ -123,7 +123,7 @@ namespace GameDev.Slice.Tests
             foreach (var (id, fighting, weapon) in guards)
             {
                 Assert.IsTrue(fighting, $"combatant {id} takes its guard");
-                Assert.AreEqual(id == Fights.SliceConfront.PlayerId ? 1f : 3f, weapon, $"combatant {id}: a sword's guard, or a dagger's");
+                Assert.AreEqual(4f, weapon, $"combatant {id}: a pistol's aim (10.2 §5d: firearms first)");
             }
 
             for (var time = 0f; fights.InFight && time < 90f; time += Time.deltaTime)

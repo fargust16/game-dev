@@ -38,8 +38,8 @@ namespace GameDev.Slice.Tests
         [Test]
         public void EveryPricedBaseHas19sRecipe()
         {
-            var bases = _items.Items.Where(i => i.kind == ItemKind.Equipment && i.price > 0).ToList();
-            CollectionAssert.AreEquivalent(bases, _workshop.Bases.ToList(), "every base a shop sells is made at the workshop");
+            var bases = _items.Items.Where(i => i.kind == ItemKind.Equipment && i.price > 0 && !SliceShops.Withheld(i)).ToList();
+            CollectionAssert.AreEquivalent(bases, _workshop.Bases.ToList(), "every base a shop sells is made at the workshop, and no melee weapon or shield (10.2 §5d)");
             CollectionAssert.AreEqual(new[] { ("iron_ore", 3), ("wood", 1) }, _items.Find("sword").recipe.Select(p => (p.item, p.count)));
             CollectionAssert.AreEqual(new[] { ("iron_ore", 9) }, _items.Find("plate_body").recipe.Select(p => (p.item, p.count)));
             CollectionAssert.AreEqual(new[] { ("flax", 4) }, _items.Find("cloth_body").recipe.Select(p => (p.item, p.count)));

@@ -109,11 +109,15 @@ namespace GameDev.Slice.Tests
             world.Clock.AdvanceTicks((int)(Night - world.Clock.Tick));
             yield return Before(player, stage);
 
+            // 10.2 §5d (owner, 2026-11-12: firearms first): the collectors carry pistols, and so does the character, its pouch beside it.
             var character = world.Character;
-            character.Set(CharacterAttribute.Strength, 14);
-            character.Set(CharacterAttribute.Endurance, 10);
-            character.Set(CharacterAttribute.Dexterity, 6);
-            character.Set(CharacterSkill.MeleeSkill, 10);
+            character.Set(CharacterAttribute.Endurance, 14);
+            character.Set(CharacterAttribute.Dexterity, 12);
+            character.Set(CharacterAttribute.Perception, 12);
+            character.Set(CharacterSkill.RangedSkill, 12);
+            var pistol = new GameDev.Items.ItemPiece("pistol");
+            Assert.IsTrue(world.Bag.AddPiece(new GameDev.Items.ItemPiece("cartridge_pouch")) && world.Bag.AddPiece(pistol), "the pistol and its pouch in the bag");
+            Assert.IsNull(world.Outfit.Wear(pistol), "the pistol in hand, the pouch beside it");
             var fights = world.Fights;
             fights.TurnPause = 0f;
             fights.AutoPlayer = true;

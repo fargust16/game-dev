@@ -4,7 +4,7 @@ using GameDev.Confront;
 using GameDev.Confront.Rules;
 using GameDev.Confront.Turns;
 using GameDev.Locomotion;
-using GameDev.Player.Progression;
+using GameDev.Slice.People;
 using UnityEngine;
 
 namespace GameDev.Slice.Fights
@@ -12,8 +12,7 @@ namespace GameDev.Slice.Fights
     /// <summary>
     /// S3b.3: a fight with people who stand in the scene, a POI's Wardens or collectors, in their own bodies. They fight
     /// as the development opponents of their group do (S3a.9), take a Yield when their group does, and may ask for mercy.
-    /// By the owner's answer of 2026-11-09 one in three of them, counted from the last, carries a pistol with its
-    /// Cartridge Pouch and keeps its melee weapon as the second Weapon Set.
+    /// Each carries what 10.2 §5d gives it (owner, 2026-11-12: firearms first; <see cref="Armed"/>).
     /// When the last beat has played, the host learns whether the player's side stood and how many were spared; those
     /// who left the fight alive leave the scene, and the fallen lie where they fell until the scene is cleared.
     /// </summary>
@@ -47,22 +46,16 @@ namespace GameDev.Slice.Fights
             _names.Clear();
             _groups.Clear();
             _peopleInFight.Clear();
-            var rules = _settings.FightRules;
             var player = new Combatant(PlayerId, PlayerSide, PlayerFighter(), at, takesIntents: !AutoPlayer);
             Equip(player);
             var combatants = new List<Combatant> { player };
             _bodies[player] = _player.transform;
             _names[player] = "ui.fight.you";
             _playerCombatant = player;
-            var weapon = group == Wardens ? _settings.KitSword : _settings.OpponentWeapon;
             for (var i = 0; i < bodies.Count; i++)
             {
                 var body = bodies[i];
-                var shooter = _settings.PeoplePistol != null && _settings.KitPouch != null && (bodies.Count - 1 - i) % 3 == 0;
-                var fighterRules = shooter
-                    ? rules.Fighter(new CharacterSheet(), null, new WeaponSet(_settings.PeoplePistol, _settings.KitPouch), second: new WeaponSet(weapon))
-                    : rules.Fighter(new CharacterSheet(), null, new WeaponSet(weapon));
-                var opponent = new Combatant(i + 1, HostileSide, fighterRules, body.position)
+                var opponent = new Combatant(i + 1, HostileSide, Armed(body, group), body.position)
                 {
                     AcceptsYield = TakesYield(group),
                 };
@@ -97,6 +90,37 @@ namespace GameDev.Slice.Fights
             Unarm();
             _playerCombatant = null;
             return false;
+        }
+
+        /// <summary>
+        /// 10.2 §5d (owner, 2026-11-12: firearms first): a person of <paramref name="group"/> as a fighter, made by the seed
+        /// from who it is. A Warden carries a pistol, or a rifle one in three, and the cult and the Veinmarket's collectors
+        /// a pistol, each keeping the numbers it fights with; a resident fights with its role's attributes, Limit and
+        /// firearm (§5a *Roles*), with its fists when the role carries none. Every firearm comes with its Cartridge Pouch,
+        /// and nobody carries a melee weapon. The cult's senior with a rifle waits for the ritual's fight.
+        /// </summary>
+        private Fighter Armed(Transform body, string group)
+        {
+            var role = group == Wardens ? ResidentRole.Warden : group == Residents ? PersonRole.Of(body) : ResidentRole.Cult;
+            var made = ResidentRoles.Make(role, Who(body), _seed);
+            return _settings.FightRules.Fighter(made.Sheet, made.Limit, Arms(made.Firearm));
+        }
+
+        private WeaponSet Arms(RoleFirearm firearm) => firearm switch
+        {
+            RoleFirearm.Pistol => new WeaponSet(_settings.PeoplePistol, _settings.KitPouch),
+            RoleFirearm.Rifle => new WeaponSet(_settings.KitRifle, _settings.KitPouch),
+            _ => new WeaponSet(_settings.Fists),
+        };
+
+        /// <summary>
+        /// Whom the seed makes: a named person by its id, anyone else by its name and place among its siblings, which a
+        /// saved scene keeps from run to run.
+        /// </summary>
+        private static string Who(Transform body)
+        {
+            var named = body.GetComponentInParent<NamedPerson>();
+            return named != null && !string.IsNullOrEmpty(named.Id) ? named.Id : $"{body.name}#{body.GetSiblingIndex()}";
         }
 
         /// <summary>The fight's last beat has played: the host hears how it went, and who left alive leaves the scene.</summary>

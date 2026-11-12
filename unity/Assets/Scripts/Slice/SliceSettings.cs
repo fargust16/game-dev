@@ -27,8 +27,7 @@ namespace GameDev.Slice
         [Tooltip("10.2 §5b's numbers for every fight.")]
         [SerializeField] private FightRules fightRules;
 
-        [Tooltip("The development kit until S5a's shops (owner, 2026-11-09): a sword in hand, the rifle with its Cartridge Pouch as the second Weapon Set, and leather.")]
-        [SerializeField] private FightWeapon kitSword;
+        [Tooltip("The development kit (10.2 §5d, owner 2026-11-12: firearms first): the pistol with its Cartridge Pouch, the rifle with another as the second Weapon Set, and leather. The rifle is every rifleman's too.")]
         [SerializeField] private FightWeapon kitRifle;
         [SerializeField] private FightOffHand kitPouch;
         [SerializeField] private FightArmour kitArmour;
@@ -48,15 +47,17 @@ namespace GameDev.Slice
         [Tooltip("Gathering's nodes and Stamina (S5a.5; 19 §6.4, 07.2 §3.2).")]
         [SerializeField] private GameDev.Slice.Gathering.GatherRules gathering;
 
-        [Tooltip("The development fight's opponents: a model and the weapon each carries. Authoring defaults.")]
+        [Tooltip("The development fight's opponents' model; what they carry is their group's (10.2 §5d). Authoring default.")]
         [SerializeField] private GameObject opponentModel;
-        [SerializeField] private FightWeapon opponentWeapon;
 
-        [Tooltip("The owner's answer of 2026-11-09: one Warden in three carries a pistol, and so does one of the collectors, with the Cartridge Pouch, their melee weapon the second Weapon Set.")]
+        [Tooltip("10.2 §5d (owner, 2026-11-12: firearms first): the pistol, with the Cartridge Pouch, of every fighter who carries one, the development kit's too.")]
         [SerializeField] private FightWeapon peoplePistol;
 
         [Tooltip("The Combat Grid's cell outlines.")]
         [SerializeField] private Material gridMaterial;
+
+        [Tooltip("The outline of the enemy under the fight's cursor (owner's play test, 2026-11-12).")]
+        [SerializeField] private Shader targetOutline;
 
         [Header("Stealth (S3b.1)")]
         [Tooltip("10.3's numbers: Stealth Mode, the Vision Cone and the Notice Meter.")]
@@ -87,8 +88,6 @@ namespace GameDev.Slice
 
         public GameDev.Slice.Beasts.BeastRules BeastRules => beastRules;
 
-        public FightWeapon KitSword => kitSword;
-
         public FightWeapon KitRifle => kitRifle;
 
         public FightOffHand KitPouch => kitPouch;
@@ -107,11 +106,11 @@ namespace GameDev.Slice
 
         public GameObject OpponentModel => opponentModel;
 
-        public FightWeapon OpponentWeapon => opponentWeapon;
-
         public FightWeapon PeoplePistol => peoplePistol;
 
         public Material GridMaterial => gridMaterial;
+
+        public Shader TargetOutline => targetOutline;
 
         public Texture2D[] FightCursors => fightCursors;
 

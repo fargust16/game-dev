@@ -77,7 +77,8 @@ namespace GameDev.Slice.Tests
 
         /// <summary>
         /// S5a.4 and the owner's play test of S5a: at the anvil beside Edda Brann's stall one who learned Item Creation makes
-        /// a dagger by a click, ten ticks passing, and the last blow on the Reaction Check's bar.
+        /// a pistol by a click, ten ticks passing, and the last blow on the Reaction Check's bar; the anvil makes no melee weapon
+        /// (10.2 §5d, owner 2026-11-12: firearms first).
         /// </summary>
         [UnityTest]
         public IEnumerator TheAnvilMakesAPieceOnAClickAndABar()
@@ -92,8 +93,8 @@ namespace GameDev.Slice.Tests
             }
 
             world.State.Set(SliceShops.LessonKey(SliceWorkshop.Lesson), 1);
-            world.Bag.Add("iron_ore", 2);
-            world.Bag.Add("wood");
+            world.Bag.Add("iron_ore", 3);
+            world.Bag.Add("wood", 2);
 
             // Edda Brann's page sends the work to the anvil.
             var edda = Object.FindObjectsByType<ShopCounter>(FindObjectsInactive.Exclude).Single(c => c.Keeper == "edda");
@@ -119,10 +120,11 @@ namespace GameDev.Slice.Tests
 
             var lines = hud.ShopLines.ToList();
             CollectionAssert.Contains(lines, "Workshop: 1 silver a piece");
-            var dagger = lines.IndexOf("Make Dagger: Iron ore × 2, Wood × 1 · 10 min");
-            Assert.Greater(dagger, 0, string.Join(" | ", lines));
+            Assert.IsFalse(lines.Any(l => l.StartsWith("Make Dagger") || l.StartsWith("Make Sword") || l.Contains("Shield")), "no melee weapon or shield at the anvil");
+            var pistol = lines.IndexOf("Make Pistol: Iron ore × 3, Wood × 2 · 10 min");
+            Assert.Greater(pistol, 0, string.Join(" | ", lines));
             var tick = world.Clock.Tick;
-            Assert.IsTrue(hud.ClickShopLine(dagger));
+            Assert.IsTrue(hud.ClickShopLine(pistol));
             yield return null;
 
             Assert.GreaterOrEqual(world.Clock.Tick, tick + 10, "ten ticks pass at the work");
@@ -137,12 +139,12 @@ namespace GameDev.Slice.Tests
             Assert.IsFalse(hud.IsShopOpen, "the hammer comes up first");
             yield return GatheringPlayTests.PlayedOut(world);
 
-            Assert.IsTrue(world.Bag.Pieces.Any(p => p.item == "dagger"), "the dagger is in the bag");
+            Assert.IsTrue(world.Bag.Pieces.Any(p => p.item == "pistol"), "the pistol is in the bag");
             Assert.AreEqual(0, world.Bag.Count("iron_ore"));
             Assert.AreEqual(400, world.Bag.Bronze, "the workshop's 100 bronze");
             Assert.Less(world.Stamina.Share, 1d, "the work spent Stamina");
             Assert.IsTrue(hud.IsShopOpen, "the page again, with what came of it");
-            StringAssert.StartsWith("Made: Dagger (", hud.ShopNote);
+            StringAssert.StartsWith("Made: Pistol (", hud.ShopNote);
             anvil.Close();
         }
 

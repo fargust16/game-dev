@@ -78,9 +78,9 @@ namespace GameDev.Slice.Shops
 
         public bool Knows => _shops.Knows(Lesson);
 
-        /// <summary>Every base a workshop makes, in the catalogue's order.</summary>
+        /// <summary>Every base a workshop makes, in the catalogue's order; no melee weapon or shield (10.2 §5d).</summary>
         public IEnumerable<ItemDefinition> Bases =>
-            _items.Items.Where(i => i.kind == ItemKind.Equipment && i.recipe != null && i.recipe.Length > 0);
+            _items.Items.Where(i => i.kind == ItemKind.Equipment && i.recipe != null && i.recipe.Length > 0 && !SliceShops.Withheld(i));
 
         public bool Has(string keeper) => _shops.Find(keeper)?.workshop == true;
 

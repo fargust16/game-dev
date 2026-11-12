@@ -6,8 +6,9 @@ using UnityEngine;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// S3a.4's wiring of the slice's settings: the fight's numbers, the development kit until S5a's shops (owner,
-    /// 2026-11-09: a sword, leather, and a rifle), the development opponents, and the Combat Grid's material. Batch:
+    /// S3a.4's wiring of the slice's settings: the fight's numbers, the development kit (10.2 §5d, owner 2026-11-12:
+    /// firearms first: a pistol, leather, and a rifle), the development opponents, the Combat Grid's material, and the
+    /// target's outline. Batch:
     /// -executeMethod GameDev.Slice.EditorTools.SliceConfrontSetup.Configure
     /// </summary>
     public static class SliceConfrontSetup
@@ -15,6 +16,7 @@ namespace GameDev.Slice.EditorTools
         public const string SettingsPath = "Assets/Data/Slice/SliceSettings.asset";
         public const string GridMaterialPath = "Assets/Materials/Slice/Confront_Grid.mat";
         private const string Data = "Assets/Data/Confront";
+        private const string TargetOutlineShader = "Assets/Shaders/Slice/TargetOutline.shader";
 
         // The Cult Forces' model, the owner's detective (owner, 2026-11-10; asset map §1).
         private const string OpponentModel = SlicePeopleModels.Folder + "/Detective.prefab";
@@ -48,13 +50,13 @@ namespace GameDev.Slice.EditorTools
             so.FindProperty("fightRules").objectReferenceValue = Load<FightRules>($"{Data}/FightRules.asset");
             so.FindProperty("stealthRules").objectReferenceValue = Load<GameDev.Confront.Stealth.StealthRules>($"{Data}/StealthRules.asset");
             so.FindProperty("beastRules").objectReferenceValue = Load<GameDev.Slice.Beasts.BeastRules>("Assets/Data/Slice/BeastRules.asset");
-            so.FindProperty("kitSword").objectReferenceValue = Load<FightWeapon>($"{Data}/Weapons/Sword.asset");
+            so.FindProperty("peoplePistol").objectReferenceValue = Load<FightWeapon>($"{Data}/Weapons/Pistol.asset");
             so.FindProperty("kitRifle").objectReferenceValue = Load<FightWeapon>($"{Data}/Weapons/Rifle.asset");
             so.FindProperty("kitPouch").objectReferenceValue = Load<FightOffHand>($"{Data}/Weapons/CartridgePouch.asset");
             so.FindProperty("kitArmour").objectReferenceValue = Load<FightArmour>($"{Data}/Armour/Leather.asset");
             so.FindProperty("opponentModel").objectReferenceValue = Load<GameObject>(OpponentModel);
-            so.FindProperty("opponentWeapon").objectReferenceValue = Load<FightWeapon>($"{Data}/Weapons/Dagger.asset");
             so.FindProperty("gridMaterial").objectReferenceValue = GridMaterial();
+            so.FindProperty("targetOutline").objectReferenceValue = Load<Shader>(TargetOutlineShader);
             var cursors = so.FindProperty("fightCursors");
             cursors.arraySize = FightCursors.Length;
             for (var i = 0; i < FightCursors.Length; i++)

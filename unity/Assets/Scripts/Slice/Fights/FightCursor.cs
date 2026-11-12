@@ -202,9 +202,11 @@ namespace GameDev.Slice.Fights
             return Cell.HasValue && _turns.SubmitIntent(TurnIntent.MoveTo(Cell.Value));
         }
 
-        /// <summary>No path, and the plain cursor.</summary>
+        /// <summary>No path, no target, and the plain cursor.</summary>
         public void Clear()
         {
+            Target = null;
+            Cell = null;
             _view.Hide();
             Set(Shape.Basic);
         }
@@ -212,6 +214,8 @@ namespace GameDev.Slice.Fights
         /// <summary>The system's cursor again, as the fight ends.</summary>
         public void Release()
         {
+            Target = null;
+            Cell = null;
             _view.Hide();
             Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             _shown = (Shape)(-1);

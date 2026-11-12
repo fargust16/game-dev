@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using GameDev.Confront;
-using GameDev.Confront.Rules;
 using GameDev.Confront.Turns;
 using GameDev.Locomotion;
-using GameDev.Player.Progression;
 using GameDev.Player.Standing;
 using GameDev.Slice.People;
 using GameDev.UI;
@@ -15,7 +13,8 @@ namespace GameDev.Slice.Fights
 {
     /// <summary>
     /// 10.2 §5c: an Assault. A blow at a person who is not fighting starts a fight in place, the blow its opening strike;
-    /// the one struck fights back, a resident with its fists and a Warden with its sword. Its cry fetches the two Wardens
+    /// the one struck fights back with what 10.2 §5d gives it, a Warden its firearm and a resident its role's or its fists
+    /// (<see cref="Armed"/>). Its cry fetches the two Wardens
     /// nearest the place: each joins on its side at the end of the round by which it has run there at 4.5 m/s, a round
     /// moving the world one tick, and enters at the grid's edge on its side. A Warden still on its way when the fight is
     /// over comes to the place, and if the character is within 20 m of it, fights it at once. A Warden left standing goes
@@ -85,7 +84,7 @@ namespace GameDev.Slice.Fights
         {
             _player = FindAnyObjectByType<PlayerLocomotion>();
             if (_lock == null || InFight || _died || _terms != null || _player == null || _player.InWater || victim == null ||
-                _settings.Fists == null || _settings.KitSword == null)
+                _settings.Fists == null || _settings.PeoplePistol == null || _settings.KitRifle == null || _settings.KitPouch == null)
             {
                 return false;
             }
@@ -114,7 +113,7 @@ namespace GameDev.Slice.Fights
             _playerCombatant = player;
 
             var warden = PeopleAround.IsWarden(victim);
-            var struck = Person(victim, warden ? Wardens : Residents, warden ? _settings.KitSword : _settings.Fists, 1);
+            var struck = Person(victim, warden ? Wardens : Residents, 1);
             _bodies[struck] = victim;
             combatants.Add(struck);
 
@@ -138,7 +137,7 @@ namespace GameDev.Slice.Fights
                 _coming.Add(new Coming
                 {
                     Body = body,
-                    Combatant = Person(body, Wardens, _settings.KitSword, id++),
+                    Combatant = Person(body, Wardens, id++),
                     Round = rounds,
                     Post = body.position,
                     PostFacing = body.rotation,
@@ -171,11 +170,10 @@ namespace GameDev.Slice.Fights
             return false;
         }
 
-        /// <summary>A person of <paramref name="group"/> as a fighter: an Uninitiated body with its weapon, out of its walk.</summary>
-        private Combatant Person(Transform body, string group, FightWeapon weapon, int id)
+        /// <summary>A person of <paramref name="group"/> as a fighter with what it carries (<see cref="Armed"/>), out of its walk.</summary>
+        private Combatant Person(Transform body, string group, int id)
         {
-            var fighter = _settings.FightRules.Fighter(new CharacterSheet(), null, new WeaponSet(weapon));
-            var c = new Combatant(id, HostileSide, fighter, body.position) { AcceptsYield = TakesYield(group) };
+            var c = new Combatant(id, HostileSide, Armed(body, group), body.position) { AcceptsYield = TakesYield(group) };
             if (!body.TryGetComponent<SliceFighter>(out var part))
             {
                 part = body.gameObject.AddComponent<SliceFighter>();
