@@ -23,23 +23,37 @@ namespace GameDev.Slice.Tests
             var start = walkers.Select(w => w.transform.position).ToArray();
             var stoodAtStart = walkers.Select(w => w.Standing > 0f).ToArray();
             var stopsAtStart = walkers.Select(w => w.Stops).ToArray();
+            var elsewhereAtStart = walkers.Select(w => w.Away || w.Greeting).ToArray();
+            var visitsAtStart = walkers.Select(w => w.VisitsBegun).ToArray();
+            var greetingsAtStart = walkers.Select(w => w.Greetings).ToArray();
 
             yield return new WaitForSeconds(3f);
 
             var ground = LayerMask.GetMask("Ground", "Structure");
             var standing = 0;
+            var elsewhere = 0;
             for (var i = 0; i < walkers.Length; i++)
             {
                 var w = walkers[i];
                 var at = w.transform.position;
                 var animator = w.GetComponentInChildren<Animator>();
+
+                // AN6: off to a bench, a stall or a door, or greeting another (ActivityPlayTests), it is not on its route's
+                // walk now.
+                if (elsewhereAtStart[i] || w.Away || w.Greeting || w.VisitsBegun != visitsAtStart[i] || w.Greetings != greetingsAtStart[i])
+                {
+                    elsewhere++;
+                    Assert.IsTrue(!w.Greeting || animator.GetCurrentAnimatorStateInfo(0).IsName("Nod") || animator.IsInTransition(0), $"{w.name} nods as it greets");
+                    continue;
+                }
+
                 var stopped = stoodAtStart[i] || w.Stops != stopsAtStart[i];
                 if (stopped)
                 {
                     // A stop lasts 4 s at least, so one begun in these 3 s still stands.
                     standing++;
                     Assert.IsTrue(stoodAtStart[i] || w.Standing > 0f, $"{w.name} stands at its turn");
-                    Assert.IsTrue(w.Standing <= 0f || animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") || animator.IsInTransition(0), $"{w.name} stands in its idle");
+                    Assert.IsTrue(w.Standing <= 0f || TownsfolkWalker.StopIdles.Any(n => animator.GetCurrentAnimatorStateInfo(0).IsName(n)) || animator.IsInTransition(0), $"{w.name} stands in one of its idles");
                 }
                 else
                 {
@@ -53,7 +67,7 @@ namespace GameDev.Slice.Tests
                 Assert.Less(DistanceToRoute(w.Route, at), 0.5f, $"{w.name} keeps to its route");
             }
 
-            Assert.Less(standing, walkers.Length / 2, "most walk, some stand");
+            Assert.Less(standing + elsewhere, walkers.Length / 2, "most walk, some stand, visit or greet");
         }
 
         private static float DistanceToRoute(Vector3[] route, Vector3 at)

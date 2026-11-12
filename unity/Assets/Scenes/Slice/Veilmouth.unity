@@ -10903,6 +10903,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 46546436}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &46831438
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 46831439}
+  - component: {fileID: 46831440}
+  m_Layer: 0
+  m_Name: Bench 3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &46831439
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 46831438}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -46.92107, y: 26.260456, z: 32.144264}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &46831440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 46831438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1701278962}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: -46.92107, y: 26.260456, z: 32.144264}
+    Seat: {x: -46.916145, y: 26.792397, z: 32.404217}
+    Yaw: -178.91452
+  - Stand: {x: -48.115574, y: 26.23752, z: 32.166893}
+    Seat: {x: -48.11065, y: 26.792397, z: 32.426846}
+    Yaw: -178.91452
+  visits: []
 --- !u!1001 &47108229
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27674,6 +27731,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 108742496}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &109568095
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 109568096}
+  - component: {fileID: 109568097}
+  m_Layer: 0
+  m_Name: Bench 16
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &109568096
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 109568095}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.908356, y: 27.39135, z: 90.840866}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &109568097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 109568095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 501655790}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 5.908356, y: 27.39135, z: 90.840866}
+    Seat: {x: 5.908222, y: 27.9532, z: 90.580864}
+    Yaw: 0.029524276
+  - Stand: {x: 7.0978236, y: 27.39507, z: 90.840256}
+    Seat: {x: 7.0976896, y: 27.9532, z: 90.58025}
+    Yaw: 0.029524276
+  visits: []
 --- !u!1001 &110580651
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32905,6 +33019,139 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 135534086}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &136069763
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 136069764}
+  - component: {fileID: 136069765}
+  m_Layer: 0
+  m_Name: Bench 10
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &136069764
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 136069763}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.1591629, y: 27.359339, z: 136.90836}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &136069765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 136069763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1629917770}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 1.1591629, y: 27.359339, z: 136.90836}
+    Seat: {x: 1.4191629, y: 27.94356, z: 136.90823}
+    Yaw: -89.97256
+  - Stand: {x: 1.1597325, y: 27.359344, z: 138.09781}
+    Seat: {x: 1.4197325, y: 27.94356, z: 138.09769}
+    Yaw: -89.97256
+  visits:
+  - Walker: 1560069754
+    Turn: 1
+    At: {x: 8.5, y: 27.39945, z: 118.5}
+    Place: 0
+  - Walker: 1560069754
+    Turn: 1
+    At: {x: 8.5, y: 27.39945, z: 118.5}
+    Place: 1
+  - Walker: 1560069754
+    Turn: 2
+    At: {x: 25.5, y: 27.400354, z: 117.5}
+    Place: 0
+  - Walker: 1560069754
+    Turn: 2
+    At: {x: 25.5, y: 27.400354, z: 117.5}
+    Place: 1
+  - Walker: 2737230115
+    Turn: 1
+    At: {x: 28.5, y: 27.400354, z: 165.5}
+    Place: 0
+  - Walker: 2737230115
+    Turn: 1
+    At: {x: 28.5, y: 27.400354, z: 165.5}
+    Place: 1
+  - Walker: 1865324234
+    Turn: 0
+    At: {x: -31.5, y: 26.887936, z: 130.5}
+    Place: 0
+  - Walker: 1865324234
+    Turn: 0
+    At: {x: -31.5, y: 26.887936, z: 130.5}
+    Place: 1
+  - Walker: 1865324234
+    Turn: 3
+    At: {x: -31.5, y: 26.737936, z: 126.5}
+    Place: 0
+  - Walker: 1865324234
+    Turn: 3
+    At: {x: -31.5, y: 26.737936, z: 126.5}
+    Place: 1
+  - Walker: 1865324234
+    Turn: 4
+    At: {x: -31.5, y: 26.887936, z: 129.5}
+    Place: 0
+  - Walker: 1865324234
+    Turn: 4
+    At: {x: -31.5, y: 26.887936, z: 129.5}
+    Place: 1
+  - Walker: 18539480
+    Turn: 1
+    At: {x: 24.5, y: 27.400354, z: 116.5}
+    Place: 0
+  - Walker: 18539480
+    Turn: 1
+    At: {x: 24.5, y: 27.400354, z: 116.5}
+    Place: 1
+  - Walker: 18539480
+    Turn: 2
+    At: {x: 30.5, y: 27.400354, z: 122.5}
+    Place: 1
+  - Walker: 1910894696
+    Turn: 0
+    At: {x: -31.5, y: 26.737936, z: 145.5}
+    Place: 0
+  - Walker: 1910894696
+    Turn: 0
+    At: {x: -31.5, y: 26.737936, z: 145.5}
+    Place: 1
+  - Walker: 1910894696
+    Turn: 5
+    At: {x: -31.5, y: 26.737936, z: 144.5}
+    Place: 0
+  - Walker: 1910894696
+    Turn: 5
+    At: {x: -31.5, y: 26.737936, z: 144.5}
+    Place: 1
 --- !u!1001 &136227523
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -33991,6 +34238,111 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1604235921773914418, guid: 50730664e113c764684cd745996e8ec5, type: 3}
   m_PrefabInstance: {fileID: 140798327}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &140852928
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 140852929}
+  - component: {fileID: 140852930}
+  m_Layer: 0
+  m_Name: Bench 20
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &140852929
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 140852928}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 16.84089, y: 27.550354, z: 81.09164}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &140852930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 140852928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 86538688}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 16.84089, y: 27.550354, z: 81.09164}
+    Seat: {x: 16.58089, y: 28.150354, z: 81.09178}
+    Yaw: 90.03262
+  - Stand: {x: 16.840212, y: 27.550354, z: 79.90215}
+    Seat: {x: 16.580212, y: 28.150354, z: 79.9023}
+    Yaw: 90.03262
+  visits:
+  - Walker: 911524222
+    Turn: 1
+    At: {x: 40.5, y: 27.400354, z: 81.5}
+    Place: 1
+  - Walker: 1699027006
+    Turn: 2
+    At: {x: 46.5, y: 27.550354, z: 92.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 0
+    At: {x: 39.5, y: 27.400354, z: 78.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 0
+    At: {x: 39.5, y: 27.400354, z: 78.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 1
+    At: {x: 14.5, y: 27.400354, z: 83.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 1
+    At: {x: 14.5, y: 27.400354, z: 83.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 2
+    At: {x: 14.5, y: 27.400354, z: 72.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 2
+    At: {x: 14.5, y: 27.400354, z: 72.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 3
+    At: {x: 21.5, y: 27.400354, z: 67.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 3
+    At: {x: 21.5, y: 27.400354, z: 67.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 5
+    At: {x: 39.5, y: 27.400354, z: 77.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 5
+    At: {x: 39.5, y: 27.400354, z: 77.5}
+    Place: 1
 --- !u!1001 &141030507
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -68035,6 +68387,119 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 27781625226275239, guid: e001f1b279f3ab44ab765201f12dab40, type: 3}
   m_PrefabInstance: {fileID: 300997351}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &301490473
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 301490474}
+  - component: {fileID: 301490475}
+  m_Layer: 0
+  m_Name: Bench 7
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &301490474
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 301490473}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.1658874, y: 27.324448, z: 171.09163}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &301490475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 301490473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1380146821}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: -2.1658874, y: 27.324448, z: 171.09163}
+    Seat: {x: -2.4258873, y: 27.858809, z: 171.0918}
+    Yaw: 90.0357
+  - Stand: {x: -2.1666284, y: 27.324438, z: 169.90211}
+    Seat: {x: -2.4266284, y: 27.858809, z: 169.90228}
+    Yaw: 90.0357
+  visits:
+  - Walker: 3396621374
+    Turn: 0
+    At: {x: -26.5, y: 27.009892, z: 198.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 0
+    At: {x: -26.5, y: 27.009892, z: 198.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 1
+    At: {x: -27.5, y: 26.98489, z: 183.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 1
+    At: {x: -27.5, y: 26.98489, z: 183.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 3
+    At: {x: -26.5, y: 27.009892, z: 172.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 3
+    At: {x: -26.5, y: 27.009892, z: 172.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 4
+    At: {x: -26.5, y: 27.009892, z: 182.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 4
+    At: {x: -26.5, y: 27.009892, z: 182.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 5
+    At: {x: -26.5, y: 27.009892, z: 197.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 5
+    At: {x: -26.5, y: 27.009892, z: 197.5}
+    Place: 1
+  - Walker: 1910894696
+    Turn: 0
+    At: {x: -31.5, y: 26.737936, z: 145.5}
+    Place: 0
+  - Walker: 1910894696
+    Turn: 0
+    At: {x: -31.5, y: 26.737936, z: 145.5}
+    Place: 1
+  - Walker: 1910894696
+    Turn: 5
+    At: {x: -31.5, y: 26.737936, z: 144.5}
+    Place: 0
+  - Walker: 1910894696
+    Turn: 5
+    At: {x: -31.5, y: 26.737936, z: 144.5}
+    Place: 1
 --- !u!1001 &301720874
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -70705,6 +71170,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5615651198693751004, guid: ecb57426d078dd8449f4778485a2dc90, type: 3}
   m_PrefabInstance: {fileID: 314349659}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &314678515
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 314678516}
+  - component: {fileID: 314678517}
+  m_Layer: 0
+  m_Name: Bench 31
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &314678516
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 314678515}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 137.1092, y: 26.138683, z: 204.17114}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &314678517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 314678515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 98472680}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 137.1092, y: 26.138683, z: 204.17114}
+    Seat: {x: 137.10439, y: 26.690527, z: 204.43109}
+    Yaw: 178.93877
+  - Stand: {x: 135.91484, y: 26.163591, z: 204.14902}
+    Seat: {x: 135.91002, y: 26.690527, z: 204.40897}
+    Yaw: 178.93877
+  visits: []
 --- !u!1001 &315178788
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -84223,6 +84745,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2659770476599671537, guid: a078021c51ab6e1479b0a7ec674264c0, type: 3}
   m_PrefabInstance: {fileID: 379003398}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &379780382
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 379780383}
+  - component: {fileID: 379780384}
+  m_Layer: 0
+  m_Name: Bench 29
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &379780383
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379780382}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 129.11041, y: 26.309395, z: 96.170166}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &379780384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379780382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1303455142}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 129.11041, y: 26.309395, z: 96.170166}
+    Seat: {x: 129.10576, y: 26.86245, z: 96.43012}
+    Yaw: 178.976
+  - Stand: {x: 127.91628, y: 26.335562, z: 96.14882}
+    Seat: {x: 127.91164, y: 26.86245, z: 96.408775}
+    Yaw: 178.976
+  visits: []
 --- !u!1001 &379831063
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -84588,6 +85167,71 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
+--- !u!1 &380983520
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 380983521}
+  - component: {fileID: 380983522}
+  m_Layer: 0
+  m_Name: Bench 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &380983521
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380983520}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -50.159122, y: 25.90089, z: -16.90836}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &380983522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380983520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1838021592}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: -50.159122, y: 25.90089, z: -16.90836}
+    Seat: {x: -50.41912, y: 26.439337, z: -16.908216}
+    Yaw: 90.031715
+  - Stand: {x: -50.15978, y: 25.900227, z: -18.09784}
+    Seat: {x: -50.419777, y: 26.439337, z: -18.097696}
+    Yaw: 90.031715
+  visits:
+  - Walker: 576528056
+    Turn: 3
+    At: {x: -68.5, y: 26.048798, z: -12.5}
+    Place: 0
+  - Walker: 576528056
+    Turn: 3
+    At: {x: -68.5, y: 26.048798, z: -12.5}
+    Place: 1
 --- !u!1001 &381070914
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -116831,6 +117475,111 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5543281019923993596, guid: c0d623f45203d5b428011c76837fa27b, type: 3}
   m_PrefabInstance: {fileID: 533824197}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &533904995
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 533904996}
+  - component: {fileID: 533904997}
+  m_Layer: 0
+  m_Name: 'Stall: Kit_Market_Bakery_6x4'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &533904996
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 533904995}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 51.9, y: 27.550354, z: 57.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &533904997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 533904995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 1
+  piece: {fileID: 497247449}
+  quiet: 0
+  shortest: 15
+  longest: 40
+  places:
+  - Stand: {x: 51.9, y: 27.550354, z: 57.8}
+    Seat: {x: 51.9, y: 27.550354, z: 57.8}
+    Yaw: -90
+  - Stand: {x: 51.9, y: 27.550354, z: 60.2}
+    Seat: {x: 51.9, y: 27.550354, z: 60.2}
+    Yaw: -90
+  visits:
+  - Walker: 911524222
+    Turn: 2
+    At: {x: 58.5, y: 27.400354, z: 69.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 2
+    At: {x: 58.5, y: 27.400354, z: 69.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 3
+    At: {x: 65.5, y: 27.400354, z: 74.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 3
+    At: {x: 65.5, y: 27.400354, z: 74.5}
+    Place: 1
+  - Walker: 4199861807
+    Turn: 1
+    At: {x: 88.5, y: 27.226027, z: 52.5}
+    Place: 1
+  - Walker: 4278534915
+    Turn: 1
+    At: {x: 79.5, y: 27.503836, z: 69.5}
+    Place: 0
+  - Walker: 4278534915
+    Turn: 1
+    At: {x: 79.5, y: 27.503836, z: 69.5}
+    Place: 1
+  - Walker: 4278534915
+    Turn: 2
+    At: {x: 86.5, y: 27.266434, z: 60.5}
+    Place: 0
+  - Walker: 4278534915
+    Turn: 2
+    At: {x: 86.5, y: 27.266434, z: 60.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 5
+    At: {x: 49.5, y: 27.470648, z: 18.5}
+    Place: 0
+  - Walker: 18539480
+    Turn: 4
+    At: {x: 49.5, y: 27.400354, z: 97.5}
+    Place: 0
+  - Walker: 18539480
+    Turn: 4
+    At: {x: 49.5, y: 27.400354, z: 97.5}
+    Place: 1
 --- !u!1001 &535154175
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -129870,6 +130619,138 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 568289162}
   m_Mesh: {fileID: 8333862565514156139, guid: ddd58aa028112314cbfcf3b684c3bcae, type: 3}
+--- !u!1 &568309715
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 568309716}
+  - component: {fileID: 568309717}
+  m_Layer: 0
+  m_Name: The old chapel's door
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &568309716
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 568309715}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -60.5, y: 26.230383, z: 132}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &568309717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 568309715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 2
+  piece: {fileID: 1669033519}
+  quiet: 0
+  shortest: 40
+  longest: 120
+  places:
+  - Stand: {x: -60.5, y: 26.230383, z: 132}
+    Seat: {x: -60.5, y: 26.230383, z: 132}
+    Yaw: 0.000005008956
+  - Stand: {x: -59.8, y: 26.242865, z: 132}
+    Seat: {x: -59.8, y: 26.242865, z: 132}
+    Yaw: 0.000005008956
+  - Stand: {x: -61.2, y: 26.218657, z: 132}
+    Seat: {x: -61.2, y: 26.218657, z: 132}
+    Yaw: 0.000005008956
+  visits:
+  - Walker: 1865324234
+    Turn: 0
+    At: {x: -31.5, y: 26.887936, z: 130.5}
+    Place: 0
+  - Walker: 1865324234
+    Turn: 0
+    At: {x: -31.5, y: 26.887936, z: 130.5}
+    Place: 1
+  - Walker: 1865324234
+    Turn: 0
+    At: {x: -31.5, y: 26.887936, z: 130.5}
+    Place: 2
+  - Walker: 1865324234
+    Turn: 1
+    At: {x: -61.5, y: 26.213968, z: 130.5}
+    Place: 0
+  - Walker: 1865324234
+    Turn: 1
+    At: {x: -61.5, y: 26.213968, z: 130.5}
+    Place: 1
+  - Walker: 1865324234
+    Turn: 1
+    At: {x: -61.5, y: 26.213968, z: 130.5}
+    Place: 2
+  - Walker: 1865324234
+    Turn: 3
+    At: {x: -31.5, y: 26.737936, z: 126.5}
+    Place: 0
+  - Walker: 1865324234
+    Turn: 3
+    At: {x: -31.5, y: 26.737936, z: 126.5}
+    Place: 1
+  - Walker: 1865324234
+    Turn: 3
+    At: {x: -31.5, y: 26.737936, z: 126.5}
+    Place: 2
+  - Walker: 1865324234
+    Turn: 4
+    At: {x: -31.5, y: 26.887936, z: 129.5}
+    Place: 0
+  - Walker: 1865324234
+    Turn: 4
+    At: {x: -31.5, y: 26.887936, z: 129.5}
+    Place: 1
+  - Walker: 1865324234
+    Turn: 4
+    At: {x: -31.5, y: 26.887936, z: 129.5}
+    Place: 2
+  - Walker: 1910894696
+    Turn: 3
+    At: {x: -66.5, y: 25.992237, z: 132.5}
+    Place: 0
+  - Walker: 1910894696
+    Turn: 3
+    At: {x: -66.5, y: 25.992237, z: 132.5}
+    Place: 1
+  - Walker: 1910894696
+    Turn: 3
+    At: {x: -66.5, y: 25.992237, z: 132.5}
+    Place: 2
+  - Walker: 1910894696
+    Turn: 4
+    At: {x: -41.5, y: 26.48792, z: 127.5}
+    Place: 0
+  - Walker: 1910894696
+    Turn: 4
+    At: {x: -41.5, y: 26.48792, z: 127.5}
+    Place: 1
+  - Walker: 1910894696
+    Turn: 4
+    At: {x: -41.5, y: 26.48792, z: 127.5}
+    Place: 2
 --- !u!1001 &568692838
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -131117,6 +131998,143 @@ MonoBehaviour:
   arriveOnPositiveZ: 1
   interactRadius: 1.5
   arrivalDistance: 1
+--- !u!1 &572812667
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 572812668}
+  - component: {fileID: 572812669}
+  m_Layer: 0
+  m_Name: Bench 27
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &572812668
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 572812667}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 94.10849, y: 27.134216, z: 180.17027}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &572812669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 572812667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 415257552}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 94.10849, y: 27.134216, z: 180.17027}
+    Seat: {x: 94.10379, y: 27.685413, z: 180.43024}
+    Yaw: 178.96422
+  - Stand: {x: 92.9142, y: 27.15661, z: 180.14867}
+    Seat: {x: 92.9095, y: 27.685413, z: 180.40863}
+    Yaw: 178.96422
+  visits:
+  - Walker: 2897873441
+    Turn: 0
+    At: {x: 106.5, y: 27.009588, z: 173.5}
+    Place: 0
+  - Walker: 2897873441
+    Turn: 0
+    At: {x: 106.5, y: 27.009588, z: 173.5}
+    Place: 1
+  - Walker: 2897873441
+    Turn: 1
+    At: {x: 88.5, y: 27.235182, z: 161.5}
+    Place: 0
+  - Walker: 2897873441
+    Turn: 1
+    At: {x: 88.5, y: 27.235182, z: 161.5}
+    Place: 1
+  - Walker: 2897873441
+    Turn: 2
+    At: {x: 98.5, y: 27.19313, z: 141.5}
+    Place: 0
+  - Walker: 2897873441
+    Turn: 2
+    At: {x: 98.5, y: 27.19313, z: 141.5}
+    Place: 1
+  - Walker: 2897873441
+    Turn: 3
+    At: {x: 106.5, y: 27.009588, z: 155.5}
+    Place: 0
+  - Walker: 2897873441
+    Turn: 3
+    At: {x: 106.5, y: 27.009588, z: 155.5}
+    Place: 1
+  - Walker: 2897873441
+    Turn: 4
+    At: {x: 106.5, y: 27.009588, z: 172.5}
+    Place: 0
+  - Walker: 2897873441
+    Turn: 4
+    At: {x: 106.5, y: 27.009588, z: 172.5}
+    Place: 1
+  - Walker: 2737230115
+    Turn: 0
+    At: {x: 58.5, y: 27.400354, z: 165.5}
+    Place: 0
+  - Walker: 2737230115
+    Turn: 0
+    At: {x: 58.5, y: 27.400354, z: 165.5}
+    Place: 1
+  - Walker: 2737230115
+    Turn: 4
+    At: {x: 58.5, y: 27.400354, z: 164.5}
+    Place: 0
+  - Walker: 2737230115
+    Turn: 4
+    At: {x: 58.5, y: 27.400354, z: 164.5}
+    Place: 1
+  - Walker: 653894698
+    Turn: 1
+    At: {x: 80.5, y: 27.310627, z: 215.5}
+    Place: 0
+  - Walker: 653894698
+    Turn: 1
+    At: {x: 80.5, y: 27.310627, z: 215.5}
+    Place: 1
+  - Walker: 653894698
+    Turn: 2
+    At: {x: 95.5, y: 27.105705, z: 202.5}
+    Place: 0
+  - Walker: 653894698
+    Turn: 2
+    At: {x: 95.5, y: 27.105705, z: 202.5}
+    Place: 1
+  - Walker: 653894698
+    Turn: 3
+    At: {x: 97.5, y: 27.195007, z: 210.5}
+    Place: 0
+  - Walker: 653894698
+    Turn: 3
+    At: {x: 97.5, y: 27.195007, z: 210.5}
+    Place: 1
 --- !u!1001 &573572117
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -144216,6 +145234,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 27781625226275239, guid: e001f1b279f3ab44ab765201f12dab40, type: 3}
   m_PrefabInstance: {fileID: 604323383}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &604394234
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 604394235}
+  - component: {fileID: 604394236}
+  m_Layer: 0
+  m_Name: Bench 30
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &604394235
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 604394234}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 134.92099, y: 26.185331, z: 187.85243}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &604394236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 604394234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1810818917}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 134.92099, y: 26.185331, z: 187.85243}
+    Seat: {x: 134.9158, y: 26.712402, z: 187.59248}
+    Yaw: 1.1421747
+  - Stand: {x: 136.11575, y: 26.160364, z: 187.8286}
+    Seat: {x: 136.11057, y: 26.712402, z: 187.56865}
+    Yaw: 1.1421747
+  visits: []
 --- !u!1001 &604479253
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -157735,6 +158810,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 27781625226275239, guid: e001f1b279f3ab44ab765201f12dab40, type: 3}
   m_PrefabInstance: {fileID: 657554762}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &657803591
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 657803592}
+  - component: {fileID: 657803593}
+  m_Layer: 0
+  m_Name: Bench 17
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &657803592
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657803591}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.0862412, y: 27.313494, z: 32.151844}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &657803593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657803591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1802539550}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 7.0862412, y: 27.313494, z: 32.151844}
+    Seat: {x: 7.087581, y: 27.852188, z: 32.411842}
+    Yaw: -179.70476
+  - Stand: {x: 5.8954167, y: 27.302387, z: 32.157978}
+    Seat: {x: 5.8967566, y: 27.852188, z: 32.417976}
+    Yaw: -179.70476
+  visits: []
 --- !u!1001 &657997568
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -162255,6 +163387,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 678401929}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &678746769
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 678746770}
+  - component: {fileID: 678746771}
+  m_Layer: 0
+  m_Name: Bench 2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &678746770
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 678746769}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -49.110573, y: 26.307684, z: 90.82991}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &678746771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 678746769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1410871886}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: -49.110573, y: 26.307684, z: 90.82991}
+    Seat: {x: -49.105953, y: 26.861717, z: 90.569954}
+    Yaw: -1.018224
+  - Stand: {x: -47.91649, y: 26.336655, z: 90.851135}
+    Seat: {x: -47.91187, y: 26.861717, z: 90.59118}
+    Yaw: -1.018224
+  visits: []
 --- !u!1001 &678759303
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -182834,6 +184023,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3720336693879971150, guid: dbe35d79f30199f46bb8c9d8ee7ea053, type: 3}
   m_PrefabInstance: {fileID: 765501229}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &765551506
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 765551507}
+  - component: {fileID: 765551508}
+  m_Layer: 0
+  m_Name: Bench 15
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &765551507
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765551506}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.9000044, y: 27.240181, z: 25.830568}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &765551508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765551506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 558666198}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 5.9000044, y: 27.240181, z: 25.830568}
+    Seat: {x: 5.901577, y: 27.781404, z: 25.570574}
+    Yaw: -0.3465391
+  - Stand: {x: 7.091035, y: 27.252686, z: 25.83777}
+    Seat: {x: 7.0926075, y: 27.781404, z: 25.577776}
+    Yaw: -0.3465391
+  visits: []
 --- !u!1001 &765624431
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -199403,6 +200649,71 @@ ReflectionProbe:
   m_UseOcclusionCulling: 1
   m_Importance: 1
   m_CustomBakedTexture: {fileID: 8900000, guid: da7404be7ab86044c87c599b3750f6e0, type: 3}
+--- !u!1 &825789796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 825789797}
+  - component: {fileID: 825789798}
+  m_Layer: 0
+  m_Name: Bench 21
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &825789797
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825789796}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 63.159153, y: 27.550264, z: 38.908348}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &825789798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825789796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 258724111}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 63.159153, y: 27.550264, z: 38.908348}
+    Seat: {x: 63.41915, y: 28.049152, z: 38.90822}
+    Yaw: -89.971054
+  - Stand: {x: 63.159756, y: 27.550283, z: 40.097816}
+    Seat: {x: 63.419754, y: 28.049152, z: 40.097687}
+    Yaw: -89.971054
+  visits:
+  - Walker: 911524222
+    Turn: 3
+    At: {x: 65.5, y: 27.400354, z: 74.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 3
+    At: {x: 65.5, y: 27.400354, z: 74.5}
+    Place: 1
 --- !u!1001 &825849003
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -210771,6 +212082,131 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 883119358}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &883124807
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 883124808}
+  - component: {fileID: 883124809}
+  m_Layer: 0
+  m_Name: Bench 26
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &883124808
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 883124807}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 80.09831, y: 27.348219, z: 180.16135}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &883124809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 883124807}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 76104309}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 80.09831, y: 27.348219, z: 180.16135}
+    Seat: {x: 80.09748, y: 27.893833, z: 180.42134}
+    Yaw: 179.81613
+  - Stand: {x: 78.9081, y: 27.35944, z: 180.15753}
+    Seat: {x: 78.907265, y: 27.893833, z: 180.41753}
+    Yaw: 179.81613
+  visits:
+  - Walker: 2897873441
+    Turn: 0
+    At: {x: 106.5, y: 27.009588, z: 173.5}
+    Place: 0
+  - Walker: 2897873441
+    Turn: 0
+    At: {x: 106.5, y: 27.009588, z: 173.5}
+    Place: 1
+  - Walker: 2897873441
+    Turn: 1
+    At: {x: 88.5, y: 27.235182, z: 161.5}
+    Place: 0
+  - Walker: 2897873441
+    Turn: 1
+    At: {x: 88.5, y: 27.235182, z: 161.5}
+    Place: 1
+  - Walker: 2897873441
+    Turn: 3
+    At: {x: 106.5, y: 27.009588, z: 155.5}
+    Place: 0
+  - Walker: 2897873441
+    Turn: 3
+    At: {x: 106.5, y: 27.009588, z: 155.5}
+    Place: 1
+  - Walker: 2897873441
+    Turn: 4
+    At: {x: 106.5, y: 27.009588, z: 172.5}
+    Place: 0
+  - Walker: 2897873441
+    Turn: 4
+    At: {x: 106.5, y: 27.009588, z: 172.5}
+    Place: 1
+  - Walker: 2737230115
+    Turn: 0
+    At: {x: 58.5, y: 27.400354, z: 165.5}
+    Place: 0
+  - Walker: 2737230115
+    Turn: 0
+    At: {x: 58.5, y: 27.400354, z: 165.5}
+    Place: 1
+  - Walker: 2737230115
+    Turn: 3
+    At: {x: 58.5, y: 27.400354, z: 147.5}
+    Place: 0
+  - Walker: 2737230115
+    Turn: 3
+    At: {x: 58.5, y: 27.400354, z: 147.5}
+    Place: 1
+  - Walker: 2737230115
+    Turn: 4
+    At: {x: 58.5, y: 27.400354, z: 164.5}
+    Place: 0
+  - Walker: 2737230115
+    Turn: 4
+    At: {x: 58.5, y: 27.400354, z: 164.5}
+    Place: 1
+  - Walker: 653894698
+    Turn: 2
+    At: {x: 95.5, y: 27.105705, z: 202.5}
+    Place: 0
+  - Walker: 653894698
+    Turn: 2
+    At: {x: 95.5, y: 27.105705, z: 202.5}
+    Place: 1
+  - Walker: 653894698
+    Turn: 3
+    At: {x: 97.5, y: 27.195007, z: 210.5}
+    Place: 0
 --- !u!1001 &883193119
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -213553,6 +214989,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 895942212}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &896023488
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 896023489}
+  - component: {fileID: 896023490}
+  m_Layer: 0
+  m_Name: Bench 25
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &896023489
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896023488}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 75.10163, y: 27.272293, z: 30.161345}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &896023490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896023488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1250486095}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 75.10163, y: 27.272293, z: 30.161345}
+    Seat: {x: 75.09862, y: 27.823883, z: 30.421328}
+    Yaw: 179.33624
+  - Stand: {x: 73.90896, y: 27.286104, z: 30.147528}
+    Seat: {x: 73.905945, y: 27.823883, z: 30.40751}
+    Yaw: 179.33624
+  visits: []
 --- !u!1 &896270985
 GameObject:
   m_ObjectHideFlags: 0
@@ -216857,6 +218350,199 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 905315074}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &905365696
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 905365697}
+  - component: {fileID: 905365698}
+  m_Layer: 0
+  m_Name: 'Stall: Master of Enchanting'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &905365697
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 905365696}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 44, y: 27.400354, z: 72.7}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &905365698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 905365696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 1
+  piece: {fileID: 62912222}
+  quiet: 0
+  shortest: 15
+  longest: 40
+  places:
+  - Stand: {x: 44, y: 27.400354, z: 72.7}
+    Seat: {x: 44, y: 27.400354, z: 72.7}
+    Yaw: 180
+  - Stand: {x: 45.4, y: 27.400354, z: 72.7}
+    Seat: {x: 45.4, y: 27.400354, z: 72.7}
+    Yaw: -130.6012
+  visits:
+  - Walker: 911524222
+    Turn: 0
+    At: {x: 65.5, y: 27.400354, z: 85.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 0
+    At: {x: 65.5, y: 27.400354, z: 85.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 1
+    At: {x: 40.5, y: 27.400354, z: 81.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 1
+    At: {x: 40.5, y: 27.400354, z: 81.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 2
+    At: {x: 58.5, y: 27.400354, z: 69.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 2
+    At: {x: 58.5, y: 27.400354, z: 69.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 3
+    At: {x: 65.5, y: 27.400354, z: 74.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 3
+    At: {x: 65.5, y: 27.400354, z: 74.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 4
+    At: {x: 65.5, y: 27.400354, z: 84.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 4
+    At: {x: 65.5, y: 27.400354, z: 84.5}
+    Place: 1
+  - Walker: 1699027006
+    Turn: 1
+    At: {x: 30.5, y: 27.550354, z: 106.5}
+    Place: 0
+  - Walker: 1699027006
+    Turn: 1
+    At: {x: 30.5, y: 27.550354, z: 106.5}
+    Place: 1
+  - Walker: 1699027006
+    Turn: 2
+    At: {x: 46.5, y: 27.550354, z: 92.5}
+    Place: 0
+  - Walker: 1699027006
+    Turn: 2
+    At: {x: 46.5, y: 27.550354, z: 92.5}
+    Place: 1
+  - Walker: 1699027006
+    Turn: 3
+    At: {x: 48.5, y: 27.550354, z: 100.5}
+    Place: 0
+  - Walker: 1699027006
+    Turn: 3
+    At: {x: 48.5, y: 27.550354, z: 100.5}
+    Place: 1
+  - Walker: 4278534915
+    Turn: 1
+    At: {x: 79.5, y: 27.503836, z: 69.5}
+    Place: 0
+  - Walker: 4278534915
+    Turn: 1
+    At: {x: 79.5, y: 27.503836, z: 69.5}
+    Place: 1
+  - Walker: 18539480
+    Turn: 3
+    At: {x: 33.5, y: 27.400354, z: 97.5}
+    Place: 0
+  - Walker: 18539480
+    Turn: 3
+    At: {x: 33.5, y: 27.400354, z: 97.5}
+    Place: 1
+  - Walker: 18539480
+    Turn: 4
+    At: {x: 49.5, y: 27.400354, z: 97.5}
+    Place: 0
+  - Walker: 18539480
+    Turn: 4
+    At: {x: 49.5, y: 27.400354, z: 97.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 0
+    At: {x: 39.5, y: 27.400354, z: 78.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 0
+    At: {x: 39.5, y: 27.400354, z: 78.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 1
+    At: {x: 14.5, y: 27.400354, z: 83.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 1
+    At: {x: 14.5, y: 27.400354, z: 83.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 2
+    At: {x: 14.5, y: 27.400354, z: 72.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 2
+    At: {x: 14.5, y: 27.400354, z: 72.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 3
+    At: {x: 21.5, y: 27.400354, z: 67.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 3
+    At: {x: 21.5, y: 27.400354, z: 67.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 4
+    At: {x: 39.5, y: 27.400354, z: 65.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 4
+    At: {x: 39.5, y: 27.400354, z: 65.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 5
+    At: {x: 39.5, y: 27.400354, z: 77.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 5
+    At: {x: 39.5, y: 27.400354, z: 77.5}
+    Place: 1
 --- !u!1001 &906399505
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -240656,6 +242342,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4002402900634614102, guid: 12f0554c00084cc4eade4df10e72e2f8, type: 3}
   m_PrefabInstance: {fileID: 1016564819}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1016875039
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1016875040}
+  - component: {fileID: 1016875041}
+  m_Layer: 0
+  m_Name: Bench 28
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1016875040
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016875039}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 127.853424, y: 26.337132, z: 197.09164}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1016875041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016875039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 493743506}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 127.853424, y: 26.337132, z: 197.09164}
+    Seat: {x: 127.59342, y: 26.888348, z: 197.09175}
+    Yaw: 90.02256
+  - Stand: {x: 127.85295, y: 26.337143, z: 195.90222}
+    Seat: {x: 127.59295, y: 26.888348, z: 195.90233}
+    Yaw: 90.02256
+  visits: []
 --- !u!1001 &1017159863
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -272759,6 +274502,127 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5615651198693751004, guid: ecb57426d078dd8449f4778485a2dc90, type: 3}
   m_PrefabInstance: {fileID: 1142326378}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1142836732
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1142836733}
+  - component: {fileID: 1142836734}
+  m_Layer: 0
+  m_Name: 'Stall: Master of Item Creation'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1142836733
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142836732}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 26.8, y: 27.400354, z: 60}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1142836734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142836732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 1
+  piece: {fileID: 587423449}
+  quiet: 0
+  shortest: 15
+  longest: 40
+  places:
+  - Stand: {x: 26.8, y: 27.400354, z: 60}
+    Seat: {x: 26.8, y: 27.400354, z: 60}
+    Yaw: 90
+  - Stand: {x: 26.8, y: 27.400354, z: 61.4}
+    Seat: {x: 26.8, y: 27.400354, z: 61.4}
+    Yaw: 139.39873
+  visits:
+  - Walker: 911524222
+    Turn: 1
+    At: {x: 40.5, y: 27.400354, z: 81.5}
+    Place: 1
+  - Walker: 3485516081
+    Turn: 0
+    At: {x: 3.5, y: 27.526451, z: 68.5}
+    Place: 0
+  - Walker: 3485516081
+    Turn: 0
+    At: {x: 3.5, y: 27.526451, z: 68.5}
+    Place: 1
+  - Walker: 3485516081
+    Turn: 3
+    At: {x: 0.5, y: 27.497375, z: 53.5}
+    Place: 1
+  - Walker: 3485516081
+    Turn: 4
+    At: {x: 3.5, y: 27.375938, z: 55.5}
+    Place: 0
+  - Walker: 3485516081
+    Turn: 4
+    At: {x: 3.5, y: 27.375938, z: 55.5}
+    Place: 1
+  - Walker: 3485516081
+    Turn: 5
+    At: {x: 3.5, y: 27.526451, z: 67.5}
+    Place: 0
+  - Walker: 3485516081
+    Turn: 5
+    At: {x: 3.5, y: 27.526451, z: 67.5}
+    Place: 1
+  - Walker: 1699027006
+    Turn: 2
+    At: {x: 46.5, y: 27.550354, z: 92.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 2
+    At: {x: 30.5, y: 27.52604, z: 24.5}
+    Place: 0
+  - Walker: 3534710570
+    Turn: 2
+    At: {x: 30.5, y: 27.52604, z: 24.5}
+    Place: 1
+  - Walker: 18539480
+    Turn: 3
+    At: {x: 33.5, y: 27.400354, z: 97.5}
+    Place: 0
+  - Walker: 18539480
+    Turn: 3
+    At: {x: 33.5, y: 27.400354, z: 97.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 3
+    At: {x: 21.5, y: 27.400354, z: 67.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 3
+    At: {x: 21.5, y: 27.400354, z: 67.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 4
+    At: {x: 39.5, y: 27.400354, z: 65.5}
+    Place: 1
 --- !u!1001 &1143268554
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -274962,6 +276826,79 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 1156548570}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1157578759
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1157578760}
+  - component: {fileID: 1157578761}
+  m_Layer: 0
+  m_Name: Bench 5
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1157578760
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157578759}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -45.840836, y: 25.90958, z: -18.091646}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1157578761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157578759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 21154337}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: -45.840836, y: 25.90958, z: -18.091646}
+    Seat: {x: -45.580837, y: 26.452837, z: -18.091772}
+    Yaw: -89.97238
+  - Stand: {x: -45.840263, y: 25.9133, z: -16.90219}
+    Seat: {x: -45.580265, y: 26.452837, z: -16.902315}
+    Yaw: -89.97238
+  visits:
+  - Walker: 1538646667
+    Turn: 1
+    At: {x: -38.5, y: 25.93608, z: -19.5}
+    Place: 0
+  - Walker: 1538646667
+    Turn: 1
+    At: {x: -38.5, y: 25.93608, z: -19.5}
+    Place: 1
+  - Walker: 1538646667
+    Turn: 2
+    At: {x: -27.5, y: 26.130184, z: -23.5}
+    Place: 1
+  - Walker: 1538646667
+    Turn: 4
+    At: {x: -15.5, y: 26.098248, z: -22.5}
+    Place: 0
 --- !u!1 &1157594168
 GameObject:
   m_ObjectHideFlags: 0
@@ -278897,6 +280834,111 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 1173379056}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1174018080
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1174018081}
+  - component: {fileID: 1174018082}
+  m_Layer: 0
+  m_Name: Bench 22
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1174018081
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174018080}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 63.159138, y: 27.550354, z: 79.90836}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1174018082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174018080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1149325322}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 63.159138, y: 27.550354, z: 79.90836}
+    Seat: {x: 63.419136, y: 28.150354, z: 79.908226}
+    Yaw: -89.97053
+  - Stand: {x: 63.159748, y: 27.550354, z: 81.09783}
+    Seat: {x: 63.419746, y: 28.150354, z: 81.097694}
+    Yaw: -89.97053
+  visits:
+  - Walker: 911524222
+    Turn: 0
+    At: {x: 65.5, y: 27.400354, z: 85.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 0
+    At: {x: 65.5, y: 27.400354, z: 85.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 2
+    At: {x: 58.5, y: 27.400354, z: 69.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 2
+    At: {x: 58.5, y: 27.400354, z: 69.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 3
+    At: {x: 65.5, y: 27.400354, z: 74.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 3
+    At: {x: 65.5, y: 27.400354, z: 74.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 4
+    At: {x: 65.5, y: 27.400354, z: 84.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 4
+    At: {x: 65.5, y: 27.400354, z: 84.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 0
+    At: {x: 39.5, y: 27.400354, z: 78.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 0
+    At: {x: 39.5, y: 27.400354, z: 78.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 5
+    At: {x: 39.5, y: 27.400354, z: 77.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 5
+    At: {x: 39.5, y: 27.400354, z: 77.5}
+    Place: 1
 --- !u!1001 &1174269648
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -284121,6 +286163,71 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5615651198693751004, guid: ecb57426d078dd8449f4778485a2dc90, type: 3}
   m_PrefabInstance: {fileID: 1195070229}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1195218451
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1195218452}
+  - component: {fileID: 1195218453}
+  m_Layer: 0
+  m_Name: Bench 19
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1195218452
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1195218451}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 16.840878, y: 27.55016, z: 40.09164}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1195218453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1195218451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1026523568}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 16.840878, y: 27.55016, z: 40.09164}
+    Seat: {x: 16.580877, y: 28.049105, z: 40.091785}
+    Yaw: 90.03158
+  - Stand: {x: 16.840221, y: 27.549511, z: 38.902157}
+    Seat: {x: 16.580221, y: 28.049105, z: 38.9023}
+    Yaw: 90.03158
+  visits:
+  - Walker: 3518463945
+    Turn: 2
+    At: {x: 14.5, y: 27.400354, z: 72.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 2
+    At: {x: 14.5, y: 27.400354, z: 72.5}
+    Place: 1
 --- !u!1001 &1195294771
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -316357,6 +318464,115 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 1320502754}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1320539119
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1320539120}
+  - component: {fileID: 1320539121}
+  m_Layer: 0
+  m_Name: 'Stall: Master of First Aid'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1320539120
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1320539119}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 36, y: 27.400354, z: 47.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1320539121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1320539119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 1
+  piece: {fileID: 1109099299}
+  quiet: 0
+  shortest: 15
+  longest: 40
+  places:
+  - Stand: {x: 36, y: 27.400354, z: 47.3}
+    Seat: {x: 36, y: 27.400354, z: 47.3}
+    Yaw: 0
+  - Stand: {x: 34.6, y: 27.400354, z: 47.3}
+    Seat: {x: 34.6, y: 27.400354, z: 47.3}
+    Yaw: 49.39872
+  visits:
+  - Walker: 3485516081
+    Turn: 0
+    At: {x: 3.5, y: 27.526451, z: 68.5}
+    Place: 1
+  - Walker: 3485516081
+    Turn: 5
+    At: {x: 3.5, y: 27.526451, z: 67.5}
+    Place: 0
+  - Walker: 3485516081
+    Turn: 5
+    At: {x: 3.5, y: 27.526451, z: 67.5}
+    Place: 1
+  - Walker: 113264044
+    Turn: 4
+    At: {x: 48.5, y: 27.239628, z: 12.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 1
+    At: {x: 29.5, y: 27.546473, z: 29.5}
+    Place: 0
+  - Walker: 3534710570
+    Turn: 2
+    At: {x: 30.5, y: 27.52604, z: 24.5}
+    Place: 0
+  - Walker: 3534710570
+    Turn: 2
+    At: {x: 30.5, y: 27.52604, z: 24.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 3
+    At: {x: 30.5, y: 27.41751, z: 14.5}
+    Place: 0
+  - Walker: 3534710570
+    Turn: 3
+    At: {x: 30.5, y: 27.41751, z: 14.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 5
+    At: {x: 49.5, y: 27.470648, z: 18.5}
+    Place: 0
+  - Walker: 3534710570
+    Turn: 5
+    At: {x: 49.5, y: 27.470648, z: 18.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 6
+    At: {x: 50.5, y: 27.478363, z: 19.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 2
+    At: {x: 14.5, y: 27.400354, z: 72.5}
+    Place: 1
 --- !u!1001 &1321183229
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -325494,6 +327710,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1604235921773914418, guid: 50730664e113c764684cd745996e8ec5, type: 3}
   m_PrefabInstance: {fileID: 1357405034}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1357464915
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1357464916}
+  - component: {fileID: 1357464917}
+  m_Layer: 0
+  m_Name: Bench 4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1357464916
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357464915}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -46.922897, y: 26.358593, z: 96.147736}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1357464917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357464915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 605700088}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: -46.922897, y: 26.358593, z: 96.147736}
+    Seat: {x: -46.917786, y: 26.885658, z: 96.407684}
+    Yaw: -178.87341
+  - Stand: {x: -48.117477, y: 26.33163, z: 96.171234}
+    Seat: {x: -48.112366, y: 26.885658, z: 96.43118}
+    Yaw: -178.87341
+  visits: []
 --- !u!1001 &1357526677
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -329114,6 +331387,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5615651198693751004, guid: ecb57426d078dd8449f4778485a2dc90, type: 3}
   m_PrefabInstance: {fileID: 1376593008}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1377025484
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1377025485}
+  - component: {fileID: 1377025486}
+  m_Layer: 0
+  m_Name: Bench 18
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1377025485
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1377025484}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.0916457, y: 27.39505, z: 96.15914}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1377025486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1377025484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1345999542}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 7.0916457, y: 27.39505, z: 96.15914}
+    Seat: {x: 7.0917754, y: 27.9532, z: 96.41914}
+    Yaw: -179.97139
+  - Stand: {x: 5.902183, y: 27.39133, z: 96.15974}
+    Seat: {x: 5.9023128, y: 27.9532, z: 96.41974}
+    Yaw: -179.97139
+  visits: []
 --- !u!1001 &1377119355
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -340236,6 +342566,103 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2659770476599671537, guid: a078021c51ab6e1479b0a7ec674264c0, type: 3}
   m_PrefabInstance: {fileID: 1433867351}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1433943892
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1433943893}
+  - component: {fileID: 1433943894}
+  m_Layer: 0
+  m_Name: Bench 8
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1433943893
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433943892}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.1659527, y: 27.324446, z: 193.09163}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1433943894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433943892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1650417989}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: -2.1659527, y: 27.324446, z: 193.09163}
+    Seat: {x: -2.4259527, y: 27.858809, z: 193.09177}
+    Yaw: 90.0294
+  - Stand: {x: -2.166563, y: 27.324438, z: 191.90218}
+    Seat: {x: -2.426563, y: 27.858809, z: 191.90231}
+    Yaw: 90.0294
+  visits:
+  - Walker: 3396621374
+    Turn: 0
+    At: {x: -26.5, y: 27.009892, z: 198.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 0
+    At: {x: -26.5, y: 27.009892, z: 198.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 1
+    At: {x: -27.5, y: 26.98489, z: 183.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 1
+    At: {x: -27.5, y: 26.98489, z: 183.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 3
+    At: {x: -26.5, y: 27.009892, z: 172.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 3
+    At: {x: -26.5, y: 27.009892, z: 172.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 4
+    At: {x: -26.5, y: 27.009892, z: 182.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 4
+    At: {x: -26.5, y: 27.009892, z: 182.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 5
+    At: {x: -26.5, y: 27.009892, z: 197.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 5
+    At: {x: -26.5, y: 27.009892, z: 197.5}
+    Place: 1
 --- !u!1001 &1434111250
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -348037,6 +350464,111 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 27781625226275239, guid: e001f1b279f3ab44ab765201f12dab40, type: 3}
   m_PrefabInstance: {fileID: 1457056897}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1457378552
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1457378553}
+  - component: {fileID: 1457378554}
+  m_Layer: 0
+  m_Name: Bench 12
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1457378553
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457378552}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.159141, y: 27.359339, z: 180.90837}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1457378554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457378552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 128068192}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 1.159141, y: 27.359339, z: 180.90837}
+    Seat: {x: 1.4191409, y: 27.94356, z: 180.90823}
+    Yaw: -89.97045
+  - Stand: {x: 1.1597544, y: 27.359344, z: 182.09782}
+    Seat: {x: 1.4197544, y: 27.94356, z: 182.09769}
+    Yaw: -89.97045
+  visits:
+  - Walker: 3396621374
+    Turn: 0
+    At: {x: -26.5, y: 27.009892, z: 198.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 0
+    At: {x: -26.5, y: 27.009892, z: 198.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 1
+    At: {x: -27.5, y: 26.98489, z: 183.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 1
+    At: {x: -27.5, y: 26.98489, z: 183.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 3
+    At: {x: -26.5, y: 27.009892, z: 172.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 3
+    At: {x: -26.5, y: 27.009892, z: 172.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 4
+    At: {x: -26.5, y: 27.009892, z: 182.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 4
+    At: {x: -26.5, y: 27.009892, z: 182.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 5
+    At: {x: -26.5, y: 27.009892, z: 197.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 5
+    At: {x: -26.5, y: 27.009892, z: 197.5}
+    Place: 1
+  - Walker: 2737230115
+    Turn: 1
+    At: {x: 28.5, y: 27.400354, z: 165.5}
+    Place: 0
+  - Walker: 2737230115
+    Turn: 1
+    At: {x: 28.5, y: 27.400354, z: 165.5}
+    Place: 1
 --- !u!1001 &1457477678
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -401637,6 +404169,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 27781625226275239, guid: e001f1b279f3ab44ab765201f12dab40, type: 3}
   m_PrefabInstance: {fileID: 1652147161}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1653823031
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1653823032}
+  - component: {fileID: 1653823033}
+  m_Layer: 0
+  m_Name: Bench 14
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1653823032
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653823031}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.717402, y: 26.355635, z: -20.0721}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1653823033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653823031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 922847683}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 5.717402, y: 26.355635, z: -20.0721}
+    Seat: {x: 5.6945214, y: 26.910873, z: -20.33109}
+    Yaw: 5.0486474
+  - Stand: {x: 6.522159, y: 26.361624, z: -20.143196}
+    Seat: {x: 6.4992785, y: 26.910873, z: -20.402187}
+    Yaw: 5.0486474
+  - Stand: {x: 7.326916, y: 26.36608, z: -20.214293}
+    Seat: {x: 7.3040357, y: 26.910873, z: -20.473284}
+    Yaw: 5.0486474
+  visits:
+  - Walker: 1538646667
+    Turn: 5
+    At: {x: -8.5, y: 26.203796, z: -20.5}
+    Place: 0
+  - Walker: 1538646667
+    Turn: 5
+    At: {x: -8.5, y: 26.203796, z: -20.5}
+    Place: 1
+  - Walker: 1538646667
+    Turn: 5
+    At: {x: -8.5, y: 26.203796, z: -20.5}
+    Place: 2
 --- !u!1001 &1654505589
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -427417,6 +430021,127 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 1774619596}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1774947077
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1774947078}
+  - component: {fileID: 1774947079}
+  m_Layer: 0
+  m_Name: 'Stall: Kit_Market_Fish_7x4'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1774947078
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1774947077}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 42.300003, y: 27.550354, z: 49.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1774947079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1774947077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 1
+  piece: {fileID: 338368273}
+  quiet: 0
+  shortest: 15
+  longest: 40
+  places:
+  - Stand: {x: 42.300003, y: 27.550354, z: 49.1}
+    Seat: {x: 42.300003, y: 27.550354, z: 49.1}
+    Yaw: -0
+  - Stand: {x: 44.700005, y: 27.550354, z: 49.1}
+    Seat: {x: 44.700005, y: 27.550354, z: 49.1}
+    Yaw: -0
+  visits:
+  - Walker: 113264044
+    Turn: 0
+    At: {x: 48.5, y: 27.255253, z: 13.5}
+    Place: 0
+  - Walker: 113264044
+    Turn: 0
+    At: {x: 48.5, y: 27.255253, z: 13.5}
+    Place: 1
+  - Walker: 113264044
+    Turn: 4
+    At: {x: 48.5, y: 27.239628, z: 12.5}
+    Place: 0
+  - Walker: 113264044
+    Turn: 4
+    At: {x: 48.5, y: 27.239628, z: 12.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 0
+    At: {x: 50.5, y: 27.48938, z: 20.5}
+    Place: 0
+  - Walker: 3534710570
+    Turn: 0
+    At: {x: 50.5, y: 27.48938, z: 20.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 1
+    At: {x: 29.5, y: 27.546473, z: 29.5}
+    Place: 0
+  - Walker: 3534710570
+    Turn: 1
+    At: {x: 29.5, y: 27.546473, z: 29.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 2
+    At: {x: 30.5, y: 27.52604, z: 24.5}
+    Place: 0
+  - Walker: 3534710570
+    Turn: 2
+    At: {x: 30.5, y: 27.52604, z: 24.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 3
+    At: {x: 30.5, y: 27.41751, z: 14.5}
+    Place: 0
+  - Walker: 3534710570
+    Turn: 3
+    At: {x: 30.5, y: 27.41751, z: 14.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 5
+    At: {x: 49.5, y: 27.470648, z: 18.5}
+    Place: 0
+  - Walker: 3534710570
+    Turn: 5
+    At: {x: 49.5, y: 27.470648, z: 18.5}
+    Place: 1
+  - Walker: 3534710570
+    Turn: 6
+    At: {x: 50.5, y: 27.478363, z: 19.5}
+    Place: 0
+  - Walker: 3534710570
+    Turn: 6
+    At: {x: 50.5, y: 27.478363, z: 19.5}
+    Place: 1
 --- !u!1001 &1775130142
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -432776,6 +435501,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 1789044921}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1789179489
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1789179490}
+  - component: {fileID: 1789179491}
+  m_Layer: 0
+  m_Name: Bench 23
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1789179490
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1789179489}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 72.90836, y: 27.395294, z: 90.84089}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1789179491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1789179489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 505011262}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 72.90836, y: 27.395294, z: 90.84089}
+    Seat: {x: 72.90822, y: 27.933445, z: 90.58089}
+    Yaw: 0.031869344
+  - Stand: {x: 74.09785, y: 27.391575, z: 90.84023}
+    Seat: {x: 74.0977, y: 27.933445, z: 90.58023}
+    Yaw: 0.031869344
+  visits:
+  - Walker: 284149256
+    Turn: 1
+    At: {x: 94.5, y: 27.126875, z: 88.5}
+    Place: 0
+  - Walker: 284149256
+    Turn: 1
+    At: {x: 94.5, y: 27.126875, z: 88.5}
+    Place: 1
+  - Walker: 284149256
+    Turn: 2
+    At: {x: 96.5, y: 27.236883, z: 86.5}
+    Place: 1
 --- !u!1001 &1789283736
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -452972,6 +455766,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 1801719162}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1802129858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1802129859}
+  - component: {fileID: 1802129860}
+  m_Layer: 0
+  m_Name: Bench 24
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1802129859
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802129858}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 74.09163, y: 27.391594, z: 96.15907}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1802129860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802129858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 326971846}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 74.09163, y: 27.391594, z: 96.15907}
+    Seat: {x: 74.09179, y: 27.933445, z: 96.419075}
+    Yaw: -179.96388
+  - Stand: {x: 72.90213, y: 27.395313, z: 96.15982}
+    Seat: {x: 72.90229, y: 27.933445, z: 96.41982}
+    Yaw: -179.96388
+  visits: []
 --- !u!1001 &1802372895
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -459421,6 +462272,103 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1604235921773914418, guid: 50730664e113c764684cd745996e8ec5, type: 3}
   m_PrefabInstance: {fileID: 1831869315}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1832541215
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1832541216}
+  - component: {fileID: 1832541217}
+  m_Layer: 0
+  m_Name: Bench 9
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1832541216
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1832541215}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.1657302, y: 27.292366, z: 215.09383}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1832541217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1832541215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1254576981}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: -2.1657302, y: 27.292366, z: 215.09383}
+    Seat: {x: -2.4257298, y: 27.829348, z: 215.09433}
+    Yaw: 90.11118
+  - Stand: {x: -2.168039, y: 27.296839, z: 213.90392}
+    Seat: {x: -2.4280386, y: 27.829348, z: 213.90442}
+    Yaw: 90.11118
+  visits:
+  - Walker: 3396621374
+    Turn: 0
+    At: {x: -26.5, y: 27.009892, z: 198.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 0
+    At: {x: -26.5, y: 27.009892, z: 198.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 1
+    At: {x: -27.5, y: 26.98489, z: 183.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 4
+    At: {x: -26.5, y: 27.009892, z: 182.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 5
+    At: {x: -26.5, y: 27.009892, z: 197.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 5
+    At: {x: -26.5, y: 27.009892, z: 197.5}
+    Place: 1
+  - Walker: 4038939989
+    Turn: 0
+    At: {x: -11.5, y: 27.062252, z: 238.5}
+    Place: 0
+  - Walker: 4038939989
+    Turn: 0
+    At: {x: -11.5, y: 27.062252, z: 238.5}
+    Place: 1
+  - Walker: 4038939989
+    Turn: 3
+    At: {x: -11.5, y: 27.076302, z: 237.5}
+    Place: 0
+  - Walker: 4038939989
+    Turn: 3
+    At: {x: -11.5, y: 27.076302, z: 237.5}
+    Place: 1
 --- !u!1001 &1832698824
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -466955,6 +469903,87 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 27781625226275239, guid: e001f1b279f3ab44ab765201f12dab40, type: 3}
   m_PrefabInstance: {fileID: 1868290379}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1868649555
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1868649556}
+  - component: {fileID: 1868649557}
+  m_Layer: 0
+  m_Name: Bench 13
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1868649556
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868649555}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.1590745, y: 27.358767, z: 202.90837}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1868649557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868649555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 45652730}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 1.1590745, y: 27.358767, z: 202.90837}
+    Seat: {x: 1.4190745, y: 27.941584, z: 202.9082}
+    Yaw: -89.96406
+  - Stand: {x: 1.1598208, y: 27.356304, z: 204.09789}
+    Seat: {x: 1.4198208, y: 27.941584, z: 204.09772}
+    Yaw: -89.96406
+  visits:
+  - Walker: 3396621374
+    Turn: 0
+    At: {x: -26.5, y: 27.009892, z: 198.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 0
+    At: {x: -26.5, y: 27.009892, z: 198.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 1
+    At: {x: -27.5, y: 26.98489, z: 183.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 4
+    At: {x: -26.5, y: 27.009892, z: 182.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 5
+    At: {x: -26.5, y: 27.009892, z: 197.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 5
+    At: {x: -26.5, y: 27.009892, z: 197.5}
+    Place: 1
 --- !u!1001 &1869684342
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -471429,6 +474458,119 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
+--- !u!1 &1892057154
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1892057155}
+  - component: {fileID: 1892057156}
+  m_Layer: 0
+  m_Name: Bench 11
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1892057155
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1892057154}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.1590971, y: 27.359337, z: 158.90837}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1892057156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1892057154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1518817303}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 1.1590971, y: 27.359337, z: 158.90837}
+    Seat: {x: 1.4190971, y: 27.94356, z: 158.90822}
+    Yaw: -89.966225
+  - Stand: {x: 1.1597983, y: 27.359344, z: 160.09785}
+    Seat: {x: 1.4197983, y: 27.94356, z: 160.0977}
+    Yaw: -89.966225
+  visits:
+  - Walker: 3396621374
+    Turn: 1
+    At: {x: -27.5, y: 26.98489, z: 183.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 1
+    At: {x: -27.5, y: 26.98489, z: 183.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 3
+    At: {x: -26.5, y: 27.009892, z: 172.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 3
+    At: {x: -26.5, y: 27.009892, z: 172.5}
+    Place: 1
+  - Walker: 3396621374
+    Turn: 4
+    At: {x: -26.5, y: 27.009892, z: 182.5}
+    Place: 0
+  - Walker: 3396621374
+    Turn: 4
+    At: {x: -26.5, y: 27.009892, z: 182.5}
+    Place: 1
+  - Walker: 2737230115
+    Turn: 1
+    At: {x: 28.5, y: 27.400354, z: 165.5}
+    Place: 0
+  - Walker: 2737230115
+    Turn: 1
+    At: {x: 28.5, y: 27.400354, z: 165.5}
+    Place: 1
+  - Walker: 2737230115
+    Turn: 2
+    At: {x: 38.5, y: 27.400354, z: 157.5}
+    Place: 0
+  - Walker: 2737230115
+    Turn: 2
+    At: {x: 38.5, y: 27.400354, z: 157.5}
+    Place: 1
+  - Walker: 1910894696
+    Turn: 0
+    At: {x: -31.5, y: 26.737936, z: 145.5}
+    Place: 0
+  - Walker: 1910894696
+    Turn: 0
+    At: {x: -31.5, y: 26.737936, z: 145.5}
+    Place: 1
+  - Walker: 1910894696
+    Turn: 5
+    At: {x: -31.5, y: 26.737936, z: 144.5}
+    Place: 0
+  - Walker: 1910894696
+    Turn: 5
+    At: {x: -31.5, y: 26.737936, z: 144.5}
+    Place: 1
 --- !u!1001 &1892060420
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -475320,6 +478462,207 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 1907913721}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1907914201
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1907914202}
+  - component: {fileID: 1907914203}
+  m_Layer: 0
+  m_Name: 'Stall: The trader''s stall'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1907914202
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1907914201}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 36, y: 27.400354, z: 72.7}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1907914203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1907914201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 1
+  piece: {fileID: 1795603207}
+  quiet: 0
+  shortest: 15
+  longest: 40
+  places:
+  - Stand: {x: 36, y: 27.400354, z: 72.7}
+    Seat: {x: 36, y: 27.400354, z: 72.7}
+    Yaw: 180
+  - Stand: {x: 37.4, y: 27.550354, z: 72.7}
+    Seat: {x: 37.4, y: 27.550354, z: 72.7}
+    Yaw: -130.6012
+  visits:
+  - Walker: 911524222
+    Turn: 0
+    At: {x: 65.5, y: 27.400354, z: 85.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 0
+    At: {x: 65.5, y: 27.400354, z: 85.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 1
+    At: {x: 40.5, y: 27.400354, z: 81.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 1
+    At: {x: 40.5, y: 27.400354, z: 81.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 2
+    At: {x: 58.5, y: 27.400354, z: 69.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 2
+    At: {x: 58.5, y: 27.400354, z: 69.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 3
+    At: {x: 65.5, y: 27.400354, z: 74.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 3
+    At: {x: 65.5, y: 27.400354, z: 74.5}
+    Place: 1
+  - Walker: 911524222
+    Turn: 4
+    At: {x: 65.5, y: 27.400354, z: 84.5}
+    Place: 0
+  - Walker: 911524222
+    Turn: 4
+    At: {x: 65.5, y: 27.400354, z: 84.5}
+    Place: 1
+  - Walker: 3485516081
+    Turn: 0
+    At: {x: 3.5, y: 27.526451, z: 68.5}
+    Place: 0
+  - Walker: 3485516081
+    Turn: 0
+    At: {x: 3.5, y: 27.526451, z: 68.5}
+    Place: 1
+  - Walker: 3485516081
+    Turn: 4
+    At: {x: 3.5, y: 27.375938, z: 55.5}
+    Place: 0
+  - Walker: 3485516081
+    Turn: 4
+    At: {x: 3.5, y: 27.375938, z: 55.5}
+    Place: 1
+  - Walker: 3485516081
+    Turn: 5
+    At: {x: 3.5, y: 27.526451, z: 67.5}
+    Place: 0
+  - Walker: 3485516081
+    Turn: 5
+    At: {x: 3.5, y: 27.526451, z: 67.5}
+    Place: 1
+  - Walker: 1699027006
+    Turn: 1
+    At: {x: 30.5, y: 27.550354, z: 106.5}
+    Place: 0
+  - Walker: 1699027006
+    Turn: 1
+    At: {x: 30.5, y: 27.550354, z: 106.5}
+    Place: 1
+  - Walker: 1699027006
+    Turn: 2
+    At: {x: 46.5, y: 27.550354, z: 92.5}
+    Place: 0
+  - Walker: 1699027006
+    Turn: 2
+    At: {x: 46.5, y: 27.550354, z: 92.5}
+    Place: 1
+  - Walker: 18539480
+    Turn: 3
+    At: {x: 33.5, y: 27.400354, z: 97.5}
+    Place: 0
+  - Walker: 18539480
+    Turn: 3
+    At: {x: 33.5, y: 27.400354, z: 97.5}
+    Place: 1
+  - Walker: 18539480
+    Turn: 4
+    At: {x: 49.5, y: 27.400354, z: 97.5}
+    Place: 0
+  - Walker: 18539480
+    Turn: 4
+    At: {x: 49.5, y: 27.400354, z: 97.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 0
+    At: {x: 39.5, y: 27.400354, z: 78.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 0
+    At: {x: 39.5, y: 27.400354, z: 78.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 1
+    At: {x: 14.5, y: 27.400354, z: 83.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 1
+    At: {x: 14.5, y: 27.400354, z: 83.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 2
+    At: {x: 14.5, y: 27.400354, z: 72.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 2
+    At: {x: 14.5, y: 27.400354, z: 72.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 3
+    At: {x: 21.5, y: 27.400354, z: 67.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 3
+    At: {x: 21.5, y: 27.400354, z: 67.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 4
+    At: {x: 39.5, y: 27.400354, z: 65.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 4
+    At: {x: 39.5, y: 27.400354, z: 65.5}
+    Place: 1
+  - Walker: 3518463945
+    Turn: 5
+    At: {x: 39.5, y: 27.400354, z: 77.5}
+    Place: 0
+  - Walker: 3518463945
+    Turn: 5
+    At: {x: 39.5, y: 27.400354, z: 77.5}
+    Place: 1
 --- !u!1001 &1908537869
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -481118,6 +484461,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1604235921773914418, guid: 50730664e113c764684cd745996e8ec5, type: 3}
   m_PrefabInstance: {fileID: 1921627756}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1921713126
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1921713127}
+  - component: {fileID: 1921713128}
+  m_Layer: 0
+  m_Name: Bench 32
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1921713127
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921713126}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 144.16684, y: 26.023518, z: 194.90834}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1921713128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921713126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 2081583628}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: 144.16684, y: 26.023518, z: 194.90834}
+    Seat: {x: 144.42683, y: 26.556742, z: 194.90823}
+    Yaw: -89.97483
+  - Stand: {x: 144.16736, y: 26.02351, z: 196.0978}
+    Seat: {x: 144.42735, y: 26.556742, z: 196.09769}
+    Yaw: -89.97483
+  visits: []
 --- !u!1001 &1922144227
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -485102,6 +488502,114 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
+--- !u!1 &1938883892
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1938883893}
+  - component: {fileID: 1938883894}
+  m_Layer: 0
+  m_Name: The Soot & Bell's door
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1938883893
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1938883892}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 97, y: 26.475, z: -8.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1938883894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1938883892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 2
+  piece: {fileID: 445193230}
+  quiet: 0
+  shortest: 60
+  longest: 180
+  places:
+  - Stand: {x: 97, y: 26.475, z: -8.5}
+    Seat: {x: 97, y: 26.475, z: -8.5}
+    Yaw: -90
+  - Stand: {x: 97, y: 26.475, z: -7.8}
+    Seat: {x: 97, y: 26.475, z: -7.8}
+    Yaw: -90
+  - Stand: {x: 97, y: 26.475, z: -9.2}
+    Seat: {x: 97, y: 26.475, z: -9.2}
+    Yaw: -90
+  visits:
+  - Walker: 2561738487
+    Turn: 3
+    At: {x: 97.5, y: 27.032227, z: 28.5}
+    Place: 0
+  - Walker: 2561738487
+    Turn: 3
+    At: {x: 97.5, y: 27.032227, z: 28.5}
+    Place: 1
+  - Walker: 2561738487
+    Turn: 3
+    At: {x: 97.5, y: 27.032227, z: 28.5}
+    Place: 2
+  - Walker: 2561738487
+    Turn: 4
+    At: {x: 97.5, y: 26.74551, z: 8.5}
+    Place: 0
+  - Walker: 2561738487
+    Turn: 4
+    At: {x: 97.5, y: 26.74551, z: 8.5}
+    Place: 1
+  - Walker: 2561738487
+    Turn: 4
+    At: {x: 97.5, y: 26.74551, z: 8.5}
+    Place: 2
+  - Walker: 1836303958
+    Turn: 0
+    At: {x: 98.5, y: 26.560753, z: 7.5}
+    Place: 0
+  - Walker: 1836303958
+    Turn: 0
+    At: {x: 98.5, y: 26.560753, z: 7.5}
+    Place: 1
+  - Walker: 1836303958
+    Turn: 0
+    At: {x: 98.5, y: 26.560753, z: 7.5}
+    Place: 2
+  - Walker: 1836303958
+    Turn: 5
+    At: {x: 98.5, y: 26.54305, z: 6.5}
+    Place: 0
+  - Walker: 1836303958
+    Turn: 5
+    At: {x: 98.5, y: 26.54305, z: 6.5}
+    Place: 1
+  - Walker: 1836303958
+    Turn: 5
+    At: {x: 98.5, y: 26.54305, z: 6.5}
+    Place: 2
 --- !u!1001 &1939009962
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -521861,6 +525369,95 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 27781625226275239, guid: e001f1b279f3ab44ab765201f12dab40, type: 3}
   m_PrefabInstance: {fileID: 2073679335}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2073702863
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2073702864}
+  - component: {fileID: 2073702865}
+  m_Layer: 0
+  m_Name: Bench 6
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2073702864
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073702863}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.165909, y: 27.324448, z: 149.09163}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2111926726}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2073702865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073702863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2057f8d159c814c43ae7ed3c1cd1414a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.ActivitySpot
+  activity: 0
+  piece: {fileID: 1753326381}
+  quiet: 0
+  shortest: 20
+  longest: 60
+  places:
+  - Stand: {x: -2.165909, y: 27.324448, z: 149.09163}
+    Seat: {x: -2.425909, y: 27.858809, z: 149.09178}
+    Yaw: 90.0336
+  - Stand: {x: -2.1666067, y: 27.324438, z: 147.90215}
+    Seat: {x: -2.4266067, y: 27.858809, z: 147.9023}
+    Yaw: 90.0336
+  visits:
+  - Walker: 2737230115
+    Turn: 1
+    At: {x: 28.5, y: 27.400354, z: 165.5}
+    Place: 0
+  - Walker: 1865324234
+    Turn: 0
+    At: {x: -31.5, y: 26.887936, z: 130.5}
+    Place: 0
+  - Walker: 1865324234
+    Turn: 0
+    At: {x: -31.5, y: 26.887936, z: 130.5}
+    Place: 1
+  - Walker: 1865324234
+    Turn: 3
+    At: {x: -31.5, y: 26.737936, z: 126.5}
+    Place: 0
+  - Walker: 1865324234
+    Turn: 3
+    At: {x: -31.5, y: 26.737936, z: 126.5}
+    Place: 1
+  - Walker: 1865324234
+    Turn: 4
+    At: {x: -31.5, y: 26.887936, z: 129.5}
+    Place: 0
+  - Walker: 1865324234
+    Turn: 4
+    At: {x: -31.5, y: 26.887936, z: 129.5}
+    Place: 1
+  - Walker: 1910894696
+    Turn: 5
+    At: {x: -31.5, y: 26.737936, z: 144.5}
+    Place: 1
 --- !u!1001 &2073868643
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -528621,6 +532218,77 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5177220391744972728, guid: a335bbfd7e32feb49b2b4d25cec5762d, type: 3}
   m_PrefabInstance: {fileID: 2111861825}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2111926725
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2111926726}
+  m_Layer: 0
+  m_Name: Activity Spots
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2111926726
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2111926725}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 380983521}
+  - {fileID: 678746770}
+  - {fileID: 46831439}
+  - {fileID: 1357464916}
+  - {fileID: 1157578760}
+  - {fileID: 2073702864}
+  - {fileID: 301490474}
+  - {fileID: 1433943893}
+  - {fileID: 1832541216}
+  - {fileID: 136069764}
+  - {fileID: 1892057155}
+  - {fileID: 1457378553}
+  - {fileID: 1868649556}
+  - {fileID: 1653823032}
+  - {fileID: 765551507}
+  - {fileID: 109568096}
+  - {fileID: 657803592}
+  - {fileID: 1377025485}
+  - {fileID: 1195218452}
+  - {fileID: 140852929}
+  - {fileID: 825789797}
+  - {fileID: 1174018081}
+  - {fileID: 1789179490}
+  - {fileID: 1802129859}
+  - {fileID: 896023489}
+  - {fileID: 883124808}
+  - {fileID: 572812668}
+  - {fileID: 1016875040}
+  - {fileID: 379780383}
+  - {fileID: 604394235}
+  - {fileID: 314678516}
+  - {fileID: 1921713127}
+  - {fileID: 1907914202}
+  - {fileID: 1142836733}
+  - {fileID: 1320539120}
+  - {fileID: 905365697}
+  - {fileID: 1774947078}
+  - {fileID: 533904996}
+  - {fileID: 1938883893}
+  - {fileID: 568309716}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2111947042
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -535530,3 +539198,4 @@ SceneRoots:
   - {fileID: 284496531}
   - {fileID: 1340495713}
   - {fileID: 857775705}
+  - {fileID: 2111926726}

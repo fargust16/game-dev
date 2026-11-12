@@ -103,6 +103,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 768
   turnDegreesPerSecond: 270
+  home: {fileID: 0}
+  homePlace: 0
 --- !u!1001 &4618686809979293109
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -76,6 +76,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 768
   turnDegreesPerSecond: 270
+  home: {fileID: 0}
+  homePlace: 0
 --- !u!54 &552490676586896911
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -11,7 +11,8 @@ namespace GameDev.Slice.Tests
 {
     /// <summary>
     /// The ordinary townsfolk: ten men and ten women of the owner's people replace every yellow Dummy, and 26 more walk
-    /// since the owner's play test of S5a, each on a clear closed route, stopping at some of its turns.
+    /// since the owner's play test of S5a, each on a clear closed route, stopping at some of its turns; since AN6 they
+    /// sit, bargain, greet and drink in their own clips (ActivityTests).
     /// </summary>
     public sealed class TownsfolkTests
     {
@@ -20,7 +21,7 @@ namespace GameDev.Slice.Tests
         [TestCase(SlicePeopleModels.Folder + "/GentlemanWalker.prefab")]
         [TestCase(SlicePeopleModels.Folder + "/LadyWalker.prefab")]
         [TestCase(SlicePeopleModels.Folder + "/WorkingWomanWalker.prefab")]
-        public void TheTownsfolkWalkAndIdleInLoops(string path)
+        public void TheTownsfolkWalkIdleAndPassTheirTimeInTheirClips(string path)
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             Assert.IsNotNull(prefab);
@@ -29,10 +30,25 @@ namespace GameDev.Slice.Tests
             var controller = (AnimatorController)prefab.GetComponentInChildren<Animator>().runtimeAnimatorController;
             var machine = controller.layers[0].stateMachine;
             Assert.AreEqual("Walk", machine.defaultState.name);
-            foreach (var state in machine.states)
+
+            // AN6: the walk and the idle, sitting on a bench and talking there, bargaining at a stall, greeting, drinking.
+            var clips = machine.states.ToDictionary(s => s.state.name, s => (AnimationClip)s.state.motion);
+            CollectionAssert.AreEquivalent(new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "StandToSit", "Sit", "SitTalk", "SitToStand", "TalkIdle", "Nod", "ShakeHead", "Drink" }, clips.Keys);
+            foreach (var loop in new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "Sit", "SitTalk", "TalkIdle", "ShakeHead" })
             {
-                Assert.IsTrue(((AnimationClip)state.state.motion).isLooping, state.state.name);
+                Assert.IsTrue(clips[loop].isLooping, loop);
             }
+
+            foreach (var once in new[] { "StandToSit", "SitToStand", "Nod", "Drink" })
+            {
+                Assert.IsFalse(clips[once].isLooping, once);
+            }
+
+            // The walker times its one-shot clips by their lengths.
+            Assert.AreEqual(clips["StandToSit"].length, TownsfolkWalker.StandToSitSeconds, 0.02f);
+            Assert.AreEqual(clips["SitToStand"].length, TownsfolkWalker.SitToStandSeconds, 0.02f);
+            Assert.AreEqual(clips["Nod"].length, TownsfolkWalker.NodSeconds, 0.02f);
+            Assert.AreEqual(clips["Drink"].length, TownsfolkWalker.DrinkSeconds, 0.02f);
         }
 
         [Test]

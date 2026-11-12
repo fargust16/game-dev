@@ -382,6 +382,10 @@ namespace GameDev.Slice.EditorTools
                 take.keepOriginalPositionY = true;
                 take.lockRootPositionXZ = true;
                 take.keepOriginalPositionXZ = true;
+
+                // Quaternius' mannequin faces back along the root in every take (measured by the shoulders in
+                // animation_check.txt, 148–180 deg, AN6): turned round, the body faces the way the root does.
+                take.rotationOffset = 180f;
                 return take;
             }).ToArray();
 
@@ -476,6 +480,31 @@ namespace GameDev.Slice.EditorTools
             On(idle, talk, 0.25f, "Talking", true);
             On(talk, idle, 0.25f, "Talking", false);
             Fight(controller, idle, female);
+            EditorUtility.SetDirty(controller);
+            return controller;
+        }
+
+        /// <summary>
+        /// A walking townsperson's controller at <paramref name="path"/> (AN6), built afresh in place so the prefabs keep it.
+        /// Its states have no transitions: <c>TownsfolkWalker</c> cross-fades to each as it walks, stands, greets, sits,
+        /// bargains or drinks. Walk, the four idles of a stop (Idle, Idle2, Idle3, FoldArms), Sit, SitTalk, TalkIdle and
+        /// ShakeHead loop; StandToSit, SitToStand, Nod and Drink play once. Foot IK on every state.
+        /// </summary>
+        public static AnimatorController Walker(string path, bool female)
+        {
+            var controller = Fresh(path);
+            var machine = controller.layers[0].stateMachine;
+            var uses = new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "StandToSit", "Sit", "SitTalk", "SitToStand", "TalkIdle", "Nod", "ShakeHead", "Drink" };
+            for (var i = 0; i < uses.Length; i++)
+            {
+                var state = State(machine, uses[i], Get(uses[i], female), new Vector3(300f + (i / 5 * 260f), i % 5 * 80f));
+                state.iKOnFeet = true;
+                if (i == 0)
+                {
+                    machine.defaultState = state;
+                }
+            }
+
             EditorUtility.SetDirty(controller);
             return controller;
         }

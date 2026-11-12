@@ -103,6 +103,40 @@ namespace GameDev.Slice.EditorTools
                 report.AppendLine($"  {use}: {clip.length:0.00} s, the chest at {chestSum / (frames + 1):0.00} m ({chestLow:0.00}–{chestHigh:0.00}), the head {headLow:0.00}–{headHigh:0.00} m");
             }
 
+            // AN6: where the sitting clips put the hips, over the root and forward of it, so ActivitySpot seats a person on a
+            // bench; and how long the townsfolk's one-shot clips last.
+            report.AppendLine();
+            report.AppendLine("Sitting and the townsfolk's clips, the player man fitted standing (the hips over the root and forward of it, m, read from the clips' curves; AN6):");
+            foreach (var use in new[] { "Sit", "SitTalk", "StandToSit", "SitToStand", "Nod", "ShakeHead", "TalkIdle", "Drink" })
+            {
+                var clip = SliceClips.Get(use);
+                var animator = SlicePeopleModels.Fitted(SlicePeopleModels.PlayerMan, SliceClips.Get("Idle"));
+                var root = animator.transform.parent;
+                Vector3 Hips(float t)
+                {
+                    SlicePeopleModels.Pose(animator, clip, t);
+                    return root.InverseTransformPoint(animator.GetBoneTransform(HumanBodyBones.Hips).position);
+                }
+
+                var first = Hips(0f);
+                var last = Hips(clip.length);
+                var mid = Hips(clip.length * 0.5f);
+                Object.DestroyImmediate(root.gameObject);
+                report.AppendLine($"  {use}: {clip.length:0.00} s, the hips at the start {first.y:0.00} m up, {first.z:0.00} m forward; midway {mid.y:0.00}, {mid.z:0.00}; at the end {last.y:0.00}, {last.z:0.00}");
+            }
+
+            // Which way each clip's body faces over its root, by its shoulders (0 = the root's forward, 180 = backward), and
+            // where its knees stand forward of the root at the clip's end.
+            report.AppendLine();
+            // Read from the curves, as every table here is: the editor's sampling leaves out the import's 180 deg turn of
+            // Quaternius' takes (orientationOffsetY), which play applies; ActivityPlayTests measures them in play.
+            report.AppendLine("The body's facing over its root by the shoulders, degrees, and the knees forward of the root at the end, m, read from the clips' curves, before the import turns Quaternius' takes round (AN6):");
+            foreach (var use in new[] { "Idle", "Walk", "Sit", "StandToSit", "SitToStand", "Nod", "TalkIdle", "Drink", "Sneak", "Swim", "Block", "ShieldGuard", "ClimbOut" })
+            {
+                var (facing, knees) = Facing(use);
+                report.AppendLine($"  {use}: facing {facing:0} deg, the knees {knees.z:0.00} m forward, {knees.y:0.00} m up");
+            }
+
             report.AppendLine();
             report.AppendLine("The player's prefab playing its controller (feet = the lower ankle's height over the root, minus its rest height; knees in degrees):");
             foreach (var prefab in new[] { SliceTestScenes.PlayerPrefabPath, SlicePeopleModels.PlayerWomanPrefab })
@@ -270,6 +304,20 @@ namespace GameDev.Slice.EditorTools
             var ankle = Mathf.Min(Up(animator, root, HumanBodyBones.LeftFoot), Up(animator, root, HumanBodyBones.RightFoot));
             animator.enabled = true;
             return ankle - lowest;
+        }
+
+        /// <summary>A clip's facing over its root by the shoulders, degrees, and its knees at its end, from its curves.</summary>
+        private static (float degrees, Vector3 knees) Facing(string use)
+        {
+            var clip = SliceClips.Get(use);
+            var animator = SlicePeopleModels.Fitted(SlicePeopleModels.PlayerMan, SliceClips.Get("Idle"));
+            var root = animator.transform.parent;
+            SlicePeopleModels.Pose(animator, clip, clip.length);
+            var across = root.InverseTransformDirection(animator.GetBoneTransform(HumanBodyBones.RightUpperArm).position - animator.GetBoneTransform(HumanBodyBones.LeftUpperArm).position);
+            var facing = Vector3.Cross(across, Vector3.up);
+            var knees = root.InverseTransformPoint((animator.GetBoneTransform(HumanBodyBones.LeftLowerLeg).position + animator.GetBoneTransform(HumanBodyBones.RightLowerLeg).position) * 0.5f);
+            Object.DestroyImmediate(root.gameObject);
+            return (Mathf.Atan2(facing.x, facing.z) * Mathf.Rad2Deg, knees);
         }
     }
 }

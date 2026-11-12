@@ -91,6 +91,13 @@ MonoBehaviour:
   groundSnap: 0.35
   landingHold: 0.2
   landingAfter: 0.45
+  wadeDepth: 1.3
+  floatHeight: 0.05
+  swimSpeed: 1.8
+  fastSwimSpeed: 3
+  swimAcceleration: 6
+  climbOutHeight: 2.1
+  climbOutSeconds: 0.8
 --- !u!114 &532679207545557893
 MonoBehaviour:
   m_ObjectHideFlags: 0

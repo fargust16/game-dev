@@ -65,7 +65,8 @@ namespace GameDev.Slice.Theft
 
         public string PromptFor(Vector3 player)
         {
-            if (_theft == null || !InteractReach.Within(transform, player, Reach))
+            // A passer-by inside a door (AN6) has its purse put away with it.
+            if (_theft == null || !isActiveAndEnabled || !InteractReach.Within(transform, player, Reach))
             {
                 return null;
             }

@@ -254,8 +254,8 @@ namespace GameDev.Slice.EditorTools
             SliceClips.Person(SliceClips.WardenWomanController, "Attention", true);
             SliceClips.Person(SliceClips.BlacksmithController, "HammerDown", false, "HammerUp");
             SliceClips.Person(SliceCharacterLook.PersonIdlePath, "Idle", false);
-            Repoint(ManWalkerController, SliceClips.Get("Idle"), SliceClips.Get("Walk"));
-            Repoint(WomanWalkerController, SliceClips.Get("Idle", true), SliceClips.Get("Walk", true));
+            SliceClips.Walker(ManWalkerController, false);
+            SliceClips.Walker(WomanWalkerController, true);
 
             // The player's pace in each moving clip: how fast its planted feet slide on both bodies at their statures (the
             // mean, as one controller plays both), against PlayerLocomotion's speed for its gait. The pack's eight
@@ -334,22 +334,6 @@ namespace GameDev.Slice.EditorTools
             {
                 AssetDatabase.DeleteAsset(StandIns);
             }
-        }
-
-        private static void Repoint(string path, AnimationClip idle, AnimationClip walk)
-        {
-            var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
-            if (controller == null)
-            {
-                return;
-            }
-
-            foreach (var s in controller.layers[0].stateMachine.states)
-            {
-                s.state.motion = s.state.name == "Walk" ? walk : idle;
-            }
-
-            EditorUtility.SetDirty(controller);
         }
 
         // ------------------------------------------------------------------------------------------- prefabs
@@ -697,7 +681,7 @@ namespace GameDev.Slice.EditorTools
                         look = LookFor(go.name, dummy ? source.Contains("HumanDummy_F") : townsWoman);
                         prefab = look.Standing;
                     }
-                    else if (walker != null && go.name != "Farmer")
+                    else if (walker != null && go.name != "Farmer" && walker.Route.Length > 0)
                     {
                         look = WalkerLook(townsWoman, go.transform.position, layout);
                         prefab = look.Walking;
