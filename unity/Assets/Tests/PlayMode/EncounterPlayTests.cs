@@ -20,6 +20,33 @@ namespace GameDev.Slice.Tests
     {
         private const string Veilmouth = "Assets/Scenes/Slice/Veilmouth.unity";
 
+        /// <summary>
+        /// The owner's play test of 2026-11-12: on the death screen a click moved the cursor to the screen's middle and
+        /// never reached a button, since the camera's look locked the cursor on a click. The look waits while the screen
+        /// shows, and comes back if the screen goes another way.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator TheDeathScreenKeepsTheCursorForItsButtons()
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene(Veilmouth);
+            var world = SliceWorldDriver.Running;
+            Assert.IsNotNull(world, "the slice's world runs");
+            var looks = Object.FindObjectsByType<GameDev.Cameras.ThirdPersonCamera>(FindObjectsSortMode.None);
+            Assert.IsNotEmpty(looks, "the scene's camera");
+            Fights.SliceDeathScreen.Show(world.Clock);
+            yield return null;
+            yield return null;
+            Assert.IsTrue(Fights.SliceDeathScreen.Shown);
+            Assert.IsTrue(looks.All(l => !l.LookEnabled), "the look waits: no click locks the cursor");
+            Assert.AreEqual(CursorLockMode.None, Cursor.lockState, "the cursor is free");
+
+            Object.Destroy(Object.FindAnyObjectByType<Fights.SliceDeathScreen>().gameObject);
+            yield return null;
+            Assert.IsFalse(Fights.SliceDeathScreen.Shown);
+            Assert.IsTrue(looks.All(l => l.LookEnabled), "the look comes back with the screen gone");
+        }
+
         [UnityTest]
         public IEnumerator AStreetFightStartsCostsOneTickARoundAndEnds()
         {

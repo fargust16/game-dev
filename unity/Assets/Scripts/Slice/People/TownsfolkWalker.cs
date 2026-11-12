@@ -1092,6 +1092,7 @@ namespace GameDev.Slice.People
         }
 
         private readonly List<Collider> _seatParts = new List<Collider>();
+        private readonly List<LooseProp> _heldUnder = new List<LooseProp>();
 
         /// <summary>
         /// A seated walker never shoves its seat: its capsule, round its root, reaches about 0.2 m into the seat, and a
@@ -1106,6 +1107,16 @@ namespace GameDev.Slice.People
                 _seatParts.Clear();
                 _seatParts.AddRange(Physics.OverlapSphere(_spot.PlaceAt(_place).Seat, 0.3f, ~0, QueryTriggerInteraction.Ignore)
                     .Where(c => !c.transform.IsChildOf(transform)));
+
+                // Whatever loose piece stands under the seat is held too, the place's own chair or not: the player still
+                // knocked a chair from under a sitter (owner's play test, 2026-11-12), and a chair found by its home alone
+                // misses one whose home lies off the seat.
+                foreach (var prop in _seatParts.Select(c => c.attachedRigidbody != null ? c.attachedRigidbody.GetComponent<LooseProp>() : c.GetComponentInParent<LooseProp>())
+                             .Where(p => p != null && !p.IsThing && p != _heldChair && !_heldUnder.Contains(p)).ToList())
+                {
+                    prop.Hold(true);
+                    _heldUnder.Add(prop);
+                }
             }
 
             foreach (var part in _seatParts.Where(c => c != null && c.enabled && c.gameObject.activeInHierarchy))
@@ -1119,6 +1130,12 @@ namespace GameDev.Slice.People
             if (!ignore)
             {
                 _seatParts.Clear();
+                foreach (var prop in _heldUnder.Where(p => p != null))
+                {
+                    prop.Hold(false);
+                }
+
+                _heldUnder.Clear();
             }
         }
 

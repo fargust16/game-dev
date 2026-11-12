@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using GameDev.Cameras;
 using GameDev.Core.Localization;
 using GameDev.Input;
 using GameDev.World.Timekeeping;
@@ -29,6 +31,7 @@ namespace GameDev.Slice.Fights
         private static readonly Color ButtonHover = new Color(0.30f, 0.23f, 0.14f, 0.95f);
 
         private static SliceDeathScreen _shown;
+        private readonly List<ThirdPersonCamera> _stilled = new List<ThirdPersonCamera>();
         private IDisposable _pause;
         private SliceWorldDriver _world;
         private bool _restarting;
@@ -120,6 +123,17 @@ namespace GameDev.Slice.Fights
                 return;
             }
 
+            // The camera's look waits: it locked the cursor again on a click, which sent the cursor to the screen's
+            // middle, so the click never reached a button (owner's play test, 2026-11-12).
+            foreach (var look in FindObjectsByType<ThirdPersonCamera>(FindObjectsSortMode.None))
+            {
+                if (look.LookEnabled)
+                {
+                    look.LookEnabled = false;
+                    _stilled.Add(look);
+                }
+            }
+
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             var input = GameInputService.Instance;
@@ -131,6 +145,14 @@ namespace GameDev.Slice.Fights
 
         private void OnDestroy()
         {
+            foreach (var look in _stilled)
+            {
+                if (look != null)
+                {
+                    look.LookEnabled = true;
+                }
+            }
+
             _pause?.Dispose();
             if (_shown == this)
             {

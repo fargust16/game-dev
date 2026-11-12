@@ -126,8 +126,8 @@ namespace GameDev.Slice.Tests
 
         /// <summary>
         /// The owner's play test of 2026-11-12: a jump rises in the take-off of Basic Motions with the arms down, never the
-        /// fall's raised arms; in place with no key it lands in the whole bent-knee landing, and after a running jump the
-        /// landing holds half a second, the body braking to a stop in it before it runs on.
+        /// fall's raised arms, and no arm farther from the body than at take-off; it lands in bent knees for 0.3 s, the
+        /// body braking to a stop in them before it runs on (the owner's later word: 1.5–2 times shorter than half a second).
         /// </summary>
         [UnityTest]
         public IEnumerator AJumpRisesInItsTakeOffAndLandsInBentKnees()
@@ -137,19 +137,34 @@ namespace GameDev.Slice.Tests
             var animator = player.GetComponentInChildren<Animator>();
             yield return new WaitForSeconds(0.3f);
 
+            // How far each upper arm hangs from the body's down, degrees. A coroutine resumes before the frame's animation,
+            // so the bones still hold the last frame's final pose, LateUpdate's hold included (batchmode never ends a frame).
+            float Reach(HumanBodyBones arm, HumanBodyBones elbow) =>
+                Vector3.Angle(-player.transform.up, animator.GetBoneTransform(elbow).position - animator.GetBoneTransform(arm).position);
+            var left = Mathf.Max(10f, Reach(HumanBodyBones.LeftUpperArm, HumanBodyBones.LeftLowerArm));
+            var right = Mathf.Max(10f, Reach(HumanBodyBones.RightUpperArm, HumanBodyBones.RightLowerArm));
+
             var rose = false;
             var fell = false;
+            var widest = 0f;
             yield return Tap(Key.Space);
             for (var t = 0f; t < 2f && player.State != PlayerLocomotion.Move.Landing; t += Time.deltaTime)
             {
                 var info = animator.IsInTransition(0) ? animator.GetNextAnimatorStateInfo(0) : animator.GetCurrentAnimatorStateInfo(0);
                 rose |= player.State == PlayerLocomotion.Move.Airborne && info.IsName("JumpRise");
                 fell |= player.State == PlayerLocomotion.Move.Airborne && info.IsName("Fall");
+                var airborne = player.State == PlayerLocomotion.Move.Airborne;
                 yield return null;
+                if (airborne && player.State == PlayerLocomotion.Move.Airborne)
+                {
+                    widest = Mathf.Max(widest, Reach(HumanBodyBones.LeftUpperArm, HumanBodyBones.LeftLowerArm) - left,
+                        Reach(HumanBodyBones.RightUpperArm, HumanBodyBones.RightLowerArm) - right);
+                }
             }
 
             Assert.IsTrue(rose, "the jump plays its take-off");
             Assert.IsFalse(fell, "never the fall's raised arms");
+            Assert.Less(widest, 2f, "in the air no arm hangs farther from the body than at take-off (owner, 2026-11-12)");
             Assert.AreEqual(PlayerLocomotion.Move.Landing, player.State, "a jump lands in the knees");
             var landed = Time.time;
             while (player.State == PlayerLocomotion.Move.Landing && Time.time < landed + 3f)
@@ -157,12 +172,12 @@ namespace GameDev.Slice.Tests
                 yield return null;
             }
 
-            // The Basic Motions landing is 0.60 s long, 0.48 s of it from LandStart (tools.txt), so whole it holds as long
-            // as the half second does.
+            // The Basic Motions landing is 0.60 s long, 0.48 s of it from LandStart (tools.txt); with no key 0.6 of that
+            // plays, 0.29 s, so the 0.3 s hold decides (owner, 2026-11-12: 1.5–2 times shorter than half a second).
             var still = Time.time - landed;
-            Assert.Greater(still, 0.47f, "in place with no key, the landing plays whole");
+            Assert.AreEqual(0.3f, still, 0.08f, "in place with no key, the landing holds 0.3 s");
 
-            // A running jump: the landing holds half a second while the run brakes to a stop, then the run goes on.
+            // A running jump: the landing holds 0.3 s while the run brakes to a stop, then the run goes on.
             Hold(Key.W);
             yield return new WaitForSeconds(0.8f);
             Hold(Key.W, Key.Space);
@@ -191,7 +206,7 @@ namespace GameDev.Slice.Tests
 
             var held = Time.time - landed;
             Hold();
-            Assert.AreEqual(0.5f, held, 0.1f, "with a key held, half a second of bent knees");
+            Assert.AreEqual(0.3f, held, 0.1f, "with a key held, 0.3 s of bent knees");
             Assert.Less(slid, 0.1f, "no glide: the body stands braked in the knees");
         }
     }

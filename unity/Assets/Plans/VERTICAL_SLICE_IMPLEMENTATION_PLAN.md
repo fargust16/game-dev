@@ -1188,7 +1188,7 @@ The owner's second list of 2026-11-12, after the play test, with eleven new peop
 |---|---|
 | PB1 | The owner's directions recorded: residents in a fight and their roles, Сбежать, 15-cell cones, a 30-cell grid, firearms first (done: 10.2 §5a, §5d, §9; 10.3 §2; 10.1; 16; 99 VS-RANGED, VS-ROLES) |
 | PB2 | The eleven new models renamed by role and placed in the scenes; each role's Limit, points and firearm (done: asset map §1 *The owner's third list*; `PersonRole`, `ResidentRoles`, the seed stream `slice.roles`; the roles' numbers wait for PB4 and PB6 to use them) |
-| PB3 | The landing's hold shorter and its arms no farther out than at take-off; a sitter's chair unmovable by the player; the death screen's buttons take the click; the swimmer neck-deep, the body under water |
+| PB3 | The landing's hold shorter and its arms no farther out than at take-off; a sitter's chair unmovable by the player; the death screen's buttons take the click; the swimmer neck-deep, the body under water (done: pipeline plan §9 *The jump, the owner's second word*, §12 *Measured*; furnishing rules §13 *held*; the death screen stills the camera's look while it shows) |
 | PB4 | Melee weapons and shields out of the shops, the anvil and the fighters; firearms by role; the target under the cursor lit (10.2 §5d) |
 | PB5 | The grid at 30 cells; Сбежать for 2 AP, seen by no enemy and 15 cells away; the enemies run to the last place they saw the character, look round, and the fight starts again on sight (10.2 §9) |
 | PB6 | Residents in a fight: the Call for Help heard 30 cells round, a line over the head; fighting back with a chance, fleeing toward a Warden otherwise; one in ten searching (10.2 §5a) |

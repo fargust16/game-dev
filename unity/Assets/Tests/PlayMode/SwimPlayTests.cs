@@ -68,7 +68,7 @@ namespace GameDev.Slice.Tests
             yield return FallIn(player, 0f);
             Assert.IsTrue(player.InWater);
             Assert.Less(_lowest, -1.35f, "fallen in, the body goes under before it comes up (owner, 2026-11-12)");
-            Assert.AreEqual(-0.04f, player.transform.position.y, 0.08f, "the root floats a little under the surface, where the stroke holds the chest under it");
+            Assert.AreEqual(-0.28f, player.transform.position.y, 0.08f, "treading still, the root floats 0.28 m under the surface: neck-deep (owner, 2026-11-12)");
             var animator = player.GetComponentInChildren<Animator>();
             Assert.IsTrue(animator.GetCurrentAnimatorStateInfo(0).IsName("Swim") || animator.GetNextAnimatorStateInfo(0).IsName("Swim"), "the swim plays");
 
@@ -81,6 +81,7 @@ namespace GameDev.Slice.Tests
             yield return new WaitForSeconds(0.8f);
             Assert.IsTrue(player.IsSprinting, "the fast swim spends Stamina as the sprint");
             Assert.Greater(player.PlanarSpeed, swimming + 0.5f, "and is faster");
+            Assert.AreEqual(-0.08f, player.transform.position.y, 0.1f, "in the stroke the root floats 0.08 m under, the body under the water and the face just out");
             Hold();
             yield return null;
             Assert.Greater(player.transform.position.z - start.z, 2f, $"swam north: {Describe(player)}");

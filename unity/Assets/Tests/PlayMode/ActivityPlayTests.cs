@@ -903,6 +903,37 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// The owner's play test of 2026-11-12, again: the player still knocked a chair from under a sitter. Whatever loose
+        /// piece stands under the seat is held while the person sits there, even one whose home lies too far off the seat
+        /// to be the place's chair, as a long seat's does.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ALooseSeatUnderASitterIsHeldThoughItsHomeLiesOff()
+        {
+            yield return Ground();
+            var spot = Spot(ActivitySpot.Activity.Sit, 3f, 1);
+            var place = spot.PlaceAt(0);
+            var seat = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            seat.name = "Test settle";
+            seat.transform.localScale = new Vector3(1.8f, SeatHeight, 0.45f);
+            seat.transform.position = new Vector3(place.Seat.x + 0.7f, Area.y + (SeatHeight / 2f), place.Seat.z);
+            seat.AddComponent<Rigidbody>().mass = 12f;
+            var prop = seat.AddComponent<LooseProp>();
+            var body = seat.GetComponent<Rigidbody>();
+            Physics.SyncTransforms();
+            var square = new[] { new Vector3(-3f, 0f, 3f), new Vector3(4f, 0f, 3f), new Vector3(4f, 0f, 9f), new Vector3(-3f, 0f, 9f) };
+            var a = Walker(ManWalker, square, square[0]);
+            yield return new WaitForSeconds(0.3f);
+            Assert.IsNull(spot.Chair(0), "its home lies 0.7 m off the seat: not the place's chair");
+            Assert.IsTrue(a.Send(spot, 0));
+            yield return Until(() => a.Seated && State(a) == "Sit", 10f, "it sits");
+            Assert.IsTrue(prop.Held && body.isKinematic, "the seat under the sitter is held");
+
+            yield return Until(() => !a.Seated, 8f, "it gets up after its while");
+            Assert.IsFalse(prop.Held || body.isKinematic, "let go, the seat is loose again");
+        }
+
+        /// <summary>
         /// A place whose chair lies far off is never taken (owner, 2026-11-12: nobody sits where a chair was); a person with
         /// no route whose own chair is gone sits at another place of its spot.
         /// </summary>

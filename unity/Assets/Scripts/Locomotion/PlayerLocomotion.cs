@@ -75,16 +75,18 @@ namespace GameDev.Locomotion
         [SerializeField] private float jumpBuffer = 0.15f;
         [Tooltip("m: how far below the feet the ground is sought, so slopes and steps down keep the body grounded.")]
         [SerializeField] private float groundSnap = 0.35f;
-        [Tooltip("s the landing's bent knees hold at least, the body braking to a stop meanwhile (owner, 2026-11-12: half a second); with no key pressed the landing plays whole.")]
-        [SerializeField] private float landingHold = 0.5f;
+        [Tooltip("s the landing's bent knees hold at least, the body braking to a stop meanwhile (owner, 2026-11-12: half a second, then 1.5–2 times shorter); with no key pressed the landing plays LandingShare of its clip.")]
+        [SerializeField] private float landingHold = 0.3f;
         [Tooltip("s in the air before a fall off an edge lands in the knees; a jump always does.")]
         [SerializeField] private float landingAfter = 0.45f;
 
         [Header("Swimming (10.1, AN5)")]
         [Tooltip("m of water over the bed from which the character swims: chest-deep on a person 1.8 m tall (authoring default).")]
         [SerializeField] private float wadeDepth = 1.3f;
-        [Tooltip("m the root floats over the water while swimming, below it when negative: the Swim clip holds the chest 0.12 m under the root and the head from 0.04 m under it to 0.08 m over (measured, SliceAnimationCheck), so at -0.04 the chest is 0.16 m under the water and the head's bone from 0.08 m under to 0.04 m over (owner, 2026-11-12: the body floated too high).")]
-        [SerializeField] private float floatHeight = -0.04f;
+        [Tooltip("m the root floats over the water in the stroke, below it when negative: the Swim clip holds the chest 0.12 m under the root and the head from 0.04 m under it to 0.08 m over (measured, SliceAnimationCheck), so at -0.08 the chest is 0.20 m under the water and the head's bone from 0.12 m under to level with it, the face just out (owner, 2026-11-12, twice: the body floated too high).")]
+        [SerializeField] private float floatHeight = -0.08f;
+        [Tooltip("m the root floats over the water treading still: Swim_Idle holds the head 0.25–0.35 m over the root (measured), so at -0.28 the head's bone, at the top of the neck, is from 0.03 m under the water to 0.07 m over: neck-deep (owner, 2026-11-12). The float goes from this to floatHeight with the stroke's speed.")]
+        [SerializeField] private float treadHeight = -0.28f;
         [SerializeField] private float swimSpeed = 1.8f;
         [SerializeField] private float fastSwimSpeed = 3f;
         [Tooltip("m/s² toward the wanted velocity in the water.")]
@@ -102,6 +104,9 @@ namespace GameDev.Locomotion
 
         private const float BuoyancyDrag = 5f;
 
+        /// <summary>Authoring default, m: how far under the root the treading body's soles hang.</summary>
+        private const float TreadSoles = 1.3f;
+
         /// <summary>Authoring default, degrees: a turn sharper than this brakes and turns round; a gentler one carries the run round with the body.</summary>
         private const float ReverseAngle = 135f;
 
@@ -110,6 +115,18 @@ namespace GameDev.Locomotion
         /// left out (measured, tools.txt: the hands over the shoulders until 0.10 s, the knees bending from 0.07 s).
         /// </summary>
         private const float LandStart = 0.12f;
+
+        /// <summary>
+        /// The share of the landing clip, after <see cref="LandStart"/>, played with no key pressed: 0.6, the delay 1.5–2
+        /// times shorter as the owner asked (2026-11-12, authoring default within it), the run's fade taking the rest.
+        /// </summary>
+        private const float LandingShare = 0.6f;
+
+        /// <summary>
+        /// Authoring default, degrees: the least an upper arm or a forearm may hang from the body's down in a jump, so an
+        /// arm held close at take-off is never pressed into the body.
+        /// </summary>
+        private const float LeastArmReach = 10f;
 
         private const float LocomotionFade = 0.12f;
         private const float CrouchFade = 0.15f;
@@ -149,6 +166,11 @@ namespace GameDev.Locomotion
         private Vector3 _climbTo;
         private bool _jumped;
         private bool _jumpQueued;
+
+        // Each arm's upper arm and forearm in pairs of a bone and the next, and how far each may hang from the body's down.
+        private Transform[] _arms;
+        private readonly float[] _armReach = new float[4];
+        private bool _armsHeld;
 
         /// <summary>The movement state now.</summary>
         public Move State { get; private set; } = Move.Grounded;
@@ -213,6 +235,17 @@ namespace GameDev.Locomotion
                 _hasPace = HasParameter(_animator, PaceParam);
                 _hasMove = HasParameter(_animator, MoveXParam) && HasParameter(_animator, MoveZParam);
                 _sneakPace = HasParameter(_animator, SneakPaceParam) ? _animator.GetFloat(SneakPaceParam) : 0f;
+                if (_animator.isHuman)
+                {
+                    Transform Bone(HumanBodyBones b) => _animator.GetBoneTransform(b);
+                    _arms = new[]
+                    {
+                        Bone(HumanBodyBones.LeftUpperArm), Bone(HumanBodyBones.LeftLowerArm),
+                        Bone(HumanBodyBones.LeftLowerArm), Bone(HumanBodyBones.LeftHand),
+                        Bone(HumanBodyBones.RightUpperArm), Bone(HumanBodyBones.RightLowerArm),
+                        Bone(HumanBodyBones.RightLowerArm), Bone(HumanBodyBones.RightHand),
+                    };
+                }
             }
 
             GameInputService.EnsureExists();
@@ -313,6 +346,7 @@ namespace GameDev.Locomotion
                 _grounded = false;
                 _sinceGround = coyoteTime + 1f;
                 _jumped = true;
+                HoldArms();
                 Enter(Move.Airborne);
             }
 
@@ -387,7 +421,8 @@ namespace GameDev.Locomotion
         /// <summary>One frame in the water; false once the bed has risen to wading depth.</summary>
         private bool Swim(GameInputService input, bool hasInput, Vector3 direction, float level, float dt)
         {
-            if (Bed(level) > level - wadeDepth + 0.15f)
+            var bed = Bed(level);
+            if (bed > level - wadeDepth + 0.15f)
             {
                 return false;
             }
@@ -410,8 +445,13 @@ namespace GameDev.Locomotion
             _velocity = Vector3.MoveTowards(_velocity, direction * wanted, swimAcceleration * dt);
 
             // The water pulls the root to its float and drags on it, so a body that fell or waded in goes under, comes
-            // up and bobs once, never springing straight to the surface.
-            _verticalVelocity += (((level + floatHeight - transform.position.y) * BuoyancySpring) - (_verticalVelocity * BuoyancyDrag)) * dt;
+            // up and bobs once, never springing straight to the surface. Treading still it floats neck-deep, in the
+            // stroke with the face just out; over a shallow bed the treading feet stand on it, their soles about
+            // TreadSoles under the root (authoring default, read from the float's head 0.25–0.35 m over the root on a
+            // body 1.8 m tall).
+            var rest = Mathf.Lerp(treadHeight, floatHeight, Mathf.Clamp01(PlanarSpeed / swimSpeed));
+            rest = Mathf.Max(rest, Mathf.Min(floatHeight, bed - level + TreadSoles));
+            _verticalVelocity += (((level + rest - transform.position.y) * BuoyancySpring) - (_verticalVelocity * BuoyancyDrag)) * dt;
             _verticalVelocity = Mathf.Clamp(_verticalVelocity, -4f, 4f);
             var flags = _controller.Move((_velocity + (Vector3.up * _verticalVelocity)) * dt);
             if ((flags & CollisionFlags.Sides) != 0)
@@ -598,7 +638,57 @@ namespace GameDev.Locomotion
             }
 
             var info = _animator.GetCurrentAnimatorStateInfo(0);
-            return info.shortNameHash == LandState && info.length > 0.01f ? Mathf.Max(landingHold, info.length - LandStart) : landingHold;
+            return info.shortNameHash == LandState && info.length > 0.01f ? Mathf.Max(landingHold, (info.length - LandStart) * LandingShare) : landingHold;
+        }
+
+        /// <summary>
+        /// The arms in a jump (owner, 2026-11-12): the take-off clip's last pose spread them, so through the air and the
+        /// landing neither upper arm nor forearm hangs farther from the body's down than it did at take-off, nor closer
+        /// than <see cref="LeastArmReach"/>. The reach is read from the pose the body left the ground in.
+        /// </summary>
+        private void HoldArms()
+        {
+            _armsHeld = _arms != null;
+            for (var i = 0; _armsHeld && i < _arms.Length; i += 2)
+            {
+                _armReach[i / 2] = _arms[i] != null && _arms[i + 1] != null
+                    ? Mathf.Max(LeastArmReach, Vector3.Angle(-transform.up, _arms[i + 1].position - _arms[i].position))
+                    : 180f;
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (!_armsHeld)
+            {
+                return;
+            }
+
+            if (!(State == Move.Airborne && _jumped) && State != Move.Landing)
+            {
+                _armsHeld = false;
+                return;
+            }
+
+            var down = -transform.up;
+            for (var i = 0; i < _arms.Length; i += 2)
+            {
+                var from = _arms[i];
+                var to = _arms[i + 1];
+                var reach = _armReach[i / 2];
+                if (from == null || to == null)
+                {
+                    continue;
+                }
+
+                var along = to.position - from.position;
+                var angle = Vector3.Angle(down, along);
+                if (angle > reach + 0.5f && angle < 179f)
+                {
+                    var wanted = Vector3.Slerp(down, along.normalized, reach / angle);
+                    from.rotation = Quaternion.FromToRotation(along, wanted) * from.rotation;
+                }
+            }
         }
 
         /// <summary>The blends follow the body's real speed, so the clips' steps keep pace with the ground.</summary>
