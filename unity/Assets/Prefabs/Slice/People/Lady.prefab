@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1022433129287371218}
   - component: {fileID: 3851650056806841638}
+  - component: {fileID: 1370296944444708937}
   m_Layer: 12
   m_Name: Lady
   m_TagString: Untagged
@@ -56,6 +57,19 @@ CapsuleCollider:
   m_Height: 1.66
   m_Direction: 1
   m_Center: {x: 0, y: 0.83, z: 0}
+--- !u!114 &1370296944444708937
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825703266475951285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e622d04ee3016fa4790649d17db7c57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.PersonRole
+  role: 0
 --- !u!1001 &7159253086599597473
 PrefabInstance:
   m_ObjectHideFlags: 0

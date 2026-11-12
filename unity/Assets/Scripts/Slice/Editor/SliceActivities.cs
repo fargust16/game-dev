@@ -83,6 +83,13 @@ namespace GameDev.Slice.EditorTools
             Debug.Log($"[SliceActivities] written {Report}");
         }
 
+        /// <summary>The Soot &amp; Bell's and the old chapel's people only, the city's spots as they stand (PB2).</summary>
+        public static void Interiors(StringBuilder report)
+        {
+            Tavern_(report);
+            Chapel_(report);
+        }
+
         private const string SeatReport = "Logs/SliceSurvey/seats.txt";
 
         private static readonly Regex SeatNames = new Regex("chair|(?<!lab)bench|pew|stool|sofa|settee", RegexOptions.IgnoreCase);
@@ -337,6 +344,18 @@ namespace GameDev.Slice.EditorTools
                 }
 
                 report.AppendLine($"  the bar: {length * 2f:0.0} m long, {places.Length} places before it 1.6 m or more along it from Nell, {(places.Length > 0 ? "a drinker at the first" : "NO ROOM")}");
+
+                // The innkeeper (the owner's third list, VS-ROLES (a)): behind the bar beside Nell, 1.2 m or more along it.
+                var behind = new[] { 1.4f, -1.4f, 2.2f, -2.2f, 1.2f, -1.2f }.Select(d => Grounded(nell.transform.position + (along * d)))
+                    .FirstOrDefault(p => Mathf.Abs(Vector3.Dot(Flat(p - bounds.center), along)) <= length + 0.6f &&
+                                         !Physics.CheckCapsule(p + (Vector3.up * 0.45f), p + (Vector3.up * 1.45f), 0.25f, Blocking, QueryTriggerInteraction.Ignore));
+                report.AppendLine(behind != Vector3.zero
+                    ? $"  the innkeeper behind the bar, {Flat(behind - nell.transform.position).magnitude:0.0} m from Nell"
+                    : "  the innkeeper: NO ROOM behind the bar");
+                if (behind != Vector3.zero)
+                {
+                    Standing(scene, SlicePeopleModels.Innkeeper.Standing, "Innkeeper", behind, Yaw(out_));
+                }
             }
             else
             {
@@ -380,7 +399,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             var spot = Spot(root, "Before the pews", ActivitySpot.Activity.Attend, true, Chapel, places.ToArray());
-            var who = new[] { (SliceTownsfolk.WomanPrefabPath, "Worshipper (matron)"), ("Assets/Prefabs/Slice/People/LadyWalker.prefab", "Worshipper (lady)"), ("Assets/Prefabs/Slice/People/GentlemanWalker.prefab", "Worshipper") };
+            var who = new[] { (SlicePeopleModels.OldBeliever.Walking, "Worshipper (old believer)"), ("Assets/Prefabs/Slice/People/LadyWalker.prefab", "Worshipper (lady)"), ("Assets/Prefabs/Slice/People/GentlemanWalker.prefab", "Worshipper") };
             var chosen = new[] { 0, places.Count / 2, places.Count - 1 }.Distinct().Take(places.Count).ToArray();
             for (var i = 0; i < who.Length && i < chosen.Length; i++)
             {
@@ -388,8 +407,70 @@ namespace GameDev.Slice.EditorTools
             }
 
             report.AppendLine($"The old chapel: {pews.Count} pews, {places.Count} places before them facing {(rostrum != null ? "the rostrum" : "NO ROSTRUM")}, {Mathf.Min(who.Length, chosen.Length)} people standing there");
+
+            // The church's people (the owner's third list): the rostrum stands against the north wall (VeilmouthInteriors.Chapel),
+            // so the old priest stands before it facing the pews, the acolyte and the maid at its sides; each on the first
+            // clear place of a few on the floor. Those of an earlier run go first, found a place or not.
+            var clergyNames = new[] { "Old priest", "Acolyte", "Church maid" };
+            foreach (var old in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                         .Where(t => t.gameObject.scene == scene && clergyNames.Contains(t.name) && PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject)).ToList())
+            {
+                Object.DestroyImmediate(old.gameObject);
+            }
+
+            Physics.SyncTransforms();
+            if (rostrum != null && pews.Count > 0)
+            {
+                // From the pews' middle, not one pew: the pews stand in two columns, and one of them lies off to a side.
+                var box = Bounds(rostrum);
+                var middle = pews.Aggregate(Vector3.zero, (sum, p) => sum + Bounds(p).center) / pews.Count;
+                var toward = Snap(Flat(box.center - middle));
+                var along = Vector3.Cross(Vector3.up, toward);
+                var depth = (Mathf.Abs(toward.x) * box.extents.x) + (Mathf.Abs(toward.z) * box.extents.z);
+                var width = (Mathf.Abs(along.x) * box.extents.x) + (Mathf.Abs(along.z) * box.extents.z);
+                var floor = rostrum.transform.position.y;
+                Vector3 Clear(IEnumerable<Vector3> tries) => tries.Select(Grounded).FirstOrDefault(p => Mathf.Abs(p.y - floor) < 0.2f &&
+                    !Physics.CheckCapsule(p + (Vector3.up * 0.45f), p + (Vector3.up * 1.45f), 0.25f, Blocking, QueryTriggerInteraction.Ignore));
+                var clergy = new[]
+                {
+                    (SlicePeopleModels.OldPriest.Standing, "Old priest", Clear(new[] { 0.5f, 0.7f, 0.9f }.Select(d => box.center - (toward * (depth + d))))),
+                    (SlicePeopleModels.Acolyte.Standing, "Acolyte", Clear(new[] { 0.5f, 0.8f, 1.1f }.Select(d => box.center - (toward * 0.3f) + (along * (width + d))))),
+                    (SlicePeopleModels.ChurchMaid.Standing, "Church maid", Clear(new[] { 0.5f, 0.8f, 1.1f }.Select(d => box.center - (toward * 0.3f) - (along * (width + d))))),
+                };
+                foreach (var (prefab, name, at) in clergy)
+                {
+                    report.AppendLine(at != Vector3.zero ? $"  {name} at {at}" : $"  {name}: NO ROOM by the rostrum (its bounds {box.center} ± {box.extents}, toward {toward})");
+                    if (at != Vector3.zero)
+                    {
+                        Standing(scene, prefab, name, at, Yaw(-toward));
+                    }
+                }
+            }
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
+        }
+
+        /// <summary>A standing person, once: one of the same name in the scene goes first, so a run starts afresh.</summary>
+        private static void Standing(UnityEngine.SceneManagement.Scene scene, string prefabPath, string name, Vector3 at, float yaw)
+        {
+            foreach (var old in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                         .Where(t => t.gameObject.scene == scene && t.name == name && PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject)).ToList())
+            {
+                Object.DestroyImmediate(old.gameObject);
+            }
+
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[SliceActivities] no {prefabPath} for {name}");
+                return;
+            }
+
+            var people = scene.GetRootGameObjects().FirstOrDefault(g => g.name == "People") ?? new GameObject("People");
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
+            go.name = name;
+            go.transform.SetParent(people.transform, true);
+            go.transform.SetPositionAndRotation(at, Quaternion.Euler(0f, yaw, 0f));
         }
 
         /// <summary>A person with no route who keeps <paramref name="place"/> of <paramref name="spot"/>, under the scene's People.</summary>
@@ -652,7 +733,8 @@ namespace GameDev.Slice.EditorTools
 
         private static Bounds Bounds(GameObject g)
         {
-            var renderers = g.GetComponentsInChildren<Renderer>().Where(r => r.enabled).ToArray();
+            // Meshes only: a candle flame's particle renderer, never simulated in the editor, has its bounds at the origin.
+            var renderers = g.GetComponentsInChildren<Renderer>().Where(r => r.enabled && (r is MeshRenderer || r is SkinnedMeshRenderer)).ToArray();
             var b = renderers.Length > 0 ? renderers[0].bounds : new Bounds(g.transform.position, Vector3.zero);
             foreach (var r in renderers)
             {

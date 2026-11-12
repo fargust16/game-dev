@@ -64,12 +64,16 @@ namespace GameDev.Slice.EditorTools
             public readonly bool Female;
             public readonly float Height;
 
-            public Look(string name, string file, bool female, float height)
+            /// <summary>The role its prefab gives the person (10.2 §5a *Roles*).</summary>
+            public readonly ResidentRole Role;
+
+            public Look(string name, string file, bool female, float height, ResidentRole role = ResidentRole.Townsfolk)
             {
                 Name = name;
                 File = file;
                 Female = female;
                 Height = height;
+                Role = role;
             }
 
             public string Model => SliceCharacterRigs.ModelPath(File);
@@ -83,8 +87,8 @@ namespace GameDev.Slice.EditorTools
         public static readonly Look Gentleman = new Look("Gentleman", "vintage_gentleman_3d_model", false, 1.78f);
         public static readonly Look Lady = new Look("Lady", "victorian_dress_3d_model", true, 1.66f);
         public static readonly Look WorkingWoman = new Look("WorkingWoman", "victorian_woman_3d_model", true, 1.63f);
-        public static readonly Look Officer = new Look("Officer", "military_officer_3d_model", false, 1.80f);
-        public static readonly Look Detective = new Look("Detective", "steampunk_detective_3d_model", false, 1.79f);
+        public static readonly Look Officer = new Look("Officer", "military_officer_3d_model", false, 1.80f, ResidentRole.Warden);
+        public static readonly Look Detective = new Look("Detective", "steampunk_detective_3d_model", false, 1.79f, ResidentRole.Cult);
         public static readonly Look Blacksmith = new Look("Blacksmith", "medieval_blacksmith_3d_model", false, 1.82f);
 
         /// <summary>
@@ -97,17 +101,40 @@ namespace GameDev.Slice.EditorTools
             "Assets/Prefabs/Slice/Townsperson.prefab", "Assets/Prefabs/Slice/Townswoman.prefab", Folder + "/Townsman.prefab", Folder + "/Matron.prefab",
         };
 
-        public static readonly Look WardenWoman = new Look("WardenWoman", "military_uniform_3d_model", true, 1.70f);
+        public static readonly Look WardenWoman = new Look("WardenWoman", "military_uniform_3d_model", true, 1.70f, ResidentRole.Warden);
 
-        public static readonly Look[] All = { Gentleman, Lady, WorkingWoman, Officer, Detective, Blacksmith, WardenWoman };
+        // The owner's third list of 2026-11-12 (asset map §1), each file renamed by its role; heights are authoring defaults.
+        public static readonly Look OldBeliever = new Look("OldBeliever", "old_believer_woman", true, 1.58f, ResidentRole.OldBeliever);
+        public static readonly Look ChurchMaid = new Look("ChurchMaid", "church_maid", true, 1.60f, ResidentRole.ChurchMaid);
+        public static readonly Look OldPriest = new Look("OldPriest", "old_priest", false, 1.72f, ResidentRole.OldPriest);
+        public static readonly Look Acolyte = new Look("Acolyte", "young_acolyte", false, 1.76f, ResidentRole.Acolyte);
+        public static readonly Look FactoryWorker = new Look("FactoryWorker", "old_factory_worker", false, 1.70f, ResidentRole.FactoryWorker);
+        public static readonly Look Vagrant = new Look("Vagrant", "street_vagrant", false, 1.74f, ResidentRole.Vagrant);
+        public static readonly Look Dockworker = new Look("Dockworker", "young_dockworker", false, 1.82f, ResidentRole.Dockworker);
+        public static readonly Look OldDockworker = new Look("OldDockworker", "old_dockworker", false, 1.74f, ResidentRole.OldDockworker);
+        public static readonly Look Moneylender = new Look("Moneylender", "moneylender", false, 1.76f, ResidentRole.Moneylender);
+        public static readonly Look Innkeeper = new Look("Innkeeper", "innkeeper", false, 1.72f, ResidentRole.Innkeeper);
+        public static readonly Look Tailor = new Look("Tailor", "tailor", false, 1.75f, ResidentRole.Tailor);
+
+        /// <summary>The third list's looks.</summary>
+        public static readonly Look[] Roles = { OldBeliever, ChurchMaid, OldPriest, Acolyte, FactoryWorker, Vagrant, Dockworker, OldDockworker, Moneylender, Innkeeper, Tailor };
+
+        public static readonly Look[] All =
+        {
+            Gentleman, Lady, WorkingWoman, Officer, Detective, Blacksmith, WardenWoman,
+            OldBeliever, ChurchMaid, OldPriest, Acolyte, FactoryWorker, Vagrant, Dockworker, OldDockworker, Moneylender, Innkeeper, Tailor,
+        };
 
         /// <summary>The player's two bodies (owner, 2026-11-10): worn by the player's prefabs, with no standing prefab of their own.</summary>
         public static readonly Look PlayerMan = new Look("PlayerMan", "human_figure_3d_model", false, 1.80f);
         public static readonly Look PlayerWoman = new Look("PlayerWoman", "human_body_3d_model", true, 1.68f);
         public const string PlayerWomanPrefab = "Assets/Prefabs/Slice/SlicePlayerWoman.prefab";
 
-        /// <summary>The looks with a walking prefab.</summary>
-        private static readonly Look[] NewWalkers = { Gentleman, Lady, WorkingWoman };
+        /// <summary>The looks with a walking prefab: the first three, and the third list's people of the streets.</summary>
+        private static readonly Look[] NewWalkers = { Gentleman, Lady, WorkingWoman, OldBeliever, FactoryWorker, Vagrant, Dockworker, OldDockworker, Moneylender, Tailor };
+
+        /// <summary>The third list's walking looks.</summary>
+        private static readonly Look[] RoleWalkers = { OldBeliever, FactoryWorker, Vagrant, Dockworker, OldDockworker, Moneylender, Tailor };
 
         /// <summary>
         /// Who wears which model (asset map §1): by the person's name in the scene, the Dummies' role names before
@@ -129,6 +156,11 @@ namespace GameDev.Slice.EditorTools
             {
                 case "Blacksmith":
                     return Blacksmith;
+                case "Old priest": return OldPriest;
+                case "Acolyte": return Acolyte;
+                case "Church maid": return ChurchMaid;
+                case "Innkeeper": return Innkeeper;
+                case "Moneylender": return Moneylender;
                 case "Josiah Harrow": case "Harrow": case "POI A - Harrow": case "Silas Quill": case "Tobias Penn": case "Mr Ashgrave":
                 case "The trader": case "Master of Enchanting":
                     return Gentleman;
@@ -171,14 +203,29 @@ namespace GameDev.Slice.EditorTools
         {
             var (px, py) = (at.x + 500f, 500f - at.z);
             var block = layout.blocks?.OrderBy(b => Outside(b, px, py)).FirstOrDefault();
-            var odd = (((Mathf.FloorToInt(px) * 73856093) ^ (Mathf.FloorToInt(py) * 19349663)) & 1) == 1;
+            var hash = ((Mathf.FloorToInt(px) * 73856093) ^ (Mathf.FloorToInt(py) * 19349663)) & 0x7fffffff;
+            var odd = (hash & 1) == 1;
+            var third = (hash >> 1) % 3;
+
+            // The third list (owner, 2026-11-12): the dock workers by the sea's quays, the old factory workers and old
+            // dock workers in the works, the vagrants, factory workers and old believers in the poor streets, a tailor in
+            // three middling men; the one moneylender is chosen apart (<see cref="OneMoneylender"/>).
+            if (!female && layout.water != null && layout.OpenCoast - px < QuayReach)
+            {
+                return odd ? Dockworker : OldDockworker;
+            }
+
             return (block?.wealth ?? "middling") switch
             {
                 "rich" => female ? Lady : Gentleman,
-                "poor" or "works" => female ? WorkingWoman : Gentleman,
-                _ => female ? (odd ? WorkingWoman : Lady) : Gentleman,
+                "works" => female ? WorkingWoman : (odd ? FactoryWorker : OldDockworker),
+                "poor" => female ? (odd ? OldBeliever : WorkingWoman) : (third == 0 ? FactoryWorker : Vagrant),
+                _ => female ? (odd ? WorkingWoman : Lady) : (third == 0 ? Tailor : Gentleman),
             };
         }
+
+        /// <summary>Authoring default, m: a man walking this near the open sea's edge works the quays.</summary>
+        private const float QuayReach = 70f;
 
         private static float Outside(VeilmouthLayout.BlockSpec b, float px, float py)
         {
@@ -273,6 +320,127 @@ namespace GameDev.Slice.EditorTools
             Directory.CreateDirectory(OutputFolder);
             File.WriteAllText($"{OutputFolder}/retired_looks.txt", report.ToString());
             Debug.Log("[SlicePeopleModels] the old looks retired:\n" + report);
+        }
+
+        /// <summary>
+        /// Batch, once (the owner's third list of 2026-11-12, PB2; asset map §1, 10.2 §5a *Roles*): the eleven new people,
+        /// their files renamed by role, made Humanoid and built as standing prefabs, and those of the streets as walking ones,
+        /// each with its role; every earlier person's prefab given its role; Veilmouth's walkers dressed again by
+        /// <see cref="WalkerLook"/> and one rich man made the moneylender; the chapel's priest, acolyte, maid and an old
+        /// believer, and the tavern's innkeeper, placed (<see cref="SliceActivities.Interiors"/>); the check sheets drawn.
+        /// -executeMethod GameDev.Slice.EditorTools.SlicePeopleModels.ThirdList
+        /// </summary>
+        public static void ThirdList()
+        {
+            var report = new StringBuilder();
+            SliceCharacterRigs.Convert();
+            foreach (var look in Roles)
+            {
+                Build(look, false, null, report);
+            }
+
+            foreach (var look in RoleWalkers)
+            {
+                Build(look, true, null, report);
+            }
+
+            foreach (var look in All.Except(Roles))
+            {
+                GiveRole(look.Standing, look.Role, report);
+            }
+
+            foreach (var look in NewWalkers.Except(RoleWalkers))
+            {
+                GiveRole(look.Walking, look.Role, report);
+            }
+
+            AssetDatabase.SaveAssets();
+            var speeds = NewWalkers.ToDictionary(l => l.Walking, l => AssetDatabase.LoadAssetAtPath<GameObject>(l.Walking).GetComponent<TownsfolkWalker>().Speed);
+            Scenes(speeds, report);
+            OneMoneylender(speeds, report);
+            SliceActivities.Interiors(report);
+            Directory.CreateDirectory(OutputFolder);
+            File.WriteAllText($"{OutputFolder}/people_third_list.txt", report.ToString());
+            Debug.Log("[SlicePeopleModels] the third list:\n" + report);
+            CheckSheet();
+            RenderRoles();
+        }
+
+        /// <summary>A prefab's role, set on its root.</summary>
+        private static void GiveRole(string prefabPath, ResidentRole role, StringBuilder report)
+        {
+            var root = PrefabUtility.LoadPrefabContents(prefabPath);
+            if (!root.TryGetComponent<PersonRole>(out var part))
+            {
+                part = root.AddComponent<PersonRole>();
+            }
+
+            part.Role = role;
+            PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
+            PrefabUtility.UnloadPrefabContents(root);
+            report.AppendLine($"{prefabPath}: role {role}");
+        }
+
+        /// <summary>
+        /// The one moneylender (VS-ROLES (a)): of Veilmouth's men walking by a rich block, the first by name, unless one
+        /// already walks in the moneylender's prefab.
+        /// </summary>
+        private static void OneMoneylender(Dictionary<string, float> speeds, StringBuilder report)
+        {
+            var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var layout = VeilmouthLayout.Load();
+            // Only a nameless townsperson: the Farmer and the other named walkers keep their own looks (LookFor).
+            var walkers = Roots().Where(g => g.name == "Townsperson" && g.GetComponent<TownsfolkWalker>() is TownsfolkWalker w && w.Route.Length > 0).ToList();
+            foreach (var named in Roots().Where(g => g.name != "Townsperson" && PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g) == Moneylender.Walking).ToList())
+            {
+                Replace(named, AssetDatabase.LoadAssetAtPath<GameObject>(Gentleman.Walking));
+                report.AppendLine($"{named.name}: back to the gentleman");
+            }
+
+            if (walkers.Any(g => PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g) == Moneylender.Walking))
+            {
+                report.AppendLine("The moneylender: already walking");
+                return;
+            }
+
+            var one = walkers.Where(g => PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g) == Gentleman.Walking)
+                .Where(g =>
+                {
+                    var (px, py) = (g.transform.position.x + 500f, 500f - g.transform.position.z);
+                    return layout.blocks?.OrderBy(b => Outside(b, px, py)).FirstOrDefault()?.wealth == "rich";
+                })
+                .OrderBy(g => g.name, System.StringComparer.Ordinal).FirstOrDefault();
+            if (one == null)
+            {
+                report.AppendLine("The moneylender: NO rich man walking");
+                return;
+            }
+
+            Replace(one, AssetDatabase.LoadAssetAtPath<GameObject>(Moneylender.Walking));
+            var lines = new List<string> { $"{one.name}: the moneylender" };
+            Paces(speeds, lines);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            report.AppendLine(string.Join("\n", lines));
+        }
+
+        /// <summary>One of each of the third list's walkers in Veilmouth, as the player would meet it (`people_role_*.png`).</summary>
+        private static void RenderRoles()
+        {
+            EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var people = Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            foreach (var look in RoleWalkers)
+            {
+                var t = people.FirstOrDefault(p => PrefabUtility.IsOutermostPrefabInstanceRoot(p.gameObject) && PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(p.gameObject) == look.Walking);
+                if (t == null)
+                {
+                    Debug.Log($"[SlicePeopleModels] no {look.Name} walking in Veilmouth");
+                    continue;
+                }
+
+                var at = t.position + (Vector3.up * 1.1f);
+                VeilmouthRenders.Eye($"people_role_{look.Name}", at + (t.forward * 3.4f) + (t.right * 1.2f) + (Vector3.up * 0.3f), at, 50f);
+            }
         }
 
         /// <summary>
@@ -430,9 +598,10 @@ namespace GameDev.Slice.EditorTools
             var idle = SliceClips.Get(IdleUse(look), look.Female);
             var walk = SliceClips.Get("Walk", look.Female);
             var root = new GameObject(look.Name);
+            root.AddComponent<PersonRole>().Role = look.Role;
             var model = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(look.Model), root.transform);
             model.name = "Model";
-            SliceKitCatalogue.LinkTripoTextures(model, look.Model);
+            SliceKitCatalogue.LinkTripoTextures(model, look.Model, look.File);
             var animator = Animated(model, look);
             if (scale.HasValue)
             {
@@ -1102,7 +1271,7 @@ namespace GameDev.Slice.EditorTools
             var model = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(look.Model), root.transform);
             model.name = "Model";
             model.transform.SetSiblingIndex(0);
-            SliceKitCatalogue.LinkTripoTextures(model, look.Model);
+            SliceKitCatalogue.LinkTripoTextures(model, look.Model, look.File);
             var animator = Animated(model, look);
             animator.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(look.Female ? WomanPlayerController : PlayerController);
             animator.applyRootMotion = false;

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7896047013878157855}
   - component: {fileID: 2041711230621302233}
+  - component: {fileID: 576567130692945239}
   m_Layer: 12
   m_Name: Gentleman
   m_TagString: Untagged
@@ -56,6 +57,19 @@ CapsuleCollider:
   m_Height: 1.78
   m_Direction: 1
   m_Center: {x: 0, y: 0.89, z: 0}
+--- !u!114 &576567130692945239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 834033506932431442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e622d04ee3016fa4790649d17db7c57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.PersonRole
+  role: 0
 --- !u!1001 &3506006738335840606
 PrefabInstance:
   m_ObjectHideFlags: 0

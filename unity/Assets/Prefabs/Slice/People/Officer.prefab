@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1730682751887845786}
   - component: {fileID: 7460627858333919173}
+  - component: {fileID: 2972649535861776587}
   m_Layer: 12
   m_Name: Officer
   m_TagString: Untagged
@@ -56,6 +57,19 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &2972649535861776587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8755413562499794411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e622d04ee3016fa4790649d17db7c57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.PersonRole
+  role: 12
 --- !u!1001 &8913590049077866783
 PrefabInstance:
   m_ObjectHideFlags: 0

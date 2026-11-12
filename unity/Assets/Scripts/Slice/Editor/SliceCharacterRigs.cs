@@ -28,6 +28,9 @@ namespace GameDev.Slice.EditorTools
             "vintage_gentleman_3d_model", "victorian_dress_3d_model", "victorian_woman_3d_model", "military_officer_3d_model",
             "steampunk_detective_3d_model", "medieval_blacksmith_3d_model",
             "military_uniform_3d_model", "human_figure_3d_model", "human_body_3d_model",
+            // The owner's third list of 2026-11-12, each file renamed by its role (asset map §1).
+            "old_believer_woman", "church_maid", "old_priest", "young_acolyte", "old_factory_worker", "street_vagrant",
+            "young_dockworker", "old_dockworker", "moneylender", "innkeeper", "tailor",
         };
 
         public static string ModelPath(string file) => $"{Tripo}/{file}/{file}.fbx";

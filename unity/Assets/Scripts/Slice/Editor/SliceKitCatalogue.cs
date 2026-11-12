@@ -960,9 +960,11 @@ namespace GameDev.Slice.EditorTools
         /// <summary>
         /// The Tripo Bridge leaves the base map empty on nine of the owner's ten models (2026-11-05), though the image
         /// lies in the model's .fbm folder. The wrapper wears a project copy of the material with the image as its base
-        /// map; the owner's files are not changed.
+        /// map; the owner's files are not changed. The copy takes the material's name, or <paramref name="copyName"/>: a
+        /// person's model renamed by its role keeps Tripo's first name inside it, and its copy goes by the role's
+        /// (owner, 2026-11-12).
         /// </summary>
-        internal static void LinkTripoTextures(GameObject model, string source)
+        internal static void LinkTripoTextures(GameObject model, string source, string copyName = null)
         {
             var folder = Path.ChangeExtension(source, ".fbm").Replace('\\', '/');
             if (!AssetDatabase.IsValidFolder(folder))
@@ -993,7 +995,7 @@ namespace GameDev.Slice.EditorTools
                         continue;
                     }
 
-                    var path = $"{MaterialFolder}/Tripo/{m.name}.mat";
+                    var path = $"{MaterialFolder}/Tripo/{copyName ?? m.name}.mat";
                     var copy = AssetDatabase.LoadAssetAtPath<Material>(path);
                     if (copy == null)
                     {

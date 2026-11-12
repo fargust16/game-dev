@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3380408142473807045}
   - component: {fileID: 4005902000269620237}
   - component: {fileID: 4713339038986640230}
+  - component: {fileID: 4050496167037699083}
   m_Layer: 12
   m_Name: GentlemanWalker
   m_TagString: Untagged
@@ -105,6 +106,19 @@ MonoBehaviour:
   turnDegreesPerSecond: 270
   home: {fileID: 0}
   homePlace: 0
+--- !u!114 &4050496167037699083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2139289341375822632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e622d04ee3016fa4790649d17db7c57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.PersonRole
+  role: 0
 --- !u!1001 &5322743283851533287
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -19,6 +19,13 @@ namespace GameDev.Slice.Tests
         [TestCase(SlicePeopleModels.Folder + "/GentlemanWalker.prefab")]
         [TestCase(SlicePeopleModels.Folder + "/LadyWalker.prefab")]
         [TestCase(SlicePeopleModels.Folder + "/WorkingWomanWalker.prefab")]
+        [TestCase(SlicePeopleModels.Folder + "/OldBelieverWalker.prefab")]
+        [TestCase(SlicePeopleModels.Folder + "/FactoryWorkerWalker.prefab")]
+        [TestCase(SlicePeopleModels.Folder + "/VagrantWalker.prefab")]
+        [TestCase(SlicePeopleModels.Folder + "/DockworkerWalker.prefab")]
+        [TestCase(SlicePeopleModels.Folder + "/OldDockworkerWalker.prefab")]
+        [TestCase(SlicePeopleModels.Folder + "/MoneylenderWalker.prefab")]
+        [TestCase(SlicePeopleModels.Folder + "/TailorWalker.prefab")]
         public void TheTownsfolkWalkIdleAndPassTheirTimeInTheirClips(string path)
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
@@ -30,8 +37,11 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual("Walk", machine.defaultState.name);
 
             // AN6: the walk and the idle, sitting on a bench and talking there, bargaining at a stall, greeting, drinking.
-            var clips = machine.states.ToDictionary(s => s.state.name, s => (AnimationClip)s.state.motion);
-            CollectionAssert.AreEquivalent(new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "StandToSit", "Sit", "SitTalk", "SitToStand", "TalkIdle", "Nod", "ShakeHead", "Drink", "Gather2" }, clips.Keys);
+            // The walk is a blend of the stroll and the walk (pipeline plan §13): its first clip stands for it.
+            var clips = machine.states.ToDictionary(s => s.state.name, s => s.state.motion as AnimationClip
+                ?? (s.state.motion as BlendTree)?.children.Select(c => c.motion as AnimationClip).FirstOrDefault(c => c != null));
+            // Among them: the controller has grown since (a fight's and a flight's states), and those have tests of their own.
+            CollectionAssert.IsSubsetOf(new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "StandToSit", "Sit", "SitTalk", "SitToStand", "TalkIdle", "Nod", "ShakeHead", "Drink", "Gather2" }, clips.Keys);
             foreach (var loop in new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "Sit", "SitTalk", "TalkIdle", "ShakeHead" })
             {
                 Assert.IsTrue(clips[loop].isLooping, loop);

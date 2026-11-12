@@ -62,10 +62,13 @@ namespace GameDev.Slice
         /// <summary>Which Wardens take a bribe (10.4 §6; WA5); fork it with the Warden's place in the scene hashed.</summary>
         public const string Wardens = "slice.wardens";
 
+        /// <summary>A resident's Limit, points and firearm by its role (10.2 §5a *Roles*; PB2); fork it with the person's name hashed.</summary>
+        public const string Roles = "slice.roles";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
-            ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens,
+            ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles,
         };
     }
 }
