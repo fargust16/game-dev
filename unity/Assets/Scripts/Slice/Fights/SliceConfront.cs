@@ -56,6 +56,7 @@ namespace GameDev.Slice.Fights
         private readonly List<GameObject> _developmentOpponents = new List<GameObject>();
         private readonly List<CombatCell> _ring = new List<CombatCell>();
         private readonly List<Vector3> _points = new List<Vector3>();
+        private readonly Dictionary<Combatant, int> _punches = new Dictionary<Combatant, int>();
         private SliceSettings _settings;
         private IWorldSeed _seed;
         private CharacterSheet _character;
@@ -605,6 +606,7 @@ namespace GameDev.Slice.Fights
             _bodies.Clear();
             _names.Clear();
             _groups.Clear();
+            _punches.Clear();
             _playerCombatant = null;
         }
 
@@ -624,6 +626,21 @@ namespace GameDev.Slice.Fights
             animator.SetBool(DownHash, c.Fighter.Down);
             animator.SetBool(FightingHash, fighting);
             Stance(c, animator, fighting);
+            Arms(c, body, fighting);
+        }
+
+        /// <summary>10.2 §5c: a fight draws every fighter's weapons at its start, its new set's on a change, and sheathes them at its end.</summary>
+        private void Arms(Combatant c, Transform body, bool fighting)
+        {
+            var held = body.GetComponent<Gear.HeldWeapons>();
+            if (fighting)
+            {
+                (held != null ? held : Gear.HeldWeapons.Of(body)).Draw(_settings != null ? _settings.WeaponModels : null, c.Fighter.Set);
+            }
+            else if (held != null)
+            {
+                held.Sheathe();
+            }
         }
 
         /// <summary>
@@ -718,7 +735,16 @@ namespace GameDev.Slice.Fights
             }
 
             _bodies.TryGetValue(target, out var targetBody);
-            _beats.Strike(body, targetBody, Motion(attacker.Fighter, result.OffHand), result, attacker, target);
+            var motion = Motion(attacker.Fighter, result.OffHand);
+            if (Mathf.RoundToInt(motion) == FightBeats.Fists)
+            {
+                // The fists strike by turns, the right's cross, then the left's jab.
+                _punches.TryGetValue(attacker, out var punches);
+                _punches[attacker] = punches + 1;
+                motion = punches % 2 == 0 ? FightBeats.Fists : FightBeats.FistsLeft;
+            }
+
+            _beats.Strike(body, targetBody, motion, result, attacker, target);
         }
 
         private void OnLanded(FightBeats.Beat beat)
@@ -774,13 +800,13 @@ namespace GameDev.Slice.Fights
         /// two-handed weapon, a dagger, a pistol, a rifle, a weapon and a shield, and two weapons, whose blow is the main
         /// hand's or, with <paramref name="offHand"/>, the other hand's.
         /// </summary>
-        private static float Motion(Fighter fighter, bool offHand = false)
+        internal static float Motion(Fighter fighter, bool offHand = false)
         {
             var set = fighter.Set;
             var weapon = set.Weapon;
-            if (weapon == null)
+            if (weapon == null || weapon.Unarmed)
             {
-                return FightBeats.OneHand;
+                return FightBeats.Fists;
             }
 
             if (weapon.Ranged)

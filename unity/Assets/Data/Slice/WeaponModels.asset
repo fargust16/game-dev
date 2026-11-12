@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89e8cfe41b3e7754ea8e83e54f373a32, type: 3}
+  m_Name: WeaponModels
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.Gear.WeaponModels
+  entries:
+  - weapon: {fileID: 11400000, guid: 7d5ac9fe2dcf482d9bc1a7dc4d8b420a, type: 2}
+    offHand: {fileID: 0}
+    held: {fileID: 1040144028705092446, guid: 9732c711c41f9984fa78c4b639799907, type: 3}
+  - weapon: {fileID: 11400000, guid: 3a0110b609ab45cb8ee6899999cb96a7, type: 2}
+    offHand: {fileID: 0}
+    held: {fileID: 1164284442429237192, guid: a09404c62bedeed43b9f33196bb5ab55, type: 3}
+  - weapon: {fileID: 11400000, guid: f1df711bbb1044f6ba61253d0501292b, type: 2}
+    offHand: {fileID: 0}
+    held: {fileID: 8685176108235649496, guid: ae39c6a0ea132364ca5edd741cd77bdd, type: 3}
+  - weapon: {fileID: 11400000, guid: 16599103bb234bb083407f650200eb2a, type: 2}
+    offHand: {fileID: 0}
+    held: {fileID: 7447841218667788024, guid: 9b5adc3170675ab4d999f8f054300427, type: 3}
+  - weapon: {fileID: 11400000, guid: 5a93dd3d88e8450a8f6fda6832c626ea, type: 2}
+    offHand: {fileID: 0}
+    held: {fileID: 2315313013324125156, guid: 4d1bb15a2e4754943bfd25aea977f778, type: 3}
+  - weapon: {fileID: 11400000, guid: 27a803eaa9f44d0d9613e524ad9fc3a8, type: 2}
+    offHand: {fileID: 0}
+    held: {fileID: 1809146335880991135, guid: 727c52ba6f05dfe4f8ee99c4fa0eff6a, type: 3}
+  - weapon: {fileID: 11400000, guid: b9182fd59df34bd89d7fdc70304bde57, type: 2}
+    offHand: {fileID: 0}
+    held: {fileID: 3976205875756727485, guid: 6c5d8428faec82948894b6514d1ab13f, type: 3}
+  - weapon: {fileID: 11400000, guid: b4a04340c6a647988cf1fc295ab908a3, type: 2}
+    offHand: {fileID: 0}
+    held: {fileID: 5000023062929504230, guid: 47e3e155fb3b63e4198268e3a327142e, type: 3}
+  - weapon: {fileID: 11400000, guid: b02db0c189004cf9be52b34f264f1d79, type: 2}
+    offHand: {fileID: 0}
+    held: {fileID: 3228629341483337119, guid: 89fc84e841c623046a0ad17654f11d13, type: 3}
+  - weapon: {fileID: 0}
+    offHand: {fileID: 11400000, guid: 90a46d768454485b889779ffc8abca3f, type: 2}
+    held: {fileID: 8377229832855619672, guid: c79da4ff6a2ad9d438303188699306cb, type: 3}
+  - weapon: {fileID: 0}
+    offHand: {fileID: 11400000, guid: 97e10b2379dd4f2a95789d114bf278ba, type: 2}
+    held: {fileID: 4833235836230201649, guid: fa70008e9b5b3f44485c30d1d5c2d0d8, type: 3}

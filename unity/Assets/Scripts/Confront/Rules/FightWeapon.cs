@@ -60,6 +60,9 @@ namespace GameDev.Confront.Rules
         [Tooltip("10.2 §5b Beasts of the slice: the chance that a hit poisons.")]
         [SerializeField, Range(0f, 1f)] private float poisonOnHit;
 
+        [Tooltip("10.2 §5c: fists, a character's empty hands; no model is held and the fists' clips are played.")]
+        [SerializeField] private bool unarmed;
+
         [Tooltip("10.2 §5b Load in a Fight: kg.")]
         [SerializeField] private float weight = 2f;
 
@@ -87,6 +90,7 @@ namespace GameDev.Confront.Rules
         public bool BleedsOnCritical => bleedsOnCritical;
         public float PoisonOnHit => poisonOnHit;
         public float Weight => weight;
+        public bool Unarmed => unarmed;
         public int Stage => stage;
         public IReadOnlyList<AttributeRequirement> Requirements => requirements;
     }

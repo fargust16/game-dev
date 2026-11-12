@@ -31,11 +31,15 @@ namespace GameDev.Slice.Fights
         public const int PairMain = 7;
         public const int PairOff = 8;
 
-        public static readonly string[] Guards = { "Guard1H", "Guard2H", "Guard1H", "PistolAim", "RifleAim", "ShieldGuard", "Guard1H", "Guard1H" };
-        public static readonly string[] Blows = { "Attack1H", "Attack2H", "Attack1H", "PistolShot", "RifleShot", "ShieldAttack", "Attack1H", "Attack1HLeft" };
+        // 10.2 §5c: fists, from Kevin Iglesias' plain combat guard, the right's cross and the left's jab by turns.
+        public const int Fists = 9;
+        public const int FistsLeft = 10;
+
+        public static readonly string[] Guards = { "Guard1H", "Guard2H", "Guard1H", "PistolAim", "RifleAim", "ShieldGuard", "Guard1H", "Guard1H", "Guard", "Guard" };
+        public static readonly string[] Blows = { "Attack1H", "Attack2H", "Attack1H", "PistolShot", "RifleShot", "ShieldAttack", "Attack1H", "Attack1HLeft", "Punch", "Jab" };
 
         /// <summary>A shot's load, played after it (10.2 §5b: the shot includes loading); null where nothing loads.</summary>
-        public static readonly string[] Loads = { null, null, null, "PistolLoad", "RifleLoad", null, null, null };
+        public static readonly string[] Loads = { null, null, null, "PistolLoad", "RifleLoad", null, null, null, null, null };
 
         // The hit blend's Struck values: three plain hits in turn, a critical hit, a hit through a guard that failed, and a
         // parry or a block that held, raised before the blow lands. The death blend's Death values, in turn.
@@ -51,8 +55,12 @@ namespace GameDev.Slice.Fights
         // how long a shot's beat holds after it, the rest of the shot and the whole load; the first frame of motion of
         // each hit, entered a little before it so the body answers the frame the blow lands; the Block clip's height,
         // where a guard that holds meets the blow and the Defensive Stance stands; and the knockback's onset.
-        private static readonly float[] Contact = { 0.33f, 0.57f, 0.33f, 0.03f, 0.10f, 0.37f, 0.33f, 0.40f };
-        private static readonly float[] ShotHold = { 0f, 0f, 0f, 2.47f, 2.40f, 0f, 0f, 0f };
+        private static readonly float[] Contact = { 0.33f, 0.57f, 0.33f, 0.03f, 0.10f, 0.37f, 0.33f, 0.40f, PunchContact, JabContact };
+        private static readonly float[] ShotHold = { 0f, 0f, 0f, 2.47f, 2.40f, 0f, 0f, 0f, 0f, 0f };
+
+        // The fists' blows reach their target here, s into the clip (SliceWeapons, held.txt: the striking hand furthest out).
+        public const float PunchContact = 0.28f;
+        public const float JabContact = 0.20f;
         private static readonly float[] Onset = { 0.14f, 0.04f, 0f, 0f, 0.04f, 0f };
         public const float BlockPeak = 0.63f;
         public const float KnockOnset = 0f;

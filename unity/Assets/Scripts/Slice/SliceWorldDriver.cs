@@ -90,6 +90,9 @@ namespace GameDev.Slice
         /// <summary>The player's work by its animation, each Reaction Check at its key frame (AN3, 07.1 §8a).</summary>
         public PlayerWork Work { get; private set; }
 
+        /// <summary>The weapon drawn on R in free exploration and a click's blow (10.2 §5c); null without fights or fists.</summary>
+        public PlayerArms Arms { get; private set; }
+
         /// <summary>Theft from the townsfolk (S5a.8); null without a bag or the Deeds Record.</summary>
         public GameDev.Slice.Theft.SliceTheft Theft { get; private set; }
 
@@ -274,6 +277,12 @@ namespace GameDev.Slice
             Reaction = gameObject.AddComponent<SliceReaction>();
             Work = gameObject.AddComponent<PlayerWork>();
             Work.Configure(Reaction, Clock);
+            if (Fights != null && Fights.WornFighter != null)
+            {
+                Arms = gameObject.AddComponent<PlayerArms>();
+                Arms.Configure(settings, Fights.WornFighter, () => Fights.InFight, () => Work.Busy || PageOpen());
+                Arms.People = PeopleAround;
+            }
             if (Bag != null && settings.Shops != null)
             {
                 Shops = new SliceShops(settings.Shops, settings.Items, seed, Clock, Bag, State);
@@ -711,6 +720,19 @@ namespace GameDev.Slice
 
             hud.ShowStamina((float)Stamina.Share, tired);
         }
+
+        // A conversation, a page or a shop puts the weapon away (10.2 §5c).
+        private bool PageOpen()
+        {
+            var hud = Hud();
+            return hud != null && (hud.IsDialogueOpen || hud.IsReadingOpen || hud.IsBagOpen || hud.IsShopOpen || hud.IsMapOpen || hud.IsNotesOpen);
+        }
+
+        // The people a blow can reach: the townsfolk and the named people of the loaded scenes.
+        private static IEnumerable<Transform> PeopleAround() =>
+            FindObjectsByType<TownsfolkWalker>(FindObjectsInactive.Exclude).Select(p => p.transform)
+                .Concat(FindObjectsByType<NamedPerson>(FindObjectsInactive.Exclude).Select(p => p.transform))
+                .Distinct();
 
         private HudView Hud()
         {

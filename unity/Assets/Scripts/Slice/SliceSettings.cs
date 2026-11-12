@@ -39,6 +39,9 @@ namespace GameDev.Slice
         [Tooltip("A character with no weapon in a Weapon Set fights with this: the dagger's numbers at half damage (S5a.2 working reading).")]
         [SerializeField] private FightWeapon fists;
 
+        [Tooltip("Each weapon's and shield's model as held (10.2 §5c), made by SliceWeapons.")]
+        [SerializeField] private GameDev.Slice.Gear.WeaponModels weaponModels;
+
         [Tooltip("The shops on Bawling Row, their keepers, goods and lessons (S5a.3).")]
         [SerializeField] private GameDev.Slice.Shops.ShopCatalogue shops;
 
@@ -95,6 +98,8 @@ namespace GameDev.Slice
         public GameDev.Items.ItemCatalogue Items => items;
 
         public FightWeapon Fists => fists;
+
+        public GameDev.Slice.Gear.WeaponModels WeaponModels => weaponModels;
 
         public GameDev.Slice.Shops.ShopCatalogue Shops => shops;
 

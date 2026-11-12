@@ -189,6 +189,8 @@ namespace GameDev.Slice.EditorTools
             Q("WalkFormal", Q1, "Walk_Formal_Loop", true),
             Q("HitChest", Q1, "Hit_Chest"),
             Q("HitHead", Q1, "Hit_Head"),
+            Q("Punch", Q1, "Punch_Cross"), // 10.2 §5c: the fists' blows, the right's cross and the left's jab
+            Q("Jab", Q1, "Punch_Jab"),
             Q("SpellEnter", Q1, "Spell_Simple_Enter"),
             Q("SpellIdle", Q1, "Spell_Simple_Idle_Loop", true),
             Q("SpellShot", Q1, "Spell_Simple_Shoot"),

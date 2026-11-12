@@ -160,6 +160,12 @@ namespace GameDev.Input
         /// <summary>S3a.6 authoring defaults in a fight: R waits to the end of the round, G ends the turn in a Defensive Stance, X changes the Weapon Set.</summary>
         public bool WaitTurnPressed => _waitTurn != null && _waitTurn.WasPressedThisFrame();
 
+        /// <summary>10.2 §5c in free exploration: R draws the weapon and sheathes it; in a fight the same key waits.</summary>
+        public bool DrawWeaponPressed => WaitTurnPressed;
+
+        /// <summary>10.2 §5c in free exploration: the left button strikes with the drawn weapon.</summary>
+        public bool AttackPressed => ClickMovePressed;
+
         public bool StancePressed => _stance != null && _stance.WasPressedThisFrame();
 
         public bool ChangeSetPressed => _changeSet != null && _changeSet.WasPressedThisFrame();
