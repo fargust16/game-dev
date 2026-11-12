@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using GameDev.Slice.Kit;
 using GameDev.Slice.People;
 using GameDev.World.Portals;
@@ -17,16 +18,17 @@ namespace GameDev.Slice.EditorTools
     /// every run.
     /// <list type="bullet">
     /// <item>Veilmouth: every street bench, its seat read from its own mesh (the top of its up-facing faces 0.25–0.8 m
-    /// over its foot, its back from the faces above that), a place to every 1.2 m of seat; Bawling Row's six stalls, a
-    /// customer before each seller, or two before a stall with none; the Soot &amp; Bell's and the old chapel's street
-    /// doors, three places each where an arriving player stands. Each walker's visits are the places within 30 m of a
-    /// turn of its route to which a straight walk is clear: ground under every half metre, no step over 0.6 m, and the
-    /// route test's capsule clear of every structure, prop and tree but in the last 0.6 m.</item>
-    /// <item>The Soot &amp; Bell: two drinkers at the two nearest free chairs, talking, and one at the bar, drinking.</item>
-    /// <item>The old chapel: three people in its pews, quiet.</item>
+    /// over its foot, its back from the faces above that), a place to every 0.8 m of seat, at most four; Bawling Row's six
+    /// stalls, a customer before each seller, or two before a stall with none; the Soot &amp; Bell's and the old chapel's
+    /// street doors, three places each where an arriving player stands. Each walker's visits are the places within 40 m
+    /// of a turn of its route to which a straight walk is clear: ground under every half metre, no step over 0.6 m, and
+    /// the route test's capsule clear of every structure, prop and tree but the spot's own piece and the last 0.6 m.</item>
+    /// <item>The Soot &amp; Bell: two drinkers at the two nearest free chairs, talking, and one at the bar, drinking, 1.6 m
+    /// or more along it from the place before Nell.</item>
+    /// <item>The old chapel: three people standing quietly in its pews' rows, the pews too high to sit on.</item>
     /// </list>
     /// Distances are authoring defaults. Writes <c>Logs/SliceSurvey/activities.txt</c>. Batch:
-    /// -executeMethod GameDev.Slice.EditorTools.SliceActivities.Run
+    /// -executeMethod GameDev.Slice.EditorTools.SliceActivities.Run; every seat of the kit, <see cref="SurveySeats"/>.
     /// </summary>
     public static class SliceActivities
     {
@@ -75,6 +77,49 @@ namespace GameDev.Slice.EditorTools
             Directory.CreateDirectory(Path.GetDirectoryName(Report) ?? ".");
             File.WriteAllText(Report, report.ToString());
             Debug.Log($"[SliceActivities] written {Report}");
+        }
+
+        private const string SeatReport = "Logs/SliceSurvey/seats.txt";
+
+        private static readonly Regex SeatNames = new Regex("chair|(?<!lab)bench|pew|stool|sofa|settee", RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// Every seat of the kit read as the townsfolk read a bench, each on a floor of its own in an empty scene (the
+        /// owner's question of 2026-11-12, which seats a person can sit on). Writes <c>Logs/SliceSurvey/seats.txt</c>. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.SliceActivities.SurveySeats
+        /// </summary>
+        [MenuItem("GameDev/Slice/Townsfolk/Measure Every Seat of the Kit")]
+        public static void SurveySeats()
+        {
+            if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
+                return;
+            }
+
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            var floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            floor.layer = LayerMask.NameToLayer(KitLayers.Ground);
+            floor.transform.position = new Vector3(0f, -0.5f, 0f);
+            floor.transform.localScale = new Vector3(400f, 1f, 20f);
+            var paths = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Prefabs/SliceKit" }).Select(AssetDatabase.GUIDToAssetPath)
+                .Where(p => SeatNames.IsMatch(Path.GetFileNameWithoutExtension(p))).OrderBy(p => p).ToList();
+            var report = new StringBuilder($"Every seat of the kit ({paths.Count}), read as the townsfolk read a bench (SliceActivities.Seats)\n\n");
+            var x = 0f;
+            foreach (var path in paths)
+            {
+                var go = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path));
+                go.transform.position = new Vector3(x, 0f, 0f);
+                x += 8f;
+                Physics.SyncTransforms();
+                if (Seats(go, report).Length == 0)
+                {
+                    report.AppendLine($"    ({path})");
+                }
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(SeatReport) ?? ".");
+            File.WriteAllText(SeatReport, report.ToString());
+            Debug.Log($"[SliceActivities] written {SeatReport}");
         }
 
         // ------------------------------------------------------------------------------------------- the city
@@ -417,7 +462,7 @@ namespace GameDev.Slice.EditorTools
 
             var top = foot + (bins.OrderByDescending(p => p.Value).First().Key * 0.02f);
             Vector3 seatSum = Vector3.zero, backSum = Vector3.zero;
-            float seatArea = 0f, backArea = 0f;
+            float seatArea = 0f, backArea = 0f, backTop = top, armSum = 0f, armArea = 0f;
             var seatPoints = new List<Vector3>();
             foreach (var (a, b, c) in tris)
             {
@@ -441,6 +486,13 @@ namespace GameDev.Slice.EditorTools
                 {
                     backSum += centre * area;
                     backArea += area;
+                    backTop = Mathf.Max(backTop, Mathf.Max(a.y, Mathf.Max(b.y, c.y)));
+                }
+                else if (n.normalized.y > 0.9f && centre.y > top + 0.1f && centre.y <= top + 0.45f)
+                {
+                    // Arms, or what else faces up a little over the seat.
+                    armSum += centre.y * area;
+                    armArea += area;
                 }
             }
 
@@ -460,7 +512,10 @@ namespace GameDev.Slice.EditorTools
                 places[i] = new ActivitySpot.Place { Seat = point, Stand = stand, Yaw = Yaw(forward) };
             }
 
-            report?.AppendLine($"  {seat.name}: seat top {top - foot:0.00} m over the floor{(Mathf.Abs(sunk) > 0.02f ? $" (its foot {sunk:0.00} m under it)" : string.Empty)}, {length:0.00} m long, {(backArea > 0.02f ? "a back" : "no back")}, {count} places");
+            var depths = seatPoints.Select(p => Vector3.Dot(p - middle, forward)).ToList();
+            var arms = armArea > 0.005f ? $", something facing up {(armSum / armArea) - top:0.00} m over it" : string.Empty;
+            report?.AppendLine($"  {seat.name}: seat top {top - foot:0.00} m over the floor{(Mathf.Abs(sunk) > 0.02f ? $" (its foot {sunk:0.00} m under it)" : string.Empty)}, " +
+                               $"{length:0.00} m long, {depths.Max() - depths.Min():0.00} m deep, {(backArea > 0.02f ? $"a back to {backTop - top:0.00} m over the seat" : "no back")}{arms}, {count} places");
             return places;
         }
 

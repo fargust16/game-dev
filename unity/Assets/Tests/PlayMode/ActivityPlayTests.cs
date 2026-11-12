@@ -2,6 +2,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using GameDev.Slice.People;
 using NUnit.Framework;
 using UnityEditor;
@@ -98,6 +100,184 @@ namespace GameDev.Slice.Tests
             var across = root.InverseTransformDirection(animator.GetBoneTransform(HumanBodyBones.RightUpperArm).position - animator.GetBoneTransform(HumanBodyBones.LeftUpperArm).position);
             var facing = Vector3.Cross(across, Vector3.up);
             return Mathf.Atan2(facing.x, facing.z) * Mathf.Rad2Deg;
+        }
+
+        private static readonly string[] Bodies =
+        {
+            ManWalker, "Assets/Prefabs/Slice/Townswoman.prefab", "Assets/Prefabs/Slice/People/GentlemanWalker.prefab",
+            "Assets/Prefabs/Slice/People/LadyWalker.prefab", WomanWalker,
+        };
+
+        /// <summary>Every skin of the body baked as it stands now, in its root's frame.</summary>
+        private static List<Vector3> Skin(GameObject body, Transform root)
+        {
+            var list = new List<Vector3>();
+            var mesh = new Mesh();
+            foreach (var s in body.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                if (!s.enabled || !s.gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                // Baked unscaled, in the renderer's frame without its scale (measured: the Tripo people carry 1.7 of scale
+                // above the renderer, which either other pairing counts once too few or too many times).
+                s.BakeMesh(mesh, false);
+                var m = Matrix4x4.TRS(s.transform.position, s.transform.rotation, Vector3.one);
+                list.AddRange(mesh.vertices.Select(v => root.InverseTransformPoint(m.MultiplyPoint3x4(v))));
+            }
+
+            Object.Destroy(mesh);
+            return list;
+        }
+
+        /// <summary>
+        /// The seated body in play, for the sizes of seats (the owner's question of 2026-11-12): each walker's skin baked
+        /// in Sit and through SitTalk, in its root's frame (+z forward, the root on the floor). Writes
+        /// <c>Logs/SliceSurvey/seated_body.txt</c>.
+        /// </summary>
+        [UnityTest, Explicit("diagnostic: run by name"), Category("Diagnostic")]
+        public IEnumerator MeasureTheSeatedBody()
+        {
+            yield return Ground();
+            var report = new StringBuilder("The seated body in play (ActivityPlayTests.MeasureTheSeatedBody): m in the root's frame, +z forward, the root on the floor;\n" +
+                                           "under = the lowest skin under the hips (where a seat's top meets it), back@h = the back's skin h over that, knees = the knee joints\n\n");
+            var x = 0f;
+            foreach (var prefab in Bodies)
+            {
+                var w = Walker(prefab, new Vector3[0], new Vector3(x, 0f, 20f));
+                x += 3f;
+                w.enabled = false;
+                var animator = w.GetComponentInChildren<Animator>();
+                var hipsBone = animator.GetBoneTransform(HumanBodyBones.Hips);
+                animator.Play("Idle", 0, 0.5f);
+                yield return null;
+                yield return null;
+                var standing = Skin(w.gameObject, w.transform);
+                report.AppendLine($"{System.IO.Path.GetFileNameWithoutExtension(prefab)}: standing {standing.Max(v => v.y):0.00} tall, its soles at {standing.Min(v => v.y):0.00}, " +
+                                  $"its hips {w.transform.InverseTransformPoint(hipsBone.position).y:0.00} up, half its width {standing.Max(v => Mathf.Abs(v.x)):0.00}");
+                foreach (var (state, times) in new[] { ("Sit", new[] { 0.25f, 0.5f, 0.75f }), ("SitTalk", Enumerable.Range(0, 10).Select(i => 0.05f + (i * 0.1f)).ToArray()) })
+                {
+                    var rows = new List<float[]>();
+                    foreach (var t in times)
+                    {
+                        animator.Play(state, 0, t);
+                        yield return null;
+                        yield return null;
+                        var v = Skin(w.gameObject, w.transform);
+                        var hips = w.transform.InverseTransformPoint(hipsBone.position);
+                        var knees = new[] { HumanBodyBones.LeftLowerLeg, HumanBodyBones.RightLowerLeg }.Select(b => w.transform.InverseTransformPoint(animator.GetBoneTransform(b).position)).ToArray();
+                        var under = v.Where(p => Mathf.Abs(p.x - hips.x) < 0.12f && p.z > hips.z - 0.15f && p.z < hips.z + 0.1f).Min(p => p.y);
+                        float Back(float h) => v.Where(p => Mathf.Abs(p.y - (under + h)) < 0.04f && Mathf.Abs(p.x - hips.x) < 0.2f).Select(p => p.z).DefaultIfEmpty(float.NaN).Min();
+                        rows.Add(new[]
+                        {
+                            hips.y, hips.z, under, v.Where(p => p.y < under + 0.2f && p.z < hips.z + 0.05f).Min(p => p.z), Back(0.15f), Back(0.35f), Back(0.55f),
+                            knees.Max(k => k.z), knees.Max(k => k.y), v.Min(p => p.y), v.Where(p => p.y < 0.2f).Select(p => p.z).DefaultIfEmpty(float.NaN).Max(),
+                            v.Where(p => p.y > under && p.y < under + 0.15f && p.z < knees.Min(k => k.z) - 0.05f).Select(p => Mathf.Abs(p.x - hips.x)).DefaultIfEmpty(float.NaN).Max(),
+                            v.Where(p => p.y > under + 0.1f && p.y < under + 0.45f).Select(p => Mathf.Abs(p.x - hips.x)).DefaultIfEmpty(float.NaN).Max(),
+                        });
+                    }
+
+                    string R(int i) => $"{rows.Min(r => r[i]):0.00}..{rows.Max(r => r[i]):0.00}";
+                    report.AppendLine($"  {state}: hips up {R(0)} and z {R(1)}; under {R(2)}; seat of the trousers z {R(3)}; back z @0.15 {R(4)}, @0.35 {R(5)}, @0.55 {R(6)}; " +
+                                      $"knees z {R(7)} y {R(8)}; soles y {R(9)}, toes z {R(10)}; half-width of the hips and thighs {R(11)}, at arm-rest height (under +0.1..0.45) {R(12)}");
+                }
+
+                Object.Destroy(w.gameObject);
+            }
+
+            System.IO.Directory.CreateDirectory("Logs/SliceSurvey");
+            System.IO.File.WriteAllText("Logs/SliceSurvey/seated_body.txt", report.ToString());
+            Debug.Log("[MeasureTheSeatedBody]\n" + report);
+        }
+
+        /// <summary>
+        /// The seated bodies seen from the side on trial seats, their feet on the floor (the owner's question of 2026-11-12):
+        /// a seat 0.50 m deep with its front 0.02 m before the root and a back behind it, at each trial height. Writes
+        /// <c>Logs/SliceSurvey/seated_side_&lt;cm&gt;.png</c>.
+        /// </summary>
+        [UnityTest, Explicit("diagnostic: run by name"), Category("Diagnostic")]
+        public IEnumerator RenderTheSeatedBodies()
+        {
+            yield return Ground();
+            var origin = Area + new Vector3(0f, 0f, -20f);
+            var parts = new List<Transform>();
+            for (var i = 0; i < Bodies.Length; i++)
+            {
+                var w = Walker(Bodies[i], new Vector3[0], origin - Area + new Vector3(0f, 0f, i * 1.6f));
+                w.enabled = false;
+                w.GetComponentInChildren<Animator>().Play("Sit", 0, 0.5f);
+                var seat = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
+                var back = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
+                foreach (var c in new[] { seat, back })
+                {
+                    Object.Destroy(c.GetComponent<Collider>());
+                    parts.Add(c);
+                }
+            }
+
+            var camera = new GameObject("Side camera").AddComponent<Camera>();
+            camera.orthographic = true;
+            camera.orthographicSize = 1.05f;
+            camera.transform.SetPositionAndRotation(origin + new Vector3(6f, 0.95f, 3f), Quaternion.Euler(0f, -90f, 0f)); // looking west: +z to the right
+            camera.backgroundColor = new Color(0.85f, 0.87f, 0.9f);
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            var texture = new RenderTexture(2850, 750, 24);
+            camera.targetTexture = texture;
+            camera.aspect = 3.8f;
+            foreach (var height in new[] { 0.40f, 0.45f })
+            {
+                for (var i = 0; i < Bodies.Length; i++)
+                {
+                    var z = origin.z + (i * 1.6f);
+                    parts[2 * i].position = new Vector3(origin.x, origin.y + (height * 0.5f), z - 0.23f);
+                    parts[2 * i].localScale = new Vector3(0.5f, height, 0.5f);
+                    parts[(2 * i) + 1].position = new Vector3(origin.x, origin.y + height + 0.25f, z - 0.51f);
+                    parts[(2 * i) + 1].localScale = new Vector3(0.5f, 0.5f, 0.04f);
+                }
+
+                yield return null;
+                yield return null;
+                camera.Render();
+                RenderTexture.active = texture;
+                var image = new Texture2D(texture.width, texture.height, TextureFormat.RGB24, false);
+                image.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
+                RenderTexture.active = null;
+                System.IO.Directory.CreateDirectory("Logs/SliceSurvey");
+                System.IO.File.WriteAllBytes($"Logs/SliceSurvey/seated_side_{Mathf.RoundToInt(height * 100f)}.png", image.EncodeToPNG());
+            }
+
+            // Close up, about 1 mm to a pixel: each body's hips on each trial seat, a row to a height.
+            var close = new RenderTexture(3000, 1200, 24);
+            camera.targetTexture = close;
+            camera.orthographicSize = 0.32f;
+            var heights = new[] { 0.40f, 0.45f };
+            for (var row = 0; row < heights.Length; row++)
+            {
+                for (var i = 0; i < Bodies.Length; i++)
+                {
+                    var z = origin.z + (i * 1.6f);
+                    parts[2 * i].position = new Vector3(origin.x, origin.y + (heights[row] * 0.5f), z - 0.23f);
+                    parts[2 * i].localScale = new Vector3(0.5f, heights[row], 0.5f);
+                    parts[(2 * i) + 1].position = new Vector3(origin.x, origin.y + heights[row] + 0.25f, z - 0.51f);
+                }
+
+                yield return null;
+                for (var i = 0; i < Bodies.Length; i++)
+                {
+                    camera.rect = new Rect(i / (float)Bodies.Length, row == 0 ? 0.5f : 0f, 1f / Bodies.Length, 0.5f);
+                    camera.aspect = 1f;
+                    camera.transform.position = new Vector3(origin.x + 6f, origin.y + 0.45f, origin.z + (i * 1.6f) - 0.2f);
+                    camera.Render();
+                }
+            }
+
+            RenderTexture.active = close;
+            var sheet = new Texture2D(close.width, close.height, TextureFormat.RGB24, false);
+            sheet.ReadPixels(new Rect(0, 0, close.width, close.height), 0, 0);
+            RenderTexture.active = null;
+            System.IO.File.WriteAllBytes("Logs/SliceSurvey/seated_close.png", sheet.EncodeToPNG());
+            Debug.Log("[RenderTheSeatedBodies] Logs/SliceSurvey/seated_side_40.png, _45.png, seated_close.png");
         }
 
         [UnityTest]
