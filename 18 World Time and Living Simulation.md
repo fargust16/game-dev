@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.21
+Version: 0.22
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-04 (open question 1 gets the working answer of the S0.1 clock. Earlier: sleep restores 3 Sanity; the slice's townsfolk schedules, by the owner's answer, with authoring-default hours. Earlier: Bleeding and Poison rates and First Aid treatment in 10.2, authoring defaults. Earlier: a Master teaches First Aid and sells its supplies. Earlier: the question on reports names forces, not numeric Influence. Earlier: ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-12 (leaving a fight: the action Сбежать, seen by no enemy and 15 cells from the nearest, by the owner's direction after the play test of 2026-11-12 ([10.2](10.2%20Combat%20System%20Draft.md) §9); question 15 answered. Earlier: open question 1 gets the working answer of the S0.1 clock. Earlier: sleep restores 3 Sanity; the slice's townsfolk schedules, by the owner's answer, with authoring-default hours. Earlier: Bleeding and Poison rates and First Aid treatment in 10.2, authoring defaults. Earlier: a Master teaches First Aid and sells its supplies. Earlier: the question on reports names forces, not numeric Influence. Earlier: ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -269,7 +269,7 @@ Allies, enemies, and other NPCs may join an active encounter when they physicall
 Combatants may attempt to flee rather than continue fighting. The player and NPCs should use the same underlying spatial escape principle.
 
 - The current proposal is that an actor can leave the tactical encounter after moving beyond a defined separation distance from the nearest hostile combatant.
-- A distance of **about 10 grid cells** from the nearest enemy ends the fight for that actor. This is the current rule, as in Baldur's Gate and Fallout.
+- Since the owner's direction after the play test of 2026-11-12, an actor leaves by the action Сбежать, 2 AP, 15 cells or more from the nearest enemy and seen by none; enemies who meant to strike it search the last place they saw it ([10.2](10.2%20Combat%20System%20Draft.md) §9). Until then about 10 cells ended the fight, as in Baldur's Gate and Fallout.
 - Leaving the encounter removes that actor from active tactical participation; it does not necessarily end combat for the remaining participants.
 - If a fleeing actor is later found, pursued, or caught by a hostile actor, a new tactical encounter may begin.
 - NPCs may choose to flee when the threat is too great, using their judgement, goals, and available information.
@@ -325,7 +325,7 @@ Information transmission is not automatic universal knowledge. Each channel need
 12. What exactly can First Aid treat or stabilise, and which injuries require a doctor or specialist?
 13. What are the exact HP/stamina recovery rules during sleep, including the timing of recovery when a blocking condition is removed partway through sleep?
 14. How are timed condition durations and early-removal probabilities finalised?
-15. The escape distance is about 10 cells. How exactly is it measured on the grid?
+15. *Answered, 2026-11-12:* 15 cells from the nearest enemy, counted as moves are, and out of every enemy's sight ([10.2](10.2%20Combat%20System%20Draft.md) §9).
 16. How are actors inserted into Initiative when they arrive during an active round?
 17. A fighter who leaves the Combat Grid drops into simulation, and one who comes inside appears on it from the next round. How do pursuit and re-engagement work across a whole city?
 18. What information can each communication channel transmit, to whom, how quickly, and with what limits?

@@ -1,10 +1,10 @@
 # 16 Architecture Pivot
 
-Version: 0.14
+Version: 0.15
 
 Status: Draft
 
-Last Updated: 2026-11-12 (§2: the owner revokes the camera-facing body; the character faces where it goes and never walks backward or sideways. Earlier: §2: the eight-way movement as built (AN2): a sprint backward is a run, and the sneak and the swim turn the body to where it goes, as their clips go forward only. Earlier: 2026-11-11: §2: the character faces the camera and moves in eight directions, by the owner's decision. Earlier: the Vertical Slice is an owner-approved exception to the seeded Overworld: one hand-built scene. Earlier: the Combat Grid test is passed (CC-33). Earlier: the Combat Grid is built during a fight; the slice uses 20 cells, with 50 planned. Earlier: transparent walls detailed from the lab. Earlier: the Combat Grid follows the player. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: the Combat Grid forms around the player; interiors stay separate scenes; door and camera rules recorded. Earlier: what failed in 2026-08 stated exactly; the world lives between rounds; the door question added to the technical test. Earlier: owner replaced the Combat Arena with combat in place on a Combat Grid.)
+Last Updated: 2026-11-12 (the grid reaches 30 cells in the slice, by the owner's direction after the play test of 2026-11-12. Earlier: §2: the owner revokes the camera-facing body; the character faces where it goes and never walks backward or sideways. Earlier: §2: the eight-way movement as built (AN2): a sprint backward is a run, and the sneak and the swim turn the body to where it goes, as their clips go forward only. Earlier: 2026-11-11: §2: the character faces the camera and moves in eight directions, by the owner's decision. Earlier: the Vertical Slice is an owner-approved exception to the seeded Overworld: one hand-built scene. Earlier: the Combat Grid test is passed (CC-33). Earlier: the Combat Grid is built during a fight; the slice uses 20 cells, with 50 planned. Earlier: transparent walls detailed from the lab. Earlier: the Combat Grid follows the player. Earlier: Combat Grid reach set to 20 cells in every direction. Earlier: the Combat Grid forms around the player; interiors stay separate scenes; door and camera rules recorded. Earlier: what failed in 2026-08 stated exactly; the world lives between rounds; the door question added to the technical test. Earlier: owner replaced the Combat Arena with combat in place on a Combat Grid.)
 
 Depends On:
 [00 Vision](00%20Vision.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [11 Vertical Slice](11%20Vertical%20Slice.md), [12 Engine Choice](12%20Engine%20Choice.md), [14 World Generation Roadmap](14%20World%20Generation%20Roadmap.md)
@@ -78,9 +78,9 @@ The record of why the pivot cancelled it: the stack was a permanent grid baked o
 
 During Turn-Based Mode the rest of the world stands still and lives one tick at the end of each round.
 
-The Combat Grid forms only around the player, for everyone taking part there. It reaches 20 cells in every direction, a diameter of 40 with the player at the centre. It follows the player every step. A fighter outside it drops into simulation, and one who comes inside appears on it from the next round. Fights the player cannot see have no grid and are not rendered: they are simulated, tick by tick.
+The Combat Grid forms only around the player, for everyone taking part there. In the slice it reaches 30 cells in every direction, a diameter of 60 with the player at the centre. It follows the player every step. A fighter outside it drops into simulation, and one who comes inside appears on it from the next round. Fights the player cannot see have no grid and are not rendered: they are simulated, tick by tick.
 
-The grid is built during a real fight, never ahead of it. That is cheaper than a grid for a whole city ([test](unity/Assets/Plans/COMBAT_GRID_TECH_TEST.md)). The slice uses 20 cells. It can grow to 30 if 20 proves too few, and the plan for later is 50 cells, about 50 m, as a measure of how far a person sees. Everything beyond that is simulated.
+The grid is built during a real fight, never ahead of it. That is cheaper than a grid for a whole city ([test](unity/Assets/Plans/COMBAT_GRID_TECH_TEST.md)). The slice used 20 cells and grew to 30 by the owner's direction after the play test of 2026-11-12, so that everyone within 30 cells is in a fight ([10.2](10.2%20Combat%20System%20Draft.md) §9); the plan for later is 50 cells, about 50 m, as a measure of how far a person sees. Everything beyond that is simulated.
 
 Interiors stay separate scenes. A fight carries through a door the way a change of level does in Fallout:
 
