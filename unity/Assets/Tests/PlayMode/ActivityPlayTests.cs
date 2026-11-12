@@ -25,7 +25,7 @@ namespace GameDev.Slice.Tests
         private const string ManWalker = "Assets/Prefabs/Slice/Townsperson.prefab";
         private const string WomanWalker = "Assets/Prefabs/Slice/People/WorkingWomanWalker.prefab";
         private static readonly Vector3 Area = new Vector3(-300f, 0f, 300f);
-        private const float SeatHeight = 0.45f;
+        private const float SeatHeight = TownsfolkWalker.SeatTop;
 
         private static IEnumerator Ground()
         {
@@ -53,7 +53,7 @@ namespace GameDev.Slice.Tests
             return walker;
         }
 
-        /// <summary>A bench facing north (+z): its seat 0.45 m up, its places 1.2 m apart along x.</summary>
+        /// <summary>A bench facing north (+z): its seat at the owner's 0.42 m, its places 1.2 m apart along x.</summary>
         private static ActivitySpot Spot(ActivitySpot.Activity kind, float seconds, int places = 2, bool quiet = false)
         {
             var list = new ActivitySpot.Place[places];
@@ -339,7 +339,8 @@ namespace GameDev.Slice.Tests
                 var k = w.BodyScale;
                 Assert.That(k, Is.InRange(0.8f, 1.1f), $"{w.name}: its scale read from its hips");
                 var seat = bench.PlaceAt(w == a ? 0 : 1).Seat;
-                Assert.AreEqual(seat.y + (TownsfolkWalker.HipsOverSeat * k), hips.y, 0.08f, $"{w.name}: its hips on the seat");
+                Assert.AreEqual(Area.y, w.transform.position.y, 0.02f, $"{w.name}: its feet on the floor");
+                Assert.That(hips.y - seat.y, Is.InRange(0.08f, 0.25f), $"{w.name}: its hip joint over the seat's top, the skin under it on the seat (MeasureTheSeatedBody)");
                 Assert.Less(new Vector2(hips.x - seat.x, hips.z - seat.z).magnitude, 0.12f, $"{w.name}: over the seat (hips {w.transform.InverseTransformPoint(hips):F3} over the root, off the seat by {hips - seat:F3}, in {State(w)})");
                 Assert.Less(Mathf.Abs(Mathf.DeltaAngle(w.transform.eulerAngles.y, 0f)), 2f, $"{w.name}: facing out from the bench");
             }

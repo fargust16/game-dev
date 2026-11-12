@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.12
+Version: 0.13
 
-Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09, 2026-11-10); fireplaces and radiators in §10.1 (owner, 2026-11-10); every piece's size checked in §11 (owner's walk, 2026-11-10); the CC0 pieces in §12 (2026-11-11)
+Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09, 2026-11-10); fireplaces and radiators in §10.1 (owner, 2026-11-10); every piece's size checked in §11 (owner's walk, 2026-11-10); the CC0 pieces in §12 (2026-11-11); seat sizes in §13 (owner, 2026-11-12)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-11 (§12, the CC0 pieces from the owner's four Blender libraries: a chess table and a dartboard in the Soot & Bell, sacks, a ladder, candle plates and damp in the cellar, food, pots, a watch and spectacles on the Victorian tables, a travelling trunk. The earlier note is in the update history)
+Last Updated: 2026-11-12 (§13, the owner's seat sizes in game metres, measured on the seated bodies; their game scale open as VS-SEAT. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -266,6 +266,8 @@ Furniture stands at game scale, ×1.2 its true size (kit standard §1). A true s
 | A nightstand | 0.6–0.7 m |
 | A standing lamp | 1.5–1.8 m |
 
+A seat is the exception the seated bodies make: its game size is §13's, its top 0.42 m over the floor, and how it is scaled is open (VS-SEAT).
+
 **Changed** (game sizes; `SliceKitTripo`, `SliceKitVictorian`):
 
 | Piece | Key | Measured | True | Now | True now |
@@ -331,6 +333,42 @@ The owner added four CC0 libraries to Blender and gave the agent the choice and 
 
 **A hung piece needs a wall.** `HangOnWall` tries the given 3 m segments in turn and keeps the first with a wall within 0.4 m behind it; with none, nothing is hung and it is reported. One hung over a doorway or a gap would stand in the air.
 
+## 13. Seats (owner, 2026-11-12)
+
+The owner asked which benches, chairs and armchairs the player and the NPCs can sit on, and thought new models easier than refitting the kit's. The agent measured the seated bodies and proposed sizes; the owner accepted them by asking that the walker be fitted to them.
+
+**The seated body**, measured in play ([ANIMATION_PIPELINE_PLAN.md](ANIMATION_PIPELINE_PLAN.md) §13, `ActivityPlayTests.MeasureTheSeatedBody`). In the sitting clip, its soles on the floor:
+
+- the hip joint stands 0.54–0.61 m up, and the lowest skin under it 0.35–0.45 m up;
+- the back is 0.14–0.21 m behind the hip joint, upright, and the knees 0.40–0.46 m before it;
+- with its hands on its thighs a man is 0.58–0.80 m wide and a woman 0.68–0.96 m, her skirts the widest.
+
+**Sizes, in game metres:**
+
+| Part | Size |
+|---|---|
+| The seat's top over the floor | 0.42 m (0.40–0.45) |
+| From the seat's front edge to the back's face | 0.45 m |
+| The back's lean | at most 10° |
+| Seat to a person | 1.0 m |
+| Arms, if any | at most 0.18 m over the seat, at least 0.75 m apart inside |
+| Clear floor before the front edge | 0.6 m |
+| A pew's row to the next | 0.95–1.0 m |
+
+No high stool: the sitting clip keeps the feet on the floor. A seat's places are read from its own mesh (`SliceActivities.Seats`), so a new model needs no hand-placed points: a place to every metre of seat, at most four, the sitter's hip joint 0.225 m behind the front edge.
+
+**Game scale.** These are game sizes, set by the bodies. Furniture stands at ×1.2 its true size (§11, kit standard §1), so a real chair's 0.42–0.46 m (§11's table) stands 0.50–0.55 m in the game, as the kit's Victorian chair (0.50 m) and street bench (0.54 m) do (measured), and a body sinks 8–12 cm into them. §11 sets a table's top at 0.90 m in the game: 0.48 m over a 0.42 m seat, where a real table stands about 0.3 m over its chair. Two things are the owner's ([99](../../../99%20Open%20Questions.md) VS-SEAT):
+
+- whether a new seat is modelled at its game size divided by 1.2 and wrapped like the rest, or modelled at its game size and exempt from FurnitureScale;
+- whether the tables people sit at come down with it.
+
+**Until the new seats come**, the walker sits on the kit's seats 0.36–0.62 m over the ground under its place, its feet on the floor, and sinks into the higher ones. It does not sit on these (measured, `Logs/SliceSurvey/seats.txt`):
+
+- the pew, 0.85 m;
+- the furniture kit's chair, 0.78 m;
+- the dark stool, 0.70 m;
+- the footstool, 0.34 m.
+
 ## Sources
 
 - CAMRA, *Pub Heritage* records of historic pub interiors, e.g. [pubheritage.camra.org.uk/pubs/141](https://pubheritage.camra.org.uk/pubs/141), [/pubs/240](https://pubheritage.camra.org.uk/pubs/240), [/pubs/582](https://pubheritage.camra.org.uk/pubs/582).
@@ -339,6 +377,7 @@ The owner added four CC0 libraries to Blender and gave the agent the choice and 
 
 ## Update history
 
+- 2026-11-12 (v0.13): §13, the owner's seat sizes in game metres, measured on the seated bodies; their game scale open as VS-SEAT; §11's table notes the exception.
 - 2026-11-11 (v0.12): §12, the CC0 pieces from the owner's four Blender libraries, on the Victorian tables and placed in the Soot & Bell and the cellar; `HangOnWall`.
 - 2026-11-11 (v0.11): §11.1, the owner's play test: the radiator ×1.5 against a plain wall, the Tripo desk larger at the same top; §10, §10.1 changed to match.
 - 2026-11-10 (v0.10): §11, the owner's walk: every piece measured as built against its usual true size, six set to theirs; §10's radiator row and §10.1's sill changed to match.

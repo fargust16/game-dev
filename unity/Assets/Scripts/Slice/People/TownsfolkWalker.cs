@@ -78,8 +78,25 @@ namespace GameDev.Slice.People
 
         public const float SeatedHipsBack = 0.26f;
 
-        /// <summary>Authoring default: the hips over the seat's top, for a body of <see cref="MeasuredStature"/>, m.</summary>
-        public const float HipsOverSeat = 0.1f;
+        /// <summary>
+        /// Seat sizes (the owner, 2026-11-12, from the seated bodies measured in play, ANIMATION_PIPELINE_PLAN §13): a
+        /// seated body keeps its feet on the floor, its hip joint 0.54–0.61 m up and the skin under it 0.35–0.45 m up, so a
+        /// seat's top stands 0.42 m over the floor (0.40–0.45), 0.45 m from its front edge to its back, the hips this far
+        /// behind the front edge: its back 0.14–0.21 m behind them, its knees 0.40–0.46 m before them.
+        /// </summary>
+        public const float SeatTop = 0.42f;
+
+        public const float HipsBehindFront = 0.225f;
+
+        /// <summary>
+        /// The seats a walker sits on, m over the floor: the kit's chairs and street benches (0.50–0.56 m) until the owner's
+        /// new seats replace them, the body sinking a little into them, and a street bench on a slope standing up to 6 cm
+        /// higher over the ground under its place (two in Veilmouth at 0.60 m, measured); never a pew or a stool (0.70 m and
+        /// over) or a footstool (authoring defaults).
+        /// </summary>
+        public const float SeatLowest = 0.36f;
+
+        public const float SeatHighest = 0.62f;
 
         /// <summary>The one-shot clips' lengths, s (measured, animation_check.txt), and how long the walker turns to a place first.</summary>
         public const float StandToSitSeconds = 1.3f;
@@ -135,9 +152,8 @@ namespace GameDev.Slice.People
         private int _state;
         private float _k = 1f;
 
-        // Seated, this body's own hips over and behind its root, read once it first sits (LateUpdate); the measured man's,
+        // Seated, this body's own hips behind and beside its root, read once it first sits (LateUpdate); the measured man's,
         // scaled, until then.
-        private float _seatedUp = float.NaN;
         private float _seatedBack = float.NaN;
         private float _seatedSide;
 
@@ -751,12 +767,10 @@ namespace GameDev.Slice.People
         {
             var used = Mathf.Min(_phase, seconds);
             _phase -= used;
-            var seat = SeatRoot();
-            var stand = StandPoint();
+            var seat = SeatRoot(); // the feet stay where it stood: the clip lowers the hips onto the seat behind them
             switch (_step)
             {
                 case 1:
-                    transform.position = Vector3.Lerp(stand, seat, 1f - (_phase / StandToSitSeconds));
                     if (_phase > 0f)
                     {
                         return 0f;
@@ -787,7 +801,6 @@ namespace GameDev.Slice.People
 
                     return seconds - used;
                 default:
-                    transform.position = Vector3.Lerp(seat, stand, 1f - (_phase / SitToStandSeconds));
                     if (_phase > 0f)
                     {
                         return 0f;
@@ -922,15 +935,17 @@ namespace GameDev.Slice.People
             return new Vector3(seat.x, place.Stand.y, seat.z);
         }
 
-        /// <summary>The root seated: the hips over the seat's top, the root under them and in front by the clip's measure, scaled to the body.</summary>
+        /// <summary>
+        /// The root seated: its feet on the floor before the seat, the hips over the place's seat point (which the seat's
+        /// reader sets <see cref="HipsBehindFront"/> behind its front edge), by the body's own seated hips.
+        /// </summary>
         private Vector3 SeatRoot()
         {
             var place = _spot.PlaceAt(_place);
-            var forward = Quaternion.Euler(0f, place.Yaw, 0f) * Vector3.forward;
-            var up = float.IsNaN(_seatedUp) ? SeatedHipsUp * _k : _seatedUp;
+            var turn = Quaternion.Euler(0f, place.Yaw, 0f);
             var back = float.IsNaN(_seatedBack) ? SeatedHipsBack * _k : _seatedBack;
-            var right = Quaternion.Euler(0f, place.Yaw, 0f) * Vector3.right;
-            return place.Seat + (forward * back) - (right * _seatedSide) + (Vector3.up * ((HipsOverSeat * _k) - up));
+            var root = place.Seat + (turn * new Vector3(-_seatedSide, 0f, back));
+            return new Vector3(root.x, place.Stand.y, root.z);
         }
 
         /// <summary>
@@ -954,7 +969,6 @@ namespace GameDev.Slice.People
             var hips = transform.InverseTransformPoint(_animator.GetBoneTransform(HumanBodyBones.Hips).position);
             if (hips.y > 0.4f * _k && hips.y < 0.8f * _k && -hips.z > 0.05f * _k && -hips.z < 0.6f * _k && Mathf.Abs(hips.x) < 0.3f * _k)
             {
-                _seatedUp = hips.y;
                 _seatedBack = -hips.z;
                 _seatedSide = hips.x;
             }

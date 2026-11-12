@@ -18,7 +18,7 @@ namespace GameDev.Slice.EditorTools
     /// every run.
     /// <list type="bullet">
     /// <item>Veilmouth: every street bench, its seat read from its own mesh (the top of its up-facing faces 0.25–0.8 m
-    /// over its foot, its back from the faces above that), a place to every 0.8 m of seat, at most four; Bawling Row's six
+    /// over its foot, its back from the faces above that), a place to every metre of seat, at most four; Bawling Row's six
     /// stalls, a customer before each seller, or two before a stall with none; the Soot &amp; Bell's and the old chapel's
     /// street doors, three places each where an arriving player stands. Each walker's visits are the places within 40 m
     /// of a turn of its route to which a straight walk is clear: ground under every half metre, no step over 0.6 m, and
@@ -50,6 +50,9 @@ namespace GameDev.Slice.EditorTools
         {
             "Assets/Prefabs/SliceKit/BkFurniture/Kit_BkFurniture_Chair_1x1.prefab", "Assets/Prefabs/SliceKit/ViFurniture/Kit_ViFurniture_Chair_1x1.prefab",
         };
+
+        /// <summary>The owner's seat size (2026-11-12): a metre of seat to a person, skirts and hands on the thighs 0.6–0.96 m wide (measured).</summary>
+        public const float PlaceWidth = 1f;
 
         /// <summary>Authoring defaults, m: how far a visit may lead from its turn, and the walk's checks.</summary>
         public const float VisitReach = 40f;
@@ -415,7 +418,8 @@ namespace GameDev.Slice.EditorTools
         /// <summary>
         /// A seat's places read from its own mesh: the top of its up-facing faces 0.25–0.8 m over its foot, most area at
         /// one height; its front away from its back (the faces standing 0.15 m and more over the seat), else its own
-        /// forward; a place to every 1.2 m of its length, up to three.
+        /// forward; a place to every metre of its length, up to four, the hips' point <see cref="TownsfolkWalker.HipsBehindFront"/>
+        /// behind its front edge; none on a seat outside <see cref="TownsfolkWalker.SeatLowest"/>–<see cref="TownsfolkWalker.SeatHighest"/>.
         /// </summary>
         public static ActivitySpot.Place[] Seats(GameObject seat, StringBuilder report)
         {
@@ -501,8 +505,9 @@ namespace GameDev.Slice.EditorTools
             var along = Vector3.Cross(Vector3.up, forward);
             var ends = seatPoints.Select(p => Vector3.Dot(p - middle, along)).ToList();
             var length = ends.Max() - ends.Min();
-            var count = Mathf.Clamp(Mathf.FloorToInt(length / 0.8f), 1, 4);
-            var mid = middle + (along * ((ends.Max() + ends.Min()) * 0.5f));
+            var count = Mathf.Clamp(Mathf.FloorToInt(length / PlaceWidth), 1, 4);
+            var depths = seatPoints.Select(p => Vector3.Dot(p - middle, forward)).ToList();
+            var mid = middle + (along * ((ends.Max() + ends.Min()) * 0.5f)) + (forward * (depths.Max() - TownsfolkWalker.HipsBehindFront));
             var places = new ActivitySpot.Place[count];
             for (var i = 0; i < count; i++)
             {
@@ -512,11 +517,14 @@ namespace GameDev.Slice.EditorTools
                 places[i] = new ActivitySpot.Place { Seat = point, Stand = stand, Yaw = Yaw(forward) };
             }
 
-            var depths = seatPoints.Select(p => Vector3.Dot(p - middle, forward)).ToList();
             var arms = armArea > 0.005f ? $", something facing up {(armSum / armArea) - top:0.00} m over it" : string.Empty;
+            var fits = top - foot >= TownsfolkWalker.SeatLowest && top - foot <= TownsfolkWalker.SeatHighest;
+            var verdict = !fits ? $"NOT SAT ON: outside {TownsfolkWalker.SeatLowest:0.00}–{TownsfolkWalker.SeatHighest:0.00} m"
+                : Mathf.Abs(top - foot - TownsfolkWalker.SeatTop) > 0.03f ? $"{count} places, {top - foot - TownsfolkWalker.SeatTop:+0.00;-0.00} m off the {TownsfolkWalker.SeatTop:0.00} m seat"
+                : $"{count} places";
             report?.AppendLine($"  {seat.name}: seat top {top - foot:0.00} m over the floor{(Mathf.Abs(sunk) > 0.02f ? $" (its foot {sunk:0.00} m under it)" : string.Empty)}, " +
-                               $"{length:0.00} m long, {depths.Max() - depths.Min():0.00} m deep, {(backArea > 0.02f ? $"a back to {backTop - top:0.00} m over the seat" : "no back")}{arms}, {count} places");
-            return places;
+                               $"{length:0.00} m long, {depths.Max() - depths.Min():0.00} m deep, {(backArea > 0.02f ? $"a back to {backTop - top:0.00} m over the seat" : "no back")}{arms}, {verdict}");
+            return fits ? places : new ActivitySpot.Place[0];
         }
 
         /// <summary>Whether a straight walk from <paramref name="from"/> to <paramref name="to"/> is clear (the class summary's checks).</summary>
